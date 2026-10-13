@@ -123,11 +123,11 @@ func (v *RationalInterval) CheckInvariant() error {
 		}
 		return nil
 	}
-	cmp, err := e.Compare(&v.lower, v.lowerKind(), &v.upper, v.upperKind())
+	less, err := e.Less(&v.lower, v.lowerKind(), &v.upper, v.upperKind())
 	if err != nil {
 		return err
 	}
-	if cmp >= 0 {
+	if !less {
 		return ErrExtendedDomain
 	}
 	return nil
@@ -164,12 +164,13 @@ func (v *RationalInterval) Contains(value *numeral.Rational) (bool, error) {
 	if err := v.open(); err != nil {
 		return false, err
 	}
+	e := RationalExtended{Numbers: v.numbers}
 	if !v.lowerInf {
-		cmp, err := v.numbers.Compare(value, &v.lower)
+		less, err := e.Less(value, Finite, &v.lower, Finite)
 		if err != nil {
 			return false, err
 		}
-		if cmp < 0 {
+		if less {
 			return false, nil
 		}
 		if v.lowerOpen {
@@ -183,11 +184,11 @@ func (v *RationalInterval) Contains(value *numeral.Rational) (bool, error) {
 		}
 	}
 	if !v.upperInf {
-		cmp, err := v.numbers.Compare(value, &v.upper)
+		greater, err := e.Less(&v.upper, Finite, value, Finite)
 		if err != nil {
 			return false, err
 		}
-		if cmp > 0 {
+		if greater {
 			return false, nil
 		}
 		if v.upperOpen {
@@ -241,11 +242,12 @@ func (v *RationalInterval) Before(other *RationalInterval) (bool, error) {
 	if v.upperInf || other.lowerInf {
 		return false, nil
 	}
-	cmp, err := v.numbers.Compare(&v.upper, &other.lower)
+	e := RationalExtended{Numbers: v.numbers}
+	less, err := e.Less(&v.upper, Finite, &other.lower, Finite)
 	if err != nil {
 		return false, err
 	}
-	if cmp < 0 {
+	if less {
 		return true, nil
 	}
 	if !v.upperOpen {

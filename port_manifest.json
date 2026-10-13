@@ -35724,7 +35724,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Concrete mpq interval invariant and equality use source extended structural equality before ordered comparison (src/math/interval/interval_def.h:655-699)",
+          "name": "Concrete mpq interval invariant checks extended structural equality before extended less-than (src/math/interval/interval_def.h:655-699)",
           "status": "ported",
           "go_target": "pkg/math/interval/rational_interval.go",
           "tests": [
