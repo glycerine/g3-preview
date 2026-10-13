@@ -169300,7 +169300,7 @@
         },
         {
           "name": "retained scoped_mpf_vector FPA value ownership and MPF subpaving coefficient reserve, indexed copies and ascending cleanup",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_fpa_scoped_values.go",
           "go_targets": [
             "pkg/math/subpaving/arbitrary_shell_coefficients.go"
@@ -169311,6 +169311,10 @@
             "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren",
             "TestArbitraryShellCoefficientSourceConversionAndCleanup"
           ]
+        },
+        {
+          "name": "remaining retained concrete scoped numeral vector specializations in unported owning consumers",
+          "status": "partial"
         }
       ],
       "ownership": [

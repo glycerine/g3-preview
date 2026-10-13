@@ -95,6 +95,16 @@ func TestArbitraryShellCoefficientSourceConversionAndCleanup(t *testing.T) {
 	if err != nil || len(coefficients) != 1 || len(w.coefficients) != 2 {
 		t.Fatalf("source reserve keeps older slot: %d, %d, %v", len(coefficients), len(w.coefficients), err)
 	}
+	// reserve(sz) never shrinks the source vector. Its previous high slot is
+	// still an owned MPF numeral and remains available for a later larger sum.
+	retained, err := core.ToDouble(&w.coefficients[1])
+	if err != nil || retained != math.Exp2(53) {
+		t.Fatalf("smaller sum lost the retained coefficient: %v, %v", retained, err)
+	}
+	_, coefficients, err = w.PrepareSum(&three, []*numeral.Int{&one, &big})
+	if err != nil || len(coefficients) != 2 || len(w.coefficients) != 2 {
+		t.Fatalf("source reserve reuses older slot: %d, %d, %v", len(coefficients), len(w.coefficients), err)
+	}
 	if err := qm.SetFractionSigned(&q, 1, 3); err != nil {
 		t.Fatal(err)
 	}
