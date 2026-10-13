@@ -1,6 +1,7 @@
 package process
 
 import (
+	"bytes"
 	"math"
 	"testing"
 
@@ -35,13 +36,17 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 	must(t, err)
 	d, err := diagnostic.NewDebugContext(region, b)
 	must(t, err)
-	cfg := InitializationConfig{Runtime: m, Rational: r, Symbols: s, Debug: d,
+	var traceOutput bytes.Buffer
+	tr := diagnostic.NewTraceTagsWithWriter(&traceOutput)
+	tr.Enable("gparams")
+	traceCompiled := tr.ShouldTrace("gparams")
+	cfg := InitializationConfig{Runtime: m, Rational: r, Symbols: s, Debug: d, Trace: tr,
 		Params:  params.ParamsConfig{Budget: b, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}},
 		Catalog: params.GlobalParamsCatalogConfig{Budget: b, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}},
 		Globals: params.GlobalParamsConfig{Budget: b, DescriptorPageSize: 2, DescriptorWordsPageSize: 16}}
 	init, err := InitializeGenerated(cfg, math.MaxUint32)
 	must(t, err)
-	if init == nil || init.Context == nil || init.Catalog == nil || init.Globals == nil {
+	if init == nil || init.Context == nil || init.Catalog == nil || init.Globals == nil || init.Trace != tr {
 		t.Fatal("generated initialization did not publish its parameter owners")
 	}
 	g := init.Globals
@@ -57,9 +62,16 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 		t.Fatal("global params did not reread process assertions", enabled, err)
 	}
 	must(t, d.EnableDebug("memory"))
-	tr := diagnostic.NewTraceTags()
 	tr.Enable("memory")
 	must(t, FinalizeGenerated(p, d, g, r, s, tr))
+	wantTrace := ""
+	if traceCompiled {
+		wantTrace = "-------- [gparams] init src/util/gparams.cpp:634 ---------\ngparams::init()\n------------------------------------------------\n" +
+			"-------- [gparams] finalize src/util/gparams.cpp:639 ---------\ngparams::finalize()\n------------------------------------------------\n"
+	}
+	if traceOutput.String() != wantTrace {
+		t.Fatal("generated process trace owner and source order", traceOutput.String())
+	}
 	if enabled, err := d.IsDebugEnabled("memory"); err != nil || enabled || tr.IsEnabled("memory") {
 		t.Fatal("diagnostic finalizers did not clear tags", enabled, err)
 	}
@@ -77,6 +89,9 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 	}
 	must(t, FinalizeGenerated(p, nil, nil, nil, nil, nil))
 	must(t, init.Close())
+	if init.Trace != nil {
+		t.Fatal("closed generated owner retained borrowed trace")
+	}
 	must(t, r.Close())
 	must(t, s.Close())
 	must(t, d.Close())

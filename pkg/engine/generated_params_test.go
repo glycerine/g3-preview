@@ -38,7 +38,8 @@ func TestGeneratedProcessLinksFullParameterCatalog(t *testing.T) {
 	must(err)
 	d, err := diagnostic.NewDebugContext(region, b)
 	must(err)
-	cfg := process.InitializationConfig{Runtime: m, Rational: r, Symbols: s, Debug: d,
+	traceTags := diagnostic.NewTraceTags()
+	cfg := process.InitializationConfig{Runtime: m, Rational: r, Symbols: s, Debug: d, Trace: traceTags,
 		Params:  params.ParamsConfig{Budget: b, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}},
 		Catalog: params.GlobalParamsCatalogConfig{Budget: b, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}},
 		Globals: params.GlobalParamsConfig{Budget: b, DescriptorPageSize: 2, DescriptorWordsPageSize: 16}}
@@ -87,7 +88,7 @@ func TestGeneratedProcessLinksFullParameterCatalog(t *testing.T) {
 		t.Fatal("source module snapshot lost its owned value", n)
 	}
 	must(ready.Context.Del(&snapshot))
-	must(process.FinalizeGenerated(p, d, ready.Globals, r, s, diagnostic.NewTraceTags()))
+	must(process.FinalizeGenerated(p, d, ready.Globals, r, s, traceTags))
 	must(ready.Close())
 	must(r.Close())
 	must(s.Close())

@@ -120516,6 +120516,7 @@
           "tests": [
             "TestGlobalParamsSetNameTracePrecedesNullAssertion",
             "TestGlobalParamsInitGetRefFinalizeTraceOrder",
+            "TestGeneratedInitializeAndFinalizeConcreteServices",
             "TestGlobalParamsNamespaceNullAndSourceArgumentOrder"
           ]
         },
@@ -120723,6 +120724,7 @@
           "tests": [
             "TestGlobalParamsSetNameTracePrecedesNullAssertion",
             "TestGlobalParamsInitGetRefFinalizeTraceOrder",
+            "TestGeneratedInitializeAndFinalizeConcreteServices",
             "TestGlobalParamsNamespaceNullAndSourceArgumentOrder"
           ]
         },
@@ -172329,7 +172331,16 @@
           "tests": [
             "TestTraceEmissionCompileGateAndSourceRecord",
             "TestGlobalParamsSetNameTracePrecedesNullAssertion",
-            "TestGlobalParamsInitGetRefFinalizeTraceOrder"
+            "TestGlobalParamsInitGetRefFinalizeTraceOrder",
+            "TestGeneratedInitializeAndFinalizeConcreteServices"
+          ]
+        },
+        {
+          "name": "generated process binds one borrowed TraceTags owner before gparams init and carries it through source-order finalization",
+          "status": "ported",
+          "go_target": "pkg/util/process/initialize.go",
+          "tests": [
+            "TestGeneratedInitializeAndFinalizeConcreteServices"
           ]
         },
         {
@@ -172420,7 +172431,16 @@
           "tests": [
             "TestTraceEmissionCompileGateAndSourceRecord",
             "TestGlobalParamsSetNameTracePrecedesNullAssertion",
-            "TestGlobalParamsInitGetRefFinalizeTraceOrder"
+            "TestGlobalParamsInitGetRefFinalizeTraceOrder",
+            "TestGeneratedInitializeAndFinalizeConcreteServices"
+          ]
+        },
+        {
+          "name": "generated process binds one borrowed TraceTags owner before gparams init and carries it through source-order finalization",
+          "status": "ported",
+          "go_target": "pkg/util/process/initialize.go",
+          "tests": [
+            "TestGeneratedInitializeAndFinalizeConcreteServices"
           ]
         },
         {

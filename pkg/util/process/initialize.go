@@ -13,26 +13,29 @@ import (
 
 // InitializationConfig supplies the two source static services and the Go
 // storage configurations needed to construct gparams after symbols exist.
-// The runtime and both services are borrowed by the generated binding.
+// The runtime and services are borrowed by the generated binding. A nil Trace
+// uses the process trace tags; pass the same explicit owner to finalization.
 type InitializationConfig struct {
 	Runtime  *memory.Runtime
 	Rational *numeral.RationalGlobalService
 	Symbols  *symbol.Service
 	Debug    *diagnostic.DebugContext
+	Trace    *diagnostic.TraceTags
 	Params   params.ParamsConfig
 	Catalog  params.GlobalParamsCatalogConfig
 	Globals  params.GlobalParamsConfig
 }
 
 // Initialized owns only the Go parameter context/catalog/service prepared
-// during generated initialization. Rational, symbol and memory owners remain
-// with the caller. A partial result is returned with any stage error so its
-// completed Go owners can still be closed.
+// during generated initialization. Rational, symbol, memory and trace owners
+// remain with the caller. A partial result is returned with any stage error so
+// its completed Go owners can still be closed.
 type Initialized struct {
 	self    *Initialized
 	Context *params.ParamsContext
 	Catalog *params.GlobalParamsCatalog
 	Globals *params.GlobalParamsService
+	Trace   *diagnostic.TraceTags
 	closed  bool
 }
 
@@ -103,6 +106,13 @@ func InitializeGenerated(c InitializationConfig, maxSize uint64) (*Initialized, 
 	if err = result.Globals.BindNamespaceAssertions(c.Debug); err != nil {
 		return result, err
 	}
+	result.Trace = c.Trace
+	if result.Trace == nil {
+		result.Trace = diagnostic.BorrowProcessTraceTags()
+	}
+	if err = result.Globals.BindNamespaceTrace(result.Trace); err != nil {
+		return result, err
+	}
 	if err = result.Globals.InitializeSource(); err != nil {
 		return result, err
 	}
@@ -139,6 +149,7 @@ func (v *Initialized) Close() error {
 		}
 		v.Context = nil
 	}
+	v.Trace = nil
 	v.closed = true
 	return nil
 }
