@@ -126,6 +126,25 @@ func (c *FastContext) open() error {
 	return nil
 }
 
+// NewVariable follows context_t<config_mpff>::mk_var before root
+// initialization. The Go root node is allocated with the context, so its
+// bound slots grow alongside the source variable and watch arrays.
+func (c *FastContext) NewVariable(integer bool) (uint32, error) {
+	if err := c.open(); err != nil {
+		return 0, err
+	}
+	if len(c.isInt) >= math.MaxUint32 || c.initStage != 0 || c.root.children != 0 || c.root.trail != nil {
+		return 0, arena.ErrInvalidSlot
+	}
+	x := uint32(len(c.isInt))
+	c.isInt = append(c.isInt, integer)
+	c.watchers = append(c.watchers, nil)
+	c.watchOrder = append(c.watchOrder, nil)
+	c.root.lower = append(c.root.lower, nil)
+	c.root.upper = append(c.root.upper, nil)
+	return x, nil
+}
+
 func (c *FastContext) closeNumerals() (err error) {
 	for _, owner := range c.owned {
 		if owner != nil {

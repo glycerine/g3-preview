@@ -51231,6 +51231,7 @@
         "TestSubpavingFastClauseSharedAtomSourceCleanup",
         "TestSubpavingFastContextRootInitializationOrderAndResume",
         "TestSubpavingFastContextRootInitializationUnitConflict",
+        "TestFastContextTacticVariableGrowthBeforeRoot",
         "TestSubpavingMPFMutableIntervalRetainedCore",
         "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias",
         "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds",
@@ -51765,6 +51766,14 @@
           ]
         },
         {
+          "name": "Concrete config_mpff tactic variable registration before root initialization (src/math/subpaving/subpaving_t_def.h:630-637)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_context.go",
+          "tests": [
+            "TestFastContextTacticVariableGrowthBeforeRoot"
+          ]
+        },
+        {
           "name": "Concrete config_mpf variable registration and context-owned directed inequality prefix",
           "status": "partial",
           "go_target": "pkg/math/subpaving/arbitrary_context_root.go",
@@ -51779,7 +51788,7 @@
         "Root close precedes source-order unit then problem-clause then lemma reference release; shared inequality values close at their last reference, and remaining unreferenced context-owned values close before context numerals. Idempotent release progress preserves cleanup retries."
       ],
       "deviations": [
-        "The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Selected bound justification tags are ported; node search/splitting, complete explanation ownership and the full solver lifecycle remain open."
+        "The config_mpff tactic variable registration now grows source-order type/watch slots and the Go root bound arrays before initialization. The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Selected bound justification tags are ported; node search/splitting, complete explanation ownership and the full solver lifecycle remain open."
       ]
     },
     {
@@ -51950,6 +51959,7 @@
         "TestSubpavingFastClauseSharedAtomSourceCleanup",
         "TestSubpavingFastContextRootInitializationOrderAndResume",
         "TestSubpavingFastContextRootInitializationUnitConflict",
+        "TestFastContextTacticVariableGrowthBeforeRoot",
         "TestSubpavingMPFMutableIntervalRetainedCore",
         "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias",
         "TestSubpavingMPFIntervalMulNineSignClassesAndDirectedBounds",
@@ -52909,6 +52919,14 @@
           ]
         },
         {
+          "name": "Concrete config_mpff tactic variable registration before root initialization (src/math/subpaving/subpaving_t_def.h:630-637)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_context.go",
+          "tests": [
+            "TestFastContextTacticVariableGrowthBeforeRoot"
+          ]
+        },
+        {
           "name": "Concrete config_mpf variable registration and context-owned directed inequality prefix",
           "status": "partial",
           "go_target": "pkg/math/subpaving/arbitrary_context_root.go",
@@ -52923,7 +52941,7 @@
         "Root close precedes source-order unit then problem-clause then lemma reference release; shared inequality values close at their last reference, and remaining unreferenced context-owned values close before context numerals. Idempotent release progress preserves cleanup retries."
       ],
       "deviations": [
-        "The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Selected bound justification tags are ported; node search/splitting, complete explanation ownership and the full solver lifecycle remain open."
+        "The config_mpff tactic variable registration now grows source-order type/watch slots and the Go root bound arrays before initialization. The config_mpff root unit/definition/queue initialization and shared clause teardown are concrete. Selected bound justification tags are ported; node search/splitting, complete explanation ownership and the full solver lifecycle remain open."
       ]
     },
     {
