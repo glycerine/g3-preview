@@ -125,6 +125,15 @@ func (g *RationalGlobalService) Manager() (*RationalManager, error) {
 	}
 	return g.current, nil
 }
+
+// Service borrows the source static rational context used by the generated
+// process lifecycle and its parameter-context consumer.
+func (g *RationalGlobalService) Service() (*RationalService, error) {
+	if e := g.open(); e != nil {
+		return nil, e
+	}
+	return g.service, nil
+}
 func (g *RationalGlobalService) FinalizeSource() error {
 	if e := g.open(); e != nil {
 		return e

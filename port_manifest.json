@@ -4820,14 +4820,35 @@
       "path": "src/api/dll/mem_initializer.cpp",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/process/finalize.go"
+      ],
+      "tests": [
+        "TestGeneratedFinalizeConcreteServices"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mem_initialize: rational, symbols, global params in generated order",
+          "status": "unported"
+        },
+        {
+          "name": "mem_finalize: debug, global params, prime, rational, symbols, trace in generated order",
+          "status": "ported",
+          "go_target": "pkg/util/process/finalize.go",
+          "tests": [
+            "TestGeneratedFinalizeConcreteServices"
+          ]
+        }
+      ],
+      "ownership": [
+        "Generated functions borrow their six concrete process services. Finalization retires each service in source order; the service owners separately release their cold Go metadata."
+      ],
+      "deviations": [
+        "The single-goroutine Go binding returns the first finalizer error and leaves the process finalizing guard set, replacing source uncaught-exception termination. Generated initialization is still unported."
+      ]
     },
     {
       "path": "src/api/dotnet/AST.cs",
@@ -78783,14 +78804,35 @@
       "path": "src/shell/mem_initializer.cpp",
       "component": "shell",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/process/finalize.go"
+      ],
+      "tests": [
+        "TestGeneratedFinalizeConcreteServices"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mem_initialize: rational, symbols, global params in generated order",
+          "status": "unported"
+        },
+        {
+          "name": "mem_finalize: debug, global params, prime, rational, symbols, trace in generated order",
+          "status": "ported",
+          "go_target": "pkg/util/process/finalize.go",
+          "tests": [
+            "TestGeneratedFinalizeConcreteServices"
+          ]
+        }
+      ],
+      "ownership": [
+        "Generated functions borrow their six concrete process services. Finalization retires each service in source order; the service owners separately release their cold Go metadata."
+      ],
+      "deviations": [
+        "The single-goroutine Go binding returns the first finalizer error and leaves the process finalizing guard set, replacing source uncaught-exception termination. Generated initialization is still unported."
+      ]
     },
     {
       "path": "src/shell/opt_frontend.cpp",
@@ -108905,14 +108947,35 @@
       "path": "src/test/mem_initializer.cpp",
       "component": "test",
       "role": "test",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/process/finalize.go"
+      ],
+      "tests": [
+        "TestGeneratedFinalizeConcreteServices"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "mem_initialize: rational, symbols, global params in generated order",
+          "status": "unported"
+        },
+        {
+          "name": "mem_finalize: debug, global params, prime, rational, symbols, trace in generated order",
+          "status": "ported",
+          "go_target": "pkg/util/process/finalize.go",
+          "tests": [
+            "TestGeneratedFinalizeConcreteServices"
+          ]
+        }
+      ],
+      "ownership": [
+        "Generated functions borrow their six concrete process services. Finalization retires each service in source order; the service owners separately release their cold Go metadata."
+      ],
+      "deviations": [
+        "The single-goroutine Go binding returns the first finalizer error and leaves the process finalizing guard set, replacing source uncaught-exception termination. Generated initialization is still unported."
+      ]
     },
     {
       "path": "src/test/memory.cpp",
@@ -146601,7 +146664,8 @@
         "pkg/sat/sat_solver_runtime.go",
         "pkg/sat/tactic/sat_goal_to_sat.go",
         "pkg/model/model_evaluator.go",
-        "pkg/util/memory/process_accounting.go"
+        "pkg/util/memory/process_accounting.go",
+        "pkg/util/process/finalize.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -146672,7 +146736,8 @@
         "TestModelEvaluatorSharedProcessMemoryAndCohort",
         "TestNumericStreamNativeCountedTextAndOwnedInput",
         "TestProcessSourceLifecycleGuards",
-        "TestProcessSourceLifecycleRejectsInvalidOwners"
+        "TestProcessSourceLifecycleRejectsInvalidOwners",
+        "TestGeneratedFinalizeConcreteServices"
       ],
       "conditionals": [
         {
@@ -146902,9 +146967,11 @@
           "name": "caller-confined actual generated initialize/finalize scalar order cpp89-113/153-160 with stable-priority rational-symbol-gparams and debug-gparams-prime-rational-symbol-trace finalizers",
           "status": "partial",
           "go_target": "pkg/util/memory/process_accounting.go",
+          "go_targets": ["pkg/util/process/finalize.go"],
           "tests": [
             "TestProcessSourceLifecycleGuards",
-            "TestProcessSourceLifecycleRejectsInvalidOwners"
+            "TestProcessSourceLifecycleRejectsInvalidOwners",
+            "TestGeneratedFinalizeConcreteServices"
           ]
         },
         {
@@ -146970,7 +147037,8 @@
         "pkg/sat/sat_solver_runtime.go",
         "pkg/sat/tactic/sat_goal_to_sat.go",
         "pkg/model/model_evaluator.go",
-        "pkg/util/memory/process_accounting.go"
+        "pkg/util/memory/process_accounting.go",
+        "pkg/util/process/finalize.go"
       ],
       "tests": [
         "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -147029,7 +147097,8 @@
         "TestModelEvaluatorSharedProcessMemoryAndCohort",
         "TestNumericStreamNativeCountedTextAndOwnedInput",
         "TestProcessSourceLifecycleGuards",
-        "TestProcessSourceLifecycleRejectsInvalidOwners"
+        "TestProcessSourceLifecycleRejectsInvalidOwners",
+        "TestGeneratedFinalizeConcreteServices"
       ],
       "conditionals": [
         {
@@ -147237,9 +147306,11 @@
           "name": "caller-confined actual generated initialize/finalize scalar order cpp89-113/153-160 with stable-priority rational-symbol-gparams and debug-gparams-prime-rational-symbol-trace finalizers",
           "status": "partial",
           "go_target": "pkg/util/memory/process_accounting.go",
+          "go_targets": ["pkg/util/process/finalize.go"],
           "tests": [
             "TestProcessSourceLifecycleGuards",
-            "TestProcessSourceLifecycleRejectsInvalidOwners"
+            "TestProcessSourceLifecycleRejectsInvalidOwners",
+            "TestGeneratedFinalizeConcreteServices"
           ]
         }
       ],
