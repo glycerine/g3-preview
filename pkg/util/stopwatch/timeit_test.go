@@ -75,7 +75,10 @@ func TestTimeitDisabledErasureAndDefaultOutput(t *testing.T) {
 	timerMust(t, disabled.Close())
 	timerMust(t, disabled.Cleanup())
 	var scope Timeit
-	timerMust(t, scope.Construct(true, TimeitConfig{Clock: func() (uint64, error) { return 100, nil }}))
+	timerMust(t, scope.Construct(true, TimeitConfig{
+		Clock:  func() (uint64, error) { return 100, nil },
+		Memory: func() (uint64, error) { return 0, nil },
+	}))
 	if scope.output != os.Stderr {
 		t.Fatal("default output")
 	}
@@ -88,6 +91,24 @@ func TestTimeitDisabledErasureAndDefaultOutput(t *testing.T) {
 	if absent.Construct(false, TimeitConfig{}) != ErrTimeitOwner || absent.Close() != ErrTimeitOwner {
 		t.Fatal("nil scope")
 	}
+}
+
+func TestTimeitEnabledRequiresSourceProcessMemory(t *testing.T) {
+	var missing Timeit
+	if e := missing.Construct(true, TimeitConfig{Clock: func() (uint64, error) {
+		t.Fatal("missing source must fail before clock start")
+		return 0, nil
+	}}); e != ErrTimeitMemorySource || missing.Close() != ErrTimeitMemorySource {
+		t.Fatal("enabled scope accepted missing process memory", e)
+	}
+	timerMust(t, missing.Cleanup())
+	p := memory.NewProcessAccounting()
+	copyProcess := *p
+	var copied Timeit
+	if e := copied.Construct(true, TimeitConfig{Process: &copyProcess}); e != ErrTimeitOwner || copied.Close() != ErrTimeitOwner {
+		t.Fatal("copied process owner accepted", e)
+	}
+	timerMust(t, copied.Cleanup())
 }
 
 func TestTimeitClockAndMemoryFailurePrefixes(t *testing.T) {
@@ -103,7 +124,7 @@ func TestTimeitClockAndMemoryFailurePrefixes(t *testing.T) {
 				}
 				return 100, nil
 			}
-			config := TimeitConfig{Output: &output, Clock: func() (uint64, error) { return 100, nil }}
+			config := TimeitConfig{Output: &output, Clock: func() (uint64, error) { return 100, nil }, Memory: func() (uint64, error) { return 0, nil }}
 			if failedProvider == "clock" {
 				config.Clock = provider
 			} else {
@@ -151,7 +172,7 @@ func TestTimeitOutputFailureAndFlush(t *testing.T) {
 			output.flushError = failure
 		}
 		var scope Timeit
-		timerMust(t, scope.Construct(true, TimeitConfig{Output: output, Message: "report", Clock: func() (uint64, error) { return 0, nil }}))
+		timerMust(t, scope.Construct(true, TimeitConfig{Output: output, Message: "report", Clock: func() (uint64, error) { return 0, nil }, Memory: func() (uint64, error) { return 0, nil }}))
 		cause := scope.Close()
 		if mode == "success" {
 			timerMust(t, cause)
@@ -204,7 +225,7 @@ func TestTimeitEachSourceOutputBoundary(t *testing.T) {
 		for at := 1; at <= len(parts); at++ {
 			out := &timeitBoundaryWriter{failAt: at, partial: partial, cause: failure}
 			var scope Timeit
-			timerMust(t, scope.Construct(true, TimeitConfig{Output: out, Message: "report", Clock: func() (uint64, error) { return 0, nil }}))
+			timerMust(t, scope.Construct(true, TimeitConfig{Output: out, Message: "report", Clock: func() (uint64, error) { return 0, nil }, Memory: func() (uint64, error) { return 0, nil }}))
 			e := scope.Close()
 			want := failure
 			if partial != 0 {

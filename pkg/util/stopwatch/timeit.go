@@ -13,10 +13,12 @@ import (
 
 var ErrTimeitOwner = errors.New("g3: invalid timeit owner")
 var ErrTimeitPending = errors.New("g3: timeit operation in progress")
+var ErrTimeitMemorySource = errors.New("g3: enabled timeit requires a process memory source")
 
 // TimeitConfig supplies optional report providers. Output defaults to stderr;
 // Memory reports bytes; Process supplies the source shared allocation count
-// when Memory is nil. A nil Clock uses process CPU time.
+// when Memory is nil. Enabled scopes require one of them. A nil Clock uses
+// process CPU time.
 type TimeitConfig struct {
 	Output  io.Writer
 	Message string
@@ -54,7 +56,10 @@ func (p *Timeit) Construct(enabled bool, config TimeitConfig) (cause error) {
 	}
 	p.message, _, _ = strings.Cut(config.Message, "\x00")
 	p.memory = config.Memory
-	if p.memory == nil && config.Process != nil {
+	if p.memory == nil {
+		if config.Process == nil {
+			return ErrTimeitMemorySource
+		}
 		if !config.Process.Valid() {
 			return ErrTimeitOwner
 		}
