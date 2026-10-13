@@ -34815,7 +34815,8 @@
         "pkg/math/subpaving/arbitrary_interval_div.go",
         "pkg/math/subpaving/arbitrary_interval_scalar.go",
         "pkg/math/subpaving/arbitrary_interval_power.go",
-        "pkg/math/interval/arbitrary_root.go"
+        "pkg/math/interval/arbitrary_root.go",
+        "pkg/math/subpaving/arbitrary_interval_root.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34843,7 +34844,8 @@
         "TestSubpavingMPFIntervalDivSixSignBranchesAndOpenZero",
         "TestSubpavingMPFIntervalScalarMulDiv",
         "TestSubpavingMPFIntervalPowerRetainedCases",
-        "TestArbitraryRootRetainedNewtonCertifiedBoundsAndCancellation"
+        "TestArbitraryRootRetainedNewtonCertifiedBoundsAndCancellation",
+        "TestSubpavingMPFIntervalXnEqYRetainedCases"
       ],
       "conditionals": [
         {
@@ -35498,6 +35500,14 @@
           "go_target": "pkg/math/interval/arbitrary_root.go",
           "tests": [
             "TestArbitraryRootRetainedNewtonCertifiedBoundsAndCancellation"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf monomial x^n=y inverse image with even symmetric and odd directed roots (src/math/interval/interval_def.h:1390-1478)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_root.go",
+          "tests": [
+            "TestSubpavingMPFIntervalXnEqYRetainedCases"
           ]
         }
       ],
