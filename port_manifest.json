@@ -175845,11 +175845,13 @@
         },
         {
           "name": "pattern_inference retained no-pattern, arithmetic fallback and failed-inference formatted warning callers",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/pattern/reduce_quantifier.go",
+          "go_targets": ["pkg/smtcore/pattern_inference_rewriter.go"],
           "tests": [
             "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
-            "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
+            "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
+            "TestPatternInferenceParamsBindRewriterAndRefresh"
           ]
         },
         {
@@ -175944,11 +175946,13 @@
         },
         {
           "name": "pattern_inference concrete warning_msg %s and %d call sites through borrowed WarningService",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/pattern/reduce_quantifier.go",
+          "go_targets": ["pkg/smtcore/pattern_inference_rewriter.go"],
           "tests": [
             "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
-            "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
+            "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
+            "TestPatternInferenceParamsBindRewriterAndRefresh"
           ]
         },
         {

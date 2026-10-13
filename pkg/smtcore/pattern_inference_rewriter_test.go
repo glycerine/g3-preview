@@ -1,10 +1,12 @@
 package smtcore
 
 import (
+	"bytes"
 	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -45,7 +47,9 @@ func TestPatternInferenceParamsBindRewriterAndRefresh(t *testing.T) {
 	m, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: c.Symbols(), Numerals: c.Numerals(), Budget: b})
 	paramsMust(t, err)
 	t.Cleanup(func() { paramsMust(t, m.Close()) })
-	r, err := owner.NewInferenceRewriter(m, nil)
+	var warningOutput bytes.Buffer
+	warnings := diagnostic.NewWarningService(&warningOutput)
+	r, err := owner.NewInferenceRewriter(m, warnings)
 	paramsMust(t, err)
 	t.Cleanup(func() { paramsMust(t, r.Close()) })
 	boolSort, err := m.MkBoolSort()
@@ -54,8 +58,20 @@ func TestPatternInferenceParamsBindRewriterAndRefresh(t *testing.T) {
 	paramsMust(t, err)
 	paramsMust(t, m.IncRef(variable))
 	t.Cleanup(func() { paramsMust(t, m.DecRef(variable)) })
+	truth, err := m.MkFamilyApp(m.BasicFamilyID(), ast.ASTOpTrue, nil, nil)
+	paramsMust(t, err)
+	inner, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: false, Sorts: []ast.ASTHandle{boolSort}, Names: []symbol.Symbol{symbol.Numerical(990)}, Body: truth,
+	})
+	paramsMust(t, err)
+	paramsMust(t, m.IncRef(inner))
+	t.Cleanup(func() { paramsMust(t, m.DecRef(inner)) })
+	body, err := m.MkFamilyApp(m.BasicFamilyID(), ast.ASTOpAnd, nil, []ast.ASTHandle{variable, inner})
+	paramsMust(t, err)
+	paramsMust(t, m.IncRef(body))
+	t.Cleanup(func() { paramsMust(t, m.DecRef(body)) })
 	q, err := m.MkQuantifier(ast.ASTQuantifierSpec{
-		Forall: true, Sorts: []ast.ASTHandle{boolSort}, Names: []symbol.Symbol{symbol.Numerical(991)}, Body: variable,
+		Forall: true, Sorts: []ast.ASTHandle{boolSort}, Names: []symbol.Symbol{symbol.Numerical(991)}, Body: body,
 	})
 	paramsMust(t, err)
 	paramsMust(t, m.IncRef(q))
@@ -69,11 +85,34 @@ func TestPatternInferenceParamsBindRewriterAndRefresh(t *testing.T) {
 	key = "pull_quantifiers"
 	paramsMust(t, c.SetBoolName(local, &key, false))
 	paramsMust(t, owner.Update(local))
-	paramsMust(t, owner.UpdateInferenceRewriter(r, nil))
+	paramsMust(t, owner.UpdateInferenceRewriter(r, warnings))
 	paramsMust(t, r.Resume(out))
 	got, err := m.RefGet(out)
 	paramsMust(t, err)
 	if got != q {
 		t.Fatal("refreshed pi option did not reach suspended traversal", got, q)
+	}
+	warningOutput.Reset()
+	decl, err := m.MkFuncDecl(symbol.Numerical(992), []ast.ASTHandle{boolSort}, boolSort, ast.ASTFuncDeclInfo{})
+	paramsMust(t, err)
+	paramsMust(t, m.IncRef(decl))
+	t.Cleanup(func() { paramsMust(t, m.DecRef(decl)) })
+	app, err := m.MkApp(decl, []ast.ASTHandle{variable})
+	paramsMust(t, err)
+	paramsMust(t, m.IncRef(app))
+	t.Cleanup(func() { paramsMust(t, m.DecRef(app)) })
+	qid, err := m.Symbols.Intern("smt-warning")
+	paramsMust(t, err)
+	withNoPattern, err := m.MkQuantifier(ast.ASTQuantifierSpec{
+		Forall: true, Sorts: []ast.ASTHandle{boolSort}, Names: []symbol.Symbol{symbol.Numerical(993)},
+		Body: app, QID: qid, NoPatterns: []ast.ASTHandle{app},
+	})
+	paramsMust(t, err)
+	paramsMust(t, m.IncRef(withNoPattern))
+	t.Cleanup(func() { paramsMust(t, m.DecRef(withNoPattern)) })
+	paramsMust(t, r.Rewrite(withNoPattern, out))
+	const wantWarning = "WARNING: ignoring nopats annotation because Z3 couldn't find any other pattern (quantifier id: smt-warning)\n"
+	if got := warningOutput.String(); got != wantWarning {
+		t.Fatal("SMT parameter warning did not reach the borrowed stream", got)
 	}
 }
