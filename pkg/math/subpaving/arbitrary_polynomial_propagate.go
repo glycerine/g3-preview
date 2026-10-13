@@ -13,7 +13,7 @@ import (
 // PropagatePolynomial applies the source's single-unbounded-variable rule.
 // The stored constant is intentionally absent from the source calculation.
 func (c *ArbitraryContext) PropagatePolynomial(variable uint32, n *ArbitraryNode) error {
-	if err := c.checkRoot(n, variable); err != nil {
+	if err := c.checkNode(n, variable); err != nil {
 		return err
 	}
 	if n.conflictVar != math.MaxUint32 {

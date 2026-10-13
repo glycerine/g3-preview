@@ -15,21 +15,21 @@ type arbitraryWatch struct {
 	clause     *ArbitraryClause
 }
 
-// PropagateQueued checkpoints before each bound and processes clause watches
-// in their original interleaved registration order.
+// PropagateQueued checkpoints before each bound and processes clause and
+// definition watches in their original interleaved registration order.
 func (c *ArbitraryContext) PropagateQueued(n *ArbitraryNode) error {
 	if err := c.open(); err != nil {
 		return err
 	}
-	if n == nil || n != c.root || n.context != c {
-		return arena.ErrInvalidSlot
+	if err := c.validNode(n); err != nil {
+		return err
 	}
 	for c.queueHead < len(c.queue) && n.conflictVar == math.MaxUint32 {
 		if !c.limit.Inc() {
 			return ErrArbitraryContextCanceled
 		}
 		b := c.queue[c.queueHead]
-		if b == nil || b.context != c || b.variable >= uint32(len(c.variables)) {
+		if b == nil || b.context != c || b.variable >= uint32(len(c.variables)) || !c.boundOnTrail(n, b) {
 			return arena.ErrInvalidSlot
 		}
 		c.queueHead++

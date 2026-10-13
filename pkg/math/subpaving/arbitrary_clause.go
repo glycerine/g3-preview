@@ -32,7 +32,7 @@ func (c *ArbitraryContext) inequalityValue(a *ArbitraryInequality, n *ArbitraryN
 	if err := c.checkInequality(a); err != nil {
 		return arbitraryUnknown, err
 	}
-	if err := c.checkRoot(n, a.variable); err != nil {
+	if err := c.checkNode(n, a.variable); err != nil {
 		return arbitraryUnknown, err
 	}
 	u, l := n.upper[a.variable], n.lower[a.variable]

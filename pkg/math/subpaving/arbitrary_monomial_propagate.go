@@ -11,7 +11,7 @@ import (
 )
 
 func (c *ArbitraryContext) PropagateMonomial(variable uint32, n *ArbitraryNode) (err error) {
-	if err = c.checkRoot(n, variable); err != nil {
+	if err = c.checkNode(n, variable); err != nil {
 		return err
 	}
 	if n.conflictVar != math.MaxUint32 {
@@ -51,10 +51,10 @@ func (c *ArbitraryContext) PropagateMonomial(variable uint32, n *ArbitraryNode) 
 		if err = c.numbers.SetInt32(&zero, 0); err != nil {
 			return err
 		}
-		if err = c.publishBoundWithReason(n, variable, &zero, true, false, false, nil, variable, true); err != nil || n.conflictVar != math.MaxUint32 {
+		if err = c.publishBoundWithReason(n, variable, &zero, true, false, false, nil, variable, true, true); err != nil || n.conflictVar != math.MaxUint32 {
 			return err
 		}
-		return c.publishBoundWithReason(n, variable, &zero, false, false, false, nil, variable, true)
+		return c.publishBoundWithReason(n, variable, &zero, false, false, false, nil, variable, true, true)
 	}
 	xUnbounded := n.lower[variable] == nil && n.upper[variable] == nil
 	if !foundUnbounded {

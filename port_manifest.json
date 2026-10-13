@@ -51746,6 +51746,8 @@
         "pkg/math/subpaving/arbitrary_monomial_propagate_test.go",
         "pkg/math/subpaving/arbitrary_context_init.go",
         "pkg/math/subpaving/arbitrary_context_init_test.go",
+        "pkg/math/subpaving/arbitrary_context_child.go",
+        "pkg/math/subpaving/arbitrary_context_child_test.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
@@ -51838,6 +51840,7 @@
         "TestArbitraryPolynomialForwardInverseAndQueue",
         "TestArbitraryMonomialForwardInverseAndArithmetic",
         "TestArbitraryContextRootInitializationStagesAndConflict",
+        "TestArbitraryChildRecentBoundReplayAndPolynomialWatcher",
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFixedNodeBoundPredicates",
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
@@ -52560,6 +52563,18 @@
           ],
           "tests": [
             "TestArbitraryContextRootInitializationStagesAndConflict"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf child copied bound views, unqueued decisions, newest-first surviving bound replay, and child polynomial watcher dispatch (src/math/subpaving/subpaving_t_def.h:310-342,1661-1681)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_context_child.go",
+          "go_targets": [
+            "pkg/math/subpaving/arbitrary_context_bounds.go",
+            "pkg/math/subpaving/arbitrary_context_propagate.go"
+          ],
+          "tests": [
+            "TestArbitraryChildRecentBoundReplayAndPolynomialWatcher"
           ]
         },
         {

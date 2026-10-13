@@ -29,23 +29,38 @@ type ArbitraryBound struct {
 
 type ArbitraryNode struct {
 	context      *ArbitraryContext
+	parent       *ArbitraryNode
+	id           uint32
+	depth        uint32
+	children     uint32
 	lower, upper []*ArbitraryBound
 	trail        *ArbitraryBound
 	conflictVar  uint32
+	closed       bool
 }
 
-func (c *ArbitraryContext) checkRoot(n *ArbitraryNode, variable uint32) error {
+func (c *ArbitraryContext) validNode(n *ArbitraryNode) error {
 	if err := c.open(); err != nil {
 		return err
 	}
-	if n == nil || n != c.root || n.context != c || variable >= uint32(len(c.variables)) {
+	if n == nil || n.context != c || n.closed || n.id >= uint32(len(c.nodes)) || c.nodes[n.id] != n {
 		return arena.ErrInvalidSlot
 	}
 	return nil
 }
 
-// Root creates the source's initial all-unbounded node. Later initialization
-// phases (definition propagation and search) remain with the context port.
+func (c *ArbitraryContext) checkNode(n *ArbitraryNode, variable uint32) error {
+	if err := c.validNode(n); err != nil {
+		return err
+	}
+	if variable >= uint32(len(c.variables)) {
+		return arena.ErrInvalidSlot
+	}
+	return nil
+}
+
+// Root creates the source's initial all-unbounded node before unit assertion,
+// the definition sweep, and queued propagation.
 func (c *ArbitraryContext) Root() (*ArbitraryNode, error) {
 	if err := c.open(); err != nil {
 		return nil, err
@@ -56,6 +71,7 @@ func (c *ArbitraryContext) Root() (*ArbitraryNode, error) {
 			context: c, lower: make([]*ArbitraryBound, len(c.variables)),
 			upper: make([]*ArbitraryBound, len(c.variables)), conflictVar: math.MaxUint32,
 		}
+		c.nodes = append(c.nodes, c.root)
 	}
 	return c.root, nil
 }
@@ -64,7 +80,7 @@ func (n *ArbitraryNode) Bounds(variable uint32) (lower, upper *ArbitraryBound, e
 	if n == nil || n.context == nil {
 		return nil, nil, arena.ErrInvalidSlot
 	}
-	if err = n.context.checkRoot(n, variable); err != nil {
+	if err = n.context.checkNode(n, variable); err != nil {
 		return nil, nil, err
 	}
 	return n.lower[variable], n.upper[variable], nil
@@ -115,11 +131,11 @@ func (c *ArbitraryContext) PublishBound(n *ArbitraryNode, variable uint32, value
 }
 
 func (c *ArbitraryContext) publishBoundReason(n *ArbitraryNode, variable uint32, value *numeral.ArbitraryFloat, lower, open, axiom bool, clause *ArbitraryClause) error {
-	return c.publishBoundWithReason(n, variable, value, lower, open, axiom, clause, 0, false)
+	return c.publishBoundWithReason(n, variable, value, lower, open, axiom, clause, 0, false, true)
 }
 
-func (c *ArbitraryContext) publishBoundWithReason(n *ArbitraryNode, variable uint32, value *numeral.ArbitraryFloat, lower, open, axiom bool, clause *ArbitraryClause, reasonVariable uint32, definitionReason bool) error {
-	if err := c.checkRoot(n, variable); err != nil {
+func (c *ArbitraryContext) publishBoundWithReason(n *ArbitraryNode, variable uint32, value *numeral.ArbitraryFloat, lower, open, axiom bool, clause *ArbitraryClause, reasonVariable uint32, definitionReason, enqueue bool) error {
+	if err := c.checkNode(n, variable); err != nil {
 		return err
 	}
 	if value == nil || n.conflictVar != math.MaxUint32 {
@@ -176,7 +192,9 @@ func (c *ArbitraryContext) publishBoundWithReason(n *ArbitraryNode, variable uin
 	if c.timestamp == math.MaxUint64 {
 		return ErrArbitraryContextTimestamp
 	}
-	c.queue = append(c.queue, b)
+	if enqueue {
+		c.queue = append(c.queue, b)
+	}
 	return nil
 }
 

@@ -48,7 +48,7 @@ func (c *ArbitraryContext) NormalizeBound(variable uint32, value *numeral.Arbitr
 // RelevantNewBound evaluates conflict, zero-epsilon improvement, max-bound,
 // then positive-epsilon gap in the source order. Candidate is normalized.
 func (c *ArbitraryContext) RelevantNewBound(n *ArbitraryNode, variable uint32, candidate *numeral.ArbitraryFloat, lower, open bool) (bool, error) {
-	if err := c.checkRoot(n, variable); err != nil {
+	if err := c.checkNode(n, variable); err != nil {
 		return false, err
 	}
 	if candidate == nil {
@@ -208,7 +208,7 @@ func (c *ArbitraryContext) propagateCandidateDefinition(n *ArbitraryNode, variab
 }
 
 func (c *ArbitraryContext) propagateCandidate(n *ArbitraryNode, variable uint32, value *numeral.ArbitraryFloat, lower, open bool, definition uint32, fromDefinition bool) (bool, error) {
-	if err := c.checkRoot(n, variable); err != nil {
+	if err := c.checkNode(n, variable); err != nil {
 		return false, err
 	}
 	if value == nil {
@@ -224,7 +224,7 @@ func (c *ArbitraryContext) propagateCandidate(n *ArbitraryNode, variable uint32,
 	if err != nil || !relevant {
 		return relevant, err
 	}
-	if err := c.publishBoundWithReason(n, variable, &c.candidateScratch, lower, open, !fromDefinition, nil, definition, fromDefinition); err != nil {
+	if err := c.publishBoundWithReason(n, variable, &c.candidateScratch, lower, open, !fromDefinition, nil, definition, fromDefinition, true); err != nil {
 		return true, err
 	}
 	return true, nil
