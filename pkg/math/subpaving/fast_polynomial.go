@@ -228,7 +228,7 @@ func (c *FastContext) propagatePolynomialTarget(p *FastPolynomial, variable, tar
 		return err
 	}
 	if !r.lowerInf {
-		if _, err = c.PropagateCandidate(n, target, lower, true, r.lowerOpen); err != nil {
+		if _, err = c.propagateCandidateReason(n, target, lower, true, r.lowerOpen, fastBoundReason{kind: fastReasonVariableDefinition, variable: variable}); err != nil {
 			return err
 		}
 		if n.inconsistent {
@@ -236,7 +236,7 @@ func (c *FastContext) propagatePolynomialTarget(p *FastPolynomial, variable, tar
 		}
 	}
 	if !r.upperInf {
-		_, err = c.PropagateCandidate(n, target, upper, false, r.upperOpen)
+		_, err = c.propagateCandidateReason(n, target, upper, false, r.upperOpen, fastBoundReason{kind: fastReasonVariableDefinition, variable: variable})
 	}
 	return err
 }

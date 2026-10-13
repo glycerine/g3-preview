@@ -11,6 +11,22 @@ import (
 
 // FastBound owns its scoped numeral. Node bound arrays borrow these values;
 // a child can retain bounds created by its parent until it closes.
+type fastBoundReasonKind uint8
+
+const (
+	fastReasonUnknown fastBoundReasonKind = iota
+	fastReasonAxiom
+	fastReasonAssumption
+	fastReasonClause
+	fastReasonVariableDefinition
+)
+
+type fastBoundReason struct {
+	kind     fastBoundReasonKind
+	clause   *FastClause // borrowed source justification pointer
+	variable uint32
+}
+
 type FastBound struct {
 	owner     *numeral.ScopedFastFloat
 	value     *numeral.FastFloat
@@ -18,6 +34,7 @@ type FastBound struct {
 	lower     bool
 	open      bool
 	decision  bool
+	reason    fastBoundReason
 	timestamp uint64
 	prev      *FastBound
 }

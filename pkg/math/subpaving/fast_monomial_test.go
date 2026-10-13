@@ -95,6 +95,10 @@ func TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue(t *testing.T) {
 	}
 	fastMonomialCheckBound(t, m, root, v, x, 4, true)
 	fastMonomialCheckBound(t, m, root, v, x, 9, false)
+	if root.lower[x].reason != (fastBoundReason{kind: fastReasonVariableDefinition, variable: x}) ||
+		root.upper[x].reason != (fastBoundReason{kind: fastReasonVariableDefinition, variable: x}) {
+		t.Fatal("forward monomial justification")
+	}
 	if c.monomials[x].visited == 0 || c.numVisited == 0 {
 		t.Fatal("watch queue did not visit monomial")
 	}
@@ -111,6 +115,10 @@ func TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue(t *testing.T) {
 	zero, err := root2.IsZero(y)
 	if err != nil || !zero {
 		t.Fatal("even upper-zero factor did not force zero", zero, err)
+	}
+	if root2.lower[y].reason != (fastBoundReason{kind: fastReasonVariableDefinition, variable: y}) ||
+		root2.upper[y].reason != (fastBoundReason{kind: fastReasonVariableDefinition, variable: y}) {
+		t.Fatal("zero monomial justification")
 	}
 }
 

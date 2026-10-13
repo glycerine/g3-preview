@@ -194,8 +194,13 @@ func (c *FastContext) AssertUnitClauses(n *FastNode) error {
 		if !c.limit.Inc() {
 			return ErrFastContextCanceled
 		}
-		a := c.unitClauses[c.unitHead].atom
-		if err := c.PropagateBound(n, a.variable, a.value, a.lower, a.open); err != nil {
+		unit := c.unitClauses[c.unitHead]
+		a := unit.atom
+		reason := fastBoundReason{kind: fastReasonAssumption}
+		if unit.axiom {
+			reason.kind = fastReasonAxiom
+		}
+		if err := c.propagateBoundReason(n, a.variable, a.value, a.lower, a.open, reason); err != nil {
 			return err
 		}
 		c.unitHead++
@@ -302,7 +307,7 @@ func (c *FastContext) PropagateClause(clause *FastClause, n *FastNode) error {
 		unknown = 0
 	}
 	a := clause.atoms[unknown]
-	if err := c.PropagateBound(n, a.variable, a.value, a.lower, a.open); err != nil {
+	if err := c.propagateBoundReason(n, a.variable, a.value, a.lower, a.open, fastBoundReason{kind: fastReasonClause, clause: clause}); err != nil {
 		return err
 	}
 	clause.visited = c.timestamp

@@ -108,6 +108,10 @@ func TestSubpavingFastPolynomialForwardReverseAndOwnedCoefficients(t *testing.T)
 	bound(forward, root, 1, 4, false)
 	must(forward.PropagatePolynomial(x, root))
 	check(root, x, 4, 6)
+	if root.lower[x].reason != (fastBoundReason{kind: fastReasonVariableDefinition, variable: x}) ||
+		root.upper[x].reason != (fastBoundReason{kind: fastReasonVariableDefinition, variable: x}) {
+		t.Fatal("forward polynomial justification")
+	}
 	if forward.polynomials[x].visited != forward.timestamp-2 {
 		t.Fatal("polynomial visitation timestamp")
 	}
@@ -121,6 +125,10 @@ func TestSubpavingFastPolynomialForwardReverseAndOwnedCoefficients(t *testing.T)
 	bound(reverse, root, x, 6, false)
 	must(reverse.PropagatePolynomial(x, root))
 	check(root, 1, 2, 5)
+	if root.lower[1].reason != (fastBoundReason{kind: fastReasonVariableDefinition, variable: x}) ||
+		root.upper[1].reason != (fastBoundReason{kind: fastReasonVariableDefinition, variable: x}) {
+		t.Fatal("reverse polynomial justification")
+	}
 	must(m.SetInt32(coefficient, 9))
 	if reverse.polynomials[x].terms[0].Coefficient == coefficient {
 		t.Fatal("polynomial retained borrowed coefficient")

@@ -253,7 +253,11 @@ func (c *FastContext) RelevantNewBound(n *FastNode, variable uint32, k *numeral.
 // node's new interval for conflict. Relevance testing is the caller's choice,
 // as source unit clauses publish directly.
 func (c *FastContext) PropagateBound(n *FastNode, variable uint32, value *numeral.FastFloat, lower, open bool) (err error) {
-	return c.publishBound(n, variable, value, lower, open, true)
+	return c.propagateBoundReason(n, variable, value, lower, open, fastBoundReason{})
+}
+
+func (c *FastContext) propagateBoundReason(n *FastNode, variable uint32, value *numeral.FastFloat, lower, open bool, reason fastBoundReason) error {
+	return c.publishBound(n, variable, value, lower, open, true, reason)
 }
 
 // DecideBound creates the source's branch decision without putting it on the
@@ -262,10 +266,10 @@ func (c *FastContext) DecideBound(n *FastNode, variable uint32, value *numeral.F
 	if n == nil || n.parent == nil {
 		return arena.ErrInvalidSlot
 	}
-	return c.publishBound(n, variable, value, lower, open, false)
+	return c.publishBound(n, variable, value, lower, open, false, fastBoundReason{kind: fastReasonAxiom})
 }
 
-func (c *FastContext) publishBound(n *FastNode, variable uint32, value *numeral.FastFloat, lower, open, enqueue bool) (err error) {
+func (c *FastContext) publishBound(n *FastNode, variable uint32, value *numeral.FastFloat, lower, open, enqueue bool, reason fastBoundReason) (err error) {
 	if err = c.checkNode(n, variable); err != nil {
 		return err
 	}
@@ -294,6 +298,7 @@ func (c *FastContext) publishBound(n *FastNode, variable uint32, value *numeral.
 	b := n.trail
 	b.timestamp = c.timestamp
 	b.decision = !enqueue
+	b.reason = reason
 	if enqueue {
 		c.queue = append(c.queue, b)
 	}
@@ -314,6 +319,10 @@ func (c *FastContext) publishBound(n *FastNode, variable uint32, value *numeral.
 // PropagateCandidate is the source definition-propagation sequence: normalize
 // a scratch candidate, check its relevance, then publish it when selected.
 func (c *FastContext) PropagateCandidate(n *FastNode, variable uint32, value *numeral.FastFloat, lower, open bool) (published bool, err error) {
+	return c.propagateCandidateReason(n, variable, value, lower, open, fastBoundReason{})
+}
+
+func (c *FastContext) propagateCandidateReason(n *FastNode, variable uint32, value *numeral.FastFloat, lower, open bool, reason fastBoundReason) (published bool, err error) {
 	if err = c.checkNode(n, variable); err != nil {
 		return false, err
 	}
@@ -336,5 +345,5 @@ func (c *FastContext) PropagateCandidate(n *FastNode, variable uint32, value *nu
 	if err != nil || !published {
 		return published, err
 	}
-	return true, c.PropagateBound(n, variable, scratch, lower, open)
+	return true, c.propagateBoundReason(n, variable, scratch, lower, open, reason)
 }

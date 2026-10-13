@@ -121,10 +121,11 @@ func (c *FastContext) PropagateMonomial(variable uint32, n *FastNode) (err error
 		if err = c.numbers.SetInt32(v, 0); err != nil {
 			return err
 		}
-		if _, err = c.PropagateCandidate(n, variable, v, true, false); err != nil || n.inconsistent {
+		reason := fastBoundReason{kind: fastReasonVariableDefinition, variable: variable}
+		if _, err = c.propagateCandidateReason(n, variable, v, true, false, reason); err != nil || n.inconsistent {
 			return err
 		}
-		_, err = c.PropagateCandidate(n, variable, v, false, false)
+		_, err = c.propagateCandidateReason(n, variable, v, false, false, reason)
 		return err
 	}
 	xUnbounded, err := n.IsUnbounded(variable)
@@ -206,7 +207,7 @@ func (c *FastContext) propagateMonomialUpward(m *FastMonomial, variable uint32, 
 			return err
 		}
 	}
-	return c.propagateFastIntervalBounds(n, variable, r)
+	return c.propagateFastIntervalBounds(n, variable, variable, r)
 }
 
 func (c *FastContext) propagateMonomialDownward(m *FastMonomial, variable uint32, j int, n *FastNode) (err error) {
@@ -277,16 +278,16 @@ func (c *FastContext) propagateMonomialDownward(m *FastMonomial, variable uint32
 			return err
 		}
 	}
-	return c.propagateFastIntervalBounds(n, m.powers[j].Variable, r)
+	return c.propagateFastIntervalBounds(n, m.powers[j].Variable, variable, r)
 }
 
-func (c *FastContext) propagateFastIntervalBounds(n *FastNode, variable uint32, r *FastInterval) error {
+func (c *FastContext) propagateFastIntervalBounds(n *FastNode, variable, sourceVariable uint32, r *FastInterval) error {
 	lower, upper, err := r.endpoints()
 	if err != nil {
 		return err
 	}
 	if !r.lowerInf {
-		if _, err := c.PropagateCandidate(n, variable, lower, true, r.lowerOpen); err != nil {
+		if _, err := c.propagateCandidateReason(n, variable, lower, true, r.lowerOpen, fastBoundReason{kind: fastReasonVariableDefinition, variable: sourceVariable}); err != nil {
 			return err
 		}
 		if n.inconsistent {
@@ -294,7 +295,7 @@ func (c *FastContext) propagateFastIntervalBounds(n *FastNode, variable uint32, 
 		}
 	}
 	if !r.upperInf {
-		_, err := c.PropagateCandidate(n, variable, upper, false, r.upperOpen)
+		_, err := c.propagateCandidateReason(n, variable, upper, false, r.upperOpen, fastBoundReason{kind: fastReasonVariableDefinition, variable: sourceVariable})
 		return err
 	}
 	return nil

@@ -50142,6 +50142,23 @@
           ]
         },
         {
+          "name": "Selected config_mpff bound justification kinds for unit axiom/assumption, clause, and polynomial/monomial variable definition",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_context_bounds.go",
+          "go_targets": [
+            "pkg/math/subpaving/fast_clause.go",
+            "pkg/math/subpaving/fast_node.go",
+            "pkg/math/subpaving/fast_monomial.go",
+            "pkg/math/subpaving/fast_polynomial.go"
+          ],
+          "tests": [
+            "TestSubpavingFastClauseStableWatchUnitAndConflict",
+            "TestSubpavingFastClauseOpennessAndUnitResume",
+            "TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue",
+            "TestSubpavingFastPolynomialForwardReverseAndOwnedCoefficients"
+          ]
+        },
+        {
           "name": "Concrete config_mpff source-order root unit assertion, definition sweep, queue drain and resumable cancellation; shared clause/inequality teardown (src/math/subpaving/subpaving_t_def.h:845-861,1092-1111,1753-1808)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/fast_context_init.go",
@@ -50515,6 +50532,23 @@
             "TestSubpavingFastClauseStableWatchUnitAndConflict",
             "TestSubpavingFastClauseOpennessAndUnitResume",
             "TestSubpavingFastClauseSharedAtomSourceCleanup"
+          ]
+        },
+        {
+          "name": "Selected config_mpff bound justification kinds for unit axiom/assumption, clause, and polynomial/monomial variable definition",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_context_bounds.go",
+          "go_targets": [
+            "pkg/math/subpaving/fast_clause.go",
+            "pkg/math/subpaving/fast_node.go",
+            "pkg/math/subpaving/fast_monomial.go",
+            "pkg/math/subpaving/fast_polynomial.go"
+          ],
+          "tests": [
+            "TestSubpavingFastClauseStableWatchUnitAndConflict",
+            "TestSubpavingFastClauseOpennessAndUnitResume",
+            "TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue",
+            "TestSubpavingFastPolynomialForwardReverseAndOwnedCoefficients"
           ]
         },
         {
@@ -51022,6 +51056,23 @@
             "TestSubpavingFastClauseStableWatchUnitAndConflict",
             "TestSubpavingFastClauseOpennessAndUnitResume",
             "TestSubpavingFastClauseSharedAtomSourceCleanup"
+          ]
+        },
+        {
+          "name": "Selected config_mpff bound justification kinds for unit axiom/assumption, clause, and polynomial/monomial variable definition",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_context_bounds.go",
+          "go_targets": [
+            "pkg/math/subpaving/fast_clause.go",
+            "pkg/math/subpaving/fast_node.go",
+            "pkg/math/subpaving/fast_monomial.go",
+            "pkg/math/subpaving/fast_polynomial.go"
+          ],
+          "tests": [
+            "TestSubpavingFastClauseStableWatchUnitAndConflict",
+            "TestSubpavingFastClauseOpennessAndUnitResume",
+            "TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue",
+            "TestSubpavingFastPolynomialForwardReverseAndOwnedCoefficients"
           ]
         },
         {

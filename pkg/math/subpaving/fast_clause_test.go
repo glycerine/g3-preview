@@ -62,6 +62,9 @@ func TestSubpavingFastClauseStableWatchUnitAndConflict(t *testing.T) {
 	if root2.inconsistent || unit.visited == 0 {
 		t.Fatal("unit propagation", root2.inconsistent, unit.visited)
 	}
+	if reason := root2.upper[1].reason; reason.kind != fastReasonClause || reason.clause != unit {
+		t.Fatal("borrowed clause justification", reason)
+	}
 	// With both atoms false, source chooses the first atom and publishes a
 	// contradictory bound to mark the node inconsistent.
 	m3, c3, v3, root3 := fastMonomialFixture(t, []bool{false, false})
@@ -80,6 +83,9 @@ func TestSubpavingFastClauseStableWatchUnitAndConflict(t *testing.T) {
 	}
 	if !root3.inconsistent || root3.conflictVar != 0 {
 		t.Fatal("source first-atom conflict", root3.conflictVar)
+	}
+	if reason := root3.lower[0].reason; reason.kind != fastReasonClause || reason.clause != conflictClause {
+		t.Fatal("conflicting clause justification", reason)
 	}
 }
 
@@ -142,6 +148,9 @@ func TestSubpavingFastClauseOpennessAndUnitResume(t *testing.T) {
 		t.Fatal("unit checkpoint suffix", c.unitHead, err)
 	}
 	fastMonomialCheckBound(t, m, root, v, 0, 1, true)
+	if reason := root.lower[0].reason; reason.kind != fastReasonAxiom || reason.clause != nil {
+		t.Fatal("unit axiom justification", reason)
+	}
 	if root.upper[1] != nil {
 		t.Fatal("canceled unit published")
 	}
@@ -150,6 +159,9 @@ func TestSubpavingFastClauseOpennessAndUnitResume(t *testing.T) {
 		t.Fatal(err)
 	}
 	fastMonomialCheckBound(t, m, root, v, 1, 2, false)
+	if reason := root.upper[1].reason; reason.kind != fastReasonAssumption || reason.clause != nil {
+		t.Fatal("unit assumption justification", reason)
+	}
 	if c.unitHead != 2 {
 		t.Fatal("unit suffix not consumed", c.unitHead)
 	}
