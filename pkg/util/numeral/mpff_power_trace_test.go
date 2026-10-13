@@ -2,12 +2,44 @@ package numeral
 
 import (
 	"bytes"
+	"errors"
 	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
+
+func TestFastFloatRawPowerTraceExponentInsertionBoundary(t *testing.T) {
+	m := fastManager(t, 2)
+	var value FastFloat
+	if err := m.SetInt32(&value, -3); err != nil {
+		t.Fatal(err)
+	}
+	if err := m.SetExponent(&value, -7); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := m.Del(&value); err != nil {
+			t.Fatal(err)
+		}
+	})
+	full := &fastDisplayWrites{}
+	if err := m.displayRawTraceTo(full, &value); err != nil {
+		t.Fatal(err)
+	}
+	if len(full.parts) != 5 || full.parts[0] != "-" || full.parts[3] != "*2^" || full.parts[4] != "-7" {
+		t.Fatal("raw display insertion order", full.parts)
+	}
+	for at := range full.parts {
+		refusal := errors.New("refused raw insertion")
+		w := &fastDisplayWrites{at: at + 1, refusal: refusal}
+		err := m.displayRawTraceTo(w, &value)
+		if !errors.Is(err, refusal) || w.String() != strings.Join(full.parts[:at], "") || len(w.parts) != at+1 {
+			t.Fatal("raw display refusal prefix", at, err, w.String(), w.parts)
+		}
+	}
+}
 
 func TestFastFloatPowerRetainedTraceBranchesAndAlias(t *testing.T) {
 	m := fastManager(t, 2)

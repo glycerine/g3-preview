@@ -16,7 +16,10 @@ func (m *FastFloatManager) tracePower(a *FastFloat, p uint32, b *FastFloat) {
 		if err := m.DisplayTo(w, a); err != nil {
 			return err
 		}
-		if err := writeFastFloatPart(w, ") ^ "+strconv.FormatUint(uint64(p), 10)); err != nil {
+		if err := writeFastFloatPart(w, ") ^ "); err != nil {
+			return err
+		}
+		if err := writeFastFloatPart(w, strconv.FormatUint(uint64(p), 10)); err != nil {
 			return err
 		}
 		bound := ">="
@@ -55,5 +58,8 @@ func (m *FastFloatManager) displayRawTraceTo(w io.Writer, b *FastFloat) error {
 			return err
 		}
 	}
-	return writeFastFloatPart(w, "*2^"+strconv.FormatInt(int64(b.exponent), 10))
+	if err := writeFastFloatPart(w, "*2^"); err != nil {
+		return err
+	}
+	return writeFastFloatPart(w, strconv.FormatInt(int64(b.exponent), 10))
 }

@@ -152791,7 +152791,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpff_power_trace.go",
           "tests": [
-            "TestFastFloatPowerRetainedTraceBranchesAndAlias"
+            "TestFastFloatPowerRetainedTraceBranchesAndAlias",
+            "TestFastFloatRawPowerTraceExponentInsertionBoundary"
           ]
         },
         {
@@ -173601,7 +173602,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpff_power_trace.go",
           "tests": [
-            "TestFastFloatPowerRetainedTraceBranchesAndAlias"
+            "TestFastFloatPowerRetainedTraceBranchesAndAlias",
+            "TestFastFloatRawPowerTraceExponentInsertionBoundary"
           ]
         },
         {
@@ -173956,7 +173958,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpff_power_trace.go",
           "tests": [
-            "TestFastFloatPowerRetainedTraceBranchesAndAlias"
+            "TestFastFloatPowerRetainedTraceBranchesAndAlias",
+            "TestFastFloatRawPowerTraceExponentInsertionBoundary"
           ]
         },
         {
