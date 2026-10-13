@@ -13,6 +13,42 @@ import (
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
+// Source: mpf.h:53-58 and vector.h:59-100. Growing an MPF vector moves its
+// owned significand; after Go slice relocation, the sole reachable row must
+// still own the large numerical payload through source destruction.
+func TestASTFloatingPointScopedValueGrowthKeepsHeapSignificand(t *testing.T) {
+	m := astTestManager(t)
+	_, e := m.RegisterArithmeticPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterBitVectorPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterFloatingPointPlugin()
+	astTestMust(t, e)
+	p := m.floatingPointPlugin
+	z, e := p.numeric.BorrowIntegerManager()
+	astTestMust(t, e)
+	var significand unumeral.Int
+	two := unumeral.NewInt(2)
+	astTestMust(t, z.Power(&two, 100, &significand))
+	var source unumeral.ArbitraryFloat
+	astTestMust(t, p.numeric.SetComponents(&source, 8, 130, false, 0, &significand))
+	astTestMust(t, p.values.push(&source))
+	astTestMust(t, p.numeric.Del(&source))
+	astTestMust(t, z.Del(&significand))
+	astTestMust(t, p.values.reserve(257))
+	got, e := p.numeric.BorrowSignificand(&p.values.values[0])
+	astTestMust(t, e)
+	var expected unumeral.Int
+	astTestMust(t, z.Power(&two, 100, &expected))
+	equal, e := z.Equal(got, &expected)
+	astTestMust(t, e)
+	if !equal {
+		t.Fatal("relocated owned significand changed")
+	}
+	astTestMust(t, z.Del(&expected))
+	astTestMust(t, m.Close())
+}
+
 func TestASTFloatingPointScopedValueNativeGrowthAndDefaults(t *testing.T) {
 	m := astTestManager(t)
 	_, e := m.RegisterArithmeticPlugin()

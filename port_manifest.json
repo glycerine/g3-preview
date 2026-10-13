@@ -149794,12 +149794,17 @@
           "status": "dead_deleted"
         },
         {
-          "name": "mpf.h:53-58 move constructor for retained scoped numerals and value storage",
-          "status": "partial",
+          "name": "mpf.h:53-58 move constructor for retained AST and subpaving scoped-MPF vector growth",
+          "status": "platform_replacement",
           "go_target": "pkg/ast/ast_fpa_scoped_values.go",
+          "go_targets": [
+            "pkg/math/subpaving/arbitrary_shell_coefficients.go"
+          ],
           "tests": [
             "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
-            "TestASTFloatingPointScopedValueActualInlinePushPublication"
+            "TestASTFloatingPointScopedValueActualInlinePushPublication",
+            "TestASTFloatingPointScopedValueGrowthKeepsHeapSignificand",
+            "TestArbitraryShellCoefficientSourceConversionAndCleanup"
           ]
         },
         {
