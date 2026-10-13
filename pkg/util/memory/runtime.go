@@ -64,7 +64,7 @@ type RuntimeStats struct {
 // and their Budget require caller confinement. Runtimes that belong to the
 // same source memory process share a ProcessAccounting owner.
 func NewRuntime(c RuntimeConfig) (*Runtime, error) {
-	if c.Process != nil && c.Process.self != c.Process {
+	if c.Process != nil && !c.Process.Valid() {
 		return nil, arena.ErrConfig
 	}
 	if c.FatalPolicy != nil && (c.Transport != nil || c.FatalPolicy.MemoryBudget() != c.Budget) {
@@ -101,6 +101,15 @@ func (m *Runtime) accountingOwner() *utilMemoryAccounting {
 		return &m.config.Process.accounting
 	}
 	return &m.accounting
+}
+
+// ProcessOwner reports the source process accounting shared by this runtime.
+// A nil result means this runtime uses its standalone accounting fields.
+func (m *Runtime) ProcessOwner() *ProcessAccounting {
+	if m == nil || m.self != m || m.closed {
+		return nil
+	}
+	return m.config.Process
 }
 func (m *Runtime) open() error {
 	if m == nil || m.self != m {

@@ -48,8 +48,8 @@ func (c *FastContext) Search() error {
 	}
 	for c.searchNode != nil || len(c.leafQueue) != 0 {
 		if c.searchNode == nil {
-			if !c.limit.Inc() {
-				return ErrFastContextCanceled
+			if err := sourceCheckpoint(c.limit, c.process, c.maxMemory, ErrFastContextCanceled); err != nil {
+				return err
 			}
 			if len(c.queue) != 0 || c.queueHead != 0 {
 				return arena.ErrInvalidSlot

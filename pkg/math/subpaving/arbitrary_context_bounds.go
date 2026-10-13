@@ -213,8 +213,8 @@ func (c *ArbitraryContext) AssertRootUnits() (*ArbitraryNode, error) {
 		return nil, err
 	}
 	for c.unitHead < len(c.unitClauses) && n.conflictVar == math.MaxUint32 {
-		if !c.limit.Inc() {
-			return n, ErrArbitraryContextCanceled
+		if err := sourceCheckpoint(c.limit, c.process, c.maxMemory, ErrArbitraryContextCanceled); err != nil {
+			return n, err
 		}
 		unit := c.unitClauses[c.unitHead]
 		a := unit.atom

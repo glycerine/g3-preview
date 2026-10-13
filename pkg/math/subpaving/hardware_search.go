@@ -17,8 +17,8 @@ func (c *HardwareContext) Search() error {
 	}
 	for c.searchNode != nil || c.leafHead != nil {
 		if c.searchNode == nil {
-			if !c.limit.Inc() {
-				return ErrHardwareContextCanceled
+			if err := sourceCheckpoint(c.limit, c.process, c.maxMemory, ErrHardwareContextCanceled); err != nil {
+				return err
 			}
 			if len(c.queue) != 0 || c.queueHead != 0 {
 				return arena.ErrInvalidSlot

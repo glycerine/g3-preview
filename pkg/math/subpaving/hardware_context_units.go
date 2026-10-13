@@ -42,8 +42,8 @@ func (c *HardwareContext) AssertUnitClauses(n *HardwareNode) error {
 		return err
 	}
 	for c.unitHead < len(c.unitClauses) && n.conflictVar == ^uint32(0) {
-		if !c.limit.Inc() {
-			return ErrHardwareContextCanceled
+		if err := sourceCheckpoint(c.limit, c.process, c.maxMemory, ErrHardwareContextCanceled); err != nil {
+			return err
 		}
 		unit := c.unitClauses[c.unitHead]
 		reason := hardwareReasonAssumption

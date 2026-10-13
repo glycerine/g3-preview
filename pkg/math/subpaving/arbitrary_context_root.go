@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/interval"
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -20,6 +21,7 @@ type ArbitraryContext struct {
 	self                                            *ArbitraryContext
 	numbers                                         *numeral.ArbitraryFloatNumeralManager
 	limit                                           *control.Reslimit
+	process                                         *memory.ProcessAccounting
 	variables                                       []bool
 	watchers                                        [][]uint32
 	clauseWatchers                                  [][]*ArbitraryClause
@@ -74,8 +76,15 @@ func newArbitraryContextOwner(m *numeral.ArbitraryFloatNumeralManager, limit *co
 	if m == nil || limit == nil {
 		return nil, arena.ErrInvalidSlot
 	}
+	core, err := m.BorrowCore()
+	if err != nil {
+		return nil, err
+	}
 	c := &ArbitraryContext{numbers: m, limit: limit}
 	c.self = c
+	if owner := core.RuntimeOwner(); owner != nil {
+		c.process = owner.ProcessOwner()
+	}
 	defer func() {
 		if err != nil {
 			err = errors.Join(err, c.closeNumerals())

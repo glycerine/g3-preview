@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/interval"
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
@@ -19,6 +20,7 @@ type HardwareContext struct {
 	self             *HardwareContext
 	numbers          *numeral.HardwareFloatNumeralManager
 	limit            *control.Reslimit
+	process          *memory.ProcessAccounting
 	epsilon          numeral.HardwareFloat
 	maxBound         numeral.HardwareFloat
 	minusMaxBound    numeral.HardwareFloat
@@ -56,6 +58,19 @@ type HardwareContext struct {
 	initStage        uint8
 	initDefHead      uint32
 	closed           bool
+}
+
+// BindProcessAccounting supplies the source global memory counter for the
+// hardware-float context, whose pointer-free numeral manager has no Runtime.
+func (c *HardwareContext) BindProcessAccounting(p *memory.ProcessAccounting) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if !p.Valid() {
+		return arena.ErrConfig
+	}
+	c.process = p
+	return nil
 }
 
 // ResetStatistics follows context_t::reset_statistics; the live node count is

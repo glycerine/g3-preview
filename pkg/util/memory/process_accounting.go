@@ -16,10 +16,13 @@ func NewProcessAccounting() *ProcessAccounting {
 	return p
 }
 
+// Valid reports whether this is the original, initialized process owner.
+func (p *ProcessAccounting) Valid() bool { return p != nil && p.self == p }
+
 // AllocationSize is the process-wide source memory::get_allocation_size value.
 // It excludes unsynchronized thread-local lane deltas, as the source getter does.
 func (p *ProcessAccounting) AllocationSize() uint64 {
-	if p == nil || p.self != p {
+	if !p.Valid() {
 		return 0
 	}
 	return p.accounting.allocationSize()

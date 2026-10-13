@@ -25,8 +25,8 @@ func (c *ArbitraryContext) PropagateQueued(n *ArbitraryNode) error {
 		return err
 	}
 	for c.queueHead < len(c.queue) && n.conflictVar == math.MaxUint32 {
-		if !c.limit.Inc() {
-			return ErrArbitraryContextCanceled
+		if err := sourceCheckpoint(c.limit, c.process, c.maxMemory, ErrArbitraryContextCanceled); err != nil {
+			return err
 		}
 		b := c.queue[c.queueHead]
 		if b == nil || b.context != c || b.variable >= uint32(len(c.variables)) || !c.boundOnTrail(n, b) {

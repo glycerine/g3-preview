@@ -160,8 +160,8 @@ func (c *HardwareContext) PropagateQueued(n *HardwareNode) error {
 		return err
 	}
 	for c.queueHead < len(c.queue) && n.conflictVar == math.MaxUint32 {
-		if !c.limit.Inc() {
-			return ErrHardwareContextCanceled
+		if err := sourceCheckpoint(c.limit, c.process, c.maxMemory, ErrHardwareContextCanceled); err != nil {
+			return err
 		}
 		b := c.queue[c.queueHead]
 		c.queueHead++

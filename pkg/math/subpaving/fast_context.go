@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/math/interval"
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -20,6 +21,7 @@ type FastContext struct {
 	self             *FastContext
 	numbers          *numeral.FastFloatManager
 	limit            *control.Reslimit
+	process          *memory.ProcessAccounting
 	isInt            []bool
 	root             *FastNode
 	nodes            []*FastNode
@@ -89,6 +91,9 @@ func newFastContextOwner(m *numeral.FastFloatManager, limit *control.Reslimit, i
 	}
 	c := &FastContext{numbers: m, limit: limit, isInt: append([]bool(nil), isInt...), polynomials: make(map[uint32]*FastPolynomial), monomials: make(map[uint32]*FastMonomial), watchers: make([][]uint32, len(isInt)), watchOrder: make([][]fastWatch, len(isInt))}
 	c.self = c
+	if owner := m.RuntimeOwner(); owner != nil {
+		c.process = owner.ProcessOwner()
+	}
 	defer func() {
 		if err != nil {
 			if c.root != nil {

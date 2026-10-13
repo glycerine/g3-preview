@@ -23,10 +23,14 @@ func newArbitraryClauseFixture(t *testing.T) *arbitraryClauseFixture {
 	return newArbitraryClauseFixtureWithPolicy(t, 0, false)
 }
 
-func newArbitraryClauseFixtureWithPolicy(t *testing.T, epsilon uint32, yInteger bool) *arbitraryClauseFixture {
+func newArbitraryClauseFixtureWithPolicy(t *testing.T, epsilon uint32, yInteger bool, process ...*umm.ProcessAccounting) *arbitraryClauseFixture {
 	t.Helper()
 	b := arena.NewBudget(1 << 27)
-	r, err := umm.NewRuntime(umm.RuntimeConfig{Budget: b, SizeTBits: 64})
+	configMemory := umm.RuntimeConfig{Budget: b, SizeTBits: 64}
+	if len(process) != 0 {
+		configMemory.Process = process[0]
+	}
+	r, err := umm.NewRuntime(configMemory)
 	if err != nil {
 		t.Fatal(err)
 	}
