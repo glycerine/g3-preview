@@ -45,6 +45,9 @@ func TestSATRuntimeSharedProcessAndNumeralCohort(t *testing.T) {
 	satOK(t, e)
 	solver, e := NewSATSolver(SolverConfig{ParamsContext: ctx, Params: params, RLimit: limit, Budget: b, Runtime: r})
 	satOK(t, e)
+	variable, e := solver.MkVar(true, true)
+	satOK(t, e)
+	literal := MakeLiteral(variable, false)
 	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
 	satOK(t, e)
 	beforeBytes := p.AllocationSize()
@@ -64,11 +67,32 @@ func TestSATRuntimeSharedProcessAndNumeralCohort(t *testing.T) {
 	if actual != p.AllocationSize() || actual < beforeBytes+(1<<20) {
 		t.Fatal("SAT owner cannot see second runtime allocation", actual, p.AllocationSize())
 	}
+	if !solver.probing.cacheEnabled {
+		t.Fatal("source probing cache unexpectedly disabled")
+	}
+	solver.probing.cacheLimit = beforeBytes
+	satOK(t, solver.probing.cacheBins(literal, 0))
+	if _, cached, e := solver.probing.cachedImpliedLits(literal); e != nil || cached {
+		t.Fatal("probing cache ignored another runtime's process allocation", cached, e)
+	}
 	satOK(t, solver.displayMemoryStat(out))
 	afterText, e := out.String()
 	satOK(t, e)
 	if want := fmt.Sprintf(" :memory %.2f", float64(actual)/(1024*1024)); afterText != want || afterText == beforeText {
 		t.Fatal("SAT report omitted cross-runtime allocation", afterText, want, beforeText)
+	}
+	satOK(t, other.Deallocate(&block))
+	satOK(t, solver.probing.cacheBins(literal, 0))
+	if _, cached, e := solver.probing.cachedImpliedLits(literal); e != nil || !cached {
+		t.Fatal("probing cache did not resume at the process limit", cached, e)
+	}
+	block, e = other.Allocate(1 << 20)
+	satOK(t, e)
+	if done, e := solver.probing.run(true); e != nil || !done {
+		t.Fatal("source probing run after process limit", done, e)
+	}
+	if solver.probing.cache.blockLive() {
+		t.Fatal("probing run retained cache above process limit")
 	}
 	satOK(t, other.Deallocate(&block))
 	satOK(t, other.Close())
