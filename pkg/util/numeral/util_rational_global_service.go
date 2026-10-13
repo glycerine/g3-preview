@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 var ErrRationalGlobalOwner = errors.New("g3: rational global binding owner mismatch")
@@ -133,6 +134,15 @@ func (g *RationalGlobalService) Service() (*RationalService, error) {
 		return nil, e
 	}
 	return g.service, nil
+}
+
+// ProcessOwner exposes the borrowed memory cohort of the source rational
+// global manager without transferring ownership of its runtime.
+func (g *RationalGlobalService) ProcessOwner() (*umemory.ProcessAccounting, error) {
+	if e := g.open(); e != nil {
+		return nil, e
+	}
+	return g.config.Integers.Memory.ProcessOwner(), nil
 }
 func (g *RationalGlobalService) FinalizeSource() error {
 	if e := g.open(); e != nil {

@@ -19,40 +19,31 @@ func must(t *testing.T, err error) {
 	}
 }
 
-func TestGeneratedFinalizeConcreteServices(t *testing.T) {
+func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
 	p := memory.NewProcessAccounting()
 	m, err := memory.NewRuntime(memory.RuntimeConfig{Budget: b, Process: p})
 	must(t, err)
-	first, err := m.BeginSourceInitialize(math.MaxUint32)
-	must(t, err)
-	if !first {
-		t.Fatal("first process initialization was skipped")
-	}
 	r, err := numeral.NewRationalGlobalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{
 		Memory: m, Cells: arena.Config{PageSize: 2, Budget: b},
 		Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}},
 	}})
 	must(t, err)
-	must(t, r.InitializeSource())
 	s, err := symbol.NewService(symbol.Config{Budget: b})
 	must(t, err)
-	must(t, s.InitializeSource())
-	sy, err := s.Manager()
+	cfg := InitializationConfig{Runtime: m, Rational: r, Symbols: s,
+		Params:  params.ParamsConfig{Budget: b, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}},
+		Catalog: params.GlobalParamsCatalogConfig{Budget: b, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}},
+		Globals: params.GlobalParamsConfig{Budget: b, DescriptorPageSize: 2, DescriptorWordsPageSize: 16}}
+	init, err := InitializeGenerated(cfg, math.MaxUint32)
 	must(t, err)
-	q, err := r.Service()
-	must(t, err)
-	c, err := params.NewParamsContext(sy, q, params.ParamsConfig{Budget: b, PageEntries: 1,
-		Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}})
-	must(t, err)
-	cat, err := params.NewGlobalParamsCatalog(sy, params.GlobalParamsCatalogConfig{Budget: b,
-		Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}},
-		Text:         arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}}})
-	must(t, err)
-	g, err := params.NewGlobalParamsService(sy, c, params.GlobalParamsConfig{Budget: b, Catalog: cat, DescriptorPageSize: 2, DescriptorWordsPageSize: 16})
-	must(t, err)
-	must(t, g.InitializeSource())
-	must(t, m.CompleteSourceInitialize())
+	if init == nil || init.Context == nil || init.Catalog == nil || init.Globals == nil {
+		t.Fatal("generated initialization did not publish its parameter owners")
+	}
+	g := init.Globals
+	if again, err := InitializeGenerated(cfg, 1<<25); err != nil || again != nil {
+		t.Fatal("repeated generated initialization", again, err)
+	}
 	region, err := arena.NewBytesRegion(arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}})
 	must(t, err)
 	d, err := diagnostic.NewDebugContext(region, b)
@@ -73,9 +64,7 @@ func TestGeneratedFinalizeConcreteServices(t *testing.T) {
 	if active, err := p.BeginFinalize(); err != nil || active {
 		t.Fatal("process guard not completed", active, err)
 	}
-	must(t, g.Close())
-	must(t, cat.Close())
-	must(t, c.Close())
+	must(t, init.Close())
 	must(t, r.Close())
 	must(t, s.Close())
 	must(t, d.Close())
