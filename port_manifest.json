@@ -118661,7 +118661,7 @@
       "path": "src/util/f2n.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/numeral/hwf_numeral.go",
         "pkg/util/numeral/hwf_rational_set.go",
@@ -118675,6 +118675,10 @@
         "pkg/math/subpaving/arbitrary_context_root.go",
         "pkg/math/subpaving/arbitrary_context_bounds.go",
         "pkg/math/subpaving/arbitrary_context_relevance.go",
+        "pkg/math/subpaving/arbitrary_interval_scalar.go",
+        "pkg/math/subpaving/arbitrary_interval_root.go",
+        "pkg/math/subpaving/arbitrary_monomial_propagate.go",
+        "pkg/math/subpaving/arbitrary_split.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/hardware_interval_scalar.go",
         "pkg/math/subpaving/hardware_interval_power.go",
@@ -118702,6 +118706,8 @@
         "TestArbitraryFloatNumeralSourcePostCheckAndClose",
         "TestArbitraryShellCoefficientSourceConversionAndCleanup",
         "TestArbitraryContextSourceCandidateRelevanceAndNormalization",
+        "TestArbitraryMonomialForwardInverseAndArithmetic",
+        "TestArbitraryMidpointSplitterSourceBranches",
         "TestArbitraryFloatNumeralSourcePredicatesAndOrder",
         "TestArbitraryFloatNumeralSourceFloorCeilAndClose",
         "TestArbitraryFloatNumeralSourceReciprocalIncrementAndPower",
@@ -118758,8 +118764,8 @@
           "text": "SASSERT(m().is_regular(b));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Retained subpaving tactic f2n<hwf_manager> construction, rounding mode, scalar conversion, checked arithmetic, floor, ceil and power",
@@ -118814,10 +118820,6 @@
           ]
         },
         {
-          "name": "Uncalled f2n<hwf_manager> field/precise, arbitrary mode setter, second inverse overload, decimal and SMT2 display helpers",
-          "status": "reference_only"
-        },
-        {
           "name": "Retained subpaving tactic f2n<mpf_manager> construction, owned scratch destruction, mode changes, checked scalar/rational setters and directed add/sub/mul/div",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_numeral.go",
@@ -118870,14 +118872,27 @@
         },
         {
           "name": "Remaining f2n<mpf_manager> interval and subpaving caller integration audit",
-          "status": "unported"
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_scalar.go",
+          "go_targets": [
+            "pkg/math/subpaving/arbitrary_interval_root.go",
+            "pkg/math/subpaving/arbitrary_monomial_propagate.go",
+            "pkg/math/subpaving/arbitrary_split.go"
+          ],
+          "tests": [
+            "TestSubpavingMPFIntervalScalarMulDiv",
+            "TestSubpavingMPFIntervalXnEqYRetainedCases",
+            "TestArbitraryMonomialForwardInverseAndArithmetic",
+            "TestArbitraryMidpointSplitterSourceBranches"
+          ]
         },
         {
-          "name": "Concrete config_mpf bound-policy numerals and retained monomial inverse-root dispatch (src/math/subpaving/subpaving_t_def.h:408-514,1641; src/math/subpaving/subpaving_mpf.h:23-43)",
-          "status": "partial",
+          "name": "Concrete config_mpf f2n bound-policy numerals and retained monomial inverse-root forwarding (src/math/subpaving/subpaving_t_def.h:408-514,1641; src/math/subpaving/subpaving_mpf.h:23-43)",
+          "status": "ported",
           "go_target": "pkg/math/subpaving/arbitrary_context_root.go",
           "tests": [
-            "TestSubpavingMPFIntervalXnEqYRetainedCases"
+            "TestSubpavingMPFIntervalXnEqYRetainedCases",
+            "TestArbitraryMonomialForwardInverseAndArithmetic"
           ]
         },
         {
@@ -118957,8 +118972,8 @@
         "The concrete HWF wrapper borrows its scalar manager and owns two pointer-free binary64 scratch values; no payload destructor is needed. The MPF wrapper borrows its ArbitraryFloatManager and owns its one/tmp numerals, deleting tmp before one on close. The HWF internal rational child is replaced by a borrowed caller manager."
       ],
       "deviations": [
-        "The earlier test-only include audit missed src/math/subpaving/tactic/subpaving_tactic.cpp and the production subpaving_mpf.h/subpaving_hwf.h headers. The tactic constructs f2n<mpf_manager> and f2n<hwf_manager>. The concrete HWF specialization is covered for retained calls; the MPF specialization now has owned scratch and directed arithmetic, predicates, comparisons and integral rounding, with reciprocal, increment/decrement and power now concrete; rational-string and numeral-display forwarding now concrete; live swap, unsigned input, previous-power, inverse overload and precise trait now concrete; interval and enclosing subpaving consumers remain open. No universal template adapter is used.",
-        "Concrete f2n<hwf_manager> scalar operations reached by hardware intervals, Newton roots, context bound policy, normalization, relevance, polynomial propagation and midpoint splitting are ported; the shared template unit remains partial for other manager instantiations."
+        "The earlier test-only include audit missed src/math/subpaving/tactic/subpaving_tactic.cpp and the production subpaving_mpf.h/subpaving_hwf.h headers. The retained production instantiations are concrete f2n<mpf_manager> and f2n<hwf_manager>. Their reached wrapper methods are ported with borrowed managers and concrete owned scratch. Uncalled HWF field/precise, arbitrary mode setter, second inverse overload, decimal and SMT2 display helpers are excluded as reference-only; no universal template adapter is used.",
+        "The HWF specialization is exercised by hardware intervals, Newton roots, context bound policy, normalization, relevance, polynomial propagation and midpoint splitting. The MPF specialization is exercised by the retained shell coefficient/inequality preparation, arbitrary intervals and extended numerals, context bounds/relevance, monomial inverse roots and midpoint splitting. These caller paths close the f2n method audit; their enclosing solver and tactic algorithms remain partial in their own manifest units."
       ]
     },
     {
