@@ -178,6 +178,19 @@ func TestArrayRewriterOriginalSortingConstantAndIteRules(t *testing.T) {
 	m.Budget().FailAfter(0)
 	status, e := rw.MkAppCore(d, args, out)
 	m.Budget().FailAfter(-1)
+	if ast.ASTSourceDebug {
+		got, getErr := m.RefGet(out)
+		satOK(t, getErr)
+		if status != RewriteFailed || !errors.Is(e, arena.ErrInjectedFailure) || got != yes || m.Budget().Used() != baseline {
+			t.Fatal("debug direct AST allocation refusal must keep the output", status, e, got, baseline, m.Budget().Used())
+		}
+		check(selected, wanted, Rewrite2)
+		satOK(t, rw.UpdtParams(p))
+		if rw.expandSelectIte || rw.expandSelectStore {
+			t.Fatal("parameter update did not reset source flags")
+		}
+		return
+	}
 	if e != nil || status != Rewrite2 {
 		t.Fatal("native vector rewrite", status, e)
 	}

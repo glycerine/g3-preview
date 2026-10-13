@@ -18106,7 +18106,8 @@
         "pkg/ast/pattern/pattern_selection.go",
         "pkg/ast/pattern/collect.go",
         "pkg/ast/pattern/infer.go",
-        "pkg/ast/pattern/reduce_quantifier.go"
+        "pkg/ast/pattern/reduce_quantifier.go",
+        "pkg/ast/pattern/rewriter.go"
       ],
       "tests": [
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
@@ -18121,7 +18122,9 @@
         "TestPatternInferenceCollectorArithmeticNestedAndDivisionException",
         "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences",
         "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
-        "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
+        "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
+        "TestPatternInferenceActualRewriterTraversalAndOwnership",
+        "TestPatternInferenceActualRewriterPendingPullAndResume"
       ],
       "conditionals": [
         {
@@ -18288,6 +18291,15 @@
             "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
             "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
           ]
+        },
+        {
+          "name": "pattern_inference_rw concrete no-proof traversal callback connects quantifier reduction, rewritten no-patterns and owning output",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/rewriter.go",
+          "tests": [
+            "TestPatternInferenceActualRewriterTraversalAndOwnership",
+            "TestPatternInferenceActualRewriterPendingPullAndResume"
+          ]
         }
       ],
       "ownership": [],
@@ -18310,7 +18322,8 @@
         "pkg/ast/pattern/pattern_selection.go",
         "pkg/ast/pattern/collect.go",
         "pkg/ast/pattern/infer.go",
-        "pkg/ast/pattern/reduce_quantifier.go"
+        "pkg/ast/pattern/reduce_quantifier.go",
+        "pkg/ast/pattern/rewriter.go"
       ],
       "tests": [
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
@@ -18325,7 +18338,9 @@
         "TestPatternInferenceCollectorArithmeticNestedAndDivisionException",
         "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences",
         "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
-        "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
+        "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
+        "TestPatternInferenceActualRewriterTraversalAndOwnership",
+        "TestPatternInferenceActualRewriterPendingPullAndResume"
       ],
       "conditionals": [
         {
@@ -18427,6 +18442,15 @@
           "tests": [
             "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
             "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
+          ]
+        },
+        {
+          "name": "pattern_inference_rw owning AST traversal and reusable configuration with preferred declaration registration",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/rewriter.go",
+          "tests": [
+            "TestPatternInferenceActualRewriterTraversalAndOwnership",
+            "TestPatternInferenceActualRewriterPendingPullAndResume"
           ]
         }
       ],

@@ -286,6 +286,7 @@
       "package": "ast/pattern",
       "imports": [
         "ast",
+        "ast/rewriter",
         "util/diagnostic"
       ],
       "production_files": [
@@ -298,6 +299,7 @@
         "pattern_selection.go",
         "preferred_pattern.go",
         "reduce_quantifier.go",
+        "rewriter.go",
         "smaller_pattern.go"
       ]
     },

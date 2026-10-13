@@ -169,6 +169,12 @@ func TestBVRewriterNANDWarmNativeBufferIgnoresBudgetFailure(t *testing.T) {
 	m.Budget().FailAfter(-1)
 	got, e := m.RefGet(out)
 	satOK(t, e)
+	if ast.ASTSourceDebug {
+		if !errors.Is(body, arena.ErrInjectedFailure) || got != x || m.Budget().Used() != before {
+			t.Fatal("debug direct AST allocation refusal must keep the NAND output", body, got, before, m.Budget().Used())
+		}
+		return
+	}
 	if body != nil || got.IsNull() || m.Budget().Used() != before {
 		t.Fatal("native buffer output/charge", body, got, before, m.Budget().Used())
 	}
@@ -263,6 +269,12 @@ func TestBVRewriterANDWarmNativeBufferIgnoresBudgetFailure(t *testing.T) {
 	m.Budget().FailAfter(-1)
 	got, e := m.RefGet(out)
 	satOK(t, e)
+	if ast.ASTSourceDebug {
+		if !errors.Is(body, arena.ErrInjectedFailure) || got != x || m.Budget().Used() != before {
+			t.Fatal("debug direct AST allocation refusal must keep the AND output", body, got, before, m.Budget().Used())
+		}
+		return
+	}
 	if body != nil || got.IsNull() || m.Budget().Used() != before {
 		t.Fatal("native buffer output/charge", body, got, before, m.Budget().Used())
 	}
