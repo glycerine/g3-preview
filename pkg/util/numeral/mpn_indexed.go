@@ -64,6 +64,7 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
+	m.traceMPNBinaryView(a, b, "/")
 	na, nb := a.size, b.size
 	// src/util/mpn.cpp:158-168 precedes denominator checks and returns
 	// before the common debug verification. Unsigned underflow is retained;
@@ -94,6 +95,7 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 	if na == 1 && nb == 1 {
 		q.write(0, a.read(0)/b.read(0))
 		r.write(0, a.read(0)%b.read(0))
+		m.traceMPNDivisionOutputs(a, b, q, r)
 		return false, m.sourceVerifyDivision(a, b, q, r)
 	}
 	if na == nb && a.read(na-1) < b.read(nb-1) {
@@ -101,6 +103,7 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 		for i := uint32(0); i < nb; i++ {
 			r.write(i, a.read(i))
 		}
+		m.traceMPNDivisionOutputs(a, b, q, r)
 		return false, m.sourceVerifyDivision(a, b, q, r)
 	}
 	if na == math.MaxUint32 {
@@ -155,6 +158,7 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 		}
 		r.write(nb-1, m.sourceDivRead(u, nb-1)>>d)
 	}
+	m.traceMPNDivisionOutputs(a, b, q, r)
 	return true, m.sourceVerifyDivision(a, b, q, r)
 }
 func (m *NaturalManager) divideViewOne(a limbView, b uint32, q limbView) {
@@ -210,6 +214,7 @@ func (m *NaturalManager) divideMany(size, n uint32, q limbView) error {
 		}
 		small := uint32(qh)
 		// Source mul(&small,1,v,n,ms), Algorithm M with the zero-digit branch.
+		m.traceMPNBinary([]uint32{small}, m.Division[v][:n], "*")
 		m.sourceDivWrite(ms, 0, 0)
 		for i := uint32(0); i < n; i++ {
 			digit := m.sourceDivRead(v, i)
@@ -221,6 +226,8 @@ func (m *NaturalManager) divideMany(size, n uint32, q limbView) error {
 			m.sourceDivWrite(ms, i, uint32(t))
 			m.sourceDivWrite(ms, i+1, uint32(t>>32))
 		}
+		m.traceMPNUnary(m.Division[ms][:n+1], 427, true)
+		m.traceMPNBinary(m.Division[u][j:j+n+1], m.Division[ms][:n+1], "-")
 		var borrow uint32
 		for i := uint32(0); i < n+1; i++ {
 			a, b := m.sourceDivRead(u, j+i), m.sourceDivRead(ms, i)
@@ -234,6 +241,7 @@ func (m *NaturalManager) divideMany(size, n uint32, q limbView) error {
 				borrow = 1
 			}
 		}
+		m.traceMPNUnary(m.Division[u][j:j+n+1], 427, true)
 		q.write(j, small)
 		if borrow != 0 {
 			q.write(j, small-1)
@@ -241,6 +249,7 @@ func (m *NaturalManager) divideMany(size, n uint32, q limbView) error {
 				return e
 			}
 			ab := 3
+			m.traceMPNBinary(m.Division[v][:n], m.Division[u][j:j+n+1], "+")
 			var carry uint32
 			for i := uint32(0); i < n+1; i++ {
 				a := uint32(0)
@@ -259,6 +268,11 @@ func (m *NaturalManager) divideMany(size, n uint32, q limbView) error {
 				}
 			}
 			m.sourceDivWrite(ab, n+1, carry)
+			realSize := n + 2
+			for realSize > 1 && m.sourceDivRead(ab, realSize-1) == 0 {
+				realSize--
+			}
+			m.traceMPNUnary(m.Division[ab][:realSize], 427, true)
 			for i := uint32(0); i < n+1; i++ {
 				m.sourceDivWrite(u, j+i, m.sourceDivRead(ab, i))
 			}

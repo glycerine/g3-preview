@@ -153671,19 +153671,52 @@
           ]
         },
         {
-          "name": "trace(a,b,op)",
-          "status": "unported",
-          "tests": []
+          "name": "trace(a,b,op) through retained compare, add, sub, mul, division and verification callers (mpn.cpp:406-429)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_arithmetic_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpn.go",
+            "pkg/util/numeral/mpn_indexed.go",
+            "pkg/util/numeral/mpn_source_verify.go"
+          ],
+          "tests": [
+            "TestMPNArithmeticSourceTraceOrder",
+            "TestMPNCompareTraceUsesSourceDecimalConversionForMultipleLimbs",
+            "TestMPNMultiLimbDivisionNestedArithmeticTrace",
+            "TestMPNDivisionAddbackTraceFollowsBorrow"
+          ]
         },
         {
-          "name": "trace(a)",
-          "status": "unported",
-          "tests": []
+          "name": "trace(a) through retained compare, add, sub, mul, division and verification callers (mpn.cpp:406-429)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_arithmetic_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpn.go",
+            "pkg/util/numeral/mpn_indexed.go",
+            "pkg/util/numeral/mpn_source_verify.go"
+          ],
+          "tests": [
+            "TestMPNArithmeticSourceTraceOrder",
+            "TestMPNCompareTraceUsesSourceDecimalConversionForMultipleLimbs",
+            "TestMPNMultiLimbDivisionNestedArithmeticTrace",
+            "TestMPNDivisionAddbackTraceFollowsBorrow"
+          ]
         },
         {
-          "name": "trace_nl",
-          "status": "unported",
-          "tests": []
+          "name": "trace_nl through retained compare, add, sub, mul, division and verification callers (mpn.cpp:406-429)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_arithmetic_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpn.go",
+            "pkg/util/numeral/mpn_indexed.go",
+            "pkg/util/numeral/mpn_source_verify.go"
+          ],
+          "tests": [
+            "TestMPNArithmeticSourceTraceOrder",
+            "TestMPNCompareTraceUsesSourceDecimalConversionForMultipleLimbs",
+            "TestMPNMultiLimbDivisionNestedArithmeticTrace",
+            "TestMPNDivisionAddbackTraceFollowsBorrow"
+          ]
         },
         {
           "name": "Natural SourceFinalize releases native division/verification workspace without Runtime events; owner guards remain",
@@ -154268,19 +154301,52 @@
           ]
         },
         {
-          "name": "trace(a,b,op)",
-          "status": "unported",
-          "tests": []
+          "name": "trace(a,b,op) through retained compare, add, sub, mul, division and verification callers (mpn.cpp:406-429)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_arithmetic_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpn.go",
+            "pkg/util/numeral/mpn_indexed.go",
+            "pkg/util/numeral/mpn_source_verify.go"
+          ],
+          "tests": [
+            "TestMPNArithmeticSourceTraceOrder",
+            "TestMPNCompareTraceUsesSourceDecimalConversionForMultipleLimbs",
+            "TestMPNMultiLimbDivisionNestedArithmeticTrace",
+            "TestMPNDivisionAddbackTraceFollowsBorrow"
+          ]
         },
         {
-          "name": "trace(a)",
-          "status": "unported",
-          "tests": []
+          "name": "trace(a) through retained compare, add, sub, mul, division and verification callers (mpn.cpp:406-429)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_arithmetic_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpn.go",
+            "pkg/util/numeral/mpn_indexed.go",
+            "pkg/util/numeral/mpn_source_verify.go"
+          ],
+          "tests": [
+            "TestMPNArithmeticSourceTraceOrder",
+            "TestMPNCompareTraceUsesSourceDecimalConversionForMultipleLimbs",
+            "TestMPNMultiLimbDivisionNestedArithmeticTrace",
+            "TestMPNDivisionAddbackTraceFollowsBorrow"
+          ]
         },
         {
-          "name": "trace_nl",
-          "status": "unported",
-          "tests": []
+          "name": "trace_nl through retained compare, add, sub, mul, division and verification callers (mpn.cpp:406-429)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_arithmetic_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpn.go",
+            "pkg/util/numeral/mpn_indexed.go",
+            "pkg/util/numeral/mpn_source_verify.go"
+          ],
+          "tests": [
+            "TestMPNArithmeticSourceTraceOrder",
+            "TestMPNCompareTraceUsesSourceDecimalConversionForMultipleLimbs",
+            "TestMPNMultiLimbDivisionNestedArithmeticTrace",
+            "TestMPNDivisionAddbackTraceFollowsBorrow"
+          ]
         },
         {
           "name": "Natural SourceFinalize releases native division/verification workspace without Runtime events; owner guards remain",

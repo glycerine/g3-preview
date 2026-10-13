@@ -27,6 +27,7 @@ func (m *NaturalManager) sourceVerifyDivision(a, b, q, r limbView) error {
 	defer func() { m.verificationScratch = m.verificationScratch[:0] }()
 	out := limbView{external: m.verificationScratch, size: size}
 	// mpn_manager::mul, Knuth M: initialize lnga cells, then every column.
+	m.traceMPNBinaryView(q, b, "*")
 	for i := uint32(0); i < q.size; i++ {
 		out.write(i, 0)
 	}
@@ -44,7 +45,9 @@ func (m *NaturalManager) sourceVerifyDivision(a, b, q, r limbView) error {
 		}
 		out.write(j+q.size, carry)
 	}
+	m.traceMPNUnaryView(out, 427, true)
 	// Source aliasing add reads temp at each position before writing that cell.
+	m.traceMPNBinaryView(limbView{external: m.verificationScratch, size: a.size}, r, "+")
 	var carry uint32
 	for i := uint32(0); i < a.size; i++ {
 		u := out.read(i)
@@ -69,6 +72,7 @@ func (m *NaturalManager) sourceVerifyDivision(a, b, q, r limbView) error {
 	for realSize > 1 && out.read(realSize-1) == 0 {
 		realSize--
 	}
+	m.traceMPNUnaryView(limbView{external: m.verificationScratch, size: realSize}, 427, true)
 	ok := true
 	for i := uint32(0); i < a.size && ok; i++ {
 		if out.read(i) != a.read(i) {
