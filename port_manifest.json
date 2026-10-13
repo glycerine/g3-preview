@@ -162593,6 +162593,12 @@
             "TestPolynomialNormalizeActualTransportOwnerSourceRefusal",
             "TestPolynomialNormalizeIndependentSignedIntegerContent"
           ]
+        },
+        {
+          "name": "mpzzp setup_p and inv source TRACE records after reached arithmetic stages",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp_trace.go",
+          "tests": ["TestIntegerModularSetupAndInverseSourceTrace"]
         }
       ],
       "ownership": [
@@ -173348,6 +173354,12 @@
           "tests": ["TestMinCutRetainedEdgeTraceAndCut"]
         },
         {
+          "name": "mpzzp setup_p and inv TRACE at source lines 55, 175, 177 and 179",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp_trace.go",
+          "tests": ["TestIntegerModularSetupAndInverseSourceTrace"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -173649,6 +173661,12 @@
           "status": "ported",
           "go_target": "pkg/util/mincut/min_cut_trace.go",
           "tests": ["TestMinCutRetainedEdgeTraceAndCut"]
+        },
+        {
+          "name": "mpzzp setup_p and inv TRACE at source lines 55, 175, 177 and 179",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp_trace.go",
+          "tests": ["TestIntegerModularSetupAndInverseSourceTrace"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

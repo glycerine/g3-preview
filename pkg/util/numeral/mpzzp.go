@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 var ErrModularOwner = errors.New("mpnum: invalid modular integer owner")
@@ -23,6 +24,7 @@ type IntegerModularManager struct {
 	Normalization                                      integerPNormalizeScope
 	self                                               *IntegerModularManager
 	manager                                            *IntegerManager
+	trace                                              *diagnostic.TraceTags
 	z, prime, primeKnown, closed                       bool
 	P, Lower, Upper, InvTmp1, InvTmp2, InvTmp3, DivTmp Int
 	Header                                             uint64
@@ -184,9 +186,11 @@ func (m *IntegerModularManager) setupPWithAllocationContext(context integerAlloc
 	}
 	if even {
 		one := NewInt(1)
-		return z.addSubWithAllocationContext(&m.Lower, &one, &m.Lower, false, context)
+		if e := z.addSubWithAllocationContext(&m.Lower, &one, &m.Lower, false, context); e != nil {
+			return e
+		}
 	}
-	return nil
+	return m.traceSetupP()
 }
 func (m *IntegerModularManager) SetZ() error {
 	if e := m.check(); e != nil {
@@ -352,10 +356,19 @@ func (m *IntegerModularManager) invWithAllocationContext(a *Int, context integer
 			return ErrModularAssertion
 		}
 	}
+	if e := m.traceInvStart(a); e != nil {
+		return e
+	}
 	if e := m.normalizeWithSourceContext(a, context); e != nil {
 		return e
 	}
+	if e := m.traceInvNormalized(a); e != nil {
+		return e
+	}
 	if e := m.manager.extendedGCDWithAllocationContext(a, &m.P, &m.InvTmp1, &m.InvTmp2, &m.InvTmp3, context); e != nil {
+		return e
+	}
+	if e := m.traceInvGCD(); e != nil {
 		return e
 	}
 	if e := m.normalizeWithSourceContext(&m.InvTmp1, context); e != nil {
