@@ -147410,6 +147410,88 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "mpf.h:53-58 move constructor for retained scoped numerals and value storage",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_fpa_scoped_values.go",
+          "tests": [
+            "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
+            "TestASTFloatingPointScopedValueActualInlinePushPublication"
+          ]
+        },
+        {
+          "name": "mpf.h:60-61 ebits and sbits accessors",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_value.go",
+          "tests": [
+            "TestArbitraryFloatValueGeometryStructuralEqualityAndHash"
+          ]
+        },
+        {
+          "name": "mpf.h:88-90 inline significand deletion",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_value.go",
+          "tests": [
+            "TestArbitraryFloatEveryCopyReservationAndLiteralFieldPrefix"
+          ]
+        },
+        {
+          "name": "mpf.h:107-114 structural eq_core reached by AST floating-point value table",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_value.go",
+          "go_targets": [
+            "pkg/ast/ast_fpa_value_table.go"
+          ],
+          "tests": [
+            "TestArbitraryFloatValueGeometryStructuralEqualityAndHash",
+            "TestArbitraryFloatEqualityShortCircuitsBeforeSignificandRead",
+            "TestASTFloatingPointValueTableUsesActualMPFHashAndEquality"
+          ]
+        },
+        {
+          "name": "mpf.h:152-153,161 sign significand and exponent accessors reached by FPA API and AST printer",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/mpf_printer_parts.go",
+          "go_targets": [
+            "pkg/util/numeral/mpf_value.go"
+          ]
+        },
+        {
+          "name": "mpf.h:193-194 borrowed integer and rational manager accessors reached by FPA API",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/mpf_printer_parts.go"
+        },
+        {
+          "name": "mpf.h:196-199 hash reached by AST floating-point value table",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_value.go",
+          "go_targets": [
+            "pkg/ast/ast_fpa_value_table.go"
+          ],
+          "tests": [
+            "TestArbitraryFloatValueGeometryStructuralEqualityAndHash",
+            "TestASTFloatingPointValueTableUsesActualMPFHashAndEquality"
+          ]
+        },
+        {
+          "name": "mpf.h:240-290 four concrete cached power families and source destruction",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_powers_runtime.go",
+          "tests": [
+            "TestArbitraryFloatPowersRuntimeWrapperCacheAndSourceDestruction",
+            "TestArbitraryFloatPowerWrapperEveryActualReservationPrefix"
+          ]
+        },
+        {
+          "name": "mpf.h:300-327 scoped_mpf and concrete AST owning value vector",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_fpa_scoped_values.go",
+          "tests": [
+            "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
+            "TestASTFloatingPointScopedValueActualInlinePushPublication",
+            "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren"
+          ]
+        },
+        {
           "name": "mpf.h:146-147 explicit rational-owner to_rational adapter",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_value_to_rational.go",
