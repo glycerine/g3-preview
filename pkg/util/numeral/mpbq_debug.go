@@ -89,7 +89,7 @@ func (m *BinaryRationalManager) debugEqualValue(old *OwnedRational, a *BinaryRat
 	}
 	return m.debugAssert(same)
 }
-func (m *BinaryRationalManager) debugArithmetic(a, b *OwnedRational, out *BinaryRational, op uint8) error {
+func (m *BinaryRationalManager) debugArithmetic(a, b *OwnedRational, out *BinaryRational, op uint8, traceLine int) error {
 	r, e := m.debugValue(out)
 	if e != nil {
 		return e
@@ -108,6 +108,9 @@ func (m *BinaryRationalManager) debugArithmetic(a, b *OwnedRational, out *Binary
 		return e
 	}
 	defer m.debugDel(&want)
+	if traceLine != 0 {
+		m.traceMPBQArithmetic(a, b, &r, &want, traceLine)
+	}
 	same, e := m.Diagnostics.Equal(&want, &r)
 	if e != nil {
 		return e

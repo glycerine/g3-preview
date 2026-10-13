@@ -23,7 +23,7 @@ func (m *BinaryRationalManager) debugDel(a *OwnedRational) {}
 func (m *BinaryRationalManager) debugEqualValue(old *OwnedRational, a *BinaryRational) error {
 	return nil
 }
-func (m *BinaryRationalManager) debugArithmetic(a, b *OwnedRational, out *BinaryRational, op uint8) error {
+func (m *BinaryRationalManager) debugArithmetic(a, b *OwnedRational, out *BinaryRational, op uint8, traceLine int) error {
 	return nil
 }
 func (m *BinaryRationalManager) debugApproxSnapshot(a, old *BinaryRational) error    { return nil }

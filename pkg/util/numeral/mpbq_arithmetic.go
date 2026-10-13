@@ -53,7 +53,11 @@ func (m *BinaryRationalManager) addSub(a, b, r *BinaryRational, sub bool) error 
 	if sub {
 		op = 1
 	}
-	return m.debugArithmetic(&da, &db, r, op)
+	traceLine := 0
+	if sub {
+		traceLine = 195
+	}
+	return m.debugArithmetic(&da, &db, r, op, traceLine)
 }
 func (m *BinaryRationalManager) AddInteger(a *BinaryRational, b *Int, r *BinaryRational) error {
 	return m.addSubInteger(a, b, r, false)
@@ -101,7 +105,11 @@ func (m *BinaryRationalManager) addSubInteger(a *BinaryRational, b *Int, r *Bina
 	if sub {
 		op = 1
 	}
-	return m.debugArithmetic(&da, &db, r, op)
+	traceLine := 0
+	if !sub {
+		traceLine = 167
+	}
+	return m.debugArithmetic(&da, &db, r, op, traceLine)
 }
 func (m *BinaryRationalManager) Mul(a, b, r *BinaryRational) error {
 	if e := m.triple(a, b, r); e != nil {
@@ -127,7 +135,7 @@ func (m *BinaryRationalManager) Mul(a, b, r *BinaryRational) error {
 			return e
 		}
 	}
-	return m.debugArithmetic(&da, &db, r, 2)
+	return m.debugArithmetic(&da, &db, r, 2, 0)
 }
 func (m *BinaryRationalManager) MulInteger(a *BinaryRational, b *Int, r *BinaryRational) error {
 	if e := m.pair(a, r); e != nil {
@@ -153,7 +161,7 @@ func (m *BinaryRationalManager) MulInteger(a *BinaryRational, b *Int, r *BinaryR
 	if e = m.normalize(r); e != nil {
 		return e
 	}
-	return m.debugArithmetic(&da, &db, r, 2)
+	return m.debugArithmetic(&da, &db, r, 2, 0)
 }
 func (m *BinaryRationalManager) AddMul(a, b, c, r *BinaryRational) error {
 	if e := m.triple(a, b, c); e != nil {
