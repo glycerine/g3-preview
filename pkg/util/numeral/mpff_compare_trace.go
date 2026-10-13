@@ -57,5 +57,16 @@ func (m *FastFloatManager) traceLessResult(result bool, computed bool) {
 	if result {
 		body = "(1 == 1)\n"
 	}
-	_ = tags.EmitShort("mpff_trace", func(w io.Writer) error { return writeFastFloatPart(w, body) })
+	_ = tags.EmitShort("mpff_trace", func(w io.Writer) error {
+		if !computed {
+			return writeFastFloatPart(w, body)
+		}
+		if err := writeFastFloatPart(w, "("); err != nil {
+			return err
+		}
+		if err := writeFastFloatPart(w, traceBoolDigit(result)); err != nil {
+			return err
+		}
+		return writeFastFloatPart(w, " == 1)\n")
+	})
 }

@@ -152289,6 +152289,7 @@
         "TestFastFloatDecimalNativeDivisionWithoutReservations",
         "TestFastShellExactCoefficientsAndDirectedInequalities",
         "TestFastFloatLessRetainedShortTraceBranches",
+        "TestFastFloatLessComputedTraceSourceInsertions",
         "TestFastFloatAddSubOuterAndInnerTraceOrder",
         "TestFastFloatMulOuterAndInnerTraceOrder",
         "TestFastFloatMulTraceReachedImpreciseRounding",
@@ -152924,7 +152925,8 @@
             "pkg/util/numeral/mpff_compare_trace.go"
           ],
           "tests": [
-            "TestFastFloatLessRetainedShortTraceBranches"
+            "TestFastFloatLessRetainedShortTraceBranches",
+            "TestFastFloatLessComputedTraceSourceInsertions"
           ]
         },
         {
@@ -173877,7 +173879,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpff_compare_trace.go",
           "tests": [
-            "TestFastFloatLessRetainedShortTraceBranches"
+            "TestFastFloatLessRetainedShortTraceBranches",
+            "TestFastFloatLessComputedTraceSourceInsertions"
           ]
         },
         {
@@ -174279,7 +174282,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpff_compare_trace.go",
           "tests": [
-            "TestFastFloatLessRetainedShortTraceBranches"
+            "TestFastFloatLessRetainedShortTraceBranches",
+            "TestFastFloatLessComputedTraceSourceInsertions"
           ]
         },
         {
