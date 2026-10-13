@@ -11,6 +11,8 @@ type hypothesisReducer struct {
 	manager *ast.ASTManager
 	sets    *hypothesisSets
 	cache   map[ast.ASTHandle]ast.ASTHandle
+	units   map[ast.ASTHandle]ast.ASTHandle
+	trail   []ast.ASTHandle
 	refs    []ast.ASTRef
 }
 
@@ -30,7 +32,32 @@ func (r *hypothesisReducer) close() error {
 	}
 	r.sets.reset()
 	clear(r.cache)
+	clear(r.units)
+	r.trail = nil
 	return result
+}
+
+func (r *hypothesisReducer) popUnits(limit int) {
+	for len(r.trail) > limit {
+		last := r.trail[len(r.trail)-1]
+		delete(r.units, last)
+		r.trail = r.trail[:len(r.trail)-1]
+	}
+}
+
+func (r *hypothesisReducer) complementary(a, b ast.ASTHandle) (bool, error) {
+	if r.manager.IsTrue(a) && r.manager.IsFalse(b) || r.manager.IsFalse(a) && r.manager.IsTrue(b) {
+		return true, nil
+	}
+	yes, child, err := r.manager.IsNot(a)
+	if err != nil {
+		return false, err
+	}
+	if yes && child == b {
+		return true, nil
+	}
+	yes, child, err = r.manager.IsNot(b)
+	return yes && child == a, err
 }
 
 func (r *hypothesisReducer) complement(e ast.ASTHandle) (ast.ASTHandle, ast.ASTRef, error) {
@@ -93,6 +120,164 @@ func (r *hypothesisReducer) literals(clause ast.ASTHandle) ([]ast.ASTHandle, err
 		}
 	}
 	return []ast.ASTHandle{clause}, nil
+}
+
+func (r *hypothesisReducer) literalInClause(literal, clause ast.ASTHandle) (bool, error) {
+	kind, err := r.manager.GetKind(clause)
+	if err != nil || kind != ast.ASTApp {
+		return false, err
+	}
+	family, err := r.manager.GetFamilyID(clause)
+	if err != nil {
+		return false, err
+	}
+	op, err := r.manager.GetDeclKind(clause)
+	if err != nil || family != r.manager.BasicFamilyID() || op != ast.ASTOpOr {
+		return false, err
+	}
+	args, err := r.literals(clause)
+	if err != nil {
+		return false, err
+	}
+	for _, arg := range args {
+		if arg == literal {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func (r *hypothesisReducer) unitResolution(p ast.ASTHandle) (ast.ASTHandle, error) {
+	n, err := r.manager.GetProofNumParents(p)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if n < 2 {
+		return ast.ASTHandle{}, ast.ErrASTDomain
+	}
+	first, err := r.manager.GetProofParent(p, 0)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	parents := []ast.ASTHandle{first}
+	limit := len(r.trail)
+	defer r.popUnits(limit)
+	for i := uint32(1); i < n; i++ {
+		parent, e := r.manager.GetProofParent(p, i)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		unit, e := r.elim(parent)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		fact, e := r.manager.GetProofFact(unit)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if r.manager.IsFalse(fact) {
+			return unit, nil
+		}
+		if ast.ASTSourceDebug {
+			oldFact, e := r.manager.GetProofFact(parent)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			if fact != oldFact {
+				return ast.ASTHandle{}, ast.ErrASTDomain
+			}
+		}
+		parents = append(parents, unit)
+		if len(r.sets.byProof[unit]) == 0 {
+			if _, exists := r.units[fact]; !exists {
+				r.units[fact] = unit
+				r.trail = append(r.trail, fact)
+			}
+		}
+	}
+	oldClause, err := r.manager.GetProofFact(first)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	clauseProof, err := r.elim(first)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	parents[0] = clauseProof
+	clause, err := r.manager.GetProofFact(clauseProof)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if r.manager.IsFalse(clause) {
+		if err := r.pin(clauseProof); err != nil {
+			return ast.ASTHandle{}, err
+		}
+		return clauseProof, nil
+	}
+	contained, err := r.literalInClause(clause, oldClause)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if contained {
+		for i := 1; i < len(parents); i++ {
+			fact, e := r.manager.GetProofFact(parents[i])
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			complement, e := r.complementary(clause, fact)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			if complement {
+				result, e := r.manager.MkProofUnitResolution([]ast.ASTHandle{clauseProof, parents[i]})
+				if e != nil {
+					return ast.ASTHandle{}, e
+				}
+				if e = r.pin(result); e != nil {
+					return ast.ASTHandle{}, e
+				}
+				return result, r.sets.add(result)
+			}
+		}
+		return clauseProof, nil
+	}
+	literals, err := r.literals(clause)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	for i := 1; i < len(parents); {
+		fact, e := r.manager.GetProofFact(parents[i])
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		found := false
+		for _, literal := range literals {
+			found, e = r.complementary(literal, fact)
+			if e != nil {
+				return ast.ASTHandle{}, e
+			}
+			if found {
+				break
+			}
+		}
+		if !found {
+			parents[i] = parents[len(parents)-1]
+			parents = parents[:len(parents)-1]
+			continue
+		}
+		i++
+	}
+	if len(parents) == 1 {
+		return clauseProof, nil
+	}
+	result, err := r.manager.MkProofUnitResolution(parents)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = r.pin(result); err != nil {
+		return ast.ASTHandle{}, err
+	}
+	return result, r.sets.add(result)
 }
 
 func (r *hypothesisReducer) lemma(p ast.ASTHandle) (ast.ASTHandle, error) {
@@ -202,11 +387,18 @@ func (r *hypothesisReducer) elim(p ast.ASTHandle) (ast.ASTHandle, error) {
 	result := p
 	switch {
 	case hypothesis:
+		fact, e := r.manager.GetProofFact(p)
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		if replacement, found := r.units[fact]; found {
+			result = replacement
+		}
 		err = r.sets.add(result)
 	case lemma:
 		result, err = r.lemma(p)
 	case unit:
-		return ast.ASTHandle{}, ast.ErrASTPending
+		result, err = r.unitResolution(p)
 	default:
 		var changed bool
 		args := make([]ast.ASTHandle, 0)
@@ -268,9 +460,9 @@ done:
 	return result, nil
 }
 
-// ReduceHypothesesNoUnits ports the source hypothesis, lemma and ordinary
-// proof branches. Unit-resolution rewriting remains an explicit pending path.
-func ReduceHypothesesNoUnits(m *ast.ASTManager, proof ast.ASTRef) (err error) {
+// ReduceHypotheses applies the retained proof_utils reduction to an owning
+// proof reference, then releases its temporary proof and expression roots.
+func ReduceHypotheses(m *ast.ASTManager, proof ast.ASTRef) (err error) {
 	if m == nil {
 		return ast.ErrASTHandle
 	}
@@ -278,7 +470,7 @@ func ReduceHypothesesNoUnits(m *ast.ASTManager, proof ast.ASTRef) (err error) {
 	if err != nil {
 		return err
 	}
-	r := &hypothesisReducer{manager: m, sets: newHypothesisSets(m), cache: make(map[ast.ASTHandle]ast.ASTHandle)}
+	r := &hypothesisReducer{manager: m, sets: newHypothesisSets(m), cache: make(map[ast.ASTHandle]ast.ASTHandle), units: make(map[ast.ASTHandle]ast.ASTHandle)}
 	defer func() { err = errors.Join(err, r.close()) }()
 	result, err := r.elim(root)
 	if err != nil {

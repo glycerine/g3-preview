@@ -19084,7 +19084,8 @@
       "tests": [
         "TestProofHypothesesConcreteUnionAndInheritedCopy",
         "TestProofIsClosedLemmaLiteralsAndScopeReset",
-        "TestProofReduceHypothesesNoUnitsLemmaAndPendingResolution",
+        "TestProofReduceHypothesesLemmaAndResolution",
+        "TestProofReduceUnitResolutionLiteralAndClauseBranches",
         "TestProofReduceOrdinaryParentsReachConcreteUnion"
       ],
       "assertions": [
@@ -19169,11 +19170,12 @@
           ]
         },
         {
-          "name": "reduce_hypotheses0 hypothesis, lemma and ordinary proof branches with source literal compaction and owning result publication; unit resolution pending (proof_utils.cpp:468-584,683-727)",
-          "status": "partial",
+          "name": "reduce_hypotheses0 hypothesis, lemma, unit-resolution and ordinary proof branches with scoped closed-unit substitution, source literal compaction and owning result publication (proof_utils.cpp:468-727)",
+          "status": "ported",
           "go_target": "pkg/ast/proofs/reduce_hypotheses.go",
           "tests": [
-            "TestProofReduceHypothesesNoUnitsLemmaAndPendingResolution",
+            "TestProofReduceHypothesesLemmaAndResolution",
+            "TestProofReduceUnitResolutionLiteralAndClauseBranches",
             "TestProofReduceOrdinaryParentsReachConcreteUnion"
           ]
         }
@@ -19192,7 +19194,8 @@
       ],
       "tests": [
         "TestProofIsClosedLemmaLiteralsAndScopeReset",
-        "TestProofReduceHypothesesNoUnitsLemmaAndPendingResolution",
+        "TestProofReduceHypothesesLemmaAndResolution",
+        "TestProofReduceUnitResolutionLiteralAndClauseBranches",
         "TestProofReduceOrdinaryParentsReachConcreteUnion"
       ],
       "conditionals": [
@@ -19247,11 +19250,12 @@
           ]
         },
         {
-          "name": "reduce_hypotheses0 hypothesis, lemma and ordinary proof branches with source literal compaction and owning result publication; unit resolution pending (proof_utils.cpp:468-584,683-727)",
-          "status": "partial",
+          "name": "reduce_hypotheses0 hypothesis, lemma, unit-resolution and ordinary proof branches with scoped closed-unit substitution, source literal compaction and owning result publication (proof_utils.cpp:468-727)",
+          "status": "ported",
           "go_target": "pkg/ast/proofs/reduce_hypotheses.go",
           "tests": [
-            "TestProofReduceHypothesesNoUnitsLemmaAndPendingResolution",
+            "TestProofReduceHypothesesLemmaAndResolution",
+            "TestProofReduceUnitResolutionLiteralAndClauseBranches",
             "TestProofReduceOrdinaryParentsReachConcreteUnion"
           ]
         }
@@ -117793,7 +117797,8 @@
       ],
       "tests": [
         "TestProofHypothesesConcreteUnionAndInheritedCopy",
-        "TestProofReduceHypothesesNoUnitsLemmaAndPendingResolution",
+        "TestProofReduceHypothesesLemmaAndResolution",
+        "TestProofReduceUnitResolutionLiteralAndClauseBranches",
         "TestProofReduceOrdinaryParentsReachConcreteUnion"
       ],
       "conditionals": [
@@ -117849,7 +117854,8 @@
           "go_target": "pkg/ast/proofs/hypotheses.go",
           "tests": [
             "TestProofHypothesesConcreteUnionAndInheritedCopy",
-            "TestProofReduceHypothesesNoUnitsLemmaAndPendingResolution",
+            "TestProofReduceHypothesesLemmaAndResolution",
+            "TestProofReduceUnitResolutionLiteralAndClauseBranches",
             "TestProofReduceOrdinaryParentsReachConcreteUnion"
           ]
         }
