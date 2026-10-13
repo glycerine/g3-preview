@@ -79288,13 +79288,18 @@
       "status": "partial",
       "go_targets": [
         "pkg/shell/global_timeout_option.go",
-        "pkg/shell/input_file_option.go"
+        "pkg/shell/input_file_option.go",
+        "pkg/shell/command_line.go"
       ],
       "tests": [
         "TestShellGlobalTimeoutOptionSourceBranch",
         "TestShellInputFileSourceBranches",
         "TestShellInputFileWarningRefusalPreservesSelection",
-        "TestShellFileOptionDirectAssignmentAndNullReset"
+        "TestShellFileOptionDirectAssignmentAndNullReset",
+        "TestShellCommandLineFilenameWarningAndOptionOrder",
+        "TestShellCommandLineTerminalActionsAndKinds",
+        "TestShellCommandLineSourceDecimalAndRefusals",
+        "TestShellCommandLineReachesGlobalParameterAndTimeoutOwners"
       ],
       "conditionals": [
         {
@@ -79421,13 +79426,24 @@
           "tests": [
             "TestShellFileOptionDirectAssignmentAndNullReset"
           ]
+        },
+        {
+          "name": "parse_cmd_line_args concrete option and filename scan, global parameter/warning/verbosity/timeout effects and terminal action selection (main.cpp:113-289)",
+          "status": "partial",
+          "go_target": "pkg/shell/command_line.go",
+          "tests": [
+            "TestShellCommandLineFilenameWarningAndOptionOrder",
+            "TestShellCommandLineTerminalActionsAndKinds",
+            "TestShellCommandLineSourceDecimalAndRefusals",
+            "TestShellCommandLineReachesGlobalParameterAndTimeoutOwners"
+          ]
         }
       ],
       "ownership": [
-        "The -T branch borrows its extracted argument and installs the resulting timer into the concrete shell TimeoutService. Input-file branches own the selected filename and borrow the warning service; -file can overwrite or clear selection, and a selected empty filename remains distinct from a null pointer. Full argument scanning and frontend dispatch remain unported."
+        "The concrete command-line scan borrows actual global-parameter, timeout, verbosity and warning services. It owns parser flags and filename state; -file can overwrite or clear selection, and a selected empty filename remains distinct from a null pointer. Terminal output and frontend dispatch remain unported."
       ],
       "deviations": [
-        "Go uses strconv on the source signed decimal prefix. Signed-long multiplication overflow is undefined in the selected C++ source; the Go branch returns an explicit range error. The input-file owner now preserves duplicate warnings, first selection, C-string boundaries, terminal -- joining, and -file direct overwrite/null assignment. Its concrete owner is not yet wired into the complete shell command-line loop or executable."
+        "The concrete scan now reaches -T, -v, -nw, -t, -memory and name=value through actual utility services and preserves option order, early terminal selection, input-kind flags, duplicate warnings, C-string boundaries and -file direct assignment. It returns terminal actions for help/version/parameter display rather than writing or exiting; -tr/-dbg, executable output, Windows slash options and frontend dispatch remain open. Go uses strconv on the source signed decimal prefix. Signed-long multiplication overflow is undefined in the selected C++ source; the Go -T branch returns an explicit range error."
       ]
     },
     {
