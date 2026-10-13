@@ -59,10 +59,16 @@ func (m *FixedPointManager) Inv(a *FixedPoint) error {
 // Power preserves the source's left-to-right small-power path for distinct
 // operands and repeated-square path for aliased or larger powers. Directed
 // rounding occurs after each multiplication, not only at the final result.
-func (m *FixedPointManager) Power(a *FixedPoint, exponent uint32, out *FixedPoint) error {
+func (m *FixedPointManager) Power(a *FixedPoint, exponent uint32, out *FixedPoint) (err error) {
 	if err := m.pair(a, out); err != nil {
 		return err
 	}
+	input := m.fixedPowerTraceInput(a)
+	defer func() {
+		if err == nil {
+			m.traceFixedPower(input, exponent, out)
+		}
+	}()
 	if a.scaled.Sign() == 0 {
 		if exponent == 0 {
 			return ErrFixedPointDomain

@@ -153004,7 +153004,8 @@
         "pkg/util/numeral/mpfx_power_of_two.go",
         "pkg/util/numeral/mpfx_power_of_two_test.go",
         "pkg/util/numeral/mpfx_compare_product_trace.go",
-        "pkg/util/numeral/mpfx_integral_trace.go"
+        "pkg/util/numeral/mpfx_integral_trace.go",
+        "pkg/util/numeral/mpfx_power_trace.go"
       ],
       "tests": [
         "TestFixedPointRetainedArithmeticAndDirectedRounding",
@@ -153016,7 +153017,8 @@
         "TestFixedPointRetainedOrderingSignsIncrementAndSwap",
         "TestFixedPointPrevPowerOfTwoSourceIntegerWords",
         "TestFixedPointComparisonAndProductSourceTrace",
-        "TestFixedPointFloorCeilSourceTrace"
+        "TestFixedPointFloorCeilSourceTrace",
+        "TestFixedPointPowerSourceTraceAndRawWords"
       ],
       "conditionals": [
         {
@@ -153316,6 +153318,14 @@
           "go_target": "pkg/util/numeral/mpfx_integral_trace.go",
           "tests": [
             "TestFixedPointFloorCeilSourceTrace"
+          ]
+        },
+        {
+          "name": "mpfx power final STRACE and mpfx_power TRACE raw signed fixed-word display (mpfx.cpp:647-648,745-756)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpfx_power_trace.go",
+          "tests": [
+            "TestFixedPointPowerSourceTraceAndRawWords"
           ]
         }
       ],
@@ -173116,7 +173126,8 @@
         "pkg/util/numeral/mpbq_debug_trace.go",
         "pkg/util/numeral/mpq_parse_trace.go",
         "pkg/util/numeral/mpfx_compare_product_trace.go",
-        "pkg/util/numeral/mpfx_integral_trace.go"
+        "pkg/util/numeral/mpfx_integral_trace.go",
+        "pkg/util/numeral/mpfx_power_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -173128,7 +173139,8 @@
         "TestBinaryRetainedDebugArithmeticTraceSites",
         "TestRationalSetStringRetainedTraceBranches",
         "TestFixedPointComparisonAndProductSourceTrace",
-        "TestFixedPointFloorCeilSourceTrace"
+        "TestFixedPointFloorCeilSourceTrace",
+        "TestFixedPointPowerSourceTraceAndRawWords"
       ],
       "conditionals": [
         {
@@ -173412,6 +173424,14 @@
           ]
         },
         {
+          "name": "mpfx power final STRACE and mpfx_power TRACE raw signed fixed-word display (mpfx.cpp:647-648,745-756)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpfx_power_trace.go",
+          "tests": [
+            "TestFixedPointPowerSourceTraceAndRawWords"
+          ]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -173439,7 +173459,8 @@
         "pkg/util/numeral/mpbq_debug_trace.go",
         "pkg/util/numeral/mpq_parse_trace.go",
         "pkg/util/numeral/mpfx_compare_product_trace.go",
-        "pkg/util/numeral/mpfx_integral_trace.go"
+        "pkg/util/numeral/mpfx_integral_trace.go",
+        "pkg/util/numeral/mpfx_power_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -173451,7 +173472,8 @@
         "TestBinaryRetainedDebugArithmeticTraceSites",
         "TestRationalSetStringRetainedTraceBranches",
         "TestFixedPointComparisonAndProductSourceTrace",
-        "TestFixedPointFloorCeilSourceTrace"
+        "TestFixedPointFloorCeilSourceTrace",
+        "TestFixedPointPowerSourceTraceAndRawWords"
       ],
       "conditionals": [
         {
@@ -173744,6 +173766,14 @@
           "go_target": "pkg/util/numeral/mpfx_integral_trace.go",
           "tests": [
             "TestFixedPointFloorCeilSourceTrace"
+          ]
+        },
+        {
+          "name": "mpfx power final STRACE and mpfx_power TRACE raw signed fixed-word display (mpfx.cpp:647-648,745-756)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpfx_power_trace.go",
+          "tests": [
+            "TestFixedPointPowerSourceTraceAndRawWords"
           ]
         },
         {
