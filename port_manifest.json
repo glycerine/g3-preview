@@ -149151,7 +149151,9 @@
         "pkg/ast/ast_fpa_numeral_probe.go",
         "pkg/ast/ast_fpa_numeral_probe_test.go",
         "pkg/ast/ast_fpa_plugin.go",
-        "pkg/ast/ast_fpa_plugin_source_test.go"
+        "pkg/ast/ast_fpa_plugin_source_test.go",
+        "pkg/util/numeral/mpf_borrowed_accessors.go",
+        "pkg/util/numeral/mpf_borrowed_accessors_test.go"
       ],
       "tests": [
         "TestArbitraryFloatScalarCopyReceiptEveryPrefix",
@@ -149360,7 +149362,8 @@
         "TestASTFloatingPointScopedClassificationSourcePredicates",
         "TestASTFloatingPointSpecialConstructorsScopedValue",
         "TestASTFloatingPointSpecialNaNFailureRetainsScalar",
-        "TestASTFloatingPointSignedZeroSortOverloads"
+        "TestASTFloatingPointSignedZeroSortOverloads",
+        "TestArbitraryFloatBorrowedFPAComponentsAndManagerLifetime"
       ],
       "conditionals": [
         {
@@ -149437,16 +149440,22 @@
         },
         {
           "name": "mpf.h:152-153,161 sign significand and exponent accessors reached by FPA API and AST printer",
-          "status": "partial",
-          "go_target": "pkg/util/numeral/mpf_printer_parts.go",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_borrowed_accessors.go",
           "go_targets": [
             "pkg/util/numeral/mpf_value.go"
+          ],
+          "tests": [
+            "TestArbitraryFloatBorrowedFPAComponentsAndManagerLifetime"
           ]
         },
         {
           "name": "mpf.h:193-194 borrowed integer and rational manager accessors reached by FPA API",
-          "status": "partial",
-          "go_target": "pkg/util/numeral/mpf_printer_parts.go"
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_borrowed_accessors.go",
+          "tests": [
+            "TestArbitraryFloatBorrowedFPAComponentsAndManagerLifetime"
+          ]
         },
         {
           "name": "mpf.h:196-199 hash reached by AST floating-point value table",
