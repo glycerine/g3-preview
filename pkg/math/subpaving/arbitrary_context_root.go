@@ -33,7 +33,9 @@ type ArbitraryContext struct {
 	unitHead                                        int
 	root                                            *ArbitraryNode
 	bounds                                          []*ArbitraryBound
+	queue                                           []*ArbitraryBound
 	timestamp                                       uint64
+	numVisited                                      uint64
 	owners                                          [4]*numeral.ScopedArbitraryFloatNumeral
 	epsilon, maxBound, minusMaxBound, rootPrecision *numeral.ArbitraryFloat
 	zeroEpsilon                                     bool
@@ -183,6 +185,7 @@ func (c *ArbitraryContext) Close() error {
 	if err := c.closeNumerals(); err != nil {
 		return err
 	}
+	c.queue = nil
 	for len(c.bounds) != 0 {
 		b := c.bounds[0]
 		if err := c.numbers.Del(&b.value); err != nil {

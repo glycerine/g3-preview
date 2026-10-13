@@ -12,6 +12,148 @@ import (
 type ArbitraryClause struct {
 	context *ArbitraryContext
 	atoms   []*ArbitraryInequality
+	visited uint64
+}
+
+type arbitraryTruth uint8
+
+const (
+	arbitraryUnknown arbitraryTruth = iota
+	arbitraryTrue
+	arbitraryFalse
+)
+
+// inequalityValue follows the source's upper/lower probe order and open-tie
+// rules. An unbounded side leaves the atom unknown.
+func (c *ArbitraryContext) inequalityValue(a *ArbitraryInequality, n *ArbitraryNode) (arbitraryTruth, error) {
+	if err := c.open(); err != nil {
+		return arbitraryUnknown, err
+	}
+	if err := c.checkInequality(a); err != nil {
+		return arbitraryUnknown, err
+	}
+	if err := c.checkRoot(n, a.variable); err != nil {
+		return arbitraryUnknown, err
+	}
+	u, l := n.upper[a.variable], n.lower[a.variable]
+	if u == nil && l == nil {
+		return arbitraryUnknown, nil
+	}
+	m := c.numbers
+	if a.lower {
+		if u != nil {
+			less, err := m.Less(&u.value, &a.value)
+			if err != nil {
+				return arbitraryUnknown, err
+			}
+			if less {
+				return arbitraryFalse, nil
+			}
+			if u.open || a.open {
+				equal, err := m.Equal(&u.value, &a.value)
+				if err != nil {
+					return arbitraryUnknown, err
+				}
+				if equal {
+					return arbitraryFalse, nil
+				}
+			}
+		}
+		if l != nil {
+			greater, err := m.Greater(&l.value, &a.value)
+			if err != nil {
+				return arbitraryUnknown, err
+			}
+			if greater {
+				return arbitraryTrue, nil
+			}
+			if l.open || !a.open {
+				equal, err := m.Equal(&l.value, &a.value)
+				if err != nil {
+					return arbitraryUnknown, err
+				}
+				if equal {
+					return arbitraryTrue, nil
+				}
+			}
+		}
+	} else {
+		if l != nil {
+			greater, err := m.Greater(&l.value, &a.value)
+			if err != nil {
+				return arbitraryUnknown, err
+			}
+			if greater {
+				return arbitraryFalse, nil
+			}
+			if l.open || a.open {
+				equal, err := m.Equal(&l.value, &a.value)
+				if err != nil {
+					return arbitraryUnknown, err
+				}
+				if equal {
+					return arbitraryFalse, nil
+				}
+			}
+		}
+		if u != nil {
+			less, err := m.Less(&u.value, &a.value)
+			if err != nil {
+				return arbitraryUnknown, err
+			}
+			if less {
+				return arbitraryTrue, nil
+			}
+			if u.open || !a.open {
+				equal, err := m.Equal(&u.value, &a.value)
+				if err != nil {
+					return arbitraryUnknown, err
+				}
+				if equal {
+					return arbitraryTrue, nil
+				}
+			}
+		}
+	}
+	return arbitraryUnknown, nil
+}
+
+// PropagateClause publishes the sole unknown atom. With all atoms false it
+// publishes the first one, exposing the ordinary bound conflict.
+func (c *ArbitraryContext) PropagateClause(clause *ArbitraryClause, n *ArbitraryNode) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if clause == nil || clause.context != c || len(clause.atoms) == 0 || n == nil || n != c.root || n.conflictVar != math.MaxUint32 {
+		return arena.ErrInvalidSlot
+	}
+	c.numVisited++
+	clause.visited = c.timestamp
+	unknown := -1
+	for i, a := range clause.atoms {
+		truth, err := c.inequalityValue(a, n)
+		if err != nil {
+			return err
+		}
+		switch truth {
+		case arbitraryTrue:
+			return nil
+		case arbitraryUnknown:
+			if unknown >= 0 {
+				return nil
+			}
+			unknown = i
+		}
+	}
+	if unknown < 0 {
+		unknown = 0
+	}
+	a := clause.atoms[unknown]
+	if err := c.publishBoundReason(n, a.variable, &a.value, a.lower, a.open, false, clause); err != nil {
+		return err
+	}
+	clause.visited = c.timestamp
+	return nil
 }
 
 type arbitraryUnitClause struct {

@@ -14,14 +14,15 @@ var ErrArbitraryContextCanceled = errors.New("subpaving: arbitrary context cance
 var ErrArbitraryContextTimestamp = errors.New("subpaving: arbitrary bound timestamp exhausted")
 
 type ArbitraryBound struct {
-	context   *ArbitraryContext
-	variable  uint32
-	value     numeral.ArbitraryFloat
-	lower     bool
-	open      bool
-	timestamp uint64
-	previous  *ArbitraryBound
-	axiom     bool
+	context      *ArbitraryContext
+	variable     uint32
+	value        numeral.ArbitraryFloat
+	lower        bool
+	open         bool
+	timestamp    uint64
+	previous     *ArbitraryBound
+	axiom        bool
+	reasonClause *ArbitraryClause
 }
 
 type ArbitraryNode struct {
@@ -88,13 +89,17 @@ func (n *ArbitraryNode) ConflictingBounds(variable uint32) (bool, error) {
 // It records the owned numeral before any fallible copy so Close can recover
 // a stopped construction.
 func (c *ArbitraryContext) PublishBound(n *ArbitraryNode, variable uint32, value *numeral.ArbitraryFloat, lower, open, axiom bool) error {
+	return c.publishBoundReason(n, variable, value, lower, open, axiom, nil)
+}
+
+func (c *ArbitraryContext) publishBoundReason(n *ArbitraryNode, variable uint32, value *numeral.ArbitraryFloat, lower, open, axiom bool, clause *ArbitraryClause) error {
 	if err := c.checkRoot(n, variable); err != nil {
 		return err
 	}
 	if value == nil || n.conflictVar != math.MaxUint32 {
 		return arena.ErrInvalidSlot
 	}
-	b := &ArbitraryBound{context: c, variable: variable, lower: lower, open: open, axiom: axiom}
+	b := &ArbitraryBound{context: c, variable: variable, lower: lower, open: open, axiom: axiom, reasonClause: clause}
 	c.bounds = append(c.bounds, b)
 	m := c.numbers
 	if c.variables[variable] {
@@ -145,6 +150,7 @@ func (c *ArbitraryContext) PublishBound(n *ArbitraryNode, variable uint32, value
 	if c.timestamp == math.MaxUint64 {
 		return ErrArbitraryContextTimestamp
 	}
+	c.queue = append(c.queue, b)
 	return nil
 }
 
