@@ -40181,3 +40181,7 @@ Added `SetFormattedLiteral` for the live `mpf_manager::set(..., char const*)` ro
 ### MPF formatted input callback and retained-child audit
 
 A real ThreadLocal Runtime failure during `SetFormattedLiteral` now verifies that manager source end, owning close, wrapper cleanup, and recursive wrapper entry all refuse the active callback without changing the output or budget. A separate cold conversion failure with an issued child history is cleaned, followed by a successful nonzero formatted call on the same manager; the older conversion's original cause and receipt remain unchanged. Focused native and checked/debug tests cover these paths. The formatted setter stays partial because exact source-stop and first-own failure histories remain unaudited; the broader `mpf.cpp` ownership audit remains open.
+
+### MPF formatted input younger source stop
+
+Reached a real signed-host TLS release failure inside the formatted setter's exponent-rational child. The child's source error stops the wrapper before ex or q destruction; the parsed `1.5p0` values remain exactly ex=0 and q=3/2 with the source cursor at zero. `SourceFinalize` returns the same stop without mutating the child, wrapper, budget, or older class state. A named physical owner audit passes before recovery, and separate owning cleanup releases the child and both parsed operands without rewriting source history. Native and checked/debug focused tests pass. The first-own release-failure profile and whole MPF ownership audit remain open.

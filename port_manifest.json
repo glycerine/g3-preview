@@ -146381,7 +146381,8 @@
             "TestArbitraryFloatFormattedLiteralSourceValues",
             "TestArbitraryFloatFormattedLiteralAllocationPrefixes",
             "TestArbitraryFloatFormattedLiteralAllocationCallbackGuards",
-            "TestArbitraryFloatFormattedLiteralRetainedChildThenLaterCall"
+            "TestArbitraryFloatFormattedLiteralRetainedChildThenLaterCall",
+            "TestArbitraryFloatFormattedLiteralYoungerSourceStop"
           ]
         },
         {
