@@ -1216,12 +1216,13 @@ func (c *ParamsContext) format(v *ParamsRef, key *usymbol.Symbol, module *string
 	if e := c.check(v); e != nil {
 		return e
 	}
-	if key != nil && v.Slot != 0 {
+	populated := v.Slot != 0 && c.Blocks[v.Slot-1].Size != 0
+	if key != nil && populated {
 		if e := c.keyCheck(*key); e != nil {
 			return e
 		}
 	}
-	if d != nil && v.Slot != 0 {
+	if d != nil && populated {
 		if d.manager != c.SymbolsField {
 			return ErrParamsOwner
 		}
@@ -1334,7 +1335,7 @@ func (c *ParamsContext) DisplaySMT2(v *ParamsRef, module *string, d *ParamDescrs
 		return "", e
 	}
 	// params_ref::display_smt2 leaves an empty reference untouched.
-	if v.Slot == 0 {
+	if v.Slot == 0 || c.Blocks[v.Slot-1].Size == 0 {
 		return "", nil
 	}
 	if d == nil {
@@ -1419,8 +1420,8 @@ func (c *ParamsContext) Validate(v *ParamsRef, d *ParamDescrs) error {
 	if e := c.check(v); e != nil {
 		return e
 	}
-	// params_ref::validate does not inspect descriptors for a null m_params.
-	if v.Slot == 0 {
+	// An absent or allocated-empty params vector never inspects descriptors.
+	if v.Slot == 0 || c.Blocks[v.Slot-1].Size == 0 {
 		return nil
 	}
 	if d == nil || d.manager != c.SymbolsField {
@@ -1599,7 +1600,7 @@ func (c *ParamsContext) FormatSMT2Into(v *ParamsRef, module *string, d *ParamDes
 	if e := c.check(v); e != nil {
 		return 0, e
 	}
-	if v.Slot == 0 {
+	if v.Slot == 0 || c.Blocks[v.Slot-1].Size == 0 {
 		return 0, nil
 	}
 	if d == nil {
