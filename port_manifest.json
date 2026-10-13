@@ -18104,7 +18104,8 @@
         "pkg/ast/pattern/multi_pattern.go",
         "pkg/ast/pattern/preferred_pattern.go",
         "pkg/ast/pattern/pattern_selection.go",
-        "pkg/ast/pattern/collect.go"
+        "pkg/ast/pattern/collect.go",
+        "pkg/ast/pattern/infer.go"
       ],
       "tests": [
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
@@ -18116,7 +18117,8 @@
         "TestPatternInferencePreferredPatternsCompleteAndOwned",
         "TestPatternInferenceSelectionStagesAndMultiBudget",
         "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
-        "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
+        "TestPatternInferenceCollectorArithmeticNestedAndDivisionException",
+        "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences"
       ],
       "conditionals": [
         {
@@ -18266,6 +18268,14 @@
             "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
             "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
           ]
+        },
+        {
+          "name": "mk_patterns reusable body collection, selection and per-call candidate reset while keeping preferred declarations",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/infer.go",
+          "tests": [
+            "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences"
+          ]
         }
       ],
       "ownership": [],
@@ -18286,7 +18296,8 @@
         "pkg/ast/pattern/multi_pattern.go",
         "pkg/ast/pattern/preferred_pattern.go",
         "pkg/ast/pattern/pattern_selection.go",
-        "pkg/ast/pattern/collect.go"
+        "pkg/ast/pattern/collect.go",
+        "pkg/ast/pattern/infer.go"
       ],
       "tests": [
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
@@ -18298,7 +18309,8 @@
         "TestPatternInferencePreferredPatternsCompleteAndOwned",
         "TestPatternInferenceSelectionStagesAndMultiBudget",
         "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
-        "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
+        "TestPatternInferenceCollectorArithmeticNestedAndDivisionException",
+        "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences"
       ],
       "conditionals": [
         {
@@ -18383,6 +18395,14 @@
           "tests": [
             "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
             "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
+          ]
+        },
+        {
+          "name": "pattern_inference_cfg reusable per-quantifier bindings and no-pattern exclusion lifecycle",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/infer.go",
+          "tests": [
+            "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences"
           ]
         }
       ],
@@ -166456,7 +166476,8 @@
         "pkg/ast/rewriter/bv_rewriter_bv2int_test.go",
         "pkg/ast/ast_bv_bv2int_numerals.go",
         "pkg/ast/ast_bv_bv2int_numerals_test.go",
-        "pkg/tactic/ufbv/match_subst.go"
+        "pkg/tactic/ufbv/match_subst.go",
+        "pkg/ast/pattern/candidates.go"
       ],
       "tests": [
         "TestSexprAccessorsAndScalarIterator",
@@ -166516,7 +166537,8 @@
         "TestBVRewriterBV2IntEveryColdReservationAndPublication",
         "TestBV2IntNativeRootReplacementConsumedOldReference",
         "TestASTBitVectorBV2IntEveryActualReservation",
-        "TestMatchSubstConcretePairCacheAndVariableBindings"
+        "TestMatchSubstConcretePairCacheAndVariableBindings",
+        "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences"
       ],
       "conditionals": [
         {
@@ -166693,6 +166715,14 @@
           "go_target": "pkg/ast/pattern/candidates.go",
           "tests": [
             "TestPatternInferenceLoopFilterConcreteCandidateOwnership"
+          ]
+        },
+        {
+          "name": "pattern_inference owning app_ref_vector candidate reset releases in source-forward order after each body",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/candidates.go",
+          "tests": [
+            "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences"
           ]
         }
       ],

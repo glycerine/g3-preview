@@ -292,6 +292,7 @@
         "candidates.go",
         "collect.go",
         "contains_subpattern.go",
+        "infer.go",
         "multi_pattern.go",
         "pattern_selection.go",
         "preferred_pattern.go",

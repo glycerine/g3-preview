@@ -137,13 +137,10 @@ func (c *patternCandidates) filterLooping() ([]ast.ASTHandle, error) {
 	return result, nil
 }
 
-func (c *patternCandidates) close() error {
-	if c == nil {
-		return ast.ErrASTHandle
-	}
-	if c.closed {
-		return nil
-	}
+// resetCandidates follows mk_patterns' end-of-call metadata reset and the
+// owning app_ref_vector's forward release order. A stopped release leaves its
+// unconsumed suffix for the next reset or close attempt.
+func (c *patternCandidates) resetCandidates() error {
 	if err := c.releaseCollectRefs(); err != nil {
 		return err
 	}
@@ -162,10 +159,23 @@ func (c *patternCandidates) close() error {
 		}
 	}
 	clear(c.info)
-	clear(c.preferred)
 	clear(c.visited)
 	c.todo = nil
 	c.noPatterns = nil
+	return nil
+}
+
+func (c *patternCandidates) close() error {
+	if c == nil {
+		return ast.ErrASTHandle
+	}
+	if c.closed {
+		return nil
+	}
+	if err := c.resetCandidates(); err != nil {
+		return err
+	}
+	clear(c.preferred)
 	c.closed = true
 	return nil
 }
