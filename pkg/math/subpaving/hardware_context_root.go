@@ -55,9 +55,22 @@ func (c *HardwareContext) UpdateParams(p HardwareContextPolicy) error {
 	if err := c.open(); err != nil {
 		return err
 	}
+	if err := c.updateEpsilon(p.Epsilon); err != nil {
+		return err
+	}
+	if err := c.updateMaxBound(p.MaxBoundPower); err != nil {
+		return err
+	}
+	c.maxDepth = p.MaxDepth
+	c.maxNodes = p.MaxNodes
+	c.updateMaxMemory(p.MaxMemoryMB)
+	return c.updateRootPrecision(p.RootPrecision)
+}
+
+func (c *HardwareContext) updateEpsilon(epsilon uint32) error {
 	m := c.numbers
-	if p.Epsilon != 0 {
-		if err := m.SetInt32(&c.epsilon, int32(p.Epsilon)); err != nil {
+	if epsilon != 0 {
+		if err := m.SetInt32(&c.epsilon, int32(epsilon)); err != nil {
 			return err
 		}
 		if err := m.Inv(&c.epsilon); err != nil {
@@ -70,10 +83,15 @@ func (c *HardwareContext) UpdateParams(p HardwareContextPolicy) error {
 		}
 		c.zeroEpsilon = true
 	}
+	return nil
+}
+
+func (c *HardwareContext) updateMaxBound(power uint32) error {
+	m := c.numbers
 	if err := m.SetInt32(&c.maxBound, 10); err != nil {
 		return err
 	}
-	if err := m.Power(&c.maxBound, p.MaxBoundPower, &c.maxBound); err != nil {
+	if err := m.Power(&c.maxBound, power, &c.maxBound); err != nil {
 		return err
 	}
 	if err := m.Set(&c.minusMaxBound, &c.maxBound); err != nil {
@@ -82,21 +100,25 @@ func (c *HardwareContext) UpdateParams(p HardwareContextPolicy) error {
 	if err := m.Neg(&c.minusMaxBound, &c.minusMaxBound); err != nil {
 		return err
 	}
-	c.maxDepth = p.MaxDepth
-	c.maxNodes = p.MaxNodes
-	if p.MaxMemoryMB == math.MaxUint32 {
+	return nil
+}
+
+func (c *HardwareContext) updateMaxMemory(megabytes uint32) {
+	if megabytes == math.MaxUint32 {
 		c.maxMemory = math.MaxUint64
 	} else {
-		c.maxMemory = uint64(p.MaxMemoryMB) * 1024 * 1024
+		c.maxMemory = uint64(megabytes) * 1024 * 1024
 	}
-	precision := p.RootPrecision
+}
+
+func (c *HardwareContext) updateRootPrecision(precision uint32) error {
 	if precision == 0 {
 		precision = 1
 	}
-	if err := m.SetInt32(&c.rootPrecision, int32(precision)); err != nil {
+	if err := c.numbers.SetInt32(&c.rootPrecision, int32(precision)); err != nil {
 		return err
 	}
-	return m.Inv(&c.rootPrecision)
+	return c.numbers.Inv(&c.rootPrecision)
 }
 
 func (c *HardwareContext) open() error {

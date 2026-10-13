@@ -50232,12 +50232,25 @@
       "path": "src/math/subpaving/subpaving.cpp",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/subpaving/hardware_context_params.go"
+      ],
+      "tests": [
+        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Concrete context_hwf wrapper updt_params dispatch into source-order named parameter getter and hardware bound policy (src/math/subpaving/subpaving.cpp:54)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_params.go",
+          "tests": [
+            "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -50291,7 +50304,8 @@
         "pkg/math/subpaving/hardware_interval_div.go",
         "pkg/math/interval/hardware_root.go",
         "pkg/math/subpaving/hardware_interval_root.go",
-        "pkg/math/subpaving/hardware_context_root.go"
+        "pkg/math/subpaving/hardware_context_root.go",
+        "pkg/math/subpaving/hardware_context_params.go"
       ],
       "tests": [
         "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
@@ -50301,7 +50315,8 @@
         "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds",
         "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
         "TestSubpavingHardwareIntervalXnEqYRetainedCases",
-        "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
+        "TestSubpavingHardwareContextBoundPolicyAndRootDispatch",
+        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
       ],
       "conditionals": [
         {
@@ -50386,6 +50401,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_root.go",
           "tests": [
             "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf context named params_ref update through epsilon, maximum bound, depth/node/memory limits and root precision (src/math/subpaving/subpaving_t_def.h:473-501)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_params.go",
+          "tests": [
+            "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
           ]
         }
       ],
@@ -50909,7 +50932,8 @@
         "pkg/math/subpaving/hardware_interval_div.go",
         "pkg/math/interval/hardware_root.go",
         "pkg/math/subpaving/hardware_interval_root.go",
-        "pkg/math/subpaving/hardware_context_root.go"
+        "pkg/math/subpaving/hardware_context_root.go",
+        "pkg/math/subpaving/hardware_context_params.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50975,7 +50999,8 @@
         "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds",
         "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
         "TestSubpavingHardwareIntervalXnEqYRetainedCases",
-        "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
+        "TestSubpavingHardwareContextBoundPolicyAndRootDispatch",
+        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
       ],
       "conditionals": [
         {
@@ -51316,6 +51341,14 @@
           "tests": [
             "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
           ]
+        },
+        {
+          "name": "Concrete config_hwf context named params_ref update through epsilon, maximum bound, depth/node/memory limits and root precision (src/math/subpaving/subpaving_t_def.h:473-501)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_params.go",
+          "tests": [
+            "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+          ]
         }
       ],
       "ownership": [
@@ -51387,7 +51420,8 @@
         "pkg/math/subpaving/hardware_interval_div.go",
         "pkg/math/interval/hardware_root.go",
         "pkg/math/subpaving/hardware_interval_root.go",
-        "pkg/math/subpaving/hardware_context_root.go"
+        "pkg/math/subpaving/hardware_context_root.go",
+        "pkg/math/subpaving/hardware_context_params.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51444,7 +51478,8 @@
         "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds",
         "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
         "TestSubpavingHardwareIntervalXnEqYRetainedCases",
-        "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
+        "TestSubpavingHardwareContextBoundPolicyAndRootDispatch",
+        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
       ],
       "assertions": [
         {
@@ -52026,6 +52061,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_root.go",
           "tests": [
             "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf context named params_ref update through epsilon, maximum bound, depth/node/memory limits and root precision (src/math/subpaving/subpaving_t_def.h:473-501)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_params.go",
+          "tests": [
+            "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
           ]
         }
       ],
@@ -160809,7 +160852,8 @@
         "pkg/util/params/util_params_string_view.go",
         "pkg/util/params/util_params_string_view_source_test.go",
         "pkg/smtcore/util_context_params_methods_source_test.go",
-        "pkg/util/params/util_params_string_stream.go"
+        "pkg/util/params/util_params_string_stream.go",
+        "pkg/math/subpaving/hardware_context_params.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -160890,7 +160934,8 @@
         "TestContextParamsMergeEveryContextCOWReservationPreservesInputAndExactReturnOwnership",
         "TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral",
         "TestContextParamsAllSetBooleanFieldsAndReachedBorrowedStringLifetime",
-        "TestContextParamsEveryLiteralBoolAndUIntDiagnosticOutputReservation"
+        "TestContextParamsEveryLiteralBoolAndUIntDiagnosticOutputReservation",
+        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
       ],
       "conditionals": [
         {
@@ -161268,6 +161313,14 @@
           "go_targets": [
             "pkg/smtcore/util_context_params_methods_source_test.go"
           ]
+        },
+        {
+          "name": "Concrete params_ref get_uint named default lookups consumed in source order by hardware context updt_params (src/util/params.h and src/math/subpaving/subpaving_t_def.h:473-501)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_params.go",
+          "tests": [
+            "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+          ]
         }
       ],
       "ownership": [
@@ -161337,7 +161390,8 @@
         "pkg/util/params/util_params_set_replacement_source.go",
         "pkg/util/params/util_params_set_replacement_source_test.go",
         "pkg/util/params/util_gparams_constructor_source.go",
-        "pkg/util/params/util_params_string_stream.go"
+        "pkg/util/params/util_params_string_stream.go",
+        "pkg/math/subpaving/hardware_context_params.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -161405,7 +161459,8 @@
         "TestParamsReferenceMatchedReplacementIndependentFramesAndReuse",
         "TestGlobalParamsSourceConstructorAllActualNestedPrefixes",
         "TestGlobalParamsServiceUnconditionalInitAndCurrentPointer",
-        "TestGlobalParamsServiceCtorRefusalPreservesCurrentAndFailedHeaders"
+        "TestGlobalParamsServiceCtorRefusalPreservesCurrentAndFailedHeaders",
+        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
       ],
       "conditionals": [
         {
@@ -161735,6 +161790,14 @@
             "TestGlobalParamsSourceConstructorAllActualNestedPrefixes",
             "TestGlobalParamsServiceUnconditionalInitAndCurrentPointer",
             "TestGlobalParamsServiceCtorRefusalPreservesCurrentAndFailedHeaders"
+          ]
+        },
+        {
+          "name": "Concrete params_ref get_uint named default lookups consumed in source order by hardware context updt_params (src/util/params.h and src/math/subpaving/subpaving_t_def.h:473-501)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_params.go",
+          "tests": [
+            "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
           ]
         }
       ],
