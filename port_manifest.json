@@ -146379,7 +146379,9 @@
           "go_target": "pkg/util/numeral/mpf_formatted_literal.go",
           "tests": [
             "TestArbitraryFloatFormattedLiteralSourceValues",
-            "TestArbitraryFloatFormattedLiteralAllocationPrefixes"
+            "TestArbitraryFloatFormattedLiteralAllocationPrefixes",
+            "TestArbitraryFloatFormattedLiteralAllocationCallbackGuards",
+            "TestArbitraryFloatFormattedLiteralRetainedChildThenLaterCall"
           ]
         },
         {

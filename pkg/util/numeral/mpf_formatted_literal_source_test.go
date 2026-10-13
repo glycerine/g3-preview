@@ -72,3 +72,44 @@ func TestArbitraryFloatFormattedLiteralAllocationPrefixes(t *testing.T) {
 		t.Fatal("formatted path never completed")
 	}
 }
+
+func TestArbitraryFloatFormattedLiteralRetainedChildThenLaterCall(t *testing.T) {
+	found := false
+	for ordinal := int64(0); ordinal < 256; ordinal++ {
+		b := arena.NewBudget(1 << 27)
+		m, e := NewArbitraryFloatManager(serviceConfig(b).Integers)
+		serviceMust(t, e)
+		var out ArbitraryFloat
+		b.FailAfter(ordinal)
+		body := m.SetFormattedLiteral(&out, 11, 4000, ArbitraryFloatNearestEven, "-123456789.25p17")
+		h := m.formattedLiteral.child.frame
+		b.FailAfter(-1)
+		if body != nil && h != nil {
+			oldBody, oldIssued := h.bodyCause, h.issued
+			serviceMust(t, m.CleanupFormattedLiteral())
+			serviceMust(t, m.CleanupValue(&out))
+			serviceMust(t, m.SetFormattedLiteral(&out, 11, 53, ArbitraryFloatNearestEven, "2p1"))
+			got, e := m.ToDouble(&out)
+			serviceMust(t, e)
+			if got != 4 || h.bodyCause != oldBody || h.issued != oldIssued {
+				t.Fatal("later formatted call adopted older conversion history", ordinal, got)
+			}
+			found = true
+		}
+		serviceMust(t, m.CleanupFormattedLiteral())
+		serviceMust(t, m.CleanupValue(&out))
+		if e := m.SourceFinalize(); e != nil && !m.integer.sourceGuard {
+			t.Fatal("formatted retained source end", ordinal, e)
+		}
+		serviceMust(t, m.Close())
+		if b.Used() != 0 {
+			t.Fatal("formatted retained owner refund", ordinal, b.Used())
+		}
+		if found {
+			break
+		}
+	}
+	if !found {
+		t.Fatal("no retained formatted conversion child")
+	}
+}
