@@ -147031,6 +147031,10 @@
           "go_targets": [
             "pkg/util/params/util_gparams_service_ops.go"
           ]
+        },
+        {
+          "name": "memory::display_i_max_usage has no retained source caller",
+          "status": "dead_deleted"
         }
       ],
       "ownership": [
@@ -147370,6 +147374,10 @@
             "TestGeneratedInitializeAndFinalizeConcreteServices",
             "TestGeneratedFinalizeNullProcessSkipsChildren"
           ]
+        },
+        {
+          "name": "memory::display_i_max_usage has no retained source caller",
+          "status": "dead_deleted"
         }
       ],
       "ownership": [
@@ -172205,6 +172213,18 @@
           "tests": [
             "TestProcessVerboseGlobalsDefaultAndBorrowedSelection"
           ]
+        },
+        {
+          "name": "fatal_error default exit reached by model implicant and MUZ TRUSTME/check-table callers; owning consumers are not yet ported",
+          "status": "unported"
+        },
+        {
+          "name": "set_fatal_error_handler callback setter and callback branch have no retained production setter call",
+          "status": "dead_deleted"
+        },
+        {
+          "name": "uint64_log2 is reached only by the inactive 64-bit mpz digit branch; selected _MP_INTERNAL digits are uint32",
+          "status": "dead_deleted"
         }
       ],
       "ownership": [
@@ -172213,7 +172233,8 @@
         "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events."
       ],
       "deviations": [
-        "Standard io.Writer and strings.Builder replace source ostream and custom buffer machinery. Quote, null, trim and indentation bytes are preserved; String refuses outputs above its explicit safe allocation bound. C++ ostream badbit, exception flags, and formatting state are standard-library internals rather than project escaped behavior and are excluded; Go Write reports io.Writer errors."
+        "Standard io.Writer and strings.Builder replace source ostream and custom buffer machinery. Quote, null, trim and indentation bytes are preserved; String refuses outputs above its explicit safe allocation bound. C++ ostream badbit, exception flags, and formatting state are standard-library internals rather than project escaped behavior and are excluded; Go Write reports io.Writer errors.",
+        "Do not introduce a process callback layer for uncalled set_fatal_error_handler. The reached fatal_error default exit belongs to the unported model/MUZ callers. The selected mpz 32-bit digit path uses the already ported log2(unsigned), so uint64_log2 needs no Go helper."
       ]
     },
     {
@@ -172628,6 +172649,22 @@
           "tests": [
             "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
           ]
+        },
+        {
+          "name": "fatal_error default exit reached by model implicant and MUZ TRUSTME/check-table callers; owning consumers are not yet ported",
+          "status": "unported"
+        },
+        {
+          "name": "set_fatal_error_handler callback setter and callback branch have no retained production setter call",
+          "status": "dead_deleted"
+        },
+        {
+          "name": "uint64_log2 is reached only by the inactive 64-bit mpz digit branch; selected _MP_INTERNAL digits are uint32",
+          "status": "dead_deleted"
+        },
+        {
+          "name": "TRUSTME macro fatal path at retained shell/MUZ callers; owning consumers remain unported",
+          "status": "unported"
         }
       ],
       "ownership": [
@@ -172642,7 +172679,8 @@
       ],
       "deviations": [
         "Standard io.Writer and strings.Builder replace source ostream and custom buffer machinery. Quote, null, trim and indentation bytes are preserved; String refuses outputs above its explicit safe allocation bound. C++ ostream badbit, exception flags, and formatting state are standard-library internals rather than project escaped behavior and are excluded; Go Write reports io.Writer errors.",
-        "Arithmetic small numeral caches, BV sort/fixed/conversion caches and bit2bool nested rows now use native slices with direct zero-gap filling/indexing. Removed astFormatRefVector, resizeNull geometric backing and reflected byte/capacity charges, plus duplicate bit2bool logical-size state. Sort acquired flags remain native metadata for actual successful INC leaves; fixed declaration interrupted-INC metadata preserves source publish-before-INC and explicit owning abort. Removed arithmetic cachePending since no fallible storage step remains after successful INC. Actual numerical/factory invocation cleanup, validation/publication order and ascending consumed-DEC retirement remain. Existing actual constructor/numeric reservation campaigns are retained; growth-only unpublished-cache expectations are retired. A native integration grows nested/conversion/sort caches under disabled arena reservations, preserves earlier cache pins, checks validation prefixes and completes source finalization. Cached arithmetic numerals retain one pin across repeated disabled-budget lookups. Prior source-capacity/refusal geometry claims are superseded; no generic C++ container or STL implementation credit is added."
+        "Arithmetic small numeral caches, BV sort/fixed/conversion caches and bit2bool nested rows now use native slices with direct zero-gap filling/indexing. Removed astFormatRefVector, resizeNull geometric backing and reflected byte/capacity charges, plus duplicate bit2bool logical-size state. Sort acquired flags remain native metadata for actual successful INC leaves; fixed declaration interrupted-INC metadata preserves source publish-before-INC and explicit owning abort. Removed arithmetic cachePending since no fallible storage step remains after successful INC. Actual numerical/factory invocation cleanup, validation/publication order and ascending consumed-DEC retirement remain. Existing actual constructor/numeric reservation campaigns are retained; growth-only unpublished-cache expectations are retired. A native integration grows nested/conversion/sort caches under disabled arena reservations, preserves earlier cache pins, checks validation prefixes and completes source finalization. Cached arithmetic numerals retain one pin across repeated disabled-budget lookups. Prior source-capacity/refusal geometry claims are superseded; no generic C++ container or STL implementation credit is added.",
+        "Do not introduce a process callback layer for uncalled set_fatal_error_handler. The reached fatal_error default exit belongs to the unported model/MUZ callers. The selected mpz 32-bit digit path uses the already ported log2(unsigned), so uint64_log2 needs no Go helper."
       ]
     },
     {
