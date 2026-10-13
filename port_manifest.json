@@ -121898,6 +121898,22 @@
             "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
             "TestEuclideanNormalizeQueryAfterNonUnitSolve"
           ]
+        },
+        {
+          "name": "SMT case-split activity, theory-aware activity and relative-goal generation heaps (smt_case_split_queue.cpp:40,61,733)",
+          "status": "unported"
+        },
+        {
+          "name": "SMT arithmetic theory variable, quantified-instance priority and difference-logic variable/DFS heaps (theory_arith.h:395; smt_quantifier_instances.h:57; diff_logic.h:201,1396)",
+          "status": "unported"
+        },
+        {
+          "name": "Hilbert basis passive and passive2 weight heaps (hilbert_basis.cpp:389,508)",
+          "status": "unported"
+        },
+        {
+          "name": "simplex variable-order heap (simplex.h:58)",
+          "status": "unported"
         }
       ],
       "ownership": [
