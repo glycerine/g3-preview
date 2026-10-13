@@ -2,7 +2,6 @@ package numeral
 
 import (
 	"bytes"
-	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
@@ -90,8 +89,6 @@ func TestFixedPointComparisonAndProductSourceTrace(t *testing.T) {
 		t.Fatal(err)
 	}
 	check("zero dividend", "[mpfx] (0) / (2) >= 0\n")
-	if err := m.Div(a, zero, out); !errors.Is(err, ErrFixedPointDivZero) {
-		t.Fatal("zero divisor", err)
-	}
+	assertFixedPointException(t, m.Div(a, zero, out), ErrFixedPointDivZero, ErrFixedPointOverflow, "multi-precision fixed point (mpfx) division by zero")
 	check("zero divisor before trace", "")
 }

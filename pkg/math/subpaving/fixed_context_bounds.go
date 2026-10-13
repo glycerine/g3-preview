@@ -97,7 +97,7 @@ func (c *FixedContext) RelevantNewBound(n *FixedNode, variable uint32, k *numera
 		return false, err
 	}
 	defer func() {
-		if errors.Is(err, numeral.ErrFixedPointOverflow) || errors.Is(err, numeral.ErrFixedPointDivZero) || errors.Is(err, numeral.ErrFixedPointDomain) {
+		if errors.Is(err, numeral.ErrFixedPointDomain) {
 			c.arithmeticFailed = true
 			relevant, err = false, nil
 		}

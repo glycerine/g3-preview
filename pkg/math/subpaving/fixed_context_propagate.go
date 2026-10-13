@@ -113,7 +113,7 @@ func (c *FixedContext) processQueuedBound(n *FixedNode, b *FixedBound) error {
 			return nil
 		}
 		if err := c.propagateDefinition(variable, n); err != nil {
-			if catchArithmetic && (errors.Is(err, numeral.ErrFixedPointOverflow) || errors.Is(err, numeral.ErrFixedPointDivZero) || errors.Is(err, numeral.ErrFixedPointDomain)) {
+			if catchArithmetic && errors.Is(err, numeral.ErrFixedPointDomain) {
 				c.arithmeticFailed = true
 				return nil
 			}
@@ -131,7 +131,7 @@ func (c *FixedContext) processQueuedBound(n *FixedNode, b *FixedBound) error {
 				continue
 			}
 			if err := c.PropagateClause(clause, n); err != nil {
-				if errors.Is(err, numeral.ErrFixedPointOverflow) || errors.Is(err, numeral.ErrFixedPointDivZero) || errors.Is(err, numeral.ErrFixedPointDomain) {
+				if errors.Is(err, numeral.ErrFixedPointDomain) {
 					c.arithmeticFailed = true
 					continue
 				}

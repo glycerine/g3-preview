@@ -4,7 +4,20 @@ import (
 	"errors"
 	"math/big"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
+
+func assertFixedPointException(t *testing.T, err, specific, sibling error, message string) {
+	t.Helper()
+	if !errors.Is(err, specific) || !errors.Is(err, ErrFixedPointDomain) || errors.Is(err, sibling) {
+		t.Fatalf("fixed-point exception inheritance: %v", err)
+	}
+	var base z3exception.Z3Exception
+	if !errors.As(err, &base) || base.Message() != message || base.ErrorCode() != z3exception.ErrorOK || base.HasErrorCode() {
+		t.Fatalf("fixed-point z3_exception surface: %v", err)
+	}
+}
 
 func TestFixedPointRetainedFloorCeilInverseAndPower(t *testing.T) {
 	m, err := NewFixedPointManager(2, 1)
@@ -75,9 +88,7 @@ func TestFixedPointRetainedFloorCeilInverseAndPower(t *testing.T) {
 	must(m.Power(out, 3, out))
 	want(out, "27/8")
 	must(m.Reset(a))
-	if err := m.Power(a, 0, out); !errors.Is(err, ErrFixedPointDomain) {
-		t.Fatalf("zero to zero power error = %v", err)
-	}
+	assertFixedPointException(t, m.Power(a, 0, out), ErrFixedPointDomain, ErrFixedPointOverflow, "multi-precision fixed point (mpfx) exception")
 	want(out, "27/8")
 	must(m.Power(a, 3, out))
 	want(out, "0")
@@ -115,9 +126,7 @@ func TestFixedPointPowerAliasExtraSquareAndCeilOverflow(t *testing.T) {
 	if err != nil || r.RatString() != "16777216" {
 		t.Fatalf("distinct-operand cube = %v, %v", r, err)
 	}
-	if err := m.Power(a, 3, a); !errors.Is(err, ErrFixedPointOverflow) {
-		t.Fatalf("aliased cube extra-square overflow = %v", err)
-	}
+	assertFixedPointException(t, m.Power(a, 3, a), ErrFixedPointOverflow, ErrFixedPointDivZero, "multi-precision fixed point (mpfx) overflow")
 	r, err = m.Rational(a)
 	if err != nil || r.RatString() != "16777216" {
 		t.Fatalf("source completed cube before extra-square failure: %v, %v", r, err)

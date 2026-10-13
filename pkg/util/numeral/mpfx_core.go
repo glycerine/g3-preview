@@ -7,14 +7,26 @@ import (
 	"math/big"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
+type fixedPointException struct {
+	message string
+	parent  error
+}
+
+func (e *fixedPointException) Error() string                    { return e.message }
+func (e *fixedPointException) Message() string                  { return e.message }
+func (e *fixedPointException) ErrorCode() z3exception.ErrorCode { return z3exception.ErrorOK }
+func (e *fixedPointException) HasErrorCode() bool               { return false }
+func (e *fixedPointException) Unwrap() error                    { return e.parent }
+
 var (
-	ErrFixedPointOwner    = errors.New("mpfx: invalid numeral owner")
-	ErrFixedPointClosed   = errors.New("mpfx: manager or numeral closed")
-	ErrFixedPointOverflow = errors.New("mpfx: integer part overflow")
-	ErrFixedPointDivZero  = errors.New("mpfx: division by zero")
-	ErrFixedPointDomain   = errors.New("mpfx: undefined or nonterminating operation")
+	ErrFixedPointOwner          = errors.New("mpfx: invalid numeral owner")
+	ErrFixedPointClosed         = errors.New("mpfx: manager or numeral closed")
+	ErrFixedPointDomain   error = &fixedPointException{message: "multi-precision fixed point (mpfx) exception"}
+	ErrFixedPointOverflow error = &fixedPointException{message: "multi-precision fixed point (mpfx) overflow", parent: ErrFixedPointDomain}
+	ErrFixedPointDivZero  error = &fixedPointException{message: "multi-precision fixed point (mpfx) division by zero", parent: ErrFixedPointDomain}
 )
 
 // FixedPointManager stores the source's fixed number of integer/fractional
