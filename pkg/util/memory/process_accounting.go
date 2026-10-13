@@ -27,3 +27,19 @@ func (p *ProcessAccounting) AllocationSize() uint64 {
 	}
 	return p.accounting.allocationSize()
 }
+
+// MaximumUsed and AllocationCount are the other process-wide getters consumed
+// by src/util/statistics.cpp's get_memory_statistics.
+func (p *ProcessAccounting) MaximumUsed() uint64 {
+	if !p.Valid() {
+		return 0
+	}
+	return p.accounting.maximumUsed()
+}
+
+func (p *ProcessAccounting) AllocationCount() uint64 {
+	if !p.Valid() {
+		return 0
+	}
+	return p.accounting.allocationCount()
+}

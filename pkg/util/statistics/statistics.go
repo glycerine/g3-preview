@@ -4,11 +4,12 @@ package statistics
 import (
 	"fmt"
 	"io"
-	"runtime"
 	"sort"
 	"strconv"
 	"strings"
 
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/insdict"
 )
 
@@ -256,8 +257,9 @@ func (s *Statistics) DisplayInternal(out io.Writer) error {
 }
 
 func memoryMegabytes(value uint64) float64 {
-	const mebibyte = uint64(1024 * 1024)
-	centi := (value/mebibyte)*100 + ((value%mebibyte)*100)/mebibyte
+	// The source multiplies unsigned long long before dividing; that product
+	// wraps in its 64-bit domain for very large byte counts.
+	centi := (100 * value) / (1024 * 1024)
 	return float64(centi) / 100
 }
 
@@ -267,16 +269,18 @@ func AddResourceLimit(s *Statistics, count uint64) {
 	s.UpdateUint64("rlimit count", count)
 }
 
-func addMemory(s *Statistics, heapAlloc, heapSys, mallocs uint64) {
-	s.UpdateDouble("max memory", memoryMegabytes(heapSys))
-	s.UpdateDouble("memory", memoryMegabytes(heapAlloc))
-	s.UpdateUint64("num allocs", mallocs)
+func addMemory(s *Statistics, current, peak, count uint64) {
+	s.UpdateDouble("max memory", memoryMegabytes(peak))
+	s.UpdateDouble("memory", memoryMegabytes(current))
+	s.UpdateUint64("num allocs", count)
 }
 
-// AddMemory reads the closest standard-library equivalents of Z3's allocator
-// counters: current heap bytes, heap bytes obtained, and cumulative mallocs.
-func AddMemory(s *Statistics) {
-	var memory runtime.MemStats
-	runtime.ReadMemStats(&memory)
-	addMemory(s, memory.HeapAlloc, memory.HeapSys, memory.Mallocs)
+// AddMemory follows get_memory_statistics using the source process accounting
+// values. Callers must supply the same process owner as their raw allocators.
+func AddMemory(s *Statistics, process *memory.ProcessAccounting) error {
+	if s == nil || !process.Valid() {
+		return arena.ErrConfig
+	}
+	addMemory(s, process.AllocationSize(), process.MaximumUsed(), process.AllocationCount())
+	return nil
 }

@@ -169840,7 +169840,8 @@
         "TestContributionsCopyResetAndRawAccess",
         "TestRenderingAggregationOrderingAndShadow",
         "TestUint64Threshold",
-        "TestMemoryStatisticsUseGoRuntimeDomains"
+        "TestMemoryStatisticsSourceCounterDomains",
+        "TestMemoryStatisticsReadsSharedSourceProcess"
       ],
       "assertions": [
         {
@@ -169902,12 +169903,13 @@
           ]
         },
         {
-          "name": "uint64 threshold helper and Go runtime memory counters",
+          "name": "uint64 threshold helper and process memory-manager statistics",
           "status": "ported",
           "go_target": "pkg/util/statistics/statistics.go",
           "tests": [
             "TestUint64Threshold",
-            "TestMemoryStatisticsUseGoRuntimeDomains"
+            "TestMemoryStatisticsSourceCounterDomains",
+            "TestMemoryStatisticsReadsSharedSourceProcess"
           ]
         }
       ],
@@ -169915,7 +169917,7 @@
         "Go strings own key spellings and typed slices own contributions; copying appends values and reset retains reusable slice capacity. No borrowed C strings, arena regions, allocation budget, manual vector capacity, or mutex is part of this single-goroutine value container."
       ],
       "deviations": [
-        "Go strings, typed slices, sort, strconv, and io.Writer replace C++ string pointers, vectors, iostreams, and allocation machinery. The approved github.com/glycerine/insdict dependency preserves stable insertion order for internal display; canonical displays sort key spellings. Go runtime.MemStats supplies the available process-memory counterparts."
+        "Go strings, typed slices, sort, strconv, and io.Writer replace C++ string pointers, vectors, iostreams, and allocation machinery. The approved github.com/glycerine/insdict dependency preserves stable insertion order for internal display; canonical displays sort key spellings. Memory statistics read the explicit shared ProcessAccounting source counters; unrelated Go heap metrics are not substituted."
       ]
     },
     {
@@ -169930,7 +169932,8 @@
         "TestContributionsCopyResetAndRawAccess",
         "TestRenderingAggregationOrderingAndShadow",
         "TestUint64Threshold",
-        "TestMemoryStatisticsUseGoRuntimeDomains"
+        "TestMemoryStatisticsSourceCounterDomains",
+        "TestMemoryStatisticsReadsSharedSourceProcess"
       ],
       "conditionals": [
         {
@@ -169980,12 +169983,13 @@
           ]
         },
         {
-          "name": "uint64 threshold helper and Go runtime memory counters",
+          "name": "uint64 threshold helper and process memory-manager statistics",
           "status": "ported",
           "go_target": "pkg/util/statistics/statistics.go",
           "tests": [
             "TestUint64Threshold",
-            "TestMemoryStatisticsUseGoRuntimeDomains"
+            "TestMemoryStatisticsSourceCounterDomains",
+            "TestMemoryStatisticsReadsSharedSourceProcess"
           ]
         }
       ],
@@ -169993,7 +169997,7 @@
         "Go strings own key spellings and typed slices own contributions; copying appends values and reset retains reusable slice capacity. No borrowed C strings, arena regions, allocation budget, manual vector capacity, or mutex is part of this single-goroutine value container."
       ],
       "deviations": [
-        "Go strings, typed slices, sort, strconv, and io.Writer replace C++ string pointers, vectors, iostreams, and allocation machinery. The approved github.com/glycerine/insdict dependency preserves stable insertion order for internal display; canonical displays sort key spellings. Go runtime.MemStats supplies the available process-memory counterparts."
+        "Go strings, typed slices, sort, strconv, and io.Writer replace C++ string pointers, vectors, iostreams, and allocation machinery. The approved github.com/glycerine/insdict dependency preserves stable insertion order for internal display; canonical displays sort key spellings. Memory statistics read the explicit shared ProcessAccounting source counters; unrelated Go heap metrics are not substituted."
       ]
     },
     {

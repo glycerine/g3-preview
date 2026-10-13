@@ -4,6 +4,9 @@ import (
 	"math"
 	"strings"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestContributionsCopyResetAndRawAccess(t *testing.T) {
@@ -76,7 +79,7 @@ func TestUint64Threshold(t *testing.T) {
 	}
 }
 
-func TestMemoryStatisticsUseGoRuntimeDomains(t *testing.T) {
+func TestMemoryStatisticsSourceCounterDomains(t *testing.T) {
 	var s Statistics
 	addMemory(&s, 2*1024*1024+1024*1024/2, 4*1024*1024, uint64(^uint32(0))+1)
 	if s.Size() != 3 || s.Key(2) != "num allocs" || s.IsUint(2) || s.DoubleValue(2) != float64(uint64(^uint32(0))+1) {
@@ -84,5 +87,61 @@ func TestMemoryStatisticsUseGoRuntimeDomains(t *testing.T) {
 	}
 	if s.Key(0) != "max memory" || s.DoubleValue(0) != 4 || s.Key(1) != "memory" || s.DoubleValue(1) != 2.5 {
 		t.Fatal("memory conversion")
+	}
+	if memoryMegabytes(^uint64(0)) != float64((^uint64(0)-99)/(1024*1024))/100 {
+		t.Fatal("unsigned source conversion overflow")
+	}
+}
+
+func TestMemoryStatisticsReadsSharedSourceProcess(t *testing.T) {
+	p := memory.NewProcessAccounting()
+	firstBudget, secondBudget := arena.NewBudget(1<<22), arena.NewBudget(1<<22)
+	first, err := memory.NewRuntime(memory.RuntimeConfig{Budget: firstBudget, Process: p, SizeTBits: 64})
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := memory.NewRuntime(memory.RuntimeConfig{Budget: secondBudget, Process: p, SizeTBits: 64})
+	if err != nil {
+		t.Fatal(err)
+	}
+	a, err := first.Allocate(1 << 20)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := second.Allocate(1 << 19)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p.AllocationSize() != (1<<20)+(1<<19)+16 || p.MaximumUsed() != p.AllocationSize() || p.AllocationCount() != 2 {
+		t.Fatal("source global counters", p.AllocationSize(), p.MaximumUsed(), p.AllocationCount())
+	}
+	var stats Statistics
+	if err := AddMemory(&stats, p); err != nil || stats.Size() != 3 || stats.Key(0) != "num allocs" || stats.UintValue(0) != 2 || stats.Key(1) != "max memory" || stats.DoubleValue(1) != 1.5 || stats.Key(2) != "memory" || stats.DoubleValue(2) != 1.5 {
+		t.Fatal("shared process stats", err, stats)
+	}
+	if err := first.Deallocate(&a); err != nil {
+		t.Fatal(err)
+	}
+	stats.Reset()
+	if err := AddMemory(&stats, p); err != nil || stats.Size() != 3 || stats.DoubleValue(1) != 1.5 || stats.DoubleValue(2) != 0.5 || stats.UintValue(0) != 2 {
+		t.Fatal("source peak survives release", err, stats)
+	}
+	if err := second.Deallocate(&b); err != nil {
+		t.Fatal(err)
+	}
+	if err := first.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err := second.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if firstBudget.Used() != 0 || secondBudget.Used() != 0 {
+		t.Fatal("retained process budgets", firstBudget.Used(), secondBudget.Used())
+	}
+	if err := AddMemory(nil, p); err != arena.ErrConfig {
+		t.Fatal("missing statistics", err)
+	}
+	if err := AddMemory(&stats, nil); err != arena.ErrConfig {
+		t.Fatal("missing process", err)
 	}
 }
