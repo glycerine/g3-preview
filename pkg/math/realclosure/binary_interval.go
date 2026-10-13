@@ -60,12 +60,22 @@ func (v *BinaryInterval) SetFinite(lower, upper *numeral.BinaryRational, lowerOp
 		return err
 	}
 	e := interval.BinaryExtended{Numbers: v.numbers}
-	cmp, err := e.Compare(lower, interval.Finite, upper, interval.Finite)
+	equal, err := e.Equal(lower, interval.Finite, upper, interval.Finite)
 	if err != nil {
 		return err
 	}
-	if cmp > 0 || cmp == 0 && (lowerOpen || upperOpen) {
-		return interval.ErrExtendedDomain
+	if equal {
+		if lowerOpen || upperOpen {
+			return interval.ErrExtendedDomain
+		}
+	} else {
+		less, err := e.Less(lower, interval.Finite, upper, interval.Finite)
+		if err != nil {
+			return err
+		}
+		if !less {
+			return interval.ErrExtendedDomain
+		}
 	}
 	if err = v.numbers.Copy(&v.lower, lower); err != nil {
 		return err
@@ -157,11 +167,11 @@ func (v *BinaryInterval) CheckInvariant() error {
 		}
 		return nil
 	}
-	cmp, err := e.Compare(&v.lower, v.lowerKind(), &v.upper, v.upperKind())
+	less, err := e.Less(&v.lower, v.lowerKind(), &v.upper, v.upperKind())
 	if err != nil {
 		return err
 	}
-	if cmp >= 0 {
+	if !less {
 		return interval.ErrExtendedDomain
 	}
 	return nil

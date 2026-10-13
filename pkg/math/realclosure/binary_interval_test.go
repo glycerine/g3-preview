@@ -403,7 +403,14 @@ func TestRealClosureBinaryIntervalRetainedCore(t *testing.T) {
 	// The source invariant checks raw mpbq equality first. These endpoints
 	// have the same numerical value but distinct source representations.
 	rawOne, rawTwoOverTwo := numeral.NewBinaryInt(1), numeral.NewBinaryIntPower(2, 1)
-	must(a.SetFinite(&rawOne, &rawTwoOverTwo, false, false))
+	if err := a.SetFinite(&rawOne, &rawTwoOverTwo, false, false); !errors.Is(err, interval.ErrExtendedDomain) {
+		t.Fatalf("raw-distinct numerically equal endpoints passed finite input check: %v", err)
+	}
+	must(a.CheckInvariant()) // rejected input did not corrupt the earlier interval
+	must(a.numbers.Copy(&a.lower, &rawOne))
+	must(a.numbers.Copy(&a.upper, &rawTwoOverTwo))
+	a.lowerInf, a.upperInf = false, false
+	a.lowerOpen, a.upperOpen = false, false
 	if err := a.CheckInvariant(); !errors.Is(err, interval.ErrExtendedDomain) {
 		t.Fatalf("raw-distinct numerically equal endpoints passed invariant: %v", err)
 	}
