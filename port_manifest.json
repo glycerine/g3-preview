@@ -145549,7 +145549,7 @@
       "path": "src/util/mpbqi.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/numeral/mpbqi.go",
         "pkg/util/numeral/mpbqi_format.go",
@@ -145636,11 +145636,6 @@
           ]
         },
         {
-          "name": "Persistent platform ostream state and remaining real polynomial/algebraic display consumers",
-          "status": "partial",
-          "tests": []
-        },
-        {
           "name": "Concrete MPBQ/open interval io.Writer display with source-order delimiter and bound insertion plus partial-write prefixes (src/util/basic_interval.h:358-360)",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpbqi_format.go",
@@ -145653,7 +145648,7 @@
         "Concrete pointer-free endpoints borrow one BinaryRationalManager domain. Actual cold manager and scope headers are charged; three retained multiplication scratch numerators preserve old output ownership. Source endpoint/destructor order and immediate reachable numeral/Words/diagnostic graphs are audited before formatting and teardown. See PORT_PROGRESS.md#audit-mpbqi-port-status-md."
       ],
       "deviations": [
-        "Concrete MPBQ/open specialization replaces C++ templates without Go generics. Native io.Writer insertion now preserves source delimiter/bound order and failing-write prefixes. The algebraic display_interval consumer now calls this writer; platform ostream state and other retained display consumers remain open; staged caller-owned strings remain available."
+        "Whole-header audit: mpbqi.h adds only the concrete MPBQ/open manager constructor, inherited interval operations, four set overloads, two add overloads and scoped aliases; those routes are represented by BinaryIntervalManager and its scoped owner. It defines no display override. The inherited basic_interval display writer and the algebraic display_interval caller are already covered; realclosure.cpp defines its own local mpbqi_manager alias over basic_interval and uses its separate Go realclosure interval owner. C++ ostream state is standard-library behavior, not a project algorithm."
       ]
     },
     {
