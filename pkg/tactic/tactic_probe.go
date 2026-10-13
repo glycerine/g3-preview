@@ -18,9 +18,10 @@ const (
 	ProbeDepth
 	ProbeSize
 	ProbeNumExprs
+	ProbeMemory
 )
 
-// Four concrete source probe classes share cold reference metadata. Each Eval
+// Concrete source probe classes share cold reference metadata. Each Eval
 // branch is the original class body, borrowing the goal only for that call.
 type Probe struct {
 	self       *Probe
@@ -33,7 +34,7 @@ type Probe struct {
 }
 
 func NewProbe(b *arena.Budget, kind ProbeKind, value float64) (*Probe, error) {
-	if kind > ProbeNumExprs {
+	if kind > ProbeMemory {
 		return nil, ast.ErrASTDomain
 	}
 	n := uint64(reflect.TypeOf(Probe{}).Size())
@@ -100,6 +101,16 @@ func (p *Probe) Eval(g *Goal) (float64, error) {
 	case ProbeNumExprs:
 		n, e := g.NumExprs()
 		return float64(n), e
+	case ProbeMemory:
+		numerals := g.manager.NumeralService()
+		if numerals == nil || numerals.RuntimeOwner() == nil {
+			return 0, ast.ErrASTHandle
+		}
+		bytes, e := numerals.RuntimeOwner().AllocationSize()
+		if e != nil {
+			return 0, e
+		}
+		return float64(bytes) / float64(1024*1024), nil
 	}
 	return 0, ast.ErrASTDomain
 }

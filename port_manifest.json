@@ -101417,10 +101417,12 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/tactic_probe.go",
+        "pkg/tactic/tactic_probe_memory_test.go",
         "pkg/smtcore/tactic_manager_test.go"
       ],
       "tests": [
-        "TestTacticManagerSourceProbeReferencesAndStructuralValues"
+        "TestTacticManagerSourceProbeReferencesAndStructuralValues",
+        "TestMemoryProbeReadsSharedProcessAllocation"
       ],
       "assertions": [
         {
@@ -101438,7 +101440,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "memory_probe::operator() reads source process allocation bytes as MiB (probe.cpp:29-37)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_probe.go",
+          "tests": [
+            "TestMemoryProbeReadsSharedProcessAllocation"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -101449,11 +101460,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/tactic_probe.go",
+        "pkg/tactic/tactic_probe_memory_test.go",
         "pkg/smtcore/tactic_manager_test.go"
       ],
       "tests": [
         "TestTacticManagerSourceProbeReferencesAndStructuralValues",
-        "TestTacticManagerDestructorFinalizesTacticsBeforeProbes"
+        "TestTacticManagerDestructorFinalizesTacticsBeforeProbes",
+        "TestMemoryProbeReadsSharedProcessAllocation"
       ],
       "conditionals": [
         {
@@ -101473,7 +101486,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "mk_memory_probe concrete factory/evaluation; generated registration remains open (probe.h:60,65)",
+          "status": "partial",
+          "go_target": "pkg/tactic/tactic_probe.go",
+          "tests": [
+            "TestMemoryProbeReadsSharedProcessAllocation"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -146849,6 +146871,14 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "memory_probe reads source process allocation bytes in MiB (tactic/probe.cpp:29-37)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_probe.go",
+          "tests": [
+            "TestMemoryProbeReadsSharedProcessAllocation"
+          ]
+        },
+        {
           "name": "model evaluator max-memory checkpoint shares AST, parameter and explicit raw Runtime process bytes (model_evaluator.cpp:282-290)",
           "status": "ported",
           "go_target": "pkg/model/model_evaluator.go",
@@ -147230,6 +147260,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "memory_probe reads source process allocation bytes in MiB (tactic/probe.cpp:29-37)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_probe.go",
+          "tests": [
+            "TestMemoryProbeReadsSharedProcessAllocation"
+          ]
+        },
         {
           "name": "model evaluator max-memory checkpoint shares AST, parameter and explicit raw Runtime process bytes (model_evaluator.cpp:282-290)",
           "status": "ported",
