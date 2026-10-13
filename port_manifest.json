@@ -120531,6 +120531,9 @@
           "name": "gparams::set/get_ref/init/finalize optional TRACE before their source body or current-imp assertion (gparams.cpp:563,608,634,639)",
           "status": "ported",
           "go_target": "pkg/util/params/util_gparams_service_ops.go",
+          "go_targets": [
+            "pkg/util/process/finalize_test.go"
+          ],
           "tests": [
             "TestGlobalParamsSetNameTracePrecedesNullAssertion",
             "TestGlobalParamsInitGetRefFinalizeTraceOrder",
@@ -120739,6 +120742,9 @@
           "name": "gparams::set/get_ref/init/finalize optional TRACE before their source body or current-imp assertion (gparams.cpp:563,608,634,639)",
           "status": "ported",
           "go_target": "pkg/util/params/util_gparams_service_ops.go",
+          "go_targets": [
+            "pkg/util/process/finalize_test.go"
+          ],
           "tests": [
             "TestGlobalParamsSetNameTracePrecedesNullAssertion",
             "TestGlobalParamsInitGetRefFinalizeTraceOrder",
@@ -162276,12 +162282,12 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": true,
       "methods": [
         {
-          "name": "concrete mpz buffers in euclidean_solver, linear_equation, bound_propagator and theory_arith_int: indexed mutable numeral, deep-copy push, source logical-size reserve, ascending reset, borrowed c_ptr and raw-vector swap",
-          "status": "partial",
+          "name": "concrete mpz/mpq Euclidean buffers: borrowed manager, size and indexed slots, deep-copy push, ordered reset/destruction, borrowed c_ptr and raw-vector swap (euclidean_solver.cpp:110-166, 439-446, 535-543, 648-697)",
+          "status": "ported",
           "go_target": "pkg/util/numeral/scoped_numeral.go",
           "go_targets": [
             "pkg/math/euclid/numeral_buffer_sort.go",
@@ -162289,31 +162295,46 @@
           ],
           "tests": [
             "TestEuclideanIntegerBufferSortAndRawSwap",
-            "TestIntegerNumeralBufferSourceReserveIndexesAndOwnsSlots",
+            "TestEuclideanRationalBufferSortAndRawSwap",
             "TestEuclideanSetupVariableJustificationAndEquationOwnership"
           ]
         },
         {
-          "name": "concrete mpq buffers in euclidean_solver and propagate_ineqs_tactic: indexed mutable numeral, deep-copy push, ascending reset, borrowed c_ptr and raw-vector swap where reached",
-          "status": "partial",
+          "name": "concrete mpz linear-equation buffer: indexed mutable slots, deep-copy push, pop/reset, borrowed c_ptr and source logical-size reserve (linear_equation.cpp:151-152, 183-196)",
+          "status": "ported",
           "go_target": "pkg/util/numeral/scoped_numeral.go",
           "go_targets": [
-            "pkg/math/euclid/numeral_buffer_sort.go",
-            "pkg/math/euclid/solver_setup.go"
+            "pkg/tactic/arith/linear_equation.go",
+            "pkg/tactic/arith/bound_equation_store.go"
           ],
           "tests": [
-            "TestEuclideanRationalBufferSortAndRawSwap",
-            "TestEuclideanSetupVariableJustificationAndEquationOwnership"
+            "TestIntegerNumeralBufferSourceReserveIndexesAndOwnsSlots",
+            "TestLinearEquationIntegerCoalesceSortNormalizeAndReuse",
+            "TestBoundEquationStoreVariablesWatchesAndConstraintOwnership"
           ]
+        },
+        {
+          "name": "remaining bound_propagator integration of concrete mpz equation buffers and propagation",
+          "status": "partial",
+          "go_target": "pkg/tactic/arith/bound_propagation.go"
+        },
+        {
+          "name": "concrete mpq propagate_ineqs_tactic buffer: push, reset, size and borrowed c_ptr (propagate_ineqs_tactic.cpp:132-169, 256-277)",
+          "status": "unported"
+        },
+        {
+          "name": "concrete mpz SMT theory_arith_int Euclidean bridge buffer (theory_arith_int.h:934-1112)",
+          "status": "unported"
         }
       ],
       "ownership": [
         "The buffer borrows its numeral manager and owns a manager-copy of each appended mpz/mpq value. Pop destroys the last value; reset and the destructor destroy values in ascending slot order. swap(svector&) transfers raw numeral storage in both directions, so the receiving owner must later delete its acquired numeral payloads. c_ptr and indexed access borrow mutable slots and become stale after slice growth or swap."
       ],
       "deviations": [
-        "No generic Go numeral-buffer adapter is retained. Concrete typed scoped numeral vectors expose borrowed indexed/c_ptr-style views and raw-slice storage swaps; Euclidean sorting and the integer/rational addmul row merges use them. The reached linear_equation mpz reserve is size growth, not Go capacity-only growth, and now has a concrete typed method; the linear_equation, other arithmetic tactic and SMT consumers remain open.",
+        "No generic Go numeral-buffer adapter is retained. Concrete typed scoped numeral vectors expose borrowed indexed/c_ptr-style views and raw-slice storage swaps; Euclidean sorting and the integer/rational addmul row merges use them. The reached linear_equation mpz reserve is size growth, not Go capacity-only growth, and has a concrete typed method. Retained propagate_ineqs_tactic and SMT theory_arith_int consumers remain unported.",
         "The arithmetic linear-equation owner now exercises concrete integer buffer reset, deep-copy push, logical-size reserve, borrowed indexed and slice views, and cleanup in native and checked/debug focused tests; other tactic and SMT consumers remain open.",
-        "The arithmetic bound equation store reaches the concrete linear-equation integer and rational buffers through variable-watch registration and ordered constraint cleanup; propagation and other tactic/SMT consumers remain open."
+        "The arithmetic bound equation store reaches the concrete linear-equation integer and rational buffers through variable-watch registration and ordered constraint cleanup; propagation and other tactic/SMT consumers remain open.",
+        "Whole-header retained-use audit: constructor/destructor, manager borrowing, size, deep-copy push, indexed slots, reset, c_ptr and raw swap are reached in the Euclidean owner; logical-size reserve is reached in linear_equation. Back, empty and mpq reserve have no retained production call in these concrete instantiations. The two still-unported concrete owners are propagate_ineqs_tactic's mpq buffer and theory_arith_int's mpz bridge; the bound_propagator's broader propagation integration remains partial."
       ]
     },
     {
@@ -172614,7 +172635,8 @@
           "status": "ported",
           "go_target": "pkg/util/params/util_gparams_service_ops.go",
           "go_targets": [
-            "pkg/util/diagnostic/util_trace_tags.go"
+            "pkg/util/diagnostic/util_trace_tags.go",
+            "pkg/util/process/finalize_test.go"
           ],
           "tests": [
             "TestTraceEmissionCompileGateAndSourceRecord",
@@ -172898,7 +172920,8 @@
           "status": "ported",
           "go_target": "pkg/util/params/util_gparams_service_ops.go",
           "go_targets": [
-            "pkg/util/diagnostic/util_trace_tags.go"
+            "pkg/util/diagnostic/util_trace_tags.go",
+            "pkg/util/process/finalize_test.go"
           ],
           "tests": [
             "TestTraceEmissionCompileGateAndSourceRecord",
