@@ -9,7 +9,7 @@ var ErrRationalNotInteger = errors.New("mpnum: operation requires integer-valued
 
 // AddInt ports add(mpq,mpz,mpq), including the source integer fast branch
 // and rat_add's single local/cached cross-product temporary.
-func (m *RationalManager) AddInt(a *Rational, b *Int, out *Rational) error {
+func (m *RationalManager) AddInt(a *Rational, b *Int, out *Rational) (err error) {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -19,12 +19,24 @@ func (m *RationalManager) AddInt(a *Rational, b *Int, out *Rational) error {
 	if e := m.check(out); e != nil {
 		return e
 	}
+	m.traceMPQMixed(a, b, out, "+", "mpq", false, true)
+	defer func() {
+		if err == nil {
+			m.traceMPQMixed(a, b, out, "+", "mpq", false, false)
+		}
+	}()
 	if isIntegerRational(a) {
 		if e := m.Z.Add(&a.Num, b, &out.Num); e != nil {
 			return e
 		}
 		return m.resetDenominator(out)
 	} else {
+		m.traceMPQMixed(a, b, out, "+", "rat_mpq", false, true)
+		defer func() {
+			if err == nil {
+				m.traceMPQMixed(a, b, out, "+", "rat_mpq", false, false)
+			}
+		}()
 		var local Int
 		tmp := &m.AddTmp1
 		if m.Synchronized {
@@ -66,7 +78,7 @@ func (m *RationalManager) MulInts(a, b *Int, out *Rational) error {
 func (m *RationalManager) MulInt(a *Int, b, out *Rational) error {
 	return m.mulIntWithAllocationContext(a, b, out, integerAllocationInvocationContext{})
 }
-func (m *RationalManager) mulIntWithAllocationContext(a *Int, b, out *Rational, context integerAllocationInvocationContext) error {
+func (m *RationalManager) mulIntWithAllocationContext(a *Int, b, out *Rational, context integerAllocationInvocationContext) (err error) {
 	if e := m.Z.check(a); e != nil {
 		return e
 	}
@@ -76,7 +88,21 @@ func (m *RationalManager) mulIntWithAllocationContext(a *Int, b, out *Rational, 
 	if e := m.check(out); e != nil {
 		return e
 	}
+	m.traceMPQMixed(b, a, out, "*", "mpq", true, true)
+	defer func() {
+		if err == nil {
+			m.traceMPQMixed(b, a, out, "*", "mpq", true, false)
+		}
+	}()
 	integer := isIntegerRational(b)
+	if !integer {
+		m.traceMPQMixed(b, a, out, "*", "rat_mpq", true, true)
+		defer func() {
+			if err == nil {
+				m.traceMPQMixed(b, a, out, "*", "rat_mpq", true, false)
+			}
+		}()
+	}
 	if e := m.Z.mulWithAllocationContext(a, &b.Num, &out.Num, context); e != nil {
 		return e
 	}
@@ -91,7 +117,7 @@ func (m *RationalManager) mulIntWithAllocationContext(a *Int, b, out *Rational, 
 func (m *RationalManager) DivInt(a *Rational, b *Int, out *Rational) error {
 	return m.divIntWithAllocationContext(a, b, out, integerAllocationInvocationContext{})
 }
-func (m *RationalManager) divIntWithAllocationContext(a *Rational, b *Int, out *Rational, context integerAllocationInvocationContext) error {
+func (m *RationalManager) divIntWithAllocationContext(a *Rational, b *Int, out *Rational, context integerAllocationInvocationContext) (err error) {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -101,6 +127,12 @@ func (m *RationalManager) divIntWithAllocationContext(a *Rational, b *Int, out *
 	if e := m.check(out); e != nil {
 		return e
 	}
+	m.traceMPQMixed(a, b, out, "/", "mpq", false, true)
+	defer func() {
+		if err == nil {
+			m.traceMPQMixed(a, b, out, "/", "mpq", false, false)
+		}
+	}()
 	if e := m.Z.copyFromOwnerWithAllocationContext(&out.Num, m.Z, &a.Num, nil, context); e != nil {
 		return e
 	}
@@ -119,13 +151,19 @@ func (m *RationalManager) divIntWithAllocationContext(a *Rational, b *Int, out *
 }
 
 // AccDiv publishes denominator multiplication before rereading the divisor.
-func (m *RationalManager) AccDiv(a *Rational, b *Int) error {
+func (m *RationalManager) AccDiv(a *Rational, b *Int) (err error) {
 	if e := m.check(a); e != nil {
 		return e
 	}
 	if e := m.Z.check(b); e != nil {
 		return e
 	}
+	m.traceMPQMixed(a, b, a, "/", "mpq", false, true)
+	defer func() {
+		if err == nil {
+			m.traceMPQMixed(a, b, a, "/", "mpq", false, false)
+		}
+	}()
 	if e := m.Z.Mul(&a.Den, b, &a.Den); e != nil {
 		return e
 	}

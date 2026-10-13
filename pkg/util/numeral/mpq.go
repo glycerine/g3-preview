@@ -653,6 +653,12 @@ func (m *RationalManager) Div(a, b, out *Rational) (_rawErr error) {
 			return e
 		}
 	}
+	m.traceMPQBinary(a, b, out, "/", "mpq", true)
+	defer func() {
+		if _rawErr == nil {
+			m.traceMPQBinary(a, b, out, "/", "mpq", false)
+		}
+	}()
 	if b == out {
 		r := &m.RawArithmetic
 		if r.DivActive {
