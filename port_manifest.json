@@ -34808,7 +34808,8 @@
         "pkg/math/interval/fast_root.go",
         "pkg/math/interval/fast_root_test.go",
         "pkg/math/subpaving/fast_interval_root.go",
-        "pkg/math/subpaving/fast_interval_root_test.go"
+        "pkg/math/subpaving/fast_interval_root_test.go",
+        "pkg/math/subpaving/arbitrary_interval.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34829,7 +34830,8 @@
         "TestSubpavingFastIntervalPowerRetainedCases",
         "TestSubpavingFastNodeConstantIntervalViews",
         "TestFastRootRetainedNewtonCertifiedBoundsAndCancellation",
-        "TestSubpavingFastIntervalXnEqYRetainedCases"
+        "TestSubpavingFastIntervalXnEqYRetainedCases",
+        "TestSubpavingMPFMutableIntervalRetainedCore"
       ],
       "conditionals": [
         {
@@ -35428,6 +35430,14 @@
           "tests": [
             "TestFastRootRetainedNewtonCertifiedBoundsAndCancellation",
             "TestSubpavingFastIntervalXnEqYRetainedCases"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf mutable interval reset/set, invariant, contains-zero and source-order display (src/math/interval/interval_def.h:597-680)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval.go",
+          "tests": [
+            "TestSubpavingMPFMutableIntervalRetainedCore"
           ]
         }
       ],
@@ -50145,9 +50155,13 @@
       "path": "src/math/subpaving/subpaving_mpf.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/subpaving/arbitrary_interval.go"
+      ],
+      "tests": [
+        "TestSubpavingMPFMutableIntervalRetainedCore"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -50160,8 +50174,19 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "methods": [
+        {
+          "name": "Concrete config_mpf mutable interval endpoint owner, source f2n arithmetic and extended endpoint kinds; context construction/search remain open",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval.go",
+          "tests": [
+            "TestSubpavingMPFMutableIntervalRetainedCore"
+          ]
+        }
+      ],
+      "ownership": [
+        "The mutable MPF interval owns and deletes two endpoint numerals and borrows the concrete f2n<mpf_manager> wrapper; the context and tactic remain separate owners."
+      ],
       "deviations": []
     },
     {
@@ -50555,7 +50580,8 @@
         "pkg/math/subpaving/fast_clause.go",
         "pkg/math/subpaving/fast_clause_test.go",
         "pkg/math/subpaving/fast_context_init.go",
-        "pkg/math/subpaving/fast_context_init_test.go"
+        "pkg/math/subpaving/fast_context_init_test.go",
+        "pkg/math/subpaving/arbitrary_interval.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50607,7 +50633,8 @@
         "TestSubpavingFastClauseOpennessAndUnitResume",
         "TestSubpavingFastClauseSharedAtomSourceCleanup",
         "TestSubpavingFastContextRootInitializationOrderAndResume",
-        "TestSubpavingFastContextRootInitializationUnitConflict"
+        "TestSubpavingFastContextRootInitializationUnitConflict",
+        "TestSubpavingMPFMutableIntervalRetainedCore"
       ],
       "conditionals": [
         {
@@ -50828,6 +50855,14 @@
             "TestSubpavingFastContextRootInitializationOrderAndResume",
             "TestSubpavingFastContextRootInitializationUnitConflict"
           ]
+        },
+        {
+          "name": "Concrete config_mpf mutable interval reset/set, invariant, contains-zero and source-order display (src/math/interval/interval_def.h:597-680)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval.go",
+          "tests": [
+            "TestSubpavingMPFMutableIntervalRetainedCore"
+          ]
         }
       ],
       "ownership": [
@@ -50883,7 +50918,8 @@
         "pkg/math/subpaving/fast_clause.go",
         "pkg/math/subpaving/fast_clause_test.go",
         "pkg/math/subpaving/fast_context_init.go",
-        "pkg/math/subpaving/fast_context_init_test.go"
+        "pkg/math/subpaving/fast_context_init_test.go",
+        "pkg/math/subpaving/arbitrary_interval.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -50925,7 +50961,8 @@
         "TestSubpavingFastClauseOpennessAndUnitResume",
         "TestSubpavingFastClauseSharedAtomSourceCleanup",
         "TestSubpavingFastContextRootInitializationOrderAndResume",
-        "TestSubpavingFastContextRootInitializationUnitConflict"
+        "TestSubpavingFastContextRootInitializationUnitConflict",
+        "TestSubpavingMPFMutableIntervalRetainedCore"
       ],
       "assertions": [
         {
@@ -51379,6 +51416,14 @@
             "TestSubpavingFastClauseSharedAtomSourceCleanup",
             "TestSubpavingFastContextRootInitializationOrderAndResume",
             "TestSubpavingFastContextRootInitializationUnitConflict"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf mutable interval reset/set, invariant, contains-zero and source-order display (src/math/interval/interval_def.h:597-680)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval.go",
+          "tests": [
+            "TestSubpavingMPFMutableIntervalRetainedCore"
           ]
         }
       ],

@@ -39610,7 +39610,13 @@ spelled finite/infinite display through `f2n<mpf_manager>`. Focused native and
 checked/debug cases cover finite and infinity branches, output reset and
 domain refusals on CPUs 8–16. This advances `src/util/ext_numeral.h` and
 `f2n.h` consumer evidence; the mutable MPF interval and enclosing subpaving
-context remain unported.
+context remain unported at that checkpoint. The next concrete
+`config_mpf` mutable interval owns and deletes its two MPF endpoints, routes
+reset/set/invariant/zero containment/display through `ArbitraryExtended`, and
+preserves interval insertion prefixes on refused writes. A focused native case
+covers unbounded, finite, open, copied, singleton, reset and closed behavior
+on CPUs 8–16. Constant node views, interval arithmetic and the enclosing
+MPF context remain open.
 
 ### Environment parameter runtime boundary
 
