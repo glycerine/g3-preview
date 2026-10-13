@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 func TestFastShellExactCoefficientsAndDirectedInequalities(t *testing.T) {
@@ -31,6 +32,13 @@ func TestFastShellExactCoefficientsAndDirectedInequalities(t *testing.T) {
 	w, err := NewFastShellCoefficients(c, qm)
 	if err != nil {
 		t.Fatal(err)
+	}
+	stats := statistics.New()
+	if err := w.CollectStatistics(stats); err != nil || stats.Size() != 1 || stats.Key(0) != "nodes" || stats.UintValue(0) != 1 {
+		t.Fatal("shell statistics forwarding", err)
+	}
+	if err := w.ResetStatistics(); err != nil {
+		t.Fatal("shell statistics reset", err)
 	}
 	var one, three, big, read numeral.Int
 	q, lowerValue, upperValue := numeral.NewRational(), numeral.NewRational(), numeral.NewRational()

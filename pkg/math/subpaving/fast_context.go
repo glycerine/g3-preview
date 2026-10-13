@@ -28,6 +28,8 @@ type FastContext struct {
 	searchNode       *FastNode
 	searchPhase      uint8
 	numSplits        uint64
+	numBounds        uint64
+	numConflicts     uint64
 	owned            [4]*numeral.ScopedFastFloat
 	epsilon          *numeral.FastFloat
 	maxBound         *numeral.FastFloat

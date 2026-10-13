@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 var ErrFastShellInexactInteger = errors.New("subpaving: integer coefficient cannot be represented exactly as fast float")
@@ -201,6 +202,20 @@ func (w *FastShellCoefficients) Search() error {
 		return err
 	}
 	return w.context.Search()
+}
+
+func (w *FastShellCoefficients) ResetStatistics() error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.ResetStatistics()
+}
+
+func (w *FastShellCoefficients) CollectStatistics(st *statistics.Statistics) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.CollectStatistics(st)
 }
 
 // Close unwinds the source members in reverse order. A refused release keeps

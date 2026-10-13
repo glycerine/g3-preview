@@ -294,6 +294,7 @@ func (c *FastContext) publishBound(n *FastNode, variable uint32, value *numeral.
 	if n.inconsistent {
 		return arena.ErrInvalidSlot
 	}
+	c.numBounds++
 	m := c.numbers
 	copyOwner, err := numeral.NewScopedFastFloat(m)
 	if err != nil {
@@ -326,6 +327,8 @@ func (c *FastContext) publishBound(n *FastNode, variable uint32, value *numeral.
 	}
 	if conflict {
 		n.inconsistent, n.conflictVar = true, variable
+		c.numConflicts++
+		c.removeLeaf(n)
 	}
 	c.timestamp++
 	if c.timestamp == math.MaxUint64 {
