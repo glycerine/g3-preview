@@ -5,7 +5,7 @@ package params
 import (
 	"bytes"
 	"errors"
-	"fmt"
+	"io"
 
 	"github.com/glycerine/g3/pkg/arena"
 	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
@@ -95,11 +95,19 @@ func (s *GlobalParamsService) SourceSetName(name, value string) error {
 	if trace == nil {
 		trace = udiag.BorrowProcessTraceTags()
 	}
-	if trace.ShouldTrace("gparams") {
-		body := fmt.Sprintf("setting [%s] <- '%s'\n", name[:utext.CStringLength(name)], value[:utext.CStringLength(value)])
-		if e := trace.Emit("gparams", "set", "src/util/gparams.cpp", 563, body); e != nil {
-			return e
+	if e := trace.EmitConditional("gparams", "set", "src/util/gparams.cpp", 563, func() bool { return true }, func(w io.Writer) error {
+		for _, part := range [...]string{"setting [", name[:utext.CStringLength(name)], "] <- '", value[:utext.CStringLength(value)], "'\n"} {
+			n, err := io.WriteString(w, part)
+			if err != nil {
+				return err
+			}
+			if n != len(part) {
+				return io.ErrShortWrite
+			}
 		}
+		return nil
+	}); e != nil {
+		return e
 	}
 	g, e := s.namespaceImpAt(564)
 	if e != nil {
