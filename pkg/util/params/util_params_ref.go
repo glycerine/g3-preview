@@ -1016,7 +1016,11 @@ func (c *ParamsContext) getRat(v *ParamsRef, k usymbol.Symbol, name *string, byN
 		e = c.NumeralsField.Copy(&r, src)
 	}
 	if e != nil {
-		c.NumeralsField.Del(&r)
+		if cleanupErr := c.NumeralsField.Del(&r); cleanupErr != nil {
+			// The result still owns any numeral storage that cleanup could not
+			// release. Return its handle so the caller can finish that cleanup.
+			return r, errors.Join(e, cleanupErr)
+		}
 		return unumeral.OwnedRational{}, e
 	}
 	return r, nil
