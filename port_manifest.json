@@ -50240,7 +50240,8 @@
         "pkg/math/subpaving/hardware_statistics_test.go",
         "pkg/math/subpaving/hardware_display_test.go",
         "pkg/math/subpaving/hardware_param_descrs_test.go",
-        "pkg/math/subpaving/hardware_context_params_test.go"
+        "pkg/math/subpaving/hardware_context_params_test.go",
+        "pkg/math/subpaving/hardware_context_root.go"
       ],
       "tests": [
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
@@ -50308,6 +50309,14 @@
           "tests": [
             "TestHardwareShellParamDescriptionsSourceOrder"
           ]
+        },
+        {
+          "name": "Concrete context_hwf wrapper set_display_proc forwarding (src/math/subpaving/subpaving.cpp:50)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_shell_coefficients.go",
+          "tests": [
+            "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
+          ]
         }
       ],
       "ownership": [],
@@ -50324,7 +50333,8 @@
         "pkg/math/subpaving/hardware_statistics_test.go",
         "pkg/math/subpaving/hardware_display_test.go",
         "pkg/math/subpaving/hardware_param_descrs_test.go",
-        "pkg/math/subpaving/hardware_context_params_test.go"
+        "pkg/math/subpaving/hardware_context_params_test.go",
+        "pkg/math/subpaving/hardware_context_root.go"
       ],
       "tests": [
         "TestHardwareShellRetainedClauseAndSearchRoute",
@@ -50384,6 +50394,14 @@
           "go_target": "pkg/math/subpaving/hardware_shell_coefficients.go",
           "tests": [
             "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+          ]
+        },
+        {
+          "name": "Concrete context_hwf shell set_display_proc entry (src/math/subpaving/subpaving.h:103)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_shell_coefficients.go",
+          "tests": [
+            "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
           ]
         }
       ],
@@ -51635,6 +51653,14 @@
           "tests": [
             "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
           ]
+        },
+        {
+          "name": "Concrete config_hwf borrowed display procedure state and setter (src/math/subpaving/subpaving_t.h:836)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_display.go",
+          "tests": [
+            "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
+          ]
         }
       ],
       "ownership": [
@@ -52519,6 +52545,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_params.go",
           "tests": [
             "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf default display procedure selection and retained tactic printer (src/math/subpaving/subpaving_t_def.h:431)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_display.go",
+          "tests": [
+            "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
           ]
         }
       ],

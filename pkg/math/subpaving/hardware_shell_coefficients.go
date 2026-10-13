@@ -171,18 +171,25 @@ func (w *HardwareShellCoefficients) CollectStatistics(st *statistics.Statistics)
 	return w.context.CollectStatistics(st)
 }
 
-func (w *HardwareShellCoefficients) DisplayConstraints(out io.Writer, useStar bool, display HardwareVariableDisplay) error {
+func (w *HardwareShellCoefficients) SetVariableDisplay(display HardwareVariableDisplay) error {
 	if err := w.open(); err != nil {
 		return err
 	}
-	return w.context.DisplayConstraints(out, useStar, display)
+	return w.context.SetVariableDisplay(display)
 }
 
-func (w *HardwareShellCoefficients) DisplayBounds(out io.Writer, display HardwareVariableDisplay) error {
+func (w *HardwareShellCoefficients) DisplayConstraints(out io.Writer, useStar bool) error {
 	if err := w.open(); err != nil {
 		return err
 	}
-	return w.context.DisplayBounds(out, display)
+	return w.context.DisplayConstraints(out, useStar)
+}
+
+func (w *HardwareShellCoefficients) DisplayBounds(out io.Writer) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.DisplayBounds(out)
 }
 
 func (w *HardwareShellCoefficients) CollectParamDescrs(d *params.ParamDescrs) error {

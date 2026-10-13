@@ -52,6 +52,7 @@ type HardwareContext struct {
 	numConflicts     uint64
 	searchNode       *HardwareNode
 	searchPhase      uint8
+	displayVariable  HardwareVariableDisplay
 	initStage        uint8
 	initDefHead      uint32
 	closed           bool
@@ -227,6 +228,7 @@ func (c *HardwareContext) Close() error {
 	c.watchOrder = nil
 	c.polynomials = nil
 	c.monomials = nil
+	c.displayVariable = nil
 	c.isInt = nil
 	c.leafHead, c.leafTail = nil, nil
 	c.closed = true

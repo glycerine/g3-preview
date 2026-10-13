@@ -15,6 +15,16 @@ import (
 // printer uses the source default x0, x1, ... spelling.
 type HardwareVariableDisplay func(io.Writer, uint32) error
 
+// SetVariableDisplay borrows the tactic's printer for subsequent display
+// calls. A nil printer restores the context's default variable spelling.
+func (c *HardwareContext) SetVariableDisplay(display HardwareVariableDisplay) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	c.displayVariable = display
+	return nil
+}
+
 func hardwareWrite(w io.Writer, value string) error {
 	n, err := io.WriteString(w, value)
 	if err != nil {
@@ -121,13 +131,14 @@ func (c *HardwareContext) displayDefinition(w io.Writer, variable uint32, useSta
 
 // DisplayConstraints emits definitions, axiom units, then clauses in their
 // source insertion order. The source tactic supplies its AST variable printer.
-func (c *HardwareContext) DisplayConstraints(w io.Writer, useStar bool, display HardwareVariableDisplay) error {
+func (c *HardwareContext) DisplayConstraints(w io.Writer, useStar bool) error {
 	if err := c.open(); err != nil {
 		return err
 	}
 	if w == nil {
 		return arena.ErrInvalidSlot
 	}
+	display := c.displayVariable
 	for variable := range c.isInt {
 		x := uint32(variable)
 		if c.monomials[x] == nil && c.polynomials[x] == nil {
@@ -203,13 +214,14 @@ func (c *HardwareContext) displayNodeBounds(w io.Writer, n *HardwareNode, displa
 
 // DisplayBounds visits consistent leaves in the source tree order, including
 // selected leaves removed from the search queue.
-func (c *HardwareContext) DisplayBounds(w io.Writer, display HardwareVariableDisplay) error {
+func (c *HardwareContext) DisplayBounds(w io.Writer) error {
 	if err := c.open(); err != nil {
 		return err
 	}
 	if w == nil {
 		return arena.ErrInvalidSlot
 	}
+	display := c.displayVariable
 	if c.root == nil {
 		return nil
 	}

@@ -2,6 +2,7 @@ package subpaving
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"strings"
 	"testing"
@@ -71,7 +72,10 @@ func TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder(t *testing.T) {
 	}
 	name := func(w io.Writer, x uint32) error { return hardwareWrite(w, "k!"+string(rune('0'+x))) }
 	var out bytes.Buffer
-	if err := c.DisplayConstraints(&out, false, name); err != nil {
+	if err := c.SetVariableDisplay(name); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.DisplayConstraints(&out, false); err != nil {
 		t.Fatal(err)
 	}
 	want := "k!2 = k!0^2 k!1\nk!3 = 2 + k!0 + 1/2 k!1\n1 <= k!0\n1 <= k!0 or k!1 < 3\n"
@@ -80,7 +84,10 @@ func TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder(t *testing.T) {
 		t.Fatalf("constraints:\n%s\nwant:\n%s", out.String(), want)
 	}
 	out.Reset()
-	if err := c.DisplayConstraints(&out, true, nil); err != nil {
+	if err := c.SetVariableDisplay(nil); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.DisplayConstraints(&out, true); err != nil {
 		t.Fatal(err)
 	}
 	if !strings.Contains(out.String(), "x2 = x0^2*x1\n") || !strings.Contains(out.String(), "x3 = 2 + x0 + 1/2*x1\n") {
@@ -101,7 +108,7 @@ func TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder(t *testing.T) {
 		t.Fatal(err)
 	}
 	out.Reset()
-	if err := c.DisplayBounds(&out, nil); err != nil {
+	if err := c.DisplayBounds(&out); err != nil {
 		t.Fatal(err)
 	}
 	want = "-1 <= x0 x0 < 0\n=========\n0 <= x0 x0 <= 2\n"
@@ -112,7 +119,7 @@ func TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder(t *testing.T) {
 		t.Fatal(err)
 	}
 	out.Reset()
-	if err := c.DisplayBounds(&out, nil); err != nil {
+	if err := c.DisplayBounds(&out); err != nil {
 		t.Fatal(err)
 	}
 	if out.String() != "0 <= x0 x0 <= 2\n" {
@@ -128,11 +135,17 @@ func TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder(t *testing.T) {
 		t.Fatal(err)
 	}
 	out.Reset()
-	if err := wrapper.DisplayConstraints(&out, false, name); err != nil || out.String() != wantConstraints {
+	if err := wrapper.SetVariableDisplay(name); err != nil {
+		t.Fatal(err)
+	}
+	if err := wrapper.DisplayConstraints(&out, false); err != nil || out.String() != wantConstraints {
 		t.Fatalf("shell constraints: %v, %q", err, out.String())
 	}
+	if err := wrapper.SetVariableDisplay(nil); err != nil {
+		t.Fatal(err)
+	}
 	out.Reset()
-	if err := wrapper.DisplayBounds(&out, nil); err != nil || out.String() != "0 <= x0 x0 <= 2\n" {
+	if err := wrapper.DisplayBounds(&out); err != nil || out.String() != "0 <= x0 x0 <= 2\n" {
 		t.Fatalf("shell bounds: %v, %q", err, out.String())
 	}
 	if err := qm.CloseChecked(); err != nil {
@@ -140,5 +153,17 @@ func TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder(t *testing.T) {
 	}
 	if budget.Used() != 0 {
 		t.Fatal("rational manager roots", budget.Used())
+	}
+	if err := c.SetVariableDisplay(name); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if c.displayVariable != nil {
+		t.Fatal("closed context retained tactic display printer")
+	}
+	if err := wrapper.SetVariableDisplay(name); !errors.Is(err, arena.ErrClosed) {
+		t.Fatalf("closed shell printer: %v", err)
 	}
 }
