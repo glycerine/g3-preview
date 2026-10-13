@@ -164033,7 +164033,8 @@
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
         "TestParamsReferenceValidateEmptySkipsDescriptors",
         "TestParamsReferenceDisplaySMT2EmptySkipsDescriptors",
-        "TestParamsReferenceDisplayKeyEmptySkipsSymbolRead"
+        "TestParamsReferenceDisplayKeyEmptySkipsSymbolRead",
+        "TestParamsNumericalSymbolValueContinuesSourceAssertion"
       ],
       "conditionals": [
         {
@@ -164596,7 +164597,8 @@
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
         "TestParamsReferenceValidateEmptySkipsDescriptors",
         "TestParamsReferenceDisplaySMT2EmptySkipsDescriptors",
-        "TestParamsReferenceDisplayKeyEmptySkipsSymbolRead"
+        "TestParamsReferenceDisplayKeyEmptySkipsSymbolRead",
+        "TestParamsNumericalSymbolValueContinuesSourceAssertion"
       ],
       "conditionals": [
         {
