@@ -83,6 +83,68 @@ func TestFastCheckpointReadsSharedProcessAfterResourceIncrement(t *testing.T) {
 	}
 }
 
+func TestFastCheckpointReadsUnsharedRuntime(t *testing.T) {
+	b := arena.NewBudget(1 << 24)
+	r, err := memory.NewRuntime(memory.RuntimeConfig{Budget: b, SizeTBits: 64})
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfg := numeral.DefaultFastFloatConfig(arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}})
+	cfg.InitialCapacity, cfg.Memory = 4, r
+	m, err := numeral.NewFastFloatManager(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	c, err := NewFastContext(m, &control.Reslimit{Limit: 100}, []bool{false}, 0, 2, 8192)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		for _, err := range []error{c.Close(), m.CloseChecked(), r.Close()} {
+			if err != nil {
+				t.Error(err)
+			}
+		}
+		if b.Used() != 0 {
+			t.Error("unshared fast context owners", b.Used())
+		}
+	})
+	if c.process != nil || c.runtime != r {
+		t.Fatal("unexpected fast-float accounting owners", c.process, c.runtime)
+	}
+	if err := c.InitializeRoot(); err != nil {
+		t.Fatal(err)
+	}
+	baseline, err := r.AllocationSize()
+	if err != nil {
+		t.Fatal(err)
+	}
+	c.maxMemory = baseline
+	extra, err := r.Allocate(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if extra != (memory.Block{}) {
+			if err := r.Deallocate(&extra); err != nil {
+				t.Error(err)
+			}
+		}
+	}()
+	if err := c.Search(); !errors.Is(err, ErrSubpavingMaxMemory) || c.searchNode != nil || len(c.leafQueue) != 1 || c.limit.Steps != 1 {
+		t.Fatal("unshared fast-float checkpoint skipped runtime bytes", err, c.searchNode, len(c.leafQueue), c.limit.Steps)
+	}
+	if err := r.Deallocate(&extra); err != nil {
+		t.Fatal(err)
+	}
+	if used, err := r.AllocationSize(); err != nil || used != baseline {
+		t.Fatal("fast-float runtime did not return to checkpoint limit", used, err, baseline)
+	}
+	if err := sourceCheckpoint(c.limit, c.runtime, c.process, c.maxMemory, ErrFastContextCanceled); err != nil {
+		t.Fatal("equal runtime allocation must pass checkpoint", err)
+	}
+}
+
 func TestFastUnitAndQueueCheckpointsReadSharedProcess(t *testing.T) {
 	c, m, other := fastProcessFixture(t)
 	root, err := c.Root()

@@ -21,6 +21,7 @@ type FastContext struct {
 	self             *FastContext
 	numbers          *numeral.FastFloatManager
 	limit            *control.Reslimit
+	runtime          *memory.Runtime
 	process          *memory.ProcessAccounting
 	isInt            []bool
 	root             *FastNode
@@ -92,6 +93,7 @@ func newFastContextOwner(m *numeral.FastFloatManager, limit *control.Reslimit, i
 	c := &FastContext{numbers: m, limit: limit, isInt: append([]bool(nil), isInt...), polynomials: make(map[uint32]*FastPolynomial), monomials: make(map[uint32]*FastMonomial), watchers: make([][]uint32, len(isInt)), watchOrder: make([][]fastWatch, len(isInt))}
 	c.self = c
 	if owner := m.RuntimeOwner(); owner != nil {
+		c.runtime = owner
 		c.process = owner.ProcessOwner()
 	}
 	defer func() {

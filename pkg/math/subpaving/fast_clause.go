@@ -191,7 +191,7 @@ func (c *FastContext) AssertUnitClauses(n *FastNode) error {
 		return err
 	}
 	for c.unitHead < len(c.unitClauses) && !n.inconsistent {
-		if err := sourceCheckpoint(c.limit, c.process, c.maxMemory, ErrFastContextCanceled); err != nil {
+		if err := sourceCheckpoint(c.limit, c.runtime, c.process, c.maxMemory, ErrFastContextCanceled); err != nil {
 			return err
 		}
 		unit := c.unitClauses[c.unitHead]

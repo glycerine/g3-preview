@@ -21,6 +21,7 @@ type ArbitraryContext struct {
 	self                                            *ArbitraryContext
 	numbers                                         *numeral.ArbitraryFloatNumeralManager
 	limit                                           *control.Reslimit
+	runtime                                         *memory.Runtime
 	process                                         *memory.ProcessAccounting
 	variables                                       []bool
 	watchers                                        [][]uint32
@@ -83,6 +84,7 @@ func newArbitraryContextOwner(m *numeral.ArbitraryFloatNumeralManager, limit *co
 	c := &ArbitraryContext{numbers: m, limit: limit}
 	c.self = c
 	if owner := core.RuntimeOwner(); owner != nil {
+		c.runtime = owner
 		c.process = owner.ProcessOwner()
 	}
 	defer func() {

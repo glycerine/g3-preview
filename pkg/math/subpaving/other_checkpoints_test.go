@@ -42,6 +42,45 @@ func TestArbitraryCheckpointBorrowsProcessFromCoreRuntime(t *testing.T) {
 	}
 }
 
+func TestArbitraryCheckpointReadsUnsharedRuntime(t *testing.T) {
+	f := newArbitraryClauseFixture(t)
+	c := f.context
+	if c.process != nil || c.runtime == nil {
+		t.Fatal("unexpected arbitrary-float accounting owners", c.process, c.runtime)
+	}
+	if err := c.InitializeRoot(); err != nil {
+		t.Fatal(err)
+	}
+	baseline, err := c.runtime.AllocationSize()
+	if err != nil {
+		t.Fatal(err)
+	}
+	c.maxMemory = baseline
+	extra, err := c.runtime.Allocate(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if extra != (memory.Block{}) {
+			if err := c.runtime.Deallocate(&extra); err != nil {
+				t.Error(err)
+			}
+		}
+	}()
+	if err := c.Search(); !errors.Is(err, ErrSubpavingMaxMemory) || c.searchNode != nil || c.leafHead != c.root || c.limit.Steps != 1 {
+		t.Fatal("unshared MPF checkpoint skipped runtime bytes", err, c.searchNode, c.leafHead, c.limit.Steps)
+	}
+	if err := c.runtime.Deallocate(&extra); err != nil {
+		t.Fatal(err)
+	}
+	if used, err := c.runtime.AllocationSize(); err != nil || used != baseline {
+		t.Fatal("arbitrary-float runtime did not return to checkpoint limit", used, err, baseline)
+	}
+	if err := sourceCheckpoint(c.limit, c.runtime, c.process, c.maxMemory, ErrArbitraryContextCanceled); err != nil {
+		t.Fatal("equal runtime allocation must pass checkpoint", err)
+	}
+}
+
 func TestHardwareCheckpointUsesBoundProcess(t *testing.T) {
 	p := memory.NewProcessAccounting()
 	b := arena.NewBudget(1024)
