@@ -22,12 +22,18 @@ const (
 func (m *IntegerManager) MachineDivRem(a, b, q, r *Int) error {
 	return m.machineDivRemWithAllocationContext(a, b, q, r, integerAllocationInvocationContext{})
 }
-func (m *IntegerManager) machineDivRemWithAllocationContext(a, b, q, r *Int, context integerAllocationInvocationContext) error {
+func (m *IntegerManager) machineDivRemWithAllocationContext(a, b, q, r *Int, context integerAllocationInvocationContext) (err error) {
 	for _, n := range []*Int{a, b, q, r} {
 		if e := m.check(n); e != nil {
 			return e
 		}
 	}
+	m.traceMPZDivision(a, b, q, r, "divrem", true)
+	defer func() {
+		if err == nil {
+			m.traceMPZDivision(a, b, q, r, "divrem", false)
+		}
+	}()
 	if b.Val == 0 {
 		return ErrDivideByZero
 	}
@@ -57,12 +63,18 @@ func (m *IntegerManager) machineDivRemWithAllocationContext(a, b, q, r *Int, con
 func (m *IntegerManager) MachineDiv(a, b, c *Int) error {
 	return m.machineDivWithAllocationContext(a, b, c, integerAllocationInvocationContext{})
 }
-func (m *IntegerManager) machineDivWithAllocationContext(a, b, c *Int, context integerAllocationInvocationContext) error {
+func (m *IntegerManager) machineDivWithAllocationContext(a, b, c *Int, context integerAllocationInvocationContext) (err error) {
 	for _, n := range []*Int{a, b, c} {
 		if e := m.check(n); e != nil {
 			return e
 		}
 	}
+	m.traceMPZDivision(a, b, c, nil, "machine-div", true)
+	defer func() {
+		if err == nil {
+			m.traceMPZDivision(a, b, c, nil, "machine-div", false)
+		}
+	}()
 	if b.Val == 0 {
 		return ErrDivideByZero
 	}
@@ -76,12 +88,18 @@ func (m *IntegerManager) Rem(a, b, c *Int) error { return m.remWithPNReceipt(a, 
 func (m *IntegerManager) remWithPNReceipt(a, b, c *Int, pn *integerPNormalizeScope) error {
 	return m.remWithAllocationContext(a, b, c, pnAllocationContext(pn))
 }
-func (m *IntegerManager) remWithAllocationContext(a, b, c *Int, context integerAllocationInvocationContext) error {
+func (m *IntegerManager) remWithAllocationContext(a, b, c *Int, context integerAllocationInvocationContext) (err error) {
 	for _, n := range []*Int{a, b, c} {
 		if e := m.check(n); e != nil {
 			return e
 		}
 	}
+	m.traceMPZDivision(a, b, c, nil, "rem", true)
+	defer func() {
+		if err == nil {
+			m.traceMPZDivision(a, b, c, nil, "rem", false)
+		}
+	}()
 	if b.Val == 0 {
 		return ErrDivideByZero
 	}
@@ -104,6 +122,12 @@ func (m *IntegerManager) divWithAllocationContext(a, b, c *Int, context integerA
 			return e
 		}
 	}
+	m.traceMPZDivision(a, b, c, nil, "div", true)
+	defer func() {
+		if err == nil {
+			m.traceMPZDivision(a, b, c, nil, "div", false)
+		}
+	}()
 	if a.Val < 0 {
 		var tmp *Int
 		var raw *integerScalarRawScope
@@ -166,12 +190,18 @@ func (m *IntegerManager) divWithAllocationContext(a, b, c *Int, context integerA
 func (m *IntegerManager) Mod(a, b, c *Int) error {
 	return m.modWithAllocationContext(a, b, c, integerAllocationInvocationContext{})
 }
-func (m *IntegerManager) modWithAllocationContext(a, b, c *Int, context integerAllocationInvocationContext) error {
+func (m *IntegerManager) modWithAllocationContext(a, b, c *Int, context integerAllocationInvocationContext) (err error) {
 	for _, n := range []*Int{a, b, c} {
 		if e := m.check(n); e != nil {
 			return e
 		}
 	}
+	m.traceMPZDivision(a, b, c, nil, "mod", true)
+	defer func() {
+		if err == nil {
+			m.traceMPZDivision(a, b, c, nil, "mod", false)
+		}
+	}()
 	if e := m.remWithAllocationContext(a, b, c, context); e != nil {
 		return e
 	}

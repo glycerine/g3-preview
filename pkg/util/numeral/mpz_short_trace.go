@@ -1,4 +1,4 @@
-// Source: src/util/mpz.h:350-389,499-519.
+// Source: src/util/mpz.h:350-389,427-519.
 package numeral
 
 import (
@@ -79,5 +79,59 @@ func (m *IntegerManager) traceMPZBinary(a, b, c *Int, op string, before bool) {
 			return err
 		}
 		return writeNumeralDisplayPart(w, " == ")
+	})
+}
+
+// traceMPZDivision covers the five source wrapper spellings. divrem has two
+// result operands; the other wrappers have one. Each half is its own STRACE.
+func (m *IntegerManager) traceMPZDivision(a, b, q, r *Int, kind string, before bool) {
+	tags := m.trace
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	if !tags.ShouldTrace("mpz") {
+		return
+	}
+	_ = tags.EmitShort("mpz", func(w io.Writer) error {
+		writeNumber := func(n *Int) error {
+			s, err := m.String(n)
+			if err != nil {
+				return err
+			}
+			return writeNumeralDisplayPart(w, s)
+		}
+		if before {
+			if err := writeNumeralDisplayPart(w, "[mpz-ext] "+kind+"("); err != nil {
+				return err
+			}
+			if err := writeNumber(a); err != nil {
+				return err
+			}
+			if err := writeNumeralDisplayPart(w, ",  "); err != nil {
+				return err
+			}
+			if err := writeNumber(b); err != nil {
+				return err
+			}
+			return writeNumeralDisplayPart(w, ") == ")
+		}
+		if r != nil {
+			if err := writeNumeralDisplayPart(w, "("); err != nil {
+				return err
+			}
+		}
+		if err := writeNumber(q); err != nil {
+			return err
+		}
+		if r == nil {
+			return writeNumeralDisplayPart(w, "\n")
+		}
+		if err := writeNumeralDisplayPart(w, ", "); err != nil {
+			return err
+		}
+		if err := writeNumber(r); err != nil {
+			return err
+		}
+		return writeNumeralDisplayPart(w, ")\n")
 	})
 }
