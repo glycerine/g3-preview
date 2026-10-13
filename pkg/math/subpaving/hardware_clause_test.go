@@ -189,3 +189,68 @@ func TestHardwareClauseOpenTruthAndQueuedUnitPropagation(t *testing.T) {
 		}
 	})
 }
+
+func TestHardwareClauseJustificationChildTrailAndContextClose(t *testing.T) {
+	m, err := numeral.NewHardwareFloatNumeralManager(numeral.NewHardwareFloatManager(), 11, 53)
+	if err != nil {
+		t.Fatal(err)
+	}
+	c, err := NewHardwareContext(m, &control.Reslimit{Limit: 100}, 0, 1, 8192)
+	if err != nil {
+		t.Fatal(err)
+	}
+	x, err := c.NewVariable(false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	y, err := c.NewVariable(false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var four, five numeral.HardwareFloat
+	if err := m.SetInt32(&four, 4); err != nil {
+		t.Fatal(err)
+	}
+	if err := m.SetInt32(&five, 5); err != nil {
+		t.Fatal(err)
+	}
+	ax, err := c.NewInequality(x, &five, true, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ay, err := c.NewInequality(y, &five, true, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	clause, err := c.AddClause([]*HardwareInequality{ay, ax}, false, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	root, err := c.CreateRootNode()
+	if err != nil {
+		t.Fatal(err)
+	}
+	child, err := c.NewChildNode(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := c.DecideBound(child, x, &four, false, false); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.AddRecentBounds(child); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.PropagateQueued(child); err != nil {
+		t.Fatal(err)
+	}
+	if root.lower[y] != nil || child.lower[y] == nil || child.lower[y].reasonClause != clause ||
+		child.lower[y].reason != hardwareReasonClause || clause.deleted || ax.refs != 1 || ay.refs != 1 {
+		t.Fatal("child bound borrows live clause reason")
+	}
+	if err := c.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if !root.closed || !child.closed || !clause.deleted || ax.refs != 0 || ay.refs != 0 || c.activeNodes != 0 {
+		t.Fatal("context closes child before releasing clause atoms")
+	}
+}

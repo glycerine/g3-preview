@@ -122,3 +122,34 @@ func (w *HardwareShellCoefficients) MkInequality(variable uint32, value *numeral
 	}
 	return w.context.NewInequality(variable, &w.constant, lower, open)
 }
+
+// These concrete wrapper entries are reached by expr2subpaving and the
+// subpaving tactic after the rational-to-hardware conversions above.
+func (w *HardwareShellCoefficients) MkVar(integer bool) (uint32, error) {
+	if err := w.open(); err != nil {
+		return 0, err
+	}
+	return w.context.NewVariable(integer)
+}
+
+func (w *HardwareShellCoefficients) MkMonomial(powers []HardwarePower) (uint32, error) {
+	if err := w.open(); err != nil {
+		return 0, err
+	}
+	return w.context.DefineMonomial(powers)
+}
+
+func (w *HardwareShellCoefficients) AddClause(atoms []*HardwareInequality) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	_, err := w.context.AddClause(atoms, false, true)
+	return err
+}
+
+func (w *HardwareShellCoefficients) Search() error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.Search()
+}
