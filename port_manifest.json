@@ -146308,9 +146308,71 @@
           "text": "SASSERT(!is_nan(a) && !is_pinf(a) && !is_ninf(a));"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "mpf.cpp:61-67 manager constructor and destructor dependency",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_manager.go"
+        },
+        {
+          "name": "mpf.cpp:318-325 mpz component SET",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_value.go",
+          "tests": [
+            "TestArbitraryFloatEveryCopyReservationAndLiteralFieldPrefix"
+          ]
+        },
+        {
+          "name": "mpf.cpp:327-333 exact mpf COPY",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_value.go",
+          "tests": [
+            "TestArbitraryFloatEveryCopyReservationAndLiteralFieldPrefix"
+          ]
+        },
+        {
+          "name": "mpf.cpp:392-417 zero one and signed-zero predicates",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_predicates.go",
+          "tests": [
+            "TestArbitraryFloatLiteralClassificationPolicies"
+          ]
+        },
+        {
+          "name": "mpf.cpp:1771-1792 NaN infinity normal and denormal predicates",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_predicates.go",
+          "tests": [
+            "TestArbitraryFloatLiteralClassificationPolicies"
+          ]
+        },
+        {
+          "name": "mpf.cpp:1821-1826 reserved-exponent predicates",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_predicates.go",
+          "tests": [
+            "TestArbitraryFloatLiteralClassificationPolicies"
+          ]
+        },
+        {
+          "name": "mpf.cpp:1857-1889 zero and NaN constructors",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_special_numeral.go",
+          "tests": [
+            "TestArbitraryFloatSpecialNumeralLiteralConstructors",
+            "TestArbitraryFloatSpecialNaNEveryActualReservationPrefix"
+          ]
+        },
+        {
+          "name": "mpf.cpp:1906-1919 signed infinity constructors",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_special_numeral.go",
+          "tests": [
+            "TestArbitraryFloatSpecialNumeralLiteralConstructors"
+          ]
+        },
         {
           "name": "mpf.cpp:194-231 formatted C-string SET reached by api_numeral.cpp",
           "status": "unported"
