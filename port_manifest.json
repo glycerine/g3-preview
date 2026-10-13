@@ -117100,7 +117100,7 @@
       "path": "src/util/f2n.h",
       "component": "util",
       "role": "production",
-      "status": "reference_only",
+      "status": "unported",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -117141,10 +117141,19 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Retained subpaving tactic f2n<hwf_manager> construction, rounding mode, value conversion and interval arithmetic",
+          "status": "unported"
+        },
+        {
+          "name": "Retained subpaving tactic f2n<mpf_manager> construction, rounding, value conversion and interval arithmetic selected by numeral=mpf",
+          "status": "unported"
+        }
+      ],
       "ownership": [],
       "deviations": [
-        "No retained production source consumer: the only direct includes are src/test/f2n.cpp, src/test/hwf.cpp, src/test/mpf.cpp, src/test/im_float_config.h, and src/util/hwf.cpp; hwf.cpp and hwf.h themselves serve only standalone source tests. No Go template adapter is needed."
+        "The earlier test-only include audit missed src/math/subpaving/tactic/subpaving_tactic.cpp and the production subpaving_mpf.h/subpaving_hwf.h headers. The tactic constructs f2n<mpf_manager> and f2n<hwf_manager>; its numeral option selects HWF for hardware-float requests. Port concrete live wrappers with their subpaving consumers, without a universal template adapter."
       ]
     },
     {
@@ -118914,7 +118923,7 @@
       "path": "src/util/hwf.cpp",
       "component": "util",
       "role": "production",
-      "status": "reference_only",
+      "status": "unported",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -119295,17 +119304,22 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Hardware-float manager value, rounding, arithmetic, comparison and classification reached through subpaving f2n<hwf_manager>",
+          "status": "unported"
+        }
+      ],
       "ownership": [],
       "deviations": [
-        "The hardware-float implementation has no retained production caller. Its header is included by src/test/hwf.cpp, src/test/f2n.cpp, and src/test/im_float_config.h only; hwf.cpp is its own implementation. Preserve the C++ file for source reference without a Go hardware-float adapter."
+        "The earlier test-only classification missed the live subpaving tactic HWF engine. src/math/subpaving/tactic/subpaving_tactic.cpp owns hwf_manager and f2n<hwf_manager>, and src/math/subpaving/subpaving_hwf.h binds the interval context. No concrete Go HWF manager exists yet; audit the reached method and owner graph with that consumer."
       ]
     },
     {
       "path": "src/util/hwf.h",
       "component": "util",
       "role": "production",
-      "status": "reference_only",
+      "status": "unported",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -119334,10 +119348,15 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Hardware-float manager declarations and hwf value semantics reached by subpaving f2n<hwf_manager>",
+          "status": "unported"
+        }
+      ],
       "ownership": [],
       "deviations": [
-        "Direct include scan finds only src/test/hwf.cpp, src/test/f2n.cpp, src/test/im_float_config.h, and its implementation src/util/hwf.cpp. The entire hwf/f2n branch lacks a retained production consumer, so no Go hardware-float manager is ported."
+        "The earlier direct-include scan missed src/math/subpaving/tactic/subpaving_tactic.cpp and src/math/subpaving/subpaving_hwf.h. The HWF branch is selected by the retained subpaving tactic numeral option and must be ported as a concrete Go consumer path."
       ]
     },
     {

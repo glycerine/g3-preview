@@ -39475,17 +39475,17 @@ consumers are retained in Go. No whole-header completion is claimed yet.
 Focused hash, bit-vector, AST-table and polynomial-monomial tests pass native
 on CPUs 8–16; source portcheck passes.
 
-### Test-only hardware floating branch
+### Subpaving hardware floating branch
 
-`src/util/f2n.h` and `src/util/hwf.h/.cpp` have no retained production
-consumer. Direct includes of `f2n.h` come from four `src/test` files plus
-`hwf.cpp`; direct includes of `hwf.h` come from three `src/test` files and
-`hwf.cpp`. There is no other source use of the `hwf` or `f2n` types. The three
-manifest units move from unported to reference-only, retaining the C++ files
-for source inspection. This does not change the status of `mpf`, `mpff`, or
-other floating-point implementations that still have live consumers. No
-generic Go hardware-float or float-to-numeral wrapper was added. Source
-portcheck validates the dispositions on CPUs 8–16.
+The earlier test-only classification of `src/util/f2n.h` and
+`src/util/hwf.h/.cpp` was incorrect. `src/math/subpaving/tactic/subpaving_tactic.cpp`
+constructs `f2n<mpf_manager>`, `hwf_manager`, and `f2n<hwf_manager>` as members.
+Its `numeral` option selects the MPF or HWF context, and
+`src/math/subpaving/subpaving_mpf.h` and `subpaving_hwf.h` bind those concrete
+wrappers to the interval template. The manifest now marks all three util units
+unported. Their reached algorithms and owner lifetimes must be ported with the
+concrete subpaving engines; no generic float-to-numeral adapter is planned.
+This correction supersedes the former reference-only disposition.
 
 ### Environment parameter runtime boundary
 
