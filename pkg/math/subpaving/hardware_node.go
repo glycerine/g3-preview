@@ -16,9 +16,18 @@ type HardwareBound struct {
 	variable  uint32
 	lower     bool
 	open      bool
+	reason    hardwareBoundReasonKind
 	timestamp uint64
 	prev      *HardwareBound
 }
+
+type hardwareBoundReasonKind uint8
+
+const (
+	hardwareReasonUnknown hardwareBoundReasonKind = iota
+	hardwareReasonAxiom
+	hardwareReasonAssumption
+)
 
 // HardwareNode uses copied Go slices for the retained parray bound views.
 // A child's replacement of a bound never changes its parent's view.

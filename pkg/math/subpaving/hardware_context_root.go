@@ -13,7 +13,7 @@ import (
 
 // HardwareContext owns the scalar bound-policy numerals and concrete
 // constraint and node records of context_hwf. Its manager and resource limit
-// are borrowed. Root propagation and search remain to be ported.
+// are borrowed. Definition propagation, queue draining and search remain.
 type HardwareContext struct {
 	self          *HardwareContext
 	numbers       *numeral.HardwareFloatNumeralManager
@@ -32,6 +32,11 @@ type HardwareContext struct {
 	inequalities  []*HardwareInequality
 	root          *HardwareNode
 	nextNodeID    uint32
+	timestamp     uint64
+	queue         []*HardwareBound
+	queueHead     int
+	unitClauses   []hardwareUnitClause
+	unitHead      int
 	closed        bool
 }
 
@@ -156,6 +161,10 @@ func (c *HardwareContext) Close() error {
 			return err
 		}
 	}
+	for _, unit := range c.unitClauses {
+		unit.atom.refs--
+	}
+	c.queue = nil
 	c.closed = true
 	return nil
 }

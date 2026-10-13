@@ -50953,7 +50953,8 @@
         "pkg/math/subpaving/hardware_context_root.go",
         "pkg/math/subpaving/hardware_context_params.go",
         "pkg/math/subpaving/hardware_context_constraints.go",
-        "pkg/math/subpaving/hardware_node.go"
+        "pkg/math/subpaving/hardware_node.go",
+        "pkg/math/subpaving/hardware_context_bounds.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -51022,7 +51023,9 @@
         "TestSubpavingHardwareContextBoundPolicyAndRootDispatch",
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
         "TestSubpavingHardwareShellCoefficientAndInequalityConversion",
-        "TestHardwareNodeRetainedBoundViewsAndChildTrail"
+        "TestHardwareNodeRetainedBoundViewsAndChildTrail",
+        "TestHardwareContextIntegerBoundsAndOpenConflicts",
+        "TestHardwareContextRootUnitAssertionResumeAndConflict"
       ],
       "conditionals": [
         {
@@ -51387,6 +51390,15 @@
           "tests": [
             "TestHardwareNodeRetainedBoundViewsAndChildTrail"
           ]
+        },
+        {
+          "name": "Concrete config_hwf bound records and context queue reached by root unit assertions (src/math/subpaving/subpaving_t.h:146-162)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_bounds.go",
+          "tests": [
+            "TestHardwareContextIntegerBoundsAndOpenConflicts",
+            "TestHardwareContextRootUnitAssertionResumeAndConflict"
+          ]
         }
       ],
       "ownership": [
@@ -51461,7 +51473,9 @@
         "pkg/math/subpaving/hardware_context_root.go",
         "pkg/math/subpaving/hardware_context_params.go",
         "pkg/math/subpaving/hardware_context_constraints.go",
-        "pkg/math/subpaving/hardware_node.go"
+        "pkg/math/subpaving/hardware_node.go",
+        "pkg/math/subpaving/hardware_context_bounds.go",
+        "pkg/math/subpaving/hardware_context_units.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51521,7 +51535,9 @@
         "TestSubpavingHardwareContextBoundPolicyAndRootDispatch",
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
         "TestSubpavingHardwareShellCoefficientAndInequalityConversion",
-        "TestHardwareNodeRetainedBoundViewsAndChildTrail"
+        "TestHardwareNodeRetainedBoundViewsAndChildTrail",
+        "TestHardwareContextIntegerBoundsAndOpenConflicts",
+        "TestHardwareContextRootUnitAssertionResumeAndConflict"
       ],
       "assertions": [
         {
@@ -52127,6 +52143,22 @@
           "go_target": "pkg/math/subpaving/hardware_node.go",
           "tests": [
             "TestHardwareNodeRetainedBoundViewsAndChildTrail"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf integer bound normalization, trail publication, timestamps and open-endpoint conflict detection (src/math/subpaving/subpaving_t_def.h:528-589,1337-1343)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_bounds.go",
+          "tests": [
+            "TestHardwareContextIntegerBoundsAndOpenConflicts"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf retained unit references and resumable root assertion (src/math/subpaving/subpaving_t_def.h:802-875,1773-1786)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_units.go",
+          "tests": [
+            "TestHardwareContextRootUnitAssertionResumeAndConflict"
           ]
         }
       ],
@@ -117913,7 +117945,8 @@
         "pkg/util/numeral/hwf_power_of_two.go",
         "pkg/math/interval/hardware_root.go",
         "pkg/math/subpaving/hardware_interval_root.go",
-        "pkg/math/subpaving/hardware_context_root.go"
+        "pkg/math/subpaving/hardware_context_root.go",
+        "pkg/math/subpaving/hardware_context_bounds.go"
       ],
       "tests": [
         "TestHardwareFloatNumeralDirectedIntervalOperations",
@@ -117940,7 +117973,8 @@
         "TestHardwareFloatPrevPowerOfTwoSourceBoundaries",
         "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
         "TestSubpavingHardwareIntervalXnEqYRetainedCases",
-        "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
+        "TestSubpavingHardwareContextBoundPolicyAndRootDispatch",
+        "TestHardwareContextIntegerBoundsAndOpenConflicts"
       ],
       "conditionals": [
         {
@@ -118130,6 +118164,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_root.go",
           "tests": [
             "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
+          ]
+        },
+        {
+          "name": "Concrete f2n<hwf_manager> ceil/floor, directed increment/decrement and integer check consumed by hardware subpaving bounds (src/util/f2n.h:70-159)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_context_bounds.go",
+          "tests": [
+            "TestHardwareContextIntegerBoundsAndOpenConflicts"
           ]
         }
       ],
