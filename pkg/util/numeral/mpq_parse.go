@@ -86,6 +86,7 @@ func (m *RationalManager) SetString(out *Rational, text string) error {
 		i++
 	}
 	marker := numeralByte(text, i)
+	m.traceParseBefore(out)
 	if marker == '/' || marker == '.' || marker == 'e' || marker == 'E' {
 		if e := m.parseRationalSuffix(out, text, i, &tmp, &ten); e != nil {
 			return e
@@ -161,6 +162,7 @@ func (m *RationalManager) parseRationalSuffix(work *Rational, text string, i int
 			} else if b == '/' {
 				return &ParseError{Reason: ParseMixedNotation}
 			}
+			m.traceParseExponent(exponent, b)
 		}
 	}
 	if !isRat {
@@ -190,6 +192,7 @@ func (m *RationalManager) parseRationalSuffix(work *Rational, text string, i int
 			if e := m.Power(&tenRat, uint32(exponent), &exp); e != nil {
 				return e
 			}
+			m.traceParsePower(work, expNegative, exponent, &exp)
 			if expNegative {
 				if e := m.Div(work, &exp, work); e != nil {
 					return e
