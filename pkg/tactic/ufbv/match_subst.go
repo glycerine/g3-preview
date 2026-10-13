@@ -52,14 +52,11 @@ func (s *matchSubst) releaseScratch() error {
 	return nil
 }
 
-// substitution::reset clears lookup before releasing its m_refs vector.
-// Keep an unconsumed reference in owned so cleanup can be retried.
+// substitution::reset clears lookup, releases m_refs, then resets its apply
+// cache and m_new_exprs. Keep an unconsumed reference for a later retry.
 func (s *matchSubst) resetBindings() error {
 	clear(s.bindings)
 	clear(s.byIndex)
-	if e := s.releaseScratch(); e != nil {
-		return e
-	}
 	for len(s.owned) != 0 {
 		h := s.owned[0]
 		consumed, e := s.manager.DecRefConsumed(h)
@@ -74,7 +71,7 @@ func (s *matchSubst) resetBindings() error {
 			return ast.ErrASTPending
 		}
 	}
-	return nil
+	return s.releaseScratch()
 }
 
 func (s *matchSubst) close() error {

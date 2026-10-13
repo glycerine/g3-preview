@@ -166403,7 +166403,7 @@
         },
         {
           "name": "UFBV match_subst substitution m_refs concrete AST target retention, ascending reset and close",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/match_subst.go",
           "tests": [
             "TestMatchSubstConcretePairCacheAndVariableBindings"
