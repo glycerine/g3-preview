@@ -77562,7 +77562,10 @@
           "name": "checkpoint sat_solver.h:268-282 captures shared diagnostic at actual exception construction",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_propagation_control.go",
-          "tests": []
+          "tests": [
+            "TestSATSolverCheckpointActualResourceAndMemoryOrder",
+            "TestSATRuntimeSharedProcessAndNumeralCohort"
+          ]
         }
       ],
       "ownership": [
@@ -147605,6 +147608,14 @@
           ]
         },
         {
+          "name": "SAT solver tenth-checkpoint max-memory cutoff reads process bytes including a second Runtime, with strict equality and count reset (sat_solver.h:268-282)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_propagation_control.go",
+          "tests": [
+            "TestSATRuntimeSharedProcessAndNumeralCohort"
+          ]
+        },
+        {
           "name": "SAT probing cache creation and run cutoff read shared process bytes across Runtime owners (sat_probing.cpp:45,204)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_probing.go",
@@ -148008,6 +148019,14 @@
           "name": "SAT solver process cohort binds its raw Runtime to parameter numeral ProcessAccounting and reads other-runtime bytes at retained memory-stat checkpoint (sat_solver.cpp:3762; sat_types.h:289-293)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_runtime.go",
+          "tests": [
+            "TestSATRuntimeSharedProcessAndNumeralCohort"
+          ]
+        },
+        {
+          "name": "SAT solver tenth-checkpoint max-memory cutoff reads process bytes including a second Runtime, with strict equality and count reset (sat_solver.h:268-282)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_propagation_control.go",
           "tests": [
             "TestSATRuntimeSharedProcessAndNumeralCohort"
           ]

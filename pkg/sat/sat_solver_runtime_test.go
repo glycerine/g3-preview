@@ -67,6 +67,20 @@ func TestSATRuntimeSharedProcessAndNumeralCohort(t *testing.T) {
 	if actual != p.AllocationSize() || actual < beforeBytes+(1<<20) {
 		t.Fatal("SAT owner cannot see second runtime allocation", actual, p.AllocationSize())
 	}
+	// sat_solver.h checks the process total only at every tenth checkpoint.
+	// A foreign Runtime must therefore trigger the same strict source cutoff.
+	propagation := solver.propagation
+	propagation.checkpointEnabled = true
+	propagation.config.state.MaxMemory = beforeBytes
+	for i := 0; i < 9; i++ {
+		satOK(t, propagation.checkpoint())
+	}
+	if propagation.numCheckpoints != 9 {
+		t.Fatal("solver memory checkpoint ran before source cadence", propagation.numCheckpoints)
+	}
+	if e := propagation.checkpoint(); !errors.Is(e, ErrSATSolverMaxMemory) || propagation.numCheckpoints != 0 {
+		t.Fatal("solver ignored foreign process allocation", e, propagation.numCheckpoints)
+	}
 	if !solver.probing.cacheEnabled {
 		t.Fatal("source probing cache unexpectedly disabled")
 	}
@@ -82,6 +96,13 @@ func TestSATRuntimeSharedProcessAndNumeralCohort(t *testing.T) {
 		t.Fatal("SAT report omitted cross-runtime allocation", afterText, want, beforeText)
 	}
 	satOK(t, other.Deallocate(&block))
+	for i := 0; i < 10; i++ {
+		satOK(t, propagation.checkpoint())
+	}
+	if propagation.numCheckpoints != 0 {
+		t.Fatal("solver memory checkpoint did not reset at equality", propagation.numCheckpoints)
+	}
+	propagation.config.state.MaxMemory = ^uint64(0)
 	satOK(t, solver.probing.cacheBins(literal, 0))
 	if _, cached, e := solver.probing.cachedImpliedLits(literal); e != nil || !cached {
 		t.Fatal("probing cache did not resume at the process limit", cached, e)
