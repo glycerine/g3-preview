@@ -99,6 +99,14 @@ func TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic(t *testing.T
 		t.Fatal("open touching intervals")
 	}
 	set(a, 2, 2, false, false)
+	var nan numeral.HardwareFloat
+	must(core.SetFloat64(&nan, math.NaN()))
+	for _, bounds := range [][2]*numeral.HardwareFloat{{&nan, &nan}, {&nan, &values[2]}, {&values[2], &nan}} {
+		if e := a.SetFinite(bounds[0], bounds[1], false, false); !errors.Is(e, interval.ErrExtendedDomain) {
+			t.Fatalf("NaN bounds accepted: %v", e)
+		}
+		must(a.CheckInvariant())
+	}
 	zero, e = a.ContainsZero()
 	must(e)
 	if zero {

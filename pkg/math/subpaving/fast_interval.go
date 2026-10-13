@@ -130,12 +130,22 @@ func (v *FastInterval) SetFinite(lower, upper *numeral.FastFloat, lowerOpen, upp
 		return err
 	}
 	e := interval.FastExtended{Numbers: v.numbers}
-	cmp, err := e.Compare(lower, interval.Finite, upper, interval.Finite)
+	equal, err := e.Equal(lower, interval.Finite, upper, interval.Finite)
 	if err != nil {
 		return err
 	}
-	if cmp > 0 || cmp == 0 && (lowerOpen || upperOpen) {
-		return interval.ErrExtendedDomain
+	if equal {
+		if lowerOpen || upperOpen {
+			return interval.ErrExtendedDomain
+		}
+	} else {
+		less, err := e.Less(lower, interval.Finite, upper, interval.Finite)
+		if err != nil {
+			return err
+		}
+		if !less {
+			return interval.ErrExtendedDomain
+		}
 	}
 	if err := v.numbers.Copy(lo, lower); err != nil {
 		return err

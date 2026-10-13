@@ -37,14 +37,14 @@ func TestSubpavingMPFMutableIntervalRetainedCore(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var lo, hi numeral.ArbitraryFloat
+	var lo, hi, nan numeral.ArbitraryFloat
 	t.Cleanup(func() {
 		for _, x := range []*ArbitraryInterval{copyOf, v} {
 			if err := x.Close(); err != nil {
 				t.Error(err)
 			}
 		}
-		for _, x := range []*numeral.ArbitraryFloat{&lo, &hi} {
+		for _, x := range []*numeral.ArbitraryFloat{&lo, &hi, &nan} {
 			if err := m.Del(x); err != nil {
 				t.Error(err)
 			}
@@ -81,6 +81,13 @@ func TestSubpavingMPFMutableIntervalRetainedCore(t *testing.T) {
 	must(m.SetInt32(&lo, -1))
 	must(m.SetInt32(&hi, 2))
 	must(v.SetFinite(&lo, &hi, false, true))
+	must(core.MkNaN(11, 53, &nan, nil))
+	for _, bounds := range [][2]*numeral.ArbitraryFloat{{&nan, &nan}, {&nan, &hi}, {&lo, &nan}} {
+		if err := v.SetFinite(bounds[0], bounds[1], false, false); !errors.Is(err, interval.ErrExtendedDomain) {
+			t.Fatalf("NaN bounds accepted: %v", err)
+		}
+		must(v.CheckInvariant())
+	}
 	must(copyOf.SetFrom(v))
 	must(copyOf.CheckInvariant())
 	rendered.Reset()

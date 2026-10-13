@@ -128,12 +128,23 @@ func (v *FixedInterval) SetFinite(lower, upper *numeral.FixedPoint, lowerOpen, u
 	if err := v.mutable(); err != nil {
 		return err
 	}
-	cmp, err := v.numbers.Compare(lower, upper)
+	e := interval.FixedExtended{Numbers: v.numbers}
+	equal, err := e.Equal(lower, interval.Finite, upper, interval.Finite)
 	if err != nil {
 		return err
 	}
-	if cmp > 0 || cmp == 0 && (lowerOpen || upperOpen) {
-		return interval.ErrExtendedDomain
+	if equal {
+		if lowerOpen || upperOpen {
+			return interval.ErrExtendedDomain
+		}
+	} else {
+		less, err := e.Less(lower, interval.Finite, upper, interval.Finite)
+		if err != nil {
+			return err
+		}
+		if !less {
+			return interval.ErrExtendedDomain
+		}
 	}
 	if err := v.numbers.Copy(v.lower, lower); err != nil {
 		return err

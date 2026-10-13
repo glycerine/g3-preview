@@ -129,8 +129,12 @@ func (v *HardwareInterval) SetFinite(lower, upper *numeral.HardwareFloat, lowerO
 		return err
 	}
 	e := interval.HardwareExtended{Numbers: v.numbers}
-	cmp := e.Compare(lower, interval.Finite, upper, interval.Finite)
-	if cmp > 0 || cmp == 0 && (lowerOpen || upperOpen) {
+	equal := e.Equal(lower, interval.Finite, upper, interval.Finite)
+	if equal {
+		if lowerOpen || upperOpen {
+			return interval.ErrExtendedDomain
+		}
+	} else if !e.Less(lower, interval.Finite, upper, interval.Finite) {
 		return interval.ErrExtendedDomain
 	}
 	if err = v.numbers.Set(lo, lower); err != nil {

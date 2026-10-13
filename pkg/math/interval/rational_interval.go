@@ -58,12 +58,23 @@ func (v *RationalInterval) SetFinite(lower, upper *numeral.Rational, lowerOpen, 
 	if err := v.open(); err != nil {
 		return err
 	}
-	cmp, err := v.numbers.Compare(lower, upper)
+	e := RationalExtended{Numbers: v.numbers}
+	equal, err := e.Equal(lower, Finite, upper, Finite)
 	if err != nil {
 		return err
 	}
-	if cmp > 0 || cmp == 0 && (lowerOpen || upperOpen) {
-		return ErrExtendedDomain
+	if equal {
+		if lowerOpen || upperOpen {
+			return ErrExtendedDomain
+		}
+	} else {
+		less, err := e.Less(lower, Finite, upper, Finite)
+		if err != nil {
+			return err
+		}
+		if !less {
+			return ErrExtendedDomain
+		}
 	}
 	if err = v.numbers.Copy(&v.lower, lower); err != nil {
 		return err
