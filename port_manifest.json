@@ -4620,13 +4620,30 @@
       "path": "src/api/dll/gparams_register_modules.cpp",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/engine/generated_params.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGeneratedProcessLinksFullParameterCatalog"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "generated source-order collector dispatch and production package linkage",
+          "status": "ported",
+          "go_target": "pkg/engine/generated_params.go",
+          "tests": [
+            "TestGeneratedProcessLinksFullParameterCatalog"
+          ]
+        }
+      ],
+      "ownership": [
+        "Generated descriptor rows retain their owned Go catalog descriptions and merge into the source-order global manager. The API unit has the same generated body as shell and test; pkg/engine links all retained collectors above util before process initialization."
+      ],
       "deviations": []
     },
     {
@@ -78476,13 +78493,30 @@
       "path": "src/shell/gparams_register_modules.cpp",
       "component": "shell",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
+      "status": "ported",
+      "go_targets": [
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/engine/generated_params.go"
+      ],
+      "tests": [
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestGeneratedProcessLinksFullParameterCatalog"
+      ],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "generated source-order collector dispatch and production package linkage",
+          "status": "ported",
+          "go_target": "pkg/engine/generated_params.go",
+          "tests": [
+            "TestGeneratedProcessLinksFullParameterCatalog"
+          ]
+        }
+      ],
+      "ownership": [
+        "Generated descriptor rows retain their owned Go catalog descriptions and merge into the source-order global manager. The shell unit has the same generated body as API and test; pkg/engine links all retained collectors above util before process initialization."
+      ],
       "deviations": []
     },
     {
@@ -106352,25 +106386,27 @@
       "path": "src/test/gparams_register_modules.cpp",
       "component": "test",
       "role": "test",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/util/params/util_gparams_catalog_collectors.go",
-        "pkg/util/params/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/engine/generated_params.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestGeneratedProcessLinksFullParameterCatalog"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete generated descriptor dispatch and exact source-order registration",
           "status": "ported",
           "go_target": "pkg/util/params/util_gparams_catalog_dispatch.go",
           "tests": [
@@ -106383,7 +106419,7 @@
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All 458 ordered metadata rows independently checked. Production collectors link above util through pkg/engine. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; wider gparams value and lifecycle work remains in src/util/gparams.cpp/.h."
       ],
       "deviations": []
     },

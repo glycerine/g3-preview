@@ -414,6 +414,33 @@
       ]
     },
     {
+      "package": "engine",
+      "imports": [
+        "ackermannization",
+        "ast",
+        "ast/fpa",
+        "ast/normal_forms",
+        "ast/rewriter",
+        "math/polynomial",
+        "math/realclosure",
+        "model",
+        "muz/base",
+        "nlsat",
+        "opt",
+        "parsers/util",
+        "sat",
+        "smtcore",
+        "solver",
+        "tactic/sls",
+        "tactic/smtlogics",
+        "util/lp",
+        "util/process"
+      ],
+      "production_files": [
+        "generated_params.go"
+      ]
+    },
+    {
       "package": "math/euclid",
       "imports": [
         "arena",
