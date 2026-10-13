@@ -18,11 +18,26 @@ func (m *FixedPointManager) traceFixedIntegerDivision(num int64, den uint64, out
 			}
 			return writeFixedPointPart(w, "\n")
 		}
-		bound := ") >= "
+		bound := ">="
 		if m.roundUp {
-			bound = ") <= "
+			bound = "<="
 		}
-		return writeFixedPointPart(w, "[mpfx] ("+strconv.FormatInt(num, 10)+") / ("+strconv.FormatUint(den, 10)+bound)
+		if err := writeFixedPointPart(w, "[mpfx] ("); err != nil {
+			return err
+		}
+		digits := strconv.FormatInt(num, 10)
+		if num < 0 {
+			if err := writeFixedPointPart(w, "-"); err != nil {
+				return err
+			}
+			digits = digits[1:]
+		}
+		for _, part := range [...]string{digits, ") / (", strconv.FormatUint(den, 10), ") ", bound, " "} {
+			if err := writeFixedPointPart(w, part); err != nil {
+				return err
+			}
+		}
+		return nil
 	})
 }
 
@@ -44,10 +59,15 @@ func (m *FixedPointManager) traceFixedInverse(a *FixedPoint, after bool) {
 		if err := m.Display(w, a); err != nil {
 			return err
 		}
-		bound := ") >= "
+		bound := ">="
 		if m.roundUp {
-			bound = ") <= "
+			bound = "<="
 		}
-		return writeFixedPointPart(w, bound)
+		for _, part := range [...]string{") ", bound, " "} {
+			if err := writeFixedPointPart(w, part); err != nil {
+				return err
+			}
+		}
+		return nil
 	})
 }

@@ -153191,7 +153191,9 @@
         "TestFixedPointComparisonAndProductSourceTrace",
         "TestFixedPointFloorCeilSourceTrace",
         "TestFixedPointPowerSourceTraceAndRawWords",
-        "TestFixedPointRetainedDivisionCallersTrace"
+        "TestFixedPointRetainedDivisionCallersTrace",
+        "TestFixedPointDivisionTraceSourceInsertionPrefixes",
+        "TestFixedPointDivisionTraceRefusalKeepsArithmetic"
       ],
       "conditionals": [
         {
@@ -153506,7 +153508,9 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpfx_division_callers_trace.go",
           "tests": [
-            "TestFixedPointRetainedDivisionCallersTrace"
+            "TestFixedPointRetainedDivisionCallersTrace",
+            "TestFixedPointDivisionTraceSourceInsertionPrefixes",
+            "TestFixedPointDivisionTraceRefusalKeepsArithmetic"
           ]
         },
         {
@@ -153557,7 +153561,9 @@
         "TestFixedPointDisplaySourceInsertionsAndShortWrites",
         "TestFixedPointRetainedOrderingSignsIncrementAndSwap",
         "TestFixedPointPrevPowerOfTwoSourceIntegerWords",
-        "TestFixedPointRetainedDivisionCallersTrace"
+        "TestFixedPointRetainedDivisionCallersTrace",
+        "TestFixedPointDivisionTraceSourceInsertionPrefixes",
+        "TestFixedPointDivisionTraceRefusalKeepsArithmetic"
       ],
       "conditionals": [
         {
@@ -153620,7 +153626,9 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpfx_division_callers_trace.go",
           "tests": [
-            "TestFixedPointRetainedDivisionCallersTrace"
+            "TestFixedPointRetainedDivisionCallersTrace",
+            "TestFixedPointDivisionTraceSourceInsertionPrefixes",
+            "TestFixedPointDivisionTraceRefusalKeepsArithmetic"
           ]
         },
         {
@@ -173445,7 +173453,9 @@
         "TestFixedPointComparisonAndProductSourceTrace",
         "TestFixedPointFloorCeilSourceTrace",
         "TestFixedPointPowerSourceTraceAndRawWords",
-        "TestFixedPointRetainedDivisionCallersTrace"
+        "TestFixedPointRetainedDivisionCallersTrace",
+        "TestFixedPointDivisionTraceSourceInsertionPrefixes",
+        "TestFixedPointDivisionTraceRefusalKeepsArithmetic"
       ],
       "conditionals": [
         {
@@ -173754,7 +173764,9 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpfx_division_callers_trace.go",
           "tests": [
-            "TestFixedPointRetainedDivisionCallersTrace"
+            "TestFixedPointRetainedDivisionCallersTrace",
+            "TestFixedPointDivisionTraceSourceInsertionPrefixes",
+            "TestFixedPointDivisionTraceRefusalKeepsArithmetic"
           ]
         },
         {
@@ -173802,7 +173814,9 @@
         "TestFixedPointComparisonAndProductSourceTrace",
         "TestFixedPointFloorCeilSourceTrace",
         "TestFixedPointPowerSourceTraceAndRawWords",
-        "TestFixedPointRetainedDivisionCallersTrace"
+        "TestFixedPointRetainedDivisionCallersTrace",
+        "TestFixedPointDivisionTraceSourceInsertionPrefixes",
+        "TestFixedPointDivisionTraceRefusalKeepsArithmetic"
       ],
       "conditionals": [
         {
@@ -174123,7 +174137,9 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpfx_division_callers_trace.go",
           "tests": [
-            "TestFixedPointRetainedDivisionCallersTrace"
+            "TestFixedPointRetainedDivisionCallersTrace",
+            "TestFixedPointDivisionTraceSourceInsertionPrefixes",
+            "TestFixedPointDivisionTraceRefusalKeepsArithmetic"
           ]
         },
         {
