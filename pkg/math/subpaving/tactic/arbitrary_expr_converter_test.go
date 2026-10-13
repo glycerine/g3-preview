@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	goaltactic "github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
@@ -192,5 +193,126 @@ func TestArbitraryExprConverterTermsAndClause(t *testing.T) {
 	}
 	if _, err := converter.InternalizeTerm(zeroConstant, &n, &d); !errors.Is(err, numeral.ErrArbitraryFloatNonRegular) {
 		t.Fatal("MPF f2n zero-constant refusal", err)
+	}
+}
+
+func TestArbitraryExprConverterSearchSimpleGoal(t *testing.T) {
+	b := arena.NewBudget(1 << 26)
+	runtime, err := memory.NewRuntime(memory.RuntimeConfig{Budget: b, SizeTBits: 64})
+	if err != nil {
+		t.Fatal(err)
+	}
+	core, err := numeral.NewArbitraryFloatManager(numeral.IntegerConfig{Memory: runtime, Profile: memory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	numbers, err := numeral.NewArbitraryFloatNumeralManager(core, 11, 53)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sy, err := symbol.NewManager(symbol.Config{Budget: b})
+	if err != nil {
+		t.Fatal(err)
+	}
+	q, err := numeral.NewRationalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	m, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b})
+	if err != nil {
+		t.Fatal(err)
+	}
+	family, err := m.RegisterArithmeticPlugin()
+	if err != nil {
+		t.Fatal(err)
+	}
+	sort, err := m.MkFamilySort(family, 1, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pc, err := params.NewParamsContext(sy, q, params.ParamsConfig{Budget: b})
+	if err != nil {
+		t.Fatal(err)
+	}
+	p, err := pc.NewValue()
+	if err != nil {
+		t.Fatal(err)
+	}
+	selected, err := sy.Intern("mpf")
+	if err != nil {
+		t.Fatal(err)
+	}
+	key, depth := "numeral", "max_depth"
+	if err := pc.SetSymbolName(&p, &key, selected); err != nil {
+		t.Fatal(err)
+	}
+	if err := pc.SetUIntName(&p, &depth, 0); err != nil {
+		t.Fatal(err)
+	}
+	qm, err := numeral.NewRationalManager(numeral.RationalConfig{Integers: numeral.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	engine, err := NewArbitraryEngine(&control.Reslimit{Limit: 1000}, numbers, pc, &p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	converter, err := NewArbitraryExprConverter(m, engine, qm)
+	if err != nil {
+		t.Fatal(err)
+	}
+	goal, err := goaltactic.NewGoal(m, false, false, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	value, err := q.NewValue()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		for _, e := range []error{goal.Close(), converter.Close(), engine.Close(), qm.CloseChecked(), pc.Del(&p), pc.Close(), q.Del(&value), m.Close(), q.Close(), sy.Close(), numbers.Close(), core.Close(), runtime.Close()} {
+			if e != nil {
+				t.Error(e)
+			}
+		}
+		if b.Used() != 0 {
+			t.Error("retained goal owner bytes", b.Used())
+		}
+	})
+	xName, err := sy.Intern("x")
+	if err != nil {
+		t.Fatal(err)
+	}
+	x, err := m.MkConst(xName, sort)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := q.SetString(&value, "2"); err != nil {
+		t.Fatal(err)
+	}
+	two, err := m.ArithmeticNumeral(&value, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	le, err := m.MkFamilyApp(family, 2, nil, []ast.ASTHandle{x, two})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := goal.Assert(le); err != nil {
+		t.Fatal(err)
+	}
+	if err := converter.SearchGoal(goal); err != nil {
+		t.Fatal("MPF simple goal search", err)
+	}
+	shell, err := engine.Shell()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var display bytes.Buffer
+	if err := shell.DisplayBounds(&display); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(display.String(), "2") {
+		t.Fatal("missing searched upper bound", display.String())
 	}
 }

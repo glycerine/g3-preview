@@ -52981,7 +52981,8 @@
       ],
       "tests": [
         "TestHardwareExprConverterTerms",
-        "TestArbitraryExprConverterTermsAndClause"
+        "TestArbitraryExprConverterTermsAndClause",
+        "TestArbitraryExprConverterSearchSimpleGoal"
       ],
       "assertions": [
         {
@@ -53042,7 +53043,8 @@
       ],
       "tests": [
         "TestHardwareExprConverterTerms",
-        "TestArbitraryExprConverterTermsAndClause"
+        "TestArbitraryExprConverterTermsAndClause",
+        "TestArbitraryExprConverterSearchSimpleGoal"
       ],
       "conditionals": [
         {
@@ -53084,7 +53086,8 @@
         "TestSubpavingTacticOptionSelectionAndDescriptions",
         "TestHardwareExprConverterTerms",
         "TestArbitraryEngineSelectedContextAndPartialCleanup",
-        "TestArbitraryExprConverterTermsAndClause"
+        "TestArbitraryExprConverterTermsAndClause",
+        "TestArbitraryExprConverterSearchSimpleGoal"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -53132,7 +53135,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The HWF and MPF branches construct concrete contexts and expression converters, internalize <=/>= literals with numeral right sides, unwrap nested negations, scale bounds by exact numerator/denominator, and add clauses in source order. The MPF converter borrows a rational manager and uses the selected owning MPF shell. Only the HWF goal-search path has been exercised end to end; MPF search, MPQ/MPFF/MPFX engine construction, AST variable display, optional print_nodes output, result tactic ownership, simplify pipeline and factory remain open."
+        "The HWF and MPF branches construct concrete contexts and expression converters, internalize <=/>= literals with numeral right sides, unwrap nested negations, scale bounds by exact numerator/denominator, and add clauses in source order. The MPF converter borrows a rational manager and uses the selected owning MPF shell. A simple MPF integer-bound goal now exercises internalize-then-search and displays its resulting bound; compound MPF search and its source f2n non-regular arithmetic stops remain to audit. MPQ/MPFF/MPFX engine construction, AST variable display, optional print_nodes output, result tactic ownership, simplify pipeline and factory remain open."
       ]
     },
     {
