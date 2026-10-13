@@ -9,7 +9,6 @@ import (
 func TestBinaryFormattingExact(t *testing.T) {
 	m, _ := binaryManager(t)
 	a := NewBinaryIntPower(-3, 3)
-	b := NewBinaryIntPower(-7, 4)
 	cases := []struct {
 		kind int
 		want string
@@ -35,10 +34,6 @@ func TestBinaryFormattingExact(t *testing.T) {
 			t.Fatal(c, got, e)
 		}
 	}
-	got, e := m.IntervalDecimalString(&a, &b, 8)
-	if e != nil || got != "-0.?" {
-		t.Fatal(got, e)
-	}
 	dst := []byte("xxx")
 	n, e := m.FormatInto(&a, dst)
 	if !errors.Is(e, ErrShortBuffer) || n != 6 || string(dst) != "xxx" {
@@ -48,23 +43,6 @@ func TestBinaryFormattingExact(t *testing.T) {
 
 func TestBinaryFormattingBranchesAndFaultPublication(t *testing.T) {
 	m, budget := binaryManager(t)
-	cases := []struct {
-		a, b BinaryRational
-		prec uint32
-		want string
-	}{
-		{NewBinaryInt(3), NewBinaryInt(3), 8, "3"},
-		{NewBinaryInt(-1), NewBinaryInt(1), 8, "?"},
-		{NewBinaryInt(-1), NewBinaryInt(-2), 8, "-?"},
-		{NewBinaryIntPower(3, 3), NewBinaryIntPower(3, 3), 8, "0.375"},
-		{NewBinaryIntPower(3, 3), NewBinaryIntPower(3, 3), 0, "0.?"},
-	}
-	for _, c := range cases {
-		got, e := m.IntervalDecimalString(&c.a, &c.b, c.prec)
-		if e != nil || got != c.want {
-			t.Fatal(c, got, e)
-		}
-	}
 	a := NewBinaryIntPower(2, 1)
 	got, e := m.DecimalString(&a, 8)
 	if SourceExtendedGCDDebug {

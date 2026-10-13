@@ -144748,7 +144748,7 @@
           ]
         },
         {
-          "name": "to_string/display/display_pp/display_smt2/display_decimal single and interval, default byte profile",
+          "name": "to_string/display/display_pp/display_smt2/display_decimal single, default byte profile",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpbq_format.go",
           "tests": [
@@ -144767,6 +144767,10 @@
             "TestBinaryFailureImmediateRoots",
             "TestBinaryVectorFailurePrefixesAndScopedRoutes"
           ]
+        },
+        {
+          "name": "two-bound mpbq display_decimal overload has no retained production caller",
+          "status": "dead_deleted"
         },
         {
           "name": "selected MPBQ_DEBUG rational actions and source SASSERT short circuit; VERIFY executes in release",
@@ -144813,7 +144817,7 @@
           ]
         },
         {
-          "name": "Actual raw decimal/interval locals and explicit end-label deletion cursors; exceptional raw roots retained for checked owning cleanup; broader binary lifecycle remains open",
+          "name": "Actual raw single-value decimal locals and explicit end-label deletion cursors; exceptional raw roots retained for checked owning cleanup; broader binary lifecycle remains open",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpbq_display_scope.go",
           "tests": [
@@ -145031,7 +145035,7 @@
           ]
         },
         {
-          "name": "to_string/display/display_pp/display_smt2/display_decimal single and interval, default byte profile",
+          "name": "to_string/display/display_pp/display_smt2/display_decimal single, default byte profile",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpbq_format.go",
           "tests": [
@@ -145050,6 +145054,10 @@
             "TestBinaryFailureImmediateRoots",
             "TestBinaryVectorFailurePrefixesAndScopedRoutes"
           ]
+        },
+        {
+          "name": "two-bound mpbq display_decimal overload has no retained production caller",
+          "status": "dead_deleted"
         },
         {
           "name": "selected MPBQ_DEBUG rational actions and source SASSERT short circuit; VERIFY executes in release",
@@ -145096,7 +145104,7 @@
           ]
         },
         {
-          "name": "Actual raw decimal/interval locals and explicit end-label deletion cursors; exceptional raw roots retained for checked owning cleanup; broader binary lifecycle remains open",
+          "name": "Actual raw single-value decimal locals and explicit end-label deletion cursors; exceptional raw roots retained for checked owning cleanup; broader binary lifecycle remains open",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpbq_display_scope.go",
           "tests": [

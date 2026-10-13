@@ -409,8 +409,6 @@ func TestBinaryScalarForwardersAndWarmWorkspace(t *testing.T) {
 		serviceMust(t, e)
 		_, e = m.FormatDecimalInto(&r, 8, dst[:])
 		serviceMust(t, e)
-		_, e = m.FormatIntervalDecimalInto(&r, &r, 8, dst[:])
-		serviceMust(t, e)
 	}
 	used := budget.Used()
 	budget.FailAfter(0)

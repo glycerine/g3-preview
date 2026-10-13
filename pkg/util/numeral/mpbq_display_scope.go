@@ -1,4 +1,4 @@
-// Source mpbq.cpp:426–515.
+// Source mpbq.cpp:426–458.
 package numeral
 
 import (
@@ -13,10 +13,10 @@ var ErrBinaryDisplayPending = errors.New("mpnum: raw binary display locals pendi
 // not jump to the source end label. These actual owning scalar records and cold
 // cursors are charged in the BinaryRationalManager header.
 type binaryDisplayScope struct {
-	Values                                      [6]Int // n1,v1,n2,v2,two_k1,two_k2
-	active, interval, sourceEnd, guard, aborted bool
-	sourceStage, owningStage                    uint8
-	original, cleanup                           error
+	Values                            [3]Int // n1,v1,two_k
+	active, sourceEnd, guard, aborted bool
+	sourceStage, owningStage          uint8
+	original, cleanup                 error
 }
 type BinaryDisplayState struct {
 	Pending, SourceEnd, Guard, OwningAbort bool
@@ -31,23 +31,15 @@ func (m *BinaryRationalManager) DisplayState() BinaryDisplayState {
 	s := &m.Display
 	return BinaryDisplayState{s.active, s.sourceEnd, s.guard, s.aborted, s.sourceStage, s.owningStage, s.original, s.cleanup}
 }
-func (m *BinaryRationalManager) beginBinaryDisplay(interval bool) error {
+func (m *BinaryRationalManager) beginBinaryDisplay() error {
 	if m.Display.active {
 		return ErrBinaryDisplayPending
 	}
-	m.Display = binaryDisplayScope{active: true, interval: interval}
+	m.Display = binaryDisplayScope{active: true}
 	return nil
 }
-func (s *binaryDisplayScope) count() uint8 {
-	if s.interval {
-		return 6
-	}
-	return 3
-}
+func (s *binaryDisplayScope) count() uint8 { return 3 }
 func (s *binaryDisplayScope) target(stage uint8) *Int {
-	if !s.interval && stage == 2 {
-		return &s.Values[4]
-	}
 	return &s.Values[stage]
 }
 func (m *BinaryRationalManager) sourceBinaryDisplayEnd() error {

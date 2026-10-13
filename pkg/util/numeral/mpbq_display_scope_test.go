@@ -100,73 +100,64 @@ func binaryDisplayAudit(t *testing.T, m *BinaryRationalManager, public ...*Binar
 }
 
 func TestBinaryRawDisplayAllFaultPrefixesAndOwningAbort(t *testing.T) {
-	for _, interval := range []bool{false, true} {
-		success, retained := false, false
-		for fault := int64(0); fault < 160; fault++ {
-			z, b := mpzPublicationDirectOwner(t)
-			m, e := binaryDisplayTestOwner(t, z)
-			serviceMust(t, e)
-			var a, c BinaryRational
-			serviceMust(t, z.SetUint64(&a.Num, 1<<63))
-			a.KField = 128
-			serviceMust(t, z.Copy(&c.Num, &a.Num))
-			c.KField = 129
-			aRef, cRef := a.Num.Cell, c.Num.Cell
-			b.FailAfter(fault)
-			dst := [32]byte{}
-			for i := range dst {
-				dst[i] = '!'
+	success, retained := false, false
+	for fault := int64(0); fault < 160; fault++ {
+		z, b := mpzPublicationDirectOwner(t)
+		m, e := binaryDisplayTestOwner(t, z)
+		serviceMust(t, e)
+		var a BinaryRational
+		serviceMust(t, z.SetUint64(&a.Num, 1<<63))
+		a.KField = 128
+		aRef := a.Num.Cell
+		b.FailAfter(fault)
+		dst := [32]byte{}
+		for i := range dst {
+			dst[i] = '!'
+		}
+		var n int
+		n, e = m.FormatDecimalInto(&a, 3, dst[:])
+		if e != nil {
+			if !numericPhysicalReservationRefusal(e) {
+				t.Fatal(fault, e)
 			}
-			var n int
-			if interval {
-				n, e = m.FormatIntervalDecimalInto(&a, &c, 3, dst[:])
-			} else {
-				n, e = m.FormatDecimalInto(&a, 3, dst[:])
-			}
-			if e != nil {
-				if !numericPhysicalReservationRefusal(e) {
-					t.Fatal(interval, fault, e)
-				}
-				for _, v := range dst {
-					if v != '!' {
-						t.Fatal("premature caller bytes", interval, fault)
-					}
-				}
-				state := m.DisplayState()
-				if !state.Pending || state.SourceEnd || state.OriginalCause != e {
-					t.Fatal("exception source prefix", interval, fault, state)
-				}
-				for _, v := range m.Display.Values {
-					retained = retained || ValidNumericRef(z.Cells, v.Cell)
-				}
-			} else {
-				success = true
-				if string(dst[:n]) != "0.000?" || m.DisplayState().Pending || !m.DisplayState().SourceEnd || m.DisplayState().SourceStage != m.Display.count() {
-					t.Fatal(interval, fault, n, string(dst[:n]), m.DisplayState())
+			for _, v := range dst {
+				if v != '!' {
+					t.Fatal("premature caller bytes", fault)
 				}
 			}
-			if a.Num.Cell != aRef || c.Num.Cell != cRef || a.KField != 128 || c.KField != 129 || z.Digit(aRef, 1) != 0x80000000 || z.Digit(cRef, 1) != 0x80000000 {
-				t.Fatal("actual input roots/limbs changed", interval, fault)
+			state := m.DisplayState()
+			if !state.Pending || state.SourceEnd || state.OriginalCause != e {
+				t.Fatal("exception source prefix", fault, state)
 			}
-			binaryDisplayAudit(t, m, &a, &c) // before fault disable or any cleanup
-			b.FailAfter(-1)
-			serviceMust(t, m.CleanupDisplay())
-			serviceMust(t, z.Del(&a.Num))
-			serviceMust(t, z.Del(&c.Num))
-			serviceMust(t, m.CloseChecked())
-			serviceMust(t, z.CloseChecked())
-			serviceMust(t, m.Diagnostics.Close())
-			if b.Used() != 0 {
-				t.Fatal("owning cleanup whole graph", interval, fault, b.Used())
+			for _, v := range m.Display.Values {
+				retained = retained || ValidNumericRef(z.Cells, v.Cell)
 			}
-			if success {
-				t.Logf("interval=%v first complete source invocation at reservation ordinal %d", interval, fault)
-				break
+		} else {
+			success = true
+			if string(dst[:n]) != "0.000?" || m.DisplayState().Pending || !m.DisplayState().SourceEnd || m.DisplayState().SourceStage != m.Display.count() {
+				t.Fatal(fault, n, string(dst[:n]), m.DisplayState())
 			}
 		}
-		if !success || !retained {
-			t.Fatal("complete real prefix campaign", interval, success, retained)
+		if a.Num.Cell != aRef || a.KField != 128 || z.Digit(aRef, 1) != 0x80000000 {
+			t.Fatal("actual input roots/limbs changed", fault)
 		}
+		binaryDisplayAudit(t, m, &a) // before fault disable or any cleanup
+		b.FailAfter(-1)
+		serviceMust(t, m.CleanupDisplay())
+		serviceMust(t, z.Del(&a.Num))
+		serviceMust(t, m.CloseChecked())
+		serviceMust(t, z.CloseChecked())
+		serviceMust(t, m.Diagnostics.Close())
+		if b.Used() != 0 {
+			t.Fatal("owning cleanup whole graph", fault, b.Used())
+		}
+		if success {
+			t.Logf("first complete source invocation at reservation ordinal %d", fault)
+			break
+		}
+	}
+	if !success || !retained {
+		t.Fatal("complete real prefix campaign", success, retained)
 	}
 }
 
@@ -174,16 +165,11 @@ func TestBinarySourceEndLabelsAndInlineWarm(t *testing.T) {
 	z, b := mpzPublicationOwner(t)
 	m, e := binaryDisplayTestOwner(t, z)
 	serviceMust(t, e)
-	a, c := NewBinaryIntPower(3, 3), NewBinaryIntPower(3, 3)
+	a := NewBinaryIntPower(3, 3)
 	var dst [32]byte
 	n, e := m.FormatDecimalInto(&a, 8, dst[:])
 	serviceMust(t, e)
 	if string(dst[:n]) != "0.375" || m.DisplayState().SourceStage != 3 {
-		t.Fatal(n, string(dst[:n]), m.DisplayState())
-	}
-	n, e = m.FormatIntervalDecimalInto(&a, &c, 8, dst[:])
-	serviceMust(t, e)
-	if string(dst[:n]) != "0.375" || m.DisplayState().SourceStage != 6 {
 		t.Fatal(n, string(dst[:n]), m.DisplayState())
 	}
 	before := numericWarmProfileSnapshot(t, z, b)
@@ -191,7 +177,7 @@ func TestBinarySourceEndLabelsAndInlineWarm(t *testing.T) {
 	var problem error
 	wrong := false
 	goalloc := testing.AllocsPerRun(100, func() {
-		n, e := m.FormatIntervalDecimalInto(&a, &c, 8, dst[:])
+		n, e := m.FormatDecimalInto(&a, 8, dst[:])
 		if e != nil {
 			problem = e
 		}
@@ -203,7 +189,7 @@ func TestBinarySourceEndLabelsAndInlineWarm(t *testing.T) {
 		t.Fatal(problem, wrong)
 	}
 	numericWarmProfileAudit(t, z, b, before, goalloc, false)
-	binaryDisplayAudit(t, m, &a, &c)
+	binaryDisplayAudit(t, m, &a)
 	b.FailAfter(-1)
 	serviceMust(t, m.CloseChecked())
 }
@@ -222,13 +208,13 @@ func TestBinarySourceEndLabelGuardedPhysicalFreeContinuation(t *testing.T) {
 	serviceMust(t, e)
 	m, e := binaryDisplayTestOwner(t, z)
 	serviceMust(t, e)
-	serviceMust(t, m.beginBinaryDisplay(true))
+	serviceMust(t, m.beginBinaryDisplay())
 	two := NewInt(2)
 	serviceMust(t, z.Power(&two, 1048576, &m.Display.Values[0]))
-	for i := 1; i < 6; i++ {
+	for i := 1; i < 3; i++ {
 		serviceMust(t, z.SetUint64(&m.Display.Values[i], uint64(1)<<63|uint64(i)))
 	}
-	refs := [6]NumericCellRef{}
+	refs := [3]NumericCellRef{}
 	for i := range refs {
 		refs[i] = m.Display.Values[i].Cell
 	}
@@ -290,7 +276,7 @@ func TestBinarySourceEndLabelGuardedPhysicalFreeContinuation(t *testing.T) {
 	if !z.Cell(refs[0]).Released || !z.Cell(refs[0]).CleanupPending {
 		t.Fatal("real descriptor release authority")
 	}
-	for i := 1; i < 6; i++ {
+	for i := 1; i < 3; i++ {
 		if !ValidNumericRef(z.Cells, refs[i]) || m.Display.Values[i].Cell != refs[i] {
 			t.Fatal("older source local lost", i)
 		}
@@ -299,7 +285,7 @@ func TestBinarySourceEndLabelGuardedPhysicalFreeContinuation(t *testing.T) {
 
 	// Each remaining actual free can independently reach the same guarded sync;
 	// the retained cursor acknowledges its previous consumed free before advancing.
-	for stage := uint8(1); stage < 6; stage++ {
+	for stage := uint8(1); stage < 3; stage++ {
 		raw := z.Cell(refs[stage]).Backing.Raw
 		extent, e := r.Size(raw)
 		serviceMust(t, e)
@@ -324,7 +310,7 @@ func TestBinarySourceEndLabelGuardedPhysicalFreeContinuation(t *testing.T) {
 				t.Fatal("acknowledged source del", stage, i)
 			}
 		}
-		for i := stage + 1; i < 6; i++ {
+		for i := stage + 1; i < 3; i++ {
 			if m.Display.Values[i].Cell != refs[i] || z.Cell(refs[i]).Released {
 				t.Fatal("older remaining local", stage, i)
 			}
@@ -337,7 +323,7 @@ func TestBinarySourceEndLabelGuardedPhysicalFreeContinuation(t *testing.T) {
 	}
 	before = r.State()
 	serviceMust(t, m.CloseChecked())
-	if r.State() != before || m.DisplayState().SourceStage != 6 || m.DisplayState().Pending || m.HeaderBytes != 0 {
+	if r.State() != before || m.DisplayState().SourceStage != 3 || m.DisplayState().Pending || m.HeaderBytes != 0 {
 		t.Fatal("final free acknowledgement", m.DisplayState(), r.State(), before)
 	}
 	// Integer owning cleanup also preserves each real postphysical refusal. It

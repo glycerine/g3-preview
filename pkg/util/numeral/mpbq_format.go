@@ -146,12 +146,12 @@ func (m *BinaryRationalManager) prepareBinaryDecimal(a *BinaryRational, prec uin
 	if a.KField == 0 {
 		return m.Z.prepareInteger(&a.Num, 0)
 	}
-	if e := m.beginBinaryDisplay(false); e != nil {
+	if e := m.beginBinaryDisplay(); e != nil {
 		return 0, e
 	}
 	defer m.finishBinaryDisplay(&result, &err)
 	two, ten := NewInt(2), NewInt(10)
-	n1, v1, twok := &m.Display.Values[0], &m.Display.Values[1], &m.Display.Values[4]
+	n1, v1, twok := &m.Display.Values[0], &m.Display.Values[1], &m.Display.Values[2]
 	w := m.Z.Natural
 	offset := uint32(0)
 	var e error
@@ -207,112 +207,6 @@ func (m *BinaryRationalManager) prepareBinaryDecimal(a *BinaryRational, prec uin
 	}
 	return w.appendDisplay(offset, "?")
 }
-func (m *BinaryRationalManager) prepareIntervalDecimal(a, b *BinaryRational, prec uint32) (result uint32, err error) {
-	if e := m.pair(a, b); e != nil {
-		return 0, e
-	}
-	w := m.Z.Natural
-	if (a.Num.Val < 0) != (b.Num.Val < 0) {
-		return w.appendDisplay(0, "?")
-	}
-	if e := m.beginBinaryDisplay(true); e != nil {
-		return 0, e
-	}
-	defer m.finishBinaryDisplay(&result, &err)
-	two, ten := NewInt(2), NewInt(10)
-	n1, v1, n2, v2, tk1, tk2 := &m.Display.Values[0], &m.Display.Values[1], &m.Display.Values[2], &m.Display.Values[3], &m.Display.Values[4], &m.Display.Values[5]
-	offset := uint32(0)
-	var e error
-	if a.Num.Val < 0 {
-		offset, e = w.appendDisplay(0, "-")
-		if e != nil {
-			return 0, e
-		}
-	}
-	if e = m.Z.Copy(v1, &a.Num); e != nil {
-		return 0, e
-	}
-	if e = m.Z.Abs(v1); e != nil {
-		return 0, e
-	}
-	if e = m.Z.Copy(v2, &b.Num); e != nil {
-		return 0, e
-	}
-	if e = m.Z.Abs(v2); e != nil {
-		return 0, e
-	}
-	if e = m.Z.Power(&two, a.KField, tk1); e != nil {
-		return 0, e
-	}
-	if e = m.Z.Power(&two, b.KField, tk2); e != nil {
-		return 0, e
-	}
-	if e = m.Z.Rem(v1, tk1, n1); e != nil {
-		return 0, e
-	}
-	if e = m.Z.Rem(v2, tk2, n2); e != nil {
-		return 0, e
-	}
-	if e = m.Z.Div(v1, tk1, v1); e != nil {
-		return 0, e
-	}
-	if e = m.Z.Div(v2, tk2, v2); e != nil {
-		return 0, e
-	}
-	same, e := m.Z.Equal(v1, v2)
-	if e != nil {
-		return 0, e
-	}
-	if !same {
-		return w.appendDisplay(offset, "?")
-	}
-	offset, e = m.Z.prepareInteger(v1, offset)
-	if e != nil {
-		return 0, e
-	}
-	if n1.Val == 0 && n2.Val == 0 {
-		return offset, nil
-	}
-	offset, e = w.appendDisplay(offset, ".")
-	if e != nil {
-		return 0, e
-	}
-	for i := uint32(0); i < prec; i++ {
-		if e = m.Z.Mul(n1, &ten, n1); e != nil {
-			return 0, e
-		}
-		if e = m.Z.Mul(n2, &ten, n2); e != nil {
-			return 0, e
-		}
-		if e = m.Z.Div(n1, tk1, v1); e != nil {
-			return 0, e
-		}
-		if e = m.Z.Div(n2, tk2, v2); e != nil {
-			return 0, e
-		}
-		same, e = m.Z.Equal(v1, v2)
-		if e != nil {
-			return 0, e
-		}
-		if !same {
-			return w.appendDisplay(offset, "?")
-		}
-		offset, e = m.Z.prepareInteger(v1, offset)
-		if e != nil {
-			return 0, e
-		}
-		if e = m.Z.Rem(n1, tk1, n1); e != nil {
-			return 0, e
-		}
-		if e = m.Z.Rem(n2, tk2, n2); e != nil {
-			return 0, e
-		}
-		if n1.Val == 0 && n2.Val == 0 {
-			return offset, nil
-		}
-	}
-	return w.appendDisplay(offset, "?")
-}
 func (m *BinaryRationalManager) DecimalString(a *BinaryRational, prec uint32) (string, error) {
 	n, e := m.prepareBinaryDecimal(a, prec)
 	if e != nil {
@@ -325,20 +219,6 @@ func (m *BinaryRationalManager) DecimalStringDefault(a *BinaryRational) (string,
 }
 func (m *BinaryRationalManager) FormatDecimalInto(a *BinaryRational, prec uint32, dst []byte) (int, error) {
 	n, e := m.prepareBinaryDecimal(a, prec)
-	if e != nil {
-		return 0, e
-	}
-	return m.Z.Natural.publishText(dst, n)
-}
-func (m *BinaryRationalManager) IntervalDecimalString(a, b *BinaryRational, prec uint32) (string, error) {
-	n, e := m.prepareIntervalDecimal(a, b, prec)
-	if e != nil {
-		return "", e
-	}
-	return m.Z.Natural.finalString(n)
-}
-func (m *BinaryRationalManager) FormatIntervalDecimalInto(a, b *BinaryRational, prec uint32, dst []byte) (int, error) {
-	n, e := m.prepareIntervalDecimal(a, b, prec)
 	if e != nil {
 		return 0, e
 	}

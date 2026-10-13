@@ -24,7 +24,7 @@ func (m *BinaryRationalManager) DisplayDecimalTo(w io.Writer, a *BinaryRational,
 		}
 		return writeBinaryRationalPart(w, text)
 	}
-	if err = m.beginBinaryDisplay(false); err != nil {
+	if err = m.beginBinaryDisplay(); err != nil {
 		return err
 	}
 	defer func() {
@@ -32,7 +32,7 @@ func (m *BinaryRationalManager) DisplayDecimalTo(w io.Writer, a *BinaryRational,
 		m.finishBinaryDisplay(&unused, &err)
 	}()
 	two, ten := NewInt(2), NewInt(10)
-	n1, v1, twok := &m.Display.Values[0], &m.Display.Values[1], &m.Display.Values[4]
+	n1, v1, twok := &m.Display.Values[0], &m.Display.Values[1], &m.Display.Values[2]
 	if a.Num.Val < 0 {
 		if err = writeBinaryRationalPart(w, "-"); err != nil {
 			return err
