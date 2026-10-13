@@ -50961,7 +50961,9 @@
         "pkg/math/subpaving/hardware_split.go",
         "pkg/math/subpaving/hardware_selector.go",
         "pkg/math/subpaving/hardware_clause.go",
-        "pkg/math/subpaving/hardware_clause_test.go"
+        "pkg/math/subpaving/hardware_clause_test.go",
+        "pkg/math/subpaving/hardware_monomial.go",
+        "pkg/math/subpaving/hardware_monomial_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -51042,7 +51044,9 @@
         "TestHardwareSelectorsRoundRobinAndBreadthFirstSourceOrder",
         "TestHardwareSelectorSingletonAndUndecidedChild",
         "TestHardwareClauseStableWatchersAndReferences",
-        "TestHardwareClauseOpenTruthAndQueuedUnitPropagation"
+        "TestHardwareClauseOpenTruthAndQueuedUnitPropagation",
+        "TestHardwareMonomialDefinitionForwardAndZero",
+        "TestHardwareMonomialReverseCubicAndSourceProduct"
       ],
       "conditionals": [
         {
@@ -51556,7 +51560,9 @@
         "pkg/math/subpaving/hardware_split.go",
         "pkg/math/subpaving/hardware_selector.go",
         "pkg/math/subpaving/hardware_clause.go",
-        "pkg/math/subpaving/hardware_clause_test.go"
+        "pkg/math/subpaving/hardware_clause_test.go",
+        "pkg/math/subpaving/hardware_monomial.go",
+        "pkg/math/subpaving/hardware_monomial_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51628,7 +51634,9 @@
         "TestHardwareSelectorsRoundRobinAndBreadthFirstSourceOrder",
         "TestHardwareSelectorSingletonAndUndecidedChild",
         "TestHardwareClauseStableWatchersAndReferences",
-        "TestHardwareClauseOpenTruthAndQueuedUnitPropagation"
+        "TestHardwareClauseOpenTruthAndQueuedUnitPropagation",
+        "TestHardwareMonomialDefinitionForwardAndZero",
+        "TestHardwareMonomialReverseCubicAndSourceProduct"
       ],
       "assertions": [
         {
@@ -171359,7 +171367,9 @@
         "pkg/ast/ast_native_plugin_caches_test.go",
         "pkg/math/subpaving/hardware_context_propagate.go",
         "pkg/math/subpaving/hardware_clause.go",
-        "pkg/math/subpaving/hardware_clause_test.go"
+        "pkg/math/subpaving/hardware_clause_test.go",
+        "pkg/math/subpaving/hardware_monomial.go",
+        "pkg/math/subpaving/hardware_monomial_test.go"
       ],
       "tests": [
         "TestParamDescrsNativeStorageAndWarmDuplicate",
@@ -171558,7 +171568,9 @@
         "TestHardwareContextRootDefinitionOrderAndQueuedWatchers",
         "TestHardwareChildRecentBoundReplayAndPolynomialWatcher",
         "TestHardwareClauseStableWatchersAndReferences",
-        "TestHardwareClauseOpenTruthAndQueuedUnitPropagation"
+        "TestHardwareClauseOpenTruthAndQueuedUnitPropagation",
+        "TestHardwareMonomialDefinitionForwardAndZero",
+        "TestHardwareMonomialReverseCubicAndSourceProduct"
       ],
       "conditionals": [
         {

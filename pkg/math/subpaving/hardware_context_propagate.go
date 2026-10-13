@@ -11,6 +11,9 @@ import (
 )
 
 func (c *HardwareContext) definitionVisited(variable uint32) (uint64, bool) {
+	if m := c.monomials[variable]; m != nil {
+		return m.visited, true
+	}
 	if p := c.polynomials[variable]; p != nil {
 		return p.visited, true
 	}
@@ -18,11 +21,14 @@ func (c *HardwareContext) definitionVisited(variable uint32) (uint64, bool) {
 }
 
 func (c *HardwareContext) propagateDefinition(variable uint32, n *HardwareNode) error {
-	if c.polynomials[variable] == nil {
-		return arena.ErrInvalidSlot
-	}
 	c.numVisited++
-	return c.PropagatePolynomial(variable, n)
+	if c.monomials[variable] != nil {
+		return c.PropagateMonomial(variable, n)
+	}
+	if c.polynomials[variable] != nil {
+		return c.PropagatePolynomial(variable, n)
+	}
+	return arena.ErrInvalidSlot
 }
 
 // PropagateAllDefinitions visits definitions in variable-creation order.

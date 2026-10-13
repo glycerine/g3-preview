@@ -13,7 +13,7 @@ import (
 
 // HardwareContext owns the scalar bound-policy numerals and concrete
 // constraint and node records of context_hwf. Its manager and resource limit
-// are borrowed. Monomial and clause propagation and the search loop remain.
+// are borrowed. The search loop remains.
 type HardwareContext struct {
 	self             *HardwareContext
 	numbers          *numeral.HardwareFloatNumeralManager
@@ -29,6 +29,7 @@ type HardwareContext struct {
 	maxMemory        uint64
 	isInt            []bool
 	polynomials      map[uint32]*HardwarePolynomial
+	monomials        map[uint32]*HardwareMonomial
 	watchers         [][]uint32
 	watchOrder       [][]hardwareWatch
 	inequalities     []*HardwareInequality

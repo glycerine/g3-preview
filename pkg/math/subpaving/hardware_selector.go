@@ -87,7 +87,7 @@ func (c *HardwareContext) SelectBranchVariable(n *HardwareNode, onlyNonDefinitio
 	}
 	x := start
 	for {
-		if !onlyNonDefinition || c.polynomials[x] == nil {
+		if !onlyNonDefinition || c.polynomials[x] == nil && c.monomials[x] == nil {
 			lower, upper := n.lower[x], n.upper[x]
 			if lower == nil || upper == nil || !c.numbers.Equal(&lower.value, &upper.value) {
 				return x, true, nil
