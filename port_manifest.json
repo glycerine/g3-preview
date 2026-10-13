@@ -34821,7 +34821,8 @@
         "pkg/math/subpaving/hardware_interval_arith.go",
         "pkg/math/subpaving/hardware_interval_scalar.go",
         "pkg/math/subpaving/hardware_interval_power.go",
-        "pkg/math/subpaving/hardware_interval_mul.go"
+        "pkg/math/subpaving/hardware_interval_mul.go",
+        "pkg/math/subpaving/hardware_interval_div.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34854,7 +34855,8 @@
         "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
         "TestSubpavingHardwareIntervalPowerRetainedBranches",
-        "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
+        "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
+        "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
       ],
       "conditionals": [
         {
@@ -35557,6 +35559,14 @@
           "go_target": "pkg/math/subpaving/hardware_interval_mul.go",
           "tests": [
             "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf interval division: six sign branches, open-zero denominators, directed bounds and source alias restriction (src/math/interval/interval_def.h:1663-1849)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_div.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
           ]
         }
       ],
@@ -50245,13 +50255,15 @@
         "pkg/math/subpaving/hardware_interval_arith.go",
         "pkg/math/subpaving/hardware_interval_scalar.go",
         "pkg/math/subpaving/hardware_interval_power.go",
-        "pkg/math/subpaving/hardware_interval_mul.go"
+        "pkg/math/subpaving/hardware_interval_mul.go",
+        "pkg/math/subpaving/hardware_interval_div.go"
       ],
       "tests": [
         "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
         "TestSubpavingHardwareIntervalPowerRetainedBranches",
-        "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
+        "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
+        "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
       ],
       "conditionals": [
         {
@@ -50304,6 +50316,14 @@
           "go_target": "pkg/math/subpaving/hardware_interval_mul.go",
           "tests": [
             "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf interval division: six sign branches, open-zero denominators, directed bounds and source alias restriction (src/math/interval/interval_def.h:1663-1849)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_div.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
           ]
         }
       ],
@@ -50823,7 +50843,8 @@
         "pkg/math/subpaving/hardware_interval_arith.go",
         "pkg/math/subpaving/hardware_interval_scalar.go",
         "pkg/math/subpaving/hardware_interval_power.go",
-        "pkg/math/subpaving/hardware_interval_mul.go"
+        "pkg/math/subpaving/hardware_interval_mul.go",
+        "pkg/math/subpaving/hardware_interval_div.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50885,7 +50906,8 @@
         "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
         "TestSubpavingHardwareIntervalPowerRetainedBranches",
-        "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
+        "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
+        "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
       ],
       "conditionals": [
         {
@@ -51194,6 +51216,14 @@
           "tests": [
             "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
           ]
+        },
+        {
+          "name": "Concrete config_hwf interval division: six sign branches, open-zero denominators, directed bounds and source alias restriction (src/math/interval/interval_def.h:1663-1849)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_div.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
+          ]
         }
       ],
       "ownership": [
@@ -51261,7 +51291,8 @@
         "pkg/math/subpaving/hardware_interval_arith.go",
         "pkg/math/subpaving/hardware_interval_scalar.go",
         "pkg/math/subpaving/hardware_interval_power.go",
-        "pkg/math/subpaving/hardware_interval_mul.go"
+        "pkg/math/subpaving/hardware_interval_mul.go",
+        "pkg/math/subpaving/hardware_interval_div.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51314,7 +51345,8 @@
         "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
         "TestSubpavingHardwareIntervalPowerRetainedBranches",
-        "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
+        "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
+        "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
       ],
       "assertions": [
         {
@@ -51864,6 +51896,14 @@
           "go_target": "pkg/math/subpaving/hardware_interval_mul.go",
           "tests": [
             "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf interval division: six sign branches, open-zero denominators, directed bounds and source alias restriction (src/math/interval/interval_def.h:1663-1849)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_interval_div.go",
+          "tests": [
+            "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
           ]
         }
       ],
@@ -117375,7 +117415,8 @@
         "pkg/math/subpaving/hardware_interval_arith.go",
         "pkg/math/subpaving/hardware_interval_scalar.go",
         "pkg/math/subpaving/hardware_interval_power.go",
-        "pkg/math/subpaving/hardware_interval_mul.go"
+        "pkg/math/subpaving/hardware_interval_mul.go",
+        "pkg/math/subpaving/hardware_interval_div.go"
       ],
       "tests": [
         "TestRationalExtendedIntervalBranches",
@@ -117390,7 +117431,8 @@
         "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
         "TestSubpavingHardwareIntervalPowerRetainedBranches",
-        "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
+        "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
+        "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
       ],
       "conditionals": [
         {
@@ -117605,12 +117647,14 @@
           "go_target": "pkg/math/subpaving/hardware_interval_scalar.go",
           "go_targets": [
             "pkg/math/subpaving/hardware_interval_power.go",
-            "pkg/math/subpaving/hardware_interval_mul.go"
+            "pkg/math/subpaving/hardware_interval_mul.go",
+            "pkg/math/subpaving/hardware_interval_div.go"
           ],
           "tests": [
             "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
             "TestSubpavingHardwareIntervalPowerRetainedBranches",
-            "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
+            "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
+            "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
           ]
         }
       ],
@@ -117641,7 +117685,8 @@
         "pkg/math/subpaving/arbitrary_context_root.go",
         "pkg/math/subpaving/hardware_interval_scalar.go",
         "pkg/math/subpaving/hardware_interval_power.go",
-        "pkg/math/subpaving/hardware_interval_mul.go"
+        "pkg/math/subpaving/hardware_interval_mul.go",
+        "pkg/math/subpaving/hardware_interval_div.go"
       ],
       "tests": [
         "TestHardwareFloatNumeralDirectedIntervalOperations",
@@ -117663,7 +117708,8 @@
         "TestSubpavingMPFIntervalXnEqYRetainedCases",
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
         "TestSubpavingHardwareIntervalPowerRetainedBranches",
-        "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
+        "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
+        "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
       ],
       "conditionals": [
         {
@@ -117821,12 +117867,14 @@
           "go_target": "pkg/math/subpaving/hardware_interval_scalar.go",
           "go_targets": [
             "pkg/math/subpaving/hardware_interval_power.go",
-            "pkg/math/subpaving/hardware_interval_mul.go"
+            "pkg/math/subpaving/hardware_interval_mul.go",
+            "pkg/math/subpaving/hardware_interval_div.go"
           ],
           "tests": [
             "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
             "TestSubpavingHardwareIntervalPowerRetainedBranches",
-            "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds"
+            "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
+            "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
           ]
         }
       ],
