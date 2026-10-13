@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
@@ -182,4 +183,11 @@ func (w *HardwareShellCoefficients) DisplayBounds(out io.Writer, display Hardwar
 		return err
 	}
 	return w.context.DisplayBounds(out, display)
+}
+
+func (w *HardwareShellCoefficients) CollectParamDescrs(d *params.ParamDescrs) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return CollectHardwareParamDescrs(d)
 }

@@ -50238,14 +50238,16 @@
         "pkg/math/subpaving/hardware_shell_coefficients.go",
         "pkg/math/subpaving/hardware_shell_search_test.go",
         "pkg/math/subpaving/hardware_statistics_test.go",
-        "pkg/math/subpaving/hardware_display_test.go"
+        "pkg/math/subpaving/hardware_display_test.go",
+        "pkg/math/subpaving/hardware_param_descrs_test.go"
       ],
       "tests": [
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
         "TestSubpavingHardwareShellCoefficientAndInequalityConversion",
         "TestHardwareShellRetainedClauseAndSearchRoute",
         "TestHardwareShellStatisticsCountersAndReset",
-        "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
+        "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder",
+        "TestHardwareShellParamDescriptionsSourceOrder"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -50297,6 +50299,14 @@
           "tests": [
             "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
           ]
+        },
+        {
+          "name": "Concrete context_hwf wrapper collect_param_descrs forwarding (src/math/subpaving/subpaving.cpp:53)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_shell_coefficients.go",
+          "tests": [
+            "TestHardwareShellParamDescriptionsSourceOrder"
+          ]
         }
       ],
       "ownership": [],
@@ -50311,12 +50321,14 @@
         "pkg/math/subpaving/hardware_shell_coefficients.go",
         "pkg/math/subpaving/hardware_shell_search_test.go",
         "pkg/math/subpaving/hardware_statistics_test.go",
-        "pkg/math/subpaving/hardware_display_test.go"
+        "pkg/math/subpaving/hardware_display_test.go",
+        "pkg/math/subpaving/hardware_param_descrs_test.go"
       ],
       "tests": [
         "TestHardwareShellRetainedClauseAndSearchRoute",
         "TestHardwareShellStatisticsCountersAndReset",
-        "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
+        "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder",
+        "TestHardwareShellParamDescriptionsSourceOrder"
       ],
       "conditionals": [
         {
@@ -50353,6 +50365,14 @@
           "go_target": "pkg/math/subpaving/hardware_shell_coefficients.go",
           "tests": [
             "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
+          ]
+        },
+        {
+          "name": "Concrete context_hwf shell collect_param_descrs entry (src/math/subpaving/subpaving.h:99)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_shell_coefficients.go",
+          "tests": [
+            "TestHardwareShellParamDescriptionsSourceOrder"
           ]
         }
       ],
@@ -51050,7 +51070,8 @@
         "pkg/math/subpaving/hardware_shell_search_test.go",
         "pkg/math/subpaving/hardware_statistics_test.go",
         "pkg/math/subpaving/hardware_display.go",
-        "pkg/math/subpaving/hardware_display_test.go"
+        "pkg/math/subpaving/hardware_display_test.go",
+        "pkg/math/subpaving/hardware_param_descrs_test.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -51138,7 +51159,8 @@
         "TestHardwareClauseJustificationChildTrailAndContextClose",
         "TestHardwareShellRetainedClauseAndSearchRoute",
         "TestHardwareShellStatisticsCountersAndReset",
-        "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
+        "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder",
+        "TestHardwareShellParamDescriptionsSourceOrder"
       ],
       "conditionals": [
         {
@@ -51585,6 +51607,14 @@
           "tests": [
             "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
           ]
+        },
+        {
+          "name": "Concrete context_hwf static collect_param_descrs declaration (src/math/subpaving/subpaving_t.h:840)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_context_params.go",
+          "tests": [
+            "TestHardwareShellParamDescriptionsSourceOrder"
+          ]
         }
       ],
       "ownership": [
@@ -51676,7 +51706,8 @@
         "pkg/math/subpaving/hardware_shell_search_test.go",
         "pkg/math/subpaving/hardware_statistics_test.go",
         "pkg/math/subpaving/hardware_display.go",
-        "pkg/math/subpaving/hardware_display_test.go"
+        "pkg/math/subpaving/hardware_display_test.go",
+        "pkg/math/subpaving/hardware_param_descrs_test.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51755,7 +51786,8 @@
         "TestHardwareClauseJustificationChildTrailAndContextClose",
         "TestHardwareShellRetainedClauseAndSearchRoute",
         "TestHardwareShellStatisticsCountersAndReset",
-        "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
+        "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder",
+        "TestHardwareShellParamDescriptionsSourceOrder"
       ],
       "assertions": [
         {
@@ -52450,6 +52482,14 @@
           "go_target": "pkg/math/subpaving/hardware_display.go",
           "tests": [
             "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder"
+          ]
+        },
+        {
+          "name": "Concrete context_hwf five source-order option descriptors (src/math/subpaving/subpaving_t_def.h:507-513)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_context_params.go",
+          "tests": [
+            "TestHardwareShellParamDescriptionsSourceOrder"
           ]
         }
       ],

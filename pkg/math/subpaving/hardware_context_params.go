@@ -63,3 +63,23 @@ func (c *HardwareContext) UpdateParamsRef(pc *params.ParamsContext, p *params.Pa
 	}
 	return c.updateRootPrecision(v)
 }
+
+// CollectHardwareParamDescrs follows context_t<config_hwf>::collect_param_descrs.
+// InsertName retains completed entries if a later insertion is refused.
+func CollectHardwareParamDescrs(d *params.ParamDescrs) error {
+	if d == nil {
+		return arena.ErrInvalidSlot
+	}
+	for _, entry := range []struct{ name, description string }{
+		{"max_nodes", "(default: 8192) maximum number of nodes in the subpaving tree."},
+		{"max_depth", "(default: 128) maximum depth of the subpaving tree."},
+		{"epsilon", "(default: 20) value k s.t. a new lower (upper) bound for x is propagated only new-lower(x) > lower(k) + 1/k * max(min(upper(x) - lower(x), |lower|), 1) (new-upper(x) < upper(x) - 1/k * max(min(upper(x) - lower(x), |lower|), 1)). If k = 0, then this restriction is ignored."},
+		{"max_bound", "(default 10) value k s.t. a new upper (lower) bound for x is propagated only if upper(x) > -10^k or lower(x) = -oo (lower(x) < 10^k or upper(x) = oo)"},
+		{"nth_root_precision", "(default 8192) value k s.t. 1/k is the precision for computing the nth root in the subpaving module."},
+	} {
+		if err := d.InsertName(entry.name, params.ParamUInt, &entry.description, nil, nil); err != nil {
+			return err
+		}
+	}
+	return nil
+}
