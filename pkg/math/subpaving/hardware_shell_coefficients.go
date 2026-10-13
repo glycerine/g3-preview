@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 var ErrHardwareShellInexactInteger = errors.New("subpaving: integer coefficient cannot be represented exactly as hardware float")
@@ -152,4 +153,18 @@ func (w *HardwareShellCoefficients) Search() error {
 		return err
 	}
 	return w.context.Search()
+}
+
+func (w *HardwareShellCoefficients) ResetStatistics() error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.ResetStatistics()
+}
+
+func (w *HardwareShellCoefficients) CollectStatistics(st *statistics.Statistics) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.CollectStatistics(st)
 }

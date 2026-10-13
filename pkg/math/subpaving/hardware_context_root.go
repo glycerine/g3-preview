@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/math/interval"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 // HardwareContext owns the scalar bound-policy numerals and concrete
@@ -47,11 +48,42 @@ type HardwareContext struct {
 	unitHead         int
 	numVisited       uint64
 	numSplits        uint64
+	numBounds        uint64
+	numConflicts     uint64
 	searchNode       *HardwareNode
 	searchPhase      uint8
 	initStage        uint8
 	initDefHead      uint32
 	closed           bool
+}
+
+// ResetStatistics follows context_t::reset_statistics; the live node count is
+// intentionally retained because source reset_statistics does not clear it.
+func (c *HardwareContext) ResetStatistics() error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	c.numConflicts = 0
+	c.numBounds = 0
+	c.numSplits = 0
+	c.numVisited = 0
+	return nil
+}
+
+// CollectStatistics appends the source's five counters in source order.
+func (c *HardwareContext) CollectStatistics(st *statistics.Statistics) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if st == nil {
+		return arena.ErrInvalidSlot
+	}
+	st.UpdateUint64("conflicts", c.numConflicts)
+	st.UpdateUint64("new bounds", c.numBounds)
+	st.UpdateUint64("splits", c.numSplits)
+	st.UpdateUint("nodes", c.activeNodes)
+	st.UpdateUint64("visited", c.numVisited)
+	return nil
 }
 
 // HardwareContextPolicy contains the unsigned source subpaving parameters.

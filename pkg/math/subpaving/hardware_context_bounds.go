@@ -114,6 +114,7 @@ func (c *HardwareContext) publishBound(n *HardwareNode, variable uint32, value *
 	if err := c.NormalizeBound(variable, &adjusted, lower, &open); err != nil {
 		return err
 	}
+	c.numBounds++
 	if err := n.PushBound(variable, &adjusted, lower, open); err != nil {
 		return err
 	}
@@ -126,6 +127,7 @@ func (c *HardwareContext) publishBound(n *HardwareNode, variable uint32, value *
 		return err
 	}
 	if conflict {
+		c.numConflicts++
 		n.conflictVar = variable
 	}
 	c.timestamp++
