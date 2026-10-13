@@ -20,7 +20,6 @@ type TimeoutService struct {
 	callback func()
 	output   io.Writer
 	events   chan error
-	done     chan struct{}
 	serial   uint64
 	caller   control.EventCaller
 	closed   bool
@@ -30,7 +29,7 @@ func NewTimeoutService(output io.Writer) *TimeoutService {
 	if output == nil {
 		output = os.Stdout
 	}
-	s := &TimeoutService{output: output, events: make(chan error, 1), done: make(chan struct{})}
+	s := &TimeoutService{output: output, events: make(chan error, 1)}
 	s.self = s
 	return s
 }
@@ -99,18 +98,20 @@ func (s *TimeoutService) fire(serial uint64, caller control.EventCaller) {
 		callback()
 	}
 	s.mu.Lock()
-	emit := !s.closed
-	if emit && s.timer != nil {
+	if !s.closed && s.timer != nil {
 		_ = s.timer.Close()
 		s.timer = nil
 	}
-	s.mu.Unlock()
-	if emit {
+	if !s.closed {
+		// An uncaught source exception ends this shell path. Preserve its first
+		// pending error if a caller rearms without consuming it; never strand
+		// the timer callback on a full delivery channel.
 		select {
 		case s.events <- z3exception.MustZ3Error(z3exception.ErrorTimeout):
-		case <-s.done:
+		default:
 		}
 	}
+	s.mu.Unlock()
 }
 
 // Events is the shell-side transport for the source timeout exception.
@@ -140,7 +141,6 @@ func (s *TimeoutService) Close() error {
 		return nil
 	}
 	s.closed = true
-	close(s.done)
 	s.serial++
 	if s.timer != nil {
 		if err := s.timer.Close(); err != nil {

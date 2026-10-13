@@ -105,3 +105,77 @@ func TestShellTimeoutReplacementDisabledAndBorrowedCallback(t *testing.T) {
 		t.Fatal("closed global timeout owner", err)
 	}
 }
+
+func TestShellTimeoutCallbackRearmIsDeletedBeforeError(t *testing.T) {
+	s := NewTimeoutService(&bytes.Buffer{})
+	defer func() {
+		if err := s.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}()
+	called := make(chan error, 2)
+	if err := s.RegisterOnTimeoutProc(func() { called <- s.SetTimeout(5) }); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.SetTimeout(5); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case err := <-called:
+		if err != nil {
+			t.Fatal(err)
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("source handler did not enter callback")
+	}
+	select {
+	case <-s.Events():
+	case <-time.After(2 * time.Second):
+		t.Fatal("source handler did not deliver timeout error")
+	}
+	select {
+	case err := <-called:
+		t.Fatal("callback's replacement timer survived source deletion", err)
+	case <-time.After(30 * time.Millisecond):
+	}
+}
+
+func TestShellTimeoutFirstUnhandledErrorDoesNotBlockRearm(t *testing.T) {
+	s := NewTimeoutService(&bytes.Buffer{})
+	defer func() {
+		if err := s.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}()
+	called := make(chan struct{}, 2)
+	if err := s.RegisterOnTimeoutProc(func() { called <- struct{}{} }); err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 2; i++ {
+		if err := s.SetTimeout(5); err != nil {
+			t.Fatal(err)
+		}
+		select {
+		case <-called:
+		case <-time.After(2 * time.Second):
+			t.Fatal("timer callback blocked")
+		}
+		deadline := time.After(2 * time.Second)
+		for {
+			s.mu.Lock()
+			idle := s.timer == nil
+			s.mu.Unlock()
+			if idle {
+				break
+			}
+			select {
+			case <-deadline:
+				t.Fatal("timer callback failed to clear owner")
+			case <-time.After(time.Millisecond):
+			}
+		}
+	}
+	if len(s.events) != 1 {
+		t.Fatal("first unhandled source timeout was not retained", len(s.events))
+	}
+}
