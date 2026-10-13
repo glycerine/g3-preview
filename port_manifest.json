@@ -121524,6 +121524,7 @@
         "TestSATCaseSplitHeapWarmPhysicalPlateauAndOwnerGuards",
         "TestHeapAssignmentSourceDestroyedFirstMember",
         "TestHeapLegacyCopiedCloseRejectsBeforeRefund",
+        "TestHeapSourceConditionalAssertionsGateAndPreMutationFailure",
         "TestDebugMacroUnreachableIgnoresAssertionSwitch",
         "TestDebugMacroVerifyFalsePrefixAndContinue",
         "TestDebugMacroXAssertionLiteralExtraBeforeAction",
@@ -121725,6 +121726,12 @@
           ]
         },
         {
+          "name": "concrete Int heap CASSERT heap-tag gates and nested source SASSERT invariant checks at construction, movement, mutation and swap",
+          "status": "ported",
+          "go_target": "pkg/util/heap/heap.go",
+          "tests": ["TestHeapSourceConditionalAssertionsGateAndPreMutationFailure"]
+        },
+        {
           "name": "move_up/move_down",
           "status": "ported",
           "go_target": "pkg/util/heap/heap.go",
@@ -121873,7 +121880,7 @@
       "deviations": [
         "Typed precondition/closed/overflow/epoch errors replace invalid source operations. Safe readonly iterators replace raw mutable backing pointers.",
         "Insert publishes the inverse index before fallible value growth, preserving source failure membership. Its publication invalidates checked iterators even on failure. Empty reset retains this prefix; live-value invariant traversal ignores additional inverse entries. Subsequent out-of-bounds slot accesses return ErrHeapValue without repairing the source state; in-range source actions remain executable.",
-        "The concrete Int heap covers selected general-heap operations. Other live C++ template instantiations in SMT remain separate consumer ports. Full process-global CASSERT/assertion-switch bindings, wrapped physical extents and native ostream transport remain open. Explicit signed and partially initialized fixtures cover undefined source domains, not ordinary native recovery. No whole source-unit promotion.",
+        "The concrete Int heap covers selected general-heap operations. Other live C++ template instantiations in SMT remain separate consumer ports. The concrete Int heap now borrows a DebugContext for CASSERT heap-tag and nested SASSERT routing; process-global binding, wrapped physical extents and native ostream transport remain open. Explicit signed and partially initialized fixtures cover undefined source domains, not ordinary native recovery. No whole source-unit promotion.",
         "Assignment copies the LT base before destroying and recopying the values and inverse-index columns. The source find_le and recursive display methods have no retained heap callers and are omitted from Go.",
         "Explicit borrowed context specializes source assertion/tag gates at actual call sites; process-global binding, notify/debugger/TRACE, source global allocation geometry and wrapped extent profiles remain open. Original tst_heap enable_debug(\"heap\") is commented out; enabled-tag worlds are independent fixtures, not registered-driver credit.",
         "XASSERT has no upstream invocation: definition-only independent fixture, no invented caller or registered-driver credit",

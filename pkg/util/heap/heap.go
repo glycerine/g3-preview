@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 var ErrStopped = errors.New("g3: heap source assignment stopped after destruction")
@@ -13,13 +14,15 @@ var ErrStopped = errors.New("g3: heap source assignment stopped after destructio
 var ErrValue = errors.New("g3: invalid, absent, or duplicate heap value")
 var ErrOwner = errors.New("g3: invalid heap owner")
 
-// Config borrows Less and its environment for the heap's lifetime.
+// Config borrows Less, its environment and an optional DebugContext for the
+// heap's lifetime.
 // Less must be a strict ordering, must not panic or reenter the heap, and may
 // change a present value's priority only together with Increased/Decreased.
 // A nil Less compares the integer values themselves.
 type Config struct {
 	Budget *arena.Budget
 	Less   func(int32, int32) bool
+	Debug  *diagnostic.DebugContext
 }
 
 // Int stores source integer values and inverse positions in pointer-free
@@ -32,6 +35,7 @@ type Int struct {
 	values, indices []int32
 	budget          *arena.Budget
 	less            func(int32, int32) bool
+	debug           *diagnostic.DebugContext
 	epoch           uint64
 	closed          bool
 }
@@ -65,7 +69,7 @@ func New(bounds int32, c Config) (*Int, error) {
 	if e := c.Budget.Reserve(ownerBytes); e != nil {
 		return nil, e
 	}
-	h := &Int{budget: c.Budget, less: c.Less, epoch: 1}
+	h := &Int{budget: c.Budget, less: c.Less, debug: c.Debug, epoch: 1}
 	h.self = h
 	if e := h.grow(&h.values, 1); e != nil {
 		h.Close()
@@ -76,7 +80,76 @@ func New(bounds int32, c Config) (*Int, error) {
 		h.Close()
 		return nil, e
 	}
+	if e := h.cassertInvariant(); e != nil {
+		h.Close()
+		return nil, e
+	}
 	return h, nil
+}
+
+// CASSERT first tests the process assertion switch and the "heap" tag. The
+// borrowed context is explicit until the process-wide debug binding exists.
+func (h *Int) cassert(line int32, condition string, test func() bool) error {
+	if h.debug == nil {
+		return nil
+	}
+	on, err := diagnostic.SourceAssertionsEnabled(h.debug)
+	if err != nil || !on {
+		return err
+	}
+	on, err = h.debug.IsDebugEnabled("heap")
+	if err != nil || !on {
+		return err
+	}
+	if test() {
+		return nil
+	}
+	return h.assertFailure(line, condition)
+}
+
+func (h *Int) assertFailure(line int32, condition string) error {
+	if err := h.debug.NotifyAssertionViolation("src/util/heap.h", line, condition); err != nil {
+		return err
+	}
+	return h.debug.InvokeAssertionDebugger()
+}
+
+func (h *Int) cassertInvariant() error {
+	if h.debug == nil {
+		return nil
+	}
+	on, err := diagnostic.SourceAssertionsEnabled(h.debug)
+	if err != nil || !on {
+		return err
+	}
+	on, err = h.debug.IsDebugEnabled("heap")
+	if err != nil || !on {
+		return err
+	}
+	// check_invariant_core reports failures through nested SASSERTs. Its
+	// Boolean return is always true once those actions continue.
+	var walk func(int) error
+	walk = func(i int) error {
+		if i >= len(h.values) {
+			return nil
+		}
+		v := h.values[i]
+		if v < 0 || int64(v) >= int64(len(h.indices)) || h.indices[v] != int32(i) {
+			if err := h.assertFailure(63, "m_value2indices[m_values[idx]] == idx"); err != nil {
+				return err
+			}
+		}
+		if i > 1 && h.lt(v, h.values[i/2]) {
+			if err := h.assertFailure(64, "parent(idx) == 0 || !less_than(m_values[idx], m_values[parent(idx)])"); err != nil {
+				return err
+			}
+		}
+		if err := walk(i * 2); err != nil {
+			return err
+		}
+		return walk(i*2 + 1)
+	}
+	return walk(1)
 }
 
 // Source resize repeatedly expands by (3*old+1)/2, starting at two.
@@ -161,7 +234,7 @@ func (h *Int) CheckInvariant() bool {
 	}
 	return true
 }
-func (h *Int) up(i int32) {
+func (h *Int) up(i int32) error {
 	v := h.values[i]
 	for p := i / 2; p != 0 && h.lt(v, h.values[p]); p = i / 2 {
 		h.values[i] = h.values[p]
@@ -170,8 +243,9 @@ func (h *Int) up(i int32) {
 	}
 	h.values[i] = v
 	h.indices[v] = i
+	return h.cassertInvariant()
 }
-func (h *Int) down(i int32) {
+func (h *Int) down(i int32) error {
 	v := h.values[i]
 	for {
 		left := uint64(i) * 2
@@ -191,9 +265,16 @@ func (h *Int) down(i int32) {
 	}
 	h.values[i] = v
 	h.indices[v] = i
+	return h.cassertInvariant()
 }
 func (h *Int) Insert(v int32) error {
 	if e := h.canChange(); e != nil {
+		return e
+	}
+	if e := h.cassertInvariant(); e != nil {
+		return e
+	}
+	if e := h.cassert(232, "!contains(val)", func() bool { return !h.Contains(v) }); e != nil {
 		return e
 	}
 	if v < 0 || int64(v) >= int64(len(h.indices)) || h.Contains(v) {
@@ -211,8 +292,10 @@ func (h *Int) Insert(v int32) error {
 		return e
 	}
 	h.values = append(h.values, v)
-	h.up(i)
-	return nil
+	if e := h.up(i); e != nil {
+		return e
+	}
+	return h.cassertInvariant()
 }
 func (h *Int) Min() (int32, error) {
 	if e := h.alive(); e != nil {
@@ -224,17 +307,34 @@ func (h *Int) Min() (int32, error) {
 	return h.values[1], nil
 }
 func (h *Int) EraseMin() (int32, error) {
-	v, e := h.Min()
-	if e != nil {
+	if e := h.alive(); e != nil {
 		return 0, e
 	}
-	if e = h.Erase(v); e != nil {
+	if e := h.cassertInvariant(); e != nil {
 		return 0, e
 	}
-	return v, nil
+	if h.Empty() {
+		return 0, ErrValue
+	}
+	v := h.values[1]
+	h.indices[v] = 0
+	last := h.values[len(h.values)-1]
+	h.values = h.values[:len(h.values)-1]
+	h.epoch++
+	if !h.Empty() {
+		h.values[1] = last
+		h.indices[last] = 1
+		if e := h.down(1); e != nil {
+			return 0, e
+		}
+	}
+	return v, h.cassertInvariant()
 }
 func (h *Int) Erase(v int32) error {
 	if e := h.canChange(); e != nil {
+		return e
+	}
+	if e := h.cassertInvariant(); e != nil {
 		return e
 	}
 	if !h.Contains(v) || h.indices[v] < 1 || int64(h.indices[v]) >= int64(len(h.values)) {
@@ -247,17 +347,21 @@ func (h *Int) Erase(v int32) error {
 	last := h.values[len(h.values)-1]
 	h.indices[v] = 0
 	h.values = h.values[:len(h.values)-1]
+	h.epoch++
 	if int(i) < len(h.values) {
 		h.values[i] = last
 		h.indices[last] = i
 		if i/2 != 0 && h.lt(last, h.values[i/2]) {
-			h.up(i)
+			if e := h.up(i); e != nil {
+				return e
+			}
 		} else {
-			h.down(i)
+			if e := h.down(i); e != nil {
+				return e
+			}
 		}
 	}
-	h.epoch++
-	return nil
+	return h.cassertInvariant()
 }
 func (h *Int) Increased(v int32) error {
 	if e := h.canChange(); e != nil {
@@ -269,8 +373,10 @@ func (h *Int) Increased(v int32) error {
 		// the completed prefix. In-range indices still follow source actions.
 		return ErrValue
 	}
-	h.down(h.indices[v])
 	h.epoch++
+	if e := h.down(h.indices[v]); e != nil {
+		return e
+	}
 	return nil
 }
 func (h *Int) Decreased(v int32) error {
@@ -283,8 +389,10 @@ func (h *Int) Decreased(v int32) error {
 		// the completed prefix. In-range indices still follow source actions.
 		return ErrValue
 	}
-	h.up(h.indices[v])
 	h.epoch++
+	if e := h.up(h.indices[v]); e != nil {
+		return e
+	}
 	return nil
 }
 func (h *Int) SetBounds(n int32) error {
@@ -295,7 +403,7 @@ func (h *Int) SetBounds(n int32) error {
 		return arena.ErrBounds
 	}
 	if int(n) == len(h.indices) {
-		return nil
+		return h.cassertInvariant()
 	}
 	if e := h.canChange(); e != nil {
 		return e
@@ -316,10 +424,13 @@ func (h *Int) SetBounds(n int32) error {
 		clear(h.indices[old:])
 	}
 	h.epoch++
-	return nil
+	return h.cassertInvariant()
 }
 func (h *Int) Reserve(n int32) error {
 	if e := h.alive(); e != nil {
+		return e
+	}
+	if e := h.cassertInvariant(); e != nil {
 		return e
 	}
 	if n > h.Bounds() {
@@ -327,11 +438,14 @@ func (h *Int) Reserve(n int32) error {
 			return e
 		}
 	}
-	return nil
+	return h.cassertInvariant()
 }
 
 func (h *Int) Reset() error {
 	if e := h.alive(); e != nil {
+		return e
+	}
+	if e := h.cassertInvariant(); e != nil {
 		return e
 	}
 	if h.Empty() {
@@ -344,7 +458,7 @@ func (h *Int) Reset() error {
 	h.values = h.values[:1]
 	h.values[0] = -1
 	h.epoch++
-	return nil
+	return h.cassertInvariant()
 }
 func (h *Int) Clear() error { return h.Reset() }
 func (h *Int) AppendValues(dst []int32) ([]int32, error) {
@@ -366,6 +480,12 @@ func (h *Int) Swap(other *Int) error {
 	}
 	if h == other {
 		return nil
+	}
+	if e := other.cassertInvariant(); e != nil {
+		return e
+	}
+	if e := h.cassertInvariant(); e != nil {
+		return e
 	}
 	if e := h.canChange(); e != nil {
 		return e
@@ -390,7 +510,10 @@ func (h *Int) Swap(other *Int) error {
 	h.indices, other.indices = other.indices, h.indices
 	h.epoch++
 	other.epoch++
-	return nil
+	if e := other.cassertInvariant(); e != nil {
+		return e
+	}
+	return h.cassertInvariant()
 }
 
 // Clone implements the source implicit heap copy constructor. Vector capacities
@@ -402,7 +525,7 @@ func (h *Int) Clone(budget *arena.Budget) (*Int, error) {
 	if e := budget.Reserve(ownerBytes); e != nil {
 		return nil, e
 	}
-	c := &Int{budget: budget, less: h.less, epoch: 1}
+	c := &Int{budget: budget, less: h.less, debug: h.debug, epoch: 1}
 	c.self = c
 	for _, p := range []struct {
 		src []int32
@@ -514,6 +637,7 @@ func (h *Int) Close() error {
 	h.values = nil
 	h.indices = nil
 	h.less = nil
+	h.debug = nil
 	h.closed = true
 	return nil
 }
