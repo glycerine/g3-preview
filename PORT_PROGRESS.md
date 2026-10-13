@@ -40185,3 +40185,7 @@ A real ThreadLocal Runtime failure during `SetFormattedLiteral` now verifies tha
 ### MPF formatted input younger source stop
 
 Reached a real signed-host TLS release failure inside the formatted setter's exponent-rational child. The child's source error stops the wrapper before ex or q destruction; the parsed `1.5p0` values remain exactly ex=0 and q=3/2 with the source cursor at zero. `SourceFinalize` returns the same stop without mutating the child, wrapper, budget, or older class state. A named physical owner audit passes before recovery, and separate owning cleanup releases the child and both parsed operands without rewriting source history. Native and checked/debug focused tests pass. The first-own release-failure profile and whole MPF ownership audit remain open.
+
+### MPF formatted input first-own release stop
+
+A separate ThreadLocal Runtime fixture now reaches an actual raw-transfer failure in the formatted setter's exponent-rational child. Before TLS fault lifting, the named physical roots and manager/runtime byte graph match. The first `CleanupFormattedLiteral` returns `arena.ErrBounds` at an owning release and preserves the wrapper's body/source causes and the issued child receipt; retry joins the remaining child and parsed ex/q, followed by clean source and owner end. Focused native and checked/debug formatted-input tests pass. The method remains partial pending a durable wrapper-level receipt/history audit across later calls and any remaining retained API consumer integration.
