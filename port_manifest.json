@@ -11194,7 +11194,8 @@
         "TestASTProofHyperNativeOutputGuardsFollowPublishedPrefix",
         "TestASTDependencyDecConsumedActualRootOwnership",
         "TestASTLabelConcreteSymbolBufferAndRecognition",
-        "TestASTLabelTemporaryParametersOnReservationFailure"
+        "TestASTLabelTemporaryParametersOnReservationFailure",
+        "TestASTSkolemDeclarationFlagForPatternInference"
       ],
       "conditionals": [
         {
@@ -11871,6 +11872,14 @@
           "tests": [
             "TestASTLabelConcreteSymbolBufferAndRecognition",
             "TestASTLabelTemporaryParametersOnReservationFailure"
+          ]
+        },
+        {
+          "name": "func_decl is_skolem checked accessor for nonground pattern candidate refusal",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_accessors.go",
+          "tests": [
+            "TestASTSkolemDeclarationFlagForPatternInference"
           ]
         }
       ],
@@ -18094,7 +18103,8 @@
         "pkg/ast/pattern/candidate_selection.go",
         "pkg/ast/pattern/multi_pattern.go",
         "pkg/ast/pattern/preferred_pattern.go",
-        "pkg/ast/pattern/pattern_selection.go"
+        "pkg/ast/pattern/pattern_selection.go",
+        "pkg/ast/pattern/collect.go"
       ],
       "tests": [
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
@@ -18104,7 +18114,9 @@
         "TestPatternInferenceMultiPatternSplitOrderLimitAndResultOwnership",
         "TestPatternInferenceMultiPatternThirtyTwoSplitCap",
         "TestPatternInferencePreferredPatternsCompleteAndOwned",
-        "TestPatternInferenceSelectionStagesAndMultiBudget"
+        "TestPatternInferenceSelectionStagesAndMultiBudget",
+        "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
+        "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
       ],
       "conditionals": [
         {
@@ -18245,6 +18257,15 @@
           "tests": [
             "TestPatternInferenceSelectionStagesAndMultiBudget"
           ]
+        },
+        {
+          "name": "pattern_inference_cfg collect body postorder, binder-depth normalization, exclusions and candidate ownership",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/collect.go",
+          "tests": [
+            "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
+            "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
+          ]
         }
       ],
       "ownership": [],
@@ -18264,7 +18285,8 @@
         "pkg/ast/pattern/candidate_selection.go",
         "pkg/ast/pattern/multi_pattern.go",
         "pkg/ast/pattern/preferred_pattern.go",
-        "pkg/ast/pattern/pattern_selection.go"
+        "pkg/ast/pattern/pattern_selection.go",
+        "pkg/ast/pattern/collect.go"
       ],
       "tests": [
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
@@ -18274,7 +18296,9 @@
         "TestPatternInferenceMultiPatternSplitOrderLimitAndResultOwnership",
         "TestPatternInferenceMultiPatternThirtyTwoSplitCap",
         "TestPatternInferencePreferredPatternsCompleteAndOwned",
-        "TestPatternInferenceSelectionStagesAndMultiBudget"
+        "TestPatternInferenceSelectionStagesAndMultiBudget",
+        "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
+        "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
       ],
       "conditionals": [
         {
@@ -18350,6 +18374,15 @@
           "go_target": "pkg/ast/pattern/pattern_selection.go",
           "tests": [
             "TestPatternInferenceSelectionStagesAndMultiBudget"
+          ]
+        },
+        {
+          "name": "pattern_inference_cfg collect entry cache, temporary info ownership and candidate metadata",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/collect.go",
+          "tests": [
+            "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
+            "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
           ]
         }
       ],
@@ -146705,7 +146738,8 @@
         "pkg/sat/sat_solver_index_set.go",
         "pkg/sat/sat_solver_index_map.go",
         "pkg/sat/sat_solver_index_set_test.go",
-        "pkg/sat/sat_solver_index_iterator_source_test.go"
+        "pkg/sat/sat_solver_index_iterator_source_test.go",
+        "pkg/ast/pattern/collect.go"
       ],
       "tests": [
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
@@ -146736,7 +146770,9 @@
         "TestSATSolverConsequenceNativeSetUnionAssignmentOracle",
         "TestSATSolverConsequenceNativeMapGrowthAndReplacement",
         "TestSATSolverAntecedentMapNativeResetAndCloseInvalidateRows",
-        "TestSATConsequenceNativeIndexIteratorBorrowLifetime"
+        "TestSATConsequenceNativeIndexIteratorBorrowLifetime",
+        "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
+        "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
       ],
       "conditionals": [
         {
@@ -146887,6 +146923,15 @@
             "TestSATSolverConsequenceNativeMapGrowthAndReplacement",
             "TestSATSolverAntecedentMapNativeResetAndCloseInvalidateRows",
             "TestSATConsequenceNativeIndexIteratorBorrowLifetime"
+          ]
+        },
+        {
+          "name": "pattern_inference collect entry-to-info map uses native typed node/depth keys",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/collect.go",
+          "tests": [
+            "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
+            "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
           ]
         }
       ],
@@ -162241,7 +162286,8 @@
         "pkg/math/polynomial/polynomial_iccp_cleanup_order_source_test.go",
         "pkg/ast/ast_bv_polynomial_neg_numerals.go",
         "pkg/ast/ast_bv_polynomial_sub_literal.go",
-        "pkg/ast/ast_bv_polynomial_neg_sub_lifetime_test.go"
+        "pkg/ast/ast_bv_polynomial_neg_sub_lifetime_test.go",
+        "pkg/ast/pattern/collect.go"
       ],
       "tests": [
         "TestSexprAccessorsAndScalarIterator",
@@ -162286,7 +162332,9 @@
         "TestASTBitVectorUnaryMinusPhysicalLocalAndLiteralLifetimes",
         "TestASTBitVectorSubtractionLiteralRefAcquiredBeforeTemporaryRetires",
         "TestPolynomialPSCBufferNativeGrowthAndReuse",
-        "TestPolynomialPSCBufferNativeStoppedReferenceCleanup"
+        "TestPolynomialPSCBufferNativeStoppedReferenceCleanup",
+        "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
+        "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
       ],
       "conditionals": [
         {
@@ -162384,6 +162432,15 @@
           "go_target": "pkg/ast/ast_bv_polynomial_sub_literal.go",
           "tests": [
             "TestASTBitVectorSubtractionLiteralRefAcquiredBeforeTemporaryRetires"
+          ]
+        },
+        {
+          "name": "pattern_inference collect info expression references use explicit typed AST pins released in discovery order",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/collect.go",
+          "tests": [
+            "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
+            "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
           ]
         }
       ],
@@ -173217,7 +173274,8 @@
         "pkg/math/subpaving/hardware_search.go",
         "pkg/math/subpaving/hardware_search_test.go",
         "pkg/math/subpaving/hardware_node.go",
-        "pkg/math/subpaving/hardware_context_root.go"
+        "pkg/math/subpaving/hardware_context_root.go",
+        "pkg/ast/pattern/collect.go"
       ],
       "tests": [
         "TestParamDescrsNativeStorageAndWarmDuplicate",
@@ -173420,7 +173478,9 @@
         "TestHardwareMonomialDefinitionForwardAndZero",
         "TestHardwareMonomialReverseCubicAndSourceProduct",
         "TestHardwareSearchBreadthFirstSplitLimitAndChildResume",
-        "TestHardwareClauseJustificationChildTrailAndContextClose"
+        "TestHardwareClauseJustificationChildTrailAndContextClose",
+        "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
+        "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
       ],
       "conditionals": [
         {
@@ -173875,6 +173935,15 @@
           ],
           "tests": [
             "TestHardwareClauseJustificationChildTrailAndContextClose"
+          ]
+        },
+        {
+          "name": "pattern_inference collect entry and owned-info vectors use typed Go slices",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/collect.go",
+          "tests": [
+            "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
+            "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
           ]
         }
       ],

@@ -161,6 +161,18 @@ func (m *ASTManager) GetDeclKind(h ASTHandle) (int32, error) {
 	_, kind, e := m.declIdentity(r)
 	return kind, e
 }
+func (m *ASTManager) IsSkolemDecl(h ASTHandle) (bool, error) {
+	if e := m.lock(); e != nil {
+		return false, e
+	}
+	defer m.mu.Unlock()
+	r, e := m.requireKind(h, ASTFuncDecl)
+	if e != nil {
+		return false, e
+	}
+	flags, e := m.funcFlags(r)
+	return flags.Skolem, e
+}
 func (m *ASTManager) GetSortSize(h ASTHandle) (SortSize, error) {
 	if e := m.lock(); e != nil {
 		return SortSize{}, e

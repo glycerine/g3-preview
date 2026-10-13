@@ -14,17 +14,21 @@ type candidateInfo struct {
 // pattern_inference_cfg. It owns each candidate AST reference; exclusions and
 // returned filter slices borrow handles from the surrounding quantifier.
 type patternCandidates struct {
-	manager     *ast.ASTManager
-	matcher     *smallerPattern
-	candidates  []ast.ASTHandle
-	info        map[ast.ASTHandle]candidateInfo
-	preferred   map[ast.ASTHandle]struct{}
-	visited     map[ast.ASTHandle]struct{}
-	todo        []ast.ASTHandle
-	noPatterns  []ast.ASTHandle
-	numBindings uint32
-	blockLoops  bool
-	closed      bool
+	manager           *ast.ASTManager
+	matcher           *smallerPattern
+	candidates        []ast.ASTHandle
+	info              map[ast.ASTHandle]candidateInfo
+	preferred         map[ast.ASTHandle]struct{}
+	visited           map[ast.ASTHandle]struct{}
+	todo              []ast.ASTHandle
+	noPatterns        []ast.ASTHandle
+	collectRefs       []ast.ASTHandle
+	numBindings       uint32
+	blockLoops        bool
+	avoidSkolems      bool
+	nestedArithOnly   bool
+	forbiddenFamilies map[ast.FamilyID]struct{}
+	closed            bool
 }
 
 func newPatternCandidates(m *ast.ASTManager, numBindings uint32, noPatterns []ast.ASTHandle, blockLoops bool) (*patternCandidates, error) {
@@ -35,6 +39,7 @@ func newPatternCandidates(m *ast.ASTManager, numBindings uint32, noPatterns []as
 	return &patternCandidates{
 		manager: m, matcher: matcher, info: make(map[ast.ASTHandle]candidateInfo), preferred: make(map[ast.ASTHandle]struct{}), visited: make(map[ast.ASTHandle]struct{}),
 		noPatterns: noPatterns, numBindings: numBindings, blockLoops: blockLoops,
+		avoidSkolems: true, nestedArithOnly: true, forbiddenFamilies: make(map[ast.FamilyID]struct{}),
 	}, nil
 }
 
@@ -138,6 +143,9 @@ func (c *patternCandidates) close() error {
 	}
 	if c.closed {
 		return nil
+	}
+	if err := c.releaseCollectRefs(); err != nil {
+		return err
 	}
 	for len(c.candidates) != 0 {
 		h := c.candidates[0]

@@ -290,6 +290,7 @@
       "production_files": [
         "candidate_selection.go",
         "candidates.go",
+        "collect.go",
         "contains_subpattern.go",
         "multi_pattern.go",
         "pattern_selection.go",
