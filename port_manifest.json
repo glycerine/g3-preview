@@ -159547,6 +159547,32 @@
           "tests": [
             "TestIntegerMul2kSourceTraceCapacityAndShortcuts"
           ]
+        },
+        {
+          "name": "bitwise_or small-operand and general chunk TRACE sites (mpz.cpp:1021,1034,1037,1039)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpz_or_root_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpz_bitwise.go"
+          ],
+          "tests": [
+            "TestIntegerBitwiseOrAndRootRetainedTraceSites"
+          ]
+        },
+        {
+          "name": "root bisection TRACE after midpoint shift and before midpoint power (mpz.cpp:1987)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpz_or_root_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpz_root.go"
+          ],
+          "tests": [
+            "TestIntegerBitwiseOrAndRootRetainedTraceSites"
+          ]
+        },
+        {
+          "name": "array-GCD size-sorting TRACE in disabled #if 0 optimization (mpz.cpp:875)",
+          "status": "dead_deleted"
         }
       ],
       "ownership": [

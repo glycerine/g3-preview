@@ -169,6 +169,7 @@ func (m *IntegerManager) rootCoreWithReceiptAndContext(a *Int, n uint32, receipt
 		if e = m.rootRawCallWithContext(2, nil, &one, mid, context); e != nil {
 			return false, e
 		}
+		m.traceRootBisection(upper, lower, mid)
 		power := NewInt(int32(n))
 		if e = m.rootRawCallWithContext(0, mid, &power, midN, context); e != nil {
 			return false, e

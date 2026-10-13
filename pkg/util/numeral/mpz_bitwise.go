@@ -44,6 +44,9 @@ func (m *IntegerManager) bitwiseBinaryWithAllocationContext(a, b, out *Int, op u
 	if modularSourceDebug && (a.Val < 0 || b.Val < 0) {
 		return ErrBitwiseDomain
 	}
+	if op == 0 {
+		m.traceBitwiseOrStart(a, b)
+	}
 	if a.IsSmall() && b.IsSmall() {
 		var v int32
 		switch op {
@@ -104,11 +107,17 @@ func (m *IntegerManager) bitwiseBinaryWithAllocationContext(a, b, out *Int, op u
 		if a1.IsSmall() && b1.IsSmall() && a1.Val == -1 && b1.Val == -1 {
 			return &BitwiseNonterminationError{Operation: BitwiseOperation(op)}
 		}
+		if op == 0 {
+			m.traceBitwiseOrOperands(a1, b1)
+		}
 		if e := m.modWithAllocationContext(a1, &m.Two64, a2, context); e != nil {
 			return e
 		}
 		if e := m.modWithAllocationContext(b1, &m.Two64, b2, context); e != nil {
 			return e
+		}
+		if op == 0 {
+			m.traceBitwiseOrChunks(a2, b2)
 		}
 		u, e := m.Uint64(a2)
 		if e != nil {
@@ -118,6 +127,7 @@ func (m *IntegerManager) bitwiseBinaryWithAllocationContext(a, b, out *Int, op u
 		if e != nil {
 			return e
 		}
+		bUnsigned := v
 		switch op {
 		case 0:
 			v = u | v
@@ -125,6 +135,9 @@ func (m *IntegerManager) bitwiseBinaryWithAllocationContext(a, b, out *Int, op u
 			v = u & v
 		case 2:
 			v = u ^ v
+		}
+		if op == 0 {
+			m.traceBitwiseOrUnsigned(u, bUnsigned)
 		}
 		if e = m.setUint64WithAllocationContext(tmp, v, context); e != nil {
 			return e
