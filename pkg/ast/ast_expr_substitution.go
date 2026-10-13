@@ -23,9 +23,14 @@ type astExprSubstEntry struct {
 	key, value astNodeRef
 	owned      uint32
 }
+type astExprSubstPending struct {
+	node  astNodeRef
+	which uint32
+}
 type astExprSubstState struct {
-	tables [3]astExprSubstTable
-	header uint64
+	tables  [3]astExprSubstTable
+	pending []astExprSubstPending
+	header  uint64
 }
 
 const astExprSubstBytes uint32 = 16

@@ -31,6 +31,106 @@ func TestASTExprSubstitutionNativeDependencyEraseFinishesSameEntry(t *testing.T)
 	}
 	astTestMust(t, m.DelExprSubstitution(&s))
 }
+
+func TestASTExprSubstitutionReplacementKeepsOldOnConsumedDeletionStop(t *testing.T) {
+	m := astTestManager(t)
+	sort, e := m.MkBoolSort()
+	astTestMust(t, e)
+	key, e := m.MkVar(11600, sort)
+	astTestMust(t, e)
+	old, e := m.MkVar(11601, sort)
+	astTestMust(t, e)
+	incoming, e := m.MkVar(11602, sort)
+	astTestMust(t, e)
+	astTestMust(t, m.IncRef(key))
+	astTestMust(t, m.IncRef(incoming))
+	s, e := m.NewExprSubstitution()
+	astTestMust(t, e)
+	astTestMust(t, m.ExprSubstitutionInsert(s, key, old, ASTHandle{}, ASTDependency{}))
+	oldRef, e := m.internal(old)
+	astTestMust(t, e)
+	incomingRef, e := m.internal(incoming)
+	astTestMust(t, e)
+	m.ExprIDs.Cleanup(m.ExprIDs.Range())
+	m.BudgetField.FailAfter(0)
+	e = m.ExprSubstitutionInsert(s, key, incoming, ASTHandle{}, ASTDependency{})
+	m.BudgetField.FailAfter(-1)
+	if !errors.Is(e, arena.ErrInjectedFailure) {
+		t.Fatalf("old value deletion refusal: %v", e)
+	}
+	table, e := m.substTable(s, 0)
+	astTestMust(t, e)
+	keyRef, e := m.internal(key)
+	astTestMust(t, e)
+	entry, found := table.entries.Get2(astSharedKey(keyRef))
+	if !found || entry.value != oldRef || entry.owned != 1 {
+		t.Fatalf("source entry published after stopped DEC: %+v, found=%v", entry, found)
+	}
+	state := m.exprSubstitutions[s.record]
+	if len(state.pending) != 1 || state.pending[0] != (astExprSubstPending{node: incomingRef}) {
+		t.Fatalf("incoming owning receipt: %+v", state.pending)
+	}
+	if _, e := m.GetRefCount(old); !errors.Is(e, ErrASTHandle) {
+		t.Fatalf("old value not consumed by stopped deletion: %v", e)
+	}
+	astTestMust(t, m.DelExprSubstitution(&s))
+	if rc, e := m.GetRefCount(incoming); e != nil || rc != 1 {
+		t.Fatalf("incoming reference after owning close = %d, %v", rc, e)
+	}
+	astTestMust(t, m.DecRef(key))
+	astTestMust(t, m.DecRef(incoming))
+}
+
+func TestASTExprSubstitutionProofReplacementKeepsOldOnConsumedDeletionStop(t *testing.T) {
+	m := astTestManager(t)
+	astTestMust(t, m.ToggleProofMode(ASTProofEnabled))
+	sort, e := m.MkBoolSort()
+	astTestMust(t, e)
+	key, e := m.MkVar(11610, sort)
+	astTestMust(t, e)
+	value, e := m.MkVar(11611, sort)
+	astTestMust(t, e)
+	old, e := m.MkProofTrue()
+	astTestMust(t, e)
+	incoming, e := m.MkProofAsserted(key)
+	astTestMust(t, e)
+	for _, h := range []ASTHandle{key, value, incoming} {
+		astTestMust(t, m.IncRef(h))
+	}
+	s, e := m.NewExprSubstitutionPolicy(false, true)
+	astTestMust(t, e)
+	astTestMust(t, m.ExprSubstitutionInsert(s, key, value, old, ASTDependency{}))
+	oldRef, e := m.internal(old)
+	astTestMust(t, e)
+	incomingRef, e := m.internal(incoming)
+	astTestMust(t, e)
+	m.ExprIDs.Cleanup(m.ExprIDs.Range())
+	m.BudgetField.FailAfter(0)
+	e = m.ExprSubstitutionInsert(s, key, value, incoming, ASTDependency{})
+	m.BudgetField.FailAfter(-1)
+	if !errors.Is(e, arena.ErrInjectedFailure) {
+		t.Fatalf("old proof deletion refusal: %v", e)
+	}
+	table, e := m.substTable(s, 1)
+	astTestMust(t, e)
+	keyRef, e := m.internal(key)
+	astTestMust(t, e)
+	entry, found := table.entries.Get2(astSharedKey(keyRef))
+	if !found || entry.value != oldRef || entry.owned != 0 {
+		t.Fatalf("source proof published after stopped DEC: %+v, found=%v", entry, found)
+	}
+	state := m.exprSubstitutions[s.record]
+	if len(state.pending) != 1 || state.pending[0] != (astExprSubstPending{node: incomingRef, which: 1}) {
+		t.Fatalf("incoming proof owning receipt: %+v", state.pending)
+	}
+	astTestMust(t, m.DelExprSubstitution(&s))
+	if rc, e := m.GetRefCount(incoming); e != nil || rc != 1 {
+		t.Fatalf("incoming proof reference after owning close = %d, %v", rc, e)
+	}
+	for _, h := range []ASTHandle{incoming, key, value} {
+		astTestMust(t, m.DecRef(h))
+	}
+}
 func TestASTExprSubstitutionNativeDestructorAfterSparseErase(t *testing.T) {
 	m := astTestManager(t)
 	s, e := m.NewExprSubstitution()

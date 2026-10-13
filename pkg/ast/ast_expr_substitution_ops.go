@@ -45,23 +45,32 @@ func (m *ASTManager) substDec(which uint32, r astNodeRef) (bool, error) {
 	}
 	return m.decNode(r)
 }
-func (m *ASTManager) substStoreValue(t *astExprSubstTable, which uint32, token uint64, new astNodeRef, replacing bool) error {
+func (m *ASTManager) substStoreValue(s ASTExprSubstitution, t *astExprSubstTable, which uint32, token uint64, new astNodeRef, replacing bool) error {
 	a, _ := t.entries.Get2(token)
 	if e := m.substInc(which, new); e != nil {
 		return e
 	}
-	var failure error
 	if replacing {
 		consumed, e := m.substDec(which, a.value)
-		if !consumed {
+		if e != nil || !consumed {
+			// The source entry still publishes old at this statement. The
+			// already-acquired incoming reference belongs to owning cleanup.
+			m.exprSubstitutions[s.record].pending = append(m.exprSubstitutions[s.record].pending,
+				astExprSubstPending{node: new, which: which})
+			if consumed {
+				a.owned &^= 2
+				t.entries.Set(token, a)
+			}
+			if e == nil {
+				return ErrASTPending
+			}
 			return e
 		}
-		failure = e
 	}
 	a.value = new
 	a.owned |= 2
 	t.entries.Set(token, a)
-	return failure
+	return nil
 }
 func (m *ASTManager) substInsert(s ASTExprSubstitution, key, def, proof, dep astNodeRef) error {
 	if e := m.substMutation(s); e != nil {
@@ -87,7 +96,7 @@ func (m *ASTManager) substInsert(s ASTExprSubstitution, key, def, proof, dep ast
 		entry.owned |= 1
 		t.entries.Set(token, entry)
 	}
-	if e = m.substStoreValue(t, 0, token, def, !fresh); e != nil {
+	if e = m.substStoreValue(s, t, 0, token, def, !fresh); e != nil {
 		return m.substNoteFailure(s, e)
 	}
 	for which := uint32(1); which < 3; which++ {
@@ -116,7 +125,7 @@ func (m *ASTManager) substInsert(s ASTExprSubstitution, key, def, proof, dep ast
 			if !found {
 				return m.substNoteFailure(s, ErrASTDomain)
 			}
-			if e = m.substStoreValue(t, which, token, value, true); e != nil {
+			if e = m.substStoreValue(s, t, which, token, value, true); e != nil {
 				return m.substNoteFailure(s, e)
 			}
 		}
@@ -343,6 +352,29 @@ func (m *ASTManager) ExprSubstitutionReset(s ASTExprSubstitution) error {
 }
 func (m *ASTManager) substCleanup(s ASTExprSubstitution) error { return m.substReset(s) }
 
+func (m *ASTManager) substDrainPending(s ASTExprSubstitution) error {
+	state := m.exprSubstitutions[s.record]
+	var failure error
+	for len(state.pending) != 0 {
+		last := len(state.pending) - 1
+		p := state.pending[last]
+		consumed, e := m.substDec(p.which, p.node)
+		if consumed {
+			state.pending = state.pending[:last]
+		}
+		if failure == nil {
+			failure = e
+		}
+		if !consumed {
+			if e != nil {
+				return e
+			}
+			return ErrASTPending
+		}
+	}
+	return failure
+}
+
 func (m *ASTManager) ExprSubstitutionCleanup(s ASTExprSubstitution) error {
 	if e := m.lock(); e != nil {
 		return e
@@ -382,6 +414,12 @@ func (m *ASTManager) DelExprSubstitution(s *ASTExprSubstitution) error {
 			}
 		}
 		t.entries.Clear()
+	}
+	if e = m.substDrainPending(*s); e != nil && failure == nil {
+		failure = e
+	}
+	if state := m.exprSubstitutions[s.record]; len(state.pending) != 0 {
+		return failure
 	}
 	state := m.exprSubstitutions[s.record]
 	if e = m.allocator.Deallocate(astExprSubstBytes, s.record); e != nil {
