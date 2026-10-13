@@ -56,6 +56,37 @@ func TestGeneratedProcessLinksFullParameterCatalog(t *testing.T) {
 			t.Fatal("generated parameter catalog omitted module", name)
 		}
 	}
+	value, err := ready.Globals.SourceGetValueName("smt.random_seed")
+	must(err)
+	if value != "0" {
+		t.Fatal("generated SMT default", value)
+	}
+	must(ready.Globals.SourceSetName("smt.random_seed", "17"))
+	value, err = ready.Globals.SourceGetValueName("smt.random_seed")
+	must(err)
+	if value != "17" {
+		t.Fatal("generated SMT override", value)
+	}
+	snapshot, err := ready.Globals.SourceGetModuleName("smt")
+	must(err)
+	seed := "random_seed"
+	n, err := ready.Context.GetUIntName(&snapshot, &seed, 0)
+	must(err)
+	if n != 17 {
+		t.Fatal("generated SMT module snapshot", n)
+	}
+	must(ready.Globals.SourceReset())
+	value, err = ready.Globals.SourceGetValueName("smt.random_seed")
+	must(err)
+	if value != "0" {
+		t.Fatal("generated SMT reset default", value)
+	}
+	n, err = ready.Context.GetUIntName(&snapshot, &seed, 0)
+	must(err)
+	if n != 17 {
+		t.Fatal("source module snapshot lost its owned value", n)
+	}
+	must(ready.Context.Del(&snapshot))
 	must(process.FinalizeGenerated(p, d, ready.Globals, r, s, diagnostic.NewTraceTags()))
 	must(ready.Close())
 	must(r.Close())
