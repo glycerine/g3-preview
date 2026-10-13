@@ -50256,7 +50256,8 @@
         "pkg/math/subpaving/hardware_param_descrs_test.go",
         "pkg/math/subpaving/hardware_context_params_test.go",
         "pkg/math/subpaving/hardware_context_root.go",
-        "pkg/math/subpaving/tactic/options_test.go"
+        "pkg/math/subpaving/tactic/options_test.go",
+        "pkg/math/subpaving/fast_shell_coefficients.go"
       ],
       "tests": [
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
@@ -50269,7 +50270,8 @@
         "TestHardwareShellStatisticsCountersAndReset",
         "TestHardwareDisplayConstraintsAndLeafBoundsSourceOrder",
         "TestHardwareShellParamDescriptionsSourceOrder",
-        "TestSubpavingTacticOptionSelectionAndDescriptions"
+        "TestSubpavingTacticOptionSelectionAndDescriptions",
+        "TestFastShellExactCoefficientsAndDirectedInequalities"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -50382,11 +50384,20 @@
           "tests": [
             "TestArbitraryContextNamedParamsSourceOrderAndDescriptions"
           ]
+        },
+        {
+          "name": "Concrete context_mpff_wrapper integer coefficient round trip, directed rational inequality and typed clause/definition forwarding (src/math/subpaving/subpaving.cpp:198-250)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_shell_coefficients.go",
+          "tests": [
+            "TestFastShellExactCoefficientsAndDirectedInequalities"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "The MPF wrapper prepares exact integer coefficients in source order using a native typed slice, registers context_mpf variables and copies directed rational inequality bounds into context ownership. Construction derives the exact borrowed core from f2n<mpf_manager>::m() and copied Go owner values cannot release the same numerals twice. Its context_mpf mk_sum construction, clause/search graph and tactic integration remain open."
+        "The MPF wrapper prepares exact integer coefficients in source order using a native typed slice, registers context_mpf variables and copies directed rational inequality bounds into context ownership. Construction derives the exact borrowed core from f2n<mpf_manager>::m() and copied Go owner values cannot release the same numerals twice. The enclosing context_mpf search graph and complete tactic lifetime remain open.",
+        "The concrete MPFF wrapper now converts integer coefficients in source order with an exact mpz round trip, chooses directed rational bound rounding, and forwards typed variables, sums, monomials and clauses. Context parameter construction, search/display, and tactic lifetime remain open."
       ]
     },
     {
@@ -109455,7 +109466,7 @@
         "MPFF uses native typed slices for significands, metadata, recycled IDs and scratch. Actual owner headers, Natural Runtime resources and retained text remain charged. Source arithmetic and alias behavior is covered separately from deleted vector-storage topology."
       ],
       "deviations": [
-        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, TRACE/STRACE, external exception transport and real subpaving consumers remain open. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence.",
+        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, TRACE/STRACE, external exception transport and full subpaving tactic integration remain open. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence.",
         "The scoped_mpff_vector specialization is omitted: its only upstream instantiation is src/test/mpff.cpp, and no production Z3 or Go code consumes it. Production scoped_mpff scalar behavior remains covered."
       ]
     },
@@ -150595,7 +150606,8 @@
         "pkg/util/numeral/mpff_format_scope.go",
         "pkg/util/numeral/mpff_format_scope_test.go",
         "pkg/util/numeral/mpff_runtime_scope_test.go",
-        "pkg/util/numeral/mpff_native_storage_test.go"
+        "pkg/util/numeral/mpff_native_storage_test.go",
+        "pkg/math/subpaving/fast_shell_coefficients.go"
       ],
       "tests": [
         "TestFastFloatIntegerConversionSource",
@@ -150631,7 +150643,8 @@
         "TestFastFloatSharedRuntimeProfileAndClose",
         "TestFastFloatBorrowedRuntimeInlineWarmScope",
         "TestFastFloatNativeStorageGrowthAndRecycledGeneration",
-        "TestFastFloatDecimalNativeDivisionWithoutReservations"
+        "TestFastFloatDecimalNativeDivisionWithoutReservations",
+        "TestFastShellExactCoefficientsAndDirectedInequalities"
       ],
       "conditionals": [
         {
@@ -151236,10 +151249,11 @@
         "MPFF owns native typed slices for significands, validity/generation metadata, recycled IDs and scratch. These Go-managed backing arrays are not charged to arena. The actual owner header, Natural services, real MPN resources and retained text workspaces keep their existing accounting. Source arithmetic and alias prefixes survive failure; lexical numeral temporaries release with the injector armed. Raw handles retain implicit manager provenance limits. See PORT_PROGRESS.md#audit-mpff-port-status-md."
       ],
       "deviations": [
-        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, TRACE/STRACE, external exception transport and real subpaving consumers remain open. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence.",
+        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, TRACE/STRACE, external exception transport and full subpaving tactic integration remain open. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence.",
         "MPFF significands, handle metadata, recycled IDs, conversion scratch and arithmetic scratch use concrete Go uint32 slices. Copied vector growth, arena descriptors and storage reservation failures are removed. Numeric handle generation/recycling, arithmetic and rounding algorithms remain explicit; shared MPN workspaces retain their separate ownership.",
         "NaturalManager no longer owns or borrows an arena.Words service: division uses actual Runtime buffers and formatting uses native slices. Permanently empty Words scratch arrays, duplicate capacity mirrors, unconsumed growth/read helpers and Words-backed limb-view adapters are removed. MPFF also no longer constructs the unused Words service. Child cleanup preserves a borrowed parent Runtime and caller allocation.",
-        "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit."
+        "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit.",
+        "The retained context_mpff_wrapper now exercises exact SetInteger/ToInteger coefficient round trips and directed SetRational inequality bounds through a concrete subpaving caller; the enclosing MPFF tactic lifecycle remains partial."
       ]
     },
     {
@@ -151261,7 +151275,8 @@
         "pkg/util/numeral/mpff_format_scope.go",
         "pkg/util/numeral/mpff_format_scope_test.go",
         "pkg/util/numeral/mpff_runtime_scope_test.go",
-        "pkg/util/numeral/mpff_native_storage_test.go"
+        "pkg/util/numeral/mpff_native_storage_test.go",
+        "pkg/math/subpaving/fast_shell_coefficients.go"
       ],
       "tests": [
         "TestFastFloatIntegerConversionSource",
@@ -151296,7 +151311,8 @@
         "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
         "TestFastFloatSharedRuntimeProfileAndClose",
         "TestFastFloatBorrowedRuntimeInlineWarmScope",
-        "TestFastFloatNativeStorageGrowthAndRecycledGeneration"
+        "TestFastFloatNativeStorageGrowthAndRecycledGeneration",
+        "TestFastShellExactCoefficientsAndDirectedInequalities"
       ],
       "conditionals": [
         {
@@ -151525,9 +151541,10 @@
         "MPFF owns native typed slices for significands, validity/generation metadata, recycled IDs and scratch. These Go-managed backing arrays are not charged to arena. The actual owner header, Natural services, real MPN resources and retained text workspaces keep their existing accounting. Source arithmetic and alias prefixes survive failure; lexical numeral temporaries release with the injector armed. Raw handles retain implicit manager provenance limits. See PORT_PROGRESS.md#audit-mpff-port-status-md."
       ],
       "deviations": [
-        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, TRACE/STRACE, external exception transport and real subpaving consumers remain open. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence.",
+        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, TRACE/STRACE, external exception transport and full subpaving tactic integration remain open. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence.",
         "MPFF significands, handle metadata, recycled IDs, conversion scratch and arithmetic scratch use concrete Go uint32 slices. Copied vector growth, arena descriptors and storage reservation failures are removed. Numeric handle generation/recycling, arithmetic and rounding algorithms remain explicit; shared MPN workspaces retain their separate ownership.",
-        "NaturalManager no longer owns or borrows an arena.Words service: division and formatting use their actual Runtime buffers. Permanently empty Words scratch arrays, duplicate capacity mirrors, unconsumed growth/read helpers and Words-backed limb-view adapters are removed. MPFF also no longer constructs the unused Words service. Child cleanup preserves a borrowed parent Runtime and caller allocation."
+        "NaturalManager no longer owns or borrows an arena.Words service: division and formatting use their actual Runtime buffers. Permanently empty Words scratch arrays, duplicate capacity mirrors, unconsumed growth/read helpers and Words-backed limb-view adapters are removed. MPFF also no longer constructs the unused Words service. Child cleanup preserves a borrowed parent Runtime and caller allocation.",
+        "The retained context_mpff_wrapper now exercises exact SetInteger/ToInteger coefficient round trips and directed SetRational inequality bounds through a concrete subpaving caller; the enclosing MPFF tactic lifecycle remains partial."
       ]
     },
     {
