@@ -202,6 +202,9 @@ func (m *IntegerManager) bitwiseNotWithAllocationContext(width uint32, a, out *I
 		if err == nil {
 			raw.BodySucceeded = true
 			err = m.finishRawSource(raw)
+			if err == nil {
+				m.traceBitwiseNotFinal(width, a, out)
+			}
 		}
 	}()
 	if e := m.copyFromOwnerWithAllocationContext(a1, m, a, nil, context); e != nil {
@@ -228,6 +231,7 @@ func (m *IntegerManager) bitwiseNotWithAllocationContext(width uint32, a, out *I
 		if width < 64 {
 			v &= (uint64(1) << width) - 1
 		}
+		m.traceBitwiseNotChunk(width, v, n)
 		if e = m.setUint64WithAllocationContext(tmp, v, context); e != nil {
 			return e
 		}

@@ -159514,6 +159514,28 @@
           "tests": [
             "TestIntegerLCMRetainedBranchTraceAndAlias"
           ]
+        },
+        {
+          "name": "bitwise_not general-loop chunk TRACE and post-scratch final TRACE, including output alias (mpz.cpp:1171,1181)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpz_bit_shift_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpz_bitwise.go"
+          ],
+          "tests": [
+            "TestIntegerBitwiseNotAndMachineDiv2kSourceTraces"
+          ]
+        },
+        {
+          "name": "machine_div2k big-digit branch TRACE before digit mutation (mpz.cpp:1651)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpz_bit_shift_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpz_power_shift.go"
+          ],
+          "tests": [
+            "TestIntegerBitwiseNotAndMachineDiv2kSourceTraces"
+          ]
         }
       ],
       "ownership": [
@@ -161543,6 +161565,28 @@
           ],
           "tests": [
             "TestIntegerLCMRetainedBranchTraceAndAlias"
+          ]
+        },
+        {
+          "name": "bitwise_not general-loop chunk TRACE and post-scratch final TRACE, including output alias (mpz.cpp:1171,1181)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpz_bit_shift_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpz_bitwise.go"
+          ],
+          "tests": [
+            "TestIntegerBitwiseNotAndMachineDiv2kSourceTraces"
+          ]
+        },
+        {
+          "name": "machine_div2k big-digit branch TRACE before digit mutation (mpz.cpp:1651)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpz_bit_shift_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpz_power_shift.go"
+          ],
+          "tests": [
+            "TestIntegerBitwiseNotAndMachineDiv2kSourceTraces"
           ]
         },
         {

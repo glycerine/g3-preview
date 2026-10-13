@@ -341,6 +341,7 @@ func (m *IntegerManager) machineDiv2kCore(a *Int, k uint32) error {
 	if modularSourceDebug && newSize < 1 {
 		return ErrIntegerAssertion
 	}
+	m.traceMachineDiv2k(bitShift, compShift, newSize, size)
 	if newSize < size {
 		i, j := uint32(0), digitShift
 		if bitShift != 0 {
