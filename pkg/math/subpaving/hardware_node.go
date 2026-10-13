@@ -12,13 +12,14 @@ import (
 // HardwareBound owns a scalar binary64 value. Node arrays retain pointers to
 // bounds from the node or one of its ancestors.
 type HardwareBound struct {
-	value     numeral.HardwareFloat
-	variable  uint32
-	lower     bool
-	open      bool
-	reason    hardwareBoundReasonKind
-	timestamp uint64
-	prev      *HardwareBound
+	value          numeral.HardwareFloat
+	variable       uint32
+	lower          bool
+	open           bool
+	reason         hardwareBoundReasonKind
+	reasonVariable uint32
+	timestamp      uint64
+	prev           *HardwareBound
 }
 
 type hardwareBoundReasonKind uint8
@@ -27,6 +28,7 @@ const (
 	hardwareReasonUnknown hardwareBoundReasonKind = iota
 	hardwareReasonAxiom
 	hardwareReasonAssumption
+	hardwareReasonVariableDefinition
 )
 
 // HardwareNode uses copied Go slices for the retained parray bound views.

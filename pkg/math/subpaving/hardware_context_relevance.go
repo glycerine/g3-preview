@@ -101,6 +101,10 @@ func (c *HardwareContext) RelevantNewBound(n *HardwareNode, variable uint32, can
 // PropagateCandidate is the retained definition path: normalize a scalar
 // candidate, test relevance, then publish only a selected bound.
 func (c *HardwareContext) PropagateCandidate(n *HardwareNode, variable uint32, value *numeral.HardwareFloat, lower, open bool) (bool, error) {
+	return c.propagateCandidateReason(n, variable, value, lower, open, hardwareReasonUnknown, 0)
+}
+
+func (c *HardwareContext) propagateCandidateReason(n *HardwareNode, variable uint32, value *numeral.HardwareFloat, lower, open bool, reason hardwareBoundReasonKind, reasonVariable uint32) (bool, error) {
 	if err := c.checkNode(n, variable); err != nil {
 		return false, err
 	}
@@ -115,5 +119,5 @@ func (c *HardwareContext) PropagateCandidate(n *HardwareNode, variable uint32, v
 	if err != nil || !relevant {
 		return relevant, err
 	}
-	return true, c.PropagateBound(n, variable, &candidate, lower, open)
+	return true, c.propagateBoundReason(n, variable, &candidate, lower, open, reason, reasonVariable)
 }

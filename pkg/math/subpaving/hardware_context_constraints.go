@@ -25,6 +25,7 @@ type hardwarePolynomialTerm struct {
 type HardwarePolynomial struct {
 	constant numeral.HardwareFloat
 	terms    []hardwarePolynomialTerm
+	visited  uint64
 }
 
 // HardwareInequality owns a scalar copy of the directed bound.

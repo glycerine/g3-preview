@@ -51,7 +51,7 @@ func (c *HardwareContext) AssertUnitClauses(n *HardwareNode) error {
 			reason = hardwareReasonAxiom
 		}
 		a := unit.atom
-		if err := c.propagateBoundReason(n, a.variable, &a.value, a.lower, a.open, reason); err != nil {
+		if err := c.propagateBoundReason(n, a.variable, &a.value, a.lower, a.open, reason, 0); err != nil {
 			return err
 		}
 		c.unitHead++

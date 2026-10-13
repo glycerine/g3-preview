@@ -50955,7 +50955,8 @@
         "pkg/math/subpaving/hardware_context_constraints.go",
         "pkg/math/subpaving/hardware_node.go",
         "pkg/math/subpaving/hardware_context_bounds.go",
-        "pkg/math/subpaving/hardware_context_relevance.go"
+        "pkg/math/subpaving/hardware_context_relevance.go",
+        "pkg/math/subpaving/hardware_polynomial.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -51028,7 +51029,8 @@
         "TestHardwareContextIntegerBoundsAndOpenConflicts",
         "TestHardwareContextRootUnitAssertionResumeAndConflict",
         "TestHardwareIntervalConstantNodeViewAndMutationGuards",
-        "TestHardwareContextRelevantNewBoundSourceBranches"
+        "TestHardwareContextRelevantNewBoundSourceBranches",
+        "TestHardwarePolynomialForwardInverseAndUnboundedSelection"
       ],
       "conditionals": [
         {
@@ -51418,6 +51420,14 @@
           "tests": [
             "TestHardwareContextRelevantNewBoundSourceBranches"
           ]
+        },
+        {
+          "name": "Concrete config_hwf polynomial definition visit timestamp and variable-definition bound reasons",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_polynomial.go",
+          "tests": [
+            "TestHardwarePolynomialForwardInverseAndUnboundedSelection"
+          ]
         }
       ],
       "ownership": [
@@ -51495,7 +51505,8 @@
         "pkg/math/subpaving/hardware_node.go",
         "pkg/math/subpaving/hardware_context_bounds.go",
         "pkg/math/subpaving/hardware_context_units.go",
-        "pkg/math/subpaving/hardware_context_relevance.go"
+        "pkg/math/subpaving/hardware_context_relevance.go",
+        "pkg/math/subpaving/hardware_polynomial.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -51559,7 +51570,8 @@
         "TestHardwareContextIntegerBoundsAndOpenConflicts",
         "TestHardwareContextRootUnitAssertionResumeAndConflict",
         "TestHardwareIntervalConstantNodeViewAndMutationGuards",
-        "TestHardwareContextRelevantNewBoundSourceBranches"
+        "TestHardwareContextRelevantNewBoundSourceBranches",
+        "TestHardwarePolynomialForwardInverseAndUnboundedSelection"
       ],
       "assertions": [
         {
@@ -52197,6 +52209,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_relevance.go",
           "tests": [
             "TestHardwareContextRelevantNewBoundSourceBranches"
+          ]
+        },
+        {
+          "name": "Concrete config_hwf polynomial forward and inverse interval propagation with source single-unbounded-variable selection (src/math/subpaving/subpaving_t_def.h:1408-1496)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_polynomial.go",
+          "tests": [
+            "TestHardwarePolynomialForwardInverseAndUnboundedSelection"
           ]
         }
       ],
@@ -117985,7 +118005,8 @@
         "pkg/math/subpaving/hardware_interval_root.go",
         "pkg/math/subpaving/hardware_context_root.go",
         "pkg/math/subpaving/hardware_context_bounds.go",
-        "pkg/math/subpaving/hardware_context_relevance.go"
+        "pkg/math/subpaving/hardware_context_relevance.go",
+        "pkg/math/subpaving/hardware_polynomial.go"
       ],
       "tests": [
         "TestHardwareFloatNumeralDirectedIntervalOperations",
@@ -118014,7 +118035,8 @@
         "TestSubpavingHardwareIntervalXnEqYRetainedCases",
         "TestSubpavingHardwareContextBoundPolicyAndRootDispatch",
         "TestHardwareContextIntegerBoundsAndOpenConflicts",
-        "TestHardwareContextRelevantNewBoundSourceBranches"
+        "TestHardwareContextRelevantNewBoundSourceBranches",
+        "TestHardwarePolynomialForwardInverseAndUnboundedSelection"
       ],
       "conditionals": [
         {
@@ -118220,6 +118242,14 @@
           "go_target": "pkg/math/subpaving/hardware_context_relevance.go",
           "tests": [
             "TestHardwareContextRelevantNewBoundSourceBranches"
+          ]
+        },
+        {
+          "name": "Concrete f2n<hwf_manager> coefficient arithmetic reached by hardware polynomial interval propagation (src/util/f2n.h:70-159)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/hardware_polynomial.go",
+          "tests": [
+            "TestHardwarePolynomialForwardInverseAndUnboundedSelection"
           ]
         }
       ],

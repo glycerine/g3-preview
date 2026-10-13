@@ -84,10 +84,10 @@ func (n *HardwareNode) ConflictingBounds(variable uint32) (bool, error) {
 // PropagateBound creates a source mk_bound, then queues it for later
 // propagation. Candidate relevance is checked by its eventual caller.
 func (c *HardwareContext) PropagateBound(n *HardwareNode, variable uint32, value *numeral.HardwareFloat, lower, open bool) error {
-	return c.propagateBoundReason(n, variable, value, lower, open, hardwareReasonUnknown)
+	return c.propagateBoundReason(n, variable, value, lower, open, hardwareReasonUnknown, 0)
 }
 
-func (c *HardwareContext) propagateBoundReason(n *HardwareNode, variable uint32, value *numeral.HardwareFloat, lower, open bool, reason hardwareBoundReasonKind) error {
+func (c *HardwareContext) propagateBoundReason(n *HardwareNode, variable uint32, value *numeral.HardwareFloat, lower, open bool, reason hardwareBoundReasonKind, reasonVariable uint32) error {
 	if err := c.checkNode(n, variable); err != nil {
 		return err
 	}
@@ -107,6 +107,7 @@ func (c *HardwareContext) propagateBoundReason(n *HardwareNode, variable uint32,
 	b := n.trail
 	b.timestamp = c.timestamp
 	b.reason = reason
+	b.reasonVariable = reasonVariable
 	conflict, err := n.ConflictingBounds(variable)
 	if err != nil {
 		return err
