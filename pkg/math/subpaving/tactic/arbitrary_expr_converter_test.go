@@ -187,6 +187,12 @@ func TestArbitraryExprConverterTermsAndClause(t *testing.T) {
 	if !strings.Contains(out.String(), "2") {
 		t.Fatal("missing bound", out.String())
 	}
+	// An unbounded even power makes interval::power reset the lower endpoint
+	// to formatted zero. The next interval::set copies it through f2n::set,
+	// whose is_regular check refuses zero (interval_def.h:1333-1363,668-684).
+	if err := shell.Search(); !errors.Is(err, numeral.ErrArbitraryFloatNonRegular) {
+		t.Fatal("source MPF even-power refusal", err)
+	}
 	zeroConstant, err := m.MkFamilyApp(family, 6, nil, []ast.ASTHandle{x, y})
 	if err != nil {
 		t.Fatal(err)
