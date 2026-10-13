@@ -62,14 +62,46 @@ func TestParamDescrsSourceHistoryDefaultsAndDisplay(t *testing.T) {
 	if _, p, e := d.DescriptionName("missing"); e != nil || p {
 		t.Fatal(p, e)
 	}
-	if e = d.Insert(a, ParamBool, nil, nil, nil); e != ErrParamDescrsPrecondition {
-		t.Fatal("kind assertion", e)
+	if e = d.Insert(a, ParamBool, nil, nil, nil); paramDescrsStreamSourceDebug {
+		if e != ErrParamDescrsPrecondition {
+			t.Fatal("checked kind assertion", e)
+		}
+	} else if e != nil {
+		t.Fatal("release duplicate retains first descriptor", e)
 	}
-	if e = d.Insert(usymbol.Numerical(7), ParamBool, nil, nil, nil); e != ErrParamDescrsPrecondition {
-		t.Fatal(e)
+	if k, e := d.Kind(a); e != nil || k != ParamUInt {
+		t.Fatal("duplicate changed first kind", k, e)
 	}
-	if k, e := d.Kind(usymbol.Numerical(7)); e != nil || k != ParamInvalid {
-		t.Fatal(k, e)
+	other := pdnew(t, m, nil)
+	t.Cleanup(func() { paramsMust(t, other.Close()) })
+	paramsMust(t, other.Insert(a, ParamBool, pdstr("replacement"), nil, nil))
+	if e = d.Copy(other); paramDescrsStreamSourceDebug {
+		if e != ErrParamDescrsPrecondition {
+			t.Fatal("checked copied-kind assertion", e)
+		}
+	} else if e != nil {
+		t.Fatal("release copied duplicate retains first descriptor", e)
+	}
+	if k, e := d.Kind(a); e != nil || k != ParamUInt {
+		t.Fatal("copied duplicate changed first kind", k, e)
+	}
+	if n, e := d.Size(); e != nil || n != 3 {
+		t.Fatal("duplicate appended name history", n, e)
+	}
+	if e = d.Insert(usymbol.Numerical(7), ParamBool, nil, nil, nil); paramDescrsStreamSourceDebug {
+		if e != ErrParamDescrsPrecondition {
+			t.Fatal("checked numerical-name assertion", e)
+		}
+		if k, e := d.Kind(usymbol.Numerical(7)); e != nil || k != ParamInvalid {
+			t.Fatal(k, e)
+		}
+	} else {
+		if e != nil {
+			t.Fatal("release numerical-name insert", e)
+		}
+		if k, e := d.Kind(usymbol.Numerical(7)); e != nil || k != ParamBool {
+			t.Fatal(k, e)
+		}
 	}
 }
 func TestParamDescrsSourceModuleAndNullKinds(t *testing.T) {

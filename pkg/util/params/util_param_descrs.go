@@ -208,11 +208,11 @@ func (d *ParamDescrs) prepareInsert(k usymbol.Symbol, kind ParamKind) (bool, err
 	if e != nil {
 		return false, e
 	}
-	if k.IsNumerical() {
+	if paramDescrsStreamSourceDebug && k.IsNumerical() {
 		return false, ErrParamDescrsPrecondition
 	}
 	if info, found := d.entries.Get2(k); found {
-		if info.kind != kind {
+		if paramDescrsStreamSourceDebug && info.kind != kind {
 			return false, ErrParamDescrsPrecondition
 		}
 		return true, nil
