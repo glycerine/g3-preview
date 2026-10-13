@@ -162838,7 +162838,7 @@
           "name": "mpzzp setup_p and inv source TRACE records after reached arithmetic stages",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpzzp_trace.go",
-          "tests": ["TestIntegerModularSetupAndInverseSourceTrace"]
+          "tests": ["TestIntegerModularSetupAndInverseSourceTrace", "TestIntegerModularTraceSourceInsertionPrefixes", "TestIntegerModularTraceNumberFailureAfterSourcePrefix"]
         }
       ],
       "ownership": [
@@ -173709,7 +173709,7 @@
           "name": "mpzzp setup_p and inv TRACE at source lines 55, 175, 177 and 179",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpzzp_trace.go",
-          "tests": ["TestIntegerModularSetupAndInverseSourceTrace"]
+          "tests": ["TestIntegerModularSetupAndInverseSourceTrace", "TestIntegerModularTraceSourceInsertionPrefixes", "TestIntegerModularTraceNumberFailureAfterSourcePrefix"]
         },
         {
           "name": "mpfx add/sub outer STRACE and nonzero add_sub TRACE at source lines 368,403,408-416",
@@ -174077,7 +174077,7 @@
           "name": "mpzzp setup_p and inv TRACE at source lines 55, 175, 177 and 179",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpzzp_trace.go",
-          "tests": ["TestIntegerModularSetupAndInverseSourceTrace"]
+          "tests": ["TestIntegerModularSetupAndInverseSourceTrace", "TestIntegerModularTraceSourceInsertionPrefixes", "TestIntegerModularTraceNumberFailureAfterSourcePrefix"]
         },
         {
           "name": "mpfx add/sub outer STRACE and nonzero add_sub TRACE at source lines 368,403,408-416",

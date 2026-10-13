@@ -57,22 +57,22 @@ func TestFixedPointFloorCeilSourceTrace(t *testing.T) {
 	if err := m.Floor(n); err != nil {
 		t.Fatal(err)
 	}
-	check("[mpfx] Floor[-5/2] == -3\n")
+	check("[mpfx] (-5) / (2) >= -5/2\n[mpfx] Floor[-5/2] == -3\n")
 	set(-5, 2)
 	if err := m.Ceil(n); err != nil {
 		t.Fatal(err)
 	}
-	check("[mpfx] Ceiling[-5/2] == -2\n")
+	check("[mpfx] (-5) / (2) >= -5/2\n[mpfx] Ceiling[-5/2] == -2\n")
 	set(5, 2)
 	if err := m.Floor(n); err != nil {
 		t.Fatal(err)
 	}
-	check("[mpfx] Floor[5/2] == 2\n")
+	check("[mpfx] (5) / (2) >= 5/2\n[mpfx] Floor[5/2] == 2\n")
 	set(5, 2)
 	if err := m.Ceil(n); err != nil {
 		t.Fatal(err)
 	}
-	check("[mpfx] Ceiling[5/2] == 3\n")
+	check("[mpfx] (5) / (2) >= 5/2\n[mpfx] Ceiling[5/2] == 3\n")
 	if err := m.SetUint64(n, (1<<32)-1); err != nil {
 		t.Fatal(err)
 	}
