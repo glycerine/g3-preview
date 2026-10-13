@@ -1367,7 +1367,7 @@ func (c *ParamsContext) appendDescrs(d *ParamDescrs) error {
 		if !found {
 			return ErrParamDescrsPrecondition
 		}
-		if !info.descr.present {
+		if paramDescrsStreamSourceDebug && !info.descr.present {
 			return ErrParamDescrsPrecondition
 		}
 	}
