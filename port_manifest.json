@@ -170871,7 +170871,8 @@
         "TestZ3ExceptionSourceCodesAndLabels",
         "TestDefaultExceptionSourceStringAndEmbeddedNUL",
         "TestDefaultExceptionSourceFormattedConstructor",
-        "TestDefaultExceptionRetainedDatalogUnsignedLine"
+        "TestDefaultExceptionRetainedDatalogUnsignedLine",
+        "TestDefaultExceptionRetainedDatalogUnsignedSymbol"
       ],
       "assertions": [
         {
@@ -170901,12 +170902,13 @@
           ]
         },
         {
-          "name": "selected default_exception(fmt, char const*, ...) %s/%d/%u construction and Linux AMD64 stream truncation; other C formats and MUZ/parser callers remain",
+          "name": "selected default_exception(fmt, char const*, ...) %s/%d/%u/%I64u construction and Linux AMD64 stream truncation; MUZ/parser callers remain",
           "status": "partial",
           "go_target": "pkg/util/z3exception/z3_exception.go",
           "tests": [
             "TestDefaultExceptionSourceFormattedConstructor",
-            "TestDefaultExceptionRetainedDatalogUnsignedLine"
+            "TestDefaultExceptionRetainedDatalogUnsignedLine",
+            "TestDefaultExceptionRetainedDatalogUnsignedSymbol"
           ]
         }
       ],
@@ -170915,7 +170917,7 @@
         "The selected formatted constructor uses Go fmt and the Linux AMD64 1023-byte stream boundary; retained MUZ/parser call sites remain unported."
       ],
       "deviations": [
-        "Go error values replace virtual exception transport. Selected %s/%d/%u formatted construction uses Go fmt with C-string input boundaries and Linux AMD64 truncation. Other C formats and the virtual exception/iostream implementation remain open. Message preserves the source first-NUL observation."
+        "Go error values replace virtual exception transport. The retained %s/%d/%u/%I64u format profiles use Go fmt with C-string input boundaries and Linux AMD64 truncation. MUZ/parser integration and virtual exception transport remain open. Message preserves the source first-NUL observation."
       ]
     },
     {
@@ -170933,6 +170935,7 @@
         "TestDefaultExceptionSourceStringAndEmbeddedNUL",
         "TestDefaultExceptionSourceFormattedConstructor",
         "TestDefaultExceptionRetainedDatalogUnsignedLine",
+        "TestDefaultExceptionRetainedDatalogUnsignedSymbol",
         "TestMemoryFatalNonExitExceptionCatch",
         "TestMemoryFatalRealExitWithActiveReservationRefusal"
       ],
@@ -170968,12 +170971,13 @@
           ]
         },
         {
-          "name": "selected default_exception(fmt, char const*, ...) %s/%d/%u construction and Linux AMD64 stream truncation; other C formats and MUZ/parser callers remain",
+          "name": "selected default_exception(fmt, char const*, ...) %s/%d/%u/%I64u construction and Linux AMD64 stream truncation; MUZ/parser callers remain",
           "status": "partial",
           "go_target": "pkg/util/z3exception/z3_exception.go",
           "tests": [
             "TestDefaultExceptionSourceFormattedConstructor",
-            "TestDefaultExceptionRetainedDatalogUnsignedLine"
+            "TestDefaultExceptionRetainedDatalogUnsignedLine",
+            "TestDefaultExceptionRetainedDatalogUnsignedSymbol"
           ]
         },
         {
@@ -170991,7 +170995,7 @@
         "The selected formatted constructor uses Go fmt and the Linux AMD64 1023-byte stream boundary; retained MUZ/parser call sites remain unported."
       ],
       "deviations": [
-        "Go error values replace virtual exception transport. Selected %s/%d/%u formatted construction uses Go fmt with C-string input boundaries and Linux AMD64 truncation. Other C formats and the virtual exception/iostream implementation remain open. Message preserves the source first-NUL observation."
+        "Go error values replace virtual exception transport. The retained %s/%d/%u/%I64u format profiles use Go fmt with C-string input boundaries and Linux AMD64 truncation. MUZ/parser integration and virtual exception transport remain open. Message preserves the source first-NUL observation."
       ]
     },
     {

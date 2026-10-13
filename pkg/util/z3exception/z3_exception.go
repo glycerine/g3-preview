@@ -93,17 +93,23 @@ type DefaultException struct{ MessageField string }
 
 func NewDefaultException(message string) DefaultException { return DefaultException{message} }
 
-// NewDefaultExceptionf covers retained %s/%d/%u formatted constructor calls.
+// NewDefaultExceptionf covers retained %s/%d/%u/%I64u constructor calls.
 // The selected Linux AMD64 format2ostream profile writes at most 1023 bytes.
 func NewDefaultExceptionf(format string, args ...any) DefaultException {
 	format = format[:cStringLength(format)]
-	// The retained datalog parser uses the plain C unsigned-decimal verb.
-	// Go formats unsigned integers with %d; leave escaped %% untouched.
-	if strings.Contains(format, "%u") {
+	// The retained datalog parser uses C unsigned-decimal verbs for 32- and
+	// 64-bit line/symbol numbers. Go formats both unsigned types with %d.
+	// Escaped %% must keep the following text literal.
+	if strings.Contains(format, "%u") || strings.Contains(format, "%I64u") {
 		var converted strings.Builder
 		converted.Grow(len(format))
 		for i := 0; i < len(format); i++ {
 			if format[i] == '%' && i+1 < len(format) {
+				if strings.HasPrefix(format[i+1:], "I64u") {
+					converted.WriteString("%d")
+					i += 4
+					continue
+				}
 				switch format[i+1] {
 				case '%':
 					converted.WriteString("%%")

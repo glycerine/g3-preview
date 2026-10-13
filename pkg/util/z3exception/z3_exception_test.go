@@ -80,3 +80,14 @@ func TestDefaultExceptionRetainedDatalogUnsignedLine(t *testing.T) {
 		t.Fatalf("escaped percent = %q, want %q", got.Message(), want)
 	}
 }
+
+func TestDefaultExceptionRetainedDatalogUnsignedSymbol(t *testing.T) {
+	got := NewDefaultExceptionf("unknown symbol number %I64u on line %d in file %s", ^uint64(0), 31, "facts.rel")
+	if want := "unknown symbol number 18446744073709551615 on line 31 in file facts.rel"; got.Message() != want {
+		t.Fatalf("message = %q, want %q", got.Message(), want)
+	}
+	got = NewDefaultExceptionf("%%I64u = %I64u", uint64(42))
+	if want := "%I64u = 42"; got.Message() != want {
+		t.Fatalf("escaped percent = %q, want %q", got.Message(), want)
+	}
+}
