@@ -51750,6 +51750,8 @@
         "pkg/math/subpaving/arbitrary_context_child_test.go",
         "pkg/math/subpaving/arbitrary_split.go",
         "pkg/math/subpaving/arbitrary_split_test.go",
+        "pkg/math/subpaving/arbitrary_selector.go",
+        "pkg/math/subpaving/arbitrary_selector_test.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
@@ -51844,6 +51846,7 @@
         "TestArbitraryContextRootInitializationStagesAndConflict",
         "TestArbitraryChildRecentBoundReplayAndPolynomialWatcher",
         "TestArbitraryMidpointSplitterSourceBranches",
+        "TestArbitrarySelectorsBreadthFirstAndRoundRobin",
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFixedNodeBoundPredicates",
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
@@ -52589,6 +52592,18 @@
           ],
           "tests": [
             "TestArbitraryMidpointSplitterSourceBranches"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf breadth-first leaf selection and round-robin variable scan after latest axiom decision (src/math/subpaving/subpaving_t_def.h:24-101,344-359)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_selector.go",
+          "go_targets": [
+            "pkg/math/subpaving/arbitrary_context_bounds.go",
+            "pkg/math/subpaving/arbitrary_context_child.go"
+          ],
+          "tests": [
+            "TestArbitrarySelectorsBreadthFirstAndRoundRobin"
           ]
         },
         {

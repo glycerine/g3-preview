@@ -36,6 +36,7 @@ type ArbitraryContext struct {
 	initDefHead                                     uint32
 	root                                            *ArbitraryNode
 	nodes                                           []*ArbitraryNode
+	leafHead, leafTail                              *ArbitraryNode
 	bounds                                          []*ArbitraryBound
 	queue                                           []*ArbitraryBound
 	queueHead                                       int
@@ -215,6 +216,7 @@ func (c *ArbitraryContext) Close() error {
 	c.bounds = nil
 	c.root = nil
 	c.nodes = nil
+	c.leafHead, c.leafTail = nil, nil
 	for len(c.unitClauses) != 0 {
 		a := c.unitClauses[0].atom
 		if a.refs == 0 {

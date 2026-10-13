@@ -33,6 +33,9 @@ type ArbitraryNode struct {
 	id           uint32
 	depth        uint32
 	children     uint32
+	leafPrev     *ArbitraryNode
+	leafNext     *ArbitraryNode
+	queuedLeaf   bool
 	lower, upper []*ArbitraryBound
 	trail        *ArbitraryBound
 	conflictVar  uint32
@@ -72,6 +75,7 @@ func (c *ArbitraryContext) Root() (*ArbitraryNode, error) {
 			upper: make([]*ArbitraryBound, len(c.variables)), conflictVar: math.MaxUint32,
 		}
 		c.nodes = append(c.nodes, c.root)
+		c.pushLeafFront(c.root)
 	}
 	return c.root, nil
 }

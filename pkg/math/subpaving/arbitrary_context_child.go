@@ -26,6 +26,7 @@ func (c *ArbitraryContext) NewChildNode(parent *ArbitraryNode) (*ArbitraryNode, 
 	}
 	parent.children++
 	c.nodes = append(c.nodes, n)
+	c.pushLeafFront(n)
 	return n, nil
 }
 
