@@ -21,11 +21,7 @@ func (e FastExtended) Display(w io.Writer, a *numeral.FastFloat, k ExtendedKind)
 	case PlusInfinity:
 		s = "+oo"
 	default:
-		var err error
-		s, err = e.Numbers.String(a)
-		if err != nil {
-			return err
-		}
+		return e.Numbers.DisplayTo(w, a)
 	}
 	return writeExtendedText(w, s)
 }

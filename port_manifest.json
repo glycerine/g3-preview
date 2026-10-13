@@ -148225,6 +148225,7 @@
         "pkg/util/numeral/mpff_arithmetic.go",
         "pkg/util/numeral/mpff_convert.go",
         "pkg/util/numeral/mpff_format.go",
+        "pkg/util/numeral/mpff_stream.go",
         "pkg/util/numeral/mpff_limbs.go",
         "pkg/util/numeral/mpff_predicates.go",
         "pkg/util/numeral/mpff_ref.go",
@@ -148242,6 +148243,7 @@
         "TestFastFloatToIntegerSourceReleaseTruncation",
         "TestFastFloatGetterSourceReleaseActions",
         "TestFastFloatSourcePrintedPaths",
+        "TestFastFloatDisplayToSourceInsertionsAndShortWrites",
         "TestFastFloatIndependentDirectedAliases",
         "TestFastFloatConstructorReservationPrefixes",
         "TestFastFloatArithmeticFailureRoots",
@@ -148835,6 +148837,14 @@
           "tests": []
         },
         {
+          "name": "mpff_manager::display source-order sign, significand and exponent writer insertions reached by fast subpaving interval endpoints (src/util/mpff.cpp:1173-1224)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff_stream.go",
+          "tests": [
+            "TestFastFloatDisplayToSourceInsertionsAndShortWrites"
+          ]
+        },
+        {
           "name": "MPFF full-precision character formatting and four reusable typed Go decimal scratch slices; character scratch also uses native byte slices; shared MPN numerical workspaces use native slices",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpff_format_scope.go",
@@ -148881,6 +148891,7 @@
         "pkg/util/numeral/mpff_arithmetic.go",
         "pkg/util/numeral/mpff_convert.go",
         "pkg/util/numeral/mpff_format.go",
+        "pkg/util/numeral/mpff_stream.go",
         "pkg/util/numeral/mpff_limbs.go",
         "pkg/util/numeral/mpff_predicates.go",
         "pkg/util/numeral/mpff_ref.go",
@@ -148898,6 +148909,7 @@
         "TestFastFloatToIntegerSourceReleaseTruncation",
         "TestFastFloatGetterSourceReleaseActions",
         "TestFastFloatSourcePrintedPaths",
+        "TestFastFloatDisplayToSourceInsertionsAndShortWrites",
         "TestFastFloatIndependentDirectedAliases",
         "TestFastFloatConstructorReservationPrefixes",
         "TestFastFloatArithmeticFailureRoots",
@@ -149112,6 +149124,14 @@
           "name": "persistent ostream state/transport, TRACE/STRACE actions, source exception transport and subpaving consumer integration",
           "status": "unported",
           "tests": []
+        },
+        {
+          "name": "mpff_manager::display source-order sign, significand and exponent writer insertions reached by fast subpaving interval endpoints (src/util/mpff.h:468; src/util/mpff.cpp:1173-1224)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff_stream.go",
+          "tests": [
+            "TestFastFloatDisplayToSourceInsertionsAndShortWrites"
+          ]
         },
         {
           "name": "MPFF full-precision character formatting and four reusable typed Go decimal scratch slices; character scratch also uses native byte slices; shared MPN numerical workspaces use native slices",
