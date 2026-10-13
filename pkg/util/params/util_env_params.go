@@ -31,6 +31,24 @@ func NewEnvParamsRuntime(g *GlobalParams, v *diagnostic.VerboseContext, m *memor
 	return &EnvParamsRuntime{globals: g, verbose: v, memory: m, warnings: w}, nil
 }
 
+// UpdateProcessEnvParams binds env_params::updt_params to a current concrete
+// gparams owner and the retained process-wide verbosity and warning owners.
+// The rational service's runtime supplies the shared memory process limits.
+func UpdateProcessEnvParams(g *GlobalParams) error {
+	if g == nil || g.ContextField == nil {
+		return arena.ErrConfig
+	}
+	q := g.ContextField.Numerals()
+	if q == nil || q.RuntimeOwner() == nil {
+		return arena.ErrConfig
+	}
+	env, err := NewEnvParamsRuntime(g, diagnostic.BorrowProcessVerboseContext(), q.RuntimeOwner(), diagnostic.BorrowProcessWarningService())
+	if err != nil {
+		return err
+	}
+	return env.Update()
+}
+
 func (e *EnvParamsRuntime) WarningsEnabled() bool { return e != nil && e.warnings.Enabled() }
 
 // Update follows the five source statements. A later failed getter or setter

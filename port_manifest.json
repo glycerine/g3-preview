@@ -118581,7 +118581,8 @@
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
         "TestGlobalParamsCatalogDispatcherFaultRoots",
         "TestEnvParamsRuntimeSourceOrderAndRawWatermark",
-        "TestRuntimeSourceMegabytesToBytesSaturatesAtSizeT"
+        "TestRuntimeSourceMegabytesToBytesSaturatesAtSizeT",
+        "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -118603,7 +118604,8 @@
           "status": "ported",
           "go_target": "pkg/util/params/util_env_params.go",
           "tests": [
-            "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
+            "TestEnvParamsRuntimeSourceOrderAndRawWatermark",
+            "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
           ]
         }
       ],
@@ -118632,7 +118634,8 @@
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
         "TestGlobalParamsCatalogDispatcherFaultRoots",
         "TestEnvParamsRuntimeSourceOrderAndRawWatermark",
-        "TestRuntimeSourceMegabytesToBytesSaturatesAtSizeT"
+        "TestRuntimeSourceMegabytesToBytesSaturatesAtSizeT",
+        "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
       ],
       "conditionals": [
         {
@@ -118664,7 +118667,8 @@
           "status": "ported",
           "go_target": "pkg/util/params/util_env_params.go",
           "tests": [
-            "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
+            "TestEnvParamsRuntimeSourceOrderAndRawWatermark",
+            "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
           ]
         }
       ],
@@ -172097,7 +172101,8 @@
         "pkg/util/memory/allocator_io.go",
         "pkg/util/diagnostic/util_small_object_allocator.go",
         "pkg/util/diagnostic/util_small_object_allocator_stream.go",
-        "pkg/util/diagnostic/util_process_verbose.go"
+        "pkg/util/diagnostic/util_process_verbose.go",
+        "pkg/util/params/util_env_params.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -172121,7 +172126,8 @@
         "TestVerboseContextAllocatorEveryOutputRefusal",
         "TestVerboseContextClosedLevelReachedBeforeOutput",
         "TestVerboseContextWarmOutputAndNullAdapter",
-        "TestProcessVerboseGlobalsDefaultAndBorrowedSelection"
+        "TestProcessVerboseGlobalsDefaultAndBorrowedSelection",
+        "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -172220,7 +172226,11 @@
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_process_verbose.go",
           "tests": [
-            "TestProcessVerboseGlobalsDefaultAndBorrowedSelection"
+            "TestProcessVerboseGlobalsDefaultAndBorrowedSelection",
+            "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
+          ],
+          "go_targets": [
+            "pkg/util/params/util_env_params.go"
           ]
         },
         {
@@ -172279,7 +172289,8 @@
         "pkg/ast/rewriter/bv_rewriter_shift.go",
         "pkg/test/uint_set_test.go",
         "pkg/math/subpaving/hardware_context_root.go",
-        "pkg/util/diagnostic/util_process_verbose.go"
+        "pkg/util/diagnostic/util_process_verbose.go",
+        "pkg/util/params/util_env_params.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -172315,7 +172326,8 @@
         "TestASTSomeValueProcScopedPriorityAndFailureRestoration",
         "TestASTSomeValueProcFallbackReservationFailureRestores",
         "TestSubpavingHardwareContextBoundPolicyAndRootDispatch",
-        "TestProcessVerboseGlobalsDefaultAndBorrowedSelection"
+        "TestProcessVerboseGlobalsDefaultAndBorrowedSelection",
+        "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
       ],
       "conditionals": [
         {
@@ -172582,7 +172594,11 @@
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_process_verbose.go",
           "tests": [
-            "TestProcessVerboseGlobalsDefaultAndBorrowedSelection"
+            "TestProcessVerboseGlobalsDefaultAndBorrowedSelection",
+            "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
+          ],
+          "go_targets": [
+            "pkg/util/params/util_env_params.go"
           ]
         },
         {
@@ -173674,7 +173690,8 @@
         "TestWarningRetainedDatalogUnsignedSymbol",
         "TestDefaultExceptionSourceFormattedConstructor",
         "TestEnvParamsRuntimeSourceOrderAndRawWatermark",
-        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
+        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
+        "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
       ],
       "conditionals": [
         {
@@ -173731,7 +173748,11 @@
           "go_target": "pkg/util/diagnostic/util_warning.go",
           "tests": [
             "TestWarningSourceDefaultRoutingAndDisabledState",
-            "TestWarningSourceBorrowedStreamTruncationAndFallback"
+            "TestWarningSourceBorrowedStreamTruncationAndFallback",
+            "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
+          ],
+          "go_targets": [
+            "pkg/util/params/util_env_params.go"
           ]
         },
         {
@@ -173798,7 +173819,8 @@
         "TestWarningRetainedDatalogUnsignedSymbol",
         "TestDefaultExceptionSourceFormattedConstructor",
         "TestEnvParamsRuntimeSourceOrderAndRawWatermark",
-        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
+        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
+        "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
       ],
       "conditionals": [
         {
@@ -173821,10 +173843,12 @@
             "TestWarningSourceDefaultRoutingAndDisabledState",
             "TestWarningSourceBorrowedStreamTruncationAndFallback",
             "TestWarningShortWritePreservesSourceInsertionPrefix",
-            "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
+            "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
+            "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
           ],
           "go_targets": [
-            "pkg/tactic/ufbv/rewrite_formula_process.go"
+            "pkg/tactic/ufbv/rewrite_formula_process.go",
+            "pkg/util/params/util_env_params.go"
           ]
         },
         {

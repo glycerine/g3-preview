@@ -110,6 +110,39 @@ func TestEnvParamsRuntimeSourceOrderAndRawWatermark(t *testing.T) {
 	}
 }
 
+func TestUpdateProcessEnvParamsSharedVerbosityAndWarning(t *testing.T) {
+	g, _, _, _, _ := envParamsRuntimeFixture(t)
+	warnings := diagnostic.BorrowProcessWarningService()
+	oldEnabled := warnings.Enabled()
+	oldLevel, e := diagnostic.ProcessVerbosityLevel()
+	paramsMust(t, e)
+	var output bytes.Buffer
+	paramsMust(t, warnings.SetWarningStream(&output))
+	t.Cleanup(func() {
+		paramsMust(t, warnings.SetWarningStream(nil))
+		paramsMust(t, warnings.Enable(oldEnabled))
+		paramsMust(t, diagnostic.SetProcessVerbosityLevel(oldLevel))
+	})
+	paramsMust(t, g.SetName("verbose", "13"))
+	paramsMust(t, g.SetName("warning", "false"))
+	paramsMust(t, UpdateProcessEnvParams(g))
+	level, e := diagnostic.ProcessVerbosityLevel()
+	paramsMust(t, e)
+	if level != 13 || warnings.Enabled() {
+		t.Fatal("process environment settings", level, warnings.Enabled())
+	}
+	paramsMust(t, warnings.Warning("suppressed"))
+	if output.Len() != 0 {
+		t.Fatal("disabled warning wrote output", output.String())
+	}
+	paramsMust(t, g.SetName("warning", "true"))
+	paramsMust(t, UpdateProcessEnvParams(g))
+	paramsMust(t, warnings.Warning("visible"))
+	if got, want := output.String(), "WARNING: visible\n"; got != want {
+		t.Fatal("re-enabled process warning", got, want)
+	}
+}
+
 func TestEnvParamsSharedProcessWatermarkAndNumericCohort(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
 	p := umemory.NewProcessAccounting()

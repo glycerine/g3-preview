@@ -14,6 +14,10 @@ import (
 // The default formatter borrows os.Stderr for the lifetime of the process.
 var processVerboseContext = newProcessVerboseContext()
 
+// BorrowProcessVerboseContext supplies the one source global owner to retained
+// environment-parameter and diagnostic consumers. Callers must not close it.
+func BorrowProcessVerboseContext() *VerboseContext { return processVerboseContext }
+
 func newProcessVerboseContext() *VerboseContext {
 	b := arena.NewBudget(math.MaxUint64)
 	stream, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b, BorrowedFile: os.Stderr})

@@ -162,7 +162,31 @@ func TestUFBVRewriterTacticProofModePreservesFormulaAndProof(t *testing.T) {
 	if got, want := warningOutput.String(), "WARNING: PRE_DEMODULATOR=true is not supported when proofs are enabled.\n"; got != want {
 		t.Fatal("source proof-mode warning", got, want)
 	}
-	cacheMust(t, warnings.Enable(false))
+	envBudget := arena.NewBudget(1 << 20)
+	global, e := uparams.NewGlobalParams(m.Symbols, ctx, uparams.GlobalParamsConfig{Budget: envBudget, Register: func(r uparams.GlobalParamsRegistrar) error {
+		d, err := uparams.NewParamDescrs(m.Symbols, uparams.ParamDescrsConfig{Budget: envBudget, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: envBudget}}})
+		if err != nil {
+			return err
+		}
+		defer d.Close()
+		description, defaultValue := "enable/disable warning messages", "true"
+		if err := d.InsertName("warning", uparams.ParamBool, &description, &defaultValue, nil); err != nil {
+			return err
+		}
+		return r.RegisterGlobal(d)
+	}})
+	cacheMust(t, e)
+	t.Cleanup(func() {
+		cacheMust(t, global.Close())
+		if envBudget.Used() != 0 {
+			t.Error("environment global roots", envBudget.Used())
+		}
+	})
+	cacheMust(t, global.SetName("warning", "false"))
+	cacheMust(t, uparams.UpdateProcessEnvParams(global))
+	if warnings.Enabled() {
+		t.Fatal("source environment update did not reach process warning state")
+	}
 	_, e = rewriter.Apply(goal)
 	cacheMust(t, e)
 	if got, want := warningOutput.String(), "WARNING: PRE_DEMODULATOR=true is not supported when proofs are enabled.\n"; got != want {
