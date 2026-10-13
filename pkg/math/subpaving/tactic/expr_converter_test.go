@@ -13,6 +13,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
+	"github.com/glycerine/g3/pkg/util/statistics"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -52,6 +53,10 @@ func TestHardwareExprConverterTerms(t *testing.T) {
 	}
 	key := "numeral"
 	if err := pc.SetSymbolName(&p, &key, hwf); err != nil {
+		t.Fatal(err)
+	}
+	depthKey := "max_depth"
+	if err := pc.SetUIntName(&p, &depthKey, 0); err != nil {
 		t.Fatal(err)
 	}
 	qm, err := numeral.NewRationalManager(numeral.RationalConfig{Integers: numeral.IntegerConfig{Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}})
@@ -458,6 +463,35 @@ func TestHardwareExprConverterTerms(t *testing.T) {
 	}
 	if _, err := converter.InternalizeInequality(badRHS); !errors.Is(err, ErrHardwareArithmeticLHS) {
 		t.Fatalf("non-numeral right side: %v", err)
+	}
+	badGoal, err := goaltactic.NewGoal(m, false, false, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := badGoal.Assert(badAtom); err != nil {
+		t.Fatal(err)
+	}
+	if err := converter.SearchGoal(badGoal); !errors.Is(err, ErrHardwareUnsupportedAtom) {
+		t.Fatalf("invalid goal should stop before search: %v", err)
+	}
+	if err := badGoal.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err := converter.SearchGoal(goal); err != nil {
+		t.Fatal(err)
+	}
+	stats := statistics.New()
+	if err := shell.CollectStatistics(stats); err != nil {
+		t.Fatal(err)
+	}
+	foundRoot := false
+	for i := 0; i < stats.Size(); i++ {
+		if stats.Key(i) == "nodes" && stats.UintValue(i) == 1 {
+			foundRoot = true
+		}
+	}
+	if !foundRoot {
+		t.Fatalf("goal search did not process the bounded root: %v", stats)
 	}
 	if err := converter.Close(); err != nil {
 		t.Fatal(err)

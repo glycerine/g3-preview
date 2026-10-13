@@ -52761,9 +52761,11 @@
         },
         {
           "name": "Selected-engine context replacement, expression converter, goal processing and tactic lifetime (src/math/subpaving/tactic/subpaving_tactic.cpp:109-259)",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/tactic/goal_internalize.go",
+          "tests": [
+            "TestHardwareExprConverterTerms"
+          ]
         },
         {
           "name": "Concrete HWF engine branch constructs selected context and shell with borrowed rational manager and resource limit (src/math/subpaving/tactic/subpaving_tactic.cpp:109-120)",
@@ -52776,7 +52778,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The HWF branch constructs a context and expression converter, internalizes <=/>= literals with numeral right sides, unwraps nested negations, scales bounds by exact numerator/denominator, and adds goal clauses in source order. MPQ/MPF/MPFF/MPFX engine construction, AST variable display, search/result tactic owner, simplify pipeline and factory remain open."
+        "The HWF branch constructs a context and expression converter, internalizes <=/>= literals with numeral right sides, unwraps nested negations, scales bounds by exact numerator/denominator, adds goal clauses in source order and searches the resulting hardware context. MPQ/MPF/MPFF/MPFX engine construction, AST variable display, optional print_nodes output, result tactic ownership, simplify pipeline and factory remain open."
       ]
     },
     {
