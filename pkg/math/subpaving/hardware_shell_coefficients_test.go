@@ -147,11 +147,10 @@ func TestSubpavingHardwareShellCoefficientAndInequalityConversion(t *testing.T) 
 	if child.id != 1 || child.depth != 1 || child.context != c {
 		t.Fatal("context child node identity")
 	}
-	if err := c.Close(); !errors.Is(err, arena.ErrInvalidSlot) {
-		t.Fatal("context with live child", err)
-	}
-	must(child.Close())
 	must(c.Close())
+	if !child.closed || !root.closed || c.activeNodes != 0 {
+		t.Fatal("context must release children before root")
+	}
 	if err := w.PrepareInequality(&q, true); !errors.Is(err, arena.ErrClosed) {
 		t.Fatal("closed wrapper context", err)
 	}

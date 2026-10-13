@@ -49,6 +49,7 @@ type HardwareNode struct {
 	leafPrev     *HardwareNode
 	leafNext     *HardwareNode
 	queuedLeaf   bool
+	registered   bool
 	conflictVar  uint32
 	closed       bool
 }
@@ -139,6 +140,9 @@ func (n *HardwareNode) Close() error {
 		n.context.removeLeaf(n)
 	}
 	n.closed = true
+	if n.registered {
+		n.context.activeNodes--
+	}
 	if n.parent != nil {
 		n.parent.children--
 	}
@@ -159,7 +163,10 @@ func (c *HardwareContext) CreateRootNode() (*HardwareNode, error) {
 		return nil, err
 	}
 	n.context = c
+	n.registered = true
 	c.root = n
+	c.nodes = append(c.nodes, n)
+	c.activeNodes++
 	c.nextNodeID = 1
 	c.pushLeafFront(n)
 	return n, nil
@@ -178,6 +185,9 @@ func (c *HardwareContext) NewChildNode(parent *HardwareNode) (*HardwareNode, err
 		return nil, err
 	}
 	c.nextNodeID++
+	n.registered = true
+	c.nodes = append(c.nodes, n)
+	c.activeNodes++
 	c.pushLeafFront(n)
 	return n, nil
 }

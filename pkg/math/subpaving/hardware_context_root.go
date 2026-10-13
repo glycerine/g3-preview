@@ -35,6 +35,8 @@ type HardwareContext struct {
 	inequalities     []*HardwareInequality
 	clauses          []*HardwareClause
 	root             *HardwareNode
+	nodes            []*HardwareNode
+	activeNodes      uint32
 	leafHead         *HardwareNode
 	leafTail         *HardwareNode
 	nextNodeID       uint32
@@ -44,6 +46,9 @@ type HardwareContext struct {
 	unitClauses      []hardwareUnitClause
 	unitHead         int
 	numVisited       uint64
+	numSplits        uint64
+	searchNode       *HardwareNode
+	searchPhase      uint8
 	initStage        uint8
 	initDefHead      uint32
 	closed           bool
@@ -165,8 +170,8 @@ func (c *HardwareContext) Close() error {
 	if c.closed {
 		return nil
 	}
-	if c.root != nil {
-		if err := c.root.Close(); err != nil {
+	for i := len(c.nodes) - 1; i >= 0; i-- {
+		if err := c.nodes[i].Close(); err != nil {
 			return err
 		}
 	}
