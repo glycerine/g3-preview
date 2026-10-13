@@ -1,11 +1,49 @@
-// Source: src/util/mpf.cpp:69-106,114-181; src/util/mpf.h:76,78-79.
+// Source: src/util/mpf.cpp:69-106,114-181,303-316; src/util/mpf.h:76,78-79.
 package numeral
 
 import (
 	"math"
+	"math/bits"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
+
+// SetComponentsUint64 is the scalar-significand overload used by the FPA API.
+// The source publishes format and sign before the integer SET, then exponent.
+func (m *ArbitraryFloatManager) SetComponentsUint64(out *ArbitraryFloat, ebits, sbits uint32, sign bool, exponent int64, significand uint64) error {
+	return m.SetComponentsUint64WithReceipt(out, ebits, sbits, sign, exponent, significand, nil)
+}
+
+func (m *ArbitraryFloatManager) SetComponentsUint64WithReceipt(out *ArbitraryFloat, ebits, sbits uint32, sign bool, exponent int64, significand uint64, receipt *ArbitraryFloatValueInputReceipt) (cause error) {
+	if e := m.valueGuard(out); e != nil {
+		return e
+	}
+	context, e := m.beginValueInput(receipt)
+	if e != nil {
+		return e
+	}
+	defer func() { m.finishValueInput(cause) }()
+	out.assignEbits(ebits)
+	out.assignSbits(sbits)
+	out.assignSign(sign)
+	m.valueExecuting = true
+	if e := m.integer.setUint64WithAllocationContext(&out.significand, significand, context); e != nil {
+		m.valueExecuting = false
+		return e
+	}
+	m.valueExecuting = false
+	out.exponent = exponent
+	if modularSourceDebug {
+		if sbits == 0 || uint32(bits.Len64(significand)) >= sbits || ebits < 2 || ebits >= 64 {
+			return ErrIntegerAssertion
+		}
+		top := int64(1) << (ebits - 1)
+		if exponent > top || exponent < -(top-1) {
+			return ErrIntegerAssertion
+		}
+	}
+	return nil
+}
 
 // SetInt32 is the literal machine-int overload. In particular it normalizes the
 // uint32 word before removing the implicit leading bit; no rounding mode is
