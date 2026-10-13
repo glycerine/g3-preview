@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 var ErrMixedNotation = errors.New("mpnum: mixing rational/scientific notation")
@@ -33,7 +34,27 @@ func (e *ParseError) Unwrap() error {
 		return ErrDivideByZero
 	}
 }
-func (e *ParseError) Error() string { return e.Unwrap().Error() }
+func (e *ParseError) Message() string {
+	switch e.Reason {
+	case ParseMixedNotation:
+		return "mixing rational/scientific notation"
+	case ParseExponentTooLarge:
+		return "exponent is too big"
+	default:
+		return "division by zero"
+	}
+}
+func (e *ParseError) Error() string                    { return e.Message() }
+func (e *ParseError) ErrorCode() z3exception.ErrorCode { return z3exception.ErrorOK }
+func (e *ParseError) HasErrorCode() bool               { return false }
+func (e *ParseError) As(target any) bool {
+	base, ok := target.(*z3exception.DefaultException)
+	if !ok {
+		return false
+	}
+	*base = z3exception.NewDefaultException(e.Message())
+	return true
+}
 
 // SetString explicitly initializes/reinitializes owned integer fields, including
 // a zero denominator. Ordinary arithmetic still rejects that raw state. The

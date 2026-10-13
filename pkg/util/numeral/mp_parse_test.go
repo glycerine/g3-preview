@@ -13,6 +13,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestSourceStringAssertions(t *testing.T) {
@@ -129,8 +130,21 @@ func TestParserExceptionCategoriesAndFailurePublication(t *testing.T) {
 			e := m.SetString(&a, f.text)
 			parserPublicationAudit(t, m, &a.Num, &a.Den)
 			var parsed *ParseError
+			var source z3exception.Z3Exception
+			var concrete z3exception.DefaultException
+			wantMessage := map[ParseErrorReason]string{
+				ParseMixedNotation:    "mixing rational/scientific notation",
+				ParseExponentTooLarge: "exponent is too big",
+				ParseZeroDenominator:  "division by zero",
+			}[f.reason]
 			if !errors.As(e, &parsed) || parsed.Reason != f.reason || !errors.Is(e, f.sentinel) || roundPublicationDecode(t, m.Z, &a.Num).Cmp(big.NewInt(f.n)) != 0 || roundPublicationDecode(t, m.Z, &a.Den).Cmp(big.NewInt(f.d)) != 0 {
 				t.Fatal(synch, f, e)
+			}
+			if !errors.As(e, &source) || source.Message() != wantMessage || source.Error() != wantMessage || source.ErrorCode() != z3exception.ErrorOK || source.HasErrorCode() {
+				t.Fatal("source default_exception parser transport", synch, f.text, e)
+			}
+			if !errors.As(e, &concrete) || concrete.Message() != wantMessage {
+				t.Fatal("source concrete default_exception parser catch", synch, f.text, e)
 			}
 			qopsMust(t, m.Del(&a))
 			m.Close()
