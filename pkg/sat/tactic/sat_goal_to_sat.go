@@ -88,9 +88,6 @@ func NewGoalTranslator(m *ast.ASTManager, s *sat.Solver) (tr *GoalTranslator, er
 	tr.dependencies = *insdict.NewDictFunc[ast.ASTHandle, uint32](hashIdentity)
 	tr.cache = make(map[ast.ASTHandle]uint32)
 	tr.interfaces = make(map[ast.ASTHandle]bool)
-	if tr.cooperation, err = cooperate.NewCooperation(s.Budget()); err != nil {
-		return tr, err
-	}
 	name := "ite_extra"
 	if tr.iteExtra, err = s.BoolParameter(&name, true); err != nil {
 		return tr, err
@@ -114,6 +111,21 @@ func (tr *GoalTranslator) open() error {
 		return ErrSATGoalFailed
 	}
 	return tr.solver.CheckOwner()
+}
+
+// BindCooperation borrows the source process owner used by goal2sat loops.
+func (tr *GoalTranslator) BindCooperation(owner *cooperate.Cooperation) error {
+	if err := tr.open(); err != nil {
+		return err
+	}
+	if owner == nil {
+		return arena.ErrConfig
+	}
+	if _, err := owner.Enabled(); err != nil {
+		return err
+	}
+	tr.cooperation = owner
+	return nil
 }
 func (tr *GoalTranslator) Close() error {
 	if tr == nil || tr.self != tr {
@@ -162,12 +174,7 @@ func (tr *GoalTranslator) Close() error {
 			return ast.ErrASTPending
 		}
 	}
-	if tr.cooperation != nil {
-		if e := tr.cooperation.Close(); e != nil {
-			return e
-		}
-		tr.cooperation = nil
-	}
+	tr.cooperation = nil
 	b := tr.solver.Budget()
 	tr.cache = nil
 	tr.Atoms = insdict.Dict[ast.ASTHandle, uint32]{}
@@ -367,8 +374,10 @@ func (tr *GoalTranslator) process(h ast.ASTHandle) error {
 		return e
 	}
 	for len(tr.frames) != 0 {
-		if e = tr.cooperation.Cooperate("goal2sat"); e != nil {
-			return e
+		if tr.cooperation != nil {
+			if e = tr.cooperation.Cooperate("goal2sat"); e != nil {
+				return e
+			}
 		}
 		if !tr.Limit.Inc() {
 			return fmt.Errorf("goal2sat: %s", tr.Limit.CancelMessage())

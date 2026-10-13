@@ -3,13 +3,17 @@
 package tactic
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/sat"
+	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 // The truth table is an independent bounded correctness check. Production
@@ -322,6 +326,14 @@ func TestSATGoalTranslatorCancellationAndMemoryParams(t *testing.T) {
 			astTestMust(t, e)
 			astTestPin(t, m, h)
 			s, c, params := satSolverCheckFixture(t)
+			owner, e := cooperate.NewCooperation(s.Budget())
+			satOK(t, e)
+			t.Cleanup(func() { satOK(t, owner.Close()) })
+			satOK(t, owner.BeginSection())
+			var traceOutput bytes.Buffer
+			tags := diagnostic.NewTraceTagsWithWriter(&traceOutput)
+			tags.Enable("cooperate_detail")
+			satOK(t, owner.BindTrace(tags))
 			if !cancel {
 				// Native solver slices do not allocate in the Runtime domain. Exercise
 				// its actual strict memory counter with an explicit caller allocation.
@@ -335,6 +347,14 @@ func TestSATGoalTranslatorCancellationAndMemoryParams(t *testing.T) {
 			tr, e := NewGoalTranslator(m, s)
 			satOK(t, e)
 			t.Cleanup(func() { satOK(t, tr.Close()) })
+			if e := tr.BindCooperation(nil); !errors.Is(e, arena.ErrConfig) {
+				t.Fatal("nil process cooperation", e)
+			}
+			copy := *owner
+			if e := tr.BindCooperation(&copy); !errors.Is(e, cooperate.ErrCooperationOwner) {
+				t.Fatal("copied process cooperation", e)
+			}
+			satOK(t, tr.BindCooperation(owner))
 			if cancel {
 				m.Limit.Cancel()
 				defer m.Limit.ResetCancel()
@@ -342,9 +362,20 @@ func TestSATGoalTranslatorCancellationAndMemoryParams(t *testing.T) {
 			if e = tr.Compile([]ast.ASTHandle{h}); e == nil {
 				t.Fatal("source frame checkpoint must stop translation")
 			}
+			if owner.OwnerThread != 0 {
+				t.Fatal("source cooperation must precede cancellation and memory")
+			}
+			if tags.ShouldTrace("cooperate_detail") && !bytes.Contains(traceOutput.Bytes(), []byte("\ngoal2sat, tid: 0\n")) {
+				t.Fatal("wrong source cooperation task", traceOutput.String())
+			}
 			if e = tr.Compile([]ast.ASTHandle{h}); !errors.Is(e, ErrSATGoalFailed) {
 				t.Fatal("interrupted translator cannot be reused", e)
 			}
+			satOK(t, tr.Close())
+			if enabled, e := owner.Enabled(); e != nil || !enabled {
+				t.Fatal("translator closed borrowed process cooperation", enabled, e)
+			}
+			satOK(t, owner.EndSection())
 		})
 	}
 }
