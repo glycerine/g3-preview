@@ -118923,9 +118923,15 @@
       "path": "src/util/hwf.cpp",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/numeral/hwf_value.go"
+      ],
+      "tests": [
+        "TestHardwareFloatSourceBinary64Classification",
+        "TestHardwareFloatSourceValueConstructionAndCopy",
+        "TestHardwareFloatSourceSignAndComparison"
+      ],
       "conditionals": [
         {
           "line": 23,
@@ -119306,22 +119312,40 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Hardware-float manager value, rounding, arithmetic, comparison and classification reached through subpaving f2n<hwf_manager>",
+          "name": "hwf.cpp:97-100,106-110,168-214,430-555 binary64 scalar set/copy, sign, comparison, classification and special-value construction",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/hwf_value.go",
+          "tests": [
+            "TestHardwareFloatSourceBinary64Classification",
+            "TestHardwareFloatSourceValueConstructionAndCopy",
+            "TestHardwareFloatSourceSignAndComparison"
+          ]
+        },
+        {
+          "name": "Remaining HWF rounded arithmetic, rational conversion, formatting, integral rounding and owning manager lifetime reached by subpaving",
           "status": "unported"
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "The concrete binary64 value is scalar and pointer-free; the Go scalar manager has no owned child. The source hwf_manager also owns an mpq manager for conversion, which is not yet ported into the HWF subpaving path."
+      ],
       "deviations": [
-        "The earlier test-only classification missed the live subpaving tactic HWF engine. src/math/subpaving/tactic/subpaving_tactic.cpp owns hwf_manager and f2n<hwf_manager>, and src/math/subpaving/subpaving_hwf.h binds the interval context. No concrete Go HWF manager exists yet; audit the reached method and owner graph with that consumer."
+        "The retained subpaving tactic owns hwf_manager and f2n<hwf_manager>. The Go binary64 scalar/profile uses math.Float64bits/frombits for exact source fields and Go comparisons; the process-wide directed FPU mode, arithmetic, conversion and owning manager path remain open."
       ]
     },
     {
       "path": "src/util/hwf.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/util/numeral/hwf_value.go"
+      ],
+      "tests": [
+        "TestHardwareFloatSourceBinary64Classification",
+        "TestHardwareFloatSourceValueConstructionAndCopy",
+        "TestHardwareFloatSourceSignAndComparison"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -119350,13 +119374,25 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Hardware-float manager declarations and hwf value semantics reached by subpaving f2n<hwf_manager>",
+          "name": "hwf binary64 value and selected manager declarations for scalar set/copy/swap, fields, predicates and special values",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/hwf_value.go",
+          "tests": [
+            "TestHardwareFloatSourceBinary64Classification",
+            "TestHardwareFloatSourceValueConstructionAndCopy",
+            "TestHardwareFloatSourceSignAndComparison"
+          ]
+        },
+        {
+          "name": "Remaining hwf_manager arithmetic, conversion, formatting, rounding and owned mpq-manager declaration paths",
           "status": "unported"
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "HardwareFloat values are pointer-free binary64 scalars. The selected Go manager owns no storage; the source manager's mpq child remains open."
+      ],
       "deviations": [
-        "The earlier direct-include scan missed src/math/subpaving/tactic/subpaving_tactic.cpp and src/math/subpaving/subpaving_hwf.h. The HWF branch is selected by the retained subpaving tactic numeral option and must be ported as a concrete Go consumer path."
+        "The HWF branch is selected by the retained subpaving tactic numeral option. Its scalar value and classification subset is ported; directed arithmetic and concrete f2n/hardware-manager ownership still require the subpaving consumer port."
       ]
     },
     {

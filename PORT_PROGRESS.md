@@ -39487,6 +39487,16 @@ unported. Their reached algorithms and owner lifetimes must be ported with the
 concrete subpaving engines; no generic float-to-numeral adapter is planned.
 This correction supersedes the former reference-only disposition.
 
+The first concrete HWF increment is `pkg/util/numeral/hwf_value.go`: a
+pointer-free binary64 value and scalar manager for source bit fields,
+classification, constructors, sign-changing operations, comparisons and
+copy/swap/reset. Focused raw-bit cases cover both signed zeros, finite
+normal/denormal values, infinity and signed NaN, including the source's
+`is_pos(+0)`/`is_neg(-0)` distinction and `is_int(0)==false`. This credits only
+the corresponding value and predicate methods in `hwf.h/.cpp`. Directed
+rounding arithmetic, rational conversion, text, the manager's mpq child and
+the subpaving `f2n<hwf_manager>` caller remain open.
+
 ### Environment parameter runtime boundary
 
 `src/util/env_params.h/.cpp` has exactly two static operations. The five
