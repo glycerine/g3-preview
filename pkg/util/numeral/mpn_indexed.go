@@ -263,6 +263,7 @@ func (m *NaturalManager) divideMany(size, n uint32, q limbView) error {
 				m.sourceDivWrite(u, j+i, m.sourceDivRead(ab, i))
 			}
 		}
+		m.traceDivisionManyStep(qh, rh, n, size, borrow)
 	}
 	return nil
 }

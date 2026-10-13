@@ -153870,6 +153870,17 @@
           "tests": [
             "TestMPNSingleLimbDivisionTraceAndDecimalCaller"
           ]
+        },
+        {
+          "name": "div_n mpn_div TRACE defined prefix after add-back; requested m+n+1 numerator limb exceeds logical m+n buffer (mpn.cpp:350-354)",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/mpn_divn_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpn_indexed.go"
+          ],
+          "tests": [
+            "TestMPNMultiLimbDivisionTraceStopsAtSourceOutOfBoundsRead"
+          ]
         }
       ],
       "ownership": [
@@ -154361,6 +154372,17 @@
           ],
           "tests": [
             "TestMPNSingleLimbDivisionTraceAndDecimalCaller"
+          ]
+        },
+        {
+          "name": "div_n mpn_div TRACE defined prefix after add-back; requested m+n+1 numerator limb exceeds logical m+n buffer (mpn.cpp:350-354)",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/mpn_divn_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpn_indexed.go"
+          ],
+          "tests": [
+            "TestMPNMultiLimbDivisionTraceStopsAtSourceOutOfBoundsRead"
           ]
         }
       ],
