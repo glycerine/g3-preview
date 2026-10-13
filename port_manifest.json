@@ -52975,10 +52975,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/math/subpaving/tactic/expr_converter.go",
-        "pkg/math/subpaving/tactic/expr_converter_test.go"
+        "pkg/math/subpaving/tactic/expr_converter_test.go",
+        "pkg/math/subpaving/tactic/arbitrary_expr_converter.go",
+        "pkg/math/subpaving/tactic/arbitrary_expr_converter_test.go"
       ],
       "tests": [
-        "TestHardwareExprConverterTerms"
+        "TestHardwareExprConverterTerms",
+        "TestArbitraryExprConverterTermsAndClause"
       ],
       "assertions": [
         {
@@ -53023,7 +53026,7 @@
       "methods": [],
       "ownership": [],
       "deviations": [
-        "Incremental hardware context specialization: numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache, AST cancellation checkpoint and the source arithmetic refusal categories are implemented; zero-degree monomials and full tactic ownership/integration remain open."
+        "Concrete HWF and MPF context specializations now implement numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache, AST cancellation checkpoint and source arithmetic refusal categories. MPF formatted zero is rejected by the source f2n wrapper, including a zero sum constant. Zero-degree monomials and full tactic ownership/integration remain open."
       ]
     },
     {
@@ -53033,10 +53036,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/math/subpaving/tactic/expr_converter.go",
-        "pkg/math/subpaving/tactic/expr_converter_test.go"
+        "pkg/math/subpaving/tactic/expr_converter_test.go",
+        "pkg/math/subpaving/tactic/arbitrary_expr_converter.go",
+        "pkg/math/subpaving/tactic/arbitrary_expr_converter_test.go"
       ],
       "tests": [
-        "TestHardwareExprConverterTerms"
+        "TestHardwareExprConverterTerms",
+        "TestArbitraryExprConverterTermsAndClause"
       ],
       "conditionals": [
         {
@@ -53053,7 +53059,7 @@
       "methods": [],
       "ownership": [],
       "deviations": [
-        "Incremental hardware context specialization: numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache, AST cancellation checkpoint and the source arithmetic refusal categories are implemented; zero-degree monomials and full tactic ownership/integration remain open."
+        "Concrete HWF and MPF context specializations now implement numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache, AST cancellation checkpoint and source arithmetic refusal categories. MPF formatted zero is rejected by the source f2n wrapper, including a zero sum constant. Zero-degree monomials and full tactic ownership/integration remain open."
       ]
     },
     {
@@ -53069,12 +53075,16 @@
         "pkg/math/subpaving/tactic/arbitrary_engine_test.go",
         "pkg/math/subpaving/tactic/goal_internalize.go",
         "pkg/math/subpaving/tactic/expr_converter.go",
-        "pkg/math/subpaving/tactic/expr_converter_test.go"
+        "pkg/math/subpaving/tactic/expr_converter_test.go",
+        "pkg/math/subpaving/tactic/arbitrary_expr_converter.go",
+        "pkg/math/subpaving/tactic/arbitrary_goal_internalize.go",
+        "pkg/math/subpaving/tactic/arbitrary_expr_converter_test.go"
       ],
       "tests": [
         "TestSubpavingTacticOptionSelectionAndDescriptions",
         "TestHardwareExprConverterTerms",
-        "TestArbitraryEngineSelectedContextAndPartialCleanup"
+        "TestArbitraryEngineSelectedContextAndPartialCleanup",
+        "TestArbitraryExprConverterTermsAndClause"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -53122,7 +53132,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The HWF branch constructs a context and expression converter, internalizes <=/>= literals with numeral right sides, unwraps nested negations, scales bounds by exact numerator/denominator, adds goal clauses in source order and searches the resulting hardware context. The MPF branch now constructs and retires its concrete context/shell while borrowing the supplied numeral manager. MPQ/MPFF/MPFX engine construction, MPF expression conversion, AST variable display, optional print_nodes output, result tactic ownership, simplify pipeline and factory remain open."
+        "The HWF and MPF branches construct concrete contexts and expression converters, internalize <=/>= literals with numeral right sides, unwrap nested negations, scale bounds by exact numerator/denominator, and add clauses in source order. The MPF converter borrows a rational manager and uses the selected owning MPF shell. Only the HWF goal-search path has been exercised end to end; MPF search, MPQ/MPFF/MPFX engine construction, AST variable display, optional print_nodes output, result tactic ownership, simplify pipeline and factory remain open."
       ]
     },
     {
