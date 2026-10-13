@@ -151722,7 +151722,9 @@
         "pkg/util/numeral/mpff_native_storage_test.go",
         "pkg/math/subpaving/fast_shell_coefficients.go",
         "pkg/util/numeral/mpff_compare_trace.go",
-        "pkg/util/numeral/mpff_compare_trace_test.go"
+        "pkg/util/numeral/mpff_compare_trace_test.go",
+        "pkg/util/numeral/mpff_add_trace.go",
+        "pkg/util/numeral/mpff_add_trace_test.go"
       ],
       "tests": [
         "TestFastFloatIntegerConversionSource",
@@ -151760,7 +151762,8 @@
         "TestFastFloatNativeStorageGrowthAndRecycledGeneration",
         "TestFastFloatDecimalNativeDivisionWithoutReservations",
         "TestFastShellExactCoefficientsAndDirectedInequalities",
-        "TestFastFloatLessRetainedShortTraceBranches"
+        "TestFastFloatLessRetainedShortTraceBranches",
+        "TestFastFloatAddSubOuterAndInnerTraceOrder"
       ],
       "conditionals": [
         {
@@ -152369,6 +152372,17 @@
           ],
           "tests": [
             "TestFastFloatLessRetainedShortTraceBranches"
+          ]
+        },
+        {
+          "name": "add/sub outer mpff_trace STRACE and nonzero add_sub mpff TRACE entry/result records",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff_arithmetic.go",
+          "go_targets": [
+            "pkg/util/numeral/mpff_add_trace.go"
+          ],
+          "tests": [
+            "TestFastFloatAddSubOuterAndInnerTraceOrder"
           ]
         }
       ],
@@ -172563,6 +172577,14 @@
           ]
         },
         {
+          "name": "mpff add/sub STRACE and reached add_sub TRACE records with zero-branch omission",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff_add_trace.go",
+          "tests": [
+            "TestFastFloatAddSubOuterAndInnerTraceOrder"
+          ]
+        },
+        {
           "name": "optional _TRACE file and remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -172572,7 +172594,7 @@
         "TraceTags owns a native Go map of C-string tag values; Finalize drops that table but preserves enable-all. The default gparams binding uses a process singleton; full shell/API tag binding remains open. The optional trace writer is borrowed when injected; otherwise a trace-enabled emitted record lazily opens the process .z3-trace file."
       ],
       "deviations": [
-        "Retained trace controls use native map tag state with C-string keys, lazy table initialization and source finalize/all-flag order. The g3trace build gate erases emission in ordinary builds; all four gparams.cpp TRACE sites are wired. No retained source caller invokes open_trace or close_trace. Cooperation checkpoint TRACE and CTRACE plus integer divides STRACE and TRACE and integer negation, add/sub/mul and division-wrapper and rational add/sub/mul, mixed and division STRACE plus MPF sqrt-helper and MPFF lt STRACE are wired; other optional TRACE/STRACE/CTRACE call sites remain open."
+        "Retained trace controls use native map tag state with C-string keys, lazy table initialization and source finalize/all-flag order. The g3trace build gate erases emission in ordinary builds; all four gparams.cpp TRACE sites are wired. No retained source caller invokes open_trace or close_trace. Cooperation checkpoint TRACE and CTRACE plus integer divides STRACE and TRACE and integer negation, add/sub/mul and division-wrapper and rational add/sub/mul, mixed and division STRACE plus MPF sqrt-helper and MPFF lt and add/sub STRACE plus add_sub TRACE are wired; other optional TRACE/STRACE/CTRACE call sites remain open."
       ]
     },
     {
@@ -172752,6 +172774,14 @@
           ]
         },
         {
+          "name": "mpff add/sub STRACE and reached add_sub TRACE records with zero-branch omission",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff_add_trace.go",
+          "tests": [
+            "TestFastFloatAddSubOuterAndInnerTraceOrder"
+          ]
+        },
+        {
           "name": "optional _TRACE file and remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -172761,7 +172791,7 @@
         "TraceTags owns a native Go map of C-string tag values; Finalize drops that table but preserves enable-all. The default gparams binding uses a process singleton; full shell/API tag binding remains open. The optional trace writer is borrowed when injected; otherwise a trace-enabled emitted record lazily opens the process .z3-trace file."
       ],
       "deviations": [
-        "Retained trace controls use native map tag state with C-string keys, lazy table initialization and source finalize/all-flag order. The g3trace build gate erases emission in ordinary builds; all four gparams.cpp TRACE sites are wired. No retained source caller invokes open_trace or close_trace. Cooperation checkpoint TRACE and CTRACE plus integer divides STRACE and TRACE and integer negation, add/sub/mul and division-wrapper and rational add/sub/mul, mixed and division STRACE plus MPF sqrt-helper and MPFF lt STRACE are wired; other optional TRACE/STRACE/CTRACE call sites remain open."
+        "Retained trace controls use native map tag state with C-string keys, lazy table initialization and source finalize/all-flag order. The g3trace build gate erases emission in ordinary builds; all four gparams.cpp TRACE sites are wired. No retained source caller invokes open_trace or close_trace. Cooperation checkpoint TRACE and CTRACE plus integer divides STRACE and TRACE and integer negation, add/sub/mul and division-wrapper and rational add/sub/mul, mixed and division STRACE plus MPF sqrt-helper and MPFF lt and add/sub STRACE plus add_sub TRACE are wired; other optional TRACE/STRACE/CTRACE call sites remain open."
       ]
     },
     {

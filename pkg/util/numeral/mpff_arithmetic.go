@@ -167,10 +167,16 @@ func (m *FastFloatManager) Prev(a *FastFloat) error {
 	}
 	return m.debugCheck(a)
 }
-func (m *FastFloatManager) addSub(sub bool, a, b, c *FastFloat) error {
+func (m *FastFloatManager) addSub(sub bool, a, b, c *FastFloat) (err error) {
 	if e := m.triple(a, b, c); e != nil {
 		return e
 	}
+	m.traceAddSubOuter(a, b, c, sub, true)
+	defer func() {
+		if err == nil {
+			m.traceAddSubOuter(a, b, c, sub, false)
+		}
+	}()
 	if a.index() == 0 {
 		if e := m.Copy(c, b); e != nil {
 			return e
@@ -183,6 +189,7 @@ func (m *FastFloatManager) addSub(sub bool, a, b, c *FastFloat) error {
 	if b.index() == 0 {
 		return m.Copy(c, a)
 	}
+	m.traceAddSubInner(a, b, c, sub, true)
 	if e := m.allocate(c); e != nil {
 		return e
 	}
@@ -255,17 +262,20 @@ func (m *FastFloatManager) addSub(sub bool, a, b, c *FastFloat) error {
 		}
 		lz := ffNLZ(dest)
 		if lz == m.bits {
-			return m.Reset(c)
+			if e := m.Reset(c); e != nil {
+				return e
+			}
 		}
-		if lz > 0 {
+		if lz > 0 && lz != m.bits {
 			ffShift(dest, dest, lz, true)
 			if e := m.exponent64(c, int64(ea)-int64(lz)); e != nil {
 				return e
 			}
-		} else {
+		} else if lz == 0 {
 			c.exponent = ea
 		}
 	}
+	m.traceAddSubInner(a, b, c, sub, false)
 	return m.debugCheck(c)
 }
 func (m *FastFloatManager) Add(a, b, c *FastFloat) error { return m.addSub(false, a, b, c) }
