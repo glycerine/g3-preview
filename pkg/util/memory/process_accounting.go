@@ -48,3 +48,9 @@ func (p *ProcessAccounting) AllocationCount() uint64 {
 func (p *ProcessAccounting) OutOfMemory() bool {
 	return p.Valid() && p.accounting.outOfMemory
 }
+
+// AboveWatermark is memory::above_high_watermark. A zero watermark disables
+// the predicate; the comparison uses only the synchronized global byte count.
+func (p *ProcessAccounting) AboveWatermark() bool {
+	return p.Valid() && p.accounting.aboveWatermark()
+}

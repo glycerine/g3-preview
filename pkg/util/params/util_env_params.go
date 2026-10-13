@@ -17,7 +17,15 @@ type EnvParamsRuntime struct {
 }
 
 func NewEnvParamsRuntime(g *GlobalParams, v *diagnostic.VerboseContext, m *memory.Runtime, w *diagnostic.WarningService) (*EnvParamsRuntime, error) {
-	if g == nil || v == nil || m == nil || w == nil {
+	if g == nil || g.ContextField == nil || v == nil || m == nil || w == nil {
+		return nil, arena.ErrConfig
+	}
+	q := g.ContextField.Numerals()
+	if q == nil || q.RuntimeOwner() == nil {
+		return nil, arena.ErrConfig
+	}
+	process, numericProcess := m.ProcessOwner(), q.RuntimeOwner().ProcessOwner()
+	if (process != nil || numericProcess != nil) && process != numericProcess {
 		return nil, arena.ErrConfig
 	}
 	return &EnvParamsRuntime{globals: g, verbose: v, memory: m, warnings: w}, nil
