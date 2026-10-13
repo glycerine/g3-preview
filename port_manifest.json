@@ -18088,10 +18088,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/ast/pattern/smaller_pattern.go"
+        "pkg/ast/pattern/smaller_pattern.go",
+        "pkg/ast/pattern/candidates.go"
       ],
       "tests": [
-        "TestSmallerPatternConcretePairCacheAndExternalVariables"
+        "TestSmallerPatternConcretePairCacheAndExternalVariables",
+        "TestPatternInferenceLoopFilterConcreteCandidateOwnership"
       ],
       "conditionals": [
         {
@@ -18183,11 +18185,19 @@
           "tests": [
             "TestSmallerPatternConcretePairCacheAndExternalVariables"
           ]
+        },
+        {
+          "name": "pattern_inference_cfg add_candidate and filter_looping_patterns candidate metadata, strict same-variable comparison and owning vector",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/candidates.go",
+          "tests": [
+            "TestPatternInferenceLoopFilterConcreteCandidateOwnership"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "The concrete smaller_pattern pair cache and worklist use typed Go map and slice storage. The remaining pattern_inference_cfg collector, filters and quantifier rewrite are not ported."
+        "The concrete smaller_pattern pair cache and worklist use typed Go map and slice storage. Candidate insertion and strict loop filtering own AST references through a native slice and keep borrowed free-variable set metadata in a typed map. The remaining pattern_inference_cfg collector, larger-pattern filter and quantifier rewrite are not ported."
       ]
     },
     {
@@ -18196,10 +18206,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/ast/pattern/smaller_pattern.go"
+        "pkg/ast/pattern/smaller_pattern.go",
+        "pkg/ast/pattern/candidates.go"
       ],
       "tests": [
-        "TestSmallerPatternConcretePairCacheAndExternalVariables"
+        "TestSmallerPatternConcretePairCacheAndExternalVariables",
+        "TestPatternInferenceLoopFilterConcreteCandidateOwnership"
       ],
       "conditionals": [
         {
@@ -18227,11 +18239,19 @@
           "tests": [
             "TestSmallerPatternConcretePairCacheAndExternalVariables"
           ]
+        },
+        {
+          "name": "pattern_inference_cfg retained candidate info map and owning app vector for loop filtering",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/candidates.go",
+          "tests": [
+            "TestPatternInferenceLoopFilterConcreteCandidateOwnership"
+          ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "The matcher borrows AST handles from its manager and owns only native Go pair-map and worklist storage; the enclosing pattern inference class remains open."
+        "The matcher borrows AST handles from its manager and owns only native Go pair-map and worklist storage. The candidate vector owns app handles while its metadata map borrows those identities; the enclosing pattern inference class remains open."
       ]
     },
     {
@@ -161862,6 +161882,14 @@
           "tests": [
             "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"
           ]
+        },
+        {
+          "name": "pattern_inference candidate obj_map<expr,info> insertion, duplicate lookup, same-free-variable filtering and erase",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/candidates.go",
+          "tests": [
+            "TestPatternInferenceLoopFilterConcreteCandidateOwnership"
+          ]
         }
       ],
       "ownership": [
@@ -166450,6 +166478,14 @@
           "go_target": "pkg/tactic/ufbv/match_subst.go",
           "tests": [
             "TestMatchSubstConcretePairCacheAndVariableBindings"
+          ]
+        },
+        {
+          "name": "pattern_inference candidate app_ref_vector owning insertion and ascending release",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/candidates.go",
+          "tests": [
+            "TestPatternInferenceLoopFilterConcreteCandidateOwnership"
           ]
         }
       ],

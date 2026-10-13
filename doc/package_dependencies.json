@@ -288,6 +288,7 @@
         "ast"
       ],
       "production_files": [
+        "candidates.go",
         "smaller_pattern.go"
       ]
     },
