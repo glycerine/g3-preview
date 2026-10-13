@@ -58,6 +58,15 @@ func (m *HardwareFloatNumeralManager) SetInt32(out *HardwareFloat, value int32) 
 	}
 	return m.check(out)
 }
+func (m *HardwareFloatNumeralManager) SetUint32(out *HardwareFloat, value uint32) error {
+	if m == nil || m.core == nil {
+		return ErrNumericOwner
+	}
+	if err := m.core.SetFloat64(out, float64(value)); err != nil {
+		return err
+	}
+	return m.check(out)
+}
 func (m *HardwareFloatNumeralManager) SetFloat64(out *HardwareFloat, value float64) error {
 	if m == nil || m.core == nil {
 		return ErrNumericOwner
@@ -91,6 +100,25 @@ func (m *HardwareFloatNumeralManager) IsPos(a *HardwareFloat) bool {
 }
 func (m *HardwareFloatNumeralManager) IsNonNeg(a *HardwareFloat) bool { return !m.IsNeg(a) }
 func (m *HardwareFloatNumeralManager) IsNonPos(a *HardwareFloat) bool { return !m.IsPos(a) }
+func (m *HardwareFloatNumeralManager) IsOne(a *HardwareFloat) bool    { return m.core.IsOne(a) }
+func (m *HardwareFloatNumeralManager) IsMinusOne(a *HardwareFloat) bool {
+	// Source temporarily negates the borrowed value, tests one, then restores it.
+	return a.RawBits() == 0xbff0000000000000
+}
+func (m *HardwareFloatNumeralManager) IsInteger(a *HardwareFloat) bool { return m.core.IsInteger(a) }
+func (m *HardwareFloatNumeralManager) Equal(a, b *HardwareFloat) bool  { return m.core.Equal(a, b) }
+func (m *HardwareFloatNumeralManager) Less(a, b *HardwareFloat) bool   { return m.core.Less(a, b) }
+func (m *HardwareFloatNumeralManager) LessEqual(a, b *HardwareFloat) bool {
+	return m.core.LessEqual(a, b)
+}
+func (m *HardwareFloatNumeralManager) Greater(a, b *HardwareFloat) bool { return m.core.Greater(a, b) }
+func (m *HardwareFloatNumeralManager) GreaterEqual(a, b *HardwareFloat) bool {
+	return m.core.GreaterEqual(a, b)
+}
+func (m *HardwareFloatNumeralManager) ToFloat64(a *HardwareFloat) float64 { return m.core.ToFloat64(a) }
+func (m *HardwareFloatNumeralManager) Abs(in, out *HardwareFloat) error   { return m.core.Abs(out, in) }
+func (m *HardwareFloatNumeralManager) Neg(in, out *HardwareFloat) error   { return m.core.Neg(out, in) }
+func (m *HardwareFloatNumeralManager) Swap(a, b *HardwareFloat) error     { return m.core.Swap(a, b) }
 
 func (m *HardwareFloatNumeralManager) Add(x, y, out *HardwareFloat) error {
 	if m == nil || m.core == nil {

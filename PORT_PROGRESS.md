@@ -39533,9 +39533,21 @@ numerator and denominator integers from the binary64 bit fields and source
 raw exponent. The smallest subnormal therefore converts to `2^-1075`, as in
 the C++ implementation; both signs of zero normalize to rational zero.
 Focused native and checked/debug tests also distinguish the source debug
-finite assertion from its release bit path. The retained rational-string
-formatter, owned rational child and subpaving context remain open. The
-uncalled fused arithmetic and square-root methods have no Go-port obligation.
+finite assertion from its release bit path. The uncalled fused arithmetic and
+square-root methods have no Go-port obligation.
+
+The retained `to_rational_string` call in subpaving diagnostics now uses the
+same HWF bit-field numerator, denominator and raw exponent, normalized and
+formatted with Go's `math/big.Rat`. Focused native and checked/debug cases
+match the project rational formatter through signed zero, subnormals and
+maximum finite binary64. The HWF manager's owned rational child and the
+enclosing subpaving caller still need integration.
+
+The concrete HWF numeral wrapper also forwards the comparisons, integer and
+one predicates, sign changes, swap, unsigned setting and scalar access called by the subpaving
+interval engine. A focused case checks source ordering, signed values and
+restoration of the borrowed input for the minus-one predicate. Retained
+method coverage and end-to-end subpaving integration still require audit.
 
 ### Environment parameter runtime boundary
 

@@ -63,3 +63,33 @@ func TestHardwareFloatNumeralFloorCeilPowerAndGuards(t *testing.T) {
 		t.Fatal("overflow check", x, err)
 	}
 }
+
+func TestHardwareFloatNumeralSourceThinPredicatesAndMoves(t *testing.T) {
+	m, e := NewHardwareFloatNumeralManager(NewHardwareFloatManager(), 11, 53)
+	if e != nil {
+		t.Fatal(e)
+	}
+	a, b, out := HardwareFloat{-1}, HardwareFloat{2}, HardwareFloat{}
+	before := a.RawBits()
+	if !m.IsMinusOne(&a) || m.IsOne(&a) || !m.IsInteger(&a) || a.RawBits() != before {
+		t.Fatal("source minus-one test must restore borrowed value", a)
+	}
+	if !m.Less(&a, &b) || !m.LessEqual(&a, &b) || m.Equal(&a, &b) || m.Greater(&a, &b) || m.GreaterEqual(&a, &b) {
+		t.Fatal("wrapper comparison order")
+	}
+	if e := m.Abs(&a, &out); e != nil || out.value != 1 {
+		t.Fatal("abs", out, e)
+	}
+	if e := m.Neg(&out, &out); e != nil || out.value != -1 {
+		t.Fatal("in-place neg", out, e)
+	}
+	if e := m.Swap(&a, &b); e != nil || a.value != 2 || b.value != -1 {
+		t.Fatal("swap", a, b, e)
+	}
+	if m.ToFloat64(&a) != 2 || !m.IsMinusOne(&out) || m.IsOne(&out) {
+		t.Fatal("scalar forwarding")
+	}
+	if e := m.SetUint32(&out, ^uint32(0)); e != nil || out.value != float64(^uint32(0)) {
+		t.Fatal("unsigned source setter", out, e)
+	}
+}

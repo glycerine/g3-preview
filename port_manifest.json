@@ -117103,13 +117103,17 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/numeral/hwf_numeral.go",
-        "pkg/util/numeral/hwf_rational_set.go"
+        "pkg/util/numeral/hwf_rational_set.go",
+        "pkg/util/numeral/hwf_rational_string.go"
       ],
       "tests": [
         "TestHardwareFloatNumeralDirectedIntervalOperations",
         "TestHardwareFloatNumeralFloorCeilPowerAndGuards",
         "TestHardwareFloatSourceRationalInputDirectedBounds",
-        "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards"
+        "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards",
+        "TestHardwareFloatRationalStringMatchesSourceConversion",
+        "TestHardwareFloatRationalStringSourceFiniteGuard",
+        "TestHardwareFloatNumeralSourceThinPredicatesAndMoves"
       ],
       "conditionals": [
         {
@@ -117169,7 +117173,24 @@
           ]
         },
         {
-          "name": "Remaining f2n<hwf_manager> rational-string formatting and enclosing subpaving caller paths",
+          "name": "f2n<hwf_manager> rational-string forwarding used by subpaving diagnostics",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/hwf_rational_string.go",
+          "tests": [
+            "TestHardwareFloatRationalStringMatchesSourceConversion",
+            "TestHardwareFloatRationalStringSourceFiniteGuard"
+          ]
+        },
+        {
+          "name": "f2n<hwf_manager> comparisons, integer/one predicates, sign changes, swap, unsigned setter and scalar access reached by subpaving",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/hwf_numeral.go",
+          "tests": [
+            "TestHardwareFloatNumeralSourceThinPredicatesAndMoves"
+          ]
+        },
+        {
+          "name": "Remaining f2n<hwf_manager> retained method audit and enclosing-caller verification",
           "status": "unported"
         },
         {
@@ -118961,7 +118982,8 @@
         "pkg/util/numeral/hwf_arithmetic.go",
         "pkg/util/numeral/hwf_round_select.go",
         "pkg/util/numeral/hwf_rational_set.go",
-        "pkg/util/numeral/hwf_rational_output.go"
+        "pkg/util/numeral/hwf_rational_output.go",
+        "pkg/util/numeral/hwf_rational_string.go"
       ],
       "tests": [
         "TestHardwareFloatSourceBinary64Classification",
@@ -118973,7 +118995,9 @@
         "TestHardwareFloatSourceRationalInputDirectedBounds",
         "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards",
         "TestHardwareFloatSourceToRationalBitDecomposition",
-        "TestHardwareFloatSourceToRationalOwnerGuards"
+        "TestHardwareFloatSourceToRationalOwnerGuards",
+        "TestHardwareFloatRationalStringMatchesSourceConversion",
+        "TestHardwareFloatRationalStringSourceFiniteGuard"
       ],
       "conditionals": [
         {
@@ -119400,7 +119424,16 @@
           ]
         },
         {
-          "name": "Remaining HWF rational-string formatting and owning manager lifetime reached by subpaving",
+          "name": "hwf.cpp:387-393 rational-string formatting reached by subpaving diagnostics",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/hwf_rational_string.go",
+          "tests": [
+            "TestHardwareFloatRationalStringMatchesSourceConversion",
+            "TestHardwareFloatRationalStringSourceFiniteGuard"
+          ]
+        },
+        {
+          "name": "Remaining owning HWF manager lifetime reached by subpaving",
           "status": "unported"
         },
         {
@@ -119412,7 +119445,7 @@
         "The concrete binary64 value is scalar and pointer-free; the Go scalar manager has no owned child. The source hwf_manager also owns an mpq manager for conversion, which is not yet ported into the HWF subpaving path."
       ],
       "deviations": [
-        "The retained subpaving tactic owns hwf_manager and f2n<hwf_manager>. The Go binary64 scalar/profile uses math.Float64bits/frombits for exact source fields and Go comparisons. Directed arithmetic and integral rounding avoid changing process-wide FPU mode. Rational input repeats the source UINT_MAX integer radix under the selected mode, then divides. Rational output retains the source raw exponent, including the subnormal 2^-1075 result. The owning manager path remains open."
+        "The retained subpaving tactic owns hwf_manager and f2n<hwf_manager>. The Go binary64 scalar/profile uses math.Float64bits/frombits for exact source fields and Go comparisons. Directed arithmetic and integral rounding avoid changing process-wide FPU mode. Rational input repeats the source UINT_MAX integer radix under the selected mode, then divides. Rational output retains the source raw exponent, including the subnormal 2^-1075 result. Rational-string formatting uses Go math/big.Rat for the source's temporary normalized mpq. The owning manager path remains open."
       ]
     },
     {
@@ -119425,7 +119458,8 @@
         "pkg/util/numeral/hwf_arithmetic.go",
         "pkg/util/numeral/hwf_round_select.go",
         "pkg/util/numeral/hwf_rational_set.go",
-        "pkg/util/numeral/hwf_rational_output.go"
+        "pkg/util/numeral/hwf_rational_output.go",
+        "pkg/util/numeral/hwf_rational_string.go"
       ],
       "tests": [
         "TestHardwareFloatSourceBinary64Classification",
@@ -119437,7 +119471,9 @@
         "TestHardwareFloatSourceRationalInputDirectedBounds",
         "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards",
         "TestHardwareFloatSourceToRationalBitDecomposition",
-        "TestHardwareFloatSourceToRationalOwnerGuards"
+        "TestHardwareFloatSourceToRationalOwnerGuards",
+        "TestHardwareFloatRationalStringMatchesSourceConversion",
+        "TestHardwareFloatRationalStringSourceFiniteGuard"
       ],
       "conditionals": [
         {
@@ -119512,7 +119548,16 @@
           ]
         },
         {
-          "name": "Remaining hwf_manager rational-string formatting and owned mpq-manager declaration paths",
+          "name": "hwf_manager rational-string formatting declaration reached by subpaving diagnostics",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/hwf_rational_string.go",
+          "tests": [
+            "TestHardwareFloatRationalStringMatchesSourceConversion",
+            "TestHardwareFloatRationalStringSourceFiniteGuard"
+          ]
+        },
+        {
+          "name": "Remaining owned mpq-manager declaration path",
           "status": "unported"
         },
         {
