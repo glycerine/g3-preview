@@ -34809,7 +34809,8 @@
         "pkg/math/interval/fast_root_test.go",
         "pkg/math/subpaving/fast_interval_root.go",
         "pkg/math/subpaving/fast_interval_root_test.go",
-        "pkg/math/subpaving/arbitrary_interval.go"
+        "pkg/math/subpaving/arbitrary_interval.go",
+        "pkg/math/subpaving/arbitrary_interval_arith.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -34831,7 +34832,8 @@
         "TestSubpavingFastNodeConstantIntervalViews",
         "TestFastRootRetainedNewtonCertifiedBoundsAndCancellation",
         "TestSubpavingFastIntervalXnEqYRetainedCases",
-        "TestSubpavingMPFMutableIntervalRetainedCore"
+        "TestSubpavingMPFMutableIntervalRetainedCore",
+        "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias"
       ],
       "conditionals": [
         {
@@ -35438,6 +35440,14 @@
           "go_target": "pkg/math/subpaving/arbitrary_interval.go",
           "tests": [
             "TestSubpavingMPFMutableIntervalRetainedCore"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf interval negation, directed addition/subtraction, infinity branches and alias-safe endpoint scratch (src/math/interval/interval_def.h:704-837)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_arith.go",
+          "tests": [
+            "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias"
           ]
         }
       ],
@@ -50157,10 +50167,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/math/subpaving/arbitrary_interval.go"
+        "pkg/math/subpaving/arbitrary_interval.go",
+        "pkg/math/subpaving/arbitrary_interval_arith.go"
       ],
       "tests": [
-        "TestSubpavingMPFMutableIntervalRetainedCore"
+        "TestSubpavingMPFMutableIntervalRetainedCore",
+        "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias"
       ],
       "conditionals": [
         {
@@ -50181,6 +50193,14 @@
           "go_target": "pkg/math/subpaving/arbitrary_interval.go",
           "tests": [
             "TestSubpavingMPFMutableIntervalRetainedCore"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf interval negation, directed addition/subtraction, infinity branches and alias-safe endpoint scratch (src/math/interval/interval_def.h:704-837)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_arith.go",
+          "tests": [
+            "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias"
           ]
         }
       ],
@@ -50581,7 +50601,8 @@
         "pkg/math/subpaving/fast_clause_test.go",
         "pkg/math/subpaving/fast_context_init.go",
         "pkg/math/subpaving/fast_context_init_test.go",
-        "pkg/math/subpaving/arbitrary_interval.go"
+        "pkg/math/subpaving/arbitrary_interval.go",
+        "pkg/math/subpaving/arbitrary_interval_arith.go"
       ],
       "tests": [
         "TestSubpavingFixedMutableIntervalRetainedCore",
@@ -50634,7 +50655,8 @@
         "TestSubpavingFastClauseSharedAtomSourceCleanup",
         "TestSubpavingFastContextRootInitializationOrderAndResume",
         "TestSubpavingFastContextRootInitializationUnitConflict",
-        "TestSubpavingMPFMutableIntervalRetainedCore"
+        "TestSubpavingMPFMutableIntervalRetainedCore",
+        "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias"
       ],
       "conditionals": [
         {
@@ -50863,6 +50885,14 @@
           "tests": [
             "TestSubpavingMPFMutableIntervalRetainedCore"
           ]
+        },
+        {
+          "name": "Concrete config_mpf interval negation, directed addition/subtraction, infinity branches and alias-safe endpoint scratch (src/math/interval/interval_def.h:704-837)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_arith.go",
+          "tests": [
+            "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias"
+          ]
         }
       ],
       "ownership": [
@@ -50919,7 +50949,8 @@
         "pkg/math/subpaving/fast_clause_test.go",
         "pkg/math/subpaving/fast_context_init.go",
         "pkg/math/subpaving/fast_context_init_test.go",
-        "pkg/math/subpaving/arbitrary_interval.go"
+        "pkg/math/subpaving/arbitrary_interval.go",
+        "pkg/math/subpaving/arbitrary_interval_arith.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
@@ -50962,7 +50993,8 @@
         "TestSubpavingFastClauseSharedAtomSourceCleanup",
         "TestSubpavingFastContextRootInitializationOrderAndResume",
         "TestSubpavingFastContextRootInitializationUnitConflict",
-        "TestSubpavingMPFMutableIntervalRetainedCore"
+        "TestSubpavingMPFMutableIntervalRetainedCore",
+        "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias"
       ],
       "assertions": [
         {
@@ -51424,6 +51456,14 @@
           "go_target": "pkg/math/subpaving/arbitrary_interval.go",
           "tests": [
             "TestSubpavingMPFMutableIntervalRetainedCore"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf interval negation, directed addition/subtraction, infinity branches and alias-safe endpoint scratch (src/math/interval/interval_def.h:704-837)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_arith.go",
+          "tests": [
+            "TestSubpavingMPFIntervalNegAddSubDirectedAndAlias"
           ]
         }
       ],

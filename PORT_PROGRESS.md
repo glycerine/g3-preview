@@ -39616,7 +39616,13 @@ reset/set/invariant/zero containment/display through `ArbitraryExtended`, and
 preserves interval insertion prefixes on refused writes. A focused native case
 covers unbounded, finite, open, copied, singleton, reset and closed behavior
 on CPUs 8–16. Constant node views, interval arithmetic and the enclosing
-MPF context remain open.
+MPF context remain open at that checkpoint. Directed negation, addition
+and subtraction now use the concrete MPF extended endpoints and staged owned
+scratch so destination aliases remain valid. Focused cases cover finite,
+unbounded and half-infinite bounds, open endpoints, aliased operands and
+separate lower/upper rounding on 1+1/3. Native and checked/debug tests run
+on CPUs 8–16. Multiplication, division, powers, root enclosure, node views
+and the enclosing context remain open.
 
 ### Environment parameter runtime boundary
 
