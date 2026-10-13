@@ -84,8 +84,10 @@ func TestSubpavingFastContextBoundFlowAndRelevance(t *testing.T) {
 	}
 	relevant(0, true, false, false)
 	relevant(1, true, false, true)
+	relevant(10, true, true, true) // equal to the upper bound; openness conflicts
 	relevant(10, false, false, false)
 	relevant(9, false, false, true)
+	relevant(0, false, true, true) // equal to the lower bound; openness conflicts
 	relevant(-1, false, false, true)
 	child, err = ctx.NewChild(root)
 	must(err)

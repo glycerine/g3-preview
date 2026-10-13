@@ -67,6 +67,24 @@ func (c *FixedContext) NormalizeBound(variable uint32, value *numeral.FixedPoint
 	return nil
 }
 
+// The source checks strict order first and calls eq only when openness makes
+// equality relevant. Keep that order for the concrete fixed-point manager.
+func fixedGreaterOrEqualWhen(m *numeral.FixedPointManager, a, b *numeral.FixedPoint, equalMatters bool) (bool, error) {
+	greater, err := m.Greater(a, b)
+	if err != nil || greater || !equalMatters {
+		return greater, err
+	}
+	return m.Equal(a, b)
+}
+
+func fixedLessOrEqualWhen(m *numeral.FixedPointManager, a, b *numeral.FixedPoint, equalMatters bool) (bool, error) {
+	less, err := m.Less(a, b)
+	if err != nil || less || !equalMatters {
+		return less, err
+	}
+	return m.Equal(a, b)
+}
+
 // RelevantNewBound follows the source conflict-first, zero-epsilon, threshold
 // and epsilon-gap branches. Arithmetic exceptions mark the context failed and
 // refuse the candidate, matching the source catch block.
@@ -87,20 +105,20 @@ func (c *FixedContext) RelevantNewBound(n *FixedNode, variable uint32, k *numera
 	currentLower, currentUpper := n.lower[variable], n.upper[variable]
 	if lower {
 		if currentUpper != nil {
-			cmp, e := m.Compare(k, currentUpper.value)
+			conflict, e := fixedGreaterOrEqualWhen(m, k, currentUpper.value, open || currentUpper.open)
 			if e != nil {
 				return false, e
 			}
-			if cmp > 0 || cmp == 0 && (open || currentUpper.open) {
+			if conflict {
 				return true, nil
 			}
 		}
 		if c.zeroEpsilon && currentLower != nil {
-			cmp, e := m.Compare(k, currentLower.value)
+			irrelevant, e := fixedLessOrEqualWhen(m, k, currentLower.value, currentLower.open || !open)
 			if e != nil {
 				return false, e
 			}
-			if cmp < 0 || cmp == 0 && (currentLower.open || !open) {
+			if irrelevant {
 				return false, nil
 			}
 		}
@@ -115,20 +133,20 @@ func (c *FixedContext) RelevantNewBound(n *FixedNode, variable uint32, k *numera
 		}
 	} else {
 		if currentLower != nil {
-			cmp, e := m.Compare(currentLower.value, k)
+			conflict, e := fixedGreaterOrEqualWhen(m, currentLower.value, k, open || currentLower.open)
 			if e != nil {
 				return false, e
 			}
-			if cmp > 0 || cmp == 0 && (open || currentLower.open) {
+			if conflict {
 				return true, nil
 			}
 		}
 		if c.zeroEpsilon && currentUpper != nil {
-			cmp, e := m.Compare(currentUpper.value, k)
+			irrelevant, e := fixedLessOrEqualWhen(m, currentUpper.value, k, currentUpper.open || !open)
 			if e != nil {
 				return false, e
 			}
-			if cmp < 0 || cmp == 0 && (currentUpper.open || !open) {
+			if irrelevant {
 				return false, nil
 			}
 		}

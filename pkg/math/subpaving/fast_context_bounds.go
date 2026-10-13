@@ -28,6 +28,24 @@ func fastCompare(m *numeral.FastFloatManager, a, b *numeral.FastFloat) (int, err
 	return 0, nil
 }
 
+// The source checks strict order first and calls eq only when openness makes
+// equality relevant. Keep that order for the concrete fast-float manager.
+func fastGreaterOrEqualWhen(m *numeral.FastFloatManager, a, b *numeral.FastFloat, equalMatters bool) (bool, error) {
+	greater, err := m.Greater(a, b)
+	if err != nil || greater || !equalMatters {
+		return greater, err
+	}
+	return m.Equal(a, b)
+}
+
+func fastLessOrEqualWhen(m *numeral.FastFloatManager, a, b *numeral.FastFloat, equalMatters bool) (bool, error) {
+	less, err := m.Less(a, b)
+	if err != nil || less || !equalMatters {
+		return less, err
+	}
+	return m.Equal(a, b)
+}
+
 func (c *FastContext) checkNode(n *FastNode, variable uint32) error {
 	if err := c.open(); err != nil {
 		return err
@@ -105,20 +123,20 @@ func (c *FastContext) RelevantNewBound(n *FastNode, variable uint32, k *numeral.
 	currentLower, currentUpper := n.lower[variable], n.upper[variable]
 	if lower {
 		if currentUpper != nil {
-			cmp, e := fastCompare(m, k, currentUpper.value)
+			conflict, e := fastGreaterOrEqualWhen(m, k, currentUpper.value, open || currentUpper.open)
 			if e != nil {
 				return false, e
 			}
-			if cmp > 0 || cmp == 0 && (open || currentUpper.open) {
+			if conflict {
 				return true, nil
 			}
 		}
 		if c.zeroEpsilon && currentLower != nil {
-			cmp, e := fastCompare(m, k, currentLower.value)
+			irrelevant, e := fastLessOrEqualWhen(m, k, currentLower.value, currentLower.open || !open)
 			if e != nil {
 				return false, e
 			}
-			if cmp < 0 || cmp == 0 && (currentLower.open || !open) {
+			if irrelevant {
 				return false, nil
 			}
 		}
@@ -133,20 +151,20 @@ func (c *FastContext) RelevantNewBound(n *FastNode, variable uint32, k *numeral.
 		}
 	} else {
 		if currentLower != nil {
-			cmp, e := fastCompare(m, currentLower.value, k)
+			conflict, e := fastGreaterOrEqualWhen(m, currentLower.value, k, open || currentLower.open)
 			if e != nil {
 				return false, e
 			}
-			if cmp > 0 || cmp == 0 && (open || currentLower.open) {
+			if conflict {
 				return true, nil
 			}
 		}
 		if c.zeroEpsilon && currentUpper != nil {
-			cmp, e := fastCompare(m, currentUpper.value, k)
+			irrelevant, e := fastLessOrEqualWhen(m, currentUpper.value, k, currentUpper.open || !open)
 			if e != nil {
 				return false, e
 			}
-			if cmp < 0 || cmp == 0 && (currentUpper.open || !open) {
+			if irrelevant {
 				return false, nil
 			}
 		}
