@@ -164307,6 +164307,7 @@
           "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsAllocatedEmptyBackingSkipsKeyInspection",
             "TestParamsReferenceSourceCopyMergeAndSignedRat",
             "TestParamsReferenceNameReadsNeverIntern",
             "TestParamsReferenceValidationSharedPrefixAndDuplicates",
@@ -164385,6 +164386,7 @@
           "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsAllocatedEmptyBackingSkipsKeyInspection",
             "TestParamsReferenceSourceCopyMergeAndSignedRat",
             "TestParamsReferenceNameReadsNeverIntern",
             "TestParamsReferenceValidationSharedPrefixAndDuplicates",
@@ -164845,6 +164847,7 @@
           "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsAllocatedEmptyBackingSkipsKeyInspection",
             "TestParamsReferenceSourceCopyMergeAndSignedRat",
             "TestParamsReferenceNameReadsNeverIntern",
             "TestParamsReferenceValidationSharedPrefixAndDuplicates",
@@ -164923,6 +164926,7 @@
           "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsAllocatedEmptyBackingSkipsKeyInspection",
             "TestParamsReferenceSourceCopyMergeAndSignedRat",
             "TestParamsReferenceNameReadsNeverIntern",
             "TestParamsReferenceValidationSharedPrefixAndDuplicates",

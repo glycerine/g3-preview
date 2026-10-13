@@ -541,12 +541,17 @@ func (c *ParamsContext) find(v *ParamsRef, k usymbol.Symbol, name *string, byNam
 	if v.Slot == 0 {
 		return nil, nil
 	}
+	b := &c.Blocks[v.Slot-1]
+	// params::GET_VALUE and CONTAINS return before comparing a key when the
+	// allocated backing exists but its entry vector is empty.
+	if b.Size == 0 {
+		return nil, nil
+	}
 	if !byName {
 		if e := c.keyCheck(k); e != nil {
 			return nil, e
 		}
 	}
-	b := &c.Blocks[v.Slot-1]
 	for i := uint32(0); i < b.Size; i++ {
 		x := c.Entry(b, i)
 		match := x.key == k
