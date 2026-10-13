@@ -120,17 +120,15 @@ const (
 	astFloatNegative
 )
 
-// isNumeralClass preserves each source query's local value copy and destructor.
-// The predicate runs only after is_numeral succeeds and before that destructor.
-func (p *astFloatingPointPluginOwner) isNumeralClass(n astNodeRef, class astFloatClass) (matched bool, result error) {
+func (p *astFloatingPointPluginOwner) beginNumeralProbe() (*astFloatNumeralProbe, error) {
 	if p == nil || p.self != p || p.owner == nil || p.owner.floatingPointPlugin != p || !p.published || p.sourceEnded {
-		return false, ErrASTHandle
+		return nil, ErrASTHandle
 	}
 	f := &p.numeralProbePrimary
 	if f.self != nil && !f.retired {
 		bytes := uint64(reflect.TypeOf(astFloatNumeralProbe{}).Size())
 		if e := p.owner.BudgetField.Reserve(bytes); e != nil {
-			return false, e
+			return nil, e
 		}
 		f = &astFloatNumeralProbe{header: bytes}
 	}
@@ -138,19 +136,31 @@ func (p *astFloatingPointPluginOwner) isNumeralClass(n astNodeRef, class astFloa
 	*f = astFloatNumeralProbe{owner: p, header: header, next: p.numeralProbeFrames}
 	f.self = f
 	p.numeralProbeFrames = f
-	defer func() {
-		f.bodyCause = result
-		result = errors.Join(result, f.destroy(false))
-		if result == nil && f.sourceDone {
-			result = f.destroy(true)
-			if result == nil {
-				p.numeralProbeFrames = f.next
-				p.owner.BudgetField.Release(f.header)
-				f.header = 0
-				f.retired = true
-			}
+	return f, nil
+}
+
+func (p *astFloatingPointPluginOwner) finishNumeralProbe(f *astFloatNumeralProbe, result *error) {
+	f.bodyCause = *result
+	*result = errors.Join(*result, f.destroy(false))
+	if *result == nil && f.sourceDone {
+		*result = f.destroy(true)
+		if *result == nil {
+			p.numeralProbeFrames = f.next
+			p.owner.BudgetField.Release(f.header)
+			f.header = 0
+			f.retired = true
 		}
-	}()
+	}
+}
+
+// isNumeralClass preserves each source query's local value copy and destructor.
+// The predicate runs only after is_numeral succeeds and before that destructor.
+func (p *astFloatingPointPluginOwner) isNumeralClass(n astNodeRef, class astFloatClass) (matched bool, result error) {
+	f, e := p.beginNumeralProbe()
+	if e != nil {
+		return false, e
+	}
+	defer p.finishNumeralProbe(f, &result)
 	found, e := p.isNumeral(n, &f.value, &f.copy)
 	if e != nil || !found {
 		return false, e
@@ -188,4 +198,32 @@ func (p *astFloatingPointPluginOwner) isNumeralClass(n astNodeRef, class astFloa
 // isNumeralOnly is fpa_decl_plugin::is_numeral(expr*).
 func (p *astFloatingPointPluginOwner) isNumeralOnly(n astNodeRef) (bool, error) {
 	return p.isNumeralClass(n, astFloatAny)
+}
+
+// Source fpa_util::mk_nan/mk_pinf/mk_ninf/mk_pzero/mk_nzero constructs the
+// local scoped_mpf before calling its numeral setter and then mk_value.
+func (p *astFloatingPointPluginOwner) mkSpecialNumeral(ebits, sbits uint32, class astFloatClass) (out astNodeRef, result error) {
+	f, e := p.beginNumeralProbe()
+	if e != nil {
+		return out, e
+	}
+	defer p.finishNumeralProbe(f, &result)
+	switch class {
+	case astFloatNaN:
+		e = p.numeric.MkNaN(ebits, sbits, &f.value, &f.copy)
+	case astFloatPInf:
+		e = p.numeric.MkInf(ebits, sbits, false, &f.value)
+	case astFloatNInf:
+		e = p.numeric.MkInf(ebits, sbits, true, &f.value)
+	case astFloatPZero:
+		e = p.numeric.MkZero(ebits, sbits, false, &f.value)
+	case astFloatNZero:
+		e = p.numeric.MkZero(ebits, sbits, true, &f.value)
+	default:
+		return out, ErrASTDomain
+	}
+	if e != nil {
+		return out, e
+	}
+	return p.mkNumeral(&f.value, nil)
 }

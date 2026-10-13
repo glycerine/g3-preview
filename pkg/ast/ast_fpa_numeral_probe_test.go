@@ -149,3 +149,56 @@ func TestASTFloatingPointScopedClassificationSourcePredicates(t *testing.T) {
 	}
 	astTestMust(t, m.Close())
 }
+
+func TestASTFloatingPointSpecialConstructorsScopedValue(t *testing.T) {
+	m := astTestManager(t)
+	_, e := m.RegisterArithmeticPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterBitVectorPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterFloatingPointPlugin()
+	astTestMust(t, e)
+	p := m.floatingPointPlugin
+	for _, tc := range []struct {
+		class astFloatClass
+		kind  int32
+	}{
+		{astFloatNaN, astFPANaN}, {astFloatPInf, astFPAPlusInf},
+		{astFloatNInf, astFPAMinusInf}, {astFloatPZero, astFPAPlusZero},
+		{astFloatNZero, astFPAMinusZero},
+	} {
+		n, e := p.mkSpecialNumeral(8, 24, tc.class)
+		astTestMust(t, e)
+		decl := m.appAt(n.slot).decl
+		family, kind, e := m.declIdentity(decl)
+		astTestMust(t, e)
+		if family != p.family || kind != tc.kind || p.numeralProbeFrames != nil {
+			t.Fatal("source special constructor", tc, family, kind, p.numeralProbeFrames)
+		}
+		matched, e := p.isNumeralClass(n, tc.class)
+		astTestMust(t, e)
+		if !matched {
+			t.Fatal("constructed special value did not classify", tc)
+		}
+	}
+	astTestMust(t, m.Close())
+}
+
+func TestASTFloatingPointSpecialNaNFailureRetainsScalar(t *testing.T) {
+	m := astTestManager(t)
+	_, e := m.RegisterArithmeticPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterBitVectorPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterFloatingPointPlugin()
+	astTestMust(t, e)
+	p := m.floatingPointPlugin
+	m.BudgetField.FailAfter(0)
+	n, body := p.mkSpecialNumeral(11, 5000, astFloatNaN)
+	if body == nil || n.slot != 0 || p.numeralProbeFrames == nil || p.numeralProbeFrames.retired {
+		t.Fatal("stopped NaN constructor lost scalar scope", n, body, p.numeralProbeFrames)
+	}
+	m.BudgetField.FailAfter(-1)
+	astFloatingPointConstructorRawGraph(t, m.numerals, p)
+	astTestMust(t, m.Close())
+}

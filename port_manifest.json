@@ -16638,7 +16638,7 @@
       "path": "src/ast/fpa_decl_plugin.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "partial",
       "go_targets": [
         "pkg/ast/ast_fpa_plugin.go",
         "pkg/ast/ast_fpa_plugin_source_test.go",
@@ -16665,7 +16665,9 @@
         "TestASTFloatingPointValueIDEveryActualReservationPrefix",
         "TestASTFloatingPointNativeValueBucketsGrowthCollisionAndReuse",
         "TestASTFloatingPointBooleanNumeralScopedValue",
-        "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy"
+        "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy",
+        "TestASTFloatingPointSpecialConstructorsScopedValue",
+        "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
       ],
       "assertions": [
         {
@@ -16772,6 +16774,15 @@
             "TestASTFloatingPointBooleanNumeralScopedValue",
             "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy"
           ]
+        },
+        {
+          "name": "Concrete fpa_util mk_nan/mk_pinf/mk_ninf/mk_pzero/mk_nzero caller-local scoped_mpf, MPF setter before mk_value and destructor after return (src/ast/fpa_decl_plugin.cpp:950-975; src/util/scoped_numeral.h:24-33)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
+          "tests": [
+            "TestASTFloatingPointSpecialConstructorsScopedValue",
+            "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
+          ]
         }
       ],
       "ownership": [
@@ -16797,7 +16808,9 @@
         "TestASTFloatingPointScopedValueActualInlinePushPublication",
         "TestASTFloatingPointScopedValueInlineErasesCopyAcquisition",
         "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren",
-        "TestASTFloatingPointScopedClassificationSourcePredicates"
+        "TestASTFloatingPointScopedClassificationSourcePredicates",
+        "TestASTFloatingPointSpecialConstructorsScopedValue",
+        "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
       ],
       "conditionals": [
         {
@@ -16867,6 +16880,15 @@
           "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
           "tests": [
             "TestASTFloatingPointScopedClassificationSourcePredicates"
+          ]
+        },
+        {
+          "name": "Concrete fpa_util mk_nan/mk_pinf/mk_ninf/mk_pzero/mk_nzero caller-local scoped_mpf, MPF setter before mk_value and destructor after return (src/ast/fpa_decl_plugin.cpp:950-975; src/util/scoped_numeral.h:24-33)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
+          "tests": [
+            "TestASTFloatingPointSpecialConstructorsScopedValue",
+            "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
           ]
         }
       ],
@@ -147609,7 +147631,9 @@
         "TestNumericStreamNativeCountedTextAndOwnedInput",
         "TestASTFloatingPointBooleanNumeralScopedValue",
         "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy",
-        "TestASTFloatingPointScopedClassificationSourcePredicates"
+        "TestASTFloatingPointScopedClassificationSourcePredicates",
+        "TestASTFloatingPointSpecialConstructorsScopedValue",
+        "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
       ],
       "conditionals": [
         {
@@ -148186,6 +148210,15 @@
           "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
           "tests": [
             "TestASTFloatingPointScopedClassificationSourcePredicates"
+          ]
+        },
+        {
+          "name": "Concrete fpa_util mk_nan/mk_pinf/mk_ninf/mk_pzero/mk_nzero caller-local scoped_mpf, MPF setter before mk_value and destructor after return (src/ast/fpa_decl_plugin.cpp:950-975; src/util/scoped_numeral.h:24-33)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
+          "tests": [
+            "TestASTFloatingPointSpecialConstructorsScopedValue",
+            "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
           ]
         }
       ],
@@ -164423,7 +164456,9 @@
         "TestPolynomialNegCompletedLocalGuardUnwind",
         "TestASTFloatingPointBooleanNumeralScopedValue",
         "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy",
-        "TestASTFloatingPointScopedClassificationSourcePredicates"
+        "TestASTFloatingPointScopedClassificationSourcePredicates",
+        "TestASTFloatingPointSpecialConstructorsScopedValue",
+        "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
       ],
       "conditionals": [
         {
@@ -164632,6 +164667,15 @@
           "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
           "tests": [
             "TestASTFloatingPointScopedClassificationSourcePredicates"
+          ]
+        },
+        {
+          "name": "Concrete fpa_util mk_nan/mk_pinf/mk_ninf/mk_pzero/mk_nzero caller-local scoped_mpf, MPF setter before mk_value and destructor after return (src/ast/fpa_decl_plugin.cpp:950-975; src/util/scoped_numeral.h:24-33)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
+          "tests": [
+            "TestASTFloatingPointSpecialConstructorsScopedValue",
+            "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
           ]
         }
       ],
