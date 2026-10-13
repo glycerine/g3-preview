@@ -172079,7 +172079,8 @@
         "pkg/util/memory/small_allocator.go",
         "pkg/util/memory/allocator_io.go",
         "pkg/util/diagnostic/util_small_object_allocator.go",
-        "pkg/util/diagnostic/util_small_object_allocator_stream.go"
+        "pkg/util/diagnostic/util_small_object_allocator_stream.go",
+        "pkg/util/diagnostic/util_process_verbose.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -172102,7 +172103,8 @@
         "TestVerboseContextColdRefusalAndExactCharge",
         "TestVerboseContextAllocatorEveryOutputRefusal",
         "TestVerboseContextClosedLevelReachedBeforeOutput",
-        "TestVerboseContextWarmOutputAndNullAdapter"
+        "TestVerboseContextWarmOutputAndNullAdapter",
+        "TestProcessVerboseGlobalsDefaultAndBorrowedSelection"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -172198,7 +172200,11 @@
         },
         {
           "name": "process-global verbosity and stderr default binding for retained shell/command-context callers",
-          "status": "unported"
+          "status": "ported",
+          "go_target": "pkg/util/diagnostic/util_process_verbose.go",
+          "tests": [
+            "TestProcessVerboseGlobalsDefaultAndBorrowedSelection"
+          ]
         }
       ],
       "ownership": [
@@ -172242,7 +172248,8 @@
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/rewriter/bv_rewriter_shift.go",
         "pkg/test/uint_set_test.go",
-        "pkg/math/subpaving/hardware_context_root.go"
+        "pkg/math/subpaving/hardware_context_root.go",
+        "pkg/util/diagnostic/util_process_verbose.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -172277,7 +172284,8 @@
         "TestUintSetIndependentBoundedOracle",
         "TestASTSomeValueProcScopedPriorityAndFailureRestoration",
         "TestASTSomeValueProcFallbackReservationFailureRestores",
-        "TestSubpavingHardwareContextBoundPolicyAndRootDispatch"
+        "TestSubpavingHardwareContextBoundPolicyAndRootDispatch",
+        "TestProcessVerboseGlobalsDefaultAndBorrowedSelection"
       ],
       "conditionals": [
         {
@@ -172541,7 +172549,11 @@
         },
         {
           "name": "process-global verbosity and stderr default binding for retained shell/command-context callers",
-          "status": "unported"
+          "status": "ported",
+          "go_target": "pkg/util/diagnostic/util_process_verbose.go",
+          "tests": [
+            "TestProcessVerboseGlobalsDefaultAndBorrowedSelection"
+          ]
         },
         {
           "name": "megabytes_to_bytes for env_params runtime with UINT_MAX and size_t overflow saturation",
