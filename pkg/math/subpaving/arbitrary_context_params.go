@@ -5,8 +5,24 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
 )
+
+// NewArbitraryContextFromParams follows the source constructor's single
+// updt_params call. On a refused update the partial owner is returned for
+// explicit Close, preserving the completed numerical mutation prefix.
+func NewArbitraryContextFromParams(m *numeral.ArbitraryFloatNumeralManager, limit *control.Reslimit, pc *params.ParamsContext, p *params.ParamsRef) (*ArbitraryContext, error) {
+	c, err := newArbitraryContextOwner(m, limit)
+	if err != nil {
+		return nil, err
+	}
+	if err := c.UpdateParamsRef(pc, p); err != nil {
+		return c, err
+	}
+	return c, nil
+}
 
 // UpdateParamsRef reads a source parameter immediately before applying its
 // mutation. If a later step fails, completed earlier fields remain changed.

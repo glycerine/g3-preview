@@ -50374,6 +50374,14 @@
             "pkg/math/subpaving/tactic/hardware_engine.go",
             "pkg/math/subpaving/tactic/options_test.go"
           ]
+        },
+        {
+          "name": "Concrete MPF factory context construction from source-order ParamsRef without preliminary default mutation (src/math/subpaving/subpaving.cpp:271-273); enclosing wrapper allocation and tactic dispatch remain",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/arbitrary_context_params.go",
+          "tests": [
+            "TestArbitraryContextNamedParamsSourceOrderAndDescriptions"
+          ]
         }
       ],
       "ownership": [],
@@ -52890,6 +52898,14 @@
           "go_targets": [
             "pkg/math/subpaving/tactic/hardware_engine.go",
             "pkg/math/subpaving/tactic/options_test.go"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf constructor policy stage applies one source-order updt_params pass with no preliminary defaults (src/math/subpaving/subpaving_t_def.h:419-438)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_context_params.go",
+          "tests": [
+            "TestArbitraryContextNamedParamsSourceOrderAndDescriptions"
           ]
         },
         {

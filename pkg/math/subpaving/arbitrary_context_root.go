@@ -70,13 +70,11 @@ type ArbitraryInequality struct {
 	refs     uint32
 }
 
-// NewArbitraryContext takes the source epsilon, max_bound exponent and
-// nth_root_precision parameter values.
-func NewArbitraryContext(m *numeral.ArbitraryFloatNumeralManager, limit *control.Reslimit, epsilon, maxBoundPower, rootPrecision uint32) (_ *ArbitraryContext, err error) {
+func newArbitraryContextOwner(m *numeral.ArbitraryFloatNumeralManager, limit *control.Reslimit) (_ *ArbitraryContext, err error) {
 	if m == nil || limit == nil {
 		return nil, arena.ErrInvalidSlot
 	}
-	c := &ArbitraryContext{numbers: m, limit: limit, zeroEpsilon: epsilon == 0, maxDepth: 128, maxNodes: 8192, maxMemory: math.MaxUint64}
+	c := &ArbitraryContext{numbers: m, limit: limit}
 	c.self = c
 	defer func() {
 		if err != nil {
@@ -101,6 +99,22 @@ func NewArbitraryContext(m *numeral.ArbitraryFloatNumeralManager, limit *control
 	if c.rootPrecision, err = c.owners[3].Get(); err != nil {
 		return nil, err
 	}
+	return c, nil
+}
+
+// NewArbitraryContext takes the source epsilon, max_bound exponent and
+// nth_root_precision parameter values.
+func NewArbitraryContext(m *numeral.ArbitraryFloatNumeralManager, limit *control.Reslimit, epsilon, maxBoundPower, rootPrecision uint32) (_ *ArbitraryContext, err error) {
+	c, err := newArbitraryContextOwner(m, limit)
+	if err != nil {
+		return nil, err
+	}
+	c.zeroEpsilon, c.maxDepth, c.maxNodes, c.maxMemory = epsilon == 0, 128, 8192, math.MaxUint64
+	defer func() {
+		if err != nil {
+			err = errors.Join(err, c.closeNumerals())
+		}
+	}()
 	if epsilon != 0 {
 		if err = m.SetInt32(c.epsilon, int32(epsilon)); err != nil {
 			return nil, err

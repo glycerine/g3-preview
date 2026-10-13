@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/symbol"
@@ -112,6 +113,37 @@ func TestArbitraryContextNamedParamsSourceOrderAndDescriptions(t *testing.T) {
 	}
 	if !c.zeroEpsilon || value(c.maxBound) != 1 || value(c.rootPrecision) != 1 {
 		t.Fatal("zero parameter branches")
+	}
+	set("epsilon", 4)
+	set("max_bound", 2)
+	set("max_depth", 7)
+	set("max_nodes", 9)
+	set("max_memory", 3)
+	set("nth_root_precision", 16)
+	fresh, err := NewArbitraryContextFromParams(f.numbers, &control.Reslimit{Limit: 100}, pc, &p)
+	if err != nil {
+		t.Fatal("single-pass factory", err)
+	}
+	if fresh.zeroEpsilon || value(fresh.epsilon) != .25 || value(fresh.maxBound) != 100 || fresh.maxDepth != 7 || fresh.maxNodes != 9 || fresh.maxMemory != 3*1024*1024 {
+		t.Fatal("factory policy")
+	}
+	if err := fresh.Close(); err != nil {
+		t.Fatal(err)
+	}
+	set("epsilon", 2)
+	set("max_bound", 1<<31)
+	partial, err := NewArbitraryContextFromParams(f.numbers, &control.Reslimit{Limit: 100}, pc, &p)
+	if err == nil || partial == nil {
+		t.Fatal("refused factory owner", partial, err)
+	}
+	if value(partial.epsilon) != .5 || value(partial.maxBound) != 1 || partial.maxDepth != 0 || partial.maxNodes != 0 {
+		t.Fatal("single pass stopped at power", partial.maxDepth, partial.maxNodes)
+	}
+	if err := partial.Close(); err != nil {
+		t.Fatal("partial factory cleanup", err)
+	}
+	if missing, err := NewArbitraryContextFromParams(nil, &control.Reslimit{Limit: 100}, pc, &p); missing != nil || !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatal("missing factory manager", missing, err)
 	}
 	if err := w.CollectParamDescrs(d); err != nil {
 		t.Fatal(err)
