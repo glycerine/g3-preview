@@ -35357,7 +35357,9 @@
         "pkg/math/polynomial/algebraic_neg_invocation.go",
         "pkg/math/polynomial/algebraic_neg_source_test.go",
         "pkg/math/polynomial/algebraic_neg_owner_cleanup_source_test.go",
-        "pkg/math/polynomial/algebraic_native_storage_test.go"
+        "pkg/math/polynomial/algebraic_native_storage_test.go",
+        "pkg/math/polynomial/algebraic_display_interval.go",
+        "pkg/math/polynomial/algebraic_display_interval_test.go"
       ],
       "tests": [
         "TestAlgebraicSourceRootCounts",
@@ -35385,7 +35387,8 @@
         "TestAlgebraicNegLiteralNullBasicAndRoot",
         "TestAlgebraicNegMinimumEveryActualReservationPrefix",
         "TestAlgebraicNegRootHornerEveryActualReservationPrefix",
-        "TestAlgebraicNativeLocatorAndVectorOwnership"
+        "TestAlgebraicNativeLocatorAndVectorOwnership",
+        "TestAlgebraicDisplayIntervalSourceBranchesAndWritePrefixes"
       ],
       "conditionals": [
         {
@@ -35854,6 +35857,14 @@
             "TestAlgebraicNegLiteralNullBasicAndRoot",
             "TestAlgebraicNegMinimumEveryActualReservationPrefix",
             "TestAlgebraicNegRootHornerEveryActualReservationPrefix"
+          ]
+        },
+        {
+          "name": "algebraic_numbers.cpp:2708-2719 basic [q, q] and algebraic MPBQ interval display",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/algebraic_display_interval.go",
+          "tests": [
+            "TestAlgebraicDisplayIntervalSourceBranchesAndWritePrefixes"
           ]
         }
       ],
@@ -145059,7 +145070,8 @@
         "pkg/util/numeral/mpbqi.go",
         "pkg/util/numeral/mpbqi_format.go",
         "pkg/util/numeral/scoped_binary_interval.go",
-        "pkg/util/numeral/mpbqi_stream_test.go"
+        "pkg/util/numeral/mpbqi_stream_test.go",
+        "pkg/math/polynomial/algebraic_display_interval_test.go"
       ],
       "tests": [
         "TestBinaryIntervalQueriesAndScalarRoutes",
@@ -145072,7 +145084,8 @@
         "TestBinaryIntervalPredicateShortCircuits",
         "TestBinaryIntervalOwnerAndScope",
         "TestBinaryIntervalRetainedProductsAndDeepCopies",
-        "TestBinaryIntervalSourceStreamOrderAndRefusalPrefixes"
+        "TestBinaryIntervalSourceStreamOrderAndRefusalPrefixes",
+        "TestAlgebraicDisplayIntervalSourceBranchesAndWritePrefixes"
       ],
       "conditionals": [
         {
@@ -145139,7 +145152,7 @@
           ]
         },
         {
-          "name": "Persistent platform ostream state and real polynomial/algebraic display consumers",
+          "name": "Persistent platform ostream state and remaining real polynomial/algebraic display consumers",
           "status": "partial",
           "tests": []
         },
@@ -145156,7 +145169,7 @@
         "Concrete pointer-free endpoints borrow one BinaryRationalManager domain. Actual cold manager and scope headers are charged; three retained multiplication scratch numerators preserve old output ownership. Source endpoint/destructor order and immediate reachable numeral/Words/diagnostic graphs are audited before formatting and teardown. See PORT_PROGRESS.md#audit-mpbqi-port-status-md."
       ],
       "deviations": [
-        "Concrete MPBQ/open specialization replaces C++ templates without Go generics. Native io.Writer insertion now preserves source delimiter/bound order and failing-write prefixes. Platform ostream state and the algebraic display_interval consumer remain open; staged caller-owned strings remain available."
+        "Concrete MPBQ/open specialization replaces C++ templates without Go generics. Native io.Writer insertion now preserves source delimiter/bound order and failing-write prefixes. The algebraic display_interval consumer now calls this writer; platform ostream state and other retained display consumers remain open; staged caller-owned strings remain available."
       ]
     },
     {
