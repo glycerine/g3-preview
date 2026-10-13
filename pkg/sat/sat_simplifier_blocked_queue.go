@@ -8,12 +8,20 @@ func newSATSimplifierBlockedQueue(s *satSimplifier) (*satVarQueue, error) {
 	if s.lifecycle == nil || s.lifecycle.propagation == nil || s.lifecycle.propagation.memory == nil || s.lifecycle.budget != s.lifecycle.propagation.memory.Budget() {
 		return nil, ErrSATOwner
 	}
-	q, e := newSATVarQueue(s.lifecycle.budget)
+	q, e := newSATVarQueueWithDebug(s.lifecycle.budget, s.debug)
 	if e != nil {
 		return nil, e
 	}
 	q.literalSource = s
 	q.initialize()
+	if e := q.cassertInvariant(); e != nil {
+		_ = q.Close()
+		return nil, e
+	}
+	if e := q.cassertInvariant(); e != nil {
+		_ = q.Close()
+		return nil, e
+	}
 	return q, nil
 }
 func (s *satSimplifier) literalWeight(idx uint32) (uint32, error) {

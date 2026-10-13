@@ -74156,6 +74156,7 @@
         "pkg/sat/sat_simplifier_blocked.go",
         "pkg/sat/sat_simplifier_blocked_queue.go",
         "pkg/sat/sat_simplifier_blocked_queue_test.go",
+        "pkg/sat/sat_var_queue_debug_test.go",
         "pkg/sat/sat_simplifier_cleanup.go",
         "pkg/sat/sat_simplifier_duplicate_bins.go",
         "pkg/sat/sat_simplifier_elimination.go",
@@ -74214,6 +74215,7 @@
         "TestSATSimplifierAllActualRefusalPrefixes",
         "TestSATSimplifierActualCancellationRetainsNamedSourcePrefix",
         "TestSATSimplifierBlockedHeapMutableActualUnsignedWeights",
+        "TestSATSolverQueuesBorrowHeapDebugAndStopBeforeReset",
         "TestSATSimplifierEliminationCostAndStableOrder",
         "TestSATSimplifierActualTernaryAndNaryResolventPublication",
         "TestSATSimplifierSourceCutoffsAndTooManyResolventsPrefix",
@@ -74412,6 +74414,7 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_simplifier_blocked_queue.go",
           "tests": [
+            "TestSATSolverQueuesBorrowHeapDebugAndStopBeforeReset",
             "TestSATCaseSplitHeapIndependentFiniteActivityOracle",
             "TestSATCaseSplitHeapWarmPhysicalPlateauAndOwnerGuards",
             "TestSATNativeCaseSplitQueueGrowthIndependentPriorityAndColdBudget",
@@ -75137,6 +75140,7 @@
         "TestSATSolverInterveningChildFailureBeforeQueueConstruction",
         "TestSATSolverFullConstructorEveryActualRefusalUnwindsRealMembers",
         "TestSATSolverCompleteMemberConstructorHasRealDefaultChildren",
+        "TestSATSolverQueuesBorrowHeapDebugAndStopBeforeReset",
         "TestSATSolverConstructorRefusesForeignRuntimeBeforeActualHeaderReserve",
         "TestSATSolverUncompletedWrapperUnwindDoesNotRunDestructorBody",
         "TestSATSolverRealDestructorStagesKeepLaterSourceMembers",
@@ -76533,6 +76537,7 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_solver.go",
           "tests": [
+            "TestSATSolverQueuesBorrowHeapDebugAndStopBeforeReset",
             "TestSATCaseSplitHeapIndependentFiniteActivityOracle",
             "TestSATCaseSplitHeapWarmPhysicalPlateauAndOwnerGuards",
             "TestSATNativeCaseSplitQueueGrowthIndependentPriorityAndColdBudget",
@@ -78068,6 +78073,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/sat/sat_var_queue.go",
+        "pkg/sat/sat_solver.go",
+        "pkg/sat/sat_var_queue_debug_test.go",
         "pkg/sat/sat_solver_activity.go",
         "pkg/sat/sat_solver_trail.go",
         "pkg/sat/sat_solver_runtime_activity_trail_test.go",
@@ -78076,6 +78083,7 @@
       ],
       "tests": [
         "TestSATVarQueueIndependentMutableActivityModel",
+        "TestSATSolverQueuesBorrowHeapDebugAndStopBeforeReset",
         "TestSATSolverNativeActivityAndTrailAccounting",
         "TestSATSolverActivityIncrementDecayAndRescaleSourceOrder",
         "TestSATSolverNativeTrailGrowthBoundsAndStableRoot",
@@ -78113,12 +78121,20 @@
           "go_target": "pkg/sat/sat_var_queue.go",
           "tests": [
             "TestSATVarQueueIndependentMutableActivityModel",
+            "TestSATSolverQueuesBorrowHeapDebugAndStopBeforeReset",
             "TestSATNativeCaseSplitQueueGrowthIndependentPriorityAndColdBudget",
             "TestSATNativeCaseSplitQueueOwnerBudgetAndIndexGuards"
           ]
         },
         {
-          "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
+          "name": "retained heap CASSERT tag and nested SASSERT routing through actual SAT variable and blocked-clause queues",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_var_queue.go",
+          "go_targets": ["pkg/sat/sat_solver.go", "pkg/sat/sat_simplifier_blocked_queue.go"],
+          "tests": ["TestSATSolverQueuesBorrowHeapDebugAndStopBeforeReset"]
+        },
+        {
+          "name": "remaining TRACE policy and consumer integration",
           "status": "unported",
           "tests": []
         },
@@ -121493,6 +121509,9 @@
       "go_targets": [
         "pkg/sat/sat_var_queue.go",
         "pkg/sat/sat_simplifier_blocked_queue.go",
+        "pkg/sat/sat_simplifier.go",
+        "pkg/sat/sat_solver.go",
+        "pkg/sat/sat_var_queue_debug_test.go",
         "pkg/util/heap/heap.go",
         "pkg/sat/sat_var_queue_oracle_test.go",
         "pkg/util/heap/heap_test.go",
@@ -121524,6 +121543,7 @@
         "TestHeapSourceShapeAndLifetime",
         "TestHeapSwapSecondReservationAndFinitePeak",
         "TestSATVarQueueIndependentMutableActivityModel",
+        "TestSATSolverQueuesBorrowHeapDebugAndStopBeforeReset",
         "TestSATSimplifierBlockedHeapMutableActualUnsignedWeights",
         "TestSATCaseSplitHeapIndependentFiniteActivityOracle",
         "TestSATCaseSplitHeapWarmPhysicalPlateauAndOwnerGuards",
@@ -121853,6 +121873,7 @@
           "go_target": "pkg/sat/sat_var_queue.go",
           "tests": [
             "TestSATVarQueueIndependentMutableActivityModel",
+            "TestSATSolverQueuesBorrowHeapDebugAndStopBeforeReset",
             "TestSATNativeCaseSplitQueueGrowthIndependentPriorityAndColdBudget",
             "TestSATNativeCaseSplitQueueOwnerBudgetAndIndexGuards"
           ]
@@ -121862,7 +121883,8 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_blocked_queue.go",
           "tests": [
-            "TestSATSimplifierBlockedHeapMutableActualUnsignedWeights"
+            "TestSATSimplifierBlockedHeapMutableActualUnsignedWeights",
+            "TestSATSolverQueuesBorrowHeapDebugAndStopBeforeReset"
           ]
         },
         {

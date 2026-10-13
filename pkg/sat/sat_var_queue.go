@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 // Concrete priority queue for solver activity and simplifier literal weights.
@@ -15,6 +16,7 @@ type satVarQueue struct {
 	solverActivity  *satSolverActivity
 	values, indices []int32
 	budget          *arena.Budget
+	debug           *diagnostic.DebugContext
 	ownerBytes      uint64
 	closed          bool
 }
@@ -25,13 +27,79 @@ func (q *satVarQueue) initialize() {
 	q.indices = make([]int32, 128)
 }
 func newSATVarQueue(b *arena.Budget) (*satVarQueue, error) {
+	return newSATVarQueueWithDebug(b, nil)
+}
+
+func newSATVarQueueWithDebug(b *arena.Budget, debug *diagnostic.DebugContext) (*satVarQueue, error) {
 	n := uint64(reflect.TypeOf(satVarQueue{}).Size())
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	q := &satVarQueue{budget: b, ownerBytes: n}
+	q := &satVarQueue{budget: b, debug: debug, ownerBytes: n}
 	q.self = q
 	return q, nil
+}
+
+func (q *satVarQueue) sourceAssertionFailure(line int32, condition string) error {
+	if e := q.debug.NotifyAssertionViolation("src/util/heap.h", line, condition); e != nil {
+		return e
+	}
+	return q.debug.InvokeAssertionDebugger()
+}
+
+func (q *satVarQueue) heapAssertionEnabled() (bool, error) {
+	if q.debug == nil {
+		return false, nil
+	}
+	on, e := diagnostic.SourceAssertionsEnabled(q.debug)
+	if e != nil || !on {
+		return false, e
+	}
+	return q.debug.IsDebugEnabled("heap")
+}
+
+func (q *satVarQueue) cassertInvariant() error {
+	on, e := q.heapAssertionEnabled()
+	if e != nil || !on {
+		return e
+	}
+	// The source outer check_invariant returns true after nested SASSERTs.
+	var walk func(int) error
+	walk = func(i int) error {
+		if i >= len(q.values) {
+			return nil
+		}
+		v := q.values[i]
+		if v < 0 || int64(v) >= int64(len(q.indices)) || q.indices[v] != int32(i) {
+			if e := q.sourceAssertionFailure(63, "m_value2indices[m_values[idx]] == idx"); e != nil {
+				return e
+			}
+		}
+		if i > 1 {
+			less, e := q.lt(v, q.values[i/2])
+			if e != nil {
+				return e
+			}
+			if less {
+				if e := q.sourceAssertionFailure(64, "parent(idx) == 0 || !less_than(m_values[idx], m_values[parent(idx)])"); e != nil {
+					return e
+				}
+			}
+		}
+		if e := walk(i * 2); e != nil {
+			return e
+		}
+		return walk(i*2 + 1)
+	}
+	return walk(1)
+}
+
+func (q *satVarQueue) cassertNotContains(v BoolVar) error {
+	on, e := q.heapAssertionEnabled()
+	if e != nil || !on || !q.Contains(v) {
+		return e
+	}
+	return q.sourceAssertionFailure(232, "!contains(val)")
 }
 func (q *satVarQueue) open() error {
 	if q == nil || q.self != q {
@@ -48,10 +116,10 @@ func (q *satVarQueue) reserve(n uint32) error {
 		return arena.ErrBounds
 	}
 	if uint64(n) <= uint64(len(q.indices)) {
-		return nil
+		return q.cassertInvariant()
 	}
 	q.indices = append(q.indices, make([]int32, int(n)-len(q.indices))...)
-	return nil
+	return q.cassertInvariant()
 }
 
 func (q *satVarQueue) Size() uint32 {
@@ -124,7 +192,10 @@ func (q *satVarQueue) up(i int32) error {
 		}
 		i = p
 	}
-	return q.put(i, v)
+	if e := q.put(i, v); e != nil {
+		return e
+	}
+	return q.cassertInvariant()
 }
 func (q *satVarQueue) down(i int32) error {
 	if i < 1 || int64(i) >= int64(len(q.values)) {
@@ -158,10 +229,19 @@ func (q *satVarQueue) down(i int32) error {
 		}
 		i = c
 	}
-	return q.put(i, v)
+	if e := q.put(i, v); e != nil {
+		return e
+	}
+	return q.cassertInvariant()
 }
 func (q *satVarQueue) insert(v BoolVar) error {
 	if e := q.open(); e != nil {
+		return e
+	}
+	if e := q.cassertInvariant(); e != nil {
+		return e
+	}
+	if e := q.cassertNotContains(v); e != nil {
 		return e
 	}
 	if uint64(v) >= uint64(len(q.indices)) {
@@ -174,7 +254,10 @@ func (q *satVarQueue) insert(v BoolVar) error {
 	q.indices[v] = i
 
 	q.values = append(q.values, int32(v))
-	return q.up(i)
+	if e := q.up(i); e != nil {
+		return e
+	}
+	return q.cassertInvariant()
 }
 func (q *satVarQueue) MkVar(v BoolVar) error {
 	if e := q.open(); e != nil {
@@ -219,6 +302,9 @@ func (q *satVarQueue) DelVar(v BoolVar) error {
 	if !q.Contains(v) {
 		return nil
 	}
+	if e := q.cassertInvariant(); e != nil {
+		return e
+	}
 	i := q.indices[v]
 	if i < 1 || int64(i) >= int64(len(q.values)) {
 		return arena.ErrBounds
@@ -241,17 +327,23 @@ func (q *satVarQueue) DelVar(v BoolVar) error {
 				return e
 			}
 			if less {
-				return q.up(i)
+				if e := q.up(i); e != nil {
+					return e
+				}
+				return q.cassertInvariant()
 			}
 		}
 		if e := q.down(i); e != nil {
 			return e
 		}
 	}
-	return nil
+	return q.cassertInvariant()
 }
 func (q *satVarQueue) NextVar() (BoolVar, error) {
 	if e := q.open(); e != nil {
+		return 0, e
+	}
+	if e := q.cassertInvariant(); e != nil {
 		return 0, e
 	}
 	if len(q.values) < 2 {
@@ -279,10 +371,13 @@ func (q *satVarQueue) NextVar() (BoolVar, error) {
 		}
 	}
 
-	return BoolVar(v), nil
+	return BoolVar(v), q.cassertInvariant()
 }
 func (q *satVarQueue) Reset() error {
 	if e := q.open(); e != nil {
+		return e
+	}
+	if e := q.cassertInvariant(); e != nil {
 		return e
 	}
 	if q.Empty() {
@@ -292,7 +387,7 @@ func (q *satVarQueue) Reset() error {
 	q.values = q.values[:1]
 	q.values[0] = -1
 
-	return nil
+	return q.cassertInvariant()
 }
 func (q *satVarQueue) CheckInvariant() (bool, error) {
 	if e := q.open(); e != nil {
@@ -339,18 +434,30 @@ func (q *satVarQueue) getActivity(i uint32) (uint32, error) {
 	return q.solverActivity.Get(i)
 }
 func newSATSolverVarQueue(a *satSolverActivity, b *arena.Budget) (*satVarQueue, error) {
+	return newSATSolverVarQueueWithDebug(a, b, nil)
+}
+
+func newSATSolverVarQueueWithDebug(a *satSolverActivity, b *arena.Budget, debug *diagnostic.DebugContext) (*satVarQueue, error) {
 	if e := a.open(); e != nil {
 		return nil, e
 	}
 	if b == nil || a.budget != b {
 		return nil, ErrSATOwner
 	}
-	q, e := newSATVarQueue(b)
+	q, e := newSATVarQueueWithDebug(b, debug)
 	if e != nil {
 		return nil, e
 	}
 	q.solverActivity = a
 	q.initialize()
+	if e := q.cassertInvariant(); e != nil {
+		_ = q.Close()
+		return nil, e
+	}
+	if e := q.cassertInvariant(); e != nil {
+		_ = q.Close()
+		return nil, e
+	}
 	return q, nil
 }
 

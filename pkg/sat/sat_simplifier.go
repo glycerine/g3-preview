@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/stopwatch"
@@ -14,6 +15,7 @@ import (
 // Concrete source member owner. Solver services are real borrowed owners; this
 // is not the complete solver constructor. Only kernel owns visited/counters.
 type satSimplifier struct {
+	debug                                                                        *diagnostic.DebugContext
 	scopedStage                                                                  uint32
 	subReportActive                                                              bool
 	self                                                                         *satSimplifier

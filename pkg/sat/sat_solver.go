@@ -8,11 +8,13 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 type SolverConfig struct {
+	Debug         *diagnostic.DebugContext
 	ParamsContext *uparams.ParamsContext
 	Params        uparams.ParamsRef
 	RLimit        *control.Reslimit
@@ -82,6 +84,9 @@ type satSolverMUSMembers struct {
 
 func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	if c.Runtime == nil || c.ParamsContext == nil || c.Budget == nil || c.RLimit == nil || c.RLimit.Closed() {
+		return nil, ErrSATOwner
+	}
+	if c.Debug != nil && !c.Debug.ValidOwner() {
 		return nil, ErrSATOwner
 	}
 	if err = c.Runtime.open(); err != nil {
@@ -167,6 +172,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	if s.simplifier, err = newSATSimplifier(s.Lifecycle, s.cleaner, s.decision, &c.Params); err != nil {
 		return s, err
 	}
+	s.simplifier.debug = c.Debug
 	if s.scc, err = newSATSCC(s.Lifecycle, &c.Params); err != nil {
 		return s, err
 	}
@@ -194,7 +200,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 		return s, err
 	}
 	s.Variables.activityInc = 128
-	if s.Variables.queue, err = newSATSolverVarQueue(s.Variables.activity, c.Budget); err != nil {
+	if s.Variables.queue, err = newSATSolverVarQueueWithDebug(s.Variables.activity, c.Budget, c.Debug); err != nil {
 		return s, err
 	}
 	s.Variables.qhead = 0
