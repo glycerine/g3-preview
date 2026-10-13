@@ -117170,7 +117170,8 @@
         "pkg/math/interval/fast_extended_test.go",
         "pkg/math/interval/extended_write.go",
         "pkg/math/interval/extended_write_test.go",
-        "pkg/math/interval/arbitrary_extended.go"
+        "pkg/math/interval/arbitrary_extended.go",
+        "pkg/math/interval/hardware_extended.go"
       ],
       "tests": [
         "TestRationalExtendedIntervalBranches",
@@ -117180,7 +117181,8 @@
         "TestSubpavingFixedExtendedRetainedBranches",
         "TestSubpavingFastFloatExtendedRetainedBranches",
         "TestExtendedInfinityDisplaysShortWrites",
-        "TestSubpavingMPFExtendedFiniteAndInfiniteBranches"
+        "TestSubpavingMPFExtendedFiniteAndInfiniteBranches",
+        "TestSubpavingHardwareExtendedRetainedBranches"
       ],
       "conditionals": [
         {
@@ -117377,6 +117379,14 @@
         {
           "name": "Subpaving context_hwf interval extended-number operations through concrete f2n<hwf_manager>",
           "status": "unported"
+        },
+        {
+          "name": "Concrete hwf extended-number finite/infinity sign, order, negation, arithmetic, reciprocal, power and display for retained subpaving hardware context (src/util/ext_numeral.h:27-344)",
+          "status": "partial",
+          "go_target": "pkg/math/interval/hardware_extended.go",
+          "tests": [
+            "TestSubpavingHardwareExtendedRetainedBranches"
+          ]
         }
       ],
       "ownership": [
