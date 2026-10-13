@@ -148151,7 +148151,8 @@
         "pkg/math/realclosure/binary_interval_test.go",
         "pkg/math/polynomial/algebraic_display_decimal_test.go",
         "pkg/util/numeral/mpbq_decimal_stream.go",
-        "pkg/util/numeral/mpbq_decimal_stream_test.go"
+        "pkg/util/numeral/mpbq_decimal_stream_test.go",
+        "pkg/util/numeral/mpbq_select_trace.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -148182,7 +148183,8 @@
         "TestBinaryRationalSourceStreamInsertionsAndRefusalPrefixes",
         "TestRealClosureBinaryIntervalRetainedCore",
         "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement",
-        "TestBinaryRationalDecimalSourceStreamAndRawScope"
+        "TestBinaryRationalDecimalSourceStreamAndRawScope",
+        "TestBinarySelectSmallRationalLowerRetainedTrace"
       ],
       "conditionals": [
         {
@@ -148649,6 +148651,14 @@
           "tests": [
             "TestBinaryRationalDecimalSourceStreamAndRawScope"
           ]
+        },
+        {
+          "name": "mpbq select_small_core rational-lower TRACE at source entry before interval assertion",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpbq_select_trace.go",
+          "tests": [
+            "TestBinarySelectSmallRationalLowerRetainedTrace"
+          ]
         }
       ],
       "ownership": [
@@ -148689,7 +148699,8 @@
         "pkg/math/realclosure/binary_interval_test.go",
         "pkg/math/polynomial/algebraic_display_decimal_test.go",
         "pkg/util/numeral/mpbq_decimal_stream.go",
-        "pkg/util/numeral/mpbq_decimal_stream_test.go"
+        "pkg/util/numeral/mpbq_decimal_stream_test.go",
+        "pkg/util/numeral/mpbq_select_trace.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -148720,7 +148731,8 @@
         "TestBinaryRationalSourceStreamInsertionsAndRefusalPrefixes",
         "TestRealClosureBinaryIntervalRetainedCore",
         "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement",
-        "TestBinaryRationalDecimalSourceStreamAndRawScope"
+        "TestBinaryRationalDecimalSourceStreamAndRawScope",
+        "TestBinarySelectSmallRationalLowerRetainedTrace"
       ],
       "conditionals": [
         {
@@ -148937,6 +148949,14 @@
           "go_target": "pkg/util/numeral/mpbq_decimal_stream.go",
           "tests": [
             "TestBinaryRationalDecimalSourceStreamAndRawScope"
+          ]
+        },
+        {
+          "name": "mpbq select_small_core rational-lower TRACE at source entry before interval assertion",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpbq_select_trace.go",
+          "tests": [
+            "TestBinarySelectSmallRationalLowerRetainedTrace"
           ]
         }
       ],
@@ -172492,14 +172512,16 @@
         "pkg/util/numeral/mpff_round_trace.go",
         "pkg/util/numeral/mpff_power_trace.go",
         "pkg/util/numeral/mpff_convert_trace.go",
-        "pkg/util/numeral/mpff_to_rational_trace.go"
+        "pkg/util/numeral/mpff_to_rational_trace.go",
+        "pkg/util/numeral/mpbq_select_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
         "TestFastFloatPowerRetainedTraceBranchesAndAlias",
         "TestFastFloatSetIntegerRetainedTraceBranches",
-        "TestFastFloatToRationalRetainedTraceExponentBranches"
+        "TestFastFloatToRationalRetainedTraceExponentBranches",
+        "TestBinarySelectSmallRationalLowerRetainedTrace"
       ],
       "conditionals": [
         {
@@ -172712,6 +172734,14 @@
           ]
         },
         {
+          "name": "mpbq select_small_core rational-lower TRACE at source entry before interval assertion",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpbq_select_trace.go",
+          "tests": [
+            "TestBinarySelectSmallRationalLowerRetainedTrace"
+          ]
+        },
+        {
           "name": "optional _TRACE file and remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -172734,14 +172764,16 @@
         "pkg/util/numeral/mpff_round_trace.go",
         "pkg/util/numeral/mpff_power_trace.go",
         "pkg/util/numeral/mpff_convert_trace.go",
-        "pkg/util/numeral/mpff_to_rational_trace.go"
+        "pkg/util/numeral/mpff_to_rational_trace.go",
+        "pkg/util/numeral/mpbq_select_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
         "TestFastFloatPowerRetainedTraceBranchesAndAlias",
         "TestFastFloatSetIntegerRetainedTraceBranches",
-        "TestFastFloatToRationalRetainedTraceExponentBranches"
+        "TestFastFloatToRationalRetainedTraceExponentBranches",
+        "TestBinarySelectSmallRationalLowerRetainedTrace"
       ],
       "conditionals": [
         {
@@ -172963,6 +172995,14 @@
           "go_target": "pkg/util/numeral/mpff_to_rational_trace.go",
           "tests": [
             "TestFastFloatToRationalRetainedTraceExponentBranches"
+          ]
+        },
+        {
+          "name": "mpbq select_small_core rational-lower TRACE at source entry before interval assertion",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpbq_select_trace.go",
+          "tests": [
+            "TestBinarySelectSmallRationalLowerRetainedTrace"
           ]
         },
         {

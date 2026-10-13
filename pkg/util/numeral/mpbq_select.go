@@ -214,6 +214,7 @@ func (m *BinaryRationalManager) SelectSmallRationalLower(qm *RationalManager, lo
 	if e := qm.check(lower); e != nil {
 		return e
 	}
+	m.traceSelectSmallRationalLower(qm, lower, upper)
 	yes, e := m.GreaterRational(upper, qm, lower)
 	if e != nil {
 		return e
