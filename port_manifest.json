@@ -146375,7 +146375,12 @@
         },
         {
           "name": "mpf.cpp:194-231 formatted C-string SET reached by api_numeral.cpp",
-          "status": "unported"
+          "status": "partial",
+          "go_target": "pkg/util/numeral/mpf_formatted_literal.go",
+          "tests": [
+            "TestArbitraryFloatFormattedLiteralSourceValues",
+            "TestArbitraryFloatFormattedLiteralAllocationPrefixes"
+          ]
         },
         {
           "name": "mpf.cpp:303-316 scalar uint64 significand SET reached by api_fpa.cpp",
