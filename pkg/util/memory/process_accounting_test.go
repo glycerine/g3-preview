@@ -38,7 +38,7 @@ func TestProcessAccountingSharesSourceGlobalCounterAndLimit(t *testing.T) {
 	memoryRuntimeRequire(t, b.SetMaxSize(48))
 	failed, err := a.Allocate(1)
 	memoryRuntimeCode(t, err, 101)
-	if failed != (Block{}) || p.AllocationSize() != 57 || !b.State().OutOfMemory {
+	if failed != (Block{}) || p.AllocationSize() != 57 || !p.OutOfMemory() || !b.State().OutOfMemory {
 		t.Fatal("cross-runtime limit", failed, p.AllocationSize(), b.State())
 	}
 	memoryRuntimeRequire(t, a.Deallocate(&x))

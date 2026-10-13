@@ -43,3 +43,8 @@ func (p *ProcessAccounting) AllocationCount() uint64 {
 	}
 	return p.accounting.allocationCount()
 }
+
+// OutOfMemory is memory::is_out_of_memory's sticky process-wide flag.
+func (p *ProcessAccounting) OutOfMemory() bool {
+	return p.Valid() && p.accounting.outOfMemory
+}

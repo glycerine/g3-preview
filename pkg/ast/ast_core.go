@@ -65,8 +65,18 @@ func constructSourceASTManager(c ASTManagerConfig, format bool, filename TraceFi
 	for i := range m.nextKind {
 		m.nextKind[i] = 1
 	}
-	m.ExprIDs = idgen.NewBudgeted(0, c.Budget, c.OutOfMemory)
-	m.declIDs = idgen.NewBudgeted(1<<31, c.Budget, c.OutOfMemory)
+	outOfMemory := c.OutOfMemory
+	if outOfMemory == nil {
+		if runtime := c.Numerals.RuntimeOwner(); runtime != nil {
+			if process := runtime.ProcessOwner(); process != nil {
+				outOfMemory = process.OutOfMemory
+			} else {
+				outOfMemory = func() bool { return runtime.State().OutOfMemory }
+			}
+		}
+	}
+	m.ExprIDs = idgen.NewBudgeted(0, c.Budget, outOfMemory)
+	m.declIDs = idgen.NewBudgeted(1<<31, c.Budget, outOfMemory)
 	// Completed constructor prefixes are owned immediately and unwound by the
 	// same real destructor actions, without touching caller-owned services.
 	fail := func(e error) (*ASTManager, error) {
