@@ -17,11 +17,16 @@ type astSharedFrame struct {
 	next uint32
 }
 
+type astSharedEntry struct {
+	node  astNodeRef
+	owned bool
+}
+
 // Entries own one reference per distinct expression. Native dictionary order
 // makes iteration and destruction follow first discovery deterministically.
 type ASTSharedOccurrences struct {
 	owner        astMarkOwner
-	entries      insdict.Dict[uint64, astNodeRef]
+	entries      insdict.Dict[uint64, astSharedEntry]
 	config       ASTSharedOccurrencesConfig
 	stack        []astSharedFrame
 	view         *astSharedView
@@ -54,11 +59,13 @@ func (s *ASTSharedOccurrences) insert(m *ASTManager, r astNodeRef) error {
 	if _, found := s.entries.Get2(key); found {
 		return nil
 	}
+	// Source insert_if_not_there_core publishes the set entry before INC.
+	s.entries.Put(key, astSharedEntry{node: r})
+	s.view = nil
 	if e := m.incNode(r); e != nil {
 		return e
 	}
-	s.entries.Put(key, r)
-	s.view = nil
+	s.entries.Set(key, astSharedEntry{node: r, owned: true})
 	return nil
 }
 func (s *ASTSharedOccurrences) process(m *ASTManager, r astNodeRef, v *astSharedMarkState) (bool, error) {
@@ -170,8 +177,14 @@ func (s *ASTSharedOccurrences) collectLocked(m *ASTManager, r astNodeRef, v *ast
 func (s *ASTSharedOccurrences) resetLocked(m *ASTManager) error {
 	s.resetPending = true
 	s.view = nil
-	for key, r := range s.entries.All() {
-		consumed, e := m.decNode(r)
+	for key, entry := range s.entries.All() {
+		if !entry.owned {
+			// The source set may retain this raw entry after INC refuses;
+			// owning cleanup has no reference to decrement for it.
+			s.entries.Del(key)
+			continue
+		}
+		consumed, e := m.decNode(entry.node)
 		if consumed {
 			s.entries.Del(key)
 		}

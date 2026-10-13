@@ -29029,7 +29029,8 @@
         "pkg/ast/ast_shared_occs.go",
         "pkg/ast/ast_shared_occs_iterator.go",
         "pkg/ast/ast_shared_occs_mark.go",
-        "pkg/ast/ast_sparse_mark.go"
+        "pkg/ast/ast_sparse_mark.go",
+        "pkg/ast/ast_shared_occs_insert_order_debug_test.go"
       ],
       "tests": [
         "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
@@ -29164,6 +29165,14 @@
           "status": "unported",
           "go_target": "",
           "tests": []
+        },
+        {
+          "name": "shared_occs::insert publishes collection entry before AST inc_ref; stopped debug assertion retains raw unowned entry for exact owning reset (shared_occs.cpp:26-29)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_shared_occs.go",
+          "tests": [
+            "TestASTSharedOccurrencePublishesBeforeRefcountAssertion"
+          ]
         }
       ],
       "ownership": [
@@ -29182,7 +29191,8 @@
         "pkg/ast/ast_shared_occs.go",
         "pkg/ast/ast_shared_occs_iterator.go",
         "pkg/ast/ast_shared_occs_mark.go",
-        "pkg/ast/ast_sparse_mark.go"
+        "pkg/ast/ast_sparse_mark.go",
+        "pkg/ast/ast_shared_occs_insert_order_debug_test.go"
       ],
       "tests": [
         "TestASTSharedOccurrencesActualMultiplicityAndDefaults",
@@ -29336,6 +29346,14 @@
             "TestASTSharedOccurrencesNativeRepeatedDeepBranch",
             "TestASTSharedOccurrencesNativeIteratorCopiesEndpointsAndClose",
             "TestASTSparseSharedExpressionDomainsAndASTWideVisited"
+          ]
+        },
+        {
+          "name": "shared_occs::insert publishes collection entry before AST inc_ref; stopped debug assertion retains raw unowned entry for exact owning reset (shared_occs.cpp:26-29)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_shared_occs.go",
+          "tests": [
+            "TestASTSharedOccurrencePublishesBeforeRefcountAssertion"
           ]
         }
       ],
@@ -167975,7 +167993,7 @@
       ],
       "deviations": [
         "No generic Go adapter is retained. Each live decrement-and-clear operation belongs in its concrete consumer with compiler-checked element and manager types.",
-        "Source shared_occs reset calls dec_ref_collection_values then resets the set. Go deletes consumed entries incrementally so an interrupted typed decrement can resume without double release; successful completion reaches the same empty set and reference counts."
+        "Source shared_occs reset calls dec_ref_collection_values then resets the set. Go deletes consumed entries incrementally so an interrupted typed decrement can resume without double release; successful completion reaches the same empty set and reference counts. A source entry published before a failed INC remains visible without an owned reference; Go owning reset removes it without a DEC."
       ]
     },
     {

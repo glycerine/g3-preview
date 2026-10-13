@@ -21,8 +21,8 @@ func (s *ASTSharedOccurrences) BeginShared() (ASTSharedOccurrencesIterator, erro
 	}
 	if s.view == nil {
 		view := &astSharedView{nodes: make([]astNodeRef, 0, s.entries.Len())}
-		for _, r := range s.entries.All() {
-			view.nodes = append(view.nodes, r)
+		for _, entry := range s.entries.All() {
+			view.nodes = append(view.nodes, entry.node)
 		}
 		s.view = view
 	}
