@@ -50911,6 +50911,15 @@
           ]
         },
         {
+          "name": "MPFF wrapper converts inexact integer coefficients and caught numeral-manager exceptions into subpaving::exception (subpaving.cpp:207-255)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fast_shell_coefficients.go",
+          "tests": [
+            "TestFastShellExactCoefficientsAndDirectedInequalities",
+            "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats"
+          ]
+        },
+        {
           "name": "Concrete MPFF factory and owning shell selected from source-order ParamsRef (src/math/subpaving/subpaving.cpp:260,275-276)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/tactic/fast_engine.go",
@@ -52405,6 +52414,15 @@
           ]
         },
         {
+          "name": "selected MPFF midpoint and bound-timestamp subpaving::exception throws share source failure classification (subpaving_t_def.h:237,570)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/source_exception.go",
+          "tests": [
+            "TestFastSearchRetainsRefusedSplitChildrenForOwnerClose",
+            "TestFastBoundTimestampSourceExceptionAfterPublication"
+          ]
+        },
+        {
           "name": "Concrete config_mpff breadth-first loop, cancellation phases and search-owned child retirement (src/math/subpaving/subpaving_t_def.h:1806-1843)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/fast_search.go",
@@ -53635,6 +53653,15 @@
           ]
         },
         {
+          "name": "selected MPFF midpoint and bound-timestamp subpaving::exception throws share source failure classification (subpaving_t_def.h:237,570)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/source_exception.go",
+          "tests": [
+            "TestFastSearchRetainsRefusedSplitChildrenForOwnerClose",
+            "TestFastBoundTimestampSourceExceptionAfterPublication"
+          ]
+        },
+        {
           "name": "Concrete config_mpff breadth-first loop, cancellation phases and search-owned child retirement (src/math/subpaving/subpaving_t_def.h:1806-1843)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/fast_search.go",
@@ -53663,9 +53690,14 @@
       "path": "src/math/subpaving/subpaving_types.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/subpaving/source_exception.go"
+      ],
+      "tests": [
+        "TestFastShellExactCoefficientsAndDirectedInequalities",
+        "TestFastSearchRetainsRefusedSplitChildrenForOwnerClose"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -53678,7 +53710,17 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "selected MPFF wrapper and context throws of the shared message-free subpaving::exception (subpaving_types.h:30-31)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/source_exception.go",
+          "tests": [
+            "TestFastShellExactCoefficientsAndDirectedInequalities",
+            "TestFastSearchRetainsRefusedSplitChildrenForOwnerClose"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -53918,6 +53960,14 @@
         {
           "name": "MPFF core tactic outer catch converts a retained z3_exception message into a fresh tactic_exception after process failure (subpaving_tactic.cpp:245-261)",
           "status": "ported",
+          "go_target": "pkg/math/subpaving/tactic/fast_core_tactic.go",
+          "tests": [
+            "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats"
+          ]
+        },
+        {
+          "name": "MPFF tactic internalize and search catches for shared subpaving::exception; real inexact-coefficient goal exercises internalize, tactic-level split failure remains to verify (subpaving_tactic.cpp:180-200)",
+          "status": "partial",
           "go_target": "pkg/math/subpaving/tactic/fast_core_tactic.go",
           "tests": [
             "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats"

@@ -14,7 +14,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
-var ErrFastContextTimestamp = errors.New("subpaving: fast-float bound timestamp exhausted")
+var ErrFastContextTimestamp error = &sourceFailure{message: "subpaving: fast-float bound timestamp exhausted"}
 
 // FastContext owns its bound-policy numerals, root node and search-created
 // children. The numeral manager and resource limit remain caller-owned.

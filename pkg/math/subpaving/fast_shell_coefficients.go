@@ -13,7 +13,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
-var ErrFastShellInexactInteger = errors.New("subpaving: integer coefficient cannot be represented exactly as fast float")
+var ErrFastShellInexactInteger error = &sourceFailure{message: "subpaving: integer coefficient cannot be represented exactly as fast float"}
 
 // FastShellCoefficients owns the MPFF wrapper's scalar, coefficient vector,
 // and exact integer comparison scratch. It owns the context only when created
@@ -82,10 +82,10 @@ func (w *FastShellCoefficients) intToFast(value *numeral.Int, out *numeral.FastF
 		return err
 	}
 	if err := w.numbers.SetInteger(out, w.rational.Z, &w.z1); err != nil {
-		return err
+		return sourceFastFailure(err)
 	}
 	if err := w.numbers.ToInteger(out, w.rational.Z, &w.z2); err != nil {
-		return err
+		return sourceFastFailure(err)
 	}
 	exact, err := w.rational.Z.Equal(&w.z1, &w.z2)
 	if err != nil {
@@ -146,7 +146,8 @@ func (w *FastShellCoefficients) MkSum(constant *numeral.Int, coefficients []*num
 	for i, variable := range variables {
 		terms[i] = FastPolynomialTerm{Variable: variable, Coefficient: &w.coefficients[i]}
 	}
-	return w.context.DefinePolynomial(&w.constant, terms)
+	variable, err := w.context.DefinePolynomial(&w.constant, terms)
+	return variable, sourceFastFailure(err)
 }
 
 func (w *FastShellCoefficients) PrepareInequality(value *numeral.Rational, lower bool) (*numeral.FastFloat, error) {
@@ -157,7 +158,7 @@ func (w *FastShellCoefficients) PrepareInequality(value *numeral.Rational, lower
 		return nil, err
 	}
 	if err := w.numbers.SetRational(&w.constant, w.rational, value); err != nil {
-		return nil, err
+		return nil, sourceFastFailure(err)
 	}
 	return &w.constant, nil
 }
@@ -167,7 +168,8 @@ func (w *FastShellCoefficients) MkInequality(variable uint32, value *numeral.Rat
 	if err != nil {
 		return nil, err
 	}
-	return w.context.NewInequality(variable, bound, lower, open)
+	atom, err := w.context.NewInequality(variable, bound, lower, open)
+	return atom, sourceFastFailure(err)
 }
 
 func (w *FastShellCoefficients) AddClause(atoms []*FastInequality) (*FastClause, error) {

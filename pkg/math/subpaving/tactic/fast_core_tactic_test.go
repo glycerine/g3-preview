@@ -176,6 +176,52 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	if err := core.CollectStatistics(st); err != nil || st.Size() != 2 || st.Key(0) != "new bounds" || st.UintValue(0) != 1 || st.Key(1) != "nodes" || st.UintValue(1) != 1 {
 		t.Fatal("source core statistics", err, st.Size())
 	}
+	if err := q.SetString(&value, "18446744073709551617"); err != nil {
+		t.Fatal(err)
+	}
+	tooPrecise, err := m.ArithmeticNumeral(&value, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	product, err := m.MkFamilyApp(family, 9, nil, []ast.ASTHandle{tooPrecise, x})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := q.SetString(&value, "0"); err != nil {
+		t.Fatal(err)
+	}
+	zero, err := m.ArithmeticNumeral(&value, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sum, err := m.MkFamilyApp(family, 6, nil, []ast.ASTHandle{product, zero})
+	if err != nil {
+		t.Fatal(err)
+	}
+	inexact, err := m.MkFamilyApp(family, 2, nil, []ast.ASTHandle{sum, two})
+	if err != nil {
+		t.Fatal(err)
+	}
+	inexactGoal, err := goaltactic.NewGoal(m, false, false, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err := inexactGoal.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
+	if err := inexactGoal.Assert(inexact); err != nil {
+		t.Fatal(err)
+	}
+	if got, err := core.Apply(inexactGoal); got != nil {
+		t.Fatal("failed internalization must not return a goal", got, err)
+	} else {
+		var tacticErr goaltactic.TacticException
+		if !errors.As(err, &tacticErr) || tacticErr.Message() != "failed to internalize goal into subpaving module" {
+			t.Fatal("source subpaving exception translation", err)
+		}
+	}
 	display, err := core.converter.VariableDisplay(sy)
 	if err != nil {
 		t.Fatal(err)

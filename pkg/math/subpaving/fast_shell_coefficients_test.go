@@ -64,7 +64,7 @@ func TestFastShellExactCoefficientsAndDirectedInequalities(t *testing.T) {
 	if err := qm.Z.Add(&big, &one, &big); err != nil {
 		t.Fatal(err)
 	}
-	if _, _, err := w.PrepareSum(&three, []*numeral.Int{&one, &big}); !errors.Is(err, ErrFastShellInexactInteger) {
+	if _, _, err := w.PrepareSum(&three, []*numeral.Int{&one, &big}); !errors.Is(err, ErrFastShellInexactInteger) || !errors.Is(err, ErrSubpavingFailure) {
 		t.Fatal("rounded coefficient refusal", err)
 	}
 	if err := qm.Z.Sub(&big, &one, &big); err != nil {

@@ -10,7 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
-var ErrFastSplitNoInterior = errors.New("subpaving: no representable fast-float midpoint")
+var ErrFastSplitNoInterior error = &sourceFailure{message: "subpaving: no representable fast-float midpoint"}
 
 // SplitMidpoint creates both children before computing the source midpoint.
 // A later numeric refusal leaves the created children for caller cleanup.

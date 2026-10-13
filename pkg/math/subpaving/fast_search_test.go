@@ -62,7 +62,7 @@ func TestFastSearchRetainsRefusedSplitChildrenForOwnerClose(t *testing.T) {
 	if err := c.PropagateQueued(root); err != nil {
 		t.Fatal(err)
 	}
-	if err := c.Search(); !errors.Is(err, ErrFastSplitNoInterior) || len(c.searchOwned) != 2 || root.children != 2 {
+	if err := c.Search(); !errors.Is(err, ErrFastSplitNoInterior) || !errors.Is(err, ErrSubpavingFailure) || len(c.searchOwned) != 2 || root.children != 2 {
 		t.Fatal("source split refusal ownership", err)
 	}
 	if err := c.Close(); err != nil {

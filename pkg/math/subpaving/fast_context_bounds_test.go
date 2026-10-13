@@ -2,12 +2,28 @@ package subpaving
 
 import (
 	"errors"
+	"math"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
+
+func TestFastBoundTimestampSourceExceptionAfterPublication(t *testing.T) {
+	m, c, value, root := fastMonomialFixture(t, []bool{false})
+	if err := m.SetInt32(value, 1); err != nil {
+		t.Fatal(err)
+	}
+	c.timestamp = math.MaxUint64 - 1
+	err := c.PropagateBound(root, 0, value, true, false)
+	if !errors.Is(err, ErrFastContextTimestamp) || !errors.Is(err, ErrSubpavingFailure) {
+		t.Fatal("source bound timestamp exception", err)
+	}
+	if root.trail == nil || root.trail.timestamp != math.MaxUint64-1 || c.timestamp != math.MaxUint64 || len(c.queue) != 1 {
+		t.Fatal("bound publication must precede timestamp exception")
+	}
+}
 
 func TestSubpavingFastContextBoundFlowAndRelevance(t *testing.T) {
 	budget := arena.NewBudget(1 << 28)

@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/math/subpaving"
 	goaltactic "github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/memory"
@@ -168,6 +169,9 @@ func (t *FastCoreTactic) ApplyWithOutput(g *goaltactic.Goal, out io.Writer) (res
 		}
 	}()
 	if err := t.converter.InternalizeGoal(g); err != nil {
+		if errors.Is(err, subpaving.ErrSubpavingFailure) {
+			return nil, goaltactic.NewTacticException("failed to internalize goal into subpaving module")
+		}
 		return nil, err
 	}
 	shell, err := t.engine.Shell()
@@ -182,6 +186,9 @@ func (t *FastCoreTactic) ApplyWithOutput(g *goaltactic.Goal, out io.Writer) (res
 		return nil, err
 	}
 	if err := shell.Search(); err != nil {
+		if errors.Is(err, subpaving.ErrSubpavingFailure) {
+			return nil, goaltactic.NewTacticException("failed building subpaving tree...")
+		}
 		return nil, err
 	}
 	if options.PrintNodes {
