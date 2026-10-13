@@ -4,6 +4,8 @@ package mincut
 import (
 	"errors"
 	"math"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 var (
@@ -24,7 +26,17 @@ type MinCut struct {
 	edges       [][]minCutEdge
 	distance    []uint32
 	predecessor []uint32
+	trace       *diagnostic.TraceTags
 	computed    bool
+}
+
+// BindTrace borrows an isolated trace stream. Nil restores the process stream.
+func (m *MinCut) BindTrace(tags *diagnostic.TraceTags) error {
+	if m == nil {
+		return ErrNode
+	}
+	m.trace = tags
+	return nil
 }
 
 // New creates the distinguished source node 0 and sink node 1.
@@ -50,6 +62,7 @@ func (m *MinCut) AddEdgeCapacity(from, to, capacity uint32) error {
 		return ErrNode
 	}
 	m.edges[from] = append(m.edges[from], minCutEdge{node: to, weight: capacity})
+	m.traceAddEdge(from, to)
 	return nil
 }
 

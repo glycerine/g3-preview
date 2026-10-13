@@ -173251,6 +173251,12 @@
           "tests": ["TestBitVectorResizeSourceTraceSites"]
         },
         {
+          "name": "min_cut::add_edge spacer.mincut TRACE after edge publication",
+          "status": "ported",
+          "go_target": "pkg/util/mincut/min_cut_trace.go",
+          "tests": ["TestMinCutRetainedEdgeTraceAndCut"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -173546,6 +173552,12 @@
           "status": "ported",
           "go_target": "pkg/util/bitset/vector_trace.go",
           "tests": ["TestBitVectorResizeSourceTraceSites"]
+        },
+        {
+          "name": "min_cut::add_edge spacer.mincut TRACE after edge publication",
+          "status": "ported",
+          "go_target": "pkg/util/mincut/min_cut_trace.go",
+          "tests": ["TestMinCutRetainedEdgeTraceAndCut"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
