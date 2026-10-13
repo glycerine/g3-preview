@@ -1,12 +1,15 @@
 package bv
 
 import (
+	"bytes"
 	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	uparams "github.com/glycerine/g3/pkg/util/params"
@@ -66,8 +69,30 @@ func TestSharingGoalPassSourceParamsAndResourceLimits(t *testing.T) {
 	sharingMust(t, ctx.SetUIntName(params, &key, 2))
 	pass, e := NewSharingGoalPassWithParams(m, ctx, params)
 	sharingMust(t, e)
+	cooperation, e := cooperate.NewCooperation(m.Budget())
+	sharingMust(t, e)
+	t.Cleanup(func() { sharingMust(t, cooperation.Close()) })
+	sharingMust(t, cooperation.BeginSection())
+	var cooperationTrace bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&cooperationTrace)
+	tags.Enable("cooperate_detail")
+	sharingMust(t, cooperation.BindTrace(tags))
+	if e := pass.BindCooperation(nil); !errors.Is(e, arena.ErrConfig) {
+		t.Fatal("nil cooperation owner", e)
+	}
+	copy := *cooperation
+	if e := pass.BindCooperation(&copy); !errors.Is(e, cooperate.ErrCooperationOwner) {
+		t.Fatal("copied cooperation owner", e)
+	}
+	sharingMust(t, pass.BindCooperation(cooperation))
 	_, e = pass.Apply(goal)
 	sharingMust(t, e)
+	if cooperation.OwnerThread != 0 {
+		t.Fatal("sharing pass skipped source cooperation")
+	}
+	if tags.ShouldTrace("cooperate_detail") && !bytes.Contains(cooperationTrace.Bytes(), []byte("\nmax bv sharing, tid: 0\n")) {
+		t.Fatal("wrong sharing cooperation task", cooperationTrace.String())
+	}
 	form, e := goal.Form(1)
 	sharingMust(t, e)
 	term, e := m.GetArg(form, 0)
@@ -90,8 +115,12 @@ func TestSharingGoalPassSourceParamsAndResourceLimits(t *testing.T) {
 	stepsKey := "max_steps"
 	sharingMust(t, ctx.SetUIntName(params, &stepsKey, 0))
 	sharingMust(t, pass.UpdateParams(ctx, params))
+	sharingMust(t, cooperation.EndTask())
 	if _, e = pass.Apply(limited); !errors.Is(e, ErrSharingMaxSteps) {
 		t.Fatal("source zero-step guard", e)
+	}
+	if cooperation.OwnerThread != 0 {
+		t.Fatal("step refusal skipped cooperation")
 	}
 	n, e := limited.Size()
 	sharingMust(t, e)
@@ -106,14 +135,19 @@ func TestSharingGoalPassSourceParamsAndResourceLimits(t *testing.T) {
 	block, e := runtime.Allocate(1)
 	sharingMust(t, e)
 	t.Cleanup(func() { sharingMust(t, runtime.Deallocate(&block)) })
+	sharingMust(t, cooperation.EndTask())
 	if _, e = pass.Apply(limited); !errors.Is(e, ErrSharingMaxMemory) {
 		t.Fatal("source zero-memory guard", e)
+	}
+	if cooperation.OwnerThread != 0 {
+		t.Fatal("memory refusal skipped preceding cooperation")
 	}
 	n, e = limited.Size()
 	sharingMust(t, e)
 	if n != 1 {
 		t.Fatal("memory refusal changed goal", n)
 	}
+	sharingMust(t, cooperation.EndSection())
 }
 
 func TestSharingGoalPassReadsSharedProcessMemory(t *testing.T) {

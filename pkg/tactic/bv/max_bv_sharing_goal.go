@@ -5,8 +5,10 @@ import (
 	"errors"
 	"math"
 
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/memory"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
@@ -18,12 +20,13 @@ var ErrSharingMaxMemory = errors.New("max. memory exceeded")
 // Parameter/resource limits and lifecycle remain in the enclosing tactic's
 // unfinished scope.
 type SharingGoalPass struct {
-	manager   *ast.ASTManager
-	memory    *memory.Runtime
-	family    ast.FamilyID
-	maxArgs   uint32
-	maxSteps  uint32
-	maxMemory uint64
+	manager     *ast.ASTManager
+	memory      *memory.Runtime
+	cooperation *cooperate.Cooperation
+	family      ast.FamilyID
+	maxArgs     uint32
+	maxSteps    uint32
+	maxMemory   uint64
 }
 
 func NewSharingGoalPass(m *ast.ASTManager, maxArgs uint32) (*SharingGoalPass, error) {
@@ -43,6 +46,21 @@ func NewSharingGoalPass(m *ast.ASTManager, maxArgs uint32) (*SharingGoalPass, er
 		return nil, e
 	}
 	return &SharingGoalPass{manager: m, memory: runtime, family: fid, maxArgs: maxArgs, maxSteps: math.MaxUint32, maxMemory: math.MaxUint64}, nil
+}
+
+// BindCooperation borrows the source process owner for sharing checkpoints.
+func (p *SharingGoalPass) BindCooperation(owner *cooperate.Cooperation) error {
+	if p == nil || p.manager == nil {
+		return ast.ErrASTHandle
+	}
+	if owner == nil {
+		return arena.ErrConfig
+	}
+	if _, err := owner.Enabled(); err != nil {
+		return err
+	}
+	p.cooperation = owner
+	return nil
 }
 
 // UpdateParams reads the three unsigned settings used by rw_cfg::updt_params.
@@ -98,6 +116,11 @@ type sharingWalk struct {
 
 func (w *sharingWalk) advance() error {
 	w.steps++
+	if w.pass.cooperation != nil {
+		if err := w.pass.cooperation.Cooperate("max bv sharing"); err != nil {
+			return err
+		}
+	}
 	used, e := w.pass.memory.AllocationSize()
 	if e != nil {
 		return e
