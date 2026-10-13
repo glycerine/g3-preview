@@ -96,6 +96,47 @@ func flushTrace(w io.Writer) error {
 	return nil
 }
 
+// The source ostream keeps its first failure while later insertion statements
+// and the final flush still execute. Suppress later physical writes but allow
+// a TRACE/CTRACE body to run after a refused header insertion.
+type traceStickyWriter struct {
+	out   io.Writer
+	first error
+}
+
+func (w *traceStickyWriter) capture(err error) {
+	if err != nil && w.first == nil {
+		w.first = err
+	}
+}
+func (w *traceStickyWriter) remember(n, want int, err error) (int, error) {
+	if err == nil && n != want {
+		err = io.ErrShortWrite
+	}
+	w.capture(err)
+	return n, err
+}
+func (w *traceStickyWriter) Write(p []byte) (int, error) {
+	if w.first != nil {
+		return 0, w.first
+	}
+	n, err := w.out.Write(p)
+	return w.remember(n, len(p), err)
+}
+func (w *traceStickyWriter) WriteString(s string) (int, error) {
+	if w.first != nil {
+		return 0, w.first
+	}
+	n, err := io.WriteString(w.out, s)
+	return w.remember(n, len(s), err)
+}
+func (w *traceStickyWriter) finish() error {
+	if err := flushTrace(w.out); w.first == nil {
+		w.first = err
+	}
+	return w.first
+}
+
 // TRACE and CTRACE insert each header component separately before CODE runs.
 func writeTraceHeader(w io.Writer, tag, function, file string, line int) error {
 	for _, part := range [...]string{"-------- [", traceTagCString(tag), "] ", function, " ", file, ":", strconv.Itoa(line), " ---------\n"} {
@@ -118,16 +159,11 @@ func (t *TraceTags) Emit(tag, function, file string, line int, body string) erro
 	if err != nil {
 		return err
 	}
-	if err := writeTraceHeader(w, tag, function, file, line); err != nil {
-		return err
-	}
-	if err := writeTracePart(w, body); err != nil {
-		return err
-	}
-	if err := writeTracePart(w, "------------------------------------------------\n"); err != nil {
-		return err
-	}
-	return flushTrace(w)
+	sticky := &traceStickyWriter{out: w}
+	sticky.capture(writeTraceHeader(sticky, tag, function, file, line))
+	sticky.capture(writeTracePart(sticky, body))
+	sticky.capture(writeTracePart(sticky, "------------------------------------------------\n"))
+	return sticky.finish()
 }
 
 // EmitShort implements STRACE: no header or footer, but each reached body is
@@ -140,12 +176,11 @@ func (t *TraceTags) EmitShort(tag string, body func(io.Writer) error) error {
 	if err != nil {
 		return err
 	}
+	sticky := &traceStickyWriter{out: w}
 	if body != nil {
-		if err := body(w); err != nil {
-			return err
-		}
+		sticky.capture(body(sticky))
 	}
-	return flushTrace(w)
+	return sticky.finish()
 }
 
 // EmitConditional implements CTRACE's compile, tag, then condition order.
@@ -159,18 +194,13 @@ func (t *TraceTags) EmitConditional(tag, function, file string, line int, condit
 	if err != nil {
 		return err
 	}
-	if err := writeTraceHeader(w, tag, function, file, line); err != nil {
-		return err
-	}
+	sticky := &traceStickyWriter{out: w}
+	sticky.capture(writeTraceHeader(sticky, tag, function, file, line))
 	if body != nil {
-		if err := body(w); err != nil {
-			return err
-		}
+		sticky.capture(body(sticky))
 	}
-	if err := writeTracePart(w, "------------------------------------------------\n"); err != nil {
-		return err
-	}
-	return flushTrace(w)
+	sticky.capture(writeTracePart(sticky, "------------------------------------------------\n"))
+	return sticky.finish()
 }
 
 // Finalize releases the tag table. Source finalize_trace leaves the all flag.

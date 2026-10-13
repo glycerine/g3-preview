@@ -173649,6 +173649,7 @@
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
         "TestTraceHeaderSourceInsertionRefusalPrefixes",
+        "TestTraceShortBodyFailureStillFlushes",
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
         "TestFastFloatPowerRetainedTraceBranchesAndAlias",
         "TestFastFloatSetIntegerRetainedTraceBranches",
@@ -173755,11 +173756,12 @@
           ]
         },
         {
-          "name": "TRACE and CTRACE nine-piece source header insertion order and refused-prefix behavior",
+          "name": "TRACE/STRACE/CTRACE refused-prefix behavior, reached body invocation and final flush; TRACE/CTRACE nine-piece header order",
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_trace_tags.go",
           "tests": [
-            "TestTraceHeaderSourceInsertionRefusalPrefixes"
+            "TestTraceHeaderSourceInsertionRefusalPrefixes",
+            "TestTraceShortBodyFailureStillFlushes"
           ]
         },
         {
@@ -174030,6 +174032,7 @@
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
         "TestTraceHeaderSourceInsertionRefusalPrefixes",
+        "TestTraceShortBodyFailureStillFlushes",
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
         "TestFastFloatPowerRetainedTraceBranchesAndAlias",
         "TestFastFloatSetIntegerRetainedTraceBranches",
@@ -174148,11 +174151,12 @@
           ]
         },
         {
-          "name": "TRACE and CTRACE nine-piece source header insertion order and refused-prefix behavior",
+          "name": "TRACE/STRACE/CTRACE refused-prefix behavior, reached body invocation and final flush; TRACE/CTRACE nine-piece header order",
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_trace_tags.go",
           "tests": [
-            "TestTraceHeaderSourceInsertionRefusalPrefixes"
+            "TestTraceHeaderSourceInsertionRefusalPrefixes",
+            "TestTraceShortBodyFailureStillFlushes"
           ]
         },
         {

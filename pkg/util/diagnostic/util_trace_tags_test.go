@@ -37,7 +37,7 @@ func TestTraceHeaderSourceInsertionRefusalPrefixes(t *testing.T) {
 			if conditional {
 				err = tags.EmitConditional("alpha", "work", "src/util/trace.cpp", 31,
 					func() bool { called++; return true },
-					func(io.Writer) error { called++; return nil })
+					func(out io.Writer) error { called++; return writeTracePart(out, "body") })
 			} else {
 				err = tags.Emit("alpha", "work", "src/util/trace.cpp", 31, "body")
 			}
@@ -48,13 +48,38 @@ func TestTraceHeaderSourceInsertionRefusalPrefixes(t *testing.T) {
 				continue
 			}
 			want := strings.Join(parts[:at], "")
-			if !errors.Is(err, refusal) || w.String() != want || w.writes != at+1 || w.flushes != 0 {
+			if !errors.Is(err, refusal) || w.String() != want || w.writes != at+1 || w.flushes != 1 {
 				t.Fatal("header refusal prefix", at, conditional, err, w.String(), want, w.writes, w.flushes)
 			}
-			if conditional && called != 1 {
+			if conditional && called != 2 {
 				t.Fatal("condition/body order", called)
 			}
 		}
+	}
+}
+
+func TestTraceShortBodyFailureStillFlushes(t *testing.T) {
+	bodyErr := errors.New("trace body stopped")
+	flushErr := errors.New("trace flush stopped")
+	w := &flushedWarningWriter{err: flushErr}
+	tags := NewTraceTagsWithWriter(w)
+	tags.Enable("alpha")
+	called := 0
+	err := tags.EmitShort("alpha", func(out io.Writer) error {
+		called++
+		if e := writeTracePart(out, "prefix"); e != nil {
+			return e
+		}
+		return bodyErr
+	})
+	if !traceCompiled {
+		if err != nil || called != 0 || w.flushes != 0 || w.Len() != 0 {
+			t.Fatal("erased short trace evaluated", err, called, w.flushes, w.String())
+		}
+		return
+	}
+	if !errors.Is(err, bodyErr) || errors.Is(err, flushErr) || called != 1 || w.flushes != 1 || w.String() != "prefix" {
+		t.Fatal("source body failure and final flush", err, called, w.flushes, w.String())
 	}
 }
 
