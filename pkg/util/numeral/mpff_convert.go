@@ -75,6 +75,7 @@ func (m *FastFloatManager) SetInteger(a *FastFloat, z *IntegerManager, v *Int) e
 	if e := z.check(v); e != nil {
 		return e
 	}
+	m.traceSetIntegerInput(z, v)
 	ok, e := z.IsInt64(v)
 	if e != nil {
 		return e
@@ -84,7 +85,12 @@ func (m *FastFloatManager) SetInteger(a *FastFloat, z *IntegerManager, v *Int) e
 		if e != nil {
 			return e
 		}
-		return m.SetInt64(a, n)
+		m.traceSetIntegerSigned(n)
+		if e = m.SetInt64(a, n); e != nil {
+			return e
+		}
+		m.traceSetIntegerResult(a)
+		return m.debugCheck(a)
 	}
 	ok, e = z.IsUint64(v)
 	if e != nil {
@@ -95,7 +101,12 @@ func (m *FastFloatManager) SetInteger(a *FastFloat, z *IntegerManager, v *Int) e
 		if e != nil {
 			return e
 		}
-		return m.SetUint64(a, n)
+		m.traceSetIntegerUnsigned()
+		if e = m.SetUint64(a, n); e != nil {
+			return e
+		}
+		m.traceSetIntegerResult(a)
+		return m.debugCheck(a)
 	}
 	if e = m.allocate(a); e != nil {
 		return e
@@ -112,6 +123,7 @@ func (m *FastFloatManager) SetInteger(a *FastFloat, z *IntegerManager, v *Int) e
 		m.write(&m.setBuffer, uint32(len(m.setBuffer))-1, 0)
 	}
 	w := ffLimbView{m: m, v: &m.setBuffer, size: uint32(len(m.setBuffer))}
+	m.traceSetIntegerWords(w)
 	lz := ffNLZ(w)
 	if SourceExtendedGCDDebug && !(lz != 0) {
 		return ErrFastFloatInvariant
@@ -135,6 +147,7 @@ func (m *FastFloatManager) SetInteger(a *FastFloat, z *IntegerManager, v *Int) e
 			}
 		}
 	}
+	m.traceSetIntegerResult(a)
 	return m.debugCheck(a)
 }
 func (m *FastFloatManager) SetRational(a *FastFloat, qm *RationalManager, v *Rational) error {

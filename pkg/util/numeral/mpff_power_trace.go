@@ -33,18 +33,27 @@ func (m *FastFloatManager) tracePower(a *FastFloat, p uint32, b *FastFloat) {
 	})
 	_ = tags.EmitConditional("mpff_power", "power", "src/util/mpff.cpp", 1053,
 		func() bool { return true }, func(w io.Writer) error {
-			if b.negative() {
-				if err := writeFastFloatPart(w, "-"); err != nil {
-					return err
-				}
+			if err := m.displayRawTraceTo(w, b); err != nil {
+				return err
 			}
-			s := m.sig(b)
-			for i := s.size; i > 0; {
-				i--
-				if _, err := fmt.Fprintf(w, "%08x", s.read(i)); err != nil {
-					return err
-				}
-			}
-			return writeFastFloatPart(w, "*2^"+strconv.FormatInt(int64(b.exponent), 10)+"\n")
+			return writeFastFloatPart(w, "\n")
 		})
+}
+
+// displayRawTraceTo follows display_raw's sign, high-to-low hex word, and
+// exponent insertions so a short write leaves the same completed prefix.
+func (m *FastFloatManager) displayRawTraceTo(w io.Writer, b *FastFloat) error {
+	if b.negative() {
+		if err := writeFastFloatPart(w, "-"); err != nil {
+			return err
+		}
+	}
+	s := m.sig(b)
+	for i := s.size; i > 0; {
+		i--
+		if err := writeFastFloatPart(w, fmt.Sprintf("%08x", s.read(i))); err != nil {
+			return err
+		}
+	}
+	return writeFastFloatPart(w, "*2^"+strconv.FormatInt(int64(b.exponent), 10))
 }

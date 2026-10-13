@@ -151730,7 +151730,8 @@
         "pkg/util/numeral/mpff_div_trace.go",
         "pkg/util/numeral/mpff_div_trace_test.go",
         "pkg/util/numeral/mpff_round_trace.go",
-        "pkg/util/numeral/mpff_power_trace.go"
+        "pkg/util/numeral/mpff_power_trace.go",
+        "pkg/util/numeral/mpff_convert_trace.go"
       ],
       "tests": [
         "TestFastFloatIntegerConversionSource",
@@ -151774,7 +151775,8 @@
         "TestFastFloatMulTraceReachedImpreciseRounding",
         "TestFastFloatDivTraceSourceShortcutsAndQuotient",
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
-        "TestFastFloatPowerRetainedTraceBranchesAndAlias"
+        "TestFastFloatPowerRetainedTraceBranchesAndAlias",
+        "TestFastFloatSetIntegerRetainedTraceBranches"
       ],
       "conditionals": [
         {
@@ -152433,6 +152435,14 @@
           "go_target": "pkg/util/numeral/mpff_power_trace.go",
           "tests": [
             "TestFastFloatPowerRetainedTraceBranchesAndAlias"
+          ]
+        },
+        {
+          "name": "mpff set_core integer conversion TRACE input, int64/uint64/decomposed-word branch, and raw result",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff_convert_trace.go",
+          "tests": [
+            "TestFastFloatSetIntegerRetainedTraceBranches"
           ]
         }
       ],
@@ -172470,12 +172480,14 @@
       "go_targets": [
         "pkg/util/diagnostic/util_trace_tags.go",
         "pkg/util/numeral/mpff_round_trace.go",
-        "pkg/util/numeral/mpff_power_trace.go"
+        "pkg/util/numeral/mpff_power_trace.go",
+        "pkg/util/numeral/mpff_convert_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
-        "TestFastFloatPowerRetainedTraceBranchesAndAlias"
+        "TestFastFloatPowerRetainedTraceBranchesAndAlias",
+        "TestFastFloatSetIntegerRetainedTraceBranches"
       ],
       "conditionals": [
         {
@@ -172672,6 +172684,14 @@
           ]
         },
         {
+          "name": "mpff set_core integer conversion TRACE input, int64/uint64/decomposed-word branch, and raw result",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff_convert_trace.go",
+          "tests": [
+            "TestFastFloatSetIntegerRetainedTraceBranches"
+          ]
+        },
+        {
           "name": "optional _TRACE file and remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -172692,12 +172712,14 @@
       "go_targets": [
         "pkg/util/diagnostic/util_trace_tags.go",
         "pkg/util/numeral/mpff_round_trace.go",
-        "pkg/util/numeral/mpff_power_trace.go"
+        "pkg/util/numeral/mpff_power_trace.go",
+        "pkg/util/numeral/mpff_convert_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
-        "TestFastFloatPowerRetainedTraceBranchesAndAlias"
+        "TestFastFloatPowerRetainedTraceBranchesAndAlias",
+        "TestFastFloatSetIntegerRetainedTraceBranches"
       ],
       "conditionals": [
         {
@@ -172903,6 +172925,14 @@
           "go_target": "pkg/util/numeral/mpff_power_trace.go",
           "tests": [
             "TestFastFloatPowerRetainedTraceBranchesAndAlias"
+          ]
+        },
+        {
+          "name": "mpff set_core integer conversion TRACE input, int64/uint64/decomposed-word branch, and raw result",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff_convert_trace.go",
+          "tests": [
+            "TestFastFloatSetIntegerRetainedTraceBranches"
           ]
         },
         {
