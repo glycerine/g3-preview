@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
@@ -17,6 +18,7 @@ import (
 type BVRewriter struct {
 	self                  *BVRewriter
 	manager               *ast.ASTManager
+	trace                 *diagnostic.TraceTags
 	context               *uparams.ParamsContext
 	bvFamily, arithFamily ast.FamilyID
 	polynomial            *BVPolynomialRewriter

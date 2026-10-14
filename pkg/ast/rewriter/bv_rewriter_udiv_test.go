@@ -2,8 +2,10 @@
 package rewriter
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"testing"
 )
 
@@ -16,6 +18,10 @@ func TestBVRewriterUnsignedDivisionOriginalBranchesAndOptionOrder(t *testing.T) 
 	p, e := NewBVRewriter(m, c, g, &local)
 	astTestMust(t, e)
 	defer func() { astTestMust(t, p.Close()) }()
+	var trace bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&trace)
+	tags.Enable("bv_udiv")
+	astTestMust(t, p.BindTrace(tags))
 	out, e := m.NewRef(ast.ASTHandle{})
 	astTestMust(t, e)
 	defer func() { astTestMust(t, m.DelRef(&out)) }()
@@ -77,8 +83,22 @@ func TestBVRewriterUnsignedDivisionOriginalBranchesAndOptionOrder(t *testing.T) 
 		special, e := m.MkFamilyApp(p.bvFamily, 13, nil, []ast.ASTHandle{x})
 		astTestMust(t, e)
 		astTestPin(t, m, special)
+		trace.Reset()
 		st, e := p.RewriteUnsignedDivision(x, zero, out)
 		astTestMust(t, e)
+		if tags.ShouldTrace("bv_udiv") {
+			wantFlag := "1"
+			if !hi {
+				wantFlag = "0"
+			}
+			want := "-------- [bv_udiv] mk_bv_udiv_core src/ast/rewriter/bv_rewriter.cpp:1038 ---------\nhi_div0: " + wantFlag + "\n------------------------------------------------\n"
+			if got := trace.String(); got != want {
+				t.Fatalf("source unsigned division trace: %q", got)
+			}
+		} else if trace.Len() != 0 {
+			t.Fatalf("erased unsigned division trace: %q", trace.String())
+		}
+		trace.Reset()
 		want, status := bvAddNum(t, m, 255, 8), RewriteDone
 		if !hi {
 			want = special

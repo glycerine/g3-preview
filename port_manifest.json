@@ -23033,6 +23033,12 @@
           ]
         },
         {
+          "name": "mk_bv_udiv_core entry hi_div0 TRACE before is_numeral, with source Boolean text and enabled/erased build gates (bv_rewriter.cpp:1038)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_udiv_trace.go",
+          "tests": ["TestBVRewriterUnsignedDivisionOriginalBranchesAndOptionOrder"]
+        },
+        {
           "name": "Complete selected mk_bv_udiv_core and configured/internal wrappers: unsigned norm copies, original zero/one and numeral folding order, power-before-inverse option, failed-inverse block exit and raw internal/symbolic fallback (src/ast/rewriter/bv_rewriter.cpp:1034-1099; src/ast/rewriter/bv_rewriter.h:122,127)",
           "status": "partial",
           "go_target": "pkg/ast/rewriter/bv_rewriter_udiv.go",
@@ -176612,6 +176618,12 @@
           "tests": ["TestHardwareExprConverterTerms", "TestFastExprConverterTermsAndClause", "TestArbitraryExprConverterTermsAndClause", "TestRationalExprConverterExactLeafGoalAndCleanup"]
         },
         {
+          "name": "Reached BV unsigned-division entry hi_div0 TRACE before numeral operand inspection (bv_rewriter.cpp:1038)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_udiv_trace.go",
+          "tests": ["TestBVRewriterUnsignedDivisionOriginalBranchesAndOptionOrder"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -177268,6 +177280,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/tactic/goal_inequality_trace.go",
           "tests": ["TestHardwareExprConverterTerms", "TestFastExprConverterTermsAndClause", "TestArbitraryExprConverterTermsAndClause", "TestRationalExprConverterExactLeafGoalAndCleanup"]
+        },
+        {
+          "name": "Reached BV unsigned-division entry hi_div0 TRACE before numeral operand inspection (bv_rewriter.cpp:1038)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_udiv_trace.go",
+          "tests": ["TestBVRewriterUnsignedDivisionOriginalBranchesAndOptionOrder"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

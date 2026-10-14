@@ -21,6 +21,7 @@ func (p *BVRewriter) rewriteUnsignedDivision(lhs, rhs ast.ASTHandle, out ast.AST
 	st = RewriteFailed
 	defer func() { p.running = false; p.fail(err) }()
 	m := p.manager
+	p.traceUnsignedDivisionEntry(hiDiv0)
 	n, e := ast.NewBitVectorUnsignedDivisionNumerals(m)
 	p.unsignedDivision = n
 	if e != nil {
