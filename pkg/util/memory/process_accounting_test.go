@@ -56,19 +56,19 @@ func TestProcessAccountingPreservesSeparateTLSLanes(t *testing.T) {
 	memoryRuntimeRequire(t, err)
 	y, err := b.Allocate(8)
 	memoryRuntimeRequire(t, err)
-	if p.AllocationSize() != 0 || a.State().LocalSize != 100000 || b.State().LocalSize != 16 {
-		t.Fatal("unsynchronized lanes", p.AllocationSize(), a.State(), b.State())
+	if p.AllocationSize() != 0 || p.AllocationCount() != 0 || a.State().LocalSize != 100000 || b.State().LocalSize != 16 {
+		t.Fatal("unsynchronized lanes", p.AllocationSize(), p.AllocationCount(), a.State(), b.State())
 	}
 	z, err := a.Allocate(0)
 	memoryRuntimeRequire(t, err)
-	if p.AllocationSize() != 100008 || b.State().GlobalSize != 100008 || b.State().LocalSize != 16 {
-		t.Fatal("shared synchronized size", p.AllocationSize(), b.State())
+	if p.AllocationSize() != 100008 || p.AllocationCount() != 2 || b.State().GlobalSize != 100008 || b.State().LocalSize != 16 {
+		t.Fatal("shared synchronized size and count", p.AllocationSize(), p.AllocationCount(), b.State())
 	}
 	memoryRuntimeRequire(t, a.Deallocate(&x))
 	memoryRuntimeRequire(t, a.Deallocate(&z))
 	memoryRuntimeRequire(t, b.Deallocate(&y))
-	if p.AllocationSize() != 0 {
-		t.Fatal("released global size", p.AllocationSize())
+	if p.AllocationSize() != 0 || p.AllocationCount() != 4 {
+		t.Fatal("released global size and cumulative TLS count", p.AllocationSize(), p.AllocationCount())
 	}
 }
 

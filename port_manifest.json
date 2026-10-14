@@ -148844,6 +148844,13 @@
           ]
         },
         {
+          "name": "memory::get_allocation_count reads only the shared global counter; TLS allocation and deallocation synchronizations add the lane's cumulative count (cpp182-184,243-269)",
+          "status": "ported",
+          "go_target": "pkg/util/memory/process_accounting.go",
+          "go_targets": ["pkg/util/memory/accounting.go", "pkg/util/memory/runtime.go"],
+          "tests": ["TestProcessAccountingPreservesSeparateTLSLanes"]
+        },
+        {
           "name": "actual owned raw allocation/reallocation/deallocation and size/count/peak/watermark routes, both source counter profiles and size widths; explicit transport/checked-lifetime adapters",
           "status": "ported",
           "go_target": "pkg/util/memory/runtime.go",
@@ -149260,6 +149267,13 @@
             "TestMemoryAccountingTLSRepeatedCountAndLimitOrder",
             "TestMemoryAccountingTLSStrictThresholds"
           ]
+        },
+        {
+          "name": "memory::get_allocation_count reads only the shared global counter; TLS allocation and deallocation synchronizations add the lane's cumulative count (cpp182-184,243-269)",
+          "status": "ported",
+          "go_target": "pkg/util/memory/process_accounting.go",
+          "go_targets": ["pkg/util/memory/accounting.go", "pkg/util/memory/runtime.go"],
+          "tests": ["TestProcessAccountingPreservesSeparateTLSLanes"]
         },
         {
           "name": "actual owned raw allocation/reallocation/deallocation and size/count/peak/watermark routes, both source counter profiles and size widths; explicit transport/checked-lifetime adapters",
