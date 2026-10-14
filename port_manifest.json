@@ -54182,6 +54182,8 @@
         "pkg/math/subpaving/tactic/options.go",
         "pkg/math/subpaving/tactic/options_test.go",
         "pkg/math/subpaving/tactic/hardware_engine.go",
+        "pkg/math/subpaving/tactic/rational_engine.go",
+        "pkg/math/subpaving/tactic/rational_engine_test.go",
         "pkg/math/subpaving/tactic/arbitrary_engine.go",
         "pkg/math/subpaving/tactic/arbitrary_engine_test.go",
         "pkg/math/subpaving/tactic/goal_internalize.go",
@@ -54202,6 +54204,7 @@
       "tests": [
         "TestSubpavingTacticOptionSelectionAndDescriptions",
         "TestHardwareExprConverterTerms",
+        "TestRationalEngineSelectionSearchAndCleanup",
         "TestArbitraryEngineSelectedContextAndPartialCleanup",
         "TestArbitraryExprConverterTermsAndClause",
         "TestArbitraryExprConverterSearchSimpleGoal",
@@ -54212,6 +54215,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete MPQ engine branch constructs and owns selected rational context while borrowing numeral manager and resource limit (src/math/subpaving/tactic/subpaving_tactic.cpp:109-120)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/tactic/rational_engine.go",
+          "tests": [
+            "TestRationalEngineSelectionSearchAndCleanup"
+          ]
+        },
         {
           "name": "Concrete print_nodes and numeral parameter reads, source engine-name branch selection (src/math/subpaving/tactic/subpaving_tactic.cpp:92-108)",
           "status": "ported",
