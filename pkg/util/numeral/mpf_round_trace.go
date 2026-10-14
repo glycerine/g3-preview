@@ -123,7 +123,10 @@ func (m *ArbitraryFloatManager) traceRoundValue(label string, value *ArbitraryFl
 				formatError = e
 				return e
 			}
-			if e := writeNumeralDisplayPart(w, decimal+"\n"); e != nil {
+			if e := writeNumeralDisplayPart(w, decimal); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, "\n"); e != nil {
 				return e
 			}
 			if !binary {
@@ -134,7 +137,15 @@ func (m *ArbitraryFloatManager) traceRoundValue(label string, value *ArbitraryFl
 				formatError = e
 				return e
 			}
-			return writeNumeralDisplayPart(w, bits+suffix+"\n")
+			if e := writeNumeralDisplayPart(w, bits); e != nil {
+				return e
+			}
+			if suffix != "" {
+				if e := writeNumeralDisplayPart(w, suffix); e != nil {
+					return e
+				}
+			}
+			return writeNumeralDisplayPart(w, "\n")
 		})
 	return formatError
 }

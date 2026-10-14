@@ -60,6 +60,40 @@ func TestArbitraryFloatRoundSourceInsertionBoundaries(t *testing.T) {
 				if !branch {
 					t.Fatalf("result-class source insertions %q in %q", tc.branch, w.parts)
 				}
+				for _, record := range []struct {
+					label, suffix string
+					binary        bool
+				}{
+					{"RND: ", "", true},
+					{"Shifted: ", "", true},
+					{"before rounding decision: ", "", false},
+					{"Rounded significand: ", "", false},
+					{"Post-normalized: ", "", false},
+					{"ROUNDED = ", " (hidden bit, unbiased exp).", true},
+				} {
+					found := false
+					for i := 0; i+2 < len(w.parts); i++ {
+						if w.parts[i] != record.label || w.parts[i+1] == "" || w.parts[i+2] != "\n" {
+							continue
+						}
+						if record.binary {
+							if i+4 >= len(w.parts) || !strings.HasPrefix(w.parts[i+3], "#b") {
+								continue
+							}
+							if record.suffix == "" && w.parts[i+4] != "\n" {
+								continue
+							}
+							if record.suffix != "" && (i+5 >= len(w.parts) || w.parts[i+4] != record.suffix || w.parts[i+5] != "\n") {
+								continue
+							}
+						}
+						found = true
+						break
+					}
+					if !found {
+						t.Fatalf("value source insertions %q in %q", record.label, w.parts)
+					}
+				}
 			}
 			serviceMust(t, m.CleanupRound())
 			serviceMust(t, m.Del(&x))
