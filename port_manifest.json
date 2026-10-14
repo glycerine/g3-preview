@@ -52199,6 +52199,25 @@
           ]
         },
         {
+          "name": "Concrete config_mpq round-robin variable selection, exact midpoint decisions, recent-bound queue and resumable breadth-first search (src/math/subpaving/subpaving_t_def.h:24-101,185-247,349-360,1665-1682,1806-1843); parameter updates, TRACE and cooperation checkpoint remain open",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/rational_search.go",
+          "go_targets": [
+            "pkg/math/subpaving/rational_selector.go",
+            "pkg/math/subpaving/rational_split.go",
+            "pkg/math/subpaving/rational_node.go",
+            "pkg/math/subpaving/rational_context_root.go"
+          ],
+          "tests": [
+            "TestRationalSelectorRoundRobinDecisionsAndDefinitions",
+            "TestRationalMidpointSplitterSourceBounds",
+            "TestRationalMidpointSplitterSingletonRefusalLeavesChildren",
+            "TestRationalSearchBreadthFirstChildrenAndDefinitionPropagation",
+            "TestRationalSearchResumesSelectedChildAfterQueueCancellation",
+            "TestRationalAddRecentBoundsOnlyNewestDirection"
+          ]
+        },
+        {
           "name": "Concrete config_mpq interval negation, exact addition/subtraction, live borrowed operands, infinity and openness branches, and destination aliasing (src/math/interval/interval_def.h:704-837)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_interval_arith.go",

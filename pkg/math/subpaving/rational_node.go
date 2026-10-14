@@ -36,6 +36,7 @@ type RationalNode struct {
 	leafNext     *RationalNode
 	queuedLeaf   bool
 	children     uint32
+	depth        uint32
 	conflictVar  uint32
 	closed       bool
 }
@@ -48,7 +49,7 @@ func NewRationalNode(m *numeral.RationalManager, variables uint32, parent *Ratio
 		if err := parent.open(); err != nil {
 			return nil, err
 		}
-		if parent.numbers != m || uint32(len(parent.lower)) != variables || parent.children == math.MaxUint32 {
+		if parent.numbers != m || uint32(len(parent.lower)) != variables || parent.children == math.MaxUint32 || parent.depth == math.MaxUint32 {
 			return nil, arena.ErrInvalidSlot
 		}
 	}
@@ -60,6 +61,7 @@ func NewRationalNode(m *numeral.RationalManager, variables uint32, parent *Ratio
 		n.context = parent.context
 		n.conflictVar = parent.conflictVar
 		n.trail = parent.trail
+		n.depth = parent.depth + 1
 		parent.children++
 	}
 	return n, nil

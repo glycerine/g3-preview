@@ -11,8 +11,8 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
-// RationalContext owns the reached config_mpq variables, bounds and clauses.
-// Definition propagation and search are still separate work.
+// RationalContext owns the reached config_mpq variables, bounds, definitions,
+// clauses and breadth-first search state.
 type RationalContext struct {
 	self             *RationalContext
 	numbers          *numeral.RationalManager
@@ -48,7 +48,12 @@ type RationalContext struct {
 	leafTail         *RationalNode
 	numBounds        uint64
 	numConflicts     uint64
+	numSplits        uint64
 	timestamp        uint64
+	maxDepth         uint32
+	maxNodes         uint32
+	searchNode       *RationalNode
+	searchPhase      uint8
 	closed           bool
 }
 
@@ -57,7 +62,7 @@ func NewRationalContext(m *numeral.RationalManager, limit *control.Reslimit) (_ 
 		return nil, arena.ErrInvalidSlot
 	}
 	c := &RationalContext{numbers: m, limit: limit, runtime: m.RuntimeOwner(), maxMemory: math.MaxUint64,
-		epsilon: numeral.NewRational(), maxBound: numeral.NewRational(), minusMaxBound: numeral.NewRational(), rootPrecision: numeral.NewRational()}
+		maxDepth: 128, maxNodes: 8192, epsilon: numeral.NewRational(), maxBound: numeral.NewRational(), minusMaxBound: numeral.NewRational(), rootPrecision: numeral.NewRational()}
 	for i := range c.relevanceScratch {
 		c.relevanceScratch[i] = numeral.NewRational()
 	}
@@ -287,6 +292,7 @@ func (c *RationalContext) Close() error {
 	c.inequalities, c.unitClauses, c.clauses, c.clauseWatchers = nil, nil, nil, nil
 	c.watchOrder, c.polynomials, c.polynomialOwners, c.numBuffer, c.monomials = nil, nil, nil, nil, nil
 	c.queue, c.queueHead = nil, 0
+	c.searchNode = nil
 	c.closed = true
 	return nil
 }
