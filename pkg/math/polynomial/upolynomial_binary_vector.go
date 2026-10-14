@@ -9,13 +9,15 @@ import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-var ErrBinaryVectorResetPending = errors.New("polynomial: binary vector manager reset pending")
+var ErrBinaryVectorResetPending = errors.New("polynomial: binary vector cleanup pending")
 
 type upolyBinaryVectorState struct {
 	values              []unumeral.BinaryRational
 	size                uint32
 	managerResetPending bool
 	managerResetCursor  uint32
+	dropPending         bool
+	dropCursor, dropTo  uint32
 }
 type BinaryRationalVector struct {
 	self    *BinaryRationalVector
@@ -54,7 +56,7 @@ func (v *BinaryRationalVector) check() error {
 	if e := v.checkOwner(); e != nil {
 		return e
 	}
-	if v.state.managerResetPending {
+	if v.state.managerResetPending || v.state.dropPending {
 		return ErrBinaryVectorResetPending
 	}
 	return nil
@@ -63,7 +65,7 @@ func (v *BinaryRationalVector) check() error {
 // Native field extent is retained for borrowed reads and owning cleanup;
 // logical size separately records the currently active binary rationals.
 func upolyBinaryExtend(s *upolyBinaryVectorState, n uint32) error {
-	if s.managerResetPending {
+	if s.managerResetPending || s.dropPending {
 		return ErrBinaryVectorResetPending
 	}
 	if uint64(n) > uint64(^uint(0)>>1) {
@@ -108,7 +110,7 @@ func numericBinaryRationalManager_binaryPushDefault(m *unumeral.BinaryRationalMa
 	return &s.values[i], nil
 }
 func numericBinaryRationalManager_binarySlot(m *unumeral.BinaryRationalManager, s *upolyBinaryVectorState, i uint32) (*unumeral.BinaryRational, error) {
-	if s.managerResetPending {
+	if s.managerResetPending || s.dropPending {
 		return nil, ErrBinaryVectorResetPending
 	}
 	if polynomialSourceDebug && i >= s.size {
@@ -120,15 +122,26 @@ func numericBinaryRationalManager_binarySlot(m *unumeral.BinaryRationalManager, 
 	return &s.values[i], nil
 }
 func numericBinaryRationalManager_binaryReset(m *unumeral.BinaryRationalManager, s *upolyBinaryVectorState) error {
-	if s.managerResetPending {
+	return upolyBinaryBeginDrop(m, s, 0)
+}
+func upolyBinaryBeginDrop(m *unumeral.BinaryRationalManager, s *upolyBinaryVectorState, to uint32) error {
+	if s.managerResetPending || s.dropPending {
 		return ErrBinaryVectorResetPending
 	}
-	for i := uint32(0); i < s.size; i++ {
-		if e := m.Del(&s.values[i]); e != nil {
+	s.dropPending = true
+	s.dropCursor, s.dropTo = to, to
+	return upolyBinaryFinishDrop(m, s)
+}
+func upolyBinaryFinishDrop(m *unumeral.BinaryRationalManager, s *upolyBinaryVectorState) error {
+	for s.dropCursor < s.size {
+		if e := m.Del(&s.values[s.dropCursor]); e != nil {
 			return e
 		}
+		s.dropCursor++
 	}
-	s.size = 0
+	s.size = s.dropTo
+	s.dropPending = false
+	s.dropCursor, s.dropTo = 0, 0
 	return nil
 }
 func numericBinaryRationalManager_binaryDestroy(m *unumeral.BinaryRationalManager, s *upolyBinaryVectorState) error {
@@ -205,6 +218,17 @@ func (v *BinaryRationalVector) CleanupManagerReset() error {
 	}
 	return v.finishManagerReset()
 }
+
+// CleanupDrop resumes vector Reset or Shrink from the first undeleted slot.
+func (v *BinaryRationalVector) CleanupDrop() error {
+	if e := v.checkOwner(); e != nil {
+		return e
+	}
+	if !v.state.dropPending {
+		return nil
+	}
+	return upolyBinaryFinishDrop(v.manager, &v.state)
+}
 func (v *BinaryRationalVector) Shrink(n uint32) error {
 	if e := v.check(); e != nil {
 		return e
@@ -212,11 +236,6 @@ func (v *BinaryRationalVector) Shrink(n uint32) error {
 	old := v.state.size
 	if old == n {
 		return nil
-	}
-	for i := n; i < old; i++ {
-		if e := v.manager.Del(&v.state.values[i]); e != nil {
-			return e
-		}
 	}
 	if v.state.values == nil {
 		if polynomialSourceDebug && n != 0 {
@@ -230,8 +249,10 @@ func (v *BinaryRationalVector) Shrink(n uint32) error {
 	if uint64(n) > uint64(len(v.state.values)) {
 		return arena.ErrBounds
 	}
-	v.state.size = n
-	return nil
+	if n > old {
+		return arena.ErrBounds
+	}
+	return upolyBinaryBeginDrop(v.manager, &v.state, n)
 }
 func (v *BinaryRationalVector) Resize(n uint32) error {
 	if e := v.check(); e != nil {
@@ -262,6 +283,9 @@ func (v *BinaryRationalVector) Close() error {
 		return e
 	}
 	if e := v.CleanupManagerReset(); e != nil {
+		return e
+	}
+	if e := v.CleanupDrop(); e != nil {
 		return e
 	}
 	if e := numericBinaryRationalManager_binaryDestroy(v.manager, &v.state); e != nil {

@@ -149753,6 +149753,7 @@
         "TestUPolynomialNativeIsolationStacksAndNumericTransfer",
         "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard",
         "TestUPolynomialBinaryVectorManagerResetPhysicalRetry",
+        "TestUPolynomialBinaryVectorDropPhysicalRetry",
         "TestBinaryRationalSourceStreamInsertionsAndRefusalPrefixes",
         "TestRealClosureBinaryIntervalRetainedCore",
         "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement",
@@ -150214,6 +150215,7 @@
             "TestUPolynomialIsolationPackedFrameFields",
             "TestUPolynomialBinaryVectorActualAscendingDestruction",
             "TestUPolynomialBinaryVectorManagerResetPhysicalRetry",
+            "TestUPolynomialBinaryVectorDropPhysicalRetry",
             "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
           ]
         },
@@ -150331,6 +150333,7 @@
         "TestUPolynomialNativeIsolationStacksAndNumericTransfer",
         "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard",
         "TestUPolynomialBinaryVectorManagerResetPhysicalRetry",
+        "TestUPolynomialBinaryVectorDropPhysicalRetry",
         "TestBinaryRationalSourceStreamInsertionsAndRefusalPrefixes",
         "TestRealClosureBinaryIntervalRetainedCore",
         "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement",
@@ -150543,6 +150546,7 @@
             "TestUPolynomialIsolationPackedFrameFields",
             "TestUPolynomialBinaryVectorActualAscendingDestruction",
             "TestUPolynomialBinaryVectorManagerResetPhysicalRetry",
+            "TestUPolynomialBinaryVectorDropPhysicalRetry",
             "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
           ]
         },
@@ -177845,6 +177849,7 @@
         "TestUPolynomialIsolationPackedFrameFields",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
         "TestUPolynomialBinaryVectorManagerResetPhysicalRetry",
+        "TestUPolynomialBinaryVectorDropPhysicalRetry",
         "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
         "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime",
         "TestMonomialPositionsSourceMapping",
@@ -178223,6 +178228,7 @@
             "TestUPolynomialIsolationPackedFrameFields",
             "TestUPolynomialBinaryVectorActualAscendingDestruction",
             "TestUPolynomialBinaryVectorManagerResetPhysicalRetry",
+            "TestUPolynomialBinaryVectorDropPhysicalRetry",
             "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
           ]
         },
