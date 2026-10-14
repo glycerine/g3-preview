@@ -96,3 +96,28 @@ func TestArbitraryFloatNumeralPowerStoppedBodyRetainsRawLocal(t *testing.T) {
 		t.Fatal("stopped body cleanup retained raw local")
 	}
 }
+
+func TestArbitraryFloatNumeralPowerMaskWrapRetainsPublishedResult(t *testing.T) {
+	core, _, _ := mpfNumeralHelpersFixture(t)
+	m, e := NewArbitraryFloatNumeralManager(core, 11, 53)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, m.Close()) })
+	var input, out ArbitraryFloat
+	serviceMust(t, m.SetInt32(&input, 1))
+	t.Cleanup(func() { serviceMust(t, core.Del(&input)); serviceMust(t, core.Del(&out)) })
+	exponent := uint32(1 << 31)
+	e = m.Power(&input, exponent, &out)
+	var domain *PowerDomainError
+	if !errors.As(e, &domain) || domain.Exponent != exponent || domain.Reason != PowerMaskOverflow || !m.rawPending {
+		t.Fatal("mask wrap did not retain source prefix", e, m.rawPending)
+	}
+	got, e := core.ToDouble(&out)
+	if e != nil || got != 1 {
+		t.Fatal("mask wrap lost published result", got, e)
+	}
+	if e := m.Power(&input, 3, &out); !errors.Is(e, ErrArbitraryFloatNumeralRawPending) {
+		t.Fatal("mask wrap allowed reentry", e)
+	}
+	serviceMust(t, m.CleanupRawLocal())
+	serviceMust(t, m.Power(&input, 3, &out))
+}

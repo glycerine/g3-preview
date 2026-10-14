@@ -44,8 +44,8 @@ func (m *ArbitraryFloatNumeralManager) Decrement(x *ArbitraryFloat) error {
 }
 
 // Power uses the source's unsigned mask walk, including its final square.
-// Once mask wraps to zero, continuing would loop forever in C++; the Go
-// translation ends that unreachable-for-default-parameters path.
+// A wrapped mask reports the source's nonterminating path after its reached
+// operations and leaves the raw local for owning cleanup.
 func (m *ArbitraryFloatNumeralManager) Power(a *ArbitraryFloat, exponent uint32, out *ArbitraryFloat) error {
 	if e := m.guard(); e != nil {
 		return e
@@ -59,7 +59,7 @@ func (m *ArbitraryFloatNumeralManager) Power(a *ArbitraryFloat, exponent uint32,
 	if e := m.SetInt32(out, 1); e != nil {
 		return e
 	}
-	for mask := uint32(1); mask != 0 && mask <= exponent; mask <<= 1 {
+	for mask := uint32(1); mask <= exponent; {
 		if mask&exponent != 0 {
 			if e := m.Mul(out, &m.rawLocal, out); e != nil {
 				return e
@@ -67,6 +67,10 @@ func (m *ArbitraryFloatNumeralManager) Power(a *ArbitraryFloat, exponent uint32,
 		}
 		if e := m.Mul(&m.rawLocal, &m.rawLocal, &m.rawLocal); e != nil {
 			return e
+		}
+		mask <<= 1
+		if mask == 0 {
+			return &PowerDomainError{Exponent: exponent, Reason: PowerMaskOverflow}
 		}
 	}
 	if e := m.finishRawLocalSource(); e != nil {

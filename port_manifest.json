@@ -121078,6 +121078,7 @@
         "TestArbitraryFloatNumeralSourceReciprocalIncrementAndPower",
         "TestArbitraryFloatNumeralRawLocalSourceEndAndOwningRetry",
         "TestArbitraryFloatNumeralPowerStoppedBodyRetainsRawLocal",
+        "TestArbitraryFloatNumeralPowerMaskWrapRetainsPublishedResult",
         "TestArbitraryFloatNumeralSourceRationalString",
         "TestArbitraryFloatNumeralSourceStringAndDisplay",
         "TestArbitraryFloatNumeralSourceSwapAndDel",
@@ -121219,7 +121220,8 @@
           "tests": [
             "TestArbitraryFloatNumeralSourceReciprocalIncrementAndPower",
             "TestArbitraryFloatNumeralRawLocalSourceEndAndOwningRetry",
-            "TestArbitraryFloatNumeralPowerStoppedBodyRetainsRawLocal"
+            "TestArbitraryFloatNumeralPowerStoppedBodyRetainsRawLocal",
+            "TestArbitraryFloatNumeralPowerMaskWrapRetainsPublishedResult"
           ]
         },
         {
