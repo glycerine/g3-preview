@@ -19,7 +19,7 @@ func (m *BinaryRationalManager) debugValue(a *BinaryRational) (OwnedRational, er
 func (m *BinaryRationalManager) debugInteger(a *Int) (OwnedRational, error) {
 	return OwnedRational{}, nil
 }
-func (m *BinaryRationalManager) debugDel(a *OwnedRational) {}
+func (m *BinaryRationalManager) debugDel(a *OwnedRational) error { return nil }
 func (m *BinaryRationalManager) debugEqualValue(old *OwnedRational, a *BinaryRational) error {
 	return nil
 }

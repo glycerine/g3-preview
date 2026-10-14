@@ -150181,7 +150181,8 @@
             "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
             "TestBinaryScopedRoutes",
-            "TestBinaryDebugIntegerCopyOwningCleanupRetry"
+            "TestBinaryDebugIntegerCopyOwningCleanupRetry",
+            "TestBinaryDebugSnapshotsRetainDestructorOrderAndRetry"
           ]
         },
         {
@@ -150506,7 +150507,8 @@
             "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
             "TestBinaryScopedRoutes",
-            "TestBinaryDebugIntegerCopyOwningCleanupRetry"
+            "TestBinaryDebugIntegerCopyOwningCleanupRetry",
+            "TestBinaryDebugSnapshotsRetainDestructorOrderAndRetry"
           ]
         },
         {

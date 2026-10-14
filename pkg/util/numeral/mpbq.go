@@ -39,6 +39,7 @@ var ErrBinaryToRationalPending = errors.New("mpnum: binary-rational to-rational 
 var ErrBinaryOwnedRationalPending = errors.New("mpnum: binary-rational owned conversion cleanup pending")
 var ErrBinaryApproxPending = errors.New("mpnum: binary-rational approximation cleanup pending")
 var ErrBinaryDebugIntegerPending = errors.New("mpnum: binary-rational debug integer cleanup pending")
+var ErrBinaryDebugSnapshotPending = errors.New("mpnum: binary-rational debug snapshot cleanup pending")
 
 type binaryOwnedRationalScope struct {
 	service                  *RationalService
@@ -93,6 +94,7 @@ type BinaryRationalManager struct {
 	approxPending                                  bool
 	debugIntegerValue                              OwnedRational
 	debugIntegerPending, debugIntegerExecuting     bool
+	debugSnapshotQueue                             []OwnedRational
 }
 type BinaryRationalStats struct {
 	HeaderBytes           uint64
@@ -150,6 +152,9 @@ func (m *BinaryRationalManager) open() error {
 	}
 	if m.debugIntegerPending && !m.debugIntegerExecuting {
 		return ErrBinaryDebugIntegerPending
+	}
+	if len(m.debugSnapshotQueue) != 0 {
+		return ErrBinaryDebugSnapshotPending
 	}
 	return nil
 }
@@ -247,6 +252,9 @@ func (m *BinaryRationalManager) CloseChecked() error {
 	if e := m.CleanupDebugInteger(); e != nil {
 		return e
 	}
+	if e := m.CleanupDebugSnapshots(); e != nil {
+		return e
+	}
 	if e := m.CleanupRefineMid(); e != nil {
 		return e
 	}
@@ -297,6 +305,23 @@ func (m *BinaryRationalManager) CleanupDebugInteger() error {
 		return ErrBinaryDebugIntegerPending
 	}
 	return m.cleanupDebugInteger()
+}
+
+// CleanupDebugSnapshots resumes the returned rational snapshots in the order
+// their source destructors were reached.
+func (m *BinaryRationalManager) CleanupDebugSnapshots() error {
+	if m == nil || m.self != m {
+		return ErrBinaryOwner
+	}
+	for len(m.debugSnapshotQueue) != 0 {
+		if e := m.Diagnostics.Del(&m.debugSnapshotQueue[0]); e != nil {
+			return e
+		}
+		m.debugSnapshotQueue[0] = OwnedRational{}
+		m.debugSnapshotQueue = m.debugSnapshotQueue[1:]
+	}
+	m.debugSnapshotQueue = nil
+	return nil
 }
 
 func (m *BinaryRationalManager) Stats() (BinaryRationalStats, error) {
@@ -459,7 +484,7 @@ func (m *BinaryRationalManager) IsNonNeg(a *BinaryRational) (bool, error) {
 	}
 	return m.Z.IsNonNeg(&a.Num)
 }
-func (m *BinaryRationalManager) normalize(a *BinaryRational) error {
+func (m *BinaryRationalManager) normalize(a *BinaryRational) (err error) {
 	if a.KField == 0 {
 		return nil
 	}
@@ -471,7 +496,11 @@ func (m *BinaryRationalManager) normalize(a *BinaryRational) error {
 	if e != nil {
 		return e
 	}
-	defer m.debugDel(&old)
+	defer func() {
+		if cleanup := m.debugDel(&old); err == nil {
+			err = cleanup
+		}
+	}()
 	k, e := m.Z.PowerOfTwoMultiple(&a.Num)
 	if e != nil {
 		return e

@@ -4,7 +4,7 @@ package numeral
 
 func (m *BinaryRationalManager) Add(a, b, r *BinaryRational) error { return m.addSub(a, b, r, false) }
 func (m *BinaryRationalManager) Sub(a, b, r *BinaryRational) error { return m.addSub(a, b, r, true) }
-func (m *BinaryRationalManager) addSub(a, b, r *BinaryRational, sub bool) error {
+func (m *BinaryRationalManager) addSub(a, b, r *BinaryRational, sub bool) (err error) {
 	if e := m.triple(a, b, r); e != nil {
 		return e
 	}
@@ -12,12 +12,20 @@ func (m *BinaryRationalManager) addSub(a, b, r *BinaryRational, sub bool) error 
 	if e != nil {
 		return e
 	}
-	defer m.debugDel(&da)
+	defer func() {
+		if cleanup := m.debugDel(&da); err == nil {
+			err = cleanup
+		}
+	}()
 	db, e := m.debugValue(b)
 	if e != nil {
 		return e
 	}
-	defer m.debugDel(&db)
+	defer func() {
+		if cleanup := m.debugDel(&db); err == nil {
+			err = cleanup
+		}
+	}()
 	x, y := &a.Num, &b.Num
 	k := a.KField
 	if a.KField < b.KField {
@@ -65,7 +73,7 @@ func (m *BinaryRationalManager) AddInteger(a *BinaryRational, b *Int, r *BinaryR
 func (m *BinaryRationalManager) SubInteger(a *BinaryRational, b *Int, r *BinaryRational) error {
 	return m.addSubInteger(a, b, r, true)
 }
-func (m *BinaryRationalManager) addSubInteger(a *BinaryRational, b *Int, r *BinaryRational, sub bool) error {
+func (m *BinaryRationalManager) addSubInteger(a *BinaryRational, b *Int, r *BinaryRational, sub bool) (err error) {
 	if e := m.pair(a, r); e != nil {
 		return e
 	}
@@ -76,12 +84,20 @@ func (m *BinaryRationalManager) addSubInteger(a *BinaryRational, b *Int, r *Bina
 	if e != nil {
 		return e
 	}
-	defer m.debugDel(&da)
+	defer func() {
+		if cleanup := m.debugDel(&da); err == nil {
+			err = cleanup
+		}
+	}()
 	db, e := m.debugInteger(b)
 	if e != nil {
 		return e
 	}
-	defer m.debugDel(&db)
+	defer func() {
+		if cleanup := m.debugDel(&db); err == nil {
+			err = cleanup
+		}
+	}()
 	y := b
 	if a.KField != 0 {
 		if e = m.Z.Mul2k(b, a.KField, &m.Tmp); e != nil {
@@ -111,7 +127,7 @@ func (m *BinaryRationalManager) addSubInteger(a *BinaryRational, b *Int, r *Bina
 	}
 	return m.debugArithmetic(&da, &db, r, op, traceLine)
 }
-func (m *BinaryRationalManager) Mul(a, b, r *BinaryRational) error {
+func (m *BinaryRationalManager) Mul(a, b, r *BinaryRational) (err error) {
 	if e := m.triple(a, b, r); e != nil {
 		return e
 	}
@@ -119,12 +135,20 @@ func (m *BinaryRationalManager) Mul(a, b, r *BinaryRational) error {
 	if e != nil {
 		return e
 	}
-	defer m.debugDel(&da)
+	defer func() {
+		if cleanup := m.debugDel(&da); err == nil {
+			err = cleanup
+		}
+	}()
 	db, e := m.debugValue(b)
 	if e != nil {
 		return e
 	}
-	defer m.debugDel(&db)
+	defer func() {
+		if cleanup := m.debugDel(&db); err == nil {
+			err = cleanup
+		}
+	}()
 	if e = m.Z.Mul(&a.Num, &b.Num, &r.Num); e != nil {
 		return e
 	}
@@ -137,7 +161,7 @@ func (m *BinaryRationalManager) Mul(a, b, r *BinaryRational) error {
 	}
 	return m.debugArithmetic(&da, &db, r, 2, 0)
 }
-func (m *BinaryRationalManager) MulInteger(a *BinaryRational, b *Int, r *BinaryRational) error {
+func (m *BinaryRationalManager) MulInteger(a *BinaryRational, b *Int, r *BinaryRational) (err error) {
 	if e := m.pair(a, r); e != nil {
 		return e
 	}
@@ -148,12 +172,20 @@ func (m *BinaryRationalManager) MulInteger(a *BinaryRational, b *Int, r *BinaryR
 	if e != nil {
 		return e
 	}
-	defer m.debugDel(&da)
+	defer func() {
+		if cleanup := m.debugDel(&da); err == nil {
+			err = cleanup
+		}
+	}()
 	db, e := m.debugInteger(b)
 	if e != nil {
 		return e
 	}
-	defer m.debugDel(&db)
+	defer func() {
+		if cleanup := m.debugDel(&db); err == nil {
+			err = cleanup
+		}
+	}()
 	if e = m.Z.Mul(&a.Num, b, &r.Num); e != nil {
 		return e
 	}

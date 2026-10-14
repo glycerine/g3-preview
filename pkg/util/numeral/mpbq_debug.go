@@ -87,29 +87,48 @@ func (m *BinaryRationalManager) debugInteger(a *Int) (out OwnedRational, err err
 	}
 	return OwnedRational{}, nil
 }
-func (m *BinaryRationalManager) debugDel(a *OwnedRational) {
-	if a.ownerID != 0 {
-		m.Diagnostics.Del(a)
+func (m *BinaryRationalManager) debugDel(a *OwnedRational) error {
+	if a.ownerID == 0 {
+		return nil
 	}
+	if len(m.debugSnapshotQueue) != 0 {
+		m.debugSnapshotQueue = append(m.debugSnapshotQueue, *a)
+		*a = OwnedRational{}
+		return ErrBinaryDebugSnapshotPending
+	}
+	if e := m.Diagnostics.Del(a); e != nil {
+		m.debugSnapshotQueue = append(m.debugSnapshotQueue, *a)
+		*a = OwnedRational{}
+		return e
+	}
+	return nil
 }
-func (m *BinaryRationalManager) debugEqualValue(old *OwnedRational, a *BinaryRational) error {
+func (m *BinaryRationalManager) debugEqualValue(old *OwnedRational, a *BinaryRational) (err error) {
 	v, e := m.debugValue(a)
 	if e != nil {
 		return e
 	}
-	defer m.debugDel(&v)
+	defer func() {
+		if cleanup := m.debugDel(&v); err == nil {
+			err = cleanup
+		}
+	}()
 	same, e := m.Diagnostics.Equal(old, &v)
 	if e != nil {
 		return e
 	}
 	return m.debugAssert(same)
 }
-func (m *BinaryRationalManager) debugArithmetic(a, b *OwnedRational, out *BinaryRational, op uint8, traceLine int) error {
+func (m *BinaryRationalManager) debugArithmetic(a, b *OwnedRational, out *BinaryRational, op uint8, traceLine int) (err error) {
 	r, e := m.debugValue(out)
 	if e != nil {
 		return e
 	}
-	defer m.debugDel(&r)
+	defer func() {
+		if cleanup := m.debugDel(&r); err == nil {
+			err = cleanup
+		}
+	}()
 	var want OwnedRational
 	switch op {
 	case 0:
@@ -122,7 +141,11 @@ func (m *BinaryRationalManager) debugArithmetic(a, b *OwnedRational, out *Binary
 	if e != nil {
 		return e
 	}
-	defer m.debugDel(&want)
+	defer func() {
+		if cleanup := m.debugDel(&want); err == nil {
+			err = cleanup
+		}
+	}()
 	if traceLine != 0 {
 		m.traceMPBQArithmetic(a, b, &r, &want, traceLine)
 	}
