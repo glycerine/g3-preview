@@ -100,8 +100,6 @@ func (s *realValueStore) signApproxAtBinaryBound(coefficients []*realValue, boun
 		return sign, e
 	}
 	// Source find_biggest_interval_magnitude chooses the initial precision.
-	// Algebraic coefficient intervals stay at their current enclosure until
-	// their root-specific refinement is ported.
 	biggest := int32(-1 << 31)
 	for _, value := range coefficients {
 		if value == nil {
@@ -125,11 +123,21 @@ func (s *realValueStore) signApproxAtBinaryBound(coefficients []*realValue, boun
 	}
 	for ; precision <= 128; precision++ {
 		for _, value := range coefficients {
-			if value == nil || !value.isRational {
+			if value == nil {
 				continue
 			}
-			if e := s.refineSturmRationalInterval(value, owned[value], precision); e != nil {
-				return 0, e
+			if value.isRational {
+				if e := s.refineSturmRationalInterval(value, owned[value], precision); e != nil {
+					return 0, e
+				}
+			} else {
+				refined, e := s.refineSturmAlgebraicInterval(value, precision)
+				if e != nil {
+					return 0, e
+				}
+				if !refined {
+					return 0, arena.ErrInvalidSlot
+				}
 			}
 		}
 		if sign, decided, e := evaluate(); e != nil || decided {

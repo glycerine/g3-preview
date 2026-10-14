@@ -115,7 +115,18 @@ func TestRealClosureAlgebraicConstantAndZeroBoundSigns(t *testing.T) {
 	if err := closeInterval.SetFinite(&closeLower, &closeUpper, false, false); err != nil {
 		t.Fatal(err)
 	}
-	closeValue := &realValue{store: store, refs: 1, functionInterval: closeInterval}
+	closeRootConstant, err := store.newRational(-715827885, 1<<31)
+	if err != nil {
+		t.Fatal(err)
+	}
+	closeRoot, err := owner.mkAlgebraic([]*realValue{closeRootConstant, one}, closeInterval, closeInterval, nil, -1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	closeValue, err := store.newAlgebraicValue(closeRoot, one)
+	if err != nil {
+		t.Fatal(err)
+	}
 	initial, err := store.rationalApproxInterval(negativeThird, bounds)
 	if err != nil {
 		t.Fatal(err)
@@ -134,10 +145,78 @@ func TestRealClosureAlgebraicConstantAndZeroBoundSigns(t *testing.T) {
 	if got, err := store.signAtBinaryBound([]*realValue{negativeThird, closeValue}, bounds, &oneBound); err != nil || got != 1 {
 		t.Fatal("refined rational coefficient sign", got, err)
 	}
+	if err := store.release(closeValue); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.release(closeRootConstant); err != nil {
+		t.Fatal(err)
+	}
 	for _, interval := range []*BinaryInterval{initialSum, initial, closeInterval} {
 		if err := interval.Close(); err != nil {
 			t.Fatal(err)
 		}
+	}
+	minusTwo, err := store.newRational(-2, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	minusThreeHalves, err := store.newRational(-3, 2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rootLower, rootUpper := numeral.NewBinaryInt(1), numeral.NewBinaryInt(2)
+	rootEnclosure, err := NewBinaryInterval(bounds)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := rootEnclosure.SetFinite(&rootLower, &rootUpper, false, false); err != nil {
+		t.Fatal(err)
+	}
+	squareRoot, err := owner.mkAlgebraic([]*realValue{minusTwo, nil, one}, rootEnclosure, rootEnclosure, nil, -1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	squareRootValue, err := store.newAlgebraicValue(squareRoot, one)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, err := store.signAtBinaryBound([]*realValue{minusThreeHalves, squareRootValue}, bounds, &oneBound); err != nil || got != -1 {
+		t.Fatal("bisected algebraic coefficient sign", got, err)
+	}
+	if !squareRoot.interval.upperOpen {
+		t.Fatal("nonroot midpoint must become an open upper endpoint")
+	}
+	exactMidpointRoot, err := owner.mkAlgebraic([]*realValue{minusThreeHalves, one}, rootEnclosure, rootEnclosure, nil, -1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	exactMidpointValue, err := store.newAlgebraicValue(exactMidpointRoot, one)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if refined, err := store.refineSturmAlgebraicInterval(exactMidpointValue, 1); err != nil || !refined {
+		t.Fatal("exact algebraic midpoint", refined, err)
+	}
+	if exactMidpointRoot.interval.lowerOpen || exactMidpointRoot.interval.upperOpen {
+		t.Fatal("exact midpoint must close the singleton interval")
+	}
+	if equal, err := bounds.Equal(&exactMidpointRoot.interval.lower, &exactMidpointRoot.interval.upper); err != nil || !equal {
+		t.Fatal("exact midpoint interval", equal, err)
+	}
+	if err := store.release(exactMidpointValue); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.release(squareRootValue); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.release(minusThreeHalves); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.release(minusTwo); err != nil {
+		t.Fatal(err)
+	}
+	if err := rootEnclosure.Close(); err != nil {
+		t.Fatal(err)
 	}
 	for _, value := range []*realValue{third, negativeThird} {
 		approximation, err := store.rationalApproxInterval(value, bounds)
