@@ -150460,7 +150460,7 @@
           "name": "mpf_manager::partial_remainder mpf_dbg_rem entry, quotient ratio, tie, Q, YQ, exponent delta, aligned subtrahend, signed difference, X-YQ, sticky and final Go value-word TRACE at mpf.cpp:1282-1435",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_partial_remainder_component_trace.go",
-          "tests": ["TestArbitraryFloatPartialRemainderScalarTraceOrder", "TestArbitraryFloatPartialRemainderZeroQuotientOmitsFinalTrace", "TestArbitraryFloatPartialRemainderZeroResidualEmitsFinalTrace"]
+          "tests": ["TestArbitraryFloatPartialRemainderScalarTraceOrder", "TestArbitraryFloatPartialRemainderZeroQuotientOmitsFinalTrace", "TestArbitraryFloatPartialRemainderZeroResidualEmitsFinalTrace", "TestArbitraryFloatPartialRemainderComponentTraceRefusalCleansChild"]
         },
         {
           "name": "mpf_manager::rem mpf_dbg_rem entry and result with Go value-word display at mpf.cpp:1441,1483 and final mpf_dbg ordinary result TRACE at 1484",
@@ -151181,7 +151181,8 @@
             "TestArbitraryFloatHexfloatComponentsEntryAuthority",
             "TestArbitraryFloatHexfloatComponentsRefusedDivisionKeepsOlderRoots",
             "TestArbitraryFloatHexfloatComponentsActualCopyTransport",
-            "TestArbitraryFloatHexfloatComponentsYoungerSourceStop"
+            "TestArbitraryFloatHexfloatComponentsYoungerSourceStop",
+            "TestArbitraryFloatPartialRemainderComponentTraceRefusalCleansChild"
           ]
         },
         {
@@ -152261,7 +152262,8 @@
             "TestArbitraryFloatHexfloatComponentsEntryAuthority",
             "TestArbitraryFloatHexfloatComponentsRefusedDivisionKeepsOlderRoots",
             "TestArbitraryFloatHexfloatComponentsActualCopyTransport",
-            "TestArbitraryFloatHexfloatComponentsYoungerSourceStop"
+            "TestArbitraryFloatHexfloatComponentsYoungerSourceStop",
+            "TestArbitraryFloatPartialRemainderComponentTraceRefusalCleansChild"
           ]
         },
         {
