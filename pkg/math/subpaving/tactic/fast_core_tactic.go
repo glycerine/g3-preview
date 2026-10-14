@@ -21,6 +21,24 @@ import (
 
 var ErrFastCorePrintNodes = errors.New("subpaving tactic: SMT2 display for this mapped expression is not yet ported")
 
+// The source print_nodes route writes to std::cout with its default
+// nonthrowing failure state. Keep a borrowed Go writer's first failed prefix
+// while allowing the tactic to publish statistics and its result.
+type fastTacticOutput struct {
+	out    io.Writer
+	failed bool
+}
+
+func (w *fastTacticOutput) Write(p []byte) (int, error) {
+	if !w.failed {
+		n, err := w.out.Write(p)
+		if err != nil || n != len(p) {
+			w.failed = true
+		}
+	}
+	return len(p), nil
+}
+
 // FastCoreTactic owns the selected engine, expression converter and a shared
 // parameter snapshot. The goal, managers and parameter service are borrowed.
 // The returned goal is borrowed.
@@ -192,13 +210,14 @@ func (t *FastCoreTactic) ApplyWithOutput(g *goaltactic.Goal, out io.Writer) (res
 		return nil, err
 	}
 	if options.PrintNodes {
-		if err := shell.DisplayConstraints(out, true); err != nil {
+		stream := &fastTacticOutput{out: out}
+		if err := shell.DisplayConstraints(stream, true); err != nil {
 			return nil, err
 		}
-		if err := fastWriteDisplay(out, "bounds at leaves: \n"); err != nil {
+		if err := fastWriteDisplay(stream, "bounds at leaves: \n"); err != nil {
 			return nil, err
 		}
-		if err := shell.DisplayBounds(out); err != nil {
+		if err := shell.DisplayBounds(stream); err != nil {
 			return nil, err
 		}
 	}

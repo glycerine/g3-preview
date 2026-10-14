@@ -3,6 +3,7 @@ package tactic
 import (
 	"bytes"
 	"errors"
+	"io"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -569,7 +570,41 @@ func TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats(t *testing.T) {
 	if got, err := printing.ApplyWithOutput(goal, &shown); err != nil || got != goal || shown.String() != "x <= 2\nbounds at leaves: \nx <= 2\n" {
 		t.Fatal("selected print_nodes output", got, err, shown.String())
 	}
+	const complete = "x <= 2\nbounds at leaves: \nx <= 2\n"
+	for _, withError := range []bool{false, true} {
+		for _, limit := range []int{0, 1, 6} {
+			short := &shortFastTacticOutput{limit: limit, withError: withError}
+			if got, err := printing.ApplyWithOutput(goal, short); err != nil || got != goal || short.String() != complete[:limit] {
+				t.Fatal("source print_nodes failbit must not stop result", limit, withError, got, err, short.String())
+			}
+			if short.calls == 0 {
+				t.Fatal("failed stream was never reached", limit, withError)
+			}
+		}
+	}
 	if err := printing.Close(); err != nil {
 		t.Fatal(err)
 	}
+}
+
+type shortFastTacticOutput struct {
+	bytes.Buffer
+	limit, calls int
+	withError    bool
+}
+
+func (w *shortFastTacticOutput) Write(p []byte) (int, error) {
+	w.calls++
+	remaining := w.limit - w.Len()
+	if remaining < 0 {
+		remaining = 0
+	}
+	if remaining < len(p) {
+		n, _ := w.Buffer.Write(p[:remaining])
+		if w.withError {
+			return n, io.ErrClosedPipe
+		}
+		return n, nil
+	}
+	return w.Buffer.Write(p)
 }
