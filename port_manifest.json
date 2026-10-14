@@ -48596,9 +48596,9 @@
       "path": "src/math/realclosure/mpz_matrix.cpp",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/math/realclosure/sign_matrix.go", "pkg/math/realclosure/sign_matrix_test.go"],
+      "tests": ["TestSignDeterminationSourceMatrices", "TestSignMatrixTensorAndCopyOwnCells"],
       "assertions": [
         {
           "line": 43,
@@ -48671,17 +48671,31 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Sign-determination dense mpz matrix mk/set/tensor_product with native Go big.Int cells and destination aliasing (mpz_matrix.cpp:38-90)",
+          "status": "ported",
+          "go_target": "pkg/math/realclosure/sign_matrix.go",
+          "tests": [
+            "TestSignMatrixTensorAndCopyOwnCells"
+          ]
+        },
+        {
+          "name": "Matrix solve, filter_cols, permute_rows, and linear_independent_rows for the retained sign-determination owner",
+          "status": "unported",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Native []big.Int replaces the C++ mpz array and allocator. Sign-determination matrix constructor is ported separately; matrix solve and owner integration remain open."]
     },
     {
       "path": "src/math/realclosure/mpz_matrix.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/math/realclosure/sign_matrix.go", "pkg/math/realclosure/sign_matrix_test.go"],
+      "tests": ["TestSignDeterminationSourceMatrices", "TestSignMatrixTensorAndCopyOwnCells"],
       "conditionals": [
         {
           "line": 31,
@@ -48716,9 +48730,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Sign-determination dense mpz matrix mk/set/tensor_product with native Go big.Int cells and destination aliasing (mpz_matrix.cpp:38-90)",
+          "status": "ported",
+          "go_target": "pkg/math/realclosure/sign_matrix.go",
+          "tests": [
+            "TestSignMatrixTensorAndCopyOwnCells"
+          ]
+        },
+        {
+          "name": "Matrix solve, filter_cols, permute_rows, and linear_independent_rows for the retained sign-determination owner",
+          "status": "unported",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Native []big.Int replaces the C++ mpz array and allocator. Sign-determination matrix constructor is ported separately; matrix solve and owner integration remain open."]
     },
     {
       "path": "src/math/realclosure/rcf_params.hpp",
@@ -48797,11 +48825,15 @@
         "pkg/math/realclosure/binary_interval_test.go",
         "pkg/math/realclosure/binary_interval_mul.go",
         "pkg/math/realclosure/binary_interval_inv.go",
-        "pkg/math/realclosure/binary_interval_div.go"
+        "pkg/math/realclosure/binary_interval_div.go",
+        "pkg/math/realclosure/sign_matrix.go",
+        "pkg/math/realclosure/sign_matrix_test.go"
       ],
       "tests": [
         "TestRealClosureBinaryExtendedNumeralBranches",
-        "TestRealClosureBinaryIntervalRetainedCore"
+        "TestRealClosureBinaryIntervalRetainedCore",
+        "TestSignDeterminationSourceMatrices",
+        "TestSignMatrixTensorAndCopyOwnCells"
       ],
       "conditionals": [
         {
@@ -49990,6 +50022,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "imp::mk_sign_det_matrix four root-sign configurations and non-discriminating refusal (realclosure.cpp:1887-1927)",
+          "status": "ported",
+          "go_target": "pkg/math/realclosure/sign_matrix.go",
+          "tests": [
+            "TestSignDeterminationSourceMatrices"
+          ]
+        },
         {
           "name": "Selected real-closure mpbq interval-manager numeral operations with source division precision and rounding state (src/math/realclosure/realclosure.cpp:54-135)",
           "status": "partial",
