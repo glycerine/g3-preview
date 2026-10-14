@@ -16914,6 +16914,15 @@
           "tests": [
             "TestASTFloatingPointSignedZeroSortOverloads"
           ]
+        },
+        {
+          "name": "Concrete fpa_decl_plugin special constant declarations: sort-parameter/width/range precedence, five scoped_mpf setters, NaN assertion and ordered local destruction (src/ast/fpa_decl_plugin.cpp:256-290; src/util/mpf.h:300-327)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_special_decl.go",
+          "tests": [
+            "TestASTFloatingPointSpecialDeclSortSelectionAndScopedValue",
+            "TestASTFloatingPointSpecialDeclFailedScalarRetainedForCleanup"
+          ]
         }
       ],
       "ownership": [
@@ -17033,6 +17042,15 @@
           "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
           "tests": [
             "TestASTFloatingPointSignedZeroSortOverloads"
+          ]
+        },
+        {
+          "name": "Concrete fpa_decl_plugin special constant declarations: sort-parameter/width/range precedence, five scoped_mpf setters, NaN assertion and ordered local destruction (src/ast/fpa_decl_plugin.cpp:256-290; src/util/mpf.h:300-327)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_special_decl.go",
+          "tests": [
+            "TestASTFloatingPointSpecialDeclSortSelectionAndScopedValue",
+            "TestASTFloatingPointSpecialDeclFailedScalarRetainedForCleanup"
           ]
         }
       ],
@@ -153559,6 +153577,15 @@
           "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
           "tests": [
             "TestASTFloatingPointSignedZeroSortOverloads"
+          ]
+        },
+        {
+          "name": "Concrete fpa_decl_plugin special constant declarations: sort-parameter/width/range precedence, five scoped_mpf setters, NaN assertion and ordered local destruction (src/ast/fpa_decl_plugin.cpp:256-290; src/util/mpf.h:300-327)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_special_decl.go",
+          "tests": [
+            "TestASTFloatingPointSpecialDeclSortSelectionAndScopedValue",
+            "TestASTFloatingPointSpecialDeclFailedScalarRetainedForCleanup"
           ]
         }
       ],

@@ -224,6 +224,11 @@ func (m *ASTManager) mkFamilyFuncDecl(fid FamilyID, k int32, ps []ASTParameter, 
 		r, e = m.basicDecl(k, ps, domain)
 	} else if m.pluginAt(fid).kind == astArrayPlugin {
 		r, e = m.arrayDecl(k, ps, domain, rangeSort)
+	} else if m.pluginAt(fid).kind == astFloatingPointPlugin && k >= astFPAPlusInf && k <= astFPAMinusZero {
+		previous := m.formatExecuting
+		m.formatExecuting = true
+		defer func() { m.formatExecuting = previous }()
+		r, e = m.floatingPointSpecialDecl(k, ps, rangeSort)
 	} else if m.pluginAt(fid).kind == astFormatPlugin {
 		r, e = m.formatDecl(k, ps, domain)
 	} else {
