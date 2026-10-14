@@ -41,6 +41,47 @@ func assertIntegerPowerOracle(t *testing.T, m *IntegerManager, a *Int, want *big
 		}
 	}
 }
+
+func TestIntegerIsPowerOfTwoMultiLimbSourceBranches(t *testing.T) {
+	m, _ := integerManager(t)
+	for _, tc := range []struct {
+		name   string
+		limbs  []uint32
+		negate bool
+		want   bool
+		shift  uint32
+	}{
+		{"bit32", []uint32{0, 1}, false, true, 32},
+		{"bit97", []uint32{0, 0, 0, 2}, false, true, 97},
+		{"lower-limb", []uint32{1, 0, 2}, false, false, 0},
+		{"middle-limb", []uint32{0, 1, 2}, false, false, 0},
+		{"top-limb", []uint32{0, 0, 3}, false, false, 0},
+		{"negative-power", []uint32{0, 0, 2}, true, false, 0},
+		{"negative-nonpower", []uint32{1, 0, 2}, true, false, 0},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			var a Int
+			if e := m.SetLimbs(&a, tc.limbs); e != nil {
+				t.Fatal(e)
+			}
+			defer m.Del(&a)
+			if tc.negate {
+				if e := m.Neg(&a); e != nil {
+					t.Fatal(e)
+				}
+			}
+			before := integerString(t, m, &a)
+			got, shift, e := m.IsPowerOfTwo(&a)
+			if e != nil || got != tc.want || (got && shift != tc.shift) {
+				t.Fatalf("IsPowerOfTwo(%s) = (%v, %d, %v); want (%v, %d)", before, got, shift, e, tc.want, tc.shift)
+			}
+			if after := integerString(t, m, &a); after != before {
+				t.Fatalf("predicate changed input: %s -> %s", before, after)
+			}
+		})
+	}
+}
+
 func TestIntegerSourceShiftTable(t *testing.T) {
 	fixtures := []struct {
 		mul bool

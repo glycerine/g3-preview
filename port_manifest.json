@@ -160545,7 +160545,7 @@
           ]
         },
         {
-          "name": "power/is_power_of_two selected internal fast paths and mask loop",
+          "name": "power selected internal fast paths and mask loop",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_power_shift.go",
           "tests": [
@@ -160556,6 +160556,15 @@
             "TestPowerShiftWarmStorageAndLifetime",
             "TestShiftUnsignedBoundsAndPromotions",
             "TestPowerDomainAliases"
+          ]
+        },
+        {
+          "name": "is_power_of_two positive small and multi-limb predicate",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpz_power_shift.go",
+          "tests": [
+            "TestIntegerPowerAndShiftIndependent",
+            "TestIntegerIsPowerOfTwoMultiLimbSourceBranches"
           ]
         },
         {
@@ -162620,7 +162629,7 @@
           ]
         },
         {
-          "name": "power/is_power_of_two selected internal fast paths and mask loop",
+          "name": "power selected internal fast paths and mask loop",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_power_shift.go",
           "tests": [
@@ -162631,6 +162640,15 @@
             "TestPowerShiftWarmStorageAndLifetime",
             "TestShiftUnsignedBoundsAndPromotions",
             "TestPowerDomainAliases"
+          ]
+        },
+        {
+          "name": "is_power_of_two positive small and multi-limb predicate",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpz_power_shift.go",
+          "tests": [
+            "TestIntegerPowerAndShiftIndependent",
+            "TestIntegerIsPowerOfTwoMultiLimbSourceBranches"
           ]
         },
         {
