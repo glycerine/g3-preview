@@ -154030,15 +154030,23 @@
           ]
         },
         {
-          "name": "Shared/borrowed Runtime identity, TLS character formatting failure, and independent Go decimal scratch; permanent significand storage and global bindings remain open",
+          "name": "Shared/borrowed Runtime identity and TLS character-formatting failure; automatic process-memory binding remains open",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpff.go",
           "tests": [
             "TestFastFloatBorrowedRuntimeIdentityAndGuards",
             "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
             "TestFastFloatSharedRuntimeProfileAndClose",
-            "TestFastFloatBorrowedRuntimeInlineWarmScope",
-            "TestFastFloatNativeStorageGrowthAndRecycledGeneration"
+            "TestFastFloatBorrowedRuntimeInlineWarmScope"
+          ]
+        },
+        {
+          "name": "mpff_manager permanent significand array, capacity doubling, reserved zero ID, recycled LIFO IDs, and slot clearing on del/reset (mpff.cpp:36-112)",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mpff.go",
+          "tests": [
+            "TestFastFloatNativeStorageGrowthAndRecycledGeneration",
+            "TestFastFloatIDRecyclingAndRetirement"
           ]
         },
         {
@@ -154428,15 +154436,23 @@
           ]
         },
         {
-          "name": "Shared/borrowed Runtime identity, TLS character formatting failure, and independent Go decimal scratch; permanent significand storage and global bindings remain open",
+          "name": "Shared/borrowed Runtime identity and TLS character-formatting failure; automatic process-memory binding remains open",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpff.go",
           "tests": [
             "TestFastFloatBorrowedRuntimeIdentityAndGuards",
             "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
             "TestFastFloatSharedRuntimeProfileAndClose",
-            "TestFastFloatBorrowedRuntimeInlineWarmScope",
-            "TestFastFloatNativeStorageGrowthAndRecycledGeneration"
+            "TestFastFloatBorrowedRuntimeInlineWarmScope"
+          ]
+        },
+        {
+          "name": "mpff_manager permanent significand array, capacity doubling, reserved zero ID, recycled LIFO IDs, and slot clearing on del/reset (mpff.cpp:36-112)",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mpff.go",
+          "tests": [
+            "TestFastFloatNativeStorageGrowthAndRecycledGeneration",
+            "TestFastFloatIDRecyclingAndRetirement"
           ]
         }
       ],
