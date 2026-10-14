@@ -125,6 +125,53 @@ func TestRationalPolynomialDuplicateCoefficientBufferAndWatchOrder(t *testing.T)
 	}
 }
 
+func TestRationalPolynomialScopedCoefficientGrowthAndReuse(t *testing.T) {
+	c, m, _, _, _ := rationalClauseFixture(t)
+	var last uint32
+	for i := 0; i < 19; i++ {
+		var err error
+		last, err = c.NewVariable(false)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	constant, first, second := numeral.NewRational(), numeral.NewRational(), numeral.NewRational()
+	t.Cleanup(func() {
+		for _, e := range []error{m.Del(&constant), m.Del(&first), m.Del(&second)} {
+			if e != nil {
+				t.Error(e)
+			}
+		}
+	})
+	if err := m.SetInt64(&first, 1<<40); err != nil {
+		t.Fatal(err)
+	}
+	if err := m.SetInt64(&second, 1<<41); err != nil {
+		t.Fatal(err)
+	}
+	for _, coefficient := range []*numeral.Rational{&first, &second} {
+		z, err := c.DefinePolynomial(&constant, []numeral.Rational{*coefficient}, []uint32{last})
+		if err != nil {
+			t.Fatal(err)
+		}
+		p := c.polynomials[z]
+		if p == nil || len(p.terms) != 1 || p.terms[0].variable != last {
+			t.Fatal("source mk_sum lost high-index coefficient")
+		}
+		cmp, err := m.Compare(&p.terms[0].coefficient, coefficient)
+		if err != nil || cmp != 0 {
+			t.Fatal("source indexed copy/swap changed coefficient", cmp, err)
+		}
+		zero, err := m.IsZero(&c.numBuffer[last])
+		if err != nil || !zero {
+			t.Fatal("source swap did not clear reusable slot", zero, err)
+		}
+	}
+	if len(c.numBuffer) != len(c.variables)-1 || len(c.numBuffer) <= 16 {
+		t.Fatal("source reserve did not grow logical indexed buffer", len(c.numBuffer), len(c.variables))
+	}
+}
+
 func TestRationalPolynomialQueuedClauseBoundTriggersDefinition(t *testing.T) {
 	c, m, value, x, y := rationalClauseFixture(t)
 	two, three, constant := numeral.NewRational(), numeral.NewRational(), numeral.NewRational()
