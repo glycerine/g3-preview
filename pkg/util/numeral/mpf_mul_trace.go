@@ -71,14 +71,26 @@ func (m *ArbitraryFloatManager) traceMulEntry(mode ArbitraryFloatRoundingMode, x
 	var formatError error
 	_ = tags.EmitConditional("mpf_mul_bug", "mul", "src/util/mpf.cpp", 590,
 		func() bool { return true }, func(w io.Writer) error {
-			if e := writeNumeralDisplayPart(w, "rm: "+strconv.FormatUint(uint64(mode), 10)+"\nX: "); e != nil {
+			if e := writeNumeralDisplayPart(w, "rm: "); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, strconv.FormatUint(uint64(mode), 10)); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, "\n"); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, "X: "); e != nil {
 				return e
 			}
 			if e := m.traceFloatString(w, x); e != nil {
 				formatError = e
 				return e
 			}
-			if e := writeNumeralDisplayPart(w, "\nY: "); e != nil {
+			if e := writeNumeralDisplayPart(w, "\n"); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, "Y: "); e != nil {
 				return e
 			}
 			if e := m.traceFloatString(w, y); e != nil {

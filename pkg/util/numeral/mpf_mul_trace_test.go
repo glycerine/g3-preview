@@ -2,6 +2,7 @@ package numeral
 
 import (
 	"bytes"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -78,6 +79,37 @@ func TestArbitraryFloatMulBugTraceSourceBoundaries(t *testing.T) {
 		got := output.String()
 		if strings.Count(got, "-------- [mpf_dbg] mul src/util/mpf.cpp:") != 2 || strings.Contains(got, "PRODUCT = ") {
 			t.Fatalf("shortcut reached general-body debug trace: %q", got)
+		}
+	}
+	serviceMust(t, m.Del(&zero))
+	serviceMust(t, m.Del(&one))
+	serviceMust(t, m.Del(&product))
+}
+
+func TestArbitraryFloatMulBugTraceSourceInsertions(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	w := &mpffArithmeticTraceWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpf_mul_bug")
+	if !tags.ShouldTrace("mpf_mul_bug") {
+		return
+	}
+	serviceMust(t, m.BindTrace(tags))
+	var zero, one, product ArbitraryFloat
+	serviceMust(t, m.MkZero(11, 53, false, &zero))
+	serviceMust(t, m.MkOne(11, 53, false, &one))
+	for _, tc := range []struct {
+		name, xText, yText, resultText string
+		x, y, out                      *ArbitraryFloat
+	}{
+		{"zero shortcut", "+zero", "1.0 0", "+zero", &zero, &one, &product},
+		{"general alias", "1.0 0", "1.0 0", "1.0 0", &one, &one, &one},
+	} {
+		w.parts = nil
+		serviceMust(t, m.Mul(ArbitraryFloatNearestEven, tc.x, tc.y, tc.out))
+		want := []string{"rm: ", strconv.FormatUint(uint64(ArbitraryFloatNearestEven), 10), "\n", "X: ", tc.xText, "\n", "Y: ", tc.yText, "\n"}
+		if !hasMPFFTraceParts(w.parts, want) || !hasMPFFTraceParts(w.parts, []string{"result: ", tc.resultText, "\n"}) {
+			t.Fatalf("%s missing source insertions %q in %q", tc.name, want, w.parts)
 		}
 	}
 	serviceMust(t, m.Del(&zero))

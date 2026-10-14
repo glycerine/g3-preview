@@ -150771,6 +150771,7 @@
         "TestArbitraryFloatAddSubDebugTraceSourceInsertions",
         "TestArbitraryFloatDivDebugTraceSourceOrderAndShortcut",
         "TestArbitraryFloatMulBugTraceSourceBoundaries",
+        "TestArbitraryFloatMulBugTraceSourceInsertions",
         "TestArbitraryFloatMulTraceFormatterRefusalsStopAtSourceSite",
         "TestArbitraryFloatMulTraceWriterFailbitDoesNotStopArithmetic",
         "TestArbitraryFloatToStringLiteralSpecialBranches",
@@ -151464,7 +151465,7 @@
           "name": "mpf_manager::mul mpf_mul_bug entry/result and mpf_dbg operand, unpacked, significand and product TRACE records at mpf.cpp:590-650,664",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_mul_trace.go",
-          "tests": ["TestArbitraryFloatMulBugTraceSourceBoundaries", "TestArbitraryFloatMulTraceFormatterRefusalsStopAtSourceSite", "TestArbitraryFloatMulTraceWriterFailbitDoesNotStopArithmetic"]
+          "tests": ["TestArbitraryFloatMulBugTraceSourceBoundaries", "TestArbitraryFloatMulBugTraceSourceInsertions", "TestArbitraryFloatMulTraceFormatterRefusalsStopAtSourceSite", "TestArbitraryFloatMulTraceWriterFailbitDoesNotStopArithmetic"]
         },
         {
           "name": "mpf.cpp:23-36,43-59 default value construction, format reset, empty destructor and value swap",
