@@ -164,3 +164,43 @@ func TestArbitraryFloatSetPlainRationalTrace(t *testing.T) {
 	serviceMust(t, m.Del(&out))
 	serviceMust(t, m.rational.Del(&q))
 }
+
+func TestArbitraryFloatSetFormattedLiteralTrace(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("mpf_dbg")
+	compiled := tags.ShouldTrace("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	var out ArbitraryFloat
+	for _, tc := range []struct {
+		value, entry, parts string
+	}{
+		{"-1.25P2", "set: -1.25P2 [8/24]", "sgn = 1 f = 1.25 e = 2"},
+		{"+0.5", "set: +0.5 [8/24]", "sgn = 0 f = 0.5 e = 0"},
+		{"1.5\x00ignored", "set: 1.5 [8/24]", "sgn = 0 f = 1.5 e = 0"},
+	} {
+		output.Reset()
+		serviceMust(t, m.SetFormattedLiteral(&out, 8, 24, ArbitraryFloatNearestEven, tc.value))
+		got := output.String()
+		if !compiled {
+			if got != "" {
+				t.Fatalf("erased literal setter trace: %q", got)
+			}
+			continue
+		}
+		last := -1
+		for _, site := range []struct{ line, body string }{{"195", tc.entry}, {"219", tc.parts}, {"230", "set: res = "}} {
+			header := "-------- [mpf_dbg] set src/util/mpf.cpp:" + site.line + " ---------\n" + site.body
+			at := strings.Index(got, header)
+			if at <= last || strings.Count(got, "src/util/mpf.cpp:"+site.line+" ---------") != 1 {
+				t.Fatalf("literal setter trace order for %q at %s: %q", tc.value, site.line, got)
+			}
+			last = at
+		}
+		if strings.Count(got, "------------------------------------------------\n") != 3 {
+			t.Fatalf("literal setter trace blocks for %q: %q", tc.value, got)
+		}
+	}
+	serviceMust(t, m.Del(&out))
+}

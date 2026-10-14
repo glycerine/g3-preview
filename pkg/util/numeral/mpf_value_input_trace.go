@@ -1,10 +1,11 @@
-// Source: src/util/mpf.cpp:76,105,124-125,147,160-161,183,187,191.
+// Source: src/util/mpf.cpp:76,105,124-125,147,160-161,183,187,191,195,219,230.
 package numeral
 
 import (
 	"io"
 	"math"
 	"strconv"
+	"strings"
 
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -35,6 +36,43 @@ func (m *ArbitraryFloatManager) traceSetPlainRationalEntry(value *Rational, ebit
 			return writeNumeralDisplayPart(w, " ["+strconv.FormatUint(uint64(ebits), 10)+"/"+strconv.FormatUint(uint64(sbits), 10)+"]\n")
 		})
 	return formatError
+}
+
+func (m *ArbitraryFloatManager) traceSetLiteralEntry(value string, ebits, sbits uint32) {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return
+	}
+	if i := strings.IndexByte(value, 0); i >= 0 {
+		value = value[:i]
+	}
+	parts := [...]string{"set: ", value, " [", strconv.FormatUint(uint64(ebits), 10), "/", strconv.FormatUint(uint64(sbits), 10), "]\n"}
+	_ = tags.EmitConditional("mpf_dbg", "set", "src/util/mpf.cpp", 195,
+		func() bool { return true }, func(w io.Writer) error {
+			for _, part := range parts {
+				if e := writeNumeralDisplayPart(w, part); e != nil {
+					return e
+				}
+			}
+			return nil
+		})
+}
+
+func (m *ArbitraryFloatManager) traceSetLiteralParts(negative bool, fraction, exponent string) {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return
+	}
+	parts := [...]string{"sgn = ", traceBoolDigit(negative), " f = ", fraction, " e = ", exponent, "\n"}
+	_ = tags.EmitConditional("mpf_dbg", "set", "src/util/mpf.cpp", 219,
+		func() bool { return true }, func(w io.Writer) error {
+			for _, part := range parts {
+				if e := writeNumeralDisplayPart(w, part); e != nil {
+					return e
+				}
+			}
+			return nil
+		})
 }
 
 func (m *ArbitraryFloatManager) traceSetOrdinaryResult(out *ArbitraryFloat, line int) error {

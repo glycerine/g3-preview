@@ -34,6 +34,7 @@ func (m *ArbitraryFloatManager) SetFormattedLiteral(out *ArbitraryFloat, ebits, 
 			cause = m.CleanupFormattedLiteral()
 		}
 	}()
+	m.traceSetLiteralEntry(value, ebits, sbits)
 
 	// These source writes precede all string operations and numeric declarations.
 	out.assignEbits(ebits)
@@ -57,6 +58,7 @@ func (m *ArbitraryFloatManager) SetFormattedLiteral(out *ArbitraryFloat, ebits, 
 	if pos >= 0 {
 		fraction, exponent = value[:pos], value[pos+1:]
 	}
+	m.traceSetLiteralParts(negative, fraction, exponent)
 
 	s.q = NewRational()
 	s.qLive = true
@@ -88,7 +90,7 @@ func (m *ArbitraryFloatManager) SetFormattedLiteral(out *ArbitraryFloat, ebits, 
 		return e
 	}
 	out.assignSign(negative)
-	return nil
+	return m.traceSetOrdinaryResult(out, 230)
 }
 
 type arbitraryFloatFormattedLiteralScope struct {
