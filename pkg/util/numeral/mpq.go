@@ -38,6 +38,8 @@ type RationalManager struct {
 	lexical                                        rationalManagerLexicalScope
 	RawArithmetic                                  rationalRawArithmeticScope
 	RawGeneration                                  uint64
+	prevPowerTemporary                             Int
+	prevPowerPending                               bool
 	self                                           *RationalManager
 	originalCause, CleanupCauseField               error
 	cleanupStage                                   uint8

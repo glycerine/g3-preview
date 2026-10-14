@@ -32,6 +32,41 @@ func TestRationalSourcePrevPowerOfTwo(t *testing.T) {
 	}
 }
 
+func TestRationalPrevPowerOfTwoRetainedTemporaryOwningCleanup(t *testing.T) {
+	m, _, _ := rawArithmeticGuardOwner(t)
+	serviceMust(t, m.Z.SetLimbs(&m.prevPowerTemporary, []uint32{1, 0, 1}))
+	m.prevPowerPending = true
+	ref := m.prevPowerTemporary.Cell
+	original := m.Z.Cell(ref)
+	bad := original
+	bad.Backing.Requested = uint64(math.MaxUint32) + 1
+	m.Z.Store(ref, bad)
+	a := Rational{Num: NewInt(9), Den: NewInt(2)}
+	if _, e := m.PrevPowerOfTwo(&a); !errors.Is(e, ErrRationalLexicalPending) {
+		t.Fatal("pending source temporary was reused", e)
+	}
+	if e := m.SourceFinalize(); !errors.Is(e, ErrRationalLexicalPending) {
+		t.Fatal("source finalization discarded scoped integer", e)
+	}
+	if e := m.CleanupPrevPowerOfTwo(); !errors.Is(e, arena.ErrBounds) || !m.prevPowerPending || m.prevPowerTemporary.Cell != ref {
+		t.Fatal("failed physical cleanup lost retained integer", e, m.prevPowerPending, m.prevPowerTemporary)
+	}
+	m.Z.Store(ref, original)
+	serviceMust(t, m.CleanupPrevPowerOfTwo())
+	if m.prevPowerPending || m.prevPowerTemporary != (Int{}) {
+		t.Fatal("owning cleanup did not retire exact temporary")
+	}
+	if value, e := m.PrevPowerOfTwo(&a); e != nil || value != 2 {
+		t.Fatal("fresh source invocation after owning cleanup", value, e)
+	}
+	serviceMust(t, m.Z.SetLimbs(&m.prevPowerTemporary, []uint32{3, 0, 1}))
+	m.prevPowerPending = true
+	serviceMust(t, m.CloseChecked())
+	if !m.closed || m.prevPowerPending {
+		t.Fatal("manager close must finish retained scoped integer first")
+	}
+}
+
 func checkSourceLogBounds(t *testing.T, m *IntegerManager, a *Int, n *big.Int) {
 	t.Helper()
 	k, e := m.Log2(a)
@@ -349,6 +384,9 @@ func TestRationalRoundInitializationAndClose(t *testing.T) {
 	m.Close()
 	if e := m.FloorToInt(&out, &integer); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal(e)
+	}
+	if _, e := m.PrevPowerOfTwo(&out); !errors.Is(e, arena.ErrClosed) || m.prevPowerPending {
+		t.Fatal("closed owner must not retain a new scoped integer", e, m.prevPowerPending)
 	}
 }
 

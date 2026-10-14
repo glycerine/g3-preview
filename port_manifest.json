@@ -157155,7 +157155,8 @@
             "TestRoundPublicationQuotientBeforeCeilCorrectionRefusal",
             "TestRoundPublicationRawShapesAndAllComponentAliases",
             "TestRationalRoundFailureCleanup",
-            "TestRationalSourcePrevPowerOfTwo"
+            "TestRationalSourcePrevPowerOfTwo",
+            "TestRationalPrevPowerOfTwoRetainedTemporaryOwningCleanup"
           ]
         },
         {
@@ -158704,7 +158705,8 @@
             "TestRoundPublicationQuotientBeforeCeilCorrectionRefusal",
             "TestRoundPublicationRawShapesAndAllComponentAliases",
             "TestRationalRoundFailureCleanup",
-            "TestRationalSourcePrevPowerOfTwo"
+            "TestRationalSourcePrevPowerOfTwo",
+            "TestRationalPrevPowerOfTwoRetainedTemporaryOwningCleanup"
           ]
         },
         {
