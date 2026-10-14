@@ -4,13 +4,17 @@ import (
 	"bytes"
 	"errors"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestFastSearchBreadthFirstCancellationAndOwnedChildren(t *testing.T) {
 	_, c, _, root := fastMonomialFixture(t, []bool{false})
 	c.maxDepth = 1
 	c.limit.Limit, c.limit.Steps = 1, 1
-	if err := c.Search(); !errors.Is(err, ErrFastContextCanceled) || len(c.leafQueue) != 1 || c.leafQueue[0] != root || c.searchNode != nil {
+	err := c.Search()
+	var source z3exception.DefaultException
+	if !errors.Is(err, ErrFastContextCanceled) || !errors.As(err, &source) || source.Message() != "canceled" || len(c.leafQueue) != 1 || c.leafQueue[0] != root || c.searchNode != nil {
 		t.Fatal("pre-selection checkpoint", err)
 	}
 	c.limit.Limit, c.limit.Steps = 1, 0

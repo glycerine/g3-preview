@@ -2,14 +2,14 @@
 package interval
 
 import (
-	"errors"
-
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/messages"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-var ErrHardwareRootCanceled = errors.New("interval: hardware-float root resource canceled")
+var ErrHardwareRootCanceled = z3exception.NewDefaultException(messages.Canceled)
 
 // HardwareRoot borrows the concrete f2n<hwf_manager> and checkpoint services.
 type HardwareRoot struct {

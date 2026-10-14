@@ -6,10 +6,12 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/messages"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-var ErrFastContextCanceled = errors.New("subpaving: propagation resource canceled")
+var ErrFastContextCanceled = z3exception.NewDefaultException(messages.Canceled)
 
 func (c *FastContext) definitionVisited(variable uint32) (uint64, bool) {
 	if p := c.polynomials[variable]; p != nil {

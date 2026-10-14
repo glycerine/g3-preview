@@ -6,10 +6,12 @@ import (
 
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/messages"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-var ErrFixedRootCanceled = errors.New("interval: fixed-point root resource canceled")
+var ErrFixedRootCanceled = z3exception.NewDefaultException(messages.Canceled)
 
 // FixedRoot borrows the concrete subpaving numeral manager and resource limit.
 // Cooperation is the source's optional single-threaded checkpoint service.

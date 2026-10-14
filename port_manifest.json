@@ -177422,7 +177422,8 @@
         "Cold caller-owned concrete exception values/messages; no retained hot interface or numeric/arena graph. Cmd symbol composition reads borrowed checked bytes directly into one final message and outlives the symbol owner. Source CString observations and signed positions preserved. See PORT_PROGRESS.md#audit-z3-exception-port-status-md.",
         "The selected formatted constructor uses Go fmt and the Linux AMD64 1023-byte stream boundary; retained MUZ/parser call sites remain unported.",
         "Concrete MPQ subpaving checkpoint and expression-converter cancellation return DefaultException(canceled); the core tactic translates the source message into TacticException.",
-        "The shared concrete subpaving converters return DefaultException for simplifier, arithmetic purifier and transcendental refusals; the core tactic forwards each source message as TacticException."
+        "The shared concrete subpaving converters return DefaultException for simplifier, arithmetic purifier and transcendental refusals; the core tactic forwards each source message as TacticException.",
+        "All five retained interval root modes and all five subpaving numeral contexts now return the source DefaultException(canceled) from resource checkpoints; direct root/search tests verify the value and resumable state."
       ],
       "deviations": [
         "Go error values replace virtual exception transport. The retained %s/%d/%u/%I64u format profiles use Go fmt with C-string input boundaries and Linux AMD64 truncation. MUZ/parser integration and virtual exception transport remain open. Message preserves the source first-NUL observation."
@@ -177502,7 +177503,8 @@
         "Cold caller-owned concrete exception values/messages; no retained hot interface or numeric/arena graph. Cmd symbol composition reads borrowed checked bytes directly into one final message and outlives the symbol owner. Source CString observations and signed positions preserved. See PORT_PROGRESS.md#audit-z3-exception-port-status-md.",
         "The selected formatted constructor uses Go fmt and the Linux AMD64 1023-byte stream boundary; retained MUZ/parser call sites remain unported.",
         "Concrete MPQ subpaving checkpoint and expression-converter cancellation return DefaultException(canceled); the core tactic translates the source message into TacticException.",
-        "The shared concrete subpaving converters return DefaultException for simplifier, arithmetic purifier and transcendental refusals; the core tactic forwards each source message as TacticException."
+        "The shared concrete subpaving converters return DefaultException for simplifier, arithmetic purifier and transcendental refusals; the core tactic forwards each source message as TacticException.",
+        "All five retained interval root modes and all five subpaving numeral contexts now return the source DefaultException(canceled) from resource checkpoints; direct root/search tests verify the value and resumable state."
       ],
       "deviations": [
         "Go error values replace virtual exception transport. The retained %s/%d/%u/%I64u format profiles use Go fmt with C-string input boundaries and Linux AMD64 truncation. MUZ/parser integration and virtual exception transport remain open. Message preserves the source first-NUL observation."

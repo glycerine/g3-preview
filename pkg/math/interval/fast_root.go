@@ -6,10 +6,12 @@ import (
 
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/messages"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-var ErrFastRootCanceled = errors.New("interval: fast-float root resource canceled")
+var ErrFastRootCanceled = z3exception.NewDefaultException(messages.Canceled)
 
 // FastRoot borrows the concrete subpaving numeral manager and resource limit.
 // Cooperation is the source's optional single-threaded checkpoint service.

@@ -6,10 +6,12 @@ import (
 
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/messages"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-var ErrArbitraryRootCanceled = errors.New("interval: arbitrary-float root resource canceled")
+var ErrArbitraryRootCanceled = z3exception.NewDefaultException(messages.Canceled)
 
 // ArbitraryRoot borrows the concrete subpaving numeral manager and resource limit.
 // Cooperation is the source's optional single-threaded checkpoint service.

@@ -3,12 +3,12 @@
 package subpaving
 
 import (
-	"errors"
-
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/messages"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-var ErrHardwareContextCanceled = errors.New("subpaving: hardware context canceled")
+var ErrHardwareContextCanceled = z3exception.NewDefaultException(messages.Canceled)
 
 type hardwareUnitClause struct {
 	atom  *HardwareInequality

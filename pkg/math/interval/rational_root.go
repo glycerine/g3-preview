@@ -6,10 +6,12 @@ import (
 
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/messages"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-var ErrRationalRootCanceled = errors.New("interval: rational root resource canceled")
+var ErrRationalRootCanceled = z3exception.NewDefaultException(messages.Canceled)
 
 // RationalRoot borrows the exact numeral manager, resource limit and optional
 // process cooperation owner.

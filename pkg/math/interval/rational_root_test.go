@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestRationalRootNewtonCertifiedBoundsAndCancellation(t *testing.T) {
@@ -78,7 +79,9 @@ func TestRationalRootNewtonCertifiedBoundsAndCancellation(t *testing.T) {
 	must(m.SetInt32(&a, 2))
 	limit.Limit = 1
 	limit.Steps = 1
-	if err := root.Bounds(&a, 2, &precision, &lo, &hi); !errors.Is(err, ErrRationalRootCanceled) {
+	err = root.Bounds(&a, 2, &precision, &lo, &hi)
+	var source z3exception.DefaultException
+	if !errors.Is(err, ErrRationalRootCanceled) || !errors.As(err, &source) || source.Message() != "canceled" {
 		t.Fatal("root checkpoint", err)
 	}
 	limit.Limit = 0

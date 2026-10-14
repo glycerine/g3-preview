@@ -3,14 +3,15 @@
 package subpaving
 
 import (
-	"errors"
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/messages"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-var ErrArbitraryContextCanceled = errors.New("subpaving: arbitrary context canceled")
+var ErrArbitraryContextCanceled = z3exception.NewDefaultException(messages.Canceled)
 var ErrArbitraryContextTimestamp error = &sourceFailure{message: "subpaving: arbitrary bound timestamp exhausted"}
 
 type ArbitraryBound struct {
