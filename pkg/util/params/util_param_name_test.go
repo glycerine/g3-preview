@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -69,10 +70,18 @@ func TestParamNameSymbolOwnershipAndSourceRoutes(t *testing.T) {
 	if got, err := NormParamSymbolName(m, usymbol.Symbol{}); err != nil || got != "_" {
 		t.Fatal(got, err)
 	}
-	for _, invalid := range []usymbol.Symbol{usymbol.Numerical(1), usymbol.Dummy()} {
-		if _, err := NormParamSymbolName(m, invalid); !errors.Is(err, usymbol.ErrInvalid) {
-			t.Fatal(invalid, err)
+	for _, numerical := range []usymbol.Symbol{usymbol.Numerical(0), usymbol.Numerical(1)} {
+		got, err := NormParamSymbolName(m, numerical)
+		if GlobalParamsSourceDebug {
+			if !errors.Is(err, usymbol.ErrInvalid) {
+				t.Fatal(numerical, err)
+			}
+		} else if err != nil || got != "_" {
+			t.Fatal(numerical, got, err)
 		}
+	}
+	if _, err := NormParamSymbolName(m, usymbol.Dummy()); !errors.Is(err, usymbol.ErrInvalid) {
+		t.Fatal(err)
 	}
 	foreign := internSymbol(t, other, "FOREIGN")
 	if _, err := NormParamSymbolName(m, foreign); !errors.Is(err, usymbol.ErrOwner) {
@@ -105,5 +114,39 @@ func TestParamNameSymbolSingleOutputAllocation(t *testing.T) {
 	allocations := testing.AllocsPerRun(100, func() { output, err = NormParamSymbolName(m, symbol) })
 	if err != nil || output != strings.Repeat("upper_name", 40) || allocations != 1 {
 		t.Fatal(err, allocations, len(output))
+	}
+}
+
+func TestParamNameNumericalSymbolWithAssertionsDisabled(t *testing.T) {
+	b := arena.NewBudget(1 << 20)
+	region, err := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: b}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	d, err := diagnostic.NewDebugContext(region, b)
+	if err != nil {
+		t.Fatal(err)
+	}
+	m, err := usymbol.NewManager(usymbol.Config{Budget: b, Debug: d})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = d.EnableAssertions(false); err != nil {
+		t.Fatal(err)
+	}
+	for _, s := range []usymbol.Symbol{usymbol.Numerical(0), usymbol.Numerical(7)} {
+		got, err := NormParamSymbolName(m, s)
+		if err != nil || got != "_" {
+			t.Fatal(s, got, err)
+		}
+	}
+	if err = m.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err = d.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err = region.Close(); err != nil || b.Used() != 0 {
+		t.Fatal(err, b.Used())
 	}
 }

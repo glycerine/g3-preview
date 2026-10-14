@@ -48,18 +48,15 @@ func NormParamSymbolName(manager *usymbol.Manager, name usymbol.Symbol) (string,
 	if manager == nil {
 		return "", usymbol.ErrInvalid
 	}
-	if err := manager.Validate(name); err != nil {
-		return "", err
-	}
-	if name.IsNumerical() {
-		return "", usymbol.ErrInvalid
-	}
-	if name.Value == 0 {
-		return "_", nil
-	}
-	text, _, err := manager.BareString(name)
+	// Source norm_param_name(symbol) reaches bare_str before the C-string
+	// overload. A numerical symbol therefore reaches its SASSERT in debug;
+	// with that assertion erased or disabled, its empty spelling becomes "_".
+	text, present, err := manager.BareString(name)
 	if err != nil {
 		return "", err
+	}
+	if !present {
+		return "_", nil
 	}
 	length, start := len(text), 0
 	if length != 0 {

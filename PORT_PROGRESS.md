@@ -1,3 +1,10 @@
+Parameter symbol-name normalization now follows the actual
+`norm_param_name(symbol)` call into `symbol::bare_str`. Numerical symbols reach
+its debug assertion; with assertions erased or disabled, their empty spelling
+normalizes to `_`, including symbol number zero. The earlier Go branch rejected
+them in every build, and its `Value == 0` shortcut skipped the debug assertion.
+Focused native and `g3debug,g3checked` parameter-name tests pass on CPUs 8-16.
+
 Retained `parray` bound-view audit: all five production subpaving configurations
 (`mpfx`, `mpff`, `hwf`, `mpq`, `mpf`) already use concrete native pointer slices.
 Root null slots, child copies, indexed lookups and child-local replacements

@@ -165511,14 +165511,15 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "norm_param_name complete nullable C-string and symbol overloads",
+          "name": "norm_param_name nullable C-string and symbol overloads, including numerical bare_str debug guard and release empty-spelling continuation",
           "status": "ported",
           "go_target": "pkg/util/params/util_param_name.go",
           "tests": [
             "TestParamNameNormalizationSourceBranches",
             "TestParamNameNormalizationByteDomain",
             "TestParamNameSymbolOwnershipAndSourceRoutes",
-            "TestParamNameSymbolSingleOutputAllocation"
+            "TestParamNameSymbolSingleOutputAllocation",
+            "TestParamNameNumericalSymbolWithAssertionsDisabled"
           ]
         },
         {
@@ -166108,14 +166109,15 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "norm_param_name complete nullable C-string and symbol overloads",
+          "name": "norm_param_name nullable C-string and symbol overloads, including numerical bare_str debug guard and release empty-spelling continuation",
           "status": "ported",
           "go_target": "pkg/util/params/util_param_name.go",
           "tests": [
             "TestParamNameNormalizationSourceBranches",
             "TestParamNameNormalizationByteDomain",
             "TestParamNameSymbolOwnershipAndSourceRoutes",
-            "TestParamNameSymbolSingleOutputAllocation"
+            "TestParamNameSymbolSingleOutputAllocation",
+            "TestParamNameNumericalSymbolWithAssertionsDisabled"
           ]
         },
         {
