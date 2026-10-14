@@ -51671,9 +51671,13 @@
       "path": "src/math/subpaving/subpaving_mpq.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/subpaving/rational_interval.go"
+      ],
+      "tests": [
+        "TestSubpavingRationalMutableIntervalCore"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -51735,6 +51739,8 @@
         "pkg/math/subpaving/fixed_split_test.go",
         "pkg/math/subpaving/fixed_selector.go",
         "pkg/math/subpaving/fixed_selector_test.go",
+        "pkg/math/subpaving/rational_interval.go",
+        "pkg/math/subpaving/rational_interval_test.go",
         "pkg/math/subpaving/fast_interval.go",
         "pkg/math/subpaving/fast_interval_test.go",
         "pkg/math/subpaving/fast_interval_arith.go",
@@ -52040,6 +52046,14 @@
           "go_target": "pkg/math/subpaving/arbitrary_interval.go",
           "tests": [
             "TestArbitraryIntervalLiveRootBoundViewAndOwnedCopy"
+          ]
+        },
+        {
+          "name": "Concrete config_mpq mutable interval endpoints, rational manager forwarding, reset/set/invariant/contains-zero/display; constant node views and context integration remain open (src/math/subpaving/subpaving_t.h:239-316)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/rational_interval.go",
+          "tests": [
+            "TestSubpavingRationalMutableIntervalCore"
           ]
         },
         {
@@ -119967,7 +119981,11 @@
         },
         {
           "name": "Subpaving context_mpq interval extended-number operations distinct from the default rational interval owner",
-          "status": "unported"
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/rational_interval.go",
+          "tests": [
+            "TestSubpavingRationalMutableIntervalCore"
+          ]
         },
         {
           "name": "Subpaving context_mpf finite/infinite extended-number operations through concrete f2n<mpf_manager>; enclosing mutable interval tracked under src/math/subpaving",
