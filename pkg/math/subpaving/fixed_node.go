@@ -52,6 +52,7 @@ type FixedNode struct {
 	context      *FixedContext
 	conflictVar  uint32
 	inconsistent bool
+	closing      bool
 	closed       bool
 }
 
@@ -86,6 +87,9 @@ func (n *FixedNode) open() error {
 		return arena.ErrInvalidSlot
 	}
 	if n.closed {
+		return arena.ErrClosed
+	}
+	if n.closing {
 		return arena.ErrClosed
 	}
 	return nil
@@ -129,21 +133,26 @@ func (n *FixedNode) PushBound(variable uint32, value *numeral.FixedPoint, lower,
 	return nil
 }
 
-func (n *FixedNode) Close() (err error) {
-	if err = n.open(); err != nil {
-		if n != nil && n.self == n && n.closed {
-			return nil
-		}
-		return err
+func (n *FixedNode) Close() error {
+	if n == nil || n.self != n || n.numbers == nil {
+		return arena.ErrInvalidSlot
+	}
+	if n.closed {
+		return nil
 	}
 	if n.children != 0 {
 		return arena.ErrInvalidSlot
 	}
-	for i := len(n.owned) - 1; i >= 0; i-- {
-		err = errors.Join(err, n.owned[i].value.Close())
-	}
-	if err != nil {
-		return err
+	n.closing = true
+	for len(n.owned) != 0 {
+		i := len(n.owned) - 1
+		b := n.owned[i]
+		if err := b.value.Close(); err != nil {
+			return err
+		}
+		n.trail = b.prev
+		n.owned[i] = nil
+		n.owned = n.owned[:i]
 	}
 	n.closed = true
 	if n.parent != nil {

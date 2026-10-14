@@ -166712,7 +166712,8 @@
           "status": "partial",
           "go_target": "pkg/math/subpaving/fixed_node.go",
           "tests": [
-            "TestSubpavingFixedNodeConstantIntervalViews"
+            "TestSubpavingFixedNodeConstantIntervalViews",
+            "TestFixedNodeCloseRetainsFailedBoundSuffix"
           ]
         },
         {
@@ -166720,7 +166721,8 @@
           "status": "partial",
           "go_target": "pkg/math/subpaving/fast_node.go",
           "tests": [
-            "TestSubpavingFastNodeConstantIntervalViews"
+            "TestSubpavingFastNodeConstantIntervalViews",
+            "TestFastNodeCloseRetainsFailedBoundSuffix"
           ]
         },
         {

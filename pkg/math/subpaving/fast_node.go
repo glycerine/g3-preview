@@ -54,6 +54,7 @@ type FastNode struct {
 	context      *FastContext
 	conflictVar  uint32
 	inconsistent bool
+	closing      bool
 	closed       bool
 }
 
@@ -89,6 +90,9 @@ func (n *FastNode) open() error {
 		return arena.ErrInvalidSlot
 	}
 	if n.closed {
+		return arena.ErrClosed
+	}
+	if n.closing {
 		return arena.ErrClosed
 	}
 	return nil
@@ -138,21 +142,26 @@ func (n *FastNode) PushBound(variable uint32, value *numeral.FastFloat, lower, o
 	return nil
 }
 
-func (n *FastNode) Close() (err error) {
-	if err = n.open(); err != nil {
-		if n != nil && n.self == n && n.closed {
-			return nil
-		}
-		return err
+func (n *FastNode) Close() error {
+	if n == nil || n.self != n || n.numbers == nil {
+		return arena.ErrInvalidSlot
+	}
+	if n.closed {
+		return nil
 	}
 	if n.children != 0 {
 		return arena.ErrInvalidSlot
 	}
-	for i := len(n.owned) - 1; i >= 0; i-- {
-		err = errors.Join(err, n.owned[i].owner.Close())
-	}
-	if err != nil {
-		return err
+	n.closing = true
+	for len(n.owned) != 0 {
+		i := len(n.owned) - 1
+		b := n.owned[i]
+		if err := b.owner.Close(); err != nil {
+			return err
+		}
+		n.trail = b.prev
+		n.owned[i] = nil
+		n.owned = n.owned[:i]
 	}
 	n.closed = true
 	if n.context != nil && n.queuedLeaf {
