@@ -64,6 +64,20 @@ func NewGoal(m *ast.ASTManager, proofs, models, cores bool) (*Goal, error) {
 	g.self = g
 	return g, nil
 }
+
+// NewGoalConfigCopy is goal(goal const&, bool): copy flags, depth and
+// precision while leaving formulas, proofs and dependencies empty.
+func NewGoalConfigCopy(src *Goal) (*Goal, error) {
+	if err := src.open(); err != nil {
+		return nil, err
+	}
+	g, err := NewGoal(src.manager, src.proofsEnabled, src.modelsEnabled, src.coreEnabled)
+	if err != nil {
+		return nil, err
+	}
+	g.depth, g.precision = src.depth, src.precision
+	return g, nil
+}
 func (g *Goal) open() error {
 	if g == nil || g.self != g {
 		return ast.ErrASTHandle

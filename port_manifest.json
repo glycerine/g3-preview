@@ -98590,13 +98590,15 @@
         "pkg/tactic/arith/polynomial_builder_test.go",
         "pkg/tactic/arith/polynomial_subsumption_test.go",
         "pkg/tactic/arith/polynomial_process_bound_test.go",
-        "pkg/tactic/arith/polynomial_collect_bounds_test.go"
+        "pkg/tactic/arith/polynomial_collect_bounds_test.go",
+        "pkg/tactic/arith/polynomial_apply_test.go"
       ],
       "tests": [
         "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer",
         "TestInequalityPolynomialSubsumptionUsesOwnedCoefficientBuffer",
         "TestInequalityPolynomialBuilderProcessBoundSourceNormalization",
-        "TestInequalityPolynomialBuilderCollectBoundsGoalOrderAndOwnership"
+        "TestInequalityPolynomialBuilderCollectBoundsGoalOrderAndOwnership",
+        "TestInequalityPolynomialBuilderApplyGoalBranchesAndConfiguration"
       ],
       "assertions": [
         {
@@ -98658,6 +98660,14 @@
           "tests": [
             "TestInequalityPolynomialBuilderProcessBoundSourceNormalization",
             "TestInequalityPolynomialBuilderCollectBoundsGoalOrderAndOwnership"
+          ]
+        },
+        {
+          "name": "Concrete imp operator goal configuration/depth, no-bound borrowed return, propagation, inconsistent false replacement and restored bounds (src/tactic/arith/propagate_ineqs_tactic.cpp:483-513)",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/polynomial_builder.go",
+          "tests": [
+            "TestInequalityPolynomialBuilderApplyGoalBranchesAndConfiguration"
           ]
         }
       ],
@@ -101670,7 +101680,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/tactic_goal.go",
-        "pkg/tactic/tactic_goal_ownership.go"
+        "pkg/tactic/tactic_goal_ownership.go",
+        "pkg/tactic/tactic_package_boundary.go"
       ],
       "tests": [
         "TestTacticGoalAssertionSplittingAndSourceOrder",
@@ -101686,7 +101697,8 @@
         "TestTacticGoalProofUpdateKeepsDerivedFacts",
         "TestTacticGoalSourceDepthPrecisionCountsAndReferences",
         "TestTacticGoalNativeSlicesGrowCopyUpdateAndRelease",
-        "TestTacticGoalNativeSlicesKeepActualPublicationPrefix"
+        "TestTacticGoalNativeSlicesKeepActualPublicationPrefix",
+        "TestTacticGoalConfigCopyKeepsFlagsDepthPrecisionWithoutAssertions"
       ],
       "assertions": [
         {
@@ -101763,6 +101775,14 @@
             "TestTacticGoalProofUpdateKeepsDerivedFacts",
             "TestTacticGoalSourceDepthPrecisionCountsAndReferences"
           ]
+        },
+        {
+          "name": "goal(goal const&, bool) configuration-only copy of manager, flags, depth and precision without formula ownership (src/tactic/goal.cpp:79-88)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_goal.go",
+          "tests": [
+            "TestTacticGoalConfigCopyKeepsFlagsDepthPrecisionWithoutAssertions"
+          ]
         }
       ],
       "ownership": [
@@ -101770,7 +101790,7 @@
         "quick_process temporary negations now use a native []ASTHandle with explicit INC before append and DEC on lexical exit, matching the source expr_ref_vector ownership. This corrects the prior nonowning expression-vector borrow. Goal output acquisition still precedes temporary cleanup."
       ],
       "deviations": [
-        "Display/printing, cross-manager translation, is_well_sorted, is_equal, the default and copying constructor facades remain unported. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred.",
+        "Display/printing, cross-manager translation, is_well_sorted, is_equal, the default and full copying constructor facades remain unported; the configuration-only constructor is concrete. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred.",
         "Goal forms/proofs/dependencies now own native []ASTHandle/[]ASTDependency slices. Copies acquire independent element pins and backing rather than persistent-array reroot graphs; native growth has no emulated allocation geometry. Actual formula/proof/core publication order, saved-first and literal-false update behavior, snapshot isolation, depth/precision and explicit reference ownership remain. Concrete ownership helpers retire consumed references even when destruction reports an error, and retain unconsumed guard failures. Added 129-row native/debug growth/copy/update/shrink/close tests with arena reservations disabled and exact formula/proof/dependency pin checks, plus a real foreign-core guard publication-prefix check. Printing/translation and other declared gaps remain open."
       ]
     },
@@ -101798,7 +101818,8 @@
         "TestTacticGoalProofUpdateKeepsDerivedFacts",
         "TestTacticGoalSourceDepthPrecisionCountsAndReferences",
         "TestTacticGoalNativeSlicesGrowCopyUpdateAndRelease",
-        "TestTacticGoalNativeSlicesKeepActualPublicationPrefix"
+        "TestTacticGoalNativeSlicesKeepActualPublicationPrefix",
+        "TestTacticGoalConfigCopyKeepsFlagsDepthPrecisionWithoutAssertions"
       ],
       "conditionals": [
         {
@@ -101831,13 +101852,21 @@
             "TestTacticGoalProofUpdateKeepsDerivedFacts",
             "TestTacticGoalSourceDepthPrecisionCountsAndReferences"
           ]
+        },
+        {
+          "name": "goal(goal const&, bool) configuration-only copy of manager, flags, depth and precision without formula ownership (src/tactic/goal.h:81)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_goal.go",
+          "tests": [
+            "TestTacticGoalConfigCopyKeepsFlagsDepthPrecisionWithoutAssertions"
+          ]
         }
       ],
       "ownership": [
         "Goal expression/dependency arrays retain their actual AST-manager owners. Assertions retain f/pr/dependencies through processing; false replacement protects proof/dependency references before reset. Redundancy membership uses local borrowed Go maps; original formula prefix/suffix ownership keeps encountered atoms alive through compaction. NumExprs shares a native identity map across formulas and the existing postorder project visitor with native frames, preserving shared-only deduplication, quantifier children and associative application weight. No shared mark/trail or native-frame backing reservation is credited at these callers."
       ],
       "deviations": [
-        "Display/printing, cross-manager translation, is_well_sorted, is_equal, the default and copying constructor facades remain unported. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred.",
+        "Display/printing, cross-manager translation, is_well_sorted, is_equal, the default and full copying constructor facades remain unported; the configuration-only constructor is concrete. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred.",
         "Goal forms/proofs/dependencies now own native []ASTHandle/[]ASTDependency slices. Copies acquire independent element pins and backing rather than persistent-array reroot graphs; native growth has no emulated allocation geometry. Actual formula/proof/core publication order, saved-first and literal-false update behavior, snapshot isolation, depth/precision and explicit reference ownership remain. Concrete ownership helpers retire consumed references even when destruction reports an error, and retain unconsumed guard failures. Added 129-row native/debug growth/copy/update/shrink/close tests with arena reservations disabled and exact formula/proof/dependency pin checks, plus a real foreign-core guard publication-prefix check. Printing/translation and other declared gaps remain open."
       ]
     },

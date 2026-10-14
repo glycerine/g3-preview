@@ -7,6 +7,18 @@ import (
 
 func (g *Goal) Manager() *ast.ASTManager { return g.manager }
 func (g *Goal) CheckOwner() error        { return g.open() }
+func (g *Goal) ModelsEnabled() (bool, error) {
+	if e := g.open(); e != nil {
+		return false, e
+	}
+	return g.modelsEnabled, nil
+}
+func (g *Goal) Precision() (GoalPrecision, error) {
+	if e := g.open(); e != nil {
+		return GoalPrecise, e
+	}
+	return g.precision, nil
+}
 func (g *Goal) ProofsEnabled() (bool, error) {
 	if e := g.open(); e != nil {
 		return false, e

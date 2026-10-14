@@ -44,6 +44,23 @@ func goalTestForms(t *testing.T, g *Goal, want ...ast.ASTHandle) {
 	}
 }
 
+func TestTacticGoalConfigCopyKeepsFlagsDepthPrecisionWithoutAssertions(t *testing.T) {
+	m := astTestManager(t)
+	p := goalTestAtom(t, m, "config-copy-p")
+	source := goalTestNew(t, m, false, true)
+	astTestMust(t, source.Assert(p))
+	astTestMust(t, source.SetDepth(7))
+	astTestMust(t, source.SetPrecision(GoalUnder))
+	copy, err := NewGoalConfigCopy(source)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, copy.Close()) })
+	if copy == source || copy.manager != m || !copy.modelsEnabled || copy.proofsEnabled || !copy.coreEnabled || copy.depth != 7 || copy.precision != GoalUnder {
+		t.Fatal("source configuration was not copied")
+	}
+	goalTestForms(t, copy)
+	goalTestForms(t, source, p)
+}
+
 func TestTacticGoalAssertionSplittingAndSourceOrder(t *testing.T) {
 	m := astTestManager(t)
 	p := goalTestAtom(t, m, "p")

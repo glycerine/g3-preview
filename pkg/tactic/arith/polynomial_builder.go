@@ -486,6 +486,73 @@ func (b *PolynomialBuilder) emitBound(saved *goaltactic.Goal, term ast.ASTHandle
 	return saved.Assert(formula)
 }
 
+// Apply executes the retained inequality pass. A newly allocated result is
+// transferred to the caller, including on a stopped path. With no recognized
+// bound, the source returns the original borrowed goal unchanged.
+func (b *PolynomialBuilder) Apply(input *goaltactic.Goal) (*goaltactic.Goal, error) {
+	if err := b.open(); err != nil {
+		return nil, err
+	}
+	if input == nil {
+		return nil, arena.ErrInvalidSlot
+	}
+	if err := input.CheckOwner(); err != nil {
+		return nil, err
+	}
+	if input.Manager() != b.manager {
+		return nil, ast.ErrASTHandle
+	}
+	proofs, err := input.ProofsEnabled()
+	if err != nil {
+		return nil, err
+	}
+	if proofs {
+		return nil, goaltactic.NewTacticException("propagate-ineqs does not support proof production")
+	}
+	cores, err := input.UnsatCoresEnabled()
+	if err != nil {
+		return nil, err
+	}
+	if cores {
+		return nil, goaltactic.NewTacticException("propagate-ineqs does not support unsat core production")
+	}
+	result, err := goaltactic.NewGoalConfigCopy(input)
+	if err != nil {
+		return nil, err
+	}
+	if err = result.IncDepth(); err != nil {
+		return result, err
+	}
+	found, err := b.CollectBounds(input, result)
+	if err != nil {
+		return result, err
+	}
+	if !found {
+		if err = result.Close(); err != nil {
+			return result, err
+		}
+		return input, nil
+	}
+	if err = b.store.Propagate(); err != nil {
+		return result, err
+	}
+	inconsistent, err := b.store.Inconsistent()
+	if err != nil {
+		return result, err
+	}
+	if inconsistent {
+		if err = result.Reset(); err != nil {
+			return result, err
+		}
+		falsehood, e := b.manager.MkFalse()
+		if e != nil {
+			return result, e
+		}
+		return result, result.Assert(falsehood)
+	}
+	return result, b.RestoreBounds(result)
+}
+
 // LowerSubsumed and UpperSubsumed are the concrete rational-buffer callers in
 // propagate_ineqs_tactic.cpp:256-277. They reuse the same owned coefficient
 // buffer as MkLinearPolynomial and borrow its current contents for one bound
