@@ -51673,10 +51673,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/math/subpaving/rational_interval.go"
+        "pkg/math/subpaving/rational_interval.go",
+        "pkg/math/subpaving/rational_interval_arith.go"
       ],
       "tests": [
-        "TestSubpavingRationalMutableIntervalCore"
+        "TestSubpavingRationalMutableIntervalCore",
+        "TestSubpavingRationalIntervalNegAddSubAndAlias"
       ],
       "conditionals": [
         {
@@ -51741,6 +51743,8 @@
         "pkg/math/subpaving/fixed_selector_test.go",
         "pkg/math/subpaving/rational_interval.go",
         "pkg/math/subpaving/rational_interval_test.go",
+        "pkg/math/subpaving/rational_interval_arith.go",
+        "pkg/math/subpaving/rational_interval_arith_test.go",
         "pkg/math/subpaving/fast_interval.go",
         "pkg/math/subpaving/fast_interval_test.go",
         "pkg/math/subpaving/fast_interval_arith.go",
@@ -52054,6 +52058,14 @@
           "go_target": "pkg/math/subpaving/rational_interval.go",
           "tests": [
             "TestSubpavingRationalMutableIntervalCore"
+          ]
+        },
+        {
+          "name": "Concrete config_mpq interval negation, exact addition/subtraction, infinity and openness branches, and destination aliasing (src/math/interval/interval_def.h:704-837)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_interval_arith.go",
+          "tests": [
+            "TestSubpavingRationalIntervalNegAddSubAndAlias"
           ]
         },
         {
@@ -119983,8 +119995,12 @@
           "name": "Subpaving context_mpq interval extended-number operations distinct from the default rational interval owner",
           "status": "partial",
           "go_target": "pkg/math/subpaving/rational_interval.go",
+          "go_targets": [
+            "pkg/math/subpaving/rational_interval_arith.go"
+          ],
           "tests": [
-            "TestSubpavingRationalMutableIntervalCore"
+            "TestSubpavingRationalMutableIntervalCore",
+            "TestSubpavingRationalIntervalNegAddSubAndAlias"
           ]
         },
         {
