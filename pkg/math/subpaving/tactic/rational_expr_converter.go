@@ -14,18 +14,22 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
-// RationalExprConverter owns the AST references created for arithmetic
-// variables. Its AST manager, MPQ engine and numeral manager are borrowed.
+// RationalExprConverter owns variable and cached-expression AST references,
+// and cached integer coefficients. Its AST manager, engine and numeral manager
+// are borrowed.
 type RationalExprConverter struct {
-	self        *RationalExprConverter
-	ast         *ast.ASTManager
-	engine      *RationalEngine
-	qm          *numeral.RationalManager
-	cooperation *cooperate.Cooperation
-	family      ast.FamilyID
-	vars        map[ast.ASTHandle]uint32
-	order       []ast.ASTHandle
-	closed      bool
+	self                                 *RationalExprConverter
+	ast                                  *ast.ASTManager
+	engine                               *RationalEngine
+	qm                                   *numeral.RationalManager
+	cooperation                          *cooperate.Cooperation
+	family                               ast.FamilyID
+	vars                                 map[ast.ASTHandle]uint32
+	order                                []ast.ASTHandle
+	cache                                map[ast.ASTHandle]cachedTerm
+	cachedOrder                          []ast.ASTHandle
+	cachedNumerators, cachedDenominators *numeral.ScopedIntVector
+	closed                               bool
 }
 
 func NewRationalExprConverter(m *ast.ASTManager, engine *RationalEngine, qm *numeral.RationalManager) (*RationalExprConverter, error) {
@@ -42,7 +46,16 @@ func NewRationalExprConverter(m *ast.ASTManager, engine *RationalEngine, qm *num
 	if err != nil {
 		return nil, err
 	}
-	c := &RationalExprConverter{ast: m, engine: engine, qm: qm, family: family, vars: make(map[ast.ASTHandle]uint32)}
+	ns, err := numeral.NewScopedIntVector(qm.Z)
+	if err != nil {
+		return nil, err
+	}
+	ds, err := numeral.NewScopedIntVector(qm.Z)
+	if err != nil {
+		_ = ns.Close()
+		return nil, err
+	}
+	c := &RationalExprConverter{ast: m, engine: engine, qm: qm, family: family, vars: make(map[ast.ASTHandle]uint32), cache: make(map[ast.ASTHandle]cachedTerm), cachedNumerators: ns, cachedDenominators: ds}
 	c.self = c
 	return c, nil
 }
@@ -73,7 +86,7 @@ func (c *RationalExprConverter) BindCooperation(owner *cooperate.Cooperation) er
 }
 
 // InternalizeTerm returns the source null_var for a numeral and an owned
-// context variable for a leaf. Compound arithmetic remains separate work.
+// context variable for a leaf or a concrete sum/product definition.
 func (c *RationalExprConverter) InternalizeTerm(t ast.ASTHandle, numerator, denominator *numeral.Int) (variable uint32, err error) {
 	if err = c.check(); err != nil {
 		return 0, err
@@ -115,6 +128,9 @@ func (c *RationalExprConverter) InternalizeTerm(t ast.ASTHandle, numerator, deno
 	if family != c.family || sortKind != 0 && sortKind != 1 {
 		return 0, ast.ErrASTDomain
 	}
+	if cached, ok, err := c.cachedTerm(t, numerator, denominator); err != nil || ok {
+		return cached, err
+	}
 	if kind == ast.ASTApp {
 		value, _, matched, err := c.ast.ArithmeticNumeralText(t)
 		if err != nil {
@@ -144,6 +160,12 @@ func (c *RationalExprConverter) InternalizeTerm(t ast.ASTHandle, numerator, deno
 				return 0, err
 			}
 			switch operator {
+			case 6: // OP_ADD
+				return c.processAdd(t, numerator, denominator)
+			case 9: // OP_MUL
+				return c.processMul(t, numerator, denominator)
+			case 18: // OP_POWER
+				return c.processPower(t, numerator, denominator, sortKind == 1)
 			case 14: // OP_TO_REAL
 				arg, err := c.ast.GetArg(t, 0)
 				if err != nil {
@@ -161,6 +183,10 @@ func (c *RationalExprConverter) InternalizeTerm(t ast.ASTHandle, numerator, deno
 			}
 		}
 	}
+	return c.mkVarFor(t, sortKind == 1, numerator, denominator)
+}
+
+func (c *RationalExprConverter) mkVarFor(t ast.ASTHandle, integer bool, numerator, denominator *numeral.Int) (uint32, error) {
 	if variable, ok := c.vars[t]; ok {
 		if err := c.qm.Z.SetInt32(numerator, 1); err != nil {
 			return 0, err
@@ -175,7 +201,7 @@ func (c *RationalExprConverter) InternalizeTerm(t ast.ASTHandle, numerator, deno
 		_, _ = c.ast.DecRefConsumed(t)
 		return 0, err
 	}
-	variable, err = context.NewVariable(sortKind == 1)
+	variable, err := context.NewVariable(integer)
 	if err != nil {
 		_, _ = c.ast.DecRefConsumed(t)
 		return 0, err
@@ -186,6 +212,55 @@ func (c *RationalExprConverter) InternalizeTerm(t ast.ASTHandle, numerator, deno
 		return 0, err
 	}
 	return variable, c.qm.Z.SetInt32(denominator, 1)
+}
+
+func (c *RationalExprConverter) cachedTerm(t ast.ASTHandle, n, d *numeral.Int) (uint32, bool, error) {
+	rc, err := c.ast.GetRefCount(t)
+	if err != nil || rc <= 1 {
+		return 0, false, err
+	}
+	entry, ok := c.cache[t]
+	if !ok {
+		return 0, false, nil
+	}
+	if err := c.cachedNumerators.Read(entry.index, n); err != nil {
+		return 0, true, err
+	}
+	if err := c.cachedDenominators.Read(entry.index, d); err != nil {
+		return 0, true, err
+	}
+	return entry.variable, true, nil
+}
+
+func (c *RationalExprConverter) cacheResult(t ast.ASTHandle, variable uint32, n, d *numeral.Int) (err error) {
+	rc, err := c.ast.GetRefCount(t)
+	if err != nil || rc <= 1 {
+		return err
+	}
+	if _, exists := c.cache[t]; exists {
+		return ast.ErrASTDomain
+	}
+	index := c.cachedNumerators.Size()
+	if err := c.ast.IncRef(t); err != nil {
+		return err
+	}
+	defer func() {
+		if err == nil {
+			return
+		}
+		err = errors.Join(err, c.cachedDenominators.Shrink(index), c.cachedNumerators.Shrink(index))
+		_, e := c.ast.DecRefConsumed(t)
+		err = errors.Join(err, e)
+	}()
+	if err = c.cachedNumerators.Push(n); err != nil {
+		return err
+	}
+	if err = c.cachedDenominators.Push(d); err != nil {
+		return err
+	}
+	c.cache[t] = cachedTerm{index: index, variable: variable}
+	c.cachedOrder = append(c.cachedOrder, t)
+	return nil
 }
 
 // InternalizeInequality follows mk_ineq's source order: strip negations,
@@ -361,6 +436,24 @@ func (c *RationalExprConverter) Close() error {
 	}
 	if c.closed {
 		return nil
+	}
+	for _, h := range c.cachedOrder {
+		if _, ok := c.cache[h]; !ok {
+			continue
+		}
+		consumed, err := c.ast.DecRefConsumed(h)
+		if consumed {
+			delete(c.cache, h)
+		}
+		if err != nil {
+			return err
+		}
+	}
+	if err := c.cachedNumerators.Close(); err != nil {
+		return err
+	}
+	if err := c.cachedDenominators.Close(); err != nil {
+		return err
 	}
 	for _, h := range c.order {
 		if _, ok := c.vars[h]; !ok {

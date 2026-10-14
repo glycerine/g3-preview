@@ -114,6 +114,87 @@ func TestRationalExprConverterExactLeafGoalAndCleanup(t *testing.T) {
 	if got, err := qm.Z.String(&d); err != nil || got != "2" {
 		t.Fatal("denominator", got, err)
 	}
+	if err := q.SetString(&value, "1/2"); err != nil {
+		t.Fatal(err)
+	}
+	half, err := m.ArithmeticNumeral(&value, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sum, err := m.MkFamilyApp(family, 6, nil, []ast.ASTHandle{x, half})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 2; i++ {
+		if err := m.IncRef(sum); err != nil {
+			t.Fatal(err)
+		}
+	}
+	defer func() {
+		for i := 0; i < 2; i++ {
+			if err := m.DecRef(sum); err != nil {
+				t.Error(err)
+			}
+		}
+	}()
+	sumVar, err := converter.InternalizeTerm(sum, &n, &d)
+	if err != nil || sumVar == variable || sumVar == math.MaxUint32 {
+		t.Fatal("exact rational sum definition", sumVar, err)
+	}
+	if got, err := qm.Z.String(&n); err != nil || got != "1" {
+		t.Fatal("sum numerator", got, err)
+	}
+	if got, err := qm.Z.String(&d); err != nil || got != "2" {
+		t.Fatal("sum denominator", got, err)
+	}
+	if again, err := converter.InternalizeTerm(sum, &n, &d); err != nil || again != sumVar {
+		t.Fatal("shared rational sum cache", again, err)
+	}
+	product, err := m.MkFamilyApp(family, 9, nil, []ast.ASTHandle{x, x})
+	if err != nil {
+		t.Fatal(err)
+	}
+	productVar, err := converter.InternalizeTerm(product, &n, &d)
+	if err != nil || productVar == math.MaxUint32 || productVar == variable {
+		t.Fatal("rational monomial", productVar, err)
+	}
+	if got, err := qm.Z.String(&n); err != nil || got != "1" {
+		t.Fatal("product numerator", got, err)
+	}
+	scaled, err := m.MkFamilyApp(family, 9, nil, []ast.ASTHandle{threshold, product})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, err := converter.InternalizeTerm(scaled, &n, &d); err != nil || got == math.MaxUint32 || got == variable {
+		t.Fatal("scaled rational monomial", got, err)
+	}
+	if got, err := qm.Z.String(&n); err != nil || got != "3" {
+		t.Fatal("scaled product numerator", got, err)
+	}
+	if got, err := qm.Z.String(&d); err != nil || got != "2" {
+		t.Fatal("scaled product denominator", got, err)
+	}
+	if err := q.SetString(&value, "2"); err != nil {
+		t.Fatal(err)
+	}
+	two, err := m.ArithmeticNumeral(&value, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	power, err := m.MkFamilyApp(family, 18, nil, []ast.ASTHandle{x, two})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, err := converter.InternalizeTerm(power, &n, &d); err != nil || got == math.MaxUint32 || got == variable {
+		t.Fatal("rational power definition", got, err)
+	}
+	sumLE, err := m.MkFamilyApp(family, 2, nil, []ast.ASTHandle{sum, two})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := goal.Assert(sumLE); err != nil {
+		t.Fatal(err)
+	}
 	le, err := m.MkFamilyApp(family, 2, nil, []ast.ASTHandle{x, threshold})
 	if err != nil {
 		t.Fatal(err)
@@ -157,12 +238,36 @@ func TestRationalExprConverterExactLeafGoalAndCleanup(t *testing.T) {
 	if err := view.Close(); err != nil {
 		t.Fatal(err)
 	}
+	view, err = subpaving.NewRationalInterval(qm)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := view.SetConstant(root, sumVar); err != nil {
+		t.Fatal(err)
+	}
+	out.Reset()
+	// The source definition propagator omits the stored constant, so the
+	// tighter x <= 3/2 bound derives a propagated sum upper endpoint of 3.
+	if err := view.Display(&out); err != nil || out.String() != "(-oo, 3]" {
+		t.Fatal("compound goal bound", out.String(), err)
+	}
+	if err := view.Close(); err != nil {
+		t.Fatal(err)
+	}
 	st := statistics.New()
-	if err := engine.CollectStatistics(st); err != nil || st.Size() < 2 || st.Key(0) != "new bounds" || st.UintValue(0) != 1 || st.Key(1) != "nodes" || st.UintValue(1) != 1 {
+	if err := engine.CollectStatistics(st); err != nil || st.Size() < 2 || st.Key(0) != "new bounds" || st.UintValue(0) < 2 || st.Key(1) != "nodes" || st.UintValue(1) != 1 {
 		t.Fatal("source goal statistics", err)
+	}
+	refsBefore, err := m.GetRefCount(sum)
+	if err != nil {
+		t.Fatal(err)
 	}
 	if err := converter.Close(); err != nil {
 		t.Fatal(err)
+	}
+	refsAfter, err := m.GetRefCount(sum)
+	if err != nil || refsBefore != refsAfter+1 {
+		t.Fatal("cached AST reference cleanup", refsBefore, refsAfter, err)
 	}
 	if _, err := converter.InternalizeTerm(x, &n, &d); !errors.Is(err, arena.ErrClosed) {
 		t.Fatal("closed converter", err)
