@@ -150454,8 +150454,8 @@
           "tests": ["TestArbitraryFloatSqrtTraceSourceBranches"]
         },
         {
-          "name": "mpf_manager::round_sqrt mpf_dbg guard-bit decision TRACE record at mpf.cpp:2123; entry/result formatting remain partial",
-          "status": "partial",
+          "name": "mpf_manager::round_sqrt mpf_dbg entry, guard-bit decision and result TRACE records at mpf.cpp:2101,2123,2130",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpf_round_sqrt.go",
           "tests": ["TestArbitraryFloatRoundSqrtDecisionTrace"]
         },
@@ -151225,7 +151225,7 @@
       "deviations": [
         "Retained mpf_manager::round_to_integral now emits X and final INTEGRAL, the subunit shortcut tie, unpacked raw A, shift/half-shift powers, quotient and remainder, and nearest-mode tie and increment decisions at their original source sites. Focused trace-enabled and erased checks cover zero and tie shortcuts plus below, exact and above half in the general branch; source-order and block-count checks pass on CPUs 8-16. Whole MPF ownership remains partial.",
         "Retained mpf_manager::sqrt emits entry X after its format assertion, unpacked A on the finite positive path, dec'ed after an inexact root's optional correction, and SQRT after shortcut or general completion. The result formatter runs after successful sqrt-scope source cleanup; formatting failures propagate. Focused trace-enabled and erased tests cover zero shortcut, exact 4 and inexact 2 with nested Round source order. Broader MPF ownership remains partial.",
-        "Retained mpf_manager::round_sqrt now emits its computed last/round/sticky and selected increment at source line 2123 without nested formatting while value execution is active. Focused trace-enabled and erased tests cover nearest-even exact halfway, inexact and directed positive decisions. Its entry/result float text records remain partial.",
+        "Retained mpf_manager::round_sqrt emits the owned float text at entry and after successful numeric source cleanup, around its computed last/round/sticky and selected increment at source line 2123. The body trace has no nested formatting while value execution is active. Focused trace-enabled and erased tests cover nearest-even exact halfway, inexact and directed positive decisions, including all three source TRACE blocks in order. Whole-unit MPF ownership remains partial.",
         "Retained mpf_manager::round emits NORMAL or DENORMAL significand text before hidden-bit removal or bottom-exponent publication, respectively. Overflow reaches neither record. Focused trace-enabled and erased tests cover each branch and preserve nested setter order. Remaining float/binary trace value formatting and whole-unit ownership stay partial.",
         "Retained mpf_manager::round now emits its bound/beta/leading-zero/sigma/cap block after shift capping, then the selected left/right shift distance and allocation-free decision records after guard-bit extraction, mode selection and post-normalization overflow comparison. Focused traces cover left/right normalization, halfway-even/away and overflow, including nested setter order. Earlier and later Round float/binary value-formatting records remain open because Round keeps valueExecuting active and their owned temporary lifetime needs separate review; no whole Round TRACE completion is claimed.",
         "Retained mpf_manager::set(mpz,mpq) emits its input rational/exponent before output publication. Its nonzero branch emits normalized rational/exponent before the assertion, pre-round significand with the output's old exponent before exponent assignment, then final text after Round or infinity publication; zero emits only entry and result. Direct and nested rational/literal trace tests verify source order and the old-exponent field. Other MPF trace and whole-unit ownership work remains partial.",

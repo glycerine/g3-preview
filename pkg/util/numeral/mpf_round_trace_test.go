@@ -143,8 +143,10 @@ func TestArbitraryFloatRoundSqrtDecisionTrace(t *testing.T) {
 				t.Fatalf("erased sqrt round trace: %q", got)
 			}
 		} else {
+			entry := "-------- [mpf_dbg] round_sqrt src/util/mpf.cpp:2101 ---------\nRND-SQRT: "
 			header := "-------- [mpf_dbg] round_sqrt src/util/mpf.cpp:2123 ---------\n" + tc.body + "\n"
-			if !strings.Contains(got, header) || strings.Count(got, "------------------------------------------------\n") != 1 {
+			result := "-------- [mpf_dbg] round_sqrt src/util/mpf.cpp:2130 ---------\nROUNDED = "
+			if first, decision, last := strings.Index(got, entry), strings.Index(got, header), strings.Index(got, result); first < 0 || decision <= first || last <= decision || strings.Count(got, "------------------------------------------------\n") != 3 {
 				t.Fatalf("sqrt round source decision: %q", got)
 			}
 		}

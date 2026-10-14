@@ -18,6 +18,9 @@ func (m *ArbitraryFloatManager) RoundSqrtWithReceipt(mode ArbitraryFloatRounding
 	if s.active || s.Invocation == ^uint64(0) {
 		return ErrNumericPending
 	}
+	if e := m.traceFloatDebugValueChecked("round_sqrt", "RND-SQRT: ", x, 2101); e != nil {
+		return e
+	}
 	invocation := s.Invocation + 1
 	*s = ArbitraryFloatRoundScope{Manager: m, Invocation: invocation, active: true, executing: true, receipt: r}
 	m.valueExecuting = true
@@ -26,6 +29,10 @@ func (m *ArbitraryFloatManager) RoundSqrtWithReceipt(mode ArbitraryFloatRounding
 		s.executing = false
 		s.bodyCause = err
 		err = errors.Join(err, m.finishRoundSqrtSource())
+		if err == nil {
+			err = m.traceFloatDebugValueChecked("round_sqrt", "ROUNDED = ", x, 2130)
+			s.bodyCause = err
+		}
 		s.recordRoundHistory()
 	}()
 	z := m.integer
