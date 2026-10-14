@@ -1484,7 +1484,10 @@ func (s *RationalService) InfLessEqual(a, b *OwnedInfRational) (bool, error) {
 		return false, e
 	}
 	ok, e := s.infLess(b, a)
-	return !ok, e
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
 }
 func (s *RationalService) InfGreaterEqual(a, b *OwnedInfRational) (bool, error) {
 	if e := s.lock(); e != nil {
@@ -1498,7 +1501,10 @@ func (s *RationalService) InfGreaterEqual(a, b *OwnedInfRational) (bool, error) 
 		return false, e
 	}
 	ok, e := s.infLess(a, b)
-	return !ok, e
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
 }
 
 func (s *RationalService) InfSetInt32(v *OwnedInfRational, n int32) (_lexErr error) {
@@ -1573,11 +1579,17 @@ func (s *RationalService) InfUnaryMinus(v *OwnedInfRational) (_lexOut OwnedInfRa
 }
 func (s *RationalService) InfNotEqual(a, b *OwnedInfRational) (bool, error) {
 	ok, e := s.InfEqual(a, b)
-	return !ok, e
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
 }
 func (s *RationalService) InfNotEqualRational(a *OwnedInfRational, b *OwnedRational) (bool, error) {
 	ok, e := s.InfEqualRational(a, b)
-	return !ok, e
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
 }
 func (s *RationalService) infLessRational(a *OwnedInfRational, b *OwnedRational, reverse bool) (bool, error) {
 	if e := s.infScalarOwner(a); e != nil {
@@ -1644,7 +1656,10 @@ func (s *RationalService) InfLessEqualRational(a *OwnedInfRational, b *OwnedRati
 		return false, e
 	}
 	ok, e := s.infLessRational(a, b, true)
-	return !ok, e
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
 }
 func (s *RationalService) InfGreaterEqualRational(a *OwnedInfRational, b *OwnedRational) (bool, error) {
 	if e := s.lock(); e != nil {
@@ -1658,7 +1673,10 @@ func (s *RationalService) InfGreaterEqualRational(a *OwnedInfRational, b *OwnedR
 		return false, e
 	}
 	ok, e := s.infLessRational(a, b, false)
-	return !ok, e
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
 }
 func (s *RationalService) InfRationalLess(a *OwnedRational, b *OwnedInfRational) (bool, error) {
 	return s.InfGreaterRational(b, a)

@@ -950,7 +950,10 @@ func (s *RationalService) InfEpsInfNotEqual(a, b *OwnedInfEpsInfRational) (bool,
 		return false, e
 	}
 	ok, e := s.infEpsInfEqual(a, b)
-	return !ok, e
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
 }
 func (s *RationalService) InfEpsInfLess(a, b *OwnedInfEpsInfRational) (bool, error) {
 	if e := s.lock(); e != nil {
@@ -992,7 +995,10 @@ func (s *RationalService) InfEpsInfLessEqual(a, b *OwnedInfEpsInfRational) (bool
 		return false, e
 	}
 	ok, e := s.infEpsInfLess(b, a)
-	return !ok, e
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
 }
 func (s *RationalService) InfEpsInfGreaterEqual(a, b *OwnedInfEpsInfRational) (bool, error) {
 	if e := s.lock(); e != nil {
@@ -1006,7 +1012,10 @@ func (s *RationalService) InfEpsInfGreaterEqual(a, b *OwnedInfEpsInfRational) (b
 		return false, e
 	}
 	ok, e := s.infEpsInfLess(a, b)
-	return !ok, e
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
 }
 func (s *RationalService) InfEpsInfEqualRational(a *OwnedInfEpsInfRational, b *OwnedRational) (bool, error) {
 	if e := s.lock(); e != nil {
@@ -1034,7 +1043,10 @@ func (s *RationalService) InfEpsInfNotEqualRational(a *OwnedInfEpsInfRational, b
 		return false, e
 	}
 	ok, e := s.infEpsInfEqualRational(a, b, false)
-	return !ok, e
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
 }
 func (s *RationalService) InfEpsInfLessRational(a *OwnedInfEpsInfRational, b *OwnedRational) (bool, error) {
 	if e := s.lock(); e != nil {
@@ -1076,7 +1088,10 @@ func (s *RationalService) InfEpsInfLessEqualRational(a *OwnedInfEpsInfRational, 
 		return false, e
 	}
 	ok, e := s.infEpsInfLessRational(a, b, true)
-	return !ok, e
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
 }
 func (s *RationalService) InfEpsInfGreaterEqualRational(a *OwnedInfEpsInfRational, b *OwnedRational) (bool, error) {
 	if e := s.lock(); e != nil {
@@ -1090,7 +1105,10 @@ func (s *RationalService) InfEpsInfGreaterEqualRational(a *OwnedInfEpsInfRationa
 		return false, e
 	}
 	ok, e := s.infEpsInfLessRational(a, b, false)
-	return !ok, e
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
 }
 func (s *RationalService) InfEpsInfRationalEqual(b *OwnedRational, a *OwnedInfEpsInfRational) (bool, error) {
 	if e := s.lock(); e != nil {
@@ -1118,7 +1136,10 @@ func (s *RationalService) InfEpsInfRationalNotEqual(b *OwnedRational, a *OwnedIn
 		return false, e
 	}
 	ok, e := s.infEpsInfEqualRational(a, b, true)
-	return !ok, e
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
 }
 func (s *RationalService) InfEpsInfRationalLess(b *OwnedRational, a *OwnedInfEpsInfRational) (bool, error) {
 	if e := s.lock(); e != nil {
@@ -1160,7 +1181,10 @@ func (s *RationalService) InfEpsInfRationalLessEqual(b *OwnedRational, a *OwnedI
 		return false, e
 	}
 	ok, e := s.infEpsInfLessRational(a, b, false)
-	return !ok, e
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
 }
 func (s *RationalService) InfEpsInfRationalGreaterEqual(b *OwnedRational, a *OwnedInfEpsInfRational) (bool, error) {
 	if e := s.lock(); e != nil {
@@ -1174,7 +1198,10 @@ func (s *RationalService) InfEpsInfRationalGreaterEqual(b *OwnedRational, a *Own
 		return false, e
 	}
 	ok, e := s.infEpsInfLessRational(a, b, true)
-	return !ok, e
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
 }
 func (s *RationalService) InfEpsInfAddAssign(a, b *OwnedInfEpsInfRational) error {
 	if e := s.lock(); e != nil {
