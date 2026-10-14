@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/messages"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/z3exception"
@@ -19,6 +20,7 @@ type ArbitraryRoot struct {
 	Numbers     *numeral.ArbitraryFloatNumeralManager
 	Limit       *control.Reslimit
 	Cooperation *cooperate.Cooperation
+	TraceTags   *diagnostic.TraceTags
 }
 
 type arbitraryRootScratch struct {
@@ -178,6 +180,9 @@ func (r ArbitraryRoot) Bounds(a *numeral.ArbitraryFloat, n uint32, precision, lo
 			return err
 		}
 		if err = r.positiveBounds(absolute, n, precision, lo, hi, &s); err != nil {
+			return err
+		}
+		if err = r.traceNthRoot(absolute, n, lo, hi); err != nil {
 			return err
 		}
 		if negative {

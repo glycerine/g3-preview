@@ -35451,7 +35451,8 @@
         "pkg/math/subpaving/hardware_interval_mul.go",
         "pkg/math/subpaving/hardware_interval_div.go",
         "pkg/math/interval/hardware_root.go",
-        "pkg/math/subpaving/hardware_interval_root.go"
+        "pkg/math/subpaving/hardware_interval_root.go",
+        "pkg/math/interval/arbitrary_root_trace.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -35488,7 +35489,8 @@
         "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
         "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds",
         "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
-        "TestSubpavingHardwareIntervalXnEqYRetainedCases"
+        "TestSubpavingHardwareIntervalXnEqYRetainedCases",
+        "TestArbitraryRootRetainedShortTraceAfterCertifiedBounds"
       ],
       "conditionals": [
         {
@@ -36215,6 +36217,13 @@
           "tests": [
             "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
           ]
+        },
+        {
+          "name": "Reached config_mpf nth_root_trace STRACE after positive Newton bounds, before negative-sign reversal (interval_def.h:208-210)",
+          "status": "ported",
+          "go_target": "pkg/math/interval/arbitrary_root_trace.go",
+          "go_targets": ["pkg/math/interval/arbitrary_root_trace_test.go"],
+          "tests": ["TestArbitraryRootRetainedShortTraceAfterCertifiedBounds"]
         },
         {
           "name": "Concrete config_hwf Newton nth-root scalar enclosure (src/math/interval/interval_def.h:175-380)",
@@ -175864,7 +175873,8 @@
         "pkg/ast/pattern/multi_pattern.go",
         "pkg/ast/util_psort_ast_sorting.go",
         "pkg/ast/ast_core_register_trace.go",
-        "pkg/ast/ast_core_delete_trace.go"
+        "pkg/ast/ast_core_delete_trace.go",
+        "pkg/math/interval/arbitrary_root_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -175894,7 +175904,8 @@
         "TestPsortASTScalarEntryTracesPrecedeSourceGuards",
         "TestPsortASTInterleaveEntryTraceBeforeOutput",
         "TestASTRegistrationSourceTraceRecords",
-        "TestASTDeletionSourceTraceRecords"
+        "TestASTDeletionSourceTraceRecords",
+        "TestArbitraryRootRetainedShortTraceAfterCertifiedBounds"
       ],
       "conditionals": [
         {
@@ -176372,6 +176383,13 @@
           "tests": ["TestASTDeletionSourceTraceRecords"]
         },
         {
+          "name": "Reached config_mpf nth_root_trace STRACE after positive Newton bounds, before negative-sign reversal (interval_def.h:208-210)",
+          "status": "ported",
+          "go_target": "pkg/math/interval/arbitrary_root_trace.go",
+          "go_targets": ["pkg/math/interval/arbitrary_root_trace_test.go"],
+          "tests": ["TestArbitraryRootRetainedShortTraceAfterCertifiedBounds"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -176407,7 +176425,8 @@
         "pkg/ast/pattern/multi_pattern.go",
         "pkg/ast/util_psort_ast_sorting.go",
         "pkg/ast/ast_core_register_trace.go",
-        "pkg/ast/ast_core_delete_trace.go"
+        "pkg/ast/ast_core_delete_trace.go",
+        "pkg/math/interval/arbitrary_root_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -176437,7 +176456,8 @@
         "TestPsortASTScalarEntryTracesPrecedeSourceGuards",
         "TestPsortASTInterleaveEntryTraceBeforeOutput",
         "TestASTRegistrationSourceTraceRecords",
-        "TestASTDeletionSourceTraceRecords"
+        "TestASTDeletionSourceTraceRecords",
+        "TestArbitraryRootRetainedShortTraceAfterCertifiedBounds"
       ],
       "conditionals": [
         {
@@ -176925,6 +176945,13 @@
           "go_target": "pkg/ast/ast_core_delete_trace.go",
           "go_targets": ["pkg/ast/ast_core_register_trace_test.go"],
           "tests": ["TestASTDeletionSourceTraceRecords"]
+        },
+        {
+          "name": "Reached config_mpf nth_root_trace STRACE after positive Newton bounds, before negative-sign reversal (interval_def.h:208-210)",
+          "status": "ported",
+          "go_target": "pkg/math/interval/arbitrary_root_trace.go",
+          "go_targets": ["pkg/math/interval/arbitrary_root_trace_test.go"],
+          "tests": ["TestArbitraryRootRetainedShortTraceAfterCertifiedBounds"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
