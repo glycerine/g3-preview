@@ -55,7 +55,8 @@ func (s *realValueStore) signValue(value *realValue) (int32, error) {
 // signAtBinaryBound follows the source's zero shortcut and exact Horner
 // evaluation for rational coefficients. Constant and zero-bound algebraic
 // coefficients use their retained interval sign. Nonzero-bound algebraic
-// Horner evaluation and interval refinement remain open.
+// coefficients use interval Horner evaluation and coefficient refinement;
+// general exact value arithmetic for an ambiguous result remains open.
 func (s *realValueStore) signAtBinaryBound(coefficients []*realValue, bounds *numeral.BinaryRationalManager, bound *numeral.BinaryRational) (sign int32, err error) {
 	if s == nil || s.numbers == nil || bounds == nil || bound == nil {
 		return 0, arena.ErrInvalidSlot
