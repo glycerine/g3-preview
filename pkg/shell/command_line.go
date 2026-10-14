@@ -62,6 +62,9 @@ func NewCommandLine(warnings *diagnostic.WarningService, timer *TimeoutService, 
 	if warnings == nil {
 		warnings = diagnostic.BorrowProcessWarningService()
 	}
+	if timer == nil {
+		timer = BorrowProcessTimeoutService()
+	}
 	return &CommandLine{Input: NewInputFileOption(warnings), Timer: timer, Warnings: warnings, Globals: globals, Trace: diagnostic.BorrowProcessTraceTags()}
 }
 

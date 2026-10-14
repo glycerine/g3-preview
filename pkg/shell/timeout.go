@@ -32,6 +32,12 @@ type timeoutEventHandler struct {
 	serial uint64
 }
 
+// Source timeout.cpp publishes one process timer and one borrowed callback.
+// Explicit test owners remain available through NewTimeoutService.
+var processTimeout = NewTimeoutService(os.Stdout)
+
+func BorrowProcessTimeoutService() *TimeoutService { return processTimeout }
+
 func (h *timeoutEventHandler) HandleEvent(caller control.EventCaller) {
 	h.owner.fire(h.serial, caller)
 }

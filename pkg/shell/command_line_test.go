@@ -40,6 +40,33 @@ func TestShellCommandLineFilenameWarningAndOptionOrder(t *testing.T) {
 	}
 }
 
+func TestShellCommandLineBorrowsProcessTimeout(t *testing.T) {
+	first := NewCommandLine(diagnostic.NewWarningService(&bytes.Buffer{}), nil, nil)
+	second := NewCommandLine(diagnostic.NewWarningService(&bytes.Buffer{}), nil, nil)
+	process := BorrowProcessTimeoutService()
+	if process == nil || first.Timer != process || second.Timer != process {
+		t.Fatal("source command lines did not share the process timeout owner")
+	}
+	if err := first.Parse([]string{"-T:0"}); err != nil {
+		t.Fatal("source -T without an injected timer", err)
+	}
+	process.mu.Lock()
+	firstTimer := process.timer
+	process.mu.Unlock()
+	if firstTimer == nil || firstTimer.Closed() {
+		t.Fatal("disabled process timeout did not retain its scoped timer")
+	}
+	if err := second.Parse([]string{"-T:-1"}); err != nil {
+		t.Fatal("second command line could not replace the shared timer", err)
+	}
+	process.mu.Lock()
+	secondTimer := process.timer
+	process.mu.Unlock()
+	if !firstTimer.Closed() || secondTimer == nil || secondTimer == firstTimer || secondTimer.Closed() {
+		t.Fatal("source replacement did not retire the first process timer")
+	}
+}
+
 func TestShellCommandLineTerminalActionsAndKinds(t *testing.T) {
 	c := NewCommandLine(diagnostic.NewWarningService(&bytes.Buffer{}), nil, nil)
 	if err := c.Parse([]string{"-dl", "-dimacs", "-wcnf", "-bpo", "-log", "-in", "-st", "-ist", "-pm:arith", "ignored"}); err != nil {
