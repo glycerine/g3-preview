@@ -493,16 +493,18 @@ func (s *ScopedRational) Cleanup() error {
 // SwapRaw methods expose the source numeral_buffer boundaries to its concrete
 // Euclidean caller, which must not keep a borrow across growth or swap.
 type ScopedIntVector struct {
-	manager *IntegerManager
-	data    []Int
-	self    *ScopedIntVector
-	closed  bool
+	manager     *IntegerManager
+	data        []Int
+	self        *ScopedIntVector
+	sourceCause error
+	closed      bool
 }
 type ScopedRationalVector struct {
-	manager *RationalManager
-	data    []Rational
-	self    *ScopedRationalVector
-	closed  bool
+	manager     *RationalManager
+	data        []Rational
+	self        *ScopedRationalVector
+	sourceCause error
+	closed      bool
 }
 
 func NewScopedIntVector(m *IntegerManager) (*ScopedIntVector, error) {
@@ -534,6 +536,9 @@ func (v *ScopedIntVector) open() error {
 	if v.closed || v.manager.closed {
 		return arena.ErrClosed
 	}
+	if v.sourceCause != nil {
+		return v.sourceCause
+	}
 	return nil
 }
 func (v *ScopedRationalVector) open() error {
@@ -542,6 +547,9 @@ func (v *ScopedRationalVector) open() error {
 	}
 	if v.closed || v.manager.closed {
 		return arena.ErrClosed
+	}
+	if v.sourceCause != nil {
+		return v.sourceCause
 	}
 	return nil
 }
@@ -720,7 +728,8 @@ func (v *ScopedIntVector) Shrink(n uint32) error {
 		return arena.ErrBounds
 	}
 	for i := int(n); i < len(v.data); i++ {
-		if e := v.manager.Del(&v.data[i]); e != nil {
+		if e := SourceIntegerDel(v.manager, &v.data[i]); e != nil {
+			v.sourceCause = e
 			return e
 		}
 	}
@@ -735,7 +744,12 @@ func (v *ScopedRationalVector) Shrink(n uint32) error {
 		return arena.ErrBounds
 	}
 	for i := int(n); i < len(v.data); i++ {
-		if e := v.manager.Del(&v.data[i]); e != nil {
+		if e := v.manager.checkCleanup(&v.data[i]); e != nil {
+			v.sourceCause = e
+			return e
+		}
+		if e := SourceRationalDel(v.manager, &v.data[i]); e != nil {
+			v.sourceCause = e
 			return e
 		}
 	}
@@ -831,6 +845,9 @@ func (v *ScopedIntVector) Close() error {
 	if v.closed {
 		return nil
 	}
+	if v.sourceCause != nil {
+		return v.sourceCause
+	}
 	var e error
 	if v.manager.closed {
 		e = arena.ErrClosed
@@ -851,6 +868,9 @@ func (v *ScopedRationalVector) Close() error {
 	if v.closed {
 		return nil
 	}
+	if v.sourceCause != nil {
+		return v.sourceCause
+	}
 	var e error
 	if v.manager.closed {
 		e = arena.ErrClosed
@@ -863,4 +883,46 @@ func (v *ScopedRationalVector) Close() error {
 	v.data = nil
 	v.closed = true
 	return e
+}
+
+// Cleanup drains a stopped integer vector without replaying its source loop.
+func (v *ScopedIntVector) Cleanup() error {
+	if v == nil || v.self != v {
+		return ErrScopedCopy
+	}
+	if v.closed {
+		return nil
+	}
+	for i := range v.data {
+		if e := v.manager.CleanupRawNumeral(&v.data[i]); e != nil {
+			return e
+		}
+	}
+	v.data = nil
+	v.closed = true
+	return nil
+}
+
+// Cleanup owns the remaining numerator/denominator suffix of each element.
+func (v *ScopedRationalVector) Cleanup() error {
+	if v == nil || v.self != v {
+		return ErrScopedCopy
+	}
+	if v.closed {
+		return nil
+	}
+	for i := range v.data {
+		if e := v.manager.checkCleanup(&v.data[i]); e != nil {
+			return e
+		}
+		if e := v.manager.Z.CleanupRawNumeral(&v.data[i].Num); e != nil {
+			return e
+		}
+		if e := v.manager.Z.CleanupRawNumeral(&v.data[i].Den); e != nil {
+			return e
+		}
+	}
+	v.data = nil
+	v.closed = true
+	return nil
 }

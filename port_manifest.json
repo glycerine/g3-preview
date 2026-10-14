@@ -171704,6 +171704,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/numeral/scoped_numeral.go",
+        "pkg/util/numeral/scoped_numeral_vector_source_cleanup_test.go",
         "pkg/util/numeral/scoped_binary.go",
         "pkg/ast/ast_fpa_scoped_values.go",
         "pkg/ast/ast_fpa_scoped_values_source_test.go",
@@ -171732,6 +171733,8 @@
         "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
         "TestScopedRationalVectorIndependentLifecycleAndFailures",
         "TestScopedNumeralDeepCloneFailureCleanup",
+        "TestScopedIntVectorStoppedSourceKeepsAscendingSuffix",
+        "TestScopedRationalVectorStoppedSourceKeepsComponentSuffix",
         "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
         "TestASTFloatingPointScopedValueActualReserveSetPublication",
         "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren",
@@ -171827,7 +171830,9 @@
             "TestScopedRationalVectorAndScalarLifetimes",
             "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
             "TestScopedRationalVectorIndependentLifecycleAndFailures",
-            "TestScopedNumeralDeepCloneFailureCleanup"
+            "TestScopedNumeralDeepCloneFailureCleanup",
+            "TestScopedIntVectorStoppedSourceKeepsAscendingSuffix",
+            "TestScopedRationalVectorStoppedSourceKeepsComponentSuffix"
           ]
         },
         {
@@ -171845,7 +171850,9 @@
             "TestScopedRationalVectorAndScalarLifetimes",
             "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
             "TestScopedRationalVectorIndependentLifecycleAndFailures",
-            "TestScopedNumeralDeepCloneFailureCleanup"
+            "TestScopedNumeralDeepCloneFailureCleanup",
+            "TestScopedIntVectorStoppedSourceKeepsAscendingSuffix",
+            "TestScopedRationalVectorStoppedSourceKeepsComponentSuffix"
           ]
         },
         {
@@ -171925,6 +171932,7 @@
       ],
       "ownership": [
         "Concrete scoped Int/Rational objects borrow managers; all cold headers and actual old+new pointer-free backing are charged. Deep copy owns independent limbs, source ascending truncation releases them, vector failure prefixes retained. See PORT_PROGRESS.md#audit-scoped-numeral-port-status-md.",
+        "Concrete scoped Int/Rational vector shrink, reset and destructor now run literal ascending source deletions. A stopped physical deletion keeps the exact original length and surviving component suffix, blocks source replay and mutations, and exposes a separate owning cleanup pass that drains the vector after repair.",
         "MPBQ specialization owns deep numerator values and real cold headers/backing; self identity/manager checks, borrowed owner lifetime, grow transfer and old/new peak audited. See PORT_PROGRESS.md#audit-mpbq-port-status-md.",
         "MPFF specialization borrows its manager, owns deep significand blocks and charges actual headers/full old-new element backing. Failure retains default failed-push element; ascending cleanup preserves source actions. See PORT_PROGRESS.md#audit-mpff-port-status-md.",
         "Scalar external polynomial owners and actual Int arrays preserve source numeral callbacks and publication prefixes. See PORT_PROGRESS.md#audit-upolynomial-port-status-md.",
