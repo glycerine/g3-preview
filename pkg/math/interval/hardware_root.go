@@ -4,6 +4,7 @@ package interval
 import (
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/messages"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/z3exception"
@@ -16,6 +17,7 @@ type HardwareRoot struct {
 	Numbers     *numeral.HardwareFloatNumeralManager
 	Limit       *control.Reslimit
 	Cooperation *cooperate.Cooperation
+	TraceTags   *diagnostic.TraceTags
 }
 
 func (r HardwareRoot) checkpoint() error {
@@ -55,6 +57,9 @@ func (r HardwareRoot) Bounds(a *numeral.HardwareFloat, n uint32, precision, lowe
 			return err
 		}
 		if err := r.positiveBounds(&absolute, n, precision, &lo, &hi); err != nil {
+			return err
+		}
+		if err := r.traceNthRoot(&absolute, n, &lo, &hi); err != nil {
 			return err
 		}
 		if m.IsNeg(a) {
@@ -180,6 +185,9 @@ func (r HardwareRoot) approx(a *numeral.HardwareFloat, n uint32, precision, x *n
 		if err := m.Abs(&d, &d); err != nil {
 			return err
 		}
+		if err := r.traceNthRootIteration(a, x, &xPrime, &d); err != nil {
+			return err
+		}
 		if err := m.Swap(x, &xPrime); err != nil {
 			return err
 		}
@@ -195,6 +203,9 @@ func (r HardwareRoot) positiveBounds(a *numeral.HardwareFloat, n uint32, precisi
 		return err
 	}
 	if err := r.aDivXPower(a, hi, n-1, true, lo); err != nil {
+		return err
+	}
+	if err := r.traceNthRootBoundCheck(a, hi); err != nil {
 		return err
 	}
 	if m.LessEqual(lo, hi) {

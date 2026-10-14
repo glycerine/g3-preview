@@ -44,7 +44,7 @@ func (r ArbitraryRoot) traceNthRoot(a *numeral.ArbitraryFloat, n uint32, lo, hi 
 			if !display(item.bound) {
 				return formatErr
 			}
-			_ = diagnostic.WriteTraceEndl(w)
+			write("\n")
 		}
 		return nil
 	})

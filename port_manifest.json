@@ -35452,7 +35452,8 @@
         "pkg/math/subpaving/hardware_interval_div.go",
         "pkg/math/interval/hardware_root.go",
         "pkg/math/subpaving/hardware_interval_root.go",
-        "pkg/math/interval/arbitrary_root_trace.go"
+        "pkg/math/interval/arbitrary_root_trace.go",
+        "pkg/math/interval/hardware_root_trace.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -35490,7 +35491,8 @@
         "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds",
         "TestHardwareRootRetainedNewtonCertifiedBoundsAndCancellation",
         "TestSubpavingHardwareIntervalXnEqYRetainedCases",
-        "TestArbitraryRootRetainedShortTraceAfterCertifiedBounds"
+        "TestArbitraryRootRetainedShortTraceAfterCertifiedBounds",
+        "TestHardwareRootRetainedTraceSitesSourceOrder"
       ],
       "conditionals": [
         {
@@ -36217,6 +36219,13 @@
           "tests": [
             "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
           ]
+        },
+        {
+          "name": "Reached config_hwf Newton scalar-root nth_root, nth_root_bug and nth_root_trace sites (interval_def.h:206-210,315-320,344-348)",
+          "status": "ported",
+          "go_target": "pkg/math/interval/hardware_root_trace.go",
+          "go_targets": ["pkg/math/interval/hardware_root_trace_test.go"],
+          "tests": ["TestHardwareRootRetainedTraceSitesSourceOrder"]
         },
         {
           "name": "Reached config_mpf Newton iteration and bound-check TRACE records, including source hi-under-lo display (interval_def.h:315-320,344-348)",
@@ -175881,7 +175890,8 @@
         "pkg/ast/util_psort_ast_sorting.go",
         "pkg/ast/ast_core_register_trace.go",
         "pkg/ast/ast_core_delete_trace.go",
-        "pkg/math/interval/arbitrary_root_trace.go"
+        "pkg/math/interval/arbitrary_root_trace.go",
+        "pkg/math/interval/hardware_root_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -175912,7 +175922,8 @@
         "TestPsortASTInterleaveEntryTraceBeforeOutput",
         "TestASTRegistrationSourceTraceRecords",
         "TestASTDeletionSourceTraceRecords",
-        "TestArbitraryRootRetainedShortTraceAfterCertifiedBounds"
+        "TestArbitraryRootRetainedShortTraceAfterCertifiedBounds",
+        "TestHardwareRootRetainedTraceSitesSourceOrder"
       ],
       "conditionals": [
         {
@@ -176397,6 +176408,13 @@
           "tests": ["TestArbitraryRootRetainedShortTraceAfterCertifiedBounds"]
         },
         {
+          "name": "Reached config_hwf Newton scalar-root nth_root, nth_root_bug and nth_root_trace sites (interval_def.h:206-210,315-320,344-348)",
+          "status": "ported",
+          "go_target": "pkg/math/interval/hardware_root_trace.go",
+          "go_targets": ["pkg/math/interval/hardware_root_trace_test.go"],
+          "tests": ["TestHardwareRootRetainedTraceSitesSourceOrder"]
+        },
+        {
           "name": "Reached config_mpf Newton iteration and bound-check TRACE records, including source hi-under-lo display (interval_def.h:315-320,344-348)",
           "status": "ported",
           "go_target": "pkg/math/interval/arbitrary_root_trace.go",
@@ -176440,7 +176458,8 @@
         "pkg/ast/util_psort_ast_sorting.go",
         "pkg/ast/ast_core_register_trace.go",
         "pkg/ast/ast_core_delete_trace.go",
-        "pkg/math/interval/arbitrary_root_trace.go"
+        "pkg/math/interval/arbitrary_root_trace.go",
+        "pkg/math/interval/hardware_root_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -176471,7 +176490,8 @@
         "TestPsortASTInterleaveEntryTraceBeforeOutput",
         "TestASTRegistrationSourceTraceRecords",
         "TestASTDeletionSourceTraceRecords",
-        "TestArbitraryRootRetainedShortTraceAfterCertifiedBounds"
+        "TestArbitraryRootRetainedShortTraceAfterCertifiedBounds",
+        "TestHardwareRootRetainedTraceSitesSourceOrder"
       ],
       "conditionals": [
         {
@@ -176966,6 +176986,13 @@
           "go_target": "pkg/math/interval/arbitrary_root_trace.go",
           "go_targets": ["pkg/math/interval/arbitrary_root_trace_test.go"],
           "tests": ["TestArbitraryRootRetainedShortTraceAfterCertifiedBounds"]
+        },
+        {
+          "name": "Reached config_hwf Newton scalar-root nth_root, nth_root_bug and nth_root_trace sites (interval_def.h:206-210,315-320,344-348)",
+          "status": "ported",
+          "go_target": "pkg/math/interval/hardware_root_trace.go",
+          "go_targets": ["pkg/math/interval/hardware_root_trace_test.go"],
+          "tests": ["TestHardwareRootRetainedTraceSitesSourceOrder"]
         },
         {
           "name": "Reached config_mpf Newton iteration and bound-check TRACE records, including source hi-under-lo display (interval_def.h:315-320,344-348)",

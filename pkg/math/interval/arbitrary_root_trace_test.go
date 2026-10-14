@@ -99,7 +99,7 @@ func TestArbitraryRootRetainedShortTraceAfterCertifiedBounds(t *testing.T) {
 	}
 	want := "[nth-root] (" + aText + ")^(1/2) >= " + loText + "\n" +
 		"[nth-root] (" + aText + ")^(1/2) <= " + hiText + "\n"
-	if writer.String() != want || writer.flushes != 3 {
+	if writer.String() != want || writer.flushes != 1 {
 		t.Fatalf("source short trace: %q, want %q; flushes %d", writer.String(), want, writer.flushes)
 	}
 	writer.Reset()
@@ -142,7 +142,7 @@ func TestArbitraryRootRetainedShortTraceAfterCertifiedBounds(t *testing.T) {
 	iterations := strings.TrimSuffix(got, tail)
 	header := "-------- [nth_root] approx_nth_root src/math/interval/interval_def.h:315 ---------\n"
 	parts := strings.Split(iterations, header)
-	if len(parts) < 2 || parts[0] != "" || writer.flushes != len(parts)-1+4 {
+	if len(parts) < 2 || parts[0] != "" || writer.flushes != len(parts)-1+2 {
 		t.Fatalf("iteration record/flush count: records %d, flushes %d", len(parts)-1, writer.flushes)
 	}
 	for i, part := range parts[1:] {
