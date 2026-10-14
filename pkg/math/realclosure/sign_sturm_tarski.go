@@ -15,7 +15,7 @@ func (s *realValueStore) sequenceReady() error {
 	if s == nil || s.numbers == nil {
 		return arena.ErrInvalidSlot
 	}
-	if s.pendingSequence != nil || len(s.pendingSturmCoefficients) != 0 || len(s.pendingSturmRationals) != 0 {
+	if s.pendingSequence != nil || len(s.pendingSturmCoefficients) != 0 || len(s.pendingSturmRationals) != 0 || len(s.pendingSturmIntegers) != 0 {
 		return errRealClosureSequencePending
 	}
 	return nil
@@ -70,12 +70,28 @@ func (s *realValueStore) releaseSturmRational(value *numeral.Rational) error {
 	return nil
 }
 
-// cleanupPendingPolynomialSequence finishes younger coefficient and scratch
-// groups before the older retained row sequence.
+func (s *realValueStore) releaseSturmInteger(value *numeral.Int) error {
+	if err := s.numbers.Integers().Del(value); err != nil {
+		s.pendingSturmIntegers = append(s.pendingSturmIntegers, *value)
+		return err
+	}
+	return nil
+}
+
+// cleanupPendingPolynomialSequence finishes raw numeric scratch and younger
+// coefficient groups before the older retained row sequence.
 func (s *realValueStore) cleanupPendingPolynomialSequence() error {
 	if s == nil {
 		return arena.ErrInvalidSlot
 	}
+	for len(s.pendingSturmIntegers) != 0 {
+		if err := s.numbers.Integers().Del(&s.pendingSturmIntegers[0]); err != nil {
+			return err
+		}
+		s.pendingSturmIntegers[0] = numeral.Int{}
+		s.pendingSturmIntegers = s.pendingSturmIntegers[1:]
+	}
+	s.pendingSturmIntegers = nil
 	for len(s.pendingSturmRationals) != 0 {
 		if err := s.numbers.Del(&s.pendingSturmRationals[0]); err != nil {
 			return err

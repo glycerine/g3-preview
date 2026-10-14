@@ -136,9 +136,13 @@ func (s *realValueStore) signedPseudoRemainderRational(left, right []*realValue)
 	return result, nil
 }
 
-func (s *realValueStore) normalizeRationalIntegerContent(values []*realValue) error {
+func (s *realValueStore) normalizeRationalIntegerContent(values []*realValue) (resultErr error) {
 	gcd := numeral.NewInt(0)
-	defer func() { _ = s.numbers.Integers().Del(&gcd) }()
+	defer func() {
+		if err := s.releaseSturmInteger(&gcd); resultErr == nil {
+			resultErr = err
+		}
+	}()
 	for _, value := range values {
 		if value == nil {
 			continue
@@ -152,14 +156,14 @@ func (s *realValueStore) normalizeRationalIntegerContent(values []*realValue) er
 		}
 		numerator := numeral.NewInt(0)
 		if err := s.numbers.Numerator(&value.rational, &numerator); err != nil {
-			_ = s.numbers.Integers().Del(&numerator)
+			_ = s.releaseSturmInteger(&numerator)
 			return err
 		}
 		if err := s.numbers.Integers().GCD(&gcd, &numerator, &gcd); err != nil {
-			_ = s.numbers.Integers().Del(&numerator)
+			_ = s.releaseSturmInteger(&numerator)
 			return err
 		}
-		if err := s.numbers.Integers().Del(&numerator); err != nil {
+		if err := s.releaseSturmInteger(&numerator); err != nil {
 			return err
 		}
 	}
