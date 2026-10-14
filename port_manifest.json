@@ -150766,6 +150766,7 @@
         "TestArbitraryFloatFMASwapAndArithmeticBranchTrace",
         "TestArbitraryFloatFMAEntryDebugTraceBeforeShortcuts",
         "TestArbitraryFloatAddSubDebugTraceSourceBranches",
+        "TestArbitraryFloatAddSubDebugTraceSourceInsertions",
         "TestArbitraryFloatDivDebugTraceSourceOrderAndShortcut",
         "TestArbitraryFloatMulBugTraceSourceBoundaries",
         "TestArbitraryFloatMulTraceFormatterRefusalsStopAtSourceSite",
@@ -151449,7 +151450,7 @@
           "name": "mpf_manager::add_sub mpf_dbg alignment, arithmetic branch and normalization TRACE records at mpf.cpp:541-579",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_add_sub.go",
-          "tests": ["TestArbitraryFloatAddSubDebugTraceSourceBranches", "TestArbitraryFloatArithmeticDebugTraceFormatterRefusals"]
+          "tests": ["TestArbitraryFloatAddSubDebugTraceSourceBranches", "TestArbitraryFloatAddSubDebugTraceSourceInsertions", "TestArbitraryFloatArithmeticDebugTraceFormatterRefusals"]
         },
         {
           "name": "mpf_manager::div mpf_dbg operand, unpacked, significand and quotient TRACE records at mpf.cpp:670-742",

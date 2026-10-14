@@ -229,7 +229,11 @@ func (m *ArbitraryFloatManager) addSubtract(mode ArbitraryFloatRoundingMode, x, 
 	if e != nil {
 		return e
 	}
-	m.traceFloatDebugText("add_sub", "NEG="+traceBoolDigit(negative), 577)
+	negativeDigit := int64(0)
+	if negative {
+		negativeDigit = 1
+	}
+	m.traceFloatDebugSigned("add_sub", "NEG=", negativeDigit, 577)
 	if e := z.Abs(&out.significand); e != nil {
 		return e
 	}

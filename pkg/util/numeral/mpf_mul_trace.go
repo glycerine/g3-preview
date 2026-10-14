@@ -161,7 +161,10 @@ func (m *ArbitraryFloatManager) traceFloatDebugText(function, value string, line
 	}
 	_ = tags.EmitConditional("mpf_dbg", function, "src/util/mpf.cpp", line,
 		func() bool { return true }, func(w io.Writer) error {
-			return writeNumeralDisplayPart(w, value+"\n")
+			if e := writeNumeralDisplayPart(w, value); e != nil {
+				return e
+			}
+			return writeNumeralDisplayPart(w, "\n")
 		})
 }
 
@@ -172,6 +175,12 @@ func (m *ArbitraryFloatManager) traceFloatDebugSigned(function, label string, va
 	}
 	_ = tags.EmitConditional("mpf_dbg", function, "src/util/mpf.cpp", line,
 		func() bool { return true }, func(w io.Writer) error {
-			return writeNumeralDisplayPart(w, label+strconv.FormatInt(value, 10)+"\n")
+			if e := writeNumeralDisplayPart(w, label); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, strconv.FormatInt(value, 10)); e != nil {
+				return e
+			}
+			return writeNumeralDisplayPart(w, "\n")
 		})
 }
