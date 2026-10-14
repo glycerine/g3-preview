@@ -11,11 +11,16 @@ import (
 
 var errRealClosureSequencePending = errors.New("realclosure: polynomial sequence cleanup pending")
 
+type sturmBinaryTemp struct {
+	manager *numeral.BinaryRationalManager
+	value   numeral.BinaryRational
+}
+
 func (s *realValueStore) sequenceReady() error {
 	if s == nil || s.numbers == nil {
 		return arena.ErrInvalidSlot
 	}
-	if s.pendingSequence != nil || len(s.pendingSturmCoefficients) != 0 || len(s.pendingSturmRationals) != 0 || len(s.pendingSturmIntegers) != 0 || len(s.pendingSturmIntervals) != 0 {
+	if s.pendingSequence != nil || len(s.pendingSturmCoefficients) != 0 || len(s.pendingSturmRationals) != 0 || len(s.pendingSturmIntegers) != 0 || len(s.pendingSturmBinaries) != 0 || len(s.pendingSturmIntervals) != 0 {
 		return errRealClosureSequencePending
 	}
 	return nil
@@ -89,12 +94,29 @@ func (s *realValueStore) releaseSturmInterval(value *BinaryInterval) error {
 	return nil
 }
 
+func (s *realValueStore) releaseSturmBinary(manager *numeral.BinaryRationalManager, value *numeral.BinaryRational) error {
+	if err := manager.Del(value); err != nil {
+		s.pendingSturmBinaries = append(s.pendingSturmBinaries, sturmBinaryTemp{manager, *value})
+		return err
+	}
+	return nil
+}
+
 // cleanupPendingPolynomialSequence finishes raw numeric scratch and younger
 // coefficient groups before the older retained row sequence.
 func (s *realValueStore) cleanupPendingPolynomialSequence() error {
 	if s == nil {
 		return arena.ErrInvalidSlot
 	}
+	for len(s.pendingSturmBinaries) != 0 {
+		entry := &s.pendingSturmBinaries[0]
+		if err := entry.manager.Del(&entry.value); err != nil {
+			return err
+		}
+		s.pendingSturmBinaries[0] = sturmBinaryTemp{}
+		s.pendingSturmBinaries = s.pendingSturmBinaries[1:]
+	}
+	s.pendingSturmBinaries = nil
 	for len(s.pendingSturmIntervals) != 0 {
 		if err := s.pendingSturmIntervals[0].Close(); err != nil {
 			return err

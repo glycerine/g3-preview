@@ -15,6 +15,7 @@ type realValueStore struct {
 	pendingSturmCoefficients [][]*realValue
 	pendingSturmRationals    []numeral.Rational
 	pendingSturmIntegers     []numeral.Int
+	pendingSturmBinaries     []sturmBinaryTemp
 	pendingSturmIntervals    []*BinaryInterval
 }
 

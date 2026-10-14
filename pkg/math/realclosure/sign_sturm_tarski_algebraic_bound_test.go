@@ -30,6 +30,18 @@ func TestRealClosureAlgebraicConstantAndZeroBoundSigns(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	third, err := store.newRational(1, 3)
+	if err != nil {
+		t.Fatal(err)
+	}
+	half, err := store.newRational(1, 2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	negativeThird, err := store.newRational(-1, 3)
+	if err != nil {
+		t.Fatal(err)
+	}
 	owner := &algebraicRootOwner{values: store, intervals: bounds}
 	makeValue := func(coefficients []*realValue, lo, hi int32) *realValue {
 		t.Helper()
@@ -79,6 +91,10 @@ func TestRealClosureAlgebraicConstantAndZeroBoundSigns(t *testing.T) {
 		{"negative zero bound", []*realValue{negative, positive}, &zero, -1},
 		{"positive interval Horner", []*realValue{positive, positive}, &nonzero, 1},
 		{"negative interval Horner", []*realValue{negative, negative}, &nonzero, -1},
+		{"mixed exact rational", []*realValue{positive, one}, &nonzero, 1},
+		{"mixed exact dyadic", []*realValue{positive, half}, &nonzero, 1},
+		{"mixed refined rational", []*realValue{positive, third}, &nonzero, 1},
+		{"mixed negative rational", []*realValue{negative, negativeThird}, &nonzero, -1},
 	} {
 		got, err := store.signAtBinaryBound(tc.coefficients, bounds, tc.bound)
 		if err != nil || got != tc.want {
@@ -88,8 +104,46 @@ func TestRealClosureAlgebraicConstantAndZeroBoundSigns(t *testing.T) {
 	if _, err := store.signAtBinaryBound([]*realValue{positive, negative}, bounds, &nonzero); !errors.Is(err, arena.ErrInvalidSlot) {
 		t.Fatal("ambiguous interval needs source refinement", err)
 	}
-	if _, err := store.signAtBinaryBound([]*realValue{positive, one}, bounds, &nonzero); !errors.Is(err, arena.ErrInvalidSlot) {
-		t.Fatal("mixed rational interval conversion remains open", err)
+	for _, value := range []*realValue{third, negativeThird} {
+		approximation, err := store.rationalApproxInterval(value, bounds)
+		if err != nil {
+			t.Fatal(err)
+		}
+		width := numeral.NewBinaryRational()
+		if err := bounds.Sub(&approximation.upper, &approximation.lower, &width); err != nil {
+			t.Fatal(err)
+		}
+		precise, err := bounds.LessOneDiv2k(&width, 24)
+		if err != nil || !precise {
+			t.Fatal("source rational interval precision", precise, err)
+		}
+		lowerInside, err := bounds.LessRational(&approximation.lower, store.numbers, &value.rational)
+		if err != nil || !lowerInside {
+			t.Fatal("source rational lower enclosure", lowerInside, err)
+		}
+		upperInside, err := bounds.GreaterRational(&approximation.upper, store.numbers, &value.rational)
+		if err != nil || !upperInside {
+			t.Fatal("source rational upper enclosure", upperInside, err)
+		}
+		if err := bounds.Del(&width); err != nil {
+			t.Fatal(err)
+		}
+		if err := approximation.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}
+	halfInterval, err := store.rationalApproxInterval(half, bounds)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if halfInterval.lowerOpen || halfInterval.upperOpen {
+		t.Fatal("exact dyadic interval must be closed")
+	}
+	if equal, err := bounds.Equal(&halfInterval.lower, &halfInterval.upper); err != nil || !equal {
+		t.Fatal("exact dyadic interval endpoints", equal, err)
+	}
+	if err := halfInterval.Close(); err != nil {
+		t.Fatal(err)
 	}
 	rows := []realPolynomial{
 		{coefficients: []*realValue{positive}},
@@ -108,7 +162,7 @@ func TestRealClosureAlgebraicConstantAndZeroBoundSigns(t *testing.T) {
 	if _, err := store.signValue(positive); !errors.Is(err, arena.ErrInvalidSlot) {
 		t.Fatal("ambiguous algebraic interval sign", err)
 	}
-	for _, value := range []*realValue{positive, negative, one, minusOne} {
+	for _, value := range []*realValue{positive, negative, one, minusOne, third, half, negativeThird} {
 		if err := store.release(value); err != nil {
 			t.Fatal(err)
 		}

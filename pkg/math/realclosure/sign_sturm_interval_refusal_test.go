@@ -64,8 +64,23 @@ func TestRealClosureSturmIntervalRefusedDestructorRetainsOwner(t *testing.T) {
 	if !interval.closed || len(store.pendingSturmIntervals) != 0 {
 		t.Fatal("recovered cleanup retained interval")
 	}
-	if err := bounds.Del(&value); err != nil {
-		t.Fatal(err)
+	valueCell := value.Num.Cell
+	valueOriginal := z.Cell(valueCell)
+	valueBad := valueOriginal
+	valueBad.Backing.Requested = uint64(math.MaxUint32) + 1
+	z.Store(valueCell, valueBad)
+	if err := store.releaseSturmBinary(bounds, &value); !errors.Is(err, arena.ErrBounds) || len(store.pendingSturmBinaries) != 1 {
+		t.Fatal("refused binary temporary release", err)
+	}
+	if err := store.sequenceReady(); !errors.Is(err, errRealClosureSequencePending) {
+		t.Fatal("pending binary temporary allowed another query", err)
+	}
+	if err := store.cleanupPendingPolynomialSequence(); !errors.Is(err, arena.ErrBounds) {
+		t.Fatal("refused binary retry", err)
+	}
+	z.Store(valueCell, valueOriginal)
+	if err := store.cleanupPendingPolynomialSequence(); err != nil || len(store.pendingSturmBinaries) != 0 {
+		t.Fatal("recovered binary cleanup", err)
 	}
 	if err := bounds.CloseChecked(); err != nil {
 		t.Fatal(err)
