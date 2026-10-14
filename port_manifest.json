@@ -155706,7 +155706,7 @@
           ]
         },
         {
-          "name": "div_normalize mpn_norm TRACE through both numeric division and multi-limb decimal conversion (mpn.cpp:257)",
+          "name": "div_normalize mpn_norm TRACE with source insertions and std::endl flush through numeric division and decimal conversion (mpn.cpp:257)",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpn_normalize_trace.go",
           "go_targets": [
@@ -155716,7 +155716,8 @@
             "pkg/util/numeral/mpz_number_theory.go"
           ],
           "tests": [
-            "TestMPNNormalizationTraceDivisionAndDecimalConversion"
+            "TestMPNNormalizationTraceDivisionAndDecimalConversion",
+            "TestMPNNormalizationTraceEndlFlushAndRefusal"
           ]
         },
         {
@@ -156267,7 +156268,7 @@
           ]
         },
         {
-          "name": "div_normalize mpn_norm TRACE through numeric division and multi-limb decimal conversion (mpn.cpp:257)",
+          "name": "div_normalize mpn_norm TRACE with source insertions and std::endl flush through numeric division and decimal conversion (mpn.cpp:257)",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpn_normalize_trace.go",
           "go_targets": [
@@ -156277,7 +156278,8 @@
             "pkg/util/numeral/mpz_number_theory.go"
           ],
           "tests": [
-            "TestMPNNormalizationTraceDivisionAndDecimalConversion"
+            "TestMPNNormalizationTraceDivisionAndDecimalConversion",
+            "TestMPNNormalizationTraceEndlFlushAndRefusal"
           ]
         },
         {
@@ -175817,6 +175819,13 @@
           "tests": ["TestMPNSingleLimbDivisionTraceAndDecimalCaller", "TestMPNSingleLimbDivisionTraceInsertionAndEndlRefusal"]
         },
         {
+          "name": "Reached MPN div_normalize TRACE operand insertions and std::endl flush before footer (mpn.cpp:257)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_normalize_trace.go",
+          "go_targets": ["pkg/util/numeral/mpn_normalize_trace_test.go"],
+          "tests": ["TestMPNNormalizationTraceDivisionAndDecimalConversion", "TestMPNNormalizationTraceEndlFlushAndRefusal"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -176323,6 +176332,13 @@
           "go_target": "pkg/util/numeral/mpn_div1_trace.go",
           "go_targets": ["pkg/util/numeral/mpn_div1_trace_test.go"],
           "tests": ["TestMPNSingleLimbDivisionTraceAndDecimalCaller", "TestMPNSingleLimbDivisionTraceInsertionAndEndlRefusal"]
+        },
+        {
+          "name": "Reached MPN div_normalize TRACE operand insertions and std::endl flush before footer (mpn.cpp:257)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_normalize_trace.go",
+          "go_targets": ["pkg/util/numeral/mpn_normalize_trace_test.go"],
+          "tests": ["TestMPNNormalizationTraceDivisionAndDecimalConversion", "TestMPNNormalizationTraceEndlFlushAndRefusal"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

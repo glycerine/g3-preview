@@ -18,18 +18,11 @@ func (m *NaturalManager) sourceTraceTags() *diagnostic.TraceTags {
 func (m *NaturalManager) traceDivisionNormalize(numer, denom []uint32) {
 	_ = m.sourceTraceTags().EmitConditional("mpn_norm", "div_normalize", "src/util/mpn.cpp", 257,
 		func() bool { return true }, func(w io.Writer) error {
-			if err := writeNumeralDisplayPart(w, "Normalized: n_numer="); err != nil {
-				return err
-			}
-			if err := m.DisplayRaw(w, numer); err != nil {
-				return err
-			}
-			if err := writeNumeralDisplayPart(w, " n_denom="); err != nil {
-				return err
-			}
-			if err := m.DisplayRaw(w, denom); err != nil {
-				return err
-			}
-			return writeNumeralDisplayPart(w, "\n")
+			_ = writeNumeralDisplayPart(w, "Normalized: n_numer=")
+			_ = m.DisplayRaw(w, numer)
+			_ = writeNumeralDisplayPart(w, " n_denom=")
+			_ = m.DisplayRaw(w, denom)
+			_ = diagnostic.WriteTraceEndl(w)
+			return nil
 		})
 }
