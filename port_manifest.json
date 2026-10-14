@@ -52182,6 +52182,23 @@
           ]
         },
         {
+          "name": "Concrete config_mpq monomial sorted power merge, source integer classification, zero/upward/downward bound propagation, inverse roots, definition watches and root sweep (src/math/subpaving/subpaving_t_def.h:657-664,690-721,1500-1663,1695-1808); arithmetic-exception and search lifecycle remain open",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/rational_monomial.go",
+          "go_targets": [
+            "pkg/math/subpaving/rational_monomial_propagate.go",
+            "pkg/math/subpaving/rational_node_predicates.go",
+            "pkg/math/subpaving/rational_context_propagate.go",
+            "pkg/math/subpaving/rational_context_init.go"
+          ],
+          "tests": [
+            "TestRationalMonomialRegistrationAndForwardBounds",
+            "TestRationalMonomialReverseRootAndZeroShortcut",
+            "TestRationalMonomialIntegerClassification",
+            "TestRationalMonomialQueuedClauseBoundTriggersWatch"
+          ]
+        },
+        {
           "name": "Concrete config_mpq interval negation, exact addition/subtraction, live borrowed operands, infinity and openness branches, and destination aliasing (src/math/interval/interval_def.h:704-837)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_interval_arith.go",
@@ -52236,7 +52253,7 @@
           ]
         },
         {
-          "name": "Concrete config_mpq context-owned default nth-root precision 1/8192, zero-parameter fallback, canceled root dispatch and interval inverse image for retained monomial propagation (src/math/subpaving/subpaving_t_def.h:499-503,1641; src/math/interval/interval_def.h:1390-1478); monomial registration and solver search remain open",
+          "name": "Concrete config_mpq context-owned default nth-root precision 1/8192, zero-parameter fallback, canceled root dispatch and interval inverse image for retained monomial propagation (src/math/subpaving/subpaving_t_def.h:499-503,1641; src/math/interval/interval_def.h:1390-1478); solver search and full memory-checkpoint transport remain open",
           "status": "partial",
           "go_target": "pkg/math/subpaving/rational_context_root_precision.go",
           "go_targets": [

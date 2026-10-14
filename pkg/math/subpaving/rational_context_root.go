@@ -36,6 +36,7 @@ type RationalContext struct {
 	watchOrder       [][]rationalWatch
 	polynomials      map[uint32]*RationalPolynomial
 	polynomialOwners []*RationalPolynomial
+	monomials        map[uint32]*RationalMonomial
 	numBuffer        []numeral.Rational
 	initDefHead      uint32
 	numVisited       uint64
@@ -284,7 +285,7 @@ func (c *RationalContext) Close() error {
 	c.nodes, c.root, c.variables = nil, nil, nil
 	c.leafHead, c.leafTail = nil, nil
 	c.inequalities, c.unitClauses, c.clauses, c.clauseWatchers = nil, nil, nil, nil
-	c.watchOrder, c.polynomials, c.polynomialOwners, c.numBuffer = nil, nil, nil, nil
+	c.watchOrder, c.polynomials, c.polynomialOwners, c.numBuffer, c.monomials = nil, nil, nil, nil, nil
 	c.queue, c.queueHead = nil, 0
 	c.closed = true
 	return nil

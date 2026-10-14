@@ -52,6 +52,12 @@ func (c *RationalContext) PropagateQueued(n *RationalNode) error {
 						return err
 					}
 				}
+			} else if m := c.monomials[watch.definition]; m != nil {
+				if b.timestamp >= m.visited {
+					if err := c.PropagateMonomial(watch.definition, n); err != nil {
+						return err
+					}
+				}
 			} else {
 				return arena.ErrInvalidSlot
 			}
@@ -59,6 +65,11 @@ func (c *RationalContext) PropagateQueued(n *RationalNode) error {
 		if n.conflictVar == math.MaxUint32 {
 			if p := c.polynomials[b.variable]; p != nil && b.timestamp >= p.visited {
 				if err := c.PropagatePolynomial(b.variable, n); err != nil {
+					return err
+				}
+			}
+			if m := c.monomials[b.variable]; m != nil && b.timestamp >= m.visited {
+				if err := c.PropagateMonomial(b.variable, n); err != nil {
 					return err
 				}
 			}

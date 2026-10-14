@@ -128,7 +128,7 @@ func (c *RationalContext) propagatePolynomialTarget(p *RationalPolynomial, targe
 		return err
 	}
 	if !r.lowerInf {
-		if err := c.propagatePolynomialCandidate(n, target, p.variable, lower, true, r.lowerOpen); err != nil {
+		if err := c.propagateRationalDefinitionCandidate(n, target, p.variable, lower, true, r.lowerOpen); err != nil {
 			return err
 		}
 		if n.conflictVar != math.MaxUint32 {
@@ -136,12 +136,12 @@ func (c *RationalContext) propagatePolynomialTarget(p *RationalPolynomial, targe
 		}
 	}
 	if !r.upperInf {
-		return c.propagatePolynomialCandidate(n, target, p.variable, upper, false, r.upperOpen)
+		return c.propagateRationalDefinitionCandidate(n, target, p.variable, upper, false, r.upperOpen)
 	}
 	return nil
 }
 
-func (c *RationalContext) propagatePolynomialCandidate(n *RationalNode, target, definition uint32, value *numeral.Rational, lower, open bool) (err error) {
+func (c *RationalContext) propagateRationalDefinitionCandidate(n *RationalNode, target, definition uint32, value *numeral.Rational, lower, open bool) (err error) {
 	adjusted := numeral.NewRational()
 	defer func() { err = errors.Join(err, c.numbers.Del(&adjusted)) }()
 	if c.variables[target] {

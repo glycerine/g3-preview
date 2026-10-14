@@ -28,6 +28,11 @@ func (c *RationalContext) InitializeRoot() error {
 					return err
 				}
 			}
+			if c.monomials[variable] != nil && n.conflictVar == math.MaxUint32 {
+				if err := c.PropagateMonomial(variable, n); err != nil {
+					return err
+				}
+			}
 			c.initDefHead++
 		}
 		c.initStage = 2
