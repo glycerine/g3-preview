@@ -1,5 +1,5 @@
 // Source: src/math/subpaving/subpaving_t_def.h:575-587,1741-1752,
-// concrete config_mpq bound queue and watched-clause dispatch.
+// concrete config_mpq bound queue and insertion-order watched dispatch.
 package subpaving
 
 import (
@@ -10,7 +10,6 @@ import (
 
 // PropagateQueued processes the exact bound queue prefix. A canceled
 // checkpoint leaves the next bound queued; a conflict clears the suffix.
-// Definitions will also dispatch at this boundary when registered.
 func (c *RationalContext) PropagateQueued(n *RationalNode) error {
 	if err := c.open(); err != nil {
 		return err
@@ -37,12 +36,29 @@ func (c *RationalContext) PropagateQueued(n *RationalNode) error {
 			return arena.ErrInvalidSlot
 		}
 		c.queueHead++
-		for _, clause := range c.clauseWatchers[b.variable] {
+		for _, watch := range c.watchOrder[b.variable] {
 			if n.conflictVar != math.MaxUint32 {
 				break
 			}
-			if b.timestamp >= clause.visited {
-				if err := c.PropagateClause(clause, n); err != nil {
+			if watch.clause != nil {
+				if b.timestamp >= watch.clause.visited {
+					if err := c.PropagateClause(watch.clause, n); err != nil {
+						return err
+					}
+				}
+			} else if p := c.polynomials[watch.definition]; p != nil {
+				if b.timestamp >= p.visited {
+					if err := c.PropagatePolynomial(watch.definition, n); err != nil {
+						return err
+					}
+				}
+			} else {
+				return arena.ErrInvalidSlot
+			}
+		}
+		if n.conflictVar == math.MaxUint32 {
+			if p := c.polynomials[b.variable]; p != nil && b.timestamp >= p.visited {
+				if err := c.PropagatePolynomial(b.variable, n); err != nil {
 					return err
 				}
 			}

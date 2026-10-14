@@ -52131,7 +52131,7 @@
           ]
         },
         {
-          "name": "Concrete config_mpq inequality threshold ownership, unit retention, axiom marking, stable multi-atom clauses, exact three-valued inequality truth, distinct-variable watches, justified conflict-first clause propagation, checkpointed bound queue dispatch, and resumable root unit/queue initialization (src/math/subpaving/subpaving_t_def.h:575-587,773-875,1345-1419,1695-1752,1773-1808); definition propagation and search remain open",
+          "name": "Concrete config_mpq inequality threshold ownership, unit retention, axiom marking, stable multi-atom clauses, exact three-valued inequality truth, distinct-variable watches, justified conflict-first clause propagation, insertion-order watched queue dispatch, and resumable root unit/definition/queue initialization (src/math/subpaving/subpaving_t_def.h:575-587,773-875,1345-1419,1695-1752,1773-1808); monomial propagation and search remain open",
           "status": "partial",
           "go_target": "pkg/math/subpaving/rational_context_units.go",
           "go_targets": [
@@ -52148,6 +52148,23 @@
             "TestRationalClauseQueuedWatchCancellationAndConflict",
             "TestRationalClauseAllFalseFirstAtomConflict",
             "TestRationalContextInitializeRootResumesUnitsAndWatchedQueue"
+          ]
+        },
+        {
+          "name": "Concrete config_mpq polynomial mk_sum with variable-indexed coefficient buffer, duplicate sorting, integer classification, forward/reverse interval propagation, exact integer candidate normalization, definition watches and root sweep (src/math/subpaving/subpaving_t_def.h:668-685,741-769,1408-1496,1695-1808); source arithmetic-exception flag transport and remaining solver lifecycle remain open",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/rational_polynomial.go",
+          "go_targets": [
+            "pkg/math/subpaving/rational_polynomial_propagate.go",
+            "pkg/math/subpaving/rational_context_root.go",
+            "pkg/math/subpaving/rational_context_propagate.go",
+            "pkg/math/subpaving/rational_context_init.go"
+          ],
+          "tests": [
+            "TestRationalPolynomialRootForwardAndReversePropagation",
+            "TestRationalPolynomialDuplicateCoefficientBufferAndWatchOrder",
+            "TestRationalPolynomialQueuedClauseBoundTriggersDefinition",
+            "TestRationalPolynomialReverseIntegerCandidateNormalization"
           ]
         },
         {

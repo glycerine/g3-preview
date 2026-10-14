@@ -32,6 +32,11 @@ type RationalContext struct {
 	initStage        uint8
 	clauses          []*RationalClause
 	clauseWatchers   [][]*RationalClause
+	watchOrder       [][]rationalWatch
+	polynomials      map[uint32]*RationalPolynomial
+	polynomialOwners []*RationalPolynomial
+	numBuffer        []numeral.Rational
+	initDefHead      uint32
 	numVisited       uint64
 	queue            []*RationalBound
 	queueHead        int
@@ -96,6 +101,7 @@ func (c *RationalContext) NewVariable(integer bool) (uint32, error) {
 	x := uint32(len(c.variables))
 	c.variables = append(c.variables, integer)
 	c.clauseWatchers = append(c.clauseWatchers, nil)
+	c.watchOrder = append(c.watchOrder, nil)
 	return x, nil
 }
 
@@ -140,10 +146,10 @@ func (c *RationalContext) NewChild(parent *RationalNode) (*RationalNode, error) 
 // PublishBound follows mk_bound's exact rational integer normalization before
 // publishing the endpoint to this node's copied bound view.
 func (c *RationalContext) PublishBound(n *RationalNode, variable uint32, value *numeral.Rational, lower, open bool) (err error) {
-	return c.publishBoundReason(n, variable, value, lower, open, false, nil)
+	return c.publishBoundReason(n, variable, value, lower, open, false, nil, math.MaxUint32)
 }
 
-func (c *RationalContext) publishBoundReason(n *RationalNode, variable uint32, value *numeral.Rational, lower, open, axiom bool, reason *RationalClause) (err error) {
+func (c *RationalContext) publishBoundReason(n *RationalNode, variable uint32, value *numeral.Rational, lower, open, axiom bool, reason *RationalClause, definition uint32) (err error) {
 	if err = c.open(); err != nil {
 		return err
 	}
@@ -161,7 +167,7 @@ func (c *RationalContext) publishBoundReason(n *RationalNode, variable uint32, v
 	}
 	c.numBounds++
 	if !c.variables[variable] {
-		return c.publishNormalized(n, variable, value, lower, open, axiom, reason)
+		return c.publishNormalized(n, variable, value, lower, open, axiom, reason, definition)
 	}
 	adjusted := numeral.NewRational()
 	defer func() { err = errors.Join(err, c.numbers.Del(&adjusted)) }()
@@ -191,14 +197,15 @@ func (c *RationalContext) publishBoundReason(n *RationalNode, variable uint32, v
 			return err
 		}
 	}
-	return c.publishNormalized(n, variable, &adjusted, lower, open, axiom, reason)
+	return c.publishNormalized(n, variable, &adjusted, lower, open, axiom, reason, definition)
 }
 
-func (c *RationalContext) publishNormalized(n *RationalNode, variable uint32, value *numeral.Rational, lower, open, axiom bool, reason *RationalClause) error {
+func (c *RationalContext) publishNormalized(n *RationalNode, variable uint32, value *numeral.Rational, lower, open, axiom bool, reason *RationalClause, definition uint32) error {
 	if err := n.pushBoundAt(variable, value, lower, open, c.timestamp, axiom); err != nil {
 		return err
 	}
 	n.trail.reasonClause = reason
+	n.trail.reasonDefinition = definition
 	conflict, err := n.ConflictingBounds(variable)
 	if err != nil {
 		return err
@@ -246,6 +253,19 @@ func (c *RationalContext) Close() error {
 		c.clauses[0] = nil
 		c.clauses = c.clauses[1:]
 	}
+	for len(c.polynomialOwners) != 0 {
+		last := len(c.polynomialOwners) - 1
+		if err := c.polynomialOwners[last].Close(); err != nil {
+			return err
+		}
+		c.polynomialOwners[last] = nil
+		c.polynomialOwners = c.polynomialOwners[:last]
+	}
+	for i := range c.numBuffer {
+		if err := c.numbers.Del(&c.numBuffer[i]); err != nil {
+			return err
+		}
+	}
 	for i := len(c.inequalities) - 1; i >= 0; i-- {
 		if !c.inequalities[i].closed {
 			if err := c.numbers.Del(&c.inequalities[i].value); err != nil {
@@ -260,6 +280,7 @@ func (c *RationalContext) Close() error {
 	c.nodes, c.root, c.variables = nil, nil, nil
 	c.leafHead, c.leafTail = nil, nil
 	c.inequalities, c.unitClauses, c.clauses, c.clauseWatchers = nil, nil, nil, nil
+	c.watchOrder, c.polynomials, c.polynomialOwners, c.numBuffer = nil, nil, nil, nil
 	c.queue, c.queueHead = nil, 0
 	c.closed = true
 	return nil

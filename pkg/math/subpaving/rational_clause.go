@@ -61,6 +61,7 @@ func (c *RationalContext) AddClause(atoms []*RationalInequality) (*RationalClaus
 	for i, a := range ordered {
 		if i == 0 || a.variable != ordered[i-1].variable {
 			c.clauseWatchers[a.variable] = append(c.clauseWatchers[a.variable], clause)
+			c.watchOrder[a.variable] = append(c.watchOrder[a.variable], rationalWatch{clause: clause})
 		}
 	}
 	c.clauses = append(c.clauses, clause)
@@ -157,7 +158,7 @@ func (c *RationalContext) PropagateClause(clause *RationalClause, n *RationalNod
 		unknown = 0
 	}
 	a := clause.atoms[unknown]
-	if err := c.publishBoundReason(n, a.variable, &a.value, a.lower, a.open, false, clause); err != nil {
+	if err := c.publishBoundReason(n, a.variable, &a.value, a.lower, a.open, false, clause, math.MaxUint32); err != nil {
 		return err
 	}
 	c.queue = append(c.queue, n.trail)

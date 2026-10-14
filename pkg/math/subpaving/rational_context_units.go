@@ -81,7 +81,7 @@ func (c *RationalContext) AssertRootUnits() (*RationalNode, error) {
 		}
 		unit := c.unitClauses[c.unitHead]
 		a := unit.atom
-		if err := c.publishBoundReason(n, a.variable, &a.value, a.lower, a.open, unit.axiom, nil); err != nil {
+		if err := c.publishBoundReason(n, a.variable, &a.value, a.lower, a.open, unit.axiom, nil, math.MaxUint32); err != nil {
 			return n, err
 		}
 		c.queue = append(c.queue, n.trail)
