@@ -150745,6 +150745,7 @@
         "TestArbitraryFloatSBVTraceFractionalAndExactBranches",
         "TestArbitraryFloatIEEEBVTraceFiniteAndInfinity",
         "TestArbitraryFloatRoundIntegralTraceBranches",
+        "TestArbitraryFloatRoundIntegralTraceSourceInsertions",
         "TestArbitraryFloatSqrtTraceSourceBranches",
         "TestArbitraryFloatRoundSqrtDecisionTrace",
         "TestArbitraryFloatRoundResultClassTrace",
@@ -151389,7 +151390,7 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_round_integral.go",
           "go_targets": ["pkg/util/numeral/mpf_round_integral_trace.go"],
-          "tests": ["TestArbitraryFloatRoundIntegralTraceBranches"]
+          "tests": ["TestArbitraryFloatRoundIntegralTraceBranches", "TestArbitraryFloatRoundIntegralTraceSourceInsertions"]
         },
         {
           "name": "mpf_manager::sqrt mpf_dbg entry, unpacked operand, inexact correction and result TRACE records at mpf.cpp:1008,1027,1036,1044",

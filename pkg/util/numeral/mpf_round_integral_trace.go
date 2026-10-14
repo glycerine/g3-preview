@@ -30,7 +30,10 @@ func (m *ArbitraryFloatManager) traceRoundIntegralRawOperand(value *ArbitraryFlo
 				formatError = e
 				return e
 			}
-			return writeNumeralDisplayPart(w, s+"\n")
+			if e := writeNumeralDisplayPart(w, s); e != nil {
+				return e
+			}
+			return writeNumeralDisplayPart(w, "\n")
 		})
 	return formatError
 }
@@ -51,7 +54,10 @@ func (m *ArbitraryFloatManager) traceRoundIntegralQuotient(div, rem *Int) error 
 				formatError = e
 				return e
 			}
-			if e := writeNumeralDisplayPart(w, s+" rem="); e != nil {
+			if e := writeNumeralDisplayPart(w, s); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, " rem="); e != nil {
 				return e
 			}
 			s, e = m.integer.String(rem)
@@ -59,7 +65,26 @@ func (m *ArbitraryFloatManager) traceRoundIntegralQuotient(div, rem *Int) error 
 				formatError = e
 				return e
 			}
-			return writeNumeralDisplayPart(w, s+"\n")
+			if e := writeNumeralDisplayPart(w, s); e != nil {
+				return e
+			}
+			return writeNumeralDisplayPart(w, "\n")
 		})
 	return formatError
+}
+
+func (m *ArbitraryFloatManager) traceRoundIntegralTie(tie, less, more bool) {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return
+	}
+	_ = tags.EmitConditional("mpf_dbg", "round_to_integral", "src/util/mpf.cpp", 1125,
+		func() bool { return true }, func(w io.Writer) error {
+			for _, part := range [...]string{"tie= ", traceBoolDigit(tie), "; <tie = ", traceBoolDigit(less), "; >tie = ", traceBoolDigit(more), "\n"} {
+				if e := writeNumeralDisplayPart(w, part); e != nil {
+					return e
+				}
+			}
+			return nil
+		})
 }

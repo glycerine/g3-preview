@@ -1,8 +1,6 @@
 // Source: src/util/mpf.cpp:1047-1170; src/util/mpf.h:133.
 package numeral
 
-import "strconv"
-
 func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode, x, out *ArbitraryFloat) (cause error) {
 	if e := m.valueGuard(x); e != nil {
 		return e
@@ -68,7 +66,11 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 				return e
 			}
 			tie := sigZero && x.exponent == -1
-			m.traceFloatDebugText("round_to_integral", "tie = "+traceBoolDigit(tie), 1076)
+			tieDigit := int64(0)
+			if tie {
+				tieDigit = 1
+			}
+			m.traceFloatDebugSigned("round_to_integral", "tie = ", tieDigit, 1076)
 			if tie && mode == ArbitraryFloatNearestEven {
 				return m.MkZero(x.EBits(), x.SBits(), x.Sign(), out)
 			}
@@ -150,7 +152,7 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 	if e != nil {
 		return e
 	}
-	m.traceFloatDebugText("round_to_integral", "shift="+strconv.FormatUint(uint64(shift), 10), 1111)
+	m.traceFloatDebugSigned("round_to_integral", "shift=", int64(shift), 1111)
 	if e := m.traceFloatDebugIntChecked("round_to_integral", "shiftm1_p=", &shiftM1, 1112); e != nil {
 		return e
 	}
@@ -180,7 +182,7 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 		if e != nil {
 			return e
 		}
-		m.traceFloatDebugText("round_to_integral", "tie= "+traceBoolDigit(tie)+"; <tie = "+traceBoolDigit(less)+"; >tie = "+traceBoolDigit(more), 1125)
+		m.traceRoundIntegralTie(tie, less, more)
 		if tie {
 			if mode == ArbitraryFloatNearestEven {
 				inc, e = m.integer.IsOdd(&s.div)

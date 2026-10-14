@@ -68,3 +68,67 @@ func TestArbitraryFloatRoundIntegralTraceBranches(t *testing.T) {
 	serviceMust(t, m.Del(&x))
 	serviceMust(t, m.Del(&out))
 }
+
+func TestArbitraryFloatRoundIntegralTraceSourceInsertions(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	w := &mpffArithmeticTraceWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpf_dbg")
+	if !tags.ShouldTrace("mpf_dbg") {
+		return
+	}
+	serviceMust(t, m.BindTrace(tags))
+	var x, out ArbitraryFloat
+	for _, tc := range []struct {
+		name    string
+		value   float64
+		general bool
+		tie     []string
+	}{
+		{"zero shortcut", 0, false, nil},
+		{"small tie", 0.5, false, []string{"tie = ", "1", "\n"}},
+		{"below tie", 1.25, true, []string{"tie= ", "0", "; <tie = ", "1", "; >tie = ", "0", "\n"}},
+		{"at tie", 1.5, true, []string{"tie= ", "1", "; <tie = ", "0", "; >tie = ", "0", "\n"}},
+		{"above tie", 1.75, true, []string{"tie= ", "0", "; <tie = ", "0", "; >tie = ", "1", "\n"}},
+	} {
+		serviceMust(t, m.SetDouble(&x, 11, 53, tc.value))
+		w.parts = nil
+		serviceMust(t, m.RoundToIntegral(ArbitraryFloatNearestEven, &x, &out))
+		for _, label := range []string{"X = ", "INTEGRAL = "} {
+			if !hasFloatTraceValueInsertion(w.parts, label) {
+				t.Fatalf("%s missing %q insertion in %q", tc.name, label, w.parts)
+			}
+		}
+		if tc.general {
+			for _, label := range []string{"A = ", "shift=", "shiftm1_p="} {
+				if !hasFloatTraceValueInsertion(w.parts, label) {
+					t.Fatalf("%s missing %q insertion in %q", tc.name, label, w.parts)
+				}
+			}
+			foundQuotient := false
+			for i := 0; i+4 < len(w.parts); i++ {
+				if w.parts[i] == "div=" && w.parts[i+1] != "" && w.parts[i+2] == " rem=" && w.parts[i+3] != "" && w.parts[i+4] == "\n" {
+					foundQuotient = true
+					break
+				}
+			}
+			if !foundQuotient {
+				t.Fatalf("%s missing quotient insertions in %q", tc.name, w.parts)
+			}
+		}
+		if len(tc.tie) != 0 && !hasMPFFTraceParts(w.parts, tc.tie) {
+			t.Fatalf("%s missing tie insertions %q in %q", tc.name, tc.tie, w.parts)
+		}
+	}
+	serviceMust(t, m.Del(&x))
+	serviceMust(t, m.Del(&out))
+}
+
+func hasFloatTraceValueInsertion(parts []string, label string) bool {
+	for i := 0; i+2 < len(parts); i++ {
+		if parts[i] == label && parts[i+1] != "" && parts[i+1] != "\n" && parts[i+2] == "\n" {
+			return true
+		}
+	}
+	return false
+}
