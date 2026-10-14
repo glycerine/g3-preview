@@ -59,6 +59,9 @@ type BinaryRationalManager struct {
 	selectRationalPending, selectRationalExecuting bool
 	refineMid                                      BinaryRational
 	refinePending, refineExecuting                 bool
+	refineImported                                 Rational
+	refineImportedPending                          bool
+	refineImportedCursor                           uint8
 }
 type BinaryRationalStats struct {
 	HeaderBytes           uint64
@@ -93,7 +96,7 @@ func (m *BinaryRationalManager) open() error {
 	if m.selectRationalPending && !m.selectRationalExecuting {
 		return ErrBinarySelectPending
 	}
-	if m.refinePending && !m.refineExecuting {
+	if (m.refinePending || m.refineImportedPending) && !m.refineExecuting {
 		return ErrBinaryRefinePending
 	}
 	return nil
@@ -148,6 +151,9 @@ func (m *BinaryRationalManager) CloseChecked() error {
 		return e
 	}
 	if e := m.CleanupSelectRationalTemporaries(); e != nil {
+		return e
+	}
+	if e := m.CleanupRefineImported(); e != nil {
 		return e
 	}
 	if e := m.CleanupRefineMid(); e != nil {

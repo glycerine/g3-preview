@@ -74,3 +74,32 @@ func TestBinaryRefineMidOwningCleanupPhysicalRetry(t *testing.T) {
 		t.Fatal("owning retry retained midpoint")
 	}
 }
+
+func TestBinaryRefineImportedOwningCleanupPhysicalRetry(t *testing.T) {
+	qm, _, _ := rawArithmeticGuardOwner(t)
+	diagnostics, e := NewRationalService(serviceConfig(qm.Z.BudgetField))
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, diagnostics.Close()) })
+	m, e := NewBinaryRationalManager(qm.Z, BinaryRationalConfig{Diagnostics: diagnostics})
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, m.CloseChecked()) })
+	serviceMust(t, qm.Z.SetLimbs(&m.refineImported.Num, []uint32{7, 0, 1}))
+	serviceMust(t, qm.Z.SetLimbs(&m.refineImported.Den, []uint32{9, 0, 1}))
+	m.refineImportedPending = true
+	den := m.refineImported.Den.Cell
+	original := qm.Z.Cell(den)
+	bad := original
+	bad.Backing.Requested = uint64(math.MaxUint32) + 1
+	qm.Z.Store(den, bad)
+	if e := m.CleanupRefineImported(); !errors.Is(e, arena.ErrBounds) || !m.refineImportedPending || m.refineImportedCursor != 1 || m.refineImported.Num.Cell != 0 || m.refineImported.Den.Cell != den {
+		t.Fatal("physical refusal lost imported denominator", e, m.refineImported)
+	}
+	if e := m.open(); !errors.Is(e, ErrBinaryRefinePending) {
+		t.Fatal("retained import allowed reentry", e)
+	}
+	qm.Z.Store(den, original)
+	serviceMust(t, m.CleanupRefineImported())
+	if m.refineImportedPending || m.refineImported.Num.Cell != 0 || m.refineImported.Den.Cell != 0 {
+		t.Fatal("owning retry retained imported rational")
+	}
+}

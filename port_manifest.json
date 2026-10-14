@@ -150127,7 +150127,8 @@
             "TestBinarySelectionScopedIntegerCleanupRetry",
             "TestBinarySelectionScopedRationalsResumeSourceDestructionOrder",
             "TestBinaryRefineRetainsMidpointAfterActualBodyFailure",
-            "TestBinaryRefineMidOwningCleanupPhysicalRetry"
+            "TestBinaryRefineMidOwningCleanupPhysicalRetry",
+            "TestBinaryRefineImportedOwningCleanupPhysicalRetry"
           ]
         },
         {
@@ -150444,7 +150445,8 @@
             "TestBinarySelectionScopedIntegerCleanupRetry",
             "TestBinarySelectionScopedRationalsResumeSourceDestructionOrder",
             "TestBinaryRefineRetainsMidpointAfterActualBodyFailure",
-            "TestBinaryRefineMidOwningCleanupPhysicalRetry"
+            "TestBinaryRefineMidOwningCleanupPhysicalRetry",
+            "TestBinaryRefineImportedOwningCleanupPhysicalRetry"
           ]
         },
         {

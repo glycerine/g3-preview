@@ -538,9 +538,17 @@ func (m *BinaryRationalManager) refine(qm *RationalManager, q *Rational, l, u *B
 	if e := m.pair(l, u); e != nil {
 		return e
 	}
-	local := NewRational()
-	defer m.dropImported(&local)
-	input, e := m.importRational(qm, q, &local)
+	m.refineImported = NewRational()
+	m.refineImportedCursor = 0
+	m.refineImportedPending = true
+	m.refineExecuting = true
+	defer func() {
+		if cleanup := m.cleanupRefineImported(); err == nil {
+			err = cleanup
+		}
+		m.refineExecuting = false
+	}()
+	input, e := m.importRational(qm, q, &m.refineImported)
 	if e != nil {
 		return e
 	}
@@ -567,9 +575,7 @@ func (m *BinaryRationalManager) refine(qm *RationalManager, q *Rational, l, u *B
 	}
 	m.refineMid = BinaryRational{}
 	m.refinePending = true
-	m.refineExecuting = true
 	defer func() {
-		m.refineExecuting = false
 		if err != nil && m.refineMid.Num.Cell == 0 {
 			m.refinePending = false
 			m.refineMid = BinaryRational{}
@@ -610,6 +616,34 @@ func (m *BinaryRationalManager) refine(qm *RationalManager, q *Rational, l, u *B
 			return m.debugEnclosure(qm, q, l, u)
 		}
 	}
+}
+
+func (m *BinaryRationalManager) cleanupRefineImported() error {
+	if !m.refineImportedPending {
+		return nil
+	}
+	roots := [2]*Int{&m.refineImported.Num, &m.refineImported.Den}
+	for m.refineImportedCursor < 2 {
+		if e := m.Z.Del(roots[m.refineImportedCursor]); e != nil {
+			return e
+		}
+		m.refineImportedCursor++
+	}
+	m.refineImported = Rational{}
+	m.refineImportedCursor = 0
+	m.refineImportedPending = false
+	return nil
+}
+
+// CleanupRefineImported resumes release of the Go cross-owner rational copy.
+func (m *BinaryRationalManager) CleanupRefineImported() error {
+	if m == nil || m.self != m {
+		return ErrBinaryOwner
+	}
+	if m.refineExecuting {
+		return ErrBinaryRefinePending
+	}
+	return m.cleanupRefineImported()
 }
 
 // CleanupRefineMid owns the raw midpoint left by a source body failure or a
