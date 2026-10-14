@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
+	"github.com/glycerine/g3/pkg/util/statistics"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -65,6 +66,13 @@ func TestRationalEngineSelectionSearchAndCleanup(t *testing.T) {
 		t.Fatal(err)
 	}
 	if err := ctx.Search(); err != nil {
+		t.Fatal(err)
+	}
+	st := statistics.New()
+	if err := e.CollectStatistics(st); err != nil || st.Size() != 1 || st.Key(0) != "nodes" || st.UintValue(0) != 1 {
+		t.Fatal("selected context statistics", err)
+	}
+	if err := e.ResetStatistics(); err != nil {
 		t.Fatal(err)
 	}
 	if err := e.Close(); err != nil {

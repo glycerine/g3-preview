@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 var ErrRationalEngineSelection = errors.New("subpaving tactic: selected numeral engine is not rational")
@@ -74,6 +75,20 @@ func (e *RationalEngine) BindCooperation(owner *cooperate.Cooperation) error {
 		return err
 	}
 	return e.context.BindCooperation(owner)
+}
+
+func (e *RationalEngine) CollectStatistics(st *statistics.Statistics) error {
+	if err := e.check(); err != nil {
+		return err
+	}
+	return e.context.CollectStatistics(st)
+}
+
+func (e *RationalEngine) ResetStatistics() error {
+	if err := e.check(); err != nil {
+		return err
+	}
+	return e.context.ResetStatistics()
 }
 
 func (e *RationalEngine) UpdateParamsRef(pc *params.ParamsContext, p *params.ParamsRef) error {

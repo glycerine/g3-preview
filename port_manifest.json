@@ -52800,6 +52800,8 @@
         "pkg/math/subpaving/arbitrary_search_test.go",
         "pkg/math/subpaving/arbitrary_statistics.go",
         "pkg/math/subpaving/arbitrary_statistics_test.go",
+        "pkg/math/subpaving/rational_statistics.go",
+        "pkg/math/subpaving/rational_statistics_test.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
@@ -52907,6 +52909,7 @@
         "TestArbitrarySelectorsBreadthFirstAndRoundRobin",
         "TestArbitrarySearchBreadthFirstLimitAndChildResume",
         "TestArbitraryStatisticsConflictLeafAndTreeCleanup",
+        "TestRationalStatisticsConflictResetAndNodeRetention",
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFixedNodeBoundPredicates",
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
@@ -53320,6 +53323,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete config_mpq reset_statistics and collect_statistics preserve live node count and emit five source-order nonzero counters (src/math/subpaving/subpaving_t_def.h:1869-1884)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_statistics.go",
+          "tests": [
+            "TestRationalStatisticsConflictResetAndNodeRetention"
+          ]
+        },
         {
           "name": "Selected config_mpfx bound axiom and polynomial/monomial variable-definition justification tags (subpaving_t.h:108-140; subpaving_t_def.h:525-576,1408-1656)",
           "status": "ported",
