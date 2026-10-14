@@ -50117,11 +50117,12 @@
           ]
         },
         {
-          "name": "Rational Sturm and Sturm-Tarski sequence generation with both remainder settings and unbounded endpoint sign variations (realclosure.cpp:3637-3702,3930-4069); nonrational coefficients remain open",
+          "name": "Rational Sturm and Sturm-Tarski sequence generation with both remainder settings and unbounded endpoint sign variations, including retained algebraic leading-coefficient sign (realclosure.cpp:3637-3738,3930-4069); nonrational sequence generation remains open",
           "status": "partial",
           "go_target": "pkg/math/realclosure/sign_sturm_tarski.go",
           "tests": [
-            "TestRealClosureRationalDerivativeKeepsCoefficientOwnership"
+            "TestRealClosureRationalDerivativeKeepsCoefficientOwnership",
+            "TestRealClosureAlgebraicConstantAndZeroBoundSigns"
           ]
         },
         {
@@ -50138,11 +50139,12 @@
           ]
         },
         {
-          "name": "Rational-coefficient exact Horner sign evaluation and finite/infinite binary interval endpoint sign variations for Sturm-Tarski queries (realclosure.cpp:3773-3920,3930-4025); nonrational coefficient approximation and refinement remain open",
+          "name": "Rational-coefficient exact Horner sign evaluation and finite/infinite binary interval endpoint sign variations, plus algebraic constant and zero-bound signs (realclosure.cpp:2452-2462,3712-3738,3773-3920,3930-4025); nonzero-bound algebraic approximation and refinement remain open",
           "status": "partial",
           "go_target": "pkg/math/realclosure/sign_sturm_tarski_interval.go",
           "tests": [
-            "TestRealClosureBoundedRationalSturmTarskiEndpoints"
+            "TestRealClosureBoundedRationalSturmTarskiEndpoints",
+            "TestRealClosureAlgebraicConstantAndZeroBoundSigns"
           ]
         },
         {

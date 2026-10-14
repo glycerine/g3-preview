@@ -171,14 +171,9 @@ func (s *realValueStore) signVariationsAtInfinity(rows []realPolynomial, plus bo
 		if len(row.coefficients) == 0 || row.coefficients[len(row.coefficients)-1] == nil {
 			return 0, arena.ErrInvalidSlot
 		}
-		sign, err := s.numbers.Sign(&row.coefficients[len(row.coefficients)-1].rational)
+		sign, err := s.signValue(row.coefficients[len(row.coefficients)-1])
 		if err != nil {
 			return 0, err
-		}
-		if sign > 0 {
-			sign = 1
-		} else if sign < 0 {
-			sign = -1
 		}
 		if !plus && (len(row.coefficients)-1)%2 != 0 {
 			sign = -sign

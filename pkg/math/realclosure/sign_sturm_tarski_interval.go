@@ -19,9 +19,43 @@ func normalizedRationalSign(raw int32) int32 {
 	return 0
 }
 
+// Source realclosure.cpp:2452-2462 obtains a nonrational value's sign from
+// its nonzero approximation interval.
+func (s *realValueStore) signValue(value *realValue) (int32, error) {
+	if value == nil {
+		return 0, nil
+	}
+	if s == nil || s.numbers == nil || value.store != s || value.deleted || value.refs == 0 {
+		return 0, arena.ErrInvalidSlot
+	}
+	if value.isRational {
+		raw, err := s.numbers.Sign(&value.rational)
+		return normalizedRationalSign(raw), err
+	}
+	if value.functionInterval == nil {
+		return 0, arena.ErrInvalidSlot
+	}
+	contains, err := value.functionInterval.ContainsZero()
+	if err != nil {
+		return 0, err
+	}
+	if contains {
+		return 0, arena.ErrInvalidSlot
+	}
+	positive, err := value.functionInterval.IsP()
+	if err != nil {
+		return 0, err
+	}
+	if positive {
+		return 1, nil
+	}
+	return -1, nil
+}
+
 // signAtBinaryBound follows the source's zero shortcut and exact Horner
-// evaluation for rational coefficients. The source may first try interval
-// approximations; those nonrational/refinement branches remain open.
+// evaluation for rational coefficients. Constant and zero-bound algebraic
+// coefficients use their retained interval sign. Nonzero-bound algebraic
+// Horner evaluation and interval refinement remain open.
 func (s *realValueStore) signAtBinaryBound(coefficients []*realValue, bounds *numeral.BinaryRationalManager, bound *numeral.BinaryRational) (sign int32, err error) {
 	if s == nil || s.numbers == nil || bounds == nil || bound == nil {
 		return 0, arena.ErrInvalidSlot
@@ -29,28 +63,23 @@ func (s *realValueStore) signAtBinaryBound(coefficients []*realValue, bounds *nu
 	if len(coefficients) == 0 {
 		return 0, nil
 	}
-	for _, value := range coefficients {
-		if !s.rationalOperand(value) {
-			return 0, arena.ErrInvalidSlot
-		}
-	}
 	if coefficients[len(coefficients)-1] == nil {
 		return 0, arena.ErrInvalidSlot
 	}
 	if len(coefficients) == 1 {
-		raw, err := s.numbers.Sign(&coefficients[0].rational)
-		return normalizedRationalSign(raw), err
+		return s.signValue(coefficients[0])
 	}
 	zero, err := bounds.IsZero(bound)
 	if err != nil {
 		return 0, err
 	}
 	if zero {
-		if coefficients[0] == nil {
-			return 0, nil
+		return s.signValue(coefficients[0])
+	}
+	for _, value := range coefficients {
+		if !s.rationalOperand(value) {
+			return 0, arena.ErrInvalidSlot
 		}
-		raw, err := s.numbers.Sign(&coefficients[0].rational)
-		return normalizedRationalSign(raw), err
 	}
 	x := numeral.NewRational()
 	defer func() { err = errors.Join(err, s.releaseSturmRational(&x)) }()
