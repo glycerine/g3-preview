@@ -168703,7 +168703,9 @@
         "pkg/math/subpaving/tactic/fast_goal_internalize.go",
         "pkg/math/subpaving/tactic/arbitrary_goal_internalize.go",
         "pkg/ast/rewriter/bool_rewriter_config.go",
-        "pkg/ast/rewriter/bool_rewriter_config_test.go"
+        "pkg/ast/rewriter/bool_rewriter_config_test.go",
+        "pkg/ast/ast_app_coercion.go",
+        "pkg/ast/ast_arith_decl_test.go"
       ],
       "tests": [
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
@@ -168733,7 +168735,9 @@
         "TestSubpavingTemporaryInequalityBufferUnwind",
         "TestFastExprConverterTermsAndClause",
         "TestBoolRewriterConjunctionEliminationOwningBufferAndTruthTables",
-        "TestBoolRewriterConjunctionEliminationReleasesEarlierTemporaryOnLaterFailure"
+        "TestBoolRewriterConjunctionEliminationReleasesEarlierTemporaryOnLaterFailure",
+        "TestASTArithmeticOriginalMixedApplications",
+        "TestASTArithmeticAppCoercionEveryWarmReservation"
       ],
       "conditionals": [
         {
@@ -168762,6 +168766,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Concrete ast_manager::mk_app_core expr_ref_buffer for associative and non-associative arithmetic coercions: source-order INC-before-push, borrowed argument publication, and ascending cleanup across allocation refusals (ast.cpp:2064-2112)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_app_coercion.go",
+          "tests": ["TestASTArithmeticOriginalMixedApplications", "TestASTArithmeticAppCoercionEveryWarmReservation"]
+        },
         {
           "name": "Concrete bool_rewriter mk_and_as_or expr_ref_buffer: INC-before-push, borrowed ordered c_ptr view, and ascending owned-reference release after mk_or/mk_not or error (bool_rewriter.cpp:73-83)",
           "status": "ported",
