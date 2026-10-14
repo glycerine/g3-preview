@@ -51077,6 +51077,10 @@
         "pkg/math/subpaving/hardware_context_params.go",
         "pkg/math/subpaving/hardware_shell_coefficients.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
+        "pkg/math/subpaving/rational_shell_coefficients.go",
+        "pkg/math/subpaving/rational_shell_coefficients_test.go",
+        "pkg/math/subpaving/tactic/rational_engine.go",
+        "pkg/math/subpaving/tactic/rational_expr_arith.go",
         "pkg/math/subpaving/arbitrary_display.go",
         "pkg/math/subpaving/arbitrary_display_test.go",
         "pkg/math/subpaving/arbitrary_context_params.go",
@@ -51103,6 +51107,8 @@
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
         "TestSubpavingHardwareShellCoefficientAndInequalityConversion",
         "TestArbitraryShellCoefficientSourceConversionAndCleanup",
+        "TestRationalShellPersistentCoefficientGrowthAndContextTransfer",
+        "TestRationalExprConverterExactLeafGoalAndCleanup",
         "TestArbitraryDisplayConstraintsDefinitionsUnitsAndClauses",
         "TestArbitraryDisplayBoundsTreeOrderConflictAndWriterPrefixes",
         "TestArbitraryContextNamedParamsSourceOrderAndDescriptions",
@@ -51119,6 +51125,19 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete context_mpq_wrapper persistent scalar and coefficient vector, integer mk_sum conversion and owning factory order (src/math/subpaving/subpaving.cpp:59-81,263-265)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_shell_coefficients.go",
+          "go_targets": [
+            "pkg/math/subpaving/tactic/rational_engine.go",
+            "pkg/math/subpaving/tactic/rational_expr_arith.go"
+          ],
+          "tests": [
+            "TestRationalShellPersistentCoefficientGrowthAndContextTransfer",
+            "TestRationalExprConverterExactLeafGoalAndCleanup"
+          ]
+        },
         {
           "name": "Concrete context_hwf wrapper updt_params dispatch into source-order named parameter getter and hardware bound policy (src/math/subpaving/subpaving.cpp:54)",
           "status": "ported",
@@ -51278,7 +51297,9 @@
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "The selected MPQ wrapper borrows its rational manager and owns persistent coefficient and constant numerals. The real rational tactic routes sums through this wrapper; engine Close retires its coefficient vector and scalar before the owning context."
+      ],
       "deviations": [
         "The MPF wrapper prepares exact integer coefficients in source order using a native typed slice, registers context_mpf variables and copies directed rational inequality bounds into context ownership. Construction derives the exact borrowed core from f2n<mpf_manager>::m() and copied Go owner values cannot release the same numerals twice. The enclosing context_mpf search graph and complete tactic lifetime remain open.",
         "The concrete MPFF wrapper now converts integer coefficients in source order with an exact mpz round trip, chooses directed rational bound rounding, and forwards typed variables, sums, monomials and clauses. Context parameter construction, search/display, and tactic lifetime remain open.",
@@ -171335,6 +171356,9 @@
         "pkg/math/subpaving/rational_polynomial.go",
         "pkg/math/subpaving/rational_context_root.go",
         "pkg/math/subpaving/rational_polynomial_test.go",
+        "pkg/math/subpaving/rational_shell_coefficients.go",
+        "pkg/math/subpaving/rational_shell_coefficients_test.go",
+        "pkg/math/subpaving/tactic/rational_expr_converter_test.go",
         "pkg/math/polynomial/upolynomial_vector.go",
         "pkg/math/polynomial/upolynomial_source_test.go",
         "pkg/math/subpaving/tactic/expr_converter.go",
@@ -171359,6 +171383,8 @@
         "TestRationalPolynomialScopedCoefficientGrowthAndReuse",
         "TestRationalPolynomialDuplicateCoefficientBufferAndWatchOrder",
         "TestRationalPolynomialRootForwardAndReversePropagation",
+        "TestRationalShellPersistentCoefficientGrowthAndContextTransfer",
+        "TestRationalExprConverterExactLeafGoalAndCleanup",
         "TestBinarySourceTst1",
         "TestBinarySourceTst2",
         "TestBinaryMixedConversionsAndIntervals",
@@ -171556,6 +171582,18 @@
           ]
         },
         {
+          "name": "retained context_mpq_wrapper scoped_mpq_vector persistent indexed integer conversion and ascending teardown",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_shell_coefficients.go",
+          "go_targets": [
+            "pkg/math/subpaving/tactic/rational_expr_converter_test.go"
+          ],
+          "tests": [
+            "TestRationalShellPersistentCoefficientGrowthAndContextTransfer",
+            "TestRationalExprConverterExactLeafGoalAndCleanup"
+          ]
+        },
+        {
           "name": "remaining retained concrete scoped numeral vector specializations in unported owning consumers",
           "status": "partial"
         }
@@ -171566,7 +171604,8 @@
         "MPFF specialization borrows its manager, owns deep significand blocks and charges actual headers/full old-new element backing. Failure retains default failed-push element; ascending cleanup preserves source actions. See PORT_PROGRESS.md#audit-mpff-port-status-md.",
         "Scalar external polynomial owners and actual Int arrays preserve source numeral callbacks and publication prefixes. See PORT_PROGRESS.md#audit-upolynomial-port-status-md.",
         "The FPA plugin already owns its MPF values in a native slice with source-aware copy receipts and ascending cleanup. The subpaving MPF wrapper now owns its coefficient numerals in a separate typed slice; reserve extends logical size and Close deletes the retained slots in ascending order.",
-        "Rational subpaving mk_sum uses a typed slice for its retained coefficient scratch: growth creates zero numerals through num_vars, indexed copies precede sorted swaps, and context Close deletes every scratch numeral in ascending order."
+        "Rational subpaving mk_sum uses a typed slice for its retained coefficient scratch: growth creates zero numerals through num_vars, indexed copies precede sorted swaps, and context Close deletes every scratch numeral in ascending order.",
+        "The context_mpq_wrapper owns its separate typed rational coefficient slice and constant across sums. Tactic engine Close deletes all wrapper coefficients in ascending order, then the scalar, then the context."
       ],
       "deviations": [
         "Concrete Int, Rational, MPBQ, MPFF and mpzzp vectors retain manager-specific storage and ownership. The subpaving converter uses the Int vector for cached numerator and denominator copies. The FPA plugin and MPF subpaving coefficient wrapper each use an owner-local native MPF slice; rational subpaving uses an owner-local native Rational slice. Context_mpf construction remains open. Other retained source instantiations stay partial until a live caller is ported. The unused any-valued callback vector was removed.",

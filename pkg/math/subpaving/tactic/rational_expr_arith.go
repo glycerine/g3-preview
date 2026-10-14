@@ -210,11 +210,7 @@ func (c *RationalExprConverter) processAdd(t ast.ASTHandle, n, d *numeral.Int) (
 	constant, argConstant := numeral.NewRational(), numeral.NewRational()
 	var argN, argD, factor, sumConstant numeral.Int
 	var numerators, denominators []numeral.Int
-	coefficients := []numeral.Rational{}
 	defer func() {
-		for i := range coefficients {
-			err = errors.Join(err, qm.Del(&coefficients[i]))
-		}
 		for i := range denominators {
 			err = errors.Join(err, z.Del(&denominators[i]))
 		}
@@ -285,20 +281,15 @@ func (c *RationalExprConverter) processAdd(t ast.ASTHandle, n, d *numeral.Int) (
 		}
 		return math.MaxUint32, c.cacheResult(t, math.MaxUint32, n, d)
 	}
-	if err = qm.SetInteger(&constant, &sumConstant); err != nil {
-		return 0, err
-	}
+	coefficientPointers := make([]*numeral.Int, len(numerators))
 	for i := range vars {
-		coefficients = append(coefficients, numeral.NewRational())
-		if err = qm.SetInteger(&coefficients[i], &numerators[i]); err != nil {
-			return 0, err
-		}
+		coefficientPointers[i] = &numerators[i]
 	}
-	context, err := c.engine.Context()
+	shell, err := c.engine.Shell()
 	if err != nil {
 		return 0, err
 	}
-	variable, err = context.DefinePolynomial(&constant, coefficients, vars)
+	variable, err = shell.MkSum(&sumConstant, coefficientPointers, vars)
 	if err != nil {
 		return 0, err
 	}
