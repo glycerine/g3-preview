@@ -34,12 +34,6 @@ func (v *astScopedFloatVector) guard() error {
 	}
 	return nil
 }
-func (v *astScopedFloatVector) size() (uint32, error) {
-	if e := v.guard(); e != nil {
-		return 0, e
-	}
-	return uint32(len(v.values)), nil
-}
 func (v *astScopedFloatVector) at(i uint32) (unumeral.ArbitraryFloat, error) {
 	if e := v.guard(); e != nil {
 		return unumeral.ArbitraryFloat{}, e
@@ -66,20 +60,6 @@ func (v *astScopedFloatVector) reserve(n uint32) error {
 	return nil
 }
 
-// Publish a default element before SET so numerical failure retains that row.
-func (v *astScopedFloatVector) push(source *unumeral.ArbitraryFloat) error {
-	n, e := v.size()
-	if e != nil {
-		return e
-	}
-	if n == ^uint32(0) {
-		return arena.ErrBounds
-	}
-	if e = v.reserve(n + 1); e != nil {
-		return e
-	}
-	return v.set(n, source)
-}
 func (v *astScopedFloatVector) set(i uint32, source *unumeral.ArbitraryFloat) error {
 	if e := v.guard(); e != nil {
 		return e

@@ -22,9 +22,8 @@ func TestASTFloatingPointValueTableUsesActualMPFHashAndEquality(t *testing.T) {
 	astTestMust(t, p.numeric.SetComponents(&a, 8, 24, false, 3, &sig))
 	astTestMust(t, p.numeric.SetComponents(&b, 8, 24, true, 3, &sig))
 	astTestMust(t, p.numeric.SetComponents(&c, 8, 24, false, 3, &sig))
-	for _, n := range []*unumeral.ArbitraryFloat{&a, &b, &c} {
-		astTestMust(t, p.values.push(n))
-	}
+	// Reach the source mk_id owner for each value, including duplicate
+	// recycling and deletion after hash/equality canonicalization.
 	h0, e := p.numeric.Hash(&a)
 	astTestMust(t, e)
 	h1, e := p.numeric.Hash(&b)
@@ -32,8 +31,9 @@ func TestASTFloatingPointValueTableUsesActualMPFHashAndEquality(t *testing.T) {
 	if h0 != h1 {
 		t.Fatal("source hash ignores sign", h0, h1)
 	}
-	for i, want := range []uint32{0, 1, 0} {
-		got, e := p.internValueID(uint32(i))
+	for i, n := range []*unumeral.ArbitraryFloat{&a, &b, &c} {
+		want := []uint32{0, 1, 0}[i]
+		got, e := p.mkValueID(n)
 		astTestMust(t, e)
 		if got != want {
 			t.Fatal("actual equality instead of ID equality", i, got, want)

@@ -16782,7 +16782,7 @@
         "TestASTFloatingPointValueIDEveryActualReservationPrefix",
         "TestASTFloatingPointNativeValueBucketsGrowthCollisionAndReuse",
         "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
-        "TestASTFloatingPointScopedValueActualInlinePushPublication",
+        "TestASTFloatingPointScopedValueActualReserveSetPublication",
         "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren",
         "TestASTFloatingPointBooleanNumeralScopedValue",
         "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy",
@@ -16934,7 +16934,7 @@
       ],
       "tests": [
         "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
-        "TestASTFloatingPointScopedValueActualInlinePushPublication",
+        "TestASTFloatingPointScopedValueActualReserveSetPublication",
         "TestASTFloatingPointScopedValueInlineErasesCopyAcquisition",
         "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren",
         "TestASTFloatingPointScopedClassificationSourcePredicates",
@@ -16999,7 +16999,7 @@
           "go_target": "pkg/ast/ast_fpa_scoped_values.go",
           "tests": [
             "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
-            "TestASTFloatingPointScopedValueActualInlinePushPublication",
+            "TestASTFloatingPointScopedValueActualReserveSetPublication",
             "TestASTFloatingPointScopedValueInlineErasesCopyAcquisition",
             "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren"
           ]
@@ -152768,7 +152768,7 @@
           ],
           "tests": [
             "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
-            "TestASTFloatingPointScopedValueActualInlinePushPublication",
+            "TestASTFloatingPointScopedValueActualReserveSetPublication",
             "TestASTFloatingPointScopedValueGrowthKeepsHeapSignificand",
             "TestArbitraryShellCoefficientSourceConversionAndCleanup"
           ]
@@ -152848,7 +152848,7 @@
           "go_target": "pkg/ast/ast_fpa_scoped_values.go",
           "tests": [
             "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
-            "TestASTFloatingPointScopedValueActualInlinePushPublication",
+            "TestASTFloatingPointScopedValueActualReserveSetPublication",
             "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren"
           ]
         },
@@ -171417,7 +171417,7 @@
         "TestScopedRationalVectorIndependentLifecycleAndFailures",
         "TestScopedNumeralDeepCloneFailureCleanup",
         "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
-        "TestASTFloatingPointScopedValueActualInlinePushPublication",
+        "TestASTFloatingPointScopedValueActualReserveSetPublication",
         "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren",
         "TestArbitraryShellCoefficientSourceConversionAndCleanup",
         "TestRationalPolynomialScopedCoefficientGrowthAndReuse",
@@ -171603,7 +171603,7 @@
           ],
           "tests": [
             "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
-            "TestASTFloatingPointScopedValueActualInlinePushPublication",
+            "TestASTFloatingPointScopedValueActualReserveSetPublication",
             "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren",
             "TestArbitraryShellCoefficientSourceConversionAndCleanup"
           ]

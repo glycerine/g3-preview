@@ -32,7 +32,8 @@ func TestASTFloatingPointScopedValueGrowthKeepsHeapSignificand(t *testing.T) {
 	astTestMust(t, z.Power(&two, 100, &significand))
 	var source unumeral.ArbitraryFloat
 	astTestMust(t, p.numeric.SetComponents(&source, 8, 130, false, 0, &significand))
-	astTestMust(t, p.values.push(&source))
+	astTestMust(t, p.values.reserve(1))
+	astTestMust(t, p.values.set(0, &source))
 	astTestMust(t, p.numeric.Del(&source))
 	astTestMust(t, z.Del(&significand))
 	astTestMust(t, p.values.reserve(257))
@@ -62,8 +63,7 @@ func TestASTFloatingPointScopedValueNativeGrowthAndDefaults(t *testing.T) {
 	physical := m.numerals.RuntimeOwner().Stats()
 	m.BudgetField.FailAfter(0)
 	astTestMust(t, v.reserve(257))
-	n, e := v.size()
-	astTestMust(t, e)
+	n := uint32(len(v.values))
 	if n != 257 || m.BudgetField.Used() != before || m.numerals.RuntimeOwner().Stats() != physical {
 		t.Fatal("Go storage charged numerical arena", n)
 	}
@@ -86,7 +86,7 @@ func TestASTFloatingPointScopedValueNativeGrowthAndDefaults(t *testing.T) {
 	}
 }
 
-func TestASTFloatingPointScopedValueActualInlinePushPublication(t *testing.T) {
+func TestASTFloatingPointScopedValueActualReserveSetPublication(t *testing.T) {
 	m := astTestManager(t)
 	_, e := m.RegisterArithmeticPlugin()
 	astTestMust(t, e)
@@ -100,13 +100,13 @@ func TestASTFloatingPointScopedValueActualInlinePushPublication(t *testing.T) {
 
 	var source unumeral.ArbitraryFloat
 	astTestMust(t, p.numeric.SetComponents(&source, 8, 24, true, 7, &sig))
-	astTestMust(t, v.push(&source))
+	astTestMust(t, v.reserve(1))
+	astTestMust(t, v.set(0, &source))
 	got, e := v.at(0)
 	astTestMust(t, e)
 	equal, e := p.numeric.EqCore(&source, &got)
 	astTestMust(t, e)
-	n, e := v.size()
-	astTestMust(t, e)
+	n := uint32(len(v.values))
 	if !equal || n != 1 || len(v.values) != 1 {
 		t.Fatal("actual default-before-SET publication", got, source, n, len(v.values))
 	}
