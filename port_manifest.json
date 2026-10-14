@@ -149582,6 +149582,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/util/numeral/mpf_div_trace_test.go",
         "pkg/util/numeral/mpf_mul_trace.go",
         "pkg/util/numeral/mpf_mul_trace_test.go",
         "pkg/util/numeral/mpf_value_format.go",
@@ -149817,6 +149818,7 @@
         "pkg/util/numeral/mpf_sqrt_trace_test.go"
       ],
       "tests": [
+        "TestArbitraryFloatDivDebugTraceSourceOrderAndShortcut",
         "TestArbitraryFloatMulBugTraceSourceBoundaries",
         "TestArbitraryFloatToStringLiteralSpecialBranches",
         "TestArbitraryFloatToStringLiteralFiniteBranches",
@@ -150407,6 +150409,12 @@
       "methods_audited": true,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "mpf_manager::div mpf_dbg operand, unpacked, significand and quotient TRACE records at mpf.cpp:670-742",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_div.go",
+          "tests": ["TestArbitraryFloatDivDebugTraceSourceOrderAndShortcut"]
+        },
         {
           "name": "mpf_manager::mul mpf_mul_bug entry/result and mpf_dbg operand, unpacked, significand and product TRACE records at mpf.cpp:590-650,664",
           "status": "ported",
@@ -151117,6 +151125,7 @@
         "Checked OwnedString output now belongs to OwnedString.AppendTo; NumericTextStream receives a native counted Go string through AppendString. Counted output preserves embedded NUL bytes and whole-field width/alignment; CString output independently stops at first NUL. Failed sentries check owner lifetime while preserving width and skipping payload conversion. Removed the stream method accepting OwnedString, so the stream no longer depends on that project text owner. See PORT_PROGRESS.md#native-counted-text-at-the-numeric-stream-boundary."
       ],
       "deviations": [
+        "Retained mpf_manager::div emits mpf_dbg records after its format assertion, after unpacks and exponent subtraction, after quotient construction, and after sticky-bit adjustment before final rounding. Shortcut branches omit the inner quotient records. Trace-enabled and erased-build focused tests cover source line order; broader MPF ownership and trace work remain partial.",
         "Retained mpf_manager::mul emits mpf_mul_bug entry before the format assertion and a result after completed shortcut or general multiplication, including aliased output. The inner mpf_dbg records follow operand, unpacked, significand and pre-round product source order; shortcuts omit the inner records. Trace-enabled and erased-build focused tests cover source line headers and value text; the broader MPF port remains partial.",
         "mpf.cpp:1519-1569 numerical body and mpq.cpp:156-185 caller-specific decimal engine are integrated through the owned MPF text result and AST SMT2 float-real literal printer; the enclosing MPF and rational source units still require whole-unit audit. No new active original-driver assertions or whole MPF/rational unit completion credit. Default decimal/no-flags stream profile only; native locale/ABI profiles remain open. Qualified signed-host TLS test proves reached q NUM DT protection; guessed youngest verification-DT recipe is diagnostic only.",
         "mpf.cpp:1695-1711 represented Go INT64_MIN input refuses at reached undefined signed negation; no C++ assertion-prefix equivalence claimed. Signed-host TLS destructor-stop tests are actual owner-primitive guard domain, not ordinary mathematical allocation failure. New ToRational tests are adapted source assertions; no direct original mpf.cpp driver coverage or whole-unit completion credit.",

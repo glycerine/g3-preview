@@ -1,4 +1,4 @@
-// Source: src/util/mpf.cpp:590-592,664.
+// Source: src/util/mpf.cpp:590-650,664,670-742.
 package numeral
 
 import (
@@ -95,12 +95,12 @@ func (m *ArbitraryFloatManager) traceMulResult(out *ArbitraryFloat) {
 		})
 }
 
-func (m *ArbitraryFloatManager) traceMulDebugValue(label string, value *ArbitraryFloat, line int) {
+func (m *ArbitraryFloatManager) traceFloatDebugValue(function, label string, value *ArbitraryFloat, line int) {
 	tags := m.floatTraceTags()
 	if !tags.ShouldTrace("mpf_dbg") {
 		return
 	}
-	_ = tags.EmitConditional("mpf_dbg", "mul", "src/util/mpf.cpp", line,
+	_ = tags.EmitConditional("mpf_dbg", function, "src/util/mpf.cpp", line,
 		func() bool { return true }, func(w io.Writer) error {
 			if e := writeNumeralDisplayPart(w, label); e != nil {
 				return e
@@ -112,12 +112,12 @@ func (m *ArbitraryFloatManager) traceMulDebugValue(label string, value *Arbitrar
 		})
 }
 
-func (m *ArbitraryFloatManager) traceMulDebugInt(label string, value *Int, line int) {
+func (m *ArbitraryFloatManager) traceFloatDebugInt(function, label string, value *Int, line int) {
 	tags := m.floatTraceTags()
 	if !tags.ShouldTrace("mpf_dbg") {
 		return
 	}
-	_ = tags.EmitConditional("mpf_dbg", "mul", "src/util/mpf.cpp", line,
+	_ = tags.EmitConditional("mpf_dbg", function, "src/util/mpf.cpp", line,
 		func() bool { return true }, func(w io.Writer) error {
 			if e := writeNumeralDisplayPart(w, label); e != nil {
 				return e

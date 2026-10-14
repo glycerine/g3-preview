@@ -13,6 +13,8 @@ func (m *ArbitraryFloatManager) Div(mode ArbitraryFloatRoundingMode, x, y, out *
 	if modularSourceDebug && (x.SBits() != y.SBits() || x.EBits() != y.EBits()) {
 		return ErrIntegerAssertion
 	}
+	m.traceFloatDebugValue("div", "X = ", x, 670)
+	m.traceFloatDebugValue("div", "Y = ", y, 671)
 	for _, v := range [...]*ArbitraryFloat{x, y} {
 		nan, e := m.IsNaN(v)
 		if e != nil {
@@ -105,11 +107,15 @@ func (m *ArbitraryFloatManager) Div(mode ArbitraryFloatRoundingMode, x, y, out *
 	if e := m.unpackRationalNumeral(&s.b, true, context); e != nil {
 		return e
 	}
+	m.traceFloatDebugValue("div", "A = ", &s.a, 722)
+	m.traceFloatDebugValue("div", "B = ", &s.b, 723)
 	exponent, e := roundSignedSub(s.a.exponent, s.b.exponent)
 	if e != nil {
 		return e
 	}
 	out.exponent = exponent
+	m.traceFloatDebugInt("div", "A' = ", &s.a.significand, 727)
+	m.traceFloatDebugInt("div", "B' = ", &s.b.significand, 728)
 	extraBits := x.SBits() + 2
 	// This source call uses the two-argument in-place overload, without SET.
 	if e := z.check(&s.a.significand); e != nil {
@@ -121,6 +127,7 @@ func (m *ArbitraryFloatManager) Div(mode ArbitraryFloatRoundingMode, x, y, out *
 	if e := z.machineDivWithAllocationContext(&s.a.significand, &s.b.significand, &out.significand, context); e != nil {
 		return e
 	}
+	m.traceFloatDebugValue("div", "QUOTIENT = ", out, 734)
 	s.stickyLive = true
 	power, e := s.power(extraBits - 2)
 	if e != nil {
@@ -145,5 +152,6 @@ func (m *ArbitraryFloatManager) Div(mode ArbitraryFloatRoundingMode, x, y, out *
 			}
 		}
 	}
+	m.traceFloatDebugValue("div", "QUOTIENT' = ", out, 742)
 	return m.roundWithParentContext(mode, out, &s.roundReceipt, context)
 }
