@@ -163,6 +163,9 @@ func (m *ArbitraryFloatManager) addSubtract(mode ArbitraryFloatRoundingMode, x, 
 	if delta > int64(x.SBits()+2) {
 		delta = int64(x.SBits() + 2)
 	}
+	m.traceFloatDebugValue("add_sub", "A  = ", &s.a, 541)
+	m.traceFloatDebugValue("add_sub", "B  = ", &s.b, 542)
+	m.traceFloatDebugSigned("add_sub", "d  = ", delta, 543)
 	if e := z.shiftWithAllocationContext(&s.a.significand, 3, &s.a.significand, true, context); e != nil {
 		return e
 	}
@@ -177,7 +180,14 @@ func (m *ArbitraryFloatManager) addSubtract(mode ArbitraryFloatRoundingMode, x, 
 	if e := z.machineDivRemWithAllocationContext(&s.b.significand, &p, &s.b.significand, &s.sticky, context); e != nil {
 		return e
 	}
+	m.traceFloatDebugInt("add_sub", "A' = ", &s.a.significand, 554)
+	m.traceFloatDebugInt("add_sub", "B' = ", &s.b.significand, 555)
 	subtract := s.a.Sign() != s.b.Sign()
+	if subtract {
+		m.traceFloatDebugText("add_sub", "SUBTRACTING", 559)
+	} else {
+		m.traceFloatDebugText("add_sub", "ADDING", 565)
+	}
 	if e := z.addSubWithAllocationContext(&s.a.significand, &s.b.significand, &out.significand, subtract, context); e != nil {
 		return e
 	}
@@ -197,6 +207,7 @@ func (m *ArbitraryFloatManager) addSubtract(mode ArbitraryFloatRoundingMode, x, 
 			}
 		}
 	}
+	m.traceFloatDebugInt("add_sub", "sum[-2:sbits+2] = ", &out.significand, 571)
 	zero, e := z.IsZero(&out.significand)
 	if e != nil {
 		return e
@@ -208,9 +219,11 @@ func (m *ArbitraryFloatManager) addSubtract(mode ArbitraryFloatRoundingMode, x, 
 	if e != nil {
 		return e
 	}
+	m.traceFloatDebugText("add_sub", "NEG="+traceBoolDigit(negative), 577)
 	if e := z.Abs(&out.significand); e != nil {
 		return e
 	}
+	m.traceFloatDebugInt("add_sub", "fs[-1:sbits+2] = ", &out.significand, 579)
 	out.assignSign(!s.a.Sign() && s.b.Sign() && negative || s.a.Sign() && !s.b.Sign() && !negative || s.a.Sign() && s.b.Sign())
 	out.exponent = s.a.exponent
 	return m.roundWithParentContext(mode, out, &s.roundReceipt, context)

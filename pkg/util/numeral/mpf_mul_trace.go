@@ -1,4 +1,4 @@
-// Source: src/util/mpf.cpp:590-650,664,670-742.
+// Source: src/util/mpf.cpp:541-579,590-650,664,670-742.
 package numeral
 
 import (
@@ -127,5 +127,27 @@ func (m *ArbitraryFloatManager) traceFloatDebugInt(function, label string, value
 				return e
 			}
 			return writeNumeralDisplayPart(w, s+"\n")
+		})
+}
+
+func (m *ArbitraryFloatManager) traceFloatDebugText(function, value string, line int) {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return
+	}
+	_ = tags.EmitConditional("mpf_dbg", function, "src/util/mpf.cpp", line,
+		func() bool { return true }, func(w io.Writer) error {
+			return writeNumeralDisplayPart(w, value+"\n")
+		})
+}
+
+func (m *ArbitraryFloatManager) traceFloatDebugSigned(function, label string, value int64, line int) {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return
+	}
+	_ = tags.EmitConditional("mpf_dbg", function, "src/util/mpf.cpp", line,
+		func() bool { return true }, func(w io.Writer) error {
+			return writeNumeralDisplayPart(w, label+strconv.FormatInt(value, 10)+"\n")
 		})
 }
