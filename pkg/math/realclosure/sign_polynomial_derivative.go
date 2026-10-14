@@ -25,11 +25,11 @@ func (s *realValueStore) derivativeRationalPolynomial(coefficients []*realValue)
 			return nil, err
 		}
 		product, err := s.multiplyRationals(scalar, coefficients[i])
-		if releaseErr := s.release(scalar); err == nil {
+		if releaseErr := s.releaseSturmScratch(scalar); err == nil {
 			err = releaseErr
 		}
 		if err != nil {
-			_ = s.release(product)
+			_ = s.releaseSturmScratch(product)
 			_ = s.releaseSturmCoefficients(result)
 			return nil, err
 		}

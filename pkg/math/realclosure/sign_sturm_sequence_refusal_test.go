@@ -186,3 +186,63 @@ func TestRealClosureSturmTemporaryRefusalPrecedesOlderRows(t *testing.T) {
 		t.Fatal("physical cleanup retained bytes", used)
 	}
 }
+
+func TestRealClosureSturmScratchRefusalRetainsValue(t *testing.T) {
+	budget := arena.NewBudget(1 << 24)
+	runtime, err := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 32})
+	if err != nil {
+		t.Fatal(err)
+	}
+	service, err := numeral.NewRationalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{
+		Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}},
+		Memory: runtime, Profile: umemory.SmallAllocatorProfile{PointerBits: 32},
+	}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	store := &realValueStore{numbers: service.Manager}
+	scratch, err := store.newRational(1, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := store.numbers.SetString(&scratch.rational, "18446744073709551617"); err != nil {
+		t.Fatal(err)
+	}
+	z := service.Manager.Z
+	ref := scratch.rational.Num.Cell
+	if ref == 0 {
+		t.Fatal("scratch has no physical numeric cell")
+	}
+	original := z.Cell(ref)
+	bad := original
+	bad.Backing.Requested = uint64(math.MaxUint32) + 1
+	z.Store(ref, bad)
+	if err := store.releaseSturmScratch(scratch); !errors.Is(err, arena.ErrBounds) {
+		t.Fatal("scratch destructor refusal", err)
+	}
+	if scratch.deleted || len(store.pendingSturmCoefficients) != 1 || len(store.pendingSturmCoefficients[0]) != 1 || store.pendingSturmCoefficients[0][0] != scratch {
+		t.Fatal("scratch owner did not retain the refused value")
+	}
+	if err := store.sequenceReady(); !errors.Is(err, errRealClosureSequencePending) {
+		t.Fatal("pending scratch allowed a new sequence", err)
+	}
+	if err := store.cleanupPendingPolynomialSequence(); !errors.Is(err, arena.ErrBounds) {
+		t.Fatal("refused scratch retry", err)
+	}
+	z.Store(ref, original)
+	if err := store.cleanupPendingPolynomialSequence(); err != nil {
+		t.Fatal(err)
+	}
+	if !scratch.deleted || store.pendingSturmCoefficients != nil {
+		t.Fatal("scratch did not drain")
+	}
+	if err := service.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err := runtime.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if used := budget.Used(); used != 0 {
+		t.Fatal("physical cleanup retained bytes", used)
+	}
+}

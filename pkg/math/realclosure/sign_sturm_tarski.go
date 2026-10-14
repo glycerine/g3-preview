@@ -49,7 +49,17 @@ func (s *realValueStore) releaseSturmCoefficients(values []*realValue) error {
 	return nil
 }
 
-// cleanupPendingPolynomialSequence finishes younger temporary coefficient
+// releaseSturmScratch retains a standalone temporary when its final release
+// refuses; it has no coefficient slice to carry it into later cleanup.
+func (s *realValueStore) releaseSturmScratch(value *realValue) error {
+	if err := s.release(value); err != nil {
+		s.pendingSturmCoefficients = append(s.pendingSturmCoefficients, []*realValue{value})
+		return err
+	}
+	return nil
+}
+
+// cleanupPendingPolynomialSequence finishes younger coefficient and scratch
 // groups before the older retained row sequence.
 func (s *realValueStore) cleanupPendingPolynomialSequence() error {
 	if s == nil {

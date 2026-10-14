@@ -112,34 +112,34 @@ func (s *realValueStore) signedRemainderRational(left, right []*realValue) ([]*r
 		for i := 0; i < len(right)-1; i++ {
 			product, err := s.multiplyRationals(ratio, right[i])
 			if err != nil {
-				_ = s.release(ratio)
+				_ = s.releaseSturmScratch(ratio)
 				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
 			index := i + shift
 			updated, err := s.subtractRationals(result[index], product)
 			if err != nil {
-				_ = s.release(product)
-				_ = s.release(ratio)
+				_ = s.releaseSturmScratch(product)
+				_ = s.releaseSturmScratch(ratio)
 				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
 			if err := s.release(result[index]); err != nil {
-				_ = s.release(updated)
-				_ = s.release(product)
-				_ = s.release(ratio)
+				_ = s.releaseSturmScratch(updated)
+				_ = s.releaseSturmScratch(product)
+				_ = s.releaseSturmScratch(ratio)
 				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
-			if err := s.release(product); err != nil {
-				_ = s.release(updated)
-				_ = s.release(ratio)
+			if err := s.releaseSturmScratch(product); err != nil {
+				_ = s.releaseSturmScratch(updated)
+				_ = s.releaseSturmScratch(ratio)
 				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
 			result[index] = updated
 		}
-		if err := s.release(ratio); err != nil {
+		if err := s.releaseSturmScratch(ratio); err != nil {
 			_ = s.releaseSturmCoefficients(result)
 			return nil, err
 		}
@@ -159,7 +159,7 @@ func (s *realValueStore) signedRemainderRational(left, right []*realValue) ([]*r
 			return nil, err
 		}
 		if err := s.release(value); err != nil {
-			_ = s.release(negated)
+			_ = s.releaseSturmScratch(negated)
 			_ = s.releaseSturmCoefficients(result)
 			return nil, err
 		}

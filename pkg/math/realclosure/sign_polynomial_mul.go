@@ -104,18 +104,18 @@ func (s *realValueStore) multiplyRationalPolynomials(left, right []*realValue) (
 			}
 			sum, err := s.addRationals(result[i+j], product)
 			if err != nil {
-				_ = s.release(product)
+				_ = s.releaseSturmScratch(product)
 				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
 			if err := s.release(result[i+j]); err != nil {
-				_ = s.release(sum)
-				_ = s.release(product)
+				_ = s.releaseSturmScratch(sum)
+				_ = s.releaseSturmScratch(product)
 				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
-			if err := s.release(product); err != nil {
-				_ = s.release(sum)
+			if err := s.releaseSturmScratch(product); err != nil {
+				_ = s.releaseSturmScratch(sum)
 				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}

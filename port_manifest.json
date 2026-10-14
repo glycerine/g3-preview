@@ -50127,7 +50127,8 @@
           "tests": [
             "TestRealClosureRationalSturmSequenceOwnsBorrowedCoefficients",
             "TestRealClosureSturmSequenceRefusedDestructorRetainsRows",
-            "TestRealClosureSturmTemporaryRefusalPrecedesOlderRows"
+            "TestRealClosureSturmTemporaryRefusalPrecedesOlderRows",
+            "TestRealClosureSturmScratchRefusalRetainsValue"
           ]
         },
         {
