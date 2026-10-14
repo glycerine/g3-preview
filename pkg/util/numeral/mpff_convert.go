@@ -150,7 +150,7 @@ func (m *FastFloatManager) SetInteger(a *FastFloat, z *IntegerManager, v *Int) e
 	m.traceSetIntegerResult(a)
 	return m.debugCheck(a)
 }
-func (m *FastFloatManager) SetRational(a *FastFloat, qm *RationalManager, v *Rational) error {
+func (m *FastFloatManager) SetRational(a *FastFloat, qm *RationalManager, v *Rational) (err error) {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -160,21 +160,29 @@ func (m *FastFloatManager) SetRational(a *FastFloat, qm *RationalManager, v *Rat
 	if e := qm.check(v); e != nil {
 		return e
 	}
-	var n, d FastFloat
-	defer func() { m.Del(&d); m.Del(&n) }()
-	if e := m.SetInteger(&n, qm.Z, &v.Num); e != nil {
+	m.rationalNum, m.rationalDen = FastFloat{}, FastFloat{}
+	m.rationalPending = true
+	m.rationalCursor = 0
+	m.rationalExecuting = true
+	defer func() {
+		if cleanup := m.cleanupSetRationalTemporaries(); err == nil {
+			err = cleanup
+		}
+		m.rationalExecuting = false
+	}()
+	if e := m.SetInteger(&m.rationalNum, qm.Z, &v.Num); e != nil {
 		return e
 	}
 	e := func() error {
 		old := m.toPlus
 		m.toPlus = !old
 		defer func() { m.toPlus = old }()
-		return m.SetInteger(&d, qm.Z, &v.Den)
+		return m.SetInteger(&m.rationalDen, qm.Z, &v.Den)
 	}()
 	if e != nil {
 		return e
 	}
-	return m.Div(&n, &d, a)
+	return m.Div(&m.rationalNum, &m.rationalDen, a)
 }
 func (m *FastFloatManager) Significand(a *FastFloat, z *IntegerManager, out *Int) error {
 	if e := m.check(a); e != nil {

@@ -154167,7 +154167,8 @@
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
             "TestFastFloatOwnerProvenance",
-            "TestFastFloatNeighborAndThinRoutes"
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatSetRationalTemporariesRetainSourceCleanupOrder"
           ]
         },
         {
@@ -154587,7 +154588,8 @@
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
             "TestFastFloatOwnerProvenance",
-            "TestFastFloatNeighborAndThinRoutes"
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatSetRationalTemporariesRetainSourceCleanupOrder"
           ]
         },
         {

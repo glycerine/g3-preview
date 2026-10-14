@@ -61,6 +61,7 @@ var ErrFastFloatDivisionByZero error = &fastFloatException{message: "multi-preci
 var ErrFastFloatInvariant = errors.New("mpnum: MPFF source invariant")
 var ErrFastFloatPowerDomain = errors.New("mpnum: MPFF power mask wrapped into nontermination")
 var ErrFastFloatPowerPending = errors.New("mpnum: MPFF power scoped cleanup pending")
+var ErrFastFloatRationalPending = errors.New("mpnum: MPFF rational setter cleanup pending")
 var ErrFastFloatOwner = errors.New("mpnum: invalid MPFF owner or dead significand")
 
 // Cold owner: owns its buffers and services, borrowing a configured Runtime; caller numerical
@@ -81,6 +82,9 @@ type FastFloatManager struct {
 	powerWork, powerTrace                      FastFloat
 	powerWorkPending, powerTracePending        bool
 	powerExecuting                             bool
+	rationalNum, rationalDen                   FastFloat
+	rationalPending, rationalExecuting         bool
+	rationalCursor                             uint8
 }
 
 func NewFastFloatManager(c FastFloatConfig) (*FastFloatManager, error) {
@@ -147,6 +151,9 @@ func (m *FastFloatManager) open() error {
 	}
 	if (m.powerWorkPending || m.powerTracePending) && !m.powerExecuting {
 		return ErrFastFloatPowerPending
+	}
+	if m.rationalPending && !m.rationalExecuting {
+		return ErrFastFloatRationalPending
 	}
 	return nil
 }
@@ -308,8 +315,14 @@ func (m *FastFloatManager) CloseChecked() error {
 	if m.powerExecuting {
 		return ErrFastFloatPowerPending
 	}
+	if m.rationalExecuting {
+		return ErrFastFloatRationalPending
+	}
 	m.closing = true
 	if e := m.CleanupPowerTemporaries(); e != nil {
+		return e
+	}
+	if e := m.CleanupSetRationalTemporaries(); e != nil {
 		return e
 	}
 	if m.natural != nil {
@@ -391,6 +404,41 @@ func (m *FastFloatManager) CleanupPowerTemporaries() error {
 		return e
 	}
 	return m.cleanupPowerTrace()
+}
+
+func (m *FastFloatManager) cleanupSetRationalTemporaries() error {
+	if !m.rationalPending {
+		return nil
+	}
+	roots := [2]*FastFloat{&m.rationalDen, &m.rationalNum}
+	for m.rationalCursor < 2 {
+		if e := m.Del(roots[m.rationalCursor]); e != nil {
+			return e
+		}
+		*roots[m.rationalCursor] = FastFloat{}
+		m.rationalCursor++
+	}
+	m.rationalPending = false
+	m.rationalCursor = 0
+	return nil
+}
+
+// CleanupSetRationalTemporaries resumes the scoped denominator then numerator.
+func (m *FastFloatManager) CleanupSetRationalTemporaries() error {
+	if m == nil || m.self != m {
+		return ErrFastFloatOwner
+	}
+	if m.rationalExecuting {
+		return ErrFastFloatRationalPending
+	}
+	closing := m.closing
+	m.closing = false
+	m.rationalExecuting = true
+	defer func() {
+		m.rationalExecuting = false
+		m.closing = closing
+	}()
+	return m.cleanupSetRationalTemporaries()
 }
 
 func (m *FastFloatManager) Precise() bool { return false }
