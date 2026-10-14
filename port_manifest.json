@@ -73417,6 +73417,8 @@
       "tests": [
         "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
         "TestSATSolverModelConverterActualCollectVars",
+        "TestSATSolverUintSetNativeGrowthAndReset",
+        "TestSATSolverUintSetIndependentNativeModel",
         "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
         "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
         "TestSATSolverModelConverterDebugAssertionBeforeLaterInvalidLiteral",
@@ -177475,6 +177477,8 @@
         "TestSATNativeActivityGrowthAndLogicalBounds",
         "TestSATSolverModelConverterActualClauseAndWrapperRoutes",
         "TestSATSolverModelConverterActualCollectVars",
+        "TestSATSolverUintSetNativeGrowthAndReset",
+        "TestSATSolverUintSetIndependentNativeModel",
         "TestSATSolverModelConverterColdRefusalsAndNativeInsert",
         "TestSATSolverModelConverterCopyAppendAndSourceBitFields",
         "TestSATSolverModelConverterDebugAssertionBeforeLaterInvalidLiteral",
@@ -177802,9 +177806,12 @@
           ]
         },
         {
-          "name": "vector<sat::model_converter::entry> growth/deep copy and sat::uint_set member svector storage",
-          "status": "partial",
+          "name": "Retained SAT model-converter entry vector growth/deep copy and selected uint_set membership/value svectors replaced by typed Go slices",
+          "status": "platform_replacement",
           "go_target": "pkg/sat/sat_solver_model_converter.go",
+          "go_targets": [
+            "pkg/sat/sat_solver_uint_set.go"
+          ],
           "tests": [
             "TestSATSolverModelConverterReversePatchAndBlockedFlip",
             "TestSATSolverModelConverterSourceOtherUndefinedAndDisplay",
@@ -177817,7 +177824,9 @@
             "TestSATSolverNativeLiteralGrowthCopyAndOracle",
             "TestSATSolverNativeLiteralColdHeaderAndLifetime",
             "TestSATSolverNativeModelEntryGrowthStableRefsAndCopy",
-            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction"
+            "TestSATSolverNativeModelColdBudgetAndIndependentReconstruction",
+            "TestSATSolverUintSetNativeGrowthAndReset",
+            "TestSATSolverUintSetIndependentNativeModel"
           ]
         },
         {
