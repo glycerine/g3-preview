@@ -542,17 +542,23 @@ func (s *RationalService) facadeCompareLocked(a, b *OwnedRational, op uint8) (bo
 	}
 	if op == 0 {
 		v, e := s.Manager.Equal(&a.Raw, &b.Raw)
-		return !v, e
+		if e != nil {
+			return false, e
+		}
+		return !v, nil
 	}
 	x, y := a, b
 	if op == 2 || op == 3 {
 		x, y = b, a
 	}
 	c, e := s.Manager.Compare(&x.Raw, &y.Raw)
-	if op == 3 || op == 4 {
-		return c >= 0, e
+	if e != nil {
+		return false, e
 	}
-	return c < 0, e
+	if op == 3 || op == 4 {
+		return c >= 0, nil
+	}
+	return c < 0, nil
 }
 func (s *RationalService) facadeCompare(a, b *OwnedRational, op uint8) (bool, error) {
 	if e := s.lock(); e != nil {
@@ -580,6 +586,11 @@ func (s *RationalService) facadeCompareInt(a *OwnedRational, n int32, op uint8) 
 	if e := s.beginLexical(); e != nil {
 		return false, e
 	}
+	defer func() {
+		if _lexErr != nil {
+			_lexValue = false
+		}
+	}()
 	defer s.endLexicalError(&_lexErr)
 	if e := s.rationalScalarOwner(a); e != nil {
 		return false, e
