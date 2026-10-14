@@ -60,6 +60,61 @@ func TestRationalSetStringTraceInsertionAndEndlBoundaries(t *testing.T) {
 	}
 }
 
+func TestRationalSetStringTraceEndlRefusalKeepsNumericResult(t *testing.T) {
+	s, _ := serviceNew(t)
+	m := s.Manager
+	refusal := errors.New("trace body flush refused")
+	w := &mpfEndlWriter{failAt: 2, refusal: refusal}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpq_set")
+	if err := m.BindTrace(tags); err != nil {
+		t.Fatal(err)
+	}
+	a := NewRational()
+	if err := m.SetString(&a, "1.25e-2"); err != nil {
+		t.Fatal(err)
+	}
+	got, err := m.String(&a)
+	if err != nil || got != "1/80" {
+		t.Fatal("source parser changed result after TRACE stream failure", got, err)
+	}
+	if !tags.ShouldTrace("mpq_set") {
+		if len(w.events) != 0 {
+			t.Fatal("erased source trace wrote", w.events)
+		}
+	} else {
+		if w.flushes != 4 {
+			t.Fatal("source endl and reached TRACE footer flush calls", w.events)
+		}
+		bodyEnd := -1
+		for i, event := range w.events {
+			if event == "write:\n" {
+				bodyEnd = i
+			}
+		}
+		if bodyEnd < 0 || bodyEnd+1 >= len(w.events) {
+			t.Fatal("source std::endl missing", w.events)
+		}
+		for _, event := range w.events[bodyEnd+1:] {
+			if event != "flush" {
+				t.Fatal("failed source trace stream wrote after endl refusal", w.events)
+			}
+		}
+		before := len(w.events)
+		if err := m.SetString(&a, "2e3"); err != nil {
+			t.Fatal(err)
+		}
+		for _, event := range w.events[before:] {
+			if event != "flush" {
+				t.Fatal("failed source trace stream wrote on later parse", w.events[before:])
+			}
+		}
+	}
+	if err := m.Del(&a); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestRationalSetStringRetainedTraceBranches(t *testing.T) {
 	s, _ := serviceNew(t)
 	m := s.Manager

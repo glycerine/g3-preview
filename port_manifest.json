@@ -157213,7 +157213,8 @@
           "go_target": "pkg/util/numeral/mpq_parse_trace.go",
           "tests": [
             "TestRationalSetStringRetainedTraceBranches",
-            "TestRationalSetStringTraceInsertionAndEndlBoundaries"
+            "TestRationalSetStringTraceInsertionAndEndlBoundaries",
+            "TestRationalSetStringTraceEndlRefusalKeepsNumericResult"
           ]
         }
       ],
@@ -158868,7 +158869,8 @@
           "go_target": "pkg/util/numeral/mpq_parse_trace.go",
           "tests": [
             "TestRationalSetStringRetainedTraceBranches",
-            "TestRationalSetStringTraceInsertionAndEndlBoundaries"
+            "TestRationalSetStringTraceInsertionAndEndlBoundaries",
+            "TestRationalSetStringTraceEndlRefusalKeepsNumericResult"
           ]
         }
       ],
@@ -175540,7 +175542,8 @@
           "go_target": "pkg/util/numeral/mpq_parse_trace.go",
           "tests": [
             "TestRationalSetStringRetainedTraceBranches",
-            "TestRationalSetStringTraceInsertionAndEndlBoundaries"
+            "TestRationalSetStringTraceInsertionAndEndlBoundaries",
+            "TestRationalSetStringTraceEndlRefusalKeepsNumericResult"
           ]
         },
         {
@@ -176025,7 +176028,8 @@
           "go_target": "pkg/util/numeral/mpq_parse_trace.go",
           "tests": [
             "TestRationalSetStringRetainedTraceBranches",
-            "TestRationalSetStringTraceInsertionAndEndlBoundaries"
+            "TestRationalSetStringTraceInsertionAndEndlBoundaries",
+            "TestRationalSetStringTraceEndlRefusalKeepsNumericResult"
           ]
         },
         {
