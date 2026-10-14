@@ -8,6 +8,58 @@ import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
+func TestRationalSetStringTraceInsertionAndEndlBoundaries(t *testing.T) {
+	s, _ := serviceNew(t)
+	m := s.Manager
+	w := &mpfEndlWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpq_set")
+	if err := m.BindTrace(tags); err != nil {
+		t.Fatal(err)
+	}
+	a := NewRational()
+	if err := m.SetString(&a, "1.25e-2"); err != nil {
+		t.Fatal(err)
+	}
+	if err := m.Del(&a); err != nil {
+		t.Fatal(err)
+	}
+	if !tags.ShouldTrace("mpq_set") {
+		if len(w.events) != 0 {
+			t.Fatal("erased source trace wrote", w.events)
+		}
+		return
+	}
+	// The first record has a literal newline. The next two use std::endl,
+	// which flushes before TRACE writes its footer and flushes again.
+	for _, want := range [][]string{
+		{"write:[before] a: ", "write:1", "write:\n"},
+		{"write:[exp]: ", "write:2", "write:, str[0]: ", "write:2", "write:\n", "flush"},
+		{"write:a: ", "write:5/4", "write:, exp_sign:", "write:1", "write:, exp: ", "write:2", "write: ", "write:100", "write:\n", "flush"},
+	} {
+		found := false
+		for i := 0; i+len(want) <= len(w.events); i++ {
+			match := true
+			for j, event := range want {
+				if w.events[i+j] != event {
+					match = false
+					break
+				}
+			}
+			if match {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Fatalf("missing source insertion sequence %q in %q", want, w.events)
+		}
+	}
+	if w.flushes != 5 {
+		t.Fatal("three TRACE footer flushes plus two std::endl flushes", w.flushes, w.events)
+	}
+}
+
 func TestRationalSetStringRetainedTraceBranches(t *testing.T) {
 	s, _ := serviceNew(t)
 	m := s.Manager

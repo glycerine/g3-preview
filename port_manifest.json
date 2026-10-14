@@ -157212,7 +157212,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpq_parse_trace.go",
           "tests": [
-            "TestRationalSetStringRetainedTraceBranches"
+            "TestRationalSetStringRetainedTraceBranches",
+            "TestRationalSetStringTraceInsertionAndEndlBoundaries"
           ]
         }
       ],
@@ -158866,7 +158867,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpq_parse_trace.go",
           "tests": [
-            "TestRationalSetStringRetainedTraceBranches"
+            "TestRationalSetStringRetainedTraceBranches",
+            "TestRationalSetStringTraceInsertionAndEndlBoundaries"
           ]
         }
       ],
@@ -175537,7 +175539,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpq_parse_trace.go",
           "tests": [
-            "TestRationalSetStringRetainedTraceBranches"
+            "TestRationalSetStringRetainedTraceBranches",
+            "TestRationalSetStringTraceInsertionAndEndlBoundaries"
           ]
         },
         {
@@ -176021,7 +176024,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpq_parse_trace.go",
           "tests": [
-            "TestRationalSetStringRetainedTraceBranches"
+            "TestRationalSetStringRetainedTraceBranches",
+            "TestRationalSetStringTraceInsertionAndEndlBoundaries"
           ]
         },
         {
