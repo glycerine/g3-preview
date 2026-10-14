@@ -121034,6 +121034,7 @@
         "pkg/util/numeral/mpf_numeral.go",
         "pkg/util/numeral/mpf_numeral_interval.go",
         "pkg/util/numeral/mpf_numeral_arithmetic.go",
+        "pkg/util/numeral/mpf_numeral_raw_scope.go",
         "pkg/util/numeral/mpf_numeral_rational_string.go",
         "pkg/util/numeral/mpf_numeral_lifetime.go",
         "pkg/math/subpaving/arbitrary_context_root.go",
@@ -121075,6 +121076,8 @@
         "TestArbitraryFloatNumeralSourcePredicatesAndOrder",
         "TestArbitraryFloatNumeralSourceFloorCeilAndClose",
         "TestArbitraryFloatNumeralSourceReciprocalIncrementAndPower",
+        "TestArbitraryFloatNumeralRawLocalSourceEndAndOwningRetry",
+        "TestArbitraryFloatNumeralPowerStoppedBodyRetainsRawLocal",
         "TestArbitraryFloatNumeralSourceRationalString",
         "TestArbitraryFloatNumeralSourceStringAndDisplay",
         "TestArbitraryFloatNumeralSourceSwapAndDel",
@@ -121214,7 +121217,9 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_numeral_arithmetic.go",
           "tests": [
-            "TestArbitraryFloatNumeralSourceReciprocalIncrementAndPower"
+            "TestArbitraryFloatNumeralSourceReciprocalIncrementAndPower",
+            "TestArbitraryFloatNumeralRawLocalSourceEndAndOwningRetry",
+            "TestArbitraryFloatNumeralPowerStoppedBodyRetainsRawLocal"
           ]
         },
         {

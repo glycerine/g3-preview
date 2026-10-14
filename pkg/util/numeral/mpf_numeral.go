@@ -9,6 +9,7 @@ import (
 )
 
 var ErrArbitraryFloatNonRegular = errors.New("numeral: non-regular arbitrary float")
+var ErrArbitraryFloatNumeralRawPending = errors.New("numeral: arbitrary-float numeral raw local cleanup pending")
 
 // ArbitraryFloatNumeralManager is the concrete subpaving f2n<mpf_manager>
 // wrapper. It borrows core and owns its source scratch numerals.
@@ -17,6 +18,8 @@ type ArbitraryFloatNumeralManager struct {
 	mode         ArbitraryFloatRoundingMode
 	ebits, sbits uint32
 	tmp, one     ArbitraryFloat
+	rawLocal     ArbitraryFloat
+	rawPending   bool
 	closed       bool
 }
 
@@ -66,6 +69,9 @@ func (m *ArbitraryFloatNumeralManager) Close() error {
 	}
 	if m.closed {
 		return nil
+	}
+	if e := m.CleanupRawLocal(); e != nil {
+		return e
 	}
 	if e := m.core.Del(&m.tmp); e != nil {
 		return e
