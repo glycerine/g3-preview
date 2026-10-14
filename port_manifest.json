@@ -98588,11 +98588,13 @@
       "go_targets": [
         "pkg/tactic/arith/polynomial_builder.go",
         "pkg/tactic/arith/polynomial_builder_test.go",
-        "pkg/tactic/arith/polynomial_subsumption_test.go"
+        "pkg/tactic/arith/polynomial_subsumption_test.go",
+        "pkg/tactic/arith/polynomial_process_bound_test.go"
       ],
       "tests": [
         "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer",
-        "TestInequalityPolynomialSubsumptionUsesOwnedCoefficientBuffer"
+        "TestInequalityPolynomialSubsumptionUsesOwnedCoefficientBuffer",
+        "TestInequalityPolynomialBuilderProcessBoundSourceNormalization"
       ],
       "assertions": [
         {
@@ -98621,6 +98623,14 @@
           "go_target": "pkg/tactic/arith/polynomial_builder.go",
           "tests": [
             "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer"
+          ]
+        },
+        {
+          "name": "Concrete process equality and ordered-bound classification, parity of NOT, numeral-left swap, exact threshold copy and bound publication (src/tactic/arith/propagate_ineqs_tactic.cpp:175-249)",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/polynomial_builder.go",
+          "tests": [
+            "TestInequalityPolynomialBuilderProcessBoundSourceNormalization"
           ]
         },
         {

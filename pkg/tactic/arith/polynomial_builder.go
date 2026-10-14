@@ -214,6 +214,107 @@ func (b *PolynomialBuilder) MkLinearPolynomial(term ast.ASTHandle) (uint32, erro
 	return x, err
 }
 
+// ProcessBound is the source process(expr*) branch for equality and ordered
+// arithmetic bounds. It consumes neither the expression nor a numeral owner;
+// a recognized bound is published before returning true.
+func (b *PolynomialBuilder) ProcessBound(term ast.ASTHandle) (processed bool, err error) {
+	if err = b.open(); err != nil {
+		return false, err
+	}
+	negated := false
+	for {
+		isNot, child, e := b.manager.IsNot(term)
+		if e != nil {
+			return false, e
+		}
+		if !isNot {
+			break
+		}
+		negated = !negated
+		term = child
+	}
+	kind, err := b.manager.GetKind(term)
+	if err != nil || kind != ast.ASTApp {
+		return false, err
+	}
+	family, err := b.manager.GetFamilyID(term)
+	if err != nil {
+		return false, err
+	}
+	op, err := b.manager.GetDeclKind(term)
+	if err != nil {
+		return false, err
+	}
+	const (
+		boundEqual = iota
+		boundLessEqual
+		boundGreaterEqual
+	)
+	bound := boundEqual
+	strict := false
+	switch {
+	case family == b.manager.BasicFamilyID() && op == ast.ASTOpEq:
+		if negated {
+			return false, nil
+		}
+	case family == b.family && op == 2:
+		bound = boundLessEqual
+		if negated {
+			bound, strict = boundGreaterEqual, true
+		}
+	case family == b.family && op == 3:
+		bound = boundGreaterEqual
+		if negated {
+			bound, strict = boundLessEqual, true
+		}
+	default:
+		return false, nil
+	}
+	lhs, err := b.manager.GetArg(term, 0)
+	if err != nil {
+		return false, err
+	}
+	rhs, err := b.manager.GetArg(term, 1)
+	if err != nil {
+		return false, err
+	}
+	if _, _, numeralLeft, e := b.manager.ArithmeticNumeralText(lhs); e != nil {
+		return false, e
+	} else if numeralLeft {
+		lhs, rhs = rhs, lhs
+		if bound == boundLessEqual {
+			bound = boundGreaterEqual
+		} else if bound == boundGreaterEqual {
+			bound = boundLessEqual
+		}
+	}
+	value, _, numeralRight, err := b.manager.ArithmeticNumeralText(rhs)
+	if err != nil || !numeralRight {
+		return false, err
+	}
+	x, err := b.MkLinearPolynomial(lhs)
+	if err != nil {
+		return false, err
+	}
+	k := numeral.NewRational()
+	defer func() { err = errors.Join(err, b.store.manager.Del(&k)) }()
+	if err = b.store.manager.SetString(&k, value); err != nil {
+		return false, err
+	}
+	switch bound {
+	case boundEqual:
+		if _, err = b.store.AssertLower(x, &k, false); err != nil {
+			return false, err
+		}
+		_, err = b.store.AssertUpper(x, &k, false)
+	case boundLessEqual:
+		_, err = b.store.AssertUpper(x, &k, strict)
+	case boundGreaterEqual:
+		_, err = b.store.AssertLower(x, &k, strict)
+	}
+	return err == nil, err
+}
+
 // LowerSubsumed and UpperSubsumed are the concrete rational-buffer callers in
 // propagate_ineqs_tactic.cpp:256-277. They reuse the same owned coefficient
 // buffer as MkLinearPolynomial and borrow its current contents for one bound
