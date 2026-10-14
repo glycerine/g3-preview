@@ -22,8 +22,38 @@ type ArbitraryRoot struct {
 }
 
 type arbitraryRootScratch struct {
-	m      *numeral.ArbitraryFloatNumeralManager
-	owners []*numeral.ScopedArbitraryFloatNumeral
+	m           *numeral.ArbitraryFloatNumeralManager
+	owners      []*numeral.ScopedArbitraryFloatNumeral
+	cursor      int
+	closing     bool
+	closed      bool
+	sourceCause error
+}
+
+// ArbitraryRootCleanupError retains the exact scoped-numeral suffix when a
+// source destructor stops. Cleanup resumes it with owning deletion.
+type ArbitraryRootCleanupError struct {
+	Cause   error
+	scratch *arbitraryRootScratch
+}
+
+func (e *ArbitraryRootCleanupError) Error() string { return e.Cause.Error() }
+func (e *ArbitraryRootCleanupError) Unwrap() error { return e.Cause }
+func (e *ArbitraryRootCleanupError) Cleanup() error {
+	if e == nil || e.scratch == nil {
+		return nil
+	}
+	s := e.scratch
+	for s.cursor >= 0 {
+		if err := s.owners[s.cursor].Cleanup(); err != nil {
+			return err
+		}
+		s.cursor--
+	}
+	s.owners = nil
+	s.closed = true
+	e.scratch = nil
+	return nil
 }
 
 func arbitraryRootCompare(m *numeral.ArbitraryFloatNumeralManager, a, b *numeral.ArbitraryFloat) (int, error) {
@@ -54,10 +84,26 @@ func (s *arbitraryRootScratch) new() (*numeral.ArbitraryFloat, error) {
 }
 
 func (s *arbitraryRootScratch) close() (err error) {
-	for i := len(s.owners) - 1; i >= 0; i-- {
-		err = errors.Join(err, s.owners[i].Close())
+	if s.closed {
+		return nil
 	}
-	return err
+	if s.sourceCause != nil {
+		return &ArbitraryRootCleanupError{Cause: s.sourceCause, scratch: s}
+	}
+	if !s.closing {
+		s.cursor = len(s.owners) - 1
+		s.closing = true
+	}
+	for s.cursor >= 0 {
+		if e := s.owners[s.cursor].Close(); e != nil {
+			s.sourceCause = e
+			return &ArbitraryRootCleanupError{Cause: e, scratch: s}
+		}
+		s.cursor--
+	}
+	s.owners = nil
+	s.closed = true
+	return nil
 }
 
 func (r ArbitraryRoot) checkpoint() error {

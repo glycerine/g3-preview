@@ -35436,6 +35436,7 @@
         "TestSubpavingMPFIntervalScalarMulDiv",
         "TestSubpavingMPFIntervalPowerRetainedCases",
         "TestArbitraryRootRetainedNewtonCertifiedBoundsAndCancellation",
+        "TestArbitraryRootScratchStoppedSourceSuffixAndOwningRetry",
         "TestSubpavingMPFIntervalXnEqYRetainedCases",
         "TestSubpavingHardwareIntervalRetainedCoreAndDirectedArithmetic",
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
@@ -36111,7 +36112,8 @@
           "status": "partial",
           "go_target": "pkg/math/interval/arbitrary_root.go",
           "tests": [
-            "TestArbitraryRootRetainedNewtonCertifiedBoundsAndCancellation"
+            "TestArbitraryRootRetainedNewtonCertifiedBoundsAndCancellation",
+            "TestArbitraryRootScratchStoppedSourceSuffixAndOwningRetry"
           ]
         },
         {
@@ -171199,6 +171201,8 @@
         "pkg/ast/ast_fpa_plugin.go",
         "pkg/ast/ast_fpa_plugin_source_test.go",
         "pkg/util/numeral/scoped_arbitrary_float_numeral.go",
+        "pkg/math/interval/arbitrary_root.go",
+        "pkg/math/interval/arbitrary_root_scratch_cleanup_test.go",
         "pkg/math/subpaving/hardware_split.go"
       ],
       "tests": [
@@ -171277,6 +171281,7 @@
         "TestASTSMT2FloatDefaultEveryActualReservation",
         "TestScopedArbitraryFloatNumeralSourceLifetime",
         "TestScopedArbitraryFloatSourceDeletionAndOwningRetry",
+        "TestArbitraryRootScratchStoppedSourceSuffixAndOwningRetry",
         "TestHardwareMidpointSplitterRetainedBranchesAndRefusal"
       ],
       "conditionals": [
