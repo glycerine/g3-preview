@@ -4,6 +4,7 @@ package numeral
 import "errors"
 
 var ErrBinarySelectPending = errors.New("mpnum: binary rational selection local cleanup pending")
+var ErrBinaryRefinePending = errors.New("mpnum: binary rational refinement midpoint cleanup pending")
 
 const (
 	selectRationalLower uint8 = iota + 1
@@ -533,7 +534,7 @@ func (m *BinaryRationalManager) RefineUpper(qm *RationalManager, q *Rational, l,
 func (m *BinaryRationalManager) RefineLower(qm *RationalManager, q *Rational, l, u *BinaryRational) error {
 	return m.refine(qm, q, l, u, false)
 }
-func (m *BinaryRationalManager) refine(qm *RationalManager, q *Rational, l, u *BinaryRational, upper bool) error {
+func (m *BinaryRationalManager) refine(qm *RationalManager, q *Rational, l, u *BinaryRational, upper bool) (err error) {
 	if e := m.pair(l, u); e != nil {
 		return e
 	}
@@ -564,46 +565,71 @@ func (m *BinaryRationalManager) refine(qm *RationalManager, q *Rational, l, u *B
 	if power {
 		return ErrBinaryInterval
 	}
-	var mid BinaryRational
-	cleaned := false
+	m.refineMid = BinaryRational{}
+	m.refinePending = true
+	m.refineExecuting = true
 	defer func() {
-		if !cleaned {
-			m.Del(&mid)
+		m.refineExecuting = false
+		if err != nil && m.refineMid.Num.Cell == 0 {
+			m.refinePending = false
+			m.refineMid = BinaryRational{}
 		}
 	}()
+	mid := &m.refineMid
 	for {
-		if e = m.Add(l, u, &mid); e != nil {
+		if e = m.Add(l, u, mid); e != nil {
 			return e
 		}
-		if e = m.Div2(&mid); e != nil {
+		if e = m.Div2(mid); e != nil {
 			return e
 		}
 		var stop bool
 		if upper {
-			stop, e = m.GreaterRational(&mid, qm, q)
+			stop, e = m.GreaterRational(mid, qm, q)
 		} else {
-			stop, e = m.LessRational(&mid, qm, q)
+			stop, e = m.LessRational(mid, qm, q)
 		}
 		if e != nil {
 			return e
 		}
 		if upper == stop {
-			if e = m.Swap(u, &mid); e != nil {
+			if e = m.Swap(u, mid); e != nil {
 				return e
 			}
 		} else {
-			if e = m.Swap(l, &mid); e != nil {
+			if e = m.Swap(l, mid); e != nil {
 				return e
 			}
 		}
 		if stop {
-			if e = m.Del(&mid); e != nil {
+			if e = m.Del(mid); e != nil {
 				return e
 			}
-			cleaned = true
+			m.refineMid = BinaryRational{}
+			m.refinePending = false
 			return m.debugEnclosure(qm, q, l, u)
 		}
 	}
+}
+
+// CleanupRefineMid owns the raw midpoint left by a source body failure or a
+// stopped explicit del(mid); it never replays a completed source deletion.
+func (m *BinaryRationalManager) CleanupRefineMid() error {
+	if m == nil || m.self != m {
+		return ErrBinaryOwner
+	}
+	if !m.refinePending {
+		return nil
+	}
+	if m.refineExecuting {
+		return ErrBinaryRefinePending
+	}
+	if e := m.Z.Del(&m.refineMid.Num); e != nil {
+		return e
+	}
+	m.refineMid = BinaryRational{}
+	m.refinePending = false
+	return nil
 }
 func (m *BinaryRationalManager) Approx(a *BinaryRational, k uint32, plus bool) error {
 	if e := m.check(a); e != nil {

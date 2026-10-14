@@ -57,6 +57,8 @@ type BinaryRationalManager struct {
 	selectRationalOwner                            *RationalManager
 	selectRationalShape, selectRationalCursor      uint8
 	selectRationalPending, selectRationalExecuting bool
+	refineMid                                      BinaryRational
+	refinePending, refineExecuting                 bool
 }
 type BinaryRationalStats struct {
 	HeaderBytes           uint64
@@ -90,6 +92,9 @@ func (m *BinaryRationalManager) open() error {
 	}
 	if m.selectRationalPending && !m.selectRationalExecuting {
 		return ErrBinarySelectPending
+	}
+	if m.refinePending && !m.refineExecuting {
+		return ErrBinaryRefinePending
 	}
 	return nil
 }
@@ -132,6 +137,9 @@ func (m *BinaryRationalManager) CloseChecked() error {
 	if m.selectIntExecuting || m.selectRationalExecuting {
 		return ErrBinarySelectPending
 	}
+	if m.refineExecuting {
+		return ErrBinaryRefinePending
+	}
 	if m.closed {
 		return nil
 	}
@@ -140,6 +148,9 @@ func (m *BinaryRationalManager) CloseChecked() error {
 		return e
 	}
 	if e := m.CleanupSelectRationalTemporaries(); e != nil {
+		return e
+	}
+	if e := m.CleanupRefineMid(); e != nil {
 		return e
 	}
 	if e := m.CleanupDisplay(); e != nil {
