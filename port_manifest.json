@@ -148704,6 +148704,7 @@
         "pkg/util/memory/release_progress.go",
         "pkg/util/memory/release_progress_test.go",
         "pkg/util/memory/runtime_size_t_entry_test.go",
+        "pkg/util/memory/process_profile_source_test.go",
         "pkg/util/diagnostic/util_memory_fatal_policy.go",
         "pkg/util/diagnostic/util_memory_fatal_policy_test.go",
         "pkg/util/text/util_numeric_stream_file.go",
@@ -148923,6 +148924,16 @@
             "TestMemoryAccountingTLSStrictThresholds",
             "TestProcessAccountingSharesSourceGlobalCounterAndLimit",
             "TestProcessAccountingPreservesSeparateTLSLanes"
+          ]
+        },
+        {
+          "name": "one source process size_t width across concrete Runtime owners, published after successful construction",
+          "status": "ported",
+          "go_target": "pkg/util/memory/runtime.go",
+          "go_targets": ["pkg/util/memory/process_accounting.go"],
+          "tests": [
+            "TestProcessAccountingKeepsOneSourceSizeTProfile",
+            "TestProcessProfilePublishesOnlyAfterSuccessfulRuntimeConstruction"
           ]
         },
         {
@@ -149152,6 +149163,7 @@
         "pkg/util/memory/shared_runtime_api_test.go",
         "pkg/util/diagnostic/util_memory_bridge_test.go",
         "pkg/util/memory/runtime_size_t_entry_test.go",
+        "pkg/util/memory/process_profile_source_test.go",
         "pkg/util/diagnostic/util_memory_fatal_policy.go",
         "pkg/util/diagnostic/util_memory_fatal_policy_test.go",
         "pkg/util/text/util_numeric_stream_file.go",
@@ -149360,6 +149372,16 @@
             "TestMemoryAccountingTLSStrictThresholds",
             "TestProcessAccountingSharesSourceGlobalCounterAndLimit",
             "TestProcessAccountingPreservesSeparateTLSLanes"
+          ]
+        },
+        {
+          "name": "one source process size_t width across concrete Runtime owners, published after successful construction",
+          "status": "ported",
+          "go_target": "pkg/util/memory/runtime.go",
+          "go_targets": ["pkg/util/memory/process_accounting.go"],
+          "tests": [
+            "TestProcessAccountingKeepsOneSourceSizeTProfile",
+            "TestProcessProfilePublishesOnlyAfterSuccessfulRuntimeConstruction"
           ]
         },
         {

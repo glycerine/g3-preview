@@ -76,6 +76,9 @@ func NewRuntime(c RuntimeConfig) (*Runtime, error) {
 	if c.SizeTBits != 32 && c.SizeTBits != 64 {
 		return nil, arena.ErrConfig
 	}
+	if c.Process != nil && c.Process.sizeTBits != 0 && c.Process.sizeTBits != c.SizeTBits {
+		return nil, arena.ErrConfig
+	}
 	n := uint64(reflect.TypeOf(Runtime{}).Size())
 	if e := c.Budget.Reserve(n); e != nil {
 		return nil, e
@@ -94,6 +97,9 @@ func NewRuntime(c RuntimeConfig) (*Runtime, error) {
 	}
 	m := &Runtime{config: c, origin: id, header: n}
 	m.self = m
+	if c.Process != nil {
+		c.Process.sizeTBits = c.SizeTBits
+	}
 	return m, nil
 }
 func (m *Runtime) accountingOwner() *utilMemoryAccounting {

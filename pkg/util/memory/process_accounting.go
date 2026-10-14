@@ -9,10 +9,12 @@ var ErrProcessLifecycleOrder = errors.New("g3: source memory lifecycle stage out
 // state for a group of Runtime owners. The caller confines the process and its
 // runtimes to one goroutine, as with the individual Runtime owners. Each runtime
 // keeps its own allocation lane, including the source TLS synchronization
-// threshold; only the global fields are shared.
+// threshold; only the global fields are shared. The first successful runtime
+// fixes the source process's size_t width for later runtime owners.
 type ProcessAccounting struct {
 	self                                      *ProcessAccounting
 	accounting                                utilMemoryAccounting
+	sizeTBits                                 uint8
 	initialized, fullyInitialized, finalizing bool
 	initializing                              bool
 }
