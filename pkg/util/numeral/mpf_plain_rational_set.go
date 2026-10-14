@@ -51,12 +51,18 @@ func (m *ArbitraryFloatManager) setRationalWithBeginReceipt(out *ArbitraryFloat,
 		cause = errors.Join(cause, m.finishPlainRationalSetSource())
 		s.recordPlainHistory()
 	}()
+	if e := m.traceSetPlainRationalEntry(value, ebits, sbits); e != nil {
+		return e
+	}
 	// Literal scoped_mpz declaration and SET0, before the reached child.
 	s.expLive = true
 	if e := m.integer.SetInt64(&s.exp, 0); e != nil {
 		return e
 	}
-	return m.setExponentRationalWithPlainCaller(out, ebits, sbits, mode, &s.exp, value, &s.child, s)
+	if e := m.setExponentRationalWithPlainCaller(out, ebits, sbits, mode, &s.exp, value, &s.child, s); e != nil {
+		return e
+	}
+	return m.traceSetOrdinaryResult(out, 191)
 }
 func (s *arbitraryFloatPlainRationalSetScope) matched(m *ArbitraryFloatManager) bool {
 	return m != nil && m.self == m && s == &m.plainRationalSet && s.manager == m && s.invocation != 0

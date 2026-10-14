@@ -130,3 +130,37 @@ func TestArbitraryFloatSetFloatRawTraceFormatterRefusal(t *testing.T) {
 	}
 	serviceMust(t, m.Del(&out))
 }
+
+func TestArbitraryFloatSetPlainRationalTrace(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("mpf_dbg")
+	compiled := tags.ShouldTrace("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	var q Rational
+	var out ArbitraryFloat
+	for _, tc := range []struct {
+		n    int64
+		text string
+	}{{3, "3/4"}, {0, "0"}} {
+		serviceMust(t, m.rational.SetFraction(&q, tc.n, 4))
+		output.Reset()
+		serviceMust(t, m.SetRational(&out, 8, 24, ArbitraryFloatNearestEven, &q))
+		got := output.String()
+		if !compiled {
+			if got != "" {
+				t.Fatalf("erased rational setter trace: %q", got)
+			}
+			continue
+		}
+		entry := "-------- [mpf_dbg] set src/util/mpf.cpp:187 ---------\nset: " + tc.text + " [8/24]\n"
+		result := "-------- [mpf_dbg] set src/util/mpf.cpp:191 ---------\nset: res = "
+		first, second := strings.Index(got, entry), strings.Index(got, result)
+		if first < 0 || second <= first || strings.Count(got, "-------- [mpf_dbg] set src/util/mpf.cpp:") != 2 {
+			t.Fatalf("rational setter trace for %d: %q", tc.n, got)
+		}
+	}
+	serviceMust(t, m.Del(&out))
+	serviceMust(t, m.rational.Del(&q))
+}

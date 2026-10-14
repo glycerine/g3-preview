@@ -1,4 +1,4 @@
-// Source: src/util/mpf.cpp:76,105,124-125,147,160-161,183.
+// Source: src/util/mpf.cpp:76,105,124-125,147,160-161,183,187,191.
 package numeral
 
 import (
@@ -11,6 +11,30 @@ import (
 
 func (m *ArbitraryFloatManager) traceSetInt32Result(out *ArbitraryFloat) error {
 	return m.traceSetOrdinaryResult(out, 105)
+}
+
+func (m *ArbitraryFloatManager) traceSetPlainRationalEntry(value *Rational, ebits, sbits uint32) error {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return nil
+	}
+	var formatError error
+	_ = tags.EmitConditional("mpf_dbg", "set", "src/util/mpf.cpp", 187,
+		func() bool { return true }, func(w io.Writer) error {
+			if e := writeNumeralDisplayPart(w, "set: "); e != nil {
+				return e
+			}
+			s, e := m.rational.String(value)
+			if e != nil {
+				formatError = e
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, s); e != nil {
+				return e
+			}
+			return writeNumeralDisplayPart(w, " ["+strconv.FormatUint(uint64(ebits), 10)+"/"+strconv.FormatUint(uint64(sbits), 10)+"]\n")
+		})
+	return formatError
 }
 
 func (m *ArbitraryFloatManager) traceSetOrdinaryResult(out *ArbitraryFloat, line int) error {
