@@ -110,10 +110,6 @@ func (m *ArbitraryFloatManager) traceMulResult(out *ArbitraryFloat) error {
 	return formatError
 }
 
-func (m *ArbitraryFloatManager) traceFloatDebugValue(function, label string, value *ArbitraryFloat, line int) {
-	_ = m.traceFloatDebugValueChecked(function, label, value, line)
-}
-
 func (m *ArbitraryFloatManager) traceFloatDebugValueChecked(function, label string, value *ArbitraryFloat, line int) error {
 	tags := m.floatTraceTags()
 	if !tags.ShouldTrace("mpf_dbg") {
@@ -153,10 +149,6 @@ func (m *ArbitraryFloatManager) traceFloatDebugIntChecked(function, label string
 			return writeNumeralDisplayPart(w, s+"\n")
 		})
 	return formatError
-}
-
-func (m *ArbitraryFloatManager) traceFloatDebugInt(function, label string, value *Int, line int) {
-	_ = m.traceFloatDebugIntChecked(function, label, value, line)
 }
 
 func (m *ArbitraryFloatManager) traceFloatDebugText(function, value string, line int) {

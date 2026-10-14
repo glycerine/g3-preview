@@ -44,9 +44,15 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 	if modularSourceDebug && (x.SBits() != y.SBits() || x.EBits() != y.EBits()) {
 		return ErrIntegerAssertion
 	}
-	m.traceFloatDebugValue("fma", "X = ", x, 752)
-	m.traceFloatDebugValue("fma", "Y = ", y, 753)
-	m.traceFloatDebugValue("fma", "Z = ", z, 754)
+	if e := m.traceFloatDebugValueChecked("fma", "X = ", x, 752); e != nil {
+		return e
+	}
+	if e := m.traceFloatDebugValueChecked("fma", "Y = ", y, 753); e != nil {
+		return e
+	}
+	if e := m.traceFloatDebugValueChecked("fma", "Z = ", z, 754); e != nil {
+		return e
+	}
 	for _, v := range [...]*ArbitraryFloat{x, y, z} {
 		nan, e := m.IsNaN(v)
 		if e != nil {
