@@ -1,4 +1,4 @@
-// Source: src/util/mpf.cpp:1301; nested component formatter failure cleanup.
+// Source: src/util/mpf.cpp:1301,1331,1352,1410; nested formatter cleanup.
 package numeral
 
 import (
@@ -17,8 +17,8 @@ func TestArbitraryFloatPartialRemainderComponentTraceRefusalCleansChild(t *testi
 	if !probe.ShouldTrace("mpf_dbg_rem") {
 		return
 	}
-	found := false
-	for ordinal := int64(0); ordinal < 256 && !found; ordinal++ {
+	reached := map[int]bool{}
+	for ordinal := int64(0); ordinal < 256 && len(reached) < 4; ordinal++ {
 		t.Run(strconv.FormatInt(ordinal, 10), func(t *testing.T) {
 			m, _, budget := mpfNumeralHelpersFixture(t)
 			var output bytes.Buffer
@@ -37,7 +37,16 @@ func TestArbitraryFloatPartialRemainderComponentTraceRefusalCleansChild(t *testi
 			}
 			child := &m.hexfloatComponents
 			if body != nil && child.bodyCause != nil {
-				found = true
+				site := 0
+				for _, candidate := range []int{1301, 1331, 1352, 1410} {
+					if bytes.Contains(output.Bytes(), []byte("src/util/mpf.cpp:"+strconv.Itoa(candidate)+" ---------")) {
+						site = candidate
+					}
+				}
+				if site == 0 {
+					t.Fatalf("component refusal without a source record: %q", output.String())
+				}
+				reached[site] = true
 				if x != beforeX || y != beforeY {
 					t.Fatal("nested trace refusal changed the caller's operands")
 				}
@@ -65,7 +74,7 @@ func TestArbitraryFloatPartialRemainderComponentTraceRefusalCleansChild(t *testi
 			}
 		})
 	}
-	if !found {
-		t.Fatal("no reached component formatter allocation refusal")
+	if len(reached) != 4 {
+		t.Fatalf("component formatter refusal sites: reached %v; want 1301, 1331, 1352, 1410", reached)
 	}
 }
