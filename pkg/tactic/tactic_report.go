@@ -26,6 +26,38 @@ func NewTacticReport(id string, goal *Goal) (*TacticReport, error) {
 	return newTacticReport(id, goal, nil)
 }
 
+// ReportTacticProgress emits positive counters at tactic verbosity level.
+// The source suppresses zero values before checking the verbose stream.
+func ReportTacticProgress(id string, value uint32) error {
+	if value == 0 {
+		return nil
+	}
+	enabled, err := diagnostic.ProcessVerboseEnabled(tacticVerbosityLevel)
+	if err != nil || !enabled {
+		return err
+	}
+	stream, err := diagnostic.BorrowProcessVerboseStream()
+	if err != nil {
+		return err
+	}
+	if err := stream.AppendCString("("); err != nil {
+		return err
+	}
+	if err := stream.AppendCString(id); err != nil {
+		return err
+	}
+	if err := stream.AppendCString(" "); err != nil {
+		return err
+	}
+	if err := stream.AppendUint32(value); err != nil {
+		return err
+	}
+	if err := stream.AppendCString(")\n"); err != nil {
+		return err
+	}
+	return stream.Flush()
+}
+
 func newTacticReport(id string, goal *Goal, clock func() (uint64, error)) (*TacticReport, error) {
 	enabled, err := diagnostic.ProcessVerboseEnabled(tacticVerbosityLevel)
 	if err != nil || !enabled {

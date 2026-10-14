@@ -489,7 +489,7 @@ func (b *PolynomialBuilder) emitBound(saved *goaltactic.Goal, term ast.ASTHandle
 // Apply executes the retained inequality pass. A newly allocated result is
 // transferred to the caller, including on a stopped path. With no recognized
 // bound, the source returns the original borrowed goal unchanged.
-func (b *PolynomialBuilder) Apply(input *goaltactic.Goal) (*goaltactic.Goal, error) {
+func (b *PolynomialBuilder) Apply(input *goaltactic.Goal) (_ *goaltactic.Goal, retErr error) {
 	if err := b.open(); err != nil {
 		return nil, err
 	}
@@ -516,6 +516,11 @@ func (b *PolynomialBuilder) Apply(input *goaltactic.Goal) (*goaltactic.Goal, err
 	if cores {
 		return nil, goaltactic.NewTacticException("propagate-ineqs does not support unsat core production")
 	}
+	report, err := goaltactic.NewTacticReport("propagate-ineqs", input)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { retErr = errors.Join(retErr, report.Close()) }()
 	result, err := goaltactic.NewGoalConfigCopy(input)
 	if err != nil {
 		return nil, err
@@ -534,6 +539,16 @@ func (b *PolynomialBuilder) Apply(input *goaltactic.Goal) (*goaltactic.Goal, err
 		return input, nil
 	}
 	if err = b.store.Propagate(); err != nil {
+		return result, err
+	}
+	propagations, falseAlarms, err := b.store.PropagationCounts()
+	if err != nil {
+		return result, err
+	}
+	if err = goaltactic.ReportTacticProgress(":bound-propagations", propagations); err != nil {
+		return result, err
+	}
+	if err = goaltactic.ReportTacticProgress(":bound-false-alarms", falseAlarms); err != nil {
 		return result, err
 	}
 	inconsistent, err := b.store.Inconsistent()

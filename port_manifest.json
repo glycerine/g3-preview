@@ -98592,6 +98592,7 @@
         "pkg/tactic/arith/polynomial_process_bound_test.go",
         "pkg/tactic/arith/polynomial_collect_bounds_test.go",
         "pkg/tactic/arith/polynomial_apply_test.go",
+        "pkg/tactic/arith/polynomial_progress_test.go",
         "pkg/tactic/arith/propagate_ineq_tactic.go",
         "pkg/tactic/arith/propagate_ineq_tactic_test.go"
       ],
@@ -98601,6 +98602,7 @@
         "TestInequalityPolynomialBuilderProcessBoundSourceNormalization",
         "TestInequalityPolynomialBuilderCollectBoundsGoalOrderAndOwnership",
         "TestInequalityPolynomialBuilderApplyGoalBranchesAndConfiguration",
+        "TestInequalityBuilderPublishesRetainedProgressOnRealGoal",
         "TestPropagateIneqTacticParameterSnapshotCleanupAndGoalReuse",
         "TestPropagateIneqTacticTranslateOwnsIndependentSnapshot"
       ],
@@ -98667,11 +98669,12 @@
           ]
         },
         {
-          "name": "Concrete imp operator goal configuration/depth, no-bound borrowed return, propagation, inconsistent false replacement and restored bounds (src/tactic/arith/propagate_ineqs_tactic.cpp:483-513)",
+          "name": "Concrete imp operator goal configuration/depth, no-bound borrowed return, propagation/progress, inconsistent false replacement and restored bounds (src/tactic/arith/propagate_ineqs_tactic.cpp:483-513)",
           "status": "ported",
           "go_target": "pkg/tactic/arith/polynomial_builder.go",
           "tests": [
-            "TestInequalityPolynomialBuilderApplyGoalBranchesAndConfiguration"
+            "TestInequalityPolynomialBuilderApplyGoalBranchesAndConfiguration",
+            "TestInequalityBuilderPublishesRetainedProgressOnRealGoal"
           ]
         },
         {
@@ -104138,11 +104141,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/tactic_report.go",
+        "pkg/tactic/tactic_report_test.go",
+        "pkg/tactic/arith/polynomial_progress_test.go",
         "pkg/tactic/bv/max_bv_sharing_goal.go",
         "pkg/tactic/ufbv/rewrite_tactic.go"
       ],
       "tests": [
         "TestTacticReportReadsProcessMemoryAndWritesSourceOrder",
+        "TestTacticProgressPositiveVerboseGateAndSourceFormat",
+        "TestInequalityBuilderPublishesRetainedProgressOnRealGoal",
         "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal"
       ],
       "assertions": [
@@ -104161,6 +104168,14 @@
           "tests": [
             "TestTacticReportReadsProcessMemoryAndWritesSourceOrder"
           ]
+        },
+        {
+          "name": "report_tactic_progress positive counter and verbosity gate (tactic.cpp:64-69)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_report.go",
+          "tests": [
+            "TestTacticProgressPositiveVerboseGateAndSourceFormat"
+          ]
         }
       ],
       "ownership": [],
@@ -104173,11 +104188,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/tactic_report.go",
+        "pkg/tactic/tactic_report_test.go",
         "pkg/tactic/bv/max_bv_sharing_goal.go",
         "pkg/tactic/ufbv/rewrite_tactic.go"
       ],
       "tests": [
         "TestTacticReportReadsProcessMemoryAndWritesSourceOrder",
+        "TestTacticProgressPositiveVerboseGateAndSourceFormat",
         "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal"
       ],
       "conditionals": [

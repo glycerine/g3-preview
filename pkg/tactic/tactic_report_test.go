@@ -93,3 +93,47 @@ func TestTacticReportReadsProcessMemoryAndWritesSourceOrder(t *testing.T) {
 	}
 	must(other.Deallocate(&block))
 }
+
+func TestTacticProgressPositiveVerboseGateAndSourceFormat(t *testing.T) {
+	b := arena.NewBudget(1024)
+	out, err := text.NewNumericTextStream(text.NumericTextStreamConfig{Budget: b})
+	if err != nil {
+		t.Fatal(err)
+	}
+	oldLevel, err := diagnostic.ProcessVerbosityLevel()
+	if err != nil {
+		t.Fatal(err)
+	}
+	oldStream, err := diagnostic.BorrowProcessVerboseStream()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := diagnostic.SetProcessVerboseStream(out); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		for _, err := range []error{diagnostic.SetProcessVerboseStream(oldStream), diagnostic.SetProcessVerbosityLevel(oldLevel), out.Close()} {
+			if err != nil {
+				t.Error(err)
+			}
+		}
+	})
+	if err := diagnostic.SetProcessVerbosityLevel(9); err != nil {
+		t.Fatal(err)
+	}
+	if err := ReportTacticProgress(":bound-propagations", 7); err != nil {
+		t.Fatal(err)
+	}
+	if err := diagnostic.SetProcessVerbosityLevel(10); err != nil {
+		t.Fatal(err)
+	}
+	for _, value := range []uint32{0, 7} {
+		if err := ReportTacticProgress(":bound-propagations", value); err != nil {
+			t.Fatal(err)
+		}
+	}
+	got, err := out.String()
+	if err != nil || got != "(:bound-propagations 7)\n" {
+		t.Fatal("source progress output", got, err)
+	}
+}
