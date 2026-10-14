@@ -35,11 +35,17 @@ func (m *ArbitraryFloatManager) setExponentRationalWithPlainCaller(out *Arbitrar
 	if significand.Num.Val != 0 && (s.active || s.invocation == ^uint64(0)) {
 		return ErrNumericPending
 	}
+	if e := m.traceSetExponentRationalEntry(significand, exponent); e != nil {
+		return e
+	}
 	out.assignEbits(ebits)
 	out.assignSbits(sbits)
 	out.assignSign(significand.Num.Val < 0)
 	if significand.Num.Val == 0 {
-		return m.MkZero(ebits, sbits, out.Sign(), out)
+		if e := m.MkZero(ebits, sbits, out.Sign(), out); e != nil {
+			return e
+		}
+		return m.traceSetOrdinaryResult(out, 300)
 	}
 	invocation := s.invocation + 1
 	*s = arbitraryFloatRationalSetScope{manager: m, invocation: invocation, active: true, executing: true, receipt: r}
@@ -129,6 +135,9 @@ func (m *ArbitraryFloatManager) setExponentRationalWithPlainCaller(out *Arbitrar
 		}
 		s.p2Live = false
 	}
+	if e := m.traceSetExponentRationalNormalized(&s.sig, &s.exp); e != nil {
+		return e
+	}
 	if modularSourceDebug {
 		if e := m.assertRationalSetNormalized(&s.sig, c); e != nil {
 			return e
@@ -172,15 +181,22 @@ func (m *ArbitraryFloatManager) setExponentRationalWithPlainCaller(out *Arbitrar
 			}
 		}
 	}
+	if e := m.traceSetExponentRationalFields(out); e != nil {
+		return e
+	}
 	if s.exp.IsSmall() {
 		v, e := m.integer.Int64(&s.exp)
 		if e != nil {
 			return e
 		}
 		out.exponent = v
-		return m.roundWithParentContext(mode, out, &s.roundChild, s.allocationContext())
+		if e := m.roundWithParentContext(mode, out, &s.roundChild, s.allocationContext()); e != nil {
+			return e
+		}
+	} else if e := m.MkInf(ebits, sbits, out.Sign(), out); e != nil {
+		return e
 	}
-	return m.MkInf(ebits, sbits, out.Sign(), out)
+	return m.traceSetOrdinaryResult(out, 300)
 }
 
 // Source: src/util/mpf.cpp:279. This helper retains the actual assertion

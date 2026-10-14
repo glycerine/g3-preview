@@ -1,4 +1,4 @@
-// Source: src/util/mpf.cpp:76,105,124-125,147,160-161,183,187,191,195,219,230.
+// Source: src/util/mpf.cpp:76,105,124-125,147,160-161,183,187,191,195,219,230,235,270,289,300.
 package numeral
 
 import (
@@ -34,6 +34,64 @@ func (m *ArbitraryFloatManager) traceSetPlainRationalEntry(value *Rational, ebit
 				return e
 			}
 			return writeNumeralDisplayPart(w, " ["+strconv.FormatUint(uint64(ebits), 10)+"/"+strconv.FormatUint(uint64(sbits), 10)+"]\n")
+		})
+	return formatError
+}
+
+func (m *ArbitraryFloatManager) traceSetExponentRationalEntry(significand *Rational, exponent *Int) error {
+	return m.traceSetRationalAndExponent("set: sig = ", significand, exponent, 235)
+}
+
+func (m *ArbitraryFloatManager) traceSetExponentRationalNormalized(significand *Rational, exponent *Int) error {
+	return m.traceSetRationalAndExponent("Normalized: sig = ", significand, exponent, 270)
+}
+
+func (m *ArbitraryFloatManager) traceSetRationalAndExponent(label string, significand *Rational, exponent *Int, line int) error {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return nil
+	}
+	var formatError error
+	_ = tags.EmitConditional("mpf_dbg", "set", "src/util/mpf.cpp", line,
+		func() bool { return true }, func(w io.Writer) error {
+			if e := writeNumeralDisplayPart(w, label); e != nil {
+				return e
+			}
+			s, e := m.rational.String(significand)
+			if e != nil {
+				formatError = e
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, s+" exp = "); e != nil {
+				return e
+			}
+			s, e = m.integer.String(exponent)
+			if e != nil {
+				formatError = e
+				return e
+			}
+			return writeNumeralDisplayPart(w, s+"\n")
+		})
+	return formatError
+}
+
+func (m *ArbitraryFloatManager) traceSetExponentRationalFields(out *ArbitraryFloat) error {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return nil
+	}
+	var formatError error
+	_ = tags.EmitConditional("mpf_dbg", "set", "src/util/mpf.cpp", 289,
+		func() bool { return true }, func(w io.Writer) error {
+			if e := writeNumeralDisplayPart(w, "sig = "); e != nil {
+				return e
+			}
+			s, e := m.integer.String(&out.significand)
+			if e != nil {
+				formatError = e
+				return e
+			}
+			return writeNumeralDisplayPart(w, s+" exp = "+strconv.FormatInt(out.exponent, 10)+"\n")
 		})
 	return formatError
 }

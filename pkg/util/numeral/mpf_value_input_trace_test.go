@@ -154,10 +154,20 @@ func TestArbitraryFloatSetPlainRationalTrace(t *testing.T) {
 			}
 			continue
 		}
-		entry := "-------- [mpf_dbg] set src/util/mpf.cpp:187 ---------\nset: " + tc.text + " [8/24]\n"
-		result := "-------- [mpf_dbg] set src/util/mpf.cpp:191 ---------\nset: res = "
-		first, second := strings.Index(got, entry), strings.Index(got, result)
-		if first < 0 || second <= first || strings.Count(got, "-------- [mpf_dbg] set src/util/mpf.cpp:") != 2 {
+		lines := []string{"187", "235", "270", "289", "300", "191"}
+		if tc.n == 0 {
+			lines = []string{"187", "235", "300", "191"}
+		}
+		last := -1
+		for _, line := range lines {
+			header := "-------- [mpf_dbg] set src/util/mpf.cpp:" + line + " ---------\n"
+			at := strings.Index(got, header)
+			if at <= last || strings.Count(got, header) != 1 {
+				t.Fatalf("rational setter source order for %d at %s: %q", tc.n, line, got)
+			}
+			last = at
+		}
+		if !strings.Contains(got, "src/util/mpf.cpp:187 ---------\nset: "+tc.text+" [8/24]\n") || strings.Count(got, "------------------------------------------------\n") != len(lines) {
 			t.Fatalf("rational setter trace for %d: %q", tc.n, got)
 		}
 	}
@@ -190,7 +200,7 @@ func TestArbitraryFloatSetFormattedLiteralTrace(t *testing.T) {
 			continue
 		}
 		last := -1
-		for _, site := range []struct{ line, body string }{{"195", tc.entry}, {"219", tc.parts}, {"230", "set: res = "}} {
+		for _, site := range []struct{ line, body string }{{"195", tc.entry}, {"219", tc.parts}, {"235", "set: sig = "}, {"270", "Normalized: sig = "}, {"289", "sig = "}, {"300", "set: res = "}, {"230", "set: res = "}} {
 			header := "-------- [mpf_dbg] set src/util/mpf.cpp:" + site.line + " ---------\n" + site.body
 			at := strings.Index(got, header)
 			if at <= last || strings.Count(got, "src/util/mpf.cpp:"+site.line+" ---------") != 1 {
@@ -198,9 +208,57 @@ func TestArbitraryFloatSetFormattedLiteralTrace(t *testing.T) {
 			}
 			last = at
 		}
-		if strings.Count(got, "------------------------------------------------\n") != 3 {
+		if strings.Count(got, "------------------------------------------------\n") != 7 {
 			t.Fatalf("literal setter trace blocks for %q: %q", tc.value, got)
 		}
 	}
 	serviceMust(t, m.Del(&out))
+}
+
+func TestArbitraryFloatSetExponentRationalTraceBranches(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("mpf_dbg")
+	compiled := tags.ShouldTrace("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	var q Rational
+	var out ArbitraryFloat
+	exponent := NewInt(0)
+	for _, tc := range []struct {
+		numerator int64
+		lines     []string
+	}{
+		{3, []string{"235", "270", "289", "300"}},
+		{0, []string{"235", "300"}},
+	} {
+		serviceMust(t, m.rational.SetFraction(&q, tc.numerator, 4))
+		out.exponent = 17
+		output.Reset()
+		serviceMust(t, m.SetExponentRational(&out, 8, 24, ArbitraryFloatNearestEven, &exponent, &q))
+		got := output.String()
+		if !compiled {
+			if got != "" {
+				t.Fatalf("erased exponent/rational trace: %q", got)
+			}
+			continue
+		}
+		last := -1
+		for _, line := range tc.lines {
+			header := "-------- [mpf_dbg] set src/util/mpf.cpp:" + line + " ---------\n"
+			at := strings.Index(got, header)
+			if at <= last || strings.Count(got, header) != 1 {
+				t.Fatalf("exponent/rational source order for %d at %s: %q", tc.numerator, line, got)
+			}
+			last = at
+		}
+		if strings.Count(got, "------------------------------------------------\n") != len(tc.lines) {
+			t.Fatalf("exponent/rational branch for %d: %q", tc.numerator, got)
+		}
+		if tc.numerator == 3 && !strings.Contains(got, "src/util/mpf.cpp:289 ---------\nsig = ") || tc.numerator == 3 && !strings.Contains(got, " exp = 17\n") {
+			t.Fatalf("pre-round field publication: %q", got)
+		}
+	}
+	serviceMust(t, m.Del(&out))
+	serviceMust(t, m.rational.Del(&q))
 }
