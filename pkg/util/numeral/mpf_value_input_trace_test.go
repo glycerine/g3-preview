@@ -167,7 +167,16 @@ func TestArbitraryFloatSetPlainRationalTrace(t *testing.T) {
 			}
 			last = at
 		}
-		if !strings.Contains(got, "src/util/mpf.cpp:187 ---------\nset: "+tc.text+" [8/24]\n") || strings.Count(got, "------------------------------------------------\n") != len(lines) {
+		blocks := len(lines)
+		if tc.n != 0 {
+			blocks += 5
+			firstRound := strings.Index(got, "round src/util/mpf.cpp:2040")
+			lastRound := strings.Index(got, "round src/util/mpf.cpp:2079")
+			if firstRound <= strings.Index(got, "set src/util/mpf.cpp:289") || lastRound <= firstRound || lastRound >= strings.Index(got, "set src/util/mpf.cpp:300") {
+				t.Fatalf("nested rational Round trace for %d: %q", tc.n, got)
+			}
+		}
+		if !strings.Contains(got, "src/util/mpf.cpp:187 ---------\nset: "+tc.text+" [8/24]\n") || strings.Count(got, "------------------------------------------------\n") != blocks {
 			t.Fatalf("rational setter trace for %d: %q", tc.n, got)
 		}
 	}
@@ -208,7 +217,9 @@ func TestArbitraryFloatSetFormattedLiteralTrace(t *testing.T) {
 			}
 			last = at
 		}
-		if strings.Count(got, "------------------------------------------------\n") != 7 {
+		firstRound := strings.Index(got, "round src/util/mpf.cpp:2040")
+		lastRound := strings.Index(got, "round src/util/mpf.cpp:2079")
+		if firstRound <= strings.Index(got, "set src/util/mpf.cpp:289") || lastRound <= firstRound || lastRound >= strings.Index(got, "set src/util/mpf.cpp:300") || strings.Count(got, "------------------------------------------------\n") != 12 {
 			t.Fatalf("literal setter trace blocks for %q: %q", tc.value, got)
 		}
 	}
@@ -252,7 +263,16 @@ func TestArbitraryFloatSetExponentRationalTraceBranches(t *testing.T) {
 			}
 			last = at
 		}
-		if strings.Count(got, "------------------------------------------------\n") != len(tc.lines) {
+		blocks := len(tc.lines)
+		if tc.numerator != 0 {
+			blocks += 5
+			firstRound := strings.Index(got, "round src/util/mpf.cpp:2040")
+			lastRound := strings.Index(got, "round src/util/mpf.cpp:2079")
+			if firstRound <= strings.Index(got, "set src/util/mpf.cpp:289") || lastRound <= firstRound || lastRound >= strings.Index(got, "set src/util/mpf.cpp:300") {
+				t.Fatalf("nested exponent/rational Round trace: %q", got)
+			}
+		}
+		if strings.Count(got, "------------------------------------------------\n") != blocks {
 			t.Fatalf("exponent/rational branch for %d: %q", tc.numerator, got)
 		}
 		if tc.numerator == 3 && !strings.Contains(got, "src/util/mpf.cpp:289 ---------\nsig = ") || tc.numerator == 3 && !strings.Contains(got, " exp = 17\n") {
