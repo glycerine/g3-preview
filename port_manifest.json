@@ -167353,6 +167353,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_expr_array.go",
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
         "pkg/math/subpaving/fast_node.go",
@@ -167362,6 +167363,8 @@
         "pkg/math/subpaving/arbitrary_context_child.go"
       ],
       "tests": [
+        "TestASTExprArrayIndependentSnapshotAndOwnedValues",
+        "TestASTExprArrayStoppedReplacementKeepsOwningPrefix",
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFastNodeConstantIntervalViews",
         "TestHardwareNodeRetainedBoundViewsAndChildTrail",
@@ -167636,9 +167639,18 @@
           "tests": []
         },
         {
-          "name": "remaining direct AST-manager expression/dependency array callbacks, subpaving context integration and other template configurations",
+          "name": "remaining AST-manager dependency-array and expression-array From/unshare/reroot callbacks, subpaving context integration and other template configurations",
           "status": "unported",
           "tests": []
+        },
+        {
+          "name": "concrete AST expression-array owning native slice: empty construction, independent copy, indexed read/replacement, append/pop and ascending close with retained AST references",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_expr_array.go",
+          "tests": [
+            "TestASTExprArrayIndependentSnapshotAndOwnedValues",
+            "TestASTExprArrayStoppedReplacementKeepsOwningPrefix"
+          ]
         },
         {
           "name": "Concrete tactic goal expression, proof and dependency arrays: independent native slice copy, append, set, shrink and ascending release",
@@ -167694,7 +167706,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "No generic Go persistent-array implementation remains. The retained tactic goal uses native owning slices with independent copies and has an explicit concrete platform-replacement credit. The standalone int32 stress workload and its dummy value-manager callbacks occur only in src/test/parray.cpp, so those concrete rows are reference-only. All five retained subpaving bound configurations have native copied-slice views that preserve root null slots, child snapshots, indexed replacement and borrowed bound identities; their owner contexts retain separate partial obligations. Source cell allocation, shared-root inverse publication, trail replay/reroot, allocator failure and TRACE/SASSERT behavior are not credited by these platform replacements and remain unported. Direct AST-manager expression/dependency array callbacks remain open. This source is not classified as dead."
+        "No generic Go persistent-array implementation remains. The retained tactic goal uses native owning slices with independent copies and has an explicit concrete platform-replacement credit. The standalone int32 stress workload and its dummy value-manager callbacks occur only in src/test/parray.cpp, so those concrete rows are reference-only. All five retained subpaving bound configurations have native copied-slice views that preserve root null slots, child snapshots, indexed replacement and borrowed bound identities; their owner contexts retain separate partial obligations. The concrete AST expression array now uses a native slice of ASTRef owners for direct copy/replacement/append/pop/release; expression From overloads and dependency arrays remain open. Source cell allocation, shared-root inverse publication, trail replay/reroot, allocator failure and TRACE/SASSERT behavior are not credited by these replacements. This source is not classified as dead."
       ]
     },
     {
