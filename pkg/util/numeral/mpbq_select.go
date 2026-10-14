@@ -5,6 +5,97 @@ import "errors"
 
 var ErrBinarySelectPending = errors.New("mpnum: binary rational selection local cleanup pending")
 
+const (
+	selectRationalLower uint8 = iota + 1
+	selectRationalUpper
+	selectRationalBoth
+)
+
+func (m *BinaryRationalManager) beginSelectRational(qm *RationalManager, shape uint8) error {
+	if e := m.open(); e != nil {
+		return e
+	}
+	m.selectRationalOwner = qm
+	m.selectRationalShape = shape
+	m.selectRationalCursor = 0
+	m.selectRationalLower = NewRational()
+	m.selectRationalUpper = NewRational()
+	m.selectRationalPending = true
+	m.selectRationalExecuting = true
+	return nil
+}
+
+func (m *BinaryRationalManager) selectRationalCount() uint8 {
+	if m.selectRationalShape == selectRationalBoth {
+		return 4
+	}
+	return 2
+}
+
+func (m *BinaryRationalManager) selectRationalPart() *Int {
+	cursor := m.selectRationalCursor
+	value := &m.selectRationalLower
+	if m.selectRationalShape == selectRationalUpper || m.selectRationalShape == selectRationalBoth && cursor < 2 {
+		value = &m.selectRationalUpper
+	}
+	if cursor%2 == 0 {
+		return &value.Num
+	}
+	return &value.Den
+}
+
+func (m *BinaryRationalManager) clearSelectRational() {
+	m.selectRationalLower = Rational{}
+	m.selectRationalUpper = Rational{}
+	m.selectRationalOwner = nil
+	m.selectRationalPending = false
+}
+
+func (m *BinaryRationalManager) finishSelectRationalSource() error {
+	if !m.selectRationalPending {
+		return nil
+	}
+	if m.selectIntPending {
+		return ErrBinarySelectPending
+	}
+	for m.selectRationalCursor < m.selectRationalCount() {
+		if _, e := sourceNumeralDel(m.selectRationalOwner.Z, m.selectRationalPart()); e != nil {
+			return e
+		}
+		m.selectRationalCursor++
+	}
+	m.clearSelectRational()
+	return nil
+}
+
+// CleanupSelectRationalTemporaries resumes the source's upper-before-lower
+// rational destructor order and each rational's numerator-before-denominator.
+func (m *BinaryRationalManager) CleanupSelectRationalTemporaries() error {
+	if m == nil || m.self != m {
+		return ErrBinaryOwner
+	}
+	if !m.selectRationalPending {
+		return nil
+	}
+	if m.selectRationalExecuting {
+		return ErrBinarySelectPending
+	}
+	if e := m.CleanupSelectIntegerTemporary(); e != nil {
+		return e
+	}
+	if m.selectRationalOwner == nil || m.selectRationalOwner.self != m.selectRationalOwner || m.selectRationalOwner.Z == nil {
+		return ErrBinaryOwner
+	}
+	for m.selectRationalCursor < m.selectRationalCount() {
+		if e := m.selectRationalOwner.Z.Del(m.selectRationalPart()); e != nil {
+			return e
+		}
+		m.selectRationalCursor++
+	}
+	m.clearSelectRational()
+	return nil
+}
+
 func (m *BinaryRationalManager) selectInteger(lower, upper *BinaryRational, r *Int) (bool, error) {
 	if lower.KField == 0 {
 		return true, m.Z.Copy(r, &lower.Num)
@@ -255,7 +346,7 @@ func (m *BinaryRationalManager) SelectSmallCore(lower, upper, r *BinaryRational)
 	}
 	return m.debugSelected(lower, upper, r)
 }
-func (m *BinaryRationalManager) SelectSmallRationalLower(qm *RationalManager, lower *Rational, upper, r *BinaryRational) error {
+func (m *BinaryRationalManager) SelectSmallRationalLower(qm *RationalManager, lower *Rational, upper, r *BinaryRational) (err error) {
 	if e := m.pair(upper, r); e != nil {
 		return e
 	}
@@ -281,24 +372,32 @@ func (m *BinaryRationalManager) SelectSmallRationalLower(qm *RationalManager, lo
 	if yes {
 		return m.SetInteger(r, aux)
 	}
-	l2k := NewRational()
-	defer qm.drop(&l2k)
+	if e = m.beginSelectRational(qm, selectRationalLower); e != nil {
+		return e
+	}
+	defer func() {
+		if cleanup := m.finishSelectRationalSource(); err == nil {
+			err = cleanup
+		}
+		m.selectRationalExecuting = false
+	}()
+	l2k := &m.selectRationalLower
 	two := Rational{Num: NewInt(2), Den: NewInt(1)}
 	u2k := &m.SelectSmallTmp2
-	if e = qm.Copy(&l2k, lower); e != nil {
+	if e = qm.Copy(l2k, lower); e != nil {
 		return e
 	}
 	if e = m.Copy(u2k, upper); e != nil {
 		return e
 	}
 	for k := uint32(1); ; k++ {
-		if e = qm.Mul(&l2k, &two, &l2k); e != nil {
+		if e = qm.Mul(l2k, &two, l2k); e != nil {
 			return e
 		}
 		if e = m.Mul2(u2k); e != nil {
 			return e
 		}
-		yes, e = m.selectIntegerRationalLower(qm, &l2k, u2k, aux)
+		yes, e = m.selectIntegerRationalLower(qm, l2k, u2k, aux)
 		if e != nil {
 			return e
 		}
@@ -307,7 +406,7 @@ func (m *BinaryRationalManager) SelectSmallRationalLower(qm *RationalManager, lo
 		}
 	}
 }
-func (m *BinaryRationalManager) SelectSmallRationalUpper(qm *RationalManager, lower *BinaryRational, upper *Rational, r *BinaryRational) error {
+func (m *BinaryRationalManager) SelectSmallRationalUpper(qm *RationalManager, lower *BinaryRational, upper *Rational, r *BinaryRational) (err error) {
 	if e := m.pair(lower, r); e != nil {
 		return e
 	}
@@ -332,24 +431,32 @@ func (m *BinaryRationalManager) SelectSmallRationalUpper(qm *RationalManager, lo
 	if yes {
 		return m.SetInteger(r, aux)
 	}
-	u2k := NewRational()
-	defer qm.drop(&u2k)
+	if e = m.beginSelectRational(qm, selectRationalUpper); e != nil {
+		return e
+	}
+	defer func() {
+		if cleanup := m.finishSelectRationalSource(); err == nil {
+			err = cleanup
+		}
+		m.selectRationalExecuting = false
+	}()
+	u2k := &m.selectRationalUpper
 	two := Rational{Num: NewInt(2), Den: NewInt(1)}
 	l2k := &m.SelectSmallTmp2
 	if e = m.Copy(l2k, lower); e != nil {
 		return e
 	}
-	if e = qm.Copy(&u2k, upper); e != nil {
+	if e = qm.Copy(u2k, upper); e != nil {
 		return e
 	}
 	for k := uint32(1); ; k++ {
 		if e = m.Mul2(l2k); e != nil {
 			return e
 		}
-		if e = qm.Mul(&u2k, &two, &u2k); e != nil {
+		if e = qm.Mul(u2k, &two, u2k); e != nil {
 			return e
 		}
-		yes, e = m.selectIntegerRationalUpper(qm, l2k, &u2k, aux)
+		yes, e = m.selectIntegerRationalUpper(qm, l2k, u2k, aux)
 		if e != nil {
 			return e
 		}
@@ -358,7 +465,7 @@ func (m *BinaryRationalManager) SelectSmallRationalUpper(qm *RationalManager, lo
 		}
 	}
 }
-func (m *BinaryRationalManager) SelectSmallRationalBounds(qm *RationalManager, lower, upper *Rational, r *BinaryRational) error {
+func (m *BinaryRationalManager) SelectSmallRationalBounds(qm *RationalManager, lower, upper *Rational, r *BinaryRational) (err error) {
 	if e := m.check(r); e != nil {
 		return e
 	}
@@ -387,24 +494,31 @@ func (m *BinaryRationalManager) SelectSmallRationalBounds(qm *RationalManager, l
 	if yes {
 		return m.SetInteger(r, aux)
 	}
-	l2k, u2k := NewRational(), NewRational()
-	defer qm.drop(&l2k)
-	defer qm.drop(&u2k)
-	two := Rational{Num: NewInt(2), Den: NewInt(1)}
-	if e = qm.Copy(&l2k, lower); e != nil {
+	if e = m.beginSelectRational(qm, selectRationalBoth); e != nil {
 		return e
 	}
-	if e = qm.Copy(&u2k, upper); e != nil {
+	defer func() {
+		if cleanup := m.finishSelectRationalSource(); err == nil {
+			err = cleanup
+		}
+		m.selectRationalExecuting = false
+	}()
+	l2k, u2k := &m.selectRationalLower, &m.selectRationalUpper
+	two := Rational{Num: NewInt(2), Den: NewInt(1)}
+	if e = qm.Copy(l2k, lower); e != nil {
+		return e
+	}
+	if e = qm.Copy(u2k, upper); e != nil {
 		return e
 	}
 	for k := uint32(1); ; k++ {
-		if e = qm.Mul(&l2k, &two, &l2k); e != nil {
+		if e = qm.Mul(l2k, &two, l2k); e != nil {
 			return e
 		}
-		if e = qm.Mul(&u2k, &two, &u2k); e != nil {
+		if e = qm.Mul(u2k, &two, u2k); e != nil {
 			return e
 		}
-		yes, e = m.selectIntegerRationalBounds(qm, &l2k, &u2k, aux)
+		yes, e = m.selectIntegerRationalBounds(qm, l2k, u2k, aux)
 		if e != nil {
 			return e
 		}

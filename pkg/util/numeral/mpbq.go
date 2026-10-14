@@ -36,23 +36,27 @@ var ErrBinaryRootDegreeZero = errors.New("mpnum: binary-rational root degree zer
 // This cold operation owner borrows z and diagnostics. Both must outlive it.
 // No operations or shared Budget accesses are concurrently safe.
 type BinaryRationalManager struct {
-	Z                                            *IntegerManager
-	Diagnostics                                  *RationalService
-	self                                         *BinaryRationalManager
-	Tmp, Tmp2                                    Int
-	AddMulTmp                                    BinaryRational
-	SelectIntTmp1, SelectIntTmp2, SelectSmallTmp Int
-	SelectSmallTmp1, SelectSmallTmp2             BinaryRational
-	DivTmp1, DivTmp2, DivTmp3                    Int
-	HeaderBytes                                  uint64
-	closed                                       bool
-	closing                                      bool
-	cleanupStage                                 uint8
-	Display                                      binaryDisplayScope
-	selectIntTemporary                           Int
-	selectIntOwner                               *RationalManager
-	selectIntPending                             bool
-	selectIntExecuting                           bool
+	Z                                              *IntegerManager
+	Diagnostics                                    *RationalService
+	self                                           *BinaryRationalManager
+	Tmp, Tmp2                                      Int
+	AddMulTmp                                      BinaryRational
+	SelectIntTmp1, SelectIntTmp2, SelectSmallTmp   Int
+	SelectSmallTmp1, SelectSmallTmp2               BinaryRational
+	DivTmp1, DivTmp2, DivTmp3                      Int
+	HeaderBytes                                    uint64
+	closed                                         bool
+	closing                                        bool
+	cleanupStage                                   uint8
+	Display                                        binaryDisplayScope
+	selectIntTemporary                             Int
+	selectIntOwner                                 *RationalManager
+	selectIntPending                               bool
+	selectIntExecuting                             bool
+	selectRationalLower, selectRationalUpper       Rational
+	selectRationalOwner                            *RationalManager
+	selectRationalShape, selectRationalCursor      uint8
+	selectRationalPending, selectRationalExecuting bool
 }
 type BinaryRationalStats struct {
 	HeaderBytes           uint64
@@ -82,6 +86,9 @@ func (m *BinaryRationalManager) open() error {
 		return arena.ErrClosed
 	}
 	if m.selectIntPending {
+		return ErrBinarySelectPending
+	}
+	if m.selectRationalPending && !m.selectRationalExecuting {
 		return ErrBinarySelectPending
 	}
 	return nil
@@ -122,7 +129,7 @@ func (m *BinaryRationalManager) CloseChecked() error {
 	if m == nil || m.self != m {
 		return ErrBinaryOwner
 	}
-	if m.selectIntExecuting {
+	if m.selectIntExecuting || m.selectRationalExecuting {
 		return ErrBinarySelectPending
 	}
 	if m.closed {
@@ -130,6 +137,9 @@ func (m *BinaryRationalManager) CloseChecked() error {
 	}
 	m.closing = true
 	if e := m.CleanupSelectIntegerTemporary(); e != nil {
+		return e
+	}
+	if e := m.CleanupSelectRationalTemporaries(); e != nil {
 		return e
 	}
 	if e := m.CleanupDisplay(); e != nil {

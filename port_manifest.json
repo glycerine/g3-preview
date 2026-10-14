@@ -150123,7 +150123,8 @@
             "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
             "TestBinaryScopedRoutes",
-            "TestBinarySelectionScopedIntegerCleanupRetry"
+            "TestBinarySelectionScopedIntegerCleanupRetry",
+            "TestBinarySelectionScopedRationalsResumeSourceDestructionOrder"
           ]
         },
         {
@@ -150437,7 +150438,8 @@
             "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
             "TestBinaryScopedRoutes",
-            "TestBinarySelectionScopedIntegerCleanupRetry"
+            "TestBinarySelectionScopedIntegerCleanupRetry",
+            "TestBinarySelectionScopedRationalsResumeSourceDestructionOrder"
           ]
         },
         {
