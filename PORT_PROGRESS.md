@@ -1,3 +1,14 @@
+Retained `parray` bound-view audit: all five production subpaving configurations
+(`mpfx`, `mpff`, `hwf`, `mpq`, `mpf`) already use concrete native pointer slices.
+Root null slots, child copies, indexed lookups and child-local replacements
+preserve borrowed bound identity; focused tests for all five pass on CPUs 8-16.
+The manifest now credits only these visible storage semantics as platform
+replacements. Persistent cell allocation, inverse-trail publication, rerooting,
+allocator refusals, AST array callbacks and source diagnostics remain open.
+`display_info` is used only in `src/test/parray.cpp` and is reference-only.
+The live configuration get threshold is 16, correcting the old int32-fixture
+threshold of eight in the inventory.
+
 `cmd_exception` location profile correction: the `line()` and `pos()` guards in
 `src/util/cmd_context_types.h` are `SASSERT` only. Native Go builds now return
 the stored location even when `has_pos()` is false; `g3debug` retains the

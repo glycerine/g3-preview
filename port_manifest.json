@@ -166561,12 +166561,16 @@
         "pkg/math/subpaving/fixed_node_test.go",
         "pkg/math/subpaving/fast_node.go",
         "pkg/math/subpaving/fast_node_test.go",
-        "pkg/math/subpaving/hardware_node.go"
+        "pkg/math/subpaving/hardware_node.go",
+        "pkg/math/subpaving/rational_node.go",
+        "pkg/math/subpaving/arbitrary_context_child.go"
       ],
       "tests": [
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFastNodeConstantIntervalViews",
-        "TestHardwareNodeRetainedBoundViewsAndChildTrail"
+        "TestHardwareNodeRetainedBoundViewsAndChildTrail",
+        "TestRationalContextRootIntegerBoundsAndChildViews",
+        "TestArbitraryChildRecentBoundReplayAndPolynomialWatcher"
       ],
       "conditionals": [
         {
@@ -166801,7 +166805,7 @@
           "tests": []
         },
         {
-          "name": "size/empty and mutable get strict trail threshold8",
+          "name": "size/empty and mutable get strict trail threshold16 in retained AST and subpaving configurations",
           "status": "unported",
           "tests": []
         },
@@ -166821,8 +166825,8 @@
           "tests": []
         },
         {
-          "name": "display_info source structure with scalar identity and budgeted host-bounded prefix output",
-          "status": "unported",
+          "name": "display_info cell-structure output is called only by src/test/parray.cpp, not by retained production consumers",
+          "status": "reference_only",
           "tests": []
         },
         {
@@ -166850,8 +166854,8 @@
           ]
         },
         {
-          "name": "Concrete subpaving bound-array copy, indexed lookup and set with borrowed bound identity",
-          "status": "partial",
+          "name": "Concrete config_mpfx subpaving bound views use native copied slices for root initialization, child copy, indexed lookup and set with borrowed bound identity",
+          "status": "platform_replacement",
           "go_target": "pkg/math/subpaving/fixed_node.go",
           "tests": [
             "TestSubpavingFixedNodeConstantIntervalViews",
@@ -166859,8 +166863,8 @@
           ]
         },
         {
-          "name": "Concrete config_mpff subpaving bound-array child copy, indexed lookup and set with borrowed fast-float bound identity",
-          "status": "partial",
+          "name": "Concrete config_mpff subpaving bound views use native copied slices for root initialization, child copy, indexed lookup and set with borrowed fast-float bound identity",
+          "status": "platform_replacement",
           "go_target": "pkg/math/subpaving/fast_node.go",
           "tests": [
             "TestSubpavingFastNodeConstantIntervalViews",
@@ -166868,17 +166872,33 @@
           ]
         },
         {
-          "name": "Concrete config_hwf subpaving bound-array root initialization, child copy and indexed replacement with borrowed bound identity",
-          "status": "partial",
+          "name": "Concrete config_hwf subpaving bound views use native copied slices for root initialization, child copy and indexed replacement with borrowed bound identity",
+          "status": "platform_replacement",
           "go_target": "pkg/math/subpaving/hardware_node.go",
           "tests": [
             "TestHardwareNodeRetainedBoundViewsAndChildTrail"
+          ]
+        },
+        {
+          "name": "Concrete config_mpq subpaving bound views use native copied slices for root initialization, child copy, indexed lookup and set with borrowed rational bound identity",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/subpaving/rational_node.go",
+          "tests": [
+            "TestRationalContextRootIntegerBoundsAndChildViews"
+          ]
+        },
+        {
+          "name": "Concrete config_mpf subpaving bound views use native copied slices for root initialization, child copy, indexed lookup and set with borrowed arbitrary-float bound identity",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/subpaving/arbitrary_context_child.go",
+          "tests": [
+            "TestArbitraryChildRecentBoundReplayAndPolynomialWatcher"
           ]
         }
       ],
       "ownership": [],
       "deviations": [
-        "No generic Go persistent-array implementation remains. The retained tactic goal uses native owning slices with independent copies and now has an explicit concrete platform-replacement credit. The standalone int32 stress workload and its dummy value-manager callbacks occur only in src/test/parray.cpp, so those concrete rows are reference-only; generic parray algorithms remain open for live AST and subpaving configurations. Direct AST-manager array callbacks remain open. Concrete fixed-point and fast-float subpaving bound arrays copy slices into child nodes and preserve borrowed bound identities, but the surrounding subpaving contexts remain partial. This source is not classified as dead."
+        "No generic Go persistent-array implementation remains. The retained tactic goal uses native owning slices with independent copies and has an explicit concrete platform-replacement credit. The standalone int32 stress workload and its dummy value-manager callbacks occur only in src/test/parray.cpp, so those concrete rows are reference-only. All five retained subpaving bound configurations have native copied-slice views that preserve root null slots, child snapshots, indexed replacement and borrowed bound identities; their owner contexts retain separate partial obligations. Source cell allocation, shared-root inverse publication, trail replay/reroot, allocator failure and TRACE/SASSERT behavior are not credited by these platform replacements and remain unported. Direct AST-manager expression/dependency array callbacks remain open. This source is not classified as dead."
       ]
     },
     {
