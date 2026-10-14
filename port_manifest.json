@@ -35467,7 +35467,9 @@
         "pkg/math/interval/fixed_root_trace.go",
         "pkg/math/interval/fast_root_trace.go",
         "pkg/math/interval/root_trace_stream.go",
-        "pkg/math/interval/fixed_fast_root_trace_test.go"
+        "pkg/math/interval/fixed_fast_root_trace_test.go",
+        "pkg/math/interval/rational_root_trace.go",
+        "pkg/math/interval/rational_root_trace_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -36289,6 +36291,13 @@
           "go_target": "pkg/math/interval/fast_root_trace.go",
           "go_targets": ["pkg/math/interval/root_trace_stream.go", "pkg/math/interval/fixed_fast_root_trace_test.go"],
           "tests": ["TestFastRootRetainedTraceSitesSourceOrder"]
+        },
+        {
+          "name": "Reached precise config_mpq scalar-root nth_root and nth_root_trace sites (interval_def.h:206-210,315-320); inexact nth_root_bug branch excluded",
+          "status": "ported",
+          "go_target": "pkg/math/interval/rational_root_trace.go",
+          "go_targets": ["pkg/math/interval/root_trace_stream.go", "pkg/math/interval/rational_root_trace_test.go"],
+          "tests": ["TestRationalRootRetainedTraceSitesSourceOrder"]
         },
         {
           "name": "Reached config_mpf Newton iteration and bound-check TRACE records, including source hi-under-lo display (interval_def.h:315-320,344-348)",
@@ -175968,7 +175977,9 @@
         "pkg/math/interval/fixed_root_trace.go",
         "pkg/math/interval/fast_root_trace.go",
         "pkg/math/interval/root_trace_stream.go",
-        "pkg/math/interval/fixed_fast_root_trace_test.go"
+        "pkg/math/interval/fixed_fast_root_trace_test.go",
+        "pkg/math/interval/rational_root_trace.go",
+        "pkg/math/interval/rational_root_trace_test.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -176541,6 +176552,13 @@
           "tests": ["TestFastRootRetainedTraceSitesSourceOrder"]
         },
         {
+          "name": "Reached precise config_mpq scalar-root nth_root and nth_root_trace sites (interval_def.h:206-210,315-320); inexact nth_root_bug branch excluded",
+          "status": "ported",
+          "go_target": "pkg/math/interval/rational_root_trace.go",
+          "go_targets": ["pkg/math/interval/root_trace_stream.go", "pkg/math/interval/rational_root_trace_test.go"],
+          "tests": ["TestRationalRootRetainedTraceSitesSourceOrder"]
+        },
+        {
           "name": "Reached config_mpf Newton iteration and bound-check TRACE records, including source hi-under-lo display (interval_def.h:315-320,344-348)",
           "status": "ported",
           "go_target": "pkg/math/interval/arbitrary_root_trace.go",
@@ -176599,7 +176617,9 @@
         "pkg/math/interval/fixed_root_trace.go",
         "pkg/math/interval/fast_root_trace.go",
         "pkg/math/interval/root_trace_stream.go",
-        "pkg/math/interval/fixed_fast_root_trace_test.go"
+        "pkg/math/interval/fixed_fast_root_trace_test.go",
+        "pkg/math/interval/rational_root_trace.go",
+        "pkg/math/interval/rational_root_trace_test.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -177182,6 +177202,13 @@
           "go_target": "pkg/math/interval/fast_root_trace.go",
           "go_targets": ["pkg/math/interval/root_trace_stream.go", "pkg/math/interval/fixed_fast_root_trace_test.go"],
           "tests": ["TestFastRootRetainedTraceSitesSourceOrder"]
+        },
+        {
+          "name": "Reached precise config_mpq scalar-root nth_root and nth_root_trace sites (interval_def.h:206-210,315-320); inexact nth_root_bug branch excluded",
+          "status": "ported",
+          "go_target": "pkg/math/interval/rational_root_trace.go",
+          "go_targets": ["pkg/math/interval/root_trace_stream.go", "pkg/math/interval/rational_root_trace_test.go"],
+          "tests": ["TestRationalRootRetainedTraceSitesSourceOrder"]
         },
         {
           "name": "Reached config_mpf Newton iteration and bound-check TRACE records, including source hi-under-lo display (interval_def.h:315-320,344-348)",

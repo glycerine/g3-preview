@@ -105,6 +105,9 @@ func (r RationalRoot) Bounds(a *numeral.Rational, n uint32, precision, lower, up
 		if err = r.positiveBounds(absolute, n, precision, lo, hi, &s); err != nil {
 			return err
 		}
+		if err = r.traceNthRoot(absolute, n, lo, hi); err != nil {
+			return err
+		}
 		if negative {
 			if err = m.Swap(lo, hi); err != nil {
 				return err
@@ -218,6 +221,9 @@ func (r RationalRoot) approx(a *numeral.Rational, n uint32, precision, x *numera
 			return err
 		}
 		if err := m.Abs(d); err != nil {
+			return err
+		}
+		if err := r.traceNthRootIteration(a, x, xPrime, d); err != nil {
 			return err
 		}
 		if err := m.Swap(x, xPrime); err != nil {
