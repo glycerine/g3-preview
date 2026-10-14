@@ -148044,8 +148044,8 @@
           ]
         },
         {
-          "name": "reached initialization OOM=false scalar assignment cpp102 through actual Runtime, preserving real allocation/counter/limit state; containing first-init/generated children/full-init publication remain open",
-          "status": "partial",
+          "name": "reached initialization OOM=false scalar assignment cpp102 through actual Runtime, preserving real allocation/counter/limit state",
+          "status": "ported",
           "go_target": "pkg/util/memory/runtime_initialization_oom.go",
           "tests": [
             "TestMemoryRuntimeInitializationClearAfterActualAllocationFailure",
@@ -148054,7 +148054,7 @@
         },
         {
           "name": "caller-confined actual generated initialize/finalize scalar order cpp89-113/153-160 with stable-priority rational-symbol-gparams and debug-gparams-prime-rational-symbol-trace finalizers",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/memory/process_accounting.go",
           "go_targets": [
             "pkg/util/process/finalize.go",
@@ -148436,8 +148436,8 @@
           ]
         },
         {
-          "name": "reached initialization OOM=false scalar assignment cpp102 through actual Runtime, preserving real allocation/counter/limit state; containing first-init/generated children/full-init publication remain open",
-          "status": "partial",
+          "name": "reached initialization OOM=false scalar assignment cpp102 through actual Runtime, preserving real allocation/counter/limit state",
+          "status": "ported",
           "go_target": "pkg/util/memory/runtime_initialization_oom.go",
           "tests": [
             "TestMemoryRuntimeInitializationClearAfterActualAllocationFailure",
@@ -148446,7 +148446,7 @@
         },
         {
           "name": "caller-confined actual generated initialize/finalize scalar order cpp89-113/153-160 with stable-priority rational-symbol-gparams and debug-gparams-prime-rational-symbol-trace finalizers",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/memory/process_accounting.go",
           "go_targets": [
             "pkg/util/process/finalize.go",
