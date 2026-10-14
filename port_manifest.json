@@ -165592,7 +165592,18 @@
           ]
         },
         {
-          "name": "params_ref default/get_empty, owning copy/destructor/assignment and sharing Copy/Append",
+          "name": "params_ref null construction and copy assignment INC-before-DEC, including self and null aliases",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsReferenceAssignmentSourcePointerPublicationAfterDEC",
+            "TestParamsReferenceNullAssignmentOldDECStop",
+            "TestParamsReferenceAssignmentSelfAliasSourceINCThenDEC"
+          ]
+        },
+        {
+          "name": "params_ref get_empty binding, destructor and sharing Copy/Append with stopped owning cleanup",
           "status": "partial",
           "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
@@ -166162,7 +166173,18 @@
           ]
         },
         {
-          "name": "params_ref default/get_empty, owning copy/destructor/assignment and sharing Copy/Append",
+          "name": "params_ref null construction and copy assignment INC-before-DEC, including self and null aliases",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsReferenceAssignmentSourcePointerPublicationAfterDEC",
+            "TestParamsReferenceNullAssignmentOldDECStop",
+            "TestParamsReferenceAssignmentSelfAliasSourceINCThenDEC"
+          ]
+        },
+        {
+          "name": "params_ref get_empty binding, destructor and sharing Copy/Append with stopped owning cleanup",
           "status": "partial",
           "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
