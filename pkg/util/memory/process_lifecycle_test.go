@@ -44,8 +44,9 @@ func TestProcessSourceLifecycleGuards(t *testing.T) {
 	if err != nil || !active || !p.finalizing {
 		t.Fatal("finalization prefix", active, err)
 	}
-	if _, err := r.BeginSourceInitialize(80); !errors.Is(err, ErrProcessLifecyclePending) || p.accounting.maxSize != 80 {
-		t.Fatal("initialization during finalization lost source limit update", err)
+	first, err = r.BeginSourceInitialize(80)
+	if err != nil || first || p.accounting.maxSize != 80 || !p.finalizing || !p.initialized || !p.fullyInitialized {
+		t.Fatal("finalization reentry missed source already-initialized branch", first, err, p)
 	}
 	if _, err := p.BeginFinalize(); !errors.Is(err, ErrProcessLifecyclePending) {
 		t.Fatal("duplicate finalization", err)

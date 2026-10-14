@@ -29,9 +29,11 @@ func (m *Runtime) BeginSourceInitialize(maxSize uint64) (bool, error) {
 		}
 	}
 	// The source updates g_memory_max_size inside the critical section before
-	// its initialized guard. A single-goroutine reentry cannot wait for the
-	// generated children, but it must keep that already reached limit update.
-	if p.finalizing || p.initializing {
+	// its initialized guard. A single-goroutine reentry during unfinished
+	// initialization cannot wait for the generated children. Finalization keeps
+	// both source initialized flags set until its children finish, so a call
+	// during finalization takes the ordinary already-initialized branch.
+	if p.initializing {
 		return false, ErrProcessLifecyclePending
 	}
 	if p.initialized {
