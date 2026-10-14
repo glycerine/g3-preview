@@ -189,6 +189,12 @@ func TestRationalIntervalLiveNodeBoundsAndOwnedCopy(t *testing.T) {
 	if shown.String() != "[0, 4]" {
 		t.Fatal("positive live view even power", shown.String())
 	}
+	must(result.Inv(view))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "[1/2, +oo)" {
+		t.Fatal("positive live view inverse", shown.String())
+	}
 	must(m.SetInt32(&lo, -2))
 	must(root.PushBound(0, &lo, true, true))
 	must(m.SetInt32(&lo, -3))

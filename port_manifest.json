@@ -51687,6 +51687,7 @@
         "pkg/math/subpaving/rational_interval_mul.go",
         "pkg/math/subpaving/rational_interval_div.go",
         "pkg/math/subpaving/rational_interval_power.go",
+        "pkg/math/subpaving/rational_interval_inv.go",
         "pkg/math/subpaving/rational_context_root.go",
         "pkg/math/subpaving/rational_node.go",
         "pkg/math/subpaving/rational_selector.go",
@@ -51699,6 +51700,7 @@
         "TestSubpavingRationalIntervalMulNineSignClassesAndTies",
         "TestSubpavingRationalIntervalDivSixSignAndOpenZeroBranches",
         "TestSubpavingRationalIntervalPowerSourceCases",
+        "TestSubpavingRationalIntervalInverseSourceBranches",
         "TestRationalContextRootIntegerBoundsAndChildViews",
         "TestRationalContextSourceBoundConflicts"
       ],
@@ -52150,6 +52152,15 @@
           "go_target": "pkg/math/subpaving/rational_interval_power.go",
           "tests": [
             "TestSubpavingRationalIntervalPowerSourceCases",
+            "TestRationalIntervalLiveNodeBoundsAndOwnedCopy"
+          ]
+        },
+        {
+          "name": "Concrete config_mpq interval reciprocal with live borrowed input, positive and negative branches, open-zero infinities, infinite endpoint zeroes and aliasing; source interval_bug TRACE records remain open (src/math/interval/interval_def.h:1510-1590)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/rational_interval_inv.go",
+          "tests": [
+            "TestSubpavingRationalIntervalInverseSourceBranches",
             "TestRationalIntervalLiveNodeBoundsAndOwnedCopy"
           ]
         },
@@ -119847,7 +119858,7 @@
       "path": "src/util/ext_numeral.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/math/interval/rational_extended.go",
         "pkg/math/interval/rational_extended_test.go",
@@ -119878,7 +119889,8 @@
         "pkg/math/subpaving/hardware_interval_scalar.go",
         "pkg/math/subpaving/hardware_interval_power.go",
         "pkg/math/subpaving/hardware_interval_mul.go",
-        "pkg/math/subpaving/hardware_interval_div.go"
+        "pkg/math/subpaving/hardware_interval_div.go",
+        "pkg/math/subpaving/rational_interval_inv.go"
       ],
       "tests": [
         "TestRationalExtendedIntervalBranches",
@@ -119894,7 +119906,9 @@
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
         "TestSubpavingHardwareIntervalPowerRetainedBranches",
         "TestSubpavingHardwareIntervalMulNineSignClassesAndDirectedBounds",
-        "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds"
+        "TestSubpavingHardwareIntervalDivSignBranchesAndDirectedBounds",
+        "TestSubpavingRationalIntervalInverseSourceBranches",
+        "TestRationalIntervalLiveNodeBoundsAndOwnedCopy"
       ],
       "conditionals": [
         {
@@ -120077,15 +120091,16 @@
           ]
         },
         {
-          "name": "Subpaving context_mpq interval extended-number operations distinct from the default rational interval owner",
-          "status": "partial",
+          "name": "Subpaving context_mpq interval extended-number signs, order, arithmetic, power, reciprocal and display through the distinct concrete rational interval owner",
+          "status": "ported",
           "go_target": "pkg/math/subpaving/rational_interval.go",
           "go_targets": [
             "pkg/math/subpaving/rational_interval_arith.go",
             "pkg/math/subpaving/rational_interval_scalar.go",
             "pkg/math/subpaving/rational_interval_mul.go",
             "pkg/math/subpaving/rational_interval_div.go",
-            "pkg/math/subpaving/rational_interval_power.go"
+            "pkg/math/subpaving/rational_interval_power.go",
+            "pkg/math/subpaving/rational_interval_inv.go"
           ],
           "tests": [
             "TestSubpavingRationalMutableIntervalCore",
@@ -120093,7 +120108,9 @@
             "TestSubpavingRationalIntervalScalarSourceBranches",
             "TestSubpavingRationalIntervalMulNineSignClassesAndTies",
             "TestSubpavingRationalIntervalDivSixSignAndOpenZeroBranches",
-            "TestSubpavingRationalIntervalPowerSourceCases"
+            "TestSubpavingRationalIntervalPowerSourceCases",
+            "TestSubpavingRationalIntervalInverseSourceBranches",
+            "TestRationalIntervalLiveNodeBoundsAndOwnedCopy"
           ]
         },
         {
@@ -120163,9 +120180,8 @@
       ],
       "deviations": [
         "No generic manager-interface translation is retained. Concrete mpq, mpbq, mpfx and mpff specializations live beside their interval and subpaving consumers. src/test/ext_numeral.cpp is test-only.",
-        "The interval_manager mpq and real-closure mpbq specializations have concrete live sign, order, arithmetic, reciprocal, power and display paths, with caller-owned outputs and borrowed numerals. The mpbq division and reciprocal paths preserve the real-closure precision and rounding direction. Other retained subpaving mpq/mpfx/mpf/mpff instantiations remain open.",
-        "The concrete mpfx extended-number path is wired to the partial fixed subpaving interval owner. The mpff helper serves mutable and constant-node fast-float interval views; the enclosing subpaving context is partial. Concrete mpq/mpbq/mpfx/mpff displays now report Go io.Writer short writes after the exact emitted prefix. Source subpaving.cpp constructs context_mpq, context_mpf and context_hwf as additional live interval-manager instantiations; the concrete MPF extended-number path is now partial; the mpq path remains unported and the hwf path is ported at the method level.",
-        "The reached config_hwf extended-number specialization is now complete at the method level through concrete HardwareExtended and hardware interval callers; the shared header remains partial for other retained numeral configurations."
+        "The reached mpq, mpbq, mpfx, mpff, mpf and hwf extended-number helper instantiations have concrete typed Go paths through their interval owners. The mpbq division and reciprocal paths preserve real-closure precision and rounding direction; caller-owned outputs and borrowed numeral managers remain explicit.",
+        "The subpaving mpq, mpfx, mpff, mpf and hwf interval and context owners can remain partial after their reached ext_numeral helper operations are ported. Concrete displays report Go io.Writer short writes after the exact emitted prefix. Unused template helpers are not translated into universal Go adapters."
       ]
     },
     {
