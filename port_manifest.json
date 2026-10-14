@@ -155720,7 +155720,7 @@
           ]
         },
         {
-          "name": "div_1 post-borrow mpn_div1 TRACE through numeric division and decimal conversion (mpn.cpp:296-302)",
+          "name": "div_1 post-borrow mpn_div1 TRACE source insertions and std::endl flush through numeric division and decimal conversion (mpn.cpp:296-302)",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpn_div1_trace.go",
           "go_targets": [
@@ -155728,7 +155728,8 @@
             "pkg/util/numeral/mpn_cstring.go"
           ],
           "tests": [
-            "TestMPNSingleLimbDivisionTraceAndDecimalCaller"
+            "TestMPNSingleLimbDivisionTraceAndDecimalCaller",
+            "TestMPNSingleLimbDivisionTraceInsertionAndEndlRefusal"
           ]
         },
         {
@@ -156280,7 +156281,7 @@
           ]
         },
         {
-          "name": "div_1 post-borrow mpn_div1 TRACE through numeric division and decimal conversion (mpn.cpp:296-302)",
+          "name": "div_1 post-borrow mpn_div1 TRACE source insertions and std::endl flush through numeric division and decimal conversion (mpn.cpp:296-302)",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpn_div1_trace.go",
           "go_targets": [
@@ -156288,7 +156289,8 @@
             "pkg/util/numeral/mpn_cstring.go"
           ],
           "tests": [
-            "TestMPNSingleLimbDivisionTraceAndDecimalCaller"
+            "TestMPNSingleLimbDivisionTraceAndDecimalCaller",
+            "TestMPNSingleLimbDivisionTraceInsertionAndEndlRefusal"
           ]
         },
         {
@@ -175808,6 +175810,13 @@
           ]
         },
         {
+          "name": "Reached MPN div_1 TRACE operand insertions and std::endl flush before footer (mpn.cpp:296-302)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_div1_trace.go",
+          "go_targets": ["pkg/util/numeral/mpn_div1_trace_test.go"],
+          "tests": ["TestMPNSingleLimbDivisionTraceAndDecimalCaller", "TestMPNSingleLimbDivisionTraceInsertionAndEndlRefusal"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -176307,6 +176316,13 @@
             "TestMPNToStringSourceEntryExitAndShortDestinationTrace",
             "TestMPNToStringSourceEndlFlushAndRefusedStream"
           ]
+        },
+        {
+          "name": "Reached MPN div_1 TRACE operand insertions and std::endl flush before footer (mpn.cpp:296-302)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_div1_trace.go",
+          "go_targets": ["pkg/util/numeral/mpn_div1_trace_test.go"],
+          "tests": ["TestMPNSingleLimbDivisionTraceAndDecimalCaller", "TestMPNSingleLimbDivisionTraceInsertionAndEndlRefusal"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
