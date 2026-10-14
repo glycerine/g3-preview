@@ -32,7 +32,7 @@ func TestUPolynomialBinaryVectorActualAscendingDestruction(t *testing.T) {
 	serviceMust(t, b.SetIntegerPower(&a, &input, 9))
 	serviceMust(t, b.Integers().Del(&input))
 	for i := 0; i < 3; i++ {
-		serviceMust(t, v.PushCopy(&a))
+		serviceMust(t, upolyAppendBinaryFixture(v, &a))
 	}
 	serviceMust(t, b.Del(&a))
 	slots := [3]arena.Slot{}

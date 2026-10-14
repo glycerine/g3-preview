@@ -115,16 +115,6 @@ func numericBinaryRationalManager_binaryDestroy(m *unumeral.BinaryRationalManage
 	*s = upolyBinaryVectorState{}
 	return nil
 }
-func (v *BinaryRationalVector) PushCopy(a *unumeral.BinaryRational) error {
-	if e := v.check(); e != nil {
-		return e
-	}
-	dst, e := numericBinaryRationalManager_binaryPushDefault(v.manager, &v.state)
-	if e != nil {
-		return e
-	}
-	return v.manager.Copy(dst, a)
-}
 func (v *BinaryRationalVector) Size() (uint32, error) {
 	if e := v.check(); e != nil {
 		return 0, e

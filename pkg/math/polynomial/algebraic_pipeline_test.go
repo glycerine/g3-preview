@@ -289,9 +289,9 @@ func TestAlgebraicPrivateMemberDestructionOrder(t *testing.T) {
 	t.Cleanup(func() { serviceMust(t, z.Del(&n)) })
 	b := unumeral.NewBinaryInt(0)
 	serviceMust(t, z.Copy(&(*b.BorrowNumerator()), &n))
-	serviceMust(t, c.roots.PushCopy(&b))
-	serviceMust(t, c.lowers.PushCopy(&b))
-	serviceMust(t, c.uppers.PushCopy(&b))
+	serviceMust(t, upolyAppendBinaryFixture(c.roots, &b))
+	serviceMust(t, upolyAppendBinaryFixture(c.lowers, &b))
+	serviceMust(t, upolyAppendBinaryFixture(c.uppers, &b))
 	serviceMust(t, z.Del(&(*b.BorrowNumerator())))
 	slots := []arena.Slot{unumeral.NumericSlot((*c.roots.state.values[0].BorrowNumerator()).Cell), unumeral.NumericSlot((*c.lowers.state.values[0].BorrowNumerator()).Cell), unumeral.NumericSlot((*c.uppers.state.values[0].BorrowNumerator()).Cell)}
 	serviceMust(t, c.Close())

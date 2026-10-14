@@ -18,7 +18,7 @@ func TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard(t *testing.T) {
 	serviceMust(t, b.SetIntegerPower(&a, &n, 7))
 	serviceMust(t, q.Integers().Del(&n))
 	for _, v := range []*BinaryRationalVector{roots, lowers, uppers} {
-		serviceMust(t, v.PushCopy(&a))
+		serviceMust(t, upolyAppendBinaryFixture(v, &a))
 	}
 	serviceMust(t, b.Del(&a))
 	p := upolySourceNew(t, m, []int32{1})
@@ -46,7 +46,7 @@ func TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults(t *testing.T) {
 	value := unumeral.NewBinaryRational()
 	serviceMust(t, b.SetIntegerPower(&value, &numeral, 7))
 	serviceMust(t, q.Integers().Del(&numeral))
-	serviceMust(t, v.PushCopy(&value))
+	serviceMust(t, upolyAppendBinaryFixture(v, &value))
 	serviceMust(t, b.Del(&value))
 	token := v.state.values[0].BorrowNumerator().NativeCellToken()
 	old := v.state.values

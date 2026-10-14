@@ -9,6 +9,14 @@ import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
+func upolyAppendBinaryFixture(v *BinaryRationalVector, a *unumeral.BinaryRational) error {
+	dst, e := numericBinaryRationalManager_binaryPushDefault(v.manager, &v.state)
+	if e != nil {
+		return e
+	}
+	return v.manager.Copy(dst, a)
+}
+
 func TestUPolynomialIsolationAllDispatchRoutesIndependent(t *testing.T) {
 	m, q, budget := upolySourceOwner(t)
 	b := upolyIsolationBinaryOwner(t, q, budget)
@@ -50,7 +58,7 @@ func TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau(t *testing.T) {
 	b := upolyIsolationBinaryOwner(t, q, budget)
 	v := upolyIsolationVector(t, b)
 	a := unumeral.NewBinaryInt(7)
-	if e := v.PushCopy(&a); e != nil {
+	if e := upolyAppendBinaryFixture(v, &a); e != nil {
 		t.Fatal(e)
 	}
 	// vector::reserve actually calls resize when needed: logical length grows,
@@ -95,7 +103,7 @@ func TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau(t *testing.T) {
 		if e = v.Reset(); e != nil {
 			t.Fatal(e)
 		}
-		if e = v.PushCopy(&a); e != nil {
+		if e = upolyAppendBinaryFixture(v, &a); e != nil {
 			t.Fatal(e)
 		}
 	}
@@ -123,7 +131,7 @@ func TestUPolynomialBinaryVectorOwnerRefusalAndNativePush(t *testing.T) {
 	v = upolyIsolationVector(t, b)
 	a := unumeral.NewBinaryInt(1)
 	budget.FailAfter(0)
-	e = v.PushCopy(&a)
+	e = upolyAppendBinaryFixture(v, &a)
 	if e != nil || upolyIsolationSize(t, v) != 1 {
 		t.Fatal("native push", e)
 	}
@@ -160,7 +168,7 @@ func TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots(t *testing.T) {
 			t.Fatal(e)
 		}
 		budget.FailAfter(fault)
-		e := v.PushCopy(&a)
+		e := upolyAppendBinaryFixture(v, &a)
 		graph, vec := m.Stats(), v.Stats()
 		binary, e2 := b.Stats()
 		if e2 != nil || graph.IntegerLiveCells != graph.IntegerCachedCells+graph.OwnedNumeralCells+upolyIntegerRawOwnedCells(t, m.IntegerManager())+vec.OwnedNumeralCells+binary.LiveScratchNumerators+1 {
@@ -356,7 +364,7 @@ func TestUPolynomialIsolationNativeCoefficientResetAndZeroPublication(t *testing
 	r, l, u := upolyIsolationVector(t, b), upolyIsolationVector(t, b), upolyIsolationVector(t, b)
 	one := unumeral.NewBinaryInt(1)
 	for _, v := range []*BinaryRationalVector{r, l, u} {
-		if e := v.PushCopy(&one); e != nil {
+		if e := upolyAppendBinaryFixture(v, &one); e != nil {
 			t.Fatal(e)
 		}
 	}
