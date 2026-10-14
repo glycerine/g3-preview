@@ -24,6 +24,8 @@ func (m *ArbitraryFloatManager) Mul(mode ArbitraryFloatRoundingMode, x, y, out *
 	if modularSourceDebug && (x.SBits() != y.SBits() || x.EBits() != y.EBits()) {
 		return ErrIntegerAssertion
 	}
+	m.traceMulDebugValue("X = ", x, 595)
+	m.traceMulDebugValue("Y = ", y, 596)
 	for _, v := range [...]*ArbitraryFloat{x, y} {
 		nan, e := m.IsNaN(v)
 		if e != nil {
@@ -108,14 +110,19 @@ func (m *ArbitraryFloatManager) Mul(mode ArbitraryFloatRoundingMode, x, y, out *
 	if e := m.unpackRationalNumeral(&s.b, true, context); e != nil {
 		return e
 	}
+	m.traceMulDebugValue("A = ", &s.a, 640)
+	m.traceMulDebugValue("B = ", &s.b, 641)
 	a, b := s.a.exponent, s.b.exponent
 	if b > 0 && a > math.MaxInt64-b || b < 0 && a < math.MinInt64-b {
 		return arena.ErrBounds
 	}
 	out.exponent = a + b
+	m.traceMulDebugInt("A' = ", &s.a.significand, 645)
+	m.traceMulDebugInt("B' = ", &s.b.significand, 646)
 	if e := z.mulWithAllocationContext(&s.a.significand, &s.b.significand, &out.significand, context); e != nil {
 		return e
 	}
+	m.traceMulDebugValue("PRODUCT = ", out, 650)
 	s.stickyLive = true
 	if out.SBits() >= 4 {
 		p, e := s.power(out.SBits() - 4)

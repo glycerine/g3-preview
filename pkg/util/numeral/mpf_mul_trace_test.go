@@ -46,6 +46,40 @@ func TestArbitraryFloatMulBugTraceSourceBoundaries(t *testing.T) {
 			}
 		}
 	}
+	tags.Enable("mpf_dbg")
+	debugCompiled := tags.ShouldTrace("mpf_dbg")
+	output.Reset()
+	serviceMust(t, m.Mul(ArbitraryFloatNearestEven, &one, &one, &one))
+	if debugCompiled {
+		got := output.String()
+		last := -1
+		if compiled {
+			last = strings.Index(got, "-------- [mpf_mul_bug] mul src/util/mpf.cpp:590 ---------\n")
+		}
+		for _, site := range []struct {
+			line, label string
+		}{{"595", "X = "}, {"596", "Y = "}, {"640", "A = "}, {"641", "B = "}, {"645", "A' = "}, {"646", "B' = "}, {"650", "PRODUCT = "}} {
+			entry := "-------- [mpf_dbg] mul src/util/mpf.cpp:" + site.line + " ---------\n" + site.label
+			at := strings.Index(got, entry)
+			if at <= last {
+				t.Fatalf("debug source order at %s: %q", site.line, got)
+			}
+			last = at
+		}
+		if compiled && strings.Index(got, "-------- [mpf_mul_bug] mul src/util/mpf.cpp:664 ---------\n") <= last {
+			t.Fatalf("result trace preceded product: %q", got)
+		}
+	} else if !compiled && output.Len() != 0 {
+		t.Fatalf("erased debug trace: %q", output.String())
+	}
+	output.Reset()
+	serviceMust(t, m.Mul(ArbitraryFloatNearestEven, &zero, &one, &product))
+	if debugCompiled {
+		got := output.String()
+		if strings.Count(got, "-------- [mpf_dbg] mul src/util/mpf.cpp:") != 2 || strings.Contains(got, "PRODUCT = ") {
+			t.Fatalf("shortcut reached general-body debug trace: %q", got)
+		}
+	}
 	serviceMust(t, m.Del(&zero))
 	serviceMust(t, m.Del(&one))
 	serviceMust(t, m.Del(&product))

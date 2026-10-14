@@ -94,3 +94,38 @@ func (m *ArbitraryFloatManager) traceMulResult(out *ArbitraryFloat) {
 			return writeNumeralDisplayPart(w, "\n")
 		})
 }
+
+func (m *ArbitraryFloatManager) traceMulDebugValue(label string, value *ArbitraryFloat, line int) {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return
+	}
+	_ = tags.EmitConditional("mpf_dbg", "mul", "src/util/mpf.cpp", line,
+		func() bool { return true }, func(w io.Writer) error {
+			if e := writeNumeralDisplayPart(w, label); e != nil {
+				return e
+			}
+			if e := m.traceFloatString(w, value); e != nil {
+				return e
+			}
+			return writeNumeralDisplayPart(w, "\n")
+		})
+}
+
+func (m *ArbitraryFloatManager) traceMulDebugInt(label string, value *Int, line int) {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return
+	}
+	_ = tags.EmitConditional("mpf_dbg", "mul", "src/util/mpf.cpp", line,
+		func() bool { return true }, func(w io.Writer) error {
+			if e := writeNumeralDisplayPart(w, label); e != nil {
+				return e
+			}
+			s, e := m.integer.String(value)
+			if e != nil {
+				return e
+			}
+			return writeNumeralDisplayPart(w, s+"\n")
+		})
+}
