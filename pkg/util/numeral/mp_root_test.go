@@ -137,6 +137,34 @@ func TestPerfectSquareIndependentAndSourceAlias(t *testing.T) {
 		}
 	}
 }
+
+func TestPerfectSquareLargeIndependentCeilingOracle(t *testing.T) {
+	m, _ := integerManager(t)
+	rng := rand.New(rand.NewSource(0x737175617265))
+	for sample := 0; sample < 48; sample++ {
+		base := new(big.Int).SetUint64(rng.Uint64() | (uint64(1) << 63))
+		base.Lsh(base, uint(sample%37))
+		base.Add(base, new(big.Int).SetUint64(rng.Uint64()))
+		square := new(big.Int).Mul(base, base)
+		for _, offset := range []int64{-1, 0, 1} {
+			input := new(big.Int).Add(square, big.NewInt(offset))
+			root := new(big.Int).Sqrt(input)
+			precise := new(big.Int).Mul(new(big.Int).Set(root), root).Cmp(input) == 0
+			if !precise {
+				root.Add(root, big.NewInt(1))
+			}
+			var in Int
+			setIntegerOracle(t, m, &in, input)
+			out := NewInt(-17)
+			exact, err := m.IsPerfectSquare(&in, &out)
+			if err != nil || exact != precise || integerString(t, m, &out) != root.String() || integerString(t, m, &in) != input.String() {
+				t.Fatal(sample, offset, exact, precise, err, root)
+			}
+			serviceMust(t, m.Del(&out))
+			serviceMust(t, m.Del(&in))
+		}
+	}
+}
 func TestRationalRootAndSquareSourcePublication(t *testing.T) {
 	for _, synch := range []bool{false, true} {
 		m, _ := rationalManager(t, synch)
