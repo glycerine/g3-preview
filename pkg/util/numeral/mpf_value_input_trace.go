@@ -7,8 +7,16 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
+
+func writeSetTracePart(w io.Writer, part string) error {
+	if part == "\n" {
+		return diagnostic.WriteTraceEndl(w)
+	}
+	return writeNumeralDisplayPart(w, part)
+}
 
 func (m *ArbitraryFloatManager) traceSetInt32Result(out *ArbitraryFloat) error {
 	return m.traceSetOrdinaryResult(out, 105)
@@ -34,7 +42,7 @@ func (m *ArbitraryFloatManager) traceSetPlainRationalEntry(value *Rational, ebit
 				return e
 			}
 			for _, part := range [...]string{" [", strconv.FormatUint(uint64(ebits), 10), "/", strconv.FormatUint(uint64(sbits), 10), "]", "\n"} {
-				if e := writeNumeralDisplayPart(w, part); e != nil {
+				if e := writeSetTracePart(w, part); e != nil {
 					return e
 				}
 			}
@@ -81,7 +89,7 @@ func (m *ArbitraryFloatManager) traceSetRationalAndExponent(label string, signif
 			if e := writeNumeralDisplayPart(w, s); e != nil {
 				return e
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }
@@ -103,7 +111,7 @@ func (m *ArbitraryFloatManager) traceSetExponentRationalFields(out *ArbitraryFlo
 				return e
 			}
 			for _, part := range [...]string{s, " exp = ", strconv.FormatInt(out.exponent, 10), "\n"} {
-				if e := writeNumeralDisplayPart(w, part); e != nil {
+				if e := writeSetTracePart(w, part); e != nil {
 					return e
 				}
 			}
@@ -124,7 +132,7 @@ func (m *ArbitraryFloatManager) traceSetLiteralEntry(value string, ebits, sbits 
 	_ = tags.EmitConditional("mpf_dbg", "set", "src/util/mpf.cpp", 195,
 		func() bool { return true }, func(w io.Writer) error {
 			for _, part := range parts {
-				if e := writeNumeralDisplayPart(w, part); e != nil {
+				if e := writeSetTracePart(w, part); e != nil {
 					return e
 				}
 			}
@@ -141,7 +149,7 @@ func (m *ArbitraryFloatManager) traceSetLiteralParts(negative bool, fraction, ex
 	_ = tags.EmitConditional("mpf_dbg", "set", "src/util/mpf.cpp", 219,
 		func() bool { return true }, func(w io.Writer) error {
 			for _, part := range parts {
-				if e := writeNumeralDisplayPart(w, part); e != nil {
+				if e := writeSetTracePart(w, part); e != nil {
 					return e
 				}
 			}
@@ -168,7 +176,7 @@ func (m *ArbitraryFloatManager) traceSetOrdinaryResult(out *ArbitraryFloat, line
 			if e := writeNumeralDisplayPart(w, value); e != nil {
 				return e
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }
@@ -199,7 +207,7 @@ func (m *ArbitraryFloatManager) traceSetNativeInput(value float64, bits int, raw
 	_ = tags.EmitConditional("mpf_dbg", "set", "src/util/mpf.cpp", line,
 		func() bool { return true }, func(w io.Writer) error {
 			for _, part := range parts {
-				if e := writeNumeralDisplayPart(w, part); e != nil {
+				if e := writeSetTracePart(w, part); e != nil {
 					return e
 				}
 			}
@@ -233,7 +241,7 @@ func (m *ArbitraryFloatManager) traceSetFloatRawResult(out *ArbitraryFloat) erro
 			if e := writeNumeralDisplayPart(w, formatted); e != nil {
 				return e
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }

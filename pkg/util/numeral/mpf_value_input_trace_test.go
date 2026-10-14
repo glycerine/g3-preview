@@ -273,6 +273,61 @@ func TestArbitraryFloatSetTraceSourceInsertions(t *testing.T) {
 	serviceMust(t, m.Del(&out))
 }
 
+func TestArbitraryFloatSetReachedEndlFlushes(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	w := &mpfEndlWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	var out ArbitraryFloat
+	var q Rational
+	serviceMust(t, m.rational.SetFraction(&q, 3, 4))
+	for _, tc := range []struct {
+		name  string
+		call  func() error
+		lines []int
+	}{
+		{"int32", func() error { return m.SetInt32(&out, 11, 53, -7) }, []int{76, 105}},
+		{"double", func() error { return m.SetDouble(&out, 11, 53, -1.5) }, []int{124, 147}},
+		{"float", func() error { return m.SetFloat(&out, 8, 24, 1.25) }, []int{160, 183}},
+		{"rational", func() error { return m.SetRational(&out, 8, 24, ArbitraryFloatNearestEven, &q) }, []int{187, 235, 270, 289, 300, 191}},
+		{"literal", func() error { return m.SetFormattedLiteral(&out, 8, 24, ArbitraryFloatNearestEven, "-1.25P2") }, []int{195, 219, 235, 270, 289, 300, 230}},
+	} {
+		w.events = nil
+		w.flushes = 0
+		serviceMust(t, tc.call())
+		if !tags.ShouldTrace("mpf_dbg") {
+			if len(w.events) != 0 {
+				t.Fatalf("%s erased trace reached writer: %q", tc.name, w.events)
+			}
+			continue
+		}
+		for _, line := range tc.lines {
+			start := -1
+			for i := 0; i+3 < len(w.events); i++ {
+				if w.events[i] == "write:src/util/mpf.cpp" && w.events[i+1] == "write::" && w.events[i+2] == "write:"+strconv.Itoa(line) && w.events[i+3] == "write: ---------\n" {
+					start = i + 4
+					break
+				}
+			}
+			if start < 0 {
+				t.Fatalf("%s missing reached setter site %d: %q", tc.name, line, w.events)
+			}
+			bodyFlushes := 0
+			for i := start; i < len(w.events) && w.events[i] != "write:------------------------------------------------\n"; i++ {
+				if i > start && w.events[i-1] == "write:\n" && w.events[i] == "flush" {
+					bodyFlushes++
+				}
+			}
+			if bodyFlushes != 1 {
+				t.Fatalf("%s source endl at %d: got %d body flushes, events %q", tc.name, line, bodyFlushes, w.events)
+			}
+		}
+	}
+	serviceMust(t, m.Del(&out))
+	serviceMust(t, m.rational.Del(&q))
+}
+
 func TestArbitraryFloatSetExponentRationalTraceBranches(t *testing.T) {
 	m, _, _ := mpfNumeralHelpersFixture(t)
 	var output bytes.Buffer
