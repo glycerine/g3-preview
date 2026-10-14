@@ -35457,7 +35457,10 @@
         "pkg/math/subpaving/hardware_interval_root_trace.go",
         "pkg/math/subpaving/hardware_interval_root_trace_test.go",
         "pkg/math/subpaving/arbitrary_interval_root_trace.go",
-        "pkg/math/subpaving/arbitrary_interval_root_trace_test.go"
+        "pkg/math/subpaving/arbitrary_interval_root_trace_test.go",
+        "pkg/math/subpaving/rational_interval_root_trace.go",
+        "pkg/math/subpaving/rational_interval_root_trace_test.go",
+        "pkg/math/subpaving/interval_root_trace_stream.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -36242,8 +36245,15 @@
           "name": "Reached config_mpf interval-valued nth_root and even xn_eq_y TRACE sites (interval_def.h:1427,1459,1470)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/arbitrary_interval_root_trace.go",
-          "go_targets": ["pkg/math/subpaving/arbitrary_interval_root_trace_test.go"],
+          "go_targets": ["pkg/math/subpaving/interval_root_trace_stream.go", "pkg/math/subpaving/arbitrary_interval_root_trace_test.go"],
           "tests": ["TestArbitraryIntervalRootRetainedTraceSites"]
+        },
+        {
+          "name": "Reached config_mpq interval-valued nth_root and even xn_eq_y TRACE sites (interval_def.h:1427,1459,1470)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_interval_root_trace.go",
+          "go_targets": ["pkg/math/subpaving/interval_root_trace_stream.go", "pkg/math/subpaving/rational_interval_root_trace_test.go"],
+          "tests": ["TestRationalIntervalRootRetainedTraceSites"]
         },
         {
           "name": "Reached config_mpf Newton iteration and bound-check TRACE records, including source hi-under-lo display (interval_def.h:315-320,344-348)",
@@ -175913,7 +175923,10 @@
         "pkg/math/subpaving/hardware_interval_root_trace.go",
         "pkg/math/subpaving/hardware_interval_root_trace_test.go",
         "pkg/math/subpaving/arbitrary_interval_root_trace.go",
-        "pkg/math/subpaving/arbitrary_interval_root_trace_test.go"
+        "pkg/math/subpaving/arbitrary_interval_root_trace_test.go",
+        "pkg/math/subpaving/rational_interval_root_trace.go",
+        "pkg/math/subpaving/rational_interval_root_trace_test.go",
+        "pkg/math/subpaving/interval_root_trace_stream.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -176447,8 +176460,15 @@
           "name": "Reached config_mpf interval-valued nth_root and even xn_eq_y TRACE sites (interval_def.h:1427,1459,1470)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/arbitrary_interval_root_trace.go",
-          "go_targets": ["pkg/math/subpaving/arbitrary_interval_root_trace_test.go"],
+          "go_targets": ["pkg/math/subpaving/interval_root_trace_stream.go", "pkg/math/subpaving/arbitrary_interval_root_trace_test.go"],
           "tests": ["TestArbitraryIntervalRootRetainedTraceSites"]
+        },
+        {
+          "name": "Reached config_mpq interval-valued nth_root and even xn_eq_y TRACE sites (interval_def.h:1427,1459,1470)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_interval_root_trace.go",
+          "go_targets": ["pkg/math/subpaving/interval_root_trace_stream.go", "pkg/math/subpaving/rational_interval_root_trace_test.go"],
+          "tests": ["TestRationalIntervalRootRetainedTraceSites"]
         },
         {
           "name": "Reached config_mpf Newton iteration and bound-check TRACE records, including source hi-under-lo display (interval_def.h:315-320,344-348)",
@@ -176499,7 +176519,10 @@
         "pkg/math/subpaving/hardware_interval_root_trace.go",
         "pkg/math/subpaving/hardware_interval_root_trace_test.go",
         "pkg/math/subpaving/arbitrary_interval_root_trace.go",
-        "pkg/math/subpaving/arbitrary_interval_root_trace_test.go"
+        "pkg/math/subpaving/arbitrary_interval_root_trace_test.go",
+        "pkg/math/subpaving/rational_interval_root_trace.go",
+        "pkg/math/subpaving/rational_interval_root_trace_test.go",
+        "pkg/math/subpaving/interval_root_trace_stream.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -177045,8 +177068,15 @@
           "name": "Reached config_mpf interval-valued nth_root and even xn_eq_y TRACE sites (interval_def.h:1427,1459,1470)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/arbitrary_interval_root_trace.go",
-          "go_targets": ["pkg/math/subpaving/arbitrary_interval_root_trace_test.go"],
+          "go_targets": ["pkg/math/subpaving/interval_root_trace_stream.go", "pkg/math/subpaving/arbitrary_interval_root_trace_test.go"],
           "tests": ["TestArbitraryIntervalRootRetainedTraceSites"]
+        },
+        {
+          "name": "Reached config_mpq interval-valued nth_root and even xn_eq_y TRACE sites (interval_def.h:1427,1459,1470)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_interval_root_trace.go",
+          "go_targets": ["pkg/math/subpaving/interval_root_trace_stream.go", "pkg/math/subpaving/rational_interval_root_trace_test.go"],
+          "tests": ["TestRationalIntervalRootRetainedTraceSites"]
         },
         {
           "name": "Reached config_mpf Newton iteration and bound-check TRACE records, including source hi-under-lo display (interval_def.h:315-320,344-348)",

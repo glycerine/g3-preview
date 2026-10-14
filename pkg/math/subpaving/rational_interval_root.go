@@ -55,6 +55,9 @@ func (v *RationalInterval) XnEqY(src *RationalInterval, n uint32, precision *num
 		if err = roots.Bounds(shi, n, precision, &rootLower, &rootUpper); err != nil {
 			return err
 		}
+		if err = v.traceRationalXnEqYBounds(src, &rootLower, &rootUpper, roots); err != nil {
+			return err
+		}
 		equal, err := m.Equal(&rootLower, &rootUpper)
 		if err != nil {
 			return err
@@ -110,5 +113,11 @@ func (v *RationalInterval) XnEqY(src *RationalInterval, n uint32, precision *num
 	}
 	v.lowerInf, v.upperInf = lowerInf, upperInf
 	v.lowerOpen, v.upperOpen = lowerOpen, upperOpen
-	return v.CheckInvariant()
+	if err = v.CheckInvariant(); err != nil {
+		return err
+	}
+	if n%2 == 0 {
+		return v.traceRationalXnEqYResult(roots)
+	}
+	return v.traceRationalNthRoot(src, roots)
 }
