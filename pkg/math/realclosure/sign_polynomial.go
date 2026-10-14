@@ -11,6 +11,8 @@ import (
 // Other rational-function and extension cases remain to be ported.
 type realValueStore struct {
 	numbers                  *numeral.RationalManager
+	initialPrecision         uint32
+	initialPrecisionBound    bool
 	pendingSequence          []realPolynomial
 	pendingSturmCoefficients [][]*realValue
 	pendingSturmRationals    []numeral.Rational

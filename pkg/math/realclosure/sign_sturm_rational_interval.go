@@ -6,10 +6,38 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/params"
 )
 
+// bindInitialPrecision reads the retained rcf parameter before future lazy
+// rational interval initialization. The enclosing realclosure updt_params
+// also reads other options that are not yet owned by this value store.
+func (s *realValueStore) bindInitialPrecision(pc *params.ParamsContext, p *params.ParamsRef) error {
+	if s == nil || s.numbers == nil || pc == nil || p == nil {
+		return arena.ErrInvalidSlot
+	}
+	if err := pc.Check(p); err != nil {
+		return err
+	}
+	name := "initial_precision"
+	value, err := pc.GetUIntName(p, &name, 24)
+	if err != nil {
+		return err
+	}
+	s.initialPrecision = value
+	s.initialPrecisionBound = true
+	return nil
+}
+
+func (s *realValueStore) rationalInitialPrecision() uint32 {
+	if s.initialPrecisionBound {
+		return s.initialPrecision
+	}
+	return 24
+}
+
 // rationalApproxInterval initializes one nonzero rational coefficient using
-// the source default initial precision. The returned interval is owned by the
+// the source initial precision. The returned interval is owned by the
 // caller; cachedRationalApproxInterval transfers that ownership to the value.
 func (s *realValueStore) rationalApproxInterval(value *realValue, bounds *numeral.BinaryRationalManager) (interval *BinaryInterval, err error) {
 	if s == nil || s.numbers == nil || bounds == nil || !s.rationalOperand(value) || value == nil {
@@ -68,7 +96,7 @@ func (s *realValueStore) rationalApproxInterval(value *realValue, bounds *numera
 			if err = bounds.Sub(&upper, &lower, &width); err != nil {
 				return nil, err
 			}
-			precise, e := bounds.LessOneDiv2k(&width, 24)
+			precise, e := bounds.LessOneDiv2k(&width, s.rationalInitialPrecision())
 			if e != nil {
 				return nil, e
 			}

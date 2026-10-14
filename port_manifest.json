@@ -50150,7 +50150,7 @@
           ]
         },
         {
-          "name": "Rational-coefficient exact Horner sign evaluation and finite/infinite binary interval endpoint sign variations, algebraic constant/zero-bound signs, and mixed rational/algebraic nonzero-bound interval Horner evaluation with default-precision rational initialization, persistent per-value rational interval caching and release, rational-coefficient refinement, finite single-root algebraic numerator-x bisection and exact singleton-zero result (realclosure.cpp:559-578,761-766,900-907,2452-2462,2515-2545,3712-3770,3773-3920,4073-4093,4247-4311); multi-root/nonrational algebraic refinement, general exact fallback and custom precision/checkpoint transport remain open",
+          "name": "Rational-coefficient exact Horner sign evaluation and finite/infinite binary interval endpoint sign variations, algebraic constant/zero-bound signs, and mixed rational/algebraic nonzero-bound interval Horner evaluation with local initial_precision parameter binding, persistent per-value rational interval caching and release, rational-coefficient refinement, finite single-root algebraic numerator-x bisection and exact singleton-zero result (realclosure.cpp:559-578,736-745,761-766,900-907,2452-2462,2515-2545,3712-3770,3773-3920,4073-4093,4247-4311); multi-root/nonrational algebraic refinement, general exact fallback, global-module/default parameter wiring, max_precision and checkpoint transport remain open",
           "status": "partial",
           "go_target": "pkg/math/realclosure/sign_sturm_tarski_interval.go",
           "go_targets": [
@@ -50164,7 +50164,8 @@
             "TestRealClosureBoundedRationalSturmTarskiEndpoints",
             "TestRealClosureAlgebraicConstantAndZeroBoundSigns",
             "TestRealClosureSturmIntervalRefusedDestructorRetainsOwner",
-            "TestRealClosureCachedRationalIntervalReleaseResumesBeforeNumeral"
+            "TestRealClosureCachedRationalIntervalReleaseResumesBeforeNumeral",
+            "TestRealClosureRationalIntervalReadsInitialPrecision"
           ]
         },
         {
