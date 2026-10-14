@@ -58,8 +58,8 @@ func TestShellInputFileWarningRefusalPreservesSelection(t *testing.T) {
 	if err := option.AcceptPositional("first"); err != nil {
 		t.Fatal(err)
 	}
-	if err := option.AcceptAfterDoubleDash([]string{"second"}); !errors.Is(err, io.ErrClosedPipe) {
-		t.Fatal("warning refusal", err)
+	if err := option.AcceptAfterDoubleDash([]string{"second"}); err != nil {
+		t.Fatal("source warning stream failbit escaped", err)
 	}
 	if name, ok := option.Selected(); !ok || name != "first" {
 		t.Fatal("source first selection lost", name, ok)

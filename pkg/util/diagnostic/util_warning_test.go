@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"io"
 	"strings"
 	"testing"
 )
@@ -43,7 +42,7 @@ func TestWarningFlushesCompletedBorrowedAndDefaultStreams(t *testing.T) {
 	}
 	flushErr := errors.New("flush failed")
 	flushed.err = flushErr
-	if err := s.Warning("again"); !errors.Is(err, flushErr) || flushed.flushes != 2 {
+	if err := s.Warning("again"); err != nil || flushed.flushes != 2 {
 		t.Fatal("completed warning flush failure", err, flushed.flushes)
 	}
 	if err := s.Enable(false); err != nil {
@@ -57,13 +56,13 @@ func TestWarningFlushesCompletedBorrowedAndDefaultStreams(t *testing.T) {
 func TestWarningShortWriteStillFlushesSourceStream(t *testing.T) {
 	w := &shortFlushingWarningWriter{shortWarningWriter: shortWarningWriter{limit: len("WARNING: x")}}
 	s := NewWarningService(w)
-	if err := s.Warning("xy"); !errors.Is(err, io.ErrShortWrite) || w.flushes != 1 || w.buf.String() != "WARNING: x" {
+	if err := s.Warning("xy"); err != nil || w.flushes != 1 || w.buf.String() != "WARNING: x" {
 		t.Fatal("short write source flush and prefix", err, w.flushes, w.buf.String())
 	}
 	flushErr := errors.New("flush failed")
 	w = &shortFlushingWarningWriter{shortWarningWriter: shortWarningWriter{limit: 0}, err: flushErr}
 	s = NewWarningService(w)
-	if err := s.Warning("xy"); !errors.Is(err, io.ErrShortWrite) || errors.Is(err, flushErr) || w.flushes != 1 {
+	if err := s.Warning("xy"); err != nil || w.flushes != 1 {
 		t.Fatal("first insertion error precedes later flush failure", err, w.flushes)
 	}
 }
@@ -107,12 +106,8 @@ func TestWarningShortWritePreservesSourceInsertionPrefix(t *testing.T) {
 		if got := w.buf.String(); got != output[:limit] {
 			t.Fatalf("limit %d: prefix %q", limit, got)
 		}
-		if limit == len(output) {
-			if err != nil {
-				t.Fatalf("complete output: %v", err)
-			}
-		} else if !errors.Is(err, io.ErrShortWrite) {
-			t.Fatalf("limit %d: got %v, want short write", limit, err)
+		if err != nil {
+			t.Fatalf("limit %d: warning stream failure escaped: %v", limit, err)
 		}
 	}
 }
