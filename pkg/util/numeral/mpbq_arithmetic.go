@@ -304,7 +304,10 @@ func (m *BinaryRationalManager) Equal(a, b *BinaryRational) (bool, error) {
 }
 func (m *BinaryRationalManager) NotEqual(a, b *BinaryRational) (bool, error) {
 	v, e := m.Equal(a, b)
-	return !v, e
+	if e != nil {
+		return false, e
+	}
+	return !v, nil
 }
 func (m *BinaryRationalManager) Less(a, b *BinaryRational) (bool, error) {
 	if e := m.pair(a, b); e != nil {
@@ -327,7 +330,10 @@ func (m *BinaryRationalManager) Less(a, b *BinaryRational) (bool, error) {
 func (m *BinaryRationalManager) Greater(a, b *BinaryRational) (bool, error) { return m.Less(b, a) }
 func (m *BinaryRationalManager) LessEqual(a, b *BinaryRational) (bool, error) {
 	v, e := m.Greater(a, b)
-	return !v, e
+	if e != nil {
+		return false, e
+	}
+	return !v, nil
 }
 func (m *BinaryRationalManager) GreaterEqual(a, b *BinaryRational) (bool, error) {
 	return m.LessEqual(b, a)
@@ -341,7 +347,10 @@ func (m *BinaryRationalManager) EqualInteger(a *BinaryRational, b *Int) (bool, e
 }
 func (m *BinaryRationalManager) NotEqualInteger(a *BinaryRational, b *Int) (bool, error) {
 	v, e := m.EqualInteger(a, b)
-	return !v, e
+	if e != nil {
+		return false, e
+	}
+	return !v, nil
 }
 func (m *BinaryRationalManager) compareInteger(a *BinaryRational, b *Int, le bool) (bool, error) {
 	if e := m.check(a); e != nil {
@@ -370,11 +379,17 @@ func (m *BinaryRationalManager) LessEqualInteger(a *BinaryRational, b *Int) (boo
 }
 func (m *BinaryRationalManager) GreaterInteger(a *BinaryRational, b *Int) (bool, error) {
 	v, e := m.LessEqualInteger(a, b)
-	return !v, e
+	if e != nil {
+		return false, e
+	}
+	return !v, nil
 }
 func (m *BinaryRationalManager) GreaterEqualInteger(a *BinaryRational, b *Int) (bool, error) {
 	v, e := m.LessInteger(a, b)
-	return !v, e
+	if e != nil {
+		return false, e
+	}
+	return !v, nil
 }
 func (m *BinaryRationalManager) compareRational(a *BinaryRational, qm *RationalManager, b *Rational, op uint8) (result bool, err error) {
 	if e := m.check(a); e != nil {
@@ -387,6 +402,9 @@ func (m *BinaryRationalManager) compareRational(a *BinaryRational, qm *RationalM
 	defer func() {
 		if cleanup := m.cleanupCompareImported(); err == nil {
 			err = cleanup
+		}
+		if err != nil {
+			result = false
 		}
 		m.compareExecuting = false
 	}()
@@ -455,7 +473,10 @@ func (m *BinaryRationalManager) EqualRational(a *BinaryRational, qm *RationalMan
 }
 func (m *BinaryRationalManager) NotEqualRational(a *BinaryRational, qm *RationalManager, b *Rational) (bool, error) {
 	v, e := m.EqualRational(a, qm, b)
-	return !v, e
+	if e != nil {
+		return false, e
+	}
+	return !v, nil
 }
 func (m *BinaryRationalManager) LessRational(a *BinaryRational, qm *RationalManager, b *Rational) (bool, error) {
 	return m.compareRational(a, qm, b, 1)
@@ -465,11 +486,17 @@ func (m *BinaryRationalManager) LessEqualRational(a *BinaryRational, qm *Rationa
 }
 func (m *BinaryRationalManager) GreaterRational(a *BinaryRational, qm *RationalManager, b *Rational) (bool, error) {
 	v, e := m.LessEqualRational(a, qm, b)
-	return !v, e
+	if e != nil {
+		return false, e
+	}
+	return !v, nil
 }
 func (m *BinaryRationalManager) GreaterEqualRational(a *BinaryRational, qm *RationalManager, b *Rational) (bool, error) {
 	v, e := m.LessRational(a, qm, b)
-	return !v, e
+	if e != nil {
+		return false, e
+	}
+	return !v, nil
 }
 func (m *BinaryRationalManager) MagnitudeLower(a *BinaryRational) (int32, error) {
 	if e := m.check(a); e != nil {

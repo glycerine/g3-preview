@@ -449,7 +449,10 @@ func (m *BinaryRationalManager) IsZero(a *BinaryRational) (bool, error) {
 }
 func (m *BinaryRationalManager) IsNonzero(a *BinaryRational) (bool, error) {
 	v, e := m.IsZero(a)
-	return !v, e
+	if e != nil {
+		return false, e
+	}
+	return !v, nil
 }
 func (m *BinaryRationalManager) IsOne(a *BinaryRational) (bool, error) {
 	if e := m.check(a); e != nil {
