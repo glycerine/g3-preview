@@ -88,8 +88,12 @@ func (m *ArbitraryFloatManager) SetInt32WithReceipt(out *ArbitraryFloat, ebits, 
 	out.assignSign(false)
 	out.assignEbits(ebits)
 	out.assignSbits(sbits)
+	m.traceFloatDebugSigned("set", "set: value = ", int64(value), 76)
 	if value == 0 {
-		return m.MkZero(ebits, sbits, false, out)
+		if e := m.MkZero(ebits, sbits, false, out); e != nil {
+			return e
+		}
+		return m.traceSetInt32Result(out)
 	}
 	uval := uint32(value)
 	if value < 0 {
@@ -111,9 +115,14 @@ func (m *ArbitraryFloatManager) SetInt32WithReceipt(out *ArbitraryFloat, ebits, 
 		return e
 	}
 	if sbits > 31 {
-		return m.integer.mul2kCoreWithAllocationContext(&out.significand, sbits-32, context)
+		if e := m.integer.mul2kCoreWithAllocationContext(&out.significand, sbits-32, context); e != nil {
+			return e
+		}
+	} else if e := m.integer.MachineDiv2kInPlace(&out.significand, 32-sbits); e != nil {
+		return e
 	}
-	return m.integer.MachineDiv2kInPlace(&out.significand, 32-sbits)
+	m.valueExecuting = false
+	return m.traceSetInt32Result(out)
 }
 
 // SetDouble copies the native IEEE bits, publishes source fields, then clamps
