@@ -1,8 +1,9 @@
-// Source: src/util/mpf.cpp:813-818,830-831,844-845.
+// Source: src/util/mpf.cpp:813-818,830-831,844-845,867-874.
 package numeral
 
 import (
 	"io"
+	"strconv"
 
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -82,6 +83,64 @@ func (m *ArbitraryFloatManager) traceFMADecimalBinary(label string, value *Arbit
 				return e
 			}
 			if e := writeNumeralDisplayPart(w, decimal+"\n"+label); e != nil {
+				return e
+			}
+			binary, e := m.traceFMABinaryString(value, 1, 0)
+			if e != nil {
+				formatError = e
+				return e
+			}
+			return writeNumeralDisplayPart(w, binary+"\n")
+		})
+	return formatError
+}
+
+func (m *ArbitraryFloatManager) traceFMAAlignment(delta uint32, shifted, sticky *Int) error {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return nil
+	}
+	var formatError error
+	_ = tags.EmitConditional("mpf_dbg", "fma", "src/util/mpf.cpp", 867,
+		func() bool { return true }, func(w io.Writer) error {
+			if e := writeNumeralDisplayPart(w, "alignment shift by delta="+strconv.FormatUint(uint64(delta), 10)+" -> sig = "); e != nil {
+				return e
+			}
+			s, e := m.integer.String(shifted)
+			if e != nil {
+				formatError = e
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, s+" sticky_rem = "); e != nil {
+				return e
+			}
+			s, e = m.integer.String(sticky)
+			if e != nil {
+				formatError = e
+				return e
+			}
+			return writeNumeralDisplayPart(w, s+"\n")
+		})
+	return formatError
+}
+
+func (m *ArbitraryFloatManager) traceFMASignificandBinary(label string, value *ArbitraryFloat, line int) error {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return nil
+	}
+	var formatError error
+	_ = tags.EmitConditional("mpf_dbg", "fma", "src/util/mpf.cpp", line,
+		func() bool { return true }, func(w io.Writer) error {
+			if e := writeNumeralDisplayPart(w, label); e != nil {
+				return e
+			}
+			s, e := m.integer.String(&value.significand)
+			if e != nil {
+				formatError = e
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, s+"\n"+label); e != nil {
 				return e
 			}
 			binary, e := m.traceFMABinaryString(value, 1, 0)

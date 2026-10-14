@@ -222,3 +222,61 @@ func TestArbitraryFloatFMAProductAndShiftedAddendTrace(t *testing.T) {
 	serviceMust(t, m.Del(&addend))
 	serviceMust(t, m.Del(&out))
 }
+
+func TestArbitraryFloatFMAAlignmentAndShiftedSignificandTrace(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("mpf_dbg")
+	compiled := tags.ShouldTrace("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	var one, addend, out ArbitraryFloat
+	serviceMust(t, m.MkOne(11, 53, false, &one))
+	for _, tc := range []struct {
+		name  string
+		value float64
+	}{
+		{"unswapped", -0.5},
+		{"swapped", 100},
+	} {
+		serviceMust(t, m.SetDouble(&addend, 11, 53, tc.value))
+		output.Reset()
+		serviceMust(t, m.FMA(ArbitraryFloatNearestEven, &one, &one, &addend, &out))
+		got := output.String()
+		if !compiled {
+			if got != "" {
+				t.Fatalf("%s erased trace: %q", tc.name, got)
+			}
+			continue
+		}
+		last := -1
+		for _, site := range []struct{ line, label string }{
+			{"844", "C_= "}, {"867", "alignment shift by delta="}, {"871", "M'= "}, {"873", "C'= "},
+		} {
+			header := "-------- [mpf_dbg] fma src/util/mpf.cpp:" + site.line + " ---------\n"
+			at := strings.Index(got, header)
+			if at <= last || strings.Count(got, header) != 1 {
+				t.Fatalf("%s alignment source order at %s: %q", tc.name, site.line, got)
+			}
+			last = at
+			body := got[at+len(header):]
+			end := strings.Index(body, "------------------------------------------------\n")
+			if end < 0 || !strings.HasPrefix(body, site.label) {
+				t.Fatalf("%s alignment body at %s: %q", tc.name, site.line, got)
+			}
+			if site.line == "867" {
+				if !strings.Contains(body[:end], " -> sig = ") || !strings.Contains(body[:end], " sticky_rem = ") {
+					t.Fatalf("%s alignment fields: %q", tc.name, body[:end])
+				}
+			} else if site.line == "871" || site.line == "873" {
+				lines := strings.Split(strings.TrimSuffix(body[:end], "\n"), "\n")
+				if len(lines) != 2 || !strings.HasPrefix(lines[1], site.label) || !strings.Contains(lines[1], "#b") {
+					t.Fatalf("%s shifted significand lines: %q", tc.name, lines)
+				}
+			}
+		}
+	}
+	serviceMust(t, m.Del(&one))
+	serviceMust(t, m.Del(&addend))
+	serviceMust(t, m.Del(&out))
+}

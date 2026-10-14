@@ -235,11 +235,20 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 	if e := im.machineDivRemWithAllocationContext(&s.c.significand, &power, &s.c.significand, &s.sticky, context); e != nil {
 		return e
 	}
+	if e := m.traceFMAAlignment(uint32(delta), &s.c.significand, &s.sticky); e != nil {
+		return e
+	}
 	empty, e := im.IsZero(&s.sticky)
 	if e != nil {
 		return e
 	}
 	alignmentSticky := !empty
+	if e := m.traceFMASignificandBinary("M'= ", &s.mr, 871); e != nil {
+		return e
+	}
+	if e := m.traceFMASignificandBinary("C'= ", &s.c, 873); e != nil {
+		return e
+	}
 	// Construction starts before the allocating copy; its source destructor is
 	// reached only after construction succeeds. Owning cleanup joins either case.
 	s.resLive = true
