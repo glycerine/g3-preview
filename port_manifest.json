@@ -118039,7 +118039,7 @@
         },
         {
           "name": "MPFF full-precision character formatting and four reusable typed Go decimal scratch slices; character scratch also uses native byte slices; shared MPN numerical workspaces use native slices",
-          "status": "partial",
+          "status": "platform_replacement",
           "go_target": "pkg/util/numeral/mpff_format_scope.go",
           "tests": [
             "TestFastFloatFormattingRetainsSourcePrecision",
@@ -153846,7 +153846,7 @@
         },
         {
           "name": "MPFF full-precision character formatting and four reusable typed Go decimal scratch slices; character scratch also uses native byte slices; shared MPN numerical workspaces use native slices",
-          "status": "partial",
+          "status": "platform_replacement",
           "go_target": "pkg/util/numeral/mpff_format_scope.go",
           "tests": [
             "TestFastFloatFormattingRetainsSourcePrecision",
