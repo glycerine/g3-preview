@@ -151278,6 +151278,7 @@
         "TestArbitraryFloatHexfloatComponentsRefusedDivisionKeepsOlderRoots",
         "TestArbitraryFloatHexfloatComponentsActualCopyTransport",
         "TestArbitraryFloatHexfloatComponentsYoungerSourceStop",
+        "TestArbitraryFloatHexfloatComponentsParentDeleteClearsView",
         "TestArbitraryFloatSignedFractionIndependentModes",
         "TestArbitraryFloatSignedFractionReachedUndefinedNegation",
         "TestArbitraryFloatSignedFractionEveryColdReservation",
@@ -152356,6 +152357,7 @@
             "TestArbitraryFloatHexfloatComponentsRefusedDivisionKeepsOlderRoots",
             "TestArbitraryFloatHexfloatComponentsActualCopyTransport",
             "TestArbitraryFloatHexfloatComponentsYoungerSourceStop",
+            "TestArbitraryFloatHexfloatComponentsParentDeleteClearsView",
             "TestArbitraryFloatPartialRemainderComponentTraceRefusalCleansChild"
           ]
         },
@@ -152868,6 +152870,7 @@
         "TestArbitraryFloatHexfloatComponentsRefusedDivisionKeepsOlderRoots",
         "TestArbitraryFloatHexfloatComponentsActualCopyTransport",
         "TestArbitraryFloatHexfloatComponentsYoungerSourceStop",
+        "TestArbitraryFloatHexfloatComponentsParentDeleteClearsView",
         "TestArbitraryFloatSignedFractionIndependentModes",
         "TestArbitraryFloatSignedFractionReachedUndefinedNegation",
         "TestArbitraryFloatSignedFractionEveryColdReservation",
@@ -153456,6 +153459,7 @@
             "TestArbitraryFloatHexfloatComponentsRefusedDivisionKeepsOlderRoots",
             "TestArbitraryFloatHexfloatComponentsActualCopyTransport",
             "TestArbitraryFloatHexfloatComponentsYoungerSourceStop",
+            "TestArbitraryFloatHexfloatComponentsParentDeleteClearsView",
             "TestArbitraryFloatPartialRemainderComponentTraceRefusalCleansChild"
           ]
         },

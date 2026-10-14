@@ -3,10 +3,11 @@ package numeral
 
 import (
 	"errors"
-	"github.com/glycerine/g3/pkg/arena"
-	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"math/big"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 type hexfloatStopText struct {
@@ -114,4 +115,40 @@ func TestArbitraryFloatHexfloatComponentsYoungerSourceStop(t *testing.T) {
 			t.Fatal("component source stop refunds", budget.Used())
 		}
 	}
+}
+
+func TestArbitraryFloatHexfloatComponentsParentDeleteClearsView(t *testing.T) {
+	m, _, budget := mpfNumeralHelpersFixture(t)
+	var sig Int
+	input := new(big.Int).Add(new(big.Int).Lsh(big.NewInt(1), 259), new(big.Int).Lsh(big.NewInt(1), 200))
+	input.Add(input, big.NewInt(1))
+	serviceMust(t, m.integer.SetString(&sig, input.String()))
+	text, e := NewArbitraryFloatFormatText(budget)
+	serviceMust(t, e)
+	var cell NumericCellRef
+	proxy := &hexfloatStopText{ArbitraryFloatFormatText: text, hook: func() {
+		s := &m.hexfloatComponents
+		if !s.sigLive || s.sig.Cell == 0 {
+			return
+		}
+		cell = s.sig.Cell
+		s.sig.Cell = ^NumericCellRef(0)
+	}}
+	view, body := m.ToStringHexfloatComponentsInto(true, 0, &sig, 8, 260, 0, proxy)
+	s := &m.hexfloatComponents
+	if cell == 0 {
+		serviceMust(t, text.Close())
+		serviceMust(t, m.integer.Del(&sig))
+		t.Fatal("parent scoped integer missing after child text body", body, *s)
+	}
+	if !errors.Is(body, arena.ErrInvalidSlot) || view.view != nil || !s.active || !s.sigLive || s.sourceCause == nil || s.format == nil || !s.formatOwned {
+		t.Fatal("failed parent scoped_mpz published a text view", body, view, *s)
+	}
+	if e := m.SourceFinalize(); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("source finalization lost parent destructor failure", e)
+	}
+	s.sig.Cell = cell
+	serviceMust(t, m.CleanupHexfloatComponents())
+	serviceMust(t, text.Close())
+	serviceMust(t, m.integer.Del(&sig))
 }

@@ -37,6 +37,8 @@ func (m *ArbitraryFloatManager) ToStringHexfloatComponentsInto(sign bool, expone
 		cause = JoinNumericErrors(cause, s.unbind())
 		if cause == nil {
 			s.active = false
+		} else {
+			view = ArbitraryFloatFormattedCString{}
 		}
 	}()
 	z, c := m.integer, integerAllocationInvocationContext{Caller: &s.hooks}
