@@ -120129,7 +120129,19 @@
           "tests": ["TestASTDependencyLeafDeletionStopsBeforeFreeOnASTFailure"]
         },
         {
-          "name": "dependency_manager<expr_dependency_config>::dec_ref/del",
+          "name": "dependency_manager<expr_dependency_config>::dec_ref/del ordinary RC decrement, left/right child publication, LIFO leaf callbacks and immediate node deallocation (dependency.h:86-107,128-134)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_dependency.go",
+          "tests": [
+            "TestASTDependencySourceLeafJoinCallbacksAndLinearization",
+            "TestASTDependencyIndependentDAGOracleProvenanceAndWarmStorage",
+            "TestASTDependencyNativeLIFOCallbacksWithReservationsDisabled",
+            "TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately",
+            "TestASTDependencyDecConsumedActualRootOwnership"
+          ]
+        },
+        {
+          "name": "dependency_manager<expr_dependency_config>::dec_ref/del stopped nested destructor and exact owning continuation after a child callback or deallocation refusal",
           "status": "partial",
           "go_target": "pkg/ast/ast_dependency.go",
           "tests": [
