@@ -148941,10 +148941,11 @@
           "name": "process-wide fatal out-of-memory policy shared by concrete Runtime owners, including owners constructed before policy binding",
           "status": "ported",
           "go_target": "pkg/util/memory/process_accounting.go",
-          "go_targets": ["pkg/util/memory/runtime.go", "pkg/util/memory/failure.go"],
+          "go_targets": ["pkg/util/memory/runtime.go", "pkg/util/memory/failure.go", "pkg/util/diagnostic/util_memory_fatal_policy_test.go"],
           "tests": [
             "TestProcessFatalPolicyDispatchesAcrossRuntimeOwners",
-            "TestProcessFatalPolicyBindsAfterSuccessfulConstruction"
+            "TestProcessFatalPolicyBindsAfterSuccessfulConstruction",
+            "TestMemoryFatalContextSharesSourceProcessWithEarlierRuntime"
           ]
         },
         {
@@ -149400,10 +149401,11 @@
           "name": "process-wide fatal out-of-memory policy shared by concrete Runtime owners, including owners constructed before policy binding",
           "status": "ported",
           "go_target": "pkg/util/memory/process_accounting.go",
-          "go_targets": ["pkg/util/memory/runtime.go", "pkg/util/memory/failure.go"],
+          "go_targets": ["pkg/util/memory/runtime.go", "pkg/util/memory/failure.go", "pkg/util/diagnostic/util_memory_fatal_policy_test.go"],
           "tests": [
             "TestProcessFatalPolicyDispatchesAcrossRuntimeOwners",
-            "TestProcessFatalPolicyBindsAfterSuccessfulConstruction"
+            "TestProcessFatalPolicyBindsAfterSuccessfulConstruction",
+            "TestMemoryFatalContextSharesSourceProcessWithEarlierRuntime"
           ]
         },
         {

@@ -70,6 +70,35 @@ func TestMemoryFatalNonExitExceptionCatch(t *testing.T) {
 		t.Fatal(b.Used())
 	}
 }
+
+func TestMemoryFatalContextSharesSourceProcessWithEarlierRuntime(t *testing.T) {
+	b := arena.NewBudget(1 << 20)
+	p := umemory.NewProcessAccounting()
+	first, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, Process: p})
+	smallObjectMust(t, e)
+	streams, e := NewMemoryStandardStreams(MemoryStandardStreamsConfig{Budget: b})
+	smallObjectMust(t, e)
+	c, e := NewMemoryFatalContext(MemoryFatalContextConfig{Budget: b, Streams: streams})
+	smallObjectMust(t, e)
+	second, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, Process: p, FatalPolicy: c})
+	smallObjectMust(t, e)
+	smallObjectMust(t, second.SetMaxSize(1))
+	for _, r := range []*umemory.Runtime{first, second} {
+		h, failure := r.Allocate(1)
+		var derived OutOfMemoryError
+		var base z3exception.Z3Error
+		if h != (umemory.Block{}) || !errors.As(failure, &derived) || !errors.As(failure, &base) || base.ErrorCode() != z3exception.ErrorMemout || !r.State().OutOfMemory {
+			t.Fatal("process failure missed the concrete exception route", h, failure, r.State())
+		}
+	}
+	smallObjectMust(t, second.Close())
+	smallObjectMust(t, first.Close())
+	smallObjectMust(t, c.Close())
+	smallObjectMust(t, streams.Close())
+	if b.Used() != 0 {
+		t.Fatal("process failure retained owner storage", b.Used())
+	}
+}
 func TestMemoryFatalSubprocessChild(t *testing.T) {
 	route := os.Getenv("G3_MEMORY_FATAL_CHILD")
 	if route == "" {
