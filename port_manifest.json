@@ -120901,7 +120901,7 @@
         },
         {
           "name": "actual namespace current-imp forwarding cpp557-631 with get_module char symbol construction before SASSERT and display_module SASSERT before symbol; numeric bare_str assertion/empty-string ternary uses same imp engine",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/params/util_gparams_service_ops.go",
           "tests": [
             "TestGlobalParamsNamespaceNullAndSourceArgumentOrder",
@@ -121132,7 +121132,7 @@
         },
         {
           "name": "actual namespace current-imp forwarding cpp557-631 with get_module char symbol construction before SASSERT and display_module SASSERT before symbol; numeric bare_str assertion/empty-string ternary uses same imp engine",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/params/util_gparams_service_ops.go",
           "tests": [
             "TestGlobalParamsNamespaceNullAndSourceArgumentOrder",
