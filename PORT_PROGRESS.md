@@ -1,3 +1,9 @@
+`z3_error` zero-code profile correction: `src/util/z3_exception.cpp:36-38`
+checks the nonzero constructor precondition only through `SASSERT`. Native Go
+builds now accept code zero, retaining the source `unknown error` message and
+false `has_error_code`; `g3debug` builds keep the rejected assertion profile.
+Focused native and debug exception tests pass on CPUs 8-16.
+
 Parameter `get_empty` reachability audit: the static null `params_ref` at `params.cpp:24` and `params.h:34,44` has two retained source consumers, API interpolation (`api_interp.cpp:139`) and the Spacer SMT context default argument (`spacer_smt_context_manager.h:53`). Their Go owners are not yet implemented. The `params.cpp/.h` manifest now tracks this as a separate unported method; the existing ParamsRef destructor and Copy/Append cleanup row remains partial. Context-bound `NewValue` tests do not certify the source static singleton or either caller.
 
 Retained AST sorting-network interleave TRACE: `PsortASTNetwork.interleave` now emits the `pb` entry record at `sorting_network.h:712` before its source assertions and output append. A real one-element/empty-vector fixture checks exact output and record bytes; literal-list `pb` records remain open. Rechecked all eight LP failure groups previously reported remotely in one fresh native run: all pass on CPUs 8-16.

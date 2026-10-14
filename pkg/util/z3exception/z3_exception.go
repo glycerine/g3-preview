@@ -39,7 +39,9 @@ type Z3Exception interface {
 type Z3Error struct{ code ErrorCode }
 
 func NewZ3Error(code ErrorCode) (Z3Error, error) {
-	if code == ErrorOK {
+	// The source's nonzero check is SASSERT-only; release construction accepts
+	// zero and then reports no error code through HasErrorCode.
+	if z3ErrorSourceDebug && code == ErrorOK {
 		return Z3Error{}, ErrExceptionPrecondition
 	}
 	return Z3Error{code}, nil

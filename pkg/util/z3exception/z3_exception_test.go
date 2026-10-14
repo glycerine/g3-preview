@@ -12,8 +12,13 @@ func TestZ3ExceptionSourceCodesAndLabels(t *testing.T) {
 	if codes[0] != 0 {
 		t.Fatal(codes)
 	}
-	if _, e := NewZ3Error(ErrorOK); e != ErrExceptionPrecondition {
-		t.Fatal(e)
+	zero, e := NewZ3Error(ErrorOK)
+	if z3ErrorSourceDebug {
+		if e != ErrExceptionPrecondition {
+			t.Fatal(e)
+		}
+	} else if e != nil || zero.ErrorCode() != ErrorOK || zero.HasErrorCode() || zero.Message() != "unknown error" {
+		t.Fatal(zero, e)
 	}
 	for i, c := range codes[1:] {
 		if c != ErrorCode(101+i) {

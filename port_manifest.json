@@ -178221,7 +178221,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "exact error-code constants and z3_error labels/code/nonzero guard",
+          "name": "exact error-code constants and z3_error labels/code; debug-only nonzero guard and release zero-code route",
           "status": "ported",
           "go_target": "pkg/util/z3exception/z3_exception.go",
           "tests": [
@@ -178293,7 +178293,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "exact error-code constants and z3_error labels/code/nonzero guard",
+          "name": "exact error-code constants and z3_error labels/code; debug-only nonzero guard and release zero-code route",
           "status": "ported",
           "go_target": "pkg/util/z3exception/z3_exception.go",
           "tests": [
