@@ -98,3 +98,71 @@ func TestPropagateIneqTacticParameterSnapshotCleanupAndGoalReuse(t *testing.T) {
 		t.Fatal("closed tactic accepted goal", err)
 	}
 }
+
+// Source: propagate_ineqs_tactic.cpp:47-49. A translated tactic gets a new
+// implementation and its own params_ref copy for the destination manager.
+func TestPropagateIneqTacticTranslateOwnsIndependentSnapshot(t *testing.T) {
+	sourceManager, _, _, _ := polynomialASTManager(t)
+	sourceNumbers, _ := equationManager(t)
+	destinationManager, symbols, q, _ := polynomialASTManager(t)
+	destinationNumbers, _ := equationManager(t)
+	context, value := boundParams(t)
+	name := "bound_max_refinements"
+	equationMust(t, context.SetUIntName(value, &name, 5))
+	source, err := NewPropagateIneqTactic(sourceManager, sourceNumbers, context, value)
+	equationMust(t, err)
+	t.Cleanup(func() { equationMust(t, source.Close()) })
+	translated, err := source.Translate(destinationManager, destinationNumbers)
+	equationMust(t, err)
+	t.Cleanup(func() { equationMust(t, translated.Close()) })
+	if translated == source || translated.current.store == source.current.store || translated.current.builder == source.current.builder {
+		t.Fatal("translation reused the source implementation")
+	}
+	equationMust(t, context.SetUIntName(value, &name, 7))
+	equationMust(t, source.UpdateParams(value))
+	if translated.current.store.maxRefinements != 5 || source.current.store.maxRefinements != 7 {
+		t.Fatal("translation did not retain its own parameter snapshot")
+	}
+	equationMust(t, source.Close())
+	equationMust(t, translated.Cleanup())
+	if translated.current.store.maxRefinements != 5 {
+		t.Fatal("translation cleanup read the source's updated parameters")
+	}
+	family, err := destinationManager.RegisterArithmeticPlugin()
+	equationMust(t, err)
+	realSort, err := destinationManager.MkFamilySort(family, 0, nil)
+	equationMust(t, err)
+	xName, err := symbols.Intern("translated-x")
+	equationMust(t, err)
+	x, err := destinationManager.MkConst(xName, realSort)
+	equationMust(t, err)
+	v, err := q.NewValue()
+	equationMust(t, err)
+	equationMust(t, q.SetString(&v, "2"))
+	two, err := destinationManager.ArithmeticNumeral(&v, false)
+	equationMust(t, err)
+	equationMust(t, q.Del(&v))
+	lower, err := destinationManager.MkFamilyApp(family, 3, nil, []ast.ASTHandle{x, two})
+	equationMust(t, err)
+	input, err := goaltactic.NewGoal(destinationManager, false, false, false)
+	equationMust(t, err)
+	t.Cleanup(func() { equationMust(t, input.Close()) })
+	equationMust(t, input.Assert(lower))
+	result, err := translated.Apply(input)
+	equationMust(t, err)
+	if result == nil || result == input {
+		t.Fatal("translated tactic did not process destination goal")
+	}
+	t.Cleanup(func() { equationMust(t, result.Close()) })
+	if size, err := result.Size(); err != nil || size != 1 {
+		t.Fatal("translated result bounds", size, err)
+	}
+	got, err := result.Form(0)
+	equationMust(t, err)
+	if got != lower {
+		t.Fatal("translated result uses wrong manager", got, lower)
+	}
+	if _, err := source.Translate(destinationManager, destinationNumbers); !errors.Is(err, arena.ErrClosed) {
+		t.Fatal("closed source translated", err)
+	}
+}

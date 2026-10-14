@@ -98601,7 +98601,8 @@
         "TestInequalityPolynomialBuilderProcessBoundSourceNormalization",
         "TestInequalityPolynomialBuilderCollectBoundsGoalOrderAndOwnership",
         "TestInequalityPolynomialBuilderApplyGoalBranchesAndConfiguration",
-        "TestPropagateIneqTacticParameterSnapshotCleanupAndGoalReuse"
+        "TestPropagateIneqTacticParameterSnapshotCleanupAndGoalReuse",
+        "TestPropagateIneqTacticTranslateOwnsIndependentSnapshot"
       ],
       "assertions": [
         {
@@ -98674,11 +98675,12 @@
           ]
         },
         {
-          "name": "Concrete tactic owner parameter snapshot, update forwarding, outer goal operator and cleanup rebuild (src/tactic/arith/propagate_ineqs_tactic.cpp:39-55,515-549)",
+          "name": "Concrete tactic owner parameter snapshot, translation, update forwarding, outer goal operator and cleanup rebuild (src/tactic/arith/propagate_ineqs_tactic.cpp:39-55,515-549)",
           "status": "ported",
           "go_target": "pkg/tactic/arith/propagate_ineq_tactic.go",
           "tests": [
-            "TestPropagateIneqTacticParameterSnapshotCleanupAndGoalReuse"
+            "TestPropagateIneqTacticParameterSnapshotCleanupAndGoalReuse",
+            "TestPropagateIneqTacticTranslateOwnsIndependentSnapshot"
           ]
         }
       ],
@@ -98695,7 +98697,8 @@
         "pkg/tactic/arith/propagate_ineq_tactic_test.go"
       ],
       "tests": [
-        "TestPropagateIneqTacticParameterSnapshotCleanupAndGoalReuse"
+        "TestPropagateIneqTacticParameterSnapshotCleanupAndGoalReuse",
+        "TestPropagateIneqTacticTranslateOwnsIndependentSnapshot"
       ],
       "conditionals": [
         {
@@ -98711,11 +98714,12 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Concrete propagate-ineqs tactic constructor and goal application",
+          "name": "Concrete propagate-ineqs tactic constructor, goal application and translation; factory integration remains open",
           "status": "partial",
           "go_target": "pkg/tactic/arith/propagate_ineq_tactic.go",
           "tests": [
-            "TestPropagateIneqTacticParameterSnapshotCleanupAndGoalReuse"
+            "TestPropagateIneqTacticParameterSnapshotCleanupAndGoalReuse",
+            "TestPropagateIneqTacticTranslateOwnsIndependentSnapshot"
           ]
         }
       ],

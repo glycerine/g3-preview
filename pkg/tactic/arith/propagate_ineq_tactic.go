@@ -92,6 +92,16 @@ func (t *PropagateIneqTactic) Apply(input *goaltactic.Goal) (*goaltactic.Goal, e
 	return t.current.builder.Apply(input)
 }
 
+// Translate constructs a separate implementation for another AST manager.
+// The caller supplies the rational manager for that implementation; both
+// managers remain borrowed by their respective tactics.
+func (t *PropagateIneqTactic) Translate(m *ast.ASTManager, numbers *numeral.RationalManager) (*PropagateIneqTactic, error) {
+	if err := t.open(); err != nil {
+		return nil, err
+	}
+	return NewPropagateIneqTactic(m, numbers, t.context, &t.params)
+}
+
 func (t *PropagateIneqTactic) UpdateParams(value *params.ParamsRef) error {
 	if err := t.open(); err != nil {
 		return err
