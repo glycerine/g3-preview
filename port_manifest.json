@@ -48857,7 +48857,9 @@
         "pkg/math/realclosure/sign_polynomial.go",
         "pkg/math/realclosure/sign_polynomial_test.go",
         "pkg/math/realclosure/sign_determination_polynomials.go",
-        "pkg/math/realclosure/sign_determination_polynomials_test.go"
+        "pkg/math/realclosure/sign_determination_polynomials_test.go",
+        "pkg/math/realclosure/sign_det_owner.go",
+        "pkg/math/realclosure/sign_det_owner_test.go"
       ],
       "tests": [
         "TestRealClosureBinaryExtendedNumeralBranches",
@@ -48871,7 +48873,8 @@
         "TestSignDeterminationRetainedColumnTransition",
         "TestKeepSignAssignmentUsesOldConditionGroups",
         "TestRealClosurePolynomialRationalCoefficientOwnership",
-        "TestSignDeterminationPolynomialRowsRetainSharedValues"
+        "TestSignDeterminationPolynomialRowsRetainSharedValues",
+        "TestSignDetSourceArrayPublicationAndSharedRootLifetime"
       ],
       "conditionals": [
         {
@@ -50060,6 +50063,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete sign_det matrix/sign-condition transfer, prs/qs polynomial copy, Tarski array publication, shared-root reference count and source-order deletion (realclosure.cpp:788-824,1780-1807); actual algebraic root attachment remains open",
+          "status": "partial",
+          "go_target": "pkg/math/realclosure/sign_det_owner.go",
+          "tests": [
+            "TestSignDetSourceArrayPublicationAndSharedRootLifetime"
+          ]
+        },
         {
           "name": "Concrete rational-value reference and polynomial coefficient ownership through sign-determination prs/qs row publication and cleanup (realclosure.cpp:752-808,864-889,1120-1127,1780-1804,2050-2093); rational-function and Tarski polynomial producers remain open",
           "status": "partial",
@@ -116963,8 +116974,8 @@
       "component": "util",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/math/realclosure/sign_determination.go", "pkg/math/realclosure/sign_determination_test.go", "pkg/math/realclosure/sign_polynomial.go", "pkg/math/realclosure/sign_polynomial_test.go", "pkg/math/realclosure/sign_determination_polynomials.go", "pkg/math/realclosure/sign_determination_polynomials_test.go"],
-      "tests": ["TestSignDeterminationRetainedColumnTransition", "TestKeepSignAssignmentUsesOldConditionGroups", "TestRealClosurePolynomialRationalCoefficientOwnership", "TestSignDeterminationPolynomialRowsRetainSharedValues"],
+      "go_targets": ["pkg/math/realclosure/sign_determination.go", "pkg/math/realclosure/sign_determination_test.go", "pkg/math/realclosure/sign_polynomial.go", "pkg/math/realclosure/sign_polynomial_test.go", "pkg/math/realclosure/sign_determination_polynomials.go", "pkg/math/realclosure/sign_determination_polynomials_test.go", "pkg/math/realclosure/sign_det_owner.go", "pkg/math/realclosure/sign_det_owner_test.go"],
+      "tests": ["TestSignDeterminationRetainedColumnTransition", "TestKeepSignAssignmentUsesOldConditionGroups", "TestRealClosurePolynomialRationalCoefficientOwnership", "TestSignDeterminationPolynomialRowsRetainSharedValues", "TestSignDetSourceArrayPublicationAndSharedRootLifetime"],
       "conditionals": [
         {
           "line": 19,
@@ -117018,7 +117029,7 @@
         }
       ],
       "ownership": [
-        "The only production include is realclosure.cpp. Polynomial ptr_array borrows value pointers and never destroys pointed-to values itself; realclosure::reset_p decrements them before finalizing the array storage. Sign-determination arrays own their element slots and backing; del_sign_det frees sign-condition nodes separately, then finalizes the pointer array, polynomial arrays and integer array in source order. The Go realclosure port now has partial sign-determination state with native Tarski and sign-condition slices; rational-coefficient prs/qs ownership is partial; full polynomial arithmetic, rational-function coefficients, final sign_det publication/deletion, and the extension owner remain open."
+        "The only production include is realclosure.cpp. Polynomial ptr_array borrows value pointers and never destroys pointed-to values itself; realclosure::reset_p decrements them before finalizing the array storage. Sign-determination arrays own their element slots and backing; del_sign_det frees sign-condition nodes separately, then finalizes the pointer array, polynomial arrays and integer array in source order. The Go realclosure port now has partial sign-determination state with native Tarski and sign-condition slices; rational-coefficient prs/qs ownership and final sign_det publication/deletion are partial; full polynomial arithmetic, rational-function coefficients, and algebraic root attachment remain open."
       ],
       "deviations": [
         "Use concrete Go slices owned by the realclosure value/sign-determination consumers. Preserve explicit referenced-value decrements, sign-condition deletion and source owner order; do not copy C++ array allocation headers or add a generic array<T>. The similarly named src/api/c++/z3++.h array is unrelated."

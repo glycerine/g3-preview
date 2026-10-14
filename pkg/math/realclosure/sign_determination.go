@@ -8,6 +8,7 @@ type signCondition struct {
 	polynomial int
 	sign       int
 	previous   *signCondition
+	deleted    bool
 }
 
 // signDetermination holds the concrete matrix, Tarski results, and columns
