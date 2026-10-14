@@ -45169,14 +45169,15 @@
         "TestPolynomialCacheFactorConstructorRefusalRetainsInsertedKey",
         "TestPolynomialCacheFactorStoppedBodyCleanupAndRetry",
         "TestPolynomialCachePSCStoppedBodyCleanupAndRetry",
-        "TestPolynomialCachePSCResultReplacementStoppedDeletion"
+        "TestPolynomialCachePSCResultReplacementStoppedDeletion",
+        "TestPolynomialCacheFactorTemporaryStoppedDeletion"
       ],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
       "deviations": [
-        "The retained NLSAT cache's mk_unique path uses native Go hash buckets and an embedded owning polynomial reference vector. PSC-chain results are memoized by canonical ordered inputs and variable. Factor results are memoized by canonical input, with source-order output reset and distinct-factor canonicalization. Actual stopped factor and PSC body refusals finish their source scopes and permit reset/retry. A real PSC result SET deletion-callback refusal retains the acquired canonical reference until caller-vector close and permits cache reset/retry. Other stopped result-vector/destructor paths and NLSAT integration remain open."
+        "The retained NLSAT cache's mk_unique path uses native Go hash buckets and an embedded owning polynomial reference vector. PSC-chain results are memoized by canonical ordered inputs and variable. Factor results are memoized by canonical input, with source-order output reset and distinct-factor canonicalization. Actual stopped factor and PSC body refusals finish their source scopes and permit reset/retry. A real PSC result SET deletion-callback refusal retains the acquired canonical reference until caller-vector close. A real temporary factor final-decrement refusal retains the factors owner and its consumed-drop receipt until CleanupFactor. Other stopped result-vector/destructor paths and NLSAT integration remain open."
       ]
     },
     {
@@ -45196,7 +45197,8 @@
         "TestPolynomialCacheFactorConstructorRefusalRetainsInsertedKey",
         "TestPolynomialCacheFactorStoppedBodyCleanupAndRetry",
         "TestPolynomialCachePSCStoppedBodyCleanupAndRetry",
-        "TestPolynomialCachePSCResultReplacementStoppedDeletion"
+        "TestPolynomialCachePSCResultReplacementStoppedDeletion",
+        "TestPolynomialCacheFactorTemporaryStoppedDeletion"
       ],
       "conditionals": [
         {
@@ -45213,7 +45215,7 @@
       "methods": [],
       "ownership": [],
       "deviations": [
-        "The concrete PolynomialCache exposes retained mk_unique, PSC-chain and factor memoization, and reset behavior with borrowed canonical handles. Selected actual stopped source scopes and a PSC result SET deletion refusal finish before retry; other result-vector/destructor cleanup and NLSAT integration remain open."
+        "The concrete PolynomialCache exposes retained mk_unique, PSC-chain and factor memoization, and reset behavior with borrowed canonical handles. Selected actual stopped source scopes, a PSC result SET deletion refusal, and a temporary factor final-decrement refusal finish before retry; other result-vector/destructor cleanup and NLSAT integration remain open."
       ]
     },
     {

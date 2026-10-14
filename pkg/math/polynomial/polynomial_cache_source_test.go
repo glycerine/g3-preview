@@ -159,6 +159,76 @@ func TestPolynomialCachePSCResultReplacementStoppedDeletion(t *testing.T) {
 	serviceMust(t, c.PSCChain(p, q, 1, retry))
 }
 
+func TestPolynomialCacheFactorTemporaryStoppedDeletion(t *testing.T) {
+	m := polynomialPSCFullFixture(t)
+	c, e := NewPolynomialCache(m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, c.Close()) })
+	p := polynomialQueryTerms(t, m.core, []int32{1, 2, 1}, [][]MonomialPower{nil, {{0, 1}}, {{0, 2}}})
+	canonicalInput, e := c.MkUnique(p)
+	serviceMust(t, e)
+	seed, e := NewPolynomialFactors(m)
+	serviceMust(t, e)
+	serviceMust(t, m.Factor(p, seed, DefaultUPolynomialFactorParams()))
+	n, e := seed.Distinct()
+	serviceMust(t, e)
+	if n != 1 {
+		t.Fatal("source square distinct factor count", n)
+	}
+	seedValue, e := seed.factor(0)
+	serviceMust(t, e)
+	if seedValue == p {
+		t.Fatal("factorization reused input identity; no temporary factor to release")
+	}
+	canonicalFactor, e := c.MkUnique(seedValue)
+	serviceMust(t, e)
+	serviceMust(t, seed.CloseChecked())
+	out, e := NewPolynomialRefVector(m.core)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, out.Close()) })
+	stop := errors.New("stop temporary factor deletion")
+	armed, fired := true, false
+	h, e := NewPolynomialDeletionHandler(m.originalBudget, func(_ *PolynomialDeletionHandler, core *MultivariatePolynomialCore, value Polynomial) error {
+		if !armed || m.factorCoreExecuting() || value == canonicalFactor || c.factors[canonicalInput] == nil {
+			return nil
+		}
+		same, err := core.Equal(value, canonicalFactor)
+		if err != nil {
+			return err
+		}
+		if same {
+			fired = true
+			return stop
+		}
+		return nil
+	})
+	serviceMust(t, e)
+	serviceMust(t, m.core.AddDeletionHandler(h))
+	t.Cleanup(func() { serviceMust(t, m.core.RemoveDeletionHandler(h)); serviceMust(t, h.CloseChecked()) })
+	e = c.Factor(p, out)
+	armed = false
+	if !fired || !errors.Is(e, stop) || c.pendingFactors == nil {
+		t.Fatal("temporary factor destructor did not retain its owner", fired, e, c.pendingFactors)
+	}
+	if c.pendingFactors.closed || len(c.pendingFactors.phases) != 1 || c.pendingFactors.phases[0] != factorLastDrop {
+		t.Fatal("stopped temporary factor lost consumed final-decrement receipt")
+	}
+	if e := c.Factor(p, out); !errors.Is(e, ErrPolynomialPending) {
+		t.Fatal("stopped temporary factor permitted cache reentry", e)
+	}
+	serviceMust(t, c.CleanupFactor())
+	if c.pendingFactors != nil {
+		t.Fatal("temporary factor owner survived owning cleanup")
+	}
+	info, e := m.core.Info(canonicalFactor)
+	serviceMust(t, e)
+	if info.RefCount != 2 {
+		t.Fatal("cleanup changed cached and caller factor references", info.RefCount)
+	}
+	serviceMust(t, c.Reset())
+	serviceMust(t, c.Factor(p, out))
+}
+
 func TestPolynomialCacheConstructorBudgetAndRefusal(t *testing.T) {
 	m := polynomialPSCFullFixture(t)
 	b := m.core.integer.Budget()
