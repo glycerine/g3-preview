@@ -178,6 +178,11 @@ func (m *ASTManager) mkFamilyAppDomainArguments(fid FamilyID, k int32, ps []ASTP
 		decl, e = m.basicDecl(k, ps, domain)
 	} else if m.pluginAt(fid).kind == astArrayPlugin {
 		decl, e = m.arrayDecl(k, ps, domain, ASTHandle{})
+	} else if m.pluginAt(fid).kind == astFloatingPointPlugin && k >= astFPAPlusInf && k <= astFPAMinusZero {
+		previous := m.formatExecuting
+		m.formatExecuting = true
+		defer func() { m.formatExecuting = previous }()
+		decl, e = m.floatingPointSpecialDecl(k, ps, ASTHandle{})
 	} else if m.pluginAt(fid).kind == astFormatPlugin {
 		decl, e = m.formatDecl(k, ps, domain)
 	} else {

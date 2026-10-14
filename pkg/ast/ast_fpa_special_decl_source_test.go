@@ -91,3 +91,44 @@ func TestASTFloatingPointSpecialDeclFailedScalarRetainedForCleanup(t *testing.T)
 	m.BudgetField.FailAfter(-1)
 	astTestMust(t, m.Close())
 }
+
+func TestASTFloatingPointSpecialAppReachesDeclarationAndClassification(t *testing.T) {
+	m := astTestManager(t)
+	_, e := m.RegisterArithmeticPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterBitVectorPlugin()
+	astTestMust(t, e)
+	family, e := m.RegisterFloatingPointPlugin()
+	astTestMust(t, e)
+	ebits, e := m.NewParameterInt(8)
+	astTestMust(t, e)
+	sbits, e := m.NewParameterInt(24)
+	astTestMust(t, e)
+	for _, tc := range []struct {
+		kind  int32
+		class astFloatClass
+	}{
+		{astFPANaN, astFloatNaN},
+		{astFPAPlusInf, astFloatPInf},
+		{astFPAMinusInf, astFloatNInf},
+		{astFPAPlusZero, astFloatPZero},
+		{astFPAMinusZero, astFloatNZero},
+	} {
+		app, err := m.MkFamilyApp(family, tc.kind, []ASTParameter{ebits, sbits}, nil)
+		astTestMust(t, err)
+		r, err := m.internal(app)
+		astTestMust(t, err)
+		if m.nodeAt(r.slot).kind != ASTApp {
+			t.Fatal("family application did not publish an app", tc.kind)
+		}
+		decl := m.appAt(r.slot).decl
+		gotFamily, gotKind, err := m.declIdentity(decl)
+		astTestMust(t, err)
+		matched, err := m.floatingPointPlugin.isNumeralClass(r, tc.class)
+		astTestMust(t, err)
+		if gotFamily != family || gotKind != tc.kind || !matched || m.floatingPointPlugin.numeralProbeFrames != nil {
+			t.Fatal("family app missed special numeral or leaked local scope", tc.kind, gotFamily, gotKind, matched)
+		}
+	}
+	astTestMust(t, m.Close())
+}

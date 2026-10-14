@@ -16921,7 +16921,8 @@
           "go_target": "pkg/ast/ast_fpa_special_decl.go",
           "tests": [
             "TestASTFloatingPointSpecialDeclSortSelectionAndScopedValue",
-            "TestASTFloatingPointSpecialDeclFailedScalarRetainedForCleanup"
+            "TestASTFloatingPointSpecialDeclFailedScalarRetainedForCleanup",
+            "TestASTFloatingPointSpecialAppReachesDeclarationAndClassification"
           ]
         }
       ],
@@ -17050,7 +17051,8 @@
           "go_target": "pkg/ast/ast_fpa_special_decl.go",
           "tests": [
             "TestASTFloatingPointSpecialDeclSortSelectionAndScopedValue",
-            "TestASTFloatingPointSpecialDeclFailedScalarRetainedForCleanup"
+            "TestASTFloatingPointSpecialDeclFailedScalarRetainedForCleanup",
+            "TestASTFloatingPointSpecialAppReachesDeclarationAndClassification"
           ]
         }
       ],
@@ -153585,7 +153587,8 @@
           "go_target": "pkg/ast/ast_fpa_special_decl.go",
           "tests": [
             "TestASTFloatingPointSpecialDeclSortSelectionAndScopedValue",
-            "TestASTFloatingPointSpecialDeclFailedScalarRetainedForCleanup"
+            "TestASTFloatingPointSpecialDeclFailedScalarRetainedForCleanup",
+            "TestASTFloatingPointSpecialAppReachesDeclarationAndClassification"
           ]
         }
       ],
