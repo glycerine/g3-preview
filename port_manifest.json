@@ -155746,14 +155746,15 @@
           ]
         },
         {
-          "name": "debug division-verification mpn_dbg CTRACE before assertion (mpn.cpp:215)",
+          "name": "debug division-verification mpn_dbg CTRACE std::endl flush before assertion (mpn.cpp:215)",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpn_verification_trace.go",
           "go_targets": [
             "pkg/util/numeral/mpn_source_verify.go"
           ],
           "tests": [
-            "TestMPNDivisionVerificationConditionalTraceBeforeAssertion"
+            "TestMPNDivisionVerificationConditionalTraceBeforeAssertion",
+            "TestMPNDivisionVerificationConditionalTraceEndlRefusal"
           ]
         },
         {
@@ -156309,14 +156310,15 @@
           ]
         },
         {
-          "name": "debug division-verification mpn_dbg CTRACE before assertion (mpn.cpp:215)",
+          "name": "debug division-verification mpn_dbg CTRACE std::endl flush before assertion (mpn.cpp:215)",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpn_verification_trace.go",
           "go_targets": [
             "pkg/util/numeral/mpn_source_verify.go"
           ],
           "tests": [
-            "TestMPNDivisionVerificationConditionalTraceBeforeAssertion"
+            "TestMPNDivisionVerificationConditionalTraceBeforeAssertion",
+            "TestMPNDivisionVerificationConditionalTraceEndlRefusal"
           ]
         },
         {
@@ -175835,6 +175837,13 @@
           "tests": ["TestMPNMultiLimbDivisionTraceStopsAtSourceOutOfBoundsRead", "TestMPNMultiLimbDivisionTraceSourcePrefixAndRefusal"]
         },
         {
+          "name": "Reached MPN checked division-verification CTRACE std::endl before assertion (mpn.cpp:215)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_verification_trace.go",
+          "go_targets": ["pkg/util/numeral/mpn_verification_trace_test.go"],
+          "tests": ["TestMPNDivisionVerificationConditionalTraceBeforeAssertion", "TestMPNDivisionVerificationConditionalTraceEndlRefusal"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -176355,6 +176364,13 @@
           "go_target": "pkg/util/numeral/mpn_divn_trace.go",
           "go_targets": ["pkg/util/numeral/mpn_divn_trace_test.go"],
           "tests": ["TestMPNMultiLimbDivisionTraceStopsAtSourceOutOfBoundsRead", "TestMPNMultiLimbDivisionTraceSourcePrefixAndRefusal"]
+        },
+        {
+          "name": "Reached MPN checked division-verification CTRACE std::endl before assertion (mpn.cpp:215)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_verification_trace.go",
+          "go_targets": ["pkg/util/numeral/mpn_verification_trace_test.go"],
+          "tests": ["TestMPNDivisionVerificationConditionalTraceBeforeAssertion", "TestMPNDivisionVerificationConditionalTraceEndlRefusal"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
