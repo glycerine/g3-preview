@@ -1,25 +1,28 @@
-// Source: src/math/polynomial/polynomial_cache.cpp:35-92,129-166,203-227.
+// Source: src/math/polynomial/polynomial_cache.cpp:35-92,129-227.
 package polynomial
 
 import (
+	"errors"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-// PolynomialCache owns canonical representatives used by the retained NLSAT
-// cache. Factor result memoization is a separate remaining path.
+// PolynomialCache owns canonical representatives and memoized results used by
+// the retained NLSAT cache.
 type PolynomialCache struct {
-	self      *PolynomialCache
-	manager   *MultivariatePolynomialManager
-	refs      polynomialReferenceVector
-	buckets   map[uint32][]Polynomial
-	ids       map[uint32]bool
-	psc       map[polynomialPSCKey]*polynomialPSCEntry
-	header    uint64
-	resetting bool
-	closing   bool
-	closed    bool
+	self           *PolynomialCache
+	manager        *MultivariatePolynomialManager
+	refs           polynomialReferenceVector
+	buckets        map[uint32][]Polynomial
+	ids            map[uint32]bool
+	psc            map[polynomialPSCKey]*polynomialPSCEntry
+	factors        map[Polynomial]*polynomialFactorCacheEntry
+	pendingFactors *PolynomialFactors
+	header         uint64
+	resetting      bool
+	closing        bool
+	closed         bool
 }
 
 type polynomialPSCKey struct {
@@ -32,6 +35,11 @@ type polynomialPSCEntry struct {
 	complete bool
 }
 
+type polynomialFactorCacheEntry struct {
+	result   []Polynomial
+	complete bool
+}
+
 func NewPolynomialCache(m *MultivariatePolynomialManager) (*PolynomialCache, error) {
 	if e := m.ready(); e != nil {
 		return nil, e
@@ -40,9 +48,114 @@ func NewPolynomialCache(m *MultivariatePolynomialManager) (*PolynomialCache, err
 	if e := m.core.integer.Budget().Reserve(header); e != nil {
 		return nil, e
 	}
-	c := &PolynomialCache{manager: m, header: header, buckets: make(map[uint32][]Polynomial), ids: make(map[uint32]bool), psc: make(map[polynomialPSCKey]*polynomialPSCEntry)}
+	c := &PolynomialCache{manager: m, header: header, buckets: make(map[uint32][]Polynomial), ids: make(map[uint32]bool), psc: make(map[polynomialPSCKey]*polynomialPSCEntry), factors: make(map[Polynomial]*polynomialFactorCacheEntry)}
 	c.self = c
 	return c, nil
+}
+
+// Factor returns distinct factors, dropping multiplicities and the source
+// factorization constant. The result cache is keyed by the canonical input.
+func (c *PolynomialCache) Factor(p Polynomial, out *PolynomialRefVector) error {
+	if e := c.ready(); e != nil {
+		return e
+	}
+	if out == nil || out.owner != c.manager.core {
+		return ErrPolynomialOwner
+	}
+	if e := out.Reset(); e != nil {
+		return e
+	}
+	var e error
+	p, e = c.MkUnique(p)
+	if e != nil {
+		return e
+	}
+	if entry, ok := c.factors[p]; ok {
+		if !entry.complete {
+			return ErrPolynomialPending
+		}
+		if e := out.Reset(); e != nil {
+			return e
+		}
+		for _, value := range entry.result {
+			if e := out.Push(value); e != nil {
+				return e
+			}
+		}
+		return nil
+	}
+	entry := &polynomialFactorCacheEntry{}
+	c.factors[p] = entry
+	fs, e := NewPolynomialFactors(c.manager)
+	if e != nil {
+		if fs != nil {
+			return c.finishFactorOwner(fs, e)
+		}
+		return e
+	}
+	if e := c.manager.Factor(p, fs, DefaultUPolynomialFactorParams()); e != nil {
+		return c.finishFactorOwner(fs, e)
+	}
+	n, e := fs.Distinct()
+	if e != nil {
+		return c.finishFactorOwner(fs, e)
+	}
+	result := make([]Polynomial, n)
+	for i := uint32(0); i < n; i++ {
+		value, e := fs.factor(i)
+		if e != nil {
+			return c.finishFactorOwner(fs, e)
+		}
+		value, e = c.MkUnique(value)
+		if e != nil {
+			return c.finishFactorOwner(fs, e)
+		}
+		if e := out.Push(value); e != nil {
+			return c.finishFactorOwner(fs, e)
+		}
+		result[i] = value
+	}
+	if e := c.finishFactorOwner(fs, nil); e != nil {
+		return e
+	}
+	entry.result = result
+	entry.complete = true
+	return nil
+}
+
+func (c *PolynomialCache) finishFactorOwner(fs *PolynomialFactors, body error) error {
+	if body != nil {
+		if e := c.manager.CleanupFactor(); e != nil {
+			c.pendingFactors = fs
+			return errors.Join(body, e)
+		}
+	}
+	if e := fs.CloseChecked(); e != nil {
+		c.pendingFactors = fs
+		return errors.Join(body, e)
+	}
+	return body
+}
+
+// CleanupFactor completes a temporary factor owner after an interrupted call.
+func (c *PolynomialCache) CleanupFactor() error {
+	if c == nil || c.self != c {
+		return ErrPolynomialOwner
+	}
+	if c.closed {
+		return arena.ErrClosed
+	}
+	if c.pendingFactors == nil {
+		return nil
+	}
+	if e := c.manager.CleanupFactor(); e != nil {
+		return e
+	}
+	if e := c.pendingFactors.CloseChecked(); e != nil {
+		return e
+	}
+	c.pendingFactors = nil
+	return nil
 }
 
 // PSCChain memoizes the source ordered pair and variable after canonicalizing
@@ -117,6 +230,9 @@ func (c *PolynomialCache) ready() error {
 	if c.resetting {
 		return ErrPolynomialPending
 	}
+	if c.pendingFactors != nil {
+		return ErrPolynomialPending
+	}
 	return c.manager.ready()
 }
 
@@ -161,6 +277,7 @@ func (c *PolynomialCache) Reset() error {
 		return e
 	}
 	clear(c.psc)
+	clear(c.factors)
 	if e := c.refs.reset(c.manager.core); e != nil {
 		c.resetting = true
 		return e
@@ -186,6 +303,7 @@ func (c *PolynomialCache) CleanupReset() error {
 	clear(c.buckets)
 	clear(c.ids)
 	clear(c.psc)
+	clear(c.factors)
 	c.resetting = false
 	return nil
 }
@@ -198,6 +316,9 @@ func (c *PolynomialCache) Close() error {
 		return nil
 	}
 	c.closing = true
+	if e := c.CleanupFactor(); e != nil {
+		return e
+	}
 	if e := c.refs.close(c.manager.core); e != nil {
 		return e
 	}
@@ -206,6 +327,7 @@ func (c *PolynomialCache) Close() error {
 	c.buckets = nil
 	c.ids = nil
 	c.psc = nil
+	c.factors = nil
 	c.closed = true
 	return nil
 }

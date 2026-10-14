@@ -149,3 +149,77 @@ func TestPolynomialCachePSCChainCanonicalKeyAndReplay(t *testing.T) {
 		t.Fatal("reset retained PSC memoized entry")
 	}
 }
+
+func TestPolynomialCacheFactorDistinctReplayAndReset(t *testing.T) {
+	m := polynomialPSCFullFixture(t)
+	c, e := NewPolynomialCache(m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, c.Close()) })
+	out, e := NewPolynomialRefVector(m.core)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, out.Close()) })
+	p := polynomialQueryTerms(t, m.core, []int32{1, 1}, [][]MonomialPower{{{0, 1}}, nil})
+	pCopy := polynomialQueryTerms(t, m.core, []int32{1, 1}, [][]MonomialPower{nil, {{0, 1}}})
+	serviceMust(t, c.Factor(p, out))
+	n, e := out.Size()
+	serviceMust(t, e)
+	if n != 1 {
+		t.Fatal("source linear polynomial distinct factor count", n)
+	}
+	first, e := out.Get(0)
+	serviceMust(t, e)
+	invocation := m.factorCoreInvocation
+	serviceMust(t, out.Reset())
+	if _, e := m.core.Info(first); e != nil {
+		t.Fatal("factor cache lost its result owner", e)
+	}
+	serviceMust(t, c.Factor(pCopy, out))
+	if m.factorCoreInvocation != invocation {
+		t.Fatal("equal canonical input recomputed factorization")
+	}
+	got, e := out.Get(0)
+	serviceMust(t, e)
+	if got != first {
+		t.Fatal("factor cache replay changed canonical identity")
+	}
+	constant := polynomialQueryTerms(t, m.core, []int32{3}, [][]MonomialPower{nil})
+	serviceMust(t, c.Factor(constant, out))
+	n, e = out.Size()
+	serviceMust(t, e)
+	if n != 0 {
+		t.Fatal("constant polynomial has distinct factors", n)
+	}
+	serviceMust(t, c.Reset())
+	serviceMust(t, c.Factor(p, out))
+	if m.factorCoreInvocation == invocation {
+		t.Fatal("reset retained factor memoized entry")
+	}
+}
+
+func TestPolynomialCacheFactorConstructorRefusalRetainsInsertedKey(t *testing.T) {
+	m := polynomialPSCFullFixture(t)
+	c, e := NewPolynomialCache(m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, c.Close()) })
+	out, e := NewPolynomialRefVector(m.core)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, out.Close()) })
+	p := polynomialQueryTerms(t, m.core, []int32{1, 1}, [][]MonomialPower{{{0, 1}}, nil})
+	_, e = c.MkUnique(p)
+	serviceMust(t, e)
+	b := m.core.integer.Budget()
+	b.FailAfter(0)
+	e = c.Factor(p, out)
+	b.FailAfter(-1)
+	if !errors.Is(e, arena.ErrInjectedFailure) {
+		t.Fatal("factor temporary constructor did not refuse", e)
+	}
+	if len(c.factors) != 1 || c.factors[p].complete {
+		t.Fatal("source cache entry not inserted before factor constructor")
+	}
+	if e = c.Factor(p, out); !errors.Is(e, ErrPolynomialPending) {
+		t.Fatal("incomplete factor entry replayed", e)
+	}
+	serviceMust(t, c.Reset())
+	serviceMust(t, c.Factor(p, out))
+}

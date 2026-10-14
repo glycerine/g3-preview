@@ -45164,14 +45164,16 @@
       "tests": [
         "TestPolynomialCacheCanonicalizationAndReset",
         "TestPolynomialCacheConstructorBudgetAndRefusal",
-        "TestPolynomialCachePSCChainCanonicalKeyAndReplay"
+        "TestPolynomialCachePSCChainCanonicalKeyAndReplay",
+        "TestPolynomialCacheFactorDistinctReplayAndReset",
+        "TestPolynomialCacheFactorConstructorRefusalRetainsInsertedKey"
       ],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
       "deviations": [
-        "The retained NLSAT cache's mk_unique path uses native Go hash buckets and an embedded owning polynomial reference vector. Equal values reuse the first representative; reset releases cached references and permits a new first representative. PSC-chain results are memoized by canonical ordered inputs and variable, with source-order result canonicalization and caller-vector replacement. Factor caching and stopped PSC failure/cleanup paths remain open."
+        "The retained NLSAT cache's mk_unique path uses native Go hash buckets and an embedded owning polynomial reference vector. PSC-chain results are memoized by canonical ordered inputs and variable. Factor results are memoized by canonical input, with source-order output reset and distinct-factor canonicalization. A stopped temporary factors owner remains available for explicit cleanup; full stopped PSC/factor failure and cleanup fidelity and NLSAT integration remain open."
       ]
     },
     {
@@ -45186,7 +45188,9 @@
       "tests": [
         "TestPolynomialCacheCanonicalizationAndReset",
         "TestPolynomialCacheConstructorBudgetAndRefusal",
-        "TestPolynomialCachePSCChainCanonicalKeyAndReplay"
+        "TestPolynomialCachePSCChainCanonicalKeyAndReplay",
+        "TestPolynomialCacheFactorDistinctReplayAndReset",
+        "TestPolynomialCacheFactorConstructorRefusalRetainsInsertedKey"
       ],
       "conditionals": [
         {
@@ -45203,7 +45207,7 @@
       "methods": [],
       "ownership": [],
       "deviations": [
-        "The concrete PolynomialCache exposes retained mk_unique, PSC-chain memoization and reset behavior with borrowed canonical handles. Factor caching, stopped PSC cleanup and complete owner lifecycle remain open."
+        "The concrete PolynomialCache exposes retained mk_unique, PSC-chain and factor memoization, and reset behavior with borrowed canonical handles. Stopped PSC/factor cleanup and NLSAT integration remain open."
       ]
     },
     {
