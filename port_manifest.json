@@ -51710,6 +51710,7 @@
         "TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue",
         "TestSubpavingFastMonomialReverseAndSourceScratch",
         "TestSubpavingFastMonomialIntervalDisplaySmoke",
+        "TestSubpavingFastQueuedMonomialCatchesMPFFOverflow",
         "TestSubpavingFastClauseStableWatchUnitAndConflict",
         "TestSubpavingFastClauseOpennessAndUnitResume",
         "TestSubpavingFastClauseSharedAtomSourceCleanup",
@@ -51749,7 +51750,8 @@
             "TestSubpavingFastIntervalXnEqYRetainedCases",
             "TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue",
             "TestSubpavingFastMonomialReverseAndSourceScratch",
-            "TestSubpavingFastMonomialIntervalDisplaySmoke"
+            "TestSubpavingFastMonomialIntervalDisplaySmoke",
+            "TestSubpavingFastQueuedMonomialCatchesMPFFOverflow"
           ]
         },
         {
@@ -52185,6 +52187,7 @@
         "TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue",
         "TestSubpavingFastMonomialReverseAndSourceScratch",
         "TestSubpavingFastMonomialIntervalDisplaySmoke",
+        "TestSubpavingFastQueuedMonomialCatchesMPFFOverflow",
         "TestSubpavingFastClauseStableWatchUnitAndConflict",
         "TestSubpavingFastClauseOpennessAndUnitResume",
         "TestSubpavingFastClauseSharedAtomSourceCleanup",
@@ -52626,7 +52629,8 @@
             "TestSubpavingFastIntervalXnEqYRetainedCases",
             "TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue",
             "TestSubpavingFastMonomialReverseAndSourceScratch",
-            "TestSubpavingFastMonomialIntervalDisplaySmoke"
+            "TestSubpavingFastMonomialIntervalDisplaySmoke",
+            "TestSubpavingFastQueuedMonomialCatchesMPFFOverflow"
           ]
         },
         {
@@ -53210,6 +53214,7 @@
         "TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue",
         "TestSubpavingFastMonomialReverseAndSourceScratch",
         "TestSubpavingFastMonomialIntervalDisplaySmoke",
+        "TestSubpavingFastQueuedMonomialCatchesMPFFOverflow",
         "TestSubpavingFastClauseStableWatchUnitAndConflict",
         "TestSubpavingFastClauseOpennessAndUnitResume",
         "TestSubpavingFastClauseSharedAtomSourceCleanup",
@@ -53694,7 +53699,8 @@
             "TestSubpavingFastIntervalXnEqYRetainedCases",
             "TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue",
             "TestSubpavingFastMonomialReverseAndSourceScratch",
-            "TestSubpavingFastMonomialIntervalDisplaySmoke"
+            "TestSubpavingFastMonomialIntervalDisplaySmoke",
+            "TestSubpavingFastQueuedMonomialCatchesMPFFOverflow"
           ]
         },
         {
@@ -153956,10 +153962,11 @@
           ]
         },
         {
-          "name": "Selected live MPFF overflow exception transport through subpaving relevant_new_bound arithmetic-failed catch (subpaving_t_def.h:1313-1317); remaining tactic result integration and other exception paths remain open",
+          "name": "Selected live MPFF overflow exception transport through subpaving relevant_new_bound and watched propagate arithmetic-failed catches (subpaving_t_def.h:1313-1317,1709-1729); remaining tactic result integration and other exception paths remain open",
           "status": "partial",
           "go_target": "pkg/math/subpaving/fast_context_bounds.go",
-          "tests": ["TestFastContextRelevanceCatchesMPFFOverflow", "TestFastContextRelevanceCatchesMPFFUpperAndThresholdOverflow"]
+          "go_targets": ["pkg/math/subpaving/fast_context_propagate.go"],
+          "tests": ["TestFastContextRelevanceCatchesMPFFOverflow", "TestFastContextRelevanceCatchesMPFFUpperAndThresholdOverflow", "TestSubpavingFastQueuedMonomialCatchesMPFFOverflow"]
         },
         {
           "name": "inherited persistent std::ostream state, flags and locale replaced by Go io.Writer for retained MPFF output",
@@ -154353,10 +154360,11 @@
           ]
         },
         {
-          "name": "Selected live MPFF overflow exception transport through subpaving relevant_new_bound arithmetic-failed catch (subpaving_t_def.h:1313-1317); remaining tactic result integration and other exception paths remain open",
+          "name": "Selected live MPFF overflow exception transport through subpaving relevant_new_bound and watched propagate arithmetic-failed catches (subpaving_t_def.h:1313-1317,1709-1729); remaining tactic result integration and other exception paths remain open",
           "status": "partial",
           "go_target": "pkg/math/subpaving/fast_context_bounds.go",
-          "tests": ["TestFastContextRelevanceCatchesMPFFOverflow", "TestFastContextRelevanceCatchesMPFFUpperAndThresholdOverflow"]
+          "go_targets": ["pkg/math/subpaving/fast_context_propagate.go"],
+          "tests": ["TestFastContextRelevanceCatchesMPFFOverflow", "TestFastContextRelevanceCatchesMPFFUpperAndThresholdOverflow", "TestSubpavingFastQueuedMonomialCatchesMPFFOverflow"]
         },
         {
           "name": "inherited persistent std::ostream state, flags and locale replaced by Go io.Writer for retained MPFF output",

@@ -122,6 +122,42 @@ func TestSubpavingFastMonomialMergedPowerForwardZeroAndQueue(t *testing.T) {
 	}
 }
 
+func TestSubpavingFastQueuedMonomialCatchesMPFFOverflow(t *testing.T) {
+	m, c, v, root := fastMonomialFixture(t, []bool{false})
+	y, err := c.DefineMonomial([]FastPower{{Variable: 0, Degree: 2}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	z, err := c.DefineMonomial([]FastPower{{Variable: 0, Degree: 1}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := m.SetMax(v); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.PropagateBound(root, 0, v, true, false); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.PropagateBound(root, 0, v, false, false); err != nil {
+		t.Fatal(err)
+	}
+	if len(c.queue) != 2 {
+		t.Fatal("source watched bound was not queued", len(c.queue))
+	}
+	if err := c.PropagateQueued(root); err != nil || !c.arithmeticFailed || root.lower[y] != nil || root.upper[y] != nil || len(c.queue) != 0 {
+		t.Fatalf("watched MPFF overflow catch: err=%v, failed=%t, derived=(%p,%p), queue=%d", err, c.arithmeticFailed, root.lower[y], root.upper[y], len(c.queue))
+	}
+	if root.lower[z] == nil || root.upper[z] == nil {
+		t.Fatal("later watched definition did not run after MPFF overflow")
+	}
+	for _, bound := range []*FastBound{root.lower[z], root.upper[z]} {
+		equal, err := m.Equal(bound.value, v)
+		if err != nil || !equal {
+			t.Fatalf("later watched definition lost the exact maximum bound: equal=%t err=%v", equal, err)
+		}
+	}
+}
+
 func TestSubpavingFastMonomialReverseAndSourceScratch(t *testing.T) {
 	t.Run("cubic", func(t *testing.T) {
 		m, c, v, root := fastMonomialFixture(t, []bool{false})
