@@ -67,6 +67,56 @@ func TestWarningShortWriteStillFlushesSourceStream(t *testing.T) {
 	}
 }
 
+func TestWarningBorrowedStreamFailurePersistsAcrossCalls(t *testing.T) {
+	w := &shortFlushingWarningWriter{shortWarningWriter: shortWarningWriter{limit: len("WARNING: x")}}
+	s := NewWarningService(&bytes.Buffer{})
+	if e := s.SetWarningStream(w); e != nil {
+		t.Fatal(e)
+	}
+	if e := s.Warning("xy"); e != nil {
+		t.Fatal(e)
+	}
+	w.limit = 100
+	if e := s.Warning("later"); e != nil {
+		t.Fatal(e)
+	}
+	if got := w.buf.String(); got != "WARNING: x" || w.flushes != 2 {
+		t.Fatalf("failed ostream accepted a later insertion: %q, flushes %d", got, w.flushes)
+	}
+	if e := s.SetWarningStream(w); e != nil {
+		t.Fatal(e)
+	}
+	if e := s.Warning("same"); e != nil || w.buf.String() != "WARNING: x" {
+		t.Fatalf("rebinding the same failed ostream cleared its state: %q, %v", w.buf.String(), e)
+	}
+	var next bytes.Buffer
+	if e := s.SetWarningStream(&next); e != nil {
+		t.Fatal(e)
+	}
+	if e := s.Warning("new"); e != nil || next.String() != "WARNING: new\n" {
+		t.Fatalf("new ostream inherited the old failed state: %q, %v", next.String(), e)
+	}
+}
+
+func TestWarningBorrowedFlushFailurePersistsAcrossCalls(t *testing.T) {
+	flushErr := errors.New("flush refused")
+	w := &flushedWarningWriter{err: flushErr}
+	s := NewWarningService(&bytes.Buffer{})
+	if e := s.SetWarningStream(w); e != nil {
+		t.Fatal(e)
+	}
+	if e := s.Warning("first"); e != nil {
+		t.Fatal(e)
+	}
+	w.err = nil
+	if e := s.Warning("second"); e != nil {
+		t.Fatal(e)
+	}
+	if got := w.String(); got != "WARNING: first\n" || w.flushes != 2 {
+		t.Fatalf("failed flush allowed later insertion: %q, flushes %d", got, w.flushes)
+	}
+}
+
 type shortFlushingWarningWriter struct {
 	shortWarningWriter
 	flushes int

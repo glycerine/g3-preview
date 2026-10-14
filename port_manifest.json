@@ -119270,6 +119270,7 @@
           "name": "Process debug owner with default streams, tied input and interactive action; generated initializer borrowing and heap CASSERT state",
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_debug_process.go",
+          "go_targets": ["pkg/util/heap/heap.go", "pkg/util/process/finalize.go"],
           "tests": [
             "TestProcessDebugDefaultOwnsSourceAssertionIO",
             "TestHeapBorrowsProcessDebugUnlessExplicit",
@@ -119567,6 +119568,7 @@
           "name": "Process debug owner with default streams, tied input and interactive action; generated initializer borrowing and heap CASSERT state",
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_debug_process.go",
+          "go_targets": ["pkg/util/heap/heap.go", "pkg/util/process/finalize.go"],
           "tests": [
             "TestProcessDebugDefaultOwnsSourceAssertionIO",
             "TestHeapBorrowsProcessDebugUnlessExplicit",
@@ -169060,6 +169062,7 @@
           "name": "Concrete BV coefficient-hoist expr_ref_buffer set and resize: acquire replacement before retiring the old root, preserve both on stopped deletion, and release the discarded suffix in source order (poly_rewriter_def.h:454-492)",
           "status": "ported",
           "go_target": "pkg/ast/ast_bv_polynomial_hoist.go",
+          "go_targets": ["pkg/ast/rewriter/bv_polynomial_add_core.go"],
           "tests": [
             "TestASTBitVectorCoefficientHoistSoleSliceOwnershipAndGrowth",
             "TestASTBitVectorCoefficientHoistEveryActualReservation",
@@ -177907,6 +177910,8 @@
             "TestWarningFormattedStringAndIntegerRoutes",
             "TestWarningRetainedDatalogUnsignedSymbol",
             "TestWarningShortWriteStillFlushesSourceStream",
+            "TestWarningBorrowedStreamFailurePersistsAcrossCalls",
+            "TestWarningBorrowedFlushFailurePersistsAcrossCalls",
             "TestDefaultExceptionSourceFormattedConstructor"
           ]
         },
@@ -178019,6 +178024,8 @@
             "TestWarningFormattedStringAndIntegerRoutes",
             "TestWarningRetainedDatalogUnsignedSymbol",
             "TestWarningShortWriteStillFlushesSourceStream",
+            "TestWarningBorrowedStreamFailurePersistsAcrossCalls",
+            "TestWarningBorrowedFlushFailurePersistsAcrossCalls",
             "TestDefaultExceptionSourceFormattedConstructor"
           ]
         },

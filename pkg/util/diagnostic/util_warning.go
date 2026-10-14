@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"reflect"
 	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -16,6 +17,8 @@ type WarningService struct {
 	stderr  io.Writer
 	stream  io.Writer
 	enabled bool
+	// A selected ostream retains its failed state across warning_msg calls.
+	streamFailed bool
 }
 
 // The source warning settings are process globals. Retained callers share this
@@ -44,7 +47,14 @@ func (s *WarningService) SetWarningStream(stream io.Writer) error {
 	if s == nil {
 		return arena.ErrConfig
 	}
+	if stream != nil && s.stream != nil {
+		t := reflect.TypeOf(stream)
+		if t == reflect.TypeOf(s.stream) && t.Comparable() && stream == s.stream {
+			return nil
+		}
+	}
 	s.stream = stream
+	s.streamFailed = false
 	return nil
 }
 
@@ -119,17 +129,26 @@ func (s *WarningService) Warning(message string) error {
 	}
 	// The source performs all three insertions and flushes even after the
 	// stream enters a failed state. A Go writer has no sticky state, so retain
-	// the first insertion failure to skip later underlying writes in this call.
+	// the first insertion failure to skip later underlying writes until the
+	// selected stream changes.
 	var failure error
+	if s.streamFailed {
+		failure = io.ErrClosedPipe
+	}
 	for _, part := range [...]string{"WARNING: ", message, "\n"} {
 		if failure == nil {
 			failure = writeWarningPart(w, part)
 		}
 	}
+	if s.stream != nil && failure != nil {
+		s.streamFailed = true
+	}
 	// std::ostream::flush and fflush publish the completed warning. A borrowed
 	// buffered Go writer supplies the corresponding Flush method.
 	if f, ok := w.(interface{ Flush() error }); ok {
-		_ = f.Flush()
+		if e := f.Flush(); s.stream != nil && e != nil {
+			s.streamFailed = true
+		}
 	}
 	// warning_msg returns void: an ostream/FILE failure never unwinds its
 	// caller. The failed state belongs to the borrowed writer, not arithmetic
