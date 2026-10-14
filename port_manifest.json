@@ -98628,8 +98628,8 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Retained mk_var and expr2linear_pol arithmetic ADD, binary numeral MUL, to_real normalization and exact mpq coefficient buffer (src/tactic/arith/propagate_ineqs_tactic.cpp:121-174)",
-          "status": "partial",
+          "name": "Concrete mk_var, expr2linear_pol and mk_linear_pol: arithmetic ADD, first-numeral binary MUL, opaque products, to_real normalization and exact mpq coefficient buffer (src/tactic/arith/propagate_ineqs_tactic.cpp:121-174)",
+          "status": "ported",
           "go_target": "pkg/tactic/arith/polynomial_builder.go",
           "tests": [
             "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer"

@@ -124,4 +124,28 @@ func TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer(t *testing.T)
 	if got := out.String(); got != "5*x1 + 2*x2 + -2*x4 = 0" {
 		t.Fatalf("fractional duplicate equation = %q", got)
 	}
+	// MATCH_BINARY(is_mul) only extracts a coefficient when the first
+	// argument is a numeral. Other products remain single variables.
+	nonlinear, err := m.MkFamilyApp(family, 9, nil, []ast.ASTHandle{x, y})
+	equationMust(t, err)
+	reversed, err := m.MkFamilyApp(family, 9, nil, []ast.ASTHandle{x, coefficient})
+	equationMust(t, err)
+	thirdSum, err := m.MkFamilyApp(family, 6, nil, []ast.ASTHandle{nonlinear, reversed})
+	equationMust(t, err)
+	third, err := builder.MkLinearPolynomial(thirdSum)
+	equationMust(t, err)
+	if third != 5 || len(builder.var2expr) != 8 || len(store.constraints) != 3 || builder.var2expr[6] != nonlinear || builder.var2expr[7] != reversed {
+		t.Fatal("unrecognized product terms were split", third, builder.var2expr)
+	}
+	out.Reset()
+	equationMust(t, builder.store.equations.Display(&out, store.constraints[2].eq))
+	if got := out.String(); got != "-1*x5 + 1*x6 + 1*x7 = 0" {
+		t.Fatalf("source opaque product coefficients = %q", got)
+	}
+	before := len(store.constraints)
+	got, err := builder.MkLinearPolynomial(nonlinear)
+	equationMust(t, err)
+	if got != 6 || len(store.constraints) != before {
+		t.Fatal("non-ADD term created an equation", got, len(store.constraints))
+	}
 }
