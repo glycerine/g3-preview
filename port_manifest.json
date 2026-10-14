@@ -149016,8 +149016,8 @@
           ]
         },
         {
-          "name": "scalar global and lane counter transitions and synchronization; allocator/runtime and transport integration open",
-          "status": "partial",
+          "name": "Selected scalar global/lane counter transitions and synchronization through actual Runtime allocation, reallocation, deallocation and transport",
+          "status": "ported",
           "go_target": "pkg/util/memory/accounting.go",
           "tests": [
             "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -149027,7 +149027,10 @@
             "TestMemoryAccountingSignedBoundaryPrefixes",
             "TestMemoryAccountingSourceSizeTPromotions",
             "TestMemoryAccountingTLSRepeatedCountAndLimitOrder",
-            "TestMemoryAccountingTLSStrictThresholds"
+            "TestMemoryAccountingTLSStrictThresholds",
+            "TestMemoryRuntimeIndependentPhysicalAndCounterModel",
+            "TestMemoryRuntimeTLSStrictThresholdAndRepeatedCounts",
+            "TestMemoryRuntimeLimitBeforePhysicalAndTLSOwnedFailure"
           ]
         },
         {
@@ -149476,8 +149479,8 @@
           ]
         },
         {
-          "name": "scalar global and lane counter transitions and synchronization; allocator/runtime and transport integration open",
-          "status": "partial",
+          "name": "Selected scalar global/lane counter transitions and synchronization through actual Runtime allocation, reallocation, deallocation and transport",
+          "status": "ported",
           "go_target": "pkg/util/memory/accounting.go",
           "tests": [
             "TestMemoryAccountingBoundedIndependentLaneModel",
@@ -149487,7 +149490,10 @@
             "TestMemoryAccountingSignedBoundaryPrefixes",
             "TestMemoryAccountingSourceSizeTPromotions",
             "TestMemoryAccountingTLSRepeatedCountAndLimitOrder",
-            "TestMemoryAccountingTLSStrictThresholds"
+            "TestMemoryAccountingTLSStrictThresholds",
+            "TestMemoryRuntimeIndependentPhysicalAndCounterModel",
+            "TestMemoryRuntimeTLSStrictThresholdAndRepeatedCounts",
+            "TestMemoryRuntimeLimitBeforePhysicalAndTLSOwnedFailure"
           ]
         },
         {
