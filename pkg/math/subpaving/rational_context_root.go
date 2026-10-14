@@ -23,6 +23,7 @@ type RationalContext struct {
 	epsilon          numeral.Rational
 	maxBound         numeral.Rational
 	minusMaxBound    numeral.Rational
+	rootPrecision    numeral.Rational
 	relevanceScratch [3]numeral.Rational
 	zeroEpsilon      bool
 	variables        []bool
@@ -55,7 +56,7 @@ func NewRationalContext(m *numeral.RationalManager, limit *control.Reslimit) (_ 
 		return nil, arena.ErrInvalidSlot
 	}
 	c := &RationalContext{numbers: m, limit: limit, runtime: m.RuntimeOwner(), maxMemory: math.MaxUint64,
-		epsilon: numeral.NewRational(), maxBound: numeral.NewRational(), minusMaxBound: numeral.NewRational()}
+		epsilon: numeral.NewRational(), maxBound: numeral.NewRational(), minusMaxBound: numeral.NewRational(), rootPrecision: numeral.NewRational()}
 	for i := range c.relevanceScratch {
 		c.relevanceScratch[i] = numeral.NewRational()
 	}
@@ -71,6 +72,9 @@ func NewRationalContext(m *numeral.RationalManager, limit *control.Reslimit) (_ 
 	if err = c.UpdateBoundPolicy(20, 10); err != nil {
 		return nil, err
 	}
+	if err = c.UpdateRootPrecision(8192); err != nil {
+		return nil, err
+	}
 	return c, nil
 }
 
@@ -78,7 +82,7 @@ func (c *RationalContext) closePolicyNumerals() (err error) {
 	for i := range c.relevanceScratch {
 		err = errors.Join(err, c.numbers.Del(&c.relevanceScratch[i]))
 	}
-	return errors.Join(err, c.numbers.Del(&c.minusMaxBound), c.numbers.Del(&c.maxBound), c.numbers.Del(&c.epsilon))
+	return errors.Join(err, c.numbers.Del(&c.rootPrecision), c.numbers.Del(&c.minusMaxBound), c.numbers.Del(&c.maxBound), c.numbers.Del(&c.epsilon))
 }
 
 func (c *RationalContext) open() error {

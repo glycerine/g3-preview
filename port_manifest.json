@@ -35906,6 +35906,20 @@
           ]
         },
         {
+          "name": "Concrete config_mpq exact Newton nth-root scalar enclosure and interval x^n=y inverse image with even symmetry, odd directed endpoints, infinity, openness and aliasing (src/math/interval/interval_def.h:173-355,1390-1478); root TRACE records and full context memory checkpoint transport remain open",
+          "status": "partial",
+          "go_target": "pkg/math/interval/rational_root.go",
+          "go_targets": [
+            "pkg/math/subpaving/rational_interval_root.go",
+            "pkg/math/subpaving/rational_context_root_precision.go"
+          ],
+          "tests": [
+            "TestRationalRootNewtonCertifiedBoundsAndCancellation",
+            "TestSubpavingRationalIntervalXnEqYSourceBranches",
+            "TestRationalContextInverseRootPrecisionAndCanceledDispatch"
+          ]
+        },
+        {
           "name": "Concrete mpq dependency masks for neg, add, sub, scalar multiply/divide, interval multiply, power, reciprocal and interval divide (src/math/interval/interval_def.h:710-725,776-823,834-850,928-1019,1219-1268,1494-1515,1593-1664)",
           "status": "partial",
           "go_target": "pkg/math/interval/rational_interval_deps.go",
@@ -52219,6 +52233,20 @@
           "tests": [
             "TestSubpavingRationalIntervalInverseSourceBranches",
             "TestRationalIntervalLiveNodeBoundsAndOwnedCopy"
+          ]
+        },
+        {
+          "name": "Concrete config_mpq context-owned default nth-root precision 1/8192, zero-parameter fallback, canceled root dispatch and interval inverse image for retained monomial propagation (src/math/subpaving/subpaving_t_def.h:499-503,1641; src/math/interval/interval_def.h:1390-1478); monomial registration and solver search remain open",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/rational_context_root_precision.go",
+          "go_targets": [
+            "pkg/math/interval/rational_root.go",
+            "pkg/math/subpaving/rational_interval_root.go"
+          ],
+          "tests": [
+            "TestRationalRootNewtonCertifiedBoundsAndCancellation",
+            "TestSubpavingRationalIntervalXnEqYSourceBranches",
+            "TestRationalContextInverseRootPrecisionAndCanceledDispatch"
           ]
         },
         {
