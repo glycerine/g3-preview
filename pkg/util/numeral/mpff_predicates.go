@@ -19,9 +19,21 @@ func (m *FastFloatManager) IsPos(a *FastFloat) (bool, error) {
 	}
 	return a.index() != 0 && !a.negative(), nil
 }
-func (m *FastFloatManager) IsNeg(a *FastFloat) (bool, error)    { return m.Sign(a) }
-func (m *FastFloatManager) IsNonPos(a *FastFloat) (bool, error) { ok, e := m.IsPos(a); return !ok, e }
-func (m *FastFloatManager) IsNonNeg(a *FastFloat) (bool, error) { ok, e := m.IsNeg(a); return !ok, e }
+func (m *FastFloatManager) IsNeg(a *FastFloat) (bool, error) { return m.Sign(a) }
+func (m *FastFloatManager) IsNonPos(a *FastFloat) (bool, error) {
+	ok, e := m.IsPos(a)
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
+}
+func (m *FastFloatManager) IsNonNeg(a *FastFloat) (bool, error) {
+	ok, e := m.IsNeg(a)
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
+}
 func (m *FastFloatManager) IsAbsOne(a *FastFloat) (bool, error) {
 	if e := m.check(a); e != nil {
 		return false, e
@@ -164,7 +176,10 @@ func (m *FastFloatManager) Equal(a, b *FastFloat) (bool, error) {
 }
 func (m *FastFloatManager) NotEqual(a, b *FastFloat) (bool, error) {
 	ok, e := m.Equal(a, b)
-	return !ok, e
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
 }
 func (m *FastFloatManager) Less(a, b *FastFloat) (bool, error) {
 	if e := m.pair(a, b); e != nil {
@@ -198,11 +213,17 @@ func (m *FastFloatManager) Less(a, b *FastFloat) (bool, error) {
 func (m *FastFloatManager) Greater(a, b *FastFloat) (bool, error) { return m.Less(b, a) }
 func (m *FastFloatManager) LessEqual(a, b *FastFloat) (bool, error) {
 	ok, e := m.Less(b, a)
-	return !ok, e
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
 }
 func (m *FastFloatManager) GreaterEqual(a, b *FastFloat) (bool, error) {
 	ok, e := m.Less(a, b)
-	return !ok, e
+	if e != nil {
+		return false, e
+	}
+	return !ok, nil
 }
 func (m *FastFloatManager) IsPowerOfTwo(a *FastFloat) (bool, error) {
 	if e := m.check(a); e != nil {

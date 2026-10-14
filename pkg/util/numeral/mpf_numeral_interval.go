@@ -16,7 +16,10 @@ func (m *ArbitraryFloatNumeralManager) IsNeg(x *ArbitraryFloat) (bool, error) {
 		return neg, e
 	}
 	zero, e := m.core.IsZero(x)
-	return !zero, e
+	if e != nil {
+		return false, e
+	}
+	return !zero, nil
 }
 func (m *ArbitraryFloatNumeralManager) IsPos(x *ArbitraryFloat) (bool, error) {
 	if e := m.guard(); e != nil {
@@ -27,15 +30,24 @@ func (m *ArbitraryFloatNumeralManager) IsPos(x *ArbitraryFloat) (bool, error) {
 		return pos, e
 	}
 	zero, e := m.core.IsZero(x)
-	return !zero, e
+	if e != nil {
+		return false, e
+	}
+	return !zero, nil
 }
 func (m *ArbitraryFloatNumeralManager) IsNonNeg(x *ArbitraryFloat) (bool, error) {
 	neg, e := m.IsNeg(x)
-	return !neg, e
+	if e != nil {
+		return false, e
+	}
+	return !neg, nil
 }
 func (m *ArbitraryFloatNumeralManager) IsNonPos(x *ArbitraryFloat) (bool, error) {
 	pos, e := m.IsPos(x)
-	return !pos, e
+	if e != nil {
+		return false, e
+	}
+	return !pos, nil
 }
 func (m *ArbitraryFloatNumeralManager) IsOne(x *ArbitraryFloat) (bool, error) {
 	if e := m.guard(); e != nil {

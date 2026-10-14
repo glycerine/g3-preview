@@ -83,7 +83,10 @@ func (m *ArbitraryFloatManager) IsNaN(a *ArbitraryFloat) (bool, error) {
 		return false, e
 	}
 	zero, e := m.integer.IsZero(&a.significand)
-	return !zero, e
+	if e != nil {
+		return false, e
+	}
+	return !zero, nil
 }
 func (m *ArbitraryFloatManager) IsInf(a *ArbitraryFloat) (bool, error) {
 	top, e := m.hasTopExponent(a)
@@ -126,7 +129,10 @@ func (m *ArbitraryFloatManager) IsNormal(a *ArbitraryFloat) (bool, error) {
 		return false, e
 	}
 	zero, e := m.IsZero(a)
-	return !zero, e
+	if e != nil {
+		return false, e
+	}
+	return !zero, nil
 }
 func (m *ArbitraryFloatManager) IsPositiveInf(a *ArbitraryFloat) (bool, error) {
 	if e := m.valueGuard(a); e != nil {
@@ -154,7 +160,10 @@ func (m *ArbitraryFloatManager) IsNegative(a *ArbitraryFloat) (bool, error) {
 		return false, nil
 	}
 	nan, e := m.IsNaN(a)
-	return !nan, e
+	if e != nil {
+		return false, e
+	}
+	return !nan, nil
 }
 func (m *ArbitraryFloatManager) IsPositive(a *ArbitraryFloat) (bool, error) {
 	if e := m.valueGuard(a); e != nil {
@@ -164,7 +173,10 @@ func (m *ArbitraryFloatManager) IsPositive(a *ArbitraryFloat) (bool, error) {
 		return false, nil
 	}
 	nan, e := m.IsNaN(a)
-	return !nan, e
+	if e != nil {
+		return false, e
+	}
+	return !nan, nil
 }
 func (m *ArbitraryFloatManager) IsNegativeZero(a *ArbitraryFloat) (bool, error) {
 	if e := m.valueGuard(a); e != nil {
