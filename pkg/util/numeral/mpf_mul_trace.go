@@ -27,32 +27,40 @@ func (m *ArbitraryFloatManager) floatTraceTags() *diagnostic.TraceTags {
 	return diagnostic.BorrowProcessTraceTags()
 }
 
-func (m *ArbitraryFloatManager) traceFloatString(w io.Writer, value *ArbitraryFloat) (cause error) {
+func (m *ArbitraryFloatManager) formatFloatTraceValue(value *ArbitraryFloat) (result string, cause error) {
 	text, err := NewArbitraryFloatFormatText(m.budget)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer func() { cause = JoinNumericErrors(cause, text.Close()) }()
 	view, err := m.ToStringInto(value, text)
 	if err != nil {
-		return err
+		return "", err
 	}
 	n, err := view.Length()
 	if err != nil {
-		return err
+		return "", err
 	}
 	if n > uint64(int(^uint(0)>>1)) {
-		return arena.ErrBounds
+		return "", arena.ErrBounds
 	}
 	data := make([]byte, int(n))
 	for i := range data {
 		b, e := view.Byte(uint64(i))
 		if e != nil {
-			return e
+			return "", e
 		}
 		data[i] = b
 	}
-	return writeNumeralDisplayPart(w, string(data))
+	return string(data), nil
+}
+
+func (m *ArbitraryFloatManager) traceFloatString(w io.Writer, value *ArbitraryFloat) error {
+	text, e := m.formatFloatTraceValue(value)
+	if e != nil {
+		return e
+	}
+	return writeNumeralDisplayPart(w, text)
 }
 
 func (m *ArbitraryFloatManager) traceMulEntry(mode ArbitraryFloatRoundingMode, x, y *ArbitraryFloat) {

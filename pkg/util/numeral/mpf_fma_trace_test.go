@@ -2,9 +2,11 @@ package numeral
 
 import (
 	"bytes"
+	"errors"
 	"strings"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
@@ -90,4 +92,91 @@ func TestArbitraryFloatFMASwapAndArithmeticBranchTrace(t *testing.T) {
 	serviceMust(t, m.Del(&one))
 	serviceMust(t, m.Del(&z))
 	serviceMust(t, m.Del(&out))
+}
+
+func TestArbitraryFloatFMAUnpackedDecimalAndBinaryTrace(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("mpf_dbg")
+	compiled := tags.ShouldTrace("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	var one, out ArbitraryFloat
+	serviceMust(t, m.MkOne(11, 53, false, &one))
+	serviceMust(t, m.FMA(ArbitraryFloatNearestEven, &one, &one, &one, &out))
+	if compiled {
+		got := output.String()
+		const header = "-------- [mpf_dbg] fma src/util/mpf.cpp:813 ---------\n"
+		start := strings.Index(got, header)
+		if start < 0 || strings.Count(got, header) != 1 {
+			t.Fatalf("missing unpacked source block: %q", got)
+		}
+		body := got[start+len(header):]
+		end := strings.Index(body, "------------------------------------------------\n")
+		if end < 0 {
+			t.Fatalf("unterminated unpacked source block: %q", got)
+		}
+		lines := strings.Split(strings.TrimSuffix(body[:end], "\n"), "\n")
+		if len(lines) != 6 {
+			t.Fatalf("unpacked six source records: %q", lines)
+		}
+		for i, line := range lines {
+			label := []string{"A = ", "B = ", "C = "}[i%3]
+			if !strings.HasPrefix(line, label) || len(line) == len(label) {
+				t.Fatalf("unpacked source order at %d: %q", i, lines)
+			}
+			if i >= 3 && !strings.Contains(line, "#b") {
+				t.Fatalf("binary source text at %d: %q", i, line)
+			}
+		}
+	} else if output.Len() != 0 {
+		t.Fatalf("erased unpacked source trace: %q", output.String())
+	}
+	serviceMust(t, m.Del(&one))
+	serviceMust(t, m.Del(&out))
+}
+
+func TestArbitraryFloatFMABinaryTraceTemporaryFailureCleanup(t *testing.T) {
+	m, _, budget := mpfNumeralHelpersFixture(t)
+	var one ArbitraryFloat
+	serviceMust(t, m.MkOne(11, 53, false, &one))
+	budget.FailAfter(0)
+	_, e := m.traceFMABinaryString(&one, 1, 0)
+	budget.FailAfter(-1)
+	if !errors.Is(e, arena.ErrInjectedFailure) || m.binaryString.active {
+		t.Fatalf("binary trace temporary retained after refusal: %v, active %v", e, m.binaryString.active)
+	}
+	text, e := m.traceFMABinaryString(&one, 1, 0)
+	serviceMust(t, e)
+	if !strings.Contains(text, "#b") || m.binaryString.active {
+		t.Fatalf("binary trace temporary retry: %q, active %v", text, m.binaryString.active)
+	}
+	serviceMust(t, m.Del(&one))
+}
+
+func TestArbitraryFloatFMAUnpackedTraceFormatterRefusalPropagates(t *testing.T) {
+	m, _, budget := mpfNumeralHelpersFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	var one ArbitraryFloat
+	serviceMust(t, m.MkOne(11, 53, false, &one))
+	if !tags.ShouldTrace("mpf_dbg") {
+		serviceMust(t, m.traceFMAUnpacked(&one, &one, &one))
+		serviceMust(t, m.Del(&one))
+		return
+	}
+	budget.FailAfter(0)
+	e := m.traceFMAUnpacked(&one, &one, &one)
+	budget.FailAfter(-1)
+	if !errors.Is(e, arena.ErrInjectedFailure) || m.binaryString.active || !strings.Contains(output.String(), "src/util/mpf.cpp:813") {
+		t.Fatalf("reached formatter refusal: %v, active %v, output %q", e, m.binaryString.active, output.String())
+	}
+	output.Reset()
+	serviceMust(t, m.traceFMAUnpacked(&one, &one, &one))
+	if !strings.Contains(output.String(), "C = #b") {
+		t.Fatalf("unpacked trace retry: %q", output.String())
+	}
+	serviceMust(t, m.Del(&one))
 }

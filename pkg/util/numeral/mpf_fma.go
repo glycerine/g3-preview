@@ -153,6 +153,9 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 			return e
 		}
 	}
+	if e := m.traceFMAUnpacked(&s.a, &s.b, &s.c); e != nil {
+		return e
+	}
 	for _, v := range [...]*Int{&s.a.significand, &s.b.significand, &s.c.significand} {
 		if e := s.assertPower(v, sb, false); e != nil {
 			return e
