@@ -140,10 +140,17 @@ func TestParamsReferenceResetOwnContinuationMatchesKindAndInvocation(t *testing.
 	prefix, e := sy.Intern("completed-prefix")
 	paramsMust(t, e)
 	paramsMust(t, c.SetUInt(&v, prefix, 42))
+	smallKey, e := sy.Intern("completed-small-numeral")
+	paramsMust(t, e)
+	small, e := q.NewValue()
+	paramsMust(t, e)
+	paramsMust(t, q.SetInt64(&small, 7))
+	paramsMust(t, c.SetRat(&v, smallKey, &small))
+	paramsMust(t, q.Del(&small))
 	paramsMust(t, c.SetRat(&v, k, &big))
 	paramsMust(t, q.Del(&big))
 	block := &c.Blocks[v.Slot-1]
-	if block.Refs != 1 || block.Size != 2 {
+	if block.Refs != 1 || block.Size != 3 {
 		t.Fatal("actual source reference", block.Refs, block.Size)
 	}
 
@@ -181,6 +188,9 @@ func TestParamsReferenceResetOwnContinuationMatchesKindAndInvocation(t *testing.
 		t.Fatal("source shared inline prefix remains visible", got)
 	}
 
+	if block.resetCursor != 2 || block.resetStage != 0 {
+		t.Fatal("reset must advance past the completed numeral before the stopped one", block.resetCursor, block.resetStage)
+	}
 	if receipt.owner != c.Owner || receipt.slot != v.Slot || receipt.generation != v.Generation || receipt.invocation == 0 || block.resetKind != paramsResetLive {
 		t.Fatal("actual live reset receipt", receipt, *block)
 	}
