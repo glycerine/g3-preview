@@ -119868,7 +119868,7 @@
       "methods": [
         {
           "name": "dependency_manager<expr_dependency_config>::mk_empty",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_dependency.go",
           "tests": [
             "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
@@ -119931,7 +119931,7 @@
         },
         {
           "name": "dependency_manager<expr_dependency_config>::inc_ref",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_dependency.go",
           "tests": [
             "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
@@ -119973,7 +119973,7 @@
         },
         {
           "name": "dependency_manager<expr_dependency_config>::contains",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_dependency.go",
           "tests": [
             "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
@@ -119994,7 +119994,7 @@
         },
         {
           "name": "dependency_manager<expr_dependency_config>::linearize",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_dependency.go",
           "tests": [
             "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
