@@ -392,9 +392,17 @@ func TestFastFloatScopedFailureLifetimes(t *testing.T) {
 			case 2:
 				out, e = a.Mul(b)
 			}
+			var pending *ScopedFastFloatCopyCleanupError
+			errors.As(e, &pending)
 			roots := []*FastFloat{&a.num, &b.num}
 			if out != nil {
 				roots = append(roots, &out.num)
+			}
+			if pending != nil {
+				if pending.owner == nil || pending.owner.closed {
+					t.Fatal("failed source copy constructor lost its scope", op, fail)
+				}
+				roots = append(roots, &pending.owner.num)
 			}
 			fastAudit(t, m, roots...)
 			if e != nil && !numericPhysicalReservationRefusal(e) {
@@ -403,6 +411,14 @@ func TestFastFloatScopedFailureLifetimes(t *testing.T) {
 			if out != nil {
 				serviceMust(t, out.Close())
 				serviceMust(t, out.Close())
+			}
+			budget.FailAfter(-1)
+			if pending != nil {
+				serviceMust(t, pending.Cleanup())
+				serviceMust(t, pending.Cleanup())
+				if pending.owner != nil {
+					t.Fatal("copy-constructor owning cleanup retained scope", op, fail)
+				}
 			}
 			serviceMust(t, a.Close())
 			serviceMust(t, b.Close())
@@ -419,6 +435,46 @@ func TestFastFloatScopedFailureLifetimes(t *testing.T) {
 		if !complete {
 			t.Fatal("incomplete scope sweep", op)
 		}
+	}
+}
+
+func TestScopedFastFloatCopyConstructorGuardRetainsOwner(t *testing.T) {
+	budget := arena.NewBudget(1 << 26)
+	cfg := DefaultFastFloatConfig(serviceConfig(budget).Integers.Words)
+	cfg.InitialCapacity = 8
+	m, e := NewFastFloatManager(cfg)
+	serviceMust(t, e)
+	t.Cleanup(func() {
+		serviceMust(t, m.CloseChecked())
+		if budget.Used() != 0 {
+			t.Fatal("retained fast-float manager", budget.Used())
+		}
+	})
+	a, e := NewScopedFastFloat(m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, a.Cleanup()) })
+	serviceMust(t, a.SetInt32(7))
+	baseline := budget.Used()
+	index := m.next
+	if index >= m.capacity {
+		t.Fatal("fixture did not reserve a fresh ID")
+	}
+	// The Go generation guard refuses this ID after the copy constructor
+	// allocates its header, before it publishes a live numeric block.
+	m.write(&m.metadata, 2*index+1, ^uint32(0))
+	copy, e := a.Clone()
+	var pending *ScopedFastFloatCopyCleanupError
+	if copy != nil || !errors.As(e, &pending) || !errors.Is(e, ErrFastFloatOwner) || pending.owner == nil || pending.owner.closed || pending.owner.num.index() != 0 {
+		t.Fatal("failed copy constructor lost its owner", copy, e)
+	}
+	if budget.Used() != baseline+uint64(reflect.TypeOf(ScopedFastFloat{}).Size()) {
+		t.Fatal("failed constructor lost charged header", budget.Used(), baseline)
+	}
+	fastAudit(t, m, &a.num, &pending.owner.num)
+	serviceMust(t, pending.Cleanup())
+	serviceMust(t, pending.Cleanup())
+	if pending.owner != nil || budget.Used() != baseline {
+		t.Fatal("owning cleanup retained failed constructor", budget.Used(), baseline)
 	}
 }
 func TestFastFloatDivisionSourceDiagnosticPrefix(t *testing.T) {

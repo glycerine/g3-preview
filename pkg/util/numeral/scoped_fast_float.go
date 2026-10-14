@@ -79,12 +79,23 @@ func (s *ScopedFastFloat) Clone() (*ScopedFastFloat, error) {
 		return nil, e
 	}
 	if e = r.Set(&s.num); e != nil {
-		r.Close()
-		return nil, e
+		// A failed source copy constructor has no scoped destructor. Keep
+		// its acquired ID and header for explicit owning cleanup.
+		return nil, &ScopedFastFloatCopyCleanupError{Cause: e, owner: r}
 	}
 	return r, nil
 }
 func (s *ScopedFastFloat) Close() error {
+	return s.cleanup()
+}
+
+// Cleanup releases a partially constructed scoped value without invoking a
+// source destructor. The physical release is the same allocation-free Del.
+func (s *ScopedFastFloat) Cleanup() error {
+	return s.cleanup()
+}
+
+func (s *ScopedFastFloat) cleanup() error {
 	if s == nil || s.self != s {
 		return ErrScopedCopy
 	}
