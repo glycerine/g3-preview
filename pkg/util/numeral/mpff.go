@@ -34,9 +34,10 @@ type FastFloatConfig struct {
 	PrecisionWords, InitialCapacity uint32
 	Storage                         arena.VectorConfig
 	// Memory borrows the actual allocation runtime. Nil constructs an owned
-	// runtime. Caller confinement and the Budget ownership contract still apply;
-	// process-global source binding remains a separate integration.
-	Memory *umemory.Runtime
+	// runtime. Process binds that owned runtime to the source process counters.
+	// When both are supplied they must refer to the same process.
+	Memory  *umemory.Runtime
+	Process *umemory.ProcessAccounting
 }
 
 func DefaultFastFloatConfig(c arena.VectorConfig) FastFloatConfig {
@@ -90,6 +91,9 @@ func NewFastFloatManager(c FastFloatConfig) (*FastFloatManager, error) {
 			return nil, arena.ErrConfig
 		}
 	}
+	if c.Process != nil && (!c.Process.Valid() || c.Memory != nil && c.Memory.ProcessOwner() != c.Process) {
+		return nil, arena.ErrConfig
+	}
 	h := uint64(reflect.TypeOf(FastFloatManager{}).Size())
 	if e := c.Storage.Descriptors.Budget.Reserve(h); e != nil {
 		return nil, e
@@ -97,7 +101,7 @@ func NewFastFloatManager(c FastFloatConfig) (*FastFloatManager, error) {
 	m := &FastFloatManager{config: c, precision: c.PrecisionWords, bits: c.PrecisionWords * 32, capacity: c.InitialCapacity, headerBytes: h}
 	m.self = m
 	var e error
-	m.natural, e = newNaturalManagerWithMemory(c.Storage, c.Memory)
+	m.natural, e = newNaturalManagerWithProcess(c.Storage, c.Memory, c.Process)
 	if e != nil {
 		m.Close()
 		return nil, e

@@ -154200,6 +154200,17 @@
           ]
         },
         {
+          "name": "explicit source process binding for an MPFF-owned raw Runtime and retained fast subpaving memory checkpoint",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff.go",
+          "go_targets": ["pkg/util/numeral/mpn_storage.go", "pkg/math/subpaving/fast_checkpoint_test.go"],
+          "tests": [
+            "TestFastFloatOwnedRuntimeJoinsSourceProcess",
+            "TestFastFloatOwnedRuntimeRejectsProcessABIWithoutStorage",
+            "TestFastCheckpointReadsSharedProcessAfterResourceIncrement"
+          ]
+        },
+        {
           "name": "Shared/borrowed Runtime identity and TLS character-formatting failure; automatic process-memory binding remains open",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpff.go",
@@ -154603,6 +154614,17 @@
             "TestFastFloatDecimalLargePrecision",
             "TestFastFloatDecimalIndependentBinaryValueModel",
             "TestFastFloatFullPrecisionWarmNativeScratch"
+          ]
+        },
+        {
+          "name": "explicit source process binding for an MPFF-owned raw Runtime and retained fast subpaving memory checkpoint",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpff.go",
+          "go_targets": ["pkg/util/numeral/mpn_storage.go", "pkg/math/subpaving/fast_checkpoint_test.go"],
+          "tests": [
+            "TestFastFloatOwnedRuntimeJoinsSourceProcess",
+            "TestFastFloatOwnedRuntimeRejectsProcessABIWithoutStorage",
+            "TestFastCheckpointReadsSharedProcessAfterResourceIncrement"
           ]
         },
         {

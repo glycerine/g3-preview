@@ -15,16 +15,12 @@ func fastProcessFixture(t *testing.T) (*FastContext, *numeral.FastFloatManager, 
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
 	p := memory.NewProcessAccounting()
-	r, err := memory.NewRuntime(memory.RuntimeConfig{Budget: b, Process: p, SizeTBits: 64})
-	if err != nil {
-		t.Fatal(err)
-	}
 	other, err := memory.NewRuntime(memory.RuntimeConfig{Budget: b, Process: p, SizeTBits: 64})
 	if err != nil {
 		t.Fatal(err)
 	}
 	cfg := numeral.DefaultFastFloatConfig(arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}})
-	cfg.InitialCapacity, cfg.Memory = 4, r
+	cfg.InitialCapacity, cfg.Process = 4, p
 	m, err := numeral.NewFastFloatManager(cfg)
 	if err != nil {
 		t.Fatal(err)
@@ -33,11 +29,11 @@ func fastProcessFixture(t *testing.T) (*FastContext, *numeral.FastFloatManager, 
 	if err != nil {
 		t.Fatal(err)
 	}
-	if c.process != p {
+	if c.process != p || m.RuntimeOwner() == other {
 		t.Fatal("context did not borrow the numeral runtime's process")
 	}
 	t.Cleanup(func() {
-		for _, err := range []error{c.Close(), m.CloseChecked(), other.Close(), r.Close()} {
+		for _, err := range []error{c.Close(), m.CloseChecked(), other.Close()} {
 			if err != nil {
 				t.Error(err)
 			}

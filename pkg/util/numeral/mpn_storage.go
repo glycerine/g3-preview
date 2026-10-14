@@ -43,6 +43,15 @@ func NewNaturalManager(c arena.VectorConfig) (*NaturalManager, error) {
 	return newNaturalManagerWithMemory(c, nil)
 }
 func newNaturalManagerWithMemory(c arena.VectorConfig, runtime *umemory.Runtime) (*NaturalManager, error) {
+	return newNaturalManagerWithProcess(c, runtime, nil)
+}
+func newNaturalManagerWithProcess(c arena.VectorConfig, runtime *umemory.Runtime, process *umemory.ProcessAccounting) (*NaturalManager, error) {
+	if process != nil && !process.Valid() {
+		return nil, arena.ErrConfig
+	}
+	if runtime != nil && process != nil && runtime.ProcessOwner() != process {
+		return nil, arena.ErrConfig
+	}
 	header := uint64(reflect.TypeOf(NaturalManager{}).Size())
 	if e := c.Descriptors.Budget.Reserve(header); e != nil {
 		return nil, e
@@ -52,7 +61,7 @@ func newNaturalManagerWithMemory(c arena.VectorConfig, runtime *umemory.Runtime)
 	if runtime == nil {
 		m.ownsRuntime = true
 		var e error
-		m.runtime, e = umemory.NewRuntime(umemory.RuntimeConfig{Budget: m.budget, SizeTBits: uint8(32 << (^uint(0) >> 63))})
+		m.runtime, e = umemory.NewRuntime(umemory.RuntimeConfig{Budget: m.budget, Process: process, SizeTBits: uint8(32 << (^uint(0) >> 63))})
 		if e != nil {
 			m.originalCause = e
 			if cleanup := m.CloseChecked(); cleanup != nil {
