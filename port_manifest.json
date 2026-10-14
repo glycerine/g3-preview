@@ -118266,6 +118266,8 @@
       "go_targets": [
         "pkg/math/polynomial/polynomial_monomial_table.go",
         "pkg/ast/ast_activity_cache.go",
+        "pkg/ast/ast_table.go",
+        "pkg/ast/ast_fpa_value_table.go",
         "pkg/math/polynomial/polynomial_monomial_table_native_test.go"
       ],
       "tests": [
@@ -118297,6 +118299,9 @@
         "TestASTActivityCacheOldestUnusedEvictionAndQueueCompression",
         "TestASTActivityCacheUsedReplacementPreservesSourceCounterQuirk",
         "TestASTActivityCacheNativeGrowthOrderAndOwnership",
+        "TestASTNativeCanonicalTableGrowthCollisionIdentityAndGeneration",
+        "TestASTSourceInterningAssertions",
+        "TestASTFloatingPointNativeValueBucketsGrowthCollisionAndReuse",
         "TestMonomialNativeScratchGrowthResetAndBounds",
         "TestMonomialNativeVariableCountingAndInterning",
         "TestMonomialNativeTableGrowthRenameAndOrder",
@@ -118498,7 +118503,7 @@
       "methods": [
         {
           "name": "int32 table/map construction, init, alloc/delete and destruction",
-          "status": "partial",
+          "status": "reference_only",
           "go_target": "",
           "tests": []
         },
@@ -118558,7 +118563,7 @@
         },
         {
           "name": "cmap int32 key/value forwarding, mutation and iteration",
-          "status": "partial",
+          "status": "reference_only",
           "go_target": "",
           "tests": []
         },
@@ -118569,10 +118574,27 @@
           "tests": []
         },
         {
-          "name": "other HashProc/EqProc/value/destructor specializations, AST structural/identity table",
+          "name": "remaining AIG, NLSAT, polynomial cache, SMT and object-pair table specializations",
           "status": "unported",
           "go_target": "",
           "tests": []
+        },
+        {
+          "name": "AST canonical structural lookup and identity erasure over borrowed generation-checked nodes using native hash buckets and insertion-ordered entries",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_table.go",
+          "tests": [
+            "TestASTNativeCanonicalTableGrowthCollisionIdentityAndGeneration",
+            "TestASTSourceInterningAssertions"
+          ]
+        },
+        {
+          "name": "FPA value-table hash/equality over borrowed scoped MPF numeral IDs using native hash buckets and LIFO ID reuse",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_fpa_value_table.go",
+          "tests": [
+            "TestASTFloatingPointNativeValueBucketsGrowthCollisionAndReuse"
+          ]
         },
         {
           "name": "disabled #if0 trace and destructor output",
@@ -118631,12 +118653,11 @@
         }
       ],
       "ownership": [
-        "Pointer-free key/value/link cell arrays; actual cold owner header and whole physical arrays budgeted, including growth overlap and refunds for failed retries. Source attempted copy updates UsedSlots even on later reservation failure. Borrowed stable hash callback is owner-confined; references/iterators are explicit cold caller values checked against owner epochs. See PORT_PROGRESS.md#audit-chain-table-port-status-md.",
-        "Monomial specialization now uses native insdict entries and Go hash buckets; no source primary/cellar/free-list/codec or container allocation/failure semantics remain. Stable temporary publication and actual monomial object ownership remain."
+        "The standalone int32 chashtable/cmap configuration is instantiated only in src/test/chashtable.cpp and its removed Go fixture is reference-only. Live source configurations include AST canonical nodes, FPA numeral IDs, monomial objects and other unported consumers.",
+        "AST canonical nodes use native hash buckets plus insertion-ordered entries and borrow generation-checked node tokens. FPA buckets borrow owned numeral IDs and retain project MPF hash/equality. Monomial entries borrow exact keys during stable temporary publication; no generic C++ primary/cellar/free-list storage remains in Go."
       ],
       "deviations": [
-        "Finalize allocates before deleting old table and charges overlap, preserving the graph on predictable failure; source deletes before allocating. Same-budget swap reserves nothing; cross-budget swap transfers only positive final byte delta before field mutation.",
-        "Checked scalar link indices replace pointers; invalid config/bounds/epoch/lifetime return typed errors. Explicit CheckInvariant scans without the source debug visited allocation and does not claim automatic CASSERT behavior. Go map Swap is an ownership adapter; source cmap does not define swap. AST specialization remains open; see PORT_PROGRESS.md#audit-ast-core-port-status-md."
+        "The removed generic/int32 Go table's charged cellar layout, synthetic capacity and swap behavior are historical only. Retained Go consumers use native maps, slices and insdict while keeping project hash/equality and ownership rules. Source pointer-visited CASSERT transport and the remaining AIG, NLSAT, polynomial-cache, SMT and object-pair consumers remain open."
       ]
     },
     {
