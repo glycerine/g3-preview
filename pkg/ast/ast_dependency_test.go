@@ -50,8 +50,17 @@ func TestASTDependencySourceLeafJoinCallbacksAndLinearization(t *testing.T) {
 	if same != x {
 		t.Fatal("same fastpath")
 	}
+	leftNull, e := m.DependencyJoin(empty, x)
+	astTestMust(t, e)
+	rightNull, e := m.DependencyJoin(x, empty)
+	astTestMust(t, e)
+	bothNull, e := m.DependencyJoin(empty, empty)
+	astTestMust(t, e)
+	if leftNull != x || rightNull != x || !bothNull.IsNull() {
+		t.Fatal("null join fastpaths", leftNull, rightNull, bothNull)
+	}
 	if n, e := m.DependencyRefCount(x); e != nil || n != 0 {
-		t.Fatal("fastpath must not INC", n, e)
+		t.Fatal("same/null fastpaths must not INC", n, e)
 	}
 	left, e := m.DependencyJoin(x, y)
 	astTestMust(t, e)

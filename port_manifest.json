@@ -120059,8 +120059,8 @@
           ]
         },
         {
-          "name": "dependency_manager<expr_dependency_config>::mk_leaf",
-          "status": "partial",
+          "name": "dependency_manager<expr_dependency_config>::mk_leaf allocation, value INC and fresh RC0 publication through AST mk_leaf null guard (dependency.h:136-141; ast.cpp:2531-2536)",
+          "status": "ported",
           "go_target": "pkg/ast/ast_dependency.go",
           "tests": [
             "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
@@ -120080,8 +120080,8 @@
           ]
         },
         {
-          "name": "dependency_manager<expr_dependency_config>::mk_join",
-          "status": "partial",
+          "name": "dependency_manager<expr_dependency_config>::mk_join null/same fastpaths, join allocation, left-then-right INC and fresh RC0 publication (dependency.h:143-158)",
+          "status": "ported",
           "go_target": "pkg/ast/ast_dependency.go",
           "tests": [
             "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
