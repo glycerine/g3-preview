@@ -52,3 +52,44 @@ func TestArbitraryFloatSqrtTraceSourceBranches(t *testing.T) {
 	serviceMust(t, m.Del(&x))
 	serviceMust(t, m.Del(&out))
 }
+
+func TestArbitraryFloatSqrtTraceSourceInsertions(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	w := &mpffArithmeticTraceWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpf_dbg")
+	if !tags.ShouldTrace("mpf_dbg") {
+		return
+	}
+	serviceMust(t, m.BindTrace(tags))
+	var x, out ArbitraryFloat
+	for _, tc := range []struct {
+		name  string
+		value float64
+		want  []string
+	}{
+		{"zero shortcut", 0, []string{"X = ", "SQRT = "}},
+		{"perfect square", 4, []string{"X = ", "A = ", "SQRT = "}},
+		{"inexact square root", 2, []string{"X = ", "A = ", "dec'ed ", "SQRT = "}},
+	} {
+		serviceMust(t, m.SetDouble(&x, 11, 53, tc.value))
+		w.parts = nil
+		serviceMust(t, m.Sqrt(ArbitraryFloatNearestEven, &x, &out))
+		last := -1
+		for _, label := range tc.want {
+			found := -1
+			for i := last + 1; i+2 < len(w.parts); i++ {
+				if w.parts[i] == label && w.parts[i+1] != "" && w.parts[i+1] != "\n" && w.parts[i+2] == "\n" {
+					found = i
+					break
+				}
+			}
+			if found < 0 {
+				t.Fatalf("%s missing source insertion boundary after %d for %q in %q", tc.name, last, label, w.parts)
+			}
+			last = found
+		}
+	}
+	serviceMust(t, m.Del(&x))
+	serviceMust(t, m.Del(&out))
+}

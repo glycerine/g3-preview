@@ -146,7 +146,10 @@ func (m *ArbitraryFloatManager) traceFloatDebugIntChecked(function, label string
 				formatError = e
 				return e
 			}
-			return writeNumeralDisplayPart(w, s+"\n")
+			if e := writeNumeralDisplayPart(w, s); e != nil {
+				return e
+			}
+			return writeNumeralDisplayPart(w, "\n")
 		})
 	return formatError
 }

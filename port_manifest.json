@@ -151394,7 +151394,7 @@
           "name": "mpf_manager::sqrt mpf_dbg entry, unpacked operand, inexact correction and result TRACE records at mpf.cpp:1008,1027,1036,1044",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_sqrt.go",
-          "tests": ["TestArbitraryFloatSqrtTraceSourceBranches"]
+          "tests": ["TestArbitraryFloatSqrtTraceSourceBranches", "TestArbitraryFloatSqrtTraceSourceInsertions"]
         },
         {
           "name": "mpf_manager::round_sqrt mpf_dbg entry, guard-bit decision and result TRACE records at mpf.cpp:2101,2123,2130",
