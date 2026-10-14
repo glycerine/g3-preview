@@ -17,16 +17,18 @@ var ErrScopedOwner = errors.New("mpnum: invalid scoped numeral owner")
 // owner-confined; close them before their manager. A self pointer rejects Go
 // struct copies without unsafe or per-record interfaces.
 type ScopedInt struct {
-	manager *IntegerManager
-	num     Int
-	self    *ScopedInt
-	closed  bool
+	manager     *IntegerManager
+	num         Int
+	self        *ScopedInt
+	sourceCause error
+	closed      bool
 }
 type ScopedRational struct {
-	manager *RationalManager
-	num     Rational
-	self    *ScopedRational
-	closed  bool
+	manager     *RationalManager
+	num         Rational
+	self        *ScopedRational
+	sourceCause error
+	closed      bool
 }
 
 func NewScopedInt(m *IntegerManager) (*ScopedInt, error) {
@@ -402,19 +404,23 @@ func (s *ScopedInt) Close() error {
 	if s.closed {
 		return nil
 	}
-	var e error
 	if s.manager.closed {
-		e = arena.ErrClosed
-	} else {
-		e = s.manager.Del(&s.num)
+		s.manager.BudgetField.Release(uint64(reflect.TypeOf(ScopedInt{}).Size()))
+		s.num = Int{}
+		s.closed = true
+		return arena.ErrClosed
 	}
-	if e != nil && !s.manager.closed {
+	if s.sourceCause != nil {
+		return s.sourceCause
+	}
+	if e := SourceIntegerDel(s.manager, &s.num); e != nil {
+		s.sourceCause = e
 		return e
 	}
 	s.manager.BudgetField.Release(uint64(reflect.TypeOf(ScopedInt{}).Size()))
 	s.num = Int{}
 	s.closed = true
-	return e
+	return nil
 }
 func (s *ScopedRational) Close() error {
 	if s == nil || s.self != s {
@@ -423,19 +429,67 @@ func (s *ScopedRational) Close() error {
 	if s.closed {
 		return nil
 	}
-	var e error
 	if s.manager.closed {
-		e = arena.ErrClosed
-	} else {
-		e = s.manager.Del(&s.num)
+		s.manager.BudgetField.Release(uint64(reflect.TypeOf(ScopedRational{}).Size()))
+		s.num = NewRational()
+		s.closed = true
+		return arena.ErrClosed
 	}
-	if e != nil && !s.manager.closed {
+	if s.sourceCause != nil {
+		return s.sourceCause
+	}
+	if e := s.manager.checkCleanup(&s.num); e != nil {
+		s.sourceCause = e
+		return e
+	}
+	if e := SourceRationalDel(s.manager, &s.num); e != nil {
+		s.sourceCause = e
 		return e
 	}
 	s.manager.BudgetField.Release(uint64(reflect.TypeOf(ScopedRational{}).Size()))
 	s.num = NewRational()
 	s.closed = true
-	return e
+	return nil
+}
+
+// Cleanup owns a stopped source destructor without invoking it again.
+func (s *ScopedInt) Cleanup() error {
+	if s == nil || s.self != s {
+		return ErrScopedCopy
+	}
+	if s.closed {
+		return nil
+	}
+	if e := s.manager.CleanupRawNumeral(&s.num); e != nil {
+		return e
+	}
+	s.manager.BudgetField.Release(uint64(reflect.TypeOf(ScopedInt{}).Size()))
+	s.num = Int{}
+	s.closed = true
+	return nil
+}
+
+// Cleanup releases the remaining numerator and denominator in source order.
+func (s *ScopedRational) Cleanup() error {
+	if s == nil || s.self != s {
+		return ErrScopedCopy
+	}
+	if s.closed {
+		return nil
+	}
+	if e := s.manager.checkCleanup(&s.num); e != nil {
+		return e
+	}
+	if e := s.manager.Z.CleanupRawNumeral(&s.num.Num); e != nil {
+		return e
+	}
+	if e := s.manager.Z.CleanupRawNumeral(&s.num.Den); e != nil {
+		return e
+	}
+	s.manager.BudgetField.Release(uint64(reflect.TypeOf(ScopedRational{}).Size()))
+	s.num = NewRational()
+	s.closed = true
+	return nil
 }
 
 // Vectors remain source-noncopyable. Read makes a deep caller-owned numeral;

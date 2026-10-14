@@ -171219,6 +171219,8 @@
         "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
         "TestScopedRationalVectorIndependentLifecycleAndFailures",
         "TestScopedNumeralDeepCloneFailureCleanup",
+        "TestScopedIntSourceDeletionAndOwningRetry",
+        "TestScopedRationalSourceDeletionAndOwningSuffix",
         "TestBinarySourceTst1",
         "TestBinarySourceTst2",
         "TestScopedBinarySourceDeletionAndOwningRetry",
@@ -171316,7 +171318,9 @@
             "TestScopedRationalVectorAndScalarLifetimes",
             "TestScopedNumeralHeadersFailuresAndSourcePushPrefix",
             "TestScopedRationalVectorIndependentLifecycleAndFailures",
-            "TestScopedNumeralDeepCloneFailureCleanup"
+            "TestScopedNumeralDeepCloneFailureCleanup",
+            "TestScopedIntSourceDeletionAndOwningRetry",
+            "TestScopedRationalSourceDeletionAndOwningSuffix"
           ]
         },
         {
@@ -171569,7 +171573,8 @@
         "scoped_numeral.h:31-33 actual Neg minus_a source destructor precedes factory result exposure; stopped source history remains distinct from exact owning acknowledgment.",
         "The retained scoped_mpf scalar borrows mpf_manager and owns an mpf value; its inherited destructor deletes the value after the caller's body, including early API returns. Selected AST FPA query, constructor and SMT2 printer callers and the subpaving wrapper now have concrete scalar owners; AST FPA rewriter, SMT FPA and API callers still need caller-local binding and exact cleanup. The existing AST scoped_mpf_vector is a separate owning collection and does not discharge scalar scope lifetimes.",
         "The boolean FPA numeral query owns its local MPF value until the source destructor completes; an allocation stop retains the exact local and copy child for separate owning cleanup before AST plugin teardown. Later calls use a charged distinct cold frame without replacing a stopped local.",
-        "The MPQ subpaving wrapper owns its constant rational across sums and deletes it after its coefficient vector but before the context base; the rational manager is borrowed."
+        "The MPQ subpaving wrapper owns its constant rational across sums and deletes it after its coefficient vector but before the context base; the rational manager is borrowed.",
+        "Concrete scoped Int and Rational source destructors guard physical NUM then DEN deletion, retain a stopped source cause without replay, and expose separate owning cleanup of the exact surviving suffix. The closed-manager wrapper still releases its independent header charge."
       ],
       "deviations": [
         "Selected concrete Int, rational, MPBQ and MPFF scopes and the boolean AST FPA MPF scalar caller are represented in Go. Other retained MPF scalar callers remain open at AST, SMT, subpaving and API sites; the unused any-valued callback adapter was removed.",
