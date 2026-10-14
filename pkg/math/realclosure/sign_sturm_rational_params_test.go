@@ -65,7 +65,7 @@ func TestRealClosureRationalIntervalReadsInitialPrecision(t *testing.T) {
 	if err := pc.SetUIntName(&p, &name, 4); err != nil {
 		t.Fatal(err)
 	}
-	if err := store.bindInitialPrecision(pc, &p, nil); err != nil {
+	if err := store.bindIntervalPrecisions(pc, &p, nil); err != nil {
 		t.Fatal(err)
 	}
 	second, precise := measure()
@@ -78,7 +78,7 @@ func TestRealClosureRationalIntervalReadsInitialPrecision(t *testing.T) {
 	if err := pc.SetUIntName(&p, &name, 0); err != nil {
 		t.Fatal(err)
 	}
-	if err := store.bindInitialPrecision(pc, &p, nil); err != nil || !store.initialPrecisionBound || store.initialPrecision != 0 {
+	if err := store.bindIntervalPrecisions(pc, &p, nil); err != nil || !store.initialPrecisionBound || store.initialPrecision != 0 {
 		t.Fatal("explicit zero precision was lost", err)
 	}
 	third, precise := measure()
@@ -92,10 +92,14 @@ func TestRealClosureRationalIntervalReadsInitialPrecision(t *testing.T) {
 	if err := pc.SetUIntName(&module, &name, 6); err != nil {
 		t.Fatal(err)
 	}
+	maxName := "max_precision"
+	if err := pc.SetUIntName(&module, &maxName, 5); err != nil {
+		t.Fatal(err)
+	}
 	if err := pc.Reset(&p); err != nil {
 		t.Fatal(err)
 	}
-	if err := store.bindInitialPrecision(pc, &p, &module); err != nil || store.initialPrecision != 6 {
+	if err := store.bindIntervalPrecisions(pc, &p, &module); err != nil || store.initialPrecision != 6 || store.intervalMaxPrecision() != 5 {
 		t.Fatal("module fallback initial precision", err)
 	}
 	fourth, precise := measure()
@@ -105,7 +109,10 @@ func TestRealClosureRationalIntervalReadsInitialPrecision(t *testing.T) {
 	if err := pc.SetUIntName(&p, &name, 4); err != nil {
 		t.Fatal(err)
 	}
-	if err := store.bindInitialPrecision(pc, &p, &module); err != nil || store.initialPrecision != 4 {
+	if err := pc.SetUIntName(&p, &maxName, 0); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.bindIntervalPrecisions(pc, &p, &module); err != nil || store.initialPrecision != 4 || store.intervalMaxPrecision() != 0 {
 		t.Fatal("local precision did not override module fallback", err)
 	}
 	for _, value := range []*realValue{first, second, third, fourth} {
@@ -185,8 +192,12 @@ func TestRealClosureInitialPrecisionAcquiresGlobalModuleRef(t *testing.T) {
 	if err := pc.SetUIntName(module, &name, 6); err != nil {
 		t.Fatal(err)
 	}
+	maxName := "max_precision"
+	if err := pc.SetUIntName(module, &maxName, 7); err != nil {
+		t.Fatal(err)
+	}
 	store := &realValueStore{numbers: service.Manager}
-	if err := store.bindInitialPrecisionFromGlobals(pc, &local, globals); err != nil || store.initialPrecision != 6 || store.pendingPrecisionHelper != nil {
+	if err := store.bindIntervalPrecisionsFromGlobals(pc, &local, globals); err != nil || store.initialPrecision != 6 || store.intervalMaxPrecision() != 7 || store.pendingPrecisionHelper != nil {
 		t.Fatal("acquired module fallback", err, store.initialPrecision)
 	}
 	bounds, err := numeral.NewBinaryRationalManager(service.Manager.Z, numeral.BinaryRationalConfig{Diagnostics: service})
@@ -215,7 +226,10 @@ func TestRealClosureInitialPrecisionAcquiresGlobalModuleRef(t *testing.T) {
 	if err := pc.SetUIntName(&local, &name, 4); err != nil {
 		t.Fatal(err)
 	}
-	if err := store.bindInitialPrecisionFromGlobals(pc, &local, globals); err != nil || store.initialPrecision != 4 || store.pendingPrecisionHelper != nil {
+	if err := pc.SetUIntName(&local, &maxName, 3); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.bindIntervalPrecisionsFromGlobals(pc, &local, globals); err != nil || store.initialPrecision != 4 || store.intervalMaxPrecision() != 3 || store.pendingPrecisionHelper != nil {
 		t.Fatal("local override through acquired module", err, store.initialPrecision)
 	}
 	if err := store.cleanupInitialPrecisionHelper(); err != nil {

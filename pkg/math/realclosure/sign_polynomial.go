@@ -14,6 +14,8 @@ type realValueStore struct {
 	numbers                  *numeral.RationalManager
 	initialPrecision         uint32
 	initialPrecisionBound    bool
+	maxPrecision             uint32
+	maxPrecisionBound        bool
 	pendingPrecisionHelper   *params.ModuleParamsOwner
 	pendingSequence          []realPolynomial
 	pendingSturmCoefficients [][]*realValue

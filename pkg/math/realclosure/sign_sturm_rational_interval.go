@@ -9,10 +9,10 @@ import (
 	"github.com/glycerine/g3/pkg/util/params"
 )
 
-// bindInitialPrecision follows the generated rcf_params getter: local value,
-// module value, then the literal default. The module reference is borrowed
+// bindIntervalPrecisions follows the selected generated rcf_params getters:
+// local value, module value, then the literal default. The module is borrowed
 // from the enclosing parameter owner, which owns its acquisition and release.
-func (s *realValueStore) bindInitialPrecision(pc *params.ParamsContext, p, module *params.ParamsRef) error {
+func (s *realValueStore) bindIntervalPrecisions(pc *params.ParamsContext, p, module *params.ParamsRef) error {
 	if s == nil || s.numbers == nil || s.pendingPrecisionHelper != nil || pc == nil || p == nil {
 		return arena.ErrInvalidSlot
 	}
@@ -26,13 +26,20 @@ func (s *realValueStore) bindInitialPrecision(pc *params.ParamsContext, p, modul
 	}
 	s.initialPrecision = value
 	s.initialPrecisionBound = true
+	name = "max_precision"
+	value, err = pc.GetUIntFallbackName(p, &name, module, 128)
+	if err != nil {
+		return err
+	}
+	s.maxPrecision = value
+	s.maxPrecisionBound = true
 	return nil
 }
 
-// bindInitialPrecisionFromGlobals executes the generated rcf_params helper's
+// bindIntervalPrecisionsFromGlobals executes the generated rcf_params helper's
 // get_module acquisition, getter and local reference destruction. A stopped
 // destruction remains with this store for explicit owning completion.
-func (s *realValueStore) bindInitialPrecisionFromGlobals(pc *params.ParamsContext, p *params.ParamsRef, globals *params.GlobalParamsService) (err error) {
+func (s *realValueStore) bindIntervalPrecisionsFromGlobals(pc *params.ParamsContext, p *params.ParamsRef, globals *params.GlobalParamsService) (err error) {
 	if s == nil || s.numbers == nil || s.pendingPrecisionHelper != nil || pc == nil || p == nil || globals == nil {
 		return arena.ErrInvalidSlot
 	}
@@ -62,6 +69,12 @@ func (s *realValueStore) bindInitialPrecisionFromGlobals(pc *params.ParamsContex
 	}
 	s.initialPrecision = value
 	s.initialPrecisionBound = true
+	value, err = owner.FrameUInt(frame, "max_precision", 128)
+	if err != nil {
+		return err
+	}
+	s.maxPrecision = value
+	s.maxPrecisionBound = true
 	return nil
 }
 
@@ -84,6 +97,13 @@ func (s *realValueStore) rationalInitialPrecision() uint32 {
 		return s.initialPrecision
 	}
 	return 24
+}
+
+func (s *realValueStore) intervalMaxPrecision() uint32 {
+	if s.maxPrecisionBound {
+		return s.maxPrecision
+	}
+	return 128
 }
 
 // rationalApproxInterval initializes one nonzero rational coefficient using
