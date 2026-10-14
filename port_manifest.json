@@ -52081,11 +52081,12 @@
           ]
         },
         {
-          "name": "Concrete config_mpq interval negation, exact addition/subtraction, infinity and openness branches, and destination aliasing (src/math/interval/interval_def.h:704-837)",
+          "name": "Concrete config_mpq interval negation, exact addition/subtraction, live borrowed operands, infinity and openness branches, and destination aliasing (src/math/interval/interval_def.h:704-837)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_interval_arith.go",
           "tests": [
-            "TestSubpavingRationalIntervalNegAddSubAndAlias"
+            "TestSubpavingRationalIntervalNegAddSubAndAlias",
+            "TestRationalIntervalLiveNodeBoundsAndOwnedCopy"
           ]
         },
         {

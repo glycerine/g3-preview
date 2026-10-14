@@ -113,14 +113,25 @@ func (v *RationalInterval) upperKind() interval.ExtendedKind {
 	return interval.Finite
 }
 
-func (v *RationalInterval) pair(other *RationalInterval) error {
+func (v *RationalInterval) pairView(other *RationalInterval) (*numeral.Rational, *numeral.Rational, error) {
 	if err := v.mutable(); err != nil {
+		return nil, nil, err
+	}
+	lo, hi, err := other.resolved()
+	if err != nil {
+		return nil, nil, err
+	}
+	if v.numbers != other.numbers {
+		return nil, nil, arena.ErrInvalidSlot
+	}
+	return lo, hi, nil
+}
+
+func (v *RationalInterval) pair(other *RationalInterval) error {
+	if _, _, err := v.pairView(other); err != nil {
 		return err
 	}
-	if _, _, err := other.resolved(); err != nil {
-		return err
-	}
-	if v.numbers != other.numbers || other.constantNode != nil {
+	if other.constantNode != nil {
 		return arena.ErrInvalidSlot
 	}
 	return nil

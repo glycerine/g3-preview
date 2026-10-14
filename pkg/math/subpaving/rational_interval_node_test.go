@@ -29,9 +29,11 @@ func TestRationalIntervalLiveNodeBoundsAndOwnedCopy(t *testing.T) {
 	must(err)
 	owned, err := NewRationalInterval(m)
 	must(err)
+	result, err := NewRationalInterval(m)
+	must(err)
 	lo, hi := numeral.NewRational(), numeral.NewRational()
 	t.Cleanup(func() {
-		for _, v := range []*RationalInterval{owned, view} {
+		for _, v := range []*RationalInterval{result, owned, view} {
 			if err := v.Close(); err != nil {
 				t.Error(err)
 			}
@@ -102,6 +104,30 @@ func TestRationalIntervalLiveNodeBoundsAndOwnedCopy(t *testing.T) {
 	must(owned.Display(&shown))
 	if shown.String() != "(-3/2, 2]" {
 		t.Fatal("owned copy followed node", shown.String())
+	}
+	must(result.Neg(view))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "[-2, 0)" {
+		t.Fatal("negated live view", shown.String())
+	}
+	must(result.Add(view, owned))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "(-3/2, 4]" {
+		t.Fatal("added live view", shown.String())
+	}
+	must(result.Sub(owned, view))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "(-7/2, 2)" {
+		t.Fatal("subtracted live view", shown.String())
+	}
+	if err := view.Neg(owned); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatalf("borrowed result mutation: %v", err)
+	}
+	if err := result.Power(view, 2); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatalf("unwired power operand: %v", err)
 	}
 	child, err := NewRationalNode(m, 1, root)
 	must(err)

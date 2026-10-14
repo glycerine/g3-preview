@@ -15,13 +15,14 @@ func rationalIntervalScratch() (numeral.Rational, numeral.Rational) {
 }
 
 func (v *RationalInterval) Neg(src *RationalInterval) (err error) {
-	if err = v.pair(src); err != nil {
+	slo, shi, err := v.pairView(src)
+	if err != nil {
 		return err
 	}
 	lower, upper := rationalIntervalScratch()
 	defer func() { err = errors.Join(err, v.numbers.Del(&lower), v.numbers.Del(&upper)) }()
 	if !src.upperInf {
-		if err = v.numbers.Copy(&lower, &src.upper); err != nil {
+		if err = v.numbers.Copy(&lower, shi); err != nil {
 			return err
 		}
 		if err = v.numbers.Neg(&lower); err != nil {
@@ -29,7 +30,7 @@ func (v *RationalInterval) Neg(src *RationalInterval) (err error) {
 		}
 	}
 	if !src.lowerInf {
-		if err = v.numbers.Copy(&upper, &src.lower); err != nil {
+		if err = v.numbers.Copy(&upper, slo); err != nil {
 			return err
 		}
 		if err = v.numbers.Neg(&upper); err != nil {
@@ -50,20 +51,22 @@ func (v *RationalInterval) Neg(src *RationalInterval) (err error) {
 }
 
 func (v *RationalInterval) Add(a, b *RationalInterval) (err error) {
-	if err = v.pair(a); err != nil {
+	alo, ahi, err := v.pairView(a)
+	if err != nil {
 		return err
 	}
-	if err = v.pair(b); err != nil {
+	blo, bhi, err := v.pairView(b)
+	if err != nil {
 		return err
 	}
 	lower, upper := rationalIntervalScratch()
 	defer func() { err = errors.Join(err, v.numbers.Del(&lower), v.numbers.Del(&upper)) }()
 	e := interval.RationalExtended{Numbers: v.numbers}
-	lk, err := e.Add(&a.lower, a.lowerKind(), &b.lower, b.lowerKind(), &lower)
+	lk, err := e.Add(alo, a.lowerKind(), blo, b.lowerKind(), &lower)
 	if err != nil {
 		return err
 	}
-	uk, err := e.Add(&a.upper, a.upperKind(), &b.upper, b.upperKind(), &upper)
+	uk, err := e.Add(ahi, a.upperKind(), bhi, b.upperKind(), &upper)
 	if err != nil {
 		return err
 	}
@@ -80,20 +83,22 @@ func (v *RationalInterval) Add(a, b *RationalInterval) (err error) {
 }
 
 func (v *RationalInterval) Sub(a, b *RationalInterval) (err error) {
-	if err = v.pair(a); err != nil {
+	alo, ahi, err := v.pairView(a)
+	if err != nil {
 		return err
 	}
-	if err = v.pair(b); err != nil {
+	blo, bhi, err := v.pairView(b)
+	if err != nil {
 		return err
 	}
 	lower, upper := rationalIntervalScratch()
 	defer func() { err = errors.Join(err, v.numbers.Del(&lower), v.numbers.Del(&upper)) }()
 	e := interval.RationalExtended{Numbers: v.numbers}
-	lk, err := e.Sub(&a.lower, a.lowerKind(), &b.upper, b.upperKind(), &lower)
+	lk, err := e.Sub(alo, a.lowerKind(), bhi, b.upperKind(), &lower)
 	if err != nil {
 		return err
 	}
-	uk, err := e.Sub(&a.upper, a.upperKind(), &b.lower, b.lowerKind(), &upper)
+	uk, err := e.Sub(ahi, a.upperKind(), blo, b.lowerKind(), &upper)
 	if err != nil {
 		return err
 	}
