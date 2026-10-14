@@ -243,10 +243,10 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 		return e
 	}
 	alignmentSticky := !empty
-	if e := m.traceFMASignificandBinary("M'= ", &s.mr, 871); e != nil {
+	if e := m.traceFMASignificandBinary("M'= ", "M'= ", &s.mr, 1, 0, 871); e != nil {
 		return e
 	}
-	if e := m.traceFMASignificandBinary("C'= ", &s.c, 873); e != nil {
+	if e := m.traceFMASignificandBinary("C'= ", "C'= ", &s.c, 1, 0, 873); e != nil {
 		return e
 	}
 	// Construction starts before the allocating copy; its source destructor is
@@ -289,6 +289,9 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 			s.res.assignSign(!s.res.Sign())
 		}
 	}
+	if e := m.traceFMASignificandBinary("S'= ", "S'= ", &s.res, 1, 0, 899); e != nil {
+		return e
+	}
 	renormSticky := false
 	if e := s.assertPower(&s.res.significand, 2*sb+4, false); e != nil {
 		return e
@@ -323,6 +326,9 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 		if e := im.MachineDiv2kInPlace(&s.res.significand, 1); e != nil {
 			return e
 		}
+		if e := m.traceFMAOverflow(&s.res); e != nil {
+			return e
+		}
 	}
 	min, e := m.minExponent(eb)
 	if e != nil {
@@ -351,6 +357,9 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 	}
 	s.res.exponent = exponent
 	if e := s.shiftInPlace(&s.res.significand, renormDelta); e != nil {
+		return e
+	}
+	if e := m.traceFMARenormalized(&s.res, renormDelta); e != nil {
 		return e
 	}
 	zeroNumeral := NewInt(0)
@@ -386,6 +395,9 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 				return e
 			}
 		}
+	}
+	if e := m.traceFMASignificandBinary("sum[-1:sbits+2] = ", "R = ", out, 1, 3, 940); e != nil {
+		return e
 	}
 	empty, e = im.IsZero(&out.significand)
 	if e != nil {

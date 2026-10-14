@@ -149822,6 +149822,7 @@
       ],
       "tests": [
         "TestArbitraryFloatFMAAlignmentAndShiftedSignificandTrace",
+        "TestArbitraryFloatFMAResultAndRenormalizationTrace",
         "TestArbitraryFloatFMAProductAndShiftedAddendTrace",
         "TestArbitraryFloatFMAUnpackedDecimalAndBinaryTrace",
         "TestArbitraryFloatFMABinaryTraceTemporaryFailureCleanup",
@@ -150421,10 +150422,10 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "mpf_manager::fma mpf_dbg entry, unpacked/product/addend, alignment and shifted-significand blocks, swap and selected add/subtract TRACE records at mpf.cpp:752-754,813-818,830-831,844-845,852,867-874,880,892; later inner trace remains partial",
-          "status": "partial",
+          "name": "mpf_manager::fma mpf_dbg entry and general-body TRACE records at mpf.cpp:752-754,813-818,830-831,844-845,852,867-874,880,892,899,913,925,940",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpf_fma.go",
-          "tests": ["TestArbitraryFloatFMAEntryDebugTraceBeforeShortcuts", "TestArbitraryFloatFMASwapAndArithmeticBranchTrace", "TestArbitraryFloatFMAUnpackedDecimalAndBinaryTrace", "TestArbitraryFloatFMABinaryTraceTemporaryFailureCleanup", "TestArbitraryFloatFMAUnpackedTraceFormatterRefusalPropagates", "TestArbitraryFloatFMAProductAndShiftedAddendTrace", "TestArbitraryFloatFMAAlignmentAndShiftedSignificandTrace"]
+          "tests": ["TestArbitraryFloatFMAEntryDebugTraceBeforeShortcuts", "TestArbitraryFloatFMASwapAndArithmeticBranchTrace", "TestArbitraryFloatFMAUnpackedDecimalAndBinaryTrace", "TestArbitraryFloatFMABinaryTraceTemporaryFailureCleanup", "TestArbitraryFloatFMAUnpackedTraceFormatterRefusalPropagates", "TestArbitraryFloatFMAProductAndShiftedAddendTrace", "TestArbitraryFloatFMAAlignmentAndShiftedSignificandTrace", "TestArbitraryFloatFMAResultAndRenormalizationTrace"]
         },
         {
           "name": "mpf_manager::add_sub mpf_dbg alignment, arithmetic branch and normalization TRACE records at mpf.cpp:541-579",
@@ -151148,7 +151149,7 @@
         "Checked OwnedString output now belongs to OwnedString.AppendTo; NumericTextStream receives a native counted Go string through AppendString. Counted output preserves embedded NUL bytes and whole-field width/alignment; CString output independently stops at first NUL. Failed sentries check owner lifetime while preserving width and skipping payload conversion. Removed the stream method accepting OwnedString, so the stream no longer depends on that project text owner. See PORT_PROGRESS.md#native-counted-text-at-the-numeric-stream-boundary."
       ],
       "deviations": [
-        "Retained mpf_manager::fma emits mpf_dbg X/Y/Z before special-value branches. Its general branch emits the six-value unpacked block, product M, shifted addend C_, the alignment delta/shifted significand/sticky remainder and two-line M'/C' shifted-significand records at their source sites; the binary records use the concrete owned formatter. Formatter failures propagate, while writer failbit remains nonthrowing. Swap! and selected ADDING or SUBTRACTING follow source order. Focused trace tests cover swapped and unswapped order, temporary cleanup and formatting refusal. Later FMA records and broader MPF ownership/trace audit remain partial.",
+        "Retained mpf_manager::fma emits mpf_dbg X/Y/Z before special-value branches and all reached general-body records through the pre-round result at their source sites, including conditional overflow and renormalization. Binary records use the concrete owned formatter; formatter failures propagate while writer failbit remains nonthrowing. Focused trace tests cover swapped, unswapped, overflow and nonoverflow order, temporary cleanup and formatting refusal. Broader MPF ownership/trace audit remains partial.",
         "Retained mpf_manager::add_sub emits mpf_dbg alignment, shifted significand, selected add/subtract, pre-normalized sum, and nonzero sign/absolute-value records at source boundaries. Exact branch order and zero-result omission are checked in trace-enabled and erased builds. Broader MPF ownership and remaining trace sites stay partial.",
         "Retained mpf_manager::div emits mpf_dbg records after its format assertion, after unpacks and exponent subtraction, after quotient construction, and after sticky-bit adjustment before final rounding. Shortcut branches omit the inner quotient records. Trace-enabled and erased-build focused tests cover source line order; broader MPF ownership and trace work remain partial.",
         "Retained mpf_manager::mul emits mpf_mul_bug entry before the format assertion and a result after completed shortcut or general multiplication, including aliased output. The inner mpf_dbg records follow operand, unpacked, significand and pre-round product source order; shortcuts omit the inner records. Trace-enabled and erased-build focused tests cover source line headers and value text; the broader MPF port remains partial.",

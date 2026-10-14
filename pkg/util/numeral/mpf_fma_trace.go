@@ -1,4 +1,4 @@
-// Source: src/util/mpf.cpp:813-818,830-831,844-845,867-874.
+// Source: src/util/mpf.cpp:813-818,830-831,844-845,867-874,899-940.
 package numeral
 
 import (
@@ -124,7 +124,7 @@ func (m *ArbitraryFloatManager) traceFMAAlignment(delta uint32, shifted, sticky 
 	return formatError
 }
 
-func (m *ArbitraryFloatManager) traceFMASignificandBinary(label string, value *ArbitraryFloat, line int) error {
+func (m *ArbitraryFloatManager) traceFMASignificandBinary(decimalLabel, binaryLabel string, value *ArbitraryFloat, upper, lower uint32, line int) error {
 	tags := m.floatTraceTags()
 	if !tags.ShouldTrace("mpf_dbg") {
 		return nil
@@ -132,7 +132,7 @@ func (m *ArbitraryFloatManager) traceFMASignificandBinary(label string, value *A
 	var formatError error
 	_ = tags.EmitConditional("mpf_dbg", "fma", "src/util/mpf.cpp", line,
 		func() bool { return true }, func(w io.Writer) error {
-			if e := writeNumeralDisplayPart(w, label); e != nil {
+			if e := writeNumeralDisplayPart(w, decimalLabel); e != nil {
 				return e
 			}
 			s, e := m.integer.String(&value.significand)
@@ -140,15 +140,57 @@ func (m *ArbitraryFloatManager) traceFMASignificandBinary(label string, value *A
 				formatError = e
 				return e
 			}
-			if e := writeNumeralDisplayPart(w, s+"\n"+label); e != nil {
+			if e := writeNumeralDisplayPart(w, s+"\n"+binaryLabel); e != nil {
 				return e
 			}
-			binary, e := m.traceFMABinaryString(value, 1, 0)
+			binary, e := m.traceFMABinaryString(value, upper, lower)
 			if e != nil {
 				formatError = e
 				return e
 			}
 			return writeNumeralDisplayPart(w, binary+"\n")
+		})
+	return formatError
+}
+
+func (m *ArbitraryFloatManager) traceFMAOverflow(value *ArbitraryFloat) error {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return nil
+	}
+	var formatError error
+	_ = tags.EmitConditional("mpf_dbg", "fma", "src/util/mpf.cpp", 913,
+		func() bool { return true }, func(w io.Writer) error {
+			if e := writeNumeralDisplayPart(w, "Add/Sub overflew into 4.xxx!\nS*= "); e != nil {
+				return e
+			}
+			binary, e := m.traceFMABinaryString(value, 2, 0)
+			if e != nil {
+				formatError = e
+				return e
+			}
+			return writeNumeralDisplayPart(w, binary+"\n")
+		})
+	return formatError
+}
+
+func (m *ArbitraryFloatManager) traceFMARenormalized(value *ArbitraryFloat, delta uint32) error {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return nil
+	}
+	var formatError error
+	_ = tags.EmitConditional("mpf_dbg", "fma", "src/util/mpf.cpp", 925,
+		func() bool { return true }, func(w io.Writer) error {
+			if e := writeNumeralDisplayPart(w, "R*= "); e != nil {
+				return e
+			}
+			binary, e := m.traceFMABinaryString(value, 2, 0)
+			if e != nil {
+				formatError = e
+				return e
+			}
+			return writeNumeralDisplayPart(w, binary+" (renormalized, delta="+strconv.FormatUint(uint64(delta), 10)+")\n")
 		})
 	return formatError
 }

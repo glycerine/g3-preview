@@ -280,3 +280,72 @@ func TestArbitraryFloatFMAAlignmentAndShiftedSignificandTrace(t *testing.T) {
 	serviceMust(t, m.Del(&addend))
 	serviceMust(t, m.Del(&out))
 }
+
+func TestArbitraryFloatFMAResultAndRenormalizationTrace(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("mpf_dbg")
+	compiled := tags.ShouldTrace("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	var one, addend, out ArbitraryFloat
+	serviceMust(t, m.MkOne(11, 53, false, &one))
+	for _, tc := range []struct {
+		name  string
+		value float64
+	}{
+		{"addition", 1},
+		{"subtraction", -0.5},
+	} {
+		serviceMust(t, m.SetDouble(&addend, 11, 53, tc.value))
+		output.Reset()
+		serviceMust(t, m.FMA(ArbitraryFloatNearestEven, &one, &one, &addend, &out))
+		got := output.String()
+		if !compiled {
+			if got != "" {
+				t.Fatalf("%s erased trace: %q", tc.name, got)
+			}
+			continue
+		}
+		last := -1
+		for _, site := range []struct {
+			line   string
+			first  string
+			second string
+		}{
+			{"899", "S'= ", "S'= #b"},
+			{"925", "R*= #b", " (renormalized, delta="},
+			{"940", "sum[-1:sbits+2] = ", "R = #b"},
+		} {
+			header := "-------- [mpf_dbg] fma src/util/mpf.cpp:" + site.line + " ---------\n"
+			at := strings.Index(got, header)
+			if at <= last || strings.Count(got, header) != 1 {
+				t.Fatalf("%s result source order at %s: %q", tc.name, site.line, got)
+			}
+			last = at
+			body := got[at+len(header):]
+			end := strings.Index(body, "------------------------------------------------\n")
+			if end < 0 || !strings.HasPrefix(body[:end], site.first) || !strings.Contains(body[:end], site.second) {
+				t.Fatalf("%s result body at %s: %q", tc.name, site.line, body)
+			}
+		}
+		overflowHeader := "-------- [mpf_dbg] fma src/util/mpf.cpp:913 ---------\n"
+		at := strings.Index(got, overflowHeader)
+		if at >= 0 {
+			t.Fatalf("%s unexpectedly reached overflow branch: %q", tc.name, got)
+		}
+	}
+	output.Reset()
+	serviceMust(t, m.traceFMAOverflow(&one))
+	if compiled {
+		got := output.String()
+		if !strings.HasPrefix(got, "-------- [mpf_dbg] fma src/util/mpf.cpp:913 ---------\nAdd/Sub overflew into 4.xxx!\nS*= #b") || strings.Count(got, "------------------------------------------------\n") != 1 {
+			t.Fatalf("overflow record format: %q", got)
+		}
+	} else if output.Len() != 0 {
+		t.Fatalf("erased overflow record: %q", output.String())
+	}
+	serviceMust(t, m.Del(&one))
+	serviceMust(t, m.Del(&addend))
+	serviceMust(t, m.Del(&out))
+}
