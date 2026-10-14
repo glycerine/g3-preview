@@ -150106,7 +150106,8 @@
             "TestBinaryScopedRoutes",
             "TestBinaryConvertImportedOwningCleanupPhysicalRetry",
             "TestBinaryRoundImportedOwningCleanupPhysicalRetry",
-            "TestBinaryToRationalImportedOwningCleanupPhysicalRetry"
+            "TestBinaryToRationalImportedOwningCleanupPhysicalRetry",
+            "TestBinaryToOwnedRationalRetainsStoppedCleanupSuffix"
           ]
         },
         {
@@ -150428,7 +150429,8 @@
             "TestBinaryScopedRoutes",
             "TestBinaryConvertImportedOwningCleanupPhysicalRetry",
             "TestBinaryRoundImportedOwningCleanupPhysicalRetry",
-            "TestBinaryToRationalImportedOwningCleanupPhysicalRetry"
+            "TestBinaryToRationalImportedOwningCleanupPhysicalRetry",
+            "TestBinaryToOwnedRationalRetainsStoppedCleanupSuffix"
           ]
         },
         {

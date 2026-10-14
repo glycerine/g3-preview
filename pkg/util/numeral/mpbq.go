@@ -36,6 +36,14 @@ var ErrBinaryComparePending = errors.New("mpnum: binary-rational comparison clea
 var ErrBinaryConvertPending = errors.New("mpnum: binary-rational conversion cleanup pending")
 var ErrBinaryRoundPending = errors.New("mpnum: binary-rational rounding cleanup pending")
 var ErrBinaryToRationalPending = errors.New("mpnum: binary-rational to-rational cleanup pending")
+var ErrBinaryOwnedRationalPending = errors.New("mpnum: binary-rational owned conversion cleanup pending")
+
+type binaryOwnedRationalScope struct {
+	service                  *RationalService
+	r, twok, two, pw, result OwnedRational
+	cursor                   uint8
+	pending, executing       bool
+}
 
 // This cold operation owner borrows z and diagnostics. Both must outlive it.
 // No operations or shared Budget accesses are concurrently safe.
@@ -78,6 +86,7 @@ type BinaryRationalManager struct {
 	toRationalImported                             Int
 	toRationalImportedOwner                        *IntegerManager
 	toRationalImportedPending, toRationalExecuting bool
+	toOwnedRationalScope                           binaryOwnedRationalScope
 }
 type BinaryRationalStats struct {
 	HeaderBytes           uint64
@@ -126,6 +135,9 @@ func (m *BinaryRationalManager) open() error {
 	}
 	if m.toRationalImportedPending && !m.toRationalExecuting {
 		return ErrBinaryToRationalPending
+	}
+	if m.toOwnedRationalScope.pending && !m.toOwnedRationalScope.executing {
+		return ErrBinaryOwnedRationalPending
 	}
 	return nil
 }
@@ -183,6 +195,9 @@ func (m *BinaryRationalManager) CloseChecked() error {
 	if m.toRationalExecuting {
 		return ErrBinaryToRationalPending
 	}
+	if m.toOwnedRationalScope.executing {
+		return ErrBinaryOwnedRationalPending
+	}
 	if m.closed {
 		return nil
 	}
@@ -206,6 +221,9 @@ func (m *BinaryRationalManager) CloseChecked() error {
 		return e
 	}
 	if e := m.CleanupToRationalImported(); e != nil {
+		return e
+	}
+	if e := m.CleanupToOwnedRational(); e != nil {
 		return e
 	}
 	if e := m.CleanupRefineMid(); e != nil {

@@ -262,56 +262,101 @@ func (m *BinaryRationalManager) CleanupToRationalImported() error {
 	}
 	return m.cleanupToRationalImported()
 }
-func (m *BinaryRationalManager) ToOwnedRational(s *RationalService, a *BinaryRational) (OwnedRational, error) {
+func (m *BinaryRationalManager) ToOwnedRational(s *RationalService, a *BinaryRational) (out OwnedRational, err error) {
 	if e := m.check(a); e != nil {
 		return OwnedRational{}, e
 	}
 	if s == nil {
 		return OwnedRational{}, ErrBinaryOwner
 	}
-	r, e := s.NewValue()
+	scope := &m.toOwnedRationalScope
+	*scope = binaryOwnedRationalScope{service: s, pending: true, executing: true}
+	stopped := false
+	defer func() {
+		if !stopped {
+			cleanup := m.cleanupToOwnedRational(4)
+			if err == nil {
+				err = cleanup
+			}
+			if cleanup == nil {
+				if err == nil {
+					out = scope.result
+					scope.result = OwnedRational{}
+					*scope = binaryOwnedRationalScope{}
+				} else {
+					_ = m.cleanupToOwnedRational(5)
+				}
+			}
+		}
+		scope.executing = false
+	}()
+	var e error
+	scope.r, e = s.NewValue()
 	if e != nil {
 		return OwnedRational{}, e
 	}
-	defer s.Del(&r)
 	if e = s.lock(); e != nil {
 		return OwnedRational{}, e
 	}
-	e = s.Manager.Z.CopyFrom(&r.Raw.Num, m.Z, &a.Num)
+	e = s.Manager.Z.CopyFrom(&scope.r.Raw.Num, m.Z, &a.Num)
 	s.mu.Unlock()
 	if e != nil {
 		return OwnedRational{}, e
 	}
-	twok, e := s.NewValue()
+	scope.twok, e = s.NewValue()
 	if e != nil {
 		return OwnedRational{}, e
 	}
-	defer s.Del(&twok)
-	two, e := s.NewValue()
+	scope.two, e = s.NewValue()
 	if e != nil {
 		return OwnedRational{}, e
 	}
-	defer func() {
-		if two.ownerID != 0 {
-			s.Del(&two)
+	if e = s.SetInt64(&scope.two, 2); e != nil {
+		return OwnedRational{}, e
+	}
+	scope.pw, e = s.Power(&scope.two, a.KField)
+	if e != nil {
+		return OwnedRational{}, e
+	}
+	if e = s.Copy(&scope.twok, &scope.pw); e != nil {
+		return OwnedRational{}, e
+	}
+	if e = m.cleanupToOwnedRational(2); e != nil {
+		stopped = true
+		return OwnedRational{}, e
+	}
+	scope.result, e = s.Div(&scope.r, &scope.twok)
+	return OwnedRational{}, e
+}
+
+func (m *BinaryRationalManager) cleanupToOwnedRational(limit uint8) error {
+	scope := &m.toOwnedRationalScope
+	if !scope.pending {
+		return nil
+	}
+	roots := [5]*OwnedRational{&scope.pw, &scope.two, &scope.twok, &scope.r, &scope.result}
+	for scope.cursor < limit {
+		v := roots[scope.cursor]
+		if v.ownerID != 0 {
+			if e := scope.service.Del(v); e != nil {
+				return e
+			}
 		}
-	}()
-	if e = s.SetInt64(&two, 2); e != nil {
-		return OwnedRational{}, e
+		scope.cursor++
 	}
-	pw, e := s.Power(&two, a.KField)
-	if e != nil {
-		return OwnedRational{}, e
+	if scope.cursor == 5 {
+		*scope = binaryOwnedRationalScope{}
 	}
-	defer func() {
-		if pw.ownerID != 0 {
-			s.Del(&pw)
-		}
-	}()
-	if e = s.Copy(&twok, &pw); e != nil {
-		return OwnedRational{}, e
+	return nil
+}
+
+// CleanupToOwnedRational resumes a stopped debug conversion's exact suffix.
+func (m *BinaryRationalManager) CleanupToOwnedRational() error {
+	if m == nil || m.self != m {
+		return ErrBinaryOwner
 	}
-	s.Del(&pw)
-	s.Del(&two)
-	return s.Div(&r, &twok)
+	if m.toOwnedRationalScope.executing {
+		return ErrBinaryOwnedRationalPending
+	}
+	return m.cleanupToOwnedRational(5)
 }
