@@ -156,8 +156,8 @@ func TestArbitraryFloatRoundEntryTraceRefusalBeforeNumericScope(t *testing.T) {
 
 func TestArbitraryFloatRoundSqrtDecisionTrace(t *testing.T) {
 	m, _, _ := mpfNumeralHelpersFixture(t)
-	var output bytes.Buffer
-	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	w := &mpffArithmeticTraceWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
 	tags.Enable("mpf_dbg")
 	compiled := tags.ShouldTrace("mpf_dbg")
 	serviceMust(t, m.BindTrace(tags))
@@ -165,18 +165,19 @@ func TestArbitraryFloatRoundSqrtDecisionTrace(t *testing.T) {
 		tail int32
 		mode ArbitraryFloatRoundingMode
 		body string
+		bits [4]string
 	}{
-		{4, ArbitraryFloatNearestEven, "last=0 round=1 sticky=0 --> inc=0"},
-		{5, ArbitraryFloatNearestEven, "last=0 round=1 sticky=1 --> inc=1"},
-		{4, ArbitraryFloatTowardPositive, "last=0 round=1 sticky=0 --> inc=1"},
-		{8, ArbitraryFloatNearestEven, "last=1 round=0 sticky=0 --> inc=0"},
+		{4, ArbitraryFloatNearestEven, "last=0 round=1 sticky=0 --> inc=0", [4]string{"0", "1", "0", "0"}},
+		{5, ArbitraryFloatNearestEven, "last=0 round=1 sticky=1 --> inc=1", [4]string{"0", "1", "1", "1"}},
+		{4, ArbitraryFloatTowardPositive, "last=0 round=1 sticky=0 --> inc=1", [4]string{"0", "1", "0", "1"}},
+		{8, ArbitraryFloatNearestEven, "last=1 round=0 sticky=0 --> inc=0", [4]string{"1", "0", "0", "0"}},
 	} {
 		var x ArbitraryFloat
 		sig := NewInt((1 << 26) + tc.tail)
 		serviceMust(t, m.SetComponents(&x, 8, 24, false, 0, &sig))
-		output.Reset()
+		w.parts = nil
 		serviceMust(t, m.RoundSqrt(tc.mode, &x))
-		got := output.String()
+		got := strings.Join(w.parts, "")
 		if !compiled {
 			if got != "" {
 				t.Fatalf("erased sqrt round trace: %q", got)
@@ -187,6 +188,10 @@ func TestArbitraryFloatRoundSqrtDecisionTrace(t *testing.T) {
 			result := "-------- [mpf_dbg] round_sqrt src/util/mpf.cpp:2130 ---------\nROUNDED = "
 			if first, decision, last := strings.Index(got, entry), strings.Index(got, header), strings.Index(got, result); first < 0 || decision <= first || last <= decision || strings.Count(got, "------------------------------------------------\n") != 3 {
 				t.Fatalf("sqrt round source decision: %q", got)
+			}
+			want := []string{"last=", tc.bits[0], " round=", tc.bits[1], " sticky=", tc.bits[2], " --> inc=", tc.bits[3], "\n"}
+			if !hasMPFFTraceParts(w.parts, want) {
+				t.Fatalf("sqrt round source insertions %q missing in %q", want, w.parts)
 			}
 		}
 		serviceMust(t, m.CleanupRoundSqrt())

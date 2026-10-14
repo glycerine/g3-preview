@@ -3,6 +3,7 @@ package numeral
 
 import (
 	"errors"
+	"io"
 )
 
 // RoundSqrt follows the source's specialized guard-bit switch. The caller owns
@@ -15,6 +16,22 @@ func (m *ArbitraryFloatManager) traceRoundSqrtResult(x *ArbitraryFloat) error {
 	m.valueExecuting = false
 	defer func() { m.valueExecuting = saved }()
 	return m.traceFloatDebugValueChecked("round_sqrt", "ROUNDED = ", x, 2130)
+}
+
+func (m *ArbitraryFloatManager) traceRoundSqrtDecision(last, round, sticky, inc bool) {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return
+	}
+	_ = tags.EmitConditional("mpf_dbg", "round_sqrt", "src/util/mpf.cpp", 2123,
+		func() bool { return true }, func(w io.Writer) error {
+			for _, part := range [...]string{"last=", traceBoolDigit(last), " round=", traceBoolDigit(round), " sticky=", traceBoolDigit(sticky), " --> inc=", traceBoolDigit(inc), "\n"} {
+				if e := writeNumeralDisplayPart(w, part); e != nil {
+					return e
+				}
+			}
+			return nil
+		})
 }
 func (m *ArbitraryFloatManager) RoundSqrtWithReceipt(mode ArbitraryFloatRoundingMode, x *ArbitraryFloat, r *ArbitraryFloatRoundReceipt) (err error) {
 	if e := m.valueGuard(x); e != nil {
@@ -84,7 +101,7 @@ func (m *ArbitraryFloatManager) RoundSqrtWithReceipt(mode ArbitraryFloatRounding
 	default:
 		return ErrIntegerAssertion
 	}
-	m.traceFloatDebugText("round_sqrt", "last="+traceBoolDigit(last)+" round="+traceBoolDigit(round)+" sticky="+traceBoolDigit(sticky)+" --> inc="+traceBoolDigit(inc), 2123)
+	m.traceRoundSqrtDecision(last, round, sticky, inc)
 	if inc {
 		one := NewInt(1)
 		if e = z.addSubWithAllocationContext(&x.significand, &one, &x.significand, false, c); e != nil {
