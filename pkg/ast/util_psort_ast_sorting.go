@@ -1,7 +1,32 @@
 // Source: src/util/sorting_network.h:597-1046.
 package ast
 
+import (
+	"io"
+	"strconv"
+
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
+)
+
+func (s *PsortASTNetwork) traceCardEntry(k, n uint32) {
+	tags := s.trace
+	if tags == nil {
+		tags = udiag.BorrowProcessTraceTags()
+	}
+	_ = tags.EmitConditional("pb", "card", "src/util/sorting_network.h", 598,
+		func() bool { return true }, func(w io.Writer) error {
+			write := func(part string) { _, _ = io.WriteString(w, part) }
+			write("card k: ")
+			write(strconv.FormatUint(uint64(k), 10))
+			write(" n: ")
+			write(strconv.FormatUint(uint64(n), 10))
+			write("\n")
+			return nil
+		})
+}
+
 func (s *PsortASTNetwork) card(k, n uint32, p psortASTPointer, out *ASTLiteralVector) (err error) {
+	s.traceCardEntry(k, n)
 	if n <= k {
 		return s.sorting(n, p, out)
 	}

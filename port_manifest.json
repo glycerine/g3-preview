@@ -173089,7 +173089,8 @@
         "pkg/ast/util_psort_ast_network_prefix_source_test.go",
         "pkg/ast/util_psort_ast_network_source_test.go",
         "pkg/ast/util_psort_ast_ownership_source_test.go",
-        "pkg/ast/util_psort_ast_recursive_oracle_source_test.go"
+        "pkg/ast/util_psort_ast_recursive_oracle_source_test.go",
+        "pkg/ast/util_psort_ast_trace_test.go"
       ],
       "tests": [
         "TestPsortASTContextActualFactoriesClausesAndTrail",
@@ -173107,7 +173108,8 @@
         "TestPsortASTNetworkRecursiveFamiliesIndependentClauseOracle",
         "TestPsortASTNetworkNativeRangeFailureUnwindsFrames",
         "TestPsortASTContextNativeRepeatedFactoriesExactReferences",
-        "TestPsortASTContextEscapedNativeStorageAfterManagerClose"
+        "TestPsortASTContextEscapedNativeStorageAfterManagerClose",
+        "TestPsortASTCardSourceEntryTrace"
       ],
       "conditionals": [
         {
@@ -175024,7 +175026,8 @@
         "pkg/util/numeral/mpfx_power_trace.go",
         "pkg/util/numeral/mpfx_division_callers_trace.go",
         "pkg/ast/pattern/smaller_pattern.go",
-        "pkg/ast/pattern/multi_pattern.go"
+        "pkg/ast/pattern/multi_pattern.go",
+        "pkg/ast/util_psort_ast_sorting.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -175048,7 +175051,8 @@
         "TestFixedPointDivisionTraceSourceInsertionPrefixes",
         "TestFixedPointDivisionTraceRefusalKeepsArithmetic",
         "TestSmallerPatternSaveTraceBeforePairPublication",
-        "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn"
+        "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
+        "TestPsortASTCardSourceEntryTrace"
       ],
       "conditionals": [
         {
@@ -175388,6 +175392,14 @@
           ]
         },
         {
+          "name": "retained psort_nw::card entry TRACE before the cardinality branch (src/util/sorting_network.h:598)",
+          "status": "ported",
+          "go_target": "pkg/ast/util_psort_ast_sorting.go",
+          "tests": [
+            "TestPsortASTCardSourceEntryTrace"
+          ]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -175419,7 +175431,8 @@
         "pkg/util/numeral/mpfx_power_trace.go",
         "pkg/util/numeral/mpfx_division_callers_trace.go",
         "pkg/ast/pattern/smaller_pattern.go",
-        "pkg/ast/pattern/multi_pattern.go"
+        "pkg/ast/pattern/multi_pattern.go",
+        "pkg/ast/util_psort_ast_sorting.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -175443,7 +175456,8 @@
         "TestFixedPointDivisionTraceSourceInsertionPrefixes",
         "TestFixedPointDivisionTraceRefusalKeepsArithmetic",
         "TestSmallerPatternSaveTraceBeforePairPublication",
-        "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn"
+        "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
+        "TestPsortASTCardSourceEntryTrace"
       ],
       "conditionals": [
         {
@@ -175792,6 +175806,14 @@
           "go_target": "pkg/ast/pattern/multi_pattern.go",
           "tests": [
             "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn"
+          ]
+        },
+        {
+          "name": "retained psort_nw::card entry TRACE before the cardinality branch (src/util/sorting_network.h:598)",
+          "status": "ported",
+          "go_target": "pkg/ast/util_psort_ast_sorting.go",
+          "tests": [
+            "TestPsortASTCardSourceEntryTrace"
           ]
         },
         {

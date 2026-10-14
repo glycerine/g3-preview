@@ -29,6 +29,7 @@ type PsortASTNetwork struct {
 	runtime         *umemory.Runtime
 	budget          *arena.Budget
 	debug           *udiag.DebugContext
+	trace           *udiag.TraceTags
 	header          uint64
 	mode            uint8
 	modeInitialized bool
@@ -93,6 +94,16 @@ func NewPsortASTNetwork(c *PsortASTContext, r *umemory.Runtime, b *arena.Budget,
 	s := &PsortASTNetwork{context: c, runtime: r, budget: b, debug: d, header: bytes}
 	s.self = s
 	return s, nil
+}
+
+// BindTrace borrows the retained TRACE tag/output owner before an operation.
+// A nil binding selects the source process trace stream.
+func (s *PsortASTNetwork) BindTrace(t *udiag.TraceTags) error {
+	if e := s.open(); e != nil {
+		return e
+	}
+	s.trace = t
+	return nil
 }
 func (s *PsortASTNetwork) open() error {
 	if s == nil || s.self != s {
