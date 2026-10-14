@@ -171276,6 +171276,7 @@
         "TestASTSMT2FloatRealLiteralEveryActualReservationPrefix",
         "TestASTSMT2FloatDefaultEveryActualReservation",
         "TestScopedArbitraryFloatNumeralSourceLifetime",
+        "TestScopedArbitraryFloatSourceDeletionAndOwningRetry",
         "TestHardwareMidpointSplitterRetainedBranchesAndRefusal"
       ],
       "conditionals": [
@@ -171533,7 +171534,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/scoped_arbitrary_float_numeral.go",
           "tests": [
-            "TestScopedArbitraryFloatNumeralSourceLifetime"
+            "TestScopedArbitraryFloatNumeralSourceLifetime",
+            "TestScopedArbitraryFloatSourceDeletionAndOwningRetry"
           ]
         },
         {

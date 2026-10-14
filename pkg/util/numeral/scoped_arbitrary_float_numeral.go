@@ -7,10 +7,11 @@ import "github.com/glycerine/g3/pkg/arena"
 // ScopedArbitraryFloatNumeral borrows the concrete f2n manager and owns one
 // MPF value. Close is the source scoped-numeral destructor boundary.
 type ScopedArbitraryFloatNumeral struct {
-	self    *ScopedArbitraryFloatNumeral
-	manager *ArbitraryFloatNumeralManager
-	value   ArbitraryFloat
-	closed  bool
+	self        *ScopedArbitraryFloatNumeral
+	manager     *ArbitraryFloatNumeralManager
+	value       ArbitraryFloat
+	sourceCause error
+	closed      bool
 }
 
 func NewScopedArbitraryFloatNumeral(m *ArbitraryFloatNumeralManager) (*ScopedArbitraryFloatNumeral, error) {
@@ -42,7 +43,34 @@ func (s *ScopedArbitraryFloatNumeral) Close() error {
 	if s.closed {
 		return nil
 	}
-	if e := s.manager.Del(&s.value); e != nil {
+	if s.sourceCause != nil {
+		return s.sourceCause
+	}
+	if e := s.manager.guard(); e != nil {
+		s.sourceCause = e
+		return e
+	}
+	if e := s.manager.core.valueGuard(&s.value); e != nil {
+		s.sourceCause = e
+		return e
+	}
+	if _, e := sourceNumeralDel(s.manager.core.integer, &s.value.significand); e != nil {
+		s.sourceCause = e
+		return e
+	}
+	s.closed = true
+	return nil
+}
+
+// Cleanup owns a stopped scoped destructor without replaying source Del.
+func (s *ScopedArbitraryFloatNumeral) Cleanup() error {
+	if s == nil || s.self != s || s.manager == nil {
+		return ErrScopedCopy
+	}
+	if s.closed {
+		return nil
+	}
+	if e := s.manager.core.CleanupValue(&s.value); e != nil {
 		return e
 	}
 	s.closed = true
