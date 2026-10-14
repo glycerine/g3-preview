@@ -2,6 +2,7 @@
 package diagnostic
 
 import (
+	"errors"
 	"io"
 	"os"
 	"strconv"
@@ -168,6 +169,13 @@ func (w *traceStickyWriter) finish() error {
 	return w.first
 }
 
+// A failed ostream insertion sets the stream state and source execution
+// continues to the TRACE footer. An error from an operand computation unwinds
+// the macro body before its footer or final flush.
+func (w *traceStickyWriter) bodyComputationFailed(err error) bool {
+	return err != nil && (w.streamErr == nil || !errors.Is(err, w.streamErr))
+}
+
 // TRACE and CTRACE insert each header component separately before CODE runs.
 func writeTraceHeader(w io.Writer, tag, function, file string, line int) error {
 	for _, part := range [...]string{"-------- [", traceTagCString(tag), "] ", function, " ", file, ":", strconv.Itoa(line), " ---------\n"} {
@@ -211,7 +219,12 @@ func (t *TraceTags) EmitShort(tag string, body func(io.Writer) error) error {
 	}
 	sticky := &traceStickyWriter{out: w, first: t.streamErr, streamErr: t.streamErr}
 	if body != nil {
-		sticky.capture(body(sticky))
+		bodyErr := body(sticky)
+		if sticky.bodyComputationFailed(bodyErr) {
+			t.streamErr = sticky.streamErr
+			return bodyErr
+		}
+		sticky.capture(bodyErr)
 	}
 	err = sticky.finish()
 	t.streamErr = sticky.streamErr
@@ -232,7 +245,12 @@ func (t *TraceTags) EmitConditional(tag, function, file string, line int, condit
 	sticky := &traceStickyWriter{out: w, first: t.streamErr, streamErr: t.streamErr}
 	sticky.capture(writeTraceHeader(sticky, tag, function, file, line))
 	if body != nil {
-		sticky.capture(body(sticky))
+		bodyErr := body(sticky)
+		if sticky.bodyComputationFailed(bodyErr) {
+			t.streamErr = sticky.streamErr
+			return bodyErr
+		}
+		sticky.capture(bodyErr)
 	}
 	sticky.capture(writeTracePart(sticky, "------------------------------------------------\n"))
 	err = sticky.finish()

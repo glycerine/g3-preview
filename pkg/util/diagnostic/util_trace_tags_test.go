@@ -58,10 +58,9 @@ func TestTraceHeaderSourceInsertionRefusalPrefixes(t *testing.T) {
 	}
 }
 
-func TestTraceShortBodyFailureStillFlushes(t *testing.T) {
+func TestTraceShortBodyFailureSkipsSourceFlush(t *testing.T) {
 	bodyErr := errors.New("trace body stopped")
-	flushErr := errors.New("trace flush stopped")
-	w := &flushedWarningWriter{err: flushErr}
+	w := &flushedWarningWriter{}
 	tags := NewTraceTagsWithWriter(w)
 	tags.Enable("alpha")
 	called := 0
@@ -78,8 +77,35 @@ func TestTraceShortBodyFailureStillFlushes(t *testing.T) {
 		}
 		return
 	}
-	if !errors.Is(err, bodyErr) || errors.Is(err, flushErr) || called != 1 || w.flushes != 1 || w.String() != "prefix" {
-		t.Fatal("source body failure and final flush", err, called, w.flushes, w.String())
+	if !errors.Is(err, bodyErr) || called != 1 || w.flushes != 0 || w.String() != "prefix" {
+		t.Fatal("source body failure skips later STRACE flush", err, called, w.flushes, w.String())
+	}
+}
+
+func TestTraceConditionalOperandFailureSkipsFooterAndFlush(t *testing.T) {
+	operandErr := errors.New("trace operand stopped")
+	w := &flushedWarningWriter{}
+	tags := NewTraceTagsWithWriter(w)
+	tags.Enable("alpha")
+	err := tags.EmitConditional("alpha", "work", "src/util/trace.cpp", 31,
+		func() bool { return true }, func(out io.Writer) error {
+			if e := writeTracePart(out, "prefix"); e != nil {
+				return e
+			}
+			return operandErr
+		})
+	if !traceCompiled {
+		if err != nil || w.flushes != 0 || w.Len() != 0 {
+			t.Fatal("erased trace reached operand", err, w.flushes, w.String())
+		}
+		return
+	}
+	want := "-------- [alpha] work src/util/trace.cpp:31 ---------\nprefix"
+	if !errors.Is(err, operandErr) || w.String() != want || w.flushes != 0 {
+		t.Fatal("source exception must skip TRACE footer and flush", err, w.String(), w.flushes)
+	}
+	if e := tags.Emit("alpha", "work", "src/util/trace.cpp", 32, "next"); e != nil || w.flushes != 1 {
+		t.Fatal("operand exception poisoned borrowed stream", e, w.flushes)
 	}
 }
 

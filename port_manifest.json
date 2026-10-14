@@ -175265,7 +175265,8 @@
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
         "TestTraceHeaderSourceInsertionRefusalPrefixes",
-        "TestTraceShortBodyFailureStillFlushes",
+        "TestTraceShortBodyFailureSkipsSourceFlush",
+        "TestTraceConditionalOperandFailureSkipsFooterAndFlush",
         "TestTraceStreamFailurePersistsAcrossRecords",
         "TestTraceBodyErrorDoesNotPoisonStream",
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
@@ -175384,7 +175385,8 @@
           "go_target": "pkg/util/diagnostic/util_trace_tags.go",
           "tests": [
             "TestTraceHeaderSourceInsertionRefusalPrefixes",
-            "TestTraceShortBodyFailureStillFlushes",
+            "TestTraceShortBodyFailureSkipsSourceFlush",
+            "TestTraceConditionalOperandFailureSkipsFooterAndFlush",
             "TestTraceStreamFailurePersistsAcrossRecords",
             "TestTraceBodyErrorDoesNotPoisonStream"
           ]
@@ -175740,7 +175742,8 @@
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
         "TestTraceHeaderSourceInsertionRefusalPrefixes",
-        "TestTraceShortBodyFailureStillFlushes",
+        "TestTraceShortBodyFailureSkipsSourceFlush",
+        "TestTraceConditionalOperandFailureSkipsFooterAndFlush",
         "TestTraceStreamFailurePersistsAcrossRecords",
         "TestTraceBodyErrorDoesNotPoisonStream",
         "TestFastFloatFloorCeilRetainedShortTraceBranches",
@@ -175871,7 +175874,8 @@
           "go_target": "pkg/util/diagnostic/util_trace_tags.go",
           "tests": [
             "TestTraceHeaderSourceInsertionRefusalPrefixes",
-            "TestTraceShortBodyFailureStillFlushes",
+            "TestTraceShortBodyFailureSkipsSourceFlush",
+            "TestTraceConditionalOperandFailureSkipsFooterAndFlush",
             "TestTraceStreamFailurePersistsAcrossRecords",
             "TestTraceBodyErrorDoesNotPoisonStream"
           ]
