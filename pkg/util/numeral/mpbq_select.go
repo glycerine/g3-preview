@@ -1,6 +1,10 @@
 // Source: src/util/mpbq.cpp.
 package numeral
 
+import "errors"
+
+var ErrBinarySelectPending = errors.New("mpnum: binary rational selection local cleanup pending")
+
 func (m *BinaryRationalManager) selectInteger(lower, upper *BinaryRational, r *Int) (bool, error) {
 	if lower.KField == 0 {
 		return true, m.Z.Copy(r, &lower.Num)
@@ -20,7 +24,7 @@ func (m *BinaryRationalManager) selectInteger(lower, upper *BinaryRational, r *I
 	}
 	return true, m.Z.Copy(r, &m.SelectIntTmp1)
 }
-func (m *BinaryRationalManager) rationalIntegerBound(qm *RationalManager, q *Rational, out *Int, upper bool) error {
+func (m *BinaryRationalManager) rationalIntegerBound(qm *RationalManager, q *Rational, out *Int, upper bool) (err error) {
 	if isIntegerRational(q) {
 		if e := m.Z.CopyFrom(out, qm.Z, &q.Num); e != nil {
 			return e
@@ -30,18 +34,65 @@ func (m *BinaryRationalManager) rationalIntegerBound(qm *RationalManager, q *Rat
 		}
 		return m.Z.Inc(out)
 	}
-	var tmp Int
-	defer qm.Z.Del(&tmp)
+	if e := m.open(); e != nil {
+		return e
+	}
+	m.selectIntOwner = qm
+	m.selectIntTemporary = Int{}
+	m.selectIntPending = true
+	m.selectIntExecuting = true
+	defer func() {
+		if e := m.finishSelectIntegerTemporarySource(); err == nil {
+			err = e
+		}
+		m.selectIntExecuting = false
+	}()
+	tmp := &m.selectIntTemporary
 	var e error
 	if upper {
-		e = qm.FloorToInt(q, &tmp)
+		e = qm.FloorToInt(q, tmp)
 	} else {
-		e = qm.CeilToInt(q, &tmp)
+		e = qm.CeilToInt(q, tmp)
 	}
 	if e != nil {
 		return e
 	}
-	return m.Z.CopyFrom(out, qm.Z, &tmp)
+	return m.Z.CopyFrom(out, qm.Z, tmp)
+}
+
+func (m *BinaryRationalManager) finishSelectIntegerTemporarySource() error {
+	if !m.selectIntPending {
+		return nil
+	}
+	if _, e := sourceNumeralDel(m.selectIntOwner.Z, &m.selectIntTemporary); e != nil {
+		return e
+	}
+	m.selectIntPending = false
+	m.selectIntOwner = nil
+	return nil
+}
+
+// CleanupSelectIntegerTemporary completes a stopped scoped_mpz destructor
+// through its borrowed rational manager before another selection or close.
+func (m *BinaryRationalManager) CleanupSelectIntegerTemporary() error {
+	if m == nil || m.self != m {
+		return ErrBinaryOwner
+	}
+	if !m.selectIntPending {
+		return nil
+	}
+	if m.selectIntExecuting {
+		return ErrBinarySelectPending
+	}
+	if m.selectIntOwner == nil || m.selectIntOwner.self != m.selectIntOwner || m.selectIntOwner.Z == nil {
+		return ErrBinaryOwner
+	}
+	if e := m.selectIntOwner.Z.Del(&m.selectIntTemporary); e != nil {
+		return e
+	}
+	m.selectIntPending = false
+	m.selectIntOwner = nil
+	return nil
 }
 func (m *BinaryRationalManager) selectIntegerRationalLower(qm *RationalManager, lower *Rational, upper *BinaryRational, r *Int) (bool, error) {
 	if upper.KField == 0 {

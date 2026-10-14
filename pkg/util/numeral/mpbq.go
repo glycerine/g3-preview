@@ -49,6 +49,10 @@ type BinaryRationalManager struct {
 	closing                                      bool
 	cleanupStage                                 uint8
 	Display                                      binaryDisplayScope
+	selectIntTemporary                           Int
+	selectIntOwner                               *RationalManager
+	selectIntPending                             bool
+	selectIntExecuting                           bool
 }
 type BinaryRationalStats struct {
 	HeaderBytes           uint64
@@ -76,6 +80,9 @@ func (m *BinaryRationalManager) open() error {
 	}
 	if m.closed || m.closing || m.Z.closed {
 		return arena.ErrClosed
+	}
+	if m.selectIntPending {
+		return ErrBinarySelectPending
 	}
 	return nil
 }
@@ -115,10 +122,16 @@ func (m *BinaryRationalManager) CloseChecked() error {
 	if m == nil || m.self != m {
 		return ErrBinaryOwner
 	}
+	if m.selectIntExecuting {
+		return ErrBinarySelectPending
+	}
 	if m.closed {
 		return nil
 	}
 	m.closing = true
+	if e := m.CleanupSelectIntegerTemporary(); e != nil {
+		return e
+	}
 	if e := m.CleanupDisplay(); e != nil {
 		return e
 	}
