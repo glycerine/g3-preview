@@ -54,23 +54,38 @@ func (m *BinaryRationalManager) debugAssert(ok bool) error {
 func (m *BinaryRationalManager) debugValue(a *BinaryRational) (OwnedRational, error) {
 	return m.ToOwnedRational(m.Diagnostics, a)
 }
-func (m *BinaryRationalManager) debugInteger(a *Int) (OwnedRational, error) {
+func (m *BinaryRationalManager) debugInteger(a *Int) (out OwnedRational, err error) {
+	if e := m.open(); e != nil {
+		return OwnedRational{}, e
+	}
 	s := m.Diagnostics
-	v, e := s.NewValue()
+	m.debugIntegerValue = OwnedRational{}
+	m.debugIntegerPending = true
+	m.debugIntegerExecuting = true
+	defer func() {
+		if err == nil {
+			out = m.debugIntegerValue
+			m.debugIntegerValue = OwnedRational{}
+			m.debugIntegerPending = false
+		} else {
+			_ = m.cleanupDebugInteger()
+		}
+		m.debugIntegerExecuting = false
+	}()
+	var e error
+	m.debugIntegerValue, e = s.NewValue()
 	if e != nil {
 		return OwnedRational{}, e
 	}
 	if e = s.lock(); e != nil {
-		s.Del(&v)
 		return OwnedRational{}, e
 	}
-	e = s.Manager.Z.CopyFrom(&v.Raw.Num, m.Z, a)
+	e = s.Manager.Z.CopyFrom(&m.debugIntegerValue.Raw.Num, m.Z, a)
 	s.mu.Unlock()
 	if e != nil {
-		s.Del(&v)
 		return OwnedRational{}, e
 	}
-	return v, nil
+	return OwnedRational{}, nil
 }
 func (m *BinaryRationalManager) debugDel(a *OwnedRational) {
 	if a.ownerID != 0 {

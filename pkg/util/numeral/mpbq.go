@@ -38,6 +38,7 @@ var ErrBinaryRoundPending = errors.New("mpnum: binary-rational rounding cleanup 
 var ErrBinaryToRationalPending = errors.New("mpnum: binary-rational to-rational cleanup pending")
 var ErrBinaryOwnedRationalPending = errors.New("mpnum: binary-rational owned conversion cleanup pending")
 var ErrBinaryApproxPending = errors.New("mpnum: binary-rational approximation cleanup pending")
+var ErrBinaryDebugIntegerPending = errors.New("mpnum: binary-rational debug integer cleanup pending")
 
 type binaryOwnedRationalScope struct {
 	service                  *RationalService
@@ -90,6 +91,8 @@ type BinaryRationalManager struct {
 	toOwnedRationalScope                           binaryOwnedRationalScope
 	approxOld                                      BinaryRational
 	approxPending                                  bool
+	debugIntegerValue                              OwnedRational
+	debugIntegerPending, debugIntegerExecuting     bool
 }
 type BinaryRationalStats struct {
 	HeaderBytes           uint64
@@ -144,6 +147,9 @@ func (m *BinaryRationalManager) open() error {
 	}
 	if m.approxPending {
 		return ErrBinaryApproxPending
+	}
+	if m.debugIntegerPending && !m.debugIntegerExecuting {
+		return ErrBinaryDebugIntegerPending
 	}
 	return nil
 }
@@ -204,6 +210,9 @@ func (m *BinaryRationalManager) CloseChecked() error {
 	if m.toOwnedRationalScope.executing {
 		return ErrBinaryOwnedRationalPending
 	}
+	if m.debugIntegerExecuting {
+		return ErrBinaryDebugIntegerPending
+	}
 	if m.closed {
 		return nil
 	}
@@ -235,6 +244,9 @@ func (m *BinaryRationalManager) CloseChecked() error {
 	if e := m.CleanupApproxDebug(); e != nil {
 		return e
 	}
+	if e := m.CleanupDebugInteger(); e != nil {
+		return e
+	}
 	if e := m.CleanupRefineMid(); e != nil {
 		return e
 	}
@@ -261,6 +273,32 @@ func (m *BinaryRationalManager) Close() {
 		panic(e)
 	}
 }
+
+func (m *BinaryRationalManager) cleanupDebugInteger() error {
+	if !m.debugIntegerPending {
+		return nil
+	}
+	if m.debugIntegerValue.ownerID != 0 {
+		if e := m.Diagnostics.Del(&m.debugIntegerValue); e != nil {
+			return e
+		}
+	}
+	m.debugIntegerValue = OwnedRational{}
+	m.debugIntegerPending = false
+	return nil
+}
+
+// CleanupDebugInteger releases a stopped mixed-arithmetic diagnostic copy.
+func (m *BinaryRationalManager) CleanupDebugInteger() error {
+	if m == nil || m.self != m {
+		return ErrBinaryOwner
+	}
+	if m.debugIntegerExecuting {
+		return ErrBinaryDebugIntegerPending
+	}
+	return m.cleanupDebugInteger()
+}
+
 func (m *BinaryRationalManager) Stats() (BinaryRationalStats, error) {
 	if e := m.open(); e != nil {
 		return BinaryRationalStats{}, e
