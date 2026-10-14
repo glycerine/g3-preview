@@ -137,7 +137,7 @@ func (m *ArbitraryFloatManager) traceFloatDebugValueChecked(function, label stri
 				formatError = e
 				return e
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }
@@ -161,7 +161,7 @@ func (m *ArbitraryFloatManager) traceFloatDebugIntChecked(function, label string
 			if e := writeNumeralDisplayPart(w, s); e != nil {
 				return e
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }
@@ -176,7 +176,7 @@ func (m *ArbitraryFloatManager) traceFloatDebugText(function, value string, line
 			if e := writeNumeralDisplayPart(w, value); e != nil {
 				return e
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 }
 
@@ -193,6 +193,6 @@ func (m *ArbitraryFloatManager) traceFloatDebugSigned(function, label string, va
 			if e := writeNumeralDisplayPart(w, strconv.FormatInt(value, 10)); e != nil {
 				return e
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 }

@@ -42,7 +42,7 @@ func (m *ArbitraryFloatManager) traceFMAUnpacked(a, b, c *ArbitraryFloat) error 
 				if e := writeNumeralDisplayPart(w, formatted); e != nil {
 					return e
 				}
-				if e := writeNumeralDisplayPart(w, "\n"); e != nil {
+				if e := diagnostic.WriteTraceEndl(w); e != nil {
 					return e
 				}
 			}
@@ -58,7 +58,7 @@ func (m *ArbitraryFloatManager) traceFMAUnpacked(a, b, c *ArbitraryFloat) error 
 				if e := writeNumeralDisplayPart(w, binary); e != nil {
 					return e
 				}
-				if e := writeNumeralDisplayPart(w, "\n"); e != nil {
+				if e := diagnostic.WriteTraceEndl(w); e != nil {
 					return e
 				}
 			}
@@ -86,7 +86,7 @@ func (m *ArbitraryFloatManager) traceFMADecimalBinary(label string, value *Arbit
 			if e := writeNumeralDisplayPart(w, decimal); e != nil {
 				return e
 			}
-			if e := writeNumeralDisplayPart(w, "\n"); e != nil {
+			if e := diagnostic.WriteTraceEndl(w); e != nil {
 				return e
 			}
 			if e := writeNumeralDisplayPart(w, label); e != nil {
@@ -100,7 +100,7 @@ func (m *ArbitraryFloatManager) traceFMADecimalBinary(label string, value *Arbit
 			if e := writeNumeralDisplayPart(w, binary); e != nil {
 				return e
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }
@@ -141,7 +141,7 @@ func (m *ArbitraryFloatManager) traceFMAAlignment(delta uint32, shifted, sticky 
 			if e := writeNumeralDisplayPart(w, s); e != nil {
 				return e
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }
@@ -165,7 +165,7 @@ func (m *ArbitraryFloatManager) traceFMASignificandBinary(decimalLabel, binaryLa
 			if e := writeNumeralDisplayPart(w, s); e != nil {
 				return e
 			}
-			if e := writeNumeralDisplayPart(w, "\n"); e != nil {
+			if e := diagnostic.WriteTraceEndl(w); e != nil {
 				return e
 			}
 			if e := writeNumeralDisplayPart(w, binaryLabel); e != nil {
@@ -179,7 +179,7 @@ func (m *ArbitraryFloatManager) traceFMASignificandBinary(decimalLabel, binaryLa
 			if e := writeNumeralDisplayPart(w, binary); e != nil {
 				return e
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }
@@ -242,7 +242,7 @@ func (m *ArbitraryFloatManager) traceFMARenormalized(value *ArbitraryFloat, delt
 			if e := writeNumeralDisplayPart(w, ")"); e != nil {
 				return e
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }

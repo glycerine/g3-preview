@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -66,6 +67,53 @@ func TestArbitraryFloatFMAOverflowTraceEndlFlushes(t *testing.T) {
 		t.Fatal("failed trace stream wrote a later record", w.events)
 	}
 	serviceMust(t, m.Del(&one))
+}
+
+func TestArbitraryFloatFMAReachedEndlFlushes(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	w := &fmaEndlWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	var x, y, z, out ArbitraryFloat
+	for _, v := range []*ArbitraryFloat{&x, &y, &z} {
+		serviceMust(t, m.SetDouble(v, 11, 53, 1.75))
+	}
+	serviceMust(t, m.FMA(ArbitraryFloatNearestEven, &x, &y, &z, &out))
+	if !tags.ShouldTrace("mpf_dbg") {
+		if len(w.events) != 0 {
+			t.Fatal("erased FMA trace reached writer", w.events)
+		}
+	} else {
+		for _, tc := range []struct{ line, endlCount int }{
+			{752, 1}, {753, 1}, {754, 1}, {813, 6}, {830, 2},
+			{844, 2}, {867, 1}, {871, 2}, {873, 2}, {892, 1},
+			{899, 2}, {913, 2}, {925, 1}, {940, 2},
+		} {
+			start := -1
+			for i := 0; i+3 < len(w.events); i++ {
+				if w.events[i] == "write:src/util/mpf.cpp" && w.events[i+1] == "write::" && w.events[i+2] == "write:"+strconv.Itoa(tc.line) && w.events[i+3] == "write: ---------\n" {
+					start = i + 4
+					break
+				}
+			}
+			if start < 0 {
+				t.Fatalf("missing reached FMA trace site %d", tc.line)
+			}
+			count := 0
+			for i := start; i < len(w.events) && w.events[i] != "write:------------------------------------------------\n"; i++ {
+				if w.events[i] == "flush" {
+					count++
+				}
+			}
+			if count != tc.endlCount {
+				t.Fatalf("FMA source endl count at %d: got %d, want %d", tc.line, count, tc.endlCount)
+			}
+		}
+	}
+	for _, v := range []*ArbitraryFloat{&x, &y, &z, &out} {
+		serviceMust(t, m.Del(v))
+	}
 }
 
 func TestArbitraryFloatFMAEntryDebugTraceBeforeShortcuts(t *testing.T) {
