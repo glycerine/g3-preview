@@ -4,6 +4,8 @@ package lp
 import (
 	"fmt"
 	"io"
+
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func (d *MPSFileDriver) floatBase() *FloatLPSolver {
@@ -27,7 +29,7 @@ func (d *MPSFileDriver) floatValue(name string, comparison bool) (float64, error
 	}
 	j, ok := base.NamesToColumns[name]
 	if !ok {
-		return 0, fmt.Errorf("get_column_value_by_name %s", name)
+		return 0, z3exception.NewDefaultException(fmt.Sprintf("get_column_value_by_name %s", name))
 	}
 	if comparison {
 		return d.floatComparison.GetColumnValue(j)

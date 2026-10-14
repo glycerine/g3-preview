@@ -8,6 +8,8 @@ import (
 	"math/rand"
 	"strings"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestLPFloatPrimalValidationIndependentRows(t *testing.T) {
@@ -190,10 +192,11 @@ func TestLPFloatPrimalValidationOutputAndMutationPrefixes(t *testing.T) {
 func TestLPFloatPrimalValidationMissingMetadata(t *testing.T) {
 	m := lpFloatPrimal(t)
 	m.GetOrCreateColumnInfo(7).Name = "x"
-	if ok, err := m.BoundsHold(nil); ok || err == nil || err.Error() != "cannot find column 7 in solution" {
+	var source z3exception.DefaultException
+	if ok, err := m.BoundsHold(nil); ok || !errors.As(err, &source) || source.Message() != "cannot find column 7 in solution" {
 		t.Fatal(ok, err)
 	}
-	if _, err := m.GetRowValue(99, nil, nil); !errors.Is(err, ErrLPSolverMissingRow) {
+	if _, err := m.GetRowValue(99, nil, nil); !errors.As(err, &source) || source.Message() != "cannot find row 99" {
 		t.Fatal(err)
 	}
 	m.SetRowColumnCoefficient(1, 7, 1)

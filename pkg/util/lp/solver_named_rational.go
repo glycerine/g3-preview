@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func (m *RationalPrimalSimplex) GetColumnValueByName(name string, out *numeral.Rational) (err error) {
@@ -15,7 +16,7 @@ func (m *RationalPrimalSimplex) GetColumnValueByName(name string, out *numeral.R
 	defer func() { m.outerStopped = err != nil }()
 	column, ok := m.NamesToColumns[name]
 	if !ok {
-		return fmt.Errorf("get_column_value_by_name %s", name)
+		return z3exception.NewDefaultException(fmt.Sprintf("get_column_value_by_name %s", name))
 	}
 	return m.GetColumnValue(column, out)
 }
@@ -27,7 +28,7 @@ func (m *RationalDualSimplex) GetColumnValueByName(name string, out *numeral.Rat
 	defer func() { m.outerStopped = err != nil }()
 	column, ok := m.NamesToColumns[name]
 	if !ok {
-		return fmt.Errorf("get_column_value_by_name %s", name)
+		return z3exception.NewDefaultException(fmt.Sprintf("get_column_value_by_name %s", name))
 	}
 	return m.GetColumnValue(column, out)
 }

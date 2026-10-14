@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // RationalDualSimplex owns stage vectors and the core borrowing their headers.
@@ -173,7 +174,7 @@ func (m *RationalDualSimplex) FillFirstStageStructuralColumn(j uint32) (err erro
 		if e != nil {
 			return e
 		}
-		return fmt.Errorf("unexpected bound type %d %s", j, name)
+		return z3exception.NewDefaultException(fmt.Sprintf("unexpected bound type %d %s", j, name))
 	case ColumnLowBound:
 		if err = m.setCanEnter(j, true); err != nil {
 			return err

@@ -5,6 +5,8 @@ package lp
 import (
 	"fmt"
 	"sort"
+
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // FlipCosts is the common lp_solver.hpp:97-102 operation used by dual setup.
@@ -143,7 +145,7 @@ func (m *FloatDualSimplex) FillFirstStageStructuralColumn(j uint32) error {
 		if err != nil {
 			return err
 		}
-		return fmt.Errorf("unexpected bound type %d %s", j, name)
+		return z3exception.NewDefaultException(fmt.Sprintf("unexpected bound type %d %s", j, name))
 	case ColumnLowBound:
 		if err := m.setCanEnter(j, true); err != nil {
 			return err

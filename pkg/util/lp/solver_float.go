@@ -2,9 +2,9 @@
 package lp
 
 import (
-	"errors"
 	"strconv"
 
+	"github.com/glycerine/g3/pkg/util/z3exception"
 	"github.com/glycerine/insdict"
 )
 
@@ -21,8 +21,8 @@ type FloatConstraint struct {
 	Relation  LPRelation
 }
 
-var ErrLPFixedColumn = errors.New("lp: found fixed column")
-var ErrLPSolverMissingRow = errors.New("lp: cannot find row")
+var ErrLPFixedColumn = z3exception.NewDefaultException("found fixed column")
+var ErrLPSolverMissingRow = z3exception.NewDefaultException("cannot find row")
 
 // FloatLPSolver implements the common floating data preparation layer. Primal
 // and dual optimization are connected by their concrete simplex types; exact/LAR variants remain partial. Ordered row

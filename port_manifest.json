@@ -140480,6 +140480,7 @@
         "pkg/util/lp/solver_prepare_exact.go",
         "pkg/util/lp/primal_validate_float.go",
         "pkg/util/lp/dual_prepare_float.go",
+        "pkg/util/lp/dual_prepare_rational.go",
         "pkg/util/lp/solver_named_rational.go",
         "pkg/util/lp/driver_mps_float.go"
       ],
@@ -140538,7 +140539,7 @@
           ]
         },
         {
-          "name": "throw_exception/exception alias: six retained named-value, named-solution, dual-bound, fixed-column and missing-row producers use existing Go error transports; no exception-class adapter",
+          "name": "throw_exception/exception alias: retained named-value, named-solution, dual-bound, fixed-column and missing-row producers return concrete DefaultException values with source messages",
           "status": "ported",
           "go_target": "pkg/util/lp/solver_float.go",
           "tests": [
@@ -140564,7 +140565,7 @@
         "Canonical numeric zero/one references are consumed as values by retained callers. No generic Go wrappers or STL storage/hash adapter is retained."
       ],
       "deviations": [
-        "Native Go map lookups and error values replace source unordered_map/default_exception wrappers. Source STL bucket hash values and layout are not a port contract; exact key equality/collision semantics are retained.",
+        "Native Go map lookups replace source unordered_map wrappers; concrete z3exception.DefaultException values preserve reached throw_exception messages and type. Source STL bucket hash values and layout are not a port contract; exact key equality/collision semantics are retained.",
         "Standalone precise wrapper is unused; direct precise trait decisions remain concrete. Source primal refactor has no caller and its throw site is excluded.",
         "Coverage is measured on actual concrete Go consumer files, not a synthetic forwarding layer. Remaining whole-LP audits remain separate from this support-unit audit.",
         "Excluded source method precise<X>(): whole-src explicit-template-call search has no matches. This unused forwarding definition is recorded here because the portcheck schema requires every method listed under a ported unit to have a Go target and tests; no unused adapter or artificial test was added."

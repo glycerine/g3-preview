@@ -7,6 +7,8 @@ import (
 	"io"
 	"math"
 	"sort"
+
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func (m *FloatPrimalSimplex) BoundsHold(solution map[string]float64) (bool, error) {
@@ -22,7 +24,7 @@ func (m *FloatPrimalSimplex) BoundsHold(solution map[string]float64) (bool, erro
 		}
 		v, ok := solution[c.Name]
 		if !ok {
-			return false, fmt.Errorf("cannot find column %d in solution", j)
+			return false, z3exception.NewDefaultException(fmt.Sprintf("cannot find column %d in solution", j))
 		}
 		if !c.BoundsHold(v) {
 			c.BoundsHold(v)
@@ -38,7 +40,7 @@ func (m *FloatPrimalSimplex) BoundsHold(solution map[string]float64) (bool, erro
 func (m *FloatPrimalSimplex) GetRowValue(i uint32, solution map[string]float64, out io.Writer) (float64, error) {
 	row, ok := m.AValues.Get2(i)
 	if !ok {
-		return 0, fmt.Errorf("%w %d", ErrLPSolverMissingRow, i)
+		return 0, z3exception.NewDefaultException(fmt.Sprintf("cannot find row %d", i))
 	}
 	if row == nil {
 		return 0, ErrBounds
