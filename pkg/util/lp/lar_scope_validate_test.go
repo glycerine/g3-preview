@@ -9,6 +9,10 @@ import (
 	"testing"
 )
 
+// These 200-digit values still force multi-cell numeral ownership in every
+// refusal campaign without making repeated fixture parsing dominate the suite.
+const larScopeFaultMagnitudeRepeats = 20
+
 func TestLARScopeEquationIndependentPairOracle(t *testing.T) {
 	h := newLPPairHarness(t)
 	rng := rand.New(rand.NewPCG(73182, 17))
@@ -227,8 +231,8 @@ func TestLARScopeValidatorPhysicalOwnership(t *testing.T) {
 					} else {
 						h = newLPPairHarness(t)
 					}
-					a := strings.Repeat("9876543210", 100) + "/7"
-					b := strings.Repeat("1234567890", 100) + "/13"
+					a := strings.Repeat("9876543210", larScopeFaultMagnitudeRepeats) + "/7"
+					b := strings.Repeat("1234567890", larScopeFaultMagnitudeRepeats) + "/13"
 					s := lpNewRemovalModel(t, h, a, "-5/7", false)
 					c := s.Core
 					h.must(h.m.SetString(&c.RX.Data[0].X, b))
@@ -303,8 +307,8 @@ func TestLARScopeOperationsLeaveOlderComparisonOwned(t *testing.T) {
 		for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
 			t.Run(fmt.Sprintf("%s/%d", op, ordinal), func(t *testing.T) {
 				h := newLPPairHarness(t)
-				a := strings.Repeat("9876543210", 100) + "/7"
-				b := strings.Repeat("1234567890", 100) + "/13"
+				a := strings.Repeat("9876543210", larScopeFaultMagnitudeRepeats) + "/7"
+				b := strings.Repeat("1234567890", larScopeFaultMagnitudeRepeats) + "/13"
 				s := lpNewRemovalModel(t, h, "2/3", "5/7", false)
 				c := s.Core
 				v := h.pair(a, b)
