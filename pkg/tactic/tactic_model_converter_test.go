@@ -140,7 +140,7 @@ func TestTacticModelConcatRealStoredChildFinalReleaseRefusal(t *testing.T) {
 		t.Fatal("real child final release prefix", e, first.refs)
 	}
 	satOK(t, combined.Close())
-	if !reflect.DeepEqual(calls, []string{"destroy:first"}) || !stored.(*tacticStoredModelConverter).closed {
+	if !reflect.DeepEqual(calls, []string{"destroy:first"}) || !stored.(*tacticStoredModelConverter).closed || !md.Closed {
 		t.Fatal("real child cleanup replay", calls)
 	}
 	satOK(t, md.Close())

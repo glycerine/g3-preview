@@ -169069,6 +169069,7 @@
         "TestTacticModelReferenceOwningAliasAndReplacement",
         "TestTacticModelReferenceCopyAssignmentOwnsSourceModel",
         "TestTacticModelRefKeepsOldOnConsumedDestructionStop",
+        "TestTacticModelRefCloseResumesConsumedFinalModelCleanup",
         "TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion",
         "TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel",
         "TestTacticModelConverterToModelStoppedAssignmentKeepsAcquiredModel",
@@ -169076,7 +169077,9 @@
         "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
         "TestTacticModelConcatShortcutsNullBranchesAndSharedOwners",
         "TestTacticModelConcatStopsAtChildErrorAndRejectsCopiedOwner",
-        "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
+        "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild",
+        "TestTacticModelConcatConsumedChildCleanupResumesWithoutSecondDecrement",
+        "TestTacticModelConcatRealStoredChildFinalReleaseRefusal"
       ],
       "conditionals": [
         {
@@ -169098,6 +169101,7 @@
           "tests": [
             "TestTacticModelReferenceCopyAssignmentOwnsSourceModel",
             "TestTacticModelRefKeepsOldOnConsumedDestructionStop",
+            "TestTacticModelRefCloseResumesConsumedFinalModelCleanup",
             "TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion",
             "TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel",
             "TestTacticModelConverterToModelStoppedAssignmentKeepsAcquiredModel",
@@ -169127,7 +169131,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The retained model2mc model_ref-to-model_ref assignment retains the incoming model before releasing the outgoing reference, including self-aliases. A consumed stopped final model deletion keeps the old raw pointer published and the acquired incoming reference in an owning receipt until explicit close. Concrete concat model converters retain each child ref, including aliases, then release second before first; concat-star releases its explicit second-child vector before the first ref member. A consumed child DEC followed by stopped child cleanup is now retried through Close without a second DEC; a real stored-model child and ordinary/star continuation fixtures verify this Go error-transport adaptation. Copied/retired owner guards remain explicit. Other retained reference instantiations, move/detach paths and failure histories remain open."
+        "The retained model2mc model_ref-to-model_ref assignment retains the incoming model before releasing the outgoing reference, including self-aliases. A consumed stopped final model deletion keeps the old raw pointer published and the acquired incoming reference in an owning receipt; ModelRef.Close now completes that model's pending destruction before releasing the acquired incoming reference. Its own final DEC also retains a cleanup receipt until the model closes. Concrete concat model converters retain each child ref, including aliases, then release second before first; concat-star releases its explicit second-child vector before the first ref member. A consumed child DEC followed by stopped child cleanup is retried through Close without a second DEC. Copied/retired owner guards remain explicit. Other retained reference instantiations, move/detach paths and failure histories remain open."
       ]
     },
     {

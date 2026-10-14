@@ -34,11 +34,35 @@ func TestTacticModelRefKeepsOldOnConsumedDestructionStop(t *testing.T) {
 		t.Fatalf("source raw pointer and acquired incoming ref: ref %+v, old %d, incoming %d", r, old.CoreField.References, incoming.References)
 	}
 	satOK(t, r.Close())
-	if !r.closed || incoming.References != 1 {
+	if !r.closed || !old.Closed || incoming.References != 1 {
 		t.Fatal("owning cleanup of stopped assignment", r, incoming.References)
 	}
 	satOK(t, old.Close())
 	satOK(t, incoming.DecRef())
+}
+
+func TestTacticModelRefCloseResumesConsumedFinalModelCleanup(t *testing.T) {
+	m := astTestManager(t)
+	md, e := model.NewModel(m)
+	satOK(t, e)
+	s, e := m.MkUninterpretedSort(astTestSymbol(t, m, "model-ref-close-stop"), nil)
+	satOK(t, e)
+	v, e := m.GetSomeValue(s)
+	satOK(t, e)
+	satOK(t, md.RegisterUniverse(s, []ast.ASTHandle{v}))
+	var r ModelRef
+	satOK(t, r.Set(&md.CoreField))
+	m.ExprIDs.Cleanup(m.ExprIDs.Range())
+	m.BudgetField.FailAfter(0)
+	e = r.Close()
+	m.BudgetField.FailAfter(-1)
+	if !errors.Is(e, arena.ErrInjectedFailure) || r.closed || r.owned || r.cleanup != &md.CoreField || md.CoreField.References != 0 {
+		t.Fatal("consumed final model release", e, r, md.CoreField.References)
+	}
+	satOK(t, r.Close())
+	if !r.closed || !md.Closed || r.cleanup != nil {
+		t.Fatal("model cleanup did not resume", r, md.Closed)
+	}
 }
 
 func TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion(t *testing.T) {
@@ -67,7 +91,7 @@ func TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion(t *tes
 		t.Fatalf("model2mc source copy assignment: %+v, incoming %d", out, incoming.References)
 	}
 	satOK(t, out.Close())
-	if incoming.References != 1 {
+	if !old.Closed || incoming.References != 1 {
 		t.Fatal("model2mc incoming owner lost after abort cleanup", incoming.References)
 	}
 	satOK(t, old.Close())
@@ -107,7 +131,7 @@ func TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel(t *testing.T) 
 		t.Fatalf("filter prematurely destroyed acquired next model: refs %d closed %v", next.References, next.Closed)
 	}
 	satOK(t, out.Close())
-	if !next.Closed {
+	if !next.Closed || !old.Closed {
 		t.Fatal("output owning cleanup retained next model")
 	}
 	satOK(t, old.Close())
@@ -142,7 +166,7 @@ func TestTacticModelConverterToModelStoppedAssignmentKeepsAcquiredModel(t *testi
 		t.Fatalf("new model destroyed despite output receipt: refs %d closed %v", next.References, next.Closed)
 	}
 	satOK(t, out.Close())
-	if !next.Closed {
+	if !next.Closed || !old.Closed {
 		t.Fatal("output cleanup did not retire acquired new model")
 	}
 	satOK(t, old.Close())

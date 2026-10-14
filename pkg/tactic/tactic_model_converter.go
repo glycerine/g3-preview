@@ -36,6 +36,7 @@ type ModelRef struct {
 	self    *ModelRef
 	value   *model.ModelCore
 	owned   bool
+	cleanup *model.ModelCore // final DEC consumed; model destruction still pending
 	pending []*model.ModelCore
 	closed  bool
 }
@@ -66,6 +67,9 @@ func (r *ModelRef) Set(value *model.ModelCore) error {
 		consumed, e := r.value.DecRefConsumed()
 		if consumed {
 			r.owned = false
+			if e != nil {
+				r.cleanup = r.value
+			}
 		}
 		if e != nil || !consumed {
 			if value != nil {
@@ -114,39 +118,49 @@ func (r *ModelRef) Close() error {
 		return nil
 	}
 	r.self = r
-	var failure error
+	if r.cleanup != nil {
+		if e := r.cleanup.Close(); e != nil {
+			return e
+		}
+		r.cleanup = nil
+	}
 	if r.value != nil && r.owned {
 		consumed, e := r.value.DecRefConsumed()
 		if consumed {
 			r.owned = false
-		}
-		if !consumed {
 			if e != nil {
+				r.cleanup = r.value
 				return e
 			}
+		}
+		if e != nil {
+			return e
+		}
+		if !consumed {
 			return ErrModelConverterOwner
 		}
-		failure = e
 	}
 	for len(r.pending) != 0 {
 		last := len(r.pending) - 1
-		consumed, e := r.pending[last].DecRefConsumed()
+		h := r.pending[last]
+		consumed, e := h.DecRefConsumed()
 		if consumed {
 			r.pending = r.pending[:last]
-		}
-		if failure == nil {
-			failure = e
-		}
-		if !consumed {
 			if e != nil {
+				r.cleanup = h
 				return e
 			}
+		}
+		if e != nil {
+			return e
+		}
+		if !consumed {
 			return ErrModelConverterOwner
 		}
 	}
 	r.value = nil
 	r.closed = true
-	return failure
+	return nil
 }
 
 // holds reports whether assignment acquired a model even if old-model
