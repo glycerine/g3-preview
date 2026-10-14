@@ -99,6 +99,9 @@ func (m *ArbitraryFloatManager) roundWithParentContext(mode ArbitraryFloatRoundi
 	if s.Invocation == ^uint64(0) {
 		return ErrNumericPending
 	}
+	if e := m.traceRoundValue("RND: ", x, 1967, true, 1, 3, ""); e != nil {
+		return e
+	}
 	invocation := s.Invocation + 1
 	*s = ArbitraryFloatRoundScope{Manager: m, Invocation: invocation, active: true, executing: true, receipt: receipt, parentFormattedSet: parent}
 	if parent.Caller != nil {
@@ -121,6 +124,9 @@ func (m *ArbitraryFloatManager) roundWithParentContext(mode ArbitraryFloatRoundi
 	}
 	m.valueExecuting = true
 	defer func() {
+		if err == nil {
+			err = m.traceRoundValue("ROUNDED = ", x, 2096, true, ^uint32(0), 0, " (hidden bit, unbiased exp).")
+		}
 		m.valueExecuting = false
 		s.executing = false
 		s.bodyCause = err
@@ -246,6 +252,9 @@ func (m *ArbitraryFloatManager) roundWithParentContext(mode ArbitraryFloatRoundi
 			return e
 		}
 	}
+	if e := m.traceRoundValue("Shifted: ", x, 2026, true, 1, 3, ""); e != nil {
+		return e
+	}
 	even, e := z.IsEven(&x.significand)
 	if e != nil {
 		return e
@@ -278,6 +287,9 @@ func (m *ArbitraryFloatManager) roundWithParentContext(mode ArbitraryFloatRoundi
 	}
 	last := !even
 	m.traceFloatDebugText("round", "sign="+traceBoolDigit(x.Sign())+" last="+traceBoolDigit(last)+" round="+traceBoolDigit(round)+" sticky="+traceBoolDigit(sticky), 2040)
+	if e := m.traceRoundValue("before rounding decision: ", x, 2041, false, 0, 0, ""); e != nil {
+		return e
+	}
 	inc := false
 	switch mode {
 	case ArbitraryFloatNearestEven:
@@ -298,6 +310,9 @@ func (m *ArbitraryFloatManager) roundWithParentContext(mode ArbitraryFloatRoundi
 			return e
 		}
 	}
+	if e := m.traceRoundValue("Rounded significand: ", x, 2059, false, 0, 0, ""); e != nil {
+		return e
+	}
 	p, e := m.roundPower(sb, false)
 	if e != nil {
 		return e
@@ -316,6 +331,9 @@ func (m *ArbitraryFloatManager) roundWithParentContext(mode ArbitraryFloatRoundi
 		x.exponent++
 	}
 	sigOverflow := x.exponent > emax
+	if e := m.traceRoundValue("Post-normalized: ", x, 2070, false, 0, 0, ""); e != nil {
+		return e
+	}
 	m.traceFloatDebugText("round", "SIGovf = "+traceBoolDigit(sigOverflow), 2071)
 	hasMaxExponent := x.exponent > emax
 	secondOverflow := sigOverflow && hasMaxExponent

@@ -141,12 +141,12 @@ func TestArbitraryFloatFMABinaryTraceTemporaryFailureCleanup(t *testing.T) {
 	var one ArbitraryFloat
 	serviceMust(t, m.MkOne(11, 53, false, &one))
 	budget.FailAfter(0)
-	_, e := m.traceFMABinaryString(&one, 1, 0)
+	_, e := m.traceFloatBinaryString(&one, 1, 0)
 	budget.FailAfter(-1)
 	if !errors.Is(e, arena.ErrInjectedFailure) || m.binaryString.active {
 		t.Fatalf("binary trace temporary retained after refusal: %v, active %v", e, m.binaryString.active)
 	}
-	text, e := m.traceFMABinaryString(&one, 1, 0)
+	text, e := m.traceFloatBinaryString(&one, 1, 0)
 	serviceMust(t, e)
 	if !strings.Contains(text, "#b") || m.binaryString.active {
 		t.Fatalf("binary trace temporary retry: %q, active %v", text, m.binaryString.active)

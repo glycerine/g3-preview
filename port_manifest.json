@@ -149832,6 +149832,7 @@
         "TestArbitraryFloatSqrtTraceSourceBranches",
         "TestArbitraryFloatRoundSqrtDecisionTrace",
         "TestArbitraryFloatRoundResultClassTrace",
+        "TestArbitraryFloatRoundEntryTraceRefusalBeforeNumericScope",
         "TestArbitraryFloatRoundDecisionTraceBranches",
         "TestArbitraryFloatSetExponentRationalTraceBranches",
         "TestArbitraryFloatSetFormattedLiteralTrace",
@@ -150460,10 +150461,11 @@
           "tests": ["TestArbitraryFloatRoundSqrtDecisionTrace"]
         },
         {
-          "name": "mpf_manager::round mpf_dbg normalization, scalar decision and normal/denormal significand TRACE records at mpf.cpp:2000,2009,2040,2055,2071,2078,2079,2087,2091; float/binary value-formatting remains partial",
-          "status": "partial",
+          "name": "mpf_manager::round retained mpf_dbg entry, normalization, shifted and decision values, scalar decisions, normal/denormal class and final decimal/binary TRACE records at mpf.cpp:1967-2097",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpf_round.go",
-          "tests": ["TestArbitraryFloatRoundDecisionTraceBranches", "TestArbitraryFloatRoundResultClassTrace"]
+          "go_targets": ["pkg/util/numeral/mpf_round_trace.go"],
+          "tests": ["TestArbitraryFloatRoundDecisionTraceBranches", "TestArbitraryFloatRoundResultClassTrace", "TestArbitraryFloatRoundEntryTraceRefusalBeforeNumericScope"]
         },
         {
           "name": "mpf_manager::set(mpz,mpq) mpf_dbg entry, normalized, pre-round fields and result TRACE records at mpf.cpp:235,270,289,300",
@@ -151225,9 +151227,9 @@
       "deviations": [
         "Retained mpf_manager::round_to_integral now emits X and final INTEGRAL, the subunit shortcut tie, unpacked raw A, shift/half-shift powers, quotient and remainder, and nearest-mode tie and increment decisions at their original source sites. Focused trace-enabled and erased checks cover zero and tie shortcuts plus below, exact and above half in the general branch; source-order and block-count checks pass on CPUs 8-16. Whole MPF ownership remains partial.",
         "Retained mpf_manager::sqrt emits entry X after its format assertion, unpacked A on the finite positive path, dec'ed after an inexact root's optional correction, and SQRT after shortcut or general completion. The result formatter runs after successful sqrt-scope source cleanup; formatting failures propagate. Focused trace-enabled and erased tests cover zero shortcut, exact 4 and inexact 2 with nested Round source order. Broader MPF ownership remains partial.",
-        "Retained mpf_manager::round_sqrt emits the owned float text at entry and after successful numeric source cleanup, around its computed last/round/sticky and selected increment at source line 2123. The body trace has no nested formatting while value execution is active. Focused trace-enabled and erased tests cover nearest-even exact halfway, inexact and directed positive decisions, including all three source TRACE blocks in order. Whole-unit MPF ownership remains partial.",
+        "Retained mpf_manager::round_sqrt emits the owned float text at entry and before numeric source cleanup at result, around its computed last/round/sticky and selected increment at source line 2123. Result formatting briefly lifts only the active value guard while keeping the numeric scope executing, then restores it before source cleanup; formatting failure becomes the body cause. Focused trace-enabled and erased tests cover nearest-even exact halfway, inexact and directed positive decisions, including all three source TRACE blocks in order. Whole-unit MPF ownership remains partial.",
         "Retained mpf_manager::round emits NORMAL or DENORMAL significand text before hidden-bit removal or bottom-exponent publication, respectively. Overflow reaches neither record. Focused trace-enabled and erased tests cover each branch and preserve nested setter order. Remaining float/binary trace value formatting and whole-unit ownership stay partial.",
-        "Retained mpf_manager::round now emits its bound/beta/leading-zero/sigma/cap block after shift capping, then the selected left/right shift distance and allocation-free decision records after guard-bit extraction, mode selection and post-normalization overflow comparison. Focused traces cover left/right normalization, halfway-even/away and overflow, including nested setter order. Earlier and later Round float/binary value-formatting records remain open because Round keeps valueExecuting active and their owned temporary lifetime needs separate review; no whole Round TRACE completion is claimed.",
+        "Retained mpf_manager::round now emits all source mpf_dbg TRACE sites from entry to final rounded value. Entry and shifted values include owned decimal/binary formatting with (1,3) extra bits; the final binary formatter receives unsigned32(-1), matching the source's wrapped upper-extra argument. Intermediate and final values use the owned formatter while temporarily lifting only Round's value-execution guard; source numeric scope remains active until after the final record. Focused traces cover left/right normalization, halfway-even/away, overflow, nested setter order, exact block order and an entry formatter refusal before Round scope creation. Whole-unit MPF ownership remains partial.",
         "Retained mpf_manager::set(mpz,mpq) emits its input rational/exponent before output publication. Its nonzero branch emits normalized rational/exponent before the assertion, pre-round significand with the output's old exponent before exponent assignment, then final text after Round or infinity publication; zero emits only entry and result. Direct and nested rational/literal trace tests verify source order and the old-exponent field. Other MPF trace and whole-unit ownership work remains partial.",
         "Retained mpf_manager::set(char const*) emits its input before format publication, parsed sign/fraction/exponent before rational and integer string SET, and ordinary result after child conversion and sign assignment. The borrowed C-string stops at the first NUL; Go string splitting preserves source lowercase-p-before-uppercase-P search. Focused trace-enabled and erased tests cover negative, explicit positive and NUL-terminated inputs, including the nested exponent/rational trace order. Other MPF setter traces and whole-unit ownership remain partial.",
         "Retained mpf_manager::set(mpq) emits source rational input and format before its local zero exponent construction, then emits the ordinary MPF result after the exponent/rational child returns and before the local exponent destructor. Focused trace-enabled and erased tests cover finite and zero rationals, including the nested exponent/rational trace order; other MPF setter traces and whole-unit ownership remain partial.",

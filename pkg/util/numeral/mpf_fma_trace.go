@@ -8,7 +8,7 @@ import (
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
-func (m *ArbitraryFloatManager) traceFMABinaryString(value *ArbitraryFloat, upper, lower uint32) (string, error) {
+func (m *ArbitraryFloatManager) traceFloatBinaryString(value *ArbitraryFloat, upper, lower uint32) (string, error) {
 	var out utext.OwnedString
 	if e := m.ToStringBinary(value, upper, lower, &out); e != nil {
 		cleanup := m.CleanupBinaryString()
@@ -49,7 +49,7 @@ func (m *ArbitraryFloatManager) traceFMAUnpacked(a, b, c *ArbitraryFloat) error 
 				if e := writeNumeralDisplayPart(w, labels[i]); e != nil {
 					return e
 				}
-				binary, e := m.traceFMABinaryString(value, 1, 0)
+				binary, e := m.traceFloatBinaryString(value, 1, 0)
 				if e != nil {
 					formatError = e
 					return e
@@ -85,7 +85,7 @@ func (m *ArbitraryFloatManager) traceFMADecimalBinary(label string, value *Arbit
 			if e := writeNumeralDisplayPart(w, decimal+"\n"+label); e != nil {
 				return e
 			}
-			binary, e := m.traceFMABinaryString(value, 1, 0)
+			binary, e := m.traceFloatBinaryString(value, 1, 0)
 			if e != nil {
 				formatError = e
 				return e
@@ -143,7 +143,7 @@ func (m *ArbitraryFloatManager) traceFMASignificandBinary(decimalLabel, binaryLa
 			if e := writeNumeralDisplayPart(w, s+"\n"+binaryLabel); e != nil {
 				return e
 			}
-			binary, e := m.traceFMABinaryString(value, upper, lower)
+			binary, e := m.traceFloatBinaryString(value, upper, lower)
 			if e != nil {
 				formatError = e
 				return e
@@ -164,7 +164,7 @@ func (m *ArbitraryFloatManager) traceFMAOverflow(value *ArbitraryFloat) error {
 			if e := writeNumeralDisplayPart(w, "Add/Sub overflew into 4.xxx!\nS*= "); e != nil {
 				return e
 			}
-			binary, e := m.traceFMABinaryString(value, 2, 0)
+			binary, e := m.traceFloatBinaryString(value, 2, 0)
 			if e != nil {
 				formatError = e
 				return e
@@ -185,7 +185,7 @@ func (m *ArbitraryFloatManager) traceFMARenormalized(value *ArbitraryFloat, delt
 			if e := writeNumeralDisplayPart(w, "R*= "); e != nil {
 				return e
 			}
-			binary, e := m.traceFMABinaryString(value, 2, 0)
+			binary, e := m.traceFloatBinaryString(value, 2, 0)
 			if e != nil {
 				formatError = e
 				return e

@@ -2,9 +2,11 @@ package numeral
 
 import (
 	"bytes"
+	"errors"
 	"strings"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
@@ -40,10 +42,15 @@ func TestArbitraryFloatRoundDecisionTraceBranches(t *testing.T) {
 		} else {
 			last := -1
 			for _, site := range []struct{ line, body string }{
+				{"1967", "RND: "},
 				{"2000", "e_min_norm = -126\ne_max_norm = 127\nbeta = "},
 				{"2009", "Shift distance: "},
+				{"2026", "Shifted: "},
 				{"2040", "sign=0 last="},
+				{"2041", "before rounding decision: "},
 				{"2055", "Rounding increment -> significand +" + tc.increment},
+				{"2059", "Rounded significand: "},
+				{"2070", "Post-normalized: "},
 				{"2071", "SIGovf = " + tc.overflow},
 				{"2078", "OVF2 = " + tc.overflow},
 				{"2079", "o_has_max_exp = " + tc.overflow},
@@ -55,15 +62,21 @@ func TestArbitraryFloatRoundDecisionTraceBranches(t *testing.T) {
 				}
 				last = at
 			}
-			blocks := 8
+			blocks := 14
 			branch := "round src/util/mpf.cpp:2087"
 			if tc.direction == "(RIGHT)" {
 				branch = "round src/util/mpf.cpp:2091"
 			}
 			if tc.overflow == "1" {
-				blocks = 7
-			} else if !strings.Contains(got, branch) {
+				blocks = 13
+			} else if at := strings.Index(got, branch); at <= last {
 				t.Fatalf("%s result class after decisions: %q", tc.name, got)
+			}
+			if at := strings.Index(got, "round src/util/mpf.cpp:2096 ---------\nROUNDED = "); at <= last {
+				t.Fatalf("%s final round result: %q", tc.name, got)
+			}
+			if !strings.Contains(got, " (hidden bit, unbiased exp).\n") || strings.Count(got, "#b") < 6 {
+				t.Fatalf("%s retained binary result fields: %q", tc.name, got)
 			}
 			if !strings.Contains(got, tc.direction+"\n") || !strings.Contains(got, "sigma_cap = -26\n") || strings.Count(got, "------------------------------------------------\n") != blocks {
 				t.Fatalf("%s round record count: %q", tc.name, got)
@@ -113,6 +126,32 @@ func TestArbitraryFloatRoundResultClassTrace(t *testing.T) {
 		serviceMust(t, m.CleanupRound())
 		serviceMust(t, m.Del(&x))
 	}
+}
+
+func TestArbitraryFloatRoundEntryTraceRefusalBeforeNumericScope(t *testing.T) {
+	m, _, budget := mpfNumeralHelpersFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("mpf_dbg")
+	if !tags.ShouldTrace("mpf_dbg") {
+		return
+	}
+	serviceMust(t, m.BindTrace(tags))
+	var x ArbitraryFloat
+	sig := NewInt(1 << 26)
+	serviceMust(t, m.SetComponents(&x, 8, 24, false, 0, &sig))
+	budget.FailAfter(0)
+	e := m.Round(ArbitraryFloatNearestEven, &x)
+	budget.FailAfter(-1)
+	if !errors.Is(e, arena.ErrInjectedFailure) || m.RoundScope.active || m.RoundScope.Invocation != 0 {
+		t.Fatalf("entry formatter refusal must precede numeric scope: %v, %#v", e, m.RoundScope)
+	}
+	if !strings.Contains(output.String(), "round src/util/mpf.cpp:1967 ---------\nRND: ") {
+		t.Fatalf("entry trace prefix on formatter refusal: %q", output.String())
+	}
+	serviceMust(t, m.Round(ArbitraryFloatNearestEven, &x))
+	serviceMust(t, m.CleanupRound())
+	serviceMust(t, m.Del(&x))
 }
 
 func TestArbitraryFloatRoundSqrtDecisionTrace(t *testing.T) {

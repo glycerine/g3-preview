@@ -10,6 +10,12 @@ import (
 func (m *ArbitraryFloatManager) RoundSqrt(mode ArbitraryFloatRoundingMode, x *ArbitraryFloat) error {
 	return m.RoundSqrtWithReceipt(mode, x, nil)
 }
+func (m *ArbitraryFloatManager) traceRoundSqrtResult(x *ArbitraryFloat) error {
+	saved := m.valueExecuting
+	m.valueExecuting = false
+	defer func() { m.valueExecuting = saved }()
+	return m.traceFloatDebugValueChecked("round_sqrt", "ROUNDED = ", x, 2130)
+}
 func (m *ArbitraryFloatManager) RoundSqrtWithReceipt(mode ArbitraryFloatRoundingMode, x *ArbitraryFloat, r *ArbitraryFloatRoundReceipt) (err error) {
 	if e := m.valueGuard(x); e != nil {
 		return e
@@ -25,14 +31,13 @@ func (m *ArbitraryFloatManager) RoundSqrtWithReceipt(mode ArbitraryFloatRounding
 	*s = ArbitraryFloatRoundScope{Manager: m, Invocation: invocation, active: true, executing: true, receipt: r}
 	m.valueExecuting = true
 	defer func() {
+		if err == nil {
+			err = m.traceRoundSqrtResult(x)
+		}
 		m.valueExecuting = false
 		s.executing = false
 		s.bodyCause = err
 		err = errors.Join(err, m.finishRoundSqrtSource())
-		if err == nil {
-			err = m.traceFloatDebugValueChecked("round_sqrt", "ROUNDED = ", x, 2130)
-			s.bodyCause = err
-		}
 		s.recordRoundHistory()
 	}()
 	z := m.integer

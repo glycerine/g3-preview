@@ -1,4 +1,4 @@
-// Source: src/util/mpf.cpp:2000-2009,2087,2091.
+// Source: src/util/mpf.cpp:1967-2097 (retained mpf_dbg TRACE sites).
 package numeral
 
 import (
@@ -65,6 +65,50 @@ func (m *ArbitraryFloatManager) traceRoundSignificandBranch(significand *Int, no
 				return e
 			}
 			return writeNumeralDisplayPart(w, s+"\n")
+		})
+	return formatError
+}
+
+// Source TRACE formatting borrows the partially rounded value while the
+// numeric body owns its scope. Only the concrete formatter call is nested.
+func (m *ArbitraryFloatManager) formatRoundTraceValue(value *ArbitraryFloat, binary bool, upper, lower uint32) (string, error) {
+	saved := m.valueExecuting
+	m.valueExecuting = false
+	defer func() { m.valueExecuting = saved }()
+	if binary {
+		return m.traceFloatBinaryString(value, upper, lower)
+	}
+	return m.formatFloatTraceValue(value)
+}
+
+func (m *ArbitraryFloatManager) traceRoundValue(label string, value *ArbitraryFloat, line int, binary bool, upper, lower uint32, suffix string) error {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return nil
+	}
+	var formatError error
+	_ = tags.EmitConditional("mpf_dbg", "round", "src/util/mpf.cpp", line,
+		func() bool { return true }, func(w io.Writer) error {
+			if e := writeNumeralDisplayPart(w, label); e != nil {
+				return e
+			}
+			decimal, e := m.formatRoundTraceValue(value, false, 0, 0)
+			if e != nil {
+				formatError = e
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, decimal+"\n"); e != nil {
+				return e
+			}
+			if !binary {
+				return nil
+			}
+			bits, e := m.formatRoundTraceValue(value, true, upper, lower)
+			if e != nil {
+				formatError = e
+				return e
+			}
+			return writeNumeralDisplayPart(w, bits+suffix+"\n")
 		})
 	return formatError
 }
