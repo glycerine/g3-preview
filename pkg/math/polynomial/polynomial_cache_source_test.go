@@ -91,3 +91,61 @@ func TestPolynomialCacheCanonicalizationAndReset(t *testing.T) {
 		t.Fatal("closed cache accepted lookup", e)
 	}
 }
+
+func TestPolynomialCachePSCChainCanonicalKeyAndReplay(t *testing.T) {
+	m := polynomialPSCFullFixture(t)
+	c, e := NewPolynomialCache(m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, c.Close()) })
+	out, e := NewPolynomialRefVector(m.core)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, out.Close()) })
+	p := polynomialQueryTerms(t, m.core, []int32{1, 1, 1, 2}, [][]MonomialPower{{{0, 1}, {1, 2}}, {{0, 1}, {1, 1}}, {{1, 1}}, nil})
+	q := polynomialQueryTerms(t, m.core, []int32{1, 3}, [][]MonomialPower{{{0, 1}, {1, 1}}, nil})
+	pCopy := polynomialQueryTerms(t, m.core, []int32{2, 1, 1, 1}, [][]MonomialPower{nil, {{1, 1}}, {{0, 1}, {1, 1}}, {{0, 1}, {1, 2}}})
+	qCopy := polynomialQueryTerms(t, m.core, []int32{3, 1}, [][]MonomialPower{nil, {{0, 1}, {1, 1}}})
+	serviceMust(t, c.PSCChain(p, q, 1, out))
+	n, e := out.Size()
+	serviceMust(t, e)
+	if n == 0 {
+		t.Fatal("source PSC fixture produced no result")
+	}
+	first := make([]Polynomial, n)
+	for i := range first {
+		first[i], e = out.Get(uint32(i))
+		serviceMust(t, e)
+	}
+	invocation := m.core.pscLocal.invocation
+	serviceMust(t, out.Reset())
+	for _, value := range first {
+		if _, e := m.core.Info(value); e != nil {
+			t.Fatal("cache lost its result reference", e)
+		}
+	}
+	serviceMust(t, c.PSCChain(pCopy, qCopy, 1, out))
+	if m.core.pscLocal.invocation != invocation {
+		t.Fatal("equal canonical pair recomputed PSC chain")
+	}
+	got, e := out.Size()
+	serviceMust(t, e)
+	if got != n {
+		t.Fatal("cached PSC result length", got, n)
+	}
+	for i, want := range first {
+		value, e := out.Get(uint32(i))
+		serviceMust(t, e)
+		if value != want {
+			t.Fatal("cached PSC result changed identity", i)
+		}
+	}
+	serviceMust(t, c.PSCChain(q, p, 1, out))
+	if m.core.pscLocal.invocation == invocation {
+		t.Fatal("reversed inputs reused an ordered PSC cache key")
+	}
+	invocation = m.core.pscLocal.invocation
+	serviceMust(t, c.Reset())
+	serviceMust(t, c.PSCChain(p, q, 1, out))
+	if m.core.pscLocal.invocation == invocation {
+		t.Fatal("reset retained PSC memoized entry")
+	}
+}

@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/polynomial_cache.cpp:83-92,129-139,203-227.
+// Source: src/math/polynomial/polynomial_cache.cpp:35-92,129-166,203-227.
 package polynomial
 
 import (
@@ -8,17 +8,28 @@ import (
 )
 
 // PolynomialCache owns canonical representatives used by the retained NLSAT
-// cache. PSC-chain and factor result memoization are separate remaining paths.
+// cache. Factor result memoization is a separate remaining path.
 type PolynomialCache struct {
 	self      *PolynomialCache
 	manager   *MultivariatePolynomialManager
 	refs      polynomialReferenceVector
 	buckets   map[uint32][]Polynomial
 	ids       map[uint32]bool
+	psc       map[polynomialPSCKey]*polynomialPSCEntry
 	header    uint64
 	resetting bool
 	closing   bool
 	closed    bool
+}
+
+type polynomialPSCKey struct {
+	p, q Polynomial
+	x    uint32
+}
+
+type polynomialPSCEntry struct {
+	result   []Polynomial
+	complete bool
 }
 
 func NewPolynomialCache(m *MultivariatePolynomialManager) (*PolynomialCache, error) {
@@ -29,9 +40,71 @@ func NewPolynomialCache(m *MultivariatePolynomialManager) (*PolynomialCache, err
 	if e := m.core.integer.Budget().Reserve(header); e != nil {
 		return nil, e
 	}
-	c := &PolynomialCache{manager: m, header: header, buckets: make(map[uint32][]Polynomial), ids: make(map[uint32]bool)}
+	c := &PolynomialCache{manager: m, header: header, buckets: make(map[uint32][]Polynomial), ids: make(map[uint32]bool), psc: make(map[polynomialPSCKey]*polynomialPSCEntry)}
 	c.self = c
 	return c, nil
+}
+
+// PSCChain memoizes the source ordered pair and variable after canonicalizing
+// both inputs. A failed computation retains its inserted entry until Reset.
+func (c *PolynomialCache) PSCChain(p, q Polynomial, x uint32, out *PolynomialRefVector) error {
+	if e := c.ready(); e != nil {
+		return e
+	}
+	var e error
+	p, e = c.MkUnique(p)
+	if e != nil {
+		return e
+	}
+	q, e = c.MkUnique(q)
+	if e != nil {
+		return e
+	}
+	key := polynomialPSCKey{p: p, q: q, x: x}
+	if entry, ok := c.psc[key]; ok {
+		if !entry.complete {
+			return ErrPolynomialPending
+		}
+		if out == nil || out.owner != c.manager.core {
+			return ErrPolynomialOwner
+		}
+		if e := out.Reset(); e != nil {
+			return e
+		}
+		for _, value := range entry.result {
+			if e := out.Push(value); e != nil {
+				return e
+			}
+		}
+		return nil
+	}
+	entry := &polynomialPSCEntry{}
+	c.psc[key] = entry
+	if e := c.manager.PSCChain(p, q, x, out); e != nil {
+		return e
+	}
+	n, e := out.Size()
+	if e != nil {
+		return e
+	}
+	result := make([]Polynomial, n)
+	for i := uint32(0); i < n; i++ {
+		value, e := out.Get(i)
+		if e != nil {
+			return e
+		}
+		value, e = c.MkUnique(value)
+		if e != nil {
+			return e
+		}
+		if e := out.setWithReceipt(i, value, nil); e != nil {
+			return e
+		}
+		result[i] = value
+	}
+	entry.result = result
+	entry.complete = true
+	return nil
 }
 
 func (c *PolynomialCache) ready() error {
@@ -87,6 +160,7 @@ func (c *PolynomialCache) Reset() error {
 	if e := c.ready(); e != nil {
 		return e
 	}
+	clear(c.psc)
 	if e := c.refs.reset(c.manager.core); e != nil {
 		c.resetting = true
 		return e
@@ -111,6 +185,7 @@ func (c *PolynomialCache) CleanupReset() error {
 	}
 	clear(c.buckets)
 	clear(c.ids)
+	clear(c.psc)
 	c.resetting = false
 	return nil
 }
@@ -130,6 +205,7 @@ func (c *PolynomialCache) Close() error {
 	c.header = 0
 	c.buckets = nil
 	c.ids = nil
+	c.psc = nil
 	c.closed = true
 	return nil
 }
