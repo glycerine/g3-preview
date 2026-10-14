@@ -612,7 +612,7 @@ func infAuditRoots(t *testing.T, s *RationalService, inf []*OwnedInfRational, ra
 	qopsAuditLiveOwnership(t, s.Manager, roots)
 }
 func TestInfRationalFailurePrefixesImmediateRoots(t *testing.T) {
-	for op := 0; op < 15; op++ {
+	for op := 0; op < 17; op++ {
 		success := false
 		failures := 0
 		for prefix := int64(0); prefix < 4096; prefix++ {
@@ -620,7 +620,7 @@ func TestInfRationalFailurePrefixesImmediateRoots(t *testing.T) {
 			config := serviceConfig(budget)
 			// Scalar arithmetic and integer floor copies reuse pooled storage; select
 			// the supported direct profile to exercise real source malloc refusals.
-			if op == 9 || op == 10 || op == 12 {
+			if op == 9 || op == 10 || op == 12 || op == 15 || op == 16 {
 				config.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 			}
 			s, e := NewRationalService(config)
@@ -629,6 +629,10 @@ func TestInfRationalFailurePrefixesImmediateRoots(t *testing.T) {
 			eps := new(big.Int).Add(new(big.Int).Lsh(big.NewInt(1), 175), big.NewInt(5)).String()
 			qa := serviceValue(t, s, huge)
 			qe := serviceValue(t, s, eps)
+			var qproj OwnedRational
+			if op == 16 {
+				qproj = serviceValue(t, s, huge+"/"+eps)
+			}
 			qb := serviceValue(t, s, "7/5")
 			qm := serviceValue(t, s, "-3/2")
 			c := serviceValue(t, s, "3/2")
@@ -638,6 +642,11 @@ func TestInfRationalFailurePrefixesImmediateRoots(t *testing.T) {
 			serviceMust(t, e)
 			serviceMust(t, s.InfSetPair(&a, &qa, &qe))
 			serviceMust(t, s.InfSetPair(&b, &qb, &qm))
+			if op == 15 {
+				serviceMust(t, s.InfSetRational(&a, &qa))
+			} else if op == 16 {
+				serviceMust(t, s.InfSetRational(&a, &qproj))
+			}
 			var value OwnedInfRational
 			var rational OwnedRational
 			budget.FailAfter(prefix)
@@ -672,10 +681,14 @@ func TestInfRationalFailurePrefixesImmediateRoots(t *testing.T) {
 				_, e = s.InfString(&a)
 			case 14:
 				e = s.InfCopy(&b, &a)
+			case 15:
+				value, e = s.InfNumerator(&a)
+			case 16:
+				value, e = s.InfDenominator(&a)
 			}
 			// Audit BEFORE String, Del, Close, or restoring the injected budget. Only
 			// actual public roots plus service-owned constants/cache can justify cells.
-			infAuditRoots(t, s, []*OwnedInfRational{&a, &b, &value}, []*OwnedRational{&qa, &qe, &qb, &qm, &c, &rational})
+			infAuditRoots(t, s, []*OwnedInfRational{&a, &b, &value}, []*OwnedRational{&qa, &qproj, &qe, &qb, &qm, &c, &rational})
 			if e != nil {
 				if !numericPhysicalReservationRefusal(e) {
 					t.Fatal(op, prefix, e)

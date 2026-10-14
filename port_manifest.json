@@ -125416,25 +125416,14 @@
           ]
         },
         {
-          "name": "numerator/denominator source domain branches and owning projections",
-          "status": "partial",
+          "name": "numerator/denominator: debug epsilon-zero assertion, first-component extraction and owning result (inf_rational.h:157-165)",
+          "status": "ported",
           "go_target": "pkg/util/numeral/inf_rational.go",
           "tests": [
             "TestInfRationalSource80Assertions",
-            "TestInfRationalApproximationFrozenBranches",
-            "TestInfRationalOwnershipErrors",
-            "TestInfRationalIndependentFiniteBounds",
             "TestInfRationalFullHeaderQueriesAndAliases",
-            "TestInfRationalRawStateComparisonRoutes",
             "TestInfRationalFailurePrefixesImmediateRoots",
-            "TestInfRationalComponentAliasSourceRereads",
-            "TestInfRationalIncrementSourceRationalRoute",
-            "TestInfRationalCompoundReturnCopyFailure",
-            "TestInfRationalCoarseRootAndFusedComponentAlias",
-            "TestInfRationalIntegerConstructorCopyRoute",
-            "TestRationalServiceInfinitesimalHeaderOwnership",
-            "TestRationalServiceInfinitesimalConstructorFailureRefunds",
-            "TestRationalServiceInfinitesimalFinalizerTraversal"
+            "TestInfRationalOwnershipErrors"
           ]
         },
         {
