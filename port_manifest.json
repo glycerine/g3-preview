@@ -52802,6 +52802,8 @@
         "pkg/math/subpaving/arbitrary_statistics_test.go",
         "pkg/math/subpaving/rational_statistics.go",
         "pkg/math/subpaving/rational_statistics_test.go",
+        "pkg/math/subpaving/rational_display.go",
+        "pkg/math/subpaving/rational_display_test.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
@@ -52910,6 +52912,7 @@
         "TestArbitrarySearchBreadthFirstLimitAndChildResume",
         "TestArbitraryStatisticsConflictLeafAndTreeCleanup",
         "TestRationalStatisticsConflictResetAndNodeRetention",
+        "TestRationalDisplayDefinitionsClausesLeavesAndWriterPrefix",
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFixedNodeBoundPredicates",
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
@@ -53323,6 +53326,18 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete config_mpq source-order definition, inequality, clause and consistent leaf-bound display with borrowed variable printer (src/math/subpaving/subpaving_t_def.h:254-282,376-416,636-650,1135-1155,1848-1861)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_display.go",
+          "go_targets": [
+            "pkg/math/subpaving/tactic/rational_core_tactic_test.go"
+          ],
+          "tests": [
+            "TestRationalDisplayDefinitionsClausesLeavesAndWriterPrefix",
+            "TestRationalCoreTacticBorrowedGoalStatisticsAndFreshCleanup"
+          ]
+        },
         {
           "name": "Concrete config_mpq reset_statistics and collect_statistics preserve live node count and emit five source-order nonzero counters (src/math/subpaving/subpaving_t_def.h:1869-1884)",
           "status": "ported",
@@ -54221,6 +54236,7 @@
         "pkg/math/subpaving/tactic/rational_expr_converter_test.go",
         "pkg/math/subpaving/tactic/rational_core_tactic.go",
         "pkg/math/subpaving/tactic/rational_core_tactic_test.go",
+        "pkg/math/subpaving/tactic/rational_variable_display.go",
         "pkg/math/subpaving/tactic/arbitrary_engine.go",
         "pkg/math/subpaving/tactic/arbitrary_engine_test.go",
         "pkg/math/subpaving/tactic/goal_internalize.go",
@@ -54255,7 +54271,19 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Concrete MPQ core tactic default apply returns borrowed goal, accumulates/reset statistics, forwards params and reconstructs converter/context on cleanup; print_nodes display remains open (src/math/subpaving/tactic/subpaving_tactic.cpp:193-263)",
+          "name": "Concrete MPQ print_nodes emits mapped SMT2 variable names, generated definition names, constraints, header and leaf bounds through a nonthrowing borrowed writer; wider interpreted expression display remains open (src/math/subpaving/tactic/subpaving_tactic.cpp:32-49,193-205)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/tactic/rational_variable_display.go",
+          "go_targets": [
+            "pkg/math/subpaving/tactic/rational_core_tactic.go"
+          ],
+          "tests": [
+            "TestRationalExprConverterExactLeafGoalAndCleanup",
+            "TestRationalCoreTacticBorrowedGoalStatisticsAndFreshCleanup"
+          ]
+        },
+        {
+          "name": "Concrete MPQ core tactic returns borrowed goal, accumulates/reset statistics, forwards params and reconstructs converter/context on cleanup; full SMT2 display and exception transport remain open (src/math/subpaving/tactic/subpaving_tactic.cpp:193-263)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/tactic/rational_core_tactic.go",
           "tests": [
@@ -54263,7 +54291,7 @@
           ]
         },
         {
-          "name": "Concrete MPQ inequality and clause internalization plus goal-order search for arithmetic leaves and compound terms; print_nodes display remains open (src/math/subpaving/tactic/subpaving_tactic.cpp:128-190)",
+          "name": "Concrete MPQ inequality and clause internalization plus goal-order search for arithmetic leaves and compound terms; full source exception transport remains open (src/math/subpaving/tactic/subpaving_tactic.cpp:128-190)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/tactic/rational_expr_converter.go",
           "tests": [

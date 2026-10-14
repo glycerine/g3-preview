@@ -4,6 +4,8 @@ package tactic
 
 import (
 	"errors"
+	"io"
+	"os"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
@@ -17,7 +19,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-var ErrRationalCorePrintNodes = errors.New("subpaving tactic: rational print_nodes display is not yet ported")
+var ErrRationalCorePrintNodes = errors.New("subpaving tactic: SMT2 display for this mapped rational expression is not yet ported")
 
 // RationalCoreTactic owns an MPQ engine, its expression converter and one
 // parameter snapshot. The AST manager, rational manager and goals are borrowed.
@@ -129,7 +131,12 @@ func (t *RationalCoreTactic) BindCooperation(owner *cooperate.Cooperation) error
 
 // Apply internalizes and searches the borrowed goal. The source core tactic
 // returns the same goal and no model, proof or dependency converter.
-func (t *RationalCoreTactic) Apply(g *goaltactic.Goal) (result *goaltactic.Goal, err error) {
+func (t *RationalCoreTactic) Apply(g *goaltactic.Goal) (*goaltactic.Goal, error) {
+	return t.ApplyWithOutput(g, os.Stdout)
+}
+
+// ApplyWithOutput routes optional print_nodes text to a borrowed writer.
+func (t *RationalCoreTactic) ApplyWithOutput(g *goaltactic.Goal, out io.Writer) (result *goaltactic.Goal, err error) {
 	if err := t.open(); err != nil {
 		return nil, err
 	}
@@ -146,8 +153,8 @@ func (t *RationalCoreTactic) Apply(g *goaltactic.Goal) (result *goaltactic.Goal,
 	if err != nil {
 		return nil, err
 	}
-	if options.PrintNodes {
-		return nil, ErrRationalCorePrintNodes
+	if options.PrintNodes && out == nil {
+		return nil, arena.ErrInvalidSlot
 	}
 	defer func() {
 		var source z3exception.Z3Exception
@@ -165,11 +172,30 @@ func (t *RationalCoreTactic) Apply(g *goaltactic.Goal) (result *goaltactic.Goal,
 	if err != nil {
 		return nil, err
 	}
+	display, err := t.converter.VariableDisplay(t.pc.SymbolsField)
+	if err != nil {
+		return nil, err
+	}
+	if err := context.SetVariableDisplay(display); err != nil {
+		return nil, err
+	}
 	if err := context.Search(); err != nil {
 		if errors.Is(err, subpaving.ErrSubpavingFailure) {
 			return nil, goaltactic.NewTacticException("failed building subpaving tree...")
 		}
 		return nil, err
+	}
+	if options.PrintNodes {
+		stream := &fastTacticOutput{out: out}
+		if err := context.DisplayConstraints(stream, false); err != nil {
+			return nil, err
+		}
+		if err := fastWriteDisplay(stream, "bounds at leaves: \n"); err != nil {
+			return nil, err
+		}
+		if err := context.DisplayBounds(stream); err != nil {
+			return nil, err
+		}
 	}
 	var current statistics.Statistics
 	if err := context.CollectStatistics(&current); err != nil {

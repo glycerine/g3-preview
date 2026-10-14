@@ -19,6 +19,7 @@ type RationalContext struct {
 	numbers          *numeral.RationalManager
 	limit            *control.Reslimit
 	cooperation      *cooperate.Cooperation
+	displayVariable  RationalVariableDisplay
 	runtime          *memory.Runtime
 	process          *memory.ProcessAccounting
 	maxMemory        uint64
@@ -305,6 +306,7 @@ func (c *RationalContext) Close() error {
 	c.queue, c.queueHead = nil, 0
 	c.searchNode = nil
 	c.cooperation = nil
+	c.displayVariable = nil
 	c.closed = true
 	return nil
 }

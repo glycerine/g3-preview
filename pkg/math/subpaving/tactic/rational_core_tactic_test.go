@@ -1,6 +1,7 @@
 package tactic
 
 import (
+	"bytes"
 	"errors"
 	"testing"
 
@@ -129,8 +130,26 @@ func TestRationalCoreTacticBorrowedGoalStatisticsAndFreshCleanup(t *testing.T) {
 	if err := core.UpdateParams(&p); err != nil {
 		t.Fatal(err)
 	}
-	if result, err := core.Apply(goal); result != nil || !errors.Is(err, ErrRationalCorePrintNodes) {
-		t.Fatal("unported display route must refuse before mutation", result, err)
+	if result, err := core.ApplyWithOutput(goal, nil); result != nil || !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatal("print route requires writer", result, err)
+	}
+	if err := core.Cleanup(); err != nil {
+		t.Fatal(err)
+	}
+	var shown bytes.Buffer
+	if result, err := core.ApplyWithOutput(goal, &shown); err != nil || result != goal {
+		t.Fatal("source print_nodes result", result, err)
+	}
+	complete := "x <= 3/2\nbounds at leaves: \nx <= 3/2\n"
+	if shown.String() != complete {
+		t.Fatal("source print_nodes text", shown.String())
+	}
+	if err := core.Cleanup(); err != nil {
+		t.Fatal(err)
+	}
+	short := &shortFastTacticOutput{limit: 6, withError: true}
+	if result, err := core.ApplyWithOutput(goal, short); err != nil || result != goal || short.String() != complete[:6] || short.calls == 0 {
+		t.Fatal("nonthrowing output prefix", result, err, short.String())
 	}
 	if err := core.Close(); err != nil {
 		t.Fatal(err)

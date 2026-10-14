@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"math"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -234,6 +236,20 @@ func TestRationalExprConverterExactLeafGoalAndCleanup(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	display, err := converter.VariableDisplay(sy)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := context.SetVariableDisplay(display); err != nil {
+		t.Fatal(err)
+	}
+	var named bytes.Buffer
+	if err := context.DisplayConstraints(&named, false); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(named.String(), "k!"+strconv.FormatUint(uint64(sumVar), 10)+" = ") || !strings.Contains(named.String(), "x <= 3/2") {
+		t.Fatal("inverse AST and generated variable display", named.String())
+	}
 	root, err := context.Root()
 	if err != nil {
 		t.Fatal(err)
@@ -278,6 +294,9 @@ func TestRationalExprConverterExactLeafGoalAndCleanup(t *testing.T) {
 	}
 	if err := converter.Close(); err != nil {
 		t.Fatal(err)
+	}
+	if err := display(&named, variable); !errors.Is(err, arena.ErrClosed) {
+		t.Fatal("closed variable display borrow", err)
 	}
 	refsAfter, err := m.GetRefCount(sum)
 	if err != nil || refsBefore != refsAfter+1 {
