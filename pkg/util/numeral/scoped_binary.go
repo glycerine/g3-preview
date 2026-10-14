@@ -86,8 +86,9 @@ func (s *ScopedBinary) Clone() (*ScopedBinary, error) {
 		return nil, e
 	}
 	if e = r.Set(&s.num); e != nil {
-		r.Close()
-		return nil, e
+		// A failed source copy constructor has no scoped destructor; retain
+		// its partially acquired numeral for explicit owning cleanup.
+		return nil, &ScopedBinaryExpressionCleanupError{Cause: e, local: r}
 	}
 	return r, nil
 }
@@ -241,12 +242,12 @@ func (s *ScopedBinary) value(other *ScopedBinary, op uint8) (*ScopedBinary, erro
 	}
 	return s.valueRaw(&other.num, op)
 }
-func (s *ScopedBinary) valueRaw(other *BinaryRational, op uint8) (*ScopedBinary, error) {
+func (s *ScopedBinary) valueRaw(other *BinaryRational, op uint8) (result *ScopedBinary, err error) {
 	r, e := s.Clone()
 	if e != nil {
 		return nil, e
 	}
-	defer r.Close()
+	defer finishScopedBinaryExpressionSource(&result, &err, r)
 	if e = r.compoundRaw(other, op); e != nil {
 		return nil, e
 	}
@@ -264,7 +265,7 @@ func (s *ScopedBinary) SubValue(other *BinaryRational) (*ScopedBinary, error) {
 func (s *ScopedBinary) MulValue(other *BinaryRational) (*ScopedBinary, error) {
 	return s.valueRaw(other, 2)
 }
-func (s *ScopedBinary) macroValue(n *Int, op uint8) (*ScopedBinary, error) {
+func (s *ScopedBinary) macroValue(n *Int, op uint8) (result *ScopedBinary, err error) {
 	if _, e := s.Get(); e != nil {
 		return nil, e
 	}
@@ -275,7 +276,7 @@ func (s *ScopedBinary) macroValue(n *Int, op uint8) (*ScopedBinary, error) {
 	if e != nil {
 		return nil, e
 	}
-	defer b.Close()
+	defer finishScopedBinaryExpressionSource(&result, &err, b)
 	if e = b.SetInteger(n); e != nil {
 		return nil, e
 	}
@@ -292,7 +293,7 @@ func (s *ScopedBinary) macroValue(n *Int, op uint8) (*ScopedBinary, error) {
 		e = s.manager.Mul(&s.num, &b.num, &r.num)
 	}
 	if e != nil {
-		r.Close()
+		finishScopedBinaryExpressionSource(&result, &e, r)
 		return nil, e
 	}
 	return r, nil
