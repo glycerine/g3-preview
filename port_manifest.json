@@ -51676,13 +51676,15 @@
         "pkg/math/subpaving/rational_interval.go",
         "pkg/math/subpaving/rational_interval_arith.go",
         "pkg/math/subpaving/rational_interval_scalar.go",
-        "pkg/math/subpaving/rational_interval_mul.go"
+        "pkg/math/subpaving/rational_interval_mul.go",
+        "pkg/math/subpaving/rational_interval_div.go"
       ],
       "tests": [
         "TestSubpavingRationalMutableIntervalCore",
         "TestSubpavingRationalIntervalNegAddSubAndAlias",
         "TestSubpavingRationalIntervalScalarSourceBranches",
-        "TestSubpavingRationalIntervalMulNineSignClassesAndTies"
+        "TestSubpavingRationalIntervalMulNineSignClassesAndTies",
+        "TestSubpavingRationalIntervalDivSixSignAndOpenZeroBranches"
       ],
       "conditionals": [
         {
@@ -51753,6 +51755,8 @@
         "pkg/math/subpaving/rational_interval_scalar_test.go",
         "pkg/math/subpaving/rational_interval_mul.go",
         "pkg/math/subpaving/rational_interval_mul_test.go",
+        "pkg/math/subpaving/rational_interval_div.go",
+        "pkg/math/subpaving/rational_interval_div_test.go",
         "pkg/math/subpaving/fast_interval.go",
         "pkg/math/subpaving/fast_interval_test.go",
         "pkg/math/subpaving/fast_interval_arith.go",
@@ -52090,6 +52094,14 @@
           "go_target": "pkg/math/subpaving/rational_interval_mul.go",
           "tests": [
             "TestSubpavingRationalIntervalMulNineSignClassesAndTies"
+          ]
+        },
+        {
+          "name": "Concrete config_mpq interval division six sign branches, open-zero and infinite denominators, zero numerator, denominator alias and numerator alias guard; source interval_bug TRACE records remain open (src/math/interval/interval_def.h:1672-1849)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/rational_interval_div.go",
+          "tests": [
+            "TestSubpavingRationalIntervalDivSixSignAndOpenZeroBranches"
           ]
         },
         {
@@ -120022,13 +120034,15 @@
           "go_targets": [
             "pkg/math/subpaving/rational_interval_arith.go",
             "pkg/math/subpaving/rational_interval_scalar.go",
-            "pkg/math/subpaving/rational_interval_mul.go"
+            "pkg/math/subpaving/rational_interval_mul.go",
+            "pkg/math/subpaving/rational_interval_div.go"
           ],
           "tests": [
             "TestSubpavingRationalMutableIntervalCore",
             "TestSubpavingRationalIntervalNegAddSubAndAlias",
             "TestSubpavingRationalIntervalScalarSourceBranches",
-            "TestSubpavingRationalIntervalMulNineSignClassesAndTies"
+            "TestSubpavingRationalIntervalMulNineSignClassesAndTies",
+            "TestSubpavingRationalIntervalDivSixSignAndOpenZeroBranches"
           ]
         },
         {
