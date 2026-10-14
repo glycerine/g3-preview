@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/insdict"
 )
@@ -66,6 +67,7 @@ type ArbitraryFloatManager struct {
 	integer                                                 *IntegerManager                 // source reference to the exact same mpq base
 	powers                                                  [4]insdict.Dict[uint32, uint32] // p, pn, pm1, pm1n
 	memory                                                  *umemory.Runtime
+	trace                                                   *diagnostic.TraceTags
 	budget                                                  *arena.Budget
 	valueExecuting                                          bool
 	valueCopy                                               integerCopyAllocationReceipt

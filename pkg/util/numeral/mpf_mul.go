@@ -15,6 +15,12 @@ func (m *ArbitraryFloatManager) Mul(mode ArbitraryFloatRoundingMode, x, y, out *
 	if m.mul.active {
 		return ErrNumericPending
 	}
+	m.traceMulEntry(mode, x, y)
+	defer func() {
+		if cause == nil {
+			m.traceMulResult(out)
+		}
+	}()
 	if modularSourceDebug && (x.SBits() != y.SBits() || x.EBits() != y.EBits()) {
 		return ErrIntegerAssertion
 	}
