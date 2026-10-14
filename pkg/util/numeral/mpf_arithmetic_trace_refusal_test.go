@@ -1,4 +1,4 @@
-// Source: src/util/mpf.cpp:541,670,752; numeric formatting inside TRACE.
+// Source: src/util/mpf.cpp:541-542,670-742,752-754; numeric formatting inside TRACE.
 package numeral
 
 import (
@@ -36,24 +36,27 @@ func TestArbitraryFloatArithmeticDebugTraceFormatterRefusals(t *testing.T) {
 	if !probe.ShouldTrace("mpf_dbg") {
 		return
 	}
+	// The integer-only records call Int.String without a budgeted reservation;
+	// this campaign can reach formatter refusals only in the float records.
 	for _, tc := range []struct {
-		name, site, next string
-		invoke           func(*ArbitraryFloatManager, *ArbitraryFloat, *ArbitraryFloat, *ArbitraryFloat) error
-		cleanup          func(*ArbitraryFloatManager) error
+		name    string
+		sites   []string
+		invoke  func(*ArbitraryFloatManager, *ArbitraryFloat, *ArbitraryFloat, *ArbitraryFloat) error
+		cleanup func(*ArbitraryFloatManager) error
 	}{
-		{"add_sub", "541", "542", func(m *ArbitraryFloatManager, x, y, out *ArbitraryFloat) error {
+		{"add_sub", []string{"541", "542"}, func(m *ArbitraryFloatManager, x, y, out *ArbitraryFloat) error {
 			return m.Add(ArbitraryFloatNearestEven, x, y, out)
 		}, (*ArbitraryFloatManager).CleanupAddSub},
-		{"div", "670", "671", func(m *ArbitraryFloatManager, x, y, out *ArbitraryFloat) error {
+		{"div", []string{"670", "671", "722", "723", "734", "742"}, func(m *ArbitraryFloatManager, x, y, out *ArbitraryFloat) error {
 			return m.Div(ArbitraryFloatNearestEven, x, y, out)
 		}, (*ArbitraryFloatManager).CleanupDiv},
-		{"fma", "752", "753", func(m *ArbitraryFloatManager, x, y, out *ArbitraryFloat) error {
+		{"fma", []string{"752", "753", "754"}, func(m *ArbitraryFloatManager, x, y, out *ArbitraryFloat) error {
 			return m.FMA(ArbitraryFloatNearestEven, x, y, y, out)
 		}, (*ArbitraryFloatManager).CleanupFMA},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			found := false
-			for ordinal := int64(0); ordinal < 128 && !found; ordinal++ {
+			found := make(map[string]bool)
+			for ordinal := int64(0); ordinal < 512 && len(found) != len(tc.sites); ordinal++ {
 				t.Run(strconv.FormatInt(ordinal, 10), func(t *testing.T) {
 					m, _, budget := mpfNumeralHelpersFixture(t)
 					var output bytes.Buffer
@@ -70,14 +73,22 @@ func TestArbitraryFloatArithmeticDebugTraceFormatterRefusals(t *testing.T) {
 					if body != nil && !numericPhysicalReservationRefusal(body) {
 						t.Fatalf("unexpected arithmetic refusal: %v", body)
 					}
-					header := []byte(tc.name + " src/util/mpf.cpp:" + tc.site + " ---------")
-					next := []byte(tc.name + " src/util/mpf.cpp:" + tc.next + " ---------")
-					if body != nil && bytes.Contains(output.Bytes(), header) && !bytes.Contains(output.Bytes(), next) {
-						found = true
-						if x != beforeX || y != beforeY || tc.name != "add_sub" && out != beforeOut {
-							t.Fatal("first debug formatter refusal changed operands or output")
+					for _, site := range tc.sites {
+						header := []byte("-------- [mpf_dbg] " + tc.name + " src/util/mpf.cpp:" + site + " ---------\n")
+						at := bytes.Index(output.Bytes(), header)
+						if body == nil || at < 0 {
+							continue
 						}
-						if tc.name != "add_sub" && (m.div.active || m.fma.active) {
+						record := output.Bytes()[at+len(header):]
+						end := bytes.Index(record, []byte("------------------------------------------------\n"))
+						if end >= 0 {
+							continue
+						}
+						found[site] = true
+						if x != beforeX || y != beforeY || tc.name != "add_sub" && site == tc.sites[0] && out != beforeOut {
+							t.Fatal("debug formatter refusal changed borrowed operands or entry output")
+						}
+						if tc.name != "add_sub" && site == tc.sites[0] && (m.div.active || m.fma.active) {
 							t.Fatal("entry formatter refusal reached arithmetic scope")
 						}
 					}
@@ -88,8 +99,10 @@ func TestArbitraryFloatArithmeticDebugTraceFormatterRefusals(t *testing.T) {
 					closeMpfAfterTraceRefusal(t, m)
 				})
 			}
-			if !found {
-				t.Fatalf("formatter refusal did not reach source line %s", tc.site)
+			for _, site := range tc.sites {
+				if !found[site] {
+					t.Errorf("formatter refusal did not reach source line %s", site)
+				}
 			}
 		})
 	}
