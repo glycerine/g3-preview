@@ -63,44 +63,51 @@ func (m *ArbitraryFloatManager) traceFloatString(w io.Writer, value *ArbitraryFl
 	return writeNumeralDisplayPart(w, text)
 }
 
-func (m *ArbitraryFloatManager) traceMulEntry(mode ArbitraryFloatRoundingMode, x, y *ArbitraryFloat) {
+func (m *ArbitraryFloatManager) traceMulEntry(mode ArbitraryFloatRoundingMode, x, y *ArbitraryFloat) error {
 	tags := m.floatTraceTags()
 	if !tags.ShouldTrace("mpf_mul_bug") {
-		return
+		return nil
 	}
+	var formatError error
 	_ = tags.EmitConditional("mpf_mul_bug", "mul", "src/util/mpf.cpp", 590,
 		func() bool { return true }, func(w io.Writer) error {
 			if e := writeNumeralDisplayPart(w, "rm: "+strconv.FormatUint(uint64(mode), 10)+"\nX: "); e != nil {
 				return e
 			}
 			if e := m.traceFloatString(w, x); e != nil {
+				formatError = e
 				return e
 			}
 			if e := writeNumeralDisplayPart(w, "\nY: "); e != nil {
 				return e
 			}
 			if e := m.traceFloatString(w, y); e != nil {
+				formatError = e
 				return e
 			}
 			return writeNumeralDisplayPart(w, "\n")
 		})
+	return formatError
 }
 
-func (m *ArbitraryFloatManager) traceMulResult(out *ArbitraryFloat) {
+func (m *ArbitraryFloatManager) traceMulResult(out *ArbitraryFloat) error {
 	tags := m.floatTraceTags()
 	if !tags.ShouldTrace("mpf_mul_bug") {
-		return
+		return nil
 	}
+	var formatError error
 	_ = tags.EmitConditional("mpf_mul_bug", "mul", "src/util/mpf.cpp", 664,
 		func() bool { return true }, func(w io.Writer) error {
 			if e := writeNumeralDisplayPart(w, "result: "); e != nil {
 				return e
 			}
 			if e := m.traceFloatString(w, out); e != nil {
+				formatError = e
 				return e
 			}
 			return writeNumeralDisplayPart(w, "\n")
 		})
+	return formatError
 }
 
 func (m *ArbitraryFloatManager) traceFloatDebugValue(function, label string, value *ArbitraryFloat, line int) {

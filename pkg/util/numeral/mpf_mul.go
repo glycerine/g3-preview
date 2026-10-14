@@ -15,17 +15,23 @@ func (m *ArbitraryFloatManager) Mul(mode ArbitraryFloatRoundingMode, x, y, out *
 	if m.mul.active {
 		return ErrNumericPending
 	}
-	m.traceMulEntry(mode, x, y)
+	if e := m.traceMulEntry(mode, x, y); e != nil {
+		return e
+	}
 	defer func() {
 		if cause == nil {
-			m.traceMulResult(out)
+			cause = m.traceMulResult(out)
 		}
 	}()
 	if modularSourceDebug && (x.SBits() != y.SBits() || x.EBits() != y.EBits()) {
 		return ErrIntegerAssertion
 	}
-	m.traceFloatDebugValue("mul", "X = ", x, 595)
-	m.traceFloatDebugValue("mul", "Y = ", y, 596)
+	if e := m.traceFloatDebugValueChecked("mul", "X = ", x, 595); e != nil {
+		return e
+	}
+	if e := m.traceFloatDebugValueChecked("mul", "Y = ", y, 596); e != nil {
+		return e
+	}
 	for _, v := range [...]*ArbitraryFloat{x, y} {
 		nan, e := m.IsNaN(v)
 		if e != nil {
@@ -110,19 +116,29 @@ func (m *ArbitraryFloatManager) Mul(mode ArbitraryFloatRoundingMode, x, y, out *
 	if e := m.unpackRationalNumeral(&s.b, true, context); e != nil {
 		return e
 	}
-	m.traceFloatDebugValue("mul", "A = ", &s.a, 640)
-	m.traceFloatDebugValue("mul", "B = ", &s.b, 641)
+	if e := m.traceFloatDebugValueChecked("mul", "A = ", &s.a, 640); e != nil {
+		return e
+	}
+	if e := m.traceFloatDebugValueChecked("mul", "B = ", &s.b, 641); e != nil {
+		return e
+	}
 	a, b := s.a.exponent, s.b.exponent
 	if b > 0 && a > math.MaxInt64-b || b < 0 && a < math.MinInt64-b {
 		return arena.ErrBounds
 	}
 	out.exponent = a + b
-	m.traceFloatDebugInt("mul", "A' = ", &s.a.significand, 645)
-	m.traceFloatDebugInt("mul", "B' = ", &s.b.significand, 646)
+	if e := m.traceFloatDebugIntChecked("mul", "A' = ", &s.a.significand, 645); e != nil {
+		return e
+	}
+	if e := m.traceFloatDebugIntChecked("mul", "B' = ", &s.b.significand, 646); e != nil {
+		return e
+	}
 	if e := z.mulWithAllocationContext(&s.a.significand, &s.b.significand, &out.significand, context); e != nil {
 		return e
 	}
-	m.traceFloatDebugValue("mul", "PRODUCT = ", out, 650)
+	if e := m.traceFloatDebugValueChecked("mul", "PRODUCT = ", out, 650); e != nil {
+		return e
+	}
 	s.stickyLive = true
 	if out.SBits() >= 4 {
 		p, e := s.power(out.SBits() - 4)
