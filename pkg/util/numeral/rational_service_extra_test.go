@@ -105,7 +105,7 @@ func TestRationalServiceExtraRootSourcePublicationAndAliases(t *testing.T) {
 		if exact || !errors.Is(e, f.want) {
 			t.Fatal(f, exact, e)
 		}
-		serviceText(t, s, &out, "7/13")
+		serviceText(t, s, &out, f.in+"/13")
 		serviceMust(t, s.Del(&in))
 		serviceMust(t, s.Del(&out))
 	}
@@ -282,6 +282,7 @@ func TestRationalServiceExtraFailurePrefixesAndOwnership(t *testing.T) {
 			serviceMust(t, e)
 			oldX, e := s.String(&x)
 			serviceMust(t, e)
+			oldXDen := x.Raw.Den
 			// Exhaust prepared cell slots for the pure Copy routes so the
 			// next source constructor actually requires a budget reservation.
 			var bank []OwnedRational
@@ -333,9 +334,14 @@ func TestRationalServiceExtraFailurePrefixesAndOwnership(t *testing.T) {
 				if !numericPhysicalReservationRefusal(e) || out.ownerID != 0 {
 					t.Fatal(op, fault, out, e)
 				}
-				// Manager ExtendedGCD deliberately publishes output denominator/coefficient
-				// prefixes. Other operations keep caller output unchanged on failure.
-				if op != 4 {
+				// Root publishes its caller numerator directly. Manager ExtendedGCD
+				// publishes denominator/coefficient prefixes; other operations leave
+				// this caller output unchanged on failure.
+				if op == 0 {
+					if x.Raw.Den != oldXDen {
+						t.Fatal("rational Root touched denominator before numerator completed", fault)
+					}
+				} else if op != 4 {
 					serviceIndependentText(t, s, &x, oldX)
 				} else if !isOneInteger(&x.Raw.Den) || !isOneInteger(&y.Raw.Den) {
 					t.Fatal("source coefficient denominator prefix missing")

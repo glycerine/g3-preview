@@ -1,10 +1,10 @@
 // Source: src/util/mpq.cpp root and mpq.h square predicates/output wrappers.
 package numeral
 
-// Root retains the source short circuit: an inexact numerator root publishes
-// that numerator and leaves the previous output denominator unchanged. A false
-// denominator result also publishes; no rational normalization is performed.
-// Staged work preserves source aliases while delaying publication on errors.
+// Root follows the source direct caller order: the numerator Root publishes
+// into out.Num before the denominator Root is considered. An inexact numerator
+// leaves the old output denominator untouched; a failing call keeps its actual
+// integer publication prefix, including when input and output alias.
 func (m *RationalManager) Root(a *Rational, n uint32, out *Rational) (bool, error) {
 	if e := m.check(a); e != nil {
 		return false, e
@@ -12,29 +12,14 @@ func (m *RationalManager) Root(a *Rational, n uint32, out *Rational) (bool, erro
 	if e := m.check(out); e != nil {
 		return false, e
 	}
-	work := NewRational()
-	defer m.drop(&work)
-	if e := m.Copy(&work, out); e != nil {
-		return false, e
-	}
-	input := a
-	if a == out {
-		input = &work
-	}
-	exact, e := m.Z.Root(&input.Num, n, &work.Num)
+	exact, e := m.Z.Root(&a.Num, n, &out.Num)
 	if e != nil {
 		return false, e
 	}
-	if exact {
-		exact, e = m.Z.Root(&input.Den, n, &work.Den)
-		if e != nil {
-			return false, e
-		}
+	if !exact {
+		return false, nil
 	}
-	if e = m.Move(out, &work); e != nil {
-		return false, e
-	}
-	return exact, nil
+	return m.Z.Root(&a.Den, n, &out.Den)
 }
 
 // IsPerfectSquare retains denominator-reset, short-circuit and alias-reset

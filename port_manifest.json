@@ -157018,6 +157018,7 @@
             "TestBigPerfectSquaresAndIntegerWrapper",
             "TestIntegerRootAndSquareFailureCleanup",
             "TestRationalRootSquareFailureCleanup",
+            "TestRationalRootDenominatorErrorKeepsPublishedNumerator",
             "TestRootWarmStorageAndClosedOutputs",
             "TestRationalRootWarmStorage"
           ]
@@ -158184,6 +158185,7 @@
             "TestBigPerfectSquaresAndIntegerWrapper",
             "TestIntegerRootAndSquareFailureCleanup",
             "TestRationalRootSquareFailureCleanup",
+            "TestRationalRootDenominatorErrorKeepsPublishedNumerator",
             "TestRootWarmStorageAndClosedOutputs",
             "TestRationalRootWarmStorage"
           ]

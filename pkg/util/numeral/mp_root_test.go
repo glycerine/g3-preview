@@ -499,6 +499,7 @@ func TestRationalRootSquareFailureCleanup(t *testing.T) {
 							dst = &a
 						}
 						beforeA, beforeOut := rationalString(t, m, &a), rationalString(t, m, dst)
+						beforeDen := dst.Den
 						b.FailAfter(fault)
 						var precise bool
 						var e error
@@ -517,8 +518,17 @@ func TestRationalRootSquareFailureCleanup(t *testing.T) {
 							qopsAuditLiveOwnership(t, m, []*Int{&a.Num, &a.Den, &out.Num, &out.Den})
 							b.FailAfter(-1)
 							failed = true
-							if !numericPhysicalReservationRefusal(e) || rationalString(t, m, &a) != beforeA || rationalString(t, m, dst) != beforeOut {
+							if !numericPhysicalReservationRefusal(e) {
 								t.Fatal("rational root publication", synch, op, alias, fault, e)
+							}
+							if op == 0 {
+								// The first direct integer Root may publish NUM before it
+								// stops. DEN may change only after an exact NUM result.
+								if (!alias && rationalString(t, m, &a) != beforeA) || (dst.Den != beforeDen && integerString(t, m.Z, &dst.Num) != rootN.String()) {
+									t.Fatal("rational root direct numerator prefix", synch, alias, fault)
+								}
+							} else if rationalString(t, m, &a) != beforeA || rationalString(t, m, dst) != beforeOut {
+								t.Fatal("rational square publication", synch, op, alias, fault, e)
 							}
 						} else {
 							b.FailAfter(-1)
