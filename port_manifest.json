@@ -3562,6 +3562,7 @@
       ],
       "tests": [
         "TestAPIASTMapConcreteReferenceCleanup",
+        "TestAPIASTMapResetResumesAfterConsumedKeyDeletionRefusal",
         "TestAPIASTMapExpressionPairTransfer"
       ],
       "assertions": [
@@ -3578,7 +3579,8 @@
           "status": "partial",
           "go_target": "pkg/api/api_ast_map_object.go",
           "tests": [
-            "TestAPIASTMapConcreteReferenceCleanup"
+            "TestAPIASTMapConcreteReferenceCleanup",
+            "TestAPIASTMapResetResumesAfterConsumedKeyDeletionRefusal"
           ]
         },
         {
@@ -119733,7 +119735,8 @@
       ],
       "tests": [
         "TestASTExprMapConcreteReferenceCleanup",
-        "TestAPIASTMapConcreteReferenceCleanup"
+        "TestAPIASTMapConcreteReferenceCleanup",
+        "TestAPIASTMapResetResumesAfterConsumedKeyDeletionRefusal"
       ],
       "conditionals": [
         {
@@ -119761,7 +119764,8 @@
           "status": "ported",
           "go_target": "pkg/api/api_ast_map_object.go",
           "tests": [
-            "TestAPIASTMapConcreteReferenceCleanup"
+            "TestAPIASTMapConcreteReferenceCleanup",
+            "TestAPIASTMapResetResumesAfterConsumedKeyDeletionRefusal"
           ]
         },
         {
@@ -169231,6 +169235,11 @@
             "TestFastExprConverterTermsAndClause",
             "TestArbitraryExprConverterTermsAndClause"
           ]
+        },
+        {
+          "name": "expr2subpaving m_lit_cache key/value cleanup is unreachable because the field is never populated or read",
+          "status": "reference_only",
+          "tests": []
         },
         {
           "name": "Remaining live concrete keys-only, values-only, key/value and collection cleanup in other AST, tactic, SMT, API and subpaving consumers",
