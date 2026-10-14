@@ -37,6 +37,7 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 	must(t, err)
 	d, err := diagnostic.NewDebugContext(region, b)
 	must(t, err)
+	previousDebug := diagnostic.BorrowProcessDebugContext()
 	var traceOutput bytes.Buffer
 	tr := diagnostic.NewTraceTagsWithWriter(&traceOutput)
 	tr.Enable("gparams")
@@ -47,6 +48,9 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 		Globals: params.GlobalParamsConfig{Budget: b, DescriptorPageSize: 2, DescriptorWordsPageSize: 16}}
 	init, err := InitializeGenerated(cfg, math.MaxUint32)
 	must(t, err)
+	if diagnostic.BorrowProcessDebugContext() != d {
+		t.Fatal("generated process did not bind its debug owner")
+	}
 	if init == nil || init.Context == nil || init.Catalog == nil || init.Globals == nil || init.Trace != tr {
 		t.Fatal("generated initialization did not publish its parameter owners")
 	}
@@ -102,6 +106,9 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 	}
 	must(t, FinalizeGenerated(p, nil, nil, nil, nil, nil))
 	must(t, init.Close())
+	if diagnostic.BorrowProcessDebugContext() != previousDebug {
+		t.Fatal("generated close did not restore the prior process debug owner")
+	}
 	if init.Trace != nil {
 		t.Fatal("closed generated owner retained borrowed trace")
 	}

@@ -14,8 +14,8 @@ var ErrStopped = errors.New("g3: heap source assignment stopped after destructio
 var ErrValue = errors.New("g3: invalid, absent, or duplicate heap value")
 var ErrOwner = errors.New("g3: invalid heap owner")
 
-// Config borrows Less, its environment and an optional DebugContext for the
-// heap's lifetime.
+// Config borrows Less, its environment and an optional explicit DebugContext
+// for the heap's lifetime. A nil Debug reads the current process owner.
 // Less must be a strict ordering, must not panic or reenter the heap, and may
 // change a present value's priority only together with Increased/Decreased.
 // A nil Less compares the integer values themselves.
@@ -87,42 +87,45 @@ func New(bounds int32, c Config) (*Int, error) {
 	return h, nil
 }
 
-// CASSERT first tests the process assertion switch and the "heap" tag. The
-// borrowed context is explicit until the process-wide debug binding exists.
-func (h *Int) cassert(line int32, condition string, test func() bool) error {
-	if h.debug == nil {
-		return nil
+func (h *Int) debugContext() *diagnostic.DebugContext {
+	if h.debug != nil {
+		return h.debug
 	}
-	on, err := diagnostic.SourceAssertionsEnabled(h.debug)
+	return diagnostic.BorrowProcessDebugContext()
+}
+
+// CASSERT first tests the process assertion switch and the "heap" tag. The
+// current process owner is read at each gate unless an explicit one was lent.
+func (h *Int) cassert(line int32, condition string, test func() bool) error {
+	d := h.debugContext()
+	on, err := diagnostic.SourceAssertionsEnabled(d)
 	if err != nil || !on {
 		return err
 	}
-	on, err = h.debug.IsDebugEnabled("heap")
+	on, err = d.IsDebugEnabled("heap")
 	if err != nil || !on {
 		return err
 	}
 	if test() {
 		return nil
 	}
-	return h.assertFailure(line, condition)
+	return h.assertFailure(d, line, condition)
 }
 
-func (h *Int) assertFailure(line int32, condition string) error {
-	if err := h.debug.NotifyAssertionViolation("src/util/heap.h", line, condition); err != nil {
+func (h *Int) assertFailure(d *diagnostic.DebugContext, line int32, condition string) error {
+	if err := d.NotifyAssertionViolation("src/util/heap.h", line, condition); err != nil {
 		return err
 	}
-	return h.debug.InvokeAssertionDebugger()
+	return d.InvokeAssertionDebugger()
 }
 
 func (h *Int) cassertInvariant() error {
-	if h.debug == nil {
-		return nil
-	}
-	on, err := diagnostic.SourceAssertionsEnabled(h.debug)
+	d := h.debugContext()
+	on, err := diagnostic.SourceAssertionsEnabled(d)
 	if err != nil || !on {
 		return err
 	}
-	on, err = h.debug.IsDebugEnabled("heap")
+	on, err = d.IsDebugEnabled("heap")
 	if err != nil || !on {
 		return err
 	}
@@ -135,12 +138,12 @@ func (h *Int) cassertInvariant() error {
 		}
 		v := h.values[i]
 		if v < 0 || int64(v) >= int64(len(h.indices)) || h.indices[v] != int32(i) {
-			if err := h.assertFailure(63, "m_value2indices[m_values[idx]] == idx"); err != nil {
+			if err := h.assertFailure(d, 63, "m_value2indices[m_values[idx]] == idx"); err != nil {
 				return err
 			}
 		}
 		if i > 1 && h.lt(v, h.values[i/2]) {
-			if err := h.assertFailure(64, "parent(idx) == 0 || !less_than(m_values[idx], m_values[parent(idx)])"); err != nil {
+			if err := h.assertFailure(d, 64, "parent(idx) == 0 || !less_than(m_values[idx], m_values[parent(idx)])"); err != nil {
 				return err
 			}
 		}
