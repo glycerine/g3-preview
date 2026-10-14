@@ -410,3 +410,36 @@ func TestArbitraryFloatFMATraceSourceInsertions(t *testing.T) {
 	serviceMust(t, m.Del(&addend))
 	serviceMust(t, m.Del(&out))
 }
+
+func TestArbitraryFloatFMAOverflowTraceSourceBranch(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	w := &mpffArithmeticTraceWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpf_dbg")
+	compiled := tags.ShouldTrace("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	var x, y, z, out ArbitraryFloat
+	for _, value := range []*ArbitraryFloat{&x, &y, &z} {
+		serviceMust(t, m.SetDouble(value, 11, 53, 1.75))
+	}
+	serviceMust(t, m.FMA(ArbitraryFloatNearestEven, &x, &y, &z, &out))
+	got, e := m.ToDouble(&out)
+	serviceMust(t, e)
+	if got != 4.8125 {
+		t.Fatalf("overflow-branch FMA result: %v", got)
+	}
+	if compiled {
+		all := strings.Join(w.parts, "")
+		first := strings.Index(all, "fma src/util/mpf.cpp:899 ---------")
+		overflow := strings.Index(all, "fma src/util/mpf.cpp:913 ---------")
+		next := strings.Index(all, "fma src/util/mpf.cpp:925 ---------")
+		if first < 0 || overflow <= first || next <= overflow || !hasMPFFTraceParts(w.parts, []string{"Add/Sub overflew into 4.xxx!", "\n", "S*= "}) || !hasFloatTraceValueInsertion(w.parts, "S*= ") {
+			t.Fatalf("real FMA overflow trace insertion order: %q", w.parts)
+		}
+	} else if len(w.parts) != 0 {
+		t.Fatalf("erased FMA overflow trace: %q", w.parts)
+	}
+	for _, value := range []*ArbitraryFloat{&x, &y, &z, &out} {
+		serviceMust(t, m.Del(value))
+	}
+}
