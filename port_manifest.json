@@ -155343,6 +155343,7 @@
         "TestPolynomialContentBeforeAIReachedGCDSourceStop",
         "TestPolynomialContentConstantActualSETAllocation",
         "TestPolynomialContentFieldActualBIGInverseChildren",
+        "TestIntegerDividesScopedNUMDestructorFailureClearsTrue",
         "TestIntegerDividesScopedNUMBeforeZeroBranch",
         "TestIntegerDividesScopedNUMEveryActualRemPrefix",
         "TestIntegerDividesScopedNUMSourceDTAndImmutableHistory",
@@ -155878,6 +155879,7 @@
           "name": "mpn.cpp:206-217 reached verification scoped buffer and shared division buffers receive exact passed bool/Divides child context at allocation/publication leaves; failed verification construction has no source DT.",
           "status": "partial",
           "tests": [
+            "TestIntegerDividesScopedNUMDestructorFailureClearsTrue",
             "TestIntegerDividesScopedNUMBeforeZeroBranch",
             "TestIntegerDividesScopedNUMEveryActualRemPrefix",
             "TestIntegerDividesScopedNUMSourceDTAndImmutableHistory",
@@ -159725,6 +159727,7 @@
         "TestPolynomialContentBeforeAIReachedGCDSourceStop",
         "TestPolynomialContentConstantActualSETAllocation",
         "TestPolynomialContentFieldActualBIGInverseChildren",
+        "TestIntegerDividesScopedNUMDestructorFailureClearsTrue",
         "TestIntegerDividesScopedNUMBeforeZeroBranch",
         "TestIntegerDividesScopedNUMEveryActualRemPrefix",
         "TestIntegerDividesScopedNUMSourceDTAndImmutableHistory",
@@ -161652,6 +161655,7 @@
           "name": "mpz.cpp:2054-2069 divides: shared public/direct engine constructs actual scoped tmp NUM before zero; actual Rem children, strict all-exit NUM DT, retained failed acquisitions and immutable returned first cause.",
           "status": "ported",
           "tests": [
+            "TestIntegerDividesScopedNUMDestructorFailureClearsTrue",
             "TestIntegerDividesScopedNUMBeforeZeroBranch",
             "TestIntegerDividesScopedNUMEveryActualRemPrefix",
             "TestIntegerDividesScopedNUMSourceDTAndImmutableHistory",
@@ -162315,6 +162319,7 @@
         "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
         "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
         "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame",
+        "TestIntegerDividesScopedNUMDestructorFailureClearsTrue",
         "TestIntegerDividesScopedNUMBeforeZeroBranch",
         "TestIntegerDividesScopedNUMEveryActualRemPrefix",
         "TestIntegerDividesScopedNUMSourceDTAndImmutableHistory",
@@ -163793,6 +163798,7 @@
           "name": "mpz.h:468-485 and mpz.cpp:2054-2069 direct actual child transport/owner boundary: negative Div RAW is end-only DEL; bool Divides tmp is distinct scoped NUM; executing owner retirement refuses before mutation.",
           "status": "partial",
           "tests": [
+            "TestIntegerDividesScopedNUMDestructorFailureClearsTrue",
             "TestIntegerDividesScopedNUMBeforeZeroBranch",
             "TestIntegerDividesScopedNUMEveryActualRemPrefix",
             "TestIntegerDividesScopedNUMSourceDTAndImmutableHistory",

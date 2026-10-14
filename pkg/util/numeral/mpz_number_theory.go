@@ -328,11 +328,7 @@ func (m *IntegerManager) dividesWithAllocationContext(a, b *Int, parent integerA
 		return false, e
 	}
 	s := receipt.Frame
-	defer func() {
-		s.Executing = false
-		s.BodyCause = cause
-		cause = JoinNumericErrors(cause, m.FinishDividesNumeralSource(s))
-	}()
+	defer m.completeDividesNumeral(s, &result, &cause)
 	if a.Val == 0 {
 		result = b.Val == 0
 	} else {
@@ -344,4 +340,13 @@ func (m *IntegerManager) dividesWithAllocationContext(a, b *Int, parent integerA
 	}
 	m.traceDivides(a, b, &s.Numeral, result)
 	return result, nil
+}
+
+func (m *IntegerManager) completeDividesNumeral(s *integerDividesNumeralScope, result *bool, cause *error) {
+	s.Executing = false
+	s.BodyCause = *cause
+	*cause = JoinNumericErrors(*cause, m.FinishDividesNumeralSource(s))
+	if *cause != nil {
+		*result = false
+	}
 }

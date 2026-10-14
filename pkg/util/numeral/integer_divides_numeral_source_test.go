@@ -87,6 +87,30 @@ func TestIntegerDividesScopedNUMBeforeZeroBranch(t *testing.T) {
 	}
 }
 
+func TestIntegerDividesScopedNUMDestructorFailureClearsTrue(t *testing.T) {
+	m, _ := integerManager(t)
+	r, e := m.BeginDividesNumeralInvocation(integerAllocationInvocationContext{})
+	serviceMust(t, e)
+	s := r.Frame
+	serviceMust(t, m.SetLimbs(&s.Numeral, []uint32{1, 2, 3, 4}))
+	if s.Numeral.Cell == 0 {
+		t.Fatal("fixture did not retain physical integer storage")
+	}
+	cell := s.Numeral.Cell
+	s.Numeral.Cell = ^NumericCellRef(0)
+	result := true // the divisibility body completed before scoped_mpz destruction
+	var cause error
+	m.completeDividesNumeral(s, &result, &cause)
+	if result || !errors.Is(cause, arena.ErrInvalidSlot) || !s.Active || s.sourceCause == nil || s.Executing {
+		t.Fatal("failed scoped_mpz destructor published divisibility", result, cause, *s)
+	}
+	s.Numeral.Cell = cell
+	serviceMust(t, m.CleanupDividesNumeralInvocation(r, true))
+	if s.Active {
+		t.Fatal("owning cleanup retained completed divides invocation")
+	}
+}
+
 // Invalid Go descriptor domain: authority still names only the actual guarded
 // primitive frame, even when a saved pointer addresses the reused receipt.
 func TestIntegerDividesScopedNUMCopiedAndRetargetedContextsRefuse(t *testing.T) {
