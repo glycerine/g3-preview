@@ -101,6 +101,21 @@ func TestDriftAndCompletionEvidence(t *testing.T) {
 	if err := Validate(a); err != nil {
 		t.Fatal(err)
 	}
+	a.Units[0].Methods[0].GoTarget = ""
+	a.Units[0].Methods[0].Tests = nil
+	if Validate(a) == nil {
+		t.Fatal("ported replacement without target/test accepted")
+	}
+	for _, status := range []string{"dead_deleted", "reference_only"} {
+		a.Units[0].Methods[0].Status = status
+		if err := Validate(a); err != nil {
+			t.Fatal(status, err)
+		}
+	}
+	a.Units[0].Methods[0].Status = "partial"
+	if Validate(a) == nil {
+		t.Fatal("partial method hidden by file status")
+	}
 	a.Units[0].Methods[0].Status = "unported"
 	if Validate(a) == nil {
 		t.Fatal("unfinished method hidden by file status")

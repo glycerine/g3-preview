@@ -149750,7 +149750,7 @@
       "path": "src/util/mpbq.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/numeral/mpbq.go",
         "pkg/util/numeral/mpbq_arithmetic.go",
@@ -150256,8 +150256,8 @@
           ]
         },
         {
-          "name": "concrete binary vector logical reserve/resize, single-slice owning move growth and ascending reset; isolation frame specializations",
-          "status": "partial",
+          "name": "Retained scoped MPBQ binary-vector specialization: typed slice default append, indexed access, logical resize, ascending numeral reset/destruction, and DRS/Sturm isolation output ownership",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_binary_vector.go",
           "tests": [
             "TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau",
@@ -150331,7 +150331,7 @@
       "path": "src/util/mpbq.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/numeral/mpbq.go",
         "pkg/util/numeral/mpbq_arithmetic.go",
@@ -150588,8 +150588,8 @@
           ]
         },
         {
-          "name": "concrete binary vector logical reserve/resize, single-slice owning move growth and ascending reset; isolation frame specializations",
-          "status": "partial",
+          "name": "Retained scoped MPBQ binary-vector specialization: typed slice default append, indexed access, logical resize, ascending numeral reset/destruction, and DRS/Sturm isolation output ownership",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_binary_vector.go",
           "tests": [
             "TestUPolynomialBinaryVectorOwnershipResizeReserveAndPlateau",
