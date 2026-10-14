@@ -31,7 +31,7 @@ func (m *IntegerManager) traceMPFSqrtBounds(input, lower, upper *Int) {
 				return err
 			}
 		}
-		return writeNumeralDisplayPart(w, "\n")
+		return diagnostic.WriteTraceEndl(w)
 	})
 }
 
@@ -64,7 +64,7 @@ func (m *IntegerManager) traceMPFSqrtMid(mid, product *Int) {
 		if err := writeNumeralDisplayPart(w, s); err != nil {
 			return err
 		}
-		return writeNumeralDisplayPart(w, "\n")
+		return diagnostic.WriteTraceEndl(w)
 	})
 }
 
@@ -76,9 +76,14 @@ func (m *IntegerManager) traceMPFSqrtChoice(lower bool) {
 	if !tags.ShouldTrace("mpf_dbg") {
 		return
 	}
-	choice := "choosing upper\n"
+	choice := "choosing upper"
 	if lower {
-		choice = "choosing lower\n"
+		choice = "choosing lower"
 	}
-	_ = tags.EmitShort("mpf_dbg", func(w io.Writer) error { return writeNumeralDisplayPart(w, choice) })
+	_ = tags.EmitShort("mpf_dbg", func(w io.Writer) error {
+		if e := writeNumeralDisplayPart(w, choice); e != nil {
+			return e
+		}
+		return diagnostic.WriteTraceEndl(w)
+	})
 }

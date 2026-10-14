@@ -175540,6 +175540,13 @@
           "tests": ["TestArbitraryFloatRoundIntegralReachedEndlFlushes"]
         },
         {
+          "name": "Reached MPF sqrt STRACE std::endl flushes and remainder object TRACE body flushes (src/util/mpf.cpp:969-990,1435-1483)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_sqrt_trace.go",
+          "go_targets": ["pkg/util/numeral/mpf_remainder_object_trace.go", "pkg/util/diagnostic/util_trace_tags.go"],
+          "tests": ["TestMyMPZSqrtReachedEndlFlushes", "TestArbitraryFloatRemObjectReachedEndlFlushes"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -176001,6 +176008,13 @@
           "go_target": "pkg/util/numeral/mpf_round_integral_trace.go",
           "go_targets": ["pkg/util/numeral/mpf_mul_trace.go", "pkg/util/diagnostic/util_trace_tags.go"],
           "tests": ["TestArbitraryFloatRoundIntegralReachedEndlFlushes"]
+        },
+        {
+          "name": "Reached MPF sqrt STRACE std::endl flushes and remainder object TRACE body flushes (src/util/mpf.cpp:969-990,1435-1483)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_sqrt_trace.go",
+          "go_targets": ["pkg/util/numeral/mpf_remainder_object_trace.go", "pkg/util/diagnostic/util_trace_tags.go"],
+          "tests": ["TestMyMPZSqrtReachedEndlFlushes", "TestArbitraryFloatRemObjectReachedEndlFlushes"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

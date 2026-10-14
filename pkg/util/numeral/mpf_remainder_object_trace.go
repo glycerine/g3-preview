@@ -4,6 +4,8 @@ package numeral
 import (
 	"fmt"
 	"io"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 // The source hexfloat(mpf) diagnostic prints native object bytes. Go values
@@ -32,7 +34,7 @@ func (m *ArbitraryFloatManager) tracePartialRemainderObject(value *ArbitraryFloa
 			if e := m.writeFloatObjectTrace(w, value, &formatError); e != nil {
 				return e
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }
@@ -63,7 +65,7 @@ func (m *ArbitraryFloatManager) traceRemObjects(x, y *ArbitraryFloat) error {
 				if e := m.writeFloatObjectTrace(w, item.value, &formatError); e != nil {
 					return e
 				}
-				if e := writeNumeralDisplayPart(w, "\n"); e != nil {
+				if e := diagnostic.WriteTraceEndl(w); e != nil {
 					return e
 				}
 			}
@@ -94,7 +96,7 @@ func (m *ArbitraryFloatManager) traceRemObjectResult(value *ArbitraryFloat) erro
 			if e := m.writeFloatObjectTrace(w, value, &formatError); e != nil {
 				return e
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }

@@ -48,3 +48,41 @@ func TestMyMPZSqrtRetainedShortTraceBranches(t *testing.T) {
 		}
 	}
 }
+
+func TestMyMPZSqrtReachedEndlFlushes(t *testing.T) {
+	m, _ := integerManager(t)
+	w := &mpfEndlWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	for _, input := range []int32{64, 65} {
+		w.events = nil
+		w.flushes = 0
+		in, out := NewInt(input), NewInt(0)
+		serviceMust(t, MyMPZSqrt(m, 2, false, &in, &out))
+		serviceMust(t, m.Del(&out))
+		if !tags.ShouldTrace("mpf_dbg") {
+			if len(w.events) != 0 {
+				t.Fatalf("erased sqrt trace for %d: %q", input, w.events)
+			}
+			continue
+		}
+		joined := strings.Join(w.events, "|")
+		if !strings.Contains(joined, "write:SIG = |") || !strings.Contains(joined, "write:MID = |") || !strings.Contains(joined, "write:choosing ") {
+			t.Fatalf("missing reached sqrt branch for %d: %q", input, w.events)
+		}
+		newlines := 0
+		for i, event := range w.events {
+			if event != "write:\n" {
+				continue
+			}
+			newlines++
+			if i+1 == len(w.events) || w.events[i+1] != "flush" {
+				t.Fatalf("sqrt std::endl for %d did not flush: %q", input, w.events)
+			}
+		}
+		if newlines < 3 || w.flushes != newlines {
+			t.Fatalf("sqrt std::endl count for %d: %d newlines, %d flushes", input, newlines, w.flushes)
+		}
+	}
+}
