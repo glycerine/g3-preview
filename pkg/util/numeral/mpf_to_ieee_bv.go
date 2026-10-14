@@ -46,7 +46,10 @@ func (m *ArbitraryFloatManager) ToIEEEBVMPZ(x *ArbitraryFloat, out *Int) (cause 
 		cause = JoinNumericErrors(cause, m.finishIEEEBVSource())
 		cause = JoinNumericErrors(cause, s.unbind())
 	}()
-	return s.run(x, out)
+	if e := s.run(x, out); e != nil {
+		return e
+	}
+	return m.traceFloatDebugIntChecked("to_ieee_bv_mpz", "IEEE_BV = ", out, 1252)
 }
 
 func (s *arbitraryFloatIEEEBVScope) run(x *ArbitraryFloat, out *Int) error {

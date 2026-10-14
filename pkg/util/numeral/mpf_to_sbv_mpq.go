@@ -55,7 +55,10 @@ func (m *ArbitraryFloatManager) ToSBVMPQ(mode ArbitraryFloatRoundingMode, x *Arb
 		cause = JoinNumericErrors(cause, m.finishSBVSource())
 		cause = JoinNumericErrors(cause, s.unbind())
 	}()
-	return s.run(mode, x, out)
+	if e := s.run(mode, x, out); e != nil {
+		return e
+	}
+	return m.traceSBVResult(out)
 }
 func (s *arbitraryFloatSBVScope) run(mode ArbitraryFloatRoundingMode, x *ArbitraryFloat, out *Rational) error {
 	if !s.NumericBound(true) {
@@ -120,6 +123,9 @@ func (s *arbitraryFloatSBVScope) run(mode ArbitraryFloatRoundingMode, x *Arbitra
 			if e := z.addSubWithAllocationContext(&s.z, &one, &s.z, false, c); e != nil {
 				return e
 			}
+		}
+		if e := m.traceSBVDecision(x, &s.z, last, round, sticky, increment); e != nil {
+			return e
 		}
 	} else {
 		if e := z.check(&s.z); e != nil {
