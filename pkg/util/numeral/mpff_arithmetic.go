@@ -491,19 +491,29 @@ func (m *FastFloatManager) Power(a *FastFloat, p uint32, b *FastFloat) (err erro
 	}
 	original := a
 	tags := m.mulTraceTags()
-	if a == b && tags.ShouldTrace("mpff_trace") {
-		var saved FastFloat
-		if err = m.Copy(&saved, a); err != nil {
-			return err
-		}
-		original = &saved
-		defer m.Del(&saved)
-	}
+	m.powerExecuting = true
 	defer func() {
+		if cleanup := m.cleanupPowerWork(); err == nil {
+			err = cleanup
+		}
 		if err == nil {
 			m.tracePower(original, p, b)
 		}
+		if !m.powerWorkPending {
+			if cleanup := m.cleanupPowerTrace(); err == nil {
+				err = cleanup
+			}
+		}
+		m.powerExecuting = false
 	}()
+	if a == b && tags.ShouldTrace("mpff_trace") {
+		m.powerTrace = FastFloat{}
+		m.powerTracePending = true
+		if err = m.Copy(&m.powerTrace, a); err != nil {
+			return err
+		}
+		original = &m.powerTrace
+	}
 	if a.index() == 0 {
 		if SourceExtendedGCDDebug && !(p != 0) {
 			return ErrFastFloatInvariant
@@ -547,9 +557,9 @@ func (m *FastFloatManager) Power(a *FastFloat, p uint32, b *FastFloat) (err erro
 		b.exponent = int32(exp)
 		return m.debugCheck(b)
 	}
-	var pw FastFloat
-	defer m.Del(&pw)
-	if e := m.Copy(&pw, a); e != nil {
+	m.powerWork = FastFloat{}
+	m.powerWorkPending = true
+	if e := m.Copy(&m.powerWork, a); e != nil {
 		return e
 	}
 	if e := m.SetInt32(b, 1); e != nil {
@@ -561,11 +571,11 @@ func (m *FastFloatManager) Power(a *FastFloat, p uint32, b *FastFloat) (err erro
 			return ErrFastFloatPowerDomain
 		}
 		if mask&p != 0 {
-			if e := m.Mul(b, &pw, b); e != nil {
+			if e := m.Mul(b, &m.powerWork, b); e != nil {
 				return e
 			}
 		}
-		if e := m.Mul(&pw, &pw, &pw); e != nil {
+		if e := m.Mul(&m.powerWork, &m.powerWork, &m.powerWork); e != nil {
 			return e
 		}
 		mask <<= 1

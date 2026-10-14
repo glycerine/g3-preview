@@ -60,6 +60,7 @@ var ErrFastFloatOverflow error = &fastFloatException{message: "multi-precision f
 var ErrFastFloatDivisionByZero error = &fastFloatException{message: "multi-precision floating point (mpff) division by zero", parent: ErrFastFloatDomain}
 var ErrFastFloatInvariant = errors.New("mpnum: MPFF source invariant")
 var ErrFastFloatPowerDomain = errors.New("mpnum: MPFF power mask wrapped into nontermination")
+var ErrFastFloatPowerPending = errors.New("mpnum: MPFF power scoped cleanup pending")
 var ErrFastFloatOwner = errors.New("mpnum: invalid MPFF owner or dead significand")
 
 // Cold owner: owns its buffers and services, borrowing a configured Runtime; caller numerical
@@ -77,6 +78,9 @@ type FastFloatManager struct {
 	formatting                                 fastFormattingScope
 	closing                                    bool
 	one                                        FastFloat
+	powerWork, powerTrace                      FastFloat
+	powerWorkPending, powerTracePending        bool
+	powerExecuting                             bool
 }
 
 func NewFastFloatManager(c FastFloatConfig) (*FastFloatManager, error) {
@@ -140,6 +144,9 @@ func (m *FastFloatManager) open() error {
 	}
 	if m.closed || m.closing {
 		return arena.ErrClosed
+	}
+	if (m.powerWorkPending || m.powerTracePending) && !m.powerExecuting {
+		return ErrFastFloatPowerPending
 	}
 	return nil
 }
@@ -298,7 +305,13 @@ func (m *FastFloatManager) CloseChecked() error {
 	if m.closed {
 		return nil
 	}
+	if m.powerExecuting {
+		return ErrFastFloatPowerPending
+	}
 	m.closing = true
+	if e := m.CleanupPowerTemporaries(); e != nil {
+		return e
+	}
 	if m.natural != nil {
 		if e := m.CleanupFormatting(); e != nil {
 			return e
@@ -332,6 +345,52 @@ func (m *FastFloatManager) Close() {
 	if e := m.CloseChecked(); e != nil {
 		panic(m)
 	}
+}
+
+func (m *FastFloatManager) cleanupPowerWork() error {
+	if !m.powerWorkPending {
+		return nil
+	}
+	if e := m.Del(&m.powerWork); e != nil {
+		return e
+	}
+	m.powerWork = FastFloat{}
+	m.powerWorkPending = false
+	return nil
+}
+
+func (m *FastFloatManager) cleanupPowerTrace() error {
+	if !m.powerTracePending {
+		return nil
+	}
+	if e := m.Del(&m.powerTrace); e != nil {
+		return e
+	}
+	m.powerTrace = FastFloat{}
+	m.powerTracePending = false
+	return nil
+}
+
+// CleanupPowerTemporaries resumes the scoped power work value before the
+// outer trace snapshot, without replaying an already completed deletion.
+func (m *FastFloatManager) CleanupPowerTemporaries() error {
+	if m == nil || m.self != m {
+		return ErrFastFloatOwner
+	}
+	if m.powerExecuting {
+		return ErrFastFloatPowerPending
+	}
+	closing := m.closing
+	m.closing = false
+	m.powerExecuting = true
+	defer func() {
+		m.powerExecuting = false
+		m.closing = closing
+	}()
+	if e := m.cleanupPowerWork(); e != nil {
+		return e
+	}
+	return m.cleanupPowerTrace()
 }
 
 func (m *FastFloatManager) Precise() bool { return false }

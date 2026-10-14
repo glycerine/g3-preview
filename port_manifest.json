@@ -154139,7 +154139,8 @@
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
             "TestFastFloatOwnerProvenance",
-            "TestFastFloatNeighborAndThinRoutes"
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatPowerTemporariesRetainSourceCleanupOrder"
           ]
         },
         {
@@ -154338,7 +154339,8 @@
           "go_target": "pkg/util/numeral/mpff_power_trace.go",
           "tests": [
             "TestFastFloatPowerRetainedTraceBranchesAndAlias",
-            "TestFastFloatRawPowerTraceExponentInsertionBoundary"
+            "TestFastFloatRawPowerTraceExponentInsertionBoundary",
+            "TestFastFloatPowerTemporariesRetainSourceCleanupOrder"
           ]
         },
         {
@@ -154557,7 +154559,8 @@
             "TestFastFloatSourceBasic",
             "TestFastFloatSourceDecimal",
             "TestFastFloatOwnerProvenance",
-            "TestFastFloatNeighborAndThinRoutes"
+            "TestFastFloatNeighborAndThinRoutes",
+            "TestFastFloatPowerTemporariesRetainSourceCleanupOrder"
           ]
         },
         {
