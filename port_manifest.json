@@ -168910,6 +168910,19 @@
           "tests": ["TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"]
         },
         {
+          "name": "Concrete UFBV m_rewrite_todo expr_ref_buffer: root and reverse-scheduled child pushes acquire AST references, pop releases its last reference, and cache destruction precedes forward cleanup of remaining todo references (ufbv_rewriter.h:170; ufbv_rewriter.cpp:319-448)",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_traversal.go",
+          "tests": ["TestRewriteTraversalSourceReverseChildrenAndOwningTodo", "TestRewriteTraversalSourceCycleCacheUsesActualTodo", "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"]
+        },
+        {
+          "name": "Concrete UFBV m_todo expr_ref_buffer: initial and rescheduled formula pushes retain AST references, LIFO processing moves a formula to an owning local before pop, and remaining todo references drain forward at rewriter close (ufbv_rewriter.h:166; ufbv_rewriter.cpp:537-538,645-646,672-686)",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_back_index.go",
+          "go_targets": ["pkg/tactic/ufbv/rewrite_formula_process.go", "pkg/tactic/ufbv/rewrite_demodulator_schedule.go"],
+          "tests": ["TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations", "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot", "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"]
+        },
+        {
           "name": "Concrete subpaving tactic MPQ/hardware/MPFF/MPF ineq ref_buffer temporary push/c_ptr/destruction: failed clause conversion releases unpublished inequalities in ascending order; successful clause/unit publication retains its own reference",
           "status": "ported",
           "go_target": "pkg/math/subpaving/inequality_buffer_release.go",
