@@ -120073,6 +120073,13 @@
           ]
         },
         {
+          "name": "dependency_manager<expr_dependency_config>::del leaf stops before leaf destruction and allocator deallocation when value dec_ref fails (dependency.h:88-94)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_dependency.go",
+          "go_targets": ["pkg/ast/ast_dependency_failure_test.go"],
+          "tests": ["TestASTDependencyLeafDeletionStopsBeforeFreeOnASTFailure"]
+        },
+        {
           "name": "dependency_manager<expr_dependency_config>::dec_ref/del",
           "status": "partial",
           "go_target": "pkg/ast/ast_dependency.go",

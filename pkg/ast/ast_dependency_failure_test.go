@@ -31,6 +31,38 @@ func TestASTDependencyNativeDeletionCompletesPhysicalGraphImmediately(t *testing
 	m.BudgetField.FailAfter(-1)
 }
 
+func TestASTDependencyLeafDeletionStopsBeforeFreeOnASTFailure(t *testing.T) {
+	if !ASTSourceDebug {
+		t.Skip("source table assertion is compiled out")
+	}
+	m := astTestManager(t)
+	sort, e := m.MkBoolSort()
+	astTestMust(t, e)
+	h, e := m.MkVar(1902, sort)
+	astTestMust(t, e)
+	ref, e := m.requireExpr(h)
+	astTestMust(t, e)
+	d, e := m.DependencyLeaf(h)
+	astTestMust(t, e)
+	astTestMust(t, m.DependencyInc(d))
+	before := m.allocator.Stats().Live
+	astTestMust(t, m.tableEraseIdentity(ref))
+	consumed, e := m.DependencyDecConsumed(d)
+	if !consumed || !errors.Is(e, ErrASTDomain) {
+		t.Fatal("AST decrement must stop the dependency destructor", consumed, e)
+	}
+	if !m.allocator.IsLive(d.record) || m.allocator.Stats().Live != before || m.dependencies.live != 1 {
+		t.Fatal("dependency leaf freed after stopped AST decrement", m.dependencies.live, m.allocator.Stats().Live, before)
+	}
+	if rc, e := m.DependencyRefCount(d); e != nil || rc != 0 {
+		t.Fatal("consumed dependency root prefix", rc, e)
+	}
+	_, inserted, e := m.tableInsert(ref)
+	if e != nil || !inserted {
+		t.Fatal("restore source table for owner teardown", inserted, e)
+	}
+}
+
 func TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences(t *testing.T) {
 
 	m := astTestManager(t)

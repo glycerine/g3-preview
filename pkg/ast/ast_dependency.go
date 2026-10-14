@@ -202,7 +202,6 @@ func (d *astDependencyManager) decConsumed(r arena.SmallBytesRef) (bool, error) 
 
 // Native scratch preserves left/right enqueue and LIFO destruction order.
 func (d *astDependencyManager) del(r arena.SmallBytesRef) error {
-	var first error
 	d.todo = append(d.todo, r)
 	for len(d.todo) != 0 {
 		x := d.todo[len(d.todo)-1]
@@ -215,8 +214,10 @@ func (d *astDependencyManager) del(r arena.SmallBytesRef) error {
 		if c.leaf {
 			bytes = 16
 			_, e = d.owner.decNode(c.value)
-			if e != nil && first == nil {
-				first = e
+			if e != nil {
+				// Source del stops inside dec_ref(value): the leaf destructor
+				// and allocator deallocation have not run yet.
+				return e
 			}
 		} else {
 			for _, child := range [2]arena.SmallBytesRef{c.left, c.right} {
@@ -241,7 +242,7 @@ func (d *astDependencyManager) del(r arena.SmallBytesRef) error {
 		}
 		d.live--
 	}
-	return first
+	return nil
 }
 func (d *astDependencyManager) closeAfterNodeTeardown() {
 	d.todo = nil
