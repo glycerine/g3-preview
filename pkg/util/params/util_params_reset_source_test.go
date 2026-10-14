@@ -149,9 +149,17 @@ func TestParamsReferenceResetOwnContinuationMatchesKindAndInvocation(t *testing.
 	paramsMust(t, q.Del(&first))
 	paramsMust(t, c.SetRat(&v, k, &big))
 	paramsMust(t, q.Del(&big))
+	textKey, e := sy.Intern("owned-text-tail")
+	paramsMust(t, e)
+	textValue := "after both numerals"
+	paramsMust(t, c.SetString(&v, textKey, &textValue))
 	block := &c.Blocks[v.Slot-1]
-	if block.Refs != 1 || block.Size != 3 {
+	if block.Refs != 1 || block.Size != 4 {
 		t.Fatal("actual source reference", block.Refs, block.Size)
+	}
+	ownedText := c.Entry(block, 3).text.owned
+	if ownedText == nil || !ownedText.live {
+		t.Fatal("owned Go string adapter before reset")
 	}
 
 	alias, e := c.NewValue()
@@ -193,6 +201,12 @@ func TestParamsReferenceResetOwnContinuationMatchesKindAndInvocation(t *testing.
 	if block.resetCursor != 2 || block.resetStage != 0 {
 		t.Fatal("reset must advance past the completed numeral before the stopped one", block.resetCursor, block.resetStage)
 	}
+	if c.Entry(block, 3).text.owned != ownedText || !ownedText.live {
+		t.Fatal("later owned text released before stopped numeral completed")
+	}
+	if got, present, err := c.GetString(&alias, textKey, nil); err != nil || !present || got != textValue {
+		t.Fatal("shared later text must remain readable during stopped reset", got, present, err)
+	}
 	if receipt.owner != c.Owner || receipt.slot != v.Slot || receipt.generation != v.Generation || receipt.invocation == 0 || block.resetKind != paramsResetLive {
 		t.Fatal("actual live reset receipt", receipt, *block)
 	}
@@ -225,6 +239,12 @@ func TestParamsReferenceResetOwnContinuationMatchesKindAndInvocation(t *testing.
 	paramsMust(t, c.CompleteReset(&v, receipt))
 	if v != token || !block.Live || block.Refs != 1 || block.Size != 0 || block.capacity != 0 || block.resetActive {
 		t.Fatal("own reset completes live vector only", v, *block)
+	}
+	if ownedText.live {
+		t.Fatal("owned text remained after vector finalization")
+	}
+	if got, present, err := c.GetString(&v, textKey, nil); err != nil || present || got != "" {
+		t.Fatal("finalized vector still exposes old text", got, present, err)
 	}
 	if !errors.Is(c.decrementReceipts[v.Slot-1].cause, arena.ErrBounds) {
 		t.Fatal("original source stop history lost")
