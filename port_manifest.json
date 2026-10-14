@@ -98589,12 +98589,14 @@
         "pkg/tactic/arith/polynomial_builder.go",
         "pkg/tactic/arith/polynomial_builder_test.go",
         "pkg/tactic/arith/polynomial_subsumption_test.go",
-        "pkg/tactic/arith/polynomial_process_bound_test.go"
+        "pkg/tactic/arith/polynomial_process_bound_test.go",
+        "pkg/tactic/arith/polynomial_collect_bounds_test.go"
       ],
       "tests": [
         "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer",
         "TestInequalityPolynomialSubsumptionUsesOwnedCoefficientBuffer",
-        "TestInequalityPolynomialBuilderProcessBoundSourceNormalization"
+        "TestInequalityPolynomialBuilderProcessBoundSourceNormalization",
+        "TestInequalityPolynomialBuilderCollectBoundsGoalOrderAndOwnership"
       ],
       "assertions": [
         {
@@ -98626,11 +98628,19 @@
           ]
         },
         {
-          "name": "Concrete process equality and ordered-bound classification, parity of NOT, numeral-left swap, exact threshold copy and bound publication (src/tactic/arith/propagate_ineqs_tactic.cpp:175-249)",
+          "name": "Concrete process equality and ordered-bound classification, parity of NOT, numeral-left swap, exact threshold copy and bound publication (src/tactic/arith/propagate_ineqs_tactic.cpp:175-237)",
           "status": "ported",
           "go_target": "pkg/tactic/arith/polynomial_builder.go",
           "tests": [
             "TestInequalityPolynomialBuilderProcessBoundSourceNormalization"
+          ]
+        },
+        {
+          "name": "Concrete collect_bounds source-size scan, consumed-bound flag and ordered non-bound goal publication (src/tactic/arith/propagate_ineqs_tactic.cpp:239-253)",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/polynomial_builder.go",
+          "tests": [
+            "TestInequalityPolynomialBuilderCollectBoundsGoalOrderAndOwnership"
           ]
         },
         {
@@ -98639,6 +98649,15 @@
           "go_target": "pkg/tactic/arith/polynomial_builder.go",
           "tests": [
             "TestInequalityPolynomialSubsumptionUsesOwnedCoefficientBuffer"
+          ]
+        },
+        {
+          "name": "Concrete restore_bounds variable order, exact equality coalescing, strict negated relation and ADD bound subsumption (src/tactic/arith/propagate_ineqs_tactic.cpp:279-318)",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/polynomial_builder.go",
+          "tests": [
+            "TestInequalityPolynomialBuilderProcessBoundSourceNormalization",
+            "TestInequalityPolynomialBuilderCollectBoundsGoalOrderAndOwnership"
           ]
         }
       ],

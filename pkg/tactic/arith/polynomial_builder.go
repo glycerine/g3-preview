@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	goaltactic "github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -313,6 +314,176 @@ func (b *PolynomialBuilder) ProcessBound(term ast.ASTHandle) (processed bool, er
 		_, err = b.store.AssertLower(x, &k, strict)
 	}
 	return err == nil, err
+}
+
+// CollectBounds scans the source goal once, retaining non-bounds in their
+// original order in a fresh goal supplied by the caller. Both goals are
+// borrowed; published bounds and the copied prefix survive a stopped call.
+func (b *PolynomialBuilder) CollectBounds(input, saved *goaltactic.Goal) (found bool, err error) {
+	if err = b.open(); err != nil {
+		return false, err
+	}
+	if input == nil || saved == nil || input == saved {
+		return false, arena.ErrInvalidSlot
+	}
+	if err = input.CheckOwner(); err != nil {
+		return false, err
+	}
+	if err = saved.CheckOwner(); err != nil {
+		return false, err
+	}
+	if input.Manager() != b.manager || saved.Manager() != b.manager {
+		return false, ast.ErrASTHandle
+	}
+	if size, e := saved.Size(); e != nil || size != 0 {
+		if e != nil {
+			return false, e
+		}
+		return false, arena.ErrInvalidSlot
+	}
+	size, err := input.Size()
+	if err != nil {
+		return false, err
+	}
+	for i := uint32(0); i < size; i++ {
+		formula, e := input.Form(i)
+		if e != nil {
+			return found, e
+		}
+		consumed, e := b.ProcessBound(formula)
+		if e != nil {
+			return found, e
+		}
+		if consumed {
+			found = true
+		} else if e = saved.Assert(formula); e != nil {
+			return found, e
+		}
+	}
+	return found, nil
+}
+
+// RestoreBounds emits the current source-order variable bounds after the
+// caller has propagated the store. Exact equal non-strict bounds become one
+// equality; ADD bounds implied by their terms are omitted.
+func (b *PolynomialBuilder) RestoreBounds(saved *goaltactic.Goal) (err error) {
+	if err = b.open(); err != nil {
+		return err
+	}
+	if saved == nil {
+		return arena.ErrInvalidSlot
+	}
+	if err = saved.CheckOwner(); err != nil {
+		return err
+	}
+	if saved.Manager() != b.manager {
+		return ast.ErrASTHandle
+	}
+	lower, upper := numeral.NewRational(), numeral.NewRational()
+	defer func() { err = errors.Join(err, b.store.manager.Del(&upper), b.store.manager.Del(&lower)) }()
+	for i, term := range b.var2expr {
+		foundLower, strictLower, _, e := b.store.Lower(uint32(i), &lower)
+		if e != nil {
+			return e
+		}
+		foundUpper, strictUpper, _, e := b.store.Upper(uint32(i), &upper)
+		if e != nil {
+			return e
+		}
+		if !foundLower && !foundUpper {
+			continue
+		}
+		if foundLower && foundUpper && !strictLower && !strictUpper {
+			cmp, e := b.store.manager.Compare(&lower, &upper)
+			if e != nil {
+				return e
+			}
+			if cmp == 0 {
+				bound, e := b.boundNumeral(term, &lower)
+				if e != nil {
+					return e
+				}
+				formula, e := b.manager.MkEq(term, bound)
+				if e != nil {
+					return e
+				}
+				if e = saved.Assert(formula); e != nil {
+					return e
+				}
+				continue
+			}
+		}
+		if foundLower {
+			subsumed, e := b.LowerSubsumed(term, &lower, strictLower)
+			if e != nil {
+				return e
+			}
+			if !subsumed {
+				if e = b.emitBound(saved, term, &lower, true, strictLower); e != nil {
+					return e
+				}
+			}
+		}
+		if foundUpper {
+			subsumed, e := b.UpperSubsumed(term, &upper, strictUpper)
+			if e != nil {
+				return e
+			}
+			if !subsumed {
+				if e = b.emitBound(saved, term, &upper, false, strictUpper); e != nil {
+					return e
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (b *PolynomialBuilder) boundNumeral(term ast.ASTHandle, value *numeral.Rational) (ast.ASTHandle, error) {
+	sort, err := b.manager.GetSort(term)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	kind, err := b.manager.GetDeclKind(sort)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	text, err := b.store.manager.String(value)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	service := b.manager.NumeralService()
+	owned, err := service.NewValue()
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if err = service.SetString(&owned, text); err != nil {
+		return ast.ASTHandle{}, errors.Join(err, service.Del(&owned))
+	}
+	h, err := b.manager.ArithmeticNumeral(&owned, kind == 1)
+	return h, errors.Join(err, service.Del(&owned))
+}
+
+func (b *PolynomialBuilder) emitBound(saved *goaltactic.Goal, term ast.ASTHandle, value *numeral.Rational, lower, strict bool) error {
+	bound, err := b.boundNumeral(term, value)
+	if err != nil {
+		return err
+	}
+	op := int32(2) // LE
+	if lower != strict {
+		op = 3 // GE
+	}
+	formula, err := b.manager.MkFamilyApp(b.family, op, nil, []ast.ASTHandle{term, bound})
+	if err != nil {
+		return err
+	}
+	if strict {
+		formula, err = b.manager.MkNot(formula)
+		if err != nil {
+			return err
+		}
+	}
+	return saved.Assert(formula)
 }
 
 // LowerSubsumed and UpperSubsumed are the concrete rational-buffer callers in

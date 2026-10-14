@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	goaltactic "github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -60,7 +61,8 @@ func TestInequalityPolynomialBuilderProcessBoundSourceNormalization(t *testing.T
 	notLeFour, err := m.MkNot(leFour)
 	equationMust(t, err)
 	apply(notLeFour, true) // x > 4
-	apply(mkOrdered(2, x, six), true)
+	upperX := mkOrdered(2, x, six)
+	apply(upperX, true)
 	eqY, err := m.MkEq(y, two)
 	equationMust(t, err)
 	apply(eqY, true)
@@ -97,5 +99,19 @@ func TestInequalityPolynomialBuilderProcessBoundSourceNormalization(t *testing.T
 	apply(mkOrdered(2, sum, eight), true)
 	if len(builder.var2expr) != 3 || len(store.constraints) != 1 || builder.coeff.Size() != 3 {
 		t.Fatal("sum bound did not reach the concrete rational coefficient buffer and equation store")
+	}
+	restored, err := goaltactic.NewGoal(m, false, false, false)
+	equationMust(t, err)
+	defer func() { equationMust(t, restored.Close()) }()
+	equationMust(t, builder.RestoreBounds(restored))
+	if size, e := restored.Size(); e != nil || size != 3 {
+		t.Fatal("subsumed ADD bounds should be omitted", size, e)
+	}
+	for i, want := range []ast.ASTHandle{notLeFour, upperX, eqY} {
+		got, e := restored.Form(uint32(i))
+		equationMust(t, e)
+		if got != want {
+			t.Fatal("strict/equality restoration order", i, got, want)
+		}
 	}
 }
