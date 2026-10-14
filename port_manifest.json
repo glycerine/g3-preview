@@ -166635,7 +166635,7 @@
       "methods": [
         {
           "name": "concrete int32 manager/ref construction, allocator encoding and ownership",
-          "status": "unported",
+          "status": "reference_only",
           "tests": []
         },
         {
@@ -166650,7 +166650,7 @@
         },
         {
           "name": "rset/rpush_back/rpop_back and suppressed int32 value callbacks",
-          "status": "unported",
+          "status": "reference_only",
           "tests": []
         },
         {
@@ -166685,7 +166685,7 @@
         },
         {
           "name": "manager() borrowed dummy value-manager identity accessor; int32 callback object not exposed by Go configuration adapter",
-          "status": "unported",
+          "status": "reference_only",
           "tests": []
         },
         {
@@ -166734,7 +166734,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "No generic Go persistent-array implementation remains. The retained tactic goal uses native owning slices with independent copies and now has an explicit concrete platform-replacement credit; generic parray algorithms and their standalone int32 stress workload are not ported. Direct AST-manager array callbacks remain open. Concrete fixed-point and fast-float subpaving bound arrays copy slices into child nodes and preserve borrowed bound identities, but the surrounding subpaving contexts remain partial. This source is not classified as dead."
+        "No generic Go persistent-array implementation remains. The retained tactic goal uses native owning slices with independent copies and now has an explicit concrete platform-replacement credit. The standalone int32 stress workload and its dummy value-manager callbacks occur only in src/test/parray.cpp, so those concrete rows are reference-only; generic parray algorithms remain open for live AST and subpaving configurations. Direct AST-manager array callbacks remain open. Concrete fixed-point and fast-float subpaving bound arrays copy slices into child nodes and preserve borrowed bound identities, but the surrounding subpaving contexts remain partial. This source is not classified as dead."
       ]
     },
     {
