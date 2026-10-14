@@ -139,4 +139,50 @@ func TestSubpavingFixedExtendedRetainedBranches(t *testing.T) {
 	if kind != Finite || down.Cmp(exact) >= 0 || up.Cmp(exact) <= 0 {
 		t.Fatalf("directed finite quotient = %d, [%s,%s]", kind, down, up)
 	}
+	// Source ext_numeral.h resolves infinite kinds before reading their
+	// numeral storage. Nil here represents a reset, unread endpoint.
+	for _, tc := range []struct {
+		kind           ExtendedKind
+		zero, pos, neg bool
+		negated        ExtendedKind
+	}{
+		{MinusInfinity, false, false, true, PlusInfinity},
+		{PlusInfinity, false, true, false, MinusInfinity},
+	} {
+		zero, err := e.IsZero(nil, tc.kind)
+		must(err)
+		pos, err := e.IsPos(nil, tc.kind)
+		must(err)
+		neg, err := e.IsNeg(nil, tc.kind)
+		must(err)
+		negated, err := e.Neg(nil, tc.kind)
+		must(err)
+		if zero != tc.zero || pos != tc.pos || neg != tc.neg || negated != tc.negated {
+			t.Fatalf("infinite kind %d: zero=%t pos=%t neg=%t negated=%d", tc.kind, zero, pos, neg, negated)
+		}
+		equal, err := e.Equal(nil, tc.kind, nil, tc.kind)
+		must(err)
+		if !equal {
+			t.Fatalf("infinite kind %d unequal to itself", tc.kind)
+		}
+	}
+	less, err := e.Less(nil, MinusInfinity, nil, PlusInfinity)
+	must(err)
+	greater, err := e.Greater(nil, PlusInfinity, nil, MinusInfinity)
+	must(err)
+	equal, err := e.Equal(nil, MinusInfinity, nil, PlusInfinity)
+	must(err)
+	if !less || !greater || equal {
+		t.Fatal("infinite kind order and equality", less, greater, equal)
+	}
+	kind, err = e.Power(nil, MinusInfinity, 0)
+	must(err)
+	if kind != PlusInfinity {
+		t.Fatal("source even-power infinity kind", kind)
+	}
+	kind, err = e.Power(nil, MinusInfinity, 3)
+	must(err)
+	if kind != MinusInfinity {
+		t.Fatal("source odd-power infinity kind", kind)
+	}
 }

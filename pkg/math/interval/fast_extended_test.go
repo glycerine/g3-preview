@@ -196,4 +196,47 @@ func TestSubpavingFastFloatExtendedRetainedBranches(t *testing.T) {
 	if k != Finite || !less {
 		t.Fatal("directed fast-float quotient", k)
 	}
+	// Source ext_numeral.h resolves infinite kinds without consulting the
+	// reset numeral. A nil numeral makes an accidental read visible here.
+	for _, tc := range []struct {
+		kind               ExtendedKind
+		positive, negative bool
+		negated            ExtendedKind
+	}{
+		{MinusInfinity, false, true, PlusInfinity},
+		{PlusInfinity, true, false, MinusInfinity},
+	} {
+		zero, err := e.IsZero(nil, tc.kind)
+		must(err)
+		positive, err := e.IsPos(nil, tc.kind)
+		must(err)
+		negative, err := e.IsNeg(nil, tc.kind)
+		must(err)
+		negated, err := e.Neg(nil, tc.kind)
+		must(err)
+		equal, err := e.Equal(nil, tc.kind, nil, tc.kind)
+		must(err)
+		if zero || positive != tc.positive || negative != tc.negative || negated != tc.negated || !equal {
+			t.Fatalf("infinite kind %d: zero=%t pos=%t neg=%t negated=%d equal=%t", tc.kind, zero, positive, negative, negated, equal)
+		}
+	}
+	less, err = e.Less(nil, MinusInfinity, nil, PlusInfinity)
+	must(err)
+	greater, err := e.Greater(nil, PlusInfinity, nil, MinusInfinity)
+	must(err)
+	equal, err := e.Equal(nil, MinusInfinity, nil, PlusInfinity)
+	must(err)
+	if !less || !greater || equal {
+		t.Fatal("infinite kind order and equality", less, greater, equal)
+	}
+	k, err = e.Power(nil, MinusInfinity, 0)
+	must(err)
+	if k != PlusInfinity {
+		t.Fatal("source even-power infinity kind", k)
+	}
+	k, err = e.Power(nil, MinusInfinity, 3)
+	must(err)
+	if k != MinusInfinity {
+		t.Fatal("source odd-power infinity kind", k)
+	}
 }
