@@ -48597,8 +48597,8 @@
       "component": "math",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/math/realclosure/sign_matrix.go", "pkg/math/realclosure/sign_matrix_test.go"],
-      "tests": ["TestSignDeterminationSourceMatrices", "TestSignMatrixTensorAndCopyOwnCells"],
+      "go_targets": ["pkg/math/realclosure/sign_matrix.go", "pkg/math/realclosure/sign_matrix_test.go", "pkg/math/realclosure/sign_matrix_solve.go", "pkg/math/realclosure/sign_matrix_solve_test.go"],
+      "tests": ["TestSignDeterminationSourceMatrices", "TestSignMatrixTensorAndCopyOwnCells", "TestSignMatrixSourceIntegerSolutions", "TestSignMatrixFilterColumnsOwnsValues", "TestSignMatrixIntegerSolverSignedTwoByTwoGrid", "TestSignMatrixIndependentRowsPreserveOriginalPriority"],
       "assertions": [
         {
           "line": 43,
@@ -48681,21 +48681,32 @@
           ]
         },
         {
-          "name": "Matrix solve, filter_cols, permute_rows, and linear_independent_rows for the retained sign-determination owner",
-          "status": "unported",
+          "name": "Retained integer solve, ascending filter_cols, and original-priority linear_independent_rows (mpz_matrix.cpp:92-387)",
+          "status": "ported",
+          "go_target": "pkg/math/realclosure/sign_matrix_solve.go",
+          "tests": [
+            "TestSignMatrixSourceIntegerSolutions",
+            "TestSignMatrixFilterColumnsOwnsValues",
+            "TestSignMatrixIntegerSolverSignedTwoByTwoGrid",
+            "TestSignMatrixIndependentRowsPreserveOriginalPriority"
+          ]
+        },
+        {
+          "name": "permute_rows has a source test caller but no retained production caller; remaining display and mpz-output profiles remain open",
+          "status": "reference_only",
           "tests": []
         }
       ],
       "ownership": [],
-      "deviations": ["Native []big.Int replaces the C++ mpz array and allocator. Sign-determination matrix constructor is ported separately; matrix solve and owner integration remain open."]
+      "deviations": ["Native []big.Int replaces the C++ mpz array and allocator. Sign-determination matrix constructor is ported separately; full real-closure owner integration and remaining matrix profiles remain open."]
     },
     {
       "path": "src/math/realclosure/mpz_matrix.h",
       "component": "math",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/math/realclosure/sign_matrix.go", "pkg/math/realclosure/sign_matrix_test.go"],
-      "tests": ["TestSignDeterminationSourceMatrices", "TestSignMatrixTensorAndCopyOwnCells"],
+      "go_targets": ["pkg/math/realclosure/sign_matrix.go", "pkg/math/realclosure/sign_matrix_test.go", "pkg/math/realclosure/sign_matrix_solve.go", "pkg/math/realclosure/sign_matrix_solve_test.go"],
+      "tests": ["TestSignDeterminationSourceMatrices", "TestSignMatrixTensorAndCopyOwnCells", "TestSignMatrixSourceIntegerSolutions", "TestSignMatrixFilterColumnsOwnsValues", "TestSignMatrixIntegerSolverSignedTwoByTwoGrid", "TestSignMatrixIndependentRowsPreserveOriginalPriority"],
       "conditionals": [
         {
           "line": 31,
@@ -48740,13 +48751,24 @@
           ]
         },
         {
-          "name": "Matrix solve, filter_cols, permute_rows, and linear_independent_rows for the retained sign-determination owner",
-          "status": "unported",
+          "name": "Retained integer solve, ascending filter_cols, and original-priority linear_independent_rows (mpz_matrix.cpp:92-387)",
+          "status": "ported",
+          "go_target": "pkg/math/realclosure/sign_matrix_solve.go",
+          "tests": [
+            "TestSignMatrixSourceIntegerSolutions",
+            "TestSignMatrixFilterColumnsOwnsValues",
+            "TestSignMatrixIntegerSolverSignedTwoByTwoGrid",
+            "TestSignMatrixIndependentRowsPreserveOriginalPriority"
+          ]
+        },
+        {
+          "name": "permute_rows has a source test caller but no retained production caller; remaining display and mpz-output profiles remain open",
+          "status": "reference_only",
           "tests": []
         }
       ],
       "ownership": [],
-      "deviations": ["Native []big.Int replaces the C++ mpz array and allocator. Sign-determination matrix constructor is ported separately; matrix solve and owner integration remain open."]
+      "deviations": ["Native []big.Int replaces the C++ mpz array and allocator. Sign-determination matrix constructor is ported separately; full real-closure owner integration and remaining matrix profiles remain open."]
     },
     {
       "path": "src/math/realclosure/rcf_params.hpp",
@@ -48827,13 +48849,19 @@
         "pkg/math/realclosure/binary_interval_inv.go",
         "pkg/math/realclosure/binary_interval_div.go",
         "pkg/math/realclosure/sign_matrix.go",
-        "pkg/math/realclosure/sign_matrix_test.go"
+        "pkg/math/realclosure/sign_matrix_test.go",
+        "pkg/math/realclosure/sign_matrix_solve.go",
+        "pkg/math/realclosure/sign_matrix_solve_test.go"
       ],
       "tests": [
         "TestRealClosureBinaryExtendedNumeralBranches",
         "TestRealClosureBinaryIntervalRetainedCore",
         "TestSignDeterminationSourceMatrices",
-        "TestSignMatrixTensorAndCopyOwnCells"
+        "TestSignMatrixTensorAndCopyOwnCells",
+        "TestSignMatrixSourceIntegerSolutions",
+        "TestSignMatrixFilterColumnsOwnsValues",
+        "TestSignMatrixIntegerSolverSignedTwoByTwoGrid",
+        "TestSignMatrixIndependentRowsPreserveOriginalPriority"
       ],
       "conditionals": [
         {
@@ -50022,6 +50050,16 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Sign-determination integer cardinality solve, ascending column filter, and original-priority independent-row selection (realclosure.cpp:2034-2083)",
+          "status": "partial",
+          "go_target": "pkg/math/realclosure/sign_matrix_solve.go",
+          "tests": [
+            "TestSignMatrixSourceIntegerSolutions",
+            "TestSignMatrixFilterColumnsOwnsValues",
+            "TestSignMatrixIndependentRowsPreserveOriginalPriority"
+          ]
+        },
         {
           "name": "imp::mk_sign_det_matrix four root-sign configurations and non-discriminating refusal (realclosure.cpp:1887-1927)",
           "status": "ported",
