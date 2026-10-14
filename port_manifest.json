@@ -119970,8 +119970,8 @@
           "status": "unported"
         },
         {
-          "name": "Subpaving context_mpf finite/infinite extended-number operations through concrete f2n<mpf_manager>; enclosing mutable interval remains open",
-          "status": "partial",
+          "name": "Subpaving context_mpf finite/infinite extended-number operations through concrete f2n<mpf_manager>; enclosing mutable interval tracked under src/math/subpaving",
+          "status": "ported",
           "go_target": "pkg/math/interval/arbitrary_extended.go",
           "tests": [
             "TestSubpavingMPFExtendedFiniteAndInfiniteBranches"
