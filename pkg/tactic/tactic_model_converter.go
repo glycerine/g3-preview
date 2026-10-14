@@ -22,6 +22,7 @@ var errTacticModelConverterGoal = errors.New("model converter: unreachable goal 
 type ModelConverter interface {
 	IncRef() error
 	DecRef() error
+	DecRefConsumed() (bool, error)
 	Close() error
 	ApplyModel(*ModelRef, uint32) error
 	ApplyUnindexed(*ModelRef) error
@@ -220,17 +221,37 @@ func (b *tacticConverterBase) IncRef() error {
 	return nil
 }
 func (b *tacticConverterBase) DecRef() error {
+	_, e := b.DecRefConsumed()
+	return e
+}
+func (b *tacticConverterBase) DecRefConsumed() (bool, error) {
 	if e := b.open(); e != nil {
-		return e
+		return false, e
 	}
 	if b.references == 0 {
-		return ErrModelConverterOwner
+		return false, ErrModelConverterOwner
 	}
 	b.references--
 	if b.references == 0 {
-		return b.owner.Close()
+		return true, b.owner.Close()
 	}
-	return nil
+	return true, nil
+}
+
+// A final decrement may consume the reference and still stop while the child
+// closes. Keep that distinction so a parent resumes Close instead of DEC.
+func closeTacticConverterRef(value ModelConverter, cleanupPending *bool) error {
+	if *cleanupPending {
+		return value.Close()
+	}
+	consumed, e := value.DecRefConsumed()
+	if !consumed && e == nil {
+		return ErrModelConverterOwner
+	}
+	if consumed && e != nil {
+		*cleanupPending = true
+	}
+	return e
 }
 func (b *tacticConverterBase) release() {
 	b.budget.Release(b.ownerBytes)
@@ -243,7 +264,8 @@ type tacticConcatModelConverter struct {
 	tacticConverterBase
 	// Concrete ref<model_converter> members from concat_converter.
 	// Construction retains first then second; Close releases second then first.
-	first, second ModelConverter
+	first, second               ModelConverter
+	firstCleanup, secondCleanup bool
 }
 
 func ConcatModels(b *arena.Budget, first, second ModelConverter) (result ModelConverter, err error) {
@@ -326,16 +348,18 @@ func (c *tacticConcatModelConverter) Close() error {
 	}
 	// Source reverse member destruction: second reference, then first.
 	if c.second != nil {
-		if e := c.second.DecRef(); e != nil {
+		if e := closeTacticConverterRef(c.second, &c.secondCleanup); e != nil {
 			return e
 		}
 		c.second = nil
+		c.secondCleanup = false
 	}
 	if c.first != nil {
-		if e := c.first.DecRef(); e != nil {
+		if e := closeTacticConverterRef(c.first, &c.firstCleanup); e != nil {
 			return e
 		}
 		c.first = nil
+		c.firstCleanup = false
 	}
 	c.release()
 	return nil
@@ -346,10 +370,11 @@ type tacticConcatStarModelConverter struct {
 	first ModelConverter
 	// Cold references to source virtual converter owners; no AST or solver
 	// records are boxed. Scalar subgoal sizes retain their own source vector.
-	seconds    []ModelConverter
-	sizes      []uint32
-	pending    ModelConverter
-	closeIndex uint32
+	seconds                                     []ModelConverter
+	sizes                                       []uint32
+	pending                                     ModelConverter
+	closeIndex                                  uint32
+	firstCleanup, secondCleanup, pendingCleanup bool
 }
 
 func (c *tacticConcatStarModelConverter) pushSecond(value ModelConverter) error {
@@ -496,26 +521,29 @@ func (c *tacticConcatStarModelConverter) Close() error {
 	for uint64(c.closeIndex) < uint64(len(c.seconds)) {
 		second := c.seconds[c.closeIndex]
 		if second != nil {
-			if e := second.DecRef(); e != nil {
+			if e := closeTacticConverterRef(second, &c.secondCleanup); e != nil {
 				return e
 			}
 			c.seconds[c.closeIndex] = nil
+			c.secondCleanup = false
 		}
 		c.closeIndex++
 	}
 	if c.pending != nil {
-		if e := c.pending.DecRef(); e != nil {
+		if e := closeTacticConverterRef(c.pending, &c.pendingCleanup); e != nil {
 			return e
 		}
 		c.pending = nil
+		c.pendingCleanup = false
 	}
 	c.sizes = nil
 	c.seconds = nil
 	if c.first != nil {
-		if e := c.first.DecRef(); e != nil {
+		if e := closeTacticConverterRef(c.first, &c.firstCleanup); e != nil {
 			return e
 		}
 		c.first = nil
+		c.firstCleanup = false
 	}
 	c.release()
 	return nil

@@ -5,6 +5,8 @@ package tactic
 import (
 	"errors"
 	"fmt"
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"reflect"
@@ -32,14 +34,18 @@ func (c *modelConverterTestLeaf) IncRef() error {
 	return nil
 }
 func (c *modelConverterTestLeaf) DecRef() error {
+	_, e := c.DecRefConsumed()
+	return e
+}
+func (c *modelConverterTestLeaf) DecRefConsumed() (bool, error) {
 	if c.closed || c.refs == 0 {
-		return ErrModelConverterOwner
+		return false, ErrModelConverterOwner
 	}
 	c.refs--
 	if c.refs == 0 {
-		return c.Close()
+		return true, c.Close()
 	}
-	return nil
+	return true, nil
 }
 func (c *modelConverterTestLeaf) Close() error {
 	if !c.closed {
@@ -47,6 +53,97 @@ func (c *modelConverterTestLeaf) Close() error {
 		*c.calls = append(*c.calls, "destroy:"+c.name)
 	}
 	return nil
+}
+
+type modelConverterStoppedRelease struct {
+	modelConverterTestLeaf
+	stop       error
+	cleanupDue bool
+	decrements uint32
+}
+
+func (c *modelConverterStoppedRelease) DecRef() error {
+	_, e := c.DecRefConsumed()
+	return e
+}
+func (c *modelConverterStoppedRelease) DecRefConsumed() (bool, error) {
+	if c.closed || c.refs == 0 {
+		return false, ErrModelConverterOwner
+	}
+	c.refs--
+	c.decrements++
+	if c.refs == 0 {
+		c.cleanupDue = true
+		return true, c.stop
+	}
+	return true, nil
+}
+func (c *modelConverterStoppedRelease) Close() error {
+	if !c.cleanupDue {
+		return ErrModelConverterOwner
+	}
+	c.cleanupDue = false
+	return c.modelConverterTestLeaf.Close()
+}
+
+func TestTacticModelConcatConsumedChildCleanupResumesWithoutSecondDecrement(t *testing.T) {
+	m := astTestManager(t)
+	calls := []string{}
+	stop := errors.New("child cleanup stopped")
+	first := &modelConverterTestLeaf{name: "first", calls: &calls}
+	second := &modelConverterStoppedRelease{modelConverterTestLeaf: modelConverterTestLeaf{name: "second", calls: &calls}, stop: stop}
+	ordinary, e := ConcatModels(m.BudgetField, first, second)
+	satOK(t, e)
+	if e = ordinary.Close(); !errors.Is(e, stop) || second.refs != 0 || second.decrements != 1 || first.refs != 1 || len(calls) != 0 {
+		t.Fatal("ordinary consumed prefix", e, second.refs, second.decrements, first.refs, calls)
+	}
+	satOK(t, ordinary.Close())
+	if second.decrements != 1 || !reflect.DeepEqual(calls, []string{"destroy:second", "destroy:first"}) {
+		t.Fatal("ordinary cleanup replayed decrement", second.decrements, calls)
+	}
+
+	calls = nil
+	root := &modelConverterTestLeaf{name: "root", calls: &calls}
+	stopped := &modelConverterStoppedRelease{modelConverterTestLeaf: modelConverterTestLeaf{name: "stopped", calls: &calls}, stop: stop}
+	later := &modelConverterTestLeaf{name: "later", calls: &calls}
+	star, e := concatTacticModelSubgoals(m.BudgetField, root, []ModelConverter{stopped, later}, []uint32{1, 1})
+	satOK(t, e)
+	if e = star.Close(); !errors.Is(e, stop) || stopped.refs != 0 || stopped.decrements != 1 || later.refs != 1 || root.refs != 1 || len(calls) != 0 {
+		t.Fatal("star consumed prefix", e, stopped.refs, stopped.decrements, later.refs, root.refs, calls)
+	}
+	satOK(t, star.Close())
+	if stopped.decrements != 1 || !reflect.DeepEqual(calls, []string{"destroy:stopped", "destroy:later", "destroy:root"}) {
+		t.Fatal("star cleanup replayed decrement", stopped.decrements, calls)
+	}
+}
+
+func TestTacticModelConcatRealStoredChildFinalReleaseRefusal(t *testing.T) {
+	m := astTestManager(t)
+	md, e := model.NewModel(m)
+	satOK(t, e)
+	sort, e := m.MkUninterpretedSort(astTestSymbol(t, m, "concat-refusal-sort"), nil)
+	satOK(t, e)
+	value, e := m.GetSomeValue(sort)
+	satOK(t, e)
+	satOK(t, md.RegisterUniverse(sort, []ast.ASTHandle{value}))
+	stored, e := NewStoredModel(&md.CoreField)
+	satOK(t, e)
+	calls := []string{}
+	first := &modelConverterTestLeaf{name: "first", calls: &calls}
+	combined, e := ConcatModels(m.BudgetField, first, stored)
+	satOK(t, e)
+	m.ExprIDs.Cleanup(m.ExprIDs.Range())
+	m.BudgetField.FailAfter(0)
+	e = combined.Close()
+	m.BudgetField.FailAfter(-1)
+	if !errors.Is(e, arena.ErrInjectedFailure) || first.refs != 1 || !combined.(*tacticConcatModelConverter).secondCleanup {
+		t.Fatal("real child final release prefix", e, first.refs)
+	}
+	satOK(t, combined.Close())
+	if !reflect.DeepEqual(calls, []string{"destroy:first"}) || !stored.(*tacticStoredModelConverter).closed {
+		t.Fatal("real child cleanup replay", calls)
+	}
+	satOK(t, md.Close())
 }
 func (c *modelConverterTestLeaf) ApplyModel(m *ModelRef, i uint32) error {
 	*c.calls = append(*c.calls, fmt.Sprintf("model:%s:%d", c.name, i))

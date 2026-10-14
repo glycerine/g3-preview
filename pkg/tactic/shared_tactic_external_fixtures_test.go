@@ -78,14 +78,18 @@ func (c *modelConverterTestLeaf) IncRef() error {
 	return nil
 }
 func (c *modelConverterTestLeaf) DecRef() error {
+	_, e := c.DecRefConsumed()
+	return e
+}
+func (c *modelConverterTestLeaf) DecRefConsumed() (bool, error) {
 	if c.closed || c.refs == 0 {
-		return tactic.ErrModelConverterOwner
+		return false, tactic.ErrModelConverterOwner
 	}
 	c.refs--
 	if c.refs == 0 {
-		return c.Close()
+		return true, c.Close()
 	}
-	return nil
+	return true, nil
 }
 func (c *modelConverterTestLeaf) Close() error {
 	if !c.closed {
