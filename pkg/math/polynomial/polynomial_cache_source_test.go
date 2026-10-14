@@ -91,6 +91,74 @@ func TestPolynomialCachePSCStoppedBodyCleanupAndRetry(t *testing.T) {
 	}
 }
 
+func TestPolynomialCachePSCResultReplacementStoppedDeletion(t *testing.T) {
+	m := polynomialPSCFullFixture(t)
+	c, e := NewPolynomialCache(m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, c.Close()) })
+	p := polynomialQueryTerms(t, m.core, []int32{1, 1, 1, 2}, [][]MonomialPower{{{0, 1}, {1, 2}}, {{0, 1}, {1, 1}}, {{1, 1}}, nil})
+	q := polynomialQueryTerms(t, m.core, []int32{1, 3}, [][]MonomialPower{{{0, 1}, {1, 1}}, nil})
+	first, e := NewPolynomialRefVector(m.core)
+	serviceMust(t, e)
+	serviceMust(t, m.PSCChain(p, q, 1, first))
+	n, e := first.Size()
+	serviceMust(t, e)
+	if n == 0 {
+		t.Fatal("source PSC fixture produced no result")
+	}
+	canonical := make([]Polynomial, n)
+	for i := uint32(0); i < n; i++ {
+		value, e := first.Get(i)
+		serviceMust(t, e)
+		canonical[i], e = c.MkUnique(value)
+		serviceMust(t, e)
+	}
+	serviceMust(t, first.Close())
+	out, e := NewPolynomialRefVector(m.core)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, out.Close()) })
+	stop := errors.New("stop cached PSC result deletion")
+	armed, fired := true, false
+	h, e := NewPolynomialDeletionHandler(m.originalBudget, func(_ *PolynomialDeletionHandler, core *MultivariatePolynomialCore, value Polynomial) error {
+		if armed && !core.pscLocal.active && value != canonical[0] && len(out.state.values) > 0 && out.state.values[0] == value {
+			fired = true
+			return stop
+		}
+		return nil
+	})
+	serviceMust(t, e)
+	serviceMust(t, m.core.AddDeletionHandler(h))
+	t.Cleanup(func() { serviceMust(t, m.core.RemoveDeletionHandler(h)); serviceMust(t, h.CloseChecked()) })
+	e = c.PSCChain(p, q, 1, out)
+	armed = false
+	if !fired || !errors.Is(e, stop) {
+		t.Fatal("published PSC result replacement did not reach deletion refusal", fired, e)
+	}
+	if !out.state.setActive || out.state.incoming != canonical[0] {
+		t.Fatal("failed SET lost its acquired canonical reference")
+	}
+	info, e := m.core.Info(canonical[0])
+	serviceMust(t, e)
+	if info.RefCount != 2 {
+		t.Fatal("failed SET did not retain its incoming reference", info.RefCount)
+	}
+	if len(c.psc) != 1 {
+		t.Fatal("failed result replacement lost inserted cache entry")
+	}
+	serviceMust(t, c.CleanupPSC())
+	serviceMust(t, out.Close())
+	info, e = m.core.Info(canonical[0])
+	serviceMust(t, e)
+	if info.RefCount != 1 {
+		t.Fatal("caller cleanup did not release incoming reference", info.RefCount)
+	}
+	serviceMust(t, c.Reset())
+	retry, e := NewPolynomialRefVector(m.core)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, retry.Close()) })
+	serviceMust(t, c.PSCChain(p, q, 1, retry))
+}
+
 func TestPolynomialCacheConstructorBudgetAndRefusal(t *testing.T) {
 	m := polynomialPSCFullFixture(t)
 	b := m.core.integer.Budget()
