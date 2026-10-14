@@ -22,8 +22,8 @@ func (m *RationalManager) Root(a *Rational, n uint32, out *Rational) (bool, erro
 	return m.Z.Root(&a.Den, n, &out.Den)
 }
 
-// IsPerfectSquare retains denominator-reset, short-circuit and alias-reset
-// behavior from source. Only a fully precise fractional result is normalized.
+// IsPerfectSquare writes directly to the caller's rational in source order.
+// Only a fully precise fractional result is normalized.
 func (m *RationalManager) IsPerfectSquare(a, out *Rational) (bool, error) {
 	return m.perfectSquare(a, out, false)
 }
@@ -41,36 +41,28 @@ func (m *RationalManager) perfectSquare(a, out *Rational, integerOnly bool) (boo
 	if integerOnly && !integer {
 		return false, &RootDomainError{Reason: RootRequiresInteger}
 	}
-	work := NewRational()
-	defer m.drop(&work)
-	if e := m.Copy(&work, out); e != nil {
-		return false, e
-	}
-	input := a
-	if a == out {
-		input = &work
-	}
-	var exact bool
-	var e error
 	if integer {
-		if e = m.resetDenominator(&work); e != nil {
+		if e := m.resetDenominator(out); e != nil {
 			return false, e
 		}
-		exact, e = m.Z.IsPerfectSquare(&input.Num, &work.Num)
-	} else {
-		exact, e = m.Z.IsPerfectSquare(&input.Num, &work.Num)
-		if e == nil && exact {
-			exact, e = m.Z.IsPerfectSquare(&input.Den, &work.Den)
-		}
-		if e == nil && exact {
-			e = m.normalize(&work)
-		}
+		return m.Z.IsPerfectSquare(&a.Num, &out.Num)
 	}
+	exact, e := m.Z.IsPerfectSquare(&a.Num, &out.Num)
 	if e != nil {
 		return false, e
 	}
-	if e = m.Move(out, &work); e != nil {
+	if !exact {
+		return false, nil
+	}
+	exact, e = m.Z.IsPerfectSquare(&a.Den, &out.Den)
+	if e != nil {
 		return false, e
 	}
-	return exact, nil
+	if !exact {
+		return false, nil
+	}
+	if e := m.normalize(out); e != nil {
+		return false, e
+	}
+	return true, nil
 }

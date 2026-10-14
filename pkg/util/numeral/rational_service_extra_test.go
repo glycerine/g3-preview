@@ -91,7 +91,9 @@ func TestRationalServiceExtraRootSourcePublicationAndAliases(t *testing.T) {
 	if exact || !errors.Is(e, ErrDivideByZero) {
 		t.Fatal(exact, e)
 	}
-	serviceText(t, s, &a, "4/9")
+	if a.Raw.Num.Val != 0 || a.Raw.Den.Val != 0 {
+		t.Fatal("fractional square alias did not publish both zero components", a.Raw)
+	}
 	serviceMust(t, s.Del(&a))
 
 	for _, f := range []struct {
@@ -340,6 +342,10 @@ func TestRationalServiceExtraFailurePrefixesAndOwnership(t *testing.T) {
 				if op == 0 {
 					if x.Raw.Den != oldXDen {
 						t.Fatal("rational Root touched denominator before numerator completed", fault)
+					}
+				} else if op == 1 || op == 2 {
+					if x.Raw.Den != oldXDen && !isOneInteger(&x.Raw.Den) {
+						t.Fatal("integer square wrapper denominator prefix", op, fault)
 					}
 				} else if op != 4 {
 					serviceIndependentText(t, s, &x, oldX)
