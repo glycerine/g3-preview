@@ -120141,8 +120141,8 @@
           ]
         },
         {
-          "name": "dependency_manager<expr_dependency_config>::dec_ref/del remaining stopped child-store and deallocation-refusal prefixes beyond the consumed leaf-callback continuation",
-          "status": "partial",
+          "name": "dependency_manager<expr_dependency_config>::dec_ref/del valid-live child-store and matching fixed-size deallocation after callback continuation; checked corruption guards are outside retained source behavior",
+          "status": "ported",
           "go_target": "pkg/ast/ast_dependency.go",
           "tests": [
             "TestASTEagerDependencyConstructorBorrowedFieldsAreReal",
@@ -120212,6 +120212,24 @@
             "TestASTDependencyNativeColdFIFOAndCompleteUnmarking",
             "TestASTDependencyWarmDestructionNoReservationOrHeapAllocation"
           ]
+        },
+        {
+          "name": "dependency_manager<nlsat::solver::imp::dconfig> concrete void-pointer assumption leaves, joins, refcounts, deletion and linearization at nlsat_solver.cpp:262-266,717,1383,1410,1497",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        },
+        {
+          "name": "scoped_dependency_manager<theory_seq::assumption> region-owned leaves, joins, linearization and scope push/pop at theory_seq.cpp:94-117,1014,1232,2989-3063,4112-4125",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
+        },
+        {
+          "name": "scoped_dependency_manager<void*> region-owned bound/justification leaves, joins, linearization and reset for SMT arithmetic, old_interval, Grobner and MUZ relation consumers",
+          "status": "unported",
+          "go_target": "",
+          "tests": []
         }
       ],
       "ownership": [
