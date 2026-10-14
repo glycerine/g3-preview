@@ -241,8 +241,7 @@ func (s *ScopedInt) AbsCopy() (*ScopedInt, error) {
 		return nil, e
 	}
 	if e = c.manager.Abs(&c.num); e != nil {
-		c.Close()
-		return nil, e
+		return nil, finishScopedIntExpressionFailure(c, e)
 	}
 	return c, nil
 }
@@ -252,8 +251,7 @@ func (s *ScopedRational) AbsCopy() (*ScopedRational, error) {
 		return nil, e
 	}
 	if e = c.manager.Abs(&c.num); e != nil {
-		c.Close()
-		return nil, e
+		return nil, finishScopedRationalExpressionFailure(c, e)
 	}
 	return c, nil
 }
@@ -307,8 +305,7 @@ func (s *ScopedInt) result(v *Int, op uint8) (*ScopedInt, error) {
 		return nil, e
 	}
 	if e = c.apply(v, op); e != nil {
-		c.Close()
-		return nil, e
+		return nil, finishScopedIntExpressionFailure(c, e)
 	}
 	return c, nil
 }
@@ -318,8 +315,7 @@ func (s *ScopedRational) result(v *Rational, op uint8) (*ScopedRational, error) 
 		return nil, e
 	}
 	if e = c.apply(v, op); e != nil {
-		c.Close()
-		return nil, e
+		return nil, finishScopedRationalExpressionFailure(c, e)
 	}
 	return c, nil
 }
