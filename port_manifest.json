@@ -79966,7 +79966,8 @@
         "pkg/shell/global_timeout_option.go",
         "pkg/shell/input_file_option.go",
         "pkg/shell/command_line.go",
-        "pkg/shell/command_line_output.go"
+        "pkg/shell/command_line_output.go",
+        "pkg/shell/dispatch_memory.go"
       ],
       "tests": [
         "TestShellGlobalTimeoutOptionSourceBranch",
@@ -79977,7 +79978,9 @@
         "TestShellCommandLineTerminalActionsAndKinds",
         "TestShellCommandLineSourceDecimalAndRefusals",
         "TestShellCommandLineReachesGlobalParameterAndTimeoutOwners",
-        "TestShellCommandLineDebugAndTraceBuildGates"
+        "TestShellCommandLineDebugAndTraceBuildGates",
+        "TestShellResolveSourceInputExtension",
+        "TestShellMemoryDispatchSourceExitText"
       ],
       "conditionals": [
         {
@@ -80123,6 +80126,15 @@
           "go_target": "pkg/shell/command_line_output.go",
           "tests": [
             "TestShellCommandLineReachesGlobalParameterAndTimeoutOwners"
+          ]
+        },
+        {
+          "name": "main input-kind extension selection and fatal-memory text at dispatch (main.cpp:294-337)",
+          "status": "partial",
+          "go_target": "pkg/shell/dispatch_memory.go",
+          "tests": [
+            "TestShellResolveSourceInputExtension",
+            "TestShellMemoryDispatchSourceExitText"
           ]
         }
       ],

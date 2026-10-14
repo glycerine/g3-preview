@@ -22,6 +22,7 @@ const (
 	InputWCNF
 	InputOPB
 	InputZ3Log
+	InputMPS
 )
 
 type CommandAction uint8
