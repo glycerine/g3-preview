@@ -54,6 +54,64 @@ func TestFastContextRelevanceCatchesMPFFOverflow(t *testing.T) {
 	}
 }
 
+func TestFastContextRelevanceCatchesMPFFUpperAndThresholdOverflow(t *testing.T) {
+	for _, tc := range []struct {
+		name                      string
+		lowerBound, upperBound    bool
+		lowMax, highMin           bool
+		candidateLower, roundPlus bool
+	}{
+		{"upper gap", true, true, false, false, false, true},
+		{"lower threshold", true, false, true, false, true, true},
+		{"upper threshold", false, true, false, true, false, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			m, c, value, root := fastMonomialFixture(t, []bool{false})
+			if err := c.updateEpsilon(20); err != nil {
+				t.Fatal(err)
+			}
+			if tc.lowerBound {
+				var err error
+				if tc.lowMax {
+					err = m.SetMax(value)
+				} else {
+					err = m.SetMin(value)
+				}
+				if err != nil {
+					t.Fatal(err)
+				}
+				if err := c.PropagateBound(root, 0, value, true, false); err != nil {
+					t.Fatal(err)
+				}
+			}
+			if tc.upperBound {
+				var err error
+				if tc.highMin {
+					err = m.SetMin(value)
+				} else {
+					err = m.SetMax(value)
+				}
+				if err != nil {
+					t.Fatal(err)
+				}
+				if err := c.PropagateBound(root, 0, value, false, false); err != nil {
+					t.Fatal(err)
+				}
+			}
+			if err := m.SetInt32(value, 0); err != nil {
+				t.Fatal(err)
+			}
+			if err := m.SetRounding(tc.roundPlus); err != nil {
+				t.Fatal(err)
+			}
+			relevant, err := c.RelevantNewBound(root, 0, value, tc.candidateLower, false)
+			if err != nil || relevant || !c.arithmeticFailed {
+				t.Fatalf("%s MPFF overflow catch: relevant=%t, err=%v, arithmeticFailed=%t", tc.name, relevant, err, c.arithmeticFailed)
+			}
+		})
+	}
+}
+
 func TestSubpavingFastContextBoundFlowAndRelevance(t *testing.T) {
 	budget := arena.NewBudget(1 << 28)
 	cfg := numeral.DefaultFastFloatConfig(arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: budget}})
