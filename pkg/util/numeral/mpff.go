@@ -64,6 +64,7 @@ var ErrFastFloatPowerPending = errors.New("mpnum: MPFF power scoped cleanup pend
 var ErrFastFloatRationalPending = errors.New("mpnum: MPFF rational setter cleanup pending")
 var ErrFastFloatIntegerPending = errors.New("mpnum: MPFF to-integer power cleanup pending")
 var ErrFastFloatToRationalPending = errors.New("mpnum: MPFF to-rational power cleanup pending")
+var ErrFastFloatFractionPending = errors.New("mpnum: MPFF fraction setter cleanup pending")
 var ErrFastFloatOwner = errors.New("mpnum: invalid MPFF owner or dead significand")
 
 // Cold owner: owns its buffers and services, borrowing a configured Runtime; caller numerical
@@ -94,6 +95,9 @@ type FastFloatManager struct {
 	rationalPowerOwner                           *RationalManager
 	rationalPowerPending, rationalPowerExecuting bool
 	rationalPowerCursor                          uint8
+	fractionNum, fractionDen                     FastFloat
+	fractionPending, fractionExecuting           bool
+	fractionCursor                               uint8
 }
 
 func NewFastFloatManager(c FastFloatConfig) (*FastFloatManager, error) {
@@ -169,6 +173,9 @@ func (m *FastFloatManager) open() error {
 	}
 	if m.rationalPowerPending && !m.rationalPowerExecuting {
 		return ErrFastFloatToRationalPending
+	}
+	if m.fractionPending && !m.fractionExecuting {
+		return ErrFastFloatFractionPending
 	}
 	return nil
 }
@@ -339,6 +346,9 @@ func (m *FastFloatManager) CloseChecked() error {
 	if m.rationalPowerExecuting {
 		return ErrFastFloatToRationalPending
 	}
+	if m.fractionExecuting {
+		return ErrFastFloatFractionPending
+	}
 	m.closing = true
 	if e := m.CleanupPowerTemporaries(); e != nil {
 		return e
@@ -350,6 +360,9 @@ func (m *FastFloatManager) CloseChecked() error {
 		return e
 	}
 	if e := m.CleanupToRationalPower(); e != nil {
+		return e
+	}
+	if e := m.CleanupFractionTemporaries(); e != nil {
 		return e
 	}
 	if m.natural != nil {
@@ -525,6 +538,41 @@ func (m *FastFloatManager) CleanupToRationalPower() error {
 		return ErrFastFloatToRationalPending
 	}
 	return m.cleanupToRationalPower(false)
+}
+
+func (m *FastFloatManager) cleanupFractionTemporaries() error {
+	if !m.fractionPending {
+		return nil
+	}
+	parts := [2]*FastFloat{&m.fractionDen, &m.fractionNum}
+	for m.fractionCursor < 2 {
+		if e := m.Del(parts[m.fractionCursor]); e != nil {
+			return e
+		}
+		*parts[m.fractionCursor] = FastFloat{}
+		m.fractionCursor++
+	}
+	m.fractionPending = false
+	m.fractionCursor = 0
+	return nil
+}
+
+// CleanupFractionTemporaries resumes denominator then numerator deletion.
+func (m *FastFloatManager) CleanupFractionTemporaries() error {
+	if m == nil || m.self != m {
+		return ErrFastFloatOwner
+	}
+	if m.fractionExecuting {
+		return ErrFastFloatFractionPending
+	}
+	closing := m.closing
+	m.closing = false
+	m.fractionExecuting = true
+	defer func() {
+		m.fractionExecuting = false
+		m.closing = closing
+	}()
+	return m.cleanupFractionTemporaries()
 }
 
 func (m *FastFloatManager) Precise() bool { return false }
@@ -719,31 +767,47 @@ func (m *FastFloatManager) SetUint64(a *FastFloat, v uint64) error {
 	}
 	return nil
 }
-func (m *FastFloatManager) SetFraction32(a *FastFloat, n int32, d uint32) error {
+func (m *FastFloatManager) SetFraction32(a *FastFloat, n int32, d uint32) (err error) {
 	if e := m.check(a); e != nil {
 		return e
 	}
-	var x, y FastFloat
-	defer func() { m.Del(&y); m.Del(&x) }()
-	if e := m.SetInt32(&x, n); e != nil {
+	m.fractionNum, m.fractionDen = FastFloat{}, FastFloat{}
+	m.fractionPending = true
+	m.fractionCursor = 0
+	m.fractionExecuting = true
+	defer func() {
+		if cleanup := m.cleanupFractionTemporaries(); err == nil {
+			err = cleanup
+		}
+		m.fractionExecuting = false
+	}()
+	if e := m.SetInt32(&m.fractionNum, n); e != nil {
 		return e
 	}
-	if e := m.SetUint32(&y, d); e != nil {
+	if e := m.SetUint32(&m.fractionDen, d); e != nil {
 		return e
 	}
-	return m.Div(&x, &y, a)
+	return m.Div(&m.fractionNum, &m.fractionDen, a)
 }
-func (m *FastFloatManager) SetFraction64(a *FastFloat, n int64, d uint64) error {
+func (m *FastFloatManager) SetFraction64(a *FastFloat, n int64, d uint64) (err error) {
 	if e := m.check(a); e != nil {
 		return e
 	}
-	var x, y FastFloat
-	defer func() { m.Del(&y); m.Del(&x) }()
-	if e := m.SetInt64(&x, n); e != nil {
+	m.fractionNum, m.fractionDen = FastFloat{}, FastFloat{}
+	m.fractionPending = true
+	m.fractionCursor = 0
+	m.fractionExecuting = true
+	defer func() {
+		if cleanup := m.cleanupFractionTemporaries(); err == nil {
+			err = cleanup
+		}
+		m.fractionExecuting = false
+	}()
+	if e := m.SetInt64(&m.fractionNum, n); e != nil {
 		return e
 	}
-	if e := m.SetUint64(&y, d); e != nil {
+	if e := m.SetUint64(&m.fractionDen, d); e != nil {
 		return e
 	}
-	return m.Div(&x, &y, a)
+	return m.Div(&m.fractionNum, &m.fractionDen, a)
 }

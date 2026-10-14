@@ -153588,6 +153588,7 @@
       ],
       "tests": [
         "TestFastFloatIntegerConversionSource",
+        "TestFastFloatFractionTemporariesRetainSourceCleanupOrder",
         "TestFastFloatToRationalPowerBorrowedCleanupOrder",
         "TestFastFloatToIntegerPowerBorrowedCleanupPhysicalRetry",
         "TestFastFloatRationalRawShapeAndConversionFailures",
@@ -154401,6 +154402,7 @@
       ],
       "tests": [
         "TestFastFloatIntegerConversionSource",
+        "TestFastFloatFractionTemporariesRetainSourceCleanupOrder",
         "TestFastFloatToRationalPowerBorrowedCleanupOrder",
         "TestFastFloatToIntegerPowerBorrowedCleanupPhysicalRetry",
         "TestFastFloatRationalRawShapeAndConversionFailures",
