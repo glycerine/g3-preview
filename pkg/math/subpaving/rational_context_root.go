@@ -58,17 +58,9 @@ type RationalContext struct {
 }
 
 func NewRationalContext(m *numeral.RationalManager, limit *control.Reslimit) (_ *RationalContext, err error) {
-	if m == nil || limit == nil {
-		return nil, arena.ErrInvalidSlot
-	}
-	c := &RationalContext{numbers: m, limit: limit, runtime: m.RuntimeOwner(), maxMemory: math.MaxUint64,
-		maxDepth: 128, maxNodes: 8192, epsilon: numeral.NewRational(), maxBound: numeral.NewRational(), minusMaxBound: numeral.NewRational(), rootPrecision: numeral.NewRational()}
-	for i := range c.relevanceScratch {
-		c.relevanceScratch[i] = numeral.NewRational()
-	}
-	c.self = c
-	if c.runtime != nil {
-		c.process = c.runtime.ProcessOwner()
+	c, err := newRationalContextOwner(m, limit)
+	if err != nil {
+		return nil, err
 	}
 	defer func() {
 		if err != nil {
@@ -80,6 +72,23 @@ func NewRationalContext(m *numeral.RationalManager, limit *control.Reslimit) (_ 
 	}
 	if err = c.UpdateRootPrecision(8192); err != nil {
 		return nil, err
+	}
+	c.maxDepth, c.maxNodes, c.maxMemory = 128, 8192, math.MaxUint64
+	return c, nil
+}
+
+func newRationalContextOwner(m *numeral.RationalManager, limit *control.Reslimit) (*RationalContext, error) {
+	if m == nil || limit == nil {
+		return nil, arena.ErrInvalidSlot
+	}
+	c := &RationalContext{numbers: m, limit: limit, runtime: m.RuntimeOwner(),
+		epsilon: numeral.NewRational(), maxBound: numeral.NewRational(), minusMaxBound: numeral.NewRational(), rootPrecision: numeral.NewRational()}
+	for i := range c.relevanceScratch {
+		c.relevanceScratch[i] = numeral.NewRational()
+	}
+	c.self = c
+	if c.runtime != nil {
+		c.process = c.runtime.ProcessOwner()
 	}
 	return c, nil
 }

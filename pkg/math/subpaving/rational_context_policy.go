@@ -9,6 +9,13 @@ func (c *RationalContext) UpdateBoundPolicy(denominator, maxPower uint32) error 
 	if err := c.open(); err != nil {
 		return err
 	}
+	if err := c.updateEpsilon(denominator); err != nil {
+		return err
+	}
+	return c.updateMaxBound(maxPower)
+}
+
+func (c *RationalContext) updateEpsilon(denominator uint32) error {
 	m := c.numbers
 	if denominator != 0 {
 		if err := m.SetInt32(&c.epsilon, int32(denominator)); err != nil {
@@ -24,6 +31,11 @@ func (c *RationalContext) UpdateBoundPolicy(denominator, maxPower uint32) error 
 		}
 		c.zeroEpsilon = true
 	}
+	return nil
+}
+
+func (c *RationalContext) updateMaxBound(maxPower uint32) error {
+	m := c.numbers
 	if err := m.SetInt32(&c.maxBound, 10); err != nil {
 		return err
 	}

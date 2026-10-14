@@ -52199,7 +52199,7 @@
           ]
         },
         {
-          "name": "Concrete config_mpq round-robin variable selection, exact midpoint decisions, recent-bound queue and resumable breadth-first search (src/math/subpaving/subpaving_t_def.h:24-101,185-247,349-360,1665-1682,1806-1843); parameter updates, TRACE and cooperation checkpoint remain open",
+          "name": "Concrete config_mpq round-robin variable selection, exact midpoint decisions, recent-bound queue and resumable breadth-first search (src/math/subpaving/subpaving_t_def.h:24-101,185-247,349-360,1665-1682,1806-1843); TRACE and cooperation checkpoint remain open",
           "status": "partial",
           "go_target": "pkg/math/subpaving/rational_search.go",
           "go_targets": [
@@ -52215,6 +52215,20 @@
             "TestRationalSearchBreadthFirstChildrenAndDefinitionPropagation",
             "TestRationalSearchResumesSelectedChildAfterQueueCancellation",
             "TestRationalAddRecentBoundsOnlyNewestDirection"
+          ]
+        },
+        {
+          "name": "Selected config_mpq six named updt_params lookups and immediate source-order mutations, default/zero branches and five option descriptions (src/math/subpaving/subpaving_t_def.h:473-513); broader constructor lifecycle, TRACE and cooperation remain separate",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_context_params.go",
+          "go_targets": [
+            "pkg/math/subpaving/rational_context_policy.go",
+            "pkg/math/subpaving/rational_context_root_precision.go",
+            "pkg/math/subpaving/rational_context_root.go",
+            "pkg/math/subpaving/hardware_context_params.go"
+          ],
+          "tests": [
+            "TestRationalContextNamedParamsSinglePassAndDefaults"
           ]
         },
         {
