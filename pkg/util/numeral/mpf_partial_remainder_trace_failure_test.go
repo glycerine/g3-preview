@@ -20,7 +20,7 @@ func TestArbitraryFloatPartialRemainderComponentTraceRefusalCleansChild(t *testi
 	reached := map[int]bool{}
 	for ordinal := int64(0); ordinal < 256 && len(reached) < 4; ordinal++ {
 		t.Run(strconv.FormatInt(ordinal, 10), func(t *testing.T) {
-			m, _, budget := mpfNumeralHelpersFixture(t)
+			m, runtime, budget := mpfNumeralHelpersFixture(t)
 			var output bytes.Buffer
 			tags := diagnostic.NewTraceTagsWithWriter(&output)
 			tags.Enable("mpf_dbg_rem")
@@ -52,6 +52,14 @@ func TestArbitraryFloatPartialRemainderComponentTraceRefusalCleansChild(t *testi
 				}
 				if child.active || child.executing || child.finishing {
 					t.Fatalf("nested formatter retained a failed scope: %+v", *child)
+				}
+				nums := []*Int{&x.significand, &y.significand, &child.sig, &child.q.significand}
+				for i := range m.partialRemainder.values {
+					nums = append(nums, &m.partialRemainder.values[i])
+				}
+				integerPhysicalAudit(t, m.integer, nums...)
+				if budget.Used() != m.OwnedStorageBytes()+runtime.Stats().TotalBytes {
+					t.Fatalf("orphaned formatter allocation: budget=%d manager=%d runtime=%d", budget.Used(), m.OwnedStorageBytes(), runtime.Stats().TotalBytes)
 				}
 			}
 			serviceMust(t, m.CleanupPartialRemainder())
