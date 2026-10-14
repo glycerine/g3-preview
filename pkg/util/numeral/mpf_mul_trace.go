@@ -1,4 +1,4 @@
-// Source: src/util/mpf.cpp:541-579,590-650,664,670-742.
+// Source: src/util/mpf.cpp:541-579,590-650,664,670-742,752-754.
 package numeral
 
 import (
