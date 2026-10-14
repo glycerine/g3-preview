@@ -179423,8 +179423,8 @@
           ]
         },
         {
-          "name": "retained warning_msg %s/%d/%I64u emission and default_exception format2ostream; caller integration remains",
-          "status": "partial",
+          "name": "warning_msg %s/%d/%I64u formatting, C-string boundary, selected-stream failure and default_exception format2ostream",
+          "status": "ported",
           "go_target": "pkg/util/diagnostic/util_warning.go",
           "go_targets": [
             "pkg/util/z3exception/z3_exception.go"
@@ -179437,6 +179437,11 @@
             "TestWarningBorrowedFlushFailurePersistsAcrossCalls",
             "TestDefaultExceptionSourceFormattedConstructor"
           ]
+        },
+        {
+          "name": "remaining direct warning_msg callers in unported API, parser, SMT, MUZ, opt and AST owners",
+          "status": "partial",
+          "tests": []
         },
         {
           "name": "set_error_stream and disable_error_msg_prefix write-only globals with no source reader",
@@ -179553,8 +179558,8 @@
           "tests": []
         },
         {
-          "name": "retained warning_msg %s/%d/%I64u emission and default_exception format2ostream; caller integration remains",
-          "status": "partial",
+          "name": "warning_msg %s/%d/%I64u formatting, C-string boundary, selected-stream failure and default_exception format2ostream",
+          "status": "ported",
           "go_target": "pkg/util/diagnostic/util_warning.go",
           "go_targets": [
             "pkg/util/z3exception/z3_exception.go"
@@ -179567,6 +179572,11 @@
             "TestWarningBorrowedFlushFailurePersistsAcrossCalls",
             "TestDefaultExceptionSourceFormattedConstructor"
           ]
+        },
+        {
+          "name": "remaining direct warning_msg callers in unported API, parser, SMT, MUZ, opt and AST owners",
+          "status": "partial",
+          "tests": []
         },
         {
           "name": "pattern_inference concrete warning_msg %s and %d call sites through borrowed WarningService",
