@@ -172,6 +172,7 @@ func (m *ASTManager) registerNode(r astNodeRef) (astNodeRef, error) {
 		return astNodeRef{}, e
 	}
 	m.nodeAt(r.slot).id = generator.Mk()
+	m.traceRegisteredNode(m.nodeAt(r.slot).id)
 	infoSlot, infoGen := m.infoForNode(r)
 	ownedInfo := false
 	attached := uint32(0)

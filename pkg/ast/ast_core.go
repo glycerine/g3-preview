@@ -57,7 +57,7 @@ func constructSourceASTManager(c ASTManagerConfig, format bool, filename TraceFi
 	if e = c.Budget.Reserve(bytes); e != nil {
 		return nil, e
 	}
-	m := &ASTManager{origin: id, BudgetField: c.Budget, Symbols: c.Symbols, numerals: c.Numerals, ownerBytes: bytes, proofMode: c.ProofMode, coercions: true, nextNode: 1, nextParameter: 1, nextInfo: 1, nextReference: 1}
+	m := &ASTManager{origin: id, BudgetField: c.Budget, Symbols: c.Symbols, numerals: c.Numerals, traceTags: c.TraceTags, ownerBytes: bytes, proofMode: c.ProofMode, coercions: true, nextNode: 1, nextParameter: 1, nextInfo: 1, nextReference: 1}
 	m.Self = m
 	// reslimit is the first automatic source member. Its zero-valued scalar
 	// constructor owns no vector payload and has no separate owner allocation.

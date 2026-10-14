@@ -175862,7 +175862,8 @@
         "pkg/util/numeral/mpfx_division_callers_trace.go",
         "pkg/ast/pattern/smaller_pattern.go",
         "pkg/ast/pattern/multi_pattern.go",
-        "pkg/ast/util_psort_ast_sorting.go"
+        "pkg/ast/util_psort_ast_sorting.go",
+        "pkg/ast/ast_core_register_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -175890,7 +175891,8 @@
         "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
         "TestPsortASTCardSourceEntryTrace",
         "TestPsortASTScalarEntryTracesPrecedeSourceGuards",
-        "TestPsortASTInterleaveEntryTraceBeforeOutput"
+        "TestPsortASTInterleaveEntryTraceBeforeOutput",
+        "TestASTRegistrationSourceTraceRecords"
       ],
       "conditionals": [
         {
@@ -176354,6 +176356,13 @@
           "tests": ["TestFixedPointAddSubSourceTraceOrderAndShortcuts", "TestFixedPointComparisonAndProductSourceTrace", "TestFixedPointRetainedDivisionCallersTrace", "TestFixedPointDivisionTraceSourceInsertionPrefixes", "TestFixedPointDivisionTraceRefusalKeepsArithmetic", "TestFixedPointFloorCeilSourceTrace", "TestFixedPointPowerSourceTraceAndRawWords"]
         },
         {
+          "name": "Reached AST register_node_core ast and mk_var_bug TRACE records (ast.cpp:1696-1697)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_register_trace.go",
+          "go_targets": ["pkg/ast/ast_core_register_trace_test.go"],
+          "tests": ["TestASTRegistrationSourceTraceRecords"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -176387,7 +176396,8 @@
         "pkg/util/numeral/mpfx_division_callers_trace.go",
         "pkg/ast/pattern/smaller_pattern.go",
         "pkg/ast/pattern/multi_pattern.go",
-        "pkg/ast/util_psort_ast_sorting.go"
+        "pkg/ast/util_psort_ast_sorting.go",
+        "pkg/ast/ast_core_register_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -176415,7 +176425,8 @@
         "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
         "TestPsortASTCardSourceEntryTrace",
         "TestPsortASTScalarEntryTracesPrecedeSourceGuards",
-        "TestPsortASTInterleaveEntryTraceBeforeOutput"
+        "TestPsortASTInterleaveEntryTraceBeforeOutput",
+        "TestASTRegistrationSourceTraceRecords"
       ],
       "conditionals": [
         {
@@ -176889,6 +176900,13 @@
           "go_target": "pkg/util/numeral/mpfx_add_trace.go",
           "go_targets": ["pkg/util/numeral/mpfx_compare_product_trace.go", "pkg/util/numeral/mpfx_division_callers_trace.go", "pkg/util/numeral/mpfx_integral_trace.go", "pkg/util/numeral/mpfx_power_trace.go", "pkg/util/numeral/mpfx_add_trace_test.go", "pkg/util/numeral/mpfx_compare_product_trace_test.go", "pkg/util/numeral/mpfx_division_callers_trace_test.go", "pkg/util/numeral/mpfx_division_source_order_test.go", "pkg/util/numeral/mpfx_integral_trace_test.go", "pkg/util/numeral/mpfx_power_trace_test.go"],
           "tests": ["TestFixedPointAddSubSourceTraceOrderAndShortcuts", "TestFixedPointComparisonAndProductSourceTrace", "TestFixedPointRetainedDivisionCallersTrace", "TestFixedPointDivisionTraceSourceInsertionPrefixes", "TestFixedPointDivisionTraceRefusalKeepsArithmetic", "TestFixedPointFloorCeilSourceTrace", "TestFixedPointPowerSourceTraceAndRawWords"]
+        },
+        {
+          "name": "Reached AST register_node_core ast and mk_var_bug TRACE records (ast.cpp:1696-1697)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_register_trace.go",
+          "go_targets": ["pkg/ast/ast_core_register_trace_test.go"],
+          "tests": ["TestASTRegistrationSourceTraceRecords"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

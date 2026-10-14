@@ -13,6 +13,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 
 	"github.com/glycerine/g3/pkg/util/control"
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/idgen"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
@@ -58,6 +59,7 @@ type ASTManagerConfig struct {
 	Budget      *arena.Budget
 	ProofMode   ASTProofMode
 	OutOfMemory func() bool
+	TraceTags   *udiag.TraceTags
 }
 type ASTManagerStats struct {
 	LiveNodes, LiveParameters, LiveInfos, LiveReferences  uint32
@@ -255,6 +257,7 @@ type ASTManager struct {
 	constructorPendingFile                                                                             *astTraceFile
 	TraceFile                                                                                          *astTraceFile
 	TraceStream                                                                                        *utext.NumericTextStream
+	traceTags                                                                                          *udiag.TraceTags
 	traceOwner                                                                                         bool
 	LowLevel                                                                                           astLowLevelFrame
 	traceExecuting                                                                                     bool
