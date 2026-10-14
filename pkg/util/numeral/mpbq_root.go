@@ -64,7 +64,7 @@ func (m *BinaryRationalManager) FloorInto(a *BinaryRational, z *IntegerManager, 
 func (m *BinaryRationalManager) CeilInto(a *BinaryRational, z *IntegerManager, out *Int) error {
 	return m.round(a, z, out, true)
 }
-func (m *BinaryRationalManager) round(a *BinaryRational, z *IntegerManager, out *Int, ceil bool) error {
+func (m *BinaryRationalManager) round(a *BinaryRational, z *IntegerManager, out *Int, ceil bool) (err error) {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -74,14 +74,22 @@ func (m *BinaryRationalManager) round(a *BinaryRational, z *IntegerManager, out 
 	if e := z.check(out); e != nil {
 		return e
 	}
-	var local Int
-	defer z.Del(&local)
 	input := &a.Num
 	if z != m.Z {
-		if e := z.CopyFrom(&local, m.Z, input); e != nil {
+		m.roundImported = Int{}
+		m.roundImportedOwner = z
+		m.roundImportedPending = true
+		m.roundExecuting = true
+		defer func() {
+			if cleanup := m.cleanupRoundImported(); err == nil {
+				err = cleanup
+			}
+			m.roundExecuting = false
+		}()
+		if e := z.CopyFrom(&m.roundImported, m.Z, input); e != nil {
 			return e
 		}
-		input = &local
+		input = &m.roundImported
 	}
 	if a.KField == 0 {
 		return z.Copy(out, input)
@@ -98,6 +106,30 @@ func (m *BinaryRationalManager) round(a *BinaryRational, z *IntegerManager, out 
 		return z.Sub(out, &one, out)
 	}
 	return nil
+}
+
+func (m *BinaryRationalManager) cleanupRoundImported() error {
+	if !m.roundImportedPending {
+		return nil
+	}
+	if e := m.roundImportedOwner.Del(&m.roundImported); e != nil {
+		return e
+	}
+	m.roundImported = Int{}
+	m.roundImportedOwner = nil
+	m.roundImportedPending = false
+	return nil
+}
+
+// CleanupRoundImported resumes release through the borrowed integer owner.
+func (m *BinaryRationalManager) CleanupRoundImported() error {
+	if m == nil || m.self != m {
+		return ErrBinaryOwner
+	}
+	if m.roundExecuting {
+		return ErrBinaryRoundPending
+	}
+	return m.cleanupRoundImported()
 }
 func (m *BinaryRationalManager) FromRational(qm *RationalManager, q *Rational, out *BinaryRational) (exact bool, err error) {
 	if e := m.check(out); e != nil {

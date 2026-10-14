@@ -150104,7 +150104,8 @@
             "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
             "TestBinaryScopedRoutes",
-            "TestBinaryConvertImportedOwningCleanupPhysicalRetry"
+            "TestBinaryConvertImportedOwningCleanupPhysicalRetry",
+            "TestBinaryRoundImportedOwningCleanupPhysicalRetry"
           ]
         },
         {
@@ -150424,7 +150425,8 @@
             "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
             "TestBinaryScopedRoutes",
-            "TestBinaryConvertImportedOwningCleanupPhysicalRetry"
+            "TestBinaryConvertImportedOwningCleanupPhysicalRetry",
+            "TestBinaryRoundImportedOwningCleanupPhysicalRetry"
           ]
         },
         {
