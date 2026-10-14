@@ -62,7 +62,9 @@ func TestGeneratedMemoryLifecycleContinuesAfterGParamsTraceRefusal(t *testing.T)
 		t.Fatal("get_ref after sticky trace failbit", e)
 	}
 	must(t, FinalizeGenerated(p, debug, initialized.Globals, rational, symbols, trace))
-	if p.InitializationStarted() || trace.IsEnabled("gparams") || writer.calls <= 10 {
+	// The source ofstream keeps badbit after the init refusal. Finalization
+	// still runs its trace body but cannot write another physical byte.
+	if p.InitializationStarted() || trace.IsEnabled("gparams") || writer.calls != 10 {
 		t.Fatal("generated finalization after sticky trace failbit", p.InitializationStarted(), writer.calls)
 	}
 	must(t, initialized.Close())

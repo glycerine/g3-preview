@@ -83,6 +83,50 @@ func TestTraceShortBodyFailureStillFlushes(t *testing.T) {
 	}
 }
 
+func TestTraceStreamFailurePersistsAcrossRecords(t *testing.T) {
+	refusal := errors.New("trace stream refused")
+	w := &traceHeaderRefusalWriter{until: 1, refusal: refusal}
+	tags := NewTraceTagsWithWriter(w)
+	tags.Enable("alpha")
+	first := tags.Emit("alpha", "work", "src/util/trace.cpp", 31, "first")
+	conditionCalls, bodyCalls := 0, 0
+	second := tags.EmitConditional("alpha", "work", "src/util/trace.cpp", 32,
+		func() bool { conditionCalls++; return true },
+		func(out io.Writer) error { bodyCalls++; return writeTracePart(out, "second") })
+	if !traceCompiled {
+		if first != nil || second != nil || conditionCalls != 0 || bodyCalls != 0 || w.writes != 0 || w.flushes != 0 {
+			t.Fatal("erased trace evaluated", first, second, conditionCalls, bodyCalls, w)
+		}
+		return
+	}
+	if !errors.Is(first, refusal) || !errors.Is(second, refusal) || conditionCalls != 1 || bodyCalls != 1 || w.writes != 1 || w.flushes != 2 {
+		t.Fatal("failed source ofstream wrote a later record", first, second, conditionCalls, bodyCalls, w.writes, w.flushes)
+	}
+}
+
+func TestTraceBodyErrorDoesNotPoisonStream(t *testing.T) {
+	var output bytes.Buffer
+	tags := NewTraceTagsWithWriter(&output)
+	tags.Enable("alpha")
+	bodyErr := errors.New("trace body failed")
+	first := tags.EmitShort("alpha", func(out io.Writer) error {
+		if err := writeTracePart(out, "first"); err != nil {
+			return err
+		}
+		return bodyErr
+	})
+	second := tags.EmitShort("alpha", func(out io.Writer) error { return writeTracePart(out, "second") })
+	if !traceCompiled {
+		if first != nil || second != nil || output.Len() != 0 {
+			t.Fatal("erased trace evaluated", first, second, output.String())
+		}
+		return
+	}
+	if !errors.Is(first, bodyErr) || second != nil || output.String() != "firstsecond" {
+		t.Fatal("body error changed source stream state", first, second, output.String())
+	}
+}
+
 func TestTraceTagsSourceControlAndFinalize(t *testing.T) {
 	tags := NewTraceTags()
 	if tags.IsEnabled("alpha") {
