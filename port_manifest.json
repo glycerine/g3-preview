@@ -48869,7 +48869,10 @@
         "pkg/math/realclosure/sign_tarski_counts.go",
         "pkg/math/realclosure/sign_tarski_counts_test.go",
         "pkg/math/realclosure/sign_polynomial_derivative.go",
-        "pkg/math/realclosure/sign_polynomial_derivative_test.go"
+        "pkg/math/realclosure/sign_polynomial_derivative_test.go",
+        "pkg/math/realclosure/sign_polynomial_div.go",
+        "pkg/math/realclosure/sign_polynomial_prem.go",
+        "pkg/math/realclosure/sign_sturm_tarski.go"
       ],
       "tests": [
         "TestRealClosureBinaryExtendedNumeralBranches",
@@ -50078,7 +50081,31 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "count_signs_at_zeros_core source Tarski q/q\u00b2 branch ordering and zero/positive/negative cardinality calculation, feeding rational sign determination (realclosure.cpp:1613-1660); Tarski query producer remains open",
+          "name": "Default use_prem=true rational signed pseudo-remainder, odd-step negative-leading sign rule and integral-content normalization (realclosure.cpp:2917-2988,3020-3043,3401-3420); nonrational values remain open",
+          "status": "partial",
+          "go_target": "pkg/math/realclosure/sign_polynomial_prem.go",
+          "tests": [
+            "TestRealClosureRationalDerivativeKeepsCoefficientOwnership"
+          ]
+        },
+        {
+          "name": "Rational Sturm and Sturm-Tarski sequence generation with both remainder settings and unbounded endpoint sign variations (realclosure.cpp:3637-3702,3930-4069); bounded intervals and nonrational coefficients remain open",
+          "status": "partial",
+          "go_target": "pkg/math/realclosure/sign_sturm_tarski.go",
+          "tests": [
+            "TestRealClosureRationalDerivativeKeepsCoefficientOwnership"
+          ]
+        },
+        {
+          "name": "Rational-coefficient rem/srem field division, high-term elimination and signed remainder for the retained use_prem=false Sturm path (realclosure.cpp:2879-2913,2991-3030); default pseudo-remainder and nonrational values are recorded separately",
+          "status": "partial",
+          "go_target": "pkg/math/realclosure/sign_polynomial_div.go",
+          "tests": [
+            "TestRealClosureRationalDerivativeKeepsCoefficientOwnership"
+          ]
+        },
+        {
+          "name": "count_signs_at_zeros_core source Tarski q/q\u00b2 branch ordering and zero/positive/negative cardinality calculation, feeding rational sign determination (realclosure.cpp:1613-1660); bounded and nonrational Tarski-query producers remain open",
           "status": "partial",
           "go_target": "pkg/math/realclosure/sign_tarski_counts.go",
           "tests": [
@@ -50087,7 +50114,7 @@
           ]
         },
         {
-          "name": "Rational-coefficient derivative for Sturm-Tarski sequence input with nil zero coefficients and source trailing-size adjustment (realclosure.cpp:3590-3606); nonrational value arithmetic and remainder sequence remain open",
+          "name": "Rational-coefficient derivative for Sturm-Tarski sequence input with nil zero coefficients and source trailing-size adjustment (realclosure.cpp:3590-3606); nonrational value arithmetic and bounded Sturm paths remain open",
           "status": "partial",
           "go_target": "pkg/math/realclosure/sign_polynomial_derivative.go",
           "tests": [
@@ -50095,7 +50122,7 @@
           ]
         },
         {
-          "name": "Rational-coefficient polynomial convolution and retained expand_taqrs prs*1/prs*q/prs*q\u00b2 row production (realclosure.cpp:1704-1741,2753-2791); Tarski-query evaluation and nonrational coefficient arithmetic remain open",
+          "name": "Rational-coefficient polynomial convolution and retained expand_taqrs prs*1/prs*q/prs*q\u00b2 row production (realclosure.cpp:1704-1741,2753-2791); bounded Tarski-query evaluation and nonrational coefficient arithmetic remain open",
           "status": "partial",
           "go_target": "pkg/math/realclosure/sign_determination_rational_products.go",
           "go_targets": [
@@ -50117,7 +50144,7 @@
           ]
         },
         {
-          "name": "Concrete sign_det matrix/sign-condition transfer, prs/qs polynomial copy, Tarski array publication, shared-root reference count and source-order deletion (realclosure.cpp:788-824,1780-1807); actual algebraic root attachment remains open",
+          "name": "Concrete sign_det matrix/sign-condition transfer, prs/qs polynomial copy, Tarski array publication, shared-root reference count and source-order deletion (realclosure.cpp:788-824,1780-1807); full root-isolation input remains open",
           "status": "partial",
           "go_target": "pkg/math/realclosure/sign_det_owner.go",
           "tests": [
