@@ -201,6 +201,16 @@ func TestArbitraryExprConverterTermsAndClause(t *testing.T) {
 	if _, err := converter.InternalizeTerm(zeroConstant, &n, &d); !errors.Is(err, subpaving.ErrSubpavingFailure) || errors.Is(err, numeral.ErrArbitraryFloatNonRegular) {
 		t.Fatal("MPF wrapper replaces zero-constant f2n refusal", err)
 	}
+	refsBefore, err := m.GetRefCount(sum)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := converter.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if refs, err := m.GetRefCount(sum); err != nil || refsBefore != refs+1 {
+		t.Fatal("released cached AST key after refused expression", refs, err)
+	}
 }
 
 func TestArbitraryExprConverterSearchSimpleGoal(t *testing.T) {

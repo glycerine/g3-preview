@@ -169109,7 +169109,11 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_expr_substitution_ops.go",
-        "pkg/ast/ast_shared_occs.go"
+        "pkg/ast/ast_shared_occs.go",
+        "pkg/math/subpaving/tactic/expr_converter.go",
+        "pkg/math/subpaving/tactic/rational_expr_converter.go",
+        "pkg/math/subpaving/tactic/fast_expr_converter.go",
+        "pkg/math/subpaving/tactic/arbitrary_expr_converter.go"
       ],
       "tests": [
         "TestASTExprSubstitutionActualMapOutputsAndReferenceOrder",
@@ -169145,7 +169149,11 @@
         "TestASTScopedExprSubstitutionNativeLimitsRejectInvalidPop",
         "TestASTSharedOccurrencesNativeResetDiscoveryOrderDestruction",
         "TestASTSharedOccurrencesNativeWideDeletionReset",
-        "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow"
+        "TestASTSharedOccurrencesForcedManagerCloseAndIteratorBorrow",
+        "TestHardwareExprConverterTerms",
+        "TestRationalExprConverterExactLeafGoalAndCleanup",
+        "TestFastExprConverterTermsAndClause",
+        "TestArbitraryExprConverterTermsAndClause"
       ],
       "conditionals": [
         {
@@ -169209,6 +169217,22 @@
           ]
         },
         {
+          "name": "expr2subpaving term-cache dec_ref_map_keys on successful converter destruction in hardware, rational, MPFF and MPF configurations",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/tactic/expr_converter.go",
+          "go_targets": [
+            "pkg/math/subpaving/tactic/rational_expr_converter.go",
+            "pkg/math/subpaving/tactic/fast_expr_converter.go",
+            "pkg/math/subpaving/tactic/arbitrary_expr_converter.go"
+          ],
+          "tests": [
+            "TestHardwareExprConverterTerms",
+            "TestRationalExprConverterExactLeafGoalAndCleanup",
+            "TestFastExprConverterTermsAndClause",
+            "TestArbitraryExprConverterTermsAndClause"
+          ]
+        },
+        {
           "name": "Remaining live concrete keys-only, values-only, key/value and collection cleanup in other AST, tactic, SMT, API and subpaving consumers",
           "status": "partial",
           "go_target": "",
@@ -169216,7 +169240,7 @@
         }
       ],
       "ownership": [
-        "AST shared occurrences owns one reference per distinct expression in an insertion-ordered dictionary. Reset and Close decrement each remaining expression once and clear its entry after a consumed decrement, retaining unfinished entries for typed cleanup refusal. The AST manager owns node storage; no generic reference manager or collection adapter is retained."
+        "AST shared occurrences owns one reference per distinct expression in an insertion-ordered dictionary. Reset and Close decrement each remaining expression once and clear its entry after a consumed decrement, retaining unfinished entries for typed cleanup refusal. The four reached expr2subpaving term caches each own one reference per cached AST key; converter close drops those keys before its cached numeral vectors and variable references. The AST manager owns node storage; no generic reference manager or collection adapter is retained."
       ],
       "deviations": [
         "No generic Go adapter is retained. Each live decrement-and-clear operation belongs in its concrete consumer with compiler-checked element and manager types.",

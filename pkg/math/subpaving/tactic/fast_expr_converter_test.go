@@ -230,8 +230,15 @@ func TestFastExprConverterTermsAndClause(t *testing.T) {
 	if _, err := converter.InternalizeInequality(ineq); err != nil {
 		t.Fatal("inequality", err)
 	}
+	refsBefore, err := m.GetRefCount(sum)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if err := converter.Close(); err != nil {
 		t.Fatal(err)
+	}
+	if refs, err := m.GetRefCount(sum); err != nil || refsBefore != refs+1 {
+		t.Fatal("released cached AST key", refs, err)
 	}
 	if _, err := converter.InternalizeTerm(x, &n, &d); !errors.Is(err, arena.ErrClosed) {
 		t.Fatal("closed converter", err)
