@@ -40,20 +40,72 @@ func (w *fastTacticOutput) Write(p []byte) (int, error) {
 }
 
 // FastCoreTactic owns the selected engine, expression converter and a shared
-// parameter snapshot. The goal, managers and parameter service are borrowed.
-// The returned goal is borrowed.
+// parameter snapshot. Its numeral managers are owned by NewFastCoreTacticOwned
+// and borrowed by NewFastCoreTactic; the AST manager and parameter service are
+// borrowed in both cases. The returned goal is borrowed.
 type FastCoreTactic struct {
-	self        *FastCoreTactic
-	manager     *ast.ASTManager
-	numbers     *numeral.FastFloatManager
-	rational    *numeral.RationalManager
-	pc          *params.ParamsContext
-	params      params.ParamsRef
-	engine      *FastEngine
-	cooperation *cooperate.Cooperation
-	converter   *FastExprConverter
-	stats       statistics.Statistics
-	closed      bool
+	self                       *FastCoreTactic
+	manager                    *ast.ASTManager
+	numbers                    *numeral.FastFloatManager
+	rational                   *numeral.RationalManager
+	pc                         *params.ParamsContext
+	params                     params.ParamsRef
+	engine                     *FastEngine
+	cooperation                *cooperate.Cooperation
+	converter                  *FastExprConverter
+	stats                      statistics.Statistics
+	ownsNumerals, paramsClosed bool
+	closed                     bool
+}
+
+// NewFastCoreTacticOwned constructs the two numeral-manager members of the
+// retained MPFF tactic from its AST manager's source memory process. The AST
+// and parameter services remain borrowed; Close releases MPFF before rational.
+func NewFastCoreTacticOwned(m *ast.ASTManager, pc *params.ParamsContext, p *params.ParamsRef) (*FastCoreTactic, error) {
+	if m == nil || pc == nil || p == nil {
+		return nil, arena.ErrInvalidSlot
+	}
+	q := m.NumeralService()
+	if q == nil || q.RuntimeOwner() == nil || pc.Numerals() == nil || pc.Numerals().RuntimeOwner() == nil {
+		return nil, arena.ErrConfig
+	}
+	runtime := q.RuntimeOwner()
+	process := runtime.ProcessOwner()
+	if process == nil || pc.Numerals().RuntimeOwner().ProcessOwner() != process {
+		return nil, arena.ErrConfig
+	}
+	budget := runtime.Budget()
+	integers := numeral.IntegerConfig{Process: process, Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}
+	rational, err := numeral.NewRationalManager(numeral.RationalConfig{Integers: integers})
+	if err != nil {
+		return nil, err
+	}
+	fastConfig := numeral.DefaultFastFloatConfig(arena.VectorConfig{Descriptors: arena.Config{Budget: budget}})
+	fastConfig.Process = process
+	numbers, err := numeral.NewFastFloatManager(fastConfig)
+	if err != nil {
+		pending := &FastCoreTactic{rational: rational, ownsNumerals: true, paramsClosed: true}
+		pending.self = pending
+		if cleanup := pending.Close(); cleanup != nil {
+			return pending, errors.Join(err, cleanup)
+		}
+		return nil, err
+	}
+	t, err := NewFastCoreTactic(m, numbers, rational, pc, p)
+	if err != nil {
+		if t == nil {
+			t = &FastCoreTactic{numbers: numbers, rational: rational, ownsNumerals: true, paramsClosed: true}
+			t.self = t
+		} else {
+			t.ownsNumerals = true
+		}
+		if cleanup := t.Close(); cleanup != nil {
+			return t, errors.Join(err, cleanup)
+		}
+		return nil, err
+	}
+	t.ownsNumerals = true
+	return t, nil
 }
 
 func NewFastCoreTactic(m *ast.ASTManager, numbers *numeral.FastFloatManager, rational *numeral.RationalManager, pc *params.ParamsContext, p *params.ParamsRef) (*FastCoreTactic, error) {
@@ -90,7 +142,10 @@ func NewFastCoreTactic(m *ast.ASTManager, numbers *numeral.FastFloatManager, rat
 	t := &FastCoreTactic{manager: m, numbers: numbers, rational: rational, pc: pc, params: owned}
 	t.self = t
 	if err := t.rebuild(); err != nil {
-		return nil, errors.Join(err, t.Close())
+		if cleanup := t.Close(); cleanup != nil {
+			return t, errors.Join(err, cleanup)
+		}
+		return nil, err
 	}
 	return t, nil
 }
@@ -312,8 +367,25 @@ func (t *FastCoreTactic) Close() error {
 		}
 		t.engine = nil
 	}
-	if err := t.pc.Del(&t.params); err != nil {
-		return err
+	if !t.paramsClosed {
+		if err := t.pc.Del(&t.params); err != nil {
+			return err
+		}
+		t.paramsClosed = true
+	}
+	if t.ownsNumerals {
+		if t.numbers != nil {
+			if err := t.numbers.CloseChecked(); err != nil {
+				return err
+			}
+			t.numbers = nil
+		}
+		if t.rational != nil {
+			if err := t.rational.CloseChecked(); err != nil {
+				return err
+			}
+			t.rational = nil
+		}
 	}
 	t.closed = true
 	return nil

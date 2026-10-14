@@ -54614,6 +54614,13 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "selected successful MPFF tactic imp owns its rational and fast-float manager members in one source process and destroys MPFF before rational",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/tactic/fast_core_tactic.go",
+          "go_targets": ["pkg/math/subpaving/tactic/core_process_binding_test.go"],
+          "tests": ["TestFastCoreTacticNumericProcessCohort"]
+        },
+        {
           "name": "Concrete MPQ/hardware/MPFF/MPF process_clause temporary inequality ref_buffer releases unpublished atoms in source push order after literal or clause failure and retains published clause/unit references (subpaving_tactic.cpp:165-178)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/inequality_buffer_release.go",
@@ -154203,11 +154210,12 @@
           "name": "explicit source process binding for an MPFF-owned raw Runtime and retained fast subpaving memory checkpoint",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpff.go",
-          "go_targets": ["pkg/util/numeral/mpn_storage.go", "pkg/math/subpaving/fast_checkpoint_test.go"],
+          "go_targets": ["pkg/util/numeral/mpn_storage.go", "pkg/math/subpaving/fast_checkpoint_test.go", "pkg/math/subpaving/tactic/core_process_binding_test.go"],
           "tests": [
             "TestFastFloatOwnedRuntimeJoinsSourceProcess",
             "TestFastFloatOwnedRuntimeRejectsProcessABIWithoutStorage",
-            "TestFastCheckpointReadsSharedProcessAfterResourceIncrement"
+            "TestFastCheckpointReadsSharedProcessAfterResourceIncrement",
+            "TestFastCoreTacticNumericProcessCohort"
           ]
         },
         {
@@ -154620,11 +154628,12 @@
           "name": "explicit source process binding for an MPFF-owned raw Runtime and retained fast subpaving memory checkpoint",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpff.go",
-          "go_targets": ["pkg/util/numeral/mpn_storage.go", "pkg/math/subpaving/fast_checkpoint_test.go"],
+          "go_targets": ["pkg/util/numeral/mpn_storage.go", "pkg/math/subpaving/fast_checkpoint_test.go", "pkg/math/subpaving/tactic/core_process_binding_test.go"],
           "tests": [
             "TestFastFloatOwnedRuntimeJoinsSourceProcess",
             "TestFastFloatOwnedRuntimeRejectsProcessABIWithoutStorage",
-            "TestFastCheckpointReadsSharedProcessAfterResourceIncrement"
+            "TestFastCheckpointReadsSharedProcessAfterResourceIncrement",
+            "TestFastCoreTacticNumericProcessCohort"
           ]
         },
         {
@@ -160411,11 +160420,12 @@
           "name": "integer-owned Runtime explicitly joins the source process shared with rational parameter and environment consumers",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz.go",
-          "go_targets": ["pkg/util/numeral/mpz_process_binding_test.go", "pkg/util/params/util_env_params_test.go"],
+          "go_targets": ["pkg/util/numeral/mpz_process_binding_test.go", "pkg/util/params/util_env_params_test.go", "pkg/math/subpaving/tactic/core_process_binding_test.go"],
           "tests": [
             "TestIntegerOwnedRuntimeJoinsSourceProcess",
             "TestIntegerOwnedRuntimeRejectsProcessABIWithoutStorage",
-            "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
+            "TestEnvParamsRuntimeSourceOrderAndRawWatermark",
+            "TestFastCoreTacticNumericProcessCohort"
           ]
         },
         {
@@ -162507,11 +162517,12 @@
           "name": "integer-owned Runtime explicitly joins the source process shared with rational parameter and environment consumers",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz.go",
-          "go_targets": ["pkg/util/numeral/mpz_process_binding_test.go", "pkg/util/params/util_env_params_test.go"],
+          "go_targets": ["pkg/util/numeral/mpz_process_binding_test.go", "pkg/util/params/util_env_params_test.go", "pkg/math/subpaving/tactic/core_process_binding_test.go"],
           "tests": [
             "TestIntegerOwnedRuntimeJoinsSourceProcess",
             "TestIntegerOwnedRuntimeRejectsProcessABIWithoutStorage",
-            "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
+            "TestEnvParamsRuntimeSourceOrderAndRawWatermark",
+            "TestFastCoreTacticNumericProcessCohort"
           ]
         },
         {
