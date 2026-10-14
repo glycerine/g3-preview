@@ -22,47 +22,63 @@ func (m *ArbitraryFloatManager) traceUnpackEntry(a *ArbitraryFloat, normalize bo
 				formatError = e
 				return e
 			}
-			if e := writeNumeralDisplayPart(w, value+": ebits="+strconv.FormatUint(uint64(a.EBits()), 10)+" sbits="+strconv.FormatUint(uint64(a.SBits()), 10)+" normalize="+traceBoolDigit(normalize)); e != nil {
-				return e
+			for _, part := range [...]string{value, ": ebits=", strconv.FormatUint(uint64(a.EBits()), 10),
+				" sbits=", strconv.FormatUint(uint64(a.SBits()), 10), " normalize=", traceBoolDigit(normalize)} {
+				if e := writeNumeralDisplayPart(w, part); e != nil {
+					return e
+				}
 			}
 			top, e := m.hasTopExponent(a)
 			if e != nil {
 				formatError = e
 				return e
 			}
-			if e := writeNumeralDisplayPart(w, " has_top_exp="+traceBoolDigit(top)+" ("); e != nil {
-				return e
+			for _, part := range [...]string{" has_top_exp=", traceBoolDigit(top), " ("} {
+				if e := writeNumeralDisplayPart(w, part); e != nil {
+					return e
+				}
 			}
 			topExp, e := m.topExponent(a.EBits())
 			if e != nil {
 				formatError = e
 				return e
 			}
-			if e := writeNumeralDisplayPart(w, strconv.FormatInt(topExp, 10)+")"); e != nil {
-				return e
+			for _, part := range [...]string{strconv.FormatInt(topExp, 10), ")"} {
+				if e := writeNumeralDisplayPart(w, part); e != nil {
+					return e
+				}
 			}
 			bottom, e := m.hasBottomExponent(a)
 			if e != nil {
 				formatError = e
 				return e
 			}
-			if e := writeNumeralDisplayPart(w, " has_bot_exp="+traceBoolDigit(bottom)+" ("); e != nil {
-				return e
+			for _, part := range [...]string{" has_bot_exp=", traceBoolDigit(bottom), " ("} {
+				if e := writeNumeralDisplayPart(w, part); e != nil {
+					return e
+				}
 			}
 			bottomExp, e := m.bottomExponent(a.EBits())
 			if e != nil {
 				formatError = e
 				return e
 			}
-			if e := writeNumeralDisplayPart(w, strconv.FormatInt(bottomExp, 10)+")"); e != nil {
-				return e
+			for _, part := range [...]string{strconv.FormatInt(bottomExp, 10), ")"} {
+				if e := writeNumeralDisplayPart(w, part); e != nil {
+					return e
+				}
 			}
 			zero, e := m.IsZero(a)
 			if e != nil {
 				formatError = e
 				return e
 			}
-			return writeNumeralDisplayPart(w, " is_zero="+traceBoolDigit(zero)+"\n")
+			for _, part := range [...]string{" is_zero=", traceBoolDigit(zero), "\n"} {
+				if e := writeNumeralDisplayPart(w, part); e != nil {
+					return e
+				}
+			}
+			return nil
 		})
 	return formatError
 }

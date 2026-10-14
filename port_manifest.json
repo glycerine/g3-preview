@@ -151372,10 +151372,10 @@
           "tests": ["TestArbitraryFloatRemResultTraceSpecialAndGeneral"]
         },
         {
-          "name": "mpf_manager::unpack pre-mutation decimal/format/classification TRACE record at mpf.cpp:1923-1928",
+          "name": "mpf_manager::unpack pre-mutation decimal/format/classification TRACE record with source operand insertion boundaries at mpf.cpp:1923-1928",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_unpack_trace.go",
-          "tests": ["TestArbitraryFloatUnpackEntryTracePreMutationClasses", "TestArbitraryFloatUnpackTraceRefusalBeforeMutation"]
+          "tests": ["TestArbitraryFloatUnpackEntryTracePreMutationClasses", "TestArbitraryFloatUnpackTraceRefusalBeforeMutation", "TestArbitraryFloatUnpackSourceInsertionBoundaries"]
         },
         {
           "name": "mpf_manager::to_sbv_mpq fractional guard-bit and final rational TRACE at mpf.cpp:1214,1225; to_ieee_bv_mpz final integer TRACE at mpf.cpp:1252",

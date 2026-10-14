@@ -76,3 +76,49 @@ func TestArbitraryFloatUnpackTraceRefusalBeforeMutation(t *testing.T) {
 	serviceMust(t, m.unpackRationalNumeral(&x, true, integerAllocationInvocationContext{}))
 	serviceMust(t, m.Del(&x))
 }
+
+func TestArbitraryFloatUnpackSourceInsertionBoundaries(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	bottom, err := m.MkBotExp(8)
+	serviceMust(t, err)
+	for _, tc := range []struct {
+		name, top, bot, zero, normalize string
+		build                           func(*ArbitraryFloat)
+	}{
+		{"zero", "0", "1", "1", "1", func(x *ArbitraryFloat) { serviceMust(t, m.MkZero(8, 24, false, x)) }},
+		{"normal", "0", "0", "0", "1", func(x *ArbitraryFloat) { serviceMust(t, m.MkOne(8, 24, false, x)) }},
+		{"denormal", "0", "1", "0", "0", func(x *ArbitraryFloat) {
+			sig := NewInt(1)
+			serviceMust(t, m.SetComponents(x, 8, 24, false, bottom, &sig))
+		}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			var x ArbitraryFloat
+			tc.build(&x)
+			w := &mpffArithmeticTraceWriter{}
+			tags := diagnostic.NewTraceTagsWithWriter(w)
+			tags.Enable("mpf_dbg")
+			serviceMust(t, m.BindTrace(tags))
+			serviceMust(t, m.unpackRationalNumeral(&x, tc.normalize == "1", integerAllocationInvocationContext{}))
+			if tags.ShouldTrace("mpf_dbg") {
+				foundValue := false
+				for i := 0; i+2 < len(w.parts); i++ {
+					if w.parts[i] == "unpack " && w.parts[i+1] != "" && w.parts[i+2] == ": ebits=" {
+						foundValue = true
+						break
+					}
+				}
+				if !foundValue {
+					t.Fatalf("missing source value insertion: %q", w.parts)
+				}
+				want := []string{": ebits=", "8", " sbits=", "24", " normalize=", tc.normalize,
+					" has_top_exp=", tc.top, " (", "128", ")", " has_bot_exp=", tc.bot, " (", "-127", ")",
+					" is_zero=", tc.zero, "\n"}
+				if !hasMPFFTraceParts(w.parts, want) {
+					t.Fatalf("missing source field insertions %q in %q", want, w.parts)
+				}
+			}
+			serviceMust(t, m.Del(&x))
+		})
+	}
+}
