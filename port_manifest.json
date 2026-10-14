@@ -48865,7 +48865,11 @@
         "pkg/math/realclosure/algebraic_root_value.go",
         "pkg/math/realclosure/sign_polynomial_mul.go",
         "pkg/math/realclosure/sign_determination_rational_products.go",
-        "pkg/math/realclosure/sign_determination_rational_products_test.go"
+        "pkg/math/realclosure/sign_determination_rational_products_test.go",
+        "pkg/math/realclosure/sign_tarski_counts.go",
+        "pkg/math/realclosure/sign_tarski_counts_test.go",
+        "pkg/math/realclosure/sign_polynomial_derivative.go",
+        "pkg/math/realclosure/sign_polynomial_derivative_test.go"
       ],
       "tests": [
         "TestRealClosureBinaryExtendedNumeralBranches",
@@ -48882,7 +48886,9 @@
         "TestSignDeterminationPolynomialRowsRetainSharedValues",
         "TestSignDetSourceArrayPublicationAndSharedRootLifetime",
         "TestAlgebraicRootsShareSignDetAndReleaseSourceOrder",
-        "TestSignDeterminationRationalProductsAndThreeWayExpansion"
+        "TestSignDeterminationRationalProductsAndThreeWayExpansion",
+        "TestRealClosureSourceTarskiSignCountBranches",
+        "TestRealClosureRationalDerivativeKeepsCoefficientOwnership"
       ],
       "conditionals": [
         {
@@ -50071,6 +50077,23 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "count_signs_at_zeros_core source Tarski q/q\u00b2 branch ordering and zero/positive/negative cardinality calculation, feeding rational sign determination (realclosure.cpp:1613-1660); Tarski query producer remains open",
+          "status": "partial",
+          "go_target": "pkg/math/realclosure/sign_tarski_counts.go",
+          "tests": [
+            "TestRealClosureSourceTarskiSignCountBranches",
+            "TestSignDeterminationRationalProductsAndThreeWayExpansion"
+          ]
+        },
+        {
+          "name": "Rational-coefficient derivative for Sturm-Tarski sequence input with nil zero coefficients and source trailing-size adjustment (realclosure.cpp:3590-3606); nonrational value arithmetic and remainder sequence remain open",
+          "status": "partial",
+          "go_target": "pkg/math/realclosure/sign_polynomial_derivative.go",
+          "tests": [
+            "TestRealClosureRationalDerivativeKeepsCoefficientOwnership"
+          ]
+        },
         {
           "name": "Rational-coefficient polynomial convolution and retained expand_taqrs prs*1/prs*q/prs*q\u00b2 row production (realclosure.cpp:1704-1741,2753-2791); Tarski-query evaluation and nonrational coefficient arithmetic remain open",
           "status": "partial",

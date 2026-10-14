@@ -43,7 +43,7 @@ func TestSignDeterminationRationalProductsAndThreeWayExpansion(t *testing.T) {
 	must(state.attachInitialPolynomial(store, one))
 	// For roots -1, 0, 1, q=x has signs -, 0, +. The source Tarski
 	// results for 1, q, q² are 3, 0, 2, respectively.
-	kept, allOne, err := state.advanceRationalProducts(1, 1, 1, []*realValue{nil, one}, []int{3, 0, 2})
+	kept, allOne, err := state.advanceFromTarski([]*realValue{nil, one}, 0, 2, []int{3, 0, 2})
 	must(err)
 	if !kept || !allOne || len(state.prs) != 3 || len(state.qs) != 1 || len(state.prs[0].coefficients) != 1 || len(state.prs[1].coefficients) != 2 || len(state.prs[2].coefficients) != 3 || state.prs[1].coefficients[0] != nil || state.prs[2].coefficients[0] != nil || state.prs[2].coefficients[1] != nil {
 		t.Fatal("three-way sign expansion did not construct 1, q, and q² rows")
