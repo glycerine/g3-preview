@@ -118652,10 +118652,12 @@
           "tests": []
         },
         {
-          "name": "automatic Z3DEBUG CASSERT routing and pointer visited-set check_invariant actions",
-          "status": "unported",
-          "go_target": "",
-          "tests": []
+          "name": "Z3DEBUG pointer-visited bucket-chain check_invariant is retired with the native Go map, slice and ordered-dictionary specializations; project hash/equality and owning caller actions remain separate",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_monomial_table.go",
+          "tests": [
+            "TestMonomialNativeTableGrowthRenameAndOrder"
+          ]
         },
         {
           "name": "remaining AIG, NLSAT, polynomial cache, SMT and object-pair table specializations",
@@ -118741,7 +118743,7 @@
         "AST canonical nodes use native hash buckets plus insertion-ordered entries and borrow generation-checked node tokens. FPA buckets borrow owned numeral IDs and retain project MPF hash/equality. Monomial entries borrow exact keys during stable temporary publication; no generic C++ primary/cellar/free-list storage remains in Go."
       ],
       "deviations": [
-        "The removed generic/int32 Go table's charged cellar layout, synthetic capacity and swap behavior are historical only. Retained Go consumers use native maps, slices and insdict while keeping project hash/equality and ownership rules. Source pointer-visited CASSERT transport and the remaining AIG, NLSAT, polynomial-cache, SMT and object-pair consumers remain open."
+        "The removed generic/int32 Go table's charged cellar layout, synthetic capacity and swap behavior are historical only. Retained Go consumers use native maps, slices and insdict while keeping project hash/equality and ownership rules. The Z3DEBUG pointer-visited check_invariant at chashtable.h:547-566 traverses only the retired C++ cell chains and is a platform replacement, not an outstanding generic Go adapter. AIG, NLSAT, polynomial-cache, SMT and object-pair consumer specializations remain open."
       ]
     },
     {
@@ -164936,7 +164938,7 @@
         "The BV sharing reducer retains each cached expr pair operand and each newly built application until Close; the native typed maps own pair membership only."
       ],
       "deviations": [
-        "The selected Q_f_def, dyn_ack count and smaller_pattern visited-pair specializations use native Go maps keyed by typed AST-handle pairs; the first has native quantifier sets and the second uses a native instantiated set. C++ cached hashes, sentinel buckets and probing are not ported. The remaining pattern-inference collector and tactic, QE, SMT and MUZ pair-table consumers still require caller audits."
+        "The selected Q_f_def, dyn_ack count and smaller_pattern visited-pair specializations use native Go maps keyed by typed AST-handle pairs; the first has native quantifier sets and the second uses a native instantiated set. C++ cached hashes, sentinel buckets and probing are not ported. Pattern-inference's separate entry/depth collector is a map.h consumer with its own native Go map credit, not another obj_pair_hashtable instantiation. The remaining tactic, QE, SMT and MUZ pair-table consumers still require caller audits."
       ]
     },
     {
