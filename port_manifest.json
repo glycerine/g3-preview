@@ -149582,6 +149582,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/util/numeral/mpf_round_trace.go",
         "pkg/util/numeral/mpf_round_trace_test.go",
         "pkg/util/numeral/mpf_fma_trace.go",
         "pkg/util/numeral/mpf_fma_trace_test.go",
@@ -150433,7 +150434,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "mpf_manager::round mpf_dbg scalar decision TRACE records at mpf.cpp:2040,2055,2071,2078,2079; value-formatting records remain partial",
+          "name": "mpf_manager::round mpf_dbg normalization and scalar decision TRACE records at mpf.cpp:2000,2009,2040,2055,2071,2078,2079; value-formatting records remain partial",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpf_round.go",
           "tests": ["TestArbitraryFloatRoundDecisionTraceBranches"]
@@ -151196,7 +151197,7 @@
         "Checked OwnedString output now belongs to OwnedString.AppendTo; NumericTextStream receives a native counted Go string through AppendString. Counted output preserves embedded NUL bytes and whole-field width/alignment; CString output independently stops at first NUL. Failed sentries check owner lifetime while preserving width and skipping payload conversion. Removed the stream method accepting OwnedString, so the stream no longer depends on that project text owner. See PORT_PROGRESS.md#native-counted-text-at-the-numeric-stream-boundary."
       ],
       "deviations": [
-        "Retained mpf_manager::round now emits allocation-free mpf_dbg decision records after guard-bit extraction, after mode selection and after post-normalization overflow comparison. Halfway-even, halfway-away and overflow focused traces verify source order and branch values. Earlier and later Round value-formatting records remain open because Round keeps valueExecuting active and their owned temporary lifetime needs separate review; no whole Round TRACE completion is claimed.",
+        "Retained mpf_manager::round now emits its bound/beta/leading-zero/sigma/cap block after shift capping, then the selected left/right shift distance and allocation-free decision records after guard-bit extraction, mode selection and post-normalization overflow comparison. Focused traces cover left/right normalization, halfway-even/away and overflow, including nested setter order. Earlier and later Round float/binary value-formatting records remain open because Round keeps valueExecuting active and their owned temporary lifetime needs separate review; no whole Round TRACE completion is claimed.",
         "Retained mpf_manager::set(mpz,mpq) emits its input rational/exponent before output publication. Its nonzero branch emits normalized rational/exponent before the assertion, pre-round significand with the output's old exponent before exponent assignment, then final text after Round or infinity publication; zero emits only entry and result. Direct and nested rational/literal trace tests verify source order and the old-exponent field. Other MPF trace and whole-unit ownership work remains partial.",
         "Retained mpf_manager::set(char const*) emits its input before format publication, parsed sign/fraction/exponent before rational and integer string SET, and ordinary result after child conversion and sign assignment. The borrowed C-string stops at the first NUL; Go string splitting preserves source lowercase-p-before-uppercase-P search. Focused trace-enabled and erased tests cover negative, explicit positive and NUL-terminated inputs, including the nested exponent/rational trace order. Other MPF setter traces and whole-unit ownership remain partial.",
         "Retained mpf_manager::set(mpq) emits source rational input and format before its local zero exponent construction, then emits the ordinary MPF result after the exponent/rational child returns and before the local exponent destructor. Focused trace-enabled and erased tests cover finite and zero rationals, including the nested exponent/rational trace order; other MPF setter traces and whole-unit ownership remain partial.",

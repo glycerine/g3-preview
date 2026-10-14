@@ -169,8 +169,8 @@ func TestArbitraryFloatSetPlainRationalTrace(t *testing.T) {
 		}
 		blocks := len(lines)
 		if tc.n != 0 {
-			blocks += 5
-			firstRound := strings.Index(got, "round src/util/mpf.cpp:2040")
+			blocks += 7
+			firstRound := strings.Index(got, "round src/util/mpf.cpp:2000")
 			lastRound := strings.Index(got, "round src/util/mpf.cpp:2079")
 			if firstRound <= strings.Index(got, "set src/util/mpf.cpp:289") || lastRound <= firstRound || lastRound >= strings.Index(got, "set src/util/mpf.cpp:300") {
 				t.Fatalf("nested rational Round trace for %d: %q", tc.n, got)
@@ -217,9 +217,9 @@ func TestArbitraryFloatSetFormattedLiteralTrace(t *testing.T) {
 			}
 			last = at
 		}
-		firstRound := strings.Index(got, "round src/util/mpf.cpp:2040")
+		firstRound := strings.Index(got, "round src/util/mpf.cpp:2000")
 		lastRound := strings.Index(got, "round src/util/mpf.cpp:2079")
-		if firstRound <= strings.Index(got, "set src/util/mpf.cpp:289") || lastRound <= firstRound || lastRound >= strings.Index(got, "set src/util/mpf.cpp:300") || strings.Count(got, "------------------------------------------------\n") != 12 {
+		if firstRound <= strings.Index(got, "set src/util/mpf.cpp:289") || lastRound <= firstRound || lastRound >= strings.Index(got, "set src/util/mpf.cpp:300") || strings.Count(got, "------------------------------------------------\n") != 14 {
 			t.Fatalf("literal setter trace blocks for %q: %q", tc.value, got)
 		}
 	}
@@ -265,8 +265,8 @@ func TestArbitraryFloatSetExponentRationalTraceBranches(t *testing.T) {
 		}
 		blocks := len(tc.lines)
 		if tc.numerator != 0 {
-			blocks += 5
-			firstRound := strings.Index(got, "round src/util/mpf.cpp:2040")
+			blocks += 7
+			firstRound := strings.Index(got, "round src/util/mpf.cpp:2000")
 			lastRound := strings.Index(got, "round src/util/mpf.cpp:2079")
 			if firstRound <= strings.Index(got, "set src/util/mpf.cpp:289") || lastRound <= firstRound || lastRound >= strings.Index(got, "set src/util/mpf.cpp:300") {
 				t.Fatalf("nested exponent/rational Round trace: %q", got)

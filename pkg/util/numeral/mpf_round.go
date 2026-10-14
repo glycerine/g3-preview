@@ -199,6 +199,9 @@ func (m *ArbitraryFloatManager) roundWithParentContext(mode ArbitraryFloatRoundi
 			return e
 		}
 	}
+	if e := m.traceRoundNormalization(emin, emax, beta, lz, beta < emin, &s.sigma, &s.cap); e != nil {
+		return e
+	}
 	minusOne := NewInt(-1)
 	c, e = z.Compare(&s.sigma, &minusOne)
 	if e != nil {
@@ -208,6 +211,7 @@ func (m *ArbitraryFloatManager) roundWithParentContext(mode ArbitraryFloatRoundi
 	if e != nil {
 		return e
 	}
+	m.traceRoundShiftDistance(sigma)
 	if c <= 0 {
 		s.stickyConstructed = true
 		p, e := m.roundPower(uint32(-sigma), false)

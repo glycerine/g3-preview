@@ -16,15 +16,16 @@ func TestArbitraryFloatRoundDecisionTraceBranches(t *testing.T) {
 	compiled := tags.ShouldTrace("mpf_dbg")
 	serviceMust(t, m.BindTrace(tags))
 	for _, tc := range []struct {
-		name                string
-		sig                 int32
-		exponent            int64
-		mode                ArbitraryFloatRoundingMode
-		increment, overflow string
+		name                           string
+		sig                            int32
+		exponent                       int64
+		mode                           ArbitraryFloatRoundingMode
+		increment, overflow, direction string
 	}{
-		{"halfway even", (1 << 26) + 4, 0, ArbitraryFloatNearestEven, "0", "0"},
-		{"halfway away", (1 << 26) + 4, 0, ArbitraryFloatNearestAway, "1", "0"},
-		{"overflow", 1 << 26, 2000, ArbitraryFloatNearestEven, "0", "1"},
+		{"halfway even", (1 << 26) + 4, 0, ArbitraryFloatNearestEven, "0", "0", "(LEFT)"},
+		{"halfway away", (1 << 26) + 4, 0, ArbitraryFloatNearestAway, "1", "0", "(LEFT)"},
+		{"denormal", 1 << 26, -149, ArbitraryFloatNearestEven, "0", "0", "(RIGHT)"},
+		{"overflow", 1 << 26, 2000, ArbitraryFloatNearestEven, "0", "1", "(LEFT)"},
 	} {
 		var x ArbitraryFloat
 		sig := NewInt(tc.sig)
@@ -39,6 +40,8 @@ func TestArbitraryFloatRoundDecisionTraceBranches(t *testing.T) {
 		} else {
 			last := -1
 			for _, site := range []struct{ line, body string }{
+				{"2000", "e_min_norm = -126\ne_max_norm = 127\nbeta = "},
+				{"2009", "Shift distance: "},
 				{"2040", "sign=0 last="},
 				{"2055", "Rounding increment -> significand +" + tc.increment},
 				{"2071", "SIGovf = " + tc.overflow},
@@ -52,7 +55,7 @@ func TestArbitraryFloatRoundDecisionTraceBranches(t *testing.T) {
 				}
 				last = at
 			}
-			if strings.Count(got, "------------------------------------------------\n") != 5 {
+			if !strings.Contains(got, tc.direction+"\n") || !strings.Contains(got, "sigma_cap = -26\n") || strings.Count(got, "------------------------------------------------\n") != 7 {
 				t.Fatalf("%s round record count: %q", tc.name, got)
 			}
 		}
