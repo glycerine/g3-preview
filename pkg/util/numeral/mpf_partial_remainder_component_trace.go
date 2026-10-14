@@ -14,7 +14,12 @@ func (m *ArbitraryFloatManager) formatPartialRemainderComponents(sign bool, expo
 	if e != nil {
 		return "", e
 	}
-	defer func() { cause = JoinNumericErrors(cause, text.Close()) }()
+	defer func() {
+		cause = JoinNumericErrors(cause, text.Close())
+		if cause != nil {
+			result = ""
+		}
+	}()
 	view, e := m.ToStringHexfloatComponentsInto(sign, exponent, significand, ebits, sbits, extra, text)
 	if e != nil {
 		return "", JoinNumericErrors(e, m.CleanupHexfloatComponents())
