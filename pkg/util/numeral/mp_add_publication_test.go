@@ -177,6 +177,7 @@ func TestAdditivePublicationCallerFailurePrefixes(t *testing.T) {
 				}
 				budget.FailAfter(-1)
 				qopsMust(t, m.CleanupAddIntTemporary())
+				qopsMust(t, m.CleanupFusedTemporary())
 				if e != nil {
 					powerPublicationComponent(t, m.Z, &out.Num, "71", pn.String(), normalized.Num().String())
 					powerPublicationComponent(t, m.Z, &out.Den, "1", pd.String(), normalized.Denom().String())

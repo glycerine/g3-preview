@@ -64,7 +64,7 @@ func (m *RationalManager) SourceFinalize() error {
 	if m == nil || m.self != m {
 		return umemory.ErrRuntimeOwner
 	}
-	if m.Z != nil && (m.Z.numericCallerExecuting() || m.Z.rationalServiceReadCallbackActive() || m.Z.conversionCallerExecuting() || m.Z.CopyAllocation.Executing || m.Z.NormalizationExecuting) || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfLifecycleCallbackActive() || (m.Z != nil && m.Z.mpfBorrowedSourceCallbackActive()) {
+	if m.fusedExecuting || m.Z != nil && (m.Z.numericCallerExecuting() || m.Z.rationalServiceReadCallbackActive() || m.Z.conversionCallerExecuting() || m.Z.CopyAllocation.Executing || m.Z.NormalizationExecuting) || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfLifecycleCallbackActive() || (m.Z != nil && m.Z.mpfBorrowedSourceCallbackActive()) {
 		return ErrNumericPending
 	}
 	if m.closed || m.SourceFinalized {
@@ -73,7 +73,7 @@ func (m *RationalManager) SourceFinalize() error {
 	if m.originalCause != nil || (m.Closing && !m.SourceFinalizing) {
 		return arena.ErrClosed
 	}
-	if m.parseOuterPending || m.parseSuffixPending || m.parseB.pending || m.parseExp.pending || m.parseTen.pending || m.prevPowerPending || m.addIntPending || m.lexical.pending() || m.RawArithmetic.Pending() {
+	if m.parseOuterPending || m.parseSuffixPending || m.parseB.pending || m.parseExp.pending || m.parseTen.pending || m.prevPowerPending || m.addIntPending || m.fusedPending || m.lexical.pending() || m.RawArithmetic.Pending() {
 		return ErrRationalLexicalPending
 	}
 	m.SourceFinalizing = true

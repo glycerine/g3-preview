@@ -233,19 +233,26 @@ func (m *RationalManager) fused(a, b, c, out *Rational, subtract bool) error {
 		}
 		return m.Add(a, c, out)
 	}
-	local := NewRational()
 	tmp := &m.AddMulTmp
 	if m.Synchronized {
-		tmp = &local
-		defer m.drop(&local)
+		m.beginFusedTemporary()
+		tmp = &m.fusedTemporary
+		defer func() { m.fusedExecuting = false }()
 	}
 	if e := m.Mul(b, c, tmp); e != nil {
 		return e
 	}
 	if subtract {
-		return m.Sub(a, tmp, out)
+		if e := m.Sub(a, tmp, out); e != nil {
+			return e
+		}
+	} else if e := m.Add(a, tmp, out); e != nil {
+		return e
 	}
-	return m.Add(a, tmp, out)
+	if m.Synchronized {
+		return m.finishFusedTemporarySource()
+	}
+	return nil
 }
 func (m *RationalManager) AddMulInt(a *Rational, b *Int, c, out *Rational) error {
 	return m.fusedInt(a, b, c, out, false)
@@ -268,19 +275,74 @@ func (m *RationalManager) fusedInt(a *Rational, b *Int, c, out *Rational, subtra
 		}
 		return m.Add(a, c, out)
 	}
-	local := NewRational()
 	tmp := &m.AddMulTmp
 	if m.Synchronized {
-		tmp = &local
-		defer m.drop(&local)
+		m.beginFusedTemporary()
+		tmp = &m.fusedTemporary
+		defer func() { m.fusedExecuting = false }()
 	}
 	if e := m.MulInt(b, c, tmp); e != nil {
 		return e
 	}
 	if subtract {
-		return m.Sub(a, tmp, out)
+		if e := m.Sub(a, tmp, out); e != nil {
+			return e
+		}
+	} else if e := m.Add(a, tmp, out); e != nil {
+		return e
 	}
-	return m.Add(a, tmp, out)
+	if m.Synchronized {
+		return m.finishFusedTemporarySource()
+	}
+	return nil
+}
+
+func (m *RationalManager) beginFusedTemporary() {
+	m.fusedTemporary = NewRational()
+	m.fusedPending = true
+	m.fusedExecuting = true
+	m.fusedCursor = 0
+}
+
+func (m *RationalManager) finishFusedTemporarySource() error {
+	for m.fusedCursor < 2 {
+		part := &m.fusedTemporary.Num
+		if m.fusedCursor == 1 {
+			part = &m.fusedTemporary.Den
+		}
+		if _, e := sourceNumeralDel(m.Z, part); e != nil {
+			return e
+		}
+		m.fusedCursor++
+	}
+	m.fusedTemporary = Rational{}
+	m.fusedPending = false
+	return nil
+}
+
+func (m *RationalManager) CleanupFusedTemporary() error {
+	if m == nil || m.self != m || m.Z == nil {
+		return umemory.ErrRuntimeOwner
+	}
+	if !m.fusedPending {
+		return nil
+	}
+	if m.fusedExecuting {
+		return ErrNumericPending
+	}
+	for m.fusedCursor < 2 {
+		part := &m.fusedTemporary.Num
+		if m.fusedCursor == 1 {
+			part = &m.fusedTemporary.Den
+		}
+		if e := m.Z.Del(part); e != nil {
+			return e
+		}
+		m.fusedCursor++
+	}
+	m.fusedTemporary = Rational{}
+	m.fusedPending = false
+	return nil
 }
 
 const (

@@ -42,6 +42,9 @@ type RationalManager struct {
 	prevPowerPending                               bool
 	addIntTemporary                                Int
 	addIntPending                                  bool
+	fusedTemporary                                 Rational
+	fusedPending, fusedExecuting                   bool
+	fusedCursor                                    uint8
 	parseOuterTemporary, parseSuffixTemporary      Int
 	parseOuterPending, parseSuffixPending          bool
 	parseB, parseExp, parseTen                     rationalParserScopedValue
@@ -88,7 +91,7 @@ func (m *RationalManager) checkOwnerReady() error {
 	if m.closed || m.Closing || m.SourceFinalizing || m.SourceFinalized || m.Z.closed || m.Z.SourceFinalizing || m.Z.constructionFailed {
 		return arena.ErrClosed
 	}
-	if m.parseOuterPending || m.parseSuffixPending || m.parseB.pending || m.parseExp.pending || m.parseTen.pending || m.prevPowerPending || m.addIntPending {
+	if m.parseOuterPending || m.parseSuffixPending || m.parseB.pending || m.parseExp.pending || m.parseTen.pending || m.prevPowerPending || m.addIntPending || (m.fusedPending && !m.fusedExecuting) {
 		return ErrRationalLexicalPending
 	}
 	return nil

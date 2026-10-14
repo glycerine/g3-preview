@@ -23,7 +23,7 @@ func (m *RationalManager) CloseChecked() error {
 	if m == nil || m.self != m {
 		return umemory.ErrRuntimeOwner
 	}
-	if m.Z != nil && (m.Z.numericCallerExecuting() || m.Z.rationalServiceReadCallbackActive() || m.Z.conversionCallerExecuting() || m.Z.CopyAllocation.Executing || m.Z.NormalizationExecuting) || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfLifecycleCallbackActive() || (m.Z != nil && m.Z.mpfBorrowedSourceCallbackActive()) {
+	if m.fusedExecuting || m.Z != nil && (m.Z.numericCallerExecuting() || m.Z.rationalServiceReadCallbackActive() || m.Z.conversionCallerExecuting() || m.Z.CopyAllocation.Executing || m.Z.NormalizationExecuting) || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfLifecycleCallbackActive() || (m.Z != nil && m.Z.mpfBorrowedSourceCallbackActive()) {
 		return ErrNumericPending
 	}
 	if m.closed {
@@ -39,6 +39,10 @@ func (m *RationalManager) CloseChecked() error {
 		return m
 	}
 	if e := m.CleanupAddIntTemporary(); e != nil {
+		m.CleanupCauseField = e
+		return m
+	}
+	if e := m.CleanupFusedTemporary(); e != nil {
 		m.CleanupCauseField = e
 		return m
 	}
