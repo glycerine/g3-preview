@@ -12,6 +12,14 @@ import (
 var ErrMixedNotation = errors.New("mpnum: mixing rational/scientific notation")
 var ErrExponentTooLarge = errors.New("mpnum: exponent is too big")
 
+// The three parser-owned rational values have fixed source declaration order:
+// b, _exp, _ten. Their destructors run in the reverse order.
+type rationalParserScopedValue struct {
+	value   Rational
+	stage   uint8 // 0: numerator, 1: denominator
+	pending bool
+}
+
 type ParseErrorReason uint8
 
 const (
@@ -65,7 +73,7 @@ func (m *RationalManager) SetString(out *Rational, text string) (err error) {
 	if m == nil {
 		return umemory.ErrRuntimeOwner
 	}
-	if m.parseOuterPending || m.parseSuffixPending {
+	if m.parseOuterPending || m.parseSuffixPending || m.parseB.pending || m.parseExp.pending || m.parseTen.pending {
 		return ErrRationalLexicalPending
 	}
 	if m.closed {
@@ -212,7 +220,11 @@ func (m *RationalManager) parseRationalSuffix(work *Rational, text string, i int
 			return &ParseError{Reason: ParseExponentTooLarge}
 		}
 		b := NewRational()
-		defer m.drop(&b)
+		defer func() {
+			if cleanupErr := m.finishParserRationalSource(&b, &m.parseB); cleanupErr != nil && err == nil {
+				err = cleanupErr
+			}
+		}()
 		if hasDen {
 			if e := m.SetParts(&b, &work.Den, &tmp2); e != nil {
 				return e
@@ -226,8 +238,16 @@ func (m *RationalManager) parseRationalSuffix(work *Rational, text string, i int
 		}
 		if exponent > 0 {
 			exp, tenRat := NewRational(), NewRational()
-			defer m.drop(&exp)
-			defer m.drop(&tenRat)
+			defer func() {
+				if cleanupErr := m.finishParserRationalSource(&exp, &m.parseExp); cleanupErr != nil && err == nil {
+					err = cleanupErr
+				}
+			}()
+			defer func() {
+				if cleanupErr := m.finishParserRationalSource(&tenRat, &m.parseTen); cleanupErr != nil && err == nil {
+					err = cleanupErr
+				}
+			}()
 			if e := m.SetInt64(&tenRat, 10); e != nil {
 				return e
 			}
@@ -253,11 +273,45 @@ func (m *RationalManager) parseRationalSuffix(work *Rational, text string, i int
 	return nil
 }
 
-// CleanupParserTemporaries continues only the two integer scopes whose source
-// destructors stopped. The suffix scope ends before the outer digit scope.
+func (m *RationalManager) finishParserRationalSource(value *Rational, slot *rationalParserScopedValue) error {
+	if _, e := sourceNumeralDel(m.Z, &value.Num); e != nil {
+		*slot = rationalParserScopedValue{value: *value, pending: true}
+		return e
+	}
+	if _, e := sourceNumeralDel(m.Z, &value.Den); e != nil {
+		*slot = rationalParserScopedValue{value: *value, stage: 1, pending: true}
+		return e
+	}
+	return nil
+}
+
+func (m *RationalManager) cleanupParserRational(slot *rationalParserScopedValue) error {
+	if !slot.pending {
+		return nil
+	}
+	if slot.stage == 0 {
+		if e := m.Z.Del(&slot.value.Num); e != nil {
+			return e
+		}
+		slot.stage = 1
+	}
+	if e := m.Z.Del(&slot.value.Den); e != nil {
+		return e
+	}
+	*slot = rationalParserScopedValue{}
+	return nil
+}
+
+// CleanupParserTemporaries continues stopped source destructors in reverse
+// declaration order, followed by suffix then outer integer scratch storage.
 func (m *RationalManager) CleanupParserTemporaries() error {
 	if m == nil || m.self != m || m.Z == nil {
 		return umemory.ErrRuntimeOwner
+	}
+	for _, slot := range [...]*rationalParserScopedValue{&m.parseTen, &m.parseExp, &m.parseB} {
+		if e := m.cleanupParserRational(slot); e != nil {
+			return e
+		}
 	}
 	if m.parseSuffixPending {
 		if e := m.Z.Del(&m.parseSuffixTemporary); e != nil {

@@ -42,6 +42,7 @@ type RationalManager struct {
 	prevPowerPending                               bool
 	parseOuterTemporary, parseSuffixTemporary      Int
 	parseOuterPending, parseSuffixPending          bool
+	parseB, parseExp, parseTen                     rationalParserScopedValue
 	self                                           *RationalManager
 	originalCause, CleanupCauseField               error
 	cleanupStage                                   uint8
@@ -85,7 +86,7 @@ func (m *RationalManager) checkOwnerReady() error {
 	if m.closed || m.Closing || m.SourceFinalizing || m.SourceFinalized || m.Z.closed || m.Z.SourceFinalizing || m.Z.constructionFailed {
 		return arena.ErrClosed
 	}
-	if m.parseOuterPending || m.parseSuffixPending || m.prevPowerPending {
+	if m.parseOuterPending || m.parseSuffixPending || m.parseB.pending || m.parseExp.pending || m.parseTen.pending || m.prevPowerPending {
 		return ErrRationalLexicalPending
 	}
 	return nil

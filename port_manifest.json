@@ -156980,6 +156980,13 @@
           "tests": ["TestRationalParserIntegerScopesRetainSuffixBeforeOuterCleanup", "TestRationalParserActualOuterScopedDeletionRefusal"]
         },
         {
+          "name": "set(char const*) concrete b, _exp and _ten scoped rational deletion in reverse construction order with numerator-before-denominator continuation (mpq.cpp:242-268)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpq_parse.go",
+          "go_targets": ["pkg/util/numeral/mpq_parse_rational_scope_test.go", "pkg/util/numeral/mpq_parse_scope_runtime_test.go"],
+          "tests": ["TestRationalParserRationalScopesRetainReverseDeletionOrder", "TestRationalParserRationalScopeDenominatorStopKeepsComponentCursor", "TestRationalParserActualExponentScopedDeletionRefusal"]
+        },
+        {
           "name": "set(char const*) complete permissive byte/text parser",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpq_parse.go",
@@ -158137,6 +158144,13 @@
           "go_target": "pkg/util/numeral/mpq_parse.go",
           "go_targets": ["pkg/util/numeral/mpq_parse_scope_test.go", "pkg/util/numeral/mpq_parse_scope_runtime_test.go"],
           "tests": ["TestRationalParserIntegerScopesRetainSuffixBeforeOuterCleanup", "TestRationalParserActualOuterScopedDeletionRefusal"]
+        },
+        {
+          "name": "set(char const*) concrete b, _exp and _ten scoped rational deletion in reverse construction order with numerator-before-denominator continuation (mpq.cpp:242-268)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpq_parse.go",
+          "go_targets": ["pkg/util/numeral/mpq_parse_rational_scope_test.go", "pkg/util/numeral/mpq_parse_scope_runtime_test.go"],
+          "tests": ["TestRationalParserRationalScopesRetainReverseDeletionOrder", "TestRationalParserRationalScopeDenominatorStopKeepsComponentCursor", "TestRationalParserActualExponentScopedDeletionRefusal"]
         },
         {
           "name": "set(char const*) complete permissive byte/text parser",
