@@ -149117,8 +149117,8 @@
           ]
         },
         {
-          "name": "cpp33-72/h44-47,70: explicit same-cohort source OOM policy, derived/base exception catch, conditional borrowed CString setter, count prefix then actual current max-count read, real exits101/113 through standard file providers",
-          "status": "partial",
+          "name": "Source OOM/count fatal policy: cohort binding, derived/base exception, borrowed CString selection, current max-count read and actual 101/113 exits (cpp33-72; h44-47,70)",
+          "status": "ported",
           "go_target": "pkg/util/diagnostic/util_memory_fatal_policy.go",
           "tests": [
             "TestMemoryFatalStandardStreamsColdGraph",
@@ -149132,8 +149132,8 @@
           ]
         },
         {
-          "name": "cpp55-72 standard ostream prerequisite: concrete borrowed os.File provider, default nonthrowing badbit, selected existing C-locale formatting, reflected cold header/embedded emission byte without unused StringBuffer",
-          "status": "partial",
+          "name": "Selected standard-file output profile: borrowed os.File, nonthrowing badbit, C-locale number insertion and charged cold stream header (cpp55-72)",
+          "status": "ported",
           "go_target": "pkg/util/text/util_numeric_stream_file.go",
           "tests": [
             "TestNumericFileStreamExactFormattingAndBorrow",
@@ -149554,8 +149554,8 @@
           ]
         },
         {
-          "name": "cpp33-72/h44-47,70: explicit same-cohort source OOM policy, derived/base exception catch, conditional borrowed CString setter, count prefix then actual current max-count read, real exits101/113 through standard file providers",
-          "status": "partial",
+          "name": "Source OOM/count fatal policy: cohort binding, derived/base exception, borrowed CString selection, current max-count read and actual 101/113 exits (cpp33-72; h44-47,70)",
+          "status": "ported",
           "go_target": "pkg/util/diagnostic/util_memory_fatal_policy.go",
           "tests": [
             "TestMemoryFatalStandardStreamsColdGraph",
@@ -149569,8 +149569,8 @@
           ]
         },
         {
-          "name": "cpp55-72 standard ostream prerequisite: concrete borrowed os.File provider, default nonthrowing badbit, selected existing C-locale formatting, reflected cold header/embedded emission byte without unused StringBuffer",
-          "status": "partial",
+          "name": "Selected standard-file output profile: borrowed os.File, nonthrowing badbit, C-locale number insertion and charged cold stream header (cpp55-72)",
+          "status": "ported",
           "go_target": "pkg/util/text/util_numeric_stream_file.go",
           "tests": [
             "TestNumericFileStreamExactFormattingAndBorrow",
