@@ -15,6 +15,7 @@ type realValueStore struct {
 	pendingSturmCoefficients [][]*realValue
 	pendingSturmRationals    []numeral.Rational
 	pendingSturmIntegers     []numeral.Int
+	pendingSturmIntervals    []*BinaryInterval
 }
 
 // realValue is a retained nonzero rational or algebraic-root function value.

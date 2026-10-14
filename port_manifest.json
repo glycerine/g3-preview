@@ -50135,16 +50135,21 @@
             "TestRealClosureSturmTemporaryRefusalPrecedesOlderRows",
             "TestRealClosureSturmScratchRefusalRetainsValue",
             "TestRealClosureSturmRawRationalRefusalRetainsNumeral",
-            "TestRealClosureSturmRawIntegerRefusalRetainsNumeral"
+            "TestRealClosureSturmRawIntegerRefusalRetainsNumeral",
+            "TestRealClosureSturmIntervalRefusedDestructorRetainsOwner"
           ]
         },
         {
-          "name": "Rational-coefficient exact Horner sign evaluation and finite/infinite binary interval endpoint sign variations, plus algebraic constant and zero-bound signs (realclosure.cpp:2452-2462,3712-3738,3773-3920,3930-4025); nonzero-bound algebraic approximation and refinement remain open",
+          "name": "Rational-coefficient exact Horner sign evaluation and finite/infinite binary interval endpoint sign variations, algebraic constant/zero-bound signs, and unambiguous all-algebraic nonzero-bound interval Horner evaluation (realclosure.cpp:2452-2462,3712-3770,3773-3920,3930-4025); mixed rational/algebraic coefficients and ambiguous-result refinement remain open",
           "status": "partial",
           "go_target": "pkg/math/realclosure/sign_sturm_tarski_interval.go",
+          "go_targets": [
+            "pkg/math/realclosure/sign_sturm_tarski_approx.go"
+          ],
           "tests": [
             "TestRealClosureBoundedRationalSturmTarskiEndpoints",
-            "TestRealClosureAlgebraicConstantAndZeroBoundSigns"
+            "TestRealClosureAlgebraicConstantAndZeroBoundSigns",
+            "TestRealClosureSturmIntervalRefusedDestructorRetainsOwner"
           ]
         },
         {

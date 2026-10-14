@@ -76,10 +76,14 @@ func (s *realValueStore) signAtBinaryBound(coefficients []*realValue, bounds *nu
 	if zero {
 		return s.signValue(coefficients[0])
 	}
+	hasAlgebraic := false
 	for _, value := range coefficients {
 		if !s.rationalOperand(value) {
-			return 0, arena.ErrInvalidSlot
+			hasAlgebraic = true
 		}
+	}
+	if hasAlgebraic {
+		return s.signApproxAtBinaryBound(coefficients, bounds, bound)
 	}
 	x := numeral.NewRational()
 	defer func() { err = errors.Join(err, s.releaseSturmRational(&x)) }()

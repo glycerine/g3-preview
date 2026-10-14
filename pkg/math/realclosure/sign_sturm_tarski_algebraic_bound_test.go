@@ -77,6 +77,8 @@ func TestRealClosureAlgebraicConstantAndZeroBoundSigns(t *testing.T) {
 		{"negative constant", []*realValue{negative}, &nonzero, -1},
 		{"positive zero bound", []*realValue{positive, negative}, &zero, 1},
 		{"negative zero bound", []*realValue{negative, positive}, &zero, -1},
+		{"positive interval Horner", []*realValue{positive, positive}, &nonzero, 1},
+		{"negative interval Horner", []*realValue{negative, negative}, &nonzero, -1},
 	} {
 		got, err := store.signAtBinaryBound(tc.coefficients, bounds, tc.bound)
 		if err != nil || got != tc.want {
@@ -84,7 +86,10 @@ func TestRealClosureAlgebraicConstantAndZeroBoundSigns(t *testing.T) {
 		}
 	}
 	if _, err := store.signAtBinaryBound([]*realValue{positive, negative}, bounds, &nonzero); !errors.Is(err, arena.ErrInvalidSlot) {
-		t.Fatal("unported algebraic Horner branch", err)
+		t.Fatal("ambiguous interval needs source refinement", err)
+	}
+	if _, err := store.signAtBinaryBound([]*realValue{positive, one}, bounds, &nonzero); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatal("mixed rational interval conversion remains open", err)
 	}
 	rows := []realPolynomial{
 		{coefficients: []*realValue{positive}},
