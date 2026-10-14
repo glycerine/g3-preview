@@ -10,8 +10,8 @@ import (
 
 // signApproxAtBinaryBound follows the source Horner interval sequence for
 // retained algebraic-root and rational coefficient intervals. Rational
-// coefficient refinement follows an ambiguous result; algebraic refinement
-// and exact fallback remain separate work.
+// coefficient refinement follows an ambiguous result. Exact fallback remains
+// separate work.
 func (s *realValueStore) signApproxAtBinaryBound(coefficients []*realValue, bounds *numeral.BinaryRationalManager, bound *numeral.BinaryRational) (sign int32, err error) {
 	for _, value := range coefficients {
 		if value == nil {
@@ -21,30 +21,11 @@ func (s *realValueStore) signApproxAtBinaryBound(coefficients []*realValue, boun
 			return 0, arena.ErrInvalidSlot
 		}
 	}
-	// Source rational values cache intervals in the value object. Keep one
-	// concrete interval per rational coefficient for this invocation until
-	// the result and point interval have been destroyed.
-	owned := make(map[*realValue]*BinaryInterval)
-	var ownedOrder []*BinaryInterval
-	defer func() {
-		for i := len(ownedOrder) - 1; i >= 0; i-- {
-			err = errors.Join(err, s.releaseSturmInterval(ownedOrder[i]))
-		}
-	}()
 	coefficientInterval := func(value *realValue) (*BinaryInterval, error) {
 		if !value.isRational {
 			return value.functionInterval, nil
 		}
-		if interval := owned[value]; interval != nil {
-			return interval, nil
-		}
-		interval, e := s.rationalApproxInterval(value, bounds)
-		if e != nil {
-			return nil, e
-		}
-		owned[value] = interval
-		ownedOrder = append(ownedOrder, interval)
-		return interval, nil
+		return s.cachedRationalApproxInterval(value, bounds)
 	}
 	point, err := NewBinaryInterval(bounds)
 	if err != nil {
@@ -140,7 +121,11 @@ func (s *realValueStore) signApproxAtBinaryBound(coefficients []*realValue, boun
 				continue
 			}
 			if value.isRational {
-				if e := s.refineSturmRationalInterval(value, owned[value], precision); e != nil {
+				coefficient, e := coefficientInterval(value)
+				if e != nil {
+					return 0, e
+				}
+				if e := s.refineSturmRationalInterval(value, coefficient, precision); e != nil {
 					return 0, e
 				}
 			} else {

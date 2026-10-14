@@ -10,7 +10,7 @@ import (
 
 // rationalApproxInterval initializes one nonzero rational coefficient using
 // the source default initial precision. The returned interval is owned by the
-// caller; the C++ value's persistent lazy cache is represented per invocation.
+// caller; cachedRationalApproxInterval transfers that ownership to the value.
 func (s *realValueStore) rationalApproxInterval(value *realValue, bounds *numeral.BinaryRationalManager) (interval *BinaryInterval, err error) {
 	if s == nil || s.numbers == nil || bounds == nil || !s.rationalOperand(value) || value == nil {
 		return nil, arena.ErrInvalidSlot
@@ -98,4 +98,24 @@ func (s *realValueStore) rationalApproxInterval(value *realValue, bounds *numera
 			return nil, err
 		}
 	}
+}
+
+// Source rational_value::m_interval is initialized lazily and survives
+// subsequent sign checks so coefficient refinement is not discarded.
+func (s *realValueStore) cachedRationalApproxInterval(value *realValue, bounds *numeral.BinaryRationalManager) (*BinaryInterval, error) {
+	if s == nil || value == nil || value.store != s || value.deleted || value.refs == 0 || !value.isRational || bounds == nil {
+		return nil, arena.ErrInvalidSlot
+	}
+	if value.rationalInterval != nil {
+		if value.rationalInterval.numbers != bounds {
+			return nil, arena.ErrInvalidSlot
+		}
+		return value.rationalInterval, nil
+	}
+	interval, err := s.rationalApproxInterval(value, bounds)
+	if err != nil {
+		return nil, err
+	}
+	value.rationalInterval = interval
+	return interval, nil
 }

@@ -25,6 +25,7 @@ type realValueStore struct {
 type realValue struct {
 	store             *realValueStore
 	rational          numeral.Rational
+	rationalInterval  *BinaryInterval
 	functionNumerator realPolynomial
 	functionInterval  *BinaryInterval
 	root              *algebraicRoot
@@ -71,6 +72,12 @@ func (s *realValueStore) release(v *realValue) error {
 		return nil
 	}
 	if v.isRational {
+		if v.rationalInterval != nil {
+			if err := v.rationalInterval.Close(); err != nil {
+				return err
+			}
+			v.rationalInterval = nil
+		}
 		if err := s.numbers.Del(&v.rational); err != nil {
 			return err
 		}

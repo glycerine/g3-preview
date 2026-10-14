@@ -145,6 +145,13 @@ func TestRealClosureAlgebraicConstantAndZeroBoundSigns(t *testing.T) {
 	if got, err := store.signAtBinaryBound([]*realValue{negativeThird, closeValue}, bounds, &oneBound); err != nil || got != 1 {
 		t.Fatal("refined rational coefficient sign", got, err)
 	}
+	refined := negativeThird.rationalInterval
+	if refined == nil {
+		t.Fatal("rational coefficient did not retain its refined interval")
+	}
+	if got, err := store.signAtBinaryBound([]*realValue{negativeThird, closeValue}, bounds, &oneBound); err != nil || got != 1 || negativeThird.rationalInterval != refined {
+		t.Fatal("second sign check rebuilt the rational interval", got, err)
+	}
 	if err := store.release(closeValue); err != nil {
 		t.Fatal(err)
 	}
@@ -280,6 +287,9 @@ func TestRealClosureAlgebraicConstantAndZeroBoundSigns(t *testing.T) {
 		if err := store.release(value); err != nil {
 			t.Fatal(err)
 		}
+	}
+	if negativeThird.rationalInterval != nil {
+		t.Fatal("rational value release retained its cached interval")
 	}
 	if err := bounds.CloseChecked(); err != nil {
 		t.Fatal(err)
