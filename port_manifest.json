@@ -169105,14 +169105,25 @@
           ]
         },
         {
-          "name": "Other retained ref<T> instantiations and any reached move/detach/swap operations outside the selected model-converter copy-assignment path still require concrete consumer audits",
+          "name": "Retained concat_converter<model_converter> and concat_star_converter<model_converter> ref<model_converter> member construction, borrowed access, shared-child retention and source member destruction order (converter.h:45-123; model_converter.cpp:22-124; ref.h:31-101)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_model_converter.go",
+          "tests": [
+            "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
+            "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
+            "TestTacticModelConcatShortcutsNullBranchesAndSharedOwners",
+            "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
+          ]
+        },
+        {
+          "name": "Other retained ref<T> instantiations and any reached move/detach/swap operations outside the selected model and model-converter construction/destruction paths still require concrete consumer audits",
           "status": "partial",
           "tests": []
         }
       ],
       "ownership": [],
       "deviations": [
-        "The retained model2mc model_ref-to-model_ref assignment retains the incoming model before releasing the outgoing reference, including self-aliases. A consumed stopped final model deletion keeps the old raw pointer published and the acquired incoming reference in an owning receipt until explicit close. Copied/retired owner guards remain explicit. Other retained reference instantiations, move/detach paths and failure histories remain open."
+        "The retained model2mc model_ref-to-model_ref assignment retains the incoming model before releasing the outgoing reference, including self-aliases. A consumed stopped final model deletion keeps the old raw pointer published and the acquired incoming reference in an owning receipt until explicit close. Concrete concat model converters retain each child ref, including aliases, then release second before first; concat-star releases its explicit second-child vector before the first ref member. Copied/retired owner guards remain explicit. Other retained reference instantiations, move/detach paths and failure histories remain open."
       ]
     },
     {

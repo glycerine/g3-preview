@@ -241,6 +241,8 @@ func (b *tacticConverterBase) release() {
 
 type tacticConcatModelConverter struct {
 	tacticConverterBase
+	// Concrete ref<model_converter> members from concat_converter.
+	// Construction retains first then second; Close releases second then first.
 	first, second ModelConverter
 }
 
