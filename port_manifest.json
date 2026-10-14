@@ -48851,7 +48851,9 @@
         "pkg/math/realclosure/sign_matrix.go",
         "pkg/math/realclosure/sign_matrix_test.go",
         "pkg/math/realclosure/sign_matrix_solve.go",
-        "pkg/math/realclosure/sign_matrix_solve_test.go"
+        "pkg/math/realclosure/sign_matrix_solve_test.go",
+        "pkg/math/realclosure/sign_determination.go",
+        "pkg/math/realclosure/sign_determination_test.go"
       ],
       "tests": [
         "TestRealClosureBinaryExtendedNumeralBranches",
@@ -48861,7 +48863,9 @@
         "TestSignMatrixSourceIntegerSolutions",
         "TestSignMatrixFilterColumnsOwnsValues",
         "TestSignMatrixIntegerSolverSignedTwoByTwoGrid",
-        "TestSignMatrixIndependentRowsPreserveOriginalPriority"
+        "TestSignMatrixIndependentRowsPreserveOriginalPriority",
+        "TestSignDeterminationRetainedColumnTransition",
+        "TestKeepSignAssignmentUsesOldConditionGroups"
       ],
       "conditionals": [
         {
@@ -50050,6 +50054,15 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Sign-determination retained cardinality-group discriminator, sign-condition chains and matrix/column/Tarski state transition (realclosure.cpp:1743-1775,1967-1978,2018-2090); polynomial value sequence and root owner remain open",
+          "status": "partial",
+          "go_target": "pkg/math/realclosure/sign_determination.go",
+          "tests": [
+            "TestSignDeterminationRetainedColumnTransition",
+            "TestKeepSignAssignmentUsesOldConditionGroups"
+          ]
+        },
         {
           "name": "Sign-determination integer cardinality solve, ascending column filter, and original-priority independent-row selection (realclosure.cpp:2034-2083)",
           "status": "partial",
@@ -116931,9 +116944,9 @@
       "path": "src/util/array.h",
       "component": "util",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/math/realclosure/sign_determination.go", "pkg/math/realclosure/sign_determination_test.go"],
+      "tests": ["TestSignDeterminationRetainedColumnTransition", "TestKeepSignAssignmentUsesOldConditionGroups"],
       "conditionals": [
         {
           "line": 19,
@@ -116987,7 +117000,7 @@
         }
       ],
       "ownership": [
-        "The only production include is realclosure.cpp. Polynomial ptr_array borrows value pointers and never destroys pointed-to values itself; realclosure::reset_p decrements them before finalizing the array storage. Sign-determination arrays own their element slots and backing; del_sign_det frees sign-condition nodes separately, then finalizes the pointer array, polynomial arrays and integer array in source order. The Go realclosure port has interval arithmetic but not the sign-determination or rational-function owners that reach these arrays."
+        "The only production include is realclosure.cpp. Polynomial ptr_array borrows value pointers and never destroys pointed-to values itself; realclosure::reset_p decrements them before finalizing the array storage. Sign-determination arrays own their element slots and backing; del_sign_det frees sign-condition nodes separately, then finalizes the pointer array, polynomial arrays and integer array in source order. The Go realclosure port now has partial sign-determination state with native Tarski and sign-condition slices; polynomial value ownership, final sign_det publication/deletion, and the rational-function owner remain open."
       ],
       "deviations": [
         "Use concrete Go slices owned by the realclosure value/sign-determination consumers. Preserve explicit referenced-value decrements, sign-condition deletion and source owner order; do not copy C++ array allocation headers or add a generic array<T>. The similarly named src/api/c++/z3++.h array is unrelated."
