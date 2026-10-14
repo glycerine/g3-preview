@@ -175401,7 +175401,7 @@
           "text": "SASSERT(m_trail_stack.size() == old_size);"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": false,
       "methods": [
         {
@@ -175414,16 +175414,22 @@
           ]
         },
         {
-          "name": "scoped symbol-table operations for retained parser and other concrete consumers",
+          "name": "SMT2 parser local<expr*,level> find/contains/insert and begin/end_scope with shadow restoration (smt2parser.cpp:52,1256-1279,1338-1348,1474,1509,1712,1748,1872-1899,1959,2217,2302-2337)",
           "status": "unported",
+          "tests": []
+        },
+        {
+          "name": "Parser-local reset/append/get_dom/get_range/get_scope_level have no direct production call; AST family enumeration is credited separately",
+          "status": "reference_only",
           "tests": []
         }
       ],
       "ownership": [
-        "AST FamilyManager borrows its symbol manager, owns an insertion-ordered dictionary and registration-order name slice, and closes before the borrowed manager. Scoped undo tables and clone/assignment staging from the deleted generic translation are not retained."
+        "AST FamilyManager borrows its symbol manager, owns an insertion-ordered dictionary and registration-order name slice, and closes before the borrowed manager. Scoped undo tables and clone/assignment staging from the deleted generic translation are not retained.",
+        "The only other production instantiation is SMT2 parser local<expr*,unsigned>. Its table and undo trail borrow expr pointers without incrementing references; their lifetimes belong to enclosing parser AST owners. Begin_scope records a trail limit, insert saves the prior local or a marked absent key, and end_scope restores or erases in reverse trail order. Its Go owner is not yet ported."
       ],
       "deviations": [
-        "The generic scoped Go symbol table and tests were deleted in 8e22e4f5. AST family_id operations now use insdict and native slices in pkg/ast/ast_family.go; that consumer never invokes begin_scope, end_scope, append, reset, or table cloning. Its enumeration uses insertion order. Other live source instantiations remain to be ported with their consumers, without restoring an unused generic adapter."
+        "The generic scoped Go symbol table and tests were deleted in 8e22e4f5. AST family_id operations now use insdict and native slices in pkg/ast/ast_family.go; that consumer never invokes begin_scope, end_scope, append, reset, or table cloning. Its enumeration uses insertion order. The SMT2 parser is the only remaining production instantiation; port its concrete local environment with that parser, without restoring an unused generic adapter."
       ]
     },
     {
