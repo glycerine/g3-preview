@@ -57,9 +57,11 @@ func (m *ArbitraryFloatManager) RoundSqrtWithReceipt(mode ArbitraryFloatRounding
 		return e
 	}
 	// Source computes last even though the specialized switch does not use it.
-	if _, e = z.IsEven(&x.significand); e != nil {
+	even, e = z.IsEven(&x.significand)
+	if e != nil {
 		return e
 	}
+	last := !even
 	inc := false
 	switch mode {
 	case ArbitraryFloatNearestEven, ArbitraryFloatNearestAway:
@@ -70,6 +72,7 @@ func (m *ArbitraryFloatManager) RoundSqrtWithReceipt(mode ArbitraryFloatRounding
 	default:
 		return ErrIntegerAssertion
 	}
+	m.traceFloatDebugText("round_sqrt", "last="+traceBoolDigit(last)+" round="+traceBoolDigit(round)+" sticky="+traceBoolDigit(sticky)+" --> inc="+traceBoolDigit(inc), 2123)
 	if inc {
 		one := NewInt(1)
 		if e = z.addSubWithAllocationContext(&x.significand, &one, &x.significand, false, c); e != nil {

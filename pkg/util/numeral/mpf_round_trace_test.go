@@ -55,11 +55,100 @@ func TestArbitraryFloatRoundDecisionTraceBranches(t *testing.T) {
 				}
 				last = at
 			}
-			if !strings.Contains(got, tc.direction+"\n") || !strings.Contains(got, "sigma_cap = -26\n") || strings.Count(got, "------------------------------------------------\n") != 7 {
+			blocks := 8
+			branch := "round src/util/mpf.cpp:2087"
+			if tc.direction == "(RIGHT)" {
+				branch = "round src/util/mpf.cpp:2091"
+			}
+			if tc.overflow == "1" {
+				blocks = 7
+			} else if !strings.Contains(got, branch) {
+				t.Fatalf("%s result class after decisions: %q", tc.name, got)
+			}
+			if !strings.Contains(got, tc.direction+"\n") || !strings.Contains(got, "sigma_cap = -26\n") || strings.Count(got, "------------------------------------------------\n") != blocks {
 				t.Fatalf("%s round record count: %q", tc.name, got)
 			}
 		}
 		serviceMust(t, m.CleanupRound())
+		serviceMust(t, m.Del(&x))
+	}
+}
+
+func TestArbitraryFloatRoundResultClassTrace(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("mpf_dbg")
+	compiled := tags.ShouldTrace("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	for _, tc := range []struct {
+		name        string
+		exponent    int64
+		line, label string
+	}{
+		{"normal", 0, "2087", "NORMAL: "},
+		{"denormal", -149, "2091", "DENORMAL: "},
+		{"overflow", 2000, "", ""},
+	} {
+		var x ArbitraryFloat
+		sig := NewInt(1 << 26)
+		serviceMust(t, m.SetComponents(&x, 8, 24, false, tc.exponent, &sig))
+		output.Reset()
+		serviceMust(t, m.Round(ArbitraryFloatNearestEven, &x))
+		got := output.String()
+		if !compiled {
+			if got != "" {
+				t.Fatalf("%s erased round trace: %q", tc.name, got)
+			}
+		} else if tc.line == "" {
+			if strings.Contains(got, "round src/util/mpf.cpp:2087") || strings.Contains(got, "round src/util/mpf.cpp:2091") {
+				t.Fatalf("overflow reached result class: %q", got)
+			}
+		} else {
+			header := "-------- [mpf_dbg] round src/util/mpf.cpp:" + tc.line + " ---------\n" + tc.label
+			if !strings.Contains(got, header) || strings.Count(got, header) != 1 {
+				t.Fatalf("%s result class record: %q", tc.name, got)
+			}
+		}
+		serviceMust(t, m.CleanupRound())
+		serviceMust(t, m.Del(&x))
+	}
+}
+
+func TestArbitraryFloatRoundSqrtDecisionTrace(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("mpf_dbg")
+	compiled := tags.ShouldTrace("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	for _, tc := range []struct {
+		tail int32
+		mode ArbitraryFloatRoundingMode
+		body string
+	}{
+		{4, ArbitraryFloatNearestEven, "last=0 round=1 sticky=0 --> inc=0"},
+		{5, ArbitraryFloatNearestEven, "last=0 round=1 sticky=1 --> inc=1"},
+		{4, ArbitraryFloatTowardPositive, "last=0 round=1 sticky=0 --> inc=1"},
+		{8, ArbitraryFloatNearestEven, "last=1 round=0 sticky=0 --> inc=0"},
+	} {
+		var x ArbitraryFloat
+		sig := NewInt((1 << 26) + tc.tail)
+		serviceMust(t, m.SetComponents(&x, 8, 24, false, 0, &sig))
+		output.Reset()
+		serviceMust(t, m.RoundSqrt(tc.mode, &x))
+		got := output.String()
+		if !compiled {
+			if got != "" {
+				t.Fatalf("erased sqrt round trace: %q", got)
+			}
+		} else {
+			header := "-------- [mpf_dbg] round_sqrt src/util/mpf.cpp:2123 ---------\n" + tc.body + "\n"
+			if !strings.Contains(got, header) || strings.Count(got, "------------------------------------------------\n") != 1 {
+				t.Fatalf("sqrt round source decision: %q", got)
+			}
+		}
+		serviceMust(t, m.CleanupRoundSqrt())
 		serviceMust(t, m.Del(&x))
 	}
 }

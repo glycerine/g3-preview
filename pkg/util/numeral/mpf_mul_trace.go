@@ -104,27 +104,35 @@ func (m *ArbitraryFloatManager) traceMulResult(out *ArbitraryFloat) {
 }
 
 func (m *ArbitraryFloatManager) traceFloatDebugValue(function, label string, value *ArbitraryFloat, line int) {
+	_ = m.traceFloatDebugValueChecked(function, label, value, line)
+}
+
+func (m *ArbitraryFloatManager) traceFloatDebugValueChecked(function, label string, value *ArbitraryFloat, line int) error {
 	tags := m.floatTraceTags()
 	if !tags.ShouldTrace("mpf_dbg") {
-		return
+		return nil
 	}
+	var formatError error
 	_ = tags.EmitConditional("mpf_dbg", function, "src/util/mpf.cpp", line,
 		func() bool { return true }, func(w io.Writer) error {
 			if e := writeNumeralDisplayPart(w, label); e != nil {
 				return e
 			}
 			if e := m.traceFloatString(w, value); e != nil {
+				formatError = e
 				return e
 			}
 			return writeNumeralDisplayPart(w, "\n")
 		})
+	return formatError
 }
 
-func (m *ArbitraryFloatManager) traceFloatDebugInt(function, label string, value *Int, line int) {
+func (m *ArbitraryFloatManager) traceFloatDebugIntChecked(function, label string, value *Int, line int) error {
 	tags := m.floatTraceTags()
 	if !tags.ShouldTrace("mpf_dbg") {
-		return
+		return nil
 	}
+	var formatError error
 	_ = tags.EmitConditional("mpf_dbg", function, "src/util/mpf.cpp", line,
 		func() bool { return true }, func(w io.Writer) error {
 			if e := writeNumeralDisplayPart(w, label); e != nil {
@@ -132,10 +140,16 @@ func (m *ArbitraryFloatManager) traceFloatDebugInt(function, label string, value
 			}
 			s, e := m.integer.String(value)
 			if e != nil {
+				formatError = e
 				return e
 			}
 			return writeNumeralDisplayPart(w, s+"\n")
 		})
+	return formatError
+}
+
+func (m *ArbitraryFloatManager) traceFloatDebugInt(function, label string, value *Int, line int) {
+	_ = m.traceFloatDebugIntChecked(function, label, value, line)
 }
 
 func (m *ArbitraryFloatManager) traceFloatDebugText(function, value string, line int) {

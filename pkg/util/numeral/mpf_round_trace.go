@@ -1,4 +1,4 @@
-// Source: src/util/mpf.cpp:2000-2009.
+// Source: src/util/mpf.cpp:2000-2009,2087,2091.
 package numeral
 
 import (
@@ -42,4 +42,29 @@ func (m *ArbitraryFloatManager) traceRoundShiftDistance(sigma int64) {
 		direction = "(LEFT)"
 	}
 	m.traceFloatDebugText("round", "Shift distance: "+strconv.FormatInt(sigma, 10)+" "+direction, 2009)
+}
+
+func (m *ArbitraryFloatManager) traceRoundSignificandBranch(significand *Int, normal bool) error {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return nil
+	}
+	line, label := 2091, "DENORMAL: "
+	if normal {
+		line, label = 2087, "NORMAL: "
+	}
+	var formatError error
+	_ = tags.EmitConditional("mpf_dbg", "round", "src/util/mpf.cpp", line,
+		func() bool { return true }, func(w io.Writer) error {
+			if e := writeNumeralDisplayPart(w, label); e != nil {
+				return e
+			}
+			s, e := m.integer.String(significand)
+			if e != nil {
+				formatError = e
+				return e
+			}
+			return writeNumeralDisplayPart(w, s+"\n")
+		})
+	return formatError
 }

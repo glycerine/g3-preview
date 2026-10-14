@@ -1,6 +1,8 @@
 // Source: src/util/mpf.cpp:1047-1170; src/util/mpf.h:133.
 package numeral
 
+import "strconv"
+
 func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode, x, out *ArbitraryFloat) (cause error) {
 	if e := m.valueGuard(x); e != nil {
 		return e
@@ -14,6 +16,14 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 	if modularSourceDebug && (x.EBits() == 0 || x.SBits() == 0) {
 		return ErrIntegerAssertion
 	}
+	if e := m.traceFloatDebugValueChecked("round_to_integral", "X = ", x, 1050); e != nil {
+		return e
+	}
+	defer func() {
+		if cause == nil {
+			cause = m.traceFloatDebugValueChecked("round_to_integral", "INTEGRAL = ", out, 1167)
+		}
+	}()
 	nan, e := m.IsNaN(x)
 	if e != nil {
 		return e
@@ -58,6 +68,7 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 				return e
 			}
 			tie := sigZero && x.exponent == -1
+			m.traceFloatDebugText("round_to_integral", "tie = "+traceBoolDigit(tie), 1076)
 			if tie && mode == ArbitraryFloatNearestEven {
 				return m.MkZero(x.EBits(), x.SBits(), x.Sign(), out)
 			}
@@ -99,6 +110,9 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 	if e := m.unpackRationalNumeral(&s.a, true, context); e != nil {
 		return e
 	}
+	if e := m.traceRoundIntegralRawOperand(&s.a); e != nil {
+		return e
+	}
 	if modularSourceDebug {
 		p, e := s.power(x.SBits())
 		if e != nil {
@@ -136,11 +150,19 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 	if e != nil {
 		return e
 	}
+	m.traceFloatDebugText("round_to_integral", "shift="+strconv.FormatUint(uint64(shift), 10), 1111)
+	if e := m.traceFloatDebugIntChecked("round_to_integral", "shiftm1_p=", &shiftM1, 1112); e != nil {
+		return e
+	}
 	s.divLive, s.remLive = true, true
 	if e := m.integer.machineDivRemWithAllocationContext(&out.significand, &shiftP, &s.div, &s.rem, context); e != nil {
 		return e
 	}
+	if e := m.traceRoundIntegralQuotient(&s.div, &s.rem); e != nil {
+		return e
+	}
 	inc := false
+	incKind := uint8(0)
 	switch mode {
 	case ArbitraryFloatNearestEven, ArbitraryFloatNearestAway:
 		c, e := m.integer.Compare(&s.rem, &shiftM1)
@@ -158,6 +180,7 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 		if e != nil {
 			return e
 		}
+		m.traceFloatDebugText("round_to_integral", "tie= "+traceBoolDigit(tie)+"; <tie = "+traceBoolDigit(less)+"; >tie = "+traceBoolDigit(more), 1125)
 		if tie {
 			if mode == ArbitraryFloatNearestEven {
 				inc, e = m.integer.IsOdd(&s.div)
@@ -167,11 +190,17 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 			} else {
 				inc = true
 			}
+			if inc {
+				incKind = 1
+			}
 		} else {
 			if modularSourceDebug && !less && !more {
 				return ErrIntegerAssertion
 			}
 			inc = more
+			if inc {
+				incKind = 2
+			}
 		}
 	case ArbitraryFloatTowardPositive, ArbitraryFloatTowardNegative:
 		isZero, e := m.integer.IsZero(&s.rem)
@@ -181,9 +210,15 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 		inc = !isZero && (mode == ArbitraryFloatTowardNegative && out.Sign() || mode == ArbitraryFloatTowardPositive && !out.Sign())
 	}
 	if inc {
+		if incKind == 1 {
+			m.traceFloatDebugText("round_to_integral", "div++ (1)", 1129)
+		}
 		one := NewInt(1)
 		if e := m.integer.addSubWithAllocationContext(&s.div, &one, &s.div, false, context); e != nil {
 			return e
+		}
+		if incKind == 2 {
+			m.traceFloatDebugText("round_to_integral", "div++ (2)", 1137)
 		}
 	}
 	if e := m.integer.shiftWithAllocationContext(&s.div, shift, &out.significand, true, context); e != nil {

@@ -169,7 +169,7 @@ func TestArbitraryFloatSetPlainRationalTrace(t *testing.T) {
 		}
 		blocks := len(lines)
 		if tc.n != 0 {
-			blocks += 7
+			blocks += 8
 			firstRound := strings.Index(got, "round src/util/mpf.cpp:2000")
 			lastRound := strings.Index(got, "round src/util/mpf.cpp:2079")
 			if firstRound <= strings.Index(got, "set src/util/mpf.cpp:289") || lastRound <= firstRound || lastRound >= strings.Index(got, "set src/util/mpf.cpp:300") {
@@ -219,7 +219,7 @@ func TestArbitraryFloatSetFormattedLiteralTrace(t *testing.T) {
 		}
 		firstRound := strings.Index(got, "round src/util/mpf.cpp:2000")
 		lastRound := strings.Index(got, "round src/util/mpf.cpp:2079")
-		if firstRound <= strings.Index(got, "set src/util/mpf.cpp:289") || lastRound <= firstRound || lastRound >= strings.Index(got, "set src/util/mpf.cpp:300") || strings.Count(got, "------------------------------------------------\n") != 14 {
+		if firstRound <= strings.Index(got, "set src/util/mpf.cpp:289") || lastRound <= firstRound || lastRound >= strings.Index(got, "set src/util/mpf.cpp:300") || !strings.Contains(got, "round src/util/mpf.cpp:2087") || strings.Count(got, "------------------------------------------------\n") != 15 {
 			t.Fatalf("literal setter trace blocks for %q: %q", tc.value, got)
 		}
 	}
@@ -265,7 +265,7 @@ func TestArbitraryFloatSetExponentRationalTraceBranches(t *testing.T) {
 		}
 		blocks := len(tc.lines)
 		if tc.numerator != 0 {
-			blocks += 7
+			blocks += 8
 			firstRound := strings.Index(got, "round src/util/mpf.cpp:2000")
 			lastRound := strings.Index(got, "round src/util/mpf.cpp:2079")
 			if firstRound <= strings.Index(got, "set src/util/mpf.cpp:289") || lastRound <= firstRound || lastRound >= strings.Index(got, "set src/util/mpf.cpp:300") {

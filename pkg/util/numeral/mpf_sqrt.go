@@ -13,6 +13,14 @@ func (m *ArbitraryFloatManager) Sqrt(mode ArbitraryFloatRoundingMode, x, out *Ar
 	if modularSourceDebug && (x.EBits() == 0 || x.SBits() == 0) {
 		return ErrIntegerAssertion
 	}
+	if e := m.traceFloatDebugValueChecked("sqrt", "X = ", x, 1008); e != nil {
+		return e
+	}
+	defer func() {
+		if cause == nil {
+			cause = m.traceFloatDebugValueChecked("sqrt", "SQRT = ", out, 1044)
+		}
+	}()
 	nan, e := m.IsNaN(x)
 	if e != nil {
 		return e
@@ -64,6 +72,9 @@ func (m *ArbitraryFloatManager) Sqrt(mode ArbitraryFloatRoundingMode, x, out *Ar
 	if e := m.unpackRationalNumeral(&s.a, true, context); e != nil {
 		return e
 	}
+	if e := m.traceFloatDebugValueChecked("sqrt", "A = ", &s.a, 1027); e != nil {
+		return e
+	}
 	extra := uint32(7)
 	if s.a.exponent%2 != 0 {
 		extra = 6
@@ -88,6 +99,9 @@ func (m *ArbitraryFloatManager) Sqrt(mode ArbitraryFloatRoundingMode, x, out *Ar
 			if e := z.addSubWithAllocationContext(&out.significand, &one, &out.significand, true, context); e != nil {
 				return e
 			}
+		}
+		if e := m.traceFloatDebugIntChecked("sqrt", "dec'ed ", &out.significand, 1036); e != nil {
+			return e
 		}
 	}
 	out.exponent = s.a.exponent >> 1

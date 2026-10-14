@@ -333,7 +333,13 @@ func (m *ArbitraryFloatManager) roundWithParentContext(mode ArbitraryFloatRoundi
 		return e
 	}
 	if c >= 0 {
+		if e := m.traceRoundSignificandBranch(&x.significand, true); e != nil {
+			return e
+		}
 		return z.addSubWithAllocationContext(&x.significand, &p, &x.significand, true, context)
+	}
+	if e := m.traceRoundSignificandBranch(&x.significand, false); e != nil {
+		return e
 	}
 	saved := m.valueExecuting
 	m.valueExecuting = false
