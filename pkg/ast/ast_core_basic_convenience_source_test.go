@@ -222,6 +222,85 @@ func TestASTDistinctExpandedEveryActualReservationKeepsNamedGraph(t *testing.T) 
 	}
 }
 
+func TestASTDistinctExpandedFailedPrefixReleasesCompletedPairs(t *testing.T) {
+	failed, completed := false, false
+	for after := int64(0); after < 256; after++ {
+		m := astTestManager(t)
+		bs, e := m.MkBoolSort()
+		astTestMust(t, e)
+		var args [4]ASTHandle
+		for i := range args {
+			args[i], e = m.MkVar(uint32(i), bs)
+			astTestMust(t, e)
+			astTestPin(t, m, args[i])
+		}
+		before := m.Stats().LiveNodes
+		m.BudgetField.FailAfter(after)
+		h, e := m.MkDistinctExpanded(args[:])
+		m.BudgetField.FailAfter(-1)
+		if e == nil {
+			ref, e := m.NewRef(h)
+			if e != nil {
+				t.Fatal("completed expansion pin", after, e)
+			}
+			if e := m.DelRef(&ref); e != nil {
+				t.Fatal("completed expansion release", after, e)
+			}
+			if got := m.Stats().LiveNodes; got != before {
+				t.Fatal("completed expansion retained temporary nodes", got, before)
+			}
+			completed = true
+			break
+		}
+		failed = true
+		if !h.IsNull() {
+			t.Fatal("failed expansion published a result", after)
+		}
+		if got := m.Stats().LiveNodes; got != before {
+			t.Fatal("failed expansion retained temporary nodes", after, got, before)
+		}
+	}
+	if !failed || !completed {
+		t.Fatal("missing failure or success boundary", failed, completed)
+	}
+}
+
+func TestASTDistinctExpandedBinaryFailedPrefixReleasesEquality(t *testing.T) {
+	failed, completed := false, false
+	for after := int64(0); after < 64; after++ {
+		m := astTestManager(t)
+		bs, e := m.MkBoolSort()
+		astTestMust(t, e)
+		var args [2]ASTHandle
+		for i := range args {
+			args[i], e = m.MkVar(uint32(i), bs)
+			astTestMust(t, e)
+			astTestPin(t, m, args[i])
+		}
+		before := m.Stats().LiveNodes
+		m.BudgetField.FailAfter(after)
+		h, e := m.MkDistinctExpanded(args[:])
+		m.BudgetField.FailAfter(-1)
+		if e == nil {
+			ref, e := m.NewRef(h)
+			astTestMust(t, e)
+			astTestMust(t, m.DelRef(&ref))
+			if m.Stats().LiveNodes != before {
+				t.Fatal("completed binary expansion retained a node", after)
+			}
+			completed = true
+			break
+		}
+		failed = true
+		if !h.IsNull() || m.Stats().LiveNodes != before {
+			t.Fatal("failed binary expansion retained a node or result", after, h, m.Stats().LiveNodes, before)
+		}
+	}
+	if !failed || !completed {
+		t.Fatal("missing binary failure or success boundary", failed, completed)
+	}
+}
+
 func TestASTBasicConvenienceInvalidBorrowAndSortFailure(t *testing.T) {
 	m := astTestManager(t)
 	other := astTestManager(t)

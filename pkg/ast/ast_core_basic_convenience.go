@@ -17,6 +17,27 @@ func (m *ASTManager) mkEquality(lhs, rhs ASTHandle) (astNodeRef, error) {
 	args := [2]ASTHandle{lhs, rhs}
 	return m.mkFamilyApp(0, k, nil, args[:])
 }
+func (m *ASTManager) mkDistinctNegatedPair(lhs, rhs ASTHandle) (astNodeRef, error) {
+	eq, e := m.mkEquality(lhs, rhs)
+	if e != nil {
+		return astNodeRef{}, e
+	}
+	// Hold the equality across the fallible NOT factory. A successful NOT
+	// acquires its own child reference before this temporary is released.
+	if e = m.incNode(eq); e != nil {
+		return astNodeRef{}, e
+	}
+	unary := [1]ASTHandle{m.external(eq)}
+	neg, e := m.mkFamilyApp(0, ASTOpNot, nil, unary[:])
+	_, release := m.decNode(eq)
+	if e != nil {
+		return astNodeRef{}, e
+	}
+	if release != nil {
+		return astNodeRef{}, release
+	}
+	return neg, nil
+}
 func (m *ASTManager) MkEq(lhs, rhs ASTHandle) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
@@ -78,7 +99,7 @@ func (m *ASTManager) MkBoolVal(b bool) (ASTHandle, error) {
 func (m *ASTManager) MkDistinct(args []ASTHandle) (ASTHandle, error) {
 	return m.MkFamilyApp(0, ASTOpDistinct, nil, args)
 }
-func (m *ASTManager) MkDistinctExpanded(args []ASTHandle) (ASTHandle, error) {
+func (m *ASTManager) MkDistinctExpanded(args []ASTHandle) (result ASTHandle, err error) {
 	if e := m.lock(); e != nil {
 		return ASTHandle{}, e
 	}
@@ -87,26 +108,31 @@ func (m *ASTManager) MkDistinctExpanded(args []ASTHandle) (ASTHandle, error) {
 		return m.external(m.trueApp), nil
 	}
 	if len(args) == 2 {
-		eq, e := m.mkEquality(args[0], args[1])
-		if e != nil {
-			return ASTHandle{}, e
-		}
-		unary := [1]ASTHandle{m.external(eq)}
-		r, e := m.mkFamilyApp(0, ASTOpNot, nil, unary[:])
+		r, e := m.mkDistinctNegatedPair(args[0], args[1])
 		return m.external(r), e
 	}
-	// Scratch borrows handles; the final applications own their child references.
+	// Source new_diseqs owns each completed NOT until the final AND has
+	// acquired its child references. Release in insertion order on every exit.
 	var expanded []ASTHandle
+	defer func() {
+		for _, h := range expanded {
+			r, e := m.internal(h)
+			if e == nil {
+				_, e = m.decNode(r)
+			}
+			if e != nil && err == nil {
+				result, err = ASTHandle{}, e
+			}
+		}
+	}()
 	for i := 0; i < len(args)-1; i++ {
 		a1 := args[i]
 		for j := i + 1; j < len(args); j++ {
-			eq, e := m.mkEquality(a1, args[j])
+			neg, e := m.mkDistinctNegatedPair(a1, args[j])
 			if e != nil {
 				return ASTHandle{}, e
 			}
-			unary := [1]ASTHandle{m.external(eq)}
-			neg, e := m.mkFamilyApp(0, ASTOpNot, nil, unary[:])
-			if e != nil {
+			if e = m.incNode(neg); e != nil {
 				return ASTHandle{}, e
 			}
 			expanded = append(expanded, m.external(neg))

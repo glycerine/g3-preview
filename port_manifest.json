@@ -12680,11 +12680,16 @@
         "pkg/ast/ast_core_boolean_factories.go",
         "pkg/ast/ast_core_boolean_factories_source_test.go",
         "pkg/ast/ast_core_span_factories.go",
-        "pkg/ast/ast_core_span_factories_source_test.go"
+        "pkg/ast/ast_core_span_factories_source_test.go",
+        "pkg/ast/ast_core_basic_convenience.go",
+        "pkg/ast/ast_core_basic_convenience_source_test.go"
       ],
       "tests": [
         "TestASTSortingBooleanFactoryRealNodesAndNotUnwrap",
-        "TestASTOrSpanSourceZeroSingletonAndInitializedSpare"
+        "TestASTOrSpanSourceZeroSingletonAndInitializedSpare",
+        "TestASTDistinctExpandedLiteralNestedPairOrderAndNoEagerInputRead",
+        "TestASTDistinctExpandedFailedPrefixReleasesCompletedPairs",
+        "TestASTDistinctExpandedBinaryFailedPrefixReleasesEquality"
       ],
       "assertions": [
         {
@@ -12773,6 +12778,16 @@
           "go_target": "pkg/ast/ast_core_span_factories.go",
           "tests": [
             "TestASTOrSpanSourceZeroSingletonAndInitializedSpare"
+          ]
+        },
+        {
+          "name": "expand_distinct nested pair construction, owned temporary disequalities, and ordered cleanup after final AND or failed factory (src/ast/ast_util.cpp:227-234)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_basic_convenience.go",
+          "tests": [
+            "TestASTDistinctExpandedLiteralNestedPairOrderAndNoEagerInputRead",
+            "TestASTDistinctExpandedFailedPrefixReleasesCompletedPairs",
+            "TestASTDistinctExpandedBinaryFailedPrefixReleasesEquality"
           ]
         }
       ],
@@ -168695,6 +168710,8 @@
         "pkg/ast/ast_bv_polynomial_hoist_test.go",
         "pkg/ast/rewriter/bv_polynomial_add_core.go",
         "pkg/ast/rewriter/bv_polynomial_add_core_test.go",
+        "pkg/ast/ast_core_basic_convenience.go",
+        "pkg/ast/ast_core_basic_convenience_source_test.go",
         "pkg/tactic/ufbv/rewrite_traversal.go",
         "pkg/tactic/ufbv/rewrite_traversal_test.go",
         "pkg/tactic/ufbv/rewrite_back_index.go",
@@ -168735,6 +168752,9 @@
         "TestASTBitVectorCoefficientHoistEveryActualReservation",
         "TestBVPolynomialNonflatAdditionBothHoistPaths",
         "TestBVPolynomialNonflatAdditionEveryColdReservation",
+        "TestASTDistinctExpandedLiteralNestedPairOrderAndNoEagerInputRead",
+        "TestASTDistinctExpandedFailedPrefixReleasesCompletedPairs",
+        "TestASTDistinctExpandedBinaryFailedPrefixReleasesEquality",
         "TestPolynomialGCDNativeMonomialSliceOwnsDuplicateReferences",
         "TestPolynomialGCDNativeMonomialSliceGeneratedOwnershipAndStoppedReset",
         "TestPolynomialGCDICCPZPXNativeMonomialGrowthIndependentModel",
@@ -168895,6 +168915,16 @@
             "TestASTBitVectorCoefficientHoistEveryActualReservation",
             "TestBVPolynomialNonflatAdditionBothHoistPaths",
             "TestBVPolynomialNonflatAdditionEveryColdReservation"
+          ]
+        },
+        {
+          "name": "Concrete ast_util expand_distinct expr_ref_buffer: each completed NOT gains a temporary reference, final AND borrows ordered arguments, and success/error cleanup releases them forward (ast_util.cpp:227-234)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_basic_convenience.go",
+          "tests": [
+            "TestASTDistinctExpandedLiteralNestedPairOrderAndNoEagerInputRead",
+            "TestASTDistinctExpandedFailedPrefixReleasesCompletedPairs",
+            "TestASTDistinctExpandedBinaryFailedPrefixReleasesEquality"
           ]
         },
         {
