@@ -45156,22 +45156,36 @@
       "path": "src/math/polynomial/polynomial_cache.cpp",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/polynomial/polynomial_cache.go",
+        "pkg/math/polynomial/polynomial_cache_source_test.go"
+      ],
+      "tests": [
+        "TestPolynomialCacheCanonicalizationAndReset",
+        "TestPolynomialCacheConstructorBudgetAndRefusal"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The retained NLSAT cache's mk_unique path uses native Go hash buckets and an embedded owning polynomial reference vector. Equal values reuse the first representative; reset releases cached references and permits a new first representative. PSC-chain and factor result caches and stopped-cleanup paths remain open."
+      ]
     },
     {
       "path": "src/math/polynomial/polynomial_cache.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/polynomial/polynomial_cache.go",
+        "pkg/math/polynomial/polynomial_cache_source_test.go"
+      ],
+      "tests": [
+        "TestPolynomialCacheCanonicalizationAndReset",
+        "TestPolynomialCacheConstructorBudgetAndRefusal"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -45186,7 +45200,9 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The concrete PolynomialCache exposes the retained mk_unique and reset behavior with borrowed canonical handles. PSC-chain, factor and complete owner lifecycle remain open."
+      ]
     },
     {
       "path": "src/math/polynomial/polynomial_primes.h",
@@ -118350,6 +118366,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_cache.go",
         "pkg/math/polynomial/polynomial_monomial_table.go",
         "pkg/ast/ast_activity_cache.go",
         "pkg/ast/ast_table.go",
