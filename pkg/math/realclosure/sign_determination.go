@@ -19,6 +19,8 @@ type signDetermination struct {
 	conditions  []*signCondition
 	polynomials int
 	numRoots    int
+	store       *realValueStore
+	prs, qs     []realPolynomial
 }
 
 func newSignDetermination(numRoots int) *signDetermination {
@@ -60,9 +62,14 @@ func keepSignAssignment(cardinalities []int, useSquare bool) bool {
 // performs the source matrix/cardinality/column transition. A rejected q
 // leaves the state intact. The returned flags are kept and all-one.
 func (s *signDetermination) advance(equal, positive, negative int, expandedTarski []int) (bool, bool) {
+	kept, allOne, _ := s.advanceCore(equal, positive, negative, expandedTarski)
+	return kept, allOne
+}
+
+func (s *signDetermination) advanceCore(equal, positive, negative int, expandedTarski []int) (bool, bool, []int) {
 	qMatrix, usefulSigns := signDetMatrix(equal, positive, negative)
 	if !usefulSigns {
-		return false, false
+		return false, false, nil
 	}
 	var expanded signMatrix
 	expanded.tensorProduct(&s.matrix, &qMatrix)
@@ -80,7 +87,7 @@ func (s *signDetermination) advance(equal, positive, negative int, expandedTarsk
 	}
 	useSquare := qMatrix.cols == 3
 	if !keepSignAssignment(cardinalities, useSquare) {
-		return false, false
+		return false, false, nil
 	}
 	columns := make([]int, 0, expanded.cols)
 	conditions := make([]*signCondition, 0, expanded.cols)
@@ -111,5 +118,5 @@ func (s *signDetermination) advance(equal, positive, negative int, expandedTarsk
 	s.tarski = tarski
 	s.conditions = conditions
 	s.polynomials++
-	return true, allOne
+	return true, allOne, rows
 }
