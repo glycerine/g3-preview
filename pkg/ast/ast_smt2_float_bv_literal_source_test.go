@@ -60,6 +60,10 @@ func TestASTSMT2FloatDefaultBitVectorFields(t *testing.T) {
 	} {
 		f, e := m.ppFloatBitVectorLiteral(m.external(node), tc.radix, g)
 		paramsMust(t, e)
+		fp := m.floatingPointPlugin
+		if fp.literalFrames != nil || !fp.literalPrimary.sourceDone || !fp.literalPrimary.retired || !fp.literalPrimary.valueConsumed {
+			t.Fatal("bit-vector float printer returned before its scoped MPF destructor", fp.literalFrames, fp.literalPrimary)
+		}
 		paramsMust(t, out.ResetText())
 		paramsMust(t, m.PrintFormat(out, f, c, p, g))
 		got, e := out.String()

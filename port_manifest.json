@@ -152413,6 +152413,8 @@
         "pkg/util/numeral/mpq_signed_fraction_source.go",
         "pkg/ast/ast_fpa_numeral_probe.go",
         "pkg/ast/ast_fpa_numeral_probe_test.go",
+        "pkg/ast/ast_smt2_float_real.go",
+        "pkg/ast/ast_smt2_float_bv_literal.go",
         "pkg/ast/ast_fpa_plugin.go",
         "pkg/ast/ast_fpa_plugin_source_test.go",
         "pkg/util/numeral/mpf_borrowed_accessors.go",
@@ -152626,6 +152628,10 @@
         "TestASTFloatingPointSpecialConstructorsScopedValue",
         "TestASTFloatingPointSpecialNaNFailureRetainsScalar",
         "TestASTFloatingPointSignedZeroSortOverloads",
+        "TestASTSMT2FloatRealLiteralUsesActualNumeralTextAndFormat",
+        "TestASTSMT2FloatDefaultBitVectorFields",
+        "TestASTSMT2FloatRealLiteralEveryActualReservationPrefix",
+        "TestASTSMT2FloatDefaultEveryActualReservation",
         "TestArbitraryFloatBorrowedFPAComponentsAndManagerLifetime"
       ],
       "conditionals": [
@@ -152755,6 +152761,13 @@
             "TestASTFloatingPointScopedValueActualInlinePushPublication",
             "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren"
           ]
+        },
+        {
+          "name": "Concrete AST SMT2 pp_float_literal caller-local scoped_mpf owner for real and bit-vector formats (src/ast/ast_smt2_pp.cpp:235-288; src/util/mpf.h:300-324)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt2_float_real.go",
+          "go_targets": ["pkg/ast/ast_smt2_float_bv_literal.go"],
+          "tests": ["TestASTSMT2FloatRealLiteralUsesActualNumeralTextAndFormat", "TestASTSMT2FloatDefaultBitVectorFields", "TestASTSMT2FloatRealLiteralEveryActualReservationPrefix", "TestASTSMT2FloatDefaultEveryActualReservation"]
         },
         {
           "name": "Concrete subpaving context_mpf_wrapper scoped_mpf constant and scoped_mpf_vector coefficient owner (src/math/subpaving/subpaving.cpp:88-107; src/util/mpf.h:300-327)",
@@ -170711,6 +170724,8 @@
         "pkg/math/polynomial/polynomial_neg_source_guard_test.go",
         "pkg/ast/ast_fpa_numeral_probe.go",
         "pkg/ast/ast_fpa_numeral_probe_test.go",
+        "pkg/ast/ast_smt2_float_real.go",
+        "pkg/ast/ast_smt2_float_bv_literal.go",
         "pkg/ast/ast_fpa_plugin.go",
         "pkg/ast/ast_fpa_plugin_source_test.go",
         "pkg/util/numeral/scoped_arbitrary_float_numeral.go",
@@ -170785,6 +170800,10 @@
         "TestASTFloatingPointSpecialConstructorsScopedValue",
         "TestASTFloatingPointSpecialNaNFailureRetainsScalar",
         "TestASTFloatingPointSignedZeroSortOverloads",
+        "TestASTSMT2FloatRealLiteralUsesActualNumeralTextAndFormat",
+        "TestASTSMT2FloatDefaultBitVectorFields",
+        "TestASTSMT2FloatRealLiteralEveryActualReservationPrefix",
+        "TestASTSMT2FloatDefaultEveryActualReservation",
         "TestScopedArbitraryFloatNumeralSourceLifetime",
         "TestHardwareMidpointSplitterRetainedBranchesAndRefusal"
       ],
@@ -170976,7 +170995,14 @@
           ]
         },
         {
-          "name": "Remaining concrete inherited scoped_mpf scalar lifetimes at retained AST FPA rewriter/printers, SMT theory and FPA API callers (src/util/scoped_numeral.h:24-171; src/util/mpf.h:300-324)",
+          "name": "Concrete AST SMT2 pp_float_literal caller-local scoped_mpf for real and bit-vector formats, with reverse lexical destruction and stopped copy retention (src/ast/ast_smt2_pp.cpp:235-288; src/util/scoped_numeral.h:24-33)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt2_float_real.go",
+          "go_targets": ["pkg/ast/ast_smt2_float_bv_literal.go"],
+          "tests": ["TestASTSMT2FloatRealLiteralUsesActualNumeralTextAndFormat", "TestASTSMT2FloatDefaultBitVectorFields", "TestASTSMT2FloatRealLiteralEveryActualReservationPrefix", "TestASTSMT2FloatDefaultEveryActualReservation"]
+        },
+        {
+          "name": "Remaining concrete inherited scoped_mpf scalar lifetimes at retained AST FPA rewriter, SMT theory and FPA API callers (src/util/scoped_numeral.h:24-171; src/util/mpf.h:300-324)",
           "status": "unported",
           "tests": []
         },
@@ -171048,7 +171074,7 @@
         "Cold reflected GCD/ICCP/Normalize records acquire only actual guarded invocations. Receipts match exact manager, stable frame pointer and nonwrapping invocation nonce; common PSC generation is not invocation identity. Completed younger source locals precede older caller locals; explicit owning numeric/reference/buffer abort is a separate pass. Source pp moves its result to a named returned temporary, ends helper c/i before caller old-DEC, then ends the temporary. Named pending/raw/backing/retired/cold graph includes all reached records; no registry/RC/whole-call snapshot supplies ownership.",
         "Actual source NUM destruction follows returned-factory evaluation; sticky source guard is not automatically retried by owning cleanup",
         "scoped_numeral.h:31-33 actual Neg minus_a source destructor precedes factory result exposure; stopped source history remains distinct from exact owning acknowledgment.",
-        "The retained scoped_mpf scalar borrows mpf_manager and owns an mpf value; its inherited destructor deletes the value after the caller's body, including early API returns. Apart from the selected boolean FPA query, AST FPA rewriter/printer, SMT FPA, subpaving and API call sites still need concrete caller-local binding and exact cleanup. The existing AST scoped_mpf_vector is a separate owning collection and does not discharge scalar scope lifetimes.",
+        "The retained scoped_mpf scalar borrows mpf_manager and owns an mpf value; its inherited destructor deletes the value after the caller's body, including early API returns. Selected AST FPA query, constructor and SMT2 printer callers and the subpaving wrapper now have concrete scalar owners; AST FPA rewriter, SMT FPA and API callers still need caller-local binding and exact cleanup. The existing AST scoped_mpf_vector is a separate owning collection and does not discharge scalar scope lifetimes.",
         "The boolean FPA numeral query owns its local MPF value until the source destructor completes; an allocation stop retains the exact local and copy child for separate owning cleanup before AST plugin teardown. Later calls use a charged distinct cold frame without replacing a stopped local."
       ],
       "deviations": [

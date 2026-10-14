@@ -43,6 +43,9 @@ func TestASTSMT2FloatRealLiteralUsesActualNumeralTextAndFormat(t *testing.T) {
 		astTestMust(t, e)
 		got, e := m.ppFloatRealLiteral(m.external(node), nil)
 		astTestMust(t, e)
+		if p.literalFrames != nil || !p.literalPrimary.sourceDone || !p.literalPrimary.retired || !p.literalPrimary.valueConsumed {
+			t.Fatal("float printer returned before its scoped MPF destructor", p.literalFrames, p.literalPrimary)
+		}
 		want, e := m.FormatString(tc.want)
 		astTestMust(t, e)
 		if got != want {
