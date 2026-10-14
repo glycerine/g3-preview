@@ -2,6 +2,8 @@
 package numeral
 
 import (
+	"strconv"
+
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"math"
@@ -101,6 +103,9 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 	}
 	d := int64(int32(expDiff))
 	n := int64(sb - 1)
+	if e := m.tracePartialRemainderEntry(x, y, d, partial); e != nil {
+		return e
+	}
 	for _, v := range [...]*Int{&x.significand, &y.significand} {
 		if e := s.assertPower(v, sb, false); e != nil {
 			return e
@@ -156,6 +161,7 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 		if e != nil {
 			return e
 		}
+		m.tracePartialRemainderText(1322, "tie= "+traceBoolDigit(tie)+"; >tie= "+traceBoolDigit(more))
 		increment := more
 		if tie {
 			odd, e := z.IsOdd(q)
@@ -244,6 +250,7 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 	if e != nil {
 		return e
 	}
+	m.tracePartialRemainderText(1365, "exp_delta="+strconv.FormatInt(delta, 10))
 	if modularSourceDebug && !(delta > -2147483648 && delta <= 2147483647) {
 		return ErrIntegerAssertion
 	}
@@ -308,11 +315,17 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 				}
 			}
 		}
+		if e := m.tracePartialRemainderInt(1394, "aligned subtrahend=", subtrahend); e != nil {
+			return e
+		}
 		if e := s.endNumeral(11); e != nil {
 			return e
 		}
 	}
 	if e := z.addSubWithAllocationContext(minuend, subtrahend, result, true, c); e != nil {
+		return e
+	}
+	if e := m.tracePartialRemainderInt(1398, "X_YQ_sig'=", result); e != nil {
 		return e
 	}
 	neg, e := z.IsNeg(result)
@@ -345,6 +358,9 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 		return e
 	}
 	if e := z.machineDivRemWithAllocationContext(result, &p, result, rnd, c); e != nil {
+		return e
+	}
+	if e := m.tracePartialRemainderInt(1421, "final sticky=", rnd); e != nil {
 		return e
 	}
 	// Preserve the source constant, independently of sbits.
