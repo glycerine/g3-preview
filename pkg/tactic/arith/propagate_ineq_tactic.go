@@ -33,7 +33,7 @@ func NewPropagateIneqTactic(m *ast.ASTManager, numbers *numeral.RationalManager,
 	if m == nil || numbers == nil {
 		return nil, arena.ErrInvalidSlot
 	}
-	if context == nil || value == nil {
+	if context == nil {
 		return nil, params.ErrParamsOwner
 	}
 	if _, err := m.ProofsEnabled(); err != nil {
@@ -43,8 +43,10 @@ func NewPropagateIneqTactic(m *ast.ASTManager, numbers *numeral.RationalManager,
 	if err != nil {
 		return nil, err
 	}
-	if err = context.Assign(&owned, value); err != nil {
-		return nil, errors.Join(err, context.Del(&owned))
+	if value != nil {
+		if err = context.Assign(&owned, value); err != nil {
+			return nil, errors.Join(err, context.Del(&owned))
+		}
 	}
 	t := &PropagateIneqTactic{manager: m, numbers: numbers, context: context, params: owned}
 	t.self = t

@@ -98594,7 +98594,9 @@
         "pkg/tactic/arith/polynomial_apply_test.go",
         "pkg/tactic/arith/polynomial_progress_test.go",
         "pkg/tactic/arith/propagate_ineq_tactic.go",
-        "pkg/tactic/arith/propagate_ineq_tactic_test.go"
+        "pkg/tactic/arith/propagate_ineq_tactic_test.go",
+        "pkg/tactic/arith/propagate_ineq_clean.go",
+        "pkg/tactic/arith/propagate_ineq_clean_test.go"
       ],
       "tests": [
         "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer",
@@ -98604,7 +98606,8 @@
         "TestInequalityPolynomialBuilderApplyGoalBranchesAndConfiguration",
         "TestInequalityBuilderPublishesRetainedProgressOnRealGoal",
         "TestPropagateIneqTacticParameterSnapshotCleanupAndGoalReuse",
-        "TestPropagateIneqTacticTranslateOwnsIndependentSnapshot"
+        "TestPropagateIneqTacticTranslateOwnsIndependentSnapshot",
+        "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild"
       ],
       "assertions": [
         {
@@ -98685,6 +98688,14 @@
             "TestPropagateIneqTacticParameterSnapshotCleanupAndGoalReuse",
             "TestPropagateIneqTacticTranslateOwnsIndependentSnapshot"
           ]
+        },
+        {
+          "name": "mk_propagate_ineqs_tactic default empty params_ref and concrete clean wrapper (src/tactic/arith/propagate_ineqs_tactic.cpp:60-62)",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/propagate_ineq_clean.go",
+          "tests": [
+            "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild"
+          ]
         }
       ],
       "ownership": [],
@@ -98694,14 +98705,17 @@
       "path": "src/tactic/arith/propagate_ineqs_tactic.h",
       "component": "tactic",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/tactic/arith/propagate_ineq_tactic.go",
-        "pkg/tactic/arith/propagate_ineq_tactic_test.go"
+        "pkg/tactic/arith/propagate_ineq_tactic_test.go",
+        "pkg/tactic/arith/propagate_ineq_clean.go",
+        "pkg/tactic/arith/propagate_ineq_clean_test.go"
       ],
       "tests": [
         "TestPropagateIneqTacticParameterSnapshotCleanupAndGoalReuse",
-        "TestPropagateIneqTacticTranslateOwnsIndependentSnapshot"
+        "TestPropagateIneqTacticTranslateOwnsIndependentSnapshot",
+        "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild"
       ],
       "conditionals": [
         {
@@ -98713,21 +98727,26 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "Concrete propagate-ineqs tactic constructor, goal application and translation; factory integration remains open",
-          "status": "partial",
-          "go_target": "pkg/tactic/arith/propagate_ineq_tactic.go",
+          "name": "mk_propagate_ineqs_tactic factory with default empty parameters and cleanup after successful application",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/propagate_ineq_clean.go",
           "tests": [
             "TestPropagateIneqTacticParameterSnapshotCleanupAndGoalReuse",
-            "TestPropagateIneqTacticTranslateOwnsIndependentSnapshot"
+            "TestPropagateIneqTacticTranslateOwnsIndependentSnapshot",
+            "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild"
           ]
         }
       ],
-      "ownership": [],
-      "deviations": []
+      "ownership": [
+        "The concrete clean wrapper owns its inner tactic and calls cleanup only after successful application, preserving the borrowed input or transferring the result goal to the caller."
+      ],
+      "deviations": [
+        "The Go constructor accepts explicit borrowed rational and parameter services in place of the C++ process-global services; nil parameters represent the source default empty params_ref."
+      ]
     },
     {
       "path": "src/tactic/arith/purify_arith_tactic.cpp",
@@ -104272,9 +104291,14 @@
       "path": "src/tactic/tactical.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/arith/propagate_ineq_clean.go",
+        "pkg/tactic/arith/propagate_ineq_clean_test.go"
+      ],
+      "tests": [
+        "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild"
+      ],
       "conditionals": [
         {
           "line": 477,
@@ -104469,7 +104493,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Concrete cleanup_tactical for propagate-ineqs: successful application then cleanup and translated wrapper (tactical.cpp:1107-1128)",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/propagate_ineq_clean.go",
+          "tests": [
+            "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -104477,9 +104510,14 @@
       "path": "src/tactic/tactical.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/arith/propagate_ineq_clean.go",
+        "pkg/tactic/arith/propagate_ineq_clean_test.go"
+      ],
+      "tests": [
+        "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -104492,7 +104530,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Concrete clean(tactic*) declaration instantiated by propagate-ineqs factory",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/propagate_ineq_clean.go",
+          "tests": [
+            "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
