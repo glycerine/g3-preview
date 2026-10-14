@@ -156,6 +156,13 @@ func (p *astFloatingPointPluginOwner) finishNumeralProbe(f *astFloatNumeralProbe
 	}
 }
 
+func (p *astFloatingPointPluginOwner) finishNumeralConstruction(f *astFloatNumeralProbe, result *error, out *astNodeRef) {
+	p.finishNumeralProbe(f, result, nil)
+	if *result != nil {
+		*out = astNodeRef{}
+	}
+}
+
 // isNumeralClass preserves each source query's local value copy and destructor.
 // The predicate runs only after is_numeral succeeds and before that destructor.
 func (p *astFloatingPointPluginOwner) isNumeralClass(n astNodeRef, class astFloatClass) (matched bool, result error) {
@@ -210,7 +217,7 @@ func (p *astFloatingPointPluginOwner) mkSpecialNumeral(ebits, sbits uint32, clas
 	if e != nil {
 		return out, e
 	}
-	defer p.finishNumeralProbe(f, &result, nil)
+	defer p.finishNumeralConstruction(f, &result, &out)
 	switch class {
 	case astFloatNaN:
 		e = p.numeric.MkNaN(ebits, sbits, &f.value, &f.copy)

@@ -16787,6 +16787,7 @@
         "TestASTFloatingPointBooleanNumeralScopedValue",
         "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy",
         "TestASTFloatingPointSpecialConstructorsScopedValue",
+        "TestASTFloatingPointConstructorDestructorFailureClearsResult",
         "TestASTFloatingPointSpecialNaNFailureRetainsScalar",
         "TestASTFloatingPointSignedZeroSortOverloads"
       ],
@@ -16902,6 +16903,7 @@
           "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
           "tests": [
             "TestASTFloatingPointSpecialConstructorsScopedValue",
+            "TestASTFloatingPointConstructorDestructorFailureClearsResult",
             "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
           ]
         },
@@ -16938,7 +16940,9 @@
         "TestASTFloatingPointScopedValueInlineErasesCopyAcquisition",
         "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren",
         "TestASTFloatingPointScopedClassificationSourcePredicates",
+        "TestASTFloatingPointClassificationDestructorFailureClearsResult",
         "TestASTFloatingPointSpecialConstructorsScopedValue",
+        "TestASTFloatingPointConstructorDestructorFailureClearsResult",
         "TestASTFloatingPointSpecialNaNFailureRetainsScalar",
         "TestASTFloatingPointSignedZeroSortOverloads"
       ],
@@ -17009,7 +17013,8 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
           "tests": [
-            "TestASTFloatingPointScopedClassificationSourcePredicates"
+            "TestASTFloatingPointScopedClassificationSourcePredicates",
+            "TestASTFloatingPointClassificationDestructorFailureClearsResult"
           ]
         },
         {
@@ -17018,6 +17023,7 @@
           "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
           "tests": [
             "TestASTFloatingPointSpecialConstructorsScopedValue",
+            "TestASTFloatingPointConstructorDestructorFailureClearsResult",
             "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
           ]
         },
@@ -152874,7 +152880,9 @@
         "TestASTFloatingPointBooleanNumeralScopedValue",
         "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy",
         "TestASTFloatingPointScopedClassificationSourcePredicates",
+        "TestASTFloatingPointClassificationDestructorFailureClearsResult",
         "TestASTFloatingPointSpecialConstructorsScopedValue",
+        "TestASTFloatingPointConstructorDestructorFailureClearsResult",
         "TestASTFloatingPointSpecialNaNFailureRetainsScalar",
         "TestASTFloatingPointSignedZeroSortOverloads",
         "TestASTSMT2FloatRealLiteralUsesActualNumeralTextAndFormat",
@@ -153489,7 +153497,8 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
           "tests": [
-            "TestASTFloatingPointScopedClassificationSourcePredicates"
+            "TestASTFloatingPointScopedClassificationSourcePredicates",
+            "TestASTFloatingPointClassificationDestructorFailureClearsResult"
           ]
         },
         {
@@ -153498,6 +153507,7 @@
           "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
           "tests": [
             "TestASTFloatingPointSpecialConstructorsScopedValue",
+            "TestASTFloatingPointConstructorDestructorFailureClearsResult",
             "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
           ]
         },
@@ -171295,7 +171305,9 @@
         "TestASTFloatingPointBooleanNumeralScopedValue",
         "TestASTFloatingPointBooleanNumeralRetainsFailedScalarCopy",
         "TestASTFloatingPointScopedClassificationSourcePredicates",
+        "TestASTFloatingPointClassificationDestructorFailureClearsResult",
         "TestASTFloatingPointSpecialConstructorsScopedValue",
+        "TestASTFloatingPointConstructorDestructorFailureClearsResult",
         "TestASTFloatingPointSpecialNaNFailureRetainsScalar",
         "TestASTFloatingPointSignedZeroSortOverloads",
         "TestASTSMT2FloatRealLiteralUsesActualNumeralTextAndFormat",
@@ -171551,7 +171563,8 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
           "tests": [
-            "TestASTFloatingPointScopedClassificationSourcePredicates"
+            "TestASTFloatingPointScopedClassificationSourcePredicates",
+            "TestASTFloatingPointClassificationDestructorFailureClearsResult"
           ]
         },
         {
@@ -171560,6 +171573,7 @@
           "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
           "tests": [
             "TestASTFloatingPointSpecialConstructorsScopedValue",
+            "TestASTFloatingPointConstructorDestructorFailureClearsResult",
             "TestASTFloatingPointSpecialNaNFailureRetainsScalar"
           ]
         },
