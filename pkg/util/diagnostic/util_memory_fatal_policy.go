@@ -103,13 +103,14 @@ type MemoryFatalContextConfig struct {
 	Streams *MemoryStandardStreams
 }
 type MemoryFatalContext struct {
-	self                      *MemoryFatalContext
-	budget                    *arena.Budget
-	streams                   *MemoryStandardStreams
-	header                    uint64
-	region                    *arena.BytesRegion
-	message                   utext.RegionCString
-	exitOOM, borrowed, closed bool
+	self                                       *MemoryFatalContext
+	budget                                     *arena.Budget
+	streams                                    *MemoryStandardStreams
+	header                                     uint64
+	region                                     *arena.BytesRegion
+	message                                    utext.RegionCString
+	literal                                    string
+	exitOOM, borrowed, literalSelected, closed bool
 }
 
 func NewMemoryFatalContext(c MemoryFatalContextConfig) (*MemoryFatalContext, error) {
@@ -154,6 +155,26 @@ func (s *MemoryFatalContext) ExitWhenOutOfMemory(flag bool, r *arena.BytesRegion
 		s.region = r
 		s.message = msg
 		s.borrowed = true
+		s.literalSelected = false
+		s.literal = ""
+	}
+	return nil
+}
+
+// ExitWhenOutOfMemoryLiteral binds a static source string, as shell/main.cpp
+// does for the SMT-LIB2 dispatch. A nil pointer or false flag retains the
+// previous message, matching exit_when_out_of_memory's pointer assignment.
+func (s *MemoryFatalContext) ExitWhenOutOfMemoryLiteral(flag bool, msg *string) error {
+	if e := s.open(); e != nil {
+		return e
+	}
+	s.exitOOM = flag
+	if flag && msg != nil {
+		s.literal = *msg
+		s.literalSelected = true
+		s.borrowed = false
+		s.region = nil
+		s.message = utext.RegionCString{}
 	}
 	return nil
 }
@@ -183,6 +204,8 @@ func (s *MemoryFatalContext) HandleMemoryFailure(r *umemory.Runtime, f umemory.F
 		}
 		if s.borrowed {
 			e = smallObjectCStringInto(out, s.region, s.message)
+		} else if s.literalSelected {
+			e = out.AppendCString(s.literal)
 		} else {
 			e = out.AppendCString("ERROR: out of memory")
 		}

@@ -107,8 +107,14 @@ func TestMemoryFatalSubprocessChild(t *testing.T) {
 		audit()
 		b.FailAfter(0)
 		_, e = r.Allocate(0)
-	case "oom", "oom-bad", "oom-custom":
+	case "oom", "oom-bad", "oom-custom", "oom-smt2":
 		smallObjectMust(t, c.ExitWhenOutOfMemory(true, nil, utext.RegionCString{}))
+		if route == "oom-smt2" {
+			message := "(error \"out of memory\")"
+			smallObjectMust(t, c.ExitWhenOutOfMemoryLiteral(true, &message))
+			smallObjectMust(t, c.ExitWhenOutOfMemoryLiteral(false, nil))
+			smallObjectMust(t, c.ExitWhenOutOfMemoryLiteral(true, nil))
+		}
 		if route == "oom-custom" {
 			region, e = arena.NewBytesRegion(arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 4, Budget: b}})
 			smallObjectMust(t, e)
@@ -134,7 +140,7 @@ func TestMemoryFatalSubprocessChild(t *testing.T) {
 func TestMemoryFatalRealExitWithActiveReservationRefusal(t *testing.T) {
 	exe, e := os.Executable()
 	smallObjectMust(t, e)
-	for _, route := range []string{"count", "count-exit", "count-bad", "oom", "oom-bad", "oom-custom"} {
+	for _, route := range []string{"count", "count-exit", "count-bad", "oom", "oom-bad", "oom-custom", "oom-smt2"} {
 		t.Run(route, func(t *testing.T) {
 			cmd := exec.Command(exe, "-test.run=^TestMemoryFatalSubprocessChild$")
 			cmd.Env = append(os.Environ(), "G3_MEMORY_FATAL_CHILD="+route)
@@ -156,6 +162,9 @@ func TestMemoryFatalRealExitWithActiveReservationRefusal(t *testing.T) {
 			}
 			if route == "oom-custom" {
 				stderr = "new\n"
+			}
+			if route == "oom-smt2" {
+				stderr = "(error \"out of memory\")\n"
 			}
 			if route == "oom-bad" {
 				stderr = ""
@@ -187,6 +196,15 @@ func TestMemoryFatalBorrowedPointerRetentionAndReachedSentry(t *testing.T) {
 	smallObjectMust(t, c.ExitWhenOutOfMemory(true, nil, utext.RegionCString{}))
 	if !c.exitOOM || c.region != region || c.message != text {
 		t.Fatal("null changed old pointer")
+	}
+	literal := "(error \"out of memory\")"
+	smallObjectMust(t, c.ExitWhenOutOfMemoryLiteral(true, &literal))
+	if !c.literalSelected || c.borrowed || c.region != nil || c.message.Present {
+		t.Fatal("static source message retained old region owner")
+	}
+	smallObjectMust(t, c.ExitWhenOutOfMemory(true, region, text))
+	if c.literalSelected || c.literal != "" || !c.borrowed {
+		t.Fatal("borrowed message retained old static selection")
 	}
 	// Closed file sets nonthrowing badbit. CString strlen still precedes sentry.
 	smallObjectMust(t, f.Close())
