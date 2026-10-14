@@ -117099,6 +117099,7 @@
         "TestFastFloatDecimalScratchResetsAfterFormattingFailure",
         "TestFastFloatFormattingScopeGuardsAndInlineWarm",
         "TestFastFloatDecimalLargePrecision",
+        "TestFastFloatDecimalIndependentBinaryValueModel",
         "TestFastFloatFullPrecisionWarmNativeScratch",
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
         "TestPolynomialPSCNextHeapBufferIndependentRemainder",
@@ -117305,6 +117306,7 @@
             "TestFastFloatDecimalScratchResetsAfterFormattingFailure",
             "TestFastFloatFormattingScopeGuardsAndInlineWarm",
             "TestFastFloatDecimalLargePrecision",
+            "TestFastFloatDecimalIndependentBinaryValueModel",
             "TestFastFloatFullPrecisionWarmNativeScratch"
           ]
         },
@@ -152466,6 +152468,7 @@
         "TestFastFloatDecimalScratchResetsAfterFormattingFailure",
         "TestFastFloatFormattingScopeGuardsAndInlineWarm",
         "TestFastFloatDecimalLargePrecision",
+        "TestFastFloatDecimalIndependentBinaryValueModel",
         "TestFastFloatFullPrecisionWarmNativeScratch",
         "TestFastFloatBorrowedRuntimeIdentityAndGuards",
         "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
@@ -153088,6 +153091,7 @@
             "TestFastFloatDecimalScratchResetsAfterFormattingFailure",
             "TestFastFloatFormattingScopeGuardsAndInlineWarm",
             "TestFastFloatDecimalLargePrecision",
+            "TestFastFloatDecimalIndependentBinaryValueModel",
             "TestFastFloatFullPrecisionWarmNativeScratch"
           ]
         },
@@ -153250,6 +153254,7 @@
         "TestFastFloatDecimalScratchResetsAfterFormattingFailure",
         "TestFastFloatFormattingScopeGuardsAndInlineWarm",
         "TestFastFloatDecimalLargePrecision",
+        "TestFastFloatDecimalIndependentBinaryValueModel",
         "TestFastFloatFullPrecisionWarmNativeScratch",
         "TestFastFloatBorrowedRuntimeIdentityAndGuards",
         "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
@@ -153482,6 +153487,7 @@
             "TestFastFloatDecimalScratchResetsAfterFormattingFailure",
             "TestFastFloatFormattingScopeGuardsAndInlineWarm",
             "TestFastFloatDecimalLargePrecision",
+            "TestFastFloatDecimalIndependentBinaryValueModel",
             "TestFastFloatFullPrecisionWarmNativeScratch"
           ]
         },
