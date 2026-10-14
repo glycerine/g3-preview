@@ -118846,10 +118846,22 @@
           ]
         },
         {
-          "name": "remaining AIG, NLSAT, polynomial cache, SMT and object-pair table specializations",
+          "name": "remaining AIG, NLSAT, SMT and object-pair table specializations",
           "status": "unported",
           "go_target": "",
           "tests": []
+        },
+        {
+          "name": "polynomial cache canonical, PSC-chain and factor table specializations use typed Go hash buckets/maps with source canonical keys and owner-held results; C++ table geometry and iterators are replaced",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "tests": [
+            "TestPolynomialCacheCanonicalizationAndReset",
+            "TestPolynomialCachePSCChainCanonicalKeyAndReplay",
+            "TestPolynomialCacheFactorDistinctReplayAndReset",
+            "TestPolynomialCachePSCStoppedBodyCleanupAndRetry",
+            "TestPolynomialCacheFactorStoppedBodyCleanupAndRetry"
+          ]
         },
         {
           "name": "AST canonical structural lookup and identity erasure over borrowed generation-checked nodes using native hash buckets and insertion-ordered entries",
@@ -118929,7 +118941,7 @@
         "AST canonical nodes use native hash buckets plus insertion-ordered entries and borrow generation-checked node tokens. FPA buckets borrow owned numeral IDs and retain project MPF hash/equality. Monomial entries borrow exact keys during stable temporary publication; no generic C++ primary/cellar/free-list storage remains in Go."
       ],
       "deviations": [
-        "The removed generic/int32 Go table's charged cellar layout, synthetic capacity and swap behavior are historical only. Retained Go consumers use native maps, slices and insdict while keeping project hash/equality and ownership rules. The Z3DEBUG pointer-visited check_invariant at chashtable.h:547-566 traverses only the retired C++ cell chains and is a platform replacement, not an outstanding generic Go adapter. AIG, NLSAT, polynomial-cache, SMT and object-pair consumer specializations remain open."
+        "The removed generic/int32 Go table's charged cellar layout, synthetic capacity and swap behavior are historical only. Retained Go consumers use native maps, slices and insdict while keeping project hash/equality and ownership rules. The Z3DEBUG pointer-visited check_invariant at chashtable.h:547-566 traverses only the retired C++ cell chains and is a platform replacement, not an outstanding generic Go adapter. The polynomial cache's three concrete tables use native maps/hash buckets and source canonical keys; AIG, NLSAT, SMT and object-pair consumer specializations remain open."
       ]
     },
     {
