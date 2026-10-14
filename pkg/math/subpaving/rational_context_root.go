@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -16,7 +17,13 @@ type RationalContext struct {
 	self         *RationalContext
 	numbers      *numeral.RationalManager
 	limit        *control.Reslimit
+	runtime      *memory.Runtime
+	process      *memory.ProcessAccounting
+	maxMemory    uint64
 	variables    []bool
+	inequalities []*RationalInequality
+	unitClauses  []rationalUnitClause
+	unitHead     int
 	root         *RationalNode
 	nodes        []*RationalNode
 	leafHead     *RationalNode
@@ -31,8 +38,11 @@ func NewRationalContext(m *numeral.RationalManager, limit *control.Reslimit) (*R
 	if m == nil || limit == nil {
 		return nil, arena.ErrInvalidSlot
 	}
-	c := &RationalContext{numbers: m, limit: limit}
+	c := &RationalContext{numbers: m, limit: limit, runtime: m.RuntimeOwner(), maxMemory: math.MaxUint64}
 	c.self = c
+	if c.runtime != nil {
+		c.process = c.runtime.ProcessOwner()
+	}
 	return c, nil
 }
 
@@ -99,6 +109,10 @@ func (c *RationalContext) NewChild(parent *RationalNode) (*RationalNode, error) 
 // PublishBound follows mk_bound's exact rational integer normalization before
 // publishing the endpoint to this node's copied bound view.
 func (c *RationalContext) PublishBound(n *RationalNode, variable uint32, value *numeral.Rational, lower, open bool) (err error) {
+	return c.publishBoundReason(n, variable, value, lower, open, false)
+}
+
+func (c *RationalContext) publishBoundReason(n *RationalNode, variable uint32, value *numeral.Rational, lower, open, axiom bool) (err error) {
 	if err = c.open(); err != nil {
 		return err
 	}
@@ -116,7 +130,7 @@ func (c *RationalContext) PublishBound(n *RationalNode, variable uint32, value *
 	}
 	c.numBounds++
 	if !c.variables[variable] {
-		return c.publishNormalized(n, variable, value, lower, open)
+		return c.publishNormalized(n, variable, value, lower, open, axiom)
 	}
 	adjusted := numeral.NewRational()
 	defer func() { err = errors.Join(err, c.numbers.Del(&adjusted)) }()
@@ -146,11 +160,11 @@ func (c *RationalContext) PublishBound(n *RationalNode, variable uint32, value *
 			return err
 		}
 	}
-	return c.publishNormalized(n, variable, &adjusted, lower, open)
+	return c.publishNormalized(n, variable, &adjusted, lower, open, axiom)
 }
 
-func (c *RationalContext) publishNormalized(n *RationalNode, variable uint32, value *numeral.Rational, lower, open bool) error {
-	if err := n.pushBoundAt(variable, value, lower, open, c.timestamp); err != nil {
+func (c *RationalContext) publishNormalized(n *RationalNode, variable uint32, value *numeral.Rational, lower, open, axiom bool) error {
+	if err := n.pushBoundAt(variable, value, lower, open, c.timestamp, axiom); err != nil {
 		return err
 	}
 	conflict, err := n.ConflictingBounds(variable)
@@ -181,8 +195,17 @@ func (c *RationalContext) Close() error {
 			return err
 		}
 	}
+	for i := len(c.inequalities) - 1; i >= 0; i-- {
+		if !c.inequalities[i].closed {
+			if err := c.numbers.Del(&c.inequalities[i].value); err != nil {
+				return err
+			}
+			c.inequalities[i].closed = true
+		}
+	}
 	c.nodes, c.root, c.variables = nil, nil, nil
 	c.leafHead, c.leafTail = nil, nil
+	c.inequalities, c.unitClauses = nil, nil
 	c.closed = true
 	return nil
 }

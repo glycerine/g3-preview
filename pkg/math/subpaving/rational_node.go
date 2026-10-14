@@ -17,6 +17,7 @@ type RationalBound struct {
 	open      bool
 	timestamp uint64
 	previous  *RationalBound
+	axiom     bool
 }
 
 // RationalNode owns bounds it publishes and copies its parent's bound views.
@@ -104,14 +105,14 @@ func (n *RationalNode) PushBound(variable uint32, value *numeral.Rational, lower
 }
 
 func (n *RationalNode) pushBound(variable uint32, value *numeral.Rational, lower, open bool) error {
-	return n.pushBoundAt(variable, value, lower, open, 0)
+	return n.pushBoundAt(variable, value, lower, open, 0, false)
 }
 
-func (n *RationalNode) pushBoundAt(variable uint32, value *numeral.Rational, lower, open bool, timestamp uint64) error {
+func (n *RationalNode) pushBoundAt(variable uint32, value *numeral.Rational, lower, open bool, timestamp uint64, axiom bool) error {
 	if _, _, err := n.Bounds(variable); err != nil {
 		return err
 	}
-	b := &RationalBound{value: numeral.NewRational(), variable: variable, lower: lower, open: open, timestamp: timestamp, previous: n.trail}
+	b := &RationalBound{value: numeral.NewRational(), variable: variable, lower: lower, open: open, timestamp: timestamp, previous: n.trail, axiom: axiom}
 	if err := n.numbers.Copy(&b.value, value); err != nil {
 		return errors.Join(err, n.numbers.Del(&b.value))
 	}
