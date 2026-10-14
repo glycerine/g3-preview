@@ -168765,8 +168765,8 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "model-core owning reference assignment/destruction specialisation, including consumed stopped final deletion and pending incoming cleanup",
-          "status": "partial",
+          "name": "Retained model-converter ref<model> default construction, retain-before-release pointer and ref copy assignment, borrowed get, and destructor cleanup, including consumed stopped deletion and pending incoming cleanup (model.h:63; model_converter.cpp:128-148; ref.h:31-101)",
+          "status": "ported",
           "go_target": "pkg/tactic/tactic_model_converter.go",
           "tests": [
             "TestTacticModelReferenceCopyAssignmentOwnsSourceModel",
@@ -168778,6 +168778,11 @@
             "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
             "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
           ]
+        },
+        {
+          "name": "Other retained ref<T> instantiations and any reached move/detach/swap operations outside the selected model-converter copy-assignment path still require concrete consumer audits",
+          "status": "partial",
+          "tests": []
         }
       ],
       "ownership": [],
