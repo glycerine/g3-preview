@@ -46,8 +46,10 @@ func TestMonomialPositionsSourceMapping(t *testing.T) {
 	if len(p.values) != 9 {
 		t.Fatal(len(p.values))
 	}
-	serviceMust(t, p.ResetMonomials(xs))
-	serviceMust(t, p.SetMonomials(xs))
+	for i, a := range xs {
+		serviceMust(t, p.Reset(a))
+		serviceMust(t, p.Set(a, uint32(i)))
+	}
 	for i, a := range xs {
 		v, e := p.Get(a)
 		serviceMust(t, e)
@@ -117,7 +119,9 @@ func TestMonomialPositionsColdChargeAndWarm(t *testing.T) {
 	if p.header != uint64(reflect.TypeOf(*p).Size()) {
 		t.Fatal(p.header)
 	}
-	serviceMust(t, p.SetMonomials(xs))
+	for i, a := range xs {
+		serviceMust(t, p.Set(a, uint32(i)))
+	}
 	before := m.config.Budget.Used()
 	blocks := m.memory.Stats()
 	alloc := testing.AllocsPerRun(100, func() {

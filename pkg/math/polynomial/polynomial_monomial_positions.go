@@ -142,37 +142,6 @@ func (p *MonomialPositions) Set(a Monomial, pos uint32) error {
 	return nil
 }
 
-// These concrete arrays replace only the two source Poly template loops. The
-// actual polynomial imp overload remains unported; no stand-in Poly interface.
-func (p *MonomialPositions) SetMonomials(xs []Monomial) error {
-	if e := p.check(); e != nil {
-		return e
-	}
-	if uint64(len(xs)) > uint64(^uint32(0)) {
-		return arena.ErrBounds
-	}
-	for i, a := range xs {
-		if e := p.Set(a, uint32(i)); e != nil {
-			return e
-		}
-	}
-	return nil
-}
-func (p *MonomialPositions) ResetMonomials(xs []Monomial) error {
-	if e := p.check(); e != nil {
-		return e
-	}
-	if uint64(len(xs)) > uint64(^uint32(0)) {
-		return arena.ErrBounds
-	}
-	for _, a := range xs {
-		if e := p.Reset(a); e != nil {
-			return e
-		}
-	}
-	return nil
-}
-
 func (p *MonomialPositions) releaseValues() {
 	p.values = nil
 }

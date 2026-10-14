@@ -39710,15 +39710,20 @@
           "tests": []
         },
         {
-          "name": "monomial2pos cpp456\u2013499 Get/Reset/Set over native []uint32 storage and concrete borrowed monomial-array template loops",
-          "status": "partial",
+          "name": "Retained monomial2pos scalar Get/Reset/Set and polynomial imp set/reset loops through actual equality consumer (polynomial.cpp:456-499,4631-4655)",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_positions.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_equal.go"
+          ],
           "tests": [
             "TestMonomialPositionsSourceMapping",
             "TestMonomialPositionsAssertionsAndOwners",
             "TestMonomialPositionsNativeGrowthIgnoresArenaFailure",
             "TestMonomialPositionsColdChargeAndWarm",
-            "TestMonomialPositionsScalarIDOnlyAndRejectedWrap"
+            "TestMonomialPositionsScalarIDOnlyAndRejectedWrap",
+            "TestPolynomialQueryEqualSourceOrderAndPermutation",
+            "TestPolynomialQueryEqualNativeScratch"
           ]
         },
         {
@@ -43383,15 +43388,20 @@
           "tests": []
         },
         {
-          "name": "monomial2pos cpp456\u2013499 Get/Reset/Set over native []uint32 storage and concrete borrowed monomial-array template loops",
-          "status": "partial",
+          "name": "Retained monomial2pos scalar Get/Reset/Set and polynomial imp set/reset loops through actual equality consumer (polynomial.cpp:456-499,4631-4655)",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_positions.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_equal.go"
+          ],
           "tests": [
             "TestMonomialPositionsSourceMapping",
             "TestMonomialPositionsAssertionsAndOwners",
             "TestMonomialPositionsNativeGrowthIgnoresArenaFailure",
             "TestMonomialPositionsColdChargeAndWarm",
-            "TestMonomialPositionsScalarIDOnlyAndRejectedWrap"
+            "TestMonomialPositionsScalarIDOnlyAndRejectedWrap",
+            "TestPolynomialQueryEqualSourceOrderAndPermutation",
+            "TestPolynomialQueryEqualNativeScratch"
           ]
         },
         {
@@ -177883,15 +177893,20 @@
           ]
         },
         {
-          "name": "monomial2pos cpp456\u2013499 Get/Reset/Set over native []uint32 storage and concrete borrowed monomial-array template loops",
-          "status": "partial",
+          "name": "Retained monomial2pos scalar Get/Reset/Set and polynomial imp set/reset loops through actual equality consumer (polynomial.cpp:456-499,4631-4655)",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_positions.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_equal.go"
+          ],
           "tests": [
             "TestMonomialPositionsSourceMapping",
             "TestMonomialPositionsAssertionsAndOwners",
             "TestMonomialPositionsNativeGrowthIgnoresArenaFailure",
             "TestMonomialPositionsColdChargeAndWarm",
-            "TestMonomialPositionsScalarIDOnlyAndRejectedWrap"
+            "TestMonomialPositionsScalarIDOnlyAndRejectedWrap",
+            "TestPolynomialQueryEqualSourceOrderAndPermutation",
+            "TestPolynomialQueryEqualNativeScratch"
           ]
         },
         {
