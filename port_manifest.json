@@ -51664,7 +51664,8 @@
         "pkg/math/subpaving/rational_node.go"
       ],
       "tests": [
-        "TestRationalContextRootIntegerBoundsAndChildViews"
+        "TestRationalContextRootIntegerBoundsAndChildViews",
+        "TestRationalContextSourceBoundConflicts"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -51694,7 +51695,8 @@
         "TestSubpavingRationalIntervalMulNineSignClassesAndTies",
         "TestSubpavingRationalIntervalDivSixSignAndOpenZeroBranches",
         "TestSubpavingRationalIntervalPowerSourceCases",
-        "TestRationalContextRootIntegerBoundsAndChildViews"
+        "TestRationalContextRootIntegerBoundsAndChildViews",
+        "TestRationalContextSourceBoundConflicts"
       ],
       "conditionals": [
         {
@@ -52089,14 +52091,15 @@
           ]
         },
         {
-          "name": "Concrete config_mpq variable registration, root and child node views, and exact integer bound normalization (src/math/subpaving/subpaving_t_def.h:291-342,525-569); conflict, propagation and search remain open",
+          "name": "Concrete config_mpq variable registration, root and child node views, integer bound normalization, and crossed/open-singleton bound conflict detection (src/math/subpaving/subpaving_t_def.h:291-342,525-569,1163-1167,1337-1342); leaf-list removal, propagation and search remain open",
           "status": "partial",
           "go_target": "pkg/math/subpaving/rational_context_root.go",
           "go_targets": [
             "pkg/math/subpaving/rational_node.go"
           ],
           "tests": [
-            "TestRationalContextRootIntegerBoundsAndChildViews"
+            "TestRationalContextRootIntegerBoundsAndChildViews",
+            "TestRationalContextSourceBoundConflicts"
           ]
         },
         {

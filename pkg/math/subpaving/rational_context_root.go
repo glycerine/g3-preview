@@ -3,6 +3,7 @@ package subpaving
 
 import (
 	"errors"
+	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/control"
@@ -12,13 +13,15 @@ import (
 // RationalContext owns the reached config_mpq variable and node-bound prefix.
 // Constraint registration, propagation and search are still separate work.
 type RationalContext struct {
-	self      *RationalContext
-	numbers   *numeral.RationalManager
-	limit     *control.Reslimit
-	variables []bool
-	root      *RationalNode
-	nodes     []*RationalNode
-	closed    bool
+	self         *RationalContext
+	numbers      *numeral.RationalManager
+	limit        *control.Reslimit
+	variables    []bool
+	root         *RationalNode
+	nodes        []*RationalNode
+	numBounds    uint64
+	numConflicts uint64
+	closed       bool
 }
 
 func NewRationalContext(m *numeral.RationalManager, limit *control.Reslimit) (*RationalContext, error) {
@@ -94,7 +97,7 @@ func (c *RationalContext) PublishBound(n *RationalNode, variable uint32, value *
 	if err = c.open(); err != nil {
 		return err
 	}
-	if n == nil || n.context != c || !n.registered || variable >= uint32(len(c.variables)) {
+	if n == nil || n.context != c || !n.registered || variable >= uint32(len(c.variables)) || n.conflictVar != math.MaxUint32 {
 		return arena.ErrInvalidSlot
 	}
 	if _, _, err = n.Bounds(variable); err != nil {
@@ -103,8 +106,9 @@ func (c *RationalContext) PublishBound(n *RationalNode, variable uint32, value *
 	if value == nil {
 		return arena.ErrInvalidSlot
 	}
+	c.numBounds++
 	if !c.variables[variable] {
-		return n.pushBound(variable, value, lower, open)
+		return c.publishNormalized(n, variable, value, lower, open)
 	}
 	adjusted := numeral.NewRational()
 	defer func() { err = errors.Join(err, c.numbers.Del(&adjusted)) }()
@@ -134,7 +138,22 @@ func (c *RationalContext) PublishBound(n *RationalNode, variable uint32, value *
 			return err
 		}
 	}
-	return n.pushBound(variable, &adjusted, lower, open)
+	return c.publishNormalized(n, variable, &adjusted, lower, open)
+}
+
+func (c *RationalContext) publishNormalized(n *RationalNode, variable uint32, value *numeral.Rational, lower, open bool) error {
+	if err := n.pushBound(variable, value, lower, open); err != nil {
+		return err
+	}
+	conflict, err := n.ConflictingBounds(variable)
+	if err != nil {
+		return err
+	}
+	if conflict {
+		n.conflictVar = variable
+		c.numConflicts++
+	}
+	return nil
 }
 
 func (c *RationalContext) Close() error {

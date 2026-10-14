@@ -25,6 +25,7 @@ type RationalNode struct {
 	lower, upper []*RationalBound
 	owned        []*RationalBound
 	children     uint32
+	conflictVar  uint32
 	closed       bool
 }
 
@@ -40,12 +41,13 @@ func NewRationalNode(m *numeral.RationalManager, variables uint32, parent *Ratio
 			return nil, arena.ErrInvalidSlot
 		}
 	}
-	n := &RationalNode{numbers: m, parent: parent, lower: make([]*RationalBound, variables), upper: make([]*RationalBound, variables)}
+	n := &RationalNode{numbers: m, parent: parent, lower: make([]*RationalBound, variables), upper: make([]*RationalBound, variables), conflictVar: math.MaxUint32}
 	n.self = n
 	if parent != nil {
 		copy(n.lower, parent.lower)
 		copy(n.upper, parent.upper)
 		n.context = parent.context
+		n.conflictVar = parent.conflictVar
 		parent.children++
 	}
 	return n, nil
@@ -69,6 +71,20 @@ func (n *RationalNode) Bounds(variable uint32) (*RationalBound, *RationalBound, 
 		return nil, nil, arena.ErrInvalidSlot
 	}
 	return n.lower[variable], n.upper[variable], nil
+}
+
+// ConflictingBounds follows the source comparison after both bound views are
+// available: reversed endpoints or an open singleton are inconsistent.
+func (n *RationalNode) ConflictingBounds(variable uint32) (bool, error) {
+	lo, hi, err := n.Bounds(variable)
+	if err != nil || lo == nil || hi == nil {
+		return false, err
+	}
+	cmp, err := n.numbers.Compare(&hi.value, &lo.value)
+	if err != nil {
+		return false, err
+	}
+	return cmp < 0 || cmp == 0 && (lo.open || hi.open), nil
 }
 
 func (n *RationalNode) PushBound(variable uint32, value *numeral.Rational, lower, open bool) error {
