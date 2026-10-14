@@ -148938,6 +148938,16 @@
           ]
         },
         {
+          "name": "process-wide fatal out-of-memory policy shared by concrete Runtime owners, including owners constructed before policy binding",
+          "status": "ported",
+          "go_target": "pkg/util/memory/process_accounting.go",
+          "go_targets": ["pkg/util/memory/runtime.go", "pkg/util/memory/failure.go"],
+          "tests": [
+            "TestProcessFatalPolicyDispatchesAcrossRuntimeOwners",
+            "TestProcessFatalPolicyBindsAfterSuccessfulConstruction"
+          ]
+        },
+        {
           "name": "scalar global and lane counter transitions and synchronization; allocator/runtime and transport integration open",
           "status": "partial",
           "go_target": "pkg/util/memory/accounting.go",
@@ -149384,6 +149394,16 @@
             "TestProcessAccountingKeepsOneSourceSizeTProfile",
             "TestProcessAccountingKeepsOneSourceTLSBranch",
             "TestProcessProfilePublishesOnlyAfterSuccessfulRuntimeConstruction"
+          ]
+        },
+        {
+          "name": "process-wide fatal out-of-memory policy shared by concrete Runtime owners, including owners constructed before policy binding",
+          "status": "ported",
+          "go_target": "pkg/util/memory/process_accounting.go",
+          "go_targets": ["pkg/util/memory/runtime.go", "pkg/util/memory/failure.go"],
+          "tests": [
+            "TestProcessFatalPolicyDispatchesAcrossRuntimeOwners",
+            "TestProcessFatalPolicyBindsAfterSuccessfulConstruction"
           ]
         },
         {

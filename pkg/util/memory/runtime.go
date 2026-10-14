@@ -67,6 +67,16 @@ func NewRuntime(c RuntimeConfig) (*Runtime, error) {
 	if c.Process != nil && !c.Process.Valid() {
 		return nil, arena.ErrConfig
 	}
+	if c.Process != nil && c.Process.fatalPolicy != nil {
+		bound := c.Process.fatalPolicy
+		if c.FatalPolicy != nil {
+			t := reflect.TypeOf(bound)
+			if t != reflect.TypeOf(c.FatalPolicy) || !t.Comparable() || bound != c.FatalPolicy {
+				return nil, arena.ErrConfig
+			}
+		}
+		c.FatalPolicy = bound
+	}
 	if c.FatalPolicy != nil && (c.Transport != nil || c.FatalPolicy.MemoryBudget() != c.Budget) {
 		return nil, arena.ErrConfig
 	}
@@ -100,6 +110,9 @@ func NewRuntime(c RuntimeConfig) (*Runtime, error) {
 	if c.Process != nil {
 		c.Process.sizeTBits = c.SizeTBits
 		c.Process.threadLocal = c.ThreadLocal
+		if c.Process.fatalPolicy == nil {
+			c.Process.fatalPolicy = c.FatalPolicy
+		}
 	}
 	return m, nil
 }

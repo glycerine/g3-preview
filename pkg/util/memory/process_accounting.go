@@ -15,6 +15,7 @@ var ErrProcessLifecycleOrder = errors.New("g3: source memory lifecycle stage out
 type ProcessAccounting struct {
 	self                                      *ProcessAccounting
 	accounting                                utilMemoryAccounting
+	fatalPolicy                               FatalPolicy
 	sizeTBits                                 uint8
 	threadLocal                               bool
 	initialized, fullyInitialized, finalizing bool

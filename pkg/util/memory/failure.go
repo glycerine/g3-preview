@@ -56,10 +56,14 @@ var ErrFailureTransport = errors.New("memory: invalid failure transport")
 
 func (m *Runtime) emitFailure(kind FailureKind) error {
 	f := Failure{Kind: kind}
-	if m.config.FatalPolicy != nil && kind != FailureVectorOverflow {
+	policy := m.config.FatalPolicy
+	if m.config.Process != nil {
+		policy = m.config.Process.fatalPolicy
+	}
+	if policy != nil && kind != FailureVectorOverflow {
 		atomic.AddUint32(&m.failureTransportDepth, 1)
 		defer atomic.AddUint32(&m.failureTransportDepth, ^uint32(0))
-		e := m.config.FatalPolicy.HandleMemoryFailure(m, f)
+		e := policy.HandleMemoryFailure(m, f)
 		if e == nil {
 			return ErrFailureTransport
 		}
