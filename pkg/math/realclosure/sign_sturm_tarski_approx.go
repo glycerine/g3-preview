@@ -84,8 +84,21 @@ func (s *realValueStore) signApproxAtBinaryBound(coefficients []*realValue, boun
 			}
 		}
 		contains, e := result.ContainsZero()
-		if e != nil || contains {
+		if e != nil {
 			return 0, false, e
+		}
+		if contains {
+			// The source's exact fallback returns zero when every Horner
+			// endpoint has collapsed to the same exact binary rational zero.
+			// A nonzero singleton is already handled by the sign branch below.
+			pointZero, e := result.isSingletonZero()
+			if e != nil {
+				return 0, false, e
+			}
+			if pointZero {
+				return 0, true, nil
+			}
+			return 0, false, nil
 		}
 		positive, e := result.IsP()
 		if e != nil {

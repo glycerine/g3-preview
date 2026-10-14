@@ -194,8 +194,8 @@ func TestRealClosureAlgebraicConstantAndZeroBoundSigns(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if refined, err := store.refineSturmAlgebraicInterval(exactMidpointValue, 1); err != nil || !refined {
-		t.Fatal("exact algebraic midpoint", refined, err)
+	if got, err := store.signAtBinaryBound([]*realValue{minusThreeHalves, exactMidpointValue}, bounds, &oneBound); err != nil || got != 0 {
+		t.Fatal("exact algebraic midpoint zero sign", got, err)
 	}
 	if exactMidpointRoot.interval.lowerOpen || exactMidpointRoot.interval.upperOpen {
 		t.Fatal("exact midpoint must close the singleton interval")

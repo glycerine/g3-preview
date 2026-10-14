@@ -50140,7 +50140,7 @@
           ]
         },
         {
-          "name": "Rational-coefficient exact Horner sign evaluation and finite/infinite binary interval endpoint sign variations, algebraic constant/zero-bound signs, and mixed rational/algebraic nonzero-bound interval Horner evaluation with default-precision rational initialization, rational-coefficient refinement and finite single-root algebraic numerator-x bisection (realclosure.cpp:559-578,900-907,2452-2462,2515-2545,3712-3770,3773-3920,4073-4093,4247-4311); multi-root/nonrational algebraic refinement, exact fallback, custom precision/checkpoint transport and persistent rational interval caching remain open",
+          "name": "Rational-coefficient exact Horner sign evaluation and finite/infinite binary interval endpoint sign variations, algebraic constant/zero-bound signs, and mixed rational/algebraic nonzero-bound interval Horner evaluation with default-precision rational initialization, rational-coefficient refinement, finite single-root algebraic numerator-x bisection and exact singleton-zero result (realclosure.cpp:559-578,900-907,2452-2462,2515-2545,3712-3770,3773-3920,4073-4093,4247-4311); multi-root/nonrational algebraic refinement, general exact fallback, custom precision/checkpoint transport and persistent rational interval caching remain open",
           "status": "partial",
           "go_target": "pkg/math/realclosure/sign_sturm_tarski_interval.go",
           "go_targets": [
