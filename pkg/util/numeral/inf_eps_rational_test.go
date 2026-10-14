@@ -358,7 +358,7 @@ func infEpsAudit(t *testing.T, s *RationalService, values []*OwnedInfEpsInfRatio
 	qopsAuditLiveOwnership(t, s.Manager, roots)
 }
 func TestInfEpsInfFailurePrefixesImmediateRoots(t *testing.T) {
-	for op := 0; op < 18; op++ {
+	for op := 0; op < 22; op++ {
 		success := false
 		failures := 0
 		for prefix := int64(0); prefix < 512; prefix++ {
@@ -373,6 +373,7 @@ func TestInfEpsInfFailurePrefixesImmediateRoots(t *testing.T) {
 			numeral := infValue(t, s, 2, 3, d+"/7")
 			var out OwnedInfEpsInfRational
 			var q OwnedRational
+			var projected OwnedInfRational
 			filler := infEpsFillCellPage(t, s)
 			budget.FailAfter(prefix)
 			switch op {
@@ -412,8 +413,16 @@ func TestInfEpsInfFailurePrefixesImmediateRoots(t *testing.T) {
 				e = s.InfEpsInfAddAssign(&a, &a)
 			case 17:
 				e = s.InfEpsInfSubAssign(&a, &b)
+			case 18:
+				q, e = s.InfEpsInfGetInfinity(&a)
+			case 19:
+				q, e = s.InfEpsInfGetRational(&a)
+			case 20:
+				q, e = s.InfEpsInfGetInfinitesimal(&a)
+			case 21:
+				projected, e = s.InfEpsInfGetNumeral(&a)
 			}
-			infEpsAudit(t, s, []*OwnedInfEpsInfRational{&a, &b, &out}, []*OwnedInfRational{&numeral}, infEpsRootsWithFiller([]*OwnedRational{&c, &q}, filler)) // before restore, format, Del, Close
+			infEpsAudit(t, s, []*OwnedInfEpsInfRational{&a, &b, &out}, []*OwnedInfRational{&numeral, &projected}, infEpsRootsWithFiller([]*OwnedRational{&c, &q}, filler)) // before restore, format, Del, Close
 			if e != nil {
 				if !numericPhysicalReservationRefusal(e) {
 					t.Fatal(op, prefix, e)
