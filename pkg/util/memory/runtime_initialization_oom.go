@@ -16,9 +16,6 @@ func (m *Runtime) BeginSourceInitialize(maxSize uint64) (bool, error) {
 	if p == nil || !p.Valid() {
 		return false, ErrRuntimeOwner
 	}
-	if p.finalizing || p.initializing {
-		return false, ErrProcessLifecyclePending
-	}
 	// C++ converts the caller's value to size_t before initialize compares it
 	// with UINT_MAX. On the 32-bit profile a wider Go argument can wrap to
 	// that sentinel, in which case the existing maximum must be preserved.
@@ -30,6 +27,12 @@ func (m *Runtime) BeginSourceInitialize(maxSize uint64) (bool, error) {
 		if e := m.SetMaxSize(maxSize); e != nil {
 			return false, e
 		}
+	}
+	// The source updates g_memory_max_size inside the critical section before
+	// its initialized guard. A single-goroutine reentry cannot wait for the
+	// generated children, but it must keep that already reached limit update.
+	if p.finalizing || p.initializing {
+		return false, ErrProcessLifecyclePending
 	}
 	if p.initialized {
 		return false, nil

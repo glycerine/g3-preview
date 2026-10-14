@@ -21,8 +21,11 @@ func TestProcessSourceLifecycleGuards(t *testing.T) {
 	if err != nil || !first || p.OutOfMemory() || p.accounting.maxSize != 1 || !p.initialized || p.fullyInitialized {
 		t.Fatal("first initialization prefix", first, err, p)
 	}
-	if _, err := r.BeginSourceInitialize(40); !errors.Is(err, ErrProcessLifecyclePending) || p.accounting.maxSize != 1 {
-		t.Fatal("pending initialization changed limit", err)
+	if _, err := r.BeginSourceInitialize(40); !errors.Is(err, ErrProcessLifecyclePending) || p.accounting.maxSize != 40 {
+		t.Fatal("pending initialization lost source limit update", err)
+	}
+	if _, err := r.BeginSourceInitialize(math.MaxUint32); !errors.Is(err, ErrProcessLifecyclePending) || p.accounting.maxSize != 40 {
+		t.Fatal("pending sentinel changed source limit", err)
 	}
 	if _, err := p.BeginFinalize(); !errors.Is(err, ErrProcessLifecyclePending) {
 		t.Fatal("finalization during generated initialization", err)
@@ -41,8 +44,8 @@ func TestProcessSourceLifecycleGuards(t *testing.T) {
 	if err != nil || !active || !p.finalizing {
 		t.Fatal("finalization prefix", active, err)
 	}
-	if _, err := r.BeginSourceInitialize(80); !errors.Is(err, ErrProcessLifecyclePending) || p.accounting.maxSize != 40 {
-		t.Fatal("initialization during finalization", err)
+	if _, err := r.BeginSourceInitialize(80); !errors.Is(err, ErrProcessLifecyclePending) || p.accounting.maxSize != 80 {
+		t.Fatal("initialization during finalization lost source limit update", err)
 	}
 	if _, err := p.BeginFinalize(); !errors.Is(err, ErrProcessLifecyclePending) {
 		t.Fatal("duplicate finalization", err)
