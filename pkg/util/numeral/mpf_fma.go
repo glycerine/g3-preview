@@ -205,6 +205,7 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 		}
 	}
 	if s.c.exponent > s.mr.exponent {
+		m.traceFloatDebugText("fma", "Swap!", 852)
 		s.mr, s.c = s.c, s.mr
 	}
 	delta, e := roundSignedSub(s.mr.exponent, s.c.exponent)
@@ -238,6 +239,11 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 	}
 	s.resSourceLive = true
 	subtract := s.mr.Sign() != s.c.Sign()
+	if subtract {
+		m.traceFloatDebugText("fma", "SUBTRACTING", 880)
+	} else {
+		m.traceFloatDebugText("fma", "ADDING", 892)
+	}
 	if e := im.addSubWithAllocationContext(&s.mr.significand, &s.c.significand, &s.res.significand, subtract, context); e != nil {
 		return e
 	}
