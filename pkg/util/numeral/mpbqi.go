@@ -22,6 +22,8 @@ type BinaryIntervalManager struct {
 	MulCurr, MulMax, MulMin BinaryRational
 	HeaderBytes             uint64
 	closed                  bool
+	closing                 bool
+	cleanupStage            uint8
 }
 type BinaryIntervalStats struct {
 	HeaderBytes           uint64
@@ -44,7 +46,7 @@ func (m *BinaryIntervalManager) open() error {
 	if m == nil || m.self != m {
 		return ErrBinaryOwner
 	}
-	if m.closed {
+	if m.closed || m.closing {
 		return arena.ErrClosed
 	}
 	return m.bounds.open()
@@ -104,12 +106,32 @@ func (m *BinaryIntervalManager) Close() {
 	if m == nil || m.self != m || m.closed {
 		return
 	}
-	m.bounds.Del(&m.MulCurr)
-	m.bounds.Del(&m.MulMax)
-	m.bounds.Del(&m.MulMin)
+	if e := m.CloseChecked(); e != nil {
+		panic(e)
+	}
+}
+
+// CloseChecked resumes the source destructor at its first unfinished scratch
+// bound: current, maximum, then minimum.
+func (m *BinaryIntervalManager) CloseChecked() error {
+	if m == nil || m.self != m {
+		return ErrBinaryOwner
+	}
+	if m.closed {
+		return nil
+	}
+	m.closing = true
+	roots := [3]*BinaryRational{&m.MulCurr, &m.MulMax, &m.MulMin}
+	for m.cleanupStage < 3 {
+		if e := m.bounds.Del(roots[m.cleanupStage]); e != nil {
+			return e
+		}
+		m.cleanupStage++
+	}
 	m.bounds.Z.BudgetField.Release(m.HeaderBytes)
 	m.HeaderBytes = 0
 	m.closed = true
+	return nil
 }
 func (m *BinaryIntervalManager) Del(a *BinaryInterval) error {
 	if e := m.checkCleanup(a); e != nil {

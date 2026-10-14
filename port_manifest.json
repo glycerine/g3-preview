@@ -117519,7 +117519,8 @@
             "TestBinaryIntervalFormattingAndWarmStorage",
             "TestBinaryIntervalPredicateShortCircuits",
             "TestBinaryIntervalOwnerAndScope",
-            "TestBinaryIntervalRetainedProductsAndDeepCopies"
+            "TestBinaryIntervalRetainedProductsAndDeepCopies",
+            "TestBinaryIntervalCloseRetainsStoppedScratchOrder"
           ]
         },
         {
@@ -150627,7 +150628,8 @@
             "TestBinaryIntervalFormattingAndWarmStorage",
             "TestBinaryIntervalPredicateShortCircuits",
             "TestBinaryIntervalOwnerAndScope",
-            "TestBinaryIntervalRetainedProductsAndDeepCopies"
+            "TestBinaryIntervalRetainedProductsAndDeepCopies",
+            "TestBinaryIntervalCloseRetainsStoppedScratchOrder"
           ]
         },
         {
