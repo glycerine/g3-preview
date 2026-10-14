@@ -48872,7 +48872,9 @@
         "pkg/math/realclosure/sign_polynomial_derivative_test.go",
         "pkg/math/realclosure/sign_polynomial_div.go",
         "pkg/math/realclosure/sign_polynomial_prem.go",
-        "pkg/math/realclosure/sign_sturm_tarski.go"
+        "pkg/math/realclosure/sign_sturm_tarski.go",
+        "pkg/math/realclosure/sign_sturm_tarski_interval.go",
+        "pkg/math/realclosure/sign_sturm_tarski_interval_test.go"
       ],
       "tests": [
         "TestRealClosureBinaryExtendedNumeralBranches",
@@ -48891,7 +48893,8 @@
         "TestAlgebraicRootsShareSignDetAndReleaseSourceOrder",
         "TestSignDeterminationRationalProductsAndThreeWayExpansion",
         "TestRealClosureSourceTarskiSignCountBranches",
-        "TestRealClosureRationalDerivativeKeepsCoefficientOwnership"
+        "TestRealClosureRationalDerivativeKeepsCoefficientOwnership",
+        "TestRealClosureBoundedRationalSturmTarskiEndpoints"
       ],
       "conditionals": [
         {
@@ -50089,11 +50092,19 @@
           ]
         },
         {
-          "name": "Rational Sturm and Sturm-Tarski sequence generation with both remainder settings and unbounded endpoint sign variations (realclosure.cpp:3637-3702,3930-4069); bounded intervals and nonrational coefficients remain open",
+          "name": "Rational Sturm and Sturm-Tarski sequence generation with both remainder settings and unbounded endpoint sign variations (realclosure.cpp:3637-3702,3930-4069); nonrational coefficients remain open",
           "status": "partial",
           "go_target": "pkg/math/realclosure/sign_sturm_tarski.go",
           "tests": [
             "TestRealClosureRationalDerivativeKeepsCoefficientOwnership"
+          ]
+        },
+        {
+          "name": "Rational-coefficient exact Horner sign evaluation and finite/infinite binary interval endpoint sign variations for Sturm-Tarski queries (realclosure.cpp:3773-3920,3930-4025); nonrational coefficient approximation and refinement remain open",
+          "status": "partial",
+          "go_target": "pkg/math/realclosure/sign_sturm_tarski_interval.go",
+          "tests": [
+            "TestRealClosureBoundedRationalSturmTarskiEndpoints"
           ]
         },
         {
