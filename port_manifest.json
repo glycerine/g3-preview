@@ -148829,7 +148829,19 @@
           ]
         },
         {
-          "name": "scalar global and lane counter transitions, synchronization and read predicates; allocator/runtime and transport open",
+          "name": "memory::get_allocation_size, get_max_used_memory, is_out_of_memory and above_high_watermark read only synchronized process counters",
+          "status": "ported",
+          "go_target": "pkg/util/memory/accounting.go",
+          "go_targets": ["pkg/util/memory/process_accounting.go", "pkg/util/memory/runtime.go"],
+          "tests": [
+            "TestMemoryAccountingDeallocationClampAndWatermark",
+            "TestMemoryAccountingTLSStrictThresholds",
+            "TestProcessAccountingSharesSourceGlobalCounterAndLimit",
+            "TestProcessAccountingPreservesSeparateTLSLanes"
+          ]
+        },
+        {
+          "name": "scalar global and lane counter transitions and synchronization; allocator/runtime and transport integration open",
           "status": "partial",
           "go_target": "pkg/util/memory/accounting.go",
           "tests": [
@@ -149254,7 +149266,19 @@
           ]
         },
         {
-          "name": "scalar global and lane counter transitions, synchronization and read predicates; allocator/runtime and transport open",
+          "name": "memory::get_allocation_size, get_max_used_memory, is_out_of_memory and above_high_watermark read only synchronized process counters",
+          "status": "ported",
+          "go_target": "pkg/util/memory/accounting.go",
+          "go_targets": ["pkg/util/memory/process_accounting.go", "pkg/util/memory/runtime.go"],
+          "tests": [
+            "TestMemoryAccountingDeallocationClampAndWatermark",
+            "TestMemoryAccountingTLSStrictThresholds",
+            "TestProcessAccountingSharesSourceGlobalCounterAndLimit",
+            "TestProcessAccountingPreservesSeparateTLSLanes"
+          ]
+        },
+        {
+          "name": "scalar global and lane counter transitions and synchronization; allocator/runtime and transport integration open",
           "status": "partial",
           "go_target": "pkg/util/memory/accounting.go",
           "tests": [
