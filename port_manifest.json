@@ -51674,11 +51674,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/math/subpaving/rational_interval.go",
-        "pkg/math/subpaving/rational_interval_arith.go"
+        "pkg/math/subpaving/rational_interval_arith.go",
+        "pkg/math/subpaving/rational_interval_scalar.go"
       ],
       "tests": [
         "TestSubpavingRationalMutableIntervalCore",
-        "TestSubpavingRationalIntervalNegAddSubAndAlias"
+        "TestSubpavingRationalIntervalNegAddSubAndAlias",
+        "TestSubpavingRationalIntervalScalarSourceBranches"
       ],
       "conditionals": [
         {
@@ -51745,6 +51747,8 @@
         "pkg/math/subpaving/rational_interval_test.go",
         "pkg/math/subpaving/rational_interval_arith.go",
         "pkg/math/subpaving/rational_interval_arith_test.go",
+        "pkg/math/subpaving/rational_interval_scalar.go",
+        "pkg/math/subpaving/rational_interval_scalar_test.go",
         "pkg/math/subpaving/fast_interval.go",
         "pkg/math/subpaving/fast_interval_test.go",
         "pkg/math/subpaving/fast_interval_arith.go",
@@ -52066,6 +52070,14 @@
           "go_target": "pkg/math/subpaving/rational_interval_arith.go",
           "tests": [
             "TestSubpavingRationalIntervalNegAddSubAndAlias"
+          ]
+        },
+        {
+          "name": "Concrete config_mpq scalar interval multiply/divide, zero reset, negative endpoint reversal, exact reciprocal, infinity and alias branches (src/math/interval/interval_def.h:839-925)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_interval_scalar.go",
+          "tests": [
+            "TestSubpavingRationalIntervalScalarSourceBranches"
           ]
         },
         {
@@ -119996,11 +120008,13 @@
           "status": "partial",
           "go_target": "pkg/math/subpaving/rational_interval.go",
           "go_targets": [
-            "pkg/math/subpaving/rational_interval_arith.go"
+            "pkg/math/subpaving/rational_interval_arith.go",
+            "pkg/math/subpaving/rational_interval_scalar.go"
           ],
           "tests": [
             "TestSubpavingRationalMutableIntervalCore",
-            "TestSubpavingRationalIntervalNegAddSubAndAlias"
+            "TestSubpavingRationalIntervalNegAddSubAndAlias",
+            "TestSubpavingRationalIntervalScalarSourceBranches"
           ]
         },
         {
