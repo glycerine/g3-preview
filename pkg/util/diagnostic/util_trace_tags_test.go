@@ -83,6 +83,60 @@ func TestTraceShortBodyFailureStillFlushes(t *testing.T) {
 	}
 }
 
+func TestTraceStreamFailurePersistsButBodyErrorDoesNot(t *testing.T) {
+	refusal := errors.New("trace write refusal")
+	w := &traceHeaderRefusalWriter{until: 2, refusal: refusal}
+	tags := NewTraceTagsWithWriter(w)
+	tags.Enable("alpha")
+	first := tags.Emit("alpha", "work", "source.cpp", 7, "body")
+	called := 0
+	second := tags.EmitShort("alpha", func(out io.Writer) error {
+		called++
+		return writeTracePart(out, "later")
+	})
+	if !traceCompiled {
+		if first != nil || second != nil || called != 0 || w.writes != 0 {
+			t.Fatal("erased trace evaluated", first, second, called, w.writes)
+		}
+		return
+	}
+	if !errors.Is(first, refusal) || !errors.Is(second, refusal) || called != 1 || w.writes != 2 || w.String() != "-------- [" {
+		t.Fatal("trace stream failure did not persist", first, second, called, w.writes, w.String())
+	}
+	var output bytes.Buffer
+	other := NewTraceTagsWithWriter(&output)
+	other.Enable("alpha")
+	bodyErr := errors.New("trace body error")
+	if err := other.EmitShort("alpha", func(out io.Writer) error {
+		if err := writeTracePart(out, "first"); err != nil {
+			return err
+		}
+		return bodyErr
+	}); !errors.Is(err, bodyErr) {
+		t.Fatal("body error", err)
+	}
+	if err := other.EmitShort("alpha", func(out io.Writer) error {
+		return writeTracePart(out, "second")
+	}); err != nil || output.String() != "firstsecond" {
+		t.Fatal("body error poisoned the borrowed stream", err, output.String())
+	}
+	flushErr := errors.New("trace flush refusal")
+	flushed := &flushedWarningWriter{err: flushErr}
+	flushTags := NewTraceTagsWithWriter(flushed)
+	flushTags.Enable("alpha")
+	if err := flushTags.EmitShort("alpha", func(out io.Writer) error {
+		return writeTracePart(out, "first")
+	}); !errors.Is(err, flushErr) {
+		t.Fatal("first flush refusal", err)
+	}
+	flushed.err = nil
+	if err := flushTags.EmitShort("alpha", func(out io.Writer) error {
+		return writeTracePart(out, "second")
+	}); !errors.Is(err, flushErr) || flushed.String() != "first" {
+		t.Fatal("flush failure did not persist", err, flushed.String())
+	}
+}
+
 func TestTraceTagsSourceControlAndFinalize(t *testing.T) {
 	tags := NewTraceTags()
 	if tags.IsEnabled("alpha") {

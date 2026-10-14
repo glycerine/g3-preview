@@ -11,10 +11,11 @@ import (
 // TraceTags is the caller-owned, single-goroutine trace-tag control state.
 // The retained shell and API callers can bind one shared instance.
 type TraceTags struct {
-	all     bool
-	tags    map[string]struct{}
-	writer  io.Writer
-	openErr error
+	all       bool
+	tags      map[string]struct{}
+	writer    io.Writer
+	openErr   error
+	streamErr error
 }
 
 func NewTraceTags() *TraceTags { return &TraceTags{} }
@@ -100,8 +101,9 @@ func flushTrace(w io.Writer) error {
 // and the final flush still execute. Suppress later physical writes but allow
 // a TRACE/CTRACE body to run after a refused header insertion.
 type traceStickyWriter struct {
-	out   io.Writer
-	first error
+	out       io.Writer
+	first     error
+	streamErr error
 }
 
 func (w *traceStickyWriter) capture(err error) {
@@ -112,6 +114,9 @@ func (w *traceStickyWriter) capture(err error) {
 func (w *traceStickyWriter) remember(n, want int, err error) (int, error) {
 	if err == nil && n != want {
 		err = io.ErrShortWrite
+	}
+	if err != nil && w.streamErr == nil {
+		w.streamErr = err
 	}
 	w.capture(err)
 	return n, err
@@ -131,10 +136,21 @@ func (w *traceStickyWriter) WriteString(s string) (int, error) {
 	return w.remember(n, len(s), err)
 }
 func (w *traceStickyWriter) finish() error {
-	if err := flushTrace(w.out); w.first == nil {
+	if err := flushTrace(w.out); err != nil && w.streamErr == nil {
+		w.streamErr = err
+	}
+	if err := w.streamErr; w.first == nil {
 		w.first = err
 	}
 	return w.first
+}
+
+func (t *TraceTags) finishRecord(w *traceStickyWriter) error {
+	err := w.finish()
+	if t.streamErr == nil {
+		t.streamErr = w.streamErr
+	}
+	return err
 }
 
 // TRACE and CTRACE insert each header component separately before CODE runs.
@@ -159,11 +175,11 @@ func (t *TraceTags) Emit(tag, function, file string, line int, body string) erro
 	if err != nil {
 		return err
 	}
-	sticky := &traceStickyWriter{out: w}
+	sticky := &traceStickyWriter{out: w, first: t.streamErr, streamErr: t.streamErr}
 	sticky.capture(writeTraceHeader(sticky, tag, function, file, line))
 	sticky.capture(writeTracePart(sticky, body))
 	sticky.capture(writeTracePart(sticky, "------------------------------------------------\n"))
-	return sticky.finish()
+	return t.finishRecord(sticky)
 }
 
 // EmitShort implements STRACE: no header or footer, but each reached body is
@@ -176,11 +192,11 @@ func (t *TraceTags) EmitShort(tag string, body func(io.Writer) error) error {
 	if err != nil {
 		return err
 	}
-	sticky := &traceStickyWriter{out: w}
+	sticky := &traceStickyWriter{out: w, first: t.streamErr, streamErr: t.streamErr}
 	if body != nil {
 		sticky.capture(body(sticky))
 	}
-	return sticky.finish()
+	return t.finishRecord(sticky)
 }
 
 // EmitConditional implements CTRACE's compile, tag, then condition order.
@@ -194,13 +210,13 @@ func (t *TraceTags) EmitConditional(tag, function, file string, line int, condit
 	if err != nil {
 		return err
 	}
-	sticky := &traceStickyWriter{out: w}
+	sticky := &traceStickyWriter{out: w, first: t.streamErr, streamErr: t.streamErr}
 	sticky.capture(writeTraceHeader(sticky, tag, function, file, line))
 	if body != nil {
 		sticky.capture(body(sticky))
 	}
 	sticky.capture(writeTracePart(sticky, "------------------------------------------------\n"))
-	return sticky.finish()
+	return t.finishRecord(sticky)
 }
 
 // Finalize releases the tag table. Source finalize_trace leaves the all flag.
