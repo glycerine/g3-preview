@@ -2,6 +2,8 @@
 package realclosure
 
 import (
+	"errors"
+
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -9,11 +11,10 @@ import (
 func (s *realValueStore) ownNonzeroRational(out *numeral.Rational) (*realValue, error) {
 	zero, err := s.numbers.IsZero(out)
 	if err != nil {
-		_ = s.numbers.Del(out)
-		return nil, err
+		return nil, errors.Join(err, s.releaseSturmRational(out))
 	}
 	if zero {
-		if err := s.numbers.Del(out); err != nil {
+		if err := s.releaseSturmRational(out); err != nil {
 			return nil, err
 		}
 		return nil, nil

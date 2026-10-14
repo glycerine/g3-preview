@@ -3,6 +3,8 @@
 package realclosure
 
 import (
+	"errors"
+
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -20,7 +22,7 @@ func normalizedRationalSign(raw int32) int32 {
 // signAtBinaryBound follows the source's zero shortcut and exact Horner
 // evaluation for rational coefficients. The source may first try interval
 // approximations; those nonrational/refinement branches remain open.
-func (s *realValueStore) signAtBinaryBound(coefficients []*realValue, bounds *numeral.BinaryRationalManager, bound *numeral.BinaryRational) (int32, error) {
+func (s *realValueStore) signAtBinaryBound(coefficients []*realValue, bounds *numeral.BinaryRationalManager, bound *numeral.BinaryRational) (sign int32, err error) {
 	if s == nil || s.numbers == nil || bounds == nil || bound == nil {
 		return 0, arena.ErrInvalidSlot
 	}
@@ -51,12 +53,12 @@ func (s *realValueStore) signAtBinaryBound(coefficients []*realValue, bounds *nu
 		return normalizedRationalSign(raw), err
 	}
 	x := numeral.NewRational()
-	defer func() { _ = s.numbers.Del(&x) }()
+	defer func() { err = errors.Join(err, s.releaseSturmRational(&x)) }()
 	if err := bounds.ToRational(s.numbers, bound, &x); err != nil {
 		return 0, err
 	}
 	acc := numeral.NewRational()
-	defer func() { _ = s.numbers.Del(&acc) }()
+	defer func() { err = errors.Join(err, s.releaseSturmRational(&acc)) }()
 	if err := s.numbers.Mul(&coefficients[len(coefficients)-1].rational, &x, &acc); err != nil {
 		return 0, err
 	}
@@ -64,24 +66,24 @@ func (s *realValueStore) signAtBinaryBound(coefficients []*realValue, bounds *nu
 		if coefficients[i] != nil {
 			next := numeral.NewRational()
 			if err := s.numbers.Add(&acc, &coefficients[i].rational, &next); err != nil {
-				_ = s.numbers.Del(&next)
-				return 0, err
+				return 0, errors.Join(err, s.releaseSturmRational(&next))
 			}
-			if err := s.numbers.Del(&acc); err != nil {
-				_ = s.numbers.Del(&next)
-				return 0, err
+			if err := s.releaseSturmRational(&acc); err != nil {
+				// The refused value has moved to the pending owner. The deferred
+				// cleanup must not try to release the same numerator again.
+				acc = numeral.NewRational()
+				return 0, errors.Join(err, s.releaseSturmRational(&next))
 			}
 			acc = next
 		}
 		if i > 0 {
 			next := numeral.NewRational()
 			if err := s.numbers.Mul(&acc, &x, &next); err != nil {
-				_ = s.numbers.Del(&next)
-				return 0, err
+				return 0, errors.Join(err, s.releaseSturmRational(&next))
 			}
-			if err := s.numbers.Del(&acc); err != nil {
-				_ = s.numbers.Del(&next)
-				return 0, err
+			if err := s.releaseSturmRational(&acc); err != nil {
+				acc = numeral.NewRational()
+				return 0, errors.Join(err, s.releaseSturmRational(&next))
 			}
 			acc = next
 		}
