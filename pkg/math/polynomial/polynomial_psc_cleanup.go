@@ -132,13 +132,17 @@ func (m *MultivariatePolynomialCore) cleanupPSCAborts(g uint64) error {
 	// Compatibility generation selects a known actual parent frame. Its concrete
 	// child tuples, rather than the generation, grant every new callee authority.
 	if g != 0 && m.pscLocal.sourceGeneration == g {
-		return m.finishPSCPhase(true, true)
-	}
-	if g != 0 && m.pscNext.sourceGeneration == g {
-		return m.finishPSCNextPhase(true, true)
-	}
-	if g != 0 && m.lazardLocal.sourceGeneration == g {
-		return m.finishLazardPhase(true, true)
+		if e := m.finishPSCPhase(true, true); e != nil {
+			return e
+		}
+	} else if g != 0 && m.pscNext.sourceGeneration == g {
+		if e := m.finishPSCNextPhase(true, true); e != nil {
+			return e
+		}
+	} else if g != 0 && m.lazardLocal.sourceGeneration == g {
+		if e := m.finishLazardPhase(true, true); e != nil {
+			return e
+		}
 	}
 
 	r := &m.pscReceipts

@@ -2,10 +2,94 @@ package polynomial
 
 import (
 	"errors"
+	"strconv"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
+
+func TestPolynomialCacheFactorStoppedBodyCleanupAndRetry(t *testing.T) {
+	stopped := false
+	for ordinal := int64(0); ordinal < 64 && !stopped; ordinal++ {
+		t.Run(strconv.FormatInt(ordinal, 10), func(t *testing.T) {
+			m := polynomialPSCFullFixture(t)
+			c, e := NewPolynomialCache(m)
+			serviceMust(t, e)
+			t.Cleanup(func() { serviceMust(t, c.Close()) })
+			out, e := NewPolynomialRefVector(m.core)
+			serviceMust(t, e)
+			t.Cleanup(func() { serviceMust(t, out.Close()) })
+			p := polynomialQueryTerms(t, m.core, []int32{1, 2, 1}, [][]MonomialPower{nil, {{0, 1}}, {{0, 2}}})
+			_, e = c.MkUnique(p)
+			serviceMust(t, e)
+			b := m.core.integer.Budget()
+			b.FailAfter(ordinal)
+			body := c.Factor(p, out)
+			b.FailAfter(-1)
+			if body == nil || m.factorCoreInvocation == 0 {
+				return
+			}
+			stopped = true
+			if e := c.Factor(p, out); !errors.Is(e, ErrPolynomialPending) {
+				t.Fatal("incomplete factor entry permitted replay", e)
+			}
+			serviceMust(t, c.CleanupFactor())
+			if c.pendingFactors != nil {
+				t.Fatal("stopped factorization retained temporary factors")
+			}
+			serviceMust(t, c.Reset())
+			serviceMust(t, c.Factor(p, out))
+		})
+	}
+	if !stopped {
+		t.Fatal("no real factor reservation refusal reached factorization")
+	}
+}
+
+func TestPolynomialCachePSCStoppedBodyCleanupAndRetry(t *testing.T) {
+	stopped := false
+	for ordinal := int64(0); ordinal < 96 && !stopped; ordinal++ {
+		t.Run(strconv.FormatInt(ordinal, 10), func(t *testing.T) {
+			m := polynomialPSCFullFixture(t)
+			c, e := NewPolynomialCache(m)
+			serviceMust(t, e)
+			t.Cleanup(func() { serviceMust(t, c.Close()) })
+			out, e := NewPolynomialRefVector(m.core)
+			serviceMust(t, e)
+			t.Cleanup(func() { serviceMust(t, out.Close()) })
+			p := polynomialQueryTerms(t, m.core, []int32{1, 1, 1, 2}, [][]MonomialPower{{{0, 1}, {1, 2}}, {{0, 1}, {1, 1}}, {{1, 1}}, nil})
+			q := polynomialQueryTerms(t, m.core, []int32{1, 3}, [][]MonomialPower{{{0, 1}, {1, 1}}, nil})
+			_, e = c.MkUnique(p)
+			serviceMust(t, e)
+			_, e = c.MkUnique(q)
+			serviceMust(t, e)
+			b := m.core.integer.Budget()
+			b.FailAfter(ordinal)
+			body := c.PSCChain(p, q, 1, out)
+			b.FailAfter(-1)
+			if body == nil || m.core.pscLocal.invocation == 0 {
+				return
+			}
+			stopped = true
+			serviceMust(t, c.CleanupPSC())
+			if m.core.pscReceipts.factory != 0 {
+				t.Fatal("completed PSC parent left an owning factory receipt")
+			}
+			if e = c.PSCChain(p, q, 1, out); !errors.Is(e, ErrPolynomialPending) {
+				t.Fatal("incomplete PSC entry permitted replay", e)
+			}
+			serviceMust(t, out.Close())
+			serviceMust(t, c.Reset())
+			retry, e := NewPolynomialRefVector(m.core)
+			serviceMust(t, e)
+			t.Cleanup(func() { serviceMust(t, retry.Close()) })
+			serviceMust(t, c.PSCChain(p, q, 1, retry))
+		})
+	}
+	if !stopped {
+		t.Fatal("no real PSC reservation refusal reached the source scope")
+	}
+}
 
 func TestPolynomialCacheConstructorBudgetAndRefusal(t *testing.T) {
 	m := polynomialPSCFullFixture(t)

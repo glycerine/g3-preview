@@ -19,6 +19,7 @@ type PolynomialCache struct {
 	psc            map[polynomialPSCKey]*polynomialPSCEntry
 	factors        map[Polynomial]*polynomialFactorCacheEntry
 	pendingFactors *PolynomialFactors
+	pendingPSC     bool
 	header         uint64
 	resetting      bool
 	closing        bool
@@ -158,6 +159,33 @@ func (c *PolynomialCache) CleanupFactor() error {
 	return nil
 }
 
+func (c *PolynomialCache) finishPSC(body error) error {
+	if e := c.manager.core.CleanupPSC(); e != nil {
+		c.pendingPSC = true
+		return errors.Join(body, e)
+	}
+	return body
+}
+
+// CleanupPSC completes the manager's source PSC scope after an interrupted
+// cache miss. The caller still owns its output reference vector.
+func (c *PolynomialCache) CleanupPSC() error {
+	if c == nil || c.self != c {
+		return ErrPolynomialOwner
+	}
+	if c.closed {
+		return arena.ErrClosed
+	}
+	if !c.pendingPSC {
+		return nil
+	}
+	if e := c.manager.core.CleanupPSC(); e != nil {
+		return e
+	}
+	c.pendingPSC = false
+	return nil
+}
+
 // PSCChain memoizes the source ordered pair and variable after canonicalizing
 // both inputs. A failed computation retains its inserted entry until Reset.
 func (c *PolynomialCache) PSCChain(p, q Polynomial, x uint32, out *PolynomialRefVector) error {
@@ -194,24 +222,24 @@ func (c *PolynomialCache) PSCChain(p, q Polynomial, x uint32, out *PolynomialRef
 	entry := &polynomialPSCEntry{}
 	c.psc[key] = entry
 	if e := c.manager.PSCChain(p, q, x, out); e != nil {
-		return e
+		return c.finishPSC(e)
 	}
 	n, e := out.Size()
 	if e != nil {
-		return e
+		return c.finishPSC(e)
 	}
 	result := make([]Polynomial, n)
 	for i := uint32(0); i < n; i++ {
 		value, e := out.Get(i)
 		if e != nil {
-			return e
+			return c.finishPSC(e)
 		}
 		value, e = c.MkUnique(value)
 		if e != nil {
-			return e
+			return c.finishPSC(e)
 		}
 		if e := out.setWithReceipt(i, value, nil); e != nil {
-			return e
+			return c.finishPSC(e)
 		}
 		result[i] = value
 	}
@@ -231,6 +259,9 @@ func (c *PolynomialCache) ready() error {
 		return ErrPolynomialPending
 	}
 	if c.pendingFactors != nil {
+		return ErrPolynomialPending
+	}
+	if c.pendingPSC {
 		return ErrPolynomialPending
 	}
 	return c.manager.ready()
@@ -316,6 +347,9 @@ func (c *PolynomialCache) Close() error {
 		return nil
 	}
 	c.closing = true
+	if e := c.CleanupPSC(); e != nil {
+		return e
+	}
 	if e := c.CleanupFactor(); e != nil {
 		return e
 	}

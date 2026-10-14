@@ -45166,14 +45166,16 @@
         "TestPolynomialCacheConstructorBudgetAndRefusal",
         "TestPolynomialCachePSCChainCanonicalKeyAndReplay",
         "TestPolynomialCacheFactorDistinctReplayAndReset",
-        "TestPolynomialCacheFactorConstructorRefusalRetainsInsertedKey"
+        "TestPolynomialCacheFactorConstructorRefusalRetainsInsertedKey",
+        "TestPolynomialCacheFactorStoppedBodyCleanupAndRetry",
+        "TestPolynomialCachePSCStoppedBodyCleanupAndRetry"
       ],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
       "deviations": [
-        "The retained NLSAT cache's mk_unique path uses native Go hash buckets and an embedded owning polynomial reference vector. PSC-chain results are memoized by canonical ordered inputs and variable. Factor results are memoized by canonical input, with source-order output reset and distinct-factor canonicalization. A stopped temporary factors owner remains available for explicit cleanup; full stopped PSC/factor failure and cleanup fidelity and NLSAT integration remain open."
+        "The retained NLSAT cache's mk_unique path uses native Go hash buckets and an embedded owning polynomial reference vector. PSC-chain results are memoized by canonical ordered inputs and variable. Factor results are memoized by canonical input, with source-order output reset and distinct-factor canonicalization. Actual stopped factor and PSC body refusals finish their source scopes and permit reset/retry; full stopped result-vector/destructor fidelity and NLSAT integration remain open."
       ]
     },
     {
@@ -45190,7 +45192,9 @@
         "TestPolynomialCacheConstructorBudgetAndRefusal",
         "TestPolynomialCachePSCChainCanonicalKeyAndReplay",
         "TestPolynomialCacheFactorDistinctReplayAndReset",
-        "TestPolynomialCacheFactorConstructorRefusalRetainsInsertedKey"
+        "TestPolynomialCacheFactorConstructorRefusalRetainsInsertedKey",
+        "TestPolynomialCacheFactorStoppedBodyCleanupAndRetry",
+        "TestPolynomialCachePSCStoppedBodyCleanupAndRetry"
       ],
       "conditionals": [
         {
@@ -45207,7 +45211,7 @@
       "methods": [],
       "ownership": [],
       "deviations": [
-        "The concrete PolynomialCache exposes retained mk_unique, PSC-chain and factor memoization, and reset behavior with borrowed canonical handles. Stopped PSC/factor cleanup and NLSAT integration remain open."
+        "The concrete PolynomialCache exposes retained mk_unique, PSC-chain and factor memoization, and reset behavior with borrowed canonical handles. Selected actual stopped source scopes finish before retry; full result-vector/destructor cleanup and NLSAT integration remain open."
       ]
     },
     {
