@@ -339,25 +339,88 @@ func (s *ScopedRational) Compare(v *Rational) (int, error) {
 	}
 	return s.manager.Compare(&s.num, v)
 }
-func (s *ScopedInt) Equal(v *Int) (bool, error) { c, e := s.Compare(v); return c == 0, e }
+func (s *ScopedInt) Equal(v *Int) (bool, error) {
+	c, e := s.Compare(v)
+	if e != nil {
+		return false, e
+	}
+	return c == 0, nil
+}
 func (s *ScopedRational) Equal(v *Rational) (bool, error) {
 	if _, e := s.Get(); e != nil {
 		return false, e
 	}
 	return s.manager.Equal(&s.num, v)
 }
-func (s *ScopedInt) NotEqual(v *Int) (bool, error)            { v1, e := s.Equal(v); return !v1, e }
-func (s *ScopedRational) NotEqual(v *Rational) (bool, error)  { v1, e := s.Equal(v); return !v1, e }
-func (s *ScopedInt) Less(v *Int) (bool, error)                { c, e := s.Compare(v); return c < 0, e }
-func (s *ScopedInt) Greater(v *Int) (bool, error)             { c, e := s.Compare(v); return c > 0, e }
-func (s *ScopedInt) LessEqual(v *Int) (bool, error)           { c, e := s.Compare(v); return c <= 0, e }
-func (s *ScopedInt) GreaterEqual(v *Int) (bool, error)        { c, e := s.Compare(v); return c >= 0, e }
-func (s *ScopedRational) Less(v *Rational) (bool, error)      { c, e := s.Compare(v); return c < 0, e }
-func (s *ScopedRational) Greater(v *Rational) (bool, error)   { c, e := s.Compare(v); return c > 0, e }
-func (s *ScopedRational) LessEqual(v *Rational) (bool, error) { c, e := s.Compare(v); return c <= 0, e }
+func (s *ScopedInt) NotEqual(v *Int) (bool, error) {
+	v1, e := s.Equal(v)
+	if e != nil {
+		return false, e
+	}
+	return !v1, nil
+}
+func (s *ScopedRational) NotEqual(v *Rational) (bool, error) {
+	v1, e := s.Equal(v)
+	if e != nil {
+		return false, e
+	}
+	return !v1, nil
+}
+func (s *ScopedInt) Less(v *Int) (bool, error) {
+	c, e := s.Compare(v)
+	if e != nil {
+		return false, e
+	}
+	return c < 0, nil
+}
+func (s *ScopedInt) Greater(v *Int) (bool, error) {
+	c, e := s.Compare(v)
+	if e != nil {
+		return false, e
+	}
+	return c > 0, nil
+}
+func (s *ScopedInt) LessEqual(v *Int) (bool, error) {
+	c, e := s.Compare(v)
+	if e != nil {
+		return false, e
+	}
+	return c <= 0, nil
+}
+func (s *ScopedInt) GreaterEqual(v *Int) (bool, error) {
+	c, e := s.Compare(v)
+	if e != nil {
+		return false, e
+	}
+	return c >= 0, nil
+}
+func (s *ScopedRational) Less(v *Rational) (bool, error) {
+	c, e := s.Compare(v)
+	if e != nil {
+		return false, e
+	}
+	return c < 0, nil
+}
+func (s *ScopedRational) Greater(v *Rational) (bool, error) {
+	c, e := s.Compare(v)
+	if e != nil {
+		return false, e
+	}
+	return c > 0, nil
+}
+func (s *ScopedRational) LessEqual(v *Rational) (bool, error) {
+	c, e := s.Compare(v)
+	if e != nil {
+		return false, e
+	}
+	return c <= 0, nil
+}
 func (s *ScopedRational) GreaterEqual(v *Rational) (bool, error) {
 	c, e := s.Compare(v)
-	return c >= 0, e
+	if e != nil {
+		return false, e
+	}
+	return c >= 0, nil
 }
 func (s *ScopedInt) sign() (int32, error) {
 	if _, e := s.Get(); e != nil {
