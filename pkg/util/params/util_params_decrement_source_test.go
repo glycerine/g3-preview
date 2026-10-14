@@ -16,6 +16,10 @@ import (
 // Public reallocs reach the source LP64 signed-overflow guarded domain. They
 // do not simulate OOM, mutate private counters, or inject a deallocation error.
 func paramsDecTLSNearMinimum(t *testing.T, r *umemory.Runtime) {
+	paramsDecTLSNearMinimumWithHeadroom(t, r, 1000)
+}
+
+func paramsDecTLSNearMinimumWithHeadroom(t *testing.T, r *umemory.Runtime, headroom int64) {
 	t.Helper()
 	a, e := r.Allocate(8)
 	paramsMust(t, e)
@@ -30,12 +34,12 @@ func paramsDecTLSNearMinimum(t *testing.T, r *umemory.Runtime) {
 	if s.LocalSize != 0 || s.GlobalSize >= 0 {
 		t.Fatal("first actual synchronization", s)
 	}
-	delta = math.MinInt64 + 1000 - s.GlobalSize + 16
+	delta = math.MinInt64 + headroom - s.GlobalSize + 16
 	if e = r.Reallocate(&b, uint64(delta)+16-8); !errors.Is(e, arena.ErrBounds) {
 		t.Fatal(e)
 	}
 	paramsMust(t, r.Deallocate(&b))
-	if s = r.State(); s.LocalSize != 0 || s.GlobalSize != math.MinInt64+1000 {
+	if s = r.State(); s.LocalSize != 0 || s.GlobalSize != math.MinInt64+headroom {
 		t.Fatal("actual source TLS lane", s)
 	}
 }

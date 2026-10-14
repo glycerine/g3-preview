@@ -140,13 +140,13 @@ func TestParamsReferenceResetOwnContinuationMatchesKindAndInvocation(t *testing.
 	prefix, e := sy.Intern("completed-prefix")
 	paramsMust(t, e)
 	paramsMust(t, c.SetUInt(&v, prefix, 42))
-	smallKey, e := sy.Intern("completed-small-numeral")
+	firstKey, e := sy.Intern("completed-large-numeral")
 	paramsMust(t, e)
-	small, e := q.NewValue()
+	first, e := q.NewValue()
 	paramsMust(t, e)
-	paramsMust(t, q.SetInt64(&small, 7))
-	paramsMust(t, c.SetRat(&v, smallKey, &small))
-	paramsMust(t, q.Del(&small))
+	paramsMust(t, q.Copy(&first, &big))
+	paramsMust(t, c.SetRat(&v, firstKey, &first))
+	paramsMust(t, q.Del(&first))
 	paramsMust(t, c.SetRat(&v, k, &big))
 	paramsMust(t, q.Del(&big))
 	block := &c.Blocks[v.Slot-1]
@@ -161,8 +161,10 @@ func TestParamsReferenceResetOwnContinuationMatchesKindAndInvocation(t *testing.
 	beforeSize, beforeRefs := block.Size, block.Refs
 	extras := numericPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &v}, {c, &alias}}}
 	before := numericAuditPhysical(t, m, extras)
-	paramsDecTLSNearMinimum(t, r)
-	bn.FailAfter(0)
+	// Between one and two 32768-limb physical releases: the first completes,
+	// then the second stops after its physical free during counter publication.
+	paramsDecTLSNearMinimumWithHeadroom(t, r, 250000)
+	bn.FailAfter(-1)
 	bc.FailAfter(0)
 	var receipt ParamsResetReceipt
 	e = c.ResetTracked(&v, &receipt)
@@ -170,8 +172,8 @@ func TestParamsReferenceResetOwnContinuationMatchesKindAndInvocation(t *testing.
 		t.Fatal("actual later numeral release stop", e)
 	}
 	after := numericAuditPhysical(t, m, extras)
-	if after.Named != before.Named || after.Objects+1 != before.Objects {
-		t.Fatal(before, after)
+	if after.Named+1 != before.Named || after.Objects+2 != before.Objects {
+		t.Fatal("completed first numeral and stopped second numeral physical prefixes", before, after, "cursor", c.Blocks[v.Slot-1].resetCursor)
 	}
 	paramsDecAuditColdGraph(t, q, m, r, bn, c, bc, sy, bs)
 	if block.Refs != beforeRefs || block.Size != beforeSize || v != alias {
