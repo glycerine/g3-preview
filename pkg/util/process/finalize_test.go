@@ -21,6 +21,30 @@ func must(t *testing.T, err error) {
 	}
 }
 
+func TestGeneratedFinalizeInvalidOwnersLeaveProcessReady(t *testing.T) {
+	b := arena.NewBudget(1 << 16)
+	p := memory.NewProcessAccounting()
+	m, err := memory.NewRuntime(memory.RuntimeConfig{Budget: b, Process: p})
+	must(t, err)
+	first, err := m.BeginSourceInitialize(math.MaxUint32)
+	if err != nil || !first {
+		t.Fatal("begin source initialization", first, err)
+	}
+	must(t, m.CompleteSourceInitialize())
+	if err := FinalizeGenerated(p, nil, nil, nil, nil, nil); !errors.Is(err, arena.ErrConfig) {
+		t.Fatal("missing generated owner", err)
+	}
+	active, err := p.BeginFinalize()
+	if err != nil || !active {
+		t.Fatal("invalid call consumed source finalization guard", active, err)
+	}
+	must(t, p.CompleteFinalize())
+	must(t, m.Close())
+	if b.Used() != 0 {
+		t.Fatal("retained budget", b.Used())
+	}
+}
+
 func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 	b := arena.NewBudget(1 << 28)
 	p := memory.NewProcessAccounting()

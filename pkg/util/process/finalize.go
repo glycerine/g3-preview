@@ -20,12 +20,16 @@ func FinalizeGenerated(p *memory.ProcessAccounting, d *diagnostic.DebugContext, 
 	if p == nil || !p.Valid() {
 		return arena.ErrConfig
 	}
-	active, err := p.BeginFinalize()
-	if err != nil || !active {
+	if !p.InitializationStarted() {
+		_, err := p.BeginFinalize()
 		return err
 	}
 	if d == nil || g == nil || r == nil || s == nil || tr == nil {
 		return arena.ErrConfig
+	}
+	active, err := p.BeginFinalize()
+	if err != nil || !active {
+		return err
 	}
 	if err = d.FinalizeDebug(); err != nil {
 		return err
