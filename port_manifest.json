@@ -149074,8 +149074,8 @@
           ]
         },
         {
-          "name": "Concrete little-endian initialized uint32 byte-view adapter and guarded real rounded object extent",
-          "status": "partial",
+          "name": "Selected little-endian initialized uint32 byte views and guarded rounded physical object extent",
+          "status": "ported",
           "go_target": "pkg/util/memory/uint32_codec.go",
           "tests": [
             "TestMemoryUint32CodecActualBackingAndInitializedBytes",
@@ -149100,8 +149100,8 @@
           ]
         },
         {
-          "name": "Actual size_t32 parameter conversion before allocation/reallocation header addition and source max-size/max-count/watermark setters; LP64 order preserved",
-          "status": "partial",
+          "name": "Actual size_t32 entry conversion before allocation/reallocation header addition and max-size/max-count/watermark setters, with LP64 order preserved",
+          "status": "ported",
           "go_target": "pkg/util/memory/runtime.go",
           "tests": [
             "TestMemoryRuntimeActualSizeT32AllocateReallocateEntry",
@@ -149534,8 +149534,8 @@
           ]
         },
         {
-          "name": "Actual size_t32 parameter conversion before allocation/reallocation header addition and source max-size/max-count/watermark setters; LP64 order preserved",
-          "status": "partial",
+          "name": "Actual size_t32 entry conversion before allocation/reallocation header addition and max-size/max-count/watermark setters, with LP64 order preserved",
+          "status": "ported",
           "go_target": "pkg/util/memory/runtime.go",
           "tests": [
             "TestMemoryRuntimeActualSizeT32AllocateReallocateEntry",
