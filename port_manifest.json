@@ -178939,6 +178939,12 @@
           "status": "ported",
           "go_target": "pkg/shell/input_file_option.go",
           "tests": ["TestShellInputFileSourceBranches", "TestShellInputFileWarningRefusalPreservesSelection"]
+        },
+        {
+          "name": "ufbv_rewriter.cpp:662 proof-enabled PRE_DEMODULATOR warning_msg literal caller and unchanged formula/proof return",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_process.go",
+          "tests": ["TestUFBVRewriterTacticProofModePreservesFormulaAndProof"]
         }
       ],
       "ownership": [
@@ -179053,6 +179059,12 @@
           "status": "ported",
           "go_target": "pkg/shell/input_file_option.go",
           "tests": ["TestShellInputFileSourceBranches", "TestShellInputFileWarningRefusalPreservesSelection"]
+        },
+        {
+          "name": "ufbv_rewriter.cpp:662 proof-enabled PRE_DEMODULATOR warning_msg literal caller and unchanged formula/proof return",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_process.go",
+          "tests": ["TestUFBVRewriterTacticProofModePreservesFormulaAndProof"]
         }
       ],
       "ownership": [
