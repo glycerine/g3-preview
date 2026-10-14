@@ -156976,8 +156976,8 @@
           "name": "set(char const*) outer and suffix scoped mpz temporary source deletion and owning continuation (mpq.cpp:188-255)",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpq_parse.go",
-          "go_targets": ["pkg/util/numeral/mpq_parse_scope_test.go"],
-          "tests": ["TestRationalParserIntegerScopesRetainSuffixBeforeOuterCleanup"]
+          "go_targets": ["pkg/util/numeral/mpq_parse_scope_test.go", "pkg/util/numeral/mpq_parse_scope_runtime_test.go"],
+          "tests": ["TestRationalParserIntegerScopesRetainSuffixBeforeOuterCleanup", "TestRationalParserActualOuterScopedDeletionRefusal"]
         },
         {
           "name": "set(char const*) complete permissive byte/text parser",
@@ -158135,8 +158135,8 @@
           "name": "set(char const*) outer and suffix scoped mpz temporary source deletion and owning continuation (mpq.cpp:188-255)",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpq_parse.go",
-          "go_targets": ["pkg/util/numeral/mpq_parse_scope_test.go"],
-          "tests": ["TestRationalParserIntegerScopesRetainSuffixBeforeOuterCleanup"]
+          "go_targets": ["pkg/util/numeral/mpq_parse_scope_test.go", "pkg/util/numeral/mpq_parse_scope_runtime_test.go"],
+          "tests": ["TestRationalParserIntegerScopesRetainSuffixBeforeOuterCleanup", "TestRationalParserActualOuterScopedDeletionRefusal"]
         },
         {
           "name": "set(char const*) complete permissive byte/text parser",
