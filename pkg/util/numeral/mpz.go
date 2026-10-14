@@ -86,6 +86,8 @@ type IntegerManager struct {
 	rootGeneration                         uint64
 	PerfectSquare                          integerPerfectSquareScope
 	PerfectSquareGeneration                uint64
+	LCMTemporary                           Int
+	LCMPending                             bool
 	RawDisplay                             rawDisplayScope
 	Smt2Display                            smt2DisplayScope
 	closed                                 bool
@@ -592,6 +594,9 @@ func (m *IntegerManager) CloseChecked() error {
 		}
 	}
 	if e := m.CleanupGCDRaw(); e != nil {
+		return fail(e)
+	}
+	if e := m.CleanupLCMTemporary(); e != nil {
 		return fail(e)
 	}
 	if e := m.CleanupAddMulRaw(); e != nil {

@@ -22,6 +22,9 @@ func (m *IntegerManager) SourceFinalize() error {
 	if m.closed || m.SourceFinalized {
 		return nil
 	}
+	if m.LCMPending {
+		return ErrIntegerLCMPending
+	}
 	if m.Smt2Display.active {
 		return ErrSMT2DisplayPending
 	}

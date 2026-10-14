@@ -58,6 +58,9 @@ func integerPhysicalAuditWithRaw(t *testing.T, m *IntegerManager, external []ume
 		add(m.stringSet.tmp.Cell)
 	}
 	add(m.PowerRaw.Value.Cell)
+	if m.LCMPending {
+		add(m.LCMTemporary.Cell)
+	}
 	for i := range m.RootRaw.Values {
 		add(m.RootRaw.Values[i].Cell)
 	}

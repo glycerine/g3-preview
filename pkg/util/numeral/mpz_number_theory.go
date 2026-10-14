@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 var errExtendedGCDInvariant = errors.New("mpnum: source extended gcd Bezout assertion failed")
@@ -178,7 +179,13 @@ func (m *IntegerManager) extendedGCDWithAllocationContext(r1, r2, a, b, g *Int, 
 }
 
 // LCM follows the signed source shortcuts; it is not canonical abs(a*b)/gcd.
-func (m *IntegerManager) LCM(a, b, c *Int) error {
+func (m *IntegerManager) LCM(a, b, c *Int) (err error) {
+	if m == nil || m.self != m {
+		return umemory.ErrRuntimeOwner
+	}
+	if m.LCMPending {
+		return ErrIntegerLCMPending
+	}
 	for _, v := range []*Int{a, b, c} {
 		if e := m.check(v); e != nil {
 			return e
@@ -209,13 +216,19 @@ func (m *IntegerManager) LCM(a, b, c *Int) error {
 		m.traceLCM(a, b, c, nil, 2, 992)
 		return nil
 	}
-	var r Int
-	defer m.Del(&r)
-	if e = m.GCD(a, b, &r); e != nil {
+	m.LCMTemporary = Int{}
+	m.LCMPending = true
+	defer func() {
+		if err == nil {
+			err = m.finishLCMSource()
+		}
+	}()
+	r := &m.LCMTemporary
+	if e = m.GCD(a, b, r); e != nil {
 		return e
 	}
-	m.traceLCM(a, b, c, &r, 0, 997)
-	cmp, e = m.Compare(&r, a)
+	m.traceLCM(a, b, c, r, 0, 997)
+	cmp, e = m.Compare(r, a)
 	if e != nil {
 		return e
 	}
@@ -226,7 +239,7 @@ func (m *IntegerManager) LCM(a, b, c *Int) error {
 		m.traceLCM(a, b, c, nil, 3, 1000)
 		return nil
 	}
-	cmp, e = m.Compare(&r, b)
+	cmp, e = m.Compare(r, b)
 	if e != nil {
 		return e
 	}
@@ -237,10 +250,10 @@ func (m *IntegerManager) LCM(a, b, c *Int) error {
 		m.traceLCM(a, b, c, nil, 4, 1004)
 		return nil
 	}
-	if e = m.MachineDiv(a, &r, &r); e != nil {
+	if e = m.MachineDiv(a, r, r); e != nil {
 		return e
 	}
-	if e = m.Mul(&r, b, c); e != nil {
+	if e = m.Mul(r, b, c); e != nil {
 		return e
 	}
 	m.traceLCM(a, b, c, nil, 5, 1011)
