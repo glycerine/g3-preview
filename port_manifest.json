@@ -160551,6 +160551,7 @@
           "tests": [
             "TestIntegerSourceShiftTable",
             "TestIntegerPowerAndShiftIndependent",
+            "TestIntegerPowerBigCellSmallValueGeneralLoop",
             "TestSourceShiftDefectAndPowerDomains",
             "TestPowerShiftFailureCleanup",
             "TestPowerShiftWarmStorageAndLifetime",
@@ -162635,6 +162636,7 @@
           "tests": [
             "TestIntegerSourceShiftTable",
             "TestIntegerPowerAndShiftIndependent",
+            "TestIntegerPowerBigCellSmallValueGeneralLoop",
             "TestSourceShiftDefectAndPowerDomains",
             "TestPowerShiftFailureCleanup",
             "TestPowerShiftWarmStorageAndLifetime",

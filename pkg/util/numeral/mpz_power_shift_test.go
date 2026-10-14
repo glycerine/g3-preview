@@ -82,6 +82,45 @@ func TestIntegerIsPowerOfTwoMultiLimbSourceBranches(t *testing.T) {
 	}
 }
 
+func TestIntegerPowerBigCellSmallValueGeneralLoop(t *testing.T) {
+	for _, tc := range []struct {
+		base int32
+		p    uint32
+	}{
+		{2, 0}, {2, 1}, {2, 5}, {2, 31},
+		{-1, 0}, {-1, 1}, {-1, 8},
+	} {
+		for _, alias := range []bool{false, true} {
+			m, _ := integerManager(t)
+			a, out := NewInt(tc.base), NewInt(37)
+			if e := m.EnsureOwnedCapacity(&a, 6); e != nil {
+				t.Fatal(e)
+			}
+			if a.IsSmall() {
+				t.Fatal("expected retained big-cell representation")
+			}
+			dst := &out
+			if alias {
+				dst = &a
+			}
+			if e := m.Power(&a, tc.p, dst); e != nil {
+				t.Fatal(tc, alias, e)
+			}
+			want := new(big.Int).Exp(big.NewInt(int64(tc.base)), new(big.Int).SetUint64(uint64(tc.p)), nil)
+			assertIntegerPowerOracle(t, m, dst, want)
+			if !alias {
+				assertIntegerPowerOracle(t, m, &a, big.NewInt(int64(tc.base)))
+			}
+			if e := m.Del(&a); e != nil {
+				t.Fatal(e)
+			}
+			if e := m.Del(&out); e != nil {
+				t.Fatal(e)
+			}
+		}
+	}
+}
+
 func TestIntegerSourceShiftTable(t *testing.T) {
 	fixtures := []struct {
 		mul bool
