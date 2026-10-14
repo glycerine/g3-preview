@@ -20,7 +20,8 @@ func (v *RationalInterval) DivScalar(src *RationalInterval, k *numeral.Rational)
 }
 
 func (v *RationalInterval) divMulScalar(k *numeral.Rational, src *RationalInterval, inverse bool) (err error) {
-	if err = v.pair(src); err != nil {
+	slo, shi, err := v.pairView(src)
+	if err != nil {
 		return err
 	}
 	m := v.numbers
@@ -45,7 +46,7 @@ func (v *RationalInterval) divMulScalar(k *numeral.Rational, src *RationalInterv
 		defer func() { err = errors.Join(err, m.Del(factor)) }()
 	}
 	e := interval.RationalExtended{Numbers: m}
-	lowerValue, upperValue := &src.lower, &src.upper
+	lowerValue, upperValue := slo, shi
 	lowerKind, upperKind := src.lowerKind(), src.upperKind()
 	lowerOpen, upperOpen := src.lowerOpen, src.upperOpen
 	if !positive {

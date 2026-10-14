@@ -52090,11 +52090,12 @@
           ]
         },
         {
-          "name": "Concrete config_mpq scalar interval multiply/divide, zero reset, negative endpoint reversal, exact reciprocal, infinity and alias branches (src/math/interval/interval_def.h:839-925)",
+          "name": "Concrete config_mpq scalar interval multiply/divide with live borrowed operands, zero reset, negative endpoint reversal, exact reciprocal, infinity and alias branches (src/math/interval/interval_def.h:839-925)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_interval_scalar.go",
           "tests": [
-            "TestSubpavingRationalIntervalScalarSourceBranches"
+            "TestSubpavingRationalIntervalScalarSourceBranches",
+            "TestRationalIntervalLiveNodeBoundsAndOwnedCopy"
           ]
         },
         {

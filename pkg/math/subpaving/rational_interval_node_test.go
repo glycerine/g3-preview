@@ -123,6 +123,31 @@ func TestRationalIntervalLiveNodeBoundsAndOwnedCopy(t *testing.T) {
 	if shown.String() != "(-7/2, 2)" {
 		t.Fatal("subtracted live view", shown.String())
 	}
+	must(result.MulScalar(&hi, view))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "(0, 4]" {
+		t.Fatal("scaled live view", shown.String())
+	}
+	must(result.DivScalar(view, &hi))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "(0, 1]" {
+		t.Fatal("divided live view", shown.String())
+	}
+	must(m.SetInt32(&lo, -2))
+	must(result.MulScalar(&lo, view))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "[-4, 0)" {
+		t.Fatal("negative scaled live view", shown.String())
+	}
+	must(result.DivScalar(view, &lo))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "[-1, 0)" {
+		t.Fatal("negative divided live view", shown.String())
+	}
 	if err := view.Neg(owned); !errors.Is(err, arena.ErrInvalidSlot) {
 		t.Fatalf("borrowed result mutation: %v", err)
 	}
@@ -146,6 +171,7 @@ func TestRationalIntervalLiveNodeBoundsAndOwnedCopy(t *testing.T) {
 	must(childView.Close())
 	must(child.Close())
 	must(view.SetMutable())
+	must(m.SetInt32(&lo, 0))
 	must(view.SetFinite(&lo, &hi, false, false))
 	if err := root.Close(); err != nil {
 		t.Fatal(err)
