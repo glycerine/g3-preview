@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestRationalSourcePrevPowerOfTwo(t *testing.T) {
@@ -64,6 +65,54 @@ func TestRationalPrevPowerOfTwoRetainedTemporaryOwningCleanup(t *testing.T) {
 	serviceMust(t, m.CloseChecked())
 	if !m.closed || m.prevPowerPending {
 		t.Fatal("manager close must finish retained scoped integer first")
+	}
+}
+
+func TestRationalPrevPowerOfTwoActualScopedDeletionRefusal(t *testing.T) {
+	budget := arena.NewBudget(1 << 26)
+	runtime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
+	serviceMust(t, e)
+	m, e := NewRationalManager(RationalConfig{Synchronized: true, Integers: IntegerConfig{
+		Memory: runtime, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true},
+		Cells: arena.Config{Budget: budget, PageSize: 1},
+		Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}},
+	}})
+	serviceMust(t, e)
+	a := NewRational()
+	digits := make([]uint32, 70)
+	digits[0], digits[69] = 1, 1
+	serviceMust(t, m.Z.SetLimbs(&a.Num, digits))
+	contextTLSNearMinimum(t, runtime)
+	lane, e := runtime.Allocate(8)
+	serviceMust(t, e)
+	delta := int64(-100001) - runtime.State().LocalSize
+	if e = runtime.Reallocate(&lane, uint64(16)+uint64(delta)-8); !errors.Is(e, arena.ErrBounds) {
+		t.Fatal("set actual TLS deallocation boundary", e)
+	}
+	value, e := m.PrevPowerOfTwo(&a)
+	if !errors.Is(e, arena.ErrBounds) || value != 69*32 || !m.prevPowerPending || m.prevPowerTemporary.Cell == 0 || !ValidNumericRef(m.Z.Cells, m.prevPowerTemporary.Cell) {
+		t.Fatal("actual scoped integer deletion did not stop", value, e, m.prevPowerPending, m.prevPowerTemporary, runtime.State())
+	}
+	if e = m.SourceFinalize(); !errors.Is(e, ErrRationalLexicalPending) {
+		t.Fatal("source finalization discarded stopped local", e)
+	}
+	recovery, e := runtime.Allocate(200000)
+	serviceMust(t, e)
+	serviceMust(t, m.CleanupPrevPowerOfTwo())
+	serviceMust(t, m.Del(&a))
+	serviceMust(t, runtime.Deallocate(&lane))
+	state := runtime.State()
+	delta = int64(-500000) - state.GlobalSize - state.LocalSize
+	if e = runtime.Reallocate(&recovery, uint64(200000)+uint64(delta)); e == nil || runtime.State().GlobalSize != -500000 || runtime.State().LocalSize != 0 {
+		t.Fatal("restore TLS accounting range before owner teardown", e, runtime.State())
+	}
+	if e = runtime.Deallocate(&recovery); e != nil {
+		t.Fatal("recovery release", e, runtime.State(), runtime.Stats())
+	}
+	serviceMust(t, m.CloseChecked())
+	serviceMust(t, runtime.Close())
+	if budget.Used() != 0 {
+		t.Fatal("actual scoped deletion leaked ownership", budget.Used())
 	}
 }
 

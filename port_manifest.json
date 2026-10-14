@@ -157156,7 +157156,8 @@
             "TestRoundPublicationRawShapesAndAllComponentAliases",
             "TestRationalRoundFailureCleanup",
             "TestRationalSourcePrevPowerOfTwo",
-            "TestRationalPrevPowerOfTwoRetainedTemporaryOwningCleanup"
+            "TestRationalPrevPowerOfTwoRetainedTemporaryOwningCleanup",
+            "TestRationalPrevPowerOfTwoActualScopedDeletionRefusal"
           ]
         },
         {
@@ -158706,7 +158707,8 @@
             "TestRoundPublicationRawShapesAndAllComponentAliases",
             "TestRationalRoundFailureCleanup",
             "TestRationalSourcePrevPowerOfTwo",
-            "TestRationalPrevPowerOfTwoRetainedTemporaryOwningCleanup"
+            "TestRationalPrevPowerOfTwoRetainedTemporaryOwningCleanup",
+            "TestRationalPrevPowerOfTwoActualScopedDeletionRefusal"
           ]
         },
         {
