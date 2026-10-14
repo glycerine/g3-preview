@@ -52119,17 +52119,21 @@
           ]
         },
         {
-          "name": "Concrete config_mpq inequality threshold ownership, unit retention, axiom marking, resumable root assertion, and checkpointed bound queue publication/drain (src/math/subpaving/subpaving_t_def.h:575-587,773-784,865-875,1741-1752,1773-1803); watched clause/definition dispatch and search remain open",
+          "name": "Concrete config_mpq inequality threshold ownership, unit retention, axiom marking, stable multi-atom clauses, exact three-valued inequality truth, distinct-variable watches, justified conflict-first clause propagation, and checkpointed bound queue dispatch (src/math/subpaving/subpaving_t_def.h:575-587,773-875,1345-1419,1695-1752,1773-1803); definition propagation and search remain open",
           "status": "partial",
           "go_target": "pkg/math/subpaving/rational_context_units.go",
           "go_targets": [
             "pkg/math/subpaving/rational_context_root.go",
             "pkg/math/subpaving/rational_node.go",
-            "pkg/math/subpaving/rational_context_propagate.go"
+            "pkg/math/subpaving/rational_context_propagate.go",
+            "pkg/math/subpaving/rational_clause.go"
           ],
           "tests": [
             "TestRationalContextRootUnitCheckpointConflictAndOwnership",
-            "TestRationalContextQueuedBoundCheckpointResume"
+            "TestRationalContextQueuedBoundCheckpointResume",
+            "TestRationalClauseExactTruthAndRegistration",
+            "TestRationalClauseQueuedWatchCancellationAndConflict",
+            "TestRationalClauseAllFalseFirstAtomConflict"
           ]
         },
         {

@@ -11,29 +11,32 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
-// RationalContext owns the reached config_mpq variable and node-bound prefix.
-// Constraint registration, propagation and search are still separate work.
+// RationalContext owns the reached config_mpq variables, bounds and clauses.
+// Definition propagation and search are still separate work.
 type RationalContext struct {
-	self         *RationalContext
-	numbers      *numeral.RationalManager
-	limit        *control.Reslimit
-	runtime      *memory.Runtime
-	process      *memory.ProcessAccounting
-	maxMemory    uint64
-	variables    []bool
-	inequalities []*RationalInequality
-	unitClauses  []rationalUnitClause
-	unitHead     int
-	queue        []*RationalBound
-	queueHead    int
-	root         *RationalNode
-	nodes        []*RationalNode
-	leafHead     *RationalNode
-	leafTail     *RationalNode
-	numBounds    uint64
-	numConflicts uint64
-	timestamp    uint64
-	closed       bool
+	self           *RationalContext
+	numbers        *numeral.RationalManager
+	limit          *control.Reslimit
+	runtime        *memory.Runtime
+	process        *memory.ProcessAccounting
+	maxMemory      uint64
+	variables      []bool
+	inequalities   []*RationalInequality
+	unitClauses    []rationalUnitClause
+	unitHead       int
+	clauses        []*RationalClause
+	clauseWatchers [][]*RationalClause
+	numVisited     uint64
+	queue          []*RationalBound
+	queueHead      int
+	root           *RationalNode
+	nodes          []*RationalNode
+	leafHead       *RationalNode
+	leafTail       *RationalNode
+	numBounds      uint64
+	numConflicts   uint64
+	timestamp      uint64
+	closed         bool
 }
 
 func NewRationalContext(m *numeral.RationalManager, limit *control.Reslimit) (*RationalContext, error) {
@@ -67,6 +70,7 @@ func (c *RationalContext) NewVariable(integer bool) (uint32, error) {
 	}
 	x := uint32(len(c.variables))
 	c.variables = append(c.variables, integer)
+	c.clauseWatchers = append(c.clauseWatchers, nil)
 	return x, nil
 }
 
@@ -111,10 +115,10 @@ func (c *RationalContext) NewChild(parent *RationalNode) (*RationalNode, error) 
 // PublishBound follows mk_bound's exact rational integer normalization before
 // publishing the endpoint to this node's copied bound view.
 func (c *RationalContext) PublishBound(n *RationalNode, variable uint32, value *numeral.Rational, lower, open bool) (err error) {
-	return c.publishBoundReason(n, variable, value, lower, open, false)
+	return c.publishBoundReason(n, variable, value, lower, open, false, nil)
 }
 
-func (c *RationalContext) publishBoundReason(n *RationalNode, variable uint32, value *numeral.Rational, lower, open, axiom bool) (err error) {
+func (c *RationalContext) publishBoundReason(n *RationalNode, variable uint32, value *numeral.Rational, lower, open, axiom bool, reason *RationalClause) (err error) {
 	if err = c.open(); err != nil {
 		return err
 	}
@@ -132,7 +136,7 @@ func (c *RationalContext) publishBoundReason(n *RationalNode, variable uint32, v
 	}
 	c.numBounds++
 	if !c.variables[variable] {
-		return c.publishNormalized(n, variable, value, lower, open, axiom)
+		return c.publishNormalized(n, variable, value, lower, open, axiom, reason)
 	}
 	adjusted := numeral.NewRational()
 	defer func() { err = errors.Join(err, c.numbers.Del(&adjusted)) }()
@@ -162,13 +166,14 @@ func (c *RationalContext) publishBoundReason(n *RationalNode, variable uint32, v
 			return err
 		}
 	}
-	return c.publishNormalized(n, variable, &adjusted, lower, open, axiom)
+	return c.publishNormalized(n, variable, &adjusted, lower, open, axiom, reason)
 }
 
-func (c *RationalContext) publishNormalized(n *RationalNode, variable uint32, value *numeral.Rational, lower, open, axiom bool) error {
+func (c *RationalContext) publishNormalized(n *RationalNode, variable uint32, value *numeral.Rational, lower, open, axiom bool, reason *RationalClause) error {
 	if err := n.pushBoundAt(variable, value, lower, open, c.timestamp, axiom); err != nil {
 		return err
 	}
+	n.trail.reasonClause = reason
 	conflict, err := n.ConflictingBounds(variable)
 	if err != nil {
 		return err
@@ -197,6 +202,25 @@ func (c *RationalContext) Close() error {
 			return err
 		}
 	}
+	for len(c.unitClauses) != 0 {
+		a := c.unitClauses[0].atom
+		if a.refs == 0 {
+			return arena.ErrInvalidSlot
+		}
+		a.refs--
+		c.unitClauses = c.unitClauses[1:]
+	}
+	for len(c.clauses) != 0 {
+		clause := c.clauses[0]
+		for _, a := range clause.atoms {
+			if a.refs == 0 {
+				return arena.ErrInvalidSlot
+			}
+			a.refs--
+		}
+		c.clauses[0] = nil
+		c.clauses = c.clauses[1:]
+	}
 	for i := len(c.inequalities) - 1; i >= 0; i-- {
 		if !c.inequalities[i].closed {
 			if err := c.numbers.Del(&c.inequalities[i].value); err != nil {
@@ -207,7 +231,7 @@ func (c *RationalContext) Close() error {
 	}
 	c.nodes, c.root, c.variables = nil, nil, nil
 	c.leafHead, c.leafTail = nil, nil
-	c.inequalities, c.unitClauses = nil, nil
+	c.inequalities, c.unitClauses, c.clauses, c.clauseWatchers = nil, nil, nil, nil
 	c.queue, c.queueHead = nil, 0
 	c.closed = true
 	return nil

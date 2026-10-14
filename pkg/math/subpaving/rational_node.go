@@ -11,13 +11,14 @@ import (
 
 // RationalBound owns one exact endpoint. Child nodes borrow ancestor bounds.
 type RationalBound struct {
-	value     numeral.Rational
-	variable  uint32
-	lower     bool
-	open      bool
-	timestamp uint64
-	previous  *RationalBound
-	axiom     bool
+	value        numeral.Rational
+	variable     uint32
+	lower        bool
+	open         bool
+	timestamp    uint64
+	previous     *RationalBound
+	axiom        bool
+	reasonClause *RationalClause
 }
 
 // RationalNode owns bounds it publishes and copies its parent's bound views.

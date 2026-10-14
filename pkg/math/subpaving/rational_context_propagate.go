@@ -1,5 +1,5 @@
 // Source: src/math/subpaving/subpaving_t_def.h:575-587,1741-1752,
-// concrete config_mpq bound queue before watched constraints are registered.
+// concrete config_mpq bound queue and watched-clause dispatch.
 package subpaving
 
 import (
@@ -10,7 +10,7 @@ import (
 
 // PropagateQueued processes the exact bound queue prefix. A canceled
 // checkpoint leaves the next bound queued; a conflict clears the suffix.
-// Watched clauses and definitions will dispatch at this boundary.
+// Definitions will also dispatch at this boundary when registered.
 func (c *RationalContext) PropagateQueued(n *RationalNode) error {
 	if err := c.open(); err != nil {
 		return err
@@ -37,6 +37,16 @@ func (c *RationalContext) PropagateQueued(n *RationalNode) error {
 			return arena.ErrInvalidSlot
 		}
 		c.queueHead++
+		for _, clause := range c.clauseWatchers[b.variable] {
+			if n.conflictVar != math.MaxUint32 {
+				break
+			}
+			if b.timestamp >= clause.visited {
+				if err := c.PropagateClause(clause, n); err != nil {
+					return err
+				}
+			}
+		}
 	}
 	c.queue, c.queueHead = nil, 0
 	return nil
