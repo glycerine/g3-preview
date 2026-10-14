@@ -165818,30 +165818,25 @@
           ]
         },
         {
-          "name": "shared reset and validation module mutation, duplicate/key-kind scan and exact exception text",
+          "name": "params::validate populated ordered scan, module key mutation, asymmetric numeral kind allowance and exact diagnostic text",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsValidationNumeralKindAsymmetryAndEarlierKeyRewrite",
+            "TestParamsReferenceValidationSharedPrefixAndDuplicates",
+            "TestParamsReferenceValidationUnknownExactOrdering",
+            "TestParamsValidationLegalListMissingDescriptionSourceGuard"
+          ]
+        },
+        {
+          "name": "shared reset and reset-key source lifetime/ownership continuation",
           "status": "partial",
           "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
-            "TestParamsAllocatedEmptyBackingSkipsKeyInspection",
-            "TestParamsReferenceSourceCopyMergeAndSignedRat",
-            "TestParamsReferenceNameReadsNeverIntern",
-            "TestParamsReferenceValidationSharedPrefixAndDuplicates",
-            "TestParamsReferenceExactDisplayAndKinds",
-            "TestParamsReferenceNumericalSymbolValueBareString",
-            "TestParamsReferenceNullableStreamAndDisplayName",
-            "TestParamsReferenceFallbackAllKinds",
-            "TestParamsReferenceNullBackingSkipsKeyRead",
-            "TestParamsReferenceValidationUnknownExactOrdering",
-            "TestParamsReferenceSourceGrowthAndFailurePrefixes",
-            "TestParamsReferenceReservationFailureSweeps",
-            "TestParamsReferenceConstructorFaultAndRecordShape",
-            "TestParamsReferenceWarmOperationsAndGeneration",
-            "TestParamsReferenceSelfCopySourceRatIdentity",
-            "TestParamsReferenceExactContextAccountingAndGrowthPeak",
-            "TestParamsReferenceFiniteSignedRatAndNullDefaults",
-            "TestParamsReferenceProvenanceBeforeMutation",
-            "TestParamsReferenceCStringPrefix"
+            "TestParamsReferenceResetRetainsCompletedInlinePrefixAtActualLeafStop",
+            "TestParamsReferenceResetKeyMatchedOwnShiftAndForeignStop",
+            "TestParamsReferenceResetKeyFiniteAscendingShiftAndNoReservation"
           ]
         },
         {
@@ -166434,30 +166429,25 @@
           ]
         },
         {
-          "name": "shared reset and validation module mutation, duplicate/key-kind scan and exact exception text",
+          "name": "params::validate populated ordered scan, module key mutation, asymmetric numeral kind allowance and exact diagnostic text",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsValidationNumeralKindAsymmetryAndEarlierKeyRewrite",
+            "TestParamsReferenceValidationSharedPrefixAndDuplicates",
+            "TestParamsReferenceValidationUnknownExactOrdering",
+            "TestParamsValidationLegalListMissingDescriptionSourceGuard"
+          ]
+        },
+        {
+          "name": "shared reset and reset-key source lifetime/ownership continuation",
           "status": "partial",
           "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceSharingAndReset",
-            "TestParamsAllocatedEmptyBackingSkipsKeyInspection",
-            "TestParamsReferenceSourceCopyMergeAndSignedRat",
-            "TestParamsReferenceNameReadsNeverIntern",
-            "TestParamsReferenceValidationSharedPrefixAndDuplicates",
-            "TestParamsReferenceExactDisplayAndKinds",
-            "TestParamsReferenceNumericalSymbolValueBareString",
-            "TestParamsReferenceNullableStreamAndDisplayName",
-            "TestParamsReferenceFallbackAllKinds",
-            "TestParamsReferenceNullBackingSkipsKeyRead",
-            "TestParamsReferenceValidationUnknownExactOrdering",
-            "TestParamsReferenceSourceGrowthAndFailurePrefixes",
-            "TestParamsReferenceReservationFailureSweeps",
-            "TestParamsReferenceConstructorFaultAndRecordShape",
-            "TestParamsReferenceWarmOperationsAndGeneration",
-            "TestParamsReferenceSelfCopySourceRatIdentity",
-            "TestParamsReferenceExactContextAccountingAndGrowthPeak",
-            "TestParamsReferenceFiniteSignedRatAndNullDefaults",
-            "TestParamsReferenceProvenanceBeforeMutation",
-            "TestParamsReferenceCStringPrefix"
+            "TestParamsReferenceResetRetainsCompletedInlinePrefixAtActualLeafStop",
+            "TestParamsReferenceResetKeyMatchedOwnShiftAndForeignStop",
+            "TestParamsReferenceResetKeyFiniteAscendingShiftAndNoReservation"
           ]
         },
         {
