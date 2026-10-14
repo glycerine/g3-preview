@@ -148,4 +148,22 @@ func TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier(t *testing.T) {
 		t.Fatal("quantifier body rewrite and unused declaration removal", n, body, x)
 	}
 	cacheMust(t, m.DelRef(&out))
+	if len(loop.newExprs) != 2 {
+		t.Fatal("source quantifier intermediates", len(loop.newExprs))
+	}
+	retained := append([]ast.ASTRef(nil), loop.newExprs...)
+	out, e = loop.rewrite(index, boolean, root)
+	cacheMust(t, e)
+	cacheMust(t, m.DelRef(&out))
+	for _, ref := range retained {
+		if _, e := m.RefGet(ref); e != nil {
+			t.Fatal("source member buffer lost a quantifier across calls", e)
+		}
+	}
+	cacheMust(t, loop.close())
+	for _, ref := range retained {
+		if _, e := m.RefGet(ref); e == nil {
+			t.Fatal("source member buffer retained a quantifier after close")
+		}
+	}
 }

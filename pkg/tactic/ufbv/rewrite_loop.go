@@ -28,8 +28,8 @@ func (r *rewriteTraversal) rewrite(index *rewriteRuleIndex, boolean *rewriter.Bo
 	if e := r.cache.reset(); e != nil {
 		return ast.ASTRef{}, e
 	}
-	// Source m_new_exprs retains every intermediate expression for the whole
-	// rewrite call. The cache and returned result acquire their own references.
+	// App temporaries live for this call. Source m_new_exprs keeps quantifier
+	// intermediates until the traversal owner closes.
 	var scratch []ast.ASTRef
 	defer func() {
 		for i := len(scratch) - 1; i >= 0; i-- {
@@ -188,14 +188,16 @@ func (r *rewriteTraversal) rewrite(index *rewriteRuleIndex, boolean *rewriter.Bo
 				if err != nil {
 					return ast.ASTRef{}, err
 				}
-				if err := keep(q); err != nil {
+				qRef, err := m.NewRef(q)
+				if err != nil {
 					return ast.ASTRef{}, err
 				}
+				r.newExprs = append(r.newExprs, qRef)
 				newQ, err := rewriter.ElimUnusedVarsUFBV(m, q)
 				if err != nil {
 					return ast.ASTRef{}, err
 				}
-				scratch = append(scratch, newQ)
+				r.newExprs = append(r.newExprs, newQ)
 				h, err := m.RefGet(newQ)
 				if err != nil {
 					return ast.ASTRef{}, err

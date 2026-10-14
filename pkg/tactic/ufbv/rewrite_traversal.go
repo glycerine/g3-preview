@@ -7,11 +7,13 @@ import "github.com/glycerine/g3/pkg/ast"
 // rewriteTraversal is the concrete UFBV child-visit frame. Its todo slice
 // owns one AST reference per entry; the cache owns its own entries separately.
 type rewriteTraversal struct {
-	manager *ast.ASTManager
-	cache   *rewriteCache
-	todo    []ast.ASTHandle
-	pending []ast.ASTHandle
-	closed  bool
+	manager         *ast.ASTManager
+	cache           *rewriteCache
+	todo            []ast.ASTHandle
+	pending         []ast.ASTHandle
+	newExprs        []ast.ASTRef
+	newExprsDrained int
+	closed          bool
 }
 
 func newRewriteTraversal(m *ast.ASTManager) (*rewriteTraversal, error) {
@@ -115,6 +117,20 @@ func (r *rewriteTraversal) close() error {
 	if r == nil || r.closed {
 		return nil
 	}
+	// m_new_exprs is declared after the cache and todo buffers in the source.
+	// Its owned expressions therefore retire first, in insertion order.
+	for r.newExprsDrained < len(r.newExprs) {
+		ref := &r.newExprs[r.newExprsDrained]
+		e := r.manager.DelRef(ref)
+		if *ref == (ast.ASTRef{}) {
+			r.newExprsDrained++
+		}
+		if e != nil {
+			return e
+		}
+	}
+	r.newExprs = nil
+	r.newExprsDrained = 0
 	if e := r.cache.close(); e != nil {
 		return e
 	}

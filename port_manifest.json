@@ -168903,6 +168903,13 @@
           "tests": ["TestBoolRewriterConjunctionEliminationOwningBufferAndTruthTables", "TestBoolRewriterConjunctionEliminationReleasesEarlierTemporaryOnLaterFailure"]
         },
         {
+          "name": "Concrete UFBV m_new_exprs member expr_ref_buffer: quantifier and eliminated-quantifier results retain independent references across rewrite calls and release in insertion order before cache and todo destruction (ufbv_rewriter.h:172; ufbv_rewriter.cpp:432-446)",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_traversal.go",
+          "go_targets": ["pkg/tactic/ufbv/rewrite_loop.go"],
+          "tests": ["TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"]
+        },
+        {
           "name": "Concrete subpaving tactic MPQ/hardware/MPFF/MPF ineq ref_buffer temporary push/c_ptr/destruction: failed clause conversion releases unpublished inequalities in ascending order; successful clause/unit publication retains its own reference",
           "status": "ported",
           "go_target": "pkg/math/subpaving/inequality_buffer_release.go",
