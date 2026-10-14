@@ -14,42 +14,66 @@ import (
 // RationalContext owns the reached config_mpq variables, bounds and clauses.
 // Definition propagation and search are still separate work.
 type RationalContext struct {
-	self           *RationalContext
-	numbers        *numeral.RationalManager
-	limit          *control.Reslimit
-	runtime        *memory.Runtime
-	process        *memory.ProcessAccounting
-	maxMemory      uint64
-	variables      []bool
-	inequalities   []*RationalInequality
-	unitClauses    []rationalUnitClause
-	unitHead       int
-	initStage      uint8
-	clauses        []*RationalClause
-	clauseWatchers [][]*RationalClause
-	numVisited     uint64
-	queue          []*RationalBound
-	queueHead      int
-	root           *RationalNode
-	nodes          []*RationalNode
-	leafHead       *RationalNode
-	leafTail       *RationalNode
-	numBounds      uint64
-	numConflicts   uint64
-	timestamp      uint64
-	closed         bool
+	self             *RationalContext
+	numbers          *numeral.RationalManager
+	limit            *control.Reslimit
+	runtime          *memory.Runtime
+	process          *memory.ProcessAccounting
+	maxMemory        uint64
+	epsilon          numeral.Rational
+	maxBound         numeral.Rational
+	minusMaxBound    numeral.Rational
+	relevanceScratch [3]numeral.Rational
+	zeroEpsilon      bool
+	variables        []bool
+	inequalities     []*RationalInequality
+	unitClauses      []rationalUnitClause
+	unitHead         int
+	initStage        uint8
+	clauses          []*RationalClause
+	clauseWatchers   [][]*RationalClause
+	numVisited       uint64
+	queue            []*RationalBound
+	queueHead        int
+	root             *RationalNode
+	nodes            []*RationalNode
+	leafHead         *RationalNode
+	leafTail         *RationalNode
+	numBounds        uint64
+	numConflicts     uint64
+	timestamp        uint64
+	closed           bool
 }
 
-func NewRationalContext(m *numeral.RationalManager, limit *control.Reslimit) (*RationalContext, error) {
+func NewRationalContext(m *numeral.RationalManager, limit *control.Reslimit) (_ *RationalContext, err error) {
 	if m == nil || limit == nil {
 		return nil, arena.ErrInvalidSlot
 	}
-	c := &RationalContext{numbers: m, limit: limit, runtime: m.RuntimeOwner(), maxMemory: math.MaxUint64}
+	c := &RationalContext{numbers: m, limit: limit, runtime: m.RuntimeOwner(), maxMemory: math.MaxUint64,
+		epsilon: numeral.NewRational(), maxBound: numeral.NewRational(), minusMaxBound: numeral.NewRational()}
+	for i := range c.relevanceScratch {
+		c.relevanceScratch[i] = numeral.NewRational()
+	}
 	c.self = c
 	if c.runtime != nil {
 		c.process = c.runtime.ProcessOwner()
 	}
+	defer func() {
+		if err != nil {
+			err = errors.Join(err, c.closePolicyNumerals())
+		}
+	}()
+	if err = c.UpdateBoundPolicy(20, 10); err != nil {
+		return nil, err
+	}
 	return c, nil
+}
+
+func (c *RationalContext) closePolicyNumerals() (err error) {
+	for i := range c.relevanceScratch {
+		err = errors.Join(err, c.numbers.Del(&c.relevanceScratch[i]))
+	}
+	return errors.Join(err, c.numbers.Del(&c.minusMaxBound), c.numbers.Del(&c.maxBound), c.numbers.Del(&c.epsilon))
 }
 
 func (c *RationalContext) open() error {
@@ -229,6 +253,9 @@ func (c *RationalContext) Close() error {
 			}
 			c.inequalities[i].closed = true
 		}
+	}
+	if err := c.closePolicyNumerals(); err != nil {
+		return err
 	}
 	c.nodes, c.root, c.variables = nil, nil, nil
 	c.leafHead, c.leafTail = nil, nil

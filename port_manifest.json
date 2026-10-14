@@ -52119,6 +52119,18 @@
           ]
         },
         {
+          "name": "Concrete config_mpq epsilon/max-bound numeral policy and normalized candidate relevance: conflict, zero-epsilon improvement, maximum threshold, and positive-epsilon gap (src/math/subpaving/subpaving_t_def.h:473-494,1204-1317); source arithmetic-exception flag transport and remaining context parameters remain open",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/rational_context_policy.go",
+          "go_targets": [
+            "pkg/math/subpaving/rational_context_relevance.go",
+            "pkg/math/subpaving/rational_context_root.go"
+          ],
+          "tests": [
+            "TestRationalContextDefaultRelevantBoundSourceOrder"
+          ]
+        },
+        {
           "name": "Concrete config_mpq inequality threshold ownership, unit retention, axiom marking, stable multi-atom clauses, exact three-valued inequality truth, distinct-variable watches, justified conflict-first clause propagation, checkpointed bound queue dispatch, and resumable root unit/queue initialization (src/math/subpaving/subpaving_t_def.h:575-587,773-875,1345-1419,1695-1752,1773-1808); definition propagation and search remain open",
           "status": "partial",
           "go_target": "pkg/math/subpaving/rational_context_units.go",
