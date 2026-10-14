@@ -117,6 +117,21 @@ func TestWarningBorrowedFlushFailurePersistsAcrossCalls(t *testing.T) {
 	}
 }
 
+func TestWarningTypedNilStreamSelectsDefaultRoute(t *testing.T) {
+	var defaultOutput bytes.Buffer
+	s := NewWarningService(&defaultOutput)
+	var absent *bytes.Buffer
+	if e := s.SetWarningStream(absent); e != nil {
+		t.Fatal(e)
+	}
+	if e := s.Warning("default"); e != nil {
+		t.Fatal(e)
+	}
+	if got := defaultOutput.String(); got != "WARNING: default\n" {
+		t.Fatalf("null stream pointer did not select the default route: %q", got)
+	}
+}
+
 type shortFlushingWarningWriter struct {
 	shortWarningWriter
 	flushes int

@@ -28,10 +28,22 @@ var processWarnings = NewWarningService(os.Stderr)
 func BorrowProcessWarningService() *WarningService { return processWarnings }
 
 func NewWarningService(stderr io.Writer) *WarningService {
-	if stderr == nil {
+	if warningWriterNil(stderr) {
 		stderr = os.Stderr
 	}
 	return &WarningService{stderr: stderr, enabled: true}
+}
+
+func warningWriterNil(w io.Writer) bool {
+	if w == nil {
+		return true
+	}
+	v := reflect.ValueOf(w)
+	switch v.Kind() {
+	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Slice:
+		return v.IsNil()
+	}
+	return false
 }
 
 func (s *WarningService) Enable(flag bool) error {
@@ -46,6 +58,9 @@ func (s *WarningService) Enabled() bool { return s != nil && s.enabled }
 func (s *WarningService) SetWarningStream(stream io.Writer) error {
 	if s == nil {
 		return arena.ErrConfig
+	}
+	if warningWriterNil(stream) {
+		stream = nil
 	}
 	if stream != nil && s.stream != nil {
 		t := reflect.TypeOf(stream)

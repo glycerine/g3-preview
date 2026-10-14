@@ -177882,6 +177882,7 @@
           "tests": [
             "TestWarningSourceDefaultRoutingAndDisabledState",
             "TestWarningSourceBorrowedStreamTruncationAndFallback",
+            "TestWarningTypedNilStreamSelectsDefaultRoute",
             "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
           ],
           "go_targets": [
@@ -177895,6 +177896,7 @@
           "tests": [
             "TestWarningSourceDefaultRoutingAndDisabledState",
             "TestWarningSourceBorrowedStreamTruncationAndFallback",
+            "TestWarningTypedNilStreamSelectsDefaultRoute",
             "TestWarningShortWritePreservesSourceInsertionPrefix",
             "TestWarningFlushesCompletedBorrowedAndDefaultStreams",
             "TestWarningShortWriteStillFlushesSourceStream",
@@ -178002,6 +178004,7 @@
           "tests": [
             "TestWarningSourceDefaultRoutingAndDisabledState",
             "TestWarningSourceBorrowedStreamTruncationAndFallback",
+            "TestWarningTypedNilStreamSelectsDefaultRoute",
             "TestWarningShortWritePreservesSourceInsertionPrefix",
             "TestWarningFlushesCompletedBorrowedAndDefaultStreams",
             "TestWarningShortWriteStillFlushesSourceStream",
