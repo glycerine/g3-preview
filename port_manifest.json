@@ -118167,7 +118167,7 @@
           "status": "unported"
         },
         {
-          "name": "set_union: expr hypothesis sets, func_decl output sets, and PDR lemma sets in retained AST/MUZ consumers",
+          "name": "set_union: remaining func_decl output sets and PDR lemma sets in retained MUZ consumers; AST proof-hypothesis expr_set specialization is ported below",
           "status": "unported"
         },
         {
