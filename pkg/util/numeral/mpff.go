@@ -62,6 +62,7 @@ var ErrFastFloatInvariant = errors.New("mpnum: MPFF source invariant")
 var ErrFastFloatPowerDomain = errors.New("mpnum: MPFF power mask wrapped into nontermination")
 var ErrFastFloatPowerPending = errors.New("mpnum: MPFF power scoped cleanup pending")
 var ErrFastFloatRationalPending = errors.New("mpnum: MPFF rational setter cleanup pending")
+var ErrFastFloatIntegerPending = errors.New("mpnum: MPFF to-integer power cleanup pending")
 var ErrFastFloatOwner = errors.New("mpnum: invalid MPFF owner or dead significand")
 
 // Cold owner: owns its buffers and services, borrowing a configured Runtime; caller numerical
@@ -85,6 +86,9 @@ type FastFloatManager struct {
 	rationalNum, rationalDen                   FastFloat
 	rationalPending, rationalExecuting         bool
 	rationalCursor                             uint8
+	integerPower                               Int
+	integerPowerOwner                          *IntegerManager
+	integerPowerPending, integerExecuting      bool
 }
 
 func NewFastFloatManager(c FastFloatConfig) (*FastFloatManager, error) {
@@ -154,6 +158,9 @@ func (m *FastFloatManager) open() error {
 	}
 	if m.rationalPending && !m.rationalExecuting {
 		return ErrFastFloatRationalPending
+	}
+	if m.integerPowerPending && !m.integerExecuting {
+		return ErrFastFloatIntegerPending
 	}
 	return nil
 }
@@ -318,11 +325,17 @@ func (m *FastFloatManager) CloseChecked() error {
 	if m.rationalExecuting {
 		return ErrFastFloatRationalPending
 	}
+	if m.integerExecuting {
+		return ErrFastFloatIntegerPending
+	}
 	m.closing = true
 	if e := m.CleanupPowerTemporaries(); e != nil {
 		return e
 	}
 	if e := m.CleanupSetRationalTemporaries(); e != nil {
+		return e
+	}
+	if e := m.CleanupToIntegerPower(); e != nil {
 		return e
 	}
 	if m.natural != nil {
@@ -439,6 +452,30 @@ func (m *FastFloatManager) CleanupSetRationalTemporaries() error {
 		m.closing = closing
 	}()
 	return m.cleanupSetRationalTemporaries()
+}
+
+func (m *FastFloatManager) cleanupToIntegerPower() error {
+	if !m.integerPowerPending {
+		return nil
+	}
+	if e := m.integerPowerOwner.Del(&m.integerPower); e != nil {
+		return e
+	}
+	m.integerPower = Int{}
+	m.integerPowerOwner = nil
+	m.integerPowerPending = false
+	return nil
+}
+
+// CleanupToIntegerPower resumes the borrowed integer's scoped deletion.
+func (m *FastFloatManager) CleanupToIntegerPower() error {
+	if m == nil || m.self != m {
+		return ErrFastFloatOwner
+	}
+	if m.integerExecuting {
+		return ErrFastFloatIntegerPending
+	}
+	return m.cleanupToIntegerPower()
 }
 
 func (m *FastFloatManager) Precise() bool { return false }

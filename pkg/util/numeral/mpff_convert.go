@@ -234,12 +234,7 @@ func (m *FastFloatManager) ToInteger(a *FastFloat, z *IntegerManager, out *Int) 
 			return e
 		}
 		if exp > 0 {
-			p := NewInt(2)
-			defer z.Del(&p)
-			if e = z.Power(&p, uint32(exp), &p); e != nil {
-				return e
-			}
-			if e = z.Mul(out, &p, out); e != nil {
+			if e = m.multiplyToIntegerPower(z, out, uint32(exp)); e != nil {
 				return e
 			}
 		}
@@ -248,6 +243,24 @@ func (m *FastFloatManager) ToInteger(a *FastFloat, z *IntegerManager, out *Int) 
 		return z.Neg(out)
 	}
 	return nil
+}
+
+// The source p scope ends before the final sign change in ToInteger.
+func (m *FastFloatManager) multiplyToIntegerPower(z *IntegerManager, out *Int, exp uint32) (err error) {
+	m.integerPower = NewInt(2)
+	m.integerPowerOwner = z
+	m.integerPowerPending = true
+	m.integerExecuting = true
+	defer func() {
+		if cleanup := m.cleanupToIntegerPower(); err == nil {
+			err = cleanup
+		}
+		m.integerExecuting = false
+	}()
+	if err = z.Power(&m.integerPower, exp, &m.integerPower); err != nil {
+		return err
+	}
+	return z.Mul(out, &m.integerPower, out)
 }
 func ffSetRational(qm *RationalManager, out *Rational, v ffLimbView) error {
 	if e := qm.check(out); e != nil {
