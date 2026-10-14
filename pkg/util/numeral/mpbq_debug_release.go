@@ -27,5 +27,5 @@ func (m *BinaryRationalManager) debugArithmetic(a, b *OwnedRational, out *Binary
 	return nil
 }
 func (m *BinaryRationalManager) debugApproxSnapshot(a, old *BinaryRational) error    { return nil }
-func (m *BinaryRationalManager) debugApproxDrop(old *BinaryRational)                 {}
+func (m *BinaryRationalManager) debugApproxDrop(old *BinaryRational) error           { return nil }
 func (m *BinaryRationalManager) debugApprox(old, a *BinaryRational, plus bool) error { return nil }

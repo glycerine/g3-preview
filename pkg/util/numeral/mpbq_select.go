@@ -665,7 +665,7 @@ func (m *BinaryRationalManager) CleanupRefineMid() error {
 	m.refinePending = false
 	return nil
 }
-func (m *BinaryRationalManager) Approx(a *BinaryRational, k uint32, plus bool) error {
+func (m *BinaryRationalManager) Approx(a *BinaryRational, k uint32, plus bool) (err error) {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -673,10 +673,14 @@ func (m *BinaryRationalManager) Approx(a *BinaryRational, k uint32, plus bool) e
 		return nil
 	}
 	var old BinaryRational
+	defer func() {
+		if cleanup := m.debugApproxDrop(&old); err == nil {
+			err = cleanup
+		}
+	}()
 	if e := m.debugApproxSnapshot(a, &old); e != nil {
 		return e
 	}
-	defer m.debugApproxDrop(&old)
 	neg := a.Num.Val < 0
 	shift := a.KField - k
 	if e := m.Z.Abs(&a.Num); e != nil {
@@ -701,6 +705,23 @@ func (m *BinaryRationalManager) Approx(a *BinaryRational, k uint32, plus bool) e
 	}
 	return m.debugApprox(&old, a, plus)
 }
+
+// CleanupApproxDebug resumes the retained scoped_mpbq snapshot's deletion.
+func (m *BinaryRationalManager) CleanupApproxDebug() error {
+	if m == nil || m.self != m {
+		return ErrBinaryOwner
+	}
+	if !m.approxPending {
+		return nil
+	}
+	if e := m.Z.Del(&m.approxOld.Num); e != nil {
+		return e
+	}
+	m.approxOld = BinaryRational{}
+	m.approxPending = false
+	return nil
+}
+
 func (m *BinaryRationalManager) ApproxDivDefault(a, b, c *BinaryRational) error {
 	return m.ApproxDiv(a, b, c, 32, false)
 }

@@ -120,7 +120,15 @@ func (m *BinaryRationalManager) debugArithmetic(a, b *OwnedRational, out *Binary
 func (m *BinaryRationalManager) debugApproxSnapshot(a, old *BinaryRational) error {
 	return m.Copy(old, a)
 }
-func (m *BinaryRationalManager) debugApproxDrop(old *BinaryRational) { m.Del(old) }
+func (m *BinaryRationalManager) debugApproxDrop(old *BinaryRational) error {
+	if e := m.Del(old); e != nil {
+		m.approxOld = *old
+		*old = BinaryRational{}
+		m.approxPending = true
+		return e
+	}
+	return nil
+}
 func (m *BinaryRationalManager) debugApprox(old, a *BinaryRational, plus bool) error {
 	var yes bool
 	var e error

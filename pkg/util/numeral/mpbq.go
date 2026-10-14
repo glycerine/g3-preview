@@ -37,6 +37,7 @@ var ErrBinaryConvertPending = errors.New("mpnum: binary-rational conversion clea
 var ErrBinaryRoundPending = errors.New("mpnum: binary-rational rounding cleanup pending")
 var ErrBinaryToRationalPending = errors.New("mpnum: binary-rational to-rational cleanup pending")
 var ErrBinaryOwnedRationalPending = errors.New("mpnum: binary-rational owned conversion cleanup pending")
+var ErrBinaryApproxPending = errors.New("mpnum: binary-rational approximation cleanup pending")
 
 type binaryOwnedRationalScope struct {
 	service                  *RationalService
@@ -87,6 +88,8 @@ type BinaryRationalManager struct {
 	toRationalImportedOwner                        *IntegerManager
 	toRationalImportedPending, toRationalExecuting bool
 	toOwnedRationalScope                           binaryOwnedRationalScope
+	approxOld                                      BinaryRational
+	approxPending                                  bool
 }
 type BinaryRationalStats struct {
 	HeaderBytes           uint64
@@ -138,6 +141,9 @@ func (m *BinaryRationalManager) open() error {
 	}
 	if m.toOwnedRationalScope.pending && !m.toOwnedRationalScope.executing {
 		return ErrBinaryOwnedRationalPending
+	}
+	if m.approxPending {
+		return ErrBinaryApproxPending
 	}
 	return nil
 }
@@ -224,6 +230,9 @@ func (m *BinaryRationalManager) CloseChecked() error {
 		return e
 	}
 	if e := m.CleanupToOwnedRational(); e != nil {
+		return e
+	}
+	if e := m.CleanupApproxDebug(); e != nil {
 		return e
 	}
 	if e := m.CleanupRefineMid(); e != nil {

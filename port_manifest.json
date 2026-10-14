@@ -150133,7 +150133,8 @@
             "TestBinarySelectionScopedRationalsResumeSourceDestructionOrder",
             "TestBinaryRefineRetainsMidpointAfterActualBodyFailure",
             "TestBinaryRefineMidOwningCleanupPhysicalRetry",
-            "TestBinaryRefineImportedOwningCleanupPhysicalRetry"
+            "TestBinaryRefineImportedOwningCleanupPhysicalRetry",
+            "TestBinaryApproxDebugSnapshotOwningCleanupRetry"
           ]
         },
         {
@@ -150456,7 +150457,8 @@
             "TestBinarySelectionScopedRationalsResumeSourceDestructionOrder",
             "TestBinaryRefineRetainsMidpointAfterActualBodyFailure",
             "TestBinaryRefineMidOwningCleanupPhysicalRetry",
-            "TestBinaryRefineImportedOwningCleanupPhysicalRetry"
+            "TestBinaryRefineImportedOwningCleanupPhysicalRetry",
+            "TestBinaryApproxDebugSnapshotOwningCleanupRetry"
           ]
         },
         {
