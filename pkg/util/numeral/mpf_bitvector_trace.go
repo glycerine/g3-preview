@@ -1,7 +1,11 @@
 // Source: src/util/mpf.cpp:1214-1217,1225,1252.
 package numeral
 
-import "io"
+import (
+	"io"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+)
 
 func (m *ArbitraryFloatManager) traceSBVDecision(x *ArbitraryFloat, z *Int, last, round, sticky, increment bool) error {
 	tags := m.floatTraceTags()
@@ -27,7 +31,18 @@ func (m *ArbitraryFloatManager) traceSBVDecision(x *ArbitraryFloat, z *Int, last
 				formatError = e
 				return e
 			}
-			return writeNumeralDisplayPart(w, integer+"\nsign="+traceBoolDigit(x.Sign())+" last="+traceBoolDigit(last)+" round="+traceBoolDigit(round)+" sticky="+traceBoolDigit(sticky)+" inc="+traceBoolDigit(increment)+"\n")
+			if e := writeNumeralDisplayPart(w, integer); e != nil {
+				return e
+			}
+			if e := diagnostic.WriteTraceEndl(w); e != nil {
+				return e
+			}
+			for _, part := range [...]string{"sign=", traceBoolDigit(x.Sign()), " last=", traceBoolDigit(last), " round=", traceBoolDigit(round), " sticky=", traceBoolDigit(sticky), " inc=", traceBoolDigit(increment)} {
+				if e := writeNumeralDisplayPart(w, part); e != nil {
+					return e
+				}
+			}
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }
@@ -48,7 +63,10 @@ func (m *ArbitraryFloatManager) traceSBVResult(out *Rational) error {
 				formatError = e
 				return e
 			}
-			return writeNumeralDisplayPart(w, s+"\n")
+			if e := writeNumeralDisplayPart(w, s); e != nil {
+				return e
+			}
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }

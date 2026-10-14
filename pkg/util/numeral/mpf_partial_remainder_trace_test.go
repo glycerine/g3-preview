@@ -2,6 +2,7 @@ package numeral
 
 import (
 	"bytes"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -53,6 +54,50 @@ func TestArbitraryFloatPartialRemainderScalarTraceOrder(t *testing.T) {
 		}
 		if strings.Count(got, "------------------------------------------------\n") != 11 {
 			t.Fatalf("partial remainder source fields: %q", got)
+		}
+	}
+	serviceMust(t, m.Del(&x))
+	serviceMust(t, m.Del(&y))
+}
+
+func TestArbitraryFloatPartialRemainderReachedEndlFlushes(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	w := &mpfEndlWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpf_dbg_rem")
+	serviceMust(t, m.BindTrace(tags))
+	const hidden = 1 << 23
+	x := ArbitraryFloat{format: arbitraryFloatFormat(11, 24, false), exponent: 40, significand: NewInt(hidden)}
+	y := ArbitraryFloat{format: arbitraryFloatFormat(11, 24, true), exponent: 0, significand: NewInt(hidden + hidden/2)}
+	serviceMust(t, m.PartialRemainder(&x, &y, 0, false))
+	if !tags.ShouldTrace("mpf_dbg_rem") {
+		if len(w.events) != 0 {
+			t.Fatal("erased partial remainder trace reached writer", w.events)
+		}
+	} else {
+		for _, tc := range []struct{ line, want int }{
+			{1282, 4}, {1301, 4}, {1322, 1}, {1331, 3}, {1352, 4},
+			{1365, 1}, {1394, 1}, {1398, 1}, {1410, 6}, {1421, 1}, {1435, 1},
+		} {
+			start := -1
+			for i := 0; i+3 < len(w.events); i++ {
+				if w.events[i] == "write:src/util/mpf.cpp" && w.events[i+1] == "write::" && w.events[i+2] == "write:"+strconv.Itoa(tc.line) && w.events[i+3] == "write: ---------\n" {
+					start = i + 4
+					break
+				}
+			}
+			if start < 0 {
+				t.Fatalf("missing partial remainder site %d: %q", tc.line, w.events)
+			}
+			bodyFlushes := 0
+			for i := start; i < len(w.events) && w.events[i] != "write:------------------------------------------------\n"; i++ {
+				if i > start && w.events[i-1] == "write:\n" && w.events[i] == "flush" {
+					bodyFlushes++
+				}
+			}
+			if bodyFlushes != tc.want {
+				t.Fatalf("partial remainder site %d: got %d body flushes, want %d: %q", tc.line, bodyFlushes, tc.want, w.events)
+			}
 		}
 	}
 	serviceMust(t, m.Del(&x))

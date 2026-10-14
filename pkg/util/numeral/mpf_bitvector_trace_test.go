@@ -83,3 +83,47 @@ func TestArbitraryFloatIEEEBVTraceFiniteAndInfinity(t *testing.T) {
 	serviceMust(t, m.integer.Del(&out))
 	serviceMust(t, m.Del(&x))
 }
+
+func TestArbitraryFloatSBVAndUnpackReachedEndlFlushes(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	w := &mpfEndlWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpf_dbg")
+	tags.Enable("mpf_dbg_sbv")
+	serviceMust(t, m.BindTrace(tags))
+	var x ArbitraryFloat
+	var out Rational
+	serviceMust(t, m.SetDouble(&x, 11, 53, 1.5))
+	w.events = nil
+	w.flushes = 0
+	serviceMust(t, m.ToSBVMPQ(ArbitraryFloatNearestEven, &x, &out))
+	if !tags.ShouldTrace("mpf_dbg") {
+		if len(w.events) != 0 {
+			t.Fatal("erased SBV trace reached writer", w.events)
+		}
+	} else {
+		for _, tc := range []struct{ line, want int }{{1923, 1}, {1214, 2}, {1225, 1}} {
+			start := -1
+			for i := 0; i+3 < len(w.events); i++ {
+				if w.events[i] == "write:src/util/mpf.cpp" && w.events[i+1] == "write::" && w.events[i+2] == "write:"+strconv.Itoa(tc.line) && w.events[i+3] == "write: ---------\n" {
+					start = i + 4
+					break
+				}
+			}
+			if start < 0 {
+				t.Fatalf("missing reached SBV/unpack site %d: %q", tc.line, w.events)
+			}
+			bodyFlushes := 0
+			for i := start; i < len(w.events) && w.events[i] != "write:------------------------------------------------\n"; i++ {
+				if i > start && w.events[i-1] == "write:\n" && w.events[i] == "flush" {
+					bodyFlushes++
+				}
+			}
+			if bodyFlushes != tc.want {
+				t.Fatalf("SBV/unpack site %d: got %d body flushes, want %d: %q", tc.line, bodyFlushes, tc.want, w.events)
+			}
+		}
+	}
+	serviceMust(t, m.Del(&x))
+	serviceMust(t, m.rational.Del(&out))
+}

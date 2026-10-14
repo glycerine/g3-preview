@@ -4,7 +4,19 @@ package numeral
 import (
 	"io"
 	"strconv"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
+
+func writePartialRemainderScalarLine(w io.Writer, label, value string) error {
+	if e := writeNumeralDisplayPart(w, label); e != nil {
+		return e
+	}
+	if e := writeNumeralDisplayPart(w, value); e != nil {
+		return e
+	}
+	return diagnostic.WriteTraceEndl(w)
+}
 
 func (m *ArbitraryFloatManager) tracePartialRemainderEntry(x, y *ArbitraryFloat, d int64, partial bool) error {
 	tags := m.floatTraceTags()
@@ -26,11 +38,17 @@ func (m *ArbitraryFloatManager) tracePartialRemainderEntry(x, y *ArbitraryFloat,
 					formatError = e
 					return e
 				}
-				if e := writeNumeralDisplayPart(w, s+"\n"); e != nil {
+				if e := writeNumeralDisplayPart(w, s); e != nil {
+					return e
+				}
+				if e := diagnostic.WriteTraceEndl(w); e != nil {
 					return e
 				}
 			}
-			return writeNumeralDisplayPart(w, "d="+strconv.FormatInt(d, 10)+"\npartial="+traceBoolDigit(partial)+"\n")
+			if e := writePartialRemainderScalarLine(w, "d=", strconv.FormatInt(d, 10)); e != nil {
+				return e
+			}
+			return writePartialRemainderScalarLine(w, "partial=", traceBoolDigit(partial))
 		})
 	return formatError
 }
@@ -42,7 +60,10 @@ func (m *ArbitraryFloatManager) tracePartialRemainderText(line int, value string
 	}
 	_ = tags.EmitConditional("mpf_dbg_rem", "partial_remainder", "src/util/mpf.cpp", line,
 		func() bool { return true }, func(w io.Writer) error {
-			return writeNumeralDisplayPart(w, value+"\n")
+			if e := writeNumeralDisplayPart(w, value); e != nil {
+				return e
+			}
+			return diagnostic.WriteTraceEndl(w)
 		})
 }
 
@@ -62,7 +83,10 @@ func (m *ArbitraryFloatManager) tracePartialRemainderInt(line int, label string,
 				formatError = e
 				return e
 			}
-			return writeNumeralDisplayPart(w, s+"\n")
+			if e := writeNumeralDisplayPart(w, s); e != nil {
+				return e
+			}
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }

@@ -4,6 +4,8 @@ package numeral
 import (
 	"io"
 	"strconv"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 func (m *ArbitraryFloatManager) traceUnpackEntry(a *ArbitraryFloat, normalize bool) error {
@@ -73,12 +75,12 @@ func (m *ArbitraryFloatManager) traceUnpackEntry(a *ArbitraryFloat, normalize bo
 				formatError = e
 				return e
 			}
-			for _, part := range [...]string{" is_zero=", traceBoolDigit(zero), "\n"} {
+			for _, part := range [...]string{" is_zero=", traceBoolDigit(zero)} {
 				if e := writeNumeralDisplayPart(w, part); e != nil {
 					return e
 				}
 			}
-			return nil
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }

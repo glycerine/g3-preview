@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 func (m *ArbitraryFloatManager) formatPartialRemainderComponents(sign bool, exponent int64, significand *Int, ebits, sbits, extra uint32) (result string, cause error) {
@@ -44,7 +45,10 @@ func (m *ArbitraryFloatManager) writePartialRemainderTraceInt(w io.Writer, label
 		*formatError = e
 		return e
 	}
-	return writeNumeralDisplayPart(w, s+"\n")
+	if e := writeNumeralDisplayPart(w, s); e != nil {
+		return e
+	}
+	return diagnostic.WriteTraceEndl(w)
 }
 
 func (m *ArbitraryFloatManager) writePartialRemainderTraceComponents(w io.Writer, label string, sign bool, exponent int64, significand *Int, ebits, sbits, extra uint32, formatError *error) error {
@@ -56,7 +60,10 @@ func (m *ArbitraryFloatManager) writePartialRemainderTraceComponents(w io.Writer
 		*formatError = e
 		return e
 	}
-	return writeNumeralDisplayPart(w, s+"\n")
+	if e := writeNumeralDisplayPart(w, s); e != nil {
+		return e
+	}
+	return diagnostic.WriteTraceEndl(w)
 }
 
 func (m *ArbitraryFloatManager) tracePartialRemainderRatio(sign bool, exponent int64, large, rem *Int, ebits, sbits uint32) error {
@@ -67,7 +74,7 @@ func (m *ArbitraryFloatManager) tracePartialRemainderRatio(sign bool, exponent i
 	var formatError error
 	_ = tags.EmitConditional("mpf_dbg_rem", "partial_remainder", "src/util/mpf.cpp", 1301,
 		func() bool { return true }, func(w io.Writer) error {
-			if e := writeNumeralDisplayPart(w, "X/Y_exp="+strconv.FormatInt(exponent, 10)+"\n"); e != nil {
+			if e := writePartialRemainderScalarLine(w, "X/Y_exp=", strconv.FormatInt(exponent, 10)); e != nil {
 				return e
 			}
 			if e := m.writePartialRemainderTraceInt(w, "X/Y_sig_lrg=", large, &formatError); e != nil {
@@ -89,7 +96,7 @@ func (m *ArbitraryFloatManager) tracePartialRemainderQ(sign bool, exponent int64
 	var formatError error
 	_ = tags.EmitConditional("mpf_dbg_rem", "partial_remainder", "src/util/mpf.cpp", 1331,
 		func() bool { return true }, func(w io.Writer) error {
-			if e := writeNumeralDisplayPart(w, "Q_exp="+strconv.FormatInt(exponent, 10)+"\n"); e != nil {
+			if e := writePartialRemainderScalarLine(w, "Q_exp=", strconv.FormatInt(exponent, 10)); e != nil {
 				return e
 			}
 			if e := m.writePartialRemainderTraceInt(w, "Q_sig=", significand, &formatError); e != nil {
@@ -108,7 +115,10 @@ func (m *ArbitraryFloatManager) tracePartialRemainderProduct(sign bool, exponent
 	var formatError error
 	_ = tags.EmitConditional("mpf_dbg_rem", "partial_remainder", "src/util/mpf.cpp", 1352,
 		func() bool { return true }, func(w io.Writer) error {
-			if e := writeNumeralDisplayPart(w, "YQ_sgn="+traceBoolDigit(sign)+"\nYQ_exp="+strconv.FormatInt(exponent, 10)+"\n"); e != nil {
+			if e := writePartialRemainderScalarLine(w, "YQ_sgn=", traceBoolDigit(sign)); e != nil {
+				return e
+			}
+			if e := writePartialRemainderScalarLine(w, "YQ_exp=", strconv.FormatInt(exponent, 10)); e != nil {
 				return e
 			}
 			if e := m.writePartialRemainderTraceInt(w, "YQ_sig=", significand, &formatError); e != nil {
@@ -133,7 +143,10 @@ func (m *ArbitraryFloatManager) tracePartialRemainderDifference(minuend, subtrah
 			if e := m.writePartialRemainderTraceInt(w, "subtrahend=", subtrahend, &formatError); e != nil {
 				return e
 			}
-			if e := writeNumeralDisplayPart(w, "X_YQ_sgn="+traceBoolDigit(sign)+"\nX_YQ_exp="+strconv.FormatInt(exponent, 10)+"\n"); e != nil {
+			if e := writePartialRemainderScalarLine(w, "X_YQ_sgn=", traceBoolDigit(sign)); e != nil {
+				return e
+			}
+			if e := writePartialRemainderScalarLine(w, "X_YQ_exp=", strconv.FormatInt(exponent, 10)); e != nil {
 				return e
 			}
 			if e := m.writePartialRemainderTraceInt(w, "X_YQ_sig=", significand, &formatError); e != nil {

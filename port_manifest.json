@@ -175547,6 +175547,20 @@
           "tests": ["TestMyMPZSqrtReachedEndlFlushes", "TestArbitraryFloatRemObjectReachedEndlFlushes"]
         },
         {
+          "name": "Reached MPF unpack and signed-bitvector TRACE std::endl body flushes (src/util/mpf.cpp:1214-1225,1923-1928)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_unpack_trace.go",
+          "go_targets": ["pkg/util/numeral/mpf_bitvector_trace.go", "pkg/util/diagnostic/util_trace_tags.go"],
+          "tests": ["TestArbitraryFloatSBVAndUnpackReachedEndlFlushes"]
+        },
+        {
+          "name": "Reached MPF partial-remainder TRACE std::endl body flushes (src/util/mpf.cpp:1282-1435)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_partial_remainder_trace.go",
+          "go_targets": ["pkg/util/numeral/mpf_partial_remainder_component_trace.go", "pkg/util/diagnostic/util_trace_tags.go"],
+          "tests": ["TestArbitraryFloatPartialRemainderReachedEndlFlushes"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -176015,6 +176029,20 @@
           "go_target": "pkg/util/numeral/mpf_sqrt_trace.go",
           "go_targets": ["pkg/util/numeral/mpf_remainder_object_trace.go", "pkg/util/diagnostic/util_trace_tags.go"],
           "tests": ["TestMyMPZSqrtReachedEndlFlushes", "TestArbitraryFloatRemObjectReachedEndlFlushes"]
+        },
+        {
+          "name": "Reached MPF unpack and signed-bitvector TRACE std::endl body flushes (src/util/mpf.cpp:1214-1225,1923-1928)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_unpack_trace.go",
+          "go_targets": ["pkg/util/numeral/mpf_bitvector_trace.go", "pkg/util/diagnostic/util_trace_tags.go"],
+          "tests": ["TestArbitraryFloatSBVAndUnpackReachedEndlFlushes"]
+        },
+        {
+          "name": "Reached MPF partial-remainder TRACE std::endl body flushes (src/util/mpf.cpp:1282-1435)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_partial_remainder_trace.go",
+          "go_targets": ["pkg/util/numeral/mpf_partial_remainder_component_trace.go", "pkg/util/diagnostic/util_trace_tags.go"],
+          "tests": ["TestArbitraryFloatPartialRemainderReachedEndlFlushes"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
