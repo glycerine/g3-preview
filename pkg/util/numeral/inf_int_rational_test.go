@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func infIntValue(t *testing.T, s *RationalService, text string, e int32) OwnedInfIntRational {
@@ -170,7 +171,9 @@ func TestInfIntRationalOverflowSourcePrefixesAndScalarDomain(t *testing.T) {
 	for _, text := range []string{"1/2", "2147483648", "-2147483649"} {
 		serviceMust(t, s.SetString(&r, text))
 		before := a.First.Num.Val
-		if err := s.InfIntMulAssign(&a, &r); !errors.Is(err, ErrInfIntScalar) {
+		err := s.InfIntMulAssign(&a, &r)
+		var source z3exception.DefaultException
+		if !errors.Is(err, ErrInfIntScalar) || !errors.As(err, &source) || source.Message() != "multiplication with large rational is not possible" {
 			t.Fatal(text, err)
 		}
 		if a.First.Num.Val != before || a.second != math.MaxInt32 {

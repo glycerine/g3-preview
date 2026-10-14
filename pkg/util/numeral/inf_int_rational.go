@@ -5,10 +5,12 @@ package numeral
 import (
 	"errors"
 	"math"
+
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 var ErrInfIntOverflow = errors.New("mpnum: infinitesimal integer signed overflow")
-var ErrInfIntScalar = errors.New("mpnum: multiplication with large rational is not possible")
+var ErrInfIntScalar = z3exception.NewDefaultException("multiplication with large rational is not possible")
 var ErrInfIntNotRational = errors.New("mpnum: infinitesimal coefficient must be zero")
 
 // OwnedInfIntRational is the source rational/int32 pair plus scalar provenance.
