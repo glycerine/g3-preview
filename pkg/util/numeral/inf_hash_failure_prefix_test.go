@@ -14,6 +14,13 @@ func TestInfHashesStopBeforeCombiningFailedComponent(t *testing.T) {
 	invalid := ^NumericCellRef(0)
 
 	plain := infValue(t, s, 5, 1, "3")
+	firstCell := plain.First.Num.Cell
+	plain.First.Num.Cell = invalid
+	firstHash, firstErr := s.InfHash(&plain)
+	plain.First.Num.Cell = firstCell
+	if firstHash != 0 || !errors.Is(firstErr, arena.ErrInvalidSlot) {
+		t.Fatal("inf_rational did not stop at failed first hash", firstHash, firstErr)
+	}
 	plainCell := plain.Second.Num.Cell
 	plain.Second.Num.Cell = invalid
 	plainHash, plainErr := s.InfHash(&plain)

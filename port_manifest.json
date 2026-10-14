@@ -125339,7 +125339,7 @@
           ]
         },
         {
-          "name": "hash/eq functors, string/stream value, inspection, extraction and owned accessors",
+          "name": "string/stream value, inspection, extraction and owned accessors",
           "status": "partial",
           "go_target": "pkg/util/numeral/inf_rational.go",
           "tests": [
@@ -125360,6 +125360,22 @@
             "TestRationalServiceInfinitesimalFinalizerTraversal",
             "TestInfHashesStopBeforeCombiningFailedComponent"
           ]
+        },
+        {
+          "name": "hash() first-then-second rational component reads and unsigned XOR/+1 combination (inf_rational.h:39-41)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_rational.go",
+          "tests": [
+            "TestInfRationalFullHeaderQueriesAndAliases",
+            "TestRawProjectionServiceAndInfOwningReferences",
+            "TestInfHashesStopBeforeCombiningFailedComponent"
+          ]
+        },
+        {
+          "name": "hash_proc and eq_proc wrappers have no retained production instantiation",
+          "status": "reference_only",
+          "go_target": "",
+          "tests": []
         },
         {
           "name": "all active compound/value/unary/fused arithmetic and rational-one prefix/postfix routes",
