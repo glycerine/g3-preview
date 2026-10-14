@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/math/subpaving"
 	goaltactic "github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -21,6 +22,7 @@ type RationalExprConverter struct {
 	self                                 *RationalExprConverter
 	ast                                  *ast.ASTManager
 	engine                               *RationalEngine
+	trace                                *diagnostic.TraceTags
 	qm                                   *numeral.RationalManager
 	cooperation                          *cooperate.Cooperation
 	family                               ast.FamilyID
@@ -340,6 +342,9 @@ func (c *RationalExprConverter) InternalizeInequality(h ast.ASTHandle) (atom *su
 	}
 	if sign < 0 {
 		lower = !lower
+	}
+	if err = emitGoalInequalityTrace(c.trace, c.qm, x, &k, lower, open); err != nil {
+		return nil, err
 	}
 	shell, err := c.engine.Shell()
 	if err != nil {

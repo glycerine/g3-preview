@@ -54791,6 +54791,12 @@
           ]
         },
         {
+          "name": "All four concrete mk_ineq TRACE records at line 158 emit variable, rational coefficient, lower/open flags before context publication",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/tactic/goal_inequality_trace.go",
+          "tests": ["TestHardwareExprConverterTerms", "TestFastExprConverterTermsAndClause", "TestArbitraryExprConverterTermsAndClause", "TestRationalExprConverterExactLeafGoalAndCleanup"]
+        },
+        {
           "name": "Concrete MPQ inequality and clause internalization plus goal-order search for arithmetic leaves and compound terms; full source exception transport remains open (src/math/subpaving/tactic/subpaving_tactic.cpp:128-190)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/tactic/rational_expr_converter.go",
@@ -176600,6 +176606,12 @@
           "tests": ["TestArbitraryRootRetainedShortTraceAfterCertifiedBounds"]
         },
         {
+          "name": "Reached subpaving tactic mk_ineq TRACE after sign-direction adjustment and before inequality publication for MPQ, HWF, MPFF and MPF (subpaving_tactic.cpp:158)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/tactic/goal_inequality_trace.go",
+          "tests": ["TestHardwareExprConverterTerms", "TestFastExprConverterTermsAndClause", "TestArbitraryExprConverterTermsAndClause", "TestRationalExprConverterExactLeafGoalAndCleanup"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -177250,6 +177262,12 @@
           "go_target": "pkg/math/interval/arbitrary_root_trace.go",
           "go_targets": ["pkg/math/interval/arbitrary_root_trace_test.go"],
           "tests": ["TestArbitraryRootRetainedShortTraceAfterCertifiedBounds"]
+        },
+        {
+          "name": "Reached subpaving tactic mk_ineq TRACE after sign-direction adjustment and before inequality publication for MPQ, HWF, MPFF and MPF (subpaving_tactic.cpp:158)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/tactic/goal_inequality_trace.go",
+          "tests": ["TestHardwareExprConverterTerms", "TestFastExprConverterTermsAndClause", "TestArbitraryExprConverterTermsAndClause", "TestRationalExprConverterExactLeafGoalAndCleanup"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

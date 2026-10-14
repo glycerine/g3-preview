@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	goaltactic "github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
@@ -429,8 +430,22 @@ func TestHardwareExprConverterTerms(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	var inequalityTrace bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&inequalityTrace)
+	tags.Enable("subpaving_tactic")
+	if err := converter.BindTrace(tags); err != nil {
+		t.Fatal(err)
+	}
 	if err := converter.InternalizeClause(negativeLE); err != nil {
 		t.Fatal(err)
+	}
+	if tags.ShouldTrace("subpaving_tactic") {
+		want := "-------- [subpaving_tactic] mk_ineq src/math/subpaving/tactic/subpaving_tactic.cpp:158 ---------\n0 -2 1 0\n------------------------------------------------\n"
+		if got := inequalityTrace.String(); got != want {
+			t.Fatalf("source inequality trace: %q", got)
+		}
+	} else if inequalityTrace.Len() != 0 {
+		t.Fatalf("erased inequality trace: %q", inequalityTrace.String())
 	}
 	display.Reset()
 	if err := shell.DisplayConstraints(&display, false); err != nil {

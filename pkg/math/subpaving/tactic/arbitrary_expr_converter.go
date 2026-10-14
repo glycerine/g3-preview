@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/math/subpaving"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -18,6 +19,7 @@ type ArbitraryExprConverter struct {
 	self                                 *ArbitraryExprConverter
 	ast                                  *ast.ASTManager
 	engine                               *ArbitraryEngine
+	trace                                *diagnostic.TraceTags
 	qm                                   *numeral.RationalManager
 	family                               ast.FamilyID
 	vars                                 map[ast.ASTHandle]uint32

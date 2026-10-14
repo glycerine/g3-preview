@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/math/subpaving"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/messages"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/z3exception"
@@ -26,6 +27,7 @@ type HardwareExprConverter struct {
 	self                                 *HardwareExprConverter
 	ast                                  *ast.ASTManager
 	engine                               *HardwareEngine
+	trace                                *diagnostic.TraceTags
 	family                               ast.FamilyID
 	vars                                 map[ast.ASTHandle]uint32
 	order                                []ast.ASTHandle

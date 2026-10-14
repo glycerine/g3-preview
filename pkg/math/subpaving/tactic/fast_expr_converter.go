@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/math/subpaving"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -19,6 +20,7 @@ type FastExprConverter struct {
 	self                                 *FastExprConverter
 	ast                                  *ast.ASTManager
 	engine                               *FastEngine
+	trace                                *diagnostic.TraceTags
 	cooperation                          *cooperate.Cooperation
 	qm                                   *numeral.RationalManager
 	family                               ast.FamilyID

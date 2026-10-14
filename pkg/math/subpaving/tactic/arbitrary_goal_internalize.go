@@ -93,6 +93,9 @@ func (c *ArbitraryExprConverter) InternalizeInequality(h ast.ASTHandle) (atom *s
 	if sign < 0 {
 		lower = !lower
 	}
+	if err = emitGoalInequalityTrace(c.trace, qm, x, &k, lower, open); err != nil {
+		return nil, err
+	}
 	shell, err := c.engine.Shell()
 	if err != nil {
 		return nil, err
