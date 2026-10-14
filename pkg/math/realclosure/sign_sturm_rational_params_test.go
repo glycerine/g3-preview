@@ -65,7 +65,7 @@ func TestRealClosureRationalIntervalReadsInitialPrecision(t *testing.T) {
 	if err := pc.SetUIntName(&p, &name, 4); err != nil {
 		t.Fatal(err)
 	}
-	if err := store.bindInitialPrecision(pc, &p); err != nil {
+	if err := store.bindInitialPrecision(pc, &p, nil); err != nil {
 		t.Fatal(err)
 	}
 	second, precise := measure()
@@ -78,14 +78,37 @@ func TestRealClosureRationalIntervalReadsInitialPrecision(t *testing.T) {
 	if err := pc.SetUIntName(&p, &name, 0); err != nil {
 		t.Fatal(err)
 	}
-	if err := store.bindInitialPrecision(pc, &p); err != nil || !store.initialPrecisionBound || store.initialPrecision != 0 {
+	if err := store.bindInitialPrecision(pc, &p, nil); err != nil || !store.initialPrecisionBound || store.initialPrecision != 0 {
 		t.Fatal("explicit zero precision was lost", err)
 	}
 	third, precise := measure()
 	if precise {
 		t.Fatal("explicit zero precision used the default")
 	}
-	for _, value := range []*realValue{first, second, third} {
+	module, err := pc.NewValue()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := pc.SetUIntName(&module, &name, 6); err != nil {
+		t.Fatal(err)
+	}
+	if err := pc.Reset(&p); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.bindInitialPrecision(pc, &p, &module); err != nil || store.initialPrecision != 6 {
+		t.Fatal("module fallback initial precision", err)
+	}
+	fourth, precise := measure()
+	if precise {
+		t.Fatal("module fallback unexpectedly used the default precision")
+	}
+	if err := pc.SetUIntName(&p, &name, 4); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.bindInitialPrecision(pc, &p, &module); err != nil || store.initialPrecision != 4 {
+		t.Fatal("local precision did not override module fallback", err)
+	}
+	for _, value := range []*realValue{first, second, third, fourth} {
 		if err := store.release(value); err != nil {
 			t.Fatal(err)
 		}
@@ -94,6 +117,9 @@ func TestRealClosureRationalIntervalReadsInitialPrecision(t *testing.T) {
 		t.Fatal(err)
 	}
 	if err := pc.Del(&p); err != nil {
+		t.Fatal(err)
+	}
+	if err := pc.Del(&module); err != nil {
 		t.Fatal(err)
 	}
 	if err := pc.Close(); err != nil {

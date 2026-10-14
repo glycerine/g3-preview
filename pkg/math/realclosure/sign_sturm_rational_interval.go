@@ -9,10 +9,10 @@ import (
 	"github.com/glycerine/g3/pkg/util/params"
 )
 
-// bindInitialPrecision reads the retained rcf parameter before future lazy
-// rational interval initialization. The enclosing realclosure updt_params
-// also reads other options that are not yet owned by this value store.
-func (s *realValueStore) bindInitialPrecision(pc *params.ParamsContext, p *params.ParamsRef) error {
+// bindInitialPrecision follows the generated rcf_params getter: local value,
+// module value, then the literal default. The module reference is borrowed
+// from the enclosing parameter owner, which owns its acquisition and release.
+func (s *realValueStore) bindInitialPrecision(pc *params.ParamsContext, p, module *params.ParamsRef) error {
 	if s == nil || s.numbers == nil || pc == nil || p == nil {
 		return arena.ErrInvalidSlot
 	}
@@ -20,7 +20,7 @@ func (s *realValueStore) bindInitialPrecision(pc *params.ParamsContext, p *param
 		return err
 	}
 	name := "initial_precision"
-	value, err := pc.GetUIntName(p, &name, 24)
+	value, err := pc.GetUIntFallbackName(p, &name, module, 24)
 	if err != nil {
 		return err
 	}
