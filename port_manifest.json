@@ -124814,7 +124814,7 @@
           ]
         },
         {
-          "name": "hash/eq functors, full inspection/conversion and owned component/numerator/denominator access",
+          "name": "hash/eq functors, remaining inspection/conversion and owned component access beyond separately credited projections",
           "status": "partial",
           "go_target": "pkg/util/numeral/inf_int_rational.go",
           "tests": [
@@ -124832,6 +124832,15 @@
             "TestRationalServiceInfinitesimalConstructorFailureRefunds",
             "TestRationalServiceInfinitesimalFinalizerTraversal",
             "TestInfHashesStopBeforeCombiningFailedComponent"
+          ]
+        },
+        {
+          "name": "numerator/denominator: debug zero-epsilon assertion, first-component rational extraction and owning inf_int_rational result (inf_int_rational.h:144-152)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_int_rational.go",
+          "tests": [
+            "TestInfIntRationalAccessorsHashDisplayPostOperations",
+            "TestInfIntProjectionPhysicalFailurePrefixes"
           ]
         },
         {
