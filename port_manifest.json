@@ -149825,6 +149825,8 @@
       "tests": [
         "TestArbitraryFloatSetInt32TraceEntryAndResult",
         "TestArbitraryFloatSetInt32TraceFormatterRefusal",
+        "TestArbitraryFloatSetNativeTraceFormats",
+        "TestArbitraryFloatSetFloatRawTraceFormatterRefusal",
         "TestArbitraryFloatFMAAlignmentAndShiftedSignificandTrace",
         "TestArbitraryFloatFMAResultAndRenormalizationTrace",
         "TestArbitraryFloatFMAProductAndShiftedAddendTrace",
@@ -150425,6 +150427,12 @@
       "methods_audited": true,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "mpf_manager::set(double/float) mpf_dbg native-bit input and ordinary/raw result TRACE records at mpf.cpp:124,147,160,183",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_value_input_trace.go",
+          "tests": ["TestArbitraryFloatSetNativeTraceFormats", "TestArbitraryFloatSetFloatRawTraceFormatterRefusal"]
+        },
         {
           "name": "mpf_manager::set(int) mpf_dbg input and result TRACE records at mpf.cpp:76,105",
           "status": "ported",
@@ -151159,6 +151167,7 @@
         "Checked OwnedString output now belongs to OwnedString.AppendTo; NumericTextStream receives a native counted Go string through AppendString. Counted output preserves embedded NUL bytes and whole-field width/alignment; CString output independently stops at first NUL. Failed sentries check owner lifetime while preserving width and skipping payload conversion. Removed the stream method accepting OwnedString, so the stream no longer depends on that project text owner. See PORT_PROGRESS.md#native-counted-text-at-the-numeric-stream-boundary."
       ],
       "deviations": [
+        "Retained mpf_manager::set(double/float) emits source input records after bit decoding and before assertions/field publication. Successful double assignment traces the ordinary MPF text result, while successful float assignment traces the raw owned-string result; both use the source line boundaries. A directly injected raw formatter refusal cleans its temporary and permits retry. Focused ordinary and trace/checked/debug tests cover finite native bits and result modes; special-value C++ stream text profiles are not claimed.",
         "Retained mpf_manager::set(int) emits its input mpf_dbg record after format/sign publication and its result record after either zero or nonzero assignment. The result uses the owned MPF formatter; its directly injected formatter failure returns, while writer failbit is nonthrowing. Focused trace-enabled and erased tests cover zero, negative and positive inputs; formatter refusal is tested directly rather than claiming a reached setter failure. Other MPF setter trace sites and whole-unit ownership remain partial.",
         "Retained mpf_manager::fma emits mpf_dbg X/Y/Z before special-value branches and all general-body records through the pre-round result at their source sites, including conditional overflow and renormalization. Binary records use the concrete owned formatter; formatter failures propagate while writer failbit remains nonthrowing. Focused trace tests cover swapped, unswapped and ordinary normalization order, temporary cleanup and formatting refusal. The 4.xxx guard's formatting is tested directly because normalized 1*1+1 and 1*1+3 do not reach it. Broader MPF ownership/trace audit remains partial.",
         "Retained mpf_manager::add_sub emits mpf_dbg alignment, shifted significand, selected add/subtract, pre-normalized sum, and nonzero sign/absolute-value records at source boundaries. Exact branch order and zero-result omission are checked in trace-enabled and erased builds. Broader MPF ownership and remaining trace sites stay partial.",

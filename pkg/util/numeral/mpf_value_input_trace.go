@@ -1,15 +1,25 @@
-// Source: src/util/mpf.cpp:76,105.
+// Source: src/util/mpf.cpp:76,105,124-125,147,160-161,183.
 package numeral
 
-import "io"
+import (
+	"io"
+	"math"
+	"strconv"
+
+	utext "github.com/glycerine/g3/pkg/util/text"
+)
 
 func (m *ArbitraryFloatManager) traceSetInt32Result(out *ArbitraryFloat) error {
+	return m.traceSetOrdinaryResult(out, 105)
+}
+
+func (m *ArbitraryFloatManager) traceSetOrdinaryResult(out *ArbitraryFloat, line int) error {
 	tags := m.floatTraceTags()
 	if !tags.ShouldTrace("mpf_dbg") {
 		return nil
 	}
 	var formatError error
-	_ = tags.EmitConditional("mpf_dbg", "set", "src/util/mpf.cpp", 105,
+	_ = tags.EmitConditional("mpf_dbg", "set", "src/util/mpf.cpp", line,
 		func() bool { return true }, func(w io.Writer) error {
 			if e := writeNumeralDisplayPart(w, "set: res = "); e != nil {
 				return e
@@ -20,6 +30,68 @@ func (m *ArbitraryFloatManager) traceSetInt32Result(out *ArbitraryFloat) error {
 				return e
 			}
 			return writeNumeralDisplayPart(w, value+"\n")
+		})
+	return formatError
+}
+
+func traceNativeFloatText(value float64, bits int) string {
+	if math.IsNaN(value) {
+		return "nan"
+	}
+	if math.IsInf(value, 1) {
+		return "inf"
+	}
+	if math.IsInf(value, -1) {
+		return "-inf"
+	}
+	return strconv.FormatFloat(value, 'g', 6, bits)
+}
+
+func (m *ArbitraryFloatManager) traceSetNativeInput(value float64, bits int, raw, sig uint64, sign bool, exponent int64, line int) {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return
+	}
+	kind := "double"
+	if bits == 32 {
+		kind = "float"
+	}
+	parts := [...]string{"set: ", traceNativeFloatText(value, bits), " is: raw=", strconv.FormatUint(raw, 10), " (", kind, ") sign=", traceBoolDigit(sign), " s=", strconv.FormatUint(sig, 10), " e=", strconv.FormatInt(exponent, 10), "\n"}
+	_ = tags.EmitConditional("mpf_dbg", "set", "src/util/mpf.cpp", line,
+		func() bool { return true }, func(w io.Writer) error {
+			for _, part := range parts {
+				if e := writeNumeralDisplayPart(w, part); e != nil {
+					return e
+				}
+			}
+			return nil
+		})
+}
+
+func (m *ArbitraryFloatManager) traceSetFloatRawResult(out *ArbitraryFloat) error {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return nil
+	}
+	var formatError error
+	_ = tags.EmitConditional("mpf_dbg", "set", "src/util/mpf.cpp", 183,
+		func() bool { return true }, func(w io.Writer) error {
+			if e := writeNumeralDisplayPart(w, "set: res = "); e != nil {
+				return e
+			}
+			var value utext.OwnedString
+			if e := m.ToStringRaw(out, &value); e != nil {
+				formatError = JoinNumericErrors(e, m.CleanupRawString())
+				value.OwnAbort()
+				return formatError
+			}
+			defer value.SourceDestroy()
+			formatted, e := value.View().String()
+			if e != nil {
+				formatError = e
+				return e
+			}
+			return writeNumeralDisplayPart(w, formatted+"\n")
 		})
 	return formatError
 }

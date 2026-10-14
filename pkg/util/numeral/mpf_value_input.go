@@ -144,6 +144,7 @@ func (m *ArbitraryFloatManager) SetDoubleWithReceipt(out *ArbitraryFloat, ebits,
 	sign := raw>>63 != 0
 	exp := int64((raw&0x7ff0000000000000)>>52) - 1023
 	sig := raw & 0x000fffffffffffff
+	m.traceSetNativeInput(value, 64, raw, sig, sign, exp, 124)
 	if modularSourceDebug && (exp < -1023 || exp > 1024) {
 		return ErrIntegerAssertion
 	}
@@ -159,12 +160,16 @@ func (m *ArbitraryFloatManager) SetDoubleWithReceipt(out *ArbitraryFloat, ebits,
 		return e
 	}
 	if sbits < 53 {
-		return m.integer.MachineDiv2kInPlace(&out.significand, 53-sbits)
+		if e := m.integer.MachineDiv2kInPlace(&out.significand, 53-sbits); e != nil {
+			return e
+		}
+	} else if sbits > 53 {
+		if e := m.integer.mul2kCoreWithAllocationContext(&out.significand, sbits-53, context); e != nil {
+			return e
+		}
 	}
-	if sbits > 53 {
-		return m.integer.mul2kCoreWithAllocationContext(&out.significand, sbits-53, context)
-	}
-	return nil
+	m.valueExecuting = false
+	return m.traceSetOrdinaryResult(out, 147)
 }
 
 func (m *ArbitraryFloatManager) SetFloat(out *ArbitraryFloat, ebits, sbits uint32, value float32) error {
@@ -184,6 +189,7 @@ func (m *ArbitraryFloatManager) SetFloatWithReceipt(out *ArbitraryFloat, ebits, 
 	sign := raw>>31 != 0
 	exp := int64(int32((raw&0x7f800000)>>23) - 127)
 	sig := raw & 0x007fffff
+	m.traceSetNativeInput(float64(value), 32, uint64(raw), uint64(sig), sign, exp, 160)
 	if modularSourceDebug && (exp < -127 || exp > 128) {
 		return ErrIntegerAssertion
 	}
@@ -199,12 +205,16 @@ func (m *ArbitraryFloatManager) SetFloatWithReceipt(out *ArbitraryFloat, ebits, 
 		return e
 	}
 	if sbits < 24 {
-		return m.integer.MachineDiv2kInPlace(&out.significand, 24-sbits)
+		if e := m.integer.MachineDiv2kInPlace(&out.significand, 24-sbits); e != nil {
+			return e
+		}
+	} else if sbits > 24 {
+		if e := m.integer.mul2kCoreWithAllocationContext(&out.significand, sbits-24, context); e != nil {
+			return e
+		}
 	}
-	if sbits > 24 {
-		return m.integer.mul2kCoreWithAllocationContext(&out.significand, sbits-24, context)
-	}
-	return nil
+	m.valueExecuting = false
+	return m.traceSetFloatRawResult(out)
 }
 
 // The source predicates use the original uint32 argument at this expression,
