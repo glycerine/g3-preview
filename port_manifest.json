@@ -175981,6 +175981,13 @@
           "tests": ["TestMPNDivisionVerificationConditionalTraceBeforeAssertion", "TestMPNDivisionVerificationConditionalTraceEndlRefusal"]
         },
         {
+          "name": "Reached fixed-point mpfx comparison, add/sub, multiply, divide, divide by power of two, floor/ceiling and power TRACE/STRACE sites (mpfx.cpp:332-648)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpfx_add_trace.go",
+          "go_targets": ["pkg/util/numeral/mpfx_compare_product_trace.go", "pkg/util/numeral/mpfx_division_callers_trace.go", "pkg/util/numeral/mpfx_integral_trace.go", "pkg/util/numeral/mpfx_power_trace.go", "pkg/util/numeral/mpfx_add_trace_test.go", "pkg/util/numeral/mpfx_compare_product_trace_test.go", "pkg/util/numeral/mpfx_division_callers_trace_test.go", "pkg/util/numeral/mpfx_division_source_order_test.go", "pkg/util/numeral/mpfx_integral_trace_test.go", "pkg/util/numeral/mpfx_power_trace_test.go"],
+          "tests": ["TestFixedPointAddSubSourceTraceOrderAndShortcuts", "TestFixedPointComparisonAndProductSourceTrace", "TestFixedPointRetainedDivisionCallersTrace", "TestFixedPointDivisionTraceSourceInsertionPrefixes", "TestFixedPointDivisionTraceRefusalKeepsArithmetic", "TestFixedPointFloorCeilSourceTrace", "TestFixedPointPowerSourceTraceAndRawWords"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -176508,6 +176515,13 @@
           "go_target": "pkg/util/numeral/mpn_verification_trace.go",
           "go_targets": ["pkg/util/numeral/mpn_verification_trace_test.go"],
           "tests": ["TestMPNDivisionVerificationConditionalTraceBeforeAssertion", "TestMPNDivisionVerificationConditionalTraceEndlRefusal"]
+        },
+        {
+          "name": "Reached fixed-point mpfx comparison, add/sub, multiply, divide, divide by power of two, floor/ceiling and power TRACE/STRACE sites (mpfx.cpp:332-648)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpfx_add_trace.go",
+          "go_targets": ["pkg/util/numeral/mpfx_compare_product_trace.go", "pkg/util/numeral/mpfx_division_callers_trace.go", "pkg/util/numeral/mpfx_integral_trace.go", "pkg/util/numeral/mpfx_power_trace.go", "pkg/util/numeral/mpfx_add_trace_test.go", "pkg/util/numeral/mpfx_compare_product_trace_test.go", "pkg/util/numeral/mpfx_division_callers_trace_test.go", "pkg/util/numeral/mpfx_division_source_order_test.go", "pkg/util/numeral/mpfx_integral_trace_test.go", "pkg/util/numeral/mpfx_power_trace_test.go"],
+          "tests": ["TestFixedPointAddSubSourceTraceOrderAndShortcuts", "TestFixedPointComparisonAndProductSourceTrace", "TestFixedPointRetainedDivisionCallersTrace", "TestFixedPointDivisionTraceSourceInsertionPrefixes", "TestFixedPointDivisionTraceRefusalKeepsArithmetic", "TestFixedPointFloorCeilSourceTrace", "TestFixedPointPowerSourceTraceAndRawWords"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
