@@ -28,10 +28,14 @@ func TestArbitraryFloatPartialRemainderScalarTraceOrder(t *testing.T) {
 		last := -1
 		for _, site := range []struct{ line, text string }{
 			{"1282", "x="},
+			{"1301", "X/Y_exp="},
 			{"1322", "tie= "},
+			{"1331", "Q_exp="},
+			{"1352", "YQ_sgn="},
 			{"1365", "exp_delta="},
 			{"1394", "aligned subtrahend="},
 			{"1398", "X_YQ_sig'="},
+			{"1410", "minuend="},
 			{"1421", "final sticky="},
 		} {
 			header := "-------- [mpf_dbg_rem] partial_remainder src/util/mpf.cpp:" + site.line + " ---------\n" + site.text
@@ -41,7 +45,12 @@ func TestArbitraryFloatPartialRemainderScalarTraceOrder(t *testing.T) {
 			}
 			last = at
 		}
-		if !strings.Contains(got, "d=0\npartial=0\n") || strings.Count(got, "------------------------------------------------\n") != 6 {
+		for _, field := range []string{"d=0\npartial=0\n", "X/Y_sig_lrg=", "X/Y_rem=", "X/Y~=", "Q_sig=", "Q=", "YQ_exp=", "YQ_sig=", "YQ=", "subtrahend=", "X_YQ_sgn=", "X_YQ_exp=", "X_YQ_sig=", "X-YQ="} {
+			if !strings.Contains(got, field) {
+				t.Fatalf("missing partial remainder trace field %q: %q", field, got)
+			}
+		}
+		if strings.Count(got, "------------------------------------------------\n") != 10 {
 			t.Fatalf("partial remainder source fields: %q", got)
 		}
 	}

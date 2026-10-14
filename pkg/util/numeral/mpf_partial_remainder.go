@@ -126,6 +126,9 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 	if e := z.machineDivRemWithAllocationContext(shifted, &y.significand, large, divRem, c); e != nil {
 		return e
 	}
+	if e := m.tracePartialRemainderRatio(x.Sign() != y.Sign(), d, large, divRem, eb, sb); e != nil {
+		return e
+	}
 	s.live[4], s.live[5] = true, true
 	q, qr := &s.values[4], &s.values[5]
 	qe := d
@@ -185,6 +188,9 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 	if e := m.renormalizeWithContext(eb, sb, &qe, q, c); e != nil {
 		return e
 	}
+	if e := m.tracePartialRemainderQ(x.Sign() != y.Sign(), qe, q, eb, sb); e != nil {
+		return e
+	}
 	if d == -1 || partial {
 		empty, e := z.IsZero(q)
 		if e != nil {
@@ -219,6 +225,9 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 		return e
 	}
 	if e := m.renormalizeWithContext(eb, 2*sb-1, &pe, product, c); e != nil {
+		return e
+	}
+	if e := m.tracePartialRemainderProduct(x.Sign(), pe, product, eb, sb); e != nil {
 		return e
 	}
 	if e := s.assertPower(product, 2*sb-1, false); e != nil {
@@ -346,6 +355,9 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 		return m.MkZero(eb, sb, x.Sign(), x)
 	}
 	if e := m.renormalizeWithContext(eb, 2*sb-1, &re, result, c); e != nil {
+		return e
+	}
+	if e := m.tracePartialRemainderDifference(minuend, subtrahend, sign, re, result, eb, sb); e != nil {
 		return e
 	}
 	if e := s.assertPower(result, 2*sb-1, false); e != nil {

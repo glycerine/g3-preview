@@ -149582,6 +149582,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/util/numeral/mpf_partial_remainder_component_trace.go",
         "pkg/util/numeral/mpf_partial_remainder_trace.go",
         "pkg/util/numeral/mpf_partial_remainder_trace_test.go",
         "pkg/util/numeral/mpf_rem_trace_test.go",
@@ -150455,9 +150456,9 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "mpf_manager::partial_remainder mpf_dbg_rem entry, tie, exponent delta, aligned subtrahend, signed difference and sticky TRACE at mpf.cpp:1282,1322,1365,1394,1398,1421; quotient/product/component and final object-layout diagnostics remain partial",
+          "name": "mpf_manager::partial_remainder mpf_dbg_rem entry, quotient ratio, tie, Q, YQ, exponent delta, aligned subtrahend, signed difference, X-YQ and sticky TRACE at mpf.cpp:1282-1421; final object-layout diagnostics remain partial",
           "status": "partial",
-          "go_target": "pkg/util/numeral/mpf_partial_remainder_trace.go",
+          "go_target": "pkg/util/numeral/mpf_partial_remainder_component_trace.go",
           "tests": ["TestArbitraryFloatPartialRemainderScalarTraceOrder"]
         },
         {
