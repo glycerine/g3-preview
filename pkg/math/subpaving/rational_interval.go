@@ -10,13 +10,13 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
-// RationalInterval owns the mutable endpoint numerals used by context_mpq.
-// The constant node/variable view will be connected with the rational node
-// owner; this type currently exposes the mutable source interval operations.
+// RationalInterval owns mutable endpoint numerals or borrows a live node view.
 type RationalInterval struct {
 	self                 *RationalInterval
 	numbers              *numeral.RationalManager
 	lower, upper         numeral.Rational
+	constantNode         *RationalNode
+	constantVariable     uint32
 	lowerInf, upperInf   bool
 	lowerOpen, upperOpen bool
 	closed               bool
@@ -44,6 +44,61 @@ func (v *RationalInterval) open() error {
 	return nil
 }
 
+func (v *RationalInterval) resolved() (*numeral.Rational, *numeral.Rational, error) {
+	if err := v.open(); err != nil {
+		return nil, nil, err
+	}
+	lower, upper := &v.lower, &v.upper
+	if v.constantNode != nil {
+		lo, hi, err := v.constantNode.Bounds(v.constantVariable)
+		if err != nil {
+			return nil, nil, err
+		}
+		v.lowerInf, v.upperInf = lo == nil, hi == nil
+		v.lowerOpen, v.upperOpen = lo == nil || lo.open, hi == nil || hi.open
+		if lo != nil {
+			lower = &lo.value
+		}
+		if hi != nil {
+			upper = &hi.value
+		}
+	}
+	return lower, upper, nil
+}
+
+func (v *RationalInterval) mutable() error {
+	_, _, err := v.resolved()
+	if err == nil && v.constantNode != nil {
+		return arena.ErrInvalidSlot
+	}
+	return err
+}
+
+func (v *RationalInterval) SetConstant(node *RationalNode, variable uint32) error {
+	if _, _, err := v.resolved(); err != nil {
+		return err
+	}
+	if node == nil || node.numbers != v.numbers {
+		return arena.ErrInvalidSlot
+	}
+	if _, _, err := node.Bounds(variable); err != nil {
+		return err
+	}
+	v.constantNode, v.constantVariable = node, variable
+	_, _, err := v.resolved()
+	return err
+}
+
+func (v *RationalInterval) SetMutable() error {
+	if _, _, err := v.resolved(); err != nil {
+		return err
+	}
+	v.constantNode = nil
+	v.lowerInf, v.upperInf = true, true
+	v.lowerOpen, v.upperOpen = true, true
+	return nil
+}
+
 func (v *RationalInterval) lowerKind() interval.ExtendedKind {
 	if v.lowerInf {
 		return interval.MinusInfinity
@@ -59,20 +114,20 @@ func (v *RationalInterval) upperKind() interval.ExtendedKind {
 }
 
 func (v *RationalInterval) pair(other *RationalInterval) error {
-	if err := v.open(); err != nil {
+	if err := v.mutable(); err != nil {
 		return err
 	}
-	if err := other.open(); err != nil {
+	if _, _, err := other.resolved(); err != nil {
 		return err
 	}
-	if v.numbers != other.numbers {
+	if v.numbers != other.numbers || other.constantNode != nil {
 		return arena.ErrInvalidSlot
 	}
 	return nil
 }
 
 func (v *RationalInterval) SetFinite(lower, upper *numeral.Rational, lowerOpen, upperOpen bool) error {
-	if err := v.open(); err != nil {
+	if err := v.mutable(); err != nil {
 		return err
 	}
 	e := interval.RationalExtended{Numbers: v.numbers}
@@ -105,7 +160,7 @@ func (v *RationalInterval) SetFinite(lower, upper *numeral.Rational, lowerOpen, 
 }
 
 func (v *RationalInterval) ResetLower() error {
-	if err := v.open(); err != nil {
+	if err := v.mutable(); err != nil {
 		return err
 	}
 	if err := v.numbers.Reset(&v.lower); err != nil {
@@ -116,7 +171,7 @@ func (v *RationalInterval) ResetLower() error {
 }
 
 func (v *RationalInterval) ResetUpper() error {
-	if err := v.open(); err != nil {
+	if err := v.mutable(); err != nil {
 		return err
 	}
 	if err := v.numbers.Reset(&v.upper); err != nil {
@@ -134,19 +189,26 @@ func (v *RationalInterval) Reset() error {
 }
 
 func (v *RationalInterval) SetFrom(src *RationalInterval) error {
-	if err := v.pair(src); err != nil {
+	if err := v.mutable(); err != nil {
 		return err
+	}
+	slo, shi, err := src.resolved()
+	if err != nil {
+		return err
+	}
+	if v.numbers != src.numbers {
+		return arena.ErrInvalidSlot
 	}
 	if v == src {
 		return nil
 	}
 	if !src.lowerInf {
-		if err := v.numbers.Copy(&v.lower, &src.lower); err != nil {
+		if err := v.numbers.Copy(&v.lower, slo); err != nil {
 			return err
 		}
 	}
 	if !src.upperInf {
-		if err := v.numbers.Copy(&v.upper, &src.upper); err != nil {
+		if err := v.numbers.Copy(&v.upper, shi); err != nil {
 			return err
 		}
 	}
@@ -156,11 +218,12 @@ func (v *RationalInterval) SetFrom(src *RationalInterval) error {
 }
 
 func (v *RationalInterval) CheckInvariant() error {
-	if err := v.open(); err != nil {
+	lo, hi, err := v.resolved()
+	if err != nil {
 		return err
 	}
 	e := interval.RationalExtended{Numbers: v.numbers}
-	equal, err := e.Equal(&v.lower, v.lowerKind(), &v.upper, v.upperKind())
+	equal, err := e.Equal(lo, v.lowerKind(), hi, v.upperKind())
 	if err != nil {
 		return err
 	}
@@ -170,7 +233,7 @@ func (v *RationalInterval) CheckInvariant() error {
 		}
 		return nil
 	}
-	less, err := e.Less(&v.lower, v.lowerKind(), &v.upper, v.upperKind())
+	less, err := e.Less(lo, v.lowerKind(), hi, v.upperKind())
 	if err != nil {
 		return err
 	}
@@ -181,26 +244,27 @@ func (v *RationalInterval) CheckInvariant() error {
 }
 
 func (v *RationalInterval) ContainsZero() (bool, error) {
-	if err := v.open(); err != nil {
-		return false, err
-	}
-	e := interval.RationalExtended{Numbers: v.numbers}
-	neg, err := e.IsNeg(&v.lower, v.lowerKind())
+	lo, hi, err := v.resolved()
 	if err != nil {
 		return false, err
 	}
-	zero, err := e.IsZero(&v.lower, v.lowerKind())
+	e := interval.RationalExtended{Numbers: v.numbers}
+	neg, err := e.IsNeg(lo, v.lowerKind())
+	if err != nil {
+		return false, err
+	}
+	zero, err := e.IsZero(lo, v.lowerKind())
 	if err != nil {
 		return false, err
 	}
 	if !neg && (!zero || v.lowerOpen) {
 		return false, nil
 	}
-	pos, err := e.IsPos(&v.upper, v.upperKind())
+	pos, err := e.IsPos(hi, v.upperKind())
 	if err != nil {
 		return false, err
 	}
-	zero, err = e.IsZero(&v.upper, v.upperKind())
+	zero, err = e.IsZero(hi, v.upperKind())
 	if err != nil {
 		return false, err
 	}
@@ -208,7 +272,8 @@ func (v *RationalInterval) ContainsZero() (bool, error) {
 }
 
 func (v *RationalInterval) Display(w io.Writer) error {
-	if err := v.open(); err != nil {
+	lo, hi, err := v.resolved()
+	if err != nil {
 		return err
 	}
 	left, right := "[", "]"
@@ -222,13 +287,13 @@ func (v *RationalInterval) Display(w io.Writer) error {
 		return err
 	}
 	e := interval.RationalExtended{Numbers: v.numbers}
-	if err := e.Display(w, &v.lower, v.lowerKind()); err != nil {
+	if err := e.Display(w, lo, v.lowerKind()); err != nil {
 		return err
 	}
 	if err := writeSubpavingIntervalText(w, ", "); err != nil {
 		return err
 	}
-	if err := e.Display(w, &v.upper, v.upperKind()); err != nil {
+	if err := e.Display(w, hi, v.upperKind()); err != nil {
 		return err
 	}
 	return writeSubpavingIntervalText(w, right)

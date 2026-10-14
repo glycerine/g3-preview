@@ -52069,11 +52069,15 @@
           ]
         },
         {
-          "name": "Concrete config_mpq mutable interval endpoints, rational manager forwarding, reset/set/invariant/contains-zero/display; constant node views and context integration remain open (src/math/subpaving/subpaving_t.h:239-316)",
+          "name": "Concrete config_mpq mutable endpoints and live rational node-bound views for invariant, zero-containment, display and owned copy; arithmetic operands and context integration remain open (src/math/subpaving/subpaving_t.h:239-316)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/rational_interval.go",
+          "go_targets": [
+            "pkg/math/subpaving/rational_node.go"
+          ],
           "tests": [
-            "TestSubpavingRationalMutableIntervalCore"
+            "TestSubpavingRationalMutableIntervalCore",
+            "TestRationalIntervalLiveNodeBoundsAndOwnedCopy"
           ]
         },
         {
