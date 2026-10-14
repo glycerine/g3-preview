@@ -122355,6 +122355,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/util/numeral/mpf_powers_runtime.go",
         "pkg/ast/ast_core_delete.go",
         "pkg/util/symbol/dictionary_int32.go",
         "pkg/ast/ast_builtin_plugins_user.go",
@@ -122374,6 +122375,9 @@
         "pkg/ast/rewriter/used_vars_ufbv.go"
       ],
       "tests": [
+        "TestArbitraryFloatSourceConstructorUsesNativePowerDictionaries",
+        "TestArbitraryFloatPowersRuntimeWrapperCacheAndSourceDestruction",
+        "TestArbitraryFloatPowerMinusOneAndNegatedCaches",
         "TestASTDebugRefCountActualDeletedIDMapAndSkippedRecycle",
         "TestSymbolDictionaryInt32LookupMutationAndReset",
         "TestASTUserNameDictionaryRegistrationAndFreshReplay",
@@ -122585,6 +122589,16 @@
           "status": "platform_replacement",
           "go_target": "pkg/ast/ast_core_delete.go",
           "tests": ["TestASTDebugRefCountActualDeletedIDMapAndSkippedRecycle"]
+        },
+        {
+          "name": "Concrete MPF powers2 four u_map<mpz*> caches: key lookup, insertion, borrowed wrapper IDs, and disposal on owner destruction (mpf.h:241-287)",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mpf_powers_runtime.go",
+          "tests": [
+            "TestArbitraryFloatSourceConstructorUsesNativePowerDictionaries",
+            "TestArbitraryFloatPowersRuntimeWrapperCacheAndSourceDestruction",
+            "TestArbitraryFloatPowerMinusOneAndNegatedCaches"
+          ]
         },
         {
           "name": "u_map<uint32> construction/copy/destruction",
@@ -148446,6 +148460,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/util/numeral/mpf_powers_runtime.go",
         "pkg/ast/ast_core_delete.go",
         "pkg/util/params/util_param_descrs.go",
         "pkg/util/params/util_gparams_dictionary.go",
@@ -148457,6 +148472,9 @@
         "pkg/ast/pattern/collect.go"
       ],
       "tests": [
+        "TestArbitraryFloatSourceConstructorUsesNativePowerDictionaries",
+        "TestArbitraryFloatPowersRuntimeWrapperCacheAndSourceDestruction",
+        "TestArbitraryFloatPowerMinusOneAndNegatedCaches",
         "TestASTDebugRefCountActualDeletedIDMapAndSkippedRecycle",
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
         "TestParamDescrsSourceModuleAndNullKinds",
@@ -148542,6 +148560,16 @@
           "status": "platform_replacement",
           "go_target": "pkg/ast/ast_core_delete.go",
           "tests": ["TestASTDebugRefCountActualDeletedIDMapAndSkippedRecycle"]
+        },
+        {
+          "name": "Concrete MPF powers2 four u_map<mpz*> caches: key lookup, insertion, borrowed wrapper IDs, and disposal on owner destruction (mpf.h:241-287)",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mpf_powers_runtime.go",
+          "tests": [
+            "TestArbitraryFloatSourceConstructorUsesNativePowerDictionaries",
+            "TestArbitraryFloatPowersRuntimeWrapperCacheAndSourceDestruction",
+            "TestArbitraryFloatPowerMinusOneAndNegatedCaches"
+          ]
         },
         {
           "name": "u_map<uint32> construction/copy/destruction",
