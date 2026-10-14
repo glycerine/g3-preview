@@ -2,6 +2,7 @@ package subpaving
 
 import (
 	"bytes"
+	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -155,6 +156,33 @@ func TestSubpavingFastQueuedMonomialCatchesMPFFOverflow(t *testing.T) {
 		if err != nil || !equal {
 			t.Fatalf("later watched definition lost the exact maximum bound: equal=%t err=%v", equal, err)
 		}
+	}
+}
+
+func TestSubpavingFastQueuedSelfDefinitionPropagatesMPFFOverflow(t *testing.T) {
+	m, c, v, root := fastMonomialFixture(t, []bool{false, false})
+	y, err := c.DefineMonomial([]FastPower{{Variable: 0, Degree: 1}, {Variable: 1, Degree: 1}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := m.SetPlusEpsilon(v); err != nil {
+		t.Fatal(err)
+	}
+	for _, lower := range []bool{true, false} {
+		if err := c.PropagateBound(root, 0, v, lower, false); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := m.SetMax(v); err != nil {
+		t.Fatal(err)
+	}
+	for _, lower := range []bool{true, false} {
+		if err := c.PropagateBound(root, y, v, lower, false); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := c.processQueuedBound(root, root.lower[y]); !errors.Is(err, numeral.ErrFastFloatDomain) || c.arithmeticFailed {
+		t.Fatalf("source self-definition exception must escape watcher catch: %v, failed=%t", err, c.arithmeticFailed)
 	}
 }
 
