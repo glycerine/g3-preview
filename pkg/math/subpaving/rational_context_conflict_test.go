@@ -59,6 +59,9 @@ func TestRationalContextSourceBoundConflicts(t *testing.T) {
 		t.Fatal("one-sided bound conflicts")
 	}
 	must(c.PublishBound(closed, x, &lo, false, false))
+	if closed.trail == nil || closed.trail.timestamp != 1 || closed.trail.previous == nil || closed.trail.previous.timestamp != 0 || closed.trail.previous.previous != nil || closed.trail.variable != x || closed.trail.lower {
+		t.Fatal("source bound trail and timestamp order")
+	}
 	conflict, err = closed.ConflictingBounds(x)
 	must(err)
 	if conflict || closed.conflictVar != math.MaxUint32 {
@@ -107,7 +110,29 @@ func TestRationalContextSourceBoundConflicts(t *testing.T) {
 	if inherited.conflictVar != x {
 		t.Fatal("child lost conflict status")
 	}
+	if inherited.trail != reversed.trail {
+		t.Fatal("child did not borrow parent trail")
+	}
 	if err := c.PublishBound(inherited, x, &lo, false, false); !errors.Is(err, arena.ErrInvalidSlot) {
 		t.Fatalf("inherited conflict allowed publication: %v", err)
+	}
+	exhausted, err := c.NewChild(root)
+	must(err)
+	c.timestamp = math.MaxUint64 - 1
+	if err := c.PublishBound(exhausted, x, &lo, true, false); !errors.Is(err, ErrRationalContextTimestamp) || !errors.Is(err, ErrSubpavingFailure) {
+		t.Fatalf("published timestamp exhaustion: %v", err)
+	}
+	bound, _, err := exhausted.Bounds(x)
+	must(err)
+	if bound == nil || bound.timestamp != math.MaxUint64-1 || exhausted.trail != bound || c.timestamp != math.MaxUint64 || c.numBounds != 7 {
+		t.Fatal("timestamp failure lost published bound")
+	}
+	if err := c.PublishBound(exhausted, x, &hi, false, false); !errors.Is(err, ErrRationalContextTimestamp) {
+		t.Fatalf("timestamp reentry: %v", err)
+	}
+	_, upper, err := exhausted.Bounds(x)
+	must(err)
+	if upper != nil || c.numBounds != 7 {
+		t.Fatal("timestamp reentry published a bound")
 	}
 }

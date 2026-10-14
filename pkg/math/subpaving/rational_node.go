@@ -11,8 +11,12 @@ import (
 
 // RationalBound owns one exact endpoint. Child nodes borrow ancestor bounds.
 type RationalBound struct {
-	value numeral.Rational
-	open  bool
+	value     numeral.Rational
+	variable  uint32
+	lower     bool
+	open      bool
+	timestamp uint64
+	previous  *RationalBound
 }
 
 // RationalNode owns bounds it publishes and copies its parent's bound views.
@@ -24,6 +28,7 @@ type RationalNode struct {
 	registered   bool
 	lower, upper []*RationalBound
 	owned        []*RationalBound
+	trail        *RationalBound
 	leafPrev     *RationalNode
 	leafNext     *RationalNode
 	queuedLeaf   bool
@@ -51,6 +56,7 @@ func NewRationalNode(m *numeral.RationalManager, variables uint32, parent *Ratio
 		copy(n.upper, parent.upper)
 		n.context = parent.context
 		n.conflictVar = parent.conflictVar
+		n.trail = parent.trail
 		parent.children++
 	}
 	return n, nil
@@ -98,14 +104,19 @@ func (n *RationalNode) PushBound(variable uint32, value *numeral.Rational, lower
 }
 
 func (n *RationalNode) pushBound(variable uint32, value *numeral.Rational, lower, open bool) error {
+	return n.pushBoundAt(variable, value, lower, open, 0)
+}
+
+func (n *RationalNode) pushBoundAt(variable uint32, value *numeral.Rational, lower, open bool, timestamp uint64) error {
 	if _, _, err := n.Bounds(variable); err != nil {
 		return err
 	}
-	b := &RationalBound{value: numeral.NewRational(), open: open}
+	b := &RationalBound{value: numeral.NewRational(), variable: variable, lower: lower, open: open, timestamp: timestamp, previous: n.trail}
 	if err := n.numbers.Copy(&b.value, value); err != nil {
 		return errors.Join(err, n.numbers.Del(&b.value))
 	}
 	n.owned = append(n.owned, b)
+	n.trail = b
 	if lower {
 		n.lower[variable] = b
 	} else {
@@ -132,7 +143,7 @@ func (n *RationalNode) Close() error {
 			return err
 		}
 	}
-	n.owned, n.lower, n.upper = nil, nil, nil
+	n.owned, n.lower, n.upper, n.trail = nil, nil, nil, nil
 	n.closed = true
 	if n.parent != nil {
 		n.parent.children--

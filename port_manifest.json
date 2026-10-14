@@ -51662,7 +51662,8 @@
       "go_targets": [
         "pkg/math/subpaving/rational_context_root.go",
         "pkg/math/subpaving/rational_node.go",
-        "pkg/math/subpaving/rational_selector.go"
+        "pkg/math/subpaving/rational_selector.go",
+        "pkg/math/subpaving/source_exception.go"
       ],
       "tests": [
         "TestRationalContextRootIntegerBoundsAndChildViews",
@@ -51688,7 +51689,8 @@
         "pkg/math/subpaving/rational_interval_power.go",
         "pkg/math/subpaving/rational_context_root.go",
         "pkg/math/subpaving/rational_node.go",
-        "pkg/math/subpaving/rational_selector.go"
+        "pkg/math/subpaving/rational_selector.go",
+        "pkg/math/subpaving/source_exception.go"
       ],
       "tests": [
         "TestSubpavingRationalMutableIntervalCore",
@@ -52093,12 +52095,13 @@
           ]
         },
         {
-          "name": "Concrete config_mpq variable registration, root and child views, integer bound normalization, crossed/open-singleton conflict detection, leaf-list removal and BFS pop (src/math/subpaving/subpaving_t_def.h:291-342,525-569,967-1060,1163-1167,1337-1342); propagation and search remain open",
+          "name": "Concrete config_mpq variable registration, root and child views, integer bound normalization, conflict and leaf-list handling, BFS pop, source bound trail and timestamp-exhaustion publication (src/math/subpaving/subpaving_t_def.h:291-342,525-570,967-1060,1163-1167,1337-1342); propagation and search remain open",
           "status": "partial",
           "go_target": "pkg/math/subpaving/rational_context_root.go",
           "go_targets": [
             "pkg/math/subpaving/rational_node.go",
-            "pkg/math/subpaving/rational_selector.go"
+            "pkg/math/subpaving/rational_selector.go",
+            "pkg/math/subpaving/source_exception.go"
           ],
           "tests": [
             "TestRationalContextRootIntegerBoundsAndChildViews",

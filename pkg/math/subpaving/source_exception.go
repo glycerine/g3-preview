@@ -9,6 +9,7 @@ import (
 )
 
 var ErrSubpavingFailure = errors.New("subpaving: source exception")
+var ErrRationalContextTimestamp error = &sourceFailure{message: "subpaving: rational bound timestamp exhausted"}
 
 type sourceFailure struct{ message string }
 

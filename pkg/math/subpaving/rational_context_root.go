@@ -23,6 +23,7 @@ type RationalContext struct {
 	leafTail     *RationalNode
 	numBounds    uint64
 	numConflicts uint64
+	timestamp    uint64
 	closed       bool
 }
 
@@ -110,6 +111,9 @@ func (c *RationalContext) PublishBound(n *RationalNode, variable uint32, value *
 	if value == nil {
 		return arena.ErrInvalidSlot
 	}
+	if c.timestamp == math.MaxUint64 {
+		return ErrRationalContextTimestamp
+	}
 	c.numBounds++
 	if !c.variables[variable] {
 		return c.publishNormalized(n, variable, value, lower, open)
@@ -146,7 +150,7 @@ func (c *RationalContext) PublishBound(n *RationalNode, variable uint32, value *
 }
 
 func (c *RationalContext) publishNormalized(n *RationalNode, variable uint32, value *numeral.Rational, lower, open bool) error {
-	if err := n.pushBound(variable, value, lower, open); err != nil {
+	if err := n.pushBoundAt(variable, value, lower, open, c.timestamp); err != nil {
 		return err
 	}
 	conflict, err := n.ConflictingBounds(variable)
@@ -157,6 +161,10 @@ func (c *RationalContext) publishNormalized(n *RationalNode, variable uint32, va
 		n.conflictVar = variable
 		c.numConflicts++
 		c.removeLeaf(n)
+	}
+	c.timestamp++
+	if c.timestamp == math.MaxUint64 {
+		return ErrRationalContextTimestamp
 	}
 	return nil
 }
