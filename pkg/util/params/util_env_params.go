@@ -25,7 +25,9 @@ func NewEnvParamsRuntime(g *GlobalParams, v *diagnostic.VerboseContext, m *memor
 		return nil, arena.ErrConfig
 	}
 	process, numericProcess := m.ProcessOwner(), q.RuntimeOwner().ProcessOwner()
-	if (process != nil || numericProcess != nil) && process != numericProcess {
+	// Separate standalone runtimes have separate counters even though both
+	// report no process owner. The source updates one memory namespace.
+	if process != numericProcess || (process == nil && m != q.RuntimeOwner()) {
 		return nil, arena.ErrConfig
 	}
 	return &EnvParamsRuntime{globals: g, verbose: v, memory: m, warnings: w}, nil

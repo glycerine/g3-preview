@@ -16,8 +16,19 @@ import (
 
 func envParamsRuntimeFixture(t *testing.T) (*GlobalParams, *diagnostic.VerboseContext, *umemory.Runtime, *EnvParamsRuntime, *bytes.Buffer) {
 	t.Helper()
-	ctx, sy, _ := paramsTestOwner(t)
 	b := arena.NewBudget(1 << 24)
+	process := umemory.NewProcessAccounting()
+	numericRuntime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, Process: process, SizeTBits: 64})
+	paramsMust(t, e)
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{
+		Memory: numericRuntime, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true},
+		Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}},
+	}})
+	paramsMust(t, e)
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
+	paramsMust(t, e)
+	ctx, e := NewParamsContext(sy, q, ParamsConfig{Budget: b})
+	paramsMust(t, e)
 	cfg := gparamsTestConfig(b)
 	cfg.Register = func(r GlobalParamsRegistrar) error {
 		d, e := NewParamDescrs(sy, ParamDescrsConfig{Budget: b, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}}})
@@ -36,7 +47,7 @@ func envParamsRuntimeFixture(t *testing.T) (*GlobalParams, *diagnostic.VerboseCo
 	paramsMust(t, e)
 	v, e := diagnostic.NewVerboseContext(out, b)
 	paramsMust(t, e)
-	m, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
+	m, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, Process: process, SizeTBits: 64})
 	paramsMust(t, e)
 	stderr := &bytes.Buffer{}
 	warnings := diagnostic.NewWarningService(stderr)
@@ -47,11 +58,35 @@ func envParamsRuntimeFixture(t *testing.T) (*GlobalParams, *diagnostic.VerboseCo
 		paramsMust(t, v.Close())
 		paramsMust(t, out.Close())
 		paramsMust(t, g.Close())
+		paramsMust(t, ctx.Close())
+		paramsMust(t, q.Close())
+		paramsMust(t, sy.Close())
+		paramsMust(t, numericRuntime.Close())
 		if b.Used() != 0 {
 			t.Fatal("environment owner storage", b.Used())
 		}
 	})
 	return g, v, m, env, stderr
+}
+
+func TestEnvParamsRejectsUnsharedStandaloneMemoryRuntime(t *testing.T) {
+	ctx, sy, q := paramsTestOwner(t)
+	b := arena.NewBudget(1 << 20)
+	g, e := NewGlobalParams(sy, ctx, gparamsTestConfig(b))
+	paramsMust(t, e)
+	t.Cleanup(func() { paramsMust(t, g.Close()) })
+	other, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
+	paramsMust(t, e)
+	t.Cleanup(func() { paramsMust(t, other.Close()) })
+	v := diagnostic.BorrowProcessVerboseContext()
+	w := diagnostic.NewWarningService(&bytes.Buffer{})
+	before := b.Used()
+	if env, err := NewEnvParamsRuntime(g, v, other, w); env != nil || !errors.Is(err, arena.ErrConfig) || b.Used() != before {
+		t.Fatal("standalone runtime has different accounting", env, err, b.Used(), before)
+	}
+	if env, err := NewEnvParamsRuntime(g, v, q.RuntimeOwner(), w); err != nil || env == nil {
+		t.Fatal("numeric runtime itself must remain valid", env, err)
+	}
 }
 
 func TestEnvParamsRuntimeSourceOrderAndRawWatermark(t *testing.T) {
@@ -85,6 +120,9 @@ func TestEnvParamsRuntimeSourceOrderAndRawWatermark(t *testing.T) {
 	if count != 3 {
 		t.Fatal("max allocation count", count)
 	}
+	// The numeric owner now shares this process counter. Release the
+	// deliberately tiny limit before exercising later parameter allocations.
+	paramsMust(t, m.SetMaxCount(0))
 	block, e := m.Allocate(1)
 	paramsMust(t, e)
 	above, e := m.AboveWatermark()
