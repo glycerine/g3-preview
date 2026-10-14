@@ -35,6 +35,7 @@ var ErrBinaryRootDegreeZero = errors.New("mpnum: binary-rational root degree zer
 var ErrBinaryComparePending = errors.New("mpnum: binary-rational comparison cleanup pending")
 var ErrBinaryConvertPending = errors.New("mpnum: binary-rational conversion cleanup pending")
 var ErrBinaryRoundPending = errors.New("mpnum: binary-rational rounding cleanup pending")
+var ErrBinaryToRationalPending = errors.New("mpnum: binary-rational to-rational cleanup pending")
 
 // This cold operation owner borrows z and diagnostics. Both must outlive it.
 // No operations or shared Budget accesses are concurrently safe.
@@ -74,6 +75,9 @@ type BinaryRationalManager struct {
 	roundImported                                  Int
 	roundImportedOwner                             *IntegerManager
 	roundImportedPending, roundExecuting           bool
+	toRationalImported                             Int
+	toRationalImportedOwner                        *IntegerManager
+	toRationalImportedPending, toRationalExecuting bool
 }
 type BinaryRationalStats struct {
 	HeaderBytes           uint64
@@ -119,6 +123,9 @@ func (m *BinaryRationalManager) open() error {
 	}
 	if m.roundImportedPending && !m.roundExecuting {
 		return ErrBinaryRoundPending
+	}
+	if m.toRationalImportedPending && !m.toRationalExecuting {
+		return ErrBinaryToRationalPending
 	}
 	return nil
 }
@@ -173,6 +180,9 @@ func (m *BinaryRationalManager) CloseChecked() error {
 	if m.roundExecuting {
 		return ErrBinaryRoundPending
 	}
+	if m.toRationalExecuting {
+		return ErrBinaryToRationalPending
+	}
 	if m.closed {
 		return nil
 	}
@@ -193,6 +203,9 @@ func (m *BinaryRationalManager) CloseChecked() error {
 		return e
 	}
 	if e := m.CleanupRoundImported(); e != nil {
+		return e
+	}
+	if e := m.CleanupToRationalImported(); e != nil {
 		return e
 	}
 	if e := m.CleanupRefineMid(); e != nil {

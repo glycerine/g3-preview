@@ -150105,7 +150105,8 @@
             "TestBinaryFailureImmediateRoots",
             "TestBinaryScopedRoutes",
             "TestBinaryConvertImportedOwningCleanupPhysicalRetry",
-            "TestBinaryRoundImportedOwningCleanupPhysicalRetry"
+            "TestBinaryRoundImportedOwningCleanupPhysicalRetry",
+            "TestBinaryToRationalImportedOwningCleanupPhysicalRetry"
           ]
         },
         {
@@ -150426,7 +150427,8 @@
             "TestBinaryFailureImmediateRoots",
             "TestBinaryScopedRoutes",
             "TestBinaryConvertImportedOwningCleanupPhysicalRetry",
-            "TestBinaryRoundImportedOwningCleanupPhysicalRetry"
+            "TestBinaryRoundImportedOwningCleanupPhysicalRetry",
+            "TestBinaryToRationalImportedOwningCleanupPhysicalRetry"
           ]
         },
         {

@@ -202,7 +202,7 @@ func (m *BinaryRationalManager) CleanupConvertImported() error {
 	}
 	return m.cleanupConvertImported()
 }
-func (m *BinaryRationalManager) ToRational(qm *RationalManager, a *BinaryRational, out *Rational) error {
+func (m *BinaryRationalManager) ToRational(qm *RationalManager, a *BinaryRational, out *Rational) (err error) {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -219,16 +219,48 @@ func (m *BinaryRationalManager) ToRational(qm *RationalManager, a *BinaryRationa
 	if e := qm.Inv(out, out); e != nil {
 		return e
 	}
-	var local Int
-	defer qm.Z.Del(&local)
 	n := &a.Num
 	if qm.Z != m.Z {
-		if e := qm.Z.CopyFrom(&local, m.Z, n); e != nil {
+		m.toRationalImported = Int{}
+		m.toRationalImportedOwner = qm.Z
+		m.toRationalImportedPending = true
+		m.toRationalExecuting = true
+		defer func() {
+			if cleanup := m.cleanupToRationalImported(); err == nil {
+				err = cleanup
+			}
+			m.toRationalExecuting = false
+		}()
+		if e := qm.Z.CopyFrom(&m.toRationalImported, m.Z, n); e != nil {
 			return e
 		}
-		n = &local
+		n = &m.toRationalImported
 	}
 	return qm.MulInt(n, out, out)
+}
+
+func (m *BinaryRationalManager) cleanupToRationalImported() error {
+	if !m.toRationalImportedPending {
+		return nil
+	}
+	if e := m.toRationalImportedOwner.Del(&m.toRationalImported); e != nil {
+		return e
+	}
+	m.toRationalImported = Int{}
+	m.toRationalImportedOwner = nil
+	m.toRationalImportedPending = false
+	return nil
+}
+
+// CleanupToRationalImported resumes release through the borrowed MPQ owner.
+func (m *BinaryRationalManager) CleanupToRationalImported() error {
+	if m == nil || m.self != m {
+		return ErrBinaryOwner
+	}
+	if m.toRationalExecuting {
+		return ErrBinaryToRationalPending
+	}
+	return m.cleanupToRationalImported()
 }
 func (m *BinaryRationalManager) ToOwnedRational(s *RationalService, a *BinaryRational) (OwnedRational, error) {
 	if e := m.check(a); e != nil {
