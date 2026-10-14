@@ -1,3 +1,10 @@
+`cmd_exception` location profile correction: the `line()` and `pos()` guards in
+`src/util/cmd_context_types.h` are `SASSERT` only. Native Go builds now return
+the stored location even when `has_pos()` is false; `g3debug` retains the
+existing precondition error. Constructor and symbol-composition behavior stays
+unchanged. Focused native and `g3debug,g3checked` smtcore suites pass on CPUs
+8-16; the command runtime and parser owners remain unported.
+
 `z3_error` zero-code profile correction: `src/util/z3_exception.cpp:36-38`
 checks the nonzero constructor precondition only through `SASSERT`. Native Go
 builds now accept code zero, retaining the source `unknown error` message and

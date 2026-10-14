@@ -18,11 +18,14 @@ func TestCmdExceptionSourceConstructorRoutesAndLocationGuards(t *testing.T) {
 		if a.MessageField != text || b.MessageField != strings.SplitN(text, "\x00", 2)[0] || a.HasPos() || b.HasPos() {
 			t.Fatal(a, b)
 		}
-		if _, e := a.Line(); e != z3exception.ErrExceptionPrecondition {
-			t.Fatal(e)
-		}
-		if _, e := a.Pos(); e != z3exception.ErrExceptionPrecondition {
-			t.Fatal(e)
+		line, lineErr := a.Line()
+		pos, posErr := a.Pos()
+		if cmdExceptionSourceDebug {
+			if lineErr != z3exception.ErrExceptionPrecondition || posErr != z3exception.ErrExceptionPrecondition {
+				t.Fatal(lineErr, posErr)
+			}
+		} else if lineErr != nil || posErr != nil || line != -1 || pos != -1 {
+			t.Fatal(line, pos, lineErr, posErr)
 		}
 		for _, line := range []int32{-2147483648, -1, 0, 1, 2147483647} {
 			for _, pos := range []int32{-2147483648, -1, 0, 5, 2147483647} {
@@ -36,8 +39,12 @@ func TestCmdExceptionSourceConstructorRoutesAndLocationGuards(t *testing.T) {
 					if le != nil || pe != nil || l != line || p != pos {
 						t.Fatal(x, l, p, le, pe)
 					}
-				} else if le != z3exception.ErrExceptionPrecondition || pe != z3exception.ErrExceptionPrecondition {
-					t.Fatal(le, pe)
+				} else if cmdExceptionSourceDebug {
+					if le != z3exception.ErrExceptionPrecondition || pe != z3exception.ErrExceptionPrecondition {
+						t.Fatal(le, pe)
+					}
+				} else if le != nil || pe != nil || l != line || p != pos {
+					t.Fatal(l, p, le, pe)
 				}
 			}
 		}

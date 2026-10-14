@@ -118829,7 +118829,7 @@
           ]
         },
         {
-          "name": "complete cmd_exception constructor/composition/location methods",
+          "name": "cmd_exception constructors, composition, has_pos and debug-only line/pos assertion with native release stored-value reads",
           "status": "ported",
           "go_target": "pkg/smtcore/util_cmd_exception.go",
           "tests": [

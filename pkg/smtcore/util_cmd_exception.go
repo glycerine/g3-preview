@@ -96,14 +96,16 @@ func NewCmdExceptionSymbolAt(m *usymbol.Manager, message string, s usymbol.Symbo
 	return NewCmdExceptionAt(out.String(), line, pos), nil
 }
 func (e CmdException) HasPos() bool { return e.line >= 0 }
+// The source guards these accessors with SASSERT only. Release builds still
+// return the stored values when HasPos is false.
 func (e CmdException) Line() (int32, error) {
-	if !e.HasPos() {
+	if cmdExceptionSourceDebug && !e.HasPos() {
 		return 0, z3exception.ErrExceptionPrecondition
 	}
 	return e.line, nil
 }
 func (e CmdException) Pos() (int32, error) {
-	if !e.HasPos() {
+	if cmdExceptionSourceDebug && !e.HasPos() {
 		return 0, z3exception.ErrExceptionPrecondition
 	}
 	return e.pos, nil
