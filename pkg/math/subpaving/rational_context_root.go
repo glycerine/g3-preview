@@ -24,6 +24,7 @@ type RationalContext struct {
 	inequalities   []*RationalInequality
 	unitClauses    []rationalUnitClause
 	unitHead       int
+	initStage      uint8
 	clauses        []*RationalClause
 	clauseWatchers [][]*RationalClause
 	numVisited     uint64
