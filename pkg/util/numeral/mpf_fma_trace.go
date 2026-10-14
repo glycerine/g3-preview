@@ -1,4 +1,4 @@
-// Source: src/util/mpf.cpp:813-818.
+// Source: src/util/mpf.cpp:813-818,830-831,844-845.
 package numeral
 
 import (
@@ -61,6 +61,35 @@ func (m *ArbitraryFloatManager) traceFMAUnpacked(a, b, c *ArbitraryFloat) error 
 				}
 			}
 			return nil
+		})
+	return formatError
+}
+
+func (m *ArbitraryFloatManager) traceFMADecimalBinary(label string, value *ArbitraryFloat, line int) error {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return nil
+	}
+	var formatError error
+	_ = tags.EmitConditional("mpf_dbg", "fma", "src/util/mpf.cpp", line,
+		func() bool { return true }, func(w io.Writer) error {
+			if e := writeNumeralDisplayPart(w, label); e != nil {
+				return e
+			}
+			decimal, e := m.formatFloatTraceValue(value)
+			if e != nil {
+				formatError = e
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, decimal+"\n"+label); e != nil {
+				return e
+			}
+			binary, e := m.traceFMABinaryString(value, 1, 0)
+			if e != nil {
+				formatError = e
+				return e
+			}
+			return writeNumeralDisplayPart(w, binary+"\n")
 		})
 	return formatError
 }

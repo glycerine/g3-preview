@@ -178,6 +178,9 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 	if e := im.mulWithAllocationContext(&s.a.significand, &s.b.significand, &s.mr.significand, context); e != nil {
 		return e
 	}
+	if e := m.traceFMADecimalBinary("M = ", &s.mr, 830); e != nil {
+		return e
+	}
 	if e := s.assertPower(&s.mr.significand, 2*sb, false); e != nil {
 		return e
 	}
@@ -191,6 +194,9 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 	}
 	s.mr.format = arbitraryFloatFormat(eb+2, 2*sb+2, s.mr.Sign())
 	if e := s.shiftInPlace(&s.mr.significand, 3); e != nil {
+		return e
+	}
+	if e := m.traceFMADecimalBinary("C_= ", &s.c, 844); e != nil {
 		return e
 	}
 	if e := s.assertPower(&s.c.significand, 2*sb+3, false); e != nil {

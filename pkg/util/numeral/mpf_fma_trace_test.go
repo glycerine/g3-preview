@@ -180,3 +180,45 @@ func TestArbitraryFloatFMAUnpackedTraceFormatterRefusalPropagates(t *testing.T) 
 	}
 	serviceMust(t, m.Del(&one))
 }
+
+func TestArbitraryFloatFMAProductAndShiftedAddendTrace(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("mpf_dbg")
+	compiled := tags.ShouldTrace("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	var one, addend, out ArbitraryFloat
+	serviceMust(t, m.MkOne(11, 53, false, &one))
+	serviceMust(t, m.SetDouble(&addend, 11, 53, 100))
+	serviceMust(t, m.FMA(ArbitraryFloatNearestEven, &one, &one, &addend, &out))
+	if compiled {
+		got := output.String()
+		last := -1
+		for _, site := range []struct{ line, label string }{{"830", "M = "}, {"844", "C_= "}} {
+			header := "-------- [mpf_dbg] fma src/util/mpf.cpp:" + site.line + " ---------\n"
+			at := strings.Index(got, header)
+			if at <= last || strings.Count(got, header) != 1 {
+				t.Fatalf("FMA product/addend source order at %s: %q", site.line, got)
+			}
+			last = at
+			body := got[at+len(header):]
+			end := strings.Index(body, "------------------------------------------------\n")
+			if end < 0 {
+				t.Fatalf("FMA trace footer at %s: %q", site.line, got)
+			}
+			lines := strings.Split(strings.TrimSuffix(body[:end], "\n"), "\n")
+			if len(lines) != 2 || !strings.HasPrefix(lines[0], site.label) || !strings.HasPrefix(lines[1], site.label) || !strings.Contains(lines[1], "#b") {
+				t.Fatalf("FMA decimal/binary block at %s: %q", site.line, lines)
+			}
+		}
+		if swap := strings.Index(got, "src/util/mpf.cpp:852"); swap <= last {
+			t.Fatalf("swap preceded shifted addend: %q", got)
+		}
+	} else if output.Len() != 0 {
+		t.Fatalf("erased product/addend trace: %q", output.String())
+	}
+	serviceMust(t, m.Del(&one))
+	serviceMust(t, m.Del(&addend))
+	serviceMust(t, m.Del(&out))
+}
