@@ -352,7 +352,10 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 		return e
 	}
 	if empty {
-		return m.MkZero(eb, sb, x.Sign(), x)
+		if e := m.MkZero(eb, sb, x.Sign(), x); e != nil {
+			return e
+		}
+		return m.tracePartialRemainderObject(x)
 	}
 	if e := m.renormalizeWithContext(eb, 2*sb-1, &re, result, c); e != nil {
 		return e
@@ -408,5 +411,8 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 		return e
 	}
 	x.exponent = re
-	return s.endNumeral(12)
+	if e := s.endNumeral(12); e != nil {
+		return e
+	}
+	return m.tracePartialRemainderObject(x)
 }

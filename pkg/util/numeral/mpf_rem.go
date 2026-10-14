@@ -18,7 +18,13 @@ func (m *ArbitraryFloatManager) Rem(x, y, out *ArbitraryFloat) (cause error) {
 	if modularSourceDebug && (x.SBits() != y.SBits() || x.EBits() != y.EBits()) {
 		return ErrIntegerAssertion
 	}
+	if e := m.traceRemObjects(x, y); e != nil {
+		return e
+	}
 	defer func() {
+		if cause == nil {
+			cause = m.traceRemObjectResult(out)
+		}
 		if cause == nil {
 			cause = m.traceFloatDebugValueChecked("rem", "REMAINDER = ", out, 1484)
 		}

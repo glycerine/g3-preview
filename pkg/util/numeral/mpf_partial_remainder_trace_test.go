@@ -37,6 +37,7 @@ func TestArbitraryFloatPartialRemainderScalarTraceOrder(t *testing.T) {
 			{"1398", "X_YQ_sig'="},
 			{"1410", "minuend="},
 			{"1421", "final sticky="},
+			{"1435", "partial remainder = go-words:"},
 		} {
 			header := "-------- [mpf_dbg_rem] partial_remainder src/util/mpf.cpp:" + site.line + " ---------\n" + site.text
 			at := strings.Index(got, header)
@@ -50,9 +51,36 @@ func TestArbitraryFloatPartialRemainderScalarTraceOrder(t *testing.T) {
 				t.Fatalf("missing partial remainder trace field %q: %q", field, got)
 			}
 		}
-		if strings.Count(got, "------------------------------------------------\n") != 10 {
+		if strings.Count(got, "------------------------------------------------\n") != 11 {
 			t.Fatalf("partial remainder source fields: %q", got)
 		}
+	}
+	serviceMust(t, m.Del(&x))
+	serviceMust(t, m.Del(&y))
+}
+
+func TestArbitraryFloatPartialRemainderZeroQuotientOmitsFinalTrace(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("mpf_dbg_rem")
+	compiled := tags.ShouldTrace("mpf_dbg_rem")
+	serviceMust(t, m.BindTrace(tags))
+	const hidden = 1 << 23
+	x := ArbitraryFloat{format: arbitraryFloatFormat(11, 24, false), exponent: -1, significand: NewInt(hidden)}
+	y := ArbitraryFloat{format: arbitraryFloatFormat(11, 24, false), exponent: 0, significand: NewInt(hidden + hidden/2)}
+	before := x
+	serviceMust(t, m.PartialRemainder(&x, &y, -1, false))
+	got := output.String()
+	if x != before {
+		t.Fatalf("zero quotient changed input: before=%v after=%v", before, x)
+	}
+	if compiled {
+		if !strings.Contains(got, "src/util/mpf.cpp:1331") || strings.Contains(got, "src/util/mpf.cpp:1435") || strings.Contains(got, "src/util/mpf.cpp:1352") {
+			t.Fatalf("zero quotient trace continued after source return: %q", got)
+		}
+	} else if got != "" {
+		t.Fatalf("erased zero quotient trace: %q", got)
 	}
 	serviceMust(t, m.Del(&x))
 	serviceMust(t, m.Del(&y))
