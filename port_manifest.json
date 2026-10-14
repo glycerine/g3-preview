@@ -150081,7 +150081,8 @@
             "TestBinaryFormattingBranchesAndFaultPublication",
             "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
-            "TestBinaryScopedRoutes"
+            "TestBinaryScopedRoutes",
+            "TestBinaryCompareImportedOwningCleanupPhysicalRetry"
           ]
         },
         {
@@ -150399,7 +150400,8 @@
             "TestBinaryFormattingBranchesAndFaultPublication",
             "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
-            "TestBinaryScopedRoutes"
+            "TestBinaryScopedRoutes",
+            "TestBinaryCompareImportedOwningCleanupPhysicalRetry"
           ]
         },
         {

@@ -344,13 +344,21 @@ func (m *BinaryRationalManager) GreaterEqualInteger(a *BinaryRational, b *Int) (
 	v, e := m.LessInteger(a, b)
 	return !v, e
 }
-func (m *BinaryRationalManager) compareRational(a *BinaryRational, qm *RationalManager, b *Rational, op uint8) (bool, error) {
+func (m *BinaryRationalManager) compareRational(a *BinaryRational, qm *RationalManager, b *Rational, op uint8) (result bool, err error) {
 	if e := m.check(a); e != nil {
 		return false, e
 	}
-	local := NewRational()
-	defer m.dropImported(&local)
-	q, e := m.importRational(qm, b, &local)
+	m.compareImported = NewRational()
+	m.compareImportedPending = true
+	m.compareImportedCursor = 0
+	m.compareExecuting = true
+	defer func() {
+		if cleanup := m.cleanupCompareImported(); err == nil {
+			err = cleanup
+		}
+		m.compareExecuting = false
+	}()
+	q, e := m.importRational(qm, b, &m.compareImported)
 	if e != nil {
 		return false, e
 	}
@@ -381,6 +389,34 @@ func (m *BinaryRationalManager) compareRational(a *BinaryRational, qm *RationalM
 		return m.Z.Less(x, y)
 	}
 	return m.Z.LessEqual(x, y)
+}
+
+func (m *BinaryRationalManager) cleanupCompareImported() error {
+	if !m.compareImportedPending {
+		return nil
+	}
+	roots := [2]*Int{&m.compareImported.Num, &m.compareImported.Den}
+	for m.compareImportedCursor < 2 {
+		if e := m.Z.Del(roots[m.compareImportedCursor]); e != nil {
+			return e
+		}
+		m.compareImportedCursor++
+	}
+	m.compareImported = Rational{}
+	m.compareImportedCursor = 0
+	m.compareImportedPending = false
+	return nil
+}
+
+// CleanupCompareImported resumes release of a stopped Go cross-owner copy.
+func (m *BinaryRationalManager) CleanupCompareImported() error {
+	if m == nil || m.self != m {
+		return ErrBinaryOwner
+	}
+	if m.compareExecuting {
+		return ErrBinaryComparePending
+	}
+	return m.cleanupCompareImported()
 }
 func (m *BinaryRationalManager) EqualRational(a *BinaryRational, qm *RationalManager, b *Rational) (bool, error) {
 	return m.compareRational(a, qm, b, 0)

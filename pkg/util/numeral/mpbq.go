@@ -32,6 +32,7 @@ var ErrBinaryOwner = errors.New("mpnum: invalid binary-rational owner")
 var ErrBinaryInvariant = errors.New("mpnum: binary-rational source invariant")
 var ErrBinaryInterval = errors.New("mpnum: binary-rational source interval precondition")
 var ErrBinaryRootDegreeZero = errors.New("mpnum: binary-rational root degree zero")
+var ErrBinaryComparePending = errors.New("mpnum: binary-rational comparison cleanup pending")
 
 // This cold operation owner borrows z and diagnostics. Both must outlive it.
 // No operations or shared Budget accesses are concurrently safe.
@@ -62,6 +63,9 @@ type BinaryRationalManager struct {
 	refineImported                                 Rational
 	refineImportedPending                          bool
 	refineImportedCursor                           uint8
+	compareImported                                Rational
+	compareImportedPending, compareExecuting       bool
+	compareImportedCursor                          uint8
 }
 type BinaryRationalStats struct {
 	HeaderBytes           uint64
@@ -98,6 +102,9 @@ func (m *BinaryRationalManager) open() error {
 	}
 	if (m.refinePending || m.refineImportedPending) && !m.refineExecuting {
 		return ErrBinaryRefinePending
+	}
+	if m.compareImportedPending && !m.compareExecuting {
+		return ErrBinaryComparePending
 	}
 	return nil
 }
@@ -143,6 +150,9 @@ func (m *BinaryRationalManager) CloseChecked() error {
 	if m.refineExecuting {
 		return ErrBinaryRefinePending
 	}
+	if m.compareExecuting {
+		return ErrBinaryComparePending
+	}
 	if m.closed {
 		return nil
 	}
@@ -154,6 +164,9 @@ func (m *BinaryRationalManager) CloseChecked() error {
 		return e
 	}
 	if e := m.CleanupRefineImported(); e != nil {
+		return e
+	}
+	if e := m.CleanupCompareImported(); e != nil {
 		return e
 	}
 	if e := m.CleanupRefineMid(); e != nil {
