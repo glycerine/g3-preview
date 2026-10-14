@@ -99,24 +99,24 @@ func (s *realValueStore) multiplyRationalPolynomials(left, right []*realValue) (
 		for j, b := range right {
 			product, err := s.multiplyRationals(a, b)
 			if err != nil {
-				_ = s.releaseCoefficients(result)
+				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
 			sum, err := s.addRationals(result[i+j], product)
 			if err != nil {
 				_ = s.release(product)
-				_ = s.releaseCoefficients(result)
+				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
 			if err := s.release(result[i+j]); err != nil {
 				_ = s.release(sum)
 				_ = s.release(product)
-				_ = s.releaseCoefficients(result)
+				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
 			if err := s.release(product); err != nil {
 				_ = s.release(sum)
-				_ = s.releaseCoefficients(result)
+				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
 			result[i+j] = sum

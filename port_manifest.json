@@ -50108,7 +50108,8 @@
           "status": "partial",
           "go_target": "pkg/math/realclosure/sign_polynomial_prem.go",
           "tests": [
-            "TestRealClosureRationalDerivativeKeepsCoefficientOwnership"
+            "TestRealClosureRationalDerivativeKeepsCoefficientOwnership",
+            "TestRealClosureRationalPolynomialProducerReservationPrefixes"
           ]
         },
         {
@@ -50142,7 +50143,8 @@
           "status": "partial",
           "go_target": "pkg/math/realclosure/sign_polynomial_div.go",
           "tests": [
-            "TestRealClosureRationalDerivativeKeepsCoefficientOwnership"
+            "TestRealClosureRationalDerivativeKeepsCoefficientOwnership",
+            "TestRealClosureRationalPolynomialProducerReservationPrefixes"
           ]
         },
         {
@@ -50159,7 +50161,8 @@
           "status": "partial",
           "go_target": "pkg/math/realclosure/sign_polynomial_derivative.go",
           "tests": [
-            "TestRealClosureRationalDerivativeKeepsCoefficientOwnership"
+            "TestRealClosureRationalDerivativeKeepsCoefficientOwnership",
+            "TestRealClosureRationalPolynomialProducerReservationPrefixes"
           ]
         },
         {
@@ -50170,7 +50173,8 @@
             "pkg/math/realclosure/sign_polynomial_mul.go"
           ],
           "tests": [
-            "TestSignDeterminationRationalProductsAndThreeWayExpansion"
+            "TestSignDeterminationRationalProductsAndThreeWayExpansion",
+            "TestRealClosureRationalPolynomialProducerReservationPrefixes"
           ]
         },
         {

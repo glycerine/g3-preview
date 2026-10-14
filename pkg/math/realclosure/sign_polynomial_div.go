@@ -98,7 +98,7 @@ func (s *realValueStore) signedRemainderRational(left, right []*realValue) ([]*r
 	result := append([]*realValue(nil), left...)
 	for i, value := range result {
 		if err := s.retain(value); err != nil {
-			_ = s.releaseCoefficients(result[:i])
+			_ = s.releaseSturmCoefficients(result[:i])
 			return nil, err
 		}
 	}
@@ -106,14 +106,14 @@ func (s *realValueStore) signedRemainderRational(left, right []*realValue) ([]*r
 		shift := len(result) - len(right)
 		ratio, err := s.divideRationals(result[len(result)-1], right[len(right)-1])
 		if err != nil {
-			_ = s.releaseCoefficients(result)
+			_ = s.releaseSturmCoefficients(result)
 			return nil, err
 		}
 		for i := 0; i < len(right)-1; i++ {
 			product, err := s.multiplyRationals(ratio, right[i])
 			if err != nil {
 				_ = s.release(ratio)
-				_ = s.releaseCoefficients(result)
+				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
 			index := i + shift
@@ -121,30 +121,30 @@ func (s *realValueStore) signedRemainderRational(left, right []*realValue) ([]*r
 			if err != nil {
 				_ = s.release(product)
 				_ = s.release(ratio)
-				_ = s.releaseCoefficients(result)
+				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
 			if err := s.release(result[index]); err != nil {
 				_ = s.release(updated)
 				_ = s.release(product)
 				_ = s.release(ratio)
-				_ = s.releaseCoefficients(result)
+				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
 			if err := s.release(product); err != nil {
 				_ = s.release(updated)
 				_ = s.release(ratio)
-				_ = s.releaseCoefficients(result)
+				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
 			result[index] = updated
 		}
 		if err := s.release(ratio); err != nil {
-			_ = s.releaseCoefficients(result)
+			_ = s.releaseSturmCoefficients(result)
 			return nil, err
 		}
 		if err := s.release(result[len(result)-1]); err != nil {
-			_ = s.releaseCoefficients(result)
+			_ = s.releaseSturmCoefficients(result)
 			return nil, err
 		}
 		result = result[:len(result)-1]
@@ -155,12 +155,12 @@ func (s *realValueStore) signedRemainderRational(left, right []*realValue) ([]*r
 	for i, value := range result {
 		negated, err := s.negateRational(value)
 		if err != nil {
-			_ = s.releaseCoefficients(result)
+			_ = s.releaseSturmCoefficients(result)
 			return nil, err
 		}
 		if err := s.release(value); err != nil {
 			_ = s.release(negated)
-			_ = s.releaseCoefficients(result)
+			_ = s.releaseSturmCoefficients(result)
 			return nil, err
 		}
 		result[i] = negated

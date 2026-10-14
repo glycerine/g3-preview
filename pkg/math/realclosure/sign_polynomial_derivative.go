@@ -21,7 +21,7 @@ func (s *realValueStore) derivativeRationalPolynomial(coefficients []*realValue)
 	for i := 1; i < len(coefficients); i++ {
 		scalar, err := s.newRational(int64(i), 1)
 		if err != nil {
-			_ = s.releaseCoefficients(result)
+			_ = s.releaseSturmCoefficients(result)
 			return nil, err
 		}
 		product, err := s.multiplyRationals(scalar, coefficients[i])
@@ -30,7 +30,7 @@ func (s *realValueStore) derivativeRationalPolynomial(coefficients []*realValue)
 		}
 		if err != nil {
 			_ = s.release(product)
-			_ = s.releaseCoefficients(result)
+			_ = s.releaseSturmCoefficients(result)
 			return nil, err
 		}
 		result = append(result, product)

@@ -30,14 +30,14 @@ func (s *realValueStore) signedPseudoRemainderRational(left, right []*realValue)
 	result := append([]*realValue(nil), left...)
 	for i, value := range result {
 		if err := s.retain(value); err != nil {
-			_ = s.releaseCoefficients(result[:i])
+			_ = s.releaseSturmCoefficients(result[:i])
 			return nil, err
 		}
 	}
 	leading := right[len(right)-1]
 	one, err := s.numbers.IsOne(&leading.rational)
 	if err != nil {
-		_ = s.releaseCoefficients(result)
+		_ = s.releaseSturmCoefficients(result)
 		return nil, err
 	}
 	steps := 0
@@ -46,7 +46,7 @@ func (s *realValueStore) signedPseudoRemainderRational(left, right []*realValue)
 		shift := len(result) - len(right)
 		high := result[len(result)-1]
 		if err := s.retain(high); err != nil {
-			_ = s.releaseCoefficients(result)
+			_ = s.releaseSturmCoefficients(result)
 			return nil, err
 		}
 		if !one {
@@ -54,13 +54,13 @@ func (s *realValueStore) signedPseudoRemainderRational(left, right []*realValue)
 				updated, err := s.multiplyRationals(result[i], leading)
 				if err != nil {
 					_ = s.release(high)
-					_ = s.releaseCoefficients(result)
+					_ = s.releaseSturmCoefficients(result)
 					return nil, err
 				}
 				if err := s.release(result[i]); err != nil {
 					_ = s.release(updated)
 					_ = s.release(high)
-					_ = s.releaseCoefficients(result)
+					_ = s.releaseSturmCoefficients(result)
 					return nil, err
 				}
 				result[i] = updated
@@ -70,7 +70,7 @@ func (s *realValueStore) signedPseudoRemainderRational(left, right []*realValue)
 			product, err := s.multiplyRationals(high, right[i])
 			if err != nil {
 				_ = s.release(high)
-				_ = s.releaseCoefficients(result)
+				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
 			index := i + shift
@@ -78,30 +78,30 @@ func (s *realValueStore) signedPseudoRemainderRational(left, right []*realValue)
 			if err != nil {
 				_ = s.release(product)
 				_ = s.release(high)
-				_ = s.releaseCoefficients(result)
+				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
 			if err := s.release(result[index]); err != nil {
 				_ = s.release(updated)
 				_ = s.release(product)
 				_ = s.release(high)
-				_ = s.releaseCoefficients(result)
+				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
 			if err := s.release(product); err != nil {
 				_ = s.release(updated)
 				_ = s.release(high)
-				_ = s.releaseCoefficients(result)
+				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
 			result[index] = updated
 		}
 		if err := s.release(high); err != nil {
-			_ = s.releaseCoefficients(result)
+			_ = s.releaseSturmCoefficients(result)
 			return nil, err
 		}
 		if err := s.release(result[len(result)-1]); err != nil {
-			_ = s.releaseCoefficients(result)
+			_ = s.releaseSturmCoefficients(result)
 			return nil, err
 		}
 		result = result[:len(result)-1]
@@ -111,26 +111,26 @@ func (s *realValueStore) signedPseudoRemainderRational(left, right []*realValue)
 	}
 	leadingSign, err := s.numbers.Sign(&leading.rational)
 	if err != nil {
-		_ = s.releaseCoefficients(result)
+		_ = s.releaseSturmCoefficients(result)
 		return nil, err
 	}
 	if steps%2 == 0 || leadingSign > 0 {
 		for i, value := range result {
 			negated, err := s.negateRational(value)
 			if err != nil {
-				_ = s.releaseCoefficients(result)
+				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
 			if err := s.release(value); err != nil {
 				_ = s.release(negated)
-				_ = s.releaseCoefficients(result)
+				_ = s.releaseSturmCoefficients(result)
 				return nil, err
 			}
 			result[i] = negated
 		}
 	}
 	if err := s.normalizeRationalIntegerContent(result); err != nil {
-		_ = s.releaseCoefficients(result)
+		_ = s.releaseSturmCoefficients(result)
 		return nil, err
 	}
 	return result, nil
