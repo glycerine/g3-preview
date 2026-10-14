@@ -252,7 +252,7 @@ func (m *FastFloatManager) multiplyToIntegerPower(z *IntegerManager, out *Int, e
 	m.integerPowerPending = true
 	m.integerExecuting = true
 	defer func() {
-		if cleanup := m.cleanupToIntegerPower(); err == nil {
+		if cleanup := m.cleanupToIntegerPower(true); err == nil {
 			err = cleanup
 		}
 		m.integerExecuting = false

@@ -19,11 +19,14 @@ func TestFastFloatToIntegerPowerBorrowedCleanupPhysicalRetry(t *testing.T) {
 	bad := original
 	bad.Backing.Requested = uint64(math.MaxUint32) + 1
 	qm.Z.Store(ref, bad)
-	if e := m.CleanupToIntegerPower(); !errors.Is(e, arena.ErrBounds) || !m.integerPowerPending || m.integerPowerOwner != qm.Z || m.integerPower.Cell != ref {
-		t.Fatal("physical refusal lost borrowed power", e, m.integerPower)
+	if e := m.cleanupToIntegerPower(true); !errors.Is(e, arena.ErrBounds) || !m.integerPowerPending || m.integerPowerOwner != qm.Z || m.integerPower.Cell != ref {
+		t.Fatal("source physical refusal lost borrowed power", e, m.integerPower)
 	}
 	if e := m.open(); !errors.Is(e, ErrFastFloatIntegerPending) {
 		t.Fatal("retained to-integer power allowed reentry", e)
+	}
+	if e := m.CleanupToIntegerPower(); !errors.Is(e, arena.ErrBounds) || !m.integerPowerPending || m.integerPower.Cell != ref {
+		t.Fatal("owning refusal lost source-stopped power", e, m.integerPower)
 	}
 	qm.Z.Store(ref, original)
 	serviceMust(t, m.CleanupToIntegerPower())

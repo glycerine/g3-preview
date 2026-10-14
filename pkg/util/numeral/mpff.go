@@ -481,11 +481,17 @@ func (m *FastFloatManager) CleanupSetRationalTemporaries() error {
 	return m.cleanupSetRationalTemporaries()
 }
 
-func (m *FastFloatManager) cleanupToIntegerPower() error {
+func (m *FastFloatManager) cleanupToIntegerPower(source bool) error {
 	if !m.integerPowerPending {
 		return nil
 	}
-	if e := m.integerPowerOwner.Del(&m.integerPower); e != nil {
+	var e error
+	if source {
+		_, e = sourceNumeralDel(m.integerPowerOwner, &m.integerPower)
+	} else {
+		e = m.integerPowerOwner.Del(&m.integerPower)
+	}
+	if e != nil {
 		return e
 	}
 	m.integerPower = Int{}
@@ -502,7 +508,7 @@ func (m *FastFloatManager) CleanupToIntegerPower() error {
 	if m.integerExecuting {
 		return ErrFastFloatIntegerPending
 	}
-	return m.cleanupToIntegerPower()
+	return m.cleanupToIntegerPower(false)
 }
 
 func (m *FastFloatManager) cleanupToRationalPower(source bool) error {
