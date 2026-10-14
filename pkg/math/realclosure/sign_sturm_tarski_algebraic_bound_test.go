@@ -104,6 +104,41 @@ func TestRealClosureAlgebraicConstantAndZeroBoundSigns(t *testing.T) {
 	if _, err := store.signAtBinaryBound([]*realValue{positive, negative}, bounds, &nonzero); !errors.Is(err, arena.ErrInvalidSlot) {
 		t.Fatal("ambiguous interval needs source refinement", err)
 	}
+	// The source's initial 24-bit interval for -1/3 overlaps zero after
+	// adding this narrow positive algebraic enclosure. Refining the rational
+	// coefficient makes the Horner result strictly positive.
+	closeLower, closeUpper := numeral.NewBinaryIntPower(357913942, 30), numeral.NewBinaryIntPower(357913943, 30)
+	closeInterval, err := NewBinaryInterval(bounds)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := closeInterval.SetFinite(&closeLower, &closeUpper, false, false); err != nil {
+		t.Fatal(err)
+	}
+	closeValue := &realValue{store: store, refs: 1, functionInterval: closeInterval}
+	initial, err := store.rationalApproxInterval(negativeThird, bounds)
+	if err != nil {
+		t.Fatal(err)
+	}
+	initialSum, err := NewBinaryInterval(bounds)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := initialSum.Add(initial, closeInterval); err != nil {
+		t.Fatal(err)
+	}
+	if ambiguous, err := initialSum.ContainsZero(); err != nil || !ambiguous {
+		t.Fatal("initial interval should be ambiguous", ambiguous, err)
+	}
+	oneBound := numeral.NewBinaryInt(1)
+	if got, err := store.signAtBinaryBound([]*realValue{negativeThird, closeValue}, bounds, &oneBound); err != nil || got != 1 {
+		t.Fatal("refined rational coefficient sign", got, err)
+	}
+	for _, interval := range []*BinaryInterval{initialSum, initial, closeInterval} {
+		if err := interval.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}
 	for _, value := range []*realValue{third, negativeThird} {
 		approximation, err := store.rationalApproxInterval(value, bounds)
 		if err != nil {

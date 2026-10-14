@@ -1,3 +1,5 @@
+Mixed realclosure endpoint-sign refinement increment: when interval Horner evaluation at a nonzero binary bound still contains zero, the concrete rational coefficient intervals now follow the source width-magnitude start and paired lower/upper refinement through the default maximum precision, reevaluating Horner after each pass. A focused case starts with an ambiguous 24-bit approximation of -1/3 and becomes strictly positive after refinement; native and checked/debug realclosure tests pass on CPUs 8-16. Algebraic coefficient refinement, exact fallback, custom precision/checkpoint transport and persistent rational interval caching remain open, as does the overall util port.
+
 Parameter symbol-name normalization now follows the actual
 `norm_param_name(symbol)` call into `symbol::bare_str`. Numerical symbols reach
 its debug assertion; with assertions erased or disabled, their empty spelling

@@ -9,8 +9,9 @@ import (
 )
 
 // signApproxAtBinaryBound follows the source Horner interval sequence for
-// retained algebraic-root and rational coefficient intervals. Refinement of
-// an ambiguous result and exact fallback are separate work.
+// retained algebraic-root and rational coefficient intervals. Rational
+// coefficient refinement follows an ambiguous result; algebraic refinement
+// and exact fallback remain separate work.
 func (s *realValueStore) signApproxAtBinaryBound(coefficients []*realValue, bounds *numeral.BinaryRationalManager, bound *numeral.BinaryRational) (sign int32, err error) {
 	for _, value := range coefficients {
 		if value == nil {
@@ -58,42 +59,82 @@ func (s *realValueStore) signApproxAtBinaryBound(coefficients []*realValue, boun
 	if err = point.SetFinite(bound, bound, false, false); err != nil {
 		return 0, err
 	}
-	last, err := coefficientInterval(coefficients[len(coefficients)-1])
-	if err != nil {
-		return 0, err
+	evaluate := func() (int32, bool, error) {
+		last, e := coefficientInterval(coefficients[len(coefficients)-1])
+		if e != nil {
+			return 0, false, e
+		}
+		if e = result.Mul(last, point); e != nil {
+			return 0, false, e
+		}
+		for i := len(coefficients) - 2; i >= 0; i-- {
+			if coefficients[i] != nil {
+				coefficient, e := coefficientInterval(coefficients[i])
+				if e != nil {
+					return 0, false, e
+				}
+				if e = result.Add(result, coefficient); e != nil {
+					return 0, false, e
+				}
+			}
+			if i > 0 {
+				if e = result.Mul(result, point); e != nil {
+					return 0, false, e
+				}
+			}
+		}
+		contains, e := result.ContainsZero()
+		if e != nil || contains {
+			return 0, false, e
+		}
+		positive, e := result.IsP()
+		if e != nil {
+			return 0, false, e
+		}
+		if positive {
+			return 1, true, nil
+		}
+		return -1, true, nil
 	}
-	if err = result.Mul(last, point); err != nil {
-		return 0, err
+	if sign, decided, e := evaluate(); e != nil || decided {
+		return sign, e
 	}
-	for i := len(coefficients) - 2; i >= 0; i-- {
-		if coefficients[i] != nil {
-			coefficient, e := coefficientInterval(coefficients[i])
-			if e != nil {
+	// Source find_biggest_interval_magnitude chooses the initial precision.
+	// Algebraic coefficient intervals stay at their current enclosure until
+	// their root-specific refinement is ported.
+	biggest := int32(-1 << 31)
+	for _, value := range coefficients {
+		if value == nil {
+			continue
+		}
+		coefficient, e := coefficientInterval(value)
+		if e != nil {
+			return 0, e
+		}
+		m, e := s.sturmIntervalMagnitude(coefficient)
+		if e != nil {
+			return 0, e
+		}
+		if m > biggest {
+			biggest = m
+		}
+	}
+	precision := uint32(1)
+	if biggest < 0 {
+		precision = uint32(-int64(biggest))
+	}
+	for ; precision <= 128; precision++ {
+		for _, value := range coefficients {
+			if value == nil || !value.isRational {
+				continue
+			}
+			if e := s.refineSturmRationalInterval(value, owned[value], precision); e != nil {
 				return 0, e
 			}
-			if err = result.Add(result, coefficient); err != nil {
-				return 0, err
-			}
 		}
-		if i > 0 {
-			if err = result.Mul(result, point); err != nil {
-				return 0, err
-			}
+		if sign, decided, e := evaluate(); e != nil || decided {
+			return sign, e
 		}
 	}
-	contains, err := result.ContainsZero()
-	if err != nil {
-		return 0, err
-	}
-	if contains {
-		return 0, arena.ErrInvalidSlot
-	}
-	positive, err := result.IsP()
-	if err != nil {
-		return 0, err
-	}
-	if positive {
-		return 1, nil
-	}
-	return -1, nil
+	return 0, arena.ErrInvalidSlot
 }
