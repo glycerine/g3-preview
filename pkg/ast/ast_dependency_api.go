@@ -54,6 +54,20 @@ func (m *ASTManager) DependencyDec(h ASTDependency) error {
 	return e
 }
 
+// CompleteDependencyDec resumes only the stopped deletion rooted at h. Its
+// child and callback cursors have already consumed the original root DEC.
+func (m *ASTManager) CompleteDependencyDec(h ASTDependency) error {
+	if e := m.lock(); e != nil {
+		return e
+	}
+	defer m.mu.Unlock()
+	d := &m.dependencies
+	if !d.pending || h.origin != m.origin || h.record != d.pendingRoot {
+		return ErrASTPending
+	}
+	return d.continueDel()
+}
+
 // DependencyDecConsumed reports whether the root reference was decremented,
 // including when subsequent AST destruction reports an error.
 func (m *ASTManager) DependencyDecConsumed(h ASTDependency) (bool, error) {
@@ -61,6 +75,9 @@ func (m *ASTManager) DependencyDecConsumed(h ASTDependency) (bool, error) {
 		return false, e
 	}
 	defer m.mu.Unlock()
+	if m.dependencies.pending {
+		return false, ErrASTPending
+	}
 	r, e := m.dependencies.valid(h)
 	if e != nil {
 		return false, e

@@ -120141,7 +120141,7 @@
           ]
         },
         {
-          "name": "dependency_manager<expr_dependency_config>::dec_ref/del stopped nested destructor and exact owning continuation after a child callback or deallocation refusal",
+          "name": "dependency_manager<expr_dependency_config>::dec_ref/del remaining stopped child-store and deallocation-refusal prefixes beyond the consumed leaf-callback continuation",
           "status": "partial",
           "go_target": "pkg/ast/ast_dependency.go",
           "tests": [
@@ -120159,6 +120159,16 @@
             "TestASTDependencyNativeLIFOCallbacksWithReservationsDisabled",
             "TestASTDependencyNativeColdFIFOAndCompleteUnmarking",
             "TestASTDependencyWarmDestructionNoReservationOrHeapAllocation"
+          ]
+        },
+        {
+          "name": "dependency_manager<expr_dependency_config>::del owning continuation after consumed leaf AST callback failure, retaining LIFO queued siblings (dependency.h:86-107)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_dependency.go",
+          "go_targets": ["pkg/ast/ast_dependency_api.go", "pkg/ast/ast_dependency_traversal.go"],
+          "tests": [
+            "TestASTDependencyLeafDeletionStopsBeforeFreeOnASTFailure",
+            "TestASTDependencyJoinDeletionResumesQueuedSiblingAfterCallbackStop"
           ]
         },
         {

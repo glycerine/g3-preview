@@ -20,6 +20,9 @@ func (d *astDependencyManager) unmarkTodo() error {
 	return first
 }
 func (d *astDependencyManager) traverse(root arena.SmallBytesRef, target astNodeRef, out *[]ASTHandle) (bool, error) {
+	if d.pending {
+		return false, ErrASTPending
+	}
 	if dependencyNull(root) {
 		return false, nil
 	}

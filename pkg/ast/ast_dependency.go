@@ -24,10 +24,13 @@ type astDependencyNode struct {
 	left, right  arena.SmallBytesRef
 }
 type astDependencyManager struct {
-	owner     *ASTManager
-	allocator *arena.SmallBytes
-	todo      []arena.SmallBytesRef
-	live      uint32
+	owner                *ASTManager
+	allocator            *arena.SmallBytes
+	todo                 []arena.SmallBytesRef
+	live                 uint32
+	pendingRoot, current arena.SmallBytesRef
+	pending              bool
+	stage, child         uint8
 }
 
 func dependencyNull(r arena.SmallBytesRef) bool { return r == (arena.SmallBytesRef{}) }
@@ -121,6 +124,9 @@ func (d *astDependencyManager) store(r arena.SmallBytesRef, c astDependencyNode)
 	return nil
 }
 func (d *astDependencyManager) inc(r arena.SmallBytesRef) error {
+	if d.pending {
+		return ErrASTPending
+	}
 	if dependencyNull(r) {
 		return nil
 	}
@@ -132,6 +138,9 @@ func (d *astDependencyManager) inc(r arena.SmallBytesRef) error {
 	return d.store(r, c)
 }
 func (d *astDependencyManager) leaf(v astNodeRef) (arena.SmallBytesRef, error) {
+	if d.pending {
+		return arena.SmallBytesRef{}, ErrASTPending
+	}
 	if v.slot == 0 {
 		return arena.SmallBytesRef{}, nil
 	}
@@ -150,6 +159,9 @@ func (d *astDependencyManager) leaf(v astNodeRef) (arena.SmallBytesRef, error) {
 	return r, e
 }
 func (d *astDependencyManager) join(a, b arena.SmallBytesRef) (arena.SmallBytesRef, error) {
+	if d.pending {
+		return arena.SmallBytesRef{}, ErrASTPending
+	}
 	if dependencyNull(a) {
 		return b, nil
 	}
@@ -180,6 +192,9 @@ func (d *astDependencyManager) dec(r arena.SmallBytesRef) error {
 }
 
 func (d *astDependencyManager) decConsumed(r arena.SmallBytesRef) (bool, error) {
+	if d.pending {
+		return false, ErrASTPending
+	}
 	if dependencyNull(r) {
 		return true, nil
 	}
@@ -202,10 +217,23 @@ func (d *astDependencyManager) decConsumed(r arena.SmallBytesRef) (bool, error) 
 
 // Native scratch preserves left/right enqueue and LIFO destruction order.
 func (d *astDependencyManager) del(r arena.SmallBytesRef) error {
+	d.pending = true
+	d.pendingRoot = r
 	d.todo = append(d.todo, r)
-	for len(d.todo) != 0 {
-		x := d.todo[len(d.todo)-1]
-		d.todo = d.todo[:len(d.todo)-1]
+	return d.continueDel()
+}
+
+// A failed callback can consume its AST reference before it reports an error.
+// The current node and child cursor retain the completed source prefix; an
+// explicit continuation finishes that prefix without replaying it.
+func (d *astDependencyManager) continueDel() error {
+	for !dependencyNull(d.current) || len(d.todo) != 0 {
+		if dependencyNull(d.current) {
+			d.current = d.todo[len(d.todo)-1]
+			d.todo = d.todo[:len(d.todo)-1]
+			d.stage, d.child = 0, 0
+		}
+		x := d.current
 		c, e := d.node(x)
 		if e != nil {
 			return e
@@ -213,14 +241,22 @@ func (d *astDependencyManager) del(r arena.SmallBytesRef) error {
 		bytes := uint32(24)
 		if c.leaf {
 			bytes = 16
-			_, e = d.owner.decNode(c.value)
-			if e != nil {
-				// Source del stops inside dec_ref(value): the leaf destructor
-				// and allocator deallocation have not run yet.
-				return e
+			if d.stage == 0 {
+				consumed, next := d.owner.decNode(c.value)
+				if consumed {
+					d.stage = 1
+				}
+				if next != nil {
+					return next
+				}
+				d.stage = 1
 			}
 		} else {
-			for _, child := range [2]arena.SmallBytesRef{c.left, c.right} {
+			for d.child < 2 {
+				child := c.left
+				if d.child == 1 {
+					child = c.right
+				}
 				v, e := d.node(child)
 				if e != nil {
 					return e
@@ -235,16 +271,27 @@ func (d *astDependencyManager) del(r arena.SmallBytesRef) error {
 				if v.rc == 0 {
 					d.todo = append(d.todo, child)
 				}
+				d.child++
 			}
 		}
 		if e = d.allocator.Deallocate(bytes, x); e != nil {
+			if !d.allocator.IsLive(x) {
+				d.live--
+				d.current = arena.SmallBytesRef{}
+			}
 			return e
 		}
 		d.live--
+		d.current = arena.SmallBytesRef{}
 	}
+	d.pending = false
+	d.pendingRoot = arena.SmallBytesRef{}
 	return nil
 }
 func (d *astDependencyManager) closeAfterNodeTeardown() {
 	d.todo = nil
 	d.live = 0
+	d.pending = false
+	d.pendingRoot, d.current = arena.SmallBytesRef{}, arena.SmallBytesRef{}
+	d.stage, d.child = 0, 0
 }

@@ -61,6 +61,60 @@ func TestASTDependencyLeafDeletionStopsBeforeFreeOnASTFailure(t *testing.T) {
 	if e != nil || !inserted {
 		t.Fatal("restore source table for owner teardown", inserted, e)
 	}
+	if e := m.CompleteDependencyDec(ASTDependency{}); !errors.Is(e, ErrASTPending) {
+		t.Fatal("unrelated continuation adopted stopped leaf", e)
+	}
+	astTestMust(t, m.CompleteDependencyDec(d))
+	if m.dependencies.pending || m.dependencies.live != 0 || m.allocator.IsLive(d.record) {
+		t.Fatal("owning continuation did not release consumed leaf", m.dependencies.pending, m.dependencies.live)
+	}
+	if e := m.CompleteDependencyDec(d); !errors.Is(e, ErrASTPending) {
+		t.Fatal("duplicate continuation", e)
+	}
+}
+
+func TestASTDependencyJoinDeletionResumesQueuedSiblingAfterCallbackStop(t *testing.T) {
+	if !ASTSourceDebug {
+		t.Skip("source table assertion is compiled out")
+	}
+	m := astTestManager(t)
+	sort, e := m.MkBoolSort()
+	astTestMust(t, e)
+	left, e := m.MkVar(1903, sort)
+	astTestMust(t, e)
+	right, e := m.MkVar(1904, sort)
+	astTestMust(t, e)
+	rightRef, e := m.requireExpr(right)
+	astTestMust(t, e)
+	a, e := m.DependencyLeaf(left)
+	astTestMust(t, e)
+	b, e := m.DependencyLeaf(right)
+	astTestMust(t, e)
+	root, e := m.DependencyJoin(a, b)
+	astTestMust(t, e)
+	astTestMust(t, m.DependencyInc(root))
+	astTestMust(t, m.tableEraseIdentity(rightRef))
+	consumed, e := m.DependencyDecConsumed(root)
+	if !consumed || !errors.Is(e, ErrASTDomain) {
+		t.Fatal("right leaf callback did not stop after root DEC", consumed, e)
+	}
+	if !m.dependencies.pending || m.dependencies.current != b.record || len(m.dependencies.todo) != 1 || m.dependencies.todo[0] != a.record || m.dependencies.stage != 1 {
+		t.Fatal("stopped LIFO deletion lost current leaf or queued sibling", m.dependencies)
+	}
+	if e := m.DependencyDec(root); !errors.Is(e, ErrASTPending) {
+		t.Fatal("ordinary DEC replayed consumed root", e)
+	}
+	if _, e := m.DependencyLinearizeRaw(a, nil); !errors.Is(e, ErrASTPending) {
+		t.Fatal("traversal overwrote pending destructor queue", e)
+	}
+	_, inserted, e := m.tableInsert(rightRef)
+	if e != nil || !inserted {
+		t.Fatal("restore source table for owner teardown", inserted, e)
+	}
+	astTestMust(t, m.CompleteDependencyDec(root))
+	if m.dependencies.pending || m.dependencies.live != 0 || m.allocator.IsLive(a.record) || m.allocator.IsLive(b.record) {
+		t.Fatal("matching continuation retained dependency nodes", m.dependencies)
+	}
 }
 
 func TestASTDependencyNativeOutputGrowthUnmarksAndBorrowsReferences(t *testing.T) {
