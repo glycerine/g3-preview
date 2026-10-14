@@ -37,6 +37,32 @@ func infText(t *testing.T, s *RationalService, v *OwnedInfRational, want string)
 	}
 }
 
+// Source inf_rational.h:313-332 reads the infinitesimal sign even when its
+// numerator lives in a multi-limb integer cell.
+func TestInfRationalBigEpsilonFloorCeilSourceSigns(t *testing.T) {
+	s, _ := serviceNew(t)
+	for _, tc := range []struct {
+		epsilon, floor, ceil string
+	}{
+		{"1267650600228229401496703205376", "0", "1"},
+		{"-1267650600228229401496703205376", "-1", "0"},
+	} {
+		v := infValue(t, s, 0, 1, tc.epsilon)
+		if v.Second.Num.Cell == 0 {
+			t.Fatal("fixture did not retain a multi-limb epsilon", tc.epsilon)
+		}
+		floor, e := s.InfFloor(&v)
+		serviceMust(t, e)
+		ceil, e := s.InfCeil(&v)
+		serviceMust(t, e)
+		serviceText(t, s, &floor, tc.floor)
+		serviceText(t, s, &ceil, tc.ceil)
+		serviceMust(t, s.Del(&floor))
+		serviceMust(t, s.Del(&ceil))
+		serviceMust(t, s.InfDel(&v))
+	}
+}
+
 // Every active ENSURE in src/test/inf_rational.cpp, including helper called twice.
 func TestInfRationalSource80Assertions(t *testing.T) {
 	s, _ := serviceNew(t)

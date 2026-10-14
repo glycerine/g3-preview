@@ -125406,7 +125406,17 @@
           ]
         },
         {
-          "name": "floor/ceil and numerator/denominator source domain branches",
+          "name": "floor/ceil exact integer-first and infinitesimal-sign branches, including multi-limb epsilon and owning returned rational (inf_rational.h:313-332)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_rational.go",
+          "tests": [
+            "TestInfRationalSource80Assertions",
+            "TestInfRationalBigEpsilonFloorCeilSourceSigns",
+            "TestInfRationalFailurePrefixesImmediateRoots"
+          ]
+        },
+        {
+          "name": "numerator/denominator source domain branches and owning projections",
           "status": "partial",
           "go_target": "pkg/util/numeral/inf_rational.go",
           "tests": [
