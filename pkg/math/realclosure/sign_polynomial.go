@@ -7,20 +7,24 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
-// realValueStore is the rational-value portion of the real-closure value
-// owner. The rational-function and extension variants remain to be ported.
+// realValueStore owns the retained rational and algebraic-root value variants.
+// Other rational-function and extension cases remain to be ported.
 type realValueStore struct {
 	numbers *numeral.RationalManager
 }
 
-// realValue is the retained nonzero rational-value variant. A nil pointer is
-// the source representation of a zero coefficient. The creator initially
+// realValue is a retained nonzero rational or algebraic-root function value.
+// A nil pointer is the source representation of zero. The creator initially
 // owns one reference, which can be transferred to a polynomial or numeral.
 type realValue struct {
-	store    *realValueStore
-	rational numeral.Rational
-	refs     uint32
-	deleted  bool
+	store             *realValueStore
+	rational          numeral.Rational
+	functionNumerator realPolynomial
+	functionInterval  *BinaryInterval
+	root              *algebraicRoot
+	refs              uint32
+	isRational        bool
+	deleted           bool
 }
 
 func (s *realValueStore) newRational(numerator int64, denominator uint64) (*realValue, error) {
@@ -30,7 +34,7 @@ func (s *realValueStore) newRational(numerator int64, denominator uint64) (*real
 	if numerator == 0 {
 		return nil, nil
 	}
-	v := &realValue{store: s, rational: numeral.NewRational(), refs: 1}
+	v := &realValue{store: s, rational: numeral.NewRational(), refs: 1, isRational: true}
 	if err := s.numbers.SetFraction(&v.rational, numerator, denominator); err != nil {
 		_ = s.numbers.Del(&v.rational)
 		return nil, err
@@ -60,8 +64,24 @@ func (s *realValueStore) release(v *realValue) error {
 		v.refs--
 		return nil
 	}
-	if err := s.numbers.Del(&v.rational); err != nil {
-		return err
+	if v.isRational {
+		if err := s.numbers.Del(&v.rational); err != nil {
+			return err
+		}
+	} else {
+		if v.functionInterval != nil {
+			if err := v.functionInterval.Close(); err != nil {
+				return err
+			}
+			v.functionInterval = nil
+		}
+		if err := s.resetPolynomial(&v.functionNumerator); err != nil {
+			return err
+		}
+		if err := v.root.release(); err != nil {
+			return err
+		}
+		v.root = nil
 	}
 	v.refs = 0
 	v.deleted = true
