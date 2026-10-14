@@ -3,12 +3,70 @@ package numeral
 import (
 	"bytes"
 	"errors"
+	"io"
 	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
+
+type fmaEndlWriter struct {
+	events  []string
+	flushes int
+	failAt  int
+	refusal error
+}
+
+func (w *fmaEndlWriter) Write(p []byte) (int, error) { return w.WriteString(string(p)) }
+func (w *fmaEndlWriter) WriteString(s string) (int, error) {
+	w.events = append(w.events, "write:"+s)
+	return len(s), nil
+}
+func (w *fmaEndlWriter) Flush() error {
+	w.flushes++
+	w.events = append(w.events, "flush")
+	if w.flushes == w.failAt {
+		return w.refusal
+	}
+	return nil
+}
+
+func TestArbitraryFloatFMAOverflowTraceEndlFlushes(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	w := &fmaEndlWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	var one ArbitraryFloat
+	serviceMust(t, m.MkOne(11, 53, false, &one))
+	serviceMust(t, m.traceFMAOverflow(&one))
+	if !tags.ShouldTrace("mpf_dbg") {
+		if len(w.events) != 0 {
+			t.Fatal("erased trace reached writer", w.events)
+		}
+		serviceMust(t, m.Del(&one))
+		return
+	}
+	joined := strings.Join(w.events, "|")
+	if w.flushes != 3 || !strings.Contains(joined, "write:Add/Sub overflew into 4.xxx!|write:\n|flush|write:S*= ") || !strings.Contains(joined, "write:\n|flush|write:------------------------------------------------\n|flush") {
+		t.Fatal("source endl boundaries and final TRACE flush", w.flushes, w.events)
+	}
+	w.events = nil
+	w.flushes = 0
+	w.failAt = 1
+	w.refusal = io.ErrClosedPipe
+	serviceMust(t, m.traceFMAOverflow(&one))
+	if w.flushes != 2 || strings.Contains(strings.Join(w.events, ""), "S*= ") || strings.Contains(strings.Join(w.events, ""), "------------------------------------------------") {
+		t.Fatal("refused first endl allowed later physical insertion", w.flushes, w.events)
+	}
+	w.events = nil
+	serviceMust(t, m.traceFMAOverflow(&one))
+	if len(w.events) != 1 || w.events[0] != "flush" {
+		t.Fatal("failed trace stream wrote a later record", w.events)
+	}
+	serviceMust(t, m.Del(&one))
+}
 
 func TestArbitraryFloatFMAEntryDebugTraceBeforeShortcuts(t *testing.T) {
 	m, _, _ := mpfNumeralHelpersFixture(t)

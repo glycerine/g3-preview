@@ -5,6 +5,7 @@ import (
 	"io"
 	"strconv"
 
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -194,7 +195,7 @@ func (m *ArbitraryFloatManager) traceFMAOverflow(value *ArbitraryFloat) error {
 			if e := writeNumeralDisplayPart(w, "Add/Sub overflew into 4.xxx!"); e != nil {
 				return e
 			}
-			if e := writeNumeralDisplayPart(w, "\n"); e != nil {
+			if e := diagnostic.WriteTraceEndl(w); e != nil {
 				return e
 			}
 			if e := writeNumeralDisplayPart(w, "S*= "); e != nil {
@@ -208,7 +209,7 @@ func (m *ArbitraryFloatManager) traceFMAOverflow(value *ArbitraryFloat) error {
 			if e := writeNumeralDisplayPart(w, binary); e != nil {
 				return e
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }

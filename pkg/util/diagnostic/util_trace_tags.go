@@ -137,6 +137,27 @@ func (w *traceStickyWriter) WriteString(s string) (int, error) {
 	n, err := io.WriteString(w.out, s)
 	return w.remember(n, len(s), err)
 }
+func (w *traceStickyWriter) Flush() error {
+	if w.first != nil {
+		return w.first
+	}
+	err := flushTrace(w.out)
+	w.capture(err)
+	if err != nil && w.streamErr == nil {
+		w.streamErr = err
+	}
+	return err
+}
+
+// WriteTraceEndl preserves a reached std::endl insertion: it writes a newline
+// and flushes before the next source insertion in the same trace body.
+func WriteTraceEndl(w io.Writer) error {
+	if err := writeTracePart(w, "\n"); err != nil {
+		return err
+	}
+	return flushTrace(w)
+}
+
 func (w *traceStickyWriter) finish() error {
 	if err := flushTrace(w.out); err != nil {
 		w.capture(err)
