@@ -160408,6 +160408,17 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "integer-owned Runtime explicitly joins the source process shared with rational parameter and environment consumers",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpz.go",
+          "go_targets": ["pkg/util/numeral/mpz_process_binding_test.go", "pkg/util/params/util_env_params_test.go"],
+          "tests": [
+            "TestIntegerOwnedRuntimeJoinsSourceProcess",
+            "TestIntegerOwnedRuntimeRejectsProcessABIWithoutStorage",
+            "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
+          ]
+        },
+        {
           "name": "mpz scalar constructor",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz.go",
@@ -162492,6 +162503,17 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "integer-owned Runtime explicitly joins the source process shared with rational parameter and environment consumers",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpz.go",
+          "go_targets": ["pkg/util/numeral/mpz_process_binding_test.go", "pkg/util/params/util_env_params_test.go"],
+          "tests": [
+            "TestIntegerOwnedRuntimeJoinsSourceProcess",
+            "TestIntegerOwnedRuntimeRejectsProcessABIWithoutStorage",
+            "TestEnvParamsRuntimeSourceOrderAndRawWatermark"
+          ]
+        },
         {
           "name": "mpz scalar constructor",
           "status": "ported",

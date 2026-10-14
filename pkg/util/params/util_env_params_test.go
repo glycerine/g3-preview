@@ -18,13 +18,14 @@ func envParamsRuntimeFixture(t *testing.T) (*GlobalParams, *diagnostic.VerboseCo
 	t.Helper()
 	b := arena.NewBudget(1 << 24)
 	process := umemory.NewProcessAccounting()
-	numericRuntime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, Process: process, SizeTBits: 64})
-	paramsMust(t, e)
 	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{
-		Memory: numericRuntime, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true},
+		Process: process, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true},
 		Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}},
 	}})
 	paramsMust(t, e)
+	if q.RuntimeOwner() == nil || q.RuntimeOwner().ProcessOwner() != process {
+		t.Fatal("rational service did not own a runtime in the source process")
+	}
 	sy, e := usymbol.NewManager(usymbol.Config{Budget: b})
 	paramsMust(t, e)
 	ctx, e := NewParamsContext(sy, q, ParamsConfig{Budget: b})
@@ -61,7 +62,6 @@ func envParamsRuntimeFixture(t *testing.T) (*GlobalParams, *diagnostic.VerboseCo
 		paramsMust(t, ctx.Close())
 		paramsMust(t, q.Close())
 		paramsMust(t, sy.Close())
-		paramsMust(t, numericRuntime.Close())
 		if b.Used() != 0 {
 			t.Fatal("environment owner storage", b.Used())
 		}

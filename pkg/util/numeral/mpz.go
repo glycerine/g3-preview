@@ -38,6 +38,7 @@ type IntegerConfig struct {
 	Cells   arena.Config
 	Words   arena.VectorConfig
 	Memory  *umemory.Runtime
+	Process *umemory.ProcessAccounting
 	Profile umemory.SmallAllocatorProfile
 }
 
@@ -109,6 +110,9 @@ func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 			return nil, arena.ErrConfig
 		}
 	}
+	if config.Process != nil && (!config.Process.Valid() || config.Memory != nil && config.Memory.ProcessOwner() != config.Process) {
+		return nil, arena.ErrConfig
+	}
 	header := uint64(reflect.TypeOf(IntegerManager{}).Size())
 	if e := config.Cells.Budget.Reserve(header); e != nil {
 		return nil, e
@@ -134,7 +138,7 @@ func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 	}
 	var e error
 	if m.Memory == nil {
-		m.Memory, e = umemory.NewRuntime(umemory.RuntimeConfig{Budget: m.BudgetField, SizeTBits: uint8(32 << (^uint(0) >> 63))})
+		m.Memory, e = umemory.NewRuntime(umemory.RuntimeConfig{Budget: m.BudgetField, Process: config.Process, SizeTBits: uint8(32 << (^uint(0) >> 63))})
 		if e != nil {
 			return fail(e)
 		}
