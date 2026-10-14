@@ -175533,6 +175533,13 @@
           "tests": ["TestArbitraryFloatSetReachedEndlFlushes"]
         },
         {
+          "name": "Reached MPF round_to_integral std::endl body flushes before TRACE footer (src/util/mpf.cpp:1050-1167; src/util/trace.h:40-46)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_round_integral_trace.go",
+          "go_targets": ["pkg/util/numeral/mpf_mul_trace.go", "pkg/util/diagnostic/util_trace_tags.go"],
+          "tests": ["TestArbitraryFloatRoundIntegralReachedEndlFlushes"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -175987,6 +175994,13 @@
           "go_target": "pkg/util/numeral/mpf_value_input_trace.go",
           "go_targets": ["pkg/util/numeral/mpf_mul_trace.go", "pkg/util/diagnostic/util_trace_tags.go"],
           "tests": ["TestArbitraryFloatSetReachedEndlFlushes"]
+        },
+        {
+          "name": "Reached MPF round_to_integral std::endl body flushes before TRACE footer (src/util/mpf.cpp:1050-1167; src/util/trace.h:40-46)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_round_integral_trace.go",
+          "go_targets": ["pkg/util/numeral/mpf_mul_trace.go", "pkg/util/diagnostic/util_trace_tags.go"],
+          "tests": ["TestArbitraryFloatRoundIntegralReachedEndlFlushes"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

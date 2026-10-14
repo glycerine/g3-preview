@@ -4,6 +4,7 @@ package numeral
 import (
 	"io"
 
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -33,7 +34,7 @@ func (m *ArbitraryFloatManager) traceRoundIntegralRawOperand(value *ArbitraryFlo
 			if e := writeNumeralDisplayPart(w, s); e != nil {
 				return e
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }
@@ -68,7 +69,7 @@ func (m *ArbitraryFloatManager) traceRoundIntegralQuotient(div, rem *Int) error 
 			if e := writeNumeralDisplayPart(w, s); e != nil {
 				return e
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }
@@ -81,7 +82,7 @@ func (m *ArbitraryFloatManager) traceRoundIntegralTie(tie, less, more bool) {
 	_ = tags.EmitConditional("mpf_dbg", "round_to_integral", "src/util/mpf.cpp", 1125,
 		func() bool { return true }, func(w io.Writer) error {
 			for _, part := range [...]string{"tie= ", traceBoolDigit(tie), "; <tie = ", traceBoolDigit(less), "; >tie = ", traceBoolDigit(more), "\n"} {
-				if e := writeNumeralDisplayPart(w, part); e != nil {
+				if e := writeRoundTracePart(w, part); e != nil {
 					return e
 				}
 			}

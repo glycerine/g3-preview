@@ -2,6 +2,7 @@ package numeral
 
 import (
 	"bytes"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -62,6 +63,48 @@ func TestArbitraryFloatRoundIntegralTraceBranches(t *testing.T) {
 		for _, part := range tc.parts {
 			if !strings.Contains(got, part) {
 				t.Fatalf("%s integral trace missing %q: %q", tc.name, part, got)
+			}
+		}
+	}
+	serviceMust(t, m.Del(&x))
+	serviceMust(t, m.Del(&out))
+}
+
+func TestArbitraryFloatRoundIntegralReachedEndlFlushes(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	w := &mpfEndlWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	var x, out ArbitraryFloat
+	serviceMust(t, m.SetDouble(&x, 11, 53, 1.75))
+	w.events = nil
+	w.flushes = 0
+	serviceMust(t, m.RoundToIntegral(ArbitraryFloatNearestEven, &x, &out))
+	if !tags.ShouldTrace("mpf_dbg") {
+		if len(w.events) != 0 {
+			t.Fatal("erased integral trace reached writer", w.events)
+		}
+	} else {
+		for _, line := range []int{1050, 1100, 1111, 1112, 1116, 1125, 1137, 1167} {
+			start := -1
+			for i := 0; i+3 < len(w.events); i++ {
+				if w.events[i] == "write:src/util/mpf.cpp" && w.events[i+1] == "write::" && w.events[i+2] == "write:"+strconv.Itoa(line) && w.events[i+3] == "write: ---------\n" {
+					start = i + 4
+					break
+				}
+			}
+			if start < 0 {
+				t.Fatalf("missing reached integral site %d: %q", line, w.events)
+			}
+			bodyFlushes := 0
+			for i := start; i < len(w.events) && w.events[i] != "write:------------------------------------------------\n"; i++ {
+				if i > start && w.events[i-1] == "write:\n" && w.events[i] == "flush" {
+					bodyFlushes++
+				}
+			}
+			if bodyFlushes != 1 {
+				t.Fatalf("integral site %d: got %d body flushes, events %q", line, bodyFlushes, w.events)
 			}
 		}
 	}
