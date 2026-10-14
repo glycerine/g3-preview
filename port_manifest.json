@@ -168705,7 +168705,9 @@
         "pkg/ast/rewriter/bool_rewriter_config.go",
         "pkg/ast/rewriter/bool_rewriter_config_test.go",
         "pkg/ast/ast_app_coercion.go",
-        "pkg/ast/ast_arith_decl_test.go"
+        "pkg/ast/ast_arith_decl_test.go",
+        "pkg/ast/rewriter/bv_rewriter_xor.go",
+        "pkg/ast/rewriter/bv_rewriter_xor_numeric_test.go"
       ],
       "tests": [
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
@@ -168737,7 +168739,8 @@
         "TestBoolRewriterConjunctionEliminationOwningBufferAndTruthTables",
         "TestBoolRewriterConjunctionEliminationReleasesEarlierTemporaryOnLaterFailure",
         "TestASTArithmeticOriginalMixedApplications",
-        "TestASTArithmeticAppCoercionEveryWarmReservation"
+        "TestASTArithmeticAppCoercionEveryWarmReservation",
+        "TestBVRewriterXOREveryActualNumericAndMaskReservation"
       ],
       "conditionals": [
         {
@@ -168766,6 +168769,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Concrete bv_rewriter XOR-mask expr_ref_buffer: source-order extracted-piece pushes, borrowed reverse/concat view, and forward reference destruction after younger not_t (bv_rewriter.cpp:1825-1852)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_xor.go",
+          "tests": ["TestBVRewriterXOREveryActualNumericAndMaskReservation"]
+        },
         {
           "name": "Concrete ast_manager::mk_app_core expr_ref_buffer for associative and non-associative arithmetic coercions: source-order INC-before-push, borrowed argument publication, and ascending cleanup across allocation refusals (ast.cpp:2064-2112)",
           "status": "ported",
