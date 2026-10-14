@@ -65,6 +65,47 @@ func TestTacticModelRefCloseResumesConsumedFinalModelCleanup(t *testing.T) {
 	}
 }
 
+func TestTacticModelRefPendingIncomingFinalCleanupResumes(t *testing.T) {
+	m := astTestManager(t)
+	old, e := model.NewModel(m)
+	satOK(t, e)
+	oldSort, e := m.MkUninterpretedSort(astTestSymbol(t, m, "pending-old-sort"), nil)
+	satOK(t, e)
+	oldValue, e := m.GetSomeValue(oldSort)
+	satOK(t, e)
+	satOK(t, old.RegisterUniverse(oldSort, []ast.ASTHandle{oldValue}))
+	incoming, e := model.NewModel(m)
+	satOK(t, e)
+	incomingSort, e := m.MkUninterpretedSort(astTestSymbol(t, m, "pending-incoming-sort"), nil)
+	satOK(t, e)
+	incomingValue, e := m.GetSomeValue(incomingSort)
+	satOK(t, e)
+	satOK(t, incoming.RegisterUniverse(incomingSort, []ast.ASTHandle{incomingValue}))
+	var r ModelRef
+	satOK(t, r.Set(&old.CoreField))
+	m.ExprIDs.Cleanup(m.ExprIDs.Range())
+	m.BudgetField.FailAfter(0)
+	e = r.Set(&incoming.CoreField)
+	m.BudgetField.FailAfter(-1)
+	if !errors.Is(e, arena.ErrInjectedFailure) || r.cleanup != &old.CoreField || len(r.pending) != 1 || incoming.CoreField.References != 1 {
+		t.Fatal("old final cleanup prefix", e, r, incoming.CoreField.References)
+	}
+	// Finish the old model so the next refusal is reached by the independently
+	// acquired incoming model while ModelRef.Close releases its pending receipt.
+	satOK(t, old.Close())
+	m.ExprIDs.Cleanup(m.ExprIDs.Range())
+	m.BudgetField.FailAfter(0)
+	e = r.Close()
+	m.BudgetField.FailAfter(-1)
+	if !errors.Is(e, arena.ErrInjectedFailure) || r.closed || r.cleanup != &incoming.CoreField || len(r.pending) != 0 || incoming.CoreField.References != 0 {
+		t.Fatal("incoming final cleanup prefix", e, r, incoming.CoreField.References)
+	}
+	satOK(t, r.Close())
+	if !r.closed || !incoming.Closed || r.cleanup != nil {
+		t.Fatal("pending incoming model cleanup", r, incoming.Closed)
+	}
+}
+
 func TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion(t *testing.T) {
 	m := astTestManager(t)
 	old, e := model.NewModel(m)
