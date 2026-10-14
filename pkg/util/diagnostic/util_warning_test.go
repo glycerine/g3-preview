@@ -45,6 +45,11 @@ func TestWarningFlushesCompletedBorrowedAndDefaultStreams(t *testing.T) {
 	if err := s.Warning("again"); err != nil || flushed.flushes != 2 {
 		t.Fatal("completed warning flush failure", err, flushed.flushes)
 	}
+	before := flushed.String()
+	flushed.err = nil
+	if err := s.Warning("after failed flush"); err != nil || flushed.String() != before || flushed.flushes != 2 {
+		t.Fatal("borrowed stream flush failure did not persist", err, flushed.String(), flushed.flushes)
+	}
 	if err := s.Enable(false); err != nil {
 		t.Fatal(err)
 	}
@@ -81,6 +86,50 @@ func (w *shortFlushingWarningWriter) Flush() error {
 type shortWarningWriter struct {
 	buf   bytes.Buffer
 	limit int
+}
+
+type recoveringWarningWriter struct {
+	buf    bytes.Buffer
+	writes int
+}
+
+func (w *recoveringWarningWriter) Write(p []byte) (int, error) {
+	w.writes++
+	if w.writes == 1 {
+		return w.buf.Write(p[:3])
+	}
+	return w.buf.Write(p)
+}
+
+func TestWarningBorrowedStreamFailurePersistsAcrossMessages(t *testing.T) {
+	var stderr bytes.Buffer
+	w := &recoveringWarningWriter{}
+	s := NewWarningService(&stderr)
+	if err := s.SetWarningStream(w); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Warning("first"); err != nil {
+		t.Fatal(err)
+	}
+	if got := w.buf.String(); got != "WAR" || w.writes != 1 {
+		t.Fatal("first borrowed stream failure prefix", got, w.writes)
+	}
+	if err := s.Warning("second"); err != nil {
+		t.Fatal(err)
+	}
+	if got := w.buf.String(); got != "WAR" || w.writes != 1 {
+		t.Fatal("borrowed stream failbit did not persist", got, w.writes)
+	}
+	var replacement bytes.Buffer
+	if err := s.SetWarningStream(&replacement); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Warning("third"); err != nil {
+		t.Fatal(err)
+	}
+	if got := replacement.String(); got != "WARNING: third\n" || stderr.Len() != 0 {
+		t.Fatal("new borrowed stream did not receive warning", got, stderr.String())
+	}
 }
 
 func (w *shortWarningWriter) Write(p []byte) (int, error) {
