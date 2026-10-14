@@ -165603,7 +165603,18 @@
           ]
         },
         {
-          "name": "params_ref get_empty binding, destructor and sharing Copy/Append with stopped owning cleanup",
+          "name": "params_ref successful Copy/Append ordered merge and shared-backing COW initialization",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceSourceCopyMergeAndSignedRat",
+            "TestParamsReferenceSelfCopySourceRatIdentity",
+            "TestParamsBorrowedStringSymbolCopyAndOwnership",
+            "TestParamsReferenceInitFailedCopySkipsOldDEC"
+          ]
+        },
+        {
+          "name": "params_ref get_empty binding, destructor and Copy/Append stopped owning cleanup",
           "status": "partial",
           "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
@@ -166184,7 +166195,18 @@
           ]
         },
         {
-          "name": "params_ref get_empty binding, destructor and sharing Copy/Append with stopped owning cleanup",
+          "name": "params_ref successful Copy/Append ordered merge and shared-backing COW initialization",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceSourceCopyMergeAndSignedRat",
+            "TestParamsReferenceSelfCopySourceRatIdentity",
+            "TestParamsBorrowedStringSymbolCopyAndOwnership",
+            "TestParamsReferenceInitFailedCopySkipsOldDEC"
+          ]
+        },
+        {
+          "name": "params_ref get_empty binding, destructor and Copy/Append stopped owning cleanup",
           "status": "partial",
           "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
