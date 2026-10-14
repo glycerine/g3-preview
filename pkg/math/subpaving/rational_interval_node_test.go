@@ -88,6 +88,12 @@ func TestRationalIntervalLiveNodeBoundsAndOwnedCopy(t *testing.T) {
 		t.Fatalf("borrowed mutation: %v", err)
 	}
 	must(owned.SetFrom(view))
+	must(result.Mul(view, owned))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "(-3, 4]" {
+		t.Fatal("mixed live view product", shown.String())
+	}
 	must(m.SetInt32(&lo, 0))
 	must(root.PushBound(0, &lo, true, true))
 	shown.Reset()
@@ -104,6 +110,18 @@ func TestRationalIntervalLiveNodeBoundsAndOwnedCopy(t *testing.T) {
 	must(owned.Display(&shown))
 	if shown.String() != "(-3/2, 2]" {
 		t.Fatal("owned copy followed node", shown.String())
+	}
+	must(result.Mul(view, owned))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "(-3, 4]" {
+		t.Fatal("changed live view product", shown.String())
+	}
+	must(result.Mul(view, view))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "(0, 4]" {
+		t.Fatal("positive live view product", shown.String())
 	}
 	must(result.Neg(view))
 	shown.Reset()
@@ -154,6 +172,17 @@ func TestRationalIntervalLiveNodeBoundsAndOwnedCopy(t *testing.T) {
 	if err := result.Power(view, 2); !errors.Is(err, arena.ErrInvalidSlot) {
 		t.Fatalf("unwired power operand: %v", err)
 	}
+	must(root.PushBound(0, &lo, true, true))
+	must(m.SetInt32(&lo, -3))
+	must(m.SetInt32(&hi, 3))
+	must(owned.SetFinite(&lo, &hi, false, false))
+	must(result.Mul(view, owned))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "[-6, 6]" {
+		t.Fatal("mixed live view closed-tie product", shown.String())
+	}
+	must(m.SetInt32(&hi, 2))
 	child, err := NewRationalNode(m, 1, root)
 	must(err)
 	if err := root.Close(); !errors.Is(err, arena.ErrInvalidSlot) {

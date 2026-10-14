@@ -69,8 +69,14 @@ func (v *RationalInterval) Div(num, den *RationalInterval) (err error) {
 	if !dn && !dp {
 		return interval.ErrExtendedDomain
 	}
-	a, b := num.endpoints()
-	c, d := den.endpoints()
+	a, b, err := num.endpoints()
+	if err != nil {
+		return err
+	}
+	c, d, err := den.endpoints()
+	if err != nil {
+		return err
+	}
 	lower, upper := numeral.NewRational(), numeral.NewRational()
 	defer func() { err = errors.Join(err, v.numbers.Del(&lower), v.numbers.Del(&upper)) }()
 	var le, ld, ue, ud intervalEndpoint

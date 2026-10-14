@@ -52099,11 +52099,12 @@
           ]
         },
         {
-          "name": "Concrete config_mpq interval multiplication nine sign classes, mixed extrema closed ties, zero/infinity and alias branches; source interval_bug TRACE records remain open (src/math/interval/interval_def.h:1017-1218)",
+          "name": "Concrete config_mpq interval multiplication with live borrowed operands, nine sign classes, mixed extrema closed ties, zero/infinity and alias branches; source interval_bug TRACE records remain open (src/math/interval/interval_def.h:1017-1218)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/rational_interval_mul.go",
           "tests": [
-            "TestSubpavingRationalIntervalMulNineSignClassesAndTies"
+            "TestSubpavingRationalIntervalMulNineSignClassesAndTies",
+            "TestRationalIntervalLiveNodeBoundsAndOwnedCopy"
           ]
         },
         {

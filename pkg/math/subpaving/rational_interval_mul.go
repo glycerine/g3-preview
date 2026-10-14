@@ -14,24 +14,32 @@ type intervalEndpoint struct {
 	open  bool
 }
 
-func (v *RationalInterval) endpoints() (intervalEndpoint, intervalEndpoint) {
-	return intervalEndpoint{&v.lower, v.lowerKind(), v.lowerOpen}, intervalEndpoint{&v.upper, v.upperKind(), v.upperOpen}
+func (v *RationalInterval) endpoints() (intervalEndpoint, intervalEndpoint, error) {
+	lo, hi, err := v.resolved()
+	if err != nil {
+		return intervalEndpoint{}, intervalEndpoint{}, err
+	}
+	return intervalEndpoint{lo, v.lowerKind(), v.lowerOpen}, intervalEndpoint{hi, v.upperKind(), v.upperOpen}, nil
 }
 
 func (v *RationalInterval) signClass() (byte, error) {
-	e := interval.RationalExtended{Numbers: v.numbers}
-	neg, err := e.IsNeg(&v.upper, v.upperKind())
+	lo, hi, err := v.resolved()
 	if err != nil {
 		return 0, err
 	}
-	z, err := e.IsZero(&v.upper, v.upperKind())
+	e := interval.RationalExtended{Numbers: v.numbers}
+	neg, err := e.IsNeg(hi, v.upperKind())
+	if err != nil {
+		return 0, err
+	}
+	z, err := e.IsZero(hi, v.upperKind())
 	if err != nil {
 		return 0, err
 	}
 	if neg || z {
 		return 'N', nil
 	}
-	neg, err = e.IsNeg(&v.lower, v.lowerKind())
+	neg, err = e.IsNeg(lo, v.lowerKind())
 	if err != nil {
 		return 0, err
 	}
@@ -42,10 +50,14 @@ func (v *RationalInterval) signClass() (byte, error) {
 }
 
 func (v *RationalInterval) closedZeroAtUpper() (bool, error) {
+	_, hi, err := v.resolved()
+	if err != nil {
+		return false, err
+	}
 	if v.upperInf {
 		return false, nil
 	}
-	z, err := v.numbers.IsZero(&v.upper)
+	z, err := v.numbers.IsZero(hi)
 	if err != nil {
 		return false, err
 	}
@@ -53,10 +65,14 @@ func (v *RationalInterval) closedZeroAtUpper() (bool, error) {
 }
 
 func (v *RationalInterval) closedZeroAtLower() (bool, error) {
+	lo, _, err := v.resolved()
+	if err != nil {
+		return false, err
+	}
 	if v.lowerInf {
 		return false, nil
 	}
-	z, err := v.numbers.IsZero(&v.lower)
+	z, err := v.numbers.IsZero(lo)
 	if err != nil {
 		return false, err
 	}
@@ -64,14 +80,18 @@ func (v *RationalInterval) closedZeroAtLower() (bool, error) {
 }
 
 func (v *RationalInterval) isSingletonZero() (bool, error) {
-	if v.lowerInf || v.upperInf {
-		return false, nil
-	}
-	l, err := v.numbers.IsZero(&v.lower)
+	lo, hi, err := v.resolved()
 	if err != nil {
 		return false, err
 	}
-	u, err := v.numbers.IsZero(&v.upper)
+	if v.lowerInf || v.upperInf {
+		return false, nil
+	}
+	l, err := v.numbers.IsZero(lo)
+	if err != nil {
+		return false, err
+	}
+	u, err := v.numbers.IsZero(hi)
 	if err != nil {
 		return false, err
 	}
@@ -81,10 +101,10 @@ func (v *RationalInterval) isSingletonZero() (bool, error) {
 // Mul computes the source's nine sign-class branches, including the mixed x
 // mixed tie rule that prefers a closed endpoint over an open one.
 func (v *RationalInterval) Mul(a, b *RationalInterval) (err error) {
-	if err = v.pair(a); err != nil {
+	if _, _, err = v.pairView(a); err != nil {
 		return err
 	}
-	if err = v.pair(b); err != nil {
+	if _, _, err = v.pairView(b); err != nil {
 		return err
 	}
 	zero, err := a.isSingletonZero()
@@ -109,8 +129,14 @@ func (v *RationalInterval) Mul(a, b *RationalInterval) (err error) {
 	if err != nil {
 		return err
 	}
-	al, au := a.endpoints()
-	bl, bu := b.endpoints()
+	al, au, err := a.endpoints()
+	if err != nil {
+		return err
+	}
+	bl, bu, err := b.endpoints()
+	if err != nil {
+		return err
+	}
 	lower, upper := numeral.NewRational(), numeral.NewRational()
 	defer func() { err = errors.Join(err, v.numbers.Del(&lower), v.numbers.Del(&upper)) }()
 	e := interval.RationalExtended{Numbers: v.numbers}
