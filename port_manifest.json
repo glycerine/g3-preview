@@ -165807,7 +165807,18 @@
           ]
         },
         {
-          "name": "shared reset/contains and validation module mutation, duplicate/key-kind scan and exact exception text",
+          "name": "params_ref::empty/contains and params::contains including null and allocated-empty backings, name lookup and shared reset visibility",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsReferenceNameReadsNeverIntern",
+            "TestParamsAllocatedEmptyBackingSkipsKeyInspection",
+            "TestParamsReferenceNullBackingSkipsKeyRead"
+          ]
+        },
+        {
+          "name": "shared reset and validation module mutation, duplicate/key-kind scan and exact exception text",
           "status": "partial",
           "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
@@ -166412,7 +166423,18 @@
           ]
         },
         {
-          "name": "shared reset/contains and validation module mutation, duplicate/key-kind scan and exact exception text",
+          "name": "params_ref::empty/contains and params::contains including null and allocated-empty backings, name lookup and shared reset visibility",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsReferenceNameReadsNeverIntern",
+            "TestParamsAllocatedEmptyBackingSkipsKeyInspection",
+            "TestParamsReferenceNullBackingSkipsKeyRead"
+          ]
+        },
+        {
+          "name": "shared reset and validation module mutation, duplicate/key-kind scan and exact exception text",
           "status": "partial",
           "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
