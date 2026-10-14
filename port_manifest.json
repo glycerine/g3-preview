@@ -168701,7 +168701,9 @@
         "pkg/math/subpaving/tactic/rational_expr_converter.go",
         "pkg/math/subpaving/tactic/goal_internalize.go",
         "pkg/math/subpaving/tactic/fast_goal_internalize.go",
-        "pkg/math/subpaving/tactic/arbitrary_goal_internalize.go"
+        "pkg/math/subpaving/tactic/arbitrary_goal_internalize.go",
+        "pkg/ast/rewriter/bool_rewriter_config.go",
+        "pkg/ast/rewriter/bool_rewriter_config_test.go"
       ],
       "tests": [
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
@@ -168729,7 +168731,9 @@
         "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
         "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
         "TestSubpavingTemporaryInequalityBufferUnwind",
-        "TestFastExprConverterTermsAndClause"
+        "TestFastExprConverterTermsAndClause",
+        "TestBoolRewriterConjunctionEliminationOwningBufferAndTruthTables",
+        "TestBoolRewriterConjunctionEliminationReleasesEarlierTemporaryOnLaterFailure"
       ],
       "conditionals": [
         {
@@ -168758,6 +168762,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Concrete bool_rewriter mk_and_as_or expr_ref_buffer: INC-before-push, borrowed ordered c_ptr view, and ascending owned-reference release after mk_or/mk_not or error (bool_rewriter.cpp:73-83)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bool_rewriter_config.go",
+          "tests": ["TestBoolRewriterConjunctionEliminationOwningBufferAndTruthTables", "TestBoolRewriterConjunctionEliminationReleasesEarlierTemporaryOnLaterFailure"]
+        },
         {
           "name": "Concrete subpaving tactic MPQ/hardware/MPFF/MPF ineq ref_buffer temporary push/c_ptr/destruction: failed clause conversion releases unpublished inequalities in ascending order; successful clause/unit publication retains its own reference",
           "status": "ported",

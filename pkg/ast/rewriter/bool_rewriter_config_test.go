@@ -156,6 +156,23 @@ func TestBoolRewriterConjunctionEliminationOwningBufferAndTruthTables(t *testing
 	}
 }
 
+func TestBoolRewriterConjunctionEliminationReleasesEarlierTemporaryOnLaterFailure(t *testing.T) {
+	m := astTestManager(t)
+	rw := boolRewriter{manager: m, flat: true, elimAnd: true}
+	first := goalTestAtom(t, m, "first-conjunct")
+	before, err := m.GetRefCount(first)
+	satOK(t, err)
+	out := astTestPin(t, m, ast.ASTHandle{})
+	if err := rw.mkAndAsOr([]ast.ASTHandle{first, {}}, out); err == nil {
+		t.Fatal("invalid later conjunct was accepted")
+	}
+	after, err := m.GetRefCount(first)
+	satOK(t, err)
+	if after != before || len(rw.andArgs) != 0 || rw.andDepth != 0 {
+		t.Fatal("earlier ref_buffer entry survived later argument failure", before, after, rw.andArgs, rw.andDepth)
+	}
+}
+
 func TestBoolRewriterAppDispatcherAndFallbackDepths(t *testing.T) {
 	m := astTestManager(t)
 	rw := boolRewriter{manager: m, flat: true, elimAnd: true}
