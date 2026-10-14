@@ -77,11 +77,11 @@ func TestMyMPZSqrtReachedEndlFlushes(t *testing.T) {
 				continue
 			}
 			newlines++
-			if i+1 == len(w.events) || w.events[i+1] != "flush" {
-				t.Fatalf("sqrt std::endl for %d did not flush: %q", input, w.events)
+			if i+2 >= len(w.events) || w.events[i+1] != "flush" || w.events[i+2] != "flush" {
+				t.Fatalf("sqrt std::endl and STRACE footer for %d did not flush: %q", input, w.events)
 			}
 		}
-		if newlines < 3 || w.flushes != newlines {
+		if newlines < 3 || w.flushes != 2*newlines {
 			t.Fatalf("sqrt std::endl count for %d: %d newlines, %d flushes", input, newlines, w.flushes)
 		}
 	}

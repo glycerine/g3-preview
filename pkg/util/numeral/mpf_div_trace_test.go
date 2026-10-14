@@ -65,8 +65,8 @@ func TestArbitraryFloatDivDebugTraceEndlFlushes(t *testing.T) {
 		serviceMust(t, m.Del(&out))
 	}()
 	for _, tc := range []struct {
-		name string
-		x    *ArbitraryFloat
+		name  string
+		x     *ArbitraryFloat
 		sites []string
 	}{
 		{"general", &one, []string{"670", "671", "722", "723", "727", "728", "734", "742"}},
@@ -81,14 +81,26 @@ func TestArbitraryFloatDivDebugTraceEndlFlushes(t *testing.T) {
 			}
 			continue
 		}
-		all := strings.Join(w.events, "|")
+		var written strings.Builder
+		for _, event := range w.events {
+			if strings.HasPrefix(event, "write:") {
+				written.WriteString(strings.TrimPrefix(event, "write:"))
+			}
+		}
+		all := written.String()
 		for _, line := range tc.sites {
 			if !strings.Contains(all, "div src/util/mpf.cpp:"+line+" ---------") {
 				t.Fatalf("%s missing source site %s: %q", tc.name, line, w.events)
 			}
 		}
-		newlines := 0
+		newlines, footers := 0, 0
 		for i, event := range w.events {
+			if event == "write:------------------------------------------------\n" {
+				footers++
+				if i+1 == len(w.events) || w.events[i+1] != "flush" {
+					t.Fatalf("%s TRACE footer did not flush: %q", tc.name, w.events)
+				}
+			}
 			if event != "write:\n" {
 				continue
 			}
@@ -97,8 +109,8 @@ func TestArbitraryFloatDivDebugTraceEndlFlushes(t *testing.T) {
 				t.Fatalf("%s source std::endl did not flush: %q", tc.name, w.events)
 			}
 		}
-		if newlines < len(tc.sites) || w.flushes != newlines {
-			t.Fatalf("%s completed %d newlines and %d flushes: %q", tc.name, newlines, w.flushes, w.events)
+		if newlines < len(tc.sites) || footers < len(tc.sites) || w.flushes != newlines+footers {
+			t.Fatalf("%s completed %d newlines, %d footers and %d flushes: %q", tc.name, newlines, footers, w.flushes, w.events)
 		}
 	}
 }
