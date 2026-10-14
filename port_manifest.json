@@ -171220,6 +171220,7 @@
         "TestScopedNumeralDeepCloneFailureCleanup",
         "TestBinarySourceTst1",
         "TestBinarySourceTst2",
+        "TestScopedBinarySourceDeletionAndOwningRetry",
         "TestBinaryMixedConversionsAndIntervals",
         "TestBinarySourceShapeDomainsAndPrefixes",
         "TestBinaryRootBoundsFinite",
@@ -171376,6 +171377,7 @@
           "tests": [
             "TestBinarySourceTst1",
             "TestBinarySourceTst2",
+            "TestScopedBinarySourceDeletionAndOwningRetry",
             "TestBinaryMixedConversionsAndIntervals",
             "TestBinarySourceShapeDomainsAndPrefixes",
             "TestBinaryRootBoundsFinite",

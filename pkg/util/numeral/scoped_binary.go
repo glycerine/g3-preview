@@ -8,10 +8,11 @@ import (
 )
 
 type ScopedBinary struct {
-	manager *BinaryRationalManager
-	num     BinaryRational
-	self    *ScopedBinary
-	closed  bool
+	manager     *BinaryRationalManager
+	num         BinaryRational
+	self        *ScopedBinary
+	sourceCause error
+	closed      bool
 }
 
 func NewScopedBinary(m *BinaryRationalManager) (*ScopedBinary, error) {
@@ -121,7 +122,34 @@ func (s *ScopedBinary) Close() error {
 	if s.closed {
 		return nil
 	}
-	if e := s.manager.Del(&s.num); e != nil {
+	if s.sourceCause != nil {
+		return s.sourceCause
+	}
+	if e := s.manager.checkCleanup(&s.num); e != nil {
+		s.sourceCause = e
+		return e
+	}
+	if _, e := sourceNumeralDel(s.manager.Z, &s.num.Num); e != nil {
+		s.sourceCause = e
+		return e
+	}
+	s.manager.Z.BudgetField.Release(uint64(reflect.TypeOf(ScopedBinary{}).Size()))
+	s.closed = true
+	return nil
+}
+
+// Cleanup releases a stopped scoped source destructor without replaying it.
+func (s *ScopedBinary) Cleanup() error {
+	if s == nil || s.self != s {
+		return ErrScopedCopy
+	}
+	if s.closed {
+		return nil
+	}
+	if e := s.manager.checkCleanup(&s.num); e != nil {
+		return e
+	}
+	if e := s.manager.Z.CleanupRawNumeral(&s.num.Num); e != nil {
 		return e
 	}
 	s.manager.Z.BudgetField.Release(uint64(reflect.TypeOf(ScopedBinary{}).Size()))
