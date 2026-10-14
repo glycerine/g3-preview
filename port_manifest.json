@@ -155734,14 +155734,15 @@
           ]
         },
         {
-          "name": "div_n mpn_div TRACE defined prefix after add-back; requested m+n+1 numerator limb exceeds logical m+n buffer (mpn.cpp:350-354)",
+          "name": "div_n mpn_div TRACE operand insertions and opening numerator bracket before requested m+n+1 limb exceeds logical m+n buffer (mpn.cpp:350-354)",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpn_divn_trace.go",
           "go_targets": [
             "pkg/util/numeral/mpn_indexed.go"
           ],
           "tests": [
-            "TestMPNMultiLimbDivisionTraceStopsAtSourceOutOfBoundsRead"
+            "TestMPNMultiLimbDivisionTraceStopsAtSourceOutOfBoundsRead",
+            "TestMPNMultiLimbDivisionTraceSourcePrefixAndRefusal"
           ]
         },
         {
@@ -156296,14 +156297,15 @@
           ]
         },
         {
-          "name": "div_n mpn_div TRACE defined prefix after add-back; requested m+n+1 numerator limb exceeds logical m+n buffer (mpn.cpp:350-354)",
+          "name": "div_n mpn_div TRACE operand insertions and opening numerator bracket before requested m+n+1 limb exceeds logical m+n buffer (mpn.cpp:350-354)",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpn_divn_trace.go",
           "go_targets": [
             "pkg/util/numeral/mpn_indexed.go"
           ],
           "tests": [
-            "TestMPNMultiLimbDivisionTraceStopsAtSourceOutOfBoundsRead"
+            "TestMPNMultiLimbDivisionTraceStopsAtSourceOutOfBoundsRead",
+            "TestMPNMultiLimbDivisionTraceSourcePrefixAndRefusal"
           ]
         },
         {
@@ -175826,6 +175828,13 @@
           "tests": ["TestMPNNormalizationTraceDivisionAndDecimalConversion", "TestMPNNormalizationTraceEndlFlushAndRefusal"]
         },
         {
+          "name": "Reached MPN div_n TRACE defined prefix before out-of-logical-bounds numerator limb (mpn.cpp:350-354)",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/mpn_divn_trace.go",
+          "go_targets": ["pkg/util/numeral/mpn_divn_trace_test.go"],
+          "tests": ["TestMPNMultiLimbDivisionTraceStopsAtSourceOutOfBoundsRead", "TestMPNMultiLimbDivisionTraceSourcePrefixAndRefusal"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -176339,6 +176348,13 @@
           "go_target": "pkg/util/numeral/mpn_normalize_trace.go",
           "go_targets": ["pkg/util/numeral/mpn_normalize_trace_test.go"],
           "tests": ["TestMPNNormalizationTraceDivisionAndDecimalConversion", "TestMPNNormalizationTraceEndlFlushAndRefusal"]
+        },
+        {
+          "name": "Reached MPN div_n TRACE defined prefix before out-of-logical-bounds numerator limb (mpn.cpp:350-354)",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/mpn_divn_trace.go",
+          "go_targets": ["pkg/util/numeral/mpn_divn_trace_test.go"],
+          "tests": ["TestMPNMultiLimbDivisionTraceStopsAtSourceOutOfBoundsRead", "TestMPNMultiLimbDivisionTraceSourcePrefixAndRefusal"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
