@@ -184,6 +184,28 @@ func TestFastExprConverterTermsAndClause(t *testing.T) {
 	if err := converter.InternalizeClause(disjunction); err != nil {
 		t.Fatal("ordered disjunction", err)
 	}
+	beforeUnwind, err := numbers.Stats()
+	if err != nil {
+		t.Fatal(err)
+	}
+	invalid, err := m.MkFalse()
+	if err != nil {
+		t.Fatal(err)
+	}
+	broken, err := m.MkOr(ineq, invalid)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := converter.InternalizeClause(broken); !errors.Is(err, ErrFastUnsupportedAtom) {
+		t.Fatal("second literal should unwind the first temporary inequality", err)
+	}
+	afterUnwind, err := numbers.Stats()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if afterUnwind.Live != beforeUnwind.Live {
+		t.Fatal("temporary ref_buffer retained a fast numeral", beforeUnwind, afterUnwind)
+	}
 	if err := goal.Assert(ineq); err != nil {
 		t.Fatal(err)
 	}

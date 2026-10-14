@@ -100,9 +100,9 @@ func (c *FastExprConverter) InternalizeInequality(h ast.ASTHandle) (atom *subpav
 	return shell.MkInequality(x, &k, lower, open)
 }
 
-// InternalizeClause uses a native typed slice for the source ref_buffer of
-// borrowed inequality pointers, preserving literal and clause order.
-func (c *FastExprConverter) InternalizeClause(h ast.ASTHandle) error {
+// InternalizeClause uses a native typed slice for the source ref_buffer,
+// preserving literal and clause order and releasing unowned atoms on unwind.
+func (c *FastExprConverter) InternalizeClause(h ast.ASTHandle) (err error) {
 	if err := c.check(); err != nil {
 		return err
 	}
@@ -135,6 +135,14 @@ func (c *FastExprConverter) InternalizeClause(h ast.ASTHandle) error {
 		}
 	}
 	atoms := make([]*subpaving.FastInequality, 0, len(args))
+	defer func() {
+		for _, atom := range atoms {
+			if cleanup := c.engine.shell.DiscardUnreferencedInequality(atom); cleanup != nil {
+				err = errors.Join(err, cleanup)
+				break
+			}
+		}
+	}()
 	for _, literal := range args {
 		atom, err := c.InternalizeInequality(literal)
 		if err != nil {

@@ -348,7 +348,7 @@ func (c *RationalExprConverter) InternalizeInequality(h ast.ASTHandle) (atom *su
 	return context.NewInequality(x, &k, lower, open)
 }
 
-func (c *RationalExprConverter) InternalizeClause(h ast.ASTHandle) error {
+func (c *RationalExprConverter) InternalizeClause(h ast.ASTHandle) (err error) {
 	if err := c.check(); err != nil {
 		return err
 	}
@@ -381,6 +381,14 @@ func (c *RationalExprConverter) InternalizeClause(h ast.ASTHandle) error {
 		}
 	}
 	atoms := make([]*subpaving.RationalInequality, 0, len(args))
+	defer func() {
+		for _, atom := range atoms {
+			if cleanup := c.engine.context.DiscardUnreferencedInequality(atom); cleanup != nil {
+				err = errors.Join(err, cleanup)
+				break
+			}
+		}
+	}()
 	for _, literal := range args {
 		atom, err := c.InternalizeInequality(literal)
 		if err != nil {

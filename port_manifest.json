@@ -54463,7 +54463,9 @@
         "pkg/math/subpaving/tactic/fast_expr_converter_test.go",
         "pkg/math/subpaving/tactic/fast_core_tactic.go",
         "pkg/math/subpaving/tactic/fast_core_tactic_test.go",
-        "pkg/math/subpaving/tactic/fast_variable_display.go"
+        "pkg/math/subpaving/tactic/fast_variable_display.go",
+        "pkg/math/subpaving/inequality_buffer_release.go",
+        "pkg/math/subpaving/inequality_buffer_release_test.go"
       ],
       "tests": [
         "TestSubpavingTacticOptionSelectionAndDescriptions",
@@ -54476,11 +54478,19 @@
         "TestArbitraryExprConverterSearchSimpleGoal",
         "TestFastEngineSelectedOwnerAndPartialCleanup",
         "TestFastExprConverterTermsAndClause",
-        "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats"
+        "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats",
+        "TestSubpavingTemporaryInequalityBufferUnwind"
       ],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete MPQ/hardware/MPFF/MPF process_clause temporary inequality ref_buffer releases unpublished atoms in source push order after literal or clause failure and retains published clause/unit references (subpaving_tactic.cpp:165-178)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/inequality_buffer_release.go",
+          "go_targets": ["pkg/math/subpaving/tactic/rational_expr_converter.go", "pkg/math/subpaving/tactic/goal_internalize.go", "pkg/math/subpaving/tactic/fast_goal_internalize.go", "pkg/math/subpaving/tactic/arbitrary_goal_internalize.go"],
+          "tests": ["TestSubpavingTemporaryInequalityBufferUnwind", "TestFastExprConverterTermsAndClause"]
+        },
         {
           "name": "Concrete MPQ print_nodes emits mapped SMT2 variable names, generated definition names, constraints, header and leaf bounds through a nonthrowing borrowed writer; wider interpreted expression display remains open (src/math/subpaving/tactic/subpaving_tactic.cpp:32-49,193-205)",
           "status": "partial",
@@ -168685,7 +168695,13 @@
         "pkg/tactic/ufbv/rewrite_formula_process.go",
         "pkg/tactic/ufbv/rewrite_tactic.go",
         "pkg/ast/pattern/preferred_pattern.go",
-        "pkg/ast/pattern/reduce_quantifier.go"
+        "pkg/ast/pattern/reduce_quantifier.go",
+        "pkg/math/subpaving/inequality_buffer_release.go",
+        "pkg/math/subpaving/inequality_buffer_release_test.go",
+        "pkg/math/subpaving/tactic/rational_expr_converter.go",
+        "pkg/math/subpaving/tactic/goal_internalize.go",
+        "pkg/math/subpaving/tactic/fast_goal_internalize.go",
+        "pkg/math/subpaving/tactic/arbitrary_goal_internalize.go"
       ],
       "tests": [
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
@@ -168711,7 +168727,9 @@
         "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
         "TestPatternInferencePreferredPatternsCompleteAndOwned",
         "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
-        "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
+        "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
+        "TestSubpavingTemporaryInequalityBufferUnwind",
+        "TestFastExprConverterTermsAndClause"
       ],
       "conditionals": [
         {
@@ -168740,6 +168758,13 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Concrete subpaving tactic MPQ/hardware/MPFF/MPF ineq ref_buffer temporary push/c_ptr/destruction: failed clause conversion releases unpublished inequalities in ascending order; successful clause/unit publication retains its own reference",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/inequality_buffer_release.go",
+          "go_targets": ["pkg/math/subpaving/tactic/rational_expr_converter.go", "pkg/math/subpaving/tactic/goal_internalize.go", "pkg/math/subpaving/tactic/fast_goal_internalize.go", "pkg/math/subpaving/tactic/arbitrary_goal_internalize.go"],
+          "tests": ["TestSubpavingTemporaryInequalityBufferUnwind", "TestFastExprConverterTermsAndClause"]
+        },
         {
           "name": "ref_buffer_core construction/destruction, push_back, pop_back, back, c_ptr, indexing, set, size, empty, reset and finalize",
           "status": "partial",
