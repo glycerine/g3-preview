@@ -19,16 +19,16 @@ func (s *realValueStore) multiplyRationals(a, b *realValue) (*realValue, error) 
 	}
 	out := numeral.NewRational()
 	if err := s.numbers.Mul(&a.rational, &b.rational, &out); err != nil {
-		_ = s.numbers.Del(&out)
+		_ = s.releaseSturmRational(&out)
 		return nil, err
 	}
 	zero, err := s.numbers.IsZero(&out)
 	if err != nil {
-		_ = s.numbers.Del(&out)
+		_ = s.releaseSturmRational(&out)
 		return nil, err
 	}
 	if zero {
-		if err := s.numbers.Del(&out); err != nil {
+		if err := s.releaseSturmRational(&out); err != nil {
 			return nil, err
 		}
 		return nil, nil
@@ -54,16 +54,16 @@ func (s *realValueStore) addRationals(a, b *realValue) (*realValue, error) {
 	}
 	out := numeral.NewRational()
 	if err := s.numbers.Add(&a.rational, &b.rational, &out); err != nil {
-		_ = s.numbers.Del(&out)
+		_ = s.releaseSturmRational(&out)
 		return nil, err
 	}
 	zero, err := s.numbers.IsZero(&out)
 	if err != nil {
-		_ = s.numbers.Del(&out)
+		_ = s.releaseSturmRational(&out)
 		return nil, err
 	}
 	if zero {
-		if err := s.numbers.Del(&out); err != nil {
+		if err := s.releaseSturmRational(&out); err != nil {
 			return nil, err
 		}
 		return nil, nil

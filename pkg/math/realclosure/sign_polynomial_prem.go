@@ -176,7 +176,7 @@ func (s *realValueStore) normalizeRationalIntegerContent(values []*realValue) er
 		}
 		out := numeral.NewRational()
 		if err := s.numbers.DivInt(&value.rational, &gcd, &out); err != nil {
-			_ = s.numbers.Del(&out)
+			_ = s.releaseSturmRational(&out)
 			return err
 		}
 		updated, err := s.ownNonzeroRational(&out)

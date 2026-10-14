@@ -50121,14 +50121,15 @@
           ]
         },
         {
-          "name": "Selected rational scoped_polynomial_seq push and destruction: owned rows and younger temporary coefficient suffixes retain refused deletions for explicit ordered continuation, and gate four query callers until cleanup (realclosure.cpp:406-451,3637-3674)",
+          "name": "Selected rational scoped_polynomial_seq push and destruction: owned rows, temporary coefficient suffixes and raw rational scratch retain refused deletions for explicit ordered continuation, and gate four query callers until cleanup (realclosure.cpp:406-451,3637-3674)",
           "status": "platform_replacement",
           "go_target": "pkg/math/realclosure/sign_sturm_tarski.go",
           "tests": [
             "TestRealClosureRationalSturmSequenceOwnsBorrowedCoefficients",
             "TestRealClosureSturmSequenceRefusedDestructorRetainsRows",
             "TestRealClosureSturmTemporaryRefusalPrecedesOlderRows",
-            "TestRealClosureSturmScratchRefusalRetainsValue"
+            "TestRealClosureSturmScratchRefusalRetainsValue",
+            "TestRealClosureSturmRawRationalRefusalRetainsNumeral"
           ]
         },
         {

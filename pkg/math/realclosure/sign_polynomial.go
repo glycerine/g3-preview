@@ -13,6 +13,7 @@ type realValueStore struct {
 	numbers                  *numeral.RationalManager
 	pendingSequence          []realPolynomial
 	pendingSturmCoefficients [][]*realValue
+	pendingSturmRationals    []numeral.Rational
 }
 
 // realValue is a retained nonzero rational or algebraic-root function value.
@@ -38,7 +39,7 @@ func (s *realValueStore) newRational(numerator int64, denominator uint64) (*real
 	}
 	v := &realValue{store: s, rational: numeral.NewRational(), refs: 1, isRational: true}
 	if err := s.numbers.SetFraction(&v.rational, numerator, denominator); err != nil {
-		_ = s.numbers.Del(&v.rational)
+		_ = s.releaseSturmRational(&v.rational)
 		return nil, err
 	}
 	return v, nil

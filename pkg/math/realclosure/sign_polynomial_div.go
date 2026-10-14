@@ -30,7 +30,7 @@ func (s *realValueStore) divideRationals(a, b *realValue) (*realValue, error) {
 	}
 	out := numeral.NewRational()
 	if err := s.numbers.Div(&a.rational, &b.rational, &out); err != nil {
-		_ = s.numbers.Del(&out)
+		_ = s.releaseSturmRational(&out)
 		return nil, err
 	}
 	return s.ownNonzeroRational(&out)
@@ -45,11 +45,11 @@ func (s *realValueStore) negateRational(a *realValue) (*realValue, error) {
 	}
 	out := numeral.NewRational()
 	if err := s.numbers.Copy(&out, &a.rational); err != nil {
-		_ = s.numbers.Del(&out)
+		_ = s.releaseSturmRational(&out)
 		return nil, err
 	}
 	if err := s.numbers.Neg(&out); err != nil {
-		_ = s.numbers.Del(&out)
+		_ = s.releaseSturmRational(&out)
 		return nil, err
 	}
 	return s.ownNonzeroRational(&out)
@@ -70,7 +70,7 @@ func (s *realValueStore) subtractRationals(a, b *realValue) (*realValue, error) 
 	}
 	out := numeral.NewRational()
 	if err := s.numbers.Sub(&a.rational, &b.rational, &out); err != nil {
-		_ = s.numbers.Del(&out)
+		_ = s.releaseSturmRational(&out)
 		return nil, err
 	}
 	return s.ownNonzeroRational(&out)

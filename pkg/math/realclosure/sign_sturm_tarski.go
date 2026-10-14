@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
 var errRealClosureSequencePending = errors.New("realclosure: polynomial sequence cleanup pending")
@@ -14,7 +15,7 @@ func (s *realValueStore) sequenceReady() error {
 	if s == nil || s.numbers == nil {
 		return arena.ErrInvalidSlot
 	}
-	if s.pendingSequence != nil || len(s.pendingSturmCoefficients) != 0 {
+	if s.pendingSequence != nil || len(s.pendingSturmCoefficients) != 0 || len(s.pendingSturmRationals) != 0 {
 		return errRealClosureSequencePending
 	}
 	return nil
@@ -59,12 +60,30 @@ func (s *realValueStore) releaseSturmScratch(value *realValue) error {
 	return nil
 }
 
+// releaseSturmRational retains the partly cleaned raw numeral if either
+// component's physical deletion refuses before it becomes a realValue.
+func (s *realValueStore) releaseSturmRational(value *numeral.Rational) error {
+	if err := s.numbers.Del(value); err != nil {
+		s.pendingSturmRationals = append(s.pendingSturmRationals, *value)
+		return err
+	}
+	return nil
+}
+
 // cleanupPendingPolynomialSequence finishes younger coefficient and scratch
 // groups before the older retained row sequence.
 func (s *realValueStore) cleanupPendingPolynomialSequence() error {
 	if s == nil {
 		return arena.ErrInvalidSlot
 	}
+	for len(s.pendingSturmRationals) != 0 {
+		if err := s.numbers.Del(&s.pendingSturmRationals[0]); err != nil {
+			return err
+		}
+		s.pendingSturmRationals[0] = numeral.Rational{}
+		s.pendingSturmRationals = s.pendingSturmRationals[1:]
+	}
+	s.pendingSturmRationals = nil
 	for len(s.pendingSturmCoefficients) != 0 {
 		group := s.pendingSturmCoefficients[0]
 		for i, value := range group {

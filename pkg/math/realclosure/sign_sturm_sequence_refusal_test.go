@@ -246,3 +246,60 @@ func TestRealClosureSturmScratchRefusalRetainsValue(t *testing.T) {
 		t.Fatal("physical cleanup retained bytes", used)
 	}
 }
+
+func TestRealClosureSturmRawRationalRefusalRetainsNumeral(t *testing.T) {
+	budget := arena.NewBudget(1 << 24)
+	runtime, err := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 32})
+	if err != nil {
+		t.Fatal(err)
+	}
+	service, err := numeral.NewRationalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{
+		Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}},
+		Memory: runtime, Profile: umemory.SmallAllocatorProfile{PointerBits: 32},
+	}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	store := &realValueStore{numbers: service.Manager}
+	raw := numeral.NewRational()
+	if err := store.numbers.SetString(&raw, "18446744073709551617"); err != nil {
+		t.Fatal(err)
+	}
+	z := service.Manager.Z
+	ref := raw.Num.Cell
+	if ref == 0 {
+		t.Fatal("raw rational has no physical numeric cell")
+	}
+	original := z.Cell(ref)
+	bad := original
+	bad.Backing.Requested = uint64(math.MaxUint32) + 1
+	z.Store(ref, bad)
+	if err := store.releaseSturmRational(&raw); !errors.Is(err, arena.ErrBounds) {
+		t.Fatal("raw rational destructor refusal", err)
+	}
+	if len(store.pendingSturmRationals) != 1 || store.pendingSturmRationals[0].Num.Cell != ref {
+		t.Fatal("raw numeral owner lost the refused cell")
+	}
+	if err := store.sequenceReady(); !errors.Is(err, errRealClosureSequencePending) {
+		t.Fatal("pending raw numeral allowed a new sequence", err)
+	}
+	if err := store.cleanupPendingPolynomialSequence(); !errors.Is(err, arena.ErrBounds) {
+		t.Fatal("refused raw numeral retry", err)
+	}
+	z.Store(ref, original)
+	if err := store.cleanupPendingPolynomialSequence(); err != nil {
+		t.Fatal(err)
+	}
+	if store.pendingSturmRationals != nil {
+		t.Fatal("raw rational did not drain")
+	}
+	if err := service.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err := runtime.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if used := budget.Used(); used != 0 {
+		t.Fatal("physical cleanup retained bytes", used)
+	}
+}
