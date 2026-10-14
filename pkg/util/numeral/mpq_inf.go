@@ -474,7 +474,10 @@ func (p *MPQInfManager) LeRational(a *MPQInf, b *Rational) (yes bool, e error) {
 	}
 	defer p.end(&e)
 	yes, e = p.compareRational(a, b, true)
-	return !yes, e
+	if e != nil {
+		return false, e
+	}
+	return !yes, nil
 }
 func (p *MPQInfManager) GeRational(a *MPQInf, b *Rational) (yes bool, e error) {
 	if e = p.begin(a); e != nil {
@@ -482,7 +485,10 @@ func (p *MPQInfManager) GeRational(a *MPQInf, b *Rational) (yes bool, e error) {
 	}
 	defer p.end(&e)
 	yes, e = p.compareRational(a, b, false)
-	return !yes, e
+	if e != nil {
+		return false, e
+	}
+	return !yes, nil
 }
 func (p *MPQInfManager) LtKind(a *MPQInf, b *Rational, k MPQInfKind) (yes bool, e error) {
 	if e = p.begin(a); e != nil {
@@ -504,7 +510,10 @@ func (p *MPQInfManager) LeKind(a *MPQInf, b *Rational, k MPQInfKind) (yes bool, 
 	}
 	defer p.end(&e)
 	yes, e = p.compareKind(a, b, k, true)
-	return !yes, e
+	if e != nil {
+		return false, e
+	}
+	return !yes, nil
 }
 func (p *MPQInfManager) GeKind(a *MPQInf, b *Rational, k MPQInfKind) (yes bool, e error) {
 	if e = p.begin(a); e != nil {
@@ -512,7 +521,10 @@ func (p *MPQInfManager) GeKind(a *MPQInf, b *Rational, k MPQInfKind) (yes bool, 
 	}
 	defer p.end(&e)
 	yes, e = p.compareKind(a, b, k, false)
-	return !yes, e
+	if e != nil {
+		return false, e
+	}
+	return !yes, nil
 }
 func (p *MPQInfManager) Lt(a, b *MPQInf) (yes bool, e error) {
 	if e = p.begin(a, b); e != nil {
@@ -534,7 +546,10 @@ func (p *MPQInfManager) Le(a, b *MPQInf) (yes bool, e error) {
 	}
 	defer p.end(&e)
 	yes, e = p.lt(b, a)
-	return !yes, e
+	if e != nil {
+		return false, e
+	}
+	return !yes, nil
 }
 func (p *MPQInfManager) Ge(a, b *MPQInf) (yes bool, e error) {
 	if e = p.begin(a, b); e != nil {
@@ -542,7 +557,10 @@ func (p *MPQInfManager) Ge(a, b *MPQInf) (yes bool, e error) {
 	}
 	defer p.end(&e)
 	yes, e = p.lt(a, b)
-	return !yes, e
+	if e != nil {
+		return false, e
+	}
+	return !yes, nil
 }
 func (p *MPQInfManager) Add(a, b, c *MPQInf) (e error) {
 	if e = p.begin(a, b, c); e != nil {
