@@ -61,9 +61,12 @@ func (e *ParseError) As(target any) bool {
 // source parser publishes numerator reset and each digit/component action into
 // the caller; errors retain those completed actions. Scientific input without
 // a dot keeps the actual old denominator until its later source arithmetic.
-func (m *RationalManager) SetString(out *Rational, text string) error {
+func (m *RationalManager) SetString(out *Rational, text string) (err error) {
 	if m == nil {
 		return umemory.ErrRuntimeOwner
+	}
+	if m.parseOuterPending || m.parseSuffixPending {
+		return ErrRationalLexicalPending
 	}
 	if m.closed {
 		return arena.ErrClosed
@@ -84,7 +87,15 @@ func (m *RationalManager) SetString(out *Rational, text string) error {
 	}
 	ten := NewInt(10)
 	var tmp Int
-	defer m.Z.Del(&tmp)
+	defer func() {
+		if _, cleanupErr := sourceNumeralDel(m.Z, &tmp); cleanupErr != nil {
+			m.parseOuterTemporary = tmp
+			m.parseOuterPending = true
+			if err == nil {
+				err = cleanupErr
+			}
+		}
+	}()
 	i := 0
 	for numeralByte(text, i) == ' ' {
 		i++
@@ -132,12 +143,20 @@ func (m *RationalManager) SetString(out *Rational, text string) error {
 
 // A separate lexical scope keeps source suffix temporaries alive exactly until
 // the suffix branch exits, before the outer sign adjustment/normalization.
-func (m *RationalManager) parseRationalSuffix(work *Rational, text string, i int, tmp, ten *Int) error {
+func (m *RationalManager) parseRationalSuffix(work *Rational, text string, i int, tmp, ten *Int) (err error) {
 	marker := numeralByte(text, i)
 
 	isRat := marker == '/'
 	tmp2 := NewInt(1)
-	defer m.Z.Del(&tmp2)
+	defer func() {
+		if _, cleanupErr := sourceNumeralDel(m.Z, &tmp2); cleanupErr != nil {
+			m.parseSuffixTemporary = tmp2
+			m.parseSuffixPending = true
+			if err == nil {
+				err = cleanupErr
+			}
+		}
+	}()
 	hasDen := false
 	if marker == '/' || marker == '.' {
 		hasDen = true
@@ -230,6 +249,29 @@ func (m *RationalManager) parseRationalSuffix(work *Rational, text string, i int
 		}
 	} else if work.Den.Val == 0 {
 		return &ParseError{Reason: ParseZeroDenominator}
+	}
+	return nil
+}
+
+// CleanupParserTemporaries continues only the two integer scopes whose source
+// destructors stopped. The suffix scope ends before the outer digit scope.
+func (m *RationalManager) CleanupParserTemporaries() error {
+	if m == nil || m.self != m || m.Z == nil {
+		return umemory.ErrRuntimeOwner
+	}
+	if m.parseSuffixPending {
+		if e := m.Z.Del(&m.parseSuffixTemporary); e != nil {
+			return e
+		}
+		m.parseSuffixTemporary = Int{}
+		m.parseSuffixPending = false
+	}
+	if m.parseOuterPending {
+		if e := m.Z.Del(&m.parseOuterTemporary); e != nil {
+			return e
+		}
+		m.parseOuterTemporary = Int{}
+		m.parseOuterPending = false
 	}
 	return nil
 }

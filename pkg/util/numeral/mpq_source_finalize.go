@@ -73,7 +73,7 @@ func (m *RationalManager) SourceFinalize() error {
 	if m.originalCause != nil || (m.Closing && !m.SourceFinalizing) {
 		return arena.ErrClosed
 	}
-	if m.prevPowerPending || m.lexical.pending() || m.RawArithmetic.Pending() {
+	if m.parseOuterPending || m.parseSuffixPending || m.prevPowerPending || m.lexical.pending() || m.RawArithmetic.Pending() {
 		return ErrRationalLexicalPending
 	}
 	m.SourceFinalizing = true

@@ -30,6 +30,10 @@ func (m *RationalManager) CloseChecked() error {
 		m.CleanupCauseField = nil
 		return nil
 	}
+	if e := m.CleanupParserTemporaries(); e != nil {
+		m.CleanupCauseField = e
+		return m
+	}
 	if e := m.CleanupPrevPowerOfTwo(); e != nil {
 		m.CleanupCauseField = e
 		return m
