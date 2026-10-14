@@ -24,6 +24,8 @@ type RationalContext struct {
 	inequalities []*RationalInequality
 	unitClauses  []rationalUnitClause
 	unitHead     int
+	queue        []*RationalBound
+	queueHead    int
 	root         *RationalNode
 	nodes        []*RationalNode
 	leafHead     *RationalNode
@@ -206,6 +208,7 @@ func (c *RationalContext) Close() error {
 	c.nodes, c.root, c.variables = nil, nil, nil
 	c.leafHead, c.leafTail = nil, nil
 	c.inequalities, c.unitClauses = nil, nil
+	c.queue, c.queueHead = nil, 0
 	c.closed = true
 	return nil
 }

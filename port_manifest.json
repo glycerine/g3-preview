@@ -51664,12 +51664,14 @@
         "pkg/math/subpaving/rational_node.go",
         "pkg/math/subpaving/rational_selector.go",
         "pkg/math/subpaving/rational_context_units.go",
+        "pkg/math/subpaving/rational_context_propagate.go",
         "pkg/math/subpaving/source_exception.go"
       ],
       "tests": [
         "TestRationalContextRootIntegerBoundsAndChildViews",
         "TestRationalContextSourceBoundConflicts",
-        "TestRationalContextRootUnitCheckpointConflictAndOwnership"
+        "TestRationalContextRootUnitCheckpointConflictAndOwnership",
+        "TestRationalContextQueuedBoundCheckpointResume"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -51694,6 +51696,7 @@
         "pkg/math/subpaving/rational_node.go",
         "pkg/math/subpaving/rational_selector.go",
         "pkg/math/subpaving/rational_context_units.go",
+        "pkg/math/subpaving/rational_context_propagate.go",
         "pkg/math/subpaving/source_exception.go"
       ],
       "tests": [
@@ -51706,7 +51709,8 @@
         "TestSubpavingRationalIntervalInverseSourceBranches",
         "TestRationalContextRootIntegerBoundsAndChildViews",
         "TestRationalContextSourceBoundConflicts",
-        "TestRationalContextRootUnitCheckpointConflictAndOwnership"
+        "TestRationalContextRootUnitCheckpointConflictAndOwnership",
+        "TestRationalContextQueuedBoundCheckpointResume"
       ],
       "conditionals": [
         {
@@ -52115,15 +52119,17 @@
           ]
         },
         {
-          "name": "Concrete config_mpq inequality threshold ownership, unit reference retention, axiom marking and resumable root assertion checkpoints (src/math/subpaving/subpaving_t_def.h:773-784,865-875,1773-1803); clause propagation and search remain open",
+          "name": "Concrete config_mpq inequality threshold ownership, unit retention, axiom marking, resumable root assertion, and checkpointed bound queue publication/drain (src/math/subpaving/subpaving_t_def.h:575-587,773-784,865-875,1741-1752,1773-1803); watched clause/definition dispatch and search remain open",
           "status": "partial",
           "go_target": "pkg/math/subpaving/rational_context_units.go",
           "go_targets": [
             "pkg/math/subpaving/rational_context_root.go",
-            "pkg/math/subpaving/rational_node.go"
+            "pkg/math/subpaving/rational_node.go",
+            "pkg/math/subpaving/rational_context_propagate.go"
           ],
           "tests": [
-            "TestRationalContextRootUnitCheckpointConflictAndOwnership"
+            "TestRationalContextRootUnitCheckpointConflictAndOwnership",
+            "TestRationalContextQueuedBoundCheckpointResume"
           ]
         },
         {

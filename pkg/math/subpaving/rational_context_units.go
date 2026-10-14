@@ -84,6 +84,7 @@ func (c *RationalContext) AssertRootUnits() (*RationalNode, error) {
 		if err := c.publishBoundReason(n, a.variable, &a.value, a.lower, a.open, unit.axiom); err != nil {
 			return n, err
 		}
+		c.queue = append(c.queue, n.trail)
 		c.unitHead++
 	}
 	return n, nil
