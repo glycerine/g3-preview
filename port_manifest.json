@@ -35455,7 +35455,9 @@
         "pkg/math/interval/arbitrary_root_trace.go",
         "pkg/math/interval/hardware_root_trace.go",
         "pkg/math/subpaving/hardware_interval_root_trace.go",
-        "pkg/math/subpaving/hardware_interval_root_trace_test.go"
+        "pkg/math/subpaving/hardware_interval_root_trace_test.go",
+        "pkg/math/subpaving/arbitrary_interval_root_trace.go",
+        "pkg/math/subpaving/arbitrary_interval_root_trace_test.go"
       ],
       "tests": [
         "TestRationalIntervalRetainedPredicatesAddSubAndOwnership",
@@ -36235,6 +36237,13 @@
           "go_target": "pkg/math/subpaving/hardware_interval_root_trace.go",
           "go_targets": ["pkg/math/subpaving/hardware_interval_root_trace_test.go"],
           "tests": ["TestHardwareIntervalRootRetainedTraceSites"]
+        },
+        {
+          "name": "Reached config_mpf interval-valued nth_root and even xn_eq_y TRACE sites (interval_def.h:1427,1459,1470)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_root_trace.go",
+          "go_targets": ["pkg/math/subpaving/arbitrary_interval_root_trace_test.go"],
+          "tests": ["TestArbitraryIntervalRootRetainedTraceSites"]
         },
         {
           "name": "Reached config_mpf Newton iteration and bound-check TRACE records, including source hi-under-lo display (interval_def.h:315-320,344-348)",
@@ -175902,7 +175911,9 @@
         "pkg/math/interval/arbitrary_root_trace.go",
         "pkg/math/interval/hardware_root_trace.go",
         "pkg/math/subpaving/hardware_interval_root_trace.go",
-        "pkg/math/subpaving/hardware_interval_root_trace_test.go"
+        "pkg/math/subpaving/hardware_interval_root_trace_test.go",
+        "pkg/math/subpaving/arbitrary_interval_root_trace.go",
+        "pkg/math/subpaving/arbitrary_interval_root_trace_test.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -176433,6 +176444,13 @@
           "tests": ["TestHardwareIntervalRootRetainedTraceSites"]
         },
         {
+          "name": "Reached config_mpf interval-valued nth_root and even xn_eq_y TRACE sites (interval_def.h:1427,1459,1470)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_root_trace.go",
+          "go_targets": ["pkg/math/subpaving/arbitrary_interval_root_trace_test.go"],
+          "tests": ["TestArbitraryIntervalRootRetainedTraceSites"]
+        },
+        {
           "name": "Reached config_mpf Newton iteration and bound-check TRACE records, including source hi-under-lo display (interval_def.h:315-320,344-348)",
           "status": "ported",
           "go_target": "pkg/math/interval/arbitrary_root_trace.go",
@@ -176479,7 +176497,9 @@
         "pkg/math/interval/arbitrary_root_trace.go",
         "pkg/math/interval/hardware_root_trace.go",
         "pkg/math/subpaving/hardware_interval_root_trace.go",
-        "pkg/math/subpaving/hardware_interval_root_trace_test.go"
+        "pkg/math/subpaving/hardware_interval_root_trace_test.go",
+        "pkg/math/subpaving/arbitrary_interval_root_trace.go",
+        "pkg/math/subpaving/arbitrary_interval_root_trace_test.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -177020,6 +177040,13 @@
           "go_target": "pkg/math/subpaving/hardware_interval_root_trace.go",
           "go_targets": ["pkg/math/subpaving/hardware_interval_root_trace_test.go"],
           "tests": ["TestHardwareIntervalRootRetainedTraceSites"]
+        },
+        {
+          "name": "Reached config_mpf interval-valued nth_root and even xn_eq_y TRACE sites (interval_def.h:1427,1459,1470)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_interval_root_trace.go",
+          "go_targets": ["pkg/math/subpaving/arbitrary_interval_root_trace_test.go"],
+          "tests": ["TestArbitraryIntervalRootRetainedTraceSites"]
         },
         {
           "name": "Reached config_mpf Newton iteration and bound-check TRACE records, including source hi-under-lo display (interval_def.h:315-320,344-348)",
