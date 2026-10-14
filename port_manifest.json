@@ -51081,6 +51081,8 @@
         "pkg/math/subpaving/rational_shell_coefficients_test.go",
         "pkg/math/subpaving/tactic/rational_engine.go",
         "pkg/math/subpaving/tactic/rational_expr_arith.go",
+        "pkg/math/subpaving/tactic/rational_expr_converter.go",
+        "pkg/math/subpaving/tactic/rational_expr_converter_test.go",
         "pkg/math/subpaving/arbitrary_display.go",
         "pkg/math/subpaving/arbitrary_display_test.go",
         "pkg/math/subpaving/arbitrary_context_params.go",
@@ -51126,12 +51128,14 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Concrete context_mpq_wrapper persistent scalar and coefficient vector, integer mk_sum conversion and owning factory order (src/math/subpaving/subpaving.cpp:59-81,263-265)",
+          "name": "Concrete context_mpq_wrapper persistent scalar and coefficient vector, integer mk_sum conversion, exact rational mk_ineq forwarding and owning factory order (src/math/subpaving/subpaving.cpp:59-83,263-265)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_shell_coefficients.go",
           "go_targets": [
             "pkg/math/subpaving/tactic/rational_engine.go",
-            "pkg/math/subpaving/tactic/rational_expr_arith.go"
+            "pkg/math/subpaving/tactic/rational_expr_arith.go",
+            "pkg/math/subpaving/tactic/rational_expr_converter.go",
+            "pkg/math/subpaving/tactic/rational_expr_converter_test.go"
           ],
           "tests": [
             "TestRationalShellPersistentCoefficientGrowthAndContextTransfer",
@@ -170876,6 +170880,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
+        "pkg/math/subpaving/rational_shell_coefficients.go",
+        "pkg/math/subpaving/rational_shell_coefficients_test.go",
         "pkg/math/subpaving/arbitrary_context_params_test.go",
         "pkg/util/numeral/scoped_numeral.go",
         "pkg/util/numeral/scoped_binary.go",
@@ -170901,6 +170907,7 @@
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
+        "TestRationalShellPersistentCoefficientGrowthAndContextTransfer",
         "TestScopedNumeralResizeUsesGoSliceStorage",
         "TestScopedNumeralMoveAndAscendingCleanup",
         "TestScopedNumeralScalarFailureAndAllThinOperations",
@@ -171175,6 +171182,14 @@
           "tests": []
         },
         {
+          "name": "Concrete context_mpq_wrapper scoped_mpq constant lifetime and destructor before context base (src/math/subpaving/subpaving.cpp:59-81; src/util/scoped_numeral.h:24-55)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_shell_coefficients.go",
+          "tests": [
+            "TestRationalShellPersistentCoefficientGrowthAndContextTransfer"
+          ]
+        },
+        {
           "name": "Concrete subpaving context_mpf_wrapper scoped_mpf scalar lifetime and destructor order (src/math/subpaving/subpaving.cpp:88-107; src/util/scoped_numeral.h:24-55)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/arbitrary_shell_coefficients.go",
@@ -171243,7 +171258,8 @@
         "Actual source NUM destruction follows returned-factory evaluation; sticky source guard is not automatically retried by owning cleanup",
         "scoped_numeral.h:31-33 actual Neg minus_a source destructor precedes factory result exposure; stopped source history remains distinct from exact owning acknowledgment.",
         "The retained scoped_mpf scalar borrows mpf_manager and owns an mpf value; its inherited destructor deletes the value after the caller's body, including early API returns. Selected AST FPA query, constructor and SMT2 printer callers and the subpaving wrapper now have concrete scalar owners; AST FPA rewriter, SMT FPA and API callers still need caller-local binding and exact cleanup. The existing AST scoped_mpf_vector is a separate owning collection and does not discharge scalar scope lifetimes.",
-        "The boolean FPA numeral query owns its local MPF value until the source destructor completes; an allocation stop retains the exact local and copy child for separate owning cleanup before AST plugin teardown. Later calls use a charged distinct cold frame without replacing a stopped local."
+        "The boolean FPA numeral query owns its local MPF value until the source destructor completes; an allocation stop retains the exact local and copy child for separate owning cleanup before AST plugin teardown. Later calls use a charged distinct cold frame without replacing a stopped local.",
+        "The MPQ subpaving wrapper owns its constant rational across sums and deletes it after its coefficient vector but before the context base; the rational manager is borrowed."
       ],
       "deviations": [
         "Selected concrete Int, rational, MPBQ and MPFF scopes and the boolean AST FPA MPF scalar caller are represented in Go. Other retained MPF scalar callers remain open at AST, SMT, subpaving and API sites; the unused any-valued callback adapter was removed.",

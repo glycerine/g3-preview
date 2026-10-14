@@ -67,6 +67,15 @@ func (w *RationalShellCoefficients) MkSum(constant *numeral.Int, coefficients []
 	return w.context.DefinePolynomial(&w.constant, w.coefficients[:len(coefficients)], variables)
 }
 
+// MkInequality is the MPQ wrapper's exact rational forwarding path. The
+// context takes its own copy of the borrowed threshold.
+func (w *RationalShellCoefficients) MkInequality(variable uint32, value *numeral.Rational, lower, open bool) (*RationalInequality, error) {
+	if err := w.open(); err != nil {
+		return nil, err
+	}
+	return w.context.NewInequality(variable, value, lower, open)
+}
+
 // Close destroys the coefficient vector before the scalar, matching reverse
 // member order. A refused numeral release resumes at the same element.
 func (w *RationalShellCoefficients) Close() error {

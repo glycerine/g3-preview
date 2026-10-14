@@ -341,11 +341,11 @@ func (c *RationalExprConverter) InternalizeInequality(h ast.ASTHandle) (atom *su
 	if sign < 0 {
 		lower = !lower
 	}
-	context, err := c.engine.Context()
+	shell, err := c.engine.Shell()
 	if err != nil {
 		return nil, err
 	}
-	return context.NewInequality(x, &k, lower, open)
+	return shell.MkInequality(x, &k, lower, open)
 }
 
 func (c *RationalExprConverter) InternalizeClause(h ast.ASTHandle) (err error) {
