@@ -99,13 +99,21 @@ func (m *BinaryRationalManager) round(a *BinaryRational, z *IntegerManager, out 
 	}
 	return nil
 }
-func (m *BinaryRationalManager) FromRational(qm *RationalManager, q *Rational, out *BinaryRational) (bool, error) {
+func (m *BinaryRationalManager) FromRational(qm *RationalManager, q *Rational, out *BinaryRational) (exact bool, err error) {
 	if e := m.check(out); e != nil {
 		return false, e
 	}
-	local := NewRational()
-	defer m.dropImported(&local)
-	input, e := m.importRational(qm, q, &local)
+	m.convertImported = NewRational()
+	m.convertImportedPending = true
+	m.convertImportedCursor = 0
+	m.convertExecuting = true
+	defer func() {
+		if cleanup := m.cleanupConvertImported(); err == nil {
+			err = cleanup
+		}
+		m.convertExecuting = false
+	}()
+	input, e := m.importRational(qm, q, &m.convertImported)
 	if e != nil {
 		return false, e
 	}
@@ -133,6 +141,34 @@ func (m *BinaryRationalManager) FromRational(qm *RationalManager, q *Rational, o
 		return false, e
 	}
 	return false, m.SetIntegerPower(out, &input.Num, k+1)
+}
+
+func (m *BinaryRationalManager) cleanupConvertImported() error {
+	if !m.convertImportedPending {
+		return nil
+	}
+	roots := [2]*Int{&m.convertImported.Num, &m.convertImported.Den}
+	for m.convertImportedCursor < 2 {
+		if e := m.Z.Del(roots[m.convertImportedCursor]); e != nil {
+			return e
+		}
+		m.convertImportedCursor++
+	}
+	m.convertImported = Rational{}
+	m.convertImportedCursor = 0
+	m.convertImportedPending = false
+	return nil
+}
+
+// CleanupConvertImported resumes release of a stopped Go cross-owner copy.
+func (m *BinaryRationalManager) CleanupConvertImported() error {
+	if m == nil || m.self != m {
+		return ErrBinaryOwner
+	}
+	if m.convertExecuting {
+		return ErrBinaryConvertPending
+	}
+	return m.cleanupConvertImported()
 }
 func (m *BinaryRationalManager) ToRational(qm *RationalManager, a *BinaryRational, out *Rational) error {
 	if e := m.check(a); e != nil {

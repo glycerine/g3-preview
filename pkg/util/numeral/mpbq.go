@@ -33,6 +33,7 @@ var ErrBinaryInvariant = errors.New("mpnum: binary-rational source invariant")
 var ErrBinaryInterval = errors.New("mpnum: binary-rational source interval precondition")
 var ErrBinaryRootDegreeZero = errors.New("mpnum: binary-rational root degree zero")
 var ErrBinaryComparePending = errors.New("mpnum: binary-rational comparison cleanup pending")
+var ErrBinaryConvertPending = errors.New("mpnum: binary-rational conversion cleanup pending")
 
 // This cold operation owner borrows z and diagnostics. Both must outlive it.
 // No operations or shared Budget accesses are concurrently safe.
@@ -66,6 +67,9 @@ type BinaryRationalManager struct {
 	compareImported                                Rational
 	compareImportedPending, compareExecuting       bool
 	compareImportedCursor                          uint8
+	convertImported                                Rational
+	convertImportedPending, convertExecuting       bool
+	convertImportedCursor                          uint8
 }
 type BinaryRationalStats struct {
 	HeaderBytes           uint64
@@ -105,6 +109,9 @@ func (m *BinaryRationalManager) open() error {
 	}
 	if m.compareImportedPending && !m.compareExecuting {
 		return ErrBinaryComparePending
+	}
+	if m.convertImportedPending && !m.convertExecuting {
+		return ErrBinaryConvertPending
 	}
 	return nil
 }
@@ -153,6 +160,9 @@ func (m *BinaryRationalManager) CloseChecked() error {
 	if m.compareExecuting {
 		return ErrBinaryComparePending
 	}
+	if m.convertExecuting {
+		return ErrBinaryConvertPending
+	}
 	if m.closed {
 		return nil
 	}
@@ -167,6 +177,9 @@ func (m *BinaryRationalManager) CloseChecked() error {
 		return e
 	}
 	if e := m.CleanupCompareImported(); e != nil {
+		return e
+	}
+	if e := m.CleanupConvertImported(); e != nil {
 		return e
 	}
 	if e := m.CleanupRefineMid(); e != nil {
@@ -405,4 +418,3 @@ func (m *BinaryRationalManager) importRational(qm *RationalManager, q *Rational,
 	}
 	return local, nil
 }
-func (m *BinaryRationalManager) dropImported(q *Rational) { m.Z.Del(&q.Num); m.Z.Del(&q.Den) }
