@@ -37189,6 +37189,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_hash.go",
+        "pkg/math/polynomial/polynomial_hash_source_test.go",
         "pkg/math/polynomial/polynomial_monomial.go",
         "pkg/math/polynomial/polynomial_monomial_display.go",
         "pkg/math/polynomial/polynomial_monomial_factory.go",
