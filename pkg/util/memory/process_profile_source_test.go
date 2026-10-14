@@ -47,12 +47,40 @@ func TestProcessAccountingKeepsOneSourceSizeTProfile(t *testing.T) {
 	}
 }
 
+func TestProcessAccountingKeepsOneSourceTLSBranch(t *testing.T) {
+	for _, tls := range []bool{false, true} {
+		p := NewProcessAccounting()
+		b := arena.NewBudget(1 << 20)
+		first, err := NewRuntime(RuntimeConfig{Budget: b, Process: p, SizeTBits: 64, ThreadLocal: tls})
+		if err != nil {
+			t.Fatal(tls, err)
+		}
+		before := b.Used()
+		if mixed, err := NewRuntime(RuntimeConfig{Budget: b, Process: p, SizeTBits: 64, ThreadLocal: !tls}); mixed != nil || !errors.Is(err, arena.ErrConfig) || b.Used() != before {
+			t.Fatal("mixed source allocator branch changed owner storage", tls, mixed, err, b.Used(), before)
+		}
+		matched, err := NewRuntime(RuntimeConfig{Budget: b, Process: p, SizeTBits: 64, ThreadLocal: tls})
+		if err != nil {
+			t.Fatal(tls, err)
+		}
+		if err := matched.Close(); err != nil {
+			t.Fatal(err)
+		}
+		if err := first.Close(); err != nil {
+			t.Fatal(err)
+		}
+		if mixed, err := NewRuntime(RuntimeConfig{Budget: b, Process: p, SizeTBits: 64, ThreadLocal: !tls}); mixed != nil || !errors.Is(err, arena.ErrConfig) || b.Used() != 0 {
+			t.Fatal("ended runtime changed source allocator branch", tls, mixed, err, b.Used())
+		}
+	}
+}
+
 func TestProcessProfilePublishesOnlyAfterSuccessfulRuntimeConstruction(t *testing.T) {
 	p := NewProcessAccounting()
 	b := arena.NewBudget(1 << 20)
 	b.FailAfter(0)
-	if runtime, err := NewRuntime(RuntimeConfig{Budget: b, Process: p, SizeTBits: 32}); runtime != nil || !errors.Is(err, arena.ErrInjectedFailure) || p.sizeTBits != 0 || b.Used() != 0 {
-		t.Fatal("failed constructor fixed process ABI", runtime, err, p.sizeTBits, b.Used())
+	if runtime, err := NewRuntime(RuntimeConfig{Budget: b, Process: p, SizeTBits: 32, ThreadLocal: true}); runtime != nil || !errors.Is(err, arena.ErrInjectedFailure) || p.sizeTBits != 0 || p.threadLocal || b.Used() != 0 {
+		t.Fatal("failed constructor fixed process profile", runtime, err, p.sizeTBits, p.threadLocal, b.Used())
 	}
 	b.FailAfter(-1)
 	runtime, err := NewRuntime(RuntimeConfig{Budget: b, Process: p, SizeTBits: 64})

@@ -76,7 +76,7 @@ func NewRuntime(c RuntimeConfig) (*Runtime, error) {
 	if c.SizeTBits != 32 && c.SizeTBits != 64 {
 		return nil, arena.ErrConfig
 	}
-	if c.Process != nil && c.Process.sizeTBits != 0 && c.Process.sizeTBits != c.SizeTBits {
+	if c.Process != nil && c.Process.sizeTBits != 0 && (c.Process.sizeTBits != c.SizeTBits || c.Process.threadLocal != c.ThreadLocal) {
 		return nil, arena.ErrConfig
 	}
 	n := uint64(reflect.TypeOf(Runtime{}).Size())
@@ -99,6 +99,7 @@ func NewRuntime(c RuntimeConfig) (*Runtime, error) {
 	m.self = m
 	if c.Process != nil {
 		c.Process.sizeTBits = c.SizeTBits
+		c.Process.threadLocal = c.ThreadLocal
 	}
 	return m, nil
 }

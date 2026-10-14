@@ -148927,12 +148927,13 @@
           ]
         },
         {
-          "name": "one source process size_t width across concrete Runtime owners, published after successful construction",
+          "name": "one source process size_t width and compile-time TLS allocator branch across concrete Runtime owners, published after successful construction",
           "status": "ported",
           "go_target": "pkg/util/memory/runtime.go",
           "go_targets": ["pkg/util/memory/process_accounting.go"],
           "tests": [
             "TestProcessAccountingKeepsOneSourceSizeTProfile",
+            "TestProcessAccountingKeepsOneSourceTLSBranch",
             "TestProcessProfilePublishesOnlyAfterSuccessfulRuntimeConstruction"
           ]
         },
@@ -149375,12 +149376,13 @@
           ]
         },
         {
-          "name": "one source process size_t width across concrete Runtime owners, published after successful construction",
+          "name": "one source process size_t width and compile-time TLS allocator branch across concrete Runtime owners, published after successful construction",
           "status": "ported",
           "go_target": "pkg/util/memory/runtime.go",
           "go_targets": ["pkg/util/memory/process_accounting.go"],
           "tests": [
             "TestProcessAccountingKeepsOneSourceSizeTProfile",
+            "TestProcessAccountingKeepsOneSourceTLSBranch",
             "TestProcessProfilePublishesOnlyAfterSuccessfulRuntimeConstruction"
           ]
         },
