@@ -48862,7 +48862,10 @@
         "pkg/math/realclosure/sign_det_owner_test.go",
         "pkg/math/realclosure/algebraic_root_owner.go",
         "pkg/math/realclosure/algebraic_root_owner_test.go",
-        "pkg/math/realclosure/algebraic_root_value.go"
+        "pkg/math/realclosure/algebraic_root_value.go",
+        "pkg/math/realclosure/sign_polynomial_mul.go",
+        "pkg/math/realclosure/sign_determination_rational_products.go",
+        "pkg/math/realclosure/sign_determination_rational_products_test.go"
       ],
       "tests": [
         "TestRealClosureBinaryExtendedNumeralBranches",
@@ -48878,7 +48881,8 @@
         "TestRealClosurePolynomialRationalCoefficientOwnership",
         "TestSignDeterminationPolynomialRowsRetainSharedValues",
         "TestSignDetSourceArrayPublicationAndSharedRootLifetime",
-        "TestAlgebraicRootsShareSignDetAndReleaseSourceOrder"
+        "TestAlgebraicRootsShareSignDetAndReleaseSourceOrder",
+        "TestSignDeterminationRationalProductsAndThreeWayExpansion"
       ],
       "conditionals": [
         {
@@ -50067,6 +50071,17 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Rational-coefficient polynomial convolution and retained expand_taqrs prs*1/prs*q/prs*q\u00b2 row production (realclosure.cpp:1704-1741,2753-2791); Tarski-query evaluation and nonrational coefficient arithmetic remain open",
+          "status": "partial",
+          "go_target": "pkg/math/realclosure/sign_determination_rational_products.go",
+          "go_targets": [
+            "pkg/math/realclosure/sign_polynomial_mul.go"
+          ],
+          "tests": [
+            "TestSignDeterminationRationalProductsAndThreeWayExpansion"
+          ]
+        },
         {
           "name": "Concrete algebraic extension registration, polynomial and interval copy, shared sign_det retention, rational-function numerator x and extension lifetime through add_root (realclosure.cpp:825-856,1244-1275,1808-1835); full root isolation and other extension/value variants remain open",
           "status": "partial",
@@ -116989,8 +117004,8 @@
       "component": "util",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/math/realclosure/sign_determination.go", "pkg/math/realclosure/sign_determination_test.go", "pkg/math/realclosure/sign_polynomial.go", "pkg/math/realclosure/sign_polynomial_test.go", "pkg/math/realclosure/sign_determination_polynomials.go", "pkg/math/realclosure/sign_determination_polynomials_test.go", "pkg/math/realclosure/sign_det_owner.go", "pkg/math/realclosure/sign_det_owner_test.go", "pkg/math/realclosure/algebraic_root_owner.go", "pkg/math/realclosure/algebraic_root_owner_test.go", "pkg/math/realclosure/algebraic_root_value.go"],
-      "tests": ["TestSignDeterminationRetainedColumnTransition", "TestKeepSignAssignmentUsesOldConditionGroups", "TestRealClosurePolynomialRationalCoefficientOwnership", "TestSignDeterminationPolynomialRowsRetainSharedValues", "TestSignDetSourceArrayPublicationAndSharedRootLifetime", "TestAlgebraicRootsShareSignDetAndReleaseSourceOrder"],
+      "go_targets": ["pkg/math/realclosure/sign_determination.go", "pkg/math/realclosure/sign_determination_test.go", "pkg/math/realclosure/sign_polynomial.go", "pkg/math/realclosure/sign_polynomial_test.go", "pkg/math/realclosure/sign_determination_polynomials.go", "pkg/math/realclosure/sign_determination_polynomials_test.go", "pkg/math/realclosure/sign_det_owner.go", "pkg/math/realclosure/sign_det_owner_test.go", "pkg/math/realclosure/algebraic_root_owner.go", "pkg/math/realclosure/algebraic_root_owner_test.go", "pkg/math/realclosure/algebraic_root_value.go", "pkg/math/realclosure/sign_polynomial_mul.go", "pkg/math/realclosure/sign_determination_rational_products.go", "pkg/math/realclosure/sign_determination_rational_products_test.go"],
+      "tests": ["TestSignDeterminationRetainedColumnTransition", "TestKeepSignAssignmentUsesOldConditionGroups", "TestRealClosurePolynomialRationalCoefficientOwnership", "TestSignDeterminationPolynomialRowsRetainSharedValues", "TestSignDetSourceArrayPublicationAndSharedRootLifetime", "TestAlgebraicRootsShareSignDetAndReleaseSourceOrder", "TestSignDeterminationRationalProductsAndThreeWayExpansion"],
       "conditionals": [
         {
           "line": 19,
