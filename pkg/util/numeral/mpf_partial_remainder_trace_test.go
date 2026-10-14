@@ -85,3 +85,31 @@ func TestArbitraryFloatPartialRemainderZeroQuotientOmitsFinalTrace(t *testing.T)
 	serviceMust(t, m.Del(&x))
 	serviceMust(t, m.Del(&y))
 }
+
+func TestArbitraryFloatPartialRemainderZeroResidualEmitsFinalTrace(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("mpf_dbg_rem")
+	compiled := tags.ShouldTrace("mpf_dbg_rem")
+	serviceMust(t, m.BindTrace(tags))
+	const hidden = 1 << 23
+	x := ArbitraryFloat{format: arbitraryFloatFormat(11, 24, true), exponent: 0, significand: NewInt(hidden)}
+	y := x
+	serviceMust(t, m.PartialRemainder(&x, &y, 0, false))
+	zero, err := m.IsZero(&x)
+	serviceMust(t, err)
+	if !zero || !x.Sign() {
+		t.Fatalf("equal negative operands did not produce negative zero: %+v", x)
+	}
+	got := output.String()
+	if compiled {
+		if !strings.Contains(got, "src/util/mpf.cpp:1398") || !strings.Contains(got, "src/util/mpf.cpp:1435 ---------\npartial remainder = go-words:") || strings.Contains(got, "src/util/mpf.cpp:1410") || strings.Contains(got, "src/util/mpf.cpp:1421") {
+			t.Fatalf("zero residual trace did not skip nonzero rounding: %q", got)
+		}
+	} else if got != "" {
+		t.Fatalf("erased zero residual trace: %q", got)
+	}
+	serviceMust(t, m.Del(&x))
+	serviceMust(t, m.Del(&y))
+}

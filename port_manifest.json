@@ -150460,7 +150460,7 @@
           "name": "mpf_manager::partial_remainder mpf_dbg_rem entry, quotient ratio, tie, Q, YQ, exponent delta, aligned subtrahend, signed difference, X-YQ, sticky and final Go value-word TRACE at mpf.cpp:1282-1435",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_partial_remainder_component_trace.go",
-          "tests": ["TestArbitraryFloatPartialRemainderScalarTraceOrder", "TestArbitraryFloatPartialRemainderZeroQuotientOmitsFinalTrace"]
+          "tests": ["TestArbitraryFloatPartialRemainderScalarTraceOrder", "TestArbitraryFloatPartialRemainderZeroQuotientOmitsFinalTrace", "TestArbitraryFloatPartialRemainderZeroResidualEmitsFinalTrace"]
         },
         {
           "name": "mpf_manager::rem mpf_dbg_rem entry and result with Go value-word display at mpf.cpp:1441,1483 and final mpf_dbg ordinary result TRACE at 1484",
@@ -151188,7 +151188,7 @@
           "name": "mpf.cpp:1621-1633; mpf.h:293 raw object-byte hexfloat diagnostic reached only by mpf_dbg_rem TRACE at 1435,1441,1483; replaced by portable six-word Go value display",
           "status": "platform_replacement",
           "go_target": "pkg/util/numeral/mpf_remainder_object_trace.go",
-          "tests": ["TestArbitraryFloatPartialRemainderScalarTraceOrder", "TestArbitraryFloatPartialRemainderZeroQuotientOmitsFinalTrace", "TestArbitraryFloatRemResultTraceSpecialAndGeneral"]
+          "tests": ["TestArbitraryFloatPartialRemainderScalarTraceOrder", "TestArbitraryFloatPartialRemainderZeroQuotientOmitsFinalTrace", "TestArbitraryFloatPartialRemainderZeroResidualEmitsFinalTrace", "TestArbitraryFloatRemResultTraceSpecialAndGeneral"]
         },
         {
           "name": "mpf.cpp:108-112; mpf.h:77 signed32 fraction SET through actual scoped rational and original plain-rational setter",
@@ -152268,7 +152268,7 @@
           "name": "mpf.cpp:1621-1633; mpf.h:293 raw object-byte hexfloat diagnostic reached only by mpf_dbg_rem TRACE at 1435,1441,1483; replaced by portable six-word Go value display",
           "status": "platform_replacement",
           "go_target": "pkg/util/numeral/mpf_remainder_object_trace.go",
-          "tests": ["TestArbitraryFloatPartialRemainderScalarTraceOrder", "TestArbitraryFloatPartialRemainderZeroQuotientOmitsFinalTrace", "TestArbitraryFloatRemResultTraceSpecialAndGeneral"]
+          "tests": ["TestArbitraryFloatPartialRemainderScalarTraceOrder", "TestArbitraryFloatPartialRemainderZeroQuotientOmitsFinalTrace", "TestArbitraryFloatPartialRemainderZeroResidualEmitsFinalTrace", "TestArbitraryFloatRemResultTraceSpecialAndGeneral"]
         },
         {
           "name": "mpf.h:155-173 sig_normalized and exp_normalized have no production source caller",
