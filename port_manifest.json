@@ -155754,14 +155754,16 @@
           ]
         },
         {
-          "name": "to_string mpn_to_string TRACE entry and successful exit (mpn.cpp:362,395)",
+          "name": "to_string mpn_to_string TRACE entry insertions and successful exit std::endl flush before footer (mpn.cpp:362,395)",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpn_to_string_trace.go",
           "go_targets": [
-            "pkg/util/numeral/mpn_cstring.go"
+            "pkg/util/numeral/mpn_cstring.go",
+            "pkg/util/numeral/mpn_to_string_trace_test.go"
           ],
           "tests": [
-            "TestMPNToStringSourceEntryExitAndShortDestinationTrace"
+            "TestMPNToStringSourceEntryExitAndShortDestinationTrace",
+            "TestMPNToStringSourceEndlFlushAndRefusedStream"
           ]
         }
       ],
@@ -156312,14 +156314,16 @@
           ]
         },
         {
-          "name": "to_string mpn_to_string TRACE entry and successful exit (mpn.cpp:362,395)",
+          "name": "to_string mpn_to_string TRACE entry insertions and successful exit std::endl flush before footer (mpn.cpp:362,395)",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpn_to_string_trace.go",
           "go_targets": [
-            "pkg/util/numeral/mpn_cstring.go"
+            "pkg/util/numeral/mpn_cstring.go",
+            "pkg/util/numeral/mpn_to_string_trace_test.go"
           ],
           "tests": [
-            "TestMPNToStringSourceEntryExitAndShortDestinationTrace"
+            "TestMPNToStringSourceEntryExitAndShortDestinationTrace",
+            "TestMPNToStringSourceEndlFlushAndRefusedStream"
           ]
         }
       ],
@@ -175792,6 +175796,18 @@
           "tests": ["TestArbitraryFloatPartialRemainderReachedEndlFlushes"]
         },
         {
+          "name": "Reached MPN to_string TRACE entry operand insertions and result std::endl flush before footer (mpn.cpp:362,395)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_to_string_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpn_to_string_trace_test.go"
+          ],
+          "tests": [
+            "TestMPNToStringSourceEntryExitAndShortDestinationTrace",
+            "TestMPNToStringSourceEndlFlushAndRefusedStream"
+          ]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -176279,6 +176295,18 @@
           "go_target": "pkg/util/numeral/mpf_partial_remainder_trace.go",
           "go_targets": ["pkg/util/numeral/mpf_partial_remainder_component_trace.go", "pkg/util/diagnostic/util_trace_tags.go"],
           "tests": ["TestArbitraryFloatPartialRemainderReachedEndlFlushes"]
+        },
+        {
+          "name": "Reached MPN to_string TRACE entry operand insertions and result std::endl flush before footer (mpn.cpp:362,395)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_to_string_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpn_to_string_trace_test.go"
+          ],
+          "tests": [
+            "TestMPNToStringSourceEntryExitAndShortDestinationTrace",
+            "TestMPNToStringSourceEndlFlushAndRefusedStream"
+          ]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
