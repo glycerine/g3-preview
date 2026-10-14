@@ -15,6 +15,7 @@ var ErrModularOwner = errors.New("mpnum: invalid modular integer owner")
 var ErrModularPrimeUninitialized = errors.New("mpnum: source modular constructor left prime flag uninitialized")
 var ErrModularAssertion = errors.New("mpnum: source modular assertion failed")
 var ErrModularUnsupported = errors.New("mpnum: source modular operation unsupported")
+var ErrModularPowerPending = errors.New("mpnum: modular power raw integer cleanup pending")
 
 // IntegerModularManager owns seven source numerals and borrows its integer
 // manager. It is caller-confined; Int operands obey the borrowed manager's
@@ -27,6 +28,8 @@ type IntegerModularManager struct {
 	trace                                              *diagnostic.TraceTags
 	z, prime, primeKnown, closed                       bool
 	P, Lower, Upper, InvTmp1, InvTmp2, InvTmp3, DivTmp Int
+	PowerTemporary                                     Int
+	PowerPending                                       bool
 	Header                                             uint64
 }
 
@@ -114,6 +117,9 @@ func (m *IntegerModularManager) Close() error {
 		return arena.ErrClosed
 	}
 	if !m.manager.closed {
+		if e := m.CleanupPowerTemporary(); e != nil {
+			return e
+		}
 		for _, v := range []*Int{&m.P, &m.Lower, &m.Upper, &m.InvTmp1, &m.InvTmp2, &m.InvTmp3, &m.DivTmp} {
 			if e := m.manager.Del(v); e != nil {
 				return e
@@ -481,6 +487,9 @@ func (m *IntegerModularManager) powerWithSourceContext(a *Int, k uint32, b *Int,
 	if e := m.check(); e != nil {
 		return e
 	}
+	if m.PowerPending {
+		return ErrModularPowerPending
+	}
 	if e := m.AssertNormalized(a); e != nil {
 		return e
 	}
@@ -515,7 +524,14 @@ func (m *IntegerModularManager) powerWithSourceContext(a *Int, k uint32, b *Int,
 		}
 		defer func() { end(cause) }()
 	} else {
-		defer m.manager.Del(power)
+		m.PowerTemporary = Int{}
+		m.PowerPending = true
+		power = &m.PowerTemporary
+		defer func() {
+			if cause == nil {
+				cause = m.finishPowerSource()
+			}
+		}()
 	}
 	if e := m.copyWithSourceContext(power, a, context); e != nil {
 		return e

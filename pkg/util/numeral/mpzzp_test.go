@@ -429,10 +429,14 @@ func TestIntegerModularConversionOverloadsAndDisplay(t *testing.T) {
 // rational scratch roots: this record is only an audit context, no callbacks.
 func modularAudit(t *testing.T, m *IntegerModularManager, public []*Int) {
 	roots := append([]*Int{&m.P, &m.Lower, &m.Upper, &m.InvTmp1, &m.InvTmp2, &m.InvTmp3, &m.DivTmp}, public...)
+	if m.PowerPending {
+		roots = append(roots, &m.PowerTemporary)
+	}
 	qopsAuditLiveOwnership(t, &RationalManager{Z: m.manager}, roots)
 }
 func TestIntegerModularPredictableFailurePrefixes(t *testing.T) {
 	sawFinalSquare := false
+	sawRetainedPower := false
 	for _, op := range []string{"power", "inv", "div", "setp"} {
 		for prefix := int64(0); prefix < 28; prefix++ {
 			t.Run(op+string(rune('A'+prefix)), func(t *testing.T) {
@@ -472,6 +476,9 @@ func TestIntegerModularPredictableFailurePrefixes(t *testing.T) {
 					t.Fatal(e)
 				}
 				if op == "power" && e != nil {
+					if m.PowerPending && m.PowerTemporary.Cell != 0 {
+						sawRetainedPower = true
+					}
 					equal, x := z.Equal(&a, &c)
 					if x != nil {
 						t.Fatal(x)
@@ -489,6 +496,9 @@ func TestIntegerModularPredictableFailurePrefixes(t *testing.T) {
 	}
 	if !sawFinalSquare {
 		t.Fatal("did not exercise source final unused square failure after output publication")
+	}
+	if !sawRetainedPower {
+		t.Fatal("did not exercise a stopped power body with a retained raw integer")
 	}
 }
 func TestIntegerModularReleaseSetupPreconditions(t *testing.T) {
