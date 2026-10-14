@@ -149633,9 +149633,9 @@
         "TestBinarySelectionRootsAndApprox",
         "TestBinaryFormattingExact",
         "TestBinaryFormattingBranchesAndFaultPublication",
-        "TestBinaryOwnerConstructorAndScopedVector",
+        "TestBinaryOwnerConstructorAndScopedScalar",
         "TestBinaryFailureImmediateRoots",
-        "TestBinaryVectorFailurePrefixesAndScopedRoutes",
+        "TestBinaryScopedRoutes",
         "TestUPolynomialIsolationPackedFrameFields",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
         "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
@@ -149953,9 +149953,9 @@
             "TestBinarySelectionRootsAndApprox",
             "TestBinaryFormattingExact",
             "TestBinaryFormattingBranchesAndFaultPublication",
-            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
-            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+            "TestBinaryScopedRoutes"
           ]
         },
         {
@@ -149974,9 +149974,9 @@
             "TestBinarySelectionRootsAndApprox",
             "TestBinaryFormattingExact",
             "TestBinaryFormattingBranchesAndFaultPublication",
-            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
-            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+            "TestBinaryScopedRoutes"
           ]
         },
         {
@@ -149995,9 +149995,9 @@
             "TestBinarySelectionRootsAndApprox",
             "TestBinaryFormattingExact",
             "TestBinaryFormattingBranchesAndFaultPublication",
-            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
-            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+            "TestBinaryScopedRoutes"
           ]
         },
         {
@@ -150016,9 +150016,9 @@
             "TestBinarySelectionRootsAndApprox",
             "TestBinaryFormattingExact",
             "TestBinaryFormattingBranchesAndFaultPublication",
-            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
-            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+            "TestBinaryScopedRoutes"
           ]
         },
         {
@@ -150037,9 +150037,9 @@
             "TestBinarySelectionRootsAndApprox",
             "TestBinaryFormattingExact",
             "TestBinaryFormattingBranchesAndFaultPublication",
-            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
-            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+            "TestBinaryScopedRoutes"
           ]
         },
         {
@@ -150062,9 +150062,9 @@
             "TestBinarySelectionRootsAndApprox",
             "TestBinaryFormattingExact",
             "TestBinaryFormattingBranchesAndFaultPublication",
-            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
-            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+            "TestBinaryScopedRoutes"
           ]
         },
         {
@@ -150195,9 +150195,9 @@
         "TestBinarySelectionRootsAndApprox",
         "TestBinaryFormattingExact",
         "TestBinaryFormattingBranchesAndFaultPublication",
-        "TestBinaryOwnerConstructorAndScopedVector",
+        "TestBinaryOwnerConstructorAndScopedScalar",
         "TestBinaryFailureImmediateRoots",
-        "TestBinaryVectorFailurePrefixesAndScopedRoutes",
+        "TestBinaryScopedRoutes",
         "TestUPolynomialIsolationPackedFrameFields",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
         "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
@@ -150245,9 +150245,9 @@
             "TestBinarySelectionRootsAndApprox",
             "TestBinaryFormattingExact",
             "TestBinaryFormattingBranchesAndFaultPublication",
-            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
-            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+            "TestBinaryScopedRoutes"
           ]
         },
         {
@@ -150266,9 +150266,9 @@
             "TestBinarySelectionRootsAndApprox",
             "TestBinaryFormattingExact",
             "TestBinaryFormattingBranchesAndFaultPublication",
-            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
-            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+            "TestBinaryScopedRoutes"
           ]
         },
         {
@@ -150287,9 +150287,9 @@
             "TestBinarySelectionRootsAndApprox",
             "TestBinaryFormattingExact",
             "TestBinaryFormattingBranchesAndFaultPublication",
-            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
-            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+            "TestBinaryScopedRoutes"
           ]
         },
         {
@@ -150308,9 +150308,9 @@
             "TestBinarySelectionRootsAndApprox",
             "TestBinaryFormattingExact",
             "TestBinaryFormattingBranchesAndFaultPublication",
-            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
-            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+            "TestBinaryScopedRoutes"
           ]
         },
         {
@@ -150329,9 +150329,9 @@
             "TestBinarySelectionRootsAndApprox",
             "TestBinaryFormattingExact",
             "TestBinaryFormattingBranchesAndFaultPublication",
-            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
-            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+            "TestBinaryScopedRoutes"
           ]
         },
         {
@@ -150350,9 +150350,9 @@
             "TestBinarySelectionRootsAndApprox",
             "TestBinaryFormattingExact",
             "TestBinaryFormattingBranchesAndFaultPublication",
-            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
-            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+            "TestBinaryScopedRoutes"
           ]
         },
         {
@@ -150375,9 +150375,9 @@
             "TestBinarySelectionRootsAndApprox",
             "TestBinaryFormattingExact",
             "TestBinaryFormattingBranchesAndFaultPublication",
-            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
-            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+            "TestBinaryScopedRoutes"
           ]
         },
         {
@@ -170953,9 +170953,9 @@
         "TestBinarySelectionRootsAndApprox",
         "TestBinaryFormattingExact",
         "TestBinaryFormattingBranchesAndFaultPublication",
-        "TestBinaryOwnerConstructorAndScopedVector",
+        "TestBinaryOwnerConstructorAndScopedScalar",
         "TestBinaryFailureImmediateRoots",
-        "TestBinaryVectorFailurePrefixesAndScopedRoutes",
+        "TestBinaryScopedRoutes",
         "TestFastFloatIntegerConversionSource",
         "TestFastFloatRationalRawShapeAndConversionFailures",
         "TestFastFloatIntegerSourceDiscardedLimbDefects",
@@ -171107,9 +171107,9 @@
             "TestBinarySelectionRootsAndApprox",
             "TestBinaryFormattingExact",
             "TestBinaryFormattingBranchesAndFaultPublication",
-            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
-            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+            "TestBinaryScopedRoutes"
           ]
         },
         {
@@ -171128,9 +171128,9 @@
             "TestBinarySelectionRootsAndApprox",
             "TestBinaryFormattingExact",
             "TestBinaryFormattingBranchesAndFaultPublication",
-            "TestBinaryOwnerConstructorAndScopedVector",
+            "TestBinaryOwnerConstructorAndScopedScalar",
             "TestBinaryFailureImmediateRoots",
-            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
+            "TestBinaryScopedRoutes"
           ]
         },
         {
@@ -171436,9 +171436,9 @@
         "TestBinarySelectionRootsAndApprox",
         "TestBinaryFormattingExact",
         "TestBinaryFormattingBranchesAndFaultPublication",
-        "TestBinaryOwnerConstructorAndScopedVector",
+        "TestBinaryOwnerConstructorAndScopedScalar",
         "TestBinaryFailureImmediateRoots",
-        "TestBinaryVectorFailurePrefixesAndScopedRoutes",
+        "TestBinaryScopedRoutes",
         "TestFastFloatIntegerConversionSource",
         "TestFastFloatRationalRawShapeAndConversionFailures",
         "TestFastFloatIntegerSourceDiscardedLimbDefects",
@@ -171533,46 +171533,15 @@
           ]
         },
         {
-          "name": "concrete MPBQ constructor/m/size/capacity/borrow and destructor",
+          "name": "retained algebraic scoped_mpbq_vector root/lower/upper ownership, indexed reads, ascending reset and destructor",
           "status": "ported",
-          "go_target": "pkg/util/numeral/scoped_binary.go",
-          "tests": [
-            "TestBinarySourceTst1",
-            "TestBinarySourceTst2",
-            "TestBinaryMixedConversionsAndIntervals",
-            "TestBinarySourceShapeDomainsAndPrefixes",
-            "TestBinaryRootBoundsFinite",
-            "TestBinaryScalarForwardersAndWarmWorkspace",
-            "TestBinaryDebugEnclosureShortCircuit",
-            "TestBinaryArithmeticFiniteAliases",
-            "TestBinarySelectionRootsAndApprox",
-            "TestBinaryFormattingExact",
-            "TestBinaryFormattingBranchesAndFaultPublication",
-            "TestBinaryOwnerConstructorAndScopedVector",
-            "TestBinaryFailureImmediateRoots",
-            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
-          ]
+          "go_target": "pkg/math/polynomial/upolynomial_binary_vector.go",
+          "go_targets": ["pkg/math/polynomial/algebraic_root.go"],
+          "tests": ["TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults", "TestUPolynomialNativeIsolationStacksAndNumericTransfer", "TestAlgebraicCellSourceRootCopyDeletionOrder"]
         },
         {
-          "name": "concrete MPBQ reset/push/pop/shrink/resize; source ascending cleanup and default-element failed-push prefix",
-          "status": "ported",
-          "go_target": "pkg/util/numeral/scoped_binary.go",
-          "tests": [
-            "TestBinarySourceTst1",
-            "TestBinarySourceTst2",
-            "TestBinaryMixedConversionsAndIntervals",
-            "TestBinarySourceShapeDomainsAndPrefixes",
-            "TestBinaryRootBoundsFinite",
-            "TestBinaryScalarForwardersAndWarmWorkspace",
-            "TestBinaryDebugEnclosureShortCircuit",
-            "TestBinaryArithmeticFiniteAliases",
-            "TestBinarySelectionRootsAndApprox",
-            "TestBinaryFormattingExact",
-            "TestBinaryFormattingBranchesAndFaultPublication",
-            "TestBinaryOwnerConstructorAndScopedVector",
-            "TestBinaryFailureImmediateRoots",
-            "TestBinaryVectorFailurePrefixesAndScopedRoutes"
-          ]
+          "name": "scoped_mpbq_vector direct push_back/pop_back/shrink/resize templates unused by retained source consumers",
+          "status": "dead_deleted"
         },
         {
           "name": "concrete mpzzp coefficient vector ownership, reset/shrink/resize/push/pop and destructor actions",

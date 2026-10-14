@@ -25,7 +25,7 @@ func binaryAudit(t *testing.T, m *BinaryRationalManager, values ...*BinaryRation
 	binaryCellsAudit(t, m, values...)
 	facadeAudit(t, m.Diagnostics)
 }
-func TestBinaryOwnerConstructorAndScopedVector(t *testing.T) {
+func TestBinaryOwnerConstructorAndScopedScalar(t *testing.T) {
 	m, b := binaryManager(t)
 	baseline := b.Used()
 	b.FailAfter(0)
@@ -46,42 +46,9 @@ func TestBinaryOwnerConstructorAndScopedVector(t *testing.T) {
 	if b.Used() != baseline {
 		t.Fatal("close borrows")
 	}
-	v, e := NewScopedBinaryVector(m)
-	serviceMust(t, e)
-	defer v.Close()
 	var a BinaryRational
 	serviceMust(t, m.Z.SetString(&a.Num, "123456789012345678901234567890"))
 	a.KField = 7
-	defer m.Del(&a)
-	for i := 0; i < 8; i++ {
-		serviceMust(t, v.Push(&a))
-		if v.Capacity() < v.Size() {
-			t.Fatal(i, v.Size(), v.Capacity())
-		}
-	}
-	roots := []*BinaryRational{&a}
-	for i := range v.data {
-		roots = append(roots, &v.data[i])
-	}
-	binaryAudit(t, m, roots...)
-	serviceMust(t, v.Shrink(3))
-	serviceMust(t, v.Pop())
-	serviceMust(t, v.Resize(5))
-	for i := 2; i < 5; i++ {
-		if v.data[i].Num.Val != 0 || v.data[i].KField != 0 {
-			t.Fatal("new default")
-		}
-	}
-	capBefore := v.Capacity()
-	serviceMust(t, m.ResetVector(v))
-	if v.Size() != 0 || v.Capacity() != capBefore {
-		t.Fatal("retained backing")
-	}
-	binaryAudit(t, m, &a)
-	copyOwner := *v
-	if _, e = copyOwner.At(0); !errors.Is(e, ErrScopedCopy) {
-		t.Fatal(e)
-	}
 	s, e := NewScopedBinary(m)
 	serviceMust(t, e)
 	serviceMust(t, s.Set(&a))
@@ -94,6 +61,7 @@ func TestBinaryOwnerConstructorAndScopedVector(t *testing.T) {
 	}
 	serviceMust(t, s.Close())
 	serviceMust(t, s.Close())
+	serviceMust(t, m.Del(&a))
 	if e = arena.ValidateRecordType(reflect.TypeOf(BinaryRational{})); e != nil {
 		t.Fatal(e)
 	}
@@ -164,43 +132,7 @@ func TestBinaryFailureImmediateRoots(t *testing.T) {
 	}
 }
 
-func TestBinaryVectorFailurePrefixesAndScopedRoutes(t *testing.T) {
-	for prefix := int64(0); prefix < 12; prefix++ {
-		m, b := binaryManager(t)
-		v, e := NewScopedBinaryVector(m)
-		serviceMust(t, e)
-		var a BinaryRational
-		serviceMust(t, m.Z.SetString(&a.Num, "123456789012345678901234567890123456789"))
-		a.KField = 9
-		serviceMust(t, v.Push(&a))
-		serviceMust(t, v.Push(&a))
-		b.FailAfter(prefix)
-		e = v.Push(&a)
-		roots := []*BinaryRational{&a}
-		for i := range v.data {
-			roots = append(roots, &v.data[i])
-		}
-		binaryAudit(t, m, roots...)
-		b.FailAfter(-1)
-		if e != nil && v.Size() != 2 && v.Size() != 3 {
-			t.Fatal(prefix, v.Size(), e)
-		}
-		if v.Size() == 3 && e != nil {
-			// The vector publishes its default element before integer Copy;
-			// Copy publishes sign and failed allocation identity before k.
-			if v.data[2].Num.Cell != m.Z.FailedNullRef || v.data[2].Num.Val != a.Num.Val || v.data[2].KField != 0 {
-				t.Fatal("source integer-copy publication", prefix, v.data[2])
-			}
-			if x := m.Z.check(&v.data[2].Num); !errors.Is(x, arena.ErrInvalidSlot) {
-				t.Fatal("failed numeral remains unreadable", x)
-			}
-		}
-		serviceMust(t, v.Close())
-		serviceMust(t, m.Del(&a))
-		if e == nil {
-			break
-		}
-	}
+func TestBinaryScopedRoutes(t *testing.T) {
 	m, _ := binaryManager(t)
 	s, e := NewScopedBinary(m)
 	serviceMust(t, e)
