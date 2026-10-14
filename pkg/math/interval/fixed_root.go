@@ -123,6 +123,9 @@ func (r FixedRoot) Bounds(a *numeral.FixedPoint, n uint32, precision, lower, upp
 		if err = r.positiveBounds(absolute, n, precision, lo, hi, &s); err != nil {
 			return err
 		}
+		if err = r.traceNthRoot(absolute, n, lo, hi); err != nil {
+			return err
+		}
 		if negative {
 			if err = m.Swap(lo, hi); err != nil {
 				return err
@@ -281,6 +284,9 @@ func (r FixedRoot) approx(a *numeral.FixedPoint, n uint32, precision, x *numeral
 		if err = m.Abs(d); err != nil {
 			return err
 		}
+		if err = r.traceNthRootIteration(a, x, xPrime, d); err != nil {
+			return err
+		}
 		if err = m.Swap(x, xPrime); err != nil {
 			return err
 		}
@@ -300,6 +306,9 @@ func (r FixedRoot) positiveBounds(a *numeral.FixedPoint, n uint32, precision, lo
 		return err
 	}
 	if err := r.aDivXPower(a, hi, n-1, true, lo); err != nil {
+		return err
+	}
+	if err := r.traceNthRootBoundCheck(a, hi); err != nil {
 		return err
 	}
 	cmp, err := m.Compare(lo, hi)
