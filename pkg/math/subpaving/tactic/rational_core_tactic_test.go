@@ -8,10 +8,12 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	goaltactic "github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/messages"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
 	"github.com/glycerine/g3/pkg/util/symbol"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestRationalCoreTacticBorrowedGoalStatisticsAndFreshCleanup(t *testing.T) {
@@ -151,6 +153,14 @@ func TestRationalCoreTacticBorrowedGoalStatisticsAndFreshCleanup(t *testing.T) {
 	if result, err := core.ApplyWithOutput(goal, short); err != nil || result != goal || short.String() != complete[:6] || short.calls == 0 {
 		t.Fatal("nonthrowing output prefix", result, err, short.String())
 	}
+	m.ResourceLimit().Cancel()
+	result, err = core.ApplyWithOutput(goal, &shown)
+	var tacticErr goaltactic.TacticException
+	var sourceErr z3exception.DefaultException
+	if result != nil || !errors.As(err, &tacticErr) || tacticErr.Message() != messages.Canceled || errors.As(err, &sourceErr) {
+		t.Fatal("converter cancellation must cross the source tactic boundary", result, err)
+	}
+	m.ResourceLimit().ResetCancel()
 	if err := core.Close(); err != nil {
 		t.Fatal(err)
 	}

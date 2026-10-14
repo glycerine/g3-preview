@@ -11,13 +11,14 @@ import (
 	"github.com/glycerine/g3/pkg/math/subpaving"
 	"github.com/glycerine/g3/pkg/util/messages"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 var ErrExprConverterUnsupported = errors.New("subpaving tactic: arithmetic expression conversion is not yet implemented")
 var ErrExprConverterNonSimplified = errors.New("you must apply simplifier before internalizing expressions into the subpaving module.")
 var ErrExprConverterPurifier = errors.New("you must apply arithmetic purifier before internalizing expressions into the subpaving module.")
 var ErrExprConverterTranscendental = errors.New("transcendental and hyperbolic functions are not supported yet.")
-var ErrExprConverterCanceled = errors.New(messages.Canceled)
+var ErrExprConverterCanceled = z3exception.NewDefaultException(messages.Canceled)
 
 // HardwareExprConverter owns the source expr2var references created for
 // arithmetic variables. Its AST manager and hardware engine are borrowed.

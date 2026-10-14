@@ -3,14 +3,15 @@
 package subpaving
 
 import (
-	"errors"
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/messages"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-var ErrRationalContextCanceled = errors.New("subpaving: rational context canceled")
+var ErrRationalContextCanceled = z3exception.NewDefaultException(messages.Canceled)
 
 type RationalInequality struct {
 	context  *RationalContext

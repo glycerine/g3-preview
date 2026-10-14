@@ -4,6 +4,9 @@ import (
 	"errors"
 	"math"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/util/messages"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestRationalSearchBreadthFirstChildrenAndDefinitionPropagation(t *testing.T) {
@@ -44,7 +47,9 @@ func TestRationalSearchResumesSelectedChildAfterQueueCancellation(t *testing.T) 
 		t.Fatal(err)
 	}
 	c.limit.Limit = 1
-	if err := c.Search(); !errors.Is(err, ErrRationalContextCanceled) || c.searchNode != left || c.searchPhase != 1 || c.queueHead != 0 || len(c.queue) != 1 || c.queue[0] != left.trail || c.queue[0].timestamp != c.timestamp {
+	err = c.Search()
+	var source z3exception.DefaultException
+	if !errors.Is(err, ErrRationalContextCanceled) || !errors.As(err, &source) || source.Message() != messages.Canceled || c.searchNode != left || c.searchPhase != 1 || c.queueHead != 0 || len(c.queue) != 1 || c.queue[0] != left.trail || c.queue[0].timestamp != c.timestamp {
 		t.Fatal("canceled child propagation did not retain selected decision", err)
 	}
 	c.limit.Limit = 0
