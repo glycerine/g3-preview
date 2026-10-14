@@ -157214,7 +157214,8 @@
           "tests": [
             "TestRationalSetStringRetainedTraceBranches",
             "TestRationalSetStringTraceInsertionAndEndlBoundaries",
-            "TestRationalSetStringTraceEndlRefusalKeepsNumericResult"
+            "TestRationalSetStringTraceEndlRefusalKeepsNumericResult",
+            "TestRationalSetStringTraceFormatterGuardPropagates"
           ]
         }
       ],
@@ -158870,7 +158871,8 @@
           "tests": [
             "TestRationalSetStringRetainedTraceBranches",
             "TestRationalSetStringTraceInsertionAndEndlBoundaries",
-            "TestRationalSetStringTraceEndlRefusalKeepsNumericResult"
+            "TestRationalSetStringTraceEndlRefusalKeepsNumericResult",
+            "TestRationalSetStringTraceFormatterGuardPropagates"
           ]
         }
       ],
@@ -175543,7 +175545,8 @@
           "tests": [
             "TestRationalSetStringRetainedTraceBranches",
             "TestRationalSetStringTraceInsertionAndEndlBoundaries",
-            "TestRationalSetStringTraceEndlRefusalKeepsNumericResult"
+            "TestRationalSetStringTraceEndlRefusalKeepsNumericResult",
+            "TestRationalSetStringTraceFormatterGuardPropagates"
           ]
         },
         {
@@ -176029,7 +176032,8 @@
           "tests": [
             "TestRationalSetStringRetainedTraceBranches",
             "TestRationalSetStringTraceInsertionAndEndlBoundaries",
-            "TestRationalSetStringTraceEndlRefusalKeepsNumericResult"
+            "TestRationalSetStringTraceEndlRefusalKeepsNumericResult",
+            "TestRationalSetStringTraceFormatterGuardPropagates"
           ]
         },
         {

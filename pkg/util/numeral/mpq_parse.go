@@ -107,7 +107,9 @@ func (m *RationalManager) SetString(out *Rational, text string) error {
 		i++
 	}
 	marker := numeralByte(text, i)
-	m.traceParseBefore(out)
+	if e := m.traceParseBefore(out); e != nil {
+		return e
+	}
 	if marker == '/' || marker == '.' || marker == 'e' || marker == 'E' {
 		if e := m.parseRationalSuffix(out, text, i, &tmp, &ten); e != nil {
 			return e
@@ -213,7 +215,9 @@ func (m *RationalManager) parseRationalSuffix(work *Rational, text string, i int
 			if e := m.Power(&tenRat, uint32(exponent), &exp); e != nil {
 				return e
 			}
-			m.traceParsePower(work, expNegative, exponent, &exp)
+			if e := m.traceParsePower(work, expNegative, exponent, &exp); e != nil {
+				return e
+			}
 			if expNegative {
 				if e := m.Div(work, &exp, work); e != nil {
 					return e

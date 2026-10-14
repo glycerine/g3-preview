@@ -32,63 +32,60 @@ func (m *RationalManager) parseRawText(a *Rational) (string, error) {
 	return n + "/" + d, nil
 }
 
-func (m *RationalManager) traceParseBefore(a *Rational) {
+func (m *RationalManager) traceParseBefore(a *Rational) error {
+	var formatErr error
 	_ = m.parseTraceTags().EmitConditional("mpq_set", "set", "src/util/mpq.cpp", 203,
 		func() bool { return true }, func(w io.Writer) error {
-			if err := writeNumeralDisplayPart(w, "[before] a: "); err != nil {
-				return err
-			}
-			v, err := m.parseRawText(a)
-			if err != nil {
-				return err
+			_ = writeNumeralDisplayPart(w, "[before] a: ")
+			v, e := m.parseRawText(a)
+			if e != nil {
+				formatErr = e
+				return e
 			}
 			for _, part := range [...]string{v, "\n"} {
-				if err := writeNumeralDisplayPart(w, part); err != nil {
-					return err
-				}
+				_ = writeNumeralDisplayPart(w, part)
 			}
 			return nil
 		})
+	return formatErr
 }
 
 func (m *RationalManager) traceParseExponent(exp uint64, character byte) {
 	_ = m.parseTraceTags().EmitConditional("mpq_set", "set", "src/util/mpq.cpp", 241,
 		func() bool { return true }, func(w io.Writer) error {
 			for _, part := range [...]string{"[exp]: ", strconv.FormatUint(exp, 10), ", str[0]: ", strconv.FormatInt(int64(character)-'0', 10)} {
-				if err := writeNumeralDisplayPart(w, part); err != nil {
-					return err
-				}
+				_ = writeNumeralDisplayPart(w, part)
 			}
-			return diagnostic.WriteTraceEndl(w)
+			_ = diagnostic.WriteTraceEndl(w)
+			return nil
 		})
 }
 
-func (m *RationalManager) traceParsePower(a *Rational, negative bool, exp uint64, power *Rational) {
+func (m *RationalManager) traceParsePower(a *Rational, negative bool, exp uint64, power *Rational) error {
+	var formatErr error
 	_ = m.parseTraceTags().EmitConditional("mpq_set", "set", "src/util/mpq.cpp", 260,
 		func() bool { return true }, func(w io.Writer) error {
-			if err := writeNumeralDisplayPart(w, "a: "); err != nil {
-				return err
-			}
-			value, err := m.parseRawText(a)
-			if err != nil {
-				return err
+			_ = writeNumeralDisplayPart(w, "a: ")
+			value, e := m.parseRawText(a)
+			if e != nil {
+				formatErr = e
+				return e
 			}
 			sign := "0"
 			if negative {
 				sign = "1"
 			}
 			for _, part := range [...]string{value, ", exp_sign:", sign, ", exp: ", strconv.FormatUint(exp, 10), " "} {
-				if err := writeNumeralDisplayPart(w, part); err != nil {
-					return err
-				}
+				_ = writeNumeralDisplayPart(w, part)
 			}
-			factor, err := m.parseRawText(power)
-			if err != nil {
-				return err
+			factor, e := m.parseRawText(power)
+			if e != nil {
+				formatErr = e
+				return e
 			}
-			if err := writeNumeralDisplayPart(w, factor); err != nil {
-				return err
-			}
-			return diagnostic.WriteTraceEndl(w)
+			_ = writeNumeralDisplayPart(w, factor)
+			_ = diagnostic.WriteTraceEndl(w)
+			return nil
 		})
+	return formatErr
 }

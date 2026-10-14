@@ -3,8 +3,10 @@ package numeral
 import (
 	"bytes"
 	"errors"
+	"math"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
@@ -109,6 +111,36 @@ func TestRationalSetStringTraceEndlRefusalKeepsNumericResult(t *testing.T) {
 				t.Fatal("failed source trace stream wrote on later parse", w.events[before:])
 			}
 		}
+	}
+	if err := m.Del(&a); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestRationalSetStringTraceFormatterGuardPropagates(t *testing.T) {
+	s, _ := serviceNew(t)
+	m := s.Manager
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("mpq_set")
+	if !tags.ShouldTrace("mpq_set") {
+		return
+	}
+	if err := m.BindTrace(tags); err != nil {
+		t.Fatal(err)
+	}
+	a := NewRational()
+	if err := m.Z.SetString(&a.Den, "123456789012345678901234567890123456789012345678901234567890"); err != nil {
+		t.Fatal(err)
+	}
+	m.Z.Natural.Formatting.invocation = math.MaxUint64
+	err := m.SetString(&a, "1")
+	m.Z.Natural.Formatting.invocation = 0
+	if !errors.Is(err, arena.ErrBounds) {
+		t.Fatal("reached to_string failure must stop source parser", err, output.String())
+	}
+	if got := output.String(); got != "-------- [mpq_set] set src/util/mpq.cpp:203 ---------\n[before] a: " {
+		t.Fatal("formatter failed at source insertion prefix", got)
 	}
 	if err := m.Del(&a); err != nil {
 		t.Fatal(err)
