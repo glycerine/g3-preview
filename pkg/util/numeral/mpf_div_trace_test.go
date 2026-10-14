@@ -49,3 +49,56 @@ func TestArbitraryFloatDivDebugTraceSourceOrderAndShortcut(t *testing.T) {
 	serviceMust(t, m.Del(&zero))
 	serviceMust(t, m.Del(&out))
 }
+
+func TestArbitraryFloatDivDebugTraceEndlFlushes(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	w := &mpfEndlWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	var one, zero, out ArbitraryFloat
+	serviceMust(t, m.MkOne(11, 53, false, &one))
+	serviceMust(t, m.MkZero(11, 53, false, &zero))
+	defer func() {
+		serviceMust(t, m.Del(&one))
+		serviceMust(t, m.Del(&zero))
+		serviceMust(t, m.Del(&out))
+	}()
+	for _, tc := range []struct {
+		name string
+		x    *ArbitraryFloat
+		sites []string
+	}{
+		{"general", &one, []string{"670", "671", "722", "723", "727", "728", "734", "742"}},
+		{"zero shortcut", &zero, []string{"670", "671"}},
+	} {
+		w.events = nil
+		w.flushes = 0
+		serviceMust(t, m.Div(ArbitraryFloatNearestEven, tc.x, &one, &out))
+		if !tags.ShouldTrace("mpf_dbg") {
+			if len(w.events) != 0 || w.flushes != 0 {
+				t.Fatalf("erased %s trace: %q", tc.name, w.events)
+			}
+			continue
+		}
+		all := strings.Join(w.events, "|")
+		for _, line := range tc.sites {
+			if !strings.Contains(all, "div src/util/mpf.cpp:"+line+" ---------") {
+				t.Fatalf("%s missing source site %s: %q", tc.name, line, w.events)
+			}
+		}
+		newlines := 0
+		for i, event := range w.events {
+			if event != "write:\n" {
+				continue
+			}
+			newlines++
+			if i+1 == len(w.events) || w.events[i+1] != "flush" {
+				t.Fatalf("%s source std::endl did not flush: %q", tc.name, w.events)
+			}
+		}
+		if newlines < len(tc.sites) || w.flushes != newlines {
+			t.Fatalf("%s completed %d newlines and %d flushes: %q", tc.name, newlines, w.flushes, w.events)
+		}
+	}
+}

@@ -150824,6 +150824,7 @@
         "TestArbitraryFloatAddSubDebugTraceSourceBranches",
         "TestArbitraryFloatAddSubDebugTraceSourceInsertions",
         "TestArbitraryFloatDivDebugTraceSourceOrderAndShortcut",
+        "TestArbitraryFloatDivDebugTraceEndlFlushes",
         "TestArbitraryFloatMulBugTraceSourceBoundaries",
         "TestArbitraryFloatMulBugTraceSourceInsertions",
         "TestArbitraryFloatMulTraceFormatterRefusalsStopAtSourceSite",
@@ -151513,7 +151514,7 @@
           "name": "mpf_manager::div mpf_dbg operand, unpacked, significand and quotient TRACE records at mpf.cpp:670-742",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_div.go",
-          "tests": ["TestArbitraryFloatDivDebugTraceSourceOrderAndShortcut", "TestArbitraryFloatArithmeticDebugTraceFormatterRefusals"]
+          "tests": ["TestArbitraryFloatDivDebugTraceSourceOrderAndShortcut", "TestArbitraryFloatDivDebugTraceEndlFlushes", "TestArbitraryFloatArithmeticDebugTraceFormatterRefusals"]
         },
         {
           "name": "mpf_manager::mul mpf_mul_bug entry/result and mpf_dbg operand, unpacked, significand and product TRACE records at mpf.cpp:590-650,664",
