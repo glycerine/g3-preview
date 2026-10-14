@@ -173109,7 +173109,8 @@
         "TestPsortASTNetworkNativeRangeFailureUnwindsFrames",
         "TestPsortASTContextNativeRepeatedFactoriesExactReferences",
         "TestPsortASTContextEscapedNativeStorageAfterManagerClose",
-        "TestPsortASTCardSourceEntryTrace"
+        "TestPsortASTCardSourceEntryTrace",
+        "TestPsortASTScalarEntryTracesPrecedeSourceGuards"
       ],
       "conditionals": [
         {
@@ -175052,7 +175053,8 @@
         "TestFixedPointDivisionTraceRefusalKeepsArithmetic",
         "TestSmallerPatternSaveTraceBeforePairPublication",
         "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
-        "TestPsortASTCardSourceEntryTrace"
+        "TestPsortASTCardSourceEntryTrace",
+        "TestPsortASTScalarEntryTracesPrecedeSourceGuards"
       ],
       "conditionals": [
         {
@@ -175400,6 +175402,14 @@
           ]
         },
         {
+          "name": "retained AST psort scalar entry TRACE before merge, sorting, smerge, dsmerge and dsorting bodies (src/util/sorting_network.h:640,744,805,923,982)",
+          "status": "ported",
+          "go_target": "pkg/ast/util_psort_ast_sorting.go",
+          "tests": [
+            "TestPsortASTScalarEntryTracesPrecedeSourceGuards"
+          ]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -175457,7 +175467,8 @@
         "TestFixedPointDivisionTraceRefusalKeepsArithmetic",
         "TestSmallerPatternSaveTraceBeforePairPublication",
         "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
-        "TestPsortASTCardSourceEntryTrace"
+        "TestPsortASTCardSourceEntryTrace",
+        "TestPsortASTScalarEntryTracesPrecedeSourceGuards"
       ],
       "conditionals": [
         {
@@ -175814,6 +175825,14 @@
           "go_target": "pkg/ast/util_psort_ast_sorting.go",
           "tests": [
             "TestPsortASTCardSourceEntryTrace"
+          ]
+        },
+        {
+          "name": "retained AST psort scalar entry TRACE before merge, sorting, smerge, dsmerge and dsorting bodies (src/util/sorting_network.h:640,744,805,923,982)",
+          "status": "ported",
+          "go_target": "pkg/ast/util_psort_ast_sorting.go",
+          "tests": [
+            "TestPsortASTScalarEntryTracesPrecedeSourceGuards"
           ]
         },
         {
