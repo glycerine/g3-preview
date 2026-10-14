@@ -168689,6 +168689,8 @@
         "pkg/ast/rewriter/bv_rewriter_concat_test.go",
         "pkg/ast/rewriter/bv_polynomial_mul_core.go",
         "pkg/ast/rewriter/bv_polynomial_mul_core_test.go",
+        "pkg/ast/rewriter/bv_polynomial_sub.go",
+        "pkg/ast/rewriter/bv_polynomial_sub_test.go",
         "pkg/tactic/ufbv/rewrite_traversal.go",
         "pkg/tactic/ufbv/rewrite_traversal_test.go",
         "pkg/tactic/ufbv/rewrite_back_index.go",
@@ -168722,6 +168724,9 @@
         "TestBVConcatNativeRootsPushPopAndForwardDestruction",
         "TestBVPolynomialNonflatMultiplicationCartesianOrderAndLimit",
         "TestBVPolynomialNonflatMultiplicationEveryCartesianOwnerAndFactoryReservation",
+        "TestBVPolynomialSubtractionRetainsSourceProductsAndSkipsZero",
+        "TestBVPolynomialSubtractionEveryOwnerAndFactoryReservation",
+        "TestBVPolynomialSubtractionSingletonBeforeSortAndAllocation",
         "TestPolynomialGCDNativeMonomialSliceOwnsDuplicateReferences",
         "TestPolynomialGCDNativeMonomialSliceGeneratedOwnershipAndStoppedReset",
         "TestPolynomialGCDICCPZPXNativeMonomialGrowthIndependentModel",
@@ -168861,6 +168866,16 @@
           "tests": [
             "TestBVPolynomialNonflatMultiplicationCartesianOrderAndLimit",
             "TestBVPolynomialNonflatMultiplicationEveryCartesianOwnerAndFactoryReservation"
+          ]
+        },
+        {
+          "name": "Concrete BV polynomial subtraction expr_ref_buffer: first and negated arguments gain references before append, skipped zeros add no reference, and cleanup releases the buffer before the older minus-one owner (poly_rewriter_def.h:683-701)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_sub.go",
+          "tests": [
+            "TestBVPolynomialSubtractionRetainsSourceProductsAndSkipsZero",
+            "TestBVPolynomialSubtractionEveryOwnerAndFactoryReservation",
+            "TestBVPolynomialSubtractionSingletonBeforeSortAndAllocation"
           ]
         },
         {
