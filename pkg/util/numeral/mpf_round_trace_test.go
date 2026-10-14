@@ -3,12 +3,100 @@ package numeral
 import (
 	"bytes"
 	"errors"
+	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
+
+func TestArbitraryFloatRoundReachedEndlFlushes(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	w := &mpfEndlWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	var x ArbitraryFloat
+	sig := NewInt((1 << 26) + 4)
+	serviceMust(t, m.SetComponents(&x, 8, 24, false, 0, &sig))
+	serviceMust(t, m.Round(ArbitraryFloatNearestEven, &x))
+	if !tags.ShouldTrace("mpf_dbg") {
+		if len(w.events) != 0 {
+			t.Fatal("erased round trace reached writer", w.events)
+		}
+	} else {
+		for _, tc := range []struct{ line, endlCount int }{
+			{1967, 2}, {2000, 6}, {2009, 1}, {2026, 2},
+			{2040, 1}, {2041, 1}, {2055, 1}, {2059, 1},
+			{2070, 1}, {2071, 1}, {2078, 1}, {2079, 1},
+			{2087, 1}, {2096, 2},
+		} {
+			start := -1
+			for i := 0; i+3 < len(w.events); i++ {
+				if w.events[i] == "write:src/util/mpf.cpp" && w.events[i+1] == "write::" && w.events[i+2] == "write:"+strconv.Itoa(tc.line) && w.events[i+3] == "write: ---------\n" {
+					start = i + 4
+					break
+				}
+			}
+			if start < 0 {
+				t.Fatalf("missing reached round trace site %d", tc.line)
+			}
+			count := 0
+			for i := start; i < len(w.events) && w.events[i] != "write:------------------------------------------------\n"; i++ {
+				if w.events[i] == "flush" {
+					count++
+				}
+			}
+			if count != tc.endlCount {
+				t.Fatalf("round source endl count at %d: got %d, want %d", tc.line, count, tc.endlCount)
+			}
+		}
+	}
+	serviceMust(t, m.CleanupRound())
+	serviceMust(t, m.Del(&x))
+}
+
+func TestArbitraryFloatRoundSqrtReachedEndlFlushes(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	w := &mpfEndlWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	var x ArbitraryFloat
+	sig := NewInt((1 << 26) + 5)
+	serviceMust(t, m.SetComponents(&x, 8, 24, false, 0, &sig))
+	serviceMust(t, m.RoundSqrt(ArbitraryFloatNearestEven, &x))
+	if !tags.ShouldTrace("mpf_dbg") {
+		if len(w.events) != 0 {
+			t.Fatal("erased sqrt round trace reached writer", w.events)
+		}
+	} else {
+		for _, line := range []int{2101, 2123, 2130} {
+			start := -1
+			for i := 0; i+3 < len(w.events); i++ {
+				if w.events[i] == "write:src/util/mpf.cpp" && w.events[i+1] == "write::" && w.events[i+2] == "write:"+strconv.Itoa(line) && w.events[i+3] == "write: ---------\n" {
+					start = i + 4
+					break
+				}
+			}
+			if start < 0 {
+				t.Fatalf("missing reached sqrt round trace site %d", line)
+			}
+			count := 0
+			for i := start; i < len(w.events) && w.events[i] != "write:------------------------------------------------\n"; i++ {
+				if w.events[i] == "flush" {
+					count++
+				}
+			}
+			if count != 1 {
+				t.Fatalf("sqrt round source endl count at %d: got %d", line, count)
+			}
+		}
+	}
+	serviceMust(t, m.CleanupRoundSqrt())
+	serviceMust(t, m.Del(&x))
+}
 
 func TestArbitraryFloatRoundDecisionTraceBranches(t *testing.T) {
 	m, _, _ := mpfNumeralHelpersFixture(t)

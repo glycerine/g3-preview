@@ -4,7 +4,18 @@ package numeral
 import (
 	"io"
 	"strconv"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
+
+// Every newline in the retained round and round_sqrt TRACE bodies is a
+// std::endl insertion, including intermediate lines in one record.
+func writeRoundTracePart(w io.Writer, part string) error {
+	if part == "\n" {
+		return diagnostic.WriteTraceEndl(w)
+	}
+	return writeNumeralDisplayPart(w, part)
+}
 
 func (m *ArbitraryFloatManager) traceRoundScalarParts(line int, parts ...string) {
 	tags := m.floatTraceTags()
@@ -14,7 +25,7 @@ func (m *ArbitraryFloatManager) traceRoundScalarParts(line int, parts ...string)
 	_ = tags.EmitConditional("mpf_dbg", "round", "src/util/mpf.cpp", line,
 		func() bool { return true }, func(w io.Writer) error {
 			for _, part := range parts {
-				if e := writeNumeralDisplayPart(w, part); e != nil {
+				if e := writeRoundTracePart(w, part); e != nil {
 					return e
 				}
 			}
@@ -45,7 +56,7 @@ func (m *ArbitraryFloatManager) traceRoundNormalization(emin, emax, beta, lz int
 				"beta = ", strconv.FormatInt(beta, 10), ", (beta < e_min) = ", traceBoolDigit(belowMin), "\n",
 				"LZ = ", strconv.FormatInt(lz, 10), "\n", "sigma = ",
 			} {
-				if e := writeNumeralDisplayPart(w, part); e != nil {
+				if e := writeRoundTracePart(w, part); e != nil {
 					return e
 				}
 			}
@@ -55,7 +66,7 @@ func (m *ArbitraryFloatManager) traceRoundNormalization(emin, emax, beta, lz int
 				return e
 			}
 			for _, part := range [...]string{s, "\n", "sigma_cap = "} {
-				if e := writeNumeralDisplayPart(w, part); e != nil {
+				if e := writeRoundTracePart(w, part); e != nil {
 					return e
 				}
 			}
@@ -67,7 +78,7 @@ func (m *ArbitraryFloatManager) traceRoundNormalization(emin, emax, beta, lz int
 			if e := writeNumeralDisplayPart(w, s); e != nil {
 				return e
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }
@@ -84,7 +95,7 @@ func (m *ArbitraryFloatManager) traceRoundShiftDistance(sigma int64) {
 	_ = tags.EmitConditional("mpf_dbg", "round", "src/util/mpf.cpp", 2009,
 		func() bool { return true }, func(w io.Writer) error {
 			for _, part := range [...]string{"Shift distance: ", strconv.FormatInt(sigma, 10), " ", direction, "\n"} {
-				if e := writeNumeralDisplayPart(w, part); e != nil {
+				if e := writeRoundTracePart(w, part); e != nil {
 					return e
 				}
 			}
@@ -115,7 +126,7 @@ func (m *ArbitraryFloatManager) traceRoundSignificandBranch(significand *Int, no
 			if e := writeNumeralDisplayPart(w, s); e != nil {
 				return e
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }
@@ -151,7 +162,7 @@ func (m *ArbitraryFloatManager) traceRoundValue(label string, value *ArbitraryFl
 			if e := writeNumeralDisplayPart(w, decimal); e != nil {
 				return e
 			}
-			if e := writeNumeralDisplayPart(w, "\n"); e != nil {
+			if e := diagnostic.WriteTraceEndl(w); e != nil {
 				return e
 			}
 			if !binary {
@@ -170,7 +181,7 @@ func (m *ArbitraryFloatManager) traceRoundValue(label string, value *ArbitraryFl
 					return e
 				}
 			}
-			return writeNumeralDisplayPart(w, "\n")
+			return diagnostic.WriteTraceEndl(w)
 		})
 	return formatError
 }

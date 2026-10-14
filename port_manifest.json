@@ -151420,14 +151420,14 @@
           "name": "mpf_manager::round_sqrt mpf_dbg entry, guard-bit decision and result TRACE records at mpf.cpp:2101,2123,2130",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_round_sqrt.go",
-          "tests": ["TestArbitraryFloatRoundSqrtDecisionTrace"]
+          "tests": ["TestArbitraryFloatRoundSqrtDecisionTrace", "TestArbitraryFloatRoundSqrtReachedEndlFlushes"]
         },
         {
           "name": "mpf_manager::round retained mpf_dbg entry, normalization, shifted and decision values, scalar decisions, normal/denormal class and final decimal/binary TRACE records at mpf.cpp:1967-2097; normalization/shift/class/value/scalar source insertion boundaries and failed-stream prefix",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_round.go",
           "go_targets": ["pkg/util/numeral/mpf_round_trace.go"],
-          "tests": ["TestArbitraryFloatRoundDecisionTraceBranches", "TestArbitraryFloatRoundResultClassTrace", "TestArbitraryFloatRoundEntryTraceRefusalBeforeNumericScope", "TestArbitraryFloatRoundSourceInsertionBoundaries", "TestArbitraryFloatRoundNormalizationRefusedInsertionPrefix", "TestArbitraryFloatRoundOverflowFlagInsertions"]
+          "tests": ["TestArbitraryFloatRoundDecisionTraceBranches", "TestArbitraryFloatRoundResultClassTrace", "TestArbitraryFloatRoundEntryTraceRefusalBeforeNumericScope", "TestArbitraryFloatRoundSourceInsertionBoundaries", "TestArbitraryFloatRoundNormalizationRefusedInsertionPrefix", "TestArbitraryFloatRoundOverflowFlagInsertions", "TestArbitraryFloatRoundReachedEndlFlushes"]
         },
         {
           "name": "mpf_manager::set(mpz,mpq) mpf_dbg entry, normalized, pre-round fields and result TRACE records at mpf.cpp:235,270,289,300",
@@ -175519,6 +175519,13 @@
           "tests": ["TestArbitraryFloatFMAOverflowTraceEndlFlushes", "TestArbitraryFloatFMAReachedEndlFlushes"]
         },
         {
+          "name": "Reached MPF round and round_sqrt std::endl body flushes before TRACE footer (src/util/mpf.cpp:1967-2130; src/util/trace.h:40-46)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_round_trace.go",
+          "go_targets": ["pkg/util/numeral/mpf_round_sqrt.go", "pkg/util/diagnostic/util_trace_tags.go"],
+          "tests": ["TestArbitraryFloatRoundReachedEndlFlushes", "TestArbitraryFloatRoundSqrtReachedEndlFlushes"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -175959,6 +175966,13 @@
           "go_target": "pkg/util/numeral/mpf_fma_trace.go",
           "go_targets": ["pkg/util/diagnostic/util_trace_tags.go"],
           "tests": ["TestArbitraryFloatFMAOverflowTraceEndlFlushes", "TestArbitraryFloatFMAReachedEndlFlushes"]
+        },
+        {
+          "name": "Reached MPF round and round_sqrt std::endl body flushes before TRACE footer (src/util/mpf.cpp:1967-2130; src/util/trace.h:40-46)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_round_trace.go",
+          "go_targets": ["pkg/util/numeral/mpf_round_sqrt.go", "pkg/util/diagnostic/util_trace_tags.go"],
+          "tests": ["TestArbitraryFloatRoundReachedEndlFlushes", "TestArbitraryFloatRoundSqrtReachedEndlFlushes"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

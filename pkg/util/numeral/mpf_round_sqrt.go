@@ -26,7 +26,7 @@ func (m *ArbitraryFloatManager) traceRoundSqrtDecision(last, round, sticky, inc 
 	_ = tags.EmitConditional("mpf_dbg", "round_sqrt", "src/util/mpf.cpp", 2123,
 		func() bool { return true }, func(w io.Writer) error {
 			for _, part := range [...]string{"last=", traceBoolDigit(last), " round=", traceBoolDigit(round), " sticky=", traceBoolDigit(sticky), " --> inc=", traceBoolDigit(inc), "\n"} {
-				if e := writeNumeralDisplayPart(w, part); e != nil {
+				if e := writeRoundTracePart(w, part); e != nil {
 					return e
 				}
 			}

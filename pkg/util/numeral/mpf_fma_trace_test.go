@@ -12,19 +12,19 @@ import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
-type fmaEndlWriter struct {
+type mpfEndlWriter struct {
 	events  []string
 	flushes int
 	failAt  int
 	refusal error
 }
 
-func (w *fmaEndlWriter) Write(p []byte) (int, error) { return w.WriteString(string(p)) }
-func (w *fmaEndlWriter) WriteString(s string) (int, error) {
+func (w *mpfEndlWriter) Write(p []byte) (int, error) { return w.WriteString(string(p)) }
+func (w *mpfEndlWriter) WriteString(s string) (int, error) {
 	w.events = append(w.events, "write:"+s)
 	return len(s), nil
 }
-func (w *fmaEndlWriter) Flush() error {
+func (w *mpfEndlWriter) Flush() error {
 	w.flushes++
 	w.events = append(w.events, "flush")
 	if w.flushes == w.failAt {
@@ -35,7 +35,7 @@ func (w *fmaEndlWriter) Flush() error {
 
 func TestArbitraryFloatFMAOverflowTraceEndlFlushes(t *testing.T) {
 	m, _, _ := mpfNumeralHelpersFixture(t)
-	w := &fmaEndlWriter{}
+	w := &mpfEndlWriter{}
 	tags := diagnostic.NewTraceTagsWithWriter(w)
 	tags.Enable("mpf_dbg")
 	serviceMust(t, m.BindTrace(tags))
@@ -71,7 +71,7 @@ func TestArbitraryFloatFMAOverflowTraceEndlFlushes(t *testing.T) {
 
 func TestArbitraryFloatFMAReachedEndlFlushes(t *testing.T) {
 	m, _, _ := mpfNumeralHelpersFixture(t)
-	w := &fmaEndlWriter{}
+	w := &mpfEndlWriter{}
 	tags := diagnostic.NewTraceTagsWithWriter(w)
 	tags.Enable("mpf_dbg")
 	serviceMust(t, m.BindTrace(tags))
