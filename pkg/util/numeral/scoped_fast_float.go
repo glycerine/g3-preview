@@ -8,10 +8,11 @@ import (
 )
 
 type ScopedFastFloat struct {
-	manager *FastFloatManager
-	num     FastFloat
-	self    *ScopedFastFloat
-	closed  bool
+	manager     *FastFloatManager
+	num         FastFloat
+	self        *ScopedFastFloat
+	sourceCause error
+	closed      bool
 }
 
 func NewScopedFastFloat(m *FastFloatManager) (*ScopedFastFloat, error) {
@@ -86,7 +87,20 @@ func (s *ScopedFastFloat) Clone() (*ScopedFastFloat, error) {
 	return r, nil
 }
 func (s *ScopedFastFloat) Close() error {
-	return s.cleanup()
+	if s == nil || s.self != s {
+		return ErrScopedCopy
+	}
+	if s.closed {
+		return nil
+	}
+	if s.sourceCause != nil {
+		return s.sourceCause
+	}
+	if e := s.cleanup(); e != nil {
+		s.sourceCause = e
+		return e
+	}
+	return nil
 }
 
 // Cleanup releases a partially constructed scoped value without invoking a
@@ -146,7 +160,8 @@ func (s *ScopedFastFloat) Abs() (*ScopedFastFloat, error) {
 		return nil, e
 	}
 	if e = r.manager.Abs(&r.num); e != nil {
-		r.Close()
+		var result *ScopedFastFloat
+		finishScopedFastFloatExpression(r, &result, &e)
 		return nil, e
 	}
 	return r, nil
@@ -172,7 +187,7 @@ func (s *ScopedFastFloat) compound(a *ScopedFastFloat, op uint32) error {
 		return s.manager.Div(&s.num, &a.num, &s.num)
 	}
 }
-func (s *ScopedFastFloat) value(a *ScopedFastFloat, op uint32) (*ScopedFastFloat, error) {
+func (s *ScopedFastFloat) value(a *ScopedFastFloat, op uint32) (result *ScopedFastFloat, cause error) {
 	if _, e := s.Get(); e != nil {
 		return nil, e
 	}
@@ -182,13 +197,13 @@ func (s *ScopedFastFloat) value(a *ScopedFastFloat, op uint32) (*ScopedFastFloat
 	if s.manager != a.manager {
 		return nil, ErrScopedOwner
 	}
-	tmp, e := s.Clone()
-	if e != nil {
-		return nil, e
+	tmp, cause := s.Clone()
+	if cause != nil {
+		return nil, cause
 	}
-	defer tmp.Close()
-	if e = tmp.compound(a, op); e != nil {
-		return nil, e
+	defer finishScopedFastFloatExpression(tmp, &result, &cause)
+	if cause = tmp.compound(a, op); cause != nil {
+		return nil, cause
 	}
 	return tmp.Clone()
 }
