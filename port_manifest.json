@@ -16924,6 +16924,15 @@
             "TestASTFloatingPointSpecialDeclFailedScalarRetainedForCleanup",
             "TestASTFloatingPointSpecialAppReachesDeclarationAndClassification"
           ]
+        },
+        {
+          "name": "FPA rounding-mode constant declarations and family expressions: five source names, no parameters or arity, and borrowed rounding sort (fpa_decl_plugin.cpp:230-253,710-724)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_rounding_decl.go",
+          "tests": [
+            "TestASTFloatingPointRoundingDeclarationsAndApplications",
+            "TestASTFloatingPointRoundingValidationOrder"
+          ]
         }
       ],
       "ownership": [
@@ -17053,6 +17062,15 @@
             "TestASTFloatingPointSpecialDeclSortSelectionAndScopedValue",
             "TestASTFloatingPointSpecialDeclFailedScalarRetainedForCleanup",
             "TestASTFloatingPointSpecialAppReachesDeclarationAndClassification"
+          ]
+        },
+        {
+          "name": "FPA rounding-mode constant declarations and family expressions: five source names, no parameters or arity, and borrowed rounding sort (fpa_decl_plugin.cpp:230-253,710-724)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_rounding_decl.go",
+          "tests": [
+            "TestASTFloatingPointRoundingDeclarationsAndApplications",
+            "TestASTFloatingPointRoundingValidationOrder"
           ]
         }
       ],

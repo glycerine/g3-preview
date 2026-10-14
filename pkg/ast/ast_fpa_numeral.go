@@ -14,12 +14,17 @@ import (
 type ASTException struct{ z3exception.DefaultException }
 
 const (
-	astFPANum       int32 = 5
-	astFPAPlusInf   int32 = 6
-	astFPAMinusInf  int32 = 7
-	astFPANaN       int32 = 8
-	astFPAPlusZero  int32 = 9
-	astFPAMinusZero int32 = 10
+	astFPARMNearestEven    int32 = 0
+	astFPARMNearestAway    int32 = 1
+	astFPARMTowardPositive int32 = 2
+	astFPARMTowardNegative int32 = 3
+	astFPARMTowardZero     int32 = 4
+	astFPANum              int32 = 5
+	astFPAPlusInf          int32 = 6
+	astFPAMinusInf         int32 = 7
+	astFPANaN              int32 = 8
+	astFPAPlusZero         int32 = 9
+	astFPAMinusZero        int32 = 10
 )
 
 func (p *astFloatingPointPluginOwner) numeralAssertionsEnabled() (bool, error) {
