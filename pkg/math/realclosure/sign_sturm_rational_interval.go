@@ -13,7 +13,7 @@ import (
 // module value, then the literal default. The module reference is borrowed
 // from the enclosing parameter owner, which owns its acquisition and release.
 func (s *realValueStore) bindInitialPrecision(pc *params.ParamsContext, p, module *params.ParamsRef) error {
-	if s == nil || s.numbers == nil || pc == nil || p == nil {
+	if s == nil || s.numbers == nil || s.pendingPrecisionHelper != nil || pc == nil || p == nil {
 		return arena.ErrInvalidSlot
 	}
 	if err := pc.Check(p); err != nil {
@@ -26,6 +26,56 @@ func (s *realValueStore) bindInitialPrecision(pc *params.ParamsContext, p, modul
 	}
 	s.initialPrecision = value
 	s.initialPrecisionBound = true
+	return nil
+}
+
+// bindInitialPrecisionFromGlobals executes the generated rcf_params helper's
+// get_module acquisition, getter and local reference destruction. A stopped
+// destruction remains with this store for explicit owning completion.
+func (s *realValueStore) bindInitialPrecisionFromGlobals(pc *params.ParamsContext, p *params.ParamsRef, globals *params.GlobalParamsService) (err error) {
+	if s == nil || s.numbers == nil || s.pendingPrecisionHelper != nil || pc == nil || p == nil || globals == nil {
+		return arena.ErrInvalidSlot
+	}
+	owner := &params.ModuleParamsOwner{Budget: globals.Config.Budget}
+	owner.Self = owner
+	if err = owner.Bind(pc, globals); err != nil {
+		return err
+	}
+	owner.Running = true
+	var frame *params.ModuleParamsFrame
+	defer func() {
+		if frame != nil {
+			err = owner.FinishHelper(frame, err)
+			if owner.Helpers != nil {
+				s.pendingPrecisionHelper = owner
+			}
+		}
+		owner.Running = false
+	}()
+	frame, err = owner.BeginHelper(p, "rcf")
+	if err != nil {
+		return err
+	}
+	value, err := owner.FrameUInt(frame, "initial_precision", 24)
+	if err != nil {
+		return err
+	}
+	s.initialPrecision = value
+	s.initialPrecisionBound = true
+	return nil
+}
+
+func (s *realValueStore) cleanupInitialPrecisionHelper() error {
+	if s == nil {
+		return arena.ErrInvalidSlot
+	}
+	if s.pendingPrecisionHelper == nil {
+		return nil
+	}
+	if err := s.pendingPrecisionHelper.CloseHelpers(); err != nil {
+		return err
+	}
+	s.pendingPrecisionHelper = nil
 	return nil
 }
 

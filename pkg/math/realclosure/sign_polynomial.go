@@ -5,6 +5,7 @@ package realclosure
 import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/params"
 )
 
 // realValueStore owns the retained rational and algebraic-root value variants.
@@ -13,6 +14,7 @@ type realValueStore struct {
 	numbers                  *numeral.RationalManager
 	initialPrecision         uint32
 	initialPrecisionBound    bool
+	pendingPrecisionHelper   *params.ModuleParamsOwner
 	pendingSequence          []realPolynomial
 	pendingSturmCoefficients [][]*realValue
 	pendingSturmRationals    []numeral.Rational
