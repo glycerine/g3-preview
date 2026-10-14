@@ -85,6 +85,9 @@ func (v *FastInterval) XnEqY(src *FastInterval, n uint32, precision *numeral.Fas
 		if err = roots.Bounds(srcUpper, n, precision, rootLower, rootUpper); err != nil {
 			return err
 		}
+		if err = v.traceFastXnEqYBounds(src, rootLower, rootUpper, roots); err != nil {
+			return err
+		}
 		equal, e := m.Equal(rootLower, rootUpper)
 		if e != nil {
 			return e
@@ -143,5 +146,11 @@ func (v *FastInterval) XnEqY(src *FastInterval, n uint32, precision *numeral.Fas
 	}
 	v.lowerInf, v.upperInf = lowerInf, upperInf
 	v.lowerOpen, v.upperOpen = lowerOpen, upperOpen
-	return v.CheckInvariant()
+	if err = v.CheckInvariant(); err != nil {
+		return err
+	}
+	if n%2 == 0 {
+		return v.traceFastXnEqYResult(roots)
+	}
+	return v.traceFastNthRoot(src, roots)
 }

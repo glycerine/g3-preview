@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/messages"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/z3exception"
@@ -19,6 +20,7 @@ type FixedRoot struct {
 	Numbers     *numeral.FixedPointManager
 	Limit       *control.Reslimit
 	Cooperation *cooperate.Cooperation
+	TraceTags   *diagnostic.TraceTags
 }
 
 type fixedRootScratch struct {
