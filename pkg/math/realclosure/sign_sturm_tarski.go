@@ -2,19 +2,58 @@
 // and 4031-4069 for rational coefficients and unbounded intervals.
 package realclosure
 
-import "github.com/glycerine/g3/pkg/arena"
+import (
+	"errors"
 
-func (s *realValueStore) closePolynomialSequence(rows []realPolynomial) error {
-	for i := range rows {
-		if err := s.resetPolynomial(&rows[i]); err != nil {
-			return err
-		}
+	"github.com/glycerine/g3/pkg/arena"
+)
+
+var errRealClosureSequencePending = errors.New("realclosure: polynomial sequence cleanup pending")
+
+func (s *realValueStore) sequenceReady() error {
+	if s == nil || s.numbers == nil {
+		return arena.ErrInvalidSlot
+	}
+	if s.pendingSequence != nil {
+		return errRealClosureSequencePending
 	}
 	return nil
 }
 
+func (s *realValueStore) closePolynomialSequence(rows []realPolynomial) error {
+	if s == nil {
+		return arena.ErrInvalidSlot
+	}
+	if s.pendingSequence != nil && (len(rows) == 0 || &rows[0] != &s.pendingSequence[0]) {
+		return errRealClosureSequencePending
+	}
+	for i := range rows {
+		if err := s.resetPolynomial(&rows[i]); err != nil {
+			s.pendingSequence = rows
+			return err
+		}
+	}
+	s.pendingSequence = nil
+	return nil
+}
+
+// cleanupPendingPolynomialSequence resumes the exact retained row sequence
+// after a coefficient destructor refused to complete.
+func (s *realValueStore) cleanupPendingPolynomialSequence() error {
+	if s == nil {
+		return arena.ErrInvalidSlot
+	}
+	if s.pendingSequence == nil {
+		return nil
+	}
+	return s.closePolynomialSequence(s.pendingSequence)
+}
+
 func (s *realValueStore) sturmSequenceRational(first, second []*realValue, usePseudo bool) ([]realPolynomial, error) {
-	if s == nil || len(first) == 0 || len(second) == 0 {
+	if err := s.sequenceReady(); err != nil {
+		return nil, err
+	}
+	if len(first) == 0 || len(second) == 0 {
 		return nil, arena.ErrInvalidSlot
 	}
 	rows := make([]realPolynomial, 2)
@@ -99,6 +138,9 @@ func (s *realValueStore) tarskiFromUnboundedSequence(rows []realPolynomial) (int
 
 // rootCountUnboundedRational follows TaQ_1 for the whole real line.
 func (s *realValueStore) rootCountUnboundedRational(p []*realValue, usePseudo bool) (int, error) {
+	if err := s.sequenceReady(); err != nil {
+		return 0, err
+	}
 	derivative, err := s.derivativeRationalPolynomial(p)
 	if err != nil {
 		return 0, err
@@ -126,6 +168,9 @@ func (s *realValueStore) rootCountUnboundedRational(p []*realValue, usePseudo bo
 // tarskiUnboundedRational follows TaQ(p,q) for an unbounded interval: it
 // starts at p and p'*q, then subtracts the endpoint sign variations.
 func (s *realValueStore) tarskiUnboundedRational(p, q []*realValue, usePseudo bool) (int, error) {
+	if err := s.sequenceReady(); err != nil {
+		return 0, err
+	}
 	derivative, err := s.derivativeRationalPolynomial(p)
 	if err != nil {
 		return 0, err

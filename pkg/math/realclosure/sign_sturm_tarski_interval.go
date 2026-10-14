@@ -136,6 +136,9 @@ func (s *realValueStore) tarskiFromBinaryIntervalSequence(rows []realPolynomial,
 // rootCountBinaryIntervalRational follows TaQ_1 across a binary-rational
 // interval. As in the source, endpoint openness does not change the query.
 func (s *realValueStore) rootCountBinaryIntervalRational(p []*realValue, interval *BinaryInterval, usePseudo bool) (int, error) {
+	if err := s.sequenceReady(); err != nil {
+		return 0, err
+	}
 	if err := interval.open(); err != nil {
 		return 0, err
 	}
@@ -164,6 +167,9 @@ func (s *realValueStore) rootCountBinaryIntervalRational(p []*realValue, interva
 }
 
 func (s *realValueStore) tarskiBinaryIntervalRational(p, q []*realValue, interval *BinaryInterval, usePseudo bool) (int, error) {
+	if err := s.sequenceReady(); err != nil {
+		return 0, err
+	}
 	if err := interval.open(); err != nil {
 		return 0, err
 	}

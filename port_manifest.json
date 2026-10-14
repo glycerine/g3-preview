@@ -48890,7 +48890,8 @@
         "pkg/math/realclosure/sign_sturm_tarski.go",
         "pkg/math/realclosure/sign_sturm_tarski_interval.go",
         "pkg/math/realclosure/sign_sturm_tarski_interval_test.go",
-        "pkg/math/realclosure/sign_sturm_sequence_ownership_test.go"
+        "pkg/math/realclosure/sign_sturm_sequence_ownership_test.go",
+        "pkg/math/realclosure/sign_sturm_sequence_refusal_test.go"
       ],
       "tests": [
         "TestRealClosureBinaryExtendedNumeralBranches",
@@ -48911,7 +48912,8 @@
         "TestRealClosureSourceTarskiSignCountBranches",
         "TestRealClosureRationalDerivativeKeepsCoefficientOwnership",
         "TestRealClosureBoundedRationalSturmTarskiEndpoints",
-        "TestRealClosureRationalSturmSequenceOwnsBorrowedCoefficients"
+        "TestRealClosureRationalSturmSequenceOwnsBorrowedCoefficients",
+        "TestRealClosureSturmSequenceRefusedDestructorRetainsRows"
       ],
       "conditionals": [
         {
@@ -50117,11 +50119,12 @@
           ]
         },
         {
-          "name": "Selected rational scoped_polynomial_seq successful push and destruction: owned typed polynomial rows retain borrowed coefficients independently of caller references, then release every row (realclosure.cpp:406-451,3637-3674)",
+          "name": "Selected rational scoped_polynomial_seq push and destruction: owned typed rows retain borrowed coefficients, preserve a refused destructor suffix for explicit continuation, and gate four query callers until cleanup (realclosure.cpp:406-451,3637-3674)",
           "status": "platform_replacement",
           "go_target": "pkg/math/realclosure/sign_sturm_tarski.go",
           "tests": [
-            "TestRealClosureRationalSturmSequenceOwnsBorrowedCoefficients"
+            "TestRealClosureRationalSturmSequenceOwnsBorrowedCoefficients",
+            "TestRealClosureSturmSequenceRefusedDestructorRetainsRows"
           ]
         },
         {
@@ -168710,8 +168713,10 @@
         "pkg/math/polynomial/polynomial_gcd_buffer_stopped_growth_source_test.go",
         "pkg/math/polynomial/polynomial_psc_cleanup_reentry_source_test.go",
         "pkg/math/polynomial/polynomial_psc_next_invocation_source_test.go",
+        "pkg/math/realclosure/sign_polynomial.go",
         "pkg/math/realclosure/sign_sturm_tarski.go",
         "pkg/math/realclosure/sign_sturm_sequence_ownership_test.go",
+        "pkg/math/realclosure/sign_sturm_sequence_refusal_test.go",
         "pkg/ast/rewriter/bv_rewriter_concat.go",
         "pkg/ast/rewriter/bv_rewriter_concat_test.go",
         "pkg/ast/rewriter/bv_polynomial_mul_core.go",
@@ -168755,6 +168760,7 @@
         "TestPolynomialPSCNextBorrowedHCallbackCannotMutateOwnedBuffer",
         "TestPolynomialPSCNextExpiredCompletedChildrenPreserveLaterVariableAndH",
         "TestRealClosureRationalSturmSequenceOwnsBorrowedCoefficients",
+        "TestRealClosureSturmSequenceRefusedDestructorRetainsRows",
         "TestBVConcatNativeRootsPushPopAndForwardDestruction",
         "TestBVPolynomialNonflatMultiplicationCartesianOrderAndLimit",
         "TestBVPolynomialNonflatMultiplicationEveryCartesianOwnerAndFactoryReservation",
@@ -168881,11 +168887,12 @@
           ]
         },
         {
-          "name": "Selected rational realclosure scoped_polynomial_seq value_ref_buffer: successful sequence rows own borrowed coefficients across caller release and discharge them on cleanup (realclosure.cpp:406-451,3637-3674)",
+          "name": "Selected rational realclosure scoped_polynomial_seq value_ref_buffer: rows own borrowed coefficients and a refused destructor suffix remains explicitly recoverable (realclosure.cpp:406-451,3637-3674)",
           "status": "platform_replacement",
           "go_target": "pkg/math/realclosure/sign_sturm_tarski.go",
           "tests": [
-            "TestRealClosureRationalSturmSequenceOwnsBorrowedCoefficients"
+            "TestRealClosureRationalSturmSequenceOwnsBorrowedCoefficients",
+            "TestRealClosureSturmSequenceRefusedDestructorRetainsRows"
           ]
         },
         {

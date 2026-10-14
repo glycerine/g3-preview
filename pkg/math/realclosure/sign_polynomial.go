@@ -10,7 +10,8 @@ import (
 // realValueStore owns the retained rational and algebraic-root value variants.
 // Other rational-function and extension cases remain to be ported.
 type realValueStore struct {
-	numbers *numeral.RationalManager
+	numbers         *numeral.RationalManager
+	pendingSequence []realPolynomial
 }
 
 // realValue is a retained nonzero rational or algebraic-root function value.
