@@ -15,9 +15,9 @@ import (
 )
 
 var ErrExprConverterUnsupported = errors.New("subpaving tactic: arithmetic expression conversion is not yet implemented")
-var ErrExprConverterNonSimplified = errors.New("you must apply simplifier before internalizing expressions into the subpaving module.")
-var ErrExprConverterPurifier = errors.New("you must apply arithmetic purifier before internalizing expressions into the subpaving module.")
-var ErrExprConverterTranscendental = errors.New("transcendental and hyperbolic functions are not supported yet.")
+var ErrExprConverterNonSimplified = z3exception.NewDefaultException("you must apply simplifier before internalizing expressions into the subpaving module.")
+var ErrExprConverterPurifier = z3exception.NewDefaultException("you must apply arithmetic purifier before internalizing expressions into the subpaving module.")
+var ErrExprConverterTranscendental = z3exception.NewDefaultException("transcendental and hyperbolic functions are not supported yet.")
 var ErrExprConverterCanceled = z3exception.NewDefaultException(messages.Canceled)
 
 // HardwareExprConverter owns the source expr2var references created for

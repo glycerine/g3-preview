@@ -15,6 +15,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
 	"github.com/glycerine/g3/pkg/util/symbol"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestHardwareExprConverterTerms(t *testing.T) {
@@ -340,7 +341,9 @@ func TestHardwareExprConverterTerms(t *testing.T) {
 			if err := qm.Z.SetInt32(&d, 11); err != nil {
 				t.Fatal(err)
 			}
-			if _, err := converter.InternalizeTerm(h, &n, &d); !errors.Is(err, tc.want) || err.Error() != tc.want.Error() {
+			_, err = converter.InternalizeTerm(h, &n, &d)
+			var source z3exception.DefaultException
+			if !errors.Is(err, tc.want) || !errors.As(err, &source) || source.Message() != tc.want.Error() {
 				t.Fatalf("source refusal: %v, want %v", err, tc.want)
 			}
 			gotN, err := qm.Z.String(&n)

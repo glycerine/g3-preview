@@ -161,6 +161,33 @@ func TestRationalCoreTacticBorrowedGoalStatisticsAndFreshCleanup(t *testing.T) {
 		t.Fatal("converter cancellation must cross the source tactic boundary", result, err)
 	}
 	m.ResourceLimit().ResetCancel()
+	if err := core.Cleanup(); err != nil {
+		t.Fatal(err)
+	}
+	badGoal, err := goaltactic.NewGoal(m, false, false, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := badGoal.Close(); err != nil {
+			t.Error(err)
+		}
+	})
+	sub, err := m.MkFamilyApp(family, 7, nil, []ast.ASTHandle{x, x})
+	if err != nil {
+		t.Fatal(err)
+	}
+	unsimplified, err := m.MkFamilyApp(family, 2, nil, []ast.ASTHandle{sub, threshold})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := badGoal.Assert(unsimplified); err != nil {
+		t.Fatal(err)
+	}
+	result, err = core.ApplyWithOutput(badGoal, &shown)
+	if result != nil || !errors.As(err, &tacticErr) || tacticErr.Message() != ErrExprConverterNonSimplified.Error() {
+		t.Fatal("unsimplified source exception must cross tactic boundary", result, err)
+	}
 	if err := core.Close(); err != nil {
 		t.Fatal(err)
 	}
