@@ -178788,7 +178788,8 @@
         "pkg/util/params/util_env_params.go",
         "pkg/util/z3exception/z3_exception.go",
         "pkg/tactic/ufbv/rewrite_formula_process.go",
-        "pkg/ast/pattern/reduce_quantifier.go"
+        "pkg/ast/pattern/reduce_quantifier.go",
+        "pkg/shell/input_file_option.go"
       ],
       "tests": [
         "TestWarningSourceDefaultRoutingAndDisabledState",
@@ -178803,7 +178804,9 @@
         "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
         "TestUpdateProcessEnvParamsSharedVerbosityAndWarning",
         "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
-        "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
+        "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
+        "TestShellInputFileSourceBranches",
+        "TestShellInputFileWarningRefusalPreservesSelection"
       ],
       "conditionals": [
         {
@@ -178927,6 +178930,12 @@
           "status": "ported",
           "go_target": "pkg/ast/pattern/reduce_quantifier.go",
           "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern", "TestPatternInferencePullsBooleanApplicationThenFindsPattern"]
+        },
+        {
+          "name": "shell/main.cpp:131,280 duplicate input-file warning_msg literal callers, including nonthrowing borrowed stream refusal",
+          "status": "ported",
+          "go_target": "pkg/shell/input_file_option.go",
+          "tests": ["TestShellInputFileSourceBranches", "TestShellInputFileWarningRefusalPreservesSelection"]
         }
       ],
       "ownership": [
@@ -178946,7 +178955,8 @@
         "pkg/util/params/util_env_params.go",
         "pkg/util/z3exception/z3_exception.go",
         "pkg/tactic/ufbv/rewrite_formula_process.go",
-        "pkg/ast/pattern/reduce_quantifier.go"
+        "pkg/ast/pattern/reduce_quantifier.go",
+        "pkg/shell/input_file_option.go"
       ],
       "tests": [
         "TestWarningSourceDefaultRoutingAndDisabledState",
@@ -178961,7 +178971,9 @@
         "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
         "TestUpdateProcessEnvParamsSharedVerbosityAndWarning",
         "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
-        "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
+        "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
+        "TestShellInputFileSourceBranches",
+        "TestShellInputFileWarningRefusalPreservesSelection"
       ],
       "conditionals": [
         {
@@ -179032,6 +179044,12 @@
           "status": "ported",
           "go_target": "pkg/ast/pattern/reduce_quantifier.go",
           "tests": ["TestPatternInferencePullDirectNestedForallFindsPattern", "TestPatternInferencePullsBooleanApplicationThenFindsPattern"]
+        },
+        {
+          "name": "shell/main.cpp:131,280 duplicate input-file warning_msg literal callers, including nonthrowing borrowed stream refusal",
+          "status": "ported",
+          "go_target": "pkg/shell/input_file_option.go",
+          "tests": ["TestShellInputFileSourceBranches", "TestShellInputFileWarningRefusalPreservesSelection"]
         }
       ],
       "ownership": [
