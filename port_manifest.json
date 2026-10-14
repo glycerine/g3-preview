@@ -150270,8 +150270,8 @@
           ]
         },
         {
-          "name": "Actual raw single-value decimal locals and explicit end-label deletion cursors; exceptional raw roots retained for checked owning cleanup; broader binary lifecycle remains open",
-          "status": "partial",
+          "name": "Retained single-value decimal display: three actual RAW locals, successful ascending end-label DEL, exceptional retained roots and explicit owning cleanup (mpbq.cpp:426-458)",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpbq_display_scope.go",
           "tests": [
             "TestBinaryDecimalErrorDoesNotExecuteSourceEndLabel",
@@ -150602,8 +150602,8 @@
           ]
         },
         {
-          "name": "Actual raw single-value decimal locals and explicit end-label deletion cursors; exceptional raw roots retained for checked owning cleanup; broader binary lifecycle remains open",
-          "status": "partial",
+          "name": "Retained single-value decimal display: three actual RAW locals, successful ascending end-label DEL, exceptional retained roots and explicit owning cleanup (mpbq.cpp:426-458)",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpbq_display_scope.go",
           "tests": [
             "TestBinaryDecimalErrorDoesNotExecuteSourceEndLabel",
