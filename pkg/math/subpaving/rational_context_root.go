@@ -19,6 +19,8 @@ type RationalContext struct {
 	variables    []bool
 	root         *RationalNode
 	nodes        []*RationalNode
+	leafHead     *RationalNode
+	leafTail     *RationalNode
 	numBounds    uint64
 	numConflicts uint64
 	closed       bool
@@ -72,6 +74,7 @@ func (c *RationalContext) Root() (*RationalNode, error) {
 	n.context, n.registered = c, true
 	c.root = n
 	c.nodes = append(c.nodes, n)
+	c.pushLeafFront(n)
 	return n, nil
 }
 
@@ -88,6 +91,7 @@ func (c *RationalContext) NewChild(parent *RationalNode) (*RationalNode, error) 
 	}
 	n.registered = true
 	c.nodes = append(c.nodes, n)
+	c.pushLeafFront(n)
 	return n, nil
 }
 
@@ -152,6 +156,7 @@ func (c *RationalContext) publishNormalized(n *RationalNode, variable uint32, va
 	if conflict {
 		n.conflictVar = variable
 		c.numConflicts++
+		c.removeLeaf(n)
 	}
 	return nil
 }
@@ -169,6 +174,7 @@ func (c *RationalContext) Close() error {
 		}
 	}
 	c.nodes, c.root, c.variables = nil, nil, nil
+	c.leafHead, c.leafTail = nil, nil
 	c.closed = true
 	return nil
 }

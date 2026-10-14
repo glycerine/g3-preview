@@ -24,6 +24,9 @@ type RationalNode struct {
 	registered   bool
 	lower, upper []*RationalBound
 	owned        []*RationalBound
+	leafPrev     *RationalNode
+	leafNext     *RationalNode
+	queuedLeaf   bool
 	children     uint32
 	conflictVar  uint32
 	closed       bool
@@ -120,6 +123,9 @@ func (n *RationalNode) Close() error {
 	}
 	if n.children != 0 {
 		return arena.ErrInvalidSlot
+	}
+	if n.context != nil {
+		n.context.removeLeaf(n)
 	}
 	for i := len(n.owned) - 1; i >= 0; i-- {
 		if err := n.numbers.Del(&n.owned[i].value); err != nil {

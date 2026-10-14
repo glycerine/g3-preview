@@ -71,6 +71,9 @@ func TestRationalContextSourceBoundConflicts(t *testing.T) {
 	if open.conflictVar != x || c.numConflicts != 1 {
 		t.Fatal("open singleton conflict", open.conflictVar, c.numConflicts)
 	}
+	if open.queuedLeaf || c.leafHead != closed || c.leafTail != root {
+		t.Fatal("open conflict remained queued")
+	}
 	if err := c.PublishBound(open, x, &hi, false, false); !errors.Is(err, arena.ErrInvalidSlot) {
 		t.Fatalf("published after conflict: %v", err)
 	}
@@ -80,6 +83,24 @@ func TestRationalContextSourceBoundConflicts(t *testing.T) {
 	must(c.PublishBound(reversed, x, &lo, false, false))
 	if reversed.conflictVar != x || c.numConflicts != 2 || c.numBounds != 6 {
 		t.Fatal("reversed conflict counters", reversed.conflictVar, c.numConflicts, c.numBounds)
+	}
+	if reversed.queuedLeaf || c.leafHead != closed || c.leafTail != root {
+		t.Fatal("reversed conflict remained queued")
+	}
+	selected, err := c.PopLeafBFS()
+	must(err)
+	if selected != root {
+		t.Fatal("BFS did not pop oldest root")
+	}
+	selected, err = c.PopLeafBFS()
+	must(err)
+	if selected != closed {
+		t.Fatal("BFS did not pop remaining child")
+	}
+	selected, err = c.PopLeafBFS()
+	must(err)
+	if selected != nil || c.leafHead != nil || c.leafTail != nil {
+		t.Fatal("empty rational leaf list")
 	}
 	inherited, err := c.NewChild(reversed)
 	must(err)
