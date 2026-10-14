@@ -149088,8 +149088,8 @@
           ]
         },
         {
-          "name": "Actual before/after physical deallocation prefixes and charged retained release authority; explicit checked cleanup continuation",
-          "status": "partial",
+          "name": "Actual before/after physical deallocation prefixes, charged release authority and explicit owning continuation (memory_manager.cpp:263-270,315-325)",
+          "status": "ported",
           "go_target": "pkg/util/memory/release_progress.go",
           "tests": [
             "TestMemoryTrackedReleaseLatePhysicalPrefix",
