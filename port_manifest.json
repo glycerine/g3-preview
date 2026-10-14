@@ -174374,6 +174374,7 @@
         "TestShellTimeoutReplacementDisabledAndBorrowedCallback",
         "TestShellTimeoutCallbackRearmIsDeletedBeforeError",
         "TestShellTimeoutFirstUnhandledErrorDoesNotBlockRearm",
+        "TestShellTimeoutRearmedEventWaitsForSourceCriticalSection",
         "TestShellGlobalTimeoutOptionSourceBranch",
         "TestShellCommandLineBorrowsProcessTimeout"
       ],
@@ -174405,7 +174406,8 @@
           "tests": [
             "TestShellTimeoutSourceCallbackOutputAndErrorOrder",
             "TestShellTimeoutCallbackRearmIsDeletedBeforeError",
-            "TestShellTimeoutFirstUnhandledErrorDoesNotBlockRearm"
+            "TestShellTimeoutFirstUnhandledErrorDoesNotBlockRearm",
+            "TestShellTimeoutRearmedEventWaitsForSourceCriticalSection"
           ]
         }
       ],

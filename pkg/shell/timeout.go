@@ -16,6 +16,7 @@ import (
 type TimeoutService struct {
 	self     *TimeoutService
 	mu       sync.Mutex
+	fireMu   sync.Mutex
 	timer    *control.ScopedTimer
 	callback func()
 	output   io.Writer
@@ -93,6 +94,11 @@ func (s *TimeoutService) SetTimeout(milliseconds int64) error {
 }
 
 func (s *TimeoutService) fire(serial uint64, caller control.EventCaller) {
+	// The source event handler holds g_timeout_cs through the borrowed
+	// callback and deletion of the current global timer. A callback may
+	// rearm that timer, but its event must wait until this handler finishes.
+	s.fireMu.Lock()
+	defer s.fireMu.Unlock()
 	s.mu.Lock()
 	if s.closed || serial != s.serial || s.timer == nil {
 		s.mu.Unlock()

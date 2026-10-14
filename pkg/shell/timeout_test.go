@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"math"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -143,6 +144,65 @@ func TestShellTimeoutCallbackRearmIsDeletedBeforeError(t *testing.T) {
 	case err := <-called:
 		t.Fatal("callback's replacement timer survived source deletion", err)
 	case <-time.After(30 * time.Millisecond):
+	}
+}
+
+func TestShellTimeoutRearmedEventWaitsForSourceCriticalSection(t *testing.T) {
+	var output bytes.Buffer
+	s := NewTimeoutService(&output)
+	defer func() {
+		if err := s.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}()
+	entered := make(chan struct{})
+	release := make(chan struct{})
+	callbackErr := make(chan error, 1)
+	var calls atomic.Int32
+	if err := s.RegisterOnTimeoutProc(func() {
+		if calls.Add(1) != 1 {
+			return
+		}
+		if err := s.SetTimeout(5); err != nil {
+			callbackErr <- err
+		}
+		close(entered)
+		<-release
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.SetTimeout(5); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-entered:
+	case <-time.After(2 * time.Second):
+		t.Fatal("first timeout callback did not start")
+	}
+	// The replacement timer expires while the first callback is held open.
+	time.Sleep(30 * time.Millisecond)
+	if got := calls.Load(); got != 1 {
+		t.Fatal("replacement entered the source critical section early", got)
+	}
+	close(release)
+	select {
+	case err := <-callbackErr:
+		t.Fatal("callback rearm", err)
+	case <-s.Events():
+	case <-time.After(2 * time.Second):
+		t.Fatal("first timeout did not finish")
+	}
+	time.Sleep(30 * time.Millisecond)
+	if got := calls.Load(); got != 1 {
+		t.Fatal("deleted replacement fired after source handler", got)
+	}
+	select {
+	case err := <-s.Events():
+		t.Fatal("replacement delivered another timeout", err)
+	default:
+	}
+	if got := output.String(); got != "timeout\n" {
+		t.Fatal("replacement wrote a second timeout", got)
 	}
 }
 
