@@ -149355,13 +149355,18 @@
           ]
         },
         {
-          "name": "Bound FatalPolicy through real lower Runtime dispatch and main alias wrapper; unbound legacy transport unchanged; source vector-overflow transport remains separate",
-          "status": "partial",
+          "name": "Bound FatalPolicy through real lower Runtime dispatch and main alias wrapper; unbound legacy transport and vector-overflow exception remain separate",
+          "status": "ported",
           "go_target": "pkg/util/diagnostic/util_memory_runtime.go",
+          "go_targets": ["pkg/util/memory/failure.go", "pkg/util/memory/runtime.go", "pkg/util/diagnostic/util_memory_fatal_policy_test.go"],
           "tests": [
             "TestMemoryFatalMainRuntimeBinding",
             "TestMemoryFatalNonExitExceptionCatch",
-            "TestMemoryFatalContextActualColdRefusalAndCohort"
+            "TestMemoryFatalContextSharesSourceProcessWithEarlierRuntime",
+            "TestMemoryFatalSubprocessChild",
+            "TestMemoryBridgeNominalOOMAndCountErrors",
+            "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
+            "TestProcessFatalPolicyDispatchesAcrossRuntimeOwners"
           ]
         },
         {
@@ -149792,13 +149797,18 @@
           ]
         },
         {
-          "name": "Bound FatalPolicy through real lower Runtime dispatch and main alias wrapper; unbound legacy transport unchanged; source vector-overflow transport remains separate",
-          "status": "partial",
+          "name": "Bound FatalPolicy through real lower Runtime dispatch and main alias wrapper; unbound legacy transport and vector-overflow exception remain separate",
+          "status": "ported",
           "go_target": "pkg/util/diagnostic/util_memory_runtime.go",
+          "go_targets": ["pkg/util/memory/failure.go", "pkg/util/memory/runtime.go", "pkg/util/diagnostic/util_memory_fatal_policy_test.go"],
           "tests": [
             "TestMemoryFatalMainRuntimeBinding",
             "TestMemoryFatalNonExitExceptionCatch",
-            "TestMemoryFatalContextActualColdRefusalAndCohort"
+            "TestMemoryFatalContextSharesSourceProcessWithEarlierRuntime",
+            "TestMemoryFatalSubprocessChild",
+            "TestMemoryBridgeNominalOOMAndCountErrors",
+            "TestMemoryBridgeDefaultExceptionAndCopiedOwner",
+            "TestProcessFatalPolicyDispatchesAcrossRuntimeOwners"
           ]
         },
         {

@@ -80,7 +80,7 @@ func TestMemoryFatalContextSharesSourceProcessWithEarlierRuntime(t *testing.T) {
 	smallObjectMust(t, e)
 	c, e := NewMemoryFatalContext(MemoryFatalContextConfig{Budget: b, Streams: streams})
 	smallObjectMust(t, e)
-	second, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, Process: p, FatalPolicy: c})
+	second, e := newUtilMemoryRuntime(umemory.RuntimeConfig{Budget: b, Process: p, FatalPolicy: c})
 	smallObjectMust(t, e)
 	smallObjectMust(t, second.SetMaxSize(1))
 	for _, r := range []*umemory.Runtime{first, second} {
@@ -109,7 +109,7 @@ func TestMemoryFatalSubprocessChild(t *testing.T) {
 	smallObjectMust(t, e)
 	c, e := NewMemoryFatalContext(MemoryFatalContextConfig{Budget: b, Streams: streams})
 	smallObjectMust(t, e)
-	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, FatalPolicy: c})
+	r, e := newUtilMemoryRuntime(umemory.RuntimeConfig{Budget: b, FatalPolicy: c})
 	smallObjectMust(t, e)
 	defer os.Stdout.WriteString("UNWOUND")
 	var region *arena.BytesRegion
