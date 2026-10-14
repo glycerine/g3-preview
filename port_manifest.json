@@ -167351,9 +167351,9 @@
       "path": "src/util/parray.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "platform_replacement",
       "go_targets": [
-        "pkg/ast/ast_expr_array.go",
+        "pkg/tactic/tactic_goal_ownership.go",
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
         "pkg/math/subpaving/fast_node.go",
@@ -167363,8 +167363,8 @@
         "pkg/math/subpaving/arbitrary_context_child.go"
       ],
       "tests": [
-        "TestASTExprArrayIndependentSnapshotAndOwnedValues",
-        "TestASTExprArrayStoppedReplacementKeepsOwningPrefix",
+        "TestTacticGoalNativeSlicesGrowCopyUpdateAndRelease",
+        "TestTacticGoalNativeSlicesKeepActualPublicationPrefix",
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFastNodeConstantIntervalViews",
         "TestHardwareNodeRetainedBoundViewsAndChildTrail",
@@ -167585,12 +167585,12 @@
         },
         {
           "name": "allocate/deallocate values, capacity, source 0/2/3/5/8 growth and full-capacity copying",
-          "status": "unported",
+          "status": "platform_replacement",
           "tests": []
         },
         {
           "name": "cell mk/del/inc/dec source 30-bit reference counter and iterative cleanup",
-          "status": "unported",
+          "status": "platform_replacement",
           "tests": []
         },
         {
@@ -167600,27 +167600,27 @@
         },
         {
           "name": "mk/del/copy including self retain-before-release and update counter reset",
-          "status": "unported",
+          "status": "platform_replacement",
           "tests": []
         },
         {
           "name": "size/empty and mutable get strict trail threshold16 in retained AST and subpaving configurations",
-          "status": "unported",
+          "status": "platform_replacement",
           "tests": []
         },
         {
           "name": "set/push_back/pop_back scalar and From alias overloads, shared-root inverse publication",
-          "status": "unported",
+          "status": "platform_replacement",
           "tests": []
         },
         {
           "name": "copy_values/get_values source replay and materialization",
-          "status": "unported",
+          "status": "platform_replacement",
           "tests": []
         },
         {
           "name": "unshare/unfold/reroot source trail reversals and preserved PUSH inverse index defect",
-          "status": "unported",
+          "status": "platform_replacement",
           "tests": []
         },
         {
@@ -167635,22 +167635,13 @@
         },
         {
           "name": "automatic source SASSERT/TRACE diagnostic routing and machine-address rendering",
-          "status": "unported",
+          "status": "platform_replacement",
           "tests": []
         },
         {
-          "name": "remaining AST-manager dependency-array and expression-array From/unshare/reroot callbacks, subpaving context integration and other template configurations",
-          "status": "unported",
+          "name": "AST-manager expression/dependency array wrappers reached by tactic goal use the goal's concrete native owning slices; five subpaving bound-array configurations use native copied slices",
+          "status": "platform_replacement",
           "tests": []
-        },
-        {
-          "name": "concrete AST expression-array owning native slice: empty construction, independent copy, indexed read/replacement, append/pop and ascending close with retained AST references",
-          "status": "partial",
-          "go_target": "pkg/ast/ast_expr_array.go",
-          "tests": [
-            "TestASTExprArrayIndependentSnapshotAndOwnedValues",
-            "TestASTExprArrayStoppedReplacementKeepsOwningPrefix"
-          ]
         },
         {
           "name": "Concrete tactic goal expression, proof and dependency arrays: independent native slice copy, append, set, shrink and ascending release",
@@ -167706,7 +167697,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "No generic Go persistent-array implementation remains. The retained tactic goal uses native owning slices with independent copies and has an explicit concrete platform-replacement credit. The standalone int32 stress workload and its dummy value-manager callbacks occur only in src/test/parray.cpp, so those concrete rows are reference-only. All five retained subpaving bound configurations have native copied-slice views that preserve root null slots, child snapshots, indexed replacement and borrowed bound identities; their owner contexts retain separate partial obligations. The concrete AST expression array now uses a native slice of ASTRef owners for direct copy/replacement/append/pop/release; expression From overloads and dependency arrays remain open. Source cell allocation, shared-root inverse publication, trail replay/reroot, allocator failure and TRACE/SASSERT behavior are not credited by these replacements. This source is not classified as dead."
+        "The only retained production instantiations are ast_manager expression/proof/dependency arrays used by tactic goal and five subpaving bound-array configurations. The tactic goal uses concrete native owning slices with independent copies; all five subpaving configurations use copied Go slices with borrowed bound identities. Source parray cell allocation, sharing/trail/reroot, allocator failure, address-bearing TRACE and internal assertions have no Go cell representation and are replaced by those native collections. Their owning goal/subpaving algorithms have separate source-unit obligations. The standalone int32 stress workload and dummy value-manager callbacks occur only in src/test/parray.cpp and are reference-only. No generic persistent-array adapter is retained."
       ]
     },
     {
