@@ -84,6 +84,9 @@ func (m *ArbitraryFloatManager) ToRational(x *ArbitraryFloat, qm *RationalManage
 // This is the reached private unpack body, including its literal special and
 // zero behavior. The rewriter's finite-input check belongs to that caller.
 func (m *ArbitraryFloatManager) unpackRationalNumeral(a *ArbitraryFloat, normalize bool, context integerAllocationInvocationContext) error {
+	if e := m.traceUnpackEntry(a, normalize); e != nil {
+		return e
+	}
 	zero, e := m.IsZero(a)
 	if e != nil || zero {
 		return e

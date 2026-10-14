@@ -42,11 +42,12 @@ func TestArbitraryFloatSBVTraceFractionalAndExactBranches(t *testing.T) {
 		}
 		inner := strings.Index(got, "to_sbv_mpq src/util/mpf.cpp:1214 ---------\nSBV: (")
 		final := strings.Index(got, "to_sbv_mpq src/util/mpf.cpp:1225 ---------\nSBV = "+tc.want+"\n")
-		blocks := 1
+		unpack := strings.Index(got, "unpack src/util/mpf.cpp:1923 ---------\nunpack ")
+		blocks := 2
 		if tc.inner {
-			blocks = 2
+			blocks = 3
 		}
-		if final < 0 || (inner >= 0) != tc.inner || tc.inner && (inner >= final || !strings.Contains(got, "\nsign="+tc.sign+" last=")) || strings.Count(got, "------------------------------------------------\n") != blocks {
+		if unpack < 0 || final <= unpack || (inner >= 0) != tc.inner || tc.inner && (inner <= unpack || inner >= final || !strings.Contains(got, "\nsign="+tc.sign+" last=")) || strings.Count(got, "------------------------------------------------\n") != blocks {
 			t.Fatalf("SBV trace branches for %v: %q", tc.value, got)
 		}
 	}

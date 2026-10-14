@@ -49,10 +49,14 @@ func TestArbitraryFloatRoundIntegralTraceBranches(t *testing.T) {
 			}
 			last = at
 		}
-		if strings.Count(got, "------------------------------------------------\n") != len(tc.lines) {
+		blocks := len(tc.lines)
+		if len(tc.lines) > 3 {
+			blocks++ // retained unpack TRACE precedes the raw A record
+		}
+		if strings.Count(got, "------------------------------------------------\n") != blocks {
 			t.Fatalf("%s integral trace block count: %q", tc.name, got)
 		}
-		if len(tc.lines) > 3 && (!strings.Contains(got, "src/util/mpf.cpp:1100 ---------\nA = [") || !strings.Contains(got, "src/util/mpf.cpp:1116 ---------\ndiv=")) {
+		if len(tc.lines) > 3 && (strings.Index(got, "unpack src/util/mpf.cpp:1923") <= strings.Index(got, "round_to_integral src/util/mpf.cpp:1050") || strings.Index(got, "unpack src/util/mpf.cpp:1923") >= strings.Index(got, "round_to_integral src/util/mpf.cpp:1100") || !strings.Contains(got, "src/util/mpf.cpp:1100 ---------\nA = [") || !strings.Contains(got, "src/util/mpf.cpp:1116 ---------\ndiv=")) {
 			t.Fatalf("%s integral raw/quotient records: %q", tc.name, got)
 		}
 		for _, part := range tc.parts {

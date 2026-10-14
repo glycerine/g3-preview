@@ -149582,6 +149582,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/util/numeral/mpf_unpack_trace.go",
+        "pkg/util/numeral/mpf_unpack_trace_test.go",
         "pkg/util/numeral/mpf_bitvector_trace.go",
         "pkg/util/numeral/mpf_bitvector_trace_test.go",
         "pkg/util/numeral/mpf_round_integral_trace.go",
@@ -149830,6 +149832,8 @@
         "pkg/util/numeral/mpf_sqrt_trace_test.go"
       ],
       "tests": [
+        "TestArbitraryFloatUnpackEntryTracePreMutationClasses",
+        "TestArbitraryFloatUnpackTraceRefusalBeforeMutation",
         "TestArbitraryFloatSBVTraceFractionalAndExactBranches",
         "TestArbitraryFloatIEEEBVTraceFiniteAndInfinity",
         "TestArbitraryFloatRoundIntegralTraceBranches",
@@ -150445,6 +150449,12 @@
       "methods_audited": true,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "mpf_manager::unpack pre-mutation decimal/format/classification TRACE record at mpf.cpp:1923-1928",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpf_unpack_trace.go",
+          "tests": ["TestArbitraryFloatUnpackEntryTracePreMutationClasses", "TestArbitraryFloatUnpackTraceRefusalBeforeMutation"]
+        },
         {
           "name": "mpf_manager::to_sbv_mpq fractional guard-bit and final rational TRACE at mpf.cpp:1214,1225; to_ieee_bv_mpz final integer TRACE at mpf.cpp:1252",
           "status": "ported",
@@ -151235,6 +151245,7 @@
         "Checked OwnedString output now belongs to OwnedString.AppendTo; NumericTextStream receives a native counted Go string through AppendString. Counted output preserves embedded NUL bytes and whole-field width/alignment; CString output independently stops at first NUL. Failed sentries check owner lifetime while preserving width and skipping payload conversion. Removed the stream method accepting OwnedString, so the stream no longer depends on that project text owner. See PORT_PROGRESS.md#native-counted-text-at-the-numeric-stream-boundary."
       ],
       "deviations": [
+        "Retained mpf_manager::unpack now emits its mpf_dbg record before zero classification or hidden-bit/denormal mutation. The owned ordinary float text, format widths, normalize flag, top and bottom exponent predicates/bounds, and zero predicate follow source insertion order. Focused trace-enabled and erased checks cover zero, normal and denormal values with both normalization choices; an injected formatter refusal preserves the original value before retry. The shared private unpack path adds this source block to reached SBV and integral-rounding traces. Whole-unit MPF ownership remains partial.",
         "Retained mpf_manager::to_sbv_mpq emits the mpf_dbg_sbv two-line decision record only when its signed shift exponent is negative, after the actual rounded integer increment and before rational output publication; it then emits mpf_dbg final rational text after optional sign negation. Retained to_ieee_bv_mpz emits its mpf_dbg integer output after finite or infinity assembly and before scoped biased-exponent source cleanup. Focused trace-enabled and erased tests cover positive/negative fractional rounding, the e>=0 shortcut, finite IEEE bits and infinity on CPUs 8-16; whole-unit MPF ownership remains partial.",
         "Retained mpf_manager::round_to_integral now emits X and final INTEGRAL, the subunit shortcut tie, unpacked raw A, shift/half-shift powers, quotient and remainder, and nearest-mode tie and increment decisions at their original source sites. Focused trace-enabled and erased checks cover zero and tie shortcuts plus below, exact and above half in the general branch; source-order and block-count checks pass on CPUs 8-16. Whole MPF ownership remains partial.",
         "Retained mpf_manager::sqrt emits entry X after its format assertion, unpacked A on the finite positive path, dec'ed after an inexact root's optional correction, and SQRT after shortcut or general completion. The result formatter runs after successful sqrt-scope source cleanup; formatting failures propagate. Focused trace-enabled and erased tests cover zero shortcut, exact 4 and inexact 2 with nested Round source order. Broader MPF ownership remains partial.",
