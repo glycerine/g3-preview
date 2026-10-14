@@ -2,8 +2,10 @@
 package ast
 
 import (
-	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
+
+	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestASTFloatingPointValueTableUsesActualMPFHashAndEquality(t *testing.T) {
@@ -83,6 +85,42 @@ func TestASTFloatingPointValueIDLiteralCanonicalization(t *testing.T) {
 	}
 	astFloatingPointConstructorRawGraph(t, m.numerals, p)
 	astTestMust(t, p.numeric.Del(&a))
+	astTestMust(t, m.Close())
+}
+
+// Source id_gen::recycle reads memory::is_out_of_memory even when the
+// duplicate MPF row itself needs no physical allocation.
+func TestASTFloatingPointValueIDDuplicateSkipsRecycleAfterRealOOM(t *testing.T) {
+	m := astTestManager(t)
+	_, e := m.RegisterArithmeticPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterBitVectorPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterFloatingPointPlugin()
+	astTestMust(t, e)
+	p := m.floatingPointPlugin
+	sig := unumeral.NewInt(19)
+	var value unumeral.ArbitraryFloat
+	astTestMust(t, p.numeric.SetComponents(&value, 8, 24, false, 7, &sig))
+	first, e := p.mkValueID(&value)
+	astTestMust(t, e)
+	r := p.numeric.RuntimeOwner()
+	astTestMust(t, r.SetMaxSize(1))
+	failed, failure := r.Allocate(8)
+	if failure == nil || failed != (umemory.Block{}) || !r.State().OutOfMemory {
+		t.Fatal("real process OOM flag was not published", failed, failure, r.State())
+	}
+	astTestMust(t, r.SetMaxSize(0))
+	duplicate, e := p.mkValueID(&value)
+	astTestMust(t, e)
+	if duplicate != first || p.nextID != first+2 || len(p.freeIDs) != 0 {
+		t.Fatal("source duplicate ID must be dropped after OOM", first, duplicate, p.nextID, p.freeIDs)
+	}
+	astTestMust(t, p.recycledValueID(first))
+	if len(p.freeIDs) != 0 || len(p.table) != 0 {
+		t.Fatal("source external deletion must also skip recycling after OOM", p.freeIDs, p.table)
+	}
+	astTestMust(t, p.numeric.Del(&value))
 	astTestMust(t, m.Close())
 }
 

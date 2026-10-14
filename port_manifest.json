@@ -123810,7 +123810,9 @@
         "pkg/math/polynomial/polynomial_id_gen.go",
         "pkg/sat/sat_clause_storage.go",
         "pkg/sat/sat_clause_idgen_test.go",
-        "pkg/ast/ast_core.go"
+        "pkg/ast/ast_core.go",
+        "pkg/ast/ast_fpa_value_binding.go",
+        "pkg/ast/ast_fpa_numeral.go"
       ],
       "tests": [
         "TestIDGeneratorSourceOrder",
@@ -123824,7 +123826,8 @@
         "TestSATClauseNativeIDFreeListAndLIFO",
         "TestSATClauseNativeIDRecycleRefusalKeepsClauseThenOOMSkips",
         "TestSATClauseIDBorrowedOOMProviderLifetime",
-        "TestASTIDRecycleReadsSharedProcessOutOfMemory"
+        "TestASTIDRecycleReadsSharedProcessOutOfMemory",
+        "TestASTFloatingPointValueIDDuplicateSkipsRecycleAfterRealOOM"
       ],
       "conditionals": [
         {
@@ -123925,14 +123928,17 @@
           "status": "ported",
           "go_target": "pkg/util/idgen/generator.go",
           "go_targets": [
-            "pkg/ast/ast_core.go"
+            "pkg/ast/ast_core.go",
+            "pkg/ast/ast_fpa_value_binding.go",
+            "pkg/ast/ast_fpa_numeral.go"
           ],
           "tests": [
             "TestIDGeneratorBudgetSourceGrowthAndReset",
             "TestIDGeneratorBudgetExactOverlapAndFailedPublication",
             "TestIDGeneratorBudgetReservationPrefixesAndOOMSkip",
             "TestIDGeneratorBudgetWarmEmbeddedValueAndCapacityBounds",
-            "TestASTIDRecycleReadsSharedProcessOutOfMemory"
+            "TestASTIDRecycleReadsSharedProcessOutOfMemory",
+            "TestASTFloatingPointValueIDDuplicateSkipsRecycleAfterRealOOM"
           ]
         },
         {
