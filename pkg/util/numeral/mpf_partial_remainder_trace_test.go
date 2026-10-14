@@ -99,6 +99,18 @@ func TestArbitraryFloatPartialRemainderReachedEndlFlushes(t *testing.T) {
 				t.Fatalf("partial remainder site %d: got %d body flushes, want %d: %q", tc.line, bodyFlushes, tc.want, w.events)
 			}
 		}
+		tieParts, deltaParts := false, false
+		for i := 0; i+5 < len(w.events); i++ {
+			if w.events[i] == "write:tie= " && (w.events[i+1] == "write:0" || w.events[i+1] == "write:1") && w.events[i+2] == "write:; >tie= " && (w.events[i+3] == "write:0" || w.events[i+3] == "write:1") && w.events[i+4] == "write:\n" && w.events[i+5] == "flush" {
+				tieParts = true
+			}
+			if w.events[i] == "write:exp_delta=" && w.events[i+1] != "write:" && w.events[i+2] == "write:\n" && w.events[i+3] == "flush" {
+				deltaParts = true
+			}
+		}
+		if !tieParts || !deltaParts {
+			t.Fatalf("partial remainder scalar source insertions: tie=%v delta=%v events=%q", tieParts, deltaParts, w.events)
+		}
 	}
 	serviceMust(t, m.Del(&x))
 	serviceMust(t, m.Del(&y))

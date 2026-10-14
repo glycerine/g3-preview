@@ -2,8 +2,6 @@
 package numeral
 
 import (
-	"strconv"
-
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"math"
@@ -164,7 +162,7 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 		if e != nil {
 			return e
 		}
-		m.tracePartialRemainderText(1322, "tie= "+traceBoolDigit(tie)+"; >tie= "+traceBoolDigit(more))
+		m.tracePartialRemainderTie(tie, more)
 		increment := more
 		if tie {
 			odd, e := z.IsOdd(q)
@@ -259,7 +257,7 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 	if e != nil {
 		return e
 	}
-	m.tracePartialRemainderText(1365, "exp_delta="+strconv.FormatInt(delta, 10))
+	m.tracePartialRemainderExponentDelta(delta)
 	if modularSourceDebug && !(delta > -2147483648 && delta <= 2147483647) {
 		return ErrIntegerAssertion
 	}

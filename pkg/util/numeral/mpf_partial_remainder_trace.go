@@ -53,17 +53,30 @@ func (m *ArbitraryFloatManager) tracePartialRemainderEntry(x, y *ArbitraryFloat,
 	return formatError
 }
 
-func (m *ArbitraryFloatManager) tracePartialRemainderText(line int, value string) {
+func (m *ArbitraryFloatManager) tracePartialRemainderTie(tie, more bool) {
 	tags := m.floatTraceTags()
 	if !tags.ShouldTrace("mpf_dbg_rem") {
 		return
 	}
-	_ = tags.EmitConditional("mpf_dbg_rem", "partial_remainder", "src/util/mpf.cpp", line,
+	_ = tags.EmitConditional("mpf_dbg_rem", "partial_remainder", "src/util/mpf.cpp", 1322,
 		func() bool { return true }, func(w io.Writer) error {
-			if e := writeNumeralDisplayPart(w, value); e != nil {
-				return e
+			for _, part := range [...]string{"tie= ", traceBoolDigit(tie), "; >tie= ", traceBoolDigit(more)} {
+				if e := writeNumeralDisplayPart(w, part); e != nil {
+					return e
+				}
 			}
 			return diagnostic.WriteTraceEndl(w)
+		})
+}
+
+func (m *ArbitraryFloatManager) tracePartialRemainderExponentDelta(delta int64) {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg_rem") {
+		return
+	}
+	_ = tags.EmitConditional("mpf_dbg_rem", "partial_remainder", "src/util/mpf.cpp", 1365,
+		func() bool { return true }, func(w io.Writer) error {
+			return writePartialRemainderScalarLine(w, "exp_delta=", strconv.FormatInt(delta, 10))
 		})
 }
 
