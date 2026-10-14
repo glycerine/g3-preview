@@ -4,6 +4,8 @@ package interval
 
 import (
 	"bytes"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -103,5 +105,56 @@ func TestArbitraryRootRetainedShortTraceAfterCertifiedBounds(t *testing.T) {
 	writer.Reset()
 	if err = root.Bounds(a, 1, precision, lower, upper); err != nil || writer.Len() != 0 {
 		t.Fatalf("easy root trace: %v, %q", err, writer.String())
+	}
+	if err = m.SetInt32(a, 8); err != nil {
+		t.Fatal(err)
+	}
+	tags.Enable("nth_root")
+	tags.Enable("nth_root_bug")
+	writer.flushes = 0
+	if err = root.Bounds(a, 3, precision, lower, upper); err != nil {
+		t.Fatal(err)
+	}
+	aText, err = m.ToString(a)
+	if err != nil {
+		t.Fatal(err)
+	}
+	loText, err = m.ToString(lower)
+	if err != nil {
+		t.Fatal(err)
+	}
+	hiText, err = m.ToString(upper)
+	if err != nil {
+		t.Fatal(err)
+	}
+	record := func(tag, function string, line int, body string) string {
+		return "-------- [" + tag + "] " + function + " src/math/interval/interval_def.h:" + strconv.Itoa(line) + " ---------\n" +
+			body + "------------------------------------------------\n"
+	}
+	tail := record("nth_root_bug", "nth_root_pos", 344,
+		"Assuming upper\nA: "+aText+"\nhi: "+hiText+"\nlo: "+hiText+"\n") +
+		"[nth-root] (" + aText + ")^(1/3) >= " + loText + "\n" +
+		"[nth-root] (" + aText + ")^(1/3) <= " + hiText + "\n"
+	got := writer.String()
+	if !strings.HasSuffix(got, tail) {
+		t.Fatalf("bound check and short trace tail:\n got %q\nwant suffix %q", got, tail)
+	}
+	iterations := strings.TrimSuffix(got, tail)
+	header := "-------- [nth_root] approx_nth_root src/math/interval/interval_def.h:315 ---------\n"
+	parts := strings.Split(iterations, header)
+	if len(parts) < 2 || parts[0] != "" || writer.flushes != len(parts)-1+4 {
+		t.Fatalf("iteration record/flush count: records %d, flushes %d", len(parts)-1, writer.flushes)
+	}
+	for i, part := range parts[1:] {
+		if !strings.HasSuffix(part, "------------------------------------------------\n") {
+			t.Fatalf("iteration %d lacks footer: %q", i, part)
+		}
+		body := strings.TrimSuffix(part, "------------------------------------------------\n")
+		lines := strings.Split(body, "\n")
+		for j, prefix := range []string{"A:       " + aText, "x:       ", "x_prime: ", "d:       "} {
+			if len(lines) != 5 || !strings.HasPrefix(lines[j], prefix) || len(lines[j]) <= len(prefix) && j != 0 {
+				t.Fatalf("iteration %d field %d: %q", i, j, body)
+			}
+		}
 	}
 }

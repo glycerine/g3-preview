@@ -336,6 +336,9 @@ func (r ArbitraryRoot) approx(a *numeral.ArbitraryFloat, n uint32, precision, x 
 		if err = m.Abs(d, d); err != nil {
 			return err
 		}
+		if err = r.traceNthRootIteration(a, x, xPrime, d); err != nil {
+			return err
+		}
 		if err = m.Swap(x, xPrime); err != nil {
 			return err
 		}
@@ -355,6 +358,9 @@ func (r ArbitraryRoot) positiveBounds(a *numeral.ArbitraryFloat, n uint32, preci
 		return err
 	}
 	if err := r.aDivXPower(a, hi, n-1, true, lo); err != nil {
+		return err
+	}
+	if err := r.traceNthRootBoundCheck(a, hi); err != nil {
 		return err
 	}
 	cmp, err := arbitraryRootCompare(m, lo, hi)

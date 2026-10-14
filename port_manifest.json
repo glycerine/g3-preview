@@ -36219,6 +36219,13 @@
           ]
         },
         {
+          "name": "Reached config_mpf Newton iteration and bound-check TRACE records, including source hi-under-lo display (interval_def.h:315-320,344-348)",
+          "status": "ported",
+          "go_target": "pkg/math/interval/arbitrary_root_trace.go",
+          "go_targets": ["pkg/math/interval/arbitrary_root_trace_test.go"],
+          "tests": ["TestArbitraryRootRetainedShortTraceAfterCertifiedBounds"]
+        },
+        {
           "name": "Reached config_mpf nth_root_trace STRACE after positive Newton bounds, before negative-sign reversal (interval_def.h:208-210)",
           "status": "ported",
           "go_target": "pkg/math/interval/arbitrary_root_trace.go",
@@ -176390,6 +176397,13 @@
           "tests": ["TestArbitraryRootRetainedShortTraceAfterCertifiedBounds"]
         },
         {
+          "name": "Reached config_mpf Newton iteration and bound-check TRACE records, including source hi-under-lo display (interval_def.h:315-320,344-348)",
+          "status": "ported",
+          "go_target": "pkg/math/interval/arbitrary_root_trace.go",
+          "go_targets": ["pkg/math/interval/arbitrary_root_trace_test.go"],
+          "tests": ["TestArbitraryRootRetainedShortTraceAfterCertifiedBounds"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -176948,6 +176962,13 @@
         },
         {
           "name": "Reached config_mpf nth_root_trace STRACE after positive Newton bounds, before negative-sign reversal (interval_def.h:208-210)",
+          "status": "ported",
+          "go_target": "pkg/math/interval/arbitrary_root_trace.go",
+          "go_targets": ["pkg/math/interval/arbitrary_root_trace_test.go"],
+          "tests": ["TestArbitraryRootRetainedShortTraceAfterCertifiedBounds"]
+        },
+        {
+          "name": "Reached config_mpf Newton iteration and bound-check TRACE records, including source hi-under-lo display (interval_def.h:315-320,344-348)",
           "status": "ported",
           "go_target": "pkg/math/interval/arbitrary_root_trace.go",
           "go_targets": ["pkg/math/interval/arbitrary_root_trace_test.go"],
