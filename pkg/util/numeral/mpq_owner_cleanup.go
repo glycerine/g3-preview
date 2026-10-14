@@ -38,6 +38,10 @@ func (m *RationalManager) CloseChecked() error {
 		m.CleanupCauseField = e
 		return m
 	}
+	if e := m.CleanupAddIntTemporary(); e != nil {
+		m.CleanupCauseField = e
+		return m
+	}
 	if m.SourceFinalizing && !m.SourceFinalized && !m.sourceGuard {
 		if e := m.SourceFinalize(); e != nil {
 			m.CleanupCauseField = e

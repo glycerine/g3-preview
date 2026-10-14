@@ -3,6 +3,7 @@ package numeral
 
 import (
 	"errors"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 var ErrRationalNotInteger = errors.New("mpnum: operation requires integer-valued rational operands")
@@ -37,11 +38,10 @@ func (m *RationalManager) AddInt(a *Rational, b *Int, out *Rational) (err error)
 				m.traceMPQMixed(a, b, out, "+", "rat_mpq", false, false)
 			}
 		}()
-		var local Int
 		tmp := &m.AddTmp1
 		if m.Synchronized {
-			tmp = &local
-			defer m.Z.Del(&local)
+			m.addIntPending = true
+			tmp = &m.addIntTemporary
 		}
 		if e := m.Z.Mul(b, &a.Den, tmp); e != nil {
 			return e
@@ -55,7 +55,29 @@ func (m *RationalManager) AddInt(a *Rational, b *Int, out *Rational) (err error)
 		if e := m.normalize(out); e != nil {
 			return e
 		}
+		if m.Synchronized {
+			if _, e := sourceNumeralDel(m.Z, tmp); e != nil {
+				return e
+			}
+			m.addIntPending = false
+		}
 	}
+	return nil
+}
+
+// CleanupAddIntTemporary completes the owning cleanup of a synchronized
+// rat_add scratch value after its source body or explicit del stops.
+func (m *RationalManager) CleanupAddIntTemporary() error {
+	if m == nil || m.self != m || m.Z == nil {
+		return umemory.ErrRuntimeOwner
+	}
+	if !m.addIntPending {
+		return nil
+	}
+	if e := m.Z.Del(&m.addIntTemporary); e != nil {
+		return e
+	}
+	m.addIntPending = false
 	return nil
 }
 

@@ -430,6 +430,7 @@ func TestRationalOpsAllPredictableFailurePrefixes(t *testing.T) {
 					qopsAuditLiveOwnership(t, m, []*Int{&a.Num, &a.Den, &b.Num, &b.Den, &c.Num, &c.Den, &out.Num, &out.Den, &z})
 				}
 				budget.FailAfter(-1)
+				qopsMust(t, m.CleanupAddIntTemporary())
 				if e != nil {
 					if !numericPhysicalReservationRefusal(e) {
 						t.Fatal("unexpected failure", operation, prefix, e)
@@ -541,6 +542,9 @@ func TestRationalOpsAllPredictableFailurePrefixes(t *testing.T) {
 func qopsAuditLiveOwnership(t *testing.T, m *RationalManager, public []*Int) {
 	t.Helper()
 	roots := append([]*Int(nil), public...)
+	if m.addIntPending {
+		roots = append(roots, &m.addIntTemporary)
+	}
 	scratch := []*Int{&m.NTmp, &m.AddTmp1, &m.AddTmp2, &m.AddMulTmp.Num, &m.AddMulTmp.Den, &m.LtTmp1.Num, &m.LtTmp1.Den, &m.LtTmp2.Num, &m.LtTmp2.Den}
 	for _, n := range scratch {
 		if m.Synchronized && n.Cell != 0 && n.Cell != m.Z.FailedRef {

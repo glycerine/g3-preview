@@ -114851,7 +114851,9 @@
             "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
             "TestRationalOpsSourceComponentAliasActionOrder",
             "TestRationalOpsLargeLimbScratchBranchesAndWarm",
-            "TestRationalOpsAllPredictableFailurePrefixes"
+            "TestRationalOpsAllPredictableFailurePrefixes",
+            "TestSynchronizedAddIntRetainsScratchAfterSourceBodyStops",
+            "TestSynchronizedAddIntDeletesScratchAfterSuccess"
           ]
         },
         {

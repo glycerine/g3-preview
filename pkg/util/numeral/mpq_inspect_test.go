@@ -506,6 +506,7 @@ func TestRationalInspectionEveryFailurePrefix(t *testing.T) {
 				// test audit lists only known concrete ownership fields, never all live slots.
 				qopsAuditLiveOwnership(t, m, []*Int{&a.Num, &a.Den, &out.Num, &out.Den, &z, &integerOut, &bank[0], &bank[1]})
 				b.FailAfter(-1)
+				qopsMust(t, m.CleanupAddIntTemporary())
 				if e != nil {
 					failures++
 					if !numericPhysicalReservationRefusal(e) || (operation < 7 && a != beforeA) || z != beforeZ {
