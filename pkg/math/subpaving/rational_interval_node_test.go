@@ -166,12 +166,27 @@ func TestRationalIntervalLiveNodeBoundsAndOwnedCopy(t *testing.T) {
 	if shown.String() != "[-1, 0)" {
 		t.Fatal("negative divided live view", shown.String())
 	}
+	must(result.Div(owned, view))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "(-oo, +oo)" {
+		t.Fatal("open-zero live denominator", shown.String())
+	}
+	must(m.SetInt32(&lo, 1))
+	must(owned.SetFinite(&lo, &hi, false, false))
+	must(result.Div(view, owned))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "(0, 2]" {
+		t.Fatal("live numerator quotient", shown.String())
+	}
 	if err := view.Neg(owned); !errors.Is(err, arena.ErrInvalidSlot) {
 		t.Fatalf("borrowed result mutation: %v", err)
 	}
 	if err := result.Power(view, 2); !errors.Is(err, arena.ErrInvalidSlot) {
 		t.Fatalf("unwired power operand: %v", err)
 	}
+	must(m.SetInt32(&lo, -2))
 	must(root.PushBound(0, &lo, true, true))
 	must(m.SetInt32(&lo, -3))
 	must(m.SetInt32(&hi, 3))

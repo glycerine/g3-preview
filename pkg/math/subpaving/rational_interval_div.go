@@ -13,10 +13,10 @@ import (
 // the destination, matching the source precondition; denominator aliasing is
 // safe because endpoint products publish from owned scratch numerals.
 func (v *RationalInterval) Div(num, den *RationalInterval) (err error) {
-	if err = v.pair(num); err != nil {
+	if _, _, err = v.pairView(num); err != nil {
 		return err
 	}
-	if err = v.pair(den); err != nil {
+	if _, _, err = v.pairView(den); err != nil {
 		return err
 	}
 	if v == num {
@@ -47,28 +47,6 @@ func (v *RationalInterval) Div(num, den *RationalInterval) (err error) {
 	if err != nil {
 		return err
 	}
-	e := interval.RationalExtended{Numbers: v.numbers}
-	negative, err := e.IsNeg(&den.upper, den.upperKind())
-	if err != nil {
-		return err
-	}
-	upperZero, err := e.IsZero(&den.upper, den.upperKind())
-	if err != nil {
-		return err
-	}
-	lowerPositive, err := e.IsPos(&den.lower, den.lowerKind())
-	if err != nil {
-		return err
-	}
-	lowerZero, err := e.IsZero(&den.lower, den.lowerKind())
-	if err != nil {
-		return err
-	}
-	dn := negative || upperZero && den.upperOpen
-	dp := lowerPositive || lowerZero && den.lowerOpen
-	if !dn && !dp {
-		return interval.ErrExtendedDomain
-	}
 	a, b, err := num.endpoints()
 	if err != nil {
 		return err
@@ -76,6 +54,28 @@ func (v *RationalInterval) Div(num, den *RationalInterval) (err error) {
 	c, d, err := den.endpoints()
 	if err != nil {
 		return err
+	}
+	e := interval.RationalExtended{Numbers: v.numbers}
+	negative, err := e.IsNeg(d.value, d.kind)
+	if err != nil {
+		return err
+	}
+	upperZero, err := e.IsZero(d.value, d.kind)
+	if err != nil {
+		return err
+	}
+	lowerPositive, err := e.IsPos(c.value, c.kind)
+	if err != nil {
+		return err
+	}
+	lowerZero, err := e.IsZero(c.value, c.kind)
+	if err != nil {
+		return err
+	}
+	dn := negative || upperZero && den.upperOpen
+	dp := lowerPositive || lowerZero && den.lowerOpen
+	if !dn && !dp {
+		return interval.ErrExtendedDomain
 	}
 	lower, upper := numeral.NewRational(), numeral.NewRational()
 	defer func() { err = errors.Join(err, v.numbers.Del(&lower), v.numbers.Del(&upper)) }()

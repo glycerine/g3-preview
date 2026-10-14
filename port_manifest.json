@@ -52108,11 +52108,12 @@
           ]
         },
         {
-          "name": "Concrete config_mpq interval division six sign branches, open-zero and infinite denominators, zero numerator, denominator alias and numerator alias guard; source interval_bug TRACE records remain open (src/math/interval/interval_def.h:1672-1849)",
+          "name": "Concrete config_mpq interval division with live borrowed operands, six sign branches, open-zero and infinite denominators, zero numerator, denominator alias and numerator alias guard; source interval_bug TRACE records remain open (src/math/interval/interval_def.h:1672-1849)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/rational_interval_div.go",
           "tests": [
-            "TestSubpavingRationalIntervalDivSixSignAndOpenZeroBranches"
+            "TestSubpavingRationalIntervalDivSixSignAndOpenZeroBranches",
+            "TestRationalIntervalLiveNodeBoundsAndOwnedCopy"
           ]
         },
         {
