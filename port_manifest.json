@@ -118176,15 +118176,23 @@
           ]
         },
         {
-          "name": "selected concrete buffer<rational> with initial raw storage for 16 elements, doubling relocation, placement copy construction before position publication, borrowed coefficient access and ascending destruction (src/util/buffer.h:29-75,90-96,146-151,194-210; src/util/rational.h:41-43,67; src/ast/rewriter/poly_rewriter_def.h:570-586)",
-          "status": "partial",
+          "name": "Concrete AST BV polynomial buffer<rational> push, indexed borrow and ascending destruction with owned values; native typed slice replaces inline raw storage and relocation (src/util/buffer.h:29-75,90-96,146-151,194-210; src/ast/rewriter/poly_rewriter_def.h:570-586)",
+          "status": "platform_replacement",
           "go_target": "pkg/util/numeral/rational_buffer.go",
+          "go_targets": ["pkg/ast/ast_bv_polynomial_add_numerals.go", "pkg/ast/rewriter/bv_polynomial_add_core.go"],
           "tests": [
             "TestRationalBuffer16CopiesAndSliceGrowth",
             "TestRationalBuffer16SourceDestructionStopsBeforeLaterElements",
             "TestRationalBuffer16ConstructionAndShallowCopyGuards",
-            "TestRationalBuffer16EveryActualCopyReservation"
+            "TestRationalBuffer16EveryActualCopyReservation",
+            "TestBVPolynomialNonflatAdditionCollectsAndCancelsCoefficients",
+            "TestBVPolynomialNonflatAdditionEveryColdReservation"
           ]
+        },
+        {
+          "name": "Remaining concrete buffer<rational> consumers in arithmetic poly rewriter, recover_01 and Fourier-Motzkin tactics (src/ast/rewriter/arith_rewriter.cpp:1657; src/tactic/arith/recover_01_tactic.cpp:232; src/tactic/arith/fm_tactic.cpp:994)",
+          "status": "unported",
+          "tests": []
         },
         {
           "name": "AST label construction and recognition use native typed Go parameter and symbol slices",
