@@ -23,12 +23,16 @@ func (m *RationalManager) CloseChecked() error {
 	if m == nil || m.self != m {
 		return umemory.ErrRuntimeOwner
 	}
-	if m.fusedExecuting || m.Z != nil && (m.Z.numericCallerExecuting() || m.Z.rationalServiceReadCallbackActive() || m.Z.conversionCallerExecuting() || m.Z.CopyAllocation.Executing || m.Z.NormalizationExecuting) || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfLifecycleCallbackActive() || (m.Z != nil && m.Z.mpfBorrowedSourceCallbackActive()) {
+	if m.fusedExecuting || m.hwfExecuting || m.Z != nil && (m.Z.numericCallerExecuting() || m.Z.rationalServiceReadCallbackActive() || m.Z.conversionCallerExecuting() || m.Z.CopyAllocation.Executing || m.Z.NormalizationExecuting) || (m.mpfParent != nil && m.mpfParent.formatInvocationExecuting()) || m.mpfLifecycleCallbackActive() || (m.Z != nil && m.Z.mpfBorrowedSourceCallbackActive()) {
 		return ErrNumericPending
 	}
 	if m.closed {
 		m.CleanupCauseField = nil
 		return nil
+	}
+	if e := m.CleanupHWFConversion(); e != nil {
+		m.CleanupCauseField = e
+		return m
 	}
 	if e := m.CleanupParserTemporaries(); e != nil {
 		m.CleanupCauseField = e

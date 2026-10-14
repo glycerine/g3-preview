@@ -123261,6 +123261,7 @@
         "TestHardwareFloatBorrowedRationalOwnerLifecycle",
         "TestHardwareFloatSourceToRationalBitDecomposition",
         "TestHardwareFloatSourceToRationalOwnerGuards",
+        "TestHardwareFloatToRationalScopedIntegersRetainReverseCleanup",
         "TestHardwareFloatRationalStringMatchesSourceConversion",
         "TestHardwareFloatRationalStringSourceFiniteGuard",
         "TestHardwareFloatSourceScientificTraceDisplay",
@@ -123688,7 +123689,8 @@
           "go_target": "pkg/util/numeral/hwf_rational_output.go",
           "tests": [
             "TestHardwareFloatSourceToRationalBitDecomposition",
-            "TestHardwareFloatSourceToRationalOwnerGuards"
+            "TestHardwareFloatSourceToRationalOwnerGuards",
+            "TestHardwareFloatToRationalScopedIntegersRetainReverseCleanup"
           ]
         },
         {
@@ -123768,6 +123770,7 @@
         "TestHardwareFloatBorrowedRationalOwnerLifecycle",
         "TestHardwareFloatSourceToRationalBitDecomposition",
         "TestHardwareFloatSourceToRationalOwnerGuards",
+        "TestHardwareFloatToRationalScopedIntegersRetainReverseCleanup",
         "TestHardwareFloatRationalStringMatchesSourceConversion",
         "TestHardwareFloatRationalStringSourceFiniteGuard",
         "TestHardwareFloatSourceScientificTraceDisplay",
@@ -123843,7 +123846,8 @@
           "go_target": "pkg/util/numeral/hwf_rational_output.go",
           "tests": [
             "TestHardwareFloatSourceToRationalBitDecomposition",
-            "TestHardwareFloatSourceToRationalOwnerGuards"
+            "TestHardwareFloatSourceToRationalOwnerGuards",
+            "TestHardwareFloatToRationalScopedIntegersRetainReverseCleanup"
           ]
         },
         {
