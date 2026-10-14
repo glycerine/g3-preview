@@ -25,6 +25,35 @@ func TestFastBoundTimestampSourceExceptionAfterPublication(t *testing.T) {
 	}
 }
 
+func TestFastContextRelevanceCatchesMPFFOverflow(t *testing.T) {
+	m, c, value, root := fastMonomialFixture(t, []bool{false})
+	if err := c.updateEpsilon(20); err != nil {
+		t.Fatal(err)
+	}
+	if err := m.SetMin(value); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.PropagateBound(root, 0, value, true, false); err != nil {
+		t.Fatal(err)
+	}
+	if err := m.SetMax(value); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.PropagateBound(root, 0, value, false, false); err != nil {
+		t.Fatal(err)
+	}
+	if err := m.SetInt32(value, 0); err != nil {
+		t.Fatal(err)
+	}
+	if err := m.SetRounding(true); err != nil {
+		t.Fatal(err)
+	}
+	relevant, err := c.RelevantNewBound(root, 0, value, true, false)
+	if err != nil || relevant || !c.arithmeticFailed {
+		t.Fatal("MPFF overflow must take the source arithmetic-failed catch", relevant, err, c.arithmeticFailed)
+	}
+}
+
 func TestSubpavingFastContextBoundFlowAndRelevance(t *testing.T) {
 	budget := arena.NewBudget(1 << 28)
 	cfg := numeral.DefaultFastFloatConfig(arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: budget}})
