@@ -1,0 +1,170 @@
+package tactic
+
+import (
+	"bytes"
+	"errors"
+	"math"
+	"testing"
+
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/math/subpaving"
+	goaltactic "github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/params"
+	"github.com/glycerine/g3/pkg/util/statistics"
+	"github.com/glycerine/g3/pkg/util/symbol"
+)
+
+func TestRationalExprConverterExactLeafGoalAndCleanup(t *testing.T) {
+	b := arena.NewBudget(1 << 27)
+	integers := numeral.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}
+	qm, err := numeral.NewRationalManager(numeral.RationalConfig{Integers: integers})
+	if err != nil {
+		t.Fatal(err)
+	}
+	sy, err := symbol.NewManager(symbol.Config{Budget: b})
+	if err != nil {
+		t.Fatal(err)
+	}
+	q, err := numeral.NewRationalService(numeral.RationalServiceConfig{Integers: integers})
+	if err != nil {
+		t.Fatal(err)
+	}
+	m, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b})
+	if err != nil {
+		t.Fatal(err)
+	}
+	family, err := m.RegisterArithmeticPlugin()
+	if err != nil {
+		t.Fatal(err)
+	}
+	sort, err := m.MkFamilySort(family, 0, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pc, err := params.NewParamsContext(sy, q, params.ParamsConfig{Budget: b})
+	if err != nil {
+		t.Fatal(err)
+	}
+	p, err := pc.NewValue()
+	if err != nil {
+		t.Fatal(err)
+	}
+	depth := "max_depth"
+	if err := pc.SetUIntName(&p, &depth, 0); err != nil {
+		t.Fatal(err)
+	}
+	engine, err := NewRationalEngine(&control.Reslimit{Limit: 1000}, qm, pc, &p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	converter, err := NewRationalExprConverter(m, engine, qm)
+	if err != nil {
+		t.Fatal(err)
+	}
+	goal, err := goaltactic.NewGoal(m, false, false, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	value, err := q.NewValue()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var n, d numeral.Int
+	t.Cleanup(func() {
+		for _, e := range []error{goal.Close(), converter.Close(), engine.Close(), qm.Z.Del(&d), qm.Z.Del(&n), pc.Del(&p), pc.Close(), q.Del(&value), m.Close(), q.Close(), sy.Close(), qm.CloseChecked()} {
+			if e != nil {
+				t.Error(e)
+			}
+		}
+		if b.Used() != 0 {
+			t.Error("rational tactic owner roots", b.Used())
+		}
+	})
+	xName, err := sy.Intern("x")
+	if err != nil {
+		t.Fatal(err)
+	}
+	x, err := m.MkConst(xName, sort)
+	if err != nil {
+		t.Fatal(err)
+	}
+	variable, err := converter.InternalizeTerm(x, &n, &d)
+	if err != nil || variable == math.MaxUint32 {
+		t.Fatal("arithmetic leaf", variable, err)
+	}
+	if got, err := qm.Z.String(&n); err != nil || got != "1" {
+		t.Fatal("variable coefficient", got, err)
+	}
+	if err := q.SetString(&value, "3/2"); err != nil {
+		t.Fatal(err)
+	}
+	threshold, err := m.ArithmeticNumeral(&value, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, err := converter.InternalizeTerm(threshold, &n, &d); err != nil || got != math.MaxUint32 {
+		t.Fatal("exact rational numeral", got, err)
+	}
+	if got, err := qm.Z.String(&n); err != nil || got != "3" {
+		t.Fatal("numerator", got, err)
+	}
+	if got, err := qm.Z.String(&d); err != nil || got != "2" {
+		t.Fatal("denominator", got, err)
+	}
+	le, err := m.MkFamilyApp(family, 2, nil, []ast.ASTHandle{x, threshold})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := goal.Assert(le); err != nil {
+		t.Fatal(err)
+	}
+	notLE, err := m.MkNot(le)
+	if err != nil {
+		t.Fatal(err)
+	}
+	disjunction, err := m.MkOr(le, notLE)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := goal.Assert(disjunction); err != nil {
+		t.Fatal(err)
+	}
+	if err := converter.SearchGoal(goal); err != nil {
+		t.Fatal("MPQ goal search", err)
+	}
+	context, err := engine.Context()
+	if err != nil {
+		t.Fatal(err)
+	}
+	root, err := context.Root()
+	if err != nil {
+		t.Fatal(err)
+	}
+	view, err := subpaving.NewRationalInterval(qm)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := view.SetConstant(root, variable); err != nil {
+		t.Fatal(err)
+	}
+	var out bytes.Buffer
+	if err := view.Display(&out); err != nil || out.String() != "(-oo, 3/2]" {
+		t.Fatal("exact searched bound", out.String(), err)
+	}
+	if err := view.Close(); err != nil {
+		t.Fatal(err)
+	}
+	st := statistics.New()
+	if err := engine.CollectStatistics(st); err != nil || st.Size() < 2 || st.Key(0) != "new bounds" || st.UintValue(0) != 1 || st.Key(1) != "nodes" || st.UintValue(1) != 1 {
+		t.Fatal("source goal statistics", err)
+	}
+	if err := converter.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := converter.InternalizeTerm(x, &n, &d); !errors.Is(err, arena.ErrClosed) {
+		t.Fatal("closed converter", err)
+	}
+}

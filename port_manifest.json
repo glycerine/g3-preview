@@ -54088,14 +54088,17 @@
         "pkg/math/subpaving/tactic/arbitrary_expr_converter_test.go",
         "pkg/math/subpaving/tactic/fast_expr_converter.go",
         "pkg/math/subpaving/tactic/fast_goal_internalize.go",
-        "pkg/math/subpaving/tactic/fast_expr_converter_test.go"
+        "pkg/math/subpaving/tactic/fast_expr_converter_test.go",
+        "pkg/math/subpaving/tactic/rational_expr_converter.go",
+        "pkg/math/subpaving/tactic/rational_expr_converter_test.go"
       ],
       "tests": [
         "TestHardwareExprConverterTerms",
         "TestArbitraryExprConverterTermsAndClause",
         "TestArbitraryExprConverterSearchSimpleGoal",
         "TestFastExprConverterTermsAndClause",
-        "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats"
+        "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats",
+        "TestRationalExprConverterExactLeafGoalAndCleanup"
       ],
       "assertions": [
         {
@@ -54137,7 +54140,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Concrete config_mpq numeral and variable leaves, to_real, cancellation checkpoint and source arithmetic refusal categories; compound arithmetic and cache remain open",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/tactic/rational_expr_converter.go",
+          "tests": [
+            "TestRationalExprConverterExactLeafGoalAndCleanup"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": [
         "Concrete HWF and MPF context specializations now implement numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache, AST cancellation checkpoint and source arithmetic refusal categories. MPF formatted zero is rejected by the source f2n wrapper, including a zero sum constant. Zero-degree monomials and full tactic ownership/integration remain open.",
@@ -54195,6 +54207,8 @@
         "pkg/math/subpaving/tactic/hardware_engine.go",
         "pkg/math/subpaving/tactic/rational_engine.go",
         "pkg/math/subpaving/tactic/rational_engine_test.go",
+        "pkg/math/subpaving/tactic/rational_expr_converter.go",
+        "pkg/math/subpaving/tactic/rational_expr_converter_test.go",
         "pkg/math/subpaving/tactic/arbitrary_engine.go",
         "pkg/math/subpaving/tactic/arbitrary_engine_test.go",
         "pkg/math/subpaving/tactic/goal_internalize.go",
@@ -54216,6 +54230,7 @@
         "TestSubpavingTacticOptionSelectionAndDescriptions",
         "TestHardwareExprConverterTerms",
         "TestRationalEngineSelectionSearchAndCleanup",
+        "TestRationalExprConverterExactLeafGoalAndCleanup",
         "TestArbitraryEngineSelectedContextAndPartialCleanup",
         "TestArbitraryExprConverterTermsAndClause",
         "TestArbitraryExprConverterSearchSimpleGoal",
@@ -54226,6 +54241,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete MPQ inequality and clause internalization plus goal-order search for arithmetic leaves; compound term conversion and full tactic application remain open (src/math/subpaving/tactic/subpaving_tactic.cpp:128-190)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/tactic/rational_expr_converter.go",
+          "tests": [
+            "TestRationalExprConverterExactLeafGoalAndCleanup"
+          ]
+        },
         {
           "name": "Concrete MPQ engine branch constructs and owns selected rational context while borrowing numeral manager and resource limit (src/math/subpaving/tactic/subpaving_tactic.cpp:109-120)",
           "status": "ported",

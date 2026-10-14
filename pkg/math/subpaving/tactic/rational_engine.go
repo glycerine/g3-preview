@@ -19,6 +19,7 @@ var ErrRationalEngineSelection = errors.New("subpaving tactic: selected numeral 
 type RationalEngine struct {
 	self    *RationalEngine
 	context *subpaving.RationalContext
+	numbers *numeral.RationalManager
 	options Options
 	closed  bool
 }
@@ -38,7 +39,7 @@ func NewRationalEngine(limit *control.Reslimit, numbers *numeral.RationalManager
 	if context == nil {
 		return nil, cause
 	}
-	e := &RationalEngine{context: context, options: selected}
+	e := &RationalEngine{context: context, numbers: numbers, options: selected}
 	e.self = e
 	return e, cause
 }
@@ -50,7 +51,7 @@ func (e *RationalEngine) check() error {
 	if e.closed {
 		return arena.ErrClosed
 	}
-	if e.context == nil {
+	if e.context == nil || e.numbers == nil {
 		return arena.ErrInvalidSlot
 	}
 	return nil
@@ -117,6 +118,7 @@ func (e *RationalEngine) Close() error {
 		return err
 	}
 	e.context = nil
+	e.numbers = nil
 	e.closed = true
 	return nil
 }
