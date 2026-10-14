@@ -175863,7 +175863,8 @@
         "pkg/ast/pattern/smaller_pattern.go",
         "pkg/ast/pattern/multi_pattern.go",
         "pkg/ast/util_psort_ast_sorting.go",
-        "pkg/ast/ast_core_register_trace.go"
+        "pkg/ast/ast_core_register_trace.go",
+        "pkg/ast/ast_core_delete_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -175892,7 +175893,8 @@
         "TestPsortASTCardSourceEntryTrace",
         "TestPsortASTScalarEntryTracesPrecedeSourceGuards",
         "TestPsortASTInterleaveEntryTraceBeforeOutput",
-        "TestASTRegistrationSourceTraceRecords"
+        "TestASTRegistrationSourceTraceRecords",
+        "TestASTDeletionSourceTraceRecords"
       ],
       "conditionals": [
         {
@@ -176363,6 +176365,13 @@
           "tests": ["TestASTRegistrationSourceTraceRecords"]
         },
         {
+          "name": "Reached AST delete_node ast, del_quantifier and mk_var_bug records before table erase (ast.cpp:1790-1792)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_delete_trace.go",
+          "go_targets": ["pkg/ast/ast_core_register_trace_test.go"],
+          "tests": ["TestASTDeletionSourceTraceRecords"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -176397,7 +176406,8 @@
         "pkg/ast/pattern/smaller_pattern.go",
         "pkg/ast/pattern/multi_pattern.go",
         "pkg/ast/util_psort_ast_sorting.go",
-        "pkg/ast/ast_core_register_trace.go"
+        "pkg/ast/ast_core_register_trace.go",
+        "pkg/ast/ast_core_delete_trace.go"
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
@@ -176426,7 +176436,8 @@
         "TestPsortASTCardSourceEntryTrace",
         "TestPsortASTScalarEntryTracesPrecedeSourceGuards",
         "TestPsortASTInterleaveEntryTraceBeforeOutput",
-        "TestASTRegistrationSourceTraceRecords"
+        "TestASTRegistrationSourceTraceRecords",
+        "TestASTDeletionSourceTraceRecords"
       ],
       "conditionals": [
         {
@@ -176907,6 +176918,13 @@
           "go_target": "pkg/ast/ast_core_register_trace.go",
           "go_targets": ["pkg/ast/ast_core_register_trace_test.go"],
           "tests": ["TestASTRegistrationSourceTraceRecords"]
+        },
+        {
+          "name": "Reached AST delete_node ast, del_quantifier and mk_var_bug records before table erase (ast.cpp:1790-1792)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_delete_trace.go",
+          "go_targets": ["pkg/ast/ast_core_register_trace_test.go"],
+          "tests": ["TestASTDeletionSourceTraceRecords"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

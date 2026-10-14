@@ -4,10 +4,12 @@ package ast
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
 	"testing"
 
 	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestASTRegistrationSourceTraceRecords(t *testing.T) {
@@ -42,5 +44,54 @@ func TestASTRegistrationSourceTraceRecords(t *testing.T) {
 	astTestMust(t, e)
 	if again != variable || buf.String() != want {
 		t.Fatalf("duplicate registration changed node or emitted another record: %q", buf.String())
+	}
+}
+
+func TestASTDeletionSourceTraceRecords(t *testing.T) {
+	s, numerals, budget := astTestOwners(t)
+	var buf bytes.Buffer
+	tags := udiag.NewTraceTagsWithWriter(&buf)
+	m, e := NewASTManager(ASTManagerConfig{Symbols: s, Numerals: numerals, Budget: budget, TraceTags: tags})
+	astTestMust(t, e)
+	t.Cleanup(func() { astTestMust(t, m.Close()) })
+	sort, e := m.MkBoolSort()
+	astTestMust(t, e)
+	disabled, e := m.MkVar(11, sort)
+	astTestMust(t, e)
+	ref, e := m.NewRef(disabled)
+	astTestMust(t, e)
+	astTestMust(t, m.DelRef(&ref))
+	if buf.Len() != 0 {
+		t.Fatalf("disabled deletion tags emitted %q", buf.String())
+	}
+	variable, e := m.MkVar(12, sort)
+	astTestMust(t, e)
+	quantifier, e := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{sort}, Names: []usymbol.Symbol{{}}, Body: variable})
+	astTestMust(t, e)
+	ref, e = m.NewRef(quantifier)
+	astTestMust(t, e)
+	qid, e := m.GetASTID(quantifier)
+	astTestMust(t, e)
+	vid, e := m.GetASTID(variable)
+	astTestMust(t, e)
+	qp := fmt.Sprintf("%p", m.nodeAt(quantifier.slot))
+	vp := fmt.Sprintf("%p", m.nodeAt(variable.slot))
+	tags.Enable("ast")
+	tags.Enable("del_quantifier")
+	tags.Enable("mk_var_bug")
+	astTestMust(t, m.DelRef(&ref))
+	qi := strconv.FormatUint(uint64(qid), 10)
+	vi := strconv.FormatUint(uint64(vid), 10)
+	record := func(tag string, line int, body string) string {
+		return "-------- [" + tag + "] delete_node src/ast/ast.cpp:" + strconv.Itoa(line) + " ---------\n" +
+			body + "\n------------------------------------------------\n"
+	}
+	want := record("ast", 1790, "Deleting object "+qi+" "+qp) +
+		record("del_quantifier", 1791, "deleting quantifier "+qi+" "+qp) +
+		record("mk_var_bug", 1792, "del_ast: "+qi) +
+		record("ast", 1790, "Deleting object "+vi+" "+vp) +
+		record("mk_var_bug", 1792, "del_ast: "+vi)
+	if got := buf.String(); got != want {
+		t.Fatalf("deletion records:\n got %q\nwant %q", got, want)
 	}
 }

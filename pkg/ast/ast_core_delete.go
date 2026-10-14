@@ -55,6 +55,7 @@ func (m *ASTManager) deleteNode(first astNodeRef) error {
 		m.deletionHead = head
 		n := m.nodeAt(current.slot)
 		m.deletionCurrent = current
+		m.traceDeletingNode(n)
 		if e := m.deletionBefore(current); e != nil {
 			return e
 		}
