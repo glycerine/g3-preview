@@ -50163,7 +50163,8 @@
           "tests": [
             "TestRealClosureBoundedRationalSturmTarskiEndpoints",
             "TestRealClosureAlgebraicConstantAndZeroBoundSigns",
-            "TestRealClosureSturmIntervalRefusedDestructorRetainsOwner"
+            "TestRealClosureSturmIntervalRefusedDestructorRetainsOwner",
+            "TestRealClosureCachedRationalIntervalReleaseResumesBeforeNumeral"
           ]
         },
         {

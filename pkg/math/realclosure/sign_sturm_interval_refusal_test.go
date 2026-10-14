@@ -95,3 +95,68 @@ func TestRealClosureSturmIntervalRefusedDestructorRetainsOwner(t *testing.T) {
 		t.Fatal("recovered interval retained bytes", used)
 	}
 }
+
+func TestRealClosureCachedRationalIntervalReleaseResumesBeforeNumeral(t *testing.T) {
+	budget := arena.NewBudget(1 << 25)
+	runtime, err := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 32})
+	if err != nil {
+		t.Fatal(err)
+	}
+	service, err := numeral.NewRationalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{
+		Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}},
+		Memory: runtime, Profile: umemory.SmallAllocatorProfile{PointerBits: 32},
+	}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	bounds, err := numeral.NewBinaryRationalManager(service.Manager.Z, numeral.BinaryRationalConfig{Diagnostics: service})
+	if err != nil {
+		t.Fatal(err)
+	}
+	store := &realValueStore{numbers: service.Manager}
+	value, err := store.newRational(1, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = service.Manager.SetString(&value.rational, "18446744073709551617"); err != nil {
+		t.Fatal(err)
+	}
+	interval, err := store.cachedRationalApproxInterval(value, bounds)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cell := interval.lower.Num.Cell
+	if cell == 0 || value.rational.Num.Cell == 0 {
+		t.Fatal("cached interval or rational did not own a physical numerator")
+	}
+	z := service.Manager.Z
+	original := z.Cell(cell)
+	bad := original
+	bad.Backing.Requested = uint64(math.MaxUint32) + 1
+	z.Store(cell, bad)
+	if err = store.release(value); !errors.Is(err, arena.ErrBounds) {
+		t.Fatal("cached interval destructor refusal", err)
+	}
+	if value.deleted || value.refs != 1 || value.rationalInterval != interval || value.rational.Num.Cell == 0 {
+		t.Fatal("refusal released the value or its older rational numerator")
+	}
+	z.Store(cell, original)
+	if err = store.release(value); err != nil {
+		t.Fatal("cached interval release retry", err)
+	}
+	if !value.deleted || value.rationalInterval != nil || !interval.closed {
+		t.Fatal("cached interval or value survived completed release")
+	}
+	if err = bounds.CloseChecked(); err != nil {
+		t.Fatal(err)
+	}
+	if err = service.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err = runtime.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if used := budget.Used(); used != 0 {
+		t.Fatal("cached interval release retained physical bytes", used)
+	}
+}
