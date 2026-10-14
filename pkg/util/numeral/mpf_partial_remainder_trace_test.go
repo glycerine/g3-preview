@@ -38,7 +38,7 @@ func TestArbitraryFloatPartialRemainderScalarTraceOrder(t *testing.T) {
 			{"1398", "X_YQ_sig'="},
 			{"1410", "minuend="},
 			{"1421", "final sticky="},
-			{"1435", "partial remainder = go-words:"},
+			{"1435", "partial remainder = "},
 		} {
 			header := "-------- [mpf_dbg_rem] partial_remainder src/util/mpf.cpp:" + site.line + " ---------\n" + site.text
 			at := strings.Index(got, header)
@@ -161,7 +161,7 @@ func TestArbitraryFloatPartialRemainderZeroResidualEmitsFinalTrace(t *testing.T)
 	}
 	got := output.String()
 	if compiled {
-		if !strings.Contains(got, "src/util/mpf.cpp:1398") || !strings.Contains(got, "src/util/mpf.cpp:1435 ---------\npartial remainder = go-words:") || strings.Contains(got, "src/util/mpf.cpp:1410") || strings.Contains(got, "src/util/mpf.cpp:1421") {
+		if !strings.Contains(got, "src/util/mpf.cpp:1398") || !strings.Contains(got, "src/util/mpf.cpp:1435 ---------\npartial remainder = ") || strings.Contains(got, "src/util/mpf.cpp:1410") || strings.Contains(got, "src/util/mpf.cpp:1421") {
 			t.Fatalf("zero residual trace did not skip nonzero rounding: %q", got)
 		}
 	} else if got != "" {

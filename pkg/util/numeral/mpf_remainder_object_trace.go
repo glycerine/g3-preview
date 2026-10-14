@@ -8,16 +8,17 @@ import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
-// The source hexfloat(mpf) diagnostic prints native object bytes. Go values
-// have a different layout, so trace the existing portable six-word value
-// record explicitly instead of exposing host object memory.
+// On the retained Linux AMD64 profile, to_string_hexfloat(mpf) reads the
+// first unsigned long long of the C++ object. Its low word is the 15/16/1
+// format bitfield and its high word is mpz::m_val. Reconstruct those source
+// words rather than reading the unrelated Go object layout.
 func (m *ArbitraryFloatManager) writeFloatObjectTrace(w io.Writer, value *ArbitraryFloat, formatError *error) error {
 	words, e := m.ValueWords(value)
 	if e != nil {
 		*formatError = e
 		return e
 	}
-	return writeNumeralDisplayPart(w, fmt.Sprintf("go-words:%08X:%08X:%08X:%08X:%08X:%08X", words[0], words[1], words[2], words[3], words[4], words[5]))
+	return writeNumeralDisplayPart(w, fmt.Sprintf("%X", uint64(words[3])<<32|uint64(words[0])))
 }
 
 func (m *ArbitraryFloatManager) tracePartialRemainderObject(value *ArbitraryFloat) error {

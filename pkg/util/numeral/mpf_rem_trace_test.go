@@ -48,7 +48,7 @@ func TestArbitraryFloatRemResultTraceSpecialAndGeneral(t *testing.T) {
 		entry := "-------- [mpf_dbg_rem] rem src/util/mpf.cpp:1441 ---------\nX = "
 		objectResult := "-------- [mpf_dbg_rem] rem src/util/mpf.cpp:1483 ---------\nR = "
 		entryAt, resultAt := strings.Index(got, entry), strings.Index(got, objectResult)
-		if entryAt < 0 || resultAt <= entryAt || resultAt >= at || strings.Count(got, "go-words:") < 3 || strings.Count(got, entry) != 1 || strings.Count(got, objectResult) != 1 {
+		if entryAt < 0 || resultAt <= entryAt || resultAt >= at || strings.Count(got, entry) != 1 || strings.Count(got, objectResult) != 1 {
 			t.Fatalf("remainder object diagnostic order for %v: %q", tc.value, got)
 		}
 	}
