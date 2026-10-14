@@ -505,7 +505,9 @@
         "arena",
         "util/control",
         "util/cooperate",
-        "util/numeral"
+        "util/messages",
+        "util/numeral",
+        "util/z3exception"
       ],
       "production_files": [
         "arbitrary_extended.go",
@@ -524,7 +526,8 @@
         "rational_interval_div.go",
         "rational_interval_inv.go",
         "rational_interval_mul.go",
-        "rational_interval_power.go"
+        "rational_interval_power.go",
+        "rational_root.go"
       ]
     },
     {
@@ -813,11 +816,31 @@
         "util/params"
       ],
       "production_files": [
+        "algebraic_root_owner.go",
+        "algebraic_root_value.go",
         "binary_interval.go",
         "binary_interval_div.go",
         "binary_interval_inv.go",
         "binary_interval_mul.go",
-        "gparams_catalog_collectors.go"
+        "gparams_catalog_collectors.go",
+        "sign_det_owner.go",
+        "sign_determination.go",
+        "sign_determination_polynomials.go",
+        "sign_determination_rational_products.go",
+        "sign_matrix.go",
+        "sign_matrix_solve.go",
+        "sign_polynomial.go",
+        "sign_polynomial_derivative.go",
+        "sign_polynomial_div.go",
+        "sign_polynomial_mul.go",
+        "sign_polynomial_prem.go",
+        "sign_sturm_algebraic_refine.go",
+        "sign_sturm_rational_interval.go",
+        "sign_sturm_rational_refine.go",
+        "sign_sturm_tarski.go",
+        "sign_sturm_tarski_approx.go",
+        "sign_sturm_tarski_interval.go",
+        "sign_tarski_counts.go"
       ]
     },
     {
@@ -826,6 +849,7 @@
         "arena",
         "math/interval",
         "util/control",
+        "util/cooperate",
         "util/memory",
         "util/messages",
         "util/numeral",
@@ -860,6 +884,7 @@
         "arbitrary_split.go",
         "arbitrary_statistics.go",
         "checkpoint.go",
+        "context_cooperation.go",
         "fast_clause.go",
         "fast_context.go",
         "fast_context_bounds.go",
@@ -924,7 +949,37 @@
         "hardware_search.go",
         "hardware_selector.go",
         "hardware_shell_coefficients.go",
-        "hardware_split.go"
+        "hardware_split.go",
+        "inequality_buffer_release.go",
+        "rational_clause.go",
+        "rational_context_init.go",
+        "rational_context_params.go",
+        "rational_context_policy.go",
+        "rational_context_propagate.go",
+        "rational_context_relevance.go",
+        "rational_context_root.go",
+        "rational_context_root_precision.go",
+        "rational_context_units.go",
+        "rational_display.go",
+        "rational_interval.go",
+        "rational_interval_arith.go",
+        "rational_interval_div.go",
+        "rational_interval_inv.go",
+        "rational_interval_mul.go",
+        "rational_interval_power.go",
+        "rational_interval_root.go",
+        "rational_interval_scalar.go",
+        "rational_monomial.go",
+        "rational_monomial_propagate.go",
+        "rational_node.go",
+        "rational_node_predicates.go",
+        "rational_polynomial.go",
+        "rational_polynomial_propagate.go",
+        "rational_search.go",
+        "rational_selector.go",
+        "rational_split.go",
+        "rational_statistics.go",
+        "source_exception.go"
       ]
     },
     {
@@ -935,13 +990,15 @@
         "math/subpaving",
         "tactic",
         "util/control",
+        "util/cooperate",
         "util/memory",
         "util/messages",
         "util/numeral",
         "util/params",
         "util/smt2",
         "util/statistics",
-        "util/symbol"
+        "util/symbol",
+        "util/z3exception"
       ],
       "production_files": [
         "arbitrary_engine.go",
@@ -955,7 +1012,12 @@
         "fast_variable_display.go",
         "goal_internalize.go",
         "hardware_engine.go",
-        "options.go"
+        "options.go",
+        "rational_core_tactic.go",
+        "rational_engine.go",
+        "rational_expr_arith.go",
+        "rational_expr_converter.go",
+        "rational_variable_display.go"
       ]
     },
     {
@@ -1188,12 +1250,22 @@
     {
       "package": "shell",
       "imports": [
+        "arena",
         "util/control",
+        "util/diagnostic",
+        "util/filepath",
+        "util/params",
         "util/text",
         "util/z3exception"
       ],
       "production_files": [
+        "command_line.go",
+        "command_line_debug_off.go",
+        "command_line_output.go",
+        "command_line_trace_off.go",
+        "dispatch_memory.go",
         "global_timeout_option.go",
+        "input_file_option.go",
         "timeout.go"
       ]
     },
@@ -1231,6 +1303,7 @@
         "tactic_manager.go",
         "tactic_registry_capacity.go",
         "util_cmd_exception.go",
+        "util_cmd_exception_nodebug.go",
         "util_context_params.go",
         "util_context_params_ast_source.go",
         "util_context_params_methods_source.go",
@@ -1268,10 +1341,12 @@
         "util/memory",
         "util/stopwatch",
         "util/symbol",
-        "util/text"
+        "util/text",
+        "util/z3exception"
       ],
       "production_files": [
         "source_debug_off.go",
+        "tactic_exception.go",
         "tactic_extension_model.go",
         "tactic_filter_model.go",
         "tactic_goal.go",
@@ -1289,6 +1364,7 @@
       "imports": [
         "arena",
         "ast",
+        "tactic",
         "util/numeral",
         "util/params"
       ],
@@ -1299,14 +1375,18 @@
         "bound_propagation.go",
         "bound_values.go",
         "linear_equation.go",
-        "polynomial_builder.go"
+        "polynomial_builder.go",
+        "propagate_ineq_clean.go",
+        "propagate_ineq_tactic.go"
       ]
     },
     {
       "package": "tactic/bv",
       "imports": [
+        "arena",
         "ast",
         "tactic",
+        "util/cooperate",
         "util/memory",
         "util/params"
       ],
@@ -1457,6 +1537,7 @@
         "util_debug_context.go",
         "util_debug_macros.go",
         "util_debug_notification.go",
+        "util_debug_process.go",
         "util_memory_fatal_policy.go",
         "util_memory_runtime.go",
         "util_numeric_char_input.go",
@@ -1536,7 +1617,8 @@
         "util/numeral",
         "util/params",
         "util/random",
-        "util/stopwatch"
+        "util/stopwatch",
+        "util/z3exception"
       ],
       "production_files": [
         "assert_release.go",
@@ -1889,7 +1971,6 @@
         "runtime.go",
         "runtime_external_allocation.go",
         "runtime_initialization_oom.go",
-        "runtime_uint32_view.go",
         "small_allocator.go",
         "small_allocator_allocation_outcome.go",
         "small_allocator_assertions.go",
@@ -1932,7 +2013,8 @@
         "util/diagnostic",
         "util/hash",
         "util/memory",
-        "util/text"
+        "util/text",
+        "util/z3exception"
       ],
       "production_files": [
         "hwf_arithmetic.go",
@@ -1981,6 +2063,7 @@
         "mpf_add_sub_scope.go",
         "mpf_bias_exp.go",
         "mpf_binary_string.go",
+        "mpf_bitvector_trace.go",
         "mpf_borrowed_accessors.go",
         "mpf_comparison.go",
         "mpf_decimal_stream.go",
@@ -1989,6 +2072,7 @@
         "mpf_extrema.go",
         "mpf_fma.go",
         "mpf_fma_scope.go",
+        "mpf_fma_trace.go",
         "mpf_formatted_literal.go",
         "mpf_formatted_set.go",
         "mpf_formatted_set_scope.go",
@@ -2001,6 +2085,7 @@
         "mpf_manager_binding.go",
         "mpf_mul.go",
         "mpf_mul_scope.go",
+        "mpf_mul_trace.go",
         "mpf_numeral.go",
         "mpf_numeral_arithmetic.go",
         "mpf_numeral_helpers.go",
@@ -2008,7 +2093,9 @@
         "mpf_numeral_lifetime.go",
         "mpf_numeral_rational_string.go",
         "mpf_partial_remainder.go",
+        "mpf_partial_remainder_component_trace.go",
         "mpf_partial_remainder_scope.go",
+        "mpf_partial_remainder_trace.go",
         "mpf_plain_rational_set.go",
         "mpf_powers_runtime.go",
         "mpf_predicates.go",
@@ -2021,14 +2108,17 @@
         "mpf_raw_string.go",
         "mpf_rem.go",
         "mpf_rem_scope.go",
+        "mpf_remainder_object_trace.go",
         "mpf_renormalize.go",
         "mpf_renormalize_scope.go",
         "mpf_round.go",
         "mpf_round_allocation.go",
         "mpf_round_integral.go",
         "mpf_round_integral_scope.go",
+        "mpf_round_integral_trace.go",
         "mpf_round_scope.go",
         "mpf_round_sqrt.go",
+        "mpf_round_trace.go",
         "mpf_sign.go",
         "mpf_signed_fraction.go",
         "mpf_smt2_stream.go",
@@ -2042,6 +2132,7 @@
         "mpf_to_mpz_scope.go",
         "mpf_to_sbv_mpq.go",
         "mpf_to_sbv_mpq_scope.go",
+        "mpf_unpack_trace.go",
         "mpf_value.go",
         "mpf_value_conversion_allocation.go",
         "mpf_value_copy_chain.go",
@@ -2054,6 +2145,7 @@
         "mpf_value_ieee.go",
         "mpf_value_input.go",
         "mpf_value_input_invocation.go",
+        "mpf_value_input_trace.go",
         "mpf_value_runtime.go",
         "mpf_value_to_rational.go",
         "mpf_value_to_rational_history.go",
@@ -2075,10 +2167,15 @@
         "mpff_round_trace.go",
         "mpff_stream.go",
         "mpff_to_rational_trace.go",
+        "mpfx_add_trace.go",
+        "mpfx_compare_product_trace.go",
         "mpfx_convert.go",
         "mpfx_core.go",
+        "mpfx_division_callers_trace.go",
+        "mpfx_integral_trace.go",
         "mpfx_ops.go",
         "mpfx_power_of_two.go",
+        "mpfx_power_trace.go",
         "mpfx_predicates.go",
         "mpn.go",
         "mpn_arithmetic_trace.go",
@@ -2146,6 +2243,7 @@
         "mpzzp_nodebug.go",
         "mpzzp_normalize_allocation_receipt.go",
         "mpzzp_ops.go",
+        "mpzzp_trace.go",
         "numeral_insertion_receipt.go",
         "numeric_allocation_cleanup.go",
         "numeric_allocation_roots.go",
@@ -2218,6 +2316,7 @@
         "util_gparams_parse.go",
         "util_gparams_service.go",
         "util_gparams_service_ops.go",
+        "util_gparams_service_writer.go",
         "util_gparams_source_finalize.go",
         "util_gparams_symbol_stream.go",
         "util_gparams_values.go",
@@ -2228,6 +2327,7 @@
         "util_param_name.go",
         "util_params_decrement_source.go",
         "util_params_ref.go",
+        "util_params_ref_writer.go",
         "util_params_reset_key_source.go",
         "util_params_reset_source.go",
         "util_params_set_rat_source.go",
@@ -2235,7 +2335,8 @@
         "util_params_source_frame.go",
         "util_params_string_stream.go",
         "util_params_string_view.go",
-        "util_source_package_boundaries.go"
+        "util_source_package_boundaries.go",
+        "util_source_text_writer.go"
       ]
     },
     {
@@ -2392,7 +2493,8 @@
       "package": "util/z3exception",
       "imports": [],
       "production_files": [
-        "z3_exception.go"
+        "z3_exception.go",
+        "z3_exception_nodebug.go"
       ]
     }
   ]

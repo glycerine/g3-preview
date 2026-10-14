@@ -1,3 +1,5 @@
+Memory uint32 view retained-consumer correction: `RuntimeUint32View` had no Go caller, so its standalone adapter is removed. The live small-allocator payload uses `Runtime.ReadUint32`/`WriteUint32`, and AST/polynomial storage remains concrete. The source-aware inventory and dependency graph no longer count the unused file; memory-manager accounting and allocator obligations remain partial.
+
 MPF FMA remaining `std::endl` actions: a real `1.75*1.75+1.75` call now checks the body flush count at every reached FMA trace site from input X/Y/Z through unpacked operands, product, alignment, significands, overflow, renormalization and result. The shared single-line MPF debug emitters and all reached FMA multi-line records flush at their source newline boundaries before the TRACE footer. The prior first-flush refusal fixture still checks persistent failed-stream behavior. Other MPF trace sites and wider util ownership remain open.
 
 MPF FMA overflow trace flush boundary: the retained `mpf.cpp:913` record now executes both `std::endl` flushes inside its body, before the following insertion and before the TRACE footer flush. A real FMA overflow fixture checks the source-order record, and a focused refused-first-flush fixture checks that later physical insertions stop and stream failure persists. Other reached `std::endl` sites and broader util ownership remain open.
@@ -1009,9 +1011,10 @@ The live free permutation algorithms from `src/util/permutation.h` reside in
 `pkg/util/permutation` as concrete `[]uint32` operations. The separate root
 Runtime-backed `permutation` class had no Go production consumer, while the
 C++ class in `permutation.cpp` has no production source caller. That duplicate
-class and its allocation-layout tests are removed. The borrowed uint32 Runtime
-view still used by AST and polynomial raw vectors now lives independently in
-`runtime_uint32_view.go`.
+class and its allocation-layout tests are removed. A later retained-consumer
+audit removed the unused `RuntimeUint32View`: the live small-allocator payload
+path calls the concrete `Runtime.ReadUint32`/`WriteUint32` codec, while AST and
+polynomial owners use their own storage.
 
 The standalone root `RuntimeUnsignedVector` wrapper is also removed. Its sole
 production field was a permanently empty member of the datatype utility, so

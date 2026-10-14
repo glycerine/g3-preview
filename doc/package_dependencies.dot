@@ -76,7 +76,9 @@ digraph packages {
   "math/interval" -> "arena";
   "math/interval" -> "util/control";
   "math/interval" -> "util/cooperate";
+  "math/interval" -> "util/messages";
   "math/interval" -> "util/numeral";
+  "math/interval" -> "util/z3exception";
   "math/polynomial" [style=filled, fillcolor="#eeeeee"];
   "math/polynomial" -> "arena";
   "math/polynomial" -> "clibrand";
@@ -97,6 +99,7 @@ digraph packages {
   "math/subpaving" -> "arena";
   "math/subpaving" -> "math/interval";
   "math/subpaving" -> "util/control";
+  "math/subpaving" -> "util/cooperate";
   "math/subpaving" -> "util/memory";
   "math/subpaving" -> "util/messages";
   "math/subpaving" -> "util/numeral";
@@ -109,6 +112,7 @@ digraph packages {
   "math/subpaving/tactic" -> "math/subpaving";
   "math/subpaving/tactic" -> "tactic";
   "math/subpaving/tactic" -> "util/control";
+  "math/subpaving/tactic" -> "util/cooperate";
   "math/subpaving/tactic" -> "util/memory";
   "math/subpaving/tactic" -> "util/messages";
   "math/subpaving/tactic" -> "util/numeral";
@@ -116,6 +120,7 @@ digraph packages {
   "math/subpaving/tactic" -> "util/smt2";
   "math/subpaving/tactic" -> "util/statistics";
   "math/subpaving/tactic" -> "util/symbol";
+  "math/subpaving/tactic" -> "util/z3exception";
   "model" [style=filled, fillcolor="#eeeeee"];
   "model" -> "arena";
   "model" -> "ast";
@@ -161,7 +166,11 @@ digraph packages {
   "sat/tactic" -> "util/cooperate";
   "sat/tactic" -> "util/lbool";
   "shell" [style=filled, fillcolor="#eeeeee"];
+  "shell" -> "arena";
   "shell" -> "util/control";
+  "shell" -> "util/diagnostic";
+  "shell" -> "util/filepath";
+  "shell" -> "util/params";
   "shell" -> "util/text";
   "shell" -> "util/z3exception";
   "smtcore" [style=filled, fillcolor="#eeeeee"];
@@ -186,14 +195,18 @@ digraph packages {
   "tactic" -> "util/stopwatch";
   "tactic" -> "util/symbol";
   "tactic" -> "util/text";
+  "tactic" -> "util/z3exception";
   "tactic/arith" [style=filled, fillcolor="#eeeeee"];
   "tactic/arith" -> "arena";
   "tactic/arith" -> "ast";
+  "tactic/arith" -> "tactic";
   "tactic/arith" -> "util/numeral";
   "tactic/arith" -> "util/params";
   "tactic/bv" [style=filled, fillcolor="#eeeeee"];
+  "tactic/bv" -> "arena";
   "tactic/bv" -> "ast";
   "tactic/bv" -> "tactic";
+  "tactic/bv" -> "util/cooperate";
   "tactic/bv" -> "util/memory";
   "tactic/bv" -> "util/params";
   "tactic/sls" [style=filled, fillcolor="#eeeeee"];
@@ -246,6 +259,7 @@ digraph packages {
   "util/lp" -> "util/params";
   "util/lp" -> "util/random";
   "util/lp" -> "util/stopwatch";
+  "util/lp" -> "util/z3exception";
   "util/luby" [style=filled, fillcolor="#dceafa"];
   "util/memory" [style=filled, fillcolor="#dceafa"];
   "util/memory" -> "arena";
@@ -259,6 +273,7 @@ digraph packages {
   "util/numeral" -> "util/hash";
   "util/numeral" -> "util/memory";
   "util/numeral" -> "util/text";
+  "util/numeral" -> "util/z3exception";
   "util/params" [style=filled, fillcolor="#dceafa"];
   "util/params" -> "arena";
   "util/params" -> "util/diagnostic";

@@ -44,6 +44,7 @@ digraph packages {
   "util/lp" -> "util/params";
   "util/lp" -> "util/random";
   "util/lp" -> "util/stopwatch";
+  "util/lp" -> "util/z3exception";
   "util/luby" [style=filled, fillcolor="#dceafa"];
   "util/memory" [style=filled, fillcolor="#dceafa"];
   "util/memory" -> "arena";
@@ -57,6 +58,7 @@ digraph packages {
   "util/numeral" -> "util/hash";
   "util/numeral" -> "util/memory";
   "util/numeral" -> "util/text";
+  "util/numeral" -> "util/z3exception";
   "util/params" [style=filled, fillcolor="#dceafa"];
   "util/params" -> "arena";
   "util/params" -> "util/diagnostic";
