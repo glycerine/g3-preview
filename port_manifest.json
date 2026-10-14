@@ -169000,6 +169000,11 @@
           ]
         },
         {
+          "name": "Polynomial fraction-substitution local ps ref_buffer is constructed but never pushed, read, reset or copied (polynomial.cpp:6408-6422)",
+          "status": "reference_only",
+          "tests": []
+        },
+        {
           "name": "Selected rational realclosure scoped_polynomial_seq value_ref_buffer: rows own borrowed coefficients, and refused younger temporary coefficients drain before retained row suffixes (realclosure.cpp:406-451,3637-3674)",
           "status": "platform_replacement",
           "go_target": "pkg/math/realclosure/sign_sturm_tarski.go",
