@@ -165449,6 +165449,7 @@
         "pkg/util/params/util_param_name.go",
         "pkg/util/params/util_param_descrs.go",
         "pkg/util/params/util_params_ref.go",
+        "pkg/util/params/util_source_package_boundaries.go",
         "pkg/util/params/util_params_string_symbol_test.go",
         "pkg/util/params/util_param_descrs_stream.go",
         "pkg/util/params/util_param_descrs_stream_debug.go",
@@ -165712,7 +165713,15 @@
           ]
         },
         {
-          "name": "params_ref::get_empty static null reference and copied default arguments at API interpolation and Spacer SMT context construction (params.h:34,44; params.cpp:24)",
+          "name": "params_ref::get_empty static null reference adapted to owner-scoped empty values at retained SMT parameter consumers (params.h:34,44; params.cpp:24)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_source_package_boundaries.go",
+          "tests": [
+            "TestParamsSourceStaticEmptyOwnerAdaptation"
+          ]
+        },
+        {
+          "name": "params_ref::get_empty copied default arguments at API interpolation and Spacer SMT context construction",
           "status": "unported",
           "tests": []
         },
@@ -166089,6 +166098,7 @@
         "pkg/util/params/util_param_name.go",
         "pkg/util/params/util_param_descrs.go",
         "pkg/util/params/util_params_ref.go",
+        "pkg/util/params/util_source_package_boundaries.go",
         "pkg/util/params/util_params_string_symbol_test.go",
         "pkg/util/params/util_param_descrs_stream.go",
         "pkg/util/params/util_param_descrs_stream_debug.go",
@@ -166310,7 +166320,15 @@
           ]
         },
         {
-          "name": "params_ref::get_empty static null reference and copied default arguments at API interpolation and Spacer SMT context construction (params.h:34,44; params.cpp:24)",
+          "name": "params_ref::get_empty static null reference adapted to owner-scoped empty values at retained SMT parameter consumers (params.h:34,44; params.cpp:24)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_source_package_boundaries.go",
+          "tests": [
+            "TestParamsSourceStaticEmptyOwnerAdaptation"
+          ]
+        },
+        {
+          "name": "params_ref::get_empty copied default arguments at API interpolation and Spacer SMT context construction",
           "status": "unported",
           "tests": []
         },

@@ -64,7 +64,8 @@ func (c *ParamsContext) CheckOpen() error         { return c.open() }
 func (c *ParamsContext) Check(p *ParamsRef) error { return c.check(p) }
 func (g *GlobalParamsService) CheckOpen() error   { return g.open() }
 
-// EmptyValue constructs a null-backed params_ref without allocating a block.
+// EmptyValue adapts params_ref::get_empty's static null reference to this
+// context's owner. Copying the value allocates no parameter block.
 func (c *ParamsContext) EmptyValue() ParamsRef { return ParamsRef{Owner: c.Owner} }
 
 func (r ParamsRef) Initialized() bool { return r.Owner != 0 }

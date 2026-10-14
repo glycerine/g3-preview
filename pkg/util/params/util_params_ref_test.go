@@ -53,6 +53,22 @@ func paramsMust(t *testing.T, e error) {
 	}
 }
 
+func TestParamsSourceStaticEmptyOwnerAdaptation(t *testing.T) {
+	c, _, _ := paramsTestOwner(t)
+	before := c.Stats()
+	a, b := c.EmptyValue(), c.EmptyValue()
+	if a.Owner == 0 || a != b || a.Slot != 0 || a.Generation != 0 {
+		t.Fatal("source static null reference adaptation", a, b)
+	}
+	if e := c.Assign(&b, &a); e != nil {
+		t.Fatal(e)
+	}
+	empty, e := c.Empty(&b)
+	if e != nil || !empty || b != a || c.Stats() != before {
+		t.Fatal("empty copy allocated or changed owner", empty, e, a, b, c.Stats(), before)
+	}
+}
+
 // Source has no registered params unit-test assertions. These finite action
 // traces are derived from complete params_ref bodies, not solver assertions.
 func TestParamsReferenceSourceSharingAndReset(t *testing.T) {
