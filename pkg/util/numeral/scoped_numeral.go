@@ -154,8 +154,9 @@ func (s *ScopedInt) Clone() (*ScopedInt, error) {
 		return nil, e
 	}
 	if e = c.Set(&s.num); e != nil {
-		c.Close()
-		return nil, e
+		// A failed source copy constructor has no scoped destructor. Its
+		// partially acquired numeral belongs to explicit owning cleanup.
+		return nil, &ScopedIntCopyCleanupError{Cause: e, owner: c}
 	}
 	return c, nil
 }
@@ -168,8 +169,7 @@ func (s *ScopedRational) Clone() (*ScopedRational, error) {
 		return nil, e
 	}
 	if e = c.Set(&s.num); e != nil {
-		c.Close()
-		return nil, e
+		return nil, &ScopedRationalCopyCleanupError{Cause: e, owner: c}
 	}
 	return c, nil
 }

@@ -4,6 +4,7 @@ package numeral
 import (
 	"errors"
 	"math"
+	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -82,4 +83,40 @@ func TestScopedRationalSourceDeletionAndOwningSuffix(t *testing.T) {
 		t.Fatal("owning retry retained rational")
 	}
 	serviceMust(t, s.Close())
+}
+
+func TestScopedIntCopyConstructorFailureKeepsUnwoundOwner(t *testing.T) {
+	m, budget := integerManager(t)
+	s, e := NewScopedInt(m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, s.Cleanup()) })
+	value, e := s.Get()
+	serviceMust(t, e)
+	serviceMust(t, m.SetLimbs(value, []uint32{7, 0, 1}))
+	var fillers []Int
+	for m.Cells.Stats().Live+m.Cells.Stats().Retired < m.Cells.Stats().Slots {
+		var v Int
+		serviceMust(t, m.SetUint64(&v, 1<<63))
+		fillers = append(fillers, v)
+	}
+	baseline := budget.Used()
+	budget.FailAfter(1) // scoped header succeeds; the new copy cell does not.
+	copy, e := s.Clone()
+	var pending *ScopedIntCopyCleanupError
+	if copy != nil || !errors.As(e, &pending) || !numericPhysicalReservationRefusal(e) || pending.owner == nil || pending.owner.closed {
+		t.Fatal("failed copy constructor lost its owner", copy, e)
+	}
+	if budget.Used() != baseline+uint64(reflect.TypeOf(ScopedInt{}).Size()) {
+		t.Fatal("unwound constructor lost its charged header", budget.Used(), baseline)
+	}
+	budget.FailAfter(-1)
+	serviceMust(t, pending.Cleanup())
+	serviceMust(t, pending.Cleanup())
+	if pending.owner != nil || budget.Used() != baseline {
+		t.Fatal("owning cleanup retained failed constructor", budget.Used(), baseline)
+	}
+	serviceMust(t, m.CleanupPendingAllocation())
+	for i := range fillers {
+		serviceMust(t, m.Del(&fillers[i]))
+	}
 }

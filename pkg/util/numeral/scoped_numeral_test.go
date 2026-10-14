@@ -645,7 +645,7 @@ func TestScopedRationalVectorIndependentLifecycleAndFailures(t *testing.T) {
 }
 
 func TestScopedNumeralDeepCloneFailureCleanup(t *testing.T) {
-	failed, passed := 0, 0
+	failed, passed, retained, partial := 0, 0, 0, 0
 	for prefix := int64(0); prefix < 24; prefix++ {
 		m, b := rationalManager(t, true)
 		s, _ := NewScopedRational(m)
@@ -662,6 +662,8 @@ func TestScopedNumeralDeepCloneFailureCleanup(t *testing.T) {
 		cells := m.Z.Cells.Stats().Live
 		b.FailAfter(prefix)
 		copy, e := s.Clone()
+		var pending *ScopedRationalCopyCleanupError
+		errors.As(e, &pending)
 		roots := []*Int{&num.Num, &num.Den}
 		for i := range fillers {
 			roots = append(roots, &fillers[i])
@@ -669,9 +671,16 @@ func TestScopedNumeralDeepCloneFailureCleanup(t *testing.T) {
 		if copy != nil {
 			roots = append(roots, &copy.num.Num, &copy.num.Den)
 		}
+		if pending != nil {
+			retained++
+			if pending.owner.num.Num.Cell != 0 && !m.Z.IsFailureRef(pending.owner.num.Num.Cell) {
+				partial++
+			}
+			roots = append(roots, &pending.owner.num.Num, &pending.owner.num.Den)
+		}
 		qopsAuditLiveOwnership(t, m, roots)
 		ownerCharge := uint64(reflect.TypeOf(ScopedRational{}).Size())
-		if copy != nil {
+		if copy != nil || pending != nil {
 			ownerCharge *= 2
 		}
 		if b.Used() != m.HeaderBytes+integerActualOwnedBytes(m.Z)+ownerCharge {
@@ -679,8 +688,15 @@ func TestScopedNumeralDeepCloneFailureCleanup(t *testing.T) {
 		}
 		if e != nil {
 			failed++
-			if !numericPhysicalReservationRefusal(e) || copy != nil || m.Z.Cells.Stats().Live != cells {
-				t.Fatal("clone immediate cleanup", prefix, e)
+			if !numericPhysicalReservationRefusal(e) || copy != nil {
+				t.Fatal("clone constructor refusal", prefix, e)
+			}
+			b.FailAfter(-1)
+			if pending != nil {
+				qopsMust(t, pending.Cleanup())
+				if pending.owner != nil {
+					t.Fatal("clone construction owner not drained", prefix)
+				}
 			}
 		} else {
 			passed++
@@ -694,6 +710,9 @@ func TestScopedNumeralDeepCloneFailureCleanup(t *testing.T) {
 		}
 		b.FailAfter(-1)
 		qopsMust(t, m.Z.CleanupPendingAllocation()) // explicit release after pre-cleanup audit
+		if m.Z.Cells.Stats().Live != cells {
+			t.Fatal("clone owning cleanup did not restore live roots", prefix)
+		}
 		for i := range fillers {
 			m.Z.Del(&fillers[i])
 		}
@@ -703,7 +722,7 @@ func TestScopedNumeralDeepCloneFailureCleanup(t *testing.T) {
 			t.Fatal("clone header unwind", prefix, b.Used())
 		}
 	}
-	if failed == 0 || passed == 0 {
-		t.Fatal("clone sweep endpoints", failed, passed)
+	if failed == 0 || passed == 0 || retained == 0 || partial == 0 {
+		t.Fatal("clone sweep endpoints and retained partial copy", failed, passed, retained, partial)
 	}
 }
