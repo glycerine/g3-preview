@@ -2,9 +2,8 @@
 package shell
 
 import (
-	"strings"
-
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	ufilepath "github.com/glycerine/g3/pkg/util/filepath"
 )
 
 const shellDefaultOOM = "ERROR: out of memory"
@@ -34,11 +33,11 @@ func (c *CommandLine) ResolveInputKind() (InputKind, error) {
 	if !selected {
 		return c.Kind, nil
 	}
-	dot := strings.LastIndexByte(name, '.')
-	if dot < 0 {
+	extension, found := ufilepath.Extension(name)
+	if !found {
 		return c.Kind, nil
 	}
-	switch name[dot+1:] {
+	switch extension {
 	case "datalog", "dl":
 		c.Kind = InputDatalog
 	case "dimacs", "cnf":
