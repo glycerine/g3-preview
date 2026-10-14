@@ -1,10 +1,46 @@
 package ast
 
 import (
+	"errors"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
+
+func TestASTFloatingPointClassificationDestructorFailureClearsResult(t *testing.T) {
+	m := astTestManager(t)
+	_, e := m.RegisterArithmeticPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterBitVectorPlugin()
+	astTestMust(t, e)
+	_, e = m.RegisterFloatingPointPlugin()
+	astTestMust(t, e)
+	p := m.floatingPointPlugin
+	f, e := p.beginNumeralProbe()
+	astTestMust(t, e)
+	z, e := p.numeric.BorrowIntegerManager()
+	astTestMust(t, e)
+	var sig unumeral.Int
+	astTestMust(t, z.SetLimbs(&sig, []uint32{1, 2, 3, 4}))
+	astTestMust(t, p.numeric.SetComponents(&f.value, 11, 5000, false, 3, &sig))
+	astTestMust(t, z.Del(&sig))
+	borrowed, e := p.numeric.BorrowSignificand(&f.value)
+	astTestMust(t, e)
+	if borrowed.Cell == 0 {
+		t.Fatal("fixture did not retain physical significand storage")
+	}
+	cell := borrowed.Cell
+	borrowed.Cell = ^unumeral.NumericCellRef(0)
+	matched := true // the classification body completed before source destruction
+	var result error
+	p.finishNumeralProbe(f, &result, &matched)
+	if matched || !errors.Is(result, arena.ErrInvalidSlot) || p.numeralProbeFrames != f || f.retired {
+		t.Fatal("failed scoped_mpf destructor published a classification", matched, result, f)
+	}
+	borrowed.Cell = cell
+	astTestMust(t, m.Close())
+}
 
 func TestASTFloatingPointBooleanNumeralScopedValue(t *testing.T) {
 	m := astTestManager(t)

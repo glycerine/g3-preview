@@ -139,7 +139,7 @@ func (p *astFloatingPointPluginOwner) beginNumeralProbe() (*astFloatNumeralProbe
 	return f, nil
 }
 
-func (p *astFloatingPointPluginOwner) finishNumeralProbe(f *astFloatNumeralProbe, result *error) {
+func (p *astFloatingPointPluginOwner) finishNumeralProbe(f *astFloatNumeralProbe, result *error, matched *bool) {
 	f.bodyCause = *result
 	*result = errors.Join(*result, f.destroy(false))
 	if *result == nil && f.sourceDone {
@@ -151,6 +151,9 @@ func (p *astFloatingPointPluginOwner) finishNumeralProbe(f *astFloatNumeralProbe
 			f.retired = true
 		}
 	}
+	if *result != nil && matched != nil {
+		*matched = false
+	}
 }
 
 // isNumeralClass preserves each source query's local value copy and destructor.
@@ -160,7 +163,7 @@ func (p *astFloatingPointPluginOwner) isNumeralClass(n astNodeRef, class astFloa
 	if e != nil {
 		return false, e
 	}
-	defer p.finishNumeralProbe(f, &result)
+	defer p.finishNumeralProbe(f, &result, &matched)
 	found, e := p.isNumeral(n, &f.value, &f.copy)
 	if e != nil || !found {
 		return false, e
@@ -207,7 +210,7 @@ func (p *astFloatingPointPluginOwner) mkSpecialNumeral(ebits, sbits uint32, clas
 	if e != nil {
 		return out, e
 	}
-	defer p.finishNumeralProbe(f, &result)
+	defer p.finishNumeralProbe(f, &result, nil)
 	switch class {
 	case astFloatNaN:
 		e = p.numeric.MkNaN(ebits, sbits, &f.value, &f.copy)
