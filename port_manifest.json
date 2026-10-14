@@ -165829,7 +165829,18 @@
           ]
         },
         {
-          "name": "shared reset and reset-key source lifetime/ownership continuation",
+          "name": "params_ref::reset overloads and params::reset/RESET ordinary paths, shared backing, first match and vector finalization",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsSharedAllocatedEmptyResetFinalizesBacking",
+            "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsReferenceNameReadsNeverIntern",
+            "TestParamsReferenceResetKeyFiniteAscendingShiftAndNoReservation"
+          ]
+        },
+        {
+          "name": "stopped reset/RESET owning continuation and exact deallocation-prefix transport",
           "status": "partial",
           "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
@@ -166440,7 +166451,18 @@
           ]
         },
         {
-          "name": "shared reset and reset-key source lifetime/ownership continuation",
+          "name": "params_ref::reset overloads and params::reset/RESET ordinary paths, shared backing, first match and vector finalization",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsSharedAllocatedEmptyResetFinalizesBacking",
+            "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsReferenceNameReadsNeverIntern",
+            "TestParamsReferenceResetKeyFiniteAscendingShiftAndNoReservation"
+          ]
+        },
+        {
+          "name": "stopped reset/RESET owning continuation and exact deallocation-prefix transport",
           "status": "partial",
           "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
