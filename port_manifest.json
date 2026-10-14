@@ -26623,6 +26623,8 @@
         "TestBVPolynomialNonflatAdditionZeroAndConstantLeadingGuard",
         "TestBVPolynomialNonflatAdditionBothHoistPaths",
         "TestBVPolynomialNonflatAdditionEveryColdReservation",
+        "TestBVPolynomialNonflatAdditionCollectsAndCancelsCoefficients",
+        "TestBVPolynomialNonflatAdditionShortcutsConstantsAndOrdering",
         "TestBVPolynomialAdditionNativeMembershipPreservesForeignMarkPlanes",
         "TestBVPolynomialNonflatAdditionEveryActualNumericReservation",
         "TestBVPolynomialNonflatAdditionConstructorRefusalAndCopyGuards",
@@ -168980,6 +168982,16 @@
           "tests": [
             "TestBVPolynomialNonflatMultiplicationCartesianOrderAndLimit",
             "TestBVPolynomialNonflatMultiplicationEveryCartesianOwnerAndFactoryReservation"
+          ]
+        },
+        {
+          "name": "Concrete BV polynomial nonflat addition expr_ref_buffer: constant and term INC-before-append in repeated and ordinary branches, borrowed factory view, and ascending buffer release before coefficient locals (poly_rewriter_def.h:589-660)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_add_core.go",
+          "tests": [
+            "TestBVPolynomialNonflatAdditionCollectsAndCancelsCoefficients",
+            "TestBVPolynomialNonflatAdditionShortcutsConstantsAndOrdering",
+            "TestBVPolynomialNonflatAdditionEveryColdReservation"
           ]
         },
         {
