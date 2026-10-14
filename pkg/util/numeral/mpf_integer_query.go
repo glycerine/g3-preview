@@ -35,12 +35,7 @@ func (m *ArbitraryFloatManager) IsInt(x *ArbitraryFloat) (result bool, cause err
 	s := &m.integerQuery
 	*s = arbitraryFloatIntegerQueryScope{constructed: true, active: true, executing: true}
 	m.valueExecuting = true
-	defer func() {
-		m.valueExecuting = false
-		s.executing = false
-		s.bodyCause = cause
-		cause = JoinNumericErrors(cause, m.finishIntegerQuerySource())
-	}()
+	defer m.completeIntegerQuery(&result, &cause)
 	z := m.integer
 	if e := z.CopyFromOwnerWithReceipt(&s.t, z, &x.significand, &s.copy); e != nil {
 		return false, e
@@ -61,6 +56,17 @@ func (m *ArbitraryFloatManager) IsInt(x *ArbitraryFloat) (result bool, cause err
 		if shift == 0 {
 			return true, nil
 		}
+	}
+}
+
+func (m *ArbitraryFloatManager) completeIntegerQuery(result *bool, cause *error) {
+	s := &m.integerQuery
+	m.valueExecuting = false
+	s.executing = false
+	s.bodyCause = *cause
+	*cause = JoinNumericErrors(*cause, m.finishIntegerQuerySource())
+	if *cause != nil {
+		*result = false
 	}
 }
 

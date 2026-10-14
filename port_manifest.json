@@ -151133,6 +151133,7 @@
         "TestArbitraryFloatNumeralHelpersEveryColdReservation",
         "TestArbitraryFloatIsIntIndependentDyadicOracle",
         "TestArbitraryFloatIsIntSourceSpecialsAndErasedCopy",
+        "TestArbitraryFloatIsIntDestructorFailureClearsResult",
         "TestArbitraryFloatIsIntEveryColdCopyReservation",
         "TestArbitraryFloatIsIntActualTransportGuardsAndAbandonedScope",
         "TestArbitraryFloatRoundToIntegralIEEEBranchesAndAliases",
@@ -152051,6 +152052,7 @@
           "tests": [
             "TestArbitraryFloatIsIntIndependentDyadicOracle",
             "TestArbitraryFloatIsIntSourceSpecialsAndErasedCopy",
+            "TestArbitraryFloatIsIntDestructorFailureClearsResult",
             "TestArbitraryFloatIsIntEveryColdCopyReservation",
             "TestArbitraryFloatIsIntActualTransportGuardsAndAbandonedScope"
           ]
@@ -152728,6 +152730,7 @@
         "TestArbitraryFloatNumeralHelpersEveryColdReservation",
         "TestArbitraryFloatIsIntIndependentDyadicOracle",
         "TestArbitraryFloatIsIntSourceSpecialsAndErasedCopy",
+        "TestArbitraryFloatIsIntDestructorFailureClearsResult",
         "TestArbitraryFloatIsIntEveryColdCopyReservation",
         "TestArbitraryFloatIsIntActualTransportGuardsAndAbandonedScope",
         "TestArbitraryFloatRoundToIntegralIEEEBranchesAndAliases",
@@ -153160,6 +153163,7 @@
           "tests": [
             "TestArbitraryFloatIsIntIndependentDyadicOracle",
             "TestArbitraryFloatIsIntSourceSpecialsAndErasedCopy",
+            "TestArbitraryFloatIsIntDestructorFailureClearsResult",
             "TestArbitraryFloatIsIntEveryColdCopyReservation",
             "TestArbitraryFloatIsIntActualTransportGuardsAndAbandonedScope"
           ]

@@ -106,6 +106,33 @@ func TestArbitraryFloatIsIntSourceSpecialsAndErasedCopy(t *testing.T) {
 	b.FailAfter(-1)
 }
 
+func TestArbitraryFloatIsIntDestructorFailureClearsResult(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	s := &m.integerQuery
+	*s = arbitraryFloatIntegerQueryScope{constructed: true, active: true, executing: true}
+	serviceMust(t, m.integer.SetLimbs(&s.t, []uint32{1, 2, 3, 4}))
+	if s.t.Cell == 0 {
+		t.Fatal("fixture did not retain physical integer storage")
+	}
+	cell := s.t.Cell
+	s.t.Cell = ^NumericCellRef(0)
+	m.valueExecuting = true
+	result := true // the numeric loop completed before scoped_mpz destruction
+	var cause error
+	m.completeIntegerQuery(&result, &cause)
+	if result || !errors.Is(cause, arena.ErrInvalidSlot) || !s.active || s.sourceCause == nil || s.executing || m.valueExecuting {
+		t.Fatal("failed scoped_mpz destructor published true", result, cause, *s)
+	}
+	if e := m.SourceFinalize(); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("source finalization lost the stopped destructor", e)
+	}
+	s.t.Cell = cell
+	serviceMust(t, m.CleanupIntegerQuery())
+	if s.active {
+		t.Fatal("owning cleanup retained completed integer query")
+	}
+}
+
 func TestArbitraryFloatIsIntEveryColdCopyReservation(t *testing.T) {
 	for _, sbits := range []uint32{4000, 40000} {
 		for _, lowBit := range []int32{0, 1} {
