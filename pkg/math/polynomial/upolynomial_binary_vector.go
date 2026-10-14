@@ -16,8 +16,10 @@ type upolyBinaryVectorState struct {
 	size                uint32
 	managerResetPending bool
 	managerResetCursor  uint32
+	managerResetCause   error
 	dropPending         bool
 	dropCursor, dropTo  uint32
+	dropCause           error
 }
 type BinaryRationalVector struct {
 	self    *BinaryRationalVector
@@ -130,11 +132,21 @@ func upolyBinaryBeginDrop(m *unumeral.BinaryRationalManager, s *upolyBinaryVecto
 	}
 	s.dropPending = true
 	s.dropCursor, s.dropTo = to, to
-	return upolyBinaryFinishDrop(m, s)
+	s.dropCause = nil
+	return upolyBinaryFinishDrop(m, s, true)
 }
-func upolyBinaryFinishDrop(m *unumeral.BinaryRationalManager, s *upolyBinaryVectorState) error {
+func upolyBinaryFinishDrop(m *unumeral.BinaryRationalManager, s *upolyBinaryVectorState, source bool) error {
 	for s.dropCursor < s.size {
-		if e := m.Del(&s.values[s.dropCursor]); e != nil {
+		var e error
+		if source {
+			e = unumeral.SourceIntegerDel(m.Integers(), &s.values[s.dropCursor].Num)
+		} else {
+			e = m.Del(&s.values[s.dropCursor])
+		}
+		if e != nil {
+			if source {
+				s.dropCause = e
+			}
 			return e
 		}
 		s.dropCursor++
@@ -142,6 +154,7 @@ func upolyBinaryFinishDrop(m *unumeral.BinaryRationalManager, s *upolyBinaryVect
 	s.size = s.dropTo
 	s.dropPending = false
 	s.dropCursor, s.dropTo = 0, 0
+	s.dropCause = nil
 	return nil
 }
 func numericBinaryRationalManager_binaryDestroy(m *unumeral.BinaryRationalManager, s *upolyBinaryVectorState) error {
@@ -193,11 +206,26 @@ func (v *BinaryRationalVector) resetManagerNumerals() error {
 	}
 	v.state.managerResetPending = true
 	v.state.managerResetCursor = 0
-	return v.finishManagerReset()
+	v.state.managerResetCause = nil
+	return v.finishManagerReset(true)
 }
-func (v *BinaryRationalVector) finishManagerReset() error {
+func (v *BinaryRationalVector) finishManagerReset(source bool) error {
 	for v.state.managerResetCursor < v.state.size {
-		if e := v.manager.Reset(&v.state.values[v.state.managerResetCursor]); e != nil {
+		a := &v.state.values[v.state.managerResetCursor]
+		var e error
+		if source {
+			e = unumeral.SourceIntegerDel(v.manager.Integers(), &a.Num)
+			if e == nil {
+				a.Num.Val = 0
+				a.KField = 0
+			}
+		} else {
+			e = v.manager.Reset(a)
+		}
+		if e != nil {
+			if source {
+				v.state.managerResetCause = e
+			}
 			return e
 		}
 		v.state.managerResetCursor++
@@ -205,6 +233,7 @@ func (v *BinaryRationalVector) finishManagerReset() error {
 	v.state.size = 0
 	v.state.managerResetCursor = 0
 	v.state.managerResetPending = false
+	v.state.managerResetCause = nil
 	return nil
 }
 
@@ -216,7 +245,7 @@ func (v *BinaryRationalVector) CleanupManagerReset() error {
 	if !v.state.managerResetPending {
 		return nil
 	}
-	return v.finishManagerReset()
+	return v.finishManagerReset(false)
 }
 
 // CleanupDrop resumes vector Reset or Shrink from the first undeleted slot.
@@ -227,7 +256,7 @@ func (v *BinaryRationalVector) CleanupDrop() error {
 	if !v.state.dropPending {
 		return nil
 	}
-	return upolyBinaryFinishDrop(v.manager, &v.state)
+	return upolyBinaryFinishDrop(v.manager, &v.state, false)
 }
 func (v *BinaryRationalVector) Shrink(n uint32) error {
 	if e := v.check(); e != nil {
@@ -279,13 +308,25 @@ func (v *BinaryRationalVector) Reserve(n uint32) error {
 	return nil
 }
 func (v *BinaryRationalVector) Close() error {
-	if e := v.checkOwner(); e != nil {
-		return e
+	if v == nil || v.self != v || v.manager == nil {
+		return unumeral.ErrBinaryOwner
 	}
-	if e := v.CleanupManagerReset(); e != nil {
-		return e
+	if v.closed {
+		return arena.ErrClosed
 	}
-	if e := v.CleanupDrop(); e != nil {
+	if v.state.managerResetPending {
+		if v.state.managerResetCause != nil {
+			return v.state.managerResetCause
+		}
+		return ErrBinaryVectorResetPending
+	}
+	if v.state.dropPending {
+		if v.state.dropCause != nil {
+			return v.state.dropCause
+		}
+		return ErrBinaryVectorResetPending
+	}
+	if e := v.manager.Open(); e != nil {
 		return e
 	}
 	if e := numericBinaryRationalManager_binaryDestroy(v.manager, &v.state); e != nil {

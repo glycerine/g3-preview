@@ -150279,7 +150279,8 @@
       ],
       "ownership": [
         "Concrete pointer-free numerator/exponent; borrowed IntegerManager and debug RationalService share actual Budget. Actual cold header and eleven retained numeral roots charged; lexical roots released on all Go errors. Source destructor order, deep scope/vector ownership, whole new backing overlaps old backing. Immediate cells/Words/diagnostics graph oracle precedes formatting/cleanup. See PORT_PROGRESS.md#audit-mpbq-port-status-md.",
-        "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output, manager cells and allocator-backed limbs before fault disabling. See PORT_PROGRESS.md#audit-upolynomial-root-isolation-packet-md; allocator/backend integration remains open."
+        "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output, manager cells and allocator-backed limbs before fault disabling. See PORT_PROGRESS.md#audit-upolynomial-root-isolation-packet-md; allocator/backend integration remains open.",
+        "The retained mpbq_manager::reset(vector) and algebraic binary-vector drop now distinguish source physical deletion from owning continuation. A stopped source loop retains its exact cursor and sticky cause; Close does not resume it after repair, while explicit cleanup drains the surviving suffix."
       ],
       "deviations": [
         "Explicit owner-local contexts and Close replace global diagnostic service/RAII. Imported foreign rational numerators/denominators copied through their real owners. Undefined degree-zero and interval preconditions have typed adapters; finite raw negative/unreduced shapes remain source behavior. Selected byte output stages in charged retained workspace; final strings caller-owned. Integer storage error adapters inherited; completed BQ statement/exponent/alias prefixes retained. Custom ostream integration keeps whole unit partial; all three visible mpbq.cpp TRACE sites are wired at retained callers.",
@@ -171705,6 +171706,8 @@
       "go_targets": [
         "pkg/util/numeral/scoped_numeral.go",
         "pkg/util/numeral/scoped_numeral_vector_source_cleanup_test.go",
+        "pkg/math/polynomial/upolynomial_binary_vector.go",
+        "pkg/math/polynomial/upolynomial_binary_vector_reset_scope_test.go",
         "pkg/util/numeral/scoped_binary.go",
         "pkg/ast/ast_fpa_scoped_values.go",
         "pkg/ast/ast_fpa_scoped_values_source_test.go",
@@ -171735,6 +171738,8 @@
         "TestScopedNumeralDeepCloneFailureCleanup",
         "TestScopedIntVectorStoppedSourceKeepsAscendingSuffix",
         "TestScopedRationalVectorStoppedSourceKeepsComponentSuffix",
+        "TestUPolynomialBinaryVectorManagerResetPhysicalRetry",
+        "TestUPolynomialBinaryVectorDropPhysicalRetry",
         "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
         "TestASTFloatingPointScopedValueActualReserveSetPublication",
         "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren",
@@ -171860,7 +171865,7 @@
           "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_binary_vector.go",
           "go_targets": ["pkg/math/polynomial/algebraic_root.go"],
-          "tests": ["TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults", "TestUPolynomialNativeIsolationStacksAndNumericTransfer", "TestAlgebraicCellSourceRootCopyDeletionOrder"]
+          "tests": ["TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults", "TestUPolynomialNativeIsolationStacksAndNumericTransfer", "TestAlgebraicCellSourceRootCopyDeletionOrder", "TestUPolynomialBinaryVectorManagerResetPhysicalRetry", "TestUPolynomialBinaryVectorDropPhysicalRetry"]
         },
         {
           "name": "scoped_mpbq_vector direct push_back/pop_back/shrink/resize templates unused by retained source consumers",
@@ -171938,7 +171943,8 @@
         "Scalar external polynomial owners and actual Int arrays preserve source numeral callbacks and publication prefixes. See PORT_PROGRESS.md#audit-upolynomial-port-status-md.",
         "The FPA plugin already owns its MPF values in a native slice with source-aware copy receipts and ascending cleanup. The subpaving MPF wrapper now owns its coefficient numerals in a separate typed slice; reserve extends logical size and Close deletes the retained slots in ascending order.",
         "Rational subpaving mk_sum uses a typed slice for its retained coefficient scratch: growth creates zero numerals through num_vars, indexed copies precede sorted swaps, and context Close deletes every scratch numeral in ascending order.",
-        "The context_mpq_wrapper owns its separate typed rational coefficient slice and constant across sums. Tactic engine Close deletes all wrapper coefficients in ascending order, then the scalar, then the context."
+        "The context_mpq_wrapper owns its separate typed rational coefficient slice and constant across sums. Tactic engine Close deletes all wrapper coefficients in ascending order, then the scalar, then the context.",
+        "The retained algebraic scoped_mpbq_vector drop and mpbq_manager vector reset now preserve the first stopped physical deletion and exact ascending cursor. Close returns the original source cause until explicit owning CleanupDrop or CleanupManagerReset completes; repair alone does not replay source destruction."
       ],
       "deviations": [
         "Concrete Int, Rational, MPBQ, MPFF and mpzzp vectors retain manager-specific storage and ownership. The subpaving converter uses the Int vector for cached numerator and denominator copies. The FPA plugin and MPF subpaving coefficient wrapper each use an owner-local native MPF slice; rational subpaving uses an owner-local native Rational slice. Context_mpf construction remains open. Other retained source instantiations stay partial until a live caller is ported. The unused any-valued callback vector was removed.",

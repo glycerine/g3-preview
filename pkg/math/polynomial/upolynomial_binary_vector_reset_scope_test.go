@@ -60,8 +60,9 @@ func TestUPolynomialBinaryVectorManagerResetPhysicalRetry(t *testing.T) {
 	bad := original
 	bad.Backing.Requested = uint64(math.MaxUint32) + 1
 	q.Z.Store(ref, bad)
-	if e := v.resetManagerNumerals(); !errors.Is(e, arena.ErrBounds) || !v.state.managerResetPending || v.state.managerResetCursor != 1 || v.state.size != 3 {
-		t.Fatal("source reset did not retain stopped second slot", e, v.state.managerResetCursor)
+	stop := v.resetManagerNumerals()
+	if !errors.Is(stop, arena.ErrBounds) || !v.state.managerResetPending || v.state.managerResetCursor != 1 || v.state.size != 3 {
+		t.Fatal("source reset did not retain stopped second slot", stop, v.state.managerResetCursor)
 	}
 	if v.state.values[0].BorrowNumerator().Cell != 0 || v.state.values[1].BorrowNumerator().Cell != ref || v.state.values[2].BorrowNumerator().Cell == 0 {
 		t.Fatal("source ascending reset crossed stopped slot")
@@ -72,10 +73,16 @@ func TestUPolynomialBinaryVectorManagerResetPhysicalRetry(t *testing.T) {
 	if e := v.Reset(); !errors.Is(e, ErrBinaryVectorResetPending) {
 		t.Fatal("pending reset allowed a second reset", e)
 	}
-	if e := v.Close(); !errors.Is(e, arena.ErrBounds) || v.state.managerResetCursor != 1 {
-		t.Fatal("owning close lost stopped reset slot", e)
+	if e := v.Close(); e != stop || v.state.managerResetCursor != 1 {
+		t.Fatal("source close replayed stopped reset slot", e)
+	}
+	if e := v.CleanupManagerReset(); !errors.Is(e, arena.ErrBounds) || v.state.managerResetCursor != 1 {
+		t.Fatal("owning refusal lost stopped reset slot", e)
 	}
 	q.Z.Store(ref, original)
+	if e := v.Close(); e != stop || v.state.managerResetCursor != 1 {
+		t.Fatal("repaired source close replayed stopped reset", e)
+	}
 	serviceMust(t, v.CleanupManagerReset())
 	if v.state.managerResetPending || v.state.managerResetCursor != 0 || v.state.size != 0 {
 		t.Fatal("owning retry retained manager reset")
@@ -129,10 +136,16 @@ func TestUPolynomialBinaryVectorDropPhysicalRetry(t *testing.T) {
 			if _, e := v.Size(); !errors.Is(e, ErrBinaryVectorResetPending) {
 				t.Fatal("pending drop allowed vector read", e)
 			}
-			if e := v.Close(); !errors.Is(e, arena.ErrBounds) || v.state.dropCursor != stopped {
-				t.Fatal("owning close lost stopped drop slot", e)
+			if again := v.Close(); again != e || v.state.dropCursor != stopped {
+				t.Fatal("source close replayed stopped drop slot", again)
+			}
+			if own := v.CleanupDrop(); !errors.Is(own, arena.ErrBounds) || v.state.dropCursor != stopped {
+				t.Fatal("owning refusal lost stopped drop slot", own)
 			}
 			q.Z.Store(ref, original)
+			if again := v.Close(); again != e || v.state.dropCursor != stopped {
+				t.Fatal("repaired source close replayed stopped drop", again)
+			}
 			serviceMust(t, v.CleanupDrop())
 			if v.state.dropPending || v.state.dropCursor != 0 || v.state.dropTo != 0 || v.state.size != tc.target {
 				t.Fatal("owning retry retained vector drop", v.state)
