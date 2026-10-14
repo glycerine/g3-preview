@@ -173110,7 +173110,8 @@
         "TestPsortASTContextNativeRepeatedFactoriesExactReferences",
         "TestPsortASTContextEscapedNativeStorageAfterManagerClose",
         "TestPsortASTCardSourceEntryTrace",
-        "TestPsortASTScalarEntryTracesPrecedeSourceGuards"
+        "TestPsortASTScalarEntryTracesPrecedeSourceGuards",
+        "TestPsortASTInterleaveEntryTraceBeforeOutput"
       ],
       "conditionals": [
         {
@@ -175054,7 +175055,8 @@
         "TestSmallerPatternSaveTraceBeforePairPublication",
         "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
         "TestPsortASTCardSourceEntryTrace",
-        "TestPsortASTScalarEntryTracesPrecedeSourceGuards"
+        "TestPsortASTScalarEntryTracesPrecedeSourceGuards",
+        "TestPsortASTInterleaveEntryTraceBeforeOutput"
       ],
       "conditionals": [
         {
@@ -175410,6 +175412,14 @@
           ]
         },
         {
+          "name": "retained AST psort interleave entry TRACE before output append (src/util/sorting_network.h:712)",
+          "status": "ported",
+          "go_target": "pkg/ast/util_psort_ast_sorting.go",
+          "tests": [
+            "TestPsortASTInterleaveEntryTraceBeforeOutput"
+          ]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -175468,7 +175478,8 @@
         "TestSmallerPatternSaveTraceBeforePairPublication",
         "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
         "TestPsortASTCardSourceEntryTrace",
-        "TestPsortASTScalarEntryTracesPrecedeSourceGuards"
+        "TestPsortASTScalarEntryTracesPrecedeSourceGuards",
+        "TestPsortASTInterleaveEntryTraceBeforeOutput"
       ],
       "conditionals": [
         {
@@ -175833,6 +175844,14 @@
           "go_target": "pkg/ast/util_psort_ast_sorting.go",
           "tests": [
             "TestPsortASTScalarEntryTracesPrecedeSourceGuards"
+          ]
+        },
+        {
+          "name": "retained AST psort interleave entry TRACE before output append (src/util/sorting_network.h:712)",
+          "status": "ported",
+          "go_target": "pkg/ast/util_psort_ast_sorting.go",
+          "tests": [
+            "TestPsortASTInterleaveEntryTraceBeforeOutput"
           ]
         },
         {

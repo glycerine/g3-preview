@@ -87,3 +87,47 @@ func TestPsortASTScalarEntryTracesPrecedeSourceGuards(t *testing.T) {
 		t.Fatalf("source scalar entry sequence:\n got %q\nwant %q", got, want)
 	}
 }
+
+func TestPsortASTInterleaveEntryTraceBeforeOutput(t *testing.T) {
+	m := astTestManager(t)
+	c, e := NewPsortASTContext(m)
+	astTestMust(t, e)
+	t.Cleanup(func() { astTestMust(t, c.Close()) })
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: m.BudgetField})
+	astTestMust(t, e)
+	t.Cleanup(func() { astTestMust(t, r.Close()) })
+	s, e := NewPsortASTNetwork(c, r, m.BudgetField, nil)
+	astTestMust(t, e)
+	t.Cleanup(func() { astTestMust(t, s.Close()) })
+	a, e := NewASTLiteralVector(m.BudgetField)
+	astTestMust(t, e)
+	t.Cleanup(func() { astTestMust(t, a.Close()) })
+	b, e := NewASTLiteralVector(m.BudgetField)
+	astTestMust(t, e)
+	t.Cleanup(func() { astTestMust(t, b.Close()) })
+	out, e := NewASTLiteralVector(m.BudgetField)
+	astTestMust(t, e)
+	t.Cleanup(func() { astTestMust(t, out.Close()) })
+	h, e := m.MkFalse()
+	astTestMust(t, e)
+	astTestMust(t, a.Push(h))
+
+	var buf bytes.Buffer
+	tags := udiag.NewTraceTagsWithWriter(&buf)
+	tags.Enable("pb")
+	astTestMust(t, s.BindTrace(tags))
+	astTestMust(t, s.interleave(a, b, out))
+	sz, e := out.Size()
+	astTestMust(t, e)
+	got, e := out.At(0)
+	astTestMust(t, e)
+	if sz != 1 || got != h {
+		t.Fatal("source interleave output", sz, got)
+	}
+	want := "-------- [pb] interleave src/util/sorting_network.h:712 ---------\n" +
+		"interleave: 1 0\n" +
+		"------------------------------------------------\n"
+	if got := buf.String(); got != want {
+		t.Fatalf("source interleave entry:\n got %q\nwant %q", got, want)
+	}
+}

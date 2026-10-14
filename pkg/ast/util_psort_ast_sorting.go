@@ -298,6 +298,22 @@ func (s *PsortASTNetwork) assertNotEmpty(v *ASTLiteralVector, line uint32, text 
 	return nil
 }
 func (s *PsortASTNetwork) interleave(a, b, out *ASTLiteralVector) error {
+	s.tracePBEntry(712, "interleave", func(w io.Writer) error {
+		psortTraceText(w, "interleave: ")
+		az, e := a.Size()
+		if e != nil {
+			return e
+		}
+		psortTraceUint(w, az)
+		psortTraceText(w, " ")
+		bz, e := b.Size()
+		if e != nil {
+			return e
+		}
+		psortTraceUint(w, bz)
+		psortTraceText(w, "\n")
+		return nil
+	})
 	on, e := s.assertions()
 	if e != nil {
 		return e
