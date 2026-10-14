@@ -82,7 +82,13 @@ func (m *ArbitraryFloatManager) traceFMADecimalBinary(label string, value *Arbit
 				formatError = e
 				return e
 			}
-			if e := writeNumeralDisplayPart(w, decimal+"\n"+label); e != nil {
+			if e := writeNumeralDisplayPart(w, decimal); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, "\n"); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, label); e != nil {
 				return e
 			}
 			binary, e := m.traceFloatBinaryString(value, 1, 0)
@@ -90,7 +96,10 @@ func (m *ArbitraryFloatManager) traceFMADecimalBinary(label string, value *Arbit
 				formatError = e
 				return e
 			}
-			return writeNumeralDisplayPart(w, binary+"\n")
+			if e := writeNumeralDisplayPart(w, binary); e != nil {
+				return e
+			}
+			return writeNumeralDisplayPart(w, "\n")
 		})
 	return formatError
 }
@@ -103,7 +112,13 @@ func (m *ArbitraryFloatManager) traceFMAAlignment(delta uint32, shifted, sticky 
 	var formatError error
 	_ = tags.EmitConditional("mpf_dbg", "fma", "src/util/mpf.cpp", 867,
 		func() bool { return true }, func(w io.Writer) error {
-			if e := writeNumeralDisplayPart(w, "alignment shift by delta="+strconv.FormatUint(uint64(delta), 10)+" -> sig = "); e != nil {
+			if e := writeNumeralDisplayPart(w, "alignment shift by delta="); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, strconv.FormatUint(uint64(delta), 10)); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, " -> sig = "); e != nil {
 				return e
 			}
 			s, e := m.integer.String(shifted)
@@ -111,7 +126,10 @@ func (m *ArbitraryFloatManager) traceFMAAlignment(delta uint32, shifted, sticky 
 				formatError = e
 				return e
 			}
-			if e := writeNumeralDisplayPart(w, s+" sticky_rem = "); e != nil {
+			if e := writeNumeralDisplayPart(w, s); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, " sticky_rem = "); e != nil {
 				return e
 			}
 			s, e = m.integer.String(sticky)
@@ -119,7 +137,10 @@ func (m *ArbitraryFloatManager) traceFMAAlignment(delta uint32, shifted, sticky 
 				formatError = e
 				return e
 			}
-			return writeNumeralDisplayPart(w, s+"\n")
+			if e := writeNumeralDisplayPart(w, s); e != nil {
+				return e
+			}
+			return writeNumeralDisplayPart(w, "\n")
 		})
 	return formatError
 }
@@ -140,7 +161,13 @@ func (m *ArbitraryFloatManager) traceFMASignificandBinary(decimalLabel, binaryLa
 				formatError = e
 				return e
 			}
-			if e := writeNumeralDisplayPart(w, s+"\n"+binaryLabel); e != nil {
+			if e := writeNumeralDisplayPart(w, s); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, "\n"); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, binaryLabel); e != nil {
 				return e
 			}
 			binary, e := m.traceFloatBinaryString(value, upper, lower)
@@ -148,7 +175,10 @@ func (m *ArbitraryFloatManager) traceFMASignificandBinary(decimalLabel, binaryLa
 				formatError = e
 				return e
 			}
-			return writeNumeralDisplayPart(w, binary+"\n")
+			if e := writeNumeralDisplayPart(w, binary); e != nil {
+				return e
+			}
+			return writeNumeralDisplayPart(w, "\n")
 		})
 	return formatError
 }
@@ -161,7 +191,13 @@ func (m *ArbitraryFloatManager) traceFMAOverflow(value *ArbitraryFloat) error {
 	var formatError error
 	_ = tags.EmitConditional("mpf_dbg", "fma", "src/util/mpf.cpp", 913,
 		func() bool { return true }, func(w io.Writer) error {
-			if e := writeNumeralDisplayPart(w, "Add/Sub overflew into 4.xxx!\nS*= "); e != nil {
+			if e := writeNumeralDisplayPart(w, "Add/Sub overflew into 4.xxx!"); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, "\n"); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, "S*= "); e != nil {
 				return e
 			}
 			binary, e := m.traceFloatBinaryString(value, 2, 0)
@@ -169,7 +205,10 @@ func (m *ArbitraryFloatManager) traceFMAOverflow(value *ArbitraryFloat) error {
 				formatError = e
 				return e
 			}
-			return writeNumeralDisplayPart(w, binary+"\n")
+			if e := writeNumeralDisplayPart(w, binary); e != nil {
+				return e
+			}
+			return writeNumeralDisplayPart(w, "\n")
 		})
 	return formatError
 }
@@ -190,7 +229,19 @@ func (m *ArbitraryFloatManager) traceFMARenormalized(value *ArbitraryFloat, delt
 				formatError = e
 				return e
 			}
-			return writeNumeralDisplayPart(w, binary+" (renormalized, delta="+strconv.FormatUint(uint64(delta), 10)+")\n")
+			if e := writeNumeralDisplayPart(w, binary); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, " (renormalized, delta="); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, strconv.FormatUint(uint64(delta), 10)); e != nil {
+				return e
+			}
+			if e := writeNumeralDisplayPart(w, ")"); e != nil {
+				return e
+			}
+			return writeNumeralDisplayPart(w, "\n")
 		})
 	return formatError
 }

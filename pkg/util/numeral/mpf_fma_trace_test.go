@@ -349,3 +349,64 @@ func TestArbitraryFloatFMAResultAndRenormalizationTrace(t *testing.T) {
 	serviceMust(t, m.Del(&addend))
 	serviceMust(t, m.Del(&out))
 }
+
+func TestArbitraryFloatFMATraceSourceInsertions(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	w := &mpffArithmeticTraceWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpf_dbg")
+	if !tags.ShouldTrace("mpf_dbg") {
+		return
+	}
+	serviceMust(t, m.BindTrace(tags))
+	var one, addend, out ArbitraryFloat
+	serviceMust(t, m.MkOne(11, 53, false, &one))
+	serviceMust(t, m.SetDouble(&addend, 11, 53, -0.5))
+	serviceMust(t, m.FMA(ArbitraryFloatNearestEven, &one, &one, &addend, &out))
+	for _, label := range []string{"M = ", "C_= ", "M'= ", "C'= ", "S'= "} {
+		found := false
+		for i := 0; i+5 < len(w.parts); i++ {
+			if w.parts[i] == label && w.parts[i+1] != "" && w.parts[i+2] == "\n" && w.parts[i+3] == label && strings.HasPrefix(w.parts[i+4], "#b") && w.parts[i+5] == "\n" {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Fatalf("missing FMA paired insertion %q in %q", label, w.parts)
+		}
+	}
+	foundAlignment := false
+	for i := 0; i+6 < len(w.parts); i++ {
+		if w.parts[i] == "alignment shift by delta=" && w.parts[i+1] != "" && w.parts[i+2] == " -> sig = " && w.parts[i+3] != "" && w.parts[i+4] == " sticky_rem = " && w.parts[i+5] != "" && w.parts[i+6] == "\n" {
+			foundAlignment = true
+			break
+		}
+	}
+	if !foundAlignment {
+		t.Fatalf("missing FMA alignment insertions in %q", w.parts)
+	}
+	if !hasFloatTraceValueInsertion(w.parts, "sum[-1:sbits+2] = ") {
+		t.Fatalf("missing FMA result significand insertions in %q", w.parts)
+	}
+	if !hasFloatTraceValueInsertion(w.parts, "R = ") {
+		t.Fatalf("missing FMA result binary insertions in %q", w.parts)
+	}
+	foundRenorm := false
+	for i := 0; i+5 < len(w.parts); i++ {
+		if w.parts[i] == "R*= " && strings.HasPrefix(w.parts[i+1], "#b") && w.parts[i+2] == " (renormalized, delta=" && w.parts[i+3] != "" && w.parts[i+4] == ")" && w.parts[i+5] == "\n" {
+			foundRenorm = true
+			break
+		}
+	}
+	if !foundRenorm {
+		t.Fatalf("missing FMA renormalization insertions in %q", w.parts)
+	}
+	w.parts = nil
+	serviceMust(t, m.traceFMAOverflow(&one))
+	if !hasMPFFTraceParts(w.parts, []string{"Add/Sub overflew into 4.xxx!", "\n", "S*= "}) || !hasFloatTraceValueInsertion(w.parts, "S*= ") {
+		t.Fatalf("missing FMA overflow insertion boundaries in %q", w.parts)
+	}
+	serviceMust(t, m.Del(&one))
+	serviceMust(t, m.Del(&addend))
+	serviceMust(t, m.Del(&out))
+}
