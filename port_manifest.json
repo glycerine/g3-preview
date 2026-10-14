@@ -118900,7 +118900,7 @@
         },
         {
           "name": "Concrete native monomial interning specialization: insertion-ordered insdict entries and Go hash buckets, stable temporary publication, project hash/equality, find/erase and owning token cleanup. C++ table geometry/counters and container failures removed.",
-          "status": "partial",
+          "status": "platform_replacement",
           "go_target": "pkg/math/polynomial/polynomial_monomial_table.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
