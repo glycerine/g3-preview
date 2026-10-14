@@ -295,26 +295,8 @@ func (m *FastFloatManager) ToRational(a *FastFloat, qm *RationalManager, out *Ra
 			return e
 		}
 		if exp != 0 {
-			p := NewRational()
-			defer qm.Del(&p)
-			if e := qm.SetInt64(&p, 2); e != nil {
+			if e := m.multiplyToRationalPower(qm, out, exp); e != nil {
 				return e
-			}
-			power := uint32(exp)
-			if exp < 0 {
-				power = uint32(-int64(exp))
-			}
-			if e := qm.Power(&p, power, &p); e != nil {
-				return e
-			}
-			if exp < 0 {
-				if e := qm.Div(out, &p, out); e != nil {
-					return e
-				}
-			} else {
-				if e := qm.Mul(out, &p, out); e != nil {
-					return e
-				}
 			}
 		}
 	}
@@ -322,4 +304,33 @@ func (m *FastFloatManager) ToRational(a *FastFloat, qm *RationalManager, out *Ra
 		return qm.Neg(out)
 	}
 	return nil
+}
+
+// The source p scope ends before the final sign change in ToRational.
+func (m *FastFloatManager) multiplyToRationalPower(qm *RationalManager, out *Rational, exp int32) (err error) {
+	m.rationalPower = NewRational()
+	m.rationalPowerOwner = qm
+	m.rationalPowerPending = true
+	m.rationalPowerCursor = 0
+	m.rationalPowerExecuting = true
+	defer func() {
+		if cleanup := m.cleanupToRationalPower(true); err == nil {
+			err = cleanup
+		}
+		m.rationalPowerExecuting = false
+	}()
+	if err = qm.SetInt64(&m.rationalPower, 2); err != nil {
+		return err
+	}
+	power := uint32(exp)
+	if exp < 0 {
+		power = uint32(-int64(exp))
+	}
+	if err = qm.Power(&m.rationalPower, power, &m.rationalPower); err != nil {
+		return err
+	}
+	if exp < 0 {
+		return qm.Div(out, &m.rationalPower, out)
+	}
+	return qm.Mul(out, &m.rationalPower, out)
 }

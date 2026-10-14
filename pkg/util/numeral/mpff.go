@@ -63,32 +63,37 @@ var ErrFastFloatPowerDomain = errors.New("mpnum: MPFF power mask wrapped into no
 var ErrFastFloatPowerPending = errors.New("mpnum: MPFF power scoped cleanup pending")
 var ErrFastFloatRationalPending = errors.New("mpnum: MPFF rational setter cleanup pending")
 var ErrFastFloatIntegerPending = errors.New("mpnum: MPFF to-integer power cleanup pending")
+var ErrFastFloatToRationalPending = errors.New("mpnum: MPFF to-rational power cleanup pending")
 var ErrFastFloatOwner = errors.New("mpnum: invalid MPFF owner or dead significand")
 
 // Cold owner: owns its buffers and services, borrowing a configured Runtime; caller numerical
 // conversion managers are borrowed only for their individual operation.
 type FastFloatManager struct {
-	self                                       *FastFloatManager
-	trace                                      *diagnostic.TraceTags
-	natural                                    *NaturalManager
-	config                                     FastFloatConfig
-	precision, bits, capacity, next, live      uint32
-	toPlus, closed                             bool
-	headerBytes                                uint64
-	significands, metadata, freeIDs, setBuffer []uint32
-	buffers                                    [4][]uint32
-	formatting                                 fastFormattingScope
-	closing                                    bool
-	one                                        FastFloat
-	powerWork, powerTrace                      FastFloat
-	powerWorkPending, powerTracePending        bool
-	powerExecuting                             bool
-	rationalNum, rationalDen                   FastFloat
-	rationalPending, rationalExecuting         bool
-	rationalCursor                             uint8
-	integerPower                               Int
-	integerPowerOwner                          *IntegerManager
-	integerPowerPending, integerExecuting      bool
+	self                                         *FastFloatManager
+	trace                                        *diagnostic.TraceTags
+	natural                                      *NaturalManager
+	config                                       FastFloatConfig
+	precision, bits, capacity, next, live        uint32
+	toPlus, closed                               bool
+	headerBytes                                  uint64
+	significands, metadata, freeIDs, setBuffer   []uint32
+	buffers                                      [4][]uint32
+	formatting                                   fastFormattingScope
+	closing                                      bool
+	one                                          FastFloat
+	powerWork, powerTrace                        FastFloat
+	powerWorkPending, powerTracePending          bool
+	powerExecuting                               bool
+	rationalNum, rationalDen                     FastFloat
+	rationalPending, rationalExecuting           bool
+	rationalCursor                               uint8
+	integerPower                                 Int
+	integerPowerOwner                            *IntegerManager
+	integerPowerPending, integerExecuting        bool
+	rationalPower                                Rational
+	rationalPowerOwner                           *RationalManager
+	rationalPowerPending, rationalPowerExecuting bool
+	rationalPowerCursor                          uint8
 }
 
 func NewFastFloatManager(c FastFloatConfig) (*FastFloatManager, error) {
@@ -161,6 +166,9 @@ func (m *FastFloatManager) open() error {
 	}
 	if m.integerPowerPending && !m.integerExecuting {
 		return ErrFastFloatIntegerPending
+	}
+	if m.rationalPowerPending && !m.rationalPowerExecuting {
+		return ErrFastFloatToRationalPending
 	}
 	return nil
 }
@@ -328,6 +336,9 @@ func (m *FastFloatManager) CloseChecked() error {
 	if m.integerExecuting {
 		return ErrFastFloatIntegerPending
 	}
+	if m.rationalPowerExecuting {
+		return ErrFastFloatToRationalPending
+	}
 	m.closing = true
 	if e := m.CleanupPowerTemporaries(); e != nil {
 		return e
@@ -336,6 +347,9 @@ func (m *FastFloatManager) CloseChecked() error {
 		return e
 	}
 	if e := m.CleanupToIntegerPower(); e != nil {
+		return e
+	}
+	if e := m.CleanupToRationalPower(); e != nil {
 		return e
 	}
 	if m.natural != nil {
@@ -476,6 +490,41 @@ func (m *FastFloatManager) CleanupToIntegerPower() error {
 		return ErrFastFloatIntegerPending
 	}
 	return m.cleanupToIntegerPower()
+}
+
+func (m *FastFloatManager) cleanupToRationalPower(source bool) error {
+	if !m.rationalPowerPending {
+		return nil
+	}
+	parts := [2]*Int{&m.rationalPower.Num, &m.rationalPower.Den}
+	for m.rationalPowerCursor < 2 {
+		var e error
+		if source {
+			_, e = sourceNumeralDel(m.rationalPowerOwner.Z, parts[m.rationalPowerCursor])
+		} else {
+			e = m.rationalPowerOwner.Z.Del(parts[m.rationalPowerCursor])
+		}
+		if e != nil {
+			return e
+		}
+		m.rationalPowerCursor++
+	}
+	m.rationalPower = Rational{}
+	m.rationalPowerOwner = nil
+	m.rationalPowerPending = false
+	m.rationalPowerCursor = 0
+	return nil
+}
+
+// CleanupToRationalPower resumes numerator then denominator deletion.
+func (m *FastFloatManager) CleanupToRationalPower() error {
+	if m == nil || m.self != m {
+		return ErrFastFloatOwner
+	}
+	if m.rationalPowerExecuting {
+		return ErrFastFloatToRationalPending
+	}
+	return m.cleanupToRationalPower(false)
 }
 
 func (m *FastFloatManager) Precise() bool { return false }
