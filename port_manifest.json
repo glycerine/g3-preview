@@ -168687,6 +168687,8 @@
         "pkg/math/polynomial/polynomial_psc_next_invocation_source_test.go",
         "pkg/ast/rewriter/bv_rewriter_concat.go",
         "pkg/ast/rewriter/bv_rewriter_concat_test.go",
+        "pkg/ast/rewriter/bv_polynomial_mul_core.go",
+        "pkg/ast/rewriter/bv_polynomial_mul_core_test.go",
         "pkg/tactic/ufbv/rewrite_traversal.go",
         "pkg/tactic/ufbv/rewrite_traversal_test.go",
         "pkg/tactic/ufbv/rewrite_back_index.go",
@@ -168718,6 +168720,8 @@
         "TestPolynomialPSCNextBorrowedHCallbackCannotMutateOwnedBuffer",
         "TestPolynomialPSCNextExpiredCompletedChildrenPreserveLaterVariableAndH",
         "TestBVConcatNativeRootsPushPopAndForwardDestruction",
+        "TestBVPolynomialNonflatMultiplicationCartesianOrderAndLimit",
+        "TestBVPolynomialNonflatMultiplicationEveryCartesianOwnerAndFactoryReservation",
         "TestPolynomialGCDNativeMonomialSliceOwnsDuplicateReferences",
         "TestPolynomialGCDNativeMonomialSliceGeneratedOwnershipAndStoppedReset",
         "TestPolynomialGCDICCPZPXNativeMonomialGrowthIndependentModel",
@@ -168848,6 +168852,15 @@
           "tests": [
             "TestBVConcatNativeRootsPushPopAndForwardDestruction",
             "TestBVRewriterConcatEveryColdReservationAndPublication"
+          ]
+        },
+        {
+          "name": "Concrete BV polynomial sum-of-monomials expr_ref_buffer: generated terms gain references before publication, survive blowup or factory failure, and release in source insertion order (poly_rewriter_def.h:349-367)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_polynomial_mul_core.go",
+          "tests": [
+            "TestBVPolynomialNonflatMultiplicationCartesianOrderAndLimit",
+            "TestBVPolynomialNonflatMultiplicationEveryCartesianOwnerAndFactoryReservation"
           ]
         },
         {
