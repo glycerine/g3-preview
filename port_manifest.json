@@ -168691,6 +168691,10 @@
         "pkg/ast/rewriter/bv_polynomial_mul_core_test.go",
         "pkg/ast/rewriter/bv_polynomial_sub.go",
         "pkg/ast/rewriter/bv_polynomial_sub_test.go",
+        "pkg/ast/ast_bv_polynomial_hoist.go",
+        "pkg/ast/ast_bv_polynomial_hoist_test.go",
+        "pkg/ast/rewriter/bv_polynomial_add_core.go",
+        "pkg/ast/rewriter/bv_polynomial_add_core_test.go",
         "pkg/tactic/ufbv/rewrite_traversal.go",
         "pkg/tactic/ufbv/rewrite_traversal_test.go",
         "pkg/tactic/ufbv/rewrite_back_index.go",
@@ -168727,6 +168731,10 @@
         "TestBVPolynomialSubtractionRetainsSourceProductsAndSkipsZero",
         "TestBVPolynomialSubtractionEveryOwnerAndFactoryReservation",
         "TestBVPolynomialSubtractionSingletonBeforeSortAndAllocation",
+        "TestASTBitVectorCoefficientHoistSoleSliceOwnershipAndGrowth",
+        "TestASTBitVectorCoefficientHoistEveryActualReservation",
+        "TestBVPolynomialNonflatAdditionBothHoistPaths",
+        "TestBVPolynomialNonflatAdditionEveryColdReservation",
         "TestPolynomialGCDNativeMonomialSliceOwnsDuplicateReferences",
         "TestPolynomialGCDNativeMonomialSliceGeneratedOwnershipAndStoppedReset",
         "TestPolynomialGCDICCPZPXNativeMonomialGrowthIndependentModel",
@@ -168876,6 +168884,17 @@
             "TestBVPolynomialSubtractionRetainsSourceProductsAndSkipsZero",
             "TestBVPolynomialSubtractionEveryOwnerAndFactoryReservation",
             "TestBVPolynomialSubtractionSingletonBeforeSortAndAllocation"
+          ]
+        },
+        {
+          "name": "Concrete BV coefficient-hoist expr_ref_buffer set and resize: acquire replacement before retiring the old root, preserve both on stopped deletion, and release the discarded suffix in source order (poly_rewriter_def.h:454-492)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_bv_polynomial_hoist.go",
+          "tests": [
+            "TestASTBitVectorCoefficientHoistSoleSliceOwnershipAndGrowth",
+            "TestASTBitVectorCoefficientHoistEveryActualReservation",
+            "TestBVPolynomialNonflatAdditionBothHoistPaths",
+            "TestBVPolynomialNonflatAdditionEveryColdReservation"
           ]
         },
         {
