@@ -175302,7 +175302,7 @@
       "methods": [
         {
           "name": "set_timeout: replace process-global scoped_timer and its owning event handler",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/shell/timeout.go",
           "tests": [
             "TestShellTimeoutReplacementDisabledAndBorrowedCallback",
@@ -175312,7 +175312,7 @@
         },
         {
           "name": "register_on_timeout_proc: replace borrowed process-global callback",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/shell/timeout.go",
           "tests": [
             "TestShellTimeoutReplacementDisabledAndBorrowedCallback"
@@ -175368,7 +175368,7 @@
       "methods": [
         {
           "name": "set_timeout(long)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/shell/timeout.go",
           "tests": [
             "TestShellTimeoutReplacementDisabledAndBorrowedCallback",
@@ -175378,7 +175378,7 @@
         },
         {
           "name": "register_on_timeout_proc(void (*)())",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/shell/timeout.go",
           "tests": [
             "TestShellTimeoutReplacementDisabledAndBorrowedCallback"
