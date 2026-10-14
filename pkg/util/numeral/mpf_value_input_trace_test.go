@@ -226,6 +226,53 @@ func TestArbitraryFloatSetFormattedLiteralTrace(t *testing.T) {
 	serviceMust(t, m.Del(&out))
 }
 
+func TestArbitraryFloatSetTraceSourceInsertions(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	w := &mpffArithmeticTraceWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpf_dbg")
+	if !tags.ShouldTrace("mpf_dbg") {
+		return
+	}
+	serviceMust(t, m.BindTrace(tags))
+	var out ArbitraryFloat
+	serviceMust(t, m.SetInt32(&out, 8, 24, -7))
+	if !hasMPFFTraceParts(w.parts, []string{"set: value = ", "-7", "\n"}) || !hasFloatTraceValueInsertion(w.parts, "set: res = ") {
+		t.Fatalf("integer setter insertion boundaries: %q", w.parts)
+	}
+	w.parts = nil
+	serviceMust(t, m.SetFloat(&out, 8, 24, 1.25))
+	if !hasFloatTraceValueInsertion(w.parts, "set: res = ") {
+		t.Fatalf("raw float setter insertion boundaries: %q", w.parts)
+	}
+	var q Rational
+	serviceMust(t, m.rational.SetFraction(&q, 3, 4))
+	w.parts = nil
+	serviceMust(t, m.SetRational(&out, 8, 24, ArbitraryFloatNearestEven, &q))
+	if !hasMPFFTraceParts(w.parts, []string{"set: ", "3/4", " [", "8", "/", "24", "]", "\n"}) {
+		t.Fatalf("rational setter entry insertions: %q", w.parts)
+	}
+	for _, label := range []string{"set: sig = ", "Normalized: sig = ", "sig = "} {
+		found := false
+		for i := 0; i+4 < len(w.parts); i++ {
+			if w.parts[i] == label && w.parts[i+1] != "" && w.parts[i+2] == " exp = " && w.parts[i+3] != "" && w.parts[i+4] == "\n" {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Fatalf("rational setter %q insertion boundaries: %q", label, w.parts)
+		}
+	}
+	w.parts = nil
+	serviceMust(t, m.SetFormattedLiteral(&out, 8, 24, ArbitraryFloatNearestEven, "-1.25P2"))
+	if !hasMPFFTraceParts(w.parts, []string{"set: ", "-1.25P2", " [", "8", "/", "24", "]", "\n"}) || !hasFloatTraceValueInsertion(w.parts, "set: res = ") {
+		t.Fatalf("formatted literal setter insertion boundaries: %q", w.parts)
+	}
+	serviceMust(t, m.rational.Del(&q))
+	serviceMust(t, m.Del(&out))
+}
+
 func TestArbitraryFloatSetExponentRationalTraceBranches(t *testing.T) {
 	m, _, _ := mpfNumeralHelpersFixture(t)
 	var output bytes.Buffer

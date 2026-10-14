@@ -150753,6 +150753,7 @@
         "TestArbitraryFloatRoundDecisionTraceBranches",
         "TestArbitraryFloatSetExponentRationalTraceBranches",
         "TestArbitraryFloatSetFormattedLiteralTrace",
+        "TestArbitraryFloatSetTraceSourceInsertions",
         "TestArbitraryFloatSetPlainRationalTrace",
         "TestArbitraryFloatSetInt32TraceEntryAndResult",
         "TestArbitraryFloatSetInt32TraceFormatterRefusal",
@@ -151418,31 +151419,31 @@
           "name": "mpf_manager::set(mpz,mpq) mpf_dbg entry, normalized, pre-round fields and result TRACE records at mpf.cpp:235,270,289,300",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_rational_set.go",
-          "tests": ["TestArbitraryFloatSetExponentRationalTraceBranches", "TestArbitraryFloatSetPlainRationalTrace", "TestArbitraryFloatSetFormattedLiteralTrace"]
+          "tests": ["TestArbitraryFloatSetExponentRationalTraceBranches", "TestArbitraryFloatSetPlainRationalTrace", "TestArbitraryFloatSetFormattedLiteralTrace", "TestArbitraryFloatSetTraceSourceInsertions"]
         },
         {
           "name": "mpf_manager::set(char const*) mpf_dbg input, parsed pieces and result TRACE records at mpf.cpp:195,219,230",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_formatted_literal.go",
-          "tests": ["TestArbitraryFloatSetFormattedLiteralTrace"]
+          "tests": ["TestArbitraryFloatSetFormattedLiteralTrace", "TestArbitraryFloatSetTraceSourceInsertions"]
         },
         {
           "name": "mpf_manager::set(mpq) mpf_dbg input and result TRACE records at mpf.cpp:187,191",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_plain_rational_set.go",
-          "tests": ["TestArbitraryFloatSetPlainRationalTrace"]
+          "tests": ["TestArbitraryFloatSetPlainRationalTrace", "TestArbitraryFloatSetTraceSourceInsertions"]
         },
         {
           "name": "mpf_manager::set(double/float) mpf_dbg native-bit input and ordinary/raw result TRACE records at mpf.cpp:124,147,160,183",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_value_input_trace.go",
-          "tests": ["TestArbitraryFloatSetNativeTraceFormats", "TestArbitraryFloatSetFloatRawTraceFormatterRefusal"]
+          "tests": ["TestArbitraryFloatSetNativeTraceFormats", "TestArbitraryFloatSetFloatRawTraceFormatterRefusal", "TestArbitraryFloatSetTraceSourceInsertions"]
         },
         {
           "name": "mpf_manager::set(int) mpf_dbg input and result TRACE records at mpf.cpp:76,105",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_value_input_trace.go",
-          "tests": ["TestArbitraryFloatSetInt32TraceEntryAndResult", "TestArbitraryFloatSetInt32TraceFormatterRefusal"]
+          "tests": ["TestArbitraryFloatSetInt32TraceEntryAndResult", "TestArbitraryFloatSetInt32TraceFormatterRefusal", "TestArbitraryFloatSetTraceSourceInsertions"]
         },
         {
           "name": "mpf_manager::fma mpf_dbg entry and general-body TRACE records at mpf.cpp:752-754,813-818,830-831,844-845,852,867-874,880,892,899,913,925,940",
