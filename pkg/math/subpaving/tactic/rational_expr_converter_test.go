@@ -188,6 +188,20 @@ func TestRationalExprConverterExactLeafGoalAndCleanup(t *testing.T) {
 	if got, err := converter.InternalizeTerm(power, &n, &d); err != nil || got == math.MaxUint32 || got == variable {
 		t.Fatal("rational power definition", got, err)
 	}
+	if err := q.SetString(&value, "0"); err != nil {
+		t.Fatal(err)
+	}
+	zero, err := m.ArithmeticNumeral(&value, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	zeroPower, err := m.MkFamilyApp(family, 18, nil, []ast.ASTHandle{x, zero})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := converter.InternalizeTerm(zeroPower, &n, &d); !errors.Is(err, ErrExprConverterUnsupported) {
+		t.Fatal("zero-degree monomial violates source assertion", err)
+	}
 	sumLE, err := m.MkFamilyApp(family, 2, nil, []ast.ASTHandle{sum, two})
 	if err != nil {
 		t.Fatal(err)

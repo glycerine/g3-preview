@@ -54219,6 +54219,8 @@
         "pkg/math/subpaving/tactic/rational_expr_converter.go",
         "pkg/math/subpaving/tactic/rational_expr_arith.go",
         "pkg/math/subpaving/tactic/rational_expr_converter_test.go",
+        "pkg/math/subpaving/tactic/rational_core_tactic.go",
+        "pkg/math/subpaving/tactic/rational_core_tactic_test.go",
         "pkg/math/subpaving/tactic/arbitrary_engine.go",
         "pkg/math/subpaving/tactic/arbitrary_engine_test.go",
         "pkg/math/subpaving/tactic/goal_internalize.go",
@@ -54241,6 +54243,7 @@
         "TestHardwareExprConverterTerms",
         "TestRationalEngineSelectionSearchAndCleanup",
         "TestRationalExprConverterExactLeafGoalAndCleanup",
+        "TestRationalCoreTacticBorrowedGoalStatisticsAndFreshCleanup",
         "TestArbitraryEngineSelectedContextAndPartialCleanup",
         "TestArbitraryExprConverterTermsAndClause",
         "TestArbitraryExprConverterSearchSimpleGoal",
@@ -54252,7 +54255,15 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Concrete MPQ inequality and clause internalization plus goal-order search for arithmetic leaves; compound term conversion and full tactic application remain open (src/math/subpaving/tactic/subpaving_tactic.cpp:128-190)",
+          "name": "Concrete MPQ core tactic default apply returns borrowed goal, accumulates/reset statistics, forwards params and reconstructs converter/context on cleanup; print_nodes display remains open (src/math/subpaving/tactic/subpaving_tactic.cpp:193-263)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/tactic/rational_core_tactic.go",
+          "tests": [
+            "TestRationalCoreTacticBorrowedGoalStatisticsAndFreshCleanup"
+          ]
+        },
+        {
+          "name": "Concrete MPQ inequality and clause internalization plus goal-order search for arithmetic leaves and compound terms; print_nodes display remains open (src/math/subpaving/tactic/subpaving_tactic.cpp:128-190)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/tactic/rational_expr_converter.go",
           "tests": [
@@ -170233,6 +170244,8 @@
         "pkg/util/numeral/scoped_integer_buffer16.go",
         "pkg/math/subpaving/tactic/expr_converter.go",
         "pkg/math/subpaving/tactic/expr_converter_test.go",
+        "pkg/math/subpaving/tactic/rational_expr_arith.go",
+        "pkg/math/subpaving/tactic/rational_expr_converter_test.go",
         "pkg/math/polynomial/polynomial_to_polynomial.go",
         "pkg/math/polynomial/polynomial_global_convert.go",
         "pkg/math/polynomial/polynomial_to_polynomial_test.go",
@@ -170251,6 +170264,7 @@
         "TestScopedIntegerBuffer16FailedCopyRetainsOwningCleanup",
         "TestScopedIntegerBuffer16FailedInPlaceScaleRetainsOwningCleanup",
         "TestHardwareExprConverterTerms",
+        "TestRationalExprConverterExactLeafGoalAndCleanup",
         "TestPolynomialToPolynomialIndependentAscendingCoefficients",
         "TestPolynomialToPolynomialEveryActualPrefix",
         "TestPolynomialGlobalConvertDistinctOwnerFilter",
@@ -170288,10 +170302,14 @@
           "name": "Concrete unsynch_mpz_manager scoped integer buffers for expr2subpaving process_add: deep push, in-place numerator scaling, borrowed c_ptr view and ascending destructor cleanup",
           "status": "ported",
           "go_target": "pkg/util/numeral/scoped_integer_buffer16.go",
+          "go_targets": [
+            "pkg/math/subpaving/tactic/rational_expr_arith.go"
+          ],
           "tests": [
             "TestScopedIntegerBuffer16CopiesMutableSubpavingCoefficients",
             "TestScopedIntegerBuffer16FailedCopyRetainsOwningCleanup",
-            "TestScopedIntegerBuffer16FailedInPlaceScaleRetainsOwningCleanup"
+            "TestScopedIntegerBuffer16FailedInPlaceScaleRetainsOwningCleanup",
+            "TestRationalExprConverterExactLeafGoalAndCleanup"
           ]
         }
       ],
@@ -170299,7 +170317,7 @@
         "Concrete []Int elements retain numeral ownership. Deep copy and ascending source deletion remain explicit; a stopped deletion leaves older elements untouched, and borrowed views reference the live slice rather than a clone. The subpaving integer specialization has its own manager-owned copied numerals and explicit owning cleanup after a stopped source scope."
       ],
       "deviations": [
-        "The polynomial mpzzp and subpaving unsynch_mpz specializations use separate concrete []Int owners. All three retained production sites are integrated: polynomial to_polynomial and global convert use ScopedIntegerModularBuffer128, and subpaving process_add uses ScopedIntegerBuffer16. Native slices replace source inline/spill storage; no any-valued universal buffer is retained.",
+        "The polynomial mpzzp and subpaving unsynch_mpz specializations use separate concrete []Int owners. All three retained source production sites are integrated: polynomial to_polynomial and global convert use ScopedIntegerModularBuffer128; HWF, MPF and MPFF subpaving process_add use ScopedIntegerBuffer16, while the concrete MPQ tactic process_add uses direct owning []Int numerator/denominator slices and exact Rational coefficients. Native slices replace source inline/spill storage; no any-valued universal buffer is retained.",
         "Borrowed views remain valid only while the owning buffer is live and unchanged."
       ]
     },
