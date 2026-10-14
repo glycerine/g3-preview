@@ -125339,7 +125339,7 @@
           ]
         },
         {
-          "name": "string/stream value, inspection, extraction and owned accessors",
+          "name": "remaining string/stream inspection, extraction and owned accessors beyond separately credited predicates, hash and formatting",
           "status": "partial",
           "go_target": "pkg/util/numeral/inf_rational.go",
           "tests": [
@@ -125359,6 +125359,16 @@
             "TestRationalServiceInfinitesimalConstructorFailureRefunds",
             "TestRationalServiceInfinitesimalFinalizerTraversal",
             "TestInfHashesStopBeforeCombiningFailedComponent"
+          ]
+        },
+        {
+          "name": "is_zero/is_one/is_minus_one and lexicographic is_neg/is_pos/is_nonneg/is_nonpos scalar predicates (inf_rational.h:277-310)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_rational.go",
+          "tests": [
+            "TestInfRationalSource80Assertions",
+            "TestInfRationalFullHeaderQueriesAndAliases",
+            "TestRawProjectionInfQueriesAndShortCircuits"
           ]
         },
         {
