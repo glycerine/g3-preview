@@ -20,6 +20,8 @@ type RationalNode struct {
 	self         *RationalNode
 	numbers      *numeral.RationalManager
 	parent       *RationalNode
+	context      *RationalContext
+	registered   bool
 	lower, upper []*RationalBound
 	owned        []*RationalBound
 	children     uint32
@@ -43,6 +45,7 @@ func NewRationalNode(m *numeral.RationalManager, variables uint32, parent *Ratio
 	if parent != nil {
 		copy(n.lower, parent.lower)
 		copy(n.upper, parent.upper)
+		n.context = parent.context
 		parent.children++
 	}
 	return n, nil
@@ -69,6 +72,13 @@ func (n *RationalNode) Bounds(variable uint32) (*RationalBound, *RationalBound, 
 }
 
 func (n *RationalNode) PushBound(variable uint32, value *numeral.Rational, lower, open bool) error {
+	if n != nil && n.context != nil {
+		return arena.ErrInvalidSlot
+	}
+	return n.pushBound(variable, value, lower, open)
+}
+
+func (n *RationalNode) pushBound(variable uint32, value *numeral.Rational, lower, open bool) error {
 	if _, _, err := n.Bounds(variable); err != nil {
 		return err
 	}

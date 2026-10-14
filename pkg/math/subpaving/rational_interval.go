@@ -127,16 +127,6 @@ func (v *RationalInterval) pairView(other *RationalInterval) (*numeral.Rational,
 	return lo, hi, nil
 }
 
-func (v *RationalInterval) pair(other *RationalInterval) error {
-	if _, _, err := v.pairView(other); err != nil {
-		return err
-	}
-	if other.constantNode != nil {
-		return arena.ErrInvalidSlot
-	}
-	return nil
-}
-
 func (v *RationalInterval) SetFinite(lower, upper *numeral.Rational, lowerOpen, upperOpen bool) error {
 	if err := v.mutable(); err != nil {
 		return err

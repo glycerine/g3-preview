@@ -51658,9 +51658,14 @@
       "path": "src/math/subpaving/subpaving_mpq.cpp",
       "component": "math",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/subpaving/rational_context_root.go",
+        "pkg/math/subpaving/rational_node.go"
+      ],
+      "tests": [
+        "TestRationalContextRootIntegerBoundsAndChildViews"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
@@ -51678,7 +51683,9 @@
         "pkg/math/subpaving/rational_interval_scalar.go",
         "pkg/math/subpaving/rational_interval_mul.go",
         "pkg/math/subpaving/rational_interval_div.go",
-        "pkg/math/subpaving/rational_interval_power.go"
+        "pkg/math/subpaving/rational_interval_power.go",
+        "pkg/math/subpaving/rational_context_root.go",
+        "pkg/math/subpaving/rational_node.go"
       ],
       "tests": [
         "TestSubpavingRationalMutableIntervalCore",
@@ -51686,7 +51693,8 @@
         "TestSubpavingRationalIntervalScalarSourceBranches",
         "TestSubpavingRationalIntervalMulNineSignClassesAndTies",
         "TestSubpavingRationalIntervalDivSixSignAndOpenZeroBranches",
-        "TestSubpavingRationalIntervalPowerSourceCases"
+        "TestSubpavingRationalIntervalPowerSourceCases",
+        "TestRationalContextRootIntegerBoundsAndChildViews"
       ],
       "conditionals": [
         {
@@ -52069,8 +52077,8 @@
           ]
         },
         {
-          "name": "Concrete config_mpq mutable endpoints and live rational node-bound views for invariant, zero-containment, display and owned copy; arithmetic operands and context integration remain open (src/math/subpaving/subpaving_t.h:239-316)",
-          "status": "partial",
+          "name": "Concrete config_mpq mutable endpoints and live rational node-bound views for invariant, zero-containment, display and owned copy (src/math/subpaving/subpaving_t.h:239-316)",
+          "status": "ported",
           "go_target": "pkg/math/subpaving/rational_interval.go",
           "go_targets": [
             "pkg/math/subpaving/rational_node.go"
@@ -52078,6 +52086,17 @@
           "tests": [
             "TestSubpavingRationalMutableIntervalCore",
             "TestRationalIntervalLiveNodeBoundsAndOwnedCopy"
+          ]
+        },
+        {
+          "name": "Concrete config_mpq variable registration, root and child node views, and exact integer bound normalization (src/math/subpaving/subpaving_t_def.h:291-342,525-569); conflict, propagation and search remain open",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/rational_context_root.go",
+          "go_targets": [
+            "pkg/math/subpaving/rational_node.go"
+          ],
+          "tests": [
+            "TestRationalContextRootIntegerBoundsAndChildViews"
           ]
         },
         {
