@@ -42,7 +42,7 @@ func (c *RationalContext) Search() error {
 	}
 	for c.searchNode != nil || c.leafHead != nil {
 		if c.searchNode == nil {
-			if err := sourceCheckpoint(c.limit, c.runtime, c.process, c.maxMemory, ErrRationalContextCanceled, nil); err != nil {
+			if err := sourceCheckpoint(c.limit, c.runtime, c.process, c.maxMemory, ErrRationalContextCanceled, c.cooperation); err != nil {
 				return err
 			}
 			if len(c.queue) != 0 || c.queueHead != 0 {

@@ -58,3 +58,14 @@ func (c *HardwareContext) BindCooperation(owner *cooperate.Cooperation) error {
 	c.cooperation = owner
 	return nil
 }
+
+func (c *RationalContext) BindCooperation(owner *cooperate.Cooperation) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if err := checkCooperation(owner); err != nil {
+		return err
+	}
+	c.cooperation = owner
+	return nil
+}

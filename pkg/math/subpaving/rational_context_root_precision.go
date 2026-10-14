@@ -25,7 +25,7 @@ func (c *RationalContext) XnEqY(out, src *RationalInterval, degree uint32) error
 	if err := c.open(); err != nil {
 		return err
 	}
-	err := out.XnEqY(src, degree, &c.rootPrecision, interval.RationalRoot{Numbers: c.numbers, Limit: c.limit})
+	err := out.XnEqY(src, degree, &c.rootPrecision, interval.RationalRoot{Numbers: c.numbers, Limit: c.limit, Cooperation: c.cooperation})
 	if errors.Is(err, interval.ErrRationalRootCanceled) {
 		return ErrRationalContextCanceled
 	}

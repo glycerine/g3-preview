@@ -5,15 +5,18 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
 var ErrRationalRootCanceled = errors.New("interval: rational root resource canceled")
 
-// RationalRoot borrows the exact numeral manager and resource limit.
+// RationalRoot borrows the exact numeral manager, resource limit and optional
+// process cooperation owner.
 type RationalRoot struct {
-	Numbers *numeral.RationalManager
-	Limit   *control.Reslimit
+	Numbers     *numeral.RationalManager
+	Limit       *control.Reslimit
+	Cooperation *cooperate.Cooperation
 }
 
 type rationalRootScratch struct {
@@ -37,6 +40,9 @@ func (s *rationalRootScratch) close() (err error) {
 func (r RationalRoot) checkpoint() error {
 	if !r.Limit.Inc() {
 		return ErrRationalRootCanceled
+	}
+	if r.Cooperation != nil {
+		return r.Cooperation.Cooperate("interval")
 	}
 	return nil
 }

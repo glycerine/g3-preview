@@ -21,7 +21,7 @@ func (c *RationalContext) PropagateQueued(n *RationalNode) error {
 		return err
 	}
 	for c.queueHead < len(c.queue) && n.conflictVar == math.MaxUint32 {
-		if err := sourceCheckpoint(c.limit, c.runtime, c.process, c.maxMemory, ErrRationalContextCanceled, nil); err != nil {
+		if err := sourceCheckpoint(c.limit, c.runtime, c.process, c.maxMemory, ErrRationalContextCanceled, c.cooperation); err != nil {
 			return err
 		}
 		b := c.queue[c.queueHead]

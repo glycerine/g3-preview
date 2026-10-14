@@ -76,7 +76,7 @@ func (c *RationalContext) AssertRootUnits() (*RationalNode, error) {
 		return nil, err
 	}
 	for c.unitHead < len(c.unitClauses) && n.conflictVar == math.MaxUint32 {
-		if err := sourceCheckpoint(c.limit, c.runtime, c.process, c.maxMemory, ErrRationalContextCanceled, nil); err != nil {
+		if err := sourceCheckpoint(c.limit, c.runtime, c.process, c.maxMemory, ErrRationalContextCanceled, c.cooperation); err != nil {
 			return n, err
 		}
 		unit := c.unitClauses[c.unitHead]

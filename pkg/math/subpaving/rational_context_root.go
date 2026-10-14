@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -17,6 +18,7 @@ type RationalContext struct {
 	self             *RationalContext
 	numbers          *numeral.RationalManager
 	limit            *control.Reslimit
+	cooperation      *cooperate.Cooperation
 	runtime          *memory.Runtime
 	process          *memory.ProcessAccounting
 	maxMemory        uint64
@@ -302,6 +304,7 @@ func (c *RationalContext) Close() error {
 	c.watchOrder, c.polynomials, c.polynomialOwners, c.numBuffer, c.monomials = nil, nil, nil, nil, nil
 	c.queue, c.queueHead = nil, 0
 	c.searchNode = nil
+	c.cooperation = nil
 	c.closed = true
 	return nil
 }
