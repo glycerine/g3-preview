@@ -25,11 +25,11 @@ func (w *mpfRoundRefusalWriter) Write(p []byte) (int, error) {
 func TestArbitraryFloatRoundSourceInsertionBoundaries(t *testing.T) {
 	m, _, _ := mpfNumeralHelpersFixture(t)
 	for _, tc := range []struct {
-		name, direction, branch, beta, below, sigma string
-		exponent                                    int64
+		name, direction, branch, beta, below, sigma, last string
+		exponent                                          int64
 	}{
-		{"normal", "(LEFT)", "NORMAL: ", "0", "0", "0", 0},
-		{"denormal", "(RIGHT)", "DENORMAL: ", "-149", "1", "-23", -149},
+		{"normal", "(LEFT)", "NORMAL: ", "0", "0", "0", "0", 0},
+		{"denormal", "(RIGHT)", "DENORMAL: ", "-149", "1", "-23", "1", -149},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			var x ArbitraryFloat
@@ -45,6 +45,11 @@ func TestArbitraryFloatRoundSourceInsertionBoundaries(t *testing.T) {
 					{"e_min_norm = ", "-126", "\n", "e_max_norm = ", "127", "\n"},
 					{"beta = ", tc.beta, ", (beta < e_min) = ", tc.below, "\n", "LZ = ", "1", "\n", "sigma = ", tc.sigma, "\n", "sigma_cap = ", "-26", "\n"},
 					{"Shift distance: ", tc.sigma, " ", tc.direction, "\n"},
+					{"sign=", "0", " last=", tc.last, " round=", "0", " sticky=", "0", "\n"},
+					{"Rounding increment -> significand +", "0", "\n"},
+					{"SIGovf = ", "0", "\n"},
+					{"OVF2 = ", "0", "\n"},
+					{"o_has_max_exp = ", "0", "\n"},
 				} {
 					if !hasMPFFTraceParts(w.parts, want) {
 						t.Fatalf("missing source insertions %q in %q", want, w.parts)
@@ -117,6 +122,31 @@ func TestArbitraryFloatRoundNormalizationRefusedInsertionPrefix(t *testing.T) {
 		}
 		if strings.Contains(strings.Join(w.parts, ""), "sigma_cap = ") || strings.Contains(strings.Join(w.parts, ""), "Shift distance:") {
 			t.Fatalf("failed stream wrote after refused insertion: %q", w.parts)
+		}
+	}
+	serviceMust(t, m.CleanupRound())
+	serviceMust(t, m.Del(&x))
+}
+
+func TestArbitraryFloatRoundOverflowFlagInsertions(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	var x ArbitraryFloat
+	sig := NewInt(1 << 26)
+	serviceMust(t, m.SetComponents(&x, 8, 24, false, 2000, &sig))
+	w := &mpffArithmeticTraceWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpf_dbg")
+	serviceMust(t, m.BindTrace(tags))
+	serviceMust(t, m.Round(ArbitraryFloatNearestEven, &x))
+	if tags.ShouldTrace("mpf_dbg") {
+		for _, want := range [][]string{
+			{"SIGovf = ", "1", "\n"},
+			{"OVF2 = ", "1", "\n"},
+			{"o_has_max_exp = ", "1", "\n"},
+		} {
+			if !hasMPFFTraceParts(w.parts, want) {
+				t.Fatalf("overflow source insertions %q in %q", want, w.parts)
+			}
 		}
 	}
 	serviceMust(t, m.CleanupRound())

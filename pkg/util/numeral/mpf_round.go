@@ -286,7 +286,7 @@ func (m *ArbitraryFloatManager) roundWithParentContext(mode ArbitraryFloatRoundi
 		return e
 	}
 	last := !even
-	m.traceFloatDebugText("round", "sign="+traceBoolDigit(x.Sign())+" last="+traceBoolDigit(last)+" round="+traceBoolDigit(round)+" sticky="+traceBoolDigit(sticky), 2040)
+	m.traceRoundBits(x.Sign(), last, round, sticky)
 	if e := m.traceRoundValue("before rounding decision: ", x, 2041, false, 0, 0, ""); e != nil {
 		return e
 	}
@@ -304,7 +304,7 @@ func (m *ArbitraryFloatManager) roundWithParentContext(mode ArbitraryFloatRoundi
 	default:
 		return ErrIntegerAssertion
 	}
-	m.traceFloatDebugText("round", "Rounding increment -> significand +"+traceBoolDigit(inc), 2055)
+	m.traceRoundFlag(2055, "Rounding increment -> significand +", inc)
 	if inc {
 		if e = z.addSubWithAllocationContext(&x.significand, &one, &x.significand, false, context); e != nil {
 			return e
@@ -334,11 +334,11 @@ func (m *ArbitraryFloatManager) roundWithParentContext(mode ArbitraryFloatRoundi
 	if e := m.traceRoundValue("Post-normalized: ", x, 2070, false, 0, 0, ""); e != nil {
 		return e
 	}
-	m.traceFloatDebugText("round", "SIGovf = "+traceBoolDigit(sigOverflow), 2071)
+	m.traceRoundFlag(2071, "SIGovf = ", sigOverflow)
 	hasMaxExponent := x.exponent > emax
 	secondOverflow := sigOverflow && hasMaxExponent
-	m.traceFloatDebugText("round", "OVF2 = "+traceBoolDigit(secondOverflow), 2078)
-	m.traceFloatDebugText("round", "o_has_max_exp = "+traceBoolDigit(hasMaxExponent), 2079)
+	m.traceRoundFlag(2078, "OVF2 = ", secondOverflow)
+	m.traceRoundFlag(2079, "o_has_max_exp = ", hasMaxExponent)
 	if secondOverflow {
 		return m.roundOverflow(mode, x)
 	}

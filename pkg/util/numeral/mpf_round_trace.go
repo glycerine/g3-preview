@@ -6,6 +6,31 @@ import (
 	"strconv"
 )
 
+func (m *ArbitraryFloatManager) traceRoundScalarParts(line int, parts ...string) {
+	tags := m.floatTraceTags()
+	if !tags.ShouldTrace("mpf_dbg") {
+		return
+	}
+	_ = tags.EmitConditional("mpf_dbg", "round", "src/util/mpf.cpp", line,
+		func() bool { return true }, func(w io.Writer) error {
+			for _, part := range parts {
+				if e := writeNumeralDisplayPart(w, part); e != nil {
+					return e
+				}
+			}
+			return nil
+		})
+}
+
+func (m *ArbitraryFloatManager) traceRoundBits(sign, last, round, sticky bool) {
+	m.traceRoundScalarParts(2040, "sign=", traceBoolDigit(sign), " last=", traceBoolDigit(last),
+		" round=", traceBoolDigit(round), " sticky=", traceBoolDigit(sticky), "\n")
+}
+
+func (m *ArbitraryFloatManager) traceRoundFlag(line int, label string, value bool) {
+	m.traceRoundScalarParts(line, label, traceBoolDigit(value), "\n")
+}
+
 func (m *ArbitraryFloatManager) traceRoundNormalization(emin, emax, beta, lz int64, belowMin bool, sigma, cap *Int) error {
 	tags := m.floatTraceTags()
 	if !tags.ShouldTrace("mpf_dbg") {

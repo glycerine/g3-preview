@@ -151403,11 +151403,11 @@
           "tests": ["TestArbitraryFloatRoundSqrtDecisionTrace"]
         },
         {
-          "name": "mpf_manager::round retained mpf_dbg entry, normalization, shifted and decision values, scalar decisions, normal/denormal class and final decimal/binary TRACE records at mpf.cpp:1967-2097; normalization/shift/class/value source insertion boundaries and failed-stream prefix",
+          "name": "mpf_manager::round retained mpf_dbg entry, normalization, shifted and decision values, scalar decisions, normal/denormal class and final decimal/binary TRACE records at mpf.cpp:1967-2097; normalization/shift/class/value/scalar source insertion boundaries and failed-stream prefix",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_round.go",
           "go_targets": ["pkg/util/numeral/mpf_round_trace.go"],
-          "tests": ["TestArbitraryFloatRoundDecisionTraceBranches", "TestArbitraryFloatRoundResultClassTrace", "TestArbitraryFloatRoundEntryTraceRefusalBeforeNumericScope", "TestArbitraryFloatRoundSourceInsertionBoundaries", "TestArbitraryFloatRoundNormalizationRefusedInsertionPrefix"]
+          "tests": ["TestArbitraryFloatRoundDecisionTraceBranches", "TestArbitraryFloatRoundResultClassTrace", "TestArbitraryFloatRoundEntryTraceRefusalBeforeNumericScope", "TestArbitraryFloatRoundSourceInsertionBoundaries", "TestArbitraryFloatRoundNormalizationRefusedInsertionPrefix", "TestArbitraryFloatRoundOverflowFlagInsertions"]
         },
         {
           "name": "mpf_manager::set(mpz,mpq) mpf_dbg entry, normalized, pre-round fields and result TRACE records at mpf.cpp:235,270,289,300",
