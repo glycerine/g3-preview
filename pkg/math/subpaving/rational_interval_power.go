@@ -11,7 +11,8 @@ import (
 // Power follows the source positive, negative, crossing-zero and odd branches.
 // Scratch endpoints keep input intact when dst aliases src.
 func (v *RationalInterval) Power(src *RationalInterval, n uint32) (err error) {
-	if err = v.pair(src); err != nil {
+	slo, shi, err := v.pairView(src)
+	if err != nil {
 		return err
 	}
 	if n == 1 {
@@ -24,41 +25,41 @@ func (v *RationalInterval) Power(src *RationalInterval, n uint32) (err error) {
 	li, ui := src.lowerInf, src.upperInf
 	if n%2 != 0 {
 		if !li {
-			if err = m.Power(&src.lower, n, &lower); err != nil {
+			if err = m.Power(slo, n, &lower); err != nil {
 				return err
 			}
 		}
 		if !ui {
-			if err = m.Power(&src.upper, n, &upper); err != nil {
+			if err = m.Power(shi, n, &upper); err != nil {
 				return err
 			}
 		}
 	} else {
 		extended := interval.RationalExtended{Numbers: m}
-		positive, e := extended.IsPos(&src.lower, src.lowerKind())
+		positive, e := extended.IsPos(slo, src.lowerKind())
 		if e != nil {
 			return e
 		}
-		negative, e := extended.IsNeg(&src.upper, src.upperKind())
+		negative, e := extended.IsNeg(shi, src.upperKind())
 		if e != nil {
 			return e
 		}
 		switch {
 		case !li && positive:
-			if err = m.Power(&src.lower, n, &lower); err != nil {
+			if err = m.Power(slo, n, &lower); err != nil {
 				return err
 			}
 			if !ui {
-				if err = m.Power(&src.upper, n, &upper); err != nil {
+				if err = m.Power(shi, n, &upper); err != nil {
 					return err
 				}
 			}
 		case !ui && negative:
-			if err = m.Power(&src.upper, n, &lower); err != nil {
+			if err = m.Power(shi, n, &lower); err != nil {
 				return err
 			}
 			if !li {
-				if err = m.Power(&src.lower, n, &upper); err != nil {
+				if err = m.Power(slo, n, &upper); err != nil {
 					return err
 				}
 			}
@@ -70,12 +71,12 @@ func (v *RationalInterval) Power(src *RationalInterval, n uint32) (err error) {
 			left, right := numeral.NewRational(), numeral.NewRational()
 			defer func() { err = errors.Join(err, m.Del(&left), m.Del(&right)) }()
 			if !li {
-				if err = m.Copy(&left, &src.lower); err != nil {
+				if err = m.Copy(&left, slo); err != nil {
 					return err
 				}
 			}
 			if !ui {
-				if err = m.Copy(&right, &src.upper); err != nil {
+				if err = m.Copy(&right, shi); err != nil {
 					return err
 				}
 			}

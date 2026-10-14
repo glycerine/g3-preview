@@ -52117,11 +52117,12 @@
           ]
         },
         {
-          "name": "Concrete config_mpq interval powers for odd/even/zero exponents, signed and crossing-zero intervals, infinity, closed ties and aliasing; source interval_bug TRACE records remain open (src/math/interval/interval_def.h:1271-1378)",
+          "name": "Concrete config_mpq interval powers with live borrowed operands for odd/even/zero exponents, signed and crossing-zero intervals, infinity, closed ties and aliasing; source interval_bug TRACE records remain open (src/math/interval/interval_def.h:1271-1378)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/rational_interval_power.go",
           "tests": [
-            "TestSubpavingRationalIntervalPowerSourceCases"
+            "TestSubpavingRationalIntervalPowerSourceCases",
+            "TestRationalIntervalLiveNodeBoundsAndOwnedCopy"
           ]
         },
         {

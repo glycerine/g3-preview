@@ -183,8 +183,11 @@ func TestRationalIntervalLiveNodeBoundsAndOwnedCopy(t *testing.T) {
 	if err := view.Neg(owned); !errors.Is(err, arena.ErrInvalidSlot) {
 		t.Fatalf("borrowed result mutation: %v", err)
 	}
-	if err := result.Power(view, 2); !errors.Is(err, arena.ErrInvalidSlot) {
-		t.Fatalf("unwired power operand: %v", err)
+	must(result.Power(view, 2))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "[0, 4]" {
+		t.Fatal("positive live view even power", shown.String())
 	}
 	must(m.SetInt32(&lo, -2))
 	must(root.PushBound(0, &lo, true, true))
@@ -196,6 +199,30 @@ func TestRationalIntervalLiveNodeBoundsAndOwnedCopy(t *testing.T) {
 	must(result.Display(&shown))
 	if shown.String() != "[-6, 6]" {
 		t.Fatal("mixed live view closed-tie product", shown.String())
+	}
+	must(result.Power(view, 2))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "[0, 4]" {
+		t.Fatal("mixed live view even power", shown.String())
+	}
+	must(result.Power(view, 3))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "(-8, 8]" {
+		t.Fatal("mixed live view odd power", shown.String())
+	}
+	must(result.Power(view, 1))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "(-2, 2]" {
+		t.Fatal("live view first power", shown.String())
+	}
+	must(result.Power(view, 0))
+	shown.Reset()
+	must(result.Display(&shown))
+	if shown.String() != "[0, 1]" {
+		t.Fatal("source mixed zero power", shown.String())
 	}
 	must(m.SetInt32(&hi, 2))
 	child, err := NewRationalNode(m, 1, root)
