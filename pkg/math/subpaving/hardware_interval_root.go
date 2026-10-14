@@ -68,7 +68,11 @@ func (v *HardwareInterval) NthRoot(src *HardwareInterval, n uint32, precision *n
 	*dstLower, *dstUpper = lower, upper
 	v.lowerInf, v.upperInf = lowerInf, upperInf
 	v.lowerOpen, v.upperOpen = lowerOpen, upperOpen
-	return v.CheckInvariant()
+	if err := v.CheckInvariant(); err != nil {
+		return err
+	}
+	v.traceNthRoot(src, roots)
+	return nil
 }
 
 // XnEqY returns the interval inverse image of the retained monomial x^n = y.
@@ -100,6 +104,7 @@ func (v *HardwareInterval) XnEqY(src *HardwareInterval, n uint32, precision *num
 	if err := roots.Bounds(srcUpper, n, precision, &rootLower, &rootUpper); err != nil {
 		return err
 	}
+	v.traceXnEqYBounds(src, &rootLower, &rootUpper, roots)
 	open := src.upperOpen && v.numbers.Equal(&rootLower, &rootUpper)
 	v.numbers.RoundToMinusInf()
 	if err := v.numbers.Neg(&rootUpper, &lower); err != nil {
@@ -109,5 +114,9 @@ func (v *HardwareInterval) XnEqY(src *HardwareInterval, n uint32, precision *num
 	*dstLower, *dstUpper = lower, rootUpper
 	v.lowerInf, v.upperInf = false, false
 	v.lowerOpen, v.upperOpen = open, open
-	return v.CheckInvariant()
+	if err := v.CheckInvariant(); err != nil {
+		return err
+	}
+	v.traceXnEqYResult(roots)
+	return nil
 }

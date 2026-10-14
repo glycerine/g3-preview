@@ -97,6 +97,9 @@ func TestArbitraryContextNamedParamsSourceOrderAndDescriptions(t *testing.T) {
 	if value(c.epsilon) != .5 || value(c.maxBound) != 1 || value(c.minusMaxBound) != -100 || c.maxDepth != 7 || c.maxNodes != 9 || c.maxMemory != 3*1024*1024 {
 		t.Fatal("source update prefix after exponent failure", value(c.epsilon), value(c.maxBound), value(c.minusMaxBound), c.maxDepth, c.maxNodes, c.maxMemory)
 	}
+	if err := f.numbers.CleanupRawLocal(); err != nil {
+		t.Fatal(err)
+	}
 	if err := pc.Reset(&p); err != nil {
 		t.Fatal(err)
 	}
