@@ -1,6 +1,7 @@
 package polynomial
 
 import (
+	"errors"
 	"math"
 	"reflect"
 
@@ -8,9 +9,13 @@ import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
+var ErrBinaryVectorResetPending = errors.New("polynomial: binary vector manager reset pending")
+
 type upolyBinaryVectorState struct {
-	values []unumeral.BinaryRational
-	size   uint32
+	values              []unumeral.BinaryRational
+	size                uint32
+	managerResetPending bool
+	managerResetCursor  uint32
 }
 type BinaryRationalVector struct {
 	self    *BinaryRationalVector
@@ -36,7 +41,7 @@ func numericBinaryRationalManager_NewVector(m *unumeral.BinaryRationalManager) (
 	v.self = v
 	return v, nil
 }
-func (v *BinaryRationalVector) check() error {
+func (v *BinaryRationalVector) checkOwner() error {
 	if v == nil || v.self != v || v.manager == nil {
 		return unumeral.ErrBinaryOwner
 	}
@@ -45,10 +50,22 @@ func (v *BinaryRationalVector) check() error {
 	}
 	return v.manager.Open()
 }
+func (v *BinaryRationalVector) check() error {
+	if e := v.checkOwner(); e != nil {
+		return e
+	}
+	if v.state.managerResetPending {
+		return ErrBinaryVectorResetPending
+	}
+	return nil
+}
 
 // Native field extent is retained for borrowed reads and owning cleanup;
 // logical size separately records the currently active binary rationals.
 func upolyBinaryExtend(s *upolyBinaryVectorState, n uint32) error {
+	if s.managerResetPending {
+		return ErrBinaryVectorResetPending
+	}
 	if uint64(n) > uint64(^uint(0)>>1) {
 		return arena.ErrBounds
 	}
@@ -91,6 +108,9 @@ func numericBinaryRationalManager_binaryPushDefault(m *unumeral.BinaryRationalMa
 	return &s.values[i], nil
 }
 func numericBinaryRationalManager_binarySlot(m *unumeral.BinaryRationalManager, s *upolyBinaryVectorState, i uint32) (*unumeral.BinaryRational, error) {
+	if s.managerResetPending {
+		return nil, ErrBinaryVectorResetPending
+	}
 	if polynomialSourceDebug && i >= s.size {
 		return nil, ErrUPolynomialAssertion
 	}
@@ -100,6 +120,9 @@ func numericBinaryRationalManager_binarySlot(m *unumeral.BinaryRationalManager, 
 	return &s.values[i], nil
 }
 func numericBinaryRationalManager_binaryReset(m *unumeral.BinaryRationalManager, s *upolyBinaryVectorState) error {
+	if s.managerResetPending {
+		return ErrBinaryVectorResetPending
+	}
 	for i := uint32(0); i < s.size; i++ {
 		if e := m.Del(&s.values[i]); e != nil {
 			return e
@@ -155,13 +178,32 @@ func (v *BinaryRationalVector) resetManagerNumerals() error {
 	if e := v.check(); e != nil {
 		return e
 	}
-	for i := uint32(0); i < v.state.size; i++ {
-		if e := v.manager.Reset(&v.state.values[i]); e != nil {
+	v.state.managerResetPending = true
+	v.state.managerResetCursor = 0
+	return v.finishManagerReset()
+}
+func (v *BinaryRationalVector) finishManagerReset() error {
+	for v.state.managerResetCursor < v.state.size {
+		if e := v.manager.Reset(&v.state.values[v.state.managerResetCursor]); e != nil {
 			return e
 		}
+		v.state.managerResetCursor++
 	}
 	v.state.size = 0
+	v.state.managerResetCursor = 0
+	v.state.managerResetPending = false
 	return nil
+}
+
+// CleanupManagerReset resumes the source ascending reset after a stopped slot.
+func (v *BinaryRationalVector) CleanupManagerReset() error {
+	if e := v.checkOwner(); e != nil {
+		return e
+	}
+	if !v.state.managerResetPending {
+		return nil
+	}
+	return v.finishManagerReset()
 }
 func (v *BinaryRationalVector) Shrink(n uint32) error {
 	if e := v.check(); e != nil {
@@ -216,7 +258,10 @@ func (v *BinaryRationalVector) Reserve(n uint32) error {
 	return nil
 }
 func (v *BinaryRationalVector) Close() error {
-	if e := v.check(); e != nil {
+	if e := v.checkOwner(); e != nil {
+		return e
+	}
+	if e := v.CleanupManagerReset(); e != nil {
 		return e
 	}
 	if e := numericBinaryRationalManager_binaryDestroy(v.manager, &v.state); e != nil {

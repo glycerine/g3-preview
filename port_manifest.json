@@ -149752,6 +149752,7 @@
         "TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults",
         "TestUPolynomialNativeIsolationStacksAndNumericTransfer",
         "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard",
+        "TestUPolynomialBinaryVectorManagerResetPhysicalRetry",
         "TestBinaryRationalSourceStreamInsertionsAndRefusalPrefixes",
         "TestRealClosureBinaryIntervalRetainedCore",
         "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement",
@@ -150199,7 +150200,8 @@
           "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_binary_vector.go",
           "tests": [
-            "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard"
+            "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard",
+            "TestUPolynomialBinaryVectorManagerResetPhysicalRetry"
           ]
         },
         {
@@ -150211,6 +150213,7 @@
             "TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots",
             "TestUPolynomialIsolationPackedFrameFields",
             "TestUPolynomialBinaryVectorActualAscendingDestruction",
+            "TestUPolynomialBinaryVectorManagerResetPhysicalRetry",
             "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
           ]
         },
@@ -150327,6 +150330,7 @@
         "TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults",
         "TestUPolynomialNativeIsolationStacksAndNumericTransfer",
         "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard",
+        "TestUPolynomialBinaryVectorManagerResetPhysicalRetry",
         "TestBinaryRationalSourceStreamInsertionsAndRefusalPrefixes",
         "TestRealClosureBinaryIntervalRetainedCore",
         "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement",
@@ -150525,7 +150529,8 @@
           "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_binary_vector.go",
           "tests": [
-            "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard"
+            "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard",
+            "TestUPolynomialBinaryVectorManagerResetPhysicalRetry"
           ]
         },
         {
@@ -150537,6 +150542,7 @@
             "TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots",
             "TestUPolynomialIsolationPackedFrameFields",
             "TestUPolynomialBinaryVectorActualAscendingDestruction",
+            "TestUPolynomialBinaryVectorManagerResetPhysicalRetry",
             "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
           ]
         },
@@ -177838,6 +177844,7 @@
         "TestASTSparseSharedExpressionDomainsAndASTWideVisited",
         "TestUPolynomialIsolationPackedFrameFields",
         "TestUPolynomialBinaryVectorActualAscendingDestruction",
+        "TestUPolynomialBinaryVectorManagerResetPhysicalRetry",
         "TestUPolynomialIsolationSSPopAndDestructorActualOrder",
         "TestSATSolverAssignmentRequiresSameActualCheckpointRuntime",
         "TestMonomialPositionsSourceMapping",
@@ -178215,6 +178222,7 @@
             "TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots",
             "TestUPolynomialIsolationPackedFrameFields",
             "TestUPolynomialBinaryVectorActualAscendingDestruction",
+            "TestUPolynomialBinaryVectorManagerResetPhysicalRetry",
             "TestUPolynomialIsolationSSPopAndDestructorActualOrder"
           ]
         },
