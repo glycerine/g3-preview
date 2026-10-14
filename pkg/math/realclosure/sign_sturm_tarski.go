@@ -14,7 +14,7 @@ func (s *realValueStore) sequenceReady() error {
 	if s == nil || s.numbers == nil {
 		return arena.ErrInvalidSlot
 	}
-	if s.pendingSequence != nil {
+	if s.pendingSequence != nil || len(s.pendingSturmCoefficients) != 0 {
 		return errRealClosureSequencePending
 	}
 	return nil
@@ -37,12 +37,36 @@ func (s *realValueStore) closePolynomialSequence(rows []realPolynomial) error {
 	return nil
 }
 
-// cleanupPendingPolynomialSequence resumes the exact retained row sequence
-// after a coefficient destructor refused to complete.
+// releaseSturmCoefficients owns a completed temporary coefficient slice and
+// retains its unconsumed suffix when one value's destructor refuses.
+func (s *realValueStore) releaseSturmCoefficients(values []*realValue) error {
+	for i, value := range values {
+		if err := s.release(value); err != nil {
+			s.pendingSturmCoefficients = append(s.pendingSturmCoefficients, values[i:])
+			return err
+		}
+	}
+	return nil
+}
+
+// cleanupPendingPolynomialSequence finishes younger temporary coefficient
+// groups before the older retained row sequence.
 func (s *realValueStore) cleanupPendingPolynomialSequence() error {
 	if s == nil {
 		return arena.ErrInvalidSlot
 	}
+	for len(s.pendingSturmCoefficients) != 0 {
+		group := s.pendingSturmCoefficients[0]
+		for i, value := range group {
+			if err := s.release(value); err != nil {
+				s.pendingSturmCoefficients[0] = group[i:]
+				return err
+			}
+		}
+		s.pendingSturmCoefficients[0] = nil
+		s.pendingSturmCoefficients = s.pendingSturmCoefficients[1:]
+	}
+	s.pendingSturmCoefficients = nil
 	if s.pendingSequence == nil {
 		return nil
 	}
@@ -83,11 +107,11 @@ func (s *realValueStore) sturmSequenceRational(first, second []*realValue, usePs
 		}
 		var next realPolynomial
 		if err := s.setPolynomial(&next, remainder); err != nil {
-			_ = s.releaseCoefficients(remainder)
+			_ = s.releaseSturmCoefficients(remainder)
 			_ = s.closePolynomialSequence(rows)
 			return nil, err
 		}
-		if err := s.releaseCoefficients(remainder); err != nil {
+		if err := s.releaseSturmCoefficients(remainder); err != nil {
 			_ = s.resetPolynomial(&next)
 			_ = s.closePolynomialSequence(rows)
 			return nil, err
@@ -146,10 +170,10 @@ func (s *realValueStore) rootCountUnboundedRational(p []*realValue, usePseudo bo
 		return 0, err
 	}
 	if len(derivative) == 0 {
-		return 0, s.releaseCoefficients(derivative)
+		return 0, s.releaseSturmCoefficients(derivative)
 	}
 	rows, err := s.sturmSequenceRational(p, derivative, usePseudo)
-	releaseErr := s.releaseCoefficients(derivative)
+	releaseErr := s.releaseSturmCoefficients(derivative)
 	if err != nil {
 		return 0, err
 	}
@@ -176,22 +200,22 @@ func (s *realValueStore) tarskiUnboundedRational(p, q []*realValue, usePseudo bo
 		return 0, err
 	}
 	if len(derivative) == 0 {
-		return 0, s.releaseCoefficients(derivative)
+		return 0, s.releaseSturmCoefficients(derivative)
 	}
 	second, err := s.multiplyRationalPolynomials(derivative, q)
-	releaseErr := s.releaseCoefficients(derivative)
+	releaseErr := s.releaseSturmCoefficients(derivative)
 	if err != nil {
 		return 0, err
 	}
 	if releaseErr != nil {
-		_ = s.releaseCoefficients(second)
+		_ = s.releaseSturmCoefficients(second)
 		return 0, releaseErr
 	}
 	if len(second) == 0 {
-		return 0, s.releaseCoefficients(second)
+		return 0, s.releaseSturmCoefficients(second)
 	}
 	rows, err := s.sturmSequenceRational(p, second, usePseudo)
-	releaseErr = s.releaseCoefficients(second)
+	releaseErr = s.releaseSturmCoefficients(second)
 	if err != nil {
 		return 0, err
 	}

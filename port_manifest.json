@@ -48913,7 +48913,8 @@
         "TestRealClosureRationalDerivativeKeepsCoefficientOwnership",
         "TestRealClosureBoundedRationalSturmTarskiEndpoints",
         "TestRealClosureRationalSturmSequenceOwnsBorrowedCoefficients",
-        "TestRealClosureSturmSequenceRefusedDestructorRetainsRows"
+        "TestRealClosureSturmSequenceRefusedDestructorRetainsRows",
+        "TestRealClosureSturmTemporaryRefusalPrecedesOlderRows"
       ],
       "conditionals": [
         {
@@ -50119,12 +50120,13 @@
           ]
         },
         {
-          "name": "Selected rational scoped_polynomial_seq push and destruction: owned typed rows retain borrowed coefficients, preserve a refused destructor suffix for explicit continuation, and gate four query callers until cleanup (realclosure.cpp:406-451,3637-3674)",
+          "name": "Selected rational scoped_polynomial_seq push and destruction: owned rows and younger temporary coefficient suffixes retain refused deletions for explicit ordered continuation, and gate four query callers until cleanup (realclosure.cpp:406-451,3637-3674)",
           "status": "platform_replacement",
           "go_target": "pkg/math/realclosure/sign_sturm_tarski.go",
           "tests": [
             "TestRealClosureRationalSturmSequenceOwnsBorrowedCoefficients",
-            "TestRealClosureSturmSequenceRefusedDestructorRetainsRows"
+            "TestRealClosureSturmSequenceRefusedDestructorRetainsRows",
+            "TestRealClosureSturmTemporaryRefusalPrecedesOlderRows"
           ]
         },
         {
@@ -168761,6 +168763,7 @@
         "TestPolynomialPSCNextExpiredCompletedChildrenPreserveLaterVariableAndH",
         "TestRealClosureRationalSturmSequenceOwnsBorrowedCoefficients",
         "TestRealClosureSturmSequenceRefusedDestructorRetainsRows",
+        "TestRealClosureSturmTemporaryRefusalPrecedesOlderRows",
         "TestBVConcatNativeRootsPushPopAndForwardDestruction",
         "TestBVPolynomialNonflatMultiplicationCartesianOrderAndLimit",
         "TestBVPolynomialNonflatMultiplicationEveryCartesianOwnerAndFactoryReservation",
@@ -168887,12 +168890,13 @@
           ]
         },
         {
-          "name": "Selected rational realclosure scoped_polynomial_seq value_ref_buffer: rows own borrowed coefficients and a refused destructor suffix remains explicitly recoverable (realclosure.cpp:406-451,3637-3674)",
+          "name": "Selected rational realclosure scoped_polynomial_seq value_ref_buffer: rows own borrowed coefficients, and refused younger temporary coefficients drain before retained row suffixes (realclosure.cpp:406-451,3637-3674)",
           "status": "platform_replacement",
           "go_target": "pkg/math/realclosure/sign_sturm_tarski.go",
           "tests": [
             "TestRealClosureRationalSturmSequenceOwnsBorrowedCoefficients",
-            "TestRealClosureSturmSequenceRefusedDestructorRetainsRows"
+            "TestRealClosureSturmSequenceRefusedDestructorRetainsRows",
+            "TestRealClosureSturmTemporaryRefusalPrecedesOlderRows"
           ]
         },
         {

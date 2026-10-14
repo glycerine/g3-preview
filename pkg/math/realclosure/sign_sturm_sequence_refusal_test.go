@@ -99,3 +99,90 @@ func TestRealClosureSturmSequenceRefusedDestructorRetainsRows(t *testing.T) {
 		t.Fatal("physical cleanup retained bytes", used)
 	}
 }
+
+func TestRealClosureSturmTemporaryRefusalPrecedesOlderRows(t *testing.T) {
+	budget := arena.NewBudget(1 << 24)
+	runtime, err := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, SizeTBits: 32})
+	if err != nil {
+		t.Fatal(err)
+	}
+	service, err := numeral.NewRationalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{
+		Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}},
+		Memory: runtime, Profile: umemory.SmallAllocatorProfile{PointerBits: 32},
+	}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	store := &realValueStore{numbers: service.Manager}
+	first, err := store.newRational(2, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	temporary, err := store.newRational(1, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	older, err := store.newRational(1, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := store.numbers.SetString(&temporary.rational, "18446744073709551617"); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.numbers.SetString(&older.rational, "18446744073709551619"); err != nil {
+		t.Fatal(err)
+	}
+	rows := make([]realPolynomial, 1)
+	if err := store.setPolynomial(&rows[0], []*realValue{older}); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.release(older); err != nil {
+		t.Fatal(err)
+	}
+	z := service.Manager.Z
+	tempRef, rowRef := temporary.rational.Num.Cell, older.rational.Num.Cell
+	if tempRef == 0 || rowRef == 0 || tempRef == rowRef {
+		t.Fatal("temporary and row need distinct real numeric cells")
+	}
+	tempCell, rowCell := z.Cell(tempRef), z.Cell(rowRef)
+	badTemp, badRow := tempCell, rowCell
+	badTemp.Backing.Requested = uint64(math.MaxUint32) + 1
+	badRow.Backing.Requested = uint64(math.MaxUint32) + 1
+	z.Store(tempRef, badTemp)
+	z.Store(rowRef, badRow)
+	if err := store.releaseSturmCoefficients([]*realValue{first, temporary}); !errors.Is(err, arena.ErrBounds) {
+		t.Fatal("temporary destructor refusal", err)
+	}
+	if !first.deleted || temporary.deleted || len(store.pendingSturmCoefficients) != 1 || len(store.pendingSturmCoefficients[0]) != 1 {
+		t.Fatal("temporary prefix or suffix ownership")
+	}
+	if _, err := store.rootCountUnboundedRational(nil, false); !errors.Is(err, errRealClosureSequencePending) {
+		t.Fatal("pending temporary allowed a new query", err)
+	}
+	if err := store.closePolynomialSequence(rows); !errors.Is(err, arena.ErrBounds) {
+		t.Fatal("older row destructor refusal", err)
+	}
+	if err := store.cleanupPendingPolynomialSequence(); !errors.Is(err, arena.ErrBounds) || older.deleted {
+		t.Fatal("younger refusal must precede older row cleanup", err)
+	}
+	z.Store(tempRef, tempCell)
+	if err := store.cleanupPendingPolynomialSequence(); !errors.Is(err, arena.ErrBounds) || !temporary.deleted || older.deleted || len(store.pendingSturmCoefficients) != 0 {
+		t.Fatal("completed temporary must precede refused row", err)
+	}
+	z.Store(rowRef, rowCell)
+	if err := store.cleanupPendingPolynomialSequence(); err != nil {
+		t.Fatal(err)
+	}
+	if !older.deleted || rows[0].coefficients != nil || store.pendingSequence != nil || store.pendingSturmCoefficients != nil {
+		t.Fatal("both lexical owners were not drained")
+	}
+	if err := service.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err := runtime.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if used := budget.Used(); used != 0 {
+		t.Fatal("physical cleanup retained bytes", used)
+	}
+}

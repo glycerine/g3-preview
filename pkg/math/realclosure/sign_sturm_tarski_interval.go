@@ -147,10 +147,10 @@ func (s *realValueStore) rootCountBinaryIntervalRational(p []*realValue, interva
 		return 0, err
 	}
 	if len(derivative) == 0 {
-		return 0, s.releaseCoefficients(derivative)
+		return 0, s.releaseSturmCoefficients(derivative)
 	}
 	rows, err := s.sturmSequenceRational(p, derivative, usePseudo)
-	releaseErr := s.releaseCoefficients(derivative)
+	releaseErr := s.releaseSturmCoefficients(derivative)
 	if err != nil {
 		return 0, err
 	}
@@ -178,22 +178,22 @@ func (s *realValueStore) tarskiBinaryIntervalRational(p, q []*realValue, interva
 		return 0, err
 	}
 	if len(derivative) == 0 {
-		return 0, s.releaseCoefficients(derivative)
+		return 0, s.releaseSturmCoefficients(derivative)
 	}
 	second, err := s.multiplyRationalPolynomials(derivative, q)
-	releaseErr := s.releaseCoefficients(derivative)
+	releaseErr := s.releaseSturmCoefficients(derivative)
 	if err != nil {
 		return 0, err
 	}
 	if releaseErr != nil {
-		_ = s.releaseCoefficients(second)
+		_ = s.releaseSturmCoefficients(second)
 		return 0, releaseErr
 	}
 	if len(second) == 0 {
-		return 0, s.releaseCoefficients(second)
+		return 0, s.releaseSturmCoefficients(second)
 	}
 	rows, err := s.sturmSequenceRational(p, second, usePseudo)
-	releaseErr = s.releaseCoefficients(second)
+	releaseErr = s.releaseSturmCoefficients(second)
 	if err != nil {
 		return 0, err
 	}
