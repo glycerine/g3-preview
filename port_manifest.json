@@ -124266,7 +124266,8 @@
             "TestInfEpsInfStructuralEqualityAndReturnCopy",
             "TestInfEpsInfPointerFreeWarmPaths",
             "TestInfEpsInfFormattingOneFinalAllocation",
-            "TestInfEpsInfConstructorSignedScalarShapes"
+            "TestInfEpsInfConstructorSignedScalarShapes",
+            "TestInfHashesStopBeforeCombiningFailedComponent"
           ]
         },
         {
@@ -124771,7 +124772,8 @@
             "TestInfIntRationalPostFailureAndGetterIndependence",
             "TestRationalServiceInfinitesimalHeaderOwnership",
             "TestRationalServiceInfinitesimalConstructorFailureRefunds",
-            "TestRationalServiceInfinitesimalFinalizerTraversal"
+            "TestRationalServiceInfinitesimalFinalizerTraversal",
+            "TestInfHashesStopBeforeCombiningFailedComponent"
           ]
         },
         {
@@ -125297,7 +125299,8 @@
             "TestInfRationalIntegerConstructorCopyRoute",
             "TestRationalServiceInfinitesimalHeaderOwnership",
             "TestRationalServiceInfinitesimalConstructorFailureRefunds",
-            "TestRationalServiceInfinitesimalFinalizerTraversal"
+            "TestRationalServiceInfinitesimalFinalizerTraversal",
+            "TestInfHashesStopBeforeCombiningFailedComponent"
           ]
         },
         {

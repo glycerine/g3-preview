@@ -316,7 +316,10 @@ func (s *RationalService) InfHash(v *OwnedInfRational) (uint32, error) {
 		return 0, e
 	}
 	b, e := s.Manager.Hash(&v.Second)
-	return a ^ (b + 1), e
+	if e != nil {
+		return 0, e
+	}
+	return a ^ (b + 1), nil
 }
 func (s *RationalService) InfString(v *OwnedInfRational) (string, error) {
 	if e := s.lock(); e != nil {

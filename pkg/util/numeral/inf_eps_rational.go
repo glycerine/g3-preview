@@ -306,7 +306,10 @@ func (s *RationalService) InfEpsInfHash(v *OwnedInfEpsInfRational) (uint32, erro
 		return 0, e
 	}
 	b, e := s.Manager.Hash(&v.numeral.Second)
-	return i ^ (a ^ (b + 1)), e
+	if e != nil {
+		return 0, e
+	}
+	return i ^ (a ^ (b + 1)), nil
 }
 
 // Offset-aware formatting keeps every intermediate byte in the existing
