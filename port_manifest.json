@@ -166367,6 +166367,7 @@
           "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceCopyMergeAndSignedRat",
+            "TestParamsReferenceCopyAllKindsSharedTargetOrderedMerge",
             "TestParamsReferenceSelfCopySourceRatIdentity",
             "TestParamsBorrowedStringSymbolCopyAndOwnership",
             "TestParamsReferenceInitFailedCopySkipsOldDEC"
@@ -166991,6 +166992,7 @@
           "go_target": "pkg/util/params/util_params_ref.go",
           "tests": [
             "TestParamsReferenceSourceCopyMergeAndSignedRat",
+            "TestParamsReferenceCopyAllKindsSharedTargetOrderedMerge",
             "TestParamsReferenceSelfCopySourceRatIdentity",
             "TestParamsBorrowedStringSymbolCopyAndOwnership",
             "TestParamsReferenceInitFailedCopySkipsOldDEC"
