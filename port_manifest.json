@@ -169811,9 +169811,11 @@
         "pkg/math/subpaving/tactic/expr_converter.go",
         "pkg/math/subpaving/tactic/rational_expr_converter.go",
         "pkg/math/subpaving/tactic/fast_expr_converter.go",
-        "pkg/math/subpaving/tactic/arbitrary_expr_converter.go"
+        "pkg/math/subpaving/tactic/arbitrary_expr_converter.go",
+        "pkg/sat/tactic/sat_goal_to_sat.go"
       ],
       "tests": [
+        "TestSATGoalTranslatorAtomOwnershipAndClosedGuard",
         "TestASTExprSubstitutionActualMapOutputsAndReferenceOrder",
         "TestASTExprSubstitutionAllPolicyMapsAndAliasedFindOutputs",
         "TestASTExprSubstitutionBoundedIndependentReferenceModel",
@@ -169936,6 +169938,14 @@
           "tests": []
         },
         {
+          "name": "Concrete atom2bool_var/expr2var dec_ref_map_keys on retained SAT goal-translator atom map at owner destruction (src/ast/expr2var.cpp:35-38; src/sat/tactic/goal2sat.cpp:56,131-150)",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat.go",
+          "tests": [
+            "TestSATGoalTranslatorAtomOwnershipAndClosedGuard"
+          ]
+        },
+        {
           "name": "Remaining live concrete keys-only, values-only, key/value and collection cleanup in other AST, tactic, SMT, API and subpaving consumers",
           "status": "partial",
           "go_target": "",
@@ -169943,7 +169953,7 @@
         }
       ],
       "ownership": [
-        "AST shared occurrences owns one reference per distinct expression in an insertion-ordered dictionary. Reset and Close decrement each remaining expression once and clear its entry after a consumed decrement, retaining unfinished entries for typed cleanup refusal. The four reached expr2subpaving term caches each own one reference per cached AST key; converter close drops those keys before its cached numeral vectors and variable references. The AST manager owns node storage; no generic reference manager or collection adapter is retained."
+        "AST shared occurrences owns one reference per distinct expression in an insertion-ordered dictionary. Reset and Close decrement each remaining expression once and clear its entry after a consumed decrement, retaining unfinished entries for typed cleanup refusal. The four reached expr2subpaving term caches each own one reference per cached AST key; converter close drops those keys before its cached numeral vectors and variable references. SAT's concrete atom2bool_var map retains one AST reference per distinct atom; GoalTranslator.Close decrements each remaining key once and removes it only after a consumed decrement. The AST manager owns node storage; no generic reference manager or collection adapter is retained."
       ],
       "deviations": [
         "No generic Go adapter is retained. Each live decrement-and-clear operation belongs in its concrete consumer with compiler-checked element and manager types.",
