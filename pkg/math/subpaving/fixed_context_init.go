@@ -1,5 +1,5 @@
 // Source: src/math/subpaving/subpaving_t_def.h:1753-1808,
-// concrete config_mpff root initialization order.
+// concrete config_mpfx root initialization order.
 package subpaving
 
 // InitializeRoot asserts units, propagates definitions in variable order and
@@ -14,6 +14,12 @@ func (c *FixedContext) InitializeRoot() error {
 		return err
 	}
 	if c.initStage == 0 {
+		if !c.initConstraintsTraced {
+			if err := c.traceInitialConstraints(); err != nil {
+				return err
+			}
+			c.initConstraintsTraced = true
+		}
 		if err := c.AssertUnitClauses(n); err != nil {
 			return err
 		}
@@ -36,6 +42,12 @@ func (c *FixedContext) InitializeRoot() error {
 			return err
 		}
 		c.initStage = 3
+	}
+	if c.initStage == 3 && !c.initRootBoundsTraced {
+		if err := c.traceInitialBounds(n, "root bounds after propagation\n", 1801); err != nil {
+			return err
+		}
+		c.initRootBoundsTraced = true
 	}
 	return nil
 }

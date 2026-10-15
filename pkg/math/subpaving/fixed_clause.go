@@ -191,6 +191,9 @@ func (c *FixedContext) AssertUnitClauses(n *FixedNode) error {
 		}
 		unit := c.unitClauses[c.unitHead]
 		a := unit.atom
+		if err := c.traceInitialUnit(a, unit.axiom); err != nil {
+			return err
+		}
 		reason := fixedBoundReason{kind: fixedReasonAssumption}
 		if unit.axiom {
 			reason.kind = fixedReasonAxiom
@@ -199,6 +202,12 @@ func (c *FixedContext) AssertUnitClauses(n *FixedNode) error {
 			return err
 		}
 		c.unitHead++
+	}
+	if !c.initUnitBoundsTraced {
+		if err := c.traceInitialBounds(n, "bounds after init\n", 1785); err != nil {
+			return err
+		}
+		c.initUnitBoundsTraced = true
 	}
 	return nil
 }
