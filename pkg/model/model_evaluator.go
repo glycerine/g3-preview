@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/messages"
 	uparams "github.com/glycerine/g3/pkg/util/params"
@@ -27,6 +28,7 @@ type ModelEvaluatorConfig struct {
 	Params      *uparams.ParamsRef
 	Memory      *umemory.Runtime
 	Cooperation *cooperate.Cooperation
+	Trace       *diagnostic.TraceTags
 }
 
 // ModelEvaluator runs the original no-proof traversal and selected evaluator_cfg
@@ -572,6 +574,9 @@ func (c *evaluatorConfiguration) GetMacro(d ast.ASTHandle) (ast.ASTHandle, ast.A
 		return ast.ASTHandle{}, ast.ASTHandle{}, ast.ASTHandle{}, false, e
 	}
 	if fi != nil {
+		if e := c.traceGetMacro(d, 228); e != nil {
+			return ast.ASTHandle{}, ast.ASTHandle{}, ast.ASTHandle{}, false, e
+		}
 		partial, e := fi.IsPartial()
 		if e != nil {
 			return ast.ASTHandle{}, ast.ASTHandle{}, ast.ASTHandle{}, false, e
@@ -610,6 +615,9 @@ func (c *evaluatorConfiguration) GetMacro(d ast.ASTHandle) (ast.ASTHandle, ast.A
 		if !considered {
 			return ast.ASTHandle{}, ast.ASTHandle{}, ast.ASTHandle{}, false, nil
 		}
+	}
+	if e := c.traceGetMacro(d, 247); e != nil {
+		return ast.ASTHandle{}, ast.ASTHandle{}, ast.ASTHandle{}, false, e
 	}
 	s, e := m.GetRange(d)
 	if e != nil {

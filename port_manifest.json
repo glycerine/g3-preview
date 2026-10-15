@@ -56575,6 +56575,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/model/model_evaluator_trace.go",
         "pkg/model/model_evaluator.go",
         "pkg/model/model_evaluator_array_expansion.go",
         "pkg/model/model_evaluator_array_equality.go",
@@ -56582,6 +56583,7 @@
         "pkg/model/model_evaluator_bv_unspecified_test.go"
       ],
       "tests": [
+        "TestModelEvaluatorGetMacroSourceTraceBranches",
         "TestModelEvaluatorSharedProcessMemoryAndCohort",
         "TestModelEvaluatorConstantCompletionAndBooleanReduction",
         "TestModelEvaluatorFunctionEntriesMacrosAndCompletion",
@@ -56645,6 +56647,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Reached get_macro TRACE records for existing and completion-created function interpretations (model_evaluator.cpp:228,247)",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "tests": ["TestModelEvaluatorGetMacroSourceTraceBranches"]
+        },
         {
           "name": "original evaluator configuration parameters, resource callback, value-only function entry lookup, uninterpreted constant/function completion, Boolean reduction, get_macro and no-proof traversal lifecycle",
           "status": "partial",
@@ -177356,6 +177364,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/model/model_evaluator_trace.go",
         "pkg/util/diagnostic/util_trace_tags.go",
         "pkg/math/euclid/normalize_query_trace.go",
         "pkg/math/euclid/apply_solution_trace.go",
@@ -177423,6 +177432,7 @@
         "pkg/math/interval/rational_root_trace_test.go"
       ],
       "tests": [
+        "TestModelEvaluatorGetMacroSourceTraceBranches",
         "TestTraceTagsSourceControlAndFinalize",
         "TestEuclideanNormalizeQueryTraceBeforeAndAfterSubstitution",
         "TestEuclideanApplySolutionTraceBeforeAndAfterIntegerSwap",
@@ -177519,6 +177529,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached model-evaluator get_macro TRACE records at existing-interpretation and completion branches (model_evaluator.cpp:228,247)",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "tests": ["TestModelEvaluatorGetMacroSourceTraceBranches"]
+        },
         {
           "name": "enable_trace, disable_trace, enable_all_trace, is_trace_enabled and finalize_trace tag state",
           "status": "platform_replacement",
@@ -178767,6 +178783,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/model/model_evaluator_trace.go",
         "pkg/util/diagnostic/util_trace_tags.go",
         "pkg/math/euclid/normalize_query_trace.go",
         "pkg/math/euclid/apply_solution_trace.go",
@@ -178834,6 +178851,7 @@
         "pkg/math/interval/rational_root_trace_test.go"
       ],
       "tests": [
+        "TestModelEvaluatorGetMacroSourceTraceBranches",
         "TestTraceTagsSourceControlAndFinalize",
         "TestEuclideanNormalizeQueryTraceBeforeAndAfterSubstitution",
         "TestEuclideanApplySolutionTraceBeforeAndAfterIntegerSwap",
@@ -178942,6 +178960,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached model-evaluator get_macro TRACE records at existing-interpretation and completion branches (model_evaluator.cpp:228,247)",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "tests": ["TestModelEvaluatorGetMacroSourceTraceBranches"]
+        },
         {
           "name": "enable_trace, disable_trace, enable_all_trace, is_trace_enabled and finalize_trace tag state",
           "status": "platform_replacement",
