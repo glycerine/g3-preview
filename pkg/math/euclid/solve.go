@@ -11,6 +11,10 @@ func (s *solverSetup) solve() (bool, error) {
 	if s.inconsistent != nullEquationIndex {
 		return false, nil
 	}
+	if e := s.traceSolveEntry(); e != nil {
+		s.stop = e
+		return false, e
+	}
 	z := s.manager.Integers()
 	for {
 		found, e := s.selectNextVar()
@@ -20,6 +24,10 @@ func (s *solverSetup) solve() (bool, error) {
 		}
 		if !found {
 			return true, nil
+		}
+		if e = s.traceSolveCandidate(); e != nil {
+			s.stop = e
+			return false, e
 		}
 		one, e := z.IsOne(&s.nextA)
 		if e != nil {
@@ -37,6 +45,10 @@ func (s *solverSetup) solve() (bool, error) {
 			e = s.decomposeAndEliminate()
 		}
 		if e != nil {
+			s.stop = e
+			return false, e
+		}
+		if e = s.traceSolveAfter(); e != nil {
 			s.stop = e
 			return false, e
 		}

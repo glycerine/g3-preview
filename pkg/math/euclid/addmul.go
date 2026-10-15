@@ -60,6 +60,9 @@ func (s *solverSetup) addmulInt(as1 []numeral.Int, xs1 []uint32, k *numeral.Int,
 		if err = z.AddMul(&as1[i1], k, &as2[i2], &newA); err != nil {
 			return err
 		}
+		if err = s.traceIntAddMul(i1, i2, &newA, &as1[i1], k, &as2[i2]); err != nil {
+			return err
+		}
 		var zero bool
 		if zero, err = z.IsZero(&newA); err != nil {
 			return err
@@ -125,6 +128,9 @@ func (s *solverSetup) addmulRational(bs1 []numeral.Rational, js1 []uint32, k *nu
 			continue
 		}
 		if err = m.AddMulInt(&bs1[i1], k, &bs2[i2], &newB); err != nil {
+			return err
+		}
+		if err = s.traceRationalAddMul(i1, i2, &newB, &bs1[i1], k, &bs2[i2]); err != nil {
 			return err
 		}
 		var zero bool

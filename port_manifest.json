@@ -34744,6 +34744,8 @@
         "pkg/math/euclid/numeral_buffer_sort.go",
         "pkg/math/euclid/numeral_buffer_sort_test.go",
         "pkg/math/euclid/addmul.go",
+        "pkg/math/euclid/addmul_trace.go",
+        "pkg/math/euclid/addmul_trace_test.go",
         "pkg/math/euclid/addmul_test.go",
         "pkg/math/euclid/apply_solution.go",
         "pkg/math/euclid/apply_solution_trace.go",
@@ -34760,6 +34762,8 @@
         "pkg/math/euclid/decompose.go",
         "pkg/math/euclid/decompose_test.go",
         "pkg/math/euclid/solve.go",
+        "pkg/math/euclid/solve_trace.go",
+        "pkg/math/euclid/solve_trace_test.go",
         "pkg/math/euclid/solve_test.go",
         "pkg/math/euclid/normalize_query.go",
         "pkg/math/euclid/normalize_query_trace.go",
@@ -34785,6 +34789,7 @@
         "TestEuclideanNormalizeQueryTraceBeforeAndAfterSubstitution",
         "TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue",
         "TestEuclideanRationalAddmulMergedJustifications",
+        "TestEuclideanAddMulTraceConcreteIntegerAndRationalCancellation",
         "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
         "TestEuclideanApplySolutionTraceBeforeAndAfterIntegerSwap",
         "TestEuclideanAssertEquationNormalizeAndOccurrences",
@@ -34803,6 +34808,8 @@
         "TestEuclideanNonUnitDecompositionSubstitutesOtherEquations",
         "TestEuclideanNonUnitDecompositionNegativeOtherCoefficient",
         "TestEuclideanSolveNonUnitThenUnitToParameterSolution",
+        "TestEuclideanSolveTraceEntryCandidateAndPostPivotDisplay",
+        "TestEuclideanSolveTracePostPivotInconsistencyDisplay",
         "TestEuclideanSolveContradictionAfterUnitSubstitution",
         "TestEuclideanSolveEmptyAndAlreadyInconsistent",
         "TestEuclideanNormalizeQueryAfterNonUnitSolve",
@@ -34928,9 +34935,11 @@
           "name": "concrete mpz and mpq addmul sorted-row merge with occurrence and queue updates at cpp:329-419",
           "status": "partial",
           "go_target": "pkg/math/euclid/addmul.go",
+          "go_targets": ["pkg/math/euclid/addmul_trace.go"],
           "tests": [
             "TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue",
-            "TestEuclideanRationalAddmulMergedJustifications"
+            "TestEuclideanRationalAddmulMergedJustifications",
+            "TestEuclideanAddMulTraceConcreteIntegerAndRationalCancellation"
           ]
         },
         {
@@ -34987,10 +34996,13 @@
           "name": "solve loop unit/non-unit dispatch, completion and inconsistency exits at cpp:708-730",
           "status": "partial",
           "go_target": "pkg/math/euclid/solve.go",
+          "go_targets": ["pkg/math/euclid/solve_trace.go"],
           "tests": [
             "TestEuclideanSolveNonUnitThenUnitToParameterSolution",
             "TestEuclideanSolveContradictionAfterUnitSubstitution",
-            "TestEuclideanSolveEmptyAndAlreadyInconsistent"
+            "TestEuclideanSolveEmptyAndAlreadyInconsistent",
+            "TestEuclideanSolveTraceEntryCandidateAndPostPivotDisplay",
+            "TestEuclideanSolveTracePostPivotInconsistencyDisplay"
           ]
         },
         {
@@ -35027,6 +35039,7 @@
         "Non-unit decomposition borrows the selected positive magnitude, publishes a new parameter and buffer slot, compacts the todo equation's remainder numerals in place, copies auxiliary coefficients from the owned decomposition buffer into a solution equation, then substitutes that solution into prior occurrences. The decomposition buffer releases its copied numerals after the solution has independent ownership."
       ],
       "deviations": [
+        "The source euclidean_solver_bug CTRACE guards at select_next_var:286 and solve:713 require a null selected variable despite a nonempty normalized equation list. Valid retained paths select a coefficient, discard empty zero equalities, or stop on a constant contradiction. The Go selector diagnoses malformed no-candidate state instead of emitting an unreachable debug record; the source guard sites are reference-only.",
         "normalizeQuery substitutes directly into the caller-owned c_prime, matching source constant publication before the rational justification merge. A real numeral allocation refusal in that later merge leaves c_prime at the substituted value while the solver retains the stopped normalization workspace for owning Close; the borrowed input constant is unchanged.",
         "normalizeQuery now retains its started equation-shaped m_norm_* workspace in the concrete solver owner after a stopped numeral copy. The original failure becomes a sticky solver stop; a later query cannot overwrite the partial owner. Successful queries release it at source function end, while solver Close drains it after the queue and before older buffer members. Native and checked/debug real-allocation tests observe completed or failed first buffer slots and full owner cleanup. Exact separate m_norm_as/m_norm_bs vectors and every normalization failure prefix remain open.",
         "Source normalize_eq checks divisibility of the constant but divides only variable coefficients and justification coefficients by their gcd. The Go path retains that exact result. After source normalize_eq destroys an empty zero equality, assert_eq still calls add_occs on its null slot; Go skips that invalid dereference.",
@@ -177188,6 +177201,8 @@
         "pkg/math/euclid/apply_solution_trace.go",
         "pkg/math/euclid/normalize_trace.go",
         "pkg/math/euclid/pivot_decompose_trace.go",
+        "pkg/math/euclid/solve_trace.go",
+        "pkg/math/euclid/addmul_trace.go",
         "pkg/api/api_trace.go",
         "pkg/util/numeral/mpff_round_trace.go",
         "pkg/util/numeral/mpff_power_trace.go",
@@ -177256,6 +177271,9 @@
         "TestEuclideanNewEquationTraceBeforeListPublication",
         "TestEuclideanUnitPivotTraceSourceOrderAndEquations",
         "TestEuclideanDecompositionTraceBeforeAuxiliaryPublication",
+        "TestEuclideanSolveTraceEntryCandidateAndPostPivotDisplay",
+        "TestEuclideanSolveTracePostPivotInconsistencyDisplay",
+        "TestEuclideanAddMulTraceConcreteIntegerAndRationalCancellation",
         "TestTraceHeaderSourceInsertionRefusalPrefixes",
         "TestTraceShortBodyFailureSkipsSourceFlush",
         "TestTraceConditionalOperandFailureSkipsFooterAndFlush",
@@ -178552,6 +178570,24 @@
           "tests": ["TestEuclideanUnitPivotTraceSourceOrderAndEquations", "TestEuclideanDecompositionTraceBeforeAuxiliaryPublication"]
         },
         {
+          "name": "Reached Euclidean solve entry, selected variable and post-pivot solver-display TRACE records (euclidean_solver.cpp:711,714,719)",
+          "status": "ported",
+          "go_target": "pkg/math/euclid/solve_trace.go",
+          "tests": ["TestEuclideanSolveTraceEntryCandidateAndPostPivotDisplay", "TestEuclideanSolveTracePostPivotInconsistencyDisplay"]
+        },
+        {
+          "name": "Reached Euclidean concrete mpz/mpq addmul overlapping-row TRACE record (euclidean_solver.cpp:404-405)",
+          "status": "ported",
+          "go_target": "pkg/math/euclid/addmul_trace.go",
+          "tests": ["TestEuclideanAddMulTraceConcreteIntegerAndRationalCancellation"]
+        },
+        {
+          "name": "Euclidean selector and solve euclidean_solver_bug CTRACE null-candidate guards have no valid retained emission (euclidean_solver.cpp:286,713)",
+          "status": "reference_only",
+          "go_target": "pkg/math/euclid/pivot.go",
+          "tests": ["TestEuclideanSelectNextPivotSourceTiesAndUnitStop", "TestEuclideanConstantOnlyTrivialAndContradictoryEquations", "TestEuclideanNonUnitDecompositionParameterAndAuxiliaryEquation"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -178576,6 +178612,8 @@
         "pkg/math/euclid/apply_solution_trace.go",
         "pkg/math/euclid/normalize_trace.go",
         "pkg/math/euclid/pivot_decompose_trace.go",
+        "pkg/math/euclid/solve_trace.go",
+        "pkg/math/euclid/addmul_trace.go",
         "pkg/api/api_trace.go",
         "pkg/util/numeral/mpff_round_trace.go",
         "pkg/util/numeral/mpff_power_trace.go",
@@ -178644,6 +178682,9 @@
         "TestEuclideanNewEquationTraceBeforeListPublication",
         "TestEuclideanUnitPivotTraceSourceOrderAndEquations",
         "TestEuclideanDecompositionTraceBeforeAuxiliaryPublication",
+        "TestEuclideanSolveTraceEntryCandidateAndPostPivotDisplay",
+        "TestEuclideanSolveTracePostPivotInconsistencyDisplay",
+        "TestEuclideanAddMulTraceConcreteIntegerAndRationalCancellation",
         "TestTraceHeaderSourceInsertionRefusalPrefixes",
         "TestTraceShortBodyFailureSkipsSourceFlush",
         "TestTraceConditionalOperandFailureSkipsFooterAndFlush",
@@ -179950,6 +179991,24 @@
           "status": "ported",
           "go_target": "pkg/math/euclid/pivot_decompose_trace.go",
           "tests": ["TestEuclideanUnitPivotTraceSourceOrderAndEquations", "TestEuclideanDecompositionTraceBeforeAuxiliaryPublication"]
+        },
+        {
+          "name": "Reached Euclidean solve entry, selected variable and post-pivot solver-display TRACE records (euclidean_solver.cpp:711,714,719)",
+          "status": "ported",
+          "go_target": "pkg/math/euclid/solve_trace.go",
+          "tests": ["TestEuclideanSolveTraceEntryCandidateAndPostPivotDisplay", "TestEuclideanSolveTracePostPivotInconsistencyDisplay"]
+        },
+        {
+          "name": "Reached Euclidean concrete mpz/mpq addmul overlapping-row TRACE record (euclidean_solver.cpp:404-405)",
+          "status": "ported",
+          "go_target": "pkg/math/euclid/addmul_trace.go",
+          "tests": ["TestEuclideanAddMulTraceConcreteIntegerAndRationalCancellation"]
+        },
+        {
+          "name": "Euclidean selector and solve euclidean_solver_bug CTRACE null-candidate guards have no valid retained emission (euclidean_solver.cpp:286,713)",
+          "status": "reference_only",
+          "go_target": "pkg/math/euclid/pivot.go",
+          "tests": ["TestEuclideanSelectNextPivotSourceTiesAndUnitStop", "TestEuclideanConstantOnlyTrivialAndContradictoryEquations", "TestEuclideanNonUnitDecompositionParameterAndAuxiliaryEquation"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
