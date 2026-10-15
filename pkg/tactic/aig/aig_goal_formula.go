@@ -197,6 +197,9 @@ func (c *goalFormulaConverter) processRoot(n *node) (ast.ASTHandle, error) {
 	}
 	c.frames = append(c.frames, goalAIGFrame{node: n, kind: c.kind(n), first: true})
 	for len(c.frames) != 0 {
+		if err := c.manager.checkpoint(); err != nil {
+			return ast.ASTHandle{}, err
+		}
 		last := len(c.frames) - 1
 		fr := c.frames[last]
 		if c.cached(fr.node) {

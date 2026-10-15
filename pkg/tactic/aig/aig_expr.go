@@ -210,6 +210,9 @@ func (c *exprConverter) convertOne(h ast.ASTHandle) (*Ref, error) {
 	}
 	err := c.visit(h)
 	for err == nil && len(c.frames) != 0 {
+		if err = c.manager.checkpoint(); err != nil {
+			break
+		}
 		last := len(c.frames) - 1
 		fr := &c.frames[last]
 		if fr.next < len(fr.args) {

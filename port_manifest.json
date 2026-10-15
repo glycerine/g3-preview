@@ -98167,7 +98167,9 @@
         "TestAIGToGoalFlattensSingleUsePositiveAndUnderNegation",
         "TestAIGMaxSharingReassociatesTowardExistingPair",
         "TestAIGMaxSharingUnchangedAndInvertedRoot",
-        "TestAIGMaxSharingCachesSharedOldNode"
+        "TestAIGMaxSharingCachesSharedOldNode",
+        "TestAIGCheckpointSourceMemoryCancelAndCooperateOrder",
+        "TestAIGGoalOutputCheckpointUsesSameSourceGuards"
       ],
       "conditionals": [
         {
@@ -98486,13 +98488,22 @@
             "TestAIGMaxSharingUnchangedAndInvertedRoot",
             "TestAIGMaxSharingCachesSharedOldNode"
           ]
+        },
+        {
+          "name": "imp::checkpoint source memory, cancellation and cooperation order at expr2aig and optimized goal-output frames",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_core.go",
+          "tests": [
+            "TestAIGCheckpointSourceMemoryCancelAndCooperateOrder",
+            "TestAIGGoalOutputCheckpointUsesSameSourceGuards"
+          ]
         }
       ],
       "ownership": [
         "Concrete AIG manager pins each variable AST expression, owns true/false counts and interning table nodes, and recursively releases child nodes when the last AIG reference closes. AIG-to-formula cache and output own ASTRef values; stopped AST releases remain with the manager for retry."
       ],
       "deviations": [
-        "Typed Go map replaces aig_table; literal inversion is a bool rather than pointer tagging. The mk_node minimizer, both gate encodings, expression-to-AIG traversal, goal conjunction and source naive AIG-to-expression conversion are ported. The optimized AIG-to-goal writer uses ITE shape recognition and source root/flattening order; max-sharing associative reuse and cache are implemented. The tactic now invokes both concrete goal-update branches. Resource checkpoints, display and full tactic parameters remain open."
+        "Typed Go map replaces aig_table; literal inversion is a bool rather than pointer tagging. The mk_node minimizer, both gate encodings, expression-to-AIG traversal, goal conjunction and source naive AIG-to-expression conversion are ported. The optimized AIG-to-goal writer uses ITE shape recognition and source root/flattening order; max-sharing associative reuse and cache are implemented. Source checkpoints now run at both retained frame loops, and the tactic invokes both goal-update branches. Display and remaining tactic integration remain open."
       ]
     },
     {
@@ -98520,7 +98531,8 @@
         "TestAIGGoalConversionSharesExpressionCacheAndConjoins",
         "TestAIGToFormulaNaiveIterativeDeMorganAndSmartInversion",
         "TestAIGToGoalSourceRootOrderAndITE",
-        "TestAIGMaxSharingReassociatesTowardExistingPair"
+        "TestAIGMaxSharingReassociatesTowardExistingPair",
+        "TestAIGCheckpointSourceMemoryCancelAndCooperateOrder"
       ],
       "conditionals": [
         {
@@ -98597,13 +98609,22 @@
             "TestAIGMaxSharingReassociatesTowardExistingPair",
             "TestAIGMaxSharingCachesSharedOldNode"
           ]
+        },
+        {
+          "name": "aig_manager set_max_memory and retained conversion checkpoints",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_core.go",
+          "tests": [
+            "TestAIGCheckpointSourceMemoryCancelAndCooperateOrder",
+            "TestAIGGoalOutputCheckpointUsesSameSourceGuards"
+          ]
         }
       ],
       "ownership": [
         "Go Ref owns one AIG reference and closes explicitly; intermediate gate references close in reverse order, including after a refused node allocation."
       ],
       "deviations": [
-        "Goal-to-AIG conjunction, both source gate encodings and to_formula(expr_ref&) are ported; optimized to_formula(goal&) covers root order, ITE/IFF and flattening, and max_sharing has its postorder associative reuse path. The concrete tactic invokes the goal-update methods; display, resource checkpoints and parameter integration remain open."
+        "Goal-to-AIG conjunction, both source gate encodings and to_formula(expr_ref&) are ported; optimized to_formula(goal&) covers root order, ITE/IFF and flattening, and max_sharing has its postorder associative reuse path. The concrete tactic invokes goal updates with source frame checkpoints and parameter-derived max memory. Display and remaining tactic integration remain open."
       ]
     },
     {
@@ -98617,7 +98638,8 @@
       "tests": [
         "TestAIGPassPerAssertionPreservesDependenciesAndDepth",
         "TestAIGPassWholeGoalCombinesAndRejectsCore",
-        "TestAIGPassRejectsProofBeforeGoalMutation"
+        "TestAIGPassRejectsProofBeforeGoalMutation",
+        "TestAIGPassParamsBindMemoryEncodingAndWholeGoalBranch"
       ],
       "assertions": [
         {
@@ -98641,13 +98663,21 @@
             "TestAIGPassWholeGoalCombinesAndRejectsCore",
             "TestAIGPassRejectsProofBeforeGoalMutation"
           ]
+        },
+        {
+          "name": "updt_params max_memory sentinel/megabytes, gate encoding and per-assertion branch selection",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_tactic.go",
+          "tests": [
+            "TestAIGPassParamsBindMemoryEncodingAndWholeGoalBranch"
+          ]
         }
       ],
       "ownership": [
         "Each Apply call owns a fresh AIG manager and closes its intermediate AIG and AST references after goal updates. The returned goal has one additional owner reference."
       ],
       "deviations": [
-        "Pass currently exposes concrete gate-encoding and per-assertion options directly. Source max_memory checkpoint, params_ref update/translation, tactic descriptor, display and checked well-sorted assertions remain open."
+        "Pass reads source max_memory, gate-encoding and per-assertion parameters, and binds memory/cancellation/cooperation checkpoints to its fresh AIG manager. Translation, parameter descriptor, generated registration, display and checked well-sorted assertions remain open."
       ]
     },
     {
@@ -98661,7 +98691,8 @@
       "tests": [
         "TestAIGPassPerAssertionPreservesDependenciesAndDepth",
         "TestAIGPassWholeGoalCombinesAndRejectsCore",
-        "TestAIGPassRejectsProofBeforeGoalMutation"
+        "TestAIGPassRejectsProofBeforeGoalMutation",
+        "TestAIGPassParamsBindMemoryEncodingAndWholeGoalBranch"
       ],
       "conditionals": [
         {
@@ -98691,7 +98722,7 @@
         "Pass borrows the goal and constructs a per-application AIG manager; source registration and params_ref ownership remain open."
       ],
       "deviations": [
-        "Concrete Pass constructor replaces the source factory for direct Go callers; parameter descriptors and generated registration remain open."
+        "Concrete Pass constructor and parameter updater replace the source factory for direct Go callers; parameter descriptors and generated registration remain open."
       ]
     },
     {

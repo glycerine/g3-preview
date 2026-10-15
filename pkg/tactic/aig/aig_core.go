@@ -8,6 +8,10 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/memory"
+	"github.com/glycerine/g3/pkg/util/messages"
 )
 
 var ErrOwner = errors.New("aig: invalid or closed owner")
@@ -53,9 +57,8 @@ func (p *idPool) take() (uint32, error) {
 }
 func (p *idPool) recycle(id uint32) { p.free = append(p.free, id) }
 
-// Manager is the concrete source AIG owner. It covers variable storage,
-// mk_node_core interning and two-level mk_node simplification; formula and
-// tactic traversals remain with the unported owning AIG code.
+// Manager owns the concrete AIG table, references, conversions and source
+// checkpoints used by the goal-rewriting tactic.
 type Manager struct {
 	self                *Manager
 	ast                 *ast.ASTManager
@@ -72,6 +75,9 @@ type Manager struct {
 	closing             bool
 	closed              bool
 	defaultGateEncoding bool
+	maxMemory           uint64
+	runtime             *memory.Runtime
+	cooperation         *cooperate.Cooperation
 }
 
 // Ref owns one source aig_ref count. Call Close for each returned reference.
@@ -89,6 +95,10 @@ func NewManager(m *ast.ASTManager) (*Manager, error) {
 // and IFF circuit construction branch.
 func NewManagerWithGateEncoding(m *ast.ASTManager, defaultGateEncoding bool) (*Manager, error) {
 	if m == nil {
+		return nil, ErrOwner
+	}
+	numerals := m.NumeralService()
+	if numerals == nil || numerals.RuntimeOwner() == nil {
 		return nil, ErrOwner
 	}
 	h, e := m.MkTrue()
@@ -109,7 +119,7 @@ func NewManagerWithGateEncoding(m *ast.ASTManager, defaultGateEncoding bool) (*M
 		m.BudgetField.Release(nodeBytes + managerBytes)
 		return nil, e
 	}
-	v := &Manager{ast: m, table: make(map[andKey]*node), header: managerBytes, nodeBytes: nodeBytes, defaultGateEncoding: defaultGateEncoding}
+	v := &Manager{ast: m, table: make(map[andKey]*node), header: managerBytes, nodeBytes: nodeBytes, defaultGateEncoding: defaultGateEncoding, maxMemory: math.MaxUint64, runtime: numerals.RuntimeOwner()}
 	v.self = v
 	v.andNodes.next = firstNodeID
 	v.trueNode = &node{id: 0, refs: 2, variable: r}
@@ -124,6 +134,51 @@ func (m *Manager) open() error {
 	}
 	if e := m.drainPendingAST(); e != nil {
 		return e
+	}
+	return nil
+}
+
+// SetMaxMemory is aig_manager::set_max_memory; zero is a real source limit.
+func (m *Manager) SetMaxMemory(limit uint64) error {
+	if err := m.open(); err != nil {
+		return err
+	}
+	m.maxMemory = limit
+	return nil
+}
+
+// BindCooperation borrows the process cooperation owner for source checkpoints.
+func (m *Manager) BindCooperation(owner *cooperate.Cooperation) error {
+	if err := m.open(); err != nil {
+		return err
+	}
+	if owner == nil {
+		return arena.ErrConfig
+	}
+	if _, err := owner.Enabled(); err != nil {
+		return err
+	}
+	m.cooperation = owner
+	return nil
+}
+
+func (m *Manager) checkpoint() error {
+	used, err := m.runtime.AllocationSize()
+	if err != nil {
+		return err
+	}
+	if used > m.maxMemory {
+		return tactic.NewTacticException(messages.MaxMemory)
+	}
+	canceled, err := m.ast.Canceled()
+	if err != nil {
+		return err
+	}
+	if canceled {
+		return tactic.NewTacticException(m.ast.Limit.CancelMessage())
+	}
+	if m.cooperation != nil {
+		return m.cooperation.Cooperate("aig")
 	}
 	return nil
 }

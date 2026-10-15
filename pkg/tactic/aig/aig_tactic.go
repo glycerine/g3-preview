@@ -3,20 +3,66 @@ package aig
 
 import (
 	"errors"
+	"math"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/cooperate"
+	uparams "github.com/glycerine/g3/pkg/util/params"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-// Pass applies the source AIG tactic's two goal-rewriting branches. Its
-// resource-limit parameters are kept separate until the source checkpoints
-// in aig.cpp are ported.
+// Pass applies the source AIG tactic's two goal-rewriting branches.
 type Pass struct {
 	DefaultGateEncoding bool
 	PerAssertion        bool
+	maxMemory           uint64
+	cooperation         *cooperate.Cooperation
+	paramsSymbols       *usymbol.Manager
 }
 
-func NewPass() *Pass { return &Pass{DefaultGateEncoding: true, PerAssertion: true} }
+func NewPass() *Pass {
+	return &Pass{DefaultGateEncoding: true, PerAssertion: true, maxMemory: math.MaxUint64}
+}
+
+// UpdateParams follows aig_tactic::updt_params, including the UINT_MAX
+// sentinel used by megabytes_to_bytes on the selected 64-bit profile.
+func (p *Pass) UpdateParams(c *uparams.ParamsContext, value *uparams.ParamsRef) error {
+	if p == nil || c == nil || c.SymbolsField == nil {
+		return ErrOwner
+	}
+	memoryName, encodingName, perName := "max_memory", "aig_default_gate_encoding", "aig_per_assertion"
+	mb, err := c.GetUIntName(value, &memoryName, math.MaxUint32)
+	if err != nil {
+		return err
+	}
+	encoding, err := c.GetBoolName(value, &encodingName, true)
+	if err != nil {
+		return err
+	}
+	per, err := c.GetBoolName(value, &perName, true)
+	if err != nil {
+		return err
+	}
+	limit := uint64(mb) << 20
+	if mb == math.MaxUint32 {
+		limit = math.MaxUint64
+	}
+	p.maxMemory, p.DefaultGateEncoding, p.PerAssertion, p.paramsSymbols = limit, encoding, per, c.SymbolsField
+	return nil
+}
+
+// BindCooperation borrows the process cooperation owner used at AIG checkpoints.
+func (p *Pass) BindCooperation(owner *cooperate.Cooperation) error {
+	if p == nil || owner == nil {
+		return ErrOwner
+	}
+	if _, err := owner.Enabled(); err != nil {
+		return err
+	}
+	p.cooperation = owner
+	return nil
+}
 
 func (p *Pass) rewriteOne(m *Manager, g *tactic.Goal, i uint32) (err error) {
 	form, err := g.Form(i)
@@ -107,6 +153,9 @@ func (p *Pass) Apply(g *tactic.Goal) (out *tactic.Goal, err error) {
 	if err = g.CheckOwner(); err != nil {
 		return nil, err
 	}
+	if p.paramsSymbols != nil && p.paramsSymbols != g.Manager().Symbols {
+		return nil, ErrOwner
+	}
 	proofs, err := g.ProofsEnabled()
 	if err != nil {
 		return nil, err
@@ -124,6 +173,14 @@ func (p *Pass) Apply(g *tactic.Goal) (out *tactic.Goal, err error) {
 	m, err := NewManagerWithGateEncoding(g.Manager(), p.DefaultGateEncoding)
 	if err != nil {
 		return nil, err
+	}
+	if err = m.SetMaxMemory(p.maxMemory); err != nil {
+		return nil, errors.Join(err, m.Close())
+	}
+	if p.cooperation != nil {
+		if err = m.BindCooperation(p.cooperation); err != nil {
+			return nil, errors.Join(err, m.Close())
+		}
 	}
 	if err = p.rewriteGoal(m, g); err != nil {
 		return nil, errors.Join(err, m.Close())
