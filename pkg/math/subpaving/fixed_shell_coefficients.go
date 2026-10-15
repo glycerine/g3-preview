@@ -115,6 +115,13 @@ func (w *FixedShellCoefficients) MkVar(integer bool) (uint32, error) {
 	return w.context.NewVariable(integer)
 }
 
+func (w *FixedShellCoefficients) MkMonomial(powers []FixedPower) (uint32, error) {
+	if err := w.open(); err != nil {
+		return 0, err
+	}
+	return w.context.DefineMonomial(powers)
+}
+
 func (w *FixedShellCoefficients) MkSum(constant *numeral.Int, coefficients []*numeral.Int, variables []uint32) (uint32, error) {
 	if len(coefficients) != len(variables) {
 		return 0, arena.ErrInvalidSlot
@@ -151,6 +158,13 @@ func (w *FixedShellCoefficients) MkInequality(variable uint32, value *numeral.Ra
 	}
 	a, err := w.context.NewInequality(variable, bound, lower, open)
 	return a, sourceFixedFailure(err)
+}
+
+func (w *FixedShellCoefficients) AddClause(atoms []*FixedInequality) (*FixedClause, error) {
+	if err := w.open(); err != nil {
+		return nil, err
+	}
+	return w.context.AddClause(atoms, false, true)
 }
 
 // Close retires z2, z1, the vector in ascending element order, and the

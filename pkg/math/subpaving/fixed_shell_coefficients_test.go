@@ -77,6 +77,10 @@ func TestFixedShellExactCoefficientOwnerAndDirectedBound(t *testing.T) {
 	if err != nil || z != 2 || len(c.polynomials[z].terms) != 2 || c.polynomials[z].terms[0].Variable != x {
 		t.Fatal("fixed polynomial publication", z, err)
 	}
+	monomial, err := w.MkMonomial([]FixedPower{{Variable: x, Degree: 2}, {Variable: y, Degree: 1}})
+	if err != nil || monomial != 3 || c.monomials[monomial] == nil {
+		t.Fatal("fixed wrapper monomial forwarding", monomial, err)
+	}
 	if err := q.Z.SetString(&tooBig, "4294967296"); err != nil {
 		t.Fatal(err)
 	}
@@ -101,6 +105,10 @@ func TestFixedShellExactCoefficientOwnerAndDirectedBound(t *testing.T) {
 	hi, err := m.Rational(upper.value)
 	if err != nil || hi.Cmp(big.NewRat(1, 3)) <= 0 || !upper.open {
 		t.Fatal("upper directed fixed bound", hi, err)
+	}
+	clause, err := w.AddClause([]*FixedInequality{upper, lower})
+	if err != nil || clause == nil || len(clause.atoms) != 2 || !clause.watched || clause.lemma {
+		t.Fatal("fixed wrapper clause forwarding", clause, err)
 	}
 }
 
