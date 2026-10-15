@@ -27,33 +27,36 @@ func (c *HardwareContext) RelevantNewBound(n *HardwareNode, variable uint32, can
 		return false, err
 	}
 	currentLower, currentUpper := n.lower[variable], n.upper[variable]
+	if err = c.traceRelevantCandidate(variable, candidate, lower, open, currentLower, currentUpper); err != nil {
+		return false, err
+	}
 	if lower {
 		if currentUpper != nil && (m.Greater(candidate, &currentUpper.value) ||
 			(open || currentUpper.open) && m.Equal(candidate, &currentUpper.value)) {
-			return true, nil
+			return c.traceRelevantDecision(true, 1218, "relevant because triggers conflict.", nil)
 		}
 		if c.zeroEpsilon && currentLower != nil && (m.Less(candidate, &currentLower.value) ||
 			(currentLower.open || !open) && m.Equal(candidate, &currentLower.value)) {
-			return false, nil
+			return c.traceRelevantDecision(false, 1224, "irrelevant because does not improve existing bound.", nil)
 		}
 		if currentUpper == nil && m.Less(&c.maxBound, candidate) {
-			return false, nil
+			return c.traceRelevantDecision(false, 1229, "irrelevant because exceeds :max-bound threshold.", nil)
 		}
 	} else {
 		if currentLower != nil && (m.Greater(&currentLower.value, candidate) ||
 			(open || currentLower.open) && m.Equal(candidate, &currentLower.value)) {
-			return true, nil
+			return c.traceRelevantDecision(true, 1268, "relevant because triggers conflict.", nil)
 		}
 		if c.zeroEpsilon && currentUpper != nil && (m.Less(&currentUpper.value, candidate) ||
 			(currentUpper.open || !open) && m.Equal(candidate, &currentUpper.value)) {
-			return false, nil
+			return c.traceRelevantDecision(false, 1274, "irrelevant because does not improve existing bound.", nil)
 		}
 		if currentLower == nil && m.Less(candidate, &c.minusMaxBound) {
-			return false, nil
+			return c.traceRelevantDecision(false, 1279, "irrelevant because exceeds -:max-bound threshold.", nil)
 		}
 	}
 	if c.zeroEpsilon || lower && currentLower == nil || !lower && currentUpper == nil {
-		return true, nil
+		return c.traceRelevantDecision(true, 1310, "new bound is relevant", nil)
 	}
 	current := currentUpper
 	if lower {
@@ -90,12 +93,21 @@ func (c *HardwareContext) RelevantNewBound(n *HardwareNode, variable uint32, can
 		if err = m.Add(&currentLower.value, &delta, &delta); err != nil {
 			return false, err
 		}
-		return m.Greater(candidate, &delta), nil
+		if err = c.traceRelevantLowerBug(candidate, &delta, &currentLower.value, &minimum); err != nil {
+			return false, err
+		}
+		if !m.Greater(candidate, &delta) {
+			return c.traceRelevantDecision(false, 1259, "irrelevant because does not improve existing bound to at least ", &delta)
+		}
+		return c.traceRelevantDecision(true, 1310, "new bound is relevant", nil)
 	}
 	if err = m.Sub(&currentUpper.value, &delta, &delta); err != nil {
 		return false, err
 	}
-	return m.Less(candidate, &delta), nil
+	if !m.Less(candidate, &delta) {
+		return c.traceRelevantDecision(false, 1304, "irrelevant because does not improve existing bound to at least ", &delta)
+	}
+	return c.traceRelevantDecision(true, 1310, "new bound is relevant", nil)
 }
 
 // PropagateCandidate is the retained definition path: normalize a scalar
