@@ -23,6 +23,9 @@ func (c *RationalContext) RelevantNewBound(n *RationalNode, variable uint32, can
 	}
 	m := c.numbers
 	currentLower, currentUpper := n.lower[variable], n.upper[variable]
+	if err := c.traceRelevantCandidate(variable, candidate, lower, open, currentLower, currentUpper); err != nil {
+		return false, err
+	}
 	if lower {
 		if currentUpper != nil {
 			cmp, err := m.Compare(candidate, &currentUpper.value)
@@ -30,7 +33,7 @@ func (c *RationalContext) RelevantNewBound(n *RationalNode, variable uint32, can
 				return false, err
 			}
 			if cmp > 0 || cmp == 0 && (open || currentUpper.open) {
-				return true, nil
+				return c.traceRelevantDecision(true, 1218, "relevant because triggers conflict.", nil)
 			}
 		}
 		if c.zeroEpsilon && currentLower != nil {
@@ -39,7 +42,7 @@ func (c *RationalContext) RelevantNewBound(n *RationalNode, variable uint32, can
 				return false, err
 			}
 			if cmp < 0 || cmp == 0 && (currentLower.open || !open) {
-				return false, nil
+				return c.traceRelevantDecision(false, 1224, "irrelevant because does not improve existing bound.", nil)
 			}
 		}
 		if currentUpper == nil {
@@ -48,7 +51,7 @@ func (c *RationalContext) RelevantNewBound(n *RationalNode, variable uint32, can
 				return false, err
 			}
 			if cmp < 0 {
-				return false, nil
+				return c.traceRelevantDecision(false, 1229, "irrelevant because exceeds :max-bound threshold.", nil)
 			}
 		}
 	} else {
@@ -58,7 +61,7 @@ func (c *RationalContext) RelevantNewBound(n *RationalNode, variable uint32, can
 				return false, err
 			}
 			if cmp > 0 || cmp == 0 && (open || currentLower.open) {
-				return true, nil
+				return c.traceRelevantDecision(true, 1268, "relevant because triggers conflict.", nil)
 			}
 		}
 		if c.zeroEpsilon && currentUpper != nil {
@@ -67,7 +70,7 @@ func (c *RationalContext) RelevantNewBound(n *RationalNode, variable uint32, can
 				return false, err
 			}
 			if cmp < 0 || cmp == 0 && (currentUpper.open || !open) {
-				return false, nil
+				return c.traceRelevantDecision(false, 1274, "irrelevant because does not improve existing bound.", nil)
 			}
 		}
 		if currentLower == nil {
@@ -76,19 +79,19 @@ func (c *RationalContext) RelevantNewBound(n *RationalNode, variable uint32, can
 				return false, err
 			}
 			if cmp < 0 {
-				return false, nil
+				return c.traceRelevantDecision(false, 1279, "irrelevant because exceeds -:max-bound threshold.", nil)
 			}
 		}
 	}
 	if c.zeroEpsilon {
-		return true, nil
+		return c.traceRelevantDecision(true, 1310, "new bound is relevant", nil)
 	}
 	current := currentUpper
 	if lower {
 		current = currentLower
 	}
 	if current == nil {
-		return true, nil
+		return c.traceRelevantDecision(true, 1310, "new bound is relevant", nil)
 	}
 	abs, minimum, delta := &c.relevanceScratch[0], &c.relevanceScratch[1], &c.relevanceScratch[2]
 	if err := m.Copy(abs, &current.value); err != nil {
@@ -132,12 +135,27 @@ func (c *RationalContext) RelevantNewBound(n *RationalNode, variable uint32, can
 		if err := m.Add(&currentLower.value, delta, delta); err != nil {
 			return false, err
 		}
+		if err := c.traceRelevantLowerBug(candidate, delta, &currentLower.value, minimum); err != nil {
+			return false, err
+		}
 		cmp, err := m.Compare(candidate, delta)
-		return cmp > 0, err
+		if err != nil {
+			return false, err
+		}
+		if cmp <= 0 {
+			return c.traceRelevantDecision(false, 1259, "irrelevant because does not improve existing bound to at least ", delta)
+		}
+		return c.traceRelevantDecision(true, 1310, "new bound is relevant", nil)
 	}
 	if err := m.Sub(&currentUpper.value, delta, delta); err != nil {
 		return false, err
 	}
 	cmp, err = m.Compare(candidate, delta)
-	return cmp < 0, err
+	if err != nil {
+		return false, err
+	}
+	if cmp >= 0 {
+		return c.traceRelevantDecision(false, 1304, "irrelevant because does not improve existing bound to at least ", delta)
+	}
+	return c.traceRelevantDecision(true, 1310, "new bound is relevant", nil)
 }
