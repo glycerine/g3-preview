@@ -12409,7 +12409,8 @@
         "pkg/ast/ast_smt2_sort.go",
         "pkg/ast/ast_smt2_fdecl.go",
         "pkg/ast/ast_smt2_var_labels.go",
-        "pkg/ast/ast_smt2_app_format.go"
+        "pkg/ast/ast_smt2_app_format.go",
+        "pkg/ast/ast_smt2_boolean_tree.go"
       ],
       "tests": [
         "TestASTSMT2BitVectorLiteralRadixAndSignedOracle",
@@ -12430,7 +12431,8 @@
         "TestASTSMT2SortSourceBuiltinAndParametricFormats",
         "TestASTSMT2FunctionDeclarationSourceFormatsAndRecursiveReference",
         "TestASTSMT2VariableAndLabelSourceFormats",
-        "TestASTSMT2ApplicationSourceShortAndLongNameLayout"
+        "TestASTSMT2ApplicationSourceShortAndLongNameLayout",
+        "TestASTSMT2BooleanTreeSourcePostorderAndLabels"
       ],
       "conditionals": [
         {
@@ -12580,6 +12582,14 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Selected smt2_printer child-before-parent Boolean application and variable traversal with constant/label dispatch; shared, flat associative, deep-alias, numeric and quantifier profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_smt2_boolean_tree.go",
+          "tests": [
+            "TestASTSMT2BooleanTreeSourcePostorderAndLabels"
+          ]
+        },
+        {
           "name": "smt2_printer::process_app nonconstant short/compound declaration format assembly (ast_smt2_pp.cpp:738-801); child traversal, aliasing and info-stack integration remain open",
           "status": "partial",
           "go_target": "pkg/ast/ast_smt2_app_format.go",
@@ -12676,7 +12686,7 @@
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
         "Standard bytes.Buffer and strconv replace C++ character/string container behavior without STL implementation credit. Long radix checks cover widths through 4097; actual numeral and formatter failure campaigns remain. NumericTextStream and fresh-name buffer consumers still require separate work before the full util split.",
-        "The retained function-name formatter now builds source format-string nodes for quoted, numerical, null and simple symbols, and for implication, ITE and IFF declaration names. Indexed and sort-parameter classification, recursive declaration/signature assembly and the base environment's sort formatter are also ported. Variable-name fallback, quoted names, positive/negative labels and nonconstant application layout are available as printer prerequisites; child traversal, frame info-stack integration and aliasing remain open. The cmd_context parametric-sort override, full SMT2 expression traversal and stream operator remain open."
+        "The retained function-name formatter now builds source format-string nodes for quoted, numerical, null and simple symbols, and for implication, ITE and IFF declaration names. Indexed and sort-parameter classification, recursive declaration/signature assembly and the base environment's sort formatter are also ported. Variable-name fallback, quoted names, positive/negative labels, nonconstant application layout and selected Boolean tree traversal are available as printer prerequisites. Shared terms, flat associative children, source depth aliases, numeric terms, quantifiers, frame info-stack integration, the cmd_context parametric-sort override and the stream operator remain open."
       ]
     },
     {
