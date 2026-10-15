@@ -159,6 +159,7 @@ type astInfoRecord struct {
 	live, isSort, private, attached bool
 	lexical                         bool
 	retainedByDebug                 bool
+	memoryTraceAllocated            bool
 	family                          FamilyID
 	kind                            int32
 	parameters                      []ASTParameter

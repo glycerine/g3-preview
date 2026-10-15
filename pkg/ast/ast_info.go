@@ -122,6 +122,7 @@ func (m *ASTManager) dropInfoStorage(slot, generation uint32) error {
 			return e
 		}
 	}
+	m.traceInfoDeallocated(r)
 	r.parameters = nil
 	r.live = false
 	r.nextFree = m.freeInfo
@@ -191,6 +192,8 @@ func (m *ASTManager) copyInfo(slot, generation uint32) (uint32, uint32, error) {
 	r.size = saved.size
 	r.flags = saved.flags
 	r.private = saved.private
+	r.memoryTraceAllocated = true
+	m.traceInfoAllocated(r)
 	for i := uint32(0); i < saved.count; i++ {
 		p, x := m.infoParameter(&saved, i)
 		e = x

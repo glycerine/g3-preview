@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -45,14 +46,15 @@ func TestASTFormatManagerMemoryWrapperConstructorOverloads(t *testing.T) {
 			}
 			id := fmt.Sprintf("%p", child)
 			size := strconv.FormatUint(uint64(reflect.TypeOf(ASTManager{}).Size()), 10)
-			want := "-------- [memory] allocate src/util/memory_manager.cpp:209 ---------\n" +
+			wantAlloc := "-------- [memory] allocate src/util/memory_manager.cpp:209 ---------\n" +
 				"alloc " + id + " src/ast/ast.cpp:" + strconv.Itoa(line) + " ast_manager " + size + "\n" +
-				"------------------------------------------------\n" +
-				"-------- [memory] deallocate src/util/memory_manager.cpp:204 ---------\n" +
+				"------------------------------------------------\n"
+			wantDealloc := "-------- [memory] deallocate src/util/memory_manager.cpp:204 ---------\n" +
 				"dealloc " + id + " src/ast/ast.cpp:1473\n" +
 				"------------------------------------------------\n"
-			if got := output.String(); got != want || b.Used() != 0 || child.formatTraceLive {
-				t.Fatalf("format child memory records: got %q want %q used %d live %v", got, want, b.Used(), child.formatTraceLive)
+			if got := output.String(); !strings.HasPrefix(got, wantAlloc) || !strings.HasSuffix(got, wantDealloc) ||
+				strings.Count(got, "\nalloc "+id+" ") != 1 || strings.Count(got, "\ndealloc "+id+" ") != 1 || b.Used() != 0 || child.formatTraceLive {
+				t.Fatalf("format child memory boundary records: got %q alloc %q dealloc %q used %d live %v", got, wantAlloc, wantDealloc, b.Used(), child.formatTraceLive)
 			}
 		})
 	}
