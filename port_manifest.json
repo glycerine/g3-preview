@@ -98146,7 +98146,8 @@
         "pkg/tactic/aig/aig_ite_shape.go",
         "pkg/tactic/aig/aig_goal_formula.go",
         "pkg/tactic/aig/aig_max_sharing.go",
-        "pkg/tactic/aig/aig_imp_memory_trace.go"
+        "pkg/tactic/aig/aig_imp_memory_trace.go",
+        "pkg/tactic/aig/aig_delete_trace.go"
       ],
       "tests": [
         "TestAIGCoreInterningOwnershipAndIDReuse",
@@ -98172,7 +98173,8 @@
         "TestAIGCheckpointSourceMemoryCancelAndCooperateOrder",
         "TestAIGGoalOutputCheckpointUsesSameSourceGuards",
         "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
-        "TestAIGManagerSeparateImpChargesAndConstructorPrefixes"
+        "TestAIGManagerSeparateImpChargesAndConstructorPrefixes",
+        "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate"
       ],
       "conditionals": [
         {
@@ -98508,6 +98510,14 @@
           "tests": [
             "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
             "TestAIGManagerSeparateImpChargesAndConstructorPrefixes"
+          ]
+        },
+        {
+          "name": "delete_node aig_lit_count TRACE before node count, variable release and child deletion cascade",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_delete_trace.go",
+          "tests": [
+            "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate"
           ]
         }
       ],
@@ -179143,7 +179153,8 @@
         "pkg/math/interval/root_trace_stream.go",
         "pkg/math/interval/fixed_fast_root_trace_test.go",
         "pkg/math/interval/rational_root_trace.go",
-        "pkg/math/interval/rational_root_trace_test.go"
+        "pkg/math/interval/rational_root_trace_test.go",
+        "pkg/tactic/aig/aig_delete_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -179214,7 +179225,8 @@
         "TestHardwarePolynomialTraceStreamRefusalKeepsDefinition",
         "TestFixedPolynomialSourceIntegerTraceAndPublication",
         "TestFixedPolynomialTraceStreamRefusalKeepsDefinition",
-        "TestFixedPolynomialTraceUsesBorrowedVariablePrinter"
+        "TestFixedPolynomialTraceUsesBorrowedVariablePrinter",
+        "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate"
       ],
       "conditionals": [
         {
@@ -180564,6 +180576,12 @@
           "tests": []
         },
         {
+          "name": "Retained AIG delete_node aig_lit_count TRACE before node recycling and child cascade (aig.cpp:149)",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_delete_trace.go",
+          "tests": ["TestAIGDeletionTraceSourceCascadeOrderAndCompileGate"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -180648,7 +180666,8 @@
         "pkg/math/interval/root_trace_stream.go",
         "pkg/math/interval/fixed_fast_root_trace_test.go",
         "pkg/math/interval/rational_root_trace.go",
-        "pkg/math/interval/rational_root_trace_test.go"
+        "pkg/math/interval/rational_root_trace_test.go",
+        "pkg/tactic/aig/aig_delete_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -180717,7 +180736,8 @@
         "TestHardwarePolynomialTraceStreamRefusalKeepsDefinition",
         "TestFixedPolynomialSourceIntegerTraceAndPublication",
         "TestFixedPolynomialTraceStreamRefusalKeepsDefinition",
-        "TestFixedPolynomialTraceUsesBorrowedVariablePrinter"
+        "TestFixedPolynomialTraceUsesBorrowedVariablePrinter",
+        "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate"
       ],
       "conditionals": [
         {
@@ -182065,6 +182085,12 @@
           "status": "partial",
           "go_target": "pkg/ast/ast_core_factories.go",
           "tests": []
+        },
+        {
+          "name": "Retained AIG delete_node aig_lit_count TRACE before node recycling and child cascade (aig.cpp:149)",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_delete_trace.go",
+          "tests": ["TestAIGDeletionTraceSourceCascadeOrderAndCompileGate"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

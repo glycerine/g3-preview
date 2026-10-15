@@ -35,6 +35,7 @@ type node struct {
 	variable ast.ASTRef
 	and      bool
 	stage    uint8 // owning deletion cursor after a stopped AST reference release
+	traced   bool  // deletion TRACE runs once before a stopped owner retries
 }
 
 type idPool struct {
@@ -397,6 +398,10 @@ func (m *Manager) dec(l Literal) {
 	}
 }
 func (m *Manager) deleteNode(n *node) error {
+	if !n.traced {
+		n.traced = true
+		m.traceDeleting(n)
+	}
 	if !n.and {
 		if n.stage == 0 {
 			if e := m.ast.DelRef(&n.variable); e != nil {
