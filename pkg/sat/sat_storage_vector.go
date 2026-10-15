@@ -2,30 +2,10 @@
 package sat
 
 import (
-	"errors"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
-
-var ErrSATSelfAppend = errors.New("sat: nonterminating source self append")
-
-func satVectorNextCapacity(old, stride uint64) (uint64, error) {
-	return satVectorNextCapacityFor(old, stride, stride)
-}
-func satVectorNextCapacityFor(old, stride, sourceStride uint64) (uint64, error) {
-	n := uint64(2)
-	if old != 0 {
-		if old > uint64(^uint32(0)) {
-			return 0, arena.ErrBounds
-		}
-		n = (3*old + 1) / 2
-	}
-	if n <= old || n > (uint64(^uint32(0))-8)/sourceStride || n > uint64(^uint(0)>>1)/stride {
-		return 0, arena.ErrBounds
-	}
-	return n, nil
-}
 
 type satClauseVector struct {
 	self       *satClauseVector
