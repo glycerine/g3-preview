@@ -183039,8 +183039,18 @@
           ]
         },
         {
-          "name": "remaining direct warning_msg callers in unported API, parser, SMT, MUZ, opt and AST owners",
+          "name": "remaining live direct warning_msg callers in unported API, parser, SMT, MUZ, opt and AST owners",
           "status": "partial",
+          "tests": []
+        },
+        {
+          "name": "cmd_context.cpp:898 recursive-definition warning is unreachable behind literal false; smt_setup.cpp:53 and smt_model_finder.cpp:1746 warning calls are commented out",
+          "status": "dead_deleted",
+          "tests": []
+        },
+        {
+          "name": "scoped_timer.cpp:212-224 pthread teardown warnings exist only in the excluded Apple branch of the selected Linux profile",
+          "status": "platform_replacement",
           "tests": []
         },
         {
@@ -183198,8 +183208,18 @@
           ]
         },
         {
-          "name": "remaining direct warning_msg callers in unported API, parser, SMT, MUZ, opt and AST owners",
+          "name": "remaining live direct warning_msg callers in unported API, parser, SMT, MUZ, opt and AST owners",
           "status": "partial",
+          "tests": []
+        },
+        {
+          "name": "cmd_context.cpp:898 recursive-definition warning is unreachable behind literal false; smt_setup.cpp:53 and smt_model_finder.cpp:1746 warning calls are commented out",
+          "status": "dead_deleted",
+          "tests": []
+        },
+        {
+          "name": "scoped_timer.cpp:212-224 pthread teardown warnings exist only in the excluded Apple branch of the selected Linux profile",
+          "status": "platform_replacement",
           "tests": []
         },
         {
