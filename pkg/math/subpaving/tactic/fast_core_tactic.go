@@ -75,12 +75,13 @@ func NewFastCoreTacticOwned(m *ast.ASTManager, pc *params.ParamsContext, p *para
 		return nil, arena.ErrConfig
 	}
 	budget := runtime.Budget()
-	integers := numeral.IntegerConfig{Process: process, Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}
+	integers := numeral.IntegerConfig{Memory: runtime, Process: process, Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}}
 	rational, err := numeral.NewRationalManager(numeral.RationalConfig{Integers: integers})
 	if err != nil {
 		return nil, err
 	}
 	fastConfig := numeral.DefaultFastFloatConfig(arena.VectorConfig{Descriptors: arena.Config{Budget: budget}})
+	fastConfig.Memory = runtime
 	fastConfig.Process = process
 	numbers, err := numeral.NewFastFloatManager(fastConfig)
 	if err != nil {

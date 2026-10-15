@@ -55648,7 +55648,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "selected successful MPFF tactic imp owns its rational and fast-float manager members in one source process and destroys MPFF before rational",
+          "name": "selected successful MPFF tactic imp borrows the AST raw Runtime for rational and fast-float members and destroys MPFF before rational",
           "status": "ported",
           "go_target": "pkg/math/subpaving/tactic/fast_core_tactic.go",
           "go_targets": ["pkg/math/subpaving/tactic/core_process_binding_test.go"],
@@ -155537,7 +155537,7 @@
           ]
         },
         {
-          "name": "Shared/borrowed Runtime identity and TLS character-formatting failure; automatic process-memory binding remains open",
+          "name": "TLS character-formatting failure and automatic process-memory binding at other retained owners remain open",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpff.go",
           "tests": [
@@ -155546,6 +155546,12 @@
             "TestFastFloatSharedRuntimeProfileAndClose",
             "TestFastFloatBorrowedRuntimeInlineWarmScope"
           ]
+        },
+        {
+          "name": "Concrete MPFF subpaving tactic borrows its AST numeral service Runtime for both owned numeral managers",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/tactic/fast_core_tactic.go",
+          "tests": ["TestFastCoreTacticNumericProcessCohort"]
         },
         {
           "name": "mpff_manager permanent significand array, capacity doubling, reserved zero ID, recycled LIFO IDs, and slot clearing on del/reset (mpff.cpp:36-112)",
@@ -155961,7 +155967,7 @@
           ]
         },
         {
-          "name": "Shared/borrowed Runtime identity and TLS character-formatting failure; automatic process-memory binding remains open",
+          "name": "TLS character-formatting failure and automatic process-memory binding at other retained owners remain open",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpff.go",
           "tests": [
@@ -155970,6 +155976,12 @@
             "TestFastFloatSharedRuntimeProfileAndClose",
             "TestFastFloatBorrowedRuntimeInlineWarmScope"
           ]
+        },
+        {
+          "name": "Concrete MPFF subpaving tactic borrows its AST numeral service Runtime for both owned numeral managers",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/tactic/fast_core_tactic.go",
+          "tests": ["TestFastCoreTacticNumericProcessCohort"]
         },
         {
           "name": "mpff_manager permanent significand array, capacity doubling, reserved zero ID, recycled LIFO IDs, and slot clearing on del/reset (mpff.cpp:36-112)",

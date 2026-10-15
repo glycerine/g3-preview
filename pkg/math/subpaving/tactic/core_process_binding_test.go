@@ -68,15 +68,23 @@ func TestFastCoreTacticNumericProcessCohort(t *testing.T) {
 		t.Fatal(err)
 	}
 	baselineBytes, baselineProcess := b.Used(), process.AllocationSize()
+	baselineRuntime := q.RuntimeOwner().Stats()
 	owned, err := NewFastCoreTacticOwned(m, pc, &value)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !owned.ownsNumerals || owned.numbers.RuntimeOwner() == q.RuntimeOwner() || owned.rational.RuntimeOwner() == q.RuntimeOwner() || owned.numbers.RuntimeOwner().ProcessOwner() != process || owned.rational.RuntimeOwner().ProcessOwner() != process {
-		t.Fatal("owned tactic numeral managers did not join the source process")
+	if !owned.ownsNumerals || owned.numbers.RuntimeOwner() != q.RuntimeOwner() || owned.rational.RuntimeOwner() != q.RuntimeOwner() || owned.numbers.RuntimeOwner().ProcessOwner() != process || owned.rational.RuntimeOwner().ProcessOwner() != process {
+		t.Fatal("owned tactic numeral managers did not borrow the source runtime")
 	}
-	if err := owned.Close(); err != nil || b.Used() != baselineBytes || process.AllocationSize() != baselineProcess {
-		t.Fatal("owned tactic did not release its numeral members", err, b.Used(), baselineBytes, process.AllocationSize(), baselineProcess)
+	if err := owned.Close(); err != nil {
+		t.Fatal("owned tactic did not close its numeral members", err)
+	}
+	afterRuntime := q.RuntimeOwner().Stats()
+	if afterRuntime.DirectoryBytes < baselineRuntime.DirectoryBytes || afterRuntime.OwnerBytes != baselineRuntime.OwnerBytes || afterRuntime.LiveBlocks != baselineRuntime.LiveBlocks || afterRuntime.PhysicalBytes != baselineRuntime.PhysicalBytes || afterRuntime.InitializationBytes != baselineRuntime.InitializationBytes || b.Used() != baselineBytes+afterRuntime.DirectoryBytes-baselineRuntime.DirectoryBytes || process.AllocationSize() != baselineProcess {
+		t.Fatal("owned tactic retained a live numeral allocation beyond shared runtime directory growth", b.Used(), baselineBytes, baselineRuntime, afterRuntime, process.AllocationSize(), baselineProcess)
+	}
+	if err := q.RuntimeOwner().CheckOpen(); err != nil {
+		t.Fatal("owned tactic closed its borrowed source runtime", err)
 	}
 	nonFast, err := pc.NewValue()
 	if err != nil {
