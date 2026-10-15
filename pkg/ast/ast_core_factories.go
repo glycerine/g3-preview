@@ -351,6 +351,7 @@ func (m *ASTManager) mkAppArguments(decl astNodeRef, args AppArguments) (astNode
 			return r, nil
 		}
 		if f.Chainable {
+			m.traceChainableApp()
 			var inline [16]ASTHandle
 			buffer := inline[:0]
 			for i := 1; i < int(args.count); i++ {

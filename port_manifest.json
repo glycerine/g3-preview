@@ -10696,6 +10696,12 @@
           "tests": ["TestASTQuantifierWeightTraceBeforeReplacement"]
         },
         {
+          "name": "mk_app chainable branch TRACE before adjacent pair-buffer construction (ast.cpp:2195)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_app_trace.go",
+          "tests": ["TestASTChainableTraceOnlyOnLongNonflatBranch"]
+        },
+        {
           "name": "proof builder and reader overloads across all 44 out-of-line names and inline mode/fact/parent inspection; diagnostic transport open",
           "status": "partial",
           "go_target": "pkg/ast/ast_proof_manager.go",
@@ -11699,6 +11705,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_core_update_trace.go",
           "tests": ["TestASTQuantifierWeightTraceBeforeReplacement"]
+        },
+        {
+          "name": "mk_app chainable branch TRACE before adjacent pair-buffer construction (ast.cpp:2195)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_app_trace.go",
+          "tests": ["TestASTChainableTraceOnlyOnLongNonflatBranch"]
         },
         {
           "name": "proof builder and reader overloads across all 44 out-of-line names and inline mode/fact/parent inspection; diagnostic transport open",
@@ -176262,6 +176274,7 @@
         "pkg/ast/ast_core_register_trace.go",
         "pkg/ast/ast_core_delete_trace.go",
         "pkg/ast/ast_core_update_trace.go",
+        "pkg/ast/ast_core_app_trace.go",
         "pkg/math/interval/arbitrary_root_trace.go",
         "pkg/math/interval/hardware_root_trace.go",
         "pkg/math/subpaving/hardware_interval_root_trace.go",
@@ -177038,6 +177051,12 @@
           "tests": ["TestASTQuantifierWeightTraceBeforeReplacement"]
         },
         {
+          "name": "Reached AST mk_app chainable branch TRACE (ast.cpp:2195)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_app_trace.go",
+          "tests": ["TestASTChainableTraceOnlyOnLongNonflatBranch"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -177075,6 +177094,7 @@
         "pkg/ast/ast_core_register_trace.go",
         "pkg/ast/ast_core_delete_trace.go",
         "pkg/ast/ast_core_update_trace.go",
+        "pkg/ast/ast_core_app_trace.go",
         "pkg/math/interval/arbitrary_root_trace.go",
         "pkg/math/interval/hardware_root_trace.go",
         "pkg/math/subpaving/hardware_interval_root_trace.go",
@@ -177861,6 +177881,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_core_update_trace.go",
           "tests": ["TestASTQuantifierWeightTraceBeforeReplacement"]
+        },
+        {
+          "name": "Reached AST mk_app chainable branch TRACE (ast.cpp:2195)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_app_trace.go",
+          "tests": ["TestASTChainableTraceOnlyOnLongNonflatBranch"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
