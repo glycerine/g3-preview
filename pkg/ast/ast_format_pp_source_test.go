@@ -113,8 +113,39 @@ func TestASTFormatPrettyEveryGetterStackAndOutputReservation(t *testing.T) {
 			break
 		}
 	}
-	if first < 3 {
-		t.Fatal("actual pp helper/todo/output horizon", first)
+	if first < 2 {
+		t.Fatal("actual pp helper/output horizon", first)
 	}
 	t.Log("first success", first)
+}
+
+func TestASTFormatPrettyNativeWorklistGrowth(t *testing.T) {
+	c, g, p, b := dynAckSourceFixture(t)
+	m, e := NewASTManager(ASTManagerConfig{Symbols: c.SymbolsField, Numerals: c.NumeralsField, Budget: b})
+	paramsMust(t, e)
+	defer func() { paramsMust(t, m.Close()) }()
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
+	paramsMust(t, e)
+	defer func() { paramsMust(t, out.Close()) }()
+	empty, e := m.FormatString("")
+	paramsMust(t, e)
+	parts := make([]ASTHandle, 129)
+	for i := range parts {
+		parts[i] = empty
+	}
+	root, e := m.FormatCompose(parts)
+	paramsMust(t, e)
+	// The frame and parameter helper still reserve owner storage. Expanding
+	// its borrowed traversal stack uses a native slice, even when later arena
+	// reservations are refused.
+	b.FailAfter(2)
+	e = m.PrintFormat(out, root, c, p, g)
+	b.FailAfter(-1)
+	paramsMust(t, e)
+	got, e := out.String()
+	paramsMust(t, e)
+	if got != "" {
+		t.Fatal("empty compose output", got)
+	}
+	astFormatPrettyNamedCold(t, m, g, b, out)
 }

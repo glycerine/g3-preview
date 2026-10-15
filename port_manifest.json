@@ -182240,6 +182240,16 @@
             "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
             "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
           ]
+        },
+        {
+          "name": "Concrete pp.cpp borrowed format-and-indent traversal worklist uses native Go slice growth and retains LIFO output order",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_format_pp.go",
+          "tests": [
+            "TestASTFormatPrettyPrinterLiteralWidthIndentAndSingleLine",
+            "TestASTFormatPrettyEveryGetterStackAndOutputReservation",
+            "TestASTFormatPrettyNativeWorklistGrowth"
+          ]
         }
       ],
       "ownership": [

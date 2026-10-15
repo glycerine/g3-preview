@@ -32,34 +32,21 @@ type astFormatPPFrame struct {
 }
 
 func (f *astFormatPPFrame) bytes() uint64 {
-	n := f.header + uint64(len(f.todo))*uint64(reflect.TypeOf(astFormatPPPair{}).Size())
+	n := f.header
 	for h := f.parameters.Helpers; h != nil; h = h.Next {
 		n += h.Header
 	}
 	return n
 }
 func (f *astFormatPPFrame) push(r astNodeRef, indent uint32) error {
-	if f.size == uint32(len(f.todo)) {
-		capacity := uint64(len(f.todo))
-		next := (capacity*3 + 1) / 2
-		if next < 2 {
-			next = 2
-		}
-		width := uint64(reflect.TypeOf(astFormatPPPair{}).Size())
-		if next > math.MaxUint32 || next > uint64(^uint(0)>>1)/width {
-			return arena.ErrBounds
-		}
-		if e := f.owner.BudgetField.Reserve(next * width); e != nil {
-			return e
-		}
-		a := make([]astFormatPPPair, int(next))
-		for i := uint32(0); i < f.size; i++ {
-			a[i] = f.todo[i]
-		}
-		f.owner.BudgetField.Release(capacity * width)
-		f.todo = a
+	if f.size == math.MaxUint32 {
+		return arena.ErrBounds
 	}
-	f.todo[f.size] = astFormatPPPair{r, indent}
+	if f.size == uint32(len(f.todo)) {
+		f.todo = append(f.todo, astFormatPPPair{r, indent})
+	} else {
+		f.todo[f.size] = astFormatPPPair{r, indent}
+	}
 	f.size++
 	return nil
 }
@@ -207,7 +194,6 @@ func (f *astFormatPPFrame) sourceDestroy(body error) error {
 			return errors.Join(body, e)
 		}
 	}
-	m.BudgetField.Release(uint64(len(f.todo)) * uint64(reflect.TypeOf(astFormatPPPair{}).Size()))
 	f.todo = nil
 	if f.helper != nil {
 		f.parameters.Running = true
@@ -237,7 +223,6 @@ func (m *ASTManager) releasePPFrames() error {
 		}
 		// This owning path is invoked only after the actual containing AST table
 		// has ended: an already-consumed source child cannot be DEC'd again.
-		m.BudgetField.Release(uint64(len(f.todo)) * uint64(reflect.TypeOf(astFormatPPPair{}).Size()))
 		f.todo = nil
 		if e := f.parameters.CloseHelpers(); e != nil {
 			if f.ownCause == nil {
