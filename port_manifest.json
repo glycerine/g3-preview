@@ -150168,6 +150168,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Z3DEBUG allocate(file,line,obj,size) and deallocate(file,line,p) wrappers: base allocation/deallocation is ported, but the reached memory TRACE records and source-site metadata remain unaudited (cpp202-211)",
+          "status": "partial",
+          "go_target": "",
+          "tests": []
+        },
+        {
           "name": "tactic_report snapshots source process allocation bytes before and after retained tactics (tactic/tactic.cpp:26-50)",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_report.go",
@@ -150643,6 +150649,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Z3DEBUG allocation/deallocation file-line overloads and alloc/dealloc macros: concrete source-site trace metadata has not been connected to retained Go callers (h69-97; cpp202-211)",
+          "status": "partial",
+          "go_target": "",
+          "tests": []
+        },
         {
           "name": "tactic_report snapshots source process allocation bytes before and after retained tactics (tactic/tactic.cpp:26-50)",
           "status": "ported",
