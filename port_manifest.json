@@ -181483,6 +181483,8 @@
         "pkg/sat/sat_solver_model_converter.go",
         "pkg/sat/sat_simplifier_elimination.go",
         "pkg/sat/sat_simplifier_elimination_test.go",
+        "pkg/sat/sat_simplifier_duplicate_bins.go",
+        "pkg/sat/sat_simplifier_duplicate_bins_test.go",
         "pkg/sat/sat_solver_nested_store.go",
         "pkg/sat/sat_solver_uint_set.go",
         "pkg/sat/sat_solver_watch_store.go",
@@ -181928,6 +181930,14 @@
           "tests": [
             "TestSATSimplifierEliminationCostAndStableOrder",
             "TestSATSimplifierEliminationNativeCostGrowthAndStableTies"
+          ]
+        },
+        {
+          "name": "SAT simplifier duplicate-binary watch list uses stable standard-library sorting over its concrete Go slice",
+          "status": "platform_replacement",
+          "go_target": "pkg/sat/sat_simplifier_duplicate_bins.go",
+          "tests": [
+            "TestSATSimplifierBinaryWatchNativeStableSort"
           ]
         },
         {
