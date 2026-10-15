@@ -69,6 +69,11 @@ func catalogGraph(c *uparams.GlobalParamsCatalog) uint64 {
 }
 func gparamsGraph(g *uparams.GlobalParams) uint64 {
 	n := g.OwnerBytes
+	for _, cell := range g.Cells {
+		if cell != nil {
+			n += uint64(reflect.TypeOf(uparams.GparamsRefCell{}).Size())
+		}
+	}
 	count := func(d *uparams.ParamDescrs) uint64 {
 		if d == nil || d.Budget != g.Budget {
 			return 0
