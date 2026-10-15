@@ -171961,7 +171961,7 @@
         },
         {
           "name": "Selected borrowed static one invocation: direct physical copy and original left-copy/compound subtraction/return-copy without an owned constant temporary (rational.h:43,306-308,462-464)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/rational_service_one_invocation.go",
           "go_targets": [
             "pkg/util/numeral/rational_service_one_invocation_test.go"
