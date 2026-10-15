@@ -37,7 +37,7 @@ func (m *ASTManager) wellSortedTraceFormat(format ASTHandle, c *uparams.ParamsCo
 }
 
 func (m *ASTManager) wellSortedTraceSMT2(app ASTHandle, c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService) (string, error) {
-	format, err := m.SMT2PPBooleanTree(app, nil)
+	format, err := m.SMT2PPExprTree(app, nil)
 	if err != nil {
 		return "", err
 	}

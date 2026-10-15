@@ -95,3 +95,58 @@ func TestASTWellSortedSortMismatchSourceTraceBeforeWarning(t *testing.T) {
 		t.Fatalf("erased trace emitted %q", got)
 	}
 }
+
+func TestASTWellSortedNonBooleanRootTraceProfiles(t *testing.T) {
+	c, g, p, budget := dynAckSourceFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("ws")
+	tags.Enable("tc")
+	m, err := NewASTManager(ASTManagerConfig{Symbols: c.SymbolsField, Numerals: c.NumeralsField, Budget: budget, TraceTags: tags})
+	paramsMust(t, err)
+	defer func() { paramsMust(t, m.Close()) }()
+	sort, err := m.MkSort(astTestSymbol(t, m, "Value"), ASTSortInfo{})
+	paramsMust(t, err)
+	other, err := m.MkSort(astTestSymbol(t, m, "OtherValue"), ASTSortInfo{})
+	paramsMust(t, err)
+	arg, err := m.MkVar(0, sort)
+	paramsMust(t, err)
+	decl, err := m.MkFuncDecl(astTestSymbol(t, m, "f"), []ASTHandle{sort}, sort, ASTFuncDeclInfo{})
+	paramsMust(t, err)
+	app, err := m.MkApp(decl, []ASTHandle{arg})
+	paramsMust(t, err)
+	appRef, err := m.internal(app)
+	paramsMust(t, err)
+	varRef, err := m.internal(arg)
+	paramsMust(t, err)
+	otherRef, err := m.internal(other)
+	paramsMust(t, err)
+	warnings := diagnostic.NewWarningService(&output)
+	m.appAt(appRef.slot).count = 0
+	good, checkErr := m.IsWellSortedWithPrinter(app, warnings, c, p, g)
+	m.appAt(appRef.slot).count = 1
+	paramsMust(t, checkErr)
+	if good {
+		t.Fatal("non-Boolean wrong arity accepted")
+	}
+	if tags.ShouldTrace("ws") && !strings.Contains(output.String(), "unexpected number of arguments.\nf") {
+		t.Fatalf("non-Boolean ws expression missing: %q", output.String())
+	}
+	output.Reset()
+	old := m.varAt(varRef.slot).sort
+	m.varAt(varRef.slot).sort = otherRef
+	good, checkErr = m.IsWellSortedWithPrinter(app, warnings, c, p, g)
+	m.varAt(varRef.slot).sort = old
+	paramsMust(t, checkErr)
+	if good {
+		t.Fatal("non-Boolean sort mismatch accepted")
+	}
+	if tags.ShouldTrace("tc") {
+		got := output.String()
+		if !strings.Contains(got, "(f (:var 0))Sort mismatch for argument 1 of (f (:var 0))\n") ||
+			!strings.Contains(got, "Expected sort: Value\nActual sort:   OtherValue\n") ||
+			!strings.Contains(got, "------------------------------------------------\nWARNING: Sort mismatch for argument 1") {
+			t.Fatalf("non-Boolean tc expression missing: %q", got)
+		}
+	}
+}

@@ -33,8 +33,18 @@ func (m *ASTManager) smt2FlatAssocCandidate(parent, child ASTHandle) (bool, erro
 
 // SMT2PPBooleanTree builds the source child-before-parent documents for
 // Boolean application trees, including flat_assoc and source-default aliases.
-// Numeric, quantifier and pattern paths still belong to the wider printer.
 func (m *ASTManager) SMT2PPBooleanTree(root ASTHandle, names []usymbol.Symbol) (ASTHandle, error) {
+	return m.smt2PPExprTree(root, names, true)
+}
+
+// SMT2PPExprTree also accepts non-Boolean application roots reached by the
+// well-sorted diagnostics. Quantifier and pattern paths remain in the wider
+// source printer.
+func (m *ASTManager) SMT2PPExprTree(root ASTHandle, names []usymbol.Symbol) (ASTHandle, error) {
+	return m.smt2PPExprTree(root, names, false)
+}
+
+func (m *ASTManager) smt2PPExprTree(root ASTHandle, names []usymbol.Symbol, requireBool bool) (ASTHandle, error) {
 	boolSort, err := m.MkBoolSort()
 	if err != nil {
 		return ASTHandle{}, err
@@ -110,7 +120,7 @@ func (m *ASTManager) SMT2PPBooleanTree(root ASTHandle, names []usymbol.Symbol) (
 		if e != nil {
 			return result{}, e
 		}
-		if h == root && sort != boolSort {
+		if requireBool && h == root && sort != boolSort {
 			return result{}, ErrASTDomain
 		}
 		if kind == ASTVar {

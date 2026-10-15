@@ -12504,6 +12504,7 @@
         "TestASTSMT2BooleanComparisonsWithArithmeticLiterals",
         "TestASTSMT2BooleanComparisonsWithBitVectorLiterals",
         "TestASTSMT2BooleanComparisonsWithFloatingPointLiterals",
+        "TestASTWellSortedNonBooleanRootTraceProfiles",
         "TestASTSMT2BooleanTreeSourcePostorderAndLabels",
         "TestASTSMT2DeclareFunSourceEntrypoint"
       ],
@@ -12663,14 +12664,15 @@
           ]
         },
         {
-          "name": "Selected smt2_printer child-before-parent Boolean application and variable traversal with constant/label dispatch, default flat associative expansion, alias registration/reuse, info-stack weight/depth/level and let wrapping; arithmetic, bit-vector and floating-point numeral children use source-default literal profiles, while string, decimal and quantifier profiles remain open",
+          "name": "Selected smt2_printer child-before-parent Boolean and uninterpreted-result application/variable traversal with constant/label dispatch, default flat associative expansion, alias registration/reuse, info-stack weight/depth/level and let wrapping; arithmetic, bit-vector and floating-point numeral children use source-default literal profiles, while string, decimal and quantifier profiles remain open",
           "status": "partial",
           "go_target": "pkg/ast/ast_smt2_boolean_tree.go",
           "tests": [
             "TestASTSMT2BooleanTreeSourcePostorderAndLabels",
             "TestASTSMT2BooleanComparisonsWithArithmeticLiterals",
             "TestASTSMT2BooleanComparisonsWithBitVectorLiterals",
-            "TestASTSMT2BooleanComparisonsWithFloatingPointLiterals"
+            "TestASTSMT2BooleanComparisonsWithFloatingPointLiterals",
+            "TestASTWellSortedNonBooleanRootTraceProfiles"
           ]
         },
         {
@@ -30622,7 +30624,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/ast/ast_well_sorted.go", "pkg/ast/ast_well_sorted_warning.go", "pkg/ast/ast_well_sorted_trace.go", "pkg/tactic/tactic_goal.go"],
-      "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder", "TestASTWellSortedApplicationGuardBranches", "TestASTWellSortedSourceMismatchPrinter", "TestASTWellSortedWrongAritySourceTraceBeforeWarning", "TestASTWellSortedSortMismatchSourceTraceBeforeWarning"],
+      "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder", "TestASTWellSortedApplicationGuardBranches", "TestASTWellSortedSourceMismatchPrinter", "TestASTWellSortedWrongAritySourceTraceBeforeWarning", "TestASTWellSortedSortMismatchSourceTraceBeforeWarning", "TestASTWellSortedNonBooleanRootTraceProfiles"],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
@@ -30633,20 +30635,20 @@
           "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder", "TestASTWellSortedApplicationGuardBranches"]
         },
         {
-          "name": "well_sorted_proc app wrong-arity ws TRACE before warning (well_sorted.cpp:49); selected Boolean SMT2 expression profile",
+          "name": "well_sorted_proc app wrong-arity ws TRACE before warning (well_sorted.cpp:49); selected Boolean and uninterpreted-result SMT2 expression profiles",
           "status": "partial",
           "go_target": "pkg/ast/ast_well_sorted_trace.go",
-          "tests": ["TestASTWellSortedWrongAritySourceTraceBeforeWarning"]
+          "tests": ["TestASTWellSortedWrongAritySourceTraceBeforeWarning", "TestASTWellSortedNonBooleanRootTraceProfiles"]
         },
         {
-          "name": "well_sorted_proc sort-mismatch tc TRACE before warning (well_sorted.cpp:59-64); selected Boolean SMT2 expression profile",
+          "name": "well_sorted_proc sort-mismatch tc TRACE before warning (well_sorted.cpp:59-64); selected Boolean and uninterpreted-result SMT2 expression profiles",
           "status": "partial",
           "go_target": "pkg/ast/ast_well_sorted_trace.go",
-          "tests": ["TestASTWellSortedSortMismatchSourceTraceBeforeWarning"]
+          "tests": ["TestASTWellSortedSortMismatchSourceTraceBeforeWarning", "TestASTWellSortedNonBooleanRootTraceProfiles"]
         }
       ],
       "ownership": [],
-      "deviations": ["Native Go slice and map replace the source expression-visitor stack and shared-node marks. The quantifier and arity warnings and selected source sort-mismatch diagnostics are present. The ws and tc traces use the selected Boolean SMT2 printer; non-Boolean app profiles remain open. Direct API/cmd-context callers remain open. Malformed-app branches are tested through temporary internal test-node mutation because public factories refuse them."]
+      "deviations": ["Native Go slice and map replace the source expression-visitor stack and shared-node marks. The quantifier and arity warnings and selected source sort-mismatch diagnostics are present. The ws and tc traces use the selected Boolean and uninterpreted-result SMT2 printer; other non-Boolean app profiles remain open. Direct API/cmd-context callers remain open. Malformed-app branches are tested through temporary internal test-node mutation because public factories refuse them."]
     },
     {
       "path": "src/ast/well_sorted.h",
@@ -179754,7 +179756,8 @@
         "TestAIGGoalConversionMissingCacheConditionalTrace",
         "TestAIGMkAndSourceTraceOriginalOperandsAndResult",
         "TestASTWellSortedWrongAritySourceTraceBeforeWarning",
-        "TestASTWellSortedSortMismatchSourceTraceBeforeWarning"
+        "TestASTWellSortedSortMismatchSourceTraceBeforeWarning",
+        "TestASTWellSortedNonBooleanRootTraceProfiles"
       ],
       "conditionals": [
         {
@@ -181175,16 +181178,16 @@
           "tests": ["TestAIGDeletionTraceSourceCascadeOrderAndCompileGate"]
         },
         {
-          "name": "Selected well_sorted_proc wrong-arity ws TRACE before warning with Boolean SMT2 expression (well_sorted.cpp:49); wider expression profiles remain open",
+          "name": "Selected well_sorted_proc wrong-arity ws TRACE before warning with Boolean and uninterpreted-result SMT2 expression (well_sorted.cpp:49); wider expression profiles remain open",
           "status": "partial",
           "go_target": "pkg/ast/ast_well_sorted_trace.go",
-          "tests": ["TestASTWellSortedWrongAritySourceTraceBeforeWarning"]
+          "tests": ["TestASTWellSortedWrongAritySourceTraceBeforeWarning", "TestASTWellSortedNonBooleanRootTraceProfiles"]
         },
         {
-          "name": "Selected well_sorted_proc sort-mismatch tc TRACE before warning with Boolean SMT2 expression (well_sorted.cpp:59-64); wider expression profiles remain open",
+          "name": "Selected well_sorted_proc sort-mismatch tc TRACE before warning with Boolean and uninterpreted-result SMT2 expression (well_sorted.cpp:59-64); wider expression profiles remain open",
           "status": "partial",
           "go_target": "pkg/ast/ast_well_sorted_trace.go",
-          "tests": ["TestASTWellSortedSortMismatchSourceTraceBeforeWarning"]
+          "tests": ["TestASTWellSortedSortMismatchSourceTraceBeforeWarning", "TestASTWellSortedNonBooleanRootTraceProfiles"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
@@ -181355,7 +181358,8 @@
         "TestAIGGoalConversionMissingCacheConditionalTrace",
         "TestAIGMkAndSourceTraceOriginalOperandsAndResult",
         "TestASTWellSortedWrongAritySourceTraceBeforeWarning",
-        "TestASTWellSortedSortMismatchSourceTraceBeforeWarning"
+        "TestASTWellSortedSortMismatchSourceTraceBeforeWarning",
+        "TestASTWellSortedNonBooleanRootTraceProfiles"
       ],
       "conditionals": [
         {
@@ -182776,16 +182780,16 @@
           "tests": ["TestAIGDeletionTraceSourceCascadeOrderAndCompileGate"]
         },
         {
-          "name": "Selected well_sorted_proc wrong-arity ws TRACE before warning with Boolean SMT2 expression (well_sorted.cpp:49); wider expression profiles remain open",
+          "name": "Selected well_sorted_proc wrong-arity ws TRACE before warning with Boolean and uninterpreted-result SMT2 expression (well_sorted.cpp:49); wider expression profiles remain open",
           "status": "partial",
           "go_target": "pkg/ast/ast_well_sorted_trace.go",
-          "tests": ["TestASTWellSortedWrongAritySourceTraceBeforeWarning"]
+          "tests": ["TestASTWellSortedWrongAritySourceTraceBeforeWarning", "TestASTWellSortedNonBooleanRootTraceProfiles"]
         },
         {
-          "name": "Selected well_sorted_proc sort-mismatch tc TRACE before warning with Boolean SMT2 expression (well_sorted.cpp:59-64); wider expression profiles remain open",
+          "name": "Selected well_sorted_proc sort-mismatch tc TRACE before warning with Boolean and uninterpreted-result SMT2 expression (well_sorted.cpp:59-64); wider expression profiles remain open",
           "status": "partial",
           "go_target": "pkg/ast/ast_well_sorted_trace.go",
-          "tests": ["TestASTWellSortedSortMismatchSourceTraceBeforeWarning"]
+          "tests": ["TestASTWellSortedSortMismatchSourceTraceBeforeWarning", "TestASTWellSortedNonBooleanRootTraceProfiles"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
