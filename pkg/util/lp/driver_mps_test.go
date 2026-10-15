@@ -566,6 +566,7 @@ func TestLPMPSDriverObjectivePhysicalOwnership(t *testing.T) {
 }
 
 func TestLPMPSDriverFullRunPhysicalOwnership(t *testing.T) {
+	// This magnitude must overflow the driver's float64 cost display to inf.
 	large := strings.Repeat("1234567890", 100) + "7/13"
 	input := strings.Replace(lpMPSDriverModel(3, 2, 4, 5, 3), lpExactMPSPair("x", "COST", "3"), lpExactMPSPair("x", "COST", large), 1)
 	name := lpMPSDriverFile(t, input)
@@ -619,7 +620,7 @@ func TestLPMPSDriverPreservesOlderComparison(t *testing.T) {
 			if phase == "objective" {
 				d = lpMPSDriverFixedObjective(t, h, false, true, io.Discard)
 			}
-			v := h.pair(strings.Repeat("9876543210", 100)+"/7", strings.Repeat("1234567890", 100)+"/13")
+			v := h.pairExactLarge(strings.Repeat("9876543210", 100)+"/7", strings.Repeat("1234567890", 100)+"/13")
 			var caller exactEtaCalls
 			before, err := caller.begin(h.m)
 			h.must(err)

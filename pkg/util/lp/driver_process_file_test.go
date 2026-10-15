@@ -286,7 +286,7 @@ func TestLPProcessFileGLPKInconclusivePrefixes(t *testing.T) {
 }
 
 func TestLPProcessFilePhysicalChildOwnership(t *testing.T) {
-	large := strings.Repeat("1234567890", 100) + "7/13"
+	large := strings.Repeat("1234567890", 20) + "7/13"
 	input := strings.Replace(lpMPSDriverModel(3, 2, 4, 5, 3), lpExactMPSPair("x", "COST", "3"), lpExactMPSPair("x", "COST", large), 1)
 	name := lpMPSDriverFile(t, input)
 	for _, direct := range []bool{false, true} {
@@ -347,7 +347,7 @@ func TestLPProcessFilePreservesOlderComparison(t *testing.T) {
 			}
 			counts := DriverComparisonCounts{}
 			d := NewProcessFileDriver(filepath.Dir(name), filepath.Base(name), args, t.TempDir(), 1000, 0, &counts, h.m, MPSDriverConfig{Output: io.Discard})
-			v := h.pair(strings.Repeat("9876543210", 100)+"/7", strings.Repeat("1234567890", 100)+"/13")
+			v := h.pairExactLarge(strings.Repeat("9876543210", 100)+"/7", strings.Repeat("1234567890", 100)+"/13")
 			var caller exactEtaCalls
 			before, err := caller.begin(h.m)
 			h.must(err)

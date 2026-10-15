@@ -199,7 +199,7 @@ func TestLPPairBenchmarkPreservesOlderComparison(t *testing.T) {
 	found := false
 	for ordinal := int64(0); ordinal < 40 && !found; ordinal++ {
 		h := newLPPairHarness(t)
-		v := h.pair(strings.Repeat("9876543210", 100)+"/7", strings.Repeat("1234567890", 100)+"/13")
+		v := h.pairExactLarge(strings.Repeat("9876543210", 100)+"/7", strings.Repeat("1234567890", 100)+"/13")
 		var caller exactEtaCalls
 		before, err := caller.begin(h.m)
 		h.must(err)

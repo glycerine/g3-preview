@@ -348,7 +348,7 @@ func TestLPDriverSetupPreservesOlderComparison(t *testing.T) {
 		h := newLPPairHarness(t)
 		m := lpRationalInputModel(t, h)
 		h.must(m.SetCostForColumn(0, lpScalarBoundValue(h, strings.Repeat("1234567890", 100)+"7/13")))
-		v := h.pair(strings.Repeat("9876543210", 100)+"/7", strings.Repeat("1234567890", 100)+"/13")
+		v := h.pairExactLarge(strings.Repeat("9876543210", 100)+"/7", strings.Repeat("1234567890", 100)+"/13")
 		var caller exactEtaCalls
 		before, err := caller.begin(h.m)
 		h.must(err)

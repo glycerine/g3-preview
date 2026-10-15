@@ -262,7 +262,7 @@ func TestLPLARSMTFileOlderCallerComparison(t *testing.T) {
 				flags = append(flags, "--compare_with_primal")
 			}
 			d := NewLARFileDriver(name, lpDriverArgs(t, flags...), h.m, MPSDriverConfig{Output: io.Discard, Clock: (&lpMPSDriverClock{}).read})
-			v := h.pair(strings.Repeat("9876543210", 100)+"/7", strings.Repeat("1234567890", 100)+"/13")
+			v := h.pairExactLarge(strings.Repeat("9876543210", 100)+"/7", strings.Repeat("1234567890", 100)+"/13")
 			var caller exactEtaCalls
 			before, err := caller.begin(h.m)
 			h.must(err)

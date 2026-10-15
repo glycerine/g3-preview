@@ -189,7 +189,7 @@ func TestLPLARDriverOlderComparison(t *testing.T) {
 				flags = append(flags, "--compare_with_primal")
 			}
 			d := NewLARRunDriver(s, r, lpDriverArgs(t, flags...), MPSDriverConfig{Output: io.Discard, Clock: (&lpMPSDriverClock{}).read})
-			v := h.pair(strings.Repeat("9876543210", 100)+"/7", strings.Repeat("1234567890", 100)+"/13")
+			v := h.pairExactLarge(strings.Repeat("9876543210", 100)+"/7", strings.Repeat("1234567890", 100)+"/13")
 			var caller exactEtaCalls
 			before, err := caller.begin(h.m)
 			h.must(err)
@@ -287,7 +287,9 @@ func TestLPLARDriverReportFlushAndLiveFields(t *testing.T) {
 }
 
 func TestLPLARDriverPhysicalOwnership(t *testing.T) {
-	input := strings.Replace(lpMPSDriverModel(3, 2, 2, 4, 3), lpExactMPSPair("x", "COST", "3"), lpExactMPSPair("x", "COST", strings.Repeat("1234567890", 100)+"7/13"), 1)
+	// The comparison phase reparses this field on every fault ordinal. The
+	// shorter value still exercises multi-limb reader and driver allocations.
+	input := strings.Replace(lpMPSDriverModel(3, 2, 2, 4, 3), lpExactMPSPair("x", "COST", "3"), lpExactMPSPair("x", "COST", strings.Repeat("1234567890", 20)+"7/13"), 1)
 	name := lpMPSDriverFile(t, input)
 	for _, phase := range []string{"solve", "infeasible", "randomize", "compare"} {
 		compare := phase == "compare"

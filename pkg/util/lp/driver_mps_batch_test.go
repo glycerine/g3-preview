@@ -403,7 +403,7 @@ func TestLPMPSBatchChildFailurePrefixes(t *testing.T) {
 
 func TestLPMPSBatchPhysicalChildOwnership(t *testing.T) {
 	home := t.TempDir()
-	large := strings.Repeat("1234567890", 100) + "7/13"
+	large := strings.Repeat("1234567890", 20) + "7/13"
 	lpBatchPut(t, home, "l0redund.mps", strings.Replace(lpProcessFixedGLPKModel(3), lpExactMPSPair("x", "COST", "3"), lpExactMPSPair("x", "COST", large), 1))
 	for _, direct := range []bool{false, true} {
 		success, failures := false, 0
@@ -449,7 +449,7 @@ func TestLPMPSBatchOlderCallerComparison(t *testing.T) {
 	for ordinal := int64(0); ordinal < 40 && !matched; ordinal++ {
 		h := newLPPairHarness(t)
 		d := NewMPSBatchDriver(lpDriverArgs(t, "--mpq"), h.m, MPSDriverConfig{Output: io.Discard})
-		v := h.pair(strings.Repeat("9876543210", 100)+"/7", strings.Repeat("1234567890", 100)+"/13")
+		v := h.pairExactLarge(strings.Repeat("9876543210", 100)+"/7", strings.Repeat("1234567890", 100)+"/13")
 		var caller exactEtaCalls
 		before, err := caller.begin(h.m)
 		h.must(err)
