@@ -178907,6 +178907,28 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Whole live MPZ TRACE/STRACE site inventory in mpz.cpp and mpz.h: integer arithmetic/division, divisibility, LCM, bitwise, shifts and root; array-GCD site at cpp875 is disabled",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpz_short_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpz_lcm_trace.go",
+            "pkg/util/numeral/mpz_bit_shift_trace.go",
+            "pkg/util/numeral/mpz_or_root_trace.go",
+            "pkg/util/numeral/mpz_mul2k_trace.go",
+            "pkg/util/numeral/mpz_divides_trace.go"
+          ],
+          "tests": [
+            "TestIntegerBinaryShortTraceAliasAndNestedAddMul",
+            "TestIntegerNegSourceShortTraceAndAbsExclusion",
+            "TestIntegerDivisionShortTraceNestedSourceOrder",
+            "TestIntegerDividesRetainedShortAndBugTrace",
+            "TestIntegerLCMRetainedBranchTraceAndAlias",
+            "TestIntegerBitwiseNotAndMachineDiv2kSourceTraces",
+            "TestIntegerMul2kSourceTraceCapacityAndShortcuts",
+            "TestIntegerBitwiseOrAndRootRetainedTraceSites"
+          ]
+        },
+        {
           "name": "get_enabled_trace_tags first table allocation memory TRACE when enable_all_trace is active (trace.cpp:29-33)",
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_trace_tags_memory_trace.go",
@@ -180400,6 +180422,28 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Whole live MPZ TRACE/STRACE site inventory in mpz.cpp and mpz.h: integer arithmetic/division, divisibility, LCM, bitwise, shifts and root; array-GCD site at cpp875 is disabled",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpz_short_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpz_lcm_trace.go",
+            "pkg/util/numeral/mpz_bit_shift_trace.go",
+            "pkg/util/numeral/mpz_or_root_trace.go",
+            "pkg/util/numeral/mpz_mul2k_trace.go",
+            "pkg/util/numeral/mpz_divides_trace.go"
+          ],
+          "tests": [
+            "TestIntegerBinaryShortTraceAliasAndNestedAddMul",
+            "TestIntegerNegSourceShortTraceAndAbsExclusion",
+            "TestIntegerDivisionShortTraceNestedSourceOrder",
+            "TestIntegerDividesRetainedShortAndBugTrace",
+            "TestIntegerLCMRetainedBranchTraceAndAlias",
+            "TestIntegerBitwiseNotAndMachineDiv2kSourceTraces",
+            "TestIntegerMul2kSourceTraceCapacityAndShortcuts",
+            "TestIntegerBitwiseOrAndRootRetainedTraceSites"
+          ]
+        },
         {
           "name": "Disabled/commented MPZ array-GCD, MPN division and MPF to_rational TRACE text has no compiled emission (mpz.cpp:875; mpn.cpp:199-200; mpf.cpp:1547-1550)",
           "status": "dead_deleted",
