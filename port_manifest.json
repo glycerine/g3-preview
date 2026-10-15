@@ -9908,7 +9908,8 @@
         "pkg/ast/ast_parameter_memory_trace.go",
         "pkg/ast/ast_parameter_memory_trace_debug_test.go",
         "pkg/ast/ast_info_memory_trace.go",
-        "pkg/ast/ast_info_memory_trace_debug_test.go"
+        "pkg/ast/ast_info_memory_trace_debug_test.go",
+        "pkg/ast/ast_core_quantifier_pattern_trace.go"
       ],
       "tests": [
         "TestASTResourceLimitSourceCanceledCountsAndScopes",
@@ -10059,7 +10060,8 @@
         "TestASTFormatManagerMemoryWrapperConstructorOverloads",
         "TestASTParameterRationalMemoryWrapperCopyMoveAssignAndDestroy",
         "TestASTInfoMemoryWrapperRegisteredSortAndDecl",
-        "TestASTInfoMemoryWrapperDebugRetainsSourceAllocation"
+        "TestASTInfoMemoryWrapperDebugRetainsSourceAllocation",
+        "TestASTQuantifierPatternSourceTraceBeforeRegistration"
       ],
       "conditionals": [
         {
@@ -10644,6 +10646,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "mk_quantifier debug-only pattern TRACE before pattern assertion and node allocation (ast.cpp:2356-2361); selected pattern application profile",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_core_quantifier_pattern_trace.go",
+          "tests": ["TestASTQuantifierPatternSourceTraceBeforeRegistration"]
+        },
         {
           "name": "family_manager constructor next0 and concrete symbol/name members",
           "status": "ported",
@@ -12506,7 +12514,8 @@
         "TestASTSMT2BooleanComparisonsWithFloatingPointLiterals",
         "TestASTWellSortedNonBooleanRootTraceProfiles",
         "TestASTSMT2BooleanTreeSourcePostorderAndLabels",
-        "TestASTSMT2DeclareFunSourceEntrypoint"
+        "TestASTSMT2DeclareFunSourceEntrypoint",
+        "TestASTQuantifierPatternSourceTraceBeforeRegistration"
       ],
       "conditionals": [
         {
@@ -12664,7 +12673,7 @@
           ]
         },
         {
-          "name": "Selected smt2_printer child-before-parent Boolean and uninterpreted-result application/variable traversal with constant/label dispatch, default flat associative expansion, alias registration/reuse, info-stack weight/depth/level and let wrapping; arithmetic, bit-vector and floating-point numeral children use source-default literal profiles, while string, decimal and quantifier profiles remain open",
+          "name": "Selected smt2_printer child-before-parent Boolean and uninterpreted-result application/variable traversal with constant/label dispatch, default flat associative expansion, alias registration/reuse, info-stack weight/depth/level and let wrapping; arithmetic, bit-vector and floating-point numeral children use source-default literal profiles, while string, decimal and quantifier profiles remain open; selected pattern apps use source mk_seq5",
           "status": "partial",
           "go_target": "pkg/ast/ast_smt2_boolean_tree.go",
           "tests": [
@@ -12672,7 +12681,8 @@
             "TestASTSMT2BooleanComparisonsWithArithmeticLiterals",
             "TestASTSMT2BooleanComparisonsWithBitVectorLiterals",
             "TestASTSMT2BooleanComparisonsWithFloatingPointLiterals",
-            "TestASTWellSortedNonBooleanRootTraceProfiles"
+            "TestASTWellSortedNonBooleanRootTraceProfiles",
+            "TestASTQuantifierPatternSourceTraceBeforeRegistration"
           ]
         },
         {
@@ -179676,7 +179686,8 @@
         "pkg/tactic/aig/aig_goal_conversion_trace.go",
         "pkg/tactic/aig/aig_max_sharing_trace.go",
         "pkg/tactic/aig/aig_and_trace.go",
-        "pkg/ast/ast_well_sorted_trace.go"
+        "pkg/ast/ast_well_sorted_trace.go",
+        "pkg/ast/ast_core_quantifier_pattern_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -179757,7 +179768,8 @@
         "TestAIGMkAndSourceTraceOriginalOperandsAndResult",
         "TestASTWellSortedWrongAritySourceTraceBeforeWarning",
         "TestASTWellSortedSortMismatchSourceTraceBeforeWarning",
-        "TestASTWellSortedNonBooleanRootTraceProfiles"
+        "TestASTWellSortedNonBooleanRootTraceProfiles",
+        "TestASTQuantifierPatternSourceTraceBeforeRegistration"
       ],
       "conditionals": [
         {
@@ -181101,10 +181113,10 @@
           "status": "dead_deleted"
         },
         {
-          "name": "AST mk_quantifier debug-only pattern TRACE at ast.cpp:2358 precedes pattern assertion and node allocation; exact mk_pp body awaits the retained AST pretty printer",
+          "name": "AST mk_quantifier debug-only pattern TRACE at ast.cpp:2358 precedes pattern assertion and node allocation; selected pattern application SMT2 profile",
           "status": "partial",
-          "go_target": "pkg/ast/ast_core_factories.go",
-          "tests": []
+          "go_target": "pkg/ast/ast_core_quantifier_pattern_trace.go",
+          "tests": ["TestASTQuantifierPatternSourceTraceBeforeRegistration"]
         },
         {
           "name": "Selected expr2aig cache_result TRACE emits process-bound SMT2 Boolean expression and AIG reference before cache INC (aig.cpp:452); wider expression profiles remain open",
@@ -181280,7 +181292,8 @@
         "pkg/tactic/aig/aig_goal_conversion_trace.go",
         "pkg/tactic/aig/aig_max_sharing_trace.go",
         "pkg/tactic/aig/aig_and_trace.go",
-        "pkg/ast/ast_well_sorted_trace.go"
+        "pkg/ast/ast_well_sorted_trace.go",
+        "pkg/ast/ast_core_quantifier_pattern_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -181359,7 +181372,8 @@
         "TestAIGMkAndSourceTraceOriginalOperandsAndResult",
         "TestASTWellSortedWrongAritySourceTraceBeforeWarning",
         "TestASTWellSortedSortMismatchSourceTraceBeforeWarning",
-        "TestASTWellSortedNonBooleanRootTraceProfiles"
+        "TestASTWellSortedNonBooleanRootTraceProfiles",
+        "TestASTQuantifierPatternSourceTraceBeforeRegistration"
       ],
       "conditionals": [
         {
@@ -182703,10 +182717,10 @@
           "status": "dead_deleted"
         },
         {
-          "name": "AST mk_quantifier debug-only pattern TRACE at ast.cpp:2358 precedes pattern assertion and node allocation; exact mk_pp body awaits the retained AST pretty printer",
+          "name": "AST mk_quantifier debug-only pattern TRACE at ast.cpp:2358 precedes pattern assertion and node allocation; selected pattern application SMT2 profile",
           "status": "partial",
-          "go_target": "pkg/ast/ast_core_factories.go",
-          "tests": []
+          "go_target": "pkg/ast/ast_core_quantifier_pattern_trace.go",
+          "tests": ["TestASTQuantifierPatternSourceTraceBeforeRegistration"]
         },
         {
           "name": "Selected expr2aig cache_result TRACE emits process-bound SMT2 Boolean expression and AIG reference before cache INC (aig.cpp:452); wider expression profiles remain open",

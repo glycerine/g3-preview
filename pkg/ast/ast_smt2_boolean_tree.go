@@ -38,8 +38,8 @@ func (m *ASTManager) SMT2PPBooleanTree(root ASTHandle, names []usymbol.Symbol) (
 }
 
 // SMT2PPExprTree also accepts non-Boolean application roots reached by the
-// well-sorted diagnostics. Quantifier and pattern paths remain in the wider
-// source printer.
+// well-sorted diagnostics. The reached pattern-app branch is also handled;
+// quantifier documents remain in the wider source printer.
 func (m *ASTManager) SMT2PPExprTree(root ASTHandle, names []usymbol.Symbol) (ASTHandle, error) {
 	return m.smt2PPExprTree(root, names, false)
 }
@@ -190,6 +190,7 @@ func (m *ASTManager) smt2PPExprTree(root ASTHandle, names []usymbol.Symbol, requ
 		}
 		args := make([]ASTHandle, 0, count)
 		value := result{weight: 1, depth: 1}
+		patternChildrenApps := true
 		for i := uint32(0); i < count; i++ {
 			child, e := m.GetArg(h, i)
 			if e != nil {
@@ -198,6 +199,9 @@ func (m *ASTManager) smt2PPExprTree(root ASTHandle, names []usymbol.Symbol, requ
 			childKind, e := m.GetKind(child)
 			if e != nil {
 				return result{}, e
+			}
+			if childKind != ASTApp {
+				patternChildrenApps = false
 			}
 			flat := false
 			if childKind == ASTApp && occurrences[child] == 1 {
@@ -238,11 +242,23 @@ func (m *ASTManager) smt2PPExprTree(root ASTHandle, names []usymbol.Symbol, requ
 			}
 			format, e = m.SMT2PPLabels(positive, labels, args[0])
 		} else {
-			decl, e := m.GetDecl(h)
-			if e != nil {
-				return result{}, e
+			family, familyErr := m.GetFamilyID(h)
+			if familyErr != nil {
+				return result{}, familyErr
 			}
-			format, e = m.SMT2PPAppFormat(decl, args)
+			declKind, kindErr := m.GetDeclKind(h)
+			if kindErr != nil {
+				return result{}, kindErr
+			}
+			if family == 2 && declKind == 0 && patternChildrenApps {
+				format, e = m.FormatSeq5(args)
+			} else {
+				decl, declErr := m.GetDecl(h)
+				if declErr != nil {
+					return result{}, declErr
+				}
+				format, e = m.SMT2PPAppFormat(decl, args)
+			}
 		}
 		if e != nil {
 			return result{}, e
