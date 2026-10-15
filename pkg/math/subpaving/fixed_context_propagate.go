@@ -114,7 +114,17 @@ func (c *FixedContext) processQueuedBound(n *FixedNode, b *FixedBound) error {
 	}
 	visit := func(variable uint32, catchArithmetic bool) error {
 		visited, ok := c.definitionVisited(variable)
-		if !ok || b.timestamp < visited {
+		if !ok {
+			return nil
+		}
+		if err := c.traceMayPropagateDefinition(b, variable, visited); err != nil {
+			if catchArithmetic && errors.Is(err, numeral.ErrFixedPointDomain) {
+				c.arithmeticFailed = true
+				return nil
+			}
+			return err
+		}
+		if b.timestamp < visited {
 			return nil
 		}
 		if err := c.propagateDefinition(variable, n); err != nil {
@@ -132,6 +142,13 @@ func (c *FixedContext) processQueuedBound(n *FixedNode, b *FixedBound) error {
 		}
 		if watched.clause != nil {
 			clause := watched.clause
+			if err := c.traceMayPropagateClause(b, clause); err != nil {
+				if errors.Is(err, numeral.ErrFixedPointDomain) {
+					c.arithmeticFailed = true
+					continue
+				}
+				return err
+			}
 			if b.timestamp < clause.visited {
 				continue
 			}

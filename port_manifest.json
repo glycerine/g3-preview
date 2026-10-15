@@ -53416,6 +53416,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_propagate_trace.go",
           "tests": ["TestFixedQueuedBoundPropagationTraceAndConsumedPrefix", "TestFixedQueuedBoundPropagationTraceRefusalAndPrinterStop"]
+        },
+        {
+          "name": "Concrete config_mpfx may_propagate clause/definition diagnostic with strict-result text and inclusive timestamp gate (subpaving_t_def.h:1170-1175)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_may_propagate_trace.go",
+          "tests": ["TestFixedMayPropagateClauseEqualTimestampAndSkippedVisitTrace", "TestFixedMayPropagateDefinitionSkippedTimestampTrace", "TestFixedMayPropagateTracePrinterFailureAfterQueueConsumption"]
         }
       ],
       "ownership": [
@@ -54876,6 +54882,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_propagate_trace.go",
           "tests": ["TestFixedQueuedBoundPropagationTraceAndConsumedPrefix", "TestFixedQueuedBoundPropagationTraceRefusalAndPrinterStop"]
+        },
+        {
+          "name": "Concrete config_mpfx may_propagate clause/definition diagnostic with strict-result text and inclusive timestamp gate (subpaving_t_def.h:1170-1175)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_may_propagate_trace.go",
+          "tests": ["TestFixedMayPropagateClauseEqualTimestampAndSkippedVisitTrace", "TestFixedMayPropagateDefinitionSkippedTimestampTrace", "TestFixedMayPropagateTracePrinterFailureAfterQueueConsumption"]
         },
         {
           "name": "Concrete config_mpff round-robin variable selector after latest child axiom (src/math/subpaving/subpaving_t_def.h:66-101)",
@@ -177423,6 +177435,12 @@
           "tests": ["TestFixedQueuedBoundPropagationTraceAndConsumedPrefix", "TestFixedQueuedBoundPropagationTraceRefusalAndPrinterStop"]
         },
         {
+          "name": "Reached config_mpfx may_propagate clause and definition TRACE diagnostics (subpaving_t_def.h:1172)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_may_propagate_trace.go",
+          "tests": ["TestFixedMayPropagateClauseEqualTimestampAndSkippedVisitTrace", "TestFixedMayPropagateDefinitionSkippedTimestampTrace", "TestFixedMayPropagateTracePrinterFailureAfterQueueConsumption"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -178329,6 +178347,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_propagate_trace.go",
           "tests": ["TestFixedQueuedBoundPropagationTraceAndConsumedPrefix", "TestFixedQueuedBoundPropagationTraceRefusalAndPrinterStop"]
+        },
+        {
+          "name": "Reached config_mpfx may_propagate clause and definition TRACE diagnostics (subpaving_t_def.h:1172)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_may_propagate_trace.go",
+          "tests": ["TestFixedMayPropagateClauseEqualTimestampAndSkippedVisitTrace", "TestFixedMayPropagateDefinitionSkippedTimestampTrace", "TestFixedMayPropagateTracePrinterFailureAfterQueueConsumption"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
