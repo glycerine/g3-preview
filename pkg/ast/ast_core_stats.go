@@ -44,7 +44,6 @@ func (m *ASTManager) Stats() ASTManagerStats {
 	for _, v := range m.basic.proofCaches {
 		s.AllocatedBytes += uint64(cap(v)) * width
 	}
-	s.AllocatedBytes += uint64(m.ExprIDs.FreeCapacity()+m.declIDs.FreeCapacity()) * 4
 	if m.allocator != nil {
 		a := m.allocator.Stats()
 		s.AllocatedBytes += a.OwnerBytes + a.PayloadBytes + a.MetadataBytes + a.DirectoryBytes

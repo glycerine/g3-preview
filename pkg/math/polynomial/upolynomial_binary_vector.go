@@ -78,6 +78,11 @@ func upolyBinaryExtend(s *upolyBinaryVectorState, n uint32) error {
 		// The initialized numeral slots are native Go storage. Logical size
 		// remains separate because reset and shrink retain the backing slice.
 		s.values = append(old, make([]unumeral.BinaryRational, int(n)-len(old))...)
+		if len(old) != 0 && &s.values[0] != &old[0] {
+			// The old backing is no longer an owner after relocation. Clear its
+			// copied pointer fields so a borrowed old view cannot retain them.
+			clear(old)
+		}
 	}
 	clear(s.values[s.size:n])
 	s.size = n

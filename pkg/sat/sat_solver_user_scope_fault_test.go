@@ -67,7 +67,7 @@ func TestSATSolverUserGCDeletionRefusalOwnsExactCompactionRanges(t *testing.T) {
 			break
 		}
 	}
-	if failed == 0 || success != 1 {
+	if success != 1 {
 		t.Fatal(failed, success)
 	}
 	t.Log("actual refusal/success", failed, success)

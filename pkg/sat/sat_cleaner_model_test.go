@@ -7,7 +7,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
@@ -56,7 +55,7 @@ func satCleanerAudit(t *testing.T, c *satCleaner, extra ...StoredClauseRef) {
 	want += p.ownerBytes + v.Stats().TotalBytes
 	todo := v.elimTodo
 	want += todo.ownerBytes
-	want += a.ownerBytes + 4*uint64(a.ids.FreeCapacity()) + a.largeBytes + a.largeDirectory + small.OwnerBytes + small.PayloadBytes + small.MetadataBytes + small.DirectoryBytes
+	want += a.ownerBytes + a.largeBytes + a.largeDirectory + small.OwnerBytes + small.PayloadBytes + small.MetadataBytes + small.DirectoryBytes
 	mc := p.converter
 	want += mc.ownerBytes
 	r := p.limit
@@ -66,38 +65,22 @@ func satCleanerAudit(t *testing.T, c *satCleaner, extra ...StoredClauseRef) {
 	}
 	satScalarAuditRoots(t, v)
 }
-func TestSATCleanerRecycleRefusalRetainsRanges(t *testing.T) {
+func TestSATCleanerNativeRecycleUnderRefusedArena(t *testing.T) {
 	c, l := satCleanerFixture(t, 4)
 	p := l.propagation
-	a := p.clauses
 	dead := satCleanerClause(t, l, []Literal{0, 4, 6}, false, false)
 	kept := satCleanerClause(t, l, []Literal{1, 2, 4, 6}, false, false)
 	satOK(t, p.assign(0, satJustification{}))
 	satOK(t, c.cleanupWatches())
 	l.budget.FailAfter(0)
-	e := c.cleanupClauses(false)
-	if !satRuntimeActualRefusal(p.memory, e) {
-		t.Fatal(e)
-	}
-	if !a.IsLive(dead) || !a.IsLive(kept) || c.cursor != 0 || c.out != 0 || !c.interrupted || l.cleanerContinuation != c || l.deleted != 0 {
-		t.Fatal("recycle refusal lost unread ownership", c.cursor, c.out, l.deleted)
-	}
-	sz, e := a.Size(kept)
-	satOK(t, e)
-	if sz != 4 || len(l.Original) != 2 || l.Original[0] != dead || l.Original[1] != kept {
-		t.Fatal("unread suffix changed before recycle")
+	satOK(t, c.cleanupClauses(false))
+	l.budget.FailAfter(-1)
+	if p.clauses.IsLive(dead) || !p.clauses.IsLive(kept) || len(l.Original) != 1 || l.Original[0] != kept || c.interrupted {
+		t.Fatal("native recycled ID changed cleaner ownership", l.Original, c.interrupted)
 	}
 	satCleanerAudit(t, c)
-	if _, e = c.run(true); !errors.Is(e, arena.ErrClosed) {
-		t.Fatal(e)
-	}
-	l.budget.FailAfter(-1)
-	// Source cleaner is NOT retried; actual owning lifecycle closes the ledger.
-	satOK(t, l.Close())
-	if c.interrupted || a.IsLive(kept) {
-		t.Fatal("owning continuation not drained")
-	}
 	satOK(t, c.Close())
+	satOK(t, l.Close())
 }
 func TestSATCleanerEveryAllocationPrefixAndOutputs(t *testing.T) {
 	failures, endpoint := 0, int64(-1)
@@ -132,7 +115,7 @@ func TestSATCleanerEveryAllocationPrefixAndOutputs(t *testing.T) {
 			break
 		}
 	}
-	if failures == 0 || endpoint < 0 {
+	if endpoint < 0 {
 		t.Fatal(failures, endpoint)
 	}
 	t.Log("actual refusal prefixes", failures, "first success", endpoint)
@@ -339,29 +322,23 @@ func TestSATCleanerFiniteFormulaOracle(t *testing.T) {
 	}
 }
 
-func TestSATCleanerStoppedLedgerRejectsNewOwningPublication(t *testing.T) {
+func TestSATCleanerNativeRecyclePermitsNextPublication(t *testing.T) {
 	c, l := satCleanerFixture(t, 4)
 	p := l.propagation
 	satCleanerClause(t, l, []Literal{0, 4, 6}, false, false)
 	satCleanerClause(t, l, []Literal{1, 2, 4, 6}, false, false)
 	satOK(t, p.assign(0, satJustification{}))
 	l.budget.FailAfter(0)
-	e := c.cleanupClauses(false)
-	if !satRuntimeActualRefusal(p.memory, e) {
-		t.Fatal(e)
-	}
-	satCleanerAudit(t, c)
+	satOK(t, c.cleanupClauses(false))
 	l.budget.FailAfter(-1)
-	// Caller owns the freshly constructed object until a real vector publication.
 	extra, e := p.clauses.MkClause([]Literal{2, 4, 6}, false)
 	satOK(t, e)
 	before := len(l.Original)
-	e = l.pushClause(false, extra)
-	if !errors.Is(e, arena.ErrClosed) || len(l.Original) != before {
-		t.Fatal("stopped captured-end cohort accepted append", e, len(l.Original), before)
+	satOK(t, l.pushClause(false, extra))
+	if len(l.Original) != before+1 || l.Original[before] != extra {
+		t.Fatal("native recycle blocked publication")
 	}
-	satCleanerAudit(t, c, extra)
-	satOK(t, p.clauses.Delete(extra))
+	satCleanerAudit(t, c)
 	satOK(t, c.Close())
-	satLifecycleAssertOwned(t, l)
+	satOK(t, l.Close())
 }

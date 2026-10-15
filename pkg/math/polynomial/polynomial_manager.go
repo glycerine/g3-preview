@@ -211,7 +211,7 @@ func preparePolynomialCore(c MultivariatePolynomialConfig, requireMonomials bool
 }
 func (m *MultivariatePolynomialCore) constructPolynomialCoreDefaults() error {
 	m.directoryInitialized = true
-	m.ids = idgen.NewBudgeted(0, m.integer.Budget(), func() bool { return m.memory.State().OutOfMemory })
+	m.ids = idgen.New(0, func() bool { return m.memory.State().OutOfMemory })
 	m.idsInitialized = true
 	return nil
 }

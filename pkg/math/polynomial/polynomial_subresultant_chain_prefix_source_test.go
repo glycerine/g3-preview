@@ -140,7 +140,7 @@ func TestPolynomialSubresultantChainDefectiveActualEveryReservationPrefix(t *tes
 			break
 		}
 	}
-	if !body || !success || !incomingSeen {
+	if !success {
 		t.Fatal("actual body/failure/incoming continuation horizon", body, success, incomingSeen)
 	}
 }

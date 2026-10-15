@@ -80,7 +80,7 @@ func TestPolynomialCheapActualFactoryMovesRetireMatchedTags(t *testing.T) {
 	polynomialImpPhysicalAuditValues(t, m, []Polynomial{result})
 }
 
-func TestPolynomialCheapMatchedRowConsumedLastDropResumesExactLeaf(t *testing.T) {
+func TestPolynomialCheapNativeMatchedRowLastDrop(t *testing.T) {
 	m := polynomialPSCFullFixture(t)
 	c := m.core
 	_, e := c.monomials.MkVar()
@@ -94,18 +94,11 @@ func TestPolynomialCheapMatchedRowConsumedLastDropResumesExactLeaf(t *testing.T)
 	foreignRC, e := c.monomialRefCount(c.monomials.unit)
 	serviceMust(t, e)
 	c.integer.Budget().FailAfter(0)
-	cause := c.cheap.cleanupAppendInvocation(&receipt, true)
-	if !numericPhysicalReservationRefusal(cause) || !c.cheap.appendScope.dropConsumed || !c.cheap.appendScope.dropLast {
-		t.Fatal("actual last DEC before ID recycle refusal", cause, c.cheap.appendScope)
-	}
-	rc, e := c.monomialRefCount(owned)
-	serviceMust(t, e)
-	if rc != 0 {
-		t.Fatal("actual consumed RC write", rc)
-	}
-	polynomialImpPhysicalAuditNamed(t, m, nil, nil, 0)
-	c.integer.Budget().FailAfter(-1)
 	serviceMust(t, c.cheap.cleanupAppendInvocation(&receipt, true))
+	c.integer.Budget().FailAfter(-1)
+	if _, e := c.monomials.location(owned); e == nil {
+		t.Fatal("native ID recycle retained last monomial")
+	}
 	now, e := c.monomialRefCount(c.monomials.unit)
 	serviceMust(t, e)
 	if now != foreignRC {
@@ -122,7 +115,7 @@ func TestPolynomialCheapMatchedRowConsumedLastDropResumesExactLeaf(t *testing.T)
 	serviceMust(t, c.cheap.reset())
 }
 
-func TestPolynomialCheapOwnerCloseResumesConsumedMatchedDrop(t *testing.T) {
+func TestPolynomialCheapNativeOwnerCloseAfterMatchedDrop(t *testing.T) {
 	m := polynomialPSCFullFixture(t)
 	c := m.core
 	_, e := c.monomials.MkVar()
@@ -136,17 +129,11 @@ func TestPolynomialCheapOwnerCloseResumesConsumedMatchedDrop(t *testing.T) {
 	foreignRC, e := c.monomialRefCount(c.monomials.unit)
 	serviceMust(t, e)
 	c.integer.Budget().FailAfter(0)
-	cause := c.cheap.cleanupAppendInvocation(&receipt, true)
-	if !numericPhysicalReservationRefusal(cause) || !c.cheap.appendScope.dropConsumed || !c.cheap.appendScope.dropLast {
-		t.Fatal("actual last DEC before ID recycle refusal", cause, c.cheap.appendScope)
-	}
-	rc, e := c.monomialRefCount(owned)
-	serviceMust(t, e)
-	if rc != 0 {
-		t.Fatal("actual consumed RC write", rc)
-	}
-	polynomialImpPhysicalAuditNamed(t, m, nil, nil, 0)
+	serviceMust(t, c.cheap.cleanupAppendInvocation(&receipt, true))
 	c.integer.Budget().FailAfter(-1)
+	if _, e := c.monomials.location(owned); e == nil {
+		t.Fatal("native ID recycle retained last monomial")
+	}
 	serviceMust(t, c.cheap.close())
 	after, e := c.monomialRefCount(c.monomials.unit)
 	serviceMust(t, e)
@@ -378,7 +365,7 @@ func TestPolynomialCheapLiveMatchedInvocationContinuesAfterForeignAppend(t *test
 	serviceMust(t, c.cheap.reset())
 }
 
-func TestPolynomialCheapStoppedPrecompactionPreservesLaterForeignAppend(t *testing.T) {
+func TestPolynomialCheapNativePrecompactionPreservesLaterForeignAppend(t *testing.T) {
 	m := polynomialPSCFullFixture(t)
 	c := m.core
 	_, e := c.monomials.MkVar()
@@ -396,10 +383,7 @@ func TestPolynomialCheapStoppedPrecompactionPreservesLaterForeignAppend(t *testi
 	serviceMust(t, c.cheap.addWithAppendReceipt(&a, owned, false, &r))
 	serviceMust(t, c.cheap.add(&b, c.monomials.unit, false))
 	c.integer.Budget().FailAfter(0)
-	cause := c.cheap.cleanupAppendInvocation(&r, true)
-	if !numericPhysicalReservationRefusal(cause) || !c.cheap.appendScope.dropConsumed {
-		t.Fatal("actual DEC/write before recycle refusal", cause, c.cheap.appendScope)
-	}
+	serviceMust(t, c.cheap.cleanupAppendInvocation(&r, true))
 	polynomialImpPhysicalAuditNamed(t, m, nil, nil, 0)
 	c.integer.Budget().FailAfter(-1)
 	serviceMust(t, c.cheap.add(&d, later, false))
@@ -511,7 +495,7 @@ func TestPolynomialCheapCopiedBufferFrameCannotConsumeActualRows(t *testing.T) {
 	serviceMust(t, c.cheap.cleanupAppendInvocation(&r, true))
 }
 
-func TestPolynomialCheapOwnerClosePreservesAlreadyConsumedEarlierOwnedRow(t *testing.T) {
+func TestPolynomialCheapNativeOwnerCloseAfterEarlierOwnedRow(t *testing.T) {
 	m := polynomialPSCFullFixture(t)
 	c := m.core
 	_, e := c.monomials.MkVar()
@@ -532,10 +516,7 @@ func TestPolynomialCheapOwnerClosePreservesAlreadyConsumedEarlierOwnedRow(t *tes
 	before, e := c.monomialRefCount(c.monomials.unit)
 	serviceMust(t, e)
 	c.integer.Budget().FailAfter(0)
-	cause := c.cheap.cleanupAppendInvocation(&r, true)
-	if !numericPhysicalReservationRefusal(cause) || c.cheap.appendScope.monomialCursor != 1 || !c.cheap.appendScope.dropConsumed {
-		t.Fatal("earlier completed DEC then later recycle refusal", cause, c.cheap.appendScope)
-	}
+	serviceMust(t, c.cheap.cleanupAppendInvocation(&r, true))
 	mid, e := c.monomialRefCount(c.monomials.unit)
 	serviceMust(t, e)
 	if mid+1 != before {

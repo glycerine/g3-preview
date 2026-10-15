@@ -545,13 +545,13 @@ func upolyHenselCallerSetZForDeadBounds(t *testing.T, cores []*UPolynomialManage
 
 func TestUPolynomialHenselDeadLowerGuardedCloseAndCallerSetZ(t *testing.T) {
 	if !polynomialSourceDebug {
-		t.Skip("exact ordinal159 belongs to source debug direct allocator profile")
+		t.Skip("exact ordinal38 belongs to source debug direct allocator profile")
 	}
 	m, prime, lift, donor, pf, lf, service, f, _, b := upolyHenselPhysicalFixture(t)
 	allocator := testFieldBySourceName(reflect.ValueOf(m.IntegerManager()).Elem(), "allocator").Elem()
 	profile := testFieldBySourceName(testFieldBySourceName(allocator, "config"), "Profile")
 	if !testFieldBySourceName(profile, "Debug").Bool() || testFieldBySourceName(profile, "Windows").Bool() {
-		t.Skip("ordinal159 requires actual non-Windows debug direct allocator profile")
+		t.Skip("ordinal38 requires actual non-Windows debug direct allocator profile")
 	}
 	locations := testFieldBySourceName(allocator, "locations")
 	chunks, direct := 0, 0
@@ -573,8 +573,8 @@ func TestUPolynomialHenselDeadLowerGuardedCloseAndCallerSetZ(t *testing.T) {
 	owners := []*UPolynomialFactors{pf, lf}
 	// The cached pair frame and public caller adapter are real cold owners.
 	// Their two reservations precede this unchanged setup_p lower Copy;
-	// the independent exact physical frontier probe reaches it at159.
-	b.FailAfter(159)
+	// the independent exact physical frontier probe reaches it at38.
+	b.FailAfter(38)
 	err := service.HenselLiftFactors(f, pf, 16, lf)
 	var failure umemory.Failure
 	if !errors.As(err, &failure) || failure.Kind != umemory.FailureMemout || !m.IntegerManager().RuntimeOwner().State().OutOfMemory {

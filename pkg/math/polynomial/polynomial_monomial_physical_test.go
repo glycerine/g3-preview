@@ -21,7 +21,7 @@ func monomialPhysicalAudit(t *testing.T, m *MonomialManager, externalRaw ...umem
 	for _, raw := range externalRaw {
 		add(raw)
 	}
-	bytes := m.header + uint64(m.ids.FreeCapacity())*4 + r.TotalBytes
+	bytes := m.header + r.TotalBytes
 	if m.allocator != nil {
 		a := m.allocator.Stats()
 		blocks += a.Chunks + a.DirectObjects + a.PendingBlocks

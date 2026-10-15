@@ -243,13 +243,9 @@ func TestSATClauseSourceIDsLocatorsAndDeleteFailure(t *testing.T) {
 	if back != r || e != nil {
 		t.Fatal(back, e)
 	}
-	base := b.Used()
 	b.FailAfter(0)
-	if e = a.Delete(r); !errors.Is(e, arena.ErrInjectedFailure) || !a.IsLive(r) || b.Used() != base {
-		t.Fatal(e)
-	}
-	b.FailAfter(-1)
 	satOK(t, a.Delete(r))
+	b.FailAfter(-1)
 	next := satMk(t, a, satLs(2, 4), true)
 	if id, _ := a.ID(next); id != 0 {
 		t.Fatal(id)

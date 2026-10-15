@@ -731,26 +731,15 @@ func TestMonomialScalarQueriesStopAtOwnerLifetime(t *testing.T) {
 	serviceMust(t, r.Close())
 }
 
-func TestMonomialOwningCloseAfterUnitIDRefusal(t *testing.T) {
+func TestMonomialOwningCloseWithNativeIDRecycle(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
 	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	serviceMust(t, e)
 	m, e := NewMonomialManager(MonomialManagerConfig{Budget: b, Memory: r})
 	serviceMust(t, e)
 	b.FailAfter(0)
-	e = m.CloseChecked()
-	if !numericPhysicalReservationRefusal(e) {
-		t.Fatal("actual unit ID vector reservation", e)
-	}
-	if !m.closing || m.unit == (Monomial{}) {
-		t.Fatal("retained real private unit", m.closing, m.unit)
-	}
-	monomialPhysicalAudit(t, m)
-	if _, e = m.Unit(); !errors.Is(e, arena.ErrClosed) {
-		t.Fatal(e)
-	}
-	b.FailAfter(-1)
 	serviceMust(t, m.CloseChecked())
+	b.FailAfter(-1)
 	serviceMust(t, r.Close())
 	if b.Used() != 0 {
 		t.Fatal(b.Used())

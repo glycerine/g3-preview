@@ -32,7 +32,7 @@ func TestASTExprSubstitutionNativeDependencyEraseFinishesSameEntry(t *testing.T)
 	astTestMust(t, m.DelExprSubstitution(&s))
 }
 
-func TestASTExprSubstitutionReplacementKeepsOldOnConsumedDeletionStop(t *testing.T) {
+func TestASTExprSubstitutionNativeValueReplacement(t *testing.T) {
 	m := astTestManager(t)
 	sort, e := m.MkBoolSort()
 	astTestMust(t, e)
@@ -44,44 +44,34 @@ func TestASTExprSubstitutionReplacementKeepsOldOnConsumedDeletionStop(t *testing
 	astTestMust(t, e)
 	astTestMust(t, m.IncRef(key))
 	astTestMust(t, m.IncRef(incoming))
-	s, e := m.NewExprSubstitution()
+	subst, e := m.NewExprSubstitution()
 	astTestMust(t, e)
-	astTestMust(t, m.ExprSubstitutionInsert(s, key, old, ASTHandle{}, ASTDependency{}))
-	oldRef, e := m.internal(old)
-	astTestMust(t, e)
-	incomingRef, e := m.internal(incoming)
-	astTestMust(t, e)
-	m.ExprIDs.Cleanup(m.ExprIDs.Range())
+	astTestMust(t, m.ExprSubstitutionInsert(subst, key, old, ASTHandle{}, ASTDependency{}))
 	m.BudgetField.FailAfter(0)
-	e = m.ExprSubstitutionInsert(s, key, incoming, ASTHandle{}, ASTDependency{})
+	astTestMust(t, m.ExprSubstitutionInsert(subst, key, incoming, ASTHandle{}, ASTDependency{}))
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatalf("old value deletion refusal: %v", e)
-	}
-	table, e := m.substTable(s, 0)
+	table, e := m.substTable(subst, 0)
 	astTestMust(t, e)
 	keyRef, e := m.internal(key)
 	astTestMust(t, e)
+	incomingRef, e := m.internal(incoming)
+	astTestMust(t, e)
 	entry, found := table.entries.Get2(astSharedKey(keyRef))
-	if !found || entry.value != oldRef || entry.owned != 1 {
-		t.Fatalf("source entry published after stopped DEC: %+v, found=%v", entry, found)
-	}
-	state := m.exprSubstitutions[s.record]
-	if len(state.pending) != 1 || state.pending[0] != (astExprSubstPending{node: incomingRef}) {
-		t.Fatalf("incoming owning receipt: %+v", state.pending)
+	if !found || entry.value != incomingRef || len(m.exprSubstitutions[subst.record].pending) != 0 {
+		t.Fatal("native value replacement", entry, found)
 	}
 	if _, e := m.GetRefCount(old); !errors.Is(e, ErrASTHandle) {
-		t.Fatalf("old value not consumed by stopped deletion: %v", e)
+		t.Fatal("old value survived", e)
 	}
-	astTestMust(t, m.DelExprSubstitution(&s))
+	astTestMust(t, m.DelExprSubstitution(&subst))
 	if rc, e := m.GetRefCount(incoming); e != nil || rc != 1 {
-		t.Fatalf("incoming reference after owning close = %d, %v", rc, e)
+		t.Fatal("incoming reference after close", rc, e)
 	}
 	astTestMust(t, m.DecRef(key))
 	astTestMust(t, m.DecRef(incoming))
 }
 
-func TestASTExprSubstitutionProofReplacementKeepsOldOnConsumedDeletionStop(t *testing.T) {
+func TestASTExprSubstitutionNativeProofReplacement(t *testing.T) {
 	m := astTestManager(t)
 	astTestMust(t, m.ToggleProofMode(ASTProofEnabled))
 	sort, e := m.MkBoolSort()
@@ -97,35 +87,28 @@ func TestASTExprSubstitutionProofReplacementKeepsOldOnConsumedDeletionStop(t *te
 	for _, h := range []ASTHandle{key, value, incoming} {
 		astTestMust(t, m.IncRef(h))
 	}
-	s, e := m.NewExprSubstitutionPolicy(false, true)
+	subst, e := m.NewExprSubstitutionPolicy(false, true)
 	astTestMust(t, e)
-	astTestMust(t, m.ExprSubstitutionInsert(s, key, value, old, ASTDependency{}))
-	oldRef, e := m.internal(old)
-	astTestMust(t, e)
-	incomingRef, e := m.internal(incoming)
-	astTestMust(t, e)
-	m.ExprIDs.Cleanup(m.ExprIDs.Range())
+	astTestMust(t, m.ExprSubstitutionInsert(subst, key, value, old, ASTDependency{}))
 	m.BudgetField.FailAfter(0)
-	e = m.ExprSubstitutionInsert(s, key, value, incoming, ASTDependency{})
+	astTestMust(t, m.ExprSubstitutionInsert(subst, key, value, incoming, ASTDependency{}))
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatalf("old proof deletion refusal: %v", e)
-	}
-	table, e := m.substTable(s, 1)
+	table, e := m.substTable(subst, 1)
 	astTestMust(t, e)
 	keyRef, e := m.internal(key)
 	astTestMust(t, e)
+	incomingRef, e := m.internal(incoming)
+	astTestMust(t, e)
 	entry, found := table.entries.Get2(astSharedKey(keyRef))
-	if !found || entry.value != oldRef || entry.owned != 0 {
-		t.Fatalf("source proof published after stopped DEC: %+v, found=%v", entry, found)
+	if !found || entry.value != incomingRef || len(m.exprSubstitutions[subst.record].pending) != 0 {
+		t.Fatal("native proof replacement", entry, found)
 	}
-	state := m.exprSubstitutions[s.record]
-	if len(state.pending) != 1 || state.pending[0] != (astExprSubstPending{node: incomingRef, which: 1}) {
-		t.Fatalf("incoming proof owning receipt: %+v", state.pending)
+	if _, e := m.GetRefCount(old); !errors.Is(e, ErrASTHandle) {
+		t.Fatal("old proof survived", e)
 	}
-	astTestMust(t, m.DelExprSubstitution(&s))
+	astTestMust(t, m.DelExprSubstitution(&subst))
 	if rc, e := m.GetRefCount(incoming); e != nil || rc != 1 {
-		t.Fatalf("incoming proof reference after owning close = %d, %v", rc, e)
+		t.Fatal("incoming proof reference after close", rc, e)
 	}
 	for _, h := range []ASTHandle{incoming, key, value} {
 		astTestMust(t, m.DecRef(h))

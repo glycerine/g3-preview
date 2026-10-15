@@ -172,7 +172,7 @@ func NewMonomialManager(c MonomialManagerConfig) (*MonomialManager, error) {
 		m.cleanupCause = m.constructorUnwind()
 		return m, m
 	}
-	m.ids = idgen.NewBudgeted(0, c.Budget, func() bool { return r.State().OutOfMemory })
+	m.ids = idgen.New(0, func() bool { return r.State().OutOfMemory })
 	m.idsInitialized = true
 	m.allocator = c.Allocator
 	if m.allocator == nil {

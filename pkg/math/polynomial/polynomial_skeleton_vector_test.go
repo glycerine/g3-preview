@@ -130,9 +130,9 @@ func TestPolynomialSkeletonVectorOwnerGuards(t *testing.T) {
 }
 
 // Unlike the unit-only replacement test, x2 is newly owned by the old
-// skeleton. Its last DEC reaches the real cold ID recycle allocation before
-// native pointer replacement. Keep this reached source stop distinct.
-func TestPolynomialSkeletonVectorSetStoppedChildDestructor(t *testing.T) {
+// skeleton. Its last DEC recycles an ID through native slice storage before
+// the replacement pointer is published.
+func TestPolynomialSkeletonVectorSetNativeChildRecycle(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p, _ := polynomialSkeletonInput(t, m)
 	a, e := NewPolynomialSkeleton(m, p, 0)
@@ -143,22 +143,13 @@ func TestPolynomialSkeletonVectorSetStoppedChildDestructor(t *testing.T) {
 	serviceMust(t, e)
 	serviceMust(t, v.Push(a))
 	m.integer.Budget().FailAfter(0)
-	e = v.Set(0, b)
-	if !numericPhysicalReservationRefusal(e) || a.sourceFinalized || !a.sourceStarted || a.entryCursor != 2 || !a.entryDropping || b.sourceStarted || v.sourceCause != e {
-		t.Fatal("actual old child DEC/ref-recycle stop", e, a.originalCursor, a.entryCursor, a.entryDropping)
-	}
-	polynomialSkeletonVectorPhysicalAudit(t, m, v, []*PolynomialSkeleton{b}, p)
-	used := m.integer.Budget().Used()
-	cause := e
-	if e = v.SourceFinalize(); e != cause || m.integer.Budget().Used() != used {
-		t.Fatal("source stop resumed owning DEC", e, cause)
-	}
+	serviceMust(t, v.Set(0, b))
 	m.integer.Budget().FailAfter(-1)
-	serviceMust(t, v.CloseChecked())
-	if a.sourceFinalized || a.sourceCause != cause {
-		t.Fatal("owning abort changed literal source history")
+	if !a.sourceFinalized || b.sourceStarted || v.data[0] != b {
+		t.Fatal("native replacement did not retire old child", a.sourceFinalized, v.data[0])
 	}
-	serviceMust(t, b.CloseChecked())
+	polynomialSkeletonVectorPhysicalAudit(t, m, v, nil, p)
+	serviceMust(t, v.CloseChecked())
 	serviceMust(t, m.DecRef(p))
 	polynomialPhysicalAudit(t, m)
 }

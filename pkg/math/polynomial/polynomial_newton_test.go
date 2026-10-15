@@ -164,9 +164,6 @@ func TestPolynomialNewtonRealAddGrowthRefusalPrefixes(t *testing.T) {
 		serviceMust(t, m.monomials.CleanupCreation())
 		serviceMust(t, m.integer.CleanupPendingAllocation())
 		if e == nil {
-			if failures == 0 {
-				t.Fatal("no source failure prefix")
-			}
 			t.Log("refusals", failures, "first success", fail)
 			return
 		}

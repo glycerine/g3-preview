@@ -86,7 +86,7 @@ func satPropagationAssertGraph(t *testing.T, s *satSolverPropagationState) {
 	want += todo.ownerBytes
 	a := s.clauses
 	small := a.storage.Stats()
-	want += a.ownerBytes + 4*uint64(a.ids.FreeCapacity()) + a.largeBytes + a.largeDirectory + small.OwnerBytes + small.PayloadBytes + small.MetadataBytes + small.DirectoryBytes
+	want += a.ownerBytes + a.largeBytes + a.largeDirectory + small.OwnerBytes + small.PayloadBytes + small.MetadataBytes + small.DirectoryBytes
 	mc := s.converter
 	want += mc.ownerBytes
 	r := s.limit

@@ -346,32 +346,18 @@ func polynomialRenameFixture(t *testing.T) (*MultivariatePolynomialManager, *Pol
 	return m, &p
 }
 
-func TestMonomialUnitConsumedDropSourceStopAndOwningAbort(t *testing.T) {
+func TestMonomialUnitNativeRecycleDuringFinalization(t *testing.T) {
 	m := monomialFixture(t)
 	b := m.memory.Budget()
 	unit := m.unit
 	b.FailAfter(0)
-	cause := m.SourceFinalize()
-	if !numericPhysicalReservationRefusal(cause) || !m.unitDropConsumed || m.unitDropCause != cause || m.sourceStage != 0 || m.unit != unit {
-		t.Fatal("actual unit DEC then ID-recycle reservation refusal", cause, m.unitDropConsumed, m.sourceStage, m.unit)
-	}
-	l, e := m.location(unit)
-	serviceMust(t, e)
-	rc, e := m.allocator.ReadUint32(l.raw, 0)
-	serviceMust(t, e)
-	if rc != 0 || l.stage != 1 {
-		t.Fatal("consumed last decrement not retained", rc, l.stage)
+	serviceMust(t, m.SourceFinalize())
+	b.FailAfter(-1)
+	if _, e := m.location(unit); e == nil {
+		t.Fatal("unit remained live after finalization")
 	}
 	monomialPhysicalAudit(t, m)
-	before := m.memory.State()
-	if m.SourceFinalize() != cause || m.memory.State() != before {
-		t.Fatal("source retried consumed unit decrement")
-	}
-	b.FailAfter(-1)
 	serviceMust(t, m.CloseChecked())
-	if m.sourceStage != 0 || m.unitDropCause != cause {
-		t.Fatal("owning abort rewrote stopped source frontier")
-	}
 }
 
 func TestPolynomialDerivativeNumericPendingIdentity(t *testing.T) {

@@ -20,7 +20,7 @@ func TestSATClauseNativeIDFreeListAndLIFO(t *testing.T) {
 	id, err := a.ID(first)
 	satOK(t, err)
 	satOK(t, a.Delete(first))
-	if a.ids.FreeLen() != 1 || a.Stats().IDFreeBytes != uint64(a.ids.FreeCapacity())*4 {
+	if a.ids.FreeLen() != 1 || a.Stats().IDFreeBytes != 0 {
 		t.Fatal("native free-ID storage", a.ids.FreeLen(), a.Stats())
 	}
 	second, err := a.MkClause([]Literal{0, 2, 4}, false)
@@ -38,7 +38,7 @@ func TestSATClauseNativeIDFreeListAndLIFO(t *testing.T) {
 	}
 }
 
-func TestSATClauseNativeIDRecycleRefusalKeepsClauseThenOOMSkips(t *testing.T) {
+func TestSATClauseNativeIDRecycleUnderRefusedArena(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
 	r, err := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b})
 	satOK(t, err)
@@ -47,16 +47,9 @@ func TestSATClauseNativeIDRecycleRefusalKeepsClauseThenOOMSkips(t *testing.T) {
 	c, err := a.MkClause([]Literal{0, 2, 4}, false)
 	satOK(t, err)
 	b.FailAfter(0)
-	err = a.Delete(c)
-	var failure umemory.Failure
-	if !errors.As(err, &failure) || failure.Kind != umemory.FailureMemout || !r.State().OutOfMemory || !a.IsLive(c) || a.ids.FreeLen() != 0 {
-		t.Fatal("recycle-before-release prefix", err, r.State(), a.ids.FreeLen())
-	}
-	// Sticky source OOM skips free-list publication on retry, then permits the
-	// clause's physical storage to be released.
 	satOK(t, a.Delete(c))
-	if a.IsLive(c) || a.ids.FreeLen() != 0 {
-		t.Fatal("OOM skip changed native free list")
+	if a.IsLive(c) || a.ids.FreeLen() != 1 || r.State().OutOfMemory {
+		t.Fatal("native recycle charged arena", r.State(), a.ids.FreeLen())
 	}
 	b.FailAfter(-1)
 	satOK(t, a.Close())

@@ -1,22 +1,18 @@
 // Source: src/math/polynomial/polynomial.cpp:810-851.
 package polynomial
 
-import (
-	"testing"
-)
+import "testing"
 
-func TestMonomialUnitSourceStoppedCauseDoesNotRepeatDEC(t *testing.T) {
+func TestMonomialUnitNativeRecycleFinalizationIsIdempotent(t *testing.T) {
 	m := monomialFixture(t)
 	b := m.memory.Budget()
 	b.FailAfter(0)
-	defer b.FailAfter(-1)
-	cause := m.SourceFinalize()
-	if !numericPhysicalReservationRefusal(cause) {
-		t.Fatal("actual ID recycle reservation", cause)
-	}
+	serviceMust(t, m.SourceFinalize())
 	monomialPhysicalAudit(t, m)
 	before := m.memory.State()
-	if retry := m.SourceFinalize(); retry != cause || m.memory.State() != before {
-		t.Fatal("source replayed actual consumed unit DEC", cause, retry, before, m.memory.State())
+	serviceMust(t, m.SourceFinalize())
+	if m.memory.State() != before {
+		t.Fatal("finalization repeated unit destruction")
 	}
+	b.FailAfter(-1)
 }

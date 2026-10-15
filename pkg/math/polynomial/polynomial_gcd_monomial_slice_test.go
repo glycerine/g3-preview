@@ -49,7 +49,7 @@ func TestPolynomialGCDNativeMonomialSliceOwnsDuplicateReferences(t *testing.T) {
 	}
 }
 
-func TestPolynomialGCDNativeMonomialSliceGeneratedOwnershipAndStoppedReset(t *testing.T) {
+func TestPolynomialGCDNativeMonomialSliceGeneratedOwnershipAndReset(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	c := full.core
 	_, e := c.monomials.MkVar()
@@ -60,36 +60,20 @@ func TestPolynomialGCDNativeMonomialSliceGeneratedOwnershipAndStoppedReset(t *te
 	a, e := c.generatedVariable(0, 17)
 	serviceMust(t, e)
 	if !c.generatedActive {
-		t.Fatal("fixture did not create a new monomial")
+		t.Fatal("fixture did not create monomial")
 	}
 	serviceMust(t, b.push(c, a))
 	if c.generatedActive {
-		t.Fatal("slice failed to accept generated ownership")
-	}
-	refs, e := c.monomialRefCount(a)
-	serviceMust(t, e)
-	if refs != 1 {
-		t.Fatal("generated monomial reference count", refs)
-	}
-	if c.monomials.ids.FreeCapacity() != 0 {
-		t.Fatal("fixture already warmed ID recycling")
+		t.Fatal("slice did not acquire ownership")
 	}
 	c.integer.Budget().FailAfter(0)
-	cause := b.reset(c, false)
-	if !numericPhysicalReservationRefusal(cause) || !b.dropping || b.cursor != 0 || len(b.values) != 1 {
-		t.Fatal("last-reference destruction did not retain its stopped cleanup", cause, b)
-	}
-	stats, used := c.memory.Stats(), c.integer.Budget().Used()
-	if retry := b.reset(c, false); retry != cause || c.memory.Stats() != stats || c.integer.Budget().Used() != used {
-		t.Fatal("source retry crossed the monomial destructor stop", retry, cause)
-	}
+	serviceMust(t, b.reset(c, false))
 	c.integer.Budget().FailAfter(-1)
-	serviceMust(t, b.close(c, true))
-	if b.values != nil || b.dropping {
-		t.Fatal("owning cleanup retained stopped monomial")
+	if len(b.values) != 0 || b.dropping {
+		t.Fatal("native recycle interrupted reset", b)
 	}
 	if _, e := c.monomials.location(a); e == nil {
-		t.Fatal("last monomial reference was not destroyed")
+		t.Fatal("last monomial reference survived reset")
 	}
 	serviceMust(t, b.close(c, true))
 }

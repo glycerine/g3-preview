@@ -91,7 +91,7 @@ func newSATClauseAllocator(c satClauseAllocatorConfig, tmp bool) (*ClauseAllocat
 		b.Release(n)
 		return nil, e
 	}
-	a := &ClauseAllocator{origin: id, storage: store, budget: b, ids: idgen.NewBudgeted(0, b, c.OutOfMemory), oomRuntime: c.OOMRuntime, ownerBytes: n, temporary: tmp}
+	a := &ClauseAllocator{origin: id, storage: store, budget: b, ids: idgen.New(0, c.OutOfMemory), oomRuntime: c.OOMRuntime, ownerBytes: n, temporary: tmp}
 	a.self = a
 	return a, nil
 }
@@ -992,13 +992,13 @@ func (a *ClauseAllocator) Stats() satClauseAllocatorStats {
 	if a == nil {
 		return satClauseAllocatorStats{}
 	}
-	return satClauseAllocatorStats{OwnerBytes: a.ownerBytes, IDFreeBytes: uint64(a.ids.FreeCapacity()) * 4, WideDirectoryBytes: a.largeDirectory, WidePayloadBytes: a.largeBytes, SmallBytes: a.storage.Stats()}
+	return satClauseAllocatorStats{OwnerBytes: a.ownerBytes, WideDirectoryBytes: a.largeDirectory, WidePayloadBytes: a.largeBytes, SmallBytes: a.storage.Stats()}
 }
 func (w satWatched) NotEqual(v satWatched) bool { return !w.Equal(v) }
 
 // The source memory OOM check precedes free-list access. Standalone allocators
 // use their supplied callback; solver allocators borrow the one Runtime state
-// provider and apply its failure transport when typed slice growth is refused.
+// provider; native ID slice growth does not request arena storage.
 func (a *ClauseAllocator) recycleID(id uint32) error {
 	if a.oomRuntime != nil {
 		if _, e := a.oomRuntime.AllocationSize(); e != nil {

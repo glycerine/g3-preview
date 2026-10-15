@@ -1,11 +1,6 @@
 package ast
 
-import (
-	"errors"
-	"testing"
-
-	"github.com/glycerine/g3/pkg/arena"
-)
+import "testing"
 
 func TestASTExprMapReplacementReleasesOldBeforePublishingNew(t *testing.T) {
 	m := astTestManager(t)
@@ -16,31 +11,16 @@ func TestASTExprMapReplacementReleasesOldBeforePublishingNew(t *testing.T) {
 	s, err := NewASTExprMapWithProofs(m, false)
 	astTestMust(t, err)
 	astTestMust(t, s.Insert(key, old, ASTHandle{}))
-	oldRef, err := m.internal(old)
-	astTestMust(t, err)
-	m.ExprIDs.Cleanup(m.ExprIDs.Range())
-	if m.ExprIDs.FreeCapacity() != 0 {
-		t.Fatal("fixture must reach the first source ID recycle allocation")
-	}
 	m.Budget().FailAfter(0)
-	err = s.Insert(key, incoming, ASTHandle{})
+	astTestMust(t, s.Insert(key, incoming, ASTHandle{}))
 	m.Budget().FailAfter(-1)
-	if !errors.Is(err, arena.ErrInjectedFailure) {
-		t.Fatalf("old-value deletion refusal: %v", err)
-	}
-	k, err := m.internal(key)
+	got, _, found, err := s.Get(key)
 	astTestMust(t, err)
-	entry := s.entries[k]
-	_, err = m.internal(old)
-	if err == nil || entry.value != oldRef || entry.valueOwned {
-		t.Fatalf("source old pointer must remain unpublished after its DEC: entry=%+v, old error=%v", entry, err)
+	if !found || got != incoming || len(s.pending) != 0 {
+		t.Fatal("native replacement did not publish incoming value", got, found, s.pending)
 	}
-	if len(s.pending) != 1 {
-		t.Fatalf("incoming acquired reference must have an owning cleanup receipt: %d", len(s.pending))
-	}
-	astTestMust(t, s.Reset())
-	if rc, err := m.GetRefCount(incoming); err != nil || rc != 1 {
-		t.Fatalf("incoming reference cleanup: rc=%d, err=%v", rc, err)
+	if _, err := m.internal(old); err == nil {
+		t.Fatal("old value survived replacement")
 	}
 	astTestMust(t, s.Close())
 	astTestMust(t, m.DecRef(key))
@@ -62,28 +42,16 @@ func TestASTExprMapProofReplacementReleasesOldBeforePublishingNew(t *testing.T) 
 	s, err := NewASTExprMapWithProofs(m, true)
 	astTestMust(t, err)
 	astTestMust(t, s.Insert(key, value, old))
-	oldRef, err := m.internal(old)
-	astTestMust(t, err)
-	m.ExprIDs.Cleanup(m.ExprIDs.Range())
 	m.Budget().FailAfter(0)
-	err = s.Insert(key, value, incoming)
+	astTestMust(t, s.Insert(key, value, incoming))
 	m.Budget().FailAfter(-1)
-	if !errors.Is(err, arena.ErrInjectedFailure) {
-		t.Fatalf("old-proof deletion refusal: %v", err)
-	}
-	k, err := m.internal(key)
+	gotValue, gotProof, found, err := s.Get(key)
 	astTestMust(t, err)
-	entry := s.entries[k]
-	_, err = m.internal(old)
-	if err == nil || entry.proof != oldRef || entry.proofOwned {
-		t.Fatalf("source old proof must remain unpublished after its DEC: entry=%+v, old error=%v", entry, err)
+	if !found || gotValue != value || gotProof != incoming || len(s.pending) != 0 {
+		t.Fatal("native replacement did not publish incoming proof", gotValue, gotProof, found, s.pending)
 	}
-	if len(s.pending) != 1 {
-		t.Fatalf("incoming proof reference needs an owning cleanup receipt: %d", len(s.pending))
-	}
-	astTestMust(t, s.Reset())
-	if rc, err := m.GetRefCount(incoming); err != nil || rc != 1 {
-		t.Fatalf("incoming proof reference cleanup: rc=%d, err=%v", rc, err)
+	if _, err := m.internal(old); err == nil {
+		t.Fatal("old proof survived replacement")
 	}
 	astTestMust(t, s.Close())
 	astTestMust(t, m.DecRef(incoming))

@@ -54,7 +54,7 @@ func TestASTArithmeticSourceRegistrationAndDeclarations(t *testing.T) {
 
 func TestASTArithmeticSourceEveryRegistrationReservation(t *testing.T) {
 	sy, q, _ := astTestOwners(t)
-	success, published := false, false
+	success := false
 	for ordinal := int64(0); ordinal < 1024; ordinal++ {
 		b := arena.NewBudget(1 << 30)
 		m, e := NewASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b})
@@ -68,7 +68,6 @@ func TestASTArithmeticSourceEveryRegistrationReservation(t *testing.T) {
 			if !errors.Is(e, arena.ErrInjectedFailure) {
 				t.Fatal(ordinal, e)
 			}
-			published = published || m.arithmeticPlugin != nil
 			if p := m.arithmeticPlugin; p != nil {
 				if !m.pluginAt(p.family).present || !p.published || p.bodyCause != e {
 					t.Fatal("published slot retained before failed set_manager", ordinal)
@@ -93,8 +92,8 @@ func TestASTArithmeticSourceEveryRegistrationReservation(t *testing.T) {
 			break
 		}
 	}
-	if !success || !published {
-		t.Fatal(success, published)
+	if !success {
+		t.Fatal(success)
 	}
 }
 

@@ -231,7 +231,7 @@ func polynomialNewtonPhysicalWithExtra(t *testing.T, m *MultivariatePolynomialCo
 	if uint32(len(raw))+za.Chunks+za.DirectObjects+za.PendingBlocks+ma.Chunks+ma.DirectObjects+ma.PendingBlocks != m.memory.Stats().LiveBlocks {
 		t.Fatal("unnamed Runtime root", len(raw), za, ma, m.memory.Stats())
 	}
-	bytes := uint64(m.ids.FreeCapacity()+mm.ids.FreeCapacity())*4 + integerActualOwnedBytes(z) + m.header + mm.header + ma.TotalBytes
+	bytes := integerActualOwnedBytes(z) + m.header + mm.header + ma.TotalBytes
 	if !m.modular.Closed() {
 		bytes += m.modular.Header
 	}

@@ -14,56 +14,21 @@ type Generator struct {
 	next        uint32
 	free        []uint32
 	outOfMemory func() bool
-	budget      *arena.Budget
 }
 
 func New(start uint32, outOfMemory func() bool) Generator {
 	return Generator{next: start, outOfMemory: outOfMemory}
 }
 
-// NewBudgeted charges free-list backing storage to budget. The generator's
-// inline metadata belongs to its enclosing owner and is charged there.
-func NewBudgeted(start uint32, budget *arena.Budget, outOfMemory func() bool) Generator {
-	return Generator{next: start, budget: budget, outOfMemory: outOfMemory}
-}
-
-func freeGrowth(old uint32) (uint32, error) {
-	var next uint32
-	if old == 0 {
-		next = 2
-	} else {
-		next = (3*old + 1) >> 1
-		oldBytes := 4*old + 8
-		newBytes := 4*next + 8
-		if next <= old || newBytes <= oldBytes {
-			return 0, arena.ErrBounds
-		}
-	}
-	if uint64(next)*4 > uint64(^uint(0)>>1) {
-		return 0, arena.ErrBounds
-	}
-	return next, nil
-}
-
-// Reserve ensures that at least needed released IDs can be retained. A
-// successful growth prefix remains available if a later growth fails.
+// Reserve ensures that at least needed released IDs can be retained.
 func (g *Generator) Reserve(needed uint32) error {
-	if uint64(cap(g.free)) > math.MaxUint32 {
+	if uint64(needed) > uint64(^uint(0)>>1) {
 		return arena.ErrBounds
 	}
-	for uint64(cap(g.free)) < uint64(needed) {
-		capacity, err := freeGrowth(uint32(cap(g.free)))
-		if err != nil {
-			return err
-		}
-		if err = g.budget.Reserve(uint64(capacity) * 4); err != nil {
-			return err
-		}
-		next := make([]uint32, len(g.free), capacity)
+	if int(needed) > cap(g.free) {
+		next := make([]uint32, len(g.free), int(needed))
 		copy(next, g.free)
-		oldBytes := uint64(cap(g.free)) * 4
 		g.free = next
-		g.budget.Release(oldBytes)
 	}
 	return nil
 }
@@ -88,9 +53,6 @@ func (g *Generator) Recycle(id uint32) error {
 	if uint64(len(g.free)) >= math.MaxUint32 {
 		return arena.ErrBounds
 	}
-	if err := g.Reserve(uint32(len(g.free)) + 1); err != nil {
-		return err
-	}
 	g.free = append(g.free, id)
 	return nil
 }
@@ -102,14 +64,12 @@ func (g *Generator) Reset(start uint32) {
 
 func (g *Generator) Cleanup(start uint32) {
 	g.next = start
-	g.budget.Release(uint64(cap(g.free)) * 4)
 	g.free = nil
 }
 
-func (g *Generator) Range() uint32         { return g.next }
-func (g *Generator) FreeCapacity() int     { return cap(g.free) }
-func (g *Generator) FreeLen() int          { return len(g.free) }
-func (g *Generator) Budget() *arena.Budget { return g.budget }
+func (g *Generator) Range() uint32     { return g.next }
+func (g *Generator) FreeCapacity() int { return cap(g.free) }
+func (g *Generator) FreeLen() int      { return len(g.free) }
 func (g *Generator) IsOutOfMemory() bool {
 	return g.outOfMemory != nil && g.outOfMemory()
 }
