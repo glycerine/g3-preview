@@ -398,12 +398,6 @@ func (m *RationalManager) modWithAllocationContext(a, b, out *Rational, context 
 	}
 	return m.resetDenominator(out)
 }
-func (m *RationalManager) IDivToInt(a, b *Rational, out *Int) error {
-	return m.integerOp(a, b, out, qIntegerDiv)
-}
-func (m *RationalManager) MachineIDivToInt(a, b *Rational, out *Int) error {
-	return m.integerOp(a, b, out, qIntegerMachineDiv)
-}
 func (m *RationalManager) RemToInt(a, b *Rational, out *Int) error {
 	return m.integerOp(a, b, out, qIntegerRem)
 }

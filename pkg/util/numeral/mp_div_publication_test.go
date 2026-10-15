@@ -226,6 +226,9 @@ func TestDivisionPublicationFractionalIntegerForwardProfiles(t *testing.T) {
 	for _, sync := range []bool{false, true} {
 		for op := 0; op < 4; op++ {
 			for _, integerOut := range []bool{false, true} {
+				if integerOut && op < 2 {
+					continue
+				}
 				m, _ := rationalManager(t, sync)
 				a, b, out := NewRational(), NewRational(), NewRational()
 				qopsMust(t, m.SetFraction(&a, 5, 2))
@@ -235,10 +238,6 @@ func TestDivisionPublicationFractionalIntegerForwardProfiles(t *testing.T) {
 				var e error
 				if integerOut {
 					switch op {
-					case 0:
-						e = m.IDivToInt(&a, &b, &z)
-					case 1:
-						e = m.MachineIDivToInt(&a, &b, &z)
 					case 2:
 						e = m.RemToInt(&a, &b, &z)
 					case 3:
@@ -487,6 +486,9 @@ func TestDivisionPublicationIntegerForwardRawSignsAliases(t *testing.T) {
 				for op := 0; op < 4; op++ {
 					for alias := 0; alias < 4; alias++ {
 						for _, intOut := range []bool{false, true} {
+							if intOut && op < 2 {
+								continue
+							}
 							a := Rational{Num: NewInt(x), Den: NewInt(-2)}
 							b := Rational{Num: NewInt(y), Den: NewInt(3)}
 							out := NewRational()
@@ -511,10 +513,6 @@ func TestDivisionPublicationIntegerForwardRawSignsAliases(t *testing.T) {
 							var e error
 							if intOut {
 								switch op {
-								case 0:
-									e = m.IDivToInt(left, right, zdst)
-								case 1:
-									e = m.MachineIDivToInt(left, right, zdst)
 								case 2:
 									e = m.RemToInt(left, right, zdst)
 								case 3:

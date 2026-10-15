@@ -160194,19 +160194,9 @@
           ]
         },
         {
-          "name": "idiv/machine_idiv(mpq,mpq,mpz)",
-          "status": "ported",
-          "go_target": "pkg/util/numeral/mpq_ops.go",
-          "tests": [
-            "TestRationalOpsSourceTst9All24Assertions",
-            "TestRationalOpsMixedFiniteOraclesAndAliases",
-            "TestRationalOpsFusedAllOutputAliases",
-            "TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks",
-            "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
-            "TestRationalOpsSourceComponentAliasActionOrder",
-            "TestRationalOpsLargeLimbScratchBranchesAndWarm",
-            "TestRationalOpsAllPredictableFailurePrefixes"
-          ]
+          "name": "idiv/machine_idiv(mpq,mpq,mpz) integer-output overloads have no retained production caller",
+          "status": "reference_only",
+          "tests": []
         },
         {
           "name": "rem/mod(mpq,mpq,mpq)",
