@@ -19,6 +19,7 @@ type wellSortedWarning struct {
 	text                    string
 	app, decl, actual, want ASTHandle
 	argument                uint32
+	traceArity              bool
 }
 
 // IsWellSorted checks the retained expression graph in source child-before-
@@ -51,8 +52,11 @@ func (m *ASTManager) isWellSorted(h ASTHandle, warnings *diagnostic.WarningServi
 	defer func() {
 		m.mu.Unlock()
 		for _, warning := range emitted {
+			if warning.traceArity {
+				resultErr = errors.Join(resultErr, m.traceWellSortedArity(warning.app, c, p, g))
+			}
 			message := warning.text
-			if warning.app != (ASTHandle{}) && c != nil {
+			if warning.argument != 0 && c != nil {
 				var e error
 				message, e = m.wellSortedMismatchWarning(warning, c, p, g)
 				if e != nil {
@@ -149,7 +153,7 @@ func (m *ASTManager) isWellSorted(h ASTHandle, warnings *diagnostic.WarningServi
 				return false, err
 			}
 			if a.count != d.arity && !flags.LeftAssociative && !flags.RightAssociative {
-				emitted = append(emitted, wellSortedWarning{text: "unexpected number of arguments."})
+				emitted = append(emitted, wellSortedWarning{text: "unexpected number of arguments.", app: m.external(r), traceArity: true})
 				valid = false
 				continue
 			}

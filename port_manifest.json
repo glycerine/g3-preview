@@ -30621,8 +30621,8 @@
       "component": "ast",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/ast/ast_well_sorted.go", "pkg/tactic/tactic_goal.go"],
-      "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder", "TestASTWellSortedApplicationGuardBranches"],
+      "go_targets": ["pkg/ast/ast_well_sorted.go", "pkg/ast/ast_well_sorted_warning.go", "pkg/ast/ast_well_sorted_trace.go", "pkg/tactic/tactic_goal.go"],
+      "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder", "TestASTWellSortedApplicationGuardBranches", "TestASTWellSortedSourceMismatchPrinter", "TestASTWellSortedWrongAritySourceTraceBeforeWarning"],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
@@ -30631,10 +30631,16 @@
           "status": "partial",
           "go_target": "pkg/ast/ast_well_sorted.go",
           "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder", "TestASTWellSortedApplicationGuardBranches"]
+        },
+        {
+          "name": "well_sorted_proc app wrong-arity ws TRACE before warning (well_sorted.cpp:49); selected Boolean SMT2 expression profile",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_well_sorted_trace.go",
+          "tests": ["TestASTWellSortedWrongAritySourceTraceBeforeWarning"]
         }
       ],
       "ownership": [],
-      "deviations": ["Native Go slice and map replace the source expression-visitor stack and shared-node marks. The quantifier and arity warnings are exact; sort-mismatch diagnostics still lack the source mk_ll_pp/mk_pp text and ws/tc trace output. Direct API/cmd-context callers remain open. Malformed-app branches are tested through temporary internal test-node mutation because public factories refuse them."]
+      "deviations": ["Native Go slice and map replace the source expression-visitor stack and shared-node marks. The quantifier and arity warnings and selected source sort-mismatch diagnostics are present. The ws trace uses the selected Boolean SMT2 printer; non-Boolean app profiles and tc trace remain open. Direct API/cmd-context callers remain open. Malformed-app branches are tested through temporary internal test-node mutation because public factories refuse them."]
     },
     {
       "path": "src/ast/well_sorted.h",
@@ -179661,7 +179667,8 @@
         "pkg/tactic/aig/aig_expr_cache_trace.go",
         "pkg/tactic/aig/aig_goal_conversion_trace.go",
         "pkg/tactic/aig/aig_max_sharing_trace.go",
-        "pkg/tactic/aig/aig_and_trace.go"
+        "pkg/tactic/aig/aig_and_trace.go",
+        "pkg/ast/ast_well_sorted_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -179739,7 +179746,8 @@
         "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
         "TestAIGMaxSharingTryingTraceAllFourReassociationBranches",
         "TestAIGGoalConversionMissingCacheConditionalTrace",
-        "TestAIGMkAndSourceTraceOriginalOperandsAndResult"
+        "TestAIGMkAndSourceTraceOriginalOperandsAndResult",
+        "TestASTWellSortedWrongAritySourceTraceBeforeWarning"
       ],
       "conditionals": [
         {
@@ -181160,6 +181168,12 @@
           "tests": ["TestAIGDeletionTraceSourceCascadeOrderAndCompileGate"]
         },
         {
+          "name": "Selected well_sorted_proc wrong-arity ws TRACE before warning with Boolean SMT2 expression (well_sorted.cpp:49); wider expression profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_well_sorted_trace.go",
+          "tests": ["TestASTWellSortedWrongAritySourceTraceBeforeWarning"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -181249,7 +181263,8 @@
         "pkg/tactic/aig/aig_expr_cache_trace.go",
         "pkg/tactic/aig/aig_goal_conversion_trace.go",
         "pkg/tactic/aig/aig_max_sharing_trace.go",
-        "pkg/tactic/aig/aig_and_trace.go"
+        "pkg/tactic/aig/aig_and_trace.go",
+        "pkg/ast/ast_well_sorted_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -181325,7 +181340,8 @@
         "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
         "TestAIGMaxSharingTryingTraceAllFourReassociationBranches",
         "TestAIGGoalConversionMissingCacheConditionalTrace",
-        "TestAIGMkAndSourceTraceOriginalOperandsAndResult"
+        "TestAIGMkAndSourceTraceOriginalOperandsAndResult",
+        "TestASTWellSortedWrongAritySourceTraceBeforeWarning"
       ],
       "conditionals": [
         {
@@ -182744,6 +182760,12 @@
           "status": "ported",
           "go_target": "pkg/tactic/aig/aig_delete_trace.go",
           "tests": ["TestAIGDeletionTraceSourceCascadeOrderAndCompileGate"]
+        },
+        {
+          "name": "Selected well_sorted_proc wrong-arity ws TRACE before warning with Boolean SMT2 expression (well_sorted.cpp:49); wider expression profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_well_sorted_trace.go",
+          "tests": ["TestASTWellSortedWrongAritySourceTraceBeforeWarning"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
