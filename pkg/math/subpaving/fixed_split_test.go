@@ -97,7 +97,7 @@ func TestSubpavingFixedMidpointSourceCasesAndNoInterior(t *testing.T) {
 		t.Fatal(err)
 	}
 	left, right, err := ctx.SplitMidpoint(root, 0, true, 1)
-	if !errors.Is(err, ErrFixedSplitNoInterior) || left == nil || right == nil || root.children != 2 || left.trail != root.trail || right.trail != root.trail {
+	if !errors.Is(err, ErrFixedSplitNoInterior) || !errors.Is(err, ErrSubpavingFailure) || left == nil || right == nil || root.children != 2 || left.trail != root.trail || right.trail != root.trail {
 		t.Fatalf("unrepresentable midpoint: left=%v right=%v children=%d err=%v", left, right, root.children, err)
 	}
 	if err := right.Close(); err != nil {

@@ -121,6 +121,16 @@ func TestFixedCoreTacticBorrowedGoalPrintStatisticsAndCleanup(t *testing.T) {
 	if err := core.CollectStatistics(st); err != nil || st.Size() != 2 || st.Key(0) != "new bounds" || st.UintValue(0) != 1 || st.Key(1) != "nodes" || st.UintValue(1) != 1 {
 		t.Fatal("source core statistics", err)
 	}
+	m.ResourceLimit().Cancel()
+	if got, err := core.ApplyWithOutput(goal, &out); got != nil {
+		t.Fatal("canceled result", got, err)
+	} else {
+		var tacticErr goaltactic.TacticException
+		if !errors.As(err, &tacticErr) || tacticErr.Message() != "canceled" {
+			t.Fatal("source cancellation exception translation", err)
+		}
+	}
+	m.ResourceLimit().ResetCancel()
 	if err := pc.SetBoolName(&p, &printKey, false); err != nil {
 		t.Fatal(err)
 	}
@@ -156,6 +166,139 @@ func TestFixedCoreTacticBorrowedGoalPrintStatisticsAndCleanup(t *testing.T) {
 	st.Reset()
 	if err := core.CollectStatistics(st); err != nil || st.Size() != 0 {
 		t.Fatal("outer reset", err)
+	}
+	if err := q.SetString(&value, "18446744073709551617"); err != nil {
+		t.Fatal(err)
+	}
+	large, err := m.ArithmeticNumeral(&value, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	product, err := m.MkFamilyApp(family, 9, nil, []ast.ASTHandle{large, x})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := q.SetString(&value, "0"); err != nil {
+		t.Fatal(err)
+	}
+	zero, err := m.ArithmeticNumeral(&value, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sum, err := m.MkFamilyApp(family, 6, nil, []ast.ASTHandle{product, zero})
+	if err != nil {
+		t.Fatal(err)
+	}
+	inexact, err := m.MkFamilyApp(family, 2, nil, []ast.ASTHandle{sum, two})
+	if err != nil {
+		t.Fatal(err)
+	}
+	badGoal, err := goaltactic.NewGoal(m, false, false, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := badGoal.Assert(inexact); err != nil {
+		t.Fatal(err)
+	}
+	badCore, err := NewFixedCoreTactic(m, numbers, qm, pc, &p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, err := badCore.Apply(badGoal); got != nil {
+		t.Fatal("inexact coefficient returned a goal", got, err)
+	} else {
+		var tacticErr goaltactic.TacticException
+		if !errors.As(err, &tacticErr) || tacticErr.Message() != "failed to internalize goal into subpaving module" {
+			t.Fatal("source inexact-coefficient translation", err)
+		}
+	}
+	if err := badGoal.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err := badCore.Close(); err != nil {
+		t.Fatal(err)
+	}
+	splitParams, err := pc.NewValue()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := pc.Assign(&splitParams, &p); err != nil {
+		t.Fatal(err)
+	}
+	if err := pc.SetUIntName(&splitParams, &depthKey, 1); err != nil {
+		t.Fatal(err)
+	}
+	realSort, err := m.MkFamilySort(family, 0, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	realName, err := sy.Intern("xr")
+	if err != nil {
+		t.Fatal(err)
+	}
+	xr, err := m.MkConst(realName, realSort)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := q.SetString(&value, "0"); err != nil {
+		t.Fatal(err)
+	}
+	zeroBound, err := m.ArithmeticNumeral(&value, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := q.SetString(&value, "1/4294967296"); err != nil {
+		t.Fatal(err)
+	}
+	tinyBound, err := m.ArithmeticNumeral(&value, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if text, _, matched, err := m.ArithmeticNumeralText(tinyBound); err != nil || !matched || text != "1/4294967296" {
+		t.Fatal("tiny rational AST numeral", text, matched, err)
+	}
+	lower, err := m.MkFamilyApp(family, 3, nil, []ast.ASTHandle{xr, zeroBound})
+	if err != nil {
+		t.Fatal(err)
+	}
+	upper, err := m.MkFamilyApp(family, 2, nil, []ast.ASTHandle{xr, tinyBound})
+	if err != nil {
+		t.Fatal(err)
+	}
+	splitGoal, err := goaltactic.NewGoal(m, false, false, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := splitGoal.Assert(lower); err != nil {
+		t.Fatal(err)
+	}
+	if err := splitGoal.Assert(upper); err != nil {
+		t.Fatal(err)
+	}
+	splitCore, err := NewFixedCoreTactic(m, numbers, qm, pc, &splitParams)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, err := splitCore.Apply(splitGoal); got != nil {
+		var observed bytes.Buffer
+		if shell, shellErr := splitCore.engine.Shell(); shellErr == nil {
+			_ = shell.DisplayBounds(&observed)
+		}
+		t.Fatal("failed split returned a goal", got, err, observed.String())
+	} else {
+		var tacticErr goaltactic.TacticException
+		if !errors.As(err, &tacticErr) || tacticErr.Message() != "failed building subpaving tree..." {
+			t.Fatal("source split exception translation", err)
+		}
+	}
+	if err := splitGoal.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err := splitCore.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err := pc.Del(&splitParams); err != nil {
+		t.Fatal(err)
 	}
 	owned, err := NewFixedCoreTacticOwned(m, pc, &p)
 	if err != nil {

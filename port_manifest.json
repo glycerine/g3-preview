@@ -53367,7 +53367,7 @@
           "name": "Concrete config_mpfx breadth-first loop, cancellation phases, node limit and context-owned child retirement (subpaving_t_def.h:1806-1843)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/fixed_search.go",
-          "tests": ["TestFixedSearchBreadthFirstCancellationAndOwnedChildren", "TestFixedSearchStopsAtSourceNodeLimit"]
+          "tests": ["TestFixedSearchBreadthFirstCancellationAndOwnedChildren", "TestFixedSearchStopsAtSourceNodeLimit", "TestFixedSearchRetainsRefusedSplitChildrenForClose"]
         }
       ],
       "ownership": [
@@ -54494,10 +54494,10 @@
           "tests": ["TestHardwareMidpointSplitSourceBoundsTrace", "TestHardwareMidpointSplitTraceRefusalKeepsChildren", "TestHardwareMidpointSplitTracePrinterFailureKeepsChildren"]
         },
         {
-          "name": "Concrete config_mpfx midpoint child construction before local numeral allocation and arithmetic, with both children retained on no-interior refusal (subpaving_t_def.h:198-239)",
+          "name": "Concrete config_mpfx midpoint child construction before local numeral allocation and arithmetic, with both children retained and source subpaving::exception classification on no-interior refusal (subpaving_t_def.h:198-239)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_split.go",
-          "tests": ["TestSubpavingFixedMidpointSourceCasesAndNoInterior", "TestFixedMidpointSplitSourceBoundsTrace"]
+          "tests": ["TestSubpavingFixedMidpointSourceCasesAndNoInterior", "TestFixedMidpointSplitSourceBoundsTrace", "TestFixedSearchRetainsRefusedSplitChildrenForClose", "TestFixedCoreTacticBorrowedGoalPrintStatisticsAndCleanup"]
         },
         {
           "name": "Concrete config_mpfx midpoint split child-bound TRACE after both decision bounds (subpaving_t_def.h:243-246)",
@@ -55229,7 +55229,7 @@
           "status": "partial",
           "go_target": "pkg/math/subpaving/tactic/fixed_core_tactic.go",
           "go_targets": ["pkg/math/subpaving/tactic/fixed_variable_display.go"],
-          "tests": ["TestFixedCoreTacticBorrowedGoalPrintStatisticsAndCleanup"]
+          "tests": ["TestFixedCoreTacticBorrowedGoalPrintStatisticsAndCleanup", "TestFixedCoreTacticRationalProcessBindingAndRefusedOwners"]
         },
         {
           "name": "MPFF core tactic outer catch converts a retained z3_exception message into a fresh tactic_exception after process failure (subpaving_tactic.cpp:245-261)",

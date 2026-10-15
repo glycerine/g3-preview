@@ -9,7 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-var ErrFixedSplitNoInterior = errors.New("subpaving: no representable strict midpoint")
+var ErrFixedSplitNoInterior error = &sourceFailure{message: "subpaving: no representable strict midpoint"}
 
 // SplitMidpoint creates both children before midpoint arithmetic, as in the
 // source. The caller owns returned children even when later arithmetic fails.
