@@ -76,6 +76,9 @@ func (s *solverSetup) applySolutionOnce(x uint32, target *equation,
 	if !minus {
 		return arena.ErrInvalidSlot
 	}
+	if e = s.traceApplyBefore(a1, sol, target); e != nil {
+		return e
+	}
 	if e = s.addmulInt(target.as, target.xs, a1, sol.as, sol.xs,
 		s.tmpAs, &s.tmpXs, updateOcc, updateQueue, eqIndex, exceptVar); e != nil {
 		return e
@@ -90,6 +93,9 @@ func (s *solverSetup) applySolutionOnce(x uint32, target *equation,
 		return e
 	}
 	target.xs, s.tmpXs = s.tmpXs, target.xs
+	if e = s.traceApplyAfter(target); e != nil {
+		return e
+	}
 	if e = s.addmulRational(target.bs, target.js, a1, sol.bs, sol.js, s.tmpBs, &s.tmpXs); e != nil {
 		return e
 	}

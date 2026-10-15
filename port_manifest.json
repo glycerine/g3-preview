@@ -34746,6 +34746,8 @@
         "pkg/math/euclid/addmul.go",
         "pkg/math/euclid/addmul_test.go",
         "pkg/math/euclid/apply_solution.go",
+        "pkg/math/euclid/apply_solution_trace.go",
+        "pkg/math/euclid/apply_solution_trace_test.go",
         "pkg/math/euclid/apply_solution_test.go",
         "pkg/math/euclid/normalize.go",
         "pkg/math/euclid/normalize_test.go",
@@ -34780,6 +34782,7 @@
         "TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue",
         "TestEuclideanRationalAddmulMergedJustifications",
         "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
+        "TestEuclideanApplySolutionTraceBeforeAndAfterIntegerSwap",
         "TestEuclideanAssertEquationNormalizeAndOccurrences",
         "TestEuclideanNormalizeUnitGCDPreservesEquation",
         "TestEuclideanConstantOnlyTrivialAndContradictoryEquations",
@@ -34925,8 +34928,10 @@
           "name": "solved-equation ownership transfer and apply_solution sorted-row substitution with newly exposed solved-variable queue work at cpp:422-461,615-618",
           "status": "partial",
           "go_target": "pkg/math/euclid/apply_solution.go",
+          "go_targets": ["pkg/math/euclid/apply_solution_trace.go"],
           "tests": [
             "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
+            "TestEuclideanApplySolutionTraceBeforeAndAfterIntegerSwap",
             "TestEuclideanNormalizeQuerySubstitutionPublishesConstantBeforeRationalRefusal"
           ]
         },
@@ -177163,6 +177168,7 @@
       "go_targets": [
         "pkg/util/diagnostic/util_trace_tags.go",
         "pkg/math/euclid/normalize_query_trace.go",
+        "pkg/math/euclid/apply_solution_trace.go",
         "pkg/api/api_trace.go",
         "pkg/util/numeral/mpff_round_trace.go",
         "pkg/util/numeral/mpff_power_trace.go",
@@ -177225,6 +177231,7 @@
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
         "TestEuclideanNormalizeQueryTraceBeforeAndAfterSubstitution",
+        "TestEuclideanApplySolutionTraceBeforeAndAfterIntegerSwap",
         "TestTraceHeaderSourceInsertionRefusalPrefixes",
         "TestTraceShortBodyFailureSkipsSourceFlush",
         "TestTraceConditionalOperandFailureSkipsFooterAndFlush",
@@ -178503,6 +178510,12 @@
           "tests": ["TestEuclideanNormalizeQueryTraceBeforeAndAfterSubstitution"]
         },
         {
+          "name": "Reached Euclidean apply_solution pre-substitution and post-integer-swap TRACE rows (euclidean_solver.cpp:436,444)",
+          "status": "ported",
+          "go_target": "pkg/math/euclid/apply_solution_trace.go",
+          "tests": ["TestEuclideanApplySolutionTraceBeforeAndAfterIntegerSwap"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -178524,6 +178537,7 @@
       "go_targets": [
         "pkg/util/diagnostic/util_trace_tags.go",
         "pkg/math/euclid/normalize_query_trace.go",
+        "pkg/math/euclid/apply_solution_trace.go",
         "pkg/api/api_trace.go",
         "pkg/util/numeral/mpff_round_trace.go",
         "pkg/util/numeral/mpff_power_trace.go",
@@ -178586,6 +178600,7 @@
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
         "TestEuclideanNormalizeQueryTraceBeforeAndAfterSubstitution",
+        "TestEuclideanApplySolutionTraceBeforeAndAfterIntegerSwap",
         "TestTraceHeaderSourceInsertionRefusalPrefixes",
         "TestTraceShortBodyFailureSkipsSourceFlush",
         "TestTraceConditionalOperandFailureSkipsFooterAndFlush",
@@ -179874,6 +179889,12 @@
           "status": "ported",
           "go_target": "pkg/math/euclid/normalize_query_trace.go",
           "tests": ["TestEuclideanNormalizeQueryTraceBeforeAndAfterSubstitution"]
+        },
+        {
+          "name": "Reached Euclidean apply_solution pre-substitution and post-integer-swap TRACE rows (euclidean_solver.cpp:436,444)",
+          "status": "ported",
+          "go_target": "pkg/math/euclid/apply_solution_trace.go",
+          "tests": ["TestEuclideanApplySolutionTraceBeforeAndAfterIntegerSwap"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

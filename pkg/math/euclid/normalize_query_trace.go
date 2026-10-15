@@ -10,10 +10,7 @@ import (
 )
 
 func (s *solverSetup) traceNormalizeRow(line int, heading string, as []numeral.Int, xs []uint32) error {
-	tags := s.trace
-	if tags == nil {
-		tags = diagnostic.BorrowProcessTraceTags()
-	}
+	tags := s.traceTags()
 	if !tags.ShouldTrace("euclidean_solver") {
 		return nil
 	}
@@ -21,19 +18,35 @@ func (s *solverSetup) traceNormalizeRow(line int, heading string, as []numeral.I
 	_ = tags.EmitConditional("euclidean_solver", "normalize", "src/math/euclid/euclidean_solver.cpp", line,
 		func() bool { return true }, func(w io.Writer) error {
 			_, _ = io.WriteString(w, heading)
-			for i := range as {
-				value, err := s.manager.Integers().String(&as[i])
-				if err != nil {
-					formatErr = err
-					return err
-				}
-				_, _ = io.WriteString(w, value)
-				_, _ = io.WriteString(w, "*x")
-				_, _ = io.WriteString(w, strconv.FormatUint(uint64(xs[i]), 10))
-				_, _ = io.WriteString(w, " ")
+			if err := s.writeTraceIntRow(w, as, xs); err != nil {
+				formatErr = err
+				return err
 			}
 			_, _ = io.WriteString(w, "\n")
 			return nil
 		})
 	return formatErr
+}
+
+func (s *solverSetup) traceTags() *diagnostic.TraceTags {
+	if s.trace != nil {
+		return s.trace
+	}
+	return diagnostic.BorrowProcessTraceTags()
+}
+
+// writeTraceIntRow evaluates each source numeral conversion even if the
+// borrowed ostream has already refused an insertion.
+func (s *solverSetup) writeTraceIntRow(w io.Writer, as []numeral.Int, xs []uint32) error {
+	for i := range as {
+		value, err := s.manager.Integers().String(&as[i])
+		if err != nil {
+			return err
+		}
+		_, _ = io.WriteString(w, value)
+		_, _ = io.WriteString(w, "*x")
+		_, _ = io.WriteString(w, strconv.FormatUint(uint64(xs[i]), 10))
+		_, _ = io.WriteString(w, " ")
+	}
+	return nil
 }
