@@ -38,7 +38,7 @@ func (m *Manager) traceImpDeallocated() {
 		return
 	}
 	_ = tags.EmitConditional("memory", "deallocate", "src/util/memory_manager.cpp", 204,
-		func() bool { return !tags.MemoryFinalizing() }, func(w io.Writer) error {
+		func() bool { return !m.memoryFinalizing(tags) }, func(w io.Writer) error {
 			_, _ = io.WriteString(w, "dealloc "+fmt.Sprintf("%p", m.managerImp)+" src/tactic/aig/aig.cpp:1688\n")
 			return nil
 		})
