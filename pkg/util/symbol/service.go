@@ -6,6 +6,8 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+	"github.com/glycerine/g3/pkg/util/memory"
 )
 
 var ErrServiceOwner = errors.New("g3: invalid symbol service owner")
@@ -19,6 +21,8 @@ type Service struct {
 	self       *Service
 	config     Config
 	manager    *Manager
+	trace      *diagnostic.TraceTags
+	process    *memory.ProcessAccounting
 	ownerBytes uint64
 	closed     bool
 }
@@ -48,7 +52,9 @@ func (s *Service) InitializeSource() error {
 	if s.manager != nil {
 		return nil
 	}
-	m, e := NewManager(s.config)
+	c := s.config
+	c.onAllocated = s.traceAllocated
+	m, e := NewManager(c)
 	if e != nil {
 		return e
 	}
@@ -63,6 +69,7 @@ func (s *Service) FinalizeSource() error {
 		if e := s.manager.Close(); e != nil {
 			return e
 		}
+		s.traceDeallocated(s.manager)
 		s.manager = nil
 	}
 	return nil

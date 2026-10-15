@@ -63,7 +63,8 @@ type Token struct{ symbol Symbol }
 func (s Symbol) Token() Token { return Token{symbol: s} }
 
 type Config struct {
-	Budget *arena.Budget
+	Budget      *arena.Budget
+	onAllocated func(*Manager)
 	// Debug is borrowed for reached source assertions; the caller keeps it alive.
 	Debug *diagnostic.DebugContext
 	// Legacy arena geometry is ignored: spellings use Go-managed storage.
@@ -120,7 +121,12 @@ func NewManager(c Config) (*Manager, error) {
 			break
 		}
 	}
-	return &Manager{byText: make(map[string]uint32), Budget: c.Budget, debug: c.Debug, owner: owner}, nil
+	m := &Manager{Budget: c.Budget, debug: c.Debug, owner: owner}
+	if c.onAllocated != nil {
+		c.onAllocated(m) // source alloc(internal_symbol_table) precedes member construction
+	}
+	m.byText = make(map[string]uint32)
+	return m, nil
 }
 
 // BindDebug borrows the generated process assertion owner after the symbol

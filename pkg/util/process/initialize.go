@@ -99,6 +99,12 @@ func InitializeGenerated(c InitializationConfig, maxSize uint64) (*Initialized, 
 	if err = c.Rational.InitializeSource(); err != nil {
 		return result, err
 	}
+	if err = c.Symbols.BindMemoryProcess(p); err != nil {
+		return result, err
+	}
+	if err = c.Symbols.BindTrace(c.Trace); err != nil {
+		return result, err
+	}
 	if err = c.Symbols.InitializeSource(); err != nil {
 		return result, err
 	}
