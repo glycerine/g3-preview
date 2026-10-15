@@ -50,6 +50,9 @@ func (c *HardwareContext) AssertUnitClauses(n *HardwareNode) error {
 			return err
 		}
 		unit := c.unitClauses[c.unitHead]
+		if err := c.traceInitialUnit(unit.atom, unit.axiom); err != nil {
+			return err
+		}
 		reason := hardwareReasonAssumption
 		if unit.axiom {
 			reason = hardwareReasonAxiom
@@ -59,6 +62,12 @@ func (c *HardwareContext) AssertUnitClauses(n *HardwareNode) error {
 			return err
 		}
 		c.unitHead++
+	}
+	if !c.initUnitBoundsTraced {
+		if err := c.traceInitialBounds(n, "bounds after init\n", 1785); err != nil {
+			return err
+		}
+		c.initUnitBoundsTraced = true
 	}
 	return nil
 }
