@@ -56780,6 +56780,7 @@
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
         "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose",
+        "TestModelEvaluatorImpMemoryTraceFailedConstructionOwnedClose",
         "TestModelEvaluatorSharedProcessMemoryAndCohort",
         "TestModelEvaluatorConstantCompletionAndBooleanReduction",
         "TestModelEvaluatorFunctionEntriesMacrosAndCompletion",
@@ -56848,7 +56849,8 @@
           "status": "platform_replacement",
           "go_target": "pkg/model/model_evaluator_memory_trace.go",
           "tests": [
-            "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose"
+            "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose",
+            "TestModelEvaluatorImpMemoryTraceFailedConstructionOwnedClose"
           ]
         },
         {
@@ -150512,6 +150514,7 @@
         "TestRuntimeUint32AcrossInitializationBitmapBoundary",
         "TestASTDeclCollectorDependencySetMemoryTrace",
         "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose",
+        "TestModelEvaluatorImpMemoryTraceFailedConstructionOwnedClose",
         "TestTraceTagTableAllocationFollowsSourceGate",
         "TestTraceTagTableFinalizationSuppressesMemoryDuringProcessFinalize",
         "TestDebugTableMemoryTraceFollowsLazyLifetime",
@@ -150663,7 +150666,8 @@
           "status": "platform_replacement",
           "go_target": "pkg/model/model_evaluator_memory_trace.go",
           "tests": [
-            "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose"
+            "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose",
+            "TestModelEvaluatorImpMemoryTraceFailedConstructionOwnedClose"
           ]
         },
         {
@@ -151215,6 +151219,7 @@
       "tests": [
         "TestASTDeclCollectorDependencySetMemoryTrace",
         "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose",
+        "TestModelEvaluatorImpMemoryTraceFailedConstructionOwnedClose",
         "TestTraceTagTableAllocationFollowsSourceGate",
         "TestTraceTagTableFinalizationSuppressesMemoryDuringProcessFinalize",
         "TestDebugTableMemoryTraceFollowsLazyLifetime",
@@ -151356,7 +151361,8 @@
           "status": "platform_replacement",
           "go_target": "pkg/model/model_evaluator_memory_trace.go",
           "tests": [
-            "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose"
+            "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose",
+            "TestModelEvaluatorImpMemoryTraceFailedConstructionOwnedClose"
           ]
         },
         {

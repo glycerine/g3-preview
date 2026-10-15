@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/model"
@@ -40,5 +41,28 @@ func TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose(t *testing.T) {
 		record("deallocate", 204, 531, "dealloc "+id+"/1 src/model/model_evaluator.cpp:")
 	if got := output.String(); got != want {
 		t.Fatalf("source evaluator imp records:\n got %q\nwant %q", got, want)
+	}
+}
+
+func TestModelEvaluatorImpMemoryTraceFailedConstructionOwnedClose(t *testing.T) {
+	m, md, _, _, _, config := evaluatorFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("memory")
+	config.Trace = tags
+	// The evaluator header is the first reached reservation; the next one
+	// fails inside imp construction after its source allocation record.
+	m.Budget().FailAfter(1)
+	ev, err := model.NewModelEvaluator(md.Core(), config)
+	m.Budget().FailAfter(-1)
+	if ev == nil || err == nil {
+		t.Fatalf("expected named partial evaluator after imp construction refusal: owner=%p err=%v", ev, err)
+	}
+	astTestMust(t, ev.Close())
+	id := fmt.Sprintf("%p", ev)
+	if strings.Count(output.String(), "alloc "+id+"/0 src/model/model_evaluator.cpp:523 imp ") != 1 ||
+		!strings.Contains(output.String(), "dealloc "+id+"/0 src/model/model_evaluator.cpp:531\n") ||
+		strings.Count(output.String(), "dealloc ") != 1 {
+		t.Fatalf("failed constructor allocation/owning cleanup: %q", output.String())
 	}
 }
