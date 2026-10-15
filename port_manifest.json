@@ -119361,8 +119361,8 @@
           ]
         },
         {
-          "name": "model2mc buffer<symbol> copy, sixteen inline entries, doubling spill and destruction",
-          "status": "ported",
+          "name": "model2mc borrowed label snapshot and append use a native Go symbol slice",
+          "status": "platform_replacement",
           "go_target": "pkg/tactic/tactic_stored_model.go",
           "tests": [
             "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",

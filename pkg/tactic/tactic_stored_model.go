@@ -10,19 +10,6 @@ import (
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-// Model2mc copies labels rather than retaining the caller's slice; applying
-// labels appends without clearing the destination.
-type tacticStoredLabelBuffer struct{ values []usymbol.Symbol }
-
-func (b *tacticStoredLabelBuffer) push(value usymbol.Symbol) error {
-	b.values = append(b.values, value)
-	return nil
-}
-func (b *tacticStoredLabelBuffer) close() {
-	clear(b.values)
-	b.values = nil
-}
-
 // Original model2mc's ownership/application portion. The stored value currently
 // exposes model_core through the original derived lifetime dispatch;
 // display and AST translation remain required; this wrapper
@@ -30,7 +17,7 @@ func (b *tacticStoredLabelBuffer) close() {
 type tacticStoredModelConverter struct {
 	tacticConverterBase
 	model  ModelRef
-	labels tacticStoredLabelBuffer
+	labels []usymbol.Symbol
 }
 
 func NewStoredModel(md *model.ModelCore) (ModelConverter, error) {
@@ -55,11 +42,9 @@ func newTacticStoredModelWithLabels(md *model.ModelCore, labels []usymbol.Symbol
 	if err = c.model.Set(md); err != nil {
 		return nil, err
 	}
-	for _, label := range labels {
-		if err = c.labels.push(label); err != nil {
-			return nil, err
-		}
-	}
+	// Copy the source values so later changes to the caller's slice cannot
+	// change the converter's labels.
+	c.labels = append(c.labels, labels...)
 	return c, nil
 }
 func (c *tacticStoredModelConverter) ApplyModel(out *ModelRef, _ uint32) error {
@@ -78,7 +63,7 @@ func (c *tacticStoredModelConverter) ApplyLabels(out *ModelLabels, _ uint32) err
 	if out == nil {
 		return ErrModelConverterOwner
 	}
-	for _, label := range c.labels.values {
+	for _, label := range c.labels {
 		if e := out.Append(label); e != nil {
 			return e
 		}
@@ -93,8 +78,9 @@ func (c *tacticStoredModelConverter) Close() error {
 	if c.closed {
 		return nil
 	}
-	// Reverse member destruction: label buffer, then owning model reference.
-	c.labels.close()
+	// Clear labels before releasing the older owning model reference.
+	clear(c.labels)
+	c.labels = nil
 	if e := c.model.Close(); e != nil {
 		return e
 	}
