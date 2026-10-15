@@ -51599,6 +51599,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_shell_coefficients.go",
           "tests": ["TestFixedEngineSelectedOwnerUpdateAndRefusal"]
+        },
+        {
+          "name": "Concrete context_mpfx_wrapper display_constraints and display_bounds forwarding (subpaving.cpp:49,56)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_shell_coefficients.go",
+          "tests": ["TestFixedDisplayConstraintsSourceDefinitionsAndClause", "TestFixedDisplayBoundsSearchOrderAndWriterPrefixes"]
         }
       ],
       "ownership": [
@@ -54768,6 +54774,12 @@
           "tests": [
             "TestFastDisplayBoundsLeavesConflictAndWriterPrefixes"
           ]
+        },
+        {
+          "name": "Concrete config_mpfx definition, clause and consistent leaf-bound display with source fixed-rational spelling and writer prefixes (subpaving_t_def.h:254-281,636-650,1135-1156,1848-1861)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_display.go",
+          "tests": ["TestFixedDisplayConstraintsSourceDefinitionsAndClause", "TestFixedDisplayBoundsSearchOrderAndWriterPrefixes"]
         },
         {
           "name": "Concrete config_mpff round-robin variable selector after latest child axiom (src/math/subpaving/subpaving_t_def.h:66-101)",

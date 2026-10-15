@@ -77,6 +77,7 @@ func NewFixedNode(m *numeral.FixedPointManager, variables uint32, parent *FixedN
 		n.context = parent.context
 		if n.context != nil {
 			n.context.numNodes++
+			n.context.nodes = append(n.context.nodes, n)
 		}
 		n.conflictVar = parent.conflictVar
 		n.inconsistent = parent.inconsistent

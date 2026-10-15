@@ -25,6 +25,7 @@ type FixedContext struct {
 	cooperation      *cooperate.Cooperation
 	isInt            []bool
 	root             *FixedNode
+	nodes            []*FixedNode
 	epsilon          *numeral.FixedPoint
 	maxBound         *numeral.FixedPoint
 	minusMaxBound    *numeral.FixedPoint
@@ -97,6 +98,7 @@ func (c *FixedContext) newRoot() error {
 	}
 	c.root = root
 	root.context = c
+	c.nodes = []*FixedNode{root}
 	c.numNodes = 1
 	return nil
 }
@@ -261,6 +263,7 @@ func (c *FixedContext) Close() error {
 	c.queue = nil
 	c.queueHead = 0
 	c.leafQueue = nil
+	c.nodes = nil
 	c.searchNode = nil
 	c.displayVariable = nil
 	c.trace = nil

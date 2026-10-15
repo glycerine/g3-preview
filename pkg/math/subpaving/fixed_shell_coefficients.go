@@ -4,6 +4,7 @@ package subpaving
 
 import (
 	"errors"
+	"io"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/control"
@@ -217,6 +218,20 @@ func (w *FixedShellCoefficients) CollectStatistics(st *statistics.Statistics) er
 		return err
 	}
 	return w.context.CollectStatistics(st)
+}
+
+func (w *FixedShellCoefficients) DisplayConstraints(out io.Writer, useStar bool) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.DisplayConstraints(out, useStar)
+}
+
+func (w *FixedShellCoefficients) DisplayBounds(out io.Writer) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.DisplayBounds(out)
 }
 
 // Close retires z2, z1, the vector in ascending element order, and the
