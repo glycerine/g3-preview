@@ -32,7 +32,9 @@ func newAPIASTMapObject(c *apiContextResults) (*apiASTMapObject, error) {
 	if e := c.manager.Budget().Reserve(n); e != nil {
 		return nil, e
 	}
-	a := &apiASTMapObject{entries: make(map[ast.ASTHandle]*apiASTMapEntry)}
+	a := &apiASTMapObject{}
+	c.traceASTMapAllocated(a, n)
+	a.entries = make(map[ast.ASTHandle]*apiASTMapEntry)
 	a.object = apiObject{context: c, destructor: a, ownerBytes: n}
 	a.object.self = &a.object
 	id, e := c.addObject(&a.object)

@@ -3557,10 +3557,13 @@
       "status": "partial",
       "go_targets": [
         "pkg/api/api_ast_map_object.go",
+        "pkg/api/api_ast_map_memory_trace.go",
+        "pkg/api/api_ast_map_memory_trace_debug_test.go",
         "pkg/api/api_ast_map_object_test.go",
         "pkg/api/api_ast_map_replacement_order_test.go"
       ],
       "tests": [
+        "TestAPIASTMapSourceMemoryWrapperReleaseSites",
         "TestAPIASTMapConcreteReferenceCleanup",
         "TestAPIASTMapResetNativeIDRecycleWithoutBackingReservation",
         "TestAPIASTMapExpressionPairTransfer"
@@ -3574,6 +3577,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Z3_ast_map_ref allocation debug memory wrapper at api_ast_map.cpp:37",
+          "status": "platform_replacement",
+          "go_target": "pkg/api/api_ast_map_memory_trace.go",
+          "tests": [
+            "TestAPIASTMapSourceMemoryWrapperReleaseSites"
+          ]
+        },
         {
           "name": "context-owned AST map construction, contains, find, insert, erase, reset, size and borrowed key snapshot",
           "status": "partial",
@@ -3751,10 +3762,12 @@
       "status": "partial",
       "go_targets": [
         "pkg/api/api_context_results.go",
+        "pkg/api/api_ast_map_memory_trace.go",
         "pkg/api/api_goal_object.go",
         "pkg/api/api_trace.go"
       ],
       "tests": [
+        "TestAPIASTMapSourceMemoryWrapperReleaseSites",
         "TestAPIContextResultsExplicitReferencesAndAlias",
         "TestAPIContextResultsAutomaticReferencesAllASTKinds",
         "TestAPIContextObjectReferenceAssignmentAndRecycledIDs",
@@ -3779,7 +3792,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "AST-map wrapper deallocation debug memory records at context.cpp:54 and 116",
+          "status": "platform_replacement",
+          "go_target": "pkg/api/api_ast_map_memory_trace.go",
+          "tests": [
+            "TestAPIASTMapSourceMemoryWrapperReleaseSites"
+          ]
+        }
+      ],
       "ownership": [
         "API context result and automatic AST trails now own concrete native []ASTHandle backing. Each append acquires one AST reference; explicit single-result replacement retains the incoming alias across reset. Cleanup retires each consumed DEC before returning a destructor error and preserves only unread roots for retry. Close releases both backing slices. Only the real context cold header is reserved; no ASTRefVector wrapper, encoded vector record/payload or backing-growth reservation remains in these callers. A 4097-entry duplicate-root fixture checks actual reference counts, both result modes, reset/close and native growth under FailAfter0. See PORT_PROGRESS.md#native-api-context-result-roots."
       ],
@@ -151118,6 +151140,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/diagnostic/util_memory_runtime.go",
+        "pkg/api/api_ast_map_memory_trace.go",
+        "pkg/api/api_ast_map_memory_trace_debug_test.go",
         "pkg/ast/ast_sort_dependency_memory_trace.go",
         "pkg/model/model_evaluator_memory_trace.go",
         "pkg/model/model_evaluator_memory_trace_debug_test.go",
@@ -151186,6 +151210,7 @@
         "pkg/tactic/aig/aig_imp_memory_trace.go"
       ],
       "tests": [
+        "TestAPIASTMapSourceMemoryWrapperReleaseSites",
         "TestRuntimeUint32AcrossInitializationBitmapBoundary",
         "TestASTDeclCollectorDependencySetMemoryTrace",
         "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose",
@@ -151346,6 +151371,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained API AST-map allocation and both context deallocation debug wrappers at api_ast_map.cpp:37 and api_context.cpp:54,116, with concrete Go header extent and process-finalizing guard",
+          "status": "platform_replacement",
+          "go_target": "pkg/api/api_ast_map_memory_trace.go",
+          "tests": [
+            "TestAPIASTMapSourceMemoryWrapperReleaseSites"
+          ]
+        },
         {
           "name": "Retained lazy format_decl_plugin allocation at format.cpp:105 and registry-order deletion at ast.cpp:1412 through debug memory wrappers",
           "status": "platform_replacement",
@@ -151952,6 +151985,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/diagnostic/util_memory_runtime.go",
+        "pkg/api/api_ast_map_memory_trace.go",
+        "pkg/api/api_ast_map_memory_trace_debug_test.go",
         "pkg/ast/ast_sort_dependency_memory_trace.go",
         "pkg/model/model_evaluator_memory_trace.go",
         "pkg/model/model_evaluator_memory_trace_debug_test.go",
@@ -152015,6 +152050,7 @@
         "pkg/tactic/aig/aig_imp_memory_trace.go"
       ],
       "tests": [
+        "TestAPIASTMapSourceMemoryWrapperReleaseSites",
         "TestASTDeclCollectorDependencySetMemoryTrace",
         "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose",
         "TestModelEvaluatorImpMemoryTraceFailedConstructionOwnedClose",
@@ -152164,6 +152200,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained API AST-map allocation and both context deallocation debug wrappers at api_ast_map.cpp:37 and api_context.cpp:54,116, with concrete Go header extent and process-finalizing guard",
+          "status": "platform_replacement",
+          "go_target": "pkg/api/api_ast_map_memory_trace.go",
+          "tests": [
+            "TestAPIASTMapSourceMemoryWrapperReleaseSites"
+          ]
+        },
         {
           "name": "Concrete model_evaluator::imp allocation/replacement/destruction debug wrappers at model_evaluator.cpp:523,556-557,531 with Go evaluator owner/generation identity, header extent and process-finalizing guard (memory_manager.cpp:202-211)",
           "status": "platform_replacement",

@@ -8,6 +8,9 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+	"github.com/glycerine/g3/pkg/util/memory"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/insdict"
 )
 
@@ -28,6 +31,9 @@ type apiContextResults struct {
 	objects                       []*apiObject
 	freeIDs                       []uint32
 	ownerBytes                    uint64
+	trace                         *diagnostic.TraceTags
+	memoryProcess                 *memory.ProcessAccounting
+	pendingDestroyLine            int
 	userRefCount, closing, closed bool
 }
 
@@ -54,8 +60,13 @@ func newAPIContextResults(m *ast.ASTManager, rc bool) (c *apiContextResults, err
 	if err = m.Budget().Reserve(n); err != nil {
 		return nil, err
 	}
-	c = &apiContextResults{manager: m, userRefCount: rc, ownerBytes: n}
+	c = &apiContextResults{manager: m, userRefCount: rc, ownerBytes: n, trace: diagnostic.BorrowProcessTraceTags()}
 	c.self = c
+	if g := uparams.BorrowProcessGlobalParamsService(); g != nil && g.Context != nil && g.Symbols == m.Symbols && g.Config.Budget == m.BudgetField {
+		if q := g.Context.Numerals(); q != nil && q.RuntimeOwner() != nil {
+			c.memoryProcess = q.RuntimeOwner().ProcessOwner()
+		}
+	}
 	return c, nil
 }
 
@@ -216,18 +227,24 @@ func (c *apiContextResults) delObject(o *apiObject) error {
 		return e
 	}
 	c.pendingDestroy = o
+	c.pendingDestroyLine = 54
 	c.allocated.Del(o.id)
-	return c.destroyObject(o)
+	return c.destroyObject(o, 54)
 }
 
-func (c *apiContextResults) destroyObject(o *apiObject) error {
+func (c *apiContextResults) destroyObject(o *apiObject, line int) error {
 	c.pendingDestroy = o
+	c.pendingDestroyLine = line
 	if e := o.destroy(); e != nil {
 		c.pendingDestroy = o
 		return e
 	}
+	if a, ok := o.destructor.(*apiASTMapObject); ok {
+		c.traceASTMapDeallocated(a, line)
+	}
 	c.objects[o.id] = nil
 	c.pendingDestroy = nil
+	c.pendingDestroyLine = 0
 	return nil
 }
 
@@ -283,7 +300,7 @@ func (c *apiContextResults) Close() error {
 	}
 	c.closing = true
 	if c.pendingDestroy != nil {
-		if e := c.destroyObject(c.pendingDestroy); e != nil {
+		if e := c.destroyObject(c.pendingDestroy, c.pendingDestroyLine); e != nil {
 			return e
 		}
 	}
@@ -307,7 +324,7 @@ func (c *apiContextResults) Close() error {
 		o := c.objects[id]
 		c.pendingDestroy = o
 		c.allocated.Del(id)
-		if err := c.destroyObject(o); err != nil {
+		if err := c.destroyObject(o, 116); err != nil {
 			return err
 		}
 	}
