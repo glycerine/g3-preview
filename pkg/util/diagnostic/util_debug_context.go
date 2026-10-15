@@ -31,6 +31,7 @@ type DebugContext struct {
 	region           *arena.BytesRegion
 	assertionStreams *MemoryStandardStreams
 	assertionActions *DebugActionContext
+	memoryTrace      *TraceTags
 	assertions       bool
 	ownerBytes       uint64
 	closed           bool
@@ -78,7 +79,9 @@ func (d *DebugContext) EnableDebug(tag string) error {
 		return e
 	}
 	if d.Tags == nil {
-		d.Tags = make(map[string]struct{})
+		fresh := make(map[string]struct{})
+		d.traceDebugTableAllocated()
+		d.Tags = fresh
 	}
 	d.Tags[debugTagName(tag)] = struct{}{}
 	return nil
@@ -88,7 +91,9 @@ func (d *DebugContext) DisableDebug(tag string) error {
 		return e
 	}
 	if d.Tags == nil {
-		d.Tags = make(map[string]struct{})
+		fresh := make(map[string]struct{})
+		d.traceDebugTableAllocated()
+		d.Tags = fresh
 	}
 	delete(d.Tags, debugTagName(tag))
 	return nil
@@ -98,7 +103,9 @@ func (d *DebugContext) IsDebugEnabled(tag string) (bool, error) {
 		return false, e
 	}
 	if d.Tags == nil {
-		d.Tags = make(map[string]struct{})
+		fresh := make(map[string]struct{})
+		d.traceDebugTableAllocated()
+		d.Tags = fresh
 	}
 	_, ok := d.Tags[debugTagName(tag)]
 	return ok, nil
@@ -110,7 +117,11 @@ func (d *DebugContext) FinalizeDebug() error {
 	if e := d.open(); e != nil {
 		return e
 	}
+	if d.Tags == nil {
+		return nil
+	}
 	d.Tags = nil
+	d.traceDebugTableDeallocated()
 	return nil
 }
 func (d *DebugContext) Close() error {

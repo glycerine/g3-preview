@@ -120733,6 +120733,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/diagnostic/util_debug_context.go",
+        "pkg/util/diagnostic/util_debug_table_memory_trace.go",
+        "pkg/util/process/initialize.go",
         "pkg/util/diagnostic/util_debug_context_test.go",
         "pkg/util/heap/heap.go",
         "pkg/util/diagnostic/util_debug_notification.go",
@@ -120749,6 +120751,8 @@
         "pkg/util/diagnostic/numeric_char_input_tie_boundary_test.go"
       ],
       "tests": [
+        "TestDebugTableMemoryTraceFollowsLazyLifetime",
+        "TestDebugTableDeallocationSuppressesMemoryDuringProcessFinalize",
         "TestDebugNotificationExactStatementsSignedFlagsAndNoReservation",
         "TestDebugNotificationBorrowedCStringActualLifetimePrefixes",
         "TestDebugNotificationClosedFileStillReadsLaterBorrowedCondition",
@@ -120795,6 +120799,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "init_debug_table and finalize_debug memory-wrapper allocation/deallocation (debug.cpp:46-54)",
+          "status": "ported",
+          "go_target": "pkg/util/diagnostic/util_debug_table_memory_trace.go",
+          "tests": ["TestDebugTableMemoryTraceFollowsLazyLifetime", "TestDebugTableDeallocationSuppressesMemoryDuringProcessFinalize"]
+        },
         {
           "name": "Selected assertion switch, lazy debug table initialization, enable/disable/query, finalize and short-circuit CASSERT gate; whole global macro and debugger bindings remain open",
           "status": "partial",

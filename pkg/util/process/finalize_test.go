@@ -61,6 +61,12 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 	must(t, err)
 	d, err := diagnostic.NewDebugContext(region, b)
 	must(t, err)
+	priorDebugTrace := diagnostic.NewTraceTags()
+	previousTrace, err := d.BindMemoryTrace(priorDebugTrace)
+	must(t, err)
+	if previousTrace != nil {
+		t.Fatal("new debug owner unexpectedly had a trace binding")
+	}
 	previousDebug := diagnostic.BorrowProcessDebugContext()
 	previousParams := params.BorrowProcessGlobalParamsService()
 	var traceOutput bytes.Buffer
@@ -78,6 +84,11 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 	}
 	if init == nil || init.Context == nil || init.Catalog == nil || init.Globals == nil || init.Trace != tr {
 		t.Fatal("generated initialization did not publish its parameter owners")
+	}
+	previousTrace, err = d.BindMemoryTrace(tr)
+	must(t, err)
+	if previousTrace != tr {
+		t.Fatal("generated debug owner did not borrow selected trace")
 	}
 	g := init.Globals
 	if params.BorrowProcessGlobalParamsService() != g {
@@ -189,6 +200,11 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 	}
 	must(t, FinalizeGenerated(p, nil, nil, nil, nil, nil))
 	must(t, init.Close())
+	previousTrace, err = d.BindMemoryTrace(nil)
+	must(t, err)
+	if previousTrace != priorDebugTrace {
+		t.Fatal("generated close did not restore debug trace binding")
+	}
 	if params.BorrowProcessGlobalParamsService() != previousParams {
 		t.Fatal("generated close did not restore the prior process global params service")
 	}

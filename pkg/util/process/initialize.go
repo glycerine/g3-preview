@@ -35,19 +35,21 @@ type InitializationConfig struct {
 // remain with the caller. A partial result is returned with any stage error so
 // its completed Go owners can still be closed.
 type Initialized struct {
-	self           *Initialized
-	process        *memory.ProcessAccounting
-	debug          *diagnostic.DebugContext
-	rational       *numeral.RationalGlobalService
-	symbols        *symbol.Service
-	Context        *params.ParamsContext
-	Catalog        *params.GlobalParamsCatalog
-	Globals        *params.GlobalParamsService
-	Trace          *diagnostic.TraceTags
-	debugPrevious  *diagnostic.DebugContext
-	paramsPrevious *params.GlobalParamsService
-	paramsBound    bool
-	closed         bool
+	self               *Initialized
+	process            *memory.ProcessAccounting
+	debug              *diagnostic.DebugContext
+	rational           *numeral.RationalGlobalService
+	symbols            *symbol.Service
+	Context            *params.ParamsContext
+	Catalog            *params.GlobalParamsCatalog
+	Globals            *params.GlobalParamsService
+	Trace              *diagnostic.TraceTags
+	debugPrevious      *diagnostic.DebugContext
+	debugTracePrevious *diagnostic.TraceTags
+	debugTraceBound    bool
+	paramsPrevious     *params.GlobalParamsService
+	paramsBound        bool
+	closed             bool
 }
 
 // Generated mem_initialize/mem_finalize use one fixed process cohort. Keep
@@ -154,6 +156,11 @@ func InitializeGenerated(c InitializationConfig, maxSize uint64) (*Initialized, 
 	if err = result.Trace.BindMemoryProcess(p); err != nil {
 		return result, err
 	}
+	result.debugTracePrevious, err = c.Debug.BindMemoryTrace(result.Trace)
+	if err != nil {
+		return result, err
+	}
+	result.debugTraceBound = true
 	if err = result.Globals.BindNamespaceTrace(result.Trace); err != nil {
 		return result, err
 	}
@@ -217,6 +224,13 @@ func (v *Initialized) Close() error {
 			return err
 		}
 		v.Context = nil
+	}
+	if v.debugTraceBound {
+		if _, err := v.debug.BindMemoryTrace(v.debugTracePrevious); err != nil {
+			return err
+		}
+		v.debugTracePrevious = nil
+		v.debugTraceBound = false
 	}
 	if v.Trace != nil {
 		if err := v.Trace.BindMemoryProcess(nil); err != nil {
