@@ -123961,6 +123961,12 @@
           ]
         },
         {
+          "name": "SAT AMD64 Z3DEBUG last-segment clause ID-to-pointer u_map is replaced by owner- and generation-checked StoredClauseRef offsets; no physical pointer segment encoding or overflow side table remains (sat_clause.cpp:135-216)",
+          "status": "platform_replacement",
+          "go_target": "pkg/sat/sat_clause_storage.go",
+          "tests": ["TestSATClauseSourceIDsLocatorsAndDeleteFailure", "TestSATClauseNativeIDFreeListAndLIFO"]
+        },
+        {
           "name": "AST debug-ref-count deleted-ID u_map<unsigned> contains and insertion use a native uint32 set; the C++ mapped value is always zero and no iteration is reached (ast.cpp:1798,1842)",
           "status": "platform_replacement",
           "go_target": "pkg/ast/ast_core_delete.go",
@@ -149999,6 +150005,12 @@
             "TestSATSolverConsequenceNativeIndexOrderAndDeepMapCopy",
             "TestSATSolverConsequenceNativeMapGrowthAndReplacement"
           ]
+        },
+        {
+          "name": "SAT AMD64 Z3DEBUG last-segment clause ID-to-pointer u_map is replaced by owner- and generation-checked StoredClauseRef offsets; no physical pointer segment encoding or overflow side table remains (sat_clause.cpp:135-216)",
+          "status": "platform_replacement",
+          "go_target": "pkg/sat/sat_clause_storage.go",
+          "tests": ["TestSATClauseSourceIDsLocatorsAndDeleteFailure", "TestSATClauseNativeIDFreeListAndLIFO"]
         },
         {
           "name": "AST debug-ref-count deleted-ID u_map<unsigned> contains and insertion use a native uint32 set; the C++ mapped value is always zero and no iteration is reached (ast.cpp:1798,1842)",

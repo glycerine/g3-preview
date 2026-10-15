@@ -253,6 +253,15 @@ func TestSATClauseSourceIDsLocatorsAndDeleteFailure(t *testing.T) {
 	if next == r || a.IsLive(r) {
 		t.Fatal("generation")
 	}
+	if _, e = a.GetClause(off); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("reused clause ID revived a stale offset", e)
+	}
+	if e = a.Delete(r); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("reused clause ID let a stale reference delete the new clause", e)
+	}
+	if !a.IsLive(next) {
+		t.Fatal("stale deletion changed the new clause")
+	}
 	foreign := satStore(t, nil)
 	if _, e = foreign.GetClause(off); !errors.Is(e, ErrSATOwner) {
 		t.Fatal(e)
