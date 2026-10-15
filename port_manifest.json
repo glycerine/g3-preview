@@ -178232,6 +178232,12 @@
           "tests": ["TestSATConsequenceEntryAssumptionSourceTrace"]
         },
         {
+          "name": "Reached SAT fixed-literal and assumption-reason TRACE before level gate, after justification read, and after completed index-set union (sat_solver.cpp:3516,3538,3585)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_consequences_trace.go",
+          "tests": ["TestSATConsequenceExtractionSourceTrace"]
+        },
+        {
           "name": "Reached SAT missed-propagation TRACE before unreachable assertion for live empty and unit clauses (sat_solver.cpp:3061)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_probing_diagnostics_trace.go",
@@ -179547,6 +179553,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_consequences_trace.go",
           "tests": ["TestSATConsequenceEntryAssumptionSourceTrace"]
+        },
+        {
+          "name": "Reached SAT fixed-literal and assumption-reason TRACE before level gate, after justification read, and after completed index-set union (sat_solver.cpp:3516,3538,3585)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_consequences_trace.go",
+          "tests": ["TestSATConsequenceExtractionSourceTrace"]
         },
         {
           "name": "Reached SAT missed-propagation TRACE before unreachable assertion for live empty and unit clauses (sat_solver.cpp:3061)",

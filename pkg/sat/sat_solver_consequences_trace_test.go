@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 // Source: src/sat/sat_solver.cpp:3285-3297. Each antecedent row is printed
@@ -43,6 +44,48 @@ func TestSATConsequenceCoreFixupSourceTraceOrder(t *testing.T) {
 	}
 	if got := output.String(); got != want {
 		t.Fatalf("fixup trace = %q, want %q", got, want)
+	}
+}
+
+// Source: src/sat/sat_solver.cpp:3516,3538,3585. Fixed-set scanning prints
+// each literal before the level gate; reason extraction prints before and
+// after its source justification switch.
+func TestSATConsequenceExtractionSourceTrace(t *testing.T) {
+	s, _, _ := satSolverCheckFixture(t)
+	for i := 0; i < 2; i++ {
+		_, e := s.MkVar(true, true)
+		satOK(t, e)
+	}
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("sat")
+	s.traceTags = tags
+	satOK(t, s.Variables.setAssignment(0, lbool.False))
+	var lits, assumptions, unfixed satMUSLiteralSet
+	t.Cleanup(func() { lits.close(); assumptions.close(); unfixed.close() })
+	satOK(t, lits.insert(0))
+	satOK(t, lits.insert(2))
+	rows, e := newSATSolverLiteralRows(s.runtime.memory, s.budget)
+	satOK(t, e)
+	t.Cleanup(func() { satOK(t, rows.CloseChecked()) })
+	satOK(t, s.extractFixedSet(&lits, &assumptions, &unfixed, rows))
+	var indices satSolverIndexSet
+	t.Cleanup(func() { satOK(t, indices.close()) })
+	satOK(t, indices.insert(1))
+	complete, e := s.extractConsequenceAssumptions(0, &indices)
+	satOK(t, e)
+	if !complete {
+		t.Fatal("source NONE reason must finish")
+	}
+	want := ""
+	if tags.ShouldTrace("sat") {
+		want = satClauseTraceRecord("sat", "extract_fixed_consequences", "3516", "extract: 0 l_false 4294967295\n") +
+			satClauseTraceRecord("sat", "extract_fixed_consequences", "3516", "extract: 1 l_undef 4294967295\n") +
+			satClauseTraceRecord("sat", "extract_assumptions", "3538", "0 none\n") +
+			satClauseTraceRecord("sat", "extract_assumptions", "3585", "0: -0 \n")
+	}
+	if got := output.String(); got != want {
+		t.Fatalf("extraction trace = %q, want %q", got, want)
 	}
 }
 

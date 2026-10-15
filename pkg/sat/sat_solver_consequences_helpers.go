@@ -55,6 +55,7 @@ func (s *Solver) extractConsequenceAssumptions(lit Literal, target *satSolverInd
 	if e != nil {
 		return false, e
 	}
+	s.traceConsequenceReason(lit, j)
 	all := true
 	switch j.Kind() {
 	case 0:
@@ -162,6 +163,7 @@ func (s *Solver) extractConsequenceAssumptions(lit Literal, target *satSolverInd
 	default:
 		return false, ErrSATAssertion
 	}
+	s.traceConsequenceReasonResult(lit, target)
 	return all, nil
 }
 func (s *Solver) extractFixedConsequence1(lit Literal, assumptions, unfixed *satMUSLiteralSet, out *satSolverLiteralRows) (got bool, err error) {
@@ -292,6 +294,7 @@ func (s *Solver) extractFixedSet(lits, assumptions, unfixed *satMUSLiteralSet, o
 		if e != nil {
 			return e
 		}
+		s.traceExtractFixedLiteral(l)
 		level, e := s.Variables.levelVar(l.variable())
 		if e != nil {
 			return e

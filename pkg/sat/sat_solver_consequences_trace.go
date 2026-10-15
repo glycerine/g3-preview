@@ -1,8 +1,9 @@
-// Source: src/sat/sat_solver.cpp:3287,3289,3297,3307,3366; retained util/trace sites.
+// Source: src/sat/sat_solver.cpp:3287,3289,3297,3307,3366,3516,3538,3585; retained util/trace sites.
 package sat
 
 import (
 	"io"
+	"strconv"
 	"strings"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
@@ -74,6 +75,46 @@ func (s *Solver) traceConsequenceAssumptions(function string, line int, asms sat
 				b.WriteByte(' ')
 			}
 			b.WriteString(Literal(v).String())
+		}
+		b.WriteByte('\n')
+		_, _ = io.WriteString(w, b.String())
+		return nil
+	})
+}
+
+func (s *Solver) traceExtractFixedLiteral(l Literal) {
+	s.traceConsequenceRecord("extract_fixed_consequences", 3516, func(w io.Writer) error {
+		value, err := s.Variables.valueLiteral(l)
+		if err != nil {
+			return err
+		}
+		level, err := s.Variables.levelVar(l.variable())
+		if err != nil {
+			return err
+		}
+		_, _ = io.WriteString(w, "extract: "+l.String()+" "+value.String()+" "+strconv.FormatUint(uint64(level), 10)+"\n")
+		return nil
+	})
+}
+
+func (s *Solver) traceConsequenceReason(l Literal, j satJustification) {
+	s.traceConsequenceRecord("extract_assumptions", 3538, func(w io.Writer) error {
+		_, _ = io.WriteString(w, l.String()+" "+satJustificationTraceString(j)+"\n")
+		return nil
+	})
+}
+
+func (s *Solver) traceConsequenceReasonResult(l Literal, row *satSolverIndexSet) {
+	s.traceConsequenceRecord("extract_assumptions", 3585, func(w io.Writer) error {
+		if err := row.open(); err != nil {
+			return err
+		}
+		var b strings.Builder
+		b.WriteString(l.String())
+		b.WriteString(": ")
+		for key := range row.keys.All() {
+			b.WriteString(Literal(key).String())
+			b.WriteByte(' ')
 		}
 		b.WriteByte('\n')
 		_, _ = io.WriteString(w, b.String())
