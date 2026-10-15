@@ -53428,6 +53428,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_polynomial_propagate_trace.go",
           "tests": ["TestFixedPolynomialPropagationSourceTraceOrder", "TestFixedPolynomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Concrete config_mpfx monomial entry, zero/unbounded and downward TRACE sites (subpaving_t_def.h:1501,1525,1603)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_monomial_propagate_trace.go",
+          "tests": ["TestFixedMonomialPropagationSourceTrace", "TestFixedMonomialPropagationTraceRefusalAndPrinterPrefix"]
         }
       ],
       "ownership": [
@@ -54900,6 +54906,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_polynomial_propagate_trace.go",
           "tests": ["TestFixedPolynomialPropagationSourceTraceOrder", "TestFixedPolynomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Concrete config_mpfx monomial entry, zero/unbounded and downward TRACE sites (subpaving_t_def.h:1501,1525,1603)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_monomial_propagate_trace.go",
+          "tests": ["TestFixedMonomialPropagationSourceTrace", "TestFixedMonomialPropagationTraceRefusalAndPrinterPrefix"]
         },
         {
           "name": "Concrete config_mpff round-robin variable selector after latest child axiom (src/math/subpaving/subpaving_t_def.h:66-101)",
@@ -177459,6 +177471,12 @@
           "tests": ["TestFixedPolynomialPropagationSourceTraceOrder", "TestFixedPolynomialPropagationTraceRefusalAndPrinterPrefix"]
         },
         {
+          "name": "Reached config_mpfx monomial entry, zero/unbounded and downward TRACE records (subpaving_t_def.h:1501,1525,1603)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_monomial_propagate_trace.go",
+          "tests": ["TestFixedMonomialPropagationSourceTrace", "TestFixedMonomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -178377,6 +178395,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_polynomial_propagate_trace.go",
           "tests": ["TestFixedPolynomialPropagationSourceTraceOrder", "TestFixedPolynomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Reached config_mpfx monomial entry, zero/unbounded and downward TRACE records (subpaving_t_def.h:1501,1525,1603)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_monomial_propagate_trace.go",
+          "tests": ["TestFixedMonomialPropagationSourceTrace", "TestFixedMonomialPropagationTraceRefusalAndPrinterPrefix"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

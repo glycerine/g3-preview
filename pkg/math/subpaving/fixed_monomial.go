@@ -78,6 +78,9 @@ func (c *FixedContext) PropagateMonomial(variable uint32, n *FixedNode) (err err
 	if m == nil {
 		return arena.ErrInvalidSlot
 	}
+	if err = c.traceMonomialStart(variable); err != nil {
+		return err
+	}
 	m.visited = c.timestamp
 	foundZero, foundUnbounded := false, false
 	for _, power := range m.powers {
@@ -99,6 +102,9 @@ func (c *FixedContext) PropagateMonomial(variable uint32, n *FixedNode) (err err
 			return e
 		}
 		foundUnbounded = foundUnbounded || unbounded
+	}
+	if err = c.traceMonomialFlags(foundZero, foundUnbounded); err != nil {
+		return err
 	}
 	if foundZero {
 		zero, e := n.IsZero(variable)
@@ -205,6 +211,9 @@ func (c *FixedContext) propagateMonomialUpward(m *FixedMonomial, variable uint32
 }
 
 func (c *FixedContext) propagateMonomialDownward(m *FixedMonomial, variable uint32, j int, n *FixedNode) (err error) {
+	if err = c.traceMonomialDownward(variable, j); err != nil {
+		return err
+	}
 	r, err := NewFixedInterval(c.numbers)
 	if err != nil {
 		return err
