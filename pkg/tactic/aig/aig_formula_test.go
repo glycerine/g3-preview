@@ -42,6 +42,19 @@ func aigEvalASTFormula(t *testing.T, m *ast.ASTManager, h ast.ASTHandle, values 
 			out = out && child(i)
 		}
 		return out
+	case ast.ASTOpIte:
+		if n != 3 {
+			t.Fatal("ITE arity")
+		}
+		if child(0) {
+			return child(1)
+		}
+		return child(2)
+	case ast.ASTOpIff:
+		if n != 2 {
+			t.Fatal("IFF arity")
+		}
+		return child(0) == child(1)
 	}
 	t.Fatalf("unexpected output operator %d", op)
 	return false

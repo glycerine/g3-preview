@@ -98143,7 +98143,8 @@
         "pkg/tactic/aig/aig_expr.go",
         "pkg/tactic/aig/aig_goal.go",
         "pkg/tactic/aig/aig_formula.go",
-        "pkg/tactic/aig/aig_ite_shape.go"
+        "pkg/tactic/aig/aig_ite_shape.go",
+        "pkg/tactic/aig/aig_goal_formula.go"
       ],
       "tests": [
         "TestAIGCoreInterningOwnershipAndIDReuse",
@@ -98160,7 +98161,9 @@
         "TestAIGEmptyGoalIsTrue",
         "TestAIGToFormulaNaiveIterativeDeMorganAndSmartInversion",
         "TestAIGToFormulaNestedGraphAndVariableNot",
-        "TestAIGITEShapeFourSourceComplementPositions"
+        "TestAIGITEShapeFourSourceComplementPositions",
+        "TestAIGToGoalSourceRootOrderAndITE",
+        "TestAIGToGoalFlattensSingleUsePositiveAndUnderNegation"
       ],
       "conditionals": [
         {
@@ -98455,10 +98458,19 @@
         },
         {
           "name": "is_ite_core four complementary-child recognition and borrowed condition/then/else collection for optimized goal output",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/aig/aig_ite_shape.go",
           "tests": [
             "TestAIGITEShapeFourSourceComplementPositions"
+          ]
+        },
+        {
+          "name": "aig2expr optimized goal output: right-first roots, ITE/IFF reconstruction, single-use AND flattening and owning AST cache",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_goal_formula.go",
+          "tests": [
+            "TestAIGToGoalSourceRootOrderAndITE",
+            "TestAIGToGoalFlattensSingleUsePositiveAndUnderNegation"
           ]
         }
       ],
@@ -98466,7 +98478,7 @@
         "Concrete AIG manager pins each variable AST expression, owns true/false counts and interning table nodes, and recursively releases child nodes when the last AIG reference closes. AIG-to-formula cache and output own ASTRef values; stopped AST releases remain with the manager for retry."
       ],
       "deviations": [
-        "Typed Go map replaces aig_table; literal inversion is a bool rather than pointer tagging. The mk_node minimizer, both gate encodings, expression-to-AIG traversal, goal conjunction and source naive AIG-to-expression conversion are ported. ITE shape recognition is a tested prerequisite; resource checkpoints, optimized aig2expr goal rewriting and the tactic/proof/goal update paths remain unported."
+        "Typed Go map replaces aig_table; literal inversion is a bool rather than pointer tagging. The mk_node minimizer, both gate encodings, expression-to-AIG traversal, goal conjunction and source naive AIG-to-expression conversion are ported. The optimized AIG-to-goal writer now uses ITE shape recognition and source root/flattening order; resource checkpoints and tactic/proof/goal update paths remain unported."
       ]
     },
     {
@@ -98480,7 +98492,8 @@
         "pkg/tactic/aig/aig_gates.go",
         "pkg/tactic/aig/aig_expr.go",
         "pkg/tactic/aig/aig_goal.go",
-        "pkg/tactic/aig/aig_formula.go"
+        "pkg/tactic/aig/aig_formula.go",
+        "pkg/tactic/aig/aig_goal_formula.go"
       ],
       "tests": [
         "TestAIGCoreInterningOwnershipAndIDReuse",
@@ -98490,7 +98503,8 @@
         "TestAIGNarySortedFolds",
         "TestAIGExprTraversalSharedLeavesAndBooleanOperations",
         "TestAIGGoalConversionSharesExpressionCacheAndConjoins",
-        "TestAIGToFormulaNaiveIterativeDeMorganAndSmartInversion"
+        "TestAIGToFormulaNaiveIterativeDeMorganAndSmartInversion",
+        "TestAIGToGoalSourceRootOrderAndITE"
       ],
       "conditionals": [
         {
@@ -98549,13 +98563,22 @@
             "TestAIGToFormulaNaiveIterativeDeMorganAndSmartInversion",
             "TestAIGToFormulaNestedGraphAndVariableNot"
           ]
+        },
+        {
+          "name": "aig_manager to_formula(aig_ref, goal&) optimized root splitting and ITE/IFF output",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_goal_formula.go",
+          "tests": [
+            "TestAIGToGoalSourceRootOrderAndITE",
+            "TestAIGToGoalFlattensSingleUsePositiveAndUnderNegation"
+          ]
         }
       ],
       "ownership": [
         "Go Ref owns one AIG reference and closes explicitly; intermediate gate references close in reverse order, including after a refused node allocation."
       ],
       "deviations": [
-        "Goal-to-AIG conjunction, both source gate encodings and to_formula(expr_ref&) are ported; max_sharing, to_formula(goal&), display and the goal-update tactic remain unported. Resource checkpoints are not exposed."
+        "Goal-to-AIG conjunction, both source gate encodings and to_formula(expr_ref&) are ported; optimized to_formula(goal&) covers root order, ITE/IFF and flattening, while max_sharing, display, resource checkpoints and the goal-update tactic remain unported."
       ]
     },
     {
