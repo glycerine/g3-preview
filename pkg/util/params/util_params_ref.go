@@ -362,7 +362,7 @@ func (c *ParamsContext) decTracked(slot uint32, out *ParamsDecrementReceipt) err
 	// A shared scalar DEC remains defined during an interrupted live reset.
 	// The last-reference destructor would replay already-consumed source leaves;
 	// reject that invalid continuation rather than adopt its reset receipt.
-	if (b.resetActive && (b.resetKind == paramsResetLive || b.resetKind == paramsResetKey) || c.replacementFrames[slot-1].active) && b.Refs == 1 {
+	if (b.resetActive && (b.resetKind == paramsResetLive || b.resetKind == paramsResetKey) || c.replacementFrames[slot-1].active || c.SetFrames[slot-1].Active && c.SetFrames[slot-1].Published) && b.Refs == 1 {
 		return ErrParamsPrecondition
 	}
 	b.Refs--
@@ -705,14 +705,7 @@ func (c *ParamsContext) setCoreWithNumeralReceipt(slot uint32, k usymbol.Symbol,
 	}
 	if kind == ParamNumeral && x != nil {
 		if x.Kind != ParamNumeral {
-			if e := c.delEntry(x); e != nil {
-				return e
-			}
-			r, e := c.NumeralsField.NewValue()
-			if e != nil {
-				return e
-			}
-			*x = paramEntry{key: k, Kind: kind, Rat: r}
+			return c.setMatchedNewNumeral(slot, matched, k, rat)
 		}
 		if receipt != nil {
 			return c.NumeralsField.CopyWithAllocationReceipt(&x.Rat, rat, receipt)

@@ -167191,6 +167191,7 @@
         "TestParamsReferenceSetRatIndependentLocalsAndDeadDestination",
         "TestParamsReferenceSetRatAllActualCopyAndAppendPrefixes",
         "TestParamsReferenceSetRatNewEntryCleansPostphysicalCopyChild",
+        "TestParamsReferenceSetRatMatchedScalarCleansPostphysicalCopyChild",
         "TestParamsReferenceMatchedReplacementRejectsConsumedNUMReplay",
         "TestParamsReferenceMatchedReplacementSourceKindsAndLiveNoops",
         "TestParamsReferenceMatchedReplacementContextAbortDoesNotPublish",
@@ -167629,7 +167630,8 @@
             "TestParamsReferenceSetRatOwningAbortActualConsumedLeaf",
             "TestParamsReferenceSetRatIndependentLocalsAndDeadDestination",
             "TestParamsReferenceSetRatAllActualCopyAndAppendPrefixes",
-            "TestParamsReferenceSetRatNewEntryCleansPostphysicalCopyChild"
+            "TestParamsReferenceSetRatNewEntryCleansPostphysicalCopyChild",
+            "TestParamsReferenceSetRatMatchedScalarCleansPostphysicalCopyChild"
           ]
         },
         {
@@ -167637,6 +167639,12 @@
           "status": "ported",
           "go_target": "pkg/util/params/util_params_set_rat_source.go",
           "tests": ["TestParamsReferenceSetRatNewEntryCleansPostphysicalCopyChild"]
+        },
+        {
+          "name": "Concrete SET_RAT matched non-numeral replacement child postphysical receipt and owning abort (params.cpp:992-1014)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_set_rat_source.go",
+          "tests": ["TestParamsReferenceSetRatMatchedScalarCleansPostphysicalCopyChild"]
         },
         {
           "name": "selected matched SET_SIMPLE/SET_SYM NUM leaf before kind/field publication and exact explicit owning continuation",
@@ -167890,6 +167898,7 @@
         "TestParamsReferenceSetRatIndependentLocalsAndDeadDestination",
         "TestParamsReferenceSetRatAllActualCopyAndAppendPrefixes",
         "TestParamsReferenceSetRatNewEntryCleansPostphysicalCopyChild",
+        "TestParamsReferenceSetRatMatchedScalarCleansPostphysicalCopyChild",
         "TestParamsReferenceMatchedReplacementRejectsConsumedNUMReplay",
         "TestParamsReferenceMatchedReplacementSourceKindsAndLiveNoops",
         "TestParamsReferenceMatchedReplacementContextAbortDoesNotPublish",
@@ -168287,7 +168296,8 @@
             "TestParamsReferenceSetRatOwningAbortActualConsumedLeaf",
             "TestParamsReferenceSetRatIndependentLocalsAndDeadDestination",
             "TestParamsReferenceSetRatAllActualCopyAndAppendPrefixes",
-            "TestParamsReferenceSetRatNewEntryCleansPostphysicalCopyChild"
+            "TestParamsReferenceSetRatNewEntryCleansPostphysicalCopyChild",
+            "TestParamsReferenceSetRatMatchedScalarCleansPostphysicalCopyChild"
           ]
         },
         {
@@ -168295,6 +168305,12 @@
           "status": "ported",
           "go_target": "pkg/util/params/util_params_set_rat_source.go",
           "tests": ["TestParamsReferenceSetRatNewEntryCleansPostphysicalCopyChild"]
+        },
+        {
+          "name": "Concrete SET_RAT matched non-numeral replacement child postphysical receipt and owning abort (params.cpp:992-1014)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_set_rat_source.go",
+          "tests": ["TestParamsReferenceSetRatMatchedScalarCleansPostphysicalCopyChild"]
         },
         {
           "name": "selected matched SET_SIMPLE/SET_SYM NUM leaf before kind/field publication and exact explicit owning continuation",

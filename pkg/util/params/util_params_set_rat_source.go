@@ -15,6 +15,8 @@ type paramsSetFrame struct {
 	Invocation          uint64
 	Generation          uint32
 	Active, Acquired    bool
+	Published           bool
+	MatchedIndex        uint32
 	Next                paramEntry
 	Child               unumeral.RationalCopyAllocationReceipt
 }
@@ -61,6 +63,39 @@ func (c *ParamsContext) setNewNumeral(slot uint32, key usymbol.Symbol, value *un
 	frame.Active = false
 	return nil
 }
+
+// Source SET_RAT MATCH deletes the old non-numeral value before allocating
+// and copying the replacement rational at its original entry position.
+func (c *ParamsContext) setMatchedNewNumeral(slot, index uint32, key usymbol.Symbol, value *unumeral.OwnedRational) error {
+	frame := &c.SetFrames[slot-1]
+	b := &c.Blocks[slot-1]
+	if frame.Active || index >= b.Size {
+		return ErrParamsPrecondition
+	}
+	entry := c.Entry(b, index)
+	if entry.key != key || entry.Kind == ParamNumeral {
+		return ErrParamsPrecondition
+	}
+	serial, e := c.nextSourceInvocation()
+	if e != nil {
+		return e
+	}
+	if e = c.delEntry(entry); e != nil {
+		return e
+	}
+	r, e := c.NumeralsField.NewValue()
+	if e != nil {
+		return e
+	}
+	*entry = paramEntry{key: key, Kind: ParamNumeral, Rat: r}
+	*frame = paramsSetFrame{Invocation: serial, Generation: b.Generation, Active: true, Acquired: true, Published: true, MatchedIndex: index, Next: paramEntry{key: key, Kind: ParamNumeral}}
+	if e = c.NumeralsField.CopyWithAllocationReceipt(&entry.Rat, value, &frame.Child); e != nil {
+		frame.Cause = e
+		return e
+	}
+	*frame = paramsSetFrame{}
+	return nil
+}
 func (c *ParamsContext) StoppedSet(v *ParamsRef) (ParamsSetReceipt, error) {
 	if c == nil || c.Self != c {
 		return ParamsSetReceipt{}, ErrParamsOwner
@@ -99,6 +134,20 @@ func (c *ParamsContext) cleanupSetFrame(slot uint32) error {
 	if !f.Active || !f.Acquired || f.Invocation == 0 || f.Generation != c.Blocks[slot-1].Generation || f.Next.Kind != ParamNumeral {
 		return ErrParamsOwner
 	}
+	b := &c.Blocks[slot-1]
+	var owned *unumeral.OwnedRational
+	if f.Published {
+		if f.MatchedIndex >= b.Size {
+			return ErrParamsOwner
+		}
+		entry := c.Entry(b, f.MatchedIndex)
+		if entry.key != f.Next.key || entry.Kind != ParamNumeral {
+			return ErrParamsOwner
+		}
+		owned = &entry.Rat
+	} else {
+		owned = &f.Next.Rat
+	}
 	if f.Child.Active() {
 		if e := c.NumeralsField.CleanupCopyAllocation(&f.Child); e != nil {
 			if f.CleanupCause == nil {
@@ -108,15 +157,23 @@ func (c *ParamsContext) cleanupSetFrame(slot uint32) error {
 		}
 	}
 	f.Child = unumeral.RationalCopyAllocationReceipt{}
-	if e := c.NumeralsField.Del(&f.Next.Rat); e != nil {
+	if e := c.NumeralsField.Del(owned); e != nil {
 		if f.CleanupCause == nil {
 			f.CleanupCause = e
 		}
 		return e
 	}
+	if f.Published {
+		for i := f.MatchedIndex + 1; i < b.Size; i++ {
+			*c.Entry(b, i-1) = *c.Entry(b, i)
+		}
+		*c.Entry(b, b.Size-1) = paramEntry{}
+		b.Size--
+	}
 	f.Next = paramEntry{}
 	f.Active = false
 	f.Acquired = false
+	f.Published = false
 	return nil
 }
 
