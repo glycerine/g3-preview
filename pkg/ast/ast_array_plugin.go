@@ -9,15 +9,15 @@ import (
 )
 
 type astArrayPluginOwner struct {
-	next      *astArrayPluginOwner
-	self      *astArrayPluginOwner
-	owner     *ASTManager
-	names     [12]usymbol.Symbol
-	family    FamilyID
-	header    uint64
-	published bool
-	completed uint32
-	bodyCause error
+	next                       *astArrayPluginOwner
+	self                       *astArrayPluginOwner
+	owner                      *ASTManager
+	names                      [12]usymbol.Symbol
+	family                     FamilyID
+	header                     uint64
+	published, memoryTraceLive bool
+	completed                  uint32
+	bodyCause                  error
 }
 
 func (m *ASTManager) arrayPluginBytes() uint64 {
@@ -32,6 +32,7 @@ func (m *ASTManager) arrayPluginBytes() uint64 {
 }
 func (m *ASTManager) releaseArrayPluginHeaders() {
 	if p := m.arrayPlugin; p != nil {
+		m.traceRegisteredPluginDeallocated(p.traceIdentity(), p.published, &p.memoryTraceLive)
 		m.BudgetField.Release(p.header)
 		p.header = 0
 		m.arrayPlugin = nil
@@ -65,6 +66,7 @@ func (m *ASTManager) registerArrayPlugin() (FamilyID, error) {
 	}
 	p := &astArrayPluginOwner{owner: m, header: bytes}
 	p.self = p
+	m.traceRegisteredPluginAllocated(p.traceIdentity(), p.header, 38, "array_decl_plugin", &p.memoryTraceLive)
 	p.next = m.arrayPluginFailed
 	m.arrayPluginFailed = p
 	for j, text := range [...]string{"store", "select", "const", "default", "map", "union", "intersect", "difference", "complement", "subset", "array-ext", "as-array"} {

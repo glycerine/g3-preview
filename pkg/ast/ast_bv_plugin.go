@@ -10,31 +10,31 @@ import (
 )
 
 type astBitVectorPluginOwner struct {
-	literalPrimary                         astBVLiteralFrame
-	literalFrames                          *astBVLiteralFrame
-	literalSerial                          uint64
-	numeralPrimary                         astBVNumeralFrame
-	numeralFrames                          *astBVNumeralFrame
-	numeralSerial                          uint64
-	next                                   *astBitVectorPluginOwner
-	self                                   *astBitVectorPluginOwner
-	owner                                  *ASTManager
-	names                                  [10]usymbol.Symbol
-	fields                                 [5]astNodeRef
-	fieldAcquired                          [5]bool
-	sortAcquired                           []byte // actual successful INC flags, alongside native sort slots
-	fixed                                  [61][]astNodeRef
-	fixedPending                           astNodeRef
-	fixedPendingKind                       int32
-	fixedPendingWidth                      uint32
-	fixedPendingIndex                      uint32
-	bit2bool                               [][]astNodeRef
-	sorts                                  []astNodeRef
-	family                                 FamilyID
-	header                                 uint64
-	power                                  unumeral.OwnedRational
-	powerActive, published                 bool
-	bodyCause, destructorCause, powerCause error
+	literalPrimary                          astBVLiteralFrame
+	literalFrames                           *astBVLiteralFrame
+	literalSerial                           uint64
+	numeralPrimary                          astBVNumeralFrame
+	numeralFrames                           *astBVNumeralFrame
+	numeralSerial                           uint64
+	next                                    *astBitVectorPluginOwner
+	self                                    *astBitVectorPluginOwner
+	owner                                   *ASTManager
+	names                                   [10]usymbol.Symbol
+	fields                                  [5]astNodeRef
+	fieldAcquired                           [5]bool
+	sortAcquired                            []byte // actual successful INC flags, alongside native sort slots
+	fixed                                   [61][]astNodeRef
+	fixedPending                            astNodeRef
+	fixedPendingKind                        int32
+	fixedPendingWidth                       uint32
+	fixedPendingIndex                       uint32
+	bit2bool                                [][]astNodeRef
+	sorts                                   []astNodeRef
+	family                                  FamilyID
+	header                                  uint64
+	power                                   unumeral.OwnedRational
+	powerActive, published, memoryTraceLive bool
+	bodyCause, destructorCause, powerCause  error
 }
 
 func (m *ASTManager) bitVectorPluginBytes() uint64 {
@@ -56,6 +56,7 @@ func (m *ASTManager) releaseBitVectorPluginHeaders() {
 			p.releaseFixed()
 			p.sorts = nil
 			p.sortAcquired = nil
+			m.traceRegisteredPluginDeallocated(p.traceIdentity(), p.published, &p.memoryTraceLive)
 			m.BudgetField.Release(p.header)
 			p.header = 0
 			m.bitVectorPlugin = nil
@@ -298,6 +299,7 @@ func (m *ASTManager) RegisterBitVectorPlugin() (FamilyID, error) {
 	}
 	p := &astBitVectorPluginOwner{owner: m, header: bytes}
 	p.self = p
+	m.traceRegisteredPluginAllocated(p.traceIdentity(), p.header, 35, "bv_decl_plugin", &p.memoryTraceLive)
 	p.next = m.bitVectorPluginFailed
 	m.bitVectorPluginFailed = p
 	for j, s := range [...]string{"bv", "concat", "sign_extend", "zero_extend", "extract", "rotate_left", "rotate_right", "repeat", "bit2bool", "mkbv"} {
