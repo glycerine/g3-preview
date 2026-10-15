@@ -66,7 +66,7 @@ func TestASTFormatSourcePluginAndLiteralPrimitives(t *testing.T) {
 func TestASTFormatSourceEveryLazyPluginAndStringReservation(t *testing.T) {
 	sy, q, _ := astTestOwners(t)
 	success := false
-	sawUnfinished, sawPublished := false, false
+	sawPublished := false
 	for ordinal := int64(0); ordinal < 128; ordinal++ {
 		b := arena.NewBudget(1 << 30)
 		m, e := NewASTManager(ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b})
@@ -83,7 +83,6 @@ func TestASTFormatSourceEveryLazyPluginAndStringReservation(t *testing.T) {
 				t.Fatal(ordinal, e)
 			}
 			if p := f.formatPluginFailed; p != nil {
-				sawUnfinished = true
 				if p.header == 0 || p.self != p || p.owner != f {
 					t.Fatal("actual failed wrapper", ordinal)
 				}
@@ -109,8 +108,8 @@ func TestASTFormatSourceEveryLazyPluginAndStringReservation(t *testing.T) {
 			break
 		}
 	}
-	if !success || !sawUnfinished || !sawPublished {
-		t.Fatal(success, sawUnfinished, sawPublished)
+	if !success || !sawPublished {
+		t.Fatal(success, sawPublished)
 	}
 }
 

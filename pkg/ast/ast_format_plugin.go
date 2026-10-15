@@ -9,64 +9,26 @@ import (
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-// Concrete pointer-free source ptr_vector specialization. The actual backing
-// contains its capacity/size words followed by encoded plugin bindings. There
-// is no second hot registry or accounting-only Runtime allocation.
-type astPluginVector struct{ words []uint32 }
+// The registry owns plugin tags in family order; plugin objects have their own
+// lifetimes and are not owned by this native slice.
+type astPluginVector struct{ bindings []astPluginBinding }
 
-func (v *astPluginVector) bytes() uint64         { return uint64(len(v.words)) * 4 }
-func (v *astPluginVector) close(b *arena.Budget) { b.Release(v.bytes()); v.words = nil }
+func (v *astPluginVector) close() { v.bindings = nil }
 func (m *ASTManager) pluginAt(id FamilyID) astPluginBinding {
-	if id < 0 || len(m.plugins.words) == 0 || uint32(id) >= m.plugins.words[1] {
+	if id < 0 || int(id) >= len(m.plugins.bindings) {
 		return astPluginBinding{}
 	}
-	x := m.plugins.words[2+uint32(id)]
-	if x == 0 {
-		return astPluginBinding{}
-	}
-	return astPluginBinding{astPluginKind(x - 1), true}
+	return m.plugins.bindings[id]
 }
 func (m *ASTManager) setPlugin(id FamilyID, kind astPluginKind) error {
 	if id < 0 || uint64(id) >= math.MaxUint32 {
 		return arena.ErrBounds
 	}
-	need := uint32(id) + 1
 	v := &m.plugins
-	var size, capacity uint32
-	if len(v.words) != 0 {
-		capacity = v.words[0]
-		size = v.words[1]
+	if need := int(id) + 1; need > len(v.bindings) {
+		v.bindings = append(v.bindings, make([]astPluginBinding, need-len(v.bindings))...)
 	}
-	// Literal setx resize(default-null) runs one push at a time, retaining every
-	// completed size/growth prefix if a later source allocation refuses.
-	for size < need {
-		if size == capacity {
-			next := (uint64(capacity)*3 + 1) / 2
-			if next < 2 {
-				next = 2
-			}
-			if next > math.MaxUint32 || next+2 > uint64(^uint(0)>>1)/4 {
-				return arena.ErrBounds
-			}
-			bytes := (next + 2) * 4
-			if e := m.BudgetField.Reserve(bytes); e != nil {
-				return e
-			}
-			a := make([]uint32, int(next)+2)
-			a[0] = uint32(next)
-			a[1] = size
-			for i := uint32(0); i < size; i++ {
-				a[2+i] = v.words[2+i]
-			}
-			m.BudgetField.Release(v.bytes())
-			v.words = a
-			capacity = uint32(next)
-		}
-		v.words[2+size] = 0
-		size++
-		v.words[1] = size
-	}
-	v.words[2+uint32(id)] = uint32(kind) + 1
+	v.bindings[id] = astPluginBinding{kind: kind, present: true}
 	return nil
 }
 

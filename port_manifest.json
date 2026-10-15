@@ -10921,6 +10921,20 @@
           ]
         },
         {
+          "name": "Concrete ast_manager plugin registry setx/get and ascending finalize traverse typed native family bindings (ast.cpp:1406-1414,1584-1585,1635-1638)",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_format_plugin.go",
+          "go_targets": [
+            "pkg/ast/ast_core.go"
+          ],
+          "tests": [
+            "TestASTFormatSourceEveryLazyPluginAndStringReservation",
+            "TestASTArithmeticSourceEveryRegistrationReservation",
+            "TestASTRegisterDeclarationPluginsSourceOrder",
+            "TestASTRegisterDeclarationPluginsPreservesExisting"
+          ]
+        },
+        {
           "name": "existing app/quantifier construction through actual borrowed result-vector ranges, preserving update control flow and metadata",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_update.go",
@@ -182249,6 +182263,20 @@
             "TestASTFormatPrettyPrinterLiteralWidthIndentAndSingleLine",
             "TestASTFormatPrettyEveryGetterStackAndOutputReservation",
             "TestASTFormatPrettyNativeWorklistGrowth"
+          ]
+        },
+        {
+          "name": "Concrete ast_manager ptr_vector<decl_plugin> registry uses typed native Go family bindings and ascending teardown",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_format_plugin.go",
+          "go_targets": [
+            "pkg/ast/ast_core.go"
+          ],
+          "tests": [
+            "TestASTFormatSourceEveryLazyPluginAndStringReservation",
+            "TestASTArithmeticSourceEveryRegistrationReservation",
+            "TestASTRegisterDeclarationPluginsSourceOrder",
+            "TestASTRegisterDeclarationPluginsPreservesExisting"
           ]
         }
       ],

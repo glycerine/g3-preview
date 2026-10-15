@@ -49,7 +49,7 @@ func (m *ASTManager) unwindConstructorMembers() error {
 	// Body-owned trace and format pointers are deliberately not source members.
 	// Plugins' pointer records also have POD destruction, not plugin finalize.
 	if m.constructorMemberStage == 0 {
-		m.plugins.close(m.BudgetField)
+		m.plugins.close()
 		if m.debugFreeComplete {
 			m.DebugFreeIndices = nil
 			m.debugFreeComplete = false

@@ -108,7 +108,7 @@ func (m *ASTManager) destroyPluginBacking() {
 	m.BudgetField.Release(uint64(cap(m.builtin.userNames)) * uint64(reflect.TypeOf(usymbol.Symbol{}).Size()))
 	m.builtin.userNames = nil
 	m.builtin.userTable.Close()
-	m.plugins.close(m.BudgetField)
+	m.plugins.close()
 	m.releaseFormatPluginHeaders()
 	m.releaseSequencePluginHeaders()
 	m.releaseArrayPluginHeaders()

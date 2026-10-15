@@ -273,8 +273,8 @@ func (m *ASTManager) closeCore(source bool) error {
 		}
 	}
 	// Source finalizes concrete registered plugins in ascending registry order.
-	if len(m.plugins.words) != 0 {
-		for id := uint32(0); id < m.plugins.words[1]; id++ {
+	if len(m.plugins.bindings) != 0 {
+		for id := range m.plugins.bindings {
 			p := m.pluginAt(FamilyID(id))
 			if !p.present {
 				continue
