@@ -52,7 +52,10 @@ func (b *smallObjectIOBridge) diagnostic(a *umemory.SmallAllocator) error {
 	if e := out.AppendCString(" bytes leaked"); e != nil {
 		return e
 	}
-	return out.AppendByte('\n') // explicit byte sink; native stderr flush remains open
+	if e := out.AppendByte('\n'); e != nil {
+		return e
+	}
+	return out.Flush()
 }
 func (b *smallObjectIOBridge) verbose(a *umemory.SmallAllocator, end bool) error {
 	out := b.config.Verbose
@@ -97,7 +100,10 @@ func (b *smallObjectIOBridge) verbose(a *umemory.SmallAllocator, end bool) error
 	if e = out.AppendCString(")"); e != nil {
 		return e
 	}
-	return out.AppendByte('\n')
+	if e = out.AppendByte('\n'); e != nil {
+		return e
+	}
+	return out.Flush()
 }
 
 func (b *smallObjectIOBridge) Emit(a *umemory.SmallAllocator, event umemory.AllocatorIOEvent) error {

@@ -175060,7 +175060,7 @@
           ]
         },
         {
-          "name": "Selected ostream provider prerequisite and external CString strlen-before-badbit sentry; actual file write failure sets nonthrowing badbit without output-buffer allocation",
+          "name": "Selected ostream provider prerequisite and external CString strlen-before-badbit sentry; actual file write failure sets nonthrowing badbit without output-buffer allocation; leak and consolidate std::endl flush after newline",
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_small_object_allocator_stream.go",
           "tests": [
@@ -175453,7 +175453,7 @@
           ]
         },
         {
-          "name": "Selected ostream provider prerequisite and external CString strlen-before-badbit sentry; actual file write failure sets nonthrowing badbit without output-buffer allocation",
+          "name": "Selected ostream provider prerequisite and external CString strlen-before-badbit sentry; actual file write failure sets nonthrowing badbit without output-buffer allocation; leak and consolidate std::endl flush after newline",
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_small_object_allocator_stream.go",
           "tests": [
@@ -179034,6 +179034,12 @@
           "status": "dead_deleted"
         },
         {
+          "name": "AST mk_quantifier debug-only pattern TRACE at ast.cpp:2358 precedes pattern assertion and node allocation; exact mk_pp body awaits the retained AST pretty printer",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_core_factories.go",
+          "tests": []
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -180508,6 +180514,12 @@
         {
           "name": "SAT reassert_min_core TRACE at sat_solver.cpp:1130 is unreachable: reassert_min_core and update_min_core have no C++ callers",
           "status": "dead_deleted"
+        },
+        {
+          "name": "AST mk_quantifier debug-only pattern TRACE at ast.cpp:2358 precedes pattern assertion and node allocation; exact mk_pp body awaits the retained AST pretty printer",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_core_factories.go",
+          "tests": []
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
