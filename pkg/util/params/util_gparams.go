@@ -20,6 +20,7 @@ type GlobalParamsConfig struct {
 	DescriptorPageSize, DescriptorWordsPageSize uint32
 	CLongBits                                   uint8
 	Register                                    func(GlobalParamsRegistrar) error
+	onAllocated                                 func(*GlobalParams)
 }
 type GparamsRefCell struct{ value ParamsRef }
 
@@ -114,6 +115,9 @@ func newSourceGlobalParams(s *usymbol.Manager, p *ParamsContext, c GlobalParamsC
 	}
 	g := &GlobalParams{SymbolsField: s, ContextField: p, Budget: c.Budget, Register: c.Register, OwnerBytes: n, catalog: c.Catalog}
 	g.self = g
+	if c.onAllocated != nil {
+		c.onAllocated(g) // source alloc(imp) traces before placement construction
+	}
 	g.cLongBits = longBits
 	fail := func(e error) (*GlobalParams, error) {
 		g.constructorCause = e

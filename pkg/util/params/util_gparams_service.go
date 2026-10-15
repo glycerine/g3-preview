@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -20,6 +21,7 @@ type GlobalParamsService struct {
 	self                        *GlobalParamsService
 	namespaceAssertions         *udiag.DebugContext
 	namespaceTrace              *udiag.TraceTags
+	memoryProcess               *umemory.ProcessAccounting
 	Symbols                     *usymbol.Manager
 	Context                     *ParamsContext
 	Config                      GlobalParamsConfig
@@ -74,7 +76,9 @@ func (s *GlobalParamsService) InitializeSource() error {
 	}
 	s.traceNamespace("init", 634, "gparams::init()\n")
 	// Source init is unconditional; a previous live pointer does not skip alloc.
-	g, e := newSourceGlobalParams(s.Symbols, s.Context, s.Config)
+	c := s.Config
+	c.onAllocated = s.traceMemoryAllocated
+	g, e := newSourceGlobalParams(s.Symbols, s.Context, c)
 	if e != nil {
 		if g != nil {
 			g.RetainedNext = s.Failed
@@ -105,9 +109,11 @@ func (s *GlobalParamsService) FinalizeSource() error {
 	}
 	s.traceNamespace("finalize", 639, "gparams::finalize()\n")
 	if s.Current != nil {
-		if e := s.Current.SourceFinalize(); e != nil {
+		current := s.Current
+		if e := current.SourceFinalize(); e != nil {
 			return e
 		}
+		s.traceMemoryDeallocated(current)
 		s.Current = nil // only after completed actual source dealloc
 	}
 	return nil

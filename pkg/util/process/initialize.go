@@ -129,6 +129,9 @@ func InitializeGenerated(c InitializationConfig, maxSize uint64) (*Initialized, 
 	if err = result.Globals.BindNamespaceAssertions(c.Debug); err != nil {
 		return result, err
 	}
+	if err = result.Globals.BindMemoryProcess(c.Runtime.ProcessOwner()); err != nil {
+		return result, err
+	}
 	result.Trace = c.Trace
 	if result.Trace == nil {
 		result.Trace = diagnostic.BorrowProcessTraceTags()
