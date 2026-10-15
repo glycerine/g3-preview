@@ -3769,6 +3769,7 @@
         "pkg/api/api_trace.go"
       ],
       "tests": [
+        "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
         "TestAPIGoalSourceMemoryWrapperReleaseSites",
         "TestAPIASTMapSourceMemoryWrapperReleaseSites",
         "TestAPIContextResultsExplicitReferencesAndAlias",
@@ -151252,6 +151253,7 @@
         "pkg/tactic/aig/aig_imp_memory_trace.go"
       ],
       "tests": [
+        "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
         "TestAPIGoalSourceMemoryWrapperReleaseSites",
         "TestAPIASTMapSourceMemoryWrapperReleaseSites",
         "TestRuntimeUint32AcrossInitializationBitmapBoundary",
@@ -152103,6 +152105,7 @@
         "pkg/tactic/aig/aig_imp_memory_trace.go"
       ],
       "tests": [
+        "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
         "TestAPIGoalSourceMemoryWrapperReleaseSites",
         "TestAPIASTMapSourceMemoryWrapperReleaseSites",
         "TestASTDeclCollectorDependencySetMemoryTrace",

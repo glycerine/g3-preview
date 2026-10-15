@@ -10,7 +10,6 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/memory"
-	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/insdict"
 )
 
@@ -62,9 +61,9 @@ func newAPIContextResults(m *ast.ASTManager, rc bool) (c *apiContextResults, err
 	}
 	c = &apiContextResults{manager: m, userRefCount: rc, ownerBytes: n, trace: diagnostic.BorrowProcessTraceTags()}
 	c.self = c
-	if g := uparams.BorrowProcessGlobalParamsService(); g != nil && g.Context != nil && g.Symbols == m.Symbols && g.Config.Budget == m.BudgetField {
-		if q := g.Context.Numerals(); q != nil && q.RuntimeOwner() != nil {
-			c.memoryProcess = q.RuntimeOwner().ProcessOwner()
+	if q := m.NumeralService(); q != nil {
+		if runtime := q.RuntimeOwner(); runtime != nil {
+			c.memoryProcess = runtime.ProcessOwner()
 		}
 	}
 	return c, nil
