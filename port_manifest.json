@@ -56065,14 +56065,15 @@
           ]
         },
         {
-          "name": "Concrete borrowed-handle occurrence map and original running maximum/tie order (func_interp.cpp:234-255)",
-          "status": "partial",
+          "name": "Concrete get_max_occ_result uses a native borrowed-handle map and original strict-greater running maximum/tie order (func_interp.cpp:234-255)",
+          "status": "ported",
           "go_target": "pkg/model/function_interpretation_counts.go",
           "go_targets": [
             "pkg/model/function_interpretation_test.go"
           ],
           "tests": [
-            "TestFunctionInterpretationBooleanIffRemainsElseAndTieOrder"
+            "TestFunctionInterpretationBooleanIffRemainsElseAndTieOrder",
+            "TestFunctionInterpretationNativeOccurrenceGrowthAndEmptyResult"
           ]
         }
       ],
@@ -56080,7 +56081,7 @@
         "Each entry owns a concrete ground handle array and result; result INC precedes old-result DEC. Entry/graph headers and actual arrays/vector backing are charged to the manager Budget. Parent retains failed unpublished constructors for owning cleanup; graph destruction retires published entries, else and cache before pending owning cleanup. Cached ITE has its own reference; explicit output ASTRefs survive graph close. EvalElse constructs and closes the original VarSubstitution lexical owner with direct index order."
       ],
       "deviations": [
-        "Selected concrete AST/Budget representation; native small_object_allocator ABI, allocator pooling, global DEBUG/TRACE transport and whole-unit allocation/ownership audits are not claimed. Existing AST equality/value theory dispatch qualifications apply. AST translation remains unported and no Translate replacement is invented. Function registration in model_core and selected evaluator paths are now integrated; full theory evaluator completion remains pending. The var_subst is_well_sorted debug predicates remain an explicitly partial dependency. Return/retain partial Copy owners for explicit Go cleanup. Source OP_EQ recognition deliberately excludes Boolean OP_IFF; do not widen the predicate to satisfy a fixture. Source occurrence count strict-greater running tie policy is preserved; concrete linear-probing handle/count cells qualify the obj_map representation.",
+        "Selected concrete AST/Budget representation; native small_object_allocator ABI, allocator pooling, global DEBUG/TRACE transport and whole-unit allocation/ownership audits are not claimed. Existing AST equality/value theory dispatch qualifications apply. AST translation remains unported and no Translate replacement is invented. Function registration in model_core and selected evaluator paths are now integrated; full theory evaluator completion remains pending. The var_subst is_well_sorted debug predicates remain an explicitly partial dependency. Return/retain partial Copy owners for explicit Go cleanup. Source OP_EQ recognition deliberately excludes Boolean OP_IFF; do not widen the predicate to satisfy a fixture. Source occurrence count strict-greater running tie policy is preserved; a native Go map holds borrowed AST handles and uint32 counts without simulated C++ probing or arena charges.",
         "Function interpretation and else-peeling scratch use direct native []ASTHandle slices for variables, equality terms and indexed arguments. Removed the functionArgumentVector wrapper; borrowed scratch acquires no extra AST reference and has no custom Budget backing refusal. Existing owning entries, cache/fallback references, source entry recognition, reset/reuse and reverse ITE construction order remain."
       ]
     },
@@ -56156,14 +56157,15 @@
           ]
         },
         {
-          "name": "Concrete borrowed-handle occurrence map and original running maximum/tie order (func_interp.cpp:234-255)",
-          "status": "partial",
+          "name": "Concrete get_max_occ_result uses a native borrowed-handle map and original strict-greater running maximum/tie order (func_interp.cpp:234-255)",
+          "status": "ported",
           "go_target": "pkg/model/function_interpretation_counts.go",
           "go_targets": [
             "pkg/model/function_interpretation_test.go"
           ],
           "tests": [
-            "TestFunctionInterpretationBooleanIffRemainsElseAndTieOrder"
+            "TestFunctionInterpretationBooleanIffRemainsElseAndTieOrder",
+            "TestFunctionInterpretationNativeOccurrenceGrowthAndEmptyResult"
           ]
         }
       ],
@@ -56171,7 +56173,7 @@
         "Each entry owns a concrete ground handle array and result; result INC precedes old-result DEC. Entry/graph headers and actual arrays/vector backing are charged to the manager Budget. Parent retains failed unpublished constructors for owning cleanup; graph destruction retires published entries, else and cache before pending owning cleanup. Cached ITE has its own reference; explicit output ASTRefs survive graph close. EvalElse constructs and closes the original VarSubstitution lexical owner with direct index order."
       ],
       "deviations": [
-        "Selected concrete AST/Budget representation; native small_object_allocator ABI, allocator pooling, global DEBUG/TRACE transport and whole-unit allocation/ownership audits are not claimed. Existing AST equality/value theory dispatch qualifications apply. AST translation remains unported and no Translate replacement is invented. Function registration in model_core and selected evaluator paths are now integrated; full theory evaluator completion remains pending. The var_subst is_well_sorted debug predicates remain an explicitly partial dependency. Return/retain partial Copy owners for explicit Go cleanup. Source OP_EQ recognition deliberately excludes Boolean OP_IFF; do not widen the predicate to satisfy a fixture. Source occurrence count strict-greater running tie policy is preserved; concrete linear-probing handle/count cells qualify the obj_map representation.",
+        "Selected concrete AST/Budget representation; native small_object_allocator ABI, allocator pooling, global DEBUG/TRACE transport and whole-unit allocation/ownership audits are not claimed. Existing AST equality/value theory dispatch qualifications apply. AST translation remains unported and no Translate replacement is invented. Function registration in model_core and selected evaluator paths are now integrated; full theory evaluator completion remains pending. The var_subst is_well_sorted debug predicates remain an explicitly partial dependency. Return/retain partial Copy owners for explicit Go cleanup. Source OP_EQ recognition deliberately excludes Boolean OP_IFF; do not widen the predicate to satisfy a fixture. Source occurrence count strict-greater running tie policy is preserved; a native Go map holds borrowed AST handles and uint32 counts without simulated C++ probing or arena charges.",
         "Function interpretation and else-peeling scratch use direct native []ASTHandle slices for variables, equality terms and indexed arguments. Removed the functionArgumentVector wrapper; borrowed scratch acquires no extra AST reference and has no custom Budget backing refusal. Existing owning entries, cache/fallback references, source entry recognition, reset/reuse and reverse ITE construction order remain."
       ]
     },
@@ -166629,6 +166631,15 @@
           "go_target": "pkg/ast/pattern/preferred_pattern.go",
           "tests": [
             "TestPatternInferencePreferredPatternsCompleteAndOwned"
+          ]
+        },
+        {
+          "name": "func_interp get_max_occ_result borrowed expr-to-uint32 occurrence map uses native Go map storage",
+          "status": "platform_replacement",
+          "go_target": "pkg/model/function_interpretation_counts.go",
+          "tests": [
+            "TestFunctionInterpretationBooleanIffRemainsElseAndTieOrder",
+            "TestFunctionInterpretationNativeOccurrenceGrowthAndEmptyResult"
           ]
         }
       ],

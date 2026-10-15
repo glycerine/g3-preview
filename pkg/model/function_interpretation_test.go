@@ -182,10 +182,41 @@ func TestFunctionInterpretationBooleanIffRemainsElseAndTieOrder(t *testing.T) {
 	if f.ArgumentsAreValues() {
 		t.Fatal("uninterpreted constants counted as values")
 	}
+	before := m.Budget().Used()
+	m.Budget().FailAfter(0)
 	most, e := f.MaxOccurrenceResult()
+	m.Budget().FailAfter(-1)
 	astTestMust(t, e)
-	if most != no {
-		t.Fatal("source running maximum tie", most)
+	if most != no || m.Budget().Used() != before {
+		t.Fatal("source running maximum tie without arena-backed map", most, m.Budget().Used(), before)
+	}
+}
+
+func TestFunctionInterpretationNativeOccurrenceGrowthAndEmptyResult(t *testing.T) {
+	m := astTestManager(t)
+	f := modelTestFunction(t, m, 1)
+	empty, e := f.MaxOccurrenceResult()
+	astTestMust(t, e)
+	if !empty.IsNull() {
+		t.Fatal("empty graph occurrence result", empty)
+	}
+	results := make([]ast.ASTHandle, 16)
+	for i := range results {
+		results[i] = goalTestAtom(t, m, fmt.Sprint("occ-result-", i))
+		arg := goalTestAtom(t, m, fmt.Sprint("occ-arg-", i))
+		astTestMust(t, f.InsertEntry([]ast.ASTHandle{arg}, results[i]))
+	}
+	for i, result := range []ast.ASTHandle{results[5], results[8]} {
+		arg := goalTestAtom(t, m, fmt.Sprint("occ-extra-", i))
+		astTestMust(t, f.InsertEntry([]ast.ASTHandle{arg}, result))
+	}
+	before := m.Budget().Used()
+	m.Budget().FailAfter(0)
+	most, e := f.MaxOccurrenceResult()
+	m.Budget().FailAfter(-1)
+	astTestMust(t, e)
+	if most != results[5] || m.Budget().Used() != before {
+		t.Fatal("first running maximum across native map growth", most, results[5], m.Budget().Used(), before)
 	}
 }
 
