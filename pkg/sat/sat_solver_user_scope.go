@@ -366,7 +366,12 @@ func (s *Solver) UserPush() error {
 	if e != nil {
 		return e
 	}
-	return s.conflict.userScopeLiterals.Push(uint32(MakeLiteral(v, false)))
+	lit := MakeLiteral(v, false)
+	if e = s.conflict.userScopeLiterals.Push(uint32(lit)); e != nil {
+		return e
+	}
+	s.traceUserPush(lit)
+	return nil
 }
 func (s *Solver) UserPop(scopes uint32) error {
 	if e := s.open(); e != nil {
@@ -420,6 +425,7 @@ func (s *Solver) UserPop(scopes uint32) error {
 				return e
 			}
 			if a == l {
+				s.traceUserPopTrail()
 				if e = s.Lifecycle.unassignVars(i); e != nil {
 					return e
 				}
