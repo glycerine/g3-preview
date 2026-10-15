@@ -34770,6 +34770,7 @@
         "TestEuclideanEquationUnsortedDecompositionBranch",
         "TestEuclideanIntegerBufferSortAndRawSwap",
         "TestEuclideanRationalBufferSortAndRawSwap",
+        "TestEuclideanBufferSortCoreUsesPublishedSlots",
         "TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue",
         "TestEuclideanRationalAddmulMergedJustifications",
         "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
@@ -34864,7 +34865,17 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "concrete mpz/mpq sort and sort_core copy/index/swap paths at cpp:135-166",
+          "name": "concrete mpz/mpq sort_core sorts source IDs and swaps previously published numeral_buffer slots into default equation coefficients (euclidean_solver.cpp:135-145)",
+          "status": "ported",
+          "go_target": "pkg/math/euclid/numeral_buffer_sort.go",
+          "tests": [
+            "TestEuclideanBufferSortCoreUsesPublishedSlots",
+            "TestEuclideanIntegerBufferSortAndRawSwap",
+            "TestEuclideanRationalBufferSortAndRawSwap"
+          ]
+        },
+        {
+          "name": "concrete mpz/mpq sort copy-then-sort paths and stopped numeral copy ownership at cpp:147-155",
           "status": "partial",
           "go_target": "pkg/math/euclid/numeral_buffer_sort.go",
           "tests": [
