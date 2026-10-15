@@ -222,31 +222,14 @@ func (s *satSolverWatchStore) EraseClauseWatch(r satSolverWatchListRef, o satCla
 	if e != nil {
 		return false, e
 	}
-	for i := uint32(0); i < uint32(len(x.values())); i++ {
-		w, e := s.Read(r, i)
-		if e != nil {
-			return false, e
-		}
+	for i, w := range x.values() {
 		if w.Clause() {
 			q, e := w.ClauseOffset()
 			if e != nil {
 				return false, e
 			}
 			if q == o {
-				n := uint32(len(x.values())) - 1
-				for j := i + 1; j < uint32(len(x.values())); j++ {
-					v, e := s.Read(r, j)
-					if e != nil {
-						return false, e
-					}
-					if e = s.Write(r, j-1, v); e != nil {
-						return false, e
-					}
-				}
-				if e = s.SetEnd(r, n); e != nil {
-					return false, e
-				}
-				return true, nil
+				return true, s.eraseAt(r, uint32(i))
 			}
 		}
 	}

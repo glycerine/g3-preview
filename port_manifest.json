@@ -80295,13 +80295,19 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "watched display and erase_clause first-match behavior with native logical tail clearing",
+          "name": "watched display and remaining source text/runtime policy",
           "status": "partial",
           "go_target": "pkg/sat/sat_watched.go",
           "tests": [
             "TestSATStorageSourceTextAndWidthActions",
             "TestSATWatchedSourceTagsWidthDefectAndErase"
           ]
+        },
+        {
+          "name": "erase_clause_watch first-match and stable suffix shift using native watched slice (sat_watched.cpp:24-39)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_watch_store.go",
+          "tests": ["TestSATWatchedSourceTagsWidthDefectAndErase", "TestSATSolverDetachInteriorNaryWatchKeepsOrder"]
         },
         {
           "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
@@ -80317,7 +80323,8 @@
             "TestSATSolverNativeWatchIteratorLifetimes",
             "TestSATSolverNativeWatchColdHeaderAndWarmIterator",
             "TestSATSolverWatchStoreActualWatchDisplayAndStableSort",
-            "TestSATSolverWatchStoreOwnerLedgerRetirement"
+            "TestSATSolverWatchStoreOwnerLedgerRetirement",
+            "TestSATSolverDetachInteriorNaryWatchKeepsOrder"
           ]
         }
       ],
@@ -80508,7 +80515,8 @@
             "TestSATSolverNativeWatchIteratorLifetimes",
             "TestSATSolverNativeWatchColdHeaderAndWarmIterator",
             "TestSATSolverWatchStoreActualWatchDisplayAndStableSort",
-            "TestSATSolverWatchStoreOwnerLedgerRetirement"
+            "TestSATSolverWatchStoreOwnerLedgerRetirement",
+            "TestSATSolverDetachInteriorNaryWatchKeepsOrder"
           ]
         },
         {
@@ -182105,7 +182113,8 @@
             "TestSATSolverNativeWatchIteratorLifetimes",
             "TestSATSolverNativeWatchColdHeaderAndWarmIterator",
             "TestSATSolverWatchStoreActualWatchDisplayAndStableSort",
-            "TestSATSolverWatchStoreOwnerLedgerRetirement"
+            "TestSATSolverWatchStoreOwnerLedgerRetirement",
+            "TestSATSolverDetachInteriorNaryWatchKeepsOrder"
           ]
         },
         {

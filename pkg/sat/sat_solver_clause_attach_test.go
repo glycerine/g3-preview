@@ -37,6 +37,44 @@ func TestSATSolverClauseAttachDetachActualKinds(t *testing.T) {
 		}
 	}
 }
+
+// Source: sat_watched.cpp:24-39, using the retained vector<watched> watch list.
+// Erasing an interior clause watch preserves the order and identity of the
+// surviving entries in both watched-literal lists.
+func TestSATSolverDetachInteriorNaryWatchKeepsOrder(t *testing.T) {
+	s, p, v, _ := satLifecycleFixture(t, 6)
+	var clauses [3]StoredClauseRef
+	for i, lits := range [][]Literal{{0, 2, 4, 6}, {0, 2, 4, 8}, {0, 2, 4, 10}} {
+		var e error
+		clauses[i], e = p.clauses.MkClause(lits, false)
+		satOK(t, e)
+		_, e = s.attach(clauses[i])
+		satOK(t, e)
+	}
+	satOK(t, s.detachClause(clauses[1]))
+	satOK(t, p.clauses.Delete(clauses[1]))
+	for _, index := range []uint32{1, 3} {
+		w, e := v.watches.Get(index)
+		satOK(t, e)
+		n, e := w.Size()
+		satOK(t, e)
+		if n != 2 {
+			t.Fatalf("watch list %d size %d, want 2", index, n)
+		}
+		for i, clause := range []StoredClauseRef{clauses[0], clauses[2]} {
+			got, e := w.Read(uint32(i))
+			satOK(t, e)
+			offset, e := got.ClauseOffset()
+			satOK(t, e)
+			want, e := p.clauses.Offset(clause)
+			satOK(t, e)
+			if offset != want {
+				t.Fatalf("watch list %d entry %d: %v, want %v", index, i, offset, want)
+			}
+		}
+	}
+}
+
 func TestSATSolverClauseScopedReinitOrdering(t *testing.T) {
 	s, p, v, _ := satLifecycleFixture(t, 4)
 	v.scopeLevel = 1
