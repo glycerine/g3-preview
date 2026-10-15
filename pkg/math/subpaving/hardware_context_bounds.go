@@ -121,11 +121,17 @@ func (c *HardwareContext) publishBound(n *HardwareNode, variable uint32, value *
 	b.timestamp = c.timestamp
 	b.reason = reason
 	b.reasonVariable = reasonVariable
+	if err := c.traceNewBound(b); err != nil {
+		return err
+	}
 	conflict, err := n.ConflictingBounds(variable)
 	if err != nil {
 		return err
 	}
 	if conflict {
+		if err := c.traceBoundConflict(n); err != nil {
+			return err
+		}
 		c.numConflicts++
 		n.conflictVar = variable
 	}
