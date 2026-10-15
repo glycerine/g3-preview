@@ -53,9 +53,9 @@ func (p *idPool) take() (uint32, error) {
 }
 func (p *idPool) recycle(id uint32) { p.free = append(p.free, id) }
 
-// Manager is the concrete source AIG owner. It currently covers variable
-// storage and mk_node_core interning; the two-level mk_node simplifier and
-// formula/tactic traversals remain with the unported owning AIG code.
+// Manager is the concrete source AIG owner. It covers variable storage,
+// mk_node_core interning and two-level mk_node simplification; formula and
+// tactic traversals remain with the unported owning AIG code.
 type Manager struct {
 	self       *Manager
 	ast        *ast.ASTManager
@@ -171,6 +171,19 @@ func (r *Ref) Same(other *Ref) bool {
 	return r != nil && other != nil && !r.closed && !other.closed && r.manager == other.manager && r.lit == other.lit
 }
 
+func (m *Manager) True() (*Ref, error) {
+	if e := m.open(); e != nil {
+		return nil, e
+	}
+	return m.newRef(Literal{node: m.trueNode})
+}
+func (m *Manager) False() (*Ref, error) {
+	if e := m.open(); e != nil {
+		return nil, e
+	}
+	return m.newRef(Literal{node: m.trueNode, inverted: true})
+}
+
 // MakeVariable is mk_var's AST-owning leaf. The source caller decides whether
 // two occurrences share a variable; this operation creates one new AIG node.
 func (m *Manager) MakeVariable(h ast.ASTHandle) (*Ref, error) {
@@ -222,30 +235,38 @@ func (m *Manager) InternAnd(left, right *Ref) (*Ref, error) {
 	if m.activeRefs == math.MaxUint32 {
 		return nil, arena.ErrBounds
 	}
-	if e := m.ast.BudgetField.Reserve(m.nodeBytes); e != nil {
+	result, e := m.internCore(l, r)
+	if e != nil {
 		return nil, e
+	}
+	return m.newRef(result)
+}
+
+func (m *Manager) internCore(l, r Literal) (Literal, error) {
+	if e := m.ast.BudgetField.Reserve(m.nodeBytes); e != nil {
+		return Literal{}, e
 	}
 	key := andKey{l, r}
 	if prior := m.table[key]; prior != nil {
 		m.ast.BudgetField.Release(m.nodeBytes)
-		return m.newRef(Literal{node: prior})
+		return Literal{node: prior}, nil
 	}
 	id, e := m.andNodes.take()
 	if e != nil {
 		m.ast.BudgetField.Release(m.nodeBytes)
-		return nil, e
+		return Literal{}, e
 	}
 	if l.node.refs == math.MaxUint32 || r.node.refs == math.MaxUint32 || l.node == r.node && l.node.refs >= math.MaxUint32-1 {
 		m.andNodes.recycle(id)
 		m.ast.BudgetField.Release(m.nodeBytes)
-		return nil, arena.ErrBounds
+		return Literal{}, arena.ErrBounds
 	}
 	n := &node{id: id, children: [2]Literal{l, r}, and: true}
 	m.table[key] = n
 	m.nodes++
 	l.node.refs++
 	r.node.refs++
-	return m.newRef(Literal{node: n})
+	return Literal{node: n}, nil
 }
 
 func (m *Manager) dec(l Literal) {

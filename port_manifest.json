@@ -98137,11 +98137,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/tactic/aig/aig_core.go"
+        "pkg/tactic/aig/aig_core.go",
+        "pkg/tactic/aig/aig_simplify.go"
       ],
       "tests": [
         "TestAIGCoreInterningOwnershipAndIDReuse",
-        "TestAIGCoreDuplicateStillAllocatesAndRefClones"
+        "TestAIGCoreDuplicateStillAllocatesAndRefClones",
+        "TestAIGTwoLevelAndRules",
+        "TestAIGTwoLevelAndTruthTables"
       ],
       "conditionals": [
         {
@@ -98386,13 +98389,22 @@
             "TestAIGCoreInterningOwnershipAndIDReuse",
             "TestAIGCoreDuplicateStillAllocatesAndRefClones"
           ]
+        },
+        {
+          "name": "imp::mk_node with enabled two-level local minimization and canonical child-ID order",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_simplify.go",
+          "tests": [
+            "TestAIGTwoLevelAndRules",
+            "TestAIGTwoLevelAndTruthTables"
+          ]
         }
       ],
       "ownership": [
         "Concrete AIG manager pins each variable AST expression, owns true/false counts and interning table nodes, and recursively releases child nodes when the last AIG reference closes."
       ],
       "deviations": [
-        "Typed Go map replaces aig_table; literal inversion is a bool rather than pointer tagging. Full mk_node simplification and the tactic/proof/goal traversal remain unported."
+        "Typed Go map replaces aig_table; literal inversion is a bool rather than pointer tagging. The mk_node minimizer is ported, while expr2aig/aig2expr rewriting and the tactic/proof/goal traversal remain unported."
       ]
     },
     {
