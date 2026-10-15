@@ -150754,7 +150754,16 @@
           ]
         },
         {
-          "name": "Z3DEBUG allocate(file,line,obj,size) and deallocate(file,line,p) wrappers: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs plus generated symbol table and rational global manager plus param_descrs::imp, params blocks, rational entries, trace-tag and debug-tag tables, and scoped_timer::imp call sites are ported; other retained caller sites remain unaudited (cpp202-211)",
+          "name": "Concrete timer::m_watch allocation and deallocation debug wrappers at timer.cpp:25/30, with constructor-before-start order, Go inline stopwatch identity/extent and process-finalizing guard",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/stopwatch/timer_memory_trace.go",
+          "tests": [
+            "TestTimerWatchMemoryTraceAllocationBeforeStartAndClose",
+            "TestTimerWatchMemoryTraceProcessFinalizeGuard"
+          ]
+        },
+        {
+          "name": "Z3DEBUG allocate(file,line,obj,size) and deallocate(file,line,p) wrappers: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs plus generated symbol table and rational global manager plus param_descrs::imp, params blocks, rational entries, trace-tag and debug-tag tables, scoped_timer::imp and timer::m_watch call sites are ported; other retained caller sites remain unaudited (cpp202-211)",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
           "go_targets": [
@@ -151398,7 +151407,16 @@
           ]
         },
         {
-          "name": "Z3DEBUG allocation/deallocation file-line overloads and alloc/dealloc macros: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs plus generated symbol table and rational global manager plus param_descrs::imp, params blocks, rational entries, trace-tag and debug-tag tables, and scoped_timer::imp sites are connected through concrete trace hooks; other retained caller sites remain unaudited (h69-97; cpp202-211)",
+          "name": "Concrete timer::m_watch allocation and deallocation debug wrappers at timer.cpp:25/30, with constructor-before-start order, Go inline stopwatch identity/extent and process-finalizing guard",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/stopwatch/timer_memory_trace.go",
+          "tests": [
+            "TestTimerWatchMemoryTraceAllocationBeforeStartAndClose",
+            "TestTimerWatchMemoryTraceProcessFinalizeGuard"
+          ]
+        },
+        {
+          "name": "Z3DEBUG allocation/deallocation file-line overloads and alloc/dealloc macros: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs plus generated symbol table and rational global manager plus param_descrs::imp, params blocks, rational entries, trace-tag and debug-tag tables, scoped_timer::imp and timer::m_watch sites are connected through concrete trace hooks; other retained caller sites remain unaudited (h69-97; cpp202-211)",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
           "go_targets": [
@@ -177991,12 +178009,16 @@
       "status": "ported",
       "go_targets": [
         "pkg/util/stopwatch/timer.go",
-        "pkg/util/stopwatch/timer_test.go"
+        "pkg/util/stopwatch/timer_test.go",
+        "pkg/util/stopwatch/timer_memory_trace.go",
+        "pkg/util/stopwatch/timer_memory_trace_debug_test.go"
       ],
       "tests": [
         "TestTimerOriginalStartQueriesAndStrictTimeouts",
         "TestTimerClockFailureAndReentryPrefixes",
-        "TestTimerActualProcessClock"
+        "TestTimerActualProcessClock",
+        "TestTimerWatchMemoryTraceAllocationBeforeStartAndClose",
+        "TestTimerWatchMemoryTraceProcessFinalizeGuard"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -178009,6 +178031,15 @@
             "TestTimerOriginalStartQueriesAndStrictTimeouts",
             "TestTimerClockFailureAndReentryPrefixes",
             "TestTimerActualProcessClock"
+          ]
+        },
+        {
+          "name": "Concrete timer::m_watch alloc(stopwatch) and dealloc debug wrappers at timer.cpp:25/30, with source constructor order, failed-start retained owner and process-finalizing guard",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/stopwatch/timer_memory_trace.go",
+          "tests": [
+            "TestTimerWatchMemoryTraceAllocationBeforeStartAndClose",
+            "TestTimerWatchMemoryTraceProcessFinalizeGuard"
           ]
         }
       ],

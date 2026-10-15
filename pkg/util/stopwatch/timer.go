@@ -1,7 +1,11 @@
 // Source: src/util/timer.h:27-36; src/util/timer.cpp:24-39.
 package stopwatch
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+)
 
 var ErrTimerOwner = errors.New("g3: invalid timer owner")
 var ErrTimerPending = errors.New("g3: timer operation in progress")
@@ -12,13 +16,22 @@ var ErrTimerClosed = errors.New("g3: timer closed")
 type Timer struct {
 	self           *Timer
 	watch          Stopwatch
+	memoryTrace    *diagnostic.TraceTags
 	cause          error
 	active, closed bool
 }
 
 func NewTimer(clock func() (uint64, error)) (*Timer, error) {
-	p := &Timer{watch: New(clock), active: true}
+	return NewTimerWithMemoryTrace(clock, nil)
+}
+
+func NewTimerWithMemoryTrace(clock func() (uint64, error), trace *diagnostic.TraceTags) (*Timer, error) {
+	if trace == nil {
+		trace = diagnostic.BorrowProcessTraceTags()
+	}
+	p := &Timer{watch: New(clock), memoryTrace: trace, active: true}
 	p.self = p
+	p.traceWatchAllocated()
 	p.cause = p.watch.Start()
 	p.active = false
 	return p, p.cause
@@ -80,6 +93,10 @@ func (p *Timer) Close() error {
 	if p.active {
 		return ErrTimerPending
 	}
+	if p.closed {
+		return nil
+	}
 	p.closed = true
+	p.traceWatchDeallocated()
 	return nil
 }
