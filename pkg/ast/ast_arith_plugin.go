@@ -26,6 +26,7 @@ type astArithmeticPluginOwner struct {
 	header                     uint64
 	completed                  uint32
 	published                  bool
+	memoryTraceLive            bool
 	bodyCause, destructorCause error
 }
 
@@ -46,6 +47,7 @@ func (m *ASTManager) releaseArithmeticPluginHeaders() {
 		}
 		p.small[1] = nil
 		p.small[0] = nil
+		p.traceArithmeticPluginDeallocated()
 		m.BudgetField.Release(p.header)
 		p.header = 0
 		m.arithmeticPlugin = nil
@@ -323,6 +325,7 @@ func (m *ASTManager) registerArithmeticPlugin() (FamilyID, error) {
 	}
 	p := &astArithmeticPluginOwner{owner: m, header: bytes}
 	p.self = p
+	p.traceArithmeticPluginAllocated()
 	p.next = m.arithmeticPluginFailed
 	m.arithmeticPluginFailed = p
 	for j, s := range [...]string{"Int", "Real", "RootObject"} {
