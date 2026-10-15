@@ -275,75 +275,77 @@ func TestLPExactLeavingGuardsAndBreakpointDispatch(t *testing.T) {
 func TestLPExactLeavingPhysicalOwnership(t *testing.T) {
 	for _, op := range []string{"ratio", "tie", "flip", "inline-minimum"} {
 		for _, direct := range []bool{false, true} {
-			success, failures := false, 0
-			for ordinal := int64(0); ordinal < 1600; ordinal++ {
-				done := false
-				t.Run(fmt.Sprintf("%s/%t/%d", op, direct, ordinal), func(t *testing.T) {
-					var h *lpPairHarness
-					if direct {
-						h = lpNewDirectSparseHarness(t)
-					} else {
-						h = newLPPairHarness(t)
-					}
-					s := lpNewRemovalModel(t, h, "-1", "3", true)
-					m := s.Core.RPrimal
-					h.must(m.Ed.Resize(2))
-					m.RowsNZ = []uint32{2, 2}
-					m.SignOfEnteringDelta = 1
-					seed := uint32(1)
-					for z3rand.New(seed).Next()%2 != 1 {
-						seed++
-					}
-					s.Settings.RandomSeed(seed)
-					huge := strings.Repeat("1234567890", 12)
-					ed := h.pair(huge+"1/7", "0")
-					for i := uint32(0); i < 2; i++ {
-						h.must(m.Ed.SetValue(&ed.X, i))
-						if op == "inline-minimum" {
-							h.must(h.m.SetInt32(&m.Ed.Data[i], -2147483648))
+			t.Run(fmt.Sprintf("%s/%t", op, direct), func(t *testing.T) {
+				success, failures := false, 0
+				for ordinal := int64(0); ordinal < 1600; ordinal++ {
+					done := false
+					t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
+						var h *lpPairHarness
+						if direct {
+							h = lpNewDirectSparseHarness(t)
+						} else {
+							h = newLPPairHarness(t)
 						}
-						h.must(s.Bounds.Types.Set(2+i, ColumnLowBound))
-						h.must((*m.LowBounds)[2+i].Copy(h.m, h.pair("-"+huge+fmt.Sprint(i+3)+"/11", huge+"5/13")))
-						if op == "inline-minimum" {
-							h.must(s.Bounds.Types.Set(2+i, ColumnUpperBound))
-							h.must((*m.UpperBounds)[2+i].Copy(h.m, h.pair(huge+fmt.Sprint(i+3)+"/11", huge+"5/13")))
+						s := lpNewRemovalModel(t, h, "-1", "3", true)
+						m := s.Core.RPrimal
+						h.must(m.Ed.Resize(2))
+						m.RowsNZ = []uint32{2, 2}
+						m.SignOfEnteringDelta = 1
+						seed := uint32(1)
+						for z3rand.New(seed).Next()%2 != 1 {
+							seed++
 						}
-					}
-					if op == "tie" {
-						h.must((*m.LowBounds)[3].Copy(h.m, &(*m.LowBounds)[2]))
-					}
-					if op == "flip" {
-						h.must(s.Bounds.Types.Set(0, ColumnBoxed))
-						h.must((*m.UpperBounds)[0].Copy(h.m, h.pair("1/3", "1/17")))
-					}
-					out := h.pair("97", "101")
-					h.budget.FailAfter(ordinal)
-					_, err := m.FindLeavingAndTPrecise(0, out)
-					h.budget.FailAfter(-1)
-					if err == nil {
-						success, done = true, true
-					} else {
-						failures++
-						if !lpExactPriorityPhysicalRefusal(err) {
-							t.Fatal(err)
+						s.Settings.RandomSeed(seed)
+						huge := strings.Repeat("1234567890", 12)
+						ed := h.pair(huge+"1/7", "0")
+						for i := uint32(0); i < 2; i++ {
+							h.must(m.Ed.SetValue(&ed.X, i))
+							if op == "inline-minimum" {
+								h.must(h.m.SetInt32(&m.Ed.Data[i], -2147483648))
+							}
+							h.must(s.Bounds.Types.Set(2+i, ColumnLowBound))
+							h.must((*m.LowBounds)[2+i].Copy(h.m, h.pair("-"+huge+fmt.Sprint(i+3)+"/11", huge+"5/13")))
+							if op == "inline-minimum" {
+								h.must(s.Bounds.Types.Set(2+i, ColumnUpperBound))
+								h.must((*m.UpperBounds)[2+i].Copy(h.m, h.pair(huge+fmt.Sprint(i+3)+"/11", huge+"5/13")))
+							}
 						}
-						if m.calls.pending() && m.PairCoreSolverBase.calls.pending() {
-							t.Fatal("adopted delegated comparison")
+						if op == "tie" {
+							h.must((*m.LowBounds)[3].Copy(h.m, &(*m.LowBounds)[2]))
 						}
-						if _, e := m.FindLeavingAndTPrecise(0, out); e != ErrExactVectorPending {
-							t.Fatal(e)
+						if op == "flip" {
+							h.must(s.Bounds.Types.Set(0, ColumnBoxed))
+							h.must((*m.UpperBounds)[0].Copy(h.m, h.pair("1/3", "1/17")))
 						}
+						out := h.pair("97", "101")
+						h.budget.FailAfter(ordinal)
+						_, err := m.FindLeavingAndTPrecise(0, out)
+						h.budget.FailAfter(-1)
+						if err == nil {
+							success, done = true, true
+						} else {
+							failures++
+							if !lpExactPriorityPhysicalRefusal(err) {
+								t.Fatal(err)
+							}
+							if m.calls.pending() && m.PairCoreSolverBase.calls.pending() {
+								t.Fatal("adopted delegated comparison")
+							}
+							if _, e := m.FindLeavingAndTPrecise(0, out); e != ErrExactVectorPending {
+								t.Fatal(e)
+							}
+						}
+						h.must(s.Close())
+						lpExactVectorNamedCensus(t, h, nil)
+					})
+					if done {
+						break
 					}
-					h.must(s.Close())
-					lpExactVectorNamedCensus(t, h, nil)
-				})
-				if done {
-					break
 				}
-			}
-			if !success || failures == 0 {
-				t.Fatal(op, direct, success, failures)
-			}
+				if !success || failures == 0 {
+					t.Fatal(op, direct, success, failures)
+				}
+			})
 		}
 	}
 }
