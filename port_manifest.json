@@ -166639,6 +166639,7 @@
         "TestIntegerModularConversionOverloadsAndDisplay",
         "TestIntegerModularPredictableFailurePrefixes",
         "TestIntegerModularPowerRawLocalSourceEndAndOwningRetry",
+        "TestIntegerModularCloseRetainsStoppedDestructorSuffix",
         "TestIntegerModularReleaseSetupPreconditions",
         "TestIntegerModularFiniteSourceQuirks",
         "TestIntegerModularExplicitInPlaceOverloads",
@@ -166902,6 +166903,14 @@
             "TestIntegerModularExplicitInPlaceOverloads",
             "TestIntegerModularColdOwnerIdentity",
             "TestIntegerModularConstructorOwnershipAndRefusal"
+          ]
+        },
+        {
+          "name": "mpzzp_manager destructor seven mpz DELs at mpzzp.h:97-105: stopped owning cleanup resumes at the first undeleted field and excludes ordinary calls until complete",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp.go",
+          "tests": [
+            "TestIntegerModularCloseRetainsStoppedDestructorSuffix"
           ]
         },
         {

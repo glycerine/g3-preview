@@ -30,6 +30,8 @@ type IntegerModularManager struct {
 	P, Lower, Upper, InvTmp1, InvTmp2, InvTmp3, DivTmp Int
 	PowerTemporary                                     Int
 	PowerPending                                       bool
+	closing                                            bool
+	closeCursor                                        uint8
 	Header                                             uint64
 }
 
@@ -88,6 +90,9 @@ func (m *IntegerModularManager) check() error {
 	if m.closed || m.manager.closed {
 		return arena.ErrClosed
 	}
+	if m.closing {
+		return ErrNumericPending
+	}
 	return nil
 }
 func (m *IntegerModularManager) Manager() (*IntegerManager, error) {
@@ -117,13 +122,18 @@ func (m *IntegerModularManager) Close() error {
 		return arena.ErrClosed
 	}
 	if !m.manager.closed {
-		if e := m.CleanupPowerTemporary(); e != nil {
-			return e
-		}
-		for _, v := range []*Int{&m.P, &m.Lower, &m.Upper, &m.InvTmp1, &m.InvTmp2, &m.InvTmp3, &m.DivTmp} {
-			if e := m.manager.Del(v); e != nil {
+		if !m.closing {
+			if e := m.CleanupPowerTemporary(); e != nil {
 				return e
 			}
+			m.closing = true
+		}
+		values := [...]*Int{&m.P, &m.Lower, &m.Upper, &m.InvTmp1, &m.InvTmp2, &m.InvTmp3, &m.DivTmp}
+		for m.closeCursor < uint8(len(values)) {
+			if e := m.manager.Del(values[m.closeCursor]); e != nil {
+				return e
+			}
+			m.closeCursor++
 		}
 	}
 	m.manager.BudgetField.Release(m.Header)
