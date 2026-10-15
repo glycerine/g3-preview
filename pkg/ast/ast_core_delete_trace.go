@@ -1,13 +1,41 @@
-// Source: src/ast/ast.cpp:1790-1792; src/util/trace.h.
+// Source: src/ast/ast.cpp:1782,1790-1792; src/util/trace.h.
 package ast
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"strconv"
 
 	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
+
+func (m *ASTManager) traceDeleteNodeBug(r astNodeRef) {
+	tags := m.traceTags
+	if tags == nil {
+		tags = udiag.BorrowProcessTraceTags()
+	}
+	if !tags.ShouldTrace("delete_node_bug") {
+		return
+	}
+	_ = tags.EmitConditional("delete_node_bug", "delete_node", "src/ast/ast.cpp", 1782,
+		func() bool { return true }, func(w io.Writer) error {
+			out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: m.BudgetField})
+			if err != nil {
+				return err
+			}
+			printErr := m.lowLevelPrint(out, r, true, true)
+			rendered, readErr := out.String()
+			_, _ = io.WriteString(w, rendered)
+			closeErr := out.Close()
+			if err := errors.Join(printErr, readErr, closeErr); err != nil {
+				return err
+			}
+			_, _ = io.WriteString(w, "\n")
+			return nil
+		})
+}
 
 func (m *ASTManager) traceDeletingNode(n *astNodeRecord) {
 	tags := m.traceTags

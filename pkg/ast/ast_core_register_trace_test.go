@@ -95,3 +95,32 @@ func TestASTDeletionSourceTraceRecords(t *testing.T) {
 		t.Fatalf("deletion records:\n got %q\nwant %q", got, want)
 	}
 }
+
+func TestASTDeleteNodeBugTraceBeforeWorklist(t *testing.T) {
+	s, numerals, budget := astTestOwners(t)
+	var buf bytes.Buffer
+	tags := udiag.NewTraceTagsWithWriter(&buf)
+	m, e := NewASTManager(ASTManagerConfig{Symbols: s, Numerals: numerals, Budget: budget, TraceTags: tags})
+	astTestMust(t, e)
+	t.Cleanup(func() { astTestMust(t, m.Close()) })
+	sort, e := m.MkBoolSort()
+	astTestMust(t, e)
+	variable, e := m.MkVar(7, sort)
+	astTestMust(t, e)
+	ref, e := m.NewRef(variable)
+	astTestMust(t, e)
+	tags.Enable("delete_node_bug")
+	tags.Enable("mk_var_bug")
+	id, e := m.GetASTID(variable)
+	astTestMust(t, e)
+	astTestMust(t, m.DelRef(&ref))
+	want := "-------- [delete_node_bug] delete_node src/ast/ast.cpp:1782 ---------\n" +
+		"(:var 7 Bool)\n\n" +
+		"------------------------------------------------\n" +
+		"-------- [mk_var_bug] delete_node src/ast/ast.cpp:1792 ---------\n" +
+		"del_ast: " + strconv.FormatUint(uint64(id), 10) + "\n" +
+		"------------------------------------------------\n"
+	if got := buf.String(); got != want {
+		t.Fatalf("delete_node_bug record:\n got %q\nwant %q", got, want)
+	}
+}

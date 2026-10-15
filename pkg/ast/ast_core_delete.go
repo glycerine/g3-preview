@@ -44,6 +44,7 @@ func (m *ASTManager) deleteNode(first astNodeRef) error {
 		stack = append(stack, r)
 		m.deletionHead = r
 	}
+	m.traceDeleteNodeBug(first)
 	push(first)
 	for len(stack) != 0 {
 		current := stack[len(stack)-1]

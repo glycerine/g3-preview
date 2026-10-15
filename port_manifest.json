@@ -10696,6 +10696,12 @@
           "tests": ["TestASTQuantifierWeightTraceBeforeReplacement"]
         },
         {
+          "name": "Reached AST delete_node_bug TRACE before deletion worklist with low-level AST printer (ast.cpp:1782)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_delete_trace.go",
+          "tests": ["TestASTDeleteNodeBugTraceBeforeWorklist"]
+        },
+        {
           "name": "mk_app chainable branch TRACE before adjacent pair-buffer construction (ast.cpp:2195)",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_app_trace.go",
@@ -176860,6 +176866,13 @@
           "tests": ["TestASTDeletionSourceTraceRecords"]
         },
         {
+          "name": "Reached AST delete_node_bug TRACE before deletion worklist with low-level AST printer (ast.cpp:1782)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_delete_trace.go",
+          "go_targets": ["pkg/ast/ast_core_register_trace_test.go"],
+          "tests": ["TestASTDeleteNodeBugTraceBeforeWorklist"]
+        },
+        {
           "name": "Reached config_mpf nth_root_trace STRACE after positive Newton bounds, before negative-sign reversal (interval_def.h:208-210)",
           "status": "ported",
           "go_target": "pkg/math/interval/arbitrary_root_trace.go",
@@ -177696,6 +177709,13 @@
           "go_target": "pkg/ast/ast_core_delete_trace.go",
           "go_targets": ["pkg/ast/ast_core_register_trace_test.go"],
           "tests": ["TestASTDeletionSourceTraceRecords"]
+        },
+        {
+          "name": "Reached AST delete_node_bug TRACE before deletion worklist with low-level AST printer (ast.cpp:1782)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_delete_trace.go",
+          "go_targets": ["pkg/ast/ast_core_register_trace_test.go"],
+          "tests": ["TestASTDeleteNodeBugTraceBeforeWorklist"]
         },
         {
           "name": "Reached config_mpf nth_root_trace STRACE after positive Newton bounds, before negative-sign reversal (interval_def.h:208-210)",
