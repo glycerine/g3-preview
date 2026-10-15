@@ -150450,6 +150450,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/diagnostic/util_memory_runtime.go",
+        "pkg/util/diagnostic/util_trace_tags_memory_trace.go",
+        "pkg/util/diagnostic/util_debug_table_memory_trace.go",
         "pkg/util/memory/accounting.go",
         "pkg/util/memory/runtime.go",
         "pkg/util/memory/failure.go",
@@ -150492,6 +150494,10 @@
         "pkg/util/params/util_params_rational_entry_memory_trace_debug_test.go"
       ],
       "tests": [
+        "TestTraceTagTableAllocationFollowsSourceGate",
+        "TestTraceTagTableFinalizationSuppressesMemoryDuringProcessFinalize",
+        "TestDebugTableMemoryTraceFollowsLazyLifetime",
+        "TestDebugTableDeallocationSuppressesMemoryDuringProcessFinalize",
         "TestMemoryAccountingBoundedIndependentLaneModel",
         "TestMemoryAccountingDeallocationClampAndWatermark",
         "TestMemoryAccountingDeallocationPhysicalBoundary",
@@ -150739,7 +150745,7 @@
           ]
         },
         {
-          "name": "Z3DEBUG allocate(file,line,obj,size) and deallocate(file,line,p) wrappers: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs plus generated symbol table and rational global manager plus param_descrs::imp and params blocks and rational entries call sites are ported; other retained caller sites remain unaudited (cpp202-211)",
+          "name": "Z3DEBUG allocate(file,line,obj,size) and deallocate(file,line,p) wrappers: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs plus generated symbol table and rational global manager plus param_descrs::imp, params blocks, rational entries, trace-tag and debug-tag tables call sites are ported; other retained caller sites remain unaudited (cpp202-211)",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
           "go_targets": [
@@ -150749,7 +150755,7 @@
           "tests": [
             "TestMemoryChunkTraceSourceSitesAndFinalizeGuard",
             "TestIntegerConstructorBindsMemoryChunkTrace",
-            "TestMonomialConstructorBindsMemoryChunkTrace"
+            "TestMonomialConstructorBindsMemoryChunkTrace", "TestTraceTagTableAllocationFollowsSourceGate", "TestTraceTagTableFinalizationSuppressesMemoryDuringProcessFinalize", "TestDebugTableMemoryTraceFollowsLazyLifetime", "TestDebugTableDeallocationSuppressesMemoryDuringProcessFinalize"
           ]
         },
         {
@@ -151094,6 +151100,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/diagnostic/util_memory_runtime.go",
+        "pkg/util/diagnostic/util_trace_tags_memory_trace.go",
+        "pkg/util/diagnostic/util_debug_table_memory_trace.go",
         "pkg/util/memory/accounting.go",
         "pkg/util/memory/runtime.go",
         "pkg/util/memory/failure.go",
@@ -151131,6 +151139,10 @@
         "pkg/util/params/util_params_rational_entry_memory_trace_debug_test.go"
       ],
       "tests": [
+        "TestTraceTagTableAllocationFollowsSourceGate",
+        "TestTraceTagTableFinalizationSuppressesMemoryDuringProcessFinalize",
+        "TestDebugTableMemoryTraceFollowsLazyLifetime",
+        "TestDebugTableDeallocationSuppressesMemoryDuringProcessFinalize",
         "TestMemoryAccountingBoundedIndependentLaneModel",
         "TestMemoryAccountingDeallocationClampAndWatermark",
         "TestMemoryAccountingDeallocationPhysicalBoundary",
@@ -151368,7 +151380,7 @@
           ]
         },
         {
-          "name": "Z3DEBUG allocation/deallocation file-line overloads and alloc/dealloc macros: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs plus generated symbol table and rational global manager plus param_descrs::imp and params blocks and rational entries sites are connected through concrete trace hooks; other retained caller sites remain unaudited (h69-97; cpp202-211)",
+          "name": "Z3DEBUG allocation/deallocation file-line overloads and alloc/dealloc macros: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs plus generated symbol table and rational global manager plus param_descrs::imp, params blocks, rational entries, trace-tag and debug-tag tables sites are connected through concrete trace hooks; other retained caller sites remain unaudited (h69-97; cpp202-211)",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
           "go_targets": [
@@ -151378,7 +151390,7 @@
           "tests": [
             "TestMemoryChunkTraceSourceSitesAndFinalizeGuard",
             "TestIntegerConstructorBindsMemoryChunkTrace",
-            "TestMonomialConstructorBindsMemoryChunkTrace"
+            "TestMonomialConstructorBindsMemoryChunkTrace", "TestTraceTagTableAllocationFollowsSourceGate", "TestTraceTagTableFinalizationSuppressesMemoryDuringProcessFinalize", "TestDebugTableMemoryTraceFollowsLazyLifetime", "TestDebugTableDeallocationSuppressesMemoryDuringProcessFinalize"
           ]
         },
         {
