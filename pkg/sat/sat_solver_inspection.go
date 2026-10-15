@@ -117,6 +117,7 @@ func (s *Solver) collectBinClauses(out []BinaryLiteralPair, learned bool) ([]Bin
 			if l.index() > l2.index() {
 				continue
 			}
+			s.traceCollectedBinClause(l, l2)
 			out = append(out, newSATSolverBinPair(l, l2))
 		}
 	}

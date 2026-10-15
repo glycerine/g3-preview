@@ -178214,6 +178214,18 @@
           "tests": ["TestSATWatchedClauseSourceTraceBranches"]
         },
         {
+          "name": "Reached SAT collect_bin_clauses TRACE before binary-pair append (sat_solver.cpp:2834)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_inspection_trace.go",
+          "tests": ["TestSATCollectBinaryClausesSourceTraceOrder"]
+        },
+        {
+          "name": "Reached SAT missed-propagation TRACE before unreachable assertion for live empty and unit clauses (sat_solver.cpp:3061)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_probing_diagnostics_trace.go",
+          "tests": ["TestSATMissedPropagationSourceTraceBeforeAssertion"]
+        },
+        {
           "name": "Reached SAT learned-watch nonfalse CTRACE before source false-literal assertion (sat_solver.cpp:419)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_clause_watch_trace.go",
@@ -179505,6 +179517,18 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_propagation_trace.go",
           "tests": ["TestSATWatchedClauseSourceTraceBranches"]
+        },
+        {
+          "name": "Reached SAT collect_bin_clauses TRACE before binary-pair append (sat_solver.cpp:2834)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_inspection_trace.go",
+          "tests": ["TestSATCollectBinaryClausesSourceTraceOrder"]
+        },
+        {
+          "name": "Reached SAT missed-propagation TRACE before unreachable assertion for live empty and unit clauses (sat_solver.cpp:3061)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_probing_diagnostics_trace.go",
+          "tests": ["TestSATMissedPropagationSourceTraceBeforeAssertion"]
         },
         {
           "name": "Reached SAT learned-watch nonfalse CTRACE before source false-literal assertion (sat_solver.cpp:419)",

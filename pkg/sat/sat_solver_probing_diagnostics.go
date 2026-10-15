@@ -81,6 +81,7 @@ func (s *satSolverClauseLifecycle) checkMissedClauseVector(cs []StoredClauseRef)
 			}
 		}
 		if empty || unit {
+			s.traceMissedPropagation(c)
 			return ErrSATAssertion
 		} // source UNREACHABLE at actual dispatch.
 		if satStorageSourceDebug {
