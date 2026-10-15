@@ -56340,11 +56340,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/model/model2expr_fresh_name.go",
-        "pkg/model/model2expr_entry_condition.go"
+        "pkg/model/model2expr_entry_condition.go",
+        "pkg/model/model2expr.go"
       ],
       "tests": [
         "TestModel2ExprFreshNameConcreteSymbolSetAndSequence",
-        "TestModel2ExprEntryConditionSourceArityAndReferenceScope"
+        "TestModel2ExprEntryConditionSourceArityAndReferenceScope",
+        "TestModel2ExprSourceConstantFullAndPartialFunctionOrder",
+        "TestModel2ExprSourceReverseEntriesAndEmptyPartialSkip",
+        "TestModel2ExprSourceBuilderAllocationRefusalsReleaseRoots"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -56360,18 +56364,24 @@
           "status": "ported",
           "go_target": "pkg/model/model2expr_fresh_name.go",
           "tests": ["TestModel2ExprFreshNameConcreteSymbolSetAndSequence"]
+        },
+        {
+          "name": "model2expr constant clauses, full and partial function clauses, reverse entry precedence, variable substitution and quantified conjunction (model2expr.cpp:79-155)",
+          "status": "ported",
+          "go_target": "pkg/model/model2expr.go",
+          "tests": ["TestModel2ExprSourceConstantFullAndPartialFunctionOrder", "TestModel2ExprSourceReverseEntriesAndEmptyPartialSkip", "TestModel2ExprSourceBuilderAllocationRefusalsReleaseRoots"]
         }
       ],
-      "ownership": [],
-      "deviations": ["Only the live fresh-name and symbol-collection helper is ported. Model-to-formula construction, its owning expr_ref_vectors and quantified result remain unported; Spacer/PDR are retained source consumers."]
+      "ownership": ["Model2ExprBuilder pins each generated conjunction and the current expression; a per-function frame pins argument and reverse-variable vectors and keeps interrupted cleanup reachable through Close."],
+      "deviations": ["The source model-to-formula algorithm and its concrete owner scopes are ported. Spacer/PDR call sites and broader source test coverage remain open, so the unit retains partial status."]
     },
     {
       "path": "src/model/model2expr.h",
       "component": "model",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/model/model2expr_fresh_name.go"],
-      "tests": ["TestModel2ExprFreshNameConcreteSymbolSetAndSequence"],
+      "go_targets": ["pkg/model/model2expr_fresh_name.go", "pkg/model/model2expr.go"],
+      "tests": ["TestModel2ExprFreshNameConcreteSymbolSetAndSequence", "TestModel2ExprSourceConstantFullAndPartialFunctionOrder"],
       "conditionals": [
         {
           "line": 19,
@@ -56390,10 +56400,16 @@
           "status": "ported",
           "go_target": "pkg/model/model2expr_fresh_name.go",
           "tests": ["TestModel2ExprFreshNameConcreteSymbolSetAndSequence"]
+        },
+        {
+          "name": "model2expr model reference entry point and result expression owner (model2expr.h:24-26)",
+          "status": "partial",
+          "go_target": "pkg/model/model2expr.go",
+          "tests": ["TestModel2ExprSourceConstantFullAndPartialFunctionOrder"]
         }
       ],
       "ownership": [],
-      "deviations": ["Only the live fresh-name and symbol-collection helper is ported. Model-to-formula construction, its owning expr_ref_vectors and quantified result remain unported; Spacer/PDR are retained source consumers."]
+      "deviations": ["The model-to-formula builder is ported, but the source's model_ref wrapper and Spacer/PDR call sites remain open."]
     },
     {
       "path": "src/model/model_core.cpp",
@@ -171797,6 +171813,12 @@
           "status": "ported",
           "go_target": "pkg/model/model2expr_entry_condition.go",
           "tests": ["TestModel2ExprEntryConditionSourceArityAndReferenceScope"]
+        },
+        {
+          "name": "Concrete model2expr owning conjunction, argument and reverse-variable vectors retain AST roots through quantified construction and release on allocation refusal (model2expr.cpp:82-152)",
+          "status": "ported",
+          "go_target": "pkg/model/model2expr.go",
+          "tests": ["TestModel2ExprSourceBuilderAllocationRefusalsReleaseRoots"]
         },
         {
           "name": "Concrete model-evaluator expr_ref_vector store rows, reconstruction arguments and equality constraints retain AST roots through source-order array expansion and comparison (model_evaluator.cpp:207-221,301-319,422-499)",
