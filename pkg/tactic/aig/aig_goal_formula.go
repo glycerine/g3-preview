@@ -132,7 +132,11 @@ func (c *goalFormulaConverter) buildAnd(n *node) (err error) {
 	if e != nil {
 		return e
 	}
-	return c.remember(n, and)
+	if e := c.remember(n, and); e != nil {
+		return e
+	}
+	m.traceGoalConversion(n, 863, "caching AND ")
+	return nil
 }
 
 func (c *goalFormulaConverter) literal(l Literal) (ast.ASTHandle, error) {
@@ -188,7 +192,11 @@ func (c *goalFormulaConverter) buildITE(n *node) (err error) {
 	if e != nil {
 		return e
 	}
-	return c.remember(n, result)
+	if e := c.remember(n, result); e != nil {
+		return e
+	}
+	c.manager.traceGoalConversion(n, 881, "caching ITE/IFF ")
+	return nil
 }
 
 func (c *goalFormulaConverter) processRoot(n *node) (ast.ASTHandle, error) {
@@ -248,6 +256,7 @@ func (c *goalFormulaConverter) processRoot(n *node) (ast.ASTHandle, error) {
 		case goalAIGITE:
 			err = c.buildITE(fr.node)
 		case goalAIGAuxAnd:
+			c.manager.traceGoalConversion(fr.node, 931, "skipping aux AND ")
 		}
 		if err != nil {
 			return ast.ASTHandle{}, err

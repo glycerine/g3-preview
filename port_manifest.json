@@ -98145,6 +98145,7 @@
         "pkg/tactic/aig/aig_formula.go",
         "pkg/tactic/aig/aig_ite_shape.go",
         "pkg/tactic/aig/aig_goal_formula.go",
+        "pkg/tactic/aig/aig_goal_conversion_trace.go",
         "pkg/tactic/aig/aig_max_sharing.go",
         "pkg/tactic/aig/aig_imp_memory_trace.go",
         "pkg/tactic/aig/aig_delete_trace.go",
@@ -98167,6 +98168,7 @@
         "TestAIGToFormulaNestedGraphAndVariableNot",
         "TestAIGITEShapeFourSourceComplementPositions",
         "TestAIGToGoalSourceRootOrderAndITE",
+        "TestAIGGoalConversionCacheAndAuxTraceSourceOrder",
         "TestAIGToGoalFlattensSingleUsePositiveAndUnderNegation",
         "TestAIGMaxSharingReassociatesTowardExistingPair",
         "TestAIGMaxSharingUnchangedAndInvertedRoot",
@@ -98523,6 +98525,14 @@
           ]
         },
         {
+          "name": "optimized aig2expr cache AND, cache ITE/IFF and skip auxiliary AND TRACE after source actions",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_goal_conversion_trace.go",
+          "tests": [
+            "TestAIGGoalConversionCacheAndAuxTraceSourceOrder"
+          ]
+        },
+        {
           "name": "delete_node aig_lit_count TRACE before node count, variable release and child deletion cascade",
           "status": "ported",
           "go_target": "pkg/tactic/aig/aig_delete_trace.go",
@@ -98551,6 +98561,7 @@
         "pkg/tactic/aig/aig_goal.go",
         "pkg/tactic/aig/aig_formula.go",
         "pkg/tactic/aig/aig_goal_formula.go",
+        "pkg/tactic/aig/aig_goal_conversion_trace.go",
         "pkg/tactic/aig/aig_max_sharing.go",
         "pkg/tactic/aig/aig_imp_memory_trace.go"
       ],
@@ -98564,6 +98575,7 @@
         "TestAIGGoalConversionSharesExpressionCacheAndConjoins",
         "TestAIGToFormulaNaiveIterativeDeMorganAndSmartInversion",
         "TestAIGToGoalSourceRootOrderAndITE",
+        "TestAIGGoalConversionCacheAndAuxTraceSourceOrder",
         "TestAIGMaxSharingReassociatesTowardExistingPair",
         "TestAIGCheckpointSourceMemoryCancelAndCooperateOrder",
         "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
@@ -179185,7 +179197,8 @@
         "pkg/math/interval/rational_root_trace.go",
         "pkg/math/interval/rational_root_trace_test.go",
         "pkg/tactic/aig/aig_delete_trace.go",
-        "pkg/tactic/aig/aig_expr_cache_trace.go"
+        "pkg/tactic/aig/aig_expr_cache_trace.go",
+        "pkg/tactic/aig/aig_goal_conversion_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -179258,7 +179271,8 @@
         "TestFixedPolynomialTraceStreamRefusalKeepsDefinition",
         "TestFixedPolynomialTraceUsesBorrowedVariablePrinter",
         "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate",
-        "TestAIGExprCacheReleaseTracePrecedesLastReference"
+        "TestAIGExprCacheReleaseTracePrecedesLastReference",
+        "TestAIGGoalConversionCacheAndAuxTraceSourceOrder"
       ],
       "conditionals": [
         {
@@ -180616,6 +180630,14 @@
           ]
         },
         {
+          "name": "Retained optimized aig2expr cache AND, ITE/IFF and skip auxiliary AND TRACE bodies (aig.cpp:863,881,931)",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_goal_conversion_trace.go",
+          "tests": [
+            "TestAIGGoalConversionCacheAndAuxTraceSourceOrder"
+          ]
+        },
+        {
           "name": "Retained AIG delete_node aig_lit_count TRACE before node recycling and child cascade (aig.cpp:149)",
           "status": "ported",
           "go_target": "pkg/tactic/aig/aig_delete_trace.go",
@@ -180708,7 +180730,8 @@
         "pkg/math/interval/rational_root_trace.go",
         "pkg/math/interval/rational_root_trace_test.go",
         "pkg/tactic/aig/aig_delete_trace.go",
-        "pkg/tactic/aig/aig_expr_cache_trace.go"
+        "pkg/tactic/aig/aig_expr_cache_trace.go",
+        "pkg/tactic/aig/aig_goal_conversion_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -180779,7 +180802,8 @@
         "TestFixedPolynomialTraceStreamRefusalKeepsDefinition",
         "TestFixedPolynomialTraceUsesBorrowedVariablePrinter",
         "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate",
-        "TestAIGExprCacheReleaseTracePrecedesLastReference"
+        "TestAIGExprCacheReleaseTracePrecedesLastReference",
+        "TestAIGGoalConversionCacheAndAuxTraceSourceOrder"
       ],
       "conditionals": [
         {
@@ -182134,6 +182158,14 @@
           "go_target": "pkg/tactic/aig/aig_expr_cache_trace.go",
           "tests": [
             "TestAIGExprCacheReleaseTracePrecedesLastReference"
+          ]
+        },
+        {
+          "name": "Retained optimized aig2expr cache AND, ITE/IFF and skip auxiliary AND TRACE bodies (aig.cpp:863,881,931)",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_goal_conversion_trace.go",
+          "tests": [
+            "TestAIGGoalConversionCacheAndAuxTraceSourceOrder"
           ]
         },
         {
