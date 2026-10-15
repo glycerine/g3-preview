@@ -57,6 +57,8 @@ func TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers(t *testing.T) {
 
 	oneUsed := makeQ(twoSorts, twoNames, v[0], nil)
 	wantOne := makeQ([]ast.ASTHandle{b}, []symbol.Symbol{twoNames[1]}, v[0], nil)
+	beforeMapping, e := m.GetRefCount(v[0])
+	satOK(t, e)
 	out, e = ElimUnusedVarsUFBV(m, oneUsed)
 	satOK(t, e)
 	got, e = m.RefGet(out)
@@ -65,6 +67,11 @@ func TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers(t *testing.T) {
 		t.Fatal("unused outer declaration must be removed with source reverse declaration order", got, wantOne)
 	}
 	satOK(t, m.DelRef(&out))
+	afterMapping, e := m.GetRefCount(v[0])
+	satOK(t, e)
+	if afterMapping != beforeMapping {
+		t.Fatal("temporary variable mapping retained an AST reference", beforeMapping, afterMapping)
+	}
 	d, e := m.MkFuncDecl(symbol.Numerical(12), []ast.ASTHandle{b}, b, ast.ASTFuncDeclInfo{})
 	satOK(t, e)
 	astTestPin(t, m, d)

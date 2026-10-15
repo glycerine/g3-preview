@@ -28957,7 +28957,7 @@
       ],
       "ownership": [
         "Complete enclosing header charged once; beta_reducer and its original engine/shifter/cache/ref members constructed in place. Partial construction returns the actual owner for Close; constructor-refusal tests warm the AST manager retained ref directory before measuring independent empty member constructions. Borrowed caller bindings retain the original engine protocol; output is an owning ASTRef.",
-        "Borrowed AppArguments input is copied directly by the existing binding engine in source normal/inverse order; Substitute and SubstituteArguments share the same reset/binding/traversal path."
+        "Borrowed AppArguments input is copied directly by the existing binding engine in source normal/inverse order; Substitute and SubstituteArguments share the same reset/binding/traversal path. The UFBV unused-variable caller now pins every constructed variable mapping until substitution and result publication finish, then releases those pins after its younger substitution/result owners."
       ],
       "deviations": [
         "is_well_sorted pre/post SASSERT and TRACE formatting remain unported dependencies; operator gains only partial credit. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. The UFBV empty-params unused-variable elimination path is now concrete; nondefault parameters, instantiate, free-variable enumeration and other consumers remain open. Explicit boolean constructor argument supplies the C++ standard-order option; selected model function interpretation/evaluator integration now uses this owner; broader theory integration remains open."
@@ -170955,7 +170955,9 @@
         "pkg/ast/rewriter/bv_rewriter_xor_numeric_test.go",
         "pkg/tactic/bv/max_bv_sharing_goal.go",
         "pkg/tactic/bv/max_bv_sharing_reduce_test.go",
-        "pkg/tactic/ufbv/rewrite_tactic_test.go"
+        "pkg/tactic/ufbv/rewrite_tactic_test.go",
+        "pkg/ast/rewriter/unused_vars_ufbv.go",
+        "pkg/ast/rewriter/unused_vars_ufbv_test.go"
       ],
       "tests": [
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
@@ -171005,7 +171007,8 @@
         "TestASTArithmeticAppCoercionEveryWarmReservation",
         "TestBVRewriterXOREveryActualNumericAndMaskReservation",
         "TestSharingGoalPassPublishesIndependentGoalReference",
-        "TestUFBVRewriterTacticPublishesIndependentGoalReference"
+        "TestUFBVRewriterTacticPublishesIndependentGoalReference",
+        "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers"
       ],
       "conditionals": [
         {
@@ -171034,6 +171037,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Concrete UFBV elim_unused_vars var_mapping expr_ref_buffer pins each generated mk_var across reverse-order substitution and releases it after younger result owners (var_subst.cpp:85-145)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/unused_vars_ufbv.go",
+          "tests": ["TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers"]
+        },
         {
           "name": "Concrete UFBV rewriter goal_ref_buffer single-result push acquires an independent goal reference after depth increment (ufbv_rewriter_tactic.cpp:65-66)",
           "status": "ported",

@@ -88,6 +88,16 @@ func ElimUnusedVarsUFBV(m *ast.ASTManager, q ast.ASTHandle) (_ ast.ASTRef, resul
 		length = int(n)
 	}
 	bindings := make([]ast.ASTHandle, length)
+	// The source var_mapping is an expr_ref_buffer. Keep each constructed
+	// variable alive until substitution and quantifier publication finish.
+	pinned := make([]bool, length)
+	defer func() {
+		for i, h := range bindings {
+			if pinned[i] {
+				result = errors.Join(result, m.DecRef(h))
+			}
+		}
+	}()
 	next := uint32(0)
 	removed := uint32(0)
 	for i := uint32(0); i < n; i++ {
@@ -99,6 +109,10 @@ func ElimUnusedVarsUFBV(m *ast.ASTManager, q ast.ASTHandle) (_ ast.ASTRef, resul
 		if e != nil {
 			return ast.ASTRef{}, e
 		}
+		if e = m.IncRef(bindings[i]); e != nil {
+			return ast.ASTRef{}, e
+		}
+		pinned[i] = true
 		next++
 	}
 	for i := n; uint64(i) < uint64(len(used.found)); i++ {
@@ -109,9 +123,14 @@ func ElimUnusedVarsUFBV(m *ast.ASTManager, q ast.ASTHandle) (_ ast.ASTRef, resul
 		if e != nil {
 			return ast.ASTRef{}, e
 		}
+		if e = m.IncRef(bindings[i]); e != nil {
+			return ast.ASTRef{}, e
+		}
+		pinned[i] = true
 	}
 	for i, j := 0, len(bindings)-1; i < j; i, j = i+1, j-1 {
 		bindings[i], bindings[j] = bindings[j], bindings[i]
+		pinned[i], pinned[j] = pinned[j], pinned[i]
 	}
 	subst, e := NewVarSubstitution(m, true)
 	if e != nil {
