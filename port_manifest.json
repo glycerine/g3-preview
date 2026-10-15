@@ -178226,6 +178226,12 @@
           "tests": ["TestSATConsequenceCoreFixupSourceTraceOrder"]
         },
         {
+          "name": "Reached SAT ordinary and bounded consequence assumption-list TRACE before antecedent reset (sat_solver.cpp:3307,3366)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_consequences_trace.go",
+          "tests": ["TestSATConsequenceEntryAssumptionSourceTrace"]
+        },
+        {
           "name": "Reached SAT missed-propagation TRACE before unreachable assertion for live empty and unit clauses (sat_solver.cpp:3061)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_probing_diagnostics_trace.go",
@@ -179535,6 +179541,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_consequences_trace.go",
           "tests": ["TestSATConsequenceCoreFixupSourceTraceOrder"]
+        },
+        {
+          "name": "Reached SAT ordinary and bounded consequence assumption-list TRACE before antecedent reset (sat_solver.cpp:3307,3366)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_consequences_trace.go",
+          "tests": ["TestSATConsequenceEntryAssumptionSourceTrace"]
         },
         {
           "name": "Reached SAT missed-propagation TRACE before unreachable assertion for live empty and unit clauses (sat_solver.cpp:3061)",

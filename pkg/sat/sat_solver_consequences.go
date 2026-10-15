@@ -143,6 +143,7 @@ func (s *Solver) consequenceInitialize(asms satConsequenceInput) (result lbool.L
 	return lbool.True, nil
 }
 func (s *Solver) getLiteralConsequencesBody(asms, lits satConsequenceInput, out *satSolverLiteralRows) (result lbool.LBool, err error) {
+	s.traceConsequenceAssumptions("get_consequences", 3366, asms)
 	// Source reset precedes actual unfixed_lits, assumptions, bool_var_set ctors.
 	if err = s.antecedents.reset(); err != nil {
 		return lbool.Undef, err
@@ -361,6 +362,7 @@ func (s *Solver) getBoundedConsequencesBody(asms, vars satConsequenceInput, out 
 			return lbool.Undef, err
 		}
 	}
+	s.traceConsequenceAssumptions("get_bounded_consequences", 3307, asms)
 	if err = s.antecedents.reset(); err != nil {
 		return lbool.Undef, err
 	}
