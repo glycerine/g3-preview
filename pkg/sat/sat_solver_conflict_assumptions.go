@@ -130,6 +130,7 @@ func (s *satSolverConflictResolution) resolveConflictForUnsatCore() error {
 	a := s.analysis
 	p := a.propagation
 	v := p.variables
+	s.traceUnsatCoreStart()
 	if e := s.core.Shrink(0); e != nil {
 		return e
 	}
@@ -176,6 +177,7 @@ func (s *satSolverConflictResolution) resolveConflictForUnsatCore() error {
 		if e != nil {
 			return e
 		}
+		s.traceUnsatCoreNotLiteral(p.notLiteral, j)
 		if e = s.processAntecedentForUnsatCore(p.notLiteral); e != nil {
 			return e
 		}
@@ -222,6 +224,7 @@ func (s *satSolverConflictResolution) resolveConflictForUnsatCore() error {
 			return e
 		}
 		if level < s.conflictLevel {
+			s.traceUnsatCoreLowerLevel(consequent, level)
 			break
 		}
 		if satStorageSourceDebug && level != s.conflictLevel {
