@@ -153517,7 +153517,7 @@
           "status": "platform_replacement",
           "go_target": "pkg/util/numeral/mpf_raw_text.go",
           "go_targets": ["pkg/util/numeral/mpf_value_input_trace.go", "pkg/util/numeral/mpf_round_integral_trace.go"],
-          "tests": ["TestArbitraryFloatRawStringLiteralClassification", "TestArbitraryFloatSetFloatRawTraceFormatterRefusal", "TestArbitraryFloatRoundIntegralTraceBranches", "TestArbitraryFloatRoundIntegralTraceSourceInsertions"]
+          "tests": ["TestArbitraryFloatRawStringLiteralClassification", "TestArbitraryFloatNativeRawStringInterruptedNumericalReadCanRetry", "TestArbitraryFloatSetFloatRawTraceFormatterRefusal", "TestArbitraryFloatRoundIntegralTraceBranches", "TestArbitraryFloatRoundIntegralTraceSourceInsertions"]
         },
         {
           "name": "mpf.cpp:1572-1576; mpf.h:141 to_rational_string actual scoped rational, to_rational and original rational string return",
@@ -154631,7 +154631,7 @@
           "status": "platform_replacement",
           "go_target": "pkg/util/numeral/mpf_raw_text.go",
           "go_targets": ["pkg/util/numeral/mpf_value_input_trace.go", "pkg/util/numeral/mpf_round_integral_trace.go"],
-          "tests": ["TestArbitraryFloatRawStringLiteralClassification", "TestArbitraryFloatSetFloatRawTraceFormatterRefusal", "TestArbitraryFloatRoundIntegralTraceBranches", "TestArbitraryFloatRoundIntegralTraceSourceInsertions"]
+          "tests": ["TestArbitraryFloatRawStringLiteralClassification", "TestArbitraryFloatNativeRawStringInterruptedNumericalReadCanRetry", "TestArbitraryFloatSetFloatRawTraceFormatterRefusal", "TestArbitraryFloatRoundIntegralTraceBranches", "TestArbitraryFloatRoundIntegralTraceSourceInsertions"]
         },
         {
           "name": "mpf.cpp:1572-1576; mpf.h:141 to_rational_string actual scoped rational, to_rational and original rational string return",

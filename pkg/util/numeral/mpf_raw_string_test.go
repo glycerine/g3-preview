@@ -43,3 +43,24 @@ func TestArbitraryFloatRawStringLiteralClassification(t *testing.T) {
 		}
 	}
 }
+
+func TestArbitraryFloatNativeRawStringInterruptedNumericalReadCanRetry(t *testing.T) {
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	x := ArbitraryFloat{format: arbitraryFloatFormat(8, 24, false)}
+	serviceMust(t, m.integer.SetString(&x.significand, "2147483648"))
+	cell := m.integer.Cell(x.significand.Cell)
+	actualSize, e := cell.Backing.ReadWord(m.integer.Allocator, 0)
+	serviceMust(t, e)
+	serviceMust(t, cell.Backing.writeWord(m.integer.Allocator, 0, cell.Capacity+10))
+	_, e = m.RawString(&x)
+	if e == nil || m.integer.Natural.Formatting.Active || m.integer.Natural.CharFormatting.active {
+		t.Fatal("interrupted numerical conversion retained scratch", e, m.integer.Natural.Formatting, m.integer.Natural.CharFormatting)
+	}
+	serviceMust(t, cell.Backing.writeWord(m.integer.Allocator, 0, actualSize))
+	got, e := m.RawString(&x)
+	serviceMust(t, e)
+	if got != "[+ 2147483648 0 N]" {
+		t.Fatal("retry after interrupted numerical read", got)
+	}
+	serviceMust(t, m.Del(&x))
+}
