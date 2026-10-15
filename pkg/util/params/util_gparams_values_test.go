@@ -1,6 +1,7 @@
 package params
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -96,6 +97,34 @@ func TestGlobalParamsActualNormalizeAndScalarSetGetRoutes(t *testing.T) {
 	paramsMust(t, e)
 	if text != "0" {
 		t.Fatal(text)
+	}
+}
+
+func TestGlobalParamsNativeNormalizationScratchGrowth(t *testing.T) {
+	g, _, sy, budget := gparamsRealRegistry(t)
+	name := ":" + strings.Repeat("Ab-", 129) + ".SeEd"
+	wantModule := strings.Repeat("ab_", 129)
+	before := budget.Used()
+	budget.FailAfter(0)
+	module, param, e := g.normalizeName(name)
+	paramsMust(t, e)
+	if budget.Used() != before {
+		t.Fatal("native normalization scratch charged arena", before, budget.Used())
+	}
+	budget.FailAfter(-1)
+	moduleText, e := sy.String(module)
+	paramsMust(t, e)
+	paramText, e := sy.String(param)
+	paramsMust(t, e)
+	if moduleText != wantModule || paramText != "seed" {
+		t.Fatal("long source name normalization", moduleText, paramText)
+	}
+	symbol, e := sy.Intern(name)
+	paramsMust(t, e)
+	moduleFromSymbol, paramFromSymbol, e := g.normalizeSymbol(symbol)
+	paramsMust(t, e)
+	if moduleFromSymbol != module || paramFromSymbol != param {
+		t.Fatal("symbol and string normalization disagree")
 	}
 }
 func TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule(t *testing.T) {

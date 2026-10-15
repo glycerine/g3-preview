@@ -122999,6 +122999,7 @@
       ],
       "tests": [
         "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
+        "TestGlobalParamsNativeNormalizationScratchGrowth",
         "TestGlobalParamsActualSATCollectorCurrentSharedRegistry",
         "TestGlobalParamsBorrowedStringAndSharedSnapshotPublication",
         "TestGlobalParamsCDoubleFilteredPrefixAndIEEEBoundary",
@@ -123114,6 +123115,7 @@
           "go_target": "pkg/util/params/util_gparams.go",
           "tests": [
             "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
+            "TestGlobalParamsNativeNormalizationScratchGrowth",
             "TestGlobalParamsActualSATCollectorCurrentSharedRegistry",
             "TestGlobalParamsBorrowedStringAndSharedSnapshotPublication",
             "TestGlobalParamsCDoubleFilteredPrefixAndIEEEBoundary",
@@ -123319,6 +123321,7 @@
       ],
       "tests": [
         "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
+        "TestGlobalParamsNativeNormalizationScratchGrowth",
         "TestGlobalParamsActualSATCollectorCurrentSharedRegistry",
         "TestGlobalParamsBorrowedStringAndSharedSnapshotPublication",
         "TestGlobalParamsCDoubleFilteredPrefixAndIEEEBoundary",
@@ -123379,6 +123382,7 @@
           "go_target": "pkg/util/params/util_gparams.go",
           "tests": [
             "TestGlobalParamsActualNormalizeAndScalarSetGetRoutes",
+            "TestGlobalParamsNativeNormalizationScratchGrowth",
             "TestGlobalParamsActualSATCollectorCurrentSharedRegistry",
             "TestGlobalParamsBorrowedStringAndSharedSnapshotPublication",
             "TestGlobalParamsCDoubleFilteredPrefixAndIEEEBoundary",

@@ -4,37 +4,12 @@ import (
 	"bytes"
 	"strings"
 
-	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // Mutable normalization scratch is ordinary Go storage retained for reuse.
-
-func (g *GlobalParams) reserveWorkspace(n int) error {
-	if n < 0 {
-		return arena.ErrBounds
-	}
-	if n <= cap(g.Workspace) {
-		return nil
-	}
-	next := cap(g.Workspace)
-	if next == 0 {
-		next = 2
-	}
-	for next < n {
-		if next > int(^uint(0)>>1)/2 {
-			next = n
-			break
-		}
-		next *= 2
-	}
-	b := make([]byte, len(g.Workspace), next)
-	copy(b, g.Workspace)
-	g.Workspace = b
-	return nil
-}
 
 func (g *GlobalParams) internWorkspace(b []byte) (usymbol.Symbol, error) {
 	return g.SymbolsField.Intern(string(b))
@@ -68,11 +43,7 @@ func (g *GlobalParams) normalizeName(name string) (usymbol.Symbol, usymbol.Symbo
 	if len(name) > 0 && name[0] == ':' {
 		name = name[1:]
 	}
-	if e := g.reserveWorkspace(len(name)); e != nil {
-		return usymbol.Symbol{}, usymbol.Symbol{}, e
-	}
-	g.Workspace = g.Workspace[:len(name)]
-	copy(g.Workspace, name)
+	g.Workspace = append(g.Workspace[:0], name...)
 	return g.normalizeWorkspace()
 }
 func (g *GlobalParams) normalizeSymbol(name usymbol.Symbol) (usymbol.Symbol, usymbol.Symbol, error) {
@@ -102,9 +73,6 @@ func (g *GlobalParams) normalizeSymbol(name usymbol.Symbol) (usymbol.Symbol, usy
 			continue
 		}
 		first = false
-		if e = g.reserveWorkspace(len(g.Workspace) + 1); e != nil {
-			return usymbol.Symbol{}, usymbol.Symbol{}, e
-		}
 		g.Workspace = append(g.Workspace, b)
 	}
 	return g.normalizeWorkspace()
