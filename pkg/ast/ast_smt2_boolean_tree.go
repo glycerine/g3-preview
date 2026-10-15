@@ -36,13 +36,9 @@ func (m *ASTManager) SMT2PPBooleanTree(root ASTHandle, names []usymbol.Symbol) (
 	if err != nil {
 		return ASTHandle{}, err
 	}
-	seen := make(map[ASTHandle]bool)
+	seenCompound := make(map[ASTHandle]bool)
 	var visit func(ASTHandle, bool) ([]ASTHandle, uint32, error)
 	visit = func(h ASTHandle, flatten bool) ([]ASTHandle, uint32, error) {
-		if seen[h] {
-			return nil, 0, ErrASTDomain // shared-subterm aliasing is still open
-		}
-		seen[h] = true
 		kind, e := m.GetKind(h)
 		if e != nil {
 			return nil, 0, e
@@ -90,6 +86,12 @@ func (m *ASTManager) SMT2PPBooleanTree(root ASTHandle, names []usymbol.Symbol) (
 			format, _, e := m.SMT2Fdecl(decl)
 			return []ASTHandle{format}, 1, e
 		}
+		// shared_occs defaults to track_atomic=false: repeated vars and
+		// zero-argument apps are printed directly, not assigned aliases.
+		if seenCompound[h] {
+			return nil, 0, ErrASTDomain // compound aliasing is still open
+		}
+		seenCompound[h] = true
 		args := make([]ASTHandle, 0, count)
 		depth := uint32(1)
 		for i := uint32(0); i < count; i++ {

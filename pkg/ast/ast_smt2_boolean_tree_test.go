@@ -36,6 +36,10 @@ func TestASTSMT2BooleanTreeSourcePostorderAndLabels(t *testing.T) {
 	paramsMust(t, err)
 	flat, err := m.MkAnd(left, inner)
 	paramsMust(t, err)
+	repeatedAtom, err := m.MkAnd(left, flat)
+	paramsMust(t, err)
+	repeatedVar, err := m.MkAnd(variable, variable)
+	paramsMust(t, err)
 	out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: budget})
 	paramsMust(t, err)
 	defer func() { paramsMust(t, out.Close()) }()
@@ -49,6 +53,8 @@ func TestASTSMT2BooleanTreeSourcePostorderAndLabels(t *testing.T) {
 		{lit, "(! true :lblpos |a b|)"},
 		{variable, "(:var 4)"},
 		{flat, "(and left middle last)"},
+		{repeatedAtom, "(and left left middle last)"},
+		{repeatedVar, "(and (:var 4) (:var 4))"},
 	} {
 		format, e := m.SMT2PPBooleanTree(tc.root, nil)
 		paramsMust(t, e)
