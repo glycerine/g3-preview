@@ -123,6 +123,41 @@ func TestGlobalParamsModuleCellMemoryTraceLateBindings(t *testing.T) {
 	}
 }
 
+func TestGlobalParamsCatalogDescriptorMemoryTrace(t *testing.T) {
+	s, _ := gparamsNamespaceFixture(t)
+	var out bytes.Buffer
+	tags := udiag.NewTraceTagsWithWriter(&out)
+	tags.Enable("memory")
+	paramsMust(t, s.BindNamespaceTrace(tags))
+	paramsMust(t, s.InitializeSource())
+	out.Reset()
+	g := s.Current
+	paramsMust(t, g.ensureRegistered())
+	registered := out.String()
+	if len(g.Descriptors) != 19 || strings.Count(registered, " param_descrs ") != 32 || strings.Count(registered, " src/util/gparams.cpp:143\n") != 13 {
+		t.Fatalf("catalog descriptor allocation/duplicate deletion count: owners %d allocs %d duplicate deletes %d", len(g.Descriptors), strings.Count(registered, " param_descrs "), strings.Count(registered, " src/util/gparams.cpp:143\n"))
+	}
+	first := g.Descriptors[0]
+	firstAlloc := fmt.Sprintf("alloc %p src/shell/gparams_register_modules.cpp:40 param_descrs %d\n", first, first.OwnerBytes)
+	if !strings.Contains(registered, firstAlloc) {
+		t.Fatalf("first source catalog allocation missing: %q", firstAlloc)
+	}
+	for line := 40; line <= 71; line++ {
+		if strings.Count(registered, fmt.Sprintf(" src/shell/gparams_register_modules.cpp:%d param_descrs ", line)) != 1 {
+			t.Fatalf("source catalog allocation line %d absent or repeated", line)
+		}
+	}
+	if a, b, c, d := strings.Index(registered, "gparams_register_modules.cpp:40 param_descrs "), strings.Index(registered, "gparams_register_modules.cpp:41 param_descrs "), strings.Index(registered, "gparams_register_modules.cpp:42 param_descrs "), strings.Index(registered, " src/util/gparams.cpp:143\n"); !(a >= 0 && a < b && b < c && c < d) {
+		t.Fatal("source catalog allocation and duplicate-merge deletion order", a, b, c, d)
+	}
+	out.Reset()
+	paramsMust(t, s.FinalizeSource())
+	finalized := out.String()
+	if strings.Count(finalized, " src/util/gparams.cpp:108\n") != 19 || !strings.Contains(finalized, fmt.Sprintf("dealloc %p src/util/gparams.cpp:108\n", first)) {
+		t.Fatal("source destructor did not release retained descriptor owners", finalized)
+	}
+}
+
 func TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle(t *testing.T) {
 	s, _ := gparamsNamespaceFixture(t)
 	out := &gparamsTraceBodyRefusalWriter{failAt: 1, cause: errors.New("memory trace refused")}
@@ -133,6 +168,7 @@ func TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle(t *testing.T) {
 	if s.Current == nil || !s.Current.constructorReady || out.calls == 0 {
 		t.Fatal("refused allocation trace stopped source constructor", s.Current, out.calls)
 	}
+	paramsMust(t, s.Current.ensureRegistered())
 	module, e := s.Symbols.Intern("refused-memory-cell")
 	paramsMust(t, e)
 	_, e = s.Current.GetParams(module)
@@ -165,13 +201,15 @@ func TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation(t *testing.T
 	paramsMust(t, e)
 	_, e = s.Current.GetParams(module)
 	paramsMust(t, e)
+	paramsMust(t, s.Current.ensureRegistered())
+	out.Reset() // duplicate-merge deletions precede process finalization
 	active, e := p.BeginFinalize()
 	if e != nil || !active {
 		t.Fatal("source finalization guard", active, e)
 	}
 	paramsMust(t, s.FinalizeSource())
 	paramsMust(t, p.CompleteFinalize())
-	if got := out.String(); !strings.Contains(got, "alloc ") || strings.Contains(got, "dealloc ") {
+	if got := out.String(); strings.Contains(got, "dealloc ") {
 		t.Fatalf("finalizing deallocation wrapper fired: %q", got)
 	}
 }

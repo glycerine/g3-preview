@@ -228,7 +228,11 @@ func (g *GlobalParams) registerModule(name string, d *ParamDescrs) error {
 		if e = old.Copy(d); e != nil {
 			return e
 		}
-		return d.Close()
+		if e = d.Close(); e != nil {
+			return e
+		}
+		g.traceModuleDescriptorDeallocated(d, 143)
+		return nil
 	}
 	if uint64(len(g.Descriptors)) >= uint64(^uint32(0)) {
 		return arena.ErrBounds
@@ -407,6 +411,7 @@ func (g *GlobalParams) closeLegacy() error {
 			if e := d.Close(); e != nil {
 				return e
 			}
+			g.traceModuleDescriptorDeallocated(d, 108)
 			g.Descriptors[descriptor-1] = nil
 		}
 	}

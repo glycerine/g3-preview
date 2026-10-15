@@ -26,100 +26,100 @@ func (c *GlobalParamsCatalog) dispatch(r GlobalParamsRegistrar) error {
 	if e := c.global(r, catalogCollectEnvParams); e != nil {
 		return e
 	}
-	if e := c.module(r, "ackermannization", catalogCollector("catalogCollectAckermannizationParams")); e != nil {
+	if e := c.module(r, 40, "ackermannization", catalogCollector("catalogCollectAckermannizationParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "rewriter", catalogCollector("catalogCollectAckermannizeBvTacticParams")); e != nil {
+	if e := c.module(r, 41, "rewriter", catalogCollector("catalogCollectAckermannizeBvTacticParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "rewriter", catalogCollector("catalogCollectFpa2bvRewriterParams")); e != nil {
+	if e := c.module(r, 42, "rewriter", catalogCollector("catalogCollectFpa2bvRewriterParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "nnf", catalogCollector("catalogCollectNnf")); e != nil {
+	if e := c.module(r, 43, "nnf", catalogCollector("catalogCollectNnf")); e != nil {
 		return e
 	}
-	if e := c.module(r, "nnf", catalogCollector("catalogCollectNnfParams")); e != nil {
+	if e := c.module(r, 44, "nnf", catalogCollector("catalogCollectNnfParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "pi", catalogCollector("catalogCollectPatternInferenceParamsHelper")); e != nil {
+	if e := c.module(r, 45, "pi", catalogCollector("catalogCollectPatternInferenceParamsHelper")); e != nil {
 		return e
 	}
-	if e := c.module(r, "pp", catalogCollector("catalogCollectPpParams")); e != nil {
+	if e := c.module(r, 46, "pp", catalogCollector("catalogCollectPpParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "rewriter", catalogCollector("catalogCollectArithRewriterParams")); e != nil {
+	if e := c.module(r, 47, "rewriter", catalogCollector("catalogCollectArithRewriterParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "rewriter", catalogCollector("catalogCollectArrayRewriterParams")); e != nil {
+	if e := c.module(r, 48, "rewriter", catalogCollector("catalogCollectArrayRewriterParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "rewriter", catalogCollector("catalogCollectBoolRewriterParams")); e != nil {
+	if e := c.module(r, 49, "rewriter", catalogCollector("catalogCollectBoolRewriterParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "rewriter", catalogCollector("catalogCollectBvRewriterParams")); e != nil {
+	if e := c.module(r, 50, "rewriter", catalogCollector("catalogCollectBvRewriterParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "rewriter", catalogCollector("catalogCollectFpaRewriterParams")); e != nil {
+	if e := c.module(r, 51, "rewriter", catalogCollector("catalogCollectFpaRewriterParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "rewriter", catalogCollector("catalogCollectPolyRewriterParams")); e != nil {
+	if e := c.module(r, 52, "rewriter", catalogCollector("catalogCollectPolyRewriterParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "rewriter", catalogCollector("catalogCollectRewriterParams")); e != nil {
+	if e := c.module(r, 53, "rewriter", catalogCollector("catalogCollectRewriterParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "interp", catalogCollector("catalogCollectInterpParams")); e != nil {
+	if e := c.module(r, 54, "interp", catalogCollector("catalogCollectInterpParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "algebraic", catalogCollector("catalogCollectAlgebraicParams")); e != nil {
+	if e := c.module(r, 55, "algebraic", catalogCollector("catalogCollectAlgebraicParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "rcf", catalogCollector("catalogCollectRcfParams")); e != nil {
+	if e := c.module(r, 56, "rcf", catalogCollector("catalogCollectRcfParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "model_evaluator", catalogCollector("catalogCollectModelEvaluatorParams")); e != nil {
+	if e := c.module(r, 57, "model_evaluator", catalogCollector("catalogCollectModelEvaluatorParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "model", catalogCollector("catalogCollectModelParams")); e != nil {
+	if e := c.module(r, 58, "model", catalogCollector("catalogCollectModelParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "fixedpoint", catalogCollector("catalogCollectFixedpointParams")); e != nil {
+	if e := c.module(r, 59, "fixedpoint", catalogCollector("catalogCollectFixedpointParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "nlsat", catalogCollector("catalogCollectNlsatParams")); e != nil {
+	if e := c.module(r, 60, "nlsat", catalogCollector("catalogCollectNlsatParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "opt", catalogCollector("catalogCollectOptParams")); e != nil {
+	if e := c.module(r, 61, "opt", catalogCollector("catalogCollectOptParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "parser", catalogCollector("catalogCollectParserParams")); e != nil {
+	if e := c.module(r, 62, "parser", catalogCollector("catalogCollectParserParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "sat", catalogCollector("catalogCollectSatAsymmBranchParams")); e != nil {
+	if e := c.module(r, 63, "sat", catalogCollector("catalogCollectSatAsymmBranchParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "sat", catalogCollector("CollectSATConfigParamDescrs")); e != nil {
+	if e := c.module(r, 64, "sat", catalogCollector("CollectSATConfigParamDescrs")); e != nil {
 		return e
 	}
-	if e := c.module(r, "sat", catalogCollector("catalogCollectSatSccParams")); e != nil {
+	if e := c.module(r, 65, "sat", catalogCollector("catalogCollectSatSccParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "sat", catalogCollector("catalogCollectSatSimplifierParams")); e != nil {
+	if e := c.module(r, 66, "sat", catalogCollector("catalogCollectSatSimplifierParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "smt", catalogCollector("catalogCollectSmtParamsHelper")); e != nil {
+	if e := c.module(r, 67, "smt", catalogCollector("catalogCollectSmtParamsHelper")); e != nil {
 		return e
 	}
-	if e := c.module(r, "combined_solver", catalogCollector("catalogCollectCombinedSolverParams")); e != nil {
+	if e := c.module(r, 68, "combined_solver", catalogCollector("catalogCollectCombinedSolverParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "sls", catalogCollector("catalogCollectSlsParams")); e != nil {
+	if e := c.module(r, 69, "sls", catalogCollector("catalogCollectSlsParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "ackermannization", catalogCollector("catalogCollectQfufbvTacticParams")); e != nil {
+	if e := c.module(r, 70, "ackermannization", catalogCollector("catalogCollectQfufbvTacticParams")); e != nil {
 		return e
 	}
-	if e := c.module(r, "lp", catalogCollector("catalogCollectLpParams")); e != nil {
+	if e := c.module(r, 71, "lp", catalogCollector("catalogCollectLpParams")); e != nil {
 		return e
 	}
 	if e := r.RegisterModuleDescription("ackermannization", c.Region, c.descriptions[0], 0); e != nil {

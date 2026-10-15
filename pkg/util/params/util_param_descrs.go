@@ -91,6 +91,7 @@ type ParamDescrsConfig struct {
 	Budget          *arena.Budget
 	InitialCapacity uint32
 	Text            arena.VectorConfig
+	onAllocated     func(*ParamDescrs)
 }
 type paramDescrText struct {
 	value   string
@@ -155,6 +156,9 @@ func newSourceParamDescrs(m *usymbol.Manager, c ParamDescrsConfig) (*ParamDescrs
 	}
 	d := &ParamDescrs{manager: m, Budget: c.Budget, OwnerBytes: owner}
 	d.Self = d
+	if c.onAllocated != nil {
+		c.onAllocated(d) // source alloc(param_descrs) precedes member construction
+	}
 	if e := d.constructSourceMembers(c); e != nil {
 		return d, e
 	}

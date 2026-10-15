@@ -81174,15 +81174,28 @@
       "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams_catalog_dispatch.go",
-        "pkg/engine/generated_params.go"
+        "pkg/engine/generated_params.go",
+        "pkg/util/params/util_gparams_memory_trace.go",
+        "pkg/util/params/util_gparams_memory_trace_debug_test.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
-        "TestGeneratedProcessLinksFullParameterCatalog"
+        "TestGeneratedProcessLinksFullParameterCatalog",
+        "TestGlobalParamsCatalogDescriptorMemoryTrace"
       ],
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Generated catalog alloc(param_descrs) memory TRACE at the 32 retained source-order module sites (cpp40-71), with Go pointer and charged descriptor header extent",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/params/util_gparams_memory_trace.go",
+          "tests": [
+            "TestGlobalParamsCatalogDescriptorMemoryTrace",
+            "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
+            "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle"
+          ]
+        },
         {
           "name": "generated source-order collector dispatch and production package linkage",
           "status": "ported",
@@ -81195,7 +81208,7 @@
       "ownership": [
         "Generated descriptor rows retain their owned Go catalog descriptions and merge into the source-order global manager. The shell unit has the same generated body as API and test; pkg/engine links all retained collectors above util before process initialization."
       ],
-      "deviations": []
+      "deviations": ["Generated module descriptor debug memory records use Go pointers and charged Go descriptor-header extents at all 32 retained catalog allocation sites; duplicate merge and imp destruction follow their source deallocation sites, with refused-stream continuation and process-finalizing suppression."]
     },
     {
       "path": "src/shell/install_tactic.cpp",
@@ -123192,7 +123205,8 @@
         "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
         "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle",
         "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset",
-        "TestGlobalParamsModuleCellMemoryTraceLateBindings"
+        "TestGlobalParamsModuleCellMemoryTraceLateBindings",
+        "TestGlobalParamsCatalogDescriptorMemoryTrace"
       ],
       "assertions": [
         {
@@ -123259,6 +123273,16 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete generated module param_descrs debug memory TRACE: duplicate merge dealloc at gparams.cpp:143 and imp destructor dealloc at gparams.cpp:108; allocation at shell/gparams_register_modules.cpp:40-71",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/params/util_gparams_memory_trace.go",
+          "tests": [
+            "TestGlobalParamsCatalogDescriptorMemoryTrace",
+            "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
+            "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle"
+          ]
+        },
         {
           "name": "Concrete gparams::imp get_params alloc(params_ref) and reset/finalize dealloc(params_ref) Z3DEBUG memory TRACE with single-cell reuse and Go pointer/header extent replacement (gparams.cpp:117,192)",
           "status": "platform_replacement",
@@ -123460,7 +123484,8 @@
         "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion",
         "Parameter-descriptor and global-parameter output APIs now accept bytes.Buffer directly, including namespace and SMT context callers. Removed custom buffer construction, closed-owner state and cleanup from this chain. Native strings and byte writes preserve source normalization, insertion order, sorted descriptor names, debug diagnostics and actual borrowed-description failure prefixes. Nil destinations use the enclosing project error domain; no STL port or new whole-unit credit is claimed.",
         "Go gparams::imp debug memory TRACE uses the actual Go owner pointer and charged Go header extent; source file/line, tag order, refused-stream continuation and process-finalizing deallocation guard follow retained alloc/dealloc wrapper sites.",
-        "Go gparams module params_ref cell debug memory TRACE uses the actual Go cell pointer and charged Go cell-header extent; the retained get_params/reset source sites, no-extra-allocation lookup, refused-stream continuation and generated-process finalizing guard are covered."
+        "Go gparams module params_ref cell debug memory TRACE uses the actual Go cell pointer and charged Go cell-header extent; the retained get_params/reset source sites, no-extra-allocation lookup, refused-stream continuation and generated-process finalizing guard are covered.",
+        "Generated module descriptor debug memory records use Go pointers and charged Go descriptor-header extents at all 32 retained catalog allocation sites; duplicate merge and imp destruction follow their source deallocation sites, with refused-stream continuation and process-finalizing suppression."
       ],
       "ownership_checks": [
         "actual source destructor reset/deletion/member cursor retained independently of sticky source cause; immediate named owner graph before sparse shrink fault lift; separate owning acknowledgment never replays failed source reset allocation; generated singleton ctor unwind and reached ParamsRef decrement-stop receipts remain open",
@@ -123542,7 +123567,8 @@
         "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
         "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle",
         "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset",
-        "TestGlobalParamsModuleCellMemoryTraceLateBindings"
+        "TestGlobalParamsModuleCellMemoryTraceLateBindings",
+        "TestGlobalParamsCatalogDescriptorMemoryTrace"
       ],
       "conditionals": [
         {
@@ -123557,6 +123583,16 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete generated module param_descrs debug memory TRACE: duplicate merge dealloc at gparams.cpp:143 and imp destructor dealloc at gparams.cpp:108; allocation at shell/gparams_register_modules.cpp:40-71",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/params/util_gparams_memory_trace.go",
+          "tests": [
+            "TestGlobalParamsCatalogDescriptorMemoryTrace",
+            "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
+            "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle"
+          ]
+        },
         {
           "name": "Concrete gparams::imp get_params alloc(params_ref) and reset/finalize dealloc(params_ref) Z3DEBUG memory TRACE with single-cell reuse and Go pointer/header extent replacement (gparams.cpp:117,192)",
           "status": "platform_replacement",
@@ -123714,7 +123750,8 @@
         "Explicit single-lane namespace binding, not process singleton/generated memory lifecycle. TRACE, native ostream/global stdout, global notification/debugger behavior and wider physical ABI/accounting remain open. Null current pointer with erased/disabled assertion reaches a typed undefined-pointer-domain guard. Symbol bare_str assertion uses actual numeric scalar at source argument site; numeric source ternary routes empty-name engine even with assertions disabled in debug. Independent fixtures give no registered driver credit.",
         "Parameter-descriptor and global-parameter output APIs now accept bytes.Buffer directly, including namespace and SMT context callers. Removed custom buffer construction, closed-owner state and cleanup from this chain. Native strings and byte writes preserve source normalization, insertion order, sorted descriptor names, debug diagnostics and actual borrowed-description failure prefixes. Nil destinations use the enclosing project error domain; no STL port or new whole-unit credit is claimed.",
         "Go gparams::imp debug memory TRACE uses the actual Go owner pointer and charged Go header extent; source file/line, tag order, refused-stream continuation and process-finalizing deallocation guard follow retained alloc/dealloc wrapper sites.",
-        "Go gparams module params_ref cell debug memory TRACE uses the actual Go cell pointer and charged Go cell-header extent; the retained get_params/reset source sites, no-extra-allocation lookup, refused-stream continuation and generated-process finalizing guard are covered."
+        "Go gparams module params_ref cell debug memory TRACE uses the actual Go cell pointer and charged Go cell-header extent; the retained get_params/reset source sites, no-extra-allocation lookup, refused-stream continuation and generated-process finalizing guard are covered.",
+        "Generated module descriptor debug memory records use Go pointers and charged Go descriptor-header extents at all 32 retained catalog allocation sites; duplicate merge and imp destruction follow their source deallocation sites, with refused-stream continuation and process-finalizing suppression."
       ],
       "ownership_checks": [
         "actual source destructor reset/deletion/member cursor retained independently of sticky source cause; immediate named owner graph before sparse shrink fault lift; separate owning acknowledgment never replays failed source reset allocation; generated singleton ctor unwind and reached ParamsRef decrement-stop receipts remain open"
@@ -150512,7 +150549,8 @@
         "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
         "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle",
         "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset",
-        "TestGlobalParamsModuleCellMemoryTraceLateBindings"
+        "TestGlobalParamsModuleCellMemoryTraceLateBindings",
+        "TestGlobalParamsCatalogDescriptorMemoryTrace"
       ],
       "conditionals": [
         {
@@ -150568,6 +150606,16 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Concrete generated module param_descrs debug allocation/deallocation wrappers with Go pointer/header extent and process-finalizing guard (memory_manager.cpp:202-211)",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/params/util_gparams_memory_trace.go",
+          "tests": [
+            "TestGlobalParamsCatalogDescriptorMemoryTrace",
+            "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
+            "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle"
+          ]
+        },
+        {
           "name": "Concrete gparams module params_ref cell debug-wrapper allocation/deallocation TRACE and process-finalizing guard with Go pointer/header extent replacement (memory_manager.cpp:202-211; gparams.cpp:117,192)",
           "status": "platform_replacement",
           "go_target": "pkg/util/params/util_gparams_memory_trace.go",
@@ -150589,7 +150637,7 @@
           ]
         },
         {
-          "name": "Z3DEBUG allocate(file,line,obj,size) and deallocate(file,line,p) wrappers: the retained small_object_allocator chunk, gparams::imp and module params_ref cell call sites are ported; other retained caller sites remain unaudited (cpp202-211)",
+          "name": "Z3DEBUG allocate(file,line,obj,size) and deallocate(file,line,p) wrappers: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs call sites are ported; other retained caller sites remain unaudited (cpp202-211)",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
           "go_targets": [
@@ -150928,7 +150976,8 @@
         "The concrete raw Runtime, SmallAllocator, source accounting/failure/cleanup progress and borrowed runtime uint32 view now live in independent util/memory. Production and tests import their actual owner directly without root util aliases or forwarding adapters. The extracted package has no dependency on root util or numeral/parameter owners. Existing private memory tests move with their real implementation; higher-level integration checks remain at callers. This changes package ownership only, preserving allocation/counter/publication/destruction/error behavior and existing completion gaps.",
         "Go-managed OwnedString/builders, numeric text streams and concrete counted snapshots now live in util/text, independent of root util/numerals/parameters. Retained callers import the actual text owner directly. Cross-package private stream access is replaced by existing CheckOpen, an identity-only tie check preserving closed-tie construction, and concrete arena-region C-string field insertion; source guard/read/width/error order remains. Formatter snapshot capture belongs with its text storage, while actual numeral invocation and source integer fault campaigns stay at their numeric consumer. No STL implementation or generic adapter credit is added.",
         "Go gparams::imp debug memory TRACE uses the actual Go owner pointer and charged Go header extent; source file/line, tag order, refused-stream continuation and process-finalizing deallocation guard follow retained alloc/dealloc wrapper sites.",
-        "Go gparams module params_ref cell debug memory TRACE uses the actual Go cell pointer and charged Go cell-header extent; the retained get_params/reset source sites, no-extra-allocation lookup, refused-stream continuation and generated-process finalizing guard are covered."
+        "Go gparams module params_ref cell debug memory TRACE uses the actual Go cell pointer and charged Go cell-header extent; the retained get_params/reset source sites, no-extra-allocation lookup, refused-stream continuation and generated-process finalizing guard are covered.",
+        "Generated module descriptor debug memory records use Go pointers and charged Go descriptor-header extents at all 32 retained catalog allocation sites; duplicate merge and imp destruction follow their source deallocation sites, with refused-stream continuation and process-finalizing suppression."
       ]
     },
     {
@@ -151028,7 +151077,8 @@
         "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
         "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle",
         "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset",
-        "TestGlobalParamsModuleCellMemoryTraceLateBindings"
+        "TestGlobalParamsModuleCellMemoryTraceLateBindings",
+        "TestGlobalParamsCatalogDescriptorMemoryTrace"
       ],
       "conditionals": [
         {
@@ -151088,6 +151138,16 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Concrete generated module param_descrs debug allocation/deallocation wrappers with Go pointer/header extent and process-finalizing guard (memory_manager.cpp:202-211)",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/params/util_gparams_memory_trace.go",
+          "tests": [
+            "TestGlobalParamsCatalogDescriptorMemoryTrace",
+            "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
+            "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle"
+          ]
+        },
+        {
           "name": "Concrete gparams module params_ref cell debug-wrapper allocation/deallocation TRACE and process-finalizing guard with Go pointer/header extent replacement (memory_manager.cpp:202-211; gparams.cpp:117,192)",
           "status": "platform_replacement",
           "go_target": "pkg/util/params/util_gparams_memory_trace.go",
@@ -151109,7 +151169,7 @@
           ]
         },
         {
-          "name": "Z3DEBUG allocation/deallocation file-line overloads and alloc/dealloc macros: the retained small_object_allocator chunk, gparams::imp and module params_ref cell sites are connected through concrete trace hooks; other retained caller sites remain unaudited (h69-97; cpp202-211)",
+          "name": "Z3DEBUG allocation/deallocation file-line overloads and alloc/dealloc macros: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs sites are connected through concrete trace hooks; other retained caller sites remain unaudited (h69-97; cpp202-211)",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
           "go_targets": [
@@ -151402,7 +151462,8 @@
         "_TRACE file path/PROFILE_MEMORY/global ostream and full registered test driver remain open.",
         "The concrete raw Runtime, SmallAllocator, source accounting/failure/cleanup progress and borrowed runtime uint32 view now live in independent util/memory. Production and tests import their actual owner directly without root util aliases or forwarding adapters. The extracted package has no dependency on root util or numeral/parameter owners. Existing private memory tests move with their real implementation; higher-level integration checks remain at callers. This changes package ownership only, preserving allocation/counter/publication/destruction/error behavior and existing completion gaps.",
         "Go gparams::imp debug memory TRACE uses the actual Go owner pointer and charged Go header extent; source file/line, tag order, refused-stream continuation and process-finalizing deallocation guard follow retained alloc/dealloc wrapper sites.",
-        "Go gparams module params_ref cell debug memory TRACE uses the actual Go cell pointer and charged Go cell-header extent; the retained get_params/reset source sites, no-extra-allocation lookup, refused-stream continuation and generated-process finalizing guard are covered."
+        "Go gparams module params_ref cell debug memory TRACE uses the actual Go cell pointer and charged Go cell-header extent; the retained get_params/reset source sites, no-extra-allocation lookup, refused-stream continuation and generated-process finalizing guard are covered.",
+        "Generated module descriptor debug memory records use Go pointers and charged Go descriptor-header extents at all 32 retained catalog allocation sites; duplicate merge and imp destruction follow their source deallocation sites, with refused-stream continuation and process-finalizing suppression."
       ]
     },
     {

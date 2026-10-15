@@ -69,6 +69,7 @@ func (g *GlobalParams) sourceFinalizeBody(owning bool) error {
 					if e := d.sourceFinalizeMembers(); e != nil {
 						return e
 					}
+					g.traceModuleDescriptorDeallocated(d, 108)
 					g.Descriptors[g.sourceIndex] = nil
 				}
 				g.sourceIndex++
