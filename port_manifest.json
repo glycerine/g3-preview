@@ -14927,9 +14927,11 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/model/model2expr_fresh_name.go",
         "pkg/ast/ast_low_level_printer.go"
       ],
       "tests": [
+        "TestModel2ExprFreshNameConcreteSymbolSetAndSequence",
         "TestASTLowLevelPrinterActualPostorderAndBorrowedStreamFlags",
         "TestASTLowLevelPrinterNativeDeclarationIdentityMarks",
         "TestASTLowLevelPrinterNativeWideAndDeepPostorder"
@@ -14947,6 +14949,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete model2expr for_each_symbol_proc collection of function names and quantifier bindings, patterns and no-patterns (for_each_ast.h:42-121)",
+          "status": "ported",
+          "go_target": "pkg/model/model2expr_fresh_name.go",
+          "tests": ["TestModel2ExprFreshNameConcreteSymbolSetAndSequence"]
+        },
         {
           "name": "Actual trace LL visitor LIFO/mark-after-proc order (src/ast/for_each_ast.h:27-125)",
           "status": "partial",
@@ -56309,22 +56317,29 @@
       "path": "src/model/model2expr.cpp",
       "component": "model",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/model/model2expr_fresh_name.go"],
+      "tests": ["TestModel2ExprFreshNameConcreteSymbolSetAndSequence"],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "mk_fresh_name::add and next concrete symbol collection, collisions and A..Z/A1 sequence (model2expr.cpp:24-61)",
+          "status": "ported",
+          "go_target": "pkg/model/model2expr_fresh_name.go",
+          "tests": ["TestModel2ExprFreshNameConcreteSymbolSetAndSequence"]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Only the live fresh-name and symbol-collection helper is ported. Model-to-formula construction, its owning expr_ref_vectors and quantified result remain unported; Spacer/PDR are retained source consumers."]
     },
     {
       "path": "src/model/model2expr.h",
       "component": "model",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/model/model2expr_fresh_name.go"],
+      "tests": ["TestModel2ExprFreshNameConcreteSymbolSetAndSequence"],
       "conditionals": [
         {
           "line": 19,
@@ -56337,9 +56352,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "mk_fresh_name concrete symbol_set, add/contains/next state and borrowed AST manager (model2expr.h:28-39)",
+          "status": "ported",
+          "go_target": "pkg/model/model2expr_fresh_name.go",
+          "tests": ["TestModel2ExprFreshNameConcreteSymbolSetAndSequence"]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Only the live fresh-name and symbol-collection helper is ported. Model-to-formula construction, its owning expr_ref_vectors and quantified result remain unported; Spacer/PDR are retained source consumers."]
     },
     {
       "path": "src/model/model_core.cpp",
@@ -123593,6 +123615,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/model/model2expr_fresh_name.go",
         "pkg/util/numeral/mpf_powers_runtime.go",
         "pkg/ast/ast_core_delete.go",
         "pkg/util/symbol/dictionary_int32.go",
@@ -123613,6 +123636,7 @@
         "pkg/ast/rewriter/used_vars_ufbv.go"
       ],
       "tests": [
+        "TestModel2ExprFreshNameConcreteSymbolSetAndSequence",
         "TestArbitraryFloatSourceConstructorUsesNativePowerDictionaries",
         "TestArbitraryFloatPowersRuntimeWrapperCacheAndSourceDestruction",
         "TestArbitraryFloatPowerMinusOneAndNegatedCaches",
@@ -123810,6 +123834,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete model2expr symbol_set insert/contains uses a typed Go symbol map; no probing or universal adapter (model2expr.h:25-39)",
+          "status": "platform_replacement",
+          "go_target": "pkg/model/model2expr_fresh_name.go",
+          "tests": ["TestModel2ExprFreshNameConcreteSymbolSetAndSequence"]
+        },
         {
           "name": "Retained SAT u_map<index_set> antecedent map insertion/find/contains/reset and owned row lifetime",
           "status": "platform_replacement",
