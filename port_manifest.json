@@ -98142,7 +98142,8 @@
         "pkg/tactic/aig/aig_gates.go",
         "pkg/tactic/aig/aig_expr.go",
         "pkg/tactic/aig/aig_goal.go",
-        "pkg/tactic/aig/aig_formula.go"
+        "pkg/tactic/aig/aig_formula.go",
+        "pkg/tactic/aig/aig_ite_shape.go"
       ],
       "tests": [
         "TestAIGCoreInterningOwnershipAndIDReuse",
@@ -98158,7 +98159,8 @@
         "TestAIGGoalConversionSharesExpressionCacheAndConjoins",
         "TestAIGEmptyGoalIsTrue",
         "TestAIGToFormulaNaiveIterativeDeMorganAndSmartInversion",
-        "TestAIGToFormulaNestedGraphAndVariableNot"
+        "TestAIGToFormulaNestedGraphAndVariableNot",
+        "TestAIGITEShapeFourSourceComplementPositions"
       ],
       "conditionals": [
         {
@@ -98450,13 +98452,21 @@
             "TestAIGToFormulaNaiveIterativeDeMorganAndSmartInversion",
             "TestAIGToFormulaNestedGraphAndVariableNot"
           ]
+        },
+        {
+          "name": "is_ite_core four complementary-child recognition and borrowed condition/then/else collection for optimized goal output",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_ite_shape.go",
+          "tests": [
+            "TestAIGITEShapeFourSourceComplementPositions"
+          ]
         }
       ],
       "ownership": [
         "Concrete AIG manager pins each variable AST expression, owns true/false counts and interning table nodes, and recursively releases child nodes when the last AIG reference closes. AIG-to-formula cache and output own ASTRef values; stopped AST releases remain with the manager for retry."
       ],
       "deviations": [
-        "Typed Go map replaces aig_table; literal inversion is a bool rather than pointer tagging. The mk_node minimizer, both gate encodings, expression-to-AIG traversal, goal conjunction and source naive AIG-to-expression conversion are ported; resource checkpoints, optimized aig2expr goal rewriting and the tactic/proof/goal update paths remain unported."
+        "Typed Go map replaces aig_table; literal inversion is a bool rather than pointer tagging. The mk_node minimizer, both gate encodings, expression-to-AIG traversal, goal conjunction and source naive AIG-to-expression conversion are ported. ITE shape recognition is a tested prerequisite; resource checkpoints, optimized aig2expr goal rewriting and the tactic/proof/goal update paths remain unported."
       ]
     },
     {
