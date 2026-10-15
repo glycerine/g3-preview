@@ -6,10 +6,12 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
+// satClauseSet keeps the source swap-erase order while using Go collections for
+// the ID index and clause sequence. Clause references are borrowed from owner.
 type satClauseSet struct {
 	self              *satClauseSet
 	owner             *ClauseAllocator
-	ids               []uint32
+	positions         map[uint32]uint32
 	refs              []StoredClauseRef
 	budget            *arena.Budget
 	ownerBytes, epoch uint64
@@ -56,58 +58,6 @@ func (s *satClauseSet) Size() uint32 {
 	return uint32(len(s.refs))
 }
 func (s *satClauseSet) Empty() bool { return s.Size() == 0 }
-func (s *satClauseSet) growIDs(need uint64) error {
-	for need > uint64(cap(s.ids)) {
-		n, e := satVectorNextCapacity(uint64(cap(s.ids)), 4)
-		if e != nil {
-			return e
-		}
-		if e = s.budget.Reserve(n * 4); e != nil {
-			return e
-		}
-		next := make([]uint32, len(s.ids), int(n))
-		copy(next, s.ids)
-		s.budget.Release(uint64(cap(s.ids)) * 4)
-		s.ids = next
-		if s.epoch != ^uint64(0) {
-			s.epoch++
-		}
-	}
-	return nil
-}
-func (s *satClauseSet) reserveIDs(n uint32) error {
-	if e := s.growIDs(uint64(n)); e != nil {
-		return e
-	}
-	old := len(s.ids)
-	if int(n) > old {
-		s.ids = s.ids[:int(n)]
-		for i := old; i < int(n); i++ {
-			s.ids[i] = ^uint32(0)
-		}
-	}
-	return nil
-}
-func (s *satClauseSet) growRefs(need uint64) error {
-	stride := uint64(reflect.TypeOf(StoredClauseRef{}).Size())
-	for need > uint64(cap(s.refs)) {
-		n, e := satVectorNextCapacity(uint64(cap(s.refs)), stride)
-		if e != nil {
-			return e
-		}
-		if e = s.budget.Reserve(n * stride); e != nil {
-			return e
-		}
-		next := make([]StoredClauseRef, len(s.refs), int(n))
-		copy(next, s.refs)
-		s.budget.Release(uint64(cap(s.refs)) * stride)
-		s.refs = next
-		if s.epoch != ^uint64(0) {
-			s.epoch++
-		}
-	}
-	return nil
-}
 func (s *satClauseSet) Contains(r StoredClauseRef) (bool, error) {
 	if e := s.open(); e != nil {
 		return false, e
@@ -116,7 +66,8 @@ func (s *satClauseSet) Contains(r StoredClauseRef) (bool, error) {
 	if e != nil {
 		return false, e
 	}
-	return uint64(id) < uint64(len(s.ids)) && s.ids[id] != ^uint32(0), nil
+	_, ok := s.positions[id]
+	return ok, nil
 }
 func (s *satClauseSet) Insert(r StoredClauseRef) error {
 	if e := s.change(); e != nil {
@@ -126,23 +77,18 @@ func (s *satClauseSet) Insert(r StoredClauseRef) error {
 	if e != nil {
 		return e
 	}
-	if e = s.reserveIDs(id + 1); e != nil {
-		return e
-	}
-	if uint64(id) >= uint64(len(s.ids)) {
-		return arena.ErrBounds
-	}
-	if s.ids[id] != ^uint32(0) {
+	if _, ok := s.positions[id]; ok {
 		return nil
 	}
-	s.ids[id] = uint32(len(s.refs))
-	if e = s.growRefs(uint64(len(s.refs)) + 1); e != nil {
-		return e
+	if uint64(len(s.refs)) >= uint64(^uint32(0)) {
+		return arena.ErrSlotLimit
 	}
+	if s.positions == nil {
+		s.positions = make(map[uint32]uint32)
+	}
+	s.positions[id] = uint32(len(s.refs))
 	s.refs = append(s.refs, r)
-	if s.epoch != ^uint64(0) {
-		s.epoch++
-	}
+	s.epoch++
 	return nil
 }
 func (s *satClauseSet) Erase(r StoredClauseRef) error {
@@ -153,34 +99,27 @@ func (s *satClauseSet) Erase(r StoredClauseRef) error {
 	if e != nil {
 		return e
 	}
-	if uint64(id) >= uint64(len(s.ids)) || len(s.refs) == 0 {
+	pos, ok := s.positions[id]
+	if !ok {
 		return nil
 	}
-	pos := s.ids[id]
-	if pos == ^uint32(0) {
-		return nil
+	if uint64(pos) >= uint64(len(s.refs)) {
+		return arena.ErrBounds
 	}
-	s.ids[id] = ^uint32(0)
 	last := len(s.refs) - 1
-	if uint64(pos) != uint64(last) {
+	if int(pos) != last {
 		lastRef := s.refs[last]
-		if uint64(pos) >= uint64(len(s.refs)) {
-			return arena.ErrBounds
-		}
-		s.refs[pos] = lastRef
 		lid, e := s.owner.ID(lastRef)
 		if e != nil {
 			return e
 		}
-		if uint64(lid) >= uint64(len(s.ids)) {
-			return arena.ErrBounds
-		}
-		s.ids[lid] = pos
+		s.refs[pos] = lastRef
+		s.positions[lid] = pos
 	}
+	delete(s.positions, id)
+	s.refs[last] = StoredClauseRef{}
 	s.refs = s.refs[:last]
-	if s.epoch != ^uint64(0) {
-		s.epoch++
-	}
+	s.epoch++
 	return nil
 }
 func (s *satClauseSet) Pop() (StoredClauseRef, error) {
@@ -193,21 +132,21 @@ func (s *satClauseSet) Pop() (StoredClauseRef, error) {
 		}
 		return StoredClauseRef{}, arena.ErrBounds
 	}
-	r := s.refs[len(s.refs)-1]
+	last := len(s.refs) - 1
+	r := s.refs[last]
 	id, e := s.owner.ID(r)
 	if e != nil {
 		return r, e
 	}
-	if satStorageSourceDebug && (uint64(id) >= uint64(len(s.ids)) || s.ids[id] != uint32(len(s.refs)-1)) {
-		return r, ErrSATAssertion
+	if satStorageSourceDebug {
+		if pos, ok := s.positions[id]; !ok || int(pos) != last {
+			return r, ErrSATAssertion
+		}
 	}
-	if uint64(id) < uint64(len(s.ids)) {
-		s.ids[id] = ^uint32(0)
-	}
-	s.refs = s.refs[:len(s.refs)-1]
-	if s.epoch != ^uint64(0) {
-		s.epoch++
-	}
+	delete(s.positions, id)
+	s.refs[last] = StoredClauseRef{}
+	s.refs = s.refs[:last]
+	s.epoch++
 	return r, nil
 }
 func (s *satClauseSet) Get(i uint32) (StoredClauseRef, error) {
@@ -226,27 +165,15 @@ func (s *satClauseSet) CheckInvariant() (bool, error) {
 	if !satStorageSourceDebug {
 		return true, nil
 	}
+	if len(s.positions) != len(s.refs) {
+		return false, ErrSATAssertion
+	}
 	for pos, r := range s.refs {
 		id, e := s.owner.ID(r)
 		if e != nil {
 			return false, e
 		}
-		if uint64(id) >= uint64(len(s.ids)) || s.ids[id] != uint32(pos) {
-			return false, ErrSATAssertion
-		}
-	}
-	for id, pos := range s.ids {
-		if pos == ^uint32(0) {
-			continue
-		}
-		if uint64(pos) >= uint64(len(s.refs)) {
-			return false, ErrSATAssertion
-		}
-		got, e := s.owner.ID(s.refs[pos])
-		if e != nil {
-			return false, e
-		}
-		if got != uint32(id) {
+		if got, ok := s.positions[id]; !ok || int(got) != pos {
 			return false, ErrSATAssertion
 		}
 	}
@@ -256,24 +183,19 @@ func (s *satClauseSet) Reset() error {
 	if e := s.change(); e != nil {
 		return e
 	}
-	s.ids = s.ids[:0]
+	clear(s.positions)
+	clear(s.refs)
 	s.refs = s.refs[:0]
-	if s.epoch != ^uint64(0) {
-		s.epoch++
-	}
+	s.epoch++
 	return nil
 }
 func (s *satClauseSet) Finalize() error {
 	if e := s.change(); e != nil {
 		return e
 	}
-	s.budget.Release(uint64(cap(s.ids)) * 4)
-	s.ids = nil
-	s.budget.Release(uint64(cap(s.refs)) * uint64(reflect.TypeOf(StoredClauseRef{}).Size()))
+	s.positions = nil
 	s.refs = nil
-	if s.epoch != ^uint64(0) {
-		s.epoch++
-	}
+	s.epoch++
 	return nil
 }
 func (s *satClauseSet) Close() error {
@@ -283,8 +205,8 @@ func (s *satClauseSet) Close() error {
 	if s.closed {
 		return nil
 	}
-	s.budget.Release(s.ownerBytes + uint64(cap(s.ids))*4 + uint64(cap(s.refs))*uint64(reflect.TypeOf(StoredClauseRef{}).Size()))
-	s.ids = nil
+	s.budget.Release(s.ownerBytes)
+	s.positions = nil
 	s.refs = nil
 	s.ownerBytes = 0
 	s.closed = true
@@ -296,30 +218,6 @@ func (s *satClauseSet) AppendTo(dst []StoredClauseRef) ([]StoredClauseRef, error
 	}
 	return append(dst, s.refs...), nil
 }
-func (s *satClauseSet) copyIDs(src *satClauseSet) error {
-	bytes := uint64(cap(src.ids)) * 4
-	if bytes == 0 {
-		return nil
-	}
-	if e := s.budget.Reserve(bytes); e != nil {
-		return e
-	}
-	s.ids = make([]uint32, len(src.ids), cap(src.ids))
-	copy(s.ids, src.ids)
-	return nil
-}
-func (s *satClauseSet) copyRefs(src *satClauseSet) error {
-	bytes := uint64(cap(src.refs)) * uint64(reflect.TypeOf(StoredClauseRef{}).Size())
-	if bytes == 0 {
-		return nil
-	}
-	if e := s.budget.Reserve(bytes); e != nil {
-		return e
-	}
-	s.refs = make([]StoredClauseRef, len(src.refs), cap(src.refs))
-	copy(s.refs, src.refs)
-	return nil
-}
 func (s *satClauseSet) Clone(b *arena.Budget) (*satClauseSet, error) {
 	if e := s.open(); e != nil {
 		return nil, e
@@ -328,12 +226,12 @@ func (s *satClauseSet) Clone(b *arena.Budget) (*satClauseSet, error) {
 	if e != nil {
 		return nil, e
 	}
-	if e = v.copyIDs(s); e == nil {
-		e = v.copyRefs(s)
-	}
-	if e != nil {
-		v.Close()
-		return nil, e
+	v.refs = append(v.refs, s.refs...)
+	if len(s.positions) != 0 {
+		v.positions = make(map[uint32]uint32, len(s.positions))
+		for id, pos := range s.positions {
+			v.positions[id] = pos
+		}
 	}
 	return v, nil
 }
@@ -350,17 +248,16 @@ func (s *satClauseSet) Assign(src *satClauseSet) error {
 	if s.owner != src.owner {
 		return ErrSATOwner
 	}
-	s.budget.Release(uint64(cap(s.ids)) * 4)
-	s.ids = nil
-	if e := s.copyIDs(src); e != nil {
-		return e
+	if s.positions == nil && len(src.positions) != 0 {
+		s.positions = make(map[uint32]uint32, len(src.positions))
 	}
-	s.budget.Release(uint64(cap(s.refs)) * uint64(reflect.TypeOf(StoredClauseRef{}).Size()))
-	s.refs = nil
-	if s.epoch != ^uint64(0) {
-		s.epoch++
+	clear(s.positions)
+	for id, pos := range src.positions {
+		s.positions[id] = pos
 	}
-	return s.copyRefs(src)
+	s.refs = append(s.refs[:0], src.refs...)
+	s.epoch++
+	return nil
 }
 func (s *satClauseSet) MoveAssign(src *satClauseSet) error { return s.Assign(src) }
 func (s *satClauseSet) MoveClone(b *arena.Budget) (*satClauseSet, error) {
@@ -371,21 +268,9 @@ func (s *satClauseSet) MoveClone(b *arena.Budget) (*satClauseSet, error) {
 	if e != nil {
 		return nil, e
 	}
-	n := uint64(cap(s.ids))*4 + uint64(cap(s.refs))*uint64(reflect.TypeOf(StoredClauseRef{}).Size())
-	if b != s.budget {
-		if e = b.Reserve(n); e != nil {
-			v.Close()
-			return nil, e
-		}
-		s.budget.Release(n)
-	}
-	v.ids = s.ids
-	v.refs = s.refs
-	s.ids = nil
-	s.refs = nil
-	if s.epoch != ^uint64(0) {
-		s.epoch++
-	}
+	v.positions, v.refs = s.positions, s.refs
+	s.positions, s.refs = nil, nil
+	s.epoch++
 	return v, nil
 }
 

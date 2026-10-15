@@ -72812,8 +72812,8 @@
         "pkg/sat/sat_clause_large.go"
       ],
       "tests": [
-        "TestSATClauseSetSourceOrderAndGhostPrefixes",
-        "TestSATClauseSetActualCopyMoveFailureOrder",
+        "TestSATClauseSetNativeCollections",
+        "TestSATClauseSetCopyMoveAndHeaderFailure",
         "TestSATClauseSourceLifecycleFlagsAndApprox",
         "TestSATClauseReleaseDebugBodiesAndModels",
         "TestSATTmpClauseSourceReuseAndDestroyBeforeGrow",
@@ -72977,8 +72977,8 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_clause_storage.go",
           "tests": [
-            "TestSATClauseSetSourceOrderAndGhostPrefixes",
-            "TestSATClauseSetActualCopyMoveFailureOrder",
+            "TestSATClauseSetNativeCollections",
+            "TestSATClauseSetCopyMoveAndHeaderFailure",
             "TestSATClauseSourceLifecycleFlagsAndApprox",
             "TestSATClauseReleaseDebugBodiesAndModels",
             "TestSATTmpClauseSourceReuseAndDestroyBeforeGrow",
@@ -73020,8 +73020,8 @@
         "pkg/sat/sat_clause_idgen_test.go"
       ],
       "tests": [
-        "TestSATClauseSetSourceOrderAndGhostPrefixes",
-        "TestSATClauseSetActualCopyMoveFailureOrder",
+        "TestSATClauseSetNativeCollections",
+        "TestSATClauseSetCopyMoveAndHeaderFailure",
         "TestSATClauseSourceLifecycleFlagsAndApprox",
         "TestSATClauseReleaseDebugBodiesAndModels",
         "TestSATTmpClauseSourceReuseAndDestroyBeforeGrow",
@@ -73129,8 +73129,8 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_clause_storage.go",
           "tests": [
-            "TestSATClauseSetSourceOrderAndGhostPrefixes",
-            "TestSATClauseSetActualCopyMoveFailureOrder",
+            "TestSATClauseSetNativeCollections",
+            "TestSATClauseSetCopyMoveAndHeaderFailure",
             "TestSATClauseSourceLifecycleFlagsAndApprox",
             "TestSATClauseReleaseDebugBodiesAndModels",
             "TestSATTmpClauseSourceReuseAndDestroyBeforeGrow",
@@ -73205,8 +73205,8 @@
         "pkg/sat/sat_clause_set.go"
       ],
       "tests": [
-        "TestSATClauseSetSourceOrderAndGhostPrefixes",
-        "TestSATClauseSetActualCopyMoveFailureOrder"
+        "TestSATClauseSetNativeCollections",
+        "TestSATClauseSetCopyMoveAndHeaderFailure"
       ],
       "assertions": [
         {
@@ -73250,12 +73250,12 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "clause set removal, last swap and source ID-binding/copy/move action order",
-          "status": "partial",
+          "name": "clause set swap-erase, native ID map and slice, copy and move behavior",
+          "status": "platform_replacement",
           "go_target": "pkg/sat/sat_clause_set.go",
           "tests": [
-            "TestSATClauseSetSourceOrderAndGhostPrefixes",
-            "TestSATClauseSetActualCopyMoveFailureOrder"
+            "TestSATClauseSetNativeCollections",
+            "TestSATClauseSetCopyMoveAndHeaderFailure"
           ]
         },
         {
@@ -73280,8 +73280,8 @@
         "pkg/sat/sat_clause_set.go"
       ],
       "tests": [
-        "TestSATClauseSetSourceOrderAndGhostPrefixes",
-        "TestSATClauseSetActualCopyMoveFailureOrder"
+        "TestSATClauseSetNativeCollections",
+        "TestSATClauseSetCopyMoveAndHeaderFailure"
       ],
       "conditionals": [
         {
@@ -73297,12 +73297,12 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "concrete two-vector clause set insert/erase/pop/reset/iteration and ghost membership prefixes",
-          "status": "partial",
+          "name": "concrete clause set insert/erase/pop/reset/iteration on native Go collections",
+          "status": "platform_replacement",
           "go_target": "pkg/sat/sat_clause_set.go",
           "tests": [
-            "TestSATClauseSetSourceOrderAndGhostPrefixes",
-            "TestSATClauseSetActualCopyMoveFailureOrder"
+            "TestSATClauseSetNativeCollections",
+            "TestSATClauseSetCopyMoveAndHeaderFailure"
           ]
         },
         {

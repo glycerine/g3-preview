@@ -7,7 +7,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-func TestSATClauseSetSourceOrderAndGhostPrefixes(t *testing.T) {
+func TestSATClauseSetNativeCollections(t *testing.T) {
 	a := satStore(t, nil)
 	b := arena.NewBudget(1 << 20)
 	s, e := NewSATClauseSet(a, b)
@@ -28,28 +28,18 @@ func TestSATClauseSetSourceOrderAndGhostPrefixes(t *testing.T) {
 		t.Fatal(got, e)
 	}
 	satOK(t, s.Insert(r1))
-	satOK(t, s.reserveIDs(3)) // Warm the source ID vector independently; fail m_set push.
+	// Native map/slice growth does not consume a simulated C++ vector budget.
 	b.FailAfter(0)
-	e = s.Insert(r3)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
-	if has, e := s.Contains(r3); !has || e != nil {
-		t.Fatal("position prefix", has, e)
-	}
-	if s.Size() != 2 {
-		t.Fatal(s.Size())
-	}
-	b.FailAfter(-1)
 	satOK(t, s.Insert(r3))
-	if s.Size() != 2 {
-		t.Fatal("retry sees ghost")
+	if has, e := s.Contains(r3); !has || e != nil || s.Size() != 3 {
+		t.Fatal(has, e, s.Size())
 	}
-	if e = s.Erase(r3); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal(e)
+	if ok, e := s.CheckInvariant(); !ok || e != nil {
+		t.Fatal(ok, e)
 	}
-	if has, _ := s.Contains(r3); has {
-		t.Fatal("erase must retain sentinel clear before OOB")
+	satOK(t, s.Erase(r3))
+	if has, e := s.Contains(r3); has || e != nil {
+		t.Fatal(has, e)
 	}
 	p, e := s.Pop()
 	if p != r1 || e != nil {
@@ -57,12 +47,14 @@ func TestSATClauseSetSourceOrderAndGhostPrefixes(t *testing.T) {
 	}
 	satOK(t, s.Reset())
 	satOK(t, s.Finalize())
+	satOK(t, s.Insert(r2))
 	s.Close()
 	if b.Used() != 0 {
 		t.Fatal(b.Used())
 	}
 }
-func TestSATClauseSetActualCopyMoveFailureOrder(t *testing.T) {
+
+func TestSATClauseSetCopyMoveAndHeaderFailure(t *testing.T) {
 	a := satStore(t, nil)
 	b := arena.NewBudget(1 << 20)
 	src, e := NewSATClauseSet(a, b)
@@ -73,20 +65,19 @@ func TestSATClauseSetActualCopyMoveFailureOrder(t *testing.T) {
 	dst, e := NewSATClauseSet(a, b)
 	satOK(t, e)
 	defer dst.Close()
-	satOK(t, dst.Insert(r))
 	b.FailAfter(0)
-	e = dst.Assign(src)
-	if !errors.Is(e, arena.ErrInjectedFailure) || len(dst.ids) != 0 || len(dst.refs) != 1 {
-		t.Fatal("ID-vector assignment first; old ref-vector not yet assigned", e, len(dst.ids), len(dst.refs))
+	if _, e = src.Clone(b); !errors.Is(e, arena.ErrInjectedFailure) {
+		t.Fatal("clone must charge its owner header", e)
 	}
-	b.FailAfter(-1)
+	// Assignment copies native collections and needs no extra source allocation.
 	satOK(t, dst.Assign(src))
+	b.FailAfter(-1)
 	copy, e := src.Clone(b)
 	satOK(t, e)
 	defer copy.Close()
 	satOK(t, dst.MoveAssign(copy))
-	if copy.Size() != 1 {
-		t.Fatal("implicit clause_set move assignment copies ptr and unsigned svectors")
+	if copy.Size() != 1 || dst.Size() != 1 {
+		t.Fatal("move assignment copies the set")
 	}
 	moved, e := copy.MoveClone(b)
 	satOK(t, e)
@@ -99,6 +90,6 @@ func TestSATClauseSetActualCopyMoveFailureOrder(t *testing.T) {
 	satOK(t, e)
 	defer raw.Close()
 	if got, e := raw.Get(0); got != r || e != nil {
-		t.Fatal("source raw copies do not dereference dead borrowed clause", got, e)
+		t.Fatal("copy must not dereference a dead borrowed clause", got, e)
 	}
 }
