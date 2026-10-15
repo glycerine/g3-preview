@@ -166,6 +166,7 @@ func (s *satSolverClauseLifecycle) attachNaryClause(c StoredClauseRef) (bool, er
 			return false, e
 		}
 		view := p.variables.clauseState()
+		view.traceTags = s.traceTags
 		if learned {
 			i, e := view.selectLearnedWatchLiteral(a, c)
 			if e != nil {

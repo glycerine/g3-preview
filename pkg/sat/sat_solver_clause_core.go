@@ -3,6 +3,7 @@ package sat
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
@@ -11,6 +12,7 @@ import (
 // supplies its actual scope level on each call; it is not a search implementation.
 type satSolverClauseState struct {
 	variables  *satSolverVariableState
+	traceTags  *diagnostic.TraceTags
 	assignment []int8
 	levels     []uint32
 }
@@ -230,6 +232,9 @@ func (s *satSolverClauseState) selectLearnedWatchLiteral(a *ClauseAllocator, cla
 	for i := uint32(1); i < n; i++ {
 		l, e := a.Literal(clause, i)
 		if e != nil {
+			return 0, e
+		}
+		if e = s.traceLearnedWatchValue(l); e != nil {
 			return 0, e
 		}
 		if satStorageSourceDebug {

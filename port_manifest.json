@@ -178177,6 +178177,12 @@
           "tests": ["TestSATAssignmentAndPropagationSourceTraceOrder"]
         },
         {
+          "name": "Reached SAT learned-watch nonfalse CTRACE before source false-literal assertion (sat_solver.cpp:419)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_clause_watch_trace.go",
+          "tests": ["TestSATLearnedWatchConditionalSourceTraceBeforeAssertion"]
+        },
+        {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_simplify_trace.go",
@@ -179401,6 +179407,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_propagation_trace.go",
           "tests": ["TestSATAssignmentAndPropagationSourceTraceOrder"]
+        },
+        {
+          "name": "Reached SAT learned-watch nonfalse CTRACE before source false-literal assertion (sat_solver.cpp:419)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_clause_watch_trace.go",
+          "tests": ["TestSATLearnedWatchConditionalSourceTraceBeforeAssertion"]
         },
         {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",
