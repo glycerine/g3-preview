@@ -53304,6 +53304,8 @@
         "pkg/math/subpaving/rational_polynomial_integer_trace_test.go",
         "pkg/math/subpaving/rational_split_trace.go",
         "pkg/math/subpaving/rational_split_trace_test.go",
+        "pkg/math/subpaving/arbitrary_split_trace.go",
+        "pkg/math/subpaving/arbitrary_split_trace_test.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
@@ -53427,6 +53429,9 @@
         "TestRationalMidpointSplitSourceBoundsTrace",
         "TestRationalMidpointSplitTraceRefusalKeepsChildren",
         "TestRationalMidpointSplitTracePrinterFailureKeepsChildren",
+        "TestArbitraryMidpointSplitSourceBoundsTrace",
+        "TestArbitraryMidpointSplitTraceRefusalKeepsChildren",
+        "TestArbitraryMidpointSplitTracePrinterFailureKeepsChildren",
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFixedNodeBoundPredicates",
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
@@ -54326,6 +54331,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_split_trace.go",
           "tests": ["TestRationalMidpointSplitSourceBoundsTrace", "TestRationalMidpointSplitTraceRefusalKeepsChildren", "TestRationalMidpointSplitTracePrinterFailureKeepsChildren"]
+        },
+        {
+          "name": "Concrete config_mpf midpoint split child-bound TRACE after both decision bounds and before local numeral cleanup (subpaving_t_def.h:243-246)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_split_trace.go",
+          "tests": ["TestArbitraryMidpointSplitSourceBoundsTrace", "TestArbitraryMidpointSplitTraceRefusalKeepsChildren", "TestArbitraryMidpointSplitTracePrinterFailureKeepsChildren"]
         },
         {
           "name": "Concrete config_hwf mk_var, mk_sum, and mk_ineq construction with sorted duplicate coefficient swaps (src/math/subpaving/subpaving_t_def.h:666-687,741-780)",
@@ -176119,6 +176130,8 @@
         "pkg/math/subpaving/rational_polynomial_integer_trace_test.go",
         "pkg/math/subpaving/rational_split_trace.go",
         "pkg/math/subpaving/rational_split_trace_test.go",
+        "pkg/math/subpaving/arbitrary_split_trace.go",
+        "pkg/math/subpaving/arbitrary_split_trace_test.go",
         "pkg/math/subpaving/arbitrary_polynomial_integer_trace.go",
         "pkg/math/subpaving/arbitrary_polynomial_integer_trace_test.go",
         "pkg/math/subpaving/fast_polynomial_integer_trace.go",
@@ -176174,6 +176187,9 @@
         "TestRationalMidpointSplitSourceBoundsTrace",
         "TestRationalMidpointSplitTraceRefusalKeepsChildren",
         "TestRationalMidpointSplitTracePrinterFailureKeepsChildren",
+        "TestArbitraryMidpointSplitSourceBoundsTrace",
+        "TestArbitraryMidpointSplitTraceRefusalKeepsChildren",
+        "TestArbitraryMidpointSplitTracePrinterFailureKeepsChildren",
         "TestArbitraryPolynomialSourceIntegerTraceAndPublication",
         "TestArbitraryPolynomialTraceStreamRefusalKeepsDefinition",
         "TestFastPolynomialSourceIntegerTraceAndPublication",
@@ -176791,6 +176807,12 @@
           "tests": ["TestRationalMidpointSplitSourceBoundsTrace", "TestRationalMidpointSplitTraceRefusalKeepsChildren", "TestRationalMidpointSplitTracePrinterFailureKeepsChildren"]
         },
         {
+          "name": "Reached config_mpf midpoint split child-bound TRACE after both decisions (subpaving_t_def.h:243-246)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_split_trace.go",
+          "tests": ["TestArbitraryMidpointSplitSourceBoundsTrace", "TestArbitraryMidpointSplitTraceRefusalKeepsChildren", "TestArbitraryMidpointSplitTracePrinterFailureKeepsChildren"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -176839,6 +176861,8 @@
         "pkg/math/subpaving/rational_polynomial_integer_trace_test.go",
         "pkg/math/subpaving/rational_split_trace.go",
         "pkg/math/subpaving/rational_split_trace_test.go",
+        "pkg/math/subpaving/arbitrary_split_trace.go",
+        "pkg/math/subpaving/arbitrary_split_trace_test.go",
         "pkg/math/subpaving/arbitrary_polynomial_integer_trace.go",
         "pkg/math/subpaving/arbitrary_polynomial_integer_trace_test.go",
         "pkg/math/subpaving/fast_polynomial_integer_trace.go",
@@ -176894,6 +176918,9 @@
         "TestRationalMidpointSplitSourceBoundsTrace",
         "TestRationalMidpointSplitTraceRefusalKeepsChildren",
         "TestRationalMidpointSplitTracePrinterFailureKeepsChildren",
+        "TestArbitraryMidpointSplitSourceBoundsTrace",
+        "TestArbitraryMidpointSplitTraceRefusalKeepsChildren",
+        "TestArbitraryMidpointSplitTracePrinterFailureKeepsChildren",
         "TestArbitraryPolynomialSourceIntegerTraceAndPublication",
         "TestArbitraryPolynomialTraceStreamRefusalKeepsDefinition",
         "TestFastPolynomialSourceIntegerTraceAndPublication",
@@ -177521,6 +177548,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_split_trace.go",
           "tests": ["TestRationalMidpointSplitSourceBoundsTrace", "TestRationalMidpointSplitTraceRefusalKeepsChildren", "TestRationalMidpointSplitTracePrinterFailureKeepsChildren"]
+        },
+        {
+          "name": "Reached config_mpf midpoint split child-bound TRACE after both decisions (subpaving_t_def.h:243-246)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_split_trace.go",
+          "tests": ["TestArbitraryMidpointSplitSourceBoundsTrace", "TestArbitraryMidpointSplitTraceRefusalKeepsChildren", "TestArbitraryMidpointSplitTracePrinterFailureKeepsChildren"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

@@ -85,5 +85,8 @@ func (c *ArbitraryContext) SplitMidpoint(n *ArbitraryNode, variable uint32, left
 	if err = c.DecideBound(right, variable, &mid, true, !leftOpen); err != nil {
 		return left, right, err
 	}
+	if err = c.traceSplitBounds(left, right); err != nil {
+		return left, right, err
+	}
 	return left, right, nil
 }
