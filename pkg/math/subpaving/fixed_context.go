@@ -38,6 +38,9 @@ type FixedContext struct {
 	queue            []*FixedBound
 	queueHead        int
 	numVisited       uint64
+	numNodes         uint32
+	numBounds        uint64
+	numConflicts     uint64
 	polynomials      map[uint32]*FixedPolynomial
 	monomials        map[uint32]*FixedMonomial
 	watchers         [][]uint32
@@ -94,6 +97,7 @@ func (c *FixedContext) newRoot() error {
 	}
 	c.root = root
 	root.context = c
+	c.numNodes = 1
 	return nil
 }
 

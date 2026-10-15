@@ -4,6 +4,18 @@ package subpaving
 
 import "github.com/glycerine/g3/pkg/arena"
 
+func (c *FixedContext) removeFixedLeaf(n *FixedNode) {
+	for i, leaf := range c.leafQueue {
+		if leaf == n {
+			copy(c.leafQueue[i:], c.leafQueue[i+1:])
+			last := len(c.leafQueue) - 1
+			c.leafQueue[last] = nil
+			c.leafQueue = c.leafQueue[:last]
+			return
+		}
+	}
+}
+
 func fixedNodeDepth(n *FixedNode) uint32 {
 	var depth uint32
 	for n.parent != nil {
@@ -35,7 +47,7 @@ func (c *FixedContext) Search() error {
 			if len(c.queue) != 0 || c.queueHead != 0 {
 				return arena.ErrInvalidSlot
 			}
-			if uint64(1+len(c.searchOwned)) > uint64(c.maxNodes) {
+			if c.numNodes > c.maxNodes {
 				return nil
 			}
 			c.searchNode = c.leafQueue[0]
@@ -73,7 +85,9 @@ func (c *FixedContext) Search() error {
 			for _, child := range []*FixedNode{left, right} {
 				if child != nil {
 					c.searchOwned = append(c.searchOwned, child)
-					c.leafQueue = append(c.leafQueue, child)
+					if !child.inconsistent {
+						c.leafQueue = append(c.leafQueue, child)
+					}
 				}
 			}
 			if err != nil {

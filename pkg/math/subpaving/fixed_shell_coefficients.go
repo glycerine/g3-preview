@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
 
 var ErrFixedShellInexactInteger error = &sourceFailure{message: "subpaving: integer coefficient cannot be represented exactly as fixed point"}
@@ -202,6 +203,20 @@ func (w *FixedShellCoefficients) Search() error {
 		return err
 	}
 	return w.context.Search()
+}
+
+func (w *FixedShellCoefficients) ResetStatistics() error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.ResetStatistics()
+}
+
+func (w *FixedShellCoefficients) CollectStatistics(st *statistics.Statistics) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.CollectStatistics(st)
 }
 
 // Close retires z2, z1, the vector in ascending element order, and the

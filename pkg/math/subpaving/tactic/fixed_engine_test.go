@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
+	"github.com/glycerine/g3/pkg/util/statistics"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -91,6 +92,17 @@ func TestFixedEngineSelectedOwnerUpdateAndRefusal(t *testing.T) {
 	}
 	if err := e.Search(); err != nil {
 		t.Fatal("selected MPFX search", err)
+	}
+	st := statistics.New()
+	if err := shell.CollectStatistics(st); err != nil || st.Size() != 2 || st.Key(0) != "nodes" || st.UintValue(0) != 1 || st.Key(1) != "visited" || st.UintValue(1) != 1 {
+		t.Fatal("selected MPFX statistics", err)
+	}
+	if err := shell.ResetStatistics(); err != nil {
+		t.Fatal(err)
+	}
+	st.Reset()
+	if err := shell.CollectStatistics(st); err != nil || st.Size() != 1 || st.Key(0) != "nodes" {
+		t.Fatal("MPFX statistic reset", err)
 	}
 	if err := pc.SetBoolName(&p, &printKey, false); err != nil {
 		t.Fatal(err)

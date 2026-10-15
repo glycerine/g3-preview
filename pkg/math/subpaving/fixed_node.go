@@ -75,6 +75,9 @@ func NewFixedNode(m *numeral.FixedPointManager, variables uint32, parent *FixedN
 		copy(n.upper, parent.upper)
 		n.trail = parent.trail
 		n.context = parent.context
+		if n.context != nil {
+			n.context.numNodes++
+		}
 		n.conflictVar = parent.conflictVar
 		n.inconsistent = parent.inconsistent
 		parent.children++
@@ -155,6 +158,9 @@ func (n *FixedNode) Close() error {
 		n.owned = n.owned[:i]
 	}
 	n.closed = true
+	if n.context != nil {
+		n.context.numNodes--
+	}
 	if n.parent != nil {
 		n.parent.children--
 	}

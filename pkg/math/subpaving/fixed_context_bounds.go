@@ -276,6 +276,7 @@ func (c *FixedContext) publishBound(n *FixedNode, variable uint32, value *numera
 	if err = c.NormalizeBound(variable, copyValue, lower, &open); err != nil {
 		return err
 	}
+	c.numBounds++
 	if err = n.PushBound(variable, copyValue, lower, open); err != nil {
 		return err
 	}
@@ -292,6 +293,8 @@ func (c *FixedContext) publishBound(n *FixedNode, variable uint32, value *numera
 	}
 	if conflict {
 		n.inconsistent, n.conflictVar = true, variable
+		c.numConflicts++
+		c.removeFixedLeaf(n)
 	}
 	c.timestamp++
 	if c.timestamp == math.MaxUint64 {
