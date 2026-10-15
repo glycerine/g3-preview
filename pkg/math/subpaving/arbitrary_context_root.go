@@ -11,6 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/math/interval"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -44,6 +45,7 @@ type ArbitraryContext struct {
 	nodes                                           []*ArbitraryNode
 	leafHead, leafTail                              *ArbitraryNode
 	displayVariable                                 func(io.Writer, uint32) error
+	trace                                           *diagnostic.TraceTags
 	maxDepth, maxNodes                              uint32
 	maxMemory                                       uint64
 	searchNode                                      *ArbitraryNode
@@ -265,6 +267,7 @@ func (c *ArbitraryContext) Close() error {
 	c.nodes = nil
 	c.leafHead, c.leafTail = nil, nil
 	c.displayVariable = nil
+	c.trace = nil
 	c.searchNode = nil
 	for len(c.unitClauses) != 0 {
 		a := c.unitClauses[0].atom
