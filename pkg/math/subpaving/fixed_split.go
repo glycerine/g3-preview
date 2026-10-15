@@ -94,5 +94,8 @@ func (c *FixedContext) SplitMidpoint(n *FixedNode, variable uint32, leftOpen boo
 	if err = c.DecideBound(right, variable, mid, true, !leftOpen); err != nil {
 		return nil, nil, errors.Join(err, right.Close(), left.Close())
 	}
+	if err = c.traceSplitBounds(left, right); err != nil {
+		return left, right, err
+	}
 	return left, right, nil
 }
