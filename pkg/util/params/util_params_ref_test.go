@@ -645,6 +645,16 @@ func paramsAuditRoots(t *testing.T, c *ParamsContext, q *unumeral.RationalServic
 		if !frame.Acquired || frame.Invocation == 0 || frame.Generation != c.Blocks[i].Generation || frame.Next.Kind != ParamNumeral {
 			t.Fatal("invalid actual acquired setter local")
 		}
+		if frame.Published {
+			if frame.MatchedIndex >= c.Blocks[i].Size {
+				t.Fatal("published replacement index outside block")
+			}
+			entry := c.Entry(&c.Blocks[i], frame.MatchedIndex)
+			if entry.key != frame.Next.key || entry.Kind != ParamNumeral {
+				t.Fatal("published replacement lost its entry")
+			}
+			continue // The block traversal below audits this one actual owner.
+		}
 		auditNumeral(&frame.Next.Rat)
 	}
 	for i := range c.Blocks {
@@ -884,6 +894,11 @@ func TestParamsReferenceReservationFailureSweeps(t *testing.T) {
 					paramsMust(t, e)
 				}
 				completed = true
+			}
+			if a.Slot != 0 && c.SetFrames[a.Slot-1].Active {
+				receipt, stopped := c.StoppedSet(&a)
+				paramsMust(t, stopped)
+				paramsMust(t, c.CleanupSet(receipt))
 			}
 			paramsMust(t, c.Del(&a))
 			paramsMust(t, c.Del(&b))
