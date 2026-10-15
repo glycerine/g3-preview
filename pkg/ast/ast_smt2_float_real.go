@@ -216,9 +216,6 @@ func (m *ASTManager) ppFloatLiteral(h ASTHandle, radix, real bool, g *uparams.Gl
 			return out, e
 		}
 	}
-	if !real {
-		return m.floatBitVectorSuffix(f, radix, g)
-	}
 	name := ""
 	if yes, e := p.numeric.IsNaN(&f.value); e != nil {
 		return out, e
@@ -240,6 +237,11 @@ func (m *ASTManager) ppFloatLiteral(h ASTHandle, radix, real bool, g *uparams.Gl
 		return out, e
 	} else if yes {
 		name = "-zero"
+	}
+	// Source pp_float_literal selects special spellings before the optional
+	// real-literal and bit-vector-field branches.
+	if name == "" && !real {
+		return m.floatBitVectorSuffix(f, radix, g)
 	}
 	b := &f.buffer
 	if name != "" {

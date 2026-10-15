@@ -12463,6 +12463,7 @@
         "pkg/ast/ast_smt2_bv_literal.go",
         "pkg/ast/ast_smt2_bv_literal_source_test.go",
         "pkg/ast/ast_smt2_float_real.go",
+        "pkg/ast/ast_smt2_float_dispatch.go",
         "pkg/ast/ast_smt2_float_real_source_test.go",
         "pkg/ast/ast_smt2_float_bv_literal.go",
         "pkg/ast/ast_smt2_float_bv_literal_source_test.go",
@@ -12502,6 +12503,7 @@
         "TestASTSMT2ApplicationSourceShortAndLongNameLayout",
         "TestASTSMT2BooleanComparisonsWithArithmeticLiterals",
         "TestASTSMT2BooleanComparisonsWithBitVectorLiterals",
+        "TestASTSMT2BooleanComparisonsWithFloatingPointLiterals",
         "TestASTSMT2BooleanTreeSourcePostorderAndLabels",
         "TestASTSMT2DeclareFunSourceEntrypoint"
       ],
@@ -12661,13 +12663,14 @@
           ]
         },
         {
-          "name": "Selected smt2_printer child-before-parent Boolean application and variable traversal with constant/label dispatch, default flat associative expansion, alias registration/reuse, info-stack weight/depth/level and let wrapping; arithmetic and bit-vector numeral children use source-default literal profiles, while other numeric and quantifier profiles remain open",
+          "name": "Selected smt2_printer child-before-parent Boolean application and variable traversal with constant/label dispatch, default flat associative expansion, alias registration/reuse, info-stack weight/depth/level and let wrapping; arithmetic, bit-vector and floating-point numeral children use source-default literal profiles, while string, decimal and quantifier profiles remain open",
           "status": "partial",
           "go_target": "pkg/ast/ast_smt2_boolean_tree.go",
           "tests": [
             "TestASTSMT2BooleanTreeSourcePostorderAndLabels",
             "TestASTSMT2BooleanComparisonsWithArithmeticLiterals",
-            "TestASTSMT2BooleanComparisonsWithBitVectorLiterals"
+            "TestASTSMT2BooleanComparisonsWithBitVectorLiterals",
+            "TestASTSMT2BooleanComparisonsWithFloatingPointLiterals"
           ]
         },
         {
@@ -12758,13 +12761,14 @@
           ]
         },
         {
-          "name": "ast_smt2_float_bv_literal concrete reached source counterpart (ast_smt2_pp.cpp:270-291)",
+          "name": "ast_smt2_float_bv_literal concrete reached source counterpart (ast_smt2_pp.cpp:235-291), with source special-value spelling selected before finite bit-vector fields",
           "status": "partial",
           "go_target": "pkg/ast/ast_smt2_float_bv_literal.go",
           "tests": [
             "TestASTSMT2FloatDefaultBitVectorFields",
             "TestASTSMT2FloatDefaultEveryActualReservation",
-            "TestASTSMT2FloatDefaultWarmUsesNativeInfoStorage"
+            "TestASTSMT2FloatDefaultWarmUsesNativeInfoStorage",
+            "TestASTSMT2BooleanComparisonsWithFloatingPointLiterals"
           ]
         }
       ],

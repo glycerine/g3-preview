@@ -142,6 +142,14 @@ func (m *ASTManager) SMT2PPBooleanTree(root ASTHandle, names []usymbol.Symbol) (
 					format, e = m.ppBitVectorLiteral(h, false, true, nil)
 					return result{docs: []ASTHandle{format}, weight: 1, depth: 1}, e
 				}
+				matched, e = m.smt2IsFloatingPointNumeral(h)
+				if e != nil {
+					return result{}, e
+				}
+				if matched {
+					format, e = m.ppFloatBitVectorLiteral(h, true, nil)
+					return result{docs: []ASTHandle{format}, weight: 1, depth: 1}, e
+				}
 				family, e := m.GetFamilyID(h)
 				if e != nil {
 					return result{}, e
