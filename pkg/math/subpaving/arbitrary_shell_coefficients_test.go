@@ -294,6 +294,23 @@ func TestArbitraryShellCoefficientSourceConversionAndCleanup(t *testing.T) {
 	if _, err := w.MkVar(false); !errors.Is(err, arena.ErrInvalidSlot) {
 		t.Fatalf("variable registration after root snapshot: %v", err)
 	}
+	// The retained scoped_mpf_vector grows its logical size and keeps the
+	// untouched high numeral when a later reserve requests fewer rows.
+	wide := make([]*numeral.Int, 257)
+	for i := range wide {
+		wide[i] = &one
+	}
+	wide[256] = &big
+	if _, rows, err := w.PrepareSum(&three, wide); err != nil || len(rows) != 257 {
+		t.Fatalf("wide source coefficient reserve: %d, %v", len(rows), err)
+	}
+	if _, rows, err := w.PrepareSum(&three, []*numeral.Int{&one}); err != nil || len(rows) != 1 || len(w.coefficients) != 257 {
+		t.Fatalf("smaller reserve keeps owning high row: %d, %d, %v", len(rows), len(w.coefficients), err)
+	}
+	retained, err = core.ToDouble(&w.coefficients[256])
+	if err != nil || retained != math.Exp2(53) {
+		t.Fatalf("high MPF row after native growth and shrink: %v, %v", retained, err)
+	}
 	if err := w.Close(); err != nil {
 		t.Fatal(err)
 	}

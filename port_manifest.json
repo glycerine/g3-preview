@@ -154207,10 +154207,12 @@
           "name": "mpf.h:300-327 scoped_mpf and concrete AST owning value vector",
           "status": "partial",
           "go_target": "pkg/ast/ast_fpa_scoped_values.go",
+          "go_targets": ["pkg/math/subpaving/arbitrary_shell_coefficients.go"],
           "tests": [
             "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
             "TestASTFloatingPointScopedValueActualReserveSetPublication",
-            "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren"
+            "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren",
+            "TestArbitraryShellCoefficientSourceConversionAndCleanup"
           ]
         },
         {
