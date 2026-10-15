@@ -25,6 +25,9 @@ type defaultProcess struct {
 	symbols  *symbol.Service
 	region   *arena.BytesRegion
 	debug    *diagnostic.DebugContext
+	streams  *diagnostic.MemoryStandardStreams
+	input    *diagnostic.NumericCharInput
+	actions  *diagnostic.DebugActionContext
 	ready    *process.Initialized
 	complete bool
 }
@@ -65,6 +68,26 @@ func InitializeDefaultProcess() error {
 	}
 	d.debug, err = diagnostic.NewDebugContext(d.region, d.budget)
 	if err != nil {
+		return fail(err)
+	}
+	d.streams, err = diagnostic.NewMemoryStandardStreams(diagnostic.MemoryStandardStreamsConfig{Budget: d.budget})
+	if err != nil {
+		return fail(err)
+	}
+	d.input, err = diagnostic.NewDebuggerCharInput(d.streams, nil)
+	if err != nil {
+		return fail(err)
+	}
+	d.actions, err = diagnostic.NewDebugActionContext(diagnostic.DebugActionConfig{
+		Budget: d.budget, Streams: d.streams, Input: d.input, Profile: diagnostic.DebugInteractive,
+	})
+	if err != nil {
+		return fail(err)
+	}
+	if err = d.debug.BindAssertionStreams(d.streams); err != nil {
+		return fail(err)
+	}
+	if err = d.debug.BindAssertionActions(d.actions); err != nil {
 		return fail(err)
 	}
 	cfg := process.InitializationConfig{Runtime: d.runtime, Rational: d.rational, Symbols: d.symbols, Debug: d.debug,
@@ -129,6 +152,24 @@ func (d *defaultProcess) close() error {
 			return err
 		}
 		d.debug = nil
+	}
+	if d.actions != nil {
+		if err := d.actions.Close(); err != nil {
+			return err
+		}
+		d.actions = nil
+	}
+	if d.input != nil {
+		if err := d.input.Close(); err != nil {
+			return err
+		}
+		d.input = nil
+	}
+	if d.streams != nil {
+		if err := d.streams.Close(); err != nil {
+			return err
+		}
+		d.streams = nil
 	}
 	if d.region != nil {
 		if err := d.region.Close(); err != nil {

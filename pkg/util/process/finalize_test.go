@@ -103,6 +103,9 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 	if _, err = g.Manager(); err != nil {
 		t.Fatal("rejected owning close released the current service", err)
 	}
+	if e := init.Close(); !errors.Is(e, arena.ErrConfig) {
+		t.Fatal("generated owner closed before source finalization", e)
+	}
 	if again, err := InitializeGenerated(InitializationConfig{Runtime: m}, 1<<25); err != nil || again != nil {
 		t.Fatal("repeated generated initialization", again, err)
 	}
@@ -131,6 +134,35 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 	}
 	must(t, d.EnableDebug("memory"))
 	tr.Enable("memory")
+	foreignDebug, err := diagnostic.NewDebugContext(region, b)
+	must(t, err)
+	foreignRational, err := numeral.NewRationalGlobalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{
+		Memory: m, Cells: arena.Config{PageSize: 2, Budget: b},
+		Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: b}},
+	}})
+	must(t, err)
+	foreignSymbols, err := symbol.NewService(symbol.Config{Budget: b})
+	must(t, err)
+	foreignTrace := diagnostic.NewTraceTagsWithWriter(new(bytes.Buffer))
+	for _, tc := range []struct {
+		name  string
+		debug *diagnostic.DebugContext
+		rat   *numeral.RationalGlobalService
+		sym   *symbol.Service
+		trace *diagnostic.TraceTags
+	}{
+		{"debug", foreignDebug, r, s, tr},
+		{"rational", d, foreignRational, s, tr},
+		{"symbols", d, r, foreignSymbols, tr},
+		{"trace", d, r, s, foreignTrace},
+	} {
+		if e := FinalizeGenerated(p, tc.debug, g, tc.rat, tc.sym, tc.trace); !errors.Is(e, arena.ErrConfig) || !p.InitializationStarted() {
+			t.Fatalf("%s: foreign borrowed owner advanced finalization: %v", tc.name, e)
+		}
+	}
+	must(t, foreignDebug.Close())
+	must(t, foreignRational.Close())
+	must(t, foreignSymbols.Close())
 	must(t, FinalizeGenerated(p, d, g, r, s, tr))
 	wantTrace := ""
 	if traceCompiled {

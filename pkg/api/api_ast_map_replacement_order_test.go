@@ -1,14 +1,12 @@
 package api
 
 import (
-	"errors"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 )
 
-func TestAPIASTMapReplacementReleasesOldBeforePublishingNew(t *testing.T) {
+func TestAPIASTMapReplacementNativeIDRecycleBeforePublishingNew(t *testing.T) {
 	m := astTestManager(t)
 	c, err := newAPIContextResults(m, false)
 	astTestMust(t, err)
@@ -31,15 +29,13 @@ func TestAPIASTMapReplacementReleasesOldBeforePublishingNew(t *testing.T) {
 	m.Budget().FailAfter(0)
 	err = a.insert(key, incoming)
 	m.Budget().FailAfter(-1)
-	if !errors.Is(err, arena.ErrInjectedFailure) {
-		t.Fatalf("old-value deletion refusal: %v", err)
-	}
+	astTestMust(t, err)
 	got, err := a.find(key)
-	if err != nil || got != old || a.entries[key].valueOwned {
-		t.Fatalf("source map publication after stopped DEC: got=%v, err=%v, entry=%+v", got, err, a.entries[key])
+	if err != nil || got != incoming || !a.entries[key].valueOwned {
+		t.Fatalf("replacement publication after native recycle: got=%v, err=%v, entry=%+v", got, err, a.entries[key])
 	}
-	if _, err := m.GetKind(old); err == nil || len(a.pending) != 1 {
-		t.Fatalf("deleted source pointer and incoming owning receipt: old error=%v, pending=%d", err, len(a.pending))
+	if _, err := m.GetKind(old); err == nil || len(a.pending) != 0 {
+		t.Fatalf("old value survived or pending owner remained: old error=%v, pending=%d", err, len(a.pending))
 	}
 	astTestMust(t, a.reset())
 	if rc, err := m.GetRefCount(incoming); err != nil || rc != 1 {

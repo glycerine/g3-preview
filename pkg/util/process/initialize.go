@@ -36,6 +36,10 @@ type InitializationConfig struct {
 // its completed Go owners can still be closed.
 type Initialized struct {
 	self           *Initialized
+	process        *memory.ProcessAccounting
+	debug          *diagnostic.DebugContext
+	rational       *numeral.RationalGlobalService
+	symbols        *symbol.Service
 	Context        *params.ParamsContext
 	Catalog        *params.GlobalParamsCatalog
 	Globals        *params.GlobalParamsService
@@ -45,6 +49,10 @@ type Initialized struct {
 	paramsBound    bool
 	closed         bool
 }
+
+// Generated mem_initialize/mem_finalize use one fixed process cohort. Keep
+// the exact borrowed children for finalization argument validation.
+var currentGenerated *Initialized
 
 // InitializeGenerated executes the first-call source order. A repeated call
 // updates the shared maximum through memory::initialize and returns nil,nil;
@@ -86,7 +94,7 @@ func InitializeGenerated(c InitializationConfig, maxSize uint64) (*Initialized, 
 	if err != nil || !first {
 		return nil, err
 	}
-	result := &Initialized{}
+	result := &Initialized{process: p, debug: c.Debug, rational: c.Rational, symbols: c.Symbols}
 	result.self = result
 	if err = c.Rational.InitializeSource(); err != nil {
 		return result, err
@@ -143,6 +151,7 @@ func InitializeGenerated(c InitializationConfig, maxSize uint64) (*Initialized, 
 	if err != nil {
 		return result, err
 	}
+	currentGenerated = result
 	return result, nil
 }
 
@@ -157,6 +166,11 @@ func (v *Initialized) Close() error {
 	}
 	if v.paramsBound && v.Globals != nil && params.BorrowProcessGlobalParamsService() != v.Globals {
 		return ErrProcessGlobalParamsBinding
+	}
+	// A stopped source finalizer retains its finalizing guard; owning Close may
+	// still drain that child. A live process must run generated finalization first.
+	if currentGenerated == v && v.process.InitializationStarted() && !v.process.Finalizing() {
+		return arena.ErrConfig
 	}
 	if v.Globals != nil {
 		if err := v.Globals.Close(); err != nil {
@@ -190,6 +204,10 @@ func (v *Initialized) Close() error {
 		}
 		v.debugPrevious = nil
 	}
+	if currentGenerated == v {
+		currentGenerated = nil
+	}
+	v.process, v.debug, v.rational, v.symbols = nil, nil, nil, nil
 	v.closed = true
 	return nil
 }

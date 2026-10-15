@@ -27,6 +27,11 @@ func FinalizeGenerated(p *memory.ProcessAccounting, d *diagnostic.DebugContext, 
 	if d == nil || g == nil || r == nil || s == nil || tr == nil {
 		return arena.ErrConfig
 	}
+	bound := currentGenerated
+	if bound == nil || bound.closed || bound.process != p || bound.debug != d || bound.Globals != g || bound.rational != r || bound.symbols != s || bound.Trace != tr ||
+		diagnostic.BorrowProcessDebugContext() != d || params.BorrowProcessGlobalParamsService() != g {
+		return arena.ErrConfig
+	}
 	active, err := p.BeginFinalize()
 	if err != nil || !active {
 		return err

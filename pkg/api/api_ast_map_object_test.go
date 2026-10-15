@@ -4,7 +4,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 )
 
@@ -73,7 +72,7 @@ func TestAPIASTMapConcreteReferenceCleanup(t *testing.T) {
 	}
 }
 
-func TestAPIASTMapResetResumesAfterConsumedKeyDeletionRefusal(t *testing.T) {
+func TestAPIASTMapResetNativeIDRecycleWithoutBackingReservation(t *testing.T) {
 	m := astTestManager(t)
 	c, err := newAPIContextResults(m, false)
 	astTestMust(t, err)
@@ -91,25 +90,15 @@ func TestAPIASTMapResetResumesAfterConsumedKeyDeletionRefusal(t *testing.T) {
 	m.Budget().FailAfter(0)
 	err = a.reset()
 	m.Budget().FailAfter(-1)
-	if !errors.Is(err, arena.ErrInjectedFailure) {
-		t.Fatal("actual key destructor refusal", err)
-	}
-	entry := a.entries[key]
-	if entry == nil || entry.keyOwned || !entry.valueOwned || len(a.pending) != 0 {
-		t.Fatal("consumed key and retained value prefix", entry, a.pending)
+	astTestMust(t, err)
+	if len(a.entries) != 0 || len(a.pending) != 0 {
+		t.Fatal("native ID recycle left map owners", a.entries, a.pending)
 	}
 	if _, err := m.GetKind(key); !errors.Is(err, ast.ErrASTHandle) {
-		t.Fatal("consumed key should be invalid", err)
-	}
-	if _, err := m.GetKind(value); err != nil {
-		t.Fatal("unconsumed value should survive", err)
-	}
-	astTestMust(t, a.reset())
-	if len(a.entries) != 0 || len(a.pending) != 0 {
-		t.Fatal("reset retry retained map owner")
+		t.Fatal("released key should be invalid", err)
 	}
 	if _, err := m.GetKind(value); !errors.Is(err, ast.ErrASTHandle) {
-		t.Fatal("retry did not delete value", err)
+		t.Fatal("released value should be invalid", err)
 	}
 	astTestMust(t, c.Close())
 }

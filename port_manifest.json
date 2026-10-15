@@ -3562,7 +3562,7 @@
       ],
       "tests": [
         "TestAPIASTMapConcreteReferenceCleanup",
-        "TestAPIASTMapResetResumesAfterConsumedKeyDeletionRefusal",
+        "TestAPIASTMapResetNativeIDRecycleWithoutBackingReservation",
         "TestAPIASTMapExpressionPairTransfer"
       ],
       "assertions": [
@@ -3580,7 +3580,7 @@
           "go_target": "pkg/api/api_ast_map_object.go",
           "tests": [
             "TestAPIASTMapConcreteReferenceCleanup",
-            "TestAPIASTMapResetResumesAfterConsumedKeyDeletionRefusal"
+            "TestAPIASTMapResetNativeIDRecycleWithoutBackingReservation"
           ]
         },
         {
@@ -3592,12 +3592,18 @@
           ]
         },
         {
-          "name": "Z3_ast_map_insert replacement increments incoming then decrements old before entry value publication, with stopped-deletion owning cleanup (api_ast_map.cpp:74-89)",
+          "name": "Z3_ast_map_insert replacement increments incoming then decrements old before entry value publication; native ID recycle completes without an arena backing charge (api_ast_map.cpp:74-89)",
           "status": "ported",
           "go_target": "pkg/api/api_ast_map_object.go",
           "tests": [
-            "TestAPIASTMapReplacementReleasesOldBeforePublishingNew"
+            "TestAPIASTMapReplacementNativeIDRecycleBeforePublishingNew"
           ]
+        },
+        {
+          "name": "API AST-map stopped key/value deletion cleanup after an actual non-ID child failure",
+          "status": "partial",
+          "go_target": "pkg/api/api_ast_map_object.go",
+          "tests": []
         }
       ],
       "ownership": [
@@ -120730,9 +120736,10 @@
         },
         {
           "name": "Concrete default standard-stream/action service preparation and exact borrowed generated process Context finalizer; source-site namespace assertion transport with gate-before-condition and bare_str C continuation (src/util/debug.cpp:28-35; src/util/debug.cpp:44-68; src/util/debug.cpp:37-42,73-117; src/test/mem_initializer.cpp:13-20; src/util/gparams.cpp:558,564,569,574,579,584,589,594,603,609,614,619,624,629; src/util/symbol.h:96)",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/util/process/finalize.go",
+          "go_targets": ["pkg/engine/default_process.go", "pkg/util/process/initialize.go", "pkg/util/diagnostic/util_debug_process.go", "pkg/util/params/util_gparams_service_ops.go"],
+          "tests": ["TestProcessDebugDefaultOwnsSourceAssertionIO", "TestDefaultProcessBindsAssertionServicesAndReleasesOwners", "TestGeneratedInitializeAndFinalizeConcreteServices", "TestGlobalParamsNamespaceAssertionBindingAtReachedSites", "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion"]
         }
       ],
       "ownership": [
@@ -121053,9 +121060,10 @@
         },
         {
           "name": "Concrete default standard-stream/action service preparation and exact borrowed generated process Context finalizer; source-site namespace assertion transport with gate-before-condition and bare_str C continuation (src/util/debug.cpp:28-35; src/util/debug.cpp:44-68; src/util/debug.cpp:37-42,73-117; src/test/mem_initializer.cpp:13-20; src/util/gparams.cpp:558,564,569,574,579,584,589,594,603,609,614,619,624,629; src/util/symbol.h:96)",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/util/process/finalize.go",
+          "go_targets": ["pkg/engine/default_process.go", "pkg/util/process/initialize.go", "pkg/util/diagnostic/util_debug_process.go", "pkg/util/params/util_gparams_service_ops.go"],
+          "tests": ["TestProcessDebugDefaultOwnsSourceAssertionIO", "TestDefaultProcessBindsAssertionServicesAndReleasesOwners", "TestGeneratedInitializeAndFinalizeConcreteServices", "TestGlobalParamsNamespaceAssertionBindingAtReachedSites", "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion"]
         }
       ],
       "ownership": [
@@ -121136,7 +121144,7 @@
       "tests": [
         "TestASTExprMapConcreteReferenceCleanup",
         "TestAPIASTMapConcreteReferenceCleanup",
-        "TestAPIASTMapResetResumesAfterConsumedKeyDeletionRefusal"
+        "TestAPIASTMapResetNativeIDRecycleWithoutBackingReservation"
       ],
       "conditionals": [
         {
@@ -121165,7 +121173,7 @@
           "go_target": "pkg/api/api_ast_map_object.go",
           "tests": [
             "TestAPIASTMapConcreteReferenceCleanup",
-            "TestAPIASTMapResetResumesAfterConsumedKeyDeletionRefusal"
+            "TestAPIASTMapResetNativeIDRecycleWithoutBackingReservation"
           ]
         },
         {
@@ -123254,9 +123262,10 @@
         },
         {
           "name": "Concrete default standard-stream/action service preparation and exact borrowed generated process Context finalizer; source-site namespace assertion transport with gate-before-condition and bare_str C continuation (src/util/debug.cpp:28-35; src/util/debug.cpp:44-68; src/util/debug.cpp:37-42,73-117; src/test/mem_initializer.cpp:13-20; src/util/gparams.cpp:558,564,569,574,579,584,589,594,603,609,614,619,624,629; src/util/symbol.h:96)",
-          "status": "partial",
-          "go_target": "pkg/util/params/util_gparams_service_ops.go",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/util/process/finalize.go",
+          "go_targets": ["pkg/engine/default_process.go", "pkg/util/process/initialize.go", "pkg/util/diagnostic/util_debug_process.go", "pkg/util/params/util_gparams_service_ops.go"],
+          "tests": ["TestProcessDebugDefaultOwnsSourceAssertionIO", "TestDefaultProcessBindsAssertionServicesAndReleasesOwners", "TestGeneratedInitializeAndFinalizeConcreteServices", "TestGlobalParamsNamespaceAssertionBindingAtReachedSites", "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion"]
         },
         {
           "name": "generated process initialization publishes one current gparams service, rejects a second live process, and requires the active binding at owning close",
@@ -176884,9 +176893,10 @@
         },
         {
           "name": "Concrete default standard-stream/action service preparation and exact borrowed generated process Context finalizer; source-site namespace assertion transport with gate-before-condition and bare_str C continuation (src/util/debug.cpp:28-35; src/util/debug.cpp:44-68; src/util/debug.cpp:37-42,73-117; src/test/mem_initializer.cpp:13-20; src/util/gparams.cpp:558,564,569,574,579,584,589,594,603,609,614,619,624,629; src/util/symbol.h:96)",
-          "status": "partial",
-          "go_target": "pkg/util/params/util_gparams_service_ops.go",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/util/process/finalize.go",
+          "go_targets": ["pkg/engine/default_process.go", "pkg/util/process/initialize.go", "pkg/util/diagnostic/util_debug_process.go", "pkg/util/params/util_gparams_service_ops.go"],
+          "tests": ["TestProcessDebugDefaultOwnsSourceAssertionIO", "TestDefaultProcessBindsAssertionServicesAndReleasesOwners", "TestGeneratedInitializeAndFinalizeConcreteServices", "TestGlobalParamsNamespaceAssertionBindingAtReachedSites", "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion"]
         },
         {
           "name": "concrete null/string/numerical symbol io.Writer insertion, including numeric prefix write and refusal boundary",
