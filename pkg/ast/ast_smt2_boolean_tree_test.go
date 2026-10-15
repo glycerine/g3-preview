@@ -28,6 +28,14 @@ func TestASTSMT2BooleanTreeSourcePostorderAndLabels(t *testing.T) {
 	paramsMust(t, err)
 	variable, err := m.MkVar(4, boolSort)
 	paramsMust(t, err)
+	middle, err := m.MkConst(astTestSymbol(t, m, "middle"), boolSort)
+	paramsMust(t, err)
+	last, err := m.MkConst(astTestSymbol(t, m, "last"), boolSort)
+	paramsMust(t, err)
+	inner, err := m.MkAnd(middle, last)
+	paramsMust(t, err)
+	flat, err := m.MkAnd(left, inner)
+	paramsMust(t, err)
 	out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: budget})
 	paramsMust(t, err)
 	defer func() { paramsMust(t, out.Close()) }()
@@ -40,6 +48,7 @@ func TestASTSMT2BooleanTreeSourcePostorderAndLabels(t *testing.T) {
 		{label, "(! (=> left (not right)) :lblpos tag)"},
 		{lit, "(! true :lblpos |a b|)"},
 		{variable, "(:var 4)"},
+		{flat, "(and left middle last)"},
 	} {
 		format, e := m.SMT2PPBooleanTree(tc.root, nil)
 		paramsMust(t, e)
@@ -57,5 +66,10 @@ func TestASTSMT2BooleanTreeSourcePostorderAndLabels(t *testing.T) {
 	paramsMust(t, err)
 	if _, err := m.SMT2PPBooleanTree(nonBoolean, nil); err == nil {
 		t.Fatal("unported numeral/non-Boolean constant path silently formatted")
+	}
+	shared, err := m.MkAnd(inner, inner)
+	paramsMust(t, err)
+	if _, err := m.SMT2PPBooleanTree(shared, nil); err == nil {
+		t.Fatal("shared associative child silently bypassed alias handling")
 	}
 }
