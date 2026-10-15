@@ -124,6 +124,7 @@ func (g *satSolverGC) gcDynPSM() error {
 					return e
 				}
 				if measure > bound {
+					g.traceFreezingClause(r, sz, measure)
 					if e = l.detachClause(r); e != nil {
 						return e
 					}
@@ -195,6 +196,7 @@ func (g *satSolverGC) gcDynPSM() error {
 	return nil
 }
 func (g *satSolverGC) activateFrozenClause(r StoredClauseRef) (bool, error) {
+	g.traceReactivatingClause(r)
 	l := g.lifecycle()
 	p := l.propagation
 	a := p.clauses
@@ -230,6 +232,7 @@ func (g *satSolverGC) activateFrozenClause(r StoredClauseRef) (bool, error) {
 			j++
 		}
 	}
+	g.traceAfterClauseCleanup(r, j)
 	switch j {
 	case 0:
 		p.setConflict(satJustification{}, DefaultLiteral())

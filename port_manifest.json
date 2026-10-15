@@ -178159,6 +178159,12 @@
           "tests": ["TestSATGCHalfAndDynamicSourceEntryTrace"]
         },
         {
+          "name": "Reached SAT dynamic-GC freeze, reactivation and cleaned-literal TRACE sites (sat_solver.cpp:1569,1612,1630)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_gc_trace.go",
+          "tests": ["TestSATGCFrozenClauseSourceTraceBoundaries", "TestSATGCReactivationCleanupSourceTraceBoundaries"]
+        },
+        {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_simplify_trace.go",
@@ -179365,6 +179371,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_gc_trace.go",
           "tests": ["TestSATGCHalfAndDynamicSourceEntryTrace"]
+        },
+        {
+          "name": "Reached SAT dynamic-GC freeze, reactivation and cleaned-literal TRACE sites (sat_solver.cpp:1569,1612,1630)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_gc_trace.go",
+          "tests": ["TestSATGCFrozenClauseSourceTraceBoundaries", "TestSATGCReactivationCleanupSourceTraceBoundaries"]
         },
         {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",
