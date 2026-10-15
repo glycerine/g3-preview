@@ -1,10 +1,8 @@
 package sat
 
 import (
-	"github.com/glycerine/g3/pkg/util/lbool"
-	"reflect"
-
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 func (s *satSolverClauseLifecycle) push() error {
@@ -26,23 +24,7 @@ func (s *satSolverClauseLifecycle) push() error {
 			return ErrSATAssertion
 		}
 	}
-	if len(s.scopes) == cap(s.scopes) {
-		next, bytes, e := satVariableNextCapacity(uint32(cap(s.scopes)), uint64(reflect.TypeOf(satSolverScope{}).Size()), 12, uint64(^uint(0)>>1))
-		if e != nil {
-			return e
-		}
-		if e = s.budget.Reserve(bytes); e != nil {
-			return e
-		}
-		buf := make([]satSolverScope, len(s.scopes), next)
-		copy(buf[:cap(s.scopes)], s.scopes[:cap(s.scopes)])
-		s.budget.Release(uint64(cap(s.scopes)) * uint64(reflect.TypeOf(satSolverScope{}).Size()))
-		s.scopes = buf
-	}
 	s.scopes = append(s.scopes, satSolverScope{})
-	if uint32(len(s.scopes)) > s.scopesInitialized {
-		s.scopesInitialized = uint32(len(s.scopes))
-	}
 	v.scopeLevel++
 	n, e := v.trail.Size(v.trailRef)
 	if e != nil {
@@ -72,10 +54,10 @@ func (s *satSolverClauseLifecycle) pop(n uint32) error {
 		return ErrSATAssertion
 	}
 	newLevel := v.scopeLevel - n
-	if newLevel >= s.scopesInitialized || uint64(newLevel) >= uint64(cap(s.scopes)) {
+	if uint64(newLevel) >= uint64(len(s.scopes)) {
 		return arena.ErrBounds
 	}
-	scope := s.scopes[:cap(s.scopes)][newLevel]
+	scope := s.scopes[newLevel]
 	p.inconsistent = false
 	if e := s.unassignVars(scope.trailLimit); e != nil {
 		return e

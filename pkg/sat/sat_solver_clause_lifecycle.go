@@ -32,7 +32,6 @@ type satSolverClauseLifecycle struct {
 	eqContinuation                                             *satElimEqs
 	ownerBytes                                                 uint64
 	mkBinary, mkTernary, mkNary, deleted, nonLearnedGeneration uint32
-	scopesInitialized                                          uint32
 	closeOriginal, closeLearned                                uint32
 	originalDone, learnedDone, closing, closed                 bool
 	traceOriginalDone, traceLearnedDone                        bool
@@ -434,7 +433,6 @@ func (s *satSolverClauseLifecycle) finalizeScopesReinit() error {
 		return ErrSATOwner
 	}
 	// Adapter physical finalization after source clause deletion, reverse member order.
-	s.budget.Release(uint64(cap(s.scopes)) * uint64(reflect.TypeOf(satSolverScope{}).Size()))
 	s.scopes = nil
 	s.reinit = nil
 	return nil

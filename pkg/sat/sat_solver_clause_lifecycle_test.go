@@ -105,7 +105,7 @@ func satLifecycleAssertOwned(t *testing.T, s *satSolverClauseLifecycle) {
 	if a.storage.Stats().Live != uint32(len(refs)) {
 		t.Fatal("anonymous actual clause descriptor", a.storage.Stats().Live, len(refs))
 	}
-	want := s.ownerBytes + uint64(cap(s.scopes))*uint64(reflect.TypeOf(satSolverScope{}).Size())
+	want := s.ownerBytes
 	p := s.propagation
 	v := p.variables
 	want += p.ownerBytes + v.Stats().TotalBytes

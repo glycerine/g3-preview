@@ -30,7 +30,7 @@ func satProbingAudit(t *testing.T, s *satSolverProbing, analysis *satSolverConfl
 	if d != nil {
 		want += d.ownerBytes
 	}
-	want += l.ownerBytes + uint64(cap(l.scopes))*uint64(reflect.TypeOf(satSolverScope{}).Size())
+	want += l.ownerBytes
 	want += p.ownerBytes + v.Stats().TotalBytes
 	todo := v.elimTodo
 	want += todo.ownerBytes
@@ -115,7 +115,7 @@ func TestSATSolverProbingIndependentFiniteImplications(t *testing.T) {
 		})
 	}
 }
-func TestSATSolverProbingAllPhysicalRefusalPrefixes(t *testing.T) {
+func TestSATSolverProbingNativeScopeWithoutArenaGrowth(t *testing.T) {
 	failed, success := 0, 0
 	for fault := int64(0); fault < 256; fault++ {
 		done := false
@@ -148,10 +148,9 @@ func TestSATSolverProbingAllPhysicalRefusalPrefixes(t *testing.T) {
 			break
 		}
 	}
-	if failed == 0 || success != 1 {
+	if failed != 0 || success != 1 {
 		t.Fatal(failed, success)
 	}
-	t.Log("real refusal prefixes", failed, "first success", success)
 }
 func TestSATSolverProbingNativeCacheAndStrictMemoryCutoff(t *testing.T) {
 	s, life := satProbingFixture(t, 3)

@@ -48,7 +48,7 @@ func satMUSFaultCall(s *Solver, recursive bool) (lbool.LBool, error) {
 	}
 	return s.Check([]Literal{0, 2, 4})
 }
-func TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots(t *testing.T) {
+func TestSATSolverMUSNativeScopePreservesNamedPhysicalRoots(t *testing.T) {
 	for _, recursive := range []bool{false, true} {
 		t.Run(fmt.Sprint(recursive), func(t *testing.T) {
 			horizon := int64(0)
@@ -114,10 +114,9 @@ func TestSATSolverMUSEveryActualRefusalPreservesNamedPhysicalRoots(t *testing.T)
 					}
 				})
 			}
-			if failures == 0 || success != 1 || int64(failures) != horizon {
-				t.Fatal("actual calibrated refusal horizon", horizon, failures, success)
+			if success != 1 || int64(failures) != horizon || (!recursive && horizon != 0) || (recursive && horizon == 0) {
+				t.Fatal("actual residual reservation horizon", horizon, failures, success)
 			}
-			t.Log("actual Budget refusals including explicit cold lexical headers", horizon, "first success", success)
 		})
 	}
 }

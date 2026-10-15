@@ -20,7 +20,7 @@ func satDecisionFixture(t *testing.T, n uint32) (*satSolverDecision, *satSolverG
 	return d, g
 }
 
-func TestSATSolverDecisionEveryActualAllocationPrefix(t *testing.T) {
+func TestSATSolverDecisionNativeScopeWithoutArenaGrowth(t *testing.T) {
 	firstSuccess := -1
 	for ordinal := int64(0); ordinal < 32; ordinal++ {
 		d, g := satDecisionFixture(t, 1)
@@ -61,10 +61,9 @@ func TestSATSolverDecisionEveryActualAllocationPrefix(t *testing.T) {
 		satOK(t, d.Close())
 		satGCAudit(t, g)
 	}
-	if firstSuccess < 1 {
-		t.Fatal("no complete actual reservation campaign", firstSuccess)
+	if firstSuccess != 0 {
+		t.Fatal("native scope/decision path reserved arena storage", firstSuccess)
 	}
-	t.Log("actual decision refusal horizon", firstSuccess)
 }
 
 func TestSATSolverDecisionThresholdCastBoundariesAndOwner(t *testing.T) {

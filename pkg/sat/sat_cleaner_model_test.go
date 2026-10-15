@@ -52,7 +52,7 @@ func satCleanerAudit(t *testing.T, c *satCleaner, extra ...StoredClauseRef) {
 	if small.Live != uint32(len(refs)) {
 		t.Fatal("unnamed physical clause", small.Live, len(refs))
 	}
-	want := c.ownerBytes + l.ownerBytes + uint64(cap(l.scopes))*uint64(reflect.TypeOf(satSolverScope{}).Size())
+	want := c.ownerBytes + l.ownerBytes
 	want += p.ownerBytes + v.Stats().TotalBytes
 	todo := v.elimTodo
 	want += todo.ownerBytes

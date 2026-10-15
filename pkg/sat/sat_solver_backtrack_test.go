@@ -44,6 +44,29 @@ func TestSATSolverBacktrackRealTrailQueueAndReinit(t *testing.T) {
 		}
 	}
 }
+func TestSATSolverScopesNativeGrowthAndPop(t *testing.T) {
+	s, _, v, b := satLifecycleFixture(t, 1)
+	before := b.Used()
+	b.FailAfter(0)
+	for i := 0; i < 129; i++ {
+		satOK(t, s.push())
+	}
+	if len(s.scopes) != 129 || v.scopeLevel != 129 || b.Used() != before {
+		t.Fatal("native scope growth", len(s.scopes), v.scopeLevel, b.Used(), before)
+	}
+	satOK(t, s.pop(129))
+	if len(s.scopes) != 0 || v.scopeLevel != 0 || b.Used() != before {
+		t.Fatal("native scope pop", len(s.scopes), v.scopeLevel, b.Used(), before)
+	}
+	want := error(arena.ErrBounds)
+	if satStorageSourceDebug {
+		want = ErrSATAssertion
+	}
+	if e := s.pop(1); !errors.Is(e, want) {
+		t.Fatal("empty scope bound", e)
+	}
+	b.FailAfter(-1)
+}
 func TestSATSolverBacktrackExtensionAndOwnerPrefixes(t *testing.T) {
 	s, p, v, _ := satLifecycleFixture(t, 1)
 	p.extensionPresent = true

@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestSATSolverDefaultCheckEveryActualRefusalKeepsNamedRuntimeRoots(t *testing.T) {
+func TestSATSolverDefaultCheckNativeScopeKeepsNamedRuntimeRoots(t *testing.T) {
 	failed, success := 0, 0
 	for fault := int64(0); fault < 1024; fault++ {
 		ok := false
@@ -49,8 +49,7 @@ func TestSATSolverDefaultCheckEveryActualRefusalKeepsNamedRuntimeRoots(t *testin
 			break
 		}
 	}
-	if failed == 0 || success != 1 {
+	if failed != 0 || success != 1 {
 		t.Fatal(failed, success)
 	}
-	t.Log("actual source Check refusal horizon", failed, success)
 }

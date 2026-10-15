@@ -1,41 +1,9 @@
 package sat
 
-import (
-	"github.com/glycerine/g3/pkg/arena"
-	"github.com/glycerine/g3/pkg/util/z3exception"
-)
-
-// Source capacity/byte arithmetic is unsigned32, independently of actual Go
-// record sizes. A source-permitted wrapped undersized allocation is outside the
-// full-capacity typed-storage domain; its raw malloc/header prefix is not ported.
-func satVariableNextCapacity(old uint32, actualStride, sourceStride, hostMax uint64) (uint32, uint64, error) {
-	n := uint32(2)
-	if old != 0 {
-		n = (3*old + 1) >> 1
-		oldBytes := uint32(sourceStride)*old + 8
-		newBytes := uint32(sourceStride)*n + 8
-		if n <= old || newBytes <= oldBytes {
-			return 0, 0, z3exception.NewDefaultException("Overflow encountered when expanding vector")
-		}
-	}
-	if actualStride == 0 || sourceStride == 0 || uint64(n) > (uint64(^uint32(0))-8)/sourceStride || uint64(n) > hostMax/actualStride {
-		return 0, 0, arena.ErrBounds
-	}
-	return n, uint64(n) * actualStride, nil
-}
-func satVariableIndex(length, capacity, initialized uint32, i uint32) error {
-	if satStorageSourceDebug && i >= length {
-		return ErrSATAssertion
-	}
-	if i >= capacity || i >= initialized {
-		return arena.ErrBounds
-	}
-	return nil
-}
+import "github.com/glycerine/g3/pkg/arena"
 
 type satVariableCharColumn struct {
-	data        []int8
-	initialized uint32
+	data []int8
 }
 
 func (c *satVariableCharColumn) extend(n uint32) {
@@ -44,34 +12,26 @@ func (c *satVariableCharColumn) extend(n uint32) {
 	}
 	old := len(c.data)
 	c.data = append(c.data, make([]int8, int(n)-old)...)
-	if n > c.initialized {
-		c.initialized = n
-	}
 }
 func (c *satVariableCharColumn) read(i uint32) (int8, error) {
-	if e := satVariableIndex(uint32(len(c.data)), uint32(cap(c.data)), c.initialized, i); e != nil {
-		return 0, e
+	if uint64(i) >= uint64(len(c.data)) {
+		if satStorageSourceDebug {
+			return 0, ErrSATAssertion
+		}
+		return 0, arena.ErrBounds
 	}
-	return c.data[:cap(c.data)][i], nil
+	return c.data[i], nil
 }
 func (c *satVariableCharColumn) write(i uint32, v int8) error {
-	if e := satVariableIndex(uint32(len(c.data)), uint32(cap(c.data)), c.initialized, i); e != nil {
-		return e
-	}
-	c.data[:cap(c.data)][i] = v
-	return nil
-}
-func (c *satVariableCharColumn) shrink(n uint32) error {
-	if satStorageSourceDebug && n > uint32(len(c.data)) {
-		return ErrSATAssertion
-	}
-	if n > c.initialized || uint64(n) > uint64(cap(c.data)) {
+	if uint64(i) >= uint64(len(c.data)) {
+		if satStorageSourceDebug {
+			return ErrSATAssertion
+		}
 		return arena.ErrBounds
 	}
-	c.data = c.data[:n]
+	c.data[i] = v
 	return nil
 }
 func (c *satVariableCharColumn) finalize() {
 	c.data = nil
-	c.initialized = 0
 }

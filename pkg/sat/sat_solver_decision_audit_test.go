@@ -21,7 +21,7 @@ func satDecisionAudit(t *testing.T, g *satSolverGC, decision *satSolverDecision)
 	roots := []umemory.Block{}
 	satScalarAuditRoots(t, v, roots...)
 	want := decision.ownerBytes + g.ownerBytes + g.scratchBytes + g.cleaner.ownerBytes + c.ownerBytes + s.ownerBytes + analysis.ownerBytes + d.ownerBytes
-	want += l.ownerBytes + uint64(cap(l.scopes))*uint64(reflect.TypeOf(satSolverScope{}).Size())
+	want += l.ownerBytes
 	want += p.ownerBytes + v.Stats().TotalBytes
 	todo := v.elimTodo
 	want += todo.ownerBytes
