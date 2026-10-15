@@ -12395,7 +12395,7 @@
       "path": "src/ast/ast_smt2_pp.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "partial",
       "go_targets": [
         "pkg/ast/ast_smt2_bv_literal.go",
         "pkg/ast/ast_smt2_bv_literal_source_test.go",
@@ -12403,7 +12403,8 @@
         "pkg/ast/ast_smt2_float_real_source_test.go",
         "pkg/ast/ast_smt2_float_bv_literal.go",
         "pkg/ast/ast_smt2_float_bv_literal_source_test.go",
-        "pkg/ast/ast_smt2_bv_literal_native_test.go"
+        "pkg/ast/ast_smt2_bv_literal_native_test.go",
+        "pkg/ast/ast_smt2_fdecl_name.go"
       ],
       "tests": [
         "TestASTSMT2BitVectorLiteralRadixAndSignedOracle",
@@ -12417,7 +12418,9 @@
         "TestASTSMT2FloatDefaultBitVectorFields",
         "TestASTSMT2FloatDefaultEveryActualReservation",
         "TestASTSMT2FloatDefaultWarmUsesNativeInfoStorage",
-        "TestASTSMT2BitVectorNativeBufferLongRadixOracle"
+        "TestASTSMT2BitVectorNativeBufferLongRadixOracle",
+        "TestASTSMT2FunctionNameSourceSymbolBranches",
+        "TestASTSMT2FunctionNameSourceBuiltinAndUserDeclarations"
       ],
       "conditionals": [
         {
@@ -12567,6 +12570,22 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "smt2_pp_environment::pp_fdecl_name(symbol) quoted/numerical/null/simple format construction",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt2_fdecl_name.go",
+          "tests": [
+            "TestASTSMT2FunctionNameSourceSymbolBranches"
+          ]
+        },
+        {
+          "name": "smt2_pp_environment::pp_fdecl_name(func_decl) implication/ITE/IFF spelling then symbol delegation",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt2_fdecl_name.go",
+          "tests": [
+            "TestASTSMT2FunctionNameSourceBuiltinAndUserDeclarations"
+          ]
+        },
+        {
           "name": "ast_smt2_bv_literal concrete reached source counterpart (ast_smt2_pp.cpp:165-233)",
           "status": "partial",
           "go_target": "pkg/ast/ast_smt2_bv_literal.go",
@@ -12606,16 +12625,22 @@
       ],
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
-        "Standard bytes.Buffer and strconv replace C++ character/string container behavior without STL implementation credit. Long radix checks cover widths through 4097; actual numeral and formatter failure campaigns remain. NumericTextStream and fresh-name buffer consumers still require separate work before the full util split."
+        "Standard bytes.Buffer and strconv replace C++ character/string container behavior without STL implementation credit. Long radix checks cover widths through 4097; actual numeral and formatter failure campaigns remain. NumericTextStream and fresh-name buffer consumers still require separate work before the full util split.",
+        "The retained function-name formatter now builds source format-string nodes for quoted, numerical, null and simple symbols, and for implication, ITE and IFF declaration names. The full SMT2 expression traversal, aliasing, layout and stream operator remain open."
       ]
     },
     {
       "path": "src/ast/ast_smt2_pp.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_smt2_fdecl_name.go"
+      ],
+      "tests": [
+        "TestASTSMT2FunctionNameSourceSymbolBranches",
+        "TestASTSMT2FunctionNameSourceBuiltinAndUserDeclarations"
+      ],
       "conditionals": [
         {
           "line": 22,
@@ -12628,9 +12653,21 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "smt2_pp_environment function-name declarations for symbols and Boolean builtins",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt2_fdecl_name.go",
+          "tests": [
+            "TestASTSMT2FunctionNameSourceSymbolBranches",
+            "TestASTSMT2FunctionNameSourceBuiltinAndUserDeclarations"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Function-name format construction is ported; the full SMT2 environment, expression printer and stream operator remain open."
+      ]
     },
     {
       "path": "src/ast/ast_smt_pp.cpp",
