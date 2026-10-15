@@ -105,3 +105,74 @@ func TestExprAbstractorRetainsInterruptedTemporaryUntilClose(t *testing.T) {
 		t.Fatal("cleanup did not finish")
 	}
 }
+
+func TestExprAbstractorForallExistsConstantOrderAndEmpty(t *testing.T) {
+	m := astTestManager(t)
+	b, e := m.MkBoolSort()
+	astTestMust(t, e)
+	makeConstant := func(name string) ASTHandle {
+		d, e := m.MkFuncDecl(astTestSymbol(t, m, name), nil, b, ASTFuncDeclInfo{})
+		astTestMust(t, e)
+		c, e := m.MkApp(d, nil)
+		astTestMust(t, e)
+		return c
+	}
+	x, y := makeConstant("abstract-x"), makeConstant("abstract-y")
+	d, e := m.MkFuncDecl(astTestSymbol(t, m, "abstract-pair"), []ASTHandle{b, b}, b, ASTFuncDeclInfo{})
+	astTestMust(t, e)
+	body, e := m.MkApp(d, []ASTHandle{x, y})
+	astTestMust(t, e)
+	astTestPin(t, m, body)
+	out, e := m.NewRef(ASTHandle{})
+	astTestMust(t, e)
+	t.Cleanup(func() { astTestMust(t, m.DelRef(&out)) })
+	a, e := NewExprAbstractor(m)
+	astTestMust(t, e)
+	for _, tc := range []struct {
+		forall bool
+		call   func([]ASTHandle, ASTHandle, ASTRef) error
+	}{{true, a.MkForall}, {false, a.MkExists}} {
+		if e = tc.call([]ASTHandle{x, y}, body, out); e != nil {
+			t.Fatal(e)
+		}
+		q, e := m.RefGet(out)
+		astTestMust(t, e)
+		forall, e := m.IsForall(q)
+		astTestMust(t, e)
+		if forall != tc.forall {
+			t.Fatal("quantifier kind", forall, tc.forall)
+		}
+		count, e := m.GetNumDeclarations(q)
+		astTestMust(t, e)
+		if count != 2 {
+			t.Fatal("declaration count", count)
+		}
+		for i, want := range []string{"abstract-x", "abstract-y"} {
+			name, e := m.GetDeclarationName(q, uint32(i))
+			astTestMust(t, e)
+			spelling, e := m.Symbols.String(name)
+			astTestMust(t, e)
+			if spelling != want {
+				t.Fatal("bound name order", i, spelling, want)
+			}
+		}
+		qb, e := m.GetQuantifierBody(q)
+		astTestMust(t, e)
+		for i, want := range []uint32{1, 0} {
+			arg, e := m.GetArg(qb, uint32(i))
+			astTestMust(t, e)
+			index, e := m.GetVarIndex(arg)
+			astTestMust(t, e)
+			if index != want {
+				t.Fatal("de Bruijn order", i, index, want)
+			}
+		}
+	}
+	if e = a.MkForall(nil, body, out); e != nil {
+		t.Fatal(e)
+	}
+	if got, e := m.RefGet(out); e != nil || got != body {
+		t.Fatal("zero-bound wrapper created a quantifier", got, e)
+	}
+	astTestMust(t, a.Close())
+}

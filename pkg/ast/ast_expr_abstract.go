@@ -1,7 +1,11 @@
-// Source: src/ast/expr_abstract.cpp:22-108; src/util/ref_buffer.h:38-99.
+// Source: src/ast/expr_abstract.cpp:22-145; src/util/ref_buffer.h:38-99.
 package ast
 
-import "math"
+import (
+	"math"
+
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+)
 
 // ExprAbstractor replaces selected constants with de Bruijn variables. Its
 // pinned slice owns each generated expression until Close, including when an
@@ -76,6 +80,61 @@ func (a *ExprAbstractor) Abstract(base uint32, bound []ASTHandle, root ASTHandle
 		return e
 	}
 	return a.cleanupPins()
+}
+
+// MkForall abstracts the supplied constant applications and publishes the
+// resulting quantifier through the caller's owning result reference.
+func (a *ExprAbstractor) MkForall(bound []ASTHandle, body ASTHandle, out ASTRef) error {
+	return a.mkQuantifier(true, bound, body, out)
+}
+
+// MkExists is the existential counterpart of MkForall.
+func (a *ExprAbstractor) MkExists(bound []ASTHandle, body ASTHandle, out ASTRef) error {
+	return a.mkQuantifier(false, bound, body, out)
+}
+
+func (a *ExprAbstractor) mkQuantifier(forall bool, bound []ASTHandle, body ASTHandle, out ASTRef) error {
+	if e := a.Abstract(0, bound, body, out); e != nil {
+		return e
+	}
+	if len(bound) == 0 {
+		return nil
+	}
+	m := a.manager
+	sorts := make([]ASTHandle, 0, len(bound))
+	names := make([]usymbol.Symbol, 0, len(bound))
+	for _, b := range bound {
+		kind, e := m.GetKind(b)
+		if e != nil {
+			return e
+		}
+		if kind != ASTApp {
+			return ErrASTDomain
+		}
+		sort, e := m.GetSort(b)
+		if e != nil {
+			return e
+		}
+		decl, e := m.GetDecl(b)
+		if e != nil {
+			return e
+		}
+		name, e := m.GetASTName(decl)
+		if e != nil {
+			return e
+		}
+		sorts = append(sorts, sort)
+		names = append(names, name)
+	}
+	abstracted, e := m.RefGet(out)
+	if e != nil {
+		return e
+	}
+	q, e := m.MkQuantifier(ASTQuantifierSpec{Forall: forall, Sorts: sorts, Names: names, Body: abstracted})
+	if e != nil {
+		return e
+	}
+	return m.SetRef(out, q)
 }
 
 func (a *ExprAbstractor) abstract(base uint32, bound []ASTHandle, root ASTHandle) (ASTHandle, error) {

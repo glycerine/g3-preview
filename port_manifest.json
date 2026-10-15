@@ -14316,7 +14316,8 @@
       ],
       "tests": [
         "TestExprAbstractorNativePatternAndNestedBinder",
-        "TestExprAbstractorRetainsInterruptedTemporaryUntilClose"
+        "TestExprAbstractorRetainsInterruptedTemporaryUntilClose",
+        "TestExprAbstractorForallExistsConstantOrderAndEmpty"
       ],
       "assertions": [
         {
@@ -14341,7 +14342,13 @@
           ]
         },
         {
-          "name": "mk_forall/mk_exists wrapper construction, expr_abstract TRACE pretty printing and source assertion profiles",
+          "name": "mk_forall/mk_exists constant-name/sort collection, reversed de Bruijn indices and zero-bound shortcut (expr_abstract.cpp:118-145)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr_abstract.go",
+          "tests": ["TestExprAbstractorForallExistsConstantOrderAndEmpty"]
+        },
+        {
+          "name": "expr_abstract TRACE pretty printing, source assertion profiles and full retained consumers",
           "status": "unported",
           "tests": []
         }
@@ -14361,7 +14368,8 @@
       ],
       "tests": [
         "TestExprAbstractorNativePatternAndNestedBinder",
-        "TestExprAbstractorRetainsInterruptedTemporaryUntilClose"
+        "TestExprAbstractorRetainsInterruptedTemporaryUntilClose",
+        "TestExprAbstractorForallExistsConstantOrderAndEmpty"
       ],
       "conditionals": [
         {
@@ -14386,7 +14394,13 @@
           ]
         },
         {
-          "name": "mk_forall/mk_exists wrapper construction, expr_abstract TRACE pretty printing and source assertion profiles",
+          "name": "mk_forall/mk_exists constant-name/sort collection, reversed de Bruijn indices and zero-bound shortcut (expr_abstract.cpp:118-145)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr_abstract.go",
+          "tests": ["TestExprAbstractorForallExistsConstantOrderAndEmpty"]
+        },
+        {
+          "name": "expr_abstract TRACE pretty printing, source assertion profiles and full retained consumers",
           "status": "unported",
           "tests": []
         }
@@ -182125,6 +182139,15 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete expr_abstractor borrowed application worklist and mk_forall/mk_exists sort/name buffers use native typed Go slices (expr_abstract.cpp:33-106,122-130)",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_expr_abstract.go",
+          "tests": [
+            "TestExprAbstractorNativePatternAndNestedBinder",
+            "TestExprAbstractorForallExistsConstantOrderAndEmpty"
+          ]
+        },
         {
           "name": "AST array declaration lexical parameter vectors use native Go slices with explicit descriptor cleanup",
           "status": "platform_replacement",
