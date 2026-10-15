@@ -54901,6 +54901,9 @@
         "pkg/math/subpaving/tactic/fast_expr_converter.go",
         "pkg/math/subpaving/tactic/fast_goal_internalize.go",
         "pkg/math/subpaving/tactic/fast_expr_converter_test.go",
+        "pkg/math/subpaving/tactic/fixed_expr_converter.go",
+        "pkg/math/subpaving/tactic/fixed_goal_internalize.go",
+        "pkg/math/subpaving/tactic/fixed_expr_converter_test.go",
         "pkg/math/subpaving/tactic/rational_expr_converter.go",
         "pkg/math/subpaving/tactic/rational_expr_arith.go",
         "pkg/math/subpaving/tactic/rational_expr_converter_test.go"
@@ -54910,6 +54913,7 @@
         "TestArbitraryExprConverterTermsAndClause",
         "TestArbitraryExprConverterSearchSimpleGoal",
         "TestFastExprConverterTermsAndClause",
+        "TestFixedExprConverterTermsAndClause",
         "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats",
         "TestRationalExprConverterExactLeafGoalAndCleanup"
       ],
@@ -54969,12 +54973,19 @@
           "tests": [
             "TestRationalExprConverterExactLeafGoalAndCleanup"
           ]
+        },
+        {
+          "name": "Concrete config_mpfx numeral and variable leaves, sums, products, powers, ref-counted term cache and source arithmetic refusal categories (expr2subpaving.cpp:99-363)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/tactic/fixed_expr_converter.go",
+          "tests": ["TestFixedExprConverterTermsAndClause"]
         }
       ],
       "ownership": [],
       "deviations": [
         "Concrete HWF and MPF context specializations now implement numeral and variable leaves, to_real, process_add, process_mul, positive integral power, ref-counted integer cache, AST cancellation checkpoint and source arithmetic refusal categories. MPF formatted zero is rejected by the source f2n wrapper, including a zero sum constant. Zero-degree monomials and full tactic ownership/integration remain open.",
-        "The concrete MPFF instantiation now internalizes AST numerals, variables, sums, products, powers, inequalities and clauses through the selected FastEngine and owning FastShellCoefficients. Ref-counted AST cache and native integer buffer lifetimes are exercised. MPFF search and enclosing tactic result ownership remain open."
+        "The concrete MPFF instantiation now internalizes AST numerals, variables, sums, products, powers, inequalities and clauses through the selected FastEngine and owning FastShellCoefficients. Ref-counted AST cache and native integer buffer lifetimes are exercised. MPFF search and enclosing tactic result ownership remain open.",
+        "The concrete MPFX instantiation now internalizes AST numerals, variables, sums, products, powers, inequalities and clauses through the selected FixedEngine and owning FixedShellCoefficients. Its exact integer cache, temporary inequality cleanup and selected search route are exercised; enclosing tactic result ownership remains open."
       ]
     },
     {
@@ -54989,13 +55000,17 @@
         "pkg/math/subpaving/tactic/arbitrary_expr_converter_test.go",
         "pkg/math/subpaving/tactic/fast_expr_converter.go",
         "pkg/math/subpaving/tactic/fast_goal_internalize.go",
-        "pkg/math/subpaving/tactic/fast_expr_converter_test.go"
+        "pkg/math/subpaving/tactic/fast_expr_converter_test.go",
+        "pkg/math/subpaving/tactic/fixed_expr_converter.go",
+        "pkg/math/subpaving/tactic/fixed_goal_internalize.go",
+        "pkg/math/subpaving/tactic/fixed_expr_converter_test.go"
       ],
       "tests": [
         "TestHardwareExprConverterTerms",
         "TestArbitraryExprConverterTermsAndClause",
         "TestArbitraryExprConverterSearchSimpleGoal",
         "TestFastExprConverterTermsAndClause",
+        "TestFixedExprConverterTermsAndClause",
         "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats"
       ],
       "conditionals": [
@@ -55078,11 +55093,11 @@
           "tests": ["TestFastCoreTacticNumericProcessCohort"]
         },
         {
-          "name": "Concrete MPQ/hardware/MPFF/MPF process_clause temporary inequality ref_buffer releases unpublished atoms in source push order after literal or clause failure and retains published clause/unit references (subpaving_tactic.cpp:165-178)",
+          "name": "Concrete MPQ/hardware/MPFF/MPF/MPFX process_clause temporary inequality ref_buffer releases unpublished atoms in source push order after literal or clause failure and retains published clause/unit references (subpaving_tactic.cpp:165-178)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/inequality_buffer_release.go",
-          "go_targets": ["pkg/math/subpaving/tactic/rational_expr_converter.go", "pkg/math/subpaving/tactic/goal_internalize.go", "pkg/math/subpaving/tactic/fast_goal_internalize.go", "pkg/math/subpaving/tactic/arbitrary_goal_internalize.go"],
-          "tests": ["TestSubpavingTemporaryInequalityBufferUnwind", "TestFastExprConverterTermsAndClause"]
+          "go_targets": ["pkg/math/subpaving/tactic/rational_expr_converter.go", "pkg/math/subpaving/tactic/goal_internalize.go", "pkg/math/subpaving/tactic/fast_goal_internalize.go", "pkg/math/subpaving/tactic/fixed_goal_internalize.go", "pkg/math/subpaving/tactic/arbitrary_goal_internalize.go"],
+          "tests": ["TestSubpavingTemporaryInequalityBufferUnwind", "TestFastExprConverterTermsAndClause", "TestFixedExprConverterTermsAndClause"]
         },
         {
           "name": "Concrete MPQ print_nodes emits mapped SMT2 variable names, generated definition names, constraints, header and leaf bounds through a nonthrowing borrowed writer; wider interpreted expression display remains open (src/math/subpaving/tactic/subpaving_tactic.cpp:32-49,193-205)",
@@ -55187,6 +55202,12 @@
           "tests": [
             "TestFastExprConverterTermsAndClause"
           ]
+        },
+        {
+          "name": "Concrete MPFX goal inequality, clause and internalize-then-search route (subpaving_tactic.cpp:128-190)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/tactic/fixed_goal_internalize.go",
+          "tests": ["TestFixedExprConverterTermsAndClause"]
         },
         {
           "name": "Concrete MPFF core tactic apply: retained goal, statistics, parameters, fresh cleanup and named-variable print_nodes output (src/math/subpaving/tactic/subpaving_tactic.cpp:32-49,193-268)",
@@ -170270,11 +170291,11 @@
           "tests": ["TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations", "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot", "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"]
         },
         {
-          "name": "Concrete subpaving tactic MPQ/hardware/MPFF/MPF ineq ref_buffer temporary push/c_ptr/destruction: failed clause conversion releases unpublished inequalities in ascending order; successful clause/unit publication retains its own reference",
+          "name": "Concrete subpaving tactic MPQ/hardware/MPFF/MPF/MPFX ineq ref_buffer temporary push/c_ptr/destruction: failed clause conversion releases unpublished inequalities in ascending order; successful clause/unit publication retains its own reference",
           "status": "ported",
           "go_target": "pkg/math/subpaving/inequality_buffer_release.go",
-          "go_targets": ["pkg/math/subpaving/tactic/rational_expr_converter.go", "pkg/math/subpaving/tactic/goal_internalize.go", "pkg/math/subpaving/tactic/fast_goal_internalize.go", "pkg/math/subpaving/tactic/arbitrary_goal_internalize.go"],
-          "tests": ["TestSubpavingTemporaryInequalityBufferUnwind", "TestFastExprConverterTermsAndClause"]
+          "go_targets": ["pkg/math/subpaving/tactic/rational_expr_converter.go", "pkg/math/subpaving/tactic/goal_internalize.go", "pkg/math/subpaving/tactic/fast_goal_internalize.go", "pkg/math/subpaving/tactic/fixed_goal_internalize.go", "pkg/math/subpaving/tactic/arbitrary_goal_internalize.go"],
+          "tests": ["TestSubpavingTemporaryInequalityBufferUnwind", "TestFastExprConverterTermsAndClause", "TestFixedExprConverterTermsAndClause"]
         },
         {
           "name": "ref_buffer_core construction/destruction, push_back, pop_back, back, c_ptr, indexing, set, size, empty, reset and finalize",

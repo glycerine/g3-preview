@@ -18,6 +18,13 @@ func (w *FastShellCoefficients) DiscardUnreferencedInequality(a *FastInequality)
 	return w.context.DiscardUnreferencedInequality(a)
 }
 
+func (w *FixedShellCoefficients) DiscardUnreferencedInequality(a *FixedInequality) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.DiscardUnreferencedInequality(a)
+}
+
 func (w *ArbitraryShellCoefficients) DiscardUnreferencedInequality(a *ArbitraryInequality) error {
 	if err := w.open(); err != nil {
 		return err
@@ -70,6 +77,32 @@ func (c *FastContext) DiscardUnreferencedInequality(a *FastInequality) error {
 			c.inequalities = c.inequalities[:len(c.inequalities)-1]
 			a.context = nil
 			a.owner = nil
+			a.value = nil
+			return nil
+		}
+	}
+	return arena.ErrInvalidSlot
+}
+
+func (c *FixedContext) DiscardUnreferencedInequality(a *FixedInequality) error {
+	if err := c.open(); err != nil {
+		return err
+	}
+	if a == nil || a.context != c || a.value == nil {
+		return arena.ErrInvalidSlot
+	}
+	if a.refs != 0 {
+		return nil
+	}
+	for i, existing := range c.inequalities {
+		if existing == a {
+			if err := a.value.Close(); err != nil {
+				return err
+			}
+			copy(c.inequalities[i:], c.inequalities[i+1:])
+			c.inequalities[len(c.inequalities)-1] = nil
+			c.inequalities = c.inequalities[:len(c.inequalities)-1]
+			a.context = nil
 			a.value = nil
 			return nil
 		}

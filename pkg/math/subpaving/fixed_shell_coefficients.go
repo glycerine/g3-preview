@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
@@ -232,6 +233,20 @@ func (w *FixedShellCoefficients) DisplayBounds(out io.Writer) error {
 		return err
 	}
 	return w.context.DisplayBounds(out)
+}
+
+func (w *FixedShellCoefficients) SetVariableDisplay(display FixedVariableDisplay) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.SetVariableDisplay(display)
+}
+
+func (w *FixedShellCoefficients) BindCooperation(owner *cooperate.Cooperation) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.BindCooperation(owner)
 }
 
 // Close retires z2, z1, the vector in ascending element order, and the
