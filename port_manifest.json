@@ -122211,6 +122211,8 @@
         "TestArbitraryFloatNumeralSourceRationalString",
         "TestArbitraryFloatNumeralRationalStringRetryAfterConversionRefusal",
         "TestArbitraryFloatNumeralRationalStringPreservesEarlierStoppedScope",
+        "TestArbitraryFloatNumeralRationalStringColdRefusalOwningBoundary",
+        "TestArbitraryFloatNumeralRationalStringPublishedPowerCacheStop",
         "TestArbitraryFloatNumeralSourceStringAndDisplay",
         "TestArbitraryFloatNumeralStringColdRefusalSourceScratchStop",
         "TestArbitraryFloatNumeralSourceSwapAndDel",
@@ -122364,6 +122366,8 @@
             "TestArbitraryFloatNumeralSourceRationalString",
             "TestArbitraryFloatNumeralRationalStringRetryAfterConversionRefusal",
             "TestArbitraryFloatNumeralRationalStringPreservesEarlierStoppedScope",
+            "TestArbitraryFloatNumeralRationalStringColdRefusalOwningBoundary",
+            "TestArbitraryFloatNumeralRationalStringPublishedPowerCacheStop",
             "TestArbitraryFloatNumeralSourceStringAndDisplay",
             "TestArbitraryFloatNumeralStringColdRefusalSourceScratchStop"
           ]

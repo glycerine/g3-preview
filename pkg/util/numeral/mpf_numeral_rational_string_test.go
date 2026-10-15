@@ -185,3 +185,75 @@ func TestArbitraryFloatNumeralStringColdRefusalSourceScratchStop(t *testing.T) {
 		t.Fatal("cold campaign missed numeric refusal or published scratch hole")
 	}
 }
+
+func TestArbitraryFloatNumeralRationalStringColdRefusalOwningBoundary(t *testing.T) {
+	sawRefusal := false
+	for ordinal := int64(0); ordinal < 10; ordinal++ {
+		core, _, budget := mpfNumeralHelpersFixture(t)
+		m, err := NewArbitraryFloatNumeralManager(core, 17, 120)
+		serviceMust(t, err)
+		x := ArbitraryFloat{format: arbitraryFloatFormat(17, 120, false), exponent: 160, significand: NewInt(1)}
+		serviceMust(t, core.integer.Mul2kInPlace(&x.significand, 119))
+		budget.FailAfter(ordinal)
+		_, body := m.ToRationalString(&x)
+		budget.FailAfter(-1)
+		if body != nil {
+			sawRefusal = true
+			if !numericPhysicalReservationRefusal(body) {
+				t.Fatal("unexpected rational-string refusal", ordinal, body)
+			}
+		}
+		if core.rationalString.active {
+			serviceMust(t, core.CleanupRationalString())
+		}
+		integerPhysicalAuditWithRaw(t, core.integer, nil, &x.significand, &core.rational.NTmp)
+		if core.integer.Tmp[0] == 0 || core.integer.Tmp[1] == 0 {
+			if _, retry := m.ToRationalString(&x); !errors.Is(retry, arena.ErrInvalidSlot) {
+				t.Fatal("source scratch stop lost", ordinal, body, retry)
+			}
+		} else {
+			got, retry := m.ToRationalString(&x)
+			if retry != nil || got == "" {
+				t.Fatal("rational-string owning retry", ordinal, body, got, retry)
+			}
+		}
+		integerPhysicalAuditWithRaw(t, core.integer, nil, &x.significand, &core.rational.NTmp)
+		serviceMust(t, core.Del(&x))
+		serviceMust(t, m.Close())
+		if core.integer.Tmp[0] == 0 || core.integer.Tmp[1] == 0 {
+			if e := core.Close(); !errors.Is(e, arena.ErrInvalidSlot) {
+				t.Fatal("source destructor scratch stop", ordinal, e)
+			}
+			serviceMust(t, core.Close())
+		}
+	}
+	if !sawRefusal {
+		t.Fatal("cold campaign missed a physical refusal")
+	}
+}
+
+func TestArbitraryFloatNumeralRationalStringPublishedPowerCacheStop(t *testing.T) {
+	core, _, budget := mpfNumeralHelpersFixture(t)
+	m, err := NewArbitraryFloatNumeralManager(core, 17, 120)
+	serviceMust(t, err)
+	x := ArbitraryFloat{format: arbitraryFloatFormat(17, 120, false), exponent: 160, significand: NewInt(1)}
+	serviceMust(t, core.integer.Mul2kInPlace(&x.significand, 119))
+	budget.FailAfter(10)
+	_, body := m.ToRationalString(&x)
+	budget.FailAfter(-1)
+	w := core.PowerWrappers
+	id, found := core.powers[0].Get2(119)
+	if !numericPhysicalReservationRefusal(body) || w == nil || !w.published || w.bodyCause == nil || !found || id != w.id {
+		t.Fatal("source cache published before power fill refused", body, w)
+	}
+	if core.rationalString.active {
+		serviceMust(t, core.CleanupRationalString())
+	}
+	if _, retry := m.ToRationalString(&x); !errors.Is(retry, arena.ErrInvalidSlot) {
+		t.Fatal("published incomplete power cache was replayed", retry)
+	}
+	integerPhysicalAuditWithRaw(t, core.integer, nil, &x.significand, &core.rational.NTmp)
+	serviceMust(t, core.Del(&x))
+	serviceMust(t, m.Close())
+	serviceMust(t, core.Close())
+}
