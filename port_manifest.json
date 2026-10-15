@@ -77051,7 +77051,7 @@
         "TestSATSolverClauseCoreWarmNoAllocation",
         "TestSATSolverClauseCoreWatchSourceAssertions",
         "TestSATSolverDiffLevelsSourceWidthAndRetainedSlots",
-        "TestSATSolverVariableColumnGrowthFailureAndScalarBounds",
+        "TestSATSolverVariableColumnNativeGrowthAndOtherSourceBounds",
         "TestSATSolverWatchListsRealRelocationAndPayloadLifetime",
         "TestSATSolverWatchListsNativePlacementAndColdUnwind",
         "TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView",
@@ -77064,7 +77064,7 @@
         "TestSATSolverNativeTrailAssignmentWithoutBackingReservation",
         "TestSATSolverAssignMissingExtensionAfterActualTrail",
         "TestSATSolverCheckpointActualResourceAndMemoryOrder",
-        "TestSATSolverPropagationConcreteExceptionAndResizePrefix",
+        "TestSATSolverPropagationConcreteExceptionAndNativeMarks",
         "TestSATSolverPropagationOwnerBudgetAndCounterBoundaries",
         "TestSATSolverPropagateBinaryTernaryAndConflictCleanup",
         "TestSATSolverPropagateClauseMoveUnitGlueAndConflict",
@@ -77806,7 +77806,7 @@
           "go_target": "pkg/sat/sat_solver_variable_state.go",
           "tests": [
             "TestSATSolverDiffLevelsSourceWidthAndRetainedSlots",
-            "TestSATSolverVariableColumnGrowthFailureAndScalarBounds",
+            "TestSATSolverVariableColumnNativeGrowthAndOtherSourceBounds",
             "TestSATSolverWatchListsRealRelocationAndPayloadLifetime",
             "TestSATSolverWatchListsNativePlacementAndColdUnwind",
             "TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView",
@@ -77834,7 +77834,7 @@
           "go_target": "pkg/sat/sat_solver_propagation.go",
           "tests": [
             "TestSATSolverCheckpointActualResourceAndMemoryOrder",
-            "TestSATSolverPropagationConcreteExceptionAndResizePrefix",
+            "TestSATSolverPropagationConcreteExceptionAndNativeMarks",
             "TestSATSolverPropagationOwnerBudgetAndCounterBoundaries",
             "TestSATSolverPropagateBinaryTernaryAndConflictCleanup",
             "TestSATSolverPropagateClauseMoveUnitGlueAndConflict",
@@ -77847,7 +77847,7 @@
           ]
         },
         {
-          "name": "num_diff_levels source2218\u20132238 on borrowed literal spans and actual clause storage; same reserve/mark/reset body and source DEBUG assignment assertion",
+          "name": "num_diff_levels source2218\u20132238 on borrowed literal spans and actual clause storage; same mark/reset body with native byte growth and source DEBUG assignment assertion",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_propagation_control.go",
           "tests": [
@@ -78654,10 +78654,11 @@
         "SAT unsigned work columns now own native []uint32 backing for lemma/minimization, assumptions/core, model, consequence scopes and probing to-assert rows. Probing cache rows own native availability flags and unsigned slices. Copies own independent values, captured slices retain their actual backing, and checked column/parent closure rejects later access. Source model/mark/compaction algorithms remain; backing has no Runtime payload, Budget reservation, size_t header or pending block. The actual strict Runtime cache-memory cutoff still reads the caller Runtime counter. See PORT_PROGRESS.md#native-sat-unsigned-work-columns-and-probing-cache."
       ],
       "deviations": [
-        "Removed two test-only SAT variable-vector adapters for unsigned values and justifications. Their live solver owners already use native typed Go slices; diffLevels remains the reached int8 source column with focused ordinary and checked/debug coverage. This does not complete the solver or generic vector header.",
+        "The live num_diff_levels mark bytes now grow in a native int8 slice with no shared arena backing charge. Actual literal traversal retains its first-pass marks on failure and clears them on successful second pass; checked/debug assignment guards remain. Other solver paths remain partial.",
+        "Removed two test-only SAT variable-vector adapters for unsigned values and justifications. Their live solver owners already use native typed Go slices; diffLevels is now the reached int8 native slice with focused ordinary and checked/debug coverage. This does not complete the solver or generic vector header.",
         "Concrete allocation-free heapsort replaces std::sort on scalar literals. TRACE, solver construction, BCP, conflicts, search, scopes and remaining methods are unported.",
         "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open.",
-        "Propagation state borrows actual variable/clause/model-converter/rlimit/Runtime/config owners and owns only its charged cold member grouping/diff-level backing. Cleaner/asymm/probing counters are real selected member state, not child Run implementations. No concrete extension subclass exists in this fork; dispatch fails explicitly at asserted/EXT call sites after completed source prefixes. Full solver constructor, UpdateParams/default policy children, propagation integrity/missed-propagation checks, literal-span num_diff_levels consumers, search/conflicts/scopes and user-scope campaign remain open.",
+        "Propagation state borrows actual variable/clause/model-converter/rlimit/Runtime/config owners and owns only its charged cold member grouping; diff-level bytes use a native Go slice. Cleaner/asymm/probing counters are real selected member state, not child Run implementations. No concrete extension subclass exists in this fork; dispatch fails explicitly at asserted/EXT call sites after completed source prefixes. Full solver constructor, UpdateParams/default policy children, propagation integrity/missed-propagation checks, literal-span num_diff_levels consumers, search/conflicts/scopes and user-scope campaign remain open.",
         "Checkpoint reads the actual bound Runtime allocation counter. SAT arena-backed typed storage has not yet been integrated into that source runtime accounting domain; end-to-end solver memory-limit behavior remains open. No allocation events are fabricated from Budget usage.",
         "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed.",
         "Selected FIRST-UIP and real assumption/init helpers are implemented with default minimization/dynamic subsumption. Full solver construction/Check/search, source extension calls, nonnull parallel exchange, optional MUS/model and global diagnostics remain explicit obligations. Constructor-error candidate retention is a typed owning adapter, not claimed C++ implicit unwinding; no registered user-scope assertion completion is credited.",
@@ -78829,7 +78830,7 @@
       ],
       "tests": [
         "TestSATSolverDiffLevelsSourceWidthAndRetainedSlots",
-        "TestSATSolverVariableColumnGrowthFailureAndScalarBounds",
+        "TestSATSolverVariableColumnNativeGrowthAndOtherSourceBounds",
         "TestSATSolverWatchListsRealRelocationAndPayloadLifetime",
         "TestSATSolverWatchListsNativePlacementAndColdUnwind",
         "TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView",
@@ -78847,7 +78848,7 @@
         "TestSATSolverNativeTrailAssignmentWithoutBackingReservation",
         "TestSATSolverAssignMissingExtensionAfterActualTrail",
         "TestSATSolverCheckpointActualResourceAndMemoryOrder",
-        "TestSATSolverPropagationConcreteExceptionAndResizePrefix",
+        "TestSATSolverPropagationConcreteExceptionAndNativeMarks",
         "TestSATSolverPropagationOwnerBudgetAndCounterBoundaries",
         "TestSATSolverPropagateBinaryTernaryAndConflictCleanup",
         "TestSATSolverPropagateClauseMoveUnitGlueAndConflict",
@@ -79117,7 +79118,7 @@
           "go_target": "pkg/sat/sat_solver_variable_state.go",
           "tests": [
             "TestSATSolverDiffLevelsSourceWidthAndRetainedSlots",
-            "TestSATSolverVariableColumnGrowthFailureAndScalarBounds",
+            "TestSATSolverVariableColumnNativeGrowthAndOtherSourceBounds",
             "TestSATSolverWatchListsRealRelocationAndPayloadLifetime",
             "TestSATSolverWatchListsNativePlacementAndColdUnwind",
             "TestSATSolverMkVarFullSourceEighteenActionsAndByteClauseView",
@@ -79145,7 +79146,7 @@
           "go_target": "pkg/sat/sat_solver_propagation.go",
           "tests": [
             "TestSATSolverCheckpointActualResourceAndMemoryOrder",
-            "TestSATSolverPropagationConcreteExceptionAndResizePrefix",
+            "TestSATSolverPropagationConcreteExceptionAndNativeMarks",
             "TestSATSolverPropagationOwnerBudgetAndCounterBoundaries",
             "TestSATSolverPropagateBinaryTernaryAndConflictCleanup",
             "TestSATSolverPropagateClauseMoveUnitGlueAndConflict",
@@ -79158,7 +79159,7 @@
           ]
         },
         {
-          "name": "num_diff_levels source2218\u20132238 on borrowed literal spans and actual clause storage; same reserve/mark/reset body and source DEBUG assignment assertion",
+          "name": "num_diff_levels source2218\u20132238 on borrowed literal spans and actual clause storage; same mark/reset body with native byte growth and source DEBUG assignment assertion",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_propagation_control.go",
           "tests": [
@@ -79674,7 +79675,7 @@
       ],
       "deviations": [
         "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open.",
-        "Propagation state borrows actual variable/clause/model-converter/rlimit/Runtime/config owners and owns only its charged cold member grouping/diff-level backing. Cleaner/asymm/probing counters are real selected member state, not child Run implementations. No concrete extension subclass exists in this fork; dispatch fails explicitly at asserted/EXT call sites after completed source prefixes. Full solver constructor, UpdateParams/default policy children, propagation integrity/missed-propagation checks, literal-span num_diff_levels consumers, search/conflicts/scopes and user-scope campaign remain open.",
+        "Propagation state borrows actual variable/clause/model-converter/rlimit/Runtime/config owners and owns only its charged cold member grouping; diff-level bytes use a native Go slice. Cleaner/asymm/probing counters are real selected member state, not child Run implementations. No concrete extension subclass exists in this fork; dispatch fails explicitly at asserted/EXT call sites after completed source prefixes. Full solver constructor, UpdateParams/default policy children, propagation integrity/missed-propagation checks, literal-span num_diff_levels consumers, search/conflicts/scopes and user-scope campaign remain open.",
         "Checkpoint reads the actual bound Runtime allocation counter. SAT arena-backed typed storage has not yet been integrated into that source runtime accounting domain; end-to-end solver memory-limit behavior remains open. No allocation events are fabricated from Budget usage.",
         "Only assignment char_vector source allocation accounting is integrated in this slice. Other SAT columns/watch/queue/clause/trail/vector allocations still require real global/runtime source hooks. Raw-state bounds/initialization guards act at endangered byte accesses; source DEBUG logical assertions remain distinct. No full solver construction/search or registered assertion completion is claimed.",
         "Selected FIRST-UIP and real assumption/init helpers are implemented with default minimization/dynamic subsumption. Full solver construction/Check/search, source extension calls, nonnull parallel exchange, optional MUS/model and global diagnostics remain explicit obligations. Constructor-error candidate retention is a typed owning adapter, not claimed C++ implicit unwinding; no registered user-scope assertion completion is credited.",
@@ -182424,7 +182425,8 @@
         "SAT unsigned work columns now own native []uint32 backing for lemma/minimization, assumptions/core, model, consequence scopes and probing to-assert rows. Probing cache rows own native availability flags and unsigned slices. Copies own independent values, captured slices retain their actual backing, and checked column/parent closure rejects later access. Source model/mark/compaction algorithms remain; backing has no Runtime payload, Budget reservation, size_t header or pending block. The actual strict Runtime cache-memory cutoff still reads the caller Runtime counter. See PORT_PROGRESS.md#native-sat-unsigned-work-columns-and-probing-cache."
       ],
       "deviations": [
-        "The SAT vector audit removed two obsolete satVariableUintColumn and satVariableJustificationColumn adapters: only their own tests referenced them. Actual solver unsigned columns and justifications already use native typed Go slices; retained diffLevels uses the concrete int8 source column. No additional generic vector implementation credit is claimed.",
+        "The reached SAT num_diff_levels int8 mark plane now extends a native Go slice. Removed its source 3/2 capacity arithmetic and arena backing charges while preserving zero-exposed marks, first-pass failure prefixes, two-pass reset, DEBUG assignment guard and unsigned scope wrap. Other concrete vector consumers remain partial.",
+        "The SAT vector audit removed two obsolete satVariableUintColumn and satVariableJustificationColumn adapters: only their own tests referenced them. Actual solver unsigned columns and justifications already use native typed Go slices; retained diffLevels now uses a concrete int8 native slice. No additional generic vector implementation credit is claimed.",
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
         "Native literal slices expose current logical values, not retained C++ spare slots. Removed reserve/resize/physical-read/reset helpers have no retained production consumers. Native clone/copy/insert no longer fail on simulated nested backing allocations; actual cold/outer reservations remain tested.",
         "Native watch backing no longer emulates C++ allocation events, erase-tail spare storage, pool growth or template-only copy/move helpers. No generic C++ vector implementation credit is claimed. Retained project consumers use checked native iterator borrows; stable sorting preserves actual watched comparator classes.",

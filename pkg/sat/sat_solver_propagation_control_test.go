@@ -81,7 +81,7 @@ func satPropagationAssertGraph(t *testing.T, s *satSolverPropagationState) {
 	t.Helper()
 	v := s.variables
 	b := s.budget
-	want := uint64(reflect.TypeOf(satSolverPropagationState{}).Size()) + uint64(cap(s.diffLevels.data)) + v.Stats().TotalBytes
+	want := uint64(reflect.TypeOf(satSolverPropagationState{}).Size()) + v.Stats().TotalBytes
 	todo := v.elimTodo
 	want += todo.ownerBytes
 	a := s.clauses
@@ -102,20 +102,18 @@ func satPropagationAssertGraph(t *testing.T, s *satSolverPropagationState) {
 		t.Fatal("config owner graph")
 	}
 }
-func TestSATSolverPropagationConcreteExceptionAndResizePrefix(t *testing.T) {
+func TestSATSolverPropagationConcreteExceptionAndNativeMarks(t *testing.T) {
 	s, v, b := satPropagationFixture(t, 1)
 	v.scopeLevel = 10
 	c, e := s.clauses.MkClause([]Literal{0, 0, 0}, false)
 	satOK(t, e)
 	satOK(t, s.assign(0, satJustification{}))
 	satPropagationAssertGraph(t, s)
-	b.FailAfter(1)
-	_, e = s.numDiffLevels(c)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
-	if len(s.diffLevels.data) != 0 || cap(s.diffLevels.data) != 2 {
-		t.Fatal("source resize unpublished size", len(s.diffLevels.data), cap(s.diffLevels.data))
+	before := b.Used()
+	b.FailAfter(0)
+	count, e := s.numDiffLevels(c)
+	if e != nil || count != 1 || len(s.diffLevels.data) != 11 || b.Used() != before {
+		t.Fatal("native marks must grow without arena reservation", count, e, len(s.diffLevels.data), b.Used(), before)
 	}
 	satPropagationAssertGraph(t, s)
 	b.FailAfter(-1)

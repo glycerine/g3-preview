@@ -359,7 +359,7 @@ func satSCCAudit(t *testing.T, c *satSCC, extra ...StoredClauseRef) {
 		t.Fatal("unnamed physical clause", small.Live, len(refs))
 	}
 	want := c.header + c.eliminator.header + l.ownerBytes + uint64(cap(l.Original)+cap(l.learned))*uint64(reflect.TypeOf(StoredClauseRef{}).Size()) + uint64(cap(l.reinit))*uint64(reflect.TypeOf(satClauseWrapper{}).Size()) + uint64(cap(l.scopes))*uint64(reflect.TypeOf(satSolverScope{}).Size())
-	want += p.ownerBytes + uint64(cap(p.diffLevels.data)) + v.Stats().TotalBytes
+	want += p.ownerBytes + v.Stats().TotalBytes
 	todo := v.elimTodo
 	want += todo.ownerBytes
 	want += a.ownerBytes + 4*uint64(a.ids.FreeCapacity()) + a.largeBytes + a.largeDirectory + small.OwnerBytes + small.PayloadBytes + small.MetadataBytes + small.DirectoryBytes

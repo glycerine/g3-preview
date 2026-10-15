@@ -418,7 +418,7 @@ func (s *Solver) closeMembers() error {
 			}
 		case 11:
 			if s.propagation != nil {
-				s.propagation.diffLevels.finalize(s.budget)
+				s.propagation.diffLevels.finalize()
 			}
 		case 12:
 			if s.analysis != nil {

@@ -11,13 +11,12 @@ import (
 func TestSATSolverDiffLevelsSourceWidthAndRetainedSlots(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
 	var c satVariableCharColumn
+	b.FailAfter(0)
+	c.extend(4)
 	for i := int8(0); i < 4; i++ {
-		satOK(t, c.push(b, i))
+		satOK(t, c.write(uint32(i), i))
 	}
-	if cap(c.data) != 5 {
-		t.Fatal(cap(c.data))
-	}
-	if b.Used() != 5 {
+	if len(c.data) != 4 || c.initialized != 4 || b.Used() != 0 {
 		t.Fatal(b.Used())
 	}
 	satOK(t, c.shrink(1))
@@ -35,25 +34,24 @@ func TestSATSolverDiffLevelsSourceWidthAndRetainedSlots(t *testing.T) {
 	if _, e = c.read(4); e == nil {
 		t.Fatal("never initialized spare slot")
 	}
-	c.finalize(b)
+	c.finalize()
 	if b.Used() != 0 {
 		t.Fatal(b.Used())
 	}
 }
-func TestSATSolverVariableColumnGrowthFailureAndScalarBounds(t *testing.T) {
+func TestSATSolverVariableColumnNativeGrowthAndOtherSourceBounds(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
 	var c satVariableCharColumn
-	satOK(t, c.push(b, 11))
-	satOK(t, c.push(b, 12))
 	b.FailAfter(0)
-	if e := c.push(b, 13); !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
+	c.extend(129)
+	for i := 0; i < 129; i++ {
+		satOK(t, c.write(uint32(i), int8(i)))
 	}
-	if len(c.data) != 2 || cap(c.data) != 2 || c.initialized != 2 || c.data[0] != 11 || b.Used() != 2 {
+	if len(c.data) != 129 || c.initialized != 129 || c.data[0] != 0 || c.data[128] != -128 || b.Used() != 0 {
 		t.Fatal(c, b.Used())
 	}
 	b.FailAfter(-1)
-	c.finalize(b)
+	c.finalize()
 	for _, s := range []uint32{1, 4, 8} {
 		n, bytes, e := satVariableNextCapacity(2, 3, uint64(s), ^uint64(0))
 		satOK(t, e)

@@ -104,7 +104,7 @@ func satLifecycleAssertOwned(t *testing.T, s *satSolverClauseLifecycle) {
 	want := s.ownerBytes + uint64(cap(s.Original)+cap(s.learned))*uint64(reflect.TypeOf(StoredClauseRef{}).Size()) + uint64(cap(s.reinit))*uint64(reflect.TypeOf(satClauseWrapper{}).Size()) + uint64(cap(s.scopes))*uint64(reflect.TypeOf(satSolverScope{}).Size())
 	p := s.propagation
 	v := p.variables
-	want += p.ownerBytes + uint64(cap(p.diffLevels.data)) + v.Stats().TotalBytes
+	want += p.ownerBytes + v.Stats().TotalBytes
 	todo := v.elimTodo
 	want += todo.ownerBytes
 	small := a.storage.Stats()

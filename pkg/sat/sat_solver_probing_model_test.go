@@ -31,7 +31,7 @@ func satProbingAudit(t *testing.T, s *satSolverProbing, analysis *satSolverConfl
 		want += d.ownerBytes
 	}
 	want += l.ownerBytes + uint64(cap(l.Original)+cap(l.learned))*uint64(reflect.TypeOf(StoredClauseRef{}).Size()) + uint64(cap(l.reinit))*uint64(reflect.TypeOf(satClauseWrapper{}).Size()) + uint64(cap(l.scopes))*uint64(reflect.TypeOf(satSolverScope{}).Size())
-	want += p.ownerBytes + uint64(cap(p.diffLevels.data)) + v.Stats().TotalBytes
+	want += p.ownerBytes + v.Stats().TotalBytes
 	todo := v.elimTodo
 	want += todo.ownerBytes
 	a := p.clauses

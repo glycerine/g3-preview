@@ -60,11 +60,12 @@ func TestSATSolverLiteralSpanDiffLevelsAccessAndFailurePrefixes(t *testing.T) {
 	satOK(t, s.assign(2, satJustification{}))
 	satOK(t, v.setLevel(BoolVar(0), 1))
 	satOK(t, v.setLevel(BoolVar(1), 2))
-	// The source reserves before touching even the first literal.
-	b.FailAfter(1)
+	// Native mark storage grows even while the shared arena refuses reservations.
+	before := b.Used()
+	b.FailAfter(0)
 	_, e := s.numDiffLevelsLiterals(1, nil)
-	if !errors.Is(e, arena.ErrInjectedFailure) || len(s.diffLevels.data) != 0 || cap(s.diffLevels.data) != 2 {
-		t.Fatal("reserve prefix", e, len(s.diffLevels.data), cap(s.diffLevels.data))
+	if !errors.Is(e, arena.ErrBounds) || len(s.diffLevels.data) != 4 || b.Used() != before {
+		t.Fatal("native growth before literal access", e, len(s.diffLevels.data), b.Used(), before)
 	}
 	satPropagationAssertGraph(t, s)
 	b.FailAfter(-1)

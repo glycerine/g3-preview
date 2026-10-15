@@ -104,7 +104,7 @@ func (s *satSolverPropagationState) Close() error {
 	if s.closed {
 		return nil
 	}
-	s.diffLevels.finalize(s.budget)
+	s.diffLevels.finalize()
 	s.budget.Release(s.ownerBytes)
 	s.ownerBytes = 0
 	s.closed = true
@@ -189,30 +189,8 @@ func (s *satSolverPropagationState) numDiffLevelsSpan(n uint32, span satSolverLi
 }
 func (s *satSolverPropagationState) numDiffLevelsSpanCore(n uint32, span satSolverLiteralSpan, c StoredClauseRef, clause bool) (uint32, error) {
 	need := s.variables.scopeLevel + 1
-	// Literal reserve(sz,false) grows logical size and default-fills new entries.
-	if need > uint32(len(s.diffLevels.data)) {
-		for need > uint32(cap(s.diffLevels.data)) {
-			n, bytes, e := satVariableNextCapacity(uint32(cap(s.diffLevels.data)), 1, 1, uint64(^uint(0)>>1))
-			if e != nil {
-				return 0, e
-			}
-			if e = s.budget.Reserve(bytes); e != nil {
-				return 0, e
-			}
-			next := make([]int8, len(s.diffLevels.data), int(n))
-			copy(next[:cap(s.diffLevels.data)], s.diffLevels.data[:cap(s.diffLevels.data)])
-			s.budget.Release(uint64(cap(s.diffLevels.data)))
-			s.diffLevels.data = next
-		}
-		old := len(s.diffLevels.data)
-		s.diffLevels.data = s.diffLevels.data[:need]
-		for i := old; i < len(s.diffLevels.data); i++ {
-			s.diffLevels.data[i] = 0
-		}
-		if need > s.diffLevels.initialized {
-			s.diffLevels.initialized = need
-		}
-	}
+	// The reached byte marks use native slice growth; newly exposed slots are zero.
+	s.diffLevels.extend(need)
 	var count uint32
 	for i := uint32(0); i < n; i++ {
 		var l Literal

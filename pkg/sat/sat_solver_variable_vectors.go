@@ -38,25 +38,15 @@ type satVariableCharColumn struct {
 	initialized uint32
 }
 
-func (c *satVariableCharColumn) push(b *arena.Budget, v int8) error {
-	if uint64(len(c.data)) == uint64(cap(c.data)) {
-		n, bytes, e := satVariableNextCapacity(uint32(cap(c.data)), 1, 1, uint64(^uint(0)>>1))
-		if e != nil {
-			return e
-		}
-		if e = b.Reserve(bytes); e != nil {
-			return e
-		}
-		next := make([]int8, len(c.data), int(n))
-		copy(next[:cap(c.data)], c.data[:cap(c.data)])
-		b.Release(uint64(cap(c.data)))
-		c.data = next
+func (c *satVariableCharColumn) extend(n uint32) {
+	if n <= uint32(len(c.data)) {
+		return
 	}
-	c.data = append(c.data, v)
-	if uint32(len(c.data)) > c.initialized {
-		c.initialized = uint32(len(c.data))
+	old := len(c.data)
+	c.data = append(c.data, make([]int8, int(n)-old)...)
+	if n > c.initialized {
+		c.initialized = n
 	}
-	return nil
 }
 func (c *satVariableCharColumn) read(i uint32) (int8, error) {
 	if e := satVariableIndex(uint32(len(c.data)), uint32(cap(c.data)), c.initialized, i); e != nil {
@@ -81,8 +71,7 @@ func (c *satVariableCharColumn) shrink(n uint32) error {
 	c.data = c.data[:n]
 	return nil
 }
-func (c *satVariableCharColumn) finalize(b *arena.Budget) {
-	b.Release(uint64(cap(c.data)))
+func (c *satVariableCharColumn) finalize() {
 	c.data = nil
 	c.initialized = 0
 }
