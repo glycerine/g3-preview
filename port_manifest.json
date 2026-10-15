@@ -150772,7 +150772,16 @@
           ]
         },
         {
-          "name": "Z3DEBUG allocate(file,line,obj,size) and deallocate(file,line,p) wrappers: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs plus generated symbol table and rational global manager plus param_descrs::imp, params blocks, rational entries, trace-tag and debug-tag tables, scoped_timer::imp, timer::m_watch and timeit::imp call sites are ported; other retained caller sites remain unaudited (cpp202-211)",
+          "name": "Concrete MPF powers2 mpz wrapper allocation/deallocation debug records at mpf.h:268/282/258, with Go wrapper identity/header extent, cache-hit skip, failed-payload owning cleanup and process-finalizing guard",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mpf_power_memory_trace.go",
+          "tests": [
+            "TestMPFPowerWrapperMemoryTraceMissHitAndSourceDeletion",
+            "TestMPFPowerWrapperMemoryTraceFailedPayloadAndFinalizeGuard"
+          ]
+        },
+        {
+          "name": "Z3DEBUG allocate(file,line,obj,size) and deallocate(file,line,p) wrappers: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs plus generated symbol table and rational global manager plus param_descrs::imp, params blocks, rational entries, trace-tag and debug-tag tables, scoped_timer::imp, timer::m_watch, timeit::imp and MPF powers2 mpz-wrapper call sites are ported; other retained caller sites remain unaudited (cpp202-211)",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
           "go_targets": [
@@ -151434,7 +151443,16 @@
           ]
         },
         {
-          "name": "Z3DEBUG allocation/deallocation file-line overloads and alloc/dealloc macros: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs plus generated symbol table and rational global manager plus param_descrs::imp, params blocks, rational entries, trace-tag and debug-tag tables, scoped_timer::imp, timer::m_watch and timeit::imp sites are connected through concrete trace hooks; other retained caller sites remain unaudited (h69-97; cpp202-211)",
+          "name": "Concrete MPF powers2 mpz wrapper allocation/deallocation debug records at mpf.h:268/282/258, with Go wrapper identity/header extent, cache-hit skip, failed-payload owning cleanup and process-finalizing guard",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mpf_power_memory_trace.go",
+          "tests": [
+            "TestMPFPowerWrapperMemoryTraceMissHitAndSourceDeletion",
+            "TestMPFPowerWrapperMemoryTraceFailedPayloadAndFinalizeGuard"
+          ]
+        },
+        {
+          "name": "Z3DEBUG allocation/deallocation file-line overloads and alloc/dealloc macros: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs plus generated symbol table and rational global manager plus param_descrs::imp, params blocks, rational entries, trace-tag and debug-tag tables, scoped_timer::imp, timer::m_watch, timeit::imp and MPF powers2 mpz-wrapper sites are connected through concrete trace hooks; other retained caller sites remain unaudited (h69-97; cpp202-211)",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
           "go_targets": [
@@ -155135,6 +155153,15 @@
           "tests": [
             "TestArbitraryFloatPowersRuntimeWrapperCacheAndSourceDestruction",
             "TestArbitraryFloatPowerWrapperEveryActualReservationPrefix"
+          ]
+        },
+        {
+          "name": "Concrete powers2 mpz wrapper alloc/dealloc debug records at mpf.h:268/282/258, including cache-hit skip, failed payload owning cleanup and process-finalizing guard",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mpf_power_memory_trace.go",
+          "tests": [
+            "TestMPFPowerWrapperMemoryTraceMissHitAndSourceDeletion",
+            "TestMPFPowerWrapperMemoryTraceFailedPayloadAndFinalizeGuard"
           ]
         },
         {

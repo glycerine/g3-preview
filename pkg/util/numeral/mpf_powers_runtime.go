@@ -23,6 +23,7 @@ type arbitraryFloatPowerWrapper struct {
 	id                                                               uint32
 	invocation, header                                               uint64
 	executing, published, Initialized, SourceDelDone, sourceFreeDone bool
+	memoryTraceReleased                                              bool
 	bodyCause, sourceCause, ownCause                                 error
 }
 
@@ -101,6 +102,7 @@ func (m *ArbitraryFloatManager) powerWrapper(n uint32, minusOne, negated bool) (
 	w.self = w
 	m.PowerWrappers = w
 	m.powerWrapperBytes += header
+	w.tracePowerWrapperAllocated(minusOne)
 	w.executing = true
 	m.valueExecuting = true
 	defer func() { w.executing = false; m.valueExecuting = false }()
@@ -240,6 +242,7 @@ func (w *arbitraryFloatPowerWrapper) destroy(own bool) error {
 			return stop(e)
 		}
 	}
+	w.tracePowerWrapperDeallocated()
 	return nil
 }
 func (m *ArbitraryFloatManager) destroyPowerWrappers(own bool) error {
