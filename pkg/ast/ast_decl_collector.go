@@ -189,6 +189,7 @@ func (c *astDeclCollector) orderDeps() error {
 		return ErrASTHandle
 	}
 	var order sortDependencyOrder
+	defer order.traceDependencySetsDeallocated()
 	for _, sort := range c.sorts {
 		if e := order.insertASTSort(c.manager, sort); e != nil {
 			return e

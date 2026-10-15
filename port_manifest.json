@@ -150450,6 +150450,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/diagnostic/util_memory_runtime.go",
+        "pkg/ast/ast_sort_dependency_memory_trace.go",
+        "pkg/ast/ast_sort_dependency_memory_trace_debug_test.go",
         "pkg/util/diagnostic/util_trace_tags_memory_trace.go",
         "pkg/util/diagnostic/util_debug_table_memory_trace.go",
         "pkg/util/memory/accounting.go",
@@ -150495,6 +150497,7 @@
       ],
       "tests": [
         "TestRuntimeUint32AcrossInitializationBitmapBoundary",
+        "TestASTDeclCollectorDependencySetMemoryTrace",
         "TestTraceTagTableAllocationFollowsSourceGate",
         "TestTraceTagTableFinalizationSuppressesMemoryDuringProcessFinalize",
         "TestDebugTableMemoryTraceFollowsLazyLifetime",
@@ -150641,6 +150644,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete top_sort<sort> dependency-set allocation/deallocation debug wrappers at decl_collector.cpp:127 and top_sort.h:79, with stable Go order-owner/slot identity, slice-header extent and process-finalizing guard (memory_manager.cpp:202-211)",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_sort_dependency_memory_trace.go",
+          "tests": [
+            "TestASTDeclCollectorDependencySetMemoryTrace"
+          ]
+        },
         {
           "name": "Concrete parameter rational-entry allocation/deallocation debug wrappers with stable Go context/setter identity, inline OwnedRational extent and process-finalizing guard (memory_manager.cpp:202-211; params.cpp:757,996,1004)",
           "status": "platform_replacement",
@@ -151137,6 +151148,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/diagnostic/util_memory_runtime.go",
+        "pkg/ast/ast_sort_dependency_memory_trace.go",
+        "pkg/ast/ast_sort_dependency_memory_trace_debug_test.go",
         "pkg/util/diagnostic/util_trace_tags_memory_trace.go",
         "pkg/util/diagnostic/util_debug_table_memory_trace.go",
         "pkg/util/memory/accounting.go",
@@ -151176,6 +151189,7 @@
         "pkg/util/params/util_params_rational_entry_memory_trace_debug_test.go"
       ],
       "tests": [
+        "TestASTDeclCollectorDependencySetMemoryTrace",
         "TestTraceTagTableAllocationFollowsSourceGate",
         "TestTraceTagTableFinalizationSuppressesMemoryDuringProcessFinalize",
         "TestDebugTableMemoryTraceFollowsLazyLifetime",
@@ -151312,6 +151326,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete top_sort<sort> dependency-set allocation/deallocation debug wrappers at decl_collector.cpp:127 and top_sort.h:79, with stable Go order-owner/slot identity, slice-header extent and process-finalizing guard (memory_manager.cpp:202-211)",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_sort_dependency_memory_trace.go",
+          "tests": [
+            "TestASTDeclCollectorDependencySetMemoryTrace"
+          ]
+        },
         {
           "name": "Concrete parameter rational-entry allocation/deallocation debug wrappers with stable Go context/setter identity, inline OwnedRational extent and process-finalizing guard (memory_manager.cpp:202-211; params.cpp:757,996,1004)",
           "status": "platform_replacement",
@@ -178160,6 +178182,8 @@
       "status": "ported",
       "go_targets": [
         "pkg/ast/ast_sort_dependency_order.go",
+        "pkg/ast/ast_sort_dependency_memory_trace.go",
+        "pkg/ast/ast_sort_dependency_memory_trace_debug_test.go",
         "pkg/ast/ast_sort_dependency_order_test.go",
         "pkg/ast/ast_decl_collector.go",
         "pkg/ast/ast_decl_collector_test.go"
@@ -178168,7 +178192,8 @@
         "TestSortDependencyOrderRetainedSourceTraversal",
         "TestSortDependencyOrderCycleAndUncollectedRoot",
         "TestSortDependencyOrderCollectsActualSortParameters",
-        "TestASTDeclCollectorVisitsRealGraphAndOrdersSorts"
+        "TestASTDeclCollectorVisitsRealGraphAndOrdersSorts",
+        "TestASTDeclCollectorDependencySetMemoryTrace"
       ],
       "conditionals": [
         {
@@ -178194,6 +178219,14 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "top_sort<sort> dependency-set destruction after decl_collector::order_deps, with concrete Go slice ownership and debug memory wrapper record (top_sort.h:78-80)",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_sort_dependency_memory_trace.go",
+          "tests": [
+            "TestASTDeclCollectorDependencySetMemoryTrace"
+          ]
+        },
+        {
           "name": "top_sort<sort> insertion and preorder/completion-stack traversal for decl_collector::order_deps",
           "status": "ported",
           "go_target": "pkg/ast/ast_sort_dependency_order.go",
@@ -178206,7 +178239,7 @@
         }
       ],
       "ownership": [
-        "The concrete AST sort-order state owns copied dependency-handle slices and borrows the referenced AST sort objects. Duplicate collected roots retain one traversal entry; dependencies absent from the collected root table are skipped. No source-owned dependency-set allocations are reproduced in Go."
+        "The concrete AST sort-order state owns copied dependency-handle slices and borrows the referenced AST sort objects. Duplicate collected roots retain one traversal entry; dependencies absent from the collected root table are skipped. Go slices replace source-owned dependency sets; the concrete AST collector emits their allocation and destruction debug records for each retained collected sort."
       ],
       "deviations": [
         "The sole retained top_sort<sort> specialization uses concrete ASTHandle maps and slices in package ast; no generic adapter or C++ hash-table traversal order is retained. Datatype constructor-edge collection and full SMT printer integration remain open in the separate declaration-collector consumer, not in this util traversal."

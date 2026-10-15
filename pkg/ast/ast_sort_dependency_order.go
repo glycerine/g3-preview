@@ -2,11 +2,14 @@
 // src/ast/decl_collector.cpp:118-124.
 package ast
 
+import udiag "github.com/glycerine/g3/pkg/util/diagnostic"
+
 // sortDependencyOrder records only sorts collected by decl_collector. A
 // dependency outside this set is ignored by the source traversal.
 type sortDependencyOrder struct {
 	roots []ASTHandle
 	deps  map[ASTHandle][]ASTHandle
+	trace *udiag.TraceTags
 }
 
 // insertASTSort supplies the parameter-sort edges collected by
@@ -23,6 +26,9 @@ func (o *sortDependencyOrder) insertASTSort(m *ASTManager, sort ASTHandle) error
 	r, e := m.requireKind(sort, ASTSort)
 	if e != nil {
 		return e
+	}
+	if o.trace == nil {
+		o.trace = m.traceTags
 	}
 	var deps []ASTHandle
 	info := m.sortAt(r.slot).info
@@ -53,6 +59,10 @@ func (o *sortDependencyOrder) insertASTSort(m *ASTManager, sort ASTHandle) error
 				deps = append(deps, child)
 			}
 		}
+	}
+	_, present := o.deps[sort]
+	if !present {
+		o.traceDependencySetAllocated(len(o.roots))
 	}
 	o.insert(sort, deps)
 	return nil
