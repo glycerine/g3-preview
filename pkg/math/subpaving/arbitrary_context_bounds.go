@@ -187,11 +187,17 @@ func (c *ArbitraryContext) publishBoundWithReason(n *ArbitraryNode, variable uin
 	} else {
 		n.upper[variable] = b
 	}
+	if err := c.traceNewBound(b); err != nil {
+		return err
+	}
 	conflict, err := n.ConflictingBounds(variable)
 	if err != nil {
 		return err
 	}
 	if conflict {
+		if err := c.traceBoundConflict(n); err != nil {
+			return err
+		}
 		n.conflictVar = variable
 		c.numConflicts++
 		c.removeLeaf(n)
