@@ -178239,6 +178239,12 @@
           "tests": ["TestAPIGlobalTraceControlsShareShellProcessTags"]
         },
         {
+          "name": "Reached SAT zero-level post-cleanup conflict TRACE before false return (sat_solver.cpp:1027)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_search_trace.go",
+          "tests": ["TestSATBackjumpCleanupConflictSourceTrace"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -179512,6 +179518,12 @@
           "status": "partial",
           "go_target": "pkg/api/api_trace.go",
           "tests": ["TestAPIGlobalTraceControlsShareShellProcessTags"]
+        },
+        {
+          "name": "Reached SAT zero-level post-cleanup conflict TRACE before false return (sat_solver.cpp:1027)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_search_trace.go",
+          "tests": ["TestSATBackjumpCleanupConflictSourceTrace"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

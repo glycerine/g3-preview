@@ -246,6 +246,7 @@ func (s *Solver) backjumpStep() (lbool.LBool, bool, error) {
 			return lbool.Undef, done, e
 		}
 		if s.propagation.inconsistent {
+			s.traceConflictAtLevelZero()
 			return lbool.False, done, nil
 		}
 		if e = s.gc.gc(); e != nil {
