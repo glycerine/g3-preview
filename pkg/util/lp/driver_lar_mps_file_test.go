@@ -244,7 +244,9 @@ func TestLPLARMPSFileReportFailures(t *testing.T) {
 }
 
 func TestLPLARMPSFilePhysicalOwnership(t *testing.T) {
-	large := strings.Repeat("1234567890", 100) + "7/13"
+	// The reader itself parses this value on every fault ordinal. Twenty
+	// blocks still force multi-limb arithmetic and physical allocations.
+	large := strings.Repeat("1234567890", 20) + "7/13"
 	input := strings.Replace(lpLARFreeMPS(2), lpExactMPSPair("x0", "COST", "1"), lpExactMPSPair("x0", "COST", large), 1)
 	name := lpMPSDriverFile(t, input)
 	for _, compare := range []bool{false, true} {

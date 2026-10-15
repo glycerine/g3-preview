@@ -133,6 +133,42 @@ func (h *lpPairHarness) pair(x, y string) *RationalPair {
 	h.must(h.m.SetString(&p.Y, y))
 	return &p
 }
+
+// Fault campaigns for LP operations need large numeric operands but do not
+// exercise decimal parsing. Load the same rational values through the concrete
+// limb setter so repeated setup does not dominate the campaign.
+func (h *lpPairHarness) pairExactLarge(x, y string) *RationalPair {
+	h.t.Helper()
+	p := h.pair("0", "0")
+	set := func(out *numeral.Rational, text string) {
+		h.t.Helper()
+		r, ok := new(big.Rat).SetString(text)
+		if !ok {
+			h.t.Fatal("invalid large rational", text)
+		}
+		load := func(dst *numeral.Int, value *big.Int) {
+			bytes := value.Bytes()
+			limbs := make([]uint32, (len(bytes)+3)/4)
+			for i := range bytes {
+				fromLow := len(bytes) - 1 - i
+				limbs[fromLow/4] |= uint32(bytes[i]) << (8 * uint(fromLow%4))
+			}
+			h.must(h.m.Z.SetLimbs(dst, limbs))
+			if value.Sign() < 0 {
+				h.must(h.m.Z.Neg(dst))
+			}
+		}
+		var n, d numeral.Int
+		load(&n, r.Num())
+		load(&d, r.Denom())
+		h.must(h.m.SetParts(out, &n, &d))
+		h.must(h.m.Z.Del(&n))
+		h.must(h.m.Z.Del(&d))
+	}
+	set(&p.X, x)
+	set(&p.Y, y)
+	return p
+}
 func (h *lpPairHarness) check(p *RationalPair, x, y *big.Rat) {
 	h.t.Helper()
 	for i, coordinate := range []*numeral.Rational{&p.X, &p.Y} {

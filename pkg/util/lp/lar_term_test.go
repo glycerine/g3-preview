@@ -9,6 +9,8 @@ import (
 	"testing"
 )
 
+const larTermMultilimbRepeats = 100
+
 func lpCheckLARTerm(t *testing.T, h *lpPairHarness, term *LARTerm, want map[uint32]*big.Rat, order []uint32) {
 	t.Helper()
 	if int(term.Size()) != len(want) {
@@ -186,9 +188,9 @@ func TestLARTermAllocationFailureCensus(t *testing.T) {
 			done := false
 			t.Run(fmt.Sprintf("%s/%d", op, ordinal), func(t *testing.T) {
 				h := newLPPairHarness(t)
-				xs := strings.Repeat("1234567890", 100) + "/7"
-				ys := strings.Repeat("9876543210", 100) + "/13"
-				p := h.pair(xs, ys)
+				xs := strings.Repeat("1234567890", larTermMultilimbRepeats) + "/7"
+				ys := strings.Repeat("9876543210", larTermMultilimbRepeats) + "/13"
+				p := h.pairExactLarge(xs, ys)
 				negative := h.pair("0", "0")
 				h.must(h.m.Copy(&negative.X, &p.X))
 				h.must(h.m.Neg(&negative.X))
@@ -324,8 +326,8 @@ func TestLARTermIteratorLiteralCursorAndCopyFailure(t *testing.T) {
 		done := false
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			h := newLPPairHarness(t)
-			text := strings.Repeat("1234567890", 100) + "/7"
-			p := h.pair(text, "0")
+			text := strings.Repeat("1234567890", larTermMultilimbRepeats) + "/7"
+			p := h.pairExactLarge(text, "0")
 			out := h.pair("0", "0")
 			term := NewLARTerm(h.m)
 			h.must(term.AddCoefficient(4, &p.X))
@@ -406,7 +408,7 @@ func TestLARTermBorrowedVectorFailureOwnership(t *testing.T) {
 	for ordinal := int64(0); ordinal < 50 && !matched; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			h := newLPPairHarness(t)
-			p := h.pair(strings.Repeat("1234567890", 100)+"/7", strings.Repeat("9876543210", 100)+"/13")
+			p := h.pairExactLarge(strings.Repeat("1234567890", larTermMultilimbRepeats)+"/7", strings.Repeat("9876543210", larTermMultilimbRepeats)+"/13")
 			term := NewLARTerm(h.m)
 			v := NewIndexedRationalVector(h.m, 1)
 			h.must(term.AddCoefficient(0, &p.X))
@@ -509,7 +511,7 @@ func TestLARTermIteratorRetainsPhysicalCopyReceipt(t *testing.T) {
 		for ordinal := int64(0); ordinal < 30 && !matched; ordinal++ {
 			t.Run(fmt.Sprintf("%d/%d", cohort, ordinal), func(t *testing.T) {
 				h := newLPPairHarness(t)
-				text := strings.Repeat("1234567890", 100) + "/7"
+				text := strings.Repeat("1234567890", larTermMultilimbRepeats) + "/7"
 				p := h.pair(text, "0")
 				out := h.pair("0", "0")
 				for n := 0; n < cohort; n++ {

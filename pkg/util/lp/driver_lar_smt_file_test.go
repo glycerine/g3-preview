@@ -194,7 +194,9 @@ func TestLPLARSMTFileReportFailures(t *testing.T) {
 }
 
 func TestLPLARSMTFilePhysicalOwnership(t *testing.T) {
-	large := strings.Repeat("1234567890", 100) + "7/13"
+	// This MPS value is reparsed for every fault ordinal; twenty blocks retain
+	// the multi-limb allocation path exercised by the file driver.
+	large := strings.Repeat("1234567890", 20) + "7/13"
 	mps := strings.Replace(lpLARFreeMPS(2), lpExactMPSPair("x0", "COST", "1"), lpExactMPSPair("x0", "COST", large), 1)
 	for _, phase := range []string{"constraints", "empty-comparison"} {
 		formula := ":formula (and)\n"

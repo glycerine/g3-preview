@@ -100,6 +100,10 @@ func TestLPPairPivotIndependentBasisRows(t *testing.T) {
 // prepares these fields before row scheduling; it is not part of calculation.
 func lpPreparedLARPivot(t *testing.T, h *lpPairHarness, a0, a1, basis string, externalZero ...bool) *LARSolver {
 	t.Helper()
+	pair := h.pair
+	if len(a0) > 256 || len(a1) > 256 || len(basis) > 256 {
+		pair = h.pairExactLarge
+	}
 	s, err := NewLARSolver(h.m)
 	h.must(err)
 	s.Settings.SimplexStrategy = StrategyLU
@@ -112,10 +116,10 @@ func lpPreparedLARPivot(t *testing.T, h *lpPairHarness, a0, a1, basis string, ex
 		h.must(err)
 	}
 	h.must(s.Core.RA.AddRow())
-	v := h.pair(a0, a1)
+	v := pair(a0, a1)
 	h.must(s.Core.RA.Set(0, 0, &v.X))
 	h.must(s.Core.RA.Set(0, 1, &v.Y))
-	h.must(s.Core.RA.Set(0, 2, &h.pair(basis, "0").X))
+	h.must(s.Core.RA.Set(0, 2, &pair(basis, "0").X))
 	s.Core.RBasis = []uint32{2}
 	m := s.Core.RPrimal
 	h.must(m.InitBasisHeadingAndNonBasicColumns())
@@ -250,7 +254,7 @@ func TestLARPivotPhysicalFailurePrefixes(t *testing.T) {
 					}
 					if operation == "substitute" {
 						input := NewSparseRationalVector(h.m)
-						v := h.pair(large+"/29", large+"/31")
+						v := h.pairExactLarge(large+"/29", large+"/31")
 						h.must(input.Append(2, &v.X))
 						h.must(input.Append(0, &v.Y))
 						_, err := s.AddTerm(input.Data, &h.pair("7", "0").X)
