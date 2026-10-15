@@ -53383,6 +53383,12 @@
           "tests": ["TestFixedSearchSourceParameterDisplayAndTrace", "TestFixedSearchBranchTraceIDsAndDepthLimit"]
         },
         {
+          "name": "Concrete config_mpff root initialization constraints, unit, post-unit bounds and post-propagation bounds TRACE with resumable stage guards (subpaving_t_def.h:1780-1801)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_init_trace.go",
+          "tests": ["TestFastRootInitializationTraceSourceOrderAndResume", "TestFastRootInitializationTraceRefusalAndPrinterPrefix"]
+        },
+        {
           "name": "Concrete config_mpfx root initialization constraints, unit, post-unit bounds and post-propagation bounds TRACE with resumable stage guards (subpaving_t_def.h:1780-1801)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_init_trace.go",
@@ -55106,6 +55112,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_search_trace.go",
           "tests": ["TestFixedSearchSourceParameterDisplayAndTrace", "TestFixedSearchBranchTraceIDsAndDepthLimit"]
+        },
+        {
+          "name": "Concrete config_mpff root initialization constraints, unit, post-unit bounds and post-propagation bounds TRACE with resumable stage guards (subpaving_t_def.h:1780-1801)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_init_trace.go",
+          "tests": ["TestFastRootInitializationTraceSourceOrderAndResume", "TestFastRootInitializationTraceRefusalAndPrinterPrefix"]
         },
         {
           "name": "Concrete config_mpfx root initialization constraints, unit, post-unit bounds and post-propagation bounds TRACE with resumable stage guards (subpaving_t_def.h:1780-1801)",
@@ -177917,6 +177929,12 @@
           "tests": ["TestFixedSearchSourceParameterDisplayAndTrace", "TestFixedSearchBranchTraceIDsAndDepthLimit"]
         },
         {
+          "name": "Reached config_mpff root initialization constraints, unit and bound TRACE records (subpaving_t_def.h:1780-1801)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_init_trace.go",
+          "tests": ["TestFastRootInitializationTraceSourceOrderAndResume", "TestFastRootInitializationTraceRefusalAndPrinterPrefix"]
+        },
+        {
           "name": "Reached config_mpfx root initialization constraints, unit and bound TRACE records (subpaving_t_def.h:1780-1801)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_init_trace.go",
@@ -179087,6 +179105,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_search_trace.go",
           "tests": ["TestFixedSearchSourceParameterDisplayAndTrace", "TestFixedSearchBranchTraceIDsAndDepthLimit"]
+        },
+        {
+          "name": "Reached config_mpff root initialization constraints, unit and bound TRACE records (subpaving_t_def.h:1780-1801)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_init_trace.go",
+          "tests": ["TestFastRootInitializationTraceSourceOrderAndResume", "TestFastRootInitializationTraceRefusalAndPrinterPrefix"]
         },
         {
           "name": "Reached config_mpfx root initialization constraints, unit and bound TRACE records (subpaving_t_def.h:1780-1801)",
