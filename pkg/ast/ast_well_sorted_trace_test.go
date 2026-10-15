@@ -2,6 +2,7 @@ package ast
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -42,6 +43,55 @@ func TestASTWellSortedWrongAritySourceTraceBeforeWarning(t *testing.T) {
 			t.Fatalf("source trace/warning order %q", got)
 		}
 	} else if got := output.String(); got != "WARNING: unexpected number of arguments.\n" {
+		t.Fatalf("erased trace emitted %q", got)
+	}
+}
+
+func TestASTWellSortedSortMismatchSourceTraceBeforeWarning(t *testing.T) {
+	c, g, p, budget := dynAckSourceFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("tc")
+	m, err := NewASTManager(ASTManagerConfig{Symbols: c.SymbolsField, Numerals: c.NumeralsField, Budget: budget, TraceTags: tags})
+	paramsMust(t, err)
+	defer func() { paramsMust(t, m.Close()) }()
+	boolSort, err := m.MkBoolSort()
+	paramsMust(t, err)
+	otherSort, err := m.MkSort(astTestSymbol(t, m, "OtherTrace"), ASTSortInfo{})
+	paramsMust(t, err)
+	arg, err := m.MkVar(0, boolSort)
+	paramsMust(t, err)
+	decl, err := m.MkFuncDecl(astTestSymbol(t, m, "guard"), []ASTHandle{boolSort}, boolSort, ASTFuncDeclInfo{})
+	paramsMust(t, err)
+	app, err := m.MkApp(decl, []ASTHandle{arg})
+	paramsMust(t, err)
+	id, err := m.GetASTID(arg)
+	paramsMust(t, err)
+	varRef, err := m.internal(arg)
+	paramsMust(t, err)
+	otherRef, err := m.internal(otherSort)
+	paramsMust(t, err)
+	warnings := diagnostic.NewWarningService(&output)
+	old := m.varAt(varRef.slot).sort
+	m.varAt(varRef.slot).sort = otherRef
+	good, checkErr := m.IsWellSortedWithPrinter(app, warnings, c, p, g)
+	m.varAt(varRef.slot).sort = old
+	paramsMust(t, checkErr)
+	if good {
+		t.Fatal("sort mismatch accepted")
+	}
+	got := output.String()
+	warning := fmt.Sprintf("WARNING: Sort mismatch for argument 1 of decl guard :: (-> Bool Bool)\n#%d := (:var 0 OtherTrace)\n(guard #%d)\n\nExpected sort: Bool\nActual sort:   OtherTrace\nFunction sort: (declare-fun guard (Bool) Bool).\n", id, id)
+	if tags.ShouldTrace("tc") {
+		want := "-------- [tc] operator() src/ast/well_sorted.cpp:59 ---------\n" +
+			"sort mismatch on argument #0.\n" +
+			"(guard (:var 0))Sort mismatch for argument 1 of (guard (:var 0))\n" +
+			"Expected sort: Bool\nActual sort:   OtherTrace\nFunction sort: (declare-fun guard (Bool) Bool)." +
+			"------------------------------------------------\n" + warning
+		if got != want {
+			t.Fatalf("source trace/warning order:\ngot %q\nwant %q", got, want)
+		}
+	} else if got != warning {
 		t.Fatalf("erased trace emitted %q", got)
 	}
 }

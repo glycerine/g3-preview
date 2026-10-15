@@ -55,6 +55,9 @@ func (m *ASTManager) isWellSorted(h ASTHandle, warnings *diagnostic.WarningServi
 			if warning.traceArity {
 				resultErr = errors.Join(resultErr, m.traceWellSortedArity(warning.app, c, p, g))
 			}
+			if warning.argument != 0 {
+				resultErr = errors.Join(resultErr, m.traceWellSortedMismatch(warning, c, p, g))
+			}
 			message := warning.text
 			if warning.argument != 0 && c != nil {
 				var e error

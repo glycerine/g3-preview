@@ -30622,7 +30622,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/ast/ast_well_sorted.go", "pkg/ast/ast_well_sorted_warning.go", "pkg/ast/ast_well_sorted_trace.go", "pkg/tactic/tactic_goal.go"],
-      "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder", "TestASTWellSortedApplicationGuardBranches", "TestASTWellSortedSourceMismatchPrinter", "TestASTWellSortedWrongAritySourceTraceBeforeWarning"],
+      "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder", "TestASTWellSortedApplicationGuardBranches", "TestASTWellSortedSourceMismatchPrinter", "TestASTWellSortedWrongAritySourceTraceBeforeWarning", "TestASTWellSortedSortMismatchSourceTraceBeforeWarning"],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
@@ -30637,10 +30637,16 @@
           "status": "partial",
           "go_target": "pkg/ast/ast_well_sorted_trace.go",
           "tests": ["TestASTWellSortedWrongAritySourceTraceBeforeWarning"]
+        },
+        {
+          "name": "well_sorted_proc sort-mismatch tc TRACE before warning (well_sorted.cpp:59-64); selected Boolean SMT2 expression profile",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_well_sorted_trace.go",
+          "tests": ["TestASTWellSortedSortMismatchSourceTraceBeforeWarning"]
         }
       ],
       "ownership": [],
-      "deviations": ["Native Go slice and map replace the source expression-visitor stack and shared-node marks. The quantifier and arity warnings and selected source sort-mismatch diagnostics are present. The ws trace uses the selected Boolean SMT2 printer; non-Boolean app profiles and tc trace remain open. Direct API/cmd-context callers remain open. Malformed-app branches are tested through temporary internal test-node mutation because public factories refuse them."]
+      "deviations": ["Native Go slice and map replace the source expression-visitor stack and shared-node marks. The quantifier and arity warnings and selected source sort-mismatch diagnostics are present. The ws and tc traces use the selected Boolean SMT2 printer; non-Boolean app profiles remain open. Direct API/cmd-context callers remain open. Malformed-app branches are tested through temporary internal test-node mutation because public factories refuse them."]
     },
     {
       "path": "src/ast/well_sorted.h",
@@ -179747,7 +179753,8 @@
         "TestAIGMaxSharingTryingTraceAllFourReassociationBranches",
         "TestAIGGoalConversionMissingCacheConditionalTrace",
         "TestAIGMkAndSourceTraceOriginalOperandsAndResult",
-        "TestASTWellSortedWrongAritySourceTraceBeforeWarning"
+        "TestASTWellSortedWrongAritySourceTraceBeforeWarning",
+        "TestASTWellSortedSortMismatchSourceTraceBeforeWarning"
       ],
       "conditionals": [
         {
@@ -181174,6 +181181,12 @@
           "tests": ["TestASTWellSortedWrongAritySourceTraceBeforeWarning"]
         },
         {
+          "name": "Selected well_sorted_proc sort-mismatch tc TRACE before warning with Boolean SMT2 expression (well_sorted.cpp:59-64); wider expression profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_well_sorted_trace.go",
+          "tests": ["TestASTWellSortedSortMismatchSourceTraceBeforeWarning"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -181341,7 +181354,8 @@
         "TestAIGMaxSharingTryingTraceAllFourReassociationBranches",
         "TestAIGGoalConversionMissingCacheConditionalTrace",
         "TestAIGMkAndSourceTraceOriginalOperandsAndResult",
-        "TestASTWellSortedWrongAritySourceTraceBeforeWarning"
+        "TestASTWellSortedWrongAritySourceTraceBeforeWarning",
+        "TestASTWellSortedSortMismatchSourceTraceBeforeWarning"
       ],
       "conditionals": [
         {
@@ -182766,6 +182780,12 @@
           "status": "partial",
           "go_target": "pkg/ast/ast_well_sorted_trace.go",
           "tests": ["TestASTWellSortedWrongAritySourceTraceBeforeWarning"]
+        },
+        {
+          "name": "Selected well_sorted_proc sort-mismatch tc TRACE before warning with Boolean SMT2 expression (well_sorted.cpp:59-64); wider expression profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_well_sorted_trace.go",
+          "tests": ["TestASTWellSortedSortMismatchSourceTraceBeforeWarning"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
