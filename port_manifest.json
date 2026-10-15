@@ -150193,6 +150193,10 @@
           "name": "Z3DEBUG allocate(file,line,obj,size) and deallocate(file,line,p) wrappers: the retained small_object_allocator chunk allocation and three release source sites are ported; other retained caller sites remain unaudited (cpp202-211)",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpz.go",
+            "pkg/math/polynomial/polynomial_monomial.go"
+          ],
           "tests": [
             "TestMemoryChunkTraceSourceSitesAndFinalizeGuard",
             "TestIntegerConstructorBindsMemoryChunkTrace",
@@ -150679,6 +150683,10 @@
           "name": "Z3DEBUG allocation/deallocation file-line overloads and alloc/dealloc macros: the retained small_object_allocator chunk sites are connected through a concrete trace hook; other retained caller sites remain unaudited (h69-97; cpp202-211)",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
+          "go_targets": [
+            "pkg/util/numeral/mpz.go",
+            "pkg/math/polynomial/polynomial_monomial.go"
+          ],
           "tests": [
             "TestMemoryChunkTraceSourceSitesAndFinalizeGuard",
             "TestIntegerConstructorBindsMemoryChunkTrace",
@@ -171588,7 +171596,9 @@
         "pkg/tactic/ufbv/rewrite_tactic.go",
         "pkg/tactic/ufbv/rewrite_tactic_test.go",
         "pkg/tactic/ufbv/rewrite_formula_process.go",
-        "pkg/tactic/ufbv/rewrite_formula_process_test.go"
+        "pkg/tactic/ufbv/rewrite_formula_process_test.go",
+        "pkg/model/model_evaluator_array_expansion.go",
+        "pkg/model/model_evaluator_array_equality.go"
       ],
       "tests": [
         "TestSexprAccessorsAndScalarIterator",
@@ -171655,7 +171665,13 @@
         "TestMatchSubstConcretePairCacheAndVariableBindings",
         "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences",
         "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
-        "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"
+        "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults",
+        "TestModelEvaluatorOriginalFunctionArrayValueExpansionAndPrecedence",
+        "TestModelEvaluatorOriginalArrayExpansionPruningAndGroundness",
+        "TestModelEvaluatorOriginalArrayExpansionAllocationRefusals",
+        "TestModelEvaluatorOriginalArrayEqualityTablesAndStorePrecedence",
+        "TestModelEvaluatorOriginalArrayEqualitySymbolicIndexFallback",
+        "TestModelEvaluatorOriginalArrayEqualityAllocationRefusals"
       ],
       "conditionals": [
         {
@@ -171692,6 +171708,22 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Concrete model-evaluator expr_ref_vector store rows, reconstruction arguments and equality constraints retain AST roots through source-order array expansion and comparison (model_evaluator.cpp:207-221,301-319,422-499)",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_array_expansion.go",
+          "go_targets": [
+            "pkg/model/model_evaluator_array_equality.go"
+          ],
+          "tests": [
+            "TestModelEvaluatorOriginalFunctionArrayValueExpansionAndPrecedence",
+            "TestModelEvaluatorOriginalArrayExpansionPruningAndGroundness",
+            "TestModelEvaluatorOriginalArrayExpansionAllocationRefusals",
+            "TestModelEvaluatorOriginalArrayEqualityTablesAndStorePrecedence",
+            "TestModelEvaluatorOriginalArrayEqualitySymbolicIndexFallback",
+            "TestModelEvaluatorOriginalArrayEqualityAllocationRefusals"
+          ]
+        },
         {
           "name": "Concrete UFBV new_exprs ref_vector publishes processed formulas and demodulators into a native slice with independent AST pins that outlive the processor and release after goal publication (ufbv_rewriter.cpp:735-749)",
           "status": "ported",
