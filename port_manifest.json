@@ -53404,6 +53404,7 @@
         "TestRationalStatisticsConflictResetAndNodeRetention",
         "TestRationalDisplayDefinitionsClausesLeavesAndWriterPrefix",
         "TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication",
+        "TestRationalPolynomialTraceStreamRefusalKeepsDefinition",
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFixedNodeBoundPredicates",
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
@@ -54266,7 +54267,13 @@
           "name": "Concrete config_mpq mk_sum integrality TRACE before the second is_int query and variable publication (subpaving_t_def.h:762-763)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_polynomial_integer_trace.go",
-          "tests": ["TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication"]
+          "tests": ["TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication", "TestRationalPolynomialTraceStreamRefusalKeepsDefinition"]
+        },
+        {
+          "name": "Concrete config_mpq is_int(polynomial) first failing term TRACE with variable, coefficient and explicit flush (subpaving_t_def.h:668-679)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_polynomial_integer_trace.go",
+          "tests": ["TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication", "TestRationalPolynomialTraceStreamRefusalKeepsDefinition"]
         },
         {
           "name": "Concrete config_hwf mk_var, mk_sum, and mk_ineq construction with sorted duplicate coefficient swaps (src/math/subpaving/subpaving_t_def.h:666-687,741-780)",
@@ -176100,7 +176107,8 @@
         "TestASTDeletionSourceTraceRecords",
         "TestArbitraryRootRetainedShortTraceAfterCertifiedBounds",
         "TestHardwareRootRetainedTraceSitesSourceOrder",
-        "TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication"
+        "TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication",
+        "TestRationalPolynomialTraceStreamRefusalKeepsDefinition"
       ],
       "conditionals": [
         {
@@ -176670,7 +176678,13 @@
           "name": "Reached config_mpq mk_sum integrality TRACE before variable publication (subpaving_t_def.h:762)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_polynomial_integer_trace.go",
-          "tests": ["TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication"]
+          "tests": ["TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication", "TestRationalPolynomialTraceStreamRefusalKeepsDefinition"]
+        },
+        {
+          "name": "Reached config_mpq is_int(polynomial) first failing term TRACE and explicit flush (subpaving_t_def.h:672)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_polynomial_integer_trace.go",
+          "tests": ["TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication", "TestRationalPolynomialTraceStreamRefusalKeepsDefinition"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
@@ -176761,7 +176775,8 @@
         "TestASTDeletionSourceTraceRecords",
         "TestArbitraryRootRetainedShortTraceAfterCertifiedBounds",
         "TestHardwareRootRetainedTraceSitesSourceOrder",
-        "TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication"
+        "TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication",
+        "TestRationalPolynomialTraceStreamRefusalKeepsDefinition"
       ],
       "conditionals": [
         {
@@ -177343,7 +177358,13 @@
           "name": "Reached config_mpq mk_sum integrality TRACE before variable publication (subpaving_t_def.h:762)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_polynomial_integer_trace.go",
-          "tests": ["TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication"]
+          "tests": ["TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication", "TestRationalPolynomialTraceStreamRefusalKeepsDefinition"]
+        },
+        {
+          "name": "Reached config_mpq is_int(polynomial) first failing term TRACE and explicit flush (subpaving_t_def.h:672)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_polynomial_integer_trace.go",
+          "tests": ["TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication", "TestRationalPolynomialTraceStreamRefusalKeepsDefinition"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
