@@ -64,6 +64,7 @@ type Manager struct {
 	andNodes            idPool
 	trueNode            *node
 	toDelete            []*node
+	pendingAST          []ast.ASTRef
 	nodes               uint32
 	activeRefs          uint32
 	header              uint64
@@ -120,6 +121,33 @@ func NewManagerWithGateEncoding(m *ast.ASTManager, defaultGateEncoding bool) (*M
 func (m *Manager) open() error {
 	if m == nil || m.self != m || m.closed || m.closing {
 		return ErrOwner
+	}
+	if e := m.drainPendingAST(); e != nil {
+		return e
+	}
+	return nil
+}
+
+func (m *Manager) releaseAST(ref *ast.ASTRef) error {
+	if ref == nil || *ref == (ast.ASTRef{}) {
+		return nil
+	}
+	e := m.ast.DelRef(ref)
+	if *ref != (ast.ASTRef{}) {
+		m.pendingAST = append(m.pendingAST, *ref)
+		*ref = ast.ASTRef{}
+	}
+	return e
+}
+func (m *Manager) drainPendingAST() error {
+	for len(m.pendingAST) != 0 {
+		e := m.ast.DelRef(&m.pendingAST[0])
+		if m.pendingAST[0] == (ast.ASTRef{}) {
+			m.pendingAST = m.pendingAST[1:]
+		}
+		if e != nil {
+			return e
+		}
 	}
 	return nil
 }
@@ -360,6 +388,9 @@ func (m *Manager) Close() error {
 	}
 	if m.activeRefs != 0 {
 		return ErrLiveReferences
+	}
+	if e := m.drainPendingAST(); e != nil {
+		return e
 	}
 	if !m.closing {
 		m.closing = true
