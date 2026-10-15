@@ -53436,6 +53436,12 @@
           "tests": ["TestRationalMayPropagateClauseEqualTimestampAndSkippedVisitTrace", "TestRationalMayPropagateDefinitionSkippedTimestampTrace", "TestRationalMayPropagateTracePrinterFailureAfterQueueConsumption"]
         },
         {
+          "name": "Concrete config_mpf may_propagate clause/definition diagnostic with strict-result text and inclusive timestamp gate (subpaving_t_def.h:1170-1175)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_may_propagate_trace.go",
+          "tests": ["TestArbitraryMayPropagateClauseEqualTimestampAndSkippedVisitTrace", "TestArbitraryMayPropagateDefinitionSkippedTimestampTrace", "TestArbitraryMayPropagateTracePrinterFailureAfterQueueConsumption"]
+        },
+        {
           "name": "Concrete config_mpff may_propagate clause/definition diagnostic with strict-result text and inclusive timestamp gate (subpaving_t_def.h:1170-1175)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fast_may_propagate_trace.go",
@@ -55044,6 +55050,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_may_propagate_trace.go",
           "tests": ["TestRationalMayPropagateClauseEqualTimestampAndSkippedVisitTrace", "TestRationalMayPropagateDefinitionSkippedTimestampTrace", "TestRationalMayPropagateTracePrinterFailureAfterQueueConsumption"]
+        },
+        {
+          "name": "Concrete config_mpf may_propagate clause/definition diagnostic with strict-result text and inclusive timestamp gate (subpaving_t_def.h:1170-1175)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_may_propagate_trace.go",
+          "tests": ["TestArbitraryMayPropagateClauseEqualTimestampAndSkippedVisitTrace", "TestArbitraryMayPropagateDefinitionSkippedTimestampTrace", "TestArbitraryMayPropagateTracePrinterFailureAfterQueueConsumption"]
         },
         {
           "name": "Concrete config_mpff may_propagate clause/definition diagnostic with strict-result text and inclusive timestamp gate (subpaving_t_def.h:1170-1175)",
@@ -177741,6 +177753,12 @@
           "tests": ["TestRationalMayPropagateClauseEqualTimestampAndSkippedVisitTrace", "TestRationalMayPropagateDefinitionSkippedTimestampTrace", "TestRationalMayPropagateTracePrinterFailureAfterQueueConsumption"]
         },
         {
+          "name": "Reached config_mpf may_propagate clause and definition TRACE diagnostics (subpaving_t_def.h:1172)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_may_propagate_trace.go",
+          "tests": ["TestArbitraryMayPropagateClauseEqualTimestampAndSkippedVisitTrace", "TestArbitraryMayPropagateDefinitionSkippedTimestampTrace", "TestArbitraryMayPropagateTracePrinterFailureAfterQueueConsumption"]
+        },
+        {
           "name": "Reached config_mpff may_propagate clause and definition TRACE diagnostics (subpaving_t_def.h:1172)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fast_may_propagate_trace.go",
@@ -178797,6 +178815,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_may_propagate_trace.go",
           "tests": ["TestRationalMayPropagateClauseEqualTimestampAndSkippedVisitTrace", "TestRationalMayPropagateDefinitionSkippedTimestampTrace", "TestRationalMayPropagateTracePrinterFailureAfterQueueConsumption"]
+        },
+        {
+          "name": "Reached config_mpf may_propagate clause and definition TRACE diagnostics (subpaving_t_def.h:1172)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_may_propagate_trace.go",
+          "tests": ["TestArbitraryMayPropagateClauseEqualTimestampAndSkippedVisitTrace", "TestArbitraryMayPropagateDefinitionSkippedTimestampTrace", "TestArbitraryMayPropagateTracePrinterFailureAfterQueueConsumption"]
         },
         {
           "name": "Reached config_mpff may_propagate clause and definition TRACE diagnostics (subpaving_t_def.h:1172)",

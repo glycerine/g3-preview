@@ -39,6 +39,13 @@ func (c *ArbitraryContext) PropagateQueued(n *ArbitraryNode) error {
 			}
 			if watch.clause != nil {
 				clause := watch.clause
+				if err := c.traceMayPropagateClause(b, clause); err != nil {
+					if errors.Is(err, numeral.ErrArbitraryFloatNonRegular) {
+						c.arithmeticFailed = true
+						continue
+					}
+					return err
+				}
 				if b.timestamp >= clause.visited {
 					if err := c.PropagateClause(clause, n); err != nil {
 						if errors.Is(err, numeral.ErrArbitraryFloatNonRegular) {
@@ -51,35 +58,63 @@ func (c *ArbitraryContext) PropagateQueued(n *ArbitraryNode) error {
 			} else {
 				p := c.polynomials[watch.definition]
 				m := c.monomials[watch.definition]
-				if p != nil && b.timestamp >= p.visited {
-					if err := c.PropagatePolynomial(watch.definition, n); err != nil {
+				if p != nil {
+					if err := c.traceMayPropagateDefinition(b, watch.definition, p.visited); err != nil {
 						if errors.Is(err, numeral.ErrArbitraryFloatNonRegular) {
 							c.arithmeticFailed = true
 							continue
 						}
 						return err
 					}
-				} else if m != nil && b.timestamp >= m.visited {
-					if err := c.PropagateMonomial(watch.definition, n); err != nil {
+					if b.timestamp >= p.visited {
+						if err := c.PropagatePolynomial(watch.definition, n); err != nil {
+							if errors.Is(err, numeral.ErrArbitraryFloatNonRegular) {
+								c.arithmeticFailed = true
+								continue
+							}
+							return err
+						}
+					}
+				} else if m != nil {
+					if err := c.traceMayPropagateDefinition(b, watch.definition, m.visited); err != nil {
 						if errors.Is(err, numeral.ErrArbitraryFloatNonRegular) {
 							c.arithmeticFailed = true
 							continue
 						}
 						return err
 					}
-				} else if p == nil && m == nil {
+					if b.timestamp >= m.visited {
+						if err := c.PropagateMonomial(watch.definition, n); err != nil {
+							if errors.Is(err, numeral.ErrArbitraryFloatNonRegular) {
+								c.arithmeticFailed = true
+								continue
+							}
+							return err
+						}
+					}
+				} else {
 					return arena.ErrInvalidSlot
 				}
 			}
 		}
 		if n.conflictVar == math.MaxUint32 {
-			if p := c.polynomials[b.variable]; p != nil && b.timestamp >= p.visited {
-				if err := c.PropagatePolynomial(b.variable, n); err != nil {
+			if p := c.polynomials[b.variable]; p != nil {
+				if err := c.traceMayPropagateDefinition(b, b.variable, p.visited); err != nil {
 					return err
 				}
-			} else if m := c.monomials[b.variable]; m != nil && b.timestamp >= m.visited {
-				if err := c.PropagateMonomial(b.variable, n); err != nil {
+				if b.timestamp >= p.visited {
+					if err := c.PropagatePolynomial(b.variable, n); err != nil {
+						return err
+					}
+				}
+			} else if m := c.monomials[b.variable]; m != nil {
+				if err := c.traceMayPropagateDefinition(b, b.variable, m.visited); err != nil {
 					return err
+				}
+				if b.timestamp >= m.visited {
+					if err := c.PropagateMonomial(b.variable, n); err != nil {
+						return err
+					}
 				}
 			}
 		}
