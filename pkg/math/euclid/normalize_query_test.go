@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -84,6 +85,51 @@ func TestEuclideanNormalizeQueryCopyRefusalRetainsOwnedBuffer(t *testing.T) {
 	for _, v := range []*numeral.Int{&constant, &aPrime, &cPrime} {
 		euclidMust(t, z.Del(v))
 	}
+}
+
+func TestEuclideanNormalizeQuerySubstitutionPublishesConstantBeforeRationalRefusal(t *testing.T) {
+	m := euclidNumeralManager(t)
+	z := m.Integers()
+	s, e := newSolverSetup(m)
+	euclidMust(t, e)
+	_, e = s.mkVar(false)
+	euclidMust(t, e)
+	j, e := s.mkJustification()
+	euclidMust(t, e)
+	minusOne, five := numeral.NewInt(-1), numeral.NewInt(5)
+	proof := numeral.NewRational()
+	euclidMust(t, m.SetString(&proof, "1"+strings.Repeat("0", 200)+"1/1"+strings.Repeat("0", 200)+"3"))
+	_, e = s.addEquation([]numeral.Int{minusOne}, []uint32{0}, &five,
+		[]numeral.Rational{proof}, []uint32{j}, true)
+	euclidMust(t, e)
+	euclidMust(t, s.promoteSolvedEquation(0, 0))
+	coefficient, constant := numeral.NewInt(2), numeral.NewInt(3)
+	aPrime, cPrime := numeral.NewInt(0), numeral.NewInt(0)
+	var js []uint32
+	z.Budget().FailAfter(0)
+	e = s.normalizeQuery([]numeral.Int{coefficient}, []uint32{0},
+		&constant, &aPrime, &cPrime, &js)
+	z.Budget().FailAfter(-1)
+	var failure umemory.Failure
+	if !errors.Is(e, arena.ErrInjectedFailure) &&
+		(!errors.As(e, &failure) || failure.Kind != umemory.FailureMemout) {
+		t.Fatal("expected rational substitution allocation refusal", e)
+	}
+	got, read := z.String(&cPrime)
+	euclidMust(t, read)
+	if got != "13" || s.normRow == nil || s.stop == nil || len(s.normRow.js) != 0 {
+		t.Fatalf("source constant-before-rational prefix lost: c_prime=%s, row=%v", got, s.normRow)
+	}
+	got, read = z.String(&constant)
+	euclidMust(t, read)
+	if got != "3" {
+		t.Fatalf("borrowed input constant changed: %s", got)
+	}
+	euclidMust(t, s.Close())
+	for _, value := range []*numeral.Int{&minusOne, &five, &coefficient, &constant, &aPrime, &cPrime} {
+		euclidMust(t, z.Del(value))
+	}
+	euclidMust(t, m.Del(&proof))
 }
 
 func TestEuclideanNormalizeQueryAfterNonUnitSolve(t *testing.T) {

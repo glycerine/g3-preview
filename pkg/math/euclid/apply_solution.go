@@ -1,7 +1,10 @@
 // Source: src/math/euclid/euclidean_solver.cpp:422-461,615-618.
 package euclid
 
-import "github.com/glycerine/g3/pkg/arena"
+import (
+	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/numeral"
+)
 
 // promoteSolvedEquation performs the source ownership transfer after a pivot
 // equation has been normalized to coefficient -1 for x. The caller removes
@@ -37,7 +40,7 @@ func (s *solverSetup) promoteSolvedEquation(eqIndex, x uint32) error {
 // merge, rational raw swap. The integer coefficient a1 remains borrowed from
 // the old target row after that row moves into tmpAs.
 func (s *solverSetup) applySolutionOnce(x uint32, target *equation,
-	updateOcc, updateQueue bool, eqIndex, exceptVar uint32) error {
+	updateOcc, updateQueue bool, eqIndex, exceptVar uint32, constant *numeral.Int) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -77,7 +80,10 @@ func (s *solverSetup) applySolutionOnce(x uint32, target *equation,
 		s.tmpAs, &s.tmpXs, updateOcc, updateQueue, eqIndex, exceptVar); e != nil {
 		return e
 	}
-	if e = z.AddMul(&target.c, a1, &sol.c, &target.c); e != nil {
+	if constant == nil {
+		constant = &target.c
+	}
+	if e = z.AddMul(constant, a1, &sol.c, constant); e != nil {
 		return e
 	}
 	if e = s.tmpAs.SwapRaw(&target.as); e != nil {
@@ -97,6 +103,12 @@ func (s *solverSetup) applySolutionOnce(x uint32, target *equation,
 // applySolutionToEquation follows the source reset/schedule/erase-min loop.
 // Newly exposed solved variables are inserted by the integer row merge.
 func (s *solverSetup) applySolutionToEquation(target *equation) error {
+	return s.applySolutionToEquationWithConstant(target, nil)
+}
+
+// normalize passes its caller-owned c_prime directly: the source applies each
+// substitution to that output before it finishes the coefficient vectors.
+func (s *solverSetup) applySolutionToEquationWithConstant(target *equation, constant *numeral.Int) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -114,7 +126,7 @@ func (s *solverSetup) applySolutionToEquation(target *equation) error {
 		if e != nil {
 			return e
 		}
-		if e := s.applySolutionOnce(uint32(x), target, false, true, nullEquationIndex, nullEquationIndex); e != nil {
+		if e := s.applySolutionOnce(uint32(x), target, false, true, nullEquationIndex, nullEquationIndex, constant); e != nil {
 			return e
 		}
 	}

@@ -111,7 +111,7 @@ func (s *solverSetup) substituteMostRecentSolution(x uint32) error {
 			return arena.ErrInvalidSlot
 		}
 		eq := s.equations[eqIndex]
-		if e := s.applySolutionOnce(x, eq, true, false, eqIndex, x); e != nil {
+		if e := s.applySolutionOnce(x, eq, true, false, eqIndex, x, nil); e != nil {
 			return e
 		}
 		if e := s.normalizeEquation(eqIndex); e != nil {

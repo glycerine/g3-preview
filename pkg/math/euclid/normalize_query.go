@@ -48,13 +48,7 @@ func (s *solverSetup) normalizeQuery(as []numeral.Int, xs []uint32, c,
 	if err = z.Copy(cPrime, c); err != nil {
 		return err
 	}
-	if err = z.Copy(&row.c, cPrime); err != nil {
-		return err
-	}
-	if err = s.applySolutionToEquation(row); err != nil {
-		return err
-	}
-	if err = z.Copy(cPrime, &row.c); err != nil {
+	if err = s.applySolutionToEquationWithConstant(row, cPrime); err != nil {
 		return err
 	}
 	*js = append(*js, row.js...)
