@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/luby"
 	"github.com/glycerine/g3/pkg/util/stopwatch"
@@ -22,6 +23,7 @@ type satSolverGC struct {
 	self                                                                                     *satSolverGC
 	conflict                                                                                 *satSolverConflictResolution
 	cleaner                                                                                  *satCleaner
+	traceTags                                                                                *diagnostic.TraceTags
 	ownerBytes                                                                               uint64
 	gcThreshold, restartThreshold, lubyIndex, restarts, restartStat, numFrozen, gcClauseStat uint32
 	minDTk                                                                                   float64
@@ -304,6 +306,7 @@ func (g *satSolverGC) finishCompaction() {
 	l.gcContinuation = nil
 }
 func (g *satSolverGC) gcHalf() error {
+	g.traceGC("gc_half", 1494)
 	l := g.lifecycle()
 	n := uint32(len(l.learned))
 	half := n / 2

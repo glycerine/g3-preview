@@ -15,6 +15,7 @@ import (
 
 type SolverConfig struct {
 	Debug         *diagnostic.DebugContext
+	TraceTags     *diagnostic.TraceTags
 	ParamsContext *uparams.ParamsContext
 	Params        uparams.ParamsRef
 	RLimit        *control.Reslimit
@@ -106,7 +107,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	if err = c.Budget.Reserve(n); err != nil {
 		return nil, err
 	}
-	s = &Solver{runtime: c.Runtime, context: c.ParamsContext, Limit: c.RLimit, budget: c.Budget, ownerBytes: n}
+	s = &Solver{runtime: c.Runtime, context: c.ParamsContext, Limit: c.RLimit, budget: c.Budget, traceTags: c.TraceTags, ownerBytes: n}
 	s.self = s
 	c.Runtime.liveSolvers++
 	defer func() {
@@ -227,6 +228,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	if s.gc, err = newSATSolverGC(s.conflict, s.cleaner); err != nil {
 		return s, err
 	}
+	s.gc.traceTags = c.TraceTags
 	if err = s.updateParams(&c.Params); err != nil {
 		return s, err
 	}

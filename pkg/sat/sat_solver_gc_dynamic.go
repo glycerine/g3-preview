@@ -6,6 +6,7 @@ import (
 )
 
 func (g *satSolverGC) gcDynPSM() error {
+	g.traceGC("gc_dyn_psm", 1519)
 	l := g.lifecycle()
 	p := l.propagation
 	v := p.variables
@@ -52,6 +53,7 @@ func (g *satSolverGC) gcDynPSM() error {
 	if d < g.minDTk {
 		g.minDTk = d
 	}
+	g.traceMinDTk()
 	if e := g.beginCompaction(0); e != nil {
 		return e
 	}

@@ -178153,6 +178153,12 @@
           "tests": ["TestFixedMonomialPropagationSourceTrace", "TestFixedMonomialPropagationTraceRefusalAndPrinterPrefix"]
         },
         {
+          "name": "Reached SAT gc_half and gc_dyn_psm entry TRACE plus dynamic minimum-change TRACE before clause traversal (sat_solver.cpp:1494,1519,1540)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_gc_trace.go",
+          "tests": ["TestSATGCHalfAndDynamicSourceEntryTrace"]
+        },
+        {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_simplify_trace.go",
@@ -179353,6 +179359,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_monomial_propagate_trace.go",
           "tests": ["TestFixedMonomialPropagationSourceTrace", "TestFixedMonomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Reached SAT gc_half and gc_dyn_psm entry TRACE plus dynamic minimum-change TRACE before clause traversal (sat_solver.cpp:1494,1519,1540)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_gc_trace.go",
+          "tests": ["TestSATGCHalfAndDynamicSourceEntryTrace"]
         },
         {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",
