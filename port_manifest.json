@@ -98149,7 +98149,8 @@
         "pkg/tactic/aig/aig_max_sharing.go",
         "pkg/tactic/aig/aig_imp_memory_trace.go",
         "pkg/tactic/aig/aig_delete_trace.go",
-        "pkg/tactic/aig/aig_expr_cache_trace.go"
+        "pkg/tactic/aig/aig_expr_cache_trace.go",
+        "pkg/tactic/aig/aig_max_sharing_trace.go"
       ],
       "tests": [
         "TestAIGCoreInterningOwnershipAndIDReuse",
@@ -98179,7 +98180,8 @@
         "TestAIGManagerSeparateImpChargesAndConstructorPrefixes",
         "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate",
         "TestAIGExprCacheReleaseTracePrecedesLastReference",
-        "TestAIGTacticConstructorFailureMemoryTracePrefixes"
+        "TestAIGTacticConstructorFailureMemoryTracePrefixes",
+        "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough"
       ],
       "conditionals": [
         {
@@ -98496,7 +98498,8 @@
           "tests": [
             "TestAIGMaxSharingReassociatesTowardExistingPair",
             "TestAIGMaxSharingUnchangedAndInvertedRoot",
-            "TestAIGMaxSharingCachesSharedOldNode"
+            "TestAIGMaxSharingCachesSharedOldNode",
+            "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough"
           ]
         },
         {
@@ -98535,6 +98538,14 @@
           ]
         },
         {
+          "name": "max_sharing process frame-index and pre-cache-reset null-result TRACE with source fallthrough",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_max_sharing_trace.go",
+          "tests": [
+            "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough"
+          ]
+        },
+        {
           "name": "delete_node aig_lit_count TRACE before node count, variable release and child deletion cascade",
           "status": "ported",
           "go_target": "pkg/tactic/aig/aig_delete_trace.go",
@@ -98565,7 +98576,8 @@
         "pkg/tactic/aig/aig_goal_formula.go",
         "pkg/tactic/aig/aig_goal_conversion_trace.go",
         "pkg/tactic/aig/aig_max_sharing.go",
-        "pkg/tactic/aig/aig_imp_memory_trace.go"
+        "pkg/tactic/aig/aig_imp_memory_trace.go",
+        "pkg/tactic/aig/aig_max_sharing_trace.go"
       ],
       "tests": [
         "TestAIGCoreInterningOwnershipAndIDReuse",
@@ -98582,7 +98594,8 @@
         "TestAIGCheckpointSourceMemoryCancelAndCooperateOrder",
         "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
         "TestAIGManagerSeparateImpChargesAndConstructorPrefixes",
-        "TestAIGTacticConstructorFailureMemoryTracePrefixes"
+        "TestAIGTacticConstructorFailureMemoryTracePrefixes",
+        "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough"
       ],
       "conditionals": [
         {
@@ -98657,7 +98670,8 @@
           "go_target": "pkg/tactic/aig/aig_max_sharing.go",
           "tests": [
             "TestAIGMaxSharingReassociatesTowardExistingPair",
-            "TestAIGMaxSharingCachesSharedOldNode"
+            "TestAIGMaxSharingCachesSharedOldNode",
+            "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough"
           ]
         },
         {
@@ -179210,7 +179224,8 @@
         "pkg/math/interval/rational_root_trace_test.go",
         "pkg/tactic/aig/aig_delete_trace.go",
         "pkg/tactic/aig/aig_expr_cache_trace.go",
-        "pkg/tactic/aig/aig_goal_conversion_trace.go"
+        "pkg/tactic/aig/aig_goal_conversion_trace.go",
+        "pkg/tactic/aig/aig_max_sharing_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -179284,7 +179299,8 @@
         "TestFixedPolynomialTraceUsesBorrowedVariablePrinter",
         "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate",
         "TestAIGExprCacheReleaseTracePrecedesLastReference",
-        "TestAIGGoalConversionCacheAndAuxTraceSourceOrder"
+        "TestAIGGoalConversionCacheAndAuxTraceSourceOrder",
+        "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough"
       ],
       "conditionals": [
         {
@@ -180650,6 +180666,14 @@
           ]
         },
         {
+          "name": "Retained max_sharing process frame-index and null-result TRACE (aig.cpp:1261,1284)",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_max_sharing_trace.go",
+          "tests": [
+            "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough"
+          ]
+        },
+        {
           "name": "Retained AIG delete_node aig_lit_count TRACE before node recycling and child cascade (aig.cpp:149)",
           "status": "ported",
           "go_target": "pkg/tactic/aig/aig_delete_trace.go",
@@ -180743,7 +180767,8 @@
         "pkg/math/interval/rational_root_trace_test.go",
         "pkg/tactic/aig/aig_delete_trace.go",
         "pkg/tactic/aig/aig_expr_cache_trace.go",
-        "pkg/tactic/aig/aig_goal_conversion_trace.go"
+        "pkg/tactic/aig/aig_goal_conversion_trace.go",
+        "pkg/tactic/aig/aig_max_sharing_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -180815,7 +180840,8 @@
         "TestFixedPolynomialTraceUsesBorrowedVariablePrinter",
         "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate",
         "TestAIGExprCacheReleaseTracePrecedesLastReference",
-        "TestAIGGoalConversionCacheAndAuxTraceSourceOrder"
+        "TestAIGGoalConversionCacheAndAuxTraceSourceOrder",
+        "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough"
       ],
       "conditionals": [
         {
@@ -182178,6 +182204,14 @@
           "go_target": "pkg/tactic/aig/aig_goal_conversion_trace.go",
           "tests": [
             "TestAIGGoalConversionCacheAndAuxTraceSourceOrder"
+          ]
+        },
+        {
+          "name": "Retained max_sharing process frame-index and null-result TRACE (aig.cpp:1261,1284)",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_max_sharing_trace.go",
+          "tests": [
+            "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough"
           ]
         },
         {

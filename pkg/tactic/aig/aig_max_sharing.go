@@ -235,13 +235,26 @@ func (p *sharingPass) process(n *node) error {
 	for len(p.frames) != 0 {
 		last := len(p.frames) - 1
 		fr := &p.frames[last]
-		if fr.next < 2 {
-			child := fr.node.children[fr.next].node
-			fr.next++
+		p.manager.traceSharingProcessing(fr.node, fr.next)
+		if fr.next == 0 {
+			fr.next = 1
+			child := fr.node.children[0].node
 			if err := p.visit(child); err != nil {
 				return err
 			}
-			continue
+			if len(p.frames) != last+1 {
+				continue
+			}
+		}
+		if fr.next == 1 {
+			fr.next = 2
+			child := fr.node.children[1].node
+			if err := p.visit(child); err != nil {
+				return err
+			}
+			if len(p.frames) != last+1 {
+				continue
+			}
 		}
 		found, err := p.cached(fr.node)
 		if err != nil {
@@ -279,6 +292,7 @@ func (m *Manager) MaxSharing(input *Ref) (out *Ref, err error) {
 		return nil, ast.ErrASTDomain
 	}
 	result := p.results[0]
+	m.traceSharingNull(result == nil)
 	p.results = nil
 	if result == nil {
 		return input.Clone()
