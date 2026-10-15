@@ -4428,9 +4428,9 @@
       "path": "src/api/api_stats.cpp",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/api/api_stats.go"],
+      "tests": ["TestAPIEstimatedAllocSizeReadsProcessCounterWithoutInitializing"],
       "assertions": [
         {
           "line": 35,
@@ -4439,9 +4439,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "Z3_get_estimated_alloc_size direct synchronized memory counter getter",
+          "status": "ported",
+          "go_target": "pkg/api/api_stats.go",
+          "tests": ["TestAPIEstimatedAllocSizeReadsProcessCounterWithoutInitializing"]
+        }
+      ],
+      "ownership": ["The API borrows the active generated process accounting owner and does not initialize memory or acquire an allocation."],
+      "deviations": ["Other statistics-object API methods in api_stats.cpp remain unported."]
     },
     {
       "path": "src/api/api_stats.h",
@@ -183644,8 +183651,8 @@
         "src/api/api_stats.cpp",
         "src/api/z3_api.h"
       ],
-      "status": "unported",
-      "tests": []
+      "status": "partial",
+      "tests": ["TestAPIEstimatedAllocSizeReadsProcessCounterWithoutInitializing"]
     },
     {
       "name": "Z3_get_finite_domain_sort_size",
