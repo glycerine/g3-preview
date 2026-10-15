@@ -25,8 +25,8 @@ type Model struct {
 	sorts           []ast.ASTHandle
 	Universes       insdict.Dict[ast.ASTHandle, *modelUniverse]
 	ownerBytes      uint64
-	copyMemoryTrace *diagnostic.TraceTags
-	copyMemoryLive  bool
+	allocationTrace *diagnostic.TraceTags
+	allocationLive  bool
 	Closed          bool
 }
 
@@ -222,7 +222,7 @@ func (md *Model) Close() error {
 	if e := md.CoreField.closeCoreMembers(); e != nil {
 		return e
 	}
-	md.traceCopyDeallocated()
+	md.traceSourceDeallocated()
 	m.Budget().Release(md.ownerBytes)
 	md.ownerBytes = 0
 	md.Closed = true

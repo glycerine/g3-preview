@@ -1,4 +1,5 @@
-// Source: src/model/model.cpp:69; src/model/model_core.h:71-75;
+// Source: src/model/model.cpp:69; src/tactic/model_converter.cpp:178;
+// src/model/model_core.h:71-75;
 // src/util/memory_manager.cpp:202-211.
 package model
 
@@ -10,17 +11,17 @@ import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
-func (md *Model) traceCopyAllocated() {
-	md.copyMemoryTrace = md.CoreField.manager.BorrowMemoryTraceTags()
-	md.copyMemoryLive = true
-	tags := md.copyMemoryTrace
+func (md *Model) traceSourceAllocated(file string, line int) {
+	md.allocationTrace = md.CoreField.manager.BorrowMemoryTraceTags()
+	md.allocationLive = true
+	tags := md.allocationTrace
 	if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
 		return
 	}
 	_ = tags.EmitConditional("memory", "allocate", "src/util/memory_manager.cpp", 209,
 		func() bool { return true }, func(w io.Writer) error {
 			for _, part := range [...]string{
-				"alloc ", fmt.Sprintf("%p", md), " src/model/model.cpp:69 model ",
+				"alloc ", fmt.Sprintf("%p", md), " ", file, ":", strconv.Itoa(line), " model ",
 				strconv.FormatUint(md.ownerBytes, 10), "\n",
 			} {
 				_, _ = io.WriteString(w, part)
@@ -29,12 +30,12 @@ func (md *Model) traceCopyAllocated() {
 		})
 }
 
-func (md *Model) traceCopyDeallocated() {
-	if !md.copyMemoryLive {
+func (md *Model) traceSourceDeallocated() {
+	if !md.allocationLive {
 		return
 	}
-	md.copyMemoryLive = false
-	tags := md.copyMemoryTrace
+	md.allocationLive = false
+	tags := md.allocationTrace
 	if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
 		return
 	}

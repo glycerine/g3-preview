@@ -72,7 +72,7 @@ func (md *Model) Copy() (copied *Model, err error) {
 	if err != nil {
 		return copied, err
 	}
-	copied.traceCopyAllocated()
+	copied.traceSourceAllocated("src/model/model.cpp", 69)
 	if err = copied.CoreField.CopyConstantInterpretations(&md.CoreField); err != nil {
 		return copied, err
 	}

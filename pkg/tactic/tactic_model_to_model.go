@@ -12,7 +12,7 @@ func ModelConverterToModel(m *ast.ASTManager, c ModelConverter, out *ModelRef) (
 	if c == nil {
 		return nil
 	}
-	md, err := model.NewModel(m)
+	md, err := model.NewConverterModel(m)
 	if err != nil {
 		return err
 	}
