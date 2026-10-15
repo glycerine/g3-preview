@@ -98135,9 +98135,14 @@
       "path": "src/tactic/aig/aig.cpp",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/aig/aig_core.go"
+      ],
+      "tests": [
+        "TestAIGCoreInterningOwnershipAndIDReuse",
+        "TestAIGCoreDuplicateStillAllocatesAndRefClones"
+      ],
       "conditionals": [
         {
           "line": 56,
@@ -98372,9 +98377,23 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "imp::mk_var, mk_node_core, delete_node and aig_ref count/identity ownership",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_core.go",
+          "tests": [
+            "TestAIGCoreInterningOwnershipAndIDReuse",
+            "TestAIGCoreDuplicateStillAllocatesAndRefClones"
+          ]
+        }
+      ],
+      "ownership": [
+        "Concrete AIG manager pins each variable AST expression, owns true/false counts and interning table nodes, and recursively releases child nodes when the last AIG reference closes."
+      ],
+      "deviations": [
+        "Typed Go map replaces aig_table; literal inversion is a bool rather than pointer tagging. Full mk_node simplification and the tactic/proof/goal traversal remain unported."
+      ]
     },
     {
       "path": "src/tactic/aig/aig.h",
@@ -119883,6 +119902,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/aig/aig_core.go",
         "pkg/math/polynomial/polynomial_cache.go",
         "pkg/math/polynomial/polynomial_monomial_table.go",
         "pkg/ast/ast_activity_cache.go",
@@ -119891,6 +119911,8 @@
         "pkg/math/polynomial/polynomial_monomial_table_native_test.go"
       ],
       "tests": [
+        "TestAIGCoreInterningOwnershipAndIDReuse",
+        "TestAIGCoreDuplicateStillAllocatesAndRefClones",
         "TestMonomialSourceConstructorAndInterning",
         "TestMonomialIndependentProductDivisionGCD",
         "TestMonomialSourceVariableSortPowerAndDerivative",
@@ -120142,10 +120164,19 @@
           ]
         },
         {
-          "name": "Remaining concrete table owners: tactic/aig/aig.cpp:95 aig* interning; nlsat/nlsat_solver.cpp:47-48 ineq_atom* and root_atom* interning; smt/smt_cg_table.h:135,172,207,217 enode* congruence tables; util/obj_pair_set.h:35 SMT conflict-resolution enode pairs. Port each owner's insert/find/erase, reset, traversal and lifetime with native typed Go containers; source bucket/cellar growth, collision counters and iterator mechanics do not require a universal adapter",
+          "name": "Remaining concrete table owners: nlsat/nlsat_solver.cpp:47-48 ineq_atom* and root_atom* interning; smt/smt_cg_table.h:135,172,207,217 enode* congruence tables; util/obj_pair_set.h:35 SMT conflict-resolution enode pairs. Port each owner's insert/find/erase, reset, traversal and lifetime with native typed Go containers; source bucket/cellar growth, collision counters and iterator mechanics do not require a universal adapter",
           "status": "unported",
           "go_target": "",
           "tests": []
+        },
+        {
+          "name": "AIG aig* insert-if-absent, identity lookup and erase in mk_node_core/delete_node with literal-sign-aware keys and owning child references",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/aig/aig_core.go",
+          "tests": [
+            "TestAIGCoreInterningOwnershipAndIDReuse",
+            "TestAIGCoreDuplicateStillAllocatesAndRefClones"
+          ]
         },
         {
           "name": "polynomial cache canonical, PSC-chain and factor table specializations use typed Go hash buckets/maps with source canonical keys and owner-held results; C++ table geometry and iterators are replaced",
@@ -120237,7 +120268,7 @@
         "AST canonical nodes use native hash buckets plus insertion-ordered entries and borrow generation-checked node tokens. FPA buckets borrow owned numeral IDs and retain project MPF hash/equality. Monomial entries borrow exact keys during stable temporary publication; no generic C++ primary/cellar/free-list storage remains in Go."
       ],
       "deviations": [
-        "The removed generic/int32 Go table's charged cellar layout, synthetic capacity and swap behavior are historical only. Retained Go consumers use native maps, slices and insdict while keeping project hash/equality and ownership rules. The Z3DEBUG pointer-visited check_invariant at chashtable.h:547-566 traverses only the retired C++ cell chains and is a platform replacement, not an outstanding generic Go adapter. The polynomial cache's three concrete tables use native maps/hash buckets and source canonical keys; AIG, NLSAT, SMT and object-pair consumer specializations remain open."
+        "The removed generic/int32 Go table's charged cellar layout, synthetic capacity and swap behavior are historical only. Retained Go consumers use native maps, slices and insdict while keeping project hash/equality and ownership rules. The Z3DEBUG pointer-visited check_invariant at chashtable.h:547-566 traverses only the retired C++ cell chains and is a platform replacement, not an outstanding generic Go adapter. The polynomial cache and AIG concrete tables use native maps and source canonical keys; NLSAT, SMT and object-pair consumer specializations remain open."
       ]
     },
     {
