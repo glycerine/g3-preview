@@ -233,6 +233,7 @@ func (c *FastContext) NewChild(parent *FastNode) (*FastNode, error) {
 	if err != nil {
 		return nil, err
 	}
+	child.id = uint32(len(c.nodes))
 	c.nodes = append(c.nodes, child)
 	c.leafQueue = append(c.leafQueue, child)
 	child.queuedLeaf = true

@@ -49,6 +49,7 @@ type FastNode struct {
 	owned        []*FastBound
 	trail        *FastBound
 	children     uint32
+	id           uint32
 	depth        uint32
 	queuedLeaf   bool
 	context      *FastContext
