@@ -48,3 +48,24 @@ func TestSMT2LocalSymbolTableNestedAndRepeatedBindings(t *testing.T) {
 	env.insert(x, smt2Local{level: 8})
 	check(x, 8, true)
 }
+
+func TestSMT2LocalSymbolTableResetDiscardsOpenScopes(t *testing.T) {
+	var env smt2LocalEnv
+	x, y := symbol.Numerical(1), symbol.Numerical(2)
+	env.insert(x, smt2Local{level: 1})
+	env.beginScope()
+	env.insert(x, smt2Local{level: 2})
+	env.insert(y, smt2Local{level: 3})
+	env.reset()
+	if env.contains(x) || env.contains(y) || len(env.trail) != 0 || len(env.limits) != 0 {
+		t.Fatal("reset retained a binding or an open scope")
+	}
+	if err := env.endScope(); !errors.Is(err, errSMT2LocalScope) {
+		t.Fatal("reset retained an endable scope", err)
+	}
+	env.beginScope()
+	env.insert(y, smt2Local{level: 4})
+	if err := env.endScope(); err != nil || env.contains(y) {
+		t.Fatal("fresh scope after reset", err)
+	}
+}

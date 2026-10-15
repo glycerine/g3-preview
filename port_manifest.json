@@ -178740,7 +178740,13 @@
           "tests": ["TestSMT2LocalSymbolTableNestedAndRepeatedBindings"]
         },
         {
-          "name": "Parser-local reset/append/get_dom/get_range/get_scope_level have no direct production call; AST family enumeration is credited separately",
+          "name": "SMT2 parser local<expr*,level> reset discards bindings and open scopes at smt2parser.cpp:3003",
+          "status": "partial",
+          "go_target": "pkg/smtcore/smt2_local_env.go",
+          "tests": ["TestSMT2LocalSymbolTableResetDiscardsOpenScopes"]
+        },
+        {
+          "name": "Parser-local append/get_dom/get_range/get_scope_level have no direct production call; AST family enumeration is credited separately",
           "status": "reference_only",
           "tests": []
         }

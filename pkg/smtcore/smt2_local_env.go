@@ -32,6 +32,14 @@ type smt2LocalEnv struct {
 	limits   []int
 }
 
+// reset is reached when the parser releases its current command state. It
+// discards both bindings and scope history, so a later parse starts fresh.
+func (e *smt2LocalEnv) reset() {
+	e.bindings = nil
+	e.trail = nil
+	e.limits = nil
+}
+
 func (e *smt2LocalEnv) find(name symbol.Symbol) (smt2Local, bool) {
 	v, ok := e.bindings[name]
 	return v, ok
