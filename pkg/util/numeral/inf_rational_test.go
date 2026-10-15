@@ -611,6 +611,29 @@ func infAuditRoots(t *testing.T, s *RationalService, inf []*OwnedInfRational, ra
 	}
 	qopsAuditLiveOwnership(t, s.Manager, roots)
 }
+func TestInfFromInt32SourceConstructor(t *testing.T) {
+	s, _ := serviceNew(t)
+	for _, tc := range []struct {
+		input int32
+		text  string
+	}{
+		{0, "0"},
+		{1, "1"},
+		{-1, "-1"},
+		{-1 << 31, "-2147483648"},
+		{1<<31 - 1, "2147483647"},
+	} {
+		value, err := s.InfFromInt32(tc.input)
+		serviceMust(t, err)
+		got, err := s.InfString(&value)
+		serviceMust(t, err)
+		if got != tc.text {
+			t.Fatalf("inf_rational(%d): got %q, want %q", tc.input, got, tc.text)
+		}
+		serviceMust(t, s.InfDel(&value))
+	}
+}
+
 func TestInfFromRationalOwnsIndependentFirst(t *testing.T) {
 	s, _ := serviceNew(t)
 	input := serviceValue(t, s, "123456789012345678901/37")

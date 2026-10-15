@@ -103,6 +103,25 @@ func (s *RationalService) NewInfValue() (OwnedInfRational, error) {
 	return s.infEmpty(), nil
 }
 
+// InfFromInt32 follows inf_rational(int): construct FIRST from the integer,
+// then complete a default zero EPS member without copying a temporary value.
+func (s *RationalService) InfFromInt32(n int32) (_lexOut OwnedInfRational, _lexErr error) {
+	if e := s.lock(); e != nil {
+		return OwnedInfRational{}, e
+	}
+	defer s.mu.Unlock()
+	if e := s.beginLexical(); e != nil {
+		return OwnedInfRational{}, e
+	}
+	defer s.endLexicalInf(&_lexOut, &_lexErr)
+	v := s.infEmpty()
+	if e := s.Manager.SetInt64(&v.First, int64(n)); e != nil {
+		s.abortLexicalRational(&v.First)
+		return OwnedInfRational{}, e
+	}
+	return v, nil
+}
+
 // InfFromRational constructs m_first from the source value, then resets the
 // default-constructed infinitesimal member, as in inf_rational(rational const&).
 func (s *RationalService) InfFromRational(r *OwnedRational) (_lexOut OwnedInfRational, _lexErr error) {
