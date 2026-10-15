@@ -64,6 +64,14 @@ func (p *Pass) BindCooperation(owner *cooperate.Cooperation) error {
 	return nil
 }
 
+func (p *Pass) closeManager(m *Manager) error {
+	if err := m.Close(); err != nil {
+		return err
+	}
+	m.traceTacticDeallocated()
+	return nil
+}
+
 func (p *Pass) rewriteOne(m *Manager, g *tactic.Goal, i uint32) (err error) {
 	form, err := g.Form(i)
 	if err != nil {
@@ -174,18 +182,19 @@ func (p *Pass) Apply(g *tactic.Goal) (out *tactic.Goal, err error) {
 	if err != nil {
 		return nil, err
 	}
+	m.traceTacticAllocated()
 	if err = m.SetMaxMemory(p.maxMemory); err != nil {
-		return nil, errors.Join(err, m.Close())
+		return nil, errors.Join(err, p.closeManager(m))
 	}
 	if p.cooperation != nil {
 		if err = m.BindCooperation(p.cooperation); err != nil {
-			return nil, errors.Join(err, m.Close())
+			return nil, errors.Join(err, p.closeManager(m))
 		}
 	}
 	if err = p.rewriteGoal(m, g); err != nil {
-		return nil, errors.Join(err, m.Close())
+		return nil, errors.Join(err, p.closeManager(m))
 	}
-	if err = m.Close(); err != nil {
+	if err = p.closeManager(m); err != nil {
 		return nil, err
 	}
 	if err = g.IncDepth(); err != nil {

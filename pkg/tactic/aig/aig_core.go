@@ -78,6 +78,7 @@ type Manager struct {
 	maxMemory           uint64
 	runtime             *memory.Runtime
 	cooperation         *cooperate.Cooperation
+	tacticTraceLive     bool
 }
 
 // Ref owns one source aig_ref count. Call Close for each returned reference.

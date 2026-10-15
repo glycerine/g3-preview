@@ -98633,13 +98633,15 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/tactic/aig/aig_tactic.go"
+        "pkg/tactic/aig/aig_tactic.go",
+        "pkg/tactic/aig/aig_tactic_memory_trace.go"
       ],
       "tests": [
         "TestAIGPassPerAssertionPreservesDependenciesAndDepth",
         "TestAIGPassWholeGoalCombinesAndRejectsCore",
         "TestAIGPassRejectsProofBeforeGoalMutation",
-        "TestAIGPassParamsBindMemoryEncodingAndWholeGoalBranch"
+        "TestAIGPassParamsBindMemoryEncodingAndWholeGoalBranch",
+        "TestAIGTacticMemoryWrapperSourceAllocationAndRelease"
       ],
       "assertions": [
         {
@@ -98671,13 +98673,21 @@
           "tests": [
             "TestAIGPassParamsBindMemoryEncodingAndWholeGoalBranch"
           ]
+        },
+        {
+          "name": "mk_aig_manager source alloc/dealloc wrapper over concrete per-application AIG manager",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_tactic_memory_trace.go",
+          "tests": [
+            "TestAIGTacticMemoryWrapperSourceAllocationAndRelease"
+          ]
         }
       ],
       "ownership": [
         "Each Apply call owns a fresh AIG manager and closes its intermediate AIG and AST references after goal updates. The returned goal has one additional owner reference."
       ],
       "deviations": [
-        "Pass reads source max_memory, gate-encoding and per-assertion parameters, and binds memory/cancellation/cooperation checkpoints to its fresh AIG manager. Translation, parameter descriptor, generated registration, display and checked well-sorted assertions remain open."
+        "Pass reads source max_memory, gate-encoding and per-assertion parameters, and binds memory/cancellation/cooperation checkpoints to its fresh AIG manager. The tactic's alloc/dealloc memory wrapper now traces its charged manager owner on successful construction and close. Constructor-refusal wrapper records, the separate aig_manager::imp allocation, translation, parameter descriptor, generated registration, display and checked well-sorted assertions remain open."
       ]
     },
     {
@@ -150847,7 +150857,8 @@
         "pkg/model/model_interpretation_owners.go",
         "pkg/model/model_evaluator_function_memory_trace.go",
         "pkg/model/model_evaluator_function_memory_trace_debug_test.go",
-        "pkg/model/model_copy.go"
+        "pkg/model/model_copy.go",
+        "pkg/tactic/aig/aig_tactic_memory_trace.go"
       ],
       "tests": [
         "TestRuntimeUint32AcrossInitializationBitmapBoundary",
@@ -150953,7 +150964,8 @@
         "TestASTInfoMemoryWrapperRegisteredSortAndDecl",
         "TestASTInfoMemoryWrapperDebugRetainsSourceAllocation",
         "TestModelEvaluatorCompletedFunctionMemoryWrapperReleaseSites",
-        "TestModelCopiedFunctionMemoryWrapperOwnerTransfer"
+        "TestModelCopiedFunctionMemoryWrapperOwnerTransfer",
+        "TestAIGTacticMemoryWrapperSourceAllocationAndRelease"
       ],
       "conditionals": [
         {
@@ -151536,6 +151548,14 @@
           "tests": [
             "TestModelCopiedFunctionMemoryWrapperOwnerTransfer"
           ]
+        },
+        {
+          "name": "Retained AIG tactic alloc(aig_manager) at aig_tactic.cpp:34 and dealloc at line 39 over the charged concrete Go manager owner",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/aig/aig_tactic_memory_trace.go",
+          "tests": [
+            "TestAIGTacticMemoryWrapperSourceAllocationAndRelease"
+          ]
         }
       ],
       "ownership": [
@@ -151648,7 +151668,8 @@
         "pkg/model/model_interpretation_owners.go",
         "pkg/model/model_evaluator_function_memory_trace.go",
         "pkg/model/model_evaluator_function_memory_trace_debug_test.go",
-        "pkg/model/model_copy.go"
+        "pkg/model/model_copy.go",
+        "pkg/tactic/aig/aig_tactic_memory_trace.go"
       ],
       "tests": [
         "TestASTDeclCollectorDependencySetMemoryTrace",
@@ -151739,7 +151760,8 @@
         "TestASTInfoMemoryWrapperRegisteredSortAndDecl",
         "TestASTInfoMemoryWrapperDebugRetainsSourceAllocation",
         "TestModelEvaluatorCompletedFunctionMemoryWrapperReleaseSites",
-        "TestModelCopiedFunctionMemoryWrapperOwnerTransfer"
+        "TestModelCopiedFunctionMemoryWrapperOwnerTransfer",
+        "TestAIGTacticMemoryWrapperSourceAllocationAndRelease"
       ],
       "conditionals": [
         {
@@ -152273,6 +152295,14 @@
           "go_target": "pkg/model/model_evaluator_function_memory_trace.go",
           "tests": [
             "TestModelCopiedFunctionMemoryWrapperOwnerTransfer"
+          ]
+        },
+        {
+          "name": "Retained AIG tactic alloc(aig_manager) at aig_tactic.cpp:34 and dealloc at line 39 over the charged concrete Go manager owner",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/aig/aig_tactic_memory_trace.go",
+          "tests": [
+            "TestAIGTacticMemoryWrapperSourceAllocationAndRelease"
           ]
         }
       ],
