@@ -159405,12 +159405,22 @@
         },
         {
           "name": "original void div(a,b,out) integer quotient with caller-local receiver and exact negative-division child context (src/util/rational.h:182-184; src/util/mpq.h:523-527; src/util/mpz.h:468-485)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/rational_service_invocation.go",
           "tests": [
             "TestRationalServiceIDivIntoInvocationAliasesAndInline",
             "TestRationalServiceIDivIntoInvocationEveryActualReservation",
-            "TestRationalServiceIDivIntoInvocationActualTransportRefusesHeldOwner"
+            "TestRationalServiceIDivIntoInvocationActualTransportRefusesHeldOwner",
+            "TestASTBitVectorExtractNumeralsEveryActualReservation",
+            "TestASTBlastEqualityPhysicalDivisionAndRemainderLifetimes",
+            "TestASTBitVectorLogicalShiftsEveryActualReservation",
+            "TestASTBitVectorArithmeticShiftEveryActualReservation"
+          ],
+          "go_targets": [
+            "pkg/ast/ast_bv_extract_numerals_test.go",
+            "pkg/ast/ast_bv_blast_eq_numerals_test.go",
+            "pkg/ast/ast_bv_logical_shift_numerals_test.go",
+            "pkg/ast/ast_bv_arithmetic_shift_numerals_test.go"
           ]
         },
         {
@@ -164246,12 +164256,22 @@
         },
         {
           "name": "original void div(a,b,out) integer quotient with caller-local receiver and exact negative-division child context (src/util/rational.h:182-184; src/util/mpq.h:523-527; src/util/mpz.h:468-485)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpz_div.go",
           "tests": [
             "TestRationalServiceIDivIntoInvocationAliasesAndInline",
             "TestRationalServiceIDivIntoInvocationEveryActualReservation",
-            "TestRationalServiceIDivIntoInvocationActualTransportRefusesHeldOwner"
+            "TestRationalServiceIDivIntoInvocationActualTransportRefusesHeldOwner",
+            "TestASTBitVectorExtractNumeralsEveryActualReservation",
+            "TestASTBlastEqualityPhysicalDivisionAndRemainderLifetimes",
+            "TestASTBitVectorLogicalShiftsEveryActualReservation",
+            "TestASTBitVectorArithmeticShiftEveryActualReservation"
+          ],
+          "go_targets": [
+            "pkg/ast/ast_bv_extract_numerals_test.go",
+            "pkg/ast/ast_bv_blast_eq_numerals_test.go",
+            "pkg/ast/ast_bv_logical_shift_numerals_test.go",
+            "pkg/ast/ast_bv_arithmetic_shift_numerals_test.go"
           ]
         },
         {
