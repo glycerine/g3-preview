@@ -17330,7 +17330,7 @@
       "path": "src/ast/macro_substitution.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
       "assertions": [
@@ -17375,17 +17375,17 @@
           "text": "SASSERT(!is_app_of(lhs, f) || !is_app_of(rhs, f));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Dead-source audit: recursive searches of retained src/ find no include, construction, or use of macro_substitution outside its own declaration and definition. The only other occurrence is the CMake compilation entry. No retained consumer reaches its util/ref_util.h cleanup specializations; the unused pkg/ast/cppsrc/ast reference mirror is deleted."]
     },
     {
       "path": "src/ast/macro_substitution.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -17398,11 +17398,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Dead-source audit: recursive searches of retained src/ find no include, construction, or use of macro_substitution outside its own declaration and definition. The only other occurrence is the CMake compilation entry. No retained consumer reaches its util/ref_util.h cleanup specializations; the unused pkg/ast/cppsrc/ast reference mirror is deleted."]
     },
     {
       "path": "src/ast/macros/CMakeLists.txt",
@@ -171786,6 +171786,11 @@
             "TestASTExprMapStoppedProofCleanupPrecedesExpressionEntries",
             "TestASTExprMapStoppedValueCleanupKeepsConsumedKeyProgress"
           ]
+        },
+        {
+          "name": "macro_substitution dec_ref_map_key_values and dec_ref_map_values have no retained owner (src/ast/macro_substitution.cpp:60-65)",
+          "status": "dead_deleted",
+          "tests": []
         },
         {
           "name": "Remaining live concrete keys-only, values-only, key/value and collection cleanup in other AST, tactic, SMT, API and subpaving consumers",
