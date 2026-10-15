@@ -167402,7 +167402,8 @@
             "TestParamsReferenceProvenanceBeforeMutation",
             "TestParamsReferenceCStringPrefix",
             "TestParamsReferenceCopyStopsAtMatchedNumeralDestruction",
-            "TestParamsReferenceCopyStoppedReplacementOwningAbort"
+            "TestParamsReferenceCopyStoppedReplacementOwningAbort",
+            "TestParamsReferenceCopyMatchedNumeralAllocationRefusal"
           ]
         },
         {
@@ -168044,7 +168045,8 @@
             "TestParamsReferenceProvenanceBeforeMutation",
             "TestParamsReferenceCStringPrefix",
             "TestParamsReferenceCopyStopsAtMatchedNumeralDestruction",
-            "TestParamsReferenceCopyStoppedReplacementOwningAbort"
+            "TestParamsReferenceCopyStoppedReplacementOwningAbort",
+            "TestParamsReferenceCopyMatchedNumeralAllocationRefusal"
           ]
         },
         {

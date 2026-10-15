@@ -159,3 +159,58 @@ func TestParamsReferenceCopyStoppedReplacementOwningAbort(t *testing.T) {
 	paramsMust(t, c.Del(&dst))
 	paramsMust(t, c.Del(&src))
 }
+
+// A matched rational copy writes into the existing entry. If its numerator
+// allocation refuses, the destination owns the failed numeral until deletion;
+// the source and an earlier completed copy step remain intact.
+func TestParamsReferenceCopyMatchedNumeralAllocationRefusal(t *testing.T) {
+	c, sy, q := paramsTestOwner(t)
+	src, e := c.NewValue()
+	paramsMust(t, e)
+	dst, e := c.NewValue()
+	paramsMust(t, e)
+	before := internSymbol(t, sy, "before")
+	key := internSymbol(t, sy, "number")
+	paramsMust(t, c.SetBool(&src, before, true))
+
+	scoped, e := unumeral.NewScopedInt(q.Manager.Z)
+	paramsMust(t, e)
+	num, e := scoped.Get()
+	paramsMust(t, e)
+	digits := make([]uint32, 32768)
+	digits[0], digits[len(digits)-1] = 17, 1
+	paramsMust(t, q.Manager.Z.SetLimbs(num, digits))
+	big, e := q.NewFromScopedInt(scoped)
+	paramsMust(t, e)
+	paramsMust(t, scoped.Close())
+	paramsMust(t, c.SetRat(&src, key, &big))
+	paramsMust(t, q.Del(&big))
+	zero, e := q.NewValue()
+	paramsMust(t, e)
+	paramsMust(t, c.SetRat(&dst, key, &zero))
+	paramsMust(t, q.Del(&zero))
+	sourceNumerator := c.Entry(&c.Blocks[src.Slot-1], 1).Rat.Raw.Num.Cell
+
+	q.Manager.Z.BudgetField.FailAfter(0)
+	e = c.Copy(&dst, &src)
+	q.Manager.Z.BudgetField.FailAfter(-1)
+	if e == nil {
+		t.Fatal("matched numeral did not reach numerator allocation", e)
+	}
+	entry := c.Entry(&c.Blocks[dst.Slot-1], 0)
+	if entry.Kind != ParamNumeral || entry.Rat.Raw.Num.Cell != q.Manager.Z.FailedNullRef {
+		t.Fatal("refusal did not retain the matched numeral's failed numerator", entry.Kind, entry.Rat.Raw.Num.Cell)
+	}
+	if got, err := c.GetBool(&dst, before, false); err != nil || !got {
+		t.Fatal("completed copy prefix", got, err)
+	}
+	sourceEntry := c.Entry(&c.Blocks[src.Slot-1], 1)
+	if sourceEntry.Rat.Raw.Num.Cell != sourceNumerator {
+		t.Fatal("source numeral changed during failed copy")
+	}
+	if rational, err := q.IsRational(&sourceEntry.Rat); err != nil || !rational {
+		t.Fatal("source numeral became unreadable", rational, err)
+	}
+	paramsMust(t, c.Del(&dst))
+	paramsMust(t, c.Del(&src))
+}
