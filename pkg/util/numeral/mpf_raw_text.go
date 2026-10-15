@@ -13,9 +13,6 @@ func (m *ArbitraryFloatManager) RawString(x *ArbitraryFloat) (string, error) {
 	if e := m.valueGuard(x); e != nil {
 		return "", e
 	}
-	if m.rawString.active {
-		return "", ErrNumericPending
-	}
 	formatInvocation := m.integer.Natural.Formatting.invocation
 	characterInvocation := m.integer.Natural.CharFormatting.invocation
 	significand, e := m.integer.String(&x.significand)

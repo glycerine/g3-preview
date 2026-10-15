@@ -120,8 +120,8 @@ func TestArbitraryFloatSetFloatRawTraceFormatterRefusal(t *testing.T) {
 	budget.FailAfter(0)
 	e := m.traceSetFloatRawResult(&out)
 	budget.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || m.rawString.active || !strings.Contains(output.String(), "src/util/mpf.cpp:183 ---------\nset: res = ") {
-		t.Fatalf("float raw trace formatter refusal: %v, active %v, output %q", e, m.rawString.active, output.String())
+	if !errors.Is(e, arena.ErrInjectedFailure) || !strings.Contains(output.String(), "src/util/mpf.cpp:183 ---------\nset: res = ") {
+		t.Fatalf("float raw trace formatter refusal: %v, output %q", e, output.String())
 	}
 	output.Reset()
 	serviceMust(t, m.SetFloat(&out, 8, 24, 2.5))

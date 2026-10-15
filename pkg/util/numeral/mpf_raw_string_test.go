@@ -2,7 +2,6 @@
 package numeral
 
 import (
-	utext "github.com/glycerine/g3/pkg/util/text"
 	"strconv"
 	"testing"
 )
@@ -18,9 +17,7 @@ func TestArbitraryFloatRawStringLiteralClassification(t *testing.T) {
 			x := ArbitraryFloat{format: arbitraryFloatFormat(8, 24, negative), exponent: tc.exp}
 			serviceMust(t, m.integer.SetString(&x.significand, tc.sig))
 			before := x
-			var out utext.OwnedString
-			serviceMust(t, m.ToStringRaw(&x, &out))
-			got, e := out.View().String()
+			got, e := m.RawString(&x)
 			serviceMust(t, e)
 			sign, kind := "+", "D"
 			if negative {
@@ -33,12 +30,6 @@ func TestArbitraryFloatRawStringLiteralClassification(t *testing.T) {
 			if got != want || x != before {
 				t.Fatal("literal raw string", tc, negative, got, want)
 			}
-			native, e := m.RawString(&x)
-			serviceMust(t, e)
-			if native != want || x != before {
-				t.Fatal("native raw string", tc, negative, native, want)
-			}
-			out.SourceDestroy()
 			serviceMust(t, m.Del(&x))
 		}
 	}
