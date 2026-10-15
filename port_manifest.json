@@ -126364,6 +126364,7 @@
       "go_targets": [
         "pkg/util/numeral/inf_approx_raw_test.go",
         "pkg/util/numeral/inf_eps_rational.go",
+        "pkg/util/numeral/inf_stream.go",
         "pkg/util/numeral/inf_scalar_projection_test.go",
         "pkg/util/numeral/mp_lexical_constructor_test.go",
         "pkg/util/numeral/mp_lexical_scope_test.go",
@@ -126374,6 +126375,7 @@
         "pkg/util/numeral/inf_muldiv_entry_source_test.go"
       ],
       "tests": [
+        "TestInfinitesimalSourceWholeStringStreamInsertion",
         "TestInfEpsInfFiniteTripleOracles",
         "TestInfEpsInfSourceQuirksAndHeader",
         "TestInfEpsInfConstantsPredicatesAndMixedRoutes",
@@ -126487,6 +126489,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "inf_eps_rational<inf_rational> ostream insertion of one complete to_string result (h431-435)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_stream.go",
+          "tests": ["TestInfinitesimalSourceWholeStringStreamInsertion"]
+        },
         {
           "name": "hash_proc and eq_proc wrappers have no retained production instantiation",
           "status": "reference_only"
@@ -126869,6 +126877,7 @@
       "go_targets": [
         "pkg/util/numeral/inf_approx_raw_test.go",
         "pkg/util/numeral/inf_int_rational.go",
+        "pkg/util/numeral/inf_stream.go",
         "pkg/util/numeral/inf_scalar_projection_test.go",
         "pkg/util/numeral/mp_lexical_constructor_test.go",
         "pkg/util/numeral/mp_lexical_scope_test.go",
@@ -126879,6 +126888,7 @@
         "pkg/util/numeral/inf_muldiv_entry_source_test.go"
       ],
       "tests": [
+        "TestInfinitesimalSourceWholeStringStreamInsertion",
         "TestInfIntRationalSourceConstructorsConstantsLifetime",
         "TestInfIntRationalIndependentArithmeticAndAliases",
         "TestInfIntRationalOverflowSourcePrefixesAndScalarDomain",
@@ -127002,6 +127012,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "inf_int_rational ostream insertion of one complete to_string result (h374-378)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_stream.go",
+          "tests": ["TestInfinitesimalSourceWholeStringStreamInsertion"]
+        },
         {
           "name": "hash_proc and eq_proc wrappers have no retained production instantiation",
           "status": "reference_only"
@@ -127403,6 +127419,7 @@
         "pkg/util/numeral/inf_approx_raw_test.go",
         "pkg/util/numeral/inf_guard_profile_test.go",
         "pkg/util/numeral/inf_rational.go",
+        "pkg/util/numeral/inf_stream.go",
         "pkg/util/numeral/inf_scalar_projection_test.go",
         "pkg/util/numeral/mp_lexical_scope_test.go",
         "pkg/util/numeral/mp_raw_projection_test.go",
@@ -127412,6 +127429,7 @@
         "pkg/util/numeral/inf_muldiv_entry_source_test.go"
       ],
       "tests": [
+        "TestInfinitesimalSourceWholeStringStreamInsertion",
         "TestInfRationalSource80Assertions",
         "TestInfRationalApproximationFrozenBranches",
         "TestInfRationalOwnershipErrors",
@@ -127547,6 +127565,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "inf_rational ostream insertion of one complete to_string result (h459-463)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_stream.go",
+          "tests": ["TestInfinitesimalSourceWholeStringStreamInsertion"]
+        },
         {
           "name": "all active constructors, assignment, reset, swap, destruction and constants",
           "status": "partial",
