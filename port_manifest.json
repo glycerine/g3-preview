@@ -98392,7 +98392,9 @@
         "pkg/tactic/aig/aig_imp_memory_trace.go",
         "pkg/tactic/aig/aig_delete_trace.go",
         "pkg/tactic/aig/aig_expr_cache_trace.go",
-        "pkg/tactic/aig/aig_max_sharing_trace.go"
+        "pkg/tactic/aig/aig_max_sharing_trace.go",
+        "pkg/tactic/aig/aig_display.go",
+        "pkg/tactic/aig/aig_display_test.go"
       ],
       "tests": [
         "TestAIGCoreInterningOwnershipAndIDReuse",
@@ -98422,6 +98424,7 @@
         "TestAIGManagerSeparateImpChargesAndConstructorPrefixes",
         "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate",
         "TestAIGExprCacheReleaseTracePrecedesLastReference",
+        "TestAIGDisplaySourceBreadthFirstAndInvertedRoot",
         "TestAIGTacticConstructorFailureMemoryTracePrefixes",
         "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
         "TestAIGMaxSharingTryingTraceAllFourReassociationBranches",
@@ -98808,6 +98811,22 @@
           ]
         },
         {
+          "name": "aig_manager::display and imp::display source breadth-first AIG references, gate edges and shared variable expressions (aig.cpp:1561-1591,1739-1741); selected Boolean SMT2 variable profile",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_display.go",
+          "tests": [
+            "TestAIGDisplaySourceBreadthFirstAndInvertedRoot"
+          ]
+        },
+        {
+          "name": "max_sharing improved and result TRACE display after successful reassociation and source cache reset (aig.cpp:1144,1162,1189,1207,1295); selected Boolean variable profile",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_max_sharing_trace.go",
+          "tests": [
+            "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough"
+          ]
+        },
+        {
           "name": "max_sharing process frame-index and pre-cache-reset null-result TRACE with source fallthrough",
           "status": "ported",
           "go_target": "pkg/tactic/aig/aig_max_sharing_trace.go",
@@ -98847,7 +98866,8 @@
         "pkg/tactic/aig/aig_goal_conversion_trace.go",
         "pkg/tactic/aig/aig_max_sharing.go",
         "pkg/tactic/aig/aig_imp_memory_trace.go",
-        "pkg/tactic/aig/aig_max_sharing_trace.go"
+        "pkg/tactic/aig/aig_max_sharing_trace.go",
+        "pkg/tactic/aig/aig_display.go"
       ],
       "tests": [
         "TestAIGCoreInterningOwnershipAndIDReuse",
@@ -98867,6 +98887,7 @@
         "TestAIGTacticConstructorFailureMemoryTracePrefixes",
         "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
         "TestAIGMaxSharingTryingTraceAllFourReassociationBranches",
+        "TestAIGDisplaySourceBreadthFirstAndInvertedRoot",
         "TestAIGGoalConversionMissingCacheConditionalTrace"
       ],
       "conditionals": [
@@ -98946,6 +98967,14 @@
             "TestAIGMaxSharingCachesSharedOldNode",
             "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
             "TestAIGMaxSharingTryingTraceAllFourReassociationBranches"
+          ]
+        },
+        {
+          "name": "aig_manager::display(aig_ref const&) source breadth-first AIG reference and node listing (aig.h:73); selected Boolean SMT2 variable profile",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_display.go",
+          "tests": [
+            "TestAIGDisplaySourceBreadthFirstAndInvertedRoot"
           ]
         },
         {
@@ -181077,6 +181106,15 @@
           ]
         },
         {
+          "name": "Selected AIG max_sharing improved/result TRACE uses source breadth-first display after successful reassociation and cache reset (aig.cpp:1144,1162,1189,1207,1295); wider AST variable profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_max_sharing_trace.go",
+          "tests": [
+            "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
+            "TestAIGDisplaySourceBreadthFirstAndInvertedRoot"
+          ]
+        },
+        {
           "name": "Retained max_sharing process frame-index and null-result TRACE (aig.cpp:1261,1284)",
           "status": "ported",
           "go_target": "pkg/tactic/aig/aig_max_sharing_trace.go",
@@ -182641,6 +182679,15 @@
           "go_target": "pkg/tactic/aig/aig_max_sharing_trace.go",
           "tests": [
             "TestAIGMaxSharingTryingTraceAllFourReassociationBranches"
+          ]
+        },
+        {
+          "name": "Selected AIG max_sharing improved/result TRACE uses source breadth-first display after successful reassociation and cache reset (aig.cpp:1144,1162,1189,1207,1295); wider AST variable profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_max_sharing_trace.go",
+          "tests": [
+            "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
+            "TestAIGDisplaySourceBreadthFirstAndInvertedRoot"
           ]
         },
         {

@@ -133,6 +133,9 @@ func (p *sharingPass) tryLeft(old *node, n Literal) (bool, error) {
 				buildErr = p.saveResult(old, outer)
 			}
 			closeErr := pin.Close()
+			if buildErr == nil && closeErr == nil {
+				buildErr = m.traceSharingImproved(old, outer, true, i == 1)
+			}
 			return true, errors.Join(buildErr, closeErr)
 		}
 		if err = pin.Close(); err != nil {
@@ -170,6 +173,9 @@ func (p *sharingPass) tryRight(old *node, n Literal) (bool, error) {
 				buildErr = p.saveResult(old, outer)
 			}
 			closeErr := pin.Close()
+			if buildErr == nil && closeErr == nil {
+				buildErr = m.traceSharingImproved(old, outer, false, i == 1)
+			}
 			return true, errors.Join(buildErr, closeErr)
 		}
 		if err = pin.Close(); err != nil {
@@ -301,13 +307,23 @@ func (m *Manager) MaxSharing(input *Ref) (out *Ref, err error) {
 	result := p.results[0]
 	m.traceSharingNull(result == nil)
 	p.results = nil
-	if result == nil {
-		return input.Clone()
+	if err = p.cleanup(); err != nil {
+		if result != nil {
+			err = errors.Join(err, result.Close())
+		}
+		return nil, err
 	}
-	if l.inverted {
+	if result == nil {
+		out, err = input.Clone()
+	} else if l.inverted {
 		out, err = result.Not()
 		err = errors.Join(err, result.Close())
+	} else {
+		out = result
+	}
+	if err != nil {
 		return out, err
 	}
-	return result, nil
+	err = m.traceSharingResult(out.lit)
+	return out, err
 }

@@ -25,6 +25,7 @@ func TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough(t *testing.T) {
 	tags := diagnostic.NewTraceTagsWithWriter(&output)
 	m, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: symbols, Numerals: numbers, Budget: budget, TraceTags: tags})
 	aigMust(t, err)
+	closeParams := aigTestBindSMT2Params(t, symbols, numbers, budget)
 	tags.Enable("max_sharing")
 	sort, err := m.MkBoolSort()
 	aigMust(t, err)
@@ -49,7 +50,7 @@ func TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough(t *testing.T) {
 	}
 	rootName := "@" + strconv.FormatUint(uint64(abc.lit.node.id-firstNodeID), 10)
 	nestedName := "@" + strconv.FormatUint(uint64(abNode.id-firstNodeID), 10)
-	check := func(wantNull string) {
+	check := func(wantNull string, result *Ref) {
 		t.Helper()
 		var bodies []string
 		for _, line := range strings.Split(output.String(), "\n") {
@@ -62,6 +63,19 @@ func TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough(t *testing.T) {
 				t.Fatalf("erased trace emitted %q", output.String())
 			}
 			return
+		}
+		resultRecord := "-------- [max_sharing] operator() src/tactic/aig/aig.cpp:1295 ---------\n" +
+			"result:\n" + aigRefText(result.lit) + "\n"
+		if !strings.Contains(output.String(), resultRecord) {
+			t.Fatalf("source result display missing: %q", output.String())
+		}
+		if wantNull == "0" {
+			improved := "-------- [max_sharing] improve_sharing_left src/tactic/aig/aig.cpp:1144 ---------\n" +
+				"improved:\n" + rootName + "\n"
+			if !strings.Contains(output.String(), improved) ||
+				!strings.Contains(output.String(), "---->\n"+aigRefText(result.lit)+"\n") {
+				t.Fatalf("source improved display missing: %q", output.String())
+			}
 		}
 		want := []string{
 			"processing " + rootName + " idx: 0",
@@ -80,14 +94,14 @@ func TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough(t *testing.T) {
 	}
 	unchanged, err := g.MaxSharing(abc)
 	aigMust(t, err)
-	check("1")
+	check("1", unchanged)
 	aigMust(t, unchanged.Close())
 	output.Reset()
 	bc, err := g.InternAnd(vars[1], vars[2])
 	aigMust(t, err)
 	shared, err := g.MaxSharing(abc)
 	aigMust(t, err)
-	check("0")
+	check("0", shared)
 	aigMust(t, shared.Close())
 	aigMust(t, bc.Close())
 	aigMust(t, abc.Close())
@@ -96,6 +110,7 @@ func TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough(t *testing.T) {
 	}
 	aigMust(t, g.Close())
 	aigMust(t, m.Close())
+	closeParams()
 	aigMust(t, numbers.Close())
 	aigMust(t, symbols.Close())
 	if budget.Used() != 0 {
@@ -115,6 +130,7 @@ func TestAIGMaxSharingTryingTraceAllFourReassociationBranches(t *testing.T) {
 	tags := diagnostic.NewTraceTagsWithWriter(&output)
 	m, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: symbols, Numerals: numbers, Budget: budget, TraceTags: tags})
 	aigMust(t, err)
+	closeParams := aigTestBindSMT2Params(t, symbols, numbers, budget)
 	tags.Enable("max_sharing")
 	sort, err := m.MkBoolSort()
 	aigMust(t, err)
@@ -191,6 +207,7 @@ func TestAIGMaxSharingTryingTraceAllFourReassociationBranches(t *testing.T) {
 	}
 	aigMust(t, g.Close())
 	aigMust(t, m.Close())
+	closeParams()
 	aigMust(t, numbers.Close())
 	aigMust(t, symbols.Close())
 	if budget.Used() != 0 {

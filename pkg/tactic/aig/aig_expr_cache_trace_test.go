@@ -9,7 +9,6 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
-	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -25,18 +24,7 @@ func TestAIGExprCacheReleaseTracePrecedesLastReference(t *testing.T) {
 	tags := diagnostic.NewTraceTagsWithWriter(&output)
 	m, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: symbols, Numerals: numbers, Budget: budget, TraceTags: tags})
 	aigMust(t, err)
-	ctx, err := uparams.NewParamsContext(symbols, numbers, uparams.ParamsConfig{Budget: budget,
-		Text: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
-	aigMust(t, err)
-	catalog, err := uparams.NewGlobalParamsCatalog(symbols, uparams.GlobalParamsCatalogConfig{Budget: budget,
-		Descriptions: arena.BytesRegionConfig{Descriptors: arena.Config{Budget: budget}},
-		Text:         arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
-	aigMust(t, err)
-	globals, err := uparams.NewGlobalParamsService(symbols, ctx, uparams.GlobalParamsConfig{Budget: budget, Catalog: catalog})
-	aigMust(t, err)
-	aigMust(t, globals.InitializeSource())
-	previous, err := uparams.BindProcessGlobalParamsService(globals)
-	aigMust(t, err)
+	closeParams := aigTestBindSMT2Params(t, symbols, numbers, budget)
 	tags.Enable("expr2aig")
 	sort, err := m.MkBoolSort()
 	aigMust(t, err)
@@ -83,11 +71,7 @@ func TestAIGExprCacheReleaseTracePrecedesLastReference(t *testing.T) {
 	}
 	aigMust(t, m.DelRef(&pPin))
 	aigMust(t, m.Close())
-	_, err = uparams.BindProcessGlobalParamsService(previous)
-	aigMust(t, err)
-	aigMust(t, globals.Close())
-	aigMust(t, catalog.Close())
-	aigMust(t, ctx.Close())
+	closeParams()
 	aigMust(t, numbers.Close())
 	aigMust(t, symbols.Close())
 	if budget.Used() != 0 {

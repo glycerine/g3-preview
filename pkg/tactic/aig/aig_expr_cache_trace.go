@@ -23,42 +23,42 @@ func writeAIGRef(w io.Writer, l Literal) {
 	_, _ = io.WriteString(w, strconv.FormatUint(uint64(number), 10))
 }
 
+func (m *Manager) smt2BooleanText(h ast.ASTHandle) (body string, result error) {
+	g := uparams.BorrowProcessGlobalParamsService()
+	if g == nil || g.Context == nil {
+		return "", uparams.ErrGlobalParamsOwner
+	}
+	format, e := m.ast.SMT2PPBooleanTree(h, nil)
+	if e != nil {
+		return "", e
+	}
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: m.ast.BudgetField})
+	if e != nil {
+		return "", e
+	}
+	defer func() { result = errors.Join(result, out.Close()) }()
+	empty, e := g.Context.NewValue()
+	if e != nil {
+		return "", e
+	}
+	defer func() { result = errors.Join(result, g.Context.Del(&empty)) }()
+	if e = m.ast.PrintFormat(out, format, g.Context, &empty, g); e != nil {
+		return "", e
+	}
+	return out.String()
+}
+
 func (m *Manager) traceExprCacheResult(h ast.ASTHandle, l Literal) error {
 	tags := m.ast.BorrowMemoryTraceTags()
 	if !tags.ShouldTrace("expr2aig") {
 		return nil
 	}
-	g := uparams.BorrowProcessGlobalParamsService()
-	if g == nil || g.Context == nil {
-		return uparams.ErrGlobalParamsOwner
-	}
 	return tags.EmitConditional("expr2aig", "cache_result", "src/tactic/aig/aig.cpp", 452,
-		func() bool { return true }, func(w io.Writer) (result error) {
-			if _, result = io.WriteString(w, "caching:\n"); result != nil {
-				return result
-			}
-			format, e := m.ast.SMT2PPBooleanTree(h, nil)
-			if e != nil {
+		func() bool { return true }, func(w io.Writer) error {
+			if _, e := io.WriteString(w, "caching:\n"); e != nil {
 				return e
 			}
-			out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: m.ast.BudgetField})
-			if e != nil {
-				return e
-			}
-			defer func() {
-				result = errors.Join(result, out.Close())
-			}()
-			empty, e := g.Context.NewValue()
-			if e != nil {
-				return e
-			}
-			defer func() {
-				result = errors.Join(result, g.Context.Del(&empty))
-			}()
-			if e = m.ast.PrintFormat(out, format, g.Context, &empty, g); e != nil {
-				return e
-			}
-			body, e := out.String()
+			body, e := m.smt2BooleanText(h)
 			if e != nil {
 				return e
 			}

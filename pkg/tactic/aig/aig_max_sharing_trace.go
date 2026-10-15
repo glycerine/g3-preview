@@ -91,3 +91,46 @@ func (m *Manager) traceSharingNull(null bool) {
 			return nil
 		})
 }
+
+func (m *Manager) traceSharingResult(l Literal) error {
+	tags := m.ast.BorrowMemoryTraceTags()
+	if !tags.ShouldTrace("max_sharing") {
+		return nil
+	}
+	return tags.EmitConditional("max_sharing", "operator()", "src/tactic/aig/aig.cpp", 1295,
+		func() bool { return true }, func(w io.Writer) error {
+			if _, err := io.WriteString(w, "result:\n"); err != nil {
+				return err
+			}
+			return m.writeAIGDisplay(w, l)
+		})
+}
+
+func (m *Manager) traceSharingImproved(old *node, replacement Literal, left, second bool) error {
+	tags := m.ast.BorrowMemoryTraceTags()
+	if !tags.ShouldTrace("max_sharing") {
+		return nil
+	}
+	line, action := 1144, "improve_sharing_left"
+	if left && second {
+		line = 1162
+	} else if !left {
+		line, action = 1189, "improve_sharing_right"
+		if second {
+			line = 1207
+		}
+	}
+	return tags.EmitConditional("max_sharing", action, "src/tactic/aig/aig.cpp", line,
+		func() bool { return true }, func(w io.Writer) error {
+			if _, err := io.WriteString(w, "improved:\n"); err != nil {
+				return err
+			}
+			if err := m.writeAIGDisplay(w, Literal{node: old}); err != nil {
+				return err
+			}
+			if _, err := io.WriteString(w, "---->\n"); err != nil {
+				return err
+			}
+			return m.writeAIGDisplay(w, replacement)
+		})
+}
