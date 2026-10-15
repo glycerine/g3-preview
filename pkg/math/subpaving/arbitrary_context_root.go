@@ -41,6 +41,9 @@ type ArbitraryContext struct {
 	unitHead                                        int
 	initStage                                       uint8
 	initDefHead                                     uint32
+	initConstraintsTraced                           bool
+	initUnitBoundsTraced                            bool
+	initRootBoundsTraced                            bool
 	root                                            *ArbitraryNode
 	nodes                                           []*ArbitraryNode
 	leafHead, leafTail                              *ArbitraryNode

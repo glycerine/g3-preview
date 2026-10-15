@@ -15,6 +15,12 @@ func (c *ArbitraryContext) InitializeRoot() error {
 		return err
 	}
 	if c.initStage == 0 {
+		if !c.initConstraintsTraced {
+			if err := c.traceInitialConstraints(); err != nil {
+				return err
+			}
+			c.initConstraintsTraced = true
+		}
 		if _, err := c.AssertRootUnits(); err != nil {
 			return err
 		}
@@ -41,6 +47,12 @@ func (c *ArbitraryContext) InitializeRoot() error {
 			return err
 		}
 		c.initStage = 3
+	}
+	if c.initStage == 3 && !c.initRootBoundsTraced {
+		if err := c.traceInitialBounds(n, "root bounds after propagation\n", 1801); err != nil {
+			return err
+		}
+		c.initRootBoundsTraced = true
 	}
 	return nil
 }

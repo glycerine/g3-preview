@@ -225,10 +225,19 @@ func (c *ArbitraryContext) AssertRootUnits() (*ArbitraryNode, error) {
 		}
 		unit := c.unitClauses[c.unitHead]
 		a := unit.atom
+		if err := c.traceInitialUnit(a, unit.axiom); err != nil {
+			return n, err
+		}
 		if err := c.PublishBound(n, a.variable, &a.value, a.lower, a.open, unit.axiom); err != nil {
 			return n, err
 		}
 		c.unitHead++
+	}
+	if !c.initUnitBoundsTraced {
+		if err := c.traceInitialBounds(n, "bounds after init\n", 1785); err != nil {
+			return n, err
+		}
+		c.initUnitBoundsTraced = true
 	}
 	return n, nil
 }
