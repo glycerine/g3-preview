@@ -54396,6 +54396,12 @@
           "tests": ["TestRationalBoundTracePublicationAndConflictOrder", "TestRationalBoundTraceStreamAndPrinterFailurePrefix"]
         },
         {
+          "name": "Concrete config_mpq init constraint, unit assertion, post-unit and post-propagation TRACE sites with resumable one-time emission (subpaving_t_def.h:1780-1801)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_init_trace.go",
+          "tests": ["TestRationalRootInitializationTraceSourceOrderAndResume", "TestRationalRootInitializationTraceRefusalAndPrinterPrefix"]
+        },
+        {
           "name": "Concrete config_hwf mk_var, mk_sum, and mk_ineq construction with sorted duplicate coefficient swaps (src/math/subpaving/subpaving_t_def.h:666-687,741-780)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/hardware_context_constraints.go",
@@ -176971,6 +176977,12 @@
           "tests": ["TestRationalBoundTracePublicationAndConflictOrder", "TestRationalBoundTraceStreamAndPrinterFailurePrefix"]
         },
         {
+          "name": "Reached config_mpq root init constraint, unit and bounds TRACE sites (subpaving_t_def.h:1780-1801)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_init_trace.go",
+          "tests": ["TestRationalRootInitializationTraceSourceOrderAndResume", "TestRationalRootInitializationTraceRefusalAndPrinterPrefix"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -177763,6 +177775,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_bound_trace.go",
           "tests": ["TestRationalBoundTracePublicationAndConflictOrder", "TestRationalBoundTraceStreamAndPrinterFailurePrefix"]
+        },
+        {
+          "name": "Reached config_mpq root init constraint, unit and bounds TRACE sites (subpaving_t_def.h:1780-1801)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_init_trace.go",
+          "tests": ["TestRationalRootInitializationTraceSourceOrderAndResume", "TestRationalRootInitializationTraceRefusalAndPrinterPrefix"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
