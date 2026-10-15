@@ -3,8 +3,12 @@
 package subpaving
 
 import (
+	"errors"
+
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/params"
 )
 
 var ErrFixedShellInexactInteger error = &sourceFailure{message: "subpaving: integer coefficient cannot be represented exactly as fixed point"}
@@ -22,7 +26,26 @@ type FixedShellCoefficients struct {
 	z1, z2       numeral.Int
 	closeStage   uint8
 	closeIndex   int
+	ownsContext  bool
 	closed       bool
+}
+
+// NewFixedShellFromParams constructs the MPFX wrapper with its context base.
+// A failed base constructor unwinds before wrapper members are constructed.
+func NewFixedShellFromParams(m *numeral.FixedPointManager, limit *control.Reslimit, rational *numeral.RationalManager, pc *params.ParamsContext, p *params.ParamsRef) (*FixedShellCoefficients, error) {
+	c, err := NewFixedContextFromParams(m, limit, pc, p)
+	if err != nil {
+		if c != nil {
+			err = errors.Join(err, c.Close())
+		}
+		return nil, err
+	}
+	w, err := NewFixedShellCoefficients(c, rational)
+	if err != nil {
+		return nil, errors.Join(err, c.Close())
+	}
+	w.ownsContext = true
+	return w, nil
 }
 
 func NewFixedShellCoefficients(context *FixedContext, rational *numeral.RationalManager) (*FixedShellCoefficients, error) {
@@ -202,6 +225,11 @@ func (w *FixedShellCoefficients) Close() error {
 			return err
 		}
 		w.closeStage++
+	}
+	if w.ownsContext {
+		if err := w.context.Close(); err != nil {
+			return err
+		}
 	}
 	w.coefficients = nil
 	w.closed = true

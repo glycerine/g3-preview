@@ -38,8 +38,12 @@ func TestFixedContextNamedParamsSourceOrderAndStoppedOwner(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	qm, err := numeral.NewRationalManager(numeral.RationalConfig{Integers: numeral.IntegerConfig{Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}}})
+	if err != nil {
+		t.Fatal(err)
+	}
 	t.Cleanup(func() {
-		for _, e := range []error{d.Close(), pc.Del(&p), pc.Close(), q.Close(), sy.Close(), m.Close()} {
+		for _, e := range []error{d.Close(), pc.Del(&p), pc.Close(), q.Close(), qm.CloseChecked(), sy.Close(), m.Close()} {
 			if e != nil {
 				t.Error(e)
 			}
@@ -116,4 +120,19 @@ func TestFixedContextNamedParamsSourceOrderAndStoppedOwner(t *testing.T) {
 	}
 	check(c.maxBound, big.NewRat(1, 1))
 	check(c.rootPrecision, big.NewRat(1, 1))
+	w, err := NewFixedShellFromParams(m, &control.Reslimit{Limit: 1000}, qm, pc, &p)
+	if err != nil {
+		t.Fatal("owning MPFX wrapper", err)
+	}
+	if _, err := w.MkVar(true); err != nil {
+		t.Fatal("factory wrapper variable", err)
+	}
+	if err := w.Close(); err != nil || !w.context.closed {
+		t.Fatal("wrapper and context cleanup", err)
+	}
+	set("epsilon", 2)
+	set("max_bound", 1<<31)
+	if failed, err := NewFixedShellFromParams(m, &control.Reslimit{Limit: 1000}, qm, pc, &p); err == nil || failed != nil {
+		t.Fatal("failed base constructor cleanup", failed, err)
+	}
 }
