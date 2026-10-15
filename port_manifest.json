@@ -172002,7 +172002,7 @@
           "tests": []
         },
         {
-          "name": "actual sexpr concrete reference-vector methods, element and iterator adaptations; stopped-decrement set, range and detached-entry ownership retain source raw pointers and owning cleanup receipts; other retained specialization behavior remains open",
+          "name": "actual sexpr concrete reference-vector methods, element and iterator adaptations; copied-source assignment refusal precedes destination reset; stopped-decrement set, range and detached-entry ownership retain source raw pointers and owning cleanup receipts; other retained specialization behavior remains open",
           "status": "partial",
           "go_target": "pkg/util/sexpr/util_sexpr.go",
           "tests": [
@@ -172010,6 +172010,7 @@
             "TestSexprBVSourceWidthQuirks",
             "TestSexprRCWrapAndDeletionLIFO",
             "TestSexprConcreteRefAndVectorActions",
+            "TestSexprRefVectorAssignRejectsCopiedSourceBeforeReset",
             "TestSexprRefVectorSetKeepsSourcePointerAndIncomingOnStoppedDeletion",
             "TestSexprRefVectorShrinkKeepsRawPrefixAfterStoppedDeletion",
             "TestSexprRefVectorStoppedRangeAndDetachedRelease",

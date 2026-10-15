@@ -40,6 +40,43 @@ func TestSexprRefVectorSetKeepsSourcePointerAndIncomingOnStoppedDeletion(t *test
 	sxMust(t, m.DecRef(incoming))
 }
 
+func TestSexprRefVectorAssignRejectsCopiedSourceBeforeReset(t *testing.T) {
+	m, _, _ := sxOwner(t, arena.NewBudget(1<<24))
+	old, e := m.MkString("destination", 0, 0)
+	sxMust(t, e)
+	incoming, e := m.MkString("source", 0, 0)
+	sxMust(t, e)
+	dst, e := m.NewRefVector()
+	sxMust(t, e)
+	src, e := m.NewRefVector()
+	sxMust(t, e)
+	sxMust(t, dst.PushBack(old))
+	sxMust(t, src.PushBack(incoming))
+	copied := *src
+	if e = dst.Assign(&copied); !errors.Is(e, ErrSexprOwner) {
+		t.Fatalf("copied source: %v", e)
+	}
+	if dst.Size() != 1 || src.Size() != 1 {
+		t.Fatal("rejected assignment changed a vector")
+	}
+	got, e := dst.Get(0)
+	sxMust(t, e)
+	if got != old {
+		t.Fatal("rejected assignment erased destination")
+	}
+	if refs, e := m.RefCount(old); e != nil || refs != 1 {
+		t.Fatalf("destination reference: %d, %v", refs, e)
+	}
+	if refs, e := m.RefCount(incoming); e != nil || refs != 1 {
+		t.Fatalf("source reference: %d, %v", refs, e)
+	}
+	sxMust(t, dst.Close())
+	sxMust(t, src.Close())
+	if e = src.Assign(src); !errors.Is(e, arena.ErrClosed) {
+		t.Fatalf("closed self-assignment: %v", e)
+	}
+}
+
 func TestSexprRefVectorShrinkKeepsRawPrefixAfterStoppedDeletion(t *testing.T) {
 	m, _, q := sxOwner(t, arena.NewBudget(1<<24))
 	first, e := m.MkString("first", 0, 0)

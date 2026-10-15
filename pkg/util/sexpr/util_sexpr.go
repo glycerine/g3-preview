@@ -1605,10 +1605,16 @@ func (v *SexprRefVector) Move() (*SexprRefVector, error) {
 	return out, nil
 }
 func (v *SexprRefVector) Assign(other *SexprRefVector) error {
+	if v == nil || v.self != v {
+		return ErrSexprOwner
+	}
+	if v.closed {
+		return arena.ErrClosed
+	}
 	if other == v {
 		return nil
 	}
-	if other == nil || other.manager != v.manager || other.closed {
+	if other == nil || other.self != other || other.manager != v.manager || other.closed {
 		return ErrSexprOwner
 	}
 	if e := v.Reset(); e != nil {
