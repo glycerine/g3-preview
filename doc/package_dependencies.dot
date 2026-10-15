@@ -26,6 +26,7 @@ digraph packages {
   "ast" -> "util/memory";
   "ast" -> "util/numeral";
   "ast" -> "util/params";
+  "ast" -> "util/smt2";
   "ast" -> "util/symbol";
   "ast" -> "util/text";
   "ast" -> "util/z3exception";
@@ -214,6 +215,16 @@ digraph packages {
   "tactic" -> "util/symbol";
   "tactic" -> "util/text";
   "tactic" -> "util/z3exception";
+  "tactic/aig" [style=filled, fillcolor="#eeeeee"];
+  "tactic/aig" -> "arena";
+  "tactic/aig" -> "ast";
+  "tactic/aig" -> "tactic";
+  "tactic/aig" -> "util/cooperate";
+  "tactic/aig" -> "util/diagnostic";
+  "tactic/aig" -> "util/memory";
+  "tactic/aig" -> "util/messages";
+  "tactic/aig" -> "util/params";
+  "tactic/aig" -> "util/symbol";
   "tactic/arith" [style=filled, fillcolor="#eeeeee"];
   "tactic/arith" -> "arena";
   "tactic/arith" -> "ast";
@@ -318,6 +329,7 @@ digraph packages {
   "util/sexpr" -> "util/symbol";
   "util/sexpr" -> "util/text";
   "util/smallint" [style=filled, fillcolor="#dceafa"];
+  "util/smallint" -> "util/text";
   "util/smt2" [style=filled, fillcolor="#dceafa"];
   "util/smt2" -> "arena";
   "util/smt2" -> "util/symbol";
@@ -328,11 +340,13 @@ digraph packages {
   "util/statistics" -> "arena";
   "util/statistics" -> "util/memory";
   "util/stopwatch" [style=filled, fillcolor="#dceafa"];
+  "util/stopwatch" -> "util/diagnostic";
   "util/stopwatch" -> "util/memory";
   "util/symbol" [style=filled, fillcolor="#dceafa"];
   "util/symbol" -> "arena";
   "util/symbol" -> "util/diagnostic";
   "util/symbol" -> "util/hash";
+  "util/symbol" -> "util/memory";
   "util/text" [style=filled, fillcolor="#dceafa"];
   "util/text" -> "arena";
   "util/version" [style=filled, fillcolor="#dceafa"];

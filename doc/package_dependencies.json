@@ -67,6 +67,7 @@
         "util/memory",
         "util/numeral",
         "util/params",
+        "util/smt2",
         "util/symbol",
         "util/text",
         "util/z3exception"
@@ -81,6 +82,7 @@
         "ast_arith_numeral_read.go",
         "ast_arith_numeral_text.go",
         "ast_arith_plugin.go",
+        "ast_arith_plugin_memory_trace.go",
         "ast_arith_values.go",
         "ast_array_as_array.go",
         "ast_array_callbacks.go",
@@ -97,6 +99,7 @@
         "ast_basic_plugin_kinds.go",
         "ast_basic_plugin_proof.go",
         "ast_builtin_names.go",
+        "ast_builtin_plugin_memory_trace.go",
         "ast_builtin_plugins.go",
         "ast_builtin_plugins_user.go",
         "ast_builtin_plugins_values.go",
@@ -217,8 +220,11 @@
         "ast_format.go",
         "ast_format_buffer.go",
         "ast_format_flat.go",
+        "ast_format_manager_memory_trace.go",
         "ast_format_plugin.go",
         "ast_format_pp.go",
+        "ast_format_seq1.go",
+        "ast_format_seq5.go",
         "ast_fpa_numeral.go",
         "ast_fpa_numeral_probe.go",
         "ast_fpa_plugin.go",
@@ -228,6 +234,7 @@
         "ast_fpa_value_binding.go",
         "ast_fpa_value_table.go",
         "ast_info.go",
+        "ast_info_memory_trace.go",
         "ast_label.go",
         "ast_low_level_bounded.go",
         "ast_low_level_printer.go",
@@ -240,6 +247,7 @@
         "ast_package_resources.go",
         "ast_parameter.go",
         "ast_parameter_access.go",
+        "ast_parameter_memory_trace.go",
         "ast_proof_manager.go",
         "ast_proof_manager_congruence.go",
         "ast_proof_manager_hyper.go",
@@ -254,15 +262,25 @@
         "ast_proof_resolution_trace.go",
         "ast_ref.go",
         "ast_reg_decl_plugins.go",
+        "ast_registered_plugin_memory_trace.go",
         "ast_resource_limit.go",
         "ast_rewriter_access.go",
         "ast_seq_plugin.go",
         "ast_shared_occs.go",
         "ast_shared_occs_iterator.go",
         "ast_shared_occs_mark.go",
+        "ast_smt2_app_format.go",
+        "ast_smt2_boolean_tree.go",
         "ast_smt2_bv_literal.go",
+        "ast_smt2_declare_fun.go",
+        "ast_smt2_fdecl.go",
+        "ast_smt2_fdecl_classify.go",
+        "ast_smt2_fdecl_name.go",
         "ast_smt2_float_bv_literal.go",
         "ast_smt2_float_real.go",
+        "ast_smt2_sort.go",
+        "ast_smt2_var_labels.go",
+        "ast_sort_dependency_memory_trace.go",
         "ast_sort_dependency_order.go",
         "ast_sort_size.go",
         "ast_sparse_mark.go",
@@ -270,6 +288,7 @@
         "ast_table_hash.go",
         "ast_trace_acquisition.go",
         "ast_trace_file.go",
+        "ast_trace_file_memory_trace.go",
         "ast_trace_filename.go",
         "ast_trace_hooks.go",
         "ast_uninterpreted_plugin.go",
@@ -1179,16 +1198,23 @@
         "model2expr_entry_condition.go",
         "model2expr_fresh_name.go",
         "model_array_tuple_table.go",
+        "model_converter_allocation.go",
         "model_copy.go",
+        "model_copy_memory_trace.go",
         "model_core.go",
         "model_evaluator.go",
         "model_evaluator_array_equality.go",
         "model_evaluator_array_expansion.go",
+        "model_evaluator_function_memory_trace.go",
+        "model_evaluator_memory_trace.go",
         "model_evaluator_trace.go",
+        "model_filter_allocation.go",
         "model_functions.go",
         "model_interpretation_owners.go",
         "model_lifecycle.go",
         "model_package_boundary.go",
+        "model_sat_allocation.go",
+        "model_universe_memory_trace.go",
         "model_value.go"
       ]
     },
@@ -1429,7 +1455,8 @@
         "dispatch_memory.go",
         "global_timeout_option.go",
         "input_file_option.go",
-        "timeout.go"
+        "timeout.go",
+        "timeout_memory_trace.go"
       ]
     },
     {
@@ -1520,6 +1547,38 @@
         "tactic_probe.go",
         "tactic_report.go",
         "tactic_stored_model.go"
+      ]
+    },
+    {
+      "package": "tactic/aig",
+      "imports": [
+        "arena",
+        "ast",
+        "tactic",
+        "util/cooperate",
+        "util/diagnostic",
+        "util/memory",
+        "util/messages",
+        "util/params",
+        "util/symbol"
+      ],
+      "production_files": [
+        "aig_core.go",
+        "aig_delete_trace.go",
+        "aig_expr.go",
+        "aig_expr_cache_trace.go",
+        "aig_formula.go",
+        "aig_gates.go",
+        "aig_goal.go",
+        "aig_goal_conversion_trace.go",
+        "aig_goal_formula.go",
+        "aig_imp_memory_trace.go",
+        "aig_ite_shape.go",
+        "aig_max_sharing.go",
+        "aig_max_sharing_trace.go",
+        "aig_simplify.go",
+        "aig_tactic.go",
+        "aig_tactic_memory_trace.go"
       ]
     },
     {
@@ -1701,6 +1760,7 @@
         "util_debug_macros.go",
         "util_debug_notification.go",
         "util_debug_process.go",
+        "util_debug_table_memory_trace.go",
         "util_memory_chunk_trace.go",
         "util_memory_fatal_policy.go",
         "util_memory_runtime.go",
@@ -1711,6 +1771,7 @@
         "util_trace_erased.go",
         "util_trace_process_erased.go",
         "util_trace_tags.go",
+        "util_trace_tags_memory_trace.go",
         "util_verbose_context.go",
         "util_warning.go"
       ]
@@ -2193,6 +2254,7 @@
         "inf_eps_rational.go",
         "inf_int_rational.go",
         "inf_rational.go",
+        "inf_stream.go",
         "integer_addmul_invocation.go",
         "integer_allocation_invocation_context.go",
         "integer_copy_allocation_receipt.go",
@@ -2262,6 +2324,7 @@
         "mpf_partial_remainder_scope.go",
         "mpf_partial_remainder_trace.go",
         "mpf_plain_rational_set.go",
+        "mpf_power_memory_trace.go",
         "mpf_powers_runtime.go",
         "mpf_predicates.go",
         "mpf_printer_parts.go",
@@ -2428,6 +2491,7 @@
         "numeric_storage_stats.go",
         "rational_buffer.go",
         "rational_copy_allocation_receipt.go",
+        "rational_global_memory_trace.go",
         "rational_lexical_scope.go",
         "rational_numeric_borrow.go",
         "rational_raw_boundary.go",
@@ -2484,6 +2548,7 @@
         "util_gparams_constructor_source.go",
         "util_gparams_dictionary.go",
         "util_gparams_display.go",
+        "util_gparams_memory_trace.go",
         "util_gparams_names.go",
         "util_gparams_nodebug.go",
         "util_gparams_parse.go",
@@ -2496,10 +2561,13 @@
         "util_gparams_values.go",
         "util_module_params_source.go",
         "util_param_descrs.go",
+        "util_param_descrs_memory_trace.go",
         "util_param_descrs_stream.go",
         "util_param_descrs_stream_nodebug.go",
         "util_param_name.go",
+        "util_params_block_memory_trace.go",
         "util_params_decrement_source.go",
+        "util_params_rational_entry_memory_trace.go",
         "util_params_ref.go",
         "util_params_ref_writer.go",
         "util_params_reset_key_source.go",
@@ -2570,10 +2638,13 @@
     },
     {
       "package": "util/smallint",
-      "imports": [],
+      "imports": [
+        "util/text"
+      ],
       "production_files": [
         "debug_off.go",
         "infinitesimal.go",
+        "infinitesimal_stream.go",
         "integer.go"
       ]
     },
@@ -2610,13 +2681,16 @@
     {
       "package": "util/stopwatch",
       "imports": [
+        "util/diagnostic",
         "util/memory"
       ],
       "production_files": [
         "clock_linux.go",
         "stopwatch.go",
         "timeit.go",
-        "timer.go"
+        "timeit_memory_trace.go",
+        "timer.go",
+        "timer_memory_trace.go"
       ]
     },
     {
@@ -2624,7 +2698,8 @@
       "imports": [
         "arena",
         "util/diagnostic",
-        "util/hash"
+        "util/hash",
+        "util/memory"
       ],
       "production_files": [
         "borrowed_input.go",
@@ -2634,6 +2709,7 @@
         "encoding.go",
         "hash.go",
         "service.go",
+        "service_memory_trace.go",
         "symbol.go"
       ]
     },

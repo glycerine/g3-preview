@@ -127905,7 +127905,7 @@
         "Pointer-free pair of int32-backed Integer values; arithmetic and comparisons allocate no storage."
       ],
       "deviations": [
-        "The Go leaf uses returned concrete values instead of C++ mutation operators, reference identity, hash/equality functors, stream insertion, or rational ownership. Future rational conversions belong at the consuming numeric boundary. Debug-tagged denominator and projection assertions are preserved. strconv replaces ostream for diagnostic text, including the source negative-epsilon coefficient spelling."
+        "The Go leaf uses returned concrete values instead of C++ mutation operators, reference identity, hash/equality functors, or rational ownership. Future rational conversions belong at the consuming numeric boundary. Debug-tagged denominator and projection assertions are preserved. String uses strconv for diagnostic text; AppendTo retains the source separate ostream insertions, width consumption and negative-epsilon coefficient spelling."
       ]
     },
     {
@@ -127915,11 +127915,13 @@
       "status": "platform_replacement",
       "go_targets": [
         "pkg/util/smallint/infinitesimal.go",
+        "pkg/util/smallint/infinitesimal_stream.go",
         "pkg/util/smallint/infinitesimal_test.go",
         "pkg/util/smallint/debug_on.go",
         "pkg/util/smallint/debug_off.go"
       ],
       "tests": [
+        "TestInfinitesimalSourceStreamInsertionOrderAndWidth",
         "TestInfinitesimalConstructionPredicatesAndText",
         "TestInfinitesimalLexicographicAlgebra",
         "TestInfinitesimalFloorCeilFusedAndGuards",
@@ -127953,6 +127955,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "inf_s_integer source ostream operator inserts numeric and literal fields separately (h250-262)",
+          "status": "ported",
+          "go_target": "pkg/util/smallint/infinitesimal_stream.go",
+          "tests": ["TestInfinitesimalSourceStreamInsertionOrderAndWidth"]
+        },
+        {
           "name": "live lexicographic signed32 pair algebra, predicates, projections and text",
           "status": "ported",
           "go_target": "pkg/util/smallint/infinitesimal.go",
@@ -127968,7 +127976,7 @@
         "Pointer-free pair of int32-backed Integer values; arithmetic and comparisons allocate no storage."
       ],
       "deviations": [
-        "The Go leaf uses returned concrete values instead of C++ mutation operators, reference identity, hash/equality functors, stream insertion, or rational ownership. Future rational conversions belong at the consuming numeric boundary. Debug-tagged denominator and projection assertions are preserved. strconv replaces ostream for diagnostic text, including the source negative-epsilon coefficient spelling."
+        "The Go leaf uses returned concrete values instead of C++ mutation operators, reference identity, hash/equality functors, or rational ownership. Future rational conversions belong at the consuming numeric boundary. Debug-tagged denominator and projection assertions are preserved. String uses strconv for diagnostic text; AppendTo retains the source separate ostream insertions, width consumption and negative-epsilon coefficient spelling."
       ]
     },
     {

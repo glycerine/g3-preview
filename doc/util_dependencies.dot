@@ -85,6 +85,7 @@ digraph packages {
   "util/sexpr" -> "util/symbol";
   "util/sexpr" -> "util/text";
   "util/smallint" [style=filled, fillcolor="#dceafa"];
+  "util/smallint" -> "util/text";
   "util/smt2" [style=filled, fillcolor="#dceafa"];
   "util/smt2" -> "arena";
   "util/smt2" -> "util/symbol";
@@ -95,11 +96,13 @@ digraph packages {
   "util/statistics" -> "arena";
   "util/statistics" -> "util/memory";
   "util/stopwatch" [style=filled, fillcolor="#dceafa"];
+  "util/stopwatch" -> "util/diagnostic";
   "util/stopwatch" -> "util/memory";
   "util/symbol" [style=filled, fillcolor="#dceafa"];
   "util/symbol" -> "arena";
   "util/symbol" -> "util/diagnostic";
   "util/symbol" -> "util/hash";
+  "util/symbol" -> "util/memory";
   "util/text" [style=filled, fillcolor="#dceafa"];
   "util/text" -> "arena";
   "util/version" [style=filled, fillcolor="#dceafa"];
