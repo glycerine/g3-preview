@@ -192,11 +192,12 @@ func (c *exprConverter) complete(fr exprFrame) error {
 
 func (c *exprConverter) cleanup() error {
 	var err error
+	for _, r := range c.cache {
+		c.manager.traceExprCacheDecRef(r.lit)
+		err = errors.Join(err, r.Close())
+	}
 	for i := len(c.results) - 1; i >= 0; i-- {
 		err = errors.Join(err, c.results[i].Close())
-	}
-	for _, r := range c.cache {
-		err = errors.Join(err, r.Close())
 	}
 	c.results = nil
 	c.cache = nil

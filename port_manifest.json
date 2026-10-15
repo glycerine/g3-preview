@@ -98147,7 +98147,8 @@
         "pkg/tactic/aig/aig_goal_formula.go",
         "pkg/tactic/aig/aig_max_sharing.go",
         "pkg/tactic/aig/aig_imp_memory_trace.go",
-        "pkg/tactic/aig/aig_delete_trace.go"
+        "pkg/tactic/aig/aig_delete_trace.go",
+        "pkg/tactic/aig/aig_expr_cache_trace.go"
       ],
       "tests": [
         "TestAIGCoreInterningOwnershipAndIDReuse",
@@ -98174,7 +98175,8 @@
         "TestAIGGoalOutputCheckpointUsesSameSourceGuards",
         "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
         "TestAIGManagerSeparateImpChargesAndConstructorPrefixes",
-        "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate"
+        "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate",
+        "TestAIGExprCacheReleaseTracePrecedesLastReference"
       ],
       "conditionals": [
         {
@@ -98513,6 +98515,14 @@
           ]
         },
         {
+          "name": "expr2aig destructor cache release before result-stack cleanup with source dec-ref TRACE",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_expr_cache_trace.go",
+          "tests": [
+            "TestAIGExprCacheReleaseTracePrecedesLastReference"
+          ]
+        },
+        {
           "name": "delete_node aig_lit_count TRACE before node count, variable release and child deletion cascade",
           "status": "ported",
           "go_target": "pkg/tactic/aig/aig_delete_trace.go",
@@ -98525,7 +98535,7 @@
         "Concrete AIG manager pins each variable AST expression, owns true/false counts and interning table nodes, and recursively releases child nodes when the last AIG reference closes. AIG-to-formula cache and output own ASTRef values; stopped AST releases remain with the manager for retry."
       ],
       "deviations": [
-        "Typed Go map replaces aig_table; literal inversion is a bool rather than pointer tagging. The mk_node minimizer, both gate encodings, expression-to-AIG traversal, goal conjunction and source naive AIG-to-expression conversion are ported. The optimized AIG-to-goal writer uses ITE shape recognition and source root/flattening order; max-sharing associative reuse and cache are implemented. Source checkpoints run at both retained frame loops. The separately charged Go managerImp owner emits successful-construction and destructor memory records; constructor-refusal source records remain open. Display and remaining tactic integration remain open."
+        "Typed Go map replaces aig_table; literal inversion is a bool rather than pointer tagging. The mk_node minimizer, both gate encodings, expression-to-AIG traversal, goal conjunction and source naive AIG-to-expression conversion are ported. The optimized AIG-to-goal writer uses ITE shape recognition and source root/flattening order; max-sharing associative reuse and cache are implemented. Source checkpoints run at both retained frame loops. The separately charged Go managerImp owner emits successful-construction and destructor memory records; constructor-refusal source records remain open. The expr2aig converter now releases its cache before its result stack and emits the source dec-ref TRACE before each cache release. Display and remaining tactic integration remain open."
       ]
     },
     {
@@ -179174,7 +179184,8 @@
         "pkg/math/interval/fixed_fast_root_trace_test.go",
         "pkg/math/interval/rational_root_trace.go",
         "pkg/math/interval/rational_root_trace_test.go",
-        "pkg/tactic/aig/aig_delete_trace.go"
+        "pkg/tactic/aig/aig_delete_trace.go",
+        "pkg/tactic/aig/aig_expr_cache_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -179246,7 +179257,8 @@
         "TestFixedPolynomialSourceIntegerTraceAndPublication",
         "TestFixedPolynomialTraceStreamRefusalKeepsDefinition",
         "TestFixedPolynomialTraceUsesBorrowedVariablePrinter",
-        "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate"
+        "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate",
+        "TestAIGExprCacheReleaseTracePrecedesLastReference"
       ],
       "conditionals": [
         {
@@ -180596,6 +180608,14 @@
           "tests": []
         },
         {
+          "name": "Retained expr2aig destructor cache dec-ref TRACE before source cache release (aig.cpp:439)",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_expr_cache_trace.go",
+          "tests": [
+            "TestAIGExprCacheReleaseTracePrecedesLastReference"
+          ]
+        },
+        {
           "name": "Retained AIG delete_node aig_lit_count TRACE before node recycling and child cascade (aig.cpp:149)",
           "status": "ported",
           "go_target": "pkg/tactic/aig/aig_delete_trace.go",
@@ -180687,7 +180707,8 @@
         "pkg/math/interval/fixed_fast_root_trace_test.go",
         "pkg/math/interval/rational_root_trace.go",
         "pkg/math/interval/rational_root_trace_test.go",
-        "pkg/tactic/aig/aig_delete_trace.go"
+        "pkg/tactic/aig/aig_delete_trace.go",
+        "pkg/tactic/aig/aig_expr_cache_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -180757,7 +180778,8 @@
         "TestFixedPolynomialSourceIntegerTraceAndPublication",
         "TestFixedPolynomialTraceStreamRefusalKeepsDefinition",
         "TestFixedPolynomialTraceUsesBorrowedVariablePrinter",
-        "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate"
+        "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate",
+        "TestAIGExprCacheReleaseTracePrecedesLastReference"
       ],
       "conditionals": [
         {
@@ -182105,6 +182127,14 @@
           "status": "partial",
           "go_target": "pkg/ast/ast_core_factories.go",
           "tests": []
+        },
+        {
+          "name": "Retained expr2aig destructor cache dec-ref TRACE before source cache release (aig.cpp:439)",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_expr_cache_trace.go",
+          "tests": [
+            "TestAIGExprCacheReleaseTracePrecedesLastReference"
+          ]
         },
         {
           "name": "Retained AIG delete_node aig_lit_count TRACE before node recycling and child cascade (aig.cpp:149)",
