@@ -239,6 +239,9 @@ func (s *satSolverConflictResolution) checkMarks() error {
 // traversal is shared; each concrete antecedent method retains its own order.
 func (s *satSolverConflictResolution) processConsequent(consequent Literal, j satJustification, mode uint8, marks *uint32) error {
 	p := s.analysis.propagation
+	if mode == 2 {
+		s.traceUnsatCoreConsequent(consequent, j)
+	}
 	switch j.Kind() {
 	case 0:
 		return nil

@@ -50,6 +50,11 @@ func TestSATUnsatCoreSourceTraceStartJustificationAndLowerLevel(t *testing.T) {
 	if got := output.String(); !strings.Contains(got, wantNot) {
 		t.Fatalf("core not-literal trace = %q, missing %q", got, wantNot)
 	}
+	wantConsequent := satClauseTraceRecord("sat", "process_consequent_for_unsat_core", "1836",
+		"processing consequent: 1\njs kind: binary -0\n")
+	if got := output.String(); strings.Count(got, wantConsequent) != 3 || strings.Index(got, wantConsequent) < strings.Index(got, wantNot) {
+		t.Fatalf("core consequent trace = %q, want three after not-literal %q", got, wantConsequent)
+	}
 	wantLower := satClauseTraceRecord("sat", "resolve_conflict_for_unsat_core", "2063", "0 at level 0\n")
 	if got := output.String(); !strings.Contains(got, wantLower) {
 		t.Fatalf("core lower-level trace = %q, missing %q", got, wantLower)

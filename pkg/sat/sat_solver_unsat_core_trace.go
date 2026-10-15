@@ -1,4 +1,4 @@
-// Source: src/sat/sat_solver.cpp:2000,2032,2063; retained util/trace TRACE sites.
+// Source: src/sat/sat_solver.cpp:1836,2000,2032,2063; retained util/trace TRACE sites.
 package sat
 
 import (
@@ -9,12 +9,12 @@ import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
-func (s *satSolverConflictResolution) traceUnsatCoreRecord(line int, body func(io.Writer) error) {
+func (s *satSolverConflictResolution) traceUnsatCoreRecord(function string, line int, body func(io.Writer) error) {
 	tags := s.traceTags
 	if tags == nil {
 		tags = diagnostic.BorrowProcessTraceTags()
 	}
-	_ = tags.EmitConditional("sat", "resolve_conflict_for_unsat_core", "src/sat/sat_solver.cpp", line,
+	_ = tags.EmitConditional("sat", function, "src/sat/sat_solver.cpp", line,
 		func() bool { return true }, body)
 }
 
@@ -24,7 +24,7 @@ func (s *satSolverConflictResolution) traceUnsatCoreStart() {
 	if s.solver == nil {
 		return
 	}
-	s.traceUnsatCoreRecord(2000, func(w io.Writer) error {
+	s.traceUnsatCoreRecord("resolve_conflict_for_unsat_core", 2000, func(w io.Writer) error {
 		if err := s.solver.traceUserDisplayInto(w); err != nil {
 			return err
 		}
@@ -65,19 +65,27 @@ func (s *satSolverConflictResolution) traceUnsatCoreStart() {
 	})
 }
 
+func (s *satSolverConflictResolution) traceUnsatCoreJustificationInto(w io.Writer, j satJustification) error {
+	_, _ = io.WriteString(w, satJustificationTraceString(j))
+	if j.Clause() {
+		c, err := s.analysis.propagation.clauses.GetClause(j.ClauseOffset())
+		if err != nil {
+			return err
+		}
+		clause, err := satTraceClause(s.analysis.propagation.clauses, c)
+		if err != nil {
+			return err
+		}
+		_, _ = io.WriteString(w, clause)
+	}
+	return nil
+}
+
 func (s *satSolverConflictResolution) traceUnsatCoreNotLiteral(l Literal, j satJustification) {
-	s.traceUnsatCoreRecord(2032, func(w io.Writer) error {
-		_, _ = io.WriteString(w, "not_l: "+l.String()+"\n"+satJustificationTraceString(j))
-		if j.Clause() {
-			c, err := s.analysis.propagation.clauses.GetClause(j.ClauseOffset())
-			if err != nil {
-				return err
-			}
-			clause, err := satTraceClause(s.analysis.propagation.clauses, c)
-			if err != nil {
-				return err
-			}
-			_, _ = io.WriteString(w, clause)
+	s.traceUnsatCoreRecord("resolve_conflict_for_unsat_core", 2032, func(w io.Writer) error {
+		_, _ = io.WriteString(w, "not_l: "+l.String()+"\n")
+		if err := s.traceUnsatCoreJustificationInto(w, j); err != nil {
+			return err
 		}
 		_, _ = io.WriteString(w, "\n")
 		return nil
@@ -85,8 +93,23 @@ func (s *satSolverConflictResolution) traceUnsatCoreNotLiteral(l Literal, j satJ
 }
 
 func (s *satSolverConflictResolution) traceUnsatCoreLowerLevel(l Literal, level uint32) {
-	s.traceUnsatCoreRecord(2063, func(w io.Writer) error {
+	s.traceUnsatCoreRecord("resolve_conflict_for_unsat_core", 2063, func(w io.Writer) error {
 		_, _ = io.WriteString(w, l.String()+" at level "+strconv.FormatUint(uint64(level), 10)+"\n")
+		return nil
+	})
+}
+
+func (s *satSolverConflictResolution) traceUnsatCoreConsequent(l Literal, j satJustification) {
+	s.traceUnsatCoreRecord("process_consequent_for_unsat_core", 1836, func(w io.Writer) error {
+		name := l.String()
+		if l == DefaultLiteral() {
+			name = "null"
+		}
+		_, _ = io.WriteString(w, "processing consequent: "+name+"\njs kind: ")
+		if err := s.traceUnsatCoreJustificationInto(w, j); err != nil {
+			return err
+		}
+		_, _ = io.WriteString(w, "\n")
 		return nil
 	})
 }

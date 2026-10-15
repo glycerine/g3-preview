@@ -178250,6 +178250,12 @@
           "tests": ["TestSATUnsatCoreSourceTraceStartJustificationAndLowerLevel"]
         },
         {
+          "name": "Reached SAT unsat-core consequent and actual justification TRACE before every reason switch (sat_solver.cpp:1836)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_unsat_core_trace.go",
+          "tests": ["TestSATUnsatCoreSourceTraceStartJustificationAndLowerLevel"]
+        },
+        {
           "name": "Reached SAT init_assumptions TRACE for explicit and user-scope literals plus the actual model-converter printer before assignment (sat_solver.cpp:1080-1086)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_assumptions_trace.go",
@@ -179604,6 +179610,12 @@
         },
         {
           "name": "Reached SAT unsat-core solver/trail display, non-null justification and lower-level consequent TRACE records (sat_solver.cpp:2000,2032,2063)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_unsat_core_trace.go",
+          "tests": ["TestSATUnsatCoreSourceTraceStartJustificationAndLowerLevel"]
+        },
+        {
+          "name": "Reached SAT unsat-core consequent and actual justification TRACE before every reason switch (sat_solver.cpp:1836)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_unsat_core_trace.go",
           "tests": ["TestSATUnsatCoreSourceTraceStartJustificationAndLowerLevel"]
