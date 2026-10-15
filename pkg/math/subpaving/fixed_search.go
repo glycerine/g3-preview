@@ -32,6 +32,9 @@ func (c *FixedContext) Search() error {
 	if err := c.InitializeRoot(); err != nil {
 		return err
 	}
+	if err := c.traceSearchStatistics(1809); err != nil {
+		return err
+	}
 	if err := c.traceSearchParams(); err != nil {
 		return err
 	}
@@ -51,9 +54,13 @@ func (c *FixedContext) Search() error {
 				return arena.ErrInvalidSlot
 			}
 			if c.numNodes > c.maxNodes {
-				return nil
+				break
 			}
-			c.searchNode = c.leafQueue[0]
+			n := c.leafQueue[0]
+			if err := c.traceSearchNode(n, "selected", 1819); err != nil {
+				return err
+			}
+			c.searchNode = n
 			c.leafQueue[0] = nil
 			c.leafQueue = c.leafQueue[1:]
 			c.searchPhase = 0
@@ -75,12 +82,35 @@ func (c *FixedContext) Search() error {
 			}
 			c.searchPhase = 2
 		}
-		if n.inconsistent || fixedNodeDepth(n) >= c.maxDepth || len(c.isInt) == 0 {
+		if c.searchPhase == 2 {
+			if err := c.traceSearchNode(n, "after", 1825); err != nil {
+				return err
+			}
+			c.searchPhase = 3
+		}
+		if n.inconsistent {
+			if err := c.traceSearchNode(n, "inconsistent", 1828); err != nil {
+				return err
+			}
 			c.searchNode = nil
 			continue
 		}
-		variable, found, err := c.SelectBranchVariable(n, true)
-		if err != nil {
+		if fixedNodeDepth(n) >= c.maxDepth {
+			if err := c.traceSearchNode(n, "depth", 1833); err != nil {
+				return err
+			}
+			c.searchNode = nil
+			continue
+		}
+		variable, found := uint32(0), false
+		if len(c.isInt) != 0 {
+			var err error
+			variable, found, err = c.SelectBranchVariable(n, true)
+			if err != nil {
+				return err
+			}
+		}
+		if err := c.traceSearchVariable(variable, found); err != nil {
 			return err
 		}
 		if found {
@@ -101,5 +131,5 @@ func (c *FixedContext) Search() error {
 		}
 		c.searchNode = nil
 	}
-	return nil
+	return c.traceSearchStatistics(1844)
 }

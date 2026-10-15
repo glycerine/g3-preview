@@ -40,6 +40,8 @@ type FixedContext struct {
 	queueHead        int
 	numVisited       uint64
 	numNodes         uint32
+	nextNodeID       uint32
+	freeNodeIDs      []uint32
 	numBounds        uint64
 	numConflicts     uint64
 	polynomials      map[uint32]*FixedPolynomial
@@ -98,9 +100,21 @@ func (c *FixedContext) newRoot() error {
 	}
 	c.root = root
 	root.context = c
+	root.id = c.takeNodeID()
 	c.nodes = []*FixedNode{root}
 	c.numNodes = 1
 	return nil
+}
+
+func (c *FixedContext) takeNodeID() uint32 {
+	if n := len(c.freeNodeIDs); n != 0 {
+		id := c.freeNodeIDs[n-1]
+		c.freeNodeIDs = c.freeNodeIDs[:n-1]
+		return id
+	}
+	id := c.nextNodeID
+	c.nextNodeID++
+	return id
 }
 
 func NewFixedContext(m *numeral.FixedPointManager, limit *control.Reslimit, isInt []bool, epsilon, maxBoundPower, rootPrecision uint32) (_ *FixedContext, err error) {

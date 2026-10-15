@@ -50,6 +50,7 @@ type FixedNode struct {
 	trail        *FixedBound
 	children     uint32
 	context      *FixedContext
+	id           uint32
 	conflictVar  uint32
 	inconsistent bool
 	closing      bool
@@ -76,6 +77,7 @@ func NewFixedNode(m *numeral.FixedPointManager, variables uint32, parent *FixedN
 		n.trail = parent.trail
 		n.context = parent.context
 		if n.context != nil {
+			n.id = n.context.takeNodeID()
 			n.context.numNodes++
 			n.context.nodes = append(n.context.nodes, n)
 		}
@@ -161,6 +163,7 @@ func (n *FixedNode) Close() error {
 	n.closed = true
 	if n.context != nil {
 		n.context.numNodes--
+		n.context.freeNodeIDs = append(n.context.freeNodeIDs, n.id)
 	}
 	if n.parent != nil {
 		n.parent.children--

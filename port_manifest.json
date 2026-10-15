@@ -53374,6 +53374,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_search_params_trace.go",
           "tests": ["TestFixedSearchSourceParameterDisplayAndTrace"]
+        },
+        {
+          "name": "Concrete config_mpfx search statistics, node selection, post-propagation, inconsistency, depth-limit and variable TRACE with source node-ID LIFO reuse (subpaving_t_def.h:1809-1844)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_search_trace.go",
+          "tests": ["TestFixedSearchSourceParameterDisplayAndTrace", "TestFixedSearchBranchTraceIDsAndDepthLimit"]
         }
       ],
       "ownership": [
@@ -54792,6 +54798,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_search_params_trace.go",
           "tests": ["TestFixedSearchSourceParameterDisplayAndTrace"]
+        },
+        {
+          "name": "Concrete config_mpfx search statistics, node selection, post-propagation, inconsistency, depth-limit and variable TRACE with source node-ID LIFO reuse (subpaving_t_def.h:1809-1844)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_search_trace.go",
+          "tests": ["TestFixedSearchSourceParameterDisplayAndTrace", "TestFixedSearchBranchTraceIDsAndDepthLimit"]
         },
         {
           "name": "Concrete config_mpff round-robin variable selector after latest child axiom (src/math/subpaving/subpaving_t_def.h:66-101)",
@@ -72494,6 +72506,12 @@
             "TestSATClauseNativeIDRecycleRefusalKeepsClauseThenOOMSkips",
             "TestSATClauseIDBorrowedOOMProviderLifetime"
           ]
+        },
+        {
+          "name": "Concrete config_mpfx search-node ID generation and LIFO recycle for trace identity (subpaving_t_def.h:876-904,1819-1833)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_context.go",
+          "tests": ["TestFixedSearchBranchTraceIDsAndDepthLimit"]
         }
       ],
       "ownership": [
@@ -177291,6 +177309,12 @@
           "tests": ["TestFixedSearchSourceParameterDisplayAndTrace"]
         },
         {
+          "name": "Reached config_mpfx search statistics, node selection, post-propagation, inconsistency, depth-limit and variable TRACE records (subpaving_t_def.h:1809-1844)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_search_trace.go",
+          "tests": ["TestFixedSearchSourceParameterDisplayAndTrace", "TestFixedSearchBranchTraceIDsAndDepthLimit"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -178155,6 +178179,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_search_params_trace.go",
           "tests": ["TestFixedSearchSourceParameterDisplayAndTrace"]
+        },
+        {
+          "name": "Reached config_mpfx search statistics, node selection, post-propagation, inconsistency, depth-limit and variable TRACE records (subpaving_t_def.h:1809-1844)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_search_trace.go",
+          "tests": ["TestFixedSearchSourceParameterDisplayAndTrace", "TestFixedSearchBranchTraceIDsAndDepthLimit"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
