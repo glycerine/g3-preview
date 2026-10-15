@@ -171998,7 +171998,7 @@
         },
         {
           "name": "Direct borrowed static-zero copy assignment into caller physical rational, without an owned constant temporary (src/util/rational.h:131-134,302-304)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/rational_service_zero_invocation.go",
           "tests": [
             "TestRationalServiceBorrowedZeroAssignmentWithoutTemporary"
