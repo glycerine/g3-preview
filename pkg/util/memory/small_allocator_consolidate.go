@@ -108,6 +108,9 @@ func (a *SmallAllocator) Consolidate() error {
 				a.cleanupChunksNeeded = true
 				e = a.config.Runtime.Deallocate(&h)
 				if h == (Block{}) {
+					if a.config.Profile.Debug && a.config.ChunkTrace != nil {
+						a.config.ChunkTrace.DeallocatedChunk(chunk.address, 221)
+					}
 					a.invalidateChunk(chunkID)
 				}
 				if e != nil {

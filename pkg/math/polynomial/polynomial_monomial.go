@@ -11,6 +11,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/idgen"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
@@ -174,7 +175,9 @@ func NewMonomialManager(c MonomialManagerConfig) (*MonomialManager, error) {
 	m.idsInitialized = true
 	m.allocator = c.Allocator
 	if m.allocator == nil {
-		a, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: r, Profile: c.Profile})
+		a, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{
+			Runtime: r, Profile: c.Profile, ChunkTrace: diagnostic.NewMemoryChunkTrace(nil, r),
+		})
 		if e != nil {
 			return fail(e)
 		}

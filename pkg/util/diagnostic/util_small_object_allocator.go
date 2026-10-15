@@ -21,6 +21,7 @@ type utilSmallObjectRef = umemory.ObjectRef
 type smallObjectStats = umemory.AllocatorStats
 type utilSmallObjectConfig struct {
 	Debug                *DebugContext
+	Trace                *TraceTags
 	Runtime              *umemory.Runtime
 	Profile              utilSmallObjectProfile
 	ID                   string
@@ -68,6 +69,7 @@ func newUtilSmallObjectAllocator(c utilSmallObjectConfig) (*utilSmallObjectAlloc
 	}
 	io := &smallObjectIOBridge{config: c}
 	mc := umemory.SmallAllocatorConfig{Runtime: c.Runtime, Profile: c.Profile, IO: io, Verbosity: c.Verbosity}
+	mc.ChunkTrace = NewMemoryChunkTrace(c.Trace, c.Runtime)
 	if c.Debug != nil {
 		mc.Assertions = c.Debug
 	}

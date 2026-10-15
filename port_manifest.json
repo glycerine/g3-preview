@@ -150168,10 +150168,12 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Z3DEBUG allocate(file,line,obj,size) and deallocate(file,line,p) wrappers: base allocation/deallocation is ported, but the reached memory TRACE records and source-site metadata remain unaudited (cpp202-211)",
+          "name": "Z3DEBUG allocate(file,line,obj,size) and deallocate(file,line,p) wrappers: the retained small_object_allocator chunk allocation and three release source sites are ported; other retained caller sites remain unaudited (cpp202-211)",
           "status": "partial",
-          "go_target": "",
-          "tests": []
+          "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
+          "tests": [
+            "TestMemoryChunkTraceSourceSitesAndFinalizeGuard"
+          ]
         },
         {
           "name": "tactic_report snapshots source process allocation bytes before and after retained tactics (tactic/tactic.cpp:26-50)",
@@ -150650,10 +150652,12 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Z3DEBUG allocation/deallocation file-line overloads and alloc/dealloc macros: concrete source-site trace metadata has not been connected to retained Go callers (h69-97; cpp202-211)",
+          "name": "Z3DEBUG allocation/deallocation file-line overloads and alloc/dealloc macros: the retained small_object_allocator chunk sites are connected through a concrete trace hook; other retained caller sites remain unaudited (h69-97; cpp202-211)",
           "status": "partial",
-          "go_target": "",
-          "tests": []
+          "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
+          "tests": [
+            "TestMemoryChunkTraceSourceSitesAndFinalizeGuard"
+          ]
         },
         {
           "name": "tactic_report snapshots source process allocation bytes before and after retained tactics (tactic/tactic.cpp:26-50)",

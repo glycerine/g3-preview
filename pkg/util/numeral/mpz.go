@@ -150,7 +150,9 @@ func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 	if profile.PointerBits == 0 {
 		profile = umemory.SmallAllocatorProfile{PointerBits: m.Memory.SizeTBits(), Debug: modularSourceDebug, Windows: runtime.GOOS == "windows"}
 	}
-	m.Allocator, e = umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: m.Memory, Profile: profile})
+	m.Allocator, e = umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{
+		Runtime: m.Memory, Profile: profile, ChunkTrace: diagnostic.NewMemoryChunkTrace(m.trace, m.Memory),
+	})
 	if e != nil {
 		return fail(e)
 	}

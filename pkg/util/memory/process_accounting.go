@@ -73,6 +73,12 @@ func (p *ProcessAccounting) InitializationStarted() bool {
 	return p.Valid() && p.initialized
 }
 
+// Finalizing reports the source g_finalizing guard used by memory's debug
+// deallocation trace while generated process children are being destroyed.
+func (p *ProcessAccounting) Finalizing() bool {
+	return p.Valid() && p.finalizing
+}
+
 // BeginFinalize enters memory::finalize's guarded generated-child interval.
 // The caller runs mem_finalize's concrete children before CompleteFinalize.
 func (p *ProcessAccounting) BeginFinalize() (bool, error) {

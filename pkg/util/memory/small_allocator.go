@@ -27,7 +27,15 @@ type SmallAllocatorConfig struct {
 	Runtime        *Runtime
 	Profile        SmallAllocatorProfile
 	IO             AllocatorIO
+	ChunkTrace     SmallAllocatorChunkTrace
 	Verbosity      uint32
+}
+
+// SmallAllocatorChunkTrace is the concrete memory::alloc(chunk)/dealloc(chunk)
+// diagnostic boundary. The address is the allocator's stable logical address.
+type SmallAllocatorChunkTrace interface {
+	AllocatedChunk(address uint64)
+	DeallocatedChunk(address uint64, sourceLine int)
 }
 type ObjectRef struct {
 	owner, address   uint64
@@ -390,6 +398,9 @@ func (a *SmallAllocator) allocateWithOutcome(n uint64, outcome *SmallAllocatorAl
 		a.rememberPendingWithOutcome(h, outcome)
 		return ObjectRef{}, e
 	}
+	if a.config.Profile.Debug && a.config.ChunkTrace != nil {
+		a.config.ChunkTrace.AllocatedChunk(address)
+	}
 	// ctor sets curr first; source next and chain publication follow.
 	if e = smallObjectWriteWord(a.config.Runtime, h, width, width, 2*width); e != nil {
 		a.rememberPendingWithOutcome(h, outcome)
@@ -542,6 +553,13 @@ func (a *SmallAllocator) freeChunks(mode uint8) error {
 		h := loc.raw
 		e = a.config.Runtime.Deallocate(&h)
 		if h == (Block{}) {
+			if a.config.Profile.Debug && a.config.ChunkTrace != nil {
+				line := 60 // reset: dealloc(c)
+				if mode == 2 {
+					line = 44 // destructor: dealloc(c)
+				}
+				a.config.ChunkTrace.DeallocatedChunk(loc.address, line)
+			}
 			a.invalidateChunk(id)
 			a.cleanupCurrent = uint32(next)
 		}
@@ -664,6 +682,9 @@ func (a *SmallAllocator) CleanupChunks() error {
 		h := loc.raw
 		e := a.config.Runtime.Deallocate(&h)
 		if h == (Block{}) {
+			if a.config.Profile.Debug && a.config.ChunkTrace != nil {
+				a.config.ChunkTrace.DeallocatedChunk(loc.address, 221)
+			}
 			a.invalidateChunk(uint32(i + 1))
 		}
 		if e != nil {
