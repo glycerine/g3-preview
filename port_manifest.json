@@ -171778,6 +171778,14 @@
           ]
         },
         {
+          "name": "Concrete expr_map reset/flush dec_ref_map_values for proofs before dec_ref_map_key_values for expressions; successful completion releases owned references and clears both native maps (src/ast/expr_map.cpp:85-94)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr_map.go",
+          "tests": [
+            "TestASTExprMapConcreteReferenceCleanup"
+          ]
+        },
+        {
           "name": "Remaining live concrete keys-only, values-only, key/value and collection cleanup in other AST, tactic, SMT, API and subpaving consumers",
           "status": "partial",
           "go_target": "",
@@ -171785,7 +171793,7 @@
         }
       ],
       "ownership": [
-        "AST shared occurrences owns one reference per distinct expression in an insertion-ordered dictionary. Reset and Close decrement each remaining expression once and clear its entry after a consumed decrement, retaining unfinished entries for typed cleanup refusal. The four reached expr2subpaving term caches each own one reference per cached AST key; converter close drops those keys before its cached numeral vectors and variable references. SAT's concrete atom2bool_var map retains one AST reference per distinct atom; GoalTranslator.Close decrements each remaining key once and removes it only after a consumed decrement. The AST manager owns node storage; no generic reference manager or collection adapter is retained."
+        "AST shared occurrences owns one reference per distinct expression in an insertion-ordered dictionary. Reset and Close decrement each remaining expression once and clear its entry after a consumed decrement, retaining unfinished entries for typed cleanup refusal. The four reached expr2subpaving term caches each own one reference per cached AST key; converter close drops those keys before its cached numeral vectors and variable references. SAT's concrete atom2bool_var map retains one AST reference per distinct atom; GoalTranslator.Close decrements each remaining key once and removes it only after a consumed decrement. Concrete ASTExprMap successful reset and flush release proof values before expression keys and values. The AST manager owns node storage; no generic reference manager or collection adapter is retained."
       ],
       "deviations": [
         "No generic Go adapter is retained. Each live decrement-and-clear operation belongs in its concrete consumer with compiler-checked element and manager types.",
