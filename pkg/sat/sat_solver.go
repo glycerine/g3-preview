@@ -146,6 +146,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	if s.propagation, err = newSATSolverPropagationState(s.Variables, s.Clauses, s.converter, c.RLimit, c.Runtime.memory, s.config, c.Budget); err != nil {
 		return s, err
 	}
+	s.propagation.traceTags = c.TraceTags
 	if s.Lifecycle, err = newSATSolverClauseLifecycle(s.propagation, c.Budget); err != nil {
 		return s, err
 	}

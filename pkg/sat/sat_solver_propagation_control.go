@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/messages"
@@ -37,6 +38,7 @@ type satSolverPropagationState struct {
 	limit                                                                       *control.Reslimit
 	memory                                                                      *umemory.Runtime
 	config                                                                      *satMainConfig
+	traceTags                                                                   *diagnostic.TraceTags
 	budget                                                                      *arena.Budget
 	diffLevels                                                                  satVariableCharColumn
 	conflict                                                                    satJustification

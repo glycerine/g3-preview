@@ -80,6 +80,7 @@ func (s *satSolverPropagationState) propagateCore(update bool) (bool, error) {
 		if e != nil {
 			return false, e
 		}
+		s.tracePropagating(l)
 		v.qhead++
 		not := l.Negated()
 		if satStorageSourceDebug {

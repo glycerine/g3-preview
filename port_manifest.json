@@ -178171,6 +178171,12 @@
           "tests": ["TestSATClauseCreationSourceTraceBeforeAndAfterSimplification", "TestSATReinitClauseSourceTraceBeforePublication"]
         },
         {
+          "name": "Reached SAT assign_core and propagate_core TRACE with incoming versus stored justification and queue-head boundary (sat_solver.cpp:506,564)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_propagation_trace.go",
+          "tests": ["TestSATAssignmentAndPropagationSourceTraceOrder"]
+        },
+        {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_simplify_trace.go",
@@ -179389,6 +179395,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_clause_trace.go",
           "tests": ["TestSATClauseCreationSourceTraceBeforeAndAfterSimplification", "TestSATReinitClauseSourceTraceBeforePublication"]
+        },
+        {
+          "name": "Reached SAT assign_core and propagate_core TRACE with incoming versus stored justification and queue-head boundary (sat_solver.cpp:506,564)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_propagation_trace.go",
+          "tests": ["TestSATAssignmentAndPropagationSourceTraceOrder"]
         },
         {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",

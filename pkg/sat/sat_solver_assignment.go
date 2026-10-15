@@ -42,6 +42,7 @@ func (s *satSolverPropagationState) assignCore(l Literal, j satJustification) er
 			return ErrSATAssertion
 		}
 	}
+	s.traceAssignCore(l, j)
 	if v.scopeLevel == 0 {
 		j = satJustification{}
 	}
