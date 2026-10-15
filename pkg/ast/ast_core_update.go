@@ -120,6 +120,7 @@ func (m *ASTManager) updateQuantifierArguments(h, body ASTHandle, forall bool, w
 		if old.weight == weight {
 			return h, nil
 		}
+		m.traceQuantifierWeight(m.nodeAt(q.slot).id, old.weight, weight)
 		body = m.external(old.body)
 	} else {
 		if flags&astUpdateKind == 0 {

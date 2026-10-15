@@ -10690,6 +10690,12 @@
           ]
         },
         {
+          "name": "update_quantifier_weight TRACE after identity check and before replacement construction (ast.cpp:2454)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_update_trace.go",
+          "tests": ["TestASTQuantifierWeightTraceBeforeReplacement"]
+        },
+        {
           "name": "proof builder and reader overloads across all 44 out-of-line names and inline mode/fact/parent inspection; diagnostic transport open",
           "status": "partial",
           "go_target": "pkg/ast/ast_proof_manager.go",
@@ -10968,7 +10974,7 @@
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
         "Private sort_size enum is encoded Go0=infinite/1=finite/2=very-big to match source default with Go zero value. Nonfinite size is canonical0 rather than source unspecified default bits. Size checks finite precondition in every Go profile instead of reading irrelevant/unspecified release fields. No source ENSURE tests are invented; tests exercise implementation SASSERT and real borrowed rational provenance/lifetime.",
-        "Source pointer identities become owner/slot/generation tokens; physical owner/page/payload accounting replaces C++ ABI sizes. Invalid/dangling domains use typed guards. Source-undefined construction/deletion allocation exceptions have explicit ownership continuation adapters. Runtime debug_ref_count, conditional debug tags, TRACE/printer-backed diagnostics, trace constructors, remaining manager/plug-in operations and complete proof/checker/solver consumers remain open. Six quantifier updates use direct retained payload copies without intermediate Go slices; update-weight TRACE remains open. No Go generics are used.",
+        "Source pointer identities become owner/slot/generation tokens; physical owner/page/payload accounting replaces C++ ABI sizes. Invalid/dangling domains use typed guards. Source-undefined construction/deletion allocation exceptions have explicit ownership continuation adapters. Runtime debug_ref_count, conditional debug tags, TRACE/printer-backed diagnostics, trace constructors, remaining manager/plug-in operations and complete proof/checker/solver consumers remain open. Six quantifier updates use direct retained payload copies without intermediate Go slices; update-weight TRACE now precedes replacement construction. No Go generics are used.",
         "Selected builtin-unreachable, malformed downcast/index and dangling-owner boundaries return typed errors after source-completed prefixes. Hyper-resolution premise and substitution outputs now use native slices, with actual node references retained before append. TRACE/printer diagnostics remain open; no generic types or functions are used. Whole-unit audit flags remain false.",
         "Expression-array never-initialized physical slots are guarded using charged initialized high-water metadata; retained freed tokens can be read before actual AST dereference rejects their generation. No new whole-unit completion claim.",
         "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code.",
@@ -11689,6 +11695,12 @@
           ]
         },
         {
+          "name": "update_quantifier_weight TRACE after identity check and before replacement construction (ast.cpp:2454)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_update_trace.go",
+          "tests": ["TestASTQuantifierWeightTraceBeforeReplacement"]
+        },
+        {
           "name": "proof builder and reader overloads across all 44 out-of-line names and inline mode/fact/parent inspection; diagnostic transport open",
           "status": "partial",
           "go_target": "pkg/ast/ast_proof_manager.go",
@@ -11928,7 +11940,7 @@
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
         "Private sort_size enum is encoded Go0=infinite/1=finite/2=very-big to match source default with Go zero value. Nonfinite size is canonical0 rather than source unspecified default bits. Size checks finite precondition in every Go profile instead of reading irrelevant/unspecified release fields. No source ENSURE tests are invented; tests exercise implementation SASSERT and real borrowed rational provenance/lifetime.",
-        "Source pointer identities become owner/slot/generation tokens; physical owner/page/payload accounting replaces C++ ABI sizes. Invalid/dangling domains use typed guards. Source-undefined construction/deletion allocation exceptions have explicit ownership continuation adapters. Runtime debug_ref_count, conditional debug tags, TRACE/printer-backed diagnostics, trace constructors, remaining manager/plug-in operations and complete proof/checker/solver consumers remain open. Six quantifier updates use direct retained payload copies without intermediate Go slices; update-weight TRACE remains open. No Go generics are used.",
+        "Source pointer identities become owner/slot/generation tokens; physical owner/page/payload accounting replaces C++ ABI sizes. Invalid/dangling domains use typed guards. Source-undefined construction/deletion allocation exceptions have explicit ownership continuation adapters. Runtime debug_ref_count, conditional debug tags, TRACE/printer-backed diagnostics, trace constructors, remaining manager/plug-in operations and complete proof/checker/solver consumers remain open. Six quantifier updates use direct retained payload copies without intermediate Go slices; update-weight TRACE now precedes replacement construction. No Go generics are used.",
         "Selected builtin-unreachable, malformed downcast/index and dangling-owner boundaries return typed errors after source-completed prefixes. Hyper-resolution premise and substitution outputs now use native slices, with actual node references retained before append. TRACE/printer diagnostics remain open; no generic types or functions are used. Whole-unit audit flags remain false.",
         "Expression-array never-initialized physical slots are guarded using charged initialized high-water metadata; retained freed tokens can be read before actual AST dereference rejects their generation. No new whole-unit completion claim.",
         "Scalar owner identity replaces debug raw addresses. Typed physical/stale-owner guards and implicit owning-copy rejection are explicit Go adapters. Source ID marks survive deletion/reuse; sparse/shared-occurrence marks and other template specializations remain open. No generic Go code.",
@@ -176249,6 +176261,7 @@
         "pkg/ast/util_psort_ast_sorting.go",
         "pkg/ast/ast_core_register_trace.go",
         "pkg/ast/ast_core_delete_trace.go",
+        "pkg/ast/ast_core_update_trace.go",
         "pkg/math/interval/arbitrary_root_trace.go",
         "pkg/math/interval/hardware_root_trace.go",
         "pkg/math/subpaving/hardware_interval_root_trace.go",
@@ -177019,6 +177032,12 @@
           "tests": ["TestRationalSearchStatisticsTraceEntryExitAndNodeLimit", "TestRationalSearchStatisticsTraceStreamRefusalKeepsExit"]
         },
         {
+          "name": "Reached AST quantifier weight TRACE before replacement registration (ast.cpp:2454)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_update_trace.go",
+          "tests": ["TestASTQuantifierWeightTraceBeforeReplacement"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -177055,6 +177074,7 @@
         "pkg/ast/util_psort_ast_sorting.go",
         "pkg/ast/ast_core_register_trace.go",
         "pkg/ast/ast_core_delete_trace.go",
+        "pkg/ast/ast_core_update_trace.go",
         "pkg/math/interval/arbitrary_root_trace.go",
         "pkg/math/interval/hardware_root_trace.go",
         "pkg/math/subpaving/hardware_interval_root_trace.go",
@@ -177835,6 +177855,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_search_statistics_trace.go",
           "tests": ["TestRationalSearchStatisticsTraceEntryExitAndNodeLimit", "TestRationalSearchStatisticsTraceStreamRefusalKeepsExit"]
+        },
+        {
+          "name": "Reached AST quantifier weight TRACE before replacement registration (ast.cpp:2454)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_update_trace.go",
+          "tests": ["TestASTQuantifierWeightTraceBeforeReplacement"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
