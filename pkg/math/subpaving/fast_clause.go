@@ -151,12 +151,12 @@ func (c *FastContext) AddClause(atoms []*FastInequality, lemma, watched bool) (*
 		return nil, c.AddUnitClause(atoms[0], true)
 	}
 	copyAtoms := append([]*FastInequality(nil), atoms...)
-	sort.SliceStable(copyAtoms, func(i, j int) bool { return copyAtoms[i].variable < copyAtoms[j].variable })
 	clause := &FastClause{context: c, atoms: copyAtoms, lemma: lemma, watched: watched}
 	for _, atom := range copyAtoms {
 		c.traceInequalityIncRef(atom)
 		atom.refs++
 	}
+	sort.SliceStable(copyAtoms, func(i, j int) bool { return copyAtoms[i].variable < copyAtoms[j].variable })
 	if watched {
 		var previous uint32
 		for i, atom := range copyAtoms {

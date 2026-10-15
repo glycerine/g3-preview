@@ -54,12 +54,12 @@ func (c *RationalContext) AddClause(atoms []*RationalInequality) (*RationalClaus
 		return nil, c.AddUnitClause(atoms[0], true)
 	}
 	ordered := append([]*RationalInequality(nil), atoms...)
-	sort.SliceStable(ordered, func(i, j int) bool { return ordered[i].variable < ordered[j].variable })
 	clause := &RationalClause{context: c, atoms: ordered}
 	for _, a := range ordered {
 		c.traceInequalityIncRef(a)
 		a.refs++
 	}
+	sort.SliceStable(ordered, func(i, j int) bool { return ordered[i].variable < ordered[j].variable })
 	for i, a := range ordered {
 		if i == 0 || a.variable != ordered[i-1].variable {
 			c.clauseWatchers[a.variable] = append(c.clauseWatchers[a.variable], clause)

@@ -39,7 +39,7 @@ func TestRationalInequalityReferenceTraceSourceOrder(t *testing.T) {
 	if tags.ShouldTrace("subpaving_ref_count") {
 		got := output.String()
 		want := []string{
-			fmt.Sprintf("inc-ref: %p 0\n", first), fmt.Sprintf("inc-ref: %p 0\n", second),
+			fmt.Sprintf("inc-ref: %p 0\n", second), fmt.Sprintf("inc-ref: %p 0\n", first),
 			fmt.Sprintf("dec-ref: %p 1\n5 <= x0\n", first), fmt.Sprintf("dec-ref: %p 1\nx1 <= 5\n", second),
 		}
 		last := -1

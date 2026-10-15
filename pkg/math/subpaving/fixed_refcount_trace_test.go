@@ -40,6 +40,45 @@ func TestFixedInequalityReferenceTraceSourceOrder(t *testing.T) {
 	}
 }
 
+func TestFixedInequalityReferenceTraceClauseInputOrder(t *testing.T) {
+	m, c, v, _ := fixedClauseFixture(t, []bool{false, false})
+	first := fixedClauseAtom(t, m, c, v, 0, 5, true, false)
+	second := fixedClauseAtom(t, m, c, v, 1, 7, false, false)
+	var output polynomialTraceFlushingBuffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("subpaving_ref_count")
+	if err := c.BindTrace(tags); err != nil {
+		t.Fatal(err)
+	}
+	clause, err := c.AddClause([]*FixedInequality{second, first}, false, true)
+	if err != nil || clause == nil || clause.atoms[0] != first || clause.atoms[1] != second {
+		t.Fatal("stable sorted clause", err)
+	}
+	if err := c.releaseClause(clause); err != nil || first.refs != 0 || second.refs != 0 {
+		t.Fatal("clause release", err)
+	}
+	if tags.ShouldTrace("subpaving_ref_count") {
+		got := output.String()
+		want := []string{
+			fmt.Sprintf("inc-ref: %p 0\n", second), fmt.Sprintf("inc-ref: %p 0\n", first),
+			fmt.Sprintf("dec-ref: %p 1\n5 <= x0\n", first), fmt.Sprintf("dec-ref: %p 1\nx1 <= 7\n", second),
+		}
+		last := -1
+		for _, part := range want {
+			at := strings.Index(got, part)
+			if at <= last {
+				t.Fatalf("fixed clause reference order missing %q in %q", part, got)
+			}
+			last = at
+		}
+		if output.flushes != 4 {
+			t.Fatalf("fixed clause reference flushes=%d", output.flushes)
+		}
+	} else if output.Len() != 0 || output.flushes != 0 {
+		t.Fatal("erased fixed clause reference trace", output.String())
+	}
+}
+
 func TestFixedInequalityReferenceTraceRefusalAndStoppedRelease(t *testing.T) {
 	m, c, v, _ := fixedClauseFixture(t, []bool{false})
 	a := fixedClauseAtom(t, m, c, v, 0, 7, false, false)
