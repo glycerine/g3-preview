@@ -107,6 +107,7 @@ func (s *satSolverConflictResolution) processAntecedentForUnsatCore(l Literal) e
 	if e != nil {
 		return e
 	}
+	s.traceUnsatCoreAntecedent(l, marked)
 	if marked {
 		return nil
 	}
@@ -324,6 +325,7 @@ func (s *satSolverConflictResolution) resolveConflictForInit() (bool, error) {
 		return false, e
 	}
 	if p.notLiteral != DefaultLiteral() {
+		s.traceInitNotLiteral(p.notLiteral)
 		if e := s.processAntecedentForInit(p.notLiteral); e != nil {
 			return false, e
 		}

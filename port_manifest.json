@@ -178238,6 +178238,12 @@
           "tests": ["TestSATConsequenceExtractionSourceTrace"]
         },
         {
+          "name": "Reached SAT unsat-core antecedent mark and conflict-init non-null literal TRACE before their source mutations (sat_solver.cpp:1825,1892)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_conflict_assumptions_extra_trace.go",
+          "tests": ["TestSATUnsatCoreAntecedentSourceTraceBeforeMark", "TestSATConflictInitNotLiteralSourceTrace"]
+        },
+        {
           "name": "Reached SAT missed-propagation TRACE before unreachable assertion for live empty and unit clauses (sat_solver.cpp:3061)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_probing_diagnostics_trace.go",
@@ -179559,6 +179565,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_consequences_trace.go",
           "tests": ["TestSATConsequenceExtractionSourceTrace"]
+        },
+        {
+          "name": "Reached SAT unsat-core antecedent mark and conflict-init non-null literal TRACE before their source mutations (sat_solver.cpp:1825,1892)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_conflict_assumptions_extra_trace.go",
+          "tests": ["TestSATUnsatCoreAntecedentSourceTraceBeforeMark", "TestSATConflictInitNotLiteralSourceTrace"]
         },
         {
           "name": "Reached SAT missed-propagation TRACE before unreachable assertion for live empty and unit clauses (sat_solver.cpp:3061)",
