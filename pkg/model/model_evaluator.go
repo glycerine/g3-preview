@@ -40,6 +40,8 @@ type ModelEvaluator struct {
 	cfg           evaluatorConfiguration
 	traversal     *rewriter.Traversal
 	header        uint64
+	impGeneration uint64
+	impLive       bool
 	ready, closed bool
 }
 type evaluatorConfiguration struct {
@@ -89,6 +91,8 @@ func NewModelEvaluator(md *ModelCore, s ModelEvaluatorConfig) (*ModelEvaluator, 
 	ev := &ModelEvaluator{model: md, services: s, header: n}
 	ev.self = ev
 	ev.services.Params = nil
+	ev.impLive = true
+	ev.traceImpAllocated(523)
 	return ev, ev.init(s.Params)
 }
 func (ev *ModelEvaluator) init(p *uparams.ParamsRef) error {
@@ -239,6 +243,11 @@ func (ev *ModelEvaluator) Cleanup(p *uparams.ParamsRef) error {
 	if e := ev.closeImp(); e != nil {
 		return e
 	}
+	ev.traceImpDeallocated(556)
+	ev.impLive = false
+	ev.impGeneration++
+	ev.impLive = true
+	ev.traceImpAllocated(557)
 	return ev.init(p)
 }
 func (ev *ModelEvaluator) Close() error {
@@ -251,6 +260,8 @@ func (ev *ModelEvaluator) Close() error {
 	if e := ev.closeImp(); e != nil {
 		return e
 	}
+	ev.traceImpDeallocated(531)
+	ev.impLive = false
 	ev.model.manager.Budget().Release(ev.header)
 	ev.header = 0
 	ev.closed = true

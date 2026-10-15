@@ -56769,6 +56769,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/model/model_evaluator_trace.go",
+        "pkg/model/model_evaluator_memory_trace.go",
+        "pkg/model/model_evaluator_memory_trace_debug_test.go",
         "pkg/model/model_evaluator.go",
         "pkg/model/model_evaluator_array_expansion.go",
         "pkg/model/model_evaluator_array_equality.go",
@@ -56777,6 +56779,7 @@
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
+        "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose",
         "TestModelEvaluatorSharedProcessMemoryAndCohort",
         "TestModelEvaluatorConstantCompletionAndBooleanReduction",
         "TestModelEvaluatorFunctionEntriesMacrosAndCompletion",
@@ -56840,6 +56843,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete model_evaluator::imp allocation, cleanup replacement and destructor debug memory records (model_evaluator.cpp:523,556-557,531)",
+          "status": "platform_replacement",
+          "go_target": "pkg/model/model_evaluator_memory_trace.go",
+          "tests": [
+            "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose"
+          ]
+        },
         {
           "name": "Reached get_macro TRACE records for existing and completion-created function interpretations (model_evaluator.cpp:228,247)",
           "status": "ported",
@@ -150451,6 +150462,8 @@
       "go_targets": [
         "pkg/util/diagnostic/util_memory_runtime.go",
         "pkg/ast/ast_sort_dependency_memory_trace.go",
+        "pkg/model/model_evaluator_memory_trace.go",
+        "pkg/model/model_evaluator_memory_trace_debug_test.go",
         "pkg/ast/ast_sort_dependency_memory_trace_debug_test.go",
         "pkg/util/diagnostic/util_trace_tags_memory_trace.go",
         "pkg/util/diagnostic/util_debug_table_memory_trace.go",
@@ -150498,6 +150511,7 @@
       "tests": [
         "TestRuntimeUint32AcrossInitializationBitmapBoundary",
         "TestASTDeclCollectorDependencySetMemoryTrace",
+        "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose",
         "TestTraceTagTableAllocationFollowsSourceGate",
         "TestTraceTagTableFinalizationSuppressesMemoryDuringProcessFinalize",
         "TestDebugTableMemoryTraceFollowsLazyLifetime",
@@ -150644,6 +150658,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete model_evaluator::imp allocation/replacement/destruction debug wrappers at model_evaluator.cpp:523,556-557,531 with Go evaluator owner/generation identity, header extent and process-finalizing guard (memory_manager.cpp:202-211)",
+          "status": "platform_replacement",
+          "go_target": "pkg/model/model_evaluator_memory_trace.go",
+          "tests": [
+            "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose"
+          ]
+        },
         {
           "name": "Concrete top_sort<sort> dependency-set allocation/deallocation debug wrappers at decl_collector.cpp:127 and top_sort.h:79, with stable Go order-owner/slot identity, slice-header extent and process-finalizing guard (memory_manager.cpp:202-211)",
           "status": "platform_replacement",
@@ -151149,6 +151171,8 @@
       "go_targets": [
         "pkg/util/diagnostic/util_memory_runtime.go",
         "pkg/ast/ast_sort_dependency_memory_trace.go",
+        "pkg/model/model_evaluator_memory_trace.go",
+        "pkg/model/model_evaluator_memory_trace_debug_test.go",
         "pkg/ast/ast_sort_dependency_memory_trace_debug_test.go",
         "pkg/util/diagnostic/util_trace_tags_memory_trace.go",
         "pkg/util/diagnostic/util_debug_table_memory_trace.go",
@@ -151190,6 +151214,7 @@
       ],
       "tests": [
         "TestASTDeclCollectorDependencySetMemoryTrace",
+        "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose",
         "TestTraceTagTableAllocationFollowsSourceGate",
         "TestTraceTagTableFinalizationSuppressesMemoryDuringProcessFinalize",
         "TestDebugTableMemoryTraceFollowsLazyLifetime",
@@ -151326,6 +151351,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete model_evaluator::imp allocation/replacement/destruction debug wrappers at model_evaluator.cpp:523,556-557,531 with Go evaluator owner/generation identity, header extent and process-finalizing guard (memory_manager.cpp:202-211)",
+          "status": "platform_replacement",
+          "go_target": "pkg/model/model_evaluator_memory_trace.go",
+          "tests": [
+            "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose"
+          ]
+        },
         {
           "name": "Concrete top_sort<sort> dependency-set allocation/deallocation debug wrappers at decl_collector.cpp:127 and top_sort.h:79, with stable Go order-owner/slot identity, slice-header extent and process-finalizing guard (memory_manager.cpp:202-211)",
           "status": "platform_replacement",
