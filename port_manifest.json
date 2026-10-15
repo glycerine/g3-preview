@@ -150369,6 +150369,14 @@
           ]
         },
         {
+          "name": "Concrete SAT tmp_clause alloc_svect/dealloc_svect byte-block specialization: capacity reuse, old-block deletion before growth, allocation refusal and final release (sat_clause.cpp:104-117; sat_clause.h:119)",
+          "status": "platform_replacement",
+          "go_target": "pkg/sat/sat_clause_storage.go",
+          "tests": [
+            "TestSATTmpClauseSourceReuseAndDestroyBeforeGrow"
+          ]
+        },
+        {
           "name": "memory::display_i_max_usage has no retained source caller",
           "status": "dead_deleted"
         }
@@ -150795,6 +150803,14 @@
             "TestGeneratedInitializeAndFinalizeConcreteServices",
             "TestGeneratedFinalizeNullProcessSkipsChildren",
             "TestGeneratedMemoryLifecycleContinuesAfterGParamsTraceRefusal"
+          ]
+        },
+        {
+          "name": "Concrete SAT tmp_clause alloc_svect/dealloc_svect byte-block specialization: capacity reuse, old-block deletion before growth, allocation refusal and final release (sat_clause.cpp:104-117; sat_clause.h:119)",
+          "status": "platform_replacement",
+          "go_target": "pkg/sat/sat_clause_storage.go",
+          "tests": [
+            "TestSATTmpClauseSourceReuseAndDestroyBeforeGrow"
           ]
         },
         {
