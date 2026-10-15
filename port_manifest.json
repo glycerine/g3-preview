@@ -183083,14 +183083,19 @@
           ]
         },
         {
-          "name": "selected default_exception(fmt, char const*, ...) %s/%d/%u/%I64u construction and Linux AMD64 stream truncation; MUZ/parser callers remain",
-          "status": "partial",
+          "name": "default_exception(fmt, char const*, ...) constructor for all retained %s/%d/%u/%I64u format literals, C-string boundaries and selected Linux AMD64 stream truncation",
+          "status": "ported",
           "go_target": "pkg/util/z3exception/z3_exception.go",
           "tests": [
             "TestDefaultExceptionSourceFormattedConstructor",
             "TestDefaultExceptionRetainedDatalogUnsignedLine",
             "TestDefaultExceptionRetainedDatalogUnsignedSymbol"
           ]
+        },
+        {
+          "name": "MUZ datalog parser and relation instruction callers of the formatted constructor, including virtual exception transport at those owning boundaries",
+          "status": "partial",
+          "tests": []
         }
       ],
       "ownership": [
@@ -183155,14 +183160,19 @@
           ]
         },
         {
-          "name": "selected default_exception(fmt, char const*, ...) %s/%d/%u/%I64u construction and Linux AMD64 stream truncation; MUZ/parser callers remain",
-          "status": "partial",
+          "name": "default_exception(fmt, char const*, ...) constructor for all retained %s/%d/%u/%I64u format literals, C-string boundaries and selected Linux AMD64 stream truncation",
+          "status": "ported",
           "go_target": "pkg/util/z3exception/z3_exception.go",
           "tests": [
             "TestDefaultExceptionSourceFormattedConstructor",
             "TestDefaultExceptionRetainedDatalogUnsignedLine",
             "TestDefaultExceptionRetainedDatalogUnsignedSymbol"
           ]
+        },
+        {
+          "name": "MUZ datalog parser and relation instruction callers of the formatted constructor, including virtual exception transport at those owning boundaries",
+          "status": "partial",
+          "tests": []
         },
         {
           "name": "ERR_MEMOUT101/ERR_ALLOC_EXCEEDED113 actual fatal dispatch and out_of_memory_error -> z3_error derived/base Go catch adaptation",
