@@ -1,10 +1,90 @@
 package euclid
 
 import (
+	"errors"
+	"strings"
 	"testing"
 
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
+
+func TestEuclideanNormalizeQueryCopyRefusalRetainsOwnedBuffer(t *testing.T) {
+	m := euclidNumeralManager(t)
+	z := m.Integers()
+	s, e := newSolverSetup(m)
+	euclidMust(t, e)
+	for i := 0; i < 2; i++ {
+		_, e = s.mkVar(false)
+		euclidMust(t, e)
+	}
+	value := strings.Repeat("1234567890", 20)
+	coeff := []numeral.Int{{}, {}}
+	for i := range coeff {
+		euclidMust(t, z.SetString(&coeff[i], value))
+	}
+	constant, aPrime, cPrime := numeral.NewInt(7), numeral.NewInt(0), numeral.NewInt(0)
+	var js []uint32
+	z.Budget().FailAfter(2)
+	e = s.normalizeQuery(coeff, []uint32{1, 0}, &constant, &aPrime, &cPrime, &js)
+	z.Budget().FailAfter(-1)
+	if e != nil {
+		var failure umemory.Failure
+		if !errors.As(e, &failure) || failure.Kind != umemory.FailureMemout {
+			t.Fatal("unexpected normalization refusal", e)
+		}
+		if s.normRow == nil || s.stop == nil {
+			t.Fatal("stopped normalization lost its owning workspace")
+		}
+		pending := s.normRow
+		if retry := s.normalizeQuery(coeff, []uint32{1, 0}, &constant, &aPrime, &cPrime, &js); retry != s.stop || s.normRow != pending {
+			t.Fatal("stopped workspace was overwritten by a later query", retry)
+		}
+		first, read := s.asBuffer.BorrowSlot(1)
+		euclidMust(t, read)
+		second, read := s.asBuffer.BorrowSlot(0)
+		euclidMust(t, read)
+		zero, read := z.IsZero(second)
+		euclidMust(t, read)
+		if z.IsFailureRef(first.Cell) {
+			if !zero {
+				t.Fatal("failed first copy reached the second buffer slot")
+			}
+		} else {
+			got, read := z.String(first)
+			euclidMust(t, read)
+			if got != value {
+				t.Fatal("source first buffer copy was not retained", got)
+			}
+			if !zero {
+				got, read = z.String(second)
+				euclidMust(t, read)
+				if got != value {
+					t.Fatal("later refusal damaged second copied buffer slot", got)
+				}
+			}
+		}
+	} else {
+		if s.normRow != nil || s.stop != nil {
+			t.Fatal("completed normalization retained a workspace")
+		}
+		checkEuclideanQueryResult(t, z, &aPrime, &cPrime, value, "7")
+	}
+	for i := range coeff {
+		got, read := z.String(&coeff[i])
+		euclidMust(t, read)
+		if got != value {
+			t.Fatal("borrowed input changed", i, got)
+		}
+	}
+	euclidMust(t, s.Close())
+	for i := range coeff {
+		euclidMust(t, z.Del(&coeff[i]))
+	}
+	for _, v := range []*numeral.Int{&constant, &aPrime, &cPrime} {
+		euclidMust(t, z.Del(v))
+	}
+}
 
 func TestEuclideanNormalizeQueryAfterNonUnitSolve(t *testing.T) {
 	m := euclidNumeralManager(t)

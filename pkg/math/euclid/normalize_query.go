@@ -23,7 +23,19 @@ func (s *solverSetup) normalizeQuery(as []numeral.Int, xs []uint32, c,
 	z := s.manager.Integers()
 	row := &equation{manager: s.manager, as: make([]numeral.Int, len(as)),
 		xs: append([]uint32(nil), xs...)}
-	defer func() { err = errors.Join(err, row.Close()) }()
+	s.normRow = row
+	defer func() {
+		if err != nil {
+			s.stop = err
+			return
+		}
+		if cleanup := row.Close(); cleanup != nil {
+			err = cleanup
+			s.stop = cleanup
+			return
+		}
+		s.normRow = nil
+	}()
 	for i := range as {
 		if err = z.Copy(&row.as[i], &as[i]); err != nil {
 			return err

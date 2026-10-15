@@ -44,6 +44,7 @@ type solverSetup struct {
 	tmpAs              *numeral.ScopedIntVector
 	tmpBs              *numeral.ScopedRationalVector
 	tmpXs              []uint32
+	normRow            *equation // owns the started source m_norm_* member workspace
 	queue              *heap.Int
 	parameter          []bool
 	solved             []uint32
@@ -257,6 +258,12 @@ func (s *solverSetup) Close() error {
 	}
 	if e := s.queue.Close(); e != nil {
 		return e
+	}
+	if s.normRow != nil {
+		if e := s.normRow.Close(); e != nil {
+			return e
+		}
+		s.normRow = nil
 	}
 	if e := s.tmpBs.Close(); e != nil {
 		return e

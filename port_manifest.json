@@ -34772,6 +34772,7 @@
         "TestEuclideanRationalBufferSortAndRawSwap",
         "TestEuclideanBufferSortCoreUsesPublishedSlots",
         "TestEuclideanIntegerBufferSortCopyBudgetBoundary",
+        "TestEuclideanNormalizeQueryCopyRefusalRetainsOwnedBuffer",
         "TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue",
         "TestEuclideanRationalAddmulMergedJustifications",
         "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
@@ -34882,7 +34883,8 @@
           "tests": [
             "TestEuclideanIntegerBufferSortAndRawSwap",
             "TestEuclideanRationalBufferSortAndRawSwap",
-            "TestEuclideanIntegerBufferSortCopyBudgetBoundary"
+            "TestEuclideanIntegerBufferSortCopyBudgetBoundary",
+            "TestEuclideanNormalizeQueryCopyRefusalRetainsOwnedBuffer"
           ]
         },
         {
@@ -34968,9 +34970,11 @@
           "name": "normalize query applies solution and computes remaining coefficient gcd, constant and justification IDs at cpp:735-783",
           "status": "partial",
           "go_target": "pkg/math/euclid/normalize_query.go",
+          "go_targets": ["pkg/math/euclid/solver_setup.go"],
           "tests": [
             "TestEuclideanNormalizeQueryAfterNonUnitSolve",
-            "TestEuclideanNormalizeQueryJustificationAndConstantOnly"
+            "TestEuclideanNormalizeQueryJustificationAndConstantOnly",
+            "TestEuclideanNormalizeQueryCopyRefusalRetainsOwnedBuffer"
           ]
         },
         {
@@ -34994,6 +34998,7 @@
         "Non-unit decomposition borrows the selected positive magnitude, publishes a new parameter and buffer slot, compacts the todo equation's remainder numerals in place, copies auxiliary coefficients from the owned decomposition buffer into a solution equation, then substitutes that solution into prior occurrences. The decomposition buffer releases its copied numerals after the solution has independent ownership."
       ],
       "deviations": [
+        "normalizeQuery now retains its started equation-shaped m_norm_* workspace in the concrete solver owner after a stopped numeral copy. The original failure becomes a sticky solver stop; a later query cannot overwrite the partial owner. Successful queries release it at source function end, while solver Close drains it after the queue and before older buffer members. Native and checked/debug real-allocation tests observe completed or failed first buffer slots and full owner cleanup. Exact separate m_norm_as/m_norm_bs vectors and every normalization failure prefix remain open.",
         "Source normalize_eq checks divisibility of the constant but divides only variable coefficients and justification coefficients by their gcd. The Go path retains that exact result. After source normalize_eq destroys an empty zero equality, assert_eq still calls add_occs on its null slot; Go skips that invalid dereference.",
         "Unit and non-unit elimination, internal solve, normalize query and public solver methods now have concrete Go paths. Source svector::erase(value) ignores an absent occurrence, which happens for a decomposition parameter in the compacted original equation; Go matches this no-op. Explanation IDs are returned as a copy of the source const vector, and io.Writer reports host write errors. Whole-source error/debug/driver audit remains open."
       ]
