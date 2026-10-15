@@ -158155,7 +158155,8 @@
             "TestRationalCopySetterFailureCleanup",
             "TestRationalWarmStorageAndScratchModes",
             "TestRationalColdSetterFailureCleanup",
-            "TestRationalColdInverseFailureCleanup"
+            "TestRationalColdInverseFailureCleanup",
+            "TestRationalCopyAllocationReceiptDenominatorPostphysicalRefusal"
           ]
         },
         {
@@ -159322,7 +159323,8 @@
             "TestRationalCopySetterFailureCleanup",
             "TestRationalWarmStorageAndScratchModes",
             "TestRationalColdSetterFailureCleanup",
-            "TestRationalColdInverseFailureCleanup"
+            "TestRationalColdInverseFailureCleanup",
+            "TestRationalCopyAllocationReceiptDenominatorPostphysicalRefusal"
           ]
         },
         {
@@ -167173,6 +167175,7 @@
         "TestParamsReferenceInitFailedCopySkipsOldDEC",
         "TestParamsReferenceCopyAllKindsSharedTargetRefusalPrefixes",
         "TestParamsReferenceCopyFromSharedSourceStoppedDetach",
+        "TestParamsReferenceCopySharedDetachStoppedNumeralAndSourceFrames",
         "TestParamsReferenceCopyStopsAtMatchedNumeralDestruction",
         "TestParamsReferenceInitFrameOwnAbortActualLeafReceipt",
         "TestParamsReferenceTwoFramesAndFreshInvocationReuse",
@@ -167360,6 +167363,7 @@
             "TestParamsReferenceCopyAllKindsSharedTargetOrderedMerge",
             "TestParamsReferenceCopyAllKindsSharedTargetRefusalPrefixes",
             "TestParamsReferenceCopyFromSharedSourceStoppedDetach",
+            "TestParamsReferenceCopySharedDetachStoppedNumeralAndSourceFrames",
             "TestParamsReferenceSelfCopySourceRatIdentity",
             "TestParamsBorrowedStringSymbolCopyAndOwnership",
             "TestParamsReferenceInitFailedCopySkipsOldDEC"
@@ -167593,6 +167597,7 @@
             "TestParamsReferenceInitFailedCopySkipsOldDEC",
             "TestParamsReferenceCopyAllKindsSharedTargetRefusalPrefixes",
             "TestParamsReferenceCopyFromSharedSourceStoppedDetach",
+            "TestParamsReferenceCopySharedDetachStoppedNumeralAndSourceFrames",
             "TestParamsReferenceInitFrameOwnAbortActualLeafReceipt",
             "TestParamsReferenceTwoFramesAndFreshInvocationReuse",
             "TestParamsReferenceNullAssignmentOldDECStop",
@@ -167880,6 +167885,7 @@
         "TestParamsReferenceInitFailedCopySkipsOldDEC",
         "TestParamsReferenceCopyAllKindsSharedTargetRefusalPrefixes",
         "TestParamsReferenceCopyFromSharedSourceStoppedDetach",
+        "TestParamsReferenceCopySharedDetachStoppedNumeralAndSourceFrames",
         "TestParamsReferenceCopyStopsAtMatchedNumeralDestruction",
         "TestParamsReferenceInitFrameOwnAbortActualLeafReceipt",
         "TestParamsReferenceTwoFramesAndFreshInvocationReuse",
@@ -168028,6 +168034,7 @@
             "TestParamsReferenceCopyAllKindsSharedTargetOrderedMerge",
             "TestParamsReferenceCopyAllKindsSharedTargetRefusalPrefixes",
             "TestParamsReferenceCopyFromSharedSourceStoppedDetach",
+            "TestParamsReferenceCopySharedDetachStoppedNumeralAndSourceFrames",
             "TestParamsReferenceSelfCopySourceRatIdentity",
             "TestParamsBorrowedStringSymbolCopyAndOwnership",
             "TestParamsReferenceInitFailedCopySkipsOldDEC"
@@ -168259,6 +168266,7 @@
             "TestParamsReferenceInitFailedCopySkipsOldDEC",
             "TestParamsReferenceCopyAllKindsSharedTargetRefusalPrefixes",
             "TestParamsReferenceCopyFromSharedSourceStoppedDetach",
+            "TestParamsReferenceCopySharedDetachStoppedNumeralAndSourceFrames",
             "TestParamsReferenceInitFrameOwnAbortActualLeafReceipt",
             "TestParamsReferenceTwoFramesAndFreshInvocationReuse",
             "TestParamsReferenceNullAssignmentOldDECStop",
