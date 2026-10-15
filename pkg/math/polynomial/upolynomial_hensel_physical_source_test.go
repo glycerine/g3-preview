@@ -178,6 +178,7 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*UPolynomialManager, factors
 		for _, field := range []string{"p", "lower", "upper", "invTmp1", "invTmp2", "invTmp3", "divTmp"} {
 			addInt(testFieldBySourceName(modular, field))
 		}
+		addInt(modular.FieldByName("PowerTemporary"))
 	}
 	// All initialized coefficient storage belongs to actual live buffers, even
 	// when a failed source copy has not yet published its logical vector size.

@@ -31,6 +31,9 @@ func (m *IntegerModularManager) OwnedNumeralCells() (count uint32) {
 			count++
 		}
 	}
+	if m.PowerPending && ValidNumericRef(m.manager.Cells, m.PowerTemporary.Cell) {
+		count++
+	}
 	return count
 }
 func (m *IntegerManager) InterruptedNumeral(a *Int) bool {

@@ -42,6 +42,7 @@ type polynomialEvaluationScope struct {
 	integerFrames                        []*polynomialEvalIntegerFrame
 	intervalFrames                       []*polynomialEvalIntervalFrame
 	modular                              *unumeral.IntegerModularManager
+	modularPowerPending                  bool
 	interval                             *unumeral.BinaryIntervalManager
 }
 
@@ -463,7 +464,7 @@ func (m *MultivariatePolynomialManager) evaluationPending() bool {
 			return true
 		}
 	}
-	return s.lexGeneration != 0 || s.groups != ([3]uint64{}) || s.numericPending != (umemory.ObjectRef{}) || s.allocatorPending != ([3]umemory.Block{})
+	return s.lexGeneration != 0 || s.groups != ([3]uint64{}) || s.modularPowerPending || s.numericPending != (umemory.ObjectRef{}) || s.allocatorPending != ([3]umemory.Block{})
 }
 func (m *MultivariatePolynomialManager) CleanupEvaluation() error {
 	if e := m.identity(); e != nil {
@@ -493,6 +494,13 @@ func (m *MultivariatePolynomialManager) CleanupEvaluation() error {
 			f.constructed = false
 			f.stage = 1
 		}
+	}
+	if s.modularPowerPending {
+		if e := s.modular.CleanupPowerTemporary(); e != nil {
+			s.cleanupCause = e
+			return e
+		}
+		s.modularPowerPending = false
 	}
 	for i := len(s.intervalFrames) - 1; i >= 0; i-- {
 		f := s.intervalFrames[i]
@@ -1129,6 +1137,7 @@ func (m *MultivariatePolynomialManager) evaluationIntegerCall(op uint8, a, b *un
 		return e
 	}
 	vm := m.evaluation.modular
+	beforePower := vm.PowerPending
 	switch op {
 	case polynomialEvalSet:
 		e = vm.Copy(out, n)
@@ -1144,6 +1153,9 @@ func (m *MultivariatePolynomialManager) evaluationIntegerCall(op uint8, a, b *un
 		e = vm.Mul(a, b, out)
 	default:
 		return arena.ErrBounds
+	}
+	if !beforePower && vm.PowerPending {
+		m.evaluation.modularPowerPending = true
 	}
 	return m.evaluationCaptureNumeric(beforeCell, beforeRaw, e)
 }

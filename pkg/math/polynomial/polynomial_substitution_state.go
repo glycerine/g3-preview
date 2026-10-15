@@ -44,6 +44,7 @@ type polynomialSubstitutionScope struct {
 	kind                                             uint8
 	newA, tmp                                        unumeral.Int
 	newAConstructed, tmpConstructed                  bool
+	modularPowerPending                              bool
 	maxConstructed, posConstructed                   bool
 	xs                                               PolynomialVariablesView
 	xsCount                                          uint32

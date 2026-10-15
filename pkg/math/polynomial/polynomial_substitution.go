@@ -227,6 +227,12 @@ func (m *MultivariatePolynomialCore) CleanupSubstitution() error {
 	if m == nil || m.self != m {
 		return ErrPolynomialOwner
 	}
+	if m.substitution.scope.modularPowerPending {
+		if e := m.modular.CleanupPowerTemporary(); e != nil {
+			return e
+		}
+		m.substitution.scope.modularPowerPending = false
+	}
 	if e := m.substitutionCleanup(true); e != nil {
 		if m.substitution.scope.ownCause == nil {
 			m.substitution.scope.ownCause = e
@@ -278,6 +284,14 @@ func (m *MultivariatePolynomialCore) CleanupSubstitution() error {
 	}
 	m.substitution.bodyCause, m.substitution.cleanupCause = nil, nil
 	return nil
+}
+func (m *MultivariatePolynomialCore) substitutionModularPower(a *unumeral.Int, k uint32, out *unumeral.Int) error {
+	before := m.modular.PowerPending
+	e := m.modular.Power(a, k, out)
+	if !before && m.modular.PowerPending {
+		m.substitution.scope.modularPowerPending = true
+	}
+	return e
 }
 func (m *MultivariatePolynomialCore) generatedSubstitutionMonomial() (Monomial, error) {
 	if m.generatedActive {
@@ -428,7 +442,7 @@ func (m *MultivariatePolynomialCore) substituteIntegers(p Polynomial, n uint32, 
 					}
 					v = &values[pos]
 				}
-				if e = m.modular.Power(v, k, &s.tmp); e != nil {
+				if e = m.substitutionModularPower(v, k, &s.tmp); e != nil {
 					return Polynomial{}, e
 				}
 				if e = m.modular.Mul(&s.tmp, &s.newA, &s.newA); e != nil {
@@ -643,14 +657,14 @@ func (m *MultivariatePolynomialCore) substituteRationalMap(p Polynomial, x2v Pol
 				if value == nil {
 					return Polynomial{}, arena.ErrConfig
 				}
-				if e = m.modular.Power(&(*value.BorrowNumerator()), k, &s.tmp); e != nil {
+				if e = m.substitutionModularPower(&(*value.BorrowNumerator()), k, &s.tmp); e != nil {
 					return Polynomial{}, e
 				}
 				if e = m.modular.Mul(&s.tmp, &s.newA, &s.newA); e != nil {
 					return Polynomial{}, e
 				}
 				if k < max {
-					if e = m.modular.Power(&(*value.BorrowDenominator()), max-k, &s.tmp); e != nil {
+					if e = m.substitutionModularPower(&(*value.BorrowDenominator()), max-k, &s.tmp); e != nil {
 						return Polynomial{}, e
 					}
 					if e = m.modular.Mul(&s.tmp, &s.newA, &s.newA); e != nil {
@@ -698,7 +712,7 @@ func (m *MultivariatePolynomialCore) substituteRationalMap(p Polynomial, x2v Pol
 				}
 				// Selected C++11 profile evaluates map(x) before degree(x), matching the
 				// expression's actual retained reference; neither value is snapshotted.
-				if e = m.modular.Power(&(*value.BorrowDenominator()), k, &s.tmp); e != nil {
+				if e = m.substitutionModularPower(&(*value.BorrowDenominator()), k, &s.tmp); e != nil {
 					return Polynomial{}, e
 				}
 				if e = m.modular.Mul(&s.tmp, &s.newA, &s.newA); e != nil {
