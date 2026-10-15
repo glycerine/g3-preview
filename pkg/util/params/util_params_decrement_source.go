@@ -61,6 +61,7 @@ func (c *ParamsContext) continueDecrement(slot uint32) error {
 	b.entries = paramsEntriesRef{}
 	b.Size = 0
 	b.capacity = 0
+	c.traceBlockDeallocated(slot)
 	b.Live = false
 	b.resetActive = false
 	return nil

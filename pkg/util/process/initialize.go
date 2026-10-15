@@ -126,6 +126,12 @@ func InitializeGenerated(c InitializationConfig, maxSize uint64) (*Initialized, 
 	if err != nil {
 		return result, err
 	}
+	if err = result.Context.BindMemoryTrace(c.Trace); err != nil {
+		return result, err
+	}
+	if err = result.Context.BindMemoryProcess(p); err != nil {
+		return result, err
+	}
 	result.Catalog, err = params.NewGlobalParamsCatalog(s, c.Catalog)
 	if err != nil {
 		return result, err

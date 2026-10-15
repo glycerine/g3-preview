@@ -11,6 +11,8 @@ import (
 	"sync/atomic"
 
 	"github.com/glycerine/g3/pkg/arena"
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
@@ -99,6 +101,8 @@ type ParamsContext struct {
 	SymbolsField      *usymbol.Manager
 	NumeralsField     *unumeral.RationalService
 	BudgetField       *arena.Budget
+	memoryTrace       *udiag.TraceTags
+	memoryProcess     *umemory.ProcessAccounting
 	Owner             uint64
 	Blocks            []paramsBlock
 	decrementReceipts []paramsDecrementReceipt
@@ -460,6 +464,11 @@ func (c *ParamsContext) initWithNumeralReceipt(v *ParamsRef, receipt *unumeral.R
 	slot, e := c.newBlock()
 	if e != nil {
 		return e
+	}
+	if old == 0 {
+		c.traceBlockAllocated(slot, 600)
+	} else {
+		c.traceBlockAllocated(slot, 605)
 	}
 	v.Slot = slot
 	v.Generation = c.Blocks[slot-1].Generation
