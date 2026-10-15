@@ -63,6 +63,10 @@ func TestSubpavingHardwareShellCoefficientAndInequalityConversion(t *testing.T) 
 	if len(w.coefficients) != 2 || m.ToFloat64(&w.coefficients[0]) != 3 || m.ToFloat64(&w.coefficients[1]) != 4 || m.ToFloat64(&w.constant) != 5 {
 		t.Fatal("source sum coefficient order")
 	}
+	must(w.PrepareSum(&values[2], []*numeral.Int{&values[0]}))
+	if len(w.coefficients) != 2 || m.ToFloat64(&w.coefficients[1]) != 4 {
+		t.Fatal("source reserve must retain the older high coefficient slot")
+	}
 	must(qm.Z.SetInt64(&values[0], 1<<53))
 	must(qm.Z.SetInt64(&values[1], 1<<53+1))
 	if err := w.PrepareSum(&values[2], []*numeral.Int{&values[0], &values[1]}); !errors.Is(err, ErrHardwareShellInexactInteger) || !errors.Is(err, ErrSubpavingFailure) {

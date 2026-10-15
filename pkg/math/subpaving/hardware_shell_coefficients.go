@@ -78,10 +78,8 @@ func (w *HardwareShellCoefficients) PrepareSum(constant *numeral.Int, coefficien
 	if err := w.open(); err != nil {
 		return err
 	}
-	if len(coefficients) > cap(w.coefficients) {
-		w.coefficients = make([]numeral.HardwareFloat, len(coefficients))
-	} else {
-		w.coefficients = w.coefficients[:len(coefficients)]
+	if len(coefficients) > len(w.coefficients) {
+		w.coefficients = append(w.coefficients, make([]numeral.HardwareFloat, len(coefficients)-len(w.coefficients))...)
 	}
 	for i, coefficient := range coefficients {
 		if err := w.intToHardware(coefficient, &w.coefficients[i]); err != nil {

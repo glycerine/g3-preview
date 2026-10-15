@@ -51426,6 +51426,12 @@
           ]
         },
         {
+          "name": "Concrete context_hwf wrapper svector<hwf>::reserve grows logical coefficient storage without shrinking on smaller sums (subpaving.cpp:174-176; vector.h:504-511)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_shell_coefficients.go",
+          "tests": ["TestSubpavingHardwareShellCoefficientAndInequalityConversion"]
+        },
+        {
           "name": "Concrete context_hwf wrapper integer coefficient and directed rational inequality conversion (src/math/subpaving/subpaving.cpp:144-206)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/hardware_shell_coefficients.go",
@@ -179167,6 +179173,7 @@
         "pkg/sat/sat_var_queue_native_test.go",
         "pkg/ast/ast_native_plugin_caches_test.go",
         "pkg/math/subpaving/hardware_context_propagate.go",
+        "pkg/math/subpaving/hardware_shell_coefficients.go",
         "pkg/math/subpaving/hardware_clause.go",
         "pkg/math/subpaving/hardware_clause_test.go",
         "pkg/math/subpaving/hardware_monomial.go",
@@ -179828,6 +179835,12 @@
             "TestPolynomialPSCChain1SourceDegreeIndexedCoefficientLayout",
             "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse"
           ]
+        },
+        {
+          "name": "Concrete context_hwf wrapper svector<hwf>::reserve retains higher logical slots through smaller sums using a typed Go slice (subpaving.cpp:174-176)",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/subpaving/hardware_shell_coefficients.go",
+          "tests": ["TestSubpavingHardwareShellCoefficientAndInequalityConversion"]
         },
         {
           "name": "Concrete config_hwf bound queue and per-variable polynomial watch lists replaced by typed Go slices",
