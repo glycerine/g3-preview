@@ -167571,6 +167571,16 @@
           "tests": ["TestParamsReferenceCopyMatchedNumeralPendingPhysicalAllocation", "TestRationalCopyAllocationReceiptSuccessfulCopyHasNoPendingOwner"]
         },
         {
+          "name": "params_ref::init alloc(params) COW placement uses a charged concrete paramsBlock directory slot and native typed entry pages; first initialization, shared copy and live-slot reuse preserve published refcount/entry owners (cpp598-611)",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsReferenceSourceCopyMergeAndSignedRat",
+            "TestParamsReferenceInitConstructorFailureKeepsCallerOldReference"
+          ]
+        },
+        {
           "name": "params_ref init/copy_core and private params ordered entries/refcounts/value destruction",
           "status": "partial",
           "go_target": "pkg/util/params/util_params_ref.go",
@@ -167781,6 +167791,16 @@
             "TestParamsReferenceSetRatAllActualCopyAndAppendPrefixes",
             "TestParamsReferenceSetRatNewEntryCleansPostphysicalCopyChild",
             "TestParamsReferenceSetRatMatchedScalarCleansPostphysicalCopyChild"
+          ]
+        },
+        {
+          "name": "SET_RAT_VALUE alloc(rational) scalar placement is an inline concrete OwnedRational in the charged paramEntry page; new, matched-scalar and replacement branches own one service value and del_value releases it (cpp753-761,992-1014)",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/params/util_params_set_rat_source.go",
+          "tests": [
+            "TestParamsReferenceSetRatAllActualCopyAndAppendPrefixes",
+            "TestParamsReferenceSetRatMatchedScalarCleansPostphysicalCopyChild",
+            "TestParamsReferenceMatchedReplacementSourceKindsAndLiveNoops"
           ]
         },
         {
@@ -168241,6 +168261,16 @@
           "tests": ["TestParamsReferenceCopyMatchedNumeralPendingPhysicalAllocation", "TestRationalCopyAllocationReceiptSuccessfulCopyHasNoPendingOwner"]
         },
         {
+          "name": "params_ref::init alloc(params) COW placement uses a charged concrete paramsBlock directory slot and native typed entry pages; first initialization, shared copy and live-slot reuse preserve published refcount/entry owners (cpp598-611)",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceSourceSharingAndReset",
+            "TestParamsReferenceSourceCopyMergeAndSignedRat",
+            "TestParamsReferenceInitConstructorFailureKeepsCallerOldReference"
+          ]
+        },
+        {
           "name": "params_ref init/copy_core and private params ordered entries/refcounts/value destruction",
           "status": "partial",
           "go_target": "pkg/util/params/util_params_ref.go",
@@ -168450,6 +168480,16 @@
             "TestParamsReferenceSetRatAllActualCopyAndAppendPrefixes",
             "TestParamsReferenceSetRatNewEntryCleansPostphysicalCopyChild",
             "TestParamsReferenceSetRatMatchedScalarCleansPostphysicalCopyChild"
+          ]
+        },
+        {
+          "name": "SET_RAT_VALUE alloc(rational) scalar placement is an inline concrete OwnedRational in the charged paramEntry page; new, matched-scalar and replacement branches own one service value and del_value releases it (cpp753-761,992-1014)",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/params/util_params_set_rat_source.go",
+          "tests": [
+            "TestParamsReferenceSetRatAllActualCopyAndAppendPrefixes",
+            "TestParamsReferenceSetRatMatchedScalarCleansPostphysicalCopyChild",
+            "TestParamsReferenceMatchedReplacementSourceKindsAndLiveNoops"
           ]
         },
         {
