@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 var ErrSATMissingParallelBinding = errors.New("g3: missing source SAT parallel-exchange binding")
@@ -20,6 +21,7 @@ type satSolverConflictResolution struct {
 	self                                                                            *satSolverConflictResolution
 	analysis                                                                        *satSolverConflictAnalysis
 	dynamic                                                                         *satSolverDynamicSubsumption
+	traceTags                                                                       *diagnostic.TraceTags
 	assumptions, userScopeLiterals, core, minCore                                   satUintColumn
 	assumptionSet                                                                   satLiteralSetStorage
 	conflictLevel, conflictStat, conflicts, conflictsSinceRestart, conflictsSinceGC uint32

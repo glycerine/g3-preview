@@ -164,6 +164,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	if s.conflict, err = newSATSolverConflictResolution(s.analysis, s.dynamic); err != nil {
 		return s, err
 	}
+	s.conflict.traceTags = c.TraceTags
 	s.decision.conflict = s.conflict
 	// Declared source member construction resumes: cleaner, model, MC,
 	// simplifier, SCC, asymmetric branching, probing, MUS.

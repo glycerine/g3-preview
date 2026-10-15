@@ -178189,6 +178189,12 @@
           "tests": ["TestSATRandomSplitSourceTraceCandidate", "TestSATDecisionSourceTraceAfterAssignment"]
         },
         {
+          "name": "Reached SAT reinit_assumptions list and antecedent TRACE around scope push and assignments (sat_solver.cpp:1143,1151-1157)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_conflict_assumptions_trace.go",
+          "tests": ["TestSATReinitAssumptionsSourceTraceAroundScopeAndAssignments"]
+        },
+        {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_simplify_trace.go",
@@ -179425,6 +179431,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_decision_trace.go",
           "tests": ["TestSATRandomSplitSourceTraceCandidate", "TestSATDecisionSourceTraceAfterAssignment"]
+        },
+        {
+          "name": "Reached SAT reinit_assumptions list and antecedent TRACE around scope push and assignments (sat_solver.cpp:1143,1151-1157)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_conflict_assumptions_trace.go",
+          "tests": ["TestSATReinitAssumptionsSourceTraceAroundScopeAndAssignments"]
         },
         {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",

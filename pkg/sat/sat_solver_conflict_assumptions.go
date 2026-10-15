@@ -51,6 +51,7 @@ func (s *satSolverConflictResolution) reinitAssumptions() error {
 	if !yes || p.variables.scopeLevel != 0 || p.inconsistent {
 		return nil
 	}
+	s.traceReinitAssumptions()
 	if e = s.dynamic.probing.lifecycle.push(); e != nil {
 		return e
 	}
@@ -86,6 +87,7 @@ func (s *satSolverConflictResolution) reinitAssumptions() error {
 			return e
 		}
 	}
+	s.traceReinitAntecedents()
 	return nil
 }
 func (s *satSolverConflictResolution) processAntecedentForUnsatCore(l Literal) error {
