@@ -51,7 +51,7 @@ func (m *ASTManager) traceInfoDeallocated(r *astInfoRecord) {
 		line = 1813
 	}
 	_ = tags.EmitConditional("memory", "deallocate", "src/util/memory_manager.cpp", 204,
-		func() bool { return !tags.MemoryFinalizing() }, func(w io.Writer) error {
+		func() bool { return !m.astMemoryFinalizing(tags) }, func(w io.Writer) error {
 			_, _ = io.WriteString(w, "dealloc "+fmt.Sprintf("%p", r)+" src/ast/ast.cpp:"+strconv.Itoa(line)+"\n")
 			return nil
 		})

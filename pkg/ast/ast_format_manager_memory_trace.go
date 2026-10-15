@@ -16,6 +16,20 @@ func (m *ASTManager) astMemoryTraceTags() *udiag.TraceTags {
 	return udiag.BorrowProcessTraceTags()
 }
 
+// A standalone AST manager can borrow an unbound trace stream while its
+// numeral service still belongs to a process. The source memory guard follows
+// that owning process, including during its finalization interval.
+func (m *ASTManager) astMemoryFinalizing(tags *udiag.TraceTags) bool {
+	if tags.MemoryFinalizing() {
+		return true
+	}
+	if m == nil || m.numerals == nil {
+		return false
+	}
+	runtime := m.numerals.RuntimeOwner()
+	return runtime != nil && runtime.ProcessOwner() != nil && runtime.ProcessOwner().Finalizing()
+}
+
 // BorrowMemoryTraceTags lets retained child owners emit source memory records
 // through the same trace channel as their AST manager.
 func (m *ASTManager) BorrowMemoryTraceTags() *udiag.TraceTags {
@@ -49,7 +63,7 @@ func (m *ASTManager) traceFormatDeallocated() {
 		return
 	}
 	_ = tags.EmitConditional("memory", "deallocate", "src/util/memory_manager.cpp", 204,
-		func() bool { return !tags.MemoryFinalizing() }, func(w io.Writer) error {
+		func() bool { return !m.astMemoryFinalizing(tags) }, func(w io.Writer) error {
 			_, _ = io.WriteString(w, "dealloc "+fmt.Sprintf("%p", m)+" src/ast/ast.cpp:1473\n")
 			return nil
 		})

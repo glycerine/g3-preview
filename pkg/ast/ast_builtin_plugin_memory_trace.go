@@ -61,7 +61,7 @@ func (m *ASTManager) traceBuiltinPluginsDeallocated() {
 			continue
 		}
 		_ = tags.EmitConditional("memory", "deallocate", "src/util/memory_manager.cpp", 204,
-			func() bool { return !tags.MemoryFinalizing() }, func(w io.Writer) error {
+			func() bool { return !m.astMemoryFinalizing(tags) }, func(w io.Writer) error {
 				_, _ = io.WriteString(w, "dealloc "+m.builtinPluginTraceIdentity(id)+" src/ast/ast.cpp:1412\n")
 				return nil
 			})

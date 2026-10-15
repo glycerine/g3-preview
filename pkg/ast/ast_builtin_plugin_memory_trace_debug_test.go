@@ -4,13 +4,58 @@ package ast
 
 import (
 	"bytes"
+	"math"
 	"strconv"
 	"strings"
 	"testing"
 	"unsafe"
 
+	"github.com/glycerine/g3/pkg/arena"
 	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
+
+func TestASTMemoryWrappersFollowOwnerProcessWithUnboundTrace(t *testing.T) {
+	b := arena.NewBudget(1 << 26)
+	p := umemory.NewProcessAccounting()
+	r, err := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, Process: p})
+	astTestMust(t, err)
+	if first, err := r.BeginSourceInitialize(math.MaxUint32); err != nil || !first {
+		t.Fatalf("source initialization: first=%v err=%v", first, err)
+	}
+	astTestMust(t, r.CompleteSourceInitialize())
+	s, err := usymbol.NewManager(usymbol.Config{Budget: b})
+	astTestMust(t, err)
+	q, err := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{
+		Memory: r, Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}},
+	}})
+	astTestMust(t, err)
+	var output bytes.Buffer
+	tags := udiag.NewTraceTagsWithWriter(&output)
+	tags.Enable("memory")
+	m, err := NewASTManager(ASTManagerConfig{Symbols: s, Numerals: q, Budget: b, TraceTags: tags})
+	astTestMust(t, err)
+	if !strings.Contains(output.String(), "alloc ") {
+		t.Fatalf("missing AST allocation records: %q", output.String())
+	}
+	before := output.Len()
+	if active, err := p.BeginFinalize(); err != nil || !active {
+		t.Fatalf("source finalization: active=%v err=%v", active, err)
+	}
+	astTestMust(t, m.Close())
+	if tail := output.String()[before:]; strings.Contains(tail, "dealloc ") {
+		t.Fatalf("AST owner emitted deallocation during process finalization: %q", tail)
+	}
+	astTestMust(t, p.CompleteFinalize())
+	astTestMust(t, q.Close())
+	astTestMust(t, s.Close())
+	astTestMust(t, r.Close())
+	if used := b.Used(); used != 0 {
+		t.Fatalf("owner graph retained %d bytes", used)
+	}
+}
 
 func TestASTBuiltinPluginMemoryWrappersFollowBothManagerDestructors(t *testing.T) {
 	symbols, numerals, budget := astTestOwners(t)
