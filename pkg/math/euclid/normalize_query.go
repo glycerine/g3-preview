@@ -20,6 +20,9 @@ func (s *solverSetup) normalizeQuery(as []numeral.Int, xs []uint32, c,
 	if len(as) != len(xs) || c == nil || aPrime == nil || cPrime == nil || js == nil {
 		return arena.ErrInvalidSlot
 	}
+	if err = s.traceNormalizeRow(734, "before applying solution set\n", as, xs); err != nil {
+		return err
+	}
 	z := s.manager.Integers()
 	row := &equation{manager: s.manager, as: make([]numeral.Int, len(as)),
 		xs: append([]uint32(nil), xs...)}
@@ -49,6 +52,9 @@ func (s *solverSetup) normalizeQuery(as []numeral.Int, xs []uint32, c,
 		return err
 	}
 	if err = s.applySolutionToEquationWithConstant(row, cPrime); err != nil {
+		return err
+	}
+	if err = s.traceNormalizeRow(751, "after applying solution set\n", row.as, row.xs); err != nil {
 		return err
 	}
 	*js = append(*js, row.js...)

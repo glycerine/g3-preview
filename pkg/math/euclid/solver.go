@@ -19,6 +19,7 @@ type Solver struct {
 	setup   *solverSetup
 	manager *numeral.RationalManager
 	debug   *diagnostic.DebugContext
+	trace   *diagnostic.TraceTags
 	owns    bool
 	closed  bool
 	stop    error
@@ -75,6 +76,17 @@ func (s *Solver) Manager() (*numeral.RationalManager, error) {
 		return nil, e
 	}
 	return s.manager, nil
+}
+
+// BindTrace borrows the source solver's trace stream. Nil restores the
+// process trace tags; Reset preserves an explicit binding.
+func (s *Solver) BindTrace(tags *diagnostic.TraceTags) error {
+	if e := s.open(); e != nil {
+		return e
+	}
+	s.trace = tags
+	s.setup.trace = tags
+	return nil
 }
 
 func (s *Solver) MkVar() (uint32, error) {
@@ -167,6 +179,7 @@ func (s *Solver) Reset() error {
 		return e
 	}
 	s.setup = setup
+	setup.trace = s.trace
 	s.stop = nil
 	return nil
 }

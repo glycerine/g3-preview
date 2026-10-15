@@ -38,6 +38,7 @@ func position(xs []uint32, x uint32) uint32 {
 type solverSetup struct {
 	self               *solverSetup
 	manager            *numeral.RationalManager
+	trace              *diagnostic.TraceTags
 	decomposeBuffer    *numeral.ScopedIntVector
 	asBuffer           *numeral.ScopedIntVector
 	bsBuffer           *numeral.ScopedRationalVector

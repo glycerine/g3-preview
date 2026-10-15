@@ -34756,6 +34756,8 @@
         "pkg/math/euclid/solve.go",
         "pkg/math/euclid/solve_test.go",
         "pkg/math/euclid/normalize_query.go",
+        "pkg/math/euclid/normalize_query_trace.go",
+        "pkg/math/euclid/normalize_query_trace_test.go",
         "pkg/math/euclid/normalize_query_test.go",
         "pkg/math/euclid/solver.go",
         "pkg/math/euclid/solver_test.go",
@@ -34774,6 +34776,7 @@
         "TestEuclideanIntegerBufferSortCopyBudgetBoundary",
         "TestEuclideanNormalizeQueryCopyRefusalRetainsOwnedBuffer",
         "TestEuclideanNormalizeQuerySubstitutionPublishesConstantBeforeRationalRefusal",
+        "TestEuclideanNormalizeQueryTraceBeforeAndAfterSubstitution",
         "TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue",
         "TestEuclideanRationalAddmulMergedJustifications",
         "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
@@ -34972,12 +34975,13 @@
           "name": "normalize query applies solution and computes remaining coefficient gcd, constant and justification IDs at cpp:735-783",
           "status": "partial",
           "go_target": "pkg/math/euclid/normalize_query.go",
-          "go_targets": ["pkg/math/euclid/solver_setup.go"],
+          "go_targets": ["pkg/math/euclid/solver_setup.go", "pkg/math/euclid/normalize_query_trace.go"],
           "tests": [
             "TestEuclideanNormalizeQueryAfterNonUnitSolve",
             "TestEuclideanNormalizeQueryJustificationAndConstantOnly",
             "TestEuclideanNormalizeQueryCopyRefusalRetainsOwnedBuffer",
-            "TestEuclideanNormalizeQuerySubstitutionPublishesConstantBeforeRationalRefusal"
+            "TestEuclideanNormalizeQuerySubstitutionPublishesConstantBeforeRationalRefusal",
+            "TestEuclideanNormalizeQueryTraceBeforeAndAfterSubstitution"
           ]
         },
         {
@@ -177158,6 +177162,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/diagnostic/util_trace_tags.go",
+        "pkg/math/euclid/normalize_query_trace.go",
         "pkg/api/api_trace.go",
         "pkg/util/numeral/mpff_round_trace.go",
         "pkg/util/numeral/mpff_power_trace.go",
@@ -177219,6 +177224,7 @@
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
+        "TestEuclideanNormalizeQueryTraceBeforeAndAfterSubstitution",
         "TestTraceHeaderSourceInsertionRefusalPrefixes",
         "TestTraceShortBodyFailureSkipsSourceFlush",
         "TestTraceConditionalOperandFailureSkipsFooterAndFlush",
@@ -178491,6 +178497,12 @@
           "tests": ["TestSATConflictLevelZeroSourceTraceBeforeReturn", "TestSATConflictFirstUIPSourceTraceOrder"]
         },
         {
+          "name": "Reached Euclidean normalize before/after solution-set TRACE rows (euclidean_solver.cpp:734,751)",
+          "status": "ported",
+          "go_target": "pkg/math/euclid/normalize_query_trace.go",
+          "tests": ["TestEuclideanNormalizeQueryTraceBeforeAndAfterSubstitution"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -178511,6 +178523,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/diagnostic/util_trace_tags.go",
+        "pkg/math/euclid/normalize_query_trace.go",
         "pkg/api/api_trace.go",
         "pkg/util/numeral/mpff_round_trace.go",
         "pkg/util/numeral/mpff_power_trace.go",
@@ -178572,6 +178585,7 @@
       ],
       "tests": [
         "TestTraceTagsSourceControlAndFinalize",
+        "TestEuclideanNormalizeQueryTraceBeforeAndAfterSubstitution",
         "TestTraceHeaderSourceInsertionRefusalPrefixes",
         "TestTraceShortBodyFailureSkipsSourceFlush",
         "TestTraceConditionalOperandFailureSkipsFooterAndFlush",
@@ -179854,6 +179868,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_conflict_trace.go",
           "tests": ["TestSATConflictLevelZeroSourceTraceBeforeReturn", "TestSATConflictFirstUIPSourceTraceOrder"]
+        },
+        {
+          "name": "Reached Euclidean normalize before/after solution-set TRACE rows (euclidean_solver.cpp:734,751)",
+          "status": "ported",
+          "go_target": "pkg/math/euclid/normalize_query_trace.go",
+          "tests": ["TestEuclideanNormalizeQueryTraceBeforeAndAfterSubstitution"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
