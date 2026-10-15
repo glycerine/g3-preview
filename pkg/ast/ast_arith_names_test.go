@@ -2,10 +2,8 @@
 package ast
 
 import (
-	"errors"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -115,40 +113,35 @@ func TestASTArithmeticNameCallbacksAppendToExistingVector(t *testing.T) {
 	}
 }
 
-func TestASTArithmeticNameVectorRefusalPreservesFlagAndPrefix(t *testing.T) {
+func TestASTArithmeticNameNativeGrowthPreservesFlagAndPrefix(t *testing.T) {
 	m := astTestManager(t)
 	_, e := m.RegisterArithmeticPlugin()
 	astTestMust(t, e)
 	logic := astTestSymbol(t, m, "NRA")
 	var names ASTBuiltinNames
+	defer names.Close()
+	before := m.Budget().Used()
 	m.Budget().FailAfter(0)
 	e = m.GetArithmeticSortNames(&names, logic)
 	m.Budget().FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || !m.arithmeticPlugin.convertIntNumerals || len(names.Items()) != 0 {
-		t.Fatal("source conversion flag precedes name vector growth", e)
+	astTestMust(t, e)
+	if !m.arithmeticPlugin.convertIntNumerals || len(names.Items()) != 1 || m.Budget().Used() != before {
+		t.Fatal("native sort names and persistent conversion flag", e, names.Items())
 	}
-	defer names.Close()
+	names.Close()
 	astTestMust(t, m.GetArithmeticOpNames(&names, usymbol.Symbol{}))
 	names.Close()
-	for fault := int64(0); fault < 32; fault++ {
-		m.Budget().FailAfter(fault)
-		e = m.GetArithmeticOpNames(&names, usymbol.Symbol{})
-		m.Budget().FailAfter(-1)
-		if e == nil {
-			if len(names.Items()) != 31 {
-				t.Fatal("complete name vector")
-			}
-			return
-		}
-		if !errors.Is(e, arena.ErrInjectedFailure) {
-			t.Fatal("name vector growth refusal", fault, e)
-		}
-		for j, item := range names.Items() {
-			if item.Kind != int32(j+2) {
-				t.Fatal("original append publication prefix", fault, j, item.Kind)
-			}
-		}
-		names.Close()
+	before = m.Budget().Used()
+	m.Budget().FailAfter(0)
+	e = m.GetArithmeticOpNames(&names, usymbol.Symbol{})
+	m.Budget().FailAfter(-1)
+	astTestMust(t, e)
+	if len(names.Items()) != 31 || m.Budget().Used() != before {
+		t.Fatal("native operator-name growth", len(names.Items()), m.Budget().Used(), before)
 	}
-	t.Fatal("name growth never succeeded")
+	for j, item := range names.Items() {
+		if item.Kind != int32(j+2) {
+			t.Fatal("operator-name order", j, item.Kind)
+		}
+	}
 }

@@ -9092,7 +9092,7 @@
         "TestBoolRewriterOriginalArithmeticOffsetEquality",
         "TestASTArithmeticOriginalSortNamesAndPersistentConversion",
         "TestASTArithmeticOriginalOperatorNamesOrderAndLogic",
-        "TestASTArithmeticNameVectorRefusalPreservesFlagAndPrefix",
+        "TestASTArithmeticNameNativeGrowthPreservesFlagAndPrefix",
         "TestASTArithmeticNameCallbacksAppendToExistingVector",
         "TestASTNumericUtilityFamilyConstruction",
         "TestASTArithmeticNumeralReadStoredFlagAndOrderedCopy",
@@ -9228,7 +9228,7 @@
           "tests": [
             "TestASTArithmeticOriginalSortNamesAndPersistentConversion",
             "TestASTArithmeticOriginalOperatorNamesOrderAndLogic",
-            "TestASTArithmeticNameVectorRefusalPreservesFlagAndPrefix",
+            "TestASTArithmeticNameNativeGrowthPreservesFlagAndPrefix",
             "TestASTArithmeticNameCallbacksAppendToExistingVector",
             "TestASTArithmeticOriginalConvertedNumeralsAndDeclaration"
           ]
@@ -13048,7 +13048,7 @@
         "TestASTBitVectorSomeValueNumericalTransportOwnerGuard",
         "TestModelOriginalBitVectorZeroCompletion",
         "TestASTBitVectorOriginalNameCallbacks",
-        "TestASTBitVectorNameVectorEveryWarmReservationAndAppend",
+        "TestASTBitVectorNameNativeGrowthAndAppend",
         "TestASTBitVectorOriginalFixedDeclarations",
         "TestASTBitVectorFixedValidationPublicationAndApplications",
         "TestASTBitVectorFixedEveryColdCacheReservation",
@@ -13229,7 +13229,7 @@
           "go_target": "pkg/ast/ast_bv_names.go",
           "tests": [
             "TestASTBitVectorOriginalNameCallbacks",
-            "TestASTBitVectorNameVectorEveryWarmReservationAndAppend"
+            "TestASTBitVectorNameNativeGrowthAndAppend"
           ]
         },
         {
@@ -182295,6 +182295,20 @@
           "tests": [
             "TestASTUserNameDictionaryRegistrationAndFreshReplay",
             "TestASTUserNameNativeGrowthAndFreshReplay"
+          ]
+        },
+        {
+          "name": "Concrete arithmetic and bit-vector builtin_name output vectors use caller-owned native Go slices",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_builtin_names.go",
+          "go_targets": [
+            "pkg/ast/ast_arith_names.go",
+            "pkg/ast/ast_bv_names.go"
+          ],
+          "tests": [
+            "TestASTArithmeticNameNativeGrowthPreservesFlagAndPrefix",
+            "TestASTBitVectorNameNativeGrowthAndAppend",
+            "TestASTArithmeticNameCallbacksAppendToExistingVector"
           ]
         }
       ],

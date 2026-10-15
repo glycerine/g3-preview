@@ -2,10 +2,8 @@
 package ast
 
 import (
-	"errors"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -70,7 +68,7 @@ func TestASTBitVectorOriginalNameCallbacks(t *testing.T) {
 	}
 }
 
-func TestASTBitVectorNameVectorEveryWarmReservationAndAppend(t *testing.T) {
+func TestASTBitVectorNameNativeGrowthAndAppend(t *testing.T) {
 	m := astTestManager(t)
 	_, e := m.RegisterArithmeticPlugin()
 	astTestMust(t, e)
@@ -80,28 +78,19 @@ func TestASTBitVectorNameVectorEveryWarmReservationAndAppend(t *testing.T) {
 	defer names.Close()
 	astTestMust(t, m.GetBitVectorOpNames(&names, usymbol.Symbol{})) // warm literals
 	names.Close()
-	for fault := int64(0); fault < 32; fault++ {
-		m.Budget().FailAfter(fault)
-		e = m.GetBitVectorOpNames(&names, usymbol.Symbol{})
-		m.Budget().FailAfter(-1)
-		if e == nil {
-			if len(names.Items()) != 58 {
-				t.Fatal("complete vector")
-			}
-			first := names.Items()[0]
-			astTestMust(t, m.GetBitVectorSortNames(&names, usymbol.Symbol{}))
-			if len(names.Items()) != 60 || names.Items()[0] != first {
-				t.Fatal("callback erased existing prefix")
-			}
-			return
-		}
-		if !errors.Is(e, arena.ErrInjectedFailure) {
-			t.Fatal("source vector growth refusal", fault, e)
-		}
-		if n := len(names.Items()); n != 0 && n != cap(names.items) {
-			t.Fatal("source push publication frontier", fault, n, cap(names.items))
-		}
-		names.Close()
+	astTestMust(t, m.GetBitVectorSortNames(&names, usymbol.Symbol{})) // warm sort literals
+	names.Close()
+	before := m.Budget().Used()
+	m.Budget().FailAfter(0)
+	e = m.GetBitVectorOpNames(&names, usymbol.Symbol{})
+	var first ASTBuiltinName
+	if e == nil {
+		first = names.Items()[0]
+		e = m.GetBitVectorSortNames(&names, usymbol.Symbol{})
 	}
-	t.Fatal("name growth never completed")
+	m.Budget().FailAfter(-1)
+	astTestMust(t, e)
+	if len(names.Items()) != 60 || names.Items()[0] != first || m.Budget().Used() != before {
+		t.Fatal("native name growth and append", len(names.Items()), m.Budget().Used(), before)
+	}
 }
