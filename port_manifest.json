@@ -178948,6 +178948,12 @@
           "tests": ["TestEuclideanSelectNextPivotSourceTiesAndUnitStop", "TestEuclideanConstantOnlyTrivialAndContradictoryEquations", "TestEuclideanNonUnitDecompositionParameterAndAuxiliaryEquation"]
         },
         {
+          "name": "Reached SAT resolve_conflict_for_init assignment-trail TRACE after learned-clause publication (sat_solver.cpp:1940)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_conflict_assumptions_extra_trace.go",
+          "tests": ["TestSATConflictInitNotLiteralSourceTrace"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -180383,6 +180389,12 @@
           "status": "reference_only",
           "go_target": "pkg/math/euclid/pivot.go",
           "tests": ["TestEuclideanSelectNextPivotSourceTiesAndUnitStop", "TestEuclideanConstantOnlyTrivialAndContradictoryEquations", "TestEuclideanNonUnitDecompositionParameterAndAuxiliaryEquation"]
+        },
+        {
+          "name": "Reached SAT resolve_conflict_for_init assignment-trail TRACE after learned-clause publication (sat_solver.cpp:1940)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_conflict_assumptions_extra_trace.go",
+          "tests": ["TestSATConflictInitNotLiteralSourceTrace"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

@@ -448,6 +448,7 @@ func (s *satSolverConflictResolution) resolveConflictForInit() (bool, error) {
 	if e != nil {
 		return false, e
 	}
+	s.traceInitTrail()
 	p.inconsistent = false
 	return true, nil
 }

@@ -33,8 +33,8 @@ func TestSATUnsatCoreAntecedentSourceTraceBeforeMark(t *testing.T) {
 	}
 }
 
-// Source: src/sat/sat_solver.cpp:1885-1894. The non-null conflicting literal
-// is printed after the placeholder lemma and before antecedent processing.
+// Source: src/sat/sat_solver.cpp:1885-1894,1940. The non-null conflicting
+// literal precedes resolution, and the trail prints after clause publication.
 func TestSATConflictInitNotLiteralSourceTrace(t *testing.T) {
 	s := satConflictFixture(t, 2)
 	p := s.analysis.propagation
@@ -54,7 +54,8 @@ func TestSATConflictInitNotLiteralSourceTrace(t *testing.T) {
 	}
 	want := ""
 	if tags.ShouldTrace("sat") {
-		want = satClauseTraceRecord("sat", "resolve_conflict_for_init", "1892", "not_l: 1\n")
+		want = satClauseTraceRecord("sat", "resolve_conflict_for_init", "1892", "not_l: 1\n") +
+			satClauseTraceRecord("sat", "resolve_conflict_for_init", "1940", "Trail: -0\n")
 	}
 	if got := output.String(); got != want {
 		t.Fatalf("init trace = %q, want %q", got, want)

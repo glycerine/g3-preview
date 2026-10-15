@@ -1,4 +1,4 @@
-// Source: src/sat/sat_solver.cpp:1825,1892; retained util/trace TRACE sites.
+// Source: src/sat/sat_solver.cpp:1825,1892,1940; retained util/trace TRACE sites.
 package sat
 
 import (
@@ -31,5 +31,34 @@ func (s *satSolverConflictResolution) traceInitNotLiteral(l Literal) {
 	s.traceAssumptionCoreRecord("resolve_conflict_for_init", 1892, func(w io.Writer) error {
 		_, _ = io.WriteString(w, "not_l: "+l.String()+"\n")
 		return nil
+	})
+}
+
+func (s *satSolverConflictResolution) traceInitTrail() {
+	s.traceAssumptionCoreRecord("resolve_conflict_for_init", 1940, func(w io.Writer) error {
+		v := s.analysis.propagation.variables
+		n, err := v.trail.Size(v.trailRef)
+		if err != nil {
+			return err
+		}
+		if _, err := io.WriteString(w, "Trail: "); err != nil {
+			return err
+		}
+		for i := uint32(0); i < n; i++ {
+			l, err := v.trail.Read(v.trailRef, i)
+			if err != nil {
+				return err
+			}
+			if i != 0 {
+				if _, err := io.WriteString(w, " "); err != nil {
+					return err
+				}
+			}
+			if _, err := io.WriteString(w, l.String()); err != nil {
+				return err
+			}
+		}
+		_, err = io.WriteString(w, "\n")
+		return err
 	})
 }
