@@ -9841,7 +9841,9 @@
         "pkg/ast/ast_trace_file_memory_trace.go",
         "pkg/ast/ast_trace_file_memory_trace_debug_test.go",
         "pkg/ast/ast_format_manager_memory_trace.go",
-        "pkg/ast/ast_format_manager_memory_trace_debug_test.go"
+        "pkg/ast/ast_format_manager_memory_trace_debug_test.go",
+        "pkg/ast/ast_parameter_memory_trace.go",
+        "pkg/ast/ast_parameter_memory_trace_debug_test.go"
       ],
       "tests": [
         "TestASTResourceLimitSourceCanceledCountsAndScopes",
@@ -9989,7 +9991,8 @@
         "TestASTLabelTemporaryParametersOnReservationFailure",
         "TestASTTraceFileMemoryWrapperSourceLifetime",
         "TestASTTraceFileMemoryWrapperFinalizationSuppressesDeallocation",
-        "TestASTFormatManagerMemoryWrapperConstructorOverloads"
+        "TestASTFormatManagerMemoryWrapperConstructorOverloads",
+        "TestASTParameterRationalMemoryWrapperCopyMoveAssignAndDestroy"
       ],
       "conditionals": [
         {
@@ -11061,7 +11064,8 @@
         "Application storage is allocated before coercion_needed. The actual coercion frame owns native []ASTHandle arguments, acquiring each reference before append. Its ascending consumed-DEC cursor and source cause survive interrupted cleanup, and manager Close drains it before plugin/member teardown. Argument views borrow this same slice; successful registration retains canonical child references. Removed buffer wrapper and the pending acquisition needed only by simulated backing refusal. Native growth is independent of AST Budget; no inline/spill or container failure credit remains.",
         "DependencyLinearizeRaw and DependencyLinearize now append to and return caller-owned native []ASTHandle values, including completed output on checked errors. Retained FIFO traversal and dependency mark cleanup remain; stable dedup uses a Go map without AST node mark-plane mutation. Removed the nonowning expression-vector Runtime codec and all wrapper construction/push/get/reset/delete calls. Actual reference-owning AST/dependency vectors and persistent arrays remain separate migration obligations. See PORT_PROGRESS.md#native-dependency-linearization-output-and-callers.",
         "The retained trace-file owner emits source debug memory allocation at construction and deallocation after stream close and owning header release; refused header construction has no record, and repeat Close is idempotent.",
-        "The parent AST manager now stamps source debug memory allocation when its owned format child header is acquired at the selected constructor overload, and deallocation after that completed child closes. Direct format managers have no enclosing alloc macro record."
+        "The parent AST manager now stamps source debug memory allocation when its owned format child header is acquired at the selected constructor overload, and deallocation after that completed child closes. Direct format managers have no enclosing alloc macro record.",
+        "Retained parameter rational copies carry a stable debug allocation identity through Go record moves. New rational construction and copy assignment emit their distinct source alloc records; replacement and destruction emit source dealloc records only after successful owned numeral deletion."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
@@ -11168,7 +11172,9 @@
         "pkg/ast/ast_some_value_proc_test.go",
         "pkg/ast/ast_rewriter_access.go",
         "pkg/ast/ast_dependency_consumed_test.go",
-        "pkg/ast/ast_label.go"
+        "pkg/ast/ast_label.go",
+        "pkg/ast/ast_parameter_memory_trace.go",
+        "pkg/ast/ast_parameter_memory_trace_debug_test.go"
       ],
       "tests": [
         "TestASTResourceLimitSourceCanceledCountsAndScopes",
@@ -11312,7 +11318,8 @@
         "TestASTDependencyDecConsumedActualRootOwnership",
         "TestASTLabelConcreteSymbolBufferAndRecognition",
         "TestASTLabelTemporaryParametersOnReservationFailure",
-        "TestASTSkolemDeclarationFlagForPatternInference"
+        "TestASTSkolemDeclarationFlagForPatternInference",
+        "TestASTParameterRationalMemoryWrapperCopyMoveAssignAndDestroy"
       ],
       "conditionals": [
         {
@@ -12039,7 +12046,8 @@
         "Fresh lexical func_decl_info resides in actual charged ASTManager header with exact epoch token and is cloned by real registerNode/copyInfo; fresh-name output uses a standard bytes.Buffer, checked symbol Display and strconv before native symbol interning and fresh_id increment; acquired node/metadata belongs to actual ASTManager pages.",
         "Convenience factories reach existing application/cache/register engines without additional ownership or child cloning. Expanded distinct uses a borrowed native []ASTHandle slice and ordered pair loop; final applications own their child references. Actual factory reservation prefixes preserve manager/symbol/reference ownership and same-owner retry; native scratch adds no custom backing failure.",
         "Inline debug map/header fields charged once; no reconstructed owner from provider census.",
-        "DependencyLinearizeRaw and DependencyLinearize now append to and return caller-owned native []ASTHandle values, including completed output on checked errors. Retained FIFO traversal and dependency mark cleanup remain; stable dedup uses a Go map without AST node mark-plane mutation. Removed the nonowning expression-vector Runtime codec and all wrapper construction/push/get/reset/delete calls. Actual reference-owning AST/dependency vectors and persistent arrays remain separate migration obligations. See PORT_PROGRESS.md#native-dependency-linearization-output-and-callers."
+        "DependencyLinearizeRaw and DependencyLinearize now append to and return caller-owned native []ASTHandle values, including completed output on checked errors. Retained FIFO traversal and dependency mark cleanup remain; stable dedup uses a Go map without AST node mark-plane mutation. Removed the nonowning expression-vector Runtime codec and all wrapper construction/push/get/reset/delete calls. Actual reference-owning AST/dependency vectors and persistent arrays remain separate migration obligations. See PORT_PROGRESS.md#native-dependency-linearization-output-and-callers.",
+        "Retained parameter rational copies carry a stable debug allocation identity through Go record moves. New rational construction and copy assignment emit their distinct source alloc records; replacement and destruction emit source dealloc records only after successful owned numeral deletion."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
@@ -150523,7 +150531,10 @@
         "pkg/ast/ast_trace_file_memory_trace.go",
         "pkg/ast/ast_trace_file_memory_trace_debug_test.go",
         "pkg/ast/ast_format_manager_memory_trace.go",
-        "pkg/ast/ast_format_manager_memory_trace_debug_test.go"
+        "pkg/ast/ast_format_manager_memory_trace_debug_test.go",
+        "pkg/ast/ast_parameter.go",
+        "pkg/ast/ast_parameter_memory_trace.go",
+        "pkg/ast/ast_parameter_memory_trace_debug_test.go"
       ],
       "tests": [
         "TestRuntimeUint32AcrossInitializationBitmapBoundary",
@@ -150624,7 +150635,8 @@
         "TestParamsRationalEntryMemoryTraceNewMatchedAndReleasePaths",
         "TestASTTraceFileMemoryWrapperSourceLifetime",
         "TestASTTraceFileMemoryWrapperFinalizationSuppressesDeallocation",
-        "TestASTFormatManagerMemoryWrapperConstructorOverloads"
+        "TestASTFormatManagerMemoryWrapperConstructorOverloads",
+        "TestASTParameterRationalMemoryWrapperCopyMoveAssignAndDestroy"
       ],
       "conditionals": [
         {
@@ -151162,6 +151174,14 @@
           "tests": [
             "TestASTFormatManagerMemoryWrapperConstructorOverloads"
           ]
+        },
+        {
+          "name": "Concrete AST parameter rational allocation at ast.h:124 and ast.cpp:60, and destruction/replacement deallocation at ast.cpp:38/53 through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_parameter_memory_trace.go",
+          "tests": [
+            "TestASTParameterRationalMemoryWrapperCopyMoveAssignAndDestroy"
+          ]
         }
       ],
       "ownership": [
@@ -151201,7 +151221,8 @@
         "Native Go params blocks live in a growable typed slice, so debug memory TRACE uses a stable concrete context-owner/slot/generation identity instead of an address that would change on slice relocation. Charged Go block extent replaces sizeof(params); first and copy-on-write allocation, last-reference destruction, refused-stream continuation and process-finalizing suppression are covered.",
         "SET_RAT_VALUE rational* allocation/deallocation debug memory TRACE uses a stable context-owner/setter-invocation identity carried by the native Go entry through page growth and suffix shifts. The inline OwnedRational extent replaces sizeof(rational); completed replacement, key reset, live reset, last-reference cleanup, refused-stream continuation and process-finalizing suppression are covered.",
         "The AST trace-file header has stable Go pointer identity and a charged Go extent in place of native std::fstream sizeof. Successful header construction emits allocate; completed Close emits deallocate once, suppressed during process finalization. Failed header reservation emits neither record.",
-        "The owned AST format child uses its stable Go manager pointer and charged Go manager-header extent in the debug memory allocation record. The owning parent emits deallocation after the child closes; failed child header reservation has no record."
+        "The owned AST format child uses its stable Go manager pointer and charged Go manager-header extent in the debug memory allocation record. The owning parent emits deallocation after the child closes; failed child header reservation has no record.",
+        "The native rational pointer becomes an inline Go OwnedRational with a stable manager/allocation identity carried through parameter moves. Debug memory records use the Go scalar extent; assignment releases its previous value before recording a copied replacement."
       ]
     },
     {
@@ -151256,7 +151277,10 @@
         "pkg/ast/ast_trace_file_memory_trace.go",
         "pkg/ast/ast_trace_file_memory_trace_debug_test.go",
         "pkg/ast/ast_format_manager_memory_trace.go",
-        "pkg/ast/ast_format_manager_memory_trace_debug_test.go"
+        "pkg/ast/ast_format_manager_memory_trace_debug_test.go",
+        "pkg/ast/ast_parameter.go",
+        "pkg/ast/ast_parameter_memory_trace.go",
+        "pkg/ast/ast_parameter_memory_trace_debug_test.go"
       ],
       "tests": [
         "TestASTDeclCollectorDependencySetMemoryTrace",
@@ -151342,7 +151366,8 @@
         "TestParamsRationalEntryMemoryTraceNewMatchedAndReleasePaths",
         "TestASTTraceFileMemoryWrapperSourceLifetime",
         "TestASTTraceFileMemoryWrapperFinalizationSuppressesDeallocation",
-        "TestASTFormatManagerMemoryWrapperConstructorOverloads"
+        "TestASTFormatManagerMemoryWrapperConstructorOverloads",
+        "TestASTParameterRationalMemoryWrapperCopyMoveAssignAndDestroy"
       ],
       "conditionals": [
         {
@@ -151844,6 +151869,14 @@
           "tests": [
             "TestASTFormatManagerMemoryWrapperConstructorOverloads"
           ]
+        },
+        {
+          "name": "Concrete AST parameter rational allocation at ast.h:124 and ast.cpp:60, and destruction/replacement deallocation at ast.cpp:38/53 through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_parameter_memory_trace.go",
+          "tests": [
+            "TestASTParameterRationalMemoryWrapperCopyMoveAssignAndDestroy"
+          ]
         }
       ],
       "ownership": [
@@ -151876,7 +151909,8 @@
         "Native Go params blocks live in a growable typed slice, so debug memory TRACE uses a stable concrete context-owner/slot/generation identity instead of an address that would change on slice relocation. Charged Go block extent replaces sizeof(params); first and copy-on-write allocation, last-reference destruction, refused-stream continuation and process-finalizing suppression are covered.",
         "SET_RAT_VALUE rational* allocation/deallocation debug memory TRACE uses a stable context-owner/setter-invocation identity carried by the native Go entry through page growth and suffix shifts. The inline OwnedRational extent replaces sizeof(rational); completed replacement, key reset, live reset, last-reference cleanup, refused-stream continuation and process-finalizing suppression are covered.",
         "The AST trace-file header has stable Go pointer identity and a charged Go extent in place of native std::fstream sizeof. Successful header construction emits allocate; completed Close emits deallocate once, suppressed during process finalization. Failed header reservation emits neither record.",
-        "The owned AST format child uses its stable Go manager pointer and charged Go manager-header extent in the debug memory allocation record. The owning parent emits deallocation after the child closes; failed child header reservation has no record."
+        "The owned AST format child uses its stable Go manager pointer and charged Go manager-header extent in the debug memory allocation record. The owning parent emits deallocation after the child closes; failed child header reservation has no record.",
+        "The native rational pointer becomes an inline Go OwnedRational with a stable manager/allocation identity carried through parameter moves. Debug memory records use the Go scalar extent; assignment releases its previous value before recording a copied replacement."
       ]
     },
     {

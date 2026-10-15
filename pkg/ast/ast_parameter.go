@@ -71,6 +71,7 @@ func (m *ASTManager) dropParameter(p ASTParameter) error {
 		if e = m.numerals.Del(&r.Rational); e != nil {
 			return e
 		}
+		m.traceParameterRationalDeallocated(r, 38)
 	}
 	r.Live = false
 	r.nextFree = m.freeParameter
@@ -158,6 +159,7 @@ func (m *ASTManager) newParameterRational(value *unumeral.OwnedRational) (ASTPar
 	r.Kind = ASTParameterRational
 	r.Rational, e = m.numerals.NewValue()
 	if e == nil {
+		m.traceParameterRationalAllocated(r, "src/ast/ast.h", 124)
 		e = m.numerals.Copy(&r.Rational, value)
 	}
 	if e != nil {
@@ -215,6 +217,7 @@ func (m *ASTManager) assignParameter(dst, src ASTParameter) error {
 		if e = m.numerals.Del(&a.Rational); e != nil {
 			return e
 		}
+		m.traceParameterRationalDeallocated(a, 53)
 	}
 	// Source deletes old owned rational before publishing the new kind/copy.
 	a.Kind = b.Kind
@@ -228,6 +231,7 @@ func (m *ASTManager) assignParameter(dst, src ASTParameter) error {
 	case ASTParameterRational:
 		a.Rational, e = m.numerals.NewValue()
 		if e == nil {
+			m.traceParameterRationalAllocated(a, "src/ast/ast.cpp", 60)
 			e = m.numerals.Copy(&a.Rational, &b.Rational)
 		}
 		// A failed new object/copy leaves a destructible zero rational adapter,
@@ -290,6 +294,7 @@ func (m *ASTManager) MoveParameter(src ASTParameter) (ASTParameter, error) {
 	dst.nextFree = 0
 	if saved.Kind == ASTParameterRational {
 		m.parameterAt(src.slot).Rational = unumeral.OwnedRational{}
+		m.parameterAt(src.slot).rationalTraceID = ""
 	}
 	return p, nil
 }

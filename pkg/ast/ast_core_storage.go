@@ -150,6 +150,7 @@ type astParameterRecord struct {
 	ast                  astNodeRef
 	symbol               usymbol.Symbol
 	Rational             unumeral.OwnedRational
+	rationalTraceID      string
 	double               float64
 	external             uint32
 }
@@ -234,6 +235,7 @@ type ASTManager struct {
 	traceAcquisitionHistory                                                                            *astTraceAcquisition
 	traceAcquisitions, traceAcquisitionExecuting                                                       *astTraceAcquisition
 	traceAcquisitionSerial                                                                             uint64
+	rationalTraceSerial                                                                                uint64
 	mu                                                                                                 sync.Mutex
 	Self                                                                                               *ASTManager
 	origin                                                                                             uint64

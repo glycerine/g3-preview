@@ -9,7 +9,7 @@ import (
 	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
-func (m *ASTManager) formatMemoryTraceTags() *udiag.TraceTags {
+func (m *ASTManager) astMemoryTraceTags() *udiag.TraceTags {
 	if m.traceTags != nil {
 		return m.traceTags
 	}
@@ -17,7 +17,7 @@ func (m *ASTManager) formatMemoryTraceTags() *udiag.TraceTags {
 }
 
 func (m *ASTManager) traceFormatAllocated(line int) {
-	tags := m.formatMemoryTraceTags()
+	tags := m.astMemoryTraceTags()
 	if !udiag.DebugBuild || !tags.ShouldTrace("memory") {
 		return
 	}
@@ -38,7 +38,7 @@ func (m *ASTManager) traceFormatDeallocated() {
 		return
 	}
 	m.formatTraceLive = false
-	tags := m.formatMemoryTraceTags()
+	tags := m.astMemoryTraceTags()
 	if !udiag.DebugBuild || !tags.ShouldTrace("memory") {
 		return
 	}
