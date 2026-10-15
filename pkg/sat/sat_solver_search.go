@@ -102,6 +102,7 @@ func (s *Solver) initAssumptionsSpan(count uint32, span satSolverLiteralSpan) er
 	if s.propagation.inconsistent {
 		return nil
 	}
+	s.traceInitAssumptions(count, span)
 	for i := uint32(0); !s.propagation.inconsistent; i++ {
 		n, e := s.conflict.userScopeLiterals.Size()
 		if e != nil {

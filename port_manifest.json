@@ -178244,6 +178244,12 @@
           "tests": ["TestSATUnsatCoreAntecedentSourceTraceBeforeMark", "TestSATConflictInitNotLiteralSourceTrace"]
         },
         {
+          "name": "Reached SAT init_assumptions TRACE for explicit and user-scope literals plus the actual model-converter printer before assignment (sat_solver.cpp:1080-1086)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_assumptions_trace.go",
+          "tests": ["TestSATInitAssumptionsSourceTraceBeforeAssignments"]
+        },
+        {
           "name": "Reached SAT missed-propagation TRACE before unreachable assertion for live empty and unit clauses (sat_solver.cpp:3061)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_probing_diagnostics_trace.go",
@@ -179571,6 +179577,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_conflict_assumptions_extra_trace.go",
           "tests": ["TestSATUnsatCoreAntecedentSourceTraceBeforeMark", "TestSATConflictInitNotLiteralSourceTrace"]
+        },
+        {
+          "name": "Reached SAT init_assumptions TRACE for explicit and user-scope literals plus the actual model-converter printer before assignment (sat_solver.cpp:1080-1086)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_assumptions_trace.go",
+          "tests": ["TestSATInitAssumptionsSourceTraceBeforeAssignments"]
         },
         {
           "name": "Reached SAT missed-propagation TRACE before unreachable assertion for live empty and unit clauses (sat_solver.cpp:3061)",
