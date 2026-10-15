@@ -78,21 +78,25 @@ func (m *ASTManager) arrayMapDecl(ps []ASTParameter, domain []ASTHandle) (result
 			return result, ErrASTDomain
 		}
 	}
-	var parameters astArrayParameterVector
-	defer func() { err = errors.Join(err, parameters.close(m)) }()
+	var parameters []ASTParameter
+	defer func() { err = errors.Join(err, m.dropArrayParameters(parameters)) }()
 	for j := uint32(0); j+1 < first.count; j++ {
 		s, e := m.arraySortParameter(first, j)
 		if e != nil {
 			return result, e
 		}
-		if e = parameters.push(m, m.external(s)); e != nil {
+		p, e := m.newParameterAST(m.external(s))
+		if e != nil {
 			return result, e
 		}
+		parameters = append(parameters, p)
 	}
-	if e = parameters.push(m, m.external(decl.rangeSort)); e != nil {
+	p, e := m.newParameterAST(m.external(decl.rangeSort))
+	if e != nil {
 		return result, e
 	}
-	output, e := m.arraySort(0, parameters.values)
+	parameters = append(parameters, p)
+	output, e := m.arraySort(0, parameters)
 	if e != nil {
 		return result, e
 	}
@@ -199,23 +203,27 @@ func (m *ASTManager) MkArraySort(domain AppArguments, rangeSort ASTHandle) (resu
 	if e != nil {
 		return result, e
 	}
-	var parameters astArrayParameterVector
-	defer func() { err = errors.Join(err, parameters.close(m)) }()
+	var parameters []ASTParameter
+	defer func() { err = errors.Join(err, m.dropArrayParameters(parameters)) }()
 	for i := uint32(0); i < domain.Count(); i++ {
 		s, e := domain.At(i)
 		if e != nil {
 			return result, e
 		}
-		if e = parameters.push(m, s); e != nil {
+		p, e := m.newParameterAST(s)
+		if e != nil {
 			return result, e
 		}
+		parameters = append(parameters, p)
 	}
-	if e := parameters.push(m, rangeSort); e != nil {
+	p, e := m.newParameterAST(rangeSort)
+	if e != nil {
 		return result, e
 	}
+	parameters = append(parameters, p)
 	if !m.pluginAt(fid).present {
 		return result, nil
 	}
-	r, e := m.arraySort(0, parameters.values)
+	r, e := m.arraySort(0, parameters)
 	return m.external(r), e
 }

@@ -9580,8 +9580,8 @@
       "ownership": [
         "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end.",
         "Select/store normalize domains in borrowed native []ASTHandle scratch and dispatch the declaration factory without a second argument-array copy. Const declarations retain the private array-sort parameter through the copied info owner and retire the lexical parameter afterward. Declaration/application factories retain actual references and canonical identity. Native scratch adds no source buffer growth/failure credit.",
-        "As-array builds its function domain/range parameters in a concrete lexical source vector with original growth, releases its descriptors/storage on refusal and publication, and publishes the actual function AST parameter in the canonical declaration info. The referenced function remains owned by that declaration.",
-        "Map declarations retain the original mapped function parameter and output array sort. Actual lexical vector<parameter> owns Go parameter descriptors and source-grown storage; borrowed array-map arguments use the existing domain buffer/application path without a second argument copy. Every warm parameter-vector refusal restores live descriptor count and charge. Sort utility handles absent plugin and scalar domain bounds explicitly.",
+        "As-array builds its function domain/range parameters in a native Go slice, releases its owned descriptors on refusal and publication, and publishes the actual function AST parameter in the canonical declaration info. The referenced function remains owned by that declaration.",
+        "Map declarations retain the original mapped function parameter and output array sort. A native Go parameter slice holds owned descriptors until array-sort publication; borrowed array-map arguments use the existing domain buffer/application path without a second argument copy. Every warm parameter-vector refusal restores live descriptor count and charge. Sort utility handles absent plugin and scalar domain bounds explicitly.",
         "Set declarations use the original exact sort identity and Boolean-range checks. Union retains its single sort parameter; intersection retains no parameter. Union/intersection canonicalize to nonflat binary declarations and applications use the existing source right-association path. Constant/empty/full-set utilities borrow source Boolean values and keep lexical parameter descriptors through publication and cleanup.",
         "Default copies the source final sort parameter into an actual lexical Go descriptor before validation and drops it after declaration publication/refusal. Extensionality creates its own retained integer index parameter, while the utility owns a separate caller parameter through the source declaration overload. Warm refusal tests restore temporary descriptor count and failed-call charge, preserve canonical declaration identity, and account successful checked/debug capacity growth to the actual manager storage; final fixture closure restores total charge.",
         "Recursive value creation borrows its range, invokes the same scoped manager override, and owns the lexical sort parameter until const-array publication/refusal. Warm refusal tests restore callback and descriptor count; fixture closure drains manager-owned raw intermediates and storage. Interpretation traverses domains in order and short-circuits before the range."
@@ -9727,8 +9727,8 @@
       ],
       "ownership": [
         "Select/store normalize domains in borrowed native []ASTHandle scratch and dispatch the declaration factory without a second argument-array copy. Const declarations retain the private array-sort parameter through the copied info owner and retire the lexical parameter afterward. Declaration/application factories retain actual references and canonical identity. Native scratch adds no source buffer growth/failure credit.",
-        "As-array builds its function domain/range parameters in a concrete lexical source vector with original growth, releases its descriptors/storage on refusal and publication, and publishes the actual function AST parameter in the canonical declaration info. The referenced function remains owned by that declaration.",
-        "Map declarations retain the original mapped function parameter and output array sort. Actual lexical vector<parameter> owns Go parameter descriptors and source-grown storage; borrowed array-map arguments use the existing domain buffer/application path without a second argument copy. Every warm parameter-vector refusal restores live descriptor count and charge. Sort utility handles absent plugin and scalar domain bounds explicitly.",
+        "As-array builds its function domain/range parameters in a native Go slice, releases its owned descriptors on refusal and publication, and publishes the actual function AST parameter in the canonical declaration info. The referenced function remains owned by that declaration.",
+        "Map declarations retain the original mapped function parameter and output array sort. A native Go parameter slice holds owned descriptors until array-sort publication; borrowed array-map arguments use the existing domain buffer/application path without a second argument copy. Every warm parameter-vector refusal restores live descriptor count and charge. Sort utility handles absent plugin and scalar domain bounds explicitly.",
         "Set declarations use the original exact sort identity and Boolean-range checks. Union retains its single sort parameter; intersection retains no parameter. Union/intersection canonicalize to nonflat binary declarations and applications use the existing source right-association path. Constant/empty/full-set utilities borrow source Boolean values and keep lexical parameter descriptors through publication and cleanup.",
         "Default copies the source final sort parameter into an actual lexical Go descriptor before validation and drops it after declaration publication/refusal. Extensionality creates its own retained integer index parameter, while the utility owns a separate caller parameter through the source declaration overload. Warm refusal tests restore temporary descriptor count and failed-call charge, preserve canonical declaration identity, and account successful checked/debug capacity growth to the actual manager storage; final fixture closure restores total charge.",
         "Recursive value creation borrows its range, invokes the same scoped manager override, and owns the lexical sort parameter until const-array publication/refusal. Warm refusal tests restore callback and descriptor count; fixture closure drains manager-owned raw intermediates and storage. Interpretation traverses domains in order and short-circuits before the range."
@@ -181448,6 +181448,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_array_as_array.go",
+        "pkg/ast/ast_array_map.go",
         "pkg/sat/sat_solver_model_converter.go",
         "pkg/sat/sat_solver_nested_store.go",
         "pkg/sat/sat_solver_uint_set.go",
@@ -181535,6 +181537,8 @@
         "pkg/ast/pattern/collect.go"
       ],
       "tests": [
+        "TestASTArrayAsArrayParameterVectorRefusalAndReuse",
+        "TestASTArrayMapOriginalParameterVectorRefusalAndReuse",
         "TestParamDescrsNativeStorageAndWarmDuplicate",
         "TestParamDescrsNativeInitialCapacity",
         "TestParamDescrsNativeCopyDisplayAndPlateau",
@@ -181850,6 +181854,15 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "AST array declaration lexical parameter vectors use native Go slices with explicit descriptor cleanup",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_array_as_array.go",
+          "tests": [
+            "TestASTArrayAsArrayParameterVectorRefusalAndReuse",
+            "TestASTArrayMapOriginalParameterVectorRefusalAndReuse"
+          ]
+        },
         {
           "name": "descriptor names/sort/prefix concrete vectors with exact source push-growth capacities",
           "status": "ported",

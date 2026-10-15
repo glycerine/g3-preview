@@ -4,25 +4,14 @@ package ast
 
 import "errors"
 
-// Concrete lexical source vector<parameter>. Each slot holds the actual Go
-// parameter descriptor; AST payloads are borrowed until declaration publication.
-type astArrayParameterVector struct{ values []ASTParameter }
-
-func (v *astArrayParameterVector) push(m *ASTManager, h ASTHandle) error {
-	p, e := m.newParameterAST(h)
-	if e != nil {
-		return e
-	}
-	v.values = append(v.values, p)
-	return nil
-}
-func (v *astArrayParameterVector) close(m *ASTManager) error {
+// Array declarations own their temporary parameter descriptors until the
+// result is published. The slice itself is ordinary Go storage.
+func (m *ASTManager) dropArrayParameters(values []ASTParameter) error {
 	var err error
-	for _, p := range v.values {
+	for _, p := range values {
 		err = errors.Join(err, m.dropParameter(p))
 	}
-	clear(v.values)
-	v.values = nil
+	clear(values)
 	return err
 }
 func (m *ASTManager) arrayAsArrayDecl(ps []ASTParameter) (result astNodeRef, err error) {
@@ -44,21 +33,25 @@ func (m *ASTManager) arrayAsArrayDecl(ps []ASTParameter) (result astNodeRef, err
 	if decl.arity == 0 {
 		return result, ErrASTDomain
 	}
-	var parameters astArrayParameterVector
-	defer func() { err = errors.Join(err, parameters.close(m)) }()
+	var parameters []ASTParameter
+	defer func() { err = errors.Join(err, m.dropArrayParameters(parameters)) }()
 	for i := uint32(0); i < decl.arity; i++ {
 		s, e := m.readInternal(decl.domain, i)
 		if e != nil {
 			return result, e
 		}
-		if e = parameters.push(m, m.external(s)); e != nil {
+		p, e := m.newParameterAST(m.external(s))
+		if e != nil {
 			return result, e
 		}
+		parameters = append(parameters, p)
 	}
-	if e = parameters.push(m, m.external(decl.rangeSort)); e != nil {
+	p, e := m.newParameterAST(m.external(decl.rangeSort))
+	if e != nil {
 		return result, e
 	}
-	sort, e := m.arraySort(0, parameters.values)
+	parameters = append(parameters, p)
+	sort, e := m.arraySort(0, parameters)
 	if e != nil {
 		return result, e
 	}
