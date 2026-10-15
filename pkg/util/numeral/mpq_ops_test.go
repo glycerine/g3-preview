@@ -76,11 +76,6 @@ func TestRationalOpsMixedFiniteOraclesAndAliases(t *testing.T) {
 							qopsEqual(t, m, dst, new(big.Rat).Quo(oracle, new(big.Rat).SetInt64(coefficient)))
 						}
 					}
-					if coefficient != 0 {
-						qopsMust(t, m.SetFraction(&a, n, d))
-						qopsMust(t, m.AccDiv(&a, &z))
-						qopsEqual(t, m, &a, new(big.Rat).Quo(oracle, new(big.Rat).SetInt64(coefficient)))
-					}
 				}
 			}
 		}
@@ -246,10 +241,6 @@ func TestRationalOpsSourceComponentAliasActionOrder(t *testing.T) {
 		}
 		minusNine := NewInt(-9)
 		qopsMust(t, m.RatDiv(&six, &minusNine, &a))
-		qopsMust(t, m.AccDiv(&a, &a.Den))
-		if rationalString(t, m, &a) != "2/9" {
-			t.Fatal("acc_div sign reads overwritten denominator", rationalString(t, m, &a))
-		}
 		// Source mixed add/mul cross-products consume the integer before
 		// output denominator assignment. Freeze both same-q and foreign-output
 		// component borrows rather than assuming their numerical equivalence.
@@ -374,7 +365,7 @@ func TestRationalOpsAllPredictableFailurePrefixes(t *testing.T) {
 	// failure preserves public inputs/output. Retained manager scratch is allowed
 	// to change like source; closing the complete manager refunds every byte.
 	for _, synch := range []bool{false, true} {
-		for operation := 0; operation < 12; operation++ {
+		for _, operation := range []int{0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11} {
 			success := false
 			for prefix := int64(0); prefix < 512; prefix++ {
 				m, budget := rationalManager(t, synch)
@@ -387,9 +378,6 @@ func TestRationalOpsAllPredictableFailurePrefixes(t *testing.T) {
 				setRationalOracle(t, m, &c, new(big.Int).Neg(n), d)
 				setIntegerOracle(t, m.Z, &z, n)
 				qopsMust(t, m.SetInt64(&out, 17))
-				if operation == 7 {
-					qopsMust(t, m.Copy(&out, &a))
-				}
 				if operation >= 8 {
 					setRationalOracle(t, m, &a, new(big.Int).Neg(n), big.NewInt(1))
 					setRationalOracle(t, m, &b, d, big.NewInt(1))
@@ -413,8 +401,6 @@ func TestRationalOpsAllPredictableFailurePrefixes(t *testing.T) {
 					e = m.SubMulInt(&a, &z, &c, &out)
 				case 6:
 					e = m.MulInts(&z, &z, &out)
-				case 7:
-					e = m.AccDiv(&out, &z)
 				case 8:
 					e = m.IDiv(&a, &b, &out)
 				case 9:
@@ -436,7 +422,7 @@ func TestRationalOpsAllPredictableFailurePrefixes(t *testing.T) {
 					if !numericPhysicalReservationRefusal(e) {
 						t.Fatal("unexpected failure", operation, prefix, e)
 					}
-					if operation == 2 || operation == 3 || operation == 7 {
+					if operation == 2 || operation == 3 {
 						old, _ := new(big.Rat).SetString(originalOutput)
 						var pn, pd *big.Int
 						switch operation {
@@ -446,9 +432,6 @@ func TestRationalOpsAllPredictableFailurePrefixes(t *testing.T) {
 						case 3:
 							pn = new(big.Int).Set(n)
 							pd = new(big.Int).Set(n)
-						case 7:
-							pn = new(big.Int).Set(old.Num())
-							pd = new(big.Int).Mul(old.Denom(), n)
 						}
 						reduced := new(big.Rat).SetFrac(pn, pd)
 						powerPublicationComponent(t, m.Z, &out.Num, old.Num().String(), pn.String(), reduced.Num().String())

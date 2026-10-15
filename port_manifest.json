@@ -113141,7 +113141,7 @@
           ]
         },
         {
-          "name": "Direct rational inverse, rational/mixed division, acc_div and rat_div component publication; debug-only integrality on eight integer division/rem/mod forwards",
+          "name": "Direct rational inverse, rational/mixed division and rat_div component publication; debug-only integrality on eight integer division/rem/mod forwards",
           "status": "partial",
           "go_target": "pkg/util/numeral/mp_div_publication_test.go",
           "tests": [
@@ -160128,19 +160128,9 @@
           ]
         },
         {
-          "name": "acc_div(mpq,mpz)",
-          "status": "ported",
-          "go_target": "pkg/util/numeral/mpq_ops.go",
-          "tests": [
-            "TestRationalOpsSourceTst9All24Assertions",
-            "TestRationalOpsMixedFiniteOraclesAndAliases",
-            "TestRationalOpsFusedAllOutputAliases",
-            "TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks",
-            "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
-            "TestRationalOpsSourceComponentAliasActionOrder",
-            "TestRationalOpsLargeLimbScratchBranchesAndWarm",
-            "TestRationalOpsAllPredictableFailurePrefixes"
-          ]
+          "name": "acc_div(mpq,mpz) has no retained production caller; declaration-only template member",
+          "status": "reference_only",
+          "tests": []
         },
         {
           "name": "rat_div(mpz,mpz,mpq)",
@@ -160471,7 +160461,7 @@
           ]
         },
         {
-          "name": "Remaining rational/mixed division, acc_div and rat_div component publication; debug-only integrality on eight integer division/rem/mod forwards",
+          "name": "Remaining rational/mixed division and rat_div component publication; debug-only integrality on eight integer division/rem/mod forwards",
           "status": "partial",
           "go_target": "pkg/util/numeral/mp_div_publication_test.go",
           "tests": [
@@ -160885,7 +160875,7 @@
           ]
         },
         {
-          "name": "mixed rational/integer add/mul, rational and integer division, and acc_div STRACE source records",
+          "name": "mixed rational/integer add/mul and retained rational and integer division STRACE source records",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpq_short_trace.go",
           "go_targets": [

@@ -52,7 +52,7 @@ func TestDivisionPublicationInverseZeroProfileAndCleanup(t *testing.T) {
 }
 func TestDivisionPublicationZeroDivisorFiniteActions(t *testing.T) {
 	for _, sync := range []bool{false, true} {
-		for op := 0; op < 4; op++ {
+		for _, op := range []int{0, 1, 3} {
 			for _, n := range []int64{-2, 0, 2} {
 				m, _ := rationalManager(t, sync)
 				a, b, out := NewRational(), NewRational(), NewRational()
@@ -66,9 +66,6 @@ func TestDivisionPublicationZeroDivisorFiniteActions(t *testing.T) {
 					e = m.Div(&a, &b, &out)
 				case 1:
 					e = m.DivInt(&a, &z, &out)
-				case 2:
-					qopsMust(t, m.Copy(&out, &a))
-					e = m.AccDiv(&out, &z)
 				case 3:
 					e = m.RatDiv(&num, &z, &out)
 				}
@@ -96,7 +93,7 @@ func TestDivisionPublicationZeroDivisorFiniteActions(t *testing.T) {
 }
 func TestDivisionPublicationCallerFailurePrefixes(t *testing.T) {
 	for _, sync := range []bool{false, true} {
-		for op := 0; op < 5; op++ {
+		for _, op := range []int{0, 1, 2, 4} {
 			for alias := 0; alias < 3; alias++ {
 				changed, success := false, false
 				for fault := int64(0); fault < 256; fault++ {
@@ -123,8 +120,6 @@ func TestDivisionPublicationCallerFailurePrefixes(t *testing.T) {
 						e = m.Inv(&a, dst)
 					case 2:
 						e = m.DivInt(&a, &b.Num, dst)
-					case 3:
-						e = m.AccDiv(dst, &b.Num)
 					case 4:
 						e = m.RatDiv(&a.Num, &b.Num, dst)
 					}
@@ -355,7 +350,7 @@ func TestDivisionPublicationEarlierAllocationPrecedesZeroDomain(t *testing.T) {
 
 func TestDivisionPublicationComponentAliasSourceActions(t *testing.T) {
 	for _, sync := range []bool{false, true} {
-		for op := 0; op < 4; op++ {
+		for op := 0; op < 2; op++ {
 			m, _ := rationalManager(t, sync)
 			a, out := NewRational(), NewRational()
 			qopsMust(t, m.SetFraction(&a, -3, 5))
@@ -369,16 +364,6 @@ func TestDivisionPublicationComponentAliasSourceActions(t *testing.T) {
 			case 1:
 				e = m.DivInt(&a, &out.Den, &out)
 				wantNum, wantDen = "-3", "55"
-			case 2:
-				e = m.AccDiv(&a, &a.Num)
-				out = a
-				a = NewRational()
-				wantNum, wantDen = "1", "5"
-			case 3:
-				e = m.AccDiv(&a, &a.Den)
-				out = a
-				a = NewRational()
-				wantNum, wantDen = "-3", "25"
 			}
 			qopsMust(t, e)
 			divPublicationAudit(t, m, &a, &out)
@@ -621,7 +606,6 @@ func TestDivisionPublicationWarmStorage(t *testing.T) {
 			qopsMust(t, m.Div(&a, &b, &out))
 			qopsMust(t, m.Inv(&a, &out))
 			qopsMust(t, m.DivInt(&a, &b.Num, &out))
-			qopsMust(t, m.AccDiv(&out, &b.Num))
 			qopsMust(t, m.RatDiv(&a.Num, &b.Num, &out))
 		}
 		for i := 0; i < 10; i++ {

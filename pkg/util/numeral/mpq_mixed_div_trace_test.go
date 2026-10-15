@@ -36,8 +36,8 @@ func TestRationalMixedAndDivisionShortTraceSourceBranches(t *testing.T) {
 			if err := m.DivInt(&a, &z, &out); err != nil || rationalString(t, m, &out) != "1/4" {
 				t.Fatal("mixed div", err)
 			}
-			if err := m.AccDiv(&a, &z); err != nil || rationalString(t, m, &a) != "1/4" {
-				t.Fatal("accumulating div", err)
+			if err := m.DivInt(&a, &z, &a); err != nil || rationalString(t, m, &a) != "1/4" {
+				t.Fatal("aliased mixed div", err)
 			}
 			if err := m.Div(&a, &b, &out); err != nil || rationalString(t, m, &out) != "1/2" {
 				t.Fatal("separate rational div", err)

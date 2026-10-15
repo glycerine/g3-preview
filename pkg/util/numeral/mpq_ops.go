@@ -172,34 +172,6 @@ func (m *RationalManager) divIntWithAllocationContext(a *Rational, b *Int, out *
 	return m.normalizeWithAllocationContext(out, context)
 }
 
-// AccDiv publishes denominator multiplication before rereading the divisor.
-func (m *RationalManager) AccDiv(a *Rational, b *Int) (err error) {
-	if e := m.check(a); e != nil {
-		return e
-	}
-	if e := m.Z.check(b); e != nil {
-		return e
-	}
-	m.traceMPQMixed(a, b, a, "/", "mpq", false, true)
-	defer func() {
-		if err == nil {
-			m.traceMPQMixed(a, b, a, "/", "mpq", false, false)
-		}
-	}()
-	if e := m.Z.Mul(&a.Den, b, &a.Den); e != nil {
-		return e
-	}
-	if b.Val < 0 {
-		if e := m.Z.Neg(&a.Num); e != nil {
-			return e
-		}
-		if e := m.Z.Neg(&a.Den); e != nil {
-			return e
-		}
-	}
-	return m.normalize(a)
-}
-
 // RatDiv deliberately retains raw denominator sign and actual Copy aliases.
 func (m *RationalManager) RatDiv(a, b *Int, out *Rational) error {
 	if e := m.Z.check(a); e != nil {
