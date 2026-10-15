@@ -53,6 +53,7 @@ func (g *GlobalParams) sourceFinalizeBody(owning bool) error {
 					}
 					g.Cells[g.sourceIndex] = nil
 					g.Budget.Release(gparamsRefCellBytes)
+					g.traceModuleCellDeallocated(cell)
 				}
 				g.sourceIndex++
 			}

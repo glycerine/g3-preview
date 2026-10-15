@@ -66,3 +66,38 @@ func (s *GlobalParamsService) traceMemoryDeallocated(g *GlobalParams) {
 			return gparamsMemoryParts(w, "dealloc ", fmt.Sprintf("%p", g), " src/util/gparams.cpp:641\n")
 		})
 }
+
+func (g *GlobalParams) moduleMemoryTraceTags() *udiag.TraceTags {
+	if g.memoryTrace != nil {
+		return g.memoryTrace
+	}
+	return udiag.BorrowProcessTraceTags()
+}
+
+func (g *GlobalParams) traceModuleCellAllocated(cell *GparamsRefCell) {
+	if !GlobalParamsSourceDebug {
+		return
+	}
+	tags := g.moduleMemoryTraceTags()
+	if !tags.ShouldTrace("memory") {
+		return
+	}
+	_ = tags.EmitConditional("memory", "allocate", "src/util/memory_manager.cpp", 209,
+		func() bool { return true }, func(w io.Writer) error {
+			return gparamsMemoryParts(w, "alloc ", fmt.Sprintf("%p", cell), " src/util/gparams.cpp:192 params_ref ", strconv.FormatUint(gparamsRefCellBytes, 10), "\n")
+		})
+}
+
+func (g *GlobalParams) traceModuleCellDeallocated(cell *GparamsRefCell) {
+	if !GlobalParamsSourceDebug {
+		return
+	}
+	tags := g.moduleMemoryTraceTags()
+	if !tags.ShouldTrace("memory") {
+		return
+	}
+	_ = tags.EmitConditional("memory", "deallocate", "src/util/memory_manager.cpp", 204,
+		func() bool { return g.memoryProcess == nil || !g.memoryProcess.Finalizing() }, func(w io.Writer) error {
+			return gparamsMemoryParts(w, "dealloc ", fmt.Sprintf("%p", cell), " src/util/gparams.cpp:117\n")
+		})
+}

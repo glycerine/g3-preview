@@ -123190,7 +123190,8 @@
         "TestGeneratedInitializeAndFinalizeConcreteServices",
         "TestGlobalParamsImpMemoryTraceAllocationAndDeallocationOrder",
         "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
-        "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle"
+        "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle",
+        "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset"
       ],
       "assertions": [
         {
@@ -123257,6 +123258,16 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete gparams::imp get_params alloc(params_ref) and reset/finalize dealloc(params_ref) Z3DEBUG memory TRACE with single-cell reuse and Go pointer/header extent replacement (gparams.cpp:117,192)",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/params/util_gparams_memory_trace.go",
+          "tests": [
+            "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset",
+            "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
+            "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle"
+          ]
+        },
         {
           "name": "gparams::init alloc(imp) and finalize dealloc(imp) Z3DEBUG memory TRACE around concrete imp construction and destruction; Go pointer and owner-header extent replace the native address and sizeof(imp) (gparams.cpp:633-644)",
           "status": "platform_replacement",
@@ -123446,7 +123457,8 @@
         "Continued null g_imp is reached typed native-undefined-domain guard; no defined native nullptr continuation or source math-regression claim",
         "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion",
         "Parameter-descriptor and global-parameter output APIs now accept bytes.Buffer directly, including namespace and SMT context callers. Removed custom buffer construction, closed-owner state and cleanup from this chain. Native strings and byte writes preserve source normalization, insertion order, sorted descriptor names, debug diagnostics and actual borrowed-description failure prefixes. Nil destinations use the enclosing project error domain; no STL port or new whole-unit credit is claimed.",
-        "Go gparams::imp debug memory TRACE uses the actual Go owner pointer and charged Go header extent; source file/line, tag order, refused-stream continuation and process-finalizing deallocation guard follow retained alloc/dealloc wrapper sites."
+        "Go gparams::imp debug memory TRACE uses the actual Go owner pointer and charged Go header extent; source file/line, tag order, refused-stream continuation and process-finalizing deallocation guard follow retained alloc/dealloc wrapper sites.",
+        "Go gparams module params_ref cell debug memory TRACE uses the actual Go cell pointer and charged Go cell-header extent; the retained get_params/reset source sites, no-extra-allocation lookup, refused-stream continuation and generated-process finalizing guard are covered."
       ],
       "ownership_checks": [
         "actual source destructor reset/deletion/member cursor retained independently of sticky source cause; immediate named owner graph before sparse shrink fault lift; separate owning acknowledgment never replays failed source reset allocation; generated singleton ctor unwind and reached ParamsRef decrement-stop receipts remain open",
@@ -123526,7 +123538,8 @@
         "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument",
         "TestGlobalParamsImpMemoryTraceAllocationAndDeallocationOrder",
         "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
-        "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle"
+        "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle",
+        "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset"
       ],
       "conditionals": [
         {
@@ -123541,6 +123554,16 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete gparams::imp get_params alloc(params_ref) and reset/finalize dealloc(params_ref) Z3DEBUG memory TRACE with single-cell reuse and Go pointer/header extent replacement (gparams.cpp:117,192)",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/params/util_gparams_memory_trace.go",
+          "tests": [
+            "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset",
+            "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
+            "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle"
+          ]
+        },
         {
           "name": "gparams::init alloc(imp) and finalize dealloc(imp) Z3DEBUG memory TRACE around concrete imp construction and destruction; Go pointer and owner-header extent replace the native address and sizeof(imp) (gparams.cpp:633-644)",
           "status": "platform_replacement",
@@ -123686,7 +123709,8 @@
         "Explicit borrowed-owner single-lane namespace service, not process singleton/generated memory lifecycle completion. Actual C++ placement delete is no-op on failed ctor; Go owning abort refunds concrete retained storage separately. Source TRACE, native ABI/global Runtime table allocation, full descendant exceptional paths and arbitrary global bindings remain open. Independent source branch fixtures give no registered test-driver credit. TLS signed-host overflow stop is guarded undefined-domain evidence, not ordinary free failure/OOM.",
         "Explicit single-lane namespace binding, not process singleton/generated memory lifecycle. TRACE, native ostream/global stdout, global notification/debugger behavior and wider physical ABI/accounting remain open. Null current pointer with erased/disabled assertion reaches a typed undefined-pointer-domain guard. Symbol bare_str assertion uses actual numeric scalar at source argument site; numeric source ternary routes empty-name engine even with assertions disabled in debug. Independent fixtures give no registered driver credit.",
         "Parameter-descriptor and global-parameter output APIs now accept bytes.Buffer directly, including namespace and SMT context callers. Removed custom buffer construction, closed-owner state and cleanup from this chain. Native strings and byte writes preserve source normalization, insertion order, sorted descriptor names, debug diagnostics and actual borrowed-description failure prefixes. Nil destinations use the enclosing project error domain; no STL port or new whole-unit credit is claimed.",
-        "Go gparams::imp debug memory TRACE uses the actual Go owner pointer and charged Go header extent; source file/line, tag order, refused-stream continuation and process-finalizing deallocation guard follow retained alloc/dealloc wrapper sites."
+        "Go gparams::imp debug memory TRACE uses the actual Go owner pointer and charged Go header extent; source file/line, tag order, refused-stream continuation and process-finalizing deallocation guard follow retained alloc/dealloc wrapper sites.",
+        "Go gparams module params_ref cell debug memory TRACE uses the actual Go cell pointer and charged Go cell-header extent; the retained get_params/reset source sites, no-extra-allocation lookup, refused-stream continuation and generated-process finalizing guard are covered."
       ],
       "ownership_checks": [
         "actual source destructor reset/deletion/member cursor retained independently of sticky source cause; immediate named owner graph before sparse shrink fault lift; separate owning acknowledgment never replays failed source reset allocation; generated singleton ctor unwind and reached ParamsRef decrement-stop receipts remain open"
@@ -150482,7 +150506,8 @@
         "TestGeneratedFinalizeNullProcessSkipsChildren",
         "TestGlobalParamsImpMemoryTraceAllocationAndDeallocationOrder",
         "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
-        "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle"
+        "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle",
+        "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset"
       ],
       "conditionals": [
         {
@@ -150538,6 +150563,16 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Concrete gparams module params_ref cell debug-wrapper allocation/deallocation TRACE and process-finalizing guard with Go pointer/header extent replacement (memory_manager.cpp:202-211; gparams.cpp:117,192)",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/params/util_gparams_memory_trace.go",
+          "tests": [
+            "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset",
+            "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
+            "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle"
+          ]
+        },
+        {
           "name": "Concrete gparams::imp alloc/dealloc debug-wrapper TRACE, source file/line and finalizing guard with Go pointer/owner-header extent replacement (memory_manager.cpp:202-211; gparams.cpp:633-644)",
           "status": "platform_replacement",
           "go_target": "pkg/util/params/util_gparams_memory_trace.go",
@@ -150548,7 +150583,7 @@
           ]
         },
         {
-          "name": "Z3DEBUG allocate(file,line,obj,size) and deallocate(file,line,p) wrappers: the retained small_object_allocator chunk and gparams::imp call sites are ported; other retained caller sites remain unaudited (cpp202-211)",
+          "name": "Z3DEBUG allocate(file,line,obj,size) and deallocate(file,line,p) wrappers: the retained small_object_allocator chunk, gparams::imp and module params_ref cell call sites are ported; other retained caller sites remain unaudited (cpp202-211)",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
           "go_targets": [
@@ -150886,7 +150921,8 @@
         "Caller-confined assertion binding does not complete process-global macros, debugger notification, TRACE, or native ostream/ABI. Null-imp and closed-context cases are explicitly checked diagnostic domains.",
         "The concrete raw Runtime, SmallAllocator, source accounting/failure/cleanup progress and borrowed runtime uint32 view now live in independent util/memory. Production and tests import their actual owner directly without root util aliases or forwarding adapters. The extracted package has no dependency on root util or numeral/parameter owners. Existing private memory tests move with their real implementation; higher-level integration checks remain at callers. This changes package ownership only, preserving allocation/counter/publication/destruction/error behavior and existing completion gaps.",
         "Go-managed OwnedString/builders, numeric text streams and concrete counted snapshots now live in util/text, independent of root util/numerals/parameters. Retained callers import the actual text owner directly. Cross-package private stream access is replaced by existing CheckOpen, an identity-only tie check preserving closed-tie construction, and concrete arena-region C-string field insertion; source guard/read/width/error order remains. Formatter snapshot capture belongs with its text storage, while actual numeral invocation and source integer fault campaigns stay at their numeric consumer. No STL implementation or generic adapter credit is added.",
-        "Go gparams::imp debug memory TRACE uses the actual Go owner pointer and charged Go header extent; source file/line, tag order, refused-stream continuation and process-finalizing deallocation guard follow retained alloc/dealloc wrapper sites."
+        "Go gparams::imp debug memory TRACE uses the actual Go owner pointer and charged Go header extent; source file/line, tag order, refused-stream continuation and process-finalizing deallocation guard follow retained alloc/dealloc wrapper sites.",
+        "Go gparams module params_ref cell debug memory TRACE uses the actual Go cell pointer and charged Go cell-header extent; the retained get_params/reset source sites, no-extra-allocation lookup, refused-stream continuation and generated-process finalizing guard are covered."
       ]
     },
     {
@@ -150984,7 +151020,8 @@
         "TestGeneratedFinalizeNullProcessSkipsChildren",
         "TestGlobalParamsImpMemoryTraceAllocationAndDeallocationOrder",
         "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
-        "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle"
+        "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle",
+        "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset"
       ],
       "conditionals": [
         {
@@ -151044,6 +151081,16 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Concrete gparams module params_ref cell debug-wrapper allocation/deallocation TRACE and process-finalizing guard with Go pointer/header extent replacement (memory_manager.cpp:202-211; gparams.cpp:117,192)",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/params/util_gparams_memory_trace.go",
+          "tests": [
+            "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset",
+            "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
+            "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle"
+          ]
+        },
+        {
           "name": "Concrete gparams::imp alloc/dealloc debug-wrapper TRACE, source file/line and finalizing guard with Go pointer/owner-header extent replacement (memory_manager.cpp:202-211; gparams.cpp:633-644)",
           "status": "platform_replacement",
           "go_target": "pkg/util/params/util_gparams_memory_trace.go",
@@ -151054,7 +151101,7 @@
           ]
         },
         {
-          "name": "Z3DEBUG allocation/deallocation file-line overloads and alloc/dealloc macros: the retained small_object_allocator chunk and gparams::imp sites are connected through concrete trace hooks; other retained caller sites remain unaudited (h69-97; cpp202-211)",
+          "name": "Z3DEBUG allocation/deallocation file-line overloads and alloc/dealloc macros: the retained small_object_allocator chunk, gparams::imp and module params_ref cell sites are connected through concrete trace hooks; other retained caller sites remain unaudited (h69-97; cpp202-211)",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
           "go_targets": [
@@ -151346,7 +151393,8 @@
         "Legacy symbol/tag/prime/Params storage lacks actual source-global Runtime backing; no accounting tickets or inferred Budget malloc events.",
         "_TRACE file path/PROFILE_MEMORY/global ostream and full registered test driver remain open.",
         "The concrete raw Runtime, SmallAllocator, source accounting/failure/cleanup progress and borrowed runtime uint32 view now live in independent util/memory. Production and tests import their actual owner directly without root util aliases or forwarding adapters. The extracted package has no dependency on root util or numeral/parameter owners. Existing private memory tests move with their real implementation; higher-level integration checks remain at callers. This changes package ownership only, preserving allocation/counter/publication/destruction/error behavior and existing completion gaps.",
-        "Go gparams::imp debug memory TRACE uses the actual Go owner pointer and charged Go header extent; source file/line, tag order, refused-stream continuation and process-finalizing deallocation guard follow retained alloc/dealloc wrapper sites."
+        "Go gparams::imp debug memory TRACE uses the actual Go owner pointer and charged Go header extent; source file/line, tag order, refused-stream continuation and process-finalizing deallocation guard follow retained alloc/dealloc wrapper sites.",
+        "Go gparams module params_ref cell debug memory TRACE uses the actual Go cell pointer and charged Go cell-header extent; the retained get_params/reset source sites, no-extra-allocation lookup, refused-stream continuation and generated-process finalizing guard are covered."
       ]
     },
     {

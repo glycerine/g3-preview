@@ -41,6 +41,49 @@ func TestGlobalParamsImpMemoryTraceAllocationAndDeallocationOrder(t *testing.T) 
 	}
 }
 
+func TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset(t *testing.T) {
+	s, _ := gparamsNamespaceFixture(t)
+	var out bytes.Buffer
+	tags := udiag.NewTraceTagsWithWriter(&out)
+	tags.Enable("memory")
+	paramsMust(t, s.BindNamespaceTrace(tags))
+	paramsMust(t, s.InitializeSource())
+	out.Reset() // inspect the separate alloc(params_ref) site
+	module, e := s.Symbols.Intern("memory-cell-module")
+	paramsMust(t, e)
+	first, e := s.Current.GetParams(module)
+	paramsMust(t, e)
+	cell := s.Current.Cells[0]
+	if cell == nil || first != &cell.value {
+		t.Fatal("source module cell was not published", first, cell)
+	}
+	again, e := s.Current.GetParams(module)
+	paramsMust(t, e)
+	if again != first {
+		t.Fatal("module lookup allocated a second cell")
+	}
+	paramsMust(t, s.Current.Reset())
+	ptr := fmt.Sprintf("%p", cell)
+	want := fmt.Sprintf("-------- [memory] allocate src/util/memory_manager.cpp:209 ---------\nalloc %s src/util/gparams.cpp:192 params_ref %d\n------------------------------------------------\n", ptr, gparamsRefCellBytes) +
+		fmt.Sprintf("-------- [memory] deallocate src/util/memory_manager.cpp:204 ---------\ndealloc %s src/util/gparams.cpp:117\n------------------------------------------------\n", ptr)
+	if out.String() != want {
+		t.Fatalf("source module-cell wrapper records: got %q want %q", out.String(), want)
+	}
+	out.Reset()
+	_, e = s.Current.GetParams(module)
+	paramsMust(t, e)
+	second := s.Current.Cells[0]
+	imp := s.Current
+	paramsMust(t, s.FinalizeSource())
+	secondPtr := fmt.Sprintf("%p", second)
+	want = fmt.Sprintf("-------- [memory] allocate src/util/memory_manager.cpp:209 ---------\nalloc %s src/util/gparams.cpp:192 params_ref %d\n------------------------------------------------\n", secondPtr, gparamsRefCellBytes) +
+		fmt.Sprintf("-------- [memory] deallocate src/util/memory_manager.cpp:204 ---------\ndealloc %s src/util/gparams.cpp:117\n------------------------------------------------\n", secondPtr) +
+		fmt.Sprintf("-------- [memory] deallocate src/util/memory_manager.cpp:204 ---------\ndealloc %p src/util/gparams.cpp:641\n------------------------------------------------\n", imp)
+	if out.String() != want {
+		t.Fatalf("source destructor module-cell wrapper records: got %q want %q", out.String(), want)
+	}
+}
+
 func TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle(t *testing.T) {
 	s, _ := gparamsNamespaceFixture(t)
 	out := &gparamsTraceBodyRefusalWriter{failAt: 1, cause: errors.New("memory trace refused")}
@@ -51,6 +94,11 @@ func TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle(t *testing.T) {
 	if s.Current == nil || !s.Current.constructorReady || out.calls == 0 {
 		t.Fatal("refused allocation trace stopped source constructor", s.Current, out.calls)
 	}
+	module, e := s.Symbols.Intern("refused-memory-cell")
+	paramsMust(t, e)
+	_, e = s.Current.GetParams(module)
+	paramsMust(t, e)
+	paramsMust(t, s.Current.Reset())
 	paramsMust(t, s.FinalizeSource())
 	if s.Current != nil {
 		t.Fatal("refused deallocation trace stopped source finalization")
@@ -74,6 +122,10 @@ func TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation(t *testing.T
 	paramsMust(t, r.CompleteSourceInitialize())
 	paramsMust(t, s.BindMemoryProcess(p))
 	paramsMust(t, s.InitializeSource())
+	module, e := s.Symbols.Intern("finalizing-memory-cell")
+	paramsMust(t, e)
+	_, e = s.Current.GetParams(module)
+	paramsMust(t, e)
 	active, e := p.BeginFinalize()
 	if e != nil || !active {
 		t.Fatal("source finalization guard", active, e)

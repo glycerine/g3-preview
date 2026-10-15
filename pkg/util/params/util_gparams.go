@@ -8,6 +8,8 @@ import (
 	"sync"
 
 	"github.com/glycerine/g3/pkg/arena"
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -21,6 +23,8 @@ type GlobalParamsConfig struct {
 	CLongBits                                   uint8
 	Register                                    func(GlobalParamsRegistrar) error
 	onAllocated                                 func(*GlobalParams)
+	memoryTrace                                 *udiag.TraceTags
+	memoryProcess                               *umemory.ProcessAccounting
 }
 type GparamsRefCell struct{ value ParamsRef }
 
@@ -37,6 +41,8 @@ type GlobalParams struct {
 	SymbolsField                            *usymbol.Manager
 	ContextField                            *ParamsContext
 	Budget                                  *arena.Budget
+	memoryTrace                             *udiag.TraceTags
+	memoryProcess                           *umemory.ProcessAccounting
 	Register                                func(GlobalParamsRegistrar) error
 	modulesRegistered, registering, closed  bool
 	sourceStarted, sourceCompleted          bool
@@ -113,7 +119,8 @@ func newSourceGlobalParams(s *usymbol.Manager, p *ParamsContext, c GlobalParamsC
 	if e := c.Budget.Reserve(n); e != nil {
 		return nil, e
 	}
-	g := &GlobalParams{SymbolsField: s, ContextField: p, Budget: c.Budget, Register: c.Register, OwnerBytes: n, catalog: c.Catalog}
+	g := &GlobalParams{SymbolsField: s, ContextField: p, Budget: c.Budget, Register: c.Register, OwnerBytes: n, catalog: c.Catalog,
+		memoryTrace: c.memoryTrace, memoryProcess: c.memoryProcess}
 	g.self = g
 	if c.onAllocated != nil {
 		c.onAllocated(g) // source alloc(imp) traces before placement construction
@@ -269,12 +276,14 @@ func (g *GlobalParams) GetParams(k usymbol.Symbol) (*ParamsRef, error) {
 	if e := g.Budget.Reserve(gparamsRefCellBytes); e != nil {
 		return nil, e
 	}
+	cell := &GparamsRefCell{}
+	g.traceModuleCellAllocated(cell)
 	v, e := g.ContextField.NewValue()
 	if e != nil {
 		g.Budget.Release(gparamsRefCellBytes)
 		return nil, e
 	}
-	cell := &GparamsRefCell{v}
+	cell.value = v
 	// Scalar directory slots are private metadata, not externally issued handles.
 	// Reuse released roots so repeated source reset/new-cell cycles plateau.
 	slot := len(g.Cells)
@@ -358,6 +367,7 @@ func (g *GlobalParams) reset() error {
 		}
 		g.Cells[i-1] = nil
 		g.Budget.Release(gparamsRefCellBytes)
+		g.traceModuleCellDeallocated(cell)
 	}
 	g.ModuleParams.reset()
 	return nil

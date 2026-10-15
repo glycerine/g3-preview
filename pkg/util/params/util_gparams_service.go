@@ -78,6 +78,8 @@ func (s *GlobalParamsService) InitializeSource() error {
 	// Source init is unconditional; a previous live pointer does not skip alloc.
 	c := s.Config
 	c.onAllocated = s.traceMemoryAllocated
+	c.memoryTrace = s.memoryTraceTags()
+	c.memoryProcess = s.memoryProcess
 	g, e := newSourceGlobalParams(s.Symbols, s.Context, c)
 	if e != nil {
 		if g != nil {
