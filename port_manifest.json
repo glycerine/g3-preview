@@ -178153,6 +178153,12 @@
           "tests": ["TestFixedMonomialPropagationSourceTrace", "TestFixedMonomialPropagationTraceRefusalAndPrinterPrefix"]
         },
         {
+          "name": "Reached SAT solver destructor TRACE before original and learned clause deletion (sat_solver.cpp:62,64)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_clause_lifecycle.go",
+          "tests": ["TestSATSolverDestructorClauseTraceSourceOrder", "TestSATDestructorTracePrecedesEachLiveClauseDeletion"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -179341,6 +179347,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_monomial_propagate_trace.go",
           "tests": ["TestFixedMonomialPropagationSourceTrace", "TestFixedMonomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Reached SAT solver destructor TRACE before original and learned clause deletion (sat_solver.cpp:62,64)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_clause_lifecycle.go",
+          "tests": ["TestSATSolverDestructorClauseTraceSourceOrder", "TestSATDestructorTracePrecedesEachLiveClauseDeletion"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

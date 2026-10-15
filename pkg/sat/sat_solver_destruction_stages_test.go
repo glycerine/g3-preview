@@ -19,11 +19,11 @@ func TestSATSolverRealDestructorStagesKeepLaterSourceMembers(t *testing.T) {
 	queue := v.queue
 	watches := v.watches
 	generation := l.nonLearnedGeneration
-	satOK(t, l.deleteClausesBody())
+	satOK(t, l.deleteClausesBody(nil))
 	if p.clauses.IsLive(o) || p.clauses.IsLive(q) || l.nonLearnedGeneration != generation+2 || cap(l.Original) != originalCap || cap(l.learned) != learnedCap {
 		t.Fatal("source dtor body changed member storage")
 	}
-	satOK(t, l.deleteClausesBody())
+	satOK(t, l.deleteClausesBody(nil))
 	if l.nonLearnedGeneration != generation+2 {
 		t.Fatal("completed clause deletion replayed")
 	}

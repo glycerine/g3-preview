@@ -33,6 +33,7 @@ type Solver struct {
 	context                      *uparams.ParamsContext
 	Limit                        *control.Reslimit
 	budget                       *arena.Budget
+	traceTags                    *diagnostic.TraceTags
 	config                       *satMainConfig
 	Clauses                      *ClauseAllocator
 	Variables                    *satSolverVariableState
@@ -368,7 +369,11 @@ func (s *Solver) closeMembers() error {
 			}
 		case 2:
 			if s.constructed {
-				e = s.Lifecycle.deleteClausesBody()
+				tags := s.traceTags
+				if tags == nil {
+					tags = diagnostic.BorrowProcessTraceTags()
+				}
+				e = s.Lifecycle.deleteClausesBody(tags)
 			}
 		case 3:
 			for i := len(s.binaryClauseGraph); i > 0; i-- {

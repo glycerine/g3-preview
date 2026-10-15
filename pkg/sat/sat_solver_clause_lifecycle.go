@@ -2,9 +2,11 @@
 package sat
 
 import (
+	"io"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 // Sole clause ownership lies in original/learned or the explicit interrupted
@@ -32,6 +34,7 @@ type satSolverClauseLifecycle struct {
 	reinitInitialized, scopesInitialized                       uint32
 	closeOriginal, closeLearned                                uint32
 	originalDone, learnedDone, closing, closed                 bool
+	traceOriginalDone, traceLearnedDone                        bool
 }
 type satSolverScope struct {
 	trailLimit, reinitLimit uint32
@@ -348,7 +351,7 @@ func (s *satSolverClauseLifecycle) Close() error {
 	if e := s.cleanupOwningContinuations(); e != nil {
 		return e
 	}
-	if e := s.deleteClausesBody(); e != nil {
+	if e := s.deleteClausesBody(nil); e != nil {
 		return e
 	}
 	if e := s.finalizeScopesReinit(); e != nil {
@@ -414,9 +417,17 @@ func (s *satSolverClauseLifecycle) cleanupOwningContinuations() error {
 	}
 	return nil
 }
-func (s *satSolverClauseLifecycle) deleteClausesBody() error {
+func (s *satSolverClauseLifecycle) deleteClausesBody(tags *diagnostic.TraceTags) error {
 	if s == nil || s.self != s {
 		return ErrSATOwner
+	}
+	if tags != nil && !s.traceOriginalDone {
+		_ = tags.EmitConditional("sat", "~solver", "src/sat/sat_solver.cpp", 62,
+			func() bool { return true }, func(w io.Writer) error {
+				_, _ = io.WriteString(w, "Delete clauses\n")
+				return nil
+			})
+		s.traceOriginalDone = true
 	}
 	a := s.propagation.clauses
 	for s.closeOriginal < uint32(len(s.Original)) {
@@ -428,6 +439,14 @@ func (s *satSolverClauseLifecycle) deleteClausesBody() error {
 	if !s.originalDone {
 		s.nonLearnedGeneration++
 		s.originalDone = true
+	}
+	if tags != nil && !s.traceLearnedDone {
+		_ = tags.EmitConditional("sat", "~solver", "src/sat/sat_solver.cpp", 64,
+			func() bool { return true }, func(w io.Writer) error {
+				_, _ = io.WriteString(w, "Delete learned\n")
+				return nil
+			})
+		s.traceLearnedDone = true
 	}
 	for s.closeLearned < uint32(len(s.learned)) {
 		if e := a.Delete(s.learned[s.closeLearned]); e != nil {
