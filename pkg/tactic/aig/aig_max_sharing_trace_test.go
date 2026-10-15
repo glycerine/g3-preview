@@ -102,3 +102,98 @@ func TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough(t *testing.T) {
 		t.Fatalf("owner graph retained %d bytes", budget.Used())
 	}
 }
+
+func TestAIGMaxSharingTryingTraceAllFourReassociationBranches(t *testing.T) {
+	budget := arena.NewBudget(1 << 30)
+	symbols, err := symbol.NewManager(symbol.Config{Budget: budget})
+	aigMust(t, err)
+	numbers, err := numeral.NewRationalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{
+		Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}},
+	}})
+	aigMust(t, err)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	m, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: symbols, Numerals: numbers, Budget: budget, TraceTags: tags})
+	aigMust(t, err)
+	tags.Enable("max_sharing")
+	sort, err := m.MkBoolSort()
+	aigMust(t, err)
+	g, err := NewManager(m)
+	aigMust(t, err)
+	var vars [4]*Ref
+	for i, name := range []string{"a", "b", "c", "d"} {
+		h, e := m.MkFreshConst(name, sort)
+		aigMust(t, e)
+		vars[i], e = g.MakeVariable(h)
+		aigMust(t, e)
+	}
+	ab, err := g.InternAnd(vars[0], vars[1])
+	aigMust(t, err)
+	cd, err := g.InternAnd(vars[2], vars[3])
+	aigMust(t, err)
+	root, err := g.InternAnd(ab, cd)
+	aigMust(t, err)
+	if root.lit.node.children[0].node != ab.lit.node || root.lit.node.children[1].node != cd.lit.node {
+		t.Fatal("source canonical order did not put earlier nested node on left")
+	}
+	left, right := ab.lit.node, cd.lit.node
+	aigMust(t, ab.Close())
+	aigMust(t, cd.Close())
+	result, err := g.MaxSharing(root)
+	aigMust(t, err)
+	if tags.ShouldTrace("max_sharing") {
+		name := func(l Literal) string {
+			prefix, id := "#", l.node.id
+			if l.node.and {
+				prefix, id = "@", id-firstNodeID
+			}
+			if l.inverted {
+				prefix = "-" + prefix
+			}
+			return prefix + strconv.FormatUint(uint64(id), 10)
+		}
+		a, b, c := name(left.children[0]), name(left.children[1]), name(root.lit.node.children[1])
+		d, e, f := name(root.lit.node.children[0]), name(right.children[0]), name(right.children[1])
+		want := []struct {
+			line         int
+			action, body string
+		}{
+			{1131, "improve_sharing_left", "trying (and " + a + " (and " + b + " " + c + "))"},
+			{1149, "improve_sharing_left", "trying (and " + a + " (and " + c + " " + b + "))"},
+			{1176, "improve_sharing_right", "trying (and (and " + d + " " + e + ") " + f + ")"},
+			{1195, "improve_sharing_right", "trying (and (and " + d + " " + f + ") " + e + ")"},
+		}
+		var headers, bodies []string
+		var previous string
+		for _, line := range strings.Split(output.String(), "\n") {
+			if strings.HasPrefix(line, "trying ") {
+				headers = append(headers, previous)
+				bodies = append(bodies, line)
+			}
+			previous = line
+		}
+		if len(bodies) != len(want) {
+			t.Fatalf("trying records %q, want four", bodies)
+		}
+		for i, row := range want {
+			header := "-------- [max_sharing] " + row.action + " src/tactic/aig/aig.cpp:" + strconv.Itoa(row.line) + " ---------"
+			if headers[i] != header || bodies[i] != row.body {
+				t.Fatalf("trying %d: header=%q body=%q; want %q %q", i, headers[i], bodies[i], header, row.body)
+			}
+		}
+	} else if output.Len() != 0 {
+		t.Fatalf("erased trace emitted %q", output.String())
+	}
+	aigMust(t, result.Close())
+	aigMust(t, root.Close())
+	for _, r := range vars {
+		aigMust(t, r.Close())
+	}
+	aigMust(t, g.Close())
+	aigMust(t, m.Close())
+	aigMust(t, numbers.Close())
+	aigMust(t, symbols.Close())
+	if budget.Used() != 0 {
+		t.Fatalf("owner graph retained %d bytes", budget.Used())
+	}
+}

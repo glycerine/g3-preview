@@ -114,7 +114,8 @@ func (p *sharingPass) tryLeft(old *node, n Literal) (bool, error) {
 	l := n.node.children[0]
 	a, b := l.node.children[0], l.node.children[1]
 	c := n.node.children[1]
-	for _, row := range [][3]Literal{{b, c, a}, {a, c, b}} {
+	for i, row := range [][3]Literal{{b, c, a}, {a, c, b}} {
+		m.traceSharingTry(a, b, c, true, i == 1)
 		inner, err := m.mkNode(row[0], row[1])
 		if err != nil {
 			return false, err
@@ -145,10 +146,16 @@ func (p *sharingPass) tryRight(old *node, n Literal) (bool, error) {
 	r := n.node.children[1]
 	a := n.node.children[0]
 	b, c := r.node.children[0], r.node.children[1]
-	for _, row := range [][3]Literal{{a, b, c}, {a, c, b}} {
+	for i, row := range [][3]Literal{{a, b, c}, {a, c, b}} {
+		if i == 0 {
+			m.traceSharingTry(a, b, c, false, false)
+		}
 		inner, err := m.mkNode(row[0], row[1])
 		if err != nil {
 			return false, err
+		}
+		if i == 1 {
+			m.traceSharingTry(a, b, c, false, true)
 		}
 		pin, err := m.newRef(inner)
 		if err != nil {

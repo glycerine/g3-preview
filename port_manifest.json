@@ -98181,7 +98181,8 @@
         "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate",
         "TestAIGExprCacheReleaseTracePrecedesLastReference",
         "TestAIGTacticConstructorFailureMemoryTracePrefixes",
-        "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough"
+        "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
+        "TestAIGMaxSharingTryingTraceAllFourReassociationBranches"
       ],
       "conditionals": [
         {
@@ -98499,7 +98500,8 @@
             "TestAIGMaxSharingReassociatesTowardExistingPair",
             "TestAIGMaxSharingUnchangedAndInvertedRoot",
             "TestAIGMaxSharingCachesSharedOldNode",
-            "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough"
+            "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
+            "TestAIGMaxSharingTryingTraceAllFourReassociationBranches"
           ]
         },
         {
@@ -98535,6 +98537,14 @@
           "go_target": "pkg/tactic/aig/aig_goal_conversion_trace.go",
           "tests": [
             "TestAIGGoalConversionCacheAndAuxTraceSourceOrder"
+          ]
+        },
+        {
+          "name": "max_sharing left/right reassociation trying TRACE before or after source candidate construction",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_max_sharing_trace.go",
+          "tests": [
+            "TestAIGMaxSharingTryingTraceAllFourReassociationBranches"
           ]
         },
         {
@@ -98595,7 +98605,8 @@
         "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
         "TestAIGManagerSeparateImpChargesAndConstructorPrefixes",
         "TestAIGTacticConstructorFailureMemoryTracePrefixes",
-        "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough"
+        "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
+        "TestAIGMaxSharingTryingTraceAllFourReassociationBranches"
       ],
       "conditionals": [
         {
@@ -98671,7 +98682,8 @@
           "tests": [
             "TestAIGMaxSharingReassociatesTowardExistingPair",
             "TestAIGMaxSharingCachesSharedOldNode",
-            "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough"
+            "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
+            "TestAIGMaxSharingTryingTraceAllFourReassociationBranches"
           ]
         },
         {
@@ -179300,7 +179312,8 @@
         "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate",
         "TestAIGExprCacheReleaseTracePrecedesLastReference",
         "TestAIGGoalConversionCacheAndAuxTraceSourceOrder",
-        "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough"
+        "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
+        "TestAIGMaxSharingTryingTraceAllFourReassociationBranches"
       ],
       "conditionals": [
         {
@@ -180666,6 +180679,14 @@
           ]
         },
         {
+          "name": "Retained max_sharing left/right reassociation trying TRACE bodies (aig.cpp:1131,1149,1176,1195)",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_max_sharing_trace.go",
+          "tests": [
+            "TestAIGMaxSharingTryingTraceAllFourReassociationBranches"
+          ]
+        },
+        {
           "name": "Retained max_sharing process frame-index and null-result TRACE (aig.cpp:1261,1284)",
           "status": "ported",
           "go_target": "pkg/tactic/aig/aig_max_sharing_trace.go",
@@ -180841,7 +180862,8 @@
         "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate",
         "TestAIGExprCacheReleaseTracePrecedesLastReference",
         "TestAIGGoalConversionCacheAndAuxTraceSourceOrder",
-        "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough"
+        "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
+        "TestAIGMaxSharingTryingTraceAllFourReassociationBranches"
       ],
       "conditionals": [
         {
@@ -182204,6 +182226,14 @@
           "go_target": "pkg/tactic/aig/aig_goal_conversion_trace.go",
           "tests": [
             "TestAIGGoalConversionCacheAndAuxTraceSourceOrder"
+          ]
+        },
+        {
+          "name": "Retained max_sharing left/right reassociation trying TRACE bodies (aig.cpp:1131,1149,1176,1195)",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_max_sharing_trace.go",
+          "tests": [
+            "TestAIGMaxSharingTryingTraceAllFourReassociationBranches"
           ]
         },
         {
