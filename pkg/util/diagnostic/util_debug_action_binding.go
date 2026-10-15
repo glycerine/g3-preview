@@ -19,7 +19,7 @@ func (d *DebugContext) BindAssertionActions(a *DebugActionContext) error {
 	if e := d.open(); e != nil {
 		return e
 	}
-	if a != nil && (a.self != a || a.budget != d.BudgetField || a.profile == DebugInteractive && d.assertionStreams != nil && d.assertionStreams != a.streams) {
+	if a != nil && (a.self != a || a.budget != d.BudgetField || a.profile == DebugInteractive && d.assertionStreams != a.streams) {
 		return arena.ErrConfig
 	}
 	d.assertionActions = a

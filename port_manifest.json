@@ -120730,9 +120730,10 @@
         },
         {
           "name": "Symmetric same-service binding of actual notification std::cerr and interactive action stream borrows, preserving nil/unbound and NO_Z3_DEBUGGER erased stream configurations",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/diagnostic/util_debug_notification.go",
-          "tests": []
+          "go_targets": ["pkg/util/diagnostic/util_debug_action_binding.go"],
+          "tests": ["TestDebugInteractiveNotificationActionStreamCohort"]
         },
         {
           "name": "Concrete default standard-stream/action service preparation and exact borrowed generated process Context finalizer; source-site namespace assertion transport with gate-before-condition and bare_str C continuation (src/util/debug.cpp:28-35; src/util/debug.cpp:44-68; src/util/debug.cpp:37-42,73-117; src/test/mem_initializer.cpp:13-20; src/util/gparams.cpp:558,564,569,574,579,584,589,594,603,609,614,619,624,629; src/util/symbol.h:96)",
@@ -121040,9 +121041,10 @@
         },
         {
           "name": "Symmetric same-service binding of actual notification std::cerr and interactive action stream borrows, preserving nil/unbound and NO_Z3_DEBUGGER erased stream configurations",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/diagnostic/util_debug_notification.go",
-          "tests": []
+          "go_targets": ["pkg/util/diagnostic/util_debug_action_binding.go"],
+          "tests": ["TestDebugInteractiveNotificationActionStreamCohort"]
         },
         {
           "name": "Literal source macro false leaves plus concrete Runtime heap constructor/reset/reserve/bounds/insert/move/erase/min/key-update/swap and nested indexed/back/pop/shrink assertion control; src/util/debug.h:63-65; src/util/debug.h:67-78; src/util/debug.h:81-92; src/util/error_codes.h:29; src/util/heap.h:57,61-66,79-92,230-239; src/util/vector.h:303-310; src/util/heap.h:126,138,145,154,162,165,174,191,196,217,260-265; src/util/heap.h:105,169,175-176,181,197,221,226; src/util/vector.h:334,344,391,402; src/util/heap.h:272-282",
@@ -182298,9 +182300,10 @@
         },
         {
           "name": "Symmetric same-service binding of actual notification std::cerr and interactive action stream borrows, preserving nil/unbound and NO_Z3_DEBUGGER erased stream configurations",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/diagnostic/util_debug_notification.go",
-          "tests": []
+          "go_targets": ["pkg/util/diagnostic/util_debug_action_binding.go"],
+          "tests": ["TestDebugInteractiveNotificationActionStreamCohort"]
         },
         {
           "name": "Concrete sorting-network ptr_vector<expr> literal storage uses native []ASTHandle, borrowed spans, nonowning reset and native recursive-frame cleanup (src/util/sorting_network.h:120-1046; src/test/sorting_network.cpp:150-181)",
