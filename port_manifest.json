@@ -21084,6 +21084,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/model/model2expr_entry_condition.go",
+        "pkg/ast/rewriter/bool_rewriter_default_and.go",
         "pkg/ast/rewriter/bool_rewriter.go",
         "pkg/ast/rewriter/bool_rewriter_eq.go",
         "pkg/ast/rewriter/bool_rewriter_ite.go",
@@ -21096,6 +21098,7 @@
         "pkg/ast/rewriter/bool_rewriter_native_context_test.go"
       ],
       "tests": [
+        "TestModel2ExprEntryConditionSourceArityAndReferenceScope",
         "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
         "TestBoolRewriterACOneLevelFlatteningAndSpill",
         "TestBoolRewriterACIndependentAssignmentsThroughCDCL",
@@ -21190,6 +21193,13 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete default Boolean AND core for model2expr entry conditions, including zero/one result and raw-AND fallback (bool_rewriter.cpp:89-168)",
+          "status": "ported",
+          "go_target": "pkg/model/model2expr_entry_condition.go",
+          "go_targets": ["pkg/ast/rewriter/bool_rewriter_default_and.go"],
+          "tests": ["TestModel2ExprEntryConditionSourceArityAndReferenceScope"]
+        },
         {
           "name": "mk_nflat_and_core / mk_flat_and_core",
           "status": "ported",
@@ -21351,6 +21361,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/model/model2expr_entry_condition.go",
+        "pkg/ast/rewriter/bool_rewriter_default_and.go",
         "pkg/ast/rewriter/bool_rewriter.go",
         "pkg/ast/rewriter/bool_rewriter_eq.go",
         "pkg/ast/rewriter/bool_rewriter_ite.go",
@@ -21362,6 +21374,7 @@
         "pkg/ast/rewriter/bool_rewriter_native_context_test.go"
       ],
       "tests": [
+        "TestModel2ExprEntryConditionSourceArityAndReferenceScope",
         "TestBoolRewriterACSourceStatusesOrderAndOutputOwnership",
         "TestBoolRewriterACOneLevelFlatteningAndSpill",
         "TestBoolRewriterACIndependentAssignmentsThroughCDCL",
@@ -21411,6 +21424,13 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Stack-local default bool_rewriter::mk_and flat/simplified result and raw-AND fallback for model2expr (bool_rewriter.h:81,135-140)",
+          "status": "ported",
+          "go_target": "pkg/model/model2expr_entry_condition.go",
+          "go_targets": ["pkg/ast/rewriter/bool_rewriter_default_and.go"],
+          "tests": ["TestModel2ExprEntryConditionSourceArityAndReferenceScope"]
+        },
         {
           "name": "private AND/OR core declarations and borrowed inline state fragment",
           "status": "partial",
@@ -56318,11 +56338,23 @@
       "component": "model",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/model/model2expr_fresh_name.go"],
-      "tests": ["TestModel2ExprFreshNameConcreteSymbolSetAndSequence"],
+      "go_targets": [
+        "pkg/model/model2expr_fresh_name.go",
+        "pkg/model/model2expr_entry_condition.go"
+      ],
+      "tests": [
+        "TestModel2ExprFreshNameConcreteSymbolSetAndSequence",
+        "TestModel2ExprEntryConditionSourceArityAndReferenceScope"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "mk_entry_cond concrete equality vector skips matching bound variables, pins each created equality and applies default Boolean AND (model2expr.cpp:65-77)",
+          "status": "ported",
+          "go_target": "pkg/model/model2expr_entry_condition.go",
+          "tests": ["TestModel2ExprEntryConditionSourceArityAndReferenceScope"]
+        },
         {
           "name": "mk_fresh_name::add and next concrete symbol collection, collisions and A..Z/A1 sequence (model2expr.cpp:24-61)",
           "status": "ported",
@@ -171621,6 +171653,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/model/model2expr_entry_condition.go",
         "pkg/ast/ast_ref.go",
         "pkg/util/sexpr/util_sexpr.go",
         "pkg/math/polynomial/polynomial_ref.go",
@@ -171651,6 +171684,7 @@
         "pkg/model/model_evaluator_array_equality.go"
       ],
       "tests": [
+        "TestModel2ExprEntryConditionSourceArityAndReferenceScope",
         "TestSexprAccessorsAndScalarIterator",
         "TestSexprBVGoScratchAndNumeralLifetime",
         "TestSexprGoTraversalScratchUnderBudgetRefusal",
@@ -171758,6 +171792,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Concrete model2expr entry-condition expr_ref_vector pins generated equalities in source order and releases them forward with retryable consumed-reference cleanup (model2expr.cpp:67-77)",
+          "status": "ported",
+          "go_target": "pkg/model/model2expr_entry_condition.go",
+          "tests": ["TestModel2ExprEntryConditionSourceArityAndReferenceScope"]
+        },
         {
           "name": "Concrete model-evaluator expr_ref_vector store rows, reconstruction arguments and equality constraints retain AST roots through source-order array expansion and comparison (model_evaluator.cpp:207-221,301-319,422-499)",
           "status": "ported",
