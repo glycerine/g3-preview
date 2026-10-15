@@ -1,6 +1,51 @@
 package ast
 
-import "testing"
+import (
+	"errors"
+	"testing"
+)
+
+func TestASTExprMapStoppedProofCleanupPrecedesExpressionEntries(t *testing.T) {
+	if !ASTSourceDebug {
+		t.Skip("source table assertion is compiled out")
+	}
+	m := astTestManager(t)
+	nodes := markTestNodes(t, m, 2)
+	for _, h := range nodes {
+		astTestMust(t, m.IncRef(h))
+	}
+	astTestMust(t, m.ToggleProofMode(ASTProofEnabled))
+	proof, e := m.MkProofTrue()
+	astTestMust(t, e)
+	s, e := NewASTExprMapWithProofs(m, true)
+	astTestMust(t, e)
+	astTestMust(t, s.Insert(nodes[0], nodes[1], proof))
+	proofNode, e := m.proofAppNode(proof)
+	astTestMust(t, e)
+	astTestMust(t, m.tableEraseIdentity(proofNode))
+	if e = s.Reset(); !errors.Is(e, ErrASTDomain) {
+		t.Fatalf("stopped proof release: %v", e)
+	}
+	for _, h := range nodes {
+		if refs, e := m.GetRefCount(h); e != nil || refs != 2 {
+			t.Fatalf("expression released before proof phase: %d, %v", refs, e)
+		}
+	}
+	if _, inserted, e := m.tableInsert(proofNode); e != nil || !inserted {
+		t.Fatalf("restore proof table entry: %v, %v", inserted, e)
+	}
+	astTestMust(t, s.Reset())
+	for _, h := range nodes {
+		if refs, e := m.GetRefCount(h); e != nil || refs != 1 {
+			t.Fatalf("expression cleanup did not resume: %d, %v", refs, e)
+		}
+	}
+	astTestMust(t, m.deleteNode(proofNode))
+	astTestMust(t, s.Close())
+	for _, h := range nodes {
+		astTestMust(t, m.DecRef(h))
+	}
+}
 
 func TestASTExprMapConcreteReferenceCleanup(t *testing.T) {
 	m := astTestManager(t)
