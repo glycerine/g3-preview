@@ -178153,6 +178153,12 @@
           "tests": ["TestFixedMonomialPropagationSourceTrace", "TestFixedMonomialPropagationTraceRefusalAndPrinterPrefix"]
         },
         {
+          "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_simplify_trace.go",
+          "tests": ["TestSATSolverSimplifyTraceAfterThresholdBeforeCleanup"]
+        },
+        {
           "name": "Reached SAT solver destructor TRACE before original and learned clause deletion (sat_solver.cpp:62,64)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_clause_lifecycle.go",
@@ -179347,6 +179353,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_monomial_propagate_trace.go",
           "tests": ["TestFixedMonomialPropagationSourceTrace", "TestFixedMonomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_simplify_trace.go",
+          "tests": ["TestSATSolverSimplifyTraceAfterThresholdBeforeCleanup"]
         },
         {
           "name": "Reached SAT solver destructor TRACE before original and learned clause deletion (sat_solver.cpp:62,64)",
