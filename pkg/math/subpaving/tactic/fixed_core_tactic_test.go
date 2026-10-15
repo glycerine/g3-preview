@@ -70,6 +70,10 @@ func TestFixedCoreTacticBorrowedGoalPrintStatisticsAndCleanup(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	descriptions, err := params.NewParamDescrs(sy, params.ParamDescrsConfig{Budget: b})
+	if err != nil {
+		t.Fatal(err)
+	}
 	goal, err := goaltactic.NewGoal(m, false, false, false)
 	if err != nil {
 		t.Fatal(err)
@@ -79,7 +83,7 @@ func TestFixedCoreTacticBorrowedGoalPrintStatisticsAndCleanup(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() {
-		for _, e := range []error{goal.Close(), core.Close(), qm.CloseChecked(), numbers.Close(), pc.Del(&p), pc.Close(), q.Del(&value), m.Close(), q.Close(), sy.Close()} {
+		for _, e := range []error{goal.Close(), core.Close(), descriptions.Close(), qm.CloseChecked(), numbers.Close(), pc.Del(&p), pc.Close(), q.Del(&value), m.Close(), q.Close(), sy.Close()} {
 			if e != nil {
 				t.Error(e)
 			}
@@ -88,6 +92,21 @@ func TestFixedCoreTacticBorrowedGoalPrintStatisticsAndCleanup(t *testing.T) {
 			t.Error("MPFX core owner bytes", b.Used())
 		}
 	})
+	if err := core.CollectParamDescriptions(descriptions); err != nil {
+		t.Fatal(err)
+	}
+	if count, err := descriptions.Size(); err != nil || count != 7 {
+		t.Fatalf("selected core parameter descriptions: %d, %v", count, err)
+	}
+	for i, want := range []string{"max_nodes", "max_depth", "epsilon", "max_bound", "nth_root_precision", "numeral", "print_nodes"} {
+		key, err := descriptions.ParamName(uint32(i))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got, err := sy.String(key); err != nil || got != want {
+			t.Fatalf("description %d: %q, %v; want %q", i, got, err, want)
+		}
+	}
 	name, err := sy.Intern("x")
 	if err != nil {
 		t.Fatal(err)

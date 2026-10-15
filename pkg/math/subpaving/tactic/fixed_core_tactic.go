@@ -298,6 +298,15 @@ func (t *FixedCoreTactic) CollectStatistics(dst *statistics.Statistics) error {
 	return nil
 }
 
+// CollectParamDescriptions follows the source core tactic's delegation to its
+// selected context, followed by the numeral and print_nodes entries.
+func (t *FixedCoreTactic) CollectParamDescriptions(dst *params.ParamDescrs) error {
+	if err := t.open(); err != nil {
+		return err
+	}
+	return CollectParamDescriptions(dst)
+}
+
 func (t *FixedCoreTactic) ResetStatistics() error {
 	if err := t.open(); err != nil {
 		return err

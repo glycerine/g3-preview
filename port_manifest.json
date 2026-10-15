@@ -55225,6 +55225,12 @@
           ]
         },
         {
+          "name": "Concrete MPFX core tactic collect_param_descrs forwards through its selected context and appends numeral/print_nodes in source order (subpaving_tactic.cpp:83-89,232-234)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/tactic/fixed_core_tactic.go",
+          "tests": ["TestFixedCoreTacticBorrowedGoalPrintStatisticsAndCleanup"]
+        },
+        {
           "name": "Concrete MPFX core tactic apply: borrowed goal result, selected search, statistics, parameter snapshot, fresh cleanup and named-variable print_nodes output (subpaving_tactic.cpp:32-49,193-268)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/tactic/fixed_core_tactic.go",
