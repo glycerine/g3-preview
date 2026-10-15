@@ -2,6 +2,7 @@
 package aig
 
 import (
+	"errors"
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -27,11 +28,30 @@ func (m *Manager) And(left, right *Ref) (*Ref, error) {
 	if m.activeRefs == math.MaxUint32 {
 		return nil, arena.ErrBounds
 	}
-	result, e := m.mkNode(l, r)
+	result, e := m.mkAnd(l, r)
 	if e != nil {
 		return nil, e
 	}
 	return m.newRef(result)
+}
+
+// mkAnd is the source mk_and wrapper around mk_node, including its TRACE.
+func (m *Manager) mkAnd(l, r Literal) (Literal, error) {
+	result, err := m.mkNode(l, r)
+	if err != nil {
+		return Literal{}, err
+	}
+	if err = m.traceMkAnd(l, r, result); err != nil {
+		if result.node.and && result.node.refs == 0 {
+			// A newly interned gate has no owning reference yet. Release its
+			// child references when trace formatting stops before newRef.
+			result.node.refs = 1
+			m.dec(result)
+			err = errors.Join(err, m.drain())
+		}
+		return Literal{}, err
+	}
+	return result, nil
 }
 
 func (m *Manager) mkNode(l, r Literal) (Literal, error) {

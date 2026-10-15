@@ -98394,7 +98394,9 @@
         "pkg/tactic/aig/aig_expr_cache_trace.go",
         "pkg/tactic/aig/aig_max_sharing_trace.go",
         "pkg/tactic/aig/aig_display.go",
-        "pkg/tactic/aig/aig_display_test.go"
+        "pkg/tactic/aig/aig_display_test.go",
+        "pkg/tactic/aig/aig_and_trace.go",
+        "pkg/tactic/aig/aig_and_trace_test.go"
       ],
       "tests": [
         "TestAIGCoreInterningOwnershipAndIDReuse",
@@ -98428,7 +98430,8 @@
         "TestAIGTacticConstructorFailureMemoryTracePrefixes",
         "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
         "TestAIGMaxSharingTryingTraceAllFourReassociationBranches",
-        "TestAIGGoalConversionMissingCacheConditionalTrace"
+        "TestAIGGoalConversionMissingCacheConditionalTrace",
+        "TestAIGMkAndSourceTraceOriginalOperandsAndResult"
       ],
       "conditionals": [
         {
@@ -98824,6 +98827,14 @@
           "go_target": "pkg/tactic/aig/aig_max_sharing_trace.go",
           "tests": [
             "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough"
+          ]
+        },
+        {
+          "name": "imp::mk_and mk_and_bug TRACE after minimization for source operands and result (aig.cpp:1341-1351); selected Boolean variable profile",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_and_trace.go",
+          "tests": [
+            "TestAIGMkAndSourceTraceOriginalOperandsAndResult"
           ]
         },
         {

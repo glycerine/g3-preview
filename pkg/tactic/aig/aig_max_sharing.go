@@ -116,7 +116,7 @@ func (p *sharingPass) tryLeft(old *node, n Literal) (bool, error) {
 	c := n.node.children[1]
 	for i, row := range [][3]Literal{{b, c, a}, {a, c, b}} {
 		m.traceSharingTry(a, b, c, true, i == 1)
-		inner, err := m.mkNode(row[0], row[1])
+		inner, err := m.mkAnd(row[0], row[1])
 		if err != nil {
 			return false, err
 		}
@@ -125,7 +125,7 @@ func (p *sharingPass) tryLeft(old *node, n Literal) (bool, error) {
 			return false, err
 		}
 		if inner.node.refs > 1 {
-			outer, buildErr := m.mkNode(row[2], inner)
+			outer, buildErr := m.mkAnd(row[2], inner)
 			if buildErr == nil {
 				if n.inverted {
 					outer = invert(outer)
@@ -153,7 +153,7 @@ func (p *sharingPass) tryRight(old *node, n Literal) (bool, error) {
 		if i == 0 {
 			m.traceSharingTry(a, b, c, false, false)
 		}
-		inner, err := m.mkNode(row[0], row[1])
+		inner, err := m.mkAnd(row[0], row[1])
 		if err != nil {
 			return false, err
 		}
@@ -165,7 +165,7 @@ func (p *sharingPass) tryRight(old *node, n Literal) (bool, error) {
 			return false, err
 		}
 		if inner.node.refs > 1 {
-			outer, buildErr := m.mkNode(inner, row[2])
+			outer, buildErr := m.mkAnd(inner, row[2])
 			if buildErr == nil {
 				if n.inverted {
 					outer = invert(outer)
@@ -226,7 +226,7 @@ func (p *sharingPass) improve(n *node) error {
 			r = invert(r)
 		}
 	}
-	newNode, err := p.manager.mkNode(l, r)
+	newNode, err := p.manager.mkAnd(l, r)
 	if err != nil {
 		return err
 	}
