@@ -12407,7 +12407,8 @@
         "pkg/ast/ast_smt2_fdecl_name.go",
         "pkg/ast/ast_smt2_fdecl_classify.go",
         "pkg/ast/ast_smt2_sort.go",
-        "pkg/ast/ast_smt2_fdecl.go"
+        "pkg/ast/ast_smt2_fdecl.go",
+        "pkg/ast/ast_smt2_var_labels.go"
       ],
       "tests": [
         "TestASTSMT2BitVectorLiteralRadixAndSignedOracle",
@@ -12426,7 +12427,8 @@
         "TestASTSMT2FunctionNameSourceBuiltinAndUserDeclarations",
         "TestASTSMT2FunctionDeclarationParameterClassification",
         "TestASTSMT2SortSourceBuiltinAndParametricFormats",
-        "TestASTSMT2FunctionDeclarationSourceFormatsAndRecursiveReference"
+        "TestASTSMT2FunctionDeclarationSourceFormatsAndRecursiveReference",
+        "TestASTSMT2VariableAndLabelSourceFormats"
       ],
       "conditionals": [
         {
@@ -12576,6 +12578,14 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "smt2_printer variable-name format, ensure_quote, pp_attribute, pp_simple_attribute and pp_labels (ast_smt2_pp.cpp:550-626); frame info-stack integration remains open",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_smt2_var_labels.go",
+          "tests": [
+            "TestASTSMT2VariableAndLabelSourceFormats"
+          ]
+        },
+        {
           "name": "smt2_pp_environment::pp_as, pp_fdecl_params, pp_fdecl, pp_signature and pp_fdecl_ref declaration format assembly (ast_smt2_pp.cpp:101-160)",
           "status": "ported",
           "go_target": "pkg/ast/ast_smt2_fdecl.go",
@@ -12656,7 +12666,7 @@
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
         "Standard bytes.Buffer and strconv replace C++ character/string container behavior without STL implementation credit. Long radix checks cover widths through 4097; actual numeral and formatter failure campaigns remain. NumericTextStream and fresh-name buffer consumers still require separate work before the full util split.",
-        "The retained function-name formatter now builds source format-string nodes for quoted, numerical, null and simple symbols, and for implication, ITE and IFF declaration names. Indexed and sort-parameter classification, recursive declaration/signature assembly and the base environment's sort formatter are also ported. The cmd_context parametric-sort override, full SMT2 expression traversal, aliasing, layout and stream operator remain open."
+        "The retained function-name formatter now builds source format-string nodes for quoted, numerical, null and simple symbols, and for implication, ITE and IFF declaration names. Indexed and sort-parameter classification, recursive declaration/signature assembly and the base environment's sort formatter are also ported. Variable-name fallback, quoted names and positive/negative label formats are available as printer prerequisites; frame info-stack integration remains open. The cmd_context parametric-sort override, full SMT2 expression traversal, aliasing, layout and stream operator remain open."
       ]
     },
     {
