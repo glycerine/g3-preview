@@ -54548,6 +54548,12 @@
           "tests": ["TestFastInequalityReferenceTraceClauseOrder", "TestFastInequalityReferenceTraceRefusalAndStoppedRelease"]
         },
         {
+          "name": "Concrete config_mpff bound-publication/conflict TRACE and post-mk_bound queue ownership (subpaving_t_def.h:563-580)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/fast_bound_trace.go", "pkg/math/subpaving/fast_context_bounds.go"],
+          "tests": ["TestFastBoundTracePublicationAndConflictOrder", "TestFastBoundTraceStreamAndPrinterFailurePrefix", "TestFastBoundTimestampSourceExceptionAfterPublication"]
+        },
+        {
           "name": "Concrete config_hwf mk_sum and is_int(polynomial) nested integer-status and first-failing-term TRACE before variable publication (subpaving_t_def.h:668-679,762-763)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/hardware_polynomial_integer_trace.go",
@@ -177369,6 +177375,12 @@
           "tests": ["TestFastInequalityReferenceTraceClauseOrder", "TestFastInequalityReferenceTraceRefusalAndStoppedRelease"]
         },
         {
+          "name": "Reached config_mpff bound-publication and conflict TRACE records (subpaving_t_def.h:563-566)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/fast_bound_trace.go", "pkg/math/subpaving/fast_context_bounds.go"],
+          "tests": ["TestFastBoundTracePublicationAndConflictOrder", "TestFastBoundTraceStreamAndPrinterFailurePrefix", "TestFastBoundTimestampSourceExceptionAfterPublication"]
+        },
+        {
           "name": "Reached config_hwf mk_sum and is_int(polynomial) nested TRACE records (subpaving_t_def.h:672,762)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/hardware_polynomial_integer_trace.go",
@@ -178329,6 +178341,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fast_refcount_trace.go",
           "tests": ["TestFastInequalityReferenceTraceClauseOrder", "TestFastInequalityReferenceTraceRefusalAndStoppedRelease"]
+        },
+        {
+          "name": "Reached config_mpff bound-publication and conflict TRACE records (subpaving_t_def.h:563-566)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/fast_bound_trace.go", "pkg/math/subpaving/fast_context_bounds.go"],
+          "tests": ["TestFastBoundTracePublicationAndConflictOrder", "TestFastBoundTraceStreamAndPrinterFailurePrefix", "TestFastBoundTimestampSourceExceptionAfterPublication"]
         },
         {
           "name": "Reached config_hwf mk_sum and is_int(polynomial) nested TRACE records (subpaving_t_def.h:672,762)",

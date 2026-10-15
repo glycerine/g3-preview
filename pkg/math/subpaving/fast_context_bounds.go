@@ -267,9 +267,9 @@ func (c *FastContext) RelevantNewBound(n *FastNode, variable uint32, k *numeral.
 	return cmp < 0, nil
 }
 
-// PropagateBound creates the normalized bound, queues it, then checks the
-// node's new interval for conflict. Relevance testing is the caller's choice,
-// as source unit clauses publish directly.
+// PropagateBound creates the normalized bound, checks the node's interval for
+// conflict, then queues it after mk_bound completes. Relevance testing is the
+// caller's choice, as source unit clauses publish directly.
 func (c *FastContext) PropagateBound(n *FastNode, variable uint32, value *numeral.FastFloat, lower, open bool) (err error) {
 	return c.propagateBoundReason(n, variable, value, lower, open, fastBoundReason{})
 }
@@ -318,14 +318,17 @@ func (c *FastContext) publishBound(n *FastNode, variable uint32, value *numeral.
 	b.timestamp = c.timestamp
 	b.decision = !enqueue
 	b.reason = reason
-	if enqueue {
-		c.queue = append(c.queue, b)
+	if err = c.traceNewBound(b); err != nil {
+		return err
 	}
 	conflict, e := n.ConflictingBounds(variable)
 	if e != nil {
 		return e
 	}
 	if conflict {
+		if err = c.traceBoundConflict(n); err != nil {
+			return err
+		}
 		n.inconsistent, n.conflictVar = true, variable
 		c.numConflicts++
 		c.removeLeaf(n)
@@ -333,6 +336,9 @@ func (c *FastContext) publishBound(n *FastNode, variable uint32, value *numeral.
 	c.timestamp++
 	if c.timestamp == math.MaxUint64 {
 		return ErrFastContextTimestamp
+	}
+	if enqueue {
+		c.queue = append(c.queue, b)
 	}
 	return nil
 }

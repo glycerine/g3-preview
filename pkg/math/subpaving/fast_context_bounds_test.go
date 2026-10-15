@@ -20,7 +20,7 @@ func TestFastBoundTimestampSourceExceptionAfterPublication(t *testing.T) {
 	if !errors.Is(err, ErrFastContextTimestamp) || !errors.Is(err, ErrSubpavingFailure) {
 		t.Fatal("source bound timestamp exception", err)
 	}
-	if root.trail == nil || root.trail.timestamp != math.MaxUint64-1 || c.timestamp != math.MaxUint64 || len(c.queue) != 1 {
+	if root.trail == nil || root.trail.timestamp != math.MaxUint64-1 || c.timestamp != math.MaxUint64 || len(c.queue) != 0 {
 		t.Fatal("bound publication must precede timestamp exception")
 	}
 }
