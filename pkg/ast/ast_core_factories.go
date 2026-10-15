@@ -276,7 +276,7 @@ func (m *ASTManager) mkApp(decl astNodeRef, args []ASTHandle) (astNodeRef, error
 	}
 	return m.mkAppArguments(decl, AppArguments{slice: args, count: uint32(len(args))})
 }
-func (m *ASTManager) mkAppArguments(decl astNodeRef, args AppArguments) (astNodeRef, error) {
+func (m *ASTManager) mkAppArguments(decl astNodeRef, args AppArguments) (result astNodeRef, cause error) {
 	f, e := m.funcFlags(decl)
 	if e != nil {
 		return astNodeRef{}, e
@@ -290,6 +290,11 @@ func (m *ASTManager) mkAppArguments(decl astNodeRef, args AppArguments) (astNode
 	if mismatch && (!f.LeftAssociative && !f.RightAssociative && !f.Chainable || int(args.count) < 2 && fid == 0 && !(f.LeftAssociative && f.RightAssociative)) {
 		return astNodeRef{}, ErrASTDomain
 	}
+	defer func() {
+		if cause == nil && result.slot != 0 {
+			cause = m.traceAppGround(result)
+		}
+	}()
 	if int(args.count) == 1 && f.Chainable && arity == 2 {
 		return m.trueApp, nil
 	}

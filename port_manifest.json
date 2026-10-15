@@ -10702,6 +10702,12 @@
           "tests": ["TestASTChainableTraceOnlyOnLongNonflatBranch"]
         },
         {
+          "name": "mk_app app_ground TRACE after every successful application path with retained low-level printer (ast.cpp:2207)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_app_trace.go",
+          "tests": ["TestASTAppGroundTraceAfterApplicationConstruction"]
+        },
+        {
           "name": "proof builder and reader overloads across all 44 out-of-line names and inline mode/fact/parent inspection; diagnostic transport open",
           "status": "partial",
           "go_target": "pkg/ast/ast_proof_manager.go",
@@ -11711,6 +11717,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_core_app_trace.go",
           "tests": ["TestASTChainableTraceOnlyOnLongNonflatBranch"]
+        },
+        {
+          "name": "mk_app app_ground TRACE after every successful application path with retained low-level printer (ast.cpp:2207)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_app_trace.go",
+          "tests": ["TestASTAppGroundTraceAfterApplicationConstruction"]
         },
         {
           "name": "proof builder and reader overloads across all 44 out-of-line names and inline mode/fact/parent inspection; diagnostic transport open",
@@ -177057,6 +177069,12 @@
           "tests": ["TestASTChainableTraceOnlyOnLongNonflatBranch"]
         },
         {
+          "name": "Reached AST mk_app app-ground TRACE after successful application paths (ast.cpp:2207)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_app_trace.go",
+          "tests": ["TestASTAppGroundTraceAfterApplicationConstruction"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -177887,6 +177905,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_core_app_trace.go",
           "tests": ["TestASTChainableTraceOnlyOnLongNonflatBranch"]
+        },
+        {
+          "name": "Reached AST mk_app app-ground TRACE after successful application paths (ast.cpp:2207)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_app_trace.go",
+          "tests": ["TestASTAppGroundTraceAfterApplicationConstruction"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
