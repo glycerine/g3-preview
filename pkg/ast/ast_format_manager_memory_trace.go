@@ -16,6 +16,12 @@ func (m *ASTManager) astMemoryTraceTags() *udiag.TraceTags {
 	return udiag.BorrowProcessTraceTags()
 }
 
+// BorrowMemoryTraceTags lets retained child owners emit source memory records
+// through the same trace channel as their AST manager.
+func (m *ASTManager) BorrowMemoryTraceTags() *udiag.TraceTags {
+	return m.astMemoryTraceTags()
+}
+
 func (m *ASTManager) traceFormatAllocated(line int) {
 	tags := m.astMemoryTraceTags()
 	if !udiag.DebugBuild || !tags.ShouldTrace("memory") {

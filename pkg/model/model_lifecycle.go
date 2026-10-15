@@ -9,12 +9,15 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/insdict"
 )
 
 type modelUniverse struct {
-	values    []ast.ASTHandle
-	sortOwned bool
+	values          []ast.ASTHandle
+	sortOwned       bool
+	memoryTrace     *diagnostic.TraceTags
+	memoryTraceLive bool
 }
 type Model struct {
 	self       *Model
@@ -139,7 +142,8 @@ func (md *Model) RegisterUniverse(s ast.ASTHandle, values []ast.ASTHandle) (err 
 		if e = m.IncRef(s); e != nil {
 			return e
 		}
-		u = &modelUniverse{sortOwned: true}
+		u = &modelUniverse{sortOwned: true, memoryTrace: m.BorrowMemoryTraceTags(), memoryTraceLive: true}
+		u.traceAllocated()
 		u.values = append(u.values, values...)
 		md.Universes.Set(s, u)
 		published = true
@@ -209,6 +213,7 @@ func (md *Model) Close() error {
 			}
 		}
 		u.values = nil
+		u.traceDeallocated()
 	}
 	md.Universes = insdict.Dict[ast.ASTHandle, *modelUniverse]{}
 	md.sorts = nil
