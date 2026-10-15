@@ -1,8 +1,6 @@
 package sat
 
 import (
-	"reflect"
-
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
@@ -85,105 +83,6 @@ func (c *satVariableCharColumn) shrink(n uint32) error {
 }
 func (c *satVariableCharColumn) finalize(b *arena.Budget) {
 	b.Release(uint64(cap(c.data)))
-	c.data = nil
-	c.initialized = 0
-}
-
-type satVariableUintColumn struct {
-	data        []uint32
-	initialized uint32
-}
-
-func (c *satVariableUintColumn) push(b *arena.Budget, v uint32) error {
-	if len(c.data) == cap(c.data) {
-		n, bytes, e := satVariableNextCapacity(uint32(cap(c.data)), 4, 4, uint64(^uint(0)>>1))
-		if e != nil {
-			return e
-		}
-		if e = b.Reserve(bytes); e != nil {
-			return e
-		}
-		next := make([]uint32, len(c.data), int(n))
-		copy(next[:cap(c.data)], c.data[:cap(c.data)])
-		b.Release(4 * uint64(cap(c.data)))
-		c.data = next
-	}
-	c.data = append(c.data, v)
-	if uint32(len(c.data)) > c.initialized {
-		c.initialized = uint32(len(c.data))
-	}
-	return nil
-}
-func (c *satVariableUintColumn) read(i uint32) (uint32, error) {
-	if e := satVariableIndex(uint32(len(c.data)), uint32(cap(c.data)), c.initialized, i); e != nil {
-		return 0, e
-	}
-	return c.data[:cap(c.data)][i], nil
-}
-func (c *satVariableUintColumn) write(i uint32, v uint32) error {
-	if e := satVariableIndex(uint32(len(c.data)), uint32(cap(c.data)), c.initialized, i); e != nil {
-		return e
-	}
-	c.data[:cap(c.data)][i] = v
-	return nil
-}
-func (c *satVariableUintColumn) shrink(n uint32) error {
-	if satStorageSourceDebug && n > uint32(len(c.data)) {
-		return ErrSATAssertion
-	}
-	if n > c.initialized || uint64(n) > uint64(cap(c.data)) {
-		return arena.ErrBounds
-	}
-	c.data = c.data[:n]
-	return nil
-}
-func (c *satVariableUintColumn) finalize(b *arena.Budget) {
-	b.Release(4 * uint64(cap(c.data)))
-	c.data = nil
-	c.initialized = 0
-}
-
-type satVariableJustificationColumn struct {
-	data        []satJustification
-	initialized uint32
-}
-
-func (c *satVariableJustificationColumn) push(b *arena.Budget, v satJustification) error {
-	stride := uint64(reflect.TypeOf(satJustification{}).Size())
-	if len(c.data) == cap(c.data) {
-		n, bytes, e := satVariableNextCapacity(uint32(cap(c.data)), stride, 8, uint64(^uint(0)>>1))
-		if e != nil {
-			return e
-		}
-		if e = b.Reserve(bytes); e != nil {
-			return e
-		}
-		next := make([]satJustification, len(c.data), int(n))
-		copy(next[:cap(c.data)], c.data[:cap(c.data)])
-		b.Release(stride * uint64(cap(c.data)))
-		c.data = next
-	}
-	c.data = append(c.data, v)
-	if uint32(len(c.data)) > c.initialized {
-		c.initialized = uint32(len(c.data))
-	}
-	return nil
-}
-func (c *satVariableJustificationColumn) read(i uint32) (satJustification, error) {
-	if e := satVariableIndex(uint32(len(c.data)), uint32(cap(c.data)), c.initialized, i); e != nil {
-		return satJustification{}, e
-	}
-	return c.data[:cap(c.data)][i], nil
-}
-func (c *satVariableJustificationColumn) write(i uint32, v satJustification) error {
-	if e := satVariableIndex(uint32(len(c.data)), uint32(cap(c.data)), c.initialized, i); e != nil {
-		return e
-	}
-	c.data[:cap(c.data)][i] = v
-	return nil
-}
-func (c *satVariableJustificationColumn) finalize(b *arena.Budget) {
-	b.Release(uint64(reflect.TypeOf(satJustification{}).Size()) * uint64(cap(c.data)))
 	c.data = nil
 	c.initialized = 0
 }

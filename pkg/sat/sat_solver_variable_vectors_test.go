@@ -2,29 +2,23 @@ package sat
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-func TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots(t *testing.T) {
+func TestSATSolverDiffLevelsSourceWidthAndRetainedSlots(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
 	var c satVariableCharColumn
-	var u satVariableUintColumn
-	var j satVariableJustificationColumn
 	for i := int8(0); i < 4; i++ {
 		satOK(t, c.push(b, i))
-		satOK(t, u.push(b, uint32(i)))
-		satOK(t, j.push(b, newSATBinaryJustification(Literal(i))))
 	}
-	if cap(c.data) != 5 || cap(u.data) != 5 || cap(j.data) != 5 {
-		t.Fatal(cap(c.data), cap(u.data), cap(j.data))
+	if cap(c.data) != 5 {
+		t.Fatal(cap(c.data))
 	}
-	want := uint64(5+20) + 5*uint64(reflect.TypeOf(satJustification{}).Size())
-	if b.Used() != want {
-		t.Fatal(b.Used(), want)
+	if b.Used() != 5 {
+		t.Fatal(b.Used())
 	}
 	satOK(t, c.shrink(1))
 	v, e := c.read(3)
@@ -42,8 +36,6 @@ func TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots(t *testing.T) {
 		t.Fatal("never initialized spare slot")
 	}
 	c.finalize(b)
-	u.finalize(b)
-	j.finalize(b)
 	if b.Used() != 0 {
 		t.Fatal(b.Used())
 	}

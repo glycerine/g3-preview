@@ -77050,7 +77050,7 @@
         "TestSATSolverClauseCoreSourcePrefixesAndGuards",
         "TestSATSolverClauseCoreWarmNoAllocation",
         "TestSATSolverClauseCoreWatchSourceAssertions",
-        "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
+        "TestSATSolverDiffLevelsSourceWidthAndRetainedSlots",
         "TestSATSolverVariableColumnGrowthFailureAndScalarBounds",
         "TestSATSolverWatchListsRealRelocationAndPayloadLifetime",
         "TestSATSolverWatchListsNativePlacementAndColdUnwind",
@@ -77805,7 +77805,7 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_variable_state.go",
           "tests": [
-            "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
+            "TestSATSolverDiffLevelsSourceWidthAndRetainedSlots",
             "TestSATSolverVariableColumnGrowthFailureAndScalarBounds",
             "TestSATSolverWatchListsRealRelocationAndPayloadLifetime",
             "TestSATSolverWatchListsNativePlacementAndColdUnwind",
@@ -78654,6 +78654,7 @@
         "SAT unsigned work columns now own native []uint32 backing for lemma/minimization, assumptions/core, model, consequence scopes and probing to-assert rows. Probing cache rows own native availability flags and unsigned slices. Copies own independent values, captured slices retain their actual backing, and checked column/parent closure rejects later access. Source model/mark/compaction algorithms remain; backing has no Runtime payload, Budget reservation, size_t header or pending block. The actual strict Runtime cache-memory cutoff still reads the caller Runtime counter. See PORT_PROGRESS.md#native-sat-unsigned-work-columns-and-probing-cache."
       ],
       "deviations": [
+        "Removed two test-only SAT variable-vector adapters for unsigned values and justifications. Their live solver owners already use native typed Go slices; diffLevels remains the reached int8 source column with focused ordinary and checked/debug coverage. This does not complete the solver or generic vector header.",
         "Concrete allocation-free heapsort replaces std::sort on scalar literals. TRACE, solver construction, BCP, conflicts, search, scopes and remaining methods are unported.",
         "Wrapped source allocations that cannot represent full typed capacity remain unported; host bounds are separate from exact source overflow DefaultException. Default child policies, full solver constructor, propagation, conflicts, scopes/search and TRACE remain open.",
         "Propagation state borrows actual variable/clause/model-converter/rlimit/Runtime/config owners and owns only its charged cold member grouping/diff-level backing. Cleaner/asymm/probing counters are real selected member state, not child Run implementations. No concrete extension subclass exists in this fork; dispatch fails explicitly at asserted/EXT call sites after completed source prefixes. Full solver constructor, UpdateParams/default policy children, propagation integrity/missed-propagation checks, literal-span num_diff_levels consumers, search/conflicts/scopes and user-scope campaign remain open.",
@@ -78827,7 +78828,7 @@
         "pkg/sat/sat_var_queue_native_test.go"
       ],
       "tests": [
-        "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
+        "TestSATSolverDiffLevelsSourceWidthAndRetainedSlots",
         "TestSATSolverVariableColumnGrowthFailureAndScalarBounds",
         "TestSATSolverWatchListsRealRelocationAndPayloadLifetime",
         "TestSATSolverWatchListsNativePlacementAndColdUnwind",
@@ -79115,7 +79116,7 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_variable_state.go",
           "tests": [
-            "TestSATSolverVariableColumnsSourceWidthsAndRetainedSlots",
+            "TestSATSolverDiffLevelsSourceWidthAndRetainedSlots",
             "TestSATSolverVariableColumnGrowthFailureAndScalarBounds",
             "TestSATSolverWatchListsRealRelocationAndPayloadLifetime",
             "TestSATSolverWatchListsNativePlacementAndColdUnwind",
@@ -182423,6 +182424,7 @@
         "SAT unsigned work columns now own native []uint32 backing for lemma/minimization, assumptions/core, model, consequence scopes and probing to-assert rows. Probing cache rows own native availability flags and unsigned slices. Copies own independent values, captured slices retain their actual backing, and checked column/parent closure rejects later access. Source model/mark/compaction algorithms remain; backing has no Runtime payload, Budget reservation, size_t header or pending block. The actual strict Runtime cache-memory cutoff still reads the caller Runtime counter. See PORT_PROGRESS.md#native-sat-unsigned-work-columns-and-probing-cache."
       ],
       "deviations": [
+        "The SAT vector audit removed two obsolete satVariableUintColumn and satVariableJustificationColumn adapters: only their own tests referenced them. Actual solver unsigned columns and justifications already use native typed Go slices; retained diffLevels uses the concrete int8 source column. No additional generic vector implementation credit is claimed.",
         "Concrete solver-specific storage, not complete generic vector template surface. Owning model Clone/Assign, other specializations and source-undefined continuation behavior remain explicitly separate.",
         "Native literal slices expose current logical values, not retained C++ spare slots. Removed reserve/resize/physical-read/reset helpers have no retained production consumers. Native clone/copy/insert no longer fail on simulated nested backing allocations; actual cold/outer reservations remain tested.",
         "Native watch backing no longer emulates C++ allocation events, erase-tail spare storage, pool growth or template-only copy/move helpers. No generic C++ vector implementation credit is claimed. Retained project consumers use checked native iterator borrows; stable sorting preserves actual watched comparator classes.",

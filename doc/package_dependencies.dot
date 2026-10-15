@@ -141,9 +141,11 @@ digraph packages {
   "model" -> "ast";
   "model" -> "ast/rewriter";
   "model" -> "util/cooperate";
+  "model" -> "util/diagnostic";
   "model" -> "util/memory";
   "model" -> "util/messages";
   "model" -> "util/params";
+  "model" -> "util/symbol";
   "muz/base" [style=filled, fillcolor="#eeeeee"];
   "muz/base" -> "util/params";
   "nlsat" [style=filled, fillcolor="#eeeeee"];
