@@ -37,7 +37,7 @@ func (u *modelUniverse) traceDeallocated() {
 		return
 	}
 	_ = tags.EmitConditional("memory", "deallocate", "src/util/memory_manager.cpp", 204,
-		func() bool { return !tags.MemoryFinalizing() }, func(w io.Writer) error {
+		func() bool { return !modelMemoryFinalizing(u.owner, tags) }, func(w io.Writer) error {
 			_, _ = io.WriteString(w, "dealloc "+fmt.Sprintf("%p", u)+" src/model/model.cpp:38\n")
 			return nil
 		})

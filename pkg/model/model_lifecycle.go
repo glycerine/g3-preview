@@ -15,6 +15,7 @@ import (
 
 type modelUniverse struct {
 	values          []ast.ASTHandle
+	owner           *ast.ASTManager
 	sortOwned       bool
 	memoryTrace     *diagnostic.TraceTags
 	memoryTraceLive bool
@@ -144,7 +145,7 @@ func (md *Model) RegisterUniverse(s ast.ASTHandle, values []ast.ASTHandle) (err 
 		if e = m.IncRef(s); e != nil {
 			return e
 		}
-		u = &modelUniverse{sortOwned: true, memoryTrace: m.BorrowMemoryTraceTags(), memoryTraceLive: true}
+		u = &modelUniverse{sortOwned: true, owner: m, memoryTrace: m.BorrowMemoryTraceTags(), memoryTraceLive: true}
 		u.traceAllocated()
 		u.values = append(u.values, values...)
 		md.Universes.Set(s, u)

@@ -49,7 +49,15 @@ func (ev *ModelEvaluator) traceImpDeallocated(line int) {
 		return
 	}
 	_ = tags.EmitConditional("memory", "deallocate", "src/util/memory_manager.cpp", 204,
-		func() bool { return !tags.MemoryFinalizing() }, func(w io.Writer) error {
+		func() bool {
+			if tags.MemoryFinalizing() {
+				return false
+			}
+			if process := ev.services.Memory.ProcessOwner(); process != nil && process.Finalizing() {
+				return false
+			}
+			return true
+		}, func(w io.Writer) error {
 			for _, part := range [...]string{
 				"dealloc ", ev.impTraceIdentity(), " src/model/model_evaluator.cpp:", strconv.Itoa(line), "\n",
 			} {

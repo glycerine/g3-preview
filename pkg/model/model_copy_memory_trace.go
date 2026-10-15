@@ -42,7 +42,7 @@ func (md *Model) traceSourceDeallocated() {
 		return
 	}
 	_ = tags.EmitConditional("memory", "deallocate", "src/util/memory_manager.cpp", 204,
-		func() bool { return !tags.MemoryFinalizing() }, func(w io.Writer) error {
+		func() bool { return !modelMemoryFinalizing(md.CoreField.manager, tags) }, func(w io.Writer) error {
 			_, _ = io.WriteString(w, "dealloc "+fmt.Sprintf("%p", md)+" src/model/model_core.h:74\n")
 			return nil
 		})
