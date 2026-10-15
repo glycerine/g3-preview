@@ -127594,29 +127594,6 @@
           ]
         },
         {
-          "name": "remaining string/stream inspection, extraction and owned accessors beyond separately credited predicates, hash and formatting",
-          "status": "partial",
-          "go_target": "pkg/util/numeral/inf_rational.go",
-          "tests": [
-            "TestInfRationalSource80Assertions",
-            "TestInfRationalApproximationFrozenBranches",
-            "TestInfRationalOwnershipErrors",
-            "TestInfRationalIndependentFiniteBounds",
-            "TestInfRationalFullHeaderQueriesAndAliases",
-            "TestInfRationalRawStateComparisonRoutes",
-            "TestInfRationalFailurePrefixesImmediateRoots",
-            "TestInfRationalComponentAliasSourceRereads",
-            "TestInfRationalIncrementSourceRationalRoute",
-            "TestInfRationalCompoundReturnCopyFailure",
-            "TestInfRationalCoarseRootAndFusedComponentAlias",
-            "TestInfRationalIntegerConstructorCopyRoute",
-            "TestRationalServiceInfinitesimalHeaderOwnership",
-            "TestRationalServiceInfinitesimalConstructorFailureRefunds",
-            "TestRationalServiceInfinitesimalFinalizerTraversal",
-            "TestInfHashesStopBeforeCombiningFailedComponent"
-          ]
-        },
-        {
           "name": "get_first/get_rational and get_infinitesimal borrowed component reads without peer inspection or copy (inf_rational.h:135-143)",
           "status": "ported",
           "go_target": "pkg/util/numeral/rational_numeric_borrow.go",
