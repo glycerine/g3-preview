@@ -9836,7 +9836,10 @@
         "pkg/ast/ast_bv_concat_arguments_test.go",
         "pkg/ast/ast_bv_add_arguments_test.go",
         "pkg/ast/ast_dependency_consumed_test.go",
-        "pkg/ast/ast_label.go"
+        "pkg/ast/ast_label.go",
+        "pkg/ast/ast_trace_file.go",
+        "pkg/ast/ast_trace_file_memory_trace.go",
+        "pkg/ast/ast_trace_file_memory_trace_debug_test.go"
       ],
       "tests": [
         "TestASTResourceLimitSourceCanceledCountsAndScopes",
@@ -9981,7 +9984,9 @@
         "TestASTProofHyperNativeOutputGuardsFollowPublishedPrefix",
         "TestASTDependencyDecConsumedActualRootOwnership",
         "TestASTLabelConcreteSymbolBufferAndRecognition",
-        "TestASTLabelTemporaryParametersOnReservationFailure"
+        "TestASTLabelTemporaryParametersOnReservationFailure",
+        "TestASTTraceFileMemoryWrapperSourceLifetime",
+        "TestASTTraceFileMemoryWrapperFinalizationSuppressesDeallocation"
       ],
       "conditionals": [
         {
@@ -11051,7 +11056,8 @@
         "Returned unfinished placement owns only actual completed members/body file-format pointers; automatic member unwind excludes source body DT. Completed body emits EOF before reverse members. Debug info numerals remain explicit original AST ownership until owning ACK.",
         "Actual reached constructor/member allocations and successful INC acquisitions are captured at their leaves. Source reverse destruction stops before older members. Explicit owning continuation acknowledges exact completed children, then caller payload, then unjoined acquisitions. Diagnostic tuples and first body/source/own causes remain through enclosing owner context end.",
         "Application storage is allocated before coercion_needed. The actual coercion frame owns native []ASTHandle arguments, acquiring each reference before append. Its ascending consumed-DEC cursor and source cause survive interrupted cleanup, and manager Close drains it before plugin/member teardown. Argument views borrow this same slice; successful registration retains canonical child references. Removed buffer wrapper and the pending acquisition needed only by simulated backing refusal. Native growth is independent of AST Budget; no inline/spill or container failure credit remains.",
-        "DependencyLinearizeRaw and DependencyLinearize now append to and return caller-owned native []ASTHandle values, including completed output on checked errors. Retained FIFO traversal and dependency mark cleanup remain; stable dedup uses a Go map without AST node mark-plane mutation. Removed the nonowning expression-vector Runtime codec and all wrapper construction/push/get/reset/delete calls. Actual reference-owning AST/dependency vectors and persistent arrays remain separate migration obligations. See PORT_PROGRESS.md#native-dependency-linearization-output-and-callers."
+        "DependencyLinearizeRaw and DependencyLinearize now append to and return caller-owned native []ASTHandle values, including completed output on checked errors. Retained FIFO traversal and dependency mark cleanup remain; stable dedup uses a Go map without AST node mark-plane mutation. Removed the nonowning expression-vector Runtime codec and all wrapper construction/push/get/reset/delete calls. Actual reference-owning AST/dependency vectors and persistent arrays remain separate migration obligations. See PORT_PROGRESS.md#native-dependency-linearization-output-and-callers.",
+        "The retained trace-file owner emits source debug memory allocation at construction and deallocation after stream close and owning header release; refused header construction has no record, and repeat Close is idempotent."
       ],
       "deviations": [
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
@@ -150508,7 +150514,10 @@
         "pkg/util/params/util_params_block_memory_trace.go",
         "pkg/util/params/util_params_block_memory_trace_debug_test.go",
         "pkg/util/params/util_params_rational_entry_memory_trace.go",
-        "pkg/util/params/util_params_rational_entry_memory_trace_debug_test.go"
+        "pkg/util/params/util_params_rational_entry_memory_trace_debug_test.go",
+        "pkg/ast/ast_trace_file.go",
+        "pkg/ast/ast_trace_file_memory_trace.go",
+        "pkg/ast/ast_trace_file_memory_trace_debug_test.go"
       ],
       "tests": [
         "TestRuntimeUint32AcrossInitializationBitmapBoundary",
@@ -150606,7 +150615,9 @@
         "TestRationalGlobalMemoryTraceFinalizingSuppressesDeallocation",
         "TestRationalGlobalMemoryTraceRefusalDoesNotStopLifecycle",
         "TestParamsBlockMemoryTraceFirstCopyOnWriteAndStableIdentity",
-        "TestParamsRationalEntryMemoryTraceNewMatchedAndReleasePaths"
+        "TestParamsRationalEntryMemoryTraceNewMatchedAndReleasePaths",
+        "TestASTTraceFileMemoryWrapperSourceLifetime",
+        "TestASTTraceFileMemoryWrapperFinalizationSuppressesDeallocation"
       ],
       "conditionals": [
         {
@@ -151127,6 +151138,15 @@
         {
           "name": "memory::display_i_max_usage has no retained source caller",
           "status": "dead_deleted"
+        },
+        {
+          "name": "Retained ast_manager owned std::fstream alloc/dealloc debug memory records at ast.cpp:1308/1478 through memory_manager.cpp:209/204",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_trace_file_memory_trace.go",
+          "tests": [
+            "TestASTTraceFileMemoryWrapperSourceLifetime",
+            "TestASTTraceFileMemoryWrapperFinalizationSuppressesDeallocation"
+          ]
         }
       ],
       "ownership": [
@@ -151164,7 +151184,8 @@
         "Concrete rational global manager debug memory TRACE uses the Go RationalManager pointer and charged header extent at rational.cpp:66/82. Generated initialization binds the memory trace before rational construction; source finalization emits the deallocation record after the completed destructor, while separate Go owning close later refunds the retained header. Pointer-present reuse, finalizing suppression and refused-stream continuation are covered.",
         "Concrete param_descrs::imp debug memory TRACE uses the address of the stable Go descriptor-entry field to distinguish the inner imp from the outer descriptor and the charged combined Go descriptor-header extent in place of sizeof(imp). The source constructor/destructor sites, nested catalog order, late trace binding, refused stream and process-finalizing guard are checked; the separate Go owning close performs its header refund.",
         "Native Go params blocks live in a growable typed slice, so debug memory TRACE uses a stable concrete context-owner/slot/generation identity instead of an address that would change on slice relocation. Charged Go block extent replaces sizeof(params); first and copy-on-write allocation, last-reference destruction, refused-stream continuation and process-finalizing suppression are covered.",
-        "SET_RAT_VALUE rational* allocation/deallocation debug memory TRACE uses a stable context-owner/setter-invocation identity carried by the native Go entry through page growth and suffix shifts. The inline OwnedRational extent replaces sizeof(rational); completed replacement, key reset, live reset, last-reference cleanup, refused-stream continuation and process-finalizing suppression are covered."
+        "SET_RAT_VALUE rational* allocation/deallocation debug memory TRACE uses a stable context-owner/setter-invocation identity carried by the native Go entry through page growth and suffix shifts. The inline OwnedRational extent replaces sizeof(rational); completed replacement, key reset, live reset, last-reference cleanup, refused-stream continuation and process-finalizing suppression are covered.",
+        "The AST trace-file header has stable Go pointer identity and a charged Go extent in place of native std::fstream sizeof. Successful header construction emits allocate; completed Close emits deallocate once, suppressed during process finalization. Failed header reservation emits neither record."
       ]
     },
     {
@@ -151214,7 +151235,10 @@
         "pkg/util/params/util_params_block_memory_trace.go",
         "pkg/util/params/util_params_block_memory_trace_debug_test.go",
         "pkg/util/params/util_params_rational_entry_memory_trace.go",
-        "pkg/util/params/util_params_rational_entry_memory_trace_debug_test.go"
+        "pkg/util/params/util_params_rational_entry_memory_trace_debug_test.go",
+        "pkg/ast/ast_trace_file.go",
+        "pkg/ast/ast_trace_file_memory_trace.go",
+        "pkg/ast/ast_trace_file_memory_trace_debug_test.go"
       ],
       "tests": [
         "TestASTDeclCollectorDependencySetMemoryTrace",
@@ -151297,7 +151321,9 @@
         "TestRationalGlobalMemoryTraceFinalizingSuppressesDeallocation",
         "TestRationalGlobalMemoryTraceRefusalDoesNotStopLifecycle",
         "TestParamsBlockMemoryTraceFirstCopyOnWriteAndStableIdentity",
-        "TestParamsRationalEntryMemoryTraceNewMatchedAndReleasePaths"
+        "TestParamsRationalEntryMemoryTraceNewMatchedAndReleasePaths",
+        "TestASTTraceFileMemoryWrapperSourceLifetime",
+        "TestASTTraceFileMemoryWrapperFinalizationSuppressesDeallocation"
       ],
       "conditionals": [
         {
@@ -151782,6 +151808,15 @@
         {
           "name": "memory::display_i_max_usage has no retained source caller",
           "status": "dead_deleted"
+        },
+        {
+          "name": "Retained ast_manager owned std::fstream alloc/dealloc debug memory records at ast.cpp:1308/1478 through memory_manager.cpp:209/204",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_trace_file_memory_trace.go",
+          "tests": [
+            "TestASTTraceFileMemoryWrapperSourceLifetime",
+            "TestASTTraceFileMemoryWrapperFinalizationSuppressesDeallocation"
+          ]
         }
       ],
       "ownership": [
@@ -151812,7 +151847,8 @@
         "Concrete rational global manager debug memory TRACE uses the Go RationalManager pointer and charged header extent at rational.cpp:66/82. Generated initialization binds the memory trace before rational construction; source finalization emits the deallocation record after the completed destructor, while separate Go owning close later refunds the retained header. Pointer-present reuse, finalizing suppression and refused-stream continuation are covered.",
         "Concrete param_descrs::imp debug memory TRACE uses the address of the stable Go descriptor-entry field to distinguish the inner imp from the outer descriptor and the charged combined Go descriptor-header extent in place of sizeof(imp). The source constructor/destructor sites, nested catalog order, late trace binding, refused stream and process-finalizing guard are checked; the separate Go owning close performs its header refund.",
         "Native Go params blocks live in a growable typed slice, so debug memory TRACE uses a stable concrete context-owner/slot/generation identity instead of an address that would change on slice relocation. Charged Go block extent replaces sizeof(params); first and copy-on-write allocation, last-reference destruction, refused-stream continuation and process-finalizing suppression are covered.",
-        "SET_RAT_VALUE rational* allocation/deallocation debug memory TRACE uses a stable context-owner/setter-invocation identity carried by the native Go entry through page growth and suffix shifts. The inline OwnedRational extent replaces sizeof(rational); completed replacement, key reset, live reset, last-reference cleanup, refused-stream continuation and process-finalizing suppression are covered."
+        "SET_RAT_VALUE rational* allocation/deallocation debug memory TRACE uses a stable context-owner/setter-invocation identity carried by the native Go entry through page growth and suffix shifts. The inline OwnedRational extent replaces sizeof(rational); completed replacement, key reset, live reset, last-reference cleanup, refused-stream continuation and process-finalizing suppression are covered.",
+        "The AST trace-file header has stable Go pointer identity and a charged Go extent in place of native std::fstream sizeof. Successful header construction emits allocate; completed Close emits deallocate once, suppressed during process finalization. Failed header reservation emits neither record."
       ]
     },
     {

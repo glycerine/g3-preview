@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	utext "github.com/glycerine/g3/pkg/util/text"
@@ -21,20 +22,22 @@ type astTraceFile struct {
 	budget           *arena.Budget
 	header           uint64
 	stream           utext.NumericTextStream
+	trace            *udiag.TraceTags
 	constructorCause error
 	Closed           bool
 }
 
 func newASTTraceFile(b *arena.Budget, name uparams.ParamsStringView) (*astTraceFile, error) {
-	return newASTTraceFileBorrowed(b, name)
+	return newASTTraceFileBorrowed(b, name, nil)
 }
-func newASTTraceFileBorrowed(b *arena.Budget, name TraceFilename) (*astTraceFile, error) {
+func newASTTraceFileBorrowed(b *arena.Budget, name TraceFilename, tags *udiag.TraceTags) (*astTraceFile, error) {
 	header := uint64(reflect.TypeOf(astTraceFile{}).Size())
 	if e := b.Reserve(header); e != nil {
 		return nil, e
 	}
-	f := &astTraceFile{budget: b, header: header}
+	f := &astTraceFile{budget: b, header: header, trace: tags}
 	f.self = f
+	f.traceAllocated()
 	f.stream.InitEmbeddedFile(b)
 	n, e := name.Length()
 	if e != nil {
@@ -78,5 +81,6 @@ func (f *astTraceFile) Close() error {
 	f.budget.Release(f.header)
 	f.header = 0
 	f.Closed = true
+	f.traceDeallocated()
 	return nil
 }
