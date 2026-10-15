@@ -11,8 +11,12 @@ import (
 
 func (m *ArbitraryFloatManager) traceFloatBinaryString(value *ArbitraryFloat, upper, lower uint32) (string, error) {
 	var out utext.OwnedString
+	previousPending := m.binaryString.active
 	if e := m.ToStringBinary(value, upper, lower, &out); e != nil {
-		cleanup := m.CleanupBinaryString()
+		var cleanup error
+		if !previousPending {
+			cleanup = m.CleanupBinaryString()
+		}
 		out.OwnAbort()
 		return "", JoinNumericErrors(e, cleanup)
 	}

@@ -10,6 +10,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 type mpfEndlWriter struct {
@@ -256,6 +257,28 @@ func TestArbitraryFloatFMABinaryTraceTemporaryFailureCleanup(t *testing.T) {
 	serviceMust(t, e)
 	if !strings.Contains(text, "#b") || m.binaryString.active {
 		t.Fatalf("binary trace temporary retry: %q, active %v", text, m.binaryString.active)
+	}
+	serviceMust(t, m.Del(&one))
+}
+
+func TestArbitraryFloatFMABinaryTracePreservesEarlierStoppedString(t *testing.T) {
+	m, _, budget := mpfNumeralHelpersFixture(t)
+	var one ArbitraryFloat
+	serviceMust(t, m.MkOne(11, 53, false, &one))
+	var earlier utext.OwnedString
+	budget.FailAfter(0)
+	refused := m.ToStringBinary(&one, 1, 0, &earlier)
+	budget.FailAfter(-1)
+	if !numericPhysicalReservationRefusal(refused) || !m.binaryString.active {
+		t.Fatal("expected earlier stopped string", refused)
+	}
+	if _, err := m.traceFloatBinaryString(&one, 1, 0); !errors.Is(err, ErrNumericPending) || !m.binaryString.active || m.binaryString.out != &earlier {
+		t.Fatal("trace consumed an earlier string invocation", err)
+	}
+	serviceMust(t, m.CleanupBinaryString())
+	earlier.OwnAbort()
+	if got, err := m.traceFloatBinaryString(&one, 1, 0); err != nil || !strings.Contains(got, "#b") {
+		t.Fatal("trace retry after owning cleanup", got, err)
 	}
 	serviceMust(t, m.Del(&one))
 }
