@@ -178256,7 +178256,7 @@
         },
         {
           "name": "Reached public Z3_enable_trace and Z3_disable_trace process-tag controls (api_context.cpp:408-419)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/api/api_trace.go",
           "tests": ["TestAPIGlobalTraceControlsShareShellProcessTags"]
         },
@@ -179543,7 +179543,7 @@
         },
         {
           "name": "Reached public Z3_enable_trace and Z3_disable_trace process-tag controls (api_context.cpp:408-419)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/api/api_trace.go",
           "tests": ["TestAPIGlobalTraceControlsShareShellProcessTags"]
         },

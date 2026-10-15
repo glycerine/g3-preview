@@ -3,11 +3,27 @@ package api
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 
-// EnableTrace changes the process trace tags shared by shell, parameters and
-// retained solver owners. TraceTags applies the source C-string boundary and
-// copies the tag into its Go-owned map.
-func EnableTrace(tag string) {
-	diagnostic.BorrowProcessTraceTags().Enable(tag)
+// EnableTrace follows the public source entry: initialize the generated
+// process, intern the C-string tag as a symbol, then enable its bare spelling.
+func EnableTrace(tag string) error {
+	g, err := globalParamService()
+	if err != nil {
+		return err
+	}
+	symbols := g.Context.Symbols()
+	s, err := symbols.Intern(tag)
+	if err != nil {
+		return err
+	}
+	spelling, present, err := symbols.BareString(s)
+	if err != nil {
+		return err
+	}
+	if !present {
+		return nil
+	}
+	diagnostic.BorrowProcessTraceTags().Enable(spelling)
+	return nil
 }
 
 // DisableTrace removes a tag from the same process trace owner.
