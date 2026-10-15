@@ -171121,7 +171121,7 @@
       "methods": [
         {
           "name": "Concrete UFBV elim_unused_vars var_mapping expr_ref_buffer pins each generated mk_var across reverse-order substitution and releases it after younger result owners (var_subst.cpp:85-145)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/rewriter/unused_vars_ufbv.go",
           "tests": ["TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers"]
         },
@@ -171694,13 +171694,13 @@
       "methods": [
         {
           "name": "Concrete UFBV new_exprs ref_vector publishes processed formulas and demodulators into a native slice with independent AST pins that outlive the processor and release after goal publication (ufbv_rewriter.cpp:735-749)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_formula_process.go",
           "tests": ["TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"]
         },
         {
           "name": "Concrete UFBV tactic forms/proofs ref_vectors copy each input formula and proof with independent AST pins before rewriting and release them in insertion order after younger rewritten output owners (ufbv_rewriter_tactic.cpp:47-68)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_tactic.go",
           "tests": ["TestUFBVRewriterTacticProofModePreservesFormulaAndProof"]
         },
