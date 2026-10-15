@@ -167190,6 +167190,7 @@
         "TestParamsReferenceSetRatOwningAbortActualConsumedLeaf",
         "TestParamsReferenceSetRatIndependentLocalsAndDeadDestination",
         "TestParamsReferenceSetRatAllActualCopyAndAppendPrefixes",
+        "TestParamsReferenceSetRatNewEntryCleansPostphysicalCopyChild",
         "TestParamsReferenceMatchedReplacementRejectsConsumedNUMReplay",
         "TestParamsReferenceMatchedReplacementSourceKindsAndLiveNoops",
         "TestParamsReferenceMatchedReplacementContextAbortDoesNotPublish",
@@ -167627,8 +167628,15 @@
             "TestParamsReferenceSetRatAppendRefusalRetainsActualLocal",
             "TestParamsReferenceSetRatOwningAbortActualConsumedLeaf",
             "TestParamsReferenceSetRatIndependentLocalsAndDeadDestination",
-            "TestParamsReferenceSetRatAllActualCopyAndAppendPrefixes"
+            "TestParamsReferenceSetRatAllActualCopyAndAppendPrefixes",
+            "TestParamsReferenceSetRatNewEntryCleansPostphysicalCopyChild"
           ]
+        },
+        {
+          "name": "Concrete SET_RAT new-entry copy child postphysical allocation receipt and owning abort (params.cpp:992-1014)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_set_rat_source.go",
+          "tests": ["TestParamsReferenceSetRatNewEntryCleansPostphysicalCopyChild"]
         },
         {
           "name": "selected matched SET_SIMPLE/SET_SYM NUM leaf before kind/field publication and exact explicit owning continuation",
@@ -167881,6 +167889,7 @@
         "TestParamsReferenceSetRatOwningAbortActualConsumedLeaf",
         "TestParamsReferenceSetRatIndependentLocalsAndDeadDestination",
         "TestParamsReferenceSetRatAllActualCopyAndAppendPrefixes",
+        "TestParamsReferenceSetRatNewEntryCleansPostphysicalCopyChild",
         "TestParamsReferenceMatchedReplacementRejectsConsumedNUMReplay",
         "TestParamsReferenceMatchedReplacementSourceKindsAndLiveNoops",
         "TestParamsReferenceMatchedReplacementContextAbortDoesNotPublish",
@@ -168277,8 +168286,15 @@
             "TestParamsReferenceSetRatAppendRefusalRetainsActualLocal",
             "TestParamsReferenceSetRatOwningAbortActualConsumedLeaf",
             "TestParamsReferenceSetRatIndependentLocalsAndDeadDestination",
-            "TestParamsReferenceSetRatAllActualCopyAndAppendPrefixes"
+            "TestParamsReferenceSetRatAllActualCopyAndAppendPrefixes",
+            "TestParamsReferenceSetRatNewEntryCleansPostphysicalCopyChild"
           ]
+        },
+        {
+          "name": "Concrete SET_RAT new-entry copy child postphysical allocation receipt and owning abort (params.cpp:992-1014)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_set_rat_source.go",
+          "tests": ["TestParamsReferenceSetRatNewEntryCleansPostphysicalCopyChild"]
         },
         {
           "name": "selected matched SET_SIMPLE/SET_SYM NUM leaf before kind/field publication and exact explicit owning continuation",

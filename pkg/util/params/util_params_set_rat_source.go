@@ -16,6 +16,7 @@ type paramsSetFrame struct {
 	Generation          uint32
 	Active, Acquired    bool
 	Next                paramEntry
+	Child               unumeral.RationalCopyAllocationReceipt
 }
 type ParamsSetReceipt struct {
 	owner, InvocationField uint64
@@ -41,7 +42,7 @@ func (c *ParamsContext) setNewNumeral(slot uint32, key usymbol.Symbol, value *un
 	frame.Next.Rat = r
 	frame.Acquired = true
 	frame.Active = true
-	if e = c.NumeralsField.Copy(&frame.Next.Rat, value); e != nil {
+	if e = c.NumeralsField.CopyWithAllocationReceipt(&frame.Next.Rat, value, &frame.Child); e != nil {
 		frame.Cause = e
 		return e
 	}
@@ -55,6 +56,7 @@ func (c *ParamsContext) setNewNumeral(slot uint32, key usymbol.Symbol, value *un
 	*c.Entry(b, b.Size) = frame.Next
 	b.Size++
 	frame.Next = paramEntry{}
+	frame.Child = unumeral.RationalCopyAllocationReceipt{}
 	frame.Acquired = false
 	frame.Active = false
 	return nil
@@ -97,6 +99,15 @@ func (c *ParamsContext) cleanupSetFrame(slot uint32) error {
 	if !f.Active || !f.Acquired || f.Invocation == 0 || f.Generation != c.Blocks[slot-1].Generation || f.Next.Kind != ParamNumeral {
 		return ErrParamsOwner
 	}
+	if f.Child.Active() {
+		if e := c.NumeralsField.CleanupCopyAllocation(&f.Child); e != nil {
+			if f.CleanupCause == nil {
+				f.CleanupCause = e
+			}
+			return e
+		}
+	}
+	f.Child = unumeral.RationalCopyAllocationReceipt{}
 	if e := c.NumeralsField.Del(&f.Next.Rat); e != nil {
 		if f.CleanupCause == nil {
 			f.CleanupCause = e

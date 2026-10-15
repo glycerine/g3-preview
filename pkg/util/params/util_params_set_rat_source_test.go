@@ -125,6 +125,77 @@ func TestParamsReferenceSetRatAppendRefusalRetainsActualLocal(t *testing.T) {
 	paramsMust(t, q.Del(&big))
 }
 
+func TestParamsReferenceSetRatNewEntryCleansPostphysicalCopyChild(t *testing.T) {
+	bn := arena.NewBudget(1 << 26)
+	bc := arena.NewBudget(1 << 24)
+	bs := arena.NewBudget(1 << 24)
+	runtime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: bn, SizeTBits: 64})
+	paramsMust(t, e)
+	q, e := unumeral.NewRationalService(unumeral.RationalServiceConfig{Integers: unumeral.IntegerConfig{Memory: runtime, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}, Cells: arena.Config{PageSize: 2, SlotLimit: 10, Budget: bn}, Words: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bn}}}})
+	paramsMust(t, e)
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: bs, PageSize: 64, DescriptorPageSize: 2})
+	paramsMust(t, e)
+	c, e := NewParamsContext(sy, q, ParamsConfig{Budget: bc, PageEntries: 1, Text: arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{PageSize: 2, Budget: bc}}})
+	paramsMust(t, e)
+	t.Cleanup(func() {
+		paramsDecFinish(t, c.Close)
+		paramsDecFinish(t, q.Close)
+		paramsDecFinish(t, runtime.Close)
+		paramsMust(t, sy.Close())
+		if bn.Used() != 0 || bc.Used() != 0 || bs.Used() != 0 {
+			t.Error("retained owners", bn.Used(), bc.Used(), bs.Used())
+		}
+	})
+	v, e := c.NewValue()
+	paramsMust(t, e)
+	prefix := internSymbol(t, sy, "before")
+	key := internSymbol(t, sy, "number")
+	paramsMust(t, c.SetBool(&v, prefix, true))
+	scoped, e := unumeral.NewScopedInt(q.Manager.Z)
+	paramsMust(t, e)
+	num, e := scoped.Get()
+	paramsMust(t, e)
+	digits := make([]uint32, 32768)
+	digits[0], digits[len(digits)-1] = 17, 1
+	paramsMust(t, q.Manager.Z.SetLimbs(num, digits))
+	big, e := q.NewFromScopedInt(scoped)
+	paramsMust(t, e)
+	paramsMust(t, scoped.Close())
+	occupied, e := q.NewValue()
+	paramsMust(t, e)
+	paramsMust(t, q.Manager.Z.SetLimbs(&occupied.Raw.Num, []uint32{1, 0, 0, 0, 0, 1}))
+
+	e = c.SetRat(&v, key, &big)
+	if !errors.Is(e, arena.ErrSlotLimit) || q.Manager.Z.PendingCell.Object == (umemory.ObjectRef{}) {
+		t.Fatal("new-entry child did not stop after physical allocation", e, q.Manager.Z.PendingCell)
+	}
+	frame := &c.SetFrames[v.Slot-1]
+	if !frame.Active || !frame.Acquired || !frame.Child.Active() {
+		t.Fatal("new-entry frame lost exact numeric child")
+	}
+	receipt, e := c.StoppedSet(&v)
+	paramsMust(t, e)
+	paramsMust(t, c.CleanupSet(receipt))
+	if frame.Active || frame.Child.Active() || q.Manager.Z.PendingCell.Object != (umemory.ObjectRef{}) {
+		t.Fatal("new-entry owning abort retained child or setter frame")
+	}
+	if e := c.CleanupSet(receipt); !errors.Is(e, ErrParamsPrecondition) {
+		t.Fatal("consumed setter receipt accepted replay", e)
+	}
+	if present, err := c.Contains(&v, key); err != nil || present {
+		t.Fatal("failed entry was published", present, err)
+	}
+	if got, err := c.GetBool(&v, prefix, false); err != nil || !got {
+		t.Fatal("completed prefix changed", got, err)
+	}
+	if rational, err := q.IsRational(&big); err != nil || !rational {
+		t.Fatal("source numeral changed", rational, err)
+	}
+	paramsMust(t, q.Del(&occupied))
+	paramsMust(t, q.Del(&big))
+	paramsMust(t, c.Del(&v))
+}
+
 // The public TLS recipe reaches the signed-overflow guarded domain only.
 // This is an owning continuation proof, not valid-domain allocation failure.
 func TestParamsReferenceSetRatOwningAbortActualConsumedLeaf(t *testing.T) {
