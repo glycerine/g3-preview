@@ -91,27 +91,12 @@ func (c *RationalContext) DefinePolynomial(constant *numeral.Rational, coefficie
 			return 0, err
 		}
 	}
-	integer := true
-	for i := range p.terms {
-		if !c.variables[p.terms[i].variable] {
-			integer = false
-			break
-		}
-		isInteger, err := c.numbers.IsInt(&p.terms[i].coefficient)
-		if err != nil {
-			return 0, err
-		}
-		if !isInteger {
-			integer = false
-			break
-		}
+	if err := c.tracePolynomialInteger(p); err != nil {
+		return 0, err
 	}
-	if integer {
-		var err error
-		integer, err = c.numbers.IsInt(&p.constant)
-		if err != nil {
-			return 0, err
-		}
+	integer, err := c.polynomialInteger(p)
+	if err != nil {
+		return 0, err
 	}
 	x, err := c.NewVariable(integer)
 	if err != nil {

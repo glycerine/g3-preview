@@ -53291,6 +53291,9 @@
         "pkg/math/subpaving/rational_statistics_test.go",
         "pkg/math/subpaving/rational_display.go",
         "pkg/math/subpaving/rational_display_test.go",
+        "pkg/math/subpaving/rational_polynomial.go",
+        "pkg/math/subpaving/rational_polynomial_integer_trace.go",
+        "pkg/math/subpaving/rational_polynomial_integer_trace_test.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/fixed_node.go",
         "pkg/math/subpaving/fixed_node_test.go",
@@ -53400,6 +53403,7 @@
         "TestArbitraryStatisticsConflictLeafAndTreeCleanup",
         "TestRationalStatisticsConflictResetAndNodeRetention",
         "TestRationalDisplayDefinitionsClausesLeavesAndWriterPrefix",
+        "TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication",
         "TestSubpavingFixedNodeConstantIntervalViews",
         "TestSubpavingFixedNodeBoundPredicates",
         "TestSubpavingFixedIntervalXnEqYRetainedCases",
@@ -54257,6 +54261,12 @@
           "tests": [
             "TestArbitraryShellCoefficientSourceConversionAndCleanup"
           ]
+        },
+        {
+          "name": "Concrete config_mpq mk_sum integrality TRACE before the second is_int query and variable publication (subpaving_t_def.h:762-763)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_polynomial_integer_trace.go",
+          "tests": ["TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication"]
         },
         {
           "name": "Concrete config_hwf mk_var, mk_sum, and mk_ineq construction with sorted duplicate coefficient swaps (src/math/subpaving/subpaving_t_def.h:666-687,741-780)",
@@ -176046,6 +176056,8 @@
         "pkg/math/subpaving/arbitrary_interval_root_trace_test.go",
         "pkg/math/subpaving/rational_interval_root_trace.go",
         "pkg/math/subpaving/rational_interval_root_trace_test.go",
+        "pkg/math/subpaving/rational_polynomial_integer_trace.go",
+        "pkg/math/subpaving/rational_polynomial_integer_trace_test.go",
         "pkg/math/subpaving/interval_root_trace_stream.go",
         "pkg/math/subpaving/fixed_interval_root_trace.go",
         "pkg/math/subpaving/fast_interval_root_trace.go",
@@ -176087,7 +176099,8 @@
         "TestASTRegistrationSourceTraceRecords",
         "TestASTDeletionSourceTraceRecords",
         "TestArbitraryRootRetainedShortTraceAfterCertifiedBounds",
-        "TestHardwareRootRetainedTraceSitesSourceOrder"
+        "TestHardwareRootRetainedTraceSitesSourceOrder",
+        "TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication"
       ],
       "conditionals": [
         {
@@ -176654,6 +176667,12 @@
           "tests": ["TestBVRewriterUnsignedDivisionOriginalBranchesAndOptionOrder"]
         },
         {
+          "name": "Reached config_mpq mk_sum integrality TRACE before variable publication (subpaving_t_def.h:762)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_polynomial_integer_trace.go",
+          "tests": ["TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -176698,6 +176717,8 @@
         "pkg/math/subpaving/arbitrary_interval_root_trace_test.go",
         "pkg/math/subpaving/rational_interval_root_trace.go",
         "pkg/math/subpaving/rational_interval_root_trace_test.go",
+        "pkg/math/subpaving/rational_polynomial_integer_trace.go",
+        "pkg/math/subpaving/rational_polynomial_integer_trace_test.go",
         "pkg/math/subpaving/interval_root_trace_stream.go",
         "pkg/math/subpaving/fixed_interval_root_trace.go",
         "pkg/math/subpaving/fast_interval_root_trace.go",
@@ -176739,7 +176760,8 @@
         "TestASTRegistrationSourceTraceRecords",
         "TestASTDeletionSourceTraceRecords",
         "TestArbitraryRootRetainedShortTraceAfterCertifiedBounds",
-        "TestHardwareRootRetainedTraceSitesSourceOrder"
+        "TestHardwareRootRetainedTraceSitesSourceOrder",
+        "TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication"
       ],
       "conditionals": [
         {
@@ -177316,6 +177338,12 @@
           "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_udiv_trace.go",
           "tests": ["TestBVRewriterUnsignedDivisionOriginalBranchesAndOptionOrder"]
+        },
+        {
+          "name": "Reached config_mpq mk_sum integrality TRACE before variable publication (subpaving_t_def.h:762)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_polynomial_integer_trace.go",
+          "tests": ["TestRationalPolynomialSourceIntegerTraceBeforeVariablePublication"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

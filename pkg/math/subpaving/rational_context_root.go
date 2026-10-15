@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -20,6 +21,7 @@ type RationalContext struct {
 	limit            *control.Reslimit
 	cooperation      *cooperate.Cooperation
 	displayVariable  RationalVariableDisplay
+	trace            *diagnostic.TraceTags
 	runtime          *memory.Runtime
 	process          *memory.ProcessAccounting
 	maxMemory        uint64
@@ -307,6 +309,7 @@ func (c *RationalContext) Close() error {
 	c.searchNode = nil
 	c.cooperation = nil
 	c.displayVariable = nil
+	c.trace = nil
 	c.closed = true
 	return nil
 }
