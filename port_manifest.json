@@ -15303,6 +15303,14 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained lazy format_decl_plugin allocation at format.cpp:105 and registry-order deletion at ast.cpp:1412 through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_format_plugin.go",
+          "tests": [
+            "TestASTFormatPluginMemoryWrapperLazyLifetime"
+          ]
+        },
+        {
           "name": "ast_format concrete reached source counterpart (format.cpp:66-212)",
           "status": "partial",
           "go_target": "pkg/ast/ast_format.go",
@@ -150760,6 +150768,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained lazy format_decl_plugin allocation at format.cpp:105 and registry-order deletion at ast.cpp:1412 through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_format_plugin.go",
+          "tests": [
+            "TestASTFormatPluginMemoryWrapperLazyLifetime"
+          ]
+        },
         {
           "name": "Concrete model_evaluator::imp allocation/replacement/destruction debug wrappers at model_evaluator.cpp:523,556-557,531 with Go evaluator owner/generation identity, header extent and process-finalizing guard (memory_manager.cpp:202-211)",
           "status": "platform_replacement",

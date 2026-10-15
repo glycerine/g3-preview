@@ -41,6 +41,7 @@ type astFormatPluginOwner struct {
 	sort                       astNodeRef
 	header                     uint64
 	completed, published       bool
+	memoryTraceLive            bool
 	bodyCause, destructorCause error
 }
 
@@ -56,6 +57,7 @@ func (m *ASTManager) formatPluginBytes() uint64 {
 }
 func (m *ASTManager) releaseFormatPluginHeaders() {
 	if p := m.formatPlugin; p != nil {
+		m.traceRegisteredPluginDeallocated(p.traceIdentity(), p.published, &p.memoryTraceLive)
 		m.BudgetField.Release(p.header)
 		p.header = 0
 		m.formatPlugin = nil
@@ -106,6 +108,7 @@ func (m *ASTManager) formatFamilyID() (FamilyID, error) {
 	}
 	p := &astFormatPluginOwner{owner: m, header: bytes}
 	p.self = p
+	m.traceRegisteredPluginAllocatedAt(p.traceIdentity(), p.header, "src/ast/format.cpp", 105, "format_decl_plugin", &p.memoryTraceLive)
 	// Unfinished wrapper is named immediately, before actual symbol constructors.
 	p.next = m.formatPluginFailed
 	m.formatPluginFailed = p

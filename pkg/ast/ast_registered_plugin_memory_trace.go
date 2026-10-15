@@ -17,10 +17,15 @@ func (p *astDatatypePluginOwner) traceIdentity() string      { return fmt.Sprint
 func (p *astAuxiliaryPluginOwner) traceIdentity() string     { return fmt.Sprintf("%p", p) }
 func (p *astSequencePluginOwner) traceIdentity() string      { return fmt.Sprintf("%p", p) }
 func (p *astFloatingPointPluginOwner) traceIdentity() string { return fmt.Sprintf("%p", p) }
+func (p *astFormatPluginOwner) traceIdentity() string        { return fmt.Sprintf("%p", p) }
 
 // These records describe the concrete charged plugin headers. Each caller
 // supplies its original allocation site and retains its own lifetime flag.
 func (m *ASTManager) traceRegisteredPluginAllocated(identity string, extent uint64, line int, name string, live *bool) {
+	m.traceRegisteredPluginAllocatedAt(identity, extent, "src/ast/reg_decl_plugins.cpp", line, name, live)
+}
+
+func (m *ASTManager) traceRegisteredPluginAllocatedAt(identity string, extent uint64, file string, line int, name string, live *bool) {
 	*live = true
 	tags := m.astMemoryTraceTags()
 	if !udiag.DebugBuild || !tags.ShouldTrace("memory") {
@@ -29,7 +34,7 @@ func (m *ASTManager) traceRegisteredPluginAllocated(identity string, extent uint
 	_ = tags.EmitConditional("memory", "allocate", "src/util/memory_manager.cpp", 209,
 		func() bool { return true }, func(w io.Writer) error {
 			for _, part := range [...]string{
-				"alloc ", identity, " src/ast/reg_decl_plugins.cpp:", strconv.Itoa(line),
+				"alloc ", identity, " ", file, ":", strconv.Itoa(line),
 				" ", name, " ", strconv.FormatUint(extent, 10), "\n",
 			} {
 				_, _ = io.WriteString(w, part)
@@ -66,6 +71,10 @@ func (m *ASTManager) traceRegisteredPluginsDeallocated() {
 			continue
 		}
 		switch binding.kind {
+		case astFormatPlugin:
+			if p := m.formatPlugin; p != nil {
+				m.traceRegisteredPluginDeallocated(p.traceIdentity(), p.published, &p.memoryTraceLive)
+			}
 		case astArithmeticPlugin:
 			if p := m.arithmeticPlugin; p != nil {
 				p.traceArithmeticPluginDeallocated()
