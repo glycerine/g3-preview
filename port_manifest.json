@@ -98675,6 +98675,7 @@
         "TestAIGPassWholeGoalCombinesAndRejectsCore",
         "TestAIGPassRejectsProofBeforeGoalMutation",
         "TestAIGPassParamsBindMemoryEncodingAndWholeGoalBranch",
+        "TestAIGPassCollectParamDescrsSourceOrderAndMetadata",
         "TestAIGTacticMemoryWrapperSourceAllocationAndRelease"
       ],
       "assertions": [
@@ -98709,6 +98710,14 @@
           ]
         },
         {
+          "name": "collect_param_descrs source-ordered max_memory and aig_per_assertion metadata",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_tactic.go",
+          "tests": [
+            "TestAIGPassCollectParamDescrsSourceOrderAndMetadata"
+          ]
+        },
+        {
           "name": "mk_aig_manager source alloc/dealloc wrapper over concrete per-application AIG manager",
           "status": "partial",
           "go_target": "pkg/tactic/aig/aig_tactic_memory_trace.go",
@@ -98721,7 +98730,7 @@
         "Each Apply call owns a fresh AIG manager and closes its intermediate AIG and AST references after goal updates. The returned goal has one additional owner reference."
       ],
       "deviations": [
-        "Pass reads source max_memory, gate-encoding and per-assertion parameters, and binds memory/cancellation/cooperation checkpoints to its fresh AIG manager. The tactic's alloc/dealloc memory wrapper and separate aig_manager::imp owner emit source-ordered records over independently charged Go owners. Constructor-refusal wrapper records, translation, parameter descriptor, generated registration, display and checked well-sorted assertions remain open."
+        "Pass reads source max_memory, gate-encoding and per-assertion parameters, and binds memory/cancellation/cooperation checkpoints to its fresh AIG manager. Its descriptor collector registers source-ordered max_memory and aig_per_assertion metadata through util/params. The tactic's alloc/dealloc memory wrapper and separate aig_manager::imp owner emit source-ordered records over independently charged Go owners. Constructor-refusal wrapper records, translation, generated registration, display and checked well-sorted assertions remain open."
       ]
     },
     {
@@ -98736,7 +98745,8 @@
         "TestAIGPassPerAssertionPreservesDependenciesAndDepth",
         "TestAIGPassWholeGoalCombinesAndRejectsCore",
         "TestAIGPassRejectsProofBeforeGoalMutation",
-        "TestAIGPassParamsBindMemoryEncodingAndWholeGoalBranch"
+        "TestAIGPassParamsBindMemoryEncodingAndWholeGoalBranch",
+        "TestAIGPassCollectParamDescrsSourceOrderAndMetadata"
       ],
       "conditionals": [
         {
@@ -98766,7 +98776,7 @@
         "Pass borrows the goal and constructs a per-application AIG manager; source registration and params_ref ownership remain open."
       ],
       "deviations": [
-        "Concrete Pass constructor and parameter updater replace the source factory for direct Go callers; parameter descriptors and generated registration remain open."
+        "Concrete Pass constructor, parameter updater and descriptor collector serve direct Go callers; generated registration remains open."
       ]
     },
     {

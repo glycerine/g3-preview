@@ -52,6 +52,18 @@ func (p *Pass) UpdateParams(c *uparams.ParamsContext, value *uparams.ParamsRef) 
 	return nil
 }
 
+// CollectParamDescrs follows aig_tactic::collect_param_descrs in source order.
+func (p *Pass) CollectParamDescrs(d *uparams.ParamDescrs) error {
+	if p == nil || d == nil {
+		return ErrOwner
+	}
+	if err := uparams.InsertMaxMemory(d); err != nil {
+		return err
+	}
+	description := "(default: true) process one assertion at a time."
+	return d.InsertName("aig_per_assertion", uparams.ParamBool, &description, nil, nil)
+}
+
 // BindCooperation borrows the process cooperation owner used at AIG checkpoints.
 func (p *Pass) BindCooperation(owner *cooperate.Cooperation) error {
 	if p == nil || owner == nil {
