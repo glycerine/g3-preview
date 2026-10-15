@@ -41,18 +41,27 @@ func (c *RationalContext) PropagateQueued(n *RationalNode) error {
 				break
 			}
 			if watch.clause != nil {
+				if err := c.traceMayPropagateClause(b, watch.clause); err != nil {
+					return err
+				}
 				if b.timestamp >= watch.clause.visited {
 					if err := c.PropagateClause(watch.clause, n); err != nil {
 						return err
 					}
 				}
 			} else if p := c.polynomials[watch.definition]; p != nil {
+				if err := c.traceMayPropagateDefinition(b, watch.definition, p.visited); err != nil {
+					return err
+				}
 				if b.timestamp >= p.visited {
 					if err := c.PropagatePolynomial(watch.definition, n); err != nil {
 						return err
 					}
 				}
 			} else if m := c.monomials[watch.definition]; m != nil {
+				if err := c.traceMayPropagateDefinition(b, watch.definition, m.visited); err != nil {
+					return err
+				}
 				if b.timestamp >= m.visited {
 					if err := c.PropagateMonomial(watch.definition, n); err != nil {
 						return err
@@ -63,14 +72,24 @@ func (c *RationalContext) PropagateQueued(n *RationalNode) error {
 			}
 		}
 		if n.conflictVar == math.MaxUint32 {
-			if p := c.polynomials[b.variable]; p != nil && b.timestamp >= p.visited {
-				if err := c.PropagatePolynomial(b.variable, n); err != nil {
+			if p := c.polynomials[b.variable]; p != nil {
+				if err := c.traceMayPropagateDefinition(b, b.variable, p.visited); err != nil {
 					return err
 				}
+				if b.timestamp >= p.visited {
+					if err := c.PropagatePolynomial(b.variable, n); err != nil {
+						return err
+					}
+				}
 			}
-			if m := c.monomials[b.variable]; m != nil && b.timestamp >= m.visited {
-				if err := c.PropagateMonomial(b.variable, n); err != nil {
+			if m := c.monomials[b.variable]; m != nil {
+				if err := c.traceMayPropagateDefinition(b, b.variable, m.visited); err != nil {
 					return err
+				}
+				if b.timestamp >= m.visited {
+					if err := c.PropagateMonomial(b.variable, n); err != nil {
+						return err
+					}
 				}
 			}
 		}
