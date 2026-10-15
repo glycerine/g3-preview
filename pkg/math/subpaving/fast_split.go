@@ -89,5 +89,8 @@ func (c *FastContext) SplitMidpoint(n *FastNode, variable uint32, leftOpen bool,
 	if err = c.DecideBound(right, variable, &mid, true, !leftOpen); err != nil {
 		return left, right, err
 	}
+	if err = c.traceSplitBounds(left, right); err != nil {
+		return left, right, err
+	}
 	return left, right, nil
 }
