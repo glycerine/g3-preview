@@ -26,7 +26,7 @@ func BuildBooleanModel(tr *GoalTranslator, values sat.Model) (md *model.ModelCor
 	if interpreted {
 		return nil, ErrSATBooleanModelInterpreted
 	}
-	derived, err := model.NewModel(tr.manager)
+	derived, err := model.NewSATBooleanModel(tr.manager)
 	if err != nil {
 		return nil, err
 	}
