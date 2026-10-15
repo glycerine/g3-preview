@@ -76313,7 +76313,7 @@
         "TestSATSimplifierActualTernaryAndNaryResolventPublication",
         "TestSATSimplifierSourceCutoffsAndTooManyResolventsPrefix",
         "TestSATSimplifierActualEnabledIntegritySites",
-        "TestSATSimplifierStoppedMergeExactOwnersAndLifecycleClose",
+        "TestSATSimplifierClauseNativeStableSizeSortAndOwnership",
         "TestSATSimplifierDestructorActualExplicitFinalizeBeforeMembers",
         "TestSATSimplifierColdCopyClosedAndWarmEmptyPhysicalPlateau",
         "TestSATSimplifierLateFinalizeGuardDoesNotReplayOuterPhases",
@@ -76484,7 +76484,7 @@
             "TestSATSimplifierActualTernaryAndNaryResolventPublication",
             "TestSATSimplifierSourceCutoffsAndTooManyResolventsPrefix",
             "TestSATSimplifierActualEnabledIntegritySites",
-            "TestSATSimplifierStoppedMergeExactOwnersAndLifecycleClose",
+            "TestSATSimplifierClauseNativeStableSizeSortAndOwnership",
             "TestSATSimplifierDestructorActualExplicitFinalizeBeforeMembers",
             "TestSATSimplifierColdCopyClosedAndWarmEmptyPhysicalPlateau",
             "TestSATSimplifierLateFinalizeGuardDoesNotReplayOuterPhases",
@@ -76524,7 +76524,7 @@
       "deviations": [
         "Selected LP64 source extents are distinct from actual Go stride/pool graph. Inline storage and pooled metadata are fully charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed.",
         "BackSubsumption, Run, BCE, elimination, TRACE and solver integration remain unported; no new registered source test assertions claimed.",
-        "This integration supersedes earlier missing ordinary simplifier Run/default-policy bindings. Entire ordinary source algorithm family is implemented with original defaults; full solver construction/Check/search and registered user-scope driver remain open. Global automatic debug tags/assertions registry, TRACE/verbose and source allocation/offset topology remain obligations. Concrete stable merge preserves comparator/tie order, not C++ standard library allocation/comparison schedule. Protocol/undefined-domain fixtures are distinct from ordinary real allocation refusals; no fake free-refusal/Budget tickets."
+        "This integration supersedes earlier missing ordinary simplifier Run/default-policy bindings. Entire ordinary source algorithm family is implemented with original defaults; full solver construction/Check/search and registered user-scope driver remain open. Global automatic debug tags/assertions registry, TRACE/verbose and source allocation/offset topology remain obligations. Native standard-library stable sorting preserves the source descending size and tie order after checked clause-size reads; no C++ standard-library allocation/comparison schedule is reproduced. Protocol/undefined-domain fixtures are distinct from ordinary real allocation refusals; no fake free-refusal/Budget tickets."
       ]
     },
     {
@@ -76606,7 +76606,7 @@
         "TestSATSimplifierActualTernaryAndNaryResolventPublication",
         "TestSATSimplifierSourceCutoffsAndTooManyResolventsPrefix",
         "TestSATSimplifierActualEnabledIntegritySites",
-        "TestSATSimplifierStoppedMergeExactOwnersAndLifecycleClose",
+        "TestSATSimplifierClauseNativeStableSizeSortAndOwnership",
         "TestSATSimplifierDestructorActualExplicitFinalizeBeforeMembers",
         "TestSATSimplifierColdCopyClosedAndWarmEmptyPhysicalPlateau",
         "TestSATSimplifierLateFinalizeGuardDoesNotReplayOuterPhases",
@@ -76697,7 +76697,7 @@
             "TestSATSimplifierActualTernaryAndNaryResolventPublication",
             "TestSATSimplifierSourceCutoffsAndTooManyResolventsPrefix",
             "TestSATSimplifierActualEnabledIntegritySites",
-            "TestSATSimplifierStoppedMergeExactOwnersAndLifecycleClose",
+            "TestSATSimplifierClauseNativeStableSizeSortAndOwnership",
             "TestSATSimplifierDestructorActualExplicitFinalizeBeforeMembers",
             "TestSATSimplifierColdCopyClosedAndWarmEmptyPhysicalPlateau",
             "TestSATSimplifierLateFinalizeGuardDoesNotReplayOuterPhases",
@@ -76725,7 +76725,7 @@
       "deviations": [
         "Selected LP64 source extents are distinct from actual Go stride/pool graph. Inline storage and pooled metadata are fully charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed.",
         "BackSubsumption, Run, BCE, elimination, TRACE and solver integration remain unported; no new registered source test assertions claimed.",
-        "This integration supersedes earlier missing ordinary simplifier Run/default-policy bindings. Entire ordinary source algorithm family is implemented with original defaults; full solver construction/Check/search and registered user-scope driver remain open. Global automatic debug tags/assertions registry, TRACE/verbose and source allocation/offset topology remain obligations. Concrete stable merge preserves comparator/tie order, not C++ standard library allocation/comparison schedule. Protocol/undefined-domain fixtures are distinct from ordinary real allocation refusals; no fake free-refusal/Budget tickets."
+        "This integration supersedes earlier missing ordinary simplifier Run/default-policy bindings. Entire ordinary source algorithm family is implemented with original defaults; full solver construction/Check/search and registered user-scope driver remain open. Global automatic debug tags/assertions registry, TRACE/verbose and source allocation/offset topology remain obligations. Native standard-library stable sorting preserves the source descending size and tie order after checked clause-size reads; no C++ standard-library allocation/comparison schedule is reproduced. Protocol/undefined-domain fixtures are distinct from ordinary real allocation refusals; no fake free-refusal/Budget tickets."
       ]
     },
     {
@@ -76822,7 +76822,7 @@
         "TestSATSimplifierActualTernaryAndNaryResolventPublication",
         "TestSATSimplifierSourceCutoffsAndTooManyResolventsPrefix",
         "TestSATSimplifierActualEnabledIntegritySites",
-        "TestSATSimplifierStoppedMergeExactOwnersAndLifecycleClose",
+        "TestSATSimplifierClauseNativeStableSizeSortAndOwnership",
         "TestSATSimplifierDestructorActualExplicitFinalizeBeforeMembers",
         "TestSATSimplifierColdCopyClosedAndWarmEmptyPhysicalPlateau",
         "TestSATSimplifierLateFinalizeGuardDoesNotReplayOuterPhases",
@@ -76853,7 +76853,7 @@
             "TestSATSimplifierActualTernaryAndNaryResolventPublication",
             "TestSATSimplifierSourceCutoffsAndTooManyResolventsPrefix",
             "TestSATSimplifierActualEnabledIntegritySites",
-            "TestSATSimplifierStoppedMergeExactOwnersAndLifecycleClose",
+            "TestSATSimplifierClauseNativeStableSizeSortAndOwnership",
             "TestSATSimplifierDestructorActualExplicitFinalizeBeforeMembers",
             "TestSATSimplifierColdCopyClosedAndWarmEmptyPhysicalPlateau",
             "TestSATSimplifierLateFinalizeGuardDoesNotReplayOuterPhases",
@@ -76875,7 +76875,7 @@
         "Concrete charged simplifier owns actual children/workspaces and borrows actual lifecycle/cleaner/decision RNG/MkVar elimTodo. Dummy routes only explicit actual tmp-clause owner. Captured arena Words span does not clone literals. Partial sort/cleanup owns exact moved prefix and unread ranges with phase cursors; lifecycle Close drains actual continuation before ordinary vectors. Completed destructor explicitly finalizes before reverse constructed members; failed constructor skips destructor body."
       ],
       "deviations": [
-        "This integration supersedes earlier missing ordinary simplifier Run/default-policy bindings. Entire ordinary source algorithm family is implemented with original defaults; full solver construction/Check/search and registered user-scope driver remain open. Global automatic debug tags/assertions registry, TRACE/verbose and source allocation/offset topology remain obligations. Concrete stable merge preserves comparator/tie order, not C++ standard library allocation/comparison schedule. Protocol/undefined-domain fixtures are distinct from ordinary real allocation refusals; no fake free-refusal/Budget tickets."
+        "This integration supersedes earlier missing ordinary simplifier Run/default-policy bindings. Entire ordinary source algorithm family is implemented with original defaults; full solver construction/Check/search and registered user-scope driver remain open. Global automatic debug tags/assertions registry, TRACE/verbose and source allocation/offset topology remain obligations. Native standard-library stable sorting preserves the source descending size and tie order after checked clause-size reads; no C++ standard-library allocation/comparison schedule is reproduced. Protocol/undefined-domain fixtures are distinct from ordinary real allocation refusals; no fake free-refusal/Budget tickets."
       ]
     },
     {
@@ -77200,7 +77200,7 @@
         "TestSATSimplifierActualTernaryAndNaryResolventPublication",
         "TestSATSimplifierSourceCutoffsAndTooManyResolventsPrefix",
         "TestSATSimplifierActualEnabledIntegritySites",
-        "TestSATSimplifierStoppedMergeExactOwnersAndLifecycleClose",
+        "TestSATSimplifierClauseNativeStableSizeSortAndOwnership",
         "TestSATSimplifierDestructorActualExplicitFinalizeBeforeMembers",
         "TestSATSimplifierColdCopyClosedAndWarmEmptyPhysicalPlateau",
         "TestSATSimplifierLateFinalizeGuardDoesNotReplayOuterPhases",
@@ -78163,7 +78163,7 @@
             "TestSATSimplifierActualTernaryAndNaryResolventPublication",
             "TestSATSimplifierSourceCutoffsAndTooManyResolventsPrefix",
             "TestSATSimplifierActualEnabledIntegritySites",
-            "TestSATSimplifierStoppedMergeExactOwnersAndLifecycleClose",
+            "TestSATSimplifierClauseNativeStableSizeSortAndOwnership",
             "TestSATSimplifierDestructorActualExplicitFinalizeBeforeMembers",
             "TestSATSimplifierColdCopyClosedAndWarmEmptyPhysicalPlateau",
             "TestSATSimplifierLateFinalizeGuardDoesNotReplayOuterPhases",
@@ -78942,7 +78942,7 @@
         "TestSATSimplifierActualTernaryAndNaryResolventPublication",
         "TestSATSimplifierSourceCutoffsAndTooManyResolventsPrefix",
         "TestSATSimplifierActualEnabledIntegritySites",
-        "TestSATSimplifierStoppedMergeExactOwnersAndLifecycleClose",
+        "TestSATSimplifierClauseNativeStableSizeSortAndOwnership",
         "TestSATSimplifierDestructorActualExplicitFinalizeBeforeMembers",
         "TestSATSimplifierColdCopyClosedAndWarmEmptyPhysicalPlateau",
         "TestSATSimplifierLateFinalizeGuardDoesNotReplayOuterPhases",
@@ -79383,7 +79383,7 @@
             "TestSATSimplifierActualTernaryAndNaryResolventPublication",
             "TestSATSimplifierSourceCutoffsAndTooManyResolventsPrefix",
             "TestSATSimplifierActualEnabledIntegritySites",
-            "TestSATSimplifierStoppedMergeExactOwnersAndLifecycleClose",
+            "TestSATSimplifierClauseNativeStableSizeSortAndOwnership",
             "TestSATSimplifierDestructorActualExplicitFinalizeBeforeMembers",
             "TestSATSimplifierColdCopyClosedAndWarmEmptyPhysicalPlateau",
             "TestSATSimplifierLateFinalizeGuardDoesNotReplayOuterPhases",
@@ -181485,6 +181485,8 @@
         "pkg/sat/sat_simplifier_elimination_test.go",
         "pkg/sat/sat_simplifier_duplicate_bins.go",
         "pkg/sat/sat_simplifier_duplicate_bins_test.go",
+        "pkg/sat/sat_simplifier_sort.go",
+        "pkg/sat/sat_simplifier_lifetime_test.go",
         "pkg/sat/sat_solver_nested_store.go",
         "pkg/sat/sat_solver_uint_set.go",
         "pkg/sat/sat_solver_watch_store.go",
@@ -181938,6 +181940,14 @@
           "go_target": "pkg/sat/sat_simplifier_duplicate_bins.go",
           "tests": [
             "TestSATSimplifierBinaryWatchNativeStableSort"
+          ]
+        },
+        {
+          "name": "SAT simplifier clause-pointer vector uses native Go storage and standard stable descending-size sort",
+          "status": "platform_replacement",
+          "go_target": "pkg/sat/sat_simplifier_sort.go",
+          "tests": [
+            "TestSATSimplifierClauseNativeStableSizeSortAndOwnership"
           ]
         },
         {

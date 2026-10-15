@@ -3,40 +3,48 @@ package sat
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-// This is an interrupted merge ownership-protocol fixture, not an injected
-// comparator failure: valid source size comparisons have no allocation call.
-func TestSATSimplifierStoppedMergeExactOwnersAndLifecycleClose(t *testing.T) {
-	s, l := satSimplifierFixture(t, 4)
-	refs := make([]StoredClauseRef, 4)
-	for i := range refs {
-		c, e := l.MkClauseCore(3, []Literal{0, 2, Literal(4 + i%2)}, false)
+func TestSATSimplifierClauseNativeStableSizeSortAndOwnership(t *testing.T) {
+	s, l := satSimplifierFixture(t, 5)
+	lengths := []uint32{3, 4, 3, 5}
+	refs := make([]StoredClauseRef, len(lengths))
+	for i, n := range lengths {
+		lits := []Literal{0, 2, 4, 6, 8}[:n]
+		c, e := l.MkClauseCore(n, lits, false)
 		satOK(t, e)
 		refs[i] = c
 	}
-	bytes := 4 * uint64(reflect.TypeOf(StoredClauseRef{}).Size())
-	satOK(t, l.budget.Reserve(bytes))
-	// A completed first pass lives in scratch; one second-pass result has moved
-	// to the vector. The vector's other scalar copies are nonowning borrows.
-	scratch := make([]StoredClauseRef, 4)
-	copy(scratch, refs)
-	l.Original[0] = refs[2]
-	s.clauseSort = satSimplifierClauseSort{scratch: scratch, bytes: bytes, n: 4, left: 0, mid: 2, right: 3, end: 4, out: 1, sourceScratch: true, active: true}
-	l.simplifierContinuation = s
+	before := l.budget.Used()
+	l.budget.FailAfter(0)
+	satOK(t, s.sortClauses(false))
+	l.budget.FailAfter(-1)
+	if l.budget.Used() != before {
+		t.Fatal("native clause sort charged arena workspace", before, l.budget.Used())
+	}
+	for i, want := range []StoredClauseRef{refs[3], refs[1], refs[0], refs[2]} {
+		if got := l.Original[i]; got != want {
+			t.Fatal("stable descending clause-size order", i, got, want)
+		}
+	}
+	retained := append([]StoredClauseRef(nil), l.Original...)
+	l.Original[2] = StoredClauseRef{}
+	if e := s.sortClauses(false); e == nil {
+		t.Fatal("invalid checked clause size accepted")
+	}
+	for i, want := range retained {
+		if i == 2 {
+			want = StoredClauseRef{}
+		}
+		if l.Original[i] != want {
+			t.Fatal("failed size read reordered owning vector", i)
+		}
+	}
+	l.Original[2] = retained[2]
 	satSimplifierAudit(t, s)
-	if e := l.pushClause(false, refs[0]); !errors.Is(e, arena.ErrClosed) {
-		t.Fatal("stopped exact owner rejects unrelated append", e)
-	}
-	satOK(t, l.Close())
-	if s.clauseSort.active || l.propagation.clauses.storage.Stats().Live != 0 {
-		t.Fatal("actual moved owner disappeared at lifecycle teardown")
-	}
-	satOK(t, s.Close())
 }
 
 func TestSATSimplifierDestructorActualExplicitFinalizeBeforeMembers(t *testing.T) {

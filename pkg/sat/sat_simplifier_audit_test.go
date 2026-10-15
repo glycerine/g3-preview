@@ -51,7 +51,6 @@ func satSimplifierAudit(t *testing.T, simplifier *satSimplifier) {
 	da := dummy.owner
 	ds := da.storage.Stats()
 	want += dummy.ownerBytes + da.ownerBytes + 4*uint64(da.ids.FreeCapacity()) + da.largeBytes + da.largeDirectory + ds.OwnerBytes + ds.PayloadBytes + ds.MetadataBytes + ds.DirectoryBytes
-	want += simplifier.clauseSort.bytes
 	if q := simplifier.blocked.queue; q != nil {
 		want += q.ownerBytes + 4*uint64(cap(q.values)+cap(q.indices))
 	}
@@ -71,24 +70,7 @@ func satSimplifierAudit(t *testing.T, simplifier *satSimplifier) {
 	}
 	for _, learned := range []bool{false, true} {
 		vec := simplifier.clauseVector(learned)
-		if simplifier.clauseSort.active && simplifier.clauseSort.learned == learned {
-			st := &simplifier.clauseSort
-			ranges := [4][2]uint32{{0, st.out}, {st.left, st.mid}, {st.right, st.end}, {st.end, st.n}}
-			for stage, r := range ranges {
-				if uint32(stage) < st.drainStage {
-					continue
-				}
-				lo := r[0]
-				if uint32(stage) == st.drainStage && st.drainIndex > lo {
-					lo = st.drainIndex
-				}
-				data := simplifier.sortSource()
-				if stage == 0 {
-					data = simplifier.sortDestination()
-				}
-				addRefs(data, lo, r[1])
-			}
-		} else if simplifier.cleanupInterrupted && simplifier.cleanupLearned == learned {
+		if simplifier.cleanupInterrupted && simplifier.cleanupLearned == learned {
 			addRefs(vec, simplifier.drainPrefix, simplifier.cleanupOut)
 			lo := simplifier.cleanupIndex
 			if simplifier.drainSuffix > lo {

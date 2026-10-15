@@ -273,11 +273,6 @@ func (s *satSimplifier) scopedFinalize() error {
 // Owning abort consumes actual kept-prefix and unread-suffix owners. Removed
 // scalar duplicates and already consumed slots are not registry fallback roots.
 func (s *satSimplifier) cleanupStopped() error {
-	if s.clauseSort.active {
-		if e := s.cleanupSort(); e != nil {
-			return e
-		}
-	}
 	if !s.cleanupInterrupted {
 		if s.scopeActive {
 			// Owning lifecycle Close abandons unfinished source cleanup/diagnostics;

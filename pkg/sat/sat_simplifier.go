@@ -19,7 +19,6 @@ type satSimplifier struct {
 	scopedStage                                                                  uint32
 	subReportActive                                                              bool
 	self                                                                         *satSimplifier
-	clauseSort                                                                   satSimplifierClauseSort
 	blocked                                                                      satSimplifierBlocked
 	elimination                                                                  satSimplifierElimination
 	lifecycle                                                                    *satSolverClauseLifecycle
@@ -137,7 +136,7 @@ func (s *satSimplifier) constructionBorrow() error {
 	if s == nil || s.self != s {
 		return ErrSATOwner
 	}
-	if s.closed || s.closing || s.scopeActive || s.cleanupInterrupted || s.clauseSort.active || s.blocked.reportActive || s.elimination.reportActive || s.subReportActive || s.finalizeStage != 0 {
+	if s.closed || s.closing || s.scopeActive || s.cleanupInterrupted || s.blocked.reportActive || s.elimination.reportActive || s.subReportActive || s.finalizeStage != 0 {
 		return arena.ErrClosed
 	}
 	if e := s.lifecycle.constructionBorrow(); e != nil {
@@ -452,9 +451,6 @@ func (s *satSimplifier) Close() error {
 		return e
 	}
 	if e := s.closeBlocked(); e != nil {
-		return e
-	}
-	if e := s.cleanupSort(); e != nil {
 		return e
 	}
 	if s.cleanupInterrupted {
