@@ -134,3 +134,54 @@ func TestArbitraryFloatNumeralSourceStringAndDisplay(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// A formatter refusal can occur after mpz has published a result and swapped
+// out its only temporary. If allocating the replacement temporary then fails,
+// source leaves a scratch hole and later arithmetic cannot retry on this owner.
+func TestArbitraryFloatNumeralStringColdRefusalSourceScratchStop(t *testing.T) {
+	sawRefusal, sawScratchHole := false, false
+	for ordinal := int64(0); ordinal < 32; ordinal++ {
+		core, _, budget := mpfNumeralHelpersFixture(t)
+		m, err := NewArbitraryFloatNumeralManager(core, 8, 260)
+		serviceMust(t, err)
+		var x ArbitraryFloat
+		one := NewInt(1)
+		serviceMust(t, core.SetComponents(&x, 8, 260, false, 0, &one))
+		budget.FailAfter(ordinal)
+		_, body := m.ToString(&x)
+		budget.FailAfter(-1)
+		if body != nil {
+			sawRefusal = true
+			if !numericPhysicalReservationRefusal(body) {
+				t.Fatal("unexpected formatter refusal", ordinal, body)
+			}
+		}
+		if core.FormatScopes != nil {
+			t.Fatal("caller retained a completed text context", ordinal)
+		}
+		hole := core.integer.Tmp[0] == 0 || core.integer.Tmp[1] == 0
+		if hole {
+			sawScratchHole = true
+			if _, retry := m.ToString(&x); !errors.Is(retry, arena.ErrInvalidSlot) {
+				t.Fatal("missing source scratch guarded retry", ordinal, body, retry)
+			}
+		} else {
+			got, retry := m.ToString(&x)
+			if retry != nil || got == "" {
+				t.Fatal("intact formatter retry", ordinal, body, got, retry)
+			}
+		}
+		integerPhysicalAuditWithRaw(t, core.integer, nil, &x.significand, &core.rational.NTmp)
+		serviceMust(t, core.Del(&x))
+		serviceMust(t, m.Close())
+		if hole {
+			if e := core.Close(); !errors.Is(e, arena.ErrInvalidSlot) {
+				t.Fatal("source destructor did not stop at missing scratch", ordinal, e)
+			}
+			serviceMust(t, core.Close())
+		}
+	}
+	if !sawRefusal || !sawScratchHole {
+		t.Fatal("cold campaign missed numeric refusal or published scratch hole")
+	}
+}

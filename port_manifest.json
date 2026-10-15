@@ -122212,6 +122212,7 @@
         "TestArbitraryFloatNumeralRationalStringRetryAfterConversionRefusal",
         "TestArbitraryFloatNumeralRationalStringPreservesEarlierStoppedScope",
         "TestArbitraryFloatNumeralSourceStringAndDisplay",
+        "TestArbitraryFloatNumeralStringColdRefusalSourceScratchStop",
         "TestArbitraryFloatNumeralSourceSwapAndDel",
         "TestSubpavingMPFIntervalXnEqYRetainedCases",
         "TestSubpavingHardwareIntervalScalarMulDivDirectedAndAlias",
@@ -122363,7 +122364,8 @@
             "TestArbitraryFloatNumeralSourceRationalString",
             "TestArbitraryFloatNumeralRationalStringRetryAfterConversionRefusal",
             "TestArbitraryFloatNumeralRationalStringPreservesEarlierStoppedScope",
-            "TestArbitraryFloatNumeralSourceStringAndDisplay"
+            "TestArbitraryFloatNumeralSourceStringAndDisplay",
+            "TestArbitraryFloatNumeralStringColdRefusalSourceScratchStop"
           ]
         },
         {
