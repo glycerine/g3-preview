@@ -21,13 +21,15 @@
         "engine",
         "tactic",
         "util/diagnostic",
-        "util/params"
+        "util/params",
+        "util/z3exception"
       ],
       "production_files": [
         "api_ast_map_object.go",
         "api_context_results.go",
         "api_global_params.go",
         "api_goal_object.go",
+        "api_stats.go",
         "api_trace.go"
       ]
     },
@@ -1295,6 +1297,7 @@
         "sat_solver_conflict_helpers.go",
         "sat_solver_conflict_resolution.go",
         "sat_solver_conflict_span.go",
+        "sat_solver_conflict_trace.go",
         "sat_solver_consequences.go",
         "sat_solver_consequences_chunking.go",
         "sat_solver_consequences_helpers.go",

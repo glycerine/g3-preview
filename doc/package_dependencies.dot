@@ -14,6 +14,7 @@ digraph packages {
   "api" -> "tactic";
   "api" -> "util/diagnostic";
   "api" -> "util/params";
+  "api" -> "util/z3exception";
   "arena" [style=filled, fillcolor="#c9e8cb"];
   "ast" [style=filled, fillcolor="#eeeeee"];
   "ast" -> "arena";
