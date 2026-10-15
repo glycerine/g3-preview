@@ -3715,14 +3715,21 @@
       "path": "src/api/api_config_params.cpp",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/api/api_global_params.go", "pkg/api/api_global_params_catalog.go"],
+      "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings"],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Z3_global_param_set/get/reset_all through generated process service, warning and environment update; implicit first-call bootstrap, API logging and native pointer ABI remain open",
+          "status": "partial",
+          "go_target": "pkg/api/api_global_params.go",
+          "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings"]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["The Go API requires process.InitializeGenerated before these calls; C++ memory::initialize performs first-call bootstrap implicitly. Returned Go strings own their bytes instead of borrowing g_Z3_global_param_get_buffer. API logging and native C ABI remain open."]
     },
     {
       "path": "src/api/api_context.cpp",
@@ -184086,8 +184093,8 @@
         "src/api/api_config_params.cpp",
         "src/api/z3_api.h"
       ],
-      "status": "unported",
-      "tests": []
+      "status": "partial",
+      "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings"]
     },
     {
       "name": "Z3_global_param_reset_all",
@@ -184095,8 +184102,8 @@
         "src/api/api_config_params.cpp",
         "src/api/z3_api.h"
       ],
-      "status": "unported",
-      "tests": []
+      "status": "partial",
+      "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings"]
     },
     {
       "name": "Z3_global_param_set",
@@ -184104,8 +184111,8 @@
         "src/api/api_config_params.cpp",
         "src/api/z3_api.h"
       ],
-      "status": "unported",
-      "tests": []
+      "status": "partial",
+      "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings"]
     },
     {
       "name": "Z3_goal_assert",

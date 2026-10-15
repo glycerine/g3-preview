@@ -10,7 +10,10 @@ digraph packages {
   "api" [style=filled, fillcolor="#eeeeee"];
   "api" -> "arena";
   "api" -> "ast";
+  "api" -> "engine";
   "api" -> "tactic";
+  "api" -> "util/diagnostic";
+  "api" -> "util/params";
   "arena" [style=filled, fillcolor="#c9e8cb"];
   "ast" [style=filled, fillcolor="#eeeeee"];
   "ast" -> "arena";
@@ -37,6 +40,7 @@ digraph packages {
   "ast/proofs" -> "ast";
   "ast/rewriter" [style=filled, fillcolor="#eeeeee"];
   "ast/rewriter" -> "ast";
+  "ast/rewriter" -> "util/diagnostic";
   "ast/rewriter" -> "util/messages";
   "ast/rewriter" -> "util/numeral";
   "ast/rewriter" -> "util/params";
@@ -76,6 +80,7 @@ digraph packages {
   "math/interval" -> "arena";
   "math/interval" -> "util/control";
   "math/interval" -> "util/cooperate";
+  "math/interval" -> "util/diagnostic";
   "math/interval" -> "util/messages";
   "math/interval" -> "util/numeral";
   "math/interval" -> "util/z3exception";
@@ -100,6 +105,7 @@ digraph packages {
   "math/subpaving" -> "math/interval";
   "math/subpaving" -> "util/control";
   "math/subpaving" -> "util/cooperate";
+  "math/subpaving" -> "util/diagnostic";
   "math/subpaving" -> "util/memory";
   "math/subpaving" -> "util/messages";
   "math/subpaving" -> "util/numeral";
@@ -113,6 +119,7 @@ digraph packages {
   "math/subpaving/tactic" -> "tactic";
   "math/subpaving/tactic" -> "util/control";
   "math/subpaving/tactic" -> "util/cooperate";
+  "math/subpaving/tactic" -> "util/diagnostic";
   "math/subpaving/tactic" -> "util/memory";
   "math/subpaving/tactic" -> "util/messages";
   "math/subpaving/tactic" -> "util/numeral";
