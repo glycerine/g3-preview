@@ -261,6 +261,9 @@ func (m *MinCut) augmentPath() {
 			}
 		}
 		if !reverseExists {
+			// min_cut.cpp adds edge(1, max) here. On a multi-edge path that
+			// creates a sink self-loop and can repeat augmentation forever;
+			// target the actual predecessor to retain a terminating residual graph.
 			m.edges[node] = append(m.edges[node], minCutEdge{node: previous, weight: bottleneck})
 		}
 	}

@@ -7,6 +7,30 @@ import (
 	"testing"
 )
 
+func TestMinCutAugmentPathReverseEdgesFollowPredecessors(t *testing.T) {
+	m := New()
+	m.NewNode() // 2
+	m.NewNode() // 3
+	for _, edge := range []struct{ from, to, capacity uint32 }{
+		{0, 2, 7}, {2, 3, 5}, {3, 1, 3},
+	} {
+		if err := m.AddEdgeCapacity(edge.from, edge.to, edge.capacity); err != nil {
+			t.Fatal(err)
+		}
+	}
+	m.predecessor = []uint32{0, 3, 0, 2}
+	m.augmentPath()
+	want := [][]minCutEdge{
+		{{node: 2, weight: 4}},
+		{{node: 3, weight: 3}},
+		{{node: 3, weight: 2}, {node: 0, weight: 3}},
+		{{node: 1, weight: 0}, {node: 2, weight: 3}},
+	}
+	if !reflect.DeepEqual(m.edges, want) {
+		t.Fatalf("residual edges after a three-edge augment: got %v, want %v", m.edges, want)
+	}
+}
+
 func TestMinCutNodeConstructionAndBounds(t *testing.T) {
 	m := New()
 	if got := m.NewNode(); got != 2 {
