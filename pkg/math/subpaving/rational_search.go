@@ -40,6 +40,9 @@ func (c *RationalContext) Search() error {
 	if err := c.InitializeRoot(); err != nil {
 		return err
 	}
+	if err := c.traceSearchStatistics(1809); err != nil {
+		return err
+	}
 	if err := c.traceSearchParams(); err != nil {
 		return err
 	}
@@ -52,11 +55,14 @@ func (c *RationalContext) Search() error {
 				return arena.ErrInvalidSlot
 			}
 			if uint64(len(c.nodes)) > uint64(c.maxNodes) {
-				return nil
+				break
 			}
 			n, err := c.SelectLeafBFS()
-			if err != nil || n == nil {
+			if err != nil {
 				return err
+			}
+			if n == nil {
+				break
 			}
 			if err := c.traceSearchNode(n, "selected", 1819); err != nil {
 				return err
@@ -122,5 +128,5 @@ func (c *RationalContext) Search() error {
 		}
 		c.searchNode = nil
 	}
-	return nil
+	return c.traceSearchStatistics(1844)
 }
