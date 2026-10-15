@@ -54596,6 +54596,12 @@
           "tests": ["TestRationalClauseTraceSortedAfterOwnership", "TestRationalClauseTraceRefusalAndPrinterFailureKeepClause"]
         },
         {
+          "name": "Concrete config_mpq inequality reference TRACE and resumable clause release (subpaving_t_def.h:786-799)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/rational_refcount_trace.go", "pkg/math/subpaving/rational_context_root.go"],
+          "tests": ["TestRationalInequalityReferenceTraceSourceOrder", "TestRationalInequalityReferenceTraceRefusalAndStoppedClose", "TestRationalInequalityReferenceTraceResumeSecondClauseAtom"]
+        },
+        {
           "name": "Concrete config_mpq mk_bound publication and conflict TRACE before source state transitions (subpaving_t_def.h:563-566)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_bound_trace.go",
@@ -177387,6 +177393,12 @@
           "tests": ["TestRationalClauseTraceSortedAfterOwnership", "TestRationalClauseTraceRefusalAndPrinterFailureKeepClause"]
         },
         {
+          "name": "Reached config_mpq inequality reference-count TRACE records (subpaving_t_def.h:786-799)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/rational_refcount_trace.go", "pkg/math/subpaving/rational_context_root.go"],
+          "tests": ["TestRationalInequalityReferenceTraceSourceOrder", "TestRationalInequalityReferenceTraceRefusalAndStoppedClose", "TestRationalInequalityReferenceTraceResumeSecondClauseAtom"]
+        },
+        {
           "name": "Reached config_mpq mk_bound publication and conflict TRACE before source state transitions (subpaving_t_def.h:563-566)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_bound_trace.go",
@@ -178323,6 +178335,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_clause_trace.go",
           "tests": ["TestRationalClauseTraceSortedAfterOwnership", "TestRationalClauseTraceRefusalAndPrinterFailureKeepClause"]
+        },
+        {
+          "name": "Reached config_mpq inequality reference-count TRACE records (subpaving_t_def.h:786-799)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/rational_refcount_trace.go", "pkg/math/subpaving/rational_context_root.go"],
+          "tests": ["TestRationalInequalityReferenceTraceSourceOrder", "TestRationalInequalityReferenceTraceRefusalAndStoppedClose", "TestRationalInequalityReferenceTraceResumeSecondClauseAtom"]
         },
         {
           "name": "Reached config_mpq mk_bound publication and conflict TRACE before source state transitions (subpaving_t_def.h:563-566)",

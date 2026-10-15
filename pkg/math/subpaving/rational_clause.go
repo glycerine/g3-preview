@@ -10,9 +10,10 @@ import (
 )
 
 type RationalClause struct {
-	context *RationalContext
-	atoms   []*RationalInequality
-	visited uint64
+	context   *RationalContext
+	atoms     []*RationalInequality
+	visited   uint64
+	releaseAt int
 }
 
 type rationalTruth uint8
@@ -56,6 +57,7 @@ func (c *RationalContext) AddClause(atoms []*RationalInequality) (*RationalClaus
 	sort.SliceStable(ordered, func(i, j int) bool { return ordered[i].variable < ordered[j].variable })
 	clause := &RationalClause{context: c, atoms: ordered}
 	for _, a := range ordered {
+		c.traceInequalityIncRef(a)
 		a.refs++
 	}
 	for i, a := range ordered {

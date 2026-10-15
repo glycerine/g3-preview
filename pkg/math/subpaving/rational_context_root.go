@@ -272,16 +272,24 @@ func (c *RationalContext) Close() error {
 		if a.refs == 0 {
 			return arena.ErrInvalidSlot
 		}
+		if err := c.traceInequalityDecRef(a); err != nil {
+			return err
+		}
 		a.refs--
 		c.unitClauses = c.unitClauses[1:]
 	}
 	for len(c.clauses) != 0 {
 		clause := c.clauses[0]
-		for _, a := range clause.atoms {
+		for clause.releaseAt < len(clause.atoms) {
+			a := clause.atoms[clause.releaseAt]
 			if a.refs == 0 {
 				return arena.ErrInvalidSlot
 			}
+			if err := c.traceInequalityDecRef(a); err != nil {
+				return err
+			}
 			a.refs--
+			clause.releaseAt++
 		}
 		c.clauses[0] = nil
 		c.clauses = c.clauses[1:]

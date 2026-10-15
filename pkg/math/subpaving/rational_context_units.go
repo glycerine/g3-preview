@@ -55,6 +55,7 @@ func (c *RationalContext) AddUnitClause(a *RationalInequality, axiom bool) error
 	if err := c.traceUnitInequality(a); err != nil {
 		return err
 	}
+	c.traceInequalityIncRef(a)
 	a.refs++
 	c.unitClauses = append(c.unitClauses, rationalUnitClause{atom: a, axiom: axiom})
 	return nil
