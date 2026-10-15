@@ -53533,6 +53533,12 @@
           "tests": ["TestFixedPolynomialPropagationSourceTraceOrder", "TestFixedPolynomialPropagationTraceRefusalAndPrinterPrefix"]
         },
         {
+          "name": "Concrete config_mpff monomial entry, zero/unbounded and downward TRACE sites (subpaving_t_def.h:1501,1525,1603)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_monomial_propagate_trace.go",
+          "tests": ["TestFastMonomialPropagationSourceTrace", "TestFastMonomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
           "name": "Concrete config_mpfx monomial entry, zero/unbounded and downward TRACE sites (subpaving_t_def.h:1501,1525,1603)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_monomial_propagate_trace.go",
@@ -55195,6 +55201,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_polynomial_propagate_trace.go",
           "tests": ["TestFixedPolynomialPropagationSourceTraceOrder", "TestFixedPolynomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Concrete config_mpff monomial entry, zero/unbounded and downward TRACE sites (subpaving_t_def.h:1501,1525,1603)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_monomial_propagate_trace.go",
+          "tests": ["TestFastMonomialPropagationSourceTrace", "TestFastMonomialPropagationTraceRefusalAndPrinterPrefix"]
         },
         {
           "name": "Concrete config_mpfx monomial entry, zero/unbounded and downward TRACE sites (subpaving_t_def.h:1501,1525,1603)",
@@ -177946,6 +177958,12 @@
           "tests": ["TestFixedPolynomialPropagationSourceTraceOrder", "TestFixedPolynomialPropagationTraceRefusalAndPrinterPrefix"]
         },
         {
+          "name": "Reached config_mpff monomial entry, zero/unbounded and downward TRACE records (subpaving_t_def.h:1501,1525,1603)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_monomial_propagate_trace.go",
+          "tests": ["TestFastMonomialPropagationSourceTrace", "TestFastMonomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
           "name": "Reached config_mpfx monomial entry, zero/unbounded and downward TRACE records (subpaving_t_def.h:1501,1525,1603)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_monomial_propagate_trace.go",
@@ -179056,6 +179074,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_polynomial_propagate_trace.go",
           "tests": ["TestFixedPolynomialPropagationSourceTraceOrder", "TestFixedPolynomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Reached config_mpff monomial entry, zero/unbounded and downward TRACE records (subpaving_t_def.h:1501,1525,1603)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_monomial_propagate_trace.go",
+          "tests": ["TestFastMonomialPropagationSourceTrace", "TestFastMonomialPropagationTraceRefusalAndPrinterPrefix"]
         },
         {
           "name": "Reached config_mpfx monomial entry, zero/unbounded and downward TRACE records (subpaving_t_def.h:1501,1525,1603)",
