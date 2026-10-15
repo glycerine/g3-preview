@@ -121,6 +121,9 @@ func (c *FastContext) RelevantNewBound(n *FastNode, variable uint32, k *numeral.
 		}
 	}()
 	currentLower, currentUpper := n.lower[variable], n.upper[variable]
+	if err = c.traceRelevantCandidate(variable, k, lower, open, currentLower, currentUpper); err != nil {
+		return false, err
+	}
 	if lower {
 		if currentUpper != nil {
 			conflict, e := fastGreaterOrEqualWhen(m, k, currentUpper.value, open || currentUpper.open)
@@ -128,7 +131,7 @@ func (c *FastContext) RelevantNewBound(n *FastNode, variable uint32, k *numeral.
 				return false, e
 			}
 			if conflict {
-				return true, nil
+				return c.traceRelevantDecision(true, 1218, "relevant because triggers conflict.", nil)
 			}
 		}
 		if c.zeroEpsilon && currentLower != nil {
@@ -137,7 +140,7 @@ func (c *FastContext) RelevantNewBound(n *FastNode, variable uint32, k *numeral.
 				return false, e
 			}
 			if irrelevant {
-				return false, nil
+				return c.traceRelevantDecision(false, 1224, "irrelevant because does not improve existing bound.", nil)
 			}
 		}
 		if currentUpper == nil {
@@ -146,7 +149,7 @@ func (c *FastContext) RelevantNewBound(n *FastNode, variable uint32, k *numeral.
 				return false, e
 			}
 			if cmp < 0 {
-				return false, nil
+				return c.traceRelevantDecision(false, 1229, "irrelevant because exceeds :max-bound threshold.", nil)
 			}
 		}
 	} else {
@@ -156,7 +159,7 @@ func (c *FastContext) RelevantNewBound(n *FastNode, variable uint32, k *numeral.
 				return false, e
 			}
 			if conflict {
-				return true, nil
+				return c.traceRelevantDecision(true, 1268, "relevant because triggers conflict.", nil)
 			}
 		}
 		if c.zeroEpsilon && currentUpper != nil {
@@ -165,7 +168,7 @@ func (c *FastContext) RelevantNewBound(n *FastNode, variable uint32, k *numeral.
 				return false, e
 			}
 			if irrelevant {
-				return false, nil
+				return c.traceRelevantDecision(false, 1274, "irrelevant because does not improve existing bound.", nil)
 			}
 		}
 		if currentLower == nil {
@@ -174,12 +177,12 @@ func (c *FastContext) RelevantNewBound(n *FastNode, variable uint32, k *numeral.
 				return false, e
 			}
 			if cmp < 0 {
-				return false, nil
+				return c.traceRelevantDecision(false, 1279, "irrelevant because exceeds -:max-bound threshold.", nil)
 			}
 		}
 	}
 	if c.zeroEpsilon || lower && currentLower == nil || !lower && currentUpper == nil {
-		return true, nil
+		return c.traceRelevantDecision(true, 1310, "new bound is relevant", nil)
 	}
 	minimumOwner, absoluteOwner, e := fastScratchPair(m)
 	if e != nil {
@@ -252,11 +255,17 @@ func (c *FastContext) RelevantNewBound(n *FastNode, variable uint32, k *numeral.
 		if err = m.Add(currentLower.value, delta, delta); err != nil {
 			return false, err
 		}
+		if err = c.traceRelevantLowerBug(k, delta, currentLower.value, minimum); err != nil {
+			return false, err
+		}
 		cmp, e = fastCompare(m, k, delta)
 		if e != nil {
 			return false, e
 		}
-		return cmp > 0, nil
+		if cmp <= 0 {
+			return c.traceRelevantDecision(false, 1259, "irrelevant because does not improve existing bound to at least ", delta)
+		}
+		return c.traceRelevantDecision(true, 1310, "new bound is relevant", nil)
 	}
 	if err = m.Sub(currentUpper.value, delta, delta); err != nil {
 		return false, err
@@ -265,7 +274,10 @@ func (c *FastContext) RelevantNewBound(n *FastNode, variable uint32, k *numeral.
 	if e != nil {
 		return false, e
 	}
-	return cmp < 0, nil
+	if cmp >= 0 {
+		return c.traceRelevantDecision(false, 1304, "irrelevant because does not improve existing bound to at least ", delta)
+	}
+	return c.traceRelevantDecision(true, 1310, "new bound is relevant", nil)
 }
 
 // PropagateBound creates the normalized bound, checks the node's interval for

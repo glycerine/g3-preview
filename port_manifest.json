@@ -53413,6 +53413,12 @@
           "tests": ["TestFixedClausePropagationTraceSourceOrder", "TestFixedClausePropagationTraceFailureBoundaries"]
         },
         {
+          "name": "Concrete config_mpff relevant_new_bound source max(min(gap,abs),1) epsilon threshold and candidate/reason TRACE branches (subpaving_t_def.h:1210-1311)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/fast_context_bounds.go", "pkg/math/subpaving/fast_relevance_trace.go"],
+          "tests": ["TestFastContextRelevanceEpsilonUsesMaximumOfMinimumAndOne", "TestFastRelevanceTraceConflictThresholdAndImprovementBranches", "TestFastRelevanceTraceRefusalAndPrinterPrefix", "TestFastRelevanceTraceEpsilonGapRecords"]
+        },
+        {
           "name": "Concrete config_mpfx relevant_new_bound source max(min(gap,abs),1) epsilon threshold and candidate/reason TRACE branches (subpaving_t_def.h:1210-1311)",
           "status": "ported",
           "go_targets": ["pkg/math/subpaving/fixed_context_bounds.go", "pkg/math/subpaving/fixed_relevance_trace.go"],
@@ -55051,6 +55057,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_clause_propagate_trace.go",
           "tests": ["TestFixedClausePropagationTraceSourceOrder", "TestFixedClausePropagationTraceFailureBoundaries"]
+        },
+        {
+          "name": "Concrete config_mpff relevant_new_bound source max(min(gap,abs),1) epsilon threshold and candidate/reason TRACE branches (subpaving_t_def.h:1210-1311)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/fast_context_bounds.go", "pkg/math/subpaving/fast_relevance_trace.go"],
+          "tests": ["TestFastContextRelevanceEpsilonUsesMaximumOfMinimumAndOne", "TestFastRelevanceTraceConflictThresholdAndImprovementBranches", "TestFastRelevanceTraceRefusalAndPrinterPrefix", "TestFastRelevanceTraceEpsilonGapRecords"]
         },
         {
           "name": "Concrete config_mpfx relevant_new_bound source max(min(gap,abs),1) epsilon threshold and candidate/reason TRACE branches (subpaving_t_def.h:1210-1311)",
@@ -177778,6 +177790,12 @@
           "tests": ["TestFixedClausePropagationTraceSourceOrder", "TestFixedClausePropagationTraceFailureBoundaries"]
         },
         {
+          "name": "Reached config_mpff relevance candidate, branch reason and lower-threshold diagnostic TRACE records (subpaving_t_def.h:1210-1311)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_relevance_trace.go",
+          "tests": ["TestFastContextRelevanceEpsilonUsesMaximumOfMinimumAndOne", "TestFastRelevanceTraceConflictThresholdAndImprovementBranches", "TestFastRelevanceTraceRefusalAndPrinterPrefix", "TestFastRelevanceTraceEpsilonGapRecords"]
+        },
+        {
           "name": "Reached config_mpfx relevance candidate, branch reason and lower-threshold diagnostic TRACE records (subpaving_t_def.h:1210-1311)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_relevance_trace.go",
@@ -178864,6 +178882,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_clause_propagate_trace.go",
           "tests": ["TestFixedClausePropagationTraceSourceOrder", "TestFixedClausePropagationTraceFailureBoundaries"]
+        },
+        {
+          "name": "Reached config_mpff relevance candidate, branch reason and lower-threshold diagnostic TRACE records (subpaving_t_def.h:1210-1311)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_relevance_trace.go",
+          "tests": ["TestFastContextRelevanceEpsilonUsesMaximumOfMinimumAndOne", "TestFastRelevanceTraceConflictThresholdAndImprovementBranches", "TestFastRelevanceTraceRefusalAndPrinterPrefix", "TestFastRelevanceTraceEpsilonGapRecords"]
         },
         {
           "name": "Reached config_mpfx relevance candidate, branch reason and lower-threshold diagnostic TRACE records (subpaving_t_def.h:1210-1311)",
