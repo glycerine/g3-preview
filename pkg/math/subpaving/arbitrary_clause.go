@@ -180,6 +180,9 @@ func (c *ArbitraryContext) AddUnitClause(a *ArbitraryInequality, axiom bool) err
 	if a.refs == math.MaxUint32 {
 		return arena.ErrInvalidSlot
 	}
+	if err := c.traceUnitInequality(a); err != nil {
+		return err
+	}
 	c.traceInequalityIncRef(a)
 	a.refs++
 	c.unitClauses = append(c.unitClauses, arbitraryUnitClause{atom: a, axiom: axiom})
@@ -222,5 +225,5 @@ func (c *ArbitraryContext) AddClause(atoms []*ArbitraryInequality) (*ArbitraryCl
 		}
 	}
 	c.clauses = append(c.clauses, clause)
-	return clause, nil
+	return clause, c.traceNewClause(clause)
 }

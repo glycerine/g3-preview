@@ -167,7 +167,7 @@ func (c *FastContext) AddClause(atoms []*FastInequality, lemma, watched bool) (*
 		}
 	}
 	c.clauses = append(c.clauses, clause)
-	return clause, nil
+	return clause, c.traceNewClause(clause)
 }
 
 func (c *FastContext) AddUnitClause(atom *FastInequality, axiom bool) error {
@@ -175,6 +175,9 @@ func (c *FastContext) AddUnitClause(atom *FastInequality, axiom bool) error {
 		return err
 	}
 	if err := c.checkInequality(atom); err != nil {
+		return err
+	}
+	if err := c.traceUnitInequality(atom); err != nil {
 		return err
 	}
 	c.traceInequalityIncRef(atom)
