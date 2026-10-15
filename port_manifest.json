@@ -53258,6 +53258,12 @@
           "tests": ["TestFixedShellExactCoefficientOwnerAndDirectedBound"]
         },
         {
+          "name": "Concrete config_mpfx constructor and updt_params read six named unsigned options in source order with immediate numeric mutations (subpaving_t_def.h:416-435,476-505)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_context_params.go",
+          "tests": ["TestFixedContextNamedParamsSourceOrderAndStoppedOwner"]
+        },
+        {
           "name": "Concrete config_mpff tactic variable registration before root initialization (src/math/subpaving/subpaving_t_def.h:630-637)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fast_context.go",

@@ -30,6 +30,9 @@ type FixedContext struct {
 	minusMaxBound    *numeral.FixedPoint
 	rootPrecision    *numeral.FixedPoint
 	zeroEpsilon      bool
+	maxDepth         uint32
+	maxNodes         uint32
+	maxMemory        uint64
 	arithmeticFailed bool
 	timestamp        uint64
 	queue            []*FixedBound
@@ -52,17 +55,14 @@ type FixedContext struct {
 
 // NewFixedContext uses the source parameter values directly. The source
 // defaults are epsilon=20, maxBoundPower=10 and rootPrecision=8192.
-func NewFixedContext(m *numeral.FixedPointManager, limit *control.Reslimit, isInt []bool, epsilon, maxBoundPower, rootPrecision uint32) (_ *FixedContext, err error) {
+func newFixedContextOwner(m *numeral.FixedPointManager, limit *control.Reslimit, isInt []bool) (_ *FixedContext, err error) {
 	if m == nil || limit == nil || len(isInt) > math.MaxUint32 {
 		return nil, arena.ErrInvalidSlot
 	}
-	c := &FixedContext{numbers: m, limit: limit, isInt: append([]bool(nil), isInt...), zeroEpsilon: epsilon == 0, polynomials: make(map[uint32]*FixedPolynomial), monomials: make(map[uint32]*FixedMonomial), watchers: make([][]uint32, len(isInt)), watchOrder: make([][]fixedWatch, len(isInt))}
+	c := &FixedContext{numbers: m, limit: limit, isInt: append([]bool(nil), isInt...), polynomials: make(map[uint32]*FixedPolynomial), monomials: make(map[uint32]*FixedMonomial), watchers: make([][]uint32, len(isInt)), watchOrder: make([][]fixedWatch, len(isInt))}
 	c.self = c
 	defer func() {
 		if err != nil {
-			if c.root != nil {
-				err = errors.Join(err, c.root.Close())
-			}
 			err = errors.Join(err, c.closeNumerals())
 		}
 	}()
@@ -78,6 +78,30 @@ func NewFixedContext(m *numeral.FixedPointManager, limit *control.Reslimit, isIn
 	if c.rootPrecision, err = m.New(); err != nil {
 		return nil, err
 	}
+	return c, nil
+}
+
+func (c *FixedContext) newRoot() error {
+	root, err := NewFixedNode(c.numbers, uint32(len(c.isInt)), nil)
+	if err != nil {
+		return err
+	}
+	c.root = root
+	root.context = c
+	return nil
+}
+
+func NewFixedContext(m *numeral.FixedPointManager, limit *control.Reslimit, isInt []bool, epsilon, maxBoundPower, rootPrecision uint32) (_ *FixedContext, err error) {
+	c, err := newFixedContextOwner(m, limit, isInt)
+	if err != nil {
+		return nil, err
+	}
+	c.zeroEpsilon, c.maxDepth, c.maxNodes, c.maxMemory = epsilon == 0, 128, 8192, math.MaxUint64
+	defer func() {
+		if err != nil {
+			err = errors.Join(err, c.closeNumerals())
+		}
+	}()
 	if epsilon != 0 {
 		if err = m.SetInt64(c.epsilon, int64(epsilon)); err != nil {
 			return nil, err
@@ -107,10 +131,9 @@ func NewFixedContext(m *numeral.FixedPointManager, limit *control.Reslimit, isIn
 	if err = m.Inv(c.rootPrecision); err != nil {
 		return nil, err
 	}
-	if c.root, err = NewFixedNode(m, uint32(len(isInt)), nil); err != nil {
+	if err = c.newRoot(); err != nil {
 		return nil, err
 	}
-	c.root.context = c
 	return c, nil
 }
 
@@ -183,11 +206,10 @@ func (c *FixedContext) Close() error {
 	if c.closed {
 		return nil
 	}
-	if c.root == nil {
-		return arena.ErrInvalidSlot
-	}
-	if err := c.root.Close(); err != nil {
-		return err
+	if c.root != nil {
+		if err := c.root.Close(); err != nil {
+			return err
+		}
 	}
 	for i := range c.unitClauses {
 		if err := c.releaseUnit(i); err != nil {
