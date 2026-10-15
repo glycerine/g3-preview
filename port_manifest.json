@@ -178948,10 +178948,16 @@
           "tests": ["TestEuclideanSelectNextPivotSourceTiesAndUnitStop", "TestEuclideanConstantOnlyTrivialAndContradictoryEquations", "TestEuclideanNonUnitDecompositionParameterAndAuxiliaryEquation"]
         },
         {
+          "name": "Reached SAT resolve_conflict_for_init pre-backtrack lemma, solver display, and assignment TRACE (sat_solver.cpp:1932)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_conflict_assumptions_extra_trace.go",
+          "tests": ["TestSATConflictInitFullSolverLemmaAndAssignmentTrace"]
+        },
+        {
           "name": "Reached SAT resolve_conflict_for_init assignment-trail TRACE after learned-clause publication (sat_solver.cpp:1940)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_conflict_assumptions_extra_trace.go",
-          "tests": ["TestSATConflictInitNotLiteralSourceTrace"]
+          "tests": ["TestSATConflictInitNotLiteralSourceTrace", "TestSATConflictInitFullSolverLemmaAndAssignmentTrace"]
         },
         {
           "name": "SAT get_consequences conditional inconsistent/display and unsat TRACE bodies at source branches (sat_solver.cpp:3420,3450); end-to-end branch fixture open",
@@ -180397,10 +180403,16 @@
           "tests": ["TestEuclideanSelectNextPivotSourceTiesAndUnitStop", "TestEuclideanConstantOnlyTrivialAndContradictoryEquations", "TestEuclideanNonUnitDecompositionParameterAndAuxiliaryEquation"]
         },
         {
+          "name": "Reached SAT resolve_conflict_for_init pre-backtrack lemma, solver display, and assignment TRACE (sat_solver.cpp:1932)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_conflict_assumptions_extra_trace.go",
+          "tests": ["TestSATConflictInitFullSolverLemmaAndAssignmentTrace"]
+        },
+        {
           "name": "Reached SAT resolve_conflict_for_init assignment-trail TRACE after learned-clause publication (sat_solver.cpp:1940)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_conflict_assumptions_extra_trace.go",
-          "tests": ["TestSATConflictInitNotLiteralSourceTrace"]
+          "tests": ["TestSATConflictInitNotLiteralSourceTrace", "TestSATConflictInitFullSolverLemmaAndAssignmentTrace"]
         },
         {
           "name": "SAT get_consequences conditional inconsistent/display and unsat TRACE bodies at source branches (sat_solver.cpp:3420,3450); end-to-end branch fixture open",

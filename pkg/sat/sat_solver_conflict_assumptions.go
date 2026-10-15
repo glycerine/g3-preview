@@ -431,6 +431,7 @@ func (s *satSolverConflictResolution) resolveConflictForInit() (bool, error) {
 			i--
 		}
 	}
+	s.traceInitLemmaState()
 	if newLevel == 0 {
 		if e = s.popReinit(v.scopeLevel); e != nil {
 			return false, e

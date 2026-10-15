@@ -61,3 +61,38 @@ func TestSATConflictInitNotLiteralSourceTrace(t *testing.T) {
 		t.Fatalf("init trace = %q, want %q", got, want)
 	}
 }
+
+// Source: src/sat/sat_solver.cpp:1932,1940. The full solver emits the lemma,
+// solver display, and pre-backtrack assignment before the reduced trail.
+func TestSATConflictInitFullSolverLemmaAndAssignmentTrace(t *testing.T) {
+	s, _, _ := satSolverCheckFixture(t)
+	for i := 0; i < 2; i++ {
+		_, err := s.MkVar(true, true)
+		satOK(t, err)
+	}
+	p := s.propagation
+	satOK(t, s.Lifecycle.push())
+	satOK(t, p.assign(0, satJustification{}))
+	satOK(t, p.assign(2, newSATBinaryJustification(1)))
+	p.setConflict(newSATBinaryJustification(1), 2)
+	s.conflict.conflictLevel = 1
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("sat")
+	s.traceTags = tags
+	s.conflict.traceTags = tags
+	ok, err := s.conflict.resolveConflictForInit()
+	satOK(t, err)
+	if !ok {
+		t.Fatal("source init conflict was not resolved")
+	}
+	want := ""
+	if tags.ShouldTrace("sat") {
+		want = satClauseTraceRecord("sat", "resolve_conflict_for_init", "1892", "not_l: 1\n") +
+			satClauseTraceRecord("sat", "resolve_conflict_for_init", "1932", "lemma: -0\n(sat\n)\nassignment:\n0 1\n") +
+			satClauseTraceRecord("sat", "resolve_conflict_for_init", "1940", "Trail: -0\n")
+	}
+	if got := output.String(); got != want {
+		t.Fatalf("source conflict-init trace = %q, want %q", got, want)
+	}
+}

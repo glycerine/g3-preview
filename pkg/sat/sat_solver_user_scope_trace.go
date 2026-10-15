@@ -68,6 +68,24 @@ func (s *Solver) traceUserDisplayInto(w io.Writer) error {
 	return nil
 }
 
+func (s *Solver) traceUserAssignmentInto(w io.Writer) error {
+	b := arena.NewBudget(^uint64(0))
+	out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	if err = s.displayAssignment(out); err != nil {
+		return err
+	}
+	text, err := out.String()
+	if err != nil {
+		return err
+	}
+	_, err = io.WriteString(w, text)
+	return err
+}
+
 func (s *Solver) traceUserPopDisplay() {
 	s.traceUserScopeRecord("user_pop", 2727, s.traceUserDisplayInto)
 }

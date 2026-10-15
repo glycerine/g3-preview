@@ -1,4 +1,4 @@
-// Source: src/sat/sat_solver.cpp:1825,1892,1940; retained util/trace TRACE sites.
+// Source: src/sat/sat_solver.cpp:1825,1892,1932,1940; retained util/trace TRACE sites.
 package sat
 
 import (
@@ -31,6 +31,47 @@ func (s *satSolverConflictResolution) traceInitNotLiteral(l Literal) {
 	s.traceAssumptionCoreRecord("resolve_conflict_for_init", 1892, func(w io.Writer) error {
 		_, _ = io.WriteString(w, "not_l: "+l.String()+"\n")
 		return nil
+	})
+}
+
+func (s *satSolverConflictResolution) traceInitLemmaState() {
+	// An isolated conflict owner has no enclosing solver to display. Production
+	// conflict resolution always has the concrete solver bound.
+	if s.solver == nil {
+		return
+	}
+	s.traceAssumptionCoreRecord("resolve_conflict_for_init", 1932, func(w io.Writer) error {
+		if _, err := io.WriteString(w, "lemma: "); err != nil {
+			return err
+		}
+		n, err := s.analysis.lemma.Size()
+		if err != nil {
+			return err
+		}
+		for i := uint32(0); i < n; i++ {
+			l, err := s.analysis.lemma.Read(i)
+			if err != nil {
+				return err
+			}
+			if i != 0 {
+				if _, err := io.WriteString(w, " "); err != nil {
+					return err
+				}
+			}
+			if _, err := io.WriteString(w, Literal(l).String()); err != nil {
+				return err
+			}
+		}
+		if _, err := io.WriteString(w, "\n"); err != nil {
+			return err
+		}
+		if err := s.solver.traceUserDisplayInto(w); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(w, "assignment:\n"); err != nil {
+			return err
+		}
+		return s.solver.traceUserAssignmentInto(w)
 	})
 }
 
