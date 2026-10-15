@@ -135,7 +135,9 @@ func (w *sharingWalk) advance() error {
 }
 
 // Apply follows the source's sequential goal updates: pairs found in an
-// earlier formula can guide the next formula. The result is the input goal.
+// earlier formula can guide the next formula. The result is the input goal
+// with an additional owning reference, as with goal_ref_buffer::push_back.
+// The caller releases the returned reference with DecRef.
 func (p *SharingGoalPass) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error) {
 	if p == nil || p.manager == nil || goal == nil || goal.Manager() != p.manager {
 		return nil, ast.ErrASTHandle
@@ -212,6 +214,9 @@ func (p *SharingGoalPass) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error
 		}
 	}
 	if e := goal.IncDepth(); e != nil {
+		return nil, e
+	}
+	if e := goal.IncRef(); e != nil {
 		return nil, e
 	}
 	return goal, nil

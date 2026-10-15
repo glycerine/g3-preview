@@ -101191,6 +101191,7 @@
       "tests": [
         "TestSharingReducerOrderedPairsReuseAndNumeralPosition",
         "TestSharingGoalPassReusesEarlierFormulaAndUpdatesDepth",
+        "TestSharingGoalPassPublishesIndependentGoalReference",
         "TestSharingGoalPassVisitsQuantifiedBody",
         "TestSharingGoalPassProofChainsCongruenceAndRewrite",
         "TestSharingGoalPassProofQuantifierIntroduction",
@@ -101271,7 +101272,7 @@
         }
       ],
       "ownership": [
-        "The concrete reducer retains cached pair operands and generated apps as AST roots through Close. The goal pass retains rebuilt applications, quantifiers, and proof nodes until goal updates acquire their own roots. Parameter values are copied from the borrowed ParamsContext; full tactic lifecycle remains unported."
+        "The concrete reducer retains cached pair operands and generated apps as AST roots through Close. The goal pass retains rebuilt applications, quantifiers, and proof nodes until goal updates acquire their own roots. On successful publication, Apply adds an independent goal reference corresponding to goal_ref_buffer::push_back; the caller releases it with DecRef. Parameter values are copied from the borrowed ParamsContext; full tactic lifecycle remains unported."
       ],
       "deviations": [
         "The four obj_pair_hashtable<expr,expr> instantiations use typed Go maps keyed by ordered AST-handle pairs; C++ hash buckets are not retained.",
@@ -170950,7 +170951,9 @@
         "pkg/ast/ast_app_coercion.go",
         "pkg/ast/ast_arith_decl_test.go",
         "pkg/ast/rewriter/bv_rewriter_xor.go",
-        "pkg/ast/rewriter/bv_rewriter_xor_numeric_test.go"
+        "pkg/ast/rewriter/bv_rewriter_xor_numeric_test.go",
+        "pkg/tactic/bv/max_bv_sharing_goal.go",
+        "pkg/tactic/bv/max_bv_sharing_reduce_test.go"
       ],
       "tests": [
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
@@ -170998,7 +171001,8 @@
         "TestBoolRewriterConjunctionEliminationReleasesEarlierTemporaryOnLaterFailure",
         "TestASTArithmeticOriginalMixedApplications",
         "TestASTArithmeticAppCoercionEveryWarmReservation",
-        "TestBVRewriterXOREveryActualNumericAndMaskReservation"
+        "TestBVRewriterXOREveryActualNumericAndMaskReservation",
+        "TestSharingGoalPassPublishesIndependentGoalReference"
       ],
       "conditionals": [
         {
@@ -171027,6 +171031,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Concrete max-bv-sharing goal_ref_buffer single-result push acquires an independent goal reference after depth increment (max_bv_sharing_tactic.cpp:265-267)",
+          "status": "ported",
+          "go_target": "pkg/tactic/bv/max_bv_sharing_goal.go",
+          "tests": ["TestSharingGoalPassPublishesIndependentGoalReference"]
+        },
         {
           "name": "Concrete bv_rewriter XOR-mask expr_ref_buffer: source-order extracted-piece pushes, borrowed reverse/concat view, and forward reference destruction after younger not_t (bv_rewriter.cpp:1825-1852)",
           "status": "ported",

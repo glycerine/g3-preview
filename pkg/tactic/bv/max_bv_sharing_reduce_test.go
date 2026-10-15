@@ -362,6 +362,28 @@ func TestSharingGoalPassReusesEarlierFormulaAndUpdatesDepth(t *testing.T) {
 	}
 }
 
+func TestSharingGoalPassPublishesIndependentGoalReference(t *testing.T) {
+	m, _ := sharingFixture(t)
+	goal, e := tactic.NewGoal(m, false, false, false)
+	sharingMust(t, e)
+	sharingMust(t, goal.IncRef()) // The source's incoming goal_ref.
+	pass, e := NewSharingGoalPass(m, 128)
+	sharingMust(t, e)
+	result, e := pass.Apply(goal)
+	sharingMust(t, e)
+	if result != goal || goal.RefCount != 2 {
+		t.Fatal("goal result must acquire its own reference", result, goal.RefCount)
+	}
+	sharingMust(t, goal.DecRef()) // Release the incoming goal_ref.
+	if goal.Closed || goal.RefCount != 1 {
+		t.Fatal("result reference must keep goal alive", goal.Closed, goal.RefCount)
+	}
+	sharingMust(t, result.DecRef()) // Release the result buffer entry.
+	if !goal.Closed {
+		t.Fatal("last result reference must retire goal")
+	}
+}
+
 func TestSharingGoalPassVisitsQuantifiedBody(t *testing.T) {
 	m, fid := sharingFixture(t)
 	sort, e := m.BitVectorSort(8)
