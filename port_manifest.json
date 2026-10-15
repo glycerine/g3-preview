@@ -159195,7 +159195,7 @@
           ]
         },
         {
-          "name": "Direct rational inverse, rational/mixed division, acc_div and rat_div component publication; debug-only integrality on eight integer division/rem/mod forwards",
+          "name": "Remaining rational/mixed division, acc_div and rat_div component publication; debug-only integrality on eight integer division/rem/mod forwards",
           "status": "partial",
           "go_target": "pkg/util/numeral/mp_div_publication_test.go",
           "tests": [
@@ -159216,6 +159216,12 @@
             "TestDivisionPublicationInverseCopyFailureBeforeDebugAssertion",
             "TestDivisionPublicationInverseTwoMinNegActions"
           ]
+        },
+        {
+          "name": "mpq_manager::inv in-place and copy-then-invert overloads: zero debug gate, sign normalization, component swap, receiver aliases and cold allocation refusal (mpq.h:443-455)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpq.go",
+          "tests": ["TestRationalSourceDivAndInverseAliases", "TestRationalCheckedInitializationAndZero", "TestRationalColdInverseFailureCleanup", "TestDivisionPublicationInverseInPlaceOverload", "TestDivisionPublicationInverseMinNegFailureOrder", "TestDivisionPublicationInverseCopyFailureBeforeDebugAssertion", "TestDivisionPublicationInverseTwoMinNegActions"]
         },
         {
           "name": "Direct additive and mixed-product caller publication; source fused/unit and Inc/Dec dependency routes",
