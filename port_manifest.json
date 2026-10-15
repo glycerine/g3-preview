@@ -178220,6 +178220,12 @@
           "tests": ["TestSATCollectBinaryClausesSourceTraceOrder"]
         },
         {
+          "name": "Reached SAT consequence-core fixup TRACE before union, for each antecedent row, and after ordered-core rebuild (sat_solver.cpp:3287,3289,3297)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_consequences_trace.go",
+          "tests": ["TestSATConsequenceCoreFixupSourceTraceOrder"]
+        },
+        {
           "name": "Reached SAT missed-propagation TRACE before unreachable assertion for live empty and unit clauses (sat_solver.cpp:3061)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_probing_diagnostics_trace.go",
@@ -179523,6 +179529,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_inspection_trace.go",
           "tests": ["TestSATCollectBinaryClausesSourceTraceOrder"]
+        },
+        {
+          "name": "Reached SAT consequence-core fixup TRACE before union, for each antecedent row, and after ordered-core rebuild (sat_solver.cpp:3287,3289,3297)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_consequences_trace.go",
+          "tests": ["TestSATConsequenceCoreFixupSourceTraceOrder"]
         },
         {
           "name": "Reached SAT missed-propagation TRACE before unreachable assertion for live empty and unit clauses (sat_solver.cpp:3061)",

@@ -422,6 +422,7 @@ func (s *Solver) fixupConsequenceCore() (err error) {
 	}
 	defer func() { err = s.consequenceDrop(f, err) }()
 	f.indexSet()
+	s.traceConsequenceCore(3287)
 	for i := uint32(0); ; i++ {
 		n, e := s.conflict.core.Size()
 		if e != nil {
@@ -438,6 +439,7 @@ func (s *Solver) fixupConsequenceCore() (err error) {
 		if e != nil {
 			return e
 		}
+		s.traceConsequenceAntecedents(Literal(l), other)
 		if err = f.index.union(other); err != nil {
 			return err
 		}
@@ -455,6 +457,7 @@ func (s *Solver) fixupConsequenceCore() (err error) {
 			return e
 		}
 		if !v.present {
+			s.traceConsequenceCore(3297)
 			return nil
 		}
 		if err = s.conflict.core.Push(v.value); err != nil {
