@@ -62,6 +62,7 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 	d, err := diagnostic.NewDebugContext(region, b)
 	must(t, err)
 	previousDebug := diagnostic.BorrowProcessDebugContext()
+	previousParams := params.BorrowProcessGlobalParamsService()
 	var traceOutput bytes.Buffer
 	tr := diagnostic.NewTraceTagsWithWriter(&traceOutput)
 	tr.Enable("gparams")
@@ -79,8 +80,14 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 		t.Fatal("generated initialization did not publish its parameter owners")
 	}
 	g := init.Globals
+	if params.BorrowProcessGlobalParamsService() != g {
+		t.Fatal("generated initialization did not publish the process global params service")
+	}
 	if again, err := InitializeGenerated(InitializationConfig{Runtime: m}, 1<<25); err != nil || again != nil {
 		t.Fatal("repeated generated initialization", again, err)
+	}
+	if params.BorrowProcessGlobalParamsService() != g {
+		t.Fatal("repeated generated initialization changed the process global params service")
 	}
 	symbols, err := s.Manager()
 	must(t, err)
@@ -130,6 +137,9 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 	}
 	must(t, FinalizeGenerated(p, nil, nil, nil, nil, nil))
 	must(t, init.Close())
+	if params.BorrowProcessGlobalParamsService() != previousParams {
+		t.Fatal("generated close did not restore the prior process global params service")
+	}
 	if diagnostic.BorrowProcessDebugContext() != previousDebug {
 		t.Fatal("generated close did not restore the prior process debug owner")
 	}

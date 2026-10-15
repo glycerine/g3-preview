@@ -31,13 +31,15 @@ type InitializationConfig struct {
 // remain with the caller. A partial result is returned with any stage error so
 // its completed Go owners can still be closed.
 type Initialized struct {
-	self          *Initialized
-	Context       *params.ParamsContext
-	Catalog       *params.GlobalParamsCatalog
-	Globals       *params.GlobalParamsService
-	Trace         *diagnostic.TraceTags
-	debugPrevious *diagnostic.DebugContext
-	closed        bool
+	self           *Initialized
+	Context        *params.ParamsContext
+	Catalog        *params.GlobalParamsCatalog
+	Globals        *params.GlobalParamsService
+	Trace          *diagnostic.TraceTags
+	debugPrevious  *diagnostic.DebugContext
+	paramsPrevious *params.GlobalParamsService
+	paramsBound    bool
+	closed         bool
 }
 
 // InitializeGenerated executes the first-call source order. A repeated call
@@ -120,6 +122,11 @@ func InitializeGenerated(c InitializationConfig, maxSize uint64) (*Initialized, 
 	if err = result.Globals.InitializeSource(); err != nil {
 		return result, err
 	}
+	result.paramsPrevious, err = params.BindProcessGlobalParamsService(result.Globals)
+	if err != nil {
+		return result, err
+	}
+	result.paramsBound = true
 	if err = c.Runtime.CompleteSourceInitialize(); err != nil {
 		return result, err
 	}
@@ -144,6 +151,13 @@ func (v *Initialized) Close() error {
 			return err
 		}
 		v.Globals = nil
+	}
+	if v.paramsBound {
+		if _, err := params.BindProcessGlobalParamsService(v.paramsPrevious); err != nil {
+			return err
+		}
+		v.paramsPrevious = nil
+		v.paramsBound = false
 	}
 	if v.Catalog != nil {
 		if err := v.Catalog.Close(); err != nil {

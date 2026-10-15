@@ -120580,7 +120580,7 @@
         "Frozen binding7 was superseded for actual lvalue capture: old putReached reevaluated current source field at store; corrected8 acquires both addresses before loads. Direct retained pointer-exchange proof is source pointer representation evidence, not ordinary source allocator failure credit.",
         "Reciprocal binding guard is concrete Go owner/config-domain enforcement of the documented single source std::cerr reference; it does not establish process-global standard stream initialization or native ABI.",
         "Existing utilhash.StrHashtable storage is Budget-backed pointer-free Go table, not memory.Runtime; actual global Runtime table/allocator accounting migration remains required next prerequisite",
-        "One explicit caller-supplied source global namespace; no package singleton/independent process Runtime adoption or native stdio static constructor claim",
+        "Generated process initialization publishes one current gparams service binding and owning close restores its predecessor; independent process Runtime adoption and native stdio static constructor remain open",
         "Default direct-Go file emission/classic input/flush profiles; native iostream locale/buffering/throwmask/unitbuf ABI and nonLinux OS/debugbreak remain qualified",
         "Continued null g_imp is reached typed native-undefined-domain guard; no defined native nullptr continuation or source math-regression claim",
         "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion",
@@ -120917,7 +120917,7 @@
         "Per-instance borrowed debug contexts represent selected source-global namespace; independent unrelated contexts are not a completed process-global registry binding",
         "Outer check_invariant always returns true after nested C continuation; no observed false outer CASSERT or fabricated source line0 regression claim",
         "Existing utilhash.StrHashtable storage is Budget-backed pointer-free Go table, not memory.Runtime; actual global Runtime table/allocator accounting migration remains required next prerequisite",
-        "One explicit caller-supplied source global namespace; no package singleton/independent process Runtime adoption or native stdio static constructor claim",
+        "Generated process initialization publishes one current gparams service binding and owning close restores its predecessor; independent process Runtime adoption and native stdio static constructor remain open",
         "Default direct-Go file emission/classic input/flush profiles; native iostream locale/buffering/throwmask/unitbuf ABI and nonLinux OS/debugbreak remain qualified",
         "Continued null g_imp is reached typed native-undefined-domain guard; no defined native nullptr continuation or source math-regression claim",
         "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion",
@@ -123039,6 +123039,13 @@
           "tests": []
         },
         {
+          "name": "generated process initialization publishes the current gparams service for retained process callers and owning close restores the prior binding",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_gparams_process_binding.go",
+          "go_targets": ["pkg/util/process/initialize.go"],
+          "tests": ["TestGeneratedInitializeAndFinalizeConcreteServices"]
+        },
+        {
           "name": "gparams namespace display forwarding to direct borrowed writer with source insertion order and sticky ostream failure (gparams.cpp:612-631)",
           "status": "ported",
           "go_target": "pkg/util/params/util_gparams_service_writer.go",
@@ -123065,7 +123072,7 @@
         "Explicit single-lane namespace binding, not process singleton/generated memory lifecycle. TRACE, native ostream/global stdout, global notification/debugger behavior and wider physical ABI/accounting remain open. Null current pointer with erased/disabled assertion reaches a typed undefined-pointer-domain guard. Symbol bare_str assertion uses actual numeric scalar at source argument site; numeric source ternary routes empty-name engine even with assertions disabled in debug. Independent fixtures give no registered driver credit.",
         "Caller-confined assertion binding does not complete process-global macros, debugger notification, TRACE, or native ostream/ABI. Null-imp and closed-context cases are explicitly checked diagnostic domains.",
         "Existing utilhash.StrHashtable storage is Budget-backed pointer-free Go table, not memory.Runtime; actual global Runtime table/allocator accounting migration remains required next prerequisite",
-        "One explicit caller-supplied source global namespace; no package singleton/independent process Runtime adoption or native stdio static constructor claim",
+        "Generated process initialization publishes one current gparams service binding and owning close restores its predecessor; independent process Runtime adoption and native stdio static constructor remain open",
         "Default direct-Go file emission/classic input/flush profiles; native iostream locale/buffering/throwmask/unitbuf ABI and nonLinux OS/debugbreak remain qualified",
         "Continued null g_imp is reached typed native-undefined-domain guard; no defined native nullptr continuation or source math-regression claim",
         "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion",
@@ -123249,6 +123256,13 @@
             "TestGlobalParamsNamespaceNativeSymbolConstructionBeforeNull",
             "TestGlobalParamsNamespaceClosedDebugReadAfterSourceModuleArgument"
           ]
+        },
+        {
+          "name": "generated process initialization publishes the current gparams service for retained process callers and owning close restores the prior binding",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_gparams_process_binding.go",
+          "go_targets": ["pkg/util/process/initialize.go"],
+          "tests": ["TestGeneratedInitializeAndFinalizeConcreteServices"]
         },
         {
           "name": "gparams namespace display forwarding to direct borrowed writer with source insertion order and sticky ostream failure (gparams.cpp:612-631)",
@@ -176372,7 +176386,7 @@
         "Interning uses native map lookup and typed slice append, with strings.Clone to avoid retaining an input suffix. Cached source hash values remain observable, but raw size_t prefixes, physical NUL bytes, region descriptors and arena allocation failures for spellings are removed. Returned Go strings remain safe after manager close; explicitly borrowed views retain owner validation.",
         "Source null/marked/numeric-invalid data operations return typed precondition errors instead of invalid dereferences; identical marked/dummy Less still returnsfalse before dereference as source.",
         "Existing utilhash.StrHashtable storage is Budget-backed pointer-free Go table, not memory.Runtime; actual global Runtime table/allocator accounting migration remains required next prerequisite",
-        "One explicit caller-supplied source global namespace; no package singleton/independent process Runtime adoption or native stdio static constructor claim",
+        "Generated process initialization publishes one current gparams service binding and owning close restores its predecessor; independent process Runtime adoption and native stdio static constructor remain open",
         "Default direct-Go file emission/classic input/flush profiles; native iostream locale/buffering/throwmask/unitbuf ABI and nonLinux OS/debugbreak remain qualified",
         "Continued null g_imp is reached typed native-undefined-domain guard; no defined native nullptr continuation or source math-regression claim",
         "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion",
