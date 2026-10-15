@@ -39,6 +39,19 @@ func (b *RationalNumericBorrow) Ready() error {
 	}
 	return b.service.lexicalReady()
 }
+
+// BorrowInfIntFirst is the source inf_int_rational::get_first/get_rational
+// const-reference read. The returned scalar borrows its owner's integer cells
+// and is valid only during this numeric-borrow callback.
+func (b *RationalNumericBorrow) BorrowInfIntFirst(v *OwnedInfIntRational) (Rational, error) {
+	if !b.Valid() {
+		return Rational{}, ErrRationalServiceOwner
+	}
+	if e := b.service.infIntScalarOwner(v); e != nil {
+		return Rational{}, e
+	}
+	return v.First, nil
+}
 func (b *RationalNumericBorrow) Integers() *IntegerManager {
 	if !b.Valid() {
 		return nil

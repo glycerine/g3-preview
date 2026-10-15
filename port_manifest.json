@@ -125950,6 +125950,7 @@
         "pkg/util/numeral/mp_lexical_scope_test.go",
         "pkg/util/numeral/mp_raw_projection_test.go",
         "pkg/util/numeral/rational_lexical_scope.go",
+        "pkg/util/numeral/rational_numeric_borrow.go",
         "pkg/util/numeral/inf_arithmetic_entry_source_test.go",
         "pkg/util/numeral/inf_muldiv_entry_source_test.go"
       ],
@@ -125964,6 +125965,7 @@
         "TestInfIntRationalAliasReReadWarmReuseAndGuards",
         "TestInfIntRationalIncrementSourceRationalRoute",
         "TestInfIntRationalPostFailureAndGetterIndependence",
+        "TestInfIntFirstSourceBorrowHasNoCopyOrDenominatorRead",
         "TestRationalServiceInfinitesimalHeaderOwnership",
         "TestRationalServiceInfinitesimalConstructorFailureRefunds",
         "TestRationalServiceInfinitesimalFinalizerTraversal",
@@ -126120,6 +126122,12 @@
             "TestRationalServiceInfinitesimalFinalizerTraversal",
             "TestInfHashesStopBeforeCombiningFailedComponent"
           ]
+        },
+        {
+          "name": "get_first and get_rational borrowed FIRST component without copy or denominator read (inf_int_rational.h:122-130)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/rational_numeric_borrow.go",
+          "tests": ["TestInfIntFirstSourceBorrowHasNoCopyOrDenominatorRead"]
         },
         {
           "name": "numerator/denominator: debug zero-epsilon assertion, first-component rational extraction and owning inf_int_rational result (inf_int_rational.h:144-152)",
@@ -126309,9 +126317,9 @@
       ],
       "deviations": [
         "Whole-source call-site audit: the only non-util inf_int_rational type consumer is the unported SMT theory_diff_logic specialization; no source call site instantiates its hash_proc or eq_proc structs. Keep direct hash and equality algorithms separate from these unused wrappers.",
-        "Global constants and borrowed rational accessors are owner-local/independent-copy adapters. Signed32 overflow, INT_MIN negation and formatting negation are explicit typed undefined-domain failures with source defined prefixes retained.",
+        "Global constants and the older owned-output rational accessors are owner-local/independent-copy adapters; get_first/get_rational also have an actual borrow through the locked numeric-borrow scope. Signed32 overflow, INT_MIN negation and formatting negation are explicit typed undefined-domain failures with source defined prefixes retained.",
         "No registered source inf_int_rational test exists; independent finite/fault/alias/ownership checks are supplied without inventing source assertion coverage.",
-        "Source h129\u2013137 returns FIRST without a denominator-domain assertion; InfIntFirst/Rational/Infinitesimal still enter ordinary checkInfInt and owning Copy, rejecting source-finite raw denominator0 and inspecting unrelated FIRST before constructing epsilon. Sign/hash NUM-only routes retain separate raw-domain debt.",
+        "Source h122-130 returns FIRST by const reference. BorrowInfIntFirst now exposes that read without copy, including raw denominator0; the older InfIntFirst/Rational owned-output adapters still perform a separate copy. Sign/hash NUM-only routes and the owned infinitesimal output retain separate raw-domain and cleanup debt.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion.",
         "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
         "Eleven Mul/Div regression groups include five tests-first source-order defects plus honest existing-behavior confirmations, independent bounded rational oracle, alias rereads and warm ownership checks. No additional registered source assertions or whole-header completion credited; raw MPQ10 and facade lexical9 bounds unchanged."
