@@ -83,11 +83,11 @@ func (c *GlobalParamsCatalog) open() error {
 	}
 	return nil
 }
-func (c *GlobalParamsCatalog) newDescriptors(onAllocated func(*ParamDescrs)) (*ParamDescrs, error) {
-	return NewParamDescrs(c.symbols, ParamDescrsConfig{Budget: c.budget, Text: c.text, onAllocated: onAllocated})
+func (c *GlobalParamsCatalog) newDescriptors(owner *GlobalParams, onAllocated func(*ParamDescrs)) (*ParamDescrs, error) {
+	return NewParamDescrs(c.symbols, ParamDescrsConfig{Budget: c.budget, Text: c.text, onAllocated: onAllocated, memoryOwner: owner})
 }
 func (c *GlobalParamsCatalog) global(r GlobalParamsRegistrar, collector func(*ParamDescrs) error) error {
-	d, e := c.newDescriptors(nil)
+	d, e := c.newDescriptors(r.owner, nil)
 	if e != nil {
 		return e
 	}
@@ -98,7 +98,7 @@ func (c *GlobalParamsCatalog) global(r GlobalParamsRegistrar, collector func(*Pa
 	return r.RegisterGlobal(d)
 }
 func (c *GlobalParamsCatalog) module(r GlobalParamsRegistrar, sourceLine int, name string, collector func(*ParamDescrs) error) error {
-	d, e := c.newDescriptors(func(d *ParamDescrs) { r.owner.traceModuleDescriptorAllocated(d, sourceLine) })
+	d, e := c.newDescriptors(r.owner, func(d *ParamDescrs) { r.owner.traceModuleDescriptorAllocated(d, sourceLine) })
 	if e != nil {
 		return e
 	}

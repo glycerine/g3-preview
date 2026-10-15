@@ -92,6 +92,7 @@ type ParamDescrsConfig struct {
 	InitialCapacity uint32
 	Text            arena.VectorConfig
 	onAllocated     func(*ParamDescrs)
+	memoryOwner     *GlobalParams
 }
 type paramDescrText struct {
 	value   string
@@ -123,6 +124,7 @@ type ParamDescrs struct {
 	constructorCompleted uint8
 	constructorCause     error
 	OwnerBytes           uint64
+	memoryOwner          *GlobalParams
 }
 
 func prepareSourceParamDescrs(m *usymbol.Manager, c ParamDescrsConfig) (ParamDescrsConfig, error) {
@@ -154,11 +156,12 @@ func newSourceParamDescrs(m *usymbol.Manager, c ParamDescrsConfig) (*ParamDescrs
 	if e := c.Budget.Reserve(owner); e != nil {
 		return nil, e
 	}
-	d := &ParamDescrs{manager: m, Budget: c.Budget, OwnerBytes: owner}
+	d := &ParamDescrs{manager: m, Budget: c.Budget, OwnerBytes: owner, memoryOwner: c.memoryOwner}
 	d.Self = d
 	if c.onAllocated != nil {
 		c.onAllocated(d) // source alloc(param_descrs) precedes member construction
 	}
+	d.traceImpAllocated()
 	if e := d.constructSourceMembers(c); e != nil {
 		return d, e
 	}
@@ -652,6 +655,7 @@ func (d *ParamDescrs) Close() error {
 	d.entries = nil
 	d.Names = nil
 	d.closed = true
+	d.traceImpDeallocated()
 	return nil
 }
 func InsertMaxMemory(d *ParamDescrs) error {
@@ -695,6 +699,7 @@ func (d *ParamDescrs) closeSourceMembers() error {
 	d.Budget.Release(d.OwnerBytes)
 	d.OwnerBytes = 0
 	d.closed = true
+	d.traceImpDeallocated()
 	return nil
 }
 
@@ -704,8 +709,9 @@ func (d *ParamDescrs) InitEmbeddedSource(m *usymbol.Manager, c ParamDescrsConfig
 	if e != nil {
 		return e
 	}
-	*d = ParamDescrs{manager: m, Budget: cfg.Budget}
+	*d = ParamDescrs{manager: m, Budget: cfg.Budget, memoryOwner: cfg.memoryOwner}
 	d.Self = d
+	d.traceImpAllocated()
 	return d.constructSourceMembers(cfg)
 }
 func (d *ParamDescrs) ConstructorReady() bool       { return d.constructorReady }

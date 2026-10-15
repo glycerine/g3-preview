@@ -138,7 +138,7 @@ func newSourceGlobalParams(s *usymbol.Manager, p *ParamsContext, c GlobalParamsC
 	g.constructorCompleted = 1
 	g.ModuleDescriptions.init()
 	g.constructorCompleted = 2
-	d, e := newSourceParamDescrs(s, ParamDescrsConfig{Budget: c.Budget, Text: arena.VectorConfig{PageSize: c.DescriptorWordsPageSize, Descriptors: arena.Config{PageSize: c.DescriptorPageSize, Budget: c.Budget}}})
+	d, e := newSourceParamDescrs(s, ParamDescrsConfig{Budget: c.Budget, Text: arena.VectorConfig{PageSize: c.DescriptorWordsPageSize, Descriptors: arena.Config{PageSize: c.DescriptorPageSize, Budget: c.Budget}}, memoryOwner: g})
 	if e != nil {
 		g.constructorPendingDescriptor = d
 		return fail(e)
