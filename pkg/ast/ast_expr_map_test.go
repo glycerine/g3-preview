@@ -47,6 +47,41 @@ func TestASTExprMapStoppedProofCleanupPrecedesExpressionEntries(t *testing.T) {
 	}
 }
 
+func TestASTExprMapStoppedValueCleanupKeepsConsumedKeyProgress(t *testing.T) {
+	if !ASTSourceDebug {
+		t.Skip("source table assertion is compiled out")
+	}
+	m := astTestManager(t)
+	nodes := markTestNodes(t, m, 2)
+	key, value := nodes[0], nodes[1]
+	astTestMust(t, m.IncRef(key))
+	s, e := NewASTExprMapWithProofs(m, false)
+	astTestMust(t, e)
+	astTestMust(t, s.Insert(key, value, ASTHandle{}))
+	valueNode, e := m.requireExpr(value)
+	astTestMust(t, e)
+	astTestMust(t, m.tableEraseIdentity(valueNode))
+	if e = s.Reset(); !errors.Is(e, ErrASTDomain) {
+		t.Fatalf("stopped expression value release: %v", e)
+	}
+	if refs, e := m.GetRefCount(key); e != nil || refs != 1 {
+		t.Fatalf("key decrement must precede value stop: %d, %v", refs, e)
+	}
+	if len(s.entries) != 1 {
+		t.Fatal("source map reset must wait for the value decrement")
+	}
+	if _, inserted, e := m.tableInsert(valueNode); e != nil || !inserted {
+		t.Fatalf("restore value table entry: %v, %v", inserted, e)
+	}
+	astTestMust(t, s.Reset())
+	if len(s.entries) != 0 {
+		t.Fatal("owning reset did not finish the stopped entry")
+	}
+	astTestMust(t, m.deleteNode(valueNode))
+	astTestMust(t, s.Close())
+	astTestMust(t, m.DecRef(key))
+}
+
 func TestASTExprMapConcreteReferenceCleanup(t *testing.T) {
 	m := astTestManager(t)
 	nodes := markTestNodes(t, m, 3)

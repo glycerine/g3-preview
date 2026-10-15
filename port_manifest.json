@@ -171778,12 +171778,13 @@
           ]
         },
         {
-          "name": "Concrete expr_map reset/flush dec_ref_map_values for proofs before dec_ref_map_key_values for expressions; stopped proof deletion leaves expression entries owned and resumable, while successful completion clears both native maps (src/ast/expr_map.cpp:85-94)",
+          "name": "Concrete expr_map reset/flush dec_ref_map_values for proofs before dec_ref_map_key_values for expressions; stopped proof or expression-value deletion retains only unconsumed ownership, while successful completion clears both native maps (src/ast/expr_map.cpp:85-94)",
           "status": "ported",
           "go_target": "pkg/ast/ast_expr_map.go",
           "tests": [
             "TestASTExprMapConcreteReferenceCleanup",
-            "TestASTExprMapStoppedProofCleanupPrecedesExpressionEntries"
+            "TestASTExprMapStoppedProofCleanupPrecedesExpressionEntries",
+            "TestASTExprMapStoppedValueCleanupKeepsConsumedKeyProgress"
           ]
         },
         {
