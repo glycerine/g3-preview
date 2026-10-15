@@ -54384,6 +54384,12 @@
           "tests": ["TestRationalUnitTracePrecedesReferenceAndPublication", "TestRationalUnitTraceFailureBoundaries"]
         },
         {
+          "name": "Concrete config_mpq add_clause_core sorted-clause TRACE after references, watches and publication (subpaving_t_def.h:802-841)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_clause_trace.go",
+          "tests": ["TestRationalClauseTraceSortedAfterOwnership", "TestRationalClauseTraceRefusalAndPrinterFailureKeepClause"]
+        },
+        {
           "name": "Concrete config_hwf mk_var, mk_sum, and mk_ineq construction with sorted duplicate coefficient swaps (src/math/subpaving/subpaving_t_def.h:666-687,741-780)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/hardware_context_constraints.go",
@@ -176941,6 +176947,12 @@
           "tests": ["TestRationalUnitTracePrecedesReferenceAndPublication", "TestRationalUnitTraceFailureBoundaries"]
         },
         {
+          "name": "Reached config_mpq add_clause_core sorted-clause TRACE after references and publication (subpaving_t_def.h:841)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_clause_trace.go",
+          "tests": ["TestRationalClauseTraceSortedAfterOwnership", "TestRationalClauseTraceRefusalAndPrinterFailureKeepClause"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -177721,6 +177733,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_unit_trace.go",
           "tests": ["TestRationalUnitTracePrecedesReferenceAndPublication", "TestRationalUnitTraceFailureBoundaries"]
+        },
+        {
+          "name": "Reached config_mpq add_clause_core sorted-clause TRACE after references and publication (subpaving_t_def.h:841)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_clause_trace.go",
+          "tests": ["TestRationalClauseTraceSortedAfterOwnership", "TestRationalClauseTraceRefusalAndPrinterFailureKeepClause"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

@@ -65,6 +65,9 @@ func (c *RationalContext) AddClause(atoms []*RationalInequality) (*RationalClaus
 		}
 	}
 	c.clauses = append(c.clauses, clause)
+	if err := c.traceNewClause(clause); err != nil {
+		return clause, err
+	}
 	return clause, nil
 }
 
