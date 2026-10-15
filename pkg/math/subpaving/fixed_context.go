@@ -124,6 +124,25 @@ func (c *FixedContext) open() error {
 	return nil
 }
 
+// NewVariable is the reached context_t<config_mpfx>::mk_var path before
+// definition and bound initialization. The root's views grow with the source
+// variable, definition and watch vectors.
+func (c *FixedContext) NewVariable(integer bool) (uint32, error) {
+	if err := c.open(); err != nil {
+		return 0, err
+	}
+	if len(c.isInt) >= math.MaxUint32 || c.initStage != 0 || c.root.children != 0 || c.root.trail != nil {
+		return 0, arena.ErrInvalidSlot
+	}
+	x := uint32(len(c.isInt))
+	c.isInt = append(c.isInt, integer)
+	c.watchers = append(c.watchers, nil)
+	c.watchOrder = append(c.watchOrder, nil)
+	c.root.lower = append(c.root.lower, nil)
+	c.root.upper = append(c.root.upper, nil)
+	return x, nil
+}
+
 func (c *FixedContext) closeNumerals() (err error) {
 	for _, v := range []*numeral.FixedPoint{c.epsilon, c.maxBound, c.minusMaxBound, c.rootPrecision} {
 		if v != nil {

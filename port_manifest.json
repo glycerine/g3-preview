@@ -51366,6 +51366,8 @@
         "pkg/math/subpaving/hardware_context_root.go",
         "pkg/math/subpaving/tactic/options_test.go",
         "pkg/math/subpaving/fast_shell_coefficients.go",
+        "pkg/math/subpaving/fixed_shell_coefficients.go",
+        "pkg/math/subpaving/fixed_shell_coefficients_test.go",
         "pkg/math/subpaving/fast_context_params.go",
         "pkg/math/subpaving/tactic/fast_engine.go",
         "pkg/math/subpaving/tactic/fast_engine_test.go",
@@ -51524,6 +51526,13 @@
           "tests": [
             "TestArbitraryContextNamedParamsSourceOrderAndDescriptions"
           ]
+        },
+        {
+          "name": "Concrete context_mpfx wrapper integer round-trip coefficient conversion, grow-only scoped vector, mk_sum and directed mk_ineq (subpaving.cpp:198-260)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_shell_coefficients.go",
+          "go_targets": ["pkg/math/subpaving/fixed_context.go", "pkg/math/subpaving/fixed_shell_coefficients_test.go"],
+          "tests": ["TestFixedShellExactCoefficientOwnerAndDirectedBound"]
         },
         {
           "name": "Concrete context_mpff_wrapper integer coefficient round trip, directed rational inequality and typed clause/definition forwarding (src/math/subpaving/subpaving.cpp:198-250)",
@@ -53243,6 +53252,12 @@
           ]
         },
         {
+          "name": "Concrete config_mpfx wrapper variable registration grows native kind, watcher and root-view slices before definitions (subpaving_t_def.h:681-688)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_context.go",
+          "tests": ["TestFixedShellExactCoefficientOwnerAndDirectedBound"]
+        },
+        {
           "name": "Concrete config_mpff tactic variable registration before root initialization (src/math/subpaving/subpaving_t_def.h:630-637)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fast_context.go",
@@ -54669,6 +54684,12 @@
           "tests": [
             "TestArbitraryContextNamedParamsSourceOrderAndDescriptions"
           ]
+        },
+        {
+          "name": "Concrete config_mpfx wrapper variable registration grows native kind, watcher and root-view slices before definitions (subpaving_t_def.h:681-688)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_context.go",
+          "tests": ["TestFixedShellExactCoefficientOwnerAndDirectedBound"]
         },
         {
           "name": "Concrete config_mpff tactic variable registration before root initialization (src/math/subpaving/subpaving_t_def.h:630-637)",
@@ -171828,6 +171849,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
+        "pkg/math/subpaving/fixed_shell_coefficients.go",
         "pkg/math/subpaving/rational_shell_coefficients.go",
         "pkg/math/subpaving/rational_shell_coefficients_test.go",
         "pkg/math/subpaving/arbitrary_context_params_test.go",
@@ -172163,6 +172185,12 @@
           "tests": ["TestASTSMT2FloatRealLiteralUsesActualNumeralTextAndFormat", "TestASTSMT2FloatDefaultBitVectorFields", "TestASTSMT2FloatRealLiteralEveryActualReservationPrefix", "TestASTSMT2FloatDefaultEveryActualReservation"]
         },
         {
+          "name": "Concrete context_mpfx wrapper scoped fixed-point scalar and integer scratch lifetimes with reverse member cleanup (subpaving.cpp:198-260)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_shell_coefficients.go",
+          "tests": ["TestFixedShellExactCoefficientOwnerAndDirectedBound"]
+        },
+        {
           "name": "Remaining concrete inherited scoped_mpf scalar lifetimes at retained AST FPA rewriter, SMT theory and FPA API callers (src/util/scoped_numeral.h:24-171; src/util/mpf.h:300-324)",
           "status": "unported",
           "tests": []
@@ -172366,6 +172394,8 @@
         "pkg/ast/ast_fpa_scoped_values_source_test.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients_test.go",
+        "pkg/math/subpaving/fixed_shell_coefficients.go",
+        "pkg/math/subpaving/fixed_shell_coefficients_test.go",
         "pkg/math/subpaving/rational_polynomial.go",
         "pkg/math/subpaving/rational_context_root.go",
         "pkg/math/subpaving/rational_polynomial_test.go",
@@ -172582,6 +172612,12 @@
             "TestRationalShellPersistentCoefficientGrowthAndContextTransfer",
             "TestRationalExprConverterExactLeafGoalAndCleanup"
           ]
+        },
+        {
+          "name": "Concrete context_mpfx scoped fixed-point coefficient vector reserve, indexed conversion and ascending destruction (subpaving.cpp:232-240)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_shell_coefficients.go",
+          "tests": ["TestFixedShellExactCoefficientOwnerAndDirectedBound"]
         },
         {
           "name": "remaining retained concrete scoped numeral vector specializations in unported owning consumers",

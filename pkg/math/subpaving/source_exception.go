@@ -33,3 +33,12 @@ func sourceArbitraryFailure(err error) error {
 	}
 	return err
 }
+
+// The concrete MPFX wrapper catches its numeral-manager exception, including
+// overflow, at coefficient, inequality and context construction boundaries.
+func sourceFixedFailure(err error) error {
+	if errors.Is(err, numeral.ErrFixedPointDomain) {
+		return ErrSubpavingFailure
+	}
+	return err
+}
