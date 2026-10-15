@@ -26,6 +26,15 @@ type goalFormulaConverter struct {
 	frames []goalAIGFrame
 }
 
+func (c *goalFormulaConverter) base(n *node) (ast.ASTHandle, error) {
+	if n.and {
+		if _, found := c.cache[n]; !found {
+			c.manager.traceInvalidGoalCache(n)
+		}
+	}
+	return c.formulaConverter.base(n)
+}
+
 func (c *goalFormulaConverter) cached(n *node) bool {
 	if !n.and {
 		return true

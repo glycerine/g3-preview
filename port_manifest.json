@@ -98182,7 +98182,8 @@
         "TestAIGExprCacheReleaseTracePrecedesLastReference",
         "TestAIGTacticConstructorFailureMemoryTracePrefixes",
         "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
-        "TestAIGMaxSharingTryingTraceAllFourReassociationBranches"
+        "TestAIGMaxSharingTryingTraceAllFourReassociationBranches",
+        "TestAIGGoalConversionMissingCacheConditionalTrace"
       ],
       "conditionals": [
         {
@@ -98489,7 +98490,8 @@
           "go_target": "pkg/tactic/aig/aig_goal_formula.go",
           "tests": [
             "TestAIGToGoalSourceRootOrderAndITE",
-            "TestAIGToGoalFlattensSingleUsePositiveAndUnderNegation"
+            "TestAIGToGoalFlattensSingleUsePositiveAndUnderNegation",
+            "TestAIGGoalConversionMissingCacheConditionalTrace"
           ]
         },
         {
@@ -98529,6 +98531,14 @@
           "go_target": "pkg/tactic/aig/aig_expr_cache_trace.go",
           "tests": [
             "TestAIGExprCacheReleaseTracePrecedesLastReference"
+          ]
+        },
+        {
+          "name": "aig2expr conditional invalid-get-cached TRACE before source assertion and lookup",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_goal_conversion_trace.go",
+          "tests": [
+            "TestAIGGoalConversionMissingCacheConditionalTrace"
           ]
         },
         {
@@ -98606,7 +98616,8 @@
         "TestAIGManagerSeparateImpChargesAndConstructorPrefixes",
         "TestAIGTacticConstructorFailureMemoryTracePrefixes",
         "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
-        "TestAIGMaxSharingTryingTraceAllFourReassociationBranches"
+        "TestAIGMaxSharingTryingTraceAllFourReassociationBranches",
+        "TestAIGGoalConversionMissingCacheConditionalTrace"
       ],
       "conditionals": [
         {
@@ -98672,7 +98683,8 @@
           "go_target": "pkg/tactic/aig/aig_goal_formula.go",
           "tests": [
             "TestAIGToGoalSourceRootOrderAndITE",
-            "TestAIGToGoalFlattensSingleUsePositiveAndUnderNegation"
+            "TestAIGToGoalFlattensSingleUsePositiveAndUnderNegation",
+            "TestAIGGoalConversionMissingCacheConditionalTrace"
           ]
         },
         {
@@ -179313,7 +179325,8 @@
         "TestAIGExprCacheReleaseTracePrecedesLastReference",
         "TestAIGGoalConversionCacheAndAuxTraceSourceOrder",
         "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
-        "TestAIGMaxSharingTryingTraceAllFourReassociationBranches"
+        "TestAIGMaxSharingTryingTraceAllFourReassociationBranches",
+        "TestAIGGoalConversionMissingCacheConditionalTrace"
       ],
       "conditionals": [
         {
@@ -180671,6 +180684,14 @@
           ]
         },
         {
+          "name": "Retained aig2expr conditional invalid-cache TRACE before source assertion (aig.cpp:770)",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_goal_conversion_trace.go",
+          "tests": [
+            "TestAIGGoalConversionMissingCacheConditionalTrace"
+          ]
+        },
+        {
           "name": "Retained optimized aig2expr cache AND, ITE/IFF and skip auxiliary AND TRACE bodies (aig.cpp:863,881,931)",
           "status": "ported",
           "go_target": "pkg/tactic/aig/aig_goal_conversion_trace.go",
@@ -180863,7 +180884,8 @@
         "TestAIGExprCacheReleaseTracePrecedesLastReference",
         "TestAIGGoalConversionCacheAndAuxTraceSourceOrder",
         "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
-        "TestAIGMaxSharingTryingTraceAllFourReassociationBranches"
+        "TestAIGMaxSharingTryingTraceAllFourReassociationBranches",
+        "TestAIGGoalConversionMissingCacheConditionalTrace"
       ],
       "conditionals": [
         {
@@ -182218,6 +182240,14 @@
           "go_target": "pkg/tactic/aig/aig_expr_cache_trace.go",
           "tests": [
             "TestAIGExprCacheReleaseTracePrecedesLastReference"
+          ]
+        },
+        {
+          "name": "Retained aig2expr conditional invalid-cache TRACE before source assertion (aig.cpp:770)",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_goal_conversion_trace.go",
+          "tests": [
+            "TestAIGGoalConversionMissingCacheConditionalTrace"
           ]
         },
         {

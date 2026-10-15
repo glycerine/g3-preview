@@ -2,6 +2,7 @@ package aig
 
 import (
 	"bytes"
+	"errors"
 	"strconv"
 	"testing"
 
@@ -12,6 +13,65 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
+
+func TestAIGGoalConversionMissingCacheConditionalTrace(t *testing.T) {
+	budget := arena.NewBudget(1 << 30)
+	symbols, err := symbol.NewManager(symbol.Config{Budget: budget})
+	aigMust(t, err)
+	numbers, err := numeral.NewRationalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{
+		Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}},
+	}})
+	aigMust(t, err)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	m, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: symbols, Numerals: numbers, Budget: budget, TraceTags: tags})
+	aigMust(t, err)
+	tags.Enable("aig2expr")
+	sort, err := m.MkBoolSort()
+	aigMust(t, err)
+	p, err := m.MkFreshConst("p", sort)
+	aigMust(t, err)
+	q, err := m.MkFreshConst("q", sort)
+	aigMust(t, err)
+	g, err := NewManager(m)
+	aigMust(t, err)
+	a, err := g.MakeVariable(p)
+	aigMust(t, err)
+	b, err := g.MakeVariable(q)
+	aigMust(t, err)
+	pair, err := g.InternAnd(a, b)
+	aigMust(t, err)
+	c := goalFormulaConverter{formulaConverter: formulaConverter{manager: g, cache: make(map[*node]ast.ASTRef)}}
+	if _, e := c.literal(pair.lit); !errors.Is(e, ast.ErrASTDomain) {
+		t.Fatalf("missing source cache: %v", e)
+	}
+	if tags.ShouldTrace("aig2expr") {
+		want := "-------- [aig2expr] get_cached src/tactic/aig/aig.cpp:770 ---------\n" +
+			"invalid get_cached for @" + strconv.FormatUint(uint64(pair.lit.node.id-firstNodeID), 10) + "\n" +
+			"------------------------------------------------\n"
+		if got := output.String(); got != want {
+			t.Fatalf("conditional cache record:\ngot %q\nwant %q", got, want)
+		}
+	} else if output.Len() != 0 {
+		t.Fatalf("erased conditional record %q", output.String())
+	}
+	output.Reset()
+	aigMust(t, c.remember(pair.lit.node, p))
+	if _, e := c.literal(pair.lit); e != nil || output.Len() != 0 {
+		t.Fatalf("cached route: %v, trace %q", e, output.String())
+	}
+	aigMust(t, c.cleanup())
+	aigMust(t, pair.Close())
+	aigMust(t, b.Close())
+	aigMust(t, a.Close())
+	aigMust(t, g.Close())
+	aigMust(t, m.Close())
+	aigMust(t, numbers.Close())
+	aigMust(t, symbols.Close())
+	if budget.Used() != 0 {
+		t.Fatalf("owner graph retained %d bytes", budget.Used())
+	}
+}
 
 func TestAIGGoalConversionCacheAndAuxTraceSourceOrder(t *testing.T) {
 	budget := arena.NewBudget(1 << 30)
