@@ -47,6 +47,8 @@ func TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults(t *tes
 	processor, e := newFormulaProcessor(m, boolean)
 	cacheMust(t, e)
 	t.Cleanup(func() { cacheMust(t, processor.close()) })
+	beforeQRefs, e := m.GetRefCount(q)
+	cacheMust(t, e)
 	// The initial LIFO queue processes `and` before it discovers q's rule.
 	// That rule reschedules the already processed expression for rewriting.
 	output, e := processor.run([]ast.ASTHandle{q, and})
@@ -55,9 +57,7 @@ func TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults(t *tes
 		t.Fatal("source processed/rule partition and empty main todo", len(output), len(processor.back.processed), len(processor.index.rules), processor.back.todo)
 	}
 	seen := map[ast.ASTHandle]bool{}
-	for _, ref := range output {
-		h, e := m.RefGet(ref)
-		cacheMust(t, e)
+	for _, h := range output {
 		seen[h] = true
 	}
 	if !seen[truth] || !seen[q] || len(seen) != 2 {
@@ -66,12 +66,22 @@ func TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults(t *tes
 	if e := processor.close(); e != nil {
 		t.Fatal(e)
 	}
-	for _, ref := range output {
-		if _, e := m.RefGet(ref); e != nil {
+	afterCloseRefs, e := m.GetRefCount(q)
+	cacheMust(t, e)
+	if afterCloseRefs != beforeQRefs+1 {
+		t.Fatal("published quantifier lost its independent output pin", beforeQRefs, afterCloseRefs)
+	}
+	for _, h := range output {
+		if _, e := m.GetKind(h); e != nil {
 			t.Fatal("published result must outlive processor", e)
 		}
 	}
-	for i := range output {
-		cacheMust(t, m.DelRef(&output[i]))
+	for _, h := range output {
+		cacheMust(t, m.DecRef(h))
+	}
+	afterOutputRefs, e := m.GetRefCount(q)
+	cacheMust(t, e)
+	if afterOutputRefs != beforeQRefs {
+		t.Fatal("output slice retained a quantifier pin", beforeQRefs, afterOutputRefs)
 	}
 }

@@ -141,8 +141,8 @@ func (t *RewriterTactic) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error)
 		return nil, errors.Join(e, processor.close())
 	}
 	defer func() {
-		for i := len(output) - 1; i >= 0; i-- {
-			result = errors.Join(result, t.manager.DelRef(&output[i]))
+		for _, h := range output {
+			result = errors.Join(result, t.manager.DecRef(h))
 		}
 	}()
 	if e := processor.close(); e != nil {
@@ -151,11 +151,7 @@ func (t *RewriterTactic) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error)
 	if e := goal.Reset(); e != nil {
 		return nil, e
 	}
-	for i, ref := range output {
-		h, e := t.manager.RefGet(ref)
-		if e != nil {
-			return nil, e
-		}
+	for i, h := range output {
 		if proofs {
 			if e := goal.AssertWithProof(h, proofNodes[i], ast.ASTDependency{}); e != nil {
 				return nil, e

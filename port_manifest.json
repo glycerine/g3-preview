@@ -106412,10 +106412,10 @@
         }
       ],
       "ownership": [
-        "The UFBV rewriter owns its rewrite cache, which retains both key and result expressions until replacement or destruction. The matcher borrows pair-cache keys but retains each substitution target until reset or close. The forward rule index retains one reference each to quantifier, LHS and RHS until index close."
+        "The UFBV rewriter owns its rewrite cache, which retains both key and result expressions until replacement or destruction. The matcher borrows pair-cache keys but retains each substitution target until reset or close. The forward rule index retains one reference each to quantifier, LHS and RHS until index close. Its published result slice pins each expression independently of the processor and releases those pins after the enclosing tactic updates the goal."
       ],
       "deviations": [
-        "The concrete rewrite cache, reverse child-visit/cycle step, matcher, forward-rule dispatch/removal, both rescheduling paths, iterative rewrite loop and default demodulator classification are ported. The main formula queue now joins those pieces for the no-proof path; proof-vector handling, enclosing tactic integration and whole-unit ownership remain open."
+        "The concrete rewrite cache, reverse child-visit/cycle step, matcher, forward-rule dispatch/removal, both rescheduling paths, iterative rewrite loop and default demodulator classification are ported. The main formula queue now joins those pieces for the no-proof path; full enclosing tactic integration, source hashtable iteration order and whole-unit ownership remain open."
       ]
     },
     {
@@ -171504,7 +171504,9 @@
         "pkg/tactic/ufbv/match_subst.go",
         "pkg/ast/pattern/candidates.go",
         "pkg/tactic/ufbv/rewrite_tactic.go",
-        "pkg/tactic/ufbv/rewrite_tactic_test.go"
+        "pkg/tactic/ufbv/rewrite_tactic_test.go",
+        "pkg/tactic/ufbv/rewrite_formula_process.go",
+        "pkg/tactic/ufbv/rewrite_formula_process_test.go"
       ],
       "tests": [
         "TestSexprAccessorsAndScalarIterator",
@@ -171570,7 +171572,8 @@
         "TestASTBitVectorBV2IntEveryActualReservation",
         "TestMatchSubstConcretePairCacheAndVariableBindings",
         "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences",
-        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
+        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
+        "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"
       ],
       "conditionals": [
         {
@@ -171607,6 +171610,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Concrete UFBV new_exprs ref_vector publishes processed formulas and demodulators into a native slice with independent AST pins that outlive the processor and release after goal publication (ufbv_rewriter.cpp:735-749)",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_process.go",
+          "tests": ["TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"]
+        },
         {
           "name": "Concrete UFBV tactic forms/proofs ref_vectors copy each input formula and proof with independent AST pins before rewriting and release them in insertion order after younger rewritten output owners (ufbv_rewriter_tactic.cpp:47-68)",
           "status": "partial",

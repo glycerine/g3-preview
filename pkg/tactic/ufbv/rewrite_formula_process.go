@@ -54,7 +54,7 @@ func (r *formulaProcessor) check() error {
 
 // run follows the source LIFO main todo loop, then publishes the processed
 // formulas and surviving indexed demodulators as independently owned refs.
-func (r *formulaProcessor) run(formulas []ast.ASTHandle) (output []ast.ASTRef, result error) {
+func (r *formulaProcessor) run(formulas []ast.ASTHandle) (output []ast.ASTHandle, result error) {
 	if e := r.check(); e != nil {
 		return nil, e
 	}
@@ -65,12 +65,19 @@ func (r *formulaProcessor) run(formulas []ast.ASTHandle) (output []ast.ASTRef, r
 	m := r.manager
 	defer func() {
 		if result != nil {
-			for i := len(output) - 1; i >= 0; i-- {
-				result = errors.Join(result, m.DelRef(&output[i]))
+			for _, h := range output {
+				result = errors.Join(result, m.DecRef(h))
 			}
 			output = nil
 		}
 	}()
+	publish := func(h ast.ASTHandle) error {
+		if e := m.IncRef(h); e != nil {
+			return e
+		}
+		output = append(output, h)
+		return nil
+	}
 	proofs, e := m.ProofsEnabled()
 	if e != nil {
 		return nil, e
@@ -80,11 +87,9 @@ func (r *formulaProcessor) run(formulas []ast.ASTHandle) (output []ast.ASTRef, r
 			return nil, e
 		}
 		for _, h := range formulas {
-			ref, e := m.NewRef(h)
-			if e != nil {
+			if e := publish(h); e != nil {
 				return output, e
 			}
-			output = append(output, ref)
 		}
 		return output, nil
 	}
@@ -102,19 +107,15 @@ func (r *formulaProcessor) run(formulas []ast.ASTHandle) (output []ast.ASTRef, r
 		}
 	}
 	for h := range r.back.processed {
-		ref, e := m.NewRef(h)
-		if e != nil {
+		if e := publish(h); e != nil {
 			return output, e
 		}
-		output = append(output, ref)
 	}
 	for _, qs := range r.index.byFunc {
 		for _, q := range qs {
-			ref, e := m.NewRef(q)
-			if e != nil {
+			if e := publish(q); e != nil {
 				return output, e
 			}
-			output = append(output, ref)
 		}
 	}
 	return output, nil
