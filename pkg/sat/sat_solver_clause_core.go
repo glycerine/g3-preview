@@ -2,6 +2,8 @@
 package sat
 
 import (
+	"sort"
+
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
@@ -15,6 +17,7 @@ type satSolverClauseState struct {
 	traceTags  *diagnostic.TraceTags
 	assignment []int8
 	levels     []uint32
+	sorter     satLiteralOrder
 }
 
 func (s *satSolverClauseState) value(l Literal) (lbool.LBool, error) {
@@ -42,31 +45,19 @@ func (s *satSolverClauseState) level(l Literal) (uint32, error) {
 	return s.levels[l.variable()], nil
 }
 
-// Concrete allocation-free library replacement for std::sort on scalar literal
-// indices. Equal indices carry identical values, so sorting stability is not an
-// observable choice. Heapsort preserves the library's O(n log n) work bound.
-func satSortClauseLiterals(a []Literal) {
-	sift := func(root, end int) {
-		for root < end/2 {
-			child := 2*root + 1
-			if child+1 < end && a[child] < a[child+1] {
-				child++
-			}
-			if a[root] >= a[child] {
-				return
-			}
-			a[root], a[child] = a[child], a[root]
-			root = child
-		}
-	}
-	for root := len(a) / 2; root > 0; {
-		root--
-		sift(root, len(a))
-	}
-	for end := len(a) - 1; end > 0; end-- {
-		a[0], a[end] = a[end], a[0]
-		sift(0, end)
-	}
+// Native source-order sort over the captured literal slice. Equal literal words
+// carry identical values, so stability is not observable. The caller keeps
+// this concrete adapter in its existing state to reuse the interface box.
+type satLiteralOrder struct{ values []Literal }
+
+func (a *satLiteralOrder) Len() int           { return len(a.values) }
+func (a *satLiteralOrder) Less(i, j int) bool { return a.values[i] < a.values[j] }
+func (a *satLiteralOrder) Swap(i, j int)      { a.values[i], a.values[j] = a.values[j], a.values[i] }
+
+func (a *satLiteralOrder) sort(values []Literal) {
+	a.values = values
+	sort.Sort(a)
+	a.values = nil
 }
 
 func (s *satSolverClauseState) simplifyClause(scope uint32, n *uint32, lits []Literal) (bool, error) {
@@ -88,7 +79,7 @@ func (s *satSolverClauseState) simplifyClauseSpan(scope uint32, n *uint32, span 
 	if span.column == nil && span.store == nil && uint64(*n) > uint64(len(span.literals)) {
 		return false, arena.ErrBounds
 	}
-	if e := satSortClauseSpan(span, *n); e != nil {
+	if e := satSortClauseSpan(span, *n, &s.sorter); e != nil {
 		return false, e
 	}
 	prev := DefaultLiteral()

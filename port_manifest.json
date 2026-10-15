@@ -77788,7 +77788,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "simplify_clause_core and scope dispatch; select_watch_lit; select_learned_watch_lit (source367\u2013465)",
+          "name": "simplify_clause_core and scope dispatch; select_watch_lit; select_learned_watch_lit (source367\u2013465); native Go sort over captured literal slice replaces hand-written heapsort",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_clause_core.go",
           "tests": [

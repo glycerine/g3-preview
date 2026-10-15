@@ -89,7 +89,7 @@ func (s satSolverLiteralSpan) setLiteral(i uint32, l Literal) error {
 }
 
 // Sort captured native values with Go's standard sorting implementation.
-func satSortClauseSpan(s satSolverLiteralSpan, n uint32) error {
+func satSortClauseSpan(s satSolverLiteralSpan, n uint32, sorter *satLiteralOrder) error {
 	if s.column != nil {
 		if e := s.column.open(); e != nil {
 			return e
@@ -111,12 +111,12 @@ func satSortClauseSpan(s satSolverLiteralSpan, n uint32) error {
 		if uint64(n) > uint64(len(s.backing.data)) {
 			return arena.ErrBounds
 		}
-		satSortClauseLiterals(s.backing.data[:n])
+		sorter.sort(s.backing.data[:n])
 		return nil
 	}
 	if uint64(n) > uint64(len(s.literals)) {
 		return arena.ErrBounds
 	}
-	satSortClauseLiterals(s.literals[:n])
+	sorter.sort(s.literals[:n])
 	return nil
 }
