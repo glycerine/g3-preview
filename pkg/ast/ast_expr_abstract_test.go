@@ -98,6 +98,13 @@ func TestExprAbstractorRetainsInterruptedTemporaryUntilClose(t *testing.T) {
 	if got, e := m.RefGet(out); e != nil || got != c {
 		t.Fatal("failed abstraction changed output", got, e)
 	}
+	copied := *a
+	if e := copied.Close(); !errors.Is(e, ErrASTHandle) {
+		t.Fatal("copied owner released original references", e)
+	}
+	if len(a.pinned) != 1 {
+		t.Fatal("copied owner changed original pending references")
+	}
 	if e = a.Close(); e != nil {
 		t.Fatal("temporary reference cleanup", e)
 	}
@@ -173,6 +180,53 @@ func TestExprAbstractorForallExistsConstantOrderAndEmpty(t *testing.T) {
 	}
 	if got, e := m.RefGet(out); e != nil || got != body {
 		t.Fatal("zero-bound wrapper created a quantifier", got, e)
+	}
+	astTestMust(t, a.Close())
+}
+
+func TestExprAbstractorSourceRootReferenceGuard(t *testing.T) {
+	m := astTestManager(t)
+	b, e := m.MkBoolSort()
+	astTestMust(t, e)
+	d, e := m.MkFuncDecl(astTestSymbol(t, m, "abstract-unpinned"), nil, b, ASTFuncDeclInfo{})
+	astTestMust(t, e)
+	c, e := m.MkApp(d, nil)
+	astTestMust(t, e)
+	refs, e := m.GetRefCount(c)
+	astTestMust(t, e)
+	if refs != 0 {
+		t.Fatal("fixture needs an unreferenced source root", refs)
+	}
+	out, e := m.NewRef(ASTHandle{})
+	astTestMust(t, e)
+	t.Cleanup(func() { astTestMust(t, m.DelRef(&out)) })
+	a, e := NewExprAbstractor(m)
+	astTestMust(t, e)
+	e = a.Abstract(0, []ASTHandle{c}, c, out)
+	if ASTSourceDebug {
+		if !errors.Is(e, ErrASTDomain) || len(a.pinned) != 0 {
+			t.Fatal("debug root-reference guard preceded generated pin", e, len(a.pinned))
+		}
+		got, e := m.RefGet(out)
+		astTestMust(t, e)
+		if !got.IsNull() {
+			t.Fatal("failed debug assertion changed output", got)
+		}
+	} else {
+		astTestMust(t, e)
+		got, e := m.RefGet(out)
+		astTestMust(t, e)
+		index, e := m.GetVarIndex(got)
+		astTestMust(t, e)
+		if index != 0 {
+			t.Fatal("release profile did not continue", index)
+		}
+	}
+	if e = a.Abstract(0, nil, c, out); e != nil {
+		t.Fatal("zero-bound shortcut must bypass the source root assertion", e)
+	}
+	if got, e := m.RefGet(out); e != nil || got != c {
+		t.Fatal("zero-bound shortcut output", got, e)
 	}
 	astTestMust(t, a.Close())
 }

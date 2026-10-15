@@ -11,6 +11,7 @@ import (
 // pinned slice owns each generated expression until Close, including when an
 // AST allocation interrupts an abstraction.
 type ExprAbstractor struct {
+	self    *ExprAbstractor
 	manager *ASTManager
 	pinned  []ASTRef
 	drain   int
@@ -25,7 +26,9 @@ func NewExprAbstractor(m *ASTManager) (*ExprAbstractor, error) {
 		return nil, e
 	}
 	m.mu.Unlock()
-	return &ExprAbstractor{manager: m}, nil
+	a := &ExprAbstractor{manager: m}
+	a.self = a
+	return a, nil
 }
 
 func (a *ExprAbstractor) pin(h ASTHandle) error {
@@ -38,7 +41,7 @@ func (a *ExprAbstractor) pin(h ASTHandle) error {
 }
 
 func (a *ExprAbstractor) Close() error {
-	if a == nil || a.manager == nil {
+	if a == nil || a.self != a || a.manager == nil {
 		return ErrASTHandle
 	}
 	if a.closed {
@@ -69,7 +72,7 @@ func (a *ExprAbstractor) cleanupPins() error {
 // Abstract writes an owning result reference after replacing bound constants.
 // A failed call retains acquired references for an explicit Close retry.
 func (a *ExprAbstractor) Abstract(base uint32, bound []ASTHandle, root ASTHandle, out ASTRef) error {
-	if a == nil || a.manager == nil || a.closed || len(a.pinned) != 0 || len(bound) > math.MaxUint32 {
+	if a == nil || a.self != a || a.manager == nil || a.closed || len(a.pinned) != 0 || len(bound) > math.MaxUint32 {
 		return ErrASTHandle
 	}
 	result, e := a.abstract(base, bound, root)
@@ -141,6 +144,15 @@ func (a *ExprAbstractor) abstract(base uint32, bound []ASTHandle, root ASTHandle
 	m := a.manager
 	if len(bound) == 0 {
 		return root, nil
+	}
+	if ASTSourceDebug {
+		count, e := m.GetRefCount(root)
+		if e != nil {
+			return ASTHandle{}, e
+		}
+		if count == 0 {
+			return ASTHandle{}, ErrASTDomain
+		}
 	}
 	result := make(map[ASTHandle]ASTHandle)
 	stack := []ASTHandle{root}
@@ -261,5 +273,9 @@ func (a *ExprAbstractor) abstract(base uint32, bound []ASTHandle, root ASTHandle
 			return ASTHandle{}, ErrASTDomain
 		}
 	}
-	return result[root], nil
+	v, found := result[root]
+	if !found {
+		return ASTHandle{}, ErrASTDomain
+	}
+	return v, nil
 }

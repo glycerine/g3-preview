@@ -14317,7 +14317,8 @@
       "tests": [
         "TestExprAbstractorNativePatternAndNestedBinder",
         "TestExprAbstractorRetainsInterruptedTemporaryUntilClose",
-        "TestExprAbstractorForallExistsConstantOrderAndEmpty"
+        "TestExprAbstractorForallExistsConstantOrderAndEmpty",
+        "TestExprAbstractorSourceRootReferenceGuard"
       ],
       "assertions": [
         {
@@ -14348,14 +14349,20 @@
           "tests": ["TestExprAbstractorForallExistsConstantOrderAndEmpty"]
         },
         {
-          "name": "expr_abstract TRACE pretty printing, source assertion profiles and full retained consumers",
+          "name": "Selected source root-reference SASSERT gate after zero-bound shortcut and final map-result VERIFY (expr_abstract.cpp:25-31,102)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_expr_abstract.go",
+          "tests": ["TestExprAbstractorSourceRootReferenceGuard"]
+        },
+        {
+          "name": "expr_abstract TRACE SMT2 pretty printing, complete debug action transport and full retained consumers",
           "status": "unported",
           "tests": []
         }
       ],
       "ownership": [],
       "deviations": [
-        "Go Abstract writes an ASTRef result and retains interrupted temporary references for explicit Close; the C++ stack owner destructs lexically. Native slices and a map replace ptr_vector and obj_map storage."
+        "Go Abstract writes an ASTRef result and retains interrupted temporary references for explicit Close; copied Go owners are rejected before cleanup. The C++ stack owner destructs lexically. Native slices and a map replace ptr_vector and obj_map storage."
       ]
     },
     {
@@ -14369,7 +14376,8 @@
       "tests": [
         "TestExprAbstractorNativePatternAndNestedBinder",
         "TestExprAbstractorRetainsInterruptedTemporaryUntilClose",
-        "TestExprAbstractorForallExistsConstantOrderAndEmpty"
+        "TestExprAbstractorForallExistsConstantOrderAndEmpty",
+        "TestExprAbstractorSourceRootReferenceGuard"
       ],
       "conditionals": [
         {
@@ -14400,14 +14408,20 @@
           "tests": ["TestExprAbstractorForallExistsConstantOrderAndEmpty"]
         },
         {
-          "name": "expr_abstract TRACE pretty printing, source assertion profiles and full retained consumers",
+          "name": "Selected source root-reference SASSERT gate after zero-bound shortcut and final map-result VERIFY (expr_abstract.cpp:25-31,102)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_expr_abstract.go",
+          "tests": ["TestExprAbstractorSourceRootReferenceGuard"]
+        },
+        {
+          "name": "expr_abstract TRACE SMT2 pretty printing, complete debug action transport and full retained consumers",
           "status": "unported",
           "tests": []
         }
       ],
       "ownership": [],
       "deviations": [
-        "Go Abstract writes an ASTRef result and retains interrupted temporary references for explicit Close; the C++ stack owner destructs lexically. Native slices and a map replace ptr_vector and obj_map storage."
+        "Go Abstract writes an ASTRef result and retains interrupted temporary references for explicit Close; copied Go owners are rejected before cleanup. The C++ stack owner destructs lexically. Native slices and a map replace ptr_vector and obj_map storage."
       ]
     },
     {
