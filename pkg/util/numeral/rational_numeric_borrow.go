@@ -52,6 +52,62 @@ func (b *RationalNumericBorrow) BorrowInfIntFirst(v *OwnedInfIntRational) (Ratio
 	}
 	return v.First, nil
 }
+
+// BorrowInfFirst implements inf_rational::get_first/get_rational's borrowed
+// const-reference read within this scope.
+func (b *RationalNumericBorrow) BorrowInfFirst(v *OwnedInfRational) (Rational, error) {
+	if !b.Valid() {
+		return Rational{}, ErrRationalServiceOwner
+	}
+	if e := b.service.infScalarOwner(v); e != nil {
+		return Rational{}, e
+	}
+	return v.First, nil
+}
+
+// BorrowInfInfinitesimal implements inf_rational::get_infinitesimal's borrowed
+// const-reference read without inspecting the unrelated FIRST component.
+func (b *RationalNumericBorrow) BorrowInfInfinitesimal(v *OwnedInfRational) (Rational, error) {
+	if !b.Valid() {
+		return Rational{}, ErrRationalServiceOwner
+	}
+	if e := b.service.infScalarOwner(v); e != nil {
+		return Rational{}, e
+	}
+	return v.Second, nil
+}
+
+// The inf_eps_rational accessors forward to the selected nested rational or
+// infinity coefficient. Each return borrows that component for this scope.
+func (b *RationalNumericBorrow) BorrowInfEpsRational(v *OwnedInfEpsInfRational) (Rational, error) {
+	if !b.Valid() {
+		return Rational{}, ErrRationalServiceOwner
+	}
+	if e := b.service.infEpsScalarOwner(v); e != nil {
+		return Rational{}, e
+	}
+	return v.numeral.First, nil
+}
+
+func (b *RationalNumericBorrow) BorrowInfEpsInfinitesimal(v *OwnedInfEpsInfRational) (Rational, error) {
+	if !b.Valid() {
+		return Rational{}, ErrRationalServiceOwner
+	}
+	if e := b.service.infEpsScalarOwner(v); e != nil {
+		return Rational{}, e
+	}
+	return v.numeral.Second, nil
+}
+
+func (b *RationalNumericBorrow) BorrowInfEpsInfinity(v *OwnedInfEpsInfRational) (Rational, error) {
+	if !b.Valid() {
+		return Rational{}, ErrRationalServiceOwner
+	}
+	if e := b.service.infEpsScalarOwner(v); e != nil {
+		return Rational{}, e
+	}
+	return v.infinity, nil
+}
 func (b *RationalNumericBorrow) Integers() *IntegerManager {
 	if !b.Valid() {
 		return nil

@@ -125453,6 +125453,7 @@
         "pkg/util/numeral/mp_lexical_scope_test.go",
         "pkg/util/numeral/mp_raw_projection_test.go",
         "pkg/util/numeral/rational_lexical_scope.go",
+        "pkg/util/numeral/rational_numeric_borrow.go",
         "pkg/util/numeral/inf_arithmetic_entry_source_test.go",
         "pkg/util/numeral/inf_muldiv_entry_source_test.go"
       ],
@@ -125466,6 +125467,7 @@
         "TestInfEpsInfDestructorReverseMemberOrder",
         "TestInfEpsInfStructuralEqualityAndReturnCopy",
         "TestInfEpsInfPointerFreeWarmPaths",
+        "TestInfEpsSourceBorrowedRationalComponentsSkipPeerReads",
         "TestInfEpsInfFormattingOneFinalAllocation",
         "TestInfEpsInfConstructorSignedScalarShapes",
         "TestInfScalarProjectionAllGetterProfilesAndRawPredicates",
@@ -125609,6 +125611,12 @@
             "TestInfEpsInfConstructorSignedScalarShapes",
             "TestInfHashesStopBeforeCombiningFailedComponent"
           ]
+        },
+        {
+          "name": "get_rational/get_infinitesimal/get_infinity borrowed selected rational components without peer inspection or copy (inf_eps_rational.h:135-147)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/rational_numeric_borrow.go",
+          "tests": ["TestInfEpsSourceBorrowedRationalComponentsSkipPeerReads"]
         },
         {
           "name": "constants/sign/integer/finite/scalar conversion predicates",
@@ -125839,8 +125847,8 @@
       ],
       "deviations": [
         "Whole-source call-site audit: inf_eps_rational has retained SMT, optimization and simplex consumers, but no source call site instantiates its hash_proc or eq_proc structs. Keep direct hash and equality algorithms separate from these unused wrappers.",
-        "Source const references return owning copies; source scalar assertion domains are typed errors. Mixed equality defect and exact nonsaturating infinity coefficient retained. No actual registered direct source assertion counts invented.",
-        "Source h131\u2013147 selected component reference projections ignore unrelated infinity/numeral components; current owning forwards check all denominators and Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt.",
+        "Older owned-output accessors still return independent copies; get_rational/get_infinitesimal/get_infinity also have borrows in the locked numeric-borrow scope. Source scalar assertion domains are typed errors. Mixed equality defect and exact nonsaturating infinity coefficient retained. No actual registered direct source assertion counts invented.",
+        "Source h135-147 selected component reference projections ignore unrelated infinity/numeral components; BorrowInfEpsRational/BorrowInfEpsInfinitesimal/BorrowInfEpsInfinity now expose those reads, including raw denominator0. Older owned-output forwards still copy; NUM-only sign/hash routes retain separate raw-domain debt.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion.",
         "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
         "Eleven Mul/Div regression groups include five tests-first source-order defects plus honest existing-behavior confirmations, independent bounded rational oracle, alias rereads and warm ownership checks. No additional registered source assertions or whole-header completion credited; raw MPQ10 and facade lexical9 bounds unchanged."
@@ -126483,6 +126491,7 @@
         "pkg/util/numeral/mp_lexical_scope_test.go",
         "pkg/util/numeral/mp_raw_projection_test.go",
         "pkg/util/numeral/rational_lexical_scope.go",
+        "pkg/util/numeral/rational_numeric_borrow.go",
         "pkg/util/numeral/inf_arithmetic_entry_source_test.go",
         "pkg/util/numeral/inf_muldiv_entry_source_test.go"
       ],
@@ -126499,6 +126508,7 @@
         "TestInfRationalCompoundReturnCopyFailure",
         "TestInfRationalCoarseRootAndFusedComponentAlias",
         "TestInfRationalIntegerConstructorCopyRoute",
+        "TestInfRationalSourceBorrowedComponentsDoNotCopyOrReadPeer",
         "TestRationalServiceInfinitesimalHeaderOwnership",
         "TestRationalServiceInfinitesimalConstructorFailureRefunds",
         "TestRationalServiceInfinitesimalFinalizerTraversal",
@@ -126665,6 +126675,12 @@
             "TestRationalServiceInfinitesimalFinalizerTraversal",
             "TestInfHashesStopBeforeCombiningFailedComponent"
           ]
+        },
+        {
+          "name": "get_first/get_rational and get_infinitesimal borrowed component reads without peer inspection or copy (inf_rational.h:135-143)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/rational_numeric_borrow.go",
+          "tests": ["TestInfRationalSourceBorrowedComponentsDoNotCopyOrReadPeer"]
         },
         {
           "name": "is_zero/is_one/is_minus_one and lexicographic is_neg/is_pos/is_nonneg/is_nonpos scalar predicates (inf_rational.h:277-310)",
@@ -126905,9 +126921,9 @@
         "Selected source comparison/unary/reset/swap paths check cold ownership then each reached component action, preserving unread invalid fields and partial publication. Actual SYNCH RAW comparison locals are charged distinct manager fields, normal deletion cursor follows source, body failure retains real limbs for explicit owning cleanup. Service lexical bound9 unchanged; copied unary results use existing literal constructor/temporary machinery. Immediate caller-named physical censuses, cold reservation sweeps and warm allocation checks cover selected routes. Unrelated arithmetic and Go-extension Move preflights remain open."
       ],
       "deviations": [
-        "Global constants/borrowed accessors replaced by owner-local constants and explicit independent copies; typed checked source-assertion errors. Signed INT_MIN constructor-negation uses widened defined adapter. Source trace/assertion-message infrastructure remains separate.",
+        "Global constants and older owned-output accessors use owner-local constants and explicit independent copies; get_first/get_rational/get_infinitesimal also have actual borrows in the locked numeric-borrow scope. Typed checked source-assertion errors and widened signed INT_MIN constructor-negation remain. Source trace/assertion-message infrastructure remains separate.",
         "Inactive/commented general pair arithmetic and duplicate #if0 approximation declarations are not runtime implementations; all eight compiled approximation functions are ported, including coarse/defective roots/powers.",
-        "Source h135\u2013143 component reference projections read only the selected component; InfFirst/InfRational/Infinitesimal still check both denominators and owning Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt.",
+        "Source h135-143 component reference projections read only the selected component; BorrowInfFirst/BorrowInfInfinitesimal now expose those reads, including raw denominator0. The older InfFirst/InfRational/Infinitesimal owned-output adapters still perform copies. NUM-only sign/hash routes retain separate raw-domain debt.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion.",
         "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
         "Eleven Mul/Div regression groups include five tests-first source-order defects plus honest existing-behavior confirmations, independent bounded rational oracle, alias rereads and warm ownership checks. No additional registered source assertions or whole-header completion credited; raw MPQ10 and facade lexical9 bounds unchanged."
