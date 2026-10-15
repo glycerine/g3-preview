@@ -38,9 +38,11 @@ func (s *Solver) mkModel() error {
 			}
 		}
 	}
+	s.traceModelConverterBeforeApply()
 	if e = s.converter.applyModelSpan(model); e != nil {
 		return e
 	}
+	s.traceCompletedModel(n, model)
 	// Selected ordinary source profile does not define _EXTERNAL_RELEASE.
 	good, e := s.checkModel()
 	if e != nil {

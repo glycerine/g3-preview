@@ -178250,6 +178250,12 @@
           "tests": ["TestSATInitAssumptionsSourceTraceBeforeAssignments"]
         },
         {
+          "name": "Reached SAT mk_model converter-display TRACE before application and completed model-value TRACE after application (sat_solver.cpp:1272,1274)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_model_trace.go",
+          "tests": ["TestSATModelConstructionSourceTraceConverterThenValues"]
+        },
+        {
           "name": "Reached SAT missed-propagation TRACE before unreachable assertion for live empty and unit clauses (sat_solver.cpp:3061)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_probing_diagnostics_trace.go",
@@ -179583,6 +179589,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_assumptions_trace.go",
           "tests": ["TestSATInitAssumptionsSourceTraceBeforeAssignments"]
+        },
+        {
+          "name": "Reached SAT mk_model converter-display TRACE before application and completed model-value TRACE after application (sat_solver.cpp:1272,1274)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_model_trace.go",
+          "tests": ["TestSATModelConstructionSourceTraceConverterThenValues"]
         },
         {
           "name": "Reached SAT missed-propagation TRACE before unreachable assertion for live empty and unit clauses (sat_solver.cpp:3061)",
