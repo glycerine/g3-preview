@@ -106564,7 +106564,8 @@
       ],
       "tests": [
         "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
-        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
+        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
+        "TestUFBVRewriterTacticPublishesIndependentGoalReference"
       ],
       "assertions": [
         {
@@ -106590,10 +106591,10 @@
         }
       ],
       "ownership": [
-        "The Go tactic owns the configured Boolean reducer and borrows AST/parameter services. The processor owns indexes and main todo references only during one Apply; output and proof references survive goal reset until assertion completes."
+        "The Go tactic owns the configured Boolean reducer and borrows AST/parameter services. The processor owns indexes and main todo references only during one Apply; output and proof references survive goal reset until assertion completes. Successful result publication adds a separate goal reference after the depth increment; the caller releases it with DecRef."
       ],
       "deviations": [
-        "The result goal is the caller's owner; converter outputs are absent because the source sets all three to null. Translation to another manager, parameter-description reporting, cleanup reconstruction and full tactic registry integration remain open."
+        "The result is the input goal with a second owning reference; converter outputs are absent because the source sets all three to null. Translation to another manager, parameter-description reporting, cleanup reconstruction and full tactic registry integration remain open."
       ]
     },
     {
@@ -170953,7 +170954,8 @@
         "pkg/ast/rewriter/bv_rewriter_xor.go",
         "pkg/ast/rewriter/bv_rewriter_xor_numeric_test.go",
         "pkg/tactic/bv/max_bv_sharing_goal.go",
-        "pkg/tactic/bv/max_bv_sharing_reduce_test.go"
+        "pkg/tactic/bv/max_bv_sharing_reduce_test.go",
+        "pkg/tactic/ufbv/rewrite_tactic_test.go"
       ],
       "tests": [
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
@@ -171002,7 +171004,8 @@
         "TestASTArithmeticOriginalMixedApplications",
         "TestASTArithmeticAppCoercionEveryWarmReservation",
         "TestBVRewriterXOREveryActualNumericAndMaskReservation",
-        "TestSharingGoalPassPublishesIndependentGoalReference"
+        "TestSharingGoalPassPublishesIndependentGoalReference",
+        "TestUFBVRewriterTacticPublishesIndependentGoalReference"
       ],
       "conditionals": [
         {
@@ -171031,6 +171034,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Concrete UFBV rewriter goal_ref_buffer single-result push acquires an independent goal reference after depth increment (ufbv_rewriter_tactic.cpp:65-66)",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_tactic.go",
+          "tests": ["TestUFBVRewriterTacticPublishesIndependentGoalReference"]
+        },
         {
           "name": "Concrete max-bv-sharing goal_ref_buffer single-result push acquires an independent goal reference after depth increment (max_bv_sharing_tactic.cpp:265-267)",
           "status": "ported",

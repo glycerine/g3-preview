@@ -58,7 +58,8 @@ func (t *RewriterTactic) check() error {
 }
 
 // Apply follows the source's goal reset, assertion and depth transition. It
-// returns the same goal owner; converters are nil in this tactic.
+// returns the same goal with an independent reference, matching the source
+// goal_ref_buffer push. The caller releases the result with DecRef.
 func (t *RewriterTactic) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error) {
 	if e := t.check(); e != nil {
 		return nil, e
@@ -156,6 +157,9 @@ func (t *RewriterTactic) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error)
 		}
 	}
 	if e := goal.IncDepth(); e != nil {
+		return nil, e
+	}
+	if e := goal.IncRef(); e != nil {
 		return nil, e
 	}
 	return goal, nil

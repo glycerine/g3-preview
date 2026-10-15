@@ -40,6 +40,30 @@ func ufbvTacticServicesFixture(t *testing.T, m *ast.ASTManager) (*uparams.Params
 	return ctx, globals
 }
 
+func TestUFBVRewriterTacticPublishesIndependentGoalReference(t *testing.T) {
+	m := cacheFixture(t)
+	ctx, globals := ufbvTacticServicesFixture(t, m)
+	rewriter, e := NewRewriterTactic(m, ctx, globals)
+	cacheMust(t, e)
+	t.Cleanup(func() { cacheMust(t, rewriter.Close()) })
+	goal, e := tactic.NewGoal(m, false, false, false)
+	cacheMust(t, e)
+	cacheMust(t, goal.IncRef()) // The incoming goal_ref.
+	result, e := rewriter.Apply(goal)
+	cacheMust(t, e)
+	if result != goal || goal.RefCount != 2 {
+		t.Fatal("result buffer must own a second reference", result, goal.RefCount)
+	}
+	cacheMust(t, goal.DecRef())
+	if goal.Closed || goal.RefCount != 1 {
+		t.Fatal("result must survive incoming reference release", goal.Closed, goal.RefCount)
+	}
+	cacheMust(t, result.DecRef())
+	if !goal.Closed {
+		t.Fatal("result release must retire goal")
+	}
+}
+
 func TestUFBVRewriterTacticGoalTransitionAndCoreRefusal(t *testing.T) {
 	m := cacheFixture(t)
 	b, e := m.MkBoolSort()
