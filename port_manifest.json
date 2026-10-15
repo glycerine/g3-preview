@@ -120128,60 +120128,6 @@
           "tests": []
         },
         {
-          "name": "copy_table and expand_table bucket/chain order, cellar retries and by-reference UsedSlots failure prefix",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "has_free_cells/get_free_cell/recycle_cell bump and LIFO cellar reuse",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "insert, insert_if_not_there, insert_if_not_there2 grow-before-duplicate and single incoming hash",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "contains/find/find_core and exact collision increments",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "erase head displacement and middle unlink/recycle",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "reset/finalize and empty reset no-op",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "empty/size/capacity/used_slots/collisions",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "begin/end and iterator dereference, arrow, pre/post increment, equality",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
-          "name": "swap storage and counters while retaining source hash functors",
-          "status": "partial",
-          "go_target": "",
-          "tests": []
-        },
-        {
           "name": "cmap int32 key/value forwarding, mutation and iteration",
           "status": "reference_only",
           "go_target": "",
@@ -120196,7 +120142,7 @@
           ]
         },
         {
-          "name": "remaining AIG, NLSAT, SMT and object-pair table specializations",
+          "name": "Remaining concrete table owners: tactic/aig/aig.cpp:95 aig* interning; nlsat/nlsat_solver.cpp:47-48 ineq_atom* and root_atom* interning; smt/smt_cg_table.h:135,172,207,217 enode* congruence tables; util/obj_pair_set.h:35 SMT conflict-resolution enode pairs. Port each owner's insert/find/erase, reset, traversal and lifetime with native typed Go containers; source bucket/cellar growth, collision counters and iterator mechanics do not require a universal adapter",
           "status": "unported",
           "go_target": "",
           "tests": []
