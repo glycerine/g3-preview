@@ -15405,13 +15405,15 @@
       "path": "src/ast/format.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "partial",
       "go_targets": [
         "pkg/ast/ast_format_flat.go",
-        "pkg/ast/ast_format_source_test.go"
+        "pkg/ast/ast_format_source_test.go",
+        "pkg/ast/ast_format_seq1.go"
       ],
       "tests": [
-        "TestASTFormatFlatNativeDeepSharedCacheWithOnlyFrameReservation"
+        "TestASTFormatFlatNativeDeepSharedCacheWithOnlyFrameReservation",
+        "TestASTFormatSeq1SourceGroupingAndNilTail"
       ],
       "conditionals": [
         {
@@ -15431,10 +15433,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Concrete format-pointer mk_seq and mk_seq1 grouped header, indentation and nil-tail behavior (format.h:67-108)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_format_seq1.go",
+          "tests": [
+            "TestASTFormatSeq1SourceGroupingAndNilTail"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": [
-        "Retained format flat recursion now borrows native []astNodeRef todo, []ASTHandle transformed arguments and a lookup-only map[astNodeRef]astNodeRef cache. Stack and child iteration preserve source order; the cache never iterates. Removed cache capacity/probing/rehash/pending-growth and vector backing/refusal emulation, plus unused IgnorePatterns=true results2 storage and obsolete AppArguments format-vector representation. Actual recursion header, AST construction, source UNREACHABLE guards and failed-frame history through enclosing teardown remain. A deep shared graph with 129 distinct leaves grows native storage with only the actual frame reservation in release; exact leaf reference counts and original CHOICE arg0 behavior remain. Original allocation campaign now covers actual frame/factory reservations, and history test stops at real line-break-to-string construction. Shared arithmetic/BV cache storage remains separately pending; no generic container, STL or whole-unit completion credit is added."
+        "Retained format flat recursion now borrows native []astNodeRef todo, []ASTHandle transformed arguments and a lookup-only map[astNodeRef]astNodeRef cache. Stack and child iteration preserve source order; the cache never iterates. Removed cache capacity/probing/rehash/pending-growth and vector backing/refusal emulation, plus unused IgnorePatterns=true results2 storage and obsolete AppArguments format-vector representation. Actual recursion header, AST construction, source UNREACHABLE guards and failed-frame history through enclosing teardown remain. A deep shared graph with 129 distinct leaves grows native storage with only the actual frame reservation in release; exact leaf reference counts and original CHOICE arg0 behavior remain. Original allocation campaign now covers actual frame/factory reservations, and history test stops at real line-break-to-string construction. Shared arithmetic/BV cache storage remains separately pending; no generic container, STL or whole-unit completion credit is added.",
+        "The concrete format-pointer mk_seq1 path now constructs source grouped and indented header documents, including empty argument lists and nil tail filtering, for retained SMT2 indexed declarations and sort applications. Other format.h templates remain open."
       ]
     },
     {
