@@ -96,5 +96,8 @@ func (c *RationalContext) SplitMidpoint(n *RationalNode, variable uint32, leftOp
 	if err = c.DecideBound(right, variable, &mid, true, !leftOpen); err != nil {
 		return left, right, err
 	}
+	if err = c.traceSplitBounds(left, right); err != nil {
+		return left, right, err
+	}
 	return left, right, nil
 }
