@@ -81,15 +81,15 @@ func TestSATSolverCopySelfRelocationGuardsReachedOriginalIterator(t *testing.T) 
 	}
 	satOK(t, s.MkClause([]Literal{0, 2, 4, 6}))
 	satOK(t, s.MkClause([]Literal{1, 2, 4, 6}))
-	if len(s.Lifecycle.Original) != 2 || cap(s.Lifecycle.Original) != 2 {
-		t.Fatal("actual source vector geometry", len(s.Lifecycle.Original), cap(s.Lifecycle.Original))
+	if len(s.Lifecycle.Original) != 2 {
+		t.Fatal("native original list", len(s.Lifecycle.Original))
 	}
 	e := s.copyFrom(s)
 	if e != ErrSATOwner {
 		t.Fatal("captured source backing guard", e)
 	}
-	if len(s.Lifecycle.Original) != 3 || cap(s.Lifecycle.Original) != 3 {
-		t.Fatal("completed first append", len(s.Lifecycle.Original), cap(s.Lifecycle.Original))
+	if len(s.Lifecycle.Original) != 3 {
+		t.Fatal("completed first append", len(s.Lifecycle.Original))
 	}
 	satFullSolverRuntimeAudit(t, s)
 	satFullSolverUserClauseAudit(t, s)

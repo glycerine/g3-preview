@@ -52,28 +52,32 @@ func TestSATSolverClauseLifecycleActualArityAndOwnership(t *testing.T) {
 		t.Fatal(e)
 	}
 }
-func TestSATSolverClauseLifecyclePendingCandidateRefusal(t *testing.T) {
+func TestSATSolverClauseLifecycleNativeCandidatePublication(t *testing.T) {
 	s, p, _, b := satLifecycleFixture(t, 3)
-	// Allocator succeeds, first watch growth/candidate publication may refuse.
-
-	// Exact targeted refusal at original-vector growth after real attachment.
+	// Build and attach before refusing arena reservations; only the native
+	// typed clause-list append remains at publication.
 	c, e := p.clauses.MkClause([]Literal{0, 2, 4}, false)
 	satOK(t, e)
 	s.pendingCandidate = c
 	satOK(t, s.attachClause(c))
+	before := b.Used()
 	b.FailAfter(0)
-	e = s.publishCandidate(false)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
-	if s.pendingCandidate != c || !p.clauses.IsLive(c) || len(s.Original) != 0 {
-		t.Fatal("retained allocated clause")
+	satOK(t, s.publishCandidate(false))
+	if s.pendingCandidate != (StoredClauseRef{}) || len(s.Original) != 1 || s.Original[0] != c || b.Used() != before {
+		t.Fatal("native original publication", b.Used(), before)
 	}
 	b.FailAfter(-1)
-	satOK(t, s.publishCandidate(false))
-	if s.pendingCandidate != (StoredClauseRef{}) || len(s.Original) != 1 {
-		t.Fatal("publication")
+	l, e := p.clauses.MkClause([]Literal{1, 3, 5}, true)
+	satOK(t, e)
+	s.pendingCandidate = l
+	satOK(t, s.attachClause(l))
+	before = b.Used()
+	b.FailAfter(0)
+	satOK(t, s.publishCandidate(true))
+	if s.pendingCandidate != (StoredClauseRef{}) || len(s.learned) != 1 || s.learned[0] != l || b.Used() != before {
+		t.Fatal("native learned publication", b.Used(), before)
 	}
+	b.FailAfter(-1)
 }
 
 // Independent named ownership walk: liveness in the allocator registry alone
@@ -101,7 +105,7 @@ func satLifecycleAssertOwned(t *testing.T, s *satSolverClauseLifecycle) {
 	if a.storage.Stats().Live != uint32(len(refs)) {
 		t.Fatal("anonymous actual clause descriptor", a.storage.Stats().Live, len(refs))
 	}
-	want := s.ownerBytes + uint64(cap(s.Original)+cap(s.learned))*uint64(reflect.TypeOf(StoredClauseRef{}).Size()) + uint64(cap(s.reinit))*uint64(reflect.TypeOf(satClauseWrapper{}).Size()) + uint64(cap(s.scopes))*uint64(reflect.TypeOf(satSolverScope{}).Size())
+	want := s.ownerBytes + uint64(cap(s.reinit))*uint64(reflect.TypeOf(satClauseWrapper{}).Size()) + uint64(cap(s.scopes))*uint64(reflect.TypeOf(satSolverScope{}).Size())
 	p := s.propagation
 	v := p.variables
 	want += p.ownerBytes + v.Stats().TotalBytes

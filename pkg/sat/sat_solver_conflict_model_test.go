@@ -22,7 +22,7 @@ func satConflictAudit(t *testing.T, c *satSolverConflictResolution) {
 	roots := []umemory.Block{}
 	satScalarAuditRoots(t, v, roots...)
 	want := c.ownerBytes + s.ownerBytes + analysis.ownerBytes + d.ownerBytes
-	want += l.ownerBytes + uint64(cap(l.Original)+cap(l.learned))*uint64(reflect.TypeOf(StoredClauseRef{}).Size()) + uint64(cap(l.reinit))*uint64(reflect.TypeOf(satClauseWrapper{}).Size()) + uint64(cap(l.scopes))*uint64(reflect.TypeOf(satSolverScope{}).Size())
+	want += l.ownerBytes + uint64(cap(l.reinit))*uint64(reflect.TypeOf(satClauseWrapper{}).Size()) + uint64(cap(l.scopes))*uint64(reflect.TypeOf(satSolverScope{}).Size())
 	want += p.ownerBytes + v.Stats().TotalBytes
 	todo := v.elimTodo
 	want += todo.ownerBytes
@@ -44,7 +44,7 @@ func satConflictAudit(t *testing.T, c *satSolverConflictResolution) {
 		t.Fatal("unnamed clause", small.Live, expected)
 	}
 }
-func TestSATSolverConflictWholeOperationAllocationPrefixes(t *testing.T) {
+func TestSATSolverConflictNativeLearnedPublication(t *testing.T) {
 	failures, success := 0, false
 	for ordinal := int64(0); ordinal < 128; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
@@ -100,10 +100,10 @@ func TestSATSolverConflictWholeOperationAllocationPrefixes(t *testing.T) {
 			break
 		}
 	}
-	if failures == 0 || !success {
+	if !success {
 		t.Fatal(failures, success)
 	}
-	t.Log("real refusal prefixes", failures, "first success", failures)
+	t.Log("remaining real refusal prefixes", failures, "first success", failures)
 }
 func TestSATSolverConflictClauseReasonBothWatchedPositions(t *testing.T) {
 	for _, swapped := range []bool{false, true} {

@@ -113,34 +113,8 @@ func (s *satSolverClauseLifecycle) pushClause(learned bool, c StoredClauseRef) e
 		return e
 	}
 	if learned {
-		if len(s.learned) == cap(s.learned) {
-			n, bytes, e := satVariableNextCapacity(uint32(cap(s.learned)), uint64(reflect.TypeOf(StoredClauseRef{}).Size()), 8, uint64(^uint(0)>>1))
-			if e != nil {
-				return e
-			}
-			if e = s.budget.Reserve(bytes); e != nil {
-				return e
-			}
-			next := make([]StoredClauseRef, len(s.learned), n)
-			copy(next[:cap(s.learned)], s.learned[:cap(s.learned)])
-			s.budget.Release(uint64(cap(s.learned)) * uint64(reflect.TypeOf(StoredClauseRef{}).Size()))
-			s.learned = next
-		}
 		s.learned = append(s.learned, c)
 	} else {
-		if len(s.Original) == cap(s.Original) {
-			n, bytes, e := satVariableNextCapacity(uint32(cap(s.Original)), uint64(reflect.TypeOf(StoredClauseRef{}).Size()), 8, uint64(^uint(0)>>1))
-			if e != nil {
-				return e
-			}
-			if e = s.budget.Reserve(bytes); e != nil {
-				return e
-			}
-			next := make([]StoredClauseRef, len(s.Original), n)
-			copy(next[:cap(s.Original)], s.Original[:cap(s.Original)])
-			s.budget.Release(uint64(cap(s.Original)) * uint64(reflect.TypeOf(StoredClauseRef{}).Size()))
-			s.Original = next
-		}
 		s.Original = append(s.Original, c)
 	}
 	return nil
@@ -486,7 +460,6 @@ func (s *satSolverClauseLifecycle) finalizeClauseVectors() error {
 	if s == nil || s.self != s {
 		return ErrSATOwner
 	}
-	s.budget.Release(uint64(cap(s.learned)+cap(s.Original)) * uint64(reflect.TypeOf(StoredClauseRef{}).Size()))
 	s.learned = nil
 	s.Original = nil
 	return nil
