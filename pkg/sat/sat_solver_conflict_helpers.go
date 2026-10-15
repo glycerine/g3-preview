@@ -193,6 +193,7 @@ func (s *satSolverConflictResolution) forgetPhaseOfVars(from uint32) error {
 		if e != nil {
 			return e
 		}
+		s.traceForgetPhase(lit)
 		if e = v.setPhase(lit.variable(), 2); e != nil {
 			return e
 		}

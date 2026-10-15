@@ -178195,6 +178195,12 @@
           "tests": ["TestSATReinitAssumptionsSourceTraceAroundScopeAndAssignments"]
         },
         {
+          "name": "Reached SAT forget_phase and push TRACE before phase clear and scope publication (sat_solver.cpp:2193,2533)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_backtrack_trace.go",
+          "tests": ["TestSATForgetPhaseSourceTraceBeforeClear", "TestSATPushScopeSourceTraceBeforePublication"]
+        },
+        {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_simplify_trace.go",
@@ -179437,6 +179443,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_conflict_assumptions_trace.go",
           "tests": ["TestSATReinitAssumptionsSourceTraceAroundScopeAndAssignments"]
+        },
+        {
+          "name": "Reached SAT forget_phase and push TRACE before phase clear and scope publication (sat_solver.cpp:2193,2533)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_backtrack_trace.go",
+          "tests": ["TestSATForgetPhaseSourceTraceBeforeClear", "TestSATPushScopeSourceTraceBeforePublication"]
         },
         {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",

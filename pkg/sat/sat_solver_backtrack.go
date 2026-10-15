@@ -13,10 +13,11 @@ func (s *satSolverClauseLifecycle) push() error {
 	}
 	p := s.propagation
 	v := p.variables
+	if satStorageSourceDebug && p.inconsistent {
+		return ErrSATAssertion
+	}
+	s.tracePushScope()
 	if satStorageSourceDebug {
-		if p.inconsistent {
-			return ErrSATAssertion
-		}
 		n, e := v.trail.Size(v.trailRef)
 		if e != nil {
 			return e
