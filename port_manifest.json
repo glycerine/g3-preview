@@ -54402,6 +54402,12 @@
           "tests": ["TestRationalRootInitializationTraceSourceOrderAndResume", "TestRationalRootInitializationTraceRefusalAndPrinterPrefix"]
         },
         {
+          "name": "Concrete config_mpq search parameter, pre-removal selected-node, post-propagation bound, depth-limit and split-variable TRACE sites (subpaving_t_def.h:1810,1819,1825,1833,1837)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_search_trace.go",
+          "tests": ["TestRationalSearchTraceSelectionPropagationSplitAndDepth", "TestRationalSearchTraceNullVariable", "TestRationalSearchTraceRefusalAndPrinterResume"]
+        },
+        {
           "name": "Concrete config_hwf mk_var, mk_sum, and mk_ineq construction with sorted duplicate coefficient swaps (src/math/subpaving/subpaving_t_def.h:666-687,741-780)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/hardware_context_constraints.go",
@@ -176983,6 +176989,12 @@
           "tests": ["TestRationalRootInitializationTraceSourceOrderAndResume", "TestRationalRootInitializationTraceRefusalAndPrinterPrefix"]
         },
         {
+          "name": "Reached config_mpq search parameter, selected-node, post-propagation, depth-limit and split-variable TRACE sites (subpaving_t_def.h:1810,1819,1825,1833,1837)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_search_trace.go",
+          "tests": ["TestRationalSearchTraceSelectionPropagationSplitAndDepth", "TestRationalSearchTraceNullVariable", "TestRationalSearchTraceRefusalAndPrinterResume"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -177781,6 +177793,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_init_trace.go",
           "tests": ["TestRationalRootInitializationTraceSourceOrderAndResume", "TestRationalRootInitializationTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Reached config_mpq search parameter, selected-node, post-propagation, depth-limit and split-variable TRACE sites (subpaving_t_def.h:1810,1819,1825,1833,1837)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_search_trace.go",
+          "tests": ["TestRationalSearchTraceSelectionPropagationSplitAndDepth", "TestRationalSearchTraceNullVariable", "TestRationalSearchTraceRefusalAndPrinterResume"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

@@ -37,6 +37,7 @@ type RationalNode struct {
 	queuedLeaf   bool
 	children     uint32
 	depth        uint32
+	id           uint32
 	conflictVar  uint32
 	closed       bool
 }

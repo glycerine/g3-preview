@@ -146,7 +146,7 @@ func (c *RationalContext) Root() (*RationalNode, error) {
 	if err != nil {
 		return nil, err
 	}
-	n.context, n.registered = c, true
+	n.context, n.registered, n.id = c, true, uint32(len(c.nodes))
 	c.root = n
 	c.nodes = append(c.nodes, n)
 	c.pushLeafFront(n)
@@ -164,7 +164,7 @@ func (c *RationalContext) NewChild(parent *RationalNode) (*RationalNode, error) 
 	if err != nil {
 		return nil, err
 	}
-	n.registered = true
+	n.registered, n.id = true, uint32(len(c.nodes))
 	c.nodes = append(c.nodes, n)
 	c.pushLeafFront(n)
 	return n, nil

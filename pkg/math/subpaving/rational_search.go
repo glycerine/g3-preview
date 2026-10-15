@@ -40,6 +40,9 @@ func (c *RationalContext) Search() error {
 	if err := c.InitializeRoot(); err != nil {
 		return err
 	}
+	if err := c.traceSearchParams(); err != nil {
+		return err
+	}
 	for c.searchNode != nil || c.leafHead != nil {
 		if c.searchNode == nil {
 			if err := sourceCheckpoint(c.limit, c.runtime, c.process, c.maxMemory, ErrRationalContextCanceled, c.cooperation); err != nil {
@@ -51,10 +54,14 @@ func (c *RationalContext) Search() error {
 			if uint64(len(c.nodes)) > uint64(c.maxNodes) {
 				return nil
 			}
-			n, err := c.PopLeafBFS()
+			n, err := c.SelectLeafBFS()
 			if err != nil || n == nil {
 				return err
 			}
+			if err := c.traceSearchNode(n, "selected", 1819); err != nil {
+				return err
+			}
+			c.removeLeaf(n)
 			c.searchNode, c.searchPhase = n, 0
 		}
 		n := c.searchNode
@@ -74,12 +81,35 @@ func (c *RationalContext) Search() error {
 			}
 			c.searchPhase = 2
 		}
-		if n.conflictVar != math.MaxUint32 || n.depth >= c.maxDepth || len(c.variables) == 0 {
+		if c.searchPhase == 2 {
+			if err := c.traceSearchNode(n, "after", 1825); err != nil {
+				return err
+			}
+			c.searchPhase = 3
+		}
+		if n.conflictVar != math.MaxUint32 {
+			if err := c.traceSearchNode(n, "inconsistent", 1828); err != nil {
+				return err
+			}
 			c.searchNode = nil
 			continue
 		}
-		variable, found, err := c.SelectBranchVariable(n, true)
-		if err != nil {
+		if n.depth >= c.maxDepth {
+			if err := c.traceSearchNode(n, "depth", 1833); err != nil {
+				return err
+			}
+			c.searchNode = nil
+			continue
+		}
+		variable, found := uint32(0), false
+		if len(c.variables) != 0 {
+			var err error
+			variable, found, err = c.SelectBranchVariable(n, true)
+			if err != nil {
+				return err
+			}
+		}
+		if err := c.traceSearchVariable(variable, found); err != nil {
 			return err
 		}
 		if found {
