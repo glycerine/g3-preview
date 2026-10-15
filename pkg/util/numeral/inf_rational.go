@@ -148,6 +148,58 @@ func (s *RationalService) InfFromRational(r *OwnedRational) (_lexOut OwnedInfRat
 	}
 	return v, nil
 }
+
+// Both two-argument constructors complete FIRST before copying EPS. A failed
+// EPS copy destroys the completed FIRST and aborts only the incomplete EPS.
+func (s *RationalService) infFromPairLocked(first, second *Rational) (_lexOut OwnedInfRational, _lexErr error) {
+	if e := s.beginLexical(); e != nil {
+		return OwnedInfRational{}, e
+	}
+	defer s.endLexicalInf(&_lexOut, &_lexErr)
+	v := s.infEmpty()
+	if e := s.Manager.Copy(&v.First, first); e != nil {
+		s.abortLexicalRational(&v.First)
+		return OwnedInfRational{}, e
+	}
+	if e := s.Manager.Copy(&v.Second, second); e != nil {
+		s.destroyLexicalRational(&v.First)
+		s.abortLexicalRational(&v.Second)
+		return OwnedInfRational{}, e
+	}
+	return v, nil
+}
+
+// InfFromPair is inf_rational(rational const&, rational const&).
+func (s *RationalService) InfFromPair(first, second *OwnedRational) (OwnedInfRational, error) {
+	if e := s.lock(); e != nil {
+		return OwnedInfRational{}, e
+	}
+	defer s.mu.Unlock()
+	if e := s.rationalScalarOwner(first); e != nil {
+		return OwnedInfRational{}, e
+	}
+	if e := s.rationalScalarOwner(second); e != nil {
+		return OwnedInfRational{}, e
+	}
+	return s.infFromPairLocked(&first.Raw, &second.Raw)
+}
+
+// InfFromOffset is inf_rational(rational const&, bool). The epsilon source is
+// the service's static one or minus-one rational.
+func (s *RationalService) InfFromOffset(first *OwnedRational, positive bool) (OwnedInfRational, error) {
+	if e := s.lock(); e != nil {
+		return OwnedInfRational{}, e
+	}
+	defer s.mu.Unlock()
+	if e := s.rationalScalarOwner(first); e != nil {
+		return OwnedInfRational{}, e
+	}
+	second := &s.MinusOneField
+	if positive {
+		second = &s.OneField
+	}
+	return s.infFromPairLocked(&first.Raw, second)
+}
 func (s *RationalService) InfClone(src *OwnedInfRational) (OwnedInfRational, error) {
 	if e := s.lock(); e != nil {
 		return OwnedInfRational{}, e

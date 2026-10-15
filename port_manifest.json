@@ -127618,6 +127618,18 @@
           "tests": ["TestInfFromInt32SourceConstructor"]
         },
         {
+          "name": "inf_rational(rational const&, bool) FIRST then signed unit EPS copy (inf_rational.h:85-88); reached by opt_solver.cpp and theory_lra.cpp",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_rational.go",
+          "tests": ["TestInfPairAndOffsetConstructorsOwnInputs", "TestInfRationalFailurePrefixesImmediateRoots"]
+        },
+        {
+          "name": "inf_rational(rational const&, rational const&) FIRST then EPS copy and completed-member unwind (inf_rational.h:96-99); reached by model_based_opt.cpp and SMT theory arithmetic",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_rational.go",
+          "tests": ["TestInfPairAndOffsetConstructorsOwnInputs", "TestInfRationalFailurePrefixesImmediateRoots"]
+        },
+        {
           "name": "get_first/get_rational and get_infinitesimal borrowed component reads without peer inspection or copy (inf_rational.h:135-143)",
           "status": "ported",
           "go_target": "pkg/util/numeral/rational_numeric_borrow.go",

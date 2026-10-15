@@ -648,8 +648,28 @@ func TestInfFromRationalOwnsIndependentFirst(t *testing.T) {
 	serviceMust(t, s.InfDel(&value))
 }
 
+func TestInfPairAndOffsetConstructorsOwnInputs(t *testing.T) {
+	s, _ := serviceNew(t)
+	first := serviceValue(t, s, "123456789012345678901/37")
+	second := serviceValue(t, s, "-7/4")
+	pair, err := s.InfFromPair(&first, &second)
+	serviceMust(t, err)
+	positive, err := s.InfFromOffset(&first, true)
+	serviceMust(t, err)
+	negative, err := s.InfFromOffset(&first, false)
+	serviceMust(t, err)
+	serviceMust(t, s.Del(&first))
+	serviceMust(t, s.Del(&second))
+	infText(t, s, &pair, "(123456789012345678901/37 -e*7/4)")
+	infText(t, s, &positive, "(123456789012345678901/37 +e*1)")
+	infText(t, s, &negative, "(123456789012345678901/37 -e*1)")
+	for _, v := range []*OwnedInfRational{&pair, &positive, &negative} {
+		serviceMust(t, s.InfDel(v))
+	}
+}
+
 func TestInfRationalFailurePrefixesImmediateRoots(t *testing.T) {
-	for op := 0; op < 18; op++ {
+	for op := 0; op < 20; op++ {
 		success := false
 		failures := 0
 		for prefix := int64(0); prefix < 4096; prefix++ {
@@ -724,6 +744,10 @@ func TestInfRationalFailurePrefixesImmediateRoots(t *testing.T) {
 				value, e = s.InfDenominator(&a)
 			case 17:
 				value, e = s.InfFromRational(&qa)
+			case 18:
+				value, e = s.InfFromPair(&qa, &qe)
+			case 19:
+				value, e = s.InfFromOffset(&qa, true)
 			}
 			// Audit BEFORE String, Del, Close, or restoring the injected budget. Only
 			// actual public roots plus service-owned constants/cache can justify cells.
