@@ -166119,6 +166119,7 @@
         "pkg/util/params/util_params_decrement_tracked_test.go",
         "pkg/util/params/util_params_source_frame.go",
         "pkg/util/params/util_params_assignment_source_test.go",
+        "pkg/util/params/util_params_copy_all_kinds_source_test.go",
         "pkg/util/params/util_params_reset_source.go",
         "pkg/util/params/util_params_reset_source_test.go",
         "pkg/util/params/util_params_reset_key_source.go",
@@ -166186,6 +166187,8 @@
         "TestParamsReferenceTrackedDecrementGuardedEntryReceipt",
         "TestParamsReferenceAssignmentSourcePointerPublicationAfterDEC",
         "TestParamsReferenceInitFailedCopySkipsOldDEC",
+        "TestParamsReferenceCopyAllKindsSharedTargetRefusalPrefixes",
+        "TestParamsReferenceCopyFromSharedSourceStoppedDetach",
         "TestParamsReferenceInitFrameOwnAbortActualLeafReceipt",
         "TestParamsReferenceTwoFramesAndFreshInvocationReuse",
         "TestParamsReferenceNullAssignmentOldDECStop",
@@ -166368,6 +166371,8 @@
           "tests": [
             "TestParamsReferenceSourceCopyMergeAndSignedRat",
             "TestParamsReferenceCopyAllKindsSharedTargetOrderedMerge",
+            "TestParamsReferenceCopyAllKindsSharedTargetRefusalPrefixes",
+            "TestParamsReferenceCopyFromSharedSourceStoppedDetach",
             "TestParamsReferenceSelfCopySourceRatIdentity",
             "TestParamsBorrowedStringSymbolCopyAndOwnership",
             "TestParamsReferenceInitFailedCopySkipsOldDEC"
@@ -166582,6 +166587,8 @@
           "tests": [
             "TestParamsReferenceAssignmentSourcePointerPublicationAfterDEC",
             "TestParamsReferenceInitFailedCopySkipsOldDEC",
+            "TestParamsReferenceCopyAllKindsSharedTargetRefusalPrefixes",
+            "TestParamsReferenceCopyFromSharedSourceStoppedDetach",
             "TestParamsReferenceInitFrameOwnAbortActualLeafReceipt",
             "TestParamsReferenceTwoFramesAndFreshInvocationReuse",
             "TestParamsReferenceNullAssignmentOldDECStop",
@@ -166786,6 +166793,7 @@
         "pkg/util/params/util_params_decrement_tracked_test.go",
         "pkg/util/params/util_params_source_frame.go",
         "pkg/util/params/util_params_assignment_source_test.go",
+        "pkg/util/params/util_params_copy_all_kinds_source_test.go",
         "pkg/util/params/util_params_reset_source.go",
         "pkg/util/params/util_params_reset_source_test.go",
         "pkg/util/params/util_params_reset_key_source.go",
@@ -166850,6 +166858,8 @@
         "TestParamsReferenceTrackedDecrementGuardedEntryReceipt",
         "TestParamsReferenceAssignmentSourcePointerPublicationAfterDEC",
         "TestParamsReferenceInitFailedCopySkipsOldDEC",
+        "TestParamsReferenceCopyAllKindsSharedTargetRefusalPrefixes",
+        "TestParamsReferenceCopyFromSharedSourceStoppedDetach",
         "TestParamsReferenceInitFrameOwnAbortActualLeafReceipt",
         "TestParamsReferenceTwoFramesAndFreshInvocationReuse",
         "TestParamsReferenceNullAssignmentOldDECStop",
@@ -166993,6 +167003,8 @@
           "tests": [
             "TestParamsReferenceSourceCopyMergeAndSignedRat",
             "TestParamsReferenceCopyAllKindsSharedTargetOrderedMerge",
+            "TestParamsReferenceCopyAllKindsSharedTargetRefusalPrefixes",
+            "TestParamsReferenceCopyFromSharedSourceStoppedDetach",
             "TestParamsReferenceSelfCopySourceRatIdentity",
             "TestParamsBorrowedStringSymbolCopyAndOwnership",
             "TestParamsReferenceInitFailedCopySkipsOldDEC"
@@ -167205,6 +167217,8 @@
           "tests": [
             "TestParamsReferenceAssignmentSourcePointerPublicationAfterDEC",
             "TestParamsReferenceInitFailedCopySkipsOldDEC",
+            "TestParamsReferenceCopyAllKindsSharedTargetRefusalPrefixes",
+            "TestParamsReferenceCopyFromSharedSourceStoppedDetach",
             "TestParamsReferenceInitFrameOwnAbortActualLeafReceipt",
             "TestParamsReferenceTwoFramesAndFreshInvocationReuse",
             "TestParamsReferenceNullAssignmentOldDECStop",

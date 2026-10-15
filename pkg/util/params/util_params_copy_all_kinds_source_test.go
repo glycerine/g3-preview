@@ -163,3 +163,66 @@ func TestParamsReferenceCopyAllKindsSharedTargetRefusalPrefixes(t *testing.T) {
 		t.Fatalf("refusal sweep missed copied prefix or success: stop=%v prefix=%d success=%v", seenDetachedStop, maxStoppedPrefix, seenSuccess)
 	}
 }
+
+func TestParamsReferenceCopyFromSharedSourceStoppedDetach(t *testing.T) {
+	const want = "(params r -7/3 s live b true)"
+	seenPublishedStop := false
+	seenSuccess := false
+	for fault := int64(0); fault < 48 && !seenSuccess; fault++ {
+		t.Run(strconv.FormatInt(fault, 10), func(t *testing.T) {
+			c, sy, q := paramsTestOwner(t)
+			src, e := c.NewValue()
+			paramsMust(t, e)
+			dst, e := c.NewValue()
+			paramsMust(t, e)
+			r := internSymbol(t, sy, "r")
+			s := internSymbol(t, sy, "s")
+			b := internSymbol(t, sy, "b")
+			value, e := q.NewValue()
+			paramsMust(t, e)
+			paramsMust(t, q.SetFractionSigned(&value, -7, 3))
+			paramsMust(t, c.SetRat(&src, r, &value))
+			paramsMust(t, q.Del(&value))
+			text := "live"
+			paramsMust(t, c.SetString(&src, s, &text))
+			paramsMust(t, c.SetBool(&src, b, true))
+			paramsMust(t, c.Assign(&dst, &src))
+			oldSlot := src.Slot
+			if dst.Slot != oldSlot || c.Blocks[oldSlot-1].Refs != 2 {
+				t.Fatal("source alias not established")
+			}
+			c.BudgetField.FailAfter(fault)
+			e = c.Copy(&dst, &src)
+			c.BudgetField.FailAfter(-1)
+			if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
+				t.Fatal(e)
+			}
+			if e != nil && dst.Slot != oldSlot {
+				seenPublishedStop = true
+				receipt, err := c.StoppedSource(&dst)
+				paramsMust(t, err)
+				if receipt.Invocation() == 0 {
+					t.Fatal("missing actual detach invocation")
+				}
+				paramsMust(t, c.CleanupSource(receipt))
+			}
+			if got, err := c.Display(&src); err != nil || got != want {
+				t.Fatalf("source changed during detach: %q, %v", got, err)
+			}
+			if e == nil {
+				seenSuccess = true
+				if got, err := c.Display(&dst); err != nil || got != want || dst.Slot == oldSlot {
+					t.Fatalf("completed detach: %q, %v, slot=%d", got, err, dst.Slot)
+				}
+			}
+			if dst.Slot != oldSlot && c.Blocks[oldSlot-1].Refs != 1 {
+				t.Fatal("cleanup consumed source alias or retained destination alias")
+			}
+			paramsMust(t, c.Del(&dst))
+			paramsMust(t, c.Del(&src))
+		})
+	}
+	if !seenPublishedStop || !seenSuccess {
+		t.Fatalf("refusal sweep missed published stop or success: stop=%v success=%v", seenPublishedStop, seenSuccess)
+	}
+}
