@@ -156,6 +156,7 @@ func (m *ASTManager) initManager() error {
 			return e
 		}
 	}
+	m.traceBuiltinPluginAllocated(0)
 	if e := m.setPlugin(0, astBasicPlugin); e != nil {
 		return e
 	}
@@ -179,6 +180,7 @@ func (m *ASTManager) initManager() error {
 		return e
 	}
 	// Label symbols are constructor-owned source scalar spellings; no node pin.
+	m.traceBuiltinPluginAllocated(1)
 	m.builtin.labelPos, e = m.Symbols.Intern("lblpos")
 	if e != nil {
 		return e
@@ -194,12 +196,15 @@ func (m *ASTManager) initManager() error {
 	if e := m.setPlugin(1, astLabelPlugin); e != nil {
 		return e
 	}
+	m.traceBuiltinPluginAllocated(2)
 	if e := m.setPlugin(2, astPatternPlugin); e != nil {
 		return e
 	}
+	m.traceBuiltinPluginAllocated(3)
 	if e := m.setPlugin(3, astModelValuePlugin); e != nil {
 		return e
 	}
+	m.traceBuiltinPluginAllocated(4)
 	if e = m.builtin.userTable.Init(m.Symbols); e != nil {
 		return e
 	}

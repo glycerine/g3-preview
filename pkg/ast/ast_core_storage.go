@@ -284,6 +284,7 @@ type ASTManager struct {
 	pageBytes, directoryBytes, ownerBytes                                                              uint64
 	table                                                                                              astCanonicalTable
 	plugins                                                                                            astPluginVector
+	builtinPluginTraceLive                                                                             [5]bool
 	basic                                                                                              astBasicPluginState
 	builtin                                                                                            astBuiltinPluginState
 	boolSort, proofSort, trueApp, falseApp, undefProof                                                 astNodeRef

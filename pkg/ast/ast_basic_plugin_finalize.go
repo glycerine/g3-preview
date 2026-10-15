@@ -93,6 +93,7 @@ func (m *ASTManager) finalizeBasic() error {
 	return failure
 }
 func (m *ASTManager) destroyPluginBacking() {
+	m.traceBuiltinPluginsDeallocated()
 	m.basic.eq = nil
 	m.basic.ite = nil
 	m.basic.oeq = nil
