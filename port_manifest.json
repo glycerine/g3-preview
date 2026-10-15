@@ -181481,6 +181481,8 @@
         "pkg/ast/ast_array_as_array.go",
         "pkg/ast/ast_array_map.go",
         "pkg/sat/sat_solver_model_converter.go",
+        "pkg/sat/sat_simplifier_elimination.go",
+        "pkg/sat/sat_simplifier_elimination_test.go",
         "pkg/sat/sat_solver_nested_store.go",
         "pkg/sat/sat_solver_uint_set.go",
         "pkg/sat/sat_solver_watch_store.go",
@@ -181917,6 +181919,15 @@
             "TestSATNativeWrapperAndBinarySliceGrowth",
             "TestSATNativeActivityGrowthAndLogicalBounds",
             "TestSATClauseUseListNativeGrowthAtColdBudgetLimit"
+          ]
+        },
+        {
+          "name": "SAT simplifier elimination-cost pair vector uses native Go slice growth and stable standard-library sorting",
+          "status": "platform_replacement",
+          "go_target": "pkg/sat/sat_simplifier_elimination.go",
+          "tests": [
+            "TestSATSimplifierEliminationCostAndStableOrder",
+            "TestSATSimplifierEliminationNativeCostGrowthAndStableTies"
           ]
         },
         {

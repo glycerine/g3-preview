@@ -3,9 +3,9 @@ package sat
 
 import (
 	"errors"
-	"github.com/glycerine/g3/pkg/util/lbool"
+	"sort"
 
-	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
 type satSimplifierVarCost struct{ variable, cost uint32 }
@@ -14,7 +14,6 @@ type satSimplifierVarCost struct{ variable, cost uint32 }
 // cleanup. Costs are concrete source pair records, never copied clause owners.
 type satSimplifierElimination struct {
 	costs        []satSimplifierVarCost
-	sortScratch  []satSimplifierVarCost
 	vars         satUintColumn
 	reportActive bool
 }
@@ -36,23 +35,9 @@ func (s *satSimplifier) closeElimination() error {
 	}
 	return nil
 }
-func (s *satSimplifier) pushCost(v, c uint32) error {
+func (s *satSimplifier) pushCost(v, c uint32) {
 	x := &s.elimination
-	if len(x.costs) == cap(x.costs) {
-		n, bytes, e := satVariableNextCapacity(uint32(cap(x.costs)), 8, 8, uint64(^uint(0)>>1))
-		if e != nil {
-			return e
-		}
-		if e = s.lifecycle.budget.Reserve(bytes); e != nil {
-			return e
-		}
-		next := make([]satSimplifierVarCost, len(x.costs), n)
-		copy(next, x.costs)
-		s.lifecycle.budget.Release(uint64(cap(x.costs)) * 8)
-		x.costs = next
-	}
 	x.costs = append(x.costs, satSimplifierVarCost{v, c})
-	return nil
 }
 func (s *satSimplifier) nonLearnedBinaries(l Literal) (uint32, error) {
 	w, e := s.lifecycle.propagation.variables.watches.Get(uint32(l.Negated()))
@@ -143,16 +128,12 @@ func (s *satSimplifier) orderVariables() error {
 		if e != nil {
 			return e
 		}
-		if e = s.pushCost(v, c); e != nil {
-			return e
-		}
+		s.pushCost(v, c)
 	}
 	if e := p.variables.elimTodo.Reset(); e != nil {
 		return e
 	}
-	if e := s.sortEliminationCosts(); e != nil {
-		return e
-	}
+	s.sortEliminationCosts()
 	for _, a := range x.costs {
 		if e := x.vars.Push(a.variable); e != nil {
 			return e
@@ -791,50 +772,9 @@ func (s *satSimplifier) resetNewClause() error {
 }
 
 func (s *satSimplifier) closeEliminationCosts() {
-	x := &s.elimination
-	s.lifecycle.budget.Release(8 * uint64(cap(x.sortScratch)))
-	x.sortScratch = nil
-	s.lifecycle.budget.Release(8 * uint64(cap(x.costs)))
-	x.costs = nil
+	s.elimination.costs = nil
 }
-func (s *satSimplifier) sortEliminationCosts() error {
+func (s *satSimplifier) sortEliminationCosts() {
 	x := &s.elimination
-	n := len(x.costs)
-	if n < 2 {
-		return nil
-	}
-	bytes := uint64(n) * 8
-	if bytes > uint64(^uint(0)>>1) {
-		return arena.ErrBounds
-	}
-	if e := s.lifecycle.budget.Reserve(bytes); e != nil {
-		return e
-	}
-	x.sortScratch = make([]satSimplifierVarCost, n)
-	defer func() { s.lifecycle.budget.Release(bytes); x.sortScratch = nil }()
-	source, destination := x.costs, x.sortScratch
-	for width := uint64(1); width < uint64(n); width *= 2 {
-		for start := uint64(0); start < uint64(n); start += 2 * width {
-			mid, end := start+width, start+2*width
-			if mid > uint64(n) {
-				mid = uint64(n)
-			}
-			if end > uint64(n) {
-				end = uint64(n)
-			}
-			left, right := start, mid
-			for out := start; out < end; out++ {
-				if left == mid || (right < end && source[right].cost < source[left].cost) {
-					destination[out] = source[right]
-					right++
-				} else {
-					destination[out] = source[left]
-					left++
-				}
-			}
-		}
-		source, destination = destination, source
-	}
-	copy(x.costs, source)
-	return nil
+	sort.SliceStable(x.costs, func(i, j int) bool { return x.costs[i].cost < x.costs[j].cost })
 }

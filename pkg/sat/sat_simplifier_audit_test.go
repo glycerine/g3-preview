@@ -51,7 +51,7 @@ func satSimplifierAudit(t *testing.T, simplifier *satSimplifier) {
 	da := dummy.owner
 	ds := da.storage.Stats()
 	want += dummy.ownerBytes + da.ownerBytes + 4*uint64(da.ids.FreeCapacity()) + da.largeBytes + da.largeDirectory + ds.OwnerBytes + ds.PayloadBytes + ds.MetadataBytes + ds.DirectoryBytes
-	want += simplifier.clauseSort.bytes + 8*uint64(cap(simplifier.elimination.costs)+cap(simplifier.elimination.sortScratch))
+	want += simplifier.clauseSort.bytes
 	if q := simplifier.blocked.queue; q != nil {
 		want += q.ownerBytes + 4*uint64(cap(q.values)+cap(q.indices))
 	}

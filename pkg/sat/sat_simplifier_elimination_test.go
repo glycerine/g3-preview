@@ -38,6 +38,27 @@ func TestSATSimplifierEliminationCostAndStableOrder(t *testing.T) {
 	satOK(t, s.closeElimination())
 }
 
+func TestSATSimplifierEliminationNativeCostGrowthAndStableTies(t *testing.T) {
+	s, l := satSimplifierFixture(t, 0)
+	before := l.budget.Used()
+	l.budget.FailAfter(0)
+	for i := uint32(0); i < 129; i++ {
+		s.pushCost(i, (i*7)%5)
+	}
+	s.sortEliminationCosts()
+	if l.budget.Used() != before {
+		t.Fatal("native cost storage charged arena", before, l.budget.Used())
+	}
+	l.budget.FailAfter(-1)
+	for i := 1; i < len(s.elimination.costs); i++ {
+		prev, next := s.elimination.costs[i-1], s.elimination.costs[i]
+		if prev.cost > next.cost || (prev.cost == next.cost && prev.variable > next.variable) {
+			t.Fatal("stable source cost order", i, prev, next)
+		}
+	}
+	s.closeEliminationCosts()
+}
+
 func TestSATSimplifierActualTernaryAndNaryResolventPublication(t *testing.T) {
 	for _, last := range [][]Literal{{1, 4, 6}, {1, 6, 8}} {
 		t.Run(string(rune('a'+last[1])), func(t *testing.T) {
