@@ -114,7 +114,7 @@ func (m *ASTManager) builtinDecl(fid FamilyID, k int32, ps []ASTParameter, domai
 	}
 }
 func (m *ASTManager) registerUserName(name usymbol.Symbol) (int32, error) {
-	return astRegisterUserName(&m.builtin.userTable, &m.builtin.userNames, m.BudgetField, name)
+	return astRegisterUserName(&m.builtin.userTable, &m.builtin.userNames, name)
 }
 func (m *ASTManager) userSort(k int32, ps []ASTParameter) (astNodeRef, error) {
 	if k < 0 || uint64(k) >= uint64(len(m.builtin.userNames)) {

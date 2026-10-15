@@ -10935,6 +10935,15 @@
           ]
         },
         {
+          "name": "Concrete user_sort_plugin register_name and mk_fresh preserve name order with a native symbol slice and Go dictionary (ast.cpp:1273-1288)",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_builtin_plugins_user.go",
+          "tests": [
+            "TestASTUserNameDictionaryRegistrationAndFreshReplay",
+            "TestASTUserNameNativeGrowthAndFreshReplay"
+          ]
+        },
+        {
           "name": "existing app/quantifier construction through actual borrowed result-vector ranges, preserving update control flow and metadata",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_update.go",
@@ -182277,6 +182286,15 @@
             "TestASTArithmeticSourceEveryRegistrationReservation",
             "TestASTRegisterDeclarationPluginsSourceOrder",
             "TestASTRegisterDeclarationPluginsPreservesExisting"
+          ]
+        },
+        {
+          "name": "Concrete user_sort_plugin ordered symbol-name vector and fresh replay use native Go slice growth",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_builtin_plugins_user.go",
+          "tests": [
+            "TestASTUserNameDictionaryRegistrationAndFreshReplay",
+            "TestASTUserNameNativeGrowthAndFreshReplay"
           ]
         }
       ],

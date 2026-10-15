@@ -36,3 +36,32 @@ func TestASTUserNameDictionaryRegistrationAndFreshReplay(t *testing.T) {
 		t.Fatal("real fresh replay must rebuild kinds", k, ok, len(fresh.names))
 	}
 }
+
+func TestASTUserNameNativeGrowthAndFreshReplay(t *testing.T) {
+	m := astTestManager(t)
+	budget := m.BudgetField
+	before := budget.Used()
+	budget.FailAfter(0)
+	defer budget.FailAfter(-1)
+	for i := uint32(0); i < 129; i++ {
+		kind, e := m.registerUserName(usymbol.Numerical(i))
+		astTestMust(t, e)
+		if kind != int32(i) {
+			t.Fatal("registration order", i, kind)
+		}
+	}
+	budget.FailAfter(-1)
+	if budget.Used() != before || len(m.builtin.userNames) != 129 {
+		t.Fatal("native name growth charged arena or lost order", budget.Used(), before, len(m.builtin.userNames))
+	}
+	fresh, e := m.freshUserPlugin()
+	astTestMust(t, e)
+	defer fresh.close()
+	for i := uint32(0); i < 129; i++ {
+		kind, found, e := fresh.dictionary.Find(usymbol.Numerical(i))
+		astTestMust(t, e)
+		if !found || kind != int32(i) || fresh.names[i] != usymbol.Numerical(i) {
+			t.Fatal("fresh plugin replay", i, kind, found)
+		}
+	}
+}

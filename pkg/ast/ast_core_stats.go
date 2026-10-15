@@ -3,8 +3,6 @@ package ast
 
 import (
 	"reflect"
-
-	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func (m *ASTManager) Stats() ASTManagerStats {
@@ -20,7 +18,7 @@ func (m *ASTManager) Stats() ASTManagerStats {
 		return ASTManagerStats{}
 	}
 	s := ASTManagerStats{LiveNodes: m.liveNodes, LiveParameters: m.liveParameters, LiveInfos: m.liveInfos, LiveReferences: m.liveReferences, OwnerBytes: m.ownerBytes, PageBytes: m.pageBytes, DirectoryBytes: m.directoryBytes}
-	s.AllocatedBytes = m.datatypePluginBytes() + m.auxiliaryPluginBytes() + m.floatingPointPluginBytes() + m.sequencePluginBytes() + m.arrayCardinalityBytes() + m.arrayPluginBytes() + m.arithmeticPluginBytes() + m.bitVectorPluginBytes() + m.formatPluginBytes() + m.formatFramesBytes() + m.ppFramesBytes() + s.OwnerBytes + s.PageBytes + s.DirectoryBytes + uint64(cap(m.builtin.userNames))*uint64(reflect.TypeOf(usymbol.Symbol{}).Size())
+	s.AllocatedBytes = m.datatypePluginBytes() + m.auxiliaryPluginBytes() + m.floatingPointPluginBytes() + m.sequencePluginBytes() + m.arrayCardinalityBytes() + m.arrayPluginBytes() + m.arithmeticPluginBytes() + m.bitVectorPluginBytes() + m.formatPluginBytes() + m.formatFramesBytes() + m.ppFramesBytes() + s.OwnerBytes + s.PageBytes + s.DirectoryBytes
 	for _, state := range m.scopedExprSubstitutions {
 		s.AllocatedBytes += state.header
 	}

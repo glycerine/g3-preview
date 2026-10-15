@@ -1,12 +1,6 @@
 // Source: src/ast/ast.cpp:917-979.
 package ast
 
-import (
-	"reflect"
-
-	usymbol "github.com/glycerine/g3/pkg/util/symbol"
-)
-
 func (m *ASTManager) finalizeBasic() error {
 	var failure error
 	drop := func(r *astNodeRef) {
@@ -105,7 +99,6 @@ func (m *ASTManager) destroyPluginBacking() {
 	for i := range m.basic.proofCaches {
 		m.basic.proofCaches[i] = nil
 	}
-	m.BudgetField.Release(uint64(cap(m.builtin.userNames)) * uint64(reflect.TypeOf(usymbol.Symbol{}).Size()))
 	m.builtin.userNames = nil
 	m.builtin.userTable.Close()
 	m.plugins.close()

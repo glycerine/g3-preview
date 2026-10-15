@@ -8,7 +8,7 @@ import (
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-func astRegisterUserName(dictionary *usymbol.DictionaryInt32, names *[]usymbol.Symbol, budget *arena.Budget, name usymbol.Symbol) (int32, error) {
+func astRegisterUserName(dictionary *usymbol.DictionaryInt32, names *[]usymbol.Symbol, name usymbol.Symbol) (int32, error) {
 	if k, ok, e := dictionary.Find(name); e != nil || ok {
 		return k, e
 	}
@@ -16,20 +16,6 @@ func astRegisterUserName(dictionary *usymbol.DictionaryInt32, names *[]usymbol.S
 		return 0, arena.ErrBounds
 	}
 	k := int32(len((*names)))
-	if len((*names)) == cap((*names)) {
-		width := uint64(reflect.TypeOf(usymbol.Symbol{}).Size())
-		n, e := astDirectoryGrowth(uint32(cap((*names))), uint32(len((*names))+1), width)
-		if e != nil {
-			return 0, e
-		}
-		if e = budget.Reserve(uint64(n) * width); e != nil {
-			return 0, e
-		}
-		next := make([]usymbol.Symbol, len((*names)), int(n))
-		copy(next, (*names))
-		budget.Release(uint64(cap((*names))) * width)
-		(*names) = next
-	}
 	// Source pushes the spelling before inserting its dictionary entry. A failed
 	// table allocation leaves this completed name-vector prefix intact.
 	(*names) = append((*names), name)
@@ -60,7 +46,7 @@ func (m *ASTManager) freshUserPlugin() (*astFreshUserPlugin, error) {
 		return nil, e
 	}
 	for _, name := range m.builtin.userNames {
-		if _, e := astRegisterUserName(&p.dictionary, &p.names, p.budget, name); e != nil {
+		if _, e := astRegisterUserName(&p.dictionary, &p.names, name); e != nil {
 			p.close()
 			return nil, e
 		}
@@ -72,7 +58,7 @@ func (p *astFreshUserPlugin) close() {
 		return
 	}
 	p.dictionary.Close()
-	p.budget.Release(uint64(cap(p.names))*uint64(reflect.TypeOf(usymbol.Symbol{}).Size()) + p.ownerBytes)
+	p.budget.Release(p.ownerBytes)
 	p.ownerBytes = 0
 	p.names = nil
 }
