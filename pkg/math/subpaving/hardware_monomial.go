@@ -109,6 +109,9 @@ func (c *HardwareContext) PropagateMonomial(variable uint32, n *HardwareNode) (e
 	if m == nil {
 		return arena.ErrInvalidSlot
 	}
+	if err = c.traceMonomialStart(variable); err != nil {
+		return err
+	}
 	m.visited = c.timestamp
 	foundZero, foundUnbounded := false, false
 	for _, power := range m.powers {
@@ -130,6 +133,9 @@ func (c *HardwareContext) PropagateMonomial(variable uint32, n *HardwareNode) (e
 			return err
 		}
 		foundUnbounded = foundUnbounded || unbounded
+	}
+	if err = c.traceMonomialFlags(foundZero, foundUnbounded); err != nil {
+		return err
 	}
 	if foundZero {
 		zero, err := n.IsZero(variable)
@@ -228,6 +234,9 @@ func (c *HardwareContext) propagateMonomialUpward(m *HardwareMonomial, variable 
 }
 
 func (c *HardwareContext) propagateMonomialDownward(m *HardwareMonomial, variable uint32, j int, n *HardwareNode) (err error) {
+	if err = c.traceMonomialDownward(variable, j); err != nil {
+		return err
+	}
 	r, err := NewHardwareInterval(c.numbers)
 	if err != nil {
 		return err
