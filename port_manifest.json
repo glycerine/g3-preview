@@ -54408,6 +54408,12 @@
           "tests": ["TestRationalSearchTraceSelectionPropagationSplitAndDepth", "TestRationalSearchTraceNullVariable", "TestRationalSearchTraceRefusalAndPrinterResume"]
         },
         {
+          "name": "Concrete config_mpq inconsistent-node TRACE after selected-child propagation (subpaving_t_def.h:1828)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_search_trace.go",
+          "tests": ["TestRationalSearchTraceChildConflictAfterPropagation"]
+        },
+        {
           "name": "Concrete config_mpq search entry and exit statistics TRACE sites, including node-limit break (subpaving_t_def.h:1809,1844)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_search_statistics_trace.go",
@@ -177001,6 +177007,12 @@
           "tests": ["TestRationalSearchTraceSelectionPropagationSplitAndDepth", "TestRationalSearchTraceNullVariable", "TestRationalSearchTraceRefusalAndPrinterResume"]
         },
         {
+          "name": "Reached config_mpq inconsistent-node TRACE after selected-child propagation (subpaving_t_def.h:1828)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_search_trace.go",
+          "tests": ["TestRationalSearchTraceChildConflictAfterPropagation"]
+        },
+        {
           "name": "Reached config_mpq search entry and exit statistics TRACE sites (subpaving_t_def.h:1809,1844)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_search_statistics_trace.go",
@@ -177811,6 +177823,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_search_trace.go",
           "tests": ["TestRationalSearchTraceSelectionPropagationSplitAndDepth", "TestRationalSearchTraceNullVariable", "TestRationalSearchTraceRefusalAndPrinterResume"]
+        },
+        {
+          "name": "Reached config_mpq inconsistent-node TRACE after selected-child propagation (subpaving_t_def.h:1828)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_search_trace.go",
+          "tests": ["TestRationalSearchTraceChildConflictAfterPropagation"]
         },
         {
           "name": "Reached config_mpq search entry and exit statistics TRACE sites (subpaving_t_def.h:1809,1844)",

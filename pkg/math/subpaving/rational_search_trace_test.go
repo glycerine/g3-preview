@@ -75,6 +75,54 @@ func TestRationalSearchTraceNullVariable(t *testing.T) {
 	}
 }
 
+func TestRationalSearchTraceChildConflictAfterPropagation(t *testing.T) {
+	c, m, v, x, y := rationalClauseFixture(t)
+	c.maxDepth = 1
+	if err := m.SetInt32(v, 0); err != nil {
+		t.Fatal(err)
+	}
+	xNegative, err := c.NewInequality(x, v, false, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	yAtMostZero, err := c.NewInequality(y, v, false, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := m.SetInt32(v, 1); err != nil {
+		t.Fatal(err)
+	}
+	yAtLeastOne, err := c.NewInequality(y, v, true, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, consequent := range []*RationalInequality{yAtLeastOne, yAtMostZero} {
+		if _, err := c.AddClause([]*RationalInequality{xNegative, consequent}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	var output polynomialTraceFlushingBuffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("subpaving_main")
+	if err := c.BindTrace(tags); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.Search(); err != nil {
+		t.Fatal(err)
+	}
+	if len(c.nodes) != 3 || c.nodes[2].conflictVar != x || c.numConflicts != 1 {
+		t.Fatal("right child did not become inconsistent during selected propagation", len(c.nodes), c.nodes[2].conflictVar, c.numConflicts)
+	}
+	if tags.ShouldTrace("subpaving_main") {
+		got := output.String()
+		if !strings.Contains(got, "node #2 after propagation\n") || !strings.Contains(got, "node #2 is inconsistent.\n") || strings.Count(got, "subpaving_t_def.h:1828") != 1 {
+			t.Fatal("source inconsistent-node record", got)
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("erased inconsistent-node trace emitted", output.String())
+	}
+}
+
 func TestRationalSearchTraceRefusalAndPrinterResume(t *testing.T) {
 	c, _, _, _, _ := rationalClauseFixture(t)
 	c.maxDepth = 1
