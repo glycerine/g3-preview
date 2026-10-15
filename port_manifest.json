@@ -34771,6 +34771,7 @@
         "TestEuclideanIntegerBufferSortAndRawSwap",
         "TestEuclideanRationalBufferSortAndRawSwap",
         "TestEuclideanBufferSortCoreUsesPublishedSlots",
+        "TestEuclideanIntegerBufferSortCopyBudgetBoundary",
         "TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue",
         "TestEuclideanRationalAddmulMergedJustifications",
         "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
@@ -34880,7 +34881,8 @@
           "go_target": "pkg/math/euclid/numeral_buffer_sort.go",
           "tests": [
             "TestEuclideanIntegerBufferSortAndRawSwap",
-            "TestEuclideanRationalBufferSortAndRawSwap"
+            "TestEuclideanRationalBufferSortAndRawSwap",
+            "TestEuclideanIntegerBufferSortCopyBudgetBoundary"
           ]
         },
         {

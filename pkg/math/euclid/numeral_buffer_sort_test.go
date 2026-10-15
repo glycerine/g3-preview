@@ -1,9 +1,12 @@
 package euclid
 
 import (
+	"errors"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -26,6 +29,51 @@ func euclidNumeralManager(t *testing.T) *numeral.RationalManager {
 		}
 	})
 	return m
+}
+
+func TestEuclideanIntegerBufferSortCopyBudgetBoundary(t *testing.T) {
+	m := euclidNumeralManager(t)
+	z := m.Integers()
+	buffer, e := numeral.NewScopedIntVector(z)
+	euclidMust(t, e)
+	euclidMust(t, buffer.Resize(3))
+	coeff := []numeral.Int{{}, {}}
+	values := []string{strings.Repeat("1234567890", 20), strings.Repeat("9876543210", 20)}
+	for i, value := range values {
+		euclidMust(t, z.SetString(&coeff[i], value))
+	}
+	ids := []uint32{2, 0}
+	before := z.Budget().Used()
+	z.Budget().FailAfter(0)
+	e = sortInt(coeff, ids, buffer)
+	z.Budget().FailAfter(-1)
+	want := []string{values[1], values[0]}
+	if e != nil {
+		var failure umemory.Failure
+		if !errors.As(e, &failure) || failure.Kind != umemory.FailureMemout {
+			t.Fatal("first copy returned a nonallocation failure", e)
+		}
+		if ids[0] != 2 || ids[1] != 0 {
+			t.Fatal("source sorted IDs before completing copies", ids)
+		}
+		want = values
+		euclidMust(t, buffer.Cleanup())
+	} else {
+		if ids[0] != 0 || ids[1] != 2 || z.Budget().Used() != before {
+			t.Fatal("warm copy/sort changed allocation or ID order", ids, before, z.Budget().Used())
+		}
+		euclidMust(t, buffer.Close())
+	}
+	for i, wantValue := range want {
+		got, e := z.String(&coeff[i])
+		euclidMust(t, e)
+		if got != wantValue {
+			t.Fatal("source coefficient moved to wrong ID", i, got)
+		}
+	}
+	for i := range coeff {
+		euclidMust(t, z.Del(&coeff[i]))
+	}
 }
 
 func euclidMust(t *testing.T, e error) {
