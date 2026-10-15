@@ -57,19 +57,20 @@ func (p *idPool) recycle(id uint32) { p.free = append(p.free, id) }
 // mk_node_core interning and two-level mk_node simplification; formula and
 // tactic traversals remain with the unported owning AIG code.
 type Manager struct {
-	self       *Manager
-	ast        *ast.ASTManager
-	table      map[andKey]*node
-	variables  idPool
-	andNodes   idPool
-	trueNode   *node
-	toDelete   []*node
-	nodes      uint32
-	activeRefs uint32
-	header     uint64
-	nodeBytes  uint64
-	closing    bool
-	closed     bool
+	self                *Manager
+	ast                 *ast.ASTManager
+	table               map[andKey]*node
+	variables           idPool
+	andNodes            idPool
+	trueNode            *node
+	toDelete            []*node
+	nodes               uint32
+	activeRefs          uint32
+	header              uint64
+	nodeBytes           uint64
+	closing             bool
+	closed              bool
+	defaultGateEncoding bool
 }
 
 // Ref owns one source aig_ref count. Call Close for each returned reference.
@@ -80,6 +81,12 @@ type Ref struct {
 }
 
 func NewManager(m *ast.ASTManager) (*Manager, error) {
+	return NewManagerWithGateEncoding(m, true)
+}
+
+// NewManagerWithGateEncoding selects the source's default or alternate ITE
+// and IFF circuit construction branch.
+func NewManagerWithGateEncoding(m *ast.ASTManager, defaultGateEncoding bool) (*Manager, error) {
 	if m == nil {
 		return nil, ErrOwner
 	}
@@ -101,7 +108,7 @@ func NewManager(m *ast.ASTManager) (*Manager, error) {
 		m.BudgetField.Release(nodeBytes + managerBytes)
 		return nil, e
 	}
-	v := &Manager{ast: m, table: make(map[andKey]*node), header: managerBytes, nodeBytes: nodeBytes}
+	v := &Manager{ast: m, table: make(map[andKey]*node), header: managerBytes, nodeBytes: nodeBytes, defaultGateEncoding: defaultGateEncoding}
 	v.self = v
 	v.andNodes.next = firstNodeID
 	v.trueNode = &node{id: 0, refs: 2, variable: r}

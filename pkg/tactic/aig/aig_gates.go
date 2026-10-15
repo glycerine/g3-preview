@@ -50,8 +50,28 @@ func (m *Manager) Or(left, right *Ref) (*Ref, error) {
 	})
 }
 
-// Ite uses the source's default gate encoding: (!c || then) && (c || else).
+// Ite selects the source's default or alternate gate encoding.
 func (m *Manager) Ite(condition, then, otherwise *Ref) (*Ref, error) {
+	if err := m.open(); err != nil {
+		return nil, err
+	}
+	if !m.defaultGateEncoding {
+		return m.composeGate(func(t *gateTemps) (*Ref, error) {
+			first, err := t.keep(m.And(condition, then))
+			if err != nil {
+				return nil, err
+			}
+			nc, err := t.keep(condition.Not())
+			if err != nil {
+				return nil, err
+			}
+			second, err := t.keep(m.And(nc, otherwise))
+			if err != nil {
+				return nil, err
+			}
+			return m.Or(first, second)
+		})
+	}
 	return m.composeGate(func(t *gateTemps) (*Ref, error) {
 		nc, err := t.keep(condition.Not())
 		if err != nil {
@@ -69,8 +89,32 @@ func (m *Manager) Ite(condition, then, otherwise *Ref) (*Ref, error) {
 	})
 }
 
-// Iff uses the source's default gate encoding: (!a || b) && (a || !b).
+// Iff selects the source's default or alternate gate encoding.
 func (m *Manager) Iff(left, right *Ref) (*Ref, error) {
+	if err := m.open(); err != nil {
+		return nil, err
+	}
+	if !m.defaultGateEncoding {
+		return m.composeGate(func(t *gateTemps) (*Ref, error) {
+			first, err := t.keep(m.And(left, right))
+			if err != nil {
+				return nil, err
+			}
+			nl, err := t.keep(left.Not())
+			if err != nil {
+				return nil, err
+			}
+			nr, err := t.keep(right.Not())
+			if err != nil {
+				return nil, err
+			}
+			second, err := t.keep(m.And(nl, nr))
+			if err != nil {
+				return nil, err
+			}
+			return m.Or(first, second)
+		})
+	}
 	return m.composeGate(func(t *gateTemps) (*Ref, error) {
 		nl, err := t.keep(left.Not())
 		if err != nil {
