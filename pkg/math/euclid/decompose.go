@@ -87,6 +87,9 @@ func (s *solverSetup) decomposeAndEliminate() (err error) {
 	newA, newC := numeral.NewInt(0), numeral.NewInt(0)
 	defer func() { err = errors.Join(err, z.Del(&newA), z.Del(&newC)) }()
 	eq := s.equations[s.nextEq]
+	if err = s.traceDecompositionStart(s.nextX, eq); err != nil {
+		return err
+	}
 	size, j := len(eq.xs), 0
 	for i := 0; i < size; i++ {
 		x := eq.xs[i]
@@ -161,7 +164,12 @@ func (s *solverSetup) decomposeAndEliminate() (err error) {
 	if e != nil {
 		return e
 	}
+	s.pendingEq = aux
+	if err = s.traceDecompositionResult(parameter, aux, eq); err != nil {
+		return err
+	}
 	s.solved[s.nextX] = uint32(len(s.solution))
 	s.solution = append(s.solution, aux)
+	s.pendingEq = nil
 	return s.substituteMostRecentSolution(s.nextX)
 }

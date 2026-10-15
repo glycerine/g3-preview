@@ -46,7 +46,7 @@ type solverSetup struct {
 	tmpBs              *numeral.ScopedRationalVector
 	tmpXs              []uint32
 	normRow            *equation // owns the started source m_norm_* member workspace
-	pendingEq          *equation // mk_eq result before assert_eq publishes it
+	pendingEq          *equation // mk_eq result before assertion or solution publication
 	queue              *heap.Int
 	parameter          []bool
 	solved             []uint32

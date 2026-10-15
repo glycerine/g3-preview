@@ -34754,6 +34754,8 @@
         "pkg/math/euclid/normalize_trace_test.go",
         "pkg/math/euclid/normalize_test.go",
         "pkg/math/euclid/pivot.go",
+        "pkg/math/euclid/pivot_decompose_trace.go",
+        "pkg/math/euclid/pivot_decompose_trace_test.go",
         "pkg/math/euclid/pivot_test.go",
         "pkg/math/euclid/decompose.go",
         "pkg/math/euclid/decompose_test.go",
@@ -34794,6 +34796,8 @@
         "TestEuclideanNewEquationTraceBeforeListPublication",
         "TestEuclideanSelectNextPivotSourceTiesAndUnitStop",
         "TestEuclideanEliminateUnitSubstitutesOccurrences",
+        "TestEuclideanUnitPivotTraceSourceOrderAndEquations",
+        "TestEuclideanDecompositionTraceBeforeAuxiliaryPublication",
         "TestEuclideanNonUnitDecompositionParameterAndAuxiliaryEquation",
         "TestEuclideanNonUnitDecompositionZeroRemainderDropsOccurrence",
         "TestEuclideanNonUnitDecompositionSubstitutesOtherEquations",
@@ -34959,20 +34963,24 @@
           "name": "select_next_var coefficient/occurrence/equation-size priority and elim_unit substitution of retained occurrences at cpp:224-284,575-622",
           "status": "partial",
           "go_target": "pkg/math/euclid/pivot.go",
+          "go_targets": ["pkg/math/euclid/pivot_decompose_trace.go"],
           "tests": [
             "TestEuclideanSelectNextPivotSourceTiesAndUnitStop",
-            "TestEuclideanEliminateUnitSubstitutesOccurrences"
+            "TestEuclideanEliminateUnitSubstitutesOccurrences",
+            "TestEuclideanUnitPivotTraceSourceOrderAndEquations"
           ]
         },
         {
           "name": "decompose signed quotient/remainder and decompose_and_elim parameter/auxiliary equation/occurrence substitution at cpp:624-705",
           "status": "partial",
           "go_target": "pkg/math/euclid/decompose.go",
+          "go_targets": ["pkg/math/euclid/pivot_decompose_trace.go", "pkg/math/euclid/solver_setup.go"],
           "tests": [
             "TestEuclideanNonUnitDecompositionParameterAndAuxiliaryEquation",
             "TestEuclideanNonUnitDecompositionZeroRemainderDropsOccurrence",
             "TestEuclideanNonUnitDecompositionSubstitutesOtherEquations",
-            "TestEuclideanNonUnitDecompositionNegativeOtherCoefficient"
+            "TestEuclideanNonUnitDecompositionNegativeOtherCoefficient",
+            "TestEuclideanDecompositionTraceBeforeAuxiliaryPublication"
           ]
         },
         {
@@ -177179,6 +177187,7 @@
         "pkg/math/euclid/normalize_query_trace.go",
         "pkg/math/euclid/apply_solution_trace.go",
         "pkg/math/euclid/normalize_trace.go",
+        "pkg/math/euclid/pivot_decompose_trace.go",
         "pkg/api/api_trace.go",
         "pkg/util/numeral/mpff_round_trace.go",
         "pkg/util/numeral/mpff_power_trace.go",
@@ -177245,6 +177254,8 @@
         "TestEuclideanAssertNormalizeTraceDivisionAndGCDContradiction",
         "TestEuclideanConstantOnlyTraceContradictionAndDeletedZero",
         "TestEuclideanNewEquationTraceBeforeListPublication",
+        "TestEuclideanUnitPivotTraceSourceOrderAndEquations",
+        "TestEuclideanDecompositionTraceBeforeAuxiliaryPublication",
         "TestTraceHeaderSourceInsertionRefusalPrefixes",
         "TestTraceShortBodyFailureSkipsSourceFlush",
         "TestTraceConditionalOperandFailureSkipsFooterAndFlush",
@@ -178535,6 +178546,12 @@
           "tests": ["TestEuclideanAssertNormalizeTraceDivisionAndGCDContradiction", "TestEuclideanConstantOnlyTraceContradictionAndDeletedZero", "TestEuclideanNewEquationTraceBeforeListPublication"]
         },
         {
+          "name": "Reached Euclidean unit elimination, occurrence substitution and non-unit decomposition TRACE records (euclidean_solver.cpp:583,592,594,605,653,699)",
+          "status": "ported",
+          "go_target": "pkg/math/euclid/pivot_decompose_trace.go",
+          "tests": ["TestEuclideanUnitPivotTraceSourceOrderAndEquations", "TestEuclideanDecompositionTraceBeforeAuxiliaryPublication"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -178558,6 +178575,7 @@
         "pkg/math/euclid/normalize_query_trace.go",
         "pkg/math/euclid/apply_solution_trace.go",
         "pkg/math/euclid/normalize_trace.go",
+        "pkg/math/euclid/pivot_decompose_trace.go",
         "pkg/api/api_trace.go",
         "pkg/util/numeral/mpff_round_trace.go",
         "pkg/util/numeral/mpff_power_trace.go",
@@ -178624,6 +178642,8 @@
         "TestEuclideanAssertNormalizeTraceDivisionAndGCDContradiction",
         "TestEuclideanConstantOnlyTraceContradictionAndDeletedZero",
         "TestEuclideanNewEquationTraceBeforeListPublication",
+        "TestEuclideanUnitPivotTraceSourceOrderAndEquations",
+        "TestEuclideanDecompositionTraceBeforeAuxiliaryPublication",
         "TestTraceHeaderSourceInsertionRefusalPrefixes",
         "TestTraceShortBodyFailureSkipsSourceFlush",
         "TestTraceConditionalOperandFailureSkipsFooterAndFlush",
@@ -179924,6 +179944,12 @@
           "status": "ported",
           "go_target": "pkg/math/euclid/normalize_trace.go",
           "tests": ["TestEuclideanAssertNormalizeTraceDivisionAndGCDContradiction", "TestEuclideanConstantOnlyTraceContradictionAndDeletedZero", "TestEuclideanNewEquationTraceBeforeListPublication"]
+        },
+        {
+          "name": "Reached Euclidean unit elimination, occurrence substitution and non-unit decomposition TRACE records (euclidean_solver.cpp:583,592,594,605,653,699)",
+          "status": "ported",
+          "go_target": "pkg/math/euclid/pivot_decompose_trace.go",
+          "tests": ["TestEuclideanUnitPivotTraceSourceOrderAndEquations", "TestEuclideanDecompositionTraceBeforeAuxiliaryPublication"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

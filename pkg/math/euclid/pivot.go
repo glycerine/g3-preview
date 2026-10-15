@@ -104,6 +104,9 @@ func (s *solverSetup) substituteMostRecentSolution(x uint32) error {
 	if len(s.solution) == 0 || x >= uint32(len(s.occurrences)) {
 		return arena.ErrInvalidSlot
 	}
+	if e := s.traceMostRecentSolution(x, s.solution[len(s.solution)-1]); e != nil {
+		return e
+	}
 	// The source iterates x's original use-list while each substitution may
 	// update other variables' lists. The exception x stays until the loop ends.
 	for _, eqIndex := range s.occurrences[x] {
@@ -111,7 +114,13 @@ func (s *solverSetup) substituteMostRecentSolution(x uint32) error {
 			return arena.ErrInvalidSlot
 		}
 		eq := s.equations[eqIndex]
+		if e := s.traceSubstitutionEquation(x, eq, false); e != nil {
+			return e
+		}
 		if e := s.applySolutionOnce(x, eq, true, false, eqIndex, x, nil); e != nil {
+			return e
+		}
+		if e := s.traceSubstitutionEquation(x, eq, true); e != nil {
 			return e
 		}
 		if e := s.normalizeEquation(eqIndex); e != nil {
@@ -145,6 +154,9 @@ func (s *solverSetup) eliminateUnit() error {
 		return arena.ErrInvalidSlot
 	}
 	eq := s.equations[s.nextEq]
+	if e := s.traceUnitElimination(eq); e != nil {
+		return e
+	}
 	if s.nextPosA {
 		for i := range eq.as {
 			if e := z.Neg(&eq.as[i]); e != nil {
