@@ -40,6 +40,8 @@ func TestASTSMT2BooleanTreeSourcePostorderAndLabels(t *testing.T) {
 	paramsMust(t, err)
 	repeatedVar, err := m.MkAnd(variable, variable)
 	paramsMust(t, err)
+	sharedSmall, err := m.MkAnd(inner, inner)
+	paramsMust(t, err)
 	out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: budget})
 	paramsMust(t, err)
 	defer func() { paramsMust(t, out.Close()) }()
@@ -55,6 +57,7 @@ func TestASTSMT2BooleanTreeSourcePostorderAndLabels(t *testing.T) {
 		{flat, "(and left middle last)"},
 		{repeatedAtom, "(and left left middle last)"},
 		{repeatedVar, "(and (:var 4) (:var 4))"},
+		{sharedSmall, "(and (and middle last) (and middle last))"},
 	} {
 		format, e := m.SMT2PPBooleanTree(tc.root, nil)
 		paramsMust(t, e)
@@ -73,9 +76,17 @@ func TestASTSMT2BooleanTreeSourcePostorderAndLabels(t *testing.T) {
 	if _, err := m.SMT2PPBooleanTree(nonBoolean, nil); err == nil {
 		t.Fatal("unported numeral/non-Boolean constant path silently formatted")
 	}
-	shared, err := m.MkAnd(inner, inner)
+	var largeArgs []ASTHandle
+	for i := 0; i < 9; i++ {
+		arg, e := m.MkConst(astTestSymbol(t, m, string(rune('a'+i))), boolSort)
+		paramsMust(t, e)
+		largeArgs = append(largeArgs, arg)
+	}
+	large, err := m.MkAndArgs(largeArgs)
 	paramsMust(t, err)
-	if _, err := m.SMT2PPBooleanTree(shared, nil); err == nil {
-		t.Fatal("shared associative child silently bypassed alias handling")
+	sharedLarge, err := m.MkAnd(large, large)
+	paramsMust(t, err)
+	if _, err := m.SMT2PPBooleanTree(sharedLarge, nil); err == nil {
+		t.Fatal("alias-required shared application silently printed without a let")
 	}
 }

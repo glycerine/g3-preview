@@ -12655,7 +12655,7 @@
           ]
         },
         {
-          "name": "Selected smt2_printer child-before-parent Boolean application and variable traversal with constant/label dispatch, repeated atomic leaves and default flat associative expansion; shared compound aliases, deep aliases, numeric and quantifier profiles remain open",
+          "name": "Selected smt2_printer child-before-parent Boolean application and variable traversal with constant/label dispatch, default flat associative expansion and direct printing of repeated atomic or small shared compound terms; alias-required compounds, numeric and quantifier profiles remain open",
           "status": "partial",
           "go_target": "pkg/ast/ast_smt2_boolean_tree.go",
           "tests": [
