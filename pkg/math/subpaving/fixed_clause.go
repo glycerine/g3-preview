@@ -158,7 +158,7 @@ func (c *FixedContext) AddClause(atoms []*FixedInequality, lemma, watched bool) 
 		}
 	}
 	c.clauses = append(c.clauses, clause)
-	return clause, nil
+	return clause, c.traceNewClause(clause)
 }
 
 func (c *FixedContext) AddUnitClause(atom *FixedInequality, axiom bool) error {
@@ -166,6 +166,9 @@ func (c *FixedContext) AddUnitClause(atom *FixedInequality, axiom bool) error {
 		return err
 	}
 	if err := c.checkInequality(atom); err != nil {
+		return err
+	}
+	if err := c.traceUnitInequality(atom); err != nil {
 		return err
 	}
 	atom.refs++

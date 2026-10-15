@@ -53392,6 +53392,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_bound_trace.go",
           "tests": ["TestFixedBoundTracePublicationAndConflictOrder", "TestFixedBoundTraceStreamAndPrinterFailurePrefix"]
+        },
+        {
+          "name": "Concrete config_mpfx unit and stable-sorted clause TRACE at their source ownership boundaries (subpaving_t_def.h:841,865-868)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_clause_trace.go",
+          "tests": ["TestFixedClauseAndUnitTracePublicationOrder", "TestFixedClauseAndUnitTraceFailureBoundaries"]
         }
       ],
       "ownership": [
@@ -54828,6 +54834,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_bound_trace.go",
           "tests": ["TestFixedBoundTracePublicationAndConflictOrder", "TestFixedBoundTraceStreamAndPrinterFailurePrefix"]
+        },
+        {
+          "name": "Concrete config_mpfx unit and stable-sorted clause TRACE at their source ownership boundaries (subpaving_t_def.h:841,865-868)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_clause_trace.go",
+          "tests": ["TestFixedClauseAndUnitTracePublicationOrder", "TestFixedClauseAndUnitTraceFailureBoundaries"]
         },
         {
           "name": "Concrete config_mpff round-robin variable selector after latest child axiom (src/math/subpaving/subpaving_t_def.h:66-101)",
@@ -177351,6 +177363,12 @@
           "tests": ["TestFixedBoundTracePublicationAndConflictOrder", "TestFixedBoundTraceStreamAndPrinterFailurePrefix"]
         },
         {
+          "name": "Reached config_mpfx unit and clause TRACE records (subpaving_t_def.h:841,865-868)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_clause_trace.go",
+          "tests": ["TestFixedClauseAndUnitTracePublicationOrder", "TestFixedClauseAndUnitTraceFailureBoundaries"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -178233,6 +178251,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_bound_trace.go",
           "tests": ["TestFixedBoundTracePublicationAndConflictOrder", "TestFixedBoundTraceStreamAndPrinterFailurePrefix"]
+        },
+        {
+          "name": "Reached config_mpfx unit and clause TRACE records (subpaving_t_def.h:841,865-868)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_clause_trace.go",
+          "tests": ["TestFixedClauseAndUnitTracePublicationOrder", "TestFixedClauseAndUnitTraceFailureBoundaries"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
