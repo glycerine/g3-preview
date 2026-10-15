@@ -3735,10 +3735,10 @@
           "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings", "TestAPIGlobalParamFirstCallInitializesGeneratedProcess"]
         },
         {
-          "name": "Z3_mk_config/Z3_del_config concrete context_params owner and Z3_set_param_value caught z3_exception warning (cpp69-94)",
+          "name": "Z3_mk_config/Z3_del_config concrete context_params owner, debug memory-wrapper trace and Z3_set_param_value caught z3_exception warning (cpp69-94)",
           "status": "ported",
           "go_target": "pkg/api/api_config_params.go",
-          "tests": ["TestAPIConfigSetCaughtWarningsAndOwnerLifetime"]
+          "tests": ["TestAPIConfigSetCaughtWarningsAndOwnerLifetime", "TestAPIConfigSourceMemoryWrapperOrder"]
         }
       ],
       "ownership": [],
@@ -151485,6 +151485,12 @@
           ]
         },
         {
+          "name": "Concrete API Z3_mk_config alloc(context_params) and Z3_del_config dealloc debug wrappers at api_config_params.cpp:73/79, with pre-constructor allocation, post-destructor release and Go header extent",
+          "status": "platform_replacement",
+          "go_target": "pkg/api/api_config_memory_trace.go",
+          "tests": ["TestAPIConfigSourceMemoryWrapperOrder"]
+        },
+        {
           "name": "Concrete timer::m_watch allocation and deallocation debug wrappers at timer.cpp:25/30, with constructor-before-start order, Go inline stopwatch identity/extent and process-finalizing guard",
           "status": "platform_replacement",
           "go_target": "pkg/util/stopwatch/timer_memory_trace.go",
@@ -152286,6 +152292,12 @@
           "tests": [
             "TestShellScopedTimerMemoryTraceSourceLifetime"
           ]
+        },
+        {
+          "name": "Concrete API Z3_mk_config alloc(context_params) and Z3_del_config dealloc debug wrappers at api_config_params.cpp:73/79, with pre-constructor allocation, post-destructor release and Go header extent",
+          "status": "platform_replacement",
+          "go_target": "pkg/api/api_config_memory_trace.go",
+          "tests": ["TestAPIConfigSourceMemoryWrapperOrder"]
         },
         {
           "name": "Concrete timer::m_watch allocation and deallocation debug wrappers at timer.cpp:25/30, with constructor-before-start order, Go inline stopwatch identity/extent and process-finalizing guard",

@@ -32,6 +32,17 @@ type ContextParams struct {
 }
 
 func NewContextParams(c *uparams.ParamsContext, g *uparams.GlobalParamsService, b *arena.Budget) (*ContextParams, error) {
+	return newContextParams(c, g, b, nil)
+}
+
+// NewContextParamsWithAllocationHook is used by the retained API alloc
+// wrapper. The hook runs after the header allocation and before construction
+// of the first string member, matching memory::allocate before placement new.
+func NewContextParamsWithAllocationHook(c *uparams.ParamsContext, g *uparams.GlobalParamsService, b *arena.Budget, onAllocated func(*ContextParams)) (*ContextParams, error) {
+	return newContextParams(c, g, b, onAllocated)
+}
+
+func newContextParams(c *uparams.ParamsContext, g *uparams.GlobalParamsService, b *arena.Budget, onAllocated func(*ContextParams)) (*ContextParams, error) {
 	if c == nil || g == nil || b == nil || g.CheckOwner(c, b) != nil {
 		return nil, uparams.ErrParamsOwner
 	}
@@ -44,6 +55,9 @@ func NewContextParams(c *uparams.ParamsContext, g *uparams.GlobalParamsService, 
 	}
 	s := &ContextParams{context: c, globals: g, budget: b, header: n}
 	s.self = s
+	if onAllocated != nil {
+		onAllocated(s)
+	}
 	// Default std::string members construct in declaration order before the body.
 	if e := s.dotProof.Construct(b, ""); e != nil {
 		s.constructorCause = e
