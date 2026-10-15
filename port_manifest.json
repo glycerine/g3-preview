@@ -150494,6 +150494,7 @@
         "pkg/util/params/util_params_rational_entry_memory_trace_debug_test.go"
       ],
       "tests": [
+        "TestRuntimeUint32AcrossInitializationBitmapBoundary",
         "TestTraceTagTableAllocationFollowsSourceGate",
         "TestTraceTagTableFinalizationSuppressesMemoryDuringProcessFinalize",
         "TestDebugTableMemoryTraceFollowsLazyLifetime",
@@ -150925,6 +150926,7 @@
           "go_target": "pkg/util/memory/uint32_codec.go",
           "tests": [
             "TestMemoryUint32CodecActualBackingAndInitializedBytes",
+            "TestRuntimeUint32AcrossInitializationBitmapBoundary",
             "TestMemoryAllocatorUint32CodecUsesIntrusivePayload",
             "TestMemoryMPZRoundedPhysicalObjectExtent",
             "TestMemoryUint32CodecGuardsAndZeroAlloc"

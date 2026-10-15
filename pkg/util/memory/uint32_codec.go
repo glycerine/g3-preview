@@ -9,20 +9,27 @@ import (
 // The complete word range is checked at this access, with no offset overflow.
 
 func (m *Runtime) ReadUint32(ref Block, offset uint64) (uint32, error) {
-	extent, e := m.Size(ref)
+	b, e := m.block(ref)
 	if e != nil {
 		return 0, e
 	}
+	n, e := m.headerRead(b)
+	if e != nil {
+		return 0, e
+	}
+	header := uint64(m.config.SizeTBits / 8)
+	extent := n - header
 	if offset > extent || extent-offset < 4 {
 		return 0, arena.ErrBounds
 	}
+	at := header + offset
 	var word uint32
 	for i := uint64(0); i < 4; i++ {
-		v, e := m.Read(ref, offset+i)
-		if e != nil {
-			return 0, e
+		byteAt := at + i
+		if b.initialized[byteAt/64]&(uint64(1)<<(byteAt%64)) == 0 {
+			return 0, ErrRuntimeUninitialized
 		}
-		word |= uint32(v) << (8 * i)
+		word |= uint32(b.data[byteAt]) << (8 * i)
 	}
 	return word, nil
 }
@@ -30,17 +37,24 @@ func (m *Runtime) ReadUint32(ref Block, offset uint64) (uint32, error) {
 // WriteUint32 validates the whole word before publishing its four bytes.
 // It neither reserves storage nor alters source allocation counters.
 func (m *Runtime) WriteUint32(ref Block, offset uint64, word uint32) error {
-	extent, e := m.Size(ref)
+	b, e := m.block(ref)
 	if e != nil {
 		return e
 	}
+	n, e := m.headerRead(b)
+	if e != nil {
+		return e
+	}
+	header := uint64(m.config.SizeTBits / 8)
+	extent := n - header
 	if offset > extent || extent-offset < 4 {
 		return arena.ErrBounds
 	}
+	at := header + offset
 	for i := uint64(0); i < 4; i++ {
-		if e := m.Write(ref, offset+i, byte(word>>(8*i))); e != nil {
-			return e
-		}
+		byteAt := at + i
+		b.data[byteAt] = byte(word >> (8 * i))
+		b.initialized[byteAt/64] |= uint64(1) << (byteAt % 64)
 	}
 	return nil
 }

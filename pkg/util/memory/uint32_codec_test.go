@@ -63,6 +63,47 @@ func TestMemoryUint32CodecActualBackingAndInitializedBytes(t *testing.T) {
 	}
 }
 
+func TestRuntimeUint32AcrossInitializationBitmapBoundary(t *testing.T) {
+	b := arena.NewBudget(1 << 16)
+	r, err := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
+	if err != nil {
+		t.Fatal(err)
+	}
+	h, err := r.Allocate(64)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Payload offset 53 starts at physical byte 61 and crosses bit 63.
+	for i := uint64(0); i < 3; i++ {
+		if err := r.Write(h, 53+i, byte(i+1)); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := r.ReadUint32(h, 53); !errors.Is(err, ErrRuntimeUninitialized) {
+			t.Fatal("partly initialized crossing word", i, err)
+		}
+	}
+	if err := r.Write(h, 56, 4); err != nil {
+		t.Fatal(err)
+	}
+	if v, err := r.ReadUint32(h, 53); err != nil || v != 0x04030201 {
+		t.Fatal("crossing read", v, err)
+	}
+	if err := r.WriteUint32(h, 53, 0x78563412); err != nil {
+		t.Fatal(err)
+	}
+	for i, want := range []byte{0x12, 0x34, 0x56, 0x78} {
+		if got, err := r.Read(h, 53+uint64(i)); err != nil || got != want {
+			t.Fatal("crossing write", i, got, want, err)
+		}
+	}
+	if err := r.Deallocate(&h); err != nil {
+		t.Fatal(err)
+	}
+	if err := r.Close(); err != nil || b.Used() != 0 {
+		t.Fatal("crossing cleanup", err, b.Used())
+	}
+}
+
 func TestMemoryAllocatorUint32CodecUsesIntrusivePayload(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
 	r, e := NewRuntime(RuntimeConfig{Budget: b, SizeTBits: 64})
