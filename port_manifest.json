@@ -3722,8 +3722,8 @@
       "component": "api",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/api/api_global_params.go", "pkg/engine/default_process.go"],
-      "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings", "TestAPIGlobalParamFirstCallInitializesGeneratedProcess"],
+      "go_targets": ["pkg/api/api_global_params.go", "pkg/api/api_config_params.go", "pkg/engine/default_process.go"],
+      "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings", "TestAPIGlobalParamFirstCallInitializesGeneratedProcess", "TestAPIConfigSetCaughtWarningsAndOwnerLifetime"],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
@@ -3733,10 +3733,16 @@
           "go_target": "pkg/api/api_global_params.go",
           "go_targets": ["pkg/engine/default_process.go"],
           "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings", "TestAPIGlobalParamFirstCallInitializesGeneratedProcess"]
+        },
+        {
+          "name": "Z3_mk_config/Z3_del_config concrete context_params owner and Z3_set_param_value caught z3_exception warning (cpp69-94)",
+          "status": "ported",
+          "go_target": "pkg/api/api_config_params.go",
+          "tests": ["TestAPIConfigSetCaughtWarningsAndOwnerLifetime"]
         }
       ],
       "ownership": [],
-      "deviations": ["The Go API now constructs concrete generated owners on first call and borrows an externally initialized process when supplied. Its explicit FinalizeDefaultProcess releases Go-owned process resources; C++ uses static finalization. Only typed z3_exception errors enter the warning catch; owner/allocation failures remain Go errors. Returned Go strings own their bytes instead of borrowing g_Z3_global_param_get_buffer. API logging and native C ABI remain open."]
+      "deviations": ["The Go API now constructs concrete generated owners on first call and borrows an externally initialized process when supplied. Its explicit FinalizeDefaultProcess releases Go-owned process resources; C++ uses static finalization. Config owns concrete smtcore.ContextParams and closes a failed constructor before returning. Only typed z3_exception errors enter the warning catches; owner/allocation failures remain Go errors. Returned Go strings own their bytes instead of borrowing g_Z3_global_param_get_buffer. API logging and native C ABI remain open."]
     },
     {
       "path": "src/api/api_context.cpp",
@@ -182913,6 +182919,7 @@
         "pkg/ast/pattern/reduce_quantifier.go",
         "pkg/shell/input_file_option.go",
         "pkg/api/api_global_params.go",
+        "pkg/api/api_config_params.go",
         "pkg/ast/ast_well_sorted.go"
       ],
       "tests": [
@@ -182932,6 +182939,7 @@
         "TestShellInputFileSourceBranches",
         "TestShellInputFileWarningRefusalPreservesSelection",
         "TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings",
+        "TestAPIConfigSetCaughtWarningsAndOwnerLifetime",
         "TestASTWellSortedQuantifierWarningAndChildOrder"
       ],
       "conditionals": [
@@ -183042,6 +183050,12 @@
           "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings"]
         },
         {
+          "name": "api_config_params.cpp:91 config parameter setter caught z3_exception warning and preserved config state",
+          "status": "ported",
+          "go_target": "pkg/api/api_config_params.go",
+          "tests": ["TestAPIConfigSetCaughtWarningsAndOwnerLifetime"]
+        },
+        {
           "name": "well_sorted.cpp:39 non-Boolean quantifier body literal warning through retained goal caller",
           "status": "ported",
           "go_target": "pkg/ast/ast_well_sorted.go",
@@ -183091,7 +183105,7 @@
         "WarningService owns only the enable scalar and borrows optional io.Writer streams. EnvParamsRuntime updates the same warning-enable state used by warning emission; literal and selected formatted writes retain source prefix, newline, C-string boundary, selected Linux AMD64 custom-stream truncation and completed-output flush when the borrowed writer supports Flush."
       ],
       "deviations": [
-        "The prior unused warning translation was removed in 589e99f8. The now-retained EnvParamsRuntime toggle binds to concrete WarningService. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; Go io.Writer short writes retain the reached source insertion prefix but no longer escape warning_msg as a caller error. Both global parameter API catches, the well-sorted quantifier diagnostic and the two shell input-file warning branches have concrete owners, but the config setter, detailed AST sort-mismatch warning, full shell loop and other direct shell/AST/MUZ warning call sites remain open. No C varargs or C++ standard-stream implementation is introduced."
+        "The prior unused warning translation was removed in 589e99f8. The now-retained EnvParamsRuntime toggle binds to concrete WarningService. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; Go io.Writer short writes retain the reached source insertion prefix but no longer escape warning_msg as a caller error. All three api_config_params.cpp catches, the well-sorted quantifier diagnostic and the two shell input-file warning branches have concrete owners, but detailed AST sort-mismatch warning, the full shell loop and other direct shell/AST/MUZ warning call sites remain open. No C varargs or C++ standard-stream implementation is introduced."
       ]
     },
     {
@@ -183107,6 +183121,7 @@
         "pkg/ast/pattern/reduce_quantifier.go",
         "pkg/shell/input_file_option.go",
         "pkg/api/api_global_params.go",
+        "pkg/api/api_config_params.go",
         "pkg/ast/ast_well_sorted.go"
       ],
       "tests": [
@@ -183126,6 +183141,7 @@
         "TestShellInputFileSourceBranches",
         "TestShellInputFileWarningRefusalPreservesSelection",
         "TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings",
+        "TestAPIConfigSetCaughtWarningsAndOwnerLifetime",
         "TestASTWellSortedQuantifierWarningAndChildOrder"
       ],
       "conditionals": [
@@ -183193,6 +183209,12 @@
           "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings"]
         },
         {
+          "name": "api_config_params.cpp:91 config parameter setter caught z3_exception warning and preserved config state",
+          "status": "ported",
+          "go_target": "pkg/api/api_config_params.go",
+          "tests": ["TestAPIConfigSetCaughtWarningsAndOwnerLifetime"]
+        },
+        {
           "name": "well_sorted.cpp:39 non-Boolean quantifier body literal warning through retained goal caller",
           "status": "ported",
           "go_target": "pkg/ast/ast_well_sorted.go",
@@ -183232,7 +183254,7 @@
         "WarningService borrows selected output streams and owns only its enable flag. A borrowed buffered writer is flushed after a complete warning. The unused warning_displayer class has no Go adapter."
       ],
       "deviations": [
-        "The concrete warning service is reached by EnvParamsRuntime. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; Go io.Writer short writes preserve the reached insertion prefix while warning_msg returns without a caller error. Both global parameter API catches, the well-sorted quantifier diagnostic and the two shell input-file warning branches have concrete owners, but the config setter, detailed AST sort-mismatch warning, full shell loop, format2ostream exception integration and other direct shell/AST/MUZ warning call sites remain open. C++ stream internals and C varargs are not copied."
+        "The concrete warning service is reached by EnvParamsRuntime. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; Go io.Writer short writes preserve the reached insertion prefix while warning_msg returns without a caller error. All three api_config_params.cpp catches, the well-sorted quantifier diagnostic and the two shell input-file warning branches have concrete owners, but detailed AST sort-mismatch warning, the full shell loop, format2ostream exception integration and other direct shell/AST/MUZ warning call sites remain open. C++ stream internals and C varargs are not copied."
       ]
     },
     {
