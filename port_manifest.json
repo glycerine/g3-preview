@@ -78626,6 +78626,10 @@
             "TestSATNativeCaseSplitQueueGrowthIndependentPriorityAndColdBudget",
             "TestSATNativeCaseSplitQueueOwnerBudgetAndIndexGuards"
           ]
+        },
+        {
+          "name": "Uncalled update_min_core and reassert_min_core (sat_solver.cpp:1102-1139), including the dormant line-1130 TRACE",
+          "status": "dead_deleted"
         }
       ],
       "ownership": [
@@ -79653,6 +79657,10 @@
             "TestSATSolverCheckpointActualResourceAndMemoryOrder",
             "TestSATRuntimeSharedProcessAndNumeralCohort"
           ]
+        },
+        {
+          "name": "Uncalled update_min_core and reassert_min_core (sat_solver.cpp:1102-1139), including the dormant line-1130 TRACE",
+          "status": "dead_deleted"
         }
       ],
       "ownership": [
@@ -178972,6 +178980,10 @@
           "tests": ["TestSATConsequenceConditionalSourceTraceBodies"]
         },
         {
+          "name": "SAT reassert_min_core TRACE at sat_solver.cpp:1130 is unreachable: reassert_min_core and update_min_core have no C++ callers",
+          "status": "dead_deleted"
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -180431,6 +180443,10 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_consequences_trace.go",
           "tests": ["TestSATConsequenceConditionalSourceTraceBodies"]
+        },
+        {
+          "name": "SAT reassert_min_core TRACE at sat_solver.cpp:1130 is unreachable: reassert_min_core and update_min_core have no C++ callers",
+          "status": "dead_deleted"
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
