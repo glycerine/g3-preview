@@ -2,7 +2,6 @@ package sat
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -141,7 +140,7 @@ func TestSATClauseUseListsInitUnsignedWrapAndFinalize(t *testing.T) {
 	}
 	retained := b.Used()
 	satOK(t, u.Finalize())
-	if u.records != nil || u.words.Stats().Live != 0 || b.Used() > retained {
+	if u.records != nil || satUseListPayloadRows(u) != 0 || b.Used() > retained {
 		t.Fatal("outer finalize")
 	}
 	satOK(t, u.Init(1))
@@ -160,12 +159,12 @@ func TestSATClauseUseListsIteratorCurrentInnerBackingAndDestructor(t *testing.T)
 	satOK(t, e)
 	r, e := v.record()
 	satOK(t, e)
-	old := r.capacity
+	old := uint32(cap(r.payload))
 	for i := 0; i < 8; i++ {
 		c := satMk(t, a, satLs(0, 1, 2), false)
 		satOK(t, v.Insert(c))
 	}
-	if r.capacity <= old {
+	if uint32(cap(r.payload)) <= old {
 		t.Fatal("no inner growth")
 	}
 	satOK(t, v.write(0, refs[4]))
@@ -175,8 +174,8 @@ func TestSATClauseUseListsIteratorCurrentInnerBackingAndDestructor(t *testing.T)
 		t.Fatal("cached inner payload")
 	}
 	satOK(t, it.Close())
-	if r.length != 5 || r.liveSize != 13 {
-		t.Fatal("captured-end compaction publication", r.length, r.liveSize)
+	if uint32(len(r.payload)) != 5 || r.liveSize != 13 {
+		t.Fatal("captured-end compaction publication", uint32(len(r.payload)), r.liveSize)
 	}
 }
 func TestSATClauseUseListsRemovedMasksIndependent(t *testing.T) {
@@ -216,7 +215,7 @@ func TestSATClauseUseListsRemovedMasksIndependent(t *testing.T) {
 		}
 		r, e := v.record()
 		satOK(t, e)
-		if r.length != uint32(len(want)) || r.liveSize != uint32(len(want)) {
+		if uint32(len(r.payload)) != uint32(len(want)) || r.liveSize != uint32(len(want)) {
 			t.Fatal(mask, r)
 		}
 		if ok, e := v.CheckInvariant(); !ok || e != nil {
@@ -291,8 +290,8 @@ func TestSATClauseUseListsNativeOuterGrowthUnderRefusedArena(t *testing.T) {
 	b.FailAfter(0)
 	satOK(t, u.Init(100))
 	b.FailAfter(-1)
-	if len(u.records) != 200 || cap(u.records) < 200 || u.words.Stats().Live != 0 || b.Used() > before {
-		t.Fatal("native outer growth charged arena or retained inner records", len(u.records), cap(u.records), u.words.Stats(), b.Used(), before)
+	if len(u.records) != 200 || cap(u.records) < 200 || satUseListPayloadRows(u) != 0 || b.Used() > before {
+		t.Fatal("native outer growth charged arena or retained inner records", len(u.records), cap(u.records), satUseListPayloadRows(u), b.Used(), before)
 	}
 	if _, e = v.Size(); !errors.Is(e, ErrSATOwner) {
 		t.Fatal("relocated child view", e)
@@ -302,68 +301,43 @@ func TestSATClauseUseListsNativeOuterGrowthUnderRefusedArena(t *testing.T) {
 	}
 	satOK(t, u.Init(1))
 }
-func TestSATClauseUseListsInsertionFaultRootsAndPrefixes(t *testing.T) {
-	done := false
-	for fail := int64(0); fail < 80; fail++ {
-		b := arena.NewBudget(^uint64(0))
-		a := satStore(t, b)
-		c := satMk(t, a, satLs(0, 1, 2), false)
-		before := b.Used()
-		u, e := newSATClauseUseLists(a, b, arena.VectorConfig{PageSize: 16, Descriptors: arena.Config{Budget: b}})
+func TestSATClauseUseListsNativeInnerGrowthUnderRefusedArena(t *testing.T) {
+	a, u, b := satOuterUseFixture(t, 2)
+	v, e := u.Get(0)
+	satOK(t, e)
+	var refs [129]StoredClauseRef
+	for i := range refs {
+		refs[i] = satMk(t, a, satLs(0, 1, 2), false)
+	}
+	before := b.Used()
+	b.FailAfter(0)
+	for _, c := range refs {
+		satOK(t, v.Insert(c))
+	}
+	if n, e := v.Size(); e != nil || n != uint32(len(refs)) {
+		t.Fatal("native inner growth", n, e)
+	}
+	if b.Used() != before {
+		t.Fatal("Go clause-reference slice charged arena", b.Used(), before)
+	}
+	it, e := v.Begin()
+	satOK(t, e)
+	for _, want := range refs {
+		got, e := it.Current()
 		satOK(t, e)
-		satOK(t, u.Init(2))
-		b.FailAfter(fail)
-		e = u.Insert(c)
-		b.FailAfter(-1)
-		if e != nil && !errors.Is(e, arena.ErrInjectedFailure) {
-			t.Fatal(fail, e)
+		if got != want {
+			t.Fatal("native insertion order", got, want)
 		}
-		var count uint32
-		ended := false
-		for i := uint32(0); i < 3; i++ {
-			v, x := u.Get(Literal(i))
-			satOK(t, x)
-			n, x := v.Size()
-			satOK(t, x)
-			if n == 0 {
-				ended = true
-			} else if n != 1 || ended {
-				t.Fatal("nonprefix", fail, i, n)
-			}
-			count += n
-		}
-		if u.words.Stats().Live != count {
-			t.Fatal("immediate lost descriptor", fail, count, u.words.Stats())
-		}
-		if !a.IsLive(c) {
-			t.Fatal("lost clause")
-		}
-		satOK(t, u.Close())
-		if b.Used() != before {
-			t.Fatal("close graph", fail, b.Used(), before)
-		}
-		satOK(t, a.Close())
-		if b.Used() != 0 {
-			t.Fatal(b.Used())
-		}
-		if e == nil {
-			done = true
-			break
-		}
+		satOK(t, it.Next())
 	}
-	if !done {
-		t.Fatal("fault sweep never completed")
+	satOK(t, it.Close())
+	satOK(t, u.Init(2))
+	b.FailAfter(-1)
+	if b.Used() != before || !a.IsLive(refs[128]) {
+		t.Fatal("reset changed clause ownership or arena", b.Used(), before)
 	}
 }
-func TestSATClauseUseListsPhysicalRecord(t *testing.T) {
-	if e := arena.ValidateRecordType(reflect.TypeOf(satClauseUseListRecord{})); e != nil {
-		t.Fatal(e)
-	}
-	if n := reflect.TypeOf(satClauseUseListRecord{}).Size(); n != 32 {
-		t.Fatal(n)
-	}
-}
-func TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership(t *testing.T) {
+func TestSATClauseUseListsNativeRepeatNoArenaCharge(t *testing.T) {
 	a, u, b := satOuterUseFixture(t, 2)
 	c := satMk(t, a, satLs(0, 1, 2), false)
 	run := func() {
@@ -387,10 +361,12 @@ func TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership(t *testing.T) {
 	}
 	run()
 	before := b.Used()
-	if n := testing.AllocsPerRun(100, run); n != 0 {
-		t.Fatal("warm allocation", n)
+	b.FailAfter(0)
+	for i := 0; i < 100; i++ {
+		run()
 	}
-	if b.Used() != before || u.words.Stats().Live != 0 || !a.IsLive(c) {
+	b.FailAfter(-1)
+	if b.Used() != before || satUseListPayloadRows(u) != 0 || !a.IsLive(c) {
 		t.Fatal("warm ownership", b.Used(), before)
 	}
 }
@@ -468,7 +444,7 @@ func TestSATClauseUseListsEraseNotRemovedAndReleaseMissing(t *testing.T) {
 	satOK(t, v.EraseNotRemoved(refs[1]))
 	r, e := v.record()
 	satOK(t, e)
-	if r.length != 2 || r.liveSize != 2 {
+	if uint32(len(r.payload)) != 2 || r.liveSize != 2 {
 		t.Fatal(r)
 	}
 	c, e := v.read(1)
@@ -483,16 +459,23 @@ func TestSATClauseUseListsEraseNotRemovedAndReleaseMissing(t *testing.T) {
 		}
 	} else {
 		satOK(t, e)
-		if r.length != 2 || r.liveSize != 1 {
+		if uint32(len(r.payload)) != 2 || r.liveSize != 1 {
 			t.Fatal(r)
 		}
 	}
 }
 
 func satOuterUseOwnedBytes(u *satClauseUseLists) uint64 {
-	s := u.words.Stats()
-	d := s.Descriptors
-	return u.ownerBytes + s.OwnerBytes + s.PayloadBytes + s.BlockMetadataBytes + s.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
+	return u.ownerBytes
+}
+func satUseListPayloadRows(u *satClauseUseLists) uint32 {
+	var n uint32
+	for i := range u.records {
+		if len(u.records[i].payload) != 0 {
+			n++
+		}
+	}
+	return n
 }
 func TestSATClauseUseListsExactOwnedGraphAndColdGuards(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))
@@ -555,21 +538,24 @@ func TestSATClauseUseListsDestructorBeyondCapturedEnd(t *testing.T) {
 			t.Fatal(e, it)
 		}
 	} else {
-		satOK(t, e)
+		if !errors.Is(e, arena.ErrBounds) {
+			t.Fatal(e)
+		}
 		if it.i != 2 || it.j != 2 {
 			t.Fatal(it)
 		}
 	}
-	// Source destructor uses i<size, not i!=size. Release i=2,size=1 skips
-	// completion and publishes initialized retained j=2 via vector::shrink.
-	satOK(t, it.Close())
+	// A native slice cannot publish the source's initialized spare slot when
+	// the captured iterator has stepped beyond its current logical end.
+	e = it.Close()
+	if satStorageSourceDebug {
+		satOK(t, e)
+	} else if !errors.Is(e, arena.ErrBounds) {
+		t.Fatal(e)
+	}
 	r, e := v.record()
 	satOK(t, e)
-	want := uint32(2)
-	if satStorageSourceDebug {
-		want = 1
-	}
-	if r.length != want {
-		t.Fatal(r.length, want)
+	if len(r.payload) != 1 {
+		t.Fatal(len(r.payload))
 	}
 }

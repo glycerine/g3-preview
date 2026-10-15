@@ -7,19 +7,15 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-// One inline nontrivial source list. The actual 32-byte record contains no Go
-// pointer. Word descriptors own pooled primitive clause-reference payloads.
-// alive distinguishes a destroyed inline object from a constructed empty one.
+// One concrete source list with native clause-reference storage.
 type satClauseUseListRecord struct {
-	payload                                 arena.VectorRef
-	length, capacity, liveSize, initialized uint32
-	alive                                   uint64
+	payload  []StoredClauseRef
+	liveSize uint32
 }
 type satClauseUseLists struct {
 	self                  *satClauseUseLists
 	allocator             *ClauseAllocator // borrowed; clauses are never owned by a list
 	budget                *arena.Budget
-	words                 *arena.Words
 	records               []satClauseUseListRecord
 	backingID, ownerBytes uint64
 	closed                bool
@@ -36,12 +32,7 @@ func newSATClauseUseLists(a *ClauseAllocator, b *arena.Budget, c arena.VectorCon
 	if e := b.Reserve(n); e != nil {
 		return nil, e
 	}
-	w, e := arena.NewWords(c)
-	if e != nil {
-		b.Release(n)
-		return nil, e
-	}
-	u := &satClauseUseLists{allocator: a, budget: b, words: w, ownerBytes: n}
+	u := &satClauseUseLists{allocator: a, budget: b, ownerBytes: n}
 	u.self = u
 	return u, nil
 }
@@ -55,23 +46,11 @@ func (u *satClauseUseLists) open() error {
 	return nil
 }
 
-func (u *satClauseUseLists) destroy(i uint32) error {
-	r := &u.records[i]
-	if e := u.words.Free(r.payload); e != nil {
-		return e
-	}
-	*r = satClauseUseListRecord{}
-	return nil
-}
 func (u *satClauseUseLists) Init(numVars uint32) error {
 	if e := u.open(); e != nil {
 		return e
 	}
-	for i := range u.records {
-		if e := u.destroy(uint32(i)); e != nil {
-			return e
-		}
-	}
+	clear(u.records)
 	u.records = u.records[:0]
 	n := 2 * numVars // The source multiplication wraps as unsigned32.
 	if uint64(n) > uint64(^uint(0)>>1)/uint64(reflect.TypeOf(satClauseUseListRecord{}).Size()) {
@@ -86,9 +65,7 @@ func (u *satClauseUseLists) Init(numVars uint32) error {
 	} else {
 		u.records = u.records[:n]
 	}
-	for i := range u.records {
-		u.records[i] = satClauseUseListRecord{alive: 1}
-	}
+	clear(u.records)
 	return nil
 }
 func (u *satClauseUseLists) Get(l Literal) (satClauseUseListView, error) {
@@ -101,9 +78,6 @@ func (u *satClauseUseLists) Get(l Literal) (satClauseUseListView, error) {
 	}
 	if uint64(i) >= uint64(len(u.records)) {
 		return satClauseUseListView{}, arena.ErrBounds
-	}
-	if u.records[i].alive == 0 {
-		return satClauseUseListView{}, ErrSATOwner
 	}
 	return satClauseUseListView{owner: u, index: i, backingID: u.backingID}, nil
 }
@@ -150,11 +124,6 @@ func (u *satClauseUseLists) Finalize() error {
 	if u.backingID == ^uint64(0) {
 		return arena.ErrSlotLimit
 	}
-	for i := range u.records {
-		if e := u.destroy(uint32(i)); e != nil {
-			return e
-		}
-	}
 	u.records = nil
 	u.backingID++
 	return nil
@@ -169,7 +138,6 @@ func (u *satClauseUseLists) Close() error {
 	if e := u.Finalize(); e != nil {
 		return e
 	}
-	u.words.Close()
 	u.budget.Release(u.ownerBytes)
 	u.ownerBytes = 0
 	u.closed = true
@@ -190,7 +158,7 @@ func (v satClauseUseListView) record() (*satClauseUseListRecord, error) {
 		return nil, e
 	}
 	u := v.owner
-	if v.backingID != u.backingID || uint64(v.index) >= uint64(len(u.records)) || u.records[v.index].alive == 0 {
+	if v.backingID != u.backingID || uint64(v.index) >= uint64(len(u.records)) {
 		return nil, ErrSATOwner
 	}
 	return &u.records[v.index], nil
@@ -208,46 +176,26 @@ func (v satClauseUseListView) read(i uint32) (StoredClauseRef, error) {
 	if e != nil {
 		return StoredClauseRef{}, e
 	}
-	if satStorageSourceDebug && i >= r.length {
+	if satStorageSourceDebug && uint64(i) >= uint64(len(r.payload)) {
 		return StoredClauseRef{}, ErrSATAssertion
 	}
-	if i >= r.capacity || i >= r.initialized {
+	if uint64(i) >= uint64(len(r.payload)) {
 		return StoredClauseRef{}, arena.ErrBounds
 	}
-	var a [5]uint32
-	for k := uint32(0); k < 5; k++ {
-		a[k], e = v.owner.words.Read(r.payload, i*5+k)
-		if e != nil {
-			return StoredClauseRef{}, e
-		}
-	}
-	return StoredClauseRef{owner: uint64(a[0]) | uint64(a[1])<<32, slot: a[2], generation: a[3], storageKind: a[4]}, nil
+	return r.payload[i], nil
 }
 func (v satClauseUseListView) write(i uint32, c StoredClauseRef) error {
 	r, e := v.record()
 	if e != nil {
 		return e
 	}
-	if satStorageSourceDebug && i >= r.length {
+	if satStorageSourceDebug && uint64(i) >= uint64(len(r.payload)) {
 		return ErrSATAssertion
 	}
-	return v.construct(r, i, c)
-}
-
-// Primitive placement construction has no source operator[] logical assertion.
-func (v satClauseUseListView) construct(r *satClauseUseListRecord, i uint32, c StoredClauseRef) error {
-	if i >= r.capacity {
+	if uint64(i) >= uint64(len(r.payload)) {
 		return arena.ErrBounds
 	}
-	a := [5]uint32{uint32(c.owner), uint32(c.owner >> 32), c.slot, c.generation, c.storageKind}
-	for k := uint32(0); k < 5; k++ {
-		if e := v.owner.words.Write(r.payload, i*5+k, a[k]); e != nil {
-			return e
-		}
-	}
-	if i >= r.initialized {
-		r.initialized = i + 1
-	}
+	r.payload[i] = c
 	return nil
 }
 func (v satClauseUseListView) contains(c StoredClauseRef) (bool, error) {
@@ -255,7 +203,7 @@ func (v satClauseUseListView) contains(c StoredClauseRef) (bool, error) {
 	if e != nil {
 		return false, e
 	}
-	for i := uint32(0); i < r.length; i++ {
+	for i := uint32(0); uint64(i) < uint64(len(r.payload)); i++ {
 		x, e := v.read(i)
 		if e != nil {
 			return false, e
@@ -299,28 +247,10 @@ func (v satClauseUseListView) Insert(c StoredClauseRef) error {
 			return e
 		}
 	}
-	if r.length == r.capacity {
-		cap := uint32(2)
-		if r.capacity != 0 {
-			cap = (3*r.capacity + 1) >> 1
-		}
-		// Source pointer backing uses an eight-byte selected architecture stride.
-		if cap <= r.capacity || cap*8+8 <= r.capacity*8+8 || uint64(cap)*5 > uint64(^uint32(0)) {
-			return arena.ErrBounds
-		}
-		p, e := v.owner.words.Resize(r.payload, cap*5)
-		if e != nil {
-			return e
-		}
-		r.payload = p
-		r.capacity = cap
+	if uint64(len(r.payload)) >= uint64(^uint32(0)) {
+		return arena.ErrBounds
 	}
-	// Source push constructs at the old end before publishing vector size.
-	i := r.length
-	if e = v.construct(r, i, c); e != nil {
-		return e
-	}
-	r.length++
+	r.payload = append(r.payload, c)
 	r.liveSize++
 	return nil
 }
@@ -347,7 +277,7 @@ func (v satClauseUseListView) EraseNotRemoved(c StoredClauseRef) error {
 			return e
 		}
 	}
-	for i := uint32(0); i < r.length; i++ {
+	for i := uint32(0); uint64(i) < uint64(len(r.payload)); i++ {
 		x, e := v.read(i)
 		if e != nil {
 			return e
@@ -355,7 +285,7 @@ func (v satClauseUseListView) EraseNotRemoved(c StoredClauseRef) error {
 		if x != c {
 			continue
 		}
-		for j := i + 1; j < r.length; j++ {
+		for j := i + 1; uint64(j) < uint64(len(r.payload)); j++ {
 			x, e = v.read(j)
 			if e != nil {
 				return e
@@ -364,7 +294,8 @@ func (v satClauseUseListView) EraseNotRemoved(c StoredClauseRef) error {
 				return e
 			}
 		}
-		r.length--
+		r.payload[len(r.payload)-1] = StoredClauseRef{}
+		r.payload = r.payload[:len(r.payload)-1]
 		break
 	}
 	r.liveSize--
@@ -375,10 +306,7 @@ func (v satClauseUseListView) Reset() error {
 	if e != nil {
 		return e
 	}
-	if e = v.owner.words.Free(r.payload); e != nil {
-		return e
-	}
-	*r = satClauseUseListRecord{alive: 1}
+	*r = satClauseUseListRecord{}
 	return nil
 }
 func (v satClauseUseListView) CheckInvariant() (bool, error) {
@@ -387,7 +315,7 @@ func (v satClauseUseListView) CheckInvariant() (bool, error) {
 		return false, e
 	}
 	var count uint32
-	for i := uint32(0); i < r.length; i++ {
+	for i := uint32(0); uint64(i) < uint64(len(r.payload)); i++ {
 		c, e := v.read(i)
 		if e != nil {
 			return false, e
@@ -418,7 +346,7 @@ func (v satClauseUseListView) Begin() (satClauseUseListsIterator, error) {
 	if e != nil {
 		return satClauseUseListsIterator{}, e
 	}
-	it := satClauseUseListsIterator{view: v, size: r.length}
+	it := satClauseUseListsIterator{view: v, size: uint32(len(r.payload))}
 	e = it.consume()
 	return it, e
 }
@@ -488,13 +416,14 @@ func (it *satClauseUseListsIterator) Close() error {
 	if e != nil {
 		return e
 	}
-	if satStorageSourceDebug && it.j > r.length {
+	if satStorageSourceDebug && uint64(it.j) > uint64(len(r.payload)) {
 		return ErrSATAssertion
 	}
-	if it.j > r.capacity || it.j > r.initialized {
+	if uint64(it.j) > uint64(len(r.payload)) {
 		return arena.ErrBounds
 	}
-	r.length = it.j
+	clear(r.payload[it.j:])
+	r.payload = r.payload[:it.j]
 	it.closed = true
 	return nil
 }

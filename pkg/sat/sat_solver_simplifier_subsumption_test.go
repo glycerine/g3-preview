@@ -134,8 +134,8 @@ func TestSATSimplifierOccurrenceChoiceCollectorsAndCompression(t *testing.T) {
 	satOK(t, e)
 	record, e := v0.record()
 	satOK(t, e)
-	if record.length != 2 {
-		t.Fatal("lexical iterator compaction", record.length)
+	if len(record.payload) != 2 {
+		t.Fatal("lexical iterator compaction", len(record.payload))
 	}
 	satOK(t, out.Shrink(0))
 	satOK(t, k.collectSubsumed0(c, out))
