@@ -27,7 +27,6 @@
         "api_ast_map_object.go",
         "api_context_results.go",
         "api_global_params.go",
-        "api_global_params_catalog.go",
         "api_goal_object.go",
         "api_trace.go"
       ]
@@ -469,6 +468,7 @@
       "package": "engine",
       "imports": [
         "ackermannization",
+        "arena",
         "ast",
         "ast/fpa",
         "ast/normal_forms",
@@ -485,10 +485,16 @@
         "solver",
         "tactic/sls",
         "tactic/smtlogics",
+        "util/diagnostic",
         "util/lp",
-        "util/process"
+        "util/memory",
+        "util/numeral",
+        "util/params",
+        "util/process",
+        "util/symbol"
       ],
       "production_files": [
+        "default_process.go",
         "generated_params.go"
       ]
     },

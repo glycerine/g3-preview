@@ -2,12 +2,12 @@ package api
 
 import (
 	"bytes"
-	"errors"
 	"math"
 	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/engine"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
@@ -20,9 +20,6 @@ import (
 // the generated process owner, publish environment updates and use the shared
 // warning stream for invalid names.
 func TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings(t *testing.T) {
-	if _, _, err := GlobalParamGet("verbose"); !errors.Is(err, ErrGlobalParamProcessUninitialized) {
-		t.Fatalf("uninitialized process: %v", err)
-	}
 	b := arena.NewBudget(1 << 28)
 	p := memory.NewProcessAccounting()
 	m, err := memory.NewRuntime(memory.RuntimeConfig{Budget: b, Process: p})
@@ -101,5 +98,28 @@ func TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings(t *testing.T) {
 	satOK(t, err)
 	if !ok || value != "0" {
 		t.Fatalf("reset default %q %v", value, ok)
+	}
+}
+
+func TestAPIGlobalParamFirstCallInitializesGeneratedProcess(t *testing.T) {
+	if params.BorrowProcessGlobalParamsService() != nil {
+		t.Fatal("previous test retained a process global parameter binding")
+	}
+	t.Cleanup(func() { satOK(t, engine.FinalizeDefaultProcess()) })
+	value, ok, err := GlobalParamGet("smt.random_seed")
+	satOK(t, err)
+	if !ok || value != "0" || params.BorrowProcessGlobalParamsService() == nil {
+		t.Fatalf("first-call default and binding: %q %v", value, ok)
+	}
+	first := params.BorrowProcessGlobalParamsService()
+	satOK(t, GlobalParamSet("smt.random_seed", "17"))
+	value, ok, err = GlobalParamGet("smt.random_seed")
+	satOK(t, err)
+	if !ok || value != "17" || params.BorrowProcessGlobalParamsService() != first {
+		t.Fatalf("repeated-call value/binding: %q %v", value, ok)
+	}
+	satOK(t, engine.FinalizeDefaultProcess())
+	if params.BorrowProcessGlobalParamsService() != nil {
+		t.Fatal("default finalization retained a process global parameter binding")
 	}
 }

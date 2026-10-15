@@ -5,17 +5,24 @@ import (
 	"errors"
 	"math"
 
+	"github.com/glycerine/g3/pkg/engine"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/params"
 )
 
 var ErrGlobalParamProcessUninitialized = errors.New("api: generated global parameter process is not initialized")
 
-// globalParamService follows the source API's memory::initialize(UINT_MAX)
-// prelude on the already-generated process. Initial construction still belongs
-// to process.InitializeGenerated, which supplies the concrete Go owners.
+// globalParamService follows memory::initialize(UINT_MAX) on every API call.
+// The first call constructs the generated process through engine; subsequent
+// calls borrow either that process or a caller-supplied generated process.
 func globalParamService() (*params.GlobalParamsService, error) {
 	g := params.BorrowProcessGlobalParamsService()
+	if g == nil {
+		if err := engine.InitializeDefaultProcess(); err != nil {
+			return nil, err
+		}
+		g = params.BorrowProcessGlobalParamsService()
+	}
 	if g == nil || g.Context == nil {
 		return nil, ErrGlobalParamProcessUninitialized
 	}

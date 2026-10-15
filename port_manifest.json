@@ -3716,20 +3716,21 @@
       "component": "api",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/api/api_global_params.go", "pkg/api/api_global_params_catalog.go"],
-      "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings"],
+      "go_targets": ["pkg/api/api_global_params.go", "pkg/engine/default_process.go"],
+      "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings", "TestAPIGlobalParamFirstCallInitializesGeneratedProcess"],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Z3_global_param_set/get/reset_all through generated process service, warning and environment update; implicit first-call bootstrap, API logging and native pointer ABI remain open",
+          "name": "Z3_global_param_set/get/reset_all through first-call generated process service, warning and environment update; API logging and native pointer ABI remain open",
           "status": "partial",
           "go_target": "pkg/api/api_global_params.go",
-          "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings"]
+          "go_targets": ["pkg/engine/default_process.go"],
+          "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings", "TestAPIGlobalParamFirstCallInitializesGeneratedProcess"]
         }
       ],
       "ownership": [],
-      "deviations": ["The Go API requires process.InitializeGenerated before these calls; C++ memory::initialize performs first-call bootstrap implicitly. Returned Go strings own their bytes instead of borrowing g_Z3_global_param_get_buffer. API logging and native C ABI remain open."]
+      "deviations": ["The Go API now constructs concrete generated owners on first call and borrows an externally initialized process when supplied. Its explicit FinalizeDefaultProcess releases Go-owned process resources; C++ uses static finalization. Returned Go strings own their bytes instead of borrowing g_Z3_global_param_get_buffer. API logging and native C ABI remain open."]
     },
     {
       "path": "src/api/api_context.cpp",
@@ -184094,7 +184095,7 @@
         "src/api/z3_api.h"
       ],
       "status": "partial",
-      "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings"]
+      "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings", "TestAPIGlobalParamFirstCallInitializesGeneratedProcess"]
     },
     {
       "name": "Z3_global_param_reset_all",
@@ -184103,7 +184104,7 @@
         "src/api/z3_api.h"
       ],
       "status": "partial",
-      "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings"]
+      "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings", "TestAPIGlobalParamFirstCallInitializesGeneratedProcess"]
     },
     {
       "name": "Z3_global_param_set",
@@ -184112,7 +184113,7 @@
         "src/api/z3_api.h"
       ],
       "status": "partial",
-      "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings"]
+      "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings", "TestAPIGlobalParamFirstCallInitializesGeneratedProcess"]
     },
     {
       "name": "Z3_goal_assert",

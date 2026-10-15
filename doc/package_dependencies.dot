@@ -53,6 +53,7 @@ digraph packages {
   "cmd/portcheck" -> "portcheck";
   "engine" [style=filled, fillcolor="#eeeeee"];
   "engine" -> "ackermannization";
+  "engine" -> "arena";
   "engine" -> "ast";
   "engine" -> "ast/fpa";
   "engine" -> "ast/normal_forms";
@@ -69,8 +70,13 @@ digraph packages {
   "engine" -> "solver";
   "engine" -> "tactic/sls";
   "engine" -> "tactic/smtlogics";
+  "engine" -> "util/diagnostic";
   "engine" -> "util/lp";
+  "engine" -> "util/memory";
+  "engine" -> "util/numeral";
+  "engine" -> "util/params";
   "engine" -> "util/process";
+  "engine" -> "util/symbol";
   "math/euclid" [style=filled, fillcolor="#eeeeee"];
   "math/euclid" -> "arena";
   "math/euclid" -> "util/diagnostic";
