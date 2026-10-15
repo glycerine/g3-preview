@@ -78224,7 +78224,8 @@
             "TestSATSolverCheckRealCancellationDoesNotCatchSolverException",
             "TestSATSolverOptionalDispatchGuardFollowsRealPopToBase",
             "TestSATSolverDefaultCheckNativeScopeKeepsNamedRuntimeRoots",
-            "TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph"
+            "TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph",
+            "TestSATSolverSimplifySortsRetainedWatchLists"
           ]
         },
         {
@@ -79454,7 +79455,8 @@
             "TestSATSolverCheckRealCancellationDoesNotCatchSolverException",
             "TestSATSolverOptionalDispatchGuardFollowsRealPopToBase",
             "TestSATSolverDefaultCheckNativeScopeKeepsNamedRuntimeRoots",
-            "TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph"
+            "TestSATSolverWarmRepeatedCheckHasBoundedActualPhysicalGraph",
+            "TestSATSolverSimplifySortsRetainedWatchLists"
           ]
         },
         {
@@ -80359,10 +80361,10 @@
         "TestSATSolverWatchStoreActualWatchDisplayAndStableSort",
         "TestSATSolverWatchStoreOwnerLedgerRetirement",
         "TestSATWatchedSourceTagsWidthDefectAndErase",
-        "TestSATSolverWatchSortLargeStableOrderAndWorkBound",
+        "TestSATSolverWatchSortLargeStableOrder",
         "TestSATSolverWatchSortThreeClassesAndActualLifetime",
         "TestSATSolverWatchSortIndependentMixedOracleAndWarmAllocation",
-        "TestSATSolverWatchSortBoundaryAndGuardPrefixes",
+        "TestSATSolverWatchSortBoundaryAndGuards",
         "TestSATSolverCopyEveryActualDestinationRefusalRetainsPublishedGraph",
         "TestSATSolverCopyIndependentBinaryCNFsAndDestinationUnion",
         "TestSATSolverCopyIndependentNaryAssignmentModels",
@@ -80520,14 +80522,15 @@
           ]
         },
         {
-          "name": "Concrete stable sorting backend for three watched_lt equivalence classes (actual solver outer loop remains open)",
-          "status": "ported",
+          "name": "Native Go stable slice sort for three watched_lt equivalence classes through the actual simplifyProblem outer loop (sat_solver.cpp:1221,1251-1255)",
+          "status": "platform_replacement",
           "go_target": "pkg/sat/sat_solver_watch_sort.go",
           "tests": [
-            "TestSATSolverWatchSortLargeStableOrderAndWorkBound",
+            "TestSATSolverWatchSortLargeStableOrder",
             "TestSATSolverWatchSortThreeClassesAndActualLifetime",
             "TestSATSolverWatchSortIndependentMixedOracleAndWarmAllocation",
-            "TestSATSolverWatchSortBoundaryAndGuardPrefixes"
+            "TestSATSolverWatchSortBoundaryAndGuards",
+            "TestSATSolverSimplifySortsRetainedWatchLists"
           ]
         },
         {

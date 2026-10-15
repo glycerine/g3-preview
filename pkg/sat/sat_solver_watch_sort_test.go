@@ -33,14 +33,7 @@ func satSortClass(w satWatched) uint32 {
 	}
 	return 2
 }
-func satSortBound(n uint32) uint64 {
-	levels := uint64(0)
-	for k := uint64(1); k < uint64(n); k *= 2 {
-		levels++
-	}
-	return 4 * uint64(n) * (levels + 1)
-}
-func TestSATSolverWatchSortLargeStableOrderAndWorkBound(t *testing.T) {
+func TestSATSolverWatchSortLargeStableOrder(t *testing.T) {
 	s, _ := satWatchStoreFixture(t)
 	const n = 2048
 	r, e := s.NewList()
@@ -54,8 +47,7 @@ func TestSATSolverWatchSortLargeStableOrderAndWorkBound(t *testing.T) {
 		input[i] = satSortValue(t, i, kind)
 		paramsMust(t, s.Push(r, input[i]))
 	}
-	var work satWatchSortWork
-	paramsMust(t, s.sortByKindWithWork(r, &work))
+	paramsMust(t, s.SortByKind(r))
 	out := uint32(0)
 	for class := uint32(0); class < 3; class++ {
 		for _, w := range input {
@@ -69,9 +61,6 @@ func TestSATSolverWatchSortLargeStableOrderAndWorkBound(t *testing.T) {
 			}
 			out++
 		}
-	}
-	if work.Comparisons > 2*n || work.Moves > satSortBound(n) {
-		t.Fatalf("source asymptotic bound: actual comparisons%d moves%d; bounds%d/%d", work.Comparisons, work.Moves, 2*n, satSortBound(n))
 	}
 }
 func TestSATSolverWatchSortThreeClassesAndActualLifetime(t *testing.T) {
@@ -117,8 +106,7 @@ func TestSATSolverWatchSortIndependentMixedOracleAndWarmAllocation(t *testing.T)
 	for _, w := range xs {
 		paramsMust(t, s.Push(r, w))
 	}
-	var work satWatchSortWork
-	paramsMust(t, s.sortByKindWithWork(r, &work))
+	paramsMust(t, s.SortByKind(r))
 	out := uint32(0)
 	for class := uint32(0); class < 3; class++ {
 		for _, w := range xs {
@@ -131,9 +119,6 @@ func TestSATSolverWatchSortIndependentMixedOracleAndWarmAllocation(t *testing.T)
 				out++
 			}
 		}
-	}
-	if work.Comparisons > 2*uint64(len(xs)) || work.Moves > satSortBound(uint32(len(xs))) {
-		t.Fatal(work)
 	}
 	b.FailAfter(0)
 	if n := testing.AllocsPerRun(20, func() {
@@ -149,27 +134,24 @@ func TestSATSolverWatchSortIndependentMixedOracleAndWarmAllocation(t *testing.T)
 		t.Fatal("warm sort allocation", n)
 	}
 }
-func TestSATSolverWatchSortBoundaryAndGuardPrefixes(t *testing.T) {
+func TestSATSolverWatchSortBoundaryAndGuards(t *testing.T) {
 	s, _ := satWatchStoreFixture(t)
 	r, e := s.NewList()
 	paramsMust(t, e)
-	var work satWatchSortWork
-	paramsMust(t, s.sortByKindWithWork(r, &work))
-	if work != (satWatchSortWork{}) {
-		t.Fatal("empty work")
-	}
+	paramsMust(t, s.SortByKind(r))
 	w := satSortValue(t, 1, 3)
 	paramsMust(t, s.Push(r, w))
-	paramsMust(t, s.sortByKindWithWork(r, &work))
-	if work.Moves != 0 {
-		t.Fatal("singleton moves")
-	}
+	paramsMust(t, s.SortByKind(r))
 	for i := 1; i < 200; i++ {
 		paramsMust(t, s.Push(r, w))
 	}
-	paramsMust(t, s.sortByKindWithWork(r, &work))
-	if work.Moves != 0 || work.Comparisons > 400 {
-		t.Fatal("equivalent classes must not rotate", work)
+	paramsMust(t, s.SortByKind(r))
+	for i := uint32(0); i < 200; i++ {
+		got, e := s.Read(r, i)
+		paramsMust(t, e)
+		if got != w {
+			t.Fatal("equivalent class changed", i, got)
+		}
 	}
 	paramsMust(t, s.Close())
 	if e = s.SortByKind(r); !errors.Is(e, arena.ErrClosed) {

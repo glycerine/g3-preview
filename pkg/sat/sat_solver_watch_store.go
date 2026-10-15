@@ -37,6 +37,7 @@ type satSolverWatchStore struct {
 	self               *satSolverWatchStore
 	budget             *arena.Budget
 	records            []satSolverWatchListRecord
+	sorter             satWatchSortSlice
 	origin, ownerBytes uint64
 	free               uint32
 	closed             bool
@@ -442,9 +443,6 @@ func (v *satSolverWatchStore) DisplayInto(r satSolverWatchListRef, a *ClauseAllo
 	return nil
 }
 
-func (s *satSolverWatchStore) SortByKind(r satSolverWatchListRef) error {
-	return s.sortByKindWithWork(r, nil)
-}
 func (s *satSolverWatchStore) EraseTernaryWatch(r satSolverWatchListRef, a, b Literal) error {
 	w, e := newSATTernaryWatch(a, b)
 	if e != nil {
