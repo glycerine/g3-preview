@@ -53425,6 +53425,12 @@
           "tests": ["TestHardwareContextRelevantNewBoundSourceBranches", "TestHardwareRelevanceTraceConflictThresholdAndImprovementBranches", "TestHardwareRelevanceTraceRefusalAndPrinterPrefix", "TestHardwareRelevanceTraceEpsilonGapRecords"]
         },
         {
+          "name": "Concrete config_mpf relevant_new_bound source max(min(gap,abs),1) epsilon threshold and candidate/reason TRACE branches (subpaving_t_def.h:1210-1311)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/arbitrary_context_relevance.go", "pkg/math/subpaving/arbitrary_relevance_trace.go"],
+          "tests": ["TestArbitraryContextSourceCandidateRelevanceAndNormalization", "TestArbitraryRelevanceTraceBranchesAndEpsilonGap", "TestArbitraryRelevanceTraceRefusalAndPrinterPrefix"]
+        },
+        {
           "name": "Concrete config_mpq relevant_new_bound source max(min(gap,abs),1) epsilon threshold and candidate/reason TRACE branches (subpaving_t_def.h:1210-1311)",
           "status": "ported",
           "go_targets": ["pkg/math/subpaving/rational_context_relevance.go", "pkg/math/subpaving/rational_relevance_trace.go"],
@@ -55081,6 +55087,12 @@
           "status": "ported",
           "go_targets": ["pkg/math/subpaving/hardware_context_relevance.go", "pkg/math/subpaving/hardware_relevance_trace.go"],
           "tests": ["TestHardwareContextRelevantNewBoundSourceBranches", "TestHardwareRelevanceTraceConflictThresholdAndImprovementBranches", "TestHardwareRelevanceTraceRefusalAndPrinterPrefix", "TestHardwareRelevanceTraceEpsilonGapRecords"]
+        },
+        {
+          "name": "Concrete config_mpf relevant_new_bound source max(min(gap,abs),1) epsilon threshold and candidate/reason TRACE branches (subpaving_t_def.h:1210-1311)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/arbitrary_context_relevance.go", "pkg/math/subpaving/arbitrary_relevance_trace.go"],
+          "tests": ["TestArbitraryContextSourceCandidateRelevanceAndNormalization", "TestArbitraryRelevanceTraceBranchesAndEpsilonGap", "TestArbitraryRelevanceTraceRefusalAndPrinterPrefix"]
         },
         {
           "name": "Concrete config_mpq relevant_new_bound source max(min(gap,abs),1) epsilon threshold and candidate/reason TRACE branches (subpaving_t_def.h:1210-1311)",
@@ -177826,6 +177838,12 @@
           "tests": ["TestHardwareContextRelevantNewBoundSourceBranches", "TestHardwareRelevanceTraceConflictThresholdAndImprovementBranches", "TestHardwareRelevanceTraceRefusalAndPrinterPrefix", "TestHardwareRelevanceTraceEpsilonGapRecords"]
         },
         {
+          "name": "Reached config_mpf relevance candidate, branch reason and lower-threshold diagnostic TRACE records (subpaving_t_def.h:1210-1311)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_relevance_trace.go",
+          "tests": ["TestArbitraryContextSourceCandidateRelevanceAndNormalization", "TestArbitraryRelevanceTraceBranchesAndEpsilonGap", "TestArbitraryRelevanceTraceRefusalAndPrinterPrefix"]
+        },
+        {
           "name": "Reached config_mpq relevance candidate, branch reason and lower-threshold diagnostic TRACE records (subpaving_t_def.h:1210-1311)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_relevance_trace.go",
@@ -178930,6 +178948,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/hardware_relevance_trace.go",
           "tests": ["TestHardwareContextRelevantNewBoundSourceBranches", "TestHardwareRelevanceTraceConflictThresholdAndImprovementBranches", "TestHardwareRelevanceTraceRefusalAndPrinterPrefix", "TestHardwareRelevanceTraceEpsilonGapRecords"]
+        },
+        {
+          "name": "Reached config_mpf relevance candidate, branch reason and lower-threshold diagnostic TRACE records (subpaving_t_def.h:1210-1311)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_relevance_trace.go",
+          "tests": ["TestArbitraryContextSourceCandidateRelevanceAndNormalization", "TestArbitraryRelevanceTraceBranchesAndEpsilonGap", "TestArbitraryRelevanceTraceRefusalAndPrinterPrefix"]
         },
         {
           "name": "Reached config_mpq relevance candidate, branch reason and lower-threshold diagnostic TRACE records (subpaving_t_def.h:1210-1311)",

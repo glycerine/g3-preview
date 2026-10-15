@@ -56,6 +56,9 @@ func (c *ArbitraryContext) RelevantNewBound(n *ArbitraryNode, variable uint32, c
 	}
 	m := c.numbers
 	currentLower, currentUpper := n.lower[variable], n.upper[variable]
+	if err := c.traceRelevantCandidate(variable, candidate, lower, open, currentLower, currentUpper); err != nil {
+		return false, err
+	}
 	if lower {
 		if currentUpper != nil {
 			greater, err := m.Greater(candidate, &currentUpper.value)
@@ -63,7 +66,7 @@ func (c *ArbitraryContext) RelevantNewBound(n *ArbitraryNode, variable uint32, c
 				return false, err
 			}
 			if greater {
-				return true, nil
+				return c.traceRelevantDecision(true, 1218, "relevant because triggers conflict.", nil)
 			}
 			if open || currentUpper.open {
 				equal, err := m.Equal(candidate, &currentUpper.value)
@@ -71,7 +74,7 @@ func (c *ArbitraryContext) RelevantNewBound(n *ArbitraryNode, variable uint32, c
 					return false, err
 				}
 				if equal {
-					return true, nil
+					return c.traceRelevantDecision(true, 1218, "relevant because triggers conflict.", nil)
 				}
 			}
 		}
@@ -81,7 +84,7 @@ func (c *ArbitraryContext) RelevantNewBound(n *ArbitraryNode, variable uint32, c
 				return false, err
 			}
 			if less {
-				return false, nil
+				return c.traceRelevantDecision(false, 1224, "irrelevant because does not improve existing bound.", nil)
 			}
 			if currentLower.open || !open {
 				equal, err := m.Equal(candidate, &currentLower.value)
@@ -89,14 +92,17 @@ func (c *ArbitraryContext) RelevantNewBound(n *ArbitraryNode, variable uint32, c
 					return false, err
 				}
 				if equal {
-					return false, nil
+					return c.traceRelevantDecision(false, 1224, "irrelevant because does not improve existing bound.", nil)
 				}
 			}
 		}
 		if currentUpper == nil {
 			tooLarge, err := m.Less(c.maxBound, candidate)
-			if err != nil || tooLarge {
+			if err != nil {
 				return false, err
+			}
+			if tooLarge {
+				return c.traceRelevantDecision(false, 1229, "irrelevant because exceeds :max-bound threshold.", nil)
 			}
 		}
 	} else {
@@ -106,7 +112,7 @@ func (c *ArbitraryContext) RelevantNewBound(n *ArbitraryNode, variable uint32, c
 				return false, err
 			}
 			if greater {
-				return true, nil
+				return c.traceRelevantDecision(true, 1268, "relevant because triggers conflict.", nil)
 			}
 			if open || currentLower.open {
 				equal, err := m.Equal(candidate, &currentLower.value)
@@ -114,7 +120,7 @@ func (c *ArbitraryContext) RelevantNewBound(n *ArbitraryNode, variable uint32, c
 					return false, err
 				}
 				if equal {
-					return true, nil
+					return c.traceRelevantDecision(true, 1268, "relevant because triggers conflict.", nil)
 				}
 			}
 		}
@@ -124,7 +130,7 @@ func (c *ArbitraryContext) RelevantNewBound(n *ArbitraryNode, variable uint32, c
 				return false, err
 			}
 			if less {
-				return false, nil
+				return c.traceRelevantDecision(false, 1274, "irrelevant because does not improve existing bound.", nil)
 			}
 			if currentUpper.open || !open {
 				equal, err := m.Equal(candidate, &currentUpper.value)
@@ -132,19 +138,22 @@ func (c *ArbitraryContext) RelevantNewBound(n *ArbitraryNode, variable uint32, c
 					return false, err
 				}
 				if equal {
-					return false, nil
+					return c.traceRelevantDecision(false, 1274, "irrelevant because does not improve existing bound.", nil)
 				}
 			}
 		}
 		if currentLower == nil {
 			tooSmall, err := m.Less(candidate, c.minusMaxBound)
-			if err != nil || tooSmall {
+			if err != nil {
 				return false, err
+			}
+			if tooSmall {
+				return c.traceRelevantDecision(false, 1279, "irrelevant because exceeds -:max-bound threshold.", nil)
 			}
 		}
 	}
 	if c.zeroEpsilon || lower && currentLower == nil || !lower && currentUpper == nil {
-		return true, nil
+		return c.traceRelevantDecision(true, 1310, "new bound is relevant", nil)
 	}
 	current := currentUpper
 	if lower {
@@ -189,12 +198,29 @@ func (c *ArbitraryContext) RelevantNewBound(n *ArbitraryNode, variable uint32, c
 		if err := m.Add(&currentLower.value, delta, delta); err != nil {
 			return false, err
 		}
-		return m.Greater(candidate, delta)
+		if err := c.traceRelevantLowerBug(candidate, delta, &currentLower.value, minimum); err != nil {
+			return false, err
+		}
+		relevant, err := m.Greater(candidate, delta)
+		if err != nil {
+			return false, err
+		}
+		if !relevant {
+			return c.traceRelevantDecision(false, 1259, "irrelevant because does not improve existing bound to at least ", delta)
+		}
+		return c.traceRelevantDecision(true, 1310, "new bound is relevant", nil)
 	}
 	if err := m.Sub(&currentUpper.value, delta, delta); err != nil {
 		return false, err
 	}
-	return m.Less(candidate, delta)
+	relevant, err := m.Less(candidate, delta)
+	if err != nil {
+		return false, err
+	}
+	if !relevant {
+		return c.traceRelevantDecision(false, 1304, "irrelevant because does not improve existing bound to at least ", delta)
+	}
+	return c.traceRelevantDecision(true, 1310, "new bound is relevant", nil)
 }
 
 // PropagateCandidate performs the source normalize/relevance/publish sequence
