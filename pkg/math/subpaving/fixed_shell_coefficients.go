@@ -190,6 +190,13 @@ func (w *FixedShellCoefficients) AddClause(atoms []*FixedInequality) (*FixedClau
 	return w.context.AddClause(atoms, false, true)
 }
 
+func (w *FixedShellCoefficients) UpdateParamsRef(pc *params.ParamsContext, p *params.ParamsRef) error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.UpdateParamsRef(pc, p)
+}
+
 // Close retires z2, z1, the vector in ascending element order, and the
 // scalar, matching reverse source member destruction and resumable cleanup.
 func (w *FixedShellCoefficients) Close() error {
