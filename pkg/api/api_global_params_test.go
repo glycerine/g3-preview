@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"errors"
 	"math"
 	"strings"
 	"testing"
@@ -98,6 +99,18 @@ func TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings(t *testing.T) {
 	satOK(t, err)
 	if !ok || value != "0" {
 		t.Fatalf("reset default %q %v", value, ok)
+	}
+	warningOutput.Reset()
+	current := init.Globals.Current
+	init.Globals.Current = nil
+	setErr := GlobalParamSet("sat.random_seed", "7")
+	_, ok, getErr := GlobalParamGet("sat.random_seed")
+	init.Globals.Current = current
+	if (!errors.Is(setErr, params.ErrGlobalParamsAssertion) && !errors.Is(setErr, params.ErrGlobalParamsUninitialized)) || warningOutput.Len() != 0 {
+		t.Fatalf("nonexception setter failure: %v warning=%q", setErr, warningOutput.String())
+	}
+	if ok || (!errors.Is(getErr, params.ErrGlobalParamsAssertion) && !errors.Is(getErr, params.ErrGlobalParamsUninitialized)) || warningOutput.Len() != 0 {
+		t.Fatalf("nonexception getter failure: %v %v warning=%q", ok, getErr, warningOutput.String())
 	}
 }
 

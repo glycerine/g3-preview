@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/engine"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/params"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 var ErrGlobalParamProcessUninitialized = errors.New("api: generated global parameter process is not initialized")
@@ -62,9 +63,17 @@ func GlobalParamSet(id, value string) error {
 		}
 	}
 	if err != nil {
-		return diagnostic.BorrowProcessWarningService().Warningf("%s", err.Error())
+		return globalParamCaughtWarning(err)
 	}
 	return nil
+}
+
+func globalParamCaughtWarning(err error) error {
+	var exception z3exception.Z3Exception
+	if !errors.As(err, &exception) {
+		return err
+	}
+	return diagnostic.BorrowProcessWarningService().Warningf("%s", exception.Message())
 }
 
 // GlobalParamResetAll has no source catch: reset and the environment update
@@ -93,7 +102,7 @@ func GlobalParamGet(id string) (value string, ok bool, err error) {
 	}
 	value, err = g.SourceGetValueName(id)
 	if err != nil {
-		if warning := diagnostic.BorrowProcessWarningService().Warningf("%s", err.Error()); warning != nil {
+		if warning := globalParamCaughtWarning(err); warning != nil {
 			return "", false, warning
 		}
 		return "", false, nil
