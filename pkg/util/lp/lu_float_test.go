@@ -185,7 +185,8 @@ func TestLPFloatLUIndependentFactorizationAndSolves(t *testing.T) {
 }
 
 func TestLPFloatLUSourceSmallInitialBasis(t *testing.T) {
-	// Initial construction from src/test/lp.cpp:test_small_lu (updates remain open).
+	// Initial construction from src/test/lp.cpp:test_small_lu; update coverage
+	// lives in lu_update_float_test.go.
 	b := [][]*big.Rat{
 		{big.NewRat(1, 1), big.NewRat(0, 1), big.NewRat(0, 1)},
 		{big.NewRat(0, 1), big.NewRat(4, 1), big.NewRat(0, 1)},
