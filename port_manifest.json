@@ -178948,6 +178948,12 @@
           "tests": ["TestEuclideanSelectNextPivotSourceTiesAndUnitStop", "TestEuclideanConstantOnlyTrivialAndContradictoryEquations", "TestEuclideanNonUnitDecompositionParameterAndAuxiliaryEquation"]
         },
         {
+          "name": "Reached SAT first-UIP post-backjump solver-display and assignment TRACE before learned-clause publication (sat_solver.cpp:1812)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_conflict_trace.go",
+          "tests": ["TestSATConflictFullSolverPostBackjumpDisplayTrace"]
+        },
+        {
           "name": "Reached SAT resolve_conflict_for_init pre-backtrack lemma, solver display, and assignment TRACE (sat_solver.cpp:1932)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_conflict_assumptions_extra_trace.go",
@@ -180401,6 +180407,12 @@
           "status": "reference_only",
           "go_target": "pkg/math/euclid/pivot.go",
           "tests": ["TestEuclideanSelectNextPivotSourceTiesAndUnitStop", "TestEuclideanConstantOnlyTrivialAndContradictoryEquations", "TestEuclideanNonUnitDecompositionParameterAndAuxiliaryEquation"]
+        },
+        {
+          "name": "Reached SAT first-UIP post-backjump solver-display and assignment TRACE before learned-clause publication (sat_solver.cpp:1812)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_conflict_trace.go",
+          "tests": ["TestSATConflictFullSolverPostBackjumpDisplayTrace"]
         },
         {
           "name": "Reached SAT resolve_conflict_for_init pre-backtrack lemma, solver display, and assignment TRACE (sat_solver.cpp:1932)",

@@ -1,4 +1,4 @@
-// Source: src/sat/sat_solver.cpp:1695,1718,1726,1788,1795.
+// Source: src/sat/sat_solver.cpp:1695,1718,1726,1788,1795,1812.
 package sat
 
 import (
@@ -76,5 +76,22 @@ func (s *satSolverConflictResolution) traceNewLemma(afterMinimization bool) {
 		}
 		_, err = io.WriteString(w, "\n")
 		return err
+	})
+}
+
+func (s *satSolverConflictResolution) tracePostBackjumpDisplay() {
+	// Production conflict resolution has an enclosing solver. Isolated owner
+	// fixtures omit it and cannot render the solver-wide source display.
+	if s.solver == nil {
+		return
+	}
+	s.traceConflictRecord("sat_conflict_detail", 1812, func(w io.Writer) error {
+		if err := s.solver.traceUserDisplayInto(w); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(w, "assignment:\n"); err != nil {
+			return err
+		}
+		return s.solver.traceUserAssignmentInto(w)
 	})
 }

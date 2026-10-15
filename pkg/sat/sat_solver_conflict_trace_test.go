@@ -69,3 +69,42 @@ func TestSATConflictFirstUIPSourceTraceOrder(t *testing.T) {
 		t.Fatalf("first-UIP trace got %q, want %q", out.String(), want)
 	}
 }
+
+// Source: src/sat/sat_solver.cpp:1812. The solver display observes the
+// backtracked level-one assignment before the learned clause is published.
+func TestSATConflictFullSolverPostBackjumpDisplayTrace(t *testing.T) {
+	s, _, _ := satSolverCheckFixture(t)
+	for i := 0; i < 4; i++ {
+		_, err := s.MkVar(true, true)
+		satOK(t, err)
+	}
+	p := s.propagation
+	satOK(t, s.Lifecycle.push())
+	satOK(t, p.assign(0, satJustification{}))
+	_, err := s.Lifecycle.propagate(false, false, false)
+	satOK(t, err)
+	satOK(t, s.Lifecycle.push())
+	satOK(t, p.assign(2, satJustification{}))
+	satOK(t, p.assign(4, newSATTernaryJustification(1, 3)))
+	satOK(t, p.assign(6, newSATBinaryJustification(5)))
+	p.setConflict(newSATBinaryJustification(3), 6)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("sat_conflict_detail")
+	s.conflict.traceTags = tags
+	ok, err := s.conflict.resolveConflict()
+	satOK(t, err)
+	if !ok {
+		t.Fatal("first-UIP conflict unresolved")
+	}
+	want := ""
+	if tags.ShouldTrace("sat_conflict_detail") {
+		want = satClauseTraceRecord("sat_conflict_detail", "resolve_conflict_core", "1726", "processing consequent: 3\nnum_marks: 1, js: binary -1\n") +
+			satClauseTraceRecord("sat_conflict_detail", "resolve_conflict_core", "1726", "processing consequent: 3\nnum_marks: 1, js: binary -2\n") +
+			satClauseTraceRecord("sat_conflict_detail", "resolve_conflict_core", "1726", "processing consequent: 2\nnum_marks: 1, js: ternary -0 -1\n") +
+			satClauseTraceRecord("sat_conflict_detail", "resolve_conflict_core", "1812", "(sat\n)\nassignment:\n0\n")
+	}
+	if got := output.String(); got != want {
+		t.Fatalf("post-backjump source trace = %q, want %q", got, want)
+	}
+}

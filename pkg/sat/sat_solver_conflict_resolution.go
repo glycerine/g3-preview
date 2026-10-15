@@ -276,6 +276,7 @@ func (s *satSolverConflictResolution) resolveConflictCore() (bool, error) {
 	if e = s.popReinit(v.scopeLevel - newLevel); e != nil {
 		return false, e
 	}
+	s.tracePostBackjumpDisplay()
 	lemma, e := l.mkClauseCoreSpan(n, span, true)
 	if e != nil {
 		return false, e
