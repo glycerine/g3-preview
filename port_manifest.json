@@ -178183,6 +178183,12 @@
           "tests": ["TestSATLearnedWatchConditionalSourceTraceBeforeAssertion"]
         },
         {
+          "name": "Reached SAT random candidate and completed decision TRACE after random draw and assignment (sat_solver.cpp:940,989)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_decision_trace.go",
+          "tests": ["TestSATRandomSplitSourceTraceCandidate", "TestSATDecisionSourceTraceAfterAssignment"]
+        },
+        {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_simplify_trace.go",
@@ -179413,6 +179419,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_clause_watch_trace.go",
           "tests": ["TestSATLearnedWatchConditionalSourceTraceBeforeAssertion"]
+        },
+        {
+          "name": "Reached SAT random candidate and completed decision TRACE after random draw and assignment (sat_solver.cpp:940,989)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_decision_trace.go",
+          "tests": ["TestSATRandomSplitSourceTraceCandidate", "TestSATDecisionSourceTraceAfterAssignment"]
         },
         {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",

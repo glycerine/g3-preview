@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/random"
 )
 
@@ -18,6 +19,7 @@ type satSolverDecision struct {
 	budget     *arena.Budget
 	self       *satSolverDecision
 	conflict   *satSolverConflictResolution
+	traceTags  *diagnostic.TraceTags
 	rng        z3rand.Generator
 	decisions  uint32
 	ownerBytes uint64
@@ -108,6 +110,7 @@ func (d *satSolverDecision) nextVar() (BoolVar, error) {
 			return NullBoolVar, arena.ErrBounds
 		}
 		next := BoolVar(draw % num)
+		d.traceRandomSplit(next)
 		value, e := v.valueVar(next)
 		if e != nil {
 			return NullBoolVar, e
@@ -207,9 +210,11 @@ func (d *satSolverDecision) decide() (bool, error) {
 	if satStorageSourceDebug && phase == lbool.Undef {
 		return false, ErrSATAssertion
 	}
-	if e = p.assign(MakeLiteral(next, phase == lbool.False), satJustification{}); e != nil {
+	nextLit := MakeLiteral(next, phase == lbool.False)
+	if e = p.assign(nextLit, satJustification{}); e != nil {
 		return false, e
 	}
+	d.traceDecide(nextLit)
 	return true, nil
 }
 

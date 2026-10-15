@@ -127,6 +127,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	if s.decision, err = newSATColdDecision(c.Budget); err != nil {
 		return s, err
 	}
+	s.decision.traceTags = c.TraceTags
 	if s.Clauses, err = NewSATClauseAllocator(satClauseAllocatorConfig{Storage: arena.SmallBytesConfig{Descriptors: arena.Config{Budget: c.Budget}}, OOMRuntime: c.Runtime.memory}); err != nil {
 		return s, err
 	}
