@@ -150941,7 +150941,10 @@
           "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
           "go_targets": [
             "pkg/util/numeral/mpz.go",
-            "pkg/math/polynomial/polynomial_monomial.go"
+            "pkg/math/polynomial/polynomial_monomial.go",
+            "pkg/model/model_copy.go",
+            "pkg/tactic/tactic_filter_model.go",
+            "pkg/ast/ast_core.go"
           ],
           "tests": [
             "TestMemoryChunkTraceSourceSitesAndFinalizeGuard",
@@ -154218,7 +154221,12 @@
         {
           "name": "mpf.cpp:61-67 manager constructor and destructor dependency",
           "status": "ported",
-          "go_target": "pkg/util/numeral/mpf_manager.go"
+          "go_target": "pkg/util/numeral/mpf_manager.go",
+          "tests": [
+            "TestArbitraryFloatSourceConstructorUsesNativePowerDictionaries",
+            "TestArbitraryFloatEveryManagerConstructorPrefix",
+            "TestArbitraryFloatActualSourceFinalizeThenOwnClose"
+          ]
         },
         {
           "name": "mpf.cpp:318-325 mpz component SET",
@@ -167919,6 +167927,10 @@
           ]
         },
         {
+          "name": "expr_dependency_ref scalar ownership in macro expansion and expression rewriting (ast.h:2232; macro_manager.cpp:216,322-327; quasi_macros.cpp:338,370; macro_finder.cpp:275,339; expr_replacer.cpp:25,57; th_rewriter.cpp:61). These concrete owners remain unported; port their dependency reference lifetimes with the owners, without a standalone generic obj_ref adapter",
+          "status": "unported"
+        },
+        {
           "name": "Concrete selected polynomial owning ref/reference-vector methods for actual Newton consumers; completed DEC and unjoined INC retain separate source versus owning phases",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_ref.go",
@@ -178922,8 +178934,7 @@
             "pkg/util/numeral/mpz_lcm_trace.go",
             "pkg/util/numeral/mpz_bit_shift_trace.go",
             "pkg/util/numeral/mpz_or_root_trace.go",
-            "pkg/util/numeral/mpz_mul2k_trace.go",
-            "pkg/util/numeral/mpz_divides_trace.go"
+            "pkg/util/numeral/mpz_mul2k_trace.go"
           ],
           "tests": [
             "TestIntegerBinaryShortTraceAliasAndNestedAddMul",
@@ -180438,8 +180449,7 @@
             "pkg/util/numeral/mpz_lcm_trace.go",
             "pkg/util/numeral/mpz_bit_shift_trace.go",
             "pkg/util/numeral/mpz_or_root_trace.go",
-            "pkg/util/numeral/mpz_mul2k_trace.go",
-            "pkg/util/numeral/mpz_divides_trace.go"
+            "pkg/util/numeral/mpz_mul2k_trace.go"
           ],
           "tests": [
             "TestIntegerBinaryShortTraceAliasAndNestedAddMul",
