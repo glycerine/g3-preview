@@ -83,6 +83,26 @@ func TestGeneratedInitializeAndFinalizeConcreteServices(t *testing.T) {
 	if params.BorrowProcessGlobalParamsService() != g {
 		t.Fatal("generated initialization did not publish the process global params service")
 	}
+	otherProcess := memory.NewProcessAccounting()
+	otherRuntime, err := memory.NewRuntime(memory.RuntimeConfig{Budget: b, Process: otherProcess})
+	must(t, err)
+	if other, e := InitializeGenerated(InitializationConfig{Runtime: otherRuntime}, math.MaxUint32); other != nil || !errors.Is(e, ErrProcessGlobalParamsBinding) || otherProcess.InitializationStarted() || params.BorrowProcessGlobalParamsService() != g {
+		t.Fatal("second generated process replaced current binding", other, e)
+	}
+	must(t, otherRuntime.Close())
+	previous, err := params.BindProcessGlobalParamsService(nil)
+	must(t, err)
+	if previous != g {
+		t.Fatal("lost generated process binding before close guard")
+	}
+	if e := init.Close(); !errors.Is(e, ErrProcessGlobalParamsBinding) {
+		t.Fatal("out-of-order owning close changed the process binding", e)
+	}
+	_, err = params.BindProcessGlobalParamsService(g)
+	must(t, err)
+	if _, err = g.Manager(); err != nil {
+		t.Fatal("rejected owning close released the current service", err)
+	}
 	if again, err := InitializeGenerated(InitializationConfig{Runtime: m}, 1<<25); err != nil || again != nil {
 		t.Fatal("repeated generated initialization", again, err)
 	}

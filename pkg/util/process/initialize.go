@@ -3,6 +3,8 @@
 package process
 
 import (
+	"errors"
+
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/memory"
@@ -10,6 +12,8 @@ import (
 	"github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
+
+var ErrProcessGlobalParamsBinding = errors.New("process: generated global parameter binding conflict")
 
 // InitializationConfig supplies the two source static services and the Go
 // storage configurations needed to construct gparams after symbols exist.
@@ -58,6 +62,11 @@ func InitializeGenerated(c InitializationConfig, maxSize uint64) (*Initialized, 
 	if p.InitializationStarted() {
 		_, err := c.Runtime.BeginSourceInitialize(maxSize)
 		return nil, err
+	}
+	// C++ has one process g_imp. A second generated process must not replace a
+	// live binding from a different memory process.
+	if params.BorrowProcessGlobalParamsService() != nil {
+		return nil, ErrProcessGlobalParamsBinding
 	}
 	if c.Rational == nil || c.Symbols == nil || c.Debug == nil || c.Params.Budget == nil ||
 		c.Catalog.Budget != c.Params.Budget || c.Globals.Budget != c.Params.Budget || c.Globals.Catalog != nil {
@@ -145,6 +154,9 @@ func (v *Initialized) Close() error {
 	}
 	if v.closed {
 		return nil
+	}
+	if v.paramsBound && v.Globals != nil && params.BorrowProcessGlobalParamsService() != v.Globals {
+		return ErrProcessGlobalParamsBinding
 	}
 	if v.Globals != nil {
 		if err := v.Globals.Close(); err != nil {

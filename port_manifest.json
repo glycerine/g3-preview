@@ -123047,7 +123047,7 @@
           "tests": []
         },
         {
-          "name": "generated process initialization publishes the current gparams service for retained process callers and owning close restores the prior binding",
+          "name": "generated process initialization publishes one current gparams service, rejects a second live process, and requires the active binding at owning close",
           "status": "ported",
           "go_target": "pkg/util/params/util_gparams_process_binding.go",
           "go_targets": ["pkg/util/process/initialize.go"],
@@ -123266,7 +123266,7 @@
           ]
         },
         {
-          "name": "generated process initialization publishes the current gparams service for retained process callers and owning close restores the prior binding",
+          "name": "generated process initialization publishes one current gparams service, rejects a second live process, and requires the active binding at owning close",
           "status": "ported",
           "go_target": "pkg/util/params/util_gparams_process_binding.go",
           "go_targets": ["pkg/util/process/initialize.go"],
