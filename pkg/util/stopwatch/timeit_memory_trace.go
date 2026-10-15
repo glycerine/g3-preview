@@ -11,10 +11,11 @@ import (
 )
 
 func (p *Timeit) traceImpAllocated() {
-	if !diagnostic.DebugBuild || !p.trace.ShouldTrace("memory") {
+	tags := p.trace
+	if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
 		return
 	}
-	_ = p.trace.EmitConditional("memory", "allocate", "src/util/memory_manager.cpp", 209,
+	_ = tags.EmitConditional("memory", "allocate", "src/util/memory_manager.cpp", 209,
 		func() bool { return true }, func(w io.Writer) error {
 			for _, part := range [...]string{
 				"alloc ", fmt.Sprintf("%p", p), " src/util/timeit.cpp:50 imp ",
@@ -27,11 +28,12 @@ func (p *Timeit) traceImpAllocated() {
 }
 
 func (p *Timeit) traceImpDeallocated() {
-	if !diagnostic.DebugBuild || !p.trace.ShouldTrace("memory") {
+	tags := p.trace
+	if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
 		return
 	}
-	_ = p.trace.EmitConditional("memory", "deallocate", "src/util/memory_manager.cpp", 204,
-		func() bool { return !p.trace.MemoryFinalizing() }, func(w io.Writer) error {
+	_ = tags.EmitConditional("memory", "deallocate", "src/util/memory_manager.cpp", 204,
+		func() bool { return !tags.MemoryFinalizing() }, func(w io.Writer) error {
 			for _, part := range [...]string{
 				"dealloc ", fmt.Sprintf("%p", p), " src/util/timeit.cpp:57\n",
 			} {
