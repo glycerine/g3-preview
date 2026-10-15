@@ -151077,6 +151077,7 @@
         "pkg/util/numeral/mpf_value_ieee_lifetime_source_test.go",
         "pkg/util/numeral/mpf_value_ieee_signed_shift_source_test.go",
         "pkg/util/numeral/mpf_value_input.go",
+        "pkg/util/numeral/mpf_native_input_bits_source_test.go",
         "pkg/util/numeral/mpf_value_input_invocation.go",
         "pkg/util/numeral/mpf_value_input_driver_source_test.go",
         "pkg/util/numeral/mpf_value_input_allocation_source_test.go",
@@ -151347,6 +151348,7 @@
         "TestArbitraryFloatIEEEActualCacheTransportRetainsEarlierCall",
         "TestArbitraryFloatToDoubleDefinedUnsignedRepresentableSignedShifts",
         "TestArbitraryFloatOriginalSetIntAndDoubleDriverAssertions",
+        "TestArbitraryFloatNativeInputIndependentIEEEFieldOracle",
         "TestArbitraryFloatInputReachedSETAndShiftAllocationReceipt",
         "TestArbitraryFloatInputMultiplePendingAndInlineHistory",
         "TestArbitraryFloatInputActualAllocationTransportOwnerGuards",
@@ -152190,6 +152192,7 @@
           "go_target": "pkg/util/numeral/mpf_value_input.go",
           "tests": [
             "TestArbitraryFloatOriginalSetIntAndDoubleDriverAssertions",
+            "TestArbitraryFloatNativeInputIndependentIEEEFieldOracle",
             "TestArbitraryFloatInputReachedSETAndShiftAllocationReceipt",
             "TestArbitraryFloatInputMultiplePendingAndInlineHistory",
             "TestArbitraryFloatInputActualAllocationTransportOwnerGuards",
@@ -152795,6 +152798,7 @@
         "pkg/util/numeral/mpf_value_ieee_branch_source_test.go",
         "pkg/util/numeral/mpf_value_ieee_lifetime_source_test.go",
         "pkg/util/numeral/mpf_value_input.go",
+        "pkg/util/numeral/mpf_native_input_bits_source_test.go",
         "pkg/util/numeral/mpf_extrema.go",
         "pkg/util/numeral/mpf_comparison_source_test.go",
         "pkg/util/numeral/mpf_printer_parts.go",
@@ -152980,6 +152984,7 @@
         "TestArbitraryFloatIEEEEveryReachedCacheReservationPrefix",
         "TestArbitraryFloatIEEEActualCacheTransportRetainsEarlierCall",
         "TestArbitraryFloatOriginalSetIntAndDoubleDriverAssertions",
+        "TestArbitraryFloatNativeInputIndependentIEEEFieldOracle",
         "TestArbitraryFloatComparisonIndependentIEEEPairs",
         "TestArbitraryFloatPrinterSourceBiasAndScopedSignificand",
         "TestArbitraryFloatPrinterSignificandEveryReservation",
@@ -153359,7 +153364,8 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_value_input.go",
           "tests": [
-            "TestArbitraryFloatOriginalSetIntAndDoubleDriverAssertions"
+            "TestArbitraryFloatOriginalSetIntAndDoubleDriverAssertions",
+            "TestArbitraryFloatNativeInputIndependentIEEEFieldOracle"
           ]
         },
         {
