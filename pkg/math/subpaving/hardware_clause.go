@@ -126,6 +126,9 @@ func (c *HardwareContext) PropagateClause(clause *HardwareClause, n *HardwareNod
 	if err := n.open(); err != nil {
 		return err
 	}
+	if err := c.tracePropagateClause(clause); err != nil {
+		return err
+	}
 	c.numVisited++
 	clause.visited = c.timestamp
 	unknown := -1
@@ -148,6 +151,9 @@ func (c *HardwareContext) PropagateClause(clause *HardwareClause, n *HardwareNod
 		unknown = 0
 	}
 	a := clause.atoms[unknown]
+	if err := c.tracePropagatingInequality(a); err != nil {
+		return err
+	}
 	previous := n.trail
 	err := c.propagateBoundReason(n, a.variable, &a.value, a.lower, a.open, hardwareReasonClause, 0)
 	if n.trail != previous {
