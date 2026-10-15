@@ -25,6 +25,7 @@ func (a *Rational) IsSmall() bool { return a.Num.IsSmall() && a.Den.IsSmall() }
 type RationalConfig struct {
 	Integers     IntegerConfig
 	Synchronized bool
+	onAllocated  func(*RationalManager)
 }
 
 // RationalManager owns an IntegerManager and the source scalar scratch fields.
@@ -77,6 +78,9 @@ func NewRationalManager(config RationalConfig) (*RationalManager, error) {
 	}
 	m := &RationalManager{Synchronized: config.Synchronized, BudgetField: budget, HeaderBytes: header, AddMulTmp: NewRational(), LtTmp1: NewRational(), LtTmp2: NewRational()}
 	m.self = m
+	if config.onAllocated != nil {
+		config.onAllocated(m) // source alloc(synch_mpq_manager) precedes child construction
+	}
 	z, e := NewIntegerManager(config.Integers)
 	if e != nil {
 		budget.Release(header)

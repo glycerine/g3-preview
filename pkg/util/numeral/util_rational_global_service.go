@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
@@ -30,6 +31,7 @@ type RationalGlobalService struct {
 	service                                         *RationalService
 	current                                         *RationalManager // actual borrowed source pointer; no second owner
 	config                                          RationalServiceConfig
+	memoryTrace                                     *diagnostic.TraceTags
 	acquisitions                                    *rationalGlobalAcquisition
 	invocation, header                              uint64
 	sourceCause                                     error
@@ -89,7 +91,7 @@ func (g *RationalGlobalService) InitializeSource() error {
 	g.invocation++
 	node := &rationalGlobalAcquisition{owner: g, invocation: g.invocation, bytes: bytes, next: g.acquisitions}
 	g.acquisitions = node
-	m, e := NewRationalManager(RationalConfig{Integers: g.config.Integers, Synchronized: true})
+	m, e := NewRationalManager(RationalConfig{Integers: g.config.Integers, Synchronized: true, onAllocated: g.traceManagerAllocated})
 	if e != nil {
 		node.cause = e
 		var failed *IntegerManager
@@ -161,10 +163,14 @@ func (g *RationalGlobalService) FinalizeSource() error {
 		}
 	}
 	g.finalizationStarted = true
+	manager := g.current
 	e := g.service.SourceFinalize()
 	if e != nil {
 		g.sourceCause = e
 		return e
+	}
+	if manager != nil {
+		g.traceManagerDeallocated(manager)
 	}
 	g.finalized = true
 	return nil

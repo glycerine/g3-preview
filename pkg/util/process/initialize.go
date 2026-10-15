@@ -96,6 +96,9 @@ func InitializeGenerated(c InitializationConfig, maxSize uint64) (*Initialized, 
 	}
 	result := &Initialized{process: p, debug: c.Debug, rational: c.Rational, symbols: c.Symbols}
 	result.self = result
+	if err = c.Rational.BindMemoryTrace(c.Trace); err != nil {
+		return result, err
+	}
 	if err = c.Rational.InitializeSource(); err != nil {
 		return result, err
 	}

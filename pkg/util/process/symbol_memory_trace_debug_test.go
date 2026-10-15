@@ -41,14 +41,15 @@ func TestGeneratedProcessBindsSymbolMemoryTraceBeforeInitialize(t *testing.T) {
 		Globals: params.GlobalParamsConfig{Budget: b, DescriptorPageSize: 2, DescriptorWordsPageSize: 16}}
 	init, err := InitializeGenerated(config, math.MaxUint32)
 	must(t, err)
+	rationalAlloc := strings.Index(out.String(), " src/util/rational.cpp:66 synch_mpq_manager ")
 	symbolAlloc := strings.Index(out.String(), " src/util/symbol.cpp:67 internal_symbol_table ")
 	gparamsAlloc := strings.Index(out.String(), " src/util/gparams.cpp:635 imp ")
-	if symbolAlloc < 0 || gparamsAlloc <= symbolAlloc {
-		t.Fatal("generated memory trace missed source symbol-before-gparams initialization order", out.String())
+	if rationalAlloc < 0 || symbolAlloc <= rationalAlloc || gparamsAlloc <= symbolAlloc {
+		t.Fatal("generated memory trace missed source rational-symbol-gparams initialization order", out.String())
 	}
 	must(t, FinalizeGenerated(p, debug, init.Globals, rational, symbols, trace))
-	if strings.Contains(out.String(), " src/util/symbol.cpp:72\n") {
-		t.Fatal("generated process finalizing guard emitted symbol-table deallocation", out.String())
+	if strings.Contains(out.String(), " src/util/symbol.cpp:72\n") || strings.Contains(out.String(), " src/util/rational.cpp:82\n") {
+		t.Fatal("generated process finalizing guard emitted manager deallocation", out.String())
 	}
 	must(t, init.Close())
 	must(t, rational.Close())
