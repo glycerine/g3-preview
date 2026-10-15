@@ -111,6 +111,7 @@ func TestASTDeleteNodeBugTraceBeforeWorklist(t *testing.T) {
 	astTestMust(t, e)
 	tags.Enable("delete_node_bug")
 	tags.Enable("mk_var_bug")
+	tags.Enable("ast_delete_node")
 	id, e := m.GetASTID(variable)
 	astTestMust(t, e)
 	astTestMust(t, m.DelRef(&ref))
@@ -119,6 +120,9 @@ func TestASTDeleteNodeBugTraceBeforeWorklist(t *testing.T) {
 		"------------------------------------------------\n" +
 		"-------- [mk_var_bug] delete_node src/ast/ast.cpp:1792 ---------\n" +
 		"del_ast: " + strconv.FormatUint(uint64(id), 10) + "\n" +
+		"------------------------------------------------\n" +
+		"-------- [ast_delete_node] delete_node src/ast/ast.cpp:1793 ---------\n" +
+		"(:var 7)\n" +
 		"------------------------------------------------\n"
 	if got := buf.String(); got != want {
 		t.Fatalf("delete_node_bug record:\n got %q\nwant %q", got, want)
