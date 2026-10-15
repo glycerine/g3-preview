@@ -150172,7 +150172,9 @@
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
           "tests": [
-            "TestMemoryChunkTraceSourceSitesAndFinalizeGuard"
+            "TestMemoryChunkTraceSourceSitesAndFinalizeGuard",
+            "TestIntegerConstructorBindsMemoryChunkTrace",
+            "TestMonomialConstructorBindsMemoryChunkTrace"
           ]
         },
         {
@@ -150656,7 +150658,9 @@
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
           "tests": [
-            "TestMemoryChunkTraceSourceSitesAndFinalizeGuard"
+            "TestMemoryChunkTraceSourceSitesAndFinalizeGuard",
+            "TestIntegerConstructorBindsMemoryChunkTrace",
+            "TestMonomialConstructorBindsMemoryChunkTrace"
           ]
         },
         {

@@ -40,6 +40,7 @@ type IntegerConfig struct {
 	Memory  *umemory.Runtime
 	Process *umemory.ProcessAccounting
 	Profile umemory.SmallAllocatorProfile
+	Trace   *diagnostic.TraceTags
 }
 
 // IntegerManager owns all persistent source cells, two reusable result
@@ -119,7 +120,7 @@ func NewIntegerManager(config IntegerConfig) (*IntegerManager, error) {
 	if e := config.Cells.Budget.Reserve(header); e != nil {
 		return nil, e
 	}
-	m := &IntegerManager{BudgetField: config.Cells.Budget, HeaderBytes: header, Memory: config.Memory}
+	m := &IntegerManager{BudgetField: config.Cells.Budget, HeaderBytes: header, Memory: config.Memory, trace: config.Trace}
 	m.self = m
 	fail := func(err error) (*IntegerManager, error) {
 		m.originalCause = err

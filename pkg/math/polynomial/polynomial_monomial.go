@@ -33,6 +33,7 @@ type MonomialManagerConfig struct {
 	Memory    *umemory.Runtime
 	Allocator *umemory.SmallAllocator
 	Profile   umemory.SmallAllocatorProfile
+	Trace     *diagnostic.TraceTags
 }
 type monomialLocation struct {
 	toPolynomialCohort                 *polynomialToPolynomialScope
@@ -176,7 +177,7 @@ func NewMonomialManager(c MonomialManagerConfig) (*MonomialManager, error) {
 	m.allocator = c.Allocator
 	if m.allocator == nil {
 		a, e := umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{
-			Runtime: r, Profile: c.Profile, ChunkTrace: diagnostic.NewMemoryChunkTrace(nil, r),
+			Runtime: r, Profile: c.Profile, ChunkTrace: diagnostic.NewMemoryChunkTrace(c.Trace, r),
 		})
 		if e != nil {
 			return fail(e)

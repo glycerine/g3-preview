@@ -94,6 +94,7 @@ digraph packages {
   "math/polynomial" [style=filled, fillcolor="#eeeeee"];
   "math/polynomial" -> "arena";
   "math/polynomial" -> "clibrand";
+  "math/polynomial" -> "util/diagnostic";
   "math/polynomial" -> "util/hash";
   "math/polynomial" -> "util/idgen";
   "math/polynomial" -> "util/memory";
