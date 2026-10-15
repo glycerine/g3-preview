@@ -26,6 +26,12 @@ func (c *RationalContext) PropagatePolynomial(variable uint32, n *RationalNode) 
 	if p == nil || p.closed {
 		return arena.ErrInvalidSlot
 	}
+	if err := c.tracePolynomialVariable("propagate_polynomial", variable, true, "propagate_polynomial: ", 1467); err != nil {
+		return err
+	}
+	if err := c.tracePolynomialBounds(n); err != nil {
+		return err
+	}
 	c.numVisited++
 	p.visited = c.timestamp
 	unbounded := uint32(math.MaxUint32)
@@ -40,6 +46,9 @@ func (c *RationalContext) PropagatePolynomial(variable uint32, n *RationalNode) 
 			}
 			unbounded = x
 		}
+	}
+	if err := c.tracePolynomialVariable("propagate_polynomial", unbounded, unbounded != math.MaxUint32, "unbounded_var: ", 1484); err != nil {
+		return err
 	}
 	if unbounded != math.MaxUint32 {
 		return c.propagatePolynomialTarget(p, unbounded, n)
@@ -104,6 +113,9 @@ func (c *RationalContext) propagatePolynomialTarget(p *RationalPolynomial, targe
 			term := &p.terms[i]
 			if term.variable == target {
 				coefficient = term
+				if err = c.tracePolynomialCoefficient(&term.coefficient); err != nil {
+					return err
+				}
 				continue
 			}
 			if err = v.SetConstant(n, term.variable); err != nil {
@@ -119,7 +131,13 @@ func (c *RationalContext) propagatePolynomialTarget(p *RationalPolynomial, targe
 		if coefficient == nil {
 			return arena.ErrInvalidSlot
 		}
+		if err = c.tracePolynomialInterval(r, 1444, "r before mul 1/a: "); err != nil {
+			return err
+		}
 		if err = r.DivScalar(r, &coefficient.coefficient); err != nil {
+			return err
+		}
+		if err = c.tracePolynomialInterval(r, 1446, "r after mul 1/a:  "); err != nil {
 			return err
 		}
 	}

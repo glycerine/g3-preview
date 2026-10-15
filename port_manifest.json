@@ -53436,6 +53436,18 @@
           "tests": ["TestHardwarePolynomialPropagationSourceTraceOrder", "TestHardwarePolynomialPropagationTraceRefusalAndPrinterPrefix"]
         },
         {
+          "name": "Concrete config_mpq polynomial propagation variable/bounds/unbounded and backward-coefficient/interval TRACE sites (subpaving_t_def.h:1441-1484)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_polynomial_propagate_trace.go",
+          "tests": ["TestRationalPolynomialPropagationSourceTraceOrder", "TestRationalPolynomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Concrete config_mpf polynomial propagation variable/bounds/unbounded and backward-coefficient/interval TRACE sites (subpaving_t_def.h:1441-1484)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_polynomial_propagate_trace.go",
+          "tests": ["TestArbitraryPolynomialPropagationSourceTraceOrder", "TestArbitraryPolynomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
           "name": "Concrete config_mpff polynomial propagation variable/bounds/unbounded and backward-coefficient/interval TRACE sites (subpaving_t_def.h:1441-1484)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fast_polynomial_propagate_trace.go",
@@ -55014,6 +55026,18 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/hardware_polynomial_propagate_trace.go",
           "tests": ["TestHardwarePolynomialPropagationSourceTraceOrder", "TestHardwarePolynomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Concrete config_mpq polynomial propagation variable/bounds/unbounded and backward-coefficient/interval TRACE sites (subpaving_t_def.h:1441-1484)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_polynomial_propagate_trace.go",
+          "tests": ["TestRationalPolynomialPropagationSourceTraceOrder", "TestRationalPolynomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Concrete config_mpf polynomial propagation variable/bounds/unbounded and backward-coefficient/interval TRACE sites (subpaving_t_def.h:1441-1484)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_polynomial_propagate_trace.go",
+          "tests": ["TestArbitraryPolynomialPropagationSourceTraceOrder", "TestArbitraryPolynomialPropagationTraceRefusalAndPrinterPrefix"]
         },
         {
           "name": "Concrete config_mpff polynomial propagation variable/bounds/unbounded and backward-coefficient/interval TRACE sites (subpaving_t_def.h:1441-1484)",
@@ -177681,6 +177705,18 @@
           "tests": ["TestHardwarePolynomialPropagationSourceTraceOrder", "TestHardwarePolynomialPropagationTraceRefusalAndPrinterPrefix"]
         },
         {
+          "name": "Reached config_mpq polynomial variable, bounds, unbounded target and backward interval TRACE records (subpaving_t_def.h:1441-1484)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_polynomial_propagate_trace.go",
+          "tests": ["TestRationalPolynomialPropagationSourceTraceOrder", "TestRationalPolynomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Reached config_mpf polynomial variable, bounds, unbounded target and backward interval TRACE records (subpaving_t_def.h:1441-1484)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_polynomial_propagate_trace.go",
+          "tests": ["TestArbitraryPolynomialPropagationSourceTraceOrder", "TestArbitraryPolynomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
           "name": "Reached config_mpff polynomial variable, bounds, unbounded target and backward interval TRACE records (subpaving_t_def.h:1441-1484)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fast_polynomial_propagate_trace.go",
@@ -178707,6 +178743,18 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/hardware_polynomial_propagate_trace.go",
           "tests": ["TestHardwarePolynomialPropagationSourceTraceOrder", "TestHardwarePolynomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Reached config_mpq polynomial variable, bounds, unbounded target and backward interval TRACE records (subpaving_t_def.h:1441-1484)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_polynomial_propagate_trace.go",
+          "tests": ["TestRationalPolynomialPropagationSourceTraceOrder", "TestRationalPolynomialPropagationTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Reached config_mpf polynomial variable, bounds, unbounded target and backward interval TRACE records (subpaving_t_def.h:1441-1484)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_polynomial_propagate_trace.go",
+          "tests": ["TestArbitraryPolynomialPropagationSourceTraceOrder", "TestArbitraryPolynomialPropagationTraceRefusalAndPrinterPrefix"]
         },
         {
           "name": "Reached config_mpff polynomial variable, bounds, unbounded target and backward interval TRACE records (subpaving_t_def.h:1441-1484)",
