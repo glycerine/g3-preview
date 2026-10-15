@@ -2,8 +2,13 @@
 package aig
 
 import (
+	"errors"
 	"io"
 	"strconv"
+
+	"github.com/glycerine/g3/pkg/ast"
+	uparams "github.com/glycerine/g3/pkg/util/params"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func writeAIGRef(w io.Writer, l Literal) {
@@ -16,6 +21,54 @@ func writeAIGRef(w io.Writer, l Literal) {
 	}
 	_, _ = io.WriteString(w, prefix)
 	_, _ = io.WriteString(w, strconv.FormatUint(uint64(number), 10))
+}
+
+func (m *Manager) traceExprCacheResult(h ast.ASTHandle, l Literal) error {
+	tags := m.ast.BorrowMemoryTraceTags()
+	if !tags.ShouldTrace("expr2aig") {
+		return nil
+	}
+	g := uparams.BorrowProcessGlobalParamsService()
+	if g == nil || g.Context == nil {
+		return uparams.ErrGlobalParamsOwner
+	}
+	return tags.EmitConditional("expr2aig", "cache_result", "src/tactic/aig/aig.cpp", 452,
+		func() bool { return true }, func(w io.Writer) (result error) {
+			if _, result = io.WriteString(w, "caching:\n"); result != nil {
+				return result
+			}
+			format, e := m.ast.SMT2PPBooleanTree(h, nil)
+			if e != nil {
+				return e
+			}
+			out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: m.ast.BudgetField})
+			if e != nil {
+				return e
+			}
+			defer func() {
+				result = errors.Join(result, out.Close())
+			}()
+			empty, e := g.Context.NewValue()
+			if e != nil {
+				return e
+			}
+			defer func() {
+				result = errors.Join(result, g.Context.Del(&empty))
+			}()
+			if e = m.ast.PrintFormat(out, format, g.Context, &empty, g); e != nil {
+				return e
+			}
+			body, e := out.String()
+			if e != nil {
+				return e
+			}
+			if _, e = io.WriteString(w, body+"\n---> "); e != nil {
+				return e
+			}
+			writeAIGRef(w, l)
+			_, e = io.WriteString(w, "\n")
+			return e
+		})
 }
 
 func (m *Manager) traceExprCacheDecRef(l Literal) {

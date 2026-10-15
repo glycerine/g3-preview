@@ -98768,6 +98768,14 @@
           ]
         },
         {
+          "name": "Selected expr2aig::cache_result TRACE at aig.cpp:452 prints source-default SMT2 Boolean AST through the process parameter owner before cache INC; non-Boolean, quantifier and other printer profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_expr_cache_trace.go",
+          "tests": [
+            "TestAIGExprCacheReleaseTracePrecedesLastReference"
+          ]
+        },
+        {
           "name": "expr2aig destructor cache release before result-stack cleanup with source dec-ref TRACE",
           "status": "partial",
           "go_target": "pkg/tactic/aig/aig_expr_cache_trace.go",
@@ -181029,6 +181037,14 @@
           "tests": []
         },
         {
+          "name": "Selected expr2aig cache_result TRACE emits process-bound SMT2 Boolean expression and AIG reference before cache INC (aig.cpp:452); wider expression profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_expr_cache_trace.go",
+          "tests": [
+            "TestAIGExprCacheReleaseTracePrecedesLastReference"
+          ]
+        },
+        {
           "name": "Retained expr2aig destructor cache dec-ref TRACE before source cache release (aig.cpp:439)",
           "status": "ported",
           "go_target": "pkg/tactic/aig/aig_expr_cache_trace.go",
@@ -182586,6 +182602,14 @@
           "status": "partial",
           "go_target": "pkg/ast/ast_core_factories.go",
           "tests": []
+        },
+        {
+          "name": "Selected expr2aig cache_result TRACE emits process-bound SMT2 Boolean expression and AIG reference before cache INC (aig.cpp:452); wider expression profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_expr_cache_trace.go",
+          "tests": [
+            "TestAIGExprCacheReleaseTracePrecedesLastReference"
+          ]
         },
         {
           "name": "Retained expr2aig destructor cache dec-ref TRACE before source cache release (aig.cpp:439)",

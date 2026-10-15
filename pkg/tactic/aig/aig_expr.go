@@ -43,6 +43,9 @@ func (c *exprConverter) variable(h ast.ASTHandle) error {
 	if err != nil {
 		return err
 	}
+	if err = c.manager.traceExprCacheResult(h, r.lit); err != nil {
+		return errors.Join(err, r.Close())
+	}
 	owned, err := r.Clone()
 	if err != nil {
 		return errors.Join(err, r.Close())
@@ -173,6 +176,9 @@ func (c *exprConverter) complete(fr exprFrame) error {
 		return err
 	}
 	if fr.cache {
+		if e := c.manager.traceExprCacheResult(fr.expr, r.lit); e != nil {
+			return errors.Join(e, r.Close())
+		}
 		copy, e := r.Clone()
 		if e != nil {
 			return errors.Join(e, r.Close())

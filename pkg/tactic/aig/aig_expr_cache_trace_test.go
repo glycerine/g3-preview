@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -24,17 +25,34 @@ func TestAIGExprCacheReleaseTracePrecedesLastReference(t *testing.T) {
 	tags := diagnostic.NewTraceTagsWithWriter(&output)
 	m, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: symbols, Numerals: numbers, Budget: budget, TraceTags: tags})
 	aigMust(t, err)
+	ctx, err := uparams.NewParamsContext(symbols, numbers, uparams.ParamsConfig{Budget: budget,
+		Text: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
+	aigMust(t, err)
+	catalog, err := uparams.NewGlobalParamsCatalog(symbols, uparams.GlobalParamsCatalogConfig{Budget: budget,
+		Descriptions: arena.BytesRegionConfig{Descriptors: arena.Config{Budget: budget}},
+		Text:         arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}})
+	aigMust(t, err)
+	globals, err := uparams.NewGlobalParamsService(symbols, ctx, uparams.GlobalParamsConfig{Budget: budget, Catalog: catalog})
+	aigMust(t, err)
+	aigMust(t, globals.InitializeSource())
+	previous, err := uparams.BindProcessGlobalParamsService(globals)
+	aigMust(t, err)
 	tags.Enable("expr2aig")
 	sort, err := m.MkBoolSort()
 	aigMust(t, err)
 	p, err := m.MkFreshConst("p", sort)
+	aigMust(t, err)
+	pPin, err := m.NewRef(p)
 	aigMust(t, err)
 	g, err := NewManager(m)
 	aigMust(t, err)
 	r, err := g.MkAIG(p)
 	aigMust(t, err)
 	if tags.ShouldTrace("expr2aig") {
-		want := "-------- [expr2aig] ~expr2aig src/tactic/aig/aig.cpp:439 ---------\n" +
+		want := "-------- [expr2aig] cache_result src/tactic/aig/aig.cpp:452 ---------\n" +
+			"caching:\np!0\n---> #1\n" +
+			"------------------------------------------------\n" +
+			"-------- [expr2aig] ~expr2aig src/tactic/aig/aig.cpp:439 ---------\n" +
 			"dec-ref: #1 ref-count: 2\n" +
 			"------------------------------------------------\n"
 		if got := output.String(); got != want {
@@ -44,11 +62,32 @@ func TestAIGExprCacheReleaseTracePrecedesLastReference(t *testing.T) {
 		t.Fatalf("erased trace emitted %q", output.String())
 	}
 	aigMust(t, r.Close())
+	output.Reset()
+	q, err := m.MkFreshConst("q", sort)
+	aigMust(t, err)
+	shared, err := m.MkAnd(p, q)
+	aigMust(t, err)
+	root, err := m.MkOr(shared, shared)
+	aigMust(t, err)
+	r, err = g.MkAIG(root)
+	aigMust(t, err)
+	if tags.ShouldTrace("expr2aig") {
+		if got := output.String(); !strings.Contains(got, "caching:\n(and p!0 q!1)\n---> @") {
+			t.Fatalf("shared compound cache result missing: %q", got)
+		}
+	}
+	aigMust(t, r.Close())
 	aigMust(t, g.Close())
 	if strings.Contains(output.String(), "aig_lit_count") {
 		t.Fatal("unenabled deletion tag emitted")
 	}
+	aigMust(t, m.DelRef(&pPin))
 	aigMust(t, m.Close())
+	_, err = uparams.BindProcessGlobalParamsService(previous)
+	aigMust(t, err)
+	aigMust(t, globals.Close())
+	aigMust(t, catalog.Close())
+	aigMust(t, ctx.Close())
 	aigMust(t, numbers.Close())
 	aigMust(t, symbols.Close())
 	if budget.Used() != 0 {
