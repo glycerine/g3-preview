@@ -32,7 +32,7 @@ type satSolverClauseLifecycle struct {
 	eqContinuation                                             *satElimEqs
 	ownerBytes                                                 uint64
 	mkBinary, mkTernary, mkNary, deleted, nonLearnedGeneration uint32
-	reinitInitialized, scopesInitialized                       uint32
+	scopesInitialized                                          uint32
 	closeOriginal, closeLearned                                uint32
 	originalDone, learnedDone, closing, closed                 bool
 	traceOriginalDone, traceLearnedDone                        bool
@@ -120,23 +120,7 @@ func (s *satSolverClauseLifecycle) pushClause(learned bool, c StoredClauseRef) e
 	return nil
 }
 func (s *satSolverClauseLifecycle) pushWrapper(w satClauseWrapper) error {
-	if len(s.reinit) == cap(s.reinit) {
-		n, bytes, e := satVariableNextCapacity(uint32(cap(s.reinit)), uint64(reflect.TypeOf(satClauseWrapper{}).Size()), 16, uint64(^uint(0)>>1))
-		if e != nil {
-			return e
-		}
-		if e = s.budget.Reserve(bytes); e != nil {
-			return e
-		}
-		next := make([]satClauseWrapper, len(s.reinit), n)
-		copy(next[:cap(s.reinit)], s.reinit[:cap(s.reinit)])
-		s.budget.Release(uint64(cap(s.reinit)) * uint64(reflect.TypeOf(satClauseWrapper{}).Size()))
-		s.reinit = next
-	}
 	s.reinit = append(s.reinit, w)
-	if uint32(len(s.reinit)) > s.reinitInitialized {
-		s.reinitInitialized = uint32(len(s.reinit))
-	}
 	return nil
 }
 
@@ -452,7 +436,6 @@ func (s *satSolverClauseLifecycle) finalizeScopesReinit() error {
 	// Adapter physical finalization after source clause deletion, reverse member order.
 	s.budget.Release(uint64(cap(s.scopes)) * uint64(reflect.TypeOf(satSolverScope{}).Size()))
 	s.scopes = nil
-	s.budget.Release(uint64(cap(s.reinit)) * uint64(reflect.TypeOf(satClauseWrapper{}).Size()))
 	s.reinit = nil
 	return nil
 }

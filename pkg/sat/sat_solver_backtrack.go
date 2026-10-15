@@ -138,6 +138,9 @@ func (s *satSolverClauseLifecycle) reinitClauses(old uint32) error {
 	if satStorageSourceDebug && old > n {
 		return ErrSATAssertion
 	}
+	if old > n {
+		return arena.ErrBounds
+	}
 	out := old
 	for i := old; i < n; i++ {
 		w := s.reinit[i]
@@ -169,9 +172,6 @@ func (s *satSolverClauseLifecycle) reinitClauses(old uint32) error {
 				}
 			}
 		}
-	}
-	if out > s.reinitInitialized || uint64(out) > uint64(cap(s.reinit)) {
-		return arena.ErrBounds
 	}
 	s.reinit = s.reinit[:out]
 	return nil

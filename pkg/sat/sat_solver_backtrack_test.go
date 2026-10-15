@@ -86,8 +86,18 @@ func TestSATSolverUnassignInvalidOldActualReadPrefix(t *testing.T) {
 	}
 }
 
-func TestSATSolverReinitIncreasingShrinkRetainedSourceSlots(t *testing.T) {
-	s, _, _, _ := satLifecycleFixture(t, 2)
+func TestSATSolverReinitNativeGrowthAndLogicalBounds(t *testing.T) {
+	s, _, _, b := satLifecycleFixture(t, 2)
+	before := b.Used()
+	b.FailAfter(0)
+	for i := 0; i < 129; i++ {
+		satOK(t, s.pushWrapper(newSATBinaryWrapper(Literal(i*2), Literal(i*2+1))))
+	}
+	if len(s.reinit) != 129 || b.Used() != before {
+		t.Fatal("native wrapper growth", len(s.reinit), b.Used(), before)
+	}
+	b.FailAfter(-1)
+	s.reinit = s.reinit[:0]
 	satOK(t, s.pushWrapper(newSATBinaryWrapper(0, 2)))
 	satOK(t, s.reinitClauses(0))
 	if len(s.reinit) != 0 {
@@ -99,9 +109,8 @@ func TestSATSolverReinitIncreasingShrinkRetainedSourceSlots(t *testing.T) {
 			t.Fatal("source logical assertion", e)
 		}
 	} else {
-		satOK(t, e)
-		if len(s.reinit) != 1 || s.reinit[0].first != 0 || s.reinit[0].second != 2 {
-			t.Fatal("source retained trivial slot")
+		if !errors.Is(e, arena.ErrBounds) || len(s.reinit) != 0 {
+			t.Fatal("native logical bounds", e)
 		}
 	}
 }

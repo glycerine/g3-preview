@@ -21,7 +21,7 @@ func satGCAudit(t *testing.T, g *satSolverGC) {
 	roots := []umemory.Block{}
 	satScalarAuditRoots(t, v, roots...)
 	want := g.ownerBytes + g.scratchBytes + g.cleaner.ownerBytes + c.ownerBytes + s.ownerBytes + analysis.ownerBytes + d.ownerBytes
-	want += l.ownerBytes + uint64(cap(l.reinit))*uint64(reflect.TypeOf(satClauseWrapper{}).Size()) + uint64(cap(l.scopes))*uint64(reflect.TypeOf(satSolverScope{}).Size())
+	want += l.ownerBytes + uint64(cap(l.scopes))*uint64(reflect.TypeOf(satSolverScope{}).Size())
 	want += p.ownerBytes + v.Stats().TotalBytes
 	todo := v.elimTodo
 	want += todo.ownerBytes
