@@ -216,9 +216,8 @@ func TestParamsReferenceCopyMatchedNumeralAllocationRefusal(t *testing.T) {
 }
 
 // The child integer allocation can succeed physically and then lose the
-// descriptor reservation. The current direct rational Copy leaves that real
-// backing in the numeric manager; the params owner has no exact child receipt
-// yet, so this fixture names and drains the lower pending owner explicitly.
+// descriptor reservation. The matched rational copy exports that exact child
+// receipt so the caller can release only its retained physical backing.
 func TestParamsReferenceCopyMatchedNumeralPendingPhysicalAllocation(t *testing.T) {
 	bn := arena.NewBudget(1 << 26)
 	bc := arena.NewBudget(1 << 24)
@@ -266,9 +265,16 @@ func TestParamsReferenceCopyMatchedNumeralPendingPhysicalAllocation(t *testing.T
 	paramsMust(t, e)
 	paramsMust(t, q.Manager.Z.SetLimbs(&occupied.Raw.Num, []uint32{1, 0, 0, 0, 0, 1}))
 
-	e = c.Copy(&dst, &src)
+	var receipt unumeral.RationalCopyAllocationReceipt
+	e = c.CopyWithNumeralReceipt(&dst, &src, &receipt)
 	if !errors.Is(e, arena.ErrSlotLimit) || q.Manager.Z.PendingCell.Object == (umemory.ObjectRef{}) {
 		t.Fatal("copy did not retain physical child before descriptor refusal", e, q.Manager.Z.PendingCell)
+	}
+	if !receipt.Active() {
+		t.Fatal("matched rational child did not issue exact receipt")
+	}
+	if e := c.CopyWithNumeralReceipt(&dst, &src, &receipt); !errors.Is(e, ErrParamsPrecondition) {
+		t.Fatal("active child receipt accepted replacement", e)
 	}
 	entry := c.Entry(&c.Blocks[dst.Slot-1], 0)
 	if entry.Kind != ParamNumeral || entry.Rat.Raw.Num.Cell != q.Manager.Z.FailedNullRef {
@@ -277,9 +283,12 @@ func TestParamsReferenceCopyMatchedNumeralPendingPhysicalAllocation(t *testing.T
 	if c.Entry(&c.Blocks[src.Slot-1], 0).Rat.Raw.Num.Cell != sourceNumerator {
 		t.Fatal("source numeral changed during stopped copy")
 	}
-	paramsMust(t, q.Manager.Z.CleanupPendingAllocation())
+	paramsMust(t, q.CleanupCopyAllocation(&receipt))
 	if q.Manager.Z.PendingCell.Object != (umemory.ObjectRef{}) {
 		t.Fatal("physical child remained after explicit lower cleanup")
+	}
+	if receipt.Active() || !errors.Is(q.CleanupCopyAllocation(&receipt), arena.ErrInvalidSlot) {
+		t.Fatal("consumed child receipt accepted replay")
 	}
 	paramsMust(t, q.Del(&occupied))
 	paramsMust(t, c.Del(&dst))

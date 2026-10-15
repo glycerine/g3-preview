@@ -221,16 +221,19 @@ func (m *RationalManager) Copy(dst, src *Rational) error {
 	return m.copyWithAllocationContext(dst, src, integerAllocationInvocationContext{})
 }
 func (m *RationalManager) copyWithAllocationContext(dst, src *Rational, context integerAllocationInvocationContext) error {
+	return m.copyWithAllocationReceipt(dst, src, context, nil)
+}
+func (m *RationalManager) copyWithAllocationReceipt(dst, src *Rational, context integerAllocationInvocationContext, receipt *integerCopyAllocationReceipt) error {
 	if e := m.checkScalarValue(dst); e != nil {
 		return e
 	}
 	if e := m.checkScalarValue(src); e != nil {
 		return e
 	}
-	if e := m.Z.copyFromOwnerWithAllocationContext(&dst.Num, m.Z, &src.Num, nil, context); e != nil {
+	if e := m.Z.copyFromOwnerWithAllocationContext(&dst.Num, m.Z, &src.Num, receipt, context); e != nil {
 		return e
 	}
-	return m.Z.copyFromOwnerWithAllocationContext(&dst.Den, m.Z, &src.Den, nil, context)
+	return m.Z.copyFromOwnerWithAllocationContext(&dst.Den, m.Z, &src.Den, receipt, context)
 }
 
 // checkSetter authorizes explicit initialization/reinitialization, including

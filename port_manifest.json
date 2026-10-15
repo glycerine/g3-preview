@@ -167414,6 +167414,13 @@
           "tests": ["TestParamsReferenceCopyStoppedReplacementOwningAbort"]
         },
         {
+          "name": "Concrete params_ref copy_core matched-rational integer allocation receipt after physical backing and before descriptor publication",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "go_targets": ["pkg/util/numeral/rational_copy_allocation_receipt.go"],
+          "tests": ["TestParamsReferenceCopyMatchedNumeralPendingPhysicalAllocation", "TestRationalCopyAllocationReceiptSuccessfulCopyHasNoPendingOwner"]
+        },
+        {
           "name": "params_ref init/copy_core and private params ordered entries/refcounts/value destruction",
           "status": "partial",
           "go_target": "pkg/util/params/util_params_ref.go",
@@ -168056,6 +168063,13 @@
           "status": "ported",
           "go_target": "pkg/util/params/util_params_set_replacement_source.go",
           "tests": ["TestParamsReferenceCopyStoppedReplacementOwningAbort"]
+        },
+        {
+          "name": "Concrete params_ref copy_core matched-rational integer allocation receipt after physical backing and before descriptor publication",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "go_targets": ["pkg/util/numeral/rational_copy_allocation_receipt.go"],
+          "tests": ["TestParamsReferenceCopyMatchedNumeralPendingPhysicalAllocation", "TestRationalCopyAllocationReceiptSuccessfulCopyHasNoPendingOwner"]
         },
         {
           "name": "params_ref init/copy_core and private params ordered entries/refcounts/value destruction",

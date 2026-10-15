@@ -442,6 +442,9 @@ func (c *ParamsContext) DelTracked(v *ParamsRef, receipt *ParamsDecrementReceipt
 	return e
 }
 func (c *ParamsContext) init(v *ParamsRef) error {
+	return c.initWithNumeralReceipt(v, nil)
+}
+func (c *ParamsContext) initWithNumeralReceipt(v *ParamsRef, receipt *unumeral.RationalCopyAllocationReceipt) error {
 	if e := c.mutable(v); e != nil {
 		return e
 	}
@@ -462,7 +465,7 @@ func (c *ParamsContext) init(v *ParamsRef) error {
 	v.Generation = c.Blocks[slot-1].Generation
 	if old != 0 {
 		c.SourceFrames[slot-1] = paramsSourceFrame{Active: true, rootGeneration: v.Generation, Invocation: serial, kind: paramsFrameInit, HeldSlot: old, HeldGeneration: oldGeneration}
-		if e = c.copyCore(slot, old); e != nil {
+		if e = c.copyCoreWithNumeralReceipt(slot, old, receipt); e != nil {
 			c.SourceFrames[slot-1].cause = e
 			return e
 		}
@@ -502,21 +505,35 @@ func (c *ParamsContext) grow(b *paramsBlock) error {
 	return nil
 }
 func (c *ParamsContext) copyCore(dst, src uint32) error {
+	return c.copyCoreWithNumeralReceipt(dst, src, nil)
+}
+func (c *ParamsContext) copyCoreWithNumeralReceipt(dst, src uint32, receipt *unumeral.RationalCopyAllocationReceipt) error {
 	if src == 0 {
 		return nil
 	}
 	n := c.Blocks[src-1].Size
 	for i := uint32(0); i < n; i++ {
 		x := c.Entry(&c.Blocks[src-1], i)
-		if e := c.setCore(dst, x.key, x.Kind, x.bits, x.symbol, nil, &x.Rat, &x.text); e != nil {
+		if e := c.setCoreWithNumeralReceipt(dst, x.key, x.Kind, x.bits, x.symbol, nil, &x.Rat, &x.text, receipt); e != nil {
 			return e
 		}
 	}
 	return nil
 }
 func (c *ParamsContext) Copy(dst, src *ParamsRef) error {
+	return c.CopyWithNumeralReceipt(dst, src, nil)
+}
+
+// CopyWithNumeralReceipt gives the caller exact cleanup authority if an
+// integer allocation while replacing a matched rational stops after physical
+// acquisition. New-entry rational copies use their separate setter frame.
+// The partially copied destination remains owned by dst in either case.
+func (c *ParamsContext) CopyWithNumeralReceipt(dst, src *ParamsRef, receipt *unumeral.RationalCopyAllocationReceipt) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	if receipt != nil && receipt.Active() {
+		return ErrParamsPrecondition
+	}
 	if e := c.mutable(dst); e != nil {
 		return e
 	}
@@ -526,10 +543,10 @@ func (c *ParamsContext) Copy(dst, src *ParamsRef) error {
 	if dst.Slot == 0 {
 		return c.assign(dst, src)
 	}
-	if e := c.init(dst); e != nil {
+	if e := c.initWithNumeralReceipt(dst, receipt); e != nil {
 		return e
 	}
-	return c.copyCore(dst.Slot, src.Slot)
+	return c.copyCoreWithNumeralReceipt(dst.Slot, src.Slot, receipt)
 }
 func (c *ParamsContext) Append(dst, src *ParamsRef) error { return c.Copy(dst, src) }
 func (c *ParamsContext) keyCheck(k usymbol.Symbol) error  { _, e := c.SymbolsField.Hash(k); return e }
@@ -672,6 +689,9 @@ func (c *ParamsContext) storeText(s *string, source *paramsText) (paramsText, er
 	return paramsText{owned: &paramsOwnedString{value: value, live: true}, present: true}, nil
 }
 func (c *ParamsContext) setCore(slot uint32, k usymbol.Symbol, kind ParamKind, bits uint64, sym usymbol.Symbol, str *string, rat *unumeral.OwnedRational, text *paramsText) error {
+	return c.setCoreWithNumeralReceipt(slot, k, kind, bits, sym, str, rat, text, nil)
+}
+func (c *ParamsContext) setCoreWithNumeralReceipt(slot uint32, k usymbol.Symbol, kind ParamKind, bits uint64, sym usymbol.Symbol, str *string, rat *unumeral.OwnedRational, text *paramsText, receipt *unumeral.RationalCopyAllocationReceipt) error {
 	b := &c.Blocks[slot-1]
 	var x *paramEntry
 	var matched uint32
@@ -693,6 +713,9 @@ func (c *ParamsContext) setCore(slot uint32, k usymbol.Symbol, kind ParamKind, b
 				return e
 			}
 			*x = paramEntry{key: k, Kind: kind, Rat: r}
+		}
+		if receipt != nil {
+			return c.NumeralsField.CopyWithAllocationReceipt(&x.Rat, rat, receipt)
 		}
 		return c.NumeralsField.Copy(&x.Rat, rat)
 	}
