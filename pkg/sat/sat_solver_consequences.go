@@ -258,6 +258,7 @@ func (s *Solver) getLiteralConsequencesBody(asms, lits satConsequenceInput, out 
 					return lbool.Undef, e
 				}
 				if !yes {
+					s.traceConsequenceInconsistent()
 					s.propagation.inconsistent = false
 					isSat = lbool.Undef
 					break
@@ -293,6 +294,7 @@ func (s *Solver) getLiteralConsequencesBody(asms, lits satConsequenceInput, out 
 			}
 		}
 		if isSat == lbool.False {
+			s.traceConsequenceUnsat()
 			s.propagation.inconsistent = false
 		}
 		if isSat == lbool.True {

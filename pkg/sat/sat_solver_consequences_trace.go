@@ -1,4 +1,4 @@
-// Source: src/sat/sat_solver.cpp:3287,3289,3297,3307,3366,3516,3538,3585; retained util/trace sites.
+// Source: src/sat/sat_solver.cpp:3287,3289,3297,3307,3366,3420,3450,3516,3538,3585; retained util/trace sites.
 package sat
 
 import (
@@ -16,6 +16,22 @@ func (s *Solver) traceConsequenceRecord(function string, line int, body func(io.
 	}
 	_ = tags.EmitConditional("sat", function, "src/sat/sat_solver.cpp", line,
 		func() bool { return true }, body)
+}
+
+func (s *Solver) traceConsequenceInconsistent() {
+	s.traceConsequenceRecord("get_consequences", 3420, func(w io.Writer) error {
+		if _, err := io.WriteString(w, "inconsistent\n"); err != nil {
+			return err
+		}
+		return s.traceUserDisplayInto(w)
+	})
+}
+
+func (s *Solver) traceConsequenceUnsat() {
+	s.traceConsequenceRecord("get_consequences", 3450, func(w io.Writer) error {
+		_, err := io.WriteString(w, "unsat\n")
+		return err
+	})
 }
 
 func (s *Solver) traceConsequenceCore(line int) {

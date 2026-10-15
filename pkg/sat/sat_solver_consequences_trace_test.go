@@ -117,3 +117,28 @@ func TestSATConsequenceEntryAssumptionSourceTrace(t *testing.T) {
 		})
 	}
 }
+
+// Source: src/sat/sat_solver.cpp:3420,3450. These conditional records use the
+// same live solver display as other SAT traces; the consequence search must
+// still supply a separate fixture that reaches both branches end to end.
+func TestSATConsequenceConditionalSourceTraceBodies(t *testing.T) {
+	s, _, _ := satSolverCheckFixture(t)
+	_, err := s.MkVar(true, true)
+	satOK(t, err)
+	var display bytes.Buffer
+	satOK(t, s.traceUserDisplayInto(&display))
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("sat")
+	s.traceTags = tags
+	s.traceConsequenceInconsistent()
+	s.traceConsequenceUnsat()
+	want := ""
+	if tags.ShouldTrace("sat") {
+		want = satClauseTraceRecord("sat", "get_consequences", "3420", "inconsistent\n"+display.String()) +
+			satClauseTraceRecord("sat", "get_consequences", "3450", "unsat\n")
+	}
+	if got := output.String(); got != want {
+		t.Fatalf("consequence branch TRACE = %q, want %q", got, want)
+	}
+}

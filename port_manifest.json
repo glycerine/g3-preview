@@ -178954,6 +178954,12 @@
           "tests": ["TestSATConflictInitNotLiteralSourceTrace"]
         },
         {
+          "name": "SAT get_consequences conditional inconsistent/display and unsat TRACE bodies at source branches (sat_solver.cpp:3420,3450); end-to-end branch fixture open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_solver_consequences_trace.go",
+          "tests": ["TestSATConsequenceConditionalSourceTraceBodies"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -180395,6 +180401,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_conflict_assumptions_extra_trace.go",
           "tests": ["TestSATConflictInitNotLiteralSourceTrace"]
+        },
+        {
+          "name": "SAT get_consequences conditional inconsistent/display and unsat TRACE bodies at source branches (sat_solver.cpp:3420,3450); end-to-end branch fixture open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_solver_consequences_trace.go",
+          "tests": ["TestSATConsequenceConditionalSourceTraceBodies"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
