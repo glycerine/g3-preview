@@ -9,15 +9,8 @@ import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-func variableHelperArray(t *testing.T, r *umemory.Runtime, values []uint32) (PolynomialVariablesView, *umemory.Block) {
-	t.Helper()
-	raw, e := r.Allocate(uint64(len(values)) * 4)
-	serviceMust(t, e)
-	for i, v := range values {
-		serviceMust(t, r.WriteUint32(raw, uint64(i)*4, v))
-	}
-	t.Cleanup(func() { serviceMust(t, r.Deallocate(&raw)) })
-	return BorrowPolynomialVariables(r, raw, 0), &raw
+func variableHelperArray(values []uint32) PolynomialVariablesView {
+	return PolynomialVariablesView{values: values}
 }
 func TestPolynomialMaxDegreesIndependentFiniteModelAndRetainedVars(t *testing.T) {
 	m := polynomialCellFixture(t)
@@ -75,7 +68,7 @@ func TestPolynomialVariablePositionsSentinelDuplicateSourceProfiles(t *testing.T
 	d, e := NewPolynomialVariablePositions(r)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, d.CloseChecked()) })
-	xs, _ := variableHelperArray(t, r, []uint32{2, 5, 2})
+	xs := variableHelperArray([]uint32{2, 5, 2})
 	e = d.Init(3, xs)
 	if polynomialSourceDebug {
 		if !errors.Is(e, ErrPolynomialAssertion) {
@@ -121,37 +114,33 @@ func TestPolynomialVariablePositionsSentinelDuplicateSourceProfiles(t *testing.T
 		}
 	}
 }
-func TestScopedPolynomialVariablePositionsCapturedBackingLifetime(t *testing.T) {
+func TestScopedPolynomialVariablePositionsBorrowedSliceAfterCallerGrowth(t *testing.T) {
 	r, _ := degreeCopyRuntime(t)
 	d, e := NewPolynomialVariablePositions(r)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, d.CloseChecked()) })
-	xs, raw := variableHelperArray(t, r, []uint32{1, 4})
+	variables := []uint32{1, 4}
+	xs := variableHelperArray(variables)
 	s, e := NewScopedPolynomialVariablePositions(d, 2, xs)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, s.CloseChecked()) })
-	serviceMust(t, r.Reallocate(raw, 24))
-	e = s.SourceFinalize()
-	if !errors.Is(e, umemory.ErrRuntimeOwner) {
-		t.Fatal("captured raw pointer after realloc", e)
-	}
-	for x, w := range map[uint32]uint32{1: 0, 4: 1} {
+	variables = append(variables, 7, 8, 9)
+	serviceMust(t, s.SourceFinalize())
+	for _, x := range []uint32{1, 4} {
 		v, e := d.Position(x)
 		serviceMust(t, e)
-		if v != w {
-			t.Fatal(x, v, w)
+		if v != ^uint32(0) {
+			t.Fatal(x, v)
 		}
 	}
-	if e = s.SourceFinalize(); !errors.Is(e, umemory.ErrRuntimeOwner) {
-		t.Fatal(e)
-	}
+	serviceMust(t, s.SourceFinalize())
 }
 func TestScopedPolynomialVariablePositionsFailedConstructorNoReset(t *testing.T) {
 	r, _ := degreeCopyRuntime(t)
 	d, e := NewPolynomialVariablePositions(r)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, d.CloseChecked()) })
-	xs, _ := variableHelperArray(t, r, []uint32{1, 1})
+	xs := variableHelperArray([]uint32{1, 1})
 	s, e := NewScopedPolynomialVariablePositions(d, 2, xs)
 	if polynomialSourceDebug {
 		if !errors.Is(e, ErrPolynomialAssertion) || s != nil {
@@ -211,7 +200,7 @@ func TestPolynomialVariablePositionsNativeSliceFill(t *testing.T) {
 	d, e := NewPolynomialVariablePositions(r)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, d.CloseChecked()) })
-	xs, _ := variableHelperArray(t, r, []uint32{19})
+	xs := variableHelperArray([]uint32{19})
 	before := b.Used()
 	b.FailAfter(0)
 	serviceMust(t, d.Init(1, xs))
@@ -276,7 +265,7 @@ func TestPolynomialVariableHelperImplicitCopyMoveAndScopedCopies(t *testing.T) {
 	positions, e := NewPolynomialVariablePositions(r)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, positions.CloseChecked()) })
-	xs, _ := variableHelperArray(t, r, []uint32{1, 4})
+	xs := variableHelperArray([]uint32{1, 4})
 	sp, e := NewScopedPolynomialVariablePositions(positions, 2, xs)
 	serviceMust(t, e)
 	sp2, e := NewScopedPolynomialVariablePositionsMove(sp)
@@ -316,14 +305,15 @@ func TestPolynomialVariableHelperScopedReachedResetPrefix(t *testing.T) {
 	d, e := NewPolynomialVariablePositions(r)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, d.CloseChecked()) })
-	xs, raw := variableHelperArray(t, r, []uint32{1, 4})
+	variables := []uint32{1, 4}
+	xs := variableHelperArray(variables)
 	s, e := NewScopedPolynomialVariablePositions(d, 2, xs)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, s.CloseChecked()) })
 	// The caller's original mutable array remains borrowed by const pointer.
 	// Changing its second value to UINT_MAX reaches a guarded source-undefined
 	// destination index; the completed first reset must remain published.
-	serviceMust(t, r.WriteUint32(*raw, 4, ^uint32(0)))
+	variables[1] = ^uint32(0)
 	e = s.SourceFinalize()
 	if e == nil {
 		t.Fatal("malformed borrowed view was accepted")
@@ -338,7 +328,7 @@ func TestPolynomialVariableHelperScopedReachedResetPrefix(t *testing.T) {
 	if v != 1 {
 		t.Fatal("unreached old variable untouched", v)
 	}
-	roots := uint32(1)
+	roots := uint32(0)
 	if r.Stats().LiveBlocks != roots || r.Stats().TotalBytes+d.header+s.header != b.Used() {
 		t.Fatal("source-stopped scope and borrowed/caller roots", r.Stats(), b.Used())
 	}

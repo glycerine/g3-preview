@@ -10,7 +10,6 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 
-	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -28,7 +27,7 @@ func TestPolynomialTranslateIndependentMultivariableIdentity(t *testing.T) {
 func TestPolynomialTranslateArraySourceAssignment(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{1, 1}, [][]MonomialPower{{{0, 1}, {1, 1}}, nil})
-	xs, _ := variableHelperArray(t, m.memory, []uint32{0, 1})
+	xs := variableHelperArray([]uint32{0, 1})
 	r, e := NewPolynomialRef(m)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, r.Close()) })
@@ -156,13 +155,13 @@ func TestPolynomialTranslateManyEveryReservationPrefix(t *testing.T) {
 		t.Run(fmt.Sprint(fault), func(t *testing.T) {
 			m := polynomialCellFixture(t)
 			p := polynomialQueryTerms(t, m, []int32{1, 1}, [][]MonomialPower{{{0, 1}, {1, 1}}, nil})
-			xs, raw := variableHelperArray(t, m.memory, []uint32{0, 1})
+			xs := variableHelperArray([]uint32{0, 1})
 			out, e := NewPolynomialRef(m)
 			serviceMust(t, e)
 			values := []unumeral.Int{unumeral.NewInt(2), unumeral.NewInt(-3)}
 			m.integer.Budget().FailAfter(fault)
 			e = m.TranslateMany(p, 2, xs, values, out)
-			polynomialSOMPhysicalWithOwners(t, m, nil, nil, []umemory.Block{*raw}, []Polynomial{p}, []*PolynomialRef{out}, &values[0], &values[1])
+			polynomialSOMPhysicalWithOwners(t, m, nil, nil, nil, []Polynomial{p}, []*PolynomialRef{out}, &values[0], &values[1])
 			m.integer.Budget().FailAfter(-1)
 			if e == nil {
 				succeeded = true
@@ -173,7 +172,7 @@ func TestPolynomialTranslateManyEveryReservationPrefix(t *testing.T) {
 				}
 				serviceMust(t, m.CleanupTranslation())
 			}
-			polynomialSOMPhysicalWithOwners(t, m, nil, nil, []umemory.Block{*raw}, []Polynomial{p}, []*PolynomialRef{out}, &values[0], &values[1])
+			polynomialSOMPhysicalWithOwners(t, m, nil, nil, nil, []Polynomial{p}, []*PolynomialRef{out}, &values[0], &values[1])
 			serviceMust(t, out.Close())
 		})
 	}
@@ -188,18 +187,11 @@ func TestPolynomialTranslateCapturedVariablesAndWrapperProfiles(t *testing.T) {
 	out, e := NewPolynomialRef(m)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, out.Close()) })
-	raw, e := m.memory.Allocate(4)
-	serviceMust(t, e)
-	serviceMust(t, m.memory.WriteUint32(raw, 0, 0))
-	xs := BorrowPolynomialVariables(m.memory, raw, 0)
-	serviceMust(t, m.memory.Deallocate(&raw))
-	e = m.TranslateMany(p, 1, xs, []unumeral.Int{unumeral.NewInt(2)}, out)
-	if !errors.Is(e, umemory.ErrRuntimeOwner) {
-		t.Fatal("captured backing read", e)
-	}
-	if out.root.value != p {
-		t.Fatal("initial source assignment was not published before variable read")
-	}
+	variables := []uint32{1}
+	xs := variableHelperArray(variables)
+	variables[0] = 0 // The concrete caller's native slice remains borrowed.
+	serviceMust(t, m.TranslateMany(p, 1, xs, []unumeral.Int{unumeral.NewInt(2)}, out))
+	polynomialQueryExpect(t, m, out.root.value, map[[3]uint32]int64{{1, 0, 0}: 1, {0, 0, 0}: 7})
 	vector, e := NewPolynomialVariableDegrees(m.memory)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, vector.CloseChecked()) })
@@ -373,7 +365,7 @@ func polynomialTranslateEvaluate(t *testing.T, m *MultivariatePolynomialCore, p 
 func TestPolynomialTranslateIndependentFiniteGrid(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{2, -3, 5, 7}, [][]MonomialPower{{{0, 3}, {1, 2}}, {{0, 1}, {1, 1}}, {{1, 2}}, nil})
-	xs, raw := variableHelperArray(t, m.memory, []uint32{0, 1})
+	xs := variableHelperArray([]uint32{0, 1})
 	out, e := NewPolynomialRef(m)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, out.Close()) })
@@ -390,7 +382,7 @@ func TestPolynomialTranslateIndependentFiniteGrid(t *testing.T) {
 					}
 				}
 			}
-			polynomialSOMPhysicalWithOwners(t, m, nil, nil, []umemory.Block{*raw}, []Polynomial{p}, []*PolynomialRef{out}, &values[0], &values[1])
+			polynomialSOMPhysicalWithOwners(t, m, nil, nil, nil, []Polynomial{p}, []*PolynomialRef{out}, &values[0], &values[1])
 		}
 	}
 }

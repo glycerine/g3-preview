@@ -8,35 +8,19 @@ import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-// PolynomialVariablesView is a by-value borrowed source var const* pointer.
-// It captures backing identity, not a vector owner, size, or copied values.
-type PolynomialVariablesView struct {
-	runtime *umemory.Runtime
-	raw     umemory.Block
-	offset  uint64
-	values  []uint32
-}
+// PolynomialVariablesView borrows the concrete caller's variable slice.
+type PolynomialVariablesView struct{ values []uint32 }
 
-func BorrowPolynomialVariables(r *umemory.Runtime, b umemory.Block, offset uint64) PolynomialVariablesView {
-	return PolynomialVariablesView{runtime: r, raw: b, offset: offset}
-}
 func (v PolynomialVariablesView) At(i uint32) (uint32, error) {
-	if v.values != nil {
-		if uint64(i) >= uint64(len(v.values)) {
-			return 0, arena.ErrBounds
-		}
-		return v.values[i], nil
-	}
-	if v.runtime == nil {
+	if v.values == nil {
 		return 0, umemory.ErrRuntimeOwner
 	}
-	o := v.offset + uint64(i)*4
-	if o < v.offset {
+	if uint64(i) >= uint64(len(v.values)) {
 		return 0, arena.ErrBounds
 	}
-	return v.runtime.ReadUint32(v.raw, o)
+	return v.values[i], nil
 }
-func (v PolynomialVariablesView) IsNull() bool { return v.values == nil && v.raw == (umemory.Block{}) }
+func (v PolynomialVariablesView) IsNull() bool { return v.values == nil }
 func variableEmbedded(d *PolynomialVariableDegrees, r *umemory.Runtime, complete bool) {
 	*d = PolynomialVariableDegrees{runtime: r, constructed: complete}
 	d.self = d

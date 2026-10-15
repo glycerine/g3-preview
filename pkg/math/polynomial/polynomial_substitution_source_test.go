@@ -12,7 +12,7 @@ import (
 func TestPolynomialSubstitutionIntegerIndependentIdentity(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{3, 5, 7, 11}, [][]MonomialPower{{{0, 2}, {1, 1}}, {{1, 2}}, {{2, 1}}, nil})
-	xs, _ := variableHelperArray(t, m.memory, []uint32{0, 2})
+	xs := variableHelperArray([]uint32{0, 2})
 	values := []unumeral.Int{{Val: 2}, {Val: -3}}
 	result, e := m.SubstituteIntegers(p, 2, xs, values)
 	serviceMust(t, e)
@@ -23,7 +23,7 @@ func TestPolynomialSubstitutionIntegerIndependentIdentity(t *testing.T) {
 func TestPolynomialSubstitutionRationalDenominatorClearing(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{1, 1, 1}, [][]MonomialPower{{{0, 2}, {2, 1}}, {{1, 1}}, {{0, 1}, {2, 1}}})
-	xs, _ := variableHelperArray(t, m.memory, []uint32{0, 1})
+	xs := variableHelperArray([]uint32{0, 1})
 	values := []unumeral.Rational{{Num: unumeral.IntFromNativeWords([3]uint32{uint32(3), uint32(0), uint32(uint64(0) >> 32)}), Den: unumeral.IntFromNativeWords([3]uint32{uint32(2), uint32(0), uint32(uint64(0) >> 32)})}, {Num: unumeral.IntFromNativeWords([3]uint32{uint32(3), uint32(0), uint32(uint64(0) >> 32)}), Den: unumeral.IntFromNativeWords([3]uint32{uint32(1), uint32(0), uint32(uint64(0) >> 32)})}}
 	result, e := m.SubstituteRationals(p, 2, xs, values)
 	serviceMust(t, e)
@@ -109,7 +109,7 @@ func TestPolynomialSubstitutionAbsentAndReachedRawFields(t *testing.T) {
 func TestPolynomialSubstitutionIntegerBoundedGridAndScalarForward(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{3, -5, 7, 11}, [][]MonomialPower{{{0, 3}, {1, 1}}, {{0, 1}, {2, 2}}, {{2, 1}}, nil})
-	xs, xsRaw := variableHelperArray(t, m.memory, []uint32{0, 2})
+	xs := variableHelperArray([]uint32{0, 2})
 	for x := int32(-3); x <= 3; x++ {
 		for z := int32(-2); z <= 2; z++ {
 			v := []unumeral.Int{unumeral.NewInt(x), unumeral.NewInt(z)}
@@ -135,7 +135,7 @@ func TestPolynomialSubstitutionIntegerBoundedGridAndScalarForward(t *testing.T) 
 	serviceMust(t, m.IncRef(a))
 	polynomialQueryExpect(t, m, a, map[[3]uint32]int64{{0, 1, 0}: -24, {0, 0, 2}: 10, {0, 0, 1}: 7, {0, 0, 0}: 11})
 	serviceMust(t, m.DecRef(a))
-	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p}, []umemory.Block{*xsRaw})
+	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p}, nil)
 }
 func TestPolynomialSubstitutionFractionZeroAndAliasProfiles(t *testing.T) {
 	m := polynomialCellFixture(t)
@@ -175,7 +175,7 @@ func TestPolynomialSubstitutionFractionZeroAndAliasProfiles(t *testing.T) {
 func TestPolynomialSubstitutionWarmAbsentBranchActualStorage(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{3, 5}, [][]MonomialPower{{{0, 2}}, {{1, 3}}})
-	xs, _ := variableHelperArray(t, m.memory, []uint32{2})
+	xs := variableHelperArray([]uint32{2})
 	values := []unumeral.Rational{{Num: unumeral.NewInt(2), Den: unumeral.NewInt(3)}}
 	a, e := m.SubstituteRationals(p, 1, xs, values)
 	serviceMust(t, e)
@@ -192,7 +192,7 @@ func TestPolynomialSubstitutionWarmAbsentBranchActualStorage(t *testing.T) {
 			panic("source absent warm branch")
 		}
 	})
-	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p}, []umemory.Block{xs.raw}, &(*values[0].BorrowNumerator()), &(*values[0].BorrowDenominator()))
+	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p}, nil, &(*values[0].BorrowNumerator()), &(*values[0].BorrowDenominator()))
 	after, e := m.memory.AllocationCount()
 	serviceMust(t, e)
 	if allocs != 0 || before != m.memory.Stats() || count != after || state != m.memory.State() || used != m.integer.Budget().Used() {
@@ -200,20 +200,21 @@ func TestPolynomialSubstitutionWarmAbsentBranchActualStorage(t *testing.T) {
 	}
 	m.integer.Budget().FailAfter(-1)
 }
-func TestPolynomialSubstitutionColdOwnersAndSourceInputLifetime(t *testing.T) {
+func TestPolynomialSubstitutionColdOwnersAndBorrowedVariables(t *testing.T) {
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{3}, [][]MonomialPower{{{0, 2}}})
-	xs, b := variableHelperArray(t, m.memory, []uint32{0})
-	stale := xs
-	serviceMust(t, m.memory.Reallocate(b, 16))
-	_, e := m.SubstituteIntegers(p, 1, stale, []unumeral.Int{unumeral.NewInt(2)})
-	if !errors.Is(e, umemory.ErrRuntimeOwner) {
-		t.Fatal("captured real source pointer accessed during scoped ctor", e)
-	}
+	variables := []uint32{0}
+	xs := variableHelperArray(variables)
+	variables[0] = 1
+	result, e := m.SubstituteIntegers(p, 1, xs, []unumeral.Int{unumeral.NewInt(2)})
+	serviceMust(t, e)
+	serviceMust(t, m.IncRef(result))
+	t.Cleanup(func() { serviceMust(t, m.DecRef(result)) })
+	polynomialQueryExpect(t, m, result, map[[3]uint32]int64{{2, 0, 0}: 3})
 	if m.substitution.scope.active {
-		t.Fatal("failed scope ctor has no reset or completed numeric locals")
+		t.Fatal("borrowed native variable left an active scope")
 	}
-	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p}, []umemory.Block{*b})
+	polynomialSubstitutionPhysical(t, m, nil, []Polynomial{p, result}, nil)
 	shallow := *m
 	if _, e = shallow.SubstituteIntegers(p, 0, PolynomialVariablesView{}, nil); !errors.Is(e, ErrPolynomialOwner) {
 		t.Fatal(e)
@@ -266,7 +267,7 @@ func TestPolynomialSubstitutionEveryReservationNamedPrefixes(t *testing.T) {
 		for fault := int64(0); fault < 128 && !success; fault++ {
 			m := polynomialCellFixture(t)
 			p := polynomialQueryTerms(t, m, []int32{3, 5, 7}, [][]MonomialPower{{{0, 3}, {1, 1}}, {{0, 2}}, nil})
-			xs, xraw := variableHelperArray(t, m.memory, []uint32{0})
+			xs := variableHelperArray([]uint32{0})
 			var input unumeral.Int
 			serviceMust(t, m.integer.SetLimbs(&input, []uint32{17, 0, 1}))
 			value := unumeral.RationalFromBorrowedNumerals(input, unumeral.NewInt(2))
@@ -285,7 +286,7 @@ func TestPolynomialSubstitutionEveryReservationNamedPrefixes(t *testing.T) {
 				e = m.SubstitutePolynomialFraction(p, 0, q, q, out)
 			}
 			polys := []Polynomial{p, q, result}
-			polynomialSubstitutionPhysical(t, m, []*PolynomialRef{out}, polys, []umemory.Block{*xraw}, &input)
+			polynomialSubstitutionPhysical(t, m, []*PolynomialRef{out}, polys, nil, &input)
 			if e != nil {
 				refusals++
 				if !numericPhysicalReservationRefusal(e) {
