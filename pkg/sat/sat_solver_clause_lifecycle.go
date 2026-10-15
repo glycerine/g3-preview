@@ -19,6 +19,7 @@ type satSolverClauseLifecycle struct {
 	asymmContinuation                                          *satAsymmBranch
 	self                                                       *satSolverClauseLifecycle
 	propagation                                                *satSolverPropagationState
+	traceTags                                                  *diagnostic.TraceTags
 	budget                                                     *arena.Budget
 	Original, learned                                          []StoredClauseRef
 	reinit                                                     []satClauseWrapper
@@ -235,6 +236,7 @@ func (s *satSolverClauseLifecycle) mkClauseCoreSpan(n uint32, span satSolverLite
 	if s.pendingCandidate != (StoredClauseRef{}) {
 		return StoredClauseRef{}, ErrSATOwner
 	}
+	s.traceMkClause(n, span, learned)
 	p := s.propagation
 	if !learned {
 		v := p.variables.clauseState()
@@ -242,6 +244,7 @@ func (s *satSolverClauseLifecycle) mkClauseCoreSpan(n uint32, span satSolverLite
 		if e != nil {
 			return StoredClauseRef{}, e
 		}
+		s.traceSimplifiedClause(n, span, keep)
 		if !keep {
 			return StoredClauseRef{}, nil
 		}

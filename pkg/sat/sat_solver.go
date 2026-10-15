@@ -149,6 +149,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	if s.Lifecycle, err = newSATSolverClauseLifecycle(s.propagation, c.Budget); err != nil {
 		return s, err
 	}
+	s.Lifecycle.traceTags = c.TraceTags
 	if s.analysis, err = newSATSolverConflictAnalysis(s.propagation, c.Budget); err != nil {
 		return s, err
 	}

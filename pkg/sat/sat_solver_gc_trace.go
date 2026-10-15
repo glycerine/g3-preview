@@ -23,8 +23,7 @@ func (g *satSolverGC) traceGC(function string, line int) {
 
 // Source: src/sat/sat_solver.cpp:1569,1612,1630. The clause renderer follows
 // src/sat/sat_clause.cpp:221-231; the cleanup site prints only the live prefix.
-func (g *satSolverGC) traceClauseLiterals(r StoredClauseRef, n uint32) (string, error) {
-	a := g.lifecycle().propagation.clauses
+func satTraceClauseLiterals(a *ClauseAllocator, r StoredClauseRef, n uint32) (string, error) {
 	var b strings.Builder
 	for i := uint32(0); i < n; i++ {
 		lit, err := a.Literal(r, i)
@@ -39,13 +38,12 @@ func (g *satSolverGC) traceClauseLiterals(r StoredClauseRef, n uint32) (string, 
 	return b.String(), nil
 }
 
-func (g *satSolverGC) traceClause(r StoredClauseRef) (string, error) {
-	a := g.lifecycle().propagation.clauses
+func satTraceClause(a *ClauseAllocator, r StoredClauseRef) (string, error) {
 	n, err := a.Size(r)
 	if err != nil {
 		return "", err
 	}
-	text, err := g.traceClauseLiterals(r, n)
+	text, err := satTraceClauseLiterals(a, r, n)
 	if err != nil {
 		return "", err
 	}
@@ -70,7 +68,7 @@ func (g *satSolverGC) traceClause(r StoredClauseRef) (string, error) {
 
 func (g *satSolverGC) traceFreezingClause(r StoredClauseRef, size, measure uint32) {
 	g.traceClauseRecord("sat_frozen", "gc_dyn_psm", 1569, func(w io.Writer) error {
-		clause, err := g.traceClause(r)
+		clause, err := satTraceClause(g.lifecycle().propagation.clauses, r)
 		if err != nil {
 			return err
 		}
@@ -82,7 +80,7 @@ func (g *satSolverGC) traceFreezingClause(r StoredClauseRef, size, measure uint3
 
 func (g *satSolverGC) traceReactivatingClause(r StoredClauseRef) {
 	g.traceClauseRecord("sat_gc", "activate_frozen_clause", 1612, func(w io.Writer) error {
-		clause, err := g.traceClause(r)
+		clause, err := satTraceClause(g.lifecycle().propagation.clauses, r)
 		if err != nil {
 			return err
 		}
@@ -93,7 +91,7 @@ func (g *satSolverGC) traceReactivatingClause(r StoredClauseRef) {
 
 func (g *satSolverGC) traceAfterClauseCleanup(r StoredClauseRef, n uint32) {
 	g.traceClauseRecord("sat", "activate_frozen_clause", 1630, func(w io.Writer) error {
-		lits, err := g.traceClauseLiterals(r, n)
+		lits, err := satTraceClauseLiterals(g.lifecycle().propagation.clauses, r, n)
 		if err != nil {
 			return err
 		}

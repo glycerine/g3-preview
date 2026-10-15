@@ -178165,6 +178165,12 @@
           "tests": ["TestSATGCFrozenClauseSourceTraceBoundaries", "TestSATGCReactivationCleanupSourceTraceBoundaries"]
         },
         {
+          "name": "Reached SAT mk_clause_core input and post-simplification TRACE plus push_reinit_stack TRACE before publication (sat_solver.cpp:196,199,250)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_clause_trace.go",
+          "tests": ["TestSATClauseCreationSourceTraceBeforeAndAfterSimplification", "TestSATReinitClauseSourceTraceBeforePublication"]
+        },
+        {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_simplify_trace.go",
@@ -179377,6 +179383,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_gc_trace.go",
           "tests": ["TestSATGCFrozenClauseSourceTraceBoundaries", "TestSATGCReactivationCleanupSourceTraceBoundaries"]
+        },
+        {
+          "name": "Reached SAT mk_clause_core input and post-simplification TRACE plus push_reinit_stack TRACE before publication (sat_solver.cpp:196,199,250)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_clause_trace.go",
+          "tests": ["TestSATClauseCreationSourceTraceBeforeAndAfterSimplification", "TestSATReinitClauseSourceTraceBeforePublication"]
         },
         {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",

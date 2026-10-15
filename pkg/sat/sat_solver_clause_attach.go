@@ -64,6 +64,7 @@ func (s *satSolverClauseLifecycle) pushWatch(l Literal, w satWatched) error {
 	return list.Push(w)
 }
 func (s *satSolverClauseLifecycle) pushReinitStack(c StoredClauseRef) error {
+	s.traceReinitClause(c)
 	if e := s.pushWrapper(newSATClauseWrapper(c)); e != nil {
 		return e
 	}
