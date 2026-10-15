@@ -164740,9 +164740,11 @@
         },
         {
           "name": "is_perfect_square cpp1871-1929 literal binary search, RESET/direct output SET, six RAW locals and end-only ascending deletion",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpz_root.go",
           "tests": [
+            "TestPerfectSquareIndependentAndSourceAlias",
+            "TestPerfectSquareLargeIndependentCeilingOracle",
             "TestIntegerPerfectSquareResetsCallerBeforeRawCopyRefusal",
             "TestIntegerPerfectSquareOwnsActualFailedRawFields",
             "TestIntegerPerfectSquareRawEndStopsBeforeLaterDeletion",
