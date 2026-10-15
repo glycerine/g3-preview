@@ -82,7 +82,6 @@ func (c *HardwareContext) DefinePolynomial(constant *numeral.HardwareFloat, term
 		variables[i] = term.Variable
 	}
 	sort.Slice(variables, func(i, j int) bool { return variables[i] < variables[j] })
-	integer := m.IsInteger(&p.constant)
 	used := make(map[uint32]bool, len(last))
 	for i, variable := range variables {
 		p.terms[i].variable = variable
@@ -90,7 +89,13 @@ func (c *HardwareContext) DefinePolynomial(constant *numeral.HardwareFloat, term
 			p.terms[i].coefficient = last[variable]
 			used[variable] = true
 		}
-		integer = integer && c.isInt[variable] && m.IsInteger(&p.terms[i].coefficient)
+	}
+	if err := c.tracePolynomialInteger(p); err != nil {
+		return 0, err
+	}
+	integer, err := c.polynomialInteger(p)
+	if err != nil {
+		return 0, err
 	}
 	x := uint32(len(c.isInt))
 	c.isInt = append(c.isInt, integer)

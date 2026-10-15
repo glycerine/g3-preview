@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/math/interval"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/statistics"
@@ -57,6 +58,7 @@ type HardwareContext struct {
 	searchNode       *HardwareNode
 	searchPhase      uint8
 	displayVariable  HardwareVariableDisplay
+	trace            *diagnostic.TraceTags
 	initStage        uint8
 	initDefHead      uint32
 	closed           bool
@@ -246,6 +248,7 @@ func (c *HardwareContext) Close() error {
 	c.polynomials = nil
 	c.monomials = nil
 	c.displayVariable = nil
+	c.trace = nil
 	c.isInt = nil
 	c.leafHead, c.leafTail = nil, nil
 	c.closed = true

@@ -53275,6 +53275,8 @@
         "pkg/math/subpaving/arbitrary_polynomial_integer_trace_test.go",
         "pkg/math/subpaving/fast_polynomial_integer_trace.go",
         "pkg/math/subpaving/fast_polynomial_integer_trace_test.go",
+        "pkg/math/subpaving/hardware_polynomial_integer_trace.go",
+        "pkg/math/subpaving/hardware_polynomial_integer_trace_test.go",
         "pkg/math/subpaving/arbitrary_polynomial_propagate.go",
         "pkg/math/subpaving/arbitrary_polynomial_propagate_test.go",
         "pkg/math/subpaving/arbitrary_monomial_propagate.go",
@@ -53402,6 +53404,8 @@
         "TestArbitraryPolynomialTraceStreamRefusalKeepsDefinition",
         "TestFastPolynomialSourceIntegerTraceAndPublication",
         "TestFastPolynomialTraceStreamRefusalKeepsDefinition",
+        "TestHardwarePolynomialSourceIntegerTraceAndPublication",
+        "TestHardwarePolynomialTraceStreamRefusalKeepsDefinition",
         "TestArbitraryMonomialForwardInverseAndArithmetic",
         "TestArbitraryContextRootInitializationStagesAndConflict",
         "TestArbitraryChildRecentBoundReplayAndPolynomialWatcher",
@@ -54294,6 +54298,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fast_polynomial_integer_trace.go",
           "tests": ["TestFastPolynomialSourceIntegerTraceAndPublication", "TestFastPolynomialTraceStreamRefusalKeepsDefinition"]
+        },
+        {
+          "name": "Concrete config_hwf mk_sum and is_int(polynomial) nested integer-status and first-failing-term TRACE before variable publication (subpaving_t_def.h:668-679,762-763)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_polynomial_integer_trace.go",
+          "tests": ["TestHardwarePolynomialSourceIntegerTraceAndPublication", "TestHardwarePolynomialTraceStreamRefusalKeepsDefinition"]
         },
         {
           "name": "Concrete config_hwf mk_var, mk_sum, and mk_ineq construction with sorted duplicate coefficient swaps (src/math/subpaving/subpaving_t_def.h:666-687,741-780)",
@@ -176089,6 +176099,8 @@
         "pkg/math/subpaving/arbitrary_polynomial_integer_trace_test.go",
         "pkg/math/subpaving/fast_polynomial_integer_trace.go",
         "pkg/math/subpaving/fast_polynomial_integer_trace_test.go",
+        "pkg/math/subpaving/hardware_polynomial_integer_trace.go",
+        "pkg/math/subpaving/hardware_polynomial_integer_trace_test.go",
         "pkg/math/subpaving/interval_root_trace_stream.go",
         "pkg/math/subpaving/fixed_interval_root_trace.go",
         "pkg/math/subpaving/fast_interval_root_trace.go",
@@ -176136,7 +176148,9 @@
         "TestArbitraryPolynomialSourceIntegerTraceAndPublication",
         "TestArbitraryPolynomialTraceStreamRefusalKeepsDefinition",
         "TestFastPolynomialSourceIntegerTraceAndPublication",
-        "TestFastPolynomialTraceStreamRefusalKeepsDefinition"
+        "TestFastPolynomialTraceStreamRefusalKeepsDefinition",
+        "TestHardwarePolynomialSourceIntegerTraceAndPublication",
+        "TestHardwarePolynomialTraceStreamRefusalKeepsDefinition"
       ],
       "conditionals": [
         {
@@ -176727,6 +176741,12 @@
           "tests": ["TestFastPolynomialSourceIntegerTraceAndPublication", "TestFastPolynomialTraceStreamRefusalKeepsDefinition"]
         },
         {
+          "name": "Reached config_hwf mk_sum and is_int(polynomial) nested TRACE records (subpaving_t_def.h:672,762)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_polynomial_integer_trace.go",
+          "tests": ["TestHardwarePolynomialSourceIntegerTraceAndPublication", "TestHardwarePolynomialTraceStreamRefusalKeepsDefinition"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -176777,6 +176797,8 @@
         "pkg/math/subpaving/arbitrary_polynomial_integer_trace_test.go",
         "pkg/math/subpaving/fast_polynomial_integer_trace.go",
         "pkg/math/subpaving/fast_polynomial_integer_trace_test.go",
+        "pkg/math/subpaving/hardware_polynomial_integer_trace.go",
+        "pkg/math/subpaving/hardware_polynomial_integer_trace_test.go",
         "pkg/math/subpaving/interval_root_trace_stream.go",
         "pkg/math/subpaving/fixed_interval_root_trace.go",
         "pkg/math/subpaving/fast_interval_root_trace.go",
@@ -176824,7 +176846,9 @@
         "TestArbitraryPolynomialSourceIntegerTraceAndPublication",
         "TestArbitraryPolynomialTraceStreamRefusalKeepsDefinition",
         "TestFastPolynomialSourceIntegerTraceAndPublication",
-        "TestFastPolynomialTraceStreamRefusalKeepsDefinition"
+        "TestFastPolynomialTraceStreamRefusalKeepsDefinition",
+        "TestHardwarePolynomialSourceIntegerTraceAndPublication",
+        "TestHardwarePolynomialTraceStreamRefusalKeepsDefinition"
       ],
       "conditionals": [
         {
@@ -177425,6 +177449,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fast_polynomial_integer_trace.go",
           "tests": ["TestFastPolynomialSourceIntegerTraceAndPublication", "TestFastPolynomialTraceStreamRefusalKeepsDefinition"]
+        },
+        {
+          "name": "Reached config_hwf mk_sum and is_int(polynomial) nested TRACE records (subpaving_t_def.h:672,762)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_polynomial_integer_trace.go",
+          "tests": ["TestHardwarePolynomialSourceIntegerTraceAndPublication", "TestHardwarePolynomialTraceStreamRefusalKeepsDefinition"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
