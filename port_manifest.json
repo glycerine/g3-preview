@@ -101530,7 +101530,7 @@
         "TestTacticModelConcatStopsAtChildErrorAndRejectsCopiedOwner",
         "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild",
         "TestTacticModelConcatConsumedChildCleanupResumesWithoutSecondDecrement",
-        "TestTacticModelConcatRealStoredChildFinalReleaseRefusal"
+        "TestTacticModelConcatRealStoredChildFinalReleaseNativeIDRecycle"
       ],
       "conditionals": [
         {
@@ -103183,7 +103183,7 @@
         "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
         "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership",
         "TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource",
-        "TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel"
+        "TestTacticFilterModelAssignmentUsesNativeIDRecycle"
       ],
       "assertions": [
         {
@@ -103203,7 +103203,7 @@
             "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
             "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership",
             "TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource",
-            "TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel"
+            "TestTacticFilterModelAssignmentUsesNativeIDRecycle"
           ]
         },
         {
@@ -103236,7 +103236,7 @@
         "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
         "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership",
         "TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource",
-        "TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel"
+        "TestTacticFilterModelAssignmentUsesNativeIDRecycle"
       ],
       "conditionals": [
         {
@@ -103838,11 +103838,11 @@
         "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
         "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
         "TestModelConverterToModelOriginalAllocationAndApplication",
-        "TestTacticModelConverterToModelStoppedAssignmentKeepsAcquiredModel",
+        "TestTacticModelConverterToModelAssignmentUsesNativeIDRecycle",
         "TestModelDerivedConstructorHeaderRefusalUnwinds",
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
         "TestTacticStoredModelLabelsSnapshotAndAppend",
-        "TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion",
+        "TestTacticStoredModelCopyAssignmentUsesNativeIDRecycle",
         "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
         "TestTacticStoredModelLabelAppendUsesNativeSliceStorage",
         "TestTacticModelReferenceOwningAliasAndReplacement",
@@ -103879,7 +103879,7 @@
           "status": "ported",
           "go_target": "pkg/tactic/tactic_model_to_model.go",
           "tests": [
-            "TestTacticModelConverterToModelStoppedAssignmentKeepsAcquiredModel"
+            "TestTacticModelConverterToModelAssignmentUsesNativeIDRecycle"
           ]
         },
         {
@@ -103889,7 +103889,7 @@
           "tests": [
             "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
             "TestTacticStoredModelLabelsSnapshotAndAppend",
-            "TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion",
+            "TestTacticStoredModelCopyAssignmentUsesNativeIDRecycle",
             "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
             "TestTacticStoredModelLabelAppendUsesNativeSliceStorage"
           ]
@@ -103927,11 +103927,11 @@
         "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
         "TestModelDerivedUniverseUpdatePreservesLiteralAppendAndCounts",
         "TestModelConverterToModelOriginalAllocationAndApplication",
-        "TestTacticModelConverterToModelStoppedAssignmentKeepsAcquiredModel",
+        "TestTacticModelConverterToModelAssignmentUsesNativeIDRecycle",
         "TestModelDerivedConstructorHeaderRefusalUnwinds",
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
         "TestTacticStoredModelLabelsSnapshotAndAppend",
-        "TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion",
+        "TestTacticStoredModelCopyAssignmentUsesNativeIDRecycle",
         "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
         "TestTacticStoredModelLabelAppendUsesNativeSliceStorage",
         "TestTacticModelReferenceOwningAliasAndReplacement",
@@ -103978,7 +103978,7 @@
           "status": "ported",
           "go_target": "pkg/tactic/tactic_model_to_model.go",
           "tests": [
-            "TestTacticModelConverterToModelStoppedAssignmentKeepsAcquiredModel"
+            "TestTacticModelConverterToModelAssignmentUsesNativeIDRecycle"
           ]
         },
         {
@@ -103988,7 +103988,7 @@
           "tests": [
             "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
             "TestTacticStoredModelLabelsSnapshotAndAppend",
-            "TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion",
+            "TestTacticStoredModelCopyAssignmentUsesNativeIDRecycle",
             "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
             "TestTacticStoredModelLabelAppendUsesNativeSliceStorage"
           ]
@@ -171261,19 +171261,19 @@
       "tests": [
         "TestTacticModelReferenceOwningAliasAndReplacement",
         "TestTacticModelReferenceCopyAssignmentOwnsSourceModel",
-        "TestTacticModelRefKeepsOldOnConsumedDestructionStop",
-        "TestTacticModelRefCloseResumesConsumedFinalModelCleanup",
-        "TestTacticModelRefPendingIncomingFinalCleanupResumes",
-        "TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion",
-        "TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel",
-        "TestTacticModelConverterToModelStoppedAssignmentKeepsAcquiredModel",
+        "TestTacticModelRefReplacesOldWithNativeIDRecycle",
+        "TestTacticModelRefCloseUsesNativeIDRecycle",
+        "TestTacticModelRefReplacesTwoDerivedModelsWithoutIDBudget",
+        "TestTacticStoredModelCopyAssignmentUsesNativeIDRecycle",
+        "TestTacticFilterModelAssignmentUsesNativeIDRecycle",
+        "TestTacticModelConverterToModelAssignmentUsesNativeIDRecycle",
         "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
         "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
         "TestTacticModelConcatShortcutsNullBranchesAndSharedOwners",
         "TestTacticModelConcatStopsAtChildErrorAndRejectsCopiedOwner",
         "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild",
         "TestTacticModelConcatConsumedChildCleanupResumesWithoutSecondDecrement",
-        "TestTacticModelConcatRealStoredChildFinalReleaseRefusal"
+        "TestTacticModelConcatRealStoredChildFinalReleaseNativeIDRecycle"
       ],
       "conditionals": [
         {
@@ -171289,21 +171289,26 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Retained model-converter ref<model> default construction, retain-before-release pointer and ref copy assignment, borrowed get, and destructor cleanup, including consumed stopped deletion and pending incoming cleanup (model.h:63; model_converter.cpp:128-148; ref.h:31-101)",
+          "name": "Retained model-converter ref<model> default construction, retain-before-release pointer and ref copy assignment, borrowed get, and successful destructor cleanup (model.h:63; model_converter.cpp:128-148; ref.h:31-101)",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_model_converter.go",
           "tests": [
             "TestTacticModelReferenceCopyAssignmentOwnsSourceModel",
-            "TestTacticModelRefKeepsOldOnConsumedDestructionStop",
-            "TestTacticModelRefCloseResumesConsumedFinalModelCleanup",
-            "TestTacticModelRefPendingIncomingFinalCleanupResumes",
-            "TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion",
-            "TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel",
-            "TestTacticModelConverterToModelStoppedAssignmentKeepsAcquiredModel",
+            "TestTacticModelRefReplacesOldWithNativeIDRecycle",
+            "TestTacticModelRefCloseUsesNativeIDRecycle",
+            "TestTacticModelRefReplacesTwoDerivedModelsWithoutIDBudget",
+            "TestTacticStoredModelCopyAssignmentUsesNativeIDRecycle",
+            "TestTacticFilterModelAssignmentUsesNativeIDRecycle",
+            "TestTacticModelConverterToModelAssignmentUsesNativeIDRecycle",
             "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
             "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
             "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild"
           ]
+        },
+        {
+          "name": "ModelRef consumed stopped final model deletion and pending incoming cleanup through actual fallible model child release",
+          "status": "partial",
+          "tests": []
         },
         {
           "name": "Retained concat_converter<model_converter> and concat_star_converter<model_converter> ref<model_converter> member construction, borrowed access, shared-child retention and source member destruction order (converter.h:45-123; model_converter.cpp:22-124; ref.h:31-101)",
@@ -171315,7 +171320,7 @@
             "TestTacticModelConcatShortcutsNullBranchesAndSharedOwners",
             "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild",
             "TestTacticModelConcatConsumedChildCleanupResumesWithoutSecondDecrement",
-            "TestTacticModelConcatRealStoredChildFinalReleaseRefusal"
+            "TestTacticModelConcatRealStoredChildFinalReleaseNativeIDRecycle"
           ]
         },
         {
@@ -171326,7 +171331,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "The retained model2mc model_ref-to-model_ref assignment retains the incoming model before releasing the outgoing reference, including self-aliases. A consumed stopped final model deletion keeps the old raw pointer published and the acquired incoming reference in an owning receipt; ModelRef.Close completes that model's pending destruction before releasing the acquired incoming reference. Its own final DEC and a pending incoming model's final DEC each retain a cleanup receipt until the model closes. Concrete concat model converters retain each child ref, including aliases, then release second before first; concat-star releases its explicit second-child vector before the first ref member. A consumed child DEC followed by stopped child cleanup is retried through Close without a second DEC. Copied/retired owner guards remain explicit. Other retained reference instantiations, move/detach paths and failure histories remain open."
+        "The retained model2mc model_ref-to-model_ref assignment retains the incoming model before releasing the outgoing reference, including self-aliases. ModelRef has owning receipts for consumed stopped deletion and pending incoming cleanup, but old fixtures triggered only an obsolete arena-backed AST ID recycle; a reached model-child final-release failure fixture remains open. Concrete concat model converters retain each child ref, including aliases, then release second before first; concat-star releases its explicit second-child vector before the first ref member. A consumed converter-child DEC followed by stopped child cleanup is retried through Close without a second DEC. Copied/retired owner guards remain explicit. Other retained reference instantiations, move/detach paths and failure histories remain open."
       ]
     },
     {

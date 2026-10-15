@@ -1,15 +1,13 @@
 package tactic
 
 import (
-	"errors"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
 )
 
-func TestTacticModelRefKeepsOldOnConsumedDestructionStop(t *testing.T) {
+func TestTacticModelRefReplacesOldWithNativeIDRecycle(t *testing.T) {
 	m := astTestManager(t)
 	old, e := model.NewModel(m)
 	satOK(t, e)
@@ -27,11 +25,9 @@ func TestTacticModelRefKeepsOldOnConsumedDestructionStop(t *testing.T) {
 	m.BudgetField.FailAfter(0)
 	e = r.Set(incoming)
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatalf("old final destruction refusal: %v", e)
-	}
-	if r.value != &old.CoreField || r.owned || len(r.pending) != 1 || r.pending[0] != incoming || old.CoreField.References != 0 || incoming.References != 2 {
-		t.Fatalf("source raw pointer and acquired incoming ref: ref %+v, old %d, incoming %d", r, old.CoreField.References, incoming.References)
+	satOK(t, e)
+	if r.value != incoming || !r.owned || len(r.pending) != 0 || !old.Closed || incoming.References != 2 {
+		t.Fatalf("source old-then-new publication: ref %+v, old closed %v, incoming %d", r, old.Closed, incoming.References)
 	}
 	satOK(t, r.Close())
 	if !r.closed || !old.Closed || incoming.References != 1 {
@@ -41,7 +37,7 @@ func TestTacticModelRefKeepsOldOnConsumedDestructionStop(t *testing.T) {
 	satOK(t, incoming.DecRef())
 }
 
-func TestTacticModelRefCloseResumesConsumedFinalModelCleanup(t *testing.T) {
+func TestTacticModelRefCloseUsesNativeIDRecycle(t *testing.T) {
 	m := astTestManager(t)
 	md, e := model.NewModel(m)
 	satOK(t, e)
@@ -56,16 +52,13 @@ func TestTacticModelRefCloseResumesConsumedFinalModelCleanup(t *testing.T) {
 	m.BudgetField.FailAfter(0)
 	e = r.Close()
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || r.closed || r.owned || r.cleanup != &md.CoreField || md.CoreField.References != 0 {
-		t.Fatal("consumed final model release", e, r, md.CoreField.References)
-	}
-	satOK(t, r.Close())
-	if !r.closed || !md.Closed || r.cleanup != nil {
-		t.Fatal("model cleanup did not resume", r, md.Closed)
+	satOK(t, e)
+	if !r.closed || !md.Closed || r.cleanup != nil || md.CoreField.References != 0 {
+		t.Fatal("native final model release", r, md.Closed)
 	}
 }
 
-func TestTacticModelRefPendingIncomingFinalCleanupResumes(t *testing.T) {
+func TestTacticModelRefReplacesTwoDerivedModelsWithoutIDBudget(t *testing.T) {
 	m := astTestManager(t)
 	old, e := model.NewModel(m)
 	satOK(t, e)
@@ -87,26 +80,21 @@ func TestTacticModelRefPendingIncomingFinalCleanupResumes(t *testing.T) {
 	m.BudgetField.FailAfter(0)
 	e = r.Set(&incoming.CoreField)
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || r.cleanup != &old.CoreField || len(r.pending) != 1 || incoming.CoreField.References != 1 {
-		t.Fatal("old final cleanup prefix", e, r, incoming.CoreField.References)
+	satOK(t, e)
+	if !old.Closed || r.value != &incoming.CoreField || !r.owned || len(r.pending) != 0 || incoming.CoreField.References != 1 {
+		t.Fatal("old released before incoming publication", r, incoming.CoreField.References)
 	}
-	// Finish the old model so the next refusal is reached by the independently
-	// acquired incoming model while ModelRef.Close releases its pending receipt.
-	satOK(t, old.Close())
 	m.ExprIDs.Cleanup(m.ExprIDs.Range())
 	m.BudgetField.FailAfter(0)
 	e = r.Close()
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || r.closed || r.cleanup != &incoming.CoreField || len(r.pending) != 0 || incoming.CoreField.References != 0 {
-		t.Fatal("incoming final cleanup prefix", e, r, incoming.CoreField.References)
-	}
-	satOK(t, r.Close())
-	if !r.closed || !incoming.Closed || r.cleanup != nil {
-		t.Fatal("pending incoming model cleanup", r, incoming.Closed)
+	satOK(t, e)
+	if !r.closed || !incoming.Closed || r.cleanup != nil || incoming.CoreField.References != 0 {
+		t.Fatal("incoming final model cleanup", r, incoming.Closed)
 	}
 }
 
-func TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion(t *testing.T) {
+func TestTacticStoredModelCopyAssignmentUsesNativeIDRecycle(t *testing.T) {
 	m := astTestManager(t)
 	old, e := model.NewModel(m)
 	satOK(t, e)
@@ -125,11 +113,9 @@ func TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion(t *tes
 	m.BudgetField.FailAfter(0)
 	e = stored.ApplyModel(&out, 0)
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatalf("model2mc old model deletion refusal: %v", e)
-	}
-	if out.value != &old.CoreField || out.owned || len(out.pending) != 1 || out.pending[0] != incoming || incoming.References != 2 {
-		t.Fatalf("model2mc source copy assignment: %+v, incoming %d", out, incoming.References)
+	satOK(t, e)
+	if out.value != incoming || !out.owned || len(out.pending) != 0 || !old.Closed || incoming.References != 2 {
+		t.Fatalf("model2mc source copy assignment: %+v, old closed %v, incoming %d", out, old.Closed, incoming.References)
 	}
 	satOK(t, out.Close())
 	if !old.Closed || incoming.References != 1 {
@@ -142,7 +128,7 @@ func TestTacticStoredModelCopyAssignmentKeepsSourceOrderOnStoppedDeletion(t *tes
 	}
 }
 
-func TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel(t *testing.T) {
+func TestTacticFilterModelAssignmentUsesNativeIDRecycle(t *testing.T) {
 	m := astTestManager(t)
 	old, e := model.NewModel(m)
 	satOK(t, e)
@@ -158,18 +144,13 @@ func TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel(t *testing.T) 
 	var out ModelRef
 	satOK(t, out.Set(&old.CoreField))
 	m.ExprIDs.Cleanup(m.ExprIDs.Range())
-	m.BudgetField.FailAfter(1) // new model header, then old AST ID recycle
+	m.BudgetField.FailAfter(1) // new model header; AST ID recycle is native
 	e = filter.ApplyModel(&out, 0)
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatalf("filtered old model deletion refusal: %v", e)
-	}
-	if out.value != &old.CoreField || out.owned || len(out.pending) != 1 {
-		t.Fatalf("source output publication and next receipt: %+v", out)
-	}
-	next := out.pending[0]
-	if next.References != 1 || next.Closed || next.DerivedModel() == nil {
-		t.Fatalf("filter prematurely destroyed acquired next model: refs %d closed %v", next.References, next.Closed)
+	satOK(t, e)
+	next := out.value
+	if next == nil || !out.owned || len(out.pending) != 0 || !old.Closed || next.References != 1 || next.Closed || next.DerivedModel() == nil {
+		t.Fatalf("filter output publication and old release: %+v", out)
 	}
 	satOK(t, out.Close())
 	if !next.Closed || !old.Closed {
@@ -179,7 +160,7 @@ func TestTacticFilterModelStoppedAssignmentKeepsAcquiredNextModel(t *testing.T) 
 	satOK(t, filter.Close())
 }
 
-func TestTacticModelConverterToModelStoppedAssignmentKeepsAcquiredModel(t *testing.T) {
+func TestTacticModelConverterToModelAssignmentUsesNativeIDRecycle(t *testing.T) {
 	m := astTestManager(t)
 	old, e := model.NewModel(m)
 	satOK(t, e)
@@ -193,18 +174,13 @@ func TestTacticModelConverterToModelStoppedAssignmentKeepsAcquiredModel(t *testi
 	calls := []string{}
 	converter := &modelConverterTestLeaf{name: "unreached", calls: &calls}
 	m.ExprIDs.Cleanup(m.ExprIDs.Range())
-	m.BudgetField.FailAfter(1) // new model header, then old AST ID recycle
+	m.BudgetField.FailAfter(1) // new model header; AST ID recycle is native
 	e = ModelConverterToModel(m, converter, &out)
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatalf("old model deletion refusal: %v", e)
-	}
-	if len(calls) != 0 || out.value != old.Core() || out.owned || len(out.pending) != 1 {
-		t.Fatalf("converter callback or source raw publication: calls %v, ref %+v", calls, out)
-	}
-	next := out.pending[0]
-	if next.References != 1 || next.Closed || next.DerivedModel() == nil {
-		t.Fatalf("new model destroyed despite output receipt: refs %d closed %v", next.References, next.Closed)
+	satOK(t, e)
+	next := out.value
+	if len(calls) != 1 || calls[0] != "model:unreached:0" || next == nil || !out.owned || len(out.pending) != 0 || !old.Closed || next.References != 1 || next.Closed || next.DerivedModel() == nil {
+		t.Fatalf("converter callback and source publication: calls %v, ref %+v", calls, out)
 	}
 	satOK(t, out.Close())
 	if !next.Closed || !old.Closed {

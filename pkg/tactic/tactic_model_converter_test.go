@@ -5,7 +5,6 @@ package tactic
 import (
 	"errors"
 	"fmt"
-	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
@@ -117,7 +116,7 @@ func TestTacticModelConcatConsumedChildCleanupResumesWithoutSecondDecrement(t *t
 	}
 }
 
-func TestTacticModelConcatRealStoredChildFinalReleaseRefusal(t *testing.T) {
+func TestTacticModelConcatRealStoredChildFinalReleaseNativeIDRecycle(t *testing.T) {
 	m := astTestManager(t)
 	md, e := model.NewModel(m)
 	satOK(t, e)
@@ -136,12 +135,12 @@ func TestTacticModelConcatRealStoredChildFinalReleaseRefusal(t *testing.T) {
 	m.BudgetField.FailAfter(0)
 	e = combined.Close()
 	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) || first.refs != 1 || !combined.(*tacticConcatModelConverter).secondCleanup {
-		t.Fatal("real child final release prefix", e, first.refs)
+	satOK(t, e)
+	if first.refs != 0 || !combined.(*tacticConcatModelConverter).closed {
+		t.Fatal("real child final release", first.refs)
 	}
-	satOK(t, combined.Close())
 	if !reflect.DeepEqual(calls, []string{"destroy:first"}) || !stored.(*tacticStoredModelConverter).closed || !md.Closed {
-		t.Fatal("real child cleanup replay", calls)
+		t.Fatal("real child cleanup order", calls)
 	}
 	satOK(t, md.Close())
 }
