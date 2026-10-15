@@ -103,6 +103,9 @@ func (c *FixedContext) RelevantNewBound(n *FixedNode, variable uint32, k *numera
 		}
 	}()
 	currentLower, currentUpper := n.lower[variable], n.upper[variable]
+	if err = c.traceRelevantCandidate(variable, k, lower, open, currentLower, currentUpper); err != nil {
+		return false, err
+	}
 	if lower {
 		if currentUpper != nil {
 			conflict, e := fixedGreaterOrEqualWhen(m, k, currentUpper.value, open || currentUpper.open)
@@ -110,7 +113,7 @@ func (c *FixedContext) RelevantNewBound(n *FixedNode, variable uint32, k *numera
 				return false, e
 			}
 			if conflict {
-				return true, nil
+				return c.traceRelevantDecision(true, 1218, "relevant because triggers conflict.", nil)
 			}
 		}
 		if c.zeroEpsilon && currentLower != nil {
@@ -119,7 +122,7 @@ func (c *FixedContext) RelevantNewBound(n *FixedNode, variable uint32, k *numera
 				return false, e
 			}
 			if irrelevant {
-				return false, nil
+				return c.traceRelevantDecision(false, 1224, "irrelevant because does not improve existing bound.", nil)
 			}
 		}
 		if currentUpper == nil {
@@ -128,7 +131,7 @@ func (c *FixedContext) RelevantNewBound(n *FixedNode, variable uint32, k *numera
 				return false, e
 			}
 			if cmp < 0 {
-				return false, nil
+				return c.traceRelevantDecision(false, 1229, "irrelevant because exceeds :max-bound threshold.", nil)
 			}
 		}
 	} else {
@@ -138,7 +141,7 @@ func (c *FixedContext) RelevantNewBound(n *FixedNode, variable uint32, k *numera
 				return false, e
 			}
 			if conflict {
-				return true, nil
+				return c.traceRelevantDecision(true, 1268, "relevant because triggers conflict.", nil)
 			}
 		}
 		if c.zeroEpsilon && currentUpper != nil {
@@ -147,7 +150,7 @@ func (c *FixedContext) RelevantNewBound(n *FixedNode, variable uint32, k *numera
 				return false, e
 			}
 			if irrelevant {
-				return false, nil
+				return c.traceRelevantDecision(false, 1274, "irrelevant because does not improve existing bound.", nil)
 			}
 		}
 		if currentLower == nil {
@@ -156,12 +159,12 @@ func (c *FixedContext) RelevantNewBound(n *FixedNode, variable uint32, k *numera
 				return false, e
 			}
 			if cmp < 0 {
-				return false, nil
+				return c.traceRelevantDecision(false, 1279, "irrelevant because exceeds -:max-bound threshold.", nil)
 			}
 		}
 	}
 	if c.zeroEpsilon || lower && currentLower == nil || !lower && currentUpper == nil {
-		return true, nil
+		return c.traceRelevantDecision(true, 1310, "new bound is relevant", nil)
 	}
 	minimum, absolute, e := fixedScratchPair(m)
 	if e != nil {
@@ -209,7 +212,7 @@ func (c *FixedContext) RelevantNewBound(n *FixedNode, variable uint32, k *numera
 	if e != nil {
 		return false, e
 	}
-	if cmp < 0 {
+	if cmp > 0 {
 		if err = m.Copy(delta, minimum); err != nil {
 			return false, err
 		}
@@ -221,11 +224,17 @@ func (c *FixedContext) RelevantNewBound(n *FixedNode, variable uint32, k *numera
 		if err = m.Add(currentLower.value, delta, delta); err != nil {
 			return false, err
 		}
+		if err = c.traceRelevantLowerBug(k, delta, currentLower.value, minimum); err != nil {
+			return false, err
+		}
 		cmp, e = m.Compare(k, delta)
 		if e != nil {
 			return false, e
 		}
-		return cmp > 0, nil
+		if cmp <= 0 {
+			return c.traceRelevantDecision(false, 1259, "irrelevant because does not improve existing bound to at least ", delta)
+		}
+		return c.traceRelevantDecision(true, 1310, "new bound is relevant", nil)
 	}
 	if err = m.Sub(currentUpper.value, delta, delta); err != nil {
 		return false, err
@@ -234,7 +243,10 @@ func (c *FixedContext) RelevantNewBound(n *FixedNode, variable uint32, k *numera
 	if e != nil {
 		return false, e
 	}
-	return cmp < 0, nil
+	if cmp >= 0 {
+		return c.traceRelevantDecision(false, 1304, "irrelevant because does not improve existing bound to at least ", delta)
+	}
+	return c.traceRelevantDecision(true, 1310, "new bound is relevant", nil)
 }
 
 // PropagateBound creates the normalized bound, queues it, then checks the
