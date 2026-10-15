@@ -151,7 +151,13 @@ func (v IntegerArrayView) checkedAt(owner *umemory.Runtime, i uint32) (Int, erro
 	return v.At(i)
 }
 func (v IntegerArrayView) sameRuntimeElement(owner *umemory.Runtime, raw umemory.Block, offset uint64, i uint32) bool {
-	return v.Allocator == nil && v.Runtime == owner && v.Raw == raw && v.Offset+uint64(i)*v.Stride == offset && (v.Stride == 0 || uint64(i) <= (math.MaxUint64-v.Offset)/v.Stride)
+	if i >= v.Count || v.Allocator != nil || v.Runtime != owner || v.Raw != raw {
+		return false
+	}
+	if v.Stride != 0 && uint64(i) > (math.MaxUint64-v.Offset)/v.Stride {
+		return false
+	}
+	return v.Offset+uint64(i)*v.Stride == offset
 }
 func (v IntegerArrayView) store(i uint32, a Int) error {
 	if i >= v.Count {

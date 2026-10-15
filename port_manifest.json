@@ -161892,13 +161892,14 @@
           ]
         },
         {
-          "name": "Array GCD borrowed concrete ObjectRef/Runtime numeral view, reached-only cohort checks and early-one unread tail",
+          "name": "Array GCD borrowed concrete ObjectRef/Runtime numeral view, reached-only cohort checks, overflow-safe alias test and early-one unread tail",
           "status": "partial",
           "go_target": "pkg/util/numeral/mp_integer_array.go",
           "tests": [
             "TestPolynomialIntegerArrayActualObjectAndEarlyOne",
             "TestPolynomialIntegerArrayReachedRuntimeCohortAndUnreadZero",
-            "TestPolynomialIntegerArrayZeroLeavesForeignAllocatorUnread"
+            "TestPolynomialIntegerArrayZeroLeavesForeignAllocatorUnread",
+            "TestIntegerArrayRuntimeAliasRejectsWrappedAndUnreachedOffsets"
           ],
           "go_targets": [
             "pkg/math/polynomial/polynomial_integer_array_source_test.go"
@@ -164837,13 +164838,14 @@
           ]
         },
         {
-          "name": "Array GCD borrowed concrete ObjectRef/Runtime numeral view, reached-only cohort checks and early-one unread tail",
+          "name": "Array GCD borrowed concrete ObjectRef/Runtime numeral view, reached-only cohort checks, overflow-safe alias test and early-one unread tail",
           "status": "partial",
           "go_target": "pkg/util/numeral/mp_integer_array.go",
           "tests": [
             "TestPolynomialIntegerArrayActualObjectAndEarlyOne",
             "TestPolynomialIntegerArrayReachedRuntimeCohortAndUnreadZero",
-            "TestPolynomialIntegerArrayZeroLeavesForeignAllocatorUnread"
+            "TestPolynomialIntegerArrayZeroLeavesForeignAllocatorUnread",
+            "TestIntegerArrayRuntimeAliasRejectsWrappedAndUnreachedOffsets"
           ],
           "go_targets": [
             "pkg/math/polynomial/polynomial_integer_array_source_test.go"
