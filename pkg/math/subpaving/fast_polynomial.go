@@ -78,10 +78,6 @@ func (c *FastContext) DefinePolynomial(constant *numeral.FastFloat, terms []Fast
 	if err = m.Copy(p.constant, constant); err != nil {
 		return 0, err
 	}
-	integer, err := m.IsInteger(p.constant)
-	if err != nil {
-		return 0, err
-	}
 	used := make(map[uint32]bool, len(last))
 	for _, variable := range variables {
 		coefficient, e := newOwned()
@@ -95,11 +91,13 @@ func (c *FastContext) DefinePolynomial(constant *numeral.FastFloat, terms []Fast
 			}
 			used[variable] = true
 		}
-		coefficientInt, e := m.IsInteger(coefficient)
-		if e != nil {
-			return 0, e
-		}
-		integer = integer && c.isInt[variable] && coefficientInt
+	}
+	if err = c.tracePolynomialInteger(p); err != nil {
+		return 0, err
+	}
+	integer, err := c.polynomialInteger(p)
+	if err != nil {
+		return 0, err
 	}
 	x := uint32(len(c.isInt))
 	c.isInt = append(c.isInt, integer)

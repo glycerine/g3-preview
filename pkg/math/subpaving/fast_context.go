@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/math/interval"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -58,6 +59,7 @@ type FastContext struct {
 	unitClauses      []fastUnitClause
 	unitHead         int
 	displayVariable  FastVariableDisplay
+	trace            *diagnostic.TraceTags
 	initStage        uint8
 	initDefHead      uint32
 	closed           bool
@@ -300,6 +302,7 @@ func (c *FastContext) Close() error {
 	c.leafQueue = nil
 	c.searchNode = nil
 	c.displayVariable = nil
+	c.trace = nil
 	c.closed = true
 	return nil
 }
