@@ -178215,6 +178215,12 @@
           "tests": ["TestSATUserPopSourceTraceBeforeAndAfterClauseCollection", "TestSATUserScopeSourceTracePublicationAndTrail"]
         },
         {
+          "name": "Reached SAT minimize_lemma drop TRACE before unmark append and lemma shrink (sat_solver.cpp:2374)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_lemma_minimization_trace.go",
+          "tests": ["TestSATMinimizeLemmaSourceDropTraceBeforeShrink"]
+        },
+        {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_simplify_trace.go",
@@ -179482,6 +179488,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_user_scope_trace.go",
           "tests": ["TestSATUserPopSourceTraceBeforeAndAfterClauseCollection", "TestSATUserScopeSourceTracePublicationAndTrail"]
+        },
+        {
+          "name": "Reached SAT minimize_lemma drop TRACE before unmark append and lemma shrink (sat_solver.cpp:2374)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_lemma_minimization_trace.go",
+          "tests": ["TestSATMinimizeLemmaSourceDropTraceBeforeShrink"]
         },
         {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",

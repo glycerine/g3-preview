@@ -293,6 +293,7 @@ func (s *satSolverConflictAnalysis) minimizeLemma() error {
 			return e
 		}
 		if ok {
+			s.traceDroppedLemmaLiteral(Literal(l))
 			if e = s.unmark.Push(uint32(Literal(l).variable())); e != nil {
 				return e
 			}
