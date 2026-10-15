@@ -242,6 +242,9 @@ func (c *apiContextResults) destroyObject(o *apiObject, line int) error {
 	if a, ok := o.destructor.(*apiASTMapObject); ok {
 		c.traceASTMapDeallocated(a, line)
 	}
+	if g, ok := o.destructor.(*apiGoalObject); ok {
+		c.traceGoalDeallocated(g, line)
+	}
 	c.objects[o.id] = nil
 	c.pendingDestroy = nil
 	c.pendingDestroyLine = 0

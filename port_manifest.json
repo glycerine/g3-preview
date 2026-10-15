@@ -3761,12 +3761,15 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/api/api_goal_memory_trace.go",
+        "pkg/api/api_goal_memory_trace_debug_test.go",
         "pkg/api/api_context_results.go",
         "pkg/api/api_ast_map_memory_trace.go",
         "pkg/api/api_goal_object.go",
         "pkg/api/api_trace.go"
       ],
       "tests": [
+        "TestAPIGoalSourceMemoryWrapperReleaseSites",
         "TestAPIASTMapSourceMemoryWrapperReleaseSites",
         "TestAPIContextResultsExplicitReferencesAndAlias",
         "TestAPIContextResultsAutomaticReferencesAllASTKinds",
@@ -3793,6 +3796,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained API goal wrapper allocation and context deallocation debug records at api_goal.cpp:35 and api_context.cpp:54,116",
+          "status": "platform_replacement",
+          "go_target": "pkg/api/api_goal_memory_trace.go",
+          "tests": [
+            "TestAPIGoalSourceMemoryWrapperReleaseSites"
+          ]
+        },
         {
           "name": "AST-map wrapper deallocation debug memory records at context.cpp:54 and 116",
           "status": "platform_replacement",
@@ -4011,9 +4022,15 @@
       "path": "src/api/api_goal.cpp",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/api/api_goal_object.go",
+        "pkg/api/api_goal_memory_trace.go",
+        "pkg/api/api_goal_memory_trace_debug_test.go"
+      ],
+      "tests": [
+        "TestAPIGoalSourceMemoryWrapperReleaseSites"
+      ],
       "assertions": [
         {
           "line": 175,
@@ -4022,9 +4039,20 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Z3_goal_ref allocation debug memory wrapper at api_goal.cpp:35",
+          "status": "platform_replacement",
+          "go_target": "pkg/api/api_goal_memory_trace.go",
+          "tests": [
+            "TestAPIGoalSourceMemoryWrapperReleaseSites"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The concrete context-owned goal wrapper emits the retained debug allocation record. The Z3_mk_goal C API, inner goal allocation, translation and other goal operations remain unported."
+      ]
     },
     {
       "path": "src/api/api_goal.h",
@@ -4032,9 +4060,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/api/api_goal_object.go"
+        "pkg/api/api_goal_object.go",
+        "pkg/api/api_goal_memory_trace.go",
+        "pkg/api/api_goal_memory_trace_debug_test.go"
       ],
       "tests": [
+        "TestAPIGoalSourceMemoryWrapperReleaseSites",
         "TestAPIContextObjectReferenceAssignmentAndRecycledIDs",
         "TestAPIContextGoalRootSurvivesExplicitResultResetAndDrains",
         "TestAPIContextResultsCopiedAndForeignOwnerGuards"
@@ -4051,7 +4082,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Retained API goal wrapper allocation and context deallocation debug records at api_goal.cpp:35 and api_context.cpp:54,116",
+          "status": "platform_replacement",
+          "go_target": "pkg/api/api_goal_memory_trace.go",
+          "tests": [
+            "TestAPIGoalSourceMemoryWrapperReleaseSites"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -151139,6 +151179,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/api/api_goal_memory_trace.go",
+        "pkg/api/api_goal_memory_trace_debug_test.go",
         "pkg/util/diagnostic/util_memory_runtime.go",
         "pkg/api/api_ast_map_memory_trace.go",
         "pkg/api/api_ast_map_memory_trace_debug_test.go",
@@ -151210,6 +151252,7 @@
         "pkg/tactic/aig/aig_imp_memory_trace.go"
       ],
       "tests": [
+        "TestAPIGoalSourceMemoryWrapperReleaseSites",
         "TestAPIASTMapSourceMemoryWrapperReleaseSites",
         "TestRuntimeUint32AcrossInitializationBitmapBoundary",
         "TestASTDeclCollectorDependencySetMemoryTrace",
@@ -151371,6 +151414,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained API goal wrapper allocation and context deallocation debug records at api_goal.cpp:35 and api_context.cpp:54,116",
+          "status": "platform_replacement",
+          "go_target": "pkg/api/api_goal_memory_trace.go",
+          "tests": [
+            "TestAPIGoalSourceMemoryWrapperReleaseSites"
+          ]
+        },
         {
           "name": "Retained API AST-map allocation and both context deallocation debug wrappers at api_ast_map.cpp:37 and api_context.cpp:54,116, with concrete Go header extent and process-finalizing guard",
           "status": "platform_replacement",
@@ -151984,6 +152035,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/api/api_goal_memory_trace.go",
+        "pkg/api/api_goal_memory_trace_debug_test.go",
         "pkg/util/diagnostic/util_memory_runtime.go",
         "pkg/api/api_ast_map_memory_trace.go",
         "pkg/api/api_ast_map_memory_trace_debug_test.go",
@@ -152050,6 +152103,7 @@
         "pkg/tactic/aig/aig_imp_memory_trace.go"
       ],
       "tests": [
+        "TestAPIGoalSourceMemoryWrapperReleaseSites",
         "TestAPIASTMapSourceMemoryWrapperReleaseSites",
         "TestASTDeclCollectorDependencySetMemoryTrace",
         "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose",
@@ -152200,6 +152254,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained API goal wrapper allocation and context deallocation debug records at api_goal.cpp:35 and api_context.cpp:54,116",
+          "status": "platform_replacement",
+          "go_target": "pkg/api/api_goal_memory_trace.go",
+          "tests": [
+            "TestAPIGoalSourceMemoryWrapperReleaseSites"
+          ]
+        },
         {
           "name": "Retained API AST-map allocation and both context deallocation debug wrappers at api_ast_map.cpp:37 and api_context.cpp:54,116, with concrete Go header extent and process-finalizing guard",
           "status": "platform_replacement",

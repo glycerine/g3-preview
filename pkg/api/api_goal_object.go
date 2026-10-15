@@ -25,6 +25,7 @@ func newAPIGoalObject(c *apiContextResults) (*apiGoalObject, error) {
 		return nil, e
 	}
 	g := &apiGoalObject{}
+	c.traceGoalAllocated(g, n)
 	g.object = apiObject{context: c, destructor: g, ownerBytes: n}
 	g.object.self = &g.object
 	id, e := c.addObject(&g.object)
