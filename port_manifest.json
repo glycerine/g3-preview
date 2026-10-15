@@ -12406,7 +12406,8 @@
         "pkg/ast/ast_smt2_bv_literal_native_test.go",
         "pkg/ast/ast_smt2_fdecl_name.go",
         "pkg/ast/ast_smt2_fdecl_classify.go",
-        "pkg/ast/ast_smt2_sort.go"
+        "pkg/ast/ast_smt2_sort.go",
+        "pkg/ast/ast_smt2_fdecl.go"
       ],
       "tests": [
         "TestASTSMT2BitVectorLiteralRadixAndSignedOracle",
@@ -12424,7 +12425,8 @@
         "TestASTSMT2FunctionNameSourceSymbolBranches",
         "TestASTSMT2FunctionNameSourceBuiltinAndUserDeclarations",
         "TestASTSMT2FunctionDeclarationParameterClassification",
-        "TestASTSMT2SortSourceBuiltinAndParametricFormats"
+        "TestASTSMT2SortSourceBuiltinAndParametricFormats",
+        "TestASTSMT2FunctionDeclarationSourceFormatsAndRecursiveReference"
       ],
       "conditionals": [
         {
@@ -12574,6 +12576,14 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "smt2_pp_environment::pp_as, pp_fdecl_params, pp_fdecl, pp_signature and pp_fdecl_ref declaration format assembly (ast_smt2_pp.cpp:101-160)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt2_fdecl.go",
+          "tests": [
+            "TestASTSMT2FunctionDeclarationSourceFormatsAndRecursiveReference"
+          ]
+        },
+        {
           "name": "smt2_pp_environment::pp_sort base environment Bool/Int/Real/BV/Array/Float/Seq/RegEx/datatype/fallback formatting (ast_smt2_pp.cpp:397-448)",
           "status": "ported",
           "go_target": "pkg/ast/ast_smt2_sort.go",
@@ -12646,7 +12656,7 @@
       "deviations": [
         "Selected concrete pure-Go counterpart only; other native methods and specialization profiles remain open. Default SMT2 environment dispatch and well_sorted callers are separate obligations. Independent bounded oracle/allocation/guard tests add no registered source driver credit. Pointer-free Runtime codecs and reflected cold headers are explicit Go representations, not native ABI equivalence.",
         "Standard bytes.Buffer and strconv replace C++ character/string container behavior without STL implementation credit. Long radix checks cover widths through 4097; actual numeral and formatter failure campaigns remain. NumericTextStream and fresh-name buffer consumers still require separate work before the full util split.",
-        "The retained function-name formatter now builds source format-string nodes for quoted, numerical, null and simple symbols, and for implication, ITE and IFF declaration names. Indexed and sort-parameter declaration classification and the base environment's sort formatter are also ported. The cmd_context parametric-sort override, full SMT2 expression traversal, aliasing, layout and stream operator remain open."
+        "The retained function-name formatter now builds source format-string nodes for quoted, numerical, null and simple symbols, and for implication, ITE and IFF declaration names. Indexed and sort-parameter classification, recursive declaration/signature assembly and the base environment's sort formatter are also ported. The cmd_context parametric-sort override, full SMT2 expression traversal, aliasing, layout and stream operator remain open."
       ]
     },
     {
@@ -12657,13 +12667,15 @@
       "go_targets": [
         "pkg/ast/ast_smt2_fdecl_name.go",
         "pkg/ast/ast_smt2_fdecl_classify.go",
-        "pkg/ast/ast_smt2_sort.go"
+        "pkg/ast/ast_smt2_sort.go",
+        "pkg/ast/ast_smt2_fdecl.go"
       ],
       "tests": [
         "TestASTSMT2FunctionNameSourceSymbolBranches",
         "TestASTSMT2FunctionNameSourceBuiltinAndUserDeclarations",
         "TestASTSMT2FunctionDeclarationParameterClassification",
-        "TestASTSMT2SortSourceBuiltinAndParametricFormats"
+        "TestASTSMT2SortSourceBuiltinAndParametricFormats",
+        "TestASTSMT2FunctionDeclarationSourceFormatsAndRecursiveReference"
       ],
       "conditionals": [
         {
@@ -12678,6 +12690,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "smt2_pp_environment declaration format and signature declarations",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt2_fdecl.go",
+          "tests": [
+            "TestASTSMT2FunctionDeclarationSourceFormatsAndRecursiveReference"
+          ]
+        },
         {
           "name": "smt2_pp_environment virtual base pp_sort declaration",
           "status": "ported",
@@ -12706,7 +12726,7 @@
       ],
       "ownership": [],
       "deviations": [
-        "Function-name format construction, indexed/sort-parameter declaration classification and base sort formatting are ported; the cmd_context sort override, full SMT2 environment, expression printer and stream operator remain open."
+        "Function-name format construction, indexed/sort-parameter declaration classification, declaration/signature format assembly and base sort formatting are ported; the cmd_context sort override, full SMT2 environment, expression printer and stream operator remain open."
       ]
     },
     {
@@ -15429,11 +15449,13 @@
       "go_targets": [
         "pkg/ast/ast_format_flat.go",
         "pkg/ast/ast_format_source_test.go",
-        "pkg/ast/ast_format_seq1.go"
+        "pkg/ast/ast_format_seq1.go",
+        "pkg/ast/ast_format_seq5.go"
       ],
       "tests": [
         "TestASTFormatFlatNativeDeepSharedCacheWithOnlyFrameReservation",
-        "TestASTFormatSeq1SourceGroupingAndNilTail"
+        "TestASTFormatSeq1SourceGroupingAndNilTail",
+        "TestASTSMT2FunctionDeclarationSourceFormatsAndRecursiveReference"
       ],
       "conditionals": [
         {
@@ -15455,6 +15477,14 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Concrete format-pointer mk_seq4/mk_seq5 grouped parenthesized signature sequence (format.h:164-195)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_format_seq5.go",
+          "tests": [
+            "TestASTSMT2FunctionDeclarationSourceFormatsAndRecursiveReference"
+          ]
+        },
+        {
           "name": "Concrete format-pointer mk_seq and mk_seq1 grouped header, indentation and nil-tail behavior (format.h:67-108)",
           "status": "ported",
           "go_target": "pkg/ast/ast_format_seq1.go",
@@ -15466,7 +15496,7 @@
       "ownership": [],
       "deviations": [
         "Retained format flat recursion now borrows native []astNodeRef todo, []ASTHandle transformed arguments and a lookup-only map[astNodeRef]astNodeRef cache. Stack and child iteration preserve source order; the cache never iterates. Removed cache capacity/probing/rehash/pending-growth and vector backing/refusal emulation, plus unused IgnorePatterns=true results2 storage and obsolete AppArguments format-vector representation. Actual recursion header, AST construction, source UNREACHABLE guards and failed-frame history through enclosing teardown remain. A deep shared graph with 129 distinct leaves grows native storage with only the actual frame reservation in release; exact leaf reference counts and original CHOICE arg0 behavior remain. Original allocation campaign now covers actual frame/factory reservations, and history test stops at real line-break-to-string construction. Shared arithmetic/BV cache storage remains separately pending; no generic container, STL or whole-unit completion credit is added.",
-        "The concrete format-pointer mk_seq1 path now constructs source grouped and indented header documents, including empty argument lists and nil tail filtering, for retained SMT2 indexed declarations and sort applications. Other format.h templates remain open."
+        "The concrete format-pointer mk_seq1 path now constructs source grouped and indented header documents, including empty argument lists and nil tail filtering, for retained SMT2 indexed declarations and sort applications. The concrete mk_seq5 signature path also preserves source grouping and nil-tail filtering. Other format.h templates remain open."
       ]
     },
     {
