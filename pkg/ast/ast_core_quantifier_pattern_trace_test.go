@@ -43,4 +43,36 @@ func TestASTQuantifierPatternSourceTraceBeforeRegistration(t *testing.T) {
 	} else if output.Len() != 0 {
 		t.Fatalf("erased pattern trace emitted %q", output.String())
 	}
+	output.Reset()
+	spec.Patterns = []ASTHandle{truth}
+	_, err = m.MkQuantifier(spec)
+	if ASTSourceDebug {
+		if err != ErrASTDomain {
+			t.Fatalf("invalid pattern was not refused: %v", err)
+		}
+		if tags.ShouldTrace("ast") && (!strings.HasPrefix(output.String(), "-------- [ast] mk_quantifier src/ast/ast.cpp:2358 ---------\n0 ") ||
+			!strings.HasSuffix(output.String(), "true\n------------------------------------------------\n")) {
+			t.Fatalf("invalid pattern was not traced before refusal: %q", output.String())
+		}
+	} else {
+		paramsMust(t, err)
+	}
+	output.Reset()
+	variable, err := m.MkVar(0, sort)
+	paramsMust(t, err)
+	badPattern, err := m.MkFamilyApp(2, 0, nil, []ASTHandle{variable})
+	paramsMust(t, err)
+	output.Reset()
+	spec.Patterns = []ASTHandle{badPattern}
+	_, err = m.MkQuantifier(spec)
+	if ASTSourceDebug {
+		if err != ErrASTDomain {
+			t.Fatalf("pattern with variable child was not refused after TRACE: %v, output %q", err, output.String())
+		}
+		if tags.ShouldTrace("ast") && !strings.HasSuffix(output.String(), "(pattern (:var 0))\n------------------------------------------------\n") {
+			t.Fatalf("pattern fallback source TRACE missing: %q", output.String())
+		}
+	} else {
+		paramsMust(t, err)
+	}
 }
