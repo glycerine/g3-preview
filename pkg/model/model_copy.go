@@ -72,6 +72,7 @@ func (md *Model) Copy() (copied *Model, err error) {
 	if err != nil {
 		return copied, err
 	}
+	copied.traceCopyAllocated()
 	if err = copied.CoreField.CopyConstantInterpretations(&md.CoreField); err != nil {
 		return copied, err
 	}

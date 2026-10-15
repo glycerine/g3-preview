@@ -20,12 +20,14 @@ type modelUniverse struct {
 	memoryTraceLive bool
 }
 type Model struct {
-	self       *Model
-	CoreField  ModelCore
-	sorts      []ast.ASTHandle
-	Universes  insdict.Dict[ast.ASTHandle, *modelUniverse]
-	ownerBytes uint64
-	Closed     bool
+	self            *Model
+	CoreField       ModelCore
+	sorts           []ast.ASTHandle
+	Universes       insdict.Dict[ast.ASTHandle, *modelUniverse]
+	ownerBytes      uint64
+	copyMemoryTrace *diagnostic.TraceTags
+	copyMemoryLive  bool
+	Closed          bool
 }
 
 func NewModel(m *ast.ASTManager) (md *Model, err error) {
@@ -220,6 +222,7 @@ func (md *Model) Close() error {
 	if e := md.CoreField.closeCoreMembers(); e != nil {
 		return e
 	}
+	md.traceCopyDeallocated()
 	m.Budget().Release(md.ownerBytes)
 	md.ownerBytes = 0
 	md.Closed = true

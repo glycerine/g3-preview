@@ -1,0 +1,46 @@
+// Source: src/model/model.cpp:69; src/model/model_core.h:71-75;
+// src/util/memory_manager.cpp:202-211.
+package model
+
+import (
+	"fmt"
+	"io"
+	"strconv"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+)
+
+func (md *Model) traceCopyAllocated() {
+	md.copyMemoryTrace = md.CoreField.manager.BorrowMemoryTraceTags()
+	md.copyMemoryLive = true
+	tags := md.copyMemoryTrace
+	if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
+		return
+	}
+	_ = tags.EmitConditional("memory", "allocate", "src/util/memory_manager.cpp", 209,
+		func() bool { return true }, func(w io.Writer) error {
+			for _, part := range [...]string{
+				"alloc ", fmt.Sprintf("%p", md), " src/model/model.cpp:69 model ",
+				strconv.FormatUint(md.ownerBytes, 10), "\n",
+			} {
+				_, _ = io.WriteString(w, part)
+			}
+			return nil
+		})
+}
+
+func (md *Model) traceCopyDeallocated() {
+	if !md.copyMemoryLive {
+		return
+	}
+	md.copyMemoryLive = false
+	tags := md.copyMemoryTrace
+	if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
+		return
+	}
+	_ = tags.EmitConditional("memory", "deallocate", "src/util/memory_manager.cpp", 204,
+		func() bool { return !tags.MemoryFinalizing() }, func(w io.Writer) error {
+			_, _ = io.WriteString(w, "dealloc "+fmt.Sprintf("%p", md)+" src/model/model_core.h:74\n")
+			return nil
+		})
+}
