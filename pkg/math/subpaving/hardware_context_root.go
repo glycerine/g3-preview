@@ -229,15 +229,34 @@ func (c *HardwareContext) Close() error {
 	}
 	c.queue = nil
 	c.searchNode = nil
-	for _, unit := range c.unitClauses {
-		unit.atom.refs--
+	for len(c.unitClauses) != 0 {
+		atom := c.unitClauses[0].atom
+		if atom.refs == 0 {
+			return arena.ErrInvalidSlot
+		}
+		if err := c.traceInequalityDecRef(atom); err != nil {
+			return err
+		}
+		atom.refs--
+		c.unitClauses = c.unitClauses[1:]
 	}
-	for _, clause := range c.clauses {
-		for _, atom := range clause.atoms {
+	for len(c.clauses) != 0 {
+		clause := c.clauses[0]
+		for clause.releaseAt < len(clause.atoms) {
+			atom := clause.atoms[clause.releaseAt]
+			if atom.refs == 0 {
+				return arena.ErrInvalidSlot
+			}
+			if err := c.traceInequalityDecRef(atom); err != nil {
+				return err
+			}
 			atom.refs--
+			clause.releaseAt++
 		}
 		clause.atoms = nil
 		clause.deleted = true
+		c.clauses[0] = nil
+		c.clauses = c.clauses[1:]
 	}
 	c.nodes = nil
 	c.unitClauses = nil

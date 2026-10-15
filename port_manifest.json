@@ -54542,6 +54542,12 @@
           "tests": ["TestHardwarePolynomialSourceIntegerTraceAndPublication", "TestHardwarePolynomialTraceStreamRefusalKeepsDefinition"]
         },
         {
+          "name": "Concrete config_hwf inequality reference TRACE and resumable clause release (subpaving_t_def.h:786-799)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/hardware_refcount_trace.go", "pkg/math/subpaving/hardware_context_root.go"],
+          "tests": ["TestHardwareInequalityReferenceTraceSourceOrder", "TestHardwareInequalityReferenceTraceRefusalAndStoppedClause"]
+        },
+        {
           "name": "Concrete config_mpfx mk_sum and is_int(polynomial) nested integer-status and first-failing-term TRACE before variable publication (subpaving_t_def.h:668-679,762-763)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_polynomial_integer_trace.go",
@@ -177345,6 +177351,12 @@
           "tests": ["TestHardwarePolynomialSourceIntegerTraceAndPublication", "TestHardwarePolynomialTraceStreamRefusalKeepsDefinition"]
         },
         {
+          "name": "Reached config_hwf inequality reference-count TRACE records (subpaving_t_def.h:786-799)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/hardware_refcount_trace.go", "pkg/math/subpaving/hardware_context_root.go"],
+          "tests": ["TestHardwareInequalityReferenceTraceSourceOrder", "TestHardwareInequalityReferenceTraceRefusalAndStoppedClause"]
+        },
+        {
           "name": "Reached config_mpfx mk_sum and is_int(polynomial) nested TRACE records (subpaving_t_def.h:672,762)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_polynomial_integer_trace.go",
@@ -178287,6 +178299,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/hardware_polynomial_integer_trace.go",
           "tests": ["TestHardwarePolynomialSourceIntegerTraceAndPublication", "TestHardwarePolynomialTraceStreamRefusalKeepsDefinition"]
+        },
+        {
+          "name": "Reached config_hwf inequality reference-count TRACE records (subpaving_t_def.h:786-799)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/hardware_refcount_trace.go", "pkg/math/subpaving/hardware_context_root.go"],
+          "tests": ["TestHardwareInequalityReferenceTraceSourceOrder", "TestHardwareInequalityReferenceTraceRefusalAndStoppedClause"]
         },
         {
           "name": "Reached config_mpfx mk_sum and is_int(polynomial) nested TRACE records (subpaving_t_def.h:672,762)",

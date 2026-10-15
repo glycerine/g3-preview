@@ -10,12 +10,13 @@ import (
 
 // HardwareClause retains its sorted atom pointers and source watcher flags.
 type HardwareClause struct {
-	context *HardwareContext
-	atoms   []*HardwareInequality
-	lemma   bool
-	watched bool
-	visited uint64
-	deleted bool
+	context   *HardwareContext
+	atoms     []*HardwareInequality
+	lemma     bool
+	watched   bool
+	visited   uint64
+	deleted   bool
+	releaseAt int
 }
 
 type hardwareWatch struct {
@@ -56,6 +57,7 @@ func (c *HardwareContext) AddClause(atoms []*HardwareInequality, lemma, watched 
 	sort.SliceStable(ordered, func(i, j int) bool { return ordered[i].variable < ordered[j].variable })
 	clause := &HardwareClause{context: c, atoms: ordered, lemma: lemma, watched: watched}
 	for _, atom := range ordered {
+		c.traceInequalityIncRef(atom)
 		atom.refs++
 	}
 	if watched {
