@@ -1,0 +1,144 @@
+package aig
+
+import (
+	"errors"
+	"testing"
+
+	"github.com/glycerine/g3/pkg/arena"
+)
+
+func TestAIGDefaultGatesTruthTablesAndFailureCleanup(t *testing.T) {
+	m, budget := aigFixture(t)
+	h, err := m.MkTrue()
+	aigMust(t, err)
+	g, err := NewManager(m)
+	aigMust(t, err)
+	a, err := g.MakeVariable(h)
+	aigMust(t, err)
+	b, err := g.MakeVariable(h)
+	aigMust(t, err)
+	c, err := g.MakeVariable(h)
+	aigMust(t, err)
+	inputs := []*Ref{a, b, c}
+	for _, left := range inputs {
+		for _, right := range inputs {
+			for _, operation := range []struct {
+				name  string
+				build func(*Ref, *Ref) (*Ref, error)
+				want  func(bool, bool) bool
+			}{
+				{"or", g.Or, func(x, y bool) bool { return x || y }},
+				{"iff", g.Iff, func(x, y bool) bool { return x == y }},
+				{"xor", g.Xor, func(x, y bool) bool { return x != y }},
+				{"implies", g.Implies, func(x, y bool) bool { return !x || y }},
+			} {
+				out, e := operation.build(left, right)
+				aigMust(t, e)
+				for mask := uint32(0); mask < 8; mask++ {
+					want := operation.want(aigEval(left.lit, mask), aigEval(right.lit, mask))
+					if got := aigEval(out.lit, mask); got != want {
+						t.Fatalf("%s mask %03b: %v want %v", operation.name, mask, got, want)
+					}
+				}
+				aigMust(t, out.Close())
+			}
+		}
+	}
+	for _, condition := range inputs {
+		for _, then := range inputs {
+			for _, otherwise := range inputs {
+				out, e := g.Ite(condition, then, otherwise)
+				aigMust(t, e)
+				for mask := uint32(0); mask < 8; mask++ {
+					want := aigEval(otherwise.lit, mask)
+					if aigEval(condition.lit, mask) {
+						want = aigEval(then.lit, mask)
+					}
+					if got := aigEval(out.lit, mask); got != want {
+						t.Fatalf("ite mask %03b: %v want %v", mask, got, want)
+					}
+				}
+				aigMust(t, out.Close())
+			}
+		}
+	}
+	before := budget.Used()
+	for _, after := range []int64{0, 1, 2} {
+		budget.FailAfter(after)
+		if out, e := g.Iff(a, b); !errors.Is(e, arena.ErrInjectedFailure) || out != nil {
+			t.Fatalf("failure after %d: %v, %v", after, e, out)
+		}
+		budget.FailAfter(-1)
+		if budget.Used() != before {
+			t.Fatalf("failure after %d retained %d bytes", after, budget.Used()-before)
+		}
+	}
+	aigMust(t, c.Close())
+	aigMust(t, b.Close())
+	aigMust(t, a.Close())
+	aigMust(t, g.Close())
+}
+
+func TestAIGNarySortedFolds(t *testing.T) {
+	m, _ := aigFixture(t)
+	h, e := m.MkTrue()
+	aigMust(t, e)
+	g, e := NewManager(m)
+	aigMust(t, e)
+	a, e := g.MakeVariable(h)
+	aigMust(t, e)
+	b, e := g.MakeVariable(h)
+	aigMust(t, e)
+	c, e := g.MakeVariable(h)
+	aigMust(t, e)
+	forward := []*Ref{a, b, c}
+	reverse := []*Ref{c, b, a}
+	for _, operation := range []struct {
+		name  string
+		build func([]*Ref) (*Ref, error)
+		want  func(bool, bool, bool) bool
+	}{
+		{"and", g.AndArgs, func(x, y, z bool) bool { return x && y && z }},
+		{"or", g.OrArgs, func(x, y, z bool) bool { return x || y || z }},
+	} {
+		first, e := operation.build(forward)
+		aigMust(t, e)
+		second, e := operation.build(reverse)
+		aigMust(t, e)
+		if !first.Same(second) {
+			t.Fatalf("%s permutation changed sorted fold", operation.name)
+		}
+		for mask := uint32(0); mask < 8; mask++ {
+			want := operation.want(aigEval(a.lit, mask), aigEval(b.lit, mask), aigEval(c.lit, mask))
+			if got := aigEval(first.lit, mask); got != want {
+				t.Fatalf("%s mask %03b: %v want %v", operation.name, mask, got, want)
+			}
+		}
+		if forward[0] != a || reverse[0] != c {
+			t.Fatal("caller arguments mutated")
+		}
+		aigMust(t, second.Close())
+		aigMust(t, first.Close())
+	}
+	zeroAnd, e := g.AndArgs(nil)
+	aigMust(t, e)
+	zeroOr, e := g.OrArgs(nil)
+	aigMust(t, e)
+	for mask := uint32(0); mask < 8; mask++ {
+		if !aigEval(zeroAnd.lit, mask) || aigEval(zeroOr.lit, mask) {
+			t.Fatal("empty fold identity")
+		}
+	}
+	one, e := g.AndArgs([]*Ref{a})
+	aigMust(t, e)
+	if !one.Same(a) {
+		t.Fatal("singleton fold did not reuse node")
+	}
+	aigMust(t, one.Close())
+	aigMust(t, zeroOr.Close())
+	aigMust(t, zeroAnd.Close())
+	aigMust(t, c.Close())
+	aigMust(t, b.Close())
+	aigMust(t, a.Close())
+	aigMust(t, g.Close())
+}

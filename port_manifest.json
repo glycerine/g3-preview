@@ -98138,13 +98138,16 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/aig/aig_core.go",
-        "pkg/tactic/aig/aig_simplify.go"
+        "pkg/tactic/aig/aig_simplify.go",
+        "pkg/tactic/aig/aig_gates.go"
       ],
       "tests": [
         "TestAIGCoreInterningOwnershipAndIDReuse",
         "TestAIGCoreDuplicateStillAllocatesAndRefClones",
         "TestAIGTwoLevelAndRules",
-        "TestAIGTwoLevelAndTruthTables"
+        "TestAIGTwoLevelAndTruthTables",
+        "TestAIGDefaultGatesTruthTablesAndFailureCleanup",
+        "TestAIGNarySortedFolds"
       ],
       "conditionals": [
         {
@@ -98398,22 +98401,40 @@
             "TestAIGTwoLevelAndRules",
             "TestAIGTwoLevelAndTruthTables"
           ]
+        },
+        {
+          "name": "default-gate mk_or, mk_iff, mk_ite, mk_xor, mk_implies and sorted n-ary mk_and/mk_or",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_gates.go",
+          "tests": [
+            "TestAIGDefaultGatesTruthTablesAndFailureCleanup",
+            "TestAIGNarySortedFolds"
+          ]
         }
       ],
       "ownership": [
         "Concrete AIG manager pins each variable AST expression, owns true/false counts and interning table nodes, and recursively releases child nodes when the last AIG reference closes."
       ],
       "deviations": [
-        "Typed Go map replaces aig_table; literal inversion is a bool rather than pointer tagging. The mk_node minimizer is ported, while expr2aig/aig2expr rewriting and the tactic/proof/goal traversal remain unported."
+        "Typed Go map replaces aig_table; literal inversion is a bool rather than pointer tagging. The mk_node minimizer and default gate encoding are ported; alternate gate encoding, expr2aig/aig2expr rewriting and the tactic/proof/goal traversal remain unported."
       ]
     },
     {
       "path": "src/tactic/aig/aig.h",
       "component": "tactic",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/tactic/aig/aig_core.go",
+        "pkg/tactic/aig/aig_simplify.go",
+        "pkg/tactic/aig/aig_gates.go"
+      ],
+      "tests": [
+        "TestAIGCoreInterningOwnershipAndIDReuse",
+        "TestAIGTwoLevelAndRules",
+        "TestAIGDefaultGatesTruthTablesAndFailureCleanup",
+        "TestAIGNarySortedFolds"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -98426,9 +98447,31 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "aig_manager mk_or, mk_iff and mk_ite with default gate encoding, plus mk_xor/mk_implies and n-ary Boolean folds",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_gates.go",
+          "tests": [
+            "TestAIGCoreInterningOwnershipAndIDReuse",
+            "TestAIGDefaultGatesTruthTablesAndFailureCleanup"
+          ]
+        },
+        {
+          "name": "aig_manager constructor/destructor and mk_not reference operations",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_core.go",
+          "tests": [
+            "TestAIGCoreInterningOwnershipAndIDReuse"
+          ]
+        }
+      ],
+      "ownership": [
+        "Go Ref owns one AIG reference and closes explicitly; intermediate gate references close in reverse order, including after a refused node allocation."
+      ],
+      "deviations": [
+        "Expression/goal conversion, max_sharing, to_formula and display remain unported; alternate gate encoding is not exposed."
+      ]
     },
     {
       "path": "src/tactic/aig/aig_tactic.cpp",
