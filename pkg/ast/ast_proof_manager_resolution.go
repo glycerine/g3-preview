@@ -142,7 +142,14 @@ func (m *ASTManager) MkProofUnitResolution(ps []ASTHandle) (ASTHandle, error) {
 		lits = nil
 	}
 	args = append(args, fact)
-	return m.proofMake(ASTPrUnitResolution, args...)
+	proof, err := m.proofMake(ASTPrUnitResolution, args...)
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	if err = m.traceUnitResolution(proof, 2964, "unit_resolution generating fact\n"); err != nil {
+		return ASTHandle{}, err
+	}
+	return proof, nil
 }
 func (m *ASTManager) MkProofUnitResolutionFact(ps []ASTHandle, fact ASTHandle) (ASTHandle, error) {
 	if e := m.lock(); e != nil {
@@ -224,5 +231,12 @@ func (m *ASTManager) MkProofUnitResolutionFact(ps []ASTHandle, fact ASTHandle) (
 			}
 		}
 	}
-	return m.proofMake(ASTPrUnitResolution, args...)
+	proof, err := m.proofMake(ASTPrUnitResolution, args...)
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	if err = m.traceUnitResolution(proof, 3015, "unit_resolution using fact\n"); err != nil {
+		return ASTHandle{}, err
+	}
+	return proof, nil
 }

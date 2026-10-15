@@ -9775,6 +9775,7 @@
         "pkg/ast/ast_proof_manager_parameters.go",
         "pkg/ast/ast_proof_manager_reader.go",
         "pkg/ast/ast_proof_manager_resolution.go",
+        "pkg/ast/ast_proof_resolution_trace.go",
         "pkg/ast/ast_proof_manager_rules.go",
         "pkg/ast/ast_proof_manager_simple.go",
         "pkg/ast/ast_ref.go",
@@ -10700,6 +10701,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_core_delete_trace.go",
           "tests": ["TestASTDeleteNodeBugTraceBeforeWorklist"]
+        },
+        {
+          "name": "Reached AST unit-resolution proof TRACE at both result publications with low-level printer (ast.cpp:2964,3015)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_proof_resolution_trace.go",
+          "tests": ["TestASTUnitResolutionSourceTraceBothOverloads"]
         },
         {
           "name": "mk_app chainable branch TRACE before adjacent pair-buffer construction (ast.cpp:2195)",
@@ -176291,6 +176298,7 @@
         "pkg/ast/util_psort_ast_sorting.go",
         "pkg/ast/ast_core_register_trace.go",
         "pkg/ast/ast_core_delete_trace.go",
+        "pkg/ast/ast_proof_resolution_trace.go",
         "pkg/ast/ast_core_update_trace.go",
         "pkg/ast/ast_core_app_trace.go",
         "pkg/math/interval/arbitrary_root_trace.go",
@@ -176873,6 +176881,13 @@
           "tests": ["TestASTDeleteNodeBugTraceBeforeWorklist"]
         },
         {
+          "name": "Reached AST unit-resolution proof TRACE at both result publications with low-level printer (ast.cpp:2964,3015)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_proof_resolution_trace.go",
+          "go_targets": ["pkg/ast/ast_proof_resolution_trace_test.go"],
+          "tests": ["TestASTUnitResolutionSourceTraceBothOverloads"]
+        },
+        {
           "name": "Reached config_mpf nth_root_trace STRACE after positive Newton bounds, before negative-sign reversal (interval_def.h:208-210)",
           "status": "ported",
           "go_target": "pkg/math/interval/arbitrary_root_trace.go",
@@ -177124,6 +177139,7 @@
         "pkg/ast/util_psort_ast_sorting.go",
         "pkg/ast/ast_core_register_trace.go",
         "pkg/ast/ast_core_delete_trace.go",
+        "pkg/ast/ast_proof_resolution_trace.go",
         "pkg/ast/ast_core_update_trace.go",
         "pkg/ast/ast_core_app_trace.go",
         "pkg/math/interval/arbitrary_root_trace.go",
@@ -177716,6 +177732,13 @@
           "go_target": "pkg/ast/ast_core_delete_trace.go",
           "go_targets": ["pkg/ast/ast_core_register_trace_test.go"],
           "tests": ["TestASTDeleteNodeBugTraceBeforeWorklist"]
+        },
+        {
+          "name": "Reached AST unit-resolution proof TRACE at both result publications with low-level printer (ast.cpp:2964,3015)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_proof_resolution_trace.go",
+          "go_targets": ["pkg/ast/ast_proof_resolution_trace_test.go"],
+          "tests": ["TestASTUnitResolutionSourceTraceBothOverloads"]
         },
         {
           "name": "Reached config_mpf nth_root_trace STRACE after positive Newton bounds, before negative-sign reversal (interval_def.h:208-210)",
