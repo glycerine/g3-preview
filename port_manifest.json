@@ -53368,6 +53368,12 @@
           "status": "partial",
           "go_target": "pkg/math/subpaving/fixed_search.go",
           "tests": ["TestFixedSearchBreadthFirstCancellationAndOwnedChildren", "TestFixedSearchStopsAtSourceNodeLimit", "TestFixedSearchRetainsRefusedSplitChildrenForClose"]
+        },
+        {
+          "name": "Concrete config_mpfx display_params source-order live numeral display and reached search-entry TRACE (subpaving_t_def.h:516-523,1810)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_search_params_trace.go",
+          "tests": ["TestFixedSearchSourceParameterDisplayAndTrace"]
         }
       ],
       "ownership": [
@@ -54780,6 +54786,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_display.go",
           "tests": ["TestFixedDisplayConstraintsSourceDefinitionsAndClause", "TestFixedDisplayBoundsSearchOrderAndWriterPrefixes"]
+        },
+        {
+          "name": "Concrete config_mpfx display_params source-order live numeral display and reached search-entry TRACE (subpaving_t_def.h:516-523,1810)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_search_params_trace.go",
+          "tests": ["TestFixedSearchSourceParameterDisplayAndTrace"]
         },
         {
           "name": "Concrete config_mpff round-robin variable selector after latest child axiom (src/math/subpaving/subpaving_t_def.h:66-101)",
@@ -177273,6 +177285,12 @@
           "tests": ["TestASTAppGroundTraceAfterApplicationConstruction"]
         },
         {
+          "name": "Reached config_mpfx search parameter TRACE through borrowed source stream (subpaving_t_def.h:1810)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_search_params_trace.go",
+          "tests": ["TestFixedSearchSourceParameterDisplayAndTrace"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -178131,6 +178149,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_core_app_trace.go",
           "tests": ["TestASTAppGroundTraceAfterApplicationConstruction"]
+        },
+        {
+          "name": "Reached config_mpfx search parameter TRACE through borrowed source stream (subpaving_t_def.h:1810)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_search_params_trace.go",
+          "tests": ["TestFixedSearchSourceParameterDisplayAndTrace"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

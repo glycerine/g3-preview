@@ -32,6 +32,9 @@ func (c *FixedContext) Search() error {
 	if err := c.InitializeRoot(); err != nil {
 		return err
 	}
+	if err := c.traceSearchParams(); err != nil {
+		return err
+	}
 	if !c.searchStarted {
 		if c.root.children != 0 {
 			return arena.ErrInvalidSlot
