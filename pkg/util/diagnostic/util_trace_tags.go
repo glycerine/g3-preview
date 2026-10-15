@@ -39,14 +39,18 @@ func traceTagCString(tag string) string {
 
 func (t *TraceTags) Enable(tag string) {
 	if t.tags == nil {
-		t.tags = make(map[string]struct{})
+		fresh := make(map[string]struct{})
+		t.traceTagTableAllocated()
+		t.tags = fresh
 	}
 	t.tags[traceTagCString(tag)] = struct{}{}
 }
 
 func (t *TraceTags) Disable(tag string) {
 	if t.tags == nil {
-		t.tags = make(map[string]struct{})
+		fresh := make(map[string]struct{})
+		t.traceTagTableAllocated()
+		t.tags = fresh
 	}
 	delete(t.tags, traceTagCString(tag))
 }
