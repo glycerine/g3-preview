@@ -32,8 +32,10 @@ func TestLPExactLUUpdateAllocationFailureCensus(t *testing.T) {
 								n = 5
 								density = 0
 							}
-							x := mustLPRat(t, "1"+strings.Repeat("0", 31)+"1/7")
-							y := mustLPRat(t, "2"+strings.Repeat("0", 47)+"3/13")
+							// Both numerators exceed one 32-bit limb; the fault walk
+							// needs physical rational storage, not enormous GCDs.
+							x := mustLPRat(t, "1"+strings.Repeat("0", 10)+"1/7")
+							y := mustLPRat(t, "2"+strings.Repeat("0", 13)+"3/13")
 							if x.Denom().Cmp(big.NewInt(7)) != 0 || y.Denom().Cmp(big.NewInt(13)) != 0 {
 								t.Fatal("genuine arbitrary-precision fractions")
 							}
