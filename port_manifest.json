@@ -159389,12 +159389,18 @@
         },
         {
           "name": "original void mod(a,b,out) direct physical receiver with caller-local allocation context and NUM-before-DEN publication (src/util/rational.h:198-200; src/util/mpq.h:549-553; src/util/mpz.h:487-497)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/rational_service_invocation.go",
           "tests": [
             "TestRationalServiceModIntoInvocationAliasesAndInline",
             "TestRationalServiceModIntoInvocationEveryActualReservation",
-            "TestRationalServiceModIntoInvocationActualTransportRefusesHeldOwner"
+            "TestRationalServiceModIntoInvocationActualTransportRefusesHeldOwner",
+            "TestASTBitVectorExtractNumeralsEveryActualReservation",
+            "TestASTBitVectorSignExtensionEveryNumericalReservation"
+          ],
+          "go_targets": [
+            "pkg/ast/ast_bv_extract_numerals_test.go",
+            "pkg/ast/ast_bv_sign_extend_test.go"
           ]
         },
         {
@@ -169493,12 +169499,18 @@
         },
         {
           "name": "original void mod(a,b,out) direct physical receiver with caller-local allocation context and NUM-before-DEN publication (src/util/rational.h:198-200; src/util/mpq.h:549-553; src/util/mpz.h:487-497)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/rational_service_invocation.go",
           "tests": [
             "TestRationalServiceModIntoInvocationAliasesAndInline",
             "TestRationalServiceModIntoInvocationEveryActualReservation",
-            "TestRationalServiceModIntoInvocationActualTransportRefusesHeldOwner"
+            "TestRationalServiceModIntoInvocationActualTransportRefusesHeldOwner",
+            "TestASTBitVectorExtractNumeralsEveryActualReservation",
+            "TestASTBitVectorSignExtensionEveryNumericalReservation"
+          ],
+          "go_targets": [
+            "pkg/ast/ast_bv_extract_numerals_test.go",
+            "pkg/ast/ast_bv_sign_extend_test.go"
           ]
         },
         {
