@@ -60,8 +60,17 @@ func (p *idPool) recycle(id uint32) { p.free = append(p.free, id) }
 // Manager owns the concrete AIG table, references, conversions and source
 // checkpoints used by the goal-rewriting tactic.
 type Manager struct {
-	self                *Manager
-	ast                 *ast.ASTManager
+	self *Manager
+	ast  *ast.ASTManager
+	*managerImp
+	header          uint64
+	closed          bool
+	tacticTraceLive bool
+}
+
+// managerImp is the separately allocated source aig_manager::imp owner. Its
+// fields are promoted to Manager so the concrete gate methods keep one owner.
+type managerImp struct {
 	table               map[andKey]*node
 	variables           idPool
 	andNodes            idPool
@@ -70,15 +79,14 @@ type Manager struct {
 	pendingAST          []ast.ASTRef
 	nodes               uint32
 	activeRefs          uint32
-	header              uint64
+	impHeader           uint64
 	nodeBytes           uint64
 	closing             bool
-	closed              bool
 	defaultGateEncoding bool
 	maxMemory           uint64
 	runtime             *memory.Runtime
 	cooperation         *cooperate.Cooperation
-	tacticTraceLive     bool
+	impTraceLive        bool
 }
 
 // Ref owns one source aig_ref count. Call Close for each returned reference.
@@ -95,6 +103,10 @@ func NewManager(m *ast.ASTManager) (*Manager, error) {
 // NewManagerWithGateEncoding selects the source's default or alternate ITE
 // and IFF circuit construction branch.
 func NewManagerWithGateEncoding(m *ast.ASTManager, defaultGateEncoding bool) (*Manager, error) {
+	return newManagerWithGateEncoding(m, defaultGateEncoding, false)
+}
+
+func newManagerWithGateEncoding(m *ast.ASTManager, defaultGateEncoding, tacticOwner bool) (*Manager, error) {
 	if m == nil {
 		return nil, ErrOwner
 	}
@@ -102,35 +114,52 @@ func NewManagerWithGateEncoding(m *ast.ASTManager, defaultGateEncoding bool) (*M
 	if numerals == nil || numerals.RuntimeOwner() == nil {
 		return nil, ErrOwner
 	}
-	h, e := m.MkTrue()
-	if e != nil {
+	managerBytes := uint64(reflect.TypeOf(Manager{}).Size())
+	impBytes := uint64(reflect.TypeOf(managerImp{}).Size())
+	nodeBytes := uint64(reflect.TypeOf(node{}).Size())
+	if e := m.BudgetField.Reserve(managerBytes); e != nil {
 		return nil, e
 	}
-	managerBytes := uint64(reflect.TypeOf(Manager{}).Size())
-	nodeBytes := uint64(reflect.TypeOf(node{}).Size())
-	if e = m.BudgetField.Reserve(managerBytes); e != nil {
+	if e := m.BudgetField.Reserve(impBytes); e != nil {
+		m.BudgetField.Release(managerBytes)
+		return nil, e
+	}
+	v := &Manager{ast: m, header: managerBytes, managerImp: &managerImp{
+		table: make(map[andKey]*node), impHeader: impBytes, nodeBytes: nodeBytes,
+		defaultGateEncoding: defaultGateEncoding, maxMemory: math.MaxUint64, runtime: numerals.RuntimeOwner(),
+	}}
+	v.self = v
+	h, e := m.MkTrue()
+	if e != nil {
+		m.BudgetField.Release(impBytes)
+		m.BudgetField.Release(managerBytes)
 		return nil, e
 	}
 	if e = m.BudgetField.Reserve(nodeBytes); e != nil {
+		m.BudgetField.Release(impBytes)
 		m.BudgetField.Release(managerBytes)
 		return nil, e
 	}
 	r, e := m.NewRef(h)
 	if e != nil {
-		m.BudgetField.Release(nodeBytes + managerBytes)
+		m.BudgetField.Release(nodeBytes)
+		m.BudgetField.Release(impBytes)
+		m.BudgetField.Release(managerBytes)
 		return nil, e
 	}
-	v := &Manager{ast: m, table: make(map[andKey]*node), header: managerBytes, nodeBytes: nodeBytes, defaultGateEncoding: defaultGateEncoding, maxMemory: math.MaxUint64, runtime: numerals.RuntimeOwner()}
-	v.self = v
 	v.andNodes.next = firstNodeID
 	v.trueNode = &node{id: 0, refs: 2, variable: r}
 	v.variables.next = 1
 	v.nodes = 1
+	if tacticOwner {
+		v.traceTacticAllocated()
+	}
+	v.traceImpAllocated()
 	return v, nil
 }
 
 func (m *Manager) open() error {
-	if m == nil || m.self != m || m.closed || m.closing {
+	if m == nil || m.self != m || m.managerImp == nil || m.closed || m.closing {
 		return ErrOwner
 	}
 	if e := m.drainPendingAST(); e != nil {
@@ -436,7 +465,7 @@ func (m *Manager) NumNodes() (uint32, error) {
 // Close releases the two source-owned true/false references after all aig_ref
 // owners are gone. A stopped AST release stays in toDelete for owning retry.
 func (m *Manager) Close() error {
-	if m == nil || m.self != m {
+	if m == nil || m.self != m || m.managerImp == nil {
 		return ErrOwner
 	}
 	if m.closed {
@@ -459,6 +488,8 @@ func (m *Manager) Close() error {
 	if m.nodes != 0 {
 		return ErrLiveReferences
 	}
+	m.ast.BudgetField.Release(m.impHeader)
+	m.traceImpDeallocated()
 	m.ast.BudgetField.Release(m.header)
 	m.closed = true
 	m.table = nil

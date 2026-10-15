@@ -58,21 +58,30 @@ func TestAIGTacticMemoryWrapperSourceAllocationAndRelease(t *testing.T) {
 	lines := strings.Split(strings.TrimSpace(output.String()), "\n")
 	var records []string
 	for _, line := range lines {
-		if strings.Contains(line, "src/tactic/aig/aig_tactic.cpp:") {
+		if strings.Contains(line, "src/tactic/aig/aig_tactic.cpp:") ||
+			strings.Contains(line, "src/tactic/aig/aig.cpp:1684") ||
+			strings.Contains(line, "src/tactic/aig/aig.cpp:1688") {
 			records = append(records, line)
 		}
 	}
-	if len(records) != 4 {
+	if len(records) != 8 {
 		t.Fatalf("tactic source memory records: %q", records)
 	}
-	size := strconv.FormatUint(uint64(reflect.TypeOf(Manager{}).Size()), 10)
-	for i := 0; i < 4; i += 2 {
-		fields := strings.Fields(records[i])
-		if len(fields) != 5 || fields[0] != "alloc" || fields[2] != "src/tactic/aig/aig_tactic.cpp:34" || fields[3] != "aig_manager" || fields[4] != size {
-			t.Fatalf("allocation record: %q", records[i])
+	wrapperSize := strconv.FormatUint(uint64(reflect.TypeOf(Manager{}).Size()), 10)
+	impSize := strconv.FormatUint(uint64(reflect.TypeOf(managerImp{}).Size()), 10)
+	for i := 0; i < 8; i += 4 {
+		wrapper, imp := strings.Fields(records[i]), strings.Fields(records[i+1])
+		if len(wrapper) != 5 || wrapper[0] != "alloc" || wrapper[2] != "src/tactic/aig/aig_tactic.cpp:34" || wrapper[3] != "aig_manager" || wrapper[4] != wrapperSize {
+			t.Fatalf("wrapper allocation record: %q", records[i])
 		}
-		if want := "dealloc " + fields[1] + " src/tactic/aig/aig_tactic.cpp:39"; records[i+1] != want {
-			t.Fatalf("release record %q, want %q", records[i+1], want)
+		if len(imp) != 5 || imp[0] != "alloc" || imp[2] != "src/tactic/aig/aig.cpp:1684" || imp[3] != "imp" || imp[4] != impSize || imp[1] == wrapper[1] {
+			t.Fatalf("imp allocation record: %q", records[i+1])
+		}
+		if want := "dealloc " + imp[1] + " src/tactic/aig/aig.cpp:1688"; records[i+2] != want {
+			t.Fatalf("imp release %q, want %q", records[i+2], want)
+		}
+		if want := "dealloc " + wrapper[1] + " src/tactic/aig/aig_tactic.cpp:39"; records[i+3] != want {
+			t.Fatalf("wrapper release %q, want %q", records[i+3], want)
 		}
 	}
 	aigMust(t, m.DelRef(&ref))

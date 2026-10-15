@@ -178,11 +178,10 @@ func (p *Pass) Apply(g *tactic.Goal) (out *tactic.Goal, err error) {
 	if report != nil {
 		defer func() { err = errors.Join(err, report.Close()) }()
 	}
-	m, err := NewManagerWithGateEncoding(g.Manager(), p.DefaultGateEncoding)
+	m, err := newManagerWithGateEncoding(g.Manager(), p.DefaultGateEncoding, true)
 	if err != nil {
 		return nil, err
 	}
-	m.traceTacticAllocated()
 	if err = m.SetMaxMemory(p.maxMemory); err != nil {
 		return nil, errors.Join(err, p.closeManager(m))
 	}
