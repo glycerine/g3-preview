@@ -74,6 +74,18 @@ func TestFixedCoreTacticBorrowedGoalPrintStatisticsAndCleanup(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	otherManager, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b})
+	if err != nil {
+		t.Fatal(err)
+	}
+	translated, err := core.Translate(otherManager)
+	if err != nil {
+		t.Fatal(err)
+	}
+	otherGoal, err := goaltactic.NewGoal(otherManager, false, false, false)
+	if err != nil {
+		t.Fatal(err)
+	}
 	goal, err := goaltactic.NewGoal(m, false, false, false)
 	if err != nil {
 		t.Fatal(err)
@@ -83,7 +95,7 @@ func TestFixedCoreTacticBorrowedGoalPrintStatisticsAndCleanup(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() {
-		for _, e := range []error{goal.Close(), core.Close(), descriptions.Close(), qm.CloseChecked(), numbers.Close(), pc.Del(&p), pc.Close(), q.Del(&value), m.Close(), q.Close(), sy.Close()} {
+		for _, e := range []error{otherGoal.Close(), goal.Close(), translated.Close(), core.Close(), descriptions.Close(), qm.CloseChecked(), numbers.Close(), pc.Del(&p), pc.Close(), q.Del(&value), otherManager.Close(), m.Close(), q.Close(), sy.Close()} {
 			if e != nil {
 				t.Error(e)
 			}
@@ -171,6 +183,12 @@ func TestFixedCoreTacticBorrowedGoalPrintStatisticsAndCleanup(t *testing.T) {
 	}
 	if options, err := core.engine.Options(); err != nil || options.PrintNodes {
 		t.Fatal("selected option update", options, err)
+	}
+	if options, err := translated.engine.Options(); err != nil || !options.PrintNodes || translated.manager != otherManager || !translated.ownsNumerals {
+		t.Fatal("translated parameter snapshot and AST owner", options, err)
+	}
+	if got, err := translated.ApplyWithOutput(otherGoal, &bytes.Buffer{}); err != nil || got != otherGoal {
+		t.Fatal("translated core applies to its destination goal", got, err)
 	}
 	if got, err := core.Apply(goal); err != nil || got != goal {
 		t.Fatal("fresh context and borrowed goal", got, err)

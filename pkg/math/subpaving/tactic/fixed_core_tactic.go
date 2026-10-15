@@ -307,6 +307,16 @@ func (t *FixedCoreTactic) CollectParamDescriptions(dst *params.ParamDescrs) erro
 	return CollectParamDescriptions(dst)
 }
 
+// Translate constructs a separate MPFX core tactic for another AST manager,
+// retaining this tactic's parameter snapshot as the source does. The new
+// tactic owns its numeral managers and borrows the destination AST manager.
+func (t *FixedCoreTactic) Translate(m *ast.ASTManager) (*FixedCoreTactic, error) {
+	if err := t.open(); err != nil {
+		return nil, err
+	}
+	return NewFixedCoreTacticOwned(m, t.pc, &t.params)
+}
+
 func (t *FixedCoreTactic) ResetStatistics() error {
 	if err := t.open(); err != nil {
 		return err

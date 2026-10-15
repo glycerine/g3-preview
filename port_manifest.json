@@ -55231,6 +55231,12 @@
           "tests": ["TestFixedCoreTacticBorrowedGoalPrintStatisticsAndCleanup"]
         },
         {
+          "name": "Concrete MPFX core tactic translate constructs a separately owned implementation for the destination AST manager while retaining its parameter snapshot (subpaving_tactic.cpp:223-225)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/tactic/fixed_core_tactic.go",
+          "tests": ["TestFixedCoreTacticBorrowedGoalPrintStatisticsAndCleanup"]
+        },
+        {
           "name": "Concrete MPFX core tactic apply: borrowed goal result, selected search, statistics, parameter snapshot, fresh cleanup and named-variable print_nodes output (subpaving_tactic.cpp:32-49,193-268)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/tactic/fixed_core_tactic.go",
