@@ -67,7 +67,7 @@ func (c *tacticFilterModelConverter) ApplyModel(out *ModelRef, _ uint32) (err er
 	for _, d := range c.declarations {
 		marks[d] = true
 	}
-	next, e := model.NewModel(m)
+	next, e := model.NewFilteredModel(m)
 	if e != nil {
 		return e
 	}

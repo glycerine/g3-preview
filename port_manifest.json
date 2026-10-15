@@ -103284,12 +103284,14 @@
           "name": "operator()(model_ref&, unsigned) constants, function graph filtering/copy and universes",
           "status": "partial",
           "go_target": "pkg/tactic/tactic_filter_model.go",
+          "go_targets": ["pkg/model/model_filter_allocation.go", "pkg/tactic/tactic_filter_model_memory_trace_debug_test.go"],
           "tests": [
             "TestTacticFilterModelRealSATBindingsUniverseAndReplacement",
             "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
             "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership",
             "TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource",
-            "TestTacticFilterModelAssignmentUsesNativeIDRecycle"
+            "TestTacticFilterModelAssignmentUsesNativeIDRecycle",
+            "TestFilterModelMemoryWrapperFollowsReplacementOwner"
           ]
         },
         {
@@ -150902,7 +150904,7 @@
           ]
         },
         {
-          "name": "Z3DEBUG allocate(file,line,obj,size) and deallocate(file,line,p) wrappers: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs plus generated symbol table and rational global manager plus param_descrs::imp, params blocks, rational entries, trace-tag and debug-tag tables, scoped_timer::imp, timer::m_watch, timeit::imp and MPF powers2 mpz-wrapper and model universe vector and model::copy and model_converter2model header call sites are ported; other retained caller sites remain unaudited (cpp202-211)",
+          "name": "Z3DEBUG allocate(file,line,obj,size) and deallocate(file,line,p) wrappers: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs plus generated symbol table and rational global manager plus param_descrs::imp, params blocks, rational entries, trace-tag and debug-tag tables, scoped_timer::imp, timer::m_watch, timeit::imp and MPF powers2 mpz-wrapper and model universe vector and model::copy and model_converter2model and filter_model_converter header call sites are ported; other retained caller sites remain unaudited (cpp202-211)",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
           "go_targets": [
@@ -150912,7 +150914,7 @@
           "tests": [
             "TestMemoryChunkTraceSourceSitesAndFinalizeGuard",
             "TestIntegerConstructorBindsMemoryChunkTrace",
-            "TestMonomialConstructorBindsMemoryChunkTrace", "TestTraceTagTableAllocationFollowsSourceGate", "TestTraceTagTableFinalizationSuppressesMemoryDuringProcessFinalize", "TestDebugTableMemoryTraceFollowsLazyLifetime", "TestDebugTableDeallocationSuppressesMemoryDuringProcessFinalize", "TestModelUniverseMemoryWrapperRegistrationCopyAndClose", "TestModelCopyMemoryWrapperSuccessfulAndRefusedHeader", "TestModelConverterMemoryWrapperFollowsReferenceOwner"
+            "TestMonomialConstructorBindsMemoryChunkTrace", "TestTraceTagTableAllocationFollowsSourceGate", "TestTraceTagTableFinalizationSuppressesMemoryDuringProcessFinalize", "TestDebugTableMemoryTraceFollowsLazyLifetime", "TestDebugTableDeallocationSuppressesMemoryDuringProcessFinalize", "TestModelUniverseMemoryWrapperRegistrationCopyAndClose", "TestModelCopyMemoryWrapperSuccessfulAndRefusedHeader", "TestModelConverterMemoryWrapperFollowsReferenceOwner", "TestFilterModelMemoryWrapperFollowsReplacementOwner"
           ]
         },
         {
