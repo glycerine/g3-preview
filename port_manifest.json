@@ -76293,9 +76293,8 @@
         "TestSATClauseUseListsEraseNotRemovedAndReleaseMissing",
         "TestSATClauseUseListsExactOwnedGraphAndColdGuards",
         "TestSATClauseUseListsDestructorBeyondCapturedEnd",
-        "TestSATSimplifierVisitedSourceStorageAndPrefixes",
+        "TestSATSimplifierVisitedNativeStorageAndUnsignedExtent",
         "TestSATSimplifierVisitedRawRetainedAndMarkFailure",
-        "TestSATSimplifierVisitedScalarExtent",
         "TestSATSimplifierSubsumptionIndependentFiniteSets",
         "TestSATSimplifierOccurrenceChoiceCollectorsAndCompression",
         "TestSATSimplifierNativeCollectorPairedPublicationAndUnsignedCost",
@@ -76459,9 +76458,8 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_simplifier_kernel.go",
           "tests": [
-            "TestSATSimplifierVisitedSourceStorageAndPrefixes",
+            "TestSATSimplifierVisitedNativeStorageAndUnsignedExtent",
             "TestSATSimplifierVisitedRawRetainedAndMarkFailure",
-            "TestSATSimplifierVisitedScalarExtent",
             "TestSATSimplifierSubsumptionIndependentFiniteSets",
             "TestSATSimplifierOccurrenceChoiceCollectorsAndCompression",
             "TestSATSimplifierNativeCollectorPairedPublicationAndUnsignedCost",
@@ -76589,9 +76587,8 @@
         "TestSATClauseUseListsEraseNotRemovedAndReleaseMissing",
         "TestSATClauseUseListsExactOwnedGraphAndColdGuards",
         "TestSATClauseUseListsDestructorBeyondCapturedEnd",
-        "TestSATSimplifierVisitedSourceStorageAndPrefixes",
+        "TestSATSimplifierVisitedNativeStorageAndUnsignedExtent",
         "TestSATSimplifierVisitedRawRetainedAndMarkFailure",
-        "TestSATSimplifierVisitedScalarExtent",
         "TestSATSimplifierSubsumptionIndependentFiniteSets",
         "TestSATSimplifierOccurrenceChoiceCollectorsAndCompression",
         "TestSATSimplifierNativeCollectorPairedPublicationAndUnsignedCost",
@@ -76674,9 +76671,8 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_simplifier_kernel.go",
           "tests": [
-            "TestSATSimplifierVisitedSourceStorageAndPrefixes",
+            "TestSATSimplifierVisitedNativeStorageAndUnsignedExtent",
             "TestSATSimplifierVisitedRawRetainedAndMarkFailure",
-            "TestSATSimplifierVisitedScalarExtent",
             "TestSATSimplifierSubsumptionIndependentFiniteSets",
             "TestSATSimplifierOccurrenceChoiceCollectorsAndCompression",
             "TestSATSimplifierNativeCollectorPairedPublicationAndUnsignedCost",
@@ -182330,6 +182326,15 @@
             "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
             "TestTacticManagerNativeRegistrationGrowthAndOwnership",
             "TestTacticManagerDestructorFinalizesTacticsBeforeProbes"
+          ]
+        },
+        {
+          "name": "Concrete SAT simplifier visited-byte vector uses native Go slice storage with wrapped uint32 logical extent",
+          "status": "platform_replacement",
+          "go_target": "pkg/sat/sat_solver_simplifier_kernel.go",
+          "tests": [
+            "TestSATSimplifierVisitedNativeStorageAndUnsignedExtent",
+            "TestSATSimplifierVisitedRawRetainedAndMarkFailure"
           ]
         }
       ],

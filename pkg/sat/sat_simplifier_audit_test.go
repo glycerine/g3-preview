@@ -39,7 +39,7 @@ func satSimplifierAudit(t *testing.T, simplifier *satSimplifier) {
 	want += mc.ownerBytes
 	r := p.limit
 	want += uint64(reflect.TypeOf(control.Reslimit{}).Size()) + 8*uint64(cap(r.Limits)) + uint64(reflect.TypeOf((*control.Reslimit)(nil)).Size())*uint64(cap(r.Children)) + p.memory.Stats().TotalBytes
-	want += simplifier.ownerBytes + satOuterUseOwnedBytes(simplifier.useList) + simplifier.kernel.ownerBytes + simplifier.kernel.backingBytes
+	want += simplifier.ownerBytes + satOuterUseOwnedBytes(simplifier.useList) + simplifier.kernel.ownerBytes
 	set := simplifier.subTodo
 	want += set.ownerBytes
 	for _, stats := range []satStorageVectorStats{simplifier.subBinTodo.Stats(), simplifier.bsCS.Stats(), simplifier.posCls.Stats(), simplifier.negCls.Stats()} {

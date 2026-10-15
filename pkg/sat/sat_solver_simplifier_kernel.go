@@ -12,20 +12,20 @@ import (
 // simplifier Run implementation. The eventual solver-bound simplifier owns this
 // subobject. Clause/use-list lifetimes remain with their actual callers.
 type satSimplifierKernel struct {
-	self                     *satSimplifierKernel
-	allocator                *ClauseAllocator
-	dummy                    *ClauseAllocator
-	useList                  *satClauseUseLists
-	budget                   *arena.Budget
-	visited                  []uint8
-	length, capacity         uint32
-	subCounter, elimCounter  int32
-	ownerBytes, backingBytes uint64
-	closed                   bool
+	self                    *satSimplifierKernel
+	allocator               *ClauseAllocator
+	dummy                   *ClauseAllocator
+	useList                 *satClauseUseLists
+	budget                  *arena.Budget
+	visited                 []uint8
+	length                  uint32
+	subCounter, elimCounter int32
+	ownerBytes              uint64
+	closed                  bool
 }
 type satSimplifierKernelStats struct {
-	OwnerBytes, BackingBytes uint64
-	Size, Capacity           uint32
+	OwnerBytes     uint64
+	Size, Capacity uint32
 }
 
 func newSATSimplifierKernel(a *ClauseAllocator, u *satClauseUseLists, b *arena.Budget) (*satSimplifierKernel, error) {
@@ -59,46 +59,20 @@ func (k *satSimplifierKernel) Stats() satSimplifierKernelStats {
 	if k == nil || k.closed {
 		return satSimplifierKernelStats{}
 	}
-	return satSimplifierKernelStats{k.ownerBytes, k.backingBytes, k.length, k.capacity}
+	return satSimplifierKernelStats{k.ownerBytes, k.length, uint32(len(k.visited))}
 }
 
-// vector<char,false,unsigned> uses wrapped source unsigned byte extents. The
-// host bound is a separate checked Go physical-storage adapter, not C++ malloc.
-func satSimplifierVisitedCapacity(old uint32, hostMax uint64) (uint32, uint64, error) {
-	n := uint32(2)
-	if old != 0 {
-		n = (3*old + 1) >> 1
-	}
-	if n <= old || n+8 <= old+8 || uint64(n) > hostMax {
-		return 0, 0, arena.ErrBounds
-	}
-	return n, uint64(n), nil
-}
 func (k *satSimplifierKernel) InitVisited(numVars uint32) error {
 	if e := k.open(); e != nil {
 		return e
 	}
 	k.length = 0 // source reset BEFORE unsigned multiply/reserve.
 	n := 2 * numVars
-	for n > k.capacity {
-		c, bytes, e := satSimplifierVisitedCapacity(k.capacity, uint64(^uint(0)>>1))
-		if e != nil {
-			return e
-		}
-		if e = k.budget.Reserve(bytes); e != nil {
-			return e
-		}
-		v := make([]uint8, int(c))
-		copy(v, k.visited)
-		k.budget.Release(k.backingBytes)
-		k.visited = v
-		k.capacity = c
-		k.backingBytes = bytes
+	if uint64(n) > uint64(len(k.visited)) {
+		k.visited = append(k.visited, make([]uint8, int(n)-len(k.visited))...)
 	}
 	k.length = n
-	for i := uint32(0); i < n; i++ {
-		k.visited[i] = 0
-	}
+	clear(k.visited[:n])
 	return nil
 }
 func (k *satSimplifierKernel) visitedIndex(l Literal) (uint32, error) {
@@ -109,7 +83,7 @@ func (k *satSimplifierKernel) visitedIndex(l Literal) (uint32, error) {
 	if satStorageSourceDebug && i >= k.length {
 		return 0, ErrSATAssertion
 	}
-	if i >= k.capacity {
+	if uint64(i) >= uint64(len(k.visited)) {
 		return 0, arena.ErrBounds
 	}
 	return i, nil
@@ -180,11 +154,8 @@ func (k *satSimplifierKernel) Finalize() error {
 	if e := k.open(); e != nil {
 		return e
 	}
-	k.budget.Release(k.backingBytes)
 	k.visited = nil
 	k.length = 0
-	k.capacity = 0
-	k.backingBytes = 0
 	return nil
 }
 func (k *satSimplifierKernel) Close() error {

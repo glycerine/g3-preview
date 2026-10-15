@@ -1,7 +1,6 @@
 package sat
 
 import (
-	"errors"
 	"reflect"
 	"testing"
 
@@ -18,23 +17,17 @@ func satSimplifierKernelFixture(t *testing.T, vars uint32) (*satSimplifierKernel
 	return k, a, u, b
 }
 
-func TestSATSimplifierVisitedSourceStorageAndPrefixes(t *testing.T) {
+func TestSATSimplifierVisitedNativeStorageAndUnsignedExtent(t *testing.T) {
 	k, _, _, b := satSimplifierKernelFixture(t, 0)
 	if k.Stats().OwnerBytes != uint64(reflect.TypeOf(satSimplifierKernel{}).Size()) {
 		t.Fatal(k.Stats())
 	}
 	before := b.Used()
-	b.FailAfter(1)
-	if e := k.InitVisited(4); !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
-	if k.length != 0 || k.capacity != 2 || k.Stats().BackingBytes != 2 || b.Used() != before+2 {
-		t.Fatal(k.Stats(), b.Used(), before)
-	}
-	b.FailAfter(-1)
+	b.FailAfter(0)
 	satOK(t, k.InitVisited(4))
-	if k.length != 8 || k.capacity != 8 {
-		t.Fatal(k.Stats())
+	b.FailAfter(-1)
+	if k.length != 8 || k.Stats().Capacity != 8 || b.Used() != before {
+		t.Fatal("native growth charged arena", k.Stats(), b.Used(), before)
 	}
 	satOK(t, k.markVisited(2))
 	satOK(t, k.InitVisited(2))
@@ -43,7 +36,7 @@ func TestSATSimplifierVisitedSourceStorageAndPrefixes(t *testing.T) {
 	}
 	// Unsigned source 2*num_vars wraps before resize, leaving retained storage.
 	satOK(t, k.InitVisited(1<<31))
-	if k.length != 0 || k.capacity != 8 {
+	if k.length != 0 || k.Stats().Capacity != 8 {
 		t.Fatal(k.Stats())
 	}
 	copyOwner := *k
@@ -55,7 +48,7 @@ func TestSATSimplifierVisitedSourceStorageAndPrefixes(t *testing.T) {
 		t.Fatal(e)
 	}
 	satOK(t, k.Finalize())
-	if k.Stats().BackingBytes != 0 || b.Used() != before {
+	if k.Stats().Capacity != 0 || b.Used() != before {
 		t.Fatal(k.Stats(), b.Used())
 	}
 }
@@ -88,24 +81,4 @@ func TestSATSimplifierVisitedRawRetainedAndMarkFailure(t *testing.T) {
 		}
 	}
 	satOK(t, k.unmarkAll(c))
-}
-
-func TestSATSimplifierVisitedScalarExtent(t *testing.T) {
-	for _, old := range []uint32{0, 2, 3, 5, 8} {
-		n, _, e := satSimplifierVisitedCapacity(old, ^uint64(0))
-		satOK(t, e)
-		want := uint32(2)
-		if old != 0 {
-			want = (3*old + 1) >> 1
-		}
-		if n != want {
-			t.Fatal(old, n, want)
-		}
-	}
-	if _, _, e := satSimplifierVisitedCapacity(8, 11); e != arena.ErrBounds {
-		t.Fatal(e)
-	}
-	if _, _, e := satSimplifierVisitedCapacity(^uint32(0), ^uint64(0)); e != arena.ErrBounds {
-		t.Fatal(e)
-	}
 }
