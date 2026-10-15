@@ -52,6 +52,7 @@ func (md *ModelCore) RegisterFunction(d ast.ASTHandle, fi *FunctionInterpretatio
 			if e = old.Close(); e != nil {
 				return e
 			}
+			old.traceEvaluatorFunctionDeallocated(81)
 		}
 		entry.function = fi
 	}
@@ -144,7 +145,7 @@ func (md *ModelCore) UnregisterDeclaration(d ast.ASTHandle) error {
 }
 func (md *ModelCore) finishFunctionRemoval() error {
 	if md.removedFunction != nil {
-		if e := md.retireFunction(md.removedFunction); e != nil {
+		if e := md.retireFunction(md.removedFunction, 105); e != nil {
 			return e
 		}
 		md.removedFunction = nil

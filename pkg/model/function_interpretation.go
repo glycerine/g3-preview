@@ -7,6 +7,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 // FunctionInterpretation retains the original ordered function graph, fallback
@@ -22,6 +23,8 @@ type FunctionInterpretation struct {
 	argsAreValues                 bool
 	substitution                  *rewriter.VarSubstitution
 	bytes                         uint64
+	memoryTrace                   *diagnostic.TraceTags
+	memoryTraceLive               bool
 	closing, closed               bool
 	drain                         uint32
 	cause                         error

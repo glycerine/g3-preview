@@ -292,7 +292,7 @@ func (md *ModelCore) closeCoreMembers() error {
 		}
 	}
 	for _, entry := range md.Functions.All() {
-		if e := md.retireFunction(entry); e != nil {
+		if e := md.retireFunction(entry, 29); e != nil {
 			return e
 		}
 	}

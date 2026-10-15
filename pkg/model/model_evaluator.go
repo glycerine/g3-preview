@@ -646,6 +646,7 @@ func (c *evaluatorConfiguration) GetMacro(d ast.ASTHandle) (ast.ASTHandle, ast.A
 	if e != nil {
 		return ast.ASTHandle{}, ast.ASTHandle{}, ast.ASTHandle{}, false, e
 	}
+	c.pending.traceEvaluatorFunctionAllocated(c.owner.impTraceTags())
 	if e = c.pending.SetElse(v); e != nil {
 		return ast.ASTHandle{}, ast.ASTHandle{}, ast.ASTHandle{}, false, e
 	}

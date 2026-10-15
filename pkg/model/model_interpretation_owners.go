@@ -60,7 +60,7 @@ func (md *ModelCore) retireConstant(entry *modelConstantEntry) error {
 	return nil
 }
 
-func (md *ModelCore) retireFunction(entry *modelFunctionEntry) error {
+func (md *ModelCore) retireFunction(entry *modelFunctionEntry, deallocationLine int) error {
 	if entry.declarationOwned {
 		consumed, e := md.manager.DecRefConsumed(entry.declaration)
 		if consumed {
@@ -74,9 +74,11 @@ func (md *ModelCore) retireFunction(entry *modelFunctionEntry) error {
 		}
 	}
 	if entry.function != nil {
-		if e := entry.function.Close(); e != nil {
+		function := entry.function
+		if e := function.Close(); e != nil {
 			return e
 		}
+		function.traceEvaluatorFunctionDeallocated(deallocationLine)
 		entry.function = nil
 	}
 	return nil
