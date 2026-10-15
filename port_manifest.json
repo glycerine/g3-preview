@@ -159375,11 +159375,16 @@
         },
         {
           "name": "original rational(unsigned) caller-local invocation through uint32 NUM setter before DEN reset (src/util/rational.h:48; src/util/mpq.h:712-715)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/rational_service_invocation.go",
           "tests": [
             "TestRationalServiceUnsignedInvocationOriginalBoundary",
-            "TestRationalServiceSourceUnsignedConstructorBoundary"
+            "TestRationalServiceSourceUnsignedConstructorBoundary",
+            "TestRationalServiceUnsignedInvocationFailedNumeratorLeavesDenominator",
+            "TestASTBitVectorUnsignedNumeralEveryNumericalReservation"
+          ],
+          "go_targets": [
+            "pkg/ast/ast_bv_unsigned_numeral_test.go"
           ]
         },
         {
@@ -169474,11 +169479,16 @@
         },
         {
           "name": "original rational(unsigned) caller-local invocation through uint32 NUM setter before DEN reset (src/util/rational.h:48; src/util/mpq.h:712-715)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/rational_service_invocation.go",
           "tests": [
             "TestRationalServiceUnsignedInvocationOriginalBoundary",
-            "TestRationalServiceSourceUnsignedConstructorBoundary"
+            "TestRationalServiceSourceUnsignedConstructorBoundary",
+            "TestRationalServiceUnsignedInvocationFailedNumeratorLeavesDenominator",
+            "TestASTBitVectorUnsignedNumeralEveryNumericalReservation"
+          ],
+          "go_targets": [
+            "pkg/ast/ast_bv_unsigned_numeral_test.go"
           ]
         },
         {
