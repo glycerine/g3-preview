@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -82,6 +83,19 @@ func (p *Pass) closeManager(m *Manager) error {
 	}
 	m.traceTacticDeallocated()
 	return nil
+}
+
+func assertGoalWellSorted(g *tactic.Goal, line int32) error {
+	debug := diagnostic.BorrowProcessDebugContext()
+	enabled, err := diagnostic.SourceAssertionsEnabled(debug)
+	if err != nil || !enabled {
+		return err
+	}
+	good, err := g.IsWellSorted()
+	if err != nil || good {
+		return err
+	}
+	return diagnostic.DebugAssertionFailure(debug, "src/tactic/aig/aig_tactic.cpp", line, "g->is_well_sorted()")
 }
 
 func (p *Pass) rewriteOne(m *Manager, g *tactic.Goal, i uint32) (err error) {
@@ -190,6 +204,9 @@ func (p *Pass) Apply(g *tactic.Goal) (out *tactic.Goal, err error) {
 	if report != nil {
 		defer func() { err = errors.Join(err, report.Close()) }()
 	}
+	if err = assertGoalWellSorted(g, 69); err != nil {
+		return nil, err
+	}
 	m, err := newManagerWithGateEncoding(g.Manager(), p.DefaultGateEncoding, true)
 	if err != nil {
 		return nil, err
@@ -203,6 +220,9 @@ func (p *Pass) Apply(g *tactic.Goal) (out *tactic.Goal, err error) {
 		}
 	}
 	if err = p.rewriteGoal(m, g); err != nil {
+		return nil, errors.Join(err, p.closeManager(m))
+	}
+	if err = assertGoalWellSorted(g, 90); err != nil {
 		return nil, errors.Join(err, p.closeManager(m))
 	}
 	if err = p.closeManager(m); err != nil {
