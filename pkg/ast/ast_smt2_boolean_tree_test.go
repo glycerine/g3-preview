@@ -86,7 +86,56 @@ func TestASTSMT2BooleanTreeSourcePostorderAndLabels(t *testing.T) {
 	paramsMust(t, err)
 	sharedLarge, err := m.MkAnd(large, large)
 	paramsMust(t, err)
-	if _, err := m.SMT2PPBooleanTree(sharedLarge, nil); err == nil {
-		t.Fatal("alias-required shared application silently printed without a let")
+	format, err := m.SMT2PPBooleanTree(sharedLarge, nil)
+	paramsMust(t, err)
+	paramsMust(t, m.PrintFormat(out, format, c, p, g))
+	got, err := out.String()
+	paramsMust(t, err)
+	want := "(let ((a!1 (and a b c d e f g h i)))\n  (and a!1 a!1))"
+	if got != want {
+		t.Fatalf("shared large app: %q, want %q", got, want)
+	}
+	paramsMust(t, out.ResetText())
+	middleArgs := append([]ASTHandle{large, large}, largeArgs[:8]...)
+	sharedMiddle, err := m.MkOrArgs(middleArgs)
+	paramsMust(t, err)
+	nestedAliases, err := m.MkAnd(sharedMiddle, sharedMiddle)
+	paramsMust(t, err)
+	format, err = m.SMT2PPBooleanTree(nestedAliases, nil)
+	paramsMust(t, err)
+	paramsMust(t, m.PrintFormat(out, format, c, p, g))
+	got, err = out.String()
+	paramsMust(t, err)
+	want = "(let ((a!1 (and a b c d e f g h i)))\n(let ((a!2 (or a!1 a!1 a b c d e f g h)))\n  (and a!2 a!2)))"
+	if got != want {
+		t.Fatalf("nested aliases: %q, want %q", got, want)
+	}
+	paramsMust(t, out.ResetText())
+	reserved := []usymbol.Symbol{astTestSymbol(t, m, "a!1")}
+	format, err = m.SMT2PPBooleanTree(nestedAliases, reserved)
+	paramsMust(t, err)
+	paramsMust(t, m.PrintFormat(out, format, c, p, g))
+	got, err = out.String()
+	paramsMust(t, err)
+	want = "(let ((a!2 (and a b c d e f g h i)))\n(let ((a!3 (or a!2 a!2 a b c d e f g h)))\n  (and a!3 a!3)))"
+	if got != want {
+		t.Fatalf("reserved alias name: %q, want %q", got, want)
+	}
+	paramsMust(t, out.ResetText())
+	deep := right
+	for i := 0; i < 4; i++ {
+		deep, err = m.MkImplies(left, deep)
+		paramsMust(t, err)
+	}
+	depthRoot, err := m.MkNot(deep)
+	paramsMust(t, err)
+	format, err = m.SMT2PPBooleanTree(depthRoot, nil)
+	paramsMust(t, err)
+	paramsMust(t, m.PrintFormat(out, format, c, p, g))
+	got, err = out.String()
+	paramsMust(t, err)
+	want = "(let ((a!1 (=> left (=> left (=> left (=> left right))))))\n  (not a!1))"
+	if got != want {
+		t.Fatalf("depth alias: %q, want %q", got, want)
 	}
 }

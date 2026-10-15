@@ -1,7 +1,11 @@
-// Source: src/ast/ast_smt2_pp.cpp:630-801,1037-1060.
+// Source: src/ast/ast_smt2_pp.cpp:630-844,1037-1060.
 package ast
 
-import usymbol "github.com/glycerine/g3/pkg/util/symbol"
+import (
+	"strconv"
+
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+)
 
 func (m *ASTManager) smt2FlatAssocCandidate(parent, child ASTHandle) (bool, error) {
 	if err := m.lock(); err != nil {
@@ -28,9 +32,8 @@ func (m *ASTManager) smt2FlatAssocCandidate(parent, child ASTHandle) (bool, erro
 }
 
 // SMT2PPBooleanTree builds the source child-before-parent documents for
-// Boolean application trees, including the default flat_assoc profile.
-// Numeric, quantifier, pattern and alias paths still belong to the wider
-// SMT2 printer traversal.
+// Boolean application trees, including flat_assoc and source-default aliases.
+// Numeric, quantifier and pattern paths still belong to the wider printer.
 func (m *ASTManager) SMT2PPBooleanTree(root ASTHandle, names []usymbol.Symbol) (ASTHandle, error) {
 	boolSort, err := m.MkBoolSort()
 	if err != nil {
@@ -70,182 +73,157 @@ func (m *ASTManager) SMT2PPBooleanTree(root ASTHandle, names []usymbol.Symbol) (
 	if err := countOccurrences(root); err != nil {
 		return ASTHandle{}, err
 	}
-	type info struct{ weight, depth uint32 }
-	metrics := make(map[ASTHandle]info)
-	var measure func(ASTHandle) (info, error)
-	measure = func(h ASTHandle) (info, error) {
-		if value, found := metrics[h]; found {
-			return value, nil
+
+	// These are the source info_stack fields. A flattened application leaves
+	// its child entries on the stack, so its own weight and depth disappear.
+	type result struct {
+		docs          []ASTHandle
+		level         uint32
+		weight, depth uint32
+	}
+	bindings := make([]smt2LetBinding, 0)
+	aliases := make(map[ASTHandle]int)
+	usedNames := make(map[string]bool)
+	for _, name := range names {
+		s, e := m.Symbols.String(name)
+		if e != nil {
+			return ASTHandle{}, e
+		}
+		usedNames[s] = true
+	}
+	nextAlias := uint32(1)
+	var visit func(ASTHandle, bool) (result, error)
+	visit = func(h ASTHandle, flatten bool) (result, error) {
+		if idx, found := aliases[h]; found {
+			binding := bindings[idx]
+			format, e := m.FormatString(binding.name)
+			return result{docs: []ASTHandle{format}, level: binding.level + 1, weight: 1, depth: 1}, e
 		}
 		kind, e := m.GetKind(h)
 		if e != nil {
-			return info{}, e
-		}
-		value := info{weight: 1, depth: 1}
-		if kind == ASTApp {
-			n, e := m.GetNumArgs(h)
-			if e != nil {
-				return info{}, e
-			}
-			for i := uint32(0); i < n; i++ {
-				child, e := m.GetArg(h, i)
-				if e != nil {
-					return info{}, e
-				}
-				childInfo, e := measure(child)
-				if e != nil {
-					return info{}, e
-				}
-				flat := false
-				if occurrences[child] == 1 {
-					childKind, e := m.GetKind(child)
-					if e != nil {
-						return info{}, e
-					}
-					if childKind == ASTApp {
-						flat, e = m.smt2FlatAssocCandidate(h, child)
-						if e != nil {
-							return info{}, e
-						}
-					}
-				}
-				if flat {
-					value.weight += childInfo.weight - 1
-					if childInfo.depth > value.depth {
-						value.depth = childInfo.depth
-					}
-				} else {
-					value.weight += childInfo.weight
-					if childInfo.depth+1 > value.depth {
-						value.depth = childInfo.depth + 1
-					}
-				}
-			}
-		}
-		metrics[h] = value
-		return value, nil
-	}
-	if _, err := measure(root); err != nil {
-		return ASTHandle{}, err
-	}
-	var visit func(ASTHandle, bool) ([]ASTHandle, uint32, error)
-	visit = func(h ASTHandle, flatten bool) ([]ASTHandle, uint32, error) {
-		kind, e := m.GetKind(h)
-		if e != nil {
-			return nil, 0, e
+			return result{}, e
 		}
 		if kind != ASTVar && kind != ASTApp {
-			return nil, 0, ErrASTDomain
+			return result{}, ErrASTDomain
 		}
 		sort, e := m.GetSort(h)
 		if e != nil {
-			return nil, 0, e
+			return result{}, e
 		}
 		if sort != boolSort {
-			return nil, 0, ErrASTDomain
+			return result{}, ErrASTDomain
 		}
 		if kind == ASTVar {
 			index, e := m.GetVarIndex(h)
 			if e != nil {
-				return nil, 0, e
+				return result{}, e
 			}
 			format, e := m.SMT2PPVar(index, names)
-			return []ASTHandle{format}, 1, e
+			return result{docs: []ASTHandle{format}, weight: 1, depth: 1}, e
 		}
 		count, e := m.GetNumArgs(h)
 		if e != nil {
-			return nil, 0, e
+			return result{}, e
 		}
 		if count == 0 {
 			var labels []usymbol.Symbol
 			labeled, e := m.IsLabelLit(h, &labels)
 			if e != nil {
-				return nil, 0, e
+				return result{}, e
 			}
 			if labeled {
 				body, e := m.FormatString("true")
 				if e != nil {
-					return nil, 0, e
+					return result{}, e
 				}
 				format, e := m.SMT2PPLabels(true, labels, body)
-				return []ASTHandle{format}, 1, e
+				return result{docs: []ASTHandle{format}, weight: 1, depth: 1}, e
 			}
 			decl, e := m.GetDecl(h)
 			if e != nil {
-				return nil, 0, e
+				return result{}, e
 			}
 			format, _, e := m.SMT2Fdecl(decl)
-			return []ASTHandle{format}, 1, e
-		}
-		// store_result creates an alias only for nonroot frames at the
-		// configured depth or shared-weight threshold. Flat children return
-		// before store_result and expose their child documents to the parent.
-		if !flatten && h != root && (metrics[h].depth >= 5 || occurrences[h] > 1 && metrics[h].weight >= 10) {
-			return nil, 0, ErrASTDomain // source alias registration is still open
+			return result{docs: []ASTHandle{format}, weight: 1, depth: 1}, e
 		}
 		args := make([]ASTHandle, 0, count)
-		depth := uint32(1)
+		value := result{weight: 1, depth: 1}
 		for i := uint32(0); i < count; i++ {
 			child, e := m.GetArg(h, i)
 			if e != nil {
-				return nil, 0, e
+				return result{}, e
 			}
 			childKind, e := m.GetKind(child)
 			if e != nil {
-				return nil, 0, e
+				return result{}, e
 			}
-			if childKind == ASTApp {
-				flat, e := m.smt2FlatAssocCandidate(h, child)
+			flat := false
+			if childKind == ASTApp && occurrences[child] == 1 {
+				flat, e = m.smt2FlatAssocCandidate(h, child)
 				if e != nil {
-					return nil, 0, e
-				}
-				if flat && occurrences[child] == 1 {
-					childDocs, childDepth, e := visit(child, true)
-					if e != nil {
-						return nil, 0, e
-					}
-					if childDepth+1 > depth {
-						depth = childDepth + 1
-					}
-					args = append(args, childDocs...)
-					continue
+					return result{}, e
 				}
 			}
-			formats, childDepth, e := visit(child, false)
+			childResult, e := visit(child, flat)
 			if e != nil {
-				return nil, 0, e
+				return result{}, e
 			}
-			if childDepth+1 > depth {
-				depth = childDepth + 1
+			if childResult.level > value.level {
+				value.level = childResult.level
 			}
-			args = append(args, formats...)
+			value.weight += childResult.weight
+			if childResult.depth > value.depth {
+				value.depth = childResult.depth
+			}
+			args = append(args, childResult.docs...)
 		}
 		if flatten {
-			return args, depth - 1, nil
+			value.docs = args
+			value.weight--
+			return value, nil
 		}
+		value.depth++
 		var positive bool
 		var labels []usymbol.Symbol
 		labeled, e := m.IsLabel(h, &positive, &labels)
 		if e != nil {
-			return nil, 0, e
+			return result{}, e
 		}
+		var format ASTHandle
 		if labeled {
 			if len(args) != 1 {
-				return nil, 0, ErrASTDomain
+				return result{}, ErrASTDomain
 			}
-			format, e := m.SMT2PPLabels(positive, labels, args[0])
-			return []ASTHandle{format}, depth, e
+			format, e = m.SMT2PPLabels(positive, labels, args[0])
+		} else {
+			decl, e := m.GetDecl(h)
+			if e != nil {
+				return result{}, e
+			}
+			format, e = m.SMT2PPAppFormat(decl, args)
 		}
-		decl, e := m.GetDecl(h)
 		if e != nil {
-			return nil, 0, e
+			return result{}, e
 		}
-		format, e := m.SMT2PPAppFormat(decl, args)
-		return []ASTHandle{format}, depth, e
+		if h != root && (value.depth >= 5 || value.weight >= 10 && occurrences[h] > 1) {
+			for {
+				name := "a!" + strconv.FormatUint(uint64(nextAlias), 10)
+				nextAlias++
+				if usedNames[name] {
+					continue
+				}
+				aliases[h] = len(bindings)
+				bindings = append(bindings, smt2LetBinding{name: name, format: format, level: value.level})
+				aliasFormat, e := m.FormatString(name)
+				return result{docs: []ASTHandle{aliasFormat}, level: value.level + 1, weight: 1, depth: 1}, e
+			}
+		}
+		value.docs = []ASTHandle{format}
+		return value, nil
 	}
-	formats, _, err := visit(root, false)
+	printed, err := visit(root, false)
 	if err != nil {
 		return ASTHandle{}, err
 	}
-	return formats[0], nil
+	return m.smt2PPLet(printed.docs[0], bindings)
 }

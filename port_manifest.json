@@ -12474,6 +12474,8 @@
         "pkg/ast/ast_smt2_var_labels.go",
         "pkg/ast/ast_smt2_app_format.go",
         "pkg/ast/ast_smt2_boolean_tree.go",
+        "pkg/ast/ast_smt2_let.go",
+        "pkg/ast/ast_smt2_let_test.go",
         "pkg/ast/ast_smt2_declare_fun.go"
       ],
       "tests": [
@@ -12655,7 +12657,7 @@
           ]
         },
         {
-          "name": "Selected smt2_printer child-before-parent Boolean application and variable traversal with constant/label dispatch, default flat associative expansion and direct printing of repeated atomic or small shared compound terms; alias-required compounds, numeric and quantifier profiles remain open",
+          "name": "Selected smt2_printer child-before-parent Boolean application and variable traversal with constant/label dispatch, default flat associative expansion, alias registration/reuse, info-stack weight/depth/level and let wrapping; numeric and quantifier profiles remain open",
           "status": "partial",
           "go_target": "pkg/ast/ast_smt2_boolean_tree.go",
           "tests": [
@@ -12663,7 +12665,7 @@
           ]
         },
         {
-          "name": "smt2_printer::process_app nonconstant short/compound declaration format assembly (ast_smt2_pp.cpp:738-801); child traversal, aliasing and info-stack integration remain open",
+          "name": "smt2_printer::process_app nonconstant short/compound declaration format assembly (ast_smt2_pp.cpp:738-801); selected Boolean child traversal and aliasing are integrated, while numeric and quantifier profiles remain open",
           "status": "partial",
           "go_target": "pkg/ast/ast_smt2_app_format.go",
           "tests": [
