@@ -51592,13 +51592,13 @@
           "name": "Concrete context_mpfx_wrapper search forwarding through the selected fixed engine (subpaving.cpp:55; subpaving_tactic.cpp:193-200)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_shell_coefficients.go",
-          "tests": ["TestFixedEngineSelectedOwnerUpdateAndRefusal"]
+          "tests": ["TestFixedShellSearchAndStatisticsForwarding"]
         },
         {
           "name": "Concrete context_mpfx_wrapper reset_statistics and collect_statistics forwarding (subpaving.cpp:51-52)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_shell_coefficients.go",
-          "tests": ["TestFixedEngineSelectedOwnerUpdateAndRefusal"]
+          "tests": ["TestFixedShellSearchAndStatisticsForwarding"]
         },
         {
           "name": "Concrete context_mpfx_wrapper display_constraints and display_bounds forwarding (subpaving.cpp:49,56)",
@@ -54739,7 +54739,7 @@
           "name": "Concrete config_hwf unit/clause TRACE and input-order pre-sort reference increments (subpaving_t_def.h:815-866)",
           "status": "ported",
           "go_targets": ["pkg/math/subpaving/hardware_clause_trace.go", "pkg/math/subpaving/hardware_clause.go"],
-          "tests": ["TestHardwareClauseAndUnitTracePublicationOrder", "TestHardwareClauseAndUnitTraceFailureBoundaries", "TestHardwareInequalityReferenceTraceClauseOrder"]
+          "tests": ["TestHardwareClauseAndUnitTracePublicationOrder", "TestHardwareClauseAndUnitTraceFailureBoundaries", "TestHardwareInequalityReferenceTraceSourceOrder"]
         },
         {
           "name": "Concrete config_hwf clause-propagation TRACE before visit and selected bound publication (subpaving_t_def.h:1376,1400)",
@@ -54781,7 +54781,7 @@
           "name": "Concrete config_mpfx midpoint child construction before local numeral allocation and arithmetic, with both children retained and source subpaving::exception classification on no-interior refusal (subpaving_t_def.h:198-239)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_split.go",
-          "tests": ["TestSubpavingFixedMidpointSourceCasesAndNoInterior", "TestFixedMidpointSplitSourceBoundsTrace", "TestFixedSearchRetainsRefusedSplitChildrenForClose", "TestFixedCoreTacticBorrowedGoalPrintStatisticsAndCleanup"]
+          "tests": ["TestSubpavingFixedMidpointSourceCasesAndNoInterior", "TestFixedMidpointSplitSourceBoundsTrace", "TestFixedSearchRetainsRefusedSplitChildrenForClose"]
         },
         {
           "name": "Concrete config_mpfx midpoint split child-bound TRACE after both decision bounds (subpaving_t_def.h:243-246)",
@@ -177788,7 +177788,7 @@
           "name": "Reached config_hwf unit and sorted-clause TRACE records (subpaving_t_def.h:841,866)",
           "status": "ported",
           "go_targets": ["pkg/math/subpaving/hardware_clause_trace.go", "pkg/math/subpaving/hardware_clause.go"],
-          "tests": ["TestHardwareClauseAndUnitTracePublicationOrder", "TestHardwareClauseAndUnitTraceFailureBoundaries", "TestHardwareInequalityReferenceTraceClauseOrder"]
+          "tests": ["TestHardwareClauseAndUnitTracePublicationOrder", "TestHardwareClauseAndUnitTraceFailureBoundaries", "TestHardwareInequalityReferenceTraceSourceOrder"]
         },
         {
           "name": "Reached config_hwf clause-propagation TRACE records (subpaving_t_def.h:1376,1400)",
@@ -178978,7 +178978,7 @@
           "name": "Reached config_hwf unit and sorted-clause TRACE records (subpaving_t_def.h:841,866)",
           "status": "ported",
           "go_targets": ["pkg/math/subpaving/hardware_clause_trace.go", "pkg/math/subpaving/hardware_clause.go"],
-          "tests": ["TestHardwareClauseAndUnitTracePublicationOrder", "TestHardwareClauseAndUnitTraceFailureBoundaries", "TestHardwareInequalityReferenceTraceClauseOrder"]
+          "tests": ["TestHardwareClauseAndUnitTracePublicationOrder", "TestHardwareClauseAndUnitTraceFailureBoundaries", "TestHardwareInequalityReferenceTraceSourceOrder"]
         },
         {
           "name": "Reached config_hwf clause-propagation TRACE records (subpaving_t_def.h:1376,1400)",

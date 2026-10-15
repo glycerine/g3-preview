@@ -9,7 +9,51 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/statistics"
 )
+
+func TestFixedShellSearchAndStatisticsForwarding(t *testing.T) {
+	m, err := numeral.NewFixedPointManager(2, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	q, err := numeral.NewRationalManager(numeral.RationalConfig{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	c, err := NewFixedContext(m, &control.Reslimit{Limit: 1000}, nil, 0, 2, 8192)
+	if err != nil {
+		t.Fatal(err)
+	}
+	w, err := NewFixedShellCoefficients(c, q)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		for _, e := range []error{w.Close(), c.Close(), q.CloseChecked(), m.Close()} {
+			if e != nil {
+				t.Error(e)
+			}
+		}
+	})
+	if err := w.Search(); err != nil {
+		t.Fatal(err)
+	}
+	if !c.searchStarted || len(c.leafQueue) != 0 {
+		t.Fatal("forwarded search did not consume root")
+	}
+	st := statistics.New()
+	if err := w.CollectStatistics(st); err != nil || st.Size() != 1 || st.Key(0) != "nodes" || st.UintValue(0) != 1 {
+		t.Fatal("forwarded search statistics", err)
+	}
+	if err := w.ResetStatistics(); err != nil {
+		t.Fatal(err)
+	}
+	st.Reset()
+	if err := w.CollectStatistics(st); err != nil || st.Size() != 1 || st.Key(0) != "nodes" || st.UintValue(0) != 1 {
+		t.Fatal("forwarded reset statistics", err)
+	}
+}
 
 func TestFixedShellExactCoefficientOwnerAndDirectedBound(t *testing.T) {
 	budget := arena.NewBudget(1 << 24)
