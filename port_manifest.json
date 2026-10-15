@@ -126518,6 +126518,12 @@
           ]
         },
         {
+          "name": "inf_eps_rational<inf_rational>(rational const&, Numeral const&) infinity-then-FIRST/EPS value construction and completed-member unwind (inf_eps_rational.h:92-95)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_eps_rational.go",
+          "tests": ["TestInfEpsInfPairConstructorOwnsIndependentComponents", "TestInfEpsInfFailurePrefixesImmediateRoots"]
+        },
+        {
           "name": "hash/display and owned component projections",
           "status": "partial",
           "go_target": "pkg/util/numeral/inf_eps_rational.go",

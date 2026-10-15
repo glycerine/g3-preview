@@ -83,6 +83,47 @@ func (s *RationalService) infEpsInfClone(src *OwnedInfEpsInfRational) (_lexOut O
 	}
 	return v, nil
 }
+
+// The pair constructor builds m_infty before the nested Numeral. A failed
+// nested copy destroys only members whose constructors finished.
+func (s *RationalService) infEpsInfFromPairLocked(i *Rational, n *OwnedInfRational) (_lexOut OwnedInfEpsInfRational, _lexErr error) {
+	if e := s.beginLexical(); e != nil {
+		return OwnedInfEpsInfRational{}, e
+	}
+	defer s.endLexicalEps(&_lexOut, &_lexErr)
+	v := s.infEpsInfEmpty()
+	if e := s.Manager.Copy(&v.infinity, i); e != nil {
+		s.abortLexicalRational(&v.infinity)
+		return OwnedInfEpsInfRational{}, e
+	}
+	if e := s.Manager.Copy(&v.numeral.First, &n.First); e != nil {
+		s.destroyLexicalRational(&v.infinity)
+		s.abortLexicalRational(&v.numeral.First)
+		return OwnedInfEpsInfRational{}, e
+	}
+	if e := s.Manager.Copy(&v.numeral.Second, &n.Second); e != nil {
+		s.destroyLexicalRational(&v.numeral.First)
+		s.destroyLexicalRational(&v.infinity)
+		s.abortLexicalRational(&v.numeral.Second)
+		return OwnedInfEpsInfRational{}, e
+	}
+	return v, nil
+}
+
+// InfEpsInfFromPair is the retained (rational, Numeral) value constructor.
+func (s *RationalService) InfEpsInfFromPair(i *OwnedRational, n *OwnedInfRational) (OwnedInfEpsInfRational, error) {
+	if e := s.lock(); e != nil {
+		return OwnedInfEpsInfRational{}, e
+	}
+	defer s.mu.Unlock()
+	if e := s.rationalScalarOwner(i); e != nil {
+		return OwnedInfEpsInfRational{}, e
+	}
+	if e := s.infScalarOwner(n); e != nil {
+		return OwnedInfEpsInfRational{}, e
+	}
+	return s.infEpsInfFromPairLocked(&i.Raw, n)
+}
 func (s *RationalService) InfEpsInfNewValue() (OwnedInfEpsInfRational, error) {
 	if e := s.lock(); e != nil {
 		return OwnedInfEpsInfRational{}, e
@@ -243,19 +284,13 @@ func (s *RationalService) infEpsInfConstant(which uint8) (_lexOut OwnedInfEpsInf
 	}
 	defer s.endLexicalEps(&_lexOut, &_lexErr)
 	v := s.infEpsInfEmpty()
-	var e error
 	n := &s.InfZeroField
 	if which == 1 {
 		n = &s.InfOneField
 	} else if which == 2 {
 		n = &s.InfMinusOneField
-	} else if which == 3 {
-		e = s.Manager.Copy(&v.infinity, &s.OneField)
 	}
-	if e == nil {
-		e = s.infCopy(&v.numeral, n)
-	}
-	if e != nil {
+	if e := s.infCopy(&v.numeral, n); e != nil {
 		s.infEpsInfDestroy(&v)
 		return OwnedInfEpsInfRational{}, e
 	}
@@ -271,7 +306,11 @@ func (s *RationalService) InfEpsInfMinusOne() (OwnedInfEpsInfRational, error) {
 	return s.infEpsInfConstant(2)
 }
 func (s *RationalService) InfEpsInfInfinity() (OwnedInfEpsInfRational, error) {
-	return s.infEpsInfConstant(3)
+	if e := s.lock(); e != nil {
+		return OwnedInfEpsInfRational{}, e
+	}
+	defer s.mu.Unlock()
+	return s.infEpsInfFromPairLocked(&s.OneField, &s.InfZeroField)
 }
 func (s *RationalService) InfEpsInfGetNumeral(v *OwnedInfEpsInfRational) (OwnedInfRational, error) {
 	if e := s.lock(); e != nil {
