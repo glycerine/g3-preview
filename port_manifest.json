@@ -153513,6 +153513,13 @@
           ]
         },
         {
+          "name": "retained MPF raw-result TRACE callers use native Go string assembly with the original numerical significand conversion and N/D classification",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mpf_raw_text.go",
+          "go_targets": ["pkg/util/numeral/mpf_value_input_trace.go", "pkg/util/numeral/mpf_round_integral_trace.go"],
+          "tests": ["TestArbitraryFloatRawStringLiteralClassification", "TestArbitraryFloatSetFloatRawTraceFormatterRefusal", "TestArbitraryFloatRoundIntegralTraceBranches", "TestArbitraryFloatRoundIntegralTraceSourceInsertions"]
+        },
+        {
           "name": "mpf.cpp:1572-1576; mpf.h:141 to_rational_string actual scoped rational, to_rational and original rational string return",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_rational_string.go",
@@ -154618,6 +154625,13 @@
             "TestArbitraryFloatRawStringWarmStreamReservation",
             "TestArbitraryFloatRawStringLiteralClassification"
           ]
+        },
+        {
+          "name": "retained MPF raw-result TRACE callers use native Go string assembly with the original numerical significand conversion and N/D classification",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mpf_raw_text.go",
+          "go_targets": ["pkg/util/numeral/mpf_value_input_trace.go", "pkg/util/numeral/mpf_round_integral_trace.go"],
+          "tests": ["TestArbitraryFloatRawStringLiteralClassification", "TestArbitraryFloatSetFloatRawTraceFormatterRefusal", "TestArbitraryFloatRoundIntegralTraceBranches", "TestArbitraryFloatRoundIntegralTraceSourceInsertions"]
         },
         {
           "name": "mpf.cpp:1572-1576; mpf.h:141 to_rational_string actual scoped rational, to_rational and original rational string return",

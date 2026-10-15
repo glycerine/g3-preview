@@ -5,7 +5,6 @@ import (
 	"io"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
-	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func (m *ArbitraryFloatManager) traceRoundIntegralRawOperand(value *ArbitraryFloat) error {
@@ -19,14 +18,7 @@ func (m *ArbitraryFloatManager) traceRoundIntegralRawOperand(value *ArbitraryFlo
 			if e := writeNumeralDisplayPart(w, "A = "); e != nil {
 				return e
 			}
-			var raw utext.OwnedString
-			if e := m.ToStringRaw(value, &raw); e != nil {
-				formatError = JoinNumericErrors(e, m.CleanupRawString())
-				raw.OwnAbort()
-				return formatError
-			}
-			defer raw.SourceDestroy()
-			s, e := raw.View().String()
+			s, e := m.RawString(value)
 			if e != nil {
 				formatError = e
 				return e

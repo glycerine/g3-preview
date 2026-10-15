@@ -33,6 +33,11 @@ func TestArbitraryFloatRawStringLiteralClassification(t *testing.T) {
 			if got != want || x != before {
 				t.Fatal("literal raw string", tc, negative, got, want)
 			}
+			native, e := m.RawString(&x)
+			serviceMust(t, e)
+			if native != want || x != before {
+				t.Fatal("native raw string", tc, negative, native, want)
+			}
 			out.SourceDestroy()
 			serviceMust(t, m.Del(&x))
 		}

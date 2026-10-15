@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
-	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func writeSetTracePart(w io.Writer, part string) error {
@@ -226,14 +225,7 @@ func (m *ArbitraryFloatManager) traceSetFloatRawResult(out *ArbitraryFloat) erro
 			if e := writeNumeralDisplayPart(w, "set: res = "); e != nil {
 				return e
 			}
-			var value utext.OwnedString
-			if e := m.ToStringRaw(out, &value); e != nil {
-				formatError = JoinNumericErrors(e, m.CleanupRawString())
-				value.OwnAbort()
-				return formatError
-			}
-			defer value.SourceDestroy()
-			formatted, e := value.View().String()
+			formatted, e := m.RawString(out)
 			if e != nil {
 				formatError = e
 				return e
