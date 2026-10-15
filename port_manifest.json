@@ -184805,6 +184805,12 @@
           ]
         },
         {
+          "name": "AST is_well_sorted sort-mismatch warning must include mk_ll_pp application, SMT2 expected and actual sorts, and SMT2 declaration (well_sorted.cpp:63-71); current Go warning stops after the argument index",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_well_sorted.go",
+          "tests": ["TestASTWellSortedApplicationGuardBranches"]
+        },
+        {
           "name": "remaining live direct warning_msg callers in unported API, parser, SMT, MUZ, opt and AST owners",
           "status": "partial",
           "tests": []
@@ -184972,6 +184978,12 @@
             "TestWarningBorrowedFlushFailurePersistsAcrossCalls",
             "TestDefaultExceptionSourceFormattedConstructor"
           ]
+        },
+        {
+          "name": "AST is_well_sorted sort-mismatch warning must include mk_ll_pp application, SMT2 expected and actual sorts, and SMT2 declaration (well_sorted.cpp:63-71); current Go warning stops after the argument index",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_well_sorted.go",
+          "tests": ["TestASTWellSortedApplicationGuardBranches"]
         },
         {
           "name": "remaining live direct warning_msg callers in unported API, parser, SMT, MUZ, opt and AST owners",
