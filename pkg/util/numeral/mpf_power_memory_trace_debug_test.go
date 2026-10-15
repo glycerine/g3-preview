@@ -75,7 +75,6 @@ func TestMPFPowerWrapperMemoryTraceFailedPayloadAndFinalizeGuard(t *testing.T) {
 	serviceMust(t, r.CompleteSourceInitialize())
 	var out bytes.Buffer
 	tags := diagnostic.NewTraceTagsWithWriter(&out)
-	serviceMust(t, tags.BindMemoryProcess(p))
 	tags.Enable("memory")
 	serviceMust(t, m.BindTrace(tags))
 	b.FailAfter(1)

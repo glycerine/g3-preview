@@ -40,7 +40,17 @@ func (w *arbitraryFloatPowerWrapper) tracePowerWrapperDeallocated() {
 		return
 	}
 	_ = tags.EmitConditional("memory", "deallocate", "src/util/memory_manager.cpp", 204,
-		func() bool { return !tags.MemoryFinalizing() }, func(out io.Writer) error {
+		func() bool {
+			if tags.MemoryFinalizing() {
+				return false
+			}
+			if runtime := w.manager.RuntimeOwner(); runtime != nil {
+				if process := runtime.ProcessOwner(); process != nil && process.Finalizing() {
+					return false
+				}
+			}
+			return true
+		}, func(out io.Writer) error {
 			for _, part := range [...]string{
 				"dealloc ", fmt.Sprintf("%p", w), " src/util/mpf.h:258\n",
 			} {
