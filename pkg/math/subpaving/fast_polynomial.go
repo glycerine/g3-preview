@@ -125,6 +125,12 @@ func (c *FastContext) PropagatePolynomial(variable uint32, n *FastNode) error {
 	if p == nil {
 		return arena.ErrInvalidSlot
 	}
+	if err := c.tracePolynomialVariable("propagate_polynomial", variable, true, "propagate_polynomial: ", 1467); err != nil {
+		return err
+	}
+	if err := c.tracePolynomialBounds(n); err != nil {
+		return err
+	}
 	p.visited = c.timestamp
 	unbounded := uint32(math.MaxUint32)
 	if n.lower[variable] == nil && n.upper[variable] == nil {
@@ -138,6 +144,9 @@ func (c *FastContext) PropagatePolynomial(variable uint32, n *FastNode) error {
 			}
 			unbounded = x
 		}
+	}
+	if err := c.tracePolynomialVariable("propagate_polynomial", unbounded, unbounded != math.MaxUint32, "unbounded_var: ", 1484); err != nil {
+		return err
 	}
 	if unbounded != math.MaxUint32 {
 		return c.propagatePolynomialTarget(p, variable, unbounded, n)
@@ -201,6 +210,9 @@ func (c *FastContext) propagatePolynomialTarget(p *FastPolynomial, variable, tar
 		for _, term := range p.terms {
 			if term.Variable == target {
 				coefficient = term.Coefficient
+				if err = c.tracePolynomialCoefficient(coefficient); err != nil {
+					return err
+				}
 				continue
 			}
 			if err = v.SetConstant(n, term.Variable); err != nil {
@@ -216,7 +228,13 @@ func (c *FastContext) propagatePolynomialTarget(p *FastPolynomial, variable, tar
 		if coefficient == nil {
 			return arena.ErrInvalidSlot
 		}
+		if err = c.tracePolynomialInterval(r, 1444, "r before mul 1/a: "); err != nil {
+			return err
+		}
 		if err = r.DivScalar(r, coefficient); err != nil {
+			return err
+		}
+		if err = c.tracePolynomialInterval(r, 1446, "r after mul 1/a:  "); err != nil {
 			return err
 		}
 	}
