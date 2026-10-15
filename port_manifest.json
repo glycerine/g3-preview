@@ -53386,6 +53386,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_init_trace.go",
           "tests": ["TestFixedRootInitializationTraceSourceOrderAndResume", "TestFixedRootInitializationTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Concrete config_mpfx bound publication and conflict TRACE before conflict/timestamp/queue transitions (subpaving_t_def.h:563-566)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_bound_trace.go",
+          "tests": ["TestFixedBoundTracePublicationAndConflictOrder", "TestFixedBoundTraceStreamAndPrinterFailurePrefix"]
         }
       ],
       "ownership": [
@@ -54816,6 +54822,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_init_trace.go",
           "tests": ["TestFixedRootInitializationTraceSourceOrderAndResume", "TestFixedRootInitializationTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Concrete config_mpfx bound publication and conflict TRACE before conflict/timestamp/queue transitions (subpaving_t_def.h:563-566)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_bound_trace.go",
+          "tests": ["TestFixedBoundTracePublicationAndConflictOrder", "TestFixedBoundTraceStreamAndPrinterFailurePrefix"]
         },
         {
           "name": "Concrete config_mpff round-robin variable selector after latest child axiom (src/math/subpaving/subpaving_t_def.h:66-101)",
@@ -177333,6 +177345,12 @@
           "tests": ["TestFixedRootInitializationTraceSourceOrderAndResume", "TestFixedRootInitializationTraceRefusalAndPrinterPrefix"]
         },
         {
+          "name": "Reached config_mpfx bound-publication and conflict TRACE records (subpaving_t_def.h:563-566)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_bound_trace.go",
+          "tests": ["TestFixedBoundTracePublicationAndConflictOrder", "TestFixedBoundTraceStreamAndPrinterFailurePrefix"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -178209,6 +178227,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_init_trace.go",
           "tests": ["TestFixedRootInitializationTraceSourceOrderAndResume", "TestFixedRootInitializationTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Reached config_mpfx bound-publication and conflict TRACE records (subpaving_t_def.h:563-566)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_bound_trace.go",
+          "tests": ["TestFixedBoundTracePublicationAndConflictOrder", "TestFixedBoundTraceStreamAndPrinterFailurePrefix"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

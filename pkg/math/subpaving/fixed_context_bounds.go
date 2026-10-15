@@ -284,14 +284,17 @@ func (c *FixedContext) publishBound(n *FixedNode, variable uint32, value *numera
 	b.timestamp = c.timestamp
 	b.decision = !enqueue
 	b.reason = reason
-	if enqueue {
-		c.queue = append(c.queue, b)
+	if err = c.traceNewBound(b); err != nil {
+		return err
 	}
 	conflict, e := n.ConflictingBounds(variable)
 	if e != nil {
 		return e
 	}
 	if conflict {
+		if err = c.traceBoundConflict(n); err != nil {
+			return err
+		}
 		n.inconsistent, n.conflictVar = true, variable
 		c.numConflicts++
 		c.removeFixedLeaf(n)
@@ -299,6 +302,9 @@ func (c *FixedContext) publishBound(n *FixedNode, variable uint32, value *numera
 	c.timestamp++
 	if c.timestamp == math.MaxUint64 {
 		return ErrFixedContextTimestamp
+	}
+	if enqueue {
+		c.queue = append(c.queue, b)
 	}
 	return nil
 }
