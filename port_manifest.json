@@ -54378,6 +54378,12 @@
           "tests": ["TestFixedMidpointSplitSourceBoundsTrace", "TestFixedMidpointSplitTraceRefusalKeepsChildren", "TestFixedMidpointSplitTracePrinterFailureKeepsChildren"]
         },
         {
+          "name": "Concrete config_mpq add_unit_clause inequality TRACE before inc_ref and unit publication (subpaving_t_def.h:865-868)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_unit_trace.go",
+          "tests": ["TestRationalUnitTracePrecedesReferenceAndPublication", "TestRationalUnitTraceFailureBoundaries"]
+        },
+        {
           "name": "Concrete config_hwf mk_var, mk_sum, and mk_ineq construction with sorted duplicate coefficient swaps (src/math/subpaving/subpaving_t_def.h:666-687,741-780)",
           "status": "partial",
           "go_target": "pkg/math/subpaving/hardware_context_constraints.go",
@@ -176929,6 +176935,12 @@
           "tests": ["TestFixedMidpointSplitSourceBoundsTrace", "TestFixedMidpointSplitTraceRefusalKeepsChildren", "TestFixedMidpointSplitTracePrinterFailureKeepsChildren"]
         },
         {
+          "name": "Reached config_mpq add_unit_clause inequality TRACE before reference and unit publication (subpaving_t_def.h:866)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_unit_trace.go",
+          "tests": ["TestRationalUnitTracePrecedesReferenceAndPublication", "TestRationalUnitTraceFailureBoundaries"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -177703,6 +177715,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_split_trace.go",
           "tests": ["TestFixedMidpointSplitSourceBoundsTrace", "TestFixedMidpointSplitTraceRefusalKeepsChildren", "TestFixedMidpointSplitTracePrinterFailureKeepsChildren"]
+        },
+        {
+          "name": "Reached config_mpq add_unit_clause inequality TRACE before reference and unit publication (subpaving_t_def.h:866)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_unit_trace.go",
+          "tests": ["TestRationalUnitTracePrecedesReferenceAndPublication", "TestRationalUnitTraceFailureBoundaries"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
