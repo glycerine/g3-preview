@@ -98178,7 +98178,8 @@
         "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
         "TestAIGManagerSeparateImpChargesAndConstructorPrefixes",
         "TestAIGDeletionTraceSourceCascadeOrderAndCompileGate",
-        "TestAIGExprCacheReleaseTracePrecedesLastReference"
+        "TestAIGExprCacheReleaseTracePrecedesLastReference",
+        "TestAIGTacticConstructorFailureMemoryTracePrefixes"
       ],
       "conditionals": [
         {
@@ -98513,7 +98514,8 @@
           "go_target": "pkg/tactic/aig/aig_imp_memory_trace.go",
           "tests": [
             "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
-            "TestAIGManagerSeparateImpChargesAndConstructorPrefixes"
+            "TestAIGManagerSeparateImpChargesAndConstructorPrefixes",
+            "TestAIGTacticConstructorFailureMemoryTracePrefixes"
           ]
         },
         {
@@ -98545,7 +98547,7 @@
         "Concrete AIG manager pins each variable AST expression, owns true/false counts and interning table nodes, and recursively releases child nodes when the last AIG reference closes. AIG-to-formula cache and output own ASTRef values; stopped AST releases remain with the manager for retry."
       ],
       "deviations": [
-        "Typed Go map replaces aig_table; literal inversion is a bool rather than pointer tagging. The mk_node minimizer, both gate encodings, expression-to-AIG traversal, goal conjunction and source naive AIG-to-expression conversion are ported. The optimized AIG-to-goal writer uses ITE shape recognition and source root/flattening order; max-sharing associative reuse and cache are implemented. Source checkpoints run at both retained frame loops. The separately charged Go managerImp owner emits successful-construction and destructor memory records; constructor-refusal source records remain open. The expr2aig converter now releases its cache before its result stack and emits the source dec-ref TRACE before each cache release. Display and remaining tactic integration remain open."
+        "Typed Go map replaces aig_table; literal inversion is a bool rather than pointer tagging. The mk_node minimizer, both gate encodings, expression-to-AIG traversal, goal conjunction and source naive AIG-to-expression conversion are ported. The optimized AIG-to-goal writer uses ITE shape recognition and source root/flattening order; max-sharing associative reuse and cache are implemented. Source checkpoints run at both retained frame loops. The separately charged Go managerImp owner emits successful-construction and destructor memory records; constructor-refusal allocation records now occur at both successful allocation boundaries before child construction. The expr2aig converter now releases its cache before its result stack and emits the source dec-ref TRACE before each cache release. Display and remaining tactic integration remain open."
       ]
     },
     {
@@ -98579,7 +98581,8 @@
         "TestAIGMaxSharingReassociatesTowardExistingPair",
         "TestAIGCheckpointSourceMemoryCancelAndCooperateOrder",
         "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
-        "TestAIGManagerSeparateImpChargesAndConstructorPrefixes"
+        "TestAIGManagerSeparateImpChargesAndConstructorPrefixes",
+        "TestAIGTacticConstructorFailureMemoryTracePrefixes"
       ],
       "conditionals": [
         {
@@ -98672,7 +98675,8 @@
           "go_target": "pkg/tactic/aig/aig_imp_memory_trace.go",
           "tests": [
             "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
-            "TestAIGManagerSeparateImpChargesAndConstructorPrefixes"
+            "TestAIGManagerSeparateImpChargesAndConstructorPrefixes",
+            "TestAIGTacticConstructorFailureMemoryTracePrefixes"
           ]
         }
       ],
@@ -98699,7 +98703,8 @@
         "TestAIGPassParamsBindMemoryEncodingAndWholeGoalBranch",
         "TestAIGPassCollectParamDescrsSourceOrderAndMetadata",
         "TestAIGPassSourceEntryWellSortedAssertionPrecedesManager",
-        "TestAIGTacticMemoryWrapperSourceAllocationAndRelease"
+        "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
+        "TestAIGTacticConstructorFailureMemoryTracePrefixes"
       ],
       "assertions": [
         {
@@ -98754,7 +98759,8 @@
           "status": "partial",
           "go_target": "pkg/tactic/aig/aig_tactic_memory_trace.go",
           "tests": [
-            "TestAIGTacticMemoryWrapperSourceAllocationAndRelease"
+            "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
+            "TestAIGTacticConstructorFailureMemoryTracePrefixes"
           ]
         }
       ],
@@ -98762,7 +98768,7 @@
         "Each Apply call owns a fresh AIG manager and closes its intermediate AIG and AST references after goal updates. The returned goal has one additional owner reference."
       ],
       "deviations": [
-        "Pass reads source max_memory, gate-encoding and per-assertion parameters, and binds memory/cancellation/cooperation checkpoints to its fresh AIG manager. Its descriptor collector registers source-ordered max_memory and aig_per_assertion metadata through util/params. The source SASSERT gate now checks goal well-sortedness at both source positions; a malformed entry goal reaches the process debug failure before manager construction. The tactic's alloc/dealloc memory wrapper and separate aig_manager::imp owner emit source-ordered records over independently charged Go owners. Constructor-refusal wrapper records, translation, generated registration, display and bound assertion action continuations remain open."
+        "Pass reads source max_memory, gate-encoding and per-assertion parameters, and binds memory/cancellation/cooperation checkpoints to its fresh AIG manager. Its descriptor collector registers source-ordered max_memory and aig_per_assertion metadata through util/params. The source SASSERT gate now checks goal well-sortedness at both source positions; a malformed entry goal reaches the process debug failure before manager construction. The tactic's alloc/dealloc memory wrapper and separate aig_manager::imp owner emit source-ordered records over independently charged Go owners. Constructor-refusal wrapper and imp allocation records now occur before child construction; translation, generated registration, display and bound assertion action continuations remain open."
       ]
     },
     {
@@ -151042,7 +151048,8 @@
         "TestASTInfoMemoryWrapperDebugRetainsSourceAllocation",
         "TestModelEvaluatorCompletedFunctionMemoryWrapperReleaseSites",
         "TestModelCopiedFunctionMemoryWrapperOwnerTransfer",
-        "TestAIGTacticMemoryWrapperSourceAllocationAndRelease"
+        "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
+        "TestAIGTacticConstructorFailureMemoryTracePrefixes"
       ],
       "conditionals": [
         {
@@ -151631,7 +151638,8 @@
           "status": "platform_replacement",
           "go_target": "pkg/tactic/aig/aig_tactic_memory_trace.go",
           "tests": [
-            "TestAIGTacticMemoryWrapperSourceAllocationAndRelease"
+            "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
+            "TestAIGTacticConstructorFailureMemoryTracePrefixes"
           ]
         },
         {
@@ -151639,7 +151647,8 @@
           "status": "platform_replacement",
           "go_target": "pkg/tactic/aig/aig_imp_memory_trace.go",
           "tests": [
-            "TestAIGTacticMemoryWrapperSourceAllocationAndRelease"
+            "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
+            "TestAIGTacticConstructorFailureMemoryTracePrefixes"
           ]
         }
       ],
@@ -151847,7 +151856,8 @@
         "TestASTInfoMemoryWrapperDebugRetainsSourceAllocation",
         "TestModelEvaluatorCompletedFunctionMemoryWrapperReleaseSites",
         "TestModelCopiedFunctionMemoryWrapperOwnerTransfer",
-        "TestAIGTacticMemoryWrapperSourceAllocationAndRelease"
+        "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
+        "TestAIGTacticConstructorFailureMemoryTracePrefixes"
       ],
       "conditionals": [
         {
@@ -152388,7 +152398,8 @@
           "status": "platform_replacement",
           "go_target": "pkg/tactic/aig/aig_tactic_memory_trace.go",
           "tests": [
-            "TestAIGTacticMemoryWrapperSourceAllocationAndRelease"
+            "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
+            "TestAIGTacticConstructorFailureMemoryTracePrefixes"
           ]
         },
         {
@@ -152396,7 +152407,8 @@
           "status": "platform_replacement",
           "go_target": "pkg/tactic/aig/aig_imp_memory_trace.go",
           "tests": [
-            "TestAIGTacticMemoryWrapperSourceAllocationAndRelease"
+            "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
+            "TestAIGTacticConstructorFailureMemoryTracePrefixes"
           ]
         }
       ],

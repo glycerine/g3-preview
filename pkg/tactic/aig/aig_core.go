@@ -121,15 +121,20 @@ func newManagerWithGateEncoding(m *ast.ASTManager, defaultGateEncoding, tacticOw
 	if e := m.BudgetField.Reserve(managerBytes); e != nil {
 		return nil, e
 	}
+	v := &Manager{ast: m, header: managerBytes}
+	v.self = v
+	if tacticOwner {
+		v.traceTacticAllocated()
+	}
 	if e := m.BudgetField.Reserve(impBytes); e != nil {
 		m.BudgetField.Release(managerBytes)
 		return nil, e
 	}
-	v := &Manager{ast: m, header: managerBytes, managerImp: &managerImp{
+	v.managerImp = &managerImp{
 		table: make(map[andKey]*node), impHeader: impBytes, nodeBytes: nodeBytes,
 		defaultGateEncoding: defaultGateEncoding, maxMemory: math.MaxUint64, runtime: numerals.RuntimeOwner(),
-	}}
-	v.self = v
+	}
+	v.traceImpAllocated()
 	h, e := m.MkTrue()
 	if e != nil {
 		m.BudgetField.Release(impBytes)
@@ -152,10 +157,6 @@ func newManagerWithGateEncoding(m *ast.ASTManager, defaultGateEncoding, tacticOw
 	v.trueNode = &node{id: 0, refs: 2, variable: r}
 	v.variables.next = 1
 	v.nodes = 1
-	if tacticOwner {
-		v.traceTacticAllocated()
-	}
-	v.traceImpAllocated()
 	return v, nil
 }
 
