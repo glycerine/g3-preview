@@ -31,10 +31,13 @@ func TestShellScopedTimerMemoryTraceSourceLifetime(t *testing.T) {
 	}
 	var out bytes.Buffer
 	tags := diagnostic.NewTraceTagsWithWriter(&out)
+	if err := tags.BindMemoryProcess(p); err != nil {
+		t.Fatal(err)
+	}
 	tags.Enable("memory")
 	s := NewTimeoutService(nil)
 	defer s.Close()
-	if err := s.BindMemoryTrace(tags, p); err != nil {
+	if err := s.BindMemoryTrace(tags); err != nil {
 		t.Fatal(err)
 	}
 	for _, disabled := range []int64{0, int64(math.MaxUint32)} {

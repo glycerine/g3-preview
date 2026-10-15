@@ -9,38 +9,34 @@ import (
 
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
-	"github.com/glycerine/g3/pkg/util/memory"
 )
 
 type timeoutMemoryTrace struct {
-	tags    *diagnostic.TraceTags
-	process *memory.ProcessAccounting
+	tags *diagnostic.TraceTags
 }
 
-func newTimeoutMemoryTrace(tags *diagnostic.TraceTags, process *memory.ProcessAccounting) control.ScopedTimerMemoryTrace {
+func newTimeoutMemoryTrace(tags *diagnostic.TraceTags) control.ScopedTimerMemoryTrace {
 	if !shellDebugOptions {
 		return nil
 	}
 	if tags == nil {
 		tags = diagnostic.BorrowProcessTraceTags()
 	}
-	return &timeoutMemoryTrace{tags: tags, process: process}
+	return &timeoutMemoryTrace{tags: tags}
 }
 
-func (s *TimeoutService) BindMemoryTrace(tags *diagnostic.TraceTags, process *memory.ProcessAccounting) error {
+func (s *TimeoutService) BindMemoryTrace(tags *diagnostic.TraceTags) error {
 	if s == nil || s.self != s {
 		return control.ErrOwner
-	}
-	if process != nil && !process.Valid() {
-		return memory.ErrRuntimeOwner
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.closed {
 		return control.ErrOwner
 	}
-	// A live timer retains the trace/process pair chosen at its allocation.
-	s.trace, s.process = tags, process
+	// A live timer retains the trace owner chosen at its allocation. The
+	// generated process binds its finalization flag to that owner directly.
+	s.trace = tags
 	return nil
 }
 
@@ -68,7 +64,7 @@ func (t *timeoutMemoryTrace) DeallocatedScopedTimer(timer *control.ScopedTimer) 
 		return
 	}
 	_ = t.tags.EmitConditional("memory", "deallocate", "src/util/memory_manager.cpp", 204,
-		func() bool { return t.process == nil || !t.process.Finalizing() }, func(w io.Writer) error {
+		func() bool { return !t.tags.MemoryFinalizing() }, func(w io.Writer) error {
 			return timeoutMemoryParts(w, "dealloc ", fmt.Sprintf("%p", timer), " src/util/scoped_timer.cpp:264\n")
 		})
 }

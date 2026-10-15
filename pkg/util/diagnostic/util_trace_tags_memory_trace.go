@@ -24,6 +24,12 @@ func (t *TraceTags) BindMemoryProcess(p *memory.ProcessAccounting) error {
 	return nil
 }
 
+// MemoryFinalizing exposes the process guard already bound to this trace
+// stream, so concrete allocation sites share the source global state.
+func (t *TraceTags) MemoryFinalizing() bool {
+	return t != nil && t.memoryProcess != nil && t.memoryProcess.Finalizing()
+}
+
 // The source allocation is traced before g_enabled_trace_tags is assigned.
 // Thus only enable_all_trace(true), not a tag in the new table, can enable it.
 func (t *TraceTags) traceTagTableAllocated() {
