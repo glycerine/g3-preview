@@ -236,15 +236,18 @@ func TestHeapSourceShapeAndLifetime(t *testing.T) {
 	}
 }
 
-func TestHeapBudgetsFailuresSwapAndWarm(t *testing.T) {
+func TestHeapNativeGrowthSwapAndWarm(t *testing.T) {
 	for prefix := int64(0); prefix < 5; prefix++ {
 		b := arena.NewBudget(1 << 20)
 		b.FailAfter(prefix)
 		h, e := New(32, Config{Budget: b})
-		if e == nil {
-			h.Close()
-		} else if !errors.Is(e, arena.ErrInjectedFailure) {
-			t.Fatal(e)
+		if prefix == 0 {
+			if !errors.Is(e, arena.ErrInjectedFailure) || h != nil {
+				t.Fatal("owner-header refusal", e)
+			}
+		} else {
+			heapMust(t, e)
+			heapMust(t, h.Close())
 		}
 		if b.Used() != 0 {
 			t.Fatal("constructor leak")
@@ -255,8 +258,8 @@ func TestHeapBudgetsFailuresSwapAndWarm(t *testing.T) {
 	heapMust(t, h.Insert(1))
 	before := b.Used()
 	b.FailAfter(0)
-	if e := h.Insert(2); !errors.Is(e, arena.ErrInjectedFailure) || h.Size() != 1 || !h.Contains(2) || b.Used() != before {
-		t.Fatal("growth publication", e)
+	if e := h.Insert(2); e != nil || h.Size() != 2 || !h.Contains(2) || b.Used() != before {
+		t.Fatal("native growth", e)
 	}
 	b.FailAfter(-1)
 	heapMust(t, h.Reset())
@@ -273,28 +276,22 @@ func TestHeapBudgetsFailuresSwapAndWarm(t *testing.T) {
 	if s.OwnerBytes+s.ValuesBytes+s.IndicesBytes != b.Used() {
 		t.Fatal("whole owned graph")
 	}
-	for fail := int64(0); fail < 2; fail++ {
-		otherBudget := arena.NewBudget(1 << 20)
-		other := testInt(t, 4, Config{Budget: otherBudget})
-		heapMust(t, other.Insert(3))
-		a, c := b.Used(), otherBudget.Used()
-		b.FailAfter(fail)
-		e := h.Swap(other)
-		b.FailAfter(-1)
-		if e != nil {
-			if !errors.Is(e, arena.ErrInjectedFailure) || b.Used() != a || otherBudget.Used() != c || !other.Contains(3) {
-				t.Fatal("failed swap", e)
-			}
-		} else {
-			if !h.Contains(3) || !other.Empty() {
-				t.Fatal("swapped backing")
-			}
-			heapMust(t, h.Swap(other))
-		}
-		heapMust(t, other.Close())
-		if otherBudget.Used() != 0 {
-			t.Fatal("swap leak")
-		}
+	otherBudget := arena.NewBudget(1 << 20)
+	other := testInt(t, 4, Config{Budget: otherBudget})
+	heapMust(t, other.Insert(3))
+	a, c := b.Used(), otherBudget.Used()
+	b.FailAfter(0)
+	otherBudget.FailAfter(0)
+	heapMust(t, h.Swap(other))
+	if !h.Contains(3) || !other.Empty() || b.Used() != a || otherBudget.Used() != c {
+		t.Fatal("native cross-budget swap")
+	}
+	heapMust(t, h.Swap(other))
+	b.FailAfter(-1)
+	otherBudget.FailAfter(-1)
+	heapMust(t, other.Close())
+	if otherBudget.Used() != 0 {
+		t.Fatal("swap leak")
 	}
 	heapMust(t, h.Close())
 	if b.Used() != 0 {
@@ -365,123 +362,83 @@ func TestHeapEpochBoundsIteratorAndComparatorSwap(t *testing.T) {
 	}
 }
 
-func TestHeapSourceBoundsGrowth(t *testing.T) {
+func TestHeapNativeBoundsGrowth(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
 	h := testInt(t, 32, Config{Budget: b})
-	if cap(h.indices) != 41 {
-		t.Fatal("source repeated resize expansion", cap(h.indices))
+	before := b.Used()
+	b.FailAfter(0)
+	heapMust(t, h.SetBounds(100))
+	heapMust(t, h.SetBounds(10000))
+	if h.Bounds() != 10000 || b.Used() != before {
+		t.Fatal("native bounds growth", h.Bounds(), b.Used(), before)
 	}
-	b.FailAfter(1)
-	if e := h.SetBounds(100); !errors.Is(e, arena.ErrInjectedFailure) || h.Bounds() != 32 || cap(h.indices) != 62 {
-		t.Fatal("source capacity-only failure prefix", e, h.Bounds(), cap(h.indices))
+	heapMust(t, h.SetBounds(1))
+	heapMust(t, h.SetBounds(10000))
+	if h.Contains(9999) {
+		t.Fatal("regrowth retained removed inverse index")
 	}
 	b.FailAfter(-1)
-	heapMust(t, h.SetBounds(100))
-	if cap(h.indices) != 140 {
-		t.Fatal("source bounds capacity", cap(h.indices))
-	}
-	heapMust(t, h.SetBounds(10000))
-	if cap(h.indices) != 12137 {
-		t.Fatal("source large resize", cap(h.indices))
-	}
 }
 
-func TestHeapCopyAndAllocationSizeBoundary(t *testing.T) {
-	if n, e := nextCapacity(0); n != 2 || e != nil {
-		t.Fatal(n, e)
-	}
-	if n, e := nextCapacity(41); n != 62 || e != nil {
-		t.Fatal(n, e)
-	}
-	if _, e := nextCapacity(800000000); !errors.Is(e, arena.ErrSlotLimit) {
-		t.Fatal("source unsigned byte-size overflow", e)
-	}
+func TestHeapNativeCloneAssignOwnership(t *testing.T) {
 	b := arena.NewBudget(1 << 20)
 	h := testInt(t, 32, Config{Budget: b})
 	for _, v := range []int32{4, 2, 6, 1} {
 		heapMust(t, h.Insert(v))
 	}
 	copyBudget := arena.NewBudget(1 << 20)
+	before := copyBudget.Used()
+	copyBudget.FailAfter(0)
+	if got, e := h.Clone(copyBudget); got != nil || !errors.Is(e, arena.ErrInjectedFailure) || copyBudget.Used() != before {
+		t.Fatal("cold owner header", got, e, copyBudget.Used())
+	}
+	copyBudget.FailAfter(1)
 	c, e := h.Clone(copyBudget)
 	heapMust(t, e)
-	defer c.Close()
-	if cap(c.values) != cap(h.values) || cap(c.indices) != cap(h.indices) {
-		t.Fatal("source copied vector capacity or nonsource scratch", c.Stats())
+	if copyBudget.Used() != before+ownerBytes || c.Stats().ValuesBytes != 0 || c.Stats().IndicesBytes != 0 {
+		t.Fatal("native copy charged backing", c.Stats(), copyBudget.Used())
 	}
+	copyBudget.FailAfter(-1)
 	heapMust(t, c.Erase(2))
 	if !h.Contains(2) {
 		t.Fatal("copy aliases source")
 	}
-	for prefix := int64(0); prefix < 3; prefix++ {
-		before := copyBudget.Used()
-		copyBudget.FailAfter(prefix)
-		got, err := h.Clone(copyBudget)
-		if got != nil {
-			got.Close()
-		}
-		if !errors.Is(err, arena.ErrInjectedFailure) || copyBudget.Used() != before {
-			t.Fatal("copy failed prefix", prefix, err)
-		}
-	}
-	copyBudget.FailAfter(-1)
 	it := c.Begin()
-	for prefix := int64(0); prefix < 2; prefix++ {
-		candidate := testInt(t, 4, Config{Budget: copyBudget})
-		heapMust(t, candidate.Insert(1))
-		before := copyBudget.Used()
-		oldValues, oldIndices := uint64(cap(candidate.values))*4, uint64(cap(candidate.indices))*4
-		copyBudget.FailAfter(prefix)
-		err := candidate.Assign(h)
-		want := before - oldValues
-		if prefix == 1 {
-			want += uint64(cap(h.values))*4 - oldIndices
-		}
-		if !errors.Is(err, arena.ErrInjectedFailure) || copyBudget.Used() != want {
-			t.Fatal("source destructive member frontier", prefix, err, copyBudget.Used(), want)
-		}
-		copyBudget.FailAfter(-1)
-		heapMust(t, candidate.CleanupStopped())
-	}
+	copyBudget.FailAfter(0)
 	heapMust(t, c.Assign(h))
-	if !c.Contains(2) || !c.CheckInvariant() {
-		t.Fatal("assignment")
+	if !c.Contains(2) || !c.CheckInvariant() || copyBudget.Used() != before+ownerBytes {
+		t.Fatal("native assignment", c.Stats(), copyBudget.Used())
 	}
 	if _, e := it.Value(); !errors.Is(e, arena.ErrInvalidSlot) {
 		t.Fatal("assignment invalidation", e)
 	}
 	heapMust(t, c.Assign(c))
+	copyBudget.FailAfter(-1)
 	heapMust(t, c.Close())
 	if copyBudget.Used() != 0 {
 		t.Fatal("copy owner leak")
 	}
 }
 
-func TestHeapSwapSecondReservationAndFinitePeak(t *testing.T) {
-	ab, bb := arena.NewBudget(1<<20), arena.NewBudget(1<<20)
+func TestHeapNativeCrossBudgetSwapAndFiniteOwner(t *testing.T) {
+	ab, bb := arena.NewBudget(ownerBytes), arena.NewBudget(ownerBytes)
 	a := testInt(t, 32, Config{Budget: ab})
 	b := testInt(t, 4, Config{Budget: bb})
 	heapMust(t, a.Insert(1))
 	heapMust(t, b.Insert(2))
 	ai, bi := a.Begin(), b.Begin()
-	au, bu := ab.Used(), bb.Used()
+	ab.FailAfter(0)
 	bb.FailAfter(0)
-	if e := a.Swap(b); !errors.Is(e, arena.ErrInjectedFailure) || ab.Used() != au || bb.Used() != bu || !a.Contains(1) || !b.Contains(2) {
-		t.Fatal("second swap reserve rollback", e)
+	heapMust(t, a.Swap(b))
+	if !a.Contains(2) || !b.Contains(1) || ab.Used() != ownerBytes || bb.Used() != ownerBytes {
+		t.Fatal("native cross-budget swap", ab.Used(), bb.Used())
 	}
-	if _, e := ai.Value(); e != nil {
-		t.Fatal("failed swap invalidated first owner", e)
+	if _, e := ai.Value(); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("first iterator survived swap", e)
 	}
-	if _, e := bi.Value(); e != nil {
-		t.Fatal("failed swap invalidated second owner", e)
+	if _, e := bi.Value(); !errors.Is(e, arena.ErrInvalidSlot) {
+		t.Fatal("second iterator survived swap", e)
 	}
+	ab.FailAfter(-1)
 	bb.FailAfter(-1)
-	// Constructor bounds2 uses indices capacity2. Exact retained graph fits;
-	// one further insert needs replacement values capacity3 while cap2 lives.
-	peak := arena.NewBudget(ownerBytes + 2*4 + 2*4 + 3*4 - 1)
-	p := testInt(t, 2, Config{Budget: peak})
-	heapMust(t, p.Insert(0))
-	used := peak.Used()
-	if e := p.Insert(1); !errors.Is(e, arena.ErrBudget) || peak.Used() != used || !p.Contains(1) || !p.CheckInvariant() {
-		t.Fatal("old plus new capacity refusal", e)
-	}
 }

@@ -9,8 +9,6 @@ import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
-var ErrStopped = errors.New("g3: heap source assignment stopped after destruction")
-
 var ErrValue = errors.New("g3: invalid, absent, or duplicate heap value")
 var ErrOwner = errors.New("g3: invalid heap owner")
 
@@ -30,8 +28,6 @@ type Config struct {
 // Do not copy an owning Int value; use Clone or Assign for source deep copies.
 type Int struct {
 	self            *Int
-	destroyed       uint8
-	sourceStop      error
 	values, indices []int32
 	budget          *arena.Budget
 	less            func(int32, int32) bool
@@ -41,22 +37,6 @@ type Int struct {
 }
 
 var ownerBytes = uint64(reflect.TypeOf(Int{}).Size())
-
-func nextCapacity(old uint64) (uint64, error) {
-	n := uint64(2)
-	if old != 0 {
-		if old > uint64(1<<32-1) {
-			return 0, arena.ErrSlotLimit
-		}
-		n = (3*old + 1) / 2
-	}
-	// Source SZ is uint32, including allocation byte-size arithmetic and
-	// the two source vector header words. Go additionally bounds host ints.
-	if n <= old || n > (uint64(1<<32-1)-8)/4 || n > uint64(^uint(0)>>1)/4 {
-		return 0, arena.ErrSlotLimit
-	}
-	return n, nil
-}
 
 type Stats struct {
 	OwnerBytes, ValuesBytes, IndicesBytes uint64
@@ -71,10 +51,6 @@ func New(bounds int32, c Config) (*Int, error) {
 	}
 	h := &Int{budget: c.Budget, less: c.Less, debug: c.Debug, epoch: 1}
 	h.self = h
-	if e := h.grow(&h.values, 1); e != nil {
-		h.Close()
-		return nil, e
-	}
 	h.values = append(h.values, -1)
 	if e := h.SetBounds(bounds); e != nil {
 		h.Close()
@@ -155,34 +131,12 @@ func (h *Int) cassertInvariant() error {
 	return walk(1)
 }
 
-// Source resize repeatedly expands by (3*old+1)/2, starting at two.
-// Each successful expansion remains retained if a later reservation fails.
-// Old and replacement storage are both charged while copying.
-func (h *Int) grow(v *[]int32, need int) error {
-	for need > cap(*v) {
-		n, e := nextCapacity(uint64(cap(*v)))
-		if e != nil {
-			return e
-		}
-		if e := h.budget.Reserve(n * 4); e != nil {
-			return e
-		}
-		next := make([]int32, len(*v), int(n))
-		copy(next, *v)
-		h.budget.Release(uint64(cap(*v)) * 4)
-		*v = next
-	}
-	return nil
-}
 func (h *Int) alive() error {
 	if h == nil || h.self != h {
 		return ErrOwner
 	}
 	if h.closed {
 		return arena.ErrClosed
-	}
-	if h.sourceStop != nil {
-		return h.sourceStop
 	}
 	return nil
 }
@@ -220,8 +174,7 @@ func (h *Int) Contains(v int32) bool {
 	return h != nil && h.self == h && !h.closed && v >= 0 && int64(v) < int64(len(h.indices)) && h.indices[v] != 0
 }
 
-// CheckInvariant checks live values, as the source traversal does. Failed
-// insertion can leave additional inverse entries that this check does not visit.
+// CheckInvariant checks live values, as the source traversal does.
 func (h *Int) CheckInvariant() bool {
 	if h == nil || h.self != h || h.closed || len(h.values) == 0 || h.values[0] != -1 {
 		return false
@@ -287,13 +240,9 @@ func (h *Int) Insert(v int32) error {
 		return arena.ErrSlotLimit
 	}
 	i := int32(len(h.values))
-	// Source publishes membership before the fallible vector push. Preserve
-	// that inverse index even when the replacement backing cannot be reserved.
+	// Source publishes membership before appending the value.
 	h.indices[v] = i
 	h.epoch++
-	if e := h.grow(&h.values, len(h.values)+1); e != nil {
-		return e
-	}
 	h.values = append(h.values, v)
 	if e := h.up(i); e != nil {
 		return e
@@ -341,9 +290,7 @@ func (h *Int) Erase(v int32) error {
 		return e
 	}
 	if !h.Contains(v) || h.indices[v] < 1 || int64(h.indices[v]) >= int64(len(h.values)) {
-		// A failed source insert can leave a nonzero inverse index without
-		// a value slot. Guard the source's next out-of-bounds access, retaining
-		// the completed prefix. In-range indices still follow source actions.
+		// Guard an invalid inverse position before indexing the native slice.
 		return ErrValue
 	}
 	i := h.indices[v]
@@ -371,9 +318,7 @@ func (h *Int) Increased(v int32) error {
 		return e
 	}
 	if !h.Contains(v) || h.indices[v] < 1 || int64(h.indices[v]) >= int64(len(h.values)) {
-		// A failed source insert can leave a nonzero inverse index without
-		// a value slot. Guard the source's next out-of-bounds access, retaining
-		// the completed prefix. In-range indices still follow source actions.
+		// Guard an invalid inverse position before indexing the native slice.
 		return ErrValue
 	}
 	h.epoch++
@@ -387,9 +332,7 @@ func (h *Int) Decreased(v int32) error {
 		return e
 	}
 	if !h.Contains(v) || h.indices[v] < 1 || int64(h.indices[v]) >= int64(len(h.values)) {
-		// A failed source insert can leave a nonzero inverse index without
-		// a value slot. Guard the source's next out-of-bounds access, retaining
-		// the completed prefix. In-range indices still follow source actions.
+		// Guard an invalid inverse position before indexing the native slice.
 		return ErrValue
 	}
 	h.epoch++
@@ -418,13 +361,11 @@ func (h *Int) SetBounds(n int32) error {
 			}
 		}
 	}
-	if e := h.grow(&h.indices, int(n)); e != nil {
-		return e
-	}
 	old := len(h.indices)
-	h.indices = h.indices[:n]
 	if int(n) > old {
-		clear(h.indices[old:])
+		h.indices = append(h.indices, make([]int32, int(n)-old)...)
+	} else {
+		h.indices = h.indices[:n]
 	}
 	h.epoch++
 	return h.cassertInvariant()
@@ -496,19 +437,6 @@ func (h *Int) Swap(other *Int) error {
 	if e := other.canChange(); e != nil {
 		return e
 	}
-	a := uint64(cap(h.values)+cap(h.indices)) * 4
-	b := uint64(cap(other.values)+cap(other.indices)) * 4
-	if h.budget != other.budget {
-		if e := h.budget.Reserve(b); e != nil {
-			return e
-		}
-		if e := other.budget.Reserve(a); e != nil {
-			h.budget.Release(b)
-			return e
-		}
-		h.budget.Release(a)
-		other.budget.Release(b)
-	}
 	h.values, other.values = other.values, h.values
 	h.indices, other.indices = other.indices, h.indices
 	h.epoch++
@@ -519,8 +447,7 @@ func (h *Int) Swap(other *Int) error {
 	return h.cassertInvariant()
 }
 
-// Clone implements the source implicit heap copy constructor. Vector capacities
-// are copied exactly.
+// Clone implements the source implicit heap copy constructor with native slices.
 func (h *Int) Clone(budget *arena.Budget) (*Int, error) {
 	if e := h.alive(); e != nil {
 		return nil, e
@@ -530,26 +457,12 @@ func (h *Int) Clone(budget *arena.Budget) (*Int, error) {
 	}
 	c := &Int{budget: budget, less: h.less, debug: h.debug, epoch: 1}
 	c.self = c
-	for _, p := range []struct {
-		src []int32
-		dst *[]int32
-	}{{h.values, &c.values}, {h.indices, &c.indices}} {
-		if cap(p.src) == 0 {
-			continue
-		}
-		if e := budget.Reserve(uint64(cap(p.src)) * 4); e != nil {
-			c.Close()
-			return nil, e
-		}
-		*p.dst = make([]int32, len(p.src), cap(p.src))
-		copy(*p.dst, p.src)
-	}
+	c.values = append([]int32(nil), h.values...)
+	c.indices = append([]int32(nil), h.indices...)
 	return c, nil
 }
 
-// Assign executes implicit base assignment followed by vector members in
-// declaration order. A refused copy retains the destroyed source field and
-// an actual consumed-ownership receipt; only CleanupStopped acknowledges it.
+// Assign copies the comparator and both concrete value slices in source order.
 func (h *Int) Assign(other *Int) error {
 	if e := h.alive(); e != nil {
 		return e
@@ -564,79 +477,27 @@ func (h *Int) Assign(other *Int) error {
 		return e
 	}
 	h.less = other.less
-	for i := uint8(0); i < 2; i++ {
-		dst, src := &h.values, other.values
-		if i == 1 {
-			dst, src = &h.indices, other.indices
-		}
-		h.budget.Release(uint64(cap(*dst)) * 4)
-		h.destroyed |= 1 << i
-		if cap(src) == 0 {
-			*dst = nil
-			h.destroyed &^= 1 << i
-			continue
-		}
-		if e := h.budget.Reserve(uint64(cap(src)) * 4); e != nil {
-			h.sourceStop = e
-			return e
-		}
-		next := make([]int32, len(src), cap(src))
-		copy(next, src)
-		*dst = next
-		h.destroyed &^= 1 << i
-	}
+	h.values = append(h.values[:0], other.values...)
+	h.indices = append(h.indices[:0], other.indices...)
 	h.epoch++
 	return nil
-}
-
-// CleanupStopped releases an assignment prefix after a source-ordered copy
-// refusal. It does not retry the assignment or reconstruct destroyed fields.
-func (h *Int) CleanupStopped() error {
-	if h == nil || h.self != h {
-		return ErrOwner
-	}
-	if h.closed {
-		return nil
-	}
-	if h.destroyed&1 != 0 {
-		h.values = nil
-	}
-	if h.destroyed&2 != 0 {
-		h.indices = nil
-	}
-	h.destroyed = 0
-	cause := h.sourceStop
-	h.sourceStop = nil
-	e := h.Close()
-	h.sourceStop = cause
-	return e
 }
 
 func (h *Int) Stats() Stats {
 	if h == nil || h.self != h || h.closed {
 		return Stats{}
 	}
-	v, i := uint64(cap(h.values))*4, uint64(cap(h.indices))*4
-	if h.destroyed&1 != 0 {
-		v = 0
-	}
-	if h.destroyed&2 != 0 {
-		i = 0
-	}
-	return Stats{ownerBytes, v, i}
+	return Stats{OwnerBytes: ownerBytes}
 }
 func (h *Int) Close() error {
 	if h != nil && h.self != h {
 		return ErrOwner
 	}
-	if h != nil && h.sourceStop != nil {
-		return h.sourceStop
-	}
 	if h == nil || h.closed {
 		return nil
 	}
 	s := h.Stats()
-	h.budget.Release(s.OwnerBytes + s.ValuesBytes + s.IndicesBytes)
+	h.budget.Release(s.OwnerBytes)
 	h.values = nil
 	h.indices = nil
 	h.less = nil
