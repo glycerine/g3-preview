@@ -19,6 +19,7 @@ import (
 // No reservation here claims to account for the transient host Go allocations.
 type astTraceFile struct {
 	self             *astTraceFile
+	owner            *ASTManager
 	budget           *arena.Budget
 	header           uint64
 	stream           utext.NumericTextStream

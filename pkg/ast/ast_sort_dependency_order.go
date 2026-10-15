@@ -10,6 +10,7 @@ type sortDependencyOrder struct {
 	roots []ASTHandle
 	deps  map[ASTHandle][]ASTHandle
 	trace *udiag.TraceTags
+	owner *ASTManager
 }
 
 // insertASTSort supplies the parameter-sort edges collected by
@@ -30,6 +31,7 @@ func (o *sortDependencyOrder) insertASTSort(m *ASTManager, sort ASTHandle) error
 	if o.trace == nil {
 		o.trace = m.traceTags
 	}
+	o.owner = m
 	var deps []ASTHandle
 	info := m.sortAt(r.slot).info
 	if info != (ASTSortInfo{}) {

@@ -5,6 +5,7 @@ package ast
 import (
 	"bytes"
 	"math"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
@@ -14,6 +15,7 @@ import (
 	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -35,7 +37,15 @@ func TestASTMemoryWrappersFollowOwnerProcessWithUnboundTrace(t *testing.T) {
 	var output bytes.Buffer
 	tags := udiag.NewTraceTagsWithWriter(&output)
 	tags.Enable("memory")
-	m, err := NewASTManager(ASTManagerConfig{Symbols: s, Numerals: q, Budget: b, TraceTags: tags})
+	name := uparams.LiteralParamsStringView(filepath.Join(t.TempDir(), "ast-finalize.log"))
+	m, err := NewSourceASTManager(ASTManagerConfig{Symbols: s, Numerals: q, Budget: b, TraceTags: tags}, &name)
+	astTestMust(t, err)
+	if m.TraceFile == nil {
+		t.Fatal("source AST trace file was not constructed")
+	}
+	sort, err := m.MkUninterpretedSort(astTestSymbol(t, m, "OwnerSort"), nil)
+	astTestMust(t, err)
+	ref, err := m.NewRef(sort)
 	astTestMust(t, err)
 	if !strings.Contains(output.String(), "alloc ") {
 		t.Fatalf("missing AST allocation records: %q", output.String())
@@ -44,9 +54,13 @@ func TestASTMemoryWrappersFollowOwnerProcessWithUnboundTrace(t *testing.T) {
 	if active, err := p.BeginFinalize(); err != nil || !active {
 		t.Fatalf("source finalization: active=%v err=%v", active, err)
 	}
+	collector := newASTDeclCollector(m, true)
+	collector.sorts = []ASTHandle{sort}
+	astTestMust(t, collector.orderDeps())
+	astTestMust(t, m.DelRef(&ref))
 	astTestMust(t, m.Close())
-	if tail := output.String()[before:]; strings.Contains(tail, "dealloc ") {
-		t.Fatalf("AST owner emitted deallocation during process finalization: %q", tail)
+	if tail := output.String()[before:]; !strings.Contains(tail, "sort_set ") || strings.Contains(tail, "dealloc ") {
+		t.Fatalf("AST file/dependency/manager records during process finalization: %q", tail)
 	}
 	astTestMust(t, p.CompleteFinalize())
 	astTestMust(t, q.Close())

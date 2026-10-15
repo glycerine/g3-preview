@@ -47,7 +47,7 @@ func (o *sortDependencyOrder) traceDependencySetsDeallocated() {
 	}
 	for i := range o.roots {
 		_ = tags.EmitConditional("memory", "deallocate", "src/util/memory_manager.cpp", 204,
-			func() bool { return !tags.MemoryFinalizing() }, func(w io.Writer) error {
+			func() bool { return !o.owner.astMemoryFinalizing(tags) }, func(w io.Writer) error {
 				for _, part := range [...]string{
 					"dealloc ", o.dependencySetIdentity(i), " src/util/top_sort.h:79\n",
 				} {

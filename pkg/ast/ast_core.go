@@ -118,6 +118,9 @@ func constructSourceASTManagerAt(c ASTManagerConfig, format bool, filename Trace
 	m.TraceStream = borrowedTrace
 	if filename != nil {
 		file, err := newASTTraceFileBorrowed(c.Budget, filename, c.TraceTags)
+		if file != nil {
+			file.owner = m
+		}
 		if err != nil {
 			m.constructorPendingFile = file
 			return fail(err)
