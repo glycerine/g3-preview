@@ -179013,10 +179013,10 @@
           "tests": ["TestSATConflictInitNotLiteralSourceTrace", "TestSATConflictInitFullSolverLemmaAndAssignmentTrace"]
         },
         {
-          "name": "SAT get_consequences conditional inconsistent/display and unsat TRACE bodies at source branches (sat_solver.cpp:3420,3450); end-to-end branch fixture open",
-          "status": "partial",
+          "name": "Reached SAT get_consequences conditional inconsistent/display and unsat TRACE bodies at source branches (sat_solver.cpp:3420,3450)",
+          "status": "ported",
           "go_target": "pkg/sat/sat_solver_consequences_trace.go",
-          "tests": ["TestSATConsequenceConditionalSourceTraceBodies"]
+          "tests": ["TestSATConsequenceConditionalSourceTraceBodies", "TestSATConsequenceConditionalTraceReachedBySearch"]
         },
         {
           "name": "SAT reassert_min_core TRACE at sat_solver.cpp:1130 is unreachable: reassert_min_core and update_min_core have no C++ callers",
@@ -180489,10 +180489,10 @@
           "tests": ["TestSATConflictInitNotLiteralSourceTrace", "TestSATConflictInitFullSolverLemmaAndAssignmentTrace"]
         },
         {
-          "name": "SAT get_consequences conditional inconsistent/display and unsat TRACE bodies at source branches (sat_solver.cpp:3420,3450); end-to-end branch fixture open",
-          "status": "partial",
+          "name": "Reached SAT get_consequences conditional inconsistent/display and unsat TRACE bodies at source branches (sat_solver.cpp:3420,3450)",
+          "status": "ported",
           "go_target": "pkg/sat/sat_solver_consequences_trace.go",
-          "tests": ["TestSATConsequenceConditionalSourceTraceBodies"]
+          "tests": ["TestSATConsequenceConditionalSourceTraceBodies", "TestSATConsequenceConditionalTraceReachedBySearch"]
         },
         {
           "name": "SAT reassert_min_core TRACE at sat_solver.cpp:1130 is unreachable: reassert_min_core and update_min_core have no C++ callers",
