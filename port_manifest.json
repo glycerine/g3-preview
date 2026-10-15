@@ -14310,9 +14310,14 @@
       "path": "src/ast/expr_abstract.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_expr_abstract.go"
+      ],
+      "tests": [
+        "TestExprAbstractorNativePatternAndNestedBinder",
+        "TestExprAbstractorRetainsInterruptedTemporaryUntilClose"
+      ],
       "assertions": [
         {
           "line": 31,
@@ -14325,17 +14330,39 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "expr_abstractor iterative app and nested-quantifier body/pattern rewrite with borrowed native stack/map and owned generated-reference slice",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr_abstract.go",
+          "tests": [
+            "TestExprAbstractorNativePatternAndNestedBinder",
+            "TestExprAbstractorRetainsInterruptedTemporaryUntilClose"
+          ]
+        },
+        {
+          "name": "mk_forall/mk_exists wrapper construction, expr_abstract TRACE pretty printing and source assertion profiles",
+          "status": "unported",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Go Abstract writes an ASTRef result and retains interrupted temporary references for explicit Close; the C++ stack owner destructs lexically. Native slices and a map replace ptr_vector and obj_map storage."
+      ]
     },
     {
       "path": "src/ast/expr_abstract.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/ast/ast_expr_abstract.go"
+      ],
+      "tests": [
+        "TestExprAbstractorNativePatternAndNestedBinder",
+        "TestExprAbstractorRetainsInterruptedTemporaryUntilClose"
+      ],
       "conditionals": [
         {
           "line": 19,
@@ -14348,9 +14375,26 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "expr_abstractor iterative app and nested-quantifier body/pattern rewrite with borrowed native stack/map and owned generated-reference slice",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr_abstract.go",
+          "tests": [
+            "TestExprAbstractorNativePatternAndNestedBinder",
+            "TestExprAbstractorRetainsInterruptedTemporaryUntilClose"
+          ]
+        },
+        {
+          "name": "mk_forall/mk_exists wrapper construction, expr_abstract TRACE pretty printing and source assertion profiles",
+          "status": "unported",
+          "tests": []
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Go Abstract writes an ASTRef result and retains interrupted temporary references for explicit Close; the C++ stack owner destructs lexically. Native slices and a map replace ptr_vector and obj_map storage."
+      ]
     },
     {
       "path": "src/ast/expr_delta_pair.h",
@@ -150040,6 +150084,15 @@
           ]
         },
         {
+          "name": "Concrete expr_abstractor obj_map<expr,expr*> remapping and discovery replaced by map[ASTHandle]ASTHandle (expr_abstract.cpp:34-107)",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_expr_abstract.go",
+          "tests": [
+            "TestExprAbstractorNativePatternAndNestedBinder",
+            "TestExprAbstractorRetainsInterruptedTemporaryUntilClose"
+          ]
+        },
+        {
           "name": "u_map<uint32> construction/copy/destruction",
           "status": "partial",
           "go_target": "",
@@ -171416,6 +171469,15 @@
           "go_target": "pkg/math/subpaving/inequality_buffer_release.go",
           "go_targets": ["pkg/math/subpaving/tactic/rational_expr_converter.go", "pkg/math/subpaving/tactic/goal_internalize.go", "pkg/math/subpaving/tactic/fast_goal_internalize.go", "pkg/math/subpaving/tactic/fixed_goal_internalize.go", "pkg/math/subpaving/tactic/arbitrary_goal_internalize.go"],
           "tests": ["TestSubpavingTemporaryInequalityBufferUnwind", "TestFastExprConverterTermsAndClause", "TestFixedExprConverterTermsAndClause"]
+        },
+        {
+          "name": "Concrete expr_abstractor nested-pattern expr_ref_buffer owns each rewritten pattern until quantifier publication (expr_abstract.cpp:80-96)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr_abstract.go",
+          "tests": [
+            "TestExprAbstractorNativePatternAndNestedBinder",
+            "TestExprAbstractorRetainsInterruptedTemporaryUntilClose"
+          ]
         },
         {
           "name": "ref_buffer_core construction/destruction, push_back, pop_back, back, c_ptr, indexing, set, size, empty, reset and finalize",
