@@ -7,6 +7,8 @@ import (
 	"sync"
 
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -20,6 +22,8 @@ type TimeoutService struct {
 	timer    *control.ScopedTimer
 	callback func()
 	output   io.Writer
+	trace    *diagnostic.TraceTags
+	process  *memory.ProcessAccounting
 	events   chan error
 	serial   uint64
 	caller   control.EventCaller
@@ -85,7 +89,7 @@ func (s *TimeoutService) SetTimeout(milliseconds int64) error {
 	}
 	s.serial++
 	serial := s.serial
-	timer, err := control.NewScopedTimer(uint32(milliseconds), &timeoutEventHandler{owner: s, serial: serial})
+	timer, err := control.NewScopedTimerWithMemoryTrace(uint32(milliseconds), &timeoutEventHandler{owner: s, serial: serial}, newTimeoutMemoryTrace(s.trace, s.process))
 	if err != nil {
 		return err
 	}
