@@ -125,8 +125,11 @@ func (c *ArbitraryContext) PropagateClause(clause *ArbitraryClause, n *Arbitrary
 	if err := c.open(); err != nil {
 		return err
 	}
-	if clause == nil || clause.context != c || len(clause.atoms) == 0 || n == nil || n != c.root || n.conflictVar != math.MaxUint32 {
+	if clause == nil || clause.context != c || len(clause.atoms) == 0 || n == nil || n.conflictVar != math.MaxUint32 {
 		return arena.ErrInvalidSlot
+	}
+	if err := c.validNode(n); err != nil {
+		return err
 	}
 	if err := c.tracePropagateClause(clause); err != nil {
 		return err

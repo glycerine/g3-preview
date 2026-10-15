@@ -54591,7 +54591,8 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/arbitrary_clause.go",
           "tests": [
-            "TestArbitraryClauseSourceTruthAndPropagation"
+            "TestArbitraryClauseSourceTruthAndPropagation",
+            "TestArbitrarySearchTraceChildConflict"
           ]
         },
         {
@@ -54807,6 +54808,12 @@
           "tests": ["TestRationalRootInitializationTraceSourceOrderAndResume", "TestRationalRootInitializationTraceRefusalAndPrinterPrefix"]
         },
         {
+          "name": "Concrete config_mpf search parameter, pre-removal selected-node, post-propagation bound, conflict, depth-limit and split-variable TRACE sites (subpaving_t_def.h:1810,1819,1825,1828,1833,1837)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/arbitrary_search.go", "pkg/math/subpaving/arbitrary_search_trace.go"],
+          "tests": ["TestArbitrarySearchTraceSelectionSplitDepthAndStatistics", "TestArbitrarySearchTraceNullVariableAndNodeLimit", "TestArbitrarySearchTraceRefusalAndStoppedPrinter", "TestArbitrarySearchTraceChildConflict"]
+        },
+        {
           "name": "Concrete config_hwf search parameter, pre-removal selected-node, post-propagation bound, conflict, depth-limit and split-variable TRACE sites (subpaving_t_def.h:1810,1819,1825,1828,1833,1837)",
           "status": "ported",
           "go_targets": ["pkg/math/subpaving/hardware_search.go", "pkg/math/subpaving/hardware_search_trace.go"],
@@ -54829,6 +54836,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_search_trace.go",
           "tests": ["TestRationalSearchTraceChildConflictAfterPropagation"]
+        },
+        {
+          "name": "Concrete config_mpf search entry and exit statistics TRACE sites, including node-limit break (subpaving_t_def.h:1809,1844)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_search_statistics_trace.go",
+          "tests": ["TestArbitrarySearchTraceSelectionSplitDepthAndStatistics", "TestArbitrarySearchTraceNullVariableAndNodeLimit", "TestArbitrarySearchTraceNullVariableAndNodeLimit"]
         },
         {
           "name": "Concrete config_hwf search entry and exit statistics TRACE sites, including node-limit break (subpaving_t_def.h:1809,1844)",
@@ -177820,6 +177833,12 @@
           "tests": ["TestRationalRootInitializationTraceSourceOrderAndResume", "TestRationalRootInitializationTraceRefusalAndPrinterPrefix"]
         },
         {
+          "name": "Reached config_mpf search parameter, selected-node, post-propagation, conflict, depth-limit and split-variable TRACE sites (subpaving_t_def.h:1810,1819,1825,1828,1833,1837)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_search_trace.go",
+          "tests": ["TestArbitrarySearchTraceSelectionSplitDepthAndStatistics", "TestArbitrarySearchTraceNullVariableAndNodeLimit", "TestArbitrarySearchTraceRefusalAndStoppedPrinter", "TestArbitrarySearchTraceChildConflict"]
+        },
+        {
           "name": "Reached config_hwf search parameter, selected-node, post-propagation, conflict, depth-limit and split-variable TRACE sites (subpaving_t_def.h:1810,1819,1825,1828,1833,1837)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/hardware_search_trace.go",
@@ -177842,6 +177861,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_search_trace.go",
           "tests": ["TestRationalSearchTraceChildConflictAfterPropagation"]
+        },
+        {
+          "name": "Reached config_mpf search entry and exit statistics TRACE sites (subpaving_t_def.h:1809,1844)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_search_statistics_trace.go",
+          "tests": ["TestArbitrarySearchTraceSelectionSplitDepthAndStatistics", "TestArbitrarySearchTraceNullVariableAndNodeLimit", "TestArbitrarySearchTraceNullVariableAndNodeLimit"]
         },
         {
           "name": "Reached config_hwf search entry and exit statistics TRACE sites (subpaving_t_def.h:1809,1844)",
@@ -178980,6 +179005,12 @@
           "tests": ["TestRationalRootInitializationTraceSourceOrderAndResume", "TestRationalRootInitializationTraceRefusalAndPrinterPrefix"]
         },
         {
+          "name": "Reached config_mpf search parameter, selected-node, post-propagation, conflict, depth-limit and split-variable TRACE sites (subpaving_t_def.h:1810,1819,1825,1828,1833,1837)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_search_trace.go",
+          "tests": ["TestArbitrarySearchTraceSelectionSplitDepthAndStatistics", "TestArbitrarySearchTraceNullVariableAndNodeLimit", "TestArbitrarySearchTraceRefusalAndStoppedPrinter", "TestArbitrarySearchTraceChildConflict"]
+        },
+        {
           "name": "Reached config_hwf search parameter, selected-node, post-propagation, conflict, depth-limit and split-variable TRACE sites (subpaving_t_def.h:1810,1819,1825,1828,1833,1837)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/hardware_search_trace.go",
@@ -179002,6 +179033,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_search_trace.go",
           "tests": ["TestRationalSearchTraceChildConflictAfterPropagation"]
+        },
+        {
+          "name": "Reached config_mpf search entry and exit statistics TRACE sites (subpaving_t_def.h:1809,1844)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_search_statistics_trace.go",
+          "tests": ["TestArbitrarySearchTraceSelectionSplitDepthAndStatistics", "TestArbitrarySearchTraceNullVariableAndNodeLimit", "TestArbitrarySearchTraceNullVariableAndNodeLimit"]
         },
         {
           "name": "Reached config_hwf search entry and exit statistics TRACE sites (subpaving_t_def.h:1809,1844)",
