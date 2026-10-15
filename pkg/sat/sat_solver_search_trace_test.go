@@ -12,17 +12,29 @@ import (
 // level zero; cleanup then discovers the already-false frozen clause.
 func TestSATBackjumpCleanupConflictSourceTrace(t *testing.T) {
 	s, _, _ := satSolverCheckFixture(t)
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 4; i++ {
 		_, e := s.MkVar(false, true)
 		satOK(t, e)
 	}
 	p := s.propagation
+	r, e := p.clauses.MkClause([]Literal{1, 3, 5}, true)
+	if e != nil {
+		t.Fatalf("frozen clause construction: %v", e)
+	}
+	if e = s.Lifecycle.pushClause(true, r); e != nil {
+		t.Fatalf("frozen clause publication: %v", e)
+	}
+	if e = p.clauses.Freeze(r); e != nil {
+		t.Fatalf("frozen clause freeze: %v", e)
+	}
 	satOK(t, p.assign(0, satJustification{}))
 	satOK(t, p.assign(2, satJustification{}))
-	satCleanerClause(t, s.Lifecycle, []Literal{1, 3}, false, true)
-	satOK(t, s.Lifecycle.push())
 	satOK(t, p.assign(4, satJustification{}))
-	p.setConflict(newSATBinaryJustification(1), 4)
+	_, e = s.Lifecycle.propagate(false, false, false)
+	satOK(t, e)
+	satOK(t, s.Lifecycle.push())
+	satOK(t, p.assign(6, satJustification{}))
+	p.setConflict(newSATBinaryJustification(1), 6)
 	s.gc.restartThreshold = 100
 	var out bytes.Buffer
 	tags := diagnostic.NewTraceTagsWithWriter(&out)

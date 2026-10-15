@@ -178267,6 +178267,12 @@
           "tests": ["TestSATBackjumpCleanupConflictSourceTrace"]
         },
         {
+          "name": "Reached SAT conflict-level, antecedent, consequent and first-UIP lemma TRACE records (sat_solver.cpp:1695,1718,1726,1788,1795)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_conflict_trace.go",
+          "tests": ["TestSATConflictLevelZeroSourceTraceBeforeReturn", "TestSATConflictFirstUIPSourceTraceOrder"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -179546,6 +179552,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_search_trace.go",
           "tests": ["TestSATBackjumpCleanupConflictSourceTrace"]
+        },
+        {
+          "name": "Reached SAT conflict-level, antecedent, consequent and first-UIP lemma TRACE records (sat_solver.cpp:1695,1718,1726,1788,1795)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_conflict_trace.go",
+          "tests": ["TestSATConflictLevelZeroSourceTraceBeforeReturn", "TestSATConflictFirstUIPSourceTraceOrder"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

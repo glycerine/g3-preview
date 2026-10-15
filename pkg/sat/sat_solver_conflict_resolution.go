@@ -141,6 +141,7 @@ func (s *satSolverConflictResolution) resolveConflictCore() (bool, error) {
 		return false, e
 	}
 	s.conflictLevel = level
+	s.traceConflictDetected(p.notLiteral)
 	if level <= 1 {
 		tracking, e := s.trackingAssumptions()
 		if e != nil {
@@ -168,12 +169,14 @@ func (s *satSolverConflictResolution) resolveConflictCore() (bool, error) {
 	}
 	marks := uint32(0)
 	if p.notLiteral != DefaultLiteral() {
+		s.traceConflictNotLiteral(p.notLiteral)
 		if e = s.processAntecedent(p.notLiteral, &marks); e != nil {
 			return false, e
 		}
 	}
 	consequent, j := p.notLiteral, p.conflict
 	for {
+		s.traceProcessingConsequent(consequent, marks, j)
 		if e = s.processConsequent(consequent, j, 0, &marks); e != nil {
 			return false, e
 		}
@@ -224,6 +227,7 @@ func (s *satSolverConflictResolution) resolveConflictCore() (bool, error) {
 	if e = a.lemma.Write(0, uint32(consequent.Negated())); e != nil {
 		return false, e
 	}
+	s.traceNewLemma(false)
 	cfg, e := p.config.State()
 	if e != nil {
 		return false, e
@@ -240,6 +244,7 @@ func (s *satSolverConflictResolution) resolveConflictCore() (bool, error) {
 				return false, e
 			}
 		}
+		s.traceNewLemma(true)
 	} else {
 		if e = a.resetLemmaVarMarks(); e != nil {
 			return false, e
