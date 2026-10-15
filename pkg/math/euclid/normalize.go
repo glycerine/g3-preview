@@ -23,12 +23,16 @@ func (s *solverSetup) normalizeEquation(eqIndex uint32) (err error) {
 	}
 	eq := s.equations[eqIndex]
 	z := s.manager.Integers()
+	if err = s.traceEquationRecord(184, "normalizing:\n", eq); err != nil {
+		return err
+	}
 	if len(eq.xs) == 0 {
 		var zero bool
 		if zero, err = z.IsZero(&eq.c); err != nil {
 			return err
 		}
 		if !zero {
+			s.traceNormalizationDiagnostic(189, "c = 0 inconsistency detected\n")
 			s.inconsistent = eqIndex
 			return nil
 		}
@@ -76,6 +80,7 @@ func (s *solverSetup) normalizeEquation(eqIndex uint32) (err error) {
 		return e
 	}
 	if !divides {
+		s.traceNormalizationDiagnostic(214, "gcd inconsistency detected\n")
 		s.inconsistent = eqIndex
 		return nil
 	}
@@ -88,6 +93,15 @@ func (s *solverSetup) normalizeEquation(eqIndex uint32) (err error) {
 		if err = s.manager.DivInt(&eq.bs[i], &g, &eq.bs[i]); err != nil {
 			return err
 		}
+	}
+	if err = z.Del(&g); err != nil {
+		return err
+	}
+	if err = z.Del(&a); err != nil {
+		return err
+	}
+	if err = s.traceEquationRecord(222, "after normalization:\n", eq); err != nil {
+		return err
 	}
 	return nil
 }
@@ -130,10 +144,18 @@ func (s *solverSetup) assertEquation(as []numeral.Int, xs []uint32, c *numeral.I
 		}
 		bs, js = []numeral.Rational{one}, []uint32{justification}
 	}
-	eq, e := s.addEquation(as, xs, c, bs, js, true)
+	eq, e := makeEquation(s.manager, as, xs, c, bs, js, s.asBuffer, s.bsBuffer, true)
 	if e != nil {
+		s.stop = e
 		return e
 	}
+	s.pendingEq = eq
+	if e = s.traceAssertEquationRecord(559, "new-eq:\n", eq); e != nil {
+		s.stop = e
+		return e
+	}
+	s.equations = append(s.equations, eq)
+	s.pendingEq = nil
 	eqIndex := uint32(len(s.equations) - 1)
 	if e = s.applySolutionToEquation(eq); e != nil {
 		s.stop = e
@@ -145,6 +167,10 @@ func (s *solverSetup) assertEquation(as []numeral.Int, xs []uint32, c *numeral.I
 	}
 	if s.equations[eqIndex] != nil {
 		if e = s.addOccurrences(eqIndex); e != nil {
+			s.stop = e
+			return e
+		}
+		if e = s.traceAssertEquationRecord(565, "asserted:\n", eq); e != nil {
 			s.stop = e
 			return e
 		}

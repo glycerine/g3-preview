@@ -46,6 +46,7 @@ type solverSetup struct {
 	tmpBs              *numeral.ScopedRationalVector
 	tmpXs              []uint32
 	normRow            *equation // owns the started source m_norm_* member workspace
+	pendingEq          *equation // mk_eq result before assert_eq publishes it
 	queue              *heap.Int
 	parameter          []bool
 	solved             []uint32
@@ -256,6 +257,12 @@ func (s *solverSetup) Close() error {
 		}
 		s.solution[s.solutionCloseIndex] = nil
 		s.solutionCloseIndex++
+	}
+	if s.pendingEq != nil {
+		if e := s.pendingEq.Close(); e != nil {
+			return e
+		}
+		s.pendingEq = nil
 	}
 	if e := s.queue.Close(); e != nil {
 		return e

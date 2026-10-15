@@ -34750,6 +34750,8 @@
         "pkg/math/euclid/apply_solution_trace_test.go",
         "pkg/math/euclid/apply_solution_test.go",
         "pkg/math/euclid/normalize.go",
+        "pkg/math/euclid/normalize_trace.go",
+        "pkg/math/euclid/normalize_trace_test.go",
         "pkg/math/euclid/normalize_test.go",
         "pkg/math/euclid/pivot.go",
         "pkg/math/euclid/pivot_test.go",
@@ -34787,6 +34789,9 @@
         "TestEuclideanNormalizeUnitGCDPreservesEquation",
         "TestEuclideanConstantOnlyTrivialAndContradictoryEquations",
         "TestEuclideanAssertEquationSubstitutesThenNormalizes",
+        "TestEuclideanAssertNormalizeTraceDivisionAndGCDContradiction",
+        "TestEuclideanConstantOnlyTraceContradictionAndDeletedZero",
+        "TestEuclideanNewEquationTraceBeforeListPublication",
         "TestEuclideanSelectNextPivotSourceTiesAndUnitStop",
         "TestEuclideanEliminateUnitSubstitutesOccurrences",
         "TestEuclideanNonUnitDecompositionParameterAndAuxiliaryEquation",
@@ -34939,11 +34944,15 @@
           "name": "assert_eq publication, apply_solution, normalize_eq gcd/divisibility and add_occs at cpp:173-222,504-510,547-564",
           "status": "partial",
           "go_target": "pkg/math/euclid/normalize.go",
+          "go_targets": ["pkg/math/euclid/normalize_trace.go", "pkg/math/euclid/solver_setup.go"],
           "tests": [
             "TestEuclideanAssertEquationNormalizeAndOccurrences",
             "TestEuclideanNormalizeUnitGCDPreservesEquation",
             "TestEuclideanConstantOnlyTrivialAndContradictoryEquations",
-            "TestEuclideanAssertEquationSubstitutesThenNormalizes"
+            "TestEuclideanAssertEquationSubstitutesThenNormalizes",
+            "TestEuclideanAssertNormalizeTraceDivisionAndGCDContradiction",
+            "TestEuclideanConstantOnlyTraceContradictionAndDeletedZero",
+            "TestEuclideanNewEquationTraceBeforeListPublication"
           ]
         },
         {
@@ -177169,6 +177178,7 @@
         "pkg/util/diagnostic/util_trace_tags.go",
         "pkg/math/euclid/normalize_query_trace.go",
         "pkg/math/euclid/apply_solution_trace.go",
+        "pkg/math/euclid/normalize_trace.go",
         "pkg/api/api_trace.go",
         "pkg/util/numeral/mpff_round_trace.go",
         "pkg/util/numeral/mpff_power_trace.go",
@@ -177232,6 +177242,9 @@
         "TestTraceTagsSourceControlAndFinalize",
         "TestEuclideanNormalizeQueryTraceBeforeAndAfterSubstitution",
         "TestEuclideanApplySolutionTraceBeforeAndAfterIntegerSwap",
+        "TestEuclideanAssertNormalizeTraceDivisionAndGCDContradiction",
+        "TestEuclideanConstantOnlyTraceContradictionAndDeletedZero",
+        "TestEuclideanNewEquationTraceBeforeListPublication",
         "TestTraceHeaderSourceInsertionRefusalPrefixes",
         "TestTraceShortBodyFailureSkipsSourceFlush",
         "TestTraceConditionalOperandFailureSkipsFooterAndFlush",
@@ -178516,6 +178529,12 @@
           "tests": ["TestEuclideanApplySolutionTraceBeforeAndAfterIntegerSwap"]
         },
         {
+          "name": "Reached Euclidean assert_eq and normalize_eq TRACE records, including contradiction diagnostics and pre-publication new-eq (euclidean_solver.cpp:184,189,214,222,559,565)",
+          "status": "ported",
+          "go_target": "pkg/math/euclid/normalize_trace.go",
+          "tests": ["TestEuclideanAssertNormalizeTraceDivisionAndGCDContradiction", "TestEuclideanConstantOnlyTraceContradictionAndDeletedZero", "TestEuclideanNewEquationTraceBeforeListPublication"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -178538,6 +178557,7 @@
         "pkg/util/diagnostic/util_trace_tags.go",
         "pkg/math/euclid/normalize_query_trace.go",
         "pkg/math/euclid/apply_solution_trace.go",
+        "pkg/math/euclid/normalize_trace.go",
         "pkg/api/api_trace.go",
         "pkg/util/numeral/mpff_round_trace.go",
         "pkg/util/numeral/mpff_power_trace.go",
@@ -178601,6 +178621,9 @@
         "TestTraceTagsSourceControlAndFinalize",
         "TestEuclideanNormalizeQueryTraceBeforeAndAfterSubstitution",
         "TestEuclideanApplySolutionTraceBeforeAndAfterIntegerSwap",
+        "TestEuclideanAssertNormalizeTraceDivisionAndGCDContradiction",
+        "TestEuclideanConstantOnlyTraceContradictionAndDeletedZero",
+        "TestEuclideanNewEquationTraceBeforeListPublication",
         "TestTraceHeaderSourceInsertionRefusalPrefixes",
         "TestTraceShortBodyFailureSkipsSourceFlush",
         "TestTraceConditionalOperandFailureSkipsFooterAndFlush",
@@ -179895,6 +179918,12 @@
           "status": "ported",
           "go_target": "pkg/math/euclid/apply_solution_trace.go",
           "tests": ["TestEuclideanApplySolutionTraceBeforeAndAfterIntegerSwap"]
+        },
+        {
+          "name": "Reached Euclidean assert_eq and normalize_eq TRACE records, including contradiction diagnostics and pre-publication new-eq (euclidean_solver.cpp:184,189,214,222,559,565)",
+          "status": "ported",
+          "go_target": "pkg/math/euclid/normalize_trace.go",
+          "tests": ["TestEuclideanAssertNormalizeTraceDivisionAndGCDContradiction", "TestEuclideanConstantOnlyTraceContradictionAndDeletedZero", "TestEuclideanNewEquationTraceBeforeListPublication"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
