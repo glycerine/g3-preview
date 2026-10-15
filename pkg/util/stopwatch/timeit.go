@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/memory"
 )
 
@@ -25,6 +26,7 @@ type TimeitConfig struct {
 	Memory  func() (uint64, error)
 	Process *memory.ProcessAccounting
 	Clock   func() (uint64, error)
+	Trace   *diagnostic.TraceTags
 }
 
 // Timeit reports elapsed time and memory snapshots when closed. Construct it
@@ -35,9 +37,11 @@ type Timeit struct {
 	message                 string
 	output                  io.Writer
 	memory                  func() (uint64, error)
+	trace                   *diagnostic.TraceTags
 	beforeMemory            float64
 	cause                   error
 	active, closed, enabled bool
+	impAllocated            bool
 }
 
 func (p *Timeit) Construct(enabled bool, config TimeitConfig) (cause error) {
@@ -50,6 +54,12 @@ func (p *Timeit) Construct(enabled bool, config TimeitConfig) (cause error) {
 	}
 	p.active = true
 	defer func() { p.active = false; p.cause = cause }()
+	p.trace = config.Trace
+	if p.trace == nil {
+		p.trace = diagnostic.BorrowProcessTraceTags()
+	}
+	p.impAllocated = true
+	p.traceImpAllocated()
 	p.output = config.Output
 	if p.output == nil {
 		p.output = os.Stderr
@@ -132,6 +142,8 @@ func (p *Timeit) Close() (cause error) {
 		}
 	}
 	p.closed = true
+	p.impAllocated = false
+	p.traceImpDeallocated()
 	return nil
 }
 
@@ -155,7 +167,12 @@ func (p *Timeit) Cleanup() error {
 		return ErrTimeitPending
 	}
 	p.closed = true
+	if p.impAllocated {
+		p.impAllocated = false
+		p.traceImpDeallocated()
+	}
 	p.watch = Stopwatch{}
 	p.message, p.output, p.memory = "", nil, nil
+	p.trace = nil
 	return nil
 }

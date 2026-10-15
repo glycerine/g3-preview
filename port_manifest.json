@@ -150763,7 +150763,16 @@
           ]
         },
         {
-          "name": "Z3DEBUG allocate(file,line,obj,size) and deallocate(file,line,p) wrappers: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs plus generated symbol table and rational global manager plus param_descrs::imp, params blocks, rational entries, trace-tag and debug-tag tables, scoped_timer::imp and timer::m_watch call sites are ported; other retained caller sites remain unaudited (cpp202-211)",
+          "name": "Concrete timeit::imp allocation and deallocation debug wrappers at timeit.cpp:50/57, with disabled guard, failed-constructor owning cleanup, Go owner/header extent and process-finalizing guard",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/stopwatch/timeit_memory_trace.go",
+          "tests": [
+            "TestTimeitImpMemoryTraceDisabledFailureAndCompletedReport",
+            "TestTimeitImpMemoryTraceProcessFinalizeGuard"
+          ]
+        },
+        {
+          "name": "Z3DEBUG allocate(file,line,obj,size) and deallocate(file,line,p) wrappers: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs plus generated symbol table and rational global manager plus param_descrs::imp, params blocks, rational entries, trace-tag and debug-tag tables, scoped_timer::imp, timer::m_watch and timeit::imp call sites are ported; other retained caller sites remain unaudited (cpp202-211)",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
           "go_targets": [
@@ -151416,7 +151425,16 @@
           ]
         },
         {
-          "name": "Z3DEBUG allocation/deallocation file-line overloads and alloc/dealloc macros: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs plus generated symbol table and rational global manager plus param_descrs::imp, params blocks, rational entries, trace-tag and debug-tag tables, scoped_timer::imp and timer::m_watch sites are connected through concrete trace hooks; other retained caller sites remain unaudited (h69-97; cpp202-211)",
+          "name": "Concrete timeit::imp allocation and deallocation debug wrappers at timeit.cpp:50/57, with disabled guard, failed-constructor owning cleanup, Go owner/header extent and process-finalizing guard",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/stopwatch/timeit_memory_trace.go",
+          "tests": [
+            "TestTimeitImpMemoryTraceDisabledFailureAndCompletedReport",
+            "TestTimeitImpMemoryTraceProcessFinalizeGuard"
+          ]
+        },
+        {
+          "name": "Z3DEBUG allocation/deallocation file-line overloads and alloc/dealloc macros: the retained small_object_allocator chunk, gparams::imp, module params_ref cell and generated module param_descrs plus generated symbol table and rational global manager plus param_descrs::imp, params blocks, rational entries, trace-tag and debug-tag tables, scoped_timer::imp, timer::m_watch and timeit::imp sites are connected through concrete trace hooks; other retained caller sites remain unaudited (h69-97; cpp202-211)",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_memory_chunk_trace.go",
           "go_targets": [
@@ -177795,7 +177813,9 @@
       "status": "ported",
       "go_targets": [
         "pkg/util/stopwatch/timeit.go",
-        "pkg/util/stopwatch/timeit_test.go"
+        "pkg/util/stopwatch/timeit_test.go",
+        "pkg/util/stopwatch/timeit_memory_trace.go",
+        "pkg/util/stopwatch/timeit_memory_trace_debug_test.go"
       ],
       "tests": [
         "TestTimeitOriginalMemoryCaptureAndFormatting",
@@ -177805,7 +177825,9 @@
         "TestTimeitReadsSharedProcessAllocationAtBothSnapshots",
         "TestTimeitEnabledRequiresSourceProcessMemory",
         "TestTimeitClockAndMemoryFailurePrefixes",
-        "TestTimeitProviderReentryAndBorrowedOutput"
+        "TestTimeitProviderReentryAndBorrowedOutput",
+        "TestTimeitImpMemoryTraceDisabledFailureAndCompletedReport",
+        "TestTimeitImpMemoryTraceProcessFinalizeGuard"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -177823,6 +177845,15 @@
             "TestTimeitEnabledRequiresSourceProcessMemory",
             "TestTimeitClockAndMemoryFailurePrefixes",
             "TestTimeitProviderReentryAndBorrowedOutput"
+          ]
+        },
+        {
+          "name": "Concrete timeit::imp alloc/dealloc debug wrappers at timeit.cpp:50/57, with disabled-scope skip, failed-constructor owning cleanup, completed report order and process-finalizing guard",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/stopwatch/timeit_memory_trace.go",
+          "tests": [
+            "TestTimeitImpMemoryTraceDisabledFailureAndCompletedReport",
+            "TestTimeitImpMemoryTraceProcessFinalizeGuard"
           ]
         }
       ],
