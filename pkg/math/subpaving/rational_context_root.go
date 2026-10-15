@@ -230,11 +230,17 @@ func (c *RationalContext) publishNormalized(n *RationalNode, variable uint32, va
 	}
 	n.trail.reasonClause = reason
 	n.trail.reasonDefinition = definition
+	if err := c.traceNewBound(n.trail); err != nil {
+		return err
+	}
 	conflict, err := n.ConflictingBounds(variable)
 	if err != nil {
 		return err
 	}
 	if conflict {
+		if err := c.traceBoundConflict(n); err != nil {
+			return err
+		}
 		n.conflictVar = variable
 		c.numConflicts++
 		c.removeLeaf(n)
