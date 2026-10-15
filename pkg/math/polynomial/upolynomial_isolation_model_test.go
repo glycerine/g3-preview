@@ -145,6 +145,25 @@ func TestUPolynomialBinaryVectorOwnerRefusalAndNativePush(t *testing.T) {
 	if upolyIsolationSize(t, v) != 1 {
 		t.Fatal("unexpected core reset")
 	}
+	before = budget.Used()
+	budget.FailAfter(0)
+	for i := 0; i < 129; i++ {
+		if e = upolyAppendBinaryFixture(v, &a); e != nil {
+			t.Fatal("native growth", i, e)
+		}
+	}
+	if upolyIsolationSize(t, v) != 130 || budget.Used() != before {
+		t.Fatal("native growth retained logical size or charged backing", v.Stats(), before, budget.Used())
+	}
+	budget.FailAfter(-1)
+	last := upolyIsolationRead(t, b, v, 129)
+	one := unumeral.NewInt(1)
+	if same, e := b.EqualInteger(&last, &one); e != nil || !same {
+		t.Fatal("native growth lost numeral", e)
+	}
+	if e = b.Del(&last); e != nil {
+		t.Fatal(e)
+	}
 }
 
 func TestUPolynomialBinaryVectorBigCopyFaultImmediateRoots(t *testing.T) {

@@ -181995,7 +181995,7 @@
           ]
         },
         {
-          "name": "concrete binary vector logical reserve/resize, single-slice owning move growth and ascending reset; isolation frame specializations",
+          "name": "concrete binary vector logical reserve/resize, native typed slice growth and ascending reset; isolation frame specializations",
           "status": "partial",
           "go_target": "pkg/math/polynomial/upolynomial_binary_vector.go",
           "tests": [

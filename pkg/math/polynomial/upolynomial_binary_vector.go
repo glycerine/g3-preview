@@ -70,32 +70,14 @@ func upolyBinaryExtend(s *upolyBinaryVectorState, n uint32) error {
 	if s.managerResetPending || s.dropPending {
 		return ErrBinaryVectorResetPending
 	}
-	if uint64(n) > uint64(^uint(0)>>1) {
+	if uint64(n) > uint64(^uint(0)>>1)/uint64(reflect.TypeOf(unumeral.BinaryRational{}).Size()) {
 		return arena.ErrBounds
 	}
 	old := s.values
 	if int(n) > len(old) {
-		if int(n) <= cap(old) {
-			s.values = old[:n]
-		} else {
-			// Preserve vector.h's capacity progression with one typed backing move.
-			limit := uint64(^uint(0)>>1) / uint64(reflect.TypeOf(unumeral.BinaryRational{}).Size())
-			capacity := uint64(cap(old))
-			if capacity == 0 {
-				capacity = 2
-			}
-			for capacity < uint64(n) {
-				next := (3*capacity + 1) / 2
-				if next <= capacity || next > limit {
-					return arena.ErrBounds
-				}
-				capacity = next
-			}
-			next := make([]unumeral.BinaryRational, int(n), int(capacity))
-			copy(next, old)
-			clear(old)
-			s.values = next
-		}
+		// The initialized numeral slots are native Go storage. Logical size
+		// remains separate because reset and shrink retain the backing slice.
+		s.values = append(old, make([]unumeral.BinaryRational, int(n)-len(old))...)
 	}
 	clear(s.values[s.size:n])
 	s.size = n
