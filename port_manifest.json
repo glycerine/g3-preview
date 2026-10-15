@@ -53418,6 +53418,30 @@
           "tests": ["TestFixedRelevanceUsesSourceMaximumOfGapAndOne", "TestFixedRelevanceTraceConflictThresholdAndImprovementBranches", "TestFixedRelevanceTraceRefusalAndPrinterPrefix"]
         },
         {
+          "name": "Concrete config_mpff queued-bound propagation TRACE after dequeue and before watcher traversal (subpaving_t_def.h:1703,1740-1751)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_propagate_trace.go",
+          "tests": ["TestFastQueuedBoundPropagationTraceAndConsumedPrefix", "TestFastQueuedBoundPropagationTraceRefusalAndPrinterStop"]
+        },
+        {
+          "name": "Concrete config_hwf queued-bound propagation TRACE after dequeue and before watcher traversal (subpaving_t_def.h:1703,1740-1751)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_propagate_trace.go",
+          "tests": ["TestHardwareQueuedBoundPropagationTraceAndConsumedPrefix", "TestHardwareQueuedBoundPropagationTraceRefusalAndPrinterStop"]
+        },
+        {
+          "name": "Concrete config_mpq queued-bound propagation TRACE after dequeue and before watcher traversal (subpaving_t_def.h:1703,1740-1751)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_propagate_trace.go",
+          "tests": ["TestRationalQueuedBoundPropagationTraceAndConsumedPrefix", "TestRationalQueuedBoundPropagationTraceRefusalAndPrinterStop"]
+        },
+        {
+          "name": "Concrete config_mpf queued-bound propagation TRACE after dequeue and before watcher traversal (subpaving_t_def.h:1703,1740-1751)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_propagate_trace.go",
+          "tests": ["TestArbitraryQueuedBoundPropagationTraceAndConsumedPrefix", "TestArbitraryQueuedBoundPropagationTraceRefusalAndPrinterStop"]
+        },
+        {
           "name": "Concrete config_mpfx queued-bound propagation TRACE after dequeue and before watcher traversal (subpaving_t_def.h:1703,1740-1751)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_propagate_trace.go",
@@ -55032,6 +55056,30 @@
           "status": "ported",
           "go_targets": ["pkg/math/subpaving/fixed_context_bounds.go", "pkg/math/subpaving/fixed_relevance_trace.go"],
           "tests": ["TestFixedRelevanceUsesSourceMaximumOfGapAndOne", "TestFixedRelevanceTraceConflictThresholdAndImprovementBranches", "TestFixedRelevanceTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Concrete config_mpff queued-bound propagation TRACE after dequeue and before watcher traversal (subpaving_t_def.h:1703,1740-1751)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_propagate_trace.go",
+          "tests": ["TestFastQueuedBoundPropagationTraceAndConsumedPrefix", "TestFastQueuedBoundPropagationTraceRefusalAndPrinterStop"]
+        },
+        {
+          "name": "Concrete config_hwf queued-bound propagation TRACE after dequeue and before watcher traversal (subpaving_t_def.h:1703,1740-1751)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_propagate_trace.go",
+          "tests": ["TestHardwareQueuedBoundPropagationTraceAndConsumedPrefix", "TestHardwareQueuedBoundPropagationTraceRefusalAndPrinterStop"]
+        },
+        {
+          "name": "Concrete config_mpq queued-bound propagation TRACE after dequeue and before watcher traversal (subpaving_t_def.h:1703,1740-1751)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_propagate_trace.go",
+          "tests": ["TestRationalQueuedBoundPropagationTraceAndConsumedPrefix", "TestRationalQueuedBoundPropagationTraceRefusalAndPrinterStop"]
+        },
+        {
+          "name": "Concrete config_mpf queued-bound propagation TRACE after dequeue and before watcher traversal (subpaving_t_def.h:1703,1740-1751)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_propagate_trace.go",
+          "tests": ["TestArbitraryQueuedBoundPropagationTraceAndConsumedPrefix", "TestArbitraryQueuedBoundPropagationTraceRefusalAndPrinterStop"]
         },
         {
           "name": "Concrete config_mpfx queued-bound propagation TRACE after dequeue and before watcher traversal (subpaving_t_def.h:1703,1740-1751)",
@@ -177735,6 +177783,30 @@
           "tests": ["TestFixedRelevanceUsesSourceMaximumOfGapAndOne", "TestFixedRelevanceTraceConflictThresholdAndImprovementBranches", "TestFixedRelevanceTraceRefusalAndPrinterPrefix"]
         },
         {
+          "name": "Reached config_mpff queued-bound propagation TRACE after dequeue (subpaving_t_def.h:1703)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_propagate_trace.go",
+          "tests": ["TestFastQueuedBoundPropagationTraceAndConsumedPrefix", "TestFastQueuedBoundPropagationTraceRefusalAndPrinterStop"]
+        },
+        {
+          "name": "Reached config_hwf queued-bound propagation TRACE after dequeue (subpaving_t_def.h:1703)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_propagate_trace.go",
+          "tests": ["TestHardwareQueuedBoundPropagationTraceAndConsumedPrefix", "TestHardwareQueuedBoundPropagationTraceRefusalAndPrinterStop"]
+        },
+        {
+          "name": "Reached config_mpq queued-bound propagation TRACE after dequeue (subpaving_t_def.h:1703)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_propagate_trace.go",
+          "tests": ["TestRationalQueuedBoundPropagationTraceAndConsumedPrefix", "TestRationalQueuedBoundPropagationTraceRefusalAndPrinterStop"]
+        },
+        {
+          "name": "Reached config_mpf queued-bound propagation TRACE after dequeue (subpaving_t_def.h:1703)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_propagate_trace.go",
+          "tests": ["TestArbitraryQueuedBoundPropagationTraceAndConsumedPrefix", "TestArbitraryQueuedBoundPropagationTraceRefusalAndPrinterStop"]
+        },
+        {
           "name": "Reached config_mpfx queued-bound propagation TRACE after dequeue (subpaving_t_def.h:1703)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_propagate_trace.go",
@@ -178797,6 +178869,30 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_relevance_trace.go",
           "tests": ["TestFixedRelevanceUsesSourceMaximumOfGapAndOne", "TestFixedRelevanceTraceConflictThresholdAndImprovementBranches", "TestFixedRelevanceTraceRefusalAndPrinterPrefix"]
+        },
+        {
+          "name": "Reached config_mpff queued-bound propagation TRACE after dequeue (subpaving_t_def.h:1703)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_propagate_trace.go",
+          "tests": ["TestFastQueuedBoundPropagationTraceAndConsumedPrefix", "TestFastQueuedBoundPropagationTraceRefusalAndPrinterStop"]
+        },
+        {
+          "name": "Reached config_hwf queued-bound propagation TRACE after dequeue (subpaving_t_def.h:1703)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/hardware_propagate_trace.go",
+          "tests": ["TestHardwareQueuedBoundPropagationTraceAndConsumedPrefix", "TestHardwareQueuedBoundPropagationTraceRefusalAndPrinterStop"]
+        },
+        {
+          "name": "Reached config_mpq queued-bound propagation TRACE after dequeue (subpaving_t_def.h:1703)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_propagate_trace.go",
+          "tests": ["TestRationalQueuedBoundPropagationTraceAndConsumedPrefix", "TestRationalQueuedBoundPropagationTraceRefusalAndPrinterStop"]
+        },
+        {
+          "name": "Reached config_mpf queued-bound propagation TRACE after dequeue (subpaving_t_def.h:1703)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_propagate_trace.go",
+          "tests": ["TestArbitraryQueuedBoundPropagationTraceAndConsumedPrefix", "TestArbitraryQueuedBoundPropagationTraceRefusalAndPrinterStop"]
         },
         {
           "name": "Reached config_mpfx queued-bound propagation TRACE after dequeue (subpaving_t_def.h:1703)",

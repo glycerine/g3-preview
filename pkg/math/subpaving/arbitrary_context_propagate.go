@@ -33,6 +33,9 @@ func (c *ArbitraryContext) PropagateQueued(n *ArbitraryNode) error {
 			return arena.ErrInvalidSlot
 		}
 		c.queueHead++
+		if err := c.tracePropagatingBound(b); err != nil {
+			return err
+		}
 		for _, watch := range c.watchOrder[b.variable] {
 			if n.conflictVar != math.MaxUint32 {
 				break

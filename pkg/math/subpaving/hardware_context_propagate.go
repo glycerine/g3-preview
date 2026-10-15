@@ -104,6 +104,9 @@ func (c *HardwareContext) processQueuedBound(n *HardwareNode, b *HardwareBound) 
 	if b == nil || b.variable >= uint32(len(c.watchers)) || !c.boundOnTrail(n, b) {
 		return arena.ErrInvalidSlot
 	}
+	if err := c.tracePropagatingBound(b); err != nil {
+		return err
+	}
 	visit := func(variable uint32, catchArithmetic bool) error {
 		visited, ok := c.definitionVisited(variable)
 		if !ok {
