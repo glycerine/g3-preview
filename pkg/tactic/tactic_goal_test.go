@@ -363,7 +363,17 @@ func TestTacticGoalSourceDepthPrecisionCountsAndReferences(t *testing.T) {
 		}
 	}
 	astTestMust(t, g.IncRef())
-	astTestMust(t, g.DecRef())
+	astTestMust(t, g.IncRef())
+	consumed, e := g.DecRefConsumed()
+	astTestMust(t, e)
+	if !consumed || g.RefCount != 1 || g.Closed {
+		t.Fatal("source shared goal reference was not consumed", consumed, g.RefCount, g.Closed)
+	}
+	consumed, e = g.DecRefConsumed()
+	astTestMust(t, e)
+	if !consumed {
+		t.Fatal("source final goal reference was not consumed")
+	}
 	if _, e = g.Size(); e == nil {
 		t.Fatal("source final reference must retire goal")
 	}

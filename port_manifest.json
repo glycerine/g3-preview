@@ -103555,7 +103555,8 @@
             "TestTacticGoalUpdateLiteralFalseHeadSourceBehavior",
             "TestTacticGoalAssertionsToSATAndValidatedModel",
             "TestTacticGoalProofUpdateKeepsDerivedFacts",
-            "TestTacticGoalSourceDepthPrecisionCountsAndReferences"
+            "TestTacticGoalSourceDepthPrecisionCountsAndReferences",
+            "TestGoalRefFinalDecrementConsumedBeforeStoppedFormulaRelease"
           ]
         },
         {
@@ -103639,7 +103640,8 @@
             "TestTacticGoalUpdateLiteralFalseHeadSourceBehavior",
             "TestTacticGoalAssertionsToSATAndValidatedModel",
             "TestTacticGoalProofUpdateKeepsDerivedFacts",
-            "TestTacticGoalSourceDepthPrecisionCountsAndReferences"
+            "TestTacticGoalSourceDepthPrecisionCountsAndReferences",
+            "TestGoalRefFinalDecrementConsumedBeforeStoppedFormulaRelease"
           ]
         },
         {
@@ -171231,9 +171233,11 @@
       "go_targets": [
         "pkg/tactic/tactic_model_converter.go",
         "pkg/tactic/tactic_stored_model.go",
+        "pkg/tactic/tactic_goal.go",
         "pkg/model/model_core.go",
         "pkg/tactic/tactic_model_ref_source_order_test.go",
-        "pkg/tactic/tactic_model_ref_stopped_child_debug_test.go"
+        "pkg/tactic/tactic_model_ref_stopped_child_debug_test.go",
+        "pkg/tactic/tactic_goal_ref_stopped_child_debug_test.go"
       ],
       "tests": [
         "TestTacticModelReferenceOwningAliasAndReplacement",
@@ -171252,7 +171256,8 @@
         "TestTacticModelConcatConsumedChildCleanupResumesWithoutSecondDecrement",
         "TestTacticModelConcatRealStoredChildFinalReleaseNativeIDRecycle",
         "TestModelRefStoppedDerivedChildRelease",
-        "TestModelRefCloseAfterStoppedDerivedChildRelease"
+        "TestModelRefCloseAfterStoppedDerivedChildRelease",
+        "TestGoalRefFinalDecrementConsumedBeforeStoppedFormulaRelease"
       ],
       "conditionals": [
         {
@@ -171291,6 +171296,15 @@
           "tests": [
             "TestModelRefStoppedDerivedChildRelease",
             "TestModelRefCloseAfterStoppedDerivedChildRelease"
+          ]
+        },
+        {
+          "name": "Concrete goal_ref final decrement receipt and owning continuation after stopped formula destruction (goal.h:84-85; ref.h:21-40)",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_goal.go",
+          "tests": [
+            "TestTacticGoalSourceDepthPrecisionCountsAndReferences",
+            "TestGoalRefFinalDecrementConsumedBeforeStoppedFormulaRelease"
           ]
         },
         {

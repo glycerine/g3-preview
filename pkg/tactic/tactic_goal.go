@@ -190,14 +190,22 @@ func (g *Goal) IncRef() error {
 	return nil
 }
 func (g *Goal) DecRef() error {
+	_, e := g.DecRefConsumed()
+	return e
+}
+
+// DecRefConsumed reports whether the source goal reference was decremented.
+// Final destruction can stop after that decrement; the owning caller then
+// resumes with Close instead of decrementing the same goal again.
+func (g *Goal) DecRefConsumed() (bool, error) {
 	if e := g.open(); e != nil {
-		return e
+		return false, e
 	}
 	g.RefCount--
 	if g.RefCount == 0 {
-		return g.Close()
+		return true, g.Close()
 	}
-	return nil
+	return true, nil
 }
 func (g *Goal) resetCore() error {
 	if e := goalDropExprs(g.manager, &g.forms); e != nil {
