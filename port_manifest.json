@@ -54536,6 +54536,12 @@
           "tests": ["TestArbitraryBoundTracePublicationAndConflictOrder", "TestArbitraryBoundTraceStreamAndPrinterFailurePrefix"]
         },
         {
+          "name": "Concrete config_mpf clause-propagation TRACE before visit and selected bound publication (subpaving_t_def.h:1376,1400)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_clause_propagate_trace.go",
+          "tests": ["TestArbitraryClausePropagationTraceSourceOrder", "TestArbitraryClausePropagationTraceRefusalAndPrinterPrefixes"]
+        },
+        {
           "name": "Concrete config_mpf unit and sorted-clause TRACE at source ownership boundaries (subpaving_t_def.h:841,866)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/arbitrary_clause_trace.go",
@@ -54558,6 +54564,12 @@
           "status": "ported",
           "go_targets": ["pkg/math/subpaving/fast_bound_trace.go", "pkg/math/subpaving/fast_context_bounds.go"],
           "tests": ["TestFastBoundTracePublicationAndConflictOrder", "TestFastBoundTraceStreamAndPrinterFailurePrefix", "TestFastBoundTimestampSourceExceptionAfterPublication"]
+        },
+        {
+          "name": "Concrete config_mpff clause-propagation TRACE before visit and selected bound publication (subpaving_t_def.h:1376,1400)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_clause_propagate_trace.go",
+          "tests": ["TestFastClausePropagationTraceSourceOrder", "TestFastClausePropagationTraceRefusalAndPrinterPrefixes"]
         },
         {
           "name": "Concrete config_mpff unit and sorted-clause TRACE at source ownership boundaries (subpaving_t_def.h:841,866)",
@@ -54642,6 +54654,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_unit_trace.go",
           "tests": ["TestRationalUnitTracePrecedesReferenceAndPublication", "TestRationalUnitTraceFailureBoundaries"]
+        },
+        {
+          "name": "Concrete config_mpq clause-propagation TRACE before visit and selected bound publication (subpaving_t_def.h:1376,1400)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_clause_propagate_trace.go",
+          "tests": ["TestRationalClausePropagationTraceSourceOrder", "TestRationalClausePropagationTraceRefusalAndPrinterPrefixes"]
         },
         {
           "name": "Concrete config_mpq add_clause_core sorted-clause TRACE after references, watches and publication (subpaving_t_def.h:802-841)",
@@ -177393,6 +177411,12 @@
           "tests": ["TestArbitraryBoundTracePublicationAndConflictOrder", "TestArbitraryBoundTraceStreamAndPrinterFailurePrefix"]
         },
         {
+          "name": "Reached config_mpf clause-propagation TRACE before visit and selected bound publication (subpaving_t_def.h:1376,1400)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_clause_propagate_trace.go",
+          "tests": ["TestArbitraryClausePropagationTraceSourceOrder", "TestArbitraryClausePropagationTraceRefusalAndPrinterPrefixes"]
+        },
+        {
           "name": "Reached config_mpf unit and sorted-clause TRACE records (subpaving_t_def.h:841,866)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/arbitrary_clause_trace.go",
@@ -177415,6 +177439,12 @@
           "status": "ported",
           "go_targets": ["pkg/math/subpaving/fast_bound_trace.go", "pkg/math/subpaving/fast_context_bounds.go"],
           "tests": ["TestFastBoundTracePublicationAndConflictOrder", "TestFastBoundTraceStreamAndPrinterFailurePrefix", "TestFastBoundTimestampSourceExceptionAfterPublication"]
+        },
+        {
+          "name": "Reached config_mpff clause-propagation TRACE before visit and selected bound publication (subpaving_t_def.h:1376,1400)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_clause_propagate_trace.go",
+          "tests": ["TestFastClausePropagationTraceSourceOrder", "TestFastClausePropagationTraceRefusalAndPrinterPrefixes"]
         },
         {
           "name": "Reached config_mpff unit and sorted-clause TRACE records (subpaving_t_def.h:841,866)",
@@ -177493,6 +177523,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_unit_trace.go",
           "tests": ["TestRationalUnitTracePrecedesReferenceAndPublication", "TestRationalUnitTraceFailureBoundaries"]
+        },
+        {
+          "name": "Reached config_mpq clause-propagation TRACE before visit and selected bound publication (subpaving_t_def.h:1376,1400)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_clause_propagate_trace.go",
+          "tests": ["TestRationalClausePropagationTraceSourceOrder", "TestRationalClausePropagationTraceRefusalAndPrinterPrefixes"]
         },
         {
           "name": "Reached config_mpq add_clause_core sorted-clause TRACE after references and publication (subpaving_t_def.h:841)",
@@ -178391,6 +178427,12 @@
           "tests": ["TestArbitraryBoundTracePublicationAndConflictOrder", "TestArbitraryBoundTraceStreamAndPrinterFailurePrefix"]
         },
         {
+          "name": "Reached config_mpf clause-propagation TRACE before visit and selected bound publication (subpaving_t_def.h:1376,1400)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/arbitrary_clause_propagate_trace.go",
+          "tests": ["TestArbitraryClausePropagationTraceSourceOrder", "TestArbitraryClausePropagationTraceRefusalAndPrinterPrefixes"]
+        },
+        {
           "name": "Reached config_mpf unit and sorted-clause TRACE records (subpaving_t_def.h:841,866)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/arbitrary_clause_trace.go",
@@ -178413,6 +178455,12 @@
           "status": "ported",
           "go_targets": ["pkg/math/subpaving/fast_bound_trace.go", "pkg/math/subpaving/fast_context_bounds.go"],
           "tests": ["TestFastBoundTracePublicationAndConflictOrder", "TestFastBoundTraceStreamAndPrinterFailurePrefix", "TestFastBoundTimestampSourceExceptionAfterPublication"]
+        },
+        {
+          "name": "Reached config_mpff clause-propagation TRACE before visit and selected bound publication (subpaving_t_def.h:1376,1400)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fast_clause_propagate_trace.go",
+          "tests": ["TestFastClausePropagationTraceSourceOrder", "TestFastClausePropagationTraceRefusalAndPrinterPrefixes"]
         },
         {
           "name": "Reached config_mpff unit and sorted-clause TRACE records (subpaving_t_def.h:841,866)",
@@ -178491,6 +178539,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/rational_unit_trace.go",
           "tests": ["TestRationalUnitTracePrecedesReferenceAndPublication", "TestRationalUnitTraceFailureBoundaries"]
+        },
+        {
+          "name": "Reached config_mpq clause-propagation TRACE before visit and selected bound publication (subpaving_t_def.h:1376,1400)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/rational_clause_propagate_trace.go",
+          "tests": ["TestRationalClausePropagationTraceSourceOrder", "TestRationalClausePropagationTraceRefusalAndPrinterPrefixes"]
         },
         {
           "name": "Reached config_mpq add_clause_core sorted-clause TRACE after references and publication (subpaving_t_def.h:841)",

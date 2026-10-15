@@ -128,6 +128,9 @@ func (c *ArbitraryContext) PropagateClause(clause *ArbitraryClause, n *Arbitrary
 	if clause == nil || clause.context != c || len(clause.atoms) == 0 || n == nil || n != c.root || n.conflictVar != math.MaxUint32 {
 		return arena.ErrInvalidSlot
 	}
+	if err := c.tracePropagateClause(clause); err != nil {
+		return err
+	}
 	c.numVisited++
 	clause.visited = c.timestamp
 	unknown := -1
@@ -150,6 +153,9 @@ func (c *ArbitraryContext) PropagateClause(clause *ArbitraryClause, n *Arbitrary
 		unknown = 0
 	}
 	a := clause.atoms[unknown]
+	if err := c.tracePropagatingInequality(a); err != nil {
+		return err
+	}
 	if err := c.publishBoundReason(n, a.variable, &a.value, a.lower, a.open, false, clause); err != nil {
 		return err
 	}

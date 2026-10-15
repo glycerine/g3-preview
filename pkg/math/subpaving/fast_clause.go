@@ -293,6 +293,9 @@ func (c *FastContext) PropagateClause(clause *FastClause, n *FastNode) error {
 	if err := n.open(); err != nil {
 		return err
 	}
+	if err := c.tracePropagateClause(clause); err != nil {
+		return err
+	}
 	c.numVisited++
 	clause.visited = c.timestamp
 	unknown := -1
@@ -315,6 +318,9 @@ func (c *FastContext) PropagateClause(clause *FastClause, n *FastNode) error {
 		unknown = 0
 	}
 	a := clause.atoms[unknown]
+	if err := c.tracePropagatingInequality(a); err != nil {
+		return err
+	}
 	if err := c.propagateBoundReason(n, a.variable, a.value, a.lower, a.open, fastBoundReason{kind: fastReasonClause, clause: clause}); err != nil {
 		return err
 	}

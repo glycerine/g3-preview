@@ -141,6 +141,9 @@ func (c *RationalContext) PropagateClause(clause *RationalClause, n *RationalNod
 	if err := n.open(); err != nil {
 		return err
 	}
+	if err := c.tracePropagateClause(clause); err != nil {
+		return err
+	}
 	c.numVisited++
 	clause.visited = c.timestamp
 	unknown := -1
@@ -163,6 +166,9 @@ func (c *RationalContext) PropagateClause(clause *RationalClause, n *RationalNod
 		unknown = 0
 	}
 	a := clause.atoms[unknown]
+	if err := c.tracePropagatingInequality(a); err != nil {
+		return err
+	}
 	if err := c.publishBoundReason(n, a.variable, &a.value, a.lower, a.open, false, clause, math.MaxUint32); err != nil {
 		return err
 	}
