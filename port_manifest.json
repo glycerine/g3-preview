@@ -167879,6 +167879,14 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Concrete ast_ref move construction, swap and steal ownership transfer without INC/DEC at obj_ref.h:56-60,100-110",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_ref.go",
+          "tests": [
+            "TestASTRefMoveSwapStealSourceOwnership"
+          ]
+        },
+        {
           "name": "actual sexpr scalar owning reference constructors/copy/move/assignment, reset, swap, steal and raw projection",
           "status": "ported",
           "go_target": "pkg/util/sexpr/util_sexpr.go",
