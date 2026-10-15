@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/math/interval"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -42,6 +43,8 @@ type FixedContext struct {
 	clauses          []*FixedClause
 	unitClauses      []fixedUnitClause
 	unitHead         int
+	displayVariable  FixedVariableDisplay
+	trace            *diagnostic.TraceTags
 	initStage        uint8
 	initDefHead      uint32
 	closed           bool
@@ -198,6 +201,8 @@ func (c *FixedContext) Close() error {
 	}
 	c.queue = nil
 	c.queueHead = 0
+	c.displayVariable = nil
+	c.trace = nil
 	c.closed = true
 	return nil
 }
