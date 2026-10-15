@@ -226,7 +226,7 @@ func TestSATGoalRecoveryLongClauseBufferGrowth(t *testing.T) {
 	n, e = m.GetNumArgs(f)
 	satOK(t, e)
 	if n != 40 {
-		t.Fatal("spill lost literals", n)
+		t.Fatal("native slice lost literals", n)
 	}
 	for i, l := range stored {
 		a, e := m.GetArg(f, uint32(i))

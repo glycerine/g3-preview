@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/glycerine/g3/pkg/util/lbool"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
@@ -213,16 +212,9 @@ func recoverSATGoalFormulas(tr *GoalTranslator, g *tactic.Goal, learned bool, ma
 		}
 	}
 	assertClauses := func(clauses []sat.StoredClauseRef) (err error) {
-		// Original ptr_buffer<expr> has sixteen inline borrowed slots and doubles
-		// spill capacity. The owning literal vector stays live throughout assertion.
-		var inline [16]ast.ASTHandle
-		lits := inline[:0]
-		stride := uint64(reflect.TypeOf(ast.ASTHandle{}).Size())
-		defer func() {
-			if cap(lits) > len(inline) {
-				m.Budget().Release(uint64(cap(lits)) * stride)
-			}
-		}()
+		// The literal handles are borrowed for each MkOrArgs call. The goal
+		// owns the resulting formula after Assert publishes it.
+		var lits []ast.ASTHandle
 		for _, clause := range clauses {
 			if e := checkpoint(); e != nil {
 				return e
@@ -236,21 +228,6 @@ func recoverSATGoalFormulas(tr *GoalTranslator, g *tactic.Goal, learned bool, ma
 				literal, e := s.ClauseAllocator().Literal(clause, i)
 				if e != nil {
 					return e
-				}
-				if len(lits) == cap(lits) {
-					capacity := uint64(cap(lits)) * 2
-					if capacity > uint64(^uint(0)>>1)/stride {
-						return arena.ErrBounds
-					}
-					if e = m.Budget().Reserve(capacity * stride); e != nil {
-						return e
-					}
-					next := make([]ast.ASTHandle, len(lits), int(capacity))
-					copy(next, lits)
-					if cap(lits) > len(inline) {
-						m.Budget().Release(uint64(cap(lits)) * stride)
-					}
-					lits = next
 				}
 				lits = append(lits, expressions.values[literal.Index()])
 			}

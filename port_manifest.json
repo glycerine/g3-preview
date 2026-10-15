@@ -119150,6 +119150,7 @@
         "pkg/ast/ast_core_plugin_dispatch.go",
         "pkg/ast/ast_proof_native_domain_test.go",
         "pkg/ast/ast_core_factories.go",
+        "pkg/sat/tactic/sat_goal_recovery.go",
         "pkg/ast/ast_chainable_native_buffer_test.go",
         "pkg/tactic/tactic_stored_model.go",
         "pkg/util/sexpr/util_sexpr.go",
@@ -119177,6 +119178,7 @@
         "TestASTProofDeclarationNativeDomainSliceOrderAndGrowth",
         "TestASTBitVectorParameterizedExpressionFallbackNativeSortSlice",
         "TestASTChainableNativePairBufferOrderAndGrowth",
+        "TestSATGoalRecoveryLongClauseBufferGrowth",
         "TestTacticStoredModelRealSATBindingOwnershipAndReplacement",
         "TestTacticStoredModelLabelsSnapshotAndAppend",
         "TestTacticStoredModelNullShortcutsCompositionAndOwnerGuards",
@@ -119348,6 +119350,14 @@
           "go_target": "pkg/ast/ast_core_factories.go",
           "tests": [
             "TestASTChainableNativePairBufferOrderAndGrowth"
+          ]
+        },
+        {
+          "name": "SAT goal recovery ptr_buffer<expr> borrowed literal sequence uses a native Go slice",
+          "status": "platform_replacement",
+          "go_target": "pkg/sat/tactic/sat_goal_recovery.go",
+          "tests": [
+            "TestSATGoalRecoveryLongClauseBufferGrowth"
           ]
         },
         {
