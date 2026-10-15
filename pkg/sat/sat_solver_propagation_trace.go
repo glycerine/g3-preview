@@ -1,4 +1,4 @@
-// Source: src/sat/sat_solver.cpp:506,564; retained util/trace TRACE sites.
+// Source: src/sat/sat_solver.cpp:506,564,622,632,635; retained util/trace sites.
 package sat
 
 import (
@@ -51,4 +51,58 @@ func (s *satSolverPropagationState) tracePropagating(l Literal) {
 		_, _ = io.WriteString(w, "propagating: "+l.String()+" "+satJustificationTraceString(j)+"\n")
 		return nil
 	})
+}
+
+func (s *satSolverPropagationState) traceBlockedClause(blocked Literal, watch satWatched) {
+	s.traceRecord("propagate_clause_bug", "propagate_core", 622, func(w io.Writer) error {
+		off, err := watch.ClauseOffset()
+		if err != nil {
+			return err
+		}
+		c, err := s.clauses.GetClause(off)
+		if err != nil {
+			return err
+		}
+		clause, err := satTraceClause(s.clauses, c)
+		if err != nil {
+			return err
+		}
+		_, _ = io.WriteString(w, "blocked literal "+blocked.String()+"\n"+clause+"\n")
+		return nil
+	})
+}
+
+func (s *satSolverPropagationState) traceProcessingClause(c StoredClauseRef) {
+	s.traceRecord("propagate_clause_bug", "propagate_core", 632, func(w io.Writer) error {
+		clause, err := satTraceClause(s.clauses, c)
+		if err != nil {
+			return err
+		}
+		removed, err := s.clauses.Removed(c)
+		if err != nil {
+			return err
+		}
+		flag := "0"
+		if removed {
+			flag = "1"
+		}
+		_, _ = io.WriteString(w, "processing... "+clause+"\nwas_removed: "+flag+"\n")
+		return nil
+	})
+}
+
+func (s *satSolverPropagationState) traceClauseMismatch(l Literal, c StoredClauseRef, mismatch bool) {
+	tags := s.traceTags
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	_ = tags.EmitConditional("propagate_bug", "propagate_core", "src/sat/sat_solver.cpp", 635,
+		func() bool { return mismatch }, func(w io.Writer) error {
+			clause, err := satTraceClause(s.clauses, c)
+			if err != nil {
+				return err
+			}
+			_, _ = io.WriteString(w, "l: "+l.String()+" "+clause+"\n")
+			return nil
+		})
 }

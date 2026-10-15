@@ -191,6 +191,7 @@ func (s *satSolverPropagationState) propagateCore(update bool) (bool, error) {
 					return false, e
 				}
 				if value == lbool.True {
+					s.traceBlockedClause(blocked, w)
 					break
 				}
 				off, e := w.ClauseOffset()
@@ -201,6 +202,7 @@ func (s *satSolverPropagationState) propagateCore(update bool) (bool, error) {
 				if e != nil {
 					return false, e
 				}
+				s.traceProcessingClause(c)
 				c0, e := s.clauses.Literal(c, 0)
 				if e != nil {
 					return false, e
@@ -217,16 +219,17 @@ func (s *satSolverPropagationState) propagateCore(update bool) (bool, error) {
 						return false, e
 					}
 				}
+				c1, e := s.clauses.Literal(c, 1)
+				if e != nil {
+					return false, e
+				}
+				s.traceClauseMismatch(l, c, c1 != not)
 				removed, e := s.clauses.Removed(c)
 				if e != nil {
 					return false, e
 				}
 				if removed {
 					break
-				}
-				c1, e := s.clauses.Literal(c, 1)
-				if e != nil {
-					return false, e
 				}
 				if c1 != not {
 					break

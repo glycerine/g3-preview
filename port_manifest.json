@@ -178208,6 +178208,12 @@
           "tests": ["TestSATAssignmentAndPropagationSourceTraceOrder"]
         },
         {
+          "name": "Reached SAT watched-clause blocked, pre-swap processing and post-swap mismatch TRACE sites (sat_solver.cpp:622,632,635)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_propagation_trace.go",
+          "tests": ["TestSATWatchedClauseSourceTraceBranches"]
+        },
+        {
           "name": "Reached SAT learned-watch nonfalse CTRACE before source false-literal assertion (sat_solver.cpp:419)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_clause_watch_trace.go",
@@ -179493,6 +179499,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_propagation_trace.go",
           "tests": ["TestSATAssignmentAndPropagationSourceTraceOrder"]
+        },
+        {
+          "name": "Reached SAT watched-clause blocked, pre-swap processing and post-swap mismatch TRACE sites (sat_solver.cpp:622,632,635)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_propagation_trace.go",
+          "tests": ["TestSATWatchedClauseSourceTraceBranches"]
         },
         {
           "name": "Reached SAT learned-watch nonfalse CTRACE before source false-literal assertion (sat_solver.cpp:419)",
