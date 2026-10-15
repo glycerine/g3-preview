@@ -39,6 +39,10 @@ func NewSourceASTManager(c ASTManagerConfig, filename *uparams.ParamsStringView)
 }
 
 func constructSourceASTManager(c ASTManagerConfig, format bool, filename TraceFilename, borrowedTrace *utext.NumericTextStream) (*ASTManager, error) {
+	return constructSourceASTManagerAt(c, format, filename, borrowedTrace, 0)
+}
+
+func constructSourceASTManagerAt(c ASTManagerConfig, format bool, filename TraceFilename, borrowedTrace *utext.NumericTextStream, allocationLine int) (*ASTManager, error) {
 	if c.Symbols == nil || c.Numerals == nil || c.ProofMode > ASTProofEnabled {
 		return nil, ErrASTDomain
 	}
@@ -59,6 +63,10 @@ func constructSourceASTManager(c ASTManagerConfig, format bool, filename TraceFi
 	}
 	m := &ASTManager{origin: id, BudgetField: c.Budget, Symbols: c.Symbols, numerals: c.Numerals, traceTags: c.TraceTags, ownerBytes: bytes, proofMode: c.ProofMode, coercions: true, nextNode: 1, nextParameter: 1, nextInfo: 1, nextReference: 1}
 	m.Self = m
+	if allocationLine != 0 {
+		m.formatTraceLive = true
+		m.traceFormatAllocated(allocationLine)
+	}
 	// reslimit is the first automatic source member. Its zero-valued scalar
 	// constructor owns no vector payload and has no separate owner allocation.
 	m.Limit.InitEmbedded(c.Budget)
@@ -121,7 +129,11 @@ func constructSourceASTManager(c ASTManagerConfig, format bool, filename TraceFi
 	if !format {
 		nested := c
 		nested.ProofMode = ASTProofDisabled
-		child, err := constructSourceASTManager(nested, true, nil, m.TraceStream)
+		line := 1313
+		if borrowedTrace != nil {
+			line = 1330
+		}
+		child, err := constructSourceASTManagerAt(nested, true, nil, m.TraceStream, line)
 		if err != nil {
 			m.constructorPendingFormat = child
 			return fail(err)
@@ -413,15 +425,19 @@ func (m *ASTManager) closeCore(source bool) error {
 		}
 	}
 	if m.Format != nil {
+		child := m.Format
 		if source {
-			if e := m.Format.SourceFinalize(); e != nil {
+			if e := child.SourceFinalize(); e != nil {
 				note(e)
 				return failure
 			}
 		}
-		note(m.Format.Close())
+		note(child.Close())
 		if source && failure != nil {
 			return failure
+		}
+		if child.Closed {
+			child.traceFormatDeallocated()
 		}
 		m.Format = nil
 	}

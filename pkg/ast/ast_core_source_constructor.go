@@ -143,9 +143,11 @@ func (m *ASTManager) abortConstructionCore() error {
 		m.constructorPendingFormat = nil
 	}
 	if m.Format != nil {
-		if e := m.Format.Close(); e != nil {
+		child := m.Format
+		if e := child.Close(); e != nil {
 			return stop(e)
 		}
+		child.traceFormatDeallocated()
 		m.Format = nil
 	}
 	if m.TraceFile != nil {

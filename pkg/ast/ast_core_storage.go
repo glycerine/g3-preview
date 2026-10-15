@@ -259,6 +259,7 @@ type ASTManager struct {
 	TraceStream                                                                                        *utext.NumericTextStream
 	traceTags                                                                                          *udiag.TraceTags
 	traceOwner                                                                                         bool
+	formatTraceLive                                                                                    bool
 	LowLevel                                                                                           astLowLevelFrame
 	traceExecuting                                                                                     bool
 	DebugRefCount                                                                                      bool
