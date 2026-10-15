@@ -292,6 +292,9 @@ func (c *FixedContext) PropagateClause(clause *FixedClause, n *FixedNode) error 
 	if err := n.open(); err != nil {
 		return err
 	}
+	if err := c.tracePropagateClause(clause); err != nil {
+		return err
+	}
 	c.numVisited++
 	clause.visited = c.timestamp
 	unknown := -1
@@ -314,6 +317,9 @@ func (c *FixedContext) PropagateClause(clause *FixedClause, n *FixedNode) error 
 		unknown = 0
 	}
 	a := clause.atoms[unknown]
+	if err := c.tracePropagatingInequality(a); err != nil {
+		return err
+	}
 	if err := c.propagateBoundReason(n, a.variable, a.value, a.lower, a.open, fixedBoundReason{kind: fixedReasonClause, clause: clause}); err != nil {
 		return err
 	}

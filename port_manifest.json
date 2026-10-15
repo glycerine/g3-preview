@@ -53398,6 +53398,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_clause_trace.go",
           "tests": ["TestFixedClauseAndUnitTracePublicationOrder", "TestFixedClauseAndUnitTraceFailureBoundaries"]
+        },
+        {
+          "name": "Concrete config_mpfx clause-propagation TRACE before visit and before selected inequality bound publication (subpaving_t_def.h:1376,1400)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_clause_propagate_trace.go",
+          "tests": ["TestFixedClausePropagationTraceSourceOrder", "TestFixedClausePropagationTraceFailureBoundaries"]
         }
       ],
       "ownership": [
@@ -54840,6 +54846,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_clause_trace.go",
           "tests": ["TestFixedClauseAndUnitTracePublicationOrder", "TestFixedClauseAndUnitTraceFailureBoundaries"]
+        },
+        {
+          "name": "Concrete config_mpfx clause-propagation TRACE before visit and before selected inequality bound publication (subpaving_t_def.h:1376,1400)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_clause_propagate_trace.go",
+          "tests": ["TestFixedClausePropagationTraceSourceOrder", "TestFixedClausePropagationTraceFailureBoundaries"]
         },
         {
           "name": "Concrete config_mpff round-robin variable selector after latest child axiom (src/math/subpaving/subpaving_t_def.h:66-101)",
@@ -177369,6 +177381,12 @@
           "tests": ["TestFixedClauseAndUnitTracePublicationOrder", "TestFixedClauseAndUnitTraceFailureBoundaries"]
         },
         {
+          "name": "Reached config_mpfx clause-propagation TRACE before visit and selected bound publication (subpaving_t_def.h:1376,1400)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_clause_propagate_trace.go",
+          "tests": ["TestFixedClausePropagationTraceSourceOrder", "TestFixedClausePropagationTraceFailureBoundaries"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -178257,6 +178275,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_clause_trace.go",
           "tests": ["TestFixedClauseAndUnitTracePublicationOrder", "TestFixedClauseAndUnitTraceFailureBoundaries"]
+        },
+        {
+          "name": "Reached config_mpfx clause-propagation TRACE before visit and selected bound publication (subpaving_t_def.h:1376,1400)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_clause_propagate_trace.go",
+          "tests": ["TestFixedClausePropagationTraceSourceOrder", "TestFixedClausePropagationTraceFailureBoundaries"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
