@@ -121510,7 +121510,7 @@
         },
         {
           "name": "notify_assertion_violation source37-42 separate stderr insertion chains with caller format state and borrowed CString reached lifetime",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/diagnostic/util_debug_notification.go",
           "tests": [
             "TestDebugNotificationExactStatementsSignedFlagsAndNoReservation",
@@ -121524,7 +121524,7 @@
         },
         {
           "name": "invoke_gdb formatted std::cin char extraction prerequisite at cpp79-80: concrete classic-byte file input, actual tied stdout sentry and default nonthrowing flags",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/diagnostic/util_numeric_char_input.go",
           "tests": [
             "TestNumericCharInputClassicWhitespaceIndependentEveryByte",
@@ -121538,7 +121538,7 @@
         },
         {
           "name": "invoke_gdb cpp73-117 and NO_Z3_DEBUGGER h42-56: literal prompt/extract/switch, real exit/default exception and concrete Linux system/signal action chain",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/diagnostic/util_debug_actions.go",
           "tests": [
             "TestDebugActionSubprocessHelper",
@@ -121823,7 +121823,7 @@
         },
         {
           "name": "notify_assertion_violation source37-42 separate stderr insertion chains with caller format state and borrowed CString reached lifetime",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/diagnostic/util_debug_notification.go",
           "tests": [
             "TestDebugNotificationExactStatementsSignedFlagsAndNoReservation",
@@ -121837,7 +121837,7 @@
         },
         {
           "name": "invoke_gdb formatted std::cin char extraction prerequisite at cpp79-80: concrete classic-byte file input, actual tied stdout sentry and default nonthrowing flags",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/diagnostic/util_numeric_char_input.go",
           "tests": [
             "TestNumericCharInputClassicWhitespaceIndependentEveryByte",
@@ -121851,7 +121851,7 @@
         },
         {
           "name": "invoke_gdb cpp73-117 and NO_Z3_DEBUGGER h42-56: literal prompt/extract/switch, real exit/default exception and concrete Linux system/signal action chain",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/diagnostic/util_debug_actions.go",
           "tests": [
             "TestDebugActionSubprocessHelper",
