@@ -166120,6 +166120,7 @@
         "pkg/util/params/util_params_source_frame.go",
         "pkg/util/params/util_params_assignment_source_test.go",
         "pkg/util/params/util_params_copy_all_kinds_source_test.go",
+        "pkg/util/params/util_params_copy_replacement_source_test.go",
         "pkg/util/params/util_params_reset_source.go",
         "pkg/util/params/util_params_reset_source_test.go",
         "pkg/util/params/util_params_reset_key_source.go",
@@ -166189,6 +166190,7 @@
         "TestParamsReferenceInitFailedCopySkipsOldDEC",
         "TestParamsReferenceCopyAllKindsSharedTargetRefusalPrefixes",
         "TestParamsReferenceCopyFromSharedSourceStoppedDetach",
+        "TestParamsReferenceCopyStopsAtMatchedNumeralDestruction",
         "TestParamsReferenceInitFrameOwnAbortActualLeafReceipt",
         "TestParamsReferenceTwoFramesAndFreshInvocationReuse",
         "TestParamsReferenceNullAssignmentOldDECStop",
@@ -166415,7 +166417,8 @@
             "TestParamsReferenceExactContextAccountingAndGrowthPeak",
             "TestParamsReferenceFiniteSignedRatAndNullDefaults",
             "TestParamsReferenceProvenanceBeforeMutation",
-            "TestParamsReferenceCStringPrefix"
+            "TestParamsReferenceCStringPrefix",
+            "TestParamsReferenceCopyStopsAtMatchedNumeralDestruction"
           ]
         },
         {
@@ -166637,7 +166640,8 @@
             "TestParamsReferenceMatchedReplacementSourceKindsAndLiveNoops",
             "TestParamsReferenceMatchedReplacementContextAbortDoesNotPublish",
             "TestParamsReferenceMatchedReplacementNativeText",
-            "TestParamsReferenceMatchedReplacementIndependentFramesAndReuse"
+            "TestParamsReferenceMatchedReplacementIndependentFramesAndReuse",
+            "TestParamsReferenceCopyStopsAtMatchedNumeralDestruction"
           ]
         },
         {
@@ -166794,6 +166798,7 @@
         "pkg/util/params/util_params_source_frame.go",
         "pkg/util/params/util_params_assignment_source_test.go",
         "pkg/util/params/util_params_copy_all_kinds_source_test.go",
+        "pkg/util/params/util_params_copy_replacement_source_test.go",
         "pkg/util/params/util_params_reset_source.go",
         "pkg/util/params/util_params_reset_source_test.go",
         "pkg/util/params/util_params_reset_key_source.go",
@@ -166860,6 +166865,7 @@
         "TestParamsReferenceInitFailedCopySkipsOldDEC",
         "TestParamsReferenceCopyAllKindsSharedTargetRefusalPrefixes",
         "TestParamsReferenceCopyFromSharedSourceStoppedDetach",
+        "TestParamsReferenceCopyStopsAtMatchedNumeralDestruction",
         "TestParamsReferenceInitFrameOwnAbortActualLeafReceipt",
         "TestParamsReferenceTwoFramesAndFreshInvocationReuse",
         "TestParamsReferenceNullAssignmentOldDECStop",
@@ -167046,7 +167052,8 @@
             "TestParamsReferenceExactContextAccountingAndGrowthPeak",
             "TestParamsReferenceFiniteSignedRatAndNullDefaults",
             "TestParamsReferenceProvenanceBeforeMutation",
-            "TestParamsReferenceCStringPrefix"
+            "TestParamsReferenceCStringPrefix",
+            "TestParamsReferenceCopyStopsAtMatchedNumeralDestruction"
           ]
         },
         {
@@ -167267,7 +167274,8 @@
             "TestParamsReferenceMatchedReplacementSourceKindsAndLiveNoops",
             "TestParamsReferenceMatchedReplacementContextAbortDoesNotPublish",
             "TestParamsReferenceMatchedReplacementNativeText",
-            "TestParamsReferenceMatchedReplacementIndependentFramesAndReuse"
+            "TestParamsReferenceMatchedReplacementIndependentFramesAndReuse",
+            "TestParamsReferenceCopyStopsAtMatchedNumeralDestruction"
           ]
         },
         {
