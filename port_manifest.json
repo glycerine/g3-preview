@@ -178141,6 +178141,17 @@
           "tests": ["TestArbitraryFloatPartialRemainderReachedEndlFlushes"]
         },
         {
+          "name": "Reached MPN arithmetic and compare TRACE call sites, including debug-only decimal operands and nested division output (mpn.cpp:55,411-429)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_arithmetic_trace.go",
+          "tests": [
+            "TestMPNArithmeticSourceTraceOrder",
+            "TestMPNCompareTraceUsesSourceDecimalConversionForMultipleLimbs",
+            "TestMPNMultiLimbDivisionNestedArithmeticTrace",
+            "TestMPNDivisionAddbackTraceFollowsBorrow"
+          ]
+        },
+        {
           "name": "Reached MPN to_string TRACE entry operand insertions and result std::endl flush before footer (mpn.cpp:362,395)",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpn_to_string_trace.go",
@@ -179604,6 +179615,17 @@
           "go_target": "pkg/util/numeral/mpf_partial_remainder_trace.go",
           "go_targets": ["pkg/util/numeral/mpf_partial_remainder_component_trace.go", "pkg/util/diagnostic/util_trace_tags.go"],
           "tests": ["TestArbitraryFloatPartialRemainderReachedEndlFlushes"]
+        },
+        {
+          "name": "Reached MPN arithmetic and compare TRACE call sites, including debug-only decimal operands and nested division output (mpn.cpp:55,411-429)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpn_arithmetic_trace.go",
+          "tests": [
+            "TestMPNArithmeticSourceTraceOrder",
+            "TestMPNCompareTraceUsesSourceDecimalConversionForMultipleLimbs",
+            "TestMPNMultiLimbDivisionNestedArithmeticTrace",
+            "TestMPNDivisionAddbackTraceFollowsBorrow"
+          ]
         },
         {
           "name": "Reached MPN to_string TRACE entry operand insertions and result std::endl flush before footer (mpn.cpp:362,395)",
