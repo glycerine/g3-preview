@@ -52936,7 +52936,8 @@
           "go_target": "pkg/math/subpaving/fast_context.go",
           "tests": [
             "TestSubpavingFastContextBoundFlowAndRelevance",
-            "TestSubpavingFastContextIntegerNormalizationAndCandidate"
+            "TestSubpavingFastContextIntegerNormalizationAndCandidate",
+            "TestFastContextRelevanceEpsilonUsesMaximumOfMinimumAndOne"
           ]
         },
         {

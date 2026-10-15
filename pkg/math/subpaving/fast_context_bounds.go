@@ -239,7 +239,8 @@ func (c *FastContext) RelevantNewBound(n *FastNode, variable uint32, k *numeral.
 	if e != nil {
 		return false, e
 	}
-	if cmp < 0 {
+	// Source uses max(minimum, 1) before multiplying by epsilon.
+	if cmp > 0 {
 		if err = m.Copy(delta, minimum); err != nil {
 			return false, err
 		}

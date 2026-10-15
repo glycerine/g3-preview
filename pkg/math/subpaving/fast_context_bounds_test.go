@@ -54,6 +54,37 @@ func TestFastContextRelevanceCatchesMPFFOverflow(t *testing.T) {
 	}
 }
 
+func TestFastContextRelevanceEpsilonUsesMaximumOfMinimumAndOne(t *testing.T) {
+	m, c, value, root := fastMonomialFixture(t, []bool{false})
+	if err := c.updateEpsilon(20); err != nil {
+		t.Fatal(err)
+	}
+	if err := m.SetInt32(value, 0); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.PropagateBound(root, 0, value, true, false); err != nil {
+		t.Fatal(err)
+	}
+	if err := m.SetFraction32(value, 1, 40); err != nil {
+		t.Fatal(err)
+	}
+	if relevant, err := c.RelevantNewBound(root, 0, value, true, false); err != nil || relevant {
+		t.Fatal("epsilon floor of one must reject improvement below 1/20", relevant, err)
+	}
+	if err := m.SetInt32(value, 10); err != nil {
+		t.Fatal(err)
+	}
+	if err := c.PropagateBound(root, 0, value, true, false); err != nil {
+		t.Fatal(err)
+	}
+	if err := m.SetFraction32(value, 41, 4); err != nil {
+		t.Fatal(err)
+	}
+	if relevant, err := c.RelevantNewBound(root, 0, value, true, false); err != nil || relevant {
+		t.Fatal("epsilon scale of ten must reject improvement below 1/2", relevant, err)
+	}
+}
+
 func TestFastContextRelevanceCatchesMPFFUpperAndThresholdOverflow(t *testing.T) {
 	for _, tc := range []struct {
 		name                      string
