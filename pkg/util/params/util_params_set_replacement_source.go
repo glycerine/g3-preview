@@ -107,6 +107,18 @@ func (c *ParamsContext) StoppedSetReplacement(v *ParamsRef) (ParamsSetReplacemen
 	return ParamsSetReplacementReceipt{owner: c.Owner, slot: v.Slot, generation: v.Generation, index: f.index, invocation: f.invocation}, nil
 }
 func (c *ParamsContext) CompleteSetReplacement(v *ParamsRef, r ParamsSetReplacementReceipt) error {
+	return c.finishSetReplacement(v, r, true)
+}
+
+// AbortSetReplacement finishes only the retained owning cleanup after a
+// stopped setter or copy_core replacement. It does not publish the incoming
+// value or resume the source assignment; the caller must release the affected
+// ParamsRef after this cleanup.
+func (c *ParamsContext) AbortSetReplacement(v *ParamsRef, r ParamsSetReplacementReceipt) error {
+	return c.finishSetReplacement(v, r, false)
+}
+
+func (c *ParamsContext) finishSetReplacement(v *ParamsRef, r ParamsSetReplacementReceipt, publish bool) error {
 	if c == nil || c.Self != c {
 		return ErrParamsOwner
 	}
@@ -122,5 +134,5 @@ func (c *ParamsContext) CompleteSetReplacement(v *ParamsRef, r ParamsSetReplacem
 	if !f.active || f.invocation != r.invocation || f.index != r.index || f.generation != r.generation {
 		return ErrParamsPrecondition
 	}
-	return c.continueReplacement(v.Slot, true)
+	return c.continueReplacement(v.Slot, publish)
 }

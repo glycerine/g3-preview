@@ -167401,8 +167401,15 @@
             "TestParamsReferenceFiniteSignedRatAndNullDefaults",
             "TestParamsReferenceProvenanceBeforeMutation",
             "TestParamsReferenceCStringPrefix",
-            "TestParamsReferenceCopyStopsAtMatchedNumeralDestruction"
+            "TestParamsReferenceCopyStopsAtMatchedNumeralDestruction",
+            "TestParamsReferenceCopyStoppedReplacementOwningAbort"
           ]
+        },
+        {
+          "name": "Concrete params_ref copy_core stopped matched-numeral replacement owning abort with exact source receipt and no incoming publication (params.cpp:568-595,753-763)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_set_replacement_source.go",
+          "tests": ["TestParamsReferenceCopyStoppedReplacementOwningAbort"]
         },
         {
           "name": "params_ref init/copy_core and private params ordered entries/refcounts/value destruction",
@@ -168036,8 +168043,15 @@
             "TestParamsReferenceFiniteSignedRatAndNullDefaults",
             "TestParamsReferenceProvenanceBeforeMutation",
             "TestParamsReferenceCStringPrefix",
-            "TestParamsReferenceCopyStopsAtMatchedNumeralDestruction"
+            "TestParamsReferenceCopyStopsAtMatchedNumeralDestruction",
+            "TestParamsReferenceCopyStoppedReplacementOwningAbort"
           ]
+        },
+        {
+          "name": "Concrete params_ref copy_core stopped matched-numeral replacement owning abort with exact source receipt and no incoming publication (params.cpp:568-595,753-763)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_set_replacement_source.go",
+          "tests": ["TestParamsReferenceCopyStoppedReplacementOwningAbort"]
         },
         {
           "name": "params_ref init/copy_core and private params ordered entries/refcounts/value destruction",
