@@ -12,7 +12,13 @@ func (m *ArbitraryFloatNumeralManager) ToRationalString(x *ArbitraryFloat) (stri
 		return "", e
 	}
 	var owned utext.OwnedString
+	// A pre-existing stopped conversion belongs to the core's caller. Only
+	// finish the lexical scope created by this invocation on failure.
+	previousPending := m.core.rationalString.active
 	if e := m.core.ToRationalString(x, &owned); e != nil {
+		if !previousPending {
+			e = JoinNumericErrors(e, m.core.CleanupRationalString())
+		}
 		owned.SourceDestroy()
 		return "", e
 	}

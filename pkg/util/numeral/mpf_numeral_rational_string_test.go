@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func TestArbitraryFloatNumeralSourceRationalString(t *testing.T) {
@@ -37,6 +38,56 @@ func TestArbitraryFloatNumeralSourceRationalString(t *testing.T) {
 	if _, err := m.ToRationalString(&x); !errors.Is(err, arena.ErrClosed) {
 		t.Fatal("closed string", err)
 	}
+}
+
+func TestArbitraryFloatNumeralRationalStringRetryAfterConversionRefusal(t *testing.T) {
+	core, _, budget := mpfNumeralHelpersFixture(t)
+	m, err := NewArbitraryFloatNumeralManager(core, 17, 120)
+	if err != nil {
+		t.Fatal(err)
+	}
+	x := ArbitraryFloat{format: arbitraryFloatFormat(17, 120, false), exponent: 160, significand: NewInt(1)}
+	if err := core.integer.Mul2kInPlace(&x.significand, 119); err != nil {
+		t.Fatal(err)
+	}
+	budget.FailAfter(0)
+	_, refused := m.ToRationalString(&x)
+	budget.FailAfter(-1)
+	if !numericPhysicalReservationRefusal(refused) {
+		t.Fatal("expected real conversion allocation refusal", refused)
+	}
+	got, err := m.ToRationalString(&x)
+	if err != nil || got == "" {
+		t.Fatal("retained source local after returned failure", got, err)
+	}
+	serviceMust(t, core.Del(&x))
+	serviceMust(t, m.Close())
+}
+
+func TestArbitraryFloatNumeralRationalStringPreservesEarlierStoppedScope(t *testing.T) {
+	core, _, budget := mpfNumeralHelpersFixture(t)
+	m, err := NewArbitraryFloatNumeralManager(core, 17, 120)
+	serviceMust(t, err)
+	x := ArbitraryFloat{format: arbitraryFloatFormat(17, 120, false), exponent: 160, significand: NewInt(1)}
+	serviceMust(t, core.integer.Mul2kInPlace(&x.significand, 119))
+	var earlier utext.OwnedString
+	budget.FailAfter(0)
+	refused := core.ToRationalString(&x, &earlier)
+	budget.FailAfter(-1)
+	if !numericPhysicalReservationRefusal(refused) || !core.rationalString.active {
+		t.Fatal("expected retained earlier lexical scope", refused)
+	}
+	if _, err := m.ToRationalString(&x); !errors.Is(err, ErrNumericPending) || !core.rationalString.active {
+		t.Fatal("higher-level caller consumed an earlier invocation", err)
+	}
+	serviceMust(t, core.CleanupRationalString())
+	earlier.OwnAbort()
+	got, err := m.ToRationalString(&x)
+	if err != nil || got == "" {
+		t.Fatal("earlier scope cleanup did not restore caller", got, err)
+	}
+	serviceMust(t, core.Del(&x))
+	serviceMust(t, m.Close())
 }
 
 type mpfNumeralShortWriter struct{ buf bytes.Buffer }

@@ -122209,6 +122209,8 @@
         "TestArbitraryFloatNumeralPowerStoppedBodyRetainsRawLocal",
         "TestArbitraryFloatNumeralPowerMaskWrapRetainsPublishedResult",
         "TestArbitraryFloatNumeralSourceRationalString",
+        "TestArbitraryFloatNumeralRationalStringRetryAfterConversionRefusal",
+        "TestArbitraryFloatNumeralRationalStringPreservesEarlierStoppedScope",
         "TestArbitraryFloatNumeralSourceStringAndDisplay",
         "TestArbitraryFloatNumeralSourceSwapAndDel",
         "TestSubpavingMPFIntervalXnEqYRetainedCases",
@@ -122359,6 +122361,8 @@
           "go_target": "pkg/util/numeral/mpf_numeral_rational_string.go",
           "tests": [
             "TestArbitraryFloatNumeralSourceRationalString",
+            "TestArbitraryFloatNumeralRationalStringRetryAfterConversionRefusal",
+            "TestArbitraryFloatNumeralRationalStringPreservesEarlierStoppedScope",
             "TestArbitraryFloatNumeralSourceStringAndDisplay"
           ]
         },
