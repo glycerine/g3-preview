@@ -152997,6 +152997,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Four commented mpf_dbg SIG/NUM/DEN/EXP TRACE statements have no compiled emission in to_rational (mpf.cpp:1547-1550)",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
+        },
+        {
           "name": "mpf_manager::partial_remainder mpf_dbg_rem entry, quotient ratio, tie, Q, YQ, exponent delta, aligned subtrahend, signed difference, X-YQ, sticky and final Go value-word TRACE at mpf.cpp:1282-1435; tie and exponent-delta source insertion boundaries",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_partial_remainder_component_trace.go",
@@ -156855,6 +156861,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Commented mpn_dbg quotient/remainder TRACE has no compiled emission in division (mpn.cpp:199-200)",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
+        },
         {
           "name": "compare",
           "status": "ported",
@@ -177530,6 +177542,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Disabled/commented MPZ array-GCD, MPN division and MPF to_rational TRACE text has no compiled emission (mpz.cpp:875; mpn.cpp:199-200; mpf.cpp:1547-1550)",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
+        },
+        {
           "name": "Reached model-evaluator get_macro TRACE records at existing-interpretation and completion branches (model_evaluator.cpp:228,247)",
           "status": "ported",
           "go_target": "pkg/model/model_evaluator_trace.go",
@@ -178960,6 +178978,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Disabled/commented MPZ array-GCD, MPN division and MPF to_rational TRACE text has no compiled emission (mpz.cpp:875; mpn.cpp:199-200; mpf.cpp:1547-1550)",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
+        },
         {
           "name": "Reached model-evaluator get_macro TRACE records at existing-interpretation and completion branches (model_evaluator.cpp:228,247)",
           "status": "ported",
