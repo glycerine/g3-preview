@@ -166698,7 +166698,7 @@
         "Concrete ASTExprMark and ASTMark own independent packed expression/declaration ID planes and borrow ASTManager for ID conversion and backing-budget lifetime. Ordinary ID marks retain no node reference and survive node deletion and ID reuse, matching source obj_mark behavior. Close releases each owner; wrapper copies and stale/foreign handles are rejected."
       ],
       "deviations": [
-        "The two retained source instantiations are concrete Go AST mark types; no generic template adapter is introduced. Go ASTHandle replaces C++ pointer/reference overloads and reports invalid or stale handles as typed errors. Source default get_id and declaration get_decl_id map to separate packed planes; mark(false) still grows the plane before clearing the bit. Fast/ref-fast and sparse marks belong to ast.h, not obj_mark.h."
+        "The two retained source instantiations are concrete Go AST mark types; no generic template adapter is introduced. Go ASTHandle replaces C++ pointer/reference overloads and reports invalid or stale handles as typed errors. Source default get_id and declaration get_decl_id map to separate packed planes; mark(false) still grows the plane before clearing the bit. Packed words now grow in native Go slices without source capacity scheduling or arena backing charges; unsigned logical-size wrap and physical guards remain. Fast/ref-fast and sparse marks belong to ast.h, not obj_mark.h."
       ]
     },
     {

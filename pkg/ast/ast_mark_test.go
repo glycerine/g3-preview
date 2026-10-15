@@ -303,6 +303,16 @@ func TestASTMarkAllNodeKindsIndependentBitOracleAndWarmPlateau(t *testing.T) {
 	marker, e := NewASTMark(m)
 	astTestMust(t, e)
 	defer marker.Close()
+	before := m.BudgetField.Used()
+	m.BudgetField.FailAfter(0)
+	for _, h := range all {
+		astTestMust(t, marker.Mark(h, true))
+	}
+	m.BudgetField.FailAfter(-1)
+	if m.BudgetField.Used() != before {
+		t.Fatal("native marker growth charged arena backing", before, m.BudgetField.Used())
+	}
+	astTestMust(t, marker.Reset())
 	expected := [5]bool{}
 	for i := 0; i < 300; i++ {
 		index := (i*37 + 11) % len(all)

@@ -126,7 +126,7 @@ func (f *astExprVisitFrame) mark(m *ASTManager, n astNodeRef) (bool, error) {
 		if e != nil || yes {
 			return yes, e
 		}
-		return false, bits.mark(m, id, true)
+		return false, bits.mark(id, true)
 	}
 	s := f.fast
 	yes, e := m.nodeMark(n, 1, s.owner.identity, 0, false)
@@ -167,7 +167,7 @@ func (f *astExprVisitFrame) sourceFinish(m *ASTManager) error {
 		f.localFast.heapBytes = 0
 		f.localFast.owner.finish()
 	} else if f.mode == 3 {
-		f.localBits.close(m)
+		f.localBits.close()
 	}
 	if f.pendingMark.slot == 0 {
 		f.active = false
@@ -245,7 +245,7 @@ func (m *ASTManager) cleanupExprVisitFrame() error {
 				s.owner.finish()
 			}
 		} else if f.mode == 3 {
-			f.localBits.close(m)
+			f.localBits.close()
 		}
 		if f.pendingMark.slot != 0 {
 			if e := m.acknowledgeExprMark(f.pendingMark, f.pendingOwner); e != nil {

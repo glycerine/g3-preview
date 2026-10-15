@@ -66,14 +66,13 @@ func (o *astMarkOwner) finish() {
 }
 
 // bit_vector's default constructor, resize(false), get/set/reset/destructor
-// subset. All backing words, including unused capacity, are charged.
+// subset. The packed words use native Go slice storage.
 type astMarkBits struct {
 	words []uint32
 	size  uint32
-	bytes uint64
 }
 
-func (b *astMarkBits) resize(m *ASTManager, n uint32) error {
+func (b *astMarkBits) resize(n uint32) error {
 	if n <= b.size {
 		b.size = n
 		return nil
@@ -82,19 +81,10 @@ func (b *astMarkBits) resize(m *ASTManager, n uint32) error {
 	// checks below bound only otherwise-invalid reads/writes after wrap.
 	need := (n + 31) / 32
 	if need > uint32(len(b.words)) {
-		cap := (need*3 + 1) >> 1
-		bytes := uint64(cap) * 4
-		if bytes > uint64(^uint(0)>>1) {
+		if uint64(need) > uint64(^uint(0)>>1)/4 {
 			return arena.ErrBounds
 		}
-		if e := m.BudgetField.Reserve(bytes); e != nil {
-			return e
-		}
-		next := make([]uint32, int(cap))
-		copy(next, b.words)
-		m.BudgetField.Release(b.bytes)
-		b.words = next
-		b.bytes = bytes
+		b.words = append(b.words, make([]uint32, int(need)-len(b.words))...)
 	}
 	begin := b.size / 32
 	if uint64(begin) >= uint64(len(b.words)) {
@@ -117,9 +107,9 @@ func (b *astMarkBits) marked(id uint32) (bool, error) {
 	}
 	return b.words[id/32]&(uint32(1)<<(id%32)) != 0, nil
 }
-func (b *astMarkBits) mark(m *ASTManager, id uint32, flag bool) error {
+func (b *astMarkBits) mark(id uint32, flag bool) error {
 	if id >= b.size {
-		if e := b.resize(m, id+1); e != nil {
+		if e := b.resize(id + 1); e != nil {
 			return e
 		}
 	}
@@ -139,11 +129,9 @@ func (b *astMarkBits) mark(m *ASTManager, id uint32, flag bool) error {
 	return nil
 }
 func (b *astMarkBits) reset() { clear(b.words); b.size = 0 }
-func (b *astMarkBits) close(m *ASTManager) {
-	m.BudgetField.Release(b.bytes)
+func (b *astMarkBits) close() {
 	b.words = nil
 	b.size = 0
-	b.bytes = 0
 }
 func (m *ASTManager) markID(h ASTHandle, expressionsOnly bool) (uint32, bool, error) {
 	r, e := m.internal(h)
@@ -212,7 +200,7 @@ func (v *ASTExprMark) Mark(h ASTHandle, flag bool) error {
 	if e != nil {
 		return e
 	}
-	return v.marks.mark(m, id, flag)
+	return v.marks.mark(id, flag)
 }
 func (v *ASTExprMark) Reset() error {
 	if v == nil {
@@ -236,7 +224,7 @@ func (v *ASTExprMark) Close() error {
 	m := v.owner.manager
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	v.marks.close(m)
+	v.marks.close()
 	v.owner.finish()
 	return nil
 }
@@ -262,12 +250,12 @@ func (s *astMarkState) mark(m *ASTManager, h ASTHandle, flag bool) error {
 		return e
 	}
 	if decl {
-		return s.decls.mark(m, id, flag)
+		return s.decls.mark(id, flag)
 	}
-	return s.exprs.mark(m, id, flag)
+	return s.exprs.mark(id, flag)
 }
-func (s *astMarkState) reset()              { s.decls.reset(); s.exprs.reset() }
-func (s *astMarkState) close(m *ASTManager) { s.decls.close(m); s.exprs.close(m); s.owner.finish() }
+func (s *astMarkState) reset() { s.decls.reset(); s.exprs.reset() }
+func (s *astMarkState) close() { s.decls.close(); s.exprs.close(); s.owner.finish() }
 
 type ASTMark struct{ state astMarkState }
 
@@ -329,6 +317,6 @@ func (v *ASTMark) Close() error {
 	m := v.state.owner.manager
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	v.state.close(m)
+	v.state.close()
 	return nil
 }

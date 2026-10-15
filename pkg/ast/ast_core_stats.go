@@ -35,7 +35,7 @@ func (m *ASTManager) Stats() ASTManagerStats {
 	if f := m.traceAcquisitionExecuting; f != nil {
 		s.AllocatedBytes += f.bytes
 	}
-	s.AllocatedBytes += m.exprVisit.bytes + m.exprVisit.localFast.heapBytes + m.exprVisit.localBits.bytes
+	s.AllocatedBytes += m.exprVisit.bytes + m.exprVisit.localFast.heapBytes
 	for h := m.exprVisitHistory; h != nil; h = h.next {
 		s.AllocatedBytes += h.bytes
 	}
