@@ -50,3 +50,48 @@ func TestASTSMT2BooleanComparisonsWithArithmeticLiterals(t *testing.T) {
 		paramsMust(t, out.ResetText())
 	}
 }
+
+func TestASTSMT2BooleanComparisonsWithBitVectorLiterals(t *testing.T) {
+	c, g, p, budget := dynAckSourceFixture(t)
+	m, err := NewASTManager(ASTManagerConfig{Symbols: c.SymbolsField, Numerals: c.NumeralsField, Budget: budget})
+	paramsMust(t, err)
+	defer func() { paramsMust(t, m.Close()) }()
+	_, err = m.RegisterArithmeticPlugin()
+	paramsMust(t, err)
+	_, err = m.RegisterBitVectorPlugin()
+	paramsMust(t, err)
+	value, err := c.NumeralsField.NewValue()
+	paramsMust(t, err)
+	defer func() { paramsMust(t, c.NumeralsField.CleanupValue(&value)) }()
+	out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: budget})
+	paramsMust(t, err)
+	defer func() { paramsMust(t, out.Close()) }()
+	for _, tc := range []struct {
+		value string
+		width uint32
+		want  string
+	}{
+		{"10", 4, "(= #xa x)"},
+		{"10", 5, "(= #b01010 x)"},
+		{"-1", 8, "(= #xff x)"},
+	} {
+		paramsMust(t, c.NumeralsField.SetString(&value, tc.value))
+		literal, e := m.BitVectorNumeral(&value, tc.width)
+		paramsMust(t, e)
+		sort, e := m.GetSort(literal)
+		paramsMust(t, e)
+		x, e := m.MkConst(astTestSymbol(t, m, "x"), sort)
+		paramsMust(t, e)
+		root, e := m.MkEq(literal, x)
+		paramsMust(t, e)
+		format, e := m.SMT2PPBooleanTree(root, nil)
+		paramsMust(t, e)
+		paramsMust(t, m.PrintFormat(out, format, c, p, g))
+		got, e := out.String()
+		paramsMust(t, e)
+		if got != tc.want {
+			t.Fatalf("%s width=%d: %q, want %q", tc.value, tc.width, got, tc.want)
+		}
+		paramsMust(t, out.ResetText())
+	}
+}

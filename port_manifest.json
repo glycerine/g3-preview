@@ -12501,6 +12501,7 @@
         "TestASTSMT2VariableAndLabelSourceFormats",
         "TestASTSMT2ApplicationSourceShortAndLongNameLayout",
         "TestASTSMT2BooleanComparisonsWithArithmeticLiterals",
+        "TestASTSMT2BooleanComparisonsWithBitVectorLiterals",
         "TestASTSMT2BooleanTreeSourcePostorderAndLabels",
         "TestASTSMT2DeclareFunSourceEntrypoint"
       ],
@@ -12660,12 +12661,13 @@
           ]
         },
         {
-          "name": "Selected smt2_printer child-before-parent Boolean application and variable traversal with constant/label dispatch, default flat associative expansion, alias registration/reuse, info-stack weight/depth/level and let wrapping; arithmetic numeral children use the source-default exact rational profile, while other numeric and quantifier profiles remain open",
+          "name": "Selected smt2_printer child-before-parent Boolean application and variable traversal with constant/label dispatch, default flat associative expansion, alias registration/reuse, info-stack weight/depth/level and let wrapping; arithmetic and bit-vector numeral children use source-default literal profiles, while other numeric and quantifier profiles remain open",
           "status": "partial",
           "go_target": "pkg/ast/ast_smt2_boolean_tree.go",
           "tests": [
             "TestASTSMT2BooleanTreeSourcePostorderAndLabels",
-            "TestASTSMT2BooleanComparisonsWithArithmeticLiterals"
+            "TestASTSMT2BooleanComparisonsWithArithmeticLiterals",
+            "TestASTSMT2BooleanComparisonsWithBitVectorLiterals"
           ]
         },
         {
