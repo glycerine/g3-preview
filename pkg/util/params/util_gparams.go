@@ -22,6 +22,9 @@ type GlobalParamsConfig struct {
 	Register                                    func(GlobalParamsRegistrar) error
 }
 type GparamsRefCell struct{ value ParamsRef }
+
+var gparamsRefCellBytes = uint64(reflect.TypeOf(GparamsRefCell{}).Size())
+
 type GparamsRegionBinding struct {
 	origin uint64
 	region *arena.BytesRegion
@@ -259,8 +262,12 @@ func (g *GlobalParams) GetParams(k usymbol.Symbol) (*ParamsRef, error) {
 		}
 		return &g.Cells[n-1].value, nil
 	}
+	if e := g.Budget.Reserve(gparamsRefCellBytes); e != nil {
+		return nil, e
+	}
 	v, e := g.ContextField.NewValue()
 	if e != nil {
+		g.Budget.Release(gparamsRefCellBytes)
 		return nil, e
 	}
 	cell := &GparamsRefCell{v}
@@ -275,6 +282,7 @@ func (g *GlobalParams) GetParams(k usymbol.Symbol) (*ParamsRef, error) {
 	}
 	if uint64(slot) >= uint64(^uint32(0)) {
 		_ = g.ContextField.Del(&v)
+		g.Budget.Release(gparamsRefCellBytes)
 		return nil, arena.ErrBounds
 	}
 	n := uint32(slot + 1)
@@ -345,6 +353,7 @@ func (g *GlobalParams) reset() error {
 			return e
 		}
 		g.Cells[i-1] = nil
+		g.Budget.Release(gparamsRefCellBytes)
 	}
 	g.ModuleParams.reset()
 	return nil

@@ -1,6 +1,7 @@
 package params
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -13,6 +14,11 @@ func gparamsVectorGraph(s arena.VectorStats) uint64 {
 }
 func gparamsGraph(g *GlobalParams) uint64 {
 	n := g.OwnerBytes
+	for _, cell := range g.Cells {
+		if cell != nil {
+			n += gparamsRefCellBytes
+		}
+	}
 	count := func(d *ParamDescrs) uint64 {
 		if d == nil || d.Budget != g.Budget {
 			return 0
@@ -31,17 +37,21 @@ func TestGlobalParamsSetterUsesGoNormalizationStorage(t *testing.T) {
 	for prefix := int64(0); prefix < 45; prefix++ {
 		g, ctx, sy, b := gparamsRealRegistry(t)
 		paramsMust(t, g.ensureRegistered())
-		// Intern source names beforehand; the registry budget remains independent
-		// of the genuinely borrowed Symbol/Params owners.
+		// Intern source names beforehand. The first module write still owns one
+		// actual alloc(params_ref) cell even though normalization uses Go strings.
 		key, e := sy.Intern("text")
 		paramsMust(t, e)
 		b.FailAfter(prefix)
 		e = g.SetName("sat.text", "a genuinely borrowed string")
 		b.FailAfter(-1)
-		if e != nil {
-			t.Fatal(prefix, e)
+		if prefix == 0 {
+			if !errors.Is(e, arena.ErrInjectedFailure) || g.ModuleParams.size() != 0 || len(g.Cells) != 0 {
+				t.Fatal("stopped module cell allocation published an owner", e, g.ModuleParams.size(), len(g.Cells))
+			}
+		} else {
+			paramsMust(t, e)
+			successes++
 		}
-		successes++
 		if b.Used() != gparamsGraph(g) {
 			t.Fatalf("prefix%d owned%d actual%d", prefix, gparamsGraph(g), b.Used())
 		}
@@ -60,7 +70,7 @@ func TestGlobalParamsSetterUsesGoNormalizationStorage(t *testing.T) {
 			t.Fatal(prefix, b.Used())
 		}
 	}
-	if successes != 45 {
+	if successes != 44 {
 		t.Fatal(successes)
 	}
 }

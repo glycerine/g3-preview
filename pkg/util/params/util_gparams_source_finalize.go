@@ -52,6 +52,7 @@ func (g *GlobalParams) sourceFinalizeBody(owning bool) error {
 						return e
 					}
 					g.Cells[g.sourceIndex] = nil
+					g.Budget.Release(gparamsRefCellBytes)
 				}
 				g.sourceIndex++
 			}

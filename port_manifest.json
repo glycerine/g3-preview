@@ -123026,6 +123026,17 @@
           ]
         },
         {
+          "name": "imp::get_params alloc(params_ref) placement charge before module publication; repeated lookup shares the cell, reset and source destructor release after completed reference destruction (cpp188-196,113-120)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_gparams.go",
+          "tests": [
+            "TestGlobalParamsModuleCellAllocationAndRelease",
+            "TestGlobalParamsSetterUsesGoNormalizationStorage",
+            "TestGlobalParamsSourceFinalizeFiniteNamedModuleOwners",
+            "TestGlobalParamsSourceModuleDECStoppedChildOwningContinuation"
+          ]
+        },
+        {
           "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
           "status": "ported",
           "go_target": "pkg/util/params/util_gparams_catalog_collectors.go",
@@ -123277,6 +123288,17 @@
             "TestGlobalParamsResetOwnerDirectoryPlateauAndWarmSnapshots",
             "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule",
             "TestGlobalParamsUnknownParameterLegalListOmitsNullDescriptions"
+          ]
+        },
+        {
+          "name": "imp::get_params alloc(params_ref) placement charge before module publication; repeated lookup shares the cell, reset and source destructor release after completed reference destruction (cpp188-196,113-120)",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_gparams.go",
+          "tests": [
+            "TestGlobalParamsModuleCellAllocationAndRelease",
+            "TestGlobalParamsSetterUsesGoNormalizationStorage",
+            "TestGlobalParamsSourceFinalizeFiniteNamedModuleOwners",
+            "TestGlobalParamsSourceModuleDECStoppedChildOwningContinuation"
           ]
         },
         {
