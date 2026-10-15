@@ -55065,6 +55065,9 @@
         "pkg/math/subpaving/tactic/fast_core_tactic.go",
         "pkg/math/subpaving/tactic/fast_core_tactic_test.go",
         "pkg/math/subpaving/tactic/fast_variable_display.go",
+        "pkg/math/subpaving/tactic/fixed_core_tactic.go",
+        "pkg/math/subpaving/tactic/fixed_core_tactic_test.go",
+        "pkg/math/subpaving/tactic/fixed_variable_display.go",
         "pkg/math/subpaving/inequality_buffer_release.go",
         "pkg/math/subpaving/inequality_buffer_release_test.go"
       ],
@@ -55080,6 +55083,7 @@
         "TestFastEngineSelectedOwnerAndPartialCleanup",
         "TestFastExprConverterTermsAndClause",
         "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats",
+        "TestFixedCoreTacticBorrowedGoalPrintStatisticsAndCleanup",
         "TestSubpavingTemporaryInequalityBufferUnwind"
       ],
       "methods_audited": false,
@@ -55219,6 +55223,13 @@
           "tests": [
             "TestFastCoreTacticReturnsBorrowedGoalAndCollectsSearchStats"
           ]
+        },
+        {
+          "name": "Concrete MPFX core tactic apply: borrowed goal result, selected search, statistics, parameter snapshot, fresh cleanup and named-variable print_nodes output (subpaving_tactic.cpp:32-49,193-268)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/tactic/fixed_core_tactic.go",
+          "go_targets": ["pkg/math/subpaving/tactic/fixed_variable_display.go"],
+          "tests": ["TestFixedCoreTacticBorrowedGoalPrintStatisticsAndCleanup"]
         },
         {
           "name": "MPFF core tactic outer catch converts a retained z3_exception message into a fresh tactic_exception after process failure (subpaving_tactic.cpp:245-261)",
