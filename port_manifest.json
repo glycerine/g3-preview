@@ -125399,6 +125399,10 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "hash_proc and eq_proc wrappers have no retained production instantiation",
+          "status": "reference_only"
+        },
+        {
           "name": "actual inf_rational specialization constructors/copy/destruction/reset/swap",
           "status": "partial",
           "go_target": "pkg/util/numeral/inf_eps_rational.go",
@@ -125663,6 +125667,7 @@
         "Selected source comparison/unary/reset/swap paths check cold ownership then each reached component action, preserving unread invalid fields and partial publication. Actual SYNCH RAW comparison locals are charged distinct manager fields, normal deletion cursor follows source, body failure retains real limbs for explicit owning cleanup. Service lexical bound9 unchanged; copied unary results use existing literal constructor/temporary machinery. Immediate caller-named physical censuses, cold reservation sweeps and warm allocation checks cover selected routes. Unrelated arithmetic and Go-extension Move preflights remain open."
       ],
       "deviations": [
+        "Whole-source call-site audit: inf_eps_rational has retained SMT, optimization and simplex consumers, but no source call site instantiates its hash_proc or eq_proc structs. Keep direct hash and equality algorithms separate from these unused wrappers.",
         "Source const references return owning copies; source scalar assertion domains are typed errors. Mixed equality defect and exact nonsaturating infinity coefficient retained. No actual registered direct source assertion counts invented.",
         "Source h131\u2013147 selected component reference projections ignore unrelated infinity/numeral components; current owning forwards check all denominators and Copy rejects source-finite raw denominator0. NUM-only sign/hash routes retain separate raw-domain debt.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion.",
@@ -125901,6 +125906,10 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "hash_proc and eq_proc wrappers have no retained production instantiation",
+          "status": "reference_only"
+        },
+        {
           "name": "all active constructors, copy/assignment, reset/swap/destruction and constants",
           "status": "partial",
           "go_target": "pkg/util/numeral/inf_int_rational.go",
@@ -125921,7 +125930,7 @@
           ]
         },
         {
-          "name": "hash/eq functors, remaining inspection/conversion and owned component access beyond separately credited projections",
+          "name": "remaining inspection/conversion and owned component access beyond separately credited projections",
           "status": "partial",
           "go_target": "pkg/util/numeral/inf_int_rational.go",
           "tests": [
@@ -126128,6 +126137,7 @@
         "Selected source comparison/unary/reset/swap paths check cold ownership then each reached component action, preserving unread invalid fields and partial publication. Actual SYNCH RAW comparison locals are charged distinct manager fields, normal deletion cursor follows source, body failure retains real limbs for explicit owning cleanup. Service lexical bound9 unchanged; copied unary results use existing literal constructor/temporary machinery. Immediate caller-named physical censuses, cold reservation sweeps and warm allocation checks cover selected routes. Unrelated arithmetic and Go-extension Move preflights remain open."
       ],
       "deviations": [
+        "Whole-source call-site audit: the only non-util inf_int_rational type consumer is the unported SMT theory_diff_logic specialization; no source call site instantiates its hash_proc or eq_proc structs. Keep direct hash and equality algorithms separate from these unused wrappers.",
         "Global constants and borrowed rational accessors are owner-local/independent-copy adapters. Signed32 overflow, INT_MIN negation and formatting negation are explicit typed undefined-domain failures with source defined prefixes retained.",
         "No registered source inf_int_rational test exists; independent finite/fault/alias/ownership checks are supplied without inventing source assertion coverage.",
         "Source h129\u2013137 returns FIRST without a denominator-domain assertion; InfIntFirst/Rational/Infinitesimal still enter ordinary checkInfInt and owning Copy, rejecting source-finite raw denominator0 and inspecting unrelated FIRST before constructing epsilon. Sign/hash NUM-only routes retain separate raw-domain debt.",
@@ -154247,15 +154257,19 @@
           ]
         },
         {
-          "name": "mpf.h:300-327 scoped_mpf and concrete AST owning value vector",
-          "status": "partial",
+          "name": "Remaining caller-local scoped_mpf scalar specializations in FPA conversion, rewriting, API, SMT and subpaving beyond separately credited concrete callers",
+          "status": "partial"
+        },
+        {
+          "name": "Concrete AST fpa_decl_plugin scoped_mpf_vector value storage: native indexed growth, source set and ascending owned-value release (fpa_decl_plugin.cpp:23-61; mpf.h:327)",
+          "status": "ported",
           "go_target": "pkg/ast/ast_fpa_scoped_values.go",
-          "go_targets": ["pkg/math/subpaving/arbitrary_shell_coefficients.go"],
           "tests": [
+            "TestASTFloatingPointScopedValueGrowthKeepsHeapSignificand",
             "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
             "TestASTFloatingPointScopedValueActualReserveSetPublication",
-            "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren",
-            "TestArbitraryShellCoefficientSourceConversionAndCleanup"
+            "TestASTFloatingPointScopedValueInlineErasesCopyAcquisition",
+            "TestASTFloatingPointScopedValueTwoRetainedAllocationChildren"
           ]
         },
         {
