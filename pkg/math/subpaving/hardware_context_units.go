@@ -24,6 +24,9 @@ func (c *HardwareContext) AddUnitClause(atom *HardwareInequality, axiom bool) er
 	if atom == nil || atom.context != c || atom.variable >= uint32(len(c.isInt)) || atom.refs >= (1<<30)-1 {
 		return arena.ErrInvalidSlot
 	}
+	if err := c.traceUnitInequality(atom); err != nil {
+		return err
+	}
 	c.traceInequalityIncRef(atom)
 	atom.refs++
 	c.unitClauses = append(c.unitClauses, hardwareUnitClause{atom: atom, axiom: axiom})

@@ -54572,6 +54572,12 @@
           "tests": ["TestHardwareBoundTracePublicationAndConflictOrder", "TestHardwareBoundTraceStreamAndPrinterFailurePrefix"]
         },
         {
+          "name": "Concrete config_hwf unit/clause TRACE and input-order pre-sort reference increments (subpaving_t_def.h:815-866)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/hardware_clause_trace.go", "pkg/math/subpaving/hardware_clause.go"],
+          "tests": ["TestHardwareClauseAndUnitTracePublicationOrder", "TestHardwareClauseAndUnitTraceFailureBoundaries", "TestHardwareInequalityReferenceTraceClauseOrder"]
+        },
+        {
           "name": "Concrete config_mpfx mk_sum and is_int(polynomial) nested integer-status and first-failing-term TRACE before variable publication (subpaving_t_def.h:668-679,762-763)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_polynomial_integer_trace.go",
@@ -177405,6 +177411,12 @@
           "tests": ["TestHardwareBoundTracePublicationAndConflictOrder", "TestHardwareBoundTraceStreamAndPrinterFailurePrefix"]
         },
         {
+          "name": "Reached config_hwf unit and sorted-clause TRACE records (subpaving_t_def.h:841,866)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/hardware_clause_trace.go", "pkg/math/subpaving/hardware_clause.go"],
+          "tests": ["TestHardwareClauseAndUnitTracePublicationOrder", "TestHardwareClauseAndUnitTraceFailureBoundaries", "TestHardwareInequalityReferenceTraceClauseOrder"]
+        },
+        {
           "name": "Reached config_mpfx mk_sum and is_int(polynomial) nested TRACE records (subpaving_t_def.h:672,762)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_polynomial_integer_trace.go",
@@ -178377,6 +178389,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/hardware_bound_trace.go",
           "tests": ["TestHardwareBoundTracePublicationAndConflictOrder", "TestHardwareBoundTraceStreamAndPrinterFailurePrefix"]
+        },
+        {
+          "name": "Reached config_hwf unit and sorted-clause TRACE records (subpaving_t_def.h:841,866)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/hardware_clause_trace.go", "pkg/math/subpaving/hardware_clause.go"],
+          "tests": ["TestHardwareClauseAndUnitTracePublicationOrder", "TestHardwareClauseAndUnitTraceFailureBoundaries", "TestHardwareInequalityReferenceTraceClauseOrder"]
         },
         {
           "name": "Reached config_mpfx mk_sum and is_int(polynomial) nested TRACE records (subpaving_t_def.h:672,762)",

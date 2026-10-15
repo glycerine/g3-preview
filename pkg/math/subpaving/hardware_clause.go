@@ -54,12 +54,12 @@ func (c *HardwareContext) AddClause(atoms []*HardwareInequality, lemma, watched 
 		return nil, c.AddUnitClause(atoms[0], true)
 	}
 	ordered := append([]*HardwareInequality(nil), atoms...)
-	sort.SliceStable(ordered, func(i, j int) bool { return ordered[i].variable < ordered[j].variable })
 	clause := &HardwareClause{context: c, atoms: ordered, lemma: lemma, watched: watched}
 	for _, atom := range ordered {
 		c.traceInequalityIncRef(atom)
 		atom.refs++
 	}
+	sort.SliceStable(ordered, func(i, j int) bool { return ordered[i].variable < ordered[j].variable })
 	if watched {
 		var previous uint32
 		for i, atom := range ordered {
@@ -70,7 +70,7 @@ func (c *HardwareContext) AddClause(atoms []*HardwareInequality, lemma, watched 
 		}
 	}
 	c.clauses = append(c.clauses, clause)
-	return clause, nil
+	return clause, c.traceNewClause(clause)
 }
 
 type hardwareTruth uint8
