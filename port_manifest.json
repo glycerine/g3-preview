@@ -127606,6 +127606,12 @@
           ]
         },
         {
+          "name": "inf_rational(rational const&) FIRST copy then default EPS reset and completed-member unwind (inf_rational.h:89-95); reached at model_based_opt.cpp:145 and SMT theory value constructors",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_rational.go",
+          "tests": ["TestInfFromRationalOwnsIndependentFirst", "TestInfRationalFailurePrefixesImmediateRoots"]
+        },
+        {
           "name": "get_first/get_rational and get_infinitesimal borrowed component reads without peer inspection or copy (inf_rational.h:135-143)",
           "status": "ported",
           "go_target": "pkg/util/numeral/rational_numeric_borrow.go",

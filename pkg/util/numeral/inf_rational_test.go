@@ -611,8 +611,22 @@ func infAuditRoots(t *testing.T, s *RationalService, inf []*OwnedInfRational, ra
 	}
 	qopsAuditLiveOwnership(t, s.Manager, roots)
 }
+func TestInfFromRationalOwnsIndependentFirst(t *testing.T) {
+	s, _ := serviceNew(t)
+	input := serviceValue(t, s, "123456789012345678901/37")
+	value, err := s.InfFromRational(&input)
+	serviceMust(t, err)
+	serviceMust(t, s.Del(&input))
+	got, err := s.InfString(&value)
+	serviceMust(t, err)
+	if got != "123456789012345678901/37" {
+		t.Fatal("constructor retained a borrowed first component", got)
+	}
+	serviceMust(t, s.InfDel(&value))
+}
+
 func TestInfRationalFailurePrefixesImmediateRoots(t *testing.T) {
-	for op := 0; op < 17; op++ {
+	for op := 0; op < 18; op++ {
 		success := false
 		failures := 0
 		for prefix := int64(0); prefix < 4096; prefix++ {
@@ -685,6 +699,8 @@ func TestInfRationalFailurePrefixesImmediateRoots(t *testing.T) {
 				value, e = s.InfNumerator(&a)
 			case 16:
 				value, e = s.InfDenominator(&a)
+			case 17:
+				value, e = s.InfFromRational(&qa)
 			}
 			// Audit BEFORE String, Del, Close, or restoring the injected budget. Only
 			// actual public roots plus service-owned constants/cache can justify cells.

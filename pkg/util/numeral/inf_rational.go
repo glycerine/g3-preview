@@ -102,6 +102,33 @@ func (s *RationalService) NewInfValue() (OwnedInfRational, error) {
 	defer s.mu.Unlock()
 	return s.infEmpty(), nil
 }
+
+// InfFromRational constructs m_first from the source value, then resets the
+// default-constructed infinitesimal member, as in inf_rational(rational const&).
+func (s *RationalService) InfFromRational(r *OwnedRational) (_lexOut OwnedInfRational, _lexErr error) {
+	if e := s.lock(); e != nil {
+		return OwnedInfRational{}, e
+	}
+	defer s.mu.Unlock()
+	if e := s.beginLexical(); e != nil {
+		return OwnedInfRational{}, e
+	}
+	defer s.endLexicalInf(&_lexOut, &_lexErr)
+	if e := s.rationalScalarOwner(r); e != nil {
+		return OwnedInfRational{}, e
+	}
+	v := s.infEmpty()
+	if e := s.Manager.Copy(&v.First, &r.Raw); e != nil {
+		s.abortLexicalRational(&v.First)
+		return OwnedInfRational{}, e
+	}
+	if e := s.Manager.Reset(&v.Second); e != nil {
+		s.destroyLexicalRational(&v.Second)
+		s.destroyLexicalRational(&v.First)
+		return OwnedInfRational{}, e
+	}
+	return v, nil
+}
 func (s *RationalService) InfClone(src *OwnedInfRational) (OwnedInfRational, error) {
 	if e := s.lock(); e != nil {
 		return OwnedInfRational{}, e
