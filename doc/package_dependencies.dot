@@ -11,6 +11,7 @@ digraph packages {
   "api" -> "arena";
   "api" -> "ast";
   "api" -> "engine";
+  "api" -> "smtcore";
   "api" -> "tactic";
   "api" -> "util/diagnostic";
   "api" -> "util/params";
