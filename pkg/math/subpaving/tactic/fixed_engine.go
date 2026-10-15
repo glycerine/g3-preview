@@ -86,6 +86,13 @@ func (e *FixedEngine) UpdateParamsRef(pc *params.ParamsContext, p *params.Params
 	return e.shell.UpdateParamsRef(pc, p)
 }
 
+func (e *FixedEngine) Search() error {
+	if err := e.check(); err != nil {
+		return err
+	}
+	return e.shell.Search()
+}
+
 func (e *FixedEngine) Close() error {
 	if e == nil || e.self != e {
 		return arena.ErrInvalidSlot

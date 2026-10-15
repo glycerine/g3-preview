@@ -46,6 +46,12 @@ type FixedContext struct {
 	clauses          []*FixedClause
 	unitClauses      []fixedUnitClause
 	unitHead         int
+	leafQueue        []*FixedNode
+	searchOwned      []*FixedNode
+	searchNode       *FixedNode
+	searchStarted    bool
+	searchPhase      uint8
+	numSplits        uint64
 	displayVariable  FixedVariableDisplay
 	trace            *diagnostic.TraceTags
 	initStage        uint8
@@ -206,6 +212,14 @@ func (c *FixedContext) Close() error {
 	if c.closed {
 		return nil
 	}
+	for len(c.searchOwned) != 0 {
+		i := len(c.searchOwned) - 1
+		if err := c.searchOwned[i].Close(); err != nil {
+			return err
+		}
+		c.searchOwned[i] = nil
+		c.searchOwned = c.searchOwned[:i]
+	}
 	if c.root != nil {
 		if err := c.root.Close(); err != nil {
 			return err
@@ -242,6 +256,8 @@ func (c *FixedContext) Close() error {
 	}
 	c.queue = nil
 	c.queueHead = 0
+	c.leafQueue = nil
+	c.searchNode = nil
 	c.displayVariable = nil
 	c.trace = nil
 	c.closed = true

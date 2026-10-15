@@ -59,11 +59,14 @@ func TestFixedEngineSelectedOwnerUpdateAndRefusal(t *testing.T) {
 	if err := pc.SetSymbolName(&p, &key, selected); err != nil {
 		t.Fatal(err)
 	}
-	printKey, boundKey := "print_nodes", "max_bound"
+	printKey, boundKey, depthKey := "print_nodes", "max_bound", "max_depth"
 	if err := pc.SetBoolName(&p, &printKey, true); err != nil {
 		t.Fatal(err)
 	}
 	if err := pc.SetUIntName(&p, &boundKey, 2); err != nil {
+		t.Fatal(err)
+	}
+	if err := pc.SetUIntName(&p, &depthKey, 0); err != nil {
 		t.Fatal(err)
 	}
 	e, err := NewFixedEngine(limit, m, qm, pc, &p)
@@ -85,6 +88,9 @@ func TestFixedEngineSelectedOwnerUpdateAndRefusal(t *testing.T) {
 	one := numeral.NewInt(1)
 	if _, err := shell.MkSum(&one, []*numeral.Int{&one}, []uint32{x}); err != nil {
 		t.Fatal("selected sum", err)
+	}
+	if err := e.Search(); err != nil {
+		t.Fatal("selected MPFX search", err)
 	}
 	if err := pc.SetBoolName(&p, &printKey, false); err != nil {
 		t.Fatal(err)

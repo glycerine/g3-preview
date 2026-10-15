@@ -197,6 +197,13 @@ func (w *FixedShellCoefficients) UpdateParamsRef(pc *params.ParamsContext, p *pa
 	return w.context.UpdateParamsRef(pc, p)
 }
 
+func (w *FixedShellCoefficients) Search() error {
+	if err := w.open(); err != nil {
+		return err
+	}
+	return w.context.Search()
+}
+
 // Close retires z2, z1, the vector in ascending element order, and the
 // scalar, matching reverse source member destruction and resumable cleanup.
 func (w *FixedShellCoefficients) Close() error {

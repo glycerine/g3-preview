@@ -51587,6 +51587,12 @@
           "tests": [
             "TestFastShellExactCoefficientsAndDirectedInequalities"
           ]
+        },
+        {
+          "name": "Concrete context_mpfx_wrapper search forwarding through the selected fixed engine (subpaving.cpp:55; subpaving_tactic.cpp:193-200)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_shell_coefficients.go",
+          "tests": ["TestFixedEngineSelectedOwnerUpdateAndRefusal"]
         }
       ],
       "ownership": [
@@ -53344,6 +53350,12 @@
             "TestFastSearchMaxNodesStopsBeforeNextLeaf",
             "TestFastSearchRetainsRefusedSplitChildrenForOwnerClose"
           ]
+        },
+        {
+          "name": "Concrete config_mpfx breadth-first loop, cancellation phases, node limit and context-owned child retirement (subpaving_t_def.h:1806-1843)",
+          "status": "partial",
+          "go_target": "pkg/math/subpaving/fixed_search.go",
+          "tests": ["TestFixedSearchBreadthFirstCancellationAndOwnedChildren", "TestFixedSearchStopsAtSourceNodeLimit"]
         }
       ],
       "ownership": [
