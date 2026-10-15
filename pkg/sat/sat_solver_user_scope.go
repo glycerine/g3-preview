@@ -380,6 +380,7 @@ func (s *Solver) UserPop(scopes uint32) error {
 	if e := s.popToBase(); e != nil {
 		return e
 	}
+	s.traceUserPopDisplay()
 	for scopes > 0 {
 		n, e := s.conflict.userScopeLiterals.Size()
 		if e != nil {
@@ -411,6 +412,7 @@ func (s *Solver) UserPop(scopes uint32) error {
 		if e = s.gcBin(l); e != nil {
 			return e
 		}
+		s.traceUserPopGC(l)
 		scopes--
 		for i := uint32(0); ; i++ {
 			n, e := s.Variables.trail.Size(s.Variables.trailRef)

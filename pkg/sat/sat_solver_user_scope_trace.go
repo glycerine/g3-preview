@@ -5,7 +5,9 @@ import (
 	"io"
 	"strings"
 
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 func (s *Solver) traceUserScopeRecord(function string, line int, body func(io.Writer) error) {
@@ -44,5 +46,35 @@ func (s *Solver) traceUserPopTrail() {
 		b.WriteByte('\n')
 		_, _ = io.WriteString(w, b.String())
 		return nil
+	})
+}
+
+func (s *Solver) traceUserDisplayInto(w io.Writer) error {
+	// The source trace stream is outside the solver's custom memory budget.
+	b := arena.NewBudget(^uint64(0))
+	out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	if err = s.displayInto(out); err != nil {
+		return err
+	}
+	text, err := out.String()
+	if err != nil {
+		return err
+	}
+	_, _ = io.WriteString(w, text)
+	return nil
+}
+
+func (s *Solver) traceUserPopDisplay() {
+	s.traceUserScopeRecord("user_pop", 2727, s.traceUserDisplayInto)
+}
+
+func (s *Solver) traceUserPopGC(l Literal) {
+	s.traceUserScopeRecord("user_pop", 2737, func(w io.Writer) error {
+		_, _ = io.WriteString(w, "gc: "+l.String()+"\n")
+		return s.traceUserDisplayInto(w)
 	})
 }

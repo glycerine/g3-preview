@@ -178207,6 +178207,12 @@
           "tests": ["TestSATUserScopeSourceTracePublicationAndTrail"]
         },
         {
+          "name": "Reached SAT user_pop solver-display TRACE before and after user-scope clause collection (sat_solver.cpp:2727,2737)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_user_scope_trace.go",
+          "tests": ["TestSATUserPopSourceTraceBeforeAndAfterClauseCollection", "TestSATUserScopeSourceTracePublicationAndTrail"]
+        },
+        {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_simplify_trace.go",
@@ -179461,6 +179467,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_user_scope_trace.go",
           "tests": ["TestSATUserScopeSourceTracePublicationAndTrail"]
+        },
+        {
+          "name": "Reached SAT user_pop solver-display TRACE before and after user-scope clause collection (sat_solver.cpp:2727,2737)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_user_scope_trace.go",
+          "tests": ["TestSATUserPopSourceTraceBeforeAndAfterClauseCollection", "TestSATUserScopeSourceTracePublicationAndTrail"]
         },
         {
           "name": "Reached SAT simplify_problem TRACE after threshold and before scope pop (sat_solver.cpp:1191-1202)",
