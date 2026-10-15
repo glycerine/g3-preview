@@ -23,7 +23,7 @@ func (md *ModelCore) CopyFunctionInterpretation(d ast.ASTHandle, source *Functio
 		return arena.ErrClosed
 	}
 	var e error
-	md.copiedFunction, e = source.Copy()
+	md.copiedFunction, e = source.copyWithMemoryTrace(true)
 	if e != nil {
 		return e
 	}

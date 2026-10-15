@@ -250,12 +250,19 @@ func (f *FunctionInterpretation) Compress() error {
 	return nil
 }
 func (f *FunctionInterpretation) Copy() (copy *FunctionInterpretation, err error) {
+	return f.copyWithMemoryTrace(false)
+}
+
+func (f *FunctionInterpretation) copyWithMemoryTrace(traceMemory bool) (copy *FunctionInterpretation, err error) {
 	if err = f.open(); err != nil {
 		return nil, err
 	}
 	copy, err = NewFunctionInterpretation(f.manager, f.arity)
 	if err != nil {
 		return copy, err
+	}
+	if traceMemory {
+		copy.traceCopiedFunctionAllocated(f.memoryTrace)
 	}
 	for _, entry := range f.entries {
 		if err = copy.InsertNewEntry(entry.args, entry.result); err != nil {

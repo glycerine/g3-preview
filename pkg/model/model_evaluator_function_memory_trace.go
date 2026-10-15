@@ -13,13 +13,27 @@ import (
 func (f *FunctionInterpretation) traceEvaluatorFunctionAllocated(tags *diagnostic.TraceTags) {
 	f.memoryTrace = tags
 	f.memoryTraceLive = true
+	f.traceFunctionAllocated("src/model/model_evaluator.cpp", 250)
+}
+
+func (f *FunctionInterpretation) traceCopiedFunctionAllocated(tags *diagnostic.TraceTags) {
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	f.memoryTrace = tags
+	f.memoryTraceLive = true
+	f.traceFunctionAllocated("src/model/func_interp.cpp", 91)
+}
+
+func (f *FunctionInterpretation) traceFunctionAllocated(file string, line int) {
+	tags := f.memoryTrace
 	if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
 		return
 	}
 	_ = tags.EmitConditional("memory", "allocate", "src/util/memory_manager.cpp", 209,
 		func() bool { return true }, func(w io.Writer) error {
 			for _, part := range [...]string{
-				"alloc ", fmt.Sprintf("%p", f), " src/model/model_evaluator.cpp:250 func_interp ",
+				"alloc ", fmt.Sprintf("%p", f), " ", file, ":", strconv.Itoa(line), " func_interp ",
 				strconv.FormatUint(f.bytes, 10), "\n",
 			} {
 				_, _ = io.WriteString(w, part)

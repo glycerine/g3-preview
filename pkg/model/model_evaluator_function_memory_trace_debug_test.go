@@ -65,3 +65,48 @@ func TestModelEvaluatorCompletedFunctionMemoryWrapperReleaseSites(t *testing.T) 
 		}
 	}
 }
+
+func TestModelCopiedFunctionMemoryWrapperOwnerTransfer(t *testing.T) {
+	m, md, original, _, _, config := evaluatorFixture(t)
+	astTestMust(t, original.Close())
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("memory")
+	config.Trace = tags
+	ev, err := model.NewModelEvaluator(md.Core(), config)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, ev.Close()) })
+	astTestMust(t, ev.SetModelCompletion(true))
+	yes, err := m.MkTrue()
+	astTestMust(t, err)
+	astTestPin(t, m, yes)
+	d := modelTestFunctionDecl(t, m, "trace-copied-function")
+	app, err := m.MkApp(d, []ast.ASTHandle{yes})
+	astTestMust(t, err)
+	astTestPin(t, m, app)
+	out := astTestPin(t, m, ast.ASTHandle{})
+	astTestMust(t, ev.Evaluate(app, out))
+	source, err := md.Core().FunctionInterpretation(d)
+	astTestMust(t, err)
+	if source == nil {
+		t.Fatal("completion did not publish source function")
+	}
+	copied, err := model.NewModelCore(m)
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, copied.Close()) })
+	astTestMust(t, copied.CopyFunctionInterpretation(d, source))
+	owned, err := copied.FunctionInterpretation(d)
+	astTestMust(t, err)
+	if owned == nil || owned == source {
+		t.Fatal("model copy did not transfer an independent graph")
+	}
+	astTestMust(t, copied.Close())
+	id := fmt.Sprintf("%p", owned)
+	size := strconv.FormatUint(uint64(reflect.TypeOf(model.FunctionInterpretation{}).Size()), 10)
+	got := output.String()
+	alloc := "\nalloc " + id + " src/model/func_interp.cpp:91 func_interp " + size + "\n"
+	dealloc := "\ndealloc " + id + " src/model/model_core.cpp:29\n"
+	if strings.Count(got, alloc) != 1 || strings.Count(got, dealloc) != 1 {
+		t.Fatalf("copied function memory records: alloc=%q dealloc=%q output=%q", alloc, dealloc, got)
+	}
+}

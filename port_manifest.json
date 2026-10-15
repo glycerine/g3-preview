@@ -56112,7 +56112,10 @@
         "pkg/model/function_interpretation.go",
         "pkg/model/function_interpretation_expr.go",
         "pkg/model/function_interpretation_counts.go",
-        "pkg/model/function_interpretation_test.go"
+        "pkg/model/function_interpretation_test.go",
+        "pkg/model/model_copy.go",
+        "pkg/model/model_evaluator_function_memory_trace.go",
+        "pkg/model/model_evaluator_function_memory_trace_debug_test.go"
       ],
       "tests": [
         "TestFunctionInterpretationEntriesReplaceAndReferences",
@@ -56122,7 +56125,8 @@
         "TestFunctionInterpretationMultiArgumentPeelingAndElseMiss",
         "TestFunctionInterpretationInsertionRefusalsReleaseReferences",
         "TestFunctionInterpretationCopyEntriesAndOwningOutput",
-        "TestModelEvaluatorFunctionEntriesMacrosAndCompletion"
+        "TestModelEvaluatorFunctionEntriesMacrosAndCompletion",
+        "TestModelCopiedFunctionMemoryWrapperOwnerTransfer"
       ],
       "assertions": [
         {
@@ -56199,7 +56203,8 @@
         }
       ],
       "ownership": [
-        "Each entry owns a concrete ground handle array and result; result INC precedes old-result DEC. Entry/graph headers and actual arrays/vector backing are charged to the manager Budget. Parent retains failed unpublished constructors for owning cleanup; graph destruction retires published entries, else and cache before pending owning cleanup. Cached ITE has its own reference; explicit output ASTRefs survive graph close. EvalElse constructs and closes the original VarSubstitution lexical owner with direct index order."
+        "Each entry owns a concrete ground handle array and result; result INC precedes old-result DEC. Entry/graph headers and actual arrays/vector backing are charged to the manager Budget. Parent retains failed unpublished constructors for owning cleanup; graph destruction retires published entries, else and cache before pending owning cleanup. Cached ITE has its own reference; explicit output ASTRefs survive graph close. EvalElse constructs and closes the original VarSubstitution lexical owner with direct index order.",
+        "The retained model-core copy path now emits the func_interp::copy source debug allocation when its independent graph header is acquired, and its receiving ModelCore emits deallocation after owned destruction. Failed partial copies retain their named Go owner for explicit cleanup."
       ],
       "deviations": [
         "Selected concrete AST/Budget representation; native small_object_allocator ABI, allocator pooling, global DEBUG/TRACE transport and whole-unit allocation/ownership audits are not claimed. Existing AST equality/value theory dispatch qualifications apply. AST translation remains unported and no Translate replacement is invented. Function registration in model_core and selected evaluator paths are now integrated; full theory evaluator completion remains pending. The var_subst is_well_sorted debug predicates remain an explicitly partial dependency. Return/retain partial Copy owners for explicit Go cleanup. Source OP_EQ recognition deliberately excludes Boolean OP_IFF; do not widen the predicate to satisfy a fixture. Source occurrence count strict-greater running tie policy is preserved; a native Go map holds borrowed AST handles and uint32 counts without simulated C++ probing or arena charges.",
@@ -56309,7 +56314,10 @@
         "pkg/model/model_value.go",
         "pkg/model/model_copy.go",
         "pkg/model/model_interpretation_owners.go",
-        "pkg/model/model_native_lookup_test.go"
+        "pkg/model/model_native_lookup_test.go",
+        "pkg/model/function_interpretation.go",
+        "pkg/model/model_evaluator_function_memory_trace.go",
+        "pkg/model/model_evaluator_function_memory_trace_debug_test.go"
       ],
       "tests": [
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -56324,7 +56332,8 @@
         "TestModelCopyConstantsFunctionsUniversesAndIndependentGraphs",
         "TestModelCopyEveryReservationFailureRetainsCleanupOwner",
         "TestModelFunctionCopyReplacementAndSelfCopy",
-        "TestModelNativeDictionaryGrowthCopyOrderAndReinsert"
+        "TestModelNativeDictionaryGrowthCopyOrderAndReinsert",
+        "TestModelCopiedFunctionMemoryWrapperOwnerTransfer"
       ],
       "assertions": [
         {
@@ -56385,7 +56394,8 @@
         }
       ],
       "ownership": [
-        "Ordered dictionary entries retain concrete constant AST references, function graph owners and universe AST references directly. Constants retire before functions; each declaration key retires before its value/graph. Native declaration slices remain borrowed. Detached unregister and failed constant replacement retain their remaining owned references for cleanup; consumed references are cleared before an error is reported."
+        "Ordered dictionary entries retain concrete constant AST references, function graph owners and universe AST references directly. Constants retire before functions; each declaration key retires before its value/graph. Native declaration slices remain borrowed. Detached unregister and failed constant replacement retain their remaining owned references for cleanup; consumed references are cleared before an error is reported.",
+        "The retained model-core copy path now emits the func_interp::copy source debug allocation when its independent graph header is acquired, and its receiving ModelCore emits deallocation after owned destruction. Failed partial copies retain their named Go owner for explicit cleanup."
       ],
       "deviations": [
         "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying and full model copy are implemented; AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
@@ -56572,7 +56582,8 @@
         "pkg/model/function_interpretation.go",
         "pkg/model/model_evaluator.go",
         "pkg/model/model_evaluator_function_memory_trace.go",
-        "pkg/model/model_evaluator_function_memory_trace_debug_test.go"
+        "pkg/model/model_evaluator_function_memory_trace_debug_test.go",
+        "pkg/model/model_copy.go"
       ],
       "tests": [
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
@@ -56594,7 +56605,8 @@
         "TestModelCoreFunctionTableGrowthRemovalReuseAndDerivedClose",
         "TestModelCoreFunctionGuardsAndConstantDispatch",
         "TestModelNativeDictionaryGrowthCopyOrderAndReinsert",
-        "TestModelEvaluatorCompletedFunctionMemoryWrapperReleaseSites"
+        "TestModelEvaluatorCompletedFunctionMemoryWrapperReleaseSites",
+        "TestModelCopiedFunctionMemoryWrapperOwnerTransfer"
       ],
       "assertions": [
         {
@@ -56664,7 +56676,8 @@
       "ownership": [
         "Constant table keys and values retain independent AST references. Declaration vectors are source non-owning insertion-order vectors; constant replacement acquires the new value before releasing the previous value.",
         "Ordered dictionary entries retain concrete constant AST references, function graph owners and universe AST references directly. Constants retire before functions; each declaration key retires before its value/graph. Native declaration slices remain borrowed. Detached unregister and failed constant replacement retain their remaining owned references for cleanup; consumed references are cleared before an error is reported.",
-        "The retained model-completion function interpretation now carries its source debug memory allocation identity through transfer to ModelCore, whose replacement, unregister and destructor paths emit their distinct source deallocation sites after owned Close."
+        "The retained model-completion function interpretation now carries its source debug memory allocation identity through transfer to ModelCore, whose replacement, unregister and destructor paths emit their distinct source deallocation sites after owned Close.",
+        "The retained model-core copy path now emits the func_interp::copy source debug allocation when its independent graph header is acquired, and its receiving ModelCore emits deallocation after owned destruction. Failed partial copies retain their named Go owner for explicit cleanup."
       ],
       "deviations": [
         "Derived construction initializes the original three empty map members and uses actual base-to-derived lifetime dispatch. Universe registration/query/copy and literal append-without-reset updates are implemented. Function interpretation registration, declaration evaluation and populated-map destruction are now implemented. Function-aware copying, scoped get_some_value and full model copy are implemented; AST translation/display and public API integration remain unported. Broad failure histories remain deferred.",
@@ -150562,7 +150575,8 @@
         "pkg/model/model_functions.go",
         "pkg/model/model_interpretation_owners.go",
         "pkg/model/model_evaluator_function_memory_trace.go",
-        "pkg/model/model_evaluator_function_memory_trace_debug_test.go"
+        "pkg/model/model_evaluator_function_memory_trace_debug_test.go",
+        "pkg/model/model_copy.go"
       ],
       "tests": [
         "TestRuntimeUint32AcrossInitializationBitmapBoundary",
@@ -150667,7 +150681,8 @@
         "TestASTParameterRationalMemoryWrapperCopyMoveAssignAndDestroy",
         "TestASTInfoMemoryWrapperRegisteredSortAndDecl",
         "TestASTInfoMemoryWrapperDebugRetainsSourceAllocation",
-        "TestModelEvaluatorCompletedFunctionMemoryWrapperReleaseSites"
+        "TestModelEvaluatorCompletedFunctionMemoryWrapperReleaseSites",
+        "TestModelCopiedFunctionMemoryWrapperOwnerTransfer"
       ],
       "conditionals": [
         {
@@ -151230,6 +151245,14 @@
           "tests": [
             "TestModelEvaluatorCompletedFunctionMemoryWrapperReleaseSites"
           ]
+        },
+        {
+          "name": "Retained model copy func_interp::copy allocation at func_interp.cpp:91, transferred model_core ownership and destructor deallocation at model_core.cpp:29 via debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/model/model_evaluator_function_memory_trace.go",
+          "tests": [
+            "TestModelCopiedFunctionMemoryWrapperOwnerTransfer"
+          ]
         }
       ],
       "ownership": [
@@ -151272,7 +151295,8 @@
         "The owned AST format child uses its stable Go manager pointer and charged Go manager-header extent in the debug memory allocation record. The owning parent emits deallocation after the child closes; failed child header reservation has no record.",
         "The native rational pointer becomes an inline Go OwnedRational with a stable manager/allocation identity carried through parameter moves. Debug memory records use the Go scalar extent; assignment releases its previous value before recording a copied replacement.",
         "Only copied metadata attached to newly registered AST nodes receives a debug allocation record. Its stable Go page-record pointer and Go record extent replace native pointers and sizeof(sort_info/func_decl_info). The debug reference-count branch retains metadata and omits the source deallocation record.",
-        "The evaluator-created function interpretation records its stable Go pointer and charged Go header extent at completion. ModelCore owns it after registration and emits deallocation only after successful replacement, unregister, or final destruction; direct caller-created interpretations have no evaluator allocation record."
+        "The evaluator-created function interpretation records its stable Go pointer and charged Go header extent at completion. ModelCore owns it after registration and emits deallocation only after successful replacement, unregister, or final destruction; direct caller-created interpretations have no evaluator allocation record.",
+        "The retained model-copy consumer stamps the source allocation before copying graph entries, carries the source trace owner with the new Go function interpretation, and emits the model-core deallocation after successful owned Close. Direct test-only Copy calls have no claimed source consumer."
       ]
     },
     {
@@ -151339,7 +151363,8 @@
         "pkg/model/model_functions.go",
         "pkg/model/model_interpretation_owners.go",
         "pkg/model/model_evaluator_function_memory_trace.go",
-        "pkg/model/model_evaluator_function_memory_trace_debug_test.go"
+        "pkg/model/model_evaluator_function_memory_trace_debug_test.go",
+        "pkg/model/model_copy.go"
       ],
       "tests": [
         "TestASTDeclCollectorDependencySetMemoryTrace",
@@ -151429,7 +151454,8 @@
         "TestASTParameterRationalMemoryWrapperCopyMoveAssignAndDestroy",
         "TestASTInfoMemoryWrapperRegisteredSortAndDecl",
         "TestASTInfoMemoryWrapperDebugRetainsSourceAllocation",
-        "TestModelEvaluatorCompletedFunctionMemoryWrapperReleaseSites"
+        "TestModelEvaluatorCompletedFunctionMemoryWrapperReleaseSites",
+        "TestModelCopiedFunctionMemoryWrapperOwnerTransfer"
       ],
       "conditionals": [
         {
@@ -151956,6 +151982,14 @@
           "tests": [
             "TestModelEvaluatorCompletedFunctionMemoryWrapperReleaseSites"
           ]
+        },
+        {
+          "name": "Retained model copy func_interp::copy allocation at func_interp.cpp:91, transferred model_core ownership and destructor deallocation at model_core.cpp:29 via debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/model/model_evaluator_function_memory_trace.go",
+          "tests": [
+            "TestModelCopiedFunctionMemoryWrapperOwnerTransfer"
+          ]
         }
       ],
       "ownership": [
@@ -151991,7 +152025,8 @@
         "The owned AST format child uses its stable Go manager pointer and charged Go manager-header extent in the debug memory allocation record. The owning parent emits deallocation after the child closes; failed child header reservation has no record.",
         "The native rational pointer becomes an inline Go OwnedRational with a stable manager/allocation identity carried through parameter moves. Debug memory records use the Go scalar extent; assignment releases its previous value before recording a copied replacement.",
         "Only copied metadata attached to newly registered AST nodes receives a debug allocation record. Its stable Go page-record pointer and Go record extent replace native pointers and sizeof(sort_info/func_decl_info). The debug reference-count branch retains metadata and omits the source deallocation record.",
-        "The evaluator-created function interpretation records its stable Go pointer and charged Go header extent at completion. ModelCore owns it after registration and emits deallocation only after successful replacement, unregister, or final destruction; direct caller-created interpretations have no evaluator allocation record."
+        "The evaluator-created function interpretation records its stable Go pointer and charged Go header extent at completion. ModelCore owns it after registration and emits deallocation only after successful replacement, unregister, or final destruction; direct caller-created interpretations have no evaluator allocation record.",
+        "The retained model-copy consumer stamps the source allocation before copying graph entries, carries the source trace owner with the new Go function interpretation, and emits the model-core deallocation after successful owned Close. Direct test-only Copy calls have no claimed source consumer."
       ]
     },
     {
