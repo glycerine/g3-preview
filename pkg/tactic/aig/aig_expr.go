@@ -204,14 +204,10 @@ func (c *exprConverter) cleanup() error {
 	return err
 }
 
-// MkAIG converts one borrowed AST expression using the source's explicit
-// postorder frame/result stacks and expression-identity cache. The caller
-// keeps the input AST live until this call returns.
-func (m *Manager) MkAIG(h ast.ASTHandle) (*Ref, error) {
-	if err := m.open(); err != nil {
-		return nil, err
+func (c *exprConverter) convertOne(h ast.ASTHandle) (*Ref, error) {
+	if len(c.frames) != 0 || len(c.results) != 0 {
+		return nil, ast.ErrASTDomain
 	}
-	c := exprConverter{manager: m, cache: make(map[ast.ASTHandle]*Ref)}
 	err := c.visit(h)
 	for err == nil && len(c.frames) != 0 {
 		last := len(c.frames) - 1
@@ -235,6 +231,18 @@ func (m *Manager) MkAIG(h ast.ASTHandle) (*Ref, error) {
 			c.results = nil
 		}
 	}
+	return out, err
+}
+
+// MkAIG converts one borrowed AST expression using the source's explicit
+// postorder frame/result stacks and expression-identity cache. The caller
+// keeps the input AST live until this call returns.
+func (m *Manager) MkAIG(h ast.ASTHandle) (*Ref, error) {
+	if err := m.open(); err != nil {
+		return nil, err
+	}
+	c := exprConverter{manager: m, cache: make(map[ast.ASTHandle]*Ref)}
+	out, err := c.convertOne(h)
 	err = errors.Join(err, c.cleanup())
 	if err != nil && out != nil {
 		err = errors.Join(err, out.Close())

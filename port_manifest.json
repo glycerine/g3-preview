@@ -98140,7 +98140,8 @@
         "pkg/tactic/aig/aig_core.go",
         "pkg/tactic/aig/aig_simplify.go",
         "pkg/tactic/aig/aig_gates.go",
-        "pkg/tactic/aig/aig_expr.go"
+        "pkg/tactic/aig/aig_expr.go",
+        "pkg/tactic/aig/aig_goal.go"
       ],
       "tests": [
         "TestAIGCoreInterningOwnershipAndIDReuse",
@@ -98151,7 +98152,9 @@
         "TestAIGNarySortedFolds",
         "TestAIGExprTraversalSharedLeavesAndBooleanOperations",
         "TestAIGExprTreatsNonBooleanEqualityAsVariable",
-        "TestAIGExprDeepNotUsesSourceFrameStack"
+        "TestAIGExprDeepNotUsesSourceFrameStack",
+        "TestAIGGoalConversionSharesExpressionCacheAndConjoins",
+        "TestAIGEmptyGoalIsTrue"
       ],
       "conditionals": [
         {
@@ -98424,13 +98427,22 @@
             "TestAIGExprTreatsNonBooleanEqualityAsVariable",
             "TestAIGExprDeepNotUsesSourceFrameStack"
           ]
+        },
+        {
+          "name": "mk_aig(goal const&) shared expression conversion and ordered conjunction of goal formulas",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_goal.go",
+          "tests": [
+            "TestAIGGoalConversionSharesExpressionCacheAndConjoins",
+            "TestAIGEmptyGoalIsTrue"
+          ]
         }
       ],
       "ownership": [
         "Concrete AIG manager pins each variable AST expression, owns true/false counts and interning table nodes, and recursively releases child nodes when the last AIG reference closes."
       ],
       "deviations": [
-        "Typed Go map replaces aig_table; literal inversion is a bool rather than pointer tagging. The mk_node minimizer, default gate encoding and expression-to-AIG traversal are ported; resource checkpoints, alternate gate encoding, goal conversion, aig2expr rewriting and the tactic/proof/goal traversal remain unported."
+        "Typed Go map replaces aig_table; literal inversion is a bool rather than pointer tagging. The mk_node minimizer, default gate encoding, expression-to-AIG traversal and goal conjunction are ported; resource checkpoints, alternate gate encoding, aig2expr rewriting and the tactic/proof/goal update paths remain unported."
       ]
     },
     {
@@ -98442,14 +98454,16 @@
         "pkg/tactic/aig/aig_core.go",
         "pkg/tactic/aig/aig_simplify.go",
         "pkg/tactic/aig/aig_gates.go",
-        "pkg/tactic/aig/aig_expr.go"
+        "pkg/tactic/aig/aig_expr.go",
+        "pkg/tactic/aig/aig_goal.go"
       ],
       "tests": [
         "TestAIGCoreInterningOwnershipAndIDReuse",
         "TestAIGTwoLevelAndRules",
         "TestAIGDefaultGatesTruthTablesAndFailureCleanup",
         "TestAIGNarySortedFolds",
-        "TestAIGExprTraversalSharedLeavesAndBooleanOperations"
+        "TestAIGExprTraversalSharedLeavesAndBooleanOperations",
+        "TestAIGGoalConversionSharesExpressionCacheAndConjoins"
       ],
       "conditionals": [
         {
@@ -98489,13 +98503,22 @@
             "TestAIGExprTraversalSharedLeavesAndBooleanOperations",
             "TestAIGExprDeepNotUsesSourceFrameStack"
           ]
+        },
+        {
+          "name": "aig_manager mk_aig(goal const&) shared converter and conjunction",
+          "status": "ported",
+          "go_target": "pkg/tactic/aig/aig_goal.go",
+          "tests": [
+            "TestAIGGoalConversionSharesExpressionCacheAndConjoins",
+            "TestAIGEmptyGoalIsTrue"
+          ]
         }
       ],
       "ownership": [
         "Go Ref owns one AIG reference and closes explicitly; intermediate gate references close in reverse order, including after a refused node allocation."
       ],
       "deviations": [
-        "Goal conversion, max_sharing, to_formula and display remain unported; resource checkpoints and alternate gate encoding are not exposed."
+        "Goal-to-AIG conjunction is ported; max_sharing, to_formula, display and the goal-update tactic remain unported. Resource checkpoints and alternate gate encoding are not exposed."
       ]
     },
     {
