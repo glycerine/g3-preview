@@ -225,57 +225,35 @@ func TestDivisionPublicationSourceThreeAssertions(t *testing.T) {
 func TestDivisionPublicationFractionalIntegerForwardProfiles(t *testing.T) {
 	for _, sync := range []bool{false, true} {
 		for op := 0; op < 4; op++ {
-			for _, integerOut := range []bool{false, true} {
-				if integerOut && op < 2 {
-					continue
-				}
-				m, _ := rationalManager(t, sync)
-				a, b, out := NewRational(), NewRational(), NewRational()
-				qopsMust(t, m.SetFraction(&a, 5, 2))
-				qopsMust(t, m.SetFraction(&b, 3, 2))
-				qopsMust(t, m.SetFraction(&out, 7, 9))
-				z := NewInt(71)
-				var e error
-				if integerOut {
-					switch op {
-					case 2:
-						e = m.RemToInt(&a, &b, &z)
-					case 3:
-						e = m.ModToInt(&a, &b, &z)
-					}
-				} else {
-					switch op {
-					case 0:
-						e = m.IDiv(&a, &b, &out)
-					case 1:
-						e = m.MachineIDiv(&a, &b, &out)
-					case 2:
-						e = m.Rem(&a, &b, &out)
-					case 3:
-						e = m.Mod(&a, &b, &out)
-					}
-				}
-				qopsAuditLiveOwnership(t, m, []*Int{&a.Num, &a.Den, &b.Num, &b.Den, &out.Num, &out.Den, &z})
-				if modularSourceDebug {
-					if !errors.Is(e, ErrRationalNotInteger) || z != NewInt(71) || out.Num != NewInt(7) || out.Den != NewInt(9) {
-						t.Fatal(e)
-					}
-				} else {
-					qopsMust(t, e)
-					want := []int32{1, 1, 2, 2}[op]
-					if integerOut {
-						if z != NewInt(want) {
-							t.Fatal(z)
-						}
-					} else {
-						qopsEqual(t, m, &out, new(big.Rat).SetInt64(int64(want)))
-					}
-				}
-				qopsMust(t, m.Del(&a))
-				qopsMust(t, m.Del(&b))
-				qopsMust(t, m.Del(&out))
-				qopsMust(t, m.Z.Del(&z))
+			m, _ := rationalManager(t, sync)
+			a, b, out := NewRational(), NewRational(), NewRational()
+			qopsMust(t, m.SetFraction(&a, 5, 2))
+			qopsMust(t, m.SetFraction(&b, 3, 2))
+			qopsMust(t, m.SetFraction(&out, 7, 9))
+			var e error
+			switch op {
+			case 0:
+				e = m.IDiv(&a, &b, &out)
+			case 1:
+				e = m.MachineIDiv(&a, &b, &out)
+			case 2:
+				e = m.Rem(&a, &b, &out)
+			case 3:
+				e = m.Mod(&a, &b, &out)
 			}
+			qopsAuditLiveOwnership(t, m, []*Int{&a.Num, &a.Den, &b.Num, &b.Den, &out.Num, &out.Den})
+			if modularSourceDebug {
+				if !errors.Is(e, ErrRationalNotInteger) || out.Num != NewInt(7) || out.Den != NewInt(9) {
+					t.Fatal(e)
+				}
+			} else {
+				qopsMust(t, e)
+				want := []int32{1, 1, 2, 2}[op]
+				qopsEqual(t, m, &out, new(big.Rat).SetInt64(int64(want)))
+			}
+			qopsMust(t, m.Del(&a))
+			qopsMust(t, m.Del(&b))
+			qopsMust(t, m.Del(&out))
 		}
 	}
 }
@@ -485,106 +463,83 @@ func TestDivisionPublicationIntegerForwardRawSignsAliases(t *testing.T) {
 				}
 				for op := 0; op < 4; op++ {
 					for alias := 0; alias < 4; alias++ {
-						for _, intOut := range []bool{false, true} {
-							if intOut && op < 2 {
-								continue
+						a := Rational{Num: NewInt(x), Den: NewInt(-2)}
+						b := Rational{Num: NewInt(y), Den: NewInt(3)}
+						out := NewRational()
+						out.Num = NewInt(71)
+						left, right := &a, &b
+						dst := &out
+						if alias == 1 {
+							dst = left
+						}
+						if alias == 2 {
+							dst = right
+						}
+						if alias == 3 {
+							right = left
+							dst = left
+						}
+						var e error
+						switch op {
+						case 0:
+							e = m.IDiv(left, right, dst)
+						case 1:
+							e = m.MachineIDiv(left, right, dst)
+						case 2:
+							e = m.Rem(left, right, dst)
+						case 3:
+							e = m.Mod(left, right, dst)
+						}
+						qopsAuditLiveOwnership(t, m, []*Int{&a.Num, &a.Den, &b.Num, &b.Den, &out.Num, &out.Den})
+						if modularSourceDebug {
+							if !errors.Is(e, ErrRationalNotInteger) {
+								t.Fatal(e)
 							}
-							a := Rational{Num: NewInt(x), Den: NewInt(-2)}
-							b := Rational{Num: NewInt(y), Den: NewInt(3)}
-							out := NewRational()
-							out.Num = NewInt(71)
-							z := NewInt(71)
-							left, right := &a, &b
-							dst := &out
-							zdst := &z
-							if alias == 1 {
-								dst = left
-								zdst = &a.Num
+							continue
+						}
+						yy := y
+						if alias == 3 {
+							yy = x
+						}
+						if yy == 0 {
+							if !errors.Is(e, ErrDivideByZero) {
+								t.Fatal(e)
 							}
+							continue
+						}
+						qopsMust(t, e)
+						quot, rem := x/yy, x%yy
+						want := quot
+						if op == 0 && x < 0 && rem != 0 {
+							sign := yy
 							if alias == 2 {
-								dst = right
-								zdst = &b.Num
+								sign = quot
 							}
-							if alias == 3 {
-								right = left
-								dst = left
-								zdst = &a.Num
-							}
-							var e error
-							if intOut {
-								switch op {
-								case 2:
-									e = m.RemToInt(left, right, zdst)
-								case 3:
-									e = m.ModToInt(left, right, zdst)
-								}
+							if sign < 0 {
+								want++
 							} else {
-								switch op {
-								case 0:
-									e = m.IDiv(left, right, dst)
-								case 1:
-									e = m.MachineIDiv(left, right, dst)
-								case 2:
-									e = m.Rem(left, right, dst)
-								case 3:
-									e = m.Mod(left, right, dst)
-								}
+								want--
 							}
-							qopsAuditLiveOwnership(t, m, []*Int{&a.Num, &a.Den, &b.Num, &b.Den, &out.Num, &out.Den, &z})
-							if modularSourceDebug {
-								if !errors.Is(e, ErrRationalNotInteger) {
-									t.Fatal(e)
-								}
-								continue
-							}
-							yy := y
-							if alias == 3 {
-								yy = x
-							}
-							if yy == 0 {
-								if !errors.Is(e, ErrDivideByZero) {
-									t.Fatal(e)
-								}
-								continue
-							}
-							qopsMust(t, e)
-							quot, rem := x/yy, x%yy
-							want := quot
-							if op == 0 && x < 0 && rem != 0 {
-								sign := yy
+						}
+						if op >= 2 {
+							want = rem
+							if op == 3 && rem < 0 {
+								divisor := yy
 								if alias == 2 {
-									sign = quot
+									divisor = rem
 								}
-								if sign < 0 {
-									want++
+								if divisor > 0 {
+									want += divisor
 								} else {
-									want--
+									want -= divisor
 								}
 							}
-							if op >= 2 {
-								want = rem
-								if op == 3 && rem < 0 {
-									divisor := yy
-									if alias == 2 {
-										divisor = rem
-									}
-									if divisor > 0 {
-										want += divisor
-									} else {
-										want -= divisor
-									}
-								}
-							}
-							got := zdst
-							if !intOut {
-								got = &dst.Num
-								if dst.Den != NewInt(1) {
-									t.Fatal("den reset")
-								}
-							}
-							if *got != NewInt(want) {
-								t.Fatal("source finite raw/sign/alias action", x, y, op, alias, intOut, *got, want)
-							}
+						}
+						if dst.Den != NewInt(1) {
+							t.Fatal("den reset")
+						}
+						if dst.Num != NewInt(want) {
+							t.Fatal("source finite raw/sign/alias action", x, y, op, alias, dst.Num, want)
 						}
 					}
 				}

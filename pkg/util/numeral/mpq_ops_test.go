@@ -135,7 +135,6 @@ func TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks(t *testing.T) {
 	for _, synch := range []bool{false, true} {
 		m, _ := rationalManager(t, synch)
 		a, b, out := NewRational(), NewRational(), NewRational()
-		var zi Int
 		for av := int64(-19); av <= 19; av++ {
 			for bv := int64(-7); bv <= 7; bv++ {
 				if bv == 0 {
@@ -149,18 +148,11 @@ func TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks(t *testing.T) {
 				tq.QuoRem(big.NewInt(av), big.NewInt(bv), tr)
 				cases := []struct {
 					q    func(*Rational, *Rational, *Rational) error
-					z    func(*Rational, *Rational, *Int) error
 					want *big.Int
-				}{{q: m.IDiv, want: eq}, {q: m.MachineIDiv, want: tq}, {m.Rem, m.RemToInt, tr}, {m.Mod, m.ModToInt, er}}
+				}{{m.IDiv, eq}, {m.MachineIDiv, tq}, {m.Rem, tr}, {m.Mod, er}}
 				for _, tc := range cases {
 					qopsMust(t, tc.q(&a, &b, &out))
 					qopsEqual(t, m, &out, new(big.Rat).SetInt(tc.want))
-					if tc.z != nil {
-						qopsMust(t, tc.z(&a, &b, &zi))
-						if integerString(t, m.Z, &zi) != tc.want.String() {
-							t.Fatal("integer output")
-						}
-					}
 				}
 			}
 		}
@@ -178,7 +170,6 @@ func TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks(t *testing.T) {
 		for _, n := range []*Rational{&a, &b, &out} {
 			qopsMust(t, m.Del(n))
 		}
-		qopsMust(t, m.Z.Del(&zi))
 	}
 }
 func TestRationalOpsIntegerProductsRatDivQuirksAndGuards(t *testing.T) {

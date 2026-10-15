@@ -153,18 +153,6 @@ func (o NumericRationalOperations) DivInt(a *Rational, b *Int, out *Rational) er
 	}
 	return o.manager.divIntWithAllocationContext(a, b, out, o.context)
 }
-func (o NumericRationalOperations) IntegerOp(a, b *Rational, out *Int, operation uint8) error {
-	if e := o.valid(); e != nil {
-		return e
-	}
-	return o.manager.integerOpWithAllocationContext(a, b, out, operation, o.context)
-}
-func (o NumericRationalOperations) IntegerOpRational(a, b, out *Rational, operation uint8) error {
-	if e := o.valid(); e != nil {
-		return e
-	}
-	return o.manager.integerOpRationalWithAllocationContext(a, b, out, operation, o.context)
-}
 func (o NumericRationalOperations) Mod(a, b, out *Rational) error {
 	if e := o.valid(); e != nil {
 		return e

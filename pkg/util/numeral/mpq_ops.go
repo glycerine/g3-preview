@@ -321,7 +321,6 @@ const (
 	qIntegerDiv uint8 = iota
 	qIntegerMachineDiv
 	qIntegerRem
-	qIntegerMod
 )
 
 func (m *RationalManager) integerOperands(a, b *Rational) error {
@@ -336,9 +335,6 @@ func (m *RationalManager) integerOperands(a, b *Rational) error {
 	}
 	return nil
 }
-func (m *RationalManager) integerOp(a, b *Rational, out *Int, operation uint8) error {
-	return m.integerOpWithAllocationContext(a, b, out, operation, integerAllocationInvocationContext{})
-}
 func (m *RationalManager) integerOpWithAllocationContext(a, b *Rational, out *Int, operation uint8, context integerAllocationInvocationContext) error {
 	if e := m.check(a); e != nil {
 		return e
@@ -350,16 +346,14 @@ func (m *RationalManager) integerOpWithAllocationContext(a, b *Rational, out *In
 		return ErrRationalNotInteger
 	}
 	// Direct output identity preserves the source base-manager's divisor/output
-	// alias quirks for Euclidean division and modulus.
+	// alias quirks for Euclidean division and remainder.
 	switch operation {
 	case qIntegerDiv:
 		return m.Z.divWithAllocationContext(&a.Num, &b.Num, out, context)
 	case qIntegerMachineDiv:
 		return m.Z.machineDivWithAllocationContext(&a.Num, &b.Num, out, context)
-	case qIntegerRem:
-		return m.Z.remWithAllocationContext(&a.Num, &b.Num, out, context)
 	default:
-		return m.Z.modWithAllocationContext(&a.Num, &b.Num, out, context)
+		return m.Z.remWithAllocationContext(&a.Num, &b.Num, out, context)
 	}
 }
 func (m *RationalManager) integerOpRational(a, b, out *Rational, operation uint8) error {
@@ -397,10 +391,4 @@ func (m *RationalManager) modWithAllocationContext(a, b, out *Rational, context 
 		return e
 	}
 	return m.resetDenominator(out)
-}
-func (m *RationalManager) RemToInt(a, b *Rational, out *Int) error {
-	return m.integerOp(a, b, out, qIntegerRem)
-}
-func (m *RationalManager) ModToInt(a, b *Rational, out *Int) error {
-	return m.integerOp(a, b, out, qIntegerMod)
 }

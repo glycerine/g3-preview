@@ -113141,7 +113141,7 @@
           ]
         },
         {
-          "name": "Direct rational inverse, rational/mixed division and rat_div component publication; debug-only integrality on eight integer division/rem/mod forwards",
+          "name": "Direct rational inverse, rational/mixed division and rat_div component publication; debug-only integrality on four retained integer division/rem/mod rational-output forwards",
           "status": "partial",
           "go_target": "pkg/util/numeral/mp_div_publication_test.go",
           "tests": [
@@ -160214,19 +160214,9 @@
           ]
         },
         {
-          "name": "rem/mod(mpq,mpq,mpz)",
-          "status": "ported",
-          "go_target": "pkg/util/numeral/mpq_ops.go",
-          "tests": [
-            "TestRationalOpsSourceTst9All24Assertions",
-            "TestRationalOpsMixedFiniteOraclesAndAliases",
-            "TestRationalOpsFusedAllOutputAliases",
-            "TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks",
-            "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
-            "TestRationalOpsSourceComponentAliasActionOrder",
-            "TestRationalOpsLargeLimbScratchBranchesAndWarm",
-            "TestRationalOpsAllPredictableFailurePrefixes"
-          ]
+          "name": "rem/mod(mpq,mpq,mpz) integer-output overloads have no retained production caller",
+          "status": "reference_only",
+          "tests": []
         },
         {
           "name": "gcd integer-valued pair wrapper",
@@ -160451,7 +160441,7 @@
           ]
         },
         {
-          "name": "Remaining rational/mixed division and rat_div component publication; debug-only integrality on eight integer division/rem/mod forwards",
+          "name": "Remaining rational/mixed division and rat_div component publication; debug-only integrality on four retained integer division/rem/mod rational-output forwards",
           "status": "partial",
           "go_target": "pkg/util/numeral/mp_div_publication_test.go",
           "tests": [
