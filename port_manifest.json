@@ -15307,7 +15307,8 @@
           "status": "platform_replacement",
           "go_target": "pkg/ast/ast_format_plugin.go",
           "tests": [
-            "TestASTFormatPluginMemoryWrapperLazyLifetime"
+            "TestASTFormatPluginMemoryWrapperLazyLifetime",
+            "TestASTFormatPluginMemoryWrapperLaterFormatFailure"
           ]
         },
         {
@@ -150773,7 +150774,8 @@
           "status": "platform_replacement",
           "go_target": "pkg/ast/ast_format_plugin.go",
           "tests": [
-            "TestASTFormatPluginMemoryWrapperLazyLifetime"
+            "TestASTFormatPluginMemoryWrapperLazyLifetime",
+            "TestASTFormatPluginMemoryWrapperLaterFormatFailure"
           ]
         },
         {
