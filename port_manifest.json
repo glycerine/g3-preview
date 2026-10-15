@@ -178316,6 +178316,12 @@
           "tests": ["TestSATSolverSimplifyTraceAfterThresholdBeforeCleanup"]
         },
         {
+          "name": "Reached SAT init_search and simplify_problem completed solver-display TRACE sites (sat_solver.cpp:1184,1237)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_search_display_trace.go",
+          "tests": ["TestSATSearchInitSourceDisplayTrace", "TestSATSolverSimplifyTraceAfterThresholdBeforeCleanup"]
+        },
+        {
           "name": "Reached SAT solver destructor TRACE before original and learned clause deletion (sat_solver.cpp:62,64)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_clause_lifecycle.go",
@@ -179661,6 +179667,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_simplify_trace.go",
           "tests": ["TestSATSolverSimplifyTraceAfterThresholdBeforeCleanup"]
+        },
+        {
+          "name": "Reached SAT init_search and simplify_problem completed solver-display TRACE sites (sat_solver.cpp:1184,1237)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_search_display_trace.go",
+          "tests": ["TestSATSearchInitSourceDisplayTrace", "TestSATSolverSimplifyTraceAfterThresholdBeforeCleanup"]
         },
         {
           "name": "Reached SAT solver destructor TRACE before original and learned clause deletion (sat_solver.cpp:62,64)",

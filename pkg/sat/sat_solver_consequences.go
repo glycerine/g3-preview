@@ -107,6 +107,7 @@ func (s *Solver) consequenceInitialize(asms satConsequenceInput) (result lbool.L
 	if err = s.gc.initSearch(); err != nil {
 		return lbool.Undef, err
 	}
+	s.traceSearchInitialized()
 	if _, err = s.Lifecycle.propagate(false, false, false); err != nil {
 		return lbool.Undef, err
 	}

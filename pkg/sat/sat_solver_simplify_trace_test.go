@@ -38,8 +38,10 @@ func TestSATSolverSimplifyTraceAfterThresholdBeforeCleanup(t *testing.T) {
 		t.Fatal("source simplification did not pop the scope")
 	}
 	if tags.ShouldTrace("sat") {
-		const want = "-------- [sat] simplify_problem src/sat/sat_solver.cpp:1199 ---------\n" +
-			"simplify\n------------------------------------------------\n"
+		var display bytes.Buffer
+		satOK(t, s.traceUserDisplayInto(&display))
+		want := satClauseTraceRecord("sat", "simplify_problem", "1199", "simplify\n") +
+			satClauseTraceRecord("sat", "simplify_problem", "1237", "consistent: 1\n"+display.String())
 		if got := w.output.String(); got != want || w.beforeScope != 1 {
 			t.Fatalf("source simplify record: got %q, want %q", got, want)
 		}

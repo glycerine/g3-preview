@@ -199,6 +199,7 @@ func (s *Solver) simplifyProblem() error {
 	if s.propagation.extensionPresent {
 		return ErrSATMissingSourceExtBinding
 	}
+	s.traceSimplifyCompleted()
 	if e := s.conflict.reinitAssumptions(); e != nil {
 		return e
 	}
@@ -348,6 +349,7 @@ func (s *Solver) checkCoreSpan(count uint32, span satSolverLiteralSpan) (lbool.L
 	if e := s.gc.initSearch(); e != nil {
 		return lbool.Undef, e
 	}
+	s.traceSearchInitialized()
 	if _, e := s.Lifecycle.propagate(false, false, false); e != nil {
 		return lbool.Undef, e
 	}
