@@ -91,6 +91,14 @@ func (t *RewriterTactic) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error)
 		return nil, e
 	}
 	forms := make([]ast.ASTHandle, n)
+	formPins := 0
+	defer func() {
+		// The source forms ref_vector releases its entries after the younger
+		// proof and rewritten-formula owners, in insertion order.
+		for i := 0; i < formPins; i++ {
+			result = errors.Join(result, t.manager.DecRef(forms[i]))
+		}
+	}()
 	var proofRefs []ast.ASTRef
 	if proofs {
 		proofRefs = make([]ast.ASTRef, 0, n)
@@ -105,6 +113,10 @@ func (t *RewriterTactic) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error)
 		if e != nil {
 			return nil, e
 		}
+		if e = t.manager.IncRef(forms[i]); e != nil {
+			return nil, e
+		}
+		formPins++
 		if proofs {
 			pr, e := goal.Proof(uint32(i))
 			if e != nil {

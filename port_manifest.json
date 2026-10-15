@@ -106591,7 +106591,7 @@
         }
       ],
       "ownership": [
-        "The Go tactic owns the configured Boolean reducer and borrows AST/parameter services. The processor owns indexes and main todo references only during one Apply; output and proof references survive goal reset until assertion completes. Successful result publication adds a separate goal reference after the depth increment; the caller releases it with DecRef."
+        "The Go tactic owns the configured Boolean reducer and borrows AST/parameter services. Its copied input-formula slice now pins each AST until the younger rewritten-formula and proof owners release; output and proof references survive goal reset until assertion completes. Successful result publication adds a separate goal reference after the depth increment; the caller releases it with DecRef."
       ],
       "deviations": [
         "The result is the input goal with a second owning reference; converter outputs are absent because the source sets all three to null. Translation to another manager, parameter-description reporting, cleanup reconstruction and full tactic registry integration remain open."
@@ -171502,7 +171502,9 @@
         "pkg/ast/ast_bv_bv2int_numerals.go",
         "pkg/ast/ast_bv_bv2int_numerals_test.go",
         "pkg/tactic/ufbv/match_subst.go",
-        "pkg/ast/pattern/candidates.go"
+        "pkg/ast/pattern/candidates.go",
+        "pkg/tactic/ufbv/rewrite_tactic.go",
+        "pkg/tactic/ufbv/rewrite_tactic_test.go"
       ],
       "tests": [
         "TestSexprAccessorsAndScalarIterator",
@@ -171567,7 +171569,8 @@
         "TestBV2IntNativeRootReplacementConsumedOldReference",
         "TestASTBitVectorBV2IntEveryActualReservation",
         "TestMatchSubstConcretePairCacheAndVariableBindings",
-        "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences"
+        "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences",
+        "TestUFBVRewriterTacticProofModePreservesFormulaAndProof"
       ],
       "conditionals": [
         {
@@ -171604,6 +171607,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Concrete UFBV tactic forms expr_ref_vector copies each input formula with an independent AST pin before rewriting and releases pins in insertion order after younger output/proof owners (ufbv_rewriter_tactic.cpp:47-68)",
+          "status": "partial",
+          "go_target": "pkg/tactic/ufbv/rewrite_tactic.go",
+          "tests": ["TestUFBVRewriterTacticProofModePreservesFormulaAndProof"]
+        },
         {
           "name": "ref_vector_core construction, move, destruction, reset/finalize, both resize forms, reserve, shrink, push/pop, access, mutation, append, swap and reverse",
           "status": "partial",

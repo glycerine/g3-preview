@@ -186,6 +186,8 @@ func TestUFBVRewriterTacticProofModePreservesFormulaAndProof(t *testing.T) {
 	cacheMust(t, goal.Assert(p))
 	beforeForm, e := goal.Form(0)
 	cacheMust(t, e)
+	beforeRefs, e := m.GetRefCount(beforeForm)
+	cacheMust(t, e)
 	beforeProof, e := goal.Proof(0)
 	cacheMust(t, e)
 	if beforeProof.IsNull() {
@@ -206,6 +208,11 @@ func TestUFBVRewriterTacticProofModePreservesFormulaAndProof(t *testing.T) {
 	cacheMust(t, e)
 	if n != 1 || afterForm != beforeForm || afterProof != beforeProof || depth != 1 {
 		t.Fatal("source proof bypass and goal depth", n, afterForm, afterProof, depth)
+	}
+	afterRefs, e := m.GetRefCount(afterForm)
+	cacheMust(t, e)
+	if afterRefs != beforeRefs {
+		t.Fatal("formula ref_vector pin survived tactic return", beforeRefs, afterRefs)
 	}
 	if got, want := warningOutput.String(), "WARNING: PRE_DEMODULATOR=true is not supported when proofs are enabled.\n"; got != want {
 		t.Fatal("source proof-mode warning", got, want)
