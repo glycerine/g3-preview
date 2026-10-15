@@ -73382,9 +73382,9 @@
         "TestSATClauseUseListsRemovedMasksIndependent",
         "TestSATClauseUseListsDuplicateAndRepeatedErase",
         "TestSATClauseUseListsConstructorFailureGraph",
-        "TestSATClauseUseListsInitRefusalCompletedGrowth",
+        "TestSATClauseUseListsNativeOuterGrowthUnderRefusedArena",
         "TestSATClauseUseListsInsertionFaultRootsAndPrefixes",
-        "TestSATClauseUseListsPhysicalRecordAndHostBounds",
+        "TestSATClauseUseListsPhysicalRecord",
         "TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership",
         "TestSATClauseUseListsEndedAndNeverConstructedSlots",
         "TestSATClauseUseListsRawCurrentAndPayloadFailurePrefix",
@@ -73467,9 +73467,9 @@
             "TestSATClauseUseListsRemovedMasksIndependent",
             "TestSATClauseUseListsDuplicateAndRepeatedErase",
             "TestSATClauseUseListsConstructorFailureGraph",
-            "TestSATClauseUseListsInitRefusalCompletedGrowth",
+            "TestSATClauseUseListsNativeOuterGrowthUnderRefusedArena",
             "TestSATClauseUseListsInsertionFaultRootsAndPrefixes",
-            "TestSATClauseUseListsPhysicalRecordAndHostBounds",
+            "TestSATClauseUseListsPhysicalRecord",
             "TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership",
             "TestSATClauseUseListsEndedAndNeverConstructedSlots",
             "TestSATClauseUseListsRawCurrentAndPayloadFailurePrefix",
@@ -73481,11 +73481,11 @@
       ],
       "ownership": [
         "The concrete cold list owns a native clause slice owner and borrows real clause allocators through native bindings. Actual list/vector cold headers are charged; native slice/map backing is uncharged. The by-value iterator borrows the current vector object, captures scalar count/indexes and retains actual callback, read/write, compaction and destruction order. Native growth and assignment do not introduce backing reservation refusal events.",
-        "Pointer-free32-byte inline records, one chargedWords pool, five-word clause tokens and cold borrowed allocator. Same-address reconstruction follows retained references; outer relocation/free invalidates at actual access. Source destruction, growth and literal action prefixes preserved. See PORT_PROGRESS.md#audit-sat-solver-clause-use-lists-port-status-md."
+        "Pointer-free 32-byte Go records, one charged Words pool, five-word clause tokens and a cold borrowed allocator. Same-backing reconstruction follows retained references; outer slice relocation/finalize invalidates at actual access. Source destruction and literal action prefixes remain; outer growth no longer requests arena storage. See PORT_PROGRESS.md#audit-sat-solver-clause-use-lists-port-status-md."
       ],
       "deviations": [
         "Explicit iterator Close and owner lifetime guards. Implicit moves, inactive nonlazy branch, STRACE and full solver consumers remain open.",
-        "Selected LP64 source extents are distinct from actual Go stride/pool graph. Inline storage and pooled metadata are fully charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed."
+        "Selected LP64 source extents are distinct from the Go record stride and pool graph. Outer Go slice backing is uncharged; only the cold owner and pooled payload metadata are charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed."
       ]
     },
     {
@@ -73527,9 +73527,9 @@
         "TestSATClauseUseListsRemovedMasksIndependent",
         "TestSATClauseUseListsDuplicateAndRepeatedErase",
         "TestSATClauseUseListsConstructorFailureGraph",
-        "TestSATClauseUseListsInitRefusalCompletedGrowth",
+        "TestSATClauseUseListsNativeOuterGrowthUnderRefusedArena",
         "TestSATClauseUseListsInsertionFaultRootsAndPrefixes",
-        "TestSATClauseUseListsPhysicalRecordAndHostBounds",
+        "TestSATClauseUseListsPhysicalRecord",
         "TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership",
         "TestSATClauseUseListsEndedAndNeverConstructedSlots",
         "TestSATClauseUseListsRawCurrentAndPayloadFailurePrefix",
@@ -73720,9 +73720,9 @@
             "TestSATClauseUseListsRemovedMasksIndependent",
             "TestSATClauseUseListsDuplicateAndRepeatedErase",
             "TestSATClauseUseListsConstructorFailureGraph",
-            "TestSATClauseUseListsInitRefusalCompletedGrowth",
+            "TestSATClauseUseListsNativeOuterGrowthUnderRefusedArena",
             "TestSATClauseUseListsInsertionFaultRootsAndPrefixes",
-            "TestSATClauseUseListsPhysicalRecordAndHostBounds",
+            "TestSATClauseUseListsPhysicalRecord",
             "TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership",
             "TestSATClauseUseListsEndedAndNeverConstructedSlots",
             "TestSATClauseUseListsRawCurrentAndPayloadFailurePrefix",
@@ -73734,11 +73734,11 @@
       ],
       "ownership": [
         "The concrete cold list owns a native clause slice owner and borrows real clause allocators through native bindings. Actual list/vector cold headers are charged; native slice/map backing is uncharged. The by-value iterator borrows the current vector object, captures scalar count/indexes and retains actual callback, read/write, compaction and destruction order. Native growth and assignment do not introduce backing reservation refusal events.",
-        "Pointer-free32-byte inline records, one chargedWords pool, five-word clause tokens and cold borrowed allocator. Same-address reconstruction follows retained references; outer relocation/free invalidates at actual access. Source destruction, growth and literal action prefixes preserved. See PORT_PROGRESS.md#audit-sat-solver-clause-use-lists-port-status-md."
+        "Pointer-free 32-byte Go records, one charged Words pool, five-word clause tokens and a cold borrowed allocator. Same-backing reconstruction follows retained references; outer slice relocation/finalize invalidates at actual access. Source destruction and literal action prefixes remain; outer growth no longer requests arena storage. See PORT_PROGRESS.md#audit-sat-solver-clause-use-lists-port-status-md."
       ],
       "deviations": [
         "Explicit iterator Close and owner lifetime guards. Implicit moves, inactive nonlazy branch, STRACE and full solver consumers remain open.",
-        "Selected LP64 source extents are distinct from actual Go stride/pool graph. Inline storage and pooled metadata are fully charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed."
+        "Selected LP64 source extents are distinct from the Go record stride and pool graph. Outer Go slice backing is uncharged; only the cold owner and pooled payload metadata are charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed."
       ]
     },
     {
@@ -76284,9 +76284,9 @@
         "TestSATClauseUseListsRemovedMasksIndependent",
         "TestSATClauseUseListsDuplicateAndRepeatedErase",
         "TestSATClauseUseListsConstructorFailureGraph",
-        "TestSATClauseUseListsInitRefusalCompletedGrowth",
+        "TestSATClauseUseListsNativeOuterGrowthUnderRefusedArena",
         "TestSATClauseUseListsInsertionFaultRootsAndPrefixes",
-        "TestSATClauseUseListsPhysicalRecordAndHostBounds",
+        "TestSATClauseUseListsPhysicalRecord",
         "TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership",
         "TestSATClauseUseListsEndedAndNeverConstructedSlots",
         "TestSATClauseUseListsRawCurrentAndPayloadFailurePrefix",
@@ -76442,9 +76442,9 @@
             "TestSATClauseUseListsRemovedMasksIndependent",
             "TestSATClauseUseListsDuplicateAndRepeatedErase",
             "TestSATClauseUseListsConstructorFailureGraph",
-            "TestSATClauseUseListsInitRefusalCompletedGrowth",
+            "TestSATClauseUseListsNativeOuterGrowthUnderRefusedArena",
             "TestSATClauseUseListsInsertionFaultRootsAndPrefixes",
-            "TestSATClauseUseListsPhysicalRecordAndHostBounds",
+            "TestSATClauseUseListsPhysicalRecord",
             "TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership",
             "TestSATClauseUseListsEndedAndNeverConstructedSlots",
             "TestSATClauseUseListsRawCurrentAndPayloadFailurePrefix",
@@ -76515,14 +76515,14 @@
         }
       ],
       "ownership": [
-        "Pointer-free32-byte inline records, one chargedWords pool, five-word clause tokens and cold borrowed allocator. Same-address reconstruction follows retained references; outer relocation/free invalidates at actual access. Source destruction, growth and literal action prefixes preserved. See PORT_PROGRESS.md#audit-sat-solver-clause-use-lists-port-status-md.",
+        "Pointer-free 32-byte Go records, one charged Words pool, five-word clause tokens and a cold borrowed allocator. Same-backing reconstruction follows retained references; outer slice relocation/finalize invalidates at actual access. Source destruction and literal action prefixes remain; outer growth no longer requests arena storage. See PORT_PROGRESS.md#audit-sat-solver-clause-use-lists-port-status-md.",
         "Charged concrete visited storage and cold borrowed allocator/use-list views; original collector and resolution publication/failure prefixes. Full simplifier owner integration remains open.",
         "Concrete charged simplifier owns actual children/workspaces and borrows actual lifecycle/cleaner/decision RNG/MkVar elimTodo. Dummy routes only explicit actual tmp-clause owner. Captured arena Words span does not clone literals. Partial sort/cleanup owns exact moved prefix and unread ranges with phase cursors; lifecycle Close drains actual continuation before ordinary vectors. Completed destructor explicitly finalizes before reverse constructed members; failed constructor skips destructor body.",
         "Live SAT storage-vector consumers now use concrete native Go slices with actual cold owner header charges; native backing does not simulate C++ capacity allocation events. Clause scalar handles and allocator bindings remain borrowed.",
         "Solver activity and simplifier literal-weight queues now share one concrete project heap algorithm over native []int32 values and reverse indexes. Source priority comparison, sentinel, move_up/down, erase/reinsert/reset order and current borrowed comparators remain. Removed the duplicate Runtime path, source vector capacity/payload/initialization geometry, backing reservations, source/owning destructor cursors and unused Clone/MoveClone and standalone activity-domain adapters. Only the actual queue cold header is budgeted. A 4097-key independent sorted-priority oracle, retained 12000-operation mutable-activity model, 81 finite priority worlds, real blocked-literal weights, warm zero-allocation reuse and exact cold-header/cohort/closed/index guards cover native behavior. Native backing introduces no Runtime or Budget allocation failures. No unused C++ vector/copy/move or general heap implementation credit is added."
       ],
       "deviations": [
-        "Selected LP64 source extents are distinct from actual Go stride/pool graph. Inline storage and pooled metadata are fully charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed.",
+        "Selected LP64 source extents are distinct from the Go record stride and pool graph. Outer Go slice backing is uncharged; only the cold owner and pooled payload metadata are charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed.",
         "BackSubsumption, Run, BCE, elimination, TRACE and solver integration remain unported; no new registered source test assertions claimed.",
         "This integration supersedes earlier missing ordinary simplifier Run/default-policy bindings. Entire ordinary source algorithm family is implemented with original defaults; full solver construction/Check/search and registered user-scope driver remain open. Global automatic debug tags/assertions registry, TRACE/verbose and source allocation/offset topology remain obligations. Native standard-library stable sorting preserves the source descending size and tie order after checked clause-size reads; no C++ standard-library allocation/comparison schedule is reproduced. Protocol/undefined-domain fixtures are distinct from ordinary real allocation refusals; no fake free-refusal/Budget tickets."
       ]
@@ -76578,9 +76578,9 @@
         "TestSATClauseUseListsRemovedMasksIndependent",
         "TestSATClauseUseListsDuplicateAndRepeatedErase",
         "TestSATClauseUseListsConstructorFailureGraph",
-        "TestSATClauseUseListsInitRefusalCompletedGrowth",
+        "TestSATClauseUseListsNativeOuterGrowthUnderRefusedArena",
         "TestSATClauseUseListsInsertionFaultRootsAndPrefixes",
-        "TestSATClauseUseListsPhysicalRecordAndHostBounds",
+        "TestSATClauseUseListsPhysicalRecord",
         "TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership",
         "TestSATClauseUseListsEndedAndNeverConstructedSlots",
         "TestSATClauseUseListsRawCurrentAndPayloadFailurePrefix",
@@ -76655,9 +76655,9 @@
             "TestSATClauseUseListsRemovedMasksIndependent",
             "TestSATClauseUseListsDuplicateAndRepeatedErase",
             "TestSATClauseUseListsConstructorFailureGraph",
-            "TestSATClauseUseListsInitRefusalCompletedGrowth",
+            "TestSATClauseUseListsNativeOuterGrowthUnderRefusedArena",
             "TestSATClauseUseListsInsertionFaultRootsAndPrefixes",
-            "TestSATClauseUseListsPhysicalRecordAndHostBounds",
+            "TestSATClauseUseListsPhysicalRecord",
             "TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership",
             "TestSATClauseUseListsEndedAndNeverConstructedSlots",
             "TestSATClauseUseListsRawCurrentAndPayloadFailurePrefix",
@@ -76716,14 +76716,14 @@
         }
       ],
       "ownership": [
-        "Pointer-free32-byte inline records, one chargedWords pool, five-word clause tokens and cold borrowed allocator. Same-address reconstruction follows retained references; outer relocation/free invalidates at actual access. Source destruction, growth and literal action prefixes preserved. See PORT_PROGRESS.md#audit-sat-solver-clause-use-lists-port-status-md.",
+        "Pointer-free 32-byte Go records, one charged Words pool, five-word clause tokens and a cold borrowed allocator. Same-backing reconstruction follows retained references; outer slice relocation/finalize invalidates at actual access. Source destruction and literal action prefixes remain; outer growth no longer requests arena storage. See PORT_PROGRESS.md#audit-sat-solver-clause-use-lists-port-status-md.",
         "Charged concrete visited storage and cold borrowed allocator/use-list views; original collector and resolution publication/failure prefixes. Full simplifier owner integration remains open.",
         "Concrete charged simplifier owns actual children/workspaces and borrows actual lifecycle/cleaner/decision RNG/MkVar elimTodo. Dummy routes only explicit actual tmp-clause owner. Captured arena Words span does not clone literals. Partial sort/cleanup owns exact moved prefix and unread ranges with phase cursors; lifecycle Close drains actual continuation before ordinary vectors. Completed destructor explicitly finalizes before reverse constructed members; failed constructor skips destructor body.",
         "Live SAT storage-vector consumers now use concrete native Go slices with actual cold owner header charges; native backing does not simulate C++ capacity allocation events. Clause scalar handles and allocator bindings remain borrowed.",
         "Solver activity and simplifier literal-weight queues now share one concrete project heap algorithm over native []int32 values and reverse indexes. Source priority comparison, sentinel, move_up/down, erase/reinsert/reset order and current borrowed comparators remain. Removed the duplicate Runtime path, source vector capacity/payload/initialization geometry, backing reservations, source/owning destructor cursors and unused Clone/MoveClone and standalone activity-domain adapters. Only the actual queue cold header is budgeted. A 4097-key independent sorted-priority oracle, retained 12000-operation mutable-activity model, 81 finite priority worlds, real blocked-literal weights, warm zero-allocation reuse and exact cold-header/cohort/closed/index guards cover native behavior. Native backing introduces no Runtime or Budget allocation failures. No unused C++ vector/copy/move or general heap implementation credit is added."
       ],
       "deviations": [
-        "Selected LP64 source extents are distinct from actual Go stride/pool graph. Inline storage and pooled metadata are fully charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed.",
+        "Selected LP64 source extents are distinct from the Go record stride and pool graph. Outer Go slice backing is uncharged; only the cold owner and pooled payload metadata are charged. Implicit copy/move, nonlazy/TRACE and full simplifier/solver remain open; no source registered use_list assertions are claimed.",
         "BackSubsumption, Run, BCE, elimination, TRACE and solver integration remain unported; no new registered source test assertions claimed.",
         "This integration supersedes earlier missing ordinary simplifier Run/default-policy bindings. Entire ordinary source algorithm family is implemented with original defaults; full solver construction/Check/search and registered user-scope driver remain open. Global automatic debug tags/assertions registry, TRACE/verbose and source allocation/offset topology remain obligations. Native standard-library stable sorting preserves the source descending size and tie order after checked clause-size reads; no C++ standard-library allocation/comparison schedule is reproduced. Protocol/undefined-domain fixtures are distinct from ordinary real allocation refusals; no fake free-refusal/Budget tickets."
       ]
@@ -182435,6 +182435,7 @@
         "SAT unsigned work columns now own native []uint32 backing for lemma/minimization, assumptions/core, model, consequence scopes and probing to-assert rows. Probing cache rows own native availability flags and unsigned slices. Copies own independent values, captured slices retain their actual backing, and checked column/parent closure rejects later access. Source model/mark/compaction algorithms remain; backing has no Runtime payload, Budget reservation, size_t header or pending block. The actual strict Runtime cache-memory cutoff still reads the caller Runtime counter. See PORT_PROGRESS.md#native-sat-unsigned-work-columns-and-probing-cache."
       ],
       "deviations": [
+        "The retained SAT LAZY_USE_LIST outer directory now stores its 32-byte records in a native Go slice. Removed its C++ 3/2 growth helper and charged Go backing; same-backing reconstruction and relocation/finalize view invalidation remain. The inner five-word clause-reference pool is a separate partial vector consumer.",
         "The shared id_gen uint32 recycled-ID list now uses Go slice growth and exact optional Reserve capacity without C++ 3/2 expansion, arena backing charges or synthetic failed-recycle prefixes. Its AST, SAT and polynomial callers retain source ID ordering, OOM skip and real owner accounting; other vector instantiations remain partial.",
         "The concrete util/heap Int specialization now uses native []int32 values and inverse indices. Removed the 3/2 vector growth helper, simulated backing charges and fallible vector-copy/swap prefixes; actual heap ordering and checked iterators remain. No generic C++ vector implementation credit is claimed.",
         "The last SAT solver source-capacity helper has been removed. Reached scope records now append to native []satSolverScope and pop from the logical slice, while diff-level int8 marks use native length bounds without test-only spare-slot emulation. A 129-scope cold push/pop succeeds with arena reservations refused; recursive MUS retains its separate real numeral/owner reservation campaign. Other vector instantiations remain partial.",

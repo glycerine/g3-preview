@@ -16,14 +16,13 @@ type satClauseUseListRecord struct {
 	alive                                   uint64
 }
 type satClauseUseLists struct {
-	self                                *satClauseUseLists
-	allocator                           *ClauseAllocator // borrowed; clauses are never owned by a list
-	budget                              *arena.Budget
-	words                               *arena.Words
-	records                             []satClauseUseListRecord
-	length, capacity                    uint32
-	backingID, ownerBytes, backingBytes uint64
-	closed                              bool
+	self                  *satClauseUseLists
+	allocator             *ClauseAllocator // borrowed; clauses are never owned by a list
+	budget                *arena.Budget
+	words                 *arena.Words
+	records               []satClauseUseListRecord
+	backingID, ownerBytes uint64
+	closed                bool
 }
 
 func newSATClauseUseLists(a *ClauseAllocator, b *arena.Budget, c arena.VectorConfig) (*satClauseUseLists, error) {
@@ -56,42 +55,6 @@ func (u *satClauseUseLists) open() error {
 	return nil
 }
 
-// Independent source uint32 extent and actual Go host extent checks.
-func satOuterUseCapacity(old uint32, hostMax uint64) (uint32, uint64, error) {
-	var c uint32 = 2
-	if old != 0 {
-		c = (3*old + 1) >> 1
-	}
-	oldSource := old*16 + 8
-	newSource := c*16 + 8
-	n := uint64(c) * uint64(reflect.TypeOf(satClauseUseListRecord{}).Size())
-	if c <= old || newSource <= oldSource || n > hostMax {
-		return 0, 0, arena.ErrBounds
-	}
-	return c, n, nil
-}
-func (u *satClauseUseLists) grow() error {
-	c, n, e := satOuterUseCapacity(u.capacity, uint64(^uint(0)>>1))
-	if e != nil {
-		return e
-	}
-	if u.backingID == ^uint64(0) {
-		return arena.ErrSlotLimit
-	}
-	if e = u.budget.Reserve(n); e != nil {
-		return e
-	}
-	r := make([]satClauseUseListRecord, int(c))
-	// Nontrivial source vector growth moves ONLY logical live elements. Init
-	// resets first, so the actual simplifier route moves zero elements.
-	copy(r, u.records[:u.length])
-	u.budget.Release(u.backingBytes)
-	u.records = r
-	u.capacity = c
-	u.backingBytes = n
-	u.backingID++
-	return nil
-}
 func (u *satClauseUseLists) destroy(i uint32) error {
 	r := &u.records[i]
 	if e := u.words.Free(r.payload); e != nil {
@@ -104,22 +67,26 @@ func (u *satClauseUseLists) Init(numVars uint32) error {
 	if e := u.open(); e != nil {
 		return e
 	}
-	for i := uint32(0); i < u.length; i++ {
-		if e := u.destroy(i); e != nil {
+	for i := range u.records {
+		if e := u.destroy(uint32(i)); e != nil {
 			return e
 		}
 	}
-	u.length = 0
+	u.records = u.records[:0]
 	n := 2 * numVars // The source multiplication wraps as unsigned32.
-	for n > u.capacity {
-		if e := u.grow(); e != nil {
-			return e
-		}
+	if uint64(n) > uint64(^uint(0)>>1)/uint64(reflect.TypeOf(satClauseUseListRecord{}).Size()) {
+		return arena.ErrBounds
 	}
-	// vector::resize publishes size after all capacity growths, then default
-	// constructs the elements (infallible in this selected specialization).
-	u.length = n
-	for i := uint32(0); i < n; i++ {
+	if int(n) > cap(u.records) {
+		if u.backingID == ^uint64(0) {
+			return arena.ErrSlotLimit
+		}
+		u.records = make([]satClauseUseListRecord, int(n))
+		u.backingID++
+	} else {
+		u.records = u.records[:n]
+	}
+	for i := range u.records {
 		u.records[i] = satClauseUseListRecord{alive: 1}
 	}
 	return nil
@@ -129,10 +96,10 @@ func (u *satClauseUseLists) Get(l Literal) (satClauseUseListView, error) {
 		return satClauseUseListView{}, e
 	}
 	i := l.index()
-	if satStorageSourceDebug && i >= u.length {
+	if satStorageSourceDebug && uint64(i) >= uint64(len(u.records)) {
 		return satClauseUseListView{}, ErrSATAssertion
 	}
-	if i >= u.capacity {
+	if uint64(i) >= uint64(len(u.records)) {
 		return satClauseUseListView{}, arena.ErrBounds
 	}
 	if u.records[i].alive == 0 {
@@ -183,16 +150,12 @@ func (u *satClauseUseLists) Finalize() error {
 	if u.backingID == ^uint64(0) {
 		return arena.ErrSlotLimit
 	}
-	for i := uint32(0); i < u.length; i++ {
-		if e := u.destroy(i); e != nil {
+	for i := range u.records {
+		if e := u.destroy(uint32(i)); e != nil {
 			return e
 		}
 	}
-	u.budget.Release(u.backingBytes)
-	u.backingBytes = 0
 	u.records = nil
-	u.length = 0
-	u.capacity = 0
 	u.backingID++
 	return nil
 }
@@ -227,7 +190,7 @@ func (v satClauseUseListView) record() (*satClauseUseListRecord, error) {
 		return nil, e
 	}
 	u := v.owner
-	if v.backingID != u.backingID || v.index >= u.capacity || u.records[v.index].alive == 0 {
+	if v.backingID != u.backingID || uint64(v.index) >= uint64(len(u.records)) || u.records[v.index].alive == 0 {
 		return nil, ErrSATOwner
 	}
 	return &u.records[v.index], nil

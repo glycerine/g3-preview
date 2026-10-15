@@ -131,17 +131,17 @@ func TestSATClauseUseListsInitUnsignedWrapAndFinalize(t *testing.T) {
 	a, u, b := satOuterUseFixture(t, 2)
 	c := satMk(t, a, satLs(0, 1, 2), false)
 	satOK(t, u.Insert(c))
-	old := u.capacity
+	old := uint32(cap(u.records))
 	satOK(t, u.Init(1<<31))
-	if u.length != 0 || u.capacity != old {
-		t.Fatal(u.length, u.capacity, old)
+	if uint32(len(u.records)) != 0 || uint32(cap(u.records)) != old {
+		t.Fatal(uint32(len(u.records)), uint32(cap(u.records)), old)
 	}
 	if !a.IsLive(c) {
 		t.Fatal("list owns clause")
 	}
 	retained := b.Used()
 	satOK(t, u.Finalize())
-	if u.capacity != 0 || u.length != 0 || b.Used() >= retained {
+	if u.records != nil || u.words.Stats().Live != 0 || b.Used() > retained {
 		t.Fatal("outer finalize")
 	}
 	satOK(t, u.Init(1))
@@ -281,31 +281,24 @@ func TestSATClauseUseListsConstructorFailureGraph(t *testing.T) {
 		t.Fatal("constructor never completed")
 	}
 }
-func TestSATClauseUseListsInitRefusalCompletedGrowth(t *testing.T) {
+func TestSATClauseUseListsNativeOuterGrowthUnderRefusedArena(t *testing.T) {
 	a, u, b := satOuterUseFixture(t, 2)
 	c := satMk(t, a, satLs(0, 1, 2), false)
 	satOK(t, u.Insert(c))
 	v, e := u.Get(0)
 	satOK(t, e)
-	old := u.capacity
-	b.FailAfter(2)
-	e = u.Init(100)
+	before := b.Used()
+	b.FailAfter(0)
+	satOK(t, u.Init(100))
 	b.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal(e)
-	}
-	c1, _, e := satOuterUseCapacity(old, uint64(^uint(0)>>1))
-	satOK(t, e)
-	c2, _, e := satOuterUseCapacity(c1, uint64(^uint(0)>>1))
-	satOK(t, e)
-	if u.capacity != c2 || u.length != 0 || u.words.Stats().Live != 0 {
-		t.Fatal("completed reset/growth prefix", u.capacity, c2, u.length, u.words.Stats())
+	if len(u.records) != 200 || cap(u.records) < 200 || u.words.Stats().Live != 0 || b.Used() > before {
+		t.Fatal("native outer growth charged arena or retained inner records", len(u.records), cap(u.records), u.words.Stats(), b.Used(), before)
 	}
 	if _, e = v.Size(); !errors.Is(e, ErrSATOwner) {
-		t.Fatal(e)
+		t.Fatal("relocated child view", e)
 	}
 	if !a.IsLive(c) {
-		t.Fatal("clause freed")
+		t.Fatal("list owned clause")
 	}
 	satOK(t, u.Init(1))
 }
@@ -362,18 +355,12 @@ func TestSATClauseUseListsInsertionFaultRootsAndPrefixes(t *testing.T) {
 		t.Fatal("fault sweep never completed")
 	}
 }
-func TestSATClauseUseListsPhysicalRecordAndHostBounds(t *testing.T) {
+func TestSATClauseUseListsPhysicalRecord(t *testing.T) {
 	if e := arena.ValidateRecordType(reflect.TypeOf(satClauseUseListRecord{})); e != nil {
 		t.Fatal(e)
 	}
 	if n := reflect.TypeOf(satClauseUseListRecord{}).Size(); n != 32 {
 		t.Fatal(n)
-	}
-	if _, _, e := satOuterUseCapacity((1<<28)-1, ^uint64(0)); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal("source unsigned extent", e)
-	}
-	if _, _, e := satOuterUseCapacity(1<<26, (1<<31)-1); !errors.Is(e, arena.ErrBounds) {
-		t.Fatal("actual simulated32 host extent", e)
 	}
 }
 func TestSATClauseUseListsWarmZeroAllocationAndNoClauseOwnership(t *testing.T) {
@@ -412,9 +399,9 @@ func TestSATClauseUseListsEndedAndNeverConstructedSlots(t *testing.T) {
 	_, u, _ := satOuterUseFixture(t, 2)
 	v, e := u.Get(3)
 	satOK(t, e)
-	cap := u.capacity
+	oldCapacity := cap(u.records)
 	satOK(t, u.Init(1))
-	if u.capacity != cap {
+	if cap(u.records) != oldCapacity {
 		t.Fatal("growth")
 	}
 	if _, e = v.Size(); !errors.Is(e, ErrSATOwner) {
@@ -424,7 +411,7 @@ func TestSATClauseUseListsEndedAndNeverConstructedSlots(t *testing.T) {
 		if !errors.Is(e, ErrSATAssertion) {
 			t.Fatal(e)
 		}
-	} else if !errors.Is(e, ErrSATOwner) {
+	} else if !errors.Is(e, arena.ErrBounds) {
 		t.Fatal(e)
 	}
 	satOK(t, u.Init(2))
@@ -505,7 +492,7 @@ func TestSATClauseUseListsEraseNotRemovedAndReleaseMissing(t *testing.T) {
 func satOuterUseOwnedBytes(u *satClauseUseLists) uint64 {
 	s := u.words.Stats()
 	d := s.Descriptors
-	return u.ownerBytes + u.backingBytes + s.OwnerBytes + s.PayloadBytes + s.BlockMetadataBytes + s.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
+	return u.ownerBytes + s.OwnerBytes + s.PayloadBytes + s.BlockMetadataBytes + s.DirectoryBytes + d.OwnerBytes + d.RecordBytes + d.MetadataBytes + d.DirectoryBytes
 }
 func TestSATClauseUseListsExactOwnedGraphAndColdGuards(t *testing.T) {
 	b := arena.NewBudget(^uint64(0))

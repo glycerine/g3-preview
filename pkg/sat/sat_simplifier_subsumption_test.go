@@ -75,7 +75,7 @@ func TestSATSimplifierActualNumVarsUsesLevelAtRead(t *testing.T) {
 	// logical lengths. The source getter is literally level.size(), not assignment.
 	v.level = v.level[:1]
 	satOK(t, s.initialize())
-	if s.useList.length != 2 || s.kernel.length != 2 {
-		t.Fatal("source level getter must determine both actual planes", s.useList.length, s.kernel.length)
+	if len(s.useList.records) != 2 || s.kernel.length != 2 {
+		t.Fatal("source level getter must determine both actual planes", len(s.useList.records), s.kernel.length)
 	}
 }
