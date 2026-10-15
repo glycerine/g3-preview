@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"errors"
 	"reflect"
+	"sort"
 	"strings"
 	"sync"
 
@@ -556,45 +557,33 @@ func (d *ParamDescrs) symbolCompare(a, b usymbol.Symbol) (int, error) {
 	return strings.Compare(x, y), nil
 }
 
-// Concrete in-place sort realizes std::sort's comparator/output contract;
-// it has no reflection swapper or additional heap-backed work arrays.
-func (d *ParamDescrs) siftSymbols(a []usymbol.Symbol, root, end int) error {
-	for root < end/2 {
-		child := root*2 + 1
-		if child+1 < end {
-			v, e := d.symbolCompare(a[child], a[child+1])
-			if e != nil {
-				return e
-			}
-			if v < 0 {
-				child++
-			}
-		}
-		v, e := d.symbolCompare(a[root], a[child])
-		if e != nil {
-			return e
-		}
-		if v >= 0 {
-			return nil
-		}
-		a[root], a[child] = a[child], a[root]
-		root = child
+// The source sorts descriptor names before either display path emits them.
+// Keep the checked project comparison, while Go owns the sorting algorithm.
+type paramDescrsSymbolSorter struct {
+	d      *ParamDescrs
+	values []usymbol.Symbol
+	err    error
+}
+
+func (s *paramDescrsSymbolSorter) Len() int { return len(s.values) }
+func (s *paramDescrsSymbolSorter) Swap(i, j int) {
+	s.values[i], s.values[j] = s.values[j], s.values[i]
+}
+func (s *paramDescrsSymbolSorter) Less(i, j int) bool {
+	if s.err != nil {
+		return false
 	}
-	return nil
+	order, err := s.d.symbolCompare(s.values[i], s.values[j])
+	if err != nil {
+		s.err = err
+		return false
+	}
+	return order < 0
 }
 func (d *ParamDescrs) sortSymbols(a []usymbol.Symbol) error {
-	for i := len(a) / 2; i > 0; i-- {
-		if e := d.siftSymbols(a, i-1, len(a)); e != nil {
-			return e
-		}
-	}
-	for end := len(a) - 1; end > 0; end-- {
-		a[0], a[end] = a[end], a[0]
-		if e := d.siftSymbols(a, 0, end); e != nil {
-			return e
-		}
-	}
-	return nil
+	sorter := &paramDescrsSymbolSorter{d: d, values: a}
+	sort.Sort(sorter)
+	return sorter.err
 }
 func (d *ParamDescrs) Display(indent uint32, smt2, includeDescr bool) (string, error) {
 	var out bytes.Buffer

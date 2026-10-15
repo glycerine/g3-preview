@@ -3,6 +3,8 @@ package params
 import (
 	"bytes"
 	"errors"
+	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -35,6 +37,34 @@ func TestParamDescrsDisplayIntoSourceBranchesAndSort(t *testing.T) {
 				t.Fatal(smt2, descr, got, want)
 			}
 		}
+	}
+}
+func TestParamDescrsDisplayLargeReverseRegistrationOrder(t *testing.T) {
+	m := symbolManagerTest(t, nil, false)
+	d := pdnew(t, m, nil)
+	const count = 129
+	for i := count - 1; i >= 0; i-- {
+		pdinsert(t, d, fmt.Sprintf("k_%03d", i), ParamUInt, pdstr("description"), nil, nil)
+	}
+	var want strings.Builder
+	for i := 0; i < count; i++ {
+		fmt.Fprintf(&want, "k_%03d (unsigned int)\n", i)
+	}
+	got, err := d.Display(0, false, false)
+	paramsMust(t, err)
+	if got != want.String() {
+		t.Fatal("descriptor display order differs from source lexicographic order")
+	}
+}
+func TestParamDescrsSortRefusalPrecedesDisplayOutput(t *testing.T) {
+	m := symbolManagerTest(t, nil, false)
+	d := pdnew(t, m, nil)
+	pdinsert(t, d, "valid", ParamUInt, pdstr("description"), nil, nil)
+	paramsMust(t, d.Insert(usymbol.Symbol{}, ParamUInt, pdstr("description"), nil, nil))
+	var out bytes.Buffer
+	out.WriteString("prefix")
+	if err := d.DisplayInto(&out, 2, false, false); !errors.Is(err, ErrParamDescrsPrecondition) || out.String() != "prefix" {
+		t.Fatal("sort comparison guard after output", err, out.String())
 	}
 }
 func TestParamDescrsDisplayIntoNullDescriptionActualAction(t *testing.T) {

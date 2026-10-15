@@ -167697,6 +167697,12 @@
           ]
         },
         {
+          "name": "param_descrs display sorted-name copy uses Go sort.Sort with concrete checked Symbol comparison instead of a hand-written STL sorting algorithm",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/params/util_param_descrs.go",
+          "tests": ["TestParamDescrsDisplayLargeReverseRegistrationOrder", "TestParamDescrsSortRefusalPrecedesDisplayOutput", "TestParamDescrsDisplayIntoSourceBranchesAndSort"]
+        },
+        {
           "name": "five parameter descriptor insertion helpers with exact descriptions",
           "status": "ported",
           "go_target": "pkg/util/params/util_param_descrs.go",
@@ -168386,6 +168392,12 @@
             "TestParamDescrsNativeCopyDisplayAndPlateau",
             "TestParamDescrsNativeInitialCapacity"
           ]
+        },
+        {
+          "name": "param_descrs display sorted-name copy uses Go sort.Sort with concrete checked Symbol comparison instead of a hand-written STL sorting algorithm",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/params/util_param_descrs.go",
+          "tests": ["TestParamDescrsDisplayLargeReverseRegistrationOrder", "TestParamDescrsSortRefusalPrecedesDisplayOutput", "TestParamDescrsDisplayIntoSourceBranchesAndSort"]
         },
         {
           "name": "five parameter descriptor insertion helpers with exact descriptions",
@@ -182045,8 +182057,8 @@
           ]
         },
         {
-          "name": "descriptor names/sort/prefix concrete vectors with exact source push-growth capacities",
-          "status": "ported",
+          "name": "descriptor names and sorted display copy use native Go symbol slices and standard-library sorting; project comparison and source output order remain",
+          "status": "platform_replacement",
           "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
             "TestParamDescrsSourceHistoryDefaultsAndDisplay",
@@ -182055,7 +182067,9 @@
             "TestParamDescrsNativeStorageAndWarmDuplicate",
             "TestParamDescrsOwnershipNullableMetadataAndGuards",
             "TestParamDescrsNativeCopyDisplayAndPlateau",
-            "TestParamDescrsNativeInitialCapacity"
+            "TestParamDescrsNativeInitialCapacity",
+            "TestParamDescrsDisplayLargeReverseRegistrationOrder",
+            "TestParamDescrsSortRefusalPrecedesDisplayOutput"
           ]
         },
         {
