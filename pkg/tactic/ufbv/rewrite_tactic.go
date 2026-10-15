@@ -99,13 +99,14 @@ func (t *RewriterTactic) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error)
 			result = errors.Join(result, t.manager.DecRef(forms[i]))
 		}
 	}()
-	var proofRefs []ast.ASTRef
+	var proofNodes []ast.ASTHandle
 	if proofs {
-		proofRefs = make([]ast.ASTRef, 0, n)
+		proofNodes = make([]ast.ASTHandle, n)
 	}
+	proofPins := 0
 	defer func() {
-		for i := len(proofRefs) - 1; i >= 0; i-- {
-			result = errors.Join(result, t.manager.DelRef(&proofRefs[i]))
+		for i := 0; i < proofPins; i++ {
+			result = errors.Join(result, t.manager.DecRef(proofNodes[i]))
 		}
 	}()
 	for i := range forms {
@@ -118,15 +119,14 @@ func (t *RewriterTactic) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error)
 		}
 		formPins++
 		if proofs {
-			pr, e := goal.Proof(uint32(i))
+			proofNodes[i], e = goal.Proof(uint32(i))
 			if e != nil {
 				return nil, e
 			}
-			ref, e := t.manager.NewRef(pr)
-			if e != nil {
+			if e = t.manager.IncRef(proofNodes[i]); e != nil {
 				return nil, e
 			}
-			proofRefs = append(proofRefs, ref)
+			proofPins++
 		}
 	}
 	processor, e := newFormulaProcessor(t.manager, t.boolean)
@@ -157,11 +157,7 @@ func (t *RewriterTactic) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error)
 			return nil, e
 		}
 		if proofs {
-			pr, e := t.manager.RefGet(proofRefs[i])
-			if e != nil {
-				return nil, e
-			}
-			if e := goal.AssertWithProof(h, pr, ast.ASTDependency{}); e != nil {
+			if e := goal.AssertWithProof(h, proofNodes[i], ast.ASTDependency{}); e != nil {
 				return nil, e
 			}
 		} else if e := goal.Assert(h); e != nil {

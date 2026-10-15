@@ -106591,7 +106591,7 @@
         }
       ],
       "ownership": [
-        "The Go tactic owns the configured Boolean reducer and borrows AST/parameter services. Its copied input-formula slice now pins each AST until the younger rewritten-formula and proof owners release; output and proof references survive goal reset until assertion completes. Successful result publication adds a separate goal reference after the depth increment; the caller releases it with DecRef."
+        "The Go tactic owns the configured Boolean reducer and borrows AST/parameter services. Its copied input-formula and proof slices each pin their AST entries until the younger rewritten-formula owners release; both survive goal reset and release in insertion order after result publication. Successful publication adds a separate goal reference after the depth increment; the caller releases it with DecRef."
       ],
       "deviations": [
         "The result is the input goal with a second owning reference; converter outputs are absent because the source sets all three to null. Translation to another manager, parameter-description reporting, cleanup reconstruction and full tactic registry integration remain open."
@@ -171608,7 +171608,7 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Concrete UFBV tactic forms expr_ref_vector copies each input formula with an independent AST pin before rewriting and releases pins in insertion order after younger output/proof owners (ufbv_rewriter_tactic.cpp:47-68)",
+          "name": "Concrete UFBV tactic forms/proofs ref_vectors copy each input formula and proof with independent AST pins before rewriting and release them in insertion order after younger rewritten output owners (ufbv_rewriter_tactic.cpp:47-68)",
           "status": "partial",
           "go_target": "pkg/tactic/ufbv/rewrite_tactic.go",
           "tests": ["TestUFBVRewriterTacticProofModePreservesFormulaAndProof"]

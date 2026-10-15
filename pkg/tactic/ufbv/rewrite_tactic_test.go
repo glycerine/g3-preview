@@ -193,6 +193,8 @@ func TestUFBVRewriterTacticProofModePreservesFormulaAndProof(t *testing.T) {
 	if beforeProof.IsNull() {
 		t.Fatal("proof-enabled source goal lacks an asserted proof")
 	}
+	beforeProofRefs, e := m.GetRefCount(beforeProof)
+	cacheMust(t, e)
 	got, e := rewriter.Apply(goal)
 	cacheMust(t, e)
 	if got != goal {
@@ -213,6 +215,11 @@ func TestUFBVRewriterTacticProofModePreservesFormulaAndProof(t *testing.T) {
 	cacheMust(t, e)
 	if afterRefs != beforeRefs {
 		t.Fatal("formula ref_vector pin survived tactic return", beforeRefs, afterRefs)
+	}
+	afterProofRefs, e := m.GetRefCount(afterProof)
+	cacheMust(t, e)
+	if afterProofRefs != beforeProofRefs {
+		t.Fatal("proof ref_vector pin survived tactic return", beforeProofRefs, afterProofRefs)
 	}
 	if got, want := warningOutput.String(), "WARNING: PRE_DEMODULATOR=true is not supported when proofs are enabled.\n"; got != want {
 		t.Fatal("source proof-mode warning", got, want)
