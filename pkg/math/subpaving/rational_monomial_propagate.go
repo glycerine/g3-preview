@@ -24,6 +24,9 @@ func (c *RationalContext) PropagateMonomial(variable uint32, n *RationalNode) (e
 	if m == nil {
 		return arena.ErrInvalidSlot
 	}
+	if err = c.traceMonomialStart(variable); err != nil {
+		return err
+	}
 	c.numVisited++
 	m.visited = c.timestamp
 	foundZero, foundUnbounded := false, false
@@ -42,6 +45,9 @@ func (c *RationalContext) PropagateMonomial(variable uint32, n *RationalNode) (e
 		} else if n.lower[power.Variable] == nil && n.upper[power.Variable] == nil {
 			foundUnbounded = true
 		}
+	}
+	if err = c.traceMonomialFlags(foundZero, foundUnbounded); err != nil {
+		return err
 	}
 	if foundZero {
 		alreadyZero, e := n.IsZero(variable)
@@ -162,6 +168,9 @@ func (c *RationalContext) propagateMonomialUpward(m *RationalMonomial, n *Ration
 }
 
 func (c *RationalContext) propagateMonomialDownward(m *RationalMonomial, j int, n *RationalNode) (err error) {
+	if err = c.traceMonomialDownward(m.variable, j); err != nil {
+		return err
+	}
 	r, err := NewRationalInterval(c.numbers)
 	if err != nil {
 		return err
