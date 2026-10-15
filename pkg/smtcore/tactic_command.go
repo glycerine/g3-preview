@@ -14,7 +14,6 @@ import (
 )
 
 var errTacticRegistryOwner = errors.New("tactic: invalid, copied or retired registration owner")
-var errTacticRegistryPending = errors.New("tactic: registration stopped after source publication")
 
 // The cold reference contract of the source abstract tactic. Concrete tactics
 // must additionally supply their original execution/converter algorithms; this

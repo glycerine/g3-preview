@@ -11,7 +11,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
@@ -238,28 +237,35 @@ func TestTacticManagerSourceDuplicateAssertionAndNamespaceSeparation(t *testing.
 	}
 }
 
-func TestTacticManagerSourcePublishedDictionaryBeforeVectorRefusal(t *testing.T) {
+func TestTacticManagerNativeRegistrationGrowthAndOwnership(t *testing.T) {
 	r, c, m := tacticRegistryFixture(t)
 	var events []int
-	name := astTestSymbol(t, m, "published-before-vector")
+	name := astTestSymbol(t, m, "native-tactic")
 	cmd, e := newTacticCmd(c, name, nil, &tacticManagerTestFactory{params: c, events: &events, id: 0})
 	astTestMust(t, e)
+	probeName := astTestSymbol(t, m, "native-probe")
+	info, e := newTacticProbeInfo(m.Symbols, m.BudgetField, probeName, nil, nil)
+	astTestMust(t, e)
+	before := m.BudgetField.Used()
 	m.BudgetField.FailAfter(0)
 	e = r.InsertTactic(cmd)
-	m.BudgetField.FailAfter(-1)
-	if !errors.Is(e, arena.ErrInjectedFailure) {
-		t.Fatal("expected source vector reservation refusal", e)
+	if e == nil {
+		e = r.InsertProbe(info)
 	}
+	m.BudgetField.FailAfter(-1)
+	astTestMust(t, e)
 	got, e := r.FindTactic(name)
 	astTestMust(t, e)
-	if got != cmd || len(r.tactics) != 0 {
-		t.Fatal("dictionary publication was rolled back or vector publication invented")
+	probe, e := r.FindProbe(probeName)
+	astTestMust(t, e)
+	if got != cmd || probe != info || len(r.tactics) != 1 || len(r.probes) != 1 || m.BudgetField.Used() != before {
+		t.Fatal("native registration order or arena charge", got, probe, m.BudgetField.Used(), before)
 	}
 	astTestMust(t, r.FinalizeTactics())
-	if cmd.closed || len(events) != 0 {
-		t.Fatal("source finalization deleted a command never owned by its vector")
+	astTestMust(t, r.FinalizeProbes())
+	if !cmd.closed || !info.closed || len(events) != 1 {
+		t.Fatal("registered descriptors were not finalized in source order")
 	}
-	astTestMust(t, cmd.Close()) // retained caller owns the unappended command.
 }
 
 func TestTacticManagerCopiedForeignAndClosedGuards(t *testing.T) {

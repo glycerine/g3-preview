@@ -11,10 +11,8 @@ import (
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-// The two source dictionaries hold scalar indices into their cold descriptor
-// vectors. The manager owns descriptors only after their vector append; a
-// failed append leaves the source map publication and a borrowed caller-owned
-// pending descriptor. Finalization follows insertion order, never hash order.
+// The dictionaries hold scalar indices into native descriptor slices.
+// Finalization follows insertion order, never hash order.
 
 type tacticManager struct {
 	self                      *tacticManager
@@ -23,8 +21,6 @@ type tacticManager struct {
 	nameToTactic, nameToProbe usymbol.DictionaryInt32
 	tactics                   []*tacticCmd
 	probes                    []*tacticProbeInfo
-	pendingTactic             *tacticCmd
-	pendingProbe              *tacticProbeInfo
 	ownerBytes                uint64
 	closed                    bool
 }
@@ -64,9 +60,6 @@ func (r *tacticManager) InsertTactic(cmd *tacticCmd) error {
 	if e := r.open(); e != nil {
 		return e
 	}
-	if r.pendingTactic != nil {
-		return errTacticRegistryPending
-	}
 	if e := cmd.open(); e != nil {
 		return e
 	}
@@ -86,32 +79,13 @@ func (r *tacticManager) InsertTactic(cmd *tacticCmd) error {
 	if e := r.nameToTactic.Insert(cmd.name, int32(len(r.tactics))); e != nil {
 		return e
 	}
-	r.pendingTactic = cmd
-	if len(r.tactics) == cap(r.tactics) {
-		stride := uint64(reflect.TypeOf((*tacticCmd)(nil)).Size())
-		n, e := tacticRegistryCapacity(cap(r.tactics), stride)
-		if e != nil {
-			return e
-		}
-		if e = r.budget.Reserve(uint64(n) * stride); e != nil {
-			return e
-		}
-		v := make([]*tacticCmd, len(r.tactics), n)
-		copy(v, r.tactics)
-		r.budget.Release(uint64(cap(r.tactics)) * stride)
-		r.tactics = v
-	}
 	r.tactics = append(r.tactics, cmd)
 	cmd.registered = r
-	r.pendingTactic = nil
 	return nil
 }
 func (r *tacticManager) InsertProbe(info *tacticProbeInfo) error {
 	if e := r.open(); e != nil {
 		return e
-	}
-	if r.pendingProbe != nil {
-		return errTacticRegistryPending
 	}
 	if e := info.open(); e != nil {
 		return e
@@ -132,24 +106,8 @@ func (r *tacticManager) InsertProbe(info *tacticProbeInfo) error {
 	if e := r.nameToProbe.Insert(info.name, int32(len(r.probes))); e != nil {
 		return e
 	}
-	r.pendingProbe = info
-	if len(r.probes) == cap(r.probes) {
-		stride := uint64(reflect.TypeOf((*tacticProbeInfo)(nil)).Size())
-		n, e := tacticRegistryCapacity(cap(r.probes), stride)
-		if e != nil {
-			return e
-		}
-		if e = r.budget.Reserve(uint64(n) * stride); e != nil {
-			return e
-		}
-		v := make([]*tacticProbeInfo, len(r.probes), n)
-		copy(v, r.probes)
-		r.budget.Release(uint64(cap(r.probes)) * stride)
-		r.probes = v
-	}
 	r.probes = append(r.probes, info)
 	info.registered = r
-	r.pendingProbe = nil
 	return nil
 }
 func (r *tacticManager) FindTactic(name usymbol.Symbol) (*tacticCmd, error) {
@@ -164,9 +122,6 @@ func (r *tacticManager) FindTactic(name usymbol.Symbol) (*tacticCmd, error) {
 	if uint64(i) < uint64(len(r.tactics)) {
 		return r.tactics[i], nil
 	}
-	if uint64(i) == uint64(len(r.tactics)) && r.pendingTactic != nil {
-		return r.pendingTactic, nil
-	}
 	return nil, errTacticRegistryOwner
 }
 func (r *tacticManager) FindProbe(name usymbol.Symbol) (*tacticProbeInfo, error) {
@@ -180,9 +135,6 @@ func (r *tacticManager) FindProbe(name usymbol.Symbol) (*tacticProbeInfo, error)
 	i := uint32(bits)
 	if uint64(i) < uint64(len(r.probes)) {
 		return r.probes[i], nil
-	}
-	if uint64(i) == uint64(len(r.probes)) && r.pendingProbe != nil {
-		return r.pendingProbe, nil
 	}
 	return nil, errTacticRegistryOwner
 }
@@ -229,7 +181,6 @@ func (r *tacticManager) FinalizeTactics() error {
 	if e := r.nameToTactic.Reset(); e != nil {
 		return e
 	}
-	r.pendingTactic = nil
 	return nil
 }
 func (r *tacticManager) FinalizeProbes() error {
@@ -245,7 +196,6 @@ func (r *tacticManager) FinalizeProbes() error {
 	if e := r.nameToProbe.Reset(); e != nil {
 		return e
 	}
-	r.pendingProbe = nil
 	return nil
 }
 func (r *tacticManager) Close() error {
@@ -262,9 +212,7 @@ func (r *tacticManager) Close() error {
 		return e
 	}
 	// Source members unwind in reverse order after the destructor body.
-	r.budget.Release(uint64(cap(r.probes)) * uint64(reflect.TypeOf((*tacticProbeInfo)(nil)).Size()))
 	r.probes = nil
-	r.budget.Release(uint64(cap(r.tactics)) * uint64(reflect.TypeOf((*tacticCmd)(nil)).Size()))
 	r.tactics = nil
 	r.nameToProbe.Close()
 	r.nameToTactic.Close()

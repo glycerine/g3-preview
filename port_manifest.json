@@ -31649,7 +31649,7 @@
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
         "TestTacticManagerSourceProbeReferencesAndStructuralValues",
         "TestTacticManagerSourceDuplicateAssertionAndNamespaceSeparation",
-        "TestTacticManagerSourcePublishedDictionaryBeforeVectorRefusal",
+        "TestTacticManagerNativeRegistrationGrowthAndOwnership",
         "TestTacticManagerCopiedForeignAndClosedGuards",
         "TestTacticManagerDestructorFinalizesTacticsBeforeProbes"
       ],
@@ -31681,7 +31681,7 @@
           "tests": [
             "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
             "TestTacticManagerSourceDuplicateAssertionAndNamespaceSeparation",
-            "TestTacticManagerSourcePublishedDictionaryBeforeVectorRefusal"
+            "TestTacticManagerNativeRegistrationGrowthAndOwnership"
           ]
         },
         {
@@ -31699,7 +31699,7 @@
           "go_target": "pkg/smtcore/tactic_manager.go",
           "tests": [
             "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
-            "TestTacticManagerSourcePublishedDictionaryBeforeVectorRefusal"
+            "TestTacticManagerNativeRegistrationGrowthAndOwnership"
           ]
         },
         {
@@ -31716,7 +31716,7 @@
           "go_target": "pkg/smtcore/tactic_manager.go",
           "tests": [
             "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
-            "TestTacticManagerSourcePublishedDictionaryBeforeVectorRefusal"
+            "TestTacticManagerNativeRegistrationGrowthAndOwnership"
           ]
         },
         {
@@ -31729,7 +31729,7 @@
         }
       ],
       "ownership": [
-        "Dictionary values are scalar indices into cold descriptor vectors. Successful vector append transfers descriptor ownership; a map-published descriptor whose append fails remains borrowed and caller-owned. Source vector reset retains backing. Descriptors own factories and reference-counted probes; finalization destroys tactics before probes and follows vector insertion order."
+        "Dictionary values are scalar indices into native descriptor slices. Dictionary insertion precedes the native append, which transfers descriptor ownership; no stopped vector-growth descriptor exists. Slice reset retains backing. Descriptors own factories and reference-counted probes; finalization destroys tactics before probes in insertion order."
       ],
       "deviations": []
     },
@@ -121503,7 +121503,7 @@
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
         "TestTacticManagerSourceProbeReferencesAndStructuralValues",
         "TestTacticManagerSourceDuplicateAssertionAndNamespaceSeparation",
-        "TestTacticManagerSourcePublishedDictionaryBeforeVectorRefusal"
+        "TestTacticManagerNativeRegistrationGrowthAndOwnership"
       ],
       "conditionals": [
         {
@@ -121571,7 +121571,7 @@
           ]
         },
         {
-          "name": "Concrete tactic/probe symbol dictionaries: source lookup, insertion and publication before descriptor-vector growth",
+          "name": "Concrete tactic/probe symbol dictionaries: source lookup and insertion before native descriptor-slice append",
           "status": "ported",
           "go_target": "pkg/smtcore/tactic_manager.go",
           "go_targets": [
@@ -121581,7 +121581,7 @@
             "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
             "TestTacticManagerSourceProbeReferencesAndStructuralValues",
             "TestTacticManagerSourceDuplicateAssertionAndNamespaceSeparation",
-            "TestTacticManagerSourcePublishedDictionaryBeforeVectorRefusal"
+            "TestTacticManagerNativeRegistrationGrowthAndOwnership"
           ]
         },
         {
@@ -182320,6 +182320,16 @@
             "TestASTArithmeticNameNativeGrowthPreservesFlagAndPrefix",
             "TestASTBitVectorNameNativeGrowthAndAppend",
             "TestASTArithmeticNameCallbacksAppendToExistingVector"
+          ]
+        },
+        {
+          "name": "Concrete tactic_manager ordered tactic_cmd and probe_info pointer vectors use native Go slices",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/tactic_manager.go",
+          "tests": [
+            "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
+            "TestTacticManagerNativeRegistrationGrowthAndOwnership",
+            "TestTacticManagerDestructorFinalizesTacticsBeforeProbes"
           ]
         }
       ],
