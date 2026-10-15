@@ -48,3 +48,32 @@ func TestDebugInteractiveNotificationActionStreamCohort(t *testing.T) {
 		t.Fatal("borrowed rebindings changed the charged graph", before, d.BudgetField.Used())
 	}
 }
+
+func TestDebugInteractiveInputMustStartTiedToItsOwnStdout(t *testing.T) {
+	_, d, _, input, streams := debugActionFixture(t, "C")
+	before := d.BudgetField.Used()
+	other, err := NewMemoryStandardStreams(MemoryStandardStreamsConfig{Budget: d.BudgetField})
+	paramsMust(t, err)
+	t.Cleanup(func() { paramsMust(t, other.Close()) })
+	foreignInput, err := NewDebuggerCharInput(other, nil)
+	paramsMust(t, err)
+	t.Cleanup(func() { paramsMust(t, foreignInput.Close()) })
+	if action, err := NewDebugActionContext(DebugActionConfig{Budget: d.BudgetField, Streams: streams, Input: foreignInput}); action != nil || !errors.Is(err, arena.ErrConfig) {
+		t.Fatal("same-budget foreign stdout tie became the process input", action, err)
+	}
+	old, err := input.SetTie(nil)
+	paramsMust(t, err)
+	if old != streams.stdout {
+		t.Fatal("lost original source stdout tie")
+	}
+	if action, err := NewDebugActionContext(DebugActionConfig{Budget: d.BudgetField, Streams: streams, Input: input}); action != nil || !errors.Is(err, arena.ErrConfig) {
+		t.Fatal("untied input became the process input", action, err)
+	}
+	_, err = input.SetTie(streams.stdout)
+	paramsMust(t, err)
+	paramsMust(t, foreignInput.Close())
+	paramsMust(t, other.Close())
+	if d.BudgetField.Used() != before {
+		t.Fatal("rejected action charged the process", before, d.BudgetField.Used())
+	}
+}

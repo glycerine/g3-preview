@@ -120639,6 +120639,7 @@
         "TestDebugActionForeignBudgetCopyClosedAndUnreadProviders",
         "TestDebugActionClosedOutputBadbitStillReachesInputAndThrow",
         "TestDebugActionPromptBeforeClosedTieRead",
+        "TestDebugInteractiveInputMustStartTiedToItsOwnStdout",
         "TestNumericCharInputClosedTieFailsAtReachedFlush"
       ],
       "conditionals": [
@@ -120719,7 +120720,8 @@
             "TestDebugActionConstructorEveryReservationAndBorrowedClose",
             "TestDebugActionForeignBudgetCopyClosedAndUnreadProviders",
             "TestDebugActionClosedOutputBadbitStillReachesInputAndThrow",
-            "TestDebugActionPromptBeforeClosedTieRead"
+            "TestDebugActionPromptBeforeClosedTieRead",
+            "TestDebugInteractiveInputMustStartTiedToItsOwnStdout"
           ]
         },
         {
@@ -120843,6 +120845,7 @@
         "TestDebugActionForeignBudgetCopyClosedAndUnreadProviders",
         "TestDebugActionClosedOutputBadbitStillReachesInputAndThrow",
         "TestDebugActionPromptBeforeClosedTieRead",
+        "TestDebugInteractiveInputMustStartTiedToItsOwnStdout",
         "TestDebugMacroUnreachableIgnoresAssertionSwitch",
         "TestDebugMacroVerifyFalsePrefixAndContinue",
         "TestDebugMacroXAssertionLiteralExtraBeforeAction",
@@ -121030,7 +121033,8 @@
             "TestDebugActionConstructorEveryReservationAndBorrowedClose",
             "TestDebugActionForeignBudgetCopyClosedAndUnreadProviders",
             "TestDebugActionClosedOutputBadbitStillReachesInputAndThrow",
-            "TestDebugActionPromptBeforeClosedTieRead"
+            "TestDebugActionPromptBeforeClosedTieRead",
+            "TestDebugInteractiveInputMustStartTiedToItsOwnStdout"
           ]
         },
         {

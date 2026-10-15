@@ -45,7 +45,9 @@ func NewDebugActionContext(c DebugActionConfig) (*DebugActionContext, error) {
 	if c.Budget == nil || c.Profile > DebugNoDebugger {
 		return nil, arena.ErrConfig
 	}
-	if c.Profile == DebugInteractive && (c.Streams == nil || c.Streams.self != c.Streams || c.Streams.budget != c.Budget || c.Input == nil || c.Input.self != c.Input || c.Input.budget != c.Budget) {
+	// The reached debugger uses the process's std::cin tied to its own
+	// std::cout. Borrow exact owner identity without reading either lifetime.
+	if c.Profile == DebugInteractive && (c.Streams == nil || c.Streams.self != c.Streams || c.Streams.budget != c.Budget || c.Input == nil || c.Input.self != c.Input || c.Input.budget != c.Budget || c.Input.tie != c.Streams.stdout) {
 		return nil, arena.ErrConfig
 	}
 	n := uint64(reflect.TypeOf(DebugActionContext{}).Size())
