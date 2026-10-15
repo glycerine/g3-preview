@@ -120740,7 +120740,7 @@
           "status": "ported",
           "go_target": "pkg/util/process/finalize.go",
           "go_targets": ["pkg/engine/default_process.go", "pkg/util/process/initialize.go", "pkg/util/diagnostic/util_debug_process.go", "pkg/util/params/util_gparams_service_ops.go"],
-          "tests": ["TestProcessDebugDefaultOwnsSourceAssertionIO", "TestDefaultProcessBindsAssertionServicesAndReleasesOwners", "TestGeneratedInitializeAndFinalizeConcreteServices", "TestGlobalParamsNamespaceAssertionBindingAtReachedSites", "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion"]
+          "tests": ["TestProcessDebugDefaultOwnsSourceAssertionIO", "TestDefaultProcessBindsAssertionServicesAndReleasesOwners", "TestDefaultProcessActualAssertionAction", "TestGeneratedInitializeAndFinalizeConcreteServices", "TestGlobalParamsNamespaceAssertionBindingAtReachedSites", "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion"]
         }
       ],
       "ownership": [
@@ -121065,7 +121065,7 @@
           "status": "ported",
           "go_target": "pkg/util/process/finalize.go",
           "go_targets": ["pkg/engine/default_process.go", "pkg/util/process/initialize.go", "pkg/util/diagnostic/util_debug_process.go", "pkg/util/params/util_gparams_service_ops.go"],
-          "tests": ["TestProcessDebugDefaultOwnsSourceAssertionIO", "TestDefaultProcessBindsAssertionServicesAndReleasesOwners", "TestGeneratedInitializeAndFinalizeConcreteServices", "TestGlobalParamsNamespaceAssertionBindingAtReachedSites", "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion"]
+          "tests": ["TestProcessDebugDefaultOwnsSourceAssertionIO", "TestDefaultProcessBindsAssertionServicesAndReleasesOwners", "TestDefaultProcessActualAssertionAction", "TestGeneratedInitializeAndFinalizeConcreteServices", "TestGlobalParamsNamespaceAssertionBindingAtReachedSites", "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion"]
         }
       ],
       "ownership": [
@@ -123267,7 +123267,7 @@
           "status": "ported",
           "go_target": "pkg/util/process/finalize.go",
           "go_targets": ["pkg/engine/default_process.go", "pkg/util/process/initialize.go", "pkg/util/diagnostic/util_debug_process.go", "pkg/util/params/util_gparams_service_ops.go"],
-          "tests": ["TestProcessDebugDefaultOwnsSourceAssertionIO", "TestDefaultProcessBindsAssertionServicesAndReleasesOwners", "TestGeneratedInitializeAndFinalizeConcreteServices", "TestGlobalParamsNamespaceAssertionBindingAtReachedSites", "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion"]
+          "tests": ["TestProcessDebugDefaultOwnsSourceAssertionIO", "TestDefaultProcessBindsAssertionServicesAndReleasesOwners", "TestDefaultProcessActualAssertionAction", "TestGeneratedInitializeAndFinalizeConcreteServices", "TestGlobalParamsNamespaceAssertionBindingAtReachedSites", "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion"]
         },
         {
           "name": "generated process initialization publishes one current gparams service, rejects a second live process, and requires the active binding at owning close",
@@ -176898,7 +176898,7 @@
           "status": "ported",
           "go_target": "pkg/util/process/finalize.go",
           "go_targets": ["pkg/engine/default_process.go", "pkg/util/process/initialize.go", "pkg/util/diagnostic/util_debug_process.go", "pkg/util/params/util_gparams_service_ops.go"],
-          "tests": ["TestProcessDebugDefaultOwnsSourceAssertionIO", "TestDefaultProcessBindsAssertionServicesAndReleasesOwners", "TestGeneratedInitializeAndFinalizeConcreteServices", "TestGlobalParamsNamespaceAssertionBindingAtReachedSites", "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion"]
+          "tests": ["TestProcessDebugDefaultOwnsSourceAssertionIO", "TestDefaultProcessBindsAssertionServicesAndReleasesOwners", "TestDefaultProcessActualAssertionAction", "TestGeneratedInitializeAndFinalizeConcreteServices", "TestGlobalParamsNamespaceAssertionBindingAtReachedSites", "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion"]
         },
         {
           "name": "concrete null/string/numerical symbol io.Writer insertion, including numeric prefix write and refusal boundary",
