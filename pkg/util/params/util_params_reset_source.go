@@ -30,6 +30,7 @@ func (c *ParamsContext) continueReset(slot uint32) error {
 					}
 					return e
 				}
+				c.traceRationalEntryDeallocated(x.ratTraceID)
 			}
 			b.resetCursor++
 		}

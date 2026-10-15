@@ -65,6 +65,7 @@ func (c *ParamsContext) continueReplacement(slot uint32, publish bool) error {
 			}
 			return e
 		}
+		c.traceRationalEntryDeallocated(entry.ratTraceID)
 		f.phase = 1
 	}
 	if publish {
@@ -74,6 +75,7 @@ func (c *ParamsContext) continueReplacement(slot uint32, publish bool) error {
 		entry.bits = f.next.bits
 		entry.symbol = f.next.symbol
 		entry.Rat = f.next.Rat
+		entry.ratTraceID = 0
 		entry.text = f.next.text
 	} else {
 		// Context owning abort is distinct from resuming the failed setter body.

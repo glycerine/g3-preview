@@ -44,6 +44,7 @@ func (c *ParamsContext) continueDecrement(slot uint32) error {
 					}
 					return e
 				}
+				c.traceRationalEntryDeallocated(entry.ratTraceID)
 			}
 			b.resetStage = 1
 		}

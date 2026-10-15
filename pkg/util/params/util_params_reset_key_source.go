@@ -25,6 +25,7 @@ func (c *ParamsContext) continueResetKey(slot uint32) error {
 				}
 				return e
 			}
+			c.traceRationalEntryDeallocated(x.ratTraceID)
 		}
 		b.resetStage = 1
 	}

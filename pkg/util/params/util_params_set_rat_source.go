@@ -35,12 +35,13 @@ func (c *ParamsContext) setNewNumeral(slot uint32, key usymbol.Symbol, value *un
 	if e != nil {
 		return e
 	}
-	*frame = paramsSetFrame{Generation: c.Blocks[slot-1].Generation, Invocation: serial, Next: paramEntry{key: key, Kind: ParamNumeral}}
+	*frame = paramsSetFrame{Generation: c.Blocks[slot-1].Generation, Invocation: serial, Next: paramEntry{key: key, Kind: ParamNumeral, ratTraceID: serial}}
 	r, e := c.NumeralsField.NewValue()
 	if e != nil {
 		frame.Cause = e
 		return e
 	}
+	c.traceRationalEntryAllocated(serial, 1004)
 	frame.Next.Rat = r
 	frame.Acquired = true
 	frame.Active = true
@@ -87,8 +88,9 @@ func (c *ParamsContext) setMatchedNewNumeral(slot, index uint32, key usymbol.Sym
 	if e != nil {
 		return e
 	}
-	*entry = paramEntry{key: key, Kind: ParamNumeral, Rat: r}
-	*frame = paramsSetFrame{Invocation: serial, Generation: b.Generation, Active: true, Acquired: true, Published: true, MatchedIndex: index, Next: paramEntry{key: key, Kind: ParamNumeral}}
+	c.traceRationalEntryAllocated(serial, 996)
+	*entry = paramEntry{key: key, Kind: ParamNumeral, Rat: r, ratTraceID: serial}
+	*frame = paramsSetFrame{Invocation: serial, Generation: b.Generation, Active: true, Acquired: true, Published: true, MatchedIndex: index, Next: paramEntry{key: key, Kind: ParamNumeral, ratTraceID: serial}}
 	if e = c.NumeralsField.CopyWithAllocationReceipt(&entry.Rat, value, &frame.Child); e != nil {
 		frame.Cause = e
 		return e
@@ -163,6 +165,7 @@ func (c *ParamsContext) cleanupSetFrame(slot uint32) error {
 		}
 		return e
 	}
+	c.traceRationalEntryDeallocated(f.Next.ratTraceID)
 	if f.Published {
 		for i := f.MatchedIndex + 1; i < b.Size; i++ {
 			*c.Entry(b, i-1) = *c.Entry(b, i)

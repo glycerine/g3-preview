@@ -72,12 +72,13 @@ type paramsText struct {
 	borrowed bool
 }
 type paramEntry struct {
-	key    usymbol.Symbol
-	Kind   ParamKind
-	bits   uint64
-	text   paramsText
-	symbol usymbol.Symbol
-	Rat    unumeral.OwnedRational
+	key        usymbol.Symbol
+	Kind       ParamKind
+	bits       uint64
+	ratTraceID uint64
+	text       paramsText
+	symbol     usymbol.Symbol
+	Rat        unumeral.OwnedRational
 }
 type paramsEntryState struct {
 	generation uint32
@@ -329,6 +330,7 @@ func (c *ParamsContext) delEntry(x *paramEntry) error {
 		if e := c.NumeralsField.Del(&x.Rat); e != nil {
 			return e
 		}
+		c.traceRationalEntryDeallocated(x.ratTraceID)
 	}
 	if x.text.present && !x.text.borrowed {
 		x.text.owned.release()
