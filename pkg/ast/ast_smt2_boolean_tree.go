@@ -110,7 +110,7 @@ func (m *ASTManager) SMT2PPBooleanTree(root ASTHandle, names []usymbol.Symbol) (
 		if e != nil {
 			return result{}, e
 		}
-		if sort != boolSort {
+		if h == root && sort != boolSort {
 			return result{}, ErrASTDomain
 		}
 		if kind == ASTVar {
@@ -126,6 +126,22 @@ func (m *ASTManager) SMT2PPBooleanTree(root ASTHandle, names []usymbol.Symbol) (
 			return result{}, e
 		}
 		if count == 0 {
+			if sort != boolSort {
+				format, matched, e := m.smt2PPArithLiteralDefault(h)
+				if e != nil {
+					return result{}, e
+				}
+				if matched {
+					return result{docs: []ASTHandle{format}, weight: 1, depth: 1}, nil
+				}
+				family, e := m.GetFamilyID(h)
+				if e != nil {
+					return result{}, e
+				}
+				if family != NullFamilyID {
+					return result{}, ErrASTDomain
+				}
+			}
 			var labels []usymbol.Symbol
 			labeled, e := m.IsLabelLit(h, &labels)
 			if e != nil {

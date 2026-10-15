@@ -12473,6 +12473,8 @@
         "pkg/ast/ast_smt2_fdecl.go",
         "pkg/ast/ast_smt2_var_labels.go",
         "pkg/ast/ast_smt2_app_format.go",
+        "pkg/ast/ast_smt2_arith_literal.go",
+        "pkg/ast/ast_smt2_arith_literal_test.go",
         "pkg/ast/ast_smt2_boolean_tree.go",
         "pkg/ast/ast_smt2_let.go",
         "pkg/ast/ast_smt2_let_test.go",
@@ -12498,6 +12500,7 @@
         "TestASTSMT2FunctionDeclarationSourceFormatsAndRecursiveReference",
         "TestASTSMT2VariableAndLabelSourceFormats",
         "TestASTSMT2ApplicationSourceShortAndLongNameLayout",
+        "TestASTSMT2BooleanComparisonsWithArithmeticLiterals",
         "TestASTSMT2BooleanTreeSourcePostorderAndLabels",
         "TestASTSMT2DeclareFunSourceEntrypoint"
       ],
@@ -12657,11 +12660,20 @@
           ]
         },
         {
-          "name": "Selected smt2_printer child-before-parent Boolean application and variable traversal with constant/label dispatch, default flat associative expansion, alias registration/reuse, info-stack weight/depth/level and let wrapping; numeric and quantifier profiles remain open",
+          "name": "Selected smt2_printer child-before-parent Boolean application and variable traversal with constant/label dispatch, default flat associative expansion, alias registration/reuse, info-stack weight/depth/level and let wrapping; arithmetic numeral children use the source-default exact rational profile, while other numeric and quantifier profiles remain open",
           "status": "partial",
           "go_target": "pkg/ast/ast_smt2_boolean_tree.go",
           "tests": [
-            "TestASTSMT2BooleanTreeSourcePostorderAndLabels"
+            "TestASTSMT2BooleanTreeSourcePostorderAndLabels",
+            "TestASTSMT2BooleanComparisonsWithArithmeticLiterals"
+          ]
+        },
+        {
+          "name": "smt2_pp_environment::pp_arith_literal default exact integer and rational paths (ast_smt2_pp.cpp:311-345); decimal and irrational algebraic profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_smt2_arith_literal.go",
+          "tests": [
+            "TestASTSMT2BooleanComparisonsWithArithmeticLiterals"
           ]
         },
         {
