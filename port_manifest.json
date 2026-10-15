@@ -30329,22 +30329,29 @@
       "path": "src/ast/well_sorted.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/ast/ast_well_sorted.go", "pkg/tactic/tactic_goal.go"],
+      "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder", "TestASTWellSortedApplicationGuardBranches"],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "is_well_sorted postorder app/quantifier traversal, sort and arity checks, and non-Boolean quantifier warning",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_well_sorted.go",
+          "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder", "TestASTWellSortedApplicationGuardBranches"]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["Native Go slice and map replace the source expression-visitor stack and shared-node marks. The quantifier and arity warnings are exact; sort-mismatch diagnostics still lack the source mk_ll_pp/mk_pp text and ws/tc trace output. Direct API/cmd-context callers remain open. Malformed-app branches are tested through temporary internal test-node mutation because public factories refuse them."]
     },
     {
       "path": "src/ast/well_sorted.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/ast/ast_well_sorted.go", "pkg/tactic/tactic_goal.go"],
+      "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder", "TestASTWellSortedApplicationGuardBranches"],
       "conditionals": [
         {
           "line": 19,
@@ -30357,9 +30364,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "is_well_sorted borrowed manager and expression call with warning side effect",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_well_sorted.go",
+          "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder", "TestASTWellSortedApplicationGuardBranches"]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["The Go entry returns a checked error for invalid manager/handle state. Detailed sort-mismatch printing and all retained owning callers are not yet complete."]
     },
     {
       "path": "src/cmd_context/CMakeLists.txt",
@@ -103459,7 +103473,8 @@
         "TestTacticGoalSourceDepthPrecisionCountsAndReferences",
         "TestTacticGoalNativeSlicesGrowCopyUpdateAndRelease",
         "TestTacticGoalNativeSlicesKeepActualPublicationPrefix",
-        "TestTacticGoalConfigCopyKeepsFlagsDepthPrecisionWithoutAssertions"
+        "TestTacticGoalConfigCopyKeepsFlagsDepthPrecisionWithoutAssertions",
+        "TestTacticGoalWellSortedStopsAtFirstBadFormula"
       ],
       "assertions": [
         {
@@ -103544,6 +103559,12 @@
           "tests": [
             "TestTacticGoalConfigCopyKeepsFlagsDepthPrecisionWithoutAssertions"
           ]
+        },
+        {
+          "name": "goal::is_well_sorted checks formulas in order and stops after the first failed AST walk (goal.cpp:622-630)",
+          "status": "partial",
+          "go_target": "pkg/tactic/tactic_goal.go",
+          "tests": ["TestTacticGoalWellSortedStopsAtFirstBadFormula"]
         }
       ],
       "ownership": [
@@ -103551,7 +103572,7 @@
         "quick_process temporary negations now use a native []ASTHandle with explicit INC before append and DEC on lexical exit, matching the source expr_ref_vector ownership. This corrects the prior nonowning expression-vector borrow. Goal output acquisition still precedes temporary cleanup."
       ],
       "deviations": [
-        "Display/printing, cross-manager translation, is_well_sorted, is_equal, the default and full copying constructor facades remain unported; the configuration-only constructor is concrete. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred.",
+        "Display/printing, cross-manager translation, is_equal, the default and full copying constructor facades remain unported; the configuration-only constructor and formula-order is_well_sorted caller are concrete. The AST walk still lacks exact sort-mismatch diagnostic text. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred.",
         "Goal forms/proofs/dependencies now own native []ASTHandle/[]ASTDependency slices. Copies acquire independent element pins and backing rather than persistent-array reroot graphs; native growth has no emulated allocation geometry. Actual formula/proof/core publication order, saved-first and literal-false update behavior, snapshot isolation, depth/precision and explicit reference ownership remain. Concrete ownership helpers retire consumed references even when destruction reports an error, and retain unconsumed guard failures. Added 129-row native/debug growth/copy/update/shrink/close tests with arena reservations disabled and exact formula/proof/dependency pin checks, plus a real foreign-core guard publication-prefix check. Printing/translation and other declared gaps remain open."
       ]
     },
@@ -103580,7 +103601,8 @@
         "TestTacticGoalSourceDepthPrecisionCountsAndReferences",
         "TestTacticGoalNativeSlicesGrowCopyUpdateAndRelease",
         "TestTacticGoalNativeSlicesKeepActualPublicationPrefix",
-        "TestTacticGoalConfigCopyKeepsFlagsDepthPrecisionWithoutAssertions"
+        "TestTacticGoalConfigCopyKeepsFlagsDepthPrecisionWithoutAssertions",
+        "TestTacticGoalWellSortedStopsAtFirstBadFormula"
       ],
       "conditionals": [
         {
@@ -103621,13 +103643,19 @@
           "tests": [
             "TestTacticGoalConfigCopyKeepsFlagsDepthPrecisionWithoutAssertions"
           ]
+        },
+        {
+          "name": "goal::is_well_sorted declaration and formula-order caller (goal.h:142)",
+          "status": "partial",
+          "go_target": "pkg/tactic/tactic_goal.go",
+          "tests": ["TestTacticGoalWellSortedStopsAtFirstBadFormula"]
         }
       ],
       "ownership": [
         "Goal expression/dependency arrays retain their actual AST-manager owners. Assertions retain f/pr/dependencies through processing; false replacement protects proof/dependency references before reset. Redundancy membership uses local borrowed Go maps; original formula prefix/suffix ownership keeps encountered atoms alive through compaction. NumExprs shares a native identity map across formulas and the existing postorder project visitor with native frames, preserving shared-only deduplication, quantifier children and associative application weight. No shared mark/trail or native-frame backing reservation is credited at these callers."
       ],
       "deviations": [
-        "Display/printing, cross-manager translation, is_well_sorted, is_equal, the default and full copying constructor facades remain unported; the configuration-only constructor is concrete. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred.",
+        "Display/printing, cross-manager translation, is_equal, the default and full copying constructor facades remain unported; the configuration-only constructor and formula-order is_well_sorted caller are concrete. The AST walk still lacks exact sort-mismatch diagnostic text. No public context or solver API completion is claimed. Broad allocation-history/debug campaigns remain deferred.",
         "Goal forms/proofs/dependencies now own native []ASTHandle/[]ASTDependency slices. Copies acquire independent element pins and backing rather than persistent-array reroot graphs; native growth has no emulated allocation geometry. Actual formula/proof/core publication order, saved-first and literal-false update behavior, snapshot isolation, depth/precision and explicit reference ownership remain. Concrete ownership helpers retire consumed references even when destruction reports an error, and retain unconsumed guard failures. Added 129-row native/debug growth/copy/update/shrink/close tests with arena reservations disabled and exact formula/proof/dependency pin checks, plus a real foreign-core guard publication-prefix check. Printing/translation and other declared gaps remain open."
       ]
     },
@@ -182879,7 +182907,8 @@
         "pkg/tactic/ufbv/rewrite_formula_process.go",
         "pkg/ast/pattern/reduce_quantifier.go",
         "pkg/shell/input_file_option.go",
-        "pkg/api/api_global_params.go"
+        "pkg/api/api_global_params.go",
+        "pkg/ast/ast_well_sorted.go"
       ],
       "tests": [
         "TestWarningSourceDefaultRoutingAndDisabledState",
@@ -182897,7 +182926,8 @@
         "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
         "TestShellInputFileSourceBranches",
         "TestShellInputFileWarningRefusalPreservesSelection",
-        "TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings"
+        "TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings",
+        "TestASTWellSortedQuantifierWarningAndChildOrder"
       ],
       "conditionals": [
         {
@@ -183007,6 +183037,12 @@
           "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings"]
         },
         {
+          "name": "well_sorted.cpp:39 non-Boolean quantifier body literal warning through retained goal caller",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_well_sorted.go",
+          "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder"]
+        },
+        {
           "name": "set_error_stream and disable_error_msg_prefix write-only globals with no source reader",
           "status": "reference_only",
           "tests": []
@@ -183050,7 +183086,7 @@
         "WarningService owns only the enable scalar and borrows optional io.Writer streams. EnvParamsRuntime updates the same warning-enable state used by warning emission; literal and selected formatted writes retain source prefix, newline, C-string boundary, selected Linux AMD64 custom-stream truncation and completed-output flush when the borrowed writer supports Flush."
       ],
       "deviations": [
-        "The prior unused warning translation was removed in 589e99f8. The now-retained EnvParamsRuntime toggle binds to concrete WarningService. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; Go io.Writer short writes retain the reached source insertion prefix but no longer escape warning_msg as a caller error. Both global parameter API catches and the two shell input-file warning branches have concrete owners, but the config setter, full shell loop and other direct shell/AST/MUZ warning call sites remain open. No C varargs or C++ standard-stream implementation is introduced."
+        "The prior unused warning translation was removed in 589e99f8. The now-retained EnvParamsRuntime toggle binds to concrete WarningService. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; Go io.Writer short writes retain the reached source insertion prefix but no longer escape warning_msg as a caller error. Both global parameter API catches, the well-sorted quantifier diagnostic and the two shell input-file warning branches have concrete owners, but the config setter, detailed AST sort-mismatch warning, full shell loop and other direct shell/AST/MUZ warning call sites remain open. No C varargs or C++ standard-stream implementation is introduced."
       ]
     },
     {
@@ -183065,7 +183101,8 @@
         "pkg/tactic/ufbv/rewrite_formula_process.go",
         "pkg/ast/pattern/reduce_quantifier.go",
         "pkg/shell/input_file_option.go",
-        "pkg/api/api_global_params.go"
+        "pkg/api/api_global_params.go",
+        "pkg/ast/ast_well_sorted.go"
       ],
       "tests": [
         "TestWarningSourceDefaultRoutingAndDisabledState",
@@ -183083,7 +183120,8 @@
         "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
         "TestShellInputFileSourceBranches",
         "TestShellInputFileWarningRefusalPreservesSelection",
-        "TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings"
+        "TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings",
+        "TestASTWellSortedQuantifierWarningAndChildOrder"
       ],
       "conditionals": [
         {
@@ -183150,6 +183188,12 @@
           "tests": ["TestAPIGlobalParamsGeneratedProcessSetGetResetAndWarnings"]
         },
         {
+          "name": "well_sorted.cpp:39 non-Boolean quantifier body literal warning through retained goal caller",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_well_sorted.go",
+          "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder"]
+        },
+        {
           "name": "pattern_inference concrete warning_msg %s and %d call sites through borrowed WarningService",
           "status": "ported",
           "go_target": "pkg/ast/pattern/reduce_quantifier.go",
@@ -183183,7 +183227,7 @@
         "WarningService borrows selected output streams and owns only its enable flag. A borrowed buffered writer is flushed after a complete warning. The unused warning_displayer class has no Go adapter."
       ],
       "deviations": [
-        "The concrete warning service is reached by EnvParamsRuntime. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; Go io.Writer short writes preserve the reached insertion prefix while warning_msg returns without a caller error. Both global parameter API catches and the two shell input-file warning branches have concrete owners, but the config setter, full shell loop, format2ostream exception integration and other direct shell/AST/MUZ warning call sites remain open. C++ stream internals and C varargs are not copied."
+        "The concrete warning service is reached by EnvParamsRuntime. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; Go io.Writer short writes preserve the reached insertion prefix while warning_msg returns without a caller error. Both global parameter API catches, the well-sorted quantifier diagnostic and the two shell input-file warning branches have concrete owners, but the config setter, detailed AST sort-mismatch warning, full shell loop, format2ostream exception integration and other direct shell/AST/MUZ warning call sites remain open. C++ stream internals and C varargs are not copied."
       ]
     },
     {

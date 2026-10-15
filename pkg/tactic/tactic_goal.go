@@ -103,6 +103,21 @@ func (g *Goal) Form(i uint32) (ast.ASTHandle, error) {
 	}
 	return g.forms[i], nil
 }
+
+// IsWellSorted follows goal.cpp's formula order and stops at the first
+// ill-sorted expression. AST warnings use the borrowed process warning owner.
+func (g *Goal) IsWellSorted() (bool, error) {
+	if e := g.open(); e != nil {
+		return false, e
+	}
+	for _, form := range g.forms {
+		good, e := g.manager.IsWellSorted(form, nil)
+		if e != nil || !good {
+			return good, e
+		}
+	}
+	return true, nil
+}
 func (g *Goal) Proof(i uint32) (ast.ASTHandle, error) {
 	if e := g.open(); e != nil {
 		return ast.ASTHandle{}, e
