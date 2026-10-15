@@ -10,8 +10,13 @@ import (
 	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
-func (p *astBitVectorPluginOwner) traceIdentity() string { return fmt.Sprintf("%p", p) }
-func (p *astArrayPluginOwner) traceIdentity() string     { return fmt.Sprintf("%p", p) }
+func (p *astArithmeticPluginOwner) traceIdentity() string    { return fmt.Sprintf("%p", p) }
+func (p *astBitVectorPluginOwner) traceIdentity() string     { return fmt.Sprintf("%p", p) }
+func (p *astArrayPluginOwner) traceIdentity() string         { return fmt.Sprintf("%p", p) }
+func (p *astDatatypePluginOwner) traceIdentity() string      { return fmt.Sprintf("%p", p) }
+func (p *astAuxiliaryPluginOwner) traceIdentity() string     { return fmt.Sprintf("%p", p) }
+func (p *astSequencePluginOwner) traceIdentity() string      { return fmt.Sprintf("%p", p) }
+func (p *astFloatingPointPluginOwner) traceIdentity() string { return fmt.Sprintf("%p", p) }
 
 // These records describe the concrete charged plugin headers. Each caller
 // supplies its original allocation site and retains its own lifetime flag.
@@ -71,6 +76,22 @@ func (m *ASTManager) traceRegisteredPluginsDeallocated() {
 			}
 		case astArrayPlugin:
 			if p := m.arrayPlugin; p != nil {
+				m.traceRegisteredPluginDeallocated(p.traceIdentity(), p.published, &p.memoryTraceLive)
+			}
+		case astDatatypePlugin:
+			if p := m.datatypePlugin; p != nil {
+				m.traceRegisteredPluginDeallocated(p.traceIdentity(), p.published, &p.memoryTraceLive)
+			}
+		case astDatalogPlugin, astPseudoBooleanPlugin:
+			if p := m.auxiliaryPlugin(binding.kind); p != nil {
+				m.traceRegisteredPluginDeallocated(p.traceIdentity(), p.published, &p.memoryTraceLive)
+			}
+		case astSequencePlugin:
+			if p := m.sequencePlugin; p != nil {
+				m.traceRegisteredPluginDeallocated(p.traceIdentity(), p.published, &p.memoryTraceLive)
+			}
+		case astFloatingPointPlugin:
+			if p := m.floatingPointPlugin; p != nil {
 				m.traceRegisteredPluginDeallocated(p.traceIdentity(), p.published, &p.memoryTraceLive)
 			}
 		}

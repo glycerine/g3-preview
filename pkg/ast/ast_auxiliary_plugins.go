@@ -12,16 +12,16 @@ import (
 // acquire no AST references. Failed initialization retains the reached prefix.
 
 type astAuxiliaryPluginOwner struct {
-	self                 *astAuxiliaryPluginOwner
-	owner                *ASTManager
-	next                 *astAuxiliaryPluginOwner
-	symbols              [17]usymbol.Symbol
-	kind                 astPluginKind
-	initialized          uint32
-	family               FamilyID
-	header               uint64
-	completed, published bool
-	bodyCause            error
+	self                                  *astAuxiliaryPluginOwner
+	owner                                 *ASTManager
+	next                                  *astAuxiliaryPluginOwner
+	symbols                               [17]usymbol.Symbol
+	kind                                  astPluginKind
+	initialized                           uint32
+	family                                FamilyID
+	header                                uint64
+	completed, published, memoryTraceLive bool
+	bodyCause                             error
 }
 
 func (m *ASTManager) auxiliaryPlugin(k astPluginKind) *astAuxiliaryPluginOwner {
@@ -54,6 +54,11 @@ func (m *ASTManager) registerAuxiliaryPlugin(k astPluginKind) (FamilyID, error) 
 	}
 	p := &astAuxiliaryPluginOwner{owner: m, kind: k, header: bytes, next: m.auxiliaryPlugins}
 	p.self = p
+	line, typeName := 53, "pb_decl_plugin"
+	if k == astDatalogPlugin {
+		line, typeName = 44, "datalog::dl_decl_plugin"
+	}
+	m.traceRegisteredPluginAllocated(p.traceIdentity(), p.header, line, typeName, &p.memoryTraceLive)
 	m.auxiliaryPlugins = p
 	dl := [17]string{"store", "empty", "is_empty", "join", "union", "widen", "project", "filter", "negation_filter", "rename", "complement", "select", "clone", "N", "<", "<=", "R"}
 	pb := [5]string{"at-most", "at-least", "pble", "pbge", "pbeq"}
@@ -116,6 +121,7 @@ func (m *ASTManager) auxiliaryPluginBytes() uint64 {
 }
 func (m *ASTManager) releaseAuxiliaryPluginHistory() {
 	for p := m.auxiliaryPlugins; p != nil; p = p.next {
+		m.traceRegisteredPluginDeallocated(p.traceIdentity(), p.published, &p.memoryTraceLive)
 		m.BudgetField.Release(p.header)
 		p.header = 0
 	}

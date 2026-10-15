@@ -7,14 +7,14 @@ package ast
 import "reflect"
 
 type astDatatypePluginOwner struct {
-	self                 *astDatatypePluginOwner
-	owner                *ASTManager
-	next                 *astDatatypePluginOwner
-	family               FamilyID
-	header               uint64
-	bodyCause            error
-	completed, published bool
-	membersEnded         bool
+	self                                  *astDatatypePluginOwner
+	owner                                 *ASTManager
+	next                                  *astDatatypePluginOwner
+	family                                FamilyID
+	header                                uint64
+	bodyCause                             error
+	completed, published, memoryTraceLive bool
+	membersEnded                          bool
 }
 
 func (m *ASTManager) registerDatatypePlugin() (FamilyID, error) {
@@ -35,6 +35,7 @@ func (m *ASTManager) registerDatatypePlugin() (FamilyID, error) {
 	}
 	p := &astDatatypePluginOwner{owner: m, header: bytes, next: m.datatypePluginFailed}
 	p.self = p
+	m.traceRegisteredPluginAllocated(p.traceIdentity(), p.header, 41, "datatype_decl_plugin", &p.memoryTraceLive)
 	m.datatypePluginFailed = p
 	p.completed = true
 	id, e = m.families.MkID(name)
@@ -74,6 +75,7 @@ func (m *ASTManager) datatypePluginBytes() uint64 {
 }
 func (m *ASTManager) releaseDatatypePluginHistory() {
 	release := func(p *astDatatypePluginOwner) {
+		m.traceRegisteredPluginDeallocated(p.traceIdentity(), p.published, &p.memoryTraceLive)
 		m.BudgetField.Release(p.header)
 		p.header = 0
 	}

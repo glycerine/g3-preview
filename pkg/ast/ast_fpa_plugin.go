@@ -18,28 +18,28 @@ import (
 // null inline storage and introduce no allocation or default numeral action.
 // Populated MPF values use native hash buckets with actual MPF hash/equality.
 type astFloatingPointPluginOwner struct {
-	literalPrimary                                              astFloatLiteralFrame
-	literalFrames                                               *astFloatLiteralFrame
-	literalSerial                                               uint64
-	numeralProbePrimary                                         astFloatNumeralProbe
-	numeralProbeFrames                                          *astFloatNumeralProbe
-	assertions                                                  *uparams.GlobalParamsService
-	next                                                        *astFloatingPointPluginOwner
-	self                                                        *astFloatingPointPluginOwner
-	owner                                                       *ASTManager
-	numeric                                                     *unumeral.ArbitraryFloatManager
-	failedNumeric                                               error
-	nextID                                                      uint32
-	freeIDs                                                     []uint32
-	values                                                      astScopedFloatVector
-	table                                                       map[uint32][]uint32
-	real, integer                                               astNodeRef
-	bitvector                                                   *astBitVectorPluginOwner
-	family, arithFamily, bvFamily                               FamilyID
-	acquired                                                    [2]bool
-	header                                                      uint64
-	numericReady, tableReady, completed, published, sourceEnded bool
-	bodyCause, sourceCause, ownCause                            error
+	literalPrimary                                                               astFloatLiteralFrame
+	literalFrames                                                                *astFloatLiteralFrame
+	literalSerial                                                                uint64
+	numeralProbePrimary                                                          astFloatNumeralProbe
+	numeralProbeFrames                                                           *astFloatNumeralProbe
+	assertions                                                                   *uparams.GlobalParamsService
+	next                                                                         *astFloatingPointPluginOwner
+	self                                                                         *astFloatingPointPluginOwner
+	owner                                                                        *ASTManager
+	numeric                                                                      *unumeral.ArbitraryFloatManager
+	failedNumeric                                                                error
+	nextID                                                                       uint32
+	freeIDs                                                                      []uint32
+	values                                                                       astScopedFloatVector
+	table                                                                        map[uint32][]uint32
+	real, integer                                                                astNodeRef
+	bitvector                                                                    *astBitVectorPluginOwner
+	family, arithFamily, bvFamily                                                FamilyID
+	acquired                                                                     [2]bool
+	header                                                                       uint64
+	numericReady, tableReady, completed, published, sourceEnded, memoryTraceLive bool
+	bodyCause, sourceCause, ownCause                                             error
 }
 
 func (m *ASTManager) floatingPointPluginBytes() uint64 {
@@ -82,6 +82,7 @@ func (m *ASTManager) registerFloatingPointPlugin() (FamilyID, error) {
 	}
 	p := &astFloatingPointPluginOwner{owner: m, header: bytes, next: m.floatingPointPluginFailed}
 	p.self = p
+	m.traceRegisteredPluginAllocated(p.traceIdentity(), p.header, 50, "fpa_decl_plugin", &p.memoryTraceLive)
 	m.floatingPointPluginFailed = p
 	p.numeric, e = m.numerals.NewArbitraryFloatManager()
 	if e != nil {
@@ -350,6 +351,7 @@ func (m *ASTManager) releaseFloatingPointHistory() {
 	if p := m.floatingPointPlugin; p != nil {
 		p.releaseLiteralFrames()
 		p.releaseNumeralProbes()
+		m.traceRegisteredPluginDeallocated(p.traceIdentity(), p.published, &p.memoryTraceLive)
 		m.BudgetField.Release(p.header)
 		p.header = 0
 	}

@@ -24,19 +24,19 @@ type astSequenceSignature struct {
 	bodyCause, sourceCause, ownCause              error
 }
 type astSequencePluginOwner struct {
-	next                    *astSequencePluginOwner
-	self                    *astSequencePluginOwner
-	owner                   *ASTManager
-	names                   [2]usymbol.Symbol
-	family                  FamilyID
-	signatures              []*astSequenceSignature
-	owned                   *astSequenceSignature
-	char, stringSort, regex astNodeRef
-	acquired                [3]bool // exact successful String, Char, RE INC leaves
-	serial                  uint32
-	header                  uint64
-	published, initialized  bool
-	bodyCause, sourceCause  error
+	next                                    *astSequencePluginOwner
+	self                                    *astSequencePluginOwner
+	owner                                   *ASTManager
+	names                                   [2]usymbol.Symbol
+	family                                  FamilyID
+	signatures                              []*astSequenceSignature
+	owned                                   *astSequenceSignature
+	char, stringSort, regex                 astNodeRef
+	acquired                                [3]bool // exact successful String, Char, RE INC leaves
+	serial                                  uint32
+	header                                  uint64
+	published, initialized, memoryTraceLive bool
+	bodyCause, sourceCause                  error
 }
 
 func (p *astSequencePluginOwner) newSignature(name string, n uint32, dom []astNodeRef, rng astNodeRef) (_s *astSequenceSignature, _body error) {
@@ -166,6 +166,7 @@ func (m *ASTManager) releaseSequencePluginHeaders() {
 	}
 	for p := m.sequencePlugin; p != nil; {
 		next := p.next
+		m.traceRegisteredPluginDeallocated(p.traceIdentity(), p.published, &p.memoryTraceLive)
 		p.signatures = nil
 		for s := p.owned; s != nil; s = s.next {
 			m.BudgetField.Release(s.header)
@@ -255,6 +256,7 @@ func (m *ASTManager) registerSequencePlugin() (FamilyID, error) {
 	}
 	p := &astSequencePluginOwner{owner: m, header: bytes, next: m.sequencePluginFailed}
 	p.self = p
+	m.traceRegisteredPluginAllocated(p.traceIdentity(), p.header, 47, "seq_decl_plugin", &p.memoryTraceLive)
 	m.sequencePluginFailed = p
 	for i, text := range [...]string{"String", "Char"} {
 		p.names[i], e = m.Symbols.Intern(text)
