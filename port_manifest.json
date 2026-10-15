@@ -154832,7 +154832,7 @@
       "path": "src/util/mpff.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/numeral/mpff.go",
         "pkg/util/numeral/mpff_arithmetic.go",
@@ -155537,14 +155537,16 @@
           ]
         },
         {
-          "name": "TLS character-formatting failure and automatic process-memory binding at other retained owners remain open",
-          "status": "partial",
+          "name": "native Go character-formatting slices replace unreachable TLS spill; the sole retained owned MPFF tactic borrows the AST numeral Runtime",
+          "status": "platform_replacement",
           "go_target": "pkg/util/numeral/mpff.go",
+          "go_targets": ["pkg/math/subpaving/tactic/core_process_binding_test.go"],
           "tests": [
             "TestFastFloatBorrowedRuntimeIdentityAndGuards",
             "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
             "TestFastFloatSharedRuntimeProfileAndClose",
-            "TestFastFloatBorrowedRuntimeInlineWarmScope"
+            "TestFastFloatBorrowedRuntimeInlineWarmScope",
+            "TestFastCoreTacticNumericProcessCohort"
           ]
         },
         {
@@ -155652,19 +155654,19 @@
         "MPFF owns native typed slices for significands, validity/generation metadata, recycled IDs and scratch. These Go-managed backing arrays are not charged to arena. The actual owner header, Natural services, real MPN resources and retained text workspaces keep their existing accounting. Source arithmetic and alias prefixes survive failure; lexical numeral temporaries release with the injector armed. Raw handles retain implicit manager provenance limits. See PORT_PROGRESS.md#audit-mpff-port-status-md."
       ],
       "deviations": [
-        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, external exception transport and full subpaving tactic integration remain open; all visible mpff.cpp TRACE/STRACE sites have retained Go call-site implementations. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence.",
+        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Retained MPFF writer insertions use Go io.Writer, source exception catches and all visible mpff.cpp TRACE/STRACE sites have concrete Go call-site implementations. The enclosing subpaving tactic result lifecycle is a consumer obligation. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence.",
         "MPFF significands, handle metadata, recycled IDs, conversion scratch and arithmetic scratch use concrete Go uint32 slices. Copied vector growth, arena descriptors and storage reservation failures are removed. Numeric handle generation/recycling, arithmetic and rounding algorithms remain explicit; shared MPN workspaces retain their separate ownership.",
         "NaturalManager no longer owns or borrows an arena.Words service: division uses actual Runtime buffers and formatting uses native slices. Permanently empty Words scratch arrays, duplicate capacity mirrors, unconsumed growth/read helpers and Words-backed limb-view adapters are removed. MPFF also no longer constructs the unused Words service. Child cleanup preserves a borrowed parent Runtime and caller allocation.",
         "Decimal MPN formatting temp/numerator/denominator storage now uses three reusable Go uint32 slices. Scratch is cleared on begin, truncated on end and released by explicit cleanup. C++ inline/spill capacity, Runtime allocation events and failed scratch-constructor/destructor states are intentionally removed. Algorithm D division and debug verification still retain separate real Runtime allocations and fault coverage. Warm formatting adds no Go or Runtime allocations; source conversion arithmetic, precision, bounded writes and output publication remain explicit.",
         "The retained context_mpff_wrapper now exercises exact SetInteger/ToInteger coefficient round trips and directed SetRational inequality bounds through a concrete subpaving caller; the enclosing MPFF tactic lifecycle remains partial.",
-        "Concrete config_mpff search now reaches the MPFF manager through live midpoint arithmetic and bound propagation, in addition to exact coefficient conversion and display. Persistent ostream transport, global binding and full tactic result lifecycle remain open; concrete MPFF trace actions are wired."
+        "Concrete config_mpff search reaches MPFF through midpoint arithmetic and bound propagation, exact coefficient conversion and display. The sole retained owned MPFF tactic borrows its AST numeral service Runtime. Default precision 2 and the retained decimal default threshold 128 bound all C++ character buffers below the 1024-byte inline capacity; Go uses native byte slices. Full tactic result lifecycle remains a consumer obligation."
       ]
     },
     {
       "path": "src/util/mpff.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/numeral/mpff.go",
         "pkg/util/numeral/mpff_arithmetic.go",
@@ -155967,14 +155969,16 @@
           ]
         },
         {
-          "name": "TLS character-formatting failure and automatic process-memory binding at other retained owners remain open",
-          "status": "partial",
+          "name": "native Go character-formatting slices replace unreachable TLS spill; the sole retained owned MPFF tactic borrows the AST numeral Runtime",
+          "status": "platform_replacement",
           "go_target": "pkg/util/numeral/mpff.go",
+          "go_targets": ["pkg/math/subpaving/tactic/core_process_binding_test.go"],
           "tests": [
             "TestFastFloatBorrowedRuntimeIdentityAndGuards",
             "TestFastFloatBorrowedRuntimeConstructorRefusalPrefixes",
             "TestFastFloatSharedRuntimeProfileAndClose",
-            "TestFastFloatBorrowedRuntimeInlineWarmScope"
+            "TestFastFloatBorrowedRuntimeInlineWarmScope",
+            "TestFastCoreTacticNumericProcessCohort"
           ]
         },
         {
@@ -155997,11 +156001,11 @@
         "MPFF owns native typed slices for significands, validity/generation metadata, recycled IDs and scratch. These Go-managed backing arrays are not charged to arena. The actual owner header, Natural services, real MPN resources and retained text workspaces keep their existing accounting. Source arithmetic and alias prefixes survive failure; lexical numeral temporaries release with the injector armed. Raw handles retain implicit manager provenance limits. See PORT_PROGRESS.md#audit-mpff-port-status-md."
       ],
       "deviations": [
-        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Persistent ostream flags/fail-state, external exception transport and full subpaving tactic integration remain open; all visible mpff.cpp TRACE/STRACE sites have retained Go call-site implementations. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence.",
+        "Concrete internal32 and explicit Close; accept finite odd precision >=2, replace alignment-dependent uint64 casts with little-endian limbs. Undefined signed negation/shift, power mask-wrap nontermination and physical storage overflow have documented typed adapters after completed prefixes. Retained MPFF writer insertions use Go io.Writer, source exception catches and all visible mpff.cpp TRACE/STRACE sites have concrete Go call-site implementations. The enclosing subpaving tactic result lifecycle is a consumer obligation. Source tests preserve finite loop/draw shapes using an explicit hermetic nonnegative31bit RNG, not an ambient libc sequence.",
         "MPFF significands, handle metadata, recycled IDs, conversion scratch and arithmetic scratch use concrete Go uint32 slices. Copied vector growth, arena descriptors and storage reservation failures are removed. Numeric handle generation/recycling, arithmetic and rounding algorithms remain explicit; shared MPN workspaces retain their separate ownership.",
         "NaturalManager no longer owns or borrows an arena.Words service: division and formatting use their actual Runtime buffers. Permanently empty Words scratch arrays, duplicate capacity mirrors, unconsumed growth/read helpers and Words-backed limb-view adapters are removed. MPFF also no longer constructs the unused Words service. Child cleanup preserves a borrowed parent Runtime and caller allocation.",
         "The retained context_mpff_wrapper now exercises exact SetInteger/ToInteger coefficient round trips and directed SetRational inequality bounds through a concrete subpaving caller; the enclosing MPFF tactic lifecycle remains partial.",
-        "Concrete config_mpff search now reaches the MPFF manager through live midpoint arithmetic and bound propagation, in addition to exact coefficient conversion and display. Persistent ostream transport, global binding and full tactic result lifecycle remain open; concrete MPFF trace actions are wired."
+        "Concrete config_mpff search reaches MPFF through midpoint arithmetic and bound propagation, exact coefficient conversion and display. The sole retained owned MPFF tactic borrows its AST numeral service Runtime. Default precision 2 and the retained decimal default threshold 128 bound all C++ character buffers below the 1024-byte inline capacity; Go uses native byte slices. Full tactic result lifecycle remains a consumer obligation."
       ]
     },
     {
