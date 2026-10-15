@@ -98838,6 +98838,11 @@
           ]
         },
         {
+          "name": "aig_manager::display_smt2 and imp::display_smt2 have no retained source callers (aig.cpp:1594-1648,1743-1745)",
+          "status": "reference_only",
+          "tests": []
+        },
+        {
           "name": "max_sharing process frame-index and pre-cache-reset null-result TRACE with source fallthrough",
           "status": "ported",
           "go_target": "pkg/tactic/aig/aig_max_sharing_trace.go",
@@ -98987,6 +98992,11 @@
           "tests": [
             "TestAIGDisplaySourceBreadthFirstAndInvertedRoot"
           ]
+        },
+        {
+          "name": "aig_manager::display_smt2(aig_ref const&) declaration has no retained source callers (aig.h:74)",
+          "status": "reference_only",
+          "tests": []
         },
         {
           "name": "aig_manager set_max_memory and retained conversion checkpoints",
@@ -179650,7 +179660,8 @@
         "pkg/tactic/aig/aig_delete_trace.go",
         "pkg/tactic/aig/aig_expr_cache_trace.go",
         "pkg/tactic/aig/aig_goal_conversion_trace.go",
-        "pkg/tactic/aig/aig_max_sharing_trace.go"
+        "pkg/tactic/aig/aig_max_sharing_trace.go",
+        "pkg/tactic/aig/aig_and_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -179727,7 +179738,8 @@
         "TestAIGGoalConversionCacheAndAuxTraceSourceOrder",
         "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
         "TestAIGMaxSharingTryingTraceAllFourReassociationBranches",
-        "TestAIGGoalConversionMissingCacheConditionalTrace"
+        "TestAIGGoalConversionMissingCacheConditionalTrace",
+        "TestAIGMkAndSourceTraceOriginalOperandsAndResult"
       ],
       "conditionals": [
         {
@@ -181126,6 +181138,14 @@
           ]
         },
         {
+          "name": "Selected imp::mk_and mk_and_bug TRACE displays source operands and result after minimization (aig.cpp:1341-1351); wider AST variable profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_and_trace.go",
+          "tests": [
+            "TestAIGMkAndSourceTraceOriginalOperandsAndResult"
+          ]
+        },
+        {
           "name": "Retained max_sharing process frame-index and null-result TRACE (aig.cpp:1261,1284)",
           "status": "ported",
           "go_target": "pkg/tactic/aig/aig_max_sharing_trace.go",
@@ -181228,7 +181248,8 @@
         "pkg/tactic/aig/aig_delete_trace.go",
         "pkg/tactic/aig/aig_expr_cache_trace.go",
         "pkg/tactic/aig/aig_goal_conversion_trace.go",
-        "pkg/tactic/aig/aig_max_sharing_trace.go"
+        "pkg/tactic/aig/aig_max_sharing_trace.go",
+        "pkg/tactic/aig/aig_and_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -181303,7 +181324,8 @@
         "TestAIGGoalConversionCacheAndAuxTraceSourceOrder",
         "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
         "TestAIGMaxSharingTryingTraceAllFourReassociationBranches",
-        "TestAIGGoalConversionMissingCacheConditionalTrace"
+        "TestAIGGoalConversionMissingCacheConditionalTrace",
+        "TestAIGMkAndSourceTraceOriginalOperandsAndResult"
       ],
       "conditionals": [
         {
@@ -182699,6 +182721,14 @@
           "tests": [
             "TestAIGMaxSharingProcessingAndNullTraceSourceFallthrough",
             "TestAIGDisplaySourceBreadthFirstAndInvertedRoot"
+          ]
+        },
+        {
+          "name": "Selected imp::mk_and mk_and_bug TRACE displays source operands and result after minimization (aig.cpp:1341-1351); wider AST variable profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/tactic/aig/aig_and_trace.go",
+          "tests": [
+            "TestAIGMkAndSourceTraceOriginalOperandsAndResult"
           ]
         },
         {
