@@ -266,24 +266,30 @@ func (c *ArbitraryContext) Close() error {
 	c.root = nil
 	c.nodes = nil
 	c.leafHead, c.leafTail = nil, nil
-	c.displayVariable = nil
-	c.trace = nil
 	c.searchNode = nil
 	for len(c.unitClauses) != 0 {
 		a := c.unitClauses[0].atom
 		if a.refs == 0 {
 			return arena.ErrInvalidSlot
 		}
+		if err := c.traceInequalityDecRef(a); err != nil {
+			return err
+		}
 		a.refs--
 		c.unitClauses = c.unitClauses[1:]
 	}
 	for len(c.clauses) != 0 {
 		clause := c.clauses[0]
-		for _, a := range clause.atoms {
+		for clause.releaseAt < len(clause.atoms) {
+			a := clause.atoms[clause.releaseAt]
 			if a.refs == 0 {
 				return arena.ErrInvalidSlot
 			}
+			if err := c.traceInequalityDecRef(a); err != nil {
+				return err
+			}
 			a.refs--
+			clause.releaseAt++
 		}
 		c.clauses[0] = nil
 		c.clauses = c.clauses[1:]
@@ -328,6 +334,8 @@ func (c *ArbitraryContext) Close() error {
 	c.powersScratch = nil
 	c.watchers = nil
 	c.variables = nil
+	c.displayVariable = nil
+	c.trace = nil
 	c.closed = true
 	return nil
 }

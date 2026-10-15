@@ -10,9 +10,10 @@ import (
 )
 
 type ArbitraryClause struct {
-	context *ArbitraryContext
-	atoms   []*ArbitraryInequality
-	visited uint64
+	context   *ArbitraryContext
+	atoms     []*ArbitraryInequality
+	visited   uint64
+	releaseAt int
 }
 
 type arbitraryTruth uint8
@@ -179,6 +180,7 @@ func (c *ArbitraryContext) AddUnitClause(a *ArbitraryInequality, axiom bool) err
 	if a.refs == math.MaxUint32 {
 		return arena.ErrInvalidSlot
 	}
+	c.traceInequalityIncRef(a)
 	a.refs++
 	c.unitClauses = append(c.unitClauses, arbitraryUnitClause{atom: a, axiom: axiom})
 	return nil
@@ -210,6 +212,7 @@ func (c *ArbitraryContext) AddClause(atoms []*ArbitraryInequality) (*ArbitraryCl
 	sort.SliceStable(ordered, func(i, j int) bool { return ordered[i].variable < ordered[j].variable })
 	clause := &ArbitraryClause{context: c, atoms: ordered}
 	for _, a := range ordered {
+		c.traceInequalityIncRef(a)
 		a.refs++
 	}
 	for i, a := range ordered {

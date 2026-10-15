@@ -54524,6 +54524,12 @@
           "tests": ["TestArbitraryPolynomialSourceIntegerTraceAndPublication", "TestArbitraryPolynomialTraceStreamRefusalKeepsDefinition"]
         },
         {
+          "name": "Concrete config_mpf inequality reference TRACE and resumable clause release (subpaving_t_def.h:786-799)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/arbitrary_refcount_trace.go", "pkg/math/subpaving/arbitrary_context_root.go"],
+          "tests": ["TestArbitraryInequalityReferenceTraceSourceOrder", "TestArbitraryInequalityReferenceTraceRefusalAndStoppedClause"]
+        },
+        {
           "name": "Concrete config_mpff mk_sum and is_int(polynomial) nested integer-status and first-failing-term TRACE before variable publication (subpaving_t_def.h:668-679,762-763)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fast_polynomial_integer_trace.go",
@@ -177333,6 +177339,12 @@
           "tests": ["TestArbitraryPolynomialSourceIntegerTraceAndPublication", "TestArbitraryPolynomialTraceStreamRefusalKeepsDefinition"]
         },
         {
+          "name": "Reached config_mpf inequality reference-count TRACE records (subpaving_t_def.h:786-799)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/arbitrary_refcount_trace.go", "pkg/math/subpaving/arbitrary_context_root.go"],
+          "tests": ["TestArbitraryInequalityReferenceTraceSourceOrder", "TestArbitraryInequalityReferenceTraceRefusalAndStoppedClause"]
+        },
+        {
           "name": "Reached config_mpff mk_sum and is_int(polynomial) nested TRACE records (subpaving_t_def.h:672,762)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fast_polynomial_integer_trace.go",
@@ -178281,6 +178293,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/arbitrary_polynomial_integer_trace.go",
           "tests": ["TestArbitraryPolynomialSourceIntegerTraceAndPublication", "TestArbitraryPolynomialTraceStreamRefusalKeepsDefinition"]
+        },
+        {
+          "name": "Reached config_mpf inequality reference-count TRACE records (subpaving_t_def.h:786-799)",
+          "status": "ported",
+          "go_targets": ["pkg/math/subpaving/arbitrary_refcount_trace.go", "pkg/math/subpaving/arbitrary_context_root.go"],
+          "tests": ["TestArbitraryInequalityReferenceTraceSourceOrder", "TestArbitraryInequalityReferenceTraceRefusalAndStoppedClause"]
         },
         {
           "name": "Reached config_mpff mk_sum and is_int(polynomial) nested TRACE records (subpaving_t_def.h:672,762)",
