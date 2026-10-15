@@ -171232,7 +171232,8 @@
         "pkg/tactic/tactic_model_converter.go",
         "pkg/tactic/tactic_stored_model.go",
         "pkg/model/model_core.go",
-        "pkg/tactic/tactic_model_ref_source_order_test.go"
+        "pkg/tactic/tactic_model_ref_source_order_test.go",
+        "pkg/tactic/tactic_model_ref_stopped_child_debug_test.go"
       ],
       "tests": [
         "TestTacticModelReferenceOwningAliasAndReplacement",
@@ -171249,7 +171250,9 @@
         "TestTacticModelConcatStopsAtChildErrorAndRejectsCopiedOwner",
         "TestTacticModelConcatStarCopiesVectorsAndRetainsExternalChild",
         "TestTacticModelConcatConsumedChildCleanupResumesWithoutSecondDecrement",
-        "TestTacticModelConcatRealStoredChildFinalReleaseNativeIDRecycle"
+        "TestTacticModelConcatRealStoredChildFinalReleaseNativeIDRecycle",
+        "TestModelRefStoppedDerivedChildRelease",
+        "TestModelRefCloseAfterStoppedDerivedChildRelease"
       ],
       "conditionals": [
         {
@@ -171283,8 +171286,12 @@
         },
         {
           "name": "ModelRef consumed stopped final model deletion and pending incoming cleanup through actual fallible model child release",
-          "status": "partial",
-          "tests": []
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_model_converter.go",
+          "tests": [
+            "TestModelRefStoppedDerivedChildRelease",
+            "TestModelRefCloseAfterStoppedDerivedChildRelease"
+          ]
         },
         {
           "name": "Retained concat_converter<model_converter> and concat_star_converter<model_converter> ref<model_converter> member construction, borrowed access, shared-child retention and source member destruction order (converter.h:45-123; model_converter.cpp:22-124; ref.h:31-101)",
