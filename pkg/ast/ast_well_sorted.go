@@ -2,9 +2,11 @@
 package ast
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 type wellSortedFrame struct {
@@ -13,13 +15,54 @@ type wellSortedFrame struct {
 	count uint32
 }
 
+type wellSortedWarning struct {
+	text                    string
+	app, decl, actual, want ASTHandle
+	argument                uint32
+}
+
 // IsWellSorted checks the retained expression graph in source child-before-
 // parent order. The warning service is borrowed; nil selects the process owner.
 func (m *ASTManager) IsWellSorted(h ASTHandle, warnings *diagnostic.WarningService) (bool, error) {
+	if m != nil {
+		g := uparams.BorrowProcessGlobalParamsService()
+		if g != nil && g.Current != nil && g.CheckOwner(g.Context, m.BudgetField) == nil && g.Context.CheckServices(m.Symbols, m.numerals) == nil {
+			p := g.Context.EmptyValue()
+			return m.isWellSorted(h, warnings, g.Context, &p, g)
+		}
+	}
+	return m.isWellSorted(h, warnings, nil, nil, nil)
+}
+
+// IsWellSortedWithPrinter uses the source low-level and SMT2 printers for a
+// sort-mismatch warning. The parameter owners are borrowed from the caller.
+func (m *ASTManager) IsWellSortedWithPrinter(h ASTHandle, warnings *diagnostic.WarningService, c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService) (bool, error) {
+	if c == nil || p == nil || g == nil {
+		return false, uparams.ErrParamsOwner
+	}
+	return m.isWellSorted(h, warnings, c, p, g)
+}
+
+func (m *ASTManager) isWellSorted(h ASTHandle, warnings *diagnostic.WarningService, c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService) (result bool, resultErr error) {
 	if e := m.lock(); e != nil {
 		return false, e
 	}
-	defer m.mu.Unlock()
+	var emitted []wellSortedWarning
+	defer func() {
+		m.mu.Unlock()
+		for _, warning := range emitted {
+			message := warning.text
+			if warning.app != (ASTHandle{}) && c != nil {
+				var e error
+				message, e = m.wellSortedMismatchWarning(warning, c, p, g)
+				if e != nil {
+					resultErr = errors.Join(resultErr, e)
+					continue
+				}
+			}
+			_ = warnings.Warning(message)
+		}
+	}()
 	root, e := m.requireExpr(h)
 	if e != nil {
 		return false, e
@@ -95,7 +138,7 @@ func (m *ASTManager) IsWellSorted(h ASTHandle, warnings *diagnostic.WarningServi
 				return false, err
 			}
 			if body != m.basic.boolSort {
-				_ = warnings.Warning("quantifier's body must be a boolean.")
+				emitted = append(emitted, wellSortedWarning{text: "quantifier's body must be a boolean."})
 				valid = false
 			}
 		case ASTApp:
@@ -106,7 +149,7 @@ func (m *ASTManager) IsWellSorted(h ASTHandle, warnings *diagnostic.WarningServi
 				return false, err
 			}
 			if a.count != d.arity && !flags.LeftAssociative && !flags.RightAssociative {
-				_ = warnings.Warning("unexpected number of arguments.")
+				emitted = append(emitted, wellSortedWarning{text: "unexpected number of arguments."})
 				valid = false
 				continue
 			}
@@ -131,7 +174,10 @@ func (m *ASTManager) IsWellSorted(h ASTHandle, warnings *diagnostic.WarningServi
 					return false, err
 				}
 				if actual != expected {
-					_ = warnings.Warning(fmt.Sprintf("Sort mismatch for argument %d", i+1))
+					emitted = append(emitted, wellSortedWarning{
+						text: fmt.Sprintf("Sort mismatch for argument %d", i+1),
+						app:  m.external(r), decl: m.external(a.decl), actual: m.external(actual), want: m.external(expected), argument: i + 1,
+					})
 					valid = false
 					break
 				}

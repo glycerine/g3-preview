@@ -184718,9 +184718,11 @@
         "pkg/shell/input_file_option.go",
         "pkg/api/api_global_params.go",
         "pkg/api/api_config_params.go",
-        "pkg/ast/ast_well_sorted.go"
+        "pkg/ast/ast_well_sorted.go",
+        "pkg/ast/ast_well_sorted_warning.go"
       ],
       "tests": [
+        "TestASTWellSortedSourceMismatchPrinter",
         "TestWarningSourceDefaultRoutingAndDisabledState",
         "TestWarningSourceBorrowedStreamTruncationAndFallback",
         "TestWarningShortWritePreservesSourceInsertionPrefix",
@@ -184837,7 +184839,13 @@
           ]
         },
         {
-          "name": "AST is_well_sorted sort-mismatch warning must include mk_ll_pp application, SMT2 expected and actual sorts, and SMT2 declaration (well_sorted.cpp:63-71); current Go warning stops after the argument index",
+          "name": "AST is_well_sorted sort-mismatch warning uses mk_ll_pp application, SMT2 expected and actual sorts, and SMT2 declaration when borrowed printer params are supplied (well_sorted.cpp:63-71)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_well_sorted_warning.go",
+          "tests": ["TestASTWellSortedSourceMismatchPrinter"]
+        },
+        {
+          "name": "Standalone AST managers without a matching process SMT2 parameter owner retain the short warning fallback; source global owner integration outside process binding remains open",
           "status": "partial",
           "go_target": "pkg/ast/ast_well_sorted.go",
           "tests": ["TestASTWellSortedApplicationGuardBranches"]
@@ -184936,9 +184944,11 @@
         "pkg/shell/input_file_option.go",
         "pkg/api/api_global_params.go",
         "pkg/api/api_config_params.go",
-        "pkg/ast/ast_well_sorted.go"
+        "pkg/ast/ast_well_sorted.go",
+        "pkg/ast/ast_well_sorted_warning.go"
       ],
       "tests": [
+        "TestASTWellSortedSourceMismatchPrinter",
         "TestWarningSourceDefaultRoutingAndDisabledState",
         "TestWarningSourceBorrowedStreamTruncationAndFallback",
         "TestWarningShortWritePreservesSourceInsertionPrefix",
@@ -185012,7 +185022,13 @@
           ]
         },
         {
-          "name": "AST is_well_sorted sort-mismatch warning must include mk_ll_pp application, SMT2 expected and actual sorts, and SMT2 declaration (well_sorted.cpp:63-71); current Go warning stops after the argument index",
+          "name": "AST is_well_sorted sort-mismatch warning uses mk_ll_pp application, SMT2 expected and actual sorts, and SMT2 declaration when borrowed printer params are supplied (well_sorted.cpp:63-71)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_well_sorted_warning.go",
+          "tests": ["TestASTWellSortedSourceMismatchPrinter"]
+        },
+        {
+          "name": "Standalone AST managers without a matching process SMT2 parameter owner retain the short warning fallback; source global owner integration outside process binding remains open",
           "status": "partial",
           "go_target": "pkg/ast/ast_well_sorted.go",
           "tests": ["TestASTWellSortedApplicationGuardBranches"]
