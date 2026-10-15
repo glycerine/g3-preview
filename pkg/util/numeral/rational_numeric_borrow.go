@@ -77,8 +77,39 @@ func (b *RationalNumericBorrow) BorrowInfInfinitesimal(v *OwnedInfRational) (Rat
 	return v.Second, nil
 }
 
+// InfRationalBorrow is a read-only view of the selected nested source Numeral.
+// Its methods are valid only while the numeric-borrow callback is active.
+type InfRationalBorrow struct {
+	scope *RationalNumericBorrow
+	value *OwnedInfRational
+}
+
+func (v InfRationalBorrow) First() (Rational, error) {
+	if !v.scope.Valid() {
+		return Rational{}, ErrRationalServiceOwner
+	}
+	return v.value.First, nil
+}
+
+func (v InfRationalBorrow) Infinitesimal() (Rational, error) {
+	if !v.scope.Valid() {
+		return Rational{}, ErrRationalServiceOwner
+	}
+	return v.value.Second, nil
+}
+
 // The inf_eps_rational accessors forward to the selected nested rational or
 // infinity coefficient. Each return borrows that component for this scope.
+func (b *RationalNumericBorrow) BorrowInfEpsNumeral(v *OwnedInfEpsInfRational) (InfRationalBorrow, error) {
+	if !b.Valid() {
+		return InfRationalBorrow{}, ErrRationalServiceOwner
+	}
+	if e := b.service.infEpsScalarOwner(v); e != nil {
+		return InfRationalBorrow{}, e
+	}
+	return InfRationalBorrow{scope: b, value: &v.numeral}, nil
+}
+
 func (b *RationalNumericBorrow) BorrowInfEpsRational(v *OwnedInfEpsInfRational) (Rational, error) {
 	if !b.Valid() {
 		return Rational{}, ErrRationalServiceOwner
