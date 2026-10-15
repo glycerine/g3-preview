@@ -126524,6 +126524,12 @@
           "tests": ["TestInfEpsInfPairConstructorOwnsIndependentComponents", "TestInfEpsInfFailurePrefixesImmediateRoots"]
         },
         {
+          "name": "inf_eps_rational<inf_rational>(Numeral const&) default infinity then FIRST/EPS copy and completed-member unwind (inf_eps_rational.h:87-90)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_eps_rational.go",
+          "tests": ["TestInfEpsInfNumeralConstructorOwnsIndependentComponents", "TestInfEpsInfFailurePrefixesImmediateRoots"]
+        },
+        {
           "name": "hash/display and owned component projections",
           "status": "partial",
           "go_target": "pkg/util/numeral/inf_eps_rational.go",

@@ -83,6 +83,29 @@ func TestInfEpsInfPairConstructorOwnsIndependentComponents(t *testing.T) {
 	serviceMust(t, s.InfEpsInfDel(&one))
 }
 
+func TestInfEpsInfNumeralConstructorOwnsIndependentComponents(t *testing.T) {
+	s, _ := serviceNew(t)
+	numeral := infValue(t, s, 5, 3, "-7/4")
+	value, err := s.InfEpsInfFromNumeral(&numeral)
+	serviceMust(t, err)
+	serviceMust(t, s.InfDel(&numeral))
+	infEpsText(t, s, &value, "(5/3 -e*7/4)")
+	serviceMust(t, s.InfEpsInfDel(&value))
+	for _, constant := range []struct {
+		makeValue func() (OwnedInfEpsInfRational, error)
+		text      string
+	}{
+		{s.InfEpsInfZero, "0"},
+		{s.InfEpsInfOne, "1"},
+		{s.InfEpsInfMinusOne, "-1"},
+	} {
+		v, e := constant.makeValue()
+		serviceMust(t, e)
+		infEpsText(t, s, &v, constant.text)
+		serviceMust(t, s.InfEpsInfDel(&v))
+	}
+}
+
 func TestInfEpsInfFiniteTripleOracles(t *testing.T) {
 	s, _ := serviceNew(t)
 	for i := int64(-1); i <= 1; i++ {
@@ -380,7 +403,7 @@ func infEpsAudit(t *testing.T, s *RationalService, values []*OwnedInfEpsInfRatio
 	qopsAuditLiveOwnership(t, s.Manager, roots)
 }
 func TestInfEpsInfFailurePrefixesImmediateRoots(t *testing.T) {
-	for op := 0; op < 23; op++ {
+	for op := 0; op < 24; op++ {
 		success := false
 		failures := 0
 		for prefix := int64(0); prefix < 512; prefix++ {
@@ -445,6 +468,8 @@ func TestInfEpsInfFailurePrefixesImmediateRoots(t *testing.T) {
 				projected, e = s.InfEpsInfGetNumeral(&a)
 			case 22:
 				out, e = s.InfEpsInfFromPair(&c, &numeral)
+			case 23:
+				out, e = s.InfEpsInfFromNumeral(&numeral)
 			}
 			infEpsAudit(t, s, []*OwnedInfEpsInfRational{&a, &b, &out}, []*OwnedInfRational{&numeral, &projected}, infEpsRootsWithFiller([]*OwnedRational{&c, &q}, filler)) // before restore, format, Del, Close
 			if e != nil {

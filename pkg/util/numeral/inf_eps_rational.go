@@ -124,6 +124,40 @@ func (s *RationalService) InfEpsInfFromPair(i *OwnedRational, n *OwnedInfRationa
 	}
 	return s.infEpsInfFromPairLocked(&i.Raw, n)
 }
+
+// The Numeral constructor first completes the default infinity member, then
+// copies the nested FIRST and EPS rationals in their declaration order.
+func (s *RationalService) infEpsInfFromNumeralLocked(n *OwnedInfRational) (_lexOut OwnedInfEpsInfRational, _lexErr error) {
+	if e := s.beginLexical(); e != nil {
+		return OwnedInfEpsInfRational{}, e
+	}
+	defer s.endLexicalEps(&_lexOut, &_lexErr)
+	v := s.infEpsInfEmpty()
+	if e := s.Manager.Copy(&v.numeral.First, &n.First); e != nil {
+		s.destroyLexicalRational(&v.infinity)
+		s.abortLexicalRational(&v.numeral.First)
+		return OwnedInfEpsInfRational{}, e
+	}
+	if e := s.Manager.Copy(&v.numeral.Second, &n.Second); e != nil {
+		s.destroyLexicalRational(&v.numeral.First)
+		s.destroyLexicalRational(&v.infinity)
+		s.abortLexicalRational(&v.numeral.Second)
+		return OwnedInfEpsInfRational{}, e
+	}
+	return v, nil
+}
+
+// InfEpsInfFromNumeral is the retained Numeral value constructor.
+func (s *RationalService) InfEpsInfFromNumeral(n *OwnedInfRational) (OwnedInfEpsInfRational, error) {
+	if e := s.lock(); e != nil {
+		return OwnedInfEpsInfRational{}, e
+	}
+	defer s.mu.Unlock()
+	if e := s.infScalarOwner(n); e != nil {
+		return OwnedInfEpsInfRational{}, e
+	}
+	return s.infEpsInfFromNumeralLocked(n)
+}
 func (s *RationalService) InfEpsInfNewValue() (OwnedInfEpsInfRational, error) {
 	if e := s.lock(); e != nil {
 		return OwnedInfEpsInfRational{}, e
@@ -274,27 +308,18 @@ func (s *RationalService) InfEpsInfSetInt32(v *OwnedInfEpsInfRational, n int32) 
 	}
 	return s.Manager.Reset(&v.numeral.Second)
 }
-func (s *RationalService) infEpsInfConstant(which uint8) (_lexOut OwnedInfEpsInfRational, _lexErr error) {
+func (s *RationalService) infEpsInfConstant(which uint8) (OwnedInfEpsInfRational, error) {
 	if e := s.lock(); e != nil {
 		return OwnedInfEpsInfRational{}, e
 	}
 	defer s.mu.Unlock()
-	if e := s.beginLexical(); e != nil {
-		return OwnedInfEpsInfRational{}, e
-	}
-	defer s.endLexicalEps(&_lexOut, &_lexErr)
-	v := s.infEpsInfEmpty()
 	n := &s.InfZeroField
 	if which == 1 {
 		n = &s.InfOneField
 	} else if which == 2 {
 		n = &s.InfMinusOneField
 	}
-	if e := s.infCopy(&v.numeral, n); e != nil {
-		s.infEpsInfDestroy(&v)
-		return OwnedInfEpsInfRational{}, e
-	}
-	return v, nil
+	return s.infEpsInfFromNumeralLocked(n)
 }
 func (s *RationalService) InfEpsInfZero() (OwnedInfEpsInfRational, error) {
 	return s.infEpsInfConstant(0)
