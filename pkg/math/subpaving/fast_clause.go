@@ -77,6 +77,9 @@ func (c *FastContext) checkInequality(a *FastInequality) error {
 
 func (c *FastContext) releaseInequality(a *FastInequality) error {
 	if a.refs > 0 {
+		if err := c.traceInequalityDecRef(a); err != nil {
+			return err
+		}
 		a.refs--
 	}
 	if a.refs == 0 {
@@ -151,6 +154,7 @@ func (c *FastContext) AddClause(atoms []*FastInequality, lemma, watched bool) (*
 	sort.SliceStable(copyAtoms, func(i, j int) bool { return copyAtoms[i].variable < copyAtoms[j].variable })
 	clause := &FastClause{context: c, atoms: copyAtoms, lemma: lemma, watched: watched}
 	for _, atom := range copyAtoms {
+		c.traceInequalityIncRef(atom)
 		atom.refs++
 	}
 	if watched {
@@ -173,6 +177,7 @@ func (c *FastContext) AddUnitClause(atom *FastInequality, axiom bool) error {
 	if err := c.checkInequality(atom); err != nil {
 		return err
 	}
+	c.traceInequalityIncRef(atom)
 	atom.refs++
 	c.unitClauses = append(c.unitClauses, fastUnitClause{atom: atom, axiom: axiom})
 	return nil
