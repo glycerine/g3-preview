@@ -7,6 +7,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/glycerine/g3/pkg/util/memory"
 )
 
 // TraceTags is the caller-owned, single-goroutine trace-tag control state.
@@ -17,7 +19,8 @@ type TraceTags struct {
 	writer  io.Writer
 	openErr error
 	// Source tout keeps badbit across records until an explicit reopen.
-	streamErr error
+	streamErr     error
+	memoryProcess *memory.ProcessAccounting
 }
 
 func NewTraceTags() *TraceTags { return &TraceTags{} }
@@ -263,4 +266,10 @@ func (t *TraceTags) EmitConditional(tag, function, file string, line int, condit
 }
 
 // Finalize releases the tag table. Source finalize_trace leaves the all flag.
-func (t *TraceTags) Finalize() { t.tags = nil }
+func (t *TraceTags) Finalize() {
+	if t.tags == nil {
+		return
+	}
+	t.tags = nil
+	t.traceTagTableDeallocated()
+}

@@ -178280,6 +178280,7 @@
         "pkg/model/model_evaluator_trace.go",
         "pkg/util/diagnostic/util_trace_tags.go",
         "pkg/util/diagnostic/util_trace_tags_memory_trace.go",
+        "pkg/util/process/initialize.go",
         "pkg/math/euclid/normalize_query_trace.go",
         "pkg/math/euclid/apply_solution_trace.go",
         "pkg/math/euclid/normalize_trace.go",
@@ -178349,6 +178350,7 @@
         "TestModelEvaluatorGetMacroSourceTraceBranches",
         "TestTraceTagsSourceControlAndFinalize",
         "TestTraceTagTableAllocationFollowsSourceGate",
+        "TestTraceTagTableFinalizationSuppressesMemoryDuringProcessFinalize",
         "TestEuclideanNormalizeQueryTraceBeforeAndAfterSubstitution",
         "TestEuclideanApplySolutionTraceBeforeAndAfterIntegerSwap",
         "TestEuclideanAssertNormalizeTraceDivisionAndGCDContradiction",
@@ -178449,6 +178451,12 @@
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_trace_tags_memory_trace.go",
           "tests": ["TestTraceTagTableAllocationFollowsSourceGate"]
+        },
+        {
+          "name": "finalize_trace table deallocation memory TRACE with source finalizing guard (trace.cpp:36-38)",
+          "status": "ported",
+          "go_target": "pkg/util/diagnostic/util_trace_tags_memory_trace.go",
+          "tests": ["TestTraceTagTableAllocationFollowsSourceGate", "TestTraceTagTableFinalizationSuppressesMemoryDuringProcessFinalize"]
         },
         {
           "name": "Disabled/commented MPZ array-GCD, MPN division and MPF to_rational TRACE text has no compiled emission (mpz.cpp:875; mpn.cpp:199-200; mpf.cpp:1547-1550)",

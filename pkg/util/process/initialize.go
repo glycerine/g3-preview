@@ -151,6 +151,9 @@ func InitializeGenerated(c InitializationConfig, maxSize uint64) (*Initialized, 
 	if result.Trace == nil {
 		result.Trace = diagnostic.BorrowProcessTraceTags()
 	}
+	if err = result.Trace.BindMemoryProcess(p); err != nil {
+		return result, err
+	}
 	if err = result.Globals.BindNamespaceTrace(result.Trace); err != nil {
 		return result, err
 	}
@@ -215,7 +218,12 @@ func (v *Initialized) Close() error {
 		}
 		v.Context = nil
 	}
-	v.Trace = nil
+	if v.Trace != nil {
+		if err := v.Trace.BindMemoryProcess(nil); err != nil {
+			return err
+		}
+		v.Trace = nil
+	}
 	if v.debugPrevious != nil {
 		if _, err := diagnostic.BindProcessDebugContext(v.debugPrevious); err != nil {
 			return err
