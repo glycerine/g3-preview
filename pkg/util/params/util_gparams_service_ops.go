@@ -34,6 +34,11 @@ func (s *GlobalParamsService) BindNamespaceTrace(t *udiag.TraceTags) error {
 		return e
 	}
 	s.namespaceTrace = t
+	for _, head := range []*GlobalParams{s.Current, s.Superseded, s.Failed} {
+		for g := head; g != nil; g = g.RetainedNext {
+			g.memoryTrace = t
+		}
+	}
 	return nil
 }
 

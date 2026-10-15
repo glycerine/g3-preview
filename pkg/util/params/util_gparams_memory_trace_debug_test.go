@@ -84,6 +84,45 @@ func TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset(t *testing.T) 
 	}
 }
 
+func TestGlobalParamsModuleCellMemoryTraceLateBindings(t *testing.T) {
+	s, _ := gparamsNamespaceFixture(t)
+	var oldOut, newOut bytes.Buffer
+	oldTags := udiag.NewTraceTagsWithWriter(&oldOut)
+	oldTags.Enable("memory")
+	paramsMust(t, s.BindNamespaceTrace(oldTags))
+	paramsMust(t, s.InitializeSource())
+	oldOut.Reset()
+	newTags := udiag.NewTraceTagsWithWriter(&newOut)
+	newTags.Enable("memory")
+	paramsMust(t, s.BindNamespaceTrace(newTags))
+	p := umemory.NewProcessAccounting()
+	r, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: s.Config.Budget, Process: p, SizeTBits: 64})
+	paramsMust(t, e)
+	t.Cleanup(func() { paramsMust(t, r.Close()) })
+	first, e := r.BeginSourceInitialize(1 << 25)
+	if e != nil || !first {
+		t.Fatal("source process initialization", first, e)
+	}
+	paramsMust(t, r.CompleteSourceInitialize())
+	paramsMust(t, s.BindMemoryProcess(p))
+	module, e := s.Symbols.Intern("late-bound-memory-cell")
+	paramsMust(t, e)
+	_, e = s.Current.GetParams(module)
+	paramsMust(t, e)
+	if oldOut.Len() != 0 || !strings.Contains(newOut.String(), "src/util/gparams.cpp:192 params_ref ") {
+		t.Fatalf("late trace binding did not reach the current module owner: old %q new %q", oldOut.String(), newOut.String())
+	}
+	active, e := p.BeginFinalize()
+	if e != nil || !active {
+		t.Fatal("source finalization guard", active, e)
+	}
+	paramsMust(t, s.FinalizeSource())
+	paramsMust(t, p.CompleteFinalize())
+	if oldOut.Len() != 0 || strings.Contains(newOut.String(), "dealloc ") {
+		t.Fatalf("late process binding did not suppress deallocation: old %q new %q", oldOut.String(), newOut.String())
+	}
+}
+
 func TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle(t *testing.T) {
 	s, _ := gparamsNamespaceFixture(t)
 	out := &gparamsTraceBodyRefusalWriter{failAt: 1, cause: errors.New("memory trace refused")}

@@ -123191,7 +123191,8 @@
         "TestGlobalParamsImpMemoryTraceAllocationAndDeallocationOrder",
         "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
         "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle",
-        "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset"
+        "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset",
+        "TestGlobalParamsModuleCellMemoryTraceLateBindings"
       ],
       "assertions": [
         {
@@ -123264,6 +123265,7 @@
           "go_target": "pkg/util/params/util_gparams_memory_trace.go",
           "tests": [
             "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset",
+            "TestGlobalParamsModuleCellMemoryTraceLateBindings",
             "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
             "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle"
           ]
@@ -123539,7 +123541,8 @@
         "TestGlobalParamsImpMemoryTraceAllocationAndDeallocationOrder",
         "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
         "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle",
-        "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset"
+        "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset",
+        "TestGlobalParamsModuleCellMemoryTraceLateBindings"
       ],
       "conditionals": [
         {
@@ -123560,6 +123563,7 @@
           "go_target": "pkg/util/params/util_gparams_memory_trace.go",
           "tests": [
             "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset",
+            "TestGlobalParamsModuleCellMemoryTraceLateBindings",
             "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
             "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle"
           ]
@@ -150507,7 +150511,8 @@
         "TestGlobalParamsImpMemoryTraceAllocationAndDeallocationOrder",
         "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
         "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle",
-        "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset"
+        "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset",
+        "TestGlobalParamsModuleCellMemoryTraceLateBindings"
       ],
       "conditionals": [
         {
@@ -150568,6 +150573,7 @@
           "go_target": "pkg/util/params/util_gparams_memory_trace.go",
           "tests": [
             "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset",
+            "TestGlobalParamsModuleCellMemoryTraceLateBindings",
             "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
             "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle"
           ]
@@ -151021,7 +151027,8 @@
         "TestGlobalParamsImpMemoryTraceAllocationAndDeallocationOrder",
         "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
         "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle",
-        "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset"
+        "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset",
+        "TestGlobalParamsModuleCellMemoryTraceLateBindings"
       ],
       "conditionals": [
         {
@@ -151086,6 +151093,7 @@
           "go_target": "pkg/util/params/util_gparams_memory_trace.go",
           "tests": [
             "TestGlobalParamsModuleCellMemoryTraceAllocationReuseAndReset",
+            "TestGlobalParamsModuleCellMemoryTraceLateBindings",
             "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
             "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle"
           ]

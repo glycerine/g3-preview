@@ -20,6 +20,11 @@ func (s *GlobalParamsService) BindMemoryProcess(p *umemory.ProcessAccounting) er
 		return umemory.ErrRuntimeOwner
 	}
 	s.memoryProcess = p
+	for _, head := range []*GlobalParams{s.Current, s.Superseded, s.Failed} {
+		for g := head; g != nil; g = g.RetainedNext {
+			g.memoryProcess = p
+		}
+	}
 	return nil
 }
 
