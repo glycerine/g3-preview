@@ -21,6 +21,9 @@ func (c *ArbitraryContext) PropagateMonomial(variable uint32, n *ArbitraryNode) 
 	if m == nil {
 		return arena.ErrInvalidSlot
 	}
+	if err = c.traceMonomialStart(variable); err != nil {
+		return err
+	}
 	c.numVisited++
 	m.visited = c.timestamp
 	foundZero, foundUnbounded := false, false
@@ -40,6 +43,9 @@ func (c *ArbitraryContext) PropagateMonomial(variable uint32, n *ArbitraryNode) 
 		}
 		unbounded := n.lower[power.Variable] == nil && n.upper[power.Variable] == nil
 		foundUnbounded = foundUnbounded || unbounded
+	}
+	if err = c.traceMonomialFlags(foundZero, foundUnbounded); err != nil {
+		return err
 	}
 	if foundZero {
 		alreadyZero, e := n.IsZero(variable)
@@ -140,6 +146,9 @@ func (c *ArbitraryContext) propagateMonomialUpward(m *ArbitraryMonomial, variabl
 }
 
 func (c *ArbitraryContext) propagateMonomialDownward(m *ArbitraryMonomial, variable uint32, j int, n *ArbitraryNode) (err error) {
+	if err = c.traceMonomialDownward(variable, j); err != nil {
+		return err
+	}
 	r, err := NewArbitraryInterval(c.numbers)
 	if err != nil {
 		return err
