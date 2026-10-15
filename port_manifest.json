@@ -178256,6 +178256,12 @@
           "tests": ["TestSATModelConstructionSourceTraceConverterThenValues"]
         },
         {
+          "name": "Reached SAT check_model failed clause, binary watch, assumption, and model-converter TRACE records (sat_solver.cpp:1299,1322,1331,1342)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_model_check_trace.go",
+          "tests": ["TestSATModelValidationSourceTraceFailures"]
+        },
+        {
           "name": "Reached SAT missed-propagation TRACE before unreachable assertion for live empty and unit clauses (sat_solver.cpp:3061)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_probing_diagnostics_trace.go",
@@ -179595,6 +179601,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_model_trace.go",
           "tests": ["TestSATModelConstructionSourceTraceConverterThenValues"]
+        },
+        {
+          "name": "Reached SAT check_model failed clause, binary watch, assumption, and model-converter TRACE records (sat_solver.cpp:1299,1322,1331,1342)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_model_check_trace.go",
+          "tests": ["TestSATModelValidationSourceTraceFailures"]
         },
         {
           "name": "Reached SAT missed-propagation TRACE before unreachable assertion for live empty and unit clauses (sat_solver.cpp:3061)",

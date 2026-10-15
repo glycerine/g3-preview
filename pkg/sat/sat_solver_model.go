@@ -70,6 +70,7 @@ func (s *Solver) checkModelSpan(model satSolverModelSpan) (bool, error) {
 				return false, e
 			}
 			if !yes {
+				s.traceModelFailedClause(c, model)
 				ok = false
 			}
 		}
@@ -105,6 +106,7 @@ func (s *Solver) checkModelSpan(model satSolverModelSpan) (bool, error) {
 					return false, e
 				}
 				if value != lbool.True {
+					s.traceModelFailedBinary(Literal(idx).Negated(), l, w.LearnedUnchecked())
 					ok = false
 				}
 			}
@@ -124,11 +126,19 @@ func (s *Solver) checkModelSpan(model satSolverModelSpan) (bool, error) {
 			return false, e
 		}
 		if v != lbool.True {
+			s.traceModelFailedAssumption(Literal(l), model)
 			ok = false
 		}
 	}
 	if ok {
-		return s.converter.checkModelSpan(model)
+		good, e := s.converter.checkModelSpan(model)
+		if e != nil {
+			return false, e
+		}
+		if !good {
+			s.traceModelFailedConverter(model)
+		}
+		return good, nil
 	}
 	return false, nil
 }
