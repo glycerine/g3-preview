@@ -53400,6 +53400,12 @@
           "tests": ["TestFixedClauseAndUnitTracePublicationOrder", "TestFixedClauseAndUnitTraceFailureBoundaries"]
         },
         {
+          "name": "Concrete config_mpfx inequality pre-increment and pre-decrement reference TRACE (subpaving_t_def.h:786-799)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_refcount_trace.go",
+          "tests": ["TestFixedInequalityReferenceTraceSourceOrder", "TestFixedInequalityReferenceTraceRefusalAndStoppedRelease"]
+        },
+        {
           "name": "Concrete config_mpfx clause-propagation TRACE before visit and before selected inequality bound publication (subpaving_t_def.h:1376,1400)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_clause_propagate_trace.go",
@@ -54876,6 +54882,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_clause_trace.go",
           "tests": ["TestFixedClauseAndUnitTracePublicationOrder", "TestFixedClauseAndUnitTraceFailureBoundaries"]
+        },
+        {
+          "name": "Concrete config_mpfx inequality pre-increment and pre-decrement reference TRACE (subpaving_t_def.h:786-799)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_refcount_trace.go",
+          "tests": ["TestFixedInequalityReferenceTraceSourceOrder", "TestFixedInequalityReferenceTraceRefusalAndStoppedRelease"]
         },
         {
           "name": "Concrete config_mpfx clause-propagation TRACE before visit and before selected inequality bound publication (subpaving_t_def.h:1376,1400)",
@@ -177441,6 +177453,12 @@
           "tests": ["TestFixedClauseAndUnitTracePublicationOrder", "TestFixedClauseAndUnitTraceFailureBoundaries"]
         },
         {
+          "name": "Reached config_mpfx inequality reference-count TRACE records (subpaving_t_def.h:786-799)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_refcount_trace.go",
+          "tests": ["TestFixedInequalityReferenceTraceSourceOrder", "TestFixedInequalityReferenceTraceRefusalAndStoppedRelease"]
+        },
+        {
           "name": "Reached config_mpfx clause-propagation TRACE before visit and selected bound publication (subpaving_t_def.h:1376,1400)",
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_clause_propagate_trace.go",
@@ -178365,6 +178383,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_clause_trace.go",
           "tests": ["TestFixedClauseAndUnitTracePublicationOrder", "TestFixedClauseAndUnitTraceFailureBoundaries"]
+        },
+        {
+          "name": "Reached config_mpfx inequality reference-count TRACE records (subpaving_t_def.h:786-799)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/fixed_refcount_trace.go",
+          "tests": ["TestFixedInequalityReferenceTraceSourceOrder", "TestFixedInequalityReferenceTraceRefusalAndStoppedRelease"]
         },
         {
           "name": "Reached config_mpfx clause-propagation TRACE before visit and selected bound publication (subpaving_t_def.h:1376,1400)",
