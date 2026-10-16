@@ -74909,8 +74909,8 @@
           ]
         },
         {
-          "name": "Retained cleaner operator cleaner_bug process assertion/tag gate at entry and exit; selected nested Boolean-variable and watch SASSERT actions ported, other checker diagnostics remain open (sat_cleaner.cpp:184,200)",
-          "status": "partial",
+          "name": "Retained cleaner operator cleaner_bug process assertion/tag gate and actual invariant call at entry and exit (sat_cleaner.cpp:184,200); nested checker diagnostics have separate method rows",
+          "status": "ported",
           "go_target": "pkg/sat/sat_cleaner_assertion.go",
           "tests": ["TestSATCleanerInvariantUsesProcessDebugGate", "TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder", "TestSATIntegrityEliminatedWatchSourceTrace", "TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         },
@@ -122990,8 +122990,8 @@
           "tests": ["TestSATConflictMarkAssertionUsesProcessDebugTagAndActions"]
         },
         {
-          "name": "Retained SAT cleaner_bug CASSERT process assertion/tag gate and invariant call; nested checker SASSERT diagnostics remain open (sat_cleaner.cpp:184,200)",
-          "status": "partial",
+          "name": "Retained SAT cleaner_bug CASSERT process assertion/tag gate and actual invariant call at entry and exit (sat_cleaner.cpp:184,200); nested checker diagnostics have separate method rows",
+          "status": "ported",
           "go_target": "pkg/sat/sat_cleaner_assertion.go",
           "tests": ["TestSATCleanerInvariantUsesProcessDebugGate"]
         },
@@ -123447,8 +123447,8 @@
           "tests": ["TestSATConflictMarkAssertionUsesProcessDebugTagAndActions"]
         },
         {
-          "name": "Retained SAT cleaner_bug CASSERT process assertion/tag gate and invariant call; nested checker SASSERT diagnostics remain open (sat_cleaner.cpp:184,200)",
-          "status": "partial",
+          "name": "Retained SAT cleaner_bug CASSERT process assertion/tag gate and actual invariant call at entry and exit (sat_cleaner.cpp:184,200); nested checker diagnostics have separate method rows",
+          "status": "ported",
           "go_target": "pkg/sat/sat_cleaner_assertion.go",
           "tests": ["TestSATCleanerInvariantUsesProcessDebugGate"]
         },
