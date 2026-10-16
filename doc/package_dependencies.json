@@ -240,6 +240,7 @@
         "ast_fpa_special_decl.go",
         "ast_fpa_value_binding.go",
         "ast_fpa_value_table.go",
+        "ast_func_decl_info_text.go",
         "ast_info.go",
         "ast_info_memory_trace.go",
         "ast_label.go",

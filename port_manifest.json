@@ -9820,6 +9820,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_func_decl_info_text.go",
+        "pkg/ast/ast_func_decl_info_text_test.go",
         "pkg/ast/ast_resource_limit.go",
         "pkg/ast/ast_basic_plugin.go",
         "pkg/ast/ast_basic_plugin_finalize.go",
@@ -9913,6 +9915,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestASTFuncDeclInfoSourceText",
         "TestASTResourceLimitSourceCanceledCountsAndScopes",
         "TestASTResourceLimitOwnedStorageAndIndependentFormat",
         "TestASTAllEagerPluginBranches",
@@ -10649,6 +10652,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "source parameter ostream and attached func_decl_info display: six parameter kinds, family/kind and nine flags for retained extension-model declaration metadata; non-finite double ostream profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_func_decl_info_text.go",
+          "tests": ["TestASTFuncDeclInfoSourceText"]
+        },
+        {
           "name": "mk_quantifier debug-only pattern TRACE before pattern assertion and node allocation (ast.cpp:2356-2361); selected pattern application profile",
           "status": "partial",
           "go_target": "pkg/ast/ast_core_quantifier_pattern_trace.go",
@@ -11194,6 +11203,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_func_decl_info_text.go",
+        "pkg/ast/ast_func_decl_info_text_test.go",
         "pkg/ast/ast_resource_limit.go",
         "pkg/ast/ast_basic_plugin.go",
         "pkg/ast/ast_basic_plugin_finalize.go",
@@ -11265,6 +11276,7 @@
         "pkg/ast/ast_parameter_memory_trace_debug_test.go"
       ],
       "tests": [
+        "TestASTFuncDeclInfoSourceText",
         "TestASTResourceLimitSourceCanceledCountsAndScopes",
         "TestASTResourceLimitOwnedStorageAndIndependentFormat",
         "TestASTAllEagerPluginBranches",
@@ -11684,6 +11696,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "source parameter ostream and attached func_decl_info display: six parameter kinds, family/kind and nine flags for retained extension-model declaration metadata; non-finite double ostream profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_func_decl_info_text.go",
+          "tests": ["TestASTFuncDeclInfoSourceText"]
+        },
         {
           "name": "family_manager constructor next0 and concrete symbol/name members",
           "status": "ported",
@@ -104658,12 +104676,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/tactic_extension_model_trace.go",
+        "pkg/ast/ast_func_decl_info_text.go",
         "pkg/model/model_v2_display.go",
         "pkg/tactic/tactic_extension_model_trace_test.go",
         "pkg/model/model_evaluator_function_memory_trace.go",
         "pkg/tactic/tactic_extension_model.go"
       ],
       "tests": [
+        "TestExtensionModelTraceAttachedDeclarationInfo",
         "TestExtensionModelDefinitionSourceTraceReverseOrder",
         "TestExtensionModelFunctionMemoryWrapperFollowsModelCore",
         "TestTacticExtensionModelOriginalReverseDefinitionOrder",
@@ -104691,11 +104711,11 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "extension_mc model_v2_pp and declaration-info snapshots before and after reverse definition reconstruction at cpp:49,71; plain declaration metadata and Boolean SMT2 profiles",
+          "name": "extension_mc model_v2_pp and declaration-info snapshots before and after reverse definition reconstruction at cpp:49,71; attached declaration metadata and Boolean SMT2 profiles",
           "status": "partial",
           "go_target": "pkg/tactic/tactic_extension_model_trace.go",
           "go_targets": ["pkg/model/model_v2_display.go"],
-          "tests": ["TestExtensionModelDefinitionSourceTraceReverseOrder"]
+          "tests": ["TestExtensionModelDefinitionSourceTraceReverseOrder", "TestExtensionModelTraceAttachedDeclarationInfo"]
         },
         {
           "name": "Reached extension_model_converter::operator() per-definition extension_mc TRACE at extension_model_converter.cpp:59, reverse evaluated order and SMT2 values",
@@ -180885,6 +180905,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/tactic_extension_model_trace.go",
+        "pkg/ast/ast_func_decl_info_text.go",
         "pkg/model/model_v2_display.go",
         "pkg/ast/pattern/reduce_quantifier_trace.go",
         "pkg/ast/pattern/pattern_stage_trace.go",
@@ -180973,6 +180994,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestExtensionModelTraceAttachedDeclarationInfo",
         "TestExtensionModelDefinitionSourceTraceReverseOrder",
         "TestModelEvaluatorBooleanReductionSourceStatusTrace",
         "TestModelEvaluatorDirectEntrySourceTrace",
@@ -181098,11 +181120,11 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Reached extension_mc pre/post model snapshots at extension_model_converter.cpp:49,71 using concrete model_v2_pp and plain declaration metadata; built-in func_decl_info display remains open",
+          "name": "Reached extension_mc pre/post model snapshots at extension_model_converter.cpp:49,71 using concrete model_v2_pp and attached func_decl_info metadata; non-finite double ostream profiles remain open",
           "status": "partial",
           "go_target": "pkg/tactic/tactic_extension_model_trace.go",
           "go_targets": ["pkg/model/model_v2_display.go"],
-          "tests": ["TestExtensionModelDefinitionSourceTraceReverseOrder"]
+          "tests": ["TestExtensionModelDefinitionSourceTraceReverseOrder", "TestExtensionModelTraceAttachedDeclarationInfo"]
         },
         {
           "name": "Selected extract_array_func_interp model_evaluator TRACE at cpp:435,451,476,482,497 with source SMT2 array and fallback rendering; non-ground entry branch at 468 is wired but retained function-entry construction rejects its test input",
@@ -182903,6 +182925,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/tactic_extension_model_trace.go",
+        "pkg/ast/ast_func_decl_info_text.go",
         "pkg/model/model_v2_display.go",
         "pkg/ast/pattern/reduce_quantifier_trace.go",
         "pkg/ast/pattern/pattern_stage_trace.go",
@@ -182989,6 +183012,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestExtensionModelTraceAttachedDeclarationInfo",
         "TestExtensionModelDefinitionSourceTraceReverseOrder",
         "TestModelEvaluatorBooleanReductionSourceStatusTrace",
         "TestModelEvaluatorDirectEntrySourceTrace",
@@ -183124,11 +183148,11 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Reached extension_mc pre/post model snapshots at extension_model_converter.cpp:49,71 using concrete model_v2_pp and plain declaration metadata; built-in func_decl_info display remains open",
+          "name": "Reached extension_mc pre/post model snapshots at extension_model_converter.cpp:49,71 using concrete model_v2_pp and attached func_decl_info metadata; non-finite double ostream profiles remain open",
           "status": "partial",
           "go_target": "pkg/tactic/tactic_extension_model_trace.go",
           "go_targets": ["pkg/model/model_v2_display.go"],
-          "tests": ["TestExtensionModelDefinitionSourceTraceReverseOrder"]
+          "tests": ["TestExtensionModelDefinitionSourceTraceReverseOrder", "TestExtensionModelTraceAttachedDeclarationInfo"]
         },
         {
           "name": "Selected extract_array_func_interp model_evaluator TRACE at cpp:435,451,476,482,497 with source SMT2 array and fallback rendering; non-ground entry branch at 468 is wired but retained function-entry construction rejects its test input",

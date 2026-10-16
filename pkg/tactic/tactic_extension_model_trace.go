@@ -103,11 +103,23 @@ func (c *tacticExtensionModelConverter) traceExtensionModel(md *model.ModelCore,
 				if err = c.writeExtensionSort(w, sort); err != nil {
 					return err
 				}
+				if _, err = io.WriteString(w, ") "); err != nil {
+					return err
+				}
+				info, present, err := c.manager.FuncDeclInfoText(d)
+				if err != nil {
+					return err
+				}
+				if present {
+					if _, err = io.WriteString(w, info); err != nil {
+						return err
+					}
+				}
 				id, err := c.manager.GetASTID(d)
 				if err != nil {
 					return err
 				}
-				if _, err = io.WriteString(w, ")  :id "+strconv.FormatUint(uint64(id), 10)+"\n"); err != nil {
+				if _, err = io.WriteString(w, " :id "+strconv.FormatUint(uint64(id), 10)+"\n"); err != nil {
 					return err
 				}
 			}
