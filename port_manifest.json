@@ -12688,7 +12688,7 @@
           ]
         },
         {
-          "name": "smt2_printer selected unannotated quantified Boolean root: source named binders, sort documents, scoped body and mk_seq3 wrapper (ast_smt2_pp.cpp:872-989); annotation and automatic-name branches remain open",
+          "name": "smt2_printer selected unannotated quantified Boolean root: source named/numerical/duplicate binders, collision suffixes, sort documents, scoped body and mk_seq3 wrapper (ast_smt2_pp.cpp:872-989); annotation branches remain open",
           "status": "partial",
           "go_target": "pkg/ast/ast_smt2_quantifier_root.go",
           "tests": ["TestASTSMT2UnannotatedQuantifierRootSourceFormat"]

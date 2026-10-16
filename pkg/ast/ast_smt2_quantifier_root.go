@@ -3,12 +3,14 @@
 package ast
 
 import (
+	"strconv"
+
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // smt2PPQuantifierRoot prints the reached unannotated binder profile.
-// Other source annotation and automatic-name branches still need their
-// declaration scopes and are refused until those paths are ported.
+// Source numeric and duplicate binder names receive fresh !N suffixes.
+// Annotation branches still need their declaration scopes.
 func (m *ASTManager) smt2PPQuantifierRoot(q ASTHandle, outer []usymbol.Symbol) (ASTHandle, error) {
 	count, err := m.GetNumDeclarations(q)
 	if err != nil || count == 0 {
@@ -48,15 +50,41 @@ func (m *ASTManager) smt2PPQuantifierRoot(q ASTHandle, outer []usymbol.Symbol) (
 		if e != nil {
 			return ASTHandle{}, e
 		}
-		if name.IsNull() || name.IsNumerical() {
+		if name.IsNull() {
 			return ASTHandle{}, ErrASTDomain
 		}
-		spelling, e := m.smt2EnsureQuote(name)
-		if e != nil {
-			return ASTHandle{}, e
+		spelling := ""
+		prefix := "x"
+		if !name.IsNumerical() {
+			spelling, e = m.smt2EnsureQuote(name)
+			if e != nil {
+				return ASTHandle{}, e
+			}
+			prefix = spelling
 		}
-		if used[spelling] {
-			return ASTHandle{}, ErrASTDomain
+		if name.IsNumerical() || used[spelling] {
+			for suffix := uint32(1); ; suffix++ {
+				candidate := prefix + "!" + strconv.FormatUint(uint64(suffix), 10)
+				if used[candidate] {
+					if suffix == ^uint32(0) {
+						return ASTHandle{}, ErrASTDomain
+					}
+					continue
+				}
+				name, e = m.Symbols.Intern(candidate)
+				if e != nil {
+					return ASTHandle{}, e
+				}
+				printed, quoteErr := m.smt2EnsureQuote(name)
+				if quoteErr != nil {
+					return ASTHandle{}, quoteErr
+				}
+				if printed != candidate {
+					return ASTHandle{}, ErrASTDomain
+				}
+				spelling = candidate
+				break
+			}
 		}
 		used[spelling] = true
 		binders = append(binders, name)

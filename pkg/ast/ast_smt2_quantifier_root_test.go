@@ -16,6 +16,7 @@ func TestASTSMT2UnannotatedQuantifierRootSourceFormat(t *testing.T) {
 	paramsMust(t, err)
 	x := astTestSymbol(t, m, "x")
 	y := astTestSymbol(t, m, "y")
+	xBang1 := astTestSymbol(t, m, "x!1")
 	body, err := m.MkVar(0, boolSort)
 	paramsMust(t, err)
 	print := func(h ASTHandle) string {
@@ -37,6 +38,10 @@ func TestASTSMT2UnannotatedQuantifierRootSourceFormat(t *testing.T) {
 	}{
 		{true, []usymbol.Symbol{x}, "(forall ((x Bool)) x)"},
 		{false, []usymbol.Symbol{x, y}, "(exists ((x Bool) (y Bool)) y)"},
+		{true, []usymbol.Symbol{usymbol.Numerical(0)}, "(forall ((x!1 Bool)) x!1)"},
+		{false, []usymbol.Symbol{usymbol.Numerical(0), usymbol.Numerical(1)}, "(exists ((x!1 Bool) (x!2 Bool)) x!2)"},
+		{true, []usymbol.Symbol{x, x}, "(forall ((x Bool) (x!1 Bool)) x!1)"},
+		{true, []usymbol.Symbol{xBang1, usymbol.Numerical(0)}, "(forall ((x!1 Bool) (x!2 Bool)) x!2)"},
 	} {
 		sorts := make([]ASTHandle, len(tc.names))
 		for i := range sorts {

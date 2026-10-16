@@ -70,6 +70,8 @@ func TestAIGExprCacheReleaseTracePrecedesLastReference(t *testing.T) {
 	aigMust(t, err)
 	bound, err := m.MkVar(0, sort)
 	aigMust(t, err)
+	boundPin, err := m.NewRef(bound)
+	aigMust(t, err)
 	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []symbol.Symbol{binder}, Body: bound})
 	aigMust(t, err)
 	r, err = g.MkAIG(quantifier)
@@ -78,7 +80,17 @@ func TestAIGExprCacheReleaseTracePrecedesLastReference(t *testing.T) {
 		t.Fatalf("quantifier variable cache result missing: %q", output.String())
 	}
 	aigMust(t, r.Close())
+	output.Reset()
+	numericQuantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []symbol.Symbol{symbol.Numerical(0)}, Body: bound})
+	aigMust(t, err)
+	r, err = g.MkAIG(numericQuantifier)
+	aigMust(t, err)
+	if tags.ShouldTrace("expr2aig") && !strings.Contains(output.String(), "caching:\n(forall ((x!1 Bool)) x!1)\n---> #") {
+		t.Fatalf("numeric-binder quantifier cache result missing: %q", output.String())
+	}
+	aigMust(t, r.Close())
 	aigMust(t, g.Close())
+	aigMust(t, m.DelRef(&boundPin))
 	if strings.Contains(output.String(), "aig_lit_count") {
 		t.Fatal("unenabled deletion tag emitted")
 	}
