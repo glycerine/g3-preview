@@ -12,23 +12,26 @@ import (
 // BoundEquationStore owns the linear constraints, variable watches and bounds
 // used by the arithmetic bound propagator.
 type BoundEquationStore struct {
-	self           *BoundEquationStore
-	manager        *numeral.RationalManager
-	trace          *diagnostic.TraceTags
-	equations      *LinearEquationManager
-	constraints    []equationConstraint
-	variables      []equationVariable
-	trail          []*equationBound
-	qhead          int
-	conflict       uint32
-	timestamp      uint32
-	maxRefinements uint32
-	threshold      float64
-	smallInterval  float64
-	propagations   uint32
-	falseAlarms    uint32
-	strict2double  float64
-	closed         bool
+	self                *BoundEquationStore
+	manager             *numeral.RationalManager
+	trace               *diagnostic.TraceTags
+	equations           *LinearEquationManager
+	constraints         []equationConstraint
+	variables           []equationVariable
+	trail               []*equationBound
+	qhead               int
+	conflict            uint32
+	timestamp           uint32
+	maxRefinements      uint32
+	threshold           float64
+	smallInterval       float64
+	propagations        uint32
+	falseAlarms         uint32
+	strict2double       float64
+	closeTrailRemaining int
+	deleteIndex         int
+	closing             bool
+	closed              bool
 }
 
 type equationConstraint struct {
@@ -62,7 +65,7 @@ func (s *BoundEquationStore) open() error {
 	if s == nil || s.self != s || s.equations == nil {
 		return arena.ErrInvalidSlot
 	}
-	if s.closed {
+	if s.closed || s.closing {
 		return arena.ErrClosed
 	}
 	return s.equations.open()
@@ -189,12 +192,18 @@ func (s *BoundEquationStore) DeleteConstraints() error {
 	if err := s.open(); err != nil {
 		return err
 	}
-	for i := range s.constraints {
-		if err := s.constraints[i].eq.Close(); err != nil {
+	return s.deleteConstraintsCore()
+}
+
+func (s *BoundEquationStore) deleteConstraintsCore() error {
+	for s.deleteIndex < len(s.constraints) {
+		if err := s.constraints[s.deleteIndex].eq.Close(); err != nil {
 			return err
 		}
+		s.deleteIndex++
 	}
 	s.constraints = nil
+	s.deleteIndex = 0
 	for i := range s.variables {
 		s.variables[i].watches = nil
 	}
@@ -208,13 +217,27 @@ func (s *BoundEquationStore) Close() error {
 	if s.closed {
 		return nil
 	}
-	for i := len(s.trail) - 1; i >= 0; i-- {
-		if err := s.manager.Del(&s.trail[i].value); err != nil {
+	if !s.closing {
+		s.closing = true
+		s.closeTrailRemaining = len(s.trail)
+	}
+	for s.closeTrailRemaining > 0 {
+		i := s.closeTrailRemaining - 1
+		b := s.trail[i]
+		v := &s.variables[b.x]
+		if b.lower && v.lower == b {
+			v.lower = b.prev
+		} else if !b.lower && v.upper == b {
+			v.upper = b.prev
+		}
+		if err := s.manager.Del(&b.value); err != nil {
 			return err
 		}
+		s.trail[i] = nil
+		s.closeTrailRemaining--
 	}
 	s.trail = nil
-	if err := s.DeleteConstraints(); err != nil {
+	if err := s.deleteConstraintsCore(); err != nil {
 		return err
 	}
 	if err := s.equations.Close(); err != nil {
@@ -222,6 +245,9 @@ func (s *BoundEquationStore) Close() error {
 	}
 	s.variables = nil
 	s.trace = nil
+	s.qhead = 0
+	s.timestamp = 0
+	s.conflict = noEquationPosition
 	s.closed = true
 	return nil
 }

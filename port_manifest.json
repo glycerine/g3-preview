@@ -100467,6 +100467,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained bound_propagator destructor reset reverse bound trail and ascending constraint destruction, with stopped Go owning continuation (cpp:81-112,742-758)",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_equation_store.go",
+          "tests": ["TestBoundEquationStoreCloseResumesReverseTrailAfterStoppedRelease", "TestBoundEquationStoreCloseResumesConstraintRelease"]
+        },
+        {
           "name": "equation constraint allocation, variable watch registration, variable-deletion dead mark and constraint deletion ownership",
           "status": "ported",
           "go_target": "pkg/tactic/arith/bound_equation_store.go",
@@ -100625,6 +100631,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete bound-propagator owned trail/constraint cleanup and stopped Go owning continuation through the retained tactic destructor",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_equation_store.go",
+          "tests": ["TestBoundEquationStoreCloseResumesReverseTrailAfterStoppedRelease", "TestBoundEquationStoreCloseResumesConstraintRelease"]
+        },
         {
           "name": "equation constraint allocation, variable watch registration, variable-deletion dead mark and constraint deletion ownership",
           "status": "ported",
@@ -163122,6 +163134,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained bound-propagator reverse trail mpq deletion consumer with stopped Go owning continuation (bound_propagator.cpp:214-235,742-758)",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_equation_store.go",
+          "tests": ["TestBoundEquationStoreCloseResumesReverseTrailAfterStoppedRelease", "TestBoundEquationStoreCloseResumesConstraintRelease"]
+        },
+        {
           "name": "mpq default construction/is_small",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpq.go",
@@ -187806,6 +187824,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained bound-propagator trail and constraint vector cleanup uses native slices with source reverse/ascending destruction and stopped Go owning continuation",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_equation_store.go",
+          "tests": ["TestBoundEquationStoreCloseResumesReverseTrailAfterStoppedRelease", "TestBoundEquationStoreCloseResumesConstraintRelease"]
+        },
         {
           "name": "Concrete expr_abstractor borrowed application worklist and mk_forall/mk_exists sort/name buffers use native typed Go slices (expr_abstract.cpp:33-106,122-130)",
           "status": "platform_replacement",
