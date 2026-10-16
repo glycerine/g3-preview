@@ -249,7 +249,7 @@ type ASTManager struct {
 	allocator                                                                                          *arena.SmallBytes
 	Format                                                                                             *ASTManager
 	proofMode                                                                                          ASTProofMode
-	coercions, Closed, closing, debugNondeterminism                                                    bool
+	coercions, Closed, closing                                                                         bool
 	sourceDTStarted, sourceDTCompleted, sourceClosing, traceEOFReached                                 bool
 	sourceDTCause, errorOwnClose                                                                       error
 	constructorComplete                                                                                bool

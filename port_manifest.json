@@ -121810,6 +121810,12 @@
           "tests": []
         },
         {
+          "name": "Retained AST nondet_bug CASSERT process assertion/tag gate and structural scan before interning; assertion notification/action continuation remains open (ast.cpp:1669-1672)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_core_debug.go",
+          "tests": ["TestASTNondeterminismTraceFollowsProcessDebugTag"]
+        },
+        {
           "name": "Process debug owner with default streams, tied input and interactive action; generated initializer borrowing and heap CASSERT state",
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_debug_process.go",
@@ -122138,6 +122144,12 @@
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_debug_context.go",
           "tests": []
+        },
+        {
+          "name": "Retained AST nondet_bug CASSERT process assertion/tag gate and structural scan before interning; assertion notification/action continuation remains open (ast.cpp:1669-1672)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_core_debug.go",
+          "tests": ["TestASTNondeterminismTraceFollowsProcessDebugTag"]
         },
         {
           "name": "Process debug owner with default streams, tied input and interactive action; generated initializer borrowing and heap CASSERT state",
@@ -180650,6 +180662,12 @@
           "tests": ["TestASTRegistrationSourceTraceRecords"]
         },
         {
+          "name": "Reached AST slow_not_contains nondet_bug TRACE with source IDs and recomputed hashes before conditional assertion refusal (ast.cpp:1650-1653)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_nondeterminism_trace.go",
+          "tests": ["TestASTNondeterminismTraceFollowsProcessDebugTag"]
+        },
+        {
           "name": "Reached AST delete_node ast, del_quantifier and mk_var_bug records before table erase (ast.cpp:1790-1792)",
           "status": "ported",
           "go_target": "pkg/ast/ast_core_delete_trace.go",
@@ -182363,6 +182381,12 @@
           "go_target": "pkg/ast/ast_core_register_trace.go",
           "go_targets": ["pkg/ast/ast_core_register_trace_test.go"],
           "tests": ["TestASTRegistrationSourceTraceRecords"]
+        },
+        {
+          "name": "Reached AST slow_not_contains nondet_bug TRACE with source IDs and recomputed hashes before conditional assertion refusal (ast.cpp:1650-1653)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_nondeterminism_trace.go",
+          "tests": ["TestASTNondeterminismTraceFollowsProcessDebugTag"]
         },
         {
           "name": "Reached AST delete_node ast, del_quantifier and mk_var_bug records before table erase (ast.cpp:1790-1792)",

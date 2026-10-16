@@ -2,6 +2,8 @@
 
 package ast
 
+import "github.com/glycerine/g3/pkg/util/diagnostic"
+
 const ASTSourceDebug = true
 
 func (m *ASTManager) registrationBefore(r astNodeRef) (bool, error) {
@@ -9,7 +11,15 @@ func (m *ASTManager) registrationBefore(r astNodeRef) (bool, error) {
 	if e != nil {
 		return false, e
 	}
-	if !contains && m.debugNondeterminism {
+	if !contains {
+		debug := diagnostic.BorrowProcessDebugContext()
+		enabled, e := debug.ConditionalAssertionEnabled("nondet_bug")
+		if e != nil {
+			return false, e
+		}
+		if !enabled {
+			return contains, nil
+		}
 		count := uint32(0)
 		for _, curr := range m.table.entries.All() {
 			equal, e := m.compareNodes(curr, r)
@@ -17,6 +27,9 @@ func (m *ASTManager) registrationBefore(r astNodeRef) (bool, error) {
 				return false, e
 			}
 			if equal {
+				if e := m.traceNondeterminismCollision(curr, r); e != nil {
+					return false, e
+				}
 				return false, ErrASTDomain
 			}
 			if m.nodeAt(curr.slot).kind == ASTApp && m.nodeAt(r.slot).kind == ASTApp {
