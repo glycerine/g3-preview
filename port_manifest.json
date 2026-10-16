@@ -70174,8 +70174,8 @@
       "component": "parsers",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/parsers/smt2/local_environment.go", "pkg/parsers/smt2/local_lookup.go", "pkg/parsers/smt2/local_sort_stack.go", "pkg/parsers/smt2/local_expr_stack.go"],
-      "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders", "TestSMT2ParserQualifiedLocalSortAndIndexRefusals", "TestSMT2LocalReferenceStacksFrameShrinkAndReset", "TestSMT2QualifiedLocalExpressionOwnerAndFrameCleanup"],
+      "go_targets": ["pkg/parsers/smt2/local_environment.go", "pkg/parsers/smt2/local_lookup.go", "pkg/parsers/smt2/local_sort_stack.go", "pkg/parsers/smt2/local_expr_stack.go", "pkg/parsers/smt2/local_sort_names.go"],
+      "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders", "TestSMT2ParserQualifiedLocalSortAndIndexRefusals", "TestSMT2LocalReferenceStacksFrameShrinkAndReset", "TestSMT2QualifiedLocalExpressionOwnerAndFrameCleanup", "TestSMT2SortAndDatatypeNameTablesSourceScopes"],
       "assertions": [
         {
           "line": 250,
@@ -70707,6 +70707,12 @@
           "go_target": "pkg/parsers/smt2/local_expr_stack.go",
           "go_targets": ["pkg/parsers/smt2/local_sort_stack.go"],
           "tests": ["TestSMT2LocalReferenceStacksFrameShrinkAndReset", "TestSMT2QualifiedLocalExpressionOwnerAndFrameCleanup"]
+        },
+        {
+          "name": "Selected sort-parameter and datatype declaration name bookkeeping with source reset boundaries; scanner and parameterized-sort construction remain open",
+          "status": "partial",
+          "go_target": "pkg/parsers/smt2/local_sort_names.go",
+          "tests": ["TestSMT2SortAndDatatypeNameTablesSourceScopes"]
         }
       ],
       "ownership": [],
@@ -122448,7 +122454,8 @@
         "pkg/util/params/util_gparams_dictionary.go",
         "pkg/util/symbol/dictionary_int32.go",
         "pkg/ast/ast_builtin_plugins_user.go",
-        "pkg/smtcore/tactic_manager.go"
+        "pkg/smtcore/tactic_manager.go",
+        "pkg/parsers/smt2/local_sort_names.go"
       ],
       "tests": [
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
@@ -122481,7 +122488,8 @@
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
         "TestTacticManagerSourceProbeReferencesAndStructuralValues",
         "TestTacticManagerSourceDuplicateAssertionAndNamespaceSeparation",
-        "TestTacticManagerNativeRegistrationGrowthAndOwnership"
+        "TestTacticManagerNativeRegistrationGrowthAndOwnership",
+        "TestSMT2SortAndDatatypeNameTablesSourceScopes"
       ],
       "conditionals": [
         {
@@ -122563,9 +122571,15 @@
           ]
         },
         {
-          "name": "Remaining command-context, parser and plugin dictionary specializations",
+          "name": "Remaining command-context dictionary specializations and their retained parser-facing operations",
           "status": "unported",
           "tests": []
+        },
+        {
+          "name": "SMT2 parser concrete sort-parameter, datatype-index and datatype-arity symbol dictionaries: overwrite, lookup, size and independent reset (smt2parser.cpp:55-57,590-604,857-879,2098-2146,2992-3006)",
+          "status": "platform_replacement",
+          "go_target": "pkg/parsers/smt2/local_sort_names.go",
+          "tests": ["TestSMT2SortAndDatatypeNameTablesSourceScopes"]
         }
       ],
       "ownership": [
@@ -124783,7 +124797,8 @@
         "pkg/sat/sat_solver_mutex_pair_set_test.go",
         "pkg/util/hash/runtime/runtime_bytes_bounded.go",
         "pkg/ast/rewriter/bv_trailing_table.go",
-        "pkg/ast/rewriter/used_vars_ufbv.go"
+        "pkg/ast/rewriter/used_vars_ufbv.go",
+        "pkg/parsers/smt2/local_sort_names.go"
       ],
       "tests": [
         "TestModel2ExprFreshNameConcreteSymbolSetAndSequence",
@@ -124863,7 +124878,8 @@
         "TestBVTrailingNativeWideDeletionReset",
         "TestBVTrailingEveryColdCountReservation",
         "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations",
-        "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations"
+        "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations",
+        "TestSMT2SortAndDatatypeNameTablesSourceScopes"
       ],
       "conditionals": [
         {
@@ -125202,6 +125218,12 @@
           "tests": [
             "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations"
           ]
+        },
+        {
+          "name": "SMT2 parser native typed symbol maps replace reached dictionary hash-table storage without carrying probing mechanics",
+          "status": "platform_replacement",
+          "go_target": "pkg/parsers/smt2/local_sort_names.go",
+          "tests": ["TestSMT2SortAndDatatypeNameTablesSourceScopes"]
         }
       ],
       "ownership": [
@@ -151011,7 +151033,8 @@
         "pkg/sat/sat_solver_index_map.go",
         "pkg/sat/sat_solver_index_set_test.go",
         "pkg/sat/sat_solver_index_iterator_source_test.go",
-        "pkg/ast/pattern/collect.go"
+        "pkg/ast/pattern/collect.go",
+        "pkg/parsers/smt2/local_sort_names.go"
       ],
       "tests": [
         "TestArbitraryFloatSourceConstructorUsesNativePowerDictionaries",
@@ -151048,7 +151071,8 @@
         "TestSATSolverAntecedentMapNativeResetAndCloseInvalidateRows",
         "TestSATConsequenceNativeIndexIteratorBorrowLifetime",
         "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
-        "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
+        "TestPatternInferenceCollectorArithmeticNestedAndDivisionException",
+        "TestSMT2SortAndDatatypeNameTablesSourceScopes"
       ],
       "conditionals": [
         {
@@ -151240,6 +151264,12 @@
             "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
             "TestPatternInferenceCollectorArithmeticNestedAndDivisionException"
           ]
+        },
+        {
+          "name": "SMT2 parser native typed symbol maps preserve reached map insert overwrite, find, size and reset semantics",
+          "status": "platform_replacement",
+          "go_target": "pkg/parsers/smt2/local_sort_names.go",
+          "tests": ["TestSMT2SortAndDatatypeNameTablesSourceScopes"]
         }
       ],
       "ownership": [
