@@ -426,7 +426,7 @@ func (s *RationalService) InfString(v *OwnedInfRational) (string, error) {
 		return "", e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return "", e
 	}
 	n, e := s.infEpsInfPrepareNumeral(v, 0)

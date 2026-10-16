@@ -129184,7 +129184,8 @@
         "pkg/util/numeral/rational_numeric_borrow.go",
         "pkg/util/numeral/inf_arithmetic_entry_source_test.go",
         "pkg/util/numeral/inf_muldiv_entry_source_test.go",
-        "pkg/util/numeral/inf_step_unread_epsilon_source_test.go"
+        "pkg/util/numeral/inf_step_unread_epsilon_source_test.go",
+        "pkg/util/numeral/inf_string_unread_epsilon_den_source_test.go"
       ],
       "tests": [
         "TestInfinitesimalSourceWholeStringStreamInsertion",
@@ -129208,6 +129209,7 @@
         "TestInfFormatSignedZeroAndDomain",
         "TestInfFormatFailurePrefixesImmediateRoots",
         "TestInfFormatNativeWorkspaceGrowth",
+        "TestInfStringZeroEpsilonSkipsUnreadDenominator",
         "TestInfScalarProjectionAllGetterProfilesAndRawPredicates",
         "TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit",
         "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
@@ -129482,7 +129484,8 @@
             "TestInfFormatOneFinalAllocation",
             "TestInfFormatSignedZeroAndDomain",
             "TestInfFormatFailurePrefixesImmediateRoots",
-            "TestInfFormatNativeWorkspaceGrowth"
+            "TestInfFormatNativeWorkspaceGrowth",
+            "TestInfStringZeroEpsilonSkipsUnreadDenominator"
           ]
         },
         {
