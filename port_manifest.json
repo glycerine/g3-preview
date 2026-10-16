@@ -77302,6 +77302,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_display_trace.go",
           "tests": ["TestSATActualSimplifierSubsumptionSolverDisplaySourceTrace"]
+        },
+        {
+          "name": "Reached full-solver scoped_finalize_fn solver and model-converter display TRACE at sat_simplifier.cpp:223",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_finalize_trace.go",
+          "tests": ["TestSATActualSimplifierFinalizerSolverAndConverterSourceTrace"]
         }
       ],
       "ownership": [
@@ -182344,6 +182350,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_display_trace.go",
           "tests": ["TestSATActualSimplifierSubsumptionSolverDisplaySourceTrace"]
+        },
+        {
+          "name": "Reached full-solver scoped_finalize_fn solver and model-converter display TRACE at sat_simplifier.cpp:223",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_finalize_trace.go",
+          "tests": ["TestSATActualSimplifierFinalizerSolverAndConverterSourceTrace"]
         }
       ],
       "ownership": [
@@ -184156,6 +184168,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_display_trace.go",
           "tests": ["TestSATActualSimplifierSubsumptionSolverDisplaySourceTrace"]
+        },
+        {
+          "name": "Reached full-solver scoped_finalize_fn solver and model-converter display TRACE at sat_simplifier.cpp:223",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_finalize_trace.go",
+          "tests": ["TestSATActualSimplifierFinalizerSolverAndConverterSourceTrace"]
         }
       ],
       "ownership": [

@@ -22,3 +22,23 @@ func (s *satSimplifier) traceFinalizeCleanupBranch() {
 			return err
 		})
 }
+
+func (s *satSimplifier) traceFinalizeDisplays() {
+	if s.cleaner == nil || s.cleaner.solver == nil {
+		return
+	}
+	tags := s.lifecycle.traceTags
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	_ = tags.EmitConditional("after_simplifier", "scoped_finalize_fn", "src/sat/sat_simplifier.cpp", 223,
+		func() bool { return true }, func(w io.Writer) error {
+			if err := s.cleaner.solver.traceUserDisplayInto(w); err != nil {
+				return err
+			}
+			if _, err := io.WriteString(w, "model_converter:\n"); err != nil {
+				return err
+			}
+			return s.cleaner.solver.traceModelConverterInto(w)
+		})
+}

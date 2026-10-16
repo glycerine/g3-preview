@@ -256,6 +256,9 @@ func (s *satSimplifier) scopedFinalize() error {
 			}
 		case 3:
 			e = s.invariant()
+			if e == nil {
+				s.traceFinalizeDisplays()
+			}
 		case 4:
 			e = s.Finalize()
 		}
