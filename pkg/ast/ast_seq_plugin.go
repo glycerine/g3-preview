@@ -13,15 +13,15 @@ import (
 // Concrete signature owners retain actual sort references. Native slices hold
 // published signatures and each owning domain in source declaration order.
 type astSequenceSignature struct {
-	next                                          *astSequenceSignature
-	owner                                         *astSequencePluginOwner
-	name                                          usymbol.Symbol
-	parameters, id, cursor                        uint32
-	domain                                        []astNodeRef
-	rangeSort                                     astNodeRef
-	header                                        uint64
-	rangeAcquired, completed, ended, contextEnded bool
-	bodyCause, sourceCause, ownCause              error
+	next                                                           *astSequenceSignature
+	owner                                                          *astSequencePluginOwner
+	name                                                           usymbol.Symbol
+	parameters, id, cursor                                         uint32
+	domain                                                         []astNodeRef
+	rangeSort                                                      astNodeRef
+	header                                                         uint64
+	rangeAcquired, completed, ended, contextEnded, memoryTraceLive bool
+	bodyCause, sourceCause, ownCause                               error
 }
 type astSequencePluginOwner struct {
 	next                                    *astSequencePluginOwner
@@ -39,7 +39,7 @@ type astSequencePluginOwner struct {
 	bodyCause, sourceCause                  error
 }
 
-func (p *astSequencePluginOwner) newSignature(name string, n uint32, dom []astNodeRef, rng astNodeRef) (_s *astSequenceSignature, _body error) {
+func (p *astSequencePluginOwner) newSignature(name string, n uint32, dom []astNodeRef, rng astNodeRef, line int) (_s *astSequenceSignature, _body error) {
 	m := p.owner
 	if p.serial == math.MaxUint32 {
 		return nil, ErrASTPending
@@ -49,8 +49,9 @@ func (p *astSequencePluginOwner) newSignature(name string, n uint32, dom []astNo
 		return nil, e
 	}
 	p.serial++
-	s := &astSequenceSignature{owner: p, id: p.serial, header: bytes, next: p.owned}
+	s := &astSequenceSignature{owner: p, id: p.serial, header: bytes, next: p.owned, memoryTraceLive: true}
 	p.owned = s
+	p.traceSignatureAllocated(s, line)
 	defer func() {
 		if _body != nil {
 			s.bodyCause = _body
@@ -127,6 +128,7 @@ func (p *astSequencePluginOwner) destroySignature(s *astSequenceSignature, own b
 	}
 	s.domain = nil
 	s.ended = true
+	p.traceSignatureDeallocated(s)
 	return nil
 }
 func (m *ASTManager) sequencePluginBytes() uint64 {
@@ -400,6 +402,7 @@ func (m *ASTManager) initializeSequence(p *astSequencePluginOwner) error {
 	p.signatures = make([]*astSequenceSignature, 44)
 	type row struct {
 		index      uint32
+		line       int
 		name       string
 		parameters uint32
 		size       int
@@ -407,51 +410,51 @@ func (m *ASTManager) initializeSequence(p *astSequencePluginOwner) error {
 		rangeSort  astNodeRef
 	}
 	rows := [...]row{
-		{0, "seq.unit", 1, 1, [3]astNodeRef{A}, seqA},
-		{1, "seq.empty", 1, 0, [3]astNodeRef{}, seqA},
-		{2, "seq.++", 1, 2, [3]astNodeRef{seqA, seqA}, seqA},
-		{3, "seq.prefixof", 1, 2, [3]astNodeRef{seqA, seqA}, boolT},
-		{4, "seq.suffixof", 1, 2, [3]astNodeRef{seqA, seqA}, boolT},
-		{5, "seq.contains", 1, 2, [3]astNodeRef{seqA, seqA}, boolT},
-		{6, "seq.extract", 1, 3, [3]astNodeRef{seqA, intT, intT}, seqA},
-		{7, "seq.replace", 1, 3, [3]astNodeRef{seqA, seqA, seqA}, seqA},
-		{10, "seq.indexof", 1, 3, [3]astNodeRef{seqA, seqA, intT}, intT},
-		{8, "seq.at", 1, 2, [3]astNodeRef{seqA, intT}, seqA},
-		{9, "seq.len", 1, 1, [3]astNodeRef{seqA}, intT},
-		{13, "re.+", 1, 1, [3]astNodeRef{reA}, reA},
-		{14, "re.*", 1, 1, [3]astNodeRef{reA}, reA},
-		{15, "re.opt", 1, 1, [3]astNodeRef{reA}, reA},
-		{16, "re.range", 1, 2, [3]astNodeRef{seqA, seqA}, reA},
-		{17, "re.++", 1, 2, [3]astNodeRef{reA, reA}, reA},
-		{18, "re.union", 1, 2, [3]astNodeRef{reA, reA}, reA},
-		{19, "re.inter", 1, 2, [3]astNodeRef{reA, reA}, reA},
-		{20, "re.loop", 1, 1, [3]astNodeRef{reA}, reA},
-		{21, "re.complement", 1, 1, [3]astNodeRef{reA}, reA},
-		{22, "re.empty", 1, 0, [3]astNodeRef{}, reA},
-		{23, "re.all", 1, 0, [3]astNodeRef{}, reA},
-		{24, "re.allchar", 1, 0, [3]astNodeRef{}, reA},
-		{25, "re.of.pred", 1, 1, [3]astNodeRef{predA}, reA},
-		{11, "seq.to.re", 1, 1, [3]astNodeRef{seqA}, reA},
-		{12, "seq.in.re", 1, 2, [3]astNodeRef{seqA, reA}, boolT},
-		{39, "str.indexof", 0, 3, [3]astNodeRef{strT, strT, intT}, intT},
-		{29, "str.replace", 0, 3, [3]astNodeRef{strT, strT, strT}, strT},
-		{27, "int.to.str", 0, 1, [3]astNodeRef{intT}, strT},
-		{28, "str.to.int", 0, 1, [3]astNodeRef{strT}, intT},
-		{30, "str.++", 1, 2, [3]astNodeRef{strT, strT}, strT},
-		{31, "str.len", 0, 1, [3]astNodeRef{strT}, intT},
-		{32, "str.contains", 0, 2, [3]astNodeRef{strT, strT}, boolT},
-		{37, "str.at", 0, 2, [3]astNodeRef{strT, intT, intT}, strT},
-		{33, "str.prefixof", 0, 2, [3]astNodeRef{strT, strT}, boolT},
-		{34, "str.suffixof", 0, 2, [3]astNodeRef{strT, strT}, boolT},
-		{35, "str.in.re", 0, 2, [3]astNodeRef{strT, reT}, boolT},
-		{36, "str.to.re", 0, 1, [3]astNodeRef{strT}, reT},
-		{40, "re.nostr", 0, 0, [3]astNodeRef{}, reT},
-		{41, "re.allchar", 0, 0, [3]astNodeRef{}, reT},
-		{38, "str.substr", 0, 3, [3]astNodeRef{strT, intT, intT}, strT},
-		{43, "_re.unroll", 0, 2, [3]astNodeRef{reT, intT}, strT},
+		{0, 530, "seq.unit", 1, 1, [3]astNodeRef{A}, seqA},
+		{1, 531, "seq.empty", 1, 0, [3]astNodeRef{}, seqA},
+		{2, 532, "seq.++", 1, 2, [3]astNodeRef{seqA, seqA}, seqA},
+		{3, 533, "seq.prefixof", 1, 2, [3]astNodeRef{seqA, seqA}, boolT},
+		{4, 534, "seq.suffixof", 1, 2, [3]astNodeRef{seqA, seqA}, boolT},
+		{5, 535, "seq.contains", 1, 2, [3]astNodeRef{seqA, seqA}, boolT},
+		{6, 536, "seq.extract", 1, 3, [3]astNodeRef{seqA, intT, intT}, seqA},
+		{7, 537, "seq.replace", 1, 3, [3]astNodeRef{seqA, seqA, seqA}, seqA},
+		{10, 538, "seq.indexof", 1, 3, [3]astNodeRef{seqA, seqA, intT}, intT},
+		{8, 539, "seq.at", 1, 2, [3]astNodeRef{seqA, intT}, seqA},
+		{9, 540, "seq.len", 1, 1, [3]astNodeRef{seqA}, intT},
+		{13, 541, "re.+", 1, 1, [3]astNodeRef{reA}, reA},
+		{14, 542, "re.*", 1, 1, [3]astNodeRef{reA}, reA},
+		{15, 543, "re.opt", 1, 1, [3]astNodeRef{reA}, reA},
+		{16, 544, "re.range", 1, 2, [3]astNodeRef{seqA, seqA}, reA},
+		{17, 545, "re.++", 1, 2, [3]astNodeRef{reA, reA}, reA},
+		{18, 546, "re.union", 1, 2, [3]astNodeRef{reA, reA}, reA},
+		{19, 547, "re.inter", 1, 2, [3]astNodeRef{reA, reA}, reA},
+		{20, 548, "re.loop", 1, 1, [3]astNodeRef{reA}, reA},
+		{21, 549, "re.complement", 1, 1, [3]astNodeRef{reA}, reA},
+		{22, 550, "re.empty", 1, 0, [3]astNodeRef{}, reA},
+		{23, 551, "re.all", 1, 0, [3]astNodeRef{}, reA},
+		{24, 570, "re.allchar", 1, 0, [3]astNodeRef{}, reA},
+		{25, 553, "re.of.pred", 1, 1, [3]astNodeRef{predA}, reA},
+		{11, 554, "seq.to.re", 1, 1, [3]astNodeRef{seqA}, reA},
+		{12, 555, "seq.in.re", 1, 2, [3]astNodeRef{seqA, reA}, boolT},
+		{39, 557, "str.indexof", 0, 3, [3]astNodeRef{strT, strT, intT}, intT},
+		{29, 558, "str.replace", 0, 3, [3]astNodeRef{strT, strT, strT}, strT},
+		{27, 559, "int.to.str", 0, 1, [3]astNodeRef{intT}, strT},
+		{28, 560, "str.to.int", 0, 1, [3]astNodeRef{strT}, intT},
+		{30, 561, "str.++", 1, 2, [3]astNodeRef{strT, strT}, strT},
+		{31, 562, "str.len", 0, 1, [3]astNodeRef{strT}, intT},
+		{32, 563, "str.contains", 0, 2, [3]astNodeRef{strT, strT}, boolT},
+		{37, 564, "str.at", 0, 2, [3]astNodeRef{strT, intT, intT}, strT},
+		{33, 565, "str.prefixof", 0, 2, [3]astNodeRef{strT, strT}, boolT},
+		{34, 566, "str.suffixof", 0, 2, [3]astNodeRef{strT, strT}, boolT},
+		{35, 567, "str.in.re", 0, 2, [3]astNodeRef{strT, reT}, boolT},
+		{36, 568, "str.to.re", 0, 1, [3]astNodeRef{strT}, reT},
+		{40, 569, "re.nostr", 0, 0, [3]astNodeRef{}, reT},
+		{41, 570, "re.allchar", 0, 0, [3]astNodeRef{}, reT},
+		{38, 571, "str.substr", 0, 3, [3]astNodeRef{strT, intT, intT}, strT},
+		{43, 572, "_re.unroll", 0, 2, [3]astNodeRef{reT, intT}, strT},
 	}
 	for _, r := range rows {
-		sig, e := p.newSignature(r.name, r.parameters, r.domain[:r.size], r.rangeSort)
+		sig, e := p.newSignature(r.name, r.parameters, r.domain[:r.size], r.rangeSort, r.line)
 		if e != nil {
 			return e
 		}
