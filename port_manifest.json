@@ -74378,7 +74378,7 @@
           "name": "Retained cleaner operator cleaner_bug process assertion/tag gate at entry and exit; selected nested Boolean-variable and watch SASSERT actions ported, other checker diagnostics remain open (sat_cleaner.cpp:184,200)",
           "status": "partial",
           "go_target": "pkg/sat/sat_cleaner_assertion.go",
-          "tests": ["TestSATCleanerInvariantUsesProcessDebugGate", "TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
+          "tests": ["TestSATCleanerInvariantUsesProcessDebugGate", "TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder", "TestSATIntegrityEliminatedWatchSourceTrace"]
         }
       ],
       "ownership": [
@@ -75081,7 +75081,7 @@
           "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
         },
         {
-          "name": "Selected check_watches SASSERT167-189 process assertion switch, source-order watch guards and per-site C/T action through cleaner_bug; sat_bug and wider sat_watched_bug TRACE profiles remain open",
+          "name": "Selected check_watches SASSERT167-189 process assertion switch, source-order watch guards and per-site C/T action through cleaner_bug; wider sat_bug and sat_watched_bug TRACE profiles remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
@@ -75091,6 +75091,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
           "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
+        },
+        {
+          "name": "Selected eliminated-watch sat_bug CTRACE before SASSERT, real solver display_watches and display body (cpp162-167); wider solver profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_watches_trace.go",
+          "tests": ["TestSATIntegrityEliminatedWatchSourceTrace"]
         }
       ],
       "ownership": [
@@ -75158,7 +75164,7 @@
           "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
         },
         {
-          "name": "Selected check_watches SASSERT167-189 process assertion switch, source-order watch guards and per-site C/T action through cleaner_bug; sat_bug and wider sat_watched_bug TRACE profiles remain open",
+          "name": "Selected check_watches SASSERT167-189 process assertion switch, source-order watch guards and per-site C/T action through cleaner_bug; wider sat_bug and sat_watched_bug TRACE profiles remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
@@ -75168,6 +75174,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
           "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
+        },
+        {
+          "name": "Selected eliminated-watch sat_bug CTRACE before SASSERT, real solver display_watches and display body (cpp162-167); wider solver profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_watches_trace.go",
+          "tests": ["TestSATIntegrityEliminatedWatchSourceTrace"]
         }
       ],
       "ownership": [
@@ -181778,6 +181790,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
           "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
+        },
+        {
+          "name": "Retained SAT checker eliminated-watch sat_bug CTRACE through real solver display owner (sat_integrity_checker.cpp:162); wider display profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_watches_trace.go",
+          "tests": ["TestSATIntegrityEliminatedWatchSourceTrace"]
         }
       ],
       "ownership": [
@@ -183505,6 +183523,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
           "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
+        },
+        {
+          "name": "Retained SAT checker eliminated-watch sat_bug CTRACE through real solver display owner (sat_integrity_checker.cpp:162); wider display profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_watches_trace.go",
+          "tests": ["TestSATIntegrityEliminatedWatchSourceTrace"]
         }
       ],
       "ownership": [

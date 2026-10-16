@@ -1,4 +1,4 @@
-// Source: src/sat/sat_integrity_checker.cpp:172-181; src/util/trace.h:40-46.
+// Source: src/sat/sat_integrity_checker.cpp:162-181; src/util/trace.h:40-46.
 package sat
 
 import (
@@ -23,6 +23,50 @@ func (c satIntegrityChecker) watchListText(list satSolverWatchListView) (body st
 		return "", err
 	}
 	return out.String()
+}
+
+func (c satIntegrityChecker) eliminatedWatchText(l Literal) (body string, result error) {
+	s := c.gc.conflict.solver
+	out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: c.lifecycle.budget})
+	if err != nil {
+		return "", err
+	}
+	defer func() { result = errors.Join(result, out.Close()) }()
+	if err = out.AppendCString("l: "); err != nil {
+		return "", err
+	}
+	if err = satLiteralInto(out, l); err != nil {
+		return "", err
+	}
+	if err = out.AppendCString("\n"); err != nil {
+		return "", err
+	}
+	if err = s.displayWatches(out); err != nil {
+		return "", err
+	}
+	if err = s.displayInto(out); err != nil {
+		return "", err
+	}
+	return out.String()
+}
+
+func (c satIntegrityChecker) traceEliminatedWatch(l Literal) {
+	tags := c.lifecycle.traceTags
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	if !tags.ShouldTrace("sat_bug") || c.gc.conflict.solver == nil {
+		return
+	}
+	_ = tags.EmitConditional("sat_bug", "check_watches", "src/sat/sat_integrity_checker.cpp", 162,
+		func() bool { return true }, func(w io.Writer) error {
+			body, err := c.eliminatedWatchText(l)
+			if err != nil {
+				return err
+			}
+			_, err = io.WriteString(w, body)
+			return err
+		})
 }
 
 func (c satIntegrityChecker) traceMissingBinaryWatch(literal, other Literal, learned, ownGone, otherGone bool, current, reciprocal satSolverWatchListView) {

@@ -458,7 +458,7 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 	if tags == nil {
 		tags = diagnostic.BorrowProcessTraceTags()
 	}
-	if !enabled && !tags.ShouldTrace("sat_watched_bug") {
+	if !enabled && !tags.ShouldTrace("sat_watched_bug") && !tags.ShouldTrace("sat_bug") {
 		return true, nil
 	}
 	p := c.lifecycle.propagation
@@ -473,13 +473,18 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 		if e != nil {
 			return false, e
 		}
-		if gone && enabled {
+		if gone && (enabled || tags.ShouldTrace("sat_bug")) {
 			size, e := list.Size()
 			if e != nil {
 				return false, e
 			}
-			if e = satIntegrityAssertion(size == 0, c.debugActions, 167, "!s.was_eliminated(l.var()) || wlist.empty()"); e != nil {
-				return false, e
+			if size != 0 {
+				c.traceEliminatedWatch(literal)
+			}
+			if enabled {
+				if e = satIntegrityAssertion(size == 0, c.debugActions, 167, "!s.was_eliminated(l.var()) || wlist.empty()"); e != nil {
+					return false, e
+				}
 			}
 		}
 		ref, e := list.ref()
