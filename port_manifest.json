@@ -70173,9 +70173,9 @@
       "path": "src/parsers/smt2/smt2parser.cpp",
       "component": "parsers",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/parsers/smt2/local_environment.go", "pkg/parsers/smt2/local_lookup.go"],
+      "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders"],
       "assertions": [
         {
           "line": 250,
@@ -70688,9 +70688,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "push_local and parse_expr_name selected local-binding branch: borrowed ground/same-level term or source var_shifter free-index adjustment, then owning expression-stack reference (smt2parser.cpp:1695-1721)",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/local_lookup.go",
+          "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders"]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": ["The selected local lookup returns an owning ASTRef for the future parser expression stack and reuses the concrete AST var_shifter; scanner, command-context fallback, other parser branches and complete expression-stack integration remain unported."]
     },
     {
       "path": "src/parsers/smt2/smt2parser.h",
@@ -178972,12 +178979,15 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_family.go",
-        "pkg/parsers/smt2/local_environment.go"
+        "pkg/parsers/smt2/local_environment.go",
+        "pkg/parsers/smt2/local_lookup.go"
       ],
       "tests": [
         "TestFamilySourceRegistrationAndQueries",
         "TestFamilySourceEnumerationOrderAndPrefixes",
-        "TestSMT2LocalSymbolTableNestedAndRepeatedBindings"
+        "TestSMT2LocalSymbolTableNestedAndRepeatedBindings",
+        "TestSMT2ParserPushLocalShiftsFreeVariables",
+        "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders"
       ],
       "conditionals": [
         {
@@ -179035,10 +179045,10 @@
       ],
       "ownership": [
         "AST FamilyManager borrows its symbol manager, owns an insertion-ordered dictionary and registration-order name slice, and closes before the borrowed manager. Scoped undo tables and clone/assignment staging from the deleted generic translation are not retained.",
-        "The only other production instantiation is SMT2 parser local<expr*,unsigned>. Its concrete Go table and undo trail borrow expression handles without incrementing references; their lifetimes belong to enclosing parser AST owners. Begin_scope records a trail limit, insert saves the prior local or absent key, and end_scope restores or erases in reverse trail order. Parser integration is still open."
+        "The only other production instantiation is SMT2 parser local<expr*,unsigned>. Its concrete Go table and undo trail borrow expression handles without incrementing references; their lifetimes belong to enclosing parser AST owners. Begin_scope records a trail limit, insert saves the prior local or absent key, and end_scope restores or erases in reverse trail order. The selected local identifier lookup now returns an owning ASTRef; other parser integration remains open."
       ],
       "deviations": [
-        "The generic scoped Go symbol table and tests were deleted in 8e22e4f5. AST family_id operations now use insdict and native slices in pkg/ast/ast_family.go; that consumer never invokes begin_scope, end_scope, append, reset, or table cloning. Its enumeration uses insertion order. The SMT2 parser's concrete local environment now uses a native map and undo slice; actual parser call sites remain unported."
+        "The generic scoped Go symbol table and tests were deleted in 8e22e4f5. AST family_id operations now use insdict and native slices in pkg/ast/ast_family.go; that consumer never invokes begin_scope, end_scope, append, reset, or table cloning. Its enumeration uses insertion order. The SMT2 parser's concrete local environment uses a native map and undo slice; the selected local identifier branch uses the existing AST var_shifter, while the remaining parser call sites are unported."
       ]
     },
     {

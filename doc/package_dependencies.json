@@ -1261,10 +1261,12 @@
       "package": "parsers/smt2",
       "imports": [
         "ast",
+        "ast/rewriter",
         "util/symbol"
       ],
       "production_files": [
-        "local_environment.go"
+        "local_environment.go",
+        "local_lookup.go"
       ]
     },
     {
