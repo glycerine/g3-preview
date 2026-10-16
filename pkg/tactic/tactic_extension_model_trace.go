@@ -12,6 +12,15 @@ import (
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
+// A TRACE ostream keeps its failed state but does not make an insertion a
+// computation error. The outer TraceTags writer still records the refusal.
+type extensionTraceOstream struct{ out io.Writer }
+
+func (w extensionTraceOstream) Write(p []byte) (int, error) {
+	_, _ = w.out.Write(p)
+	return len(p), nil
+}
+
 func (c *tacticExtensionModelConverter) extensionTraceTags() *diagnostic.TraceTags {
 	if c.services.Trace != nil {
 		return c.services.Trace
@@ -58,8 +67,11 @@ func (c *tacticExtensionModelConverter) traceExtensionModel(md *model.ModelCore,
 	if !tags.ShouldTrace("extension_mc") {
 		return nil
 	}
-	return tags.EmitConditional("extension_mc", "operator()", "src/tactic/extension_model_converter.cpp", line,
-		func() bool { return true }, func(w io.Writer) error {
+	var operandErr error
+	_ = tags.EmitConditional("extension_mc", "operator()", "src/tactic/extension_model_converter.cpp", line,
+		func() bool { return true }, func(w io.Writer) (bodyErr error) {
+			defer func() { operandErr = bodyErr }()
+			w = extensionTraceOstream{w}
 			if err := md.WriteV2(w, c.services.Context, c.services.Globals, false); err != nil {
 				return err
 			}
@@ -125,6 +137,7 @@ func (c *tacticExtensionModelConverter) traceExtensionModel(md *model.ModelCore,
 			}
 			return nil
 		})
+	return operandErr
 }
 
 func (c *tacticExtensionModelConverter) traceExtensionDefinition(decl, definition, value ast.ASTHandle) error {
@@ -140,8 +153,11 @@ func (c *tacticExtensionModelConverter) traceExtensionDefinition(decl, definitio
 	if err != nil {
 		return err
 	}
-	return tags.EmitConditional("extension_mc", "operator()", "src/tactic/extension_model_converter.cpp", 59,
-		func() bool { return true }, func(w io.Writer) error {
+	var operandErr error
+	_ = tags.EmitConditional("extension_mc", "operator()", "src/tactic/extension_model_converter.cpp", 59,
+		func() bool { return true }, func(w io.Writer) (bodyErr error) {
+			defer func() { operandErr = bodyErr }()
+			w = extensionTraceOstream{w}
 			if _, err := io.WriteString(w, spelling+" ->\n"); err != nil {
 				return err
 			}
@@ -157,4 +173,5 @@ func (c *tacticExtensionModelConverter) traceExtensionDefinition(decl, definitio
 			_, err := io.WriteString(w, "\n")
 			return err
 		})
+	return operandErr
 }

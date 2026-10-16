@@ -105197,6 +105197,13 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Extension-model TRACE writer refusal preserves source sticky ostream state while model reconstruction continues",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_extension_model_trace.go",
+          "go_targets": ["pkg/model/model_v2_display.go"],
+          "tests": ["TestExtensionModelTraceWriterRefusalKeepsDefinitions", "TestModelV2DisplayConstantsFunctionsAndPartialElse"]
+        },
+        {
           "name": "extension_mc model_v2_pp and declaration-info snapshots before and after reverse definition reconstruction at cpp:49,71; attached declaration metadata and Boolean SMT2 profiles",
           "status": "partial",
           "go_target": "pkg/tactic/tactic_extension_model_trace.go",
@@ -182358,6 +182365,13 @@
           "tests": ["TestFilterModelSourceBeforeAfterTrace"]
         },
         {
+          "name": "Extension-model TRACE writer refusal preserves source sticky ostream state while model reconstruction continues",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_extension_model_trace.go",
+          "go_targets": ["pkg/model/model_v2_display.go"],
+          "tests": ["TestExtensionModelTraceWriterRefusalKeepsDefinitions", "TestModelV2DisplayConstantsFunctionsAndPartialElse"]
+        },
+        {
           "name": "Reached extension_mc pre/post model snapshots at extension_model_converter.cpp:49,71 using concrete model_v2_pp and attached func_decl_info metadata; non-finite double ostream profiles remain open",
           "status": "partial",
           "go_target": "pkg/tactic/tactic_extension_model_trace.go",
@@ -184762,6 +184776,13 @@
           "go_target": "pkg/tactic/tactic_filter_model_trace.go",
           "go_targets": ["pkg/model/model_v2_display.go"],
           "tests": ["TestFilterModelSourceBeforeAfterTrace"]
+        },
+        {
+          "name": "Extension-model TRACE writer refusal preserves source sticky ostream state while model reconstruction continues",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_extension_model_trace.go",
+          "go_targets": ["pkg/model/model_v2_display.go"],
+          "tests": ["TestExtensionModelTraceWriterRefusalKeepsDefinitions", "TestModelV2DisplayConstantsFunctionsAndPartialElse"]
         },
         {
           "name": "Reached extension_mc pre/post model snapshots at extension_model_converter.cpp:49,71 using concrete model_v2_pp and attached func_decl_info metadata; non-finite double ostream profiles remain open",

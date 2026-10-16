@@ -2,6 +2,8 @@ package model_test
 
 import (
 	"bytes"
+	"errors"
+	"io"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -43,5 +45,9 @@ func TestModelV2DisplayConstantsFunctionsAndPartialElse(t *testing.T) {
 		"display-g -> {\n  #unspecified\n}\n"
 	if out.String() != want {
 		t.Fatalf("source partial model display: got %q, want %q", out.String(), want)
+	}
+	refused := &refusingModelEvaluatorTraceWriter{}
+	if err := md.Core().WriteV2(refused, context, config.Globals, false); !errors.Is(err, io.ErrClosedPipe) || refused.calls != 1 {
+		t.Fatal("ordinary model display must report its writer refusal", err, refused.calls)
 	}
 }

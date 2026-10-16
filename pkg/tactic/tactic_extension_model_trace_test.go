@@ -2,12 +2,45 @@ package tactic
 
 import (
 	"bytes"
+	"io"
 	"strconv"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
+
+type refusingExtensionTraceWriter struct{ calls int }
+
+func (w *refusingExtensionTraceWriter) Write([]byte) (int, error) {
+	w.calls++
+	return 0, io.ErrClosedPipe
+}
+
+func TestExtensionModelTraceWriterRefusalKeepsDefinitions(t *testing.T) {
+	w := &refusingExtensionTraceWriter{}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("extension_mc")
+	m, md, out, config := extensionFixture(t, tags)
+	c, err := NewExtensionModel(m, config)
+	satOK(t, err)
+	t.Cleanup(func() { satOK(t, c.Close()) })
+	a := goalTestAtom(t, m, "extension-refused-trace")
+	d, err := m.GetDecl(a)
+	satOK(t, err)
+	yes, err := m.MkTrue()
+	satOK(t, err)
+	satOK(t, c.Insert(d, yes))
+	satOK(t, c.ApplyModel(out, 0))
+	got, err := md.Core().ConstantInterpretation(d)
+	satOK(t, err)
+	if got != yes {
+		t.Fatal("source extension definition stopped after trace stream refusal", got)
+	}
+	if tags.ShouldTrace("extension_mc") && w.calls != 1 {
+		t.Fatal("source extension trace stream did not retain bad state", w.calls)
+	}
+}
 
 // Source: extension_model_converter.cpp:57-68. The source traverses the
 // definitions backward and prints each evaluated value before publishing it.
