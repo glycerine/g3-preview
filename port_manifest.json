@@ -171708,7 +171708,16 @@
           ]
         },
         {
-          "name": "selected default DEBUG dec_ref predecrement assertion and zero-reference ascending destruction with explicit per-block owning continuation",
+          "name": "params::dec_ref SASSERT(m_ref_count > 0) at params.cpp:338 with process Throw/Continue before unsigned decrement",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsReferenceRepeatedDECSourceAssertionAfterActualSetLimbsLeafStop",
+            "TestParamsReferenceTrackedDecrementGuardedEntryReceipt"
+          ]
+        },
+        {
+          "name": "selected params::dec_ref zero-reference ascending destruction with explicit per-block owning continuation",
           "status": "ported",
           "go_target": "pkg/util/params/util_params_decrement_source.go",
           "tests": [
@@ -172462,7 +172471,7 @@
           ]
         },
         {
-          "name": "selected default DEBUG dec_ref predecrement assertion and zero-reference ascending destruction with explicit per-block owning continuation",
+          "name": "selected params::dec_ref zero-reference ascending destruction with explicit per-block owning continuation",
           "status": "ported",
           "go_target": "pkg/util/params/util_params_decrement_source.go",
           "tests": [

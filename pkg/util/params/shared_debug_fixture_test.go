@@ -1,9 +1,11 @@
 package params
 
 import (
+	"os"
+	"testing"
+
 	"github.com/glycerine/g3/pkg/arena"
 	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
-	"testing"
 )
 
 func debugFixture(t *testing.T) (*udiag.DebugContext, *arena.BytesRegion, *arena.Budget) {
@@ -32,4 +34,37 @@ func bindProcessAssertionRefusal(t *testing.T) {
 		_, e := udiag.BindProcessDebugContext(old)
 		serviceMust(t, e)
 	})
+}
+
+func bindProcessAssertionActions(t *testing.T, commands string) (*udiag.NumericCharInput, *os.File) {
+	t.Helper()
+	d, _, budget := debugFixture(t)
+	in, e := os.CreateTemp(t.TempDir(), "params-debug-input-*")
+	serviceMust(t, e)
+	_, e = in.WriteString(commands)
+	serviceMust(t, e)
+	_, e = in.Seek(0, 0)
+	serviceMust(t, e)
+	out, e := os.CreateTemp(t.TempDir(), "params-debug-output-*")
+	serviceMust(t, e)
+	streams, e := udiag.NewMemoryStandardStreams(udiag.MemoryStandardStreamsConfig{Budget: budget, Stdout: out, Stderr: out})
+	serviceMust(t, e)
+	input, e := udiag.NewDebuggerCharInput(streams, in)
+	serviceMust(t, e)
+	actions, e := udiag.NewDebugActionContext(udiag.DebugActionConfig{Budget: budget, Streams: streams, Input: input})
+	serviceMust(t, e)
+	serviceMust(t, d.BindAssertionStreams(streams))
+	serviceMust(t, d.BindAssertionActions(actions))
+	old, e := udiag.BindProcessDebugContext(d)
+	serviceMust(t, e)
+	t.Cleanup(func() {
+		_, e := udiag.BindProcessDebugContext(old)
+		serviceMust(t, e)
+		serviceMust(t, actions.Close())
+		serviceMust(t, input.Close())
+		serviceMust(t, streams.Close())
+		serviceMust(t, in.Close())
+		serviceMust(t, out.Close())
+	})
+	return input, out
 }

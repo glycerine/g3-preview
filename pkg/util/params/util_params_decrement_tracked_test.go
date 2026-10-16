@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
@@ -103,7 +104,8 @@ func TestParamsReferenceTrackedDecrementGuardedEntryReceipt(t *testing.T) {
 		t.Fatal("nonzero reference decrement stamped receipt")
 	}
 	if GlobalParamsSourceDebug {
-		if e := c.DelTracked(&v, &unchanged); !errors.Is(e, ErrParamsPrecondition) {
+		bindProcessAssertionRefusal(t)
+		if e := c.DelTracked(&v, &unchanged); !errors.Is(e, udiag.ErrDebugAssertion) {
 			t.Fatal("source assertion before repeat stamp", e)
 		}
 		if unchanged != receipt {

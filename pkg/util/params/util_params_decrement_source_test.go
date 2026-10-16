@@ -4,6 +4,7 @@ package params
 import (
 	"errors"
 	"math"
+	"os"
 	"reflect"
 	"testing"
 
@@ -11,6 +12,7 @@ import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // Public reallocs reach the source LP64 signed-overflow guarded domain. They
@@ -120,12 +122,27 @@ func TestParamsReferenceRepeatedDECSourceAssertionAfterActualSetLimbsLeafStop(t 
 	}
 	// Invalid repeat is source SASSERT(m_ref_count>0) before decrement in debug.
 	// Release erases the assertion and literally wraps the unsigned count.
-	again := c.Del(&v)
 	if GlobalParamsSourceDebug {
-		if !errors.Is(again, ErrParamsPrecondition) || block.Refs != 0 {
-			t.Fatal("source DEBUG assertion before repeated decrement", again, block.Refs)
+		input, out := bindProcessAssertionActions(t, "TC")
+		var thrown z3exception.DefaultException
+		if again := c.Del(&v); !errors.As(again, &thrown) || block.Refs != 0 {
+			t.Fatal("source Throw before repeated decrement", again, block.Refs)
 		}
-	} else if again != nil || block.Refs != math.MaxUint32 {
+		if again := c.Del(&v); again != nil || block.Refs != math.MaxUint32 {
+			t.Fatal("source Continue reaches unsigned decrement", again, block.Refs)
+		}
+		state, e := input.State()
+		paramsMust(t, e)
+		if state.Position != 2 {
+			t.Fatal(state)
+		}
+		data, e := os.ReadFile(out.Name())
+		paramsMust(t, e)
+		const record = "ASSERTION VIOLATION\nFile: src/util/params.cpp\nLine: 338\nm_ref_count > 0\n(C)ontinue, (A)bort, (S)top, (T)hrow exception, Invoke (G)DB\n"
+		if string(data) != record+record {
+			t.Fatal("source actions", string(data))
+		}
+	} else if again := c.Del(&v); again != nil || block.Refs != math.MaxUint32 {
 		t.Fatal("literal release unsigned decrement", again, block.Refs)
 	}
 }

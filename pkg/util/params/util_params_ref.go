@@ -362,8 +362,17 @@ func (c *ParamsContext) decTracked(slot uint32, out *ParamsDecrementReceipt) err
 		return nil
 	}
 	b := &c.Blocks[slot-1]
-	if GlobalParamsSourceDebug && b.Refs == 0 {
-		return ErrParamsPrecondition
+	if udiag.DebugBuild {
+		d := udiag.BorrowProcessDebugContext()
+		enabled, e := udiag.SourceAssertionsEnabled(d)
+		if e != nil {
+			return e
+		}
+		if enabled && b.Refs == 0 {
+			if e := udiag.DebugAssertionFailure(d, "src/util/params.cpp", 338, "m_ref_count > 0"); e != nil {
+				return e
+			}
+		}
 	}
 	// A shared scalar DEC remains defined during an interrupted live reset.
 	// The last-reference destructor would replay already-consumed source leaves;
