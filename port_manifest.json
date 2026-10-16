@@ -75665,10 +75665,11 @@
           ]
         },
         {
-          "name": "Selected check_bool_vars SASSERT133-149 process assertion switch, source-order array lengths and eliminated-watch emptiness, per-site C/T action through cleaner_bug; other checker assertions remain open",
-          "status": "partial",
+          "name": "check_bool_vars SASSERT133-149 source-order column lengths and eliminated-watch emptiness with C/T action; line 140 is tautological because num_vars is m_level.size",
+          "status": "ported",
           "go_target": "pkg/sat/sat_integrity_assertion.go",
-          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
+          "go_targets": ["pkg/sat/sat_integrity_checker.go"],
+          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder", "TestSATIntegrityBoolColumnAssertionsUseSourceActions"]
         },
         {
           "name": "check_watches SASSERT167-189 process assertion switch, source-order binary/ternary/clause guards and per-site C/T action through cleaner_bug",
@@ -75803,10 +75804,11 @@
           ]
         },
         {
-          "name": "Selected check_bool_vars SASSERT133-149 process assertion switch, source-order array lengths and eliminated-watch emptiness, per-site C/T action through cleaner_bug; other checker assertions remain open",
-          "status": "partial",
+          "name": "check_bool_vars SASSERT133-149 source-order column lengths and eliminated-watch emptiness with C/T action; line 140 is tautological because num_vars is m_level.size",
+          "status": "ported",
           "go_target": "pkg/sat/sat_integrity_assertion.go",
-          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
+          "go_targets": ["pkg/sat/sat_integrity_checker.go"],
+          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder", "TestSATIntegrityBoolColumnAssertionsUseSourceActions"]
         },
         {
           "name": "check_watches SASSERT167-189 process assertion switch, source-order binary/ternary/clause guards and per-site C/T action through cleaner_bug",
@@ -122994,10 +122996,11 @@
           "tests": ["TestSATCleanerInvariantUsesProcessDebugGate"]
         },
         {
-          "name": "Retained SAT cleaner check_bool_vars SASSERT133-149 source-order notification and C/T action for array lengths and eliminated watches; other nested checker sites remain open",
-          "status": "partial",
+          "name": "Retained SAT cleaner check_bool_vars SASSERT133-149 source-order column-length and eliminated-watch notification with C/T action; line 140 is tautological",
+          "status": "ported",
           "go_target": "pkg/sat/sat_integrity_assertion.go",
-          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
+          "go_targets": ["pkg/sat/sat_integrity_checker.go"],
+          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder", "TestSATIntegrityBoolColumnAssertionsUseSourceActions"]
         },
         {
           "name": "Retained SAT cleaner check_watches SASSERT167-189 process assertion switch and C/T action for binary/ternary/clause watch guards; companion CTRACE sites are credited under util trace",
@@ -123450,10 +123453,11 @@
           "tests": ["TestSATCleanerInvariantUsesProcessDebugGate"]
         },
         {
-          "name": "Retained SAT cleaner check_bool_vars SASSERT133-149 source-order notification and C/T action for array lengths and eliminated watches; other nested checker sites remain open",
-          "status": "partial",
+          "name": "Retained SAT cleaner check_bool_vars SASSERT133-149 source-order column-length and eliminated-watch notification with C/T action; line 140 is tautological",
+          "status": "ported",
           "go_target": "pkg/sat/sat_integrity_assertion.go",
-          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
+          "go_targets": ["pkg/sat/sat_integrity_checker.go"],
+          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder", "TestSATIntegrityBoolColumnAssertionsUseSourceActions"]
         },
         {
           "name": "Retained SAT cleaner check_watches SASSERT167-189 process assertion switch and C/T action for binary/ternary/clause watch guards; companion CTRACE sites are credited under util trace",
