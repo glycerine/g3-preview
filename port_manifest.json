@@ -108715,6 +108715,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained UFBV rewrite child, quantifier-body and final-cache SASSERT at ufbv_rewriter.cpp:402,437,457,459",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_loop.go",
+          "tests": ["TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier", "TestRewriteTraversalSourceChildCacheAssertionAndSafeGuard"]
+        },
+        {
           "name": "Retained UFBV rewrite entry SASSERT at ufbv_rewriter.cpp:362 after empty forward-index bypass",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_loop.go",
@@ -122973,6 +122979,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained UFBV rewrite child, quantifier-body and final-cache SASSERT at ufbv_rewriter.cpp:402,437,457,459",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_loop.go",
+          "tests": ["TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier", "TestRewriteTraversalSourceChildCacheAssertionAndSafeGuard"]
+        },
+        {
           "name": "Retained UFBV rewrite entry SASSERT at ufbv_rewriter.cpp:362 after empty forward-index bypass",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_loop.go",
@@ -123465,6 +123477,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained UFBV rewrite child, quantifier-body and final-cache SASSERT at ufbv_rewriter.cpp:402,437,457,459",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_loop.go",
+          "tests": ["TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier", "TestRewriteTraversalSourceChildCacheAssertionAndSafeGuard"]
+        },
         {
           "name": "Retained UFBV rewrite entry SASSERT at ufbv_rewriter.cpp:362 after empty forward-index bypass",
           "status": "ported",

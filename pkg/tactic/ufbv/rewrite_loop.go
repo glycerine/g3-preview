@@ -102,14 +102,11 @@ func (r *rewriteTraversal) rewrite(index *rewriteRuleIndex, boolean *rewriter.Bo
 				if err != nil {
 					return ast.ASTRef{}, err
 				}
-				child, found, err := r.cache.get(old)
+				child, err := r.completedChild(old)
 				if err != nil {
 					return ast.ASTRef{}, err
 				}
-				if !found || !child.done {
-					return ast.ASTRef{}, ast.ErrASTPending
-				}
-				args[i] = child.expr
+				args[i] = child
 				untouched = untouched && args[i] == old
 			}
 			next, matched, err := index.tryRewrite(f, args)
@@ -189,6 +186,13 @@ func (r *rewriteTraversal) rewrite(index *rewriteRuleIndex, boolean *rewriter.Bo
 				return ast.ASTRef{}, err
 			} else if found {
 				if !child.done {
+					if enabled, e := forwardAssertionEnabled(); e != nil {
+						return ast.ASTRef{}, e
+					} else if enabled {
+						if e := forwardAssertionFailure(437, "ebp.second"); e != nil {
+							return ast.ASTRef{}, e
+						}
+					}
 					return ast.ASTRef{}, ast.ErrASTPending
 				}
 				q, err := m.UpdateQuantifierBody(actual, child.expr)
@@ -226,8 +230,45 @@ func (r *rewriteTraversal) rewrite(index *rewriteRuleIndex, boolean *rewriter.Bo
 	if err != nil {
 		return ast.ASTRef{}, err
 	}
-	if !found || !final.done {
+	if !found {
+		if enabled, e := forwardAssertionEnabled(); e != nil {
+			return ast.ASTRef{}, e
+		} else if enabled {
+			if e := forwardAssertionFailure(457, "m_rewrite_cache.contains(n)"); e != nil {
+				return ast.ASTRef{}, e
+			}
+		}
+		return ast.ASTRef{}, ast.ErrASTPending
+	}
+	if !final.done {
+		if enabled, e := forwardAssertionEnabled(); e != nil {
+			return ast.ASTRef{}, e
+		} else if enabled {
+			if e := forwardAssertionFailure(459, "ebp.second"); e != nil {
+				return ast.ASTRef{}, e
+			}
+		}
 		return ast.ASTRef{}, ast.ErrASTPending
 	}
 	return m.NewRef(final.expr)
+}
+
+// completedChild is the source's cache lookup immediately after the child
+// traversal reports ready. A stopped assertion leaves the cache untouched.
+func (r *rewriteTraversal) completedChild(old ast.ASTHandle) (ast.ASTHandle, error) {
+	child, found, err := r.cache.get(old)
+	if err != nil {
+		return ast.ASTHandle{}, err
+	}
+	if !found || !child.done {
+		if enabled, e := forwardAssertionEnabled(); e != nil {
+			return ast.ASTHandle{}, e
+		} else if enabled {
+			if e := forwardAssertionFailure(402, "m_rewrite_cache.contains(o_child) && m_rewrite_cache.get(o_child).second"); e != nil {
+				return ast.ASTHandle{}, e
+			}
+		}
+		return ast.ASTHandle{}, ast.ErrASTPending
+	}
+	return child.expr, nil
 }
