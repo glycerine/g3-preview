@@ -330,6 +330,7 @@ func TestInfIntRationalComparisonsSignsAndRounding(t *testing.T) {
 }
 
 func TestInfIntRationalAccessorsHashDisplayPostOperations(t *testing.T) {
+	disableInfProjectionAssertions(t)
 	s, _ := serviceNew(t)
 	a := infIntValue(t, s, "-3/2", 2)
 	hash, e := s.InfIntHash(&a)
@@ -358,15 +359,9 @@ func TestInfIntRationalAccessorsHashDisplayPostOperations(t *testing.T) {
 	infIntCheck(t, s, &a, "-3/2", 2)
 	serviceMust(t, s.InfIntDel(&old))
 	extracted, err := s.InfIntNumerator(&a)
-	if modularSourceDebug {
-		if !errors.Is(err, ErrInfIntNotRational) || extracted.ownerID != 0 {
-			t.Fatal(err, extracted)
-		}
-	} else {
-		serviceMust(t, err)
-		infIntCheck(t, s, &extracted, "-3", 0)
-		serviceMust(t, s.InfIntDel(&extracted))
-	}
+	serviceMust(t, err)
+	infIntCheck(t, s, &extracted, "-3", 0)
+	serviceMust(t, s.InfIntDel(&extracted))
 	serviceMust(t, s.InfIntReset(&a))
 	r := serviceValue(t, s, "-3/2")
 	serviceMust(t, s.InfIntSetRational(&a, &r))

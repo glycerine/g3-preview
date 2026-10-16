@@ -287,21 +287,15 @@ func TestRawProjectionInfExtractionSourceDebugBoundary(t *testing.T) {
 		} else {
 			out, e = s.InfIntNumerator(&x)
 		}
-		if modularSourceDebug {
-			if !errors.Is(e, ErrInfIntNotRational) || out.ownerID != 0 {
-				t.Fatal(out, e)
-			}
-		} else {
-			serviceMust(t, e)
-			want := int32(7)
-			if den {
-				want = 0
-			}
-			if out.First.Num.Val != want || out.First.Den.Val != 1 || out.second != 0 {
-				t.Fatal(out)
-			}
-			serviceMust(t, s.InfIntDel(&out))
+		serviceMust(t, e)
+		want := int32(7)
+		if den {
+			want = 0
 		}
+		if out.First.Num.Val != want || out.First.Den.Val != 1 || out.second != 0 {
+			t.Fatal(out)
+		}
+		serviceMust(t, s.InfIntDel(&out))
 		var r OwnedInfRational
 		if den {
 			r, e = s.InfDenominator(&y)
@@ -309,7 +303,7 @@ func TestRawProjectionInfExtractionSourceDebugBoundary(t *testing.T) {
 			r, e = s.InfNumerator(&y)
 		}
 		serviceMust(t, e)
-		want := int32(7)
+		want = int32(7)
 		if den {
 			want = 0
 		}

@@ -591,13 +591,26 @@ func (s *RationalService) InfIntInfinitesimal(v *OwnedInfIntRational) (_lexOut O
 	return out, nil
 }
 func (s *RationalService) partInfInt(v *OwnedInfIntRational, den bool) (_lexOut OwnedInfIntRational, _lexErr error) {
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return OwnedInfIntRational{}, e
+		}
+		if enabled && v.second != 0 {
+			line := int32(145)
+			if den {
+				line = 150
+			}
+			if e = diagnostic.DebugAssertionFailure(d, "src/util/inf_int_rational.h", line, "r.m_second == 0"); e != nil {
+				return OwnedInfIntRational{}, e
+			}
+		}
+	}
 	if e := s.beginLexical(); e != nil {
 		return OwnedInfIntRational{}, e
 	}
 	defer s.endLexicalInfInt(&_lexOut, &_lexErr)
-	if modularSourceDebug && v.second != 0 {
-		return OwnedInfIntRational{}, ErrInfIntNotRational
-	}
 	part := NewRational()
 	defer s.destroyLexicalRational(&part)
 	var e error

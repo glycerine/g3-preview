@@ -1,7 +1,7 @@
 //go:build g3debug
 
 // Source: src/util/inf_eps_rational.h:121-128;
-// src/util/inf_rational.h:125-165; src/util/inf_int_rational.h:112-120;
+// src/util/inf_rational.h:125-165; src/util/inf_int_rational.h:112-152;
 // src/util/debug.h:63.
 package numeral
 
@@ -31,7 +31,7 @@ func TestInfinitesimalSourceAssertionActions(t *testing.T) {
 	serviceMust(t, e)
 	inFile, e := os.CreateTemp(t.TempDir(), "inf-eps-actions-*")
 	serviceMust(t, e)
-	_, e = inFile.WriteString("CTCTCTCT")
+	_, e = inFile.WriteString("CTCTCTCTCT")
 	serviceMust(t, e)
 	_, e = inFile.Seek(0, 0)
 	serviceMust(t, e)
@@ -93,6 +93,14 @@ func TestInfinitesimalSourceAssertionActions(t *testing.T) {
 	if _, e := s.InfDenominator(&inner); !errors.As(e, &thrown) || serviceBudget.Used() != beforeThrow {
 		t.Fatal("denominator Throw must precede lexical result allocation", e)
 	}
+	intNum, e := s.InfIntNumerator(&integer)
+	serviceMust(t, e)
+	infIntCheck(t, s, &intNum, "7", 0)
+	serviceMust(t, s.InfIntDel(&intNum))
+	beforeThrow = serviceBudget.Used()
+	if _, e := s.InfIntDenominator(&integer); !errors.As(e, &thrown) || serviceBudget.Used() != beforeThrow {
+		t.Fatal("integer-epsilon denominator Throw must precede lexical result allocation", e)
+	}
 	serviceMust(t, d.EnableAssertions(false))
 	if got, e := s.InfEpsInfUint64(&v); e != nil || got != 7 {
 		t.Fatal("disabled source assertion must reach nested getter", got, e)
@@ -106,9 +114,13 @@ func TestInfinitesimalSourceAssertionActions(t *testing.T) {
 	den, e := s.InfDenominator(&inner)
 	serviceMust(t, e)
 	serviceMust(t, s.InfDel(&den))
+	intDen, e := s.InfIntDenominator(&integer)
+	serviceMust(t, e)
+	infIntCheck(t, s, &intDen, "1", 0)
+	serviceMust(t, s.InfIntDel(&intDen))
 	state, e := input.State()
 	serviceMust(t, e)
-	if state.Position != 8 {
+	if state.Position != 10 {
 		t.Fatal("unexpected debugger action consumption", state.Position)
 	}
 	got, e := os.ReadFile(outFile.Name())
@@ -121,7 +133,9 @@ func TestInfinitesimalSourceAssertionActions(t *testing.T) {
 		"ASSERTION VIOLATION\nFile: src/util/inf_int_rational.h\nLine: 113\nis_int64()\n" + prompt +
 		"ASSERTION VIOLATION\nFile: src/util/inf_int_rational.h\nLine: 118\nis_uint64()\n" + prompt +
 		"ASSERTION VIOLATION\nFile: src/util/inf_rational.h\nLine: 158\nr.m_second.is_zero()\n" + prompt +
-		"ASSERTION VIOLATION\nFile: src/util/inf_rational.h\nLine: 163\nr.m_second.is_zero()\n" + prompt
+		"ASSERTION VIOLATION\nFile: src/util/inf_rational.h\nLine: 163\nr.m_second.is_zero()\n" + prompt +
+		"ASSERTION VIOLATION\nFile: src/util/inf_int_rational.h\nLine: 145\nr.m_second == 0\n" + prompt +
+		"ASSERTION VIOLATION\nFile: src/util/inf_int_rational.h\nLine: 150\nr.m_second == 0\n" + prompt
 	if string(got) != want {
 		t.Fatalf("source assertion records: got %q, want %q", got, want)
 	}

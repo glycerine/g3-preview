@@ -122935,6 +122935,12 @@
           "tests": ["TestInfinitesimalSourceAssertionActions"]
         },
         {
+          "name": "InfIntRational numerator/denominator epsilon-zero SASSERT switch, notification and debugger action before owning extraction (inf_int_rational.h:145,150)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_int_rational.go",
+          "tests": ["TestInfinitesimalSourceAssertionActions"]
+        },
+        {
           "name": "Selected assertion switch, lazy debug table initialization, enable/disable/query, finalize and short-circuit CASSERT gate; whole global macro and debugger bindings remain open",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_debug_context.go",
@@ -123382,6 +123388,12 @@
           "name": "InfRational numerator/denominator epsilon-zero SASSERT switch, notification and debugger action before owning extraction (inf_rational.h:158,163)",
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_rational.go",
+          "tests": ["TestInfinitesimalSourceAssertionActions"]
+        },
+        {
+          "name": "InfIntRational numerator/denominator epsilon-zero SASSERT switch, notification and debugger action before owning extraction (inf_int_rational.h:145,150)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_int_rational.go",
           "tests": ["TestInfinitesimalSourceAssertionActions"]
         },
         {
@@ -128867,10 +128879,11 @@
           "tests": ["TestInfIntFirstSourceBorrowHasNoCopyOrDenominatorRead"]
         },
         {
-          "name": "numerator/denominator: debug zero-epsilon assertion, first-component rational extraction and owning inf_int_rational result (inf_int_rational.h:144-152)",
+          "name": "numerator/denominator: process-gated zero-epsilon SASSERT145/150 notification and debugger action before first-component extraction and owning inf_int_rational result",
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_int_rational.go",
           "tests": [
+            "TestInfinitesimalSourceAssertionActions",
             "TestInfIntRationalAccessorsHashDisplayPostOperations",
             "TestInfIntProjectionPhysicalFailurePrefixes"
           ]
