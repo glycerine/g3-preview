@@ -108486,9 +108486,11 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/ufbv/rewrite_tactic_trace.go",
         "pkg/tactic/ufbv/rewrite_tactic.go"
       ],
       "tests": [
+        "TestUFBVRewriterPublishedGoalSourceTraceAndFormatterRefusal",
         "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
         "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
         "TestUFBVRewriterTacticPublishesIndependentGoalReference"
@@ -108506,6 +108508,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Reached post-publication ufbv-rewriter goal display TRACE at cpp:67, with result-reference cleanup after formatter refusal",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_tactic_trace.go",
+          "tests": ["TestUFBVRewriterPublishedGoalSourceTraceAndFormatterRefusal"]
+        },
         {
           "name": "concrete tactic construction, no-proof and proof-bypass goal application, unsat-core guard and close",
           "status": "partial",
@@ -120806,9 +120814,12 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
+        "pkg/util/bitset/vector_trace.go",
         "pkg/util/bitset/vector.go"
       ],
       "tests": [
+        "TestBitVectorResizeTraceBodySourceInsertionPrefixes",
+        "TestBitVectorResizeSourceTraceSites",
         "TestSourceResizeCrash",
         "TestSourceResize30",
         "TestSourceShift",
@@ -120855,6 +120866,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached bit_vector resize start and post-growth field TRACE at cpp:43,67 with source insertion order",
+          "status": "ported",
+          "go_target": "pkg/util/bitset/vector_trace.go",
+          "tests": ["TestBitVectorResizeSourceTraceSites", "TestBitVectorResizeTraceBodySourceInsertionPrefixes"]
+        },
         {
           "name": "Retained variable-width bit_vector constructors, ownership, packed-bit operations, resize/shift, set algebra, hash and display (bit_vector.h/cpp)",
           "status": "ported",
@@ -154230,10 +154247,13 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
+        "pkg/util/mincut/min_cut_trace.go",
         "pkg/util/mincut/min_cut.go",
         "pkg/util/mincut/min_cut_test.go"
       ],
       "tests": [
+        "TestMinCutTraceSourceInsertionPrefixes",
+        "TestMinCutRetainedEdgeTraceAndCut",
         "TestMinCutWeightedBranchesAndAppendOrder",
         "TestMinCutZeroCapacityStillAppearsInCutEnumeration",
         "TestMinCutRejectsSourceGraphsThatWouldNotTerminate",
@@ -154242,6 +154262,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached spacer.mincut edge-publication TRACE at cpp:35 with source insertion order",
+          "status": "ported",
+          "go_target": "pkg/util/mincut/min_cut_trace.go",
+          "tests": ["TestMinCutRetainedEdgeTraceAndCut", "TestMinCutTraceSourceInsertionPrefixes"]
+        },
         {
           "name": "initial distance labels, admissible-edge advance/retreat, path augmentation and residual reverse capacity",
           "status": "ported",
@@ -180943,6 +180969,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/ufbv/rewrite_tactic_trace.go",
         "pkg/ast/ast_smt2_alias_trace.go",
         "pkg/ast/ast_smt2_let_trace.go",
         "pkg/tactic/tactic_extension_model_trace.go",
@@ -181036,6 +181063,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestUFBVRewriterPublishedGoalSourceTraceAndFormatterRefusal",
         "TestASTSMT2AliasSourceTraceFormatterRefusalKeepsPrefix",
         "TestASTSMT2AliasSourceTraceBeforeLetRegistration",
         "TestASTSMT2LetSourceTraceEmptyAndAliased",
@@ -181165,6 +181193,24 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached post-publication ufbv-rewriter goal display TRACE at ufbv_rewriter_tactic.cpp:67",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_tactic_trace.go",
+          "tests": ["TestUFBVRewriterPublishedGoalSourceTraceAndFormatterRefusal"]
+        },
+        {
+          "name": "Reached bit_vector resize TRACE at bit_vector.cpp:43,67",
+          "status": "ported",
+          "go_target": "pkg/util/bitset/vector_trace.go",
+          "tests": ["TestBitVectorResizeSourceTraceSites", "TestBitVectorResizeTraceBodySourceInsertionPrefixes"]
+        },
+        {
+          "name": "Reached spacer.mincut edge-publication TRACE at min_cut.cpp:35",
+          "status": "ported",
+          "go_target": "pkg/util/mincut/min_cut_trace.go",
+          "tests": ["TestMinCutRetainedEdgeTraceAndCut", "TestMinCutTraceSourceInsertionPrefixes"]
+        },
         {
           "name": "Reached SMT2 store_result alias-registration TRACE at ast_smt2_pp.cpp:708 with source depth, weight, level, ID, low-level expression and shared flag",
           "status": "ported",
@@ -182989,6 +183035,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/ufbv/rewrite_tactic_trace.go",
         "pkg/ast/ast_smt2_alias_trace.go",
         "pkg/ast/ast_smt2_let_trace.go",
         "pkg/tactic/tactic_extension_model_trace.go",
@@ -183080,6 +183127,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestUFBVRewriterPublishedGoalSourceTraceAndFormatterRefusal",
         "TestASTSMT2AliasSourceTraceFormatterRefusalKeepsPrefix",
         "TestASTSMT2AliasSourceTraceBeforeLetRegistration",
         "TestASTSMT2LetSourceTraceEmptyAndAliased",
@@ -183219,6 +183267,24 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached post-publication ufbv-rewriter goal display TRACE at ufbv_rewriter_tactic.cpp:67",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_tactic_trace.go",
+          "tests": ["TestUFBVRewriterPublishedGoalSourceTraceAndFormatterRefusal"]
+        },
+        {
+          "name": "Reached bit_vector resize TRACE at bit_vector.cpp:43,67",
+          "status": "ported",
+          "go_target": "pkg/util/bitset/vector_trace.go",
+          "tests": ["TestBitVectorResizeSourceTraceSites", "TestBitVectorResizeTraceBodySourceInsertionPrefixes"]
+        },
+        {
+          "name": "Reached spacer.mincut edge-publication TRACE at min_cut.cpp:35",
+          "status": "ported",
+          "go_target": "pkg/util/mincut/min_cut_trace.go",
+          "tests": ["TestMinCutRetainedEdgeTraceAndCut", "TestMinCutTraceSourceInsertionPrefixes"]
+        },
         {
           "name": "Reached SMT2 store_result alias-registration TRACE at ast_smt2_pp.cpp:708 with source depth, weight, level, ID, low-level expression and shared flag",
           "status": "ported",

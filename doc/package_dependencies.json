@@ -1757,6 +1757,7 @@
         "rewrite_loop.go",
         "rewrite_rule_index.go",
         "rewrite_tactic.go",
+        "rewrite_tactic_trace.go",
         "rewrite_traversal.go"
       ]
     },

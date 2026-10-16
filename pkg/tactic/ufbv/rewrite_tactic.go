@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
@@ -21,6 +22,7 @@ type RewriterTactic struct {
 	context *uparams.ParamsContext
 	globals *uparams.GlobalParamsService
 	boolean *rewriter.BoolRewriter
+	trace   *diagnostic.TraceTags
 	header  uint64
 	closed  bool
 }
@@ -165,6 +167,9 @@ func (t *RewriterTactic) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error)
 	}
 	if e := goal.IncRef(); e != nil {
 		return nil, e
+	}
+	if e := t.tracePublishedGoal(goal); e != nil {
+		return nil, errors.Join(e, goal.DecRef())
 	}
 	return goal, nil
 }
