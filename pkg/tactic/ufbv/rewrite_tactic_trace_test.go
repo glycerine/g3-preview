@@ -3,6 +3,7 @@ package ufbv
 import (
 	"bytes"
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -77,6 +78,18 @@ func TestUFBVRewriterPublishedGoalSourceTraceAndFormatterRefusal(t *testing.T) {
 	if got := output.String(); got != want {
 		t.Fatalf("source rewritten-goal trace: got %q, want %q", got, want)
 	}
+	output.Reset()
+	tags.Enable("demodulator")
+	result, err = rewriter.Apply(goal)
+	cacheMust(t, err)
+	cacheMust(t, result.DecRef())
+	inner := strings.Index(output.String(), "ufbv_rewriter.cpp:668 ---------\n")
+	final := strings.Index(output.String(), "ufbv_rewriter.cpp:753 ---------\n")
+	outer := strings.Index(output.String(), "ufbv_rewriter_tactic.cpp:67 ---------\n")
+	if inner < 0 || final <= inner || outer <= final {
+		t.Fatal("tactic-bound inner trace did not precede published goal", output.String())
+	}
+	tags.Disable("demodulator")
 	output.Reset()
 	_, err = uparams.BindProcessGlobalParamsService(nil)
 	cacheMust(t, err)

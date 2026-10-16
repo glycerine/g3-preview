@@ -136,6 +136,9 @@ func (t *RewriterTactic) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error)
 		}
 	}
 	processor, e := newFormulaProcessor(t.manager, t.imp.boolean)
+	if processor != nil {
+		processor.trace = t.trace
+	}
 	if e != nil {
 		if processor != nil {
 			result = errors.Join(result, processor.close())

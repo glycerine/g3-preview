@@ -265,6 +265,7 @@ digraph packages {
   "tactic/ufbv" -> "tactic";
   "tactic/ufbv" -> "util/diagnostic";
   "tactic/ufbv" -> "util/params";
+  "tactic/ufbv" -> "util/text";
   "test" [style=filled, fillcolor="#eeeeee"];
   "testoracle" [style=filled, fillcolor="#eeeeee"];
   "util/approx" [style=filled, fillcolor="#dceafa"];

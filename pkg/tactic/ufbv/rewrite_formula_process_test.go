@@ -1,9 +1,12 @@
 package ufbv
 
 import (
+	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -46,6 +49,10 @@ func TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults(t *tes
 	boolean := ufbvBooleanFixture(t, m)
 	processor, e := newFormulaProcessor(m, boolean)
 	cacheMust(t, e)
+	var trace bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&trace)
+	tags.Enable("demodulator")
+	processor.trace = tags
 	t.Cleanup(func() { cacheMust(t, processor.close()) })
 	beforeQRefs, e := m.GetRefCount(q)
 	cacheMust(t, e)
@@ -62,6 +69,9 @@ func TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults(t *tes
 	}
 	if !seen[truth] || !seen[q] || len(seen) != 2 {
 		t.Fatal("rescheduled formula did not simplify or rule not published", seen)
+	}
+	if tags.ShouldTrace("demodulator") && (!strings.Contains(trace.String(), "ufbv_rewriter.cpp:748 ---------\n") || !strings.Contains(trace.String(), "after demodulator:\n")) {
+		t.Fatal("source demodulator publication and final trace", trace.String())
 	}
 	if e := processor.close(); e != nil {
 		t.Fatal(e)

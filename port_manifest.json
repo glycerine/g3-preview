@@ -108715,6 +108715,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained UFBV formula before, processed, demodulator and after TRACE at ufbv_rewriter.cpp:668,736,748,753",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_trace.go",
+          "tests": ["TestUFBVFormulaSourceBeforePublishedAndAfterTraces", "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults", "TestUFBVFormulaTraceWriterRefusalDoesNotStopRewrite", "TestUFBVRewriterPublishedGoalSourceTraceAndFormatterRefusal"]
+        },
+        {
           "name": "UFBV check_fwd_idx_consistency and show_fwd_idx, including cpp259/272 SASSERT, have no production caller",
           "status": "dead_deleted",
           "tests": []
@@ -182181,6 +182187,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained UFBV formula before, processed, demodulator and after TRACE at ufbv_rewriter.cpp:668,736,748,753",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_trace.go",
+          "tests": ["TestUFBVFormulaSourceBeforePublishedAndAfterTraces", "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults", "TestUFBVFormulaTraceWriterRefusalDoesNotStopRewrite", "TestUFBVRewriterPublishedGoalSourceTraceAndFormatterRefusal"]
+        },
+        {
           "name": "find_ite_bounds TRACE sites (propagate_ineqs_tactic.cpp:355,366,383,393,406,415,428,440,452,477) are unreachable: the only operator() call is commented out",
           "status": "dead_deleted"
         },
@@ -184526,6 +184538,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained UFBV formula before, processed, demodulator and after TRACE at ufbv_rewriter.cpp:668,736,748,753",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_trace.go",
+          "tests": ["TestUFBVFormulaSourceBeforePublishedAndAfterTraces", "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults", "TestUFBVFormulaTraceWriterRefusalDoesNotStopRewrite", "TestUFBVRewriterPublishedGoalSourceTraceAndFormatterRefusal"]
+        },
         {
           "name": "find_ite_bounds TRACE sites (propagate_ineqs_tactic.cpp:355,366,383,393,406,415,428,440,452,477) are unreachable: the only operator() call is commented out",
           "status": "dead_deleted"

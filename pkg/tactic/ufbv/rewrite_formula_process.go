@@ -13,6 +13,7 @@ import (
 // formula batch. The configured Boolean reducer is borrowed from its caller.
 type formulaProcessor struct {
 	manager *ast.ASTManager
+	trace   *diagnostic.TraceTags
 	index   *rewriteRuleIndex
 	back    *rewriteBackIndex
 	loop    *rewriteTraversal
@@ -93,6 +94,9 @@ func (r *formulaProcessor) run(formulas []ast.ASTHandle) (output []ast.ASTHandle
 		}
 		return output, nil
 	}
+	if e := r.traceFormulas(668, "before demodulator:\n", formulas); e != nil {
+		return nil, e
+	}
 	for _, h := range formulas {
 		if e := m.IncRef(h); e != nil {
 			return output, e
@@ -110,13 +114,22 @@ func (r *formulaProcessor) run(formulas []ast.ASTHandle) (output []ast.ASTHandle
 		if e := publish(h); e != nil {
 			return output, e
 		}
+		if e := r.traceFormulas(736, "", []ast.ASTHandle{h}); e != nil {
+			return output, e
+		}
 	}
 	for _, qs := range r.index.byFunc {
 		for _, q := range qs.values {
 			if e := publish(q); e != nil {
 				return output, e
 			}
+			if e := r.traceFormulas(748, "", []ast.ASTHandle{q}); e != nil {
+				return output, e
+			}
 		}
+	}
+	if e := r.traceFormulas(753, "after demodulator:\n", output); e != nil {
+		return output, e
 	}
 	return output, nil
 }

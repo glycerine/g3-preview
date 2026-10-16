@@ -1779,7 +1779,8 @@
         "ast/rewriter",
         "tactic",
         "util/diagnostic",
-        "util/params"
+        "util/params",
+        "util/text"
       ],
       "production_files": [
         "match_subst.go",
@@ -1793,6 +1794,7 @@
         "rewrite_formula_assert.go",
         "rewrite_formula_demodulator_assert.go",
         "rewrite_formula_process.go",
+        "rewrite_formula_trace.go",
         "rewrite_loop.go",
         "rewrite_rule_index.go",
         "rewrite_rule_index_assert.go",
