@@ -108715,6 +108715,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained UFBV forward-index SASSERT at ufbv_rewriter.cpp:217-219,231,297,307 with process debug gate and erased-build domain guards",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_rule_index_assert.go",
+          "tests": ["TestRewriteForwardIndexSourcePreconditionsAndRuleGuards"]
+        },
+        {
           "name": "Retained UFBV back-index existing-set SASSERT at ufbv_rewriter.cpp:482,507,518,607 with process debug gate and C/T actions",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_back_index_assert.go",
@@ -122955,6 +122961,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained UFBV forward-index SASSERT at ufbv_rewriter.cpp:217-219,231,297,307 with process debug gate and erased-build domain guards",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_rule_index_assert.go",
+          "tests": ["TestRewriteForwardIndexSourcePreconditionsAndRuleGuards"]
+        },
+        {
           "name": "Retained UFBV back-index existing-set SASSERT at ufbv_rewriter.cpp:482,507,518,607 with process debug gate and C/T actions",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_back_index_assert.go",
@@ -123429,6 +123441,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained UFBV forward-index SASSERT at ufbv_rewriter.cpp:217-219,231,297,307 with process debug gate and erased-build domain guards",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_rule_index_assert.go",
+          "tests": ["TestRewriteForwardIndexSourcePreconditionsAndRuleGuards"]
+        },
         {
           "name": "Retained UFBV back-index existing-set SASSERT at ufbv_rewriter.cpp:482,507,518,607 with process debug gate and C/T actions",
           "status": "ported",

@@ -52,7 +52,35 @@ func (r *rewriteRuleIndex) insert(quantifier, lhs, rhs ast.ASTHandle) error {
 	if e := r.check(); e != nil {
 		return e
 	}
+	assertions, e := forwardAssertionEnabled()
+	if e != nil {
+		return e
+	}
+	if assertions {
+		kind, e := r.manager.GetKind(lhs)
+		if e != nil {
+			return e
+		}
+		if kind != ast.ASTApp {
+			if e := forwardAssertionFailure(217, "large->get_kind() == AST_APP"); e != nil {
+				return e
+			}
+		}
+		if quantifier.IsNull() {
+			if e := forwardAssertionFailure(218, "demodulator"); e != nil {
+				return e
+			}
+		}
+		if lhs.IsNull() || rhs.IsNull() {
+			if e := forwardAssertionFailure(219, "large && small"); e != nil {
+				return e
+			}
+		}
+	}
 	if _, present := r.rules[quantifier]; present {
+		return ast.ErrASTDomain
+	}
+	if rhs.IsNull() {
 		return ast.ErrASTDomain
 	}
 	kind, e := r.manager.GetKind(quantifier)
@@ -66,8 +94,16 @@ func (r *rewriteRuleIndex) insert(quantifier, lhs, rhs ast.ASTHandle) error {
 	if e != nil {
 		return e
 	}
-	set := r.byFunc[f]
-	if set == nil {
+	set, found := r.byFunc[f]
+	if found && set == nil {
+		if assertions {
+			if e := forwardAssertionFailure(231, "it->m_value"); e != nil {
+				return e
+			}
+		}
+		return ast.ErrASTDomain
+	}
+	if !found {
 		set, e = r.newForwardSet()
 		if e != nil {
 			return e
@@ -172,6 +208,13 @@ func (r *rewriteRuleIndex) tryRewrite(f ast.ASTHandle, args []ast.ASTHandle) (as
 	for _, q := range set.values {
 		rule, found := r.rules[q]
 		if !found {
+			if enabled, e := forwardAssertionEnabled(); e != nil {
+				return ast.ASTRef{}, false, e
+			} else if enabled {
+				if e := forwardAssertionFailure(297, "m_demodulator2lhs_rhs.contains(d)"); e != nil {
+					return ast.ASTRef{}, false, e
+				}
+			}
 			return ast.ASTRef{}, false, ast.ErrASTDomain
 		}
 		if rule.removing {
@@ -189,6 +232,13 @@ func (r *rewriteRuleIndex) tryRewrite(f ast.ASTHandle, args []ast.ASTHandle) (as
 			return ast.ASTRef{}, false, e
 		}
 		if decl != f {
+			if enabled, e := forwardAssertionEnabled(); e != nil {
+				return ast.ASTRef{}, false, e
+			} else if enabled {
+				if e := forwardAssertionFailure(307, "large->get_decl() == f"); e != nil {
+					return ast.ASTRef{}, false, e
+				}
+			}
 			return ast.ASTRef{}, false, ast.ErrASTDomain
 		}
 		out, matched, e := r.matcher.rewriteRule(rule.lhs, rule.rhs, args)
