@@ -209,6 +209,7 @@ func (s *satSimplifier) subsume() (err error) {
 	} // source intentionally ignores bool
 	p := s.lifecycle.propagation
 	for {
+		s.traceSubsumptionTodoSize()
 		s.kernel.subCounter = int32(uint32(s.kernel.subCounter) - s.subBinTodo.Size())
 		for s.subBinTodo.Size() != 0 {
 			if e := p.checkpoint(); e != nil {
@@ -274,6 +275,7 @@ func (s *satSimplifier) subsume() (err error) {
 			return ErrSATSignedCounterDomain
 		}
 		s.kernel.subCounter--
+		s.traceSubsumptionTodoClause(845, "next: ", c)
 		trail, e := p.variables.trail.Size(p.variables.trailRef)
 		if e != nil {
 			return e
@@ -307,12 +309,14 @@ func (s *satSimplifier) subsume() (err error) {
 				}
 				continue
 			case 2:
+				s.traceSubsumptionTodoClause(863, "clause became binary: ", c)
 				if e = s.binaryFromClause(c); e != nil {
 					return e
 				}
 				continue
 			}
 		}
+		s.traceSubsumptionTodoClause(870, "using: ", c)
 		if e = s.backSubsumption1(c); e != nil {
 			return e
 		}

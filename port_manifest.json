@@ -77290,6 +77290,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_subsumption_trace.go",
           "tests": ["TestSATSimplifierBackwardSubsumptionSourceTraces"]
+        },
+        {
+          "name": "Reached subsume queue-size/next/binary/using TRACE sites at sat_simplifier.cpp:815,845,863,870",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_todos_trace.go",
+          "tests": ["TestSATSimplifierActualSubsumptionTodoSourceTraces"]
         }
       ],
       "ownership": [
@@ -182320,6 +182326,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_subsumption_trace.go",
           "tests": ["TestSATSimplifierBackwardSubsumptionSourceTraces"]
+        },
+        {
+          "name": "Reached subsume queue-size/next/binary/using TRACE sites at sat_simplifier.cpp:815,845,863,870",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_todos_trace.go",
+          "tests": ["TestSATSimplifierActualSubsumptionTodoSourceTraces"]
         }
       ],
       "ownership": [
@@ -184120,6 +184132,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_subsumption_trace.go",
           "tests": ["TestSATSimplifierBackwardSubsumptionSourceTraces"]
+        },
+        {
+          "name": "Reached subsume queue-size/next/binary/using TRACE sites at sat_simplifier.cpp:815,845,863,870",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_todos_trace.go",
+          "tests": ["TestSATSimplifierActualSubsumptionTodoSourceTraces"]
         }
       ],
       "ownership": [
