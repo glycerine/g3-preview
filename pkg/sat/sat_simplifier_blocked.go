@@ -249,6 +249,7 @@ func (s *satSimplifier) blockedClauseOccurrences(l Literal, entry *satModelConve
 			return e
 		}
 		if yes {
+			s.traceBlockedClause(c)
 			if *entry == (satModelConversionEntryRef{}) {
 				*entry, e = p.converter.Mk(satModelBlockLit, l.variable())
 				if e != nil {
@@ -322,6 +323,7 @@ func (s *satSimplifier) removeBinaryHalf(l1, l2 Literal, learned bool) error {
 	return e
 }
 func (s *satSimplifier) blockedProcess(l Literal) error {
+	s.traceBlockedProcessing(l)
 	yes, e := s.blockedProcessVar(l.variable())
 	if e != nil {
 		return e
@@ -392,6 +394,7 @@ func (s *satSimplifier) blockedProcess(l Literal) error {
 					return e
 				}
 			}
+			s.traceBlockedBinary(l2, l)
 			learned, e := x.Learned()
 			if e != nil {
 				return e

@@ -77314,6 +77314,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_display_trace.go",
           "tests": ["TestSATActualSimplifierInitializeAndRunDisplaySourceTraces"]
+        },
+        {
+          "name": "Reached blocked-clause process/nary/binary TRACE sites at sat_simplifier.cpp:951,967,1008",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_blocked_trace.go",
+          "tests": ["TestSATSimplifierActualBlockedClauseSourceTraces"]
         }
       ],
       "ownership": [
@@ -182368,6 +182374,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_display_trace.go",
           "tests": ["TestSATActualSimplifierInitializeAndRunDisplaySourceTraces"]
+        },
+        {
+          "name": "Reached blocked-clause process/nary/binary TRACE sites at sat_simplifier.cpp:951,967,1008",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_blocked_trace.go",
+          "tests": ["TestSATSimplifierActualBlockedClauseSourceTraces"]
         }
       ],
       "ownership": [
@@ -184192,6 +184204,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_display_trace.go",
           "tests": ["TestSATActualSimplifierInitializeAndRunDisplaySourceTraces"]
+        },
+        {
+          "name": "Reached blocked-clause process/nary/binary TRACE sites at sat_simplifier.cpp:951,967,1008",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_blocked_trace.go",
+          "tests": ["TestSATSimplifierActualBlockedClauseSourceTraces"]
         }
       ],
       "ownership": [
