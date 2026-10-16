@@ -57307,6 +57307,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Reached model_evaluator::operator()(expr*, expr_ref&) entry TRACE at model_evaluator.cpp:566, with source SMT2 term before traversal",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "tests": ["TestModelEvaluatorGetMacroSourceTraceBranches"]
+        },
+        {
           "name": "Concrete model_evaluator::imp allocation, cleanup replacement and destructor debug memory records (model_evaluator.cpp:523,556-557,531)",
           "status": "platform_replacement",
           "go_target": "pkg/model/model_evaluator_memory_trace.go",
@@ -180980,6 +180986,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Reached model_evaluator::operator()(expr*, expr_ref&) entry TRACE at model_evaluator.cpp:566, with source SMT2 term before traversal",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "tests": ["TestModelEvaluatorGetMacroSourceTraceBranches"]
+        },
+        {
           "name": "Reached pulled-quantifier TRACE after successful nested binder pull and pattern inference (pattern_inference.cpp:695), with complete process-bound SMT2 result",
           "status": "ported",
           "go_target": "pkg/ast/pattern/reduce_quantifier_trace.go",
@@ -182960,6 +182972,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached model_evaluator::operator()(expr*, expr_ref&) entry TRACE at model_evaluator.cpp:566, with source SMT2 term before traversal",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "tests": ["TestModelEvaluatorGetMacroSourceTraceBranches"]
+        },
         {
           "name": "Reached pulled-quantifier TRACE after successful nested binder pull and pattern inference (pattern_inference.cpp:695), with complete process-bound SMT2 result",
           "status": "ported",

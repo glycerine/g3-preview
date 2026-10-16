@@ -153,6 +153,9 @@ func (ev *ModelEvaluator) Evaluate(t ast.ASTHandle, out ast.ASTRef) error {
 	if e := ev.open(); e != nil {
 		return e
 	}
+	if e := ev.traceEvaluate(t); e != nil {
+		return e
+	}
 	if e := ev.traversal.Rewrite(t, out); e != nil {
 		return e
 	}

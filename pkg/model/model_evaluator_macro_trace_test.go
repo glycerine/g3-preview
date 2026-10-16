@@ -29,14 +29,23 @@ func TestModelEvaluatorGetMacroSourceTraceBranches(t *testing.T) {
 	out := astTestPin(t, m, ast.ASTHandle{})
 	astTestMust(t, ev.Evaluate(app, out))
 	firstRecords := output.String()
+	entry := func(name string) string {
+		return "-------- [model_evaluator] operator() src/model/model_evaluator.cpp:566 ---------\n" +
+			"(" + name + " false)\n" +
+			"------------------------------------------------\n"
+	}
 	missing := modelTestFunctionDecl(t, m, "macro-trace-missing")
 	app, e = m.MkApp(missing, []ast.ASTHandle{no})
 	astTestMust(t, e)
 	astTestPin(t, m, app)
 	astTestMust(t, ev.Reset(nil))
 	astTestMust(t, ev.Evaluate(app, out))
-	if output.String() != firstRecords {
-		t.Fatal("absent interpretation traced with completion disabled")
+	secondRecords := firstRecords
+	if tags.ShouldTrace("model_evaluator") {
+		secondRecords += entry("macro-trace-missing")
+	}
+	if output.String() != secondRecords {
+		t.Fatal("absent interpretation traced with completion disabled", output.String())
 	}
 	astTestMust(t, ev.Reset(nil))
 	astTestMust(t, ev.SetModelCompletion(true))
@@ -47,9 +56,11 @@ func TestModelEvaluatorGetMacroSourceTraceBranches(t *testing.T) {
 		}
 		return
 	}
-	want := "-------- [model_evaluator] get_macro src/model/model_evaluator.cpp:228 ---------\n" +
+	want := entry("macro-trace-existing") +
+		"-------- [model_evaluator] get_macro src/model/model_evaluator.cpp:228 ---------\n" +
 		"get_macro for macro-trace-existing (model completion: 0)\n" +
 		"------------------------------------------------\n" +
+		entry("macro-trace-missing") + entry("macro-trace-missing") +
 		"-------- [model_evaluator] get_macro src/model/model_evaluator.cpp:247 ---------\n" +
 		"get_macro for macro-trace-missing (model completion: 1)\n" +
 		"------------------------------------------------\n"
