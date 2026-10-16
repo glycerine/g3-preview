@@ -113,12 +113,21 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 	p := c.lifecycle.propagation
 	a := p.clauses
 	v := p.variables
+	assertions := false
 	if satStorageSourceDebug {
 		enabled, e := diagnostic.BorrowProcessDebugContext().AssertionsEnabled()
 		if e != nil {
 			return false, e
 		}
-		if enabled {
+		assertions = enabled
+	}
+	tags := c.lifecycle.traceTags
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	traceClause := tags.ShouldTrace("sat_bug") && c.gc != nil && c.gc.conflict != nil && c.gc.conflict.solver != nil
+	if assertions || traceClause {
+		if assertions {
 			removed, e := a.Removed(cl)
 			if e != nil {
 				return false, e
@@ -126,18 +135,20 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 			if e = satIntegrityAssertion(!removed, c.debugActions, 53, "!c.was_removed()"); e != nil {
 				return false, e
 			}
-			for i := uint32(0); ; i++ {
-				n, e := a.Size(cl)
-				if e != nil {
-					return false, e
-				}
-				if i >= n {
-					break
-				}
-				lit, e := a.Literal(cl, i)
-				if e != nil {
-					return false, e
-				}
+		}
+		for i := uint32(0); ; i++ {
+			n, e := a.Size(cl)
+			if e != nil {
+				return false, e
+			}
+			if i >= n {
+				break
+			}
+			lit, e := a.Literal(cl, i)
+			if e != nil {
+				return false, e
+			}
+			if assertions {
 				vars, e := v.numVarsChecked()
 				if e != nil {
 					return false, e
@@ -145,14 +156,21 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 				if e = satIntegrityAssertion(uint32(lit.variable()) <= vars, c.debugActions, 55, "c[i].var() <= s.num_vars()"); e != nil {
 					return false, e
 				}
-				gone, e := c.eliminated(lit.variable())
-				if e != nil {
-					return false, e
-				}
+			}
+			gone, e := c.eliminated(lit.variable())
+			if e != nil {
+				return false, e
+			}
+			if gone && traceClause {
+				c.traceEliminatedClause(cl, uint32(lit.variable()))
+			}
+			if assertions {
 				if e = satIntegrityAssertion(!gone, c.debugActions, 60, "!s.was_eliminated(c[i].var())"); e != nil {
 					return false, e
 				}
 			}
+		}
+		if assertions {
 			yes, e := a.CheckApprox(cl)
 			if e != nil {
 				return false, e

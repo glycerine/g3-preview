@@ -75115,6 +75115,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
+        },
+        {
+          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source clause and real solver display (cpp56-60); later ternary and residual trace sites remain open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_clause_trace.go",
+          "tests": ["TestSATIntegrityEliminatedClauseSourceTrace"]
         }
       ],
       "ownership": [
@@ -75216,6 +75222,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
+        },
+        {
+          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source clause and real solver display (cpp56-60); later ternary and residual trace sites remain open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_clause_trace.go",
+          "tests": ["TestSATIntegrityEliminatedClauseSourceTrace"]
         }
       ],
       "ownership": [
@@ -181862,6 +181874,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_integrity_disjoint_trace.go",
           "tests": ["TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
+        },
+        {
+          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source clause and real solver display (cpp56-60); later ternary and residual trace sites remain open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_clause_trace.go",
+          "tests": ["TestSATIntegrityEliminatedClauseSourceTrace"]
         }
       ],
       "ownership": [
@@ -183601,6 +183619,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_integrity_disjoint_trace.go",
           "tests": ["TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
+        },
+        {
+          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source clause and real solver display (cpp56-60); later ternary and residual trace sites remain open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_clause_trace.go",
+          "tests": ["TestSATIntegrityEliminatedClauseSourceTrace"]
         }
       ],
       "ownership": [
