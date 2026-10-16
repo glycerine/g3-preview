@@ -23709,6 +23709,12 @@
           ]
         },
         {
+          "name": "mk_extract_core reached extraction-propagation process-bound SMT2 TRACE after rewritten node creation (bv_rewriter.cpp:776)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_extract_trace.go",
+          "tests": ["TestBVRewriterExtractPropagationSourceTrace"]
+        },
+        {
           "name": "mk_bv_le_core successful extra concat/overflow process-bound SMT2 TRACE (bv_rewriter.cpp:514,523)",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_leq_trace.go",
@@ -182935,6 +182941,12 @@
           "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
         },
         {
+          "name": "Retained BV extract-propagation process-bound SMT2 TRACE at bv_rewriter.cpp:776",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_extract_trace.go",
+          "tests": ["TestBVRewriterExtractPropagationSourceTrace"]
+        },
+        {
           "name": "Retained BV LE extra concat/overflow process-bound SMT2 TRACE at bv_rewriter.cpp:514,523",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_leq_trace.go",
@@ -185066,6 +185078,12 @@
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
           "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
+        },
+        {
+          "name": "Retained BV extract-propagation process-bound SMT2 TRACE at bv_rewriter.cpp:776",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_extract_trace.go",
+          "tests": ["TestBVRewriterExtractPropagationSourceTrace"]
         },
         {
           "name": "Retained BV LE extra concat/overflow process-bound SMT2 TRACE at bv_rewriter.cpp:514,523",

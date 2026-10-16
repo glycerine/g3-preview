@@ -192,7 +192,10 @@ func (p *BVRewriter) bvExtractBody(v *bvExtractInvocation, high, low uint32, arg
 				return failed, RewriteFailed, e
 			}
 			node, e := p.extract.Apply(high, low, term)
-			return node, Rewrite2, e
+			if e != nil {
+				return failed, RewriteFailed, e
+			}
+			return node, Rewrite2, p.traceExtractPropagation(arg, node, high, low, removed)
 		}
 		// A failed predicate still ends ep_res before the following ITE guard.
 		if e = v.endRef(m); e != nil {
