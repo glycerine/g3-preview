@@ -12496,6 +12496,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_smt2_let_trace.go",
         "pkg/ast/ast_smt2_bv_literal.go",
         "pkg/ast/ast_smt2_bv_literal_source_test.go",
         "pkg/ast/ast_smt2_float_real.go",
@@ -12520,6 +12521,7 @@
         "pkg/ast/ast_smt2_quantifier_root.go"
       ],
       "tests": [
+        "TestASTSMT2LetSourceTraceEmptyAndAliased",
         "TestASTSMT2BitVectorLiteralRadixAndSignedOracle",
         "TestASTSMT2BitVectorLiteralEveryReachedReservation",
         "TestASTSMT2BitVectorLiteralWarmInlinePrimaryDoesNotArchive",
@@ -12696,6 +12698,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Selected root-scope pp_let alias-count, declaration-level, and open-let TRACE checkpoints at ast_smt2_pp.cpp:806,818,833; nested scope alias offset remains partial",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_smt2_let_trace.go",
+          "tests": ["TestASTSMT2LetSourceTraceEmptyAndAliased"]
+        },
         {
           "name": "smt2_printer::operator()(func_decl*,format_ref&) declare-fun document from name, domain and range sorts (ast_smt2_pp.cpp:1117-1131)",
           "status": "ported",
@@ -180926,6 +180934,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_smt2_let_trace.go",
         "pkg/tactic/tactic_extension_model_trace.go",
         "pkg/tactic/tactic_filter_model_trace.go",
         "pkg/ast/ast_func_decl_info_text.go",
@@ -181017,6 +181026,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestASTSMT2LetSourceTraceEmptyAndAliased",
         "TestFilterModelSourceBeforeAfterTrace",
         "TestExtensionModelTraceAttachedDeclarationInfo",
         "TestExtensionModelDefinitionSourceTraceReverseOrder",
@@ -181143,6 +181153,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Selected root-scope pp_let alias-count, declaration-level, and open-let TRACE checkpoints at ast_smt2_pp.cpp:806,818,833; nested scope alias offset remains partial",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_smt2_let_trace.go",
+          "tests": ["TestASTSMT2LetSourceTraceEmptyAndAliased"]
+        },
         {
           "name": "reached filter_mc before/after model_v2_pp TRACE at filter_model_converter.cpp:26,51 with concrete retained constant/function snapshots and ordered converter display",
           "status": "ported",
@@ -182955,6 +182971,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_smt2_let_trace.go",
         "pkg/tactic/tactic_extension_model_trace.go",
         "pkg/tactic/tactic_filter_model_trace.go",
         "pkg/ast/ast_func_decl_info_text.go",
@@ -183044,6 +183061,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestASTSMT2LetSourceTraceEmptyAndAliased",
         "TestFilterModelSourceBeforeAfterTrace",
         "TestExtensionModelTraceAttachedDeclarationInfo",
         "TestExtensionModelDefinitionSourceTraceReverseOrder",
@@ -183180,6 +183198,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Selected root-scope pp_let alias-count, declaration-level, and open-let TRACE checkpoints at ast_smt2_pp.cpp:806,818,833; nested scope alias offset remains partial",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_smt2_let_trace.go",
+          "tests": ["TestASTSMT2LetSourceTraceEmptyAndAliased"]
+        },
         {
           "name": "reached filter_mc before/after model_v2_pp TRACE at filter_model_converter.cpp:26,51 with concrete retained constant/function snapshots and ordered converter display",
           "status": "ported",

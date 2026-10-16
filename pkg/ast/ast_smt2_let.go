@@ -10,6 +10,9 @@ type smt2LetBinding struct {
 }
 
 func (m *ASTManager) smt2PPLet(body ASTHandle, bindings []smt2LetBinding) (ASTHandle, error) {
+	if err := m.traceSMT2Let(806, "old_sz: 0, sz: ", len(bindings)); err != nil {
+		return ASTHandle{}, err
+	}
 	if len(bindings) == 0 {
 		return body, nil
 	}
@@ -23,6 +26,9 @@ func (m *ASTManager) smt2PPLet(body ASTHandle, bindings []smt2LetBinding) (ASTHa
 			return ASTHandle{}, err
 		}
 		levels[binding.level] = append(levels[binding.level], decl)
+	}
+	if err := m.traceSMT2Let(818, "decls.size(): ", len(levels)); err != nil {
+		return ASTHandle{}, err
 	}
 	parts := make([]ASTHandle, 0, 4*len(levels)+2)
 	open := 0
@@ -51,6 +57,9 @@ func (m *ASTManager) smt2PPLet(body ASTHandle, bindings []smt2LetBinding) (ASTHa
 			return ASTHandle{}, err
 		}
 		parts = append(parts, prefix, group)
+	}
+	if err := m.traceSMT2Let(833, "num_op: ", open); err != nil {
+		return ASTHandle{}, err
 	}
 	line, err := m.FormatLineBreak()
 	if err != nil {

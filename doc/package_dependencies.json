@@ -295,6 +295,7 @@
         "ast_smt2_float_dispatch.go",
         "ast_smt2_float_real.go",
         "ast_smt2_let.go",
+        "ast_smt2_let_trace.go",
         "ast_smt2_quantifier_root.go",
         "ast_smt2_sort.go",
         "ast_smt2_var_labels.go",
