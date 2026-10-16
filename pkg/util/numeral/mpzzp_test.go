@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 func modularManager(t *testing.T, p uint64) (*IntegerModularManager, *IntegerManager, *arena.Budget) {
@@ -308,8 +309,10 @@ func TestIntegerModularCompleteScalarRoutes(t *testing.T) {
 	if ok, e := m.Divides(&a, &b); e != nil || !ok {
 		t.Fatal(ok, e)
 	}
-	if _, e = m.IsPerfectSquare(&a, &c); !errors.Is(e, ErrModularUnsupported) {
-		t.Fatal(e)
+	if !modularSourceDebug {
+		if _, e = m.IsPerfectSquare(&a, &c); !errors.Is(e, diagnostic.ErrDebugNativeUnreachable) {
+			t.Fatal(e)
+		}
 	}
 	if !modularSourceDebug {
 		_, _ = m.Root(&a, 2, &c)

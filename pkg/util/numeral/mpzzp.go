@@ -374,7 +374,7 @@ func (m *IntegerModularManager) invWithAllocationContext(a *Int, context integer
 		return e
 	}
 	if m.z {
-		return ErrModularUnsupported
+		return diagnostic.BorrowProcessDebugContext().UnreachableSource("src/util/mpzzp.h", 169)
 	}
 	if diagnostic.DebugBuild {
 		d := diagnostic.BorrowProcessDebugContext()
@@ -616,7 +616,7 @@ func (m *IntegerModularManager) isPerfectSquareWithSourceContext(a, out *Int, co
 		return false, ErrModularOwner
 	}
 	if !m.z {
-		return false, ErrModularUnsupported
+		return false, diagnostic.BorrowProcessDebugContext().NotImplementedYet("src/util/mpzzp.h", 261)
 	}
 	return m.manager.isPerfectSquareWithAllocationContext(a, out, context)
 }

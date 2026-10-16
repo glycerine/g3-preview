@@ -169685,6 +169685,15 @@
           ]
         },
         {
+          "name": "mpzzp Z-mode inverse UNREACHABLE at mpzzp.h:169 and finite perfect-square NOT_IMPLEMENTED_YET at :261 through source process diagnostics",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp.go",
+          "tests": [
+            "TestIntegerModularExplicitSourceDiagnostics",
+            "TestIntegerModularHeaderRefusalAndWarm"
+          ]
+        },
+        {
           "name": "Remaining scalar arithmetic/fused/sets/const-mutable conversion/bit/log/root/formatting overloads beyond separately ported source assertions",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpzzp_ops.go",
