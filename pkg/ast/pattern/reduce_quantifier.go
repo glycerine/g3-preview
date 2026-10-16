@@ -239,6 +239,7 @@ func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle,
 		}
 	}
 	baseQ, outputBody := q, newBody
+	pulledWithPatterns := false
 	if len(patterns) == 0 && opts.pullQuantifiers {
 		contained, e := c.bodyContainsQuantifier(newBody)
 		if e != nil {
@@ -308,6 +309,7 @@ func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle,
 						return out, false, err
 					}
 					baseQ, outputBody = pulled, pulledBody
+					pulledWithPatterns = true
 					weight, err = c.manager.GetQuantifierWeight(pulled)
 					if err != nil {
 						return out, false, err
@@ -351,5 +353,19 @@ func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle,
 		}
 	}
 	out, err = c.manager.NewRef(updated)
-	return out, err == nil, err
+	if err != nil {
+		return out, false, err
+	}
+	if pulledWithPatterns {
+		if err = c.tracePulledQuantifier(updated); err != nil {
+			if cleanup := c.manager.DelRef(&out); cleanup != nil {
+				if out != (ast.ASTRef{}) {
+					c.pendingPatternRefs = append(c.pendingPatternRefs, out)
+				}
+				err = errors.Join(err, cleanup)
+			}
+			return ast.ASTRef{}, false, err
+		}
+	}
+	return out, true, nil
 }

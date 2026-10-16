@@ -18880,6 +18880,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Reached pulled-quantifier TRACE after successful nested binder pull and pattern inference (pattern_inference.cpp:695), with complete process-bound SMT2 result",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/reduce_quantifier_trace.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
+        {
           "name": "Reached reduce_quantifier entry and no-pattern-result TRACE sites (pattern_inference.cpp:584,704), including source ordering and process-bound SMT2 quantifier display",
           "status": "ported",
           "go_target": "pkg/ast/pattern/reduce_quantifier_trace.go",
@@ -180905,6 +180911,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Reached pulled-quantifier TRACE after successful nested binder pull and pattern inference (pattern_inference.cpp:695), with complete process-bound SMT2 result",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/reduce_quantifier_trace.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
+        {
           "name": "Reached reduce_quantifier entry and no-pattern-result TRACE sites (pattern_inference.cpp:584,704), including source ordering and process-bound SMT2 quantifier display",
           "status": "ported",
           "go_target": "pkg/ast/pattern/reduce_quantifier_trace.go",
@@ -182879,6 +182891,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached pulled-quantifier TRACE after successful nested binder pull and pattern inference (pattern_inference.cpp:695), with complete process-bound SMT2 result",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/reduce_quantifier_trace.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
         {
           "name": "Reached reduce_quantifier entry and no-pattern-result TRACE sites (pattern_inference.cpp:584,704), including source ordering and process-bound SMT2 quantifier display",
           "status": "ported",

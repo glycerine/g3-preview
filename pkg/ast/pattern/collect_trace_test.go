@@ -360,4 +360,52 @@ func TestPatternCollectInfoSourceSMT2Trace(t *testing.T) {
 	if changed || reduced != (ast.ASTRef{}) || output.Len() != 0 {
 		t.Fatal("disabled quantifier traces changed reduction or emitted output", changed, reduced, output.String())
 	}
+	pullOuterName, err := sy.Intern("collect-y")
+	patternMust(t, err)
+	pairName, err := sy.Intern("collect-pair")
+	patternMust(t, err)
+	pairDecl, err := m.MkFuncDecl(pairName, []ast.ASTHandle{boolSort, boolSort}, boolSort, ast.ASTFuncDeclInfo{})
+	patternMust(t, err)
+	patternMust(t, m.IncRef(pairDecl))
+	t.Cleanup(func() { patternMust(t, m.DecRef(pairDecl)) })
+	pairBody, err := m.MkApp(pairDecl, []ast.ASTHandle{y, x})
+	patternMust(t, err)
+	patternMust(t, m.IncRef(pairBody))
+	t.Cleanup(func() { patternMust(t, m.DecRef(pairBody)) })
+	pullInner, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{boolSort}, Names: []symbol.Symbol{xName}, Body: pairBody, Weight: 3})
+	patternMust(t, err)
+	patternMust(t, m.IncRef(pullInner))
+	t.Cleanup(func() { patternMust(t, m.DecRef(pullInner)) })
+	pullOuter, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{boolSort}, Names: []symbol.Symbol{pullOuterName}, Body: pullInner, Weight: 7})
+	patternMust(t, err)
+	patternMust(t, m.IncRef(pullOuter))
+	t.Cleanup(func() { patternMust(t, m.DecRef(pullOuter)) })
+	output.Reset()
+	tags.Enable("pattern_inference")
+	reduced, changed, err = c.reduceQuantifierNoDatabase(pullOuter, pullInner, nil, quantifierInferenceOptions{arithmeticMode: arithmeticPatternsNo, noPatternWeight: -1, pullQuantifiers: true})
+	patternMust(t, err)
+	if !changed {
+		t.Fatal("nested quantifier did not find pulled pattern")
+	}
+	patternMust(t, m.DelRef(&reduced))
+	if tags.ShouldTrace("pattern_inference") {
+		entry := "-------- [pattern_inference] reduce_quantifier src/ast/pattern/pattern_inference.cpp:584 ---------\n" +
+			"processing:\n(forall ((collect-y Bool))\n  (! (forall ((collect-x Bool))\n       (! (collect-pair collect-y collect-x) :weight 3))\n     :weight 7))\n------------------------------------------------\n"
+		pulled := "-------- [pattern_inference] reduce_quantifier src/ast/pattern/pattern_inference.cpp:695 ---------\n" +
+			"pulled quantifier:\n(forall ((collect-y Bool) (collect-x Bool))\n  (! (collect-pair collect-y collect-x)\n" +
+			"     :pattern ((collect-pair collect-y collect-x))\n     :weight 3))\n------------------------------------------------\n"
+		if !strings.HasPrefix(output.String(), entry) || !strings.HasSuffix(output.String(), pulled) || strings.Count(output.String(), pulled) != 1 || strings.Contains(output.String(), "[pi_failed]") {
+			t.Fatalf("pulled quantifier source trace: got %q", output.String())
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("erased pulled quantifier trace wrote output", output.String())
+	}
+	output.Reset()
+	tags.Disable("pattern_inference")
+	reduced, changed, err = c.reduceQuantifierNoDatabase(pullOuter, pullInner, nil, quantifierInferenceOptions{arithmeticMode: arithmeticPatternsNo, noPatternWeight: -1, pullQuantifiers: true})
+	patternMust(t, err)
+	if !changed || output.Len() != 0 {
+		t.Fatal("disabled pulled quantifier trace changed inference or emitted output", changed, output.String())
+	}
+	patternMust(t, m.DelRef(&reduced))
 }
