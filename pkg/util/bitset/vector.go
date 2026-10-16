@@ -128,9 +128,9 @@ func (v *Vector) Reserve(n uint32, val bool) {
 }
 
 // ShiftRight increases bit indices by k and inserts k zero low bits, as in C++.
-func (v *Vector) ShiftRight(k uint32) {
+func (v *Vector) ShiftRight(k uint32) error {
 	if k == 0 {
-		return
+		return nil
 	}
 	n := v.size + k
 	if n < v.size {
@@ -153,6 +153,22 @@ func (v *Vector) ShiftRight(k uint32) {
 		}
 	}
 	if bits > 0 {
+		if diagnostic.DebugBuild {
+			d := diagnostic.BorrowProcessDebugContext()
+			enabled, e := diagnostic.SourceAssertionsEnabled(d)
+			if e != nil {
+				return e
+			}
+			if enabled {
+				for i := uint32(0); i < words; i++ {
+					if v.words[i] != 0 {
+						if e := diagnostic.DebugAssertionFailure(d, "src/util/bit_vector.cpp", 106, "m_data[i] == 0"); e != nil {
+							return e
+						}
+					}
+				}
+			}
+		}
 		prev := uint32(0)
 		for i := words; i < nw; i++ {
 			next := v.words[i] >> (32 - bits)
@@ -160,6 +176,7 @@ func (v *Vector) ShiftRight(k uint32) {
 			prev = next
 		}
 	}
+	return nil
 }
 func lastMask(n uint32) uint32 {
 	m := (uint32(1) << (n % 32)) - 1
@@ -184,29 +201,54 @@ func (v *Vector) Equal(other *Vector) bool {
 	mask := lastMask(v.size)
 	return v.words[n-1]&mask == other.words[n-1]&mask
 }
-func (v *Vector) Or(src *Vector) {
+func (v *Vector) Or(src *Vector) error {
 	if v.size < src.size {
 		v.Resize(src.size, false)
 	}
 	n := src.NumWords()
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return e
+		}
+		if enabled && n > v.NumWords() {
+			if e := diagnostic.DebugAssertionFailure(d, "src/util/bit_vector.cpp", 141, "n2 <= num_words()"); e != nil {
+				return e
+			}
+		}
+	}
 	if n == 0 {
-		return
+		return nil
 	}
 	for i := uint32(0); i < n-1; i++ {
 		v.words[i] |= src.words[i]
 	}
 	v.words[n-1] |= src.words[n-1] & lastMask(src.size)
+	return nil
 }
-func (v *Vector) And(src *Vector) {
+func (v *Vector) And(src *Vector) error {
 	n1, n2 := v.NumWords(), src.NumWords()
 	if n1 == 0 {
-		return
+		return nil
 	}
 	if n2 > n1 {
 		for i := uint32(0); i < n1; i++ {
 			v.words[i] &= src.words[i]
 		}
-		return
+		return nil
+	}
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return e
+		}
+		if enabled && n2 > n1 {
+			if e := diagnostic.DebugAssertionFailure(d, "src/util/bit_vector.cpp", 168, "n2 <= n1"); e != nil {
+				return e
+			}
+		}
 	}
 	if n2 > 0 {
 		for i := uint32(0); i < n2-1; i++ {
@@ -217,6 +259,7 @@ func (v *Vector) And(src *Vector) {
 	for i := n2; i < n1; i++ {
 		v.words[i] = 0
 	}
+	return nil
 }
 func (v *Vector) Neg() {
 	for i := uint32(0); i < v.NumWords(); i++ {

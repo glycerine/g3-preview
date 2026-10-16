@@ -121246,7 +121246,8 @@
       "status": "ported",
       "go_targets": [
         "pkg/util/bitset/vector_trace.go",
-        "pkg/util/bitset/vector.go"
+        "pkg/util/bitset/vector.go",
+        "pkg/util/bitset/vector_assertion_debug_test.go"
       ],
       "tests": [
         "TestBitVectorResizeTraceBodySourceInsertionPrefixes",
@@ -121264,7 +121265,8 @@
         "TestAndEmptyAndLonger",
         "TestNativeGrowthAndStaleBits",
         "TestBoundedOperationOracle",
-        "TestWarmOperationsDoNotAllocate"
+        "TestWarmOperationsDoNotAllocate",
+        "TestBitVectorSourceAssertionGateOrder"
       ],
       "conditionals": [
         {
@@ -121321,7 +121323,8 @@
             "TestAndEmptyAndLonger",
             "TestNativeGrowthAndStaleBits",
             "TestBoundedOperationOracle",
-            "TestWarmOperationsDoNotAllocate"
+            "TestWarmOperationsDoNotAllocate",
+            "TestBitVectorSourceAssertionGateOrder"
           ]
         }
       ],
@@ -121329,7 +121332,7 @@
         "bitset.Vector owns native uint32 word storage. New zero-initializes reserved words and FromWords copies source words; Clone copies all capacity words, Assign preserves source-null early return, grows only when needed, and copies the source capacity words. Swap transfers word storage; Reset clears all backing words while retaining capacity. Growth and shrink preserve the source stale-bit behavior. Hash reads floor(size/8) bytes in source little-endian order."
       ],
       "deviations": [
-        "Native Go slices replace C++ memory-manager allocation, source word-capacity scheduling and C++ ostream state. Bounds and impossible extent overflow are diagnosed with Go panics. The active descending display and packed-word algorithms are retained; inactive #else display is excluded. C++ optional TRACE output and process-global assertion diagnostics belong to their diagnostic units. fr_bit_vector has no source caller, so its earlier test-only Go FastReset translation was removed. AST-specific mark variants are credited to obj_mark.h, not to this bit-vector unit."
+        "Native Go slices replace C++ memory-manager allocation, source word-capacity scheduling and C++ ostream state. Bounds and impossible extent overflow are diagnosed with Go panics. The active descending display and packed-word algorithms are retained; inactive #else display is excluded. The three compiled cpp SASSERT gates borrow the process debug owner and return stopped actions after their source mutation prefixes; header bounds retain Go panic guards. C++ optional TRACE output belongs to its diagnostic unit. fr_bit_vector has no source caller, so its earlier test-only Go FastReset translation was removed. AST-specific mark variants are credited to obj_mark.h, not to this bit-vector unit."
       ]
     },
     {
