@@ -402,7 +402,14 @@ func (s *RationalService) infEpsInfPrepareNumeral(v *OwnedInfRational, offset ui
 		return 0, e
 	}
 	defer s.endLexicalError(&_lexErr)
-	if v.Second.Num.Val == 0 {
+	if e := s.infScalarOwner(v); e != nil {
+		return 0, e
+	}
+	zero, e := s.Manager.IsZero(&v.Second)
+	if e != nil {
+		return 0, e
+	}
+	if zero {
 		return s.infEpsInfPrepareRational(&v.First, offset)
 	}
 	n, e := s.Manager.Z.Natural.appendDisplay(offset, "(")
@@ -413,8 +420,12 @@ func (s *RationalService) infEpsInfPrepareNumeral(v *OwnedInfRational, offset ui
 	if e != nil {
 		return 0, e
 	}
+	negative, e := s.Manager.IsNeg(&v.Second)
+	if e != nil {
+		return 0, e
+	}
 	sign := " +e*"
-	if v.Second.Num.Val < 0 {
+	if negative {
 		sign = " -e*"
 	}
 	n, e = s.Manager.Z.Natural.appendDisplay(n, sign)
@@ -443,7 +454,11 @@ func (s *RationalService) infEpsInfPrepareNumeral(v *OwnedInfRational, offset ui
 	return s.Manager.Z.Natural.appendDisplay(n, ")")
 }
 func (s *RationalService) infEpsInfPrepare(v *OwnedInfEpsInfRational) (uint32, error) {
-	if v.infinity.Num.Val == 0 {
+	zero, e := s.Manager.IsZero(&v.infinity)
+	if e != nil {
+		return 0, e
+	}
+	if zero {
 		return s.infEpsInfPrepareNumeral(&v.numeral, 0)
 	}
 	one, e := s.Manager.IsOne(&v.infinity)
@@ -470,8 +485,21 @@ func (s *RationalService) infEpsInfPrepare(v *OwnedInfEpsInfRational) (uint32, e
 	if e != nil {
 		return 0, e
 	}
-	if v.numeral.First.Num.Val == 0 && v.numeral.Second.Num.Val == 0 {
-		return n, nil
+	if e := s.infScalarOwner(&v.numeral); e != nil {
+		return 0, e
+	}
+	firstZero, e := s.Manager.IsZero(&v.numeral.First)
+	if e != nil {
+		return 0, e
+	}
+	if firstZero {
+		secondZero, e := s.Manager.IsZero(&v.numeral.Second)
+		if e != nil {
+			return 0, e
+		}
+		if secondZero {
+			return n, nil
+		}
 	}
 	// Source builds the infinity spelling before checking/printing the numeral.
 	// Insert '(' while preserving that completed prefix in owner storage.
@@ -502,7 +530,7 @@ func (s *RationalService) InfEpsInfString(v *OwnedInfEpsInfRational) (string, er
 		return "", e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return "", e
 	}
 	n, e := s.infEpsInfPrepare(v)
