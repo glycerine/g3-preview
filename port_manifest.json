@@ -122175,9 +122175,15 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
+        {
+          "name": "Whole direct debug.cpp definition audit: assertion switch, stderr notification, lazy tag-table init/finalize and enable/disable/query, and selected Linux invoke_gdb prompt/command/exit actions; remaining partial credit belongs to retained macro callers",
+          "status": "ported",
+          "go_target": "pkg/util/diagnostic/util_debug_context.go",
+          "tests": ["TestDebugContextAssertionsFinalizeAndOwner", "TestDebugTableMemoryTraceFollowsLazyLifetime", "TestDebugNotificationExactStatementsSignedFlagsAndNoReservation", "TestDebugActionLiteralContinueAbortThrowEOFFlow", "TestDebugActionActualHostStopAndSystemFailure"]
+        },
         {
           "name": "init_debug_table and finalize_debug memory-wrapper allocation/deallocation (debug.cpp:46-54)",
           "status": "ported",
