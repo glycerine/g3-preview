@@ -143,7 +143,11 @@ func (m *satSolverMUSMembers) setCore() error {
 	if e := m.solver.conflict.core.Shrink(0); e != nil {
 		return e
 	}
-	return satMUSAppend(&m.solver.conflict.core, &m.mus)
+	if e := satMUSAppend(&m.solver.conflict.core, &m.mus); e != nil {
+		return e
+	}
+	m.traceMUSCore(40, "new core: ", &m.solver.conflict.core)
+	return nil
 }
 func (m *satSolverMUSMembers) updateModel() error {
 	n, e := m.model.Size()
@@ -262,10 +266,15 @@ func (m *satSolverMUSMembers) scopedCheck(core *satUintColumn, lit Literal) (r l
 	if e != nil {
 		return lbool.Undef, e
 	}
-	return m.solver.checkSpan(count, satConflictColumnSpan(&m.mus))
+	r, e = m.solver.checkSpan(count, satConflictColumnSpan(&m.mus))
+	if e == nil {
+		m.traceMUSCore(93, "mus: ", &m.mus)
+	}
+	return r, e
 }
 func (m *satSolverMUSMembers) mus1() (lbool.LBool, error) {
 	partial := m.solver.config.state.CoreMinimizePartial
+	m.traceMUSCore(61, "old core: ", &m.solver.conflict.core)
 	if e := m.getCore(); e != nil {
 		return lbool.Undef, e
 	}
@@ -287,6 +296,7 @@ func (m *satSolverMUSMembers) mus1() (lbool.LBool, error) {
 		if e = m.emitMUSProgress(n, partial); e != nil {
 			return lbool.Undef, e
 		}
+		m.traceMUSPair(71, "core: ", &m.core, "mus:  ", &m.mus)
 		if !m.solver.Limit.Inc() {
 			if e = m.setCore(); e != nil {
 				return lbool.Undef, e
@@ -360,6 +370,7 @@ func (m *satSolverMUSMembers) mus1() (lbool.LBool, error) {
 					return lbool.Undef, e
 				}
 			} else {
+				m.traceMUSPair(120, "core: ", &m.solver.conflict.core, " mus: ", &m.mus)
 				if e = m.core.Shrink(0); e != nil {
 					return lbool.Undef, e
 				}

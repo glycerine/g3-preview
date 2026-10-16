@@ -76125,6 +76125,12 @@
             "TestSATSolverActualMUSSourceVerboseLevels",
             "TestSATSolverActualMUSQXSourceFinalCoreVerbose"
           ]
+        },
+        {
+          "name": "Reached SAT MUS old/loop/scoped-check/reduced/final core TRACE sites at sat_mus.cpp:40,61,71,93,120",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_mus_trace.go",
+          "tests": ["TestSATActualMUSSourceTraceTransitions"]
         }
       ],
       "ownership": [
@@ -76133,7 +76139,7 @@
         "SAT unsigned work columns now own native []uint32 backing for lemma/minimization, assumptions/core, model, consequence scopes and probing to-assert rows. Probing cache rows own native availability flags and unsigned slices. Copies own independent values, captured slices retain their actual backing, and checked column/parent closure rejects later access. Source model/mark/compaction algorithms remain; backing has no Runtime payload, Budget reservation, size_t header or pending block. The actual strict Runtime cache-memory cutoff still reads the caller Runtime counter. See PORT_PROGRESS.md#native-sat-unsigned-work-columns-and-probing-cache."
       ],
       "deviations": [
-        "TRACE/verbose/verify_core diagnostic output and global source assertion bindings remain open. Empty qx native nontermination retains first split/union prefix before typed repeated-recursion guard, never success.",
+        "The uncalled verify_core diagnostic and global source assertion bindings remain open. Empty qx native nontermination retains first split/union prefix before typed repeated-recursion guard, never success.",
         "Named vector return move is a Go ABI adapter; optional C++ copy elision allocation schedule is not claimed. No additional registered source-test assertion credit; independent CNF and actual refusal campaigns only.",
         "This checkpoint supersedes prior Runtime scalar-column/cache growth, raw-header, allocation-refusal and stale-on-reallocation claims for these SAT unsigned members. Retired tests of emulated storage events; retained independent solver, minimization, consequence, MUS, model and probing results in native/debug profiles. Empty invalid lemma operations now stop at native checked bounds. Clause sorting uses Go standard sort instead of a translated STL heap algorithm. Native replacements add no generic C++ vector/STL implementation credit."
       ]
@@ -182260,6 +182266,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_cleaner_clause_trace.go",
           "tests": ["TestSATCleanerClauseSourceTraceStages"]
+        },
+        {
+          "name": "Reached SAT MUS old/loop/scoped-check/reduced/final core TRACE sites at sat_mus.cpp:40,61,71,93,120",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_mus_trace.go",
+          "tests": ["TestSATActualMUSSourceTraceTransitions"]
         }
       ],
       "ownership": [
@@ -184030,6 +184042,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_cleaner_clause_trace.go",
           "tests": ["TestSATCleanerClauseSourceTraceStages"]
+        },
+        {
+          "name": "Reached SAT MUS old/loop/scoped-check/reduced/final core TRACE sites at sat_mus.cpp:40,61,71,93,120",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_mus_trace.go",
+          "tests": ["TestSATActualMUSSourceTraceTransitions"]
         }
       ],
       "ownership": [
