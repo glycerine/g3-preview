@@ -75671,10 +75671,10 @@
           "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
         },
         {
-          "name": "Selected check_watches SASSERT167-189 process assertion switch, source-order watch guards and per-site C/T action through cleaner_bug; wider sat_bug and sat_watched_bug TRACE profiles remain open",
-          "status": "partial",
+          "name": "check_watches SASSERT167-189 process assertion switch, source-order binary/ternary/clause guards and per-site C/T action through cleaner_bug",
+          "status": "ported",
           "go_target": "pkg/sat/sat_integrity_checker.go",
-          "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
+          "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder", "TestSATIntegrityWatchKindAssertionsUseSourceActions", "TestSATIntegrityBinaryWatchContinuesFromEliminatedToReciprocalGuard"]
         },
         {
           "name": "Binary missing-reciprocal sat_watched_bug CTRACE before SASSERT, source watch-list body across binary/ternary/clause/external kinds and false/learned fields (cpp172-181)",
@@ -75809,10 +75809,10 @@
           "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
         },
         {
-          "name": "Selected check_watches SASSERT167-189 process assertion switch, source-order watch guards and per-site C/T action through cleaner_bug; wider sat_bug and sat_watched_bug TRACE profiles remain open",
-          "status": "partial",
+          "name": "check_watches SASSERT167-189 process assertion switch, source-order binary/ternary/clause guards and per-site C/T action through cleaner_bug",
+          "status": "ported",
           "go_target": "pkg/sat/sat_integrity_checker.go",
-          "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
+          "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder", "TestSATIntegrityWatchKindAssertionsUseSourceActions", "TestSATIntegrityBinaryWatchContinuesFromEliminatedToReciprocalGuard"]
         },
         {
           "name": "Binary missing-reciprocal sat_watched_bug CTRACE before SASSERT, source watch-list body across binary/ternary/clause/external kinds and false/learned fields (cpp172-181)",
@@ -123000,10 +123000,10 @@
           "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
         },
         {
-          "name": "Retained SAT cleaner check_watches SASSERT167-189 process assertion switch and C/T action for watch guards; companion CTRACE sites are credited under util trace",
-          "status": "partial",
+          "name": "Retained SAT cleaner check_watches SASSERT167-189 process assertion switch and C/T action for binary/ternary/clause watch guards; companion CTRACE sites are credited under util trace",
+          "status": "ported",
           "go_target": "pkg/sat/sat_integrity_checker.go",
-          "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
+          "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder", "TestSATIntegrityWatchKindAssertionsUseSourceActions", "TestSATIntegrityBinaryWatchContinuesFromEliminatedToReciprocalGuard"]
         },
         {
           "name": "Process debug owner with default streams, tied input and interactive action; generated initializer borrowing and heap CASSERT state",
@@ -123456,10 +123456,10 @@
           "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
         },
         {
-          "name": "Retained SAT cleaner check_watches SASSERT167-189 process assertion switch and C/T action for watch guards; companion CTRACE sites are credited under util trace",
-          "status": "partial",
+          "name": "Retained SAT cleaner check_watches SASSERT167-189 process assertion switch and C/T action for binary/ternary/clause watch guards; companion CTRACE sites are credited under util trace",
+          "status": "ported",
           "go_target": "pkg/sat/sat_integrity_checker.go",
-          "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
+          "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder", "TestSATIntegrityWatchKindAssertionsUseSourceActions", "TestSATIntegrityBinaryWatchContinuesFromEliminatedToReciprocalGuard"]
         },
         {
           "name": "Process debug owner with default streams, tied input and interactive action; generated initializer borrowing and heap CASSERT state",
