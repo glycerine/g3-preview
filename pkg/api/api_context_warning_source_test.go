@@ -4,6 +4,7 @@ package api
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
@@ -35,5 +36,31 @@ func TestAPIContextUncollectedObjectSourceWarningGate(t *testing.T) {
 	}
 	if got := output.String(); got != want {
 		t.Fatalf("source warning gate: got %q, want %q", got, want)
+	}
+}
+
+func TestAPIToggleWarningMessagesControlsReachedContextWarning(t *testing.T) {
+	warnings := diagnostic.BorrowProcessWarningService()
+	wasEnabled := warnings.Enabled()
+	var output bytes.Buffer
+	astTestMust(t, warnings.SetWarningStream(&output))
+	defer func() {
+		astTestMust(t, warnings.SetWarningStream(nil))
+		ToggleWarningMessages(wasEnabled)
+	}()
+
+	m := astTestManager(t)
+	for _, enabled := range []bool{false, true} {
+		ToggleWarningMessages(enabled)
+		c, err := newAPIContextResults(m, false)
+		astTestMust(t, err)
+		_, err = newAPIGoalObject(c)
+		astTestMust(t, err)
+		astTestMust(t, c.Close())
+		if got := output.String(); !enabled && got != "" {
+			t.Fatalf("disabled source warning: %q", got)
+		} else if enabled && diagnostic.DebugBuild && !strings.HasPrefix(got, "WARNING: Uncollected memory: ") {
+			t.Fatalf("enabled source warning: %q", got)
+		}
 	}
 }

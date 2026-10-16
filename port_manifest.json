@@ -3764,6 +3764,7 @@
         "pkg/api/api_goal_memory_trace.go",
         "pkg/api/api_goal_memory_trace_debug_test.go",
         "pkg/api/api_context_results.go",
+        "pkg/api/api_context_warning.go",
         "pkg/api/api_ast_map_memory_trace.go",
         "pkg/api/api_goal_object.go",
         "pkg/api/api_trace.go"
@@ -3798,6 +3799,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Z3_toggle_warning_messages forwards its Boolean gate to the process warning service at api_context.cpp:364-368",
+          "status": "ported",
+          "go_target": "pkg/api/api_context_warning.go",
+          "tests": ["TestAPIToggleWarningMessagesControlsReachedContextWarning"]
+        },
         {
           "name": "Retained API object::dec_ref and context::save_ast_trail SASSERT gates at api_context.cpp:39,216",
           "status": "ported",
@@ -195482,8 +195489,9 @@
         "src/api/api_context.cpp",
         "src/api/z3_api.h"
       ],
-      "status": "unported",
-      "tests": []
+      "status": "ported",
+      "go_target": "pkg/api/api_context_warning.go",
+      "tests": ["TestAPIToggleWarningMessagesControlsReachedContextWarning"]
     },
     {
       "name": "Z3_translate",
