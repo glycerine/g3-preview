@@ -319,7 +319,7 @@ func (m *ASTManager) MkProofModusPonens(p, q ASTHandle) (ASTHandle, error) {
 	}
 	var f, g ASTHandle
 	var e error
-	if ASTSourceDebug {
+	if ASTSourceDebug || m.proofModusPonensTraceEnabled() {
 		f, e = m.proofFact(p)
 		if e != nil {
 			return ASTHandle{}, e
@@ -328,6 +328,8 @@ func (m *ASTManager) MkProofModusPonens(p, q ASTHandle) (ASTHandle, error) {
 		if e != nil {
 			return ASTHandle{}, e
 		}
+	}
+	if ASTSourceDebug || m.proofModusPonensTraceEnabled() {
 		valid := false
 		for _, k := range [...]int32{ASTOpImplies, ASTOpIff, ASTOpOEq} {
 			yes, e := m.proofKind(g, k)
@@ -336,9 +338,16 @@ func (m *ASTManager) MkProofModusPonens(p, q ASTHandle) (ASTHandle, error) {
 			}
 			valid = valid || yes
 		}
-		if !valid {
+		if !valid && m.proofModusPonensTraceEnabled() {
+			if e = m.traceProofModusPonensBadFact(p, q); e != nil {
+				return ASTHandle{}, e
+			}
+		}
+		if ASTSourceDebug && !valid {
 			return ASTHandle{}, ErrASTDomain
 		}
+	}
+	if ASTSourceDebug {
 		a, e := m.proofArg(g, 0)
 		if e != nil {
 			return ASTHandle{}, e

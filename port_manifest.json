@@ -181555,6 +181555,12 @@
           "tests": ["TestASTProofAssertedNonBooleanSourceTraceBeforeDebugGuard"]
         },
         {
+          "name": "Retained mk_modus_ponens CTRACE for invalid second proof fact before debug guard (ast.cpp:2641-2643)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_proof_modus_ponens_trace.go",
+          "tests": ["TestASTModusPonensInvalidSecondFactSourceTrace"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -183238,6 +183244,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_proof_asserted_trace.go",
           "tests": ["TestASTProofAssertedNonBooleanSourceTraceBeforeDebugGuard"]
+        },
+        {
+          "name": "Retained mk_modus_ponens CTRACE for invalid second proof fact before debug guard (ast.cpp:2641-2643)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_proof_modus_ponens_trace.go",
+          "tests": ["TestASTModusPonensInvalidSecondFactSourceTrace"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
