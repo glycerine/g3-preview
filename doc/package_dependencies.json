@@ -1631,6 +1631,7 @@
         "bound_trace.go",
         "bound_values.go",
         "linear_equation.go",
+        "linear_equation_trace.go",
         "polynomial_builder.go",
         "propagate_ineq_clean.go",
         "propagate_ineq_tactic.go"

@@ -15,6 +15,9 @@ func (s *BoundEquationStore) BindTrace(tags *diagnostic.TraceTags) error {
 	if err := s.open(); err != nil {
 		return err
 	}
+	if err := s.equations.BindTrace(tags); err != nil {
+		return err
+	}
 	s.trace = tags
 	return nil
 }

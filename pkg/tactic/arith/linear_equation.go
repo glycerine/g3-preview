@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -94,6 +95,7 @@ func (e *LinearEquation) Close() error {
 type LinearEquationManager struct {
 	self      *LinearEquationManager
 	manager   *numeral.RationalManager
+	trace     *diagnostic.TraceTags
 	intBuffer *numeral.ScopedIntVector
 	valBuffer *numeral.ScopedIntVector
 	mark      []bool
@@ -249,11 +251,20 @@ func (l *LinearEquationManager) MkRational(as []numeral.Rational, xs []uint32, n
 			return nil, err
 		}
 	}
+	if err = l.traceEquationLCM(&lcm); err != nil {
+		return nil, err
+	}
 	if err = l.intBuffer.Reset(); err != nil {
 		return nil, err
 	}
 	for i := range as {
+		if err = l.traceEquationRational(i, &as[i], false); err != nil {
+			return nil, err
+		}
 		if err = l.manager.MulInt(&lcm, &as[i], &as[i]); err != nil {
+			return nil, err
+		}
+		if err = l.traceEquationRational(i, &as[i], true); err != nil {
 			return nil, err
 		}
 		if err = l.intBuffer.Push(&as[i].Num); err != nil {
@@ -357,6 +368,9 @@ func (l *LinearEquationManager) mkCore(as []numeral.Int, xs []uint32) (out *Line
 		return nil, arena.ErrInvalidSlot
 	}
 	z := l.manager.Integers()
+	if err = l.traceEquationCore(as, xs, nil); err != nil {
+		return nil, err
+	}
 	g := numeral.NewInt(0)
 	defer func() { err = errors.Join(err, z.Del(&g)) }()
 	if err = z.Copy(&g, &as[0]); err != nil {
@@ -397,6 +411,9 @@ func (l *LinearEquationManager) mkCore(as []numeral.Int, xs []uint32) (out *Line
 				return nil, e
 			}
 		}
+	}
+	if err = l.traceEquationCore(as, xs, &g); err != nil {
+		return nil, err
 	}
 	eq := &LinearEquation{manager: l.manager, as: make([]numeral.Int, len(as)),
 		approx: make([]float64, len(as)), xs: append([]uint32(nil), xs...)}

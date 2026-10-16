@@ -100775,12 +100775,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/arith/linear_equation.go",
-        "pkg/tactic/arith/linear_equation_test.go"
+        "pkg/tactic/arith/linear_equation_test.go",
+        "pkg/tactic/arith/linear_equation_trace.go"
       ],
       "tests": [
         "TestLinearEquationIntegerCoalesceSortNormalizeAndReuse",
         "TestLinearEquationIntegerCancellationAndLargeOwnership",
-        "TestLinearEquationRationalDenominatorClearingAndCombination"
+        "TestLinearEquationRationalDenominatorClearingAndCombination",
+        "TestLinearEquationSourceConstructionTrace"
       ],
       "assertions": [
         {
@@ -100842,6 +100844,14 @@
           "status": "unported",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "Retained rational LCM and before/after coefficient TRACE, and integer gcd normalization TRACE at source sites",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/linear_equation_trace.go",
+          "tests": [
+            "TestLinearEquationSourceConstructionTrace"
+          ]
         }
       ],
       "ownership": [
@@ -179872,7 +179882,8 @@
         "pkg/tactic/aig/aig_and_trace.go",
         "pkg/ast/ast_well_sorted_trace.go",
         "pkg/ast/ast_core_quantifier_pattern_trace.go",
-        "pkg/tactic/arith/bound_trace.go"
+        "pkg/tactic/arith/bound_trace.go",
+        "pkg/tactic/arith/linear_equation_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -179959,7 +179970,8 @@
         "TestBoundRelevanceSourceTraceOldValueAndSmallImprovement",
         "TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds",
         "TestBoundPropagationTraceVariableAndEquationSourceOrder",
-        "TestBoundExactPropagationStepTraceWithEquationBounds"
+        "TestBoundExactPropagationStepTraceWithEquationBounds",
+        "TestLinearEquationSourceConstructionTrace"
       ],
       "conditionals": [
         {
@@ -181426,6 +181438,14 @@
           "go_target": "pkg/tactic/arith/bound_trace.go",
           "go_targets": ["pkg/tactic/arith/bound_display.go"],
           "tests": ["TestBoundExactPropagationStepTraceWithEquationBounds"]
+        },
+        {
+          "name": "Retained linear_equation constructor TRACE records with source headers and sticky stream continuation",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/linear_equation_trace.go",
+          "tests": [
+            "TestLinearEquationSourceConstructionTrace"
+          ]
         }
       ],
       "ownership": [
@@ -181515,7 +181535,8 @@
         "pkg/tactic/aig/aig_and_trace.go",
         "pkg/ast/ast_well_sorted_trace.go",
         "pkg/ast/ast_core_quantifier_pattern_trace.go",
-        "pkg/tactic/arith/bound_trace.go"
+        "pkg/tactic/arith/bound_trace.go",
+        "pkg/tactic/arith/linear_equation_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -181600,7 +181621,8 @@
         "TestBoundRelevanceSourceTraceOldValueAndSmallImprovement",
         "TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds",
         "TestBoundPropagationTraceVariableAndEquationSourceOrder",
-        "TestBoundExactPropagationStepTraceWithEquationBounds"
+        "TestBoundExactPropagationStepTraceWithEquationBounds",
+        "TestLinearEquationSourceConstructionTrace"
       ],
       "conditionals": [
         {
@@ -183067,6 +183089,14 @@
           "go_target": "pkg/tactic/arith/bound_trace.go",
           "go_targets": ["pkg/tactic/arith/bound_display.go"],
           "tests": ["TestBoundExactPropagationStepTraceWithEquationBounds"]
+        },
+        {
+          "name": "Retained linear_equation constructor TRACE macro gates and source-order records",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/linear_equation_trace.go",
+          "tests": [
+            "TestLinearEquationSourceConstructionTrace"
+          ]
         }
       ],
       "ownership": [
