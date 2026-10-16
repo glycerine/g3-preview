@@ -9,7 +9,20 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
+
+func disableInfProjectionAssertions(t *testing.T) {
+	t.Helper()
+	if !diagnostic.DebugBuild {
+		return
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	old, e := d.AssertionsEnabled()
+	serviceMust(t, e)
+	serviceMust(t, d.EnableAssertions(false))
+	t.Cleanup(func() { serviceMust(t, d.EnableAssertions(old)) })
+}
 
 func infProjectionWant(n *big.Int, a *Int) (int64, uint64) {
 	u := projectionLowMagnitude(n)
@@ -24,6 +37,7 @@ func infProjectionWant(n *big.Int, a *Int) (int64, uint64) {
 }
 
 func TestInfScalarProjectionAllGetterProfilesAndRawPredicates(t *testing.T) {
+	disableInfProjectionAssertions(t)
 	s, _ := serviceNew(t)
 	for _, text := range []string{"-9223372036854775808", "18446744073709551615", "18446744073709551623", "-18446744073709551623", "-7", "0", "2"} {
 		n, ok := new(big.Int).SetString(text, 10)
@@ -84,6 +98,7 @@ func TestInfScalarProjectionAllGetterProfilesAndRawPredicates(t *testing.T) {
 }
 
 func TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit(t *testing.T) {
+	disableInfProjectionAssertions(t)
 	s, _ := serviceNew(t)
 	v, e := s.InfEpsInfNewValue()
 	serviceMust(t, e)

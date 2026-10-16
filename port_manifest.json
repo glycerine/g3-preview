@@ -122835,7 +122835,8 @@
         "pkg/util/params/util_gparams_service_ops.go",
         "pkg/util/diagnostic/numeric_char_input_tie_boundary_test.go",
         "pkg/tactic/arith/linear_equation_debug.go",
-        "pkg/api/api_context_results.go"
+        "pkg/api/api_context_results.go",
+        "pkg/util/numeral/inf_eps_rational.go"
       ],
       "tests": [
         "TestDebugTableMemoryTraceFollowsLazyLifetime",
@@ -122906,6 +122907,12 @@
           "status": "ported",
           "go_target": "pkg/api/api_context_results.go",
           "tests": ["TestAPIContextSourceObjectAndTrailAssertions"]
+        },
+        {
+          "name": "InfEpsInf signed/unsigned64 getter SASSERT process switch, source notification and debugger Continue/Throw action (inf_eps_rational.h:122,127)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_eps_rational.go",
+          "tests": ["TestInfEpsInf64BitSourceAssertionActions"]
         },
         {
           "name": "Selected assertion switch, lazy debug table initialization, enable/disable/query, finalize and short-circuit CASSERT gate; whole global macro and debugger bindings remain open",
@@ -123170,7 +123177,8 @@
         "pkg/util/diagnostic/util_debug_macro_source_test.go",
         "pkg/util/params/util_gparams_service_ops.go",
         "pkg/tactic/arith/linear_equation_debug.go",
-        "pkg/api/api_context_results.go"
+        "pkg/api/api_context_results.go",
+        "pkg/util/numeral/inf_eps_rational.go"
       ],
       "tests": [
         "TestDebugNotificationExactStatementsSignedFlagsAndNoReservation",
@@ -123329,6 +123337,12 @@
           "status": "ported",
           "go_target": "pkg/api/api_context_results.go",
           "tests": ["TestAPIContextSourceObjectAndTrailAssertions"]
+        },
+        {
+          "name": "InfEpsInf signed/unsigned64 getter SASSERT process switch, source notification and debugger Continue/Throw action (inf_eps_rational.h:122,127)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_eps_rational.go",
+          "tests": ["TestInfEpsInf64BitSourceAssertionActions"]
         },
         {
           "name": "Selected assertion switch, lazy debug table initialization, enable/disable/query, finalize and short-circuit CASSERT gate; whole global macro and debugger bindings remain open",
@@ -128105,6 +128119,7 @@
       "go_targets": [
         "pkg/util/numeral/inf_approx_raw_test.go",
         "pkg/util/numeral/inf_eps_rational.go",
+        "pkg/util/numeral/inf_eps_source_assertion_debug_test.go",
         "pkg/util/numeral/inf_stream.go",
         "pkg/util/numeral/inf_scalar_projection_test.go",
         "pkg/util/numeral/mp_lexical_constructor_test.go",
@@ -128119,6 +128134,7 @@
         "TestInfinitesimalSourceWholeStringStreamInsertion",
         "TestInfEpsInfFiniteTripleOracles",
         "TestInfEpsInfSourceQuirksAndHeader",
+        "TestInfEpsInf64BitSourceAssertionActions",
         "TestInfEpsInfConstantsPredicatesAndMixedRoutes",
         "TestInfEpsInfLifetimeAndDomain",
         "TestInfEpsInfFailurePrefixesImmediateRoots",
@@ -128384,11 +128400,12 @@
           "tests": []
         },
         {
-          "name": "Source scalar IsInt/IsRational and signed/unsigned64 fit/getter family, DEBUG assertions and release FIRST projection with actual component short circuit",
+          "name": "Source scalar IsInt/IsRational and signed/unsigned64 fit/getter family, process-gated SASSERT122/127 notification and debugger action, and FIRST projection after Continue with actual component short circuit",
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_eps_rational.go",
           "tests": [
             "TestInfScalarProjectionAllGetterProfilesAndRawPredicates",
+            "TestInfEpsInf64BitSourceAssertionActions",
             "TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit",
             "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
             "TestInfScalarProjectionOwnershipAndWarmGraph",

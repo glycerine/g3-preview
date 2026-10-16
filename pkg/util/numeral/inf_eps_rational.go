@@ -4,6 +4,8 @@
 // and other raw-domain arithmetic adapters remain separate obligations.
 package numeral
 
+import "github.com/glycerine/g3/pkg/util/diagnostic"
+
 // OwnedInfEpsInfRational represents infinity*i + (first + epsilon*second).
 // Infinity is a rational coefficient, not a saturating flag. Every component
 // is owned; never shallow-copy a live value. Its service owns numeric storage.
@@ -952,13 +954,22 @@ func (s *RationalService) InfEpsInfInt64(v *OwnedInfEpsInfRational) (int64, erro
 	if e := s.infEpsScalarOwner(v); e != nil {
 		return 0, e
 	}
-	if modularSourceDebug {
-		ok, e := s.infEpsScalarFits(v, false)
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return 0, e
 		}
-		if !ok {
-			return 0, ErrIntegerAssertion
+		if enabled {
+			ok, e := s.infEpsScalarFits(v, false)
+			if e != nil {
+				return 0, e
+			}
+			if !ok {
+				if e = diagnostic.DebugAssertionFailure(d, "src/util/inf_eps_rational.h", 122, "is_int64()"); e != nil {
+					return 0, e
+				}
+			}
 		}
 	}
 	if e := s.infScalarOwner(&v.numeral); e != nil {
@@ -974,13 +985,22 @@ func (s *RationalService) InfEpsInfUint64(v *OwnedInfEpsInfRational) (uint64, er
 	if e := s.infEpsScalarOwner(v); e != nil {
 		return 0, e
 	}
-	if modularSourceDebug {
-		ok, e := s.infEpsScalarFits(v, true)
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return 0, e
 		}
-		if !ok {
-			return 0, ErrIntegerAssertion
+		if enabled {
+			ok, e := s.infEpsScalarFits(v, true)
+			if e != nil {
+				return 0, e
+			}
+			if !ok {
+				if e = diagnostic.DebugAssertionFailure(d, "src/util/inf_eps_rational.h", 127, "is_uint64()"); e != nil {
+					return 0, e
+				}
+			}
 		}
 	}
 	if e := s.infScalarOwner(&v.numeral); e != nil {
