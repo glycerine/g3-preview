@@ -168,4 +168,48 @@ func TestPatternCollectInfoSourceSMT2Trace(t *testing.T) {
 	} else if output.Len() != 0 {
 		t.Fatal("erased quantifier display wrote output", output.String())
 	}
+	tags.Disable("collect_info")
+	innerName, err := sy.Intern("collect-inner")
+	patternMust(t, err)
+	outerName, err := sy.Intern("collect-outer")
+	patternMust(t, err)
+	makeUnary := func(name symbol.Symbol, child ast.ASTHandle) ast.ASTHandle {
+		t.Helper()
+		d, err := m.MkFuncDecl(name, []ast.ASTHandle{boolSort}, boolSort, ast.ASTFuncDeclInfo{})
+		patternMust(t, err)
+		patternMust(t, m.IncRef(d))
+		t.Cleanup(func() { patternMust(t, m.DecRef(d)) })
+		a, err := m.MkApp(d, []ast.ASTHandle{child})
+		patternMust(t, err)
+		patternMust(t, m.IncRef(a))
+		t.Cleanup(func() { patternMust(t, m.DecRef(a)) })
+		return a
+	}
+	inner := makeUnary(innerName, x)
+	outer := makeUnary(outerName, inner)
+	patternMust(t, c.collect(outer))
+	output.Reset()
+	tags.Enable("pattern_inference")
+	filtered, err := c.filterBigger([]ast.ASTHandle{outer, inner})
+	patternMust(t, err)
+	if len(filtered) != 1 || filtered[0] != inner {
+		t.Fatal("source bigger-pattern filter", filtered)
+	}
+	if tags.ShouldTrace("pattern_inference") {
+		want := "-------- [pattern_inference] operator() src/ast/pattern/pattern_inference.cpp:354 ---------\n" +
+			"(collect-outer (collect-inner (:var 0)))\nis bigger than\n(collect-inner (:var 0))\n" +
+			"------------------------------------------------\n"
+		if output.String() != want {
+			t.Fatalf("bigger-pattern trace: got %q, want %q", output.String(), want)
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("erased bigger-pattern trace wrote output", output.String())
+	}
+	output.Reset()
+	tags.Disable("pattern_inference")
+	filtered, err = c.filterBigger([]ast.ASTHandle{outer, inner})
+	patternMust(t, err)
+	if len(filtered) != 1 || filtered[0] != inner || output.Len() != 0 {
+		t.Fatal("disabled bigger-pattern trace changed filtering or emitted output", filtered, output.String())
+	}
 }

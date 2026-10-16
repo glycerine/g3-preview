@@ -1,7 +1,12 @@
 // Source: src/ast/pattern/pattern_inference.cpp:326-393.
 package pattern
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"io"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+)
 
 func (c *patternCandidates) saveSubpattern(n ast.ASTHandle) {
 	if _, seen := c.visited[n]; seen {
@@ -38,6 +43,9 @@ func (c *patternCandidates) containsSubpattern(root ast.ASTHandle) (bool, error)
 		case ast.ASTApp:
 			if curr != root {
 				if info, found := c.info[curr]; found && sameFreeVars(rootInfo.freeVars, info.freeVars) {
+					if err := c.traceBiggerSubpattern(root, curr); err != nil {
+						return false, err
+					}
 					return true, nil
 				}
 			}
@@ -58,6 +66,32 @@ func (c *patternCandidates) containsSubpattern(root ast.ASTHandle) (bool, error)
 		}
 	}
 	return false, nil
+}
+
+// Source: src/ast/pattern/pattern_inference.cpp:354. Both expressions are
+// displayed before the first equal-free-variable subpattern is accepted.
+func (c *patternCandidates) traceBiggerSubpattern(root, child ast.ASTHandle) error {
+	tags := c.traceTags
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	if !tags.ShouldTrace("pattern_inference") {
+		return nil
+	}
+	return tags.EmitConditional("pattern_inference", "operator()", "src/ast/pattern/pattern_inference.cpp", 354,
+		func() bool { return true }, func(w io.Writer) error {
+			if err := c.writePatternSMT2(w, root); err != nil {
+				return err
+			}
+			if _, err := io.WriteString(w, "\nis bigger than\n"); err != nil {
+				return err
+			}
+			if err := c.writePatternSMT2(w, child); err != nil {
+				return err
+			}
+			_, err := io.WriteString(w, "\n")
+			return err
+		})
 }
 
 // filterBigger is pattern_inference_cfg::filter_bigger_patterns. It borrows

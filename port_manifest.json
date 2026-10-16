@@ -18878,6 +18878,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Reached bigger-pattern same-free-variable subapplication TRACE at pattern_inference.cpp:354 before filter refusal",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/contains_subpattern.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
+        {
           "name": "Reached pattern collector potential-candidate TRACE at pattern_inference.cpp:251 after collected-info publication and before candidate insertion",
           "status": "ported",
           "go_target": "pkg/ast/pattern/collect.go",
@@ -180666,6 +180672,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/contains_subpattern.go",
         "pkg/ast/pattern/collect.go",
         "pkg/model/model_evaluator_trace.go",
         "pkg/util/diagnostic/util_trace_tags.go",
@@ -180868,6 +180875,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached bigger-pattern same-free-variable subapplication TRACE at pattern_inference.cpp:354 before filter refusal",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/contains_subpattern.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
         {
           "name": "Reached pattern collector potential-candidate TRACE at pattern_inference.cpp:251 after collected-info publication and before candidate insertion",
           "status": "ported",
@@ -182599,6 +182612,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/contains_subpattern.go",
         "pkg/ast/pattern/collect.go",
         "pkg/model/model_evaluator_trace.go",
         "pkg/util/diagnostic/util_trace_tags.go",
@@ -182809,6 +182823,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached bigger-pattern same-free-variable subapplication TRACE at pattern_inference.cpp:354 before filter refusal",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/contains_subpattern.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
         {
           "name": "Reached pattern collector potential-candidate TRACE at pattern_inference.cpp:251 after collected-info publication and before candidate insertion",
           "status": "ported",
