@@ -205,6 +205,7 @@ func (s *satSimplifier) propagateUnit(l Literal) error {
 func (s *satSimplifier) eliminateLiteral(c StoredClauseRef, l Literal) error {
 	p := s.lifecycle.propagation
 	a := p.clauses
+	s.traceElimLitClause(644, "processing: ", c)
 	s.needCleanup = true
 	s.numElimLits++
 	if e := p.variables.elimTodo.Insert(uint32(l.variable())); e != nil {
@@ -230,6 +231,7 @@ func (s *satSimplifier) eliminateLiteral(c StoredClauseRef, l Literal) error {
 		return e
 	}
 	if satisfied {
+		s.traceElimLitText(654, "clause was satisfied\n")
 		return s.removeClause(c)
 	}
 	n, e = a.Size(c)
@@ -238,6 +240,7 @@ func (s *satSimplifier) eliminateLiteral(c StoredClauseRef, l Literal) error {
 	}
 	switch n {
 	case 0:
+		s.traceElimLitText(660, "clause is empty\n")
 		p.setConflict(satJustification{}, DefaultLiteral())
 		return nil
 	case 1:
@@ -245,6 +248,7 @@ func (s *satSimplifier) eliminateLiteral(c StoredClauseRef, l Literal) error {
 		if e != nil {
 			return e
 		}
+		s.traceElimLitUnit(l)
 		return s.propagateUnit(l)
 	case 2:
 		l1, e := a.Literal(c, 0)
@@ -255,6 +259,7 @@ func (s *satSimplifier) eliminateLiteral(c StoredClauseRef, l Literal) error {
 		if e != nil {
 			return e
 		}
+		s.traceElimLitBinary(l1, l2)
 		learned, e := a.Learned(c)
 		if e != nil {
 			return e
@@ -280,6 +285,7 @@ func (s *satSimplifier) eliminateLiteral(c StoredClauseRef, l Literal) error {
 		}
 		return s.removeClause(c)
 	default:
+		s.traceElimLitClause(676, "result: ", c)
 		return s.subTodo.Insert(c)
 	}
 }

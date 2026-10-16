@@ -77278,6 +77278,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_finalize_trace.go",
           "tests": ["TestSATSimplifierActualFinalizeCleanupBranchSourceTrace"]
+        },
+        {
+          "name": "Reached elim_lit processing/satisfied/empty/unit/binary/nary TRACE branches at sat_simplifier.cpp:644,654,660,664,670,676",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_elim_lit_trace.go",
+          "tests": ["TestSATSimplifierEliminateLiteralSourceTraceBranches"]
         }
       ],
       "ownership": [
@@ -182296,6 +182302,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_finalize_trace.go",
           "tests": ["TestSATSimplifierActualFinalizeCleanupBranchSourceTrace"]
+        },
+        {
+          "name": "Reached elim_lit processing/satisfied/empty/unit/binary/nary TRACE branches at sat_simplifier.cpp:644,654,660,664,670,676",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_elim_lit_trace.go",
+          "tests": ["TestSATSimplifierEliminateLiteralSourceTraceBranches"]
         }
       ],
       "ownership": [
@@ -184084,6 +184096,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_finalize_trace.go",
           "tests": ["TestSATSimplifierActualFinalizeCleanupBranchSourceTrace"]
+        },
+        {
+          "name": "Reached elim_lit processing/satisfied/empty/unit/binary/nary TRACE branches at sat_simplifier.cpp:644,654,660,664,670,676",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_elim_lit_trace.go",
+          "tests": ["TestSATSimplifierEliminateLiteralSourceTraceBranches"]
         }
       ],
       "ownership": [
