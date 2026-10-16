@@ -61,8 +61,8 @@ func (d *ParamDescrs) displayInto(dst sourceTextBuffer, indent uint32, smt2, inc
 		if !found {
 			return ErrParamDescrsPrecondition
 		}
-		if paramDescrsStreamSourceDebug && !info.descr.present {
-			return ErrParamDescrsPrecondition
+		if e := sourceAssertParamDescription(info.descr.present); e != nil {
+			return e
 		}
 		dst.WriteString(" (")
 		dst.WriteString(info.kind.String())

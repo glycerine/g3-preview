@@ -212,6 +212,19 @@ func paramDescrString(s *string) paramDescrText {
 func (d *ParamDescrs) load(r paramDescrText) (string, bool, error) {
 	return r.value, r.present, nil
 }
+
+func sourceAssertParamDescription(present bool) error {
+	if !udiag.DebugBuild {
+		return nil
+	}
+	d := udiag.BorrowProcessDebugContext()
+	enabled, e := udiag.SourceAssertionsEnabled(d)
+	if e != nil || !enabled || present {
+		return e
+	}
+	return udiag.DebugAssertionFailure(d, "src/util/params.cpp", 190, "d.m_descr")
+}
+
 func (d *ParamDescrs) prepareInsert(k usymbol.Symbol, kind ParamKind) (bool, error) {
 	_, e := d.manager.Hash(k)
 	if e != nil {

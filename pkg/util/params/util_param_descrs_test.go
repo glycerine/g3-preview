@@ -309,6 +309,9 @@ func pdtotal(s ParamDescrsStats) uint64 {
 	return s.OwnerBytes + s.TableBytes + s.NamesBytes
 }
 func TestParamDescrsOwnershipNullableMetadataAndGuards(t *testing.T) {
+	if paramDescrsStreamSourceDebug {
+		bindProcessAssertionRefusal(t)
+	}
 	m := symbolManagerTest(t, nil, false)
 	other := symbolManagerTest(t, nil, false)
 	d := pdnew(t, m, nil)
@@ -348,7 +351,7 @@ func TestParamDescrsOwnershipNullableMetadataAndGuards(t *testing.T) {
 	}
 	pdinsert(t, d, "undescribed", ParamUInt, nil, nil, nil)
 	if got, e := d.Display(0, false, false); paramDescrsStreamSourceDebug {
-		if e != ErrParamDescrsPrecondition {
+		if e != udiag.ErrDebugAssertion {
 			t.Fatal("checked description assertion", e)
 		}
 	} else if e != nil || got != "mixed_name (unknown) (default: )\nundescribed (unsigned int)\n" {

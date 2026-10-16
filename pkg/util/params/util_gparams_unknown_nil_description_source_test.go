@@ -5,9 +5,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 func TestGlobalParamsUnknownParameterLegalListOmitsNullDescriptions(t *testing.T) {
+	if paramDescrsStreamSourceDebug {
+		bindProcessAssertionRefusal(t)
+	}
 	ctx, symbols, _ := paramsTestOwner(t)
 	budget := arena.NewBudget(^uint64(0))
 	cfg := gparamsTestConfig(budget)
@@ -55,7 +59,7 @@ func TestGlobalParamsUnknownParameterLegalListOmitsNullDescriptions(t *testing.T
 		} {
 			err := action()
 			if paramDescrsStreamSourceDebug {
-				if !errors.Is(err, ErrParamDescrsPrecondition) {
+				if !errors.Is(err, udiag.ErrDebugAssertion) {
 					t.Fatal(tc.name, "checked legal-list assertion", err)
 				}
 			} else if err == nil || err.Error() != tc.want {

@@ -2,10 +2,14 @@ package params
 
 import (
 	"errors"
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	"testing"
 )
 
 func TestParamsValidationLegalListMissingDescriptionSourceGuard(t *testing.T) {
+	if paramDescrsStreamSourceDebug {
+		bindProcessAssertionRefusal(t)
+	}
 	c, symbols, _ := paramsTestOwner(t)
 	v, err := c.NewValue()
 	paramsMust(t, err)
@@ -25,7 +29,7 @@ func TestParamsValidationLegalListMissingDescriptionSourceGuard(t *testing.T) {
 	paramsMust(t, c.SetBool(&v, internSymbol(t, symbols, "missing"), true))
 	err = c.Validate(&v, d)
 	if paramDescrsStreamSourceDebug {
-		if !errors.Is(err, ErrParamDescrsPrecondition) {
+		if !errors.Is(err, udiag.ErrDebugAssertion) {
 			t.Fatal("checked legal-list assertion", err)
 		}
 		wantPrefix := "unknown parameter 'missing'\nLegal parameters are:\n  first (unsigned int)\n  known"

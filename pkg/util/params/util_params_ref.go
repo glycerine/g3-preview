@@ -1420,8 +1420,8 @@ func (c *ParamsContext) appendDescrs(d *ParamDescrs) error {
 		if !found {
 			return ErrParamDescrsPrecondition
 		}
-		if paramDescrsStreamSourceDebug && !info.descr.present {
-			return ErrParamDescrsPrecondition
+		if e := sourceAssertParamDescription(info.descr.present); e != nil {
+			return e
 		}
 		if e = c.appendString(" ("); e != nil {
 			return e

@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -68,6 +69,9 @@ func TestParamDescrsSortRefusalPrecedesDisplayOutput(t *testing.T) {
 	}
 }
 func TestParamDescrsDisplayIntoNullDescriptionActualAction(t *testing.T) {
+	if paramDescrsStreamSourceDebug {
+		bindProcessAssertionRefusal(t)
+	}
 	m := symbolManagerTest(t, nil, false)
 	d := pdnew(t, m, nil)
 	pdinsert(t, d, "A-key", ParamUInt, nil, nil, nil)
@@ -79,10 +83,10 @@ func TestParamDescrsDisplayIntoNullDescriptionActualAction(t *testing.T) {
 		want := "p  a_key (unsigned int)\n"
 		if paramDescrsStreamSourceDebug {
 			want = "p  a_key"
-			if !errors.Is(e, ErrParamDescrsPrecondition) {
+			if !errors.Is(e, udiag.ErrDebugAssertion) {
 				t.Fatal("source assertion position", e)
 			}
-			if displayErr != ErrParamDescrsPrecondition || gotDisplay != want[1:] {
+			if displayErr != udiag.ErrDebugAssertion || gotDisplay != want[1:] {
 				t.Fatal("checked display assertion prefix", gotDisplay, displayErr)
 			}
 		} else if descr {

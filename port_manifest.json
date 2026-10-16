@@ -171403,8 +171403,23 @@
           "status": "ported",
           "go_target": "pkg/util/params/util_param_descrs.go",
           "tests": [
-            "TestParamDescrsInsertSourceAssertionActions",
+            "TestParamDescrsInsertAndDisplaySourceAssertionActions",
             "TestGlobalParamsModuleMergeDuplicateKindSourceAssertion"
+          ]
+        },
+        {
+          "name": "param_descrs display missing-description SASSERT at params.cpp:190 before kind insertion, including legal-parameter list callers",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_param_descrs_stream.go",
+          "go_targets": [
+            "pkg/util/params/util_param_descrs.go",
+            "pkg/util/params/util_params_ref.go"
+          ],
+          "tests": [
+            "TestParamDescrsInsertAndDisplaySourceAssertionActions",
+            "TestParamDescrsDisplayIntoNullDescriptionActualAction",
+            "TestParamsValidationLegalListMissingDescriptionSourceGuard",
+            "TestGlobalParamsUnknownParameterLegalListOmitsNullDescriptions"
           ]
         },
         {

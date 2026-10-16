@@ -14,11 +14,11 @@ import (
 )
 
 // Source: src/util/params.cpp:75-80. The first assertion precedes dictionary lookup.
-func TestParamDescrsInsertSourceAssertionActions(t *testing.T) {
+func TestParamDescrsInsertAndDisplaySourceAssertionActions(t *testing.T) {
 	d, _, budget := debugFixture(t)
 	in, e := os.CreateTemp(t.TempDir(), "descr-input-*")
 	paramsMust(t, e)
-	_, e = in.WriteString("TCTC")
+	_, e = in.WriteString("TCTCTC")
 	paramsMust(t, e)
 	_, e = in.Seek(0, 0)
 	paramsMust(t, e)
@@ -65,22 +65,32 @@ func TestParamDescrsInsertSourceAssertionActions(t *testing.T) {
 	if kind, e := descr.Kind(name); e != nil || kind != ParamUInt {
 		t.Fatal("duplicate changed original kind", kind, e)
 	}
+	missing := pdnew(t, symbols, nil)
+	paramsMust(t, missing.InsertName("a-key", ParamBool, nil, nil, nil))
+	if prefix, e := missing.Display(2, false, false); !errors.As(e, &thrown) || prefix != "  a_key" {
+		t.Fatal("description Throw must preserve preceding text", prefix, e)
+	}
+	if rendered, e := missing.Display(2, false, false); e != nil || rendered != "  a_key (bool)\n" {
+		t.Fatal("description Continue must reach kind output", rendered, e)
+	}
 	paramsMust(t, d.EnableAssertions(false))
 	paramsMust(t, descr.Insert(usymbol.Numerical(8), ParamBool, nil, nil, nil))
 	paramsMust(t, descr.Insert(name, ParamSymbol, nil, nil, nil))
 	state, e := input.State()
 	paramsMust(t, e)
-	if state.Position != 4 {
+	if state.Position != 6 {
 		t.Fatal("disabled assertions consumed input", state)
 	}
 	got, e := os.ReadFile(out.Name())
 	paramsMust(t, e)
 	const prompt = "(C)ontinue, (A)bort, (S)top, (T)hrow exception, Invoke (G)DB\n"
 	want := ""
-	for _, line := range []int{75, 75, 78, 78} {
+	for _, line := range []int{75, 75, 78, 78, 190, 190} {
 		condition := "!name.is_numerical()"
 		if line == 78 {
 			condition = "i.m_kind == k"
+		} else if line == 190 {
+			condition = "d.m_descr"
 		}
 		want += "ASSERTION VIOLATION\nFile: src/util/params.cpp\nLine: " + strconv.Itoa(line) + "\n" + condition + "\n" + prompt
 	}
