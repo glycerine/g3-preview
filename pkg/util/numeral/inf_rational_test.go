@@ -303,14 +303,6 @@ func TestInfRationalApproximationFrozenBranches(t *testing.T) {
 		serviceMust(t, s.InfDel(&u))
 		serviceMust(t, s.InfDel(&v))
 	}
-	root, e := s.InfLowerRoot(&x, 0)
-	serviceMust(t, e)
-	infText(t, s, &root, "0")
-	serviceMust(t, s.InfDel(&root))
-	root, e = s.InfUpperRoot(&x, 0)
-	serviceMust(t, e)
-	infText(t, s, &root, "(2 +e*3)")
-	serviceMust(t, s.InfDel(&root))
 	// b=5,d=-7,positive numerator: upper denominator 5-5/2; lower5.
 	l, e := s.InfLowerDiv(&x, &y)
 	serviceMust(t, e)
@@ -345,21 +337,7 @@ func TestInfRationalOwnershipErrors(t *testing.T) {
 		infAuditRoots(t, s, []*OwnedInfRational{&v, &z, &div}, nil)
 		serviceMust(t, s.InfDel(&div))
 	}
-	root, e := s.InfLowerRoot(&z, 2)
-	serviceMust(t, e)
-	serviceMust(t, s.InfDel(&root))
 	serviceMust(t, s.InfNeg(&z))
-	root, e = s.InfUpperRoot(&z, 2)
-	if SourceExtendedGCDDebug {
-		if !errors.Is(e, ErrInfRationalDomain) {
-			t.Fatal(e)
-		}
-	} else {
-		serviceMust(t, e)
-		infText(t, s, &root, "(0 -e*1)")
-		infAuditRoots(t, s, []*OwnedInfRational{&v, &z, &root}, nil)
-		serviceMust(t, s.InfDel(&root))
-	}
 	serviceMust(t, s.Close())
 	if _, e := s.InfHash(&v); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal(e)
@@ -900,29 +878,23 @@ func TestInfRationalCompoundReturnCopyFailure(t *testing.T) {
 		t.Fatal("source return-copy failure boundary disappeared")
 	}
 }
-func TestInfRationalCoarseRootAndFusedComponentAlias(t *testing.T) {
+func TestInfRationalFusedComponentAlias(t *testing.T) {
 	s, _ := serviceNew(t)
 	v := infValue(t, s, 1, 2, "0")
-	upper, e := s.InfUpperRoot(&v, 2)
-	serviceMust(t, e)
-	infText(t, s, &upper, "1/2")
-	lower, e := s.InfLowerRoot(&v, 2)
-	serviceMust(t, e)
-	infText(t, s, &lower, "0") // deliberately source coarse, upper is not sqrt(1/2)
 	serviceMust(t, s.InfSetInt32(&v, 2))
 	two := serviceValue(t, s, "2")
 	three := serviceValue(t, s, "3")
 	serviceMust(t, s.InfSetPair(&v, &two, &three))
 	k := infValue(t, s, 4, 1, "5")
 	serviceMust(t, s.lock())
-	e = s.infRatFused(&v.First, &v.First, &k.First, false)
+	e := s.infRatFused(&v.First, &v.First, &k.First, false)
 	if e == nil {
 		e = s.infRatFused(&v.Second, &v.First, &k.Second, false)
 	}
 	s.mu.Unlock()
 	serviceMust(t, e)
 	infText(t, s, &v, "(10 +e*53)")
-	for _, x := range []*OwnedInfRational{&v, &upper, &lower, &k} {
+	for _, x := range []*OwnedInfRational{&v, &k} {
 		serviceMust(t, s.InfDel(x))
 	}
 	serviceMust(t, s.Del(&two))

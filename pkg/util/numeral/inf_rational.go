@@ -1496,33 +1496,6 @@ func (s *RationalService) InfUpperPower(v *OwnedInfRational, n uint32) (OwnedInf
 	}
 	return s.infPower(v, n, true)
 }
-func (s *RationalService) InfLowerRoot(v *OwnedInfRational, n uint32) (OwnedInfRational, error) {
-	if e := s.lock(); e != nil {
-		return OwnedInfRational{}, e
-	}
-	defer s.mu.Unlock()
-	if e := s.infScalarOwner(v); e != nil {
-		return OwnedInfRational{}, e
-	}
-	if SourceExtendedGCDDebug && s.infSign(v) < 0 {
-		return OwnedInfRational{}, ErrInfRationalDomain
-	}
-	return s.infEmpty(), nil
-}
-func (s *RationalService) InfUpperRoot(v *OwnedInfRational, n uint32) (OwnedInfRational, error) {
-	if e := s.lock(); e != nil {
-		return OwnedInfRational{}, e
-	}
-	defer s.mu.Unlock()
-	if e := s.infScalarOwner(v); e != nil {
-		return OwnedInfRational{}, e
-	}
-	if SourceExtendedGCDDebug && s.infSign(v) < 0 {
-		return OwnedInfRational{}, ErrInfRationalDomain
-	}
-	return s.infClone(v)
-}
-
 func (s *RationalService) infLess(a, b *OwnedInfRational) (bool, error) {
 	if e := s.infScalarOwner(a); e != nil {
 		return false, e

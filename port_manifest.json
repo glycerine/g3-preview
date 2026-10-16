@@ -111944,7 +111944,7 @@
         "TestInfRationalComponentAliasSourceRereads",
         "TestInfRationalIncrementSourceRationalRoute",
         "TestInfRationalCompoundReturnCopyFailure",
-        "TestInfRationalCoarseRootAndFusedComponentAlias",
+        "TestInfRationalFusedComponentAlias",
         "TestInfRationalIntegerConstructorCopyRoute"
       ],
       "assertions": [
@@ -112215,7 +112215,7 @@
             "TestInfRationalComponentAliasSourceRereads",
             "TestInfRationalIncrementSourceRationalRoute",
             "TestInfRationalCompoundReturnCopyFailure",
-            "TestInfRationalCoarseRootAndFusedComponentAlias",
+            "TestInfRationalFusedComponentAlias",
             "TestInfRationalIntegerConstructorCopyRoute"
           ]
         }
@@ -128999,7 +128999,7 @@
         "TestInfRationalComponentAliasSourceRereads",
         "TestInfRationalIncrementSourceRationalRoute",
         "TestInfRationalCompoundReturnCopyFailure",
-        "TestInfRationalCoarseRootAndFusedComponentAlias",
+        "TestInfRationalFusedComponentAlias",
         "TestInfRationalIntegerConstructorCopyRoute",
         "TestRationalServiceInfinitesimalHeaderOwnership",
         "TestRationalServiceInfinitesimalConstructorFailureRefunds",
@@ -129011,8 +129011,7 @@
         "TestConstructorEightRootsAndWarmBoundary",
         "TestConstructorExpressionFailedCopyPhase",
         "TestInfGuardZeroFirstDivisionProfiles",
-        "TestInfGuardRootProfilesAndUnreadFields",
-        "TestInfGuardUnreadDivisorAndLowerRoot",
+        "TestInfGuardUnreadDivisor",
         "TestInfGuardAllocationPrecedenceAndWarmRoots",
         "TestInfApproxRawPowerSelectedBranches",
         "TestInfApproxUnreadPowerFields",
@@ -129045,7 +129044,11 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "complete inf_mult/sup_mult, inf_div/sup_div, inf_power/sup_power, inf_root/sup_root algorithms",
+          "name": "inf_root/sup_root have no retained production caller; removed test-only Go entry points under the retained-consumer rule",
+          "status": "dead_deleted"
+        },
+        {
+          "name": "complete inf_mult/sup_mult, inf_div/sup_div and inf_power/sup_power algorithms",
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_rational.go",
           "tests": [
@@ -129059,7 +129062,7 @@
             "TestInfRationalComponentAliasSourceRereads",
             "TestInfRationalIncrementSourceRationalRoute",
             "TestInfRationalCompoundReturnCopyFailure",
-            "TestInfRationalCoarseRootAndFusedComponentAlias",
+            "TestInfRationalFusedComponentAlias",
             "TestInfRationalIntegerConstructorCopyRoute",
             "TestRationalServiceInfinitesimalHeaderOwnership",
             "TestRationalServiceInfinitesimalConstructorFailureRefunds",
@@ -129081,7 +129084,7 @@
             "TestInfRationalComponentAliasSourceRereads",
             "TestInfRationalIncrementSourceRationalRoute",
             "TestInfRationalCompoundReturnCopyFailure",
-            "TestInfRationalCoarseRootAndFusedComponentAlias",
+            "TestInfRationalFusedComponentAlias",
             "TestInfRationalIntegerConstructorCopyRoute",
             "TestRationalServiceInfinitesimalHeaderOwnership",
             "TestRationalServiceInfinitesimalConstructorFailureRefunds",
@@ -129089,13 +129092,12 @@
           ]
         },
         {
-          "name": "Selected inf_div/sup_div/inf_root/sup_root DEBUG scalar guards, reached raw fields and release DEFAULT/COPY routes with actual lexical cleanup",
+          "name": "Selected inf_div/sup_div DEBUG scalar guards, reached raw fields and release DEFAULT/COPY routes with actual lexical cleanup",
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_rational.go",
           "tests": [
             "TestInfGuardZeroFirstDivisionProfiles",
-            "TestInfGuardRootProfilesAndUnreadFields",
-            "TestInfGuardUnreadDivisorAndLowerRoot",
+                "TestInfGuardUnreadDivisor",
             "TestInfGuardAllocationPrecedenceAndWarmRoots"
           ]
         },
@@ -129152,7 +129154,7 @@
         "TestInfRationalComponentAliasSourceRereads",
         "TestInfRationalIncrementSourceRationalRoute",
         "TestInfRationalCompoundReturnCopyFailure",
-        "TestInfRationalCoarseRootAndFusedComponentAlias",
+        "TestInfRationalFusedComponentAlias",
         "TestInfRationalIntegerConstructorCopyRoute",
         "TestInfRationalSourceBorrowedComponentsDoNotCopyOrReadPeer",
         "TestRationalServiceInfinitesimalHeaderOwnership",
@@ -129189,8 +129191,7 @@
         "TestLexicalOriginalFailureAndCleanupCause",
         "TestLexicalRationalManagerOneRootContinuation",
         "TestInfGuardZeroFirstDivisionProfiles",
-        "TestInfGuardRootProfilesAndUnreadFields",
-        "TestInfGuardUnreadDivisorAndLowerRoot",
+        "TestInfGuardUnreadDivisor",
         "TestInfGuardAllocationPrecedenceAndWarmRoots",
         "TestInfApproxRawPowerSelectedBranches",
         "TestInfApproxUnreadPowerFields",
@@ -129278,6 +129279,10 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "inf_root/sup_root have no retained production caller; removed test-only Go entry points under the retained-consumer rule",
+          "status": "dead_deleted"
+        },
+        {
           "name": "inf_rational ostream insertion of one complete to_string result (h459-463)",
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_stream.go",
@@ -129298,7 +129303,7 @@
             "TestInfRationalComponentAliasSourceRereads",
             "TestInfRationalIncrementSourceRationalRoute",
             "TestInfRationalCompoundReturnCopyFailure",
-            "TestInfRationalCoarseRootAndFusedComponentAlias",
+            "TestInfRationalFusedComponentAlias",
             "TestInfRationalIntegerConstructorCopyRoute",
             "TestRationalServiceInfinitesimalHeaderOwnership",
             "TestRationalServiceInfinitesimalConstructorFailureRefunds",
@@ -129380,7 +129385,7 @@
             "TestInfRationalComponentAliasSourceRereads",
             "TestInfRationalIncrementSourceRationalRoute",
             "TestInfRationalCompoundReturnCopyFailure",
-            "TestInfRationalCoarseRootAndFusedComponentAlias",
+            "TestInfRationalFusedComponentAlias",
             "TestInfRationalIntegerConstructorCopyRoute",
             "TestRationalServiceInfinitesimalHeaderOwnership",
             "TestRationalServiceInfinitesimalConstructorFailureRefunds",
@@ -129402,7 +129407,7 @@
             "TestInfRationalComponentAliasSourceRereads",
             "TestInfRationalIncrementSourceRationalRoute",
             "TestInfRationalCompoundReturnCopyFailure",
-            "TestInfRationalCoarseRootAndFusedComponentAlias",
+            "TestInfRationalFusedComponentAlias",
             "TestInfRationalIntegerConstructorCopyRoute",
             "TestRationalServiceInfinitesimalHeaderOwnership",
             "TestRationalServiceInfinitesimalConstructorFailureRefunds",
@@ -129494,13 +129499,12 @@
           ]
         },
         {
-          "name": "Selected inf_div/sup_div/inf_root/sup_root DEBUG scalar guards, reached raw fields and release DEFAULT/COPY routes with actual lexical cleanup",
+          "name": "Selected inf_div/sup_div DEBUG scalar guards, reached raw fields and release DEFAULT/COPY routes with actual lexical cleanup",
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_rational.go",
           "tests": [
             "TestInfGuardZeroFirstDivisionProfiles",
-            "TestInfGuardRootProfilesAndUnreadFields",
-            "TestInfGuardUnreadDivisorAndLowerRoot",
+                "TestInfGuardUnreadDivisor",
             "TestInfGuardAllocationPrecedenceAndWarmRoots"
           ]
         },
@@ -173423,7 +173427,7 @@
         "TestInfRationalComponentAliasSourceRereads",
         "TestInfRationalIncrementSourceRationalRoute",
         "TestInfRationalCompoundReturnCopyFailure",
-        "TestInfRationalCoarseRootAndFusedComponentAlias",
+        "TestInfRationalFusedComponentAlias",
         "TestInfRationalIntegerConstructorCopyRoute",
         "TestInfIntRationalSourceConstructorsConstantsLifetime",
         "TestInfIntRationalIndependentArithmeticAndAliases",
@@ -173565,7 +173569,7 @@
             "TestInfRationalComponentAliasSourceRereads",
             "TestInfRationalIncrementSourceRationalRoute",
             "TestInfRationalCompoundReturnCopyFailure",
-            "TestInfRationalCoarseRootAndFusedComponentAlias",
+            "TestInfRationalFusedComponentAlias",
             "TestInfRationalIntegerConstructorCopyRoute",
             "TestInfIntRationalSourceConstructorsConstantsLifetime",
             "TestInfIntRationalIndependentArithmeticAndAliases",

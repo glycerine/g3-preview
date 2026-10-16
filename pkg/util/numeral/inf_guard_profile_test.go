@@ -8,7 +8,7 @@ import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
-// Added branch fixtures for inf_rational.cpp:80-111,169-179; no new source ENSURE credit.
+// Added branch fixtures for inf_rational.cpp:80-111; no new source ENSURE credit.
 func TestInfGuardZeroFirstDivisionProfiles(t *testing.T) {
 	for _, divisorEPS := range []string{"0", "-1", "1"} {
 		for _, upper := range []bool{false, true} {
@@ -59,51 +59,9 @@ func TestInfGuardZeroFirstDivisionProfiles(t *testing.T) {
 	}
 }
 
-func TestInfGuardRootProfilesAndUnreadFields(t *testing.T) {
-	for _, upper := range []bool{false, true} {
-		s, _ := serviceNew(t)
-		v := infValue(t, s, -2, 1, "-3")
-		var out OwnedInfRational
-		var err error
-		if upper {
-			out, err = s.InfUpperRoot(&v, 0)
-		} else {
-			out, err = s.InfLowerRoot(&v, 0)
-		}
-		if SourceExtendedGCDDebug {
-			if !errors.Is(err, ErrInfRationalDomain) {
-				t.Fatal(err)
-			}
-		} else {
-			serviceMust(t, err)
-			if upper {
-				infText(t, s, &out, "(-2 -e*3)")
-			} else {
-				infText(t, s, &out, "0")
-			}
-			serviceMust(t, s.InfDel(&out))
-		}
-		// Source lower root has no component reads. A raw positive 1/0 passes
-		// its scalar debug assertion; upper root copies the actual raw fields.
-		v.First.Num = Int{Val: 1}
-		v.First.Den = Int{}
-		out, err = s.InfLowerRoot(&v, 17)
-		serviceMust(t, err)
-		serviceMust(t, s.InfDel(&out))
-		out, err = s.InfUpperRoot(&v, 17)
-		serviceMust(t, err)
-		if out.First.Num.Val != 1 || out.First.Den.Val != 0 {
-			t.Fatal(out)
-		}
-		infAuditRoots(t, s, []*OwnedInfRational{&v, &out}, nil)
-		serviceMust(t, s.InfDel(&out))
-		serviceMust(t, s.InfDel(&v))
-	}
-}
-
 // Unread fields are intentionally malformed scalar tokens; they own no live
 // storage. Restore them before caller destruction, rather than repairing math.
-func TestInfGuardUnreadDivisorAndLowerRoot(t *testing.T) {
+func TestInfGuardUnreadDivisor(t *testing.T) {
 	s, _ := serviceNew(t)
 	a := infValue(t, s, 6, 1, "2")
 	b := infValue(t, s, 3, 1, "0")
@@ -114,15 +72,6 @@ func TestInfGuardUnreadDivisorAndLowerRoot(t *testing.T) {
 	serviceMust(t, e)
 	infText(t, s, &out, "(2 +e*2/3)")
 	serviceMust(t, s.InfDel(&out))
-	b.First.Num = Int{Val: 1, Cell: s.Manager.Z.FailedRef}
-	out, e = s.InfLowerRoot(&b, 2)
-	serviceMust(t, e)
-	infText(t, s, &out, "0")
-	serviceMust(t, s.InfDel(&out))
-	if _, e = s.InfUpperRoot(&b, 2); e == nil {
-		t.Fatal("upper root must reach invalid FIRST copy")
-	}
-	b.First = NewRational()
 	b.Second = saved
 	infAuditRoots(t, s, []*OwnedInfRational{&a, &b}, nil)
 	serviceMust(t, s.InfDel(&a))
@@ -162,8 +111,8 @@ func TestInfGuardAllocationPrecedenceAndWarmRoots(t *testing.T) {
 	serviceMust(t, s.Manager.Z.CleanupPendingAllocation())
 	serviceMust(t, s.InfDel(&a))
 	serviceMust(t, s.InfDel(&zero))
-	// All scalar constructor routes in this cluster are inline. Both root
-	// results and division's rational(2) branch require no raw allocation.
+	// All scalar constructor routes in this cluster are inline. The division
+	// branch's rational(2) requires no raw allocation.
 	a = infValue(t, s, 2, 1, "2")
 	d := infValue(t, s, 2, 1, "1")
 	out, e = s.InfLowerDiv(&a, &d)
@@ -172,20 +121,6 @@ func TestInfGuardAllocationPrecedenceAndWarmRoots(t *testing.T) {
 	before := numericWarmProfileSnapshot(t, s.Manager.Z, b)
 	allocs := testing.AllocsPerRun(10, func() {
 		r, err := s.InfLowerDiv(&a, &d)
-		if err != nil {
-			panic(err)
-		}
-		if err = s.InfDel(&r); err != nil {
-			panic(err)
-		}
-		r, err = s.InfLowerRoot(&a, 0)
-		if err != nil {
-			panic(err)
-		}
-		if err = s.InfDel(&r); err != nil {
-			panic(err)
-		}
-		r, err = s.InfUpperRoot(&a, 0)
 		if err != nil {
 			panic(err)
 		}
