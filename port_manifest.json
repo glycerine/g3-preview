@@ -171773,6 +171773,19 @@
           ]
         },
         {
+          "name": "params::reset post-finalize SASSERT(empty()) at params.cpp:802 in live reset and destructor reset, retaining stopped owning receipts",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_reset_source.go",
+          "go_targets": [
+            "pkg/util/params/util_params_decrement_source.go"
+          ],
+          "tests": [
+            "TestParamsResetSourcePostconditionAfterFinalization",
+            "TestParamsReferenceResetOwnContinuationMatchesKindAndInvocation",
+            "TestParamsReferenceTrackedDecrementGuardedEntryReceipt"
+          ]
+        },
+        {
           "name": "selected matched-key del_value then ascending suffix assignment/pop with exact index/kind/invocation explicit owning continuation",
           "status": "ported",
           "go_target": "pkg/util/params/util_params_reset_key_source.go",

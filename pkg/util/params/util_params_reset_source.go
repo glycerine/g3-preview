@@ -1,6 +1,8 @@
 // Source: src/util/params.cpp:677-680,753-781,799-803.
 package params
 
+import udiag "github.com/glycerine/g3/pkg/util/diagnostic"
+
 const (
 	paramsResetDestroy uint8 = 1
 	paramsResetLive    uint8 = 2
@@ -11,6 +13,18 @@ const (
 type ParamsResetReceipt struct {
 	owner, invocation uint64
 	slot, generation  uint32
+}
+
+func sourceAssertParamsResetEmpty(b *paramsBlock) error {
+	if !udiag.DebugBuild {
+		return nil
+	}
+	d := udiag.BorrowProcessDebugContext()
+	enabled, e := udiag.SourceAssertionsEnabled(d)
+	if e != nil || !enabled || b.Size == 0 {
+		return e
+	}
+	return udiag.DebugAssertionFailure(d, "src/util/params.cpp", 802, "empty()")
 }
 
 func (c *ParamsContext) continueReset(slot uint32) error {
@@ -51,6 +65,12 @@ func (c *ParamsContext) continueReset(slot uint32) error {
 	b.entries = paramsEntriesRef{}
 	b.Size = 0
 	b.capacity = 0
+	if e := sourceAssertParamsResetEmpty(b); e != nil {
+		if r.cause == nil {
+			r.cause = e
+		}
+		return e
+	}
 	b.resetActive = false
 	b.resetCursor = 0
 	b.resetStage = 0
