@@ -124,6 +124,9 @@ func (f *FunctionInterpretation) SetElse(term ast.ASTHandle) error {
 		if !yes {
 			break
 		}
+		if e := f.tracePeeledEntry(term); e != nil {
+			return e
+		}
 		result, e := f.manager.GetArg(term, 1)
 		if e != nil {
 			return e

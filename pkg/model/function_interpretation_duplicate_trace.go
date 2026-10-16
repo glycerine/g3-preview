@@ -17,31 +17,8 @@ func (f *FunctionInterpretation) traceDuplicateNewEntry(old *FunctionEntry, args
 	}
 	return tags.EmitConditional("func_interp_bug", "insert_new_entry", "src/model/func_interp.cpp", 202,
 		func() bool { return true }, func(w io.Writer) error {
-			globals := uparams.BorrowProcessGlobalParamsService()
-			if globals == nil || globals.Context == nil {
-				return uparams.ErrGlobalParamsOwner
-			}
 			write := func(s string) error { _, err := io.WriteString(w, s); return err }
-			print := func(h ast.ASTHandle) (err error) {
-				format, err := f.manager.SMT2PPExprTree(h, nil)
-				if err != nil {
-					return err
-				}
-				stream, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: f.manager.Budget()})
-				if err != nil {
-					return err
-				}
-				defer func() { err = errors.Join(err, stream.Close()) }()
-				empty := globals.Context.EmptyValue()
-				if err = f.manager.PrintFormat(stream, format, globals.Context, &empty, globals); err != nil {
-					return err
-				}
-				body, err := stream.String()
-				if err != nil {
-					return err
-				}
-				return write(body)
-			}
+			print := func(h ast.ASTHandle) error { return f.writeTraceSMT2(w, h) }
 			if err := write("Old: "); err != nil {
 				return err
 			}
@@ -84,4 +61,30 @@ func (f *FunctionInterpretation) traceDuplicateNewEntry(old *FunctionEntry, args
 			}
 			return write("\n")
 		})
+}
+
+func (f *FunctionInterpretation) writeTraceSMT2(w io.Writer, h ast.ASTHandle) (result error) {
+	globals := uparams.BorrowProcessGlobalParamsService()
+	if globals == nil || globals.Context == nil {
+		return uparams.ErrGlobalParamsOwner
+	}
+	format, err := f.manager.SMT2PPExprTree(h, nil)
+	if err != nil {
+		return err
+	}
+	stream, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: f.manager.Budget()})
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, stream.Close()) }()
+	empty := globals.Context.EmptyValue()
+	if err = f.manager.PrintFormat(stream, format, globals.Context, &empty, globals); err != nil {
+		return err
+	}
+	body, err := stream.String()
+	if err != nil {
+		return err
+	}
+	_, err = io.WriteString(w, body)
+	return err
 }

@@ -56660,6 +56660,12 @@
           ]
         },
         {
+          "name": "set_else ITE-entry TRACE before each peeled graph insertion (func_interp.cpp:146)",
+          "status": "ported",
+          "go_target": "pkg/model/function_interpretation_else_trace.go",
+          "tests": ["TestFunctionInterpretationSetElseEntrySourceTrace"]
+        },
+        {
           "name": "insert_new_entry duplicate-key checked CTRACE before refusal (func_interp.cpp:202-215)",
           "status": "ported",
           "go_target": "pkg/model/function_interpretation_duplicate_trace.go",
@@ -56757,6 +56763,12 @@
             "TestFunctionInterpretationInsertionRefusalsReleaseReferences",
             "TestFunctionInterpretationCopyEntriesAndOwningOutput"
           ]
+        },
+        {
+          "name": "set_else ITE-entry TRACE before each peeled graph insertion (func_interp.cpp:146)",
+          "status": "ported",
+          "go_target": "pkg/model/function_interpretation_else_trace.go",
+          "tests": ["TestFunctionInterpretationSetElseEntrySourceTrace"]
         },
         {
           "name": "insert_new_entry duplicate-key checked CTRACE before refusal (func_interp.cpp:202-215)",
@@ -182905,6 +182917,12 @@
           "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
         },
         {
+          "name": "Retained func_interp::set_else ITE-entry TRACE before each graph insertion (func_interp.cpp:146)",
+          "status": "ported",
+          "go_target": "pkg/model/function_interpretation_else_trace.go",
+          "tests": ["TestFunctionInterpretationSetElseEntrySourceTrace"]
+        },
+        {
           "name": "Retained func_interp::insert_new_entry duplicate-key CTRACE before checked refusal (func_interp.cpp:202-215)",
           "status": "ported",
           "go_target": "pkg/model/function_interpretation_duplicate_trace.go",
@@ -185012,6 +185030,12 @@
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
           "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
+        },
+        {
+          "name": "Retained func_interp::set_else ITE-entry TRACE before each graph insertion (func_interp.cpp:146)",
+          "status": "ported",
+          "go_target": "pkg/model/function_interpretation_else_trace.go",
+          "tests": ["TestFunctionInterpretationSetElseEntrySourceTrace"]
         },
         {
           "name": "Retained func_interp::insert_new_entry duplicate-key CTRACE before checked refusal (func_interp.cpp:202-215)",
