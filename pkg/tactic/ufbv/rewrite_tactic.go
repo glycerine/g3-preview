@@ -46,6 +46,7 @@ func NewRewriterTactic(m *ast.ASTManager, c *uparams.ParamsContext, g *uparams.G
 	}
 	t := &RewriterTactic{manager: m, context: c, globals: g, header: n}
 	t.self = t
+	t.traceOuterAllocated()
 	imp, e := t.newImp(81)
 	t.imp = imp
 	return t, e
@@ -199,6 +200,7 @@ func (t *RewriterTactic) Close() error {
 		}
 		t.imp = nil
 	}
+	t.traceOuterDeallocated()
 	t.manager.Budget().Release(t.header)
 	t.header = 0
 	t.closed = true

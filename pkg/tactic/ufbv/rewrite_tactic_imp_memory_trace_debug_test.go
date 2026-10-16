@@ -42,6 +42,10 @@ func TestUFBVRewriterImpMemoryCleanupSwapAndClose(t *testing.T) {
 	t.Cleanup(func() { cacheMust(t, r.Close()) })
 	first := r.imp
 	size := uint64(reflect.TypeOf(rewriteTacticImp{}).Size())
+	outerSize := uint64(reflect.TypeOf(RewriterTactic{}).Size())
+	if r.header != outerSize {
+		t.Fatal("outer tactic owner extent", r.header, outerSize)
+	}
 	if first == nil || first.header != size || first.boolean == nil {
 		t.Fatal("initial concrete implementation owner", first)
 	}
@@ -57,11 +61,13 @@ func TestUFBVRewriterImpMemoryCleanupSwapAndClose(t *testing.T) {
 	record := func(action string, line int, body string) string {
 		return "-------- [memory] " + action + " src/util/memory_manager.cpp:" + strconv.Itoa(line) + " ---------\n" + body + "\n------------------------------------------------\n"
 	}
-	id1, id2 := fmt.Sprintf("%p", first), fmt.Sprintf("%p", second)
-	want := record("allocate", 209, "alloc "+id1+" src/tactic/ufbv/ufbv_rewriter_tactic.cpp:81 imp "+strconv.FormatUint(size, 10)) +
+	id, id1, id2 := fmt.Sprintf("%p", r), fmt.Sprintf("%p", first), fmt.Sprintf("%p", second)
+	want := record("allocate", 209, "alloc "+id+" src/tactic/ufbv/ufbv_rewriter_tactic.cpp:121 ufbv_rewriter_tactic "+strconv.FormatUint(outerSize, 10)) +
+		record("allocate", 209, "alloc "+id1+" src/tactic/ufbv/ufbv_rewriter_tactic.cpp:81 imp "+strconv.FormatUint(size, 10)) +
 		record("allocate", 209, "alloc "+id2+" src/tactic/ufbv/ufbv_rewriter_tactic.cpp:113 imp "+strconv.FormatUint(size, 10)) +
 		record("deallocate", 204, "dealloc "+id1+" src/tactic/ufbv/ufbv_rewriter_tactic.cpp:115") +
-		record("deallocate", 204, "dealloc "+id2+" src/tactic/ufbv/ufbv_rewriter_tactic.cpp:89")
+		record("deallocate", 204, "dealloc "+id2+" src/tactic/ufbv/ufbv_rewriter_tactic.cpp:89") +
+		record("deallocate", 204, "dealloc "+id+" src/tactic/tactic.h:43")
 	got := output.String()
 	if got != want {
 		t.Fatalf("concrete imp source memory records:\ngot  %q\nwant %q", got, want)

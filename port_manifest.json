@@ -108137,6 +108137,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Concrete UFBV rewriter tactic outer allocation at ufbv_rewriter_tactic.cpp:121 and final reference-counted deallocation at tactic.h:43 through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/rewrite_tactic_outer_memory_trace.go",
+          "tests": ["TestUFBVRewriterImpMemoryCleanupSwapAndClose"]
+        },
+        {
           "name": "tactic_report source verbosity level and scoped constructor/destructor for retained BV/UFBV tactics (tactic.h:103-120)",
           "status": "ported",
           "go_target": "pkg/tactic/tactic_report.go",
@@ -108972,6 +108978,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete UFBV rewriter tactic outer allocation at ufbv_rewriter_tactic.cpp:121 and final reference-counted deallocation at tactic.h:43 through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/rewrite_tactic_outer_memory_trace.go",
+          "tests": ["TestUFBVRewriterImpMemoryCleanupSwapAndClose"]
+        },
         {
           "name": "Concrete ufbv_rewriter_tactic::imp allocation at cpp81, cleanup replacement at cpp113-115 and destructor release at cpp89",
           "status": "ported",
@@ -153198,6 +153210,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Concrete UFBV rewriter tactic outer allocation at ufbv_rewriter_tactic.cpp:121 and final reference-counted deallocation at tactic.h:43 through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/rewrite_tactic_outer_memory_trace.go",
+          "tests": ["TestUFBVRewriterImpMemoryCleanupSwapAndClose"]
+        },
+        {
           "name": "Concrete ufbv_rewriter_tactic::imp allocation at cpp81, cleanup replacement at cpp113-115 and destructor release at cpp89",
           "status": "platform_replacement",
           "go_target": "pkg/tactic/ufbv/rewrite_tactic_imp_memory_trace.go",
@@ -154151,6 +154169,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete UFBV rewriter tactic outer allocation at ufbv_rewriter_tactic.cpp:121 and final reference-counted deallocation at tactic.h:43 through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/rewrite_tactic_outer_memory_trace.go",
+          "tests": ["TestUFBVRewriterImpMemoryCleanupSwapAndClose"]
+        },
         {
           "name": "Concrete ufbv_rewriter_tactic::imp allocation at cpp81, cleanup replacement at cpp113-115 and destructor release at cpp89",
           "status": "platform_replacement",
