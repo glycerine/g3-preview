@@ -709,7 +709,12 @@ func (s *RationalService) infEpsInfRound(v *OwnedInfEpsInfRational, ceil bool) (
 		return OwnedRational{}, e
 	}
 	defer s.endLexicalRational(&_lexOut, &_lexErr)
-	if e := s.infEpsInfCheck(v); e != nil {
+	// The source floor/ceil wrappers ignore m_infty; their finite-domain
+	// SASSERTs are commented out. Validate only the reached nested numeral.
+	if e := s.infEpsScalarOwner(v); e != nil {
+		return OwnedRational{}, e
+	}
+	if e := s.infScalarOwner(&v.numeral); e != nil {
 		return OwnedRational{}, e
 	}
 	n := &v.numeral
