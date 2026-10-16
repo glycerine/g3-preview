@@ -81195,6 +81195,7 @@
         "TestSATGoalRecoveryFreshUnitsLearnedAndCheckpoints",
         "TestSATGoalRecoveryLongClauseBufferGrowth",
         "TestSATGoalTranslatorNestedBooleanTruthTableAndModel",
+        "TestSATGoalTranslatorSourceMaxMemorySizeTSentinel",
         "TestSATGoalTranslatorConstants",
         "TestSATGoalTranslatorConnectivesTruthTable",
         "TestSATGoalTranslatorAtomOwnershipAndClosedGuard",
@@ -81298,6 +81299,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "goal2sat::imp::updt_params max_memory conversion through util.h megabytes_to_bytes (cpp80-82)",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat.go",
+          "tests": ["TestSATGoalTranslatorSourceMaxMemorySizeTSentinel"]
+        },
         {
           "name": "sat2goal::imp formula recovery/checkpoints (model converters outstanding)",
           "status": "partial",
@@ -183957,7 +183964,8 @@
         "pkg/math/subpaving/hardware_context_root.go",
         "pkg/util/diagnostic/util_process_verbose.go",
         "pkg/util/params/util_env_params.go",
-        "pkg/sat/sat_solver_find_mutexes.go"
+        "pkg/sat/sat_solver_find_mutexes.go",
+        "pkg/sat/tactic/sat_goal_to_sat.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -183995,7 +184003,8 @@
         "TestSubpavingHardwareContextBoundPolicyAndRootDispatch",
         "TestProcessVerboseGlobalsDefaultAndBorrowedSelection",
         "TestUpdateProcessEnvParamsSharedVerbosityAndWarning",
-        "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations"
+        "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations",
+        "TestSATGoalTranslatorSourceMaxMemorySizeTSentinel"
       ],
       "conditionals": [
         {
@@ -184277,6 +184286,12 @@
           "tests": [
             "TestRuntimeSourceMegabytesToBytesSaturatesAtSizeT"
           ]
+        },
+        {
+          "name": "megabytes_to_bytes for retained goal2sat translator max_memory with UINT_MAX sentinel and size_t saturation (util.h:391-398; goal2sat.cpp:80-82)",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat.go",
+          "tests": ["TestSATGoalTranslatorSourceMaxMemorySizeTSentinel"]
         },
         {
           "name": "compare_arrays concrete AST declaration domain, application argument, and quantifier sort/name/pattern/no-pattern identity/order (util.h:307-315; ast.cpp:451-490)",

@@ -97,7 +97,13 @@ func NewGoalTranslator(m *ast.ASTManager, s *sat.Solver) (tr *GoalTranslator, er
 	if mb, err = s.UIntParameter(&name, ^uint32(0)); err != nil {
 		return tr, err
 	}
-	tr.maxMemory = uint64(mb) * 1024 * 1024
+	// util.h:391-398 treats UINT_MAX as SIZE_MAX and saturates the
+	// conversion to the host size_t width before storing this limit.
+	maxSizeT := uint64(^uint(0))
+	tr.maxMemory = uint64(mb) << 20
+	if mb == ^uint32(0) || tr.maxMemory > maxSizeT {
+		tr.maxMemory = maxSizeT
+	}
 	return tr, nil
 }
 func (tr *GoalTranslator) open() error {

@@ -18,6 +18,41 @@ import (
 
 // The truth table is an independent bounded correctness check. Production
 // must use the source translator and the existing CDCL SAT implementation.
+func TestSATGoalTranslatorSourceMaxMemorySizeTSentinel(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		mb   uint32
+		set  bool
+	}{
+		{"default", 0, false},
+		{"zero", 0, true},
+		{"finite", 4097, true},
+		{"largest-finite", ^uint32(0) - 1, true},
+		{"sentinel", ^uint32(0), true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			m := astTestManager(t)
+			s, c, params := satSolverCheckFixture(t)
+			if tc.set {
+				key := "max_memory"
+				satOK(t, c.SetUIntName(&params, &key, tc.mb))
+				satOK(t, s.UpdateParams(&params))
+			}
+			tr, err := NewGoalTranslator(m, s)
+			satOK(t, err)
+			t.Cleanup(func() { satOK(t, tr.Close()) })
+			maxSizeT := uint64(^uint(0))
+			want := uint64(tc.mb) << 20
+			if !tc.set || tc.mb == ^uint32(0) || want > maxSizeT {
+				want = maxSizeT
+			}
+			if tr.maxMemory != want {
+				t.Fatalf("util.h size_t limit for %d MB: got %d, want %d", tc.mb, tr.maxMemory, want)
+			}
+		})
+	}
+}
+
 func TestSATGoalTranslatorNestedBooleanTruthTableAndModel(t *testing.T) {
 	for bits := 0; bits < 8; bits++ {
 		t.Run(fmt.Sprint(bits), func(t *testing.T) {
