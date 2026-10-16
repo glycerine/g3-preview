@@ -566,6 +566,7 @@ func (s *satSimplifier) tryEliminate(v BoolVar) (bool, error) {
 				return false, e
 			}
 			if ok {
+				s.traceEliminationResolventDetail(a, b)
 				after++
 				if after > np+nn {
 					s.traceEliminationTooMany(after)
@@ -628,6 +629,7 @@ func (s *satSimplifier) tryEliminate(v BoolVar) (bool, error) {
 			if !ok {
 				continue
 			}
+			s.traceEliminationNewClause(a, b)
 			satisfied, e := s.cleanupLiterals(s.newCls)
 			if e != nil {
 				return false, e

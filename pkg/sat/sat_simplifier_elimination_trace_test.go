@@ -101,3 +101,39 @@ func TestSATSimplifierTooManyResolventsSourceTrace(t *testing.T) {
 		t.Fatalf("source too-many refusal trace: got %q, want %q", got, want)
 	}
 }
+
+func TestSATSimplifierActualResolventBodiesSourceTraces(t *testing.T) {
+	s, l := satSimplifierFixture(t, 4)
+	satOK(t, s.useList.Init(4))
+	satOK(t, s.kernel.InitVisited(4))
+	s.kernel.elimCounter = 1000
+	for _, literals := range [][]Literal{{0, 2, 4}, {1, 4, 6}} {
+		c, err := l.MkClauseCore(3, literals, false)
+		satOK(t, err)
+		satOK(t, s.useList.Insert(c))
+	}
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("resolution_detail")
+	tags.Enable("resolution_new_cls")
+	l.traceTags = tags
+	yes, err := s.tryEliminate(0)
+	satOK(t, err)
+	if !yes || l.propagation.converter.Size() != 1 {
+		t.Fatal("live resolvent publication")
+	}
+	want := ""
+	if tags.ShouldTrace("resolution_detail") {
+		want += "-------- [resolution_detail] try_eliminate src/sat/sat_simplifier.cpp:1354 ---------\n" +
+			"collecting number of after_clauses\n------------------------------------------------\n" +
+			"-------- [resolution_detail] try_eliminate src/sat/sat_simplifier.cpp:1365 ---------\n" +
+			"(0 1 2)\n(-0 2 3)\n-->\n1 2 3 \n------------------------------------------------\n"
+	}
+	if tags.ShouldTrace("resolution_new_cls") {
+		want += "-------- [resolution_new_cls] try_eliminate src/sat/sat_simplifier.cpp:1401 ---------\n" +
+			"(0 1 2)\n(-0 2 3)\n-->\n1 2 3\n------------------------------------------------\n"
+	}
+	if got := output.String(); got != want {
+		t.Fatalf("source resolvent body traces: got %q, want %q", got, want)
+	}
+}

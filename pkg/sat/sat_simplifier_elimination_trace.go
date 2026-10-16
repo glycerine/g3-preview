@@ -1,9 +1,10 @@
-// Source: src/sat/sat_simplifier.cpp:1296-1375; retained util/trace sites.
+// Source: src/sat/sat_simplifier.cpp:1296-1401; retained util/trace sites.
 package sat
 
 import (
 	"io"
 	"strconv"
+	"strings"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
@@ -62,6 +63,79 @@ func (s *satSimplifier) traceEliminationFound(before, after uint32) {
 		_, err := io.WriteString(w, "found var to eliminate, before: "+strconv.FormatUint(uint64(before), 10)+
 			" after: "+strconv.FormatUint(uint64(after), 10)+"\n")
 		return err
+	})
+}
+
+func (s *satSimplifier) traceEliminationWrapper(c satClauseWrapper) (string, error) {
+	a := s.lifecycle.propagation.clauses
+	n, err := c.Size(a)
+	if err != nil {
+		return "", err
+	}
+	var b strings.Builder
+	b.WriteByte('(')
+	for i := uint32(0); i < n; i++ {
+		if i > 0 {
+			b.WriteByte(' ')
+		}
+		l, err := c.Literal(a, i)
+		if err != nil {
+			return "", err
+		}
+		b.WriteString(l.String())
+	}
+	b.WriteByte(')')
+	return b.String(), nil
+}
+
+func (s *satSimplifier) traceEliminationInputsAndResult(w io.Writer, first, second satClauseWrapper, trailingSpace bool) error {
+	a, err := s.traceEliminationWrapper(first)
+	if err != nil {
+		return err
+	}
+	b, err := s.traceEliminationWrapper(second)
+	if err != nil {
+		return err
+	}
+	if _, err = io.WriteString(w, a+"\n"+b+"\n-->\n"); err != nil {
+		return err
+	}
+	n, err := s.literalStore.Size(s.newCls)
+	if err != nil {
+		return err
+	}
+	for i := uint32(0); i < n; i++ {
+		l, err := s.literalStore.Read(s.newCls, i)
+		if err != nil {
+			return err
+		}
+		if i > 0 && !trailingSpace {
+			if _, err = io.WriteString(w, " "); err != nil {
+				return err
+			}
+		}
+		if _, err = io.WriteString(w, l.String()); err != nil {
+			return err
+		}
+		if trailingSpace {
+			if _, err = io.WriteString(w, " "); err != nil {
+				return err
+			}
+		}
+	}
+	_, err = io.WriteString(w, "\n")
+	return err
+}
+
+func (s *satSimplifier) traceEliminationResolventDetail(first, second satClauseWrapper) {
+	s.traceElimination("resolution_detail", "try_eliminate", 1365, func(w io.Writer) error {
+		return s.traceEliminationInputsAndResult(w, first, second, true)
+	})
+}
+
+func (s *satSimplifier) traceEliminationNewClause(first, second satClauseWrapper) {
+	s.traceElimination("resolution_new_cls", "try_eliminate", 1401, func(w io.Writer) error {
+		return s.traceEliminationInputsAndResult(w, first, second, false)
 	})
 }
 

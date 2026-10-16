@@ -77322,10 +77322,10 @@
           "tests": ["TestSATSimplifierActualBlockedClauseSourceTraces"]
         },
         {
-          "name": "Reached variable-elimination TRACE sites at sat_simplifier.cpp:1296,1302,1315,1338,1354,1369,1375",
+          "name": "Reached variable-elimination TRACE sites at sat_simplifier.cpp:1296,1302,1315,1338,1354,1365,1369,1375,1401",
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
-          "tests": ["TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace"]
+          "tests": ["TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
         }
       ],
       "ownership": [
@@ -182388,10 +182388,10 @@
           "tests": ["TestSATSimplifierActualBlockedClauseSourceTraces"]
         },
         {
-          "name": "Reached variable-elimination TRACE sites at sat_simplifier.cpp:1296,1302,1315,1338,1354,1369,1375",
+          "name": "Reached variable-elimination TRACE sites at sat_simplifier.cpp:1296,1302,1315,1338,1354,1365,1369,1375,1401",
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
-          "tests": ["TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace"]
+          "tests": ["TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
         }
       ],
       "ownership": [
@@ -184224,10 +184224,10 @@
           "tests": ["TestSATSimplifierActualBlockedClauseSourceTraces"]
         },
         {
-          "name": "Reached variable-elimination TRACE sites at sat_simplifier.cpp:1296,1302,1315,1338,1354,1369,1375",
+          "name": "Reached variable-elimination TRACE sites at sat_simplifier.cpp:1296,1302,1315,1338,1354,1365,1369,1375,1401",
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
-          "tests": ["TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace"]
+          "tests": ["TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
         }
       ],
       "ownership": [
