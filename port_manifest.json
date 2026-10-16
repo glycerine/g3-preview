@@ -81789,6 +81789,7 @@
         "pkg/ast/ast_resource_limit_test.go"
       ],
       "tests": [
+        "TestSATGoalTranslatorSourceUnsupportedSMT2Diagnostic",
         "TestSATGoalDependencyFormulaSourceTrace",
         "TestSATGoalTranslatorResultStackSourceTrace",
         "TestSATGoalInverseLiteralOwnership",
@@ -81900,6 +81901,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained unsupported Boolean operator source SMT2 diagnostic with process-bound parameters; standalone manager fallback retains AST identity (cpp192-197)",
+          "status": "partial",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat.go",
+          "tests": ["TestSATGoalTranslatorSourceUnsupportedSMT2Diagnostic", "TestSATGoalTranslatorRejectsUnnormalizedSourceOperators"]
+        },
         {
           "name": "Retained goal overload sat TRACE of final formula before process, after self-label skip (cpp480)",
           "status": "ported",

@@ -14,11 +14,19 @@ import (
 	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/insdict"
 )
 
 var ErrSATGoalUnsupported = errors.New("operator not supported, apply simplifier before invoking translator")
 var ErrSATGoalFailed = errors.New("sat: translator failed; close before reuse")
+
+type satGoalUnsupportedOperator struct{ formula string }
+
+func (e satGoalUnsupportedOperator) Error() string {
+	return "operator " + e.formula + " not supported, apply simplifier before invoking translator"
+}
+func (e satGoalUnsupportedOperator) Unwrap() error { return ErrSATGoalUnsupported }
 
 type satGoalFrame struct {
 	term       ast.ASTHandle
@@ -349,8 +357,15 @@ func (tr *GoalTranslator) visit(h ast.ASTHandle, root, sign bool) (bool, error) 
 		if e := tr.traceGoalUnhandled(h); e != nil {
 			return true, e
 		}
-		// The source SMT2 pretty-printer message is a separate dependency. Carry
-		// the offending AST and operation rather than inventing its printed text.
+		formula, e := tr.traceGoalFormula(h)
+		if e == nil {
+			return true, satGoalUnsupportedOperator{formula: formula}
+		}
+		if !errors.Is(e, uparams.ErrGlobalParamsOwner) {
+			return true, e
+		}
+		// Standalone managers may have no process parameter owner yet. Preserve
+		// the originating node for that explicit unbound state.
 		return true, fmt.Errorf("%w (AST %d, operation %d)", ErrSATGoalUnsupported, h.Slot(), op)
 	default:
 		return true, tr.convertAtom(h, root, sign)

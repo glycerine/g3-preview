@@ -137,6 +137,9 @@ func TestSATGoalTranslatorResultStackSourceTrace(t *testing.T) {
 	if err = tr.Compile([]ast.ASTHandle{xor}); !errors.Is(err, ErrSATGoalUnsupported) {
 		t.Fatalf("source unsupported operator: %v", err)
 	}
+	if want := "operator (xor p q) not supported, apply simplifier before invoking translator"; err.Error() != want {
+		t.Fatalf("source unsupported operator text: got %q, want %q", err, want)
+	}
 	if got := output.String(); !strings.Contains(got, "[goal2sat_not_handled] visit src/sat/tactic/goal2sat.cpp:192 ---------\n(xor p q)\n") {
 		t.Fatalf("source unsupported operator trace: %q", got)
 	}
