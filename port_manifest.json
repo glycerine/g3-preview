@@ -32040,6 +32040,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/param_datatype_refs.go",
           "tests": ["TestParamDatatypeValidationFirstMissingAndDuplicateAcrossConstructors"]
+        },
+        {
+          "name": "Retained pdatatypes_decl::fix_missing_refs TRACE at pdecl.cpp:667 before ordered dictionary construction and both failed/completed resolution passes",
+          "status": "ported",
+          "go_target": "pkg/smtcore/param_datatype_refs.go",
+          "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"]
         }
       ],
       "ownership": [],
@@ -181757,7 +181763,8 @@
         "pkg/tactic/arith/linear_equation_trace.go",
         "pkg/tactic/arith/polynomial_trace.go",
         "pkg/ast/ast_core_distinct_trace.go",
-        "pkg/smtcore/smt_model_finder_hint_trace.go"
+        "pkg/smtcore/smt_model_finder_hint_trace.go",
+        "pkg/smtcore/param_datatype_refs.go"
       ],
       "tests": [
         "TestSATGoalDependencyFormulaSourceTrace",
@@ -181863,7 +181870,8 @@
         "TestLinearEquationSourceConstructionTrace",
         "TestInequalityRestoredGoalSourceTrace",
         "TestASTExpandedDistinctSourceTraceAfterConjunction",
-        "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"
+        "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit",
+        "TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"
       ],
       "conditionals": [
         {
@@ -183977,6 +183985,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder_hint_trace.go",
           "tests": ["TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"]
+        },
+        {
+          "name": "Retained pdatatypes_decl::fix_missing_refs TRACE at pdecl.cpp:667 before ordered dictionary construction and both failed/completed resolution passes",
+          "status": "ported",
+          "go_target": "pkg/smtcore/param_datatype_refs.go",
+          "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"]
         }
       ],
       "ownership": [
@@ -184085,7 +184099,8 @@
         "pkg/tactic/arith/linear_equation_trace.go",
         "pkg/tactic/arith/polynomial_trace.go",
         "pkg/ast/ast_core_distinct_trace.go",
-        "pkg/smtcore/smt_model_finder_hint_trace.go"
+        "pkg/smtcore/smt_model_finder_hint_trace.go",
+        "pkg/smtcore/param_datatype_refs.go"
       ],
       "tests": [
         "TestSATGoalDependencyFormulaSourceTrace",
@@ -184189,7 +184204,8 @@
         "TestLinearEquationSourceConstructionTrace",
         "TestInequalityRestoredGoalSourceTrace",
         "TestASTExpandedDistinctSourceTraceAfterConjunction",
-        "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"
+        "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit",
+        "TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"
       ],
       "conditionals": [
         {
@@ -186303,6 +186319,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder_hint_trace.go",
           "tests": ["TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"]
+        },
+        {
+          "name": "Retained pdatatypes_decl::fix_missing_refs TRACE at pdecl.cpp:667 before ordered dictionary construction and both failed/completed resolution passes",
+          "status": "ported",
+          "go_target": "pkg/smtcore/param_datatype_refs.go",
+          "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"]
         }
       ],
       "ownership": [

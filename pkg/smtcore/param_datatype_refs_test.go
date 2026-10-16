@@ -1,8 +1,10 @@
 package smtcore
 
 import (
+	"bytes"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -18,6 +20,10 @@ func TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite(t *testing.T) {
 		{Name: b},
 		{Name: a}, // source dictionary::insert replaces a's index with the last one.
 	}}
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	group.trace = tags
+	tags.Enable("fix_missing_refs")
 	missing, ok := group.FixMissingRefs()
 	if ok || missing != unknown {
 		t.Fatal("did not stop at first missing accessor", missing, ok)
@@ -37,6 +43,16 @@ func TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite(t *testing.T) {
 	as = group.Datatypes[0].Constructors[0].Accessors
 	if as[2].SortKind != ParamRecursiveSort || as[2].RecursiveIndex != 3 || as[3].SortKind != ParamRecursiveSort || as[3].RecursiveIndex != 2 {
 		t.Fatal("recursive indices did not use declaration positions", as)
+	}
+	if tags.ShouldTrace("fix_missing_refs") {
+		const record = "-------- [fix_missing_refs] fix_missing_refs src/cmd_context/pdecl.cpp:667 ---------\n" +
+			"pdatatypes_decl::fix_missing_refs\n" +
+			"------------------------------------------------\n"
+		if got := output.String(); got != record+record {
+			t.Fatalf("source pre-resolution TRACE on failed and completed pass: got %q", got)
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("erased datatype TRACE emitted", output.String())
 	}
 }
 

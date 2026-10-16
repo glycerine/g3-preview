@@ -1,7 +1,12 @@
 // Source: src/cmd_context/pdecl.cpp:432-461,495-503,555-563,666-677.
 package smtcore
 
-import usymbol "github.com/glycerine/g3/pkg/util/symbol"
+import (
+	"io"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+)
 
 // ParamDatatypeSortKind is the reached ptype tag used while resolving
 // mutually recursive accessor types. Parametric sort instantiation is owned
@@ -65,11 +70,21 @@ func (d *ParamDatatypeDecl) HasDuplicateAccessors() (usymbol.Symbol, bool) {
 // overwrite the previous dictionary index, as map::insert does.
 type ParamDatatypeGroup struct {
 	Datatypes []ParamDatatypeDecl
+	trace     *diagnostic.TraceTags
 }
 
 // FixMissingRefs changes each reached missing accessor to a recursive index.
 // It stops at the first unknown name without undoing earlier replacements.
 func (g *ParamDatatypeGroup) FixMissingRefs() (missing usymbol.Symbol, ok bool) {
+	tags := g.trace
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	_ = tags.EmitConditional("fix_missing_refs", "fix_missing_refs", "src/cmd_context/pdecl.cpp", 667,
+		func() bool { return true }, func(w io.Writer) error {
+			_, err := io.WriteString(w, "pdatatypes_decl::fix_missing_refs\n")
+			return err
+		})
 	indices := make(map[usymbol.Symbol]int32, len(g.Datatypes))
 	for i := range g.Datatypes {
 		indices[g.Datatypes[i].Name] = int32(i)
