@@ -79446,6 +79446,10 @@
             "TestSATSolverActualConsequenceProgressSourceVerbose",
             "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput"
           ]
+        },
+        {
+          "name": "sat_solver.cpp:3199,3212,3218 core_chunking IF_VERBOSE reports are unreachable: the only static caller at cpp3275 is guarded by literal false && asms.empty()",
+          "status": "dead_deleted"
         }
       ],
       "ownership": [
@@ -184769,6 +184773,10 @@
             "TestSATSolverActualMUSSourceVerboseLevels",
             "TestSATSolverActualMUSQXSourceFinalCoreVerbose"
           ]
+        },
+        {
+          "name": "sat_solver.cpp:3199,3212,3218 core_chunking IF_VERBOSE reports are unreachable: the only static caller at cpp3275 is guarded by literal false && asms.empty()",
+          "status": "dead_deleted"
         }
       ],
       "ownership": [
@@ -185414,6 +185422,10 @@
             "TestSATSolverActualMUSSourceVerboseLevels",
             "TestSATSolverActualMUSQXSourceFinalCoreVerbose"
           ]
+        },
+        {
+          "name": "sat_solver.cpp:3199,3212,3218 core_chunking IF_VERBOSE reports are unreachable: the only static caller at cpp3275 is guarded by literal false && asms.empty()",
+          "status": "dead_deleted"
         }
       ],
       "ownership": [
