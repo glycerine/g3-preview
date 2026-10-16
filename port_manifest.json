@@ -13338,7 +13338,9 @@
         "pkg/ast/ast_bv_boolean_bits.go",
         "pkg/ast/ast_bv_boolean_bits_test.go",
         "pkg/ast/ast_bv_recognizers.go",
+        "pkg/ast/ast_bv_recognizers_trace.go",
         "pkg/ast/ast_bv_recognizers_test.go",
+        "pkg/ast/ast_bv_recognizers_trace_test.go",
         "pkg/ast/ast_bv_sort.go",
         "pkg/ast/ast_bv_sort_test.go",
         "pkg/ast/ast_bv_inverse.go",
@@ -13361,6 +13363,7 @@
         "pkg/ast/ast_native_plugin_caches_test.go"
       ],
       "tests": [
+        "TestASTBitVectorAllOneSourceTrace",
         "TestASTBitVectorSourceEagerSortsAndPinnedDeclarations",
         "TestASTBitVectorSourcePinnedKindsAndEveryASTReservation",
         "TestASTBitVectorReusedSortActualINCAcquisitionGuard",
@@ -13651,7 +13654,8 @@
             "TestASTBitVectorRecognizersDoNotNormalizeStoredParameters",
             "TestASTBitVectorAllOneEveryActualNumericalReservation",
             "TestASTBitVectorExtractRecognizerPreservesSignedToUnsignedBounds",
-            "TestASTBitVectorAllOneTransportOwnerGuard"
+            "TestASTBitVectorAllOneTransportOwnerGuard",
+            "TestASTBitVectorAllOneSourceTrace"
           ]
         },
         {
@@ -180987,6 +180991,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_bv_recognizers_trace.go",
         "pkg/tactic/ufbv/rewrite_tactic_trace.go",
         "pkg/ast/ast_smt2_alias_trace.go",
         "pkg/ast/ast_smt2_let_trace.go",
@@ -181081,6 +181086,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestASTBitVectorAllOneSourceTrace",
         "TestUFBVRewriterPublishedGoalSourceTraceAndFormatterRefusal",
         "TestASTSMT2AliasSourceTraceFormatterRefusalKeepsPrefix",
         "TestASTSMT2AliasSourceTraceBeforeLetRegistration",
@@ -182820,6 +182826,12 @@
           "tests": ["TestASTHyperResolveSourceTracePremisesAndParameters"]
         },
         {
+          "name": "Retained bv_recognizers is_allone TRACE after arithmetic temporaries finish (bv_decl_plugin.cpp:801)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_bv_recognizers_trace.go",
+          "tests": ["TestASTBitVectorAllOneSourceTrace"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -183059,6 +183071,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_bv_recognizers_trace.go",
         "pkg/tactic/ufbv/rewrite_tactic_trace.go",
         "pkg/ast/ast_smt2_alias_trace.go",
         "pkg/ast/ast_smt2_let_trace.go",
@@ -183151,6 +183164,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestASTBitVectorAllOneSourceTrace",
         "TestUFBVRewriterPublishedGoalSourceTraceAndFormatterRefusal",
         "TestASTSMT2AliasSourceTraceFormatterRefusalKeepsPrefix",
         "TestASTSMT2AliasSourceTraceBeforeLetRegistration",
@@ -184886,6 +184900,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_proof_hyper_trace.go",
           "tests": ["TestASTHyperResolveSourceTracePremisesAndParameters"]
+        },
+        {
+          "name": "Retained bv_recognizers is_allone TRACE after arithmetic temporaries finish (bv_decl_plugin.cpp:801)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_bv_recognizers_trace.go",
+          "tests": ["TestASTBitVectorAllOneSourceTrace"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

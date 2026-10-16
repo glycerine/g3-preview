@@ -112,6 +112,9 @@ func (m *ASTManager) isBitVectorAllOne(h ASTHandle, c *ASTBitVectorNumeralInvoca
 			return false, e
 		}
 	}
+	if e = m.traceBitVectorAllOne(&f.values[0], all); e != nil {
+		return false, e
+	}
 	return all, nil
 }
 
