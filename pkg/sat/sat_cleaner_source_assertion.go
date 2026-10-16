@@ -3,6 +3,13 @@ package sat
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 
+func (c *satCleaner) assertionsEnabled() (bool, error) {
+	if !satStorageSourceDebug {
+		return false, nil
+	}
+	return diagnostic.BorrowProcessDebugContext().AssertionsEnabled()
+}
+
 func (c *satCleaner) sourceAssertion(ok bool, line int32, condition string) error {
 	if ok {
 		return nil

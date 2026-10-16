@@ -78,23 +78,31 @@ func (c *satCleaner) cleanupClauses(learned bool) error {
 			continue
 		}
 		c.traceSmallClause(r, j)
-		if satStorageSourceDebug {
+		assertions, e := c.assertionsEnabled()
+		if e != nil {
+			return e
+		}
+		if assertions {
 			f, e := a.Frozen(r)
 			if e != nil {
 				return e
 			}
-			if !f && j < 2 {
-				return ErrSATAssertion
+			if e = c.sourceAssertion(f || j >= 2, 119, "c.frozen() || new_sz >= 2"); e != nil {
+				return e
 			}
 		}
 		if j < 2 {
-			if satStorageSourceDebug {
+			if assertions {
 				f, e := a.Frozen(r)
 				if e != nil {
 					return e
 				}
-				if !f {
-					return ErrSATAssertion
+				line := int32(123)
+				if j != 0 {
+					line = 130
+				}
+				if e = c.sourceAssertion(f, line, "c.frozen()"); e != nil {
+					return e
 				}
 			}
 			if j == 0 {
@@ -113,19 +121,29 @@ func (c *satCleaner) cleanupClauses(learned bool) error {
 			}
 			c.cursor = i + 1
 		} else {
-			if satStorageSourceDebug {
-				for k := uint32(0); k < 2; k++ {
-					lit, e := a.Literal(r, k)
+			if assertions {
+				first, e := a.Literal(r, 0)
+				if e != nil {
+					return e
+				}
+				value, e := v.valueLiteral(first)
+				if e != nil {
+					return e
+				}
+				valid := value == lbool.Undef
+				if valid {
+					second, e := a.Literal(r, 1)
 					if e != nil {
 						return e
 					}
-					x, e := v.valueLiteral(lit)
+					value, e = v.valueLiteral(second)
 					if e != nil {
 						return e
 					}
-					if x != lbool.Undef {
-						return ErrSATAssertion
-					}
+					valid = value == lbool.Undef
+				}
+				if e = c.sourceAssertion(valid, 135, "s.value(c[0]) == l_undef && s.value(c[1]) == l_undef"); e != nil {
+					return e
 				}
 			}
 			if j == 2 {

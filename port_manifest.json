@@ -74398,6 +74398,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_cleaner_clause_trace.go",
           "tests": ["TestSATCleanerClauseSourceTraceStages"]
+        },
+        {
+          "name": "Retained cleanup_clauses SASSERT119,123,130,135 process gate, small-active-clause C/T source order and short-circuit undefined-watch check",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_clauses.go",
+          "tests": ["TestSATCleanerSmallActiveClauseSourceAssertions"]
         }
       ],
       "ownership": [
@@ -74481,6 +74487,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_cleaner_clause_trace.go",
           "tests": ["TestSATCleanerClauseSourceTraceStages"]
+        },
+        {
+          "name": "Retained cleanup_clauses SASSERT119,123,130,135 process gate, small-active-clause C/T source order and short-circuit undefined-watch check",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_clauses.go",
+          "tests": ["TestSATCleanerSmallActiveClauseSourceAssertions"]
         }
       ],
       "ownership": [
@@ -122189,6 +122201,12 @@
           "go_target": "pkg/sat/sat_cleaner_source_assertion.go",
           "go_targets": ["pkg/sat/sat_cleaner.go"],
           "tests": ["TestSATCleanerFalseBinaryWatchSourceAssertion"]
+        },
+        {
+          "name": "Retained cleanup_clauses SASSERT119,123,130,135 process gate, small-active-clause C/T source order and short-circuit undefined-watch check",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_clauses.go",
+          "tests": ["TestSATCleanerSmallActiveClauseSourceAssertions"]
         }
       ],
       "ownership": [
@@ -122618,6 +122636,12 @@
           "go_target": "pkg/sat/sat_cleaner_source_assertion.go",
           "go_targets": ["pkg/sat/sat_cleaner.go"],
           "tests": ["TestSATCleanerFalseBinaryWatchSourceAssertion"]
+        },
+        {
+          "name": "Retained cleanup_clauses SASSERT119,123,130,135 process gate, small-active-clause C/T source order and short-circuit undefined-watch check",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_clauses.go",
+          "tests": ["TestSATCleanerSmallActiveClauseSourceAssertions"]
         }
       ],
       "ownership": [
