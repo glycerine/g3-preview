@@ -18769,6 +18769,7 @@
         "pkg/smtcore/pattern_inference_rewriter.go"
       ],
       "tests": [
+        "TestPatternCollectInfoSourceSMT2Trace",
         "TestPatternCollectSharedChildSourceStackTrace",
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
         "TestSmallerPatternSaveTraceBeforePairPublication",
@@ -18876,6 +18877,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Selected pattern collector collect_info TRACE at pattern_inference.cpp:132 prints the process-bound SMT2 variable body after line-131 record; wider expression profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/ast/pattern/collect.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
         {
           "name": "collect source stack revisit and duplicate-child queue order with line-131 TRACE before child traversal",
           "status": "ported",
@@ -180735,6 +180742,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestPatternCollectInfoSourceSMT2Trace",
         "TestPatternCollectSharedChildSourceStackTrace",
         "TestModelEvaluatorGetMacroSourceTraceBranches",
         "TestTraceTagsSourceControlAndFinalize",
@@ -180854,6 +180862,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Selected pattern collector collect_info TRACE at pattern_inference.cpp:132 prints the process-bound SMT2 variable body after line-131 record; wider expression profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/ast/pattern/collect.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
         {
           "name": "Reached pattern collector collect TRACE at pattern_inference.cpp:131 on each source stack visit, including duplicate queued children and parent revisit",
           "status": "ported",
@@ -182653,6 +182667,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestPatternCollectInfoSourceSMT2Trace",
         "TestPatternCollectSharedChildSourceStackTrace",
         "TestModelEvaluatorGetMacroSourceTraceBranches",
         "TestTraceTagsSourceControlAndFinalize",
@@ -182782,6 +182797,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Selected pattern collector collect_info TRACE at pattern_inference.cpp:132 prints the process-bound SMT2 variable body after line-131 record; wider expression profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/ast/pattern/collect.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
         {
           "name": "Reached pattern collector collect TRACE at pattern_inference.cpp:131 on each source stack visit, including duplicate queued children and parent revisit",
           "status": "ported",

@@ -2,11 +2,14 @@
 package pattern
 
 import (
+	"errors"
 	"io"
 	"strconv"
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	uparams "github.com/glycerine/g3/pkg/util/params"
+	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
 type collectKey struct {
@@ -222,6 +225,9 @@ func (c *patternCandidates) collect(body ast.ASTHandle) (err error) {
 		if err = c.traceCollectVisit(key); err != nil {
 			return err
 		}
+		if err = c.traceCollectInfo(key); err != nil {
+			return err
+		}
 		kind, e := c.manager.GetKind(key.node)
 		if e != nil {
 			return e
@@ -290,6 +296,44 @@ func (c *patternCandidates) traceCollectVisit(key collectKey) error {
 	return tags.EmitConditional("collect", "operator()", "src/ast/pattern/pattern_inference.cpp", 131,
 		func() bool { return true }, func(w io.Writer) error {
 			_, err := io.WriteString(w, "processing: "+strconv.FormatUint(uint64(id), 10)+" "+strconv.FormatUint(uint64(key.delta), 10)+" kind: "+strconv.FormatUint(uint64(kind), 10)+"\n")
+			return err
+		})
+}
+
+// mk_pp uses the process SMT2 printer settings, and its body is evaluated
+// only while collect_info is enabled, just like the source TRACE macro.
+func (c *patternCandidates) traceCollectInfo(key collectKey) error {
+	tags := c.traceTags
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	if !tags.ShouldTrace("collect_info") {
+		return nil
+	}
+	return tags.EmitConditional("collect_info", "operator()", "src/ast/pattern/pattern_inference.cpp", 132,
+		func() bool { return true }, func(w io.Writer) (result error) {
+			g := uparams.BorrowProcessGlobalParamsService()
+			if g == nil || g.Context == nil {
+				return uparams.ErrGlobalParamsOwner
+			}
+			format, err := c.manager.SMT2PPExprTree(key.node, nil)
+			if err != nil {
+				return err
+			}
+			out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: c.manager.BudgetField})
+			if err != nil {
+				return err
+			}
+			defer func() { result = errors.Join(result, out.Close()) }()
+			empty := g.Context.EmptyValue()
+			if err = c.manager.PrintFormat(out, format, g.Context, &empty, g); err != nil {
+				return err
+			}
+			body, err := out.String()
+			if err != nil {
+				return err
+			}
+			_, err = io.WriteString(w, body+"\n")
 			return err
 		})
 }

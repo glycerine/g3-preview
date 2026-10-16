@@ -93,6 +93,11 @@ func TestSmallerPatternSaveTraceBeforePairPublication(t *testing.T) {
 }
 
 func patternManager(t *testing.T) *ast.ASTManager {
+	m, _, _ := patternManagerServices(t)
+	return m
+}
+
+func patternManagerServices(t *testing.T) (*ast.ASTManager, *symbol.Manager, *numeral.RationalService) {
 	t.Helper()
 	b := arena.NewBudget(1 << 30)
 	sy, err := symbol.NewManager(symbol.Config{Budget: b})
@@ -109,7 +114,7 @@ func patternManager(t *testing.T) *ast.ASTManager {
 			t.Fatal("pattern manager retained bytes", b.Used())
 		}
 	})
-	return m
+	return m, sy, q
 }
 
 func TestSmallerPatternConcretePairCacheAndExternalVariables(t *testing.T) {

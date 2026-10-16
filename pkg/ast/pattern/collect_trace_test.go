@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -61,5 +63,63 @@ func TestPatternCollectSharedChildSourceStackTrace(t *testing.T) {
 	patternMust(t, c.collect(app))
 	if output.Len() != 0 || len(c.candidates) != 1 {
 		t.Fatal("disabled collect trace changed candidate or emitted output", c.candidates, output.String())
+	}
+}
+
+func TestPatternCollectInfoSourceSMT2Trace(t *testing.T) {
+	m, sy, q := patternManagerServices(t)
+	b := m.BudgetField
+	ctx, err := uparams.NewParamsContext(sy, q, uparams.ParamsConfig{Budget: b})
+	patternMust(t, err)
+	catalog, err := uparams.NewGlobalParamsCatalog(sy, uparams.GlobalParamsCatalogConfig{
+		Budget:       b,
+		Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}},
+		Text:         arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: b}},
+	})
+	patternMust(t, err)
+	g, err := uparams.NewGlobalParamsService(sy, ctx, uparams.GlobalParamsConfig{Budget: b, Catalog: catalog})
+	patternMust(t, err)
+	patternMust(t, g.InitializeSource())
+	previous, err := uparams.BindProcessGlobalParamsService(g)
+	patternMust(t, err)
+	t.Cleanup(func() {
+		_, e := uparams.BindProcessGlobalParamsService(previous)
+		patternMust(t, e)
+		patternMust(t, g.Close())
+		patternMust(t, catalog.Close())
+		patternMust(t, ctx.Close())
+	})
+	boolSort, err := m.MkBoolSort()
+	patternMust(t, err)
+	x, err := m.MkVar(0, boolSort)
+	patternMust(t, err)
+	patternMust(t, m.IncRef(x))
+	t.Cleanup(func() { patternMust(t, m.DecRef(x)) })
+	c, err := newPatternCandidates(m, 1, nil, false)
+	patternMust(t, err)
+	t.Cleanup(func() { patternMust(t, c.close()) })
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("collect")
+	tags.Enable("collect_info")
+	c.traceTags = tags
+	patternMust(t, c.collect(x))
+	if tags.ShouldTrace("collect_info") {
+		id, err := m.GetASTID(x)
+		patternMust(t, err)
+		want := fmt.Sprintf("-------- [collect] operator() src/ast/pattern/pattern_inference.cpp:131 ---------\nprocessing: %d 0 kind: 1\n------------------------------------------------\n", id) +
+			"-------- [collect_info] operator() src/ast/pattern/pattern_inference.cpp:132 ---------\n(:var 0)\n------------------------------------------------\n"
+		if output.String() != want {
+			t.Fatalf("source SMT2 body: got %q, want %q", output.String(), want)
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("erased collect_info trace wrote output", output.String())
+	}
+	output.Reset()
+	tags.Disable("collect")
+	tags.Disable("collect_info")
+	patternMust(t, c.collect(x))
+	if output.Len() != 0 {
+		t.Fatal("disabled collect_info trace wrote output", output.String())
 	}
 }
