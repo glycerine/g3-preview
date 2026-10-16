@@ -20,10 +20,21 @@ func (m *ASTManager) traceSMT2Alias(h ASTHandle, name string, depth, weight, lev
 	}
 	return tags.EmitConditional("smt2_pp", "store_result", "src/ast/ast_smt2_pp.cpp", 708,
 		func() bool { return true }, func(w io.Writer) (result error) {
+			var streamErr error
+			write := func(part string) {
+				_, err := io.WriteString(w, part)
+				if streamErr == nil {
+					streamErr = err
+				}
+			}
+			write("a: " + name + " depth: " + strconv.FormatUint(uint64(depth), 10) +
+				", weight: " + strconv.FormatUint(uint64(weight), 10) +
+				", lvl: " + strconv.FormatUint(uint64(level), 10) + " t: #")
 			id, err := m.GetASTID(h)
 			if err != nil {
 				return err
 			}
+			write(strconv.FormatUint(uint64(id), 10) + "\n")
 			out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: m.BudgetField})
 			if err != nil {
 				return err
@@ -40,9 +51,8 @@ func (m *ASTManager) traceSMT2Alias(h ASTHandle, name string, depth, weight, lev
 			if shared {
 				sharedBit = "1"
 			}
-			_, err = io.WriteString(w, "a: "+name+" depth: "+strconv.FormatUint(uint64(depth), 10)+
-				", weight: "+strconv.FormatUint(uint64(weight), 10)+", lvl: "+strconv.FormatUint(uint64(level), 10)+
-				" t: #"+strconv.FormatUint(uint64(id), 10)+"\n"+childText+", is-shared: "+sharedBit+"\n")
-			return err
+			write(childText)
+			write(", is-shared: " + sharedBit + "\n")
+			return streamErr
 		})
 }

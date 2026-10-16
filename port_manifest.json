@@ -12522,6 +12522,7 @@
         "pkg/ast/ast_smt2_quantifier_root.go"
       ],
       "tests": [
+        "TestASTSMT2AliasSourceTraceFormatterRefusalKeepsPrefix",
         "TestASTSMT2AliasSourceTraceBeforeLetRegistration",
         "TestASTSMT2LetSourceTraceEmptyAndAliased",
         "TestASTSMT2BitVectorLiteralRadixAndSignedOracle",
@@ -12704,7 +12705,7 @@
           "name": "Reached SMT2 store_result alias-registration TRACE at ast_smt2_pp.cpp:708 with source depth, weight, level, ID, low-level expression and shared flag",
           "status": "ported",
           "go_target": "pkg/ast/ast_smt2_alias_trace.go",
-          "tests": ["TestASTSMT2AliasSourceTraceBeforeLetRegistration"]
+          "tests": ["TestASTSMT2AliasSourceTraceBeforeLetRegistration", "TestASTSMT2AliasSourceTraceFormatterRefusalKeepsPrefix"]
         },
         {
           "name": "Selected root-scope pp_let alias-count, declaration-level, and open-let TRACE checkpoints at ast_smt2_pp.cpp:806,818,833; nested scope alias offset remains partial",
@@ -181035,6 +181036,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestASTSMT2AliasSourceTraceFormatterRefusalKeepsPrefix",
         "TestASTSMT2AliasSourceTraceBeforeLetRegistration",
         "TestASTSMT2LetSourceTraceEmptyAndAliased",
         "TestFilterModelSourceBeforeAfterTrace",
@@ -181167,7 +181169,7 @@
           "name": "Reached SMT2 store_result alias-registration TRACE at ast_smt2_pp.cpp:708 with source depth, weight, level, ID, low-level expression and shared flag",
           "status": "ported",
           "go_target": "pkg/ast/ast_smt2_alias_trace.go",
-          "tests": ["TestASTSMT2AliasSourceTraceBeforeLetRegistration"]
+          "tests": ["TestASTSMT2AliasSourceTraceBeforeLetRegistration", "TestASTSMT2AliasSourceTraceFormatterRefusalKeepsPrefix"]
         },
         {
           "name": "Selected root-scope pp_let alias-count, declaration-level, and open-let TRACE checkpoints at ast_smt2_pp.cpp:806,818,833; nested scope alias offset remains partial",
@@ -183078,6 +183080,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestASTSMT2AliasSourceTraceFormatterRefusalKeepsPrefix",
         "TestASTSMT2AliasSourceTraceBeforeLetRegistration",
         "TestASTSMT2LetSourceTraceEmptyAndAliased",
         "TestFilterModelSourceBeforeAfterTrace",
@@ -183220,7 +183223,7 @@
           "name": "Reached SMT2 store_result alias-registration TRACE at ast_smt2_pp.cpp:708 with source depth, weight, level, ID, low-level expression and shared flag",
           "status": "ported",
           "go_target": "pkg/ast/ast_smt2_alias_trace.go",
-          "tests": ["TestASTSMT2AliasSourceTraceBeforeLetRegistration"]
+          "tests": ["TestASTSMT2AliasSourceTraceBeforeLetRegistration", "TestASTSMT2AliasSourceTraceFormatterRefusalKeepsPrefix"]
         },
         {
           "name": "Selected root-scope pp_let alias-count, declaration-level, and open-let TRACE checkpoints at ast_smt2_pp.cpp:806,818,833; nested scope alias offset remains partial",
