@@ -23,7 +23,7 @@ type patternCandidates struct {
 	visited            map[ast.ASTHandle]struct{}
 	todo               []ast.ASTHandle
 	noPatterns         []ast.ASTHandle
-	collectRefs        []ast.ASTHandle
+	collectRefs        []collectedRef
 	pendingPatternRefs []ast.ASTRef
 	numBindings        uint32
 	blockLoops         bool

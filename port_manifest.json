@@ -18752,6 +18752,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/collect_memory_trace.go",
         "pkg/ast/pattern/multi_pattern_memory_trace.go",
         "pkg/ast/pattern/reduce_quantifier_trace.go",
         "pkg/ast/pattern/pattern_stage_trace.go",
@@ -18772,6 +18773,7 @@
         "pkg/smtcore/pattern_inference_rewriter.go"
       ],
       "tests": [
+        "TestPatternCollectGroundChildAndInfoMemoryLifetime",
         "TestPatternCollectInfoSourceSMT2Trace",
         "TestPatternCollectSharedChildSourceStackTrace",
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
@@ -18880,6 +18882,18 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Ground application is not forbidden in pattern collection (pattern_inference.cpp:485-489), preserving constant children when forming non-ground candidates",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/collect.go",
+          "tests": ["TestPatternCollectGroundChildAndInfoMemoryLifetime"]
+        },
+        {
+          "name": "Concrete collect::info allocation at pattern_inference.cpp:186,188,205,238 and delete_proc reset at util.h:171 through debug memory wrappers, including duplicate child visits and source-order release",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/collect_memory_trace.go",
+          "tests": ["TestPatternCollectGroundChildAndInfoMemoryLifetime", "TestPatternCollectSharedChildSourceStackTrace"]
+        },
         {
           "name": "Concrete pattern pre_pattern queue allocation at pattern_inference.cpp:439,455 and delete_proc reset at util.h:171 through debug memory wrappers, including early-return cleanup and source queue order",
           "status": "platform_replacement",
@@ -152251,6 +152265,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/collect_memory_trace.go",
         "pkg/ast/pattern/multi_pattern_memory_trace.go",
         "pkg/api/api_goal_memory_trace.go",
         "pkg/api/api_goal_memory_trace_debug_test.go",
@@ -152330,6 +152345,7 @@
         "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
+        "TestPatternCollectGroundChildAndInfoMemoryLifetime",
         "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
         "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
         "TestAPIGoalSourceMemoryWrapperReleaseSites",
@@ -152501,6 +152517,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete collect::info allocation at pattern_inference.cpp:186,188,205,238 and delete_proc reset at util.h:171 through debug memory wrappers, including duplicate child visits and source-order release",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/collect_memory_trace.go",
+          "tests": ["TestPatternCollectGroundChildAndInfoMemoryLifetime", "TestPatternCollectSharedChildSourceStackTrace"]
+        },
         {
           "name": "Concrete pattern pre_pattern queue allocation at pattern_inference.cpp:439,455 and delete_proc reset at util.h:171 through debug memory wrappers, including early-return cleanup and source queue order",
           "status": "platform_replacement",
@@ -153170,6 +153192,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/collect_memory_trace.go",
         "pkg/ast/pattern/multi_pattern_memory_trace.go",
         "pkg/api/api_goal_memory_trace.go",
         "pkg/api/api_goal_memory_trace_debug_test.go",
@@ -153244,6 +153267,7 @@
         "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
+        "TestPatternCollectGroundChildAndInfoMemoryLifetime",
         "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
         "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
         "TestAPIGoalSourceMemoryWrapperReleaseSites",
@@ -153404,6 +153428,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete collect::info allocation at pattern_inference.cpp:186,188,205,238 and delete_proc reset at util.h:171 through debug memory wrappers, including duplicate child visits and source-order release",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/collect_memory_trace.go",
+          "tests": ["TestPatternCollectGroundChildAndInfoMemoryLifetime", "TestPatternCollectSharedChildSourceStackTrace"]
+        },
         {
           "name": "Concrete pattern pre_pattern queue allocation at pattern_inference.cpp:439,455 and delete_proc reset at util.h:171 through debug memory wrappers, including early-return cleanup and source queue order",
           "status": "platform_replacement",
@@ -185418,6 +185448,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/collect_memory_trace.go",
         "pkg/ast/pattern/multi_pattern_memory_trace.go",
         "pkg/util/productiter/next.go",
         "pkg/util/random/generator.go",
@@ -185474,6 +185505,7 @@
         "pkg/sat/sat_solver_mus_verbose.go"
       ],
       "tests": [
+        "TestPatternCollectGroundChildAndInfoMemoryLifetime",
         "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
         "TestSourceProductIteratorOrderCarryAndWrap",
         "TestSourceRandomVectors",
@@ -185713,6 +185745,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete collect::info allocation at pattern_inference.cpp:186,188,205,238 and delete_proc reset at util.h:171 through debug memory wrappers, including duplicate child visits and source-order release",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/collect_memory_trace.go",
+          "tests": ["TestPatternCollectGroundChildAndInfoMemoryLifetime", "TestPatternCollectSharedChildSourceStackTrace"]
+        },
         {
           "name": "Concrete pattern pre_pattern queue allocation at pattern_inference.cpp:439,455 and delete_proc reset at util.h:171 through debug memory wrappers, including early-return cleanup and source queue order",
           "status": "platform_replacement",

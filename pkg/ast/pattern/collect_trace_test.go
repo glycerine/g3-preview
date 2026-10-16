@@ -3,6 +3,7 @@ package pattern
 import (
 	"bytes"
 	"fmt"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -64,6 +65,28 @@ func TestPatternCollectSharedChildSourceStackTrace(t *testing.T) {
 	patternMust(t, c.collect(app))
 	if output.Len() != 0 || len(c.candidates) != 1 {
 		t.Fatal("disabled collect trace changed candidate or emitted output", c.candidates, output.String())
+	}
+	patternMust(t, c.resetCandidates())
+	output.Reset()
+	tags.Enable("memory")
+	patternMust(t, c.collect(app))
+	if len(c.candidates) != 1 || len(c.collectRefs) != 0 {
+		t.Fatal("shared child collected-info ownership", c.candidates, len(c.collectRefs))
+	}
+	if diagnostic.DebugBuild && tags.ShouldTrace("memory") {
+		got := output.String()
+		allocs := regexp.MustCompile(`alloc (0x[0-9a-f]+) src/ast/pattern/pattern_inference.cpp:(186|238) info ([0-9]+)\n`).FindAllStringSubmatch(got, -1)
+		deallocs := regexp.MustCompile(`dealloc (0x[0-9a-f]+) src/util/util.h:171\n`).FindAllStringSubmatch(got, -1)
+		if len(allocs) != 3 || len(deallocs) != 3 || allocs[0][2] != "186" || allocs[1][2] != "186" || allocs[2][2] != "238" {
+			t.Fatalf("shared-child source info allocation visits: %q", got)
+		}
+		for i := range allocs {
+			if allocs[i][1] != deallocs[i][1] || allocs[i][3] == "0" {
+				t.Fatalf("shared-child source info release order: %q", got)
+			}
+		}
+	} else if output.Len() != 0 {
+		t.Fatalf("erased shared-child info memory trace emitted %q", output.String())
 	}
 }
 

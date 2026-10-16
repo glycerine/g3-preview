@@ -353,6 +353,7 @@
         "candidate_selection.go",
         "candidates.go",
         "collect.go",
+        "collect_memory_trace.go",
         "contains_subpattern.go",
         "infer.go",
         "multi_pattern.go",

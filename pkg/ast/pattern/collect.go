@@ -23,12 +23,18 @@ type collectedInfo struct {
 	size uint32
 }
 
+type collectedRef struct {
+	node ast.ASTHandle
+	info *collectedInfo
+}
+
 func (c *patternCandidates) releaseCollectRefs() error {
 	for len(c.collectRefs) != 0 {
-		h := c.collectRefs[0]
-		consumed, err := c.manager.DecRefConsumed(h)
+		ref := c.collectRefs[0]
+		consumed, err := c.manager.DecRefConsumed(ref.node)
 		if consumed {
-			c.collectRefs[0] = ast.ASTHandle{}
+			c.traceCollectedInfoDeallocated(ref.info)
+			c.collectRefs[0] = collectedRef{}
 			c.collectRefs = c.collectRefs[1:]
 		}
 		if err != nil {
@@ -41,12 +47,14 @@ func (c *patternCandidates) releaseCollectRefs() error {
 	return nil
 }
 
-func (c *patternCandidates) saveCollectInfo(cache map[collectKey]*collectedInfo, key collectKey, info *collectedInfo) error {
+func (c *patternCandidates) saveCollectInfo(cache map[collectKey]*collectedInfo, key collectKey, info *collectedInfo, allocLine int) error {
 	if info != nil {
+		c.traceCollectedInfoAllocated(info, allocLine)
 		if err := c.manager.IncRef(info.node); err != nil {
+			c.traceCollectedInfoDeallocated(info)
 			return err
 		}
-		c.collectRefs = append(c.collectRefs, info.node)
+		c.collectRefs = append(c.collectRefs, collectedRef{node: info.node, info: info})
 	}
 	cache[key] = info
 	return nil
@@ -54,8 +62,11 @@ func (c *patternCandidates) saveCollectInfo(cache map[collectKey]*collectedInfo,
 
 func (c *patternCandidates) forbiddenApp(n ast.ASTHandle) (bool, error) {
 	ground, err := c.manager.IsGround(n)
-	if err != nil || ground {
-		return ground, err
+	if err != nil {
+		return false, err
+	}
+	if ground {
+		return false, nil
 	}
 	decl, err := c.manager.GetDecl(n)
 	if err != nil {
@@ -104,7 +115,7 @@ func (c *patternCandidates) collectNode(cache map[collectKey]*collectedInfo, key
 			return e
 		}
 		if index < key.delta {
-			return c.saveCollectInfo(cache, key, nil)
+			return c.saveCollectInfo(cache, key, nil, 0)
 		}
 		index -= key.delta
 		vars := make(map[uint32]struct{})
@@ -122,21 +133,25 @@ func (c *patternCandidates) collectNode(cache map[collectKey]*collectedInfo, key
 				return e
 			}
 		}
-		return c.saveCollectInfo(cache, key, &collectedInfo{node: mapped, vars: vars, size: 1})
+		line := 186
+		if key.delta != 0 {
+			line = 188
+		}
+		return c.saveCollectInfo(cache, key, &collectedInfo{node: mapped, vars: vars, size: 1}, line)
 	case ast.ASTApp:
 		forbidden, e := c.forbiddenApp(n)
 		if e != nil {
 			return e
 		}
 		if forbidden {
-			return c.saveCollectInfo(cache, key, nil)
+			return c.saveCollectInfo(cache, key, nil, 0)
 		}
 		count, e := m.GetNumArgs(n)
 		if e != nil {
 			return e
 		}
 		if count == 0 {
-			return c.saveCollectInfo(cache, key, &collectedInfo{node: n, vars: make(map[uint32]struct{}), size: 1})
+			return c.saveCollectInfo(cache, key, &collectedInfo{node: n, vars: make(map[uint32]struct{}), size: 1}, 205)
 		}
 		args := make([]ast.ASTHandle, count)
 		vars := make(map[uint32]struct{})
@@ -152,7 +167,7 @@ func (c *patternCandidates) collectNode(cache map[collectKey]*collectedInfo, key
 				return ast.ErrASTDomain
 			}
 			if info == nil {
-				return c.saveCollectInfo(cache, key, nil)
+				return c.saveCollectInfo(cache, key, nil, 0)
 			}
 			args[i] = info.node
 			changed = changed || child != info.node
@@ -173,7 +188,7 @@ func (c *patternCandidates) collectNode(cache map[collectKey]*collectedInfo, key
 			}
 		}
 		info := &collectedInfo{node: mapped, vars: vars, size: size}
-		if err := c.saveCollectInfo(cache, key, info); err != nil {
+		if err := c.saveCollectInfo(cache, key, info, 238); err != nil {
 			return err
 		}
 		family, e := m.GetFamilyID(n)
@@ -204,7 +219,7 @@ func (c *patternCandidates) collectNode(cache map[collectKey]*collectedInfo, key
 		}
 		return c.addCandidate(mapped, free, size)
 	default:
-		return c.saveCollectInfo(cache, key, nil)
+		return c.saveCollectInfo(cache, key, nil, 0)
 	}
 }
 

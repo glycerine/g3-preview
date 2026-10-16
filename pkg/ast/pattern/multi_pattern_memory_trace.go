@@ -11,7 +11,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
-func (c *patternCandidates) prePatternMemoryTags() *diagnostic.TraceTags {
+func (c *patternCandidates) patternMemoryTags() *diagnostic.TraceTags {
 	if c.traceTags != nil {
 		return c.traceTags
 	}
@@ -19,7 +19,7 @@ func (c *patternCandidates) prePatternMemoryTags() *diagnostic.TraceTags {
 }
 
 func (c *patternCandidates) tracePrePatternAllocated(p *prePattern, line int) {
-	tags := c.prePatternMemoryTags()
+	tags := c.patternMemoryTags()
 	if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
 		return
 	}
@@ -32,7 +32,7 @@ func (c *patternCandidates) tracePrePatternAllocated(p *prePattern, line int) {
 }
 
 func (c *patternCandidates) tracePrePatternDeallocated(p *prePattern) {
-	tags := c.prePatternMemoryTags()
+	tags := c.patternMemoryTags()
 	if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
 		return
 	}
