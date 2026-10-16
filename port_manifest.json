@@ -171179,6 +171179,7 @@
         "pkg/util/params/util_params_source_frame.go",
         "pkg/util/params/util_params_assignment_source_test.go",
         "pkg/util/params/util_params_copy_all_kinds_source_test.go",
+        "pkg/util/params/util_params_self_copy_all_kinds_source_test.go",
         "pkg/util/params/util_params_copy_replacement_source_test.go",
         "pkg/util/params/util_params_reset_source.go",
         "pkg/util/params/util_params_reset_source_test.go",
@@ -171237,6 +171238,7 @@
         "TestParamsReferenceConstructorFaultAndRecordShape",
         "TestParamsReferenceWarmOperationsAndGeneration",
         "TestParamsReferenceSelfCopySourceRatIdentity",
+        "TestParamsSelfCopyAllKindsDetachesSharedBlock",
         "TestParamsReferenceExactContextAccountingAndGrowthPeak",
         "TestParamsReferenceFiniteSignedRatAndNullDefaults",
         "TestParamsReferenceProvenanceBeforeMutation",
@@ -171527,6 +171529,7 @@
             "TestParamsReferenceCopyFromSharedSourceStoppedDetach",
             "TestParamsReferenceCopySharedDetachStoppedNumeralAndSourceFrames",
             "TestParamsReferenceSelfCopySourceRatIdentity",
+            "TestParamsSelfCopyAllKindsDetachesSharedBlock",
             "TestParamsBorrowedStringSymbolCopyAndOwnership",
             "TestParamsReferenceInitFailedCopySkipsOldDEC"
           ]
@@ -172035,6 +172038,7 @@
         "pkg/util/params/util_params_source_frame.go",
         "pkg/util/params/util_params_assignment_source_test.go",
         "pkg/util/params/util_params_copy_all_kinds_source_test.go",
+        "pkg/util/params/util_params_self_copy_all_kinds_source_test.go",
         "pkg/util/params/util_params_copy_replacement_source_test.go",
         "pkg/util/params/util_params_reset_source.go",
         "pkg/util/params/util_params_reset_source_test.go",
@@ -172089,6 +172093,7 @@
         "TestParamsReferenceConstructorFaultAndRecordShape",
         "TestParamsReferenceWarmOperationsAndGeneration",
         "TestParamsReferenceSelfCopySourceRatIdentity",
+        "TestParamsSelfCopyAllKindsDetachesSharedBlock",
         "TestParamsReferenceExactContextAccountingAndGrowthPeak",
         "TestParamsReferenceFiniteSignedRatAndNullDefaults",
         "TestParamsReferenceProvenanceBeforeMutation",
@@ -172315,6 +172320,7 @@
             "TestParamsReferenceCopyFromSharedSourceStoppedDetach",
             "TestParamsReferenceCopySharedDetachStoppedNumeralAndSourceFrames",
             "TestParamsReferenceSelfCopySourceRatIdentity",
+            "TestParamsSelfCopyAllKindsDetachesSharedBlock",
             "TestParamsBorrowedStringSymbolCopyAndOwnership",
             "TestParamsReferenceInitFailedCopySkipsOldDEC"
           ]
