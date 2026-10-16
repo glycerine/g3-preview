@@ -76,11 +76,26 @@ func TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit(t *testing
 			found, e := s.searchFrom(m, f)
 			astTestMust(t, e)
 			if tags.ShouldTrace("model_finder_hint") {
-				const want = "-------- [model_finder_hint] greedy src/smt/smt_model_finder.cpp:2925 ---------\n" +
-					"candidates from residue:\nk!11 \n" +
-					"------------------------------------------------\n"
-				if got := trace.String(); got != want {
-					t.Fatalf("source residue-candidate TRACE: got %q, want %q", got, want)
+				const footer = "------------------------------------------------\n"
+				const first = "-------- [model_finder_hint] greedy src/smt/smt_model_finder.cpp:2841 ---------\n" +
+					"greedy depth: 0, f: k!10\nfs:\n\nsatisfied:\n\nresidue:\n\n" + footer
+				const candidates = "-------- [model_finder_hint] greedy src/smt/smt_model_finder.cpp:2925 ---------\n" +
+					"candidates from residue:\nk!11 \n" + footer
+				const second = "-------- [model_finder_hint] greedy src/smt/smt_model_finder.cpp:2841 ---------\n" +
+					"greedy depth: 1, f: k!11\nfs:\nk!10 \nsatisfied:\nnull \nresidue:\nnull \n" + footer
+				prefix := first + candidates + second
+				got := trace.String()
+				if cyclic {
+					if got != prefix {
+						t.Fatalf("source cyclic greedy TRACE: got %q, want %q", got, prefix)
+					}
+				} else {
+					const foundHead = "-------- [model_finder_hint] greedy src/smt/smt_model_finder.cpp:2917 ---------\n" +
+						"found subset that is satisfied by macros\nfs:\n"
+					const foundTail = "\nsatisfied:\nnull null \nresidue:\n\n" + footer
+					if got != prefix+foundHead+"k!10 k!11 "+foundTail && got != prefix+foundHead+"k!11 k!10 "+foundTail {
+						t.Fatalf("source greedy TRACE: got %q", got)
+					}
 				}
 			} else if trace.Len() != 0 {
 				t.Fatal("erased residue-candidate TRACE", trace.String())

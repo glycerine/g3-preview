@@ -19,6 +19,7 @@ func (s *hintSearchState) greedyFunction(m *ast.ASTManager, f ast.ASTHandle, dep
 	if depth >= hintGreedyMaxDepth {
 		return false, nil
 	}
+	s.traceGreedyFunction(m, f, depth)
 	defs := s.defsByFunction[f]
 	if defs == nil {
 		return false, ast.ErrASTDomain
@@ -53,6 +54,9 @@ func (s *hintSearchState) greedyFunction(m *ast.ASTManager, f ast.ASTHandle, dep
 func (s *hintSearchState) greedyResidue(m *ast.ASTManager, depth uint32) (bool, error) {
 	if s.residue.empty() {
 		cyclic, e := s.isCyclic(m)
+		if e == nil && !cyclic {
+			s.traceFoundSubset(m)
+		}
 		return !cyclic && e == nil, e
 	}
 	candidates, e := s.candidatesFromResidue()

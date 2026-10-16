@@ -91456,6 +91456,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder_hint_trace.go",
           "tests": ["TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"]
+        },
+        {
+          "name": "Retained hint_solver greedy-entry and acyclic-found TRACE at smt_model_finder.cpp:2841,2917 with source search-state snapshots",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_finder_hint_trace.go",
+          "tests": ["TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"]
         }
       ],
       "ownership": [
@@ -183965,6 +183971,12 @@
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder_hint_trace.go",
           "tests": ["TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"]
+        },
+        {
+          "name": "Retained hint_solver greedy-entry and acyclic-found TRACE at smt_model_finder.cpp:2841,2917 with source search-state snapshots",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_finder_hint_trace.go",
+          "tests": ["TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"]
         }
       ],
       "ownership": [
@@ -186282,6 +186294,12 @@
         },
         {
           "name": "Retained hint_solver residue-candidate TRACE at smt_model_finder.cpp:2925 after candidate collection and before recursive selection",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_finder_hint_trace.go",
+          "tests": ["TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"]
+        },
+        {
+          "name": "Retained hint_solver greedy-entry and acyclic-found TRACE at smt_model_finder.cpp:2841,2917 with source search-state snapshots",
           "status": "ported",
           "go_target": "pkg/smtcore/smt_model_finder_hint_trace.go",
           "tests": ["TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"]
