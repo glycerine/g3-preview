@@ -270,6 +270,7 @@ func TestRawProjectionServiceAndInfOwningReferences(t *testing.T) {
 }
 
 func TestRawProjectionInfExtractionSourceDebugBoundary(t *testing.T) {
+	disableInfProjectionAssertions(t)
 	s, _ := serviceNew(t)
 	x, e := s.InfIntNewValue()
 	serviceMust(t, e)
@@ -307,21 +308,15 @@ func TestRawProjectionInfExtractionSourceDebugBoundary(t *testing.T) {
 		} else {
 			r, e = s.InfNumerator(&y)
 		}
-		if modularSourceDebug {
-			if !errors.Is(e, ErrInfRationalDomain) || r.ownerID != 0 {
-				t.Fatal(r, e)
-			}
-		} else {
-			serviceMust(t, e)
-			want := int32(7)
-			if den {
-				want = 0
-			}
-			if r.First.Num.Val != want || r.First.Den.Val != 1 || r.Second.Num.Val != 0 {
-				t.Fatal(r)
-			}
-			serviceMust(t, s.InfDel(&r))
+		serviceMust(t, e)
+		want := int32(7)
+		if den {
+			want = 0
 		}
+		if r.First.Num.Val != want || r.First.Den.Val != 1 || r.Second.Num.Val != 0 {
+			t.Fatal(r)
+		}
+		serviceMust(t, s.InfDel(&r))
 	}
 	serviceAuditRationalRoots(t, s, &x.First, &y.First, &y.Second)
 	serviceMust(t, s.InfIntDel(&x))

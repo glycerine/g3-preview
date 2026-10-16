@@ -122914,19 +122914,25 @@
           "name": "InfEpsInf signed/unsigned64 getter SASSERT process switch, source notification and debugger Continue/Throw action (inf_eps_rational.h:122,127)",
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_eps_rational.go",
-          "tests": ["TestInfinitesimal64BitSourceAssertionActions"]
+          "tests": ["TestInfinitesimalSourceAssertionActions"]
         },
         {
           "name": "InfRational signed/unsigned64 getter SASSERT process switch, source notification and debugger Continue/Throw action (inf_rational.h:126,131)",
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_rational.go",
-          "tests": ["TestInfinitesimal64BitSourceAssertionActions"]
+          "tests": ["TestInfinitesimalSourceAssertionActions"]
         },
         {
           "name": "InfIntRational signed/unsigned64 getter SASSERT process switch, source notification and debugger Continue/Throw action (inf_int_rational.h:113,118)",
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_int_rational.go",
-          "tests": ["TestInfinitesimal64BitSourceAssertionActions"]
+          "tests": ["TestInfinitesimalSourceAssertionActions"]
+        },
+        {
+          "name": "InfRational numerator/denominator epsilon-zero SASSERT switch, notification and debugger action before owning extraction (inf_rational.h:158,163)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_rational.go",
+          "tests": ["TestInfinitesimalSourceAssertionActions"]
         },
         {
           "name": "Selected assertion switch, lazy debug table initialization, enable/disable/query, finalize and short-circuit CASSERT gate; whole global macro and debugger bindings remain open",
@@ -123358,19 +123364,25 @@
           "name": "InfEpsInf signed/unsigned64 getter SASSERT process switch, source notification and debugger Continue/Throw action (inf_eps_rational.h:122,127)",
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_eps_rational.go",
-          "tests": ["TestInfinitesimal64BitSourceAssertionActions"]
+          "tests": ["TestInfinitesimalSourceAssertionActions"]
         },
         {
           "name": "InfRational signed/unsigned64 getter SASSERT process switch, source notification and debugger Continue/Throw action (inf_rational.h:126,131)",
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_rational.go",
-          "tests": ["TestInfinitesimal64BitSourceAssertionActions"]
+          "tests": ["TestInfinitesimalSourceAssertionActions"]
         },
         {
           "name": "InfIntRational signed/unsigned64 getter SASSERT process switch, source notification and debugger Continue/Throw action (inf_int_rational.h:113,118)",
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_int_rational.go",
-          "tests": ["TestInfinitesimal64BitSourceAssertionActions"]
+          "tests": ["TestInfinitesimalSourceAssertionActions"]
+        },
+        {
+          "name": "InfRational numerator/denominator epsilon-zero SASSERT switch, notification and debugger action before owning extraction (inf_rational.h:158,163)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_rational.go",
+          "tests": ["TestInfinitesimalSourceAssertionActions"]
         },
         {
           "name": "Selected assertion switch, lazy debug table initialization, enable/disable/query, finalize and short-circuit CASSERT gate; whole global macro and debugger bindings remain open",
@@ -128162,7 +128174,7 @@
         "TestInfinitesimalSourceWholeStringStreamInsertion",
         "TestInfEpsInfFiniteTripleOracles",
         "TestInfEpsInfSourceQuirksAndHeader",
-        "TestInfinitesimal64BitSourceAssertionActions",
+        "TestInfinitesimalSourceAssertionActions",
         "TestInfEpsInfConstantsPredicatesAndMixedRoutes",
         "TestInfEpsInfLifetimeAndDomain",
         "TestInfEpsInfFailurePrefixesImmediateRoots",
@@ -128433,7 +128445,7 @@
           "go_target": "pkg/util/numeral/inf_eps_rational.go",
           "tests": [
             "TestInfScalarProjectionAllGetterProfilesAndRawPredicates",
-            "TestInfinitesimal64BitSourceAssertionActions",
+            "TestInfinitesimalSourceAssertionActions",
             "TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit",
             "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
             "TestInfScalarProjectionOwnershipAndWarmGraph",
@@ -128686,7 +128698,7 @@
         "TestInfIntRationalComparisonsSignsAndRounding",
         "TestInfIntRationalAccessorsHashDisplayPostOperations",
         "TestInfIntRationalConversionsAndMixedComparisons",
-        "TestInfinitesimal64BitSourceAssertionActions",
+        "TestInfinitesimalSourceAssertionActions",
         "TestInfIntRationalFaultPrefixesTemporaryCleanup",
         "TestInfIntRationalAliasReReadWarmReuseAndGuards",
         "TestInfIntRationalIncrementSourceRationalRoute",
@@ -128913,7 +128925,7 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_int_rational.go",
           "tests": [
-            "TestInfinitesimal64BitSourceAssertionActions",
+            "TestInfinitesimalSourceAssertionActions",
             "TestInfScalarProjectionAllGetterProfilesAndRawPredicates",
             "TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit",
             "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
@@ -129147,7 +129159,7 @@
         "TestInfRationalSource80Assertions",
         "TestInfRationalOwnershipErrors",
         "TestInfRationalFullHeaderQueriesAndAliases",
-        "TestInfinitesimal64BitSourceAssertionActions",
+        "TestInfinitesimalSourceAssertionActions",
         "TestInfRationalRawStateComparisonRoutes",
         "TestInfRationalFailurePrefixesImmediateRoots",
         "TestInfRationalComponentAliasSourceRereads",
@@ -129417,11 +129429,12 @@
           ]
         },
         {
-          "name": "numerator/denominator: debug epsilon-zero assertion, first-component extraction and owning result (inf_rational.h:157-165)",
+          "name": "numerator/denominator: process-gated epsilon-zero SASSERT158/163 notification and debugger action before first-component extraction and owning result",
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_rational.go",
           "tests": [
             "TestInfRationalSource80Assertions",
+            "TestInfinitesimalSourceAssertionActions",
             "TestInfRationalFullHeaderQueriesAndAliases",
             "TestInfRationalFailurePrefixesImmediateRoots",
             "TestInfRationalOwnershipErrors"
@@ -129448,7 +129461,7 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_rational.go",
           "tests": [
-            "TestInfinitesimal64BitSourceAssertionActions",
+            "TestInfinitesimalSourceAssertionActions",
             "TestInfScalarProjectionAllGetterProfilesAndRawPredicates",
             "TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit",
             "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",

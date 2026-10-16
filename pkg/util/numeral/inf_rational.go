@@ -660,16 +660,29 @@ func (s *RationalService) infNumDen(v *OwnedInfRational, den bool) (_lexOut Owne
 		return OwnedInfRational{}, e
 	}
 	defer s.mu.Unlock()
+	if e := s.infScalarOwner(v); e != nil {
+		return OwnedInfRational{}, e
+	}
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return OwnedInfRational{}, e
+		}
+		if enabled && v.Second.Num.Val != 0 {
+			line := int32(158)
+			if den {
+				line = 163
+			}
+			if e = diagnostic.DebugAssertionFailure(d, "src/util/inf_rational.h", line, "r.m_second.is_zero()"); e != nil {
+				return OwnedInfRational{}, e
+			}
+		}
+	}
 	if e := s.beginLexical(); e != nil {
 		return OwnedInfRational{}, e
 	}
 	defer s.endLexicalInf(&_lexOut, &_lexErr)
-	if e := s.infScalarOwner(v); e != nil {
-		return OwnedInfRational{}, e
-	}
-	if modularSourceDebug && v.Second.Num.Val != 0 {
-		return OwnedInfRational{}, ErrInfRationalDomain
-	}
 	tmp := NewRational()
 	defer s.destroyLexicalRational(&tmp)
 	var e error
