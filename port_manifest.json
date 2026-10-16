@@ -171753,6 +171753,16 @@
           ]
         },
         {
+          "name": "params_ref::init postcondition SASSERT(m_params->m_ref_count == 1) at params.cpp:611 after first allocation, unique no-op, and completed COW old decrement",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": [
+            "TestParamsInitSourcePostconditionAfterFirstAndUnique",
+            "TestParamsReferenceInitFailedCopySkipsOldDEC",
+            "TestParamsReferenceCopySharedDetachStoppedNumeralAndSourceFrames"
+          ]
+        },
+        {
           "name": "selected live params::reset ascending numeral traversal retains scalar entries until vector finalize, and explicit invocation/kind-matched owning continuation",
           "status": "ported",
           "go_target": "pkg/util/params/util_params_reset_source.go",

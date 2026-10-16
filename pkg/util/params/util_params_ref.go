@@ -459,12 +459,26 @@ func (c *ParamsContext) DelTracked(v *ParamsRef, receipt *ParamsDecrementReceipt
 func (c *ParamsContext) init(v *ParamsRef) error {
 	return c.initWithNumeralReceipt(v, nil)
 }
+func (c *ParamsContext) sourceAssertInitUnique(v *ParamsRef) error {
+	if !udiag.DebugBuild {
+		return nil
+	}
+	d := udiag.BorrowProcessDebugContext()
+	enabled, e := udiag.SourceAssertionsEnabled(d)
+	if e != nil || !enabled {
+		return e
+	}
+	if c.Blocks[v.Slot-1].Refs == 1 {
+		return nil
+	}
+	return udiag.DebugAssertionFailure(d, "src/util/params.cpp", 611, "m_params->m_ref_count == 1")
+}
 func (c *ParamsContext) initWithNumeralReceipt(v *ParamsRef, receipt *unumeral.RationalCopyAllocationReceipt) error {
 	if e := c.mutable(v); e != nil {
 		return e
 	}
 	if v.Slot != 0 && c.Blocks[v.Slot-1].Refs == 1 {
-		return nil
+		return c.sourceAssertInitUnique(v)
 	}
 	serial, e := c.nextSourceInvocation()
 	if e != nil {
@@ -497,7 +511,10 @@ func (c *ParamsContext) initWithNumeralReceipt(v *ParamsRef, receipt *unumeral.R
 			c.SourceFrames[slot-1].Active = false
 		}
 	}
-	return e
+	if e != nil {
+		return e
+	}
+	return c.sourceAssertInitUnique(v)
 }
 func (c *ParamsContext) grow(b *paramsBlock) error {
 	n, e := pdGrowth(int(b.capacity))
