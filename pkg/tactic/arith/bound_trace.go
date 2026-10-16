@@ -1,4 +1,4 @@
-// Source: src/tactic/arith/bound_propagator.cpp:279-305,331-357,382-411,457,473,523.
+// Source: src/tactic/arith/bound_propagator.cpp:279-305,331-357,382-411,457,473,523,691-702,735-736.
 package arith
 
 import (
@@ -160,4 +160,67 @@ func (s *BoundEquationStore) tracePropagatingEquation(eq *LinearEquation) {
 			_, err := io.WriteString(w, "\n")
 			return err
 		})
+}
+
+func (s *BoundEquationStore) traceLowerStepInput(k *numeral.Rational, b *equationBound, coeff *numeral.Int) error {
+	if !s.boundTraceTags().ShouldTrace("bound_propagator_step_detail") {
+		return nil
+	}
+	kText, err := s.manager.String(k)
+	if err != nil {
+		return err
+	}
+	bText, err := s.manager.String(&b.value)
+	if err != nil {
+		return err
+	}
+	aText, err := s.manager.Integers().String(coeff)
+	if err != nil {
+		return err
+	}
+	s.emitBoundTrace("bound_propagator_step_detail", "propagate_lower", 691,
+		"k: "+kText+" b_j->m_k: "+bText+" a_j: "+aText+"\n")
+	return nil
+}
+
+func (s *BoundEquationStore) traceLowerStepSum(k *numeral.Rational) error {
+	if !s.boundTraceTags().ShouldTrace("bound_propagator_step_detail") {
+		return nil
+	}
+	value, err := s.manager.String(k)
+	if err != nil {
+		return err
+	}
+	s.emitBoundTrace("bound_propagator_step_detail", "propagate_lower", 698, "k: "+value+"\n")
+	return nil
+}
+
+func (s *BoundEquationStore) tracePropagationStep(eq *LinearEquation, x uint32, k *numeral.Rational, strict, lower bool) error {
+	tags := s.boundTraceTags()
+	if !tags.ShouldTrace("bound_propagator_step") {
+		return nil
+	}
+	value, err := s.manager.String(k)
+	if err != nil {
+		return err
+	}
+	function, direction, line := "propagate_upper", "upper", 735
+	if lower {
+		function, direction, line = "propagate_lower", "lower", 701
+	}
+	_ = tags.EmitConditional("bound_propagator_step", function, "src/tactic/arith/bound_propagator.cpp", line,
+		func() bool { return true }, func(w io.Writer) error {
+			body := "propagating " + direction + " x" + strconv.FormatUint(uint64(x), 10) + " " + value + " strict: " + sourceBoolDigit(strict) + " using\n"
+			if _, err := io.WriteString(w, body); err != nil {
+				return err
+			}
+			if err := s.equations.Display(w, eq); err != nil {
+				return err
+			}
+			if _, err := io.WriteString(w, "\n"); err != nil {
+				return err
+			}
+			return s.displayBoundsOf(w, eq)
+		})
+	return nil
 }

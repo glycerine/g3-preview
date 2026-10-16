@@ -86,6 +86,20 @@ func (s *BoundEquationStore) displayVarBounds(out io.Writer, x uint32, approxima
 	return nil
 }
 
+// displayBoundsOf is the reached equation-specific diagnostic used by exact
+// propagation TRACE. It includes every variable in equation order.
+func (s *BoundEquationStore) displayBoundsOf(out io.Writer, eq *LinearEquation) error {
+	for _, x := range eq.xs {
+		if err := s.displayVarBounds(out, x, true, true); err != nil {
+			return err
+		}
+		if err := writeBoundText(out, "\n"); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // Display follows source variable-slot order, skips dead variables and then
 // prints every retained equation in insertion order, including dead marks.
 func (s *BoundEquationStore) Display(out io.Writer) error {

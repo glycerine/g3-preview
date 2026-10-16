@@ -236,3 +236,56 @@ func TestBoundPropagationTraceVariableAndEquationSourceOrder(t *testing.T) {
 		t.Fatal("dead constraint emitted equation TRACE")
 	}
 }
+
+func TestBoundExactPropagationStepTraceWithEquationBounds(t *testing.T) {
+	m, _ := equationManager(t)
+	s, err := NewBoundEquationStore(m)
+	equationMust(t, err)
+	defer func() { equationMust(t, s.Close()) }()
+	equationMust(t, s.MkVar(0, true))
+	equationMust(t, s.MkVar(1, true))
+	coeff := []numeral.Int{numeral.NewInt(1), numeral.NewInt(1)}
+	index, err := s.MkIntEquation(coeff, []uint32{0, 1})
+	equationMust(t, err)
+	for i := range coeff {
+		equationMust(t, m.Integers().Del(&coeff[i]))
+	}
+	value := numeral.NewRational()
+	defer func() { equationMust(t, m.Del(&value)) }()
+	equationMust(t, m.SetInt32(&value, 2))
+	_, err = s.AssertLower(0, &value, false)
+	equationMust(t, err)
+	equationMust(t, m.SetInt32(&value, 4))
+	_, err = s.AssertUpper(0, &value, false)
+	equationMust(t, err)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("bound_propagator_step_detail")
+	tags.Enable("bound_propagator_step")
+	equationMust(t, s.BindTrace(tags))
+	for _, lower := range []bool{true, false} {
+		accepted, err := s.propagateExact(index, 1, lower)
+		equationMust(t, err)
+		if !accepted {
+			t.Fatal("exact propagated bound was refused", lower)
+		}
+	}
+	if !tags.ShouldTrace("bound_propagator_step") {
+		if output.Len() != 0 {
+			t.Fatal("erased propagation-step TRACE wrote output", output.String())
+		}
+		return
+	}
+	record := func(tag, function string, line int, body string) string {
+		return "-------- [" + tag + "] " + function + " src/tactic/arith/bound_propagator.cpp:" + strconv.Itoa(line) + " ---------\n" + body + "------------------------------------------------\n"
+	}
+	want := record("bound_propagator_step_detail", "propagate_lower", 691, "k: 0 b_j->m_k: 4 a_j: 1\n") +
+		record("bound_propagator_step_detail", "propagate_lower", 698, "k: 4\n") +
+		record("bound_propagator_step", "propagate_lower", 701,
+			"propagating lower x1 -4 strict: 0 using\n1*x0 + 1*x1 = 0\n2 | 2 <= x0 <= 4 | 4\n-oo < x1 < oo\n") +
+		record("bound_propagator_step", "propagate_upper", 735,
+			"propagating upper x1 -2 strict: 0 using\n1*x0 + 1*x1 = 0\n2 | 2 <= x0 <= 4 | 4\n-4 | -4 <= x1 < oo\n")
+	if got := output.String(); got != want {
+		t.Fatalf("exact propagation-step TRACE\n got: %q\nwant: %q", got, want)
+	}
+}

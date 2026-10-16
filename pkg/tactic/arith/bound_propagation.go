@@ -86,8 +86,18 @@ func (s *BoundEquationStore) propagateExact(index uint32, position int, lower bo
 		if b == nil {
 			return false, arena.ErrInvalidSlot
 		}
+		if lower {
+			if err = s.traceLowerStepInput(&k, b, &eq.as[j]); err != nil {
+				return false, err
+			}
+		}
 		strict = strict || b.strict
 		if err = s.manager.AddMulInt(&k, &eq.as[j], &b.value, &k); err != nil {
+			return false, err
+		}
+	}
+	if lower {
+		if err = s.traceLowerStepSum(&k); err != nil {
 			return false, err
 		}
 	}
@@ -95,6 +105,9 @@ func (s *BoundEquationStore) propagateExact(index uint32, position int, lower bo
 		return false, err
 	}
 	if err = s.manager.DivInt(&k, &eq.as[position], &k); err != nil {
+		return false, err
+	}
+	if err = s.tracePropagationStep(eq, eq.xs[position], &k, strict, lower); err != nil {
 		return false, err
 	}
 	return s.assertBound(eq.xs[position], &k, strict, lower, true)

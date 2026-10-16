@@ -99404,7 +99404,8 @@
         "TestBoundAssertionSourceTraceAndFalseAlarmOrder",
         "TestBoundRelevanceSourceTraceOldValueAndSmallImprovement",
         "TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds",
-        "TestBoundPropagationTraceVariableAndEquationSourceOrder"
+        "TestBoundPropagationTraceVariableAndEquationSourceOrder",
+        "TestBoundExactPropagationStepTraceWithEquationBounds"
       ],
       "conditionals": [
         {
@@ -99574,6 +99575,13 @@
           "status": "ported",
           "go_target": "pkg/tactic/arith/bound_trace.go",
           "tests": ["TestBoundPropagationTraceVariableAndEquationSourceOrder"]
+        },
+        {
+          "name": "Selected exact propagate_lower running-sum TRACE and lower/upper step records with equation and bound displays before derived assertion (bound_propagator.cpp:691-702,735-736)",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_trace.go",
+          "go_targets": ["pkg/tactic/arith/bound_display.go"],
+          "tests": ["TestBoundExactPropagationStepTraceWithEquationBounds"]
         }
       ],
       "ownership": [
@@ -179950,7 +179958,8 @@
         "TestBoundAssertionSourceTraceAndFalseAlarmOrder",
         "TestBoundRelevanceSourceTraceOldValueAndSmallImprovement",
         "TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds",
-        "TestBoundPropagationTraceVariableAndEquationSourceOrder"
+        "TestBoundPropagationTraceVariableAndEquationSourceOrder",
+        "TestBoundExactPropagationStepTraceWithEquationBounds"
       ],
       "conditionals": [
         {
@@ -181410,6 +181419,13 @@
           "status": "ported",
           "go_target": "pkg/tactic/arith/bound_trace.go",
           "tests": ["TestBoundPropagationTraceVariableAndEquationSourceOrder"]
+        },
+        {
+          "name": "Retained bound_propagator exact propagation-step TRACE with gated numeral formatting and equation-specific bound displays",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_trace.go",
+          "go_targets": ["pkg/tactic/arith/bound_display.go"],
+          "tests": ["TestBoundExactPropagationStepTraceWithEquationBounds"]
         }
       ],
       "ownership": [
@@ -181583,7 +181599,8 @@
         "TestBoundAssertionSourceTraceAndFalseAlarmOrder",
         "TestBoundRelevanceSourceTraceOldValueAndSmallImprovement",
         "TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds",
-        "TestBoundPropagationTraceVariableAndEquationSourceOrder"
+        "TestBoundPropagationTraceVariableAndEquationSourceOrder",
+        "TestBoundExactPropagationStepTraceWithEquationBounds"
       ],
       "conditionals": [
         {
@@ -183043,6 +183060,13 @@
           "status": "ported",
           "go_target": "pkg/tactic/arith/bound_trace.go",
           "tests": ["TestBoundPropagationTraceVariableAndEquationSourceOrder"]
+        },
+        {
+          "name": "Retained propagate_lower and propagate_upper TRACE macro sites, including source-order lower sum and before-assert displays",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_trace.go",
+          "go_targets": ["pkg/tactic/arith/bound_display.go"],
+          "tests": ["TestBoundExactPropagationStepTraceWithEquationBounds"]
         }
       ],
       "ownership": [
