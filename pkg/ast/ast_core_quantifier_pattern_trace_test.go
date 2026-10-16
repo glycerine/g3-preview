@@ -75,4 +75,42 @@ func TestASTQuantifierPatternSourceTraceBeforeRegistration(t *testing.T) {
 	} else {
 		paramsMust(t, err)
 	}
+	output.Reset()
+	spec.Patterns = []ASTHandle{truth, pattern}
+	_, err = m.MkQuantifier(spec)
+	if ASTSourceDebug {
+		if err != ErrASTDomain {
+			t.Fatalf("first invalid pattern was not refused: %v", err)
+		}
+		if tags.ShouldTrace("ast") {
+			got := output.String()
+			if strings.Count(got, "[ast] mk_quantifier src/ast/ast.cpp:2358") != 1 ||
+				!strings.Contains(got, "\n0 true\n") || strings.Contains(got, "\n1 ") {
+				t.Fatalf("later pattern traced after first assertion: %q", got)
+			}
+		} else if output.Len() != 0 {
+			t.Fatalf("erased first-pattern trace emitted %q", output.String())
+		}
+	} else {
+		paramsMust(t, err)
+	}
+	output.Reset()
+	spec.Patterns = []ASTHandle{pattern, truth}
+	_, err = m.MkQuantifier(spec)
+	if ASTSourceDebug {
+		if err != ErrASTDomain {
+			t.Fatalf("second invalid pattern was not refused: %v", err)
+		}
+		if tags.ShouldTrace("ast") {
+			got := output.String()
+			if strings.Count(got, "[ast] mk_quantifier src/ast/ast.cpp:2358") != 2 ||
+				!strings.Contains(got, "\n0 (true)\n") || !strings.Contains(got, "\n1 true\n") {
+				t.Fatalf("second pattern trace/source assertion order: %q", got)
+			}
+		} else if output.Len() != 0 {
+			t.Fatalf("erased second-pattern trace emitted %q", output.String())
+		}
+	} else {
+		paramsMust(t, err)
+	}
 }

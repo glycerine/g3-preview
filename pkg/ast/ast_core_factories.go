@@ -415,18 +415,16 @@ func (m *ASTManager) MkQuantifier(spec ASTQuantifierSpec) (ASTHandle, error) {
 			}
 		}
 	}
-	if ASTSourceDebug && len(spec.Patterns) != 0 {
-		// Source TRACE precedes the pattern assertion and node allocation.
-		// The selected SMT2 printer acquires this manager's lock itself.
-		m.mu.Unlock()
-		traceErr := m.traceQuantifierPatterns(spec.Patterns)
-		m.mu.Lock()
-		if traceErr != nil {
-			return ASTHandle{}, traceErr
-		}
-	}
 	if ASTSourceDebug {
-		for _, h := range spec.Patterns {
+		for i, h := range spec.Patterns {
+			// Source traces each pattern immediately before asserting that one.
+			// The selected SMT2 printer acquires this manager's lock itself.
+			m.mu.Unlock()
+			traceErr := m.traceQuantifierPattern(i, h)
+			m.mu.Lock()
+			if traceErr != nil {
+				return ASTHandle{}, traceErr
+			}
 			r, e := m.requireExpr(h)
 			if e != nil {
 				return ASTHandle{}, e

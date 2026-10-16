@@ -181467,7 +181467,7 @@
           "status": "dead_deleted"
         },
         {
-          "name": "AST mk_quantifier debug-only pattern TRACE at ast.cpp:2358 precedes pattern assertion and node allocation; selected pattern application SMT2 profile",
+          "name": "AST mk_quantifier debug-only pattern TRACE at ast.cpp:2358 precedes each corresponding pattern assertion and node allocation; selected pattern application SMT2 profile",
           "status": "partial",
           "go_target": "pkg/ast/ast_core_quantifier_pattern_trace.go",
           "tests": ["TestASTQuantifierPatternSourceTraceBeforeRegistration"]
@@ -183182,7 +183182,7 @@
           "status": "dead_deleted"
         },
         {
-          "name": "AST mk_quantifier debug-only pattern TRACE at ast.cpp:2358 precedes pattern assertion and node allocation; selected pattern application SMT2 profile",
+          "name": "AST mk_quantifier debug-only pattern TRACE at ast.cpp:2358 precedes each corresponding pattern assertion and node allocation; selected pattern application SMT2 profile",
           "status": "partial",
           "go_target": "pkg/ast/ast_core_quantifier_pattern_trace.go",
           "tests": ["TestASTQuantifierPatternSourceTraceBeforeRegistration"]
