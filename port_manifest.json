@@ -181549,6 +181549,12 @@
           "tests": ["TestASTWellSortedSortMismatchSourceTraceBeforeWarning", "TestASTWellSortedNonBooleanRootTraceProfiles"]
         },
         {
+          "name": "Retained mk_asserted_bug CTRACE on non-Boolean assertion before debug guard (ast.cpp:2627)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_proof_asserted_trace.go",
+          "tests": ["TestASTProofAssertedNonBooleanSourceTraceBeforeDebugGuard"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -183226,6 +183232,12 @@
           "status": "partial",
           "go_target": "pkg/ast/ast_well_sorted_trace.go",
           "tests": ["TestASTWellSortedSortMismatchSourceTraceBeforeWarning", "TestASTWellSortedNonBooleanRootTraceProfiles"]
+        },
+        {
+          "name": "Retained mk_asserted_bug CTRACE on non-Boolean assertion before debug guard (ast.cpp:2627)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_proof_asserted_trace.go",
+          "tests": ["TestASTProofAssertedNonBooleanSourceTraceBeforeDebugGuard"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

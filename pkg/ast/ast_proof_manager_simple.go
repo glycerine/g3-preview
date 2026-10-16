@@ -24,6 +24,22 @@ func (m *ASTManager) MkProofAsserted(h ASTHandle) (ASTHandle, error) {
 		return ASTHandle{}, e
 	}
 	defer m.mu.Unlock()
+	if m.proofAssertedTraceEnabled() {
+		isBool, e := m.proofBool(h)
+		if e != nil {
+			return ASTHandle{}, e
+		}
+		if !isBool {
+			// Source CTRACE precedes the debug-only Boolean assertion. The
+			// SMT2 printer takes this manager's lock itself.
+			m.mu.Unlock()
+			traceErr := m.traceProofAssertedNonBool(h)
+			m.mu.Lock()
+			if traceErr != nil {
+				return ASTHandle{}, traceErr
+			}
+		}
+	}
 	return m.proofGuardedUnary(ASTPrAsserted, h, true)
 }
 func (m *ASTManager) MkProofGoal(h ASTHandle) (ASTHandle, error) {
