@@ -15,6 +15,11 @@ func (m *MultivariatePolynomialManager) gcdEuclid(u, v Polynomial, r *polynomial
 		if !field {
 			return ErrPolynomialAssertion
 		}
+	}
+	if err = m.traceEuclidNonUnivariate(u, v); err != nil {
+		return err
+	}
+	if polynomialSourceDebug {
 		one, e := c.IsUnivariate(u)
 		if e != nil {
 			return e

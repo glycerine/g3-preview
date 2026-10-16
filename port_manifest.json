@@ -43179,6 +43179,12 @@
           ]
         },
         {
+          "name": "Retained euclid_gcd non-univariate mgcd CTRACE before source assertion at polynomial.cpp:3641",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_euclid_trace.go",
+          "tests": ["TestPolynomialEuclidNonUnivariateConditionalSourceTrace"]
+        },
+        {
           "name": "Retained iccp_ZpX content_bug CTRACE with source divisibility condition at polynomial.cpp:4002",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_content_bug_trace.go",
@@ -46047,6 +46053,12 @@
             "TestPolynomialVariableRecognitionLiteralWritePrefixes",
             "TestPolynomialVariableRecognitionBIGEveryActualPrefix"
           ]
+        },
+        {
+          "name": "Retained euclid_gcd non-univariate mgcd CTRACE before source assertion at polynomial.cpp:3641",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_euclid_trace.go",
+          "tests": ["TestPolynomialEuclidNonUnivariateConditionalSourceTrace"]
         },
         {
           "name": "Retained iccp_ZpX content_bug CTRACE with source divisibility condition at polynomial.cpp:4002",
@@ -183460,6 +183472,12 @@
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
         },
         {
+          "name": "Retained euclid_gcd non-univariate mgcd CTRACE before source assertion at polynomial.cpp:3641",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_euclid_trace.go",
+          "tests": ["TestPolynomialEuclidNonUnivariateConditionalSourceTrace"]
+        },
+        {
           "name": "Retained iccp_ZpX content_bug CTRACE with source divisibility condition at polynomial.cpp:4002",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_content_bug_trace.go",
@@ -185729,6 +185747,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
+        },
+        {
+          "name": "Retained euclid_gcd non-univariate mgcd CTRACE before source assertion at polynomial.cpp:3641",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_euclid_trace.go",
+          "tests": ["TestPolynomialEuclidNonUnivariateConditionalSourceTrace"]
         },
         {
           "name": "Retained iccp_ZpX content_bug CTRACE with source divisibility condition at polynomial.cpp:4002",
