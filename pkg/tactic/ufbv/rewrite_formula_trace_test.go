@@ -17,6 +17,48 @@ func (w *refusingUFBVTraceWriter) Write([]byte) (int, error) {
 	return 0, io.ErrClosedPipe
 }
 
+func TestUFBVClassifierSourceTestingTrace(t *testing.T) {
+	m := cacheFixture(t)
+	b, e := m.MkBoolSort()
+	cacheMust(t, e)
+	leftName, e := m.Symbols.Intern("trace_left")
+	cacheMust(t, e)
+	rightName, e := m.Symbols.Intern("trace_right")
+	cacheMust(t, e)
+	left, e := m.MkConst(leftName, b)
+	cacheMust(t, e)
+	right, e := m.MkConst(rightName, b)
+	cacheMust(t, e)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	c := demodulatorClassifier{manager: m, trace: tags}
+	cacheMust(t, c.traceTest(left, right, 2, -1))
+	if output.Len() != 0 {
+		t.Fatal("disabled classifier trace emitted", output.String())
+	}
+	tags.Enable("demodulator")
+	cacheMust(t, c.traceTest(left, right, 2, -1))
+	if !tags.ShouldTrace("demodulator") {
+		if output.Len() != 0 {
+			t.Fatal("erased classifier trace emitted", output.String())
+		}
+		return
+	}
+	want := "-------- [demodulator] is_demodulator src/tactic/ufbv/ufbv_rewriter.cpp:63 ---------\n" +
+		"testing is_demodulator:\ntrace_left\ntrace_right\nsubset: 2, smaller: -1\n" +
+		"------------------------------------------------\n"
+	if got := output.String(); got != want {
+		t.Fatalf("source classifier trace:\ngot  %q\nwant %q", got, want)
+	}
+	refused := &refusingUFBVTraceWriter{}
+	refusedTags := diagnostic.NewTraceTagsWithWriter(refused)
+	refusedTags.Enable("demodulator")
+	cacheMust(t, (demodulatorClassifier{manager: m, trace: refusedTags}).traceTest(left, right, 2, -1))
+	if refusedTags.ShouldTrace("demodulator") && refused.calls != 1 {
+		t.Fatal("classifier stream refusal did not retain its bad state", refused.calls)
+	}
+}
+
 func TestUFBVFormulaSourceBeforePublishedAndAfterTraces(t *testing.T) {
 	m := cacheFixture(t)
 	b, e := m.MkBoolSort()

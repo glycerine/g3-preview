@@ -1,4 +1,4 @@
-// Source: src/tactic/ufbv/ufbv_rewriter.cpp:668,702,706,736,748,753;
+// Source: src/tactic/ufbv/ufbv_rewriter.cpp:63,668,702,706,736,748,753;
 // src/util/trace.h:40-46.
 package ufbv
 
@@ -20,16 +20,20 @@ func (r *formulaProcessor) formulaTraceTags() *diagnostic.TraceTags {
 }
 
 func (r *formulaProcessor) traceFormulaText(h ast.ASTHandle) (body string, result error) {
-	format, e := r.manager.SMT2PPExprTree(h, nil)
+	return formulaTraceText(r.manager, h)
+}
+
+func formulaTraceText(manager *ast.ASTManager, h ast.ASTHandle) (body string, result error) {
+	format, e := manager.SMT2PPExprTree(h, nil)
 	if e != nil {
 		return "", e
 	}
-	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: r.manager.Budget()})
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: manager.Budget()})
 	if e != nil {
 		return "", e
 	}
 	defer func() { result = errors.Join(result, out.Close()) }()
-	if e := r.manager.PrintFormat(out, format, nil, nil, nil); e != nil {
+	if e := manager.PrintFormat(out, format, nil, nil, nil); e != nil {
 		return "", e
 	}
 	return out.String()

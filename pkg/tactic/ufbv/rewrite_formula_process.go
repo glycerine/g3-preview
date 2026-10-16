@@ -167,7 +167,7 @@ func (r *formulaProcessor) processLast() (result error) {
 	if e := r.assertRewrittenFixedPoint(rewritten); e != nil {
 		return e
 	}
-	c := demodulatorClassifier{manager: m}
+	c := demodulatorClassifier{manager: m, trace: r.formulaTraceTags()}
 	large, small, demodulator, e := c.classify(rewritten)
 	if e != nil {
 		return e

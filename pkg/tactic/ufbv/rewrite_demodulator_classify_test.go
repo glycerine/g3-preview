@@ -1,9 +1,12 @@
 package ufbv
 
 import (
+	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -47,7 +50,10 @@ func TestUFBVDemodulatorClassificationOrderingAndBooleanForms(t *testing.T) {
 	pin(y)
 	f, g, h := decl(101, 1), decl(102, 1), decl(103, 2)
 	fx, gx := app(f, x), app(g, x)
-	c := demodulatorClassifier{manager: m}
+	var trace bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&trace)
+	tags.Enable("demodulator")
+	c := demodulatorClassifier{manager: m, trace: tags}
 	for _, tc := range []struct {
 		left, right ast.ASTHandle
 		want        int
@@ -132,5 +138,8 @@ func TestUFBVDemodulatorClassificationOrderingAndBooleanForms(t *testing.T) {
 			cacheMust(t, m.DelRef(&small))
 			cacheMust(t, m.DelRef(&large))
 		})
+	}
+	if tags.ShouldTrace("demodulator") && !strings.Contains(trace.String(), "is_demodulator src/tactic/ufbv/ufbv_rewriter.cpp:63 ---------\n") {
+		t.Fatal("source equality classifier did not reach testing trace", trace.String())
 	}
 }

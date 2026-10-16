@@ -108715,6 +108715,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained UFBV equality-classifier TRACE at ufbv_rewriter.cpp:63",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_demodulator_classify.go",
+          "tests": ["TestUFBVClassifierSourceTestingTrace", "TestUFBVDemodulatorClassificationOrderingAndBooleanForms"]
+        },
+        {
           "name": "Retained UFBV found-demodulator long and compact TRACE at ufbv_rewriter.cpp:702,706",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_formula_trace.go",
@@ -182193,6 +182199,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained UFBV equality-classifier TRACE at ufbv_rewriter.cpp:63",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_demodulator_classify.go",
+          "tests": ["TestUFBVClassifierSourceTestingTrace", "TestUFBVDemodulatorClassificationOrderingAndBooleanForms"]
+        },
+        {
           "name": "Retained UFBV found-demodulator long and compact TRACE at ufbv_rewriter.cpp:702,706",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_formula_trace.go",
@@ -184550,6 +184562,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained UFBV equality-classifier TRACE at ufbv_rewriter.cpp:63",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_demodulator_classify.go",
+          "tests": ["TestUFBVClassifierSourceTestingTrace", "TestUFBVDemodulatorClassificationOrderingAndBooleanForms"]
+        },
         {
           "name": "Retained UFBV found-demodulator long and compact TRACE at ufbv_rewriter.cpp:702,706",
           "status": "ported",

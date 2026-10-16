@@ -3,13 +3,48 @@ package ufbv
 
 import (
 	"errors"
+	"io"
+	"strconv"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 // demodulatorClassifier is the concrete default UFBV term ordering. Its
 // temporary variable sets are native Go maps, keyed by de Bruijn index.
-type demodulatorClassifier struct{ manager *ast.ASTManager }
+type demodulatorClassifier struct {
+	manager *ast.ASTManager
+	trace   *diagnostic.TraceTags
+}
+
+func (c demodulatorClassifier) traceTest(lhs, rhs ast.ASTHandle, subset, smaller int) error {
+	tags := c.trace
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	if !tags.ShouldTrace("demodulator") {
+		return nil
+	}
+	var operandErr error
+	_ = tags.EmitConditional("demodulator", "is_demodulator", "src/tactic/ufbv/ufbv_rewriter.cpp", 63,
+		func() bool { return true }, func(w io.Writer) error {
+			_, _ = io.WriteString(w, "testing is_demodulator:\n")
+			left, e := formulaTraceText(c.manager, lhs)
+			if e != nil {
+				operandErr = e
+				return e
+			}
+			_, _ = io.WriteString(w, left+"\n")
+			right, e := formulaTraceText(c.manager, rhs)
+			if e != nil {
+				operandErr = e
+				return e
+			}
+			_, _ = io.WriteString(w, right+"\nsubset: "+strconv.Itoa(subset)+", smaller: "+strconv.Itoa(smaller)+"\n")
+			return nil
+		})
+	return operandErr
+}
 
 func (c demodulatorClassifier) uninterpreted(expr ast.ASTHandle) (bool, error) {
 	kind, e := c.manager.GetKind(expr)
@@ -276,6 +311,9 @@ func (c demodulatorClassifier) classify(q ast.ASTHandle) (large, small ast.ASTRe
 				}
 				smaller, e := c.smaller(lhs, rhs)
 				if e != nil {
+					return large, small, false, e
+				}
+				if e := c.traceTest(lhs, rhs, subset, smaller); e != nil {
 					return large, small, false, e
 				}
 				if (subset == 1 || subset == 2) && smaller == 1 {
