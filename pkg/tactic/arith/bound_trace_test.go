@@ -180,3 +180,59 @@ func TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds(t *testing.
 		t.Fatal("established conflict emitted a second check_feasibility TRACE")
 	}
 }
+
+func TestBoundPropagationTraceVariableAndEquationSourceOrder(t *testing.T) {
+	m, _ := equationManager(t)
+	s, err := NewBoundEquationStore(m)
+	equationMust(t, err)
+	defer func() { equationMust(t, s.Close()) }()
+	equationMust(t, s.MkVar(0, true))
+	equationMust(t, s.MkVar(1, true))
+	coeff := []numeral.Int{numeral.NewInt(1), numeral.NewInt(1)}
+	index, err := s.MkIntEquation(coeff, []uint32{0, 1})
+	equationMust(t, err)
+	for i := range coeff {
+		equationMust(t, m.Integers().Del(&coeff[i]))
+	}
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("bound_propagator_detail")
+	equationMust(t, s.BindTrace(tags))
+	_, err = s.propagateEquation(index)
+	equationMust(t, err)
+	if !tags.ShouldTrace("bound_propagator_detail") {
+		if output.Len() != 0 {
+			t.Fatal("erased propagation TRACE wrote output", output.String())
+		}
+		return
+	}
+	equationRecord := "-------- [bound_propagator_detail] propagate_eq src/tactic/arith/bound_propagator.cpp:523 ---------\n" +
+		"propagating using eq: 1*x0 + 1*x1 = 0\n" +
+		"------------------------------------------------\n"
+	if got := output.String(); got != equationRecord {
+		t.Fatalf("equation propagation TRACE\n got: %q\nwant: %q", got, equationRecord)
+	}
+	tags.Disable("bound_propagator_detail")
+	value := numeral.NewRational()
+	defer func() { equationMust(t, m.Del(&value)) }()
+	equationMust(t, m.SetInt32(&value, 2))
+	_, err = s.AssertLower(0, &value, false)
+	equationMust(t, err)
+	tags.Enable("bound_propagator_detail")
+	before := output.Len()
+	equationMust(t, s.Propagate())
+	got := output.String()[before:]
+	variableRecord := "-------- [bound_propagator_detail] propagate src/tactic/arith/bound_propagator.cpp:473 ---------\n" +
+		"propagating x0\n" +
+		"------------------------------------------------\n"
+	if !strings.HasPrefix(got, variableRecord+equationRecord) {
+		t.Fatalf("variable/equation propagation TRACE order: %q", got)
+	}
+	before = output.Len()
+	equationMust(t, s.DelVar(0))
+	_, err = s.propagateEquation(index)
+	equationMust(t, err)
+	if output.Len() != before {
+		t.Fatal("dead constraint emitted equation TRACE")
+	}
+}

@@ -99403,7 +99403,8 @@
         "TestBoundEquationDisplaySourceOrderDeadConstraintAndWriterError",
         "TestBoundAssertionSourceTraceAndFalseAlarmOrder",
         "TestBoundRelevanceSourceTraceOldValueAndSmallImprovement",
-        "TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds"
+        "TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds",
+        "TestBoundPropagationTraceVariableAndEquationSourceOrder"
       ],
       "conditionals": [
         {
@@ -99567,6 +99568,12 @@
           "status": "ported",
           "go_target": "pkg/tactic/arith/bound_trace.go",
           "tests": ["TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds"]
+        },
+        {
+          "name": "Selected propagate trail-variable and live-equation TRACE before queue advance and approximate scan; dead constraints are silent (bound_propagator.cpp:473,523)",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_trace.go",
+          "tests": ["TestBoundPropagationTraceVariableAndEquationSourceOrder"]
         }
       ],
       "ownership": [
@@ -179942,7 +179949,8 @@
         "TestASTQuantifierPatternSourceTraceBeforeRegistration",
         "TestBoundAssertionSourceTraceAndFalseAlarmOrder",
         "TestBoundRelevanceSourceTraceOldValueAndSmallImprovement",
-        "TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds"
+        "TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds",
+        "TestBoundPropagationTraceVariableAndEquationSourceOrder"
       ],
       "conditionals": [
         {
@@ -181396,6 +181404,12 @@
           "status": "ported",
           "go_target": "pkg/tactic/arith/bound_trace.go",
           "tests": ["TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds"]
+        },
+        {
+          "name": "Retained bound_propagator propagation-variable and live-equation TRACE records with source-order display and stream state",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_trace.go",
+          "tests": ["TestBoundPropagationTraceVariableAndEquationSourceOrder"]
         }
       ],
       "ownership": [
@@ -181568,7 +181582,8 @@
         "TestASTQuantifierPatternSourceTraceBeforeRegistration",
         "TestBoundAssertionSourceTraceAndFalseAlarmOrder",
         "TestBoundRelevanceSourceTraceOldValueAndSmallImprovement",
-        "TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds"
+        "TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds",
+        "TestBoundPropagationTraceVariableAndEquationSourceOrder"
       ],
       "conditionals": [
         {
@@ -183022,6 +183037,12 @@
           "status": "ported",
           "go_target": "pkg/tactic/arith/bound_trace.go",
           "tests": ["TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds"]
+        },
+        {
+          "name": "Retained propagate and propagate_eq TRACE macro call sites, including dead-constraint and tag gates",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_trace.go",
+          "tests": ["TestBoundPropagationTraceVariableAndEquationSourceOrder"]
         }
       ],
       "ownership": [

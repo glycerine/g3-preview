@@ -109,6 +109,7 @@ func (s *BoundEquationStore) propagateEquation(index uint32) (bool, error) {
 		return false, nil
 	}
 	eq := c.eq
+	s.tracePropagatingEquation(eq)
 	llPosition, uuPosition := -1, -1
 	llFailed, uuFailed := false, false
 	ll, uu := 0.0, 0.0
@@ -223,10 +224,12 @@ func (s *BoundEquationStore) Propagate() (err error) {
 		if event.lower {
 			b = v.lower
 		}
-		s.qhead++
 		if b == nil {
+			s.qhead++
 			continue
 		}
+		s.tracePropagatingVariable(event.x)
+		s.qhead++
 		for _, index := range v.watches {
 			c := &s.constraints[index]
 			if b.timestamp < c.timestamp {

@@ -1,4 +1,4 @@
-// Source: src/tactic/arith/bound_propagator.cpp:279-305,331-357,382-411,457.
+// Source: src/tactic/arith/bound_propagator.cpp:279-305,331-357,382-411,457,473,523.
 package arith
 
 import (
@@ -133,5 +133,31 @@ func (s *BoundEquationStore) traceBoundConflict(x uint32) {
 				return err
 			}
 			return s.Display(w)
+		})
+}
+
+func (s *BoundEquationStore) tracePropagatingVariable(x uint32) {
+	if !s.boundTraceTags().ShouldTrace("bound_propagator_detail") {
+		return
+	}
+	s.emitBoundTrace("bound_propagator_detail", "propagate", 473,
+		"propagating x"+strconv.FormatUint(uint64(x), 10)+"\n")
+}
+
+func (s *BoundEquationStore) tracePropagatingEquation(eq *LinearEquation) {
+	tags := s.boundTraceTags()
+	if !tags.ShouldTrace("bound_propagator_detail") {
+		return
+	}
+	_ = tags.EmitConditional("bound_propagator_detail", "propagate_eq", "src/tactic/arith/bound_propagator.cpp", 523,
+		func() bool { return true }, func(w io.Writer) error {
+			if _, err := io.WriteString(w, "propagating using eq: "); err != nil {
+				return err
+			}
+			if err := s.equations.Display(w, eq); err != nil {
+				return err
+			}
+			_, err := io.WriteString(w, "\n")
+			return err
 		})
 }
