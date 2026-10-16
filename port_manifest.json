@@ -74641,7 +74641,7 @@
         },
         {
           "name": "Retained cleanup_watches cleanup_bug TRACE at cpp48 for each unassigned list and cpp61 for each visited binary watch, including source keeping record on drop",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/sat/sat_cleaner_watch_trace.go",
           "tests": ["TestSATCleanerWatchSourceTracesKeepAndDrop"]
         },
@@ -74654,7 +74654,7 @@
         },
         {
           "name": "Retained cleanup_clauses TRACE/CTRACE sites cpp86,88,108,117,137 with pre-clean clause values, frozen condition, compacted prefix, small-clause diagnostic and binary-conversion order",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/sat/sat_cleaner_clause_trace.go",
           "tests": ["TestSATCleanerClauseSourceTraceStages"]
         },
@@ -74730,7 +74730,7 @@
         },
         {
           "name": "Retained cleanup_watches cleanup_bug TRACE at cpp48 for each unassigned list and cpp61 for each visited binary watch, including source keeping record on drop",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/sat/sat_cleaner_watch_trace.go",
           "tests": ["TestSATCleanerWatchSourceTracesKeepAndDrop"]
         },
@@ -74743,7 +74743,7 @@
         },
         {
           "name": "Retained cleanup_clauses TRACE/CTRACE sites cpp86,88,108,117,137 with pre-clean clause values, frozen condition, compacted prefix, small-clause diagnostic and binary-conversion order",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/sat/sat_cleaner_clause_trace.go",
           "tests": ["TestSATCleanerClauseSourceTraceStages"]
         },
@@ -183143,13 +183143,13 @@
         },
         {
           "name": "Retained cleanup_watches cleanup_bug TRACE at cpp48 for each unassigned list and cpp61 for each visited binary watch, including source keeping record on drop",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/sat/sat_cleaner_watch_trace.go",
           "tests": ["TestSATCleanerWatchSourceTracesKeepAndDrop"]
         },
         {
           "name": "Retained cleanup_clauses TRACE/CTRACE sites cpp86,88,108,117,137 with pre-clean clause values, frozen condition, compacted prefix, small-clause diagnostic and binary-conversion order",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/sat/sat_cleaner_clause_trace.go",
           "tests": ["TestSATCleanerClauseSourceTraceStages"]
         },
@@ -185312,13 +185312,13 @@
         },
         {
           "name": "Retained cleanup_watches cleanup_bug TRACE at cpp48 for each unassigned list and cpp61 for each visited binary watch, including source keeping record on drop",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/sat/sat_cleaner_watch_trace.go",
           "tests": ["TestSATCleanerWatchSourceTracesKeepAndDrop"]
         },
         {
           "name": "Retained cleanup_clauses TRACE/CTRACE sites cpp86,88,108,117,137 with pre-clean clause values, frozen condition, compacted prefix, small-clause diagnostic and binary-conversion order",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/sat/sat_cleaner_clause_trace.go",
           "tests": ["TestSATCleanerClauseSourceTraceStages"]
         },
