@@ -1,4 +1,4 @@
-// Source: src/sat/sat_simplifier.cpp:1296,1302,1315; retained util/trace sites.
+// Source: src/sat/sat_simplifier.cpp:1296-1375; retained util/trace sites.
 package sat
 
 import (
@@ -29,6 +29,38 @@ func (s *satSimplifier) traceEliminationOccurrences(v BoolVar, pos, neg uint32) 
 		_, err := io.WriteString(w, strconv.FormatUint(uint64(v), 10)+
 			" num_pos: "+strconv.FormatUint(uint64(pos), 10)+
 			" neg_pos: "+strconv.FormatUint(uint64(neg), 10)+"\n")
+		return err
+	})
+}
+
+func (s *satSimplifier) traceEliminationBeforeLiterals(v BoolVar, pos, neg, before uint32) {
+	s.traceElimination("resolution", "try_eliminate", 1338, func(w io.Writer) error {
+		_, err := io.WriteString(w, strconv.FormatUint(uint64(v), 10)+
+			" num_pos: "+strconv.FormatUint(uint64(pos), 10)+
+			" neg_pos: "+strconv.FormatUint(uint64(neg), 10)+
+			" before_lits: "+strconv.FormatUint(uint64(before), 10)+"\n")
+		return err
+	})
+}
+
+func (s *satSimplifier) traceEliminationCollecting() {
+	s.traceElimination("resolution_detail", "try_eliminate", 1354, func(w io.Writer) error {
+		_, err := io.WriteString(w, "collecting number of after_clauses\n")
+		return err
+	})
+}
+
+func (s *satSimplifier) traceEliminationTooMany(after uint32) {
+	s.traceElimination("resolution", "try_eliminate", 1369, func(w io.Writer) error {
+		_, err := io.WriteString(w, "too many after clauses: "+strconv.FormatUint(uint64(after), 10)+"\n")
+		return err
+	})
+}
+
+func (s *satSimplifier) traceEliminationFound(before, after uint32) {
+	s.traceElimination("resolution", "try_eliminate", 1375, func(w io.Writer) error {
+		_, err := io.WriteString(w, "found var to eliminate, before: "+strconv.FormatUint(uint64(before), 10)+
+			" after: "+strconv.FormatUint(uint64(after), 10)+"\n")
 		return err
 	})
 }

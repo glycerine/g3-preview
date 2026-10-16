@@ -523,6 +523,7 @@ func (s *satSimplifier) tryEliminate(v BoolVar) (bool, error) {
 		return false, e
 	}
 	before += n
+	s.traceEliminationBeforeLiterals(v, np, nn, before)
 	if np >= s.occRanges[2] && nn >= s.occRanges[2] && before > s.litRanges[2] && uint32(len(s.lifecycle.Original)) > s.clsCutoffs[1] {
 		return false, nil
 	}
@@ -544,6 +545,7 @@ func (s *satSimplifier) tryEliminate(v BoolVar) (bool, error) {
 	if e = s.collectClauses(neg, s.negCls); e != nil {
 		return false, e
 	}
+	s.traceEliminationCollecting()
 	after := uint32(0)
 	pc, nc := s.posCls.Size(), s.negCls.Size()
 	for i := uint32(0); i < pc; i++ {
@@ -566,11 +568,13 @@ func (s *satSimplifier) tryEliminate(v BoolVar) (bool, error) {
 			if ok {
 				after++
 				if after > np+nn {
+					s.traceEliminationTooMany(after)
 					return false, nil
 				}
 			}
 		}
 	}
+	s.traceEliminationFound(np+nn, after)
 	s.kernel.elimCounter -= int32(np*nn + before)
 	mc, e := p.converter.Mk(satModelElimVar, v)
 	if e != nil {
