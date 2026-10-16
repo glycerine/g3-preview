@@ -12,6 +12,7 @@ import (
 	"github.com/glycerine/g3/pkg/sat"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/insdict"
 )
@@ -35,6 +36,7 @@ type GoalTranslator struct {
 	// Borrow the AST manager's original resource limit for translation checkpoints.
 	Limit                                     *control.Reslimit
 	cooperation                               *cooperate.Cooperation
+	traceTags                                 *diagnostic.TraceTags
 	cache                                     map[ast.ASTHandle]uint32
 	Atoms                                     insdict.Dict[ast.ASTHandle, uint32]
 	interfaces                                map[ast.ASTHandle]bool
@@ -392,6 +394,9 @@ func (tr *GoalTranslator) process(h ast.ASTHandle) error {
 		}
 		i := len(tr.frames) - 1
 		fr := tr.frames[i]
+		if e = tr.traceGoalResultStack(396, "result stack\n", fr); e != nil {
+			return e
+		}
 		if fr.index == 0 {
 			if found, e := tr.cached(fr.term, fr.root, fr.sign); found || e != nil {
 				if e != nil {
@@ -438,6 +443,9 @@ func (tr *GoalTranslator) process(h ast.ASTHandle) error {
 		}
 		if descended {
 			continue
+		}
+		if e = tr.traceGoalResultStack(415, "converting\n", fr); e != nil {
+			return e
 		}
 		if e = tr.convert(fr, op, int(n)); e != nil {
 			return e

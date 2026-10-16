@@ -81781,6 +81781,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/sat/tactic/sat_goal_to_sat_trace.go",
         "pkg/sat/tactic/sat_goal_recovery.go",
         "pkg/sat/tactic/sat_goal_to_sat.go",
         "pkg/sat/tactic/sat_goal_interface.go",
@@ -81788,6 +81789,7 @@
         "pkg/ast/ast_resource_limit_test.go"
       ],
       "tests": [
+        "TestSATGoalTranslatorResultStackSourceTrace",
         "TestSATGoalInverseLiteralOwnership",
         "TestSATGoalRecoveryIndependentBinaryTruthTables",
         "TestSATGoalRecoveryFreshUnitsLearnedAndCheckpoints",
@@ -81897,6 +81899,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained imp::process goal2sat_bug result-stack and converting TRACE checkpoints (cpp396,415)",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+          "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
+        },
         {
           "name": "goal2sat::imp::updt_params max_memory conversion through util.h megabytes_to_bytes (cpp80-82)",
           "status": "ported",
@@ -180991,6 +180999,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/sat/tactic/sat_goal_to_sat_trace.go",
         "pkg/ast/ast_bv_recognizers_trace.go",
         "pkg/tactic/ufbv/rewrite_tactic_trace.go",
         "pkg/ast/ast_smt2_alias_trace.go",
@@ -181086,6 +181095,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestSATGoalTranslatorResultStackSourceTrace",
         "TestASTBitVectorAllOneSourceTrace",
         "TestUFBVRewriterPublishedGoalSourceTraceAndFormatterRefusal",
         "TestASTSMT2AliasSourceTraceFormatterRefusalKeepsPrefix",
@@ -182832,6 +182842,12 @@
           "tests": ["TestASTBitVectorAllOneSourceTrace"]
         },
         {
+          "name": "Retained goal2sat::imp::process result-stack and converting TRACE checkpoints (goal2sat.cpp:396,415)",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+          "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -183071,6 +183087,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/sat/tactic/sat_goal_to_sat_trace.go",
         "pkg/ast/ast_bv_recognizers_trace.go",
         "pkg/tactic/ufbv/rewrite_tactic_trace.go",
         "pkg/ast/ast_smt2_alias_trace.go",
@@ -183164,6 +183181,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestSATGoalTranslatorResultStackSourceTrace",
         "TestASTBitVectorAllOneSourceTrace",
         "TestUFBVRewriterPublishedGoalSourceTraceAndFormatterRefusal",
         "TestASTSMT2AliasSourceTraceFormatterRefusalKeepsPrefix",
@@ -184906,6 +184924,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_bv_recognizers_trace.go",
           "tests": ["TestASTBitVectorAllOneSourceTrace"]
+        },
+        {
+          "name": "Retained goal2sat::imp::process result-stack and converting TRACE checkpoints (goal2sat.cpp:396,415)",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+          "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
