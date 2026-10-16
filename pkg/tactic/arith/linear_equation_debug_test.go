@@ -1,6 +1,7 @@
 package arith
 
 import (
+	"bytes"
 	"errors"
 	"testing"
 
@@ -87,5 +88,48 @@ func TestLinearEquationNormalizedSourceDuplicateDebugGuard(t *testing.T) {
 	equationMust(t, l.assertUniqueNormalizedEquationVars([]uint32{2, 2}))
 	if !l.mark[2] {
 		t.Fatal("disabled DEBUG_CODE cleared the source partial mark")
+	}
+}
+
+func TestLinearEquationCombineZeroMultiplierSourceAssertionProfile(t *testing.T) {
+	debug := equationSourceDebugFixture(t)
+	m, l := equationManager(t)
+	as := []numeral.Int{numeral.NewInt(2), numeral.NewInt(3)}
+	defer func() {
+		for i := range as {
+			equationMust(t, m.Integers().Del(&as[i]))
+		}
+	}()
+	eq, err := l.MkInt(as, []uint32{0, 1}, true)
+	equationMust(t, err)
+	defer func() { equationMust(t, eq.Close()) }()
+	zero, one := numeral.NewInt(0), numeral.NewInt(1)
+	defer func() {
+		equationMust(t, m.Integers().Del(&one))
+		equationMust(t, m.Integers().Del(&zero))
+	}()
+	if diagnostic.DebugBuild {
+		for _, pair := range [][2]*numeral.Int{{&zero, &one}, {&one, &zero}} {
+			result, e := l.Combine(pair[0], eq, pair[1], eq)
+			if !errors.Is(e, diagnostic.ErrDebugAssertion) || result != nil {
+				t.Fatalf("zero multiplier assertion: result=%v err=%v", result, e)
+			}
+		}
+		equationMust(t, debug.EnableAssertions(false))
+	}
+	for _, pair := range [][2]*numeral.Int{{&zero, &one}, {&one, &zero}} {
+		result, e := l.Combine(pair[0], eq, pair[1], eq)
+		equationMust(t, e)
+		var output bytes.Buffer
+		equationMust(t, l.Display(&output, result))
+		if output.String() != "2*x0 + 3*x1 = 0" {
+			t.Fatalf("release zero multiplier result %q", output.String())
+		}
+		equationMust(t, result.Close())
+	}
+	result, err := l.Combine(&zero, eq, &zero, eq)
+	equationMust(t, err)
+	if result != nil {
+		t.Fatal("two zero multipliers should cancel every shared term")
 	}
 }

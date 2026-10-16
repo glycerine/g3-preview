@@ -289,19 +289,16 @@ func (l *LinearEquationManager) Combine(b1 *numeral.Int, eq1 *LinearEquation, b2
 	if eq1 == nil || eq2 == nil || eq1.closed || eq2.closed || eq1.manager != l.manager || eq2.manager != l.manager {
 		return nil, arena.ErrInvalidSlot
 	}
-	z := l.manager.Integers()
-	for _, b := range []*numeral.Int{b1, b2} {
-		if b == nil {
-			return nil, arena.ErrInvalidSlot
-		}
-		zero, e := z.IsZero(b)
-		if e != nil {
-			return nil, e
-		}
-		if zero {
-			return nil, arena.ErrInvalidSlot
-		}
+	if b1 == nil || b2 == nil {
+		return nil, arena.ErrInvalidSlot
 	}
+	if err = l.assertNonzeroEquationMultiplier(b1, 209, "!m.is_zero(b1)"); err != nil {
+		return nil, err
+	}
+	if err = l.assertNonzeroEquationMultiplier(b2, 210, "!m.is_zero(b2)"); err != nil {
+		return nil, err
+	}
+	z := l.manager.Integers()
 	if err = l.intBuffer.Reset(); err != nil {
 		return nil, err
 	}

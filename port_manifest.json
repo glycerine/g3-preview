@@ -100785,7 +100785,8 @@
         "TestLinearEquationRationalDenominatorClearingAndCombination",
         "TestLinearEquationSourceConstructionTrace",
         "TestLinearEquationCoreSourceSortedDebugGuard",
-        "TestLinearEquationNormalizedSourceDuplicateDebugGuard"
+        "TestLinearEquationNormalizedSourceDuplicateDebugGuard",
+        "TestLinearEquationCombineZeroMultiplierSourceAssertionProfile"
       ],
       "assertions": [
         {
@@ -100870,6 +100871,14 @@
           "go_target": "pkg/tactic/arith/linear_equation_debug.go",
           "tests": [
             "TestLinearEquationNormalizedSourceDuplicateDebugGuard"
+          ]
+        },
+        {
+          "name": "Combine nonzero-multiplier SASSERTs at lines 209-210, with release continuation through zero and cancellation",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/linear_equation_debug.go",
+          "tests": [
+            "TestLinearEquationCombineZeroMultiplierSourceAssertionProfile"
           ]
         }
       ],
@@ -121700,7 +121709,8 @@
         "TestDebugInteractiveInputMustStartTiedToItsOwnStdout",
         "TestNumericCharInputClosedTieFailsAtReachedFlush",
         "TestLinearEquationCoreSourceSortedDebugGuard",
-        "TestLinearEquationNormalizedSourceDuplicateDebugGuard"
+        "TestLinearEquationNormalizedSourceDuplicateDebugGuard",
+        "TestLinearEquationCombineZeroMultiplierSourceAssertionProfile"
       ],
       "conditionals": [
         {
@@ -121825,6 +121835,14 @@
           "tests": [
             "TestLinearEquationNormalizedSourceDuplicateDebugGuard"
           ]
+        },
+        {
+          "name": "Retained equation-combination zero-multiplier assertions route through the process debug action only when enabled",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/linear_equation_debug.go",
+          "tests": [
+            "TestLinearEquationCombineZeroMultiplierSourceAssertionProfile"
+          ]
         }
       ],
       "ownership": [
@@ -121937,7 +121955,8 @@
         "TestDebugMacroCassertLiteralTagShortCircuitAndUninitializedCondition",
         "TestDebugMacroVerifyConditionIsNotErasedByAssertionSwitch",
         "TestLinearEquationCoreSourceSortedDebugGuard",
-        "TestLinearEquationNormalizedSourceDuplicateDebugGuard"
+        "TestLinearEquationNormalizedSourceDuplicateDebugGuard",
+        "TestLinearEquationCombineZeroMultiplierSourceAssertionProfile"
       ],
       "conditionals": [
         {
@@ -122170,6 +122189,14 @@
           "go_target": "pkg/tactic/arith/linear_equation_debug.go",
           "tests": [
             "TestLinearEquationNormalizedSourceDuplicateDebugGuard"
+          ]
+        },
+        {
+          "name": "Retained equation-combination SASSERT gates for b1 and b2 before buffer reset",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/linear_equation_debug.go",
+          "tests": [
+            "TestLinearEquationCombineZeroMultiplierSourceAssertionProfile"
           ]
         }
       ],

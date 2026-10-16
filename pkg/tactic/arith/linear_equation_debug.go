@@ -4,7 +4,23 @@ package arith
 import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	"github.com/glycerine/g3/pkg/util/numeral"
 )
+
+// The two combine preconditions are source SASSERTs, so a release build
+// proceeds with a zero multiplier instead of rejecting the call.
+func (l *LinearEquationManager) assertNonzeroEquationMultiplier(b *numeral.Int, line int32, condition string) error {
+	d := diagnostic.BorrowProcessDebugContext()
+	on, err := diagnostic.SourceAssertionsEnabled(d)
+	if err != nil || !on {
+		return err
+	}
+	zero, err := l.manager.Integers().IsZero(b)
+	if err != nil || !zero {
+		return err
+	}
+	return diagnostic.DebugAssertionFailure(d, "src/tactic/arith/linear_equation.cpp", line, condition)
+}
 
 // The normalized constructor's DEBUG_CODE marks each input variable before
 // sorting. If an assertion action aborts, earlier marks remain as in source.
