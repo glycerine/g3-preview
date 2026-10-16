@@ -43179,6 +43179,18 @@
           ]
         },
         {
+          "name": "Retained polynomial skeleton grouped-power TRACE at polynomial.cpp:3012",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_skeleton_trace.go",
+          "tests": ["TestPolynomialSkeletonSourceTraceOfGroupedPowers"]
+        },
+        {
+          "name": "Retained sparse interpolator equation and system TRACE at polynomial.cpp:3157,3164",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_sparse_trace.go",
+          "tests": ["TestPolynomialSparseInterpolationSourceTraceSequence"]
+        },
+        {
           "name": "Retained Newton interpolator add/mk TRACE at polynomial.cpp:2833,2851,2871,2890,2896,2901",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_newton_trace.go",
@@ -45981,6 +45993,18 @@
             "TestPolynomialVariableRecognitionLiteralWritePrefixes",
             "TestPolynomialVariableRecognitionBIGEveryActualPrefix"
           ]
+        },
+        {
+          "name": "Retained polynomial skeleton grouped-power TRACE at polynomial.cpp:3012",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_skeleton_trace.go",
+          "tests": ["TestPolynomialSkeletonSourceTraceOfGroupedPowers"]
+        },
+        {
+          "name": "Retained sparse interpolator equation and system TRACE at polynomial.cpp:3157,3164",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_sparse_trace.go",
+          "tests": ["TestPolynomialSparseInterpolationSourceTraceSequence"]
         },
         {
           "name": "Retained Newton interpolator add/mk TRACE at polynomial.cpp:2833,2851,2871,2890,2896,2901",
@@ -183328,6 +183352,18 @@
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
         },
         {
+          "name": "Retained polynomial skeleton grouped-power TRACE at polynomial.cpp:3012",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_skeleton_trace.go",
+          "tests": ["TestPolynomialSkeletonSourceTraceOfGroupedPowers"]
+        },
+        {
+          "name": "Retained sparse interpolator equation and system TRACE at polynomial.cpp:3157,3164",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_sparse_trace.go",
+          "tests": ["TestPolynomialSparseInterpolationSourceTraceSequence"]
+        },
+        {
           "name": "Retained Newton interpolator add/mk TRACE at polynomial.cpp:2833,2851,2871,2890,2896,2901",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_newton_trace.go",
@@ -185531,6 +185567,18 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
+        },
+        {
+          "name": "Retained polynomial skeleton grouped-power TRACE at polynomial.cpp:3012",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_skeleton_trace.go",
+          "tests": ["TestPolynomialSkeletonSourceTraceOfGroupedPowers"]
+        },
+        {
+          "name": "Retained sparse interpolator equation and system TRACE at polynomial.cpp:3157,3164",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_sparse_trace.go",
+          "tests": ["TestPolynomialSparseInterpolationSourceTraceSequence"]
         },
         {
           "name": "Retained Newton interpolator add/mk TRACE at polynomial.cpp:2833,2851,2871,2890,2896,2901",

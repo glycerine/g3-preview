@@ -20,6 +20,10 @@ func (s *polynomialTraceSink) WriteLiteral(value string) error {
 	}
 	return nil
 }
+func (s *polynomialTraceSink) Write(value []byte) (int, error) {
+	_ = s.WriteLiteral(string(value))
+	return len(value), nil
+}
 func (s *polynomialTraceSink) WriteUnsigned(value uint32) error {
 	return s.WriteLiteral(strconv.FormatUint(uint64(value), 10))
 }

@@ -122,6 +122,9 @@ func NewPolynomialSkeleton(m *MultivariatePolynomialCore, p Polynomial, x uint32
 		s.originals = append(s.originals, orig)
 		s.powers = append(s.powers, k)
 	}
+	if e := s.traceConstruction(p); e != nil {
+		return fail(e)
+	}
 	if polynomialSourceDebug {
 		for i := 1; i < len(s.entries); i++ {
 			v, e := m.monomials.Lex(s.entries[i-1].Monomial, s.entries[i].Monomial)

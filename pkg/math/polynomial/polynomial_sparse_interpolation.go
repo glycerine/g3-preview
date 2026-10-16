@@ -250,6 +250,9 @@ func (s *PolynomialSparseInterpolator) Interpolate(out *PolynomialRef) (ok bool,
 				return false, arena.ErrBounds
 			}
 			b := s.outputs[outputIndex]
+			if e = s.traceEquation(*cs); e != nil {
+				return false, e
+			}
 			before, x := s.numericBefore()
 			if x != nil {
 				return false, x
@@ -259,6 +262,9 @@ func (s *PolynomialSparseInterpolator) Interpolate(out *PolynomialRef) (ok bool,
 			if e != nil {
 				return false, e
 			}
+		}
+		if e = s.traceSystem(entry, &f.solver); e != nil {
+			return false, e
 		}
 		before, x := s.numericBefore()
 		if x != nil {
