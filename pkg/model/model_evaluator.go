@@ -478,7 +478,14 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 		if e = m.SetRef(out, value); e != nil {
 			return rewriter.RewriteFailed, e
 		}
-		return c.evaluateReducedApp(rewriter.RewriteDone, out)
+		final, e := c.evaluateReducedApp(rewriter.RewriteDone, out)
+		if e != nil || final == rewriter.Rewrite1 {
+			return final, e
+		}
+		if e = c.traceReduceStatus(final, out); e != nil {
+			return rewriter.RewriteFailed, e
+		}
+		return final, nil
 	}
 	// The original arithmetic/BV reducers leave their unspecified symbols at
 	// BR_FAILED, then invoke the existing partial-theory interpretation path.

@@ -6,6 +6,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
 // Source: src/model/model_evaluator.cpp:149-202,566. Successful Boolean
@@ -44,5 +45,42 @@ func TestModelEvaluatorBooleanReductionSourceStatusTrace(t *testing.T) {
 		"------------------------------------------------\n"
 	if got := output.String(); got != want {
 		t.Fatalf("source Boolean status trace: got %q, want %q", got, want)
+	}
+}
+
+// Source: src/model/model_evaluator.cpp:180-202. Label elimination also
+// reaches the conditional BR_DONE result record after application relookup.
+func TestModelEvaluatorLabelReductionSourceStatusTrace(t *testing.T) {
+	m, _, ev, _, _, _ := evaluatorFixture(t)
+	yes, e := m.MkTrue()
+	astTestMust(t, e)
+	term, e := m.MkLabel(true, []usymbol.Symbol{astTestSymbol(t, m, "trace-label")}, yes)
+	astTestMust(t, e)
+	astTestPin(t, m, term)
+	out := astTestPin(t, m, ast.ASTHandle{})
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	astTestMust(t, ev.BindTrace(tags))
+	tags.Enable("model_evaluator")
+	astTestMust(t, ev.Evaluate(term, out))
+	got, e := m.RefGet(out)
+	astTestMust(t, e)
+	if got != yes {
+		t.Fatal("label reduction", got)
+	}
+	if !tags.ShouldTrace("model_evaluator") {
+		if output.Len() != 0 {
+			t.Fatal("erased trace", output.String())
+		}
+		return
+	}
+	want := "-------- [model_evaluator] operator() src/model/model_evaluator.cpp:566 ---------\n" +
+		"(! true :lblpos trace-label)\n" +
+		"------------------------------------------------\n" +
+		"-------- [model_evaluator] reduce_app src/model/model_evaluator.cpp:200 ---------\n" +
+		"true\n" +
+		"------------------------------------------------\n"
+	if got := output.String(); got != want {
+		t.Fatalf("label status trace: got %q, want %q", got, want)
 	}
 }
