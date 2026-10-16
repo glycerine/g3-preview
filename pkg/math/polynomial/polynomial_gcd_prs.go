@@ -77,6 +77,9 @@ func (m *MultivariatePolynomialManager) gcdContent(u Polynomial, x uint32, v Pol
 }
 func (m *MultivariatePolynomialManager) gcdPRS(u, v Polynomial, x uint32, r *polynomialReference) (err error) {
 	c := m.core
+	if e := c.traceGCDPRSEntry(u, v, x); e != nil {
+		return e
+	}
 	a, e := c.Degree(u, x)
 	if e != nil {
 		return e
@@ -129,6 +132,9 @@ func (m *MultivariatePolynomialManager) gcdPRS(u, v Polynomial, x uint32, r *pol
 	if e != nil {
 		return e
 	}
+	if e = c.traceGCDPRSContent(u, v, &s.nums[0], &s.nums[1], cu.value, cv.value, pu.value, pv.value, dr.value, &s.nums[2]); e != nil {
+		return e
+	}
 	if e = g.assign(c, c.unit); e != nil {
 		return e
 	}
@@ -159,6 +165,9 @@ func (m *MultivariatePolynomialManager) gcdPRS(u, v Polynomial, x uint32, r *pol
 			return e
 		}
 		delta := du - dv
+		if e = c.traceGCDPRSIteration(counter, pu.value, pv.value, delta); e != nil {
+			return e
+		}
 		counter++
 		if e = c.ExactPseudoRemainder(pu.value, pv.value, x, &s.refs[7]); e != nil {
 			return e
@@ -168,6 +177,9 @@ func (m *MultivariatePolynomialManager) gcdPRS(u, v Polynomial, x uint32, r *pol
 			return e
 		}
 		if zero {
+			if e = c.traceGCDPRSZero(pv.value); e != nil {
+				return e
+			}
 			if e = m.flipLeadingSign(pv); e != nil {
 				return e
 			}
@@ -185,6 +197,9 @@ func (m *MultivariatePolynomialManager) gcdPRS(u, v Polynomial, x uint32, r *pol
 			return e
 		}
 		if constant {
+			if e = c.traceGCDPRSConstant(rem.value, dr.value, &s.nums[2]); e != nil {
+				return e
+			}
 			unit, e := c.monomials.Unit()
 			if e != nil {
 				return e
