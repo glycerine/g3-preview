@@ -98,12 +98,17 @@ func (m *ASTManager) MkProofLemma(p, f ASTHandle) (ASTHandle, error) {
 	if p.IsNull() {
 		return p, nil
 	}
-	if ASTSourceDebug {
+	if ASTSourceDebug || m.proofRuleTraceEnabled("mk_lemma") {
 		fact, e := m.proofFact(p)
 		if e != nil {
 			return ASTHandle{}, e
 		}
-		if fact != m.external(m.falseApp) {
+		if fact != m.external(m.falseApp) && m.proofRuleTraceEnabled("mk_lemma") {
+			if e := m.traceProofLemma(p); e != nil {
+				return ASTHandle{}, e
+			}
+		}
+		if ASTSourceDebug && fact != m.external(m.falseApp) {
 			return ASTHandle{}, ErrASTDomain
 		}
 	}
@@ -411,6 +416,20 @@ func (m *ASTManager) MkProofAndElim(p ASTHandle, i uint32) (ASTHandle, error) {
 		}
 		if !yes {
 			return ASTHandle{}, ErrASTDomain
+		}
+	}
+	if m.proofRuleTraceEnabled("mk_and_elim") {
+		r, e := m.requireKind(f, ASTApp)
+		if e != nil {
+			return ASTHandle{}, e
+		}
+		if i >= m.appAt(r.slot).count {
+			m.mu.Unlock()
+			traceErr := m.traceProofAndElim(f, i)
+			m.mu.Lock()
+			if traceErr != nil {
+				return ASTHandle{}, traceErr
+			}
 		}
 	}
 	a, e := m.proofArg(f, i)

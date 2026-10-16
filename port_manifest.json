@@ -181574,6 +181574,12 @@
           "tests": ["TestASTTransitivitySourceTracesBeforeDebugGuards"]
         },
         {
+          "name": "Retained mk_lemma and mk_and_elim conditional diagnostics before source guards (ast.cpp:3026,3102)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_proof_rule_trace.go",
+          "tests": ["TestASTLemmaAndAndElimSourceTracesBeforeGuards"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -183269,6 +183275,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_proof_transitivity_trace.go",
           "tests": ["TestASTTransitivitySourceTracesBeforeDebugGuards"]
+        },
+        {
+          "name": "Retained mk_lemma and mk_and_elim conditional diagnostics before source guards (ast.cpp:3026,3102)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_proof_rule_trace.go",
+          "tests": ["TestASTLemmaAndAndElimSourceTracesBeforeGuards"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
