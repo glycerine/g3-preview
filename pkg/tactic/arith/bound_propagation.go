@@ -9,14 +9,17 @@ import (
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
-func (s *BoundEquationStore) relevantBound(x uint32, candidate float64, lower bool) bool {
+func (s *BoundEquationStore) relevantBound(x uint32, candidate float64, lower bool) (bool, error) {
 	v := &s.variables[x]
 	b := v.upper
 	if lower {
 		b = v.lower
 	}
+	if err := s.traceRelevantBound(x, candidate, lower, b); err != nil {
+		return false, err
+	}
 	if b == nil {
-		return true
+		return true, nil
 	}
 	bounded := v.lower != nil && v.upper != nil
 	intervalSize := 0.0
@@ -33,18 +36,19 @@ func (s *BoundEquationStore) relevantBound(x uint32, candidate float64, lower bo
 			improvement = s.threshold * math.Max(math.Min(intervalSize, absK), 1)
 		}
 		if lower && candidate <= b.approx+improvement || !lower && candidate >= b.approx-improvement {
-			return false
+			s.traceBoundSmallImprovement(candidate, b.approx, lower)
+			return false, nil
 		}
 	} else if lower && candidate < b.approx+1 || !lower && candidate > b.approx-1 {
-		return false
+		return false, nil
 	}
 	if bounded && intervalSize <= s.smallInterval {
-		return true
+		return true, nil
 	}
 	if lower {
-		return v.lowerRefinements < s.maxRefinements
+		return v.lowerRefinements < s.maxRefinements, nil
 	}
-	return v.upperRefinements < s.maxRefinements
+	return v.upperRefinements < s.maxRefinements, nil
 }
 
 // propagateExact recomputes a source candidate using rationals after the
@@ -144,7 +148,11 @@ func (s *BoundEquationStore) propagateEquation(index uint32) (bool, error) {
 	propagated := false
 	try := func(position int, candidate float64, lower bool) error {
 		x := eq.xs[position]
-		if !s.relevantBound(x, candidate, lower) {
+		relevant, e := s.relevantBound(x, candidate, lower)
+		if e != nil {
+			return e
+		}
+		if !relevant {
 			return nil
 		}
 		accepted, err := s.propagateExact(index, position, lower)

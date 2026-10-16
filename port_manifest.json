@@ -99401,7 +99401,8 @@
         "TestBoundEquationFullyBoundedTighteningAndStrictness",
         "TestBoundEquationRetainedParameterReadsAndProgressCounts",
         "TestBoundEquationDisplaySourceOrderDeadConstraintAndWriterError",
-        "TestBoundAssertionSourceTraceAndFalseAlarmOrder"
+        "TestBoundAssertionSourceTraceAndFalseAlarmOrder",
+        "TestBoundRelevanceSourceTraceOldValueAndSmallImprovement"
       ],
       "conditionals": [
         {
@@ -99553,6 +99554,12 @@
           "status": "ported",
           "go_target": "pkg/tactic/arith/bound_trace.go",
           "tests": ["TestBoundAssertionSourceTraceAndFalseAlarmOrder"]
+        },
+        {
+          "name": "Selected relevant_bound TRACE entry with old exact/approximate bound and noninteger small-improvement refusal (bound_propagator.cpp:382-411)",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_trace.go",
+          "tests": ["TestBoundRelevanceSourceTraceOldValueAndSmallImprovement"]
         }
       ],
       "ownership": [
@@ -179926,7 +179933,8 @@
         "TestASTWellSortedSortMismatchSourceTraceBeforeWarning",
         "TestASTWellSortedNonBooleanRootTraceProfiles",
         "TestASTQuantifierPatternSourceTraceBeforeRegistration",
-        "TestBoundAssertionSourceTraceAndFalseAlarmOrder"
+        "TestBoundAssertionSourceTraceAndFalseAlarmOrder",
+        "TestBoundRelevanceSourceTraceOldValueAndSmallImprovement"
       ],
       "conditionals": [
         {
@@ -181368,6 +181376,12 @@
           "status": "ported",
           "go_target": "pkg/tactic/arith/bound_trace.go",
           "tests": ["TestBoundAssertionSourceTraceAndFalseAlarmOrder"]
+        },
+        {
+          "name": "Retained bound_propagator relevant_bound detail and too-small-improvement TRACE records with lazy numeral formatting",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_trace.go",
+          "tests": ["TestBoundRelevanceSourceTraceOldValueAndSmallImprovement"]
         }
       ],
       "ownership": [
@@ -181538,7 +181552,8 @@
         "TestASTWellSortedSortMismatchSourceTraceBeforeWarning",
         "TestASTWellSortedNonBooleanRootTraceProfiles",
         "TestASTQuantifierPatternSourceTraceBeforeRegistration",
-        "TestBoundAssertionSourceTraceAndFalseAlarmOrder"
+        "TestBoundAssertionSourceTraceAndFalseAlarmOrder",
+        "TestBoundRelevanceSourceTraceOldValueAndSmallImprovement"
       ],
       "conditionals": [
         {
@@ -182980,6 +182995,12 @@
           "status": "ported",
           "go_target": "pkg/tactic/arith/bound_trace.go",
           "tests": ["TestBoundAssertionSourceTraceAndFalseAlarmOrder"]
+        },
+        {
+          "name": "Retained relevant_bound TRACE macro call sites with source headers, compile/tag gates and sticky stream",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_trace.go",
+          "tests": ["TestBoundRelevanceSourceTraceOldValueAndSmallImprovement"]
         }
       ],
       "ownership": [

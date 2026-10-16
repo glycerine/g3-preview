@@ -57,18 +57,18 @@ func TestBoundEquationRetainedParameterReadsAndProgressCounts(t *testing.T) {
 	equationMust(t, m.SetInt32(&value, 0))
 	_, err = s.AssertLower(0, &value, false)
 	equationMust(t, err)
-	if s.relevantBound(0, 1, true) {
+	if relevant, err := s.relevantBound(0, 1, true); err != nil || relevant {
 		t.Fatal("configured unbounded refinement limit was ignored")
 	}
 	equationMust(t, m.SetInt32(&value, 10))
 	_, err = s.AssertUpper(0, &value, false)
 	equationMust(t, err)
-	if s.relevantBound(0, 1, true) {
+	if relevant, err := s.relevantBound(0, 1, true); err != nil || relevant {
 		t.Fatal("configured narrow-interval gate was ignored")
 	}
 	equationMust(t, c.SetDoubleName(v, namePtr("bound_small_interval"), 20))
 	equationMust(t, s.UpdateParams(c, v))
-	if !s.relevantBound(0, 1, true) {
+	if relevant, err := s.relevantBound(0, 1, true); err != nil || !relevant {
 		t.Fatal("configured small interval did not override the refinement limit")
 	}
 	coeff := []numeral.Int{numeral.NewInt(1), numeral.NewInt(1)}

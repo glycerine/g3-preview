@@ -1,4 +1,4 @@
-// Source: src/tactic/arith/bound_propagator.cpp:279-305,331-357.
+// Source: src/tactic/arith/bound_propagator.cpp:279-305,331-357,382-411.
 package arith
 
 import (
@@ -92,4 +92,32 @@ func (s *BoundEquationStore) traceBoundApprox(lower bool, x uint32, k *numeral.R
 	body := "x" + strconv.FormatUint(uint64(x), 10) + " " + direction + ": " + value + label + strconv.FormatFloat(approx, 'g', 6, 64) + "\n"
 	s.emitBoundTrace("new_bound", function, line, body)
 	return nil
+}
+
+func (s *BoundEquationStore) traceRelevantBound(x uint32, candidate float64, lower bool, old *equationBound) error {
+	if !s.boundTraceTags().ShouldTrace("bound_propagator_detail") {
+		return nil
+	}
+	body := "relevant_bound x" + strconv.FormatUint(uint64(x), 10) + " " + strconv.FormatFloat(candidate, 'g', 6, 64) + " LOWER: " + sourceBoolDigit(lower) + "\n"
+	if old != nil {
+		value, err := s.manager.String(&old.value)
+		if err != nil {
+			return err
+		}
+		body += "old: " + value + " | " + strconv.FormatFloat(old.approx, 'g', 6, 64) + "\n"
+	}
+	s.emitBoundTrace("bound_propagator_detail", "relevant_bound", 382, body)
+	return nil
+}
+
+func (s *BoundEquationStore) traceBoundSmallImprovement(candidate, old float64, lower bool) {
+	if !s.boundTraceTags().ShouldTrace("bound_propagator") {
+		return
+	}
+	label, line := "UPPER", 411
+	if lower {
+		label, line = "LOWER", 405
+	}
+	body := label + " new: " + strconv.FormatFloat(candidate, 'g', 6, 64) + " old: " + strconv.FormatFloat(old, 'g', 6, 64) + " improvement is too small\n"
+	s.emitBoundTrace("bound_propagator", "relevant_bound", line, body)
 }
