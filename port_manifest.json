@@ -74879,7 +74879,7 @@
       "path": "src/sat/sat_iff3_finder.cpp",
       "component": "sat",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
       "assertions": [
@@ -74888,17 +74888,24 @@
           "text": "SASSERT(lt(k, m));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "iff3_finder construction, sorting, equivalence detection and three TRACE sites have no live source invocation; the sole solver call at sat_solver.cpp:762 is commented out",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": ["No retained source consumer constructs or owns iff3_finder; the solver header include and friend declaration do not instantiate it."],
+      "deviations": ["Dead-source audit: recursive search of src/ finds only the solver header include, friend declaration, CMake listing and the commented-out call at sat_solver.cpp:762 outside this pair. No retained source consumer reaches any iff3_finder method, so no Go algorithm, container or TRACE adapter is required. The original C++ sources remain available for reference."]
     },
     {
       "path": "src/sat/sat_iff3_finder.h",
       "component": "sat",
       "role": "production",
-      "status": "unported",
+      "status": "dead_deleted",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -74911,11 +74918,18 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "iff3_finder construction, sorting, equivalence detection and three TRACE sites have no live source invocation; the sole solver call at sat_solver.cpp:762 is commented out",
+          "status": "dead_deleted",
+          "go_target": "",
+          "tests": []
+        }
+      ],
+      "ownership": ["No retained source consumer constructs or owns iff3_finder; the solver header include and friend declaration do not instantiate it."],
+      "deviations": ["Dead-source audit: recursive search of src/ finds only the solver header include, friend declaration, CMake listing and the commented-out call at sat_solver.cpp:762 outside this pair. No retained source consumer reaches any iff3_finder method, so no Go algorithm, container or TRACE adapter is required. The original C++ sources remain available for reference."]
     },
     {
       "path": "src/sat/sat_integrity_checker.cpp",
