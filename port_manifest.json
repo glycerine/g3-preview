@@ -126518,55 +126518,55 @@
         },
         {
           "name": "u_map<uint32> construction/copy/destruction",
-          "status": "partial",
+          "status": "unported",
           "go_target": "",
           "tests": []
         },
         {
           "name": "u_map<uint32> growth/rehash/reset/finalize",
-          "status": "partial",
+          "status": "unported",
           "go_target": "",
           "tests": []
         },
         {
           "name": "u_map<uint32> insert/insert-if-absent/find/get/contains",
-          "status": "partial",
+          "status": "unported",
           "go_target": "",
           "tests": []
         },
         {
           "name": "u_map<uint32> remove/erase/iteration/entry value reference",
-          "status": "partial",
+          "status": "unported",
           "go_target": "",
           "tests": []
         },
         {
           "name": "u_map<uint32> assignment/union/intersection/swap/invariant/statistics",
-          "status": "partial",
+          "status": "unported",
           "go_target": "",
           "tests": []
         },
         {
           "name": "UintSet-to-uint32 concrete table constructors/copy/destruction",
-          "status": "partial",
+          "status": "unported",
           "go_target": "",
           "tests": []
         },
         {
           "name": "UintSet-to-uint32 wrapper key temporaries and insert/find/remove",
-          "status": "partial",
+          "status": "unported",
           "go_target": "",
           "tests": []
         },
         {
           "name": "UintSet-to-uint32 rehash/reset/finalize retained-key lifetimes",
-          "status": "partial",
+          "status": "unported",
           "go_target": "",
           "tests": []
         },
         {
           "name": "UintSet-to-uint32 iteration/views/assignment/union/intersection/swap",
-          "status": "partial",
+          "status": "unported",
           "go_target": "",
           "tests": []
         },
@@ -126735,6 +126735,7 @@
         "Mutex detection uses a native map[[2]uint32]struct{} for literal-pair membership. It never iterates the map; source clause collection and clique traversal order remain. Removed Runtime-backed bucket geometry, cached hashes, FREE/default member construction, rehash/copy and allocation/destructor refusal simulation. Only the actual lexical frame header remains budgeted. A 32-variable complete graph exercises 496 pairs through both collection passes, repeats append-only queries with just one permitted header reservation, checks independent clique membership and exact frame cleanup. No C++ hash/table implementation credit is added."
       ],
       "deviations": [
+        "The remaining generic u_map<unsigned> and map<uint_set,unsigned> rows have no Go target because their owners (SAT incremental consequences, AST static features, SMT arithmetic/sequence/UTVPI, MUZ compiler, and symbolic automata) are unported. The reached AST deleted-ID map and SAT antecedent map already use native Go collections. Port each remaining instantiation with its owning consumer, not as a standalone template adapter.",
         "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",
         "Budgeted reset/finalize/cross-owner swap reserve before publication. A failed post-removal tombstone cleanup preserves the completed removal.",
         "Readonly owner/epoch key views replace mutable raw borrows. Predictable replacement failure preserves old contents and adds documented peak storage; partial bulk operations remain source ordered.",
@@ -152540,55 +152541,55 @@
         },
         {
           "name": "u_map<uint32> construction/copy/destruction",
-          "status": "partial",
+          "status": "unported",
           "go_target": "",
           "tests": []
         },
         {
           "name": "u_map<uint32> growth/rehash/reset/finalize",
-          "status": "partial",
+          "status": "unported",
           "go_target": "",
           "tests": []
         },
         {
           "name": "u_map<uint32> insert/insert-if-absent/find/get/contains",
-          "status": "partial",
+          "status": "unported",
           "go_target": "",
           "tests": []
         },
         {
           "name": "u_map<uint32> remove/erase/iteration/entry value reference",
-          "status": "partial",
+          "status": "unported",
           "go_target": "",
           "tests": []
         },
         {
           "name": "u_map<uint32> assignment/union/intersection/swap/invariant/statistics",
-          "status": "partial",
+          "status": "unported",
           "go_target": "",
           "tests": []
         },
         {
           "name": "UintSet-to-uint32 concrete table constructors/copy/destruction",
-          "status": "partial",
+          "status": "unported",
           "go_target": "",
           "tests": []
         },
         {
           "name": "UintSet-to-uint32 wrapper key temporaries and insert/find/remove",
-          "status": "partial",
+          "status": "unported",
           "go_target": "",
           "tests": []
         },
         {
           "name": "UintSet-to-uint32 rehash/reset/finalize retained-key lifetimes",
-          "status": "partial",
+          "status": "unported",
           "go_target": "",
           "tests": []
         },
         {
           "name": "UintSet-to-uint32 iteration/views/assignment/union/intersection/swap",
-          "status": "partial",
+          "status": "unported",
           "go_target": "",
           "tests": []
         },
@@ -152673,6 +152674,7 @@
         "Default-entry Runtime mode has NIL Go hot slice and actual wrapper24/32-byte object plus40-byte record payload. Legacy mode has actual Go backing and cold scalar capacity/counter. Acquisitions stamp exact returned allocation; lexical copies are inline owners. Current field/pending nodes and failed copy owners remain named; source-completed DT separate from owning abort; immediate raw bijection/full cold sums precede each real reservation fault lift. Accidental Go owner copies reject exact self before mutation; actual source clones prepare valid owners."
       ],
       "deviations": [
+        "The remaining generic u_map<unsigned> and map<uint_set,unsigned> rows have no Go target because their owners (SAT incremental consequences, AST static features, SMT arithmetic/sequence/UTVPI, MUZ compiler, and symbolic automata) are unported. The reached AST deleted-ID map and SAT antecedent map already use native Go collections. Port each remaining instantiation with its owning consumer, not as a standalone template adapter.",
         "Checked cold owner/epoch snapshots replace borrowed entry pointers; structural mutation invalidates snapshots.",
         "Budgeted reset/finalize/cross-owner swap reserve before publication. A failed post-removal tombstone cleanup preserves the completed removal.",
         "Readonly owner/epoch key views replace mutable raw borrows. Predictable replacement failure preserves old contents and adds documented peak storage; partial bulk operations remain source ordered.",
