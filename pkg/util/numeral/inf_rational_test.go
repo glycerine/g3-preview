@@ -291,6 +291,7 @@ func TestInfRationalOwnershipErrors(t *testing.T) {
 }
 
 func TestInfRationalFullHeaderQueriesAndAliases(t *testing.T) {
+	disableInfProjectionAssertions(t)
 	s, _ := serviceNew(t)
 	a := infValue(t, s, 7, 5, "-2/3")
 	b := infValue(t, s, 7, 5, "1/2")

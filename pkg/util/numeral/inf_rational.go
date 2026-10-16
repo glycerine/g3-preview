@@ -4,6 +4,8 @@ package numeral
 
 import (
 	"errors"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 var ErrInfRationalDomain = errors.New("mpnum: infinitesimal rational domain")
@@ -820,25 +822,43 @@ func (s *RationalService) infScalarFits(v *OwnedInfRational, unsigned bool) (boo
 	return ok && v.Second.Num.Val == 0, e
 }
 func (s *RationalService) infSignedProjectionLocked(v *OwnedInfRational) (int64, error) {
-	if modularSourceDebug {
-		ok, e := s.infScalarFits(v, false)
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return 0, e
 		}
-		if !ok {
-			return 0, ErrIntegerAssertion
+		if enabled {
+			ok, e := s.infScalarFits(v, false)
+			if e != nil {
+				return 0, e
+			}
+			if !ok {
+				if e = diagnostic.DebugAssertionFailure(d, "src/util/inf_rational.h", 126, "is_int64()"); e != nil {
+					return 0, e
+				}
+			}
 		}
 	}
 	return s.Manager.Int64(&v.First)
 }
 func (s *RationalService) infUnsignedProjectionLocked(v *OwnedInfRational) (uint64, error) {
-	if modularSourceDebug {
-		ok, e := s.infScalarFits(v, true)
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return 0, e
 		}
-		if !ok {
-			return 0, ErrIntegerAssertion
+		if enabled {
+			ok, e := s.infScalarFits(v, true)
+			if e != nil {
+				return 0, e
+			}
+			if !ok {
+				if e = diagnostic.DebugAssertionFailure(d, "src/util/inf_rational.h", 131, "is_uint64()"); e != nil {
+					return 0, e
+				}
+			}
 		}
 	}
 	return s.Manager.Uint64(&v.First)

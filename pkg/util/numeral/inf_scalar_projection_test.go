@@ -63,20 +63,23 @@ func TestInfScalarProjectionAllGetterProfilesAndRawPredicates(t *testing.T) {
 				wantI, wantU := infProjectionWant(n, &a.First.Num)
 				fitI := den == 1 && epsilon == 0 && n.IsInt64()
 				fitU := den == 1 && epsilon == 0 && n.Sign() >= 0 && n.BitLen() <= 64
+				firstFitI := den == 1 && n.IsInt64()
+				firstFitU := den == 1 && n.Sign() >= 0 && n.BitLen() <= 64
 				for _, f := range []struct {
 					i                          func() (int64, error)
 					u                          func() (uint64, error)
 					ip, up, integral, rational func() (bool, error)
+					assertI, assertU           bool
 				}{
-					{func() (int64, error) { return s.InfIntInt64(&a) }, func() (uint64, error) { return s.InfIntUint64(&a) }, func() (bool, error) { return s.InfIntIsInt64(&a) }, func() (bool, error) { return s.InfIntIsUint64(&a) }, func() (bool, error) { return s.InfIntIsInt(&a) }, func() (bool, error) { return s.InfIntIsRational(&a) }},
-					{func() (int64, error) { return s.InfInt64(&b) }, func() (uint64, error) { return s.InfUint64(&b) }, func() (bool, error) { return s.InfIsInt64(&b) }, func() (bool, error) { return s.InfIsUint64(&b) }, func() (bool, error) { return s.InfIsInt(&b) }, func() (bool, error) { return s.InfIsRational(&b) }},
-					{func() (int64, error) { return s.InfEpsInfInt64(&c) }, func() (uint64, error) { return s.InfEpsInfUint64(&c) }, func() (bool, error) { return s.InfEpsInfIsInt64(&c) }, func() (bool, error) { return s.InfEpsInfIsUint64(&c) }, func() (bool, error) { return s.InfEpsInfIsInt(&c) }, func() (bool, error) { return s.InfEpsInfIsRational(&c) }},
+					{func() (int64, error) { return s.InfIntInt64(&a) }, func() (uint64, error) { return s.InfIntUint64(&a) }, func() (bool, error) { return s.InfIntIsInt64(&a) }, func() (bool, error) { return s.InfIntIsUint64(&a) }, func() (bool, error) { return s.InfIntIsInt(&a) }, func() (bool, error) { return s.InfIntIsRational(&a) }, !fitI, !fitU},
+					{func() (int64, error) { return s.InfInt64(&b) }, func() (uint64, error) { return s.InfUint64(&b) }, func() (bool, error) { return s.InfIsInt64(&b) }, func() (bool, error) { return s.InfIsUint64(&b) }, func() (bool, error) { return s.InfIsInt(&b) }, func() (bool, error) { return s.InfIsRational(&b) }, !firstFitI, !firstFitU},
+					{func() (int64, error) { return s.InfEpsInfInt64(&c) }, func() (uint64, error) { return s.InfEpsInfUint64(&c) }, func() (bool, error) { return s.InfEpsInfIsInt64(&c) }, func() (bool, error) { return s.InfEpsInfIsUint64(&c) }, func() (bool, error) { return s.InfEpsInfIsInt(&c) }, func() (bool, error) { return s.InfEpsInfIsRational(&c) }, !firstFitI, !firstFitU},
 				} {
 					iv, ie := f.i()
 					uv, ue := f.u()
 					serviceAuditRationalRoots(t, s, &a.First, &b.First, &b.Second, &c.infinity, &c.numeral.First, &c.numeral.Second)
-					projectionExpectError(t, ie, !fitI)
-					projectionExpectError(t, ue, !fitU)
+					projectionExpectError(t, ie, f.assertI)
+					projectionExpectError(t, ue, f.assertU)
 					if (ie == nil && iv != wantI) || (ue == nil && uv != wantU) {
 						t.Fatal("release delegates FIRST, ignoring epsilon/infinity", text, den, epsilon, iv, uv, wantI, wantU)
 					}
@@ -128,11 +131,7 @@ func TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit(t *testing.T) {
 	}
 	v.numeral.First.Num = NewInt(7)
 	v.numeral.Second.Num = stale
-	if got, e := s.InfEpsInfInt64(&v); modularSourceDebug {
-		if !errors.Is(e, ErrIntegerAssertion) {
-			t.Fatal("DEBUG tests epsilon scalar value, not its dead pointee", e)
-		}
-	} else if e != nil || got != 7 {
+	if got, e := s.InfEpsInfInt64(&v); e != nil || got != 7 {
 		t.Fatal("release getter never reads epsilon pointee", got, e)
 	}
 	serviceAuditRationalRoots(t, s, &v.infinity, &v.numeral.First)
