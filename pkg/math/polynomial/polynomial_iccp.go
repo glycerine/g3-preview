@@ -229,6 +229,9 @@ func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uin
 		if e != nil {
 			return e
 		}
+		if e = core.traceICCPDegree(term, x, k); e != nil {
+			return e
+		}
 		count := s.filter[k]
 		if count == 0 {
 			s.powers = append(s.powers, k)
@@ -274,6 +277,9 @@ func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uin
 	if e = core.integerContentWithReceipt(p, i, pp, &s.contentInvocation); e != nil {
 		return e
 	}
+	if e = core.traceICCPContent(p, i, pp.value); e != nil {
+		return e
+	}
 	s.ciConstructed = true
 	k := s.powers[0]
 	q, e := core.coeffCoreWithReceipts(pp.value, x, k, nil, &s.coefficient, &s.coefficientAppend, &s.coefficientFactory)
@@ -313,6 +319,9 @@ func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uin
 		}
 	}
 	if e = m.flipLeadingSignWithReceipt(c, &s.neg); e != nil {
+		return e
+	}
+	if e = core.traceICCPDivisor(pp.value, c.value); e != nil {
 		return e
 	}
 	q, e = core.exactDivWithReceipt(pp.value, c.value, &s.division)
