@@ -78,9 +78,8 @@ func TestPatternInferencePullDirectNestedForallFindsPattern(t *testing.T) {
 	patternMust(t, err)
 	term, err := m.GetArg(pat, 0)
 	patternMust(t, err)
-	if term != body || !strings.Contains(output.String(), "pulled nested quantifier to be able to find an useable pattern") ||
-		!strings.Contains(output.String(), "outer-pull-qid") {
-		t.Fatal("source inferred pattern and warning", term, output.String())
+	if want := "WARNING: pulled nested quantifier to be able to find an useable pattern (quantifier id: outer-pull-qid)\n"; term != body || output.String() != want {
+		t.Fatalf("source inferred pattern and warning: term=%v got %q, want %q", term, output.String(), want)
 	}
 
 	innerEmpty, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{b},

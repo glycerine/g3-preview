@@ -187028,6 +187028,7 @@
         "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
         "TestUpdateProcessEnvParamsSharedVerbosityAndWarning",
         "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
+        "TestPatternInferencePullDirectNestedForallFindsPattern",
         "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
         "TestShellInputFileSourceBranches",
         "TestShellInputFileWarningRefusalPreservesSelection",
@@ -187138,13 +187139,19 @@
           "tests": ["TestASTWellSortedSourceMismatchPrinter"]
         },
         {
+          "name": "Pattern inference no-pattern, conservative/non-nested arithmetic, pulled-quantifier and no-pattern-found warnings at pattern_inference.cpp:635,648,663,689,702",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/reduce_quantifier.go",
+          "tests": ["TestPatternInferenceQuantifierRetriesWarningsAndWeights", "TestPatternInferencePullDirectNestedForallFindsPattern"]
+        },
+        {
           "name": "Standalone AST managers without a matching process SMT2 parameter owner retain the short warning fallback; source global owner integration outside process binding remains open",
           "status": "partial",
           "go_target": "pkg/ast/ast_well_sorted.go",
           "tests": ["TestASTWellSortedApplicationGuardBranches"]
         },
         {
-          "name": "remaining live direct warning_msg callers in unported API, parser, SMT, MUZ, opt and AST owners",
+          "name": "remaining live direct warning_msg callers in unported API, parser, SMT, MUZ, opt and AST owners outside the credited pattern inference and well-sorted branches",
           "status": "partial",
           "tests": []
         },
@@ -187260,6 +187267,7 @@
         "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
         "TestUpdateProcessEnvParamsSharedVerbosityAndWarning",
         "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
+        "TestPatternInferencePullDirectNestedForallFindsPattern",
         "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
         "TestShellInputFileSourceBranches",
         "TestShellInputFileWarningRefusalPreservesSelection",
@@ -187327,13 +187335,19 @@
           "tests": ["TestASTWellSortedSourceMismatchPrinter"]
         },
         {
+          "name": "Pattern inference no-pattern, conservative/non-nested arithmetic, pulled-quantifier and no-pattern-found warnings at pattern_inference.cpp:635,648,663,689,702",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/reduce_quantifier.go",
+          "tests": ["TestPatternInferenceQuantifierRetriesWarningsAndWeights", "TestPatternInferencePullDirectNestedForallFindsPattern"]
+        },
+        {
           "name": "Standalone AST managers without a matching process SMT2 parameter owner retain the short warning fallback; source global owner integration outside process binding remains open",
           "status": "partial",
           "go_target": "pkg/ast/ast_well_sorted.go",
           "tests": ["TestASTWellSortedApplicationGuardBranches"]
         },
         {
-          "name": "remaining live direct warning_msg callers in unported API, parser, SMT, MUZ, opt and AST owners",
+          "name": "remaining live direct warning_msg callers in unported API, parser, SMT, MUZ, opt and AST owners outside the credited pattern inference and well-sorted branches",
           "status": "partial",
           "tests": []
         },

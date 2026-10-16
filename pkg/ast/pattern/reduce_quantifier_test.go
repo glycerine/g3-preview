@@ -94,8 +94,8 @@ func TestPatternInferenceQuantifierRetriesWarningsAndWeights(t *testing.T) {
 		t.Fatal("no-pattern retry must infer a replacement")
 	}
 	check(result, fx, 2)
-	if !strings.Contains(output.String(), "ignoring nopats annotation") || !strings.Contains(output.String(), "reduce-q") {
-		t.Fatal("source no-pattern warning", output.String())
+	if want := "WARNING: ignoring nopats annotation because Z3 couldn't find any other pattern (quantifier id: reduce-q)\n"; output.String() != want {
+		t.Fatalf("source no-pattern warning: got %q, want %q", output.String(), want)
 	}
 	patternMust(t, m.DelRef(&result))
 	patternMust(t, c.close())
@@ -111,8 +111,8 @@ func TestPatternInferenceQuantifierRetriesWarningsAndWeights(t *testing.T) {
 		t.Fatal("conservative arithmetic retry must infer")
 	}
 	check(result, pmul, 5)
-	if !strings.Contains(output.String(), "using arith. in pattern") {
-		t.Fatal("source conservative arithmetic warning", output.String())
+	if want := "WARNING: using arith. in pattern (quantifier id: reduce-q), the weight was increased to 5 (this value can be modified using PI_ARITH_WEIGHT=<val>).\n"; output.String() != want {
+		t.Fatalf("source conservative arithmetic warning: got %q, want %q", output.String(), want)
 	}
 	patternMust(t, m.DelRef(&result))
 	patternMust(t, c.close())
@@ -128,8 +128,8 @@ func TestPatternInferenceQuantifierRetriesWarningsAndWeights(t *testing.T) {
 		t.Fatal("non-nested arithmetic retry must infer")
 	}
 	check(result, mul, 10)
-	if !strings.Contains(output.String(), "using non nested arith. pattern") {
-		t.Fatal("source non-nested arithmetic warning", output.String())
+	if want := "WARNING: using non nested arith. pattern (quantifier id: reduce-q), the weight was increased to 10 (this value can be modified using PI_NON_NESTED_ARITH_WEIGHT=<val>).\n"; output.String() != want {
+		t.Fatalf("source non-nested arithmetic warning: got %q, want %q", output.String(), want)
 	}
 	patternMust(t, m.DelRef(&result))
 	patternMust(t, c.close())
@@ -147,8 +147,8 @@ func TestPatternInferenceQuantifierRetriesWarningsAndWeights(t *testing.T) {
 		t.Fatal("unnamed unsigned arithmetic mode must reach non-nested retry")
 	}
 	check(result, mul, 10)
-	if !strings.Contains(output.String(), "using non nested arith. pattern") {
-		t.Fatal("unnamed mode must use non-nested retry warning", output.String())
+	if want := "WARNING: using non nested arith. pattern (quantifier id: reduce-q), the weight was increased to 10 (this value can be modified using PI_NON_NESTED_ARITH_WEIGHT=<val>).\n"; output.String() != want {
+		t.Fatalf("unnamed mode non-nested retry warning: got %q, want %q", output.String(), want)
 	}
 	patternMust(t, m.DelRef(&result))
 	patternMust(t, c.close())
@@ -160,8 +160,8 @@ func TestPatternInferenceQuantifierRetriesWarningsAndWeights(t *testing.T) {
 	c.forbiddenFamilies[arith] = struct{}{} // Source constructor caches AP_NO before reduction.
 	result, changed, err = c.reduceQuantifierNoDatabase(q, pmul, nil, opts)
 	patternMust(t, err)
-	if changed || result != (ast.ASTRef{}) || !strings.Contains(output.String(), "failed to find a pattern") {
-		t.Fatal("AP_NO must forbid arithmetic through the whole reduction", result, changed, output.String())
+	if want := "WARNING: failed to find a pattern for quantifier (quantifier id: reduce-q)\n"; changed || result != (ast.ASTRef{}) || output.String() != want {
+		t.Fatalf("AP_NO warning: changed=%v result=%v got %q, want %q", changed, result, output.String(), want)
 	}
 	patternMust(t, c.close())
 }
