@@ -9,6 +9,9 @@ import (
 
 func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32, vars []uint32, r *polynomialReference) (err error) {
 	c := m.core
+	if err = m.traceModGCDRecPolynomials(4078, "mod_gcd_rec\nu: ", true, u, v); err != nil {
+		return err
+	}
 	numVars := uint32(len(vars))
 	if polynomialSourceDebug && numVars == 0 {
 		return ErrPolynomialAssertion
@@ -30,7 +33,10 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 				return ErrPolynomialAssertion
 			}
 		}
-		return m.gcdEuclid(u, v, r)
+		if err = m.gcdEuclid(u, v, r); err != nil {
+			return err
+		}
+		return m.traceModGCDRecPolynomials(4085, "mod_gcd_rec result: ", true, r.value)
 	}
 	if uint64(idx) >= uint64(len(vars)) {
 		if polynomialSourceDebug {
@@ -138,6 +144,9 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 				break
 			}
 		}
+		if e = m.traceModGCDRecPoint(x, &s.nums[3]); e != nil {
+			return e
+		}
 		a, e = c.SubstituteInteger(pu.value, x, &s.nums[3])
 		if e != nil {
 			return e
@@ -221,6 +230,7 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 				}
 			}
 		} else {
+			m.traceModGCDRecSkipped()
 			continue
 		}
 		found := false
@@ -335,6 +345,9 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 			}
 		}
 		if done {
+			if e = m.traceModGCDRecResult(idx, r.value); e != nil {
+				return e
+			}
 			if sk == nil && m.useSparseGCD {
 				// Source raw new_sk becomes owned by the persistent vector only after
 				// its Set publication succeeds. Retain the actual returned pointer.
