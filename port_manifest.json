@@ -104443,7 +104443,8 @@
       "go_targets": [
         "pkg/tactic/tactic_goal.go",
         "pkg/tactic/tactic_goal_ownership.go",
-        "pkg/tactic/tactic_package_boundary.go"
+        "pkg/tactic/tactic_package_boundary.go",
+        "pkg/tactic/tactic_goal_display.go"
       ],
       "tests": [
         "TestTacticGoalAssertionSplittingAndSourceOrder",
@@ -104461,7 +104462,8 @@
         "TestTacticGoalNativeSlicesGrowCopyUpdateAndRelease",
         "TestTacticGoalNativeSlicesKeepActualPublicationPrefix",
         "TestTacticGoalConfigCopyKeepsFlagsDepthPrecisionWithoutAssertions",
-        "TestTacticGoalWellSortedStopsAtFirstBadFormula"
+        "TestTacticGoalWellSortedStopsAtFirstBadFormula",
+        "TestGoalSourceDefaultDisplayAndProcessPrinter"
       ],
       "assertions": [
         {
@@ -104553,6 +104555,14 @@
           "status": "partial",
           "go_target": "pkg/tactic/tactic_goal.go",
           "tests": ["TestTacticGoalWellSortedStopsAtFirstBadFormula"]
+        },
+        {
+          "name": "Default formula-only goal::display(std::ostream&) uses source SMT2 expression printer and final newline",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_goal_display.go",
+          "tests": [
+            "TestGoalSourceDefaultDisplayAndProcessPrinter"
+          ]
         }
       ],
       "ownership": [
@@ -104572,7 +104582,8 @@
       "go_targets": [
         "pkg/tactic/tactic_goal.go",
         "pkg/tactic/tactic_goal_ownership.go",
-        "pkg/tactic/tactic_package_boundary.go"
+        "pkg/tactic/tactic_package_boundary.go",
+        "pkg/tactic/tactic_goal_display.go"
       ],
       "tests": [
         "TestTacticGoalAssertionSplittingAndSourceOrder",
@@ -104590,7 +104601,8 @@
         "TestTacticGoalNativeSlicesGrowCopyUpdateAndRelease",
         "TestTacticGoalNativeSlicesKeepActualPublicationPrefix",
         "TestTacticGoalConfigCopyKeepsFlagsDepthPrecisionWithoutAssertions",
-        "TestTacticGoalWellSortedStopsAtFirstBadFormula"
+        "TestTacticGoalWellSortedStopsAtFirstBadFormula",
+        "TestGoalSourceDefaultDisplayAndProcessPrinter"
       ],
       "conditionals": [
         {
@@ -104638,6 +104650,14 @@
           "status": "partial",
           "go_target": "pkg/tactic/tactic_goal.go",
           "tests": ["TestTacticGoalWellSortedStopsAtFirstBadFormula"]
+        },
+        {
+          "name": "Default borrowed ostream goal display declaration and formula-order output",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_goal_display.go",
+          "tests": [
+            "TestGoalSourceDefaultDisplayAndProcessPrinter"
+          ]
         }
       ],
       "ownership": [

@@ -217,6 +217,7 @@ digraph packages {
   "tactic" -> "model";
   "tactic" -> "util/diagnostic";
   "tactic" -> "util/memory";
+  "tactic" -> "util/params";
   "tactic" -> "util/stopwatch";
   "tactic" -> "util/symbol";
   "tactic" -> "util/text";
