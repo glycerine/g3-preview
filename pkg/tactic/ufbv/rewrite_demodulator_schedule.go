@@ -126,7 +126,13 @@ func (r *rewriteBackIndex) rescheduleDemodulators(index *rewriteRuleIndex, f, lh
 		return ast.ErrASTDomain
 	}
 	var values map[ast.ASTHandle]struct{}
-	if set := r.byDecl[f]; set != nil {
+	if set, found := r.byDecl[f]; found {
+		if set == nil {
+			if e := assertBackIndexSetPresent(607); e != nil {
+				return e
+			}
+			return ast.ErrASTDomain
+		}
 		values = set.values
 	}
 	occurrences := make([]ast.ASTHandle, 0, len(values))
@@ -165,8 +171,8 @@ func (r *rewriteBackIndex) rescheduleDemodulators(index *rewriteRuleIndex, f, lh
 			return e
 		}
 		for _, d := range decls {
-			if set := r.byDecl[d]; set != nil {
-				delete(set.values, q)
+			if e := r.removeBackOccurrence(d, q); e != nil {
+				return e
 			}
 		}
 		r.todo = append(r.todo, q)

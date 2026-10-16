@@ -13,7 +13,13 @@ import (
 )
 
 func (r *rewriteBackIndex) ensureBackSet(f ast.ASTHandle) (*rewriteBackSet, error) {
-	if set := r.byDecl[f]; set != nil {
+	if set, found := r.byDecl[f]; found {
+		if set == nil {
+			if e := assertBackIndexSetPresent(482); e != nil {
+				return nil, e
+			}
+			return nil, ast.ErrASTDomain
+		}
 		return set, nil
 	}
 	n := uint64(reflect.TypeOf(rewriteBackSet{}).Size())

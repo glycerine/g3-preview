@@ -108715,6 +108715,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained UFBV back-index existing-set SASSERT at ufbv_rewriter.cpp:482,507,518,607 with process debug gate and C/T actions",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_back_index_assert.go",
+          "tests": ["TestRewriteBackIndexPresentNilSetSourceGuards", "TestRewriteBackIndexNilSetSourceContinueAndThrow"]
+        },
+        {
           "name": "rewrite cache insert, contains/get and lazy reset use sites",
           "status": "partial",
           "go_target": "pkg/tactic/ufbv/rewrite_cache.go",
@@ -122949,6 +122955,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained UFBV back-index existing-set SASSERT at ufbv_rewriter.cpp:482,507,518,607 with process debug gate and C/T actions",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_back_index_assert.go",
+          "tests": ["TestRewriteBackIndexPresentNilSetSourceGuards", "TestRewriteBackIndexNilSetSourceContinueAndThrow"]
+        },
+        {
           "name": "Retained UFBV rewriter tactic entry and post-publication goal well-sorted SASSERT at cpp39,68 through the process debug gate",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_tactic_assert.go",
@@ -123417,6 +123429,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained UFBV back-index existing-set SASSERT at ufbv_rewriter.cpp:482,507,518,607 with process debug gate and C/T actions",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_back_index_assert.go",
+          "tests": ["TestRewriteBackIndexPresentNilSetSourceGuards", "TestRewriteBackIndexNilSetSourceContinueAndThrow"]
+        },
         {
           "name": "Retained UFBV rewriter tactic entry and post-publication goal well-sorted SASSERT at cpp39,68 through the process debug gate",
           "status": "ported",

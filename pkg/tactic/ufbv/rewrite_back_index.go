@@ -173,7 +173,13 @@ func (r *rewriteBackIndex) rescheduleProcessed(f ast.ASTHandle) error {
 		return e
 	}
 	var values map[ast.ASTHandle]struct{}
-	if set := r.byDecl[f]; set != nil {
+	if set, found := r.byDecl[f]; found {
+		if set == nil {
+			if e := assertBackIndexSetPresent(518); e != nil {
+				return e
+			}
+			return ast.ErrASTDomain
+		}
 		values = set.values
 	}
 	selected := make([]ast.ASTHandle, 0, len(values))
@@ -195,8 +201,8 @@ func (r *rewriteBackIndex) rescheduleProcessed(f ast.ASTHandle) error {
 		r.todo = append(r.todo, expr)
 		delete(r.processed, expr)
 		for _, d := range decls {
-			if set := r.byDecl[d]; set != nil {
-				delete(set.values, expr)
+			if e := r.removeBackOccurrence(d, expr); e != nil {
+				return e
 			}
 		}
 		for i, h := range r.owned {
