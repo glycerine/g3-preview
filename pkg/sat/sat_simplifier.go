@@ -40,6 +40,7 @@ type satSimplifier struct {
 	occRanges, litRanges                                                         [3]uint32
 	clsCutoffs                                                                   [2]uint32
 	numBlocked, numSubsumed, numElimVars, numSubRes, numElimLits, oldNumElimVars uint32
+	subReportSubsumed, subReportSubRes, blockedReportBlocked, elimReportVars     uint32
 	subReport, blockedReport, elimReport                                         stopwatch.Stopwatch
 	ownerBytes                                                                   uint64
 	closeStage                                                                   uint32

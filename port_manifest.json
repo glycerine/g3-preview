@@ -152056,7 +152056,8 @@
         "pkg/tactic/aig/aig_imp_memory_trace.go",
         "pkg/sat/sat_asymm_branch_report.go",
         "pkg/sat/sat_solver_stat_display.go",
-        "pkg/sat/sat_solver_probing_report.go"
+        "pkg/sat/sat_solver_probing_report.go",
+        "pkg/sat/sat_simplifier_report.go"
       ],
       "tests": [
         "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
@@ -152171,7 +152172,9 @@
         "TestSATAsymmReportActualReductionAndSourceGates",
         "TestSATAsymmReportSurvivesCanceledSourceCatch",
         "TestSATReportsReadCompactStatsDuringStoppedContinuation",
-        "TestSATSolverProbingReportAssignedStoppedAndSourceGates"
+        "TestSATSolverProbingReportAssignedStoppedAndSourceGates",
+        "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
+        "TestSATSimplifierReportsActualSubsumptionAndResolution"
       ],
       "conditionals": [
         {
@@ -152819,6 +152822,15 @@
           "tests": [
             "TestSATSolverProbingReportAssignedStoppedAndSourceGates"
           ]
+        },
+        {
+          "name": "Retained SAT simplifier report scopes read process allocation size after source cleanup, including repeated timed invocations (src/sat/sat_simplifier.cpp:785-806,1058-1077,1438-1458)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_report.go",
+          "tests": [
+            "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
+            "TestSATSimplifierReportsActualSubsumptionAndResolution"
+          ]
         }
       ],
       "ownership": [
@@ -152940,7 +152952,8 @@
         "pkg/tactic/aig/aig_imp_memory_trace.go",
         "pkg/sat/sat_asymm_branch_report.go",
         "pkg/sat/sat_solver_stat_display.go",
-        "pkg/sat/sat_solver_probing_report.go"
+        "pkg/sat/sat_solver_probing_report.go",
+        "pkg/sat/sat_simplifier_report.go"
       ],
       "tests": [
         "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
@@ -153040,7 +153053,9 @@
         "TestSATAsymmReportActualReductionAndSourceGates",
         "TestSATAsymmReportSurvivesCanceledSourceCatch",
         "TestSATReportsReadCompactStatsDuringStoppedContinuation",
-        "TestSATSolverProbingReportAssignedStoppedAndSourceGates"
+        "TestSATSolverProbingReportAssignedStoppedAndSourceGates",
+        "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
+        "TestSATSimplifierReportsActualSubsumptionAndResolution"
       ],
       "conditionals": [
         {
@@ -153639,6 +153654,15 @@
           "go_target": "pkg/sat/sat_solver_probing_report.go",
           "tests": [
             "TestSATSolverProbingReportAssignedStoppedAndSourceGates"
+          ]
+        },
+        {
+          "name": "Retained SAT simplifier report scopes read process allocation size after source cleanup, including repeated timed invocations (src/sat/sat_simplifier.cpp:785-806,1058-1077,1438-1458)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_report.go",
+          "tests": [
+            "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
+            "TestSATSimplifierReportsActualSubsumptionAndResolution"
           ]
         }
       ],
@@ -184414,7 +184438,8 @@
         "pkg/sat/sat_scc_report.go",
         "pkg/sat/sat_asymm_branch_report.go",
         "pkg/sat/sat_solver_stat_display.go",
-        "pkg/sat/sat_solver_probing_report.go"
+        "pkg/sat/sat_solver_probing_report.go",
+        "pkg/sat/sat_simplifier_report.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184442,7 +184467,9 @@
         "TestSATAsymmReportActualReductionAndSourceGates",
         "TestSATAsymmReportSurvivesCanceledSourceCatch",
         "TestSATReportsReadCompactStatsDuringStoppedContinuation",
-        "TestSATSolverProbingReportAssignedStoppedAndSourceGates"
+        "TestSATSolverProbingReportAssignedStoppedAndSourceGates",
+        "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
+        "TestSATSimplifierReportsActualSubsumptionAndResolution"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -184571,6 +184598,15 @@
           "tests": [
             "TestSATSolverProbingReportAssignedStoppedAndSourceGates"
           ]
+        },
+        {
+          "name": "Retained SAT subsumption, blocked-clause, and variable-elimination IF_VERBOSE(10) reports use the process-selected stream (src/sat/sat_simplifier.cpp:785-806,1058-1077,1438-1458)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_report.go",
+          "tests": [
+            "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
+            "TestSATSimplifierReportsActualSubsumptionAndResolution"
+          ]
         }
       ],
       "ownership": [
@@ -184634,7 +184670,8 @@
         "pkg/sat/sat_scc_report.go",
         "pkg/sat/sat_asymm_branch_report.go",
         "pkg/sat/sat_solver_stat_display.go",
-        "pkg/sat/sat_solver_probing_report.go"
+        "pkg/sat/sat_solver_probing_report.go",
+        "pkg/sat/sat_simplifier_report.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184689,7 +184726,9 @@
         "TestSATAsymmReportActualReductionAndSourceGates",
         "TestSATAsymmReportSurvivesCanceledSourceCatch",
         "TestSATReportsReadCompactStatsDuringStoppedContinuation",
-        "TestSATSolverProbingReportAssignedStoppedAndSourceGates"
+        "TestSATSolverProbingReportAssignedStoppedAndSourceGates",
+        "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
+        "TestSATSimplifierReportsActualSubsumptionAndResolution"
       ],
       "conditionals": [
         {
@@ -185116,6 +185155,15 @@
           "go_target": "pkg/sat/sat_solver_probing_report.go",
           "tests": [
             "TestSATSolverProbingReportAssignedStoppedAndSourceGates"
+          ]
+        },
+        {
+          "name": "Retained SAT subsumption, blocked-clause, and variable-elimination IF_VERBOSE(10) reports use the process-selected stream (src/sat/sat_simplifier.cpp:785-806,1058-1077,1438-1458)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_report.go",
+          "tests": [
+            "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
+            "TestSATSimplifierReportsActualSubsumptionAndResolution"
           ]
         }
       ],

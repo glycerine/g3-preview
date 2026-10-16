@@ -3,6 +3,8 @@ package sat
 
 import (
 	"errors"
+
+	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
 
 func (s *satSimplifier) watchIterator(w satSolverWatchListView) (satSolverWatchIterator, error) {
@@ -188,6 +190,8 @@ func (s *satSimplifier) binaryFromClause(c StoredClauseRef) error {
 	return s.removeClause(c)
 }
 func (s *satSimplifier) subsume() (err error) {
+	s.subReport = stopwatch.Stopwatch{}
+	s.subReportSubsumed, s.subReportSubRes = s.numSubsumed, s.numSubRes
 	if e := s.subReport.Start(); e != nil {
 		return e
 	}
@@ -323,5 +327,5 @@ func (s *satSimplifier) closeSubsumeReport() error {
 		return e
 	}
 	s.subReportActive = false
-	return nil
+	return s.emitSubsumeReport()
 }

@@ -3,6 +3,8 @@ package sat
 
 import (
 	"errors"
+
+	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
 
 type satSimplifierBlocked struct {
@@ -42,10 +44,15 @@ func (s *satSimplifier) closeBlocked() error {
 			return e
 		}
 		b.reportActive = false
+		if e := s.emitBlockedReport(); e != nil {
+			return e
+		}
 	}
 	return nil
 }
 func (s *satSimplifier) eliminateBlocked() (err error) {
+	s.blockedReport = stopwatch.Stopwatch{}
+	s.blockedReportBlocked = s.numBlocked
 	if e := s.blockedReport.Start(); e != nil {
 		return e
 	}

@@ -6,6 +6,7 @@ import (
 	"sort"
 
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/stopwatch"
 )
 
 type satSimplifierVarCost struct{ variable, cost uint32 }
@@ -32,6 +33,9 @@ func (s *satSimplifier) closeElimination() error {
 			return e
 		}
 		x.reportActive = false
+		if e := s.emitEliminationReport(); e != nil {
+			return e
+		}
 	}
 	return nil
 }
@@ -705,6 +709,8 @@ func (s *satSimplifier) eliminateVariables() (err error) {
 	if !s.elimVars {
 		return nil
 	}
+	s.elimReport = stopwatch.Stopwatch{}
+	s.elimReportVars = s.numElimVars
 	if e := s.elimReport.Start(); e != nil {
 		return e
 	}
