@@ -17,15 +17,17 @@ func lpRowIterationFixture(t *testing.T, h *lpPairHarness, initial, bound, a *bi
 	f := lpNewPairCoreFixture(t, h, 1, 3)
 	f.settings.SimplexStrategy = StrategyTableauRows
 	h.must(f.a.Set(0, 0, &h.pair("1", "0").X))
-	h.must(f.a.Set(0, 1, &h.pair(a.RatString(), "0").X))
+	h.must(f.a.Set(0, 1, &h.pairExactLarge(a.RatString(), "0").X))
 	h.must(f.a.Set(0, 2, &h.pair("-1", "0").X))
 	f.types[0], f.types[1], f.types[2] = kind, ColumnFree, ColumnFixed
-	h.must(f.x.Data[0].Copy(h.m, h.pair(initial.RatString(), epsilonInitial.RatString())))
+	initialValue := h.pairExactLarge(initial.RatString(), epsilonInitial.RatString())
+	h.must(f.x.Data[0].Copy(h.m, initialValue))
 	for _, p := range []*RationalPair{&f.x.Data[2], &f.low.Data[2], &f.up.Data[2]} {
-		h.must(p.Copy(h.m, h.pair(initial.RatString(), epsilonInitial.RatString())))
+		h.must(p.Copy(h.m, initialValue))
 	}
+	boundValue := h.pairExactLarge(bound.RatString(), epsilonBound.RatString())
 	for _, p := range []*RationalPair{&f.low.Data[0], &f.up.Data[0]} {
-		h.must(p.Copy(h.m, h.pair(bound.RatString(), epsilonBound.RatString())))
+		h.must(p.Copy(h.m, boundValue))
 	}
 	m, e := NewPairPrimalCoreSolver(f.input())
 	h.must(e)
