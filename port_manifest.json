@@ -184346,7 +184346,8 @@
         "pkg/util/diagnostic/util_small_object_allocator_stream.go",
         "pkg/util/diagnostic/util_process_verbose.go",
         "pkg/util/params/util_env_params.go",
-        "pkg/sat/sat_cleaner_report.go"
+        "pkg/sat/sat_cleaner_report.go",
+        "pkg/sat/sat_scc_report.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184369,7 +184370,8 @@
         "TestVerboseContextWarmOutputAndNullAdapter",
         "TestProcessVerboseGlobalsDefaultAndBorrowedSelection",
         "TestUpdateProcessEnvParamsSharedVerbosityAndWarning",
-        "TestSATCleanerReportUsesProcessVerboseStreamAndSourceGate"
+        "TestSATCleanerReportUsesProcessVerboseStreamAndSourceGate",
+        "TestSATSCCReportActualEliminationAndSourceGates"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -184465,6 +184467,14 @@
           "tests": [
             "TestSATCleanerReportUsesProcessVerboseStreamAndSourceGate"
           ]
+        },
+        {
+          "name": "Retained SAT SCC report IF_VERBOSE(10) gate, process-selected stream, and source stopwatch/stat chain (src/sat/sat_scc.cpp:43-58)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_scc_report.go",
+          "tests": [
+            "TestSATSCCReportActualEliminationAndSourceGates"
+          ]
         }
       ],
       "ownership": [
@@ -184524,7 +184534,8 @@
         "pkg/math/subpaving/fast_context_params.go",
         "pkg/math/subpaving/rational_context_params.go",
         "pkg/math/subpaving/hardware_context_root.go",
-        "pkg/sat/sat_cleaner_report.go"
+        "pkg/sat/sat_cleaner_report.go",
+        "pkg/sat/sat_scc_report.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184574,7 +184585,8 @@
         "TestFastContextNamedParamsSinglePassAndStoppedPrefix",
         "TestRationalContextNamedParamsSinglePassAndDefaults",
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
-        "TestSATCleanerReportUsesProcessVerboseStreamAndSourceGate"
+        "TestSATCleanerReportUsesProcessVerboseStreamAndSourceGate",
+        "TestSATSCCReportActualEliminationAndSourceGates"
       ],
       "conditionals": [
         {
@@ -184968,6 +184980,14 @@
           "go_target": "pkg/sat/sat_cleaner_report.go",
           "tests": [
             "TestSATCleanerReportUsesProcessVerboseStreamAndSourceGate"
+          ]
+        },
+        {
+          "name": "Retained SAT SCC report IF_VERBOSE(10) gate, process-selected stream, and source stopwatch/stat chain (src/sat/sat_scc.cpp:43-58)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_scc_report.go",
+          "tests": [
+            "TestSATSCCReportActualEliminationAndSourceGates"
           ]
         }
       ],

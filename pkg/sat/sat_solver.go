@@ -183,6 +183,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	if s.scc, err = newSATSCC(s.Lifecycle, &c.Params); err != nil {
 		return s, err
 	}
+	s.scc.solver = s
 	if s.asymm, err = newSATAsymmBranch(s.Lifecycle, &c.Params); err != nil {
 		return s, err
 	}

@@ -16,6 +16,7 @@ import (
 // no encoded frame or container backing is allocated through Runtime.
 type satSCC struct {
 	self                                             *satSCC
+	solver                                           *Solver // borrowed source owner for mk_stat in report
 	lifecycle                                        *satSolverClauseLifecycle
 	index, lowlink, stack                            []uint32
 	inStack                                          []bool
@@ -23,7 +24,7 @@ type satSCC struct {
 	frames                                           []satSCCFrame
 	toElim                                           []BoolVar
 	eliminator                                       satElimEqs
-	numElim, nextIndex                               uint32
+	numElim, nextIndex, reportNumElim                uint32
 	header                                           uint64
 	bodyCause, cleanupCause                          error
 	report                                           stopwatch.Stopwatch
@@ -105,6 +106,9 @@ func (c *satSCC) closeVectors() error {
 			return e
 		}
 		c.reportActive = false
+		if c.solver != nil {
+			return c.emitReport()
+		}
 	}
 	return nil
 }
@@ -180,6 +184,7 @@ func (c *satSCC) run() (count uint32, err error) {
 		}
 	}
 	c.report = stopwatch.Stopwatch{}
+	c.reportNumElim = c.numElim
 	if e := c.report.Start(); e != nil {
 		return 0, e
 	}
