@@ -4,9 +4,7 @@
 package diagnostic
 
 import (
-	"os"
 	"os/exec"
-	"syscall"
 )
 
 const debugHostLinux = true
@@ -41,8 +39,9 @@ func (a *DebugActionContext) hostRunCommand(command string) (int, error) {
 	return 0, nil
 }
 func (a *DebugActionContext) hostStop() error {
-	if e := syscall.Kill(os.Getpid(), syscall.SIGSEGV); e != nil {
-		return e
-	}
-	select {} // the actual Go signal handler terminates this process.
+	// The source stops by writing through a null pointer. Sending SIGSEGV to
+	// the process can land on another Go thread and leave this caller blocked.
+	var stopped *int
+	*stopped = 0
+	return nil
 }

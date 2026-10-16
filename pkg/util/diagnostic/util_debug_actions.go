@@ -102,8 +102,8 @@ func (a *DebugActionContext) hostCommand() (string, error) {
 }
 
 // InvokeDebugger preserves prompt/extraction/switch order. Exit is the actual
-// process action. The Linux null-store replacement sends the real SIGSEGV to
-// this Go process; its runtime diagnostic and exit status differ from C++ UB.
+// process action. The Linux null store raises Go's SIGSEGV diagnostic; its
+// exit status differs from C++ undefined behavior.
 func (a *DebugActionContext) InvokeDebugger() error {
 	if e := a.open(); e != nil {
 		return e

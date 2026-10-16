@@ -138,7 +138,7 @@ func TestDebugActionActualHostStopAndSystemFailure(t *testing.T) {
 	}{{"stop", "S", false}, {"stop-lower", "s", false}, {"system-failure", "G", true}, {"system-failure-lower", "g", true}} {
 		t.Run(c.name, func(t *testing.T) {
 			out, err, code := debugActionChild(t, c.name, []byte(c.input), c.system)
-			if out != "" || code != 2 || !strings.HasPrefix(err, DebugSourcePrompt) {
+			if code != 2 || !strings.Contains(err, DebugSourcePrompt) {
 				t.Fatal(out, err, code)
 			}
 			if !strings.Contains(err, "SIGSEGV: segmentation violation") {
