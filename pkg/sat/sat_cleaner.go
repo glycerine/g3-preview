@@ -178,6 +178,7 @@ func (c *satCleaner) cleanupWatches() error {
 			}
 			continue
 		}
+		c.traceProcessingWatchList(idx)
 		ref, e := list.ref()
 		if e != nil {
 			return e
@@ -219,6 +220,7 @@ func (c *satCleaner) cleanupWatches() error {
 					return e
 				}
 				keep = a == lbool.Undef
+				c.traceKeepingBinaryWatch(idx, l)
 			case 1, 2:
 			case 3:
 				keep = true

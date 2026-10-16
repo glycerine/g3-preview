@@ -74379,6 +74379,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_cleaner_assertion.go",
           "tests": ["TestSATCleanerInvariantUsesProcessDebugGate", "TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder", "TestSATIntegrityEliminatedWatchSourceTrace", "TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
+        },
+        {
+          "name": "Retained cleanup_watches cleanup_bug TRACE at cpp48 for each unassigned list and cpp61 for each visited binary watch, including source keeping record on drop",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_watch_trace.go",
+          "tests": ["TestSATCleanerWatchSourceTracesKeepAndDrop"]
         }
       ],
       "ownership": [
@@ -74443,6 +74449,12 @@
             "TestSATCleanerFiniteFormulaOracle",
             "TestSATCleanerNativeRecyclePermitsNextPublication"
           ]
+        },
+        {
+          "name": "Retained cleanup_watches cleanup_bug TRACE at cpp48 for each unassigned list and cpp61 for each visited binary watch, including source keeping record on drop",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_watch_trace.go",
+          "tests": ["TestSATCleanerWatchSourceTracesKeepAndDrop"]
         }
       ],
       "ownership": [
@@ -182005,6 +182017,12 @@
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "go_targets": ["pkg/sat/sat_integrity_checker.go"],
           "tests": ["TestSATIntegrityNaryResidualSourceTraceAndAssertion"]
+        },
+        {
+          "name": "Retained cleanup_watches cleanup_bug TRACE at cpp48 for each unassigned list and cpp61 for each visited binary watch, including source keeping record on drop",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_watch_trace.go",
+          "tests": ["TestSATCleanerWatchSourceTracesKeepAndDrop"]
         }
       ],
       "ownership": [
@@ -183763,6 +183781,12 @@
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "go_targets": ["pkg/sat/sat_integrity_checker.go"],
           "tests": ["TestSATIntegrityNaryResidualSourceTraceAndAssertion"]
+        },
+        {
+          "name": "Retained cleanup_watches cleanup_bug TRACE at cpp48 for each unassigned list and cpp61 for each visited binary watch, including source keeping record on drop",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_watch_trace.go",
+          "tests": ["TestSATCleanerWatchSourceTracesKeepAndDrop"]
         }
       ],
       "ownership": [
