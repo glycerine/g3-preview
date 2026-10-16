@@ -214,10 +214,12 @@ func (m *MonomialManager) mulInputsCreated(left, right monomialInput, outcome *m
 	if e = m.tempSetSize(t, k); e != nil {
 		return Monomial{}, e
 	}
+	m.traceMultiplyBefore(left, right, t)
 	r, e := m.internTempCreated(1, outcome)
 	if e != nil {
 		return r, e
 	}
+	m.traceMultiplyAfter(left, right, t, k, r)
 	if polynomialSourceDebug {
 		ok, e := m.IsValid(r)
 		if e != nil {

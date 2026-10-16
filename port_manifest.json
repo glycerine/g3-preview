@@ -43179,6 +43179,12 @@
           ]
         },
         {
+          "name": "monomial_manager::mul source TRACE around interning at polynomial.cpp:960,967",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_monomial_mul_trace.go",
+          "tests": ["TestMonomialMultiplySourceTraceBeforeAndAfterIntern"]
+        },
+        {
           "name": "polynomial.cpp:6558-6830 Factor family: strict minimum-degree selector, direct AccConstant/FlipSign, original-p UP converter, borrowed bound square-free backend, literal degree dispatcher, recursive FactorCore and accumulating Factor including erased zero/constant paths.",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factor_core.go",
@@ -45945,6 +45951,12 @@
             "TestPolynomialVariableRecognitionLiteralWritePrefixes",
             "TestPolynomialVariableRecognitionBIGEveryActualPrefix"
           ]
+        },
+        {
+          "name": "monomial_manager::mul source TRACE around interning at polynomial.cpp:960,967",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_monomial_mul_trace.go",
+          "tests": ["TestMonomialMultiplySourceTraceBeforeAndAfterIntern"]
         },
         {
           "name": "polynomial.cpp:6558-6830 Factor family: strict minimum-degree selector, direct AccConstant/FlipSign, original-p UP converter, borrowed bound square-free backend, literal degree dispatcher, recursive FactorCore and accumulating Factor including erased zero/constant paths.",
@@ -183256,6 +183268,12 @@
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
         },
         {
+          "name": "Retained monomial multiplication pre/post intern TRACE at polynomial.cpp:960,967",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_monomial_mul_trace.go",
+          "tests": ["TestMonomialMultiplySourceTraceBeforeAndAfterIntern"]
+        },
+        {
           "name": "Reached expr_abstract and mk_quantifier TRACE sites at expr_abstract.cpp:113,130",
           "status": "ported",
           "go_target": "pkg/ast/ast_expr_abstract_trace.go",
@@ -185423,6 +185441,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
+        },
+        {
+          "name": "Retained monomial multiplication pre/post intern TRACE at polynomial.cpp:960,967",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_monomial_mul_trace.go",
+          "tests": ["TestMonomialMultiplySourceTraceBeforeAndAfterIntern"]
         },
         {
           "name": "Reached expr_abstract and mk_quantifier TRACE sites at expr_abstract.cpp:113,130",
