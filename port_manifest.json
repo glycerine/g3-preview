@@ -77308,6 +77308,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_finalize_trace.go",
           "tests": ["TestSATActualSimplifierFinalizerSolverAndConverterSourceTrace"]
+        },
+        {
+          "name": "Reached full-solver initialize and operator() before/after cleaner display TRACE sites at sat_simplifier.cpp:147,162,168",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_display_trace.go",
+          "tests": ["TestSATActualSimplifierInitializeAndRunDisplaySourceTraces"]
         }
       ],
       "ownership": [
@@ -182356,6 +182362,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_finalize_trace.go",
           "tests": ["TestSATActualSimplifierFinalizerSolverAndConverterSourceTrace"]
+        },
+        {
+          "name": "Reached full-solver initialize and operator() before/after cleaner display TRACE sites at sat_simplifier.cpp:147,162,168",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_display_trace.go",
+          "tests": ["TestSATActualSimplifierInitializeAndRunDisplaySourceTraces"]
         }
       ],
       "ownership": [
@@ -184174,6 +184186,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_finalize_trace.go",
           "tests": ["TestSATActualSimplifierFinalizerSolverAndConverterSourceTrace"]
+        },
+        {
+          "name": "Reached full-solver initialize and operator() before/after cleaner display TRACE sites at sat_simplifier.cpp:147,162,168",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_display_trace.go",
+          "tests": ["TestSATActualSimplifierInitializeAndRunDisplaySourceTraces"]
         }
       ],
       "ownership": [

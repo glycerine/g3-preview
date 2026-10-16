@@ -269,6 +269,7 @@ func (s *satSimplifier) Run(learned bool) (err error) {
 	if e := s.invariant(); e != nil {
 		return e
 	}
+	s.traceRunSolverDisplay("before_simplifier", "operator()", 162)
 	if e := s.subTodo.Reset(); e != nil {
 		return e
 	}
@@ -283,6 +284,7 @@ func (s *satSimplifier) Run(learned bool) (err error) {
 	if e != nil {
 		return e
 	}
+	s.traceRunSolverDisplay("after_cleanup", "operator()", 168)
 	if e = s.invariant(); e != nil {
 		return e
 	}
@@ -393,6 +395,7 @@ func (s *satSimplifier) initialize() error {
 	if e = s.kernel.InitVisited(n); e != nil {
 		return e
 	}
+	s.traceRunSolverDisplay("after_cleanup", "initialize", 147)
 	return s.invariant()
 }
 
