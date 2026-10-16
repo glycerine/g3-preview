@@ -38,8 +38,8 @@ func (m *ASTManager) SMT2PPBooleanTree(root ASTHandle, names []usymbol.Symbol) (
 }
 
 // SMT2PPExprTree also accepts non-Boolean application roots reached by the
-// well-sorted diagnostics. The reached pattern-app branch is also handled;
-// quantifier documents remain in the wider source printer.
+// well-sorted diagnostics. Pattern apps and root quantifiers use their source
+// document branches; nested quantifiers remain in the wider printer.
 func (m *ASTManager) SMT2PPExprTree(root ASTHandle, names []usymbol.Symbol) (ASTHandle, error) {
 	return m.smt2PPExprTree(root, names, false)
 }

@@ -8,9 +8,7 @@ import (
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
-// smt2PPQuantifierRoot prints the reached unannotated binder profile.
-// Source numeric and duplicate binder names receive fresh !N suffixes.
-// Annotation branches still need their declaration scopes.
+// smt2PPQuantifierRoot prints source binder names, children and annotations.
 func (m *ASTManager) smt2PPQuantifierRoot(q ASTHandle, outer []usymbol.Symbol) (ASTHandle, error) {
 	count, err := m.GetNumDeclarations(q)
 	if err != nil || count == 0 {
@@ -32,9 +30,6 @@ func (m *ASTManager) smt2PPQuantifierRoot(q ASTHandle, outer []usymbol.Symbol) (
 	if err != nil {
 		return ASTHandle{}, err
 	}
-	if patterns != 0 || noPatterns != 0 || weight > 1 || !skid.IsNull() || !qid.IsNull() && !qid.IsNumerical() {
-		return ASTHandle{}, ErrASTDomain
-	}
 	used := make(map[string]bool, len(outer)+int(count))
 	for _, name := range outer {
 		spelling, e := m.smt2EnsureQuote(name)
@@ -44,7 +39,8 @@ func (m *ASTManager) smt2PPQuantifierRoot(q ASTHandle, outer []usymbol.Symbol) (
 		used[spelling] = true
 	}
 	binders := make([]usymbol.Symbol, 0, count)
-	decls := make([]ASTHandle, 0, count)
+	spellings := make([]string, 0, count)
+	sorts := make([]ASTHandle, 0, count)
 	for i := uint32(0); i < count; i++ {
 		name, e := m.GetDeclarationName(q, i)
 		if e != nil {
@@ -92,25 +88,97 @@ func (m *ASTManager) smt2PPQuantifierRoot(q ASTHandle, outer []usymbol.Symbol) (
 		if e != nil {
 			return ASTHandle{}, e
 		}
+		spellings = append(spellings, spelling)
+		sorts = append(sorts, sort)
+	}
+	scopedNames := append(append([]usymbol.Symbol{}, outer...), binders...)
+	printedPatterns := make([]ASTHandle, 0, patterns)
+	for i := uint32(0); i < patterns; i++ {
+		pattern, e := m.GetPattern(q, i)
+		if e != nil {
+			return ASTHandle{}, e
+		}
+		printed, e := m.smt2PPExprTree(pattern, scopedNames, false)
+		if e != nil {
+			return ASTHandle{}, e
+		}
+		printedPatterns = append(printedPatterns, printed)
+	}
+	printedNoPatterns := make([]ASTHandle, 0, noPatterns)
+	for i := uint32(0); i < noPatterns; i++ {
+		pattern, e := m.GetNoPattern(q, i)
+		if e != nil {
+			return ASTHandle{}, e
+		}
+		printed, e := m.smt2PPExprTree(pattern, scopedNames, false)
+		if e != nil {
+			return ASTHandle{}, e
+		}
+		printedNoPatterns = append(printedNoPatterns, printed)
+	}
+	body, err := m.GetQuantifierBody(q)
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	printedBody, err := m.smt2PPExprTree(body, scopedNames, false)
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	if patterns != 0 || noPatterns != 0 || weight > 1 || !skid.IsNull() || !qid.IsNull() && !qid.IsNumerical() {
+		parts := []ASTHandle{printedBody}
+		for _, printed := range printedPatterns {
+			attr, e := m.SMT2PPAttribute(":pattern ", printed)
+			if e != nil {
+				return ASTHandle{}, e
+			}
+			parts = append(parts, attr)
+		}
+		for _, printed := range printedNoPatterns {
+			attr, e := m.SMT2PPAttribute(":no-pattern ", printed)
+			if e != nil {
+				return ASTHandle{}, e
+			}
+			parts = append(parts, attr)
+		}
+		if weight > 1 {
+			attr, e := m.SMT2PPSimpleAttributeInt(":weight ", weight)
+			if e != nil {
+				return ASTHandle{}, e
+			}
+			parts = append(parts, attr)
+		}
+		if !skid.IsNull() {
+			attr, e := m.SMT2PPSimpleAttributeSymbol(":skolemid ", skid)
+			if e != nil {
+				return ASTHandle{}, e
+			}
+			parts = append(parts, attr)
+		}
+		if !qid.IsNull() && !qid.IsNumerical() {
+			attr, e := m.SMT2PPSimpleAttributeSymbol(":qid ", qid)
+			if e != nil {
+				return ASTHandle{}, e
+			}
+			parts = append(parts, attr)
+		}
+		printedBody, err = m.FormatSeq1("!", parts)
+		if err != nil {
+			return ASTHandle{}, err
+		}
+	}
+	decls := make([]ASTHandle, 0, count)
+	for i, sort := range sorts {
 		printedSort, e := m.SMT2PPSort(sort)
 		if e != nil {
 			return ASTHandle{}, e
 		}
-		decl, e := m.FormatSeq1(spelling, []ASTHandle{printedSort})
+		decl, e := m.FormatSeq1(spellings[i], []ASTHandle{printedSort})
 		if e != nil {
 			return ASTHandle{}, e
 		}
 		decls = append(decls, decl)
 	}
 	printedDecls, err := m.FormatSeq5(decls)
-	if err != nil {
-		return ASTHandle{}, err
-	}
-	body, err := m.GetQuantifierBody(q)
-	if err != nil {
-		return ASTHandle{}, err
-	}
-	printedBody, err := m.smt2PPExprTree(body, append(append([]usymbol.Symbol{}, outer...), binders...), false)
 	if err != nil {
 		return ASTHandle{}, err
 	}

@@ -89,6 +89,26 @@ func TestAIGExprCacheReleaseTracePrecedesLastReference(t *testing.T) {
 		t.Fatalf("numeric-binder quantifier cache result missing: %q", output.String())
 	}
 	aigMust(t, r.Close())
+	output.Reset()
+	fName, err := symbols.Intern("f")
+	aigMust(t, err)
+	fDecl, err := m.MkFuncDecl(fName, []ast.ASTHandle{sort}, sort, ast.ASTFuncDeclInfo{})
+	aigMust(t, err)
+	term, err := m.MkApp(fDecl, []ast.ASTHandle{bound})
+	aigMust(t, err)
+	pattern, err := m.MkFamilyApp(2, 0, nil, []ast.ASTHandle{term})
+	aigMust(t, err)
+	qid, err := symbols.Intern("q")
+	aigMust(t, err)
+	annotated, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []symbol.Symbol{symbol.Numerical(0)}, Body: bound,
+		Patterns: []ast.ASTHandle{pattern}, Weight: 2, QID: qid})
+	aigMust(t, err)
+	r, err = g.MkAIG(annotated)
+	aigMust(t, err)
+	if tags.ShouldTrace("expr2aig") && !strings.Contains(output.String(), "caching:\n(forall ((x!1 Bool)) (! x!1 :pattern ((f x!1)) :weight 2 :qid q))\n---> #") {
+		t.Fatalf("annotated quantifier cache result missing: %q", output.String())
+	}
+	aigMust(t, r.Close())
 	aigMust(t, g.Close())
 	aigMust(t, m.DelRef(&boundPin))
 	if strings.Contains(output.String(), "aig_lit_count") {

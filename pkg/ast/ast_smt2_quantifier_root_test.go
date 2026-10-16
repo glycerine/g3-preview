@@ -7,7 +7,7 @@ import (
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
-func TestASTSMT2UnannotatedQuantifierRootSourceFormat(t *testing.T) {
+func TestASTSMT2QuantifierRootSourceFormat(t *testing.T) {
 	c, g, p, budget := dynAckSourceFixture(t)
 	m, err := NewASTManager(ASTManagerConfig{Symbols: c.SymbolsField, Numerals: c.NumeralsField, Budget: budget})
 	paramsMust(t, err)
@@ -55,7 +55,27 @@ func TestASTSMT2UnannotatedQuantifierRootSourceFormat(t *testing.T) {
 	}
 	q, err := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{boolSort}, Names: []usymbol.Symbol{x}, Body: body, Weight: 2})
 	paramsMust(t, err)
-	if _, err = m.SMT2PPBooleanTree(q, nil); err != ErrASTDomain {
-		t.Fatalf("unported annotated quantifier accepted: %v", err)
+	if got := print(q); got != "(forall ((x Bool)) (! x :weight 2))" {
+		t.Fatalf("weighted quantifier format %q", got)
+	}
+	f, err := m.MkFuncDecl(astTestSymbol(t, m, "f"), []ASTHandle{boolSort}, boolSort, ASTFuncDeclInfo{})
+	paramsMust(t, err)
+	term, err := m.MkApp(f, []ASTHandle{body})
+	paramsMust(t, err)
+	pattern, err := m.MkFamilyApp(2, 0, nil, []ASTHandle{term})
+	paramsMust(t, err)
+	qid := astTestSymbol(t, m, "qid")
+	skid := astTestSymbol(t, m, "skid")
+	q, err = m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{boolSort}, Names: []usymbol.Symbol{x}, Body: body,
+		Patterns: []ASTHandle{pattern}, Weight: 3, QID: qid, SkolemID: skid})
+	paramsMust(t, err)
+	if got := print(q); got != "(forall ((x Bool)) (! x :pattern ((f x)) :weight 3 :skolemid skid :qid qid))" {
+		t.Fatalf("pattern annotation format %q", got)
+	}
+	q, err = m.MkQuantifier(ASTQuantifierSpec{Forall: false, Sorts: []ASTHandle{boolSort}, Names: []usymbol.Symbol{x}, Body: body,
+		NoPatterns: []ASTHandle{term}, QID: usymbol.Numerical(7)})
+	paramsMust(t, err)
+	if got := print(q); got != "(exists ((x Bool)) (! x :no-pattern (f x)))" {
+		t.Fatalf("no-pattern annotation format %q", got)
 	}
 }
