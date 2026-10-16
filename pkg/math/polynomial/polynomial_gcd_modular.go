@@ -30,6 +30,7 @@ func (m *MultivariatePolynomialManager) modularGCDImage(s *polynomialGCDFunction
 		return false, e
 	}
 	if size != old {
+		m.traceModGCDLiteral(4293, "bad prime, coefficient(s) vanished\n")
 		return true, nil
 	}
 	v, e := m.normalizeWithReceipt(s.refs[1].root.value, &s.normalizeInvocation)
@@ -48,7 +49,11 @@ func (m *MultivariatePolynomialManager) modularGCDImage(s *polynomialGCDFunction
 		return false, e
 	}
 	if size != old {
+		m.traceModGCDLiteral(4298, "bad prime, coefficient(s) vanished\n")
 		return true, nil
+	}
+	if e = m.traceModGCDPolynomials("mgcd", 4301, "u_Zp: ", s.refs[2].root.value, s.refs[3].root.value); e != nil {
+		return false, e
 	}
 	if e = m.modGCDRec(s.refs[2].root.value, s.refs[3].root.value, prime, 0, s.vars, &s.refs[5].root); e != nil {
 		return false, e
@@ -78,6 +83,12 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 	c := m.core
 	if e := m.newton.SetOwner(c); e != nil {
 		return e
+	}
+	if err = m.traceModGCDPolynomials("mgcd", 4239, "mod_gcd\nu: ", u, v); err != nil {
+		return err
+	}
+	if err = m.traceModGCDPolynomials("mgcd_call", 4240, "mod_gcd\nu: ", u, v); err != nil {
+		return err
 	}
 	if polynomialSourceDebug {
 		field, e := c.modular.Modular()
@@ -227,6 +238,9 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 		if e != nil {
 			return e
 		}
+		if e = m.traceModGCDPrime(&s.nums[7]); e != nil {
+			return e
+		}
 		bad, e := m.modularGCDImage(s, prime)
 		if e != nil {
 			return e
@@ -234,11 +248,15 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 		if bad {
 			continue
 		}
+		if e = m.traceModGCDPolynomials("mgcd", 4308, "new q:\n", s.refs[5].root.value); e != nil {
+			return e
+		}
 		constant, e := c.IsConstant(s.refs[5].root.value)
 		if e != nil {
 			return e
 		}
 		if constant {
+			m.traceModGCDLiteral(4310, "done, modular gcd is one\n")
 			result, e := c.MkConstantTakeCopy(&s.nums[2])
 			if e != nil {
 				return e
@@ -274,6 +292,7 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 				return e
 			}
 			if order < 0 {
+				m.traceModGCDLiteral(4324, "discarding image\n")
 				if e = s.refs[4].root.assign(c, s.refs[5].root.value); e != nil {
 					return e
 				}
@@ -284,6 +303,9 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 				if e = m.gcdCRA(s.refs[5].root.value, &s.nums[7], s.refs[4].root.value, &s.nums[6], &s.refs[4]); e != nil {
 					return e
 				}
+				if e = m.traceModGCDPolynomials("mgcd", 4330, "new combined:\n", s.refs[4].root.value); e != nil {
+					return e
+				}
 			}
 		}
 		candidate, e := m.normalizeWithReceipt(s.refs[4].root.value, &s.normalizeInvocation)
@@ -291,6 +313,9 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 			return e
 		}
 		if e = s.refs[6].root.assign(c, candidate); e != nil {
+			return e
+		}
+		if e = m.traceModGCDPolynomials("mgcd", 4334, "candidate:\n", s.refs[6].root.value); e != nil {
 			return e
 		}
 		frontier := s.depth
@@ -323,6 +348,7 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 			}
 		}
 		if divides {
+			m.traceModGCDLiteral(4340, "found GCD\n")
 			unit, e := c.monomials.Unit()
 			if e != nil {
 				return e
@@ -334,7 +360,10 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 			if e = r.assign(c, result); e != nil {
 				return e
 			}
-			return m.flipLeadingSign(r)
+			if e = m.flipLeadingSign(r); e != nil {
+				return e
+			}
+			return m.traceModGCDPolynomials("mgcd", 4343, "r: ", r.value)
 		}
 		if e = m.finishGCDLocalsTo(s, frontier); e != nil {
 			return e
