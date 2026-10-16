@@ -1,11 +1,14 @@
 package ufbv
 
 import (
+	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/ast/rewriter"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/symbol"
@@ -92,6 +95,10 @@ func TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier(t *testing.T) {
 	t.Cleanup(func() { cacheMust(t, index.close()) })
 	cacheMust(t, index.insert(qF, fx, gx))
 	cacheMust(t, index.insert(qG, gx, x))
+	var trace bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&trace)
+	tags.Enable("demodulator_bug")
+	index.trace = tags
 	loop, e := newRewriteTraversal(m)
 	cacheMust(t, e)
 	t.Cleanup(func() { cacheMust(t, loop.close()) })
@@ -118,6 +125,9 @@ func TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier(t *testing.T) {
 			}
 			cacheMust(t, m.DelRef(&out))
 		})
+	}
+	if tags.ShouldTrace("demodulator_bug") && !strings.Contains(trace.String(), "rewrite src/tactic/ufbv/ufbv_rewriter.cpp:423 ---------\ne:\n") {
+		t.Fatal("nested source rewrite did not reach rebuilt application trace", trace.String())
 	}
 	truth, e := m.MkTrue()
 	cacheMust(t, e)

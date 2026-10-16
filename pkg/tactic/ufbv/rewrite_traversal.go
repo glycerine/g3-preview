@@ -2,12 +2,16 @@
 // src/util/ref_buffer.h:35-51 and src/util/array_map.h:62-91.
 package ufbv
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+)
 
 // rewriteTraversal is the concrete UFBV child-visit frame. Its todo slice
 // owns one AST reference per entry; the cache owns its own entries separately.
 type rewriteTraversal struct {
 	manager         *ast.ASTManager
+	trace           *diagnostic.TraceTags
 	cache           *rewriteCache
 	todo            []ast.ASTHandle
 	pending         []ast.ASTHandle
@@ -100,6 +104,9 @@ func (r *rewriteTraversal) visitChildren(app ast.ASTHandle) (bool, error) {
 			}
 		}
 		if recursive {
+			if e := r.traceCycle(app, child); e != nil {
+				return false, e
+			}
 			if e := r.cache.insert(child, child, true); e != nil {
 				return false, e
 			}

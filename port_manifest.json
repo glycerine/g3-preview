@@ -108715,6 +108715,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained UFBV cycle and rebuilt-application TRACE at ufbv_rewriter.cpp:336,423",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_loop_trace.go",
+          "tests": ["TestRewriteTraversalSourceCycleCacheUsesActualTodo", "TestUFBVTraversalSourceRebuiltApplicationTrace", "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"]
+        },
+        {
           "name": "Retained UFBV rewrite entry and result TRACE at ufbv_rewriter.cpp:359,462",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_loop_trace.go",
@@ -182217,6 +182223,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained UFBV cycle and rebuilt-application TRACE at ufbv_rewriter.cpp:336,423",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_loop_trace.go",
+          "tests": ["TestRewriteTraversalSourceCycleCacheUsesActualTodo", "TestUFBVTraversalSourceRebuiltApplicationTrace", "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"]
+        },
+        {
           "name": "Retained UFBV rewrite entry and result TRACE at ufbv_rewriter.cpp:359,462",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_loop_trace.go",
@@ -184598,6 +184610,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained UFBV cycle and rebuilt-application TRACE at ufbv_rewriter.cpp:336,423",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_loop_trace.go",
+          "tests": ["TestRewriteTraversalSourceCycleCacheUsesActualTodo", "TestUFBVTraversalSourceRebuiltApplicationTrace", "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"]
+        },
         {
           "name": "Retained UFBV rewrite entry and result TRACE at ufbv_rewriter.cpp:359,462",
           "status": "ported",

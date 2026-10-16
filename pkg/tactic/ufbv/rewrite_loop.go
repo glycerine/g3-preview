@@ -22,6 +22,7 @@ func (r *rewriteTraversal) rewrite(index *rewriteRuleIndex, boolean *rewriter.Bo
 	if len(index.byFunc) == 0 {
 		return m.NewRef(root)
 	}
+	r.trace = index.traceTags()
 	if e := r.traceRewrite(index, 359, "rewrite: ", root); e != nil {
 		return ast.ASTRef{}, e
 	}
@@ -172,6 +173,9 @@ func (r *rewriteTraversal) rewrite(index *rewriteRuleIndex, boolean *rewriter.Bo
 					if err := keep(rebuilt); err != nil {
 						return ast.ASTRef{}, err
 					}
+				}
+				if err := r.traceRebuilt(index, e, args, rebuilt); err != nil {
+					return ast.ASTRef{}, err
 				}
 				if err := r.cache.insert(e, rebuilt, true); err != nil {
 					return ast.ASTRef{}, err

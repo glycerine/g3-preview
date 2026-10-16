@@ -1,9 +1,11 @@
 package ufbv
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 func TestRewriteTraversalSourceReverseChildrenAndOwningTodo(t *testing.T) {
@@ -79,9 +81,23 @@ func TestRewriteTraversalSourceCycleCacheUsesActualTodo(t *testing.T) {
 	cacheMust(t, m.IncRef(app))
 	r, e := newRewriteTraversal(m)
 	cacheMust(t, e)
+	var trace bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&trace)
+	tags.Enable("demodulator")
+	r.trace = tags
 	cacheMust(t, r.pushTodo(a))
 	ready, e := r.visitChildren(app)
 	cacheMust(t, e)
+	if tags.ShouldTrace("demodulator") {
+		want := "-------- [demodulator] rewrite_visit_children src/tactic/ufbv/ufbv_rewriter.cpp:336 ---------\n" +
+			"Detected demodulator cycle: (cycle (:var 4001) (:var 4002) (:var 4001)) --> (:var 4001)\n" +
+			"------------------------------------------------\n"
+		if got := trace.String(); got != want {
+			t.Fatalf("first source cycle record:\ngot  %q\nwant %q", got, want)
+		}
+	} else if trace.Len() != 0 {
+		t.Fatal("erased source cycle trace emitted", trace.String())
+	}
 	if ready || len(r.todo) != 2 || r.todo[0] != a || r.todo[1] != b {
 		t.Fatal("cycle must cache A and schedule only B", ready, r.todo)
 	}
@@ -90,10 +106,17 @@ func TestRewriteTraversalSourceCycleCacheUsesActualTodo(t *testing.T) {
 	if !found || !entry.done || entry.expr != a {
 		t.Fatal("actual array-map cycle entry", entry, found)
 	}
+	refused := &refusingUFBVTraceWriter{}
+	refusedTags := diagnostic.NewTraceTagsWithWriter(refused)
+	refusedTags.Enable("demodulator")
+	r.trace = refusedTags
 	ready, e = r.visitChildren(app)
 	cacheMust(t, e)
 	if !ready || len(r.todo) != 2 {
 		t.Fatal("second visit must mark B cycle and skip cached A", ready, r.todo)
+	}
+	if refusedTags.ShouldTrace("demodulator") && refused.calls != 1 {
+		t.Fatal("cycle stream refusal stopped traversal or lost bad state", refused.calls)
 	}
 	cacheMust(t, r.close())
 	cacheMust(t, m.DecRef(app))

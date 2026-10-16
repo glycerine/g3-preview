@@ -84,3 +84,54 @@ func TestUFBVTraversalSourceEntryAndResultTraces(t *testing.T) {
 		t.Fatal("source heading must precede failed operand formatting", prefix.String())
 	}
 }
+
+func TestUFBVTraversalSourceRebuiltApplicationTrace(t *testing.T) {
+	m := cacheFixture(t)
+	b, e := m.MkBoolSort()
+	cacheMust(t, e)
+	f, e := m.MkFuncDecl(symbol.Numerical(910), []ast.ASTHandle{b}, b, ast.ASTFuncDeclInfo{})
+	cacheMust(t, e)
+	a, e := m.MkConst(symbol.Numerical(911), b)
+	cacheMust(t, e)
+	c, e := m.MkConst(symbol.Numerical(912), b)
+	cacheMust(t, e)
+	old, e := m.MkApp(f, []ast.ASTHandle{a})
+	cacheMust(t, e)
+	rebuilt, e := m.MkApp(f, []ast.ASTHandle{c})
+	cacheMust(t, e)
+	index, e := newRewriteRuleIndex(m)
+	cacheMust(t, e)
+	t.Cleanup(func() { cacheMust(t, index.close()) })
+	loop, e := newRewriteTraversal(m)
+	cacheMust(t, e)
+	t.Cleanup(func() { cacheMust(t, loop.close()) })
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	index.trace = tags
+	cacheMust(t, loop.traceRebuilt(index, old, []ast.ASTHandle{c}, rebuilt))
+	if output.Len() != 0 {
+		t.Fatal("disabled rebuilt trace emitted", output.String())
+	}
+	tags.Enable("demodulator_bug")
+	cacheMust(t, loop.traceRebuilt(index, old, []ast.ASTHandle{c}, rebuilt))
+	if !tags.ShouldTrace("demodulator_bug") {
+		if output.Len() != 0 {
+			t.Fatal("erased rebuilt trace emitted", output.String())
+		}
+		return
+	}
+	want := "-------- [demodulator_bug] rewrite src/tactic/ufbv/ufbv_rewriter.cpp:423 ---------\n" +
+		"e:\n(k!910 k!911)\nnew_args: \nk!912\n=====>\nna:\n (k!910 k!912)\n" +
+		"------------------------------------------------\n"
+	if got := output.String(); got != want {
+		t.Fatalf("source rebuilt application record:\ngot  %q\nwant %q", got, want)
+	}
+	refused := &refusingUFBVTraceWriter{}
+	refusedTags := diagnostic.NewTraceTagsWithWriter(refused)
+	refusedTags.Enable("demodulator_bug")
+	index.trace = refusedTags
+	cacheMust(t, loop.traceRebuilt(index, old, []ast.ASTHandle{c}, rebuilt))
+	if refusedTags.ShouldTrace("demodulator_bug") && refused.calls != 1 {
+		t.Fatal("rebuilt trace stream refusal did not retain bad state", refused.calls)
+	}
+}
