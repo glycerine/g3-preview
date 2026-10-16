@@ -97,7 +97,9 @@ func (s *satSimplifier) eliminationCost(v BoolVar) (uint32, error) {
 	if e != nil {
 		return 0, e
 	}
-	return 2*np*nn + np*bn + nn*bp, nil
+	cost := 2*np*nn + np*bn + nn*bp
+	s.traceEliminationZeroCost(v, np, nn, bp, bn, cost)
+	return cost, nil
 }
 func (s *satSimplifier) orderVariables() error {
 	defer s.closeEliminationCosts()
@@ -138,6 +140,7 @@ func (s *satSimplifier) orderVariables() error {
 		return e
 	}
 	s.sortEliminationCosts()
+	s.traceEliminationSortedCosts(x.costs)
 	for _, a := range x.costs {
 		if e := x.vars.Push(a.variable); e != nil {
 			return e

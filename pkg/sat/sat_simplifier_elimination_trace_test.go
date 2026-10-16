@@ -137,3 +137,37 @@ func TestSATSimplifierActualResolventBodiesSourceTraces(t *testing.T) {
 		t.Fatalf("source resolvent body traces: got %q, want %q", got, want)
 	}
 }
+
+func TestSATSimplifierEliminationCostAndOrderSourceTraces(t *testing.T) {
+	s, l := satSimplifierFixture(t, 3)
+	satOK(t, s.useList.Init(3))
+	for _, literals := range [][]Literal{{0, 2, 4}, {1, 2, 5}} {
+		c, err := l.MkClauseCore(3, literals, false)
+		satOK(t, err)
+		satOK(t, s.useList.Insert(c))
+	}
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("elim_vars_detail")
+	tags.Enable("elim_vars")
+	l.traceTags = tags
+	satOK(t, l.propagation.variables.elimTodo.Reset())
+	for _, v := range []uint32{2, 0, 1} {
+		satOK(t, l.propagation.variables.elimTodo.Insert(v))
+	}
+	s.elimination.vars.Bind(l.propagation.memory)
+	satOK(t, s.orderVariables())
+	want := ""
+	if tags.ShouldTrace("elim_vars_detail") {
+		want += "-------- [elim_vars_detail] get_to_elim_cost src/sat/sat_simplifier.cpp:1105 ---------\n" +
+			"1 num_pos: 2 num_neg: 0 num_bin_pos: 0 num_bin_neg: 0 cost: 0\n------------------------------------------------\n"
+	}
+	if tags.ShouldTrace("elim_vars") {
+		want += "-------- [elim_vars] order_vars_for_elim src/sat/sat_simplifier.cpp:1133 ---------\n" +
+			"(1, 0) (2, 2) (0, 2) \n------------------------------------------------\n"
+	}
+	if got := output.String(); got != want {
+		t.Fatalf("source cost/order trace: got %q, want %q", got, want)
+	}
+	satOK(t, s.closeElimination())
+}

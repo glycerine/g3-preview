@@ -1,4 +1,4 @@
-// Source: src/sat/sat_simplifier.cpp:1296-1401; retained util/trace sites.
+// Source: src/sat/sat_simplifier.cpp:1105-1401; retained util/trace sites.
 package sat
 
 import (
@@ -21,6 +21,34 @@ func (s *satSimplifier) traceElimination(tag, method string, line int, body func
 func (s *satSimplifier) traceEliminationProcessing(v BoolVar) {
 	s.traceElimination("resolution_bug", "try_eliminate", 1302, func(w io.Writer) error {
 		_, err := io.WriteString(w, "processing: "+strconv.FormatUint(uint64(v), 10)+"\n")
+		return err
+	})
+}
+
+func (s *satSimplifier) traceEliminationZeroCost(v BoolVar, pos, neg, binPos, binNeg, cost uint32) {
+	if cost != 0 {
+		return
+	}
+	s.traceElimination("elim_vars_detail", "get_to_elim_cost", 1105, func(w io.Writer) error {
+		_, err := io.WriteString(w, strconv.FormatUint(uint64(v), 10)+
+			" num_pos: "+strconv.FormatUint(uint64(pos), 10)+
+			" num_neg: "+strconv.FormatUint(uint64(neg), 10)+
+			" num_bin_pos: "+strconv.FormatUint(uint64(binPos), 10)+
+			" num_bin_neg: "+strconv.FormatUint(uint64(binNeg), 10)+
+			" cost: "+strconv.FormatUint(uint64(cost), 10)+"\n")
+		return err
+	})
+}
+
+func (s *satSimplifier) traceEliminationSortedCosts(costs []satSimplifierVarCost) {
+	s.traceElimination("elim_vars", "order_vars_for_elim", 1133, func(w io.Writer) error {
+		for _, c := range costs {
+			if _, err := io.WriteString(w, "("+strconv.FormatUint(uint64(c.variable), 10)+", "+
+				strconv.FormatUint(uint64(c.cost), 10)+") "); err != nil {
+				return err
+			}
+		}
+		_, err := io.WriteString(w, "\n")
 		return err
 	})
 }
