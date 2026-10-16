@@ -77296,6 +77296,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_todos_trace.go",
           "tests": ["TestSATSimplifierActualSubsumptionTodoSourceTraces"]
+        },
+        {
+          "name": "Reached full-solver subsume pre-loop and post-checkpoint subsumption_bug display TRACE sites at sat_simplifier.cpp:813,832",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_display_trace.go",
+          "tests": ["TestSATActualSimplifierSubsumptionSolverDisplaySourceTrace"]
         }
       ],
       "ownership": [
@@ -182332,6 +182338,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_todos_trace.go",
           "tests": ["TestSATSimplifierActualSubsumptionTodoSourceTraces"]
+        },
+        {
+          "name": "Reached full-solver subsume pre-loop and post-checkpoint subsumption_bug display TRACE sites at sat_simplifier.cpp:813,832",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_display_trace.go",
+          "tests": ["TestSATActualSimplifierSubsumptionSolverDisplaySourceTrace"]
         }
       ],
       "ownership": [
@@ -184138,6 +184150,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_todos_trace.go",
           "tests": ["TestSATSimplifierActualSubsumptionTodoSourceTraces"]
+        },
+        {
+          "name": "Reached full-solver subsume pre-loop and post-checkpoint subsumption_bug display TRACE sites at sat_simplifier.cpp:813,832",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_display_trace.go",
+          "tests": ["TestSATActualSimplifierSubsumptionSolverDisplaySourceTrace"]
         }
       ],
       "ownership": [

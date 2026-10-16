@@ -207,6 +207,7 @@ func (s *satSimplifier) subsume() (err error) {
 	if _, e := s.subsumeBinaries(); e != nil {
 		return e
 	} // source intentionally ignores bool
+	s.traceSubsumeSolverDisplay(813)
 	p := s.lifecycle.propagation
 	for {
 		s.traceSubsumptionTodoSize()
@@ -256,6 +257,7 @@ func (s *satSimplifier) subsume() (err error) {
 		if e := p.checkpoint(); e != nil {
 			return e
 		}
+		s.traceSubsumeSolverDisplay(832)
 		if s.subTodo.Empty() {
 			var e error
 			s.lastSubTrailSize, e = p.variables.trail.Size(p.variables.trailRef)
