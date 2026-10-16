@@ -105,12 +105,12 @@ func (r *rewriteBackIndex) addDemodulator(index *rewriteRuleIndex, q ast.ASTHand
 		return e
 	}
 	for f := range decls {
-		set := r.byDecl[f]
-		if set == nil {
-			set = make(map[ast.ASTHandle]struct{})
-			r.byDecl[f] = set
+		if _, e := r.ensureBackSet(f); e != nil {
+			return e
 		}
-		set[q] = struct{}{}
+	}
+	for f := range decls {
+		r.byDecl[f].values[q] = struct{}{}
 	}
 	return nil
 }
@@ -125,8 +125,12 @@ func (r *rewriteBackIndex) rescheduleDemodulators(index *rewriteRuleIndex, f, lh
 	if index == nil || index.manager != r.manager || index.check() != nil {
 		return ast.ErrASTDomain
 	}
-	occurrences := make([]ast.ASTHandle, 0, len(r.byDecl[f]))
-	for q := range r.byDecl[f] {
+	var values map[ast.ASTHandle]struct{}
+	if set := r.byDecl[f]; set != nil {
+		values = set.values
+	}
+	occurrences := make([]ast.ASTHandle, 0, len(values))
+	for q := range values {
 		occurrences = append(occurrences, q)
 	}
 	for _, q := range occurrences {
@@ -161,7 +165,9 @@ func (r *rewriteBackIndex) rescheduleDemodulators(index *rewriteRuleIndex, f, lh
 			return e
 		}
 		for d := range decls {
-			delete(r.byDecl[d], q)
+			if set := r.byDecl[d]; set != nil {
+				delete(set.values, q)
+			}
 		}
 		r.todo = append(r.todo, q)
 		r.owned[at] = ast.ASTHandle{} // transfer local reference to todo

@@ -69,8 +69,8 @@ func TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot(t *testi
 	cacheMust(t, back.addDemodulator(forward, qDifferent))
 	cacheMust(t, back.addProcessed(qProcessed))
 	cacheMust(t, back.addProcessed(fa))
-	if len(back.byDecl[f]) != 4 {
-		t.Fatal("back index missed quantified annotation or processed occurrences", len(back.byDecl[f]))
+	if len(back.byDecl[f].values) != 4 {
+		t.Fatal("back index missed quantified annotation or processed occurrences", len(back.byDecl[f].values))
 	}
 	cacheMust(t, back.rescheduleDemodulators(forward, f, fa))
 	if _, found := forward.rules[qAnnotation]; found {
@@ -79,8 +79,8 @@ func TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot(t *testi
 	if _, found := forward.rules[qDifferent]; !found {
 		t.Fatal("nonmatching demodulator was removed")
 	}
-	if len(back.todo) != 1 || back.todo[0] != qAnnotation || len(back.byDecl[f]) != 3 {
-		t.Fatal("rescheduling must move only the matched quantified occurrence", back.todo, len(back.byDecl[f]))
+	if len(back.todo) != 1 || back.todo[0] != qAnnotation || len(back.byDecl[f].values) != 3 {
+		t.Fatal("rescheduling must move only the matched quantified occurrence", back.todo, len(back.byDecl[f].values))
 	}
 	if !forward.consistent() {
 		t.Fatal("forward index inconsistent after rescheduling")

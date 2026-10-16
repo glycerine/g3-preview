@@ -5,9 +5,14 @@ import "github.com/glycerine/g3/pkg/ast"
 
 // rewriteBackIndex is the concrete UFBV m_back_idx/m_processed/m_todo state.
 // Forward and backward object sets use native Go maps of AST identities.
+type rewriteBackSet struct {
+	values map[ast.ASTHandle]struct{}
+	header uint64
+}
+
 type rewriteBackIndex struct {
 	manager   *ast.ASTManager
-	byDecl    map[ast.ASTHandle]map[ast.ASTHandle]struct{}
+	byDecl    map[ast.ASTHandle]*rewriteBackSet
 	processed map[ast.ASTHandle]struct{}
 	todo      []ast.ASTHandle
 	owned     []ast.ASTHandle
@@ -20,7 +25,7 @@ func newRewriteBackIndex(m *ast.ASTManager) (*rewriteBackIndex, error) {
 	}
 	return &rewriteBackIndex{
 		manager:   m,
-		byDecl:    make(map[ast.ASTHandle]map[ast.ASTHandle]struct{}),
+		byDecl:    make(map[ast.ASTHandle]*rewriteBackSet),
 		processed: make(map[ast.ASTHandle]struct{}),
 	}, nil
 }
@@ -124,6 +129,11 @@ func (r *rewriteBackIndex) addProcessed(expr ast.ASTHandle) error {
 	if _, present := r.processed[expr]; present {
 		return nil
 	}
+	for f := range decls {
+		if _, e := r.ensureBackSet(f); e != nil {
+			return e
+		}
+	}
 	// The source borrows m_processed roots from the enclosing rewriter's
 	// argument/result owners. This concrete owner retains them until queued.
 	if e := r.manager.IncRef(expr); e != nil {
@@ -132,12 +142,7 @@ func (r *rewriteBackIndex) addProcessed(expr ast.ASTHandle) error {
 	r.owned = append(r.owned, expr)
 	r.processed[expr] = struct{}{}
 	for f := range decls {
-		set := r.byDecl[f]
-		if set == nil {
-			set = make(map[ast.ASTHandle]struct{})
-			r.byDecl[f] = set
-		}
-		set[expr] = struct{}{}
+		r.byDecl[f].values[expr] = struct{}{}
 	}
 	return nil
 }
@@ -148,8 +153,12 @@ func (r *rewriteBackIndex) rescheduleProcessed(f ast.ASTHandle) error {
 	if e := r.check(); e != nil {
 		return e
 	}
-	selected := make([]ast.ASTHandle, 0, len(r.byDecl[f]))
-	for expr := range r.byDecl[f] {
+	var values map[ast.ASTHandle]struct{}
+	if set := r.byDecl[f]; set != nil {
+		values = set.values
+	}
+	selected := make([]ast.ASTHandle, 0, len(values))
+	for expr := range values {
 		if _, active := r.processed[expr]; active {
 			selected = append(selected, expr)
 		}
@@ -167,7 +176,9 @@ func (r *rewriteBackIndex) rescheduleProcessed(f ast.ASTHandle) error {
 		r.todo = append(r.todo, expr)
 		delete(r.processed, expr)
 		for d := range decls {
-			delete(r.byDecl[d], expr)
+			if set := r.byDecl[d]; set != nil {
+				delete(set.values, expr)
+			}
 		}
 		for i, h := range r.owned {
 			if h == expr {
@@ -224,6 +235,9 @@ func (r *rewriteBackIndex) close() error {
 		if !consumed {
 			return ast.ErrASTPending
 		}
+	}
+	for _, set := range r.byDecl {
+		r.releaseBackSet(set)
 	}
 	r.byDecl = nil
 	r.processed = nil

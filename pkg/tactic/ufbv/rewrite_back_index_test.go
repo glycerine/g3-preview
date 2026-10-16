@@ -1,8 +1,10 @@
 package ufbv
 
 import (
+	"errors"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -58,11 +60,11 @@ func TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations(t *test
 	for _, h := range []ast.ASTHandle{both, q, ga} {
 		cacheMust(t, r.addProcessed(h))
 	}
-	if len(r.byDecl[f]) != 2 || len(r.byDecl[g]) != 3 || len(r.byDecl[constant]) != 0 || len(r.processed) != 3 {
+	if len(r.byDecl[f].values) != 2 || len(r.byDecl[g].values) != 3 || r.byDecl[constant] != nil || len(r.processed) != 3 {
 		t.Fatal("back index must visit body and no-pattern, but skip constants and interpreted conjunctions")
 	}
 	cacheMust(t, r.rescheduleProcessed(f))
-	if len(r.processed) != 1 || len(r.todo) != 2 || len(r.byDecl[f]) != 0 || len(r.byDecl[g]) != 1 {
+	if len(r.processed) != 1 || len(r.todo) != 2 || len(r.byDecl[f].values) != 0 || len(r.byDecl[g].values) != 1 {
 		t.Fatal("reschedule must snapshot f occurrences then erase all their back-index memberships")
 	}
 	if _, found := r.processed[ga]; !found {
@@ -89,5 +91,32 @@ func TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations(t *test
 		if got != refs {
 			t.Fatal("back-index owner leaked expression", h, got, refs)
 		}
+	}
+}
+
+func TestRewriteBackIndexSetAllocationRefusalCanRetry(t *testing.T) {
+	m := cacheFixture(t)
+	b, e := m.MkBoolSort()
+	cacheMust(t, e)
+	x, e := m.MkVar(0, b)
+	cacheMust(t, e)
+	f, e := m.MkFuncDecl(symbol.Numerical(65), []ast.ASTHandle{b}, b, ast.ASTFuncDeclInfo{})
+	cacheMust(t, e)
+	fx, e := m.MkApp(f, []ast.ASTHandle{x})
+	cacheMust(t, e)
+	cacheMust(t, m.IncRef(fx))
+	t.Cleanup(func() { cacheMust(t, m.DecRef(fx)) })
+	r, e := newRewriteBackIndex(m)
+	cacheMust(t, e)
+	t.Cleanup(func() { cacheMust(t, r.close()) })
+	before := m.Budget().Used()
+	m.Budget().FailAfter(0)
+	if e := r.addProcessed(fx); !errors.Is(e, arena.ErrInjectedFailure) || len(r.byDecl) != 0 || len(r.processed) != 0 || len(r.owned) != 0 || m.Budget().Used() != before {
+		t.Fatal("refused expr-set allocation published an incomplete back index", e, r.byDecl, r.processed, r.owned)
+	}
+	m.Budget().FailAfter(-1)
+	cacheMust(t, r.addProcessed(fx))
+	if len(r.byDecl[f].values) != 1 {
+		t.Fatal("retry did not index the expression", r.byDecl[f])
 	}
 }
