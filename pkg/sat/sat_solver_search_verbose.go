@@ -1,4 +1,4 @@
-// Source: src/sat/sat_solver.cpp:723-790,1191-1196,1347-1355.
+// Source: src/sat/sat_solver.cpp:723-790,1191-1196,1276-1280,1347-1355.
 package sat
 
 import (
@@ -36,6 +36,18 @@ func (s *Solver) emitSearchAbort(reason string, conflicts bool) error {
 		}
 	}
 	return out.AppendCString("\")\n")
+}
+
+func (s *Solver) emitModelCheckNotice() error {
+	enabled, err := diagnostic.ProcessVerboseEnabled(10)
+	if err != nil || !enabled {
+		return err
+	}
+	out, err := diagnostic.BorrowProcessVerboseStream()
+	if err != nil {
+		return err
+	}
+	return out.AppendCString("\"checking model\"\n")
 }
 
 func (s *Solver) emitSimplifyNotice() error {

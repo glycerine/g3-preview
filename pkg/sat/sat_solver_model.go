@@ -44,6 +44,9 @@ func (s *Solver) mkModel() error {
 	}
 	s.traceCompletedModel(n, model)
 	// Selected ordinary source profile does not define _EXTERNAL_RELEASE.
+	if e := s.emitModelCheckNotice(); e != nil {
+		return e
+	}
 	good, e := s.checkModel()
 	if e != nil {
 		return e

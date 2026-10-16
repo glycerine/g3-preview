@@ -136,6 +136,42 @@ func TestSATSolverCheckSourceRestartLimitAbort(t *testing.T) {
 	}
 }
 
+func TestSATSolverCheckSourceModelNotice(t *testing.T) {
+	for _, level := range []uint32{0, 10} {
+		t.Run(strconv.FormatUint(uint64(level), 10), func(t *testing.T) {
+			s, _, _ := satSolverCheckFixture(t)
+			out := satInspectionStream(t, arena.NewBudget(8192))
+			oldLevel, err := diagnostic.ProcessVerbosityLevel()
+			satOK(t, err)
+			oldStream, err := diagnostic.BorrowProcessVerboseStream()
+			satOK(t, err)
+			t.Cleanup(func() {
+				satOK(t, diagnostic.SetProcessVerboseStream(oldStream))
+				satOK(t, diagnostic.SetProcessVerbosityLevel(oldLevel))
+			})
+			satOK(t, diagnostic.SetProcessVerboseStream(out))
+			satOK(t, diagnostic.SetProcessVerbosityLevel(level))
+			result, err := s.Check(nil)
+			satOK(t, err)
+			got, err := out.String()
+			satOK(t, err)
+			if result != lbool.True {
+				t.Fatal("empty formula should produce a checked model", result)
+			}
+			if level == 0 && got != "" {
+				t.Fatal("disabled verbosity emitted model notice", got)
+			}
+			if level == 10 {
+				entry := strings.Index(got, "(sat.sat-solver)\n")
+				model := strings.Index(got, "\"checking model\"\n")
+				if entry != 0 || model <= entry || strings.Count(got, "\"checking model\"\n") != 1 {
+					t.Fatal("source check/model notice order", got)
+				}
+			}
+		})
+	}
+}
+
 func TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity(t *testing.T) {
 	for _, level := range []uint32{0, 2, 10} {
 		t.Run(strconv.FormatUint(uint64(level), 10), func(t *testing.T) {

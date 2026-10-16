@@ -78090,7 +78090,8 @@
         "TestSATNativeCaseSplitQueueOwnerBudgetAndIndexGuards",
         "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity",
         "TestSATSolverCheckSourceRestartLimitAbort",
-        "TestSATSolverCheckVerboseFileFailureKeepsSearchResult"
+        "TestSATSolverCheckVerboseFileFailureKeepsSearchResult",
+        "TestSATSolverCheckSourceModelNotice"
       ],
       "conditionals": [
         {
@@ -79393,6 +79394,14 @@
             "TestSATSolverCheckSourceRestartLimitAbort",
             "TestSATSolverCheckVerboseFileFailureKeepsSearchResult",
             "TestSATSolverCheckMaxConflictsZeroSourceReturnsUndef"
+          ]
+        },
+        {
+          "name": "Retained mk_model IF_VERBOSE(10) checking-model notice after converter application and before check_model at sat_solver.cpp:1277; cloned-solver notice is disabled by the commented CLONE_BEFORE_SOLVING macro",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_search_verbose.go",
+          "tests": [
+            "TestSATSolverCheckSourceModelNotice"
           ]
         }
       ],
@@ -184499,7 +184508,8 @@
         "TestSATSolverSimplifyAndRestartSourceVerboseLevels",
         "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity",
         "TestSATSolverCheckSourceRestartLimitAbort",
-        "TestSATSolverCheckVerboseFileFailureKeepsSearchResult"
+        "TestSATSolverCheckVerboseFileFailureKeepsSearchResult",
+        "TestSATSolverCheckSourceModelNotice"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -184664,6 +184674,14 @@
             "TestSATSolverCheckVerboseFileFailureKeepsSearchResult",
             "TestSATSolverCheckMaxConflictsZeroSourceReturnsUndef"
           ]
+        },
+        {
+          "name": "Retained mk_model IF_VERBOSE(10) checking-model notice after converter application and before check_model at sat_solver.cpp:1277; cloned-solver notice is disabled by the commented CLONE_BEFORE_SOLVING macro",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_search_verbose.go",
+          "tests": [
+            "TestSATSolverCheckSourceModelNotice"
+          ]
         }
       ],
       "ownership": [
@@ -184792,7 +184810,8 @@
         "TestSATSolverSimplifyAndRestartSourceVerboseLevels",
         "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity",
         "TestSATSolverCheckSourceRestartLimitAbort",
-        "TestSATSolverCheckVerboseFileFailureKeepsSearchResult"
+        "TestSATSolverCheckVerboseFileFailureKeepsSearchResult",
+        "TestSATSolverCheckSourceModelNotice"
       ],
       "conditionals": [
         {
@@ -185255,6 +185274,14 @@
             "TestSATSolverCheckSourceRestartLimitAbort",
             "TestSATSolverCheckVerboseFileFailureKeepsSearchResult",
             "TestSATSolverCheckMaxConflictsZeroSourceReturnsUndef"
+          ]
+        },
+        {
+          "name": "Retained mk_model IF_VERBOSE(10) checking-model notice after converter application and before check_model at sat_solver.cpp:1277; cloned-solver notice is disabled by the commented CLONE_BEFORE_SOLVING macro",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_search_verbose.go",
+          "tests": [
+            "TestSATSolverCheckSourceModelNotice"
           ]
         }
       ],
