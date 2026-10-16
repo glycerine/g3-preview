@@ -12708,10 +12708,10 @@
           "tests": ["TestASTSMT2AliasSourceTraceBeforeLetRegistration", "TestASTSMT2AliasSourceTraceFormatterRefusalKeepsPrefix"]
         },
         {
-          "name": "Selected pp_let alias-count, declaration-level, and open-let TRACE checkpoints at ast_smt2_pp.cpp:806,818,833; nested quantifier alias offset is reached without patterns, while pattern alias accumulation remains partial",
-          "status": "partial",
+          "name": "Reached pp_let alias-count, declaration-level, and open-let TRACE checkpoints at ast_smt2_pp.cpp:806,818,833 across root and nested quantifiers; pattern frames suppress aliases and extra pp_let calls",
+          "status": "ported",
           "go_target": "pkg/ast/ast_smt2_let_trace.go",
-          "tests": ["TestASTSMT2LetSourceTraceEmptyAndAliased", "TestASTSMT2LetSourceTraceNestedScopeOffset"]
+          "tests": ["TestASTSMT2LetSourceTraceEmptyAndAliased", "TestASTSMT2LetSourceTraceNestedScopeOffset", "TestASTSMT2LetPatternDisablesAliasTraversal"]
         },
         {
           "name": "smt2_printer::operator()(func_decl*,format_ref&) declare-fun document from name, domain and range sorts (ast_smt2_pp.cpp:1117-1131)",
@@ -181236,10 +181236,10 @@
           "tests": ["TestASTSMT2AliasSourceTraceBeforeLetRegistration", "TestASTSMT2AliasSourceTraceFormatterRefusalKeepsPrefix"]
         },
         {
-          "name": "Selected pp_let alias-count, declaration-level, and open-let TRACE checkpoints at ast_smt2_pp.cpp:806,818,833; nested quantifier alias offset is reached without patterns, while pattern alias accumulation remains partial",
-          "status": "partial",
+          "name": "Reached pp_let alias-count, declaration-level, and open-let TRACE checkpoints at ast_smt2_pp.cpp:806,818,833 across root and nested quantifiers; pattern frames suppress aliases and extra pp_let calls",
+          "status": "ported",
           "go_target": "pkg/ast/ast_smt2_let_trace.go",
-          "tests": ["TestASTSMT2LetSourceTraceEmptyAndAliased", "TestASTSMT2LetSourceTraceNestedScopeOffset"]
+          "tests": ["TestASTSMT2LetSourceTraceEmptyAndAliased", "TestASTSMT2LetSourceTraceNestedScopeOffset", "TestASTSMT2LetPatternDisablesAliasTraversal"]
         },
         {
           "name": "reached filter_mc before/after model_v2_pp TRACE at filter_model_converter.cpp:26,51 with concrete retained constant/function snapshots and ordered converter display",
@@ -183316,10 +183316,10 @@
           "tests": ["TestASTSMT2AliasSourceTraceBeforeLetRegistration", "TestASTSMT2AliasSourceTraceFormatterRefusalKeepsPrefix"]
         },
         {
-          "name": "Selected pp_let alias-count, declaration-level, and open-let TRACE checkpoints at ast_smt2_pp.cpp:806,818,833; nested quantifier alias offset is reached without patterns, while pattern alias accumulation remains partial",
-          "status": "partial",
+          "name": "Reached pp_let alias-count, declaration-level, and open-let TRACE checkpoints at ast_smt2_pp.cpp:806,818,833 across root and nested quantifiers; pattern frames suppress aliases and extra pp_let calls",
+          "status": "ported",
           "go_target": "pkg/ast/ast_smt2_let_trace.go",
-          "tests": ["TestASTSMT2LetSourceTraceEmptyAndAliased", "TestASTSMT2LetSourceTraceNestedScopeOffset"]
+          "tests": ["TestASTSMT2LetSourceTraceEmptyAndAliased", "TestASTSMT2LetSourceTraceNestedScopeOffset", "TestASTSMT2LetPatternDisablesAliasTraversal"]
         },
         {
           "name": "reached filter_mc before/after model_v2_pp TRACE at filter_model_converter.cpp:26,51 with concrete retained constant/function snapshots and ordered converter display",

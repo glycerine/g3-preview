@@ -51,10 +51,10 @@ func (m *ASTManager) smt2PPExprTree(root ASTHandle, names []usymbol.Symbol, requ
 }
 
 func (m *ASTManager) smt2PPExprTreeWithInfo(root ASTHandle, names []usymbol.Symbol, requireBool bool, info *smt2PPInfo) (ASTHandle, error) {
-	return m.smt2PPExprTreeWithInfoAt(root, names, requireBool, info, 0)
+	return m.smt2PPExprTreeWithInfoAt(root, names, requireBool, info, 0, true)
 }
 
-func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Symbol, requireBool bool, info *smt2PPInfo, enclosingAliases int) (ASTHandle, error) {
+func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Symbol, requireBool bool, info *smt2PPInfo, enclosingAliases int, allowAliases bool) (ASTHandle, error) {
 	boolSort, err := m.MkBoolSort()
 	if err != nil {
 		return ASTHandle{}, err
@@ -64,7 +64,13 @@ func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Sy
 		return ASTHandle{}, err
 	}
 	if rootKind == ASTQuantifier {
-		return m.smt2PPQuantifierRootWithInfoAt(root, names, info, enclosingAliases)
+		format, err := m.smt2PPQuantifierRootWithInfoAt(root, names, info, enclosingAliases, allowAliases)
+		if err != nil || !allowAliases {
+			return format, err
+		}
+		// The source printer runs pp_let once more on the completed root,
+		// after the quantifier has already wrapped its own body.
+		return m.smt2PPLetAt(format, nil, enclosingAliases)
 	}
 	// shared_occs visits each compound node's children once, but records a
 	// second incoming edge as shared. Its default profile ignores atomic nodes
@@ -160,11 +166,11 @@ func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Sy
 		}
 		if kind == ASTQuantifier {
 			var childInfo smt2PPInfo
-			format, e := m.smt2PPQuantifierRootWithInfoAt(h, names, &childInfo, enclosingAliases+len(bindings))
+			format, e := m.smt2PPQuantifierRootWithInfoAt(h, names, &childInfo, enclosingAliases+len(bindings), allowAliases)
 			if e != nil {
 				return result{}, e
 			}
-			if h != root && (childInfo.depth >= 5 || occurrences[h] > 1) {
+			if allowAliases && h != root && (childInfo.depth >= 5 || occurrences[h] > 1) {
 				return registerAlias(h, format, 0, childInfo.depth, childInfo.weight, occurrences[h] > 1)
 			}
 			return result{docs: []ASTHandle{format}, weight: childInfo.weight, depth: childInfo.depth}, nil
@@ -314,7 +320,7 @@ func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Sy
 		if e != nil {
 			return result{}, e
 		}
-		if h != root && (value.depth >= 5 || value.weight >= 10 && occurrences[h] > 1) {
+		if allowAliases && h != root && (value.depth >= 5 || value.weight >= 10 && occurrences[h] > 1) {
 			return registerAlias(h, format, value.level, value.depth, value.weight, occurrences[h] > 1)
 		}
 		value.docs = []ASTHandle{format}
@@ -326,6 +332,9 @@ func (m *ASTManager) smt2PPExprTreeWithInfoAt(root ASTHandle, names []usymbol.Sy
 	}
 	if info != nil {
 		*info = smt2PPInfo{weight: printed.weight, depth: printed.depth, lets: uint32(len(bindings))}
+	}
+	if !allowAliases {
+		return printed.docs[0], nil
 	}
 	return m.smt2PPLetAt(printed.docs[0], bindings, enclosingAliases)
 }

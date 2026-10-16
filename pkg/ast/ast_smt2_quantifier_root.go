@@ -10,10 +10,10 @@ import (
 
 // smt2PPQuantifierRoot prints source binder names, children and annotations.
 func (m *ASTManager) smt2PPQuantifierRootWithInfo(q ASTHandle, outer []usymbol.Symbol, info *smt2PPInfo) (ASTHandle, error) {
-	return m.smt2PPQuantifierRootWithInfoAt(q, outer, info, 0)
+	return m.smt2PPQuantifierRootWithInfoAt(q, outer, info, 0, true)
 }
 
-func (m *ASTManager) smt2PPQuantifierRootWithInfoAt(q ASTHandle, outer []usymbol.Symbol, info *smt2PPInfo, enclosingAliases int) (ASTHandle, error) {
+func (m *ASTManager) smt2PPQuantifierRootWithInfoAt(q ASTHandle, outer []usymbol.Symbol, info *smt2PPInfo, enclosingAliases int, allowAliases bool) (ASTHandle, error) {
 	count, err := m.GetNumDeclarations(q)
 	if err != nil || count == 0 {
 		return ASTHandle{}, ErrASTDomain
@@ -102,7 +102,7 @@ func (m *ASTManager) smt2PPQuantifierRootWithInfoAt(q ASTHandle, outer []usymbol
 		if e != nil {
 			return ASTHandle{}, e
 		}
-		printed, e := m.smt2PPExprTree(pattern, scopedNames, false)
+		printed, e := m.smt2PPExprTreeWithInfoAt(pattern, scopedNames, false, nil, enclosingAliases, false)
 		if e != nil {
 			return ASTHandle{}, e
 		}
@@ -114,7 +114,7 @@ func (m *ASTManager) smt2PPQuantifierRootWithInfoAt(q ASTHandle, outer []usymbol
 		if e != nil {
 			return ASTHandle{}, e
 		}
-		printed, e := m.smt2PPExprTree(pattern, scopedNames, false)
+		printed, e := m.smt2PPExprTreeWithInfoAt(pattern, scopedNames, false, nil, enclosingAliases, false)
 		if e != nil {
 			return ASTHandle{}, e
 		}
@@ -125,9 +125,17 @@ func (m *ASTManager) smt2PPQuantifierRootWithInfoAt(q ASTHandle, outer []usymbol
 		return ASTHandle{}, err
 	}
 	var bodyInfo smt2PPInfo
-	printedBody, err := m.smt2PPExprTreeWithInfoAt(body, scopedNames, false, &bodyInfo, enclosingAliases)
+	printedBody, err := m.smt2PPExprTreeWithInfoAt(body, scopedNames, false, &bodyInfo, enclosingAliases, allowAliases)
 	if err != nil {
 		return ASTHandle{}, err
+	}
+	if !allowAliases {
+		// A pattern suppresses new aliases, but a quantifier encountered in
+		// that pattern still executes its own pp_let checkpoint.
+		printedBody, err = m.smt2PPLetAt(printedBody, nil, enclosingAliases)
+		if err != nil {
+			return ASTHandle{}, err
+		}
 	}
 	if patterns != 0 || noPatterns != 0 || weight > 1 || !skid.IsNull() || !qid.IsNull() && !qid.IsNumerical() {
 		parts := []ASTHandle{printedBody}

@@ -97,3 +97,49 @@ func TestASTSMT2LetSourceTraceNestedScopeOffset(t *testing.T) {
 		t.Fatalf("source nested alias scope counts: %q", got)
 	}
 }
+
+// A pattern frame is entered with m_use_alias=false in the source. Repeated
+// large descendants therefore do not add a let or a pattern-local pp_let
+// checkpoint before the quantifier body is visited.
+func TestASTSMT2LetPatternDisablesAliasTraversal(t *testing.T) {
+	c, globals, local, budget := dynAckSourceFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	m, err := NewASTManager(ASTManagerConfig{Symbols: c.SymbolsField, Numerals: c.NumeralsField, Budget: budget, TraceTags: tags})
+	paramsMust(t, err)
+	defer func() { paramsMust(t, m.Close()) }()
+	bs, err := m.MkBoolSort()
+	paramsMust(t, err)
+	args := make([]ASTHandle, 9)
+	for i := range args {
+		args[i], err = m.MkConst(astTestSymbol(t, m, string(rune('a'+i))), bs)
+		paramsMust(t, err)
+	}
+	shared, err := m.MkAndArgs(args)
+	paramsMust(t, err)
+	repeated, err := m.MkAnd(shared, shared)
+	paramsMust(t, err)
+	pattern, err := m.MkFamilyApp(2, 0, nil, []ASTHandle{repeated})
+	paramsMust(t, err)
+	body, err := m.MkConst(astTestSymbol(t, m, "body"), bs)
+	paramsMust(t, err)
+	q, err := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{bs}, Names: []usymbol.Symbol{astTestSymbol(t, m, "x")}, Body: body, Patterns: []ASTHandle{pattern}})
+	paramsMust(t, err)
+	tags.Enable("pp_let")
+	format, err := m.SMT2PPExprTree(q, nil)
+	paramsMust(t, err)
+	printed, err := m.wellSortedTraceFormat(format, c, local, globals)
+	paramsMust(t, err)
+	if !strings.Contains(printed, ":pattern") || strings.Contains(printed, "(let ") {
+		t.Fatalf("pattern descendants gained a source-disabled alias: %q", printed)
+	}
+	if !tags.ShouldTrace("pp_let") {
+		if output.Len() != 0 {
+			t.Fatal("erased pattern trace", output.String())
+		}
+		return
+	}
+	if got := output.String(); strings.Count(got, "[pp_let]") != 2 || strings.Count(got, "old_sz: 0, sz: 0\n") != 2 {
+		t.Fatalf("pattern created an alias or pp_let checkpoint: %q", got)
+	}
+}
