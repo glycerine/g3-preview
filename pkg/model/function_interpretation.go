@@ -129,6 +129,9 @@ func (f *FunctionInterpretation) InsertNewEntry(args []ast.ASTHandle, result ast
 			return e
 		}
 		if entry != nil {
+			if e := f.traceDuplicateNewEntry(entry, args, result); e != nil {
+				return e
+			}
 			return ast.ErrASTDomain
 		}
 	}

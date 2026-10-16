@@ -56660,6 +56660,12 @@
           ]
         },
         {
+          "name": "insert_new_entry duplicate-key checked CTRACE before refusal (func_interp.cpp:202-215)",
+          "status": "ported",
+          "go_target": "pkg/model/function_interpretation_duplicate_trace.go",
+          "tests": ["TestFunctionInterpretationDuplicateNewEntrySourceTrace"]
+        },
+        {
           "name": "Concrete get_max_occ_result uses a native borrowed-handle map and original strict-greater running maximum/tie order (func_interp.cpp:234-255)",
           "status": "ported",
           "go_target": "pkg/model/function_interpretation_counts.go",
@@ -56751,6 +56757,12 @@
             "TestFunctionInterpretationInsertionRefusalsReleaseReferences",
             "TestFunctionInterpretationCopyEntriesAndOwningOutput"
           ]
+        },
+        {
+          "name": "insert_new_entry duplicate-key checked CTRACE before refusal (func_interp.cpp:202-215)",
+          "status": "ported",
+          "go_target": "pkg/model/function_interpretation_duplicate_trace.go",
+          "tests": ["TestFunctionInterpretationDuplicateNewEntrySourceTrace"]
         },
         {
           "name": "Concrete get_max_occ_result uses a native borrowed-handle map and original strict-greater running maximum/tie order (func_interp.cpp:234-255)",
@@ -182893,6 +182905,12 @@
           "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
         },
         {
+          "name": "Retained func_interp::insert_new_entry duplicate-key CTRACE before checked refusal (func_interp.cpp:202-215)",
+          "status": "ported",
+          "go_target": "pkg/model/function_interpretation_duplicate_trace.go",
+          "tests": ["TestFunctionInterpretationDuplicateNewEntrySourceTrace"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -184994,6 +185012,12 @@
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
           "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
+        },
+        {
+          "name": "Retained func_interp::insert_new_entry duplicate-key CTRACE before checked refusal (func_interp.cpp:202-215)",
+          "status": "ported",
+          "go_target": "pkg/model/function_interpretation_duplicate_trace.go",
+          "tests": ["TestFunctionInterpretationDuplicateNewEntrySourceTrace"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
