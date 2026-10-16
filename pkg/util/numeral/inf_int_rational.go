@@ -515,7 +515,7 @@ func (s *RationalService) InfIntHash(v *OwnedInfIntRational) (uint32, error) {
 	return h ^ (uint32(v.second) + 1), nil
 }
 func (s *RationalService) InfIntString(v *OwnedInfIntRational) (string, error) {
-	if e := s.lockInfInt(v); e != nil {
+	if e := s.lockInfIntSource(v); e != nil {
 		return "", e
 	}
 	defer s.mu.Unlock()

@@ -128616,7 +128616,8 @@
       "role": "production",
       "status": "ported",
       "go_targets": [
-        "pkg/util/numeral/inf_int_rational.go"
+        "pkg/util/numeral/inf_int_rational.go",
+        "pkg/util/numeral/inf_int_string_source_prefix_test.go"
       ],
       "tests": [
         "TestInfIntRationalSourceConstructorsConstantsLifetime",
@@ -128635,7 +128636,8 @@
         "TestInfFormatOneFinalAllocation",
         "TestInfFormatSignedZeroAndDomain",
         "TestInfFormatFailurePrefixesImmediateRoots",
-        "TestInfFormatNativeWorkspaceGrowth"
+        "TestInfFormatNativeWorkspaceGrowth",
+        "TestInfIntStringWritesOpeningPrefixBeforeFirstFailure"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -128657,7 +128659,8 @@
             "TestInfIntRationalPostFailureAndGetterIndependence",
             "TestRationalServiceInfinitesimalHeaderOwnership",
             "TestRationalServiceInfinitesimalConstructorFailureRefunds",
-            "TestRationalServiceInfinitesimalFinalizerTraversal"
+            "TestRationalServiceInfinitesimalFinalizerTraversal",
+            "TestInfIntStringWritesOpeningPrefixBeforeFirstFailure"
           ]
         },
         {
