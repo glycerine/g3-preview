@@ -204,6 +204,10 @@ func TestModelEvaluatorArrayPartialTheoryGraphCompletion(t *testing.T) {
 	astTestMust(t, e)
 	astTestMust(t, md.Core().RegisterFunction(selectDecl, fi))
 	// Partial theory graphs acquire an else value even with model completion off.
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	astTestMust(t, ev.BindTrace(tags))
+	tags.Enable("model_evaluator")
 	out := astTestPin(t, m, ast.ASTHandle{})
 	astTestMust(t, ev.Evaluate(selected, out))
 	no, e := m.MkFalse()
@@ -214,6 +218,21 @@ func TestModelEvaluatorArrayPartialTheoryGraphCompletion(t *testing.T) {
 	astTestMust(t, e)
 	if got != no || fallback != no {
 		t.Fatal("source theory graph completion", got, fallback)
+	}
+	if !tags.ShouldTrace("model_evaluator") {
+		if output.Len() != 0 {
+			t.Fatal("erased partial-theory trace", output.String())
+		}
+		return
+	}
+	want := "-------- [model_evaluator] operator() src/model/model_evaluator.cpp:566 ---------\n" +
+		"(select partial-array-base partial-array-index)\n" +
+		"------------------------------------------------\n" +
+		"-------- [model_evaluator] reduce_app src/model/model_evaluator.cpp:200 ---------\n" +
+		"false\n" +
+		"------------------------------------------------\n"
+	if got := output.String(); got != want {
+		t.Fatalf("partial-theory source trace: got %q, want %q", got, want)
 	}
 }
 

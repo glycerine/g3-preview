@@ -466,7 +466,7 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 			return rewriter.RewriteFailed, e
 		}
 		if status == rewriter.RewriteFailed {
-			return c.evaluatePartialTheory(d, args, out, proof)
+			return c.evaluatePartialTheoryWithTrace(d, args, out, proof)
 		}
 		final, e := c.evaluateReducedApp(status, out)
 		if e != nil || status == rewriter.RewriteDone && final == rewriter.Rewrite1 {
@@ -497,7 +497,7 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 	// The original arithmetic/BV reducers leave their unspecified symbols at
 	// BR_FAILED, then invoke the existing partial-theory interpretation path.
 	if consideredUninterpreted {
-		return c.evaluatePartialTheory(d, args, out, proof)
+		return c.evaluatePartialTheoryWithTrace(d, args, out, proof)
 	}
 	// Source arithmetic/BV numeral reducers return BR_FAILED, allowing the
 	// original traversal to retain values reached through a theory macro.
@@ -506,7 +506,7 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 		return rewriter.RewriteFailed, e
 	}
 	if numeral {
-		return c.evaluatePartialTheory(d, args, out, proof)
+		return c.evaluatePartialTheoryWithTrace(d, args, out, proof)
 	}
 	if fid > 4 {
 		return rewriter.RewriteFailed, ErrModelEvaluatorTheory
@@ -555,6 +555,18 @@ func (c *evaluatorConfiguration) evaluateReducedApp(status rewriter.RewriteStatu
 	}
 	if found {
 		return rewriter.Rewrite1, nil
+	}
+	return status, nil
+}
+
+// Source: src/model/model_evaluator.cpp:254-276.
+func (c *evaluatorConfiguration) evaluatePartialTheoryWithTrace(d ast.ASTHandle, args ast.AppArguments, out, proof ast.ASTRef) (rewriter.RewriteStatus, error) {
+	status, err := c.evaluatePartialTheory(d, args, out, proof)
+	if err != nil {
+		return status, err
+	}
+	if err = c.traceReduceStatus(status, out); err != nil {
+		return rewriter.RewriteFailed, err
 	}
 	return status, nil
 }
