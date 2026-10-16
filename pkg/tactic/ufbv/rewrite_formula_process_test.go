@@ -52,6 +52,7 @@ func TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults(t *tes
 	var trace bytes.Buffer
 	tags := diagnostic.NewTraceTagsWithWriter(&trace)
 	tags.Enable("demodulator")
+	tags.Enable("demodulator_s")
 	processor.trace = tags
 	t.Cleanup(func() { cacheMust(t, processor.close()) })
 	beforeQRefs, e := m.GetRefCount(q)
@@ -70,7 +71,7 @@ func TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults(t *tes
 	if !seen[truth] || !seen[q] || len(seen) != 2 {
 		t.Fatal("rescheduled formula did not simplify or rule not published", seen)
 	}
-	if tags.ShouldTrace("demodulator") && (!strings.Contains(trace.String(), "ufbv_rewriter.cpp:748 ---------\n") || !strings.Contains(trace.String(), "after demodulator:\n")) {
+	if tags.ShouldTrace("demodulator") && (!strings.Contains(trace.String(), "ufbv_rewriter.cpp:702 ---------\n") || !strings.Contains(trace.String(), "ufbv_rewriter.cpp:706 ---------\n") || !strings.Contains(trace.String(), "ufbv_rewriter.cpp:748 ---------\n") || !strings.Contains(trace.String(), "after demodulator:\n")) {
 		t.Fatal("source demodulator publication and final trace", trace.String())
 	}
 	if e := processor.close(); e != nil {

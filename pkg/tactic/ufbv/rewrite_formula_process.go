@@ -186,6 +186,9 @@ func (r *formulaProcessor) processLast() (result error) {
 	if e != nil {
 		return e
 	}
+	if e := r.traceFoundDemodulator(lhs, rhs); e != nil {
+		return e
+	}
 	f, e := r.demodulatorFunction(lhs)
 	if e != nil {
 		return e

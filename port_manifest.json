@@ -108715,6 +108715,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained UFBV found-demodulator long and compact TRACE at ufbv_rewriter.cpp:702,706",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_trace.go",
+          "tests": ["TestUFBVFoundDemodulatorSourceLongAndShortRecords", "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"]
+        },
+        {
           "name": "Retained UFBV formula before, processed, demodulator and after TRACE at ufbv_rewriter.cpp:668,736,748,753",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_formula_trace.go",
@@ -182187,6 +182193,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained UFBV found-demodulator long and compact TRACE at ufbv_rewriter.cpp:702,706",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_trace.go",
+          "tests": ["TestUFBVFoundDemodulatorSourceLongAndShortRecords", "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"]
+        },
+        {
           "name": "Retained UFBV formula before, processed, demodulator and after TRACE at ufbv_rewriter.cpp:668,736,748,753",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_formula_trace.go",
@@ -184538,6 +184550,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained UFBV found-demodulator long and compact TRACE at ufbv_rewriter.cpp:702,706",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_trace.go",
+          "tests": ["TestUFBVFoundDemodulatorSourceLongAndShortRecords", "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"]
+        },
         {
           "name": "Retained UFBV formula before, processed, demodulator and after TRACE at ufbv_rewriter.cpp:668,736,748,753",
           "status": "ported",

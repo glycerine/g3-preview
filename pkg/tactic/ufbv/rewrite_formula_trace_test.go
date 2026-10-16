@@ -3,6 +3,7 @@ package ufbv
 import (
 	"bytes"
 	"io"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -83,5 +84,78 @@ func TestUFBVFormulaTraceWriterRefusalDoesNotStopRewrite(t *testing.T) {
 	cacheMust(t, m.DecRef(result[0]))
 	if tags.ShouldTrace("demodulator") && w.calls != 1 {
 		t.Fatal("failed source trace stream did not retain its bad state", w.calls)
+	}
+}
+
+func TestUFBVFoundDemodulatorSourceLongAndShortRecords(t *testing.T) {
+	m := cacheFixture(t)
+	b, e := m.MkBoolSort()
+	cacheMust(t, e)
+	aName, e := m.Symbols.Intern("lhs_const")
+	cacheMust(t, e)
+	bName, e := m.Symbols.Intern("rhs_const")
+	cacheMust(t, e)
+	a, e := m.MkConst(aName, b)
+	cacheMust(t, e)
+	c, e := m.MkConst(bName, b)
+	cacheMust(t, e)
+	for _, h := range []ast.ASTHandle{a, c} {
+		cacheMust(t, m.IncRef(h))
+		t.Cleanup(func() { cacheMust(t, m.DecRef(h)) })
+	}
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("demodulator")
+	tags.Enable("demodulator_s")
+	r, e := newFormulaProcessor(m, ufbvBooleanFixture(t, m))
+	cacheMust(t, e)
+	r.trace = tags
+	t.Cleanup(func() { cacheMust(t, r.close()) })
+	cacheMust(t, r.traceFoundDemodulator(a, c))
+	if !tags.ShouldTrace("demodulator") {
+		if output.Len() != 0 {
+			t.Fatal("erased found-demodulator trace emitted", output.String())
+		}
+		return
+	}
+	want := "-------- [demodulator] operator() src/tactic/ufbv/ufbv_rewriter.cpp:702 ---------\n" +
+		"Found demodulator: \nlhs_const\n ---> \nrhs_const\n" +
+		"------------------------------------------------\n" +
+		"-------- [demodulator_s] operator() src/tactic/ufbv/ufbv_rewriter.cpp:706 ---------\n" +
+		"Found demodulator: \nlhs_const[1] ---> rhs_const[1]\n" +
+		"------------------------------------------------\n"
+	if got := output.String(); got != want {
+		t.Fatalf("source found-demodulator records:\ngot  %q\nwant %q", got, want)
+	}
+	at := strings.Index(want, "-------- [demodulator_s]")
+	longRecord, shortRecord := want[:at], want[at:]
+	output.Reset()
+	tags.Disable("demodulator")
+	cacheMust(t, r.traceFoundDemodulator(a, c))
+	if got := output.String(); got != shortRecord {
+		t.Fatal("short tag must emit independently", got, shortRecord)
+	}
+	output.Reset()
+	tags.Enable("demodulator")
+	tags.Disable("demodulator_s")
+	cacheMust(t, r.traceFoundDemodulator(a, c))
+	if got := output.String(); got != longRecord {
+		t.Fatal("long tag must emit independently", got, longRecord)
+	}
+	variable, e := m.MkVar(0, b)
+	cacheMust(t, e)
+	cacheMust(t, m.IncRef(variable))
+	t.Cleanup(func() { cacheMust(t, m.DecRef(variable)) })
+	output.Reset()
+	tags.Disable("demodulator")
+	tags.Enable("demodulator_s")
+	cacheMust(t, r.traceFoundDemodulator(a, variable))
+	variableText, e := r.traceFormulaText(variable)
+	cacheMust(t, e)
+	want = "-------- [demodulator_s] operator() src/tactic/ufbv/ufbv_rewriter.cpp:706 ---------\n" +
+		"Found demodulator: \nlhs_const[1] ---> " + variableText + "\n" +
+		"------------------------------------------------\n"
+	if got := output.String(); got != want {
+		t.Fatal("short trace non-application RHS branch", got, want)
 	}
 }
