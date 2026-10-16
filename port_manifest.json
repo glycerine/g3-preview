@@ -122834,7 +122834,8 @@
         "pkg/util/diagnostic/util_debug_action_binding.go",
         "pkg/util/params/util_gparams_service_ops.go",
         "pkg/util/diagnostic/numeric_char_input_tie_boundary_test.go",
-        "pkg/tactic/arith/linear_equation_debug.go"
+        "pkg/tactic/arith/linear_equation_debug.go",
+        "pkg/api/api_context_results.go"
       ],
       "tests": [
         "TestDebugTableMemoryTraceFollowsLazyLifetime",
@@ -122899,6 +122900,12 @@
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_debug_table_memory_trace.go",
           "tests": ["TestDebugTableMemoryTraceFollowsLazyLifetime", "TestDebugTableDeallocationSuppressesMemoryDuringProcessFinalize"]
+        },
+        {
+          "name": "API object::dec_ref and context::save_ast_trail SASSERT process switch, source notification and debugger action (api_context.cpp:39,216)",
+          "status": "ported",
+          "go_target": "pkg/api/api_context_results.go",
+          "tests": ["TestAPIContextSourceObjectAndTrailAssertions"]
         },
         {
           "name": "Selected assertion switch, lazy debug table initialization, enable/disable/query, finalize and short-circuit CASSERT gate; whole global macro and debugger bindings remain open",
@@ -123162,7 +123169,8 @@
         "pkg/util/diagnostic/util_debug_macros.go",
         "pkg/util/diagnostic/util_debug_macro_source_test.go",
         "pkg/util/params/util_gparams_service_ops.go",
-        "pkg/tactic/arith/linear_equation_debug.go"
+        "pkg/tactic/arith/linear_equation_debug.go",
+        "pkg/api/api_context_results.go"
       ],
       "tests": [
         "TestDebugNotificationExactStatementsSignedFlagsAndNoReservation",
@@ -123315,6 +123323,12 @@
           "status": "ported",
           "go_target": "pkg/api/api_context_results.go",
           "tests": ["TestAPIContextUncollectedObjectSourceWarningGate"]
+        },
+        {
+          "name": "API object::dec_ref and context::save_ast_trail SASSERT process switch, source notification and debugger action (api_context.cpp:39,216)",
+          "status": "ported",
+          "go_target": "pkg/api/api_context_results.go",
+          "tests": ["TestAPIContextSourceObjectAndTrailAssertions"]
         },
         {
           "name": "Selected assertion switch, lazy debug table initialization, enable/disable/query, finalize and short-circuit CASSERT gate; whole global macro and debugger bindings remain open",
