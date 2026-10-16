@@ -108715,6 +108715,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained UFBV remove_fwd_idx absent-forward SASSERT at cpp252 before any rule-reference release",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
+          "tests": ["TestRewriteForwardIndexSourcePreconditionsAndRuleGuards"]
+        },
+        {
           "name": "Retained UFBV forward-index SASSERT at ufbv_rewriter.cpp:217-219,231,297,307 with process debug gate and erased-build domain guards",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_rule_index_assert.go",
@@ -122961,6 +122967,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained UFBV remove_fwd_idx absent-forward SASSERT at cpp252 before any rule-reference release",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
+          "tests": ["TestRewriteForwardIndexSourcePreconditionsAndRuleGuards"]
+        },
+        {
           "name": "Retained UFBV forward-index SASSERT at ufbv_rewriter.cpp:217-219,231,297,307 with process debug gate and erased-build domain guards",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_rule_index_assert.go",
@@ -123441,6 +123453,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained UFBV remove_fwd_idx absent-forward SASSERT at cpp252 before any rule-reference release",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
+          "tests": ["TestRewriteForwardIndexSourcePreconditionsAndRuleGuards"]
+        },
         {
           "name": "Retained UFBV forward-index SASSERT at ufbv_rewriter.cpp:217-219,231,297,307 with process debug gate and erased-build domain guards",
           "status": "ported",

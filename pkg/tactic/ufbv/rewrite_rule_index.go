@@ -135,6 +135,22 @@ func (r *rewriteRuleIndex) remove(f, quantifier ast.ASTHandle) error {
 	if e := r.check(); e != nil {
 		return e
 	}
+	set, inForward := r.byFunc[f]
+	if !inForward {
+		if enabled, e := forwardAssertionEnabled(); e != nil {
+			return e
+		} else if enabled {
+			if _, present := r.rules[quantifier]; !present {
+				if e := forwardAssertionFailure(252, "m_demodulator2lhs_rhs.contains(demodulator)"); e != nil {
+					return e
+				}
+			}
+		}
+		return ast.ErrASTDomain
+	}
+	if set == nil {
+		return ast.ErrASTDomain
+	}
 	rule, found := r.rules[quantifier]
 	if !found || rule.function != f {
 		return ast.ErrASTDomain
@@ -162,10 +178,6 @@ func (r *rewriteRuleIndex) remove(f, quantifier ast.ASTHandle) error {
 		}
 	}
 	delete(r.rules, quantifier)
-	set := r.byFunc[f]
-	if set == nil {
-		return ast.ErrASTDomain
-	}
 	for i, q := range set.values {
 		if q == quantifier {
 			copy(set.values[i:], set.values[i+1:])

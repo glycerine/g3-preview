@@ -106,4 +106,25 @@ func TestRewriteForwardIndexSourcePreconditionsAndRuleGuards(t *testing.T) {
 		want(t, e, ast.ErrASTDomain)
 		r.rules[q] = rule
 	})
+	t.Run("missing-forward-and-rule-252", func(t *testing.T) {
+		r := newIndex(t)
+		want(t, r.remove(f, q), ast.ErrASTDomain)
+	})
+	t.Run("missing-forward-retains-rule", func(t *testing.T) {
+		r := newIndex(t)
+		cacheMust(t, r.insert(q, fx, x))
+		set := r.byFunc[f]
+		owned := append([]ast.ASTHandle(nil), r.owned...)
+		delete(r.byFunc, f)
+		if e := r.remove(f, q); !errors.Is(e, ast.ErrASTDomain) || len(r.rules) != 1 || len(r.owned) != len(owned) {
+			t.Fatal("missing forward entry consumed the retained rule", e, r.rules, r.owned)
+		}
+		for i, h := range owned {
+			if r.owned[i] != h {
+				t.Fatal("missing forward entry released a rule reference", i, h, r.owned[i])
+			}
+		}
+		r.byFunc[f] = set
+		cacheMust(t, r.remove(f, q))
+	})
 }
