@@ -70175,7 +70175,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/parsers/smt2/local_environment.go", "pkg/parsers/smt2/local_lookup.go"],
-      "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders"],
+      "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders", "TestSMT2ParserQualifiedLocalSortAndIndexRefusals"],
       "assertions": [
         {
           "line": 250,
@@ -70694,6 +70694,12 @@
           "status": "ported",
           "go_target": "pkg/parsers/smt2/local_lookup.go",
           "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders"]
+        },
+        {
+          "name": "parse_qualified_name selected local sort/index checks after push_local and owning reference cleanup on refusal; sort-stack pop and parser frame integration remain open (smt2parser.cpp:1735-1754)",
+          "status": "partial",
+          "go_target": "pkg/parsers/smt2/local_lookup.go",
+          "tests": ["TestSMT2ParserQualifiedLocalSortAndIndexRefusals"]
         }
       ],
       "ownership": [],
@@ -178987,7 +178993,8 @@
         "TestFamilySourceEnumerationOrderAndPrefixes",
         "TestSMT2LocalSymbolTableNestedAndRepeatedBindings",
         "TestSMT2ParserPushLocalShiftsFreeVariables",
-        "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders"
+        "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders",
+        "TestSMT2ParserQualifiedLocalSortAndIndexRefusals"
       ],
       "conditionals": [
         {

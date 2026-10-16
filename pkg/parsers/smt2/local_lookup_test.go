@@ -199,3 +199,64 @@ func TestSMT2ParserPushLocalRespectsNestedQuantifierBinders(t *testing.T) {
 		t.Fatal("quantifier annotations changed", weight, qid)
 	}
 }
+
+func TestSMT2ParserQualifiedLocalSortAndIndexRefusals(t *testing.T) {
+	m := localLookupManager(t)
+	shifter := localTestShifter(t, m)
+	boolSort, err := m.MkBoolSort()
+	if err != nil {
+		t.Fatal(err)
+	}
+	otherSort, err := m.MkSort(usymbol.Numerical(22), ast.ASTSortInfo{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	variable, err := m.MkVar(0, boolSort)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var env smt2LocalEnv
+	name := usymbol.Numerical(23)
+	env.insert(name, smt2Local{term: variable, level: 1})
+	before := m.Stats().LiveReferences
+	ref, found, err := env.resolveQualifiedLocal(m, shifter, name, 2, boolSort, true, 0)
+	if err != nil || !found {
+		t.Fatal("qualified local", found, err)
+	}
+	h, err := m.RefGet(ref)
+	if err != nil {
+		t.Fatal(err)
+	}
+	index, err := m.GetVarIndex(h)
+	if err != nil || index != 1 {
+		t.Fatal("qualified local shift", index, err)
+	}
+	if err := m.DelRef(&ref); err != nil {
+		t.Fatal(err)
+	}
+	if m.Stats().LiveReferences != before {
+		t.Fatal("qualified local retained a temporary reference")
+	}
+	for _, tc := range []struct {
+		sort    ast.ASTHandle
+		hasSort bool
+		indices uint32
+		want    error
+	}{
+		{otherSort, true, 1, errLocalQualifiedSort}, // source sort check wins
+		{boolSort, true, 1, errLocalIndexed},
+		{ast.ASTHandle{}, false, 1, errLocalIndexed},
+	} {
+		ref, found, err := env.resolveQualifiedLocal(m, shifter, name, 2, tc.sort, tc.hasSort, tc.indices)
+		if !found || ref != (ast.ASTRef{}) || !errors.Is(err, tc.want) {
+			t.Fatal("qualified local refusal", tc, found, ref, err)
+		}
+		if m.Stats().LiveReferences != before {
+			t.Fatal("refused qualified local retained expression-stack reference", tc)
+		}
+	}
+	ref, found, err = env.resolveQualifiedLocal(m, shifter, usymbol.Numerical(24), 2, otherSort, true, 1)
+	if found || err != nil || ref != (ast.ASTRef{}) {
+		t.Fatal("unknown qualified name reached local checks", found, ref, err)
+	}
+}

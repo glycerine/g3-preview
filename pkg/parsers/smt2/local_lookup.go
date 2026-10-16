@@ -1,4 +1,4 @@
-// Source: src/parsers/smt2/smt2parser.cpp:1699-1721.
+// Source: src/parsers/smt2/smt2parser.cpp:1699-1721,1723-1729,1735-1754.
 package smt2
 
 import (
@@ -11,6 +11,8 @@ import (
 
 var errLocalBindingLevel = errors.New("smt2 parser: local binding level exceeds current bindings")
 var errLocalShifter = errors.New("smt2 parser: variable shifter is unavailable")
+var errLocalQualifiedSort = errors.New("invalid qualified identifier, sort mismatch")
+var errLocalIndexed = errors.New("invalid indexed identifier, symbol is a local declaration")
 
 // resolveLocal is the local-identifier branch of parse_expr_name. A found
 // result is an owning expression-stack reference; the parser releases it when
@@ -40,6 +42,33 @@ func (e *smt2LocalEnv) resolveLocal(m *ast.ASTManager, shifter *rewriter.VarShif
 	}
 	if err = shifter.ShiftBy(l.term, numBindings-l.level, ref); err != nil {
 		return ast.ASTRef{}, true, errors.Join(err, m.DelRef(&ref))
+	}
+	return ref, true, nil
+}
+
+// resolveQualifiedLocal is the local branch of parse_qualified_name. Source
+// order is push_local, optional sort check, then rejection of index parameters.
+// A refused branch releases the newly pushed expression-stack reference.
+func (e *smt2LocalEnv) resolveQualifiedLocal(m *ast.ASTManager, shifter *rewriter.VarShifter, name usymbol.Symbol, numBindings uint32, expectedSort ast.ASTHandle, hasSort bool, numIndices uint32) (ast.ASTRef, bool, error) {
+	ref, found, err := e.resolveLocal(m, shifter, name, numBindings)
+	if err != nil || !found {
+		return ref, found, err
+	}
+	if hasSort {
+		h, e := m.RefGet(ref)
+		if e != nil {
+			return ast.ASTRef{}, true, errors.Join(e, m.DelRef(&ref))
+		}
+		sort, e := m.GetSort(h)
+		if e != nil {
+			return ast.ASTRef{}, true, errors.Join(e, m.DelRef(&ref))
+		}
+		if sort != expectedSort {
+			return ast.ASTRef{}, true, errors.Join(errLocalQualifiedSort, m.DelRef(&ref))
+		}
+	}
+	if numIndices != 0 {
+		return ast.ASTRef{}, true, errors.Join(errLocalIndexed, m.DelRef(&ref))
 	}
 	return ref, true, nil
 }
