@@ -43179,6 +43179,12 @@
           ]
         },
         {
+          "name": "Retained recursive modular GCD mgcd_detail TRACE at polynomial.cpp:4100,4114,4149,4152,4167,4184,4186,4205",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_recursive_detail_trace.go",
+          "tests": ["TestPolynomialRecursiveModularGCDSourceTrace"]
+        },
+        {
           "name": "Retained recursive modular GCD mgcd TRACE at polynomial.cpp:4078,4085,4141,4177,4223",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_recursive_trace.go",
@@ -46029,6 +46035,12 @@
             "TestPolynomialVariableRecognitionLiteralWritePrefixes",
             "TestPolynomialVariableRecognitionBIGEveryActualPrefix"
           ]
+        },
+        {
+          "name": "Retained recursive modular GCD mgcd_detail TRACE at polynomial.cpp:4100,4114,4149,4152,4167,4184,4186,4205",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_recursive_detail_trace.go",
+          "tests": ["TestPolynomialRecursiveModularGCDSourceTrace"]
         },
         {
           "name": "Retained recursive modular GCD mgcd TRACE at polynomial.cpp:4078,4085,4141,4177,4223",
@@ -183424,6 +183436,12 @@
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
         },
         {
+          "name": "Retained recursive modular GCD mgcd_detail TRACE at polynomial.cpp:4100,4114,4149,4152,4167,4184,4186,4205",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_recursive_detail_trace.go",
+          "tests": ["TestPolynomialRecursiveModularGCDSourceTrace"]
+        },
+        {
           "name": "Retained recursive modular GCD mgcd TRACE at polynomial.cpp:4078,4085,4141,4177,4223",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_recursive_trace.go",
@@ -185675,6 +185693,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
+        },
+        {
+          "name": "Retained recursive modular GCD mgcd_detail TRACE at polynomial.cpp:4100,4114,4149,4152,4167,4184,4186,4205",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_recursive_detail_trace.go",
+          "tests": ["TestPolynomialRecursiveModularGCDSourceTrace"]
         },
         {
           "name": "Retained recursive modular GCD mgcd TRACE at polynomial.cpp:4078,4085,4141,4177,4223",

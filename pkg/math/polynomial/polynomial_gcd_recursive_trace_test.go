@@ -28,6 +28,7 @@ func TestPolynomialRecursiveModularGCDSourceTrace(t *testing.T) {
 	var output bytes.Buffer
 	tags := diagnostic.NewTraceTagsWithWriter(&output)
 	tags.Enable("mgcd")
+	tags.Enable("mgcd_detail")
 	c.monomials.config.Trace = tags
 	serviceMust(t, full.GCD(u, v, r))
 	same, err := c.Equal(common, r.root.value)
@@ -50,7 +51,25 @@ func TestPolynomialRecursiveModularGCDSourceTrace(t *testing.T) {
 	} else if output.Len() != 0 {
 		t.Fatalf("ordinary build emitted trace: %q", output.String())
 	}
+	if tags.ShouldTrace("mgcd_detail") {
+		got := output.String()
+		for _, part := range []string{
+			"[mgcd_detail] mod_gcd_rec src/math/polynomial/polynomial.cpp:4100 ---------\nidx: 0\nx",
+			"[mgcd_detail] mod_gcd_rec src/math/polynomial/polynomial.cpp:4114 ---------\nc_g = ",
+			"[mgcd_detail] mod_gcd_rec src/math/polynomial/polynomial.cpp:4149 ---------\ncounter: 0\nidx: 0\nq: ",
+			"[mgcd_detail] mod_gcd_rec src/math/polynomial/polynomial.cpp:4152 ---------\nreseting...\n",
+			"[mgcd_detail] mod_gcd_rec src/math/polynomial/polynomial.cpp:4167 ---------\nadding sample point...\n",
+			"[mgcd_detail] mod_gcd_rec src/math/polynomial/polynomial.cpp:4184 ---------\nidx: 0\ncandidate H: ",
+			"[mgcd_detail] mod_gcd_rec src/math/polynomial/polynomial.cpp:4186 ---------\nidx: 0\nlc_H: ",
+			"[mgcd_detail] mod_gcd_rec src/math/polynomial/polynomial.cpp:4205 ---------\nC: ",
+		} {
+			if !strings.Contains(got, part) {
+				t.Fatalf("missing recursive detail record %q: %q", part, got)
+			}
+		}
+	}
 	tags.Disable("mgcd")
+	tags.Disable("mgcd_detail")
 	before := output.String()
 	serviceMust(t, full.GCD(u, v, r))
 	if output.String() != before {
@@ -59,6 +78,7 @@ func TestPolynomialRecursiveModularGCDSourceTrace(t *testing.T) {
 	refused := &algebraicIntervalRefusingWriter{stop: 10, err: errors.New("trace refused")}
 	tags = diagnostic.NewTraceTagsWithWriter(refused)
 	tags.Enable("mgcd")
+	tags.Enable("mgcd_detail")
 	c.monomials.config.Trace = tags
 	serviceMust(t, full.GCD(u, v, r))
 	same, err = c.Equal(common, r.root.value)

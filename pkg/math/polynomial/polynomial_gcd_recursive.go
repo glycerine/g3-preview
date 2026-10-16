@@ -87,6 +87,9 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 	s.constructReference(c, 6)
 	s.constructReference(c, 7)
 	cg, lg := &s.refs[6].root, &s.refs[7].root
+	if e = m.traceModGCDRecInitial(idx, x, pu.value, pv.value, cu.value, cv.value, lu.value, lv.value, &s.nums[0], &s.nums[1]); e != nil {
+		return e
+	}
 	before, e := polynomialNumericBefore(c.integer)
 	if e != nil {
 		return e
@@ -100,6 +103,9 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 		return e
 	}
 	if e = m.gcdEuclid(lu.value, lv.value, lg); e != nil {
+		return e
+	}
+	if e = m.traceModGCDRecContents(cg.value, lg.value, &s.nums[2]); e != nil {
 		return e
 	}
 	sk, e := m.skeletons.Get(idx)
@@ -193,7 +199,11 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 				return e
 			}
 		}
+		if e = m.traceModGCDRecIteration(counter, idx, q.value, degree, minDegree, vars[idx+1], qvar); e != nil {
+			return e
+		}
 		if degree < minDegree {
+			m.traceModGCDRecDetailLiteral(4152, "reseting...\n")
 			counter = 0
 			minDegree = degree
 			if sk == nil {
@@ -216,6 +226,7 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 				}
 			}
 		} else if degree == minDegree {
+			m.traceModGCDRecDetailLiteral(4167, "adding sample point...\n")
 			if sk == nil {
 				if e = interpolator.Add(&s.nums[3], q.value); e != nil {
 					return e
@@ -247,11 +258,17 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 			if e = interpolator.Mk(x, &s.refs[11]); e != nil {
 				return e
 			}
+			if e = m.traceModGCDRecCandidate(4184, idx, "candidate H: ", h.value, "", Polynomial{}); e != nil {
+				return e
+			}
 			a, e = m.lcGlexZPX(h.value, x)
 			if e != nil {
 				return e
 			}
 			if e = lh.assign(c, a); e != nil {
+				return e
+			}
+			if e = m.traceModGCDRecCandidate(4186, idx, "lc_H: ", lh.value, "lc_g: ", lg.value); e != nil {
 				return e
 			}
 			found, e = c.Equal(lh.value, lg.value)
@@ -292,6 +309,9 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 				if e = candidate.assign(c, a); e != nil {
 					return e
 				}
+			}
+			if e = m.traceModGCDRecDivides(candidate.value, pu.value, pv.value, &s.dividesInvocation); e != nil {
+				return e
 			}
 			first, e := c.dividesWithReceipt(candidate.value, pu.value, &s.dividesInvocation)
 			if e != nil {
