@@ -77776,7 +77776,8 @@
         "pkg/sat/sat_solver_stat_display_test.go",
         "pkg/sat/sat_var_queue_oracle_test.go",
         "pkg/sat/sat_solver_trail_test.go",
-        "pkg/sat/sat_var_queue_native_test.go"
+        "pkg/sat/sat_var_queue_native_test.go",
+        "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
         "TestSATSolverScopesNativeGrowthAndPop",
@@ -78086,7 +78087,8 @@
         "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations",
         "TestSATSolverNativeTrailColdHeaderAndRetirement",
         "TestSATNativeCaseSplitQueueGrowthIndependentPriorityAndColdBudget",
-        "TestSATNativeCaseSplitQueueOwnerBudgetAndIndexGuards"
+        "TestSATNativeCaseSplitQueueOwnerBudgetAndIndexGuards",
+        "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity"
       ],
       "conditionals": [
         {
@@ -79379,6 +79381,15 @@
         {
           "name": "Uncalled update_min_core and reassert_min_core (sat_solver.cpp:1102-1139), including the dormant line-1130 TRACE",
           "status": "dead_deleted"
+        },
+        {
+          "name": "Retained SAT solver check-entry level-two notice and level-ten zero/conflict/restart abort messages at sat_solver.cpp:725,767,779,789, through the process verbose stream",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_search_verbose.go",
+          "tests": [
+            "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity",
+            "TestSATSolverCheckMaxConflictsZeroSourceReturnsUndef"
+          ]
         }
       ],
       "ownership": [
@@ -184481,7 +184492,8 @@
         "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
         "TestSATSimplifierReportsActualSubsumptionAndResolution",
         "TestSATSolverGCReportsStrategiesDynamicCountsAndGate",
-        "TestSATSolverSimplifyAndRestartSourceVerboseLevels"
+        "TestSATSolverSimplifyAndRestartSourceVerboseLevels",
+        "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -184635,6 +184647,15 @@
           "tests": [
             "TestSATSolverSimplifyAndRestartSourceVerboseLevels"
           ]
+        },
+        {
+          "name": "Retained SAT solver check-entry level-two notice and level-ten zero/conflict/restart abort messages at sat_solver.cpp:725,767,779,789, through the process verbose stream",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_search_verbose.go",
+          "tests": [
+            "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity",
+            "TestSATSolverCheckMaxConflictsZeroSourceReturnsUndef"
+          ]
         }
       ],
       "ownership": [
@@ -184760,7 +184781,8 @@
         "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
         "TestSATSimplifierReportsActualSubsumptionAndResolution",
         "TestSATSolverGCReportsStrategiesDynamicCountsAndGate",
-        "TestSATSolverSimplifyAndRestartSourceVerboseLevels"
+        "TestSATSolverSimplifyAndRestartSourceVerboseLevels",
+        "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity"
       ],
       "conditionals": [
         {
@@ -185212,6 +185234,15 @@
           "go_target": "pkg/sat/sat_solver_search_verbose.go",
           "tests": [
             "TestSATSolverSimplifyAndRestartSourceVerboseLevels"
+          ]
+        },
+        {
+          "name": "Retained SAT solver check-entry level-two notice and level-ten zero/conflict/restart abort messages at sat_solver.cpp:725,767,779,789, through the process verbose stream",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_search_verbose.go",
+          "tests": [
+            "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity",
+            "TestSATSolverCheckMaxConflictsZeroSourceReturnsUndef"
           ]
         }
       ],

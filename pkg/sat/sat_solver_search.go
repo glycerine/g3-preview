@@ -304,6 +304,9 @@ func (s *Solver) checkSpan(count uint32, span satSolverLiteralSpan) (lbool.LBool
 	if e := s.popToBase(); e != nil {
 		return lbool.Undef, e
 	}
+	if e := s.emitCheckNotice(); e != nil {
+		return lbool.Undef, e
+	}
 	if satStorageSourceDebug && s.Variables.scopeLevel != 0 {
 		return lbool.Undef, ErrSATAssertion
 	}
@@ -405,6 +408,9 @@ func (s *Solver) checkCoreSpan(count uint32, span satSolverLiteralSpan) (lbool.L
 		return lbool.False, nil
 	}
 	if cfg.MaxConflicts == 0 {
+		if e = s.emitSearchAbort("max-conflicts = 0", false); e != nil {
+			return lbool.Undef, e
+		}
 		return lbool.Undef, nil
 	}
 	for {
@@ -419,6 +425,9 @@ func (s *Solver) checkCoreSpan(count uint32, span satSolverLiteralSpan) (lbool.L
 			return r, nil
 		}
 		if s.conflict.conflicts > cfg.MaxConflicts {
+			if e = s.emitSearchAbort("max-conflicts = ", true); e != nil {
+				return lbool.Undef, e
+			}
 			return lbool.Undef, nil
 		}
 		if e = s.gc.restart(); e != nil {
@@ -438,6 +447,9 @@ func (s *Solver) checkCoreSpan(count uint32, span satSolverLiteralSpan) (lbool.L
 			return lbool.Undef, e
 		}
 		if cfg.RestartMax <= s.gc.restarts {
+			if e = s.emitSearchAbort("max-restarts", false); e != nil {
+				return lbool.Undef, e
+			}
 			return lbool.Undef, nil
 		}
 	}

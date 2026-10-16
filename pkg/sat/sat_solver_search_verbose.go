@@ -1,10 +1,42 @@
-// Source: src/sat/sat_solver.cpp:1191-1196,1347-1355.
+// Source: src/sat/sat_solver.cpp:723-790,1191-1196,1347-1355.
 package sat
 
 import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
+
+func (s *Solver) emitCheckNotice() error {
+	enabled, err := diagnostic.ProcessVerboseEnabled(2)
+	if err != nil || !enabled {
+		return err
+	}
+	out, err := diagnostic.BorrowProcessVerboseStream()
+	if err != nil {
+		return err
+	}
+	return out.AppendCString("(sat.sat-solver)\n")
+}
+
+func (s *Solver) emitSearchAbort(reason string, conflicts bool) error {
+	enabled, err := diagnostic.ProcessVerboseEnabled(10)
+	if err != nil || !enabled {
+		return err
+	}
+	out, err := diagnostic.BorrowProcessVerboseStream()
+	if err != nil {
+		return err
+	}
+	if err = out.AppendCString("(sat \"abort: " + reason); err != nil {
+		return err
+	}
+	if conflicts {
+		if err = out.AppendUint32(s.conflict.conflicts); err != nil {
+			return err
+		}
+	}
+	return out.AppendCString("\")\n")
+}
 
 func (s *Solver) emitSimplifyNotice() error {
 	enabled, err := diagnostic.ProcessVerboseEnabled(2)
