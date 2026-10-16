@@ -111,4 +111,10 @@ func TestASTSMT2QuantifierRootSourceFormat(t *testing.T) {
 	if got := print(q); got != want {
 		t.Fatalf("quantified local let format %q, want %q", got, want)
 	}
+	repeatedQuantifier, err := m.MkAnd(q, q)
+	paramsMust(t, err)
+	want = "(let ((a!1 (forall ((a!1 Bool))\n             (let ((a!2 (and a!1 a b c d e f g h)))\n               (and a!2 a!2)))))\n  (and a!1 a!1))"
+	if got := print(repeatedQuantifier); got != want {
+		t.Fatalf("shared quantifier format %q, want %q", got, want)
+	}
 }

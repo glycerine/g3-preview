@@ -57,13 +57,25 @@ func (m *ASTManager) smt2PPExprTree(root ASTHandle, names []usymbol.Symbol, requ
 		return m.smt2PPQuantifierRoot(root, names)
 	}
 	// shared_occs visits each compound node's children once, but records a
-	// second incoming edge as shared. Its default profile ignores atomic nodes.
+	// second incoming edge as shared. Its default profile ignores atomic nodes
+	// and quantifier patterns, while visiting each quantifier body.
 	occurrences := make(map[ASTHandle]uint32)
 	var countOccurrences func(ASTHandle) error
 	countOccurrences = func(h ASTHandle) error {
 		kind, e := m.GetKind(h)
 		if e != nil {
 			return e
+		}
+		if kind == ASTQuantifier {
+			occurrences[h]++
+			if occurrences[h] > 1 {
+				return nil
+			}
+			body, e := m.GetQuantifierBody(h)
+			if e != nil {
+				return e
+			}
+			return countOccurrences(body)
 		}
 		if kind != ASTApp {
 			return nil
@@ -109,6 +121,19 @@ func (m *ASTManager) smt2PPExprTree(root ASTHandle, names []usymbol.Symbol, requ
 		usedNames[s] = true
 	}
 	nextAlias := uint32(1)
+	registerAlias := func(h ASTHandle, format ASTHandle, level uint32) (result, error) {
+		for {
+			name := "a!" + strconv.FormatUint(uint64(nextAlias), 10)
+			nextAlias++
+			if usedNames[name] {
+				continue
+			}
+			aliases[h] = len(bindings)
+			bindings = append(bindings, smt2LetBinding{name: name, format: format, level: level})
+			aliasFormat, e := m.FormatString(name)
+			return result{docs: []ASTHandle{aliasFormat}, level: level + 1, weight: 1, depth: 1}, e
+		}
+	}
 	var visit func(ASTHandle, bool) (result, error)
 	visit = func(h ASTHandle, flatten bool) (result, error) {
 		if idx, found := aliases[h]; found {
@@ -124,6 +149,9 @@ func (m *ASTManager) smt2PPExprTree(root ASTHandle, names []usymbol.Symbol, requ
 			format, e := m.smt2PPQuantifierRoot(h, names)
 			if e != nil {
 				return result{}, e
+			}
+			if h != root && occurrences[h] > 1 {
+				return registerAlias(h, format, 0)
 			}
 			decls, e := m.GetNumDeclarations(h)
 			return result{docs: []ASTHandle{format}, weight: 1 + 2*decls, depth: 2}, e
@@ -279,17 +307,7 @@ func (m *ASTManager) smt2PPExprTree(root ASTHandle, names []usymbol.Symbol, requ
 			return result{}, e
 		}
 		if h != root && (value.depth >= 5 || value.weight >= 10 && occurrences[h] > 1) {
-			for {
-				name := "a!" + strconv.FormatUint(uint64(nextAlias), 10)
-				nextAlias++
-				if usedNames[name] {
-					continue
-				}
-				aliases[h] = len(bindings)
-				bindings = append(bindings, smt2LetBinding{name: name, format: format, level: value.level})
-				aliasFormat, e := m.FormatString(name)
-				return result{docs: []ASTHandle{aliasFormat}, level: value.level + 1, weight: 1, depth: 1}, e
-			}
+			return registerAlias(h, format, value.level)
 		}
 		value.docs = []ASTHandle{format}
 		return value, nil
