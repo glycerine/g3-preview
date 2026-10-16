@@ -603,11 +603,19 @@ func (c satIntegrityChecker) checkReinitStack() (bool, error) {
 	if e := c.open(); e != nil {
 		return false, e
 	}
+	enabled := false
+	if satStorageSourceDebug {
+		on, e := diagnostic.BorrowProcessDebugContext().AssertionsEnabled()
+		if e != nil {
+			return false, e
+		}
+		enabled = on
+	}
 	for _, w := range c.lifecycle.reinit {
 		if w.Binary() {
 			continue
 		}
-		if satStorageSourceDebug {
+		if enabled {
 			cl, e := w.ClauseRef()
 			if e != nil {
 				return false, e
@@ -616,8 +624,8 @@ func (c satIntegrityChecker) checkReinitStack() (bool, error) {
 			if e != nil {
 				return false, e
 			}
-			if !yes {
-				return false, ErrSATAssertion
+			if e = satIntegrityAssertion(yes, c.debugActions, 205, "it->get_clause()->on_reinit_stack()"); e != nil {
+				return false, e
 			}
 		}
 	}
@@ -653,6 +661,7 @@ func (c satIntegrityChecker) checkDisjointClauses() (yes bool, err error) {
 			return false, e
 		}
 		if ids.Contains(id) {
+			c.traceRepeatedClause(id)
 			return false, nil
 		}
 	}
@@ -666,47 +675,54 @@ func (c satIntegrityChecker) run() (bool, error) {
 		return true, nil
 	}
 	if satStorageSourceDebug {
+		enabled, e := diagnostic.BorrowProcessDebugContext().AssertionsEnabled()
+		if e != nil {
+			return false, e
+		}
+		if !enabled {
+			return true, nil
+		}
 		yes, e := c.checkClauses()
 		if e != nil {
 			return false, e
 		}
-		if !yes {
-			return false, ErrSATAssertion
+		if e = satIntegrityAssertion(yes, c.debugActions, 231, "check_clauses()"); e != nil {
+			return false, e
 		}
 		yes, e = c.checkLearnedClauses()
 		if e != nil {
 			return false, e
 		}
-		if !yes {
-			return false, ErrSATAssertion
+		if e = satIntegrityAssertion(yes, c.debugActions, 232, "check_learned_clauses()"); e != nil {
+			return false, e
 		}
 		yes, e = c.checkWatches()
 		if e != nil {
 			return false, e
 		}
-		if !yes {
-			return false, ErrSATAssertion
+		if e = satIntegrityAssertion(yes, c.debugActions, 233, "check_watches()"); e != nil {
+			return false, e
 		}
 		yes, e = c.checkBoolVars()
 		if e != nil {
 			return false, e
 		}
-		if !yes {
-			return false, ErrSATAssertion
+		if e = satIntegrityAssertion(yes, c.debugActions, 234, "check_bool_vars()"); e != nil {
+			return false, e
 		}
 		yes, e = c.checkReinitStack()
 		if e != nil {
 			return false, e
 		}
-		if !yes {
-			return false, ErrSATAssertion
+		if e = satIntegrityAssertion(yes, c.debugActions, 235, "check_reinit_stack()"); e != nil {
+			return false, e
 		}
 		yes, e = c.checkDisjointClauses()
 		if e != nil {
 			return false, e
 		}
-		if !yes {
-			return false, ErrSATAssertion
+		if e = satIntegrityAssertion(yes, c.debugActions, 236, "check_disjoint_clauses()"); e != nil {
+			return false, e
 		}
 	}
 	return true, nil

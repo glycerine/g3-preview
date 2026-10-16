@@ -74378,7 +74378,7 @@
           "name": "Retained cleaner operator cleaner_bug process assertion/tag gate at entry and exit; selected nested Boolean-variable and watch SASSERT actions ported, other checker diagnostics remain open (sat_cleaner.cpp:184,200)",
           "status": "partial",
           "go_target": "pkg/sat/sat_cleaner_assertion.go",
-          "tests": ["TestSATCleanerInvariantUsesProcessDebugGate", "TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder", "TestSATIntegrityEliminatedWatchSourceTrace"]
+          "tests": ["TestSATCleanerInvariantUsesProcessDebugGate", "TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder", "TestSATIntegrityEliminatedWatchSourceTrace", "TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         }
       ],
       "ownership": [
@@ -75097,6 +75097,18 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
           "tests": ["TestSATIntegrityEliminatedWatchSourceTrace"]
+        },
+        {
+          "name": "Selected reinit-stack SASSERT205 and operator SASSERT231-236 process gate, per-site C/T action through cleaner_bug; other nested checker methods remain partial",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
+        },
+        {
+          "name": "check_disjoint_clauses repeated-ID TRACE before false return (cpp220-222)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_integrity_disjoint_trace.go",
+          "tests": ["TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         }
       ],
       "ownership": [
@@ -75180,6 +75192,18 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
           "tests": ["TestSATIntegrityEliminatedWatchSourceTrace"]
+        },
+        {
+          "name": "Selected reinit-stack SASSERT205 and operator SASSERT231-236 process gate, per-site C/T action through cleaner_bug; other nested checker methods remain partial",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
+        },
+        {
+          "name": "check_disjoint_clauses repeated-ID TRACE before false return (cpp220-222)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_integrity_disjoint_trace.go",
+          "tests": ["TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         }
       ],
       "ownership": [
@@ -121997,6 +122021,12 @@
           "tests": [
             "TestLinearEquationCombineZeroMultiplierSourceAssertionProfile"
           ]
+        },
+        {
+          "name": "Retained SAT reinit-stack SASSERT205 and integrity-checker operator SASSERT231-236 process gate and C/T actions; other nested checker sites remain partial",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         }
       ],
       "ownership": [
@@ -122382,6 +122412,12 @@
           "tests": [
             "TestLinearEquationCombineZeroMultiplierSourceAssertionProfile"
           ]
+        },
+        {
+          "name": "Retained SAT reinit-stack SASSERT205 and integrity-checker operator SASSERT231-236 process gate and C/T actions; other nested checker sites remain partial",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         }
       ],
       "ownership": [
@@ -181796,6 +181832,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
           "tests": ["TestSATIntegrityEliminatedWatchSourceTrace"]
+        },
+        {
+          "name": "Retained SAT integrity-checker repeated-clause TRACE before false disjoint result (sat_integrity_checker.cpp:221)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_integrity_disjoint_trace.go",
+          "tests": ["TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         }
       ],
       "ownership": [
@@ -183529,6 +183571,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
           "tests": ["TestSATIntegrityEliminatedWatchSourceTrace"]
+        },
+        {
+          "name": "Retained SAT integrity-checker repeated-clause TRACE before false disjoint result (sat_integrity_checker.cpp:221)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_integrity_disjoint_trace.go",
+          "tests": ["TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         }
       ],
       "ownership": [
