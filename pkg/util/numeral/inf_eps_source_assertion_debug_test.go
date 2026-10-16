@@ -1,6 +1,8 @@
 //go:build g3debug
 
-// Source: src/util/inf_eps_rational.h:121-128; src/util/debug.h:63.
+// Source: src/util/inf_eps_rational.h:121-128;
+// src/util/inf_rational.h:125-133; src/util/inf_int_rational.h:112-120;
+// src/util/debug.h:63.
 package numeral
 
 import (
@@ -13,12 +15,14 @@ import (
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-func TestInfEpsAndInfRational64BitSourceAssertionActions(t *testing.T) {
+func TestInfinitesimal64BitSourceAssertionActions(t *testing.T) {
 	s, _ := serviceNew(t)
 	v := infEpsValue(t, s, "1", "7", "0")
 	t.Cleanup(func() { serviceMust(t, s.InfEpsInfDel(&v)) })
 	inner := infValue(t, s, 7, 1, "1")
 	t.Cleanup(func() { serviceMust(t, s.InfDel(&inner)) })
+	integer := infIntValue(t, s, "7", 1)
+	t.Cleanup(func() { serviceMust(t, s.InfIntDel(&integer)) })
 
 	budget := arena.NewBudget(^uint64(0))
 	region, e := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: budget}})
@@ -27,7 +31,7 @@ func TestInfEpsAndInfRational64BitSourceAssertionActions(t *testing.T) {
 	serviceMust(t, e)
 	inFile, e := os.CreateTemp(t.TempDir(), "inf-eps-actions-*")
 	serviceMust(t, e)
-	_, e = inFile.WriteString("CTCT")
+	_, e = inFile.WriteString("CTCTCT")
 	serviceMust(t, e)
 	_, e = inFile.Seek(0, 0)
 	serviceMust(t, e)
@@ -68,6 +72,12 @@ func TestInfEpsAndInfRational64BitSourceAssertionActions(t *testing.T) {
 	if _, e := s.InfUint64(&inner); !errors.As(e, &thrown) {
 		t.Fatal("inf_rational Throw must stop before FIRST getter", e)
 	}
+	if got, e := s.InfIntInt64(&integer); e != nil || got != 7 {
+		t.Fatal("inf_int_rational Continue must reach FIRST getter", got, e)
+	}
+	if _, e := s.InfIntUint64(&integer); !errors.As(e, &thrown) {
+		t.Fatal("inf_int_rational Throw must stop before FIRST getter", e)
+	}
 	serviceMust(t, d.EnableAssertions(false))
 	if got, e := s.InfEpsInfUint64(&v); e != nil || got != 7 {
 		t.Fatal("disabled source assertion must reach nested getter", got, e)
@@ -75,9 +85,12 @@ func TestInfEpsAndInfRational64BitSourceAssertionActions(t *testing.T) {
 	if got, e := s.InfUint64(&inner); e != nil || got != 7 {
 		t.Fatal("disabled inf_rational assertion must reach FIRST", got, e)
 	}
+	if got, e := s.InfIntUint64(&integer); e != nil || got != 7 {
+		t.Fatal("disabled inf_int_rational assertion must reach FIRST", got, e)
+	}
 	state, e := input.State()
 	serviceMust(t, e)
-	if state.Position != 4 {
+	if state.Position != 6 {
 		t.Fatal("unexpected debugger action consumption", state.Position)
 	}
 	got, e := os.ReadFile(outFile.Name())
@@ -86,7 +99,9 @@ func TestInfEpsAndInfRational64BitSourceAssertionActions(t *testing.T) {
 	want := "ASSERTION VIOLATION\nFile: src/util/inf_eps_rational.h\nLine: 122\nis_int64()\n" + prompt +
 		"ASSERTION VIOLATION\nFile: src/util/inf_eps_rational.h\nLine: 127\nis_uint64()\n" + prompt +
 		"ASSERTION VIOLATION\nFile: src/util/inf_rational.h\nLine: 126\nis_int64()\n" + prompt +
-		"ASSERTION VIOLATION\nFile: src/util/inf_rational.h\nLine: 131\nis_uint64()\n" + prompt
+		"ASSERTION VIOLATION\nFile: src/util/inf_rational.h\nLine: 131\nis_uint64()\n" + prompt +
+		"ASSERTION VIOLATION\nFile: src/util/inf_int_rational.h\nLine: 113\nis_int64()\n" + prompt +
+		"ASSERTION VIOLATION\nFile: src/util/inf_int_rational.h\nLine: 118\nis_uint64()\n" + prompt
 	if string(got) != want {
 		t.Fatalf("source assertion records: got %q, want %q", got, want)
 	}

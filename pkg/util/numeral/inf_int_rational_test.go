@@ -399,6 +399,7 @@ func TestInfIntRationalAccessorsHashDisplayPostOperations(t *testing.T) {
 }
 
 func TestInfIntRationalConversionsAndMixedComparisons(t *testing.T) {
+	disableInfProjectionAssertions(t)
 	s, _ := serviceNew(t)
 	for _, text := range []string{"-9223372036854775808", "9223372036854775807", "18446744073709551615", "1/2"} {
 		a := infIntValue(t, s, text, 0)
@@ -452,7 +453,7 @@ func TestInfIntRationalConversionsAndMixedComparisons(t *testing.T) {
 		}
 		serviceAuditRationalRoots(t, s, &a.First, &r.Raw)
 		a.second = 1
-		if got, e := s.InfIntInt64(&a); modularSourceDebug {
+		if got, e := s.InfIntInt64(&a); modularSourceDebug && !wantI {
 			if !errors.Is(e, ErrIntegerAssertion) {
 				t.Fatal(e)
 			}
@@ -465,7 +466,7 @@ func TestInfIntRationalConversionsAndMixedComparisons(t *testing.T) {
 				t.Fatal("release ignores epsilon signed", text, got, want, e)
 			}
 		}
-		if got, e := s.InfIntUint64(&a); modularSourceDebug {
+		if got, e := s.InfIntUint64(&a); modularSourceDebug && !wantU {
 			if !errors.Is(e, ErrIntegerAssertion) {
 				t.Fatal(e)
 			}

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"math"
 
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
@@ -733,25 +734,43 @@ func (s *RationalService) infIntScalarFits(v *OwnedInfIntRational, unsigned bool
 	return ok && v.second == 0, e
 }
 func (s *RationalService) infIntSignedProjectionLocked(v *OwnedInfIntRational) (int64, error) {
-	if modularSourceDebug {
-		ok, e := s.infIntScalarFits(v, false)
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return 0, e
 		}
-		if !ok {
-			return 0, ErrIntegerAssertion
+		if enabled {
+			ok, e := s.infIntScalarFits(v, false)
+			if e != nil {
+				return 0, e
+			}
+			if !ok {
+				if e = diagnostic.DebugAssertionFailure(d, "src/util/inf_int_rational.h", 113, "is_int64()"); e != nil {
+					return 0, e
+				}
+			}
 		}
 	}
 	return s.Manager.Int64(&v.First)
 }
 func (s *RationalService) infIntUnsignedProjectionLocked(v *OwnedInfIntRational) (uint64, error) {
-	if modularSourceDebug {
-		ok, e := s.infIntScalarFits(v, true)
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return 0, e
 		}
-		if !ok {
-			return 0, ErrIntegerAssertion
+		if enabled {
+			ok, e := s.infIntScalarFits(v, true)
+			if e != nil {
+				return 0, e
+			}
+			if !ok {
+				if e = diagnostic.DebugAssertionFailure(d, "src/util/inf_int_rational.h", 118, "is_uint64()"); e != nil {
+					return 0, e
+				}
+			}
 		}
 	}
 	return s.Manager.Uint64(&v.First)

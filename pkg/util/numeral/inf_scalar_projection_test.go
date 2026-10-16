@@ -71,7 +71,7 @@ func TestInfScalarProjectionAllGetterProfilesAndRawPredicates(t *testing.T) {
 					ip, up, integral, rational func() (bool, error)
 					assertI, assertU           bool
 				}{
-					{func() (int64, error) { return s.InfIntInt64(&a) }, func() (uint64, error) { return s.InfIntUint64(&a) }, func() (bool, error) { return s.InfIntIsInt64(&a) }, func() (bool, error) { return s.InfIntIsUint64(&a) }, func() (bool, error) { return s.InfIntIsInt(&a) }, func() (bool, error) { return s.InfIntIsRational(&a) }, !fitI, !fitU},
+					{func() (int64, error) { return s.InfIntInt64(&a) }, func() (uint64, error) { return s.InfIntUint64(&a) }, func() (bool, error) { return s.InfIntIsInt64(&a) }, func() (bool, error) { return s.InfIntIsUint64(&a) }, func() (bool, error) { return s.InfIntIsInt(&a) }, func() (bool, error) { return s.InfIntIsRational(&a) }, !firstFitI, !firstFitU},
 					{func() (int64, error) { return s.InfInt64(&b) }, func() (uint64, error) { return s.InfUint64(&b) }, func() (bool, error) { return s.InfIsInt64(&b) }, func() (bool, error) { return s.InfIsUint64(&b) }, func() (bool, error) { return s.InfIsInt(&b) }, func() (bool, error) { return s.InfIsRational(&b) }, !firstFitI, !firstFitU},
 					{func() (int64, error) { return s.InfEpsInfInt64(&c) }, func() (uint64, error) { return s.InfEpsInfUint64(&c) }, func() (bool, error) { return s.InfEpsInfIsInt64(&c) }, func() (bool, error) { return s.InfEpsInfIsUint64(&c) }, func() (bool, error) { return s.InfEpsInfIsInt(&c) }, func() (bool, error) { return s.InfEpsInfIsRational(&c) }, !firstFitI, !firstFitU},
 				} {
