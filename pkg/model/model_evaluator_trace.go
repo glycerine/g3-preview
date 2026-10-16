@@ -36,8 +36,8 @@ func (ev *ModelEvaluator) writeSMT2(w io.Writer, t ast.ASTHandle) (result error)
 	if err != nil {
 		return err
 	}
-	_, err = io.WriteString(w, body)
-	return err
+	_, _ = io.WriteString(w, body)
+	return nil
 }
 
 // BindTrace borrows a trace stream for reached evaluator sites. Nil restores
@@ -55,14 +55,17 @@ func (ev *ModelEvaluator) traceEvaluateAt(t ast.ASTHandle, line int) error {
 	if !tags.ShouldTrace("model_evaluator") {
 		return nil
 	}
-	return tags.EmitConditional("model_evaluator", "operator()", "src/model/model_evaluator.cpp", line,
+	var operandErr error
+	_ = tags.EmitConditional("model_evaluator", "operator()", "src/model/model_evaluator.cpp", line,
 		func() bool { return true }, func(w io.Writer) error {
 			if err := ev.writeSMT2(w, t); err != nil {
+				operandErr = err
 				return err
 			}
-			_, err := io.WriteString(w, "\n")
-			return err
+			_, _ = io.WriteString(w, "\n")
+			return nil
 		})
+	return operandErr
 }
 
 func (ev *ModelEvaluator) traceEvaluate(t ast.ASTHandle) error {
@@ -84,36 +87,36 @@ func (c *evaluatorConfiguration) traceReduceApp(d ast.ASTHandle, args ast.AppArg
 	if err != nil {
 		return err
 	}
-	return tags.EmitConditional("model_evaluator", "reduce_app", "src/model/model_evaluator.cpp", 187,
+	var operandErr error
+	_ = tags.EmitConditional("model_evaluator", "reduce_app", "src/model/model_evaluator.cpp", 187,
 		func() bool { return true }, func(w io.Writer) error {
-			if _, err := io.WriteString(w, "reduce_app "+spelling+"\n"); err != nil {
-				return err
-			}
+			_, _ = io.WriteString(w, "reduce_app "+spelling+"\n")
 			for i := uint32(0); i < args.Count(); i++ {
 				h, err := args.At(i)
 				if err != nil {
+					operandErr = err
 					return err
 				}
 				if err = ev.writeSMT2(w, h); err != nil {
+					operandErr = err
 					return err
 				}
-				if _, err = io.WriteString(w, "\n"); err != nil {
-					return err
-				}
+				_, _ = io.WriteString(w, "\n")
 			}
 			result, err := m.RefGet(out)
 			if err != nil {
+				operandErr = err
 				return err
 			}
-			if _, err = io.WriteString(w, "---->\n"); err != nil {
-				return err
-			}
+			_, _ = io.WriteString(w, "---->\n")
 			if err = ev.writeSMT2(w, result); err != nil {
+				operandErr = err
 				return err
 			}
-			_, err = io.WriteString(w, "\n")
-			return err
+			_, _ = io.WriteString(w, "\n")
+			return nil
 		})
+	return operandErr
 }
 
 func (c *evaluatorConfiguration) traceReduceStatus(status rewriter.RewriteStatus, out ast.ASTRef) error {
@@ -125,18 +128,22 @@ func (c *evaluatorConfiguration) traceReduceStatus(status rewriter.RewriteStatus
 	if !tags.ShouldTrace("model_evaluator") {
 		return nil
 	}
-	return tags.EmitConditional("model_evaluator", "reduce_app", "src/model/model_evaluator.cpp", 200,
+	var operandErr error
+	_ = tags.EmitConditional("model_evaluator", "reduce_app", "src/model/model_evaluator.cpp", 200,
 		func() bool { return true }, func(w io.Writer) error {
 			result, err := ev.model.manager.RefGet(out)
 			if err != nil {
+				operandErr = err
 				return err
 			}
 			if err = ev.writeSMT2(w, result); err != nil {
+				operandErr = err
 				return err
 			}
-			_, err = io.WriteString(w, "\n")
-			return err
+			_, _ = io.WriteString(w, "\n")
+			return nil
 		})
+	return operandErr
 }
 
 // traceArray records the reached extract_array_func_interp branches. The
@@ -148,21 +155,20 @@ func (c *evaluatorConfiguration) traceArray(line int, prefix string, terms ...as
 	if !tags.ShouldTrace("model_evaluator") {
 		return nil
 	}
-	return tags.EmitConditional("model_evaluator", "extract_array_func_interp", "src/model/model_evaluator.cpp", line,
+	var operandErr error
+	_ = tags.EmitConditional("model_evaluator", "extract_array_func_interp", "src/model/model_evaluator.cpp", line,
 		func() bool { return true }, func(w io.Writer) error {
-			if _, err := io.WriteString(w, prefix); err != nil {
-				return err
-			}
+			_, _ = io.WriteString(w, prefix)
 			for _, term := range terms {
 				if err := ev.writeSMT2(w, term); err != nil {
+					operandErr = err
 					return err
 				}
-				if _, err := io.WriteString(w, "\n"); err != nil {
-					return err
-				}
+				_, _ = io.WriteString(w, "\n")
 			}
 			return nil
 		})
+	return operandErr
 }
 
 func (c *evaluatorConfiguration) traceGetMacro(d ast.ASTHandle, line int) error {

@@ -57705,6 +57705,12 @@
           "tests": ["TestModelEvaluatorArrayExtractionSourceTrace"]
         },
         {
+          "name": "Model evaluator reached TRACE writer refusals retain sticky stream state without stopping evaluation",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "tests": ["TestModelEvaluatorTraceStreamRefusalKeepsEvaluation", "TestModelEvaluatorDirectEntrySourceTrace", "TestModelEvaluatorBooleanReductionSourceStatusTrace"]
+        },
+        {
           "name": "Selected Boolean reduce_app BR_DONE application relookup and conditional result CTRACE at model_evaluator.cpp:194-202",
           "status": "partial",
           "go_target": "pkg/model/model_evaluator_trace.go",
@@ -182372,6 +182378,12 @@
           "tests": ["TestExtensionModelDefinitionSourceTraceReverseOrder"]
         },
         {
+          "name": "Model evaluator reached TRACE writer refusals retain sticky stream state without stopping evaluation",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "tests": ["TestModelEvaluatorTraceStreamRefusalKeepsEvaluation", "TestModelEvaluatorDirectEntrySourceTrace", "TestModelEvaluatorBooleanReductionSourceStatusTrace"]
+        },
+        {
           "name": "Selected Boolean reduce_app BR_DONE application relookup and conditional result CTRACE at model_evaluator.cpp:194-202",
           "status": "partial",
           "go_target": "pkg/model/model_evaluator_trace.go",
@@ -184770,6 +184782,12 @@
           "status": "ported",
           "go_target": "pkg/tactic/tactic_extension_model_trace.go",
           "tests": ["TestExtensionModelDefinitionSourceTraceReverseOrder"]
+        },
+        {
+          "name": "Model evaluator reached TRACE writer refusals retain sticky stream state without stopping evaluation",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "tests": ["TestModelEvaluatorTraceStreamRefusalKeepsEvaluation", "TestModelEvaluatorDirectEntrySourceTrace", "TestModelEvaluatorBooleanReductionSourceStatusTrace"]
         },
         {
           "name": "Selected Boolean reduce_app BR_DONE application relookup and conditional result CTRACE at model_evaluator.cpp:194-202",
