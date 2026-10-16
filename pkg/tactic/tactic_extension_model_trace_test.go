@@ -3,6 +3,7 @@ package tactic
 import (
 	"bytes"
 	"io"
+	"math"
 	"strconv"
 	"testing"
 
@@ -110,7 +111,13 @@ func TestExtensionModelTraceAttachedDeclarationInfo(t *testing.T) {
 	p, err := m.NewParameterInt(7)
 	satOK(t, err)
 	defer func() { satOK(t, m.DelParameter(&p)) }()
-	info, err := m.NewFuncDeclInfo(ast.NullFamilyID, 17, []ast.ASTParameter{p}, ast.ASTFuncFlags{Skolem: true}, false)
+	negativeZero, err := m.NewParameterDouble(math.Copysign(0, -1))
+	satOK(t, err)
+	defer func() { satOK(t, m.DelParameter(&negativeZero)) }()
+	exponent, err := m.NewParameterDouble(1_000_000)
+	satOK(t, err)
+	defer func() { satOK(t, m.DelParameter(&exponent)) }()
+	info, err := m.NewFuncDeclInfo(ast.NullFamilyID, 17, []ast.ASTParameter{p, negativeZero, exponent}, ast.ASTFuncFlags{Skolem: true}, false)
 	satOK(t, err)
 	defer func() { satOK(t, m.DelFuncDeclInfo(&info)) }()
 	d, err := m.MkFuncDecl(astTestSymbol(t, m, "metadata-extension"), nil, bs, info)
@@ -128,7 +135,7 @@ func TestExtensionModelTraceAttachedDeclarationInfo(t *testing.T) {
 	}
 	id, err := m.GetASTID(d)
 	satOK(t, err)
-	meta := ":fid -1 :decl-kind 17 :parameters (7)" +
+	meta := ":fid -1 :decl-kind 17 :parameters (7 -0 1e+06)" +
 		" :left-assoc 0 :right-assoc 0 :flat-associative 0 :commutative 0" +
 		" :chainable 0 :pairwise 0 :injective 0 :idempotent 0 :skolem 1"
 	want := "-------- [extension_mc] operator() src/tactic/extension_model_converter.cpp:49 ---------\n" +

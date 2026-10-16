@@ -10674,10 +10674,16 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "source parameter ostream and attached func_decl_info display: six parameter kinds, family/kind and nine flags for retained extension-model declaration metadata; non-finite double ostream profiles remain open",
-          "status": "partial",
+          "name": "source parameter ostream and attached func_decl_info display for the retained defined declaration domain: six parameter kinds, family/kind and nine flags",
+          "status": "ported",
           "go_target": "pkg/ast/ast_func_decl_info_text.go",
-          "tests": ["TestASTFuncDeclInfoSourceText"]
+          "tests": ["TestASTFuncDeclInfoSourceText", "TestASTFuncDeclInfoDoubleRegistrationAndSourceTextDomain"]
+        },
+        {
+          "name": "PARAM_DOUBLE non-finite or out-of-range declaration metadata stops at undefined source unsigned hash conversion; Go registration refuses it",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_parameter.go",
+          "tests": ["TestASTFuncDeclInfoDoubleRegistrationAndSourceTextDomain", "TestASTParameterDoubleHashSourceDomain"]
         },
         {
           "name": "mk_quantifier debug-only pattern TRACE before pattern assertion and node allocation (ast.cpp:2356-2361); selected pattern application profile",
@@ -11723,10 +11729,16 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "source parameter ostream and attached func_decl_info display: six parameter kinds, family/kind and nine flags for retained extension-model declaration metadata; non-finite double ostream profiles remain open",
-          "status": "partial",
+          "name": "source parameter ostream and attached func_decl_info display for the retained defined declaration domain: six parameter kinds, family/kind and nine flags",
+          "status": "ported",
           "go_target": "pkg/ast/ast_func_decl_info_text.go",
-          "tests": ["TestASTFuncDeclInfoSourceText"]
+          "tests": ["TestASTFuncDeclInfoSourceText", "TestASTFuncDeclInfoDoubleRegistrationAndSourceTextDomain"]
+        },
+        {
+          "name": "PARAM_DOUBLE non-finite or out-of-range declaration metadata stops at undefined source unsigned hash conversion; Go registration refuses it",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/ast_parameter.go",
+          "tests": ["TestASTFuncDeclInfoDoubleRegistrationAndSourceTextDomain", "TestASTParameterDoubleHashSourceDomain"]
         },
         {
           "name": "family_manager constructor next0 and concrete symbol/name members",
@@ -182372,7 +182384,7 @@
           "tests": ["TestExtensionModelTraceWriterRefusalKeepsDefinitions", "TestModelV2DisplayConstantsFunctionsAndPartialElse"]
         },
         {
-          "name": "Reached extension_mc pre/post model snapshots at extension_model_converter.cpp:49,71 using concrete model_v2_pp and attached func_decl_info metadata; non-finite double ostream profiles remain open",
+          "name": "Reached extension_mc pre/post model snapshots at extension_model_converter.cpp:49,71 using concrete model_v2_pp and attached defined-domain func_decl_info metadata; wider model display profiles remain open",
           "status": "partial",
           "go_target": "pkg/tactic/tactic_extension_model_trace.go",
           "go_targets": ["pkg/model/model_v2_display.go"],
@@ -184785,7 +184797,7 @@
           "tests": ["TestExtensionModelTraceWriterRefusalKeepsDefinitions", "TestModelV2DisplayConstantsFunctionsAndPartialElse"]
         },
         {
-          "name": "Reached extension_mc pre/post model snapshots at extension_model_converter.cpp:49,71 using concrete model_v2_pp and attached func_decl_info metadata; non-finite double ostream profiles remain open",
+          "name": "Reached extension_mc pre/post model snapshots at extension_model_converter.cpp:49,71 using concrete model_v2_pp and attached defined-domain func_decl_info metadata; wider model display profiles remain open",
           "status": "partial",
           "go_target": "pkg/tactic/tactic_extension_model_trace.go",
           "go_targets": ["pkg/model/model_v2_display.go"],
