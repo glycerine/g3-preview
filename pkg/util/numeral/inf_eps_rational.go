@@ -1516,7 +1516,10 @@ func (s *RationalService) InfEpsInfInc(v *OwnedInfEpsInfRational) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
+		return e
+	}
+	if e := s.infScalarOwner(&v.numeral); e != nil {
 		return e
 	}
 	return s.infRatStep(&v.numeral.First, false)
@@ -1548,7 +1551,10 @@ func (s *RationalService) InfEpsInfDec(v *OwnedInfEpsInfRational) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
+		return e
+	}
+	if e := s.infScalarOwner(&v.numeral); e != nil {
 		return e
 	}
 	return s.infRatStep(&v.numeral.First, true)
