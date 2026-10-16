@@ -2,7 +2,6 @@ package ast
 
 import (
 	"math"
-	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
@@ -23,42 +22,4 @@ func astRegisterUserName(dictionary *usymbol.DictionaryInt32, names *[]usymbol.S
 		return 0, e
 	}
 	return k, nil
-}
-
-// An actual freshly constructed user_sort_plugin before set_manager. It owns
-// its name vector and dictionary, borrows spelling identities, and has no AST
-// callback or fabricated manager. Future plugin inheritance binds it normally.
-type astFreshUserPlugin struct {
-	dictionary usymbol.DictionaryInt32
-	names      []usymbol.Symbol
-	budget     *arena.Budget
-	ownerBytes uint64
-}
-
-func (m *ASTManager) freshUserPlugin() (*astFreshUserPlugin, error) {
-	bytes := uint64(reflect.TypeOf(astFreshUserPlugin{}).Size())
-	if e := m.BudgetField.Reserve(bytes); e != nil {
-		return nil, e
-	}
-	p := &astFreshUserPlugin{budget: m.BudgetField, ownerBytes: bytes}
-	if e := p.dictionary.Init(m.Symbols); e != nil {
-		p.close()
-		return nil, e
-	}
-	for _, name := range m.builtin.userNames {
-		if _, e := astRegisterUserName(&p.dictionary, &p.names, name); e != nil {
-			p.close()
-			return nil, e
-		}
-	}
-	return p, nil
-}
-func (p *astFreshUserPlugin) close() {
-	if p == nil {
-		return
-	}
-	p.dictionary.Close()
-	p.budget.Release(p.ownerBytes)
-	p.ownerBytes = 0
-	p.names = nil
 }

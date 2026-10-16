@@ -11045,13 +11045,17 @@
           ]
         },
         {
-          "name": "Concrete user_sort_plugin register_name and mk_fresh preserve name order with a native symbol slice and Go dictionary (ast.cpp:1273-1288)",
+          "name": "Concrete user_sort_plugin register_name preserves name order with a native symbol slice and Go dictionary (ast.cpp:1273-1281)",
           "status": "platform_replacement",
           "go_target": "pkg/ast/ast_builtin_plugins_user.go",
           "tests": [
-            "TestASTUserNameDictionaryRegistrationAndFreshReplay",
-            "TestASTUserNameNativeGrowthAndFreshReplay"
+            "TestASTUserNameDictionaryRegistration",
+            "TestASTUserNameNativeGrowth"
           ]
+        },
+        {
+          "name": "user_sort_plugin::mk_fresh is unreachable: every ast_manager constructor registers the built-in user-sort plugin before copy_families_plugins (ast.cpp:1283-1288,1375,1550)",
+          "status": "dead_deleted"
         },
         {
           "name": "existing app/quantifier construction through actual borrowed result-vector ranges, preserving update control flow and metadata",
@@ -11164,7 +11168,7 @@
         "Registered node metadata copies are distinguished from caller-owned unattached info. Their stable page-record identity emits source alloc at registration and dealloc after successful release of owned parameters, unless the debug reference-count branch deliberately retains the source allocation."
       ],
       "deviations": [
-        "The remaining user_sort_plugin::mk_fresh allocation at ast.cpp:1284 is reached from copy_families_plugins at ast.cpp:1550 during ast_translation construction. Both ast_translation units remain unported, and the Go freshUserPlugin helper is currently called only by tests; no production memory-wrapper or translation completion credit is claimed.",
+        "user_sort_plugin::mk_fresh at ast.cpp:1284 is unreachable: ast_manager::init registers the built-in user-sort plugin for every target before copy_families_plugins, whose mk_fresh branch requires the target plugin to be absent. The test-only Go clone helper was removed. Other ast_translation behavior remains unported.",
         "Family source signed next++ overflow and invalid symbol/lifetime domains have typed guards. Enumeration appends to caller buffers; no fake AST/plugin instantiation. Implicit family owning copies are not exported; actual AST copy_families_plugins remains separate.",
         "Private sort_size enum is encoded Go0=infinite/1=finite/2=very-big to match source default with Go zero value. Nonfinite size is canonical0 rather than source unspecified default bits. Size checks finite precondition in every Go profile instead of reading irrelevant/unspecified release fields. No source ENSURE tests are invented; tests exercise implementation SASSERT and real borrowed rational provenance/lifetime.",
         "Source pointer identities become owner/slot/generation tokens; physical owner/page/payload accounting replaces C++ ABI sizes. Invalid/dangling domains use typed guards. Source-undefined construction/deletion allocation exceptions have explicit ownership continuation adapters. Runtime debug_ref_count, conditional debug tags, TRACE/printer-backed diagnostics, trace constructors, remaining manager/plug-in operations and complete proof/checker/solver consumers remain open. Six quantifier updates use direct retained payload copies without intermediate Go slices; update-weight TRACE now precedes replacement construction. No Go generics are used.",
@@ -123954,7 +123958,7 @@
         "TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule",
         "TestSymbolDictionaryInt32LookupMutationAndReset",
         "TestSymbolDictionaryInt32RejectsClosedSymbolOwner",
-        "TestASTUserNameDictionaryRegistrationAndFreshReplay",
+        "TestASTUserNameDictionaryRegistration",
         "TestTacticManagerSourceOrderLookupFactoryAndFinalization",
         "TestTacticManagerSourceProbeReferencesAndStructuralValues",
         "TestTacticManagerSourceDuplicateAssertionAndNamespaceSeparation",
@@ -124024,7 +124028,7 @@
           "tests": [
             "TestSymbolDictionaryInt32LookupMutationAndReset",
             "TestSymbolDictionaryInt32RejectsClosedSymbolOwner",
-            "TestASTUserNameDictionaryRegistrationAndFreshReplay"
+            "TestASTUserNameDictionaryRegistration"
           ]
         },
         {
@@ -126273,7 +126277,7 @@
         "TestArbitraryFloatPowerMinusOneAndNegatedCaches",
         "TestASTDebugRefCountActualDeletedIDMapAndSkippedRecycle",
         "TestSymbolDictionaryInt32LookupMutationAndReset",
-        "TestASTUserNameDictionaryRegistrationAndFreshReplay",
+        "TestASTUserNameDictionaryRegistration",
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
         "TestParamDescrsSourceModuleAndNullKinds",
         "TestParamDescrsSourceKindLabelsAndHelpers",
@@ -126573,7 +126577,7 @@
           "status": "platform_replacement",
           "go_target": "pkg/util/symbol/dictionary_int32.go",
           "go_targets": ["pkg/ast/ast_builtin_plugins_user.go"],
-          "tests": ["TestSymbolDictionaryInt32LookupMutationAndReset", "TestASTUserNameDictionaryRegistrationAndFreshReplay"]
+          "tests": ["TestSymbolDictionaryInt32LookupMutationAndReset", "TestASTUserNameDictionaryRegistration"]
         },
         {
           "name": "descriptor dictionary physical probing/growth/removal/tombstone cleanup specialization",
@@ -153643,7 +153647,7 @@
         "Checked OwnedString output now belongs to OwnedString.AppendTo; NumericTextStream receives a native counted Go string through AppendString. Counted output preserves embedded NUL bytes and whole-field width/alignment; CString output independently stops at first NUL. Failed sentries check owner lifetime while preserving width and skipping payload conversion. Removed the stream method accepting OwnedString, so the stream no longer depends on that project text owner. See PORT_PROGRESS.md#native-counted-text-at-the-numeric-stream-boundary."
       ],
       "deviations": [
-        "AST allocation-site audit: the eager ast.cpp:1364,1372-1375 sites, normal format-child sites, registered declaration plugins, and lazy format.cpp:105 plugin are traced. The ast.cpp:1284 user-sort mk_fresh allocation and format.cpp:63 mk_fresh allocation require the still-unported copy_families_plugins/ast_translation production path; current Go freshUserPlugin is test-only. Keep the debug wrapper method partial.",
+        "AST allocation-site audit: the eager ast.cpp:1364,1372-1375 sites, normal format-child sites, registered declaration plugins, and lazy format.cpp:105 plugin are traced. The ast.cpp:1284 user-sort mk_fresh allocation is unreachable because every manager target already registers that built-in plugin; the test-only Go clone helper was removed. The format.cpp:63 mk_fresh allocation remains with the unported ast_translation production path. Keep the debug wrapper method partial.",
         "Source signed-overflow/invalid-lane domains use scalar typed outcomes after completed field prefixes. Containing allocator must execute real physical operations between counter phases. The later Runtime implements physical hooks, headers and OOM exits, and process.InitializeGenerated binds generated callback order. Concurrent OpenMP/global-service and remaining consumer integration stay open.",
         "Size_t promotion is explicit32/64: LP64 updates use unsigned modular arithmetic; ILP32 shrink delta uses uint32 subtraction before LL64 promotion. Signed synchronization/count and ILP32 promoted overflow have typed boundaries after prior field prefixes.",
         "Explicit LE word codecs are a Go source-storage adapter, not an additional C++ allocator algorithm. MPZ backend typed accesses must bound against actual object extent; this prerequisite does not complete MPZ/Natural backing or tracked release/global lifecycle.",
@@ -154524,7 +154528,7 @@
         "Checked OwnedString output now belongs to OwnedString.AppendTo; NumericTextStream receives a native counted Go string through AppendString. Counted output preserves embedded NUL bytes and whole-field width/alignment; CString output independently stops at first NUL. Failed sentries check owner lifetime while preserving width and skipping payload conversion. Removed the stream method accepting OwnedString, so the stream no longer depends on that project text owner. See PORT_PROGRESS.md#native-counted-text-at-the-numeric-stream-boundary."
       ],
       "deviations": [
-        "AST allocation-site audit: user-sort mk_fresh at ast.cpp:1284 and format mk_fresh at format.cpp:63 remain with the unported copy_families_plugins/ast_translation path; test-only Go freshUserPlugin is not retained consumer evidence. Keep alloc/dealloc macro wrapper credit partial.",
+        "AST allocation-site audit: user-sort mk_fresh at ast.cpp:1284 is unreachable because every manager target already registers that built-in plugin; the test-only Go clone helper was removed. Format mk_fresh at format.cpp:63 remains with the unported ast_translation path. Keep alloc/dealloc macro wrapper credit partial.",
         "Source signed-overflow/invalid-lane domains use scalar typed outcomes after completed field prefixes. Containing allocator must execute real physical operations between counter phases. The later Runtime implements physical hooks, headers and OOM exits, and process.InitializeGenerated binds generated callback order. Concurrent OpenMP/global-service and remaining consumer integration stay open.",
         "Size_t promotion is explicit32/64: LP64 updates use unsigned modular arithmetic; ILP32 shrink delta uses uint32 subtraction before LL64 promotion. Signed synchronization/count and ILP32 promoted overflow have typed boundaries after prior field prefixes.",
         "Selected bound OOM/count exit/stream gap is now implemented: actual Runtime failure routes, real subprocess101/113 with Budget refusal still active, file badbit cannot suppress exit, borrowed CString mutation/false/null retention, errors.As derived/base catch. Prior broad global/exit/stream-open notes remain historical beyond this explicit provider binding. Generated callback order is implemented through the caller-confined process binding; native process-global/OpenMP singleton wiring remains OPEN; direct Go file emission is not arbitrary ostream locale/flags/exception/native buffering ABI. Closed Runtime count getter fixture is checked invalid-lifetime prefix coverage, not valid source exhaustion. src/test/memory.cpp Windows high-level API campaign is not credited.",
@@ -188196,12 +188200,12 @@
           ]
         },
         {
-          "name": "Concrete user_sort_plugin ordered symbol-name vector and fresh replay use native Go slice growth",
+          "name": "Concrete user_sort_plugin ordered symbol-name vector uses native Go slice growth",
           "status": "platform_replacement",
           "go_target": "pkg/ast/ast_builtin_plugins_user.go",
           "tests": [
-            "TestASTUserNameDictionaryRegistrationAndFreshReplay",
-            "TestASTUserNameNativeGrowthAndFreshReplay"
+            "TestASTUserNameDictionaryRegistration",
+            "TestASTUserNameNativeGrowth"
           ]
         },
         {
