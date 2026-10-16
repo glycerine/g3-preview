@@ -5,6 +5,7 @@ package numeral
 import (
 	"errors"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -24,7 +25,7 @@ func TestIntegerModularStringSourceAssertionActions(t *testing.T) {
 	serviceMust(t, e)
 	in, e := os.CreateTemp(t.TempDir(), "mpzzp-assert-input-*")
 	serviceMust(t, e)
-	_, e = in.WriteString("CT")
+	_, e = in.WriteString("CTCTCTCTCTCTCT")
 	serviceMust(t, e)
 	_, e = in.Seek(0, 0)
 	serviceMust(t, e)
@@ -59,18 +60,53 @@ func TestIntegerModularStringSourceAssertionActions(t *testing.T) {
 	if _, e := m.String(&a); !errors.As(e, &thrown) {
 		t.Fatal("Throw must stop before numeral formatting", e)
 	}
+	b := NewInt(0)
+	calls := []func() error{
+		func() error { _, e := m.IsZero(&a); return e },
+		func() error { _, e := m.IsOne(&a); return e },
+		func() error { _, e := m.IsPos(&a); return e },
+		func() error { _, e := m.IsNeg(&a); return e },
+		func() error { _, e := m.IsNonPos(&a); return e },
+		func() error { _, e := m.IsNonNeg(&a); return e },
+		func() error { _, e := m.IsMinusOne(&a); return e },
+		func() error { _, e := m.Equal(&a, &b); return e },
+		func() error { _, e := m.Less(&a, &b); return e },
+		func() error { _, e := m.LessEqual(&a, &b); return e },
+		func() error { _, e := m.Greater(&a, &b); return e },
+		func() error { _, e := m.GreaterEqual(&a, &b); return e },
+	}
+	for i, call := range calls {
+		e := call()
+		if i%2 == 0 {
+			if e != nil {
+				t.Fatal("Continue must reach the raw scalar operation", i, e)
+			}
+		} else if !errors.As(e, &thrown) {
+			t.Fatal("Throw must stop before the raw scalar operation", i, e)
+		}
+	}
 	serviceMust(t, d.EnableAssertions(false))
 	if got, e := m.String(&a); e != nil || got != "8" {
 		t.Fatal("disabled source assertion must leave numeral readable", got, e)
 	}
+	if _, e := m.Greater(&a, &b); e != nil {
+		t.Fatal("disabled pair assertion must reach comparison", e)
+	}
 	data, e := os.ReadFile(out.Name())
 	serviceMust(t, e)
-	if strings.Count(string(data), "File: src/util/mpzzp.h\nLine: 146\n") != 2 || strings.Count(string(data), "is_p_normalized(a)") != 2 {
+	if strings.Count(string(data), "File: src/util/mpzzp.h\nLine: 146\n") != 2 ||
+		strings.Count(string(data), "is_p_normalized(a)\n") != 9 ||
+		strings.Count(string(data), "is_p_normalized(a) && is_p_normalized(b)\n") != 5 {
 		t.Fatal("missing source assertion records", string(data))
+	}
+	for line := 133; line <= 144; line++ {
+		if strings.Count(string(data), "Line: "+strconv.Itoa(line)+"\n") != 1 {
+			t.Fatal("missing scalar assertion source line", line, string(data))
+		}
 	}
 	state, e := input.State()
 	serviceMust(t, e)
-	if state.Position != 2 {
+	if state.Position != 14 {
 		t.Fatal("disabled assertion consumed an action", state.Position)
 	}
 }

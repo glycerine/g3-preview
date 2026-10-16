@@ -3,6 +3,50 @@ package numeral
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 
+// These sites share the same predicate, but retain their distinct source
+// locations and the left-before-right short circuit of binary assertions.
+func (m *IntegerModularManager) sourceAssertNormalized(a *Int, line int32) error {
+	if !diagnostic.DebugBuild {
+		return nil
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil || !enabled {
+		return e
+	}
+	ok, e := m.IsPNormalized(a)
+	if e != nil || ok {
+		return e
+	}
+	return diagnostic.DebugAssertionFailure(d, "src/util/mpzzp.h", line, "is_p_normalized(a)")
+}
+
+func (m *IntegerModularManager) sourceAssertNormalizedPair(a, b *Int, line int32) error {
+	if !diagnostic.DebugBuild {
+		return nil
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil || !enabled {
+		return e
+	}
+	left, e := m.IsPNormalized(a)
+	if e != nil {
+		return e
+	}
+	ok := left
+	if left {
+		ok, e = m.IsPNormalized(b)
+		if e != nil {
+			return e
+		}
+	}
+	if ok {
+		return nil
+	}
+	return diagnostic.DebugAssertionFailure(d, "src/util/mpzzp.h", line, "is_p_normalized(a) && is_p_normalized(b)")
+}
+
 func (m *IntegerModularManager) Reset(a *Int) error {
 	if e := m.check(); e != nil {
 		return e
@@ -183,7 +227,7 @@ func (m *IntegerModularManager) IsZero(a *Int) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
-	if e := m.AssertNormalized(a); e != nil {
+	if e := m.sourceAssertNormalized(a, 133); e != nil {
 		return false, e
 	}
 	return m.manager.IsZero(a)
@@ -192,7 +236,7 @@ func (m *IntegerModularManager) IsOne(a *Int) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
-	if e := m.AssertNormalized(a); e != nil {
+	if e := m.sourceAssertNormalized(a, 134); e != nil {
 		return false, e
 	}
 	return m.manager.IsOne(a)
@@ -201,7 +245,7 @@ func (m *IntegerModularManager) IsPos(a *Int) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
-	if e := m.AssertNormalized(a); e != nil {
+	if e := m.sourceAssertNormalized(a, 135); e != nil {
 		return false, e
 	}
 	return m.manager.IsPos(a)
@@ -210,7 +254,7 @@ func (m *IntegerModularManager) IsNeg(a *Int) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
-	if e := m.AssertNormalized(a); e != nil {
+	if e := m.sourceAssertNormalized(a, 136); e != nil {
 		return false, e
 	}
 	return m.manager.IsNeg(a)
@@ -219,7 +263,7 @@ func (m *IntegerModularManager) IsNonPos(a *Int) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
-	if e := m.AssertNormalized(a); e != nil {
+	if e := m.sourceAssertNormalized(a, 137); e != nil {
 		return false, e
 	}
 	return m.manager.IsNonPos(a)
@@ -228,7 +272,7 @@ func (m *IntegerModularManager) IsNonNeg(a *Int) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
-	if e := m.AssertNormalized(a); e != nil {
+	if e := m.sourceAssertNormalized(a, 138); e != nil {
 		return false, e
 	}
 	return m.manager.IsNonNeg(a)
@@ -237,7 +281,7 @@ func (m *IntegerModularManager) IsMinusOne(a *Int) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
-	if e := m.AssertNormalized(a); e != nil {
+	if e := m.sourceAssertNormalized(a, 139); e != nil {
 		return false, e
 	}
 	return m.manager.IsMinusOne(a)
@@ -246,10 +290,7 @@ func (m *IntegerModularManager) Equal(a, b *Int) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
-	if e := m.AssertNormalized(a); e != nil {
-		return false, e
-	}
-	if e := m.AssertNormalized(b); e != nil {
+	if e := m.sourceAssertNormalizedPair(a, b, 140); e != nil {
 		return false, e
 	}
 	return m.manager.Equal(a, b)
@@ -258,10 +299,7 @@ func (m *IntegerModularManager) Less(a, b *Int) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
-	if e := m.AssertNormalized(a); e != nil {
-		return false, e
-	}
-	if e := m.AssertNormalized(b); e != nil {
+	if e := m.sourceAssertNormalizedPair(a, b, 141); e != nil {
 		return false, e
 	}
 	return m.manager.Less(a, b)
@@ -270,10 +308,7 @@ func (m *IntegerModularManager) LessEqual(a, b *Int) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
-	if e := m.AssertNormalized(a); e != nil {
-		return false, e
-	}
-	if e := m.AssertNormalized(b); e != nil {
+	if e := m.sourceAssertNormalizedPair(a, b, 142); e != nil {
 		return false, e
 	}
 	return m.manager.LessEqual(a, b)
@@ -282,10 +317,7 @@ func (m *IntegerModularManager) Greater(a, b *Int) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
-	if e := m.AssertNormalized(a); e != nil {
-		return false, e
-	}
-	if e := m.AssertNormalized(b); e != nil {
+	if e := m.sourceAssertNormalizedPair(a, b, 143); e != nil {
 		return false, e
 	}
 	return m.manager.Greater(a, b)
@@ -294,10 +326,7 @@ func (m *IntegerModularManager) GreaterEqual(a, b *Int) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
-	if e := m.AssertNormalized(a); e != nil {
-		return false, e
-	}
-	if e := m.AssertNormalized(b); e != nil {
+	if e := m.sourceAssertNormalizedPair(a, b, 144); e != nil {
 		return false, e
 	}
 	return m.manager.GreaterEqual(a, b)
@@ -521,26 +550,8 @@ func (m *IntegerModularManager) String(a *Int) (string, error) {
 	if e := m.check(); e != nil {
 		return "", e
 	}
-	if diagnostic.DebugBuild {
-		d := diagnostic.BorrowProcessDebugContext()
-		enabled, e := diagnostic.SourceAssertionsEnabled(d)
-		if e != nil {
-			return "", e
-		}
-		if enabled {
-			ok, e := m.IsPNormalized(a)
-			if e != nil {
-				return "", e
-			}
-			if !ok {
-				if d == nil || !d.HasAssertionActions() {
-					return "", ErrModularAssertion
-				}
-				if e := diagnostic.DebugAssertionFailure(d, "src/util/mpzzp.h", 146, "is_p_normalized(a)"); e != nil {
-					return "", e
-				}
-			}
-		}
+	if e := m.sourceAssertNormalized(a, 146); e != nil {
+		return "", e
 	}
 	return m.manager.String(a)
 }

@@ -169566,6 +169566,15 @@
           ]
         },
         {
+          "name": "mpzzp scalar predicate and comparison normalization SASSERTs at mpzzp.h:133-144 with source-site process actions and binary left-before-right short circuit",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp_ops.go",
+          "tests": [
+            "TestIntegerModularStringSourceAssertionActions",
+            "TestIntegerModularCompleteScalarRoutes"
+          ]
+        },
+        {
           "name": "Remaining scalar predicates/arithmetic/fused/sets/const-mutable conversion/bit/log/root/formatting overloads beyond separately ported to_string assertion",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpzzp_ops.go",
