@@ -78088,7 +78088,9 @@
         "TestSATSolverNativeTrailColdHeaderAndRetirement",
         "TestSATNativeCaseSplitQueueGrowthIndependentPriorityAndColdBudget",
         "TestSATNativeCaseSplitQueueOwnerBudgetAndIndexGuards",
-        "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity"
+        "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity",
+        "TestSATSolverCheckSourceRestartLimitAbort",
+        "TestSATSolverCheckVerboseFileFailureKeepsSearchResult"
       ],
       "conditionals": [
         {
@@ -79388,6 +79390,8 @@
           "go_target": "pkg/sat/sat_solver_search_verbose.go",
           "tests": [
             "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity",
+            "TestSATSolverCheckSourceRestartLimitAbort",
+            "TestSATSolverCheckVerboseFileFailureKeepsSearchResult",
             "TestSATSolverCheckMaxConflictsZeroSourceReturnsUndef"
           ]
         }
@@ -184493,7 +184497,9 @@
         "TestSATSimplifierReportsActualSubsumptionAndResolution",
         "TestSATSolverGCReportsStrategiesDynamicCountsAndGate",
         "TestSATSolverSimplifyAndRestartSourceVerboseLevels",
-        "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity"
+        "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity",
+        "TestSATSolverCheckSourceRestartLimitAbort",
+        "TestSATSolverCheckVerboseFileFailureKeepsSearchResult"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -184654,6 +184660,8 @@
           "go_target": "pkg/sat/sat_solver_search_verbose.go",
           "tests": [
             "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity",
+            "TestSATSolverCheckSourceRestartLimitAbort",
+            "TestSATSolverCheckVerboseFileFailureKeepsSearchResult",
             "TestSATSolverCheckMaxConflictsZeroSourceReturnsUndef"
           ]
         }
@@ -184782,7 +184790,9 @@
         "TestSATSimplifierReportsActualSubsumptionAndResolution",
         "TestSATSolverGCReportsStrategiesDynamicCountsAndGate",
         "TestSATSolverSimplifyAndRestartSourceVerboseLevels",
-        "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity"
+        "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity",
+        "TestSATSolverCheckSourceRestartLimitAbort",
+        "TestSATSolverCheckVerboseFileFailureKeepsSearchResult"
       ],
       "conditionals": [
         {
@@ -185242,6 +185252,8 @@
           "go_target": "pkg/sat/sat_solver_search_verbose.go",
           "tests": [
             "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity",
+            "TestSATSolverCheckSourceRestartLimitAbort",
+            "TestSATSolverCheckVerboseFileFailureKeepsSearchResult",
             "TestSATSolverCheckMaxConflictsZeroSourceReturnsUndef"
           ]
         }
