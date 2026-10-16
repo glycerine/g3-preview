@@ -142,10 +142,12 @@ func TestPatternCollectInfoSourceSMT2Trace(t *testing.T) {
 	infoRecord := func(body string) string {
 		return "-------- [collect_info] operator() src/ast/pattern/pattern_inference.cpp:132 ---------\n" + body + "\n------------------------------------------------\n"
 	}
+	tags.Enable("pattern_inference")
 	patternMust(t, c.collect(app))
 	if tags.ShouldTrace("collect_info") {
 		appBody := "(collect-f (:var 0))"
 		want := infoRecord(appBody) + infoRecord("(:var 0)") + infoRecord(appBody)
+		want += "-------- [pattern_inference] save_candidate src/ast/pattern/pattern_inference.cpp:251 ---------\npotential candidate: \n" + appBody + "\n------------------------------------------------\n"
 		if output.String() != want {
 			t.Fatalf("application stack display: got %q, want %q", output.String(), want)
 		}
@@ -154,6 +156,7 @@ func TestPatternCollectInfoSourceSMT2Trace(t *testing.T) {
 	}
 	patternMust(t, c.resetCandidates())
 	output.Reset()
+	tags.Disable("pattern_inference")
 	patternMust(t, c.collect(forall))
 	if tags.ShouldTrace("collect_info") {
 		appBody := "(collect-f (:var 0))"

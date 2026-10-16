@@ -193,6 +193,9 @@ func (c *patternCandidates) collectNode(cache map[collectKey]*collectedInfo, key
 		for v := range vars {
 			free = append(free, v)
 		}
+		if e := c.tracePotentialCandidate(mapped); e != nil {
+			return e
+		}
 		return c.addCandidate(mapped, free, size)
 	default:
 		return c.saveCollectInfo(cache, key, nil)
@@ -311,29 +314,61 @@ func (c *patternCandidates) traceCollectInfo(key collectKey) error {
 		return nil
 	}
 	return tags.EmitConditional("collect_info", "operator()", "src/ast/pattern/pattern_inference.cpp", 132,
-		func() bool { return true }, func(w io.Writer) (result error) {
-			g := uparams.BorrowProcessGlobalParamsService()
-			if g == nil || g.Context == nil {
-				return uparams.ErrGlobalParamsOwner
-			}
-			format, err := c.manager.SMT2PPExprTree(key.node, nil)
-			if err != nil {
+		func() bool { return true }, func(w io.Writer) error {
+			if err := c.writePatternSMT2(w, key.node); err != nil {
 				return err
 			}
-			out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: c.manager.BudgetField})
-			if err != nil {
-				return err
-			}
-			defer func() { result = errors.Join(result, out.Close()) }()
-			empty := g.Context.EmptyValue()
-			if err = c.manager.PrintFormat(out, format, g.Context, &empty, g); err != nil {
-				return err
-			}
-			body, err := out.String()
-			if err != nil {
-				return err
-			}
-			_, err = io.WriteString(w, body+"\n")
+			_, err := io.WriteString(w, "\n")
 			return err
 		})
+}
+
+// Source: src/ast/pattern/pattern_inference.cpp:251. The newly mapped
+// candidate is displayed after its collect-info entry is saved, before the
+// owning candidate vector receives its reference.
+func (c *patternCandidates) tracePotentialCandidate(node ast.ASTHandle) error {
+	tags := c.traceTags
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	if !tags.ShouldTrace("pattern_inference") {
+		return nil
+	}
+	return tags.EmitConditional("pattern_inference", "save_candidate", "src/ast/pattern/pattern_inference.cpp", 251,
+		func() bool { return true }, func(w io.Writer) error {
+			if _, err := io.WriteString(w, "potential candidate: \n"); err != nil {
+				return err
+			}
+			if err := c.writePatternSMT2(w, node); err != nil {
+				return err
+			}
+			_, err := io.WriteString(w, "\n")
+			return err
+		})
+}
+
+func (c *patternCandidates) writePatternSMT2(w io.Writer, node ast.ASTHandle) (result error) {
+	g := uparams.BorrowProcessGlobalParamsService()
+	if g == nil || g.Context == nil {
+		return uparams.ErrGlobalParamsOwner
+	}
+	format, err := c.manager.SMT2PPExprTree(node, nil)
+	if err != nil {
+		return err
+	}
+	out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: c.manager.BudgetField})
+	if err != nil {
+		return err
+	}
+	defer func() { result = errors.Join(result, out.Close()) }()
+	empty := g.Context.EmptyValue()
+	if err = c.manager.PrintFormat(out, format, g.Context, &empty, g); err != nil {
+		return err
+	}
+	body, err := out.String()
+	if err != nil {
+		return err
+	}
+	_, err = io.WriteString(w, body)
+	return err
 }

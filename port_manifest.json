@@ -18878,6 +18878,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Reached pattern collector potential-candidate TRACE at pattern_inference.cpp:251 after collected-info publication and before candidate insertion",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/collect.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
+        {
           "name": "Reached pattern collector collect_info TRACE at pattern_inference.cpp:132 prints process-bound SMT2 variable, application and quantifier bodies after line-131 record",
           "status": "ported",
           "go_target": "pkg/ast/pattern/collect.go",
@@ -180863,6 +180869,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Reached pattern collector potential-candidate TRACE at pattern_inference.cpp:251 after collected-info publication and before candidate insertion",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/collect.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
+        {
           "name": "Reached pattern collector collect_info TRACE at pattern_inference.cpp:132 prints process-bound SMT2 variable, application and quantifier bodies after line-131 record",
           "status": "ported",
           "go_target": "pkg/ast/pattern/collect.go",
@@ -182797,6 +182809,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached pattern collector potential-candidate TRACE at pattern_inference.cpp:251 after collected-info publication and before candidate insertion",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/collect.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
         {
           "name": "Reached pattern collector collect_info TRACE at pattern_inference.cpp:132 prints process-bound SMT2 variable, application and quantifier bodies after line-131 record",
           "status": "ported",
