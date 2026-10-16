@@ -106,7 +106,7 @@ func TestRewriterNativeFrameAndScopeGrowth(t *testing.T) {
 	// Cache objects have actual owning headers. Construct these first so this
 	// test independently disables reservations during cold scope/frame growth.
 	for i := 0; i < 65; i++ {
-		_, e = c.pushCache(&c.cacheStack)
+		_, e = c.pushCache(&c.cacheStack, 99)
 		satOK(t, e)
 	}
 	used := m.Budget().Used()

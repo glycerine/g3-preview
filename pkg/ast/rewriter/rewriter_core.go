@@ -32,12 +32,13 @@ type rewriterScope struct {
 
 // Cache objects retain their own AST ownership and destructor continuation.
 // The directory that owns them is a native Go slice.
-func closeRewriterCaches(caches *[]*ast.ActivityCache) error {
-	for i, c := range *caches {
-		if c != nil {
-			if e := c.Close(); e != nil {
+func (c *rewriterCore) closeRewriterCaches(caches *[]*ast.ActivityCache) error {
+	for i, cache := range *caches {
+		if cache != nil {
+			if e := cache.Close(); e != nil {
 				return e
 			}
+			c.traceCacheDeallocated(cache)
 			(*caches)[i] = nil
 		}
 	}
@@ -104,11 +105,12 @@ func (c *rewriterCore) open() error {
 	_, e := c.manager.ProofsEnabled()
 	return e
 }
-func (c *rewriterCore) pushCache(stack *[]*ast.ActivityCache) (*ast.ActivityCache, error) {
+func (c *rewriterCore) pushCache(stack *[]*ast.ActivityCache, line int) (*ast.ActivityCache, error) {
 	v, e := ast.NewActivityCache(c.manager, nil)
 	if e != nil {
 		return nil, e
 	}
+	c.traceCacheAllocated(v, line)
 	*stack = append(*stack, v)
 	return v, nil
 }
@@ -116,13 +118,13 @@ func (c *rewriterCore) initCacheStack() error {
 	if len(c.cacheStack) != 0 {
 		return ast.ErrASTDomain
 	}
-	v, e := c.pushCache(&c.cacheStack)
+	v, e := c.pushCache(&c.cacheStack, 25)
 	if e != nil {
 		return e
 	}
 	c.cache = v
 	if c.proofGen {
-		v, e = c.pushCache(&c.proofCacheStack)
+		v, e = c.pushCache(&c.proofCacheStack, 29)
 		if e != nil {
 			return e
 		}
@@ -131,12 +133,12 @@ func (c *rewriterCore) initCacheStack() error {
 	return nil
 }
 func (c *rewriterCore) delCacheStack() error {
-	if e := closeRewriterCaches(&c.cacheStack); e != nil {
+	if e := c.closeRewriterCaches(&c.cacheStack); e != nil {
 		return e
 	}
 	c.cache = nil
 	if c.proofGen {
-		if e := closeRewriterCaches(&c.proofCacheStack); e != nil {
+		if e := c.closeRewriterCaches(&c.proofCacheStack); e != nil {
 			return e
 		}
 		c.proofCache = nil
@@ -232,11 +234,11 @@ func (c *rewriterCore) beginScope() (err error) {
 		return ast.ErrASTDomain
 	}
 	if level == len(c.cacheStack) {
-		if _, e := c.pushCache(&c.cacheStack); e != nil {
+		if _, e := c.pushCache(&c.cacheStack, 99); e != nil {
 			return e
 		}
 		if c.proofGen {
-			if _, e := c.pushCache(&c.proofCacheStack); e != nil {
+			if _, e := c.pushCache(&c.proofCacheStack, 101); e != nil {
 				return e
 			}
 		}

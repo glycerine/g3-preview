@@ -36,6 +36,12 @@ func (m *ASTManager) BorrowMemoryTraceTags() *udiag.TraceTags {
 	return m.astMemoryTraceTags()
 }
 
+// MemoryTraceFinalizing lets retained child owners use the manager's process
+// finalization gate for source memory deallocation records.
+func (m *ASTManager) MemoryTraceFinalizing(tags *udiag.TraceTags) bool {
+	return m.astMemoryFinalizing(tags)
+}
+
 func (m *ASTManager) traceFormatAllocated(line int) {
 	tags := m.astMemoryTraceTags()
 	if !udiag.DebugBuild || !tags.ShouldTrace("memory") {
