@@ -25,65 +25,6 @@ func infApproxRawEqual(t *testing.T, v *OwnedInfRational, n, d, e, ed int32) {
 		t.Fatalf("raw result %#v want %d/%d,%d/%d", v, n, d, e, ed)
 	}
 }
-func TestInfApproxRawPowerSelectedBranches(t *testing.T) {
-	cases := []struct {
-		upper           bool
-		n, d, e, ed     int32
-		p               uint32
-		wn, wd, we, wed int32
-	}{
-		{false, 1, 0, -1, 0, 2, 0, 1, 0, 1}, // even DEFAULT, no arithmetic reads
-		{true, 0, 0, 1, 0, 3, 1, 1, 0, 1},   // upper constant one
-		{false, 0, 0, 1, 0, 3, -1, 1, 0, 1}, // lower constant minus one
-		{false, 1, 0, 1, 0, 1, 1, 0, 1, 0},  // n1 assignment FIRST then EPS
-		{true, -1, 0, -1, 0, 1, -1, 0, -1, 0},
-		{false, 1, 0, 0, 0, 0, 1, 1, 0, 1}, // exact rational Power: Copy before out1
-		{true, -1, 0, 0, 0, 2, 1, 0, 0, 1},
-		{false, 1, 0, 0, 0, 3, 1, 0, 0, 1},
-	}
-	for _, tc := range cases {
-		s, _ := serviceNew(t)
-		v := infApproxRaw(s, tc.n, tc.d, tc.e, tc.ed)
-		var out OwnedInfRational
-		var e error
-		if tc.upper {
-			out, e = s.InfUpperPower(&v, tc.p)
-		} else {
-			out, e = s.InfLowerPower(&v, tc.p)
-		}
-		serviceMust(t, e)
-		infApproxRawEqual(t, &out, tc.wn, tc.wd, tc.we, tc.wed)
-		infAuditRoots(t, s, []*OwnedInfRational{&v, &out}, nil)
-		serviceMust(t, s.InfDel(&out))
-		serviceMust(t, s.InfDel(&v))
-	}
-}
-func TestInfApproxUnreadPowerFields(t *testing.T) {
-	s, _ := serviceNew(t)
-	v := infApproxRaw(s, 1, 0, -1, 0)
-	v.First.Num.Cell = s.Manager.Z.FailedRef
-	v.Second.Num.Cell = s.Manager.Z.FailedRef
-	out, e := s.InfLowerPower(&v, 2)
-	serviceMust(t, e)
-	infApproxRawEqual(t, &out, 0, 1, 0, 1)
-	serviceMust(t, s.InfDel(&out))
-	v.First.Num.Val = 0
-	v.Second.Num.Val = 1
-	out, e = s.InfUpperPower(&v, 3)
-	serviceMust(t, e)
-	infApproxRawEqual(t, &out, 1, 1, 0, 1)
-	serviceMust(t, s.InfDel(&out))
-	// EPS DEN is never read by exact power; only FIRST is copied/arithmetic.
-	v = infApproxRaw(s, 2, 1, 0, 1)
-	v.Second.Den.Cell = s.Manager.Z.FailedRef
-	out, e = s.InfLowerPower(&v, 3)
-	serviceMust(t, e)
-	infApproxRawEqual(t, &out, 8, 1, 0, 1)
-	serviceMust(t, s.InfDel(&out))
-	// Del acknowledges only the deliberately unowned failed-reference tokens.
-	serviceMust(t, s.InfDel(&v))
-	infAuditRoots(t, s, nil, nil)
-}
 func TestInfApproxPublicRationalRawDependencies(t *testing.T) {
 	for _, synch := range []bool{false, true} {
 		m, _ := rationalManager(t, synch)
@@ -231,61 +172,8 @@ func TestInfApproxFirstCopyFailurePrecedesUnreadEPS(t *testing.T) {
 	serviceMust(t, s.InfDel(&other))
 }
 
-func TestInfApproxFiniteSignParityAndProductTable(t *testing.T) {
+func TestInfApproxRawProductSignedDenominators(t *testing.T) {
 	s, _ := serviceNew(t)
-	for n := int32(-2); n <= 2; n++ {
-		for eps := int32(-1); eps <= 1; eps++ {
-			for p := uint32(0); p <= 5; p++ {
-				for _, upper := range []bool{false, true} {
-					v := infApproxRaw(s, n, 1, eps, 1)
-					var out OwnedInfRational
-					var e error
-					if upper {
-						out, e = s.InfUpperPower(&v, p)
-					} else {
-						out, e = s.InfLowerPower(&v, p)
-					}
-					serviceMust(t, e)
-					want := new(big.Rat)
-					wantE := int32(0)
-					even := p&1 == 0
-					exact := eps == 0
-					if upper {
-						exact = exact || n > 0 && eps < 0 || n < 0 && eps > 0 && even
-					} else {
-						exact = exact || n > 0 && eps > 0 || n < 0 && eps < 0 && even
-					}
-					switch {
-					case p == 1:
-						want.SetInt64(int64(n))
-						wantE = eps
-					case exact:
-						want.SetInt(new(big.Int).Exp(big.NewInt(int64(n)), big.NewInt(int64(p)), nil))
-					case !upper && even:
-					case !upper && n == 0:
-						want.SetInt64(-1)
-					case upper && (n == 0 || p == 0):
-						want.SetInt64(1)
-					default:
-						factor := int64(1)
-						if upper && (n > 0 || even) || !upper && n < 0 {
-							factor = 3
-						}
-						base := new(big.Rat).SetFrac(big.NewInt(int64(n)*factor), big.NewInt(2))
-						want.SetFrac(new(big.Int).Exp(base.Num(), big.NewInt(int64(p)), nil), new(big.Int).Exp(base.Denom(), big.NewInt(int64(p)), nil))
-					}
-					gotN := roundPublicationDecode(t, s.Manager.Z, &out.First.Num)
-					gotD := roundPublicationDecode(t, s.Manager.Z, &out.First.Den)
-					if new(big.Rat).SetFrac(gotN, gotD).Cmp(want) != 0 || out.Second.Num != NewInt(wantE) || out.Second.Den != NewInt(1) {
-						t.Fatal(n, eps, p, upper, out, want)
-					}
-					infAuditRoots(t, s, []*OwnedInfRational{&v, &out}, nil)
-					serviceMust(t, s.InfDel(&out))
-					serviceMust(t, s.InfDel(&v))
-				}
-			}
-		}
-	}
 	// Raw signed denominators remain finite; correction predicates use the source
 	// numerator signs, independently of the mathematical fraction signs.
 	for a := int32(-2); a <= 2; a++ {
@@ -325,56 +213,6 @@ func TestInfApproxFiniteSignParityAndProductTable(t *testing.T) {
 					}
 				}
 			}
-		}
-	}
-}
-
-func TestInfApproxPowerActualMaskAndEarlierRefusal(t *testing.T) {
-	for _, upper := range []bool{false, true} {
-		for _, n := range []int32{-1, 0, 1} {
-			s, _ := serviceNew(t)
-			v := infApproxRaw(s, n, 1, 0, 1)
-			var out OwnedInfRational
-			var e error
-			if upper {
-				out, e = s.InfUpperPower(&v, 1<<31)
-			} else {
-				out, e = s.InfLowerPower(&v, 1<<31)
-			}
-			if !errors.Is(e, ErrNonterminatingPower) || out.ownerID != 0 {
-				t.Fatal(n, upper, e, out)
-			}
-			infAuditRoots(t, s, []*OwnedInfRational{&v}, nil)
-			serviceMust(t, s.InfDel(&v))
-		}
-	}
-	for _, upper := range []bool{false, true} {
-		budget := arena.NewBudget(1 << 24)
-		cfg := serviceConfig(budget)
-		cfg.Integers.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
-		s, e := NewRationalService(cfg)
-		serviceMust(t, e)
-		// The exact branch raises FIRST2; its first actual square allocation must
-		// refuse before the later mask-wrap boundary. No gigantic arithmetic oracle.
-		v := infApproxRaw(s, 2, 1, 0, 1)
-		budget.FailAfter(0)
-		var out OwnedInfRational
-		if upper {
-			out, e = s.InfUpperPower(&v, 1<<31)
-		} else {
-			out, e = s.InfLowerPower(&v, 1<<31)
-		}
-		if !numericPhysicalReservationRefusal(e) || errors.Is(e, ErrNonterminatingPower) || out.ownerID != 0 {
-			t.Fatal(upper, e, out)
-		}
-		infAuditRoots(t, s, []*OwnedInfRational{&v}, nil)
-		budget.FailAfter(-1)
-		serviceMust(t, s.Manager.CleanupRawArithmetic())
-		serviceMust(t, s.Manager.Z.CleanupPendingAllocation())
-		serviceMust(t, s.InfDel(&v))
-		serviceMust(t, s.Close())
-		if budget.Used() != 0 {
-			t.Fatal(budget.Used())
 		}
 	}
 }

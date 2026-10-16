@@ -128116,17 +128116,13 @@
         "TestLexicalRationalManagerOneRootContinuation",
         "TestConstructorPartialAbortWaitsForSourceUnwind",
         "TestConstructorLexicalBoundaryAPI",
-        "TestConstructorInfPowerUsesPrvalueMove",
         "TestConstructorCompletedUnwindPrecedesOwningAbort",
         "TestConstructorEightRootsAndWarmBoundary",
         "TestConstructorExpressionFailedCopyPhase",
-        "TestInfApproxRawPowerSelectedBranches",
-        "TestInfApproxUnreadPowerFields",
         "TestInfApproxPublicRationalRawDependencies",
         "TestInfApproxSignedValueConstructionAndRawAssignments",
         "TestInfApproxFirstCopyFailurePrecedesUnreadEPS",
-        "TestInfApproxFiniteSignParityAndProductTable",
-        "TestInfApproxPowerActualMaskAndEarlierRefusal",
+        "TestInfApproxRawProductSignedDenominators",
         "TestInfApproxRawProductReachedZeroDenominators",
         "TestInfCompareSourceUnreadMembers",
         "TestInfCompareSourceNestedUnreadNumeral",
@@ -128403,7 +128399,6 @@
           "tests": [
             "TestConstructorPartialAbortWaitsForSourceUnwind",
             "TestConstructorLexicalBoundaryAPI",
-            "TestConstructorInfPowerUsesPrvalueMove",
             "TestConstructorCompletedUnwindPrecedesOwningAbort",
             "TestConstructorEightRootsAndWarmBoundary",
             "TestConstructorExpressionFailedCopyPhase"
@@ -128643,17 +128638,13 @@
         "TestLexicalRationalManagerOneRootContinuation",
         "TestConstructorPartialAbortWaitsForSourceUnwind",
         "TestConstructorLexicalBoundaryAPI",
-        "TestConstructorInfPowerUsesPrvalueMove",
         "TestConstructorCompletedUnwindPrecedesOwningAbort",
         "TestConstructorEightRootsAndWarmBoundary",
         "TestConstructorExpressionFailedCopyPhase",
-        "TestInfApproxRawPowerSelectedBranches",
-        "TestInfApproxUnreadPowerFields",
         "TestInfApproxPublicRationalRawDependencies",
         "TestInfApproxSignedValueConstructionAndRawAssignments",
         "TestInfApproxFirstCopyFailurePrecedesUnreadEPS",
-        "TestInfApproxFiniteSignParityAndProductTable",
-        "TestInfApproxPowerActualMaskAndEarlierRefusal",
+        "TestInfApproxRawProductSignedDenominators",
         "TestInfApproxRawProductReachedZeroDenominators",
         "TestInfCompareSourceUnreadMembers",
         "TestInfCompareSourceNestedUnreadNumeral",
@@ -128889,7 +128880,6 @@
           "tests": [
             "TestConstructorPartialAbortWaitsForSourceUnwind",
             "TestConstructorLexicalBoundaryAPI",
-            "TestConstructorInfPowerUsesPrvalueMove",
             "TestConstructorCompletedUnwindPrecedesOwningAbort",
             "TestConstructorEightRootsAndWarmBoundary",
             "TestConstructorExpressionFailedCopyPhase"
@@ -129006,20 +128996,16 @@
         "TestRationalServiceInfinitesimalFinalizerTraversal",
         "TestConstructorPartialAbortWaitsForSourceUnwind",
         "TestConstructorLexicalBoundaryAPI",
-        "TestConstructorInfPowerUsesPrvalueMove",
         "TestConstructorCompletedUnwindPrecedesOwningAbort",
         "TestConstructorEightRootsAndWarmBoundary",
         "TestConstructorExpressionFailedCopyPhase",
         "TestInfGuardZeroFirstDivisionProfiles",
         "TestInfGuardUnreadDivisor",
         "TestInfGuardAllocationPrecedenceAndWarmRoots",
-        "TestInfApproxRawPowerSelectedBranches",
-        "TestInfApproxUnreadPowerFields",
         "TestInfApproxPublicRationalRawDependencies",
         "TestInfApproxSignedValueConstructionAndRawAssignments",
         "TestInfApproxFirstCopyFailurePrecedesUnreadEPS",
-        "TestInfApproxFiniteSignParityAndProductTable",
-        "TestInfApproxPowerActualMaskAndEarlierRefusal",
+        "TestInfApproxRawProductSignedDenominators",
         "TestInfApproxRawProductReachedZeroDenominators"
       ],
       "assertions": [
@@ -129048,7 +129034,11 @@
           "status": "dead_deleted"
         },
         {
-          "name": "complete inf_mult/sup_mult, inf_div/sup_div and inf_power/sup_power algorithms",
+          "name": "inf_power/sup_power have no retained production caller; removed test-only Go entry points under the retained-consumer rule",
+          "status": "dead_deleted"
+        },
+        {
+          "name": "complete inf_mult/sup_mult and inf_div/sup_div algorithms",
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_rational.go",
           "tests": [
@@ -129102,16 +129092,13 @@
           ]
         },
         {
-          "name": "inf_mult/sup_mult and inf_power/sup_power source branches, full-expression temporaries and selected reached raw scalar profiles",
+          "name": "inf_mult/sup_mult source branches, full-expression temporaries and selected reached raw scalar profiles",
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_rational.go",
           "tests": [
-            "TestInfApproxRawPowerSelectedBranches",
-            "TestInfApproxUnreadPowerFields",
             "TestInfApproxPublicRationalRawDependencies",
             "TestInfApproxFirstCopyFailurePrecedesUnreadEPS",
-            "TestInfApproxFiniteSignParityAndProductTable",
-            "TestInfApproxPowerActualMaskAndEarlierRefusal",
+            "TestInfApproxRawProductSignedDenominators",
             "TestInfApproxRawProductReachedZeroDenominators"
           ]
         }
@@ -129121,7 +129108,7 @@
       ],
       "deviations": [
         "Global constants/borrowed accessors replaced by owner-local constants and explicit independent copies; typed checked source-assertion errors. Signed INT_MIN constructor-negation uses widened defined adapter. Source trace/assertion-message infrastructure remains separate.",
-        "Inactive/commented general pair arithmetic and duplicate #if0 approximation declarations are not runtime implementations; all eight compiled approximation functions are ported, including coarse/defective roots/powers."
+        "Inactive/commented general pair arithmetic and duplicate #if0 approximation declarations are not runtime implementations; root and power approximations have no retained production callers and their test-only Go entry points were removed."
       ]
     },
     {
@@ -129193,13 +129180,10 @@
         "TestInfGuardZeroFirstDivisionProfiles",
         "TestInfGuardUnreadDivisor",
         "TestInfGuardAllocationPrecedenceAndWarmRoots",
-        "TestInfApproxRawPowerSelectedBranches",
-        "TestInfApproxUnreadPowerFields",
         "TestInfApproxPublicRationalRawDependencies",
         "TestInfApproxSignedValueConstructionAndRawAssignments",
         "TestInfApproxFirstCopyFailurePrecedesUnreadEPS",
-        "TestInfApproxFiniteSignParityAndProductTable",
-        "TestInfApproxPowerActualMaskAndEarlierRefusal",
+        "TestInfApproxRawProductSignedDenominators",
         "TestInfApproxRawProductReachedZeroDenominators",
         "TestInfCompareSourceUnreadMembers",
         "TestInfCompareSourceNestedUnreadNumeral",
@@ -129280,6 +129264,10 @@
       "methods": [
         {
           "name": "inf_root/sup_root have no retained production caller; removed test-only Go entry points under the retained-consumer rule",
+          "status": "dead_deleted"
+        },
+        {
+          "name": "inf_power/sup_power have no retained production caller; removed test-only Go entry points under the retained-consumer rule",
           "status": "dead_deleted"
         },
         {
@@ -129583,7 +129571,7 @@
       ],
       "deviations": [
         "Global constants and older owned-output accessors use owner-local constants and explicit independent copies; get_first/get_rational/get_infinitesimal also have actual borrows in the locked numeric-borrow scope. Typed checked source-assertion errors and widened signed INT_MIN constructor-negation remain. Source trace/assertion-message infrastructure remains separate.",
-        "Inactive/commented general pair arithmetic and duplicate #if0 approximation declarations are not runtime implementations; all eight compiled approximation functions are ported, including coarse/defective roots/powers.",
+        "Inactive/commented general pair arithmetic and duplicate #if0 approximation declarations are not runtime implementations; root and power approximations have no retained production callers and their test-only Go entry points were removed.",
         "Source h135-143 component reference projections read only the selected component; BorrowInfFirst/BorrowInfInfinitesimal now expose those reads, including raw denominator0. The older InfFirst/InfRational/Infinitesimal owned-output adapters still perform copies. NUM-only sign/hash routes retain separate raw-domain debt.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion.",
         "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
@@ -173829,7 +173817,6 @@
         "TestLexicalRationalManagerOneRootContinuation",
         "TestConstructorPartialAbortWaitsForSourceUnwind",
         "TestConstructorLexicalBoundaryAPI",
-        "TestConstructorInfPowerUsesPrvalueMove",
         "TestConstructorCompletedUnwindPrecedesOwningAbort",
         "TestConstructorEightRootsAndWarmBoundary",
         "TestConstructorExpressionFailedCopyPhase",
@@ -174359,7 +174346,6 @@
           "tests": [
             "TestConstructorPartialAbortWaitsForSourceUnwind",
             "TestConstructorLexicalBoundaryAPI",
-            "TestConstructorInfPowerUsesPrvalueMove",
             "TestConstructorCompletedUnwindPrecedesOwningAbort",
             "TestConstructorEightRootsAndWarmBoundary",
             "TestConstructorExpressionFailedCopyPhase"

@@ -286,23 +286,6 @@ func TestInfRationalApproximationFrozenBranches(t *testing.T) {
 	infText(t, s, &hi, "(10 +e*1)")
 	serviceMust(t, s.InfDel(&lo))
 	serviceMust(t, s.InfDel(&hi))
-	for _, tc := range []struct {
-		a      int64
-		b      string
-		n      uint32
-		lo, hi string
-	}{{2, "-1", 2, "0", "4"}, {2, "1", 2, "4", "9"}, {-2, "-1", 2, "4", "9"}, {-2, "1", 3, "-27", "-1"}, {0, "-1", 3, "-1", "1"}, {0, "1", 0, "0", "1"}, {2, "-1", 1, "(2 -e*1)", "(2 -e*1)"}} {
-		v := infValue(t, s, tc.a, 1, tc.b)
-		l, e := s.InfLowerPower(&v, tc.n)
-		serviceMust(t, e)
-		u, e := s.InfUpperPower(&v, tc.n)
-		serviceMust(t, e)
-		infText(t, s, &l, tc.lo)
-		infText(t, s, &u, tc.hi)
-		serviceMust(t, s.InfDel(&l))
-		serviceMust(t, s.InfDel(&u))
-		serviceMust(t, s.InfDel(&v))
-	}
 	// b=5,d=-7,positive numerator: upper denominator 5-5/2; lower5.
 	l, e := s.InfLowerDiv(&x, &y)
 	serviceMust(t, e)
@@ -398,28 +381,6 @@ func TestInfRationalIndependentFiniteBounds(t *testing.T) {
 					}
 					serviceMust(t, s.InfDel(&x))
 					serviceMust(t, s.InfDel(&y))
-				}
-			}
-		}
-	}
-	for a := int64(-2); a <= 2; a++ {
-		for b := int64(-1); b <= 1; b++ {
-			for n := uint32(0); n <= 5; n++ {
-				x := infValue(t, s, a, 1, big.NewInt(b).String())
-				base := eval(&x)
-				actual := big.NewRat(1, 1)
-				for i := uint32(0); i < n; i++ {
-					actual.Mul(actual, base)
-				}
-				lo, e := s.InfLowerPower(&x, n)
-				serviceMust(t, e)
-				hi, e := s.InfUpperPower(&x, n)
-				serviceMust(t, e)
-				if eval(&lo).Cmp(actual) > 0 || eval(&hi).Cmp(actual) < 0 {
-					t.Fatalf("power bounds %d %d %d", a, b, n)
-				}
-				for _, v := range []*OwnedInfRational{&x, &lo, &hi} {
-					serviceMust(t, s.InfDel(v))
 				}
 			}
 		}
@@ -648,6 +609,9 @@ func TestInfPairAndOffsetConstructorsOwnInputs(t *testing.T) {
 
 func TestInfRationalFailurePrefixesImmediateRoots(t *testing.T) {
 	for op := 0; op < 20; op++ {
+		if op == 5 || op == 6 { // unused source approximation powers
+			continue
+		}
 		success := false
 		failures := 0
 		for prefix := int64(0); prefix < 4096; prefix++ {
@@ -696,10 +660,6 @@ func TestInfRationalFailurePrefixesImmediateRoots(t *testing.T) {
 				value, e = s.InfLowerDiv(&a, &b)
 			case 4:
 				value, e = s.InfUpperDiv(&a, &b)
-			case 5:
-				value, e = s.InfLowerPower(&a, 3)
-			case 6:
-				value, e = s.InfUpperPower(&a, 3)
 			case 7:
 				e = s.InfAddMulAssign(&a, &c, &b)
 			case 8:
