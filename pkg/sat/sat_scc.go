@@ -203,6 +203,8 @@ func (c *satSCC) run() (count uint32, err error) {
 			}
 		}
 	}()
+	c.traceSolverDisplay("scc", 68)
+	c.traceSolverWatches()
 	nv, e := p.variables.numVarsChecked()
 	if e != nil {
 		return 0, e
@@ -318,11 +320,13 @@ func (c *satSCC) run() (count uint32, err error) {
 			c.frames = c.frames[:len(c.frames)-1]
 		}
 	}
+	c.traceRoots()
 	n := uint32(len(c.toElim))
 	c.numElim += n
 	if e = c.eliminator.run(c.roots, c.toElim); e != nil {
 		return 0, e
 	}
+	c.traceSolverDisplay("scc_detail", 221)
 	if satStorageSourceDebug && c.debugInvariant {
 		if e := c.lifecycle.checkInvariant(); e != nil {
 			return 0, e
@@ -339,7 +343,9 @@ func (c *satSCC) component(li uint32) error {
 	if sn == 0 {
 		return ErrSATAssertion
 	}
+	c.traceCycle(li)
 	if rv != DefaultLiteral() {
+		c.traceSCCDetail(156, "consuming stack...\n")
 		for {
 			n := uint32(len(c.stack))
 			x := c.stack[n-1]
@@ -358,6 +364,7 @@ func (c *satSCC) component(li uint32) error {
 		}
 		return nil
 	}
+	c.traceSCCDetail(168, "assigning roots...\n")
 	root := DefaultLiteral()
 	j := sn - 1
 	for {
@@ -382,6 +389,7 @@ func (c *satSCC) component(li uint32) error {
 	if root == DefaultLiteral() {
 		root = l
 	}
+	c.traceRoot(root)
 	for {
 		n := uint32(len(c.stack))
 		x := c.stack[n-1]

@@ -76767,6 +76767,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Reached SAT SCC solver/watch displays, nontrivial-cycle CTRACE, stack/root detail, mapping and post-elimination TRACE sites at sat_scc.cpp:68,69,138,156,168,191,216,221",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_scc_trace.go",
+          "tests": ["TestSATSCCSourceCycleAndRootTraces", "TestSATSCCFullSolverDisplaySourceTraces"]
+        },
+        {
           "name": "Selected SCC construction, parameters, statistics, iterative Tarjan and equivalence-elimination clause/model routes",
           "status": "partial",
           "go_target": "pkg/sat/sat_scc.go",
@@ -76810,7 +76816,7 @@
         "Fresh native Go traversal slices per run: uint32 indexes/lowlinks/stack, bool membership, Literal roots, BoolVar elimination order and typed frames borrowing actual watch iterators. Native backing is uncharged; real SCC owner headers remain charged. Equivalence elimination borrows native root/order slices through its existing concrete run route. Actual solver model converter, disjoint clause compaction prefix/suffix and standalone eliminator owner/lifecycle guards remain. The actual retained clause/model allocation sweep audits named Runtime roots before disabling faults; removed vector/frame backing contributes no refusal events."
       ],
       "deviations": [
-        "Enabled scc_bug integrity checker, TRACE/verbose and propagation-wrapper diagnostics remain open. Concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Native typed frames borrow actual watch iterators without a frame codec. Generated parameter binding receives no whole-unit completion credit pending complete generated binding audit. No whole solver or registered assertion completion credit."
+        "Enabled scc_bug integrity checker, verbose and propagation-wrapper diagnostics remain open. Concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Native typed frames borrow actual watch iterators without a frame codec. Generated parameter binding receives no whole-unit completion credit pending complete generated binding audit. No whole solver or registered assertion completion credit."
       ]
     },
     {
@@ -180816,6 +180822,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Reached SAT SCC solver/watch displays, nontrivial-cycle CTRACE, stack/root detail, mapping and post-elimination TRACE sites at sat_scc.cpp:68,69,138,156,168,191,216,221",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_scc_trace.go",
+          "tests": ["TestSATSCCSourceCycleAndRootTraces", "TestSATSCCFullSolverDisplaySourceTraces"]
+        },
+        {
           "name": "Reached SAT asymm_branch solver display and process/reduction/unit TRACE sites at sat_asymm_branch.cpp:68,118,143,162,187",
           "status": "ported",
           "go_target": "pkg/sat/sat_asymm_branch_trace.go",
@@ -182705,6 +182717,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached SAT SCC solver/watch displays, nontrivial-cycle CTRACE, stack/root detail, mapping and post-elimination TRACE sites at sat_scc.cpp:68,69,138,156,168,191,216,221",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_scc_trace.go",
+          "tests": ["TestSATSCCSourceCycleAndRootTraces", "TestSATSCCFullSolverDisplaySourceTraces"]
+        },
         {
           "name": "Reached SAT asymm_branch solver display and process/reduction/unit TRACE sites at sat_asymm_branch.cpp:68,118,143,162,187",
           "status": "ported",
