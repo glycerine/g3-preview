@@ -77710,6 +77710,10 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "collect_subsumed1_core resolution_bug CTRACE removed-clause condition at sat_simplifier.cpp:393 has no single-goroutine emission: LAZY_USE_LIST iterator consume skips removed clauses before curr",
+          "status": "reference_only"
+        },
+        {
           "name": "literal-indexed use_list init/insert/erase/erase-except/get/finalize through concrete inline lazy-list storage",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_clause_use_lists.go",
@@ -181626,6 +181630,10 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "collect_subsumed1_core resolution_bug CTRACE removed-clause condition at sat_simplifier.cpp:393 has no single-goroutine emission: LAZY_USE_LIST iterator consume skips removed clauses before curr",
+          "status": "reference_only"
+        },
+        {
           "name": "Retained goal2sat goal-overload sat TRACE after dependency guard construction (goal2sat.cpp:480)",
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
@@ -183941,6 +183949,10 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "collect_subsumed1_core resolution_bug CTRACE removed-clause condition at sat_simplifier.cpp:393 has no single-goroutine emission: LAZY_USE_LIST iterator consume skips removed clauses before curr",
+          "status": "reference_only"
+        },
         {
           "name": "Retained goal2sat goal-overload sat TRACE after dependency guard construction (goal2sat.cpp:480)",
           "status": "ported",
