@@ -14632,13 +14632,15 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/ast/ast_expr_abstract.go"
+        "pkg/ast/ast_expr_abstract.go",
+        "pkg/ast/ast_expr_abstract_trace.go"
       ],
       "tests": [
         "TestExprAbstractorNativePatternAndNestedBinder",
         "TestExprAbstractorRetainsInterruptedTemporaryUntilClose",
         "TestExprAbstractorForallExistsConstantOrderAndEmpty",
-        "TestExprAbstractorSourceRootReferenceGuard"
+        "TestExprAbstractorSourceRootReferenceGuard",
+        "TestExprAbstractSourceTraceBothCallers"
       ],
       "assertions": [
         {
@@ -14675,8 +14677,15 @@
           "tests": ["TestExprAbstractorSourceRootReferenceGuard"]
         },
         {
-          "name": "expr_abstract TRACE SMT2 pretty printing, complete debug action transport and full retained consumers",
-          "status": "unported",
+          "name": "Reached expr_abstract and mk_quantifier TRACE sites at expr_abstract.cpp:113,130: SMT2 input, bound, and result after publication",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr_abstract_trace.go",
+          "tests": ["TestExprAbstractSourceTraceBothCallers"]
+        },
+        {
+          "name": "Complete debug action transport and remaining retained expr_abstract consumers",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_expr_abstract.go",
           "tests": []
         }
       ],
@@ -14691,13 +14700,15 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/ast/ast_expr_abstract.go"
+        "pkg/ast/ast_expr_abstract.go",
+        "pkg/ast/ast_expr_abstract_trace.go"
       ],
       "tests": [
         "TestExprAbstractorNativePatternAndNestedBinder",
         "TestExprAbstractorRetainsInterruptedTemporaryUntilClose",
         "TestExprAbstractorForallExistsConstantOrderAndEmpty",
-        "TestExprAbstractorSourceRootReferenceGuard"
+        "TestExprAbstractorSourceRootReferenceGuard",
+        "TestExprAbstractSourceTraceBothCallers"
       ],
       "conditionals": [
         {
@@ -14734,8 +14745,15 @@
           "tests": ["TestExprAbstractorSourceRootReferenceGuard"]
         },
         {
-          "name": "expr_abstract TRACE SMT2 pretty printing, complete debug action transport and full retained consumers",
-          "status": "unported",
+          "name": "Reached expr_abstract and mk_quantifier TRACE sites at expr_abstract.cpp:113,130: SMT2 input, bound, and result after publication",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr_abstract_trace.go",
+          "tests": ["TestExprAbstractSourceTraceBothCallers"]
+        },
+        {
+          "name": "Complete debug action transport and remaining retained expr_abstract consumers",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_expr_abstract.go",
           "tests": []
         }
       ],
@@ -183019,6 +183037,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
+        },
+        {
+          "name": "Reached expr_abstract and mk_quantifier TRACE sites at expr_abstract.cpp:113,130",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr_abstract_trace.go",
+          "tests": ["TestExprAbstractSourceTraceBothCallers"]
         }
       ],
       "ownership": [
@@ -185081,6 +185105,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
+        },
+        {
+          "name": "Reached expr_abstract and mk_quantifier TRACE sites at expr_abstract.cpp:113,130",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_expr_abstract_trace.go",
+          "tests": ["TestExprAbstractSourceTraceBothCallers"]
         }
       ],
       "ownership": [

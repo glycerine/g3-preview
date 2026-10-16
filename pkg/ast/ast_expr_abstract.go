@@ -82,7 +82,10 @@ func (a *ExprAbstractor) Abstract(base uint32, bound []ASTHandle, root ASTHandle
 	if e = a.manager.SetRef(out, result); e != nil {
 		return e
 	}
-	return a.cleanupPins()
+	if e = a.cleanupPins(); e != nil {
+		return e
+	}
+	return a.traceExprAbstract(root, nil, result, false)
 }
 
 // MkForall abstracts the supplied constant applications and publishes the
@@ -101,7 +104,7 @@ func (a *ExprAbstractor) mkQuantifier(forall bool, bound []ASTHandle, body ASTHa
 		return e
 	}
 	if len(bound) == 0 {
-		return nil
+		return a.traceExprAbstract(body, nil, body, true)
 	}
 	m := a.manager
 	sorts := make([]ASTHandle, 0, len(bound))
@@ -137,7 +140,10 @@ func (a *ExprAbstractor) mkQuantifier(forall bool, bound []ASTHandle, body ASTHa
 	if e != nil {
 		return e
 	}
-	return m.SetRef(out, q)
+	if e = m.SetRef(out, q); e != nil {
+		return e
+	}
+	return a.traceExprAbstract(body, bound, q, true)
 }
 
 func (a *ExprAbstractor) abstract(base uint32, bound []ASTHandle, root ASTHandle) (ASTHandle, error) {
