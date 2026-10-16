@@ -6,7 +6,6 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
-	"github.com/glycerine/g3/pkg/util/heap"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -47,7 +46,7 @@ type solverSetup struct {
 	tmpXs              []uint32
 	normRow            *equation // owns the started source m_norm_* member workspace
 	pendingEq          *equation // mk_eq result before assertion or solution publication
-	queue              *heap.Int
+	queue              solvedQueue
 	parameter          []bool
 	solved             []uint32
 	occurrences        [][]uint32
@@ -117,18 +116,7 @@ func newSolverSetupWithDebug(m *numeral.RationalManager, debug *diagnostic.Debug
 	s := &solverSetup{manager: m, decomposeBuffer: decompose, asBuffer: as, bsBuffer: bs, tmpAs: tmpAs, tmpBs: tmpBs,
 		inconsistent: nullEquationIndex, nextX: nullEquationIndex, nextEq: nullEquationIndex, header: header}
 	s.self = s
-	s.queue, e = heap.New(16, heap.Config{Budget: m.BudgetField, Debug: debug, Less: func(a, b int32) bool {
-		return s.solved[a] < s.solved[b]
-	}})
-	if e != nil {
-		_ = tmpBs.Close()
-		_ = tmpAs.Close()
-		_ = bs.Close()
-		_ = as.Close()
-		_ = decompose.Close()
-		m.BudgetField.Release(header)
-		return nil, e
-	}
+	s.queue = solvedQueue{owner: s, debug: debug, bounds: 16, positions: make(map[int32]int)}
 	return s, nil
 }
 

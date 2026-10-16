@@ -86,7 +86,6 @@ digraph packages {
   "math/euclid" [style=filled, fillcolor="#eeeeee"];
   "math/euclid" -> "arena";
   "math/euclid" -> "util/diagnostic";
-  "math/euclid" -> "util/heap";
   "math/euclid" -> "util/numeral";
   "math/interval" [style=filled, fillcolor="#eeeeee"];
   "math/interval" -> "arena";
@@ -151,6 +150,7 @@ digraph packages {
   "model" -> "util/messages";
   "model" -> "util/params";
   "model" -> "util/symbol";
+  "model" -> "util/text";
   "muz/base" [style=filled, fillcolor="#eeeeee"];
   "muz/base" -> "util/params";
   "nlsat" [style=filled, fillcolor="#eeeeee"];

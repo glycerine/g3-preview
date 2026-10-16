@@ -35353,6 +35353,7 @@
         "pkg/math/euclid/solver.go",
         "pkg/math/euclid/solver_test.go",
         "pkg/math/euclid/solver_setup.go",
+        "pkg/math/euclid/solved_queue.go",
         "pkg/math/euclid/solver_setup_test.go",
         "pkg/math/euclid/solver_heap_debug_test.go",
         "pkg/util/numeral/scoped_numeral.go"
@@ -35615,7 +35616,7 @@
       "ownership": [
         "The partial sort path borrows the rational manager, copies coefficient numerals into typed owned buffer slots, sorts scalar IDs, then swaps each raw numeral with its source-indexed slot. A whole-slice raw swap transfers numeral ownership between the equation slice and buffer without cloning.",
         "The concrete equation allocates its owner header first, copies coefficients into indexed reusable slots, transfers them into its vectors with sort_core, then owns its constant, integer coefficients and rational justifications. del_eq releases those in that order, leaving caller inputs and reusable buffers separately owned.",
-        "The pre-elimination setup borrows its rational manager, publishes variable metadata before the matching integer buffer slot, reserves that ID in a concrete solved-index-priority heap, publishes a justification buffer slot before incrementing its ID, owns equation pointers in source list order, and closes its heap, rational and integer member buffers in reverse declaration order.",
+        "The pre-elimination setup borrows its rational manager, publishes variable metadata before the matching integer buffer slot, reserves that ID in a solver-local typed-slice priority queue, publishes a justification buffer slot before incrementing its ID, owns equation pointers in source list order, and closes its heap, rational and integer member buffers in reverse declaration order.",
         "Solved-equation promotion transfers one equation pointer from the todo list to the solution list. apply_solution swaps integer and rational row storage through reusable owned numeral buffers; the old target row remains in its buffer until the next reset or solver destruction. The coefficient borrowed from that old row remains alive across the rational merge.",
         "Non-unit decomposition borrows the selected positive magnitude, publishes a new parameter and buffer slot, compacts the todo equation's remainder numerals in place, copies auxiliary coefficients from the owned decomposition buffer into a solution equation, then substitutes that solution into prior occurrences. The decomposition buffer releases its copied numerals after the solution has independent ownership."
       ],
@@ -126261,6 +126262,7 @@
         "pkg/util/heap/source_prefix_test.go",
         "pkg/sat/sat_var_queue_native_test.go",
         "pkg/math/euclid/solver_setup.go",
+        "pkg/math/euclid/solved_queue.go",
         "pkg/math/euclid/solver.go",
         "pkg/math/euclid/solver_setup_test.go",
         "pkg/math/euclid/solver_heap_debug_test.go",
@@ -126629,8 +126631,8 @@
         {
           "name": "concrete Euclidean solved-variable heap with borrowed elimination order",
           "status": "ported",
-          "go_target": "pkg/math/euclid/solver_setup.go",
-          "go_targets": ["pkg/math/euclid/solver.go"],
+          "go_target": "pkg/math/euclid/solved_queue.go",
+          "go_targets": ["pkg/math/euclid/solver_setup.go", "pkg/math/euclid/solver.go"],
           "tests": [
             "TestEuclideanSetupSolvedVariableQueue",
             "TestEuclideanSolvedQueueBorrowsHeapDebugAcrossReset",
@@ -126663,7 +126665,7 @@
         "Solver activity and simplifier literal-weight queues now share one concrete project heap algorithm over native []int32 values and reverse indexes. Source priority comparison, sentinel, move_up/down, erase/reinsert/reset order and current borrowed comparators remain. Removed the duplicate Runtime path, source vector capacity/payload/initialization geometry, backing reservations, source/owning destructor cursors and unused Clone/MoveClone and standalone activity-domain adapters. Only the actual queue cold header is budgeted. A 4097-key independent sorted-priority oracle, retained 12000-operation mutable-activity model, 81 finite priority worlds, real blocked-literal weights, warm zero-allocation reuse and exact cold-header/cohort/closed/index guards cover native behavior. Native backing introduces no Runtime or Budget allocation failures. No unused C++ vector/copy/move or general heap implementation credit is added."
       ],
       "deviations": [
-        "The retained concrete Int heap used by Euclid now keeps value and inverse-index arrays in native Go slices. Constructor, insert, bounds growth, clone, assignment and cross-budget swap no longer emulate vector capacity or reserve arena backing. Removed synthetic failed-insert ghost states and stopped assignment cleanup; only the real heap owner header remains charged. A 129-value heap and cross-budget copies/swaps pass with arena reservations refused. SMT, Hilbert and simplex heap specializations remain unported with their owning consumers.",
+        "The former concrete Int heap used by Euclid kept value and inverse-index arrays in native Go slices; Euclid now owns a local []int32 priority queue and map[int32]int inverse index using container/heap. The pkg/util/heap.Int owner is no longer imported by Euclid. Constructor, insert, bounds growth, clone, assignment and cross-budget swap no longer emulate vector capacity or reserve arena backing. Removed synthetic failed-insert ghost states and stopped assignment cleanup; only the real heap owner header remains charged. A 129-value heap and cross-budget copies/swaps pass with arena reservations refused. SMT, Hilbert and simplex heap specializations remain unported with their owning consumers.",
         "Typed precondition/closed/overflow/epoch errors replace invalid source operations. Safe readonly iterators replace raw mutable backing pointers.",
         "Insert publishes the inverse index before fallible value growth, preserving source failure membership. Its publication invalidates checked iterators even on failure. Empty reset retains this prefix; live-value invariant traversal ignores additional inverse entries. Subsequent out-of-bounds slot accesses return ErrHeapValue without repairing the source state; in-range source actions remain executable.",
         "The concrete Int heap covers selected general-heap operations. Other live C++ template instantiations in SMT remain separate consumer ports. The concrete Int heap now borrows a DebugContext for CASSERT heap-tag and nested SASSERT routing; process-global binding, wrapped physical extents and native ostream transport remain open. Explicit signed and partially initialized fixtures cover undefined source domains, not ordinary native recovery. No whole source-unit promotion.",

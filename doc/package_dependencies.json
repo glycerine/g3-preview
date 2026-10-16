@@ -554,7 +554,6 @@
       "imports": [
         "arena",
         "util/diagnostic",
-        "util/heap",
         "util/numeral"
       ],
       "production_files": [
@@ -574,6 +573,7 @@
         "pivot_decompose_trace.go",
         "solve.go",
         "solve_trace.go",
+        "solved_queue.go",
         "solver.go",
         "solver_setup.go"
       ]
@@ -1211,7 +1211,8 @@
         "util/memory",
         "util/messages",
         "util/params",
-        "util/symbol"
+        "util/symbol",
+        "util/text"
       ],
       "production_files": [
         "function_entry.go",
@@ -1621,6 +1622,7 @@
         "source_debug_off.go",
         "tactic_exception.go",
         "tactic_extension_model.go",
+        "tactic_extension_model_trace.go",
         "tactic_filter_model.go",
         "tactic_goal.go",
         "tactic_goal_display.go",
@@ -1630,7 +1632,8 @@
         "tactic_package_boundary.go",
         "tactic_probe.go",
         "tactic_report.go",
-        "tactic_stored_model.go"
+        "tactic_stored_model.go",
+        "tactic_stored_model_memory_trace.go"
       ]
     },
     {
