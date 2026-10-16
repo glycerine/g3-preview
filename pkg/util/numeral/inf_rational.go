@@ -796,13 +796,13 @@ func (s *RationalService) infFused(v *OwnedInfRational, c *OwnedRational, k *Own
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return e
 	}
 	if e := s.check(c); e != nil {
 		return e
 	}
-	if e := s.infCheck(k); e != nil {
+	if e := s.infScalarOwner(k); e != nil {
 		return e
 	}
 	if e := s.infRatFused(&v.First, &c.Raw, &k.First, sub); e != nil {

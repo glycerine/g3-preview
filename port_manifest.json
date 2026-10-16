@@ -129186,7 +129186,8 @@
         "pkg/util/numeral/inf_muldiv_entry_source_test.go",
         "pkg/util/numeral/inf_step_unread_epsilon_source_test.go",
         "pkg/util/numeral/inf_string_unread_epsilon_den_source_test.go",
-        "pkg/util/numeral/inf_round_unread_epsilon_source_test.go"
+        "pkg/util/numeral/inf_round_unread_epsilon_source_test.go",
+        "pkg/util/numeral/inf_fused_source_order_test.go"
       ],
       "tests": [
         "TestInfinitesimalSourceWholeStringStreamInsertion",
@@ -129212,6 +129213,7 @@
         "TestInfFormatNativeWorkspaceGrowth",
         "TestInfStringZeroEpsilonSkipsUnreadDenominator",
         "TestInfRoundSkipsUnreadEpsilonStorage",
+        "TestInfFusedKeepsFirstOnLateEpsilonFailure",
         "TestInfScalarProjectionAllGetterProfilesAndRawPredicates",
         "TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit",
         "TestInfScalarProjectionFacadeRawFieldsAndNarrowing",
@@ -129430,6 +129432,7 @@
             "TestInfPrefixStepsSkipUnreadEpsilon",
             "TestInfRationalCompoundReturnCopyFailure",
             "TestInfRationalFusedComponentAlias",
+            "TestInfFusedKeepsFirstOnLateEpsilonFailure",
             "TestInfRationalIntegerConstructorCopyRoute",
             "TestRationalServiceInfinitesimalHeaderOwnership",
             "TestRationalServiceInfinitesimalConstructorFailureRefunds",
