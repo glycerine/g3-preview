@@ -336,7 +336,7 @@ func (g *satSolverGC) gcHalf() error {
 	}
 	g.gcClauseStat += n - g.out
 	g.finishCompaction()
-	return nil
+	return g.emitHalfReport(l.propagation.config.state.GCStrategy, n-g.out)
 }
 func (g *satSolverGC) Close() error {
 	if g == nil || g.self != g {

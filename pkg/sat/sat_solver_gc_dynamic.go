@@ -54,6 +54,7 @@ func (g *satSolverGC) gcDynPSM() error {
 		g.minDTk = d
 	}
 	g.traceMinDTk()
+	frozen, activated, deleted := uint32(0), uint32(0), uint32(0)
 	if e := g.beginCompaction(0); e != nil {
 		return e
 	}
@@ -104,6 +105,7 @@ func (g *satSolverGC) gcDynPSM() error {
 							return e
 						}
 						g.gcClauseStat++
+						deleted++
 						g.cursor = i + 1
 						continue
 					}
@@ -135,6 +137,7 @@ func (g *satSolverGC) gcDynPSM() error {
 						return e
 					}
 					g.numFrozen++
+					frozen++
 				}
 			}
 		} else {
@@ -155,6 +158,7 @@ func (g *satSolverGC) gcDynPSM() error {
 					return e
 				}
 				g.numFrozen--
+				activated++
 				keep, e := g.activateFrozenClause(r)
 				if e != nil {
 					return e
@@ -183,6 +187,7 @@ func (g *satSolverGC) gcDynPSM() error {
 						return e
 					}
 					g.gcClauseStat++
+					deleted++
 					g.cursor = i + 1
 					continue
 				}
@@ -193,7 +198,7 @@ func (g *satSolverGC) gcDynPSM() error {
 		g.cursor = i + 1
 	}
 	g.finishCompaction()
-	return nil
+	return g.emitDynamicReport(d, frozen, activated, deleted)
 }
 func (g *satSolverGC) activateFrozenClause(r StoredClauseRef) (bool, error) {
 	g.traceReactivatingClause(r)

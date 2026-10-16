@@ -184439,7 +184439,8 @@
         "pkg/sat/sat_asymm_branch_report.go",
         "pkg/sat/sat_solver_stat_display.go",
         "pkg/sat/sat_solver_probing_report.go",
-        "pkg/sat/sat_simplifier_report.go"
+        "pkg/sat/sat_simplifier_report.go",
+        "pkg/sat/sat_solver_gc_report.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184469,7 +184470,8 @@
         "TestSATReportsReadCompactStatsDuringStoppedContinuation",
         "TestSATSolverProbingReportAssignedStoppedAndSourceGates",
         "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
-        "TestSATSimplifierReportsActualSubsumptionAndResolution"
+        "TestSATSimplifierReportsActualSubsumptionAndResolution",
+        "TestSATSolverGCReportsStrategiesDynamicCountsAndGate"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -184607,6 +184609,14 @@
             "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
             "TestSATSimplifierReportsActualSubsumptionAndResolution"
           ]
+        },
+        {
+          "name": "Retained SAT half and dynamic garbage-collection IF_VERBOSE(10) reports use process-selected stream (src/sat/sat_solver.cpp:1512,1606-1607)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_gc_report.go",
+          "tests": [
+            "TestSATSolverGCReportsStrategiesDynamicCountsAndGate"
+          ]
         }
       ],
       "ownership": [
@@ -184671,7 +184681,8 @@
         "pkg/sat/sat_asymm_branch_report.go",
         "pkg/sat/sat_solver_stat_display.go",
         "pkg/sat/sat_solver_probing_report.go",
-        "pkg/sat/sat_simplifier_report.go"
+        "pkg/sat/sat_simplifier_report.go",
+        "pkg/sat/sat_solver_gc_report.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184728,7 +184739,8 @@
         "TestSATReportsReadCompactStatsDuringStoppedContinuation",
         "TestSATSolverProbingReportAssignedStoppedAndSourceGates",
         "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
-        "TestSATSimplifierReportsActualSubsumptionAndResolution"
+        "TestSATSimplifierReportsActualSubsumptionAndResolution",
+        "TestSATSolverGCReportsStrategiesDynamicCountsAndGate"
       ],
       "conditionals": [
         {
@@ -185164,6 +185176,14 @@
           "tests": [
             "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
             "TestSATSimplifierReportsActualSubsumptionAndResolution"
+          ]
+        },
+        {
+          "name": "Retained SAT half and dynamic garbage-collection IF_VERBOSE(10) reports use process-selected stream (src/sat/sat_solver.cpp:1512,1606-1607)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_gc_report.go",
+          "tests": [
+            "TestSATSolverGCReportsStrategiesDynamicCountsAndGate"
           ]
         }
       ],
