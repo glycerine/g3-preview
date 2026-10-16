@@ -408,6 +408,9 @@ func (s *Solver) getBoundedConsequencesBody(asms, vars satConsequenceInput, out 
 			return lbool.Undef, e
 		}
 		if s.conflict.conflicts > cfg.MaxConflicts {
+			if err = s.emitSearchAbort("max-conflicts = ", true); err != nil {
+				return lbool.Undef, err
+			}
 			return lbool.Undef, nil
 		}
 		if err = s.gc.restart(); err != nil {
@@ -432,6 +435,9 @@ func (s *Solver) getBoundedConsequencesBody(asms, vars satConsequenceInput, out 
 			return lbool.Undef, e
 		}
 		if cfg.RestartMax <= iterations {
+			if err = s.emitSearchAbort("max-restarts", false); err != nil {
+				return lbool.Undef, err
+			}
 			return lbool.Undef, nil
 		}
 	}

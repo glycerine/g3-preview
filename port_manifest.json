@@ -78093,7 +78093,8 @@
         "TestSATSolverCheckSourceRestartLimitAbort",
         "TestSATSolverCheckVerboseFileFailureKeepsSearchResult",
         "TestSATSolverCheckSourceModelNotice",
-        "TestSATSolverActualMUSCoreSourceVerboseReport"
+        "TestSATSolverActualMUSCoreSourceVerboseReport",
+        "TestSATSolverBoundedConsequencesSourceAbortVerbose"
       ],
       "conditionals": [
         {
@@ -79413,6 +79414,14 @@
           "tests": [
             "TestSATSolverActualMUSCoreSourceVerboseReport",
             "TestSATSolverMUSActualThreeNecessaryAssumptions"
+          ]
+        },
+        {
+          "name": "Retained bounded get_consequences conflict-limit and restart-limit IF_VERBOSE(10) abort records at sat_solver.cpp:3346,3359, using the process-selected stream after actual bounded search/restart branches",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_consequences.go",
+          "tests": [
+            "TestSATSolverBoundedConsequencesSourceAbortVerbose"
           ]
         }
       ],
@@ -184485,7 +184494,8 @@
         "pkg/sat/sat_simplifier_report.go",
         "pkg/sat/sat_solver_gc_report.go",
         "pkg/sat/sat_solver_search_verbose.go",
-        "pkg/sat/sat_solver_unsat_core_verbose.go"
+        "pkg/sat/sat_solver_unsat_core_verbose.go",
+        "pkg/sat/sat_solver_consequences.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184522,7 +184532,8 @@
         "TestSATSolverCheckSourceRestartLimitAbort",
         "TestSATSolverCheckVerboseFileFailureKeepsSearchResult",
         "TestSATSolverCheckSourceModelNotice",
-        "TestSATSolverActualMUSCoreSourceVerboseReport"
+        "TestSATSolverActualMUSCoreSourceVerboseReport",
+        "TestSATSolverBoundedConsequencesSourceAbortVerbose"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -184704,6 +184715,14 @@
             "TestSATSolverActualMUSCoreSourceVerboseReport",
             "TestSATSolverMUSActualThreeNecessaryAssumptions"
           ]
+        },
+        {
+          "name": "Retained bounded get_consequences conflict-limit and restart-limit IF_VERBOSE(10) abort records at sat_solver.cpp:3346,3359, using the process-selected stream after actual bounded search/restart branches",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_consequences.go",
+          "tests": [
+            "TestSATSolverBoundedConsequencesSourceAbortVerbose"
+          ]
         }
       ],
       "ownership": [
@@ -184771,7 +184790,8 @@
         "pkg/sat/sat_simplifier_report.go",
         "pkg/sat/sat_solver_gc_report.go",
         "pkg/sat/sat_solver_search_verbose.go",
-        "pkg/sat/sat_solver_unsat_core_verbose.go"
+        "pkg/sat/sat_solver_unsat_core_verbose.go",
+        "pkg/sat/sat_solver_consequences.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184835,7 +184855,8 @@
         "TestSATSolverCheckSourceRestartLimitAbort",
         "TestSATSolverCheckVerboseFileFailureKeepsSearchResult",
         "TestSATSolverCheckSourceModelNotice",
-        "TestSATSolverActualMUSCoreSourceVerboseReport"
+        "TestSATSolverActualMUSCoreSourceVerboseReport",
+        "TestSATSolverBoundedConsequencesSourceAbortVerbose"
       ],
       "conditionals": [
         {
@@ -185315,6 +185336,14 @@
           "tests": [
             "TestSATSolverActualMUSCoreSourceVerboseReport",
             "TestSATSolverMUSActualThreeNecessaryAssumptions"
+          ]
+        },
+        {
+          "name": "Retained bounded get_consequences conflict-limit and restart-limit IF_VERBOSE(10) abort records at sat_solver.cpp:3346,3359, using the process-selected stream after actual bounded search/restart branches",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_consequences.go",
+          "tests": [
+            "TestSATSolverBoundedConsequencesSourceAbortVerbose"
           ]
         }
       ],
