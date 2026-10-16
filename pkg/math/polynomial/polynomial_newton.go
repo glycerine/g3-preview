@@ -199,6 +199,9 @@ func (n *PolynomialNewtonInterpolator) Add(input *unumeral.Int, output Polynomia
 		return e
 	}
 	m := n.owner
+	if e := n.traceAddEntry(input, output); e != nil {
+		return e
+	}
 	if polynomialSourceDebug && m.modular.IntegerMode() {
 		return ErrPolynomialAssertion
 	}
@@ -251,6 +254,9 @@ func (n *PolynomialNewtonInterpolator) Add(input *unumeral.Int, output Polynomia
 		return e
 	}
 	if e = n.pushNumeral(&n.invs, &s.product); e != nil {
+		return e
+	}
+	if e = n.traceNumeral(2851, "add", newtonIndexLabel("invs", sz), &s.product); e != nil {
 		return e
 	}
 	if polynomialSourceDebug {
@@ -322,7 +328,10 @@ func (n *PolynomialNewtonInterpolator) Add(input *unumeral.Int, output Polynomia
 	if e = n.assertPolynomialNormalized(s.auxPoly.value); e != nil {
 		return e
 	}
-	return n.vs.push(m, s.auxPoly.value)
+	if e = n.vs.push(m, s.auxPoly.value); e != nil {
+		return e
+	}
+	return n.tracePolynomial(2871, "add", newtonIndexLabel("vs", sz), s.auxPoly.value)
 }
 func (n *PolynomialNewtonInterpolator) scale(a *unumeral.Int, p Polynomial) (Polynomial, error) {
 	u, e := n.owner.monomials.Unit()
@@ -370,6 +379,9 @@ func (n *PolynomialNewtonInterpolator) Mk(x uint32, r *PolynomialRef) (err error
 		return arena.ErrBounds
 	}
 	for k := d - 1; k >= 0; k-- {
+		if e = n.tracePolynomial(2890, "mk", "u: ", s.u.value); e != nil {
+			return e
+		}
 		a := n.inputs[uint32(k)]
 		if e = m.modular.Copy(&s.c, &a); e != nil {
 			return e
@@ -383,6 +395,9 @@ func (n *PolynomialNewtonInterpolator) Mk(x uint32, r *PolynomialRef) (err error
 			return e
 		}
 		if e = s.auxPoly.assign(m, p); e != nil {
+			return e
+		}
+		if e = n.tracePolynomial(2896, "mk", "(x - inputs[k]): ", s.auxPoly.value); e != nil {
 			return e
 		}
 		p, e = m.Mul(s.u.value, s.auxPoly.value)
@@ -403,6 +418,9 @@ func (n *PolynomialNewtonInterpolator) Mk(x uint32, r *PolynomialRef) (err error
 		if e = s.u.assign(m, p); e != nil {
 			return e
 		}
+	}
+	if e = n.tracePolynomial(2901, "mk", "result u: ", s.u.value); e != nil {
+		return e
 	}
 	return r.Assign(s.u.value)
 }
