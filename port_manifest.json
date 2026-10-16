@@ -18878,6 +18878,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Reached complete preferred-pattern TRACE at pattern_inference.cpp:510 before singleton-pattern construction",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/preferred_pattern.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
+        {
           "name": "Reached bigger-pattern same-free-variable subapplication TRACE at pattern_inference.cpp:354 before filter refusal",
           "status": "ported",
           "go_target": "pkg/ast/pattern/contains_subpattern.go",
@@ -180672,6 +180678,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/preferred_pattern.go",
         "pkg/ast/pattern/contains_subpattern.go",
         "pkg/ast/pattern/collect.go",
         "pkg/model/model_evaluator_trace.go",
@@ -180875,6 +180882,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached complete preferred-pattern TRACE at pattern_inference.cpp:510 before singleton-pattern construction",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/preferred_pattern.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
         {
           "name": "Reached bigger-pattern same-free-variable subapplication TRACE at pattern_inference.cpp:354 before filter refusal",
           "status": "ported",
@@ -182612,6 +182625,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/preferred_pattern.go",
         "pkg/ast/pattern/contains_subpattern.go",
         "pkg/ast/pattern/collect.go",
         "pkg/model/model_evaluator_trace.go",
@@ -182823,6 +182837,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached complete preferred-pattern TRACE at pattern_inference.cpp:510 before singleton-pattern construction",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/preferred_pattern.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
         {
           "name": "Reached bigger-pattern same-free-variable subapplication TRACE at pattern_inference.cpp:354 before filter refusal",
           "status": "ported",

@@ -212,4 +212,32 @@ func TestPatternCollectInfoSourceSMT2Trace(t *testing.T) {
 	if len(filtered) != 1 || filtered[0] != inner || output.Len() != 0 {
 		t.Fatal("disabled bigger-pattern trace changed filtering or emitted output", filtered, output.String())
 	}
+	patternMust(t, c.resetCandidates())
+	patternMust(t, c.addCandidate(app, []uint32{0}, 2))
+	patternMust(t, c.registerPreferred(decl))
+	output.Reset()
+	tags.Enable("pattern_inference")
+	preferred, found, err := c.selectPreferred([]ast.ASTHandle{app})
+	patternMust(t, err)
+	if !found || len(preferred) != 1 {
+		t.Fatal("source preferred candidate", found, len(preferred))
+	}
+	if tags.ShouldTrace("pattern_inference") {
+		want := "-------- [pattern_inference] has_preferred_patterns src/ast/pattern/pattern_inference.cpp:510 ---------\n" +
+			"found preferred pattern:\n(collect-f (:var 0))\n------------------------------------------------\n"
+		if output.String() != want {
+			t.Fatalf("preferred-pattern trace: got %q, want %q", output.String(), want)
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("erased preferred-pattern trace wrote output", output.String())
+	}
+	patternMust(t, m.DelRef(&preferred[0]))
+	output.Reset()
+	tags.Disable("pattern_inference")
+	preferred, found, err = c.selectPreferred([]ast.ASTHandle{app})
+	patternMust(t, err)
+	if !found || len(preferred) != 1 || output.Len() != 0 {
+		t.Fatal("disabled preferred trace changed selection or emitted output", found, len(preferred), output.String())
+	}
+	patternMust(t, m.DelRef(&preferred[0]))
 }

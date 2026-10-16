@@ -2,7 +2,12 @@
 // src/ast/pattern/pattern_inference.cpp:501-518.
 package pattern
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"io"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+)
 
 // registerPreferred stores a borrowed declaration identity. Duplicate source
 // registrations leave one set member and do not acquire an AST reference.
@@ -47,6 +52,9 @@ func (c *patternCandidates) selectPreferred(candidates []ast.ASTHandle) ([]ast.A
 		if uint32(len(info.freeVars)) != c.numBindings {
 			continue
 		}
+		if err := c.tracePreferredPattern(candidate); err != nil {
+			return result, len(result) != 0, err
+		}
 		pattern, err := c.manager.MkFamilyApp(2, 0, nil, []ast.ASTHandle{candidate})
 		if err != nil {
 			return result, len(result) != 0, err
@@ -58,4 +66,27 @@ func (c *patternCandidates) selectPreferred(candidates []ast.ASTHandle) ([]ast.A
 		result = append(result, owned)
 	}
 	return result, len(result) != 0, nil
+}
+
+// Source: src/ast/pattern/pattern_inference.cpp:510. The trace precedes
+// singleton pattern construction for each complete preferred declaration.
+func (c *patternCandidates) tracePreferredPattern(candidate ast.ASTHandle) error {
+	tags := c.traceTags
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	if !tags.ShouldTrace("pattern_inference") {
+		return nil
+	}
+	return tags.EmitConditional("pattern_inference", "has_preferred_patterns", "src/ast/pattern/pattern_inference.cpp", 510,
+		func() bool { return true }, func(w io.Writer) error {
+			if _, err := io.WriteString(w, "found preferred pattern:\n"); err != nil {
+				return err
+			}
+			if err := c.writePatternSMT2(w, candidate); err != nil {
+				return err
+			}
+			_, err := io.WriteString(w, "\n")
+			return err
+		})
 }
