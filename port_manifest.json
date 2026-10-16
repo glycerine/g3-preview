@@ -124811,8 +124811,8 @@
           ]
         },
         {
-          "name": "imp destructor body reset/module deletion and reverse member suffix; guarded source stop with separate owning sparse-shrink acknowledgment (cpp106-123); generated g_imp finalization/nulling, ctor unwind and descendant stopped numeral decrements remain open",
-          "status": "partial",
+          "name": "imp destructor reset/module deletion and reverse member suffix with exact stopped-child owning continuations (cpp106-123)",
+          "status": "ported",
           "go_target": "pkg/util/params/util_gparams_source_finalize.go",
           "tests": [
             "TestGlobalParamsSourceFinalizeEmptyMembersAndGuards",
@@ -124822,7 +124822,7 @@
         },
         {
           "name": "imp destructor module ParamsRef zero-count child stop and matching explicit owning continuation; actual internal get_params plus numeral setter lifecycle route, not public string parser coverage",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/params/util_gparams_source_finalize.go",
           "tests": [
             "TestGlobalParamsSourceModuleDECStoppedChildOwningContinuation"
@@ -124830,15 +124830,15 @@
         },
         {
           "name": "actual imp destructor stage0 live global-value reset with scalar prefix preservation and separate exact reset-child owning receipt; internal value setter route, not public string parsing coverage",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/params/util_gparams_source_finalize.go",
           "tests": [
             "TestGlobalParamsSourceGlobalResetRetainsInlinePrefixBeforeChildStop"
           ]
         },
         {
-          "name": "actual imp declaration-order constructor, completed-member unwind and unconditional source g_imp initialize/finalize pointer boundaries; explicit named owning abort for failed placement headers and overwritten predecessors",
-          "status": "partial",
+          "name": "imp declaration-order constructor, completed-member unwind and unconditional source g_imp initialize/finalize pointer boundaries with named owning abort for failed placements and overwritten predecessors",
+          "status": "ported",
           "go_target": "pkg/util/params/util_gparams_service.go",
           "tests": [
             "TestGlobalParamsSourceConstructorAllActualNestedPrefixes",
@@ -125121,8 +125121,8 @@
           ]
         },
         {
-          "name": "imp destructor body reset/module deletion and reverse member suffix; guarded source stop with separate owning sparse-shrink acknowledgment (cpp106-123); generated g_imp finalization/nulling, ctor unwind and descendant stopped numeral decrements remain open",
-          "status": "partial",
+          "name": "imp destructor reset/module deletion and reverse member suffix with exact stopped-child owning continuations (cpp106-123)",
+          "status": "ported",
           "go_target": "pkg/util/params/util_gparams_source_finalize.go",
           "tests": [
             "TestGlobalParamsSourceFinalizeEmptyMembersAndGuards",
@@ -125131,8 +125131,8 @@
           ]
         },
         {
-          "name": "actual imp declaration-order constructor, completed-member unwind and unconditional source g_imp initialize/finalize pointer boundaries; explicit named owning abort for failed placement headers and overwritten predecessors",
-          "status": "partial",
+          "name": "imp declaration-order constructor, completed-member unwind and unconditional source g_imp initialize/finalize pointer boundaries with named owning abort for failed placements and overwritten predecessors",
+          "status": "ported",
           "go_target": "pkg/util/params/util_gparams_service.go",
           "tests": [
             "TestGlobalParamsSourceConstructorAllActualNestedPrefixes",
