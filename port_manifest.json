@@ -186757,6 +186757,12 @@
           "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder"]
         },
         {
+          "name": "well_sorted.cpp:50 wrong-arity application literal warning before returning from the checker",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_well_sorted.go",
+          "tests": ["TestASTWellSortedApplicationGuardBranches", "TestASTWellSortedWrongAritySourceTraceBeforeWarning"]
+        },
+        {
           "name": "set_error_stream and disable_error_msg_prefix write-only globals with no source reader",
           "status": "reference_only",
           "tests": []
@@ -186938,6 +186944,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_well_sorted.go",
           "tests": ["TestASTWellSortedQuantifierWarningAndChildOrder"]
+        },
+        {
+          "name": "well_sorted.cpp:50 wrong-arity application literal warning before returning from the checker",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_well_sorted.go",
+          "tests": ["TestASTWellSortedApplicationGuardBranches", "TestASTWellSortedWrongAritySourceTraceBeforeWarning"]
         },
         {
           "name": "pattern_inference concrete warning_msg %s and %d call sites through borrowed WarningService",
