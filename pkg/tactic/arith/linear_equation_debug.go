@@ -22,6 +22,17 @@ func (l *LinearEquationManager) assertNonzeroEquationMultiplier(b *numeral.Int, 
 	return diagnostic.DebugAssertionFailure(d, "src/tactic/arith/linear_equation.cpp", line, condition)
 }
 
+// Source: linear_equation.cpp:60. The rational constructor's minimum arity
+// is a debug assertion; a release build can construct a normalized singleton.
+func (l *LinearEquationManager) assertRationalEquationArity(size int) error {
+	d := diagnostic.BorrowProcessDebugContext()
+	on, err := diagnostic.SourceAssertionsEnabled(d)
+	if err != nil || !on || size > 1 {
+		return err
+	}
+	return diagnostic.DebugAssertionFailure(d, "src/tactic/arith/linear_equation.cpp", 60, "sz > 1")
+}
+
 // The normalized constructor's DEBUG_CODE marks each input variable before
 // sorting. If an assertion action aborts, earlier marks remain as in source.
 func (l *LinearEquationManager) assertUniqueNormalizedEquationVars(xs []uint32) error {

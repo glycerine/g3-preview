@@ -236,8 +236,11 @@ func (l *LinearEquationManager) MkRational(as []numeral.Rational, xs []uint32, n
 	if err = l.open(); err != nil {
 		return nil, err
 	}
-	if len(as) != len(xs) || len(as) <= 1 {
+	if len(as) != len(xs) || len(as) == 0 {
 		return nil, arena.ErrInvalidSlot
+	}
+	if err = l.assertRationalEquationArity(len(as)); err != nil {
+		return nil, err
 	}
 	z := l.manager.Integers()
 	lcm, denominator := numeral.NewInt(0), numeral.NewInt(0)

@@ -133,3 +133,41 @@ func TestLinearEquationCombineZeroMultiplierSourceAssertionProfile(t *testing.T)
 		t.Fatal("two zero multipliers should cancel every shared term")
 	}
 }
+
+func TestLinearEquationRationalSingletonSourceAssertionProfile(t *testing.T) {
+	debug := equationSourceDebugFixture(t)
+	m, l := equationManager(t)
+	values := []numeral.Rational{numeral.NewRational()}
+	defer func() { equationMust(t, m.Del(&values[0])) }()
+	equationMust(t, m.SetString(&values[0], "3/2"))
+	eq, err := l.MkRational(values, []uint32{4}, true)
+	if diagnostic.DebugBuild {
+		if !errors.Is(err, diagnostic.ErrDebugAssertion) || eq != nil {
+			t.Fatalf("rational arity assertion: eq=%v err=%v", eq, err)
+		}
+		integer, e := m.IsInt(&values[0])
+		equationMust(t, e)
+		if integer {
+			t.Fatal("assertion ran after denominator clearing")
+		}
+		equationMust(t, debug.EnableAssertions(false))
+	} else {
+		equationMust(t, err)
+	}
+	if eq == nil {
+		eq, err = l.MkRational(values, []uint32{4}, true)
+		equationMust(t, err)
+	}
+	var output bytes.Buffer
+	equationMust(t, l.Display(&output, eq))
+	if output.String() != "1*x4 = 0" {
+		t.Fatalf("release singleton equation %q", output.String())
+	}
+	equationMust(t, eq.Close())
+	equationMust(t, m.SetString(&values[0], "3/2"))
+	eq, err = l.MkRational(values, []uint32{4}, false)
+	equationMust(t, err)
+	if eq != nil {
+		t.Fatal("non-normalized singleton should be discarded")
+	}
+}
