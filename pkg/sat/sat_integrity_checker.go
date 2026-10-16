@@ -109,7 +109,17 @@ func (c satIntegrityChecker) containsClause(index uint32, cl StoredClauseRef, of
 		}
 	}
 	// Source UNREACHABLE has undefined release continuation on GNU; expose a
-	// checked assertion error rather than inventing a missing-watch success.
+	// checked assertion error to unbound direct callers. The real cleaner's
+	// bound debugger can continue to the following VERIFY after a C action.
+	if c.debugActions && satStorageSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		if d.HasAssertionActions() {
+			if e := d.UnreachableSource("src/sat/sat_integrity_checker.cpp", 48); e != nil {
+				return false, e
+			}
+			return false, nil
+		}
+	}
 	return false, ErrSATAssertion
 }
 func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
@@ -358,6 +368,20 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 				return false, e
 			}
 			if !yes {
+				if c.debugActions && satStorageSourceDebug {
+					d := diagnostic.BorrowProcessDebugContext()
+					if d.HasAssertionActions() {
+						line := int32(99 + k)
+						condition := "contains_watched(s.get_wlist(~c[0]), c, s.get_offset(c))"
+						if k != 0 {
+							condition = "contains_watched(s.get_wlist(~c[1]), c, s.get_offset(c))"
+						}
+						if e = d.VerifyFailure("src/sat/sat_integrity_checker.cpp", line, condition); e != nil {
+							return false, e
+						}
+						continue
+					}
+				}
 				return false, ErrSATAssertion
 			}
 		}

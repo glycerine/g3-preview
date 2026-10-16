@@ -75140,6 +75140,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerNaryBlockedLiteralUsesSourceAssertion"]
+        },
+        {
+          "name": "Retained nary contains_watched absent-watch UNREACHABLE48 C continuation into first VERIFY99 stderr, notification and T action through real cleaner; unbound direct checker retains explicit error",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerMissingNaryWatchUnreachableThenVerify"]
         }
       ],
       "ownership": [
@@ -75266,6 +75272,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerNaryBlockedLiteralUsesSourceAssertion"]
+        },
+        {
+          "name": "Retained nary contains_watched absent-watch UNREACHABLE48 C continuation into first VERIFY99 stderr, notification and T action through real cleaner; unbound direct checker retains explicit error",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerMissingNaryWatchUnreachableThenVerify"]
         }
       ],
       "ownership": [
@@ -122108,6 +122120,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerNaryBlockedLiteralUsesSourceAssertion"]
+        },
+        {
+          "name": "Retained nary contains_watched absent-watch UNREACHABLE48 C continuation into first VERIFY99 stderr, notification and T action through real cleaner; unbound direct checker retains explicit error",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerMissingNaryWatchUnreachableThenVerify"]
         }
       ],
       "ownership": [
@@ -122518,6 +122536,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerNaryBlockedLiteralUsesSourceAssertion"]
+        },
+        {
+          "name": "Retained nary contains_watched absent-watch UNREACHABLE48 C continuation into first VERIFY99 stderr, notification and T action through real cleaner; unbound direct checker retains explicit error",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerMissingNaryWatchUnreachableThenVerify"]
         }
       ],
       "ownership": [
