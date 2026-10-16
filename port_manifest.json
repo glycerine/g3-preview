@@ -18752,6 +18752,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/pattern_stage_trace.go",
         "pkg/ast/pattern/smaller_pattern.go",
         "pkg/ast/pattern/candidates.go",
         "pkg/ast/pattern/contains_subpattern.go",
@@ -18877,6 +18878,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Reached mk_patterns initial, post-loop-filter, post-bigger-filter and post-sort candidate TRACE checkpoints (pattern_inference.cpp:531,542,551,562)",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/pattern_stage_trace.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
         {
           "name": "Reached non-ground Skolem exclusion CTRACE at pattern_inference.cpp:493 with source conditional gate and SMT2 body",
           "status": "ported",
@@ -180684,6 +180691,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/pattern_stage_trace.go",
         "pkg/ast/pattern/preferred_pattern.go",
         "pkg/ast/pattern/contains_subpattern.go",
         "pkg/ast/pattern/collect.go",
@@ -180888,6 +180896,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached mk_patterns initial, post-loop-filter, post-bigger-filter and post-sort candidate TRACE checkpoints (pattern_inference.cpp:531,542,551,562)",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/pattern_stage_trace.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
         {
           "name": "Reached non-ground Skolem exclusion CTRACE at pattern_inference.cpp:493 with source conditional gate and SMT2 body",
           "status": "ported",
@@ -182637,6 +182651,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/pattern_stage_trace.go",
         "pkg/ast/pattern/preferred_pattern.go",
         "pkg/ast/pattern/contains_subpattern.go",
         "pkg/ast/pattern/collect.go",
@@ -182849,6 +182864,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached mk_patterns initial, post-loop-filter, post-bigger-filter and post-sort candidate TRACE checkpoints (pattern_inference.cpp:531,542,551,562)",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/pattern_stage_trace.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
         {
           "name": "Reached non-ground Skolem exclusion CTRACE at pattern_inference.cpp:493 with source conditional gate and SMT2 body",
           "status": "ported",

@@ -3,6 +3,7 @@ package pattern
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -275,4 +276,57 @@ func TestPatternCollectInfoSourceSMT2Trace(t *testing.T) {
 	if len(c.candidates) != 1 || c.candidates[0] != skolemApp || output.Len() != 0 {
 		t.Fatal("Skolem avoidance off must admit candidate without exclusion trace", c.candidates, output.String())
 	}
+	y, err := m.MkVar(1, boolSort)
+	patternMust(t, err)
+	patternMust(t, m.IncRef(y))
+	t.Cleanup(func() { patternMust(t, m.DecRef(y)) })
+	gName, err := sy.Intern("collect-g")
+	patternMust(t, err)
+	gApp := makeUnary(gName, y)
+	body, err := m.MkFamilyApp(m.BasicFamilyID(), ast.ASTOpAnd, nil, []ast.ASTHandle{app, gApp})
+	patternMust(t, err)
+	patternMust(t, m.IncRef(body))
+	t.Cleanup(func() { patternMust(t, m.DecRef(body)) })
+	patternMust(t, c.resetCandidates())
+	c.avoidSkolems = true
+	output.Reset()
+	tags.Disable("pattern_inference_skolem")
+	tags.Enable("pattern_inference")
+	results, err := c.inferPatternBody(body, 2, nil, 0)
+	patternMust(t, err)
+	if len(results) != 1 {
+		t.Fatal("two partial candidates must produce one multi-pattern", len(results))
+	}
+	patternMust(t, m.DelRef(&results[0]))
+	if tags.ShouldTrace("pattern_inference") {
+		candidateRows := "(collect-f (:var 0))\n(collect-g (:var 1))\n"
+		stages := []struct {
+			line int
+			body string
+		}{
+			{531, "(and (collect-f (:var 0)) (collect-g (:var 1)))\ncandidates:\n" + candidateRows},
+			{542, "candidates after removing looping-patterns:\n" + candidateRows},
+			{551, "candidates after removing bigger patterns:\n" + candidateRows},
+			{562, "candidates after sorting:\n" + candidateRows},
+		}
+		previousEnd := 0
+		for _, stage := range stages {
+			record := fmt.Sprintf("-------- [pattern_inference] mk_patterns src/ast/pattern/pattern_inference.cpp:%d ---------\n%s------------------------------------------------\n", stage.line, stage.body)
+			at := strings.Index(output.String(), record)
+			if at < previousEnd || strings.Count(output.String(), record) != 1 {
+				t.Fatalf("source candidate stage %d order/body: output %q, record %q", stage.line, output.String(), record)
+			}
+			previousEnd = at + len(record)
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("erased stage traces wrote output", output.String())
+	}
+	output.Reset()
+	tags.Disable("pattern_inference")
+	results, err = c.inferPatternBody(body, 2, nil, 0)
+	patternMust(t, err)
+	if len(results) != 1 || output.Len() != 0 {
+		t.Fatal("disabled stage traces changed multi-pattern or emitted output", len(results), output.String())
+	}
+	patternMust(t, m.DelRef(&results[0]))
 }

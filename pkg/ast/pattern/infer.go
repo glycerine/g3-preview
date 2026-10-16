@@ -24,5 +24,8 @@ func (c *patternCandidates) inferPatternBody(body ast.ASTHandle, numBindings uin
 	if err = c.collect(body); err != nil {
 		return nil, err
 	}
+	if err = c.tracePatternStage(531, body, c.candidates); err != nil {
+		return nil, err
+	}
 	return c.selectPatterns(maxExtraMulti)
 }

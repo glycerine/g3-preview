@@ -17,6 +17,9 @@ func (c *patternCandidates) selectPatterns(maxExtraMulti uint32) ([]ast.ASTRef, 
 	if err != nil {
 		return nil, err
 	}
+	if err = c.tracePatternStage(542, ast.ASTHandle{}, loopFiltered); err != nil {
+		return nil, err
+	}
 	if len(loopFiltered) == 0 {
 		return nil, ast.ErrASTDomain
 	}
@@ -26,6 +29,9 @@ func (c *patternCandidates) selectPatterns(maxExtraMulti uint32) ([]ast.ASTRef, 
 	}
 	filtered, err := c.filterBigger(loopFiltered)
 	if err != nil {
+		return nil, err
+	}
+	if err = c.tracePatternStage(551, ast.ASTHandle{}, filtered); err != nil {
 		return nil, err
 	}
 	if len(filtered) == 0 {
@@ -45,6 +51,9 @@ func (c *patternCandidates) selectPatterns(maxExtraMulti uint32) ([]ast.ASTRef, 
 		return unary, nil
 	}
 	if err := c.sortByWeight(remaining); err != nil {
+		return unary, err
+	}
+	if err := c.tracePatternStage(562, ast.ASTHandle{}, remaining); err != nil {
 		return unary, err
 	}
 	return c.selectMulti(remaining, multiLimit, unary)
