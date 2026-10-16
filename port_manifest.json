@@ -169258,7 +169258,7 @@
         "TestIntegerModularHeaderRefusalAndWarm",
         "TestIntegerModularCompleteScalarRoutes",
         "TestIntegerModularConversionOverloadsAndDisplay",
-        "TestIntegerModularStringSourceAssertionActions",
+        "TestIntegerModularScalarSourceAssertionActions",
         "TestIntegerModularPredictableFailurePrefixes",
         "TestIntegerModularPowerRawLocalSourceEndAndOwningRetry",
         "TestIntegerModularCloseRetainsStoppedDestructorSuffix",
@@ -169561,7 +169561,7 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpzzp_ops.go",
           "tests": [
-            "TestIntegerModularStringSourceAssertionActions",
+            "TestIntegerModularScalarSourceAssertionActions",
             "TestIntegerModularConversionOverloadsAndDisplay"
           ]
         },
@@ -169570,12 +169570,21 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpzzp_ops.go",
           "tests": [
-            "TestIntegerModularStringSourceAssertionActions",
+            "TestIntegerModularScalarSourceAssertionActions",
             "TestIntegerModularCompleteScalarRoutes"
           ]
         },
         {
-          "name": "Remaining scalar predicates/arithmetic/fused/sets/const-mutable conversion/bit/log/root/formatting overloads beyond separately ported to_string assertion",
+          "name": "mpzzp add/sub/inc/dec/mul/addmul/submul/swap normalization SASSERTs at mpzzp.h:150-162,188 with source-order process actions before mutation",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp_ops.go",
+          "tests": [
+            "TestIntegerModularScalarSourceAssertionActions",
+            "TestIntegerModularFusedLargeAliasOracle"
+          ]
+        },
+        {
+          "name": "Remaining scalar arithmetic/fused/sets/const-mutable conversion/bit/log/root/formatting overloads beyond separately ported source assertions",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpzzp_ops.go",
           "tests": [

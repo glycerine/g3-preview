@@ -14,9 +14,9 @@ import (
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-// Source: src/util/mpzzp.h:146. The assertion precedes integer formatting.
-func TestIntegerModularStringSourceAssertionActions(t *testing.T) {
-	m, _, _ := modularManager(t, 7)
+// Source: src/util/mpzzp.h:133-162,188. Assertions precede scalar operations.
+func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
+	m, z, _ := modularManager(t, 7)
 	a := NewInt(8) // outside the centered [-3, 3] residue interval
 	budget := arena.NewBudget(^uint64(0))
 	region, e := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: budget}})
@@ -25,7 +25,7 @@ func TestIntegerModularStringSourceAssertionActions(t *testing.T) {
 	serviceMust(t, e)
 	in, e := os.CreateTemp(t.TempDir(), "mpzzp-assert-input-*")
 	serviceMust(t, e)
-	_, e = in.WriteString("CTCTCTCTCTCTCT")
+	_, e = in.WriteString(strings.Repeat("CT", 12))
 	serviceMust(t, e)
 	_, e = in.Seek(0, 0)
 	serviceMust(t, e)
@@ -85,6 +85,47 @@ func TestIntegerModularStringSourceAssertionActions(t *testing.T) {
 			t.Fatal("Throw must stop before the raw scalar operation", i, e)
 		}
 	}
+	outValue := NewInt(99)
+	if e := m.Add(&a, &b, &outValue); e != nil {
+		t.Fatal("Add Continue must reach arithmetic", e)
+	}
+	modularValue(t, z, &outValue, 1)
+	outValue = NewInt(99)
+	if e := m.Sub(&a, &b, &outValue); !errors.As(e, &thrown) || outValue.Val != 99 {
+		t.Fatal("Sub Throw must precede output mutation", outValue, e)
+	}
+	v := NewInt(8)
+	if e := m.Inc(&v); e != nil {
+		t.Fatal("Inc Continue must reach mutation", e)
+	}
+	modularValue(t, z, &v, 2)
+	v = NewInt(8)
+	if e := m.Dec(&v); !errors.As(e, &thrown) || v.Val != 8 {
+		t.Fatal("Dec Throw must precede mutation", v, e)
+	}
+	if e := m.Mul(&a, &b, &outValue); e != nil {
+		t.Fatal("Mul Continue must reach arithmetic", e)
+	}
+	modularValue(t, z, &outValue, 0)
+	outValue = NewInt(99)
+	if e := m.AddMul(&a, &b, &b, &outValue); !errors.As(e, &thrown) || outValue.Val != 99 {
+		t.Fatal("AddMul Throw must precede output mutation", outValue, e)
+	}
+	if e := m.SubMul(&a, &b, &b, &outValue); e != nil {
+		t.Fatal("SubMul first Continue must reach arithmetic", e)
+	}
+	modularValue(t, z, &outValue, 1)
+	outValue = NewInt(99)
+	if e := m.SubMul(&b, &a, &b, &outValue); !errors.As(e, &thrown) || outValue.Val != 99 {
+		t.Fatal("SubMul second Throw must precede output mutation", outValue, e)
+	}
+	if e := m.SubMul(&b, &b, &a, &outValue); e != nil {
+		t.Fatal("SubMul third Continue must reach arithmetic", e)
+	}
+	modularValue(t, z, &outValue, 0)
+	if e := m.Swap(&a, &b); !errors.As(e, &thrown) || a.Val != 8 || b.Val != 0 {
+		t.Fatal("Swap Throw must precede receiver mutation", a, b, e)
+	}
 	serviceMust(t, d.EnableAssertions(false))
 	if got, e := m.String(&a); e != nil || got != "8" {
 		t.Fatal("disabled source assertion must leave numeral readable", got, e)
@@ -92,11 +133,17 @@ func TestIntegerModularStringSourceAssertionActions(t *testing.T) {
 	if _, e := m.Greater(&a, &b); e != nil {
 		t.Fatal("disabled pair assertion must reach comparison", e)
 	}
+	if e := m.Add(&a, &b, &outValue); e != nil {
+		t.Fatal("disabled arithmetic assertion must reach addition", e)
+	}
 	data, e := os.ReadFile(out.Name())
 	serviceMust(t, e)
 	if strings.Count(string(data), "File: src/util/mpzzp.h\nLine: 146\n") != 2 ||
-		strings.Count(string(data), "is_p_normalized(a)\n") != 9 ||
-		strings.Count(string(data), "is_p_normalized(a) && is_p_normalized(b)\n") != 5 {
+		strings.Count(string(data), "is_p_normalized(a)\n") != 12 ||
+		strings.Count(string(data), "is_p_normalized(a) && is_p_normalized(b)\n") != 9 ||
+		strings.Count(string(data), "is_p_normalized(a) && is_p_normalized(b) && is_p_normalized(c)\n") != 1 ||
+		strings.Count(string(data), "Line: 161\nis_p_normalized(b)\n") != 1 ||
+		strings.Count(string(data), "Line: 162\nis_p_normalized(c)\n") != 1 {
 		t.Fatal("missing source assertion records", string(data))
 	}
 	for line := 133; line <= 144; line++ {
@@ -104,9 +151,14 @@ func TestIntegerModularStringSourceAssertionActions(t *testing.T) {
 			t.Fatal("missing scalar assertion source line", line, string(data))
 		}
 	}
+	for _, line := range []int{150, 151, 152, 153, 154, 156, 160, 161, 162, 188} {
+		if strings.Count(string(data), "Line: "+strconv.Itoa(line)+"\n") != 1 {
+			t.Fatal("missing arithmetic assertion source line", line, string(data))
+		}
+	}
 	state, e := input.State()
 	serviceMust(t, e)
-	if state.Position != 14 {
+	if state.Position != 24 {
 		t.Fatal("disabled assertion consumed an action", state.Position)
 	}
 }

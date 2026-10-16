@@ -6,6 +6,10 @@ import "github.com/glycerine/g3/pkg/util/diagnostic"
 // These sites share the same predicate, but retain their distinct source
 // locations and the left-before-right short circuit of binary assertions.
 func (m *IntegerModularManager) sourceAssertNormalized(a *Int, line int32) error {
+	return m.sourceAssertNormalizedNamed(a, line, "is_p_normalized(a)")
+}
+
+func (m *IntegerModularManager) sourceAssertNormalizedNamed(a *Int, line int32, condition string) error {
 	if !diagnostic.DebugBuild {
 		return nil
 	}
@@ -18,7 +22,7 @@ func (m *IntegerModularManager) sourceAssertNormalized(a *Int, line int32) error
 	if e != nil || ok {
 		return e
 	}
-	return diagnostic.DebugAssertionFailure(d, "src/util/mpzzp.h", line, "is_p_normalized(a)")
+	return diagnostic.DebugAssertionFailure(d, "src/util/mpzzp.h", line, condition)
 }
 
 func (m *IntegerModularManager) sourceAssertNormalizedPair(a, b *Int, line int32) error {
@@ -45,6 +49,27 @@ func (m *IntegerModularManager) sourceAssertNormalizedPair(a, b *Int, line int32
 		return nil
 	}
 	return diagnostic.DebugAssertionFailure(d, "src/util/mpzzp.h", line, "is_p_normalized(a) && is_p_normalized(b)")
+}
+
+func (m *IntegerModularManager) sourceAssertNormalizedTriple(a, b, c *Int, line int32) error {
+	if !diagnostic.DebugBuild {
+		return nil
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil || !enabled {
+		return e
+	}
+	for _, v := range []*Int{a, b, c} {
+		ok, e := m.IsPNormalized(v)
+		if e != nil {
+			return e
+		}
+		if !ok {
+			return diagnostic.DebugAssertionFailure(d, "src/util/mpzzp.h", line, "is_p_normalized(a) && is_p_normalized(b) && is_p_normalized(c)")
+		}
+	}
+	return nil
 }
 
 func (m *IntegerModularManager) Reset(a *Int) error {
@@ -104,7 +129,7 @@ func (m *IntegerModularManager) Inc(a *Int) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.AssertNormalized(a); e != nil {
+	if e := m.sourceAssertNormalized(a, 152); e != nil {
 		return e
 	}
 	if e := m.manager.Inc(a); e != nil {
@@ -116,7 +141,7 @@ func (m *IntegerModularManager) Dec(a *Int) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.AssertNormalized(a); e != nil {
+	if e := m.sourceAssertNormalized(a, 153); e != nil {
 		return e
 	}
 	if e := m.manager.Dec(a); e != nil {
@@ -132,10 +157,7 @@ func (m *IntegerModularManager) addWithSourceContext(a, b, c *Int, context integ
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.AssertNormalized(a); e != nil {
-		return e
-	}
-	if e := m.AssertNormalized(b); e != nil {
+	if e := m.sourceAssertNormalizedPair(a, b, 150); e != nil {
 		return e
 	}
 	if e := m.manager.addSubWithAllocationContext(a, b, c, false, context); e != nil {
@@ -150,10 +172,7 @@ func (m *IntegerModularManager) subWithSourceContext(a, b, c *Int, context integ
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.AssertNormalized(a); e != nil {
-		return e
-	}
-	if e := m.AssertNormalized(b); e != nil {
+	if e := m.sourceAssertNormalizedPair(a, b, 151); e != nil {
 		return e
 	}
 	if e := m.manager.addSubWithAllocationContext(a, b, c, true, context); e != nil {
@@ -169,10 +188,7 @@ func (m *IntegerModularManager) mulWithSourceContext(a, b, c *Int, context integ
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.AssertNormalized(a); e != nil {
-		return e
-	}
-	if e := m.AssertNormalized(b); e != nil {
+	if e := m.sourceAssertNormalizedPair(a, b, 154); e != nil {
 		return e
 	}
 	if e := m.manager.mulWithAllocationContext(a, b, c, context); e != nil {
@@ -188,13 +204,7 @@ func (m *IntegerModularManager) addMulWithSourceContext(a, b, c, d *Int, child *
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.AssertNormalized(a); e != nil {
-		return e
-	}
-	if e := m.AssertNormalized(b); e != nil {
-		return e
-	}
-	if e := m.AssertNormalized(c); e != nil {
+	if e := m.sourceAssertNormalizedTriple(a, b, c, 156); e != nil {
 		return e
 	}
 	if e := m.manager.addMulWithAllocationContext(a, b, c, d, child, context); e != nil {
@@ -209,13 +219,13 @@ func (m *IntegerModularManager) subMulWithSourceContext(a, b, c, d *Int, child *
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.AssertNormalized(a); e != nil {
+	if e := m.sourceAssertNormalized(a, 160); e != nil {
 		return e
 	}
-	if e := m.AssertNormalized(b); e != nil {
+	if e := m.sourceAssertNormalizedNamed(b, 161, "is_p_normalized(b)"); e != nil {
 		return e
 	}
-	if e := m.AssertNormalized(c); e != nil {
+	if e := m.sourceAssertNormalizedNamed(c, 162, "is_p_normalized(c)"); e != nil {
 		return e
 	}
 	if e := m.manager.addSubMulWithAllocationContext(a, b, c, d, true, child, context); e != nil {
@@ -335,10 +345,7 @@ func (m *IntegerModularManager) Swap(a, b *Int) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.AssertNormalized(a); e != nil {
-		return e
-	}
-	if e := m.AssertNormalized(b); e != nil {
+	if e := m.sourceAssertNormalizedPair(a, b, 188); e != nil {
 		return e
 	}
 	return m.manager.Swap(a, b)
