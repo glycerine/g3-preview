@@ -183790,7 +183790,6 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/productiter/next.go",
-        "pkg/util/random/generator.go",
         "pkg/util/numeral/mpz_log.go",
         "pkg/util/sexpr/util_sexpr.go",
         "pkg/util/escaped/escaped.go",
@@ -183805,9 +183804,6 @@
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
-        "TestSourceRandomVectors",
-        "TestShuffleTraversal",
-        "TestSourceZeroSeed",
         "TestRationalSourcePrevPowerOfTwo",
         "TestIntegerSourceLogBounds",
         "TestIntegerLogSignsSizesAndOwnership",
@@ -183828,39 +183824,9 @@
         "TestProcessVerboseGlobalsDefaultAndBorrowedSelection",
         "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
-        {
-          "name": "random_gen::operator()",
-          "status": "ported",
-          "go_target": "pkg/util/random/generator.go",
-          "tests": [
-            "TestSourceRandomVectors",
-            "TestShuffleTraversal",
-            "TestSourceZeroSeed"
-          ]
-        },
-        {
-          "name": "random_gen::set_seed",
-          "status": "ported",
-          "go_target": "pkg/util/random/generator.go",
-          "tests": [
-            "TestSourceRandomVectors",
-            "TestShuffleTraversal",
-            "TestSourceZeroSeed"
-          ]
-        },
-        {
-          "name": "shuffle",
-          "status": "ported",
-          "go_target": "pkg/util/random/generator.go",
-          "tests": [
-            "TestSourceRandomVectors",
-            "TestShuffleTraversal",
-            "TestSourceZeroSeed"
-          ]
-        },
         {
           "name": "log2(unsigned) concrete mask primitive",
           "status": "ported",
@@ -183876,7 +183842,7 @@
           ]
         },
         {
-          "name": "escaped constructor and end nullable first-NUL/LF suffix selection (h379-389,cpp122-136)",
+          "name": "escaped::end nullable first-NUL/LF suffix selection (cpp122-136)",
           "status": "ported",
           "go_target": "pkg/util/escaped/escaped.go",
           "tests": [
@@ -183886,7 +183852,7 @@
           ]
         },
         {
-          "name": "escaped display and stream insertion through io.Writer (cpp138-152)",
+          "name": "escaped::display through io.Writer (cpp138-152)",
           "status": "ported",
           "go_target": "pkg/util/escaped/escaped.go",
           "tests": [
@@ -183947,9 +183913,9 @@
         }
       ],
       "ownership": [
-        "Random state owner-local, shuffle borrows caller sequence. Other util methods unported.",
+        "The two process verbosity globals retain a uint32 level and borrow the selected stream; the default Go stream borrows os.Stderr. The explicit VerboseContext is a separately charged Go owner used by retained callers, with no C++ util.cpp allocation claim.",
         "The escaped leaf borrows nullable input synchronously and writes to a caller-owned io.Writer or returns a caller-owned string. Standard library builders replace C++ vector and stream storage.",
-        "Actual cold charged VerboseContext owns the unsigned level and borrows selected NumericTextStream pointer. Get/set stream does not touch borrowed stream lifetime; reached insertion performs its existing guards. Allocator borrows optional getter interface, no shadow mutable scalar or source allocation events."
+        "The reached log2 and product-iterator functions borrow scalar or caller-owned coordinate storage and allocate no source object. The fatal-error callback global stays null because no retained setter caller exists; its default process-exit path belongs to unported model and MUZ owners. No util.cpp constructor, destructor, alloc or dealloc site remains outside those recorded owners."
       ],
       "deviations": [
         "Standard io.Writer and strings.Builder replace source ostream and custom buffer machinery. Quote, null, trim and indentation bytes are preserved; String refuses outputs above its explicit safe allocation bound. C++ ostream badbit, exception flags, and formatting state are standard-library internals rather than project escaped behavior and are excluded; Go Write reports io.Writer errors.",
