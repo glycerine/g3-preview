@@ -39,7 +39,9 @@ digraph packages {
   "ast/pattern" -> "ast";
   "ast/pattern" -> "ast/rewriter";
   "ast/pattern" -> "util/diagnostic";
+  "ast/pattern" -> "util/params";
   "ast/pattern" -> "util/symbol";
+  "ast/pattern" -> "util/text";
   "ast/proofs" [style=filled, fillcolor="#eeeeee"];
   "ast/proofs" -> "ast";
   "ast/rewriter" [style=filled, fillcolor="#eeeeee"];
@@ -190,6 +192,7 @@ digraph packages {
   "sat/tactic" -> "util/control";
   "sat/tactic" -> "util/cooperate";
   "sat/tactic" -> "util/lbool";
+  "sat/tactic" -> "util/memory";
   "shell" [style=filled, fillcolor="#eeeeee"];
   "shell" -> "arena";
   "shell" -> "util/control";
