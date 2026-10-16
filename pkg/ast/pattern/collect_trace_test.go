@@ -240,4 +240,39 @@ func TestPatternCollectInfoSourceSMT2Trace(t *testing.T) {
 		t.Fatal("disabled preferred trace changed selection or emitted output", found, len(preferred), output.String())
 	}
 	patternMust(t, m.DelRef(&preferred[0]))
+	patternMust(t, c.resetCandidates())
+	skolemName, err := sy.Intern("collect-skolem")
+	patternMust(t, err)
+	info, err := m.NewFuncDeclInfo(ast.NullFamilyID, -1, nil, ast.ASTFuncFlags{Skolem: true}, false)
+	patternMust(t, err)
+	t.Cleanup(func() { patternMust(t, m.DelFuncDeclInfo(&info)) })
+	skolemDecl, err := m.MkFuncDecl(skolemName, []ast.ASTHandle{boolSort}, boolSort, info)
+	patternMust(t, err)
+	patternMust(t, m.IncRef(skolemDecl))
+	t.Cleanup(func() { patternMust(t, m.DecRef(skolemDecl)) })
+	skolemApp, err := m.MkApp(skolemDecl, []ast.ASTHandle{x})
+	patternMust(t, err)
+	patternMust(t, m.IncRef(skolemApp))
+	t.Cleanup(func() { patternMust(t, m.DecRef(skolemApp)) })
+	output.Reset()
+	tags.Enable("pattern_inference_skolem")
+	patternMust(t, c.collect(skolemApp))
+	if len(c.candidates) != 0 {
+		t.Fatal("source Skolem candidate must be excluded", c.candidates)
+	}
+	if tags.ShouldTrace("pattern_inference_skolem") {
+		want := "-------- [pattern_inference_skolem] is_forbidden src/ast/pattern/pattern_inference.cpp:493 ---------\n" +
+			"ignoring: (collect-skolem (:var 0))\n------------------------------------------------\n"
+		if output.String() != want {
+			t.Fatalf("Skolem exclusion trace: got %q, want %q", output.String(), want)
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("erased Skolem trace wrote output", output.String())
+	}
+	c.avoidSkolems = false
+	output.Reset()
+	patternMust(t, c.collect(skolemApp))
+	if len(c.candidates) != 1 || c.candidates[0] != skolemApp || output.Len() != 0 {
+		t.Fatal("Skolem avoidance off must admit candidate without exclusion trace", c.candidates, output.String())
+	}
 }

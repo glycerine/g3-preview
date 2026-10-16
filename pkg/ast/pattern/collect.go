@@ -63,8 +63,14 @@ func (c *patternCandidates) forbiddenApp(n ast.ASTHandle) (bool, error) {
 	}
 	if c.avoidSkolems {
 		skolem, e := c.manager.IsSkolemDecl(decl)
-		if e != nil || skolem {
-			return skolem, e
+		if e != nil {
+			return false, e
+		}
+		if skolem {
+			if e = c.traceForbiddenSkolem(n); e != nil {
+				return false, e
+			}
+			return true, nil
 		}
 	}
 	family, err := c.manager.GetFamilyID(decl)
@@ -337,6 +343,29 @@ func (c *patternCandidates) tracePotentialCandidate(node ast.ASTHandle) error {
 	return tags.EmitConditional("pattern_inference", "save_candidate", "src/ast/pattern/pattern_inference.cpp", 251,
 		func() bool { return true }, func(w io.Writer) error {
 			if _, err := io.WriteString(w, "potential candidate: \n"); err != nil {
+				return err
+			}
+			if err := c.writePatternSMT2(w, node); err != nil {
+				return err
+			}
+			_, err := io.WriteString(w, "\n")
+			return err
+		})
+}
+
+// Source: src/ast/pattern/pattern_inference.cpp:493. This CTRACE runs only
+// for a non-ground application whose declaration is Skolem and avoidance is on.
+func (c *patternCandidates) traceForbiddenSkolem(node ast.ASTHandle) error {
+	tags := c.traceTags
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	if !tags.ShouldTrace("pattern_inference_skolem") {
+		return nil
+	}
+	return tags.EmitConditional("pattern_inference_skolem", "is_forbidden", "src/ast/pattern/pattern_inference.cpp", 493,
+		func() bool { return true }, func(w io.Writer) error {
+			if _, err := io.WriteString(w, "ignoring: "); err != nil {
 				return err
 			}
 			if err := c.writePatternSMT2(w, node); err != nil {

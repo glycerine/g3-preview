@@ -18878,6 +18878,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Reached non-ground Skolem exclusion CTRACE at pattern_inference.cpp:493 with source conditional gate and SMT2 body",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/collect.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
+        {
           "name": "Reached complete preferred-pattern TRACE at pattern_inference.cpp:510 before singleton-pattern construction",
           "status": "ported",
           "go_target": "pkg/ast/pattern/preferred_pattern.go",
@@ -180883,6 +180889,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Reached non-ground Skolem exclusion CTRACE at pattern_inference.cpp:493 with source conditional gate and SMT2 body",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/collect.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
+        {
           "name": "Reached complete preferred-pattern TRACE at pattern_inference.cpp:510 before singleton-pattern construction",
           "status": "ported",
           "go_target": "pkg/ast/pattern/preferred_pattern.go",
@@ -182837,6 +182849,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached non-ground Skolem exclusion CTRACE at pattern_inference.cpp:493 with source conditional gate and SMT2 body",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/collect.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
         {
           "name": "Reached complete preferred-pattern TRACE at pattern_inference.cpp:510 before singleton-pattern construction",
           "status": "ported",
