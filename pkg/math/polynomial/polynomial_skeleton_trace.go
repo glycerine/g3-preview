@@ -3,6 +3,32 @@ package polynomial
 
 import "io"
 
+func (m *MonomialManager) traceSkeletonLexCompare(a, b Monomial, min uint32) error {
+	tags := m.monomialTraceTags()
+	if !tags.ShouldTrace("lex_bug") {
+		return nil
+	}
+	var formatErr error
+	_ = tags.EmitConditional("lex_bug", "operator()", "src/math/polynomial/polynomial.cpp", 684,
+		func() bool { return true }, func(w io.Writer) error {
+			sink := &polynomialTraceSink{writer: w}
+			_ = sink.WriteLiteral("min: x")
+			_ = sink.WriteUnsigned(min)
+			_ = sink.WriteLiteral("\n")
+			formatErr = m.DisplayInto(a, sink, false)
+			if formatErr != nil {
+				return formatErr
+			}
+			_ = sink.WriteLiteral("\n")
+			formatErr = m.DisplayInto(b, sink, false)
+			if formatErr != nil {
+				return formatErr
+			}
+			return sink.WriteLiteral("\n")
+		})
+	return formatErr
+}
+
 func (s *PolynomialSkeleton) traceConstruction(p Polynomial) error {
 	m := s.owner
 	tags := m.monomials.monomialTraceTags()

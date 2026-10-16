@@ -43179,6 +43179,12 @@
           ]
         },
         {
+          "name": "Retained skeleton lex_lt2 comparator TRACE at polynomial.cpp:684 on native Go sort calls",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_skeleton_trace.go",
+          "tests": ["TestPolynomialSkeletonLexComparatorTraceUsesLiveGoSortCalls"]
+        },
+        {
           "name": "Retained polynomial skeleton grouped-power TRACE at polynomial.cpp:3012",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_skeleton_trace.go",
@@ -45993,6 +45999,12 @@
             "TestPolynomialVariableRecognitionLiteralWritePrefixes",
             "TestPolynomialVariableRecognitionBIGEveryActualPrefix"
           ]
+        },
+        {
+          "name": "Retained skeleton lex_lt2 comparator TRACE at polynomial.cpp:684 on native Go sort calls",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_skeleton_trace.go",
+          "tests": ["TestPolynomialSkeletonLexComparatorTraceUsesLiveGoSortCalls"]
         },
         {
           "name": "Retained polynomial skeleton grouped-power TRACE at polynomial.cpp:3012",
@@ -183352,6 +183364,12 @@
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
         },
         {
+          "name": "Retained skeleton lex_lt2 comparator TRACE at polynomial.cpp:684 on native Go sort calls",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_skeleton_trace.go",
+          "tests": ["TestPolynomialSkeletonLexComparatorTraceUsesLiveGoSortCalls"]
+        },
+        {
           "name": "Retained polynomial skeleton grouped-power TRACE at polynomial.cpp:3012",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_skeleton_trace.go",
@@ -185567,6 +185585,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
+        },
+        {
+          "name": "Retained skeleton lex_lt2 comparator TRACE at polynomial.cpp:684 on native Go sort calls",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_skeleton_trace.go",
+          "tests": ["TestPolynomialSkeletonLexComparatorTraceUsesLiveGoSortCalls"]
         },
         {
           "name": "Retained polynomial skeleton grouped-power TRACE at polynomial.cpp:3012",

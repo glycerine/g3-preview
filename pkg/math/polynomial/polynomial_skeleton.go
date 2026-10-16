@@ -68,6 +68,10 @@ func NewPolynomialSkeleton(m *MultivariatePolynomialCore, p Polynomial, x uint32
 		if sortErr != nil {
 			return false
 		}
+		if e := m.monomials.traceSkeletonLexCompare(ms[i], ms[j], x); e != nil {
+			sortErr = e
+			return false
+		}
 		v, e := m.monomials.LexWithMinimum(ms[i], ms[j], x)
 		sortErr = e
 		return e == nil && v < 0
