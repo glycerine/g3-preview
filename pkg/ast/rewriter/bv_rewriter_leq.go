@@ -225,14 +225,20 @@ func (p *BVRewriter) leBody(v *bvLEInvocation, signed bool, a, b ast.ASTHandle, 
 	}
 	if p.polynomial.config.bitVector.LEExtra {
 		st, e := p.rewriteLEConcat(signed, a, b, out)
-		if e != nil || st != RewriteFailed {
+		if e != nil {
 			return failed, st, true, e
+		}
+		if st != RewriteFailed {
+			return failed, st, true, p.traceLEExtra(514, signed, a, b, out)
 		}
 	}
 	if p.polynomial.config.bitVector.LEExtra {
 		st, e := p.rewriteLEOverflow(signed, a, b, out)
-		if e != nil || st != RewriteFailed {
+		if e != nil {
 			return failed, st, true, e
+		}
+		if st != RewriteFailed {
+			return failed, st, true, p.traceLEExtra(523, signed, a, b, out)
 		}
 	}
 	if !signed {

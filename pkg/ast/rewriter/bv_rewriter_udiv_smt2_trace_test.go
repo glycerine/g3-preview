@@ -7,28 +7,12 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
-	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 func TestBVRewriterUnsignedDivisionSMT2SourceTrace(t *testing.T) {
 	c, g, _ := bvPolynomialParamsFixture(t)
 	m, _ := bvAddFixture(t)
-	context, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.Budget()})
-	astTestMust(t, err)
-	catalog, err := uparams.NewGlobalParamsCatalog(m.Symbols, uparams.GlobalParamsCatalogConfig{Budget: m.Budget()})
-	astTestMust(t, err)
-	globals, err := uparams.NewGlobalParamsService(m.Symbols, context, uparams.GlobalParamsConfig{Budget: m.Budget(), Catalog: catalog})
-	astTestMust(t, err)
-	astTestMust(t, globals.InitializeSource())
-	previous, err := uparams.BindProcessGlobalParamsService(globals)
-	astTestMust(t, err)
-	t.Cleanup(func() {
-		_, e := uparams.BindProcessGlobalParamsService(previous)
-		astTestMust(t, e)
-		astTestMust(t, globals.Close())
-		astTestMust(t, catalog.Close())
-		astTestMust(t, context.Close())
-	})
+	bindBVTraceGlobals(t, m)
 	local, err := c.NewValue()
 	astTestMust(t, err)
 	defer func() { astTestMust(t, c.Del(&local)) }()

@@ -11,14 +11,14 @@ import (
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
-func (p *BVRewriter) unsignedDivisionTraceTags() *diagnostic.TraceTags {
+func (p *BVRewriter) bvTraceTags() *diagnostic.TraceTags {
 	if p.trace != nil {
 		return p.trace
 	}
 	return diagnostic.BorrowProcessTraceTags()
 }
 
-func (p *BVRewriter) writeUnsignedDivisionSMT2(w io.Writer, h ast.ASTHandle, globals *uparams.GlobalParamsService) (result error) {
+func (p *BVRewriter) writeBVTraceSMT2(w io.Writer, h ast.ASTHandle, globals *uparams.GlobalParamsService) (result error) {
 	format, err := p.manager.SMT2PPExprTree(h, nil)
 	if err != nil {
 		return err
@@ -41,7 +41,7 @@ func (p *BVRewriter) writeUnsignedDivisionSMT2(w io.Writer, h ast.ASTHandle, glo
 }
 
 func (p *BVRewriter) traceUnsignedDivisionOption(rhs ast.ASTHandle) error {
-	tags := p.unsignedDivisionTraceTags()
+	tags := p.bvTraceTags()
 	if !tags.ShouldTrace("udiv2mul") {
 		return nil
 	}
@@ -51,7 +51,7 @@ func (p *BVRewriter) traceUnsignedDivisionOption(rhs ast.ASTHandle) error {
 	}
 	return tags.EmitConditional("udiv2mul", "mk_bv_udiv_core", "src/ast/rewriter/bv_rewriter.cpp", 1040,
 		func() bool { return true }, func(w io.Writer) error {
-			if err := p.writeUnsignedDivisionSMT2(w, rhs, globals); err != nil {
+			if err := p.writeBVTraceSMT2(w, rhs, globals); err != nil {
 				return err
 			}
 			text := "0"
@@ -64,7 +64,7 @@ func (p *BVRewriter) traceUnsignedDivisionOption(rhs ast.ASTHandle) error {
 }
 
 func (p *BVRewriter) traceUnsignedDivisionRewrite(lhs, rhs, result ast.ASTHandle) error {
-	tags := p.unsignedDivisionTraceTags()
+	tags := p.bvTraceTags()
 	if !tags.ShouldTrace("bv_udiv") {
 		return nil
 	}
@@ -75,7 +75,7 @@ func (p *BVRewriter) traceUnsignedDivisionRewrite(lhs, rhs, result ast.ASTHandle
 	return tags.EmitConditional("bv_udiv", "mk_bv_udiv_core", "src/ast/rewriter/bv_rewriter.cpp", 1097,
 		func() bool { return true }, func(w io.Writer) error {
 			for _, h := range [...]ast.ASTHandle{lhs, rhs} {
-				if err := p.writeUnsignedDivisionSMT2(w, h, globals); err != nil {
+				if err := p.writeBVTraceSMT2(w, h, globals); err != nil {
 					return err
 				}
 				if _, err := io.WriteString(w, "\n"); err != nil {
@@ -85,7 +85,7 @@ func (p *BVRewriter) traceUnsignedDivisionRewrite(lhs, rhs, result ast.ASTHandle
 			if _, err := io.WriteString(w, "---->\n"); err != nil {
 				return err
 			}
-			if err := p.writeUnsignedDivisionSMT2(w, result, globals); err != nil {
+			if err := p.writeBVTraceSMT2(w, result, globals); err != nil {
 				return err
 			}
 			_, err := io.WriteString(w, "\n")
