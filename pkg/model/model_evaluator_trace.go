@@ -1,4 +1,4 @@
-// Source: src/model/model_evaluator.cpp:187,223,228,247,566; src/util/trace.h.
+// Source: src/model/model_evaluator.cpp:187,200,223,228,247,566; src/util/trace.h.
 package model
 
 import (
@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/ast/rewriter"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -101,6 +102,29 @@ func (c *evaluatorConfiguration) traceReduceApp(d ast.ASTHandle, args ast.AppArg
 				return err
 			}
 			if _, err = io.WriteString(w, "---->\n"); err != nil {
+				return err
+			}
+			if err = ev.writeSMT2(w, result); err != nil {
+				return err
+			}
+			_, err = io.WriteString(w, "\n")
+			return err
+		})
+}
+
+func (c *evaluatorConfiguration) traceReduceStatus(status rewriter.RewriteStatus, out ast.ASTRef) error {
+	if status == rewriter.RewriteFailed {
+		return nil
+	}
+	ev := c.owner
+	tags := ev.traceTags()
+	if !tags.ShouldTrace("model_evaluator") {
+		return nil
+	}
+	return tags.EmitConditional("model_evaluator", "reduce_app", "src/model/model_evaluator.cpp", 200,
+		func() bool { return true }, func(w io.Writer) error {
+			result, err := ev.model.manager.RefGet(out)
+			if err != nil {
 				return err
 			}
 			if err = ev.writeSMT2(w, result); err != nil {

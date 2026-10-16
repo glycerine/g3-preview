@@ -444,7 +444,21 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 				return rewriter.RewriteFailed, ErrModelEvaluatorTheory
 			}
 		}
-		return c.boolean.MkAppCore(d, args, out)
+		status, e := c.boolean.MkAppCore(d, args, out)
+		if e != nil {
+			return rewriter.RewriteFailed, e
+		}
+		final, e := c.evaluateReducedApp(status, out)
+		if e != nil {
+			return rewriter.RewriteFailed, e
+		}
+		if status == rewriter.RewriteDone && final == rewriter.Rewrite1 {
+			return final, nil
+		}
+		if e = c.traceReduceStatus(final, out); e != nil {
+			return rewriter.RewriteFailed, e
+		}
+		return final, nil
 	}
 	if fid == c.arrayFamily {
 		status, e := c.array.MkAppCore(d, args, out)

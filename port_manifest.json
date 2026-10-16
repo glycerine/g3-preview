@@ -57239,6 +57239,7 @@
         "pkg/model/model_evaluator_function_memory_trace_debug_test.go"
       ],
       "tests": [
+        "TestModelEvaluatorBooleanReductionSourceStatusTrace",
         "TestModelEvaluatorDirectEntrySourceTrace",
         "TestModelEvaluatorGetMacroSourceTraceBranches",
         "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose",
@@ -57307,6 +57308,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Selected Boolean reduce_app BR_DONE application relookup and conditional result CTRACE at model_evaluator.cpp:194-202",
+          "status": "partial",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "tests": ["TestModelEvaluatorBooleanReductionSourceStatusTrace"]
+        },
         {
           "name": "Reached model_evaluator::reduce_app direct function-entry TRACE at model_evaluator.cpp:187-191, with evaluated SMT2 arguments and result",
           "status": "ported",
@@ -180872,6 +180879,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestModelEvaluatorBooleanReductionSourceStatusTrace",
         "TestModelEvaluatorDirectEntrySourceTrace",
         "TestPatternCollectInfoSourceSMT2Trace",
         "TestPatternCollectSharedChildSourceStackTrace",
@@ -180993,6 +181001,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Selected Boolean reduce_app BR_DONE application relookup and conditional result CTRACE at model_evaluator.cpp:194-202",
+          "status": "partial",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "tests": ["TestModelEvaluatorBooleanReductionSourceStatusTrace"]
+        },
         {
           "name": "Reached model_evaluator::reduce_app direct function-entry TRACE at model_evaluator.cpp:187-191, with evaluated SMT2 arguments and result",
           "status": "ported",
@@ -182856,6 +182870,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestModelEvaluatorBooleanReductionSourceStatusTrace",
         "TestModelEvaluatorDirectEntrySourceTrace",
         "TestPatternCollectInfoSourceSMT2Trace",
         "TestPatternCollectSharedChildSourceStackTrace",
@@ -182987,6 +183002,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Selected Boolean reduce_app BR_DONE application relookup and conditional result CTRACE at model_evaluator.cpp:194-202",
+          "status": "partial",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "tests": ["TestModelEvaluatorBooleanReductionSourceStatusTrace"]
+        },
         {
           "name": "Reached model_evaluator::reduce_app direct function-entry TRACE at model_evaluator.cpp:187-191, with evaluated SMT2 arguments and result",
           "status": "ported",
