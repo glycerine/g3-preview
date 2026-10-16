@@ -4,6 +4,7 @@ package sat
 import (
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
+	"strconv"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
@@ -11,6 +12,7 @@ import (
 type satElimEqs struct {
 	self                                       *satElimEqs
 	closing                                    bool
+	solver                                     *Solver
 	lifecycle                                  *satSolverClauseLifecycle
 	borrowedRoots                              []Literal
 	borrowedElim                               []BoolVar
@@ -79,6 +81,7 @@ func (e *satElimEqs) execute() error {
 	if err := e.cleanupBinWatches(); err != nil {
 		return err
 	}
+	e.traceBinCleanup()
 	if err := e.cleanupClauses(false); err != nil {
 		return err
 	}
@@ -227,6 +230,7 @@ func (e *satElimEqs) cleanupClauses(learned bool) error {
 	vec := e.vector()
 	for i := uint32(0); i < e.end; i++ {
 		c := (*vec)[i]
+		e.traceClause(81, "processing: ", c, "")
 		sz, err := a.Size(c)
 		if err != nil {
 			return err
@@ -285,6 +289,7 @@ func (e *satElimEqs) cleanupClauses(learned bool) error {
 		if err = e.sortClause(c, sz); err != nil {
 			return err
 		}
+		e.traceClause(104, "after normalization/sorting: ", c, "")
 		prev := DefaultLiteral()
 		j := uint32(0)
 		for k = 0; k < sz; k++ {
@@ -331,6 +336,7 @@ func (e *satElimEqs) cleanupClauses(learned bool) error {
 			e.finish(e.out)
 			return nil
 		}
+		e.traceClause(138, "after removing duplicates: ", c, " j: "+strconv.FormatUint(uint64(j), 10))
 		if j < sz {
 			err = a.Shrink(c, j)
 		} else {
@@ -521,6 +527,7 @@ func (e *satElimEqs) saveElim() error {
 			if err != nil {
 				return err
 			}
+			e.traceSaveElim(v, lit, r)
 			if err = p.variables.setEliminated(v, true); err != nil {
 				return err
 			}
@@ -551,6 +558,7 @@ func (e *satElimEqs) checkClauses() error {
 				if err != nil {
 					return err
 				}
+				e.traceEliminatedClauseLiteral(elim, lit, c)
 				if elim {
 					return ErrSATAssertion
 				}

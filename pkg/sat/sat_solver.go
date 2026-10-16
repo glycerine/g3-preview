@@ -184,6 +184,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 		return s, err
 	}
 	s.scc.solver = s
+	s.scc.eliminator.solver = s
 	if s.asymm, err = newSATAsymmBranch(s.Lifecycle, &c.Params); err != nil {
 		return s, err
 	}

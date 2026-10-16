@@ -74698,26 +74698,21 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/sat/sat_scc.go",
         "pkg/sat/sat_elim_eqs.go",
+        "pkg/sat/sat_elim_eqs_trace.go",
+        "pkg/sat/sat_scc.go",
         "pkg/sat/sat_scc_test.go",
         "pkg/sat/sat_solver_clause_lifecycle.go"
       ],
       "tests": [
-        "TestSATSCCDefaultEquivalenceAndActualConverter",
-        "TestSATSCCExternalRootAndContradiction",
         "TestSATElimEqsAllClauseAritiesAndModels",
-        "TestSATSCCIndependentBoundedImplicationGraphs",
         "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
-        "TestSATSCCParametersAndNativeLocalStorage",
-        "TestSATSCCActualAllocationPrefixSweep",
-        "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
-        "TestSATSCCColdConstructionAndSourceStatWrap",
         "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
         "TestSATElimEqsOwningIdentityGuard",
         "TestSATElimEqsSortActualLargeBacking",
-        "TestSATSCCNativeFrameGrowthAndCleanup",
-        "TestSATSCCNativeDeepComponentsAndRepeat"
+        "TestSATElimEqsClauseAndModelSourceTraces",
+        "TestSATElimEqsFullSolverBinCleanupDisplaySourceTrace",
+        "TestSATElimEqsEliminatedLiteralSourceTraceBeforeAssertion"
       ],
       "assertions": [
         {
@@ -74757,32 +74752,29 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Selected SCC construction, parameters, statistics, iterative Tarjan and equivalence-elimination clause/model routes",
+          "name": "Reached SAT equivalence-elimination clause normalization, model deletion, invalid-literal CTRACE and full-solver display sites at sat_elim_eqs.cpp:81,104,138,187,205,216",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_elim_eqs_trace.go",
+          "tests": ["TestSATElimEqsClauseAndModelSourceTraces", "TestSATElimEqsFullSolverBinCleanupDisplaySourceTrace", "TestSATElimEqsEliminatedLiteralSourceTraceBeforeAssertion"]
+        },
+        {
+          "name": "Selected equivalence-elimination binary-watch, clause-normalization and model-converter routes",
           "status": "partial",
-          "go_target": "pkg/sat/sat_scc.go",
+          "go_target": "pkg/sat/sat_elim_eqs.go",
           "tests": [
-            "TestSATSCCDefaultEquivalenceAndActualConverter",
-            "TestSATSCCExternalRootAndContradiction",
             "TestSATElimEqsAllClauseAritiesAndModels",
-            "TestSATSCCIndependentBoundedImplicationGraphs",
             "TestSATElimEqsEmptyUnitUnaffectedAndExternal",
-            "TestSATSCCParametersAndNativeLocalStorage",
-            "TestSATSCCActualAllocationPrefixSweep",
-            "TestSATSCCCancelBeforeNodeAndCapturedPhysicalFrame",
-            "TestSATSCCColdConstructionAndSourceStatWrap",
             "TestSATElimEqsBinaryUnitConflictKeepsSourcePrefix",
             "TestSATElimEqsOwningIdentityGuard",
-            "TestSATElimEqsSortActualLargeBacking",
-            "TestSATSCCNativeFrameGrowthAndCleanup",
-            "TestSATSCCNativeDeepComponentsAndRepeat"
+            "TestSATElimEqsSortActualLargeBacking"
           ]
         }
       ],
       "ownership": [
-        "Fresh native Go traversal slices per run: uint32 indexes/lowlinks/stack, bool membership, Literal roots, BoolVar elimination order and typed frames borrowing actual watch iterators. Native backing is uncharged; real SCC owner headers remain charged. Equivalence elimination borrows native root/order slices through its existing concrete run route. Actual solver model converter, disjoint clause compaction prefix/suffix and standalone eliminator owner/lifecycle guards remain. The actual retained clause/model allocation sweep audits named Runtime roots before disabling faults; removed vector/frame backing contributes no refusal events."
+        "The standalone eliminator owns a charged header; the SCC embeds its eliminator directly. Each run borrows root and elimination-order slices from SCC, while the clause lifecycle retains clause/watch ownership, model-converter entries and interrupted compaction prefixes. Clause sorting uses existing storage without an additional Runtime buffer."
       ],
       "deviations": [
-        "Enabled scc_bug integrity checker, TRACE/verbose and propagation-wrapper diagnostics remain open. Concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Native typed frames borrow actual watch iterators without a frame codec. Generated parameter binding receives no whole-unit completion credit pending complete generated binding audit. No whole solver or registered assertion completion credit."
+        "Selected equivalence-elimination clauses, watches, model entries and six TRACE/CTRACE sites are connected. Remaining source assertion and propagation-wrapper diagnostics require a separate audit. The concrete in-place heapsort preserves unsigned literal order, not C++ standard-library invocation schedules. Standalone eliminator fixtures have no full solver display owner; the retained SCC solver binds it. No whole-unit completion credit."
       ]
     },
     {
@@ -180822,6 +180814,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Reached SAT equivalence-elimination clause normalization, model deletion, invalid-literal CTRACE and full-solver display sites at sat_elim_eqs.cpp:81,104,138,187,205,216",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_elim_eqs_trace.go",
+          "tests": ["TestSATElimEqsClauseAndModelSourceTraces", "TestSATElimEqsFullSolverBinCleanupDisplaySourceTrace", "TestSATElimEqsEliminatedLiteralSourceTraceBeforeAssertion"]
+        },
+        {
           "name": "Reached SAT SCC solver/watch displays, nontrivial-cycle CTRACE, stack/root detail, mapping and post-elimination TRACE sites at sat_scc.cpp:68,69,138,156,168,191,216,221",
           "status": "ported",
           "go_target": "pkg/sat/sat_scc_trace.go",
@@ -182717,6 +182715,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached SAT equivalence-elimination clause normalization, model deletion, invalid-literal CTRACE and full-solver display sites at sat_elim_eqs.cpp:81,104,138,187,205,216",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_elim_eqs_trace.go",
+          "tests": ["TestSATElimEqsClauseAndModelSourceTraces", "TestSATElimEqsFullSolverBinCleanupDisplaySourceTrace", "TestSATElimEqsEliminatedLiteralSourceTraceBeforeAssertion"]
+        },
         {
           "name": "Reached SAT SCC solver/watch displays, nontrivial-cycle CTRACE, stack/root detail, mapping and post-elimination TRACE sites at sat_scc.cpp:68,69,138,156,168,191,216,221",
           "status": "ported",
