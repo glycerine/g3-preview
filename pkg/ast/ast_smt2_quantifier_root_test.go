@@ -92,4 +92,23 @@ func TestASTSMT2QuantifierRootSourceFormat(t *testing.T) {
 	if got := print(compound); got != "(and (exists ((x Bool)) x) true)" {
 		t.Fatalf("application with quantified child format %q", got)
 	}
+	// Source quantifier scopes keep let aliases inside the binder and skip
+	// binder names when assigning a!N aliases.
+	aliasBinder := astTestSymbol(t, m, "a!1")
+	sharedArgs := []ASTHandle{body}
+	for i := 0; i < 8; i++ {
+		atom, e := m.MkConst(astTestSymbol(t, m, string(rune('a'+i))), boolSort)
+		paramsMust(t, e)
+		sharedArgs = append(sharedArgs, atom)
+	}
+	shared, err := m.MkAndArgs(sharedArgs)
+	paramsMust(t, err)
+	sharedBody, err := m.MkAnd(shared, shared)
+	paramsMust(t, err)
+	q, err = m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{boolSort}, Names: []usymbol.Symbol{aliasBinder}, Body: sharedBody})
+	paramsMust(t, err)
+	want := "(forall ((a!1 Bool)) (let ((a!2 (and a!1 a b c d e f g h))) (and a!2 a!2)))"
+	if got := print(q); got != want {
+		t.Fatalf("quantified local let format %q, want %q", got, want)
+	}
 }
