@@ -112,7 +112,7 @@ func (r *formulaProcessor) run(formulas []ast.ASTHandle) (output []ast.ASTHandle
 		}
 	}
 	for _, qs := range r.index.byFunc {
-		for _, q := range qs {
+		for _, q := range qs.values {
 			if e := publish(q); e != nil {
 				return output, e
 			}

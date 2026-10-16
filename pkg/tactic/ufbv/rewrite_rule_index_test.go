@@ -1,8 +1,10 @@
 package ufbv
 
 import (
+	"errors"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -61,8 +63,21 @@ func TestRewriteRuleIndexTriesRulesAndOwnsDemodulators(t *testing.T) {
 	r, e := newRewriteRuleIndex(m)
 	cacheMust(t, e)
 	t.Cleanup(func() { cacheMust(t, r.close()) })
+	beforeSet := m.Budget().Used()
+	m.Budget().FailAfter(0)
+	if e = r.insert(q1, firstLHS, firstRHS); !errors.Is(e, arena.ErrInjectedFailure) || len(r.byFunc) != 0 || len(r.owned) != 0 || m.Budget().Used() != beforeSet {
+		t.Fatal("refused source quantifier-set allocation published an index or reference", e, r.byFunc, r.owned)
+	}
+	m.Budget().FailAfter(-1)
 	cacheMust(t, r.insert(q1, firstLHS, firstRHS))
+	set := r.byFunc[f]
+	if set == nil || set.header == 0 || m.Budget().Used() != beforeSet+set.header {
+		t.Fatal("first source quantifier-set allocation", set, m.Budget().Used(), beforeSet)
+	}
 	cacheMust(t, r.insert(q2, secondLHS, secondRHS))
+	if r.byFunc[f] != set || m.Budget().Used() != beforeSet+set.header {
+		t.Fatal("same function must reuse its source set", r.byFunc[f], m.Budget().Used())
+	}
 	for h, refs := range base {
 		got, e := m.GetRefCount(h)
 		cacheMust(t, e)
@@ -70,7 +85,7 @@ func TestRewriteRuleIndexTriesRulesAndOwnsDemodulators(t *testing.T) {
 			t.Fatal("indexed rule must retain quantifier and both expressions", h, got, refs)
 		}
 	}
-	if len(r.byFunc[f]) != 2 {
+	if len(r.byFunc[f].values) != 2 {
 		t.Fatal("forward index lost a rule")
 	}
 	if !r.consistent() {
@@ -92,8 +107,8 @@ func TestRewriteRuleIndexTriesRulesAndOwnsDemodulators(t *testing.T) {
 		t.Fatal("arity mismatch should skip indexed rules")
 	}
 	cacheMust(t, r.remove(f, q1))
-	if !r.consistent() || len(r.byFunc[f]) != 1 || r.byFunc[f][0] != q2 {
-		t.Fatal("remove_fwd_idx must erase only the selected quantifier", r.byFunc[f])
+	if !r.consistent() || len(r.byFunc[f].values) != 1 || r.byFunc[f].values[0] != q2 {
+		t.Fatal("remove_fwd_idx must erase only the selected quantifier", r.byFunc[f].values)
 	}
 	for _, h := range []ast.ASTHandle{q1, firstLHS, firstRHS} {
 		refs, e := m.GetRefCount(h)
@@ -109,8 +124,8 @@ func TestRewriteRuleIndexTriesRulesAndOwnsDemodulators(t *testing.T) {
 	}
 	cacheMust(t, m.DelRef(&again))
 	cacheMust(t, r.remove(f, q2))
-	if !r.consistent() || len(r.byFunc[f]) != 0 {
-		t.Fatal("source keeps an empty forward function entry", r.byFunc[f])
+	if !r.consistent() || len(r.byFunc[f].values) != 0 {
+		t.Fatal("source keeps an empty forward function entry", r.byFunc[f].values)
 	}
 	miss, matched, e = r.tryRewrite(f, []ast.ASTHandle{a, c})
 	cacheMust(t, e)

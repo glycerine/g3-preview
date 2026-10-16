@@ -153173,6 +153173,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Concrete UFBV forward quantifier_set allocation at ufbv_rewriter.cpp:226 and retained empty-set deallocation at obj_hashtable.h:220 through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/rewrite_rule_index_memory_trace.go",
+          "tests": ["TestRewriteForwardSetMemoryWrapperRetainsEmptySetUntilClose", "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators"]
+        },
+        {
           "name": "Concrete extension model arity-positive func_interp allocation at extension_model_converter.cpp:66 and model-core destruction at model_core.cpp:29 through debug memory wrappers",
           "status": "platform_replacement",
           "go_target": "pkg/tactic/tactic_extension_model.go",
@@ -154108,6 +154114,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete UFBV forward quantifier_set allocation at ufbv_rewriter.cpp:226 and retained empty-set deallocation at obj_hashtable.h:220 through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/rewrite_rule_index_memory_trace.go",
+          "tests": ["TestRewriteForwardSetMemoryWrapperRetainsEmptySetUntilClose", "TestRewriteRuleIndexTriesRulesAndOwnsDemodulators"]
+        },
         {
           "name": "Concrete extension model arity-positive func_interp allocation at extension_model_converter.cpp:66 and model-core destruction at model_core.cpp:29 through debug memory wrappers",
           "status": "platform_replacement",

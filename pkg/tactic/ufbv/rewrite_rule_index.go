@@ -3,6 +3,12 @@ package ufbv
 
 import "github.com/glycerine/g3/pkg/ast"
 
+type rewriteForwardSet struct {
+	values    []ast.ASTHandle
+	header    uint64
+	traceLive bool
+}
+
 type demodulatorRule struct {
 	function, quantifier, lhs, rhs ast.ASTHandle
 	ownedStart                     int
@@ -14,7 +20,7 @@ type demodulatorRule struct {
 type rewriteRuleIndex struct {
 	manager *ast.ASTManager
 	matcher *matchSubst
-	byFunc  map[ast.ASTHandle][]ast.ASTHandle
+	byFunc  map[ast.ASTHandle]*rewriteForwardSet
 	rules   map[ast.ASTHandle]demodulatorRule
 	owned   []ast.ASTHandle
 	closing bool
@@ -28,7 +34,7 @@ func newRewriteRuleIndex(m *ast.ASTManager) (*rewriteRuleIndex, error) {
 	}
 	return &rewriteRuleIndex{
 		manager: m, matcher: matcher,
-		byFunc: make(map[ast.ASTHandle][]ast.ASTHandle),
+		byFunc: make(map[ast.ASTHandle]*rewriteForwardSet),
 		rules:  make(map[ast.ASTHandle]demodulatorRule),
 	}, nil
 }
@@ -60,6 +66,14 @@ func (r *rewriteRuleIndex) insert(quantifier, lhs, rhs ast.ASTHandle) error {
 	if e != nil {
 		return e
 	}
+	set := r.byFunc[f]
+	if set == nil {
+		set, e = r.newForwardSet()
+		if e != nil {
+			return e
+		}
+		r.byFunc[f] = set
+	}
 	start := len(r.owned)
 	if e = r.manager.IncRef(quantifier); e != nil {
 		return e
@@ -73,7 +87,7 @@ func (r *rewriteRuleIndex) insert(quantifier, lhs, rhs ast.ASTHandle) error {
 		return e
 	}
 	r.owned = append(r.owned, rhs)
-	r.byFunc[f] = append(r.byFunc[f], quantifier)
+	set.values = append(set.values, quantifier)
 	r.rules[quantifier] = demodulatorRule{function: f, quantifier: quantifier, lhs: lhs, rhs: rhs, ownedStart: start}
 	return nil
 }
@@ -113,11 +127,14 @@ func (r *rewriteRuleIndex) remove(f, quantifier ast.ASTHandle) error {
 	}
 	delete(r.rules, quantifier)
 	set := r.byFunc[f]
-	for i, q := range set {
+	if set == nil {
+		return ast.ErrASTDomain
+	}
+	for i, q := range set.values {
 		if q == quantifier {
-			copy(set[i:], set[i+1:])
-			set[len(set)-1] = ast.ASTHandle{}
-			r.byFunc[f] = set[:len(set)-1]
+			copy(set.values[i:], set.values[i+1:])
+			set.values[len(set.values)-1] = ast.ASTHandle{}
+			set.values = set.values[:len(set.values)-1]
 			return nil
 		}
 	}
@@ -129,7 +146,10 @@ func (r *rewriteRuleIndex) consistent() bool {
 		return false
 	}
 	for f, set := range r.byFunc {
-		for _, q := range set {
+		if set == nil {
+			return false
+		}
+		for _, q := range set.values {
 			rule, found := r.rules[q]
 			if !found || rule.removing || rule.function != f {
 				return false
@@ -145,7 +165,11 @@ func (r *rewriteRuleIndex) tryRewrite(f ast.ASTHandle, args []ast.ASTHandle) (as
 	if e := r.check(); e != nil {
 		return ast.ASTRef{}, false, e
 	}
-	for _, q := range r.byFunc[f] {
+	set := r.byFunc[f]
+	if set == nil {
+		return ast.ASTRef{}, false, nil
+	}
+	for _, q := range set.values {
 		rule, found := r.rules[q]
 		if !found {
 			return ast.ASTRef{}, false, ast.ErrASTDomain
@@ -182,6 +206,10 @@ func (r *rewriteRuleIndex) close() error {
 	r.closing = true
 	if e := r.matcher.close(); e != nil {
 		return e
+	}
+	for f, set := range r.byFunc {
+		r.releaseForwardSet(set)
+		delete(r.byFunc, f)
 	}
 	for len(r.owned) != 0 {
 		h := r.owned[0]
