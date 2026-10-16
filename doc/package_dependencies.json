@@ -22,14 +22,18 @@
         "smtcore",
         "tactic",
         "util/diagnostic",
+        "util/memory",
         "util/params",
         "util/z3exception"
       ],
       "production_files": [
+        "api_ast_map_memory_trace.go",
         "api_ast_map_object.go",
+        "api_config_memory_trace.go",
         "api_config_params.go",
         "api_context_results.go",
         "api_global_params.go",
+        "api_goal_memory_trace.go",
         "api_goal_object.go",
         "api_stats.go",
         "api_trace.go"
@@ -191,6 +195,7 @@
         "ast_core_pages.go",
         "ast_core_payload.go",
         "ast_core_plugin_dispatch.go",
+        "ast_core_quantifier_pattern_trace.go",
         "ast_core_query.go",
         "ast_core_register.go",
         "ast_core_register_trace.go",
@@ -270,6 +275,7 @@
         "ast_shared_occs_iterator.go",
         "ast_shared_occs_mark.go",
         "ast_smt2_app_format.go",
+        "ast_smt2_arith_literal.go",
         "ast_smt2_boolean_tree.go",
         "ast_smt2_bv_literal.go",
         "ast_smt2_declare_fun.go",
@@ -277,7 +283,10 @@
         "ast_smt2_fdecl_classify.go",
         "ast_smt2_fdecl_name.go",
         "ast_smt2_float_bv_literal.go",
+        "ast_smt2_float_dispatch.go",
         "ast_smt2_float_real.go",
+        "ast_smt2_let.go",
+        "ast_smt2_quantifier_root.go",
         "ast_smt2_sort.go",
         "ast_smt2_var_labels.go",
         "ast_sort_dependency_memory_trace.go",
@@ -293,6 +302,8 @@
         "ast_trace_hooks.go",
         "ast_uninterpreted_plugin.go",
         "ast_well_sorted.go",
+        "ast_well_sorted_trace.go",
+        "ast_well_sorted_warning.go",
         "gparams_catalog_collectors.go",
         "util_ast_literal_vector.go",
         "util_psort_ast_bounds.go",
@@ -1212,6 +1223,7 @@
         "model_functions.go",
         "model_interpretation_owners.go",
         "model_lifecycle.go",
+        "model_memory_process_guard.go",
         "model_package_boundary.go",
         "model_sat_allocation.go",
         "model_universe_memory_trace.go",
@@ -1243,6 +1255,16 @@
       ],
       "production_files": [
         "gparams_catalog_collectors.go"
+      ]
+    },
+    {
+      "package": "parsers/smt2",
+      "imports": [
+        "ast",
+        "util/symbol"
+      ],
+      "production_files": [
+        "local_environment.go"
       ]
     },
     {
@@ -1477,7 +1499,6 @@
         "gparams_catalog_collectors.go",
         "owned_string_alias.go",
         "pattern_inference_rewriter.go",
-        "smt2_local_env.go",
         "smt_dyn_ack_pairs.go",
         "smt_dyn_ack_schedule.go",
         "smt_dyn_ack_triples.go",
@@ -1560,11 +1581,14 @@
         "util/memory",
         "util/messages",
         "util/params",
-        "util/symbol"
+        "util/symbol",
+        "util/text"
       ],
       "production_files": [
+        "aig_and_trace.go",
         "aig_core.go",
         "aig_delete_trace.go",
+        "aig_display.go",
         "aig_expr.go",
         "aig_expr_cache_trace.go",
         "aig_formula.go",

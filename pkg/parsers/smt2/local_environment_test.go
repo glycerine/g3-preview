@@ -1,4 +1,4 @@
-package smtcore
+package smt2
 
 import (
 	"errors"

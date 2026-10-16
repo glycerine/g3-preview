@@ -14,6 +14,7 @@ digraph packages {
   "api" -> "smtcore";
   "api" -> "tactic";
   "api" -> "util/diagnostic";
+  "api" -> "util/memory";
   "api" -> "util/params";
   "api" -> "util/z3exception";
   "arena" [style=filled, fillcolor="#c9e8cb"];
@@ -154,6 +155,9 @@ digraph packages {
   "nlsat" -> "util/params";
   "opt" [style=filled, fillcolor="#eeeeee"];
   "opt" -> "util/params";
+  "parsers/smt2" [style=filled, fillcolor="#eeeeee"];
+  "parsers/smt2" -> "ast";
+  "parsers/smt2" -> "util/symbol";
   "parsers/util" [style=filled, fillcolor="#eeeeee"];
   "parsers/util" -> "util/params";
   "pkg" [style=filled, fillcolor="#eeeeee"];
@@ -225,6 +229,7 @@ digraph packages {
   "tactic/aig" -> "util/messages";
   "tactic/aig" -> "util/params";
   "tactic/aig" -> "util/symbol";
+  "tactic/aig" -> "util/text";
   "tactic/arith" [style=filled, fillcolor="#eeeeee"];
   "tactic/arith" -> "arena";
   "tactic/arith" -> "ast";
