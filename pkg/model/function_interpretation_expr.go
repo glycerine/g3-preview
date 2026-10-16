@@ -143,8 +143,15 @@ func (f *FunctionInterpretation) SetElse(term ast.ASTHandle) error {
 		return e
 	}
 	f.replacement = term
-	if e := f.manager.DecRef(f.fallback); e != nil {
+	consumed, e := f.manager.DecRefConsumed(f.fallback)
+	if consumed {
+		f.fallback = ast.ASTHandle{}
+	}
+	if e != nil {
 		return e
+	}
+	if !consumed {
+		return ast.ErrASTPending
 	}
 	f.fallback = term
 	f.replacement = ast.ASTHandle{}

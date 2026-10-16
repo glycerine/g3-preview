@@ -52,6 +52,9 @@ func (f *FunctionInterpretation) open() error {
 	if f.closed || f.closing {
 		return arena.ErrClosed
 	}
+	if !f.replacement.IsNull() {
+		return ast.ErrASTPending
+	}
 	if f.cause != nil {
 		return f.cause
 	}
@@ -91,10 +94,16 @@ func (f *FunctionInterpretation) FindEntryArguments(args ast.AppArguments) (*Fun
 	return nil, nil
 }
 func (f *FunctionInterpretation) resetCache() error {
-	if e := f.manager.DecRef(f.cached); e != nil {
+	consumed, e := f.manager.DecRefConsumed(f.cached)
+	if consumed {
+		f.cached = ast.ASTHandle{}
+	}
+	if e != nil {
 		return e
 	}
-	f.cached = ast.ASTHandle{}
+	if !consumed {
+		return ast.ErrASTPending
+	}
 	return nil
 }
 func (f *FunctionInterpretation) InsertEntry(args []ast.ASTHandle, result ast.ASTHandle) error {

@@ -74,6 +74,9 @@ func (f *FunctionEntry) open() error {
 	if f.closed {
 		return arena.ErrClosed
 	}
+	if !f.replacement.IsNull() {
+		return ast.ErrASTPending
+	}
 	_, e := f.manager.ProofsEnabled()
 	return e
 }
@@ -126,10 +129,19 @@ func (f *FunctionEntry) setResult(value ast.ASTHandle) error {
 		return e
 	}
 	f.replacement = value
-	if e := f.manager.DecRef(f.result); e != nil {
+	consumed, e := f.manager.DecRefConsumed(f.result)
+	if consumed {
+		f.resultOwned = false
+		f.result = ast.ASTHandle{}
+	}
+	if e != nil {
 		return e
 	}
+	if !consumed {
+		return ast.ErrASTPending
+	}
 	f.result = value
+	f.resultOwned = true
 	f.replacement = ast.ASTHandle{}
 	return nil
 }
