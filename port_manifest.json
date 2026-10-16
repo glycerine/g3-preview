@@ -75081,10 +75081,16 @@
           "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
         },
         {
-          "name": "Selected check_watches SASSERT167-189 process assertion switch, source-order watch guards and per-site C/T action through cleaner_bug; sat_bug/sat_watched_bug CTRACE remains open",
+          "name": "Selected check_watches SASSERT167-189 process assertion switch, source-order watch guards and per-site C/T action through cleaner_bug; sat_bug and wider sat_watched_bug TRACE profiles remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
+        },
+        {
+          "name": "Selected binary missing-reciprocal sat_watched_bug CTRACE before SASSERT, source watch-list body and false/learned fields (cpp172-181)",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_watches_trace.go",
+          "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
         }
       ],
       "ownership": [
@@ -75152,10 +75158,16 @@
           "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
         },
         {
-          "name": "Selected check_watches SASSERT167-189 process assertion switch, source-order watch guards and per-site C/T action through cleaner_bug; sat_bug/sat_watched_bug CTRACE remains open",
+          "name": "Selected check_watches SASSERT167-189 process assertion switch, source-order watch guards and per-site C/T action through cleaner_bug; sat_bug and wider sat_watched_bug TRACE profiles remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
+        },
+        {
+          "name": "Selected binary missing-reciprocal sat_watched_bug CTRACE before SASSERT, source watch-list body and false/learned fields (cpp172-181)",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_watches_trace.go",
+          "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
         }
       ],
       "ownership": [
@@ -181760,6 +181772,12 @@
           "tests": [
             "TestASTExpandedDistinctSourceTraceAfterConjunction"
           ]
+        },
+        {
+          "name": "Retained SAT checker sat_watched_bug missing-reciprocal CTRACE with two source watch-list displays (sat_integrity_checker.cpp:172)",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_watches_trace.go",
+          "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
         }
       ],
       "ownership": [
@@ -183481,6 +183499,12 @@
           "tests": [
             "TestASTExpandedDistinctSourceTraceAfterConjunction"
           ]
+        },
+        {
+          "name": "Retained SAT checker sat_watched_bug missing-reciprocal CTRACE with two source watch-list displays (sat_integrity_checker.cpp:172)",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_watches_trace.go",
+          "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
         }
       ],
       "ownership": [

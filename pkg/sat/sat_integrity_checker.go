@@ -454,7 +454,11 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 	if e != nil {
 		return false, e
 	}
-	if !enabled {
+	tags := c.lifecycle.traceTags
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	if !enabled && !tags.ShouldTrace("sat_watched_bug") {
 		return true, nil
 	}
 	p := c.lifecycle.propagation
@@ -469,7 +473,7 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 		if e != nil {
 			return false, e
 		}
-		if gone {
+		if gone && enabled {
 			size, e := list.Size()
 			if e != nil {
 				return false, e
@@ -500,12 +504,14 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 				if e != nil {
 					return false, e
 				}
-				gone, e := v.wasEliminated(other.variable())
+				otherGone, e := v.wasEliminated(other.variable())
 				if e != nil {
 					return false, e
 				}
-				if e = satIntegrityAssertion(!gone, c.debugActions, 171, "!s.was_eliminated(w.get_literal().var())"); e != nil {
-					return false, e
+				if enabled {
+					if e = satIntegrityAssertion(!otherGone, c.debugActions, 171, "!s.was_eliminated(w.get_literal().var())"); e != nil {
+						return false, e
+					}
 				}
 				counterpart, e := v.watches.Get(other.Negated().index())
 				if e != nil {
@@ -527,10 +533,18 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 				if e != nil {
 					return false, e
 				}
-				if e = satIntegrityAssertion(yes, c.debugActions, 181, "s.get_wlist(~(w.get_literal())).contains(watched(l, w.is_learned()))"); e != nil {
-					return false, e
+				if !yes {
+					c.traceMissingBinaryWatch(literal, other, learned, gone, otherGone, list, counterpart)
+				}
+				if enabled {
+					if e = satIntegrityAssertion(yes, c.debugActions, 181, "s.get_wlist(~(w.get_literal())).contains(watched(l, w.is_learned()))"); e != nil {
+						return false, e
+					}
 				}
 			case 1:
+				if !enabled {
+					continue
+				}
 				one, e := w.Literal1()
 				if e != nil {
 					return false, e
@@ -557,6 +571,9 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 					return false, e
 				}
 			case 2:
+				if !enabled {
+					continue
+				}
 				off, e := w.ClauseOffset()
 				if e != nil {
 					return false, e
