@@ -108715,6 +108715,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained UFBV post-rewrite fixed-point SASSERT at ufbv_rewriter.cpp:690 with a second checked rewrite",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_assert.go",
+          "tests": ["TestUFBVFormulaSourceSecondRewriteFixedPointAssertion"]
+        },
+        {
           "name": "Retained UFBV rewrite child, quantifier-body and final-cache SASSERT at ufbv_rewriter.cpp:402,437,457,459",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_loop.go",
@@ -122979,6 +122985,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained UFBV post-rewrite fixed-point SASSERT at ufbv_rewriter.cpp:690 with a second checked rewrite",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_assert.go",
+          "tests": ["TestUFBVFormulaSourceSecondRewriteFixedPointAssertion"]
+        },
+        {
           "name": "Retained UFBV rewrite child, quantifier-body and final-cache SASSERT at ufbv_rewriter.cpp:402,437,457,459",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_loop.go",
@@ -123477,6 +123489,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained UFBV post-rewrite fixed-point SASSERT at ufbv_rewriter.cpp:690 with a second checked rewrite",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_assert.go",
+          "tests": ["TestUFBVFormulaSourceSecondRewriteFixedPointAssertion"]
+        },
         {
           "name": "Retained UFBV rewrite child, quantifier-body and final-cache SASSERT at ufbv_rewriter.cpp:402,437,457,459",
           "status": "ported",

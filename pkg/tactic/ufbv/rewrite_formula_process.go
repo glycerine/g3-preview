@@ -151,6 +151,9 @@ func (r *formulaProcessor) processLast() (result error) {
 	if e != nil {
 		return e
 	}
+	if e := r.assertRewrittenFixedPoint(rewritten); e != nil {
+		return e
+	}
 	c := demodulatorClassifier{manager: m}
 	large, small, demodulator, e := c.classify(rewritten)
 	if e != nil {
