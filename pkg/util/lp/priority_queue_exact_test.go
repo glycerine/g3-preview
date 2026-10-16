@@ -342,16 +342,16 @@ func TestLPRationalPriorityQueueAllocationFailureCensus(t *testing.T) {
 						h = newLPPairHarness(t)
 					}
 					digits := strings.Repeat("1234567890", 100)
-					old := h.pair(digits+"/7", digits+"/11")
-					next := h.pair("9"+digits+"/13", "8"+digits+"/17")
-					low := h.pair(digits+"/"+strings.Repeat("9876543210", 200)+"7", digits+"/"+strings.Repeat("7654321090", 200)+"9")
+					old := h.pairExactLarge(digits+"/7", digits+"/11")
+					next := h.pairExactLarge("9"+digits+"/13", "8"+digits+"/17")
+					low := h.pairExactLarge(digits+"/"+strings.Repeat("9876543210", 200)+"7", digits+"/"+strings.Repeat("7654321090", 200)+"9")
 					q := NewRationalPriorityQueue(h.m, 4)
 					h.must(q.Enqueue(0, &old.X))
 					if op == "decrease" || op == "increase" {
 						h.must(q.Enqueue(1, &next.X))
 					}
 					if op == "dequeue" {
-						a, b, c := h.pair(digits+"/11", "1"), h.pair(digits+"/13", "2"), h.pair(digits+"/17", "3")
+						a, b, c := h.pairExactLarge(digits+"/11", "1"), h.pairExactLarge(digits+"/13", "2"), h.pairExactLarge(digits+"/17", "3")
 						for i, v := range []*RationalPair{a, b, c} {
 							h.must(q.Enqueue(uint32(i+1), &v.X))
 						}
@@ -469,16 +469,16 @@ func TestLPPairPriorityQueueAllocationFailureCensus(t *testing.T) {
 						h = newLPPairHarness(t)
 					}
 					digits := strings.Repeat("1234567890", 100)
-					old := h.pair(digits+"/7", digits+"/11")
-					next := h.pair("9"+digits+"/13", "8"+digits+"/17")
-					low := h.pair(digits+"/"+strings.Repeat("9876543210", 200)+"7", digits+"/"+strings.Repeat("7654321090", 200)+"9")
+					old := h.pairExactLarge(digits+"/7", digits+"/11")
+					next := h.pairExactLarge("9"+digits+"/13", "8"+digits+"/17")
+					low := h.pairExactLarge(digits+"/"+strings.Repeat("9876543210", 200)+"7", digits+"/"+strings.Repeat("7654321090", 200)+"9")
 					q := NewPairPriorityQueue(h.m, 4)
 					h.must(q.Enqueue(0, old))
 					if op == "decrease" || op == "increase" {
 						h.must(q.Enqueue(1, next))
 					}
 					if op == "dequeue" {
-						a, b, c := h.pair(digits+"/11", "1"), h.pair(digits+"/13", "2"), h.pair(digits+"/17", "3")
+						a, b, c := h.pairExactLarge(digits+"/11", "1"), h.pairExactLarge(digits+"/13", "2"), h.pairExactLarge(digits+"/17", "3")
 						for i, v := range []*RationalPair{a, b, c} {
 							h.must(q.Enqueue(uint32(i+1), v))
 						}
