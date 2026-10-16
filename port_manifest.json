@@ -75109,6 +75109,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_integrity_disjoint_trace.go",
           "tests": ["TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
+        },
+        {
+          "name": "Selected check_clause SASSERT53,55,60,63, vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; clause sat_bug CTRACE56 and other diagnostics remain open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
         }
       ],
       "ownership": [
@@ -75204,6 +75210,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_integrity_disjoint_trace.go",
           "tests": ["TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
+        },
+        {
+          "name": "Selected check_clause SASSERT53,55,60,63, vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; clause sat_bug CTRACE56 and other diagnostics remain open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
         }
       ],
       "ownership": [
@@ -122027,6 +122039,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
+        },
+        {
+          "name": "Selected check_clause SASSERT53,55,60,63, vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; clause sat_bug CTRACE56 and other diagnostics remain open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
         }
       ],
       "ownership": [
@@ -122418,6 +122436,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
+        },
+        {
+          "name": "Selected check_clause SASSERT53,55,60,63, vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; clause sat_bug CTRACE56 and other diagnostics remain open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
         }
       ],
       "ownership": [

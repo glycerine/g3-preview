@@ -114,46 +114,52 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 	a := p.clauses
 	v := p.variables
 	if satStorageSourceDebug {
-		removed, e := a.Removed(cl)
+		enabled, e := diagnostic.BorrowProcessDebugContext().AssertionsEnabled()
 		if e != nil {
 			return false, e
 		}
-		if removed {
-			return false, ErrSATAssertion
-		}
-		for i := uint32(0); ; i++ {
-			n, e := a.Size(cl)
+		if enabled {
+			removed, e := a.Removed(cl)
 			if e != nil {
 				return false, e
 			}
-			if i >= n {
-				break
+			if e = satIntegrityAssertion(!removed, c.debugActions, 53, "!c.was_removed()"); e != nil {
+				return false, e
 			}
-			lit, e := a.Literal(cl, i)
+			for i := uint32(0); ; i++ {
+				n, e := a.Size(cl)
+				if e != nil {
+					return false, e
+				}
+				if i >= n {
+					break
+				}
+				lit, e := a.Literal(cl, i)
+				if e != nil {
+					return false, e
+				}
+				vars, e := v.numVarsChecked()
+				if e != nil {
+					return false, e
+				}
+				if e = satIntegrityAssertion(uint32(lit.variable()) <= vars, c.debugActions, 55, "c[i].var() <= s.num_vars()"); e != nil {
+					return false, e
+				}
+				gone, e := c.eliminated(lit.variable())
+				if e != nil {
+					return false, e
+				}
+				if e = satIntegrityAssertion(!gone, c.debugActions, 60, "!s.was_eliminated(c[i].var())"); e != nil {
+					return false, e
+				}
+			}
+			yes, e := a.CheckApprox(cl)
 			if e != nil {
 				return false, e
 			}
-			vars, e := v.numVarsChecked()
-			if e != nil {
+			if e = satIntegrityAssertion(yes, c.debugActions, 63, "c.check_approx()"); e != nil {
 				return false, e
 			}
-			if uint32(lit.variable()) > vars {
-				return false, ErrSATAssertion
-			}
-			gone, e := c.eliminated(lit.variable())
-			if e != nil {
-				return false, e
-			}
-			if gone {
-				return false, ErrSATAssertion
-			}
-		}
-		yes, e := a.CheckApprox(cl)
-		if e != nil {
-			return false, e
-		}
-		if !yes {
-			return false, ErrSATAssertion
 		}
 	}
 	frozen, e := a.Frozen(cl)
@@ -304,14 +310,22 @@ func (c satIntegrityChecker) checkClauseVector(cs []StoredClauseRef) (bool, erro
 	if e := c.open(); e != nil {
 		return false, e
 	}
+	enabled := false
+	if satStorageSourceDebug {
+		on, e := diagnostic.BorrowProcessDebugContext().AssertionsEnabled()
+		if e != nil {
+			return false, e
+		}
+		enabled = on
+	}
 	for i := 0; i < len(cs); i++ {
-		if satStorageSourceDebug {
+		if enabled {
 			yes, e := c.checkClause(cs[i])
 			if e != nil {
 				return false, e
 			}
-			if !yes {
-				return false, ErrSATAssertion
+			if e = satIntegrityAssertion(yes, c.debugActions, 107, "check_clause(*(*it))"); e != nil {
+				return false, e
 			}
 		}
 	}
@@ -335,14 +349,20 @@ func (c satIntegrityChecker) checkLearnedClauses() (bool, error) {
 		}
 	}
 	if satStorageSourceDebug {
-		if c.gc == nil || c.gc.self != c.gc || c.gc.lifecycle() != c.lifecycle {
-			return false, ErrSATOwner
+		enabled, e := diagnostic.BorrowProcessDebugContext().AssertionsEnabled()
+		if e != nil {
+			return false, e
 		}
-		if c.gc.closed || c.gc.closing {
-			return false, arena.ErrClosed
-		}
-		if count != c.gc.numFrozen {
-			return false, ErrSATAssertion
+		if enabled {
+			if c.gc == nil || c.gc.self != c.gc || c.gc.lifecycle() != c.lifecycle {
+				return false, ErrSATOwner
+			}
+			if c.gc.closed || c.gc.closing {
+				return false, arena.ErrClosed
+			}
+			if e = satIntegrityAssertion(count == c.gc.numFrozen, c.debugActions, 124, "num_frozen == s.m_num_frozen"); e != nil {
+				return false, e
+			}
 		}
 	}
 	return c.checkClauseVector(c.lifecycle.learned)
