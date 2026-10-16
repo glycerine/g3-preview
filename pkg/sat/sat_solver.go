@@ -144,6 +144,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	if s.converter, err = newSATColdModelConverter(c.Budget); err != nil {
 		return s, err
 	}
+	s.converter.traceTags = c.TraceTags
 	if s.propagation, err = newSATSolverPropagationState(s.Variables, s.Clauses, s.converter, c.RLimit, c.Runtime.memory, s.config, c.Budget); err != nil {
 		return s, err
 	}

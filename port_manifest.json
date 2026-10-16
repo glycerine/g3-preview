@@ -75526,6 +75526,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Reached SAT model-converter failed-clause, three insertion-form and invalid-later-entry TRACE/CTRACE sites at sat_model_converter.cpp:108,142,152,163,181",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_model_converter_trace.go",
+          "tests": ["TestSATModelConverterInsertSourceTraces", "TestSATModelConverterFailedClauseSourceTrace", "TestSATModelConverterInvariantSourceTraceBeforeAssertion"]
+        },
+        {
           "name": "model_converter::model_converter",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_model_converter.go",
@@ -75770,7 +75776,7 @@
         "Source member initialization retains its declared construction stage and checked owner identity. No retained source consumer requires implicit model-converter Clone/Assign; unused wrappers and their emulated vector lifetime machinery were removed. Retained project model reconstruction, insertion checks, bitfields and traversal order remain."
       ],
       "deviations": [
-        "Native slices replace C++ vector capacity, relocation and interrupted-copy emulation. Explicit project Copy is retained for goal2sat; unused implicit copy constructor/assignment receives no implementation credit. Display still uses NumericTextStream. TRACE diagnostics and complete downstream integration remain open; whole-unit audit flags remain false."
+        "Native slices replace C++ vector capacity, relocation and interrupted-copy emulation. Explicit project Copy is retained for goal2sat; unused implicit copy constructor/assignment receives no implementation credit. Display still uses NumericTextStream. All five retained TRACE/CTRACE sites are connected; complete downstream integration and whole-unit method/ownership audits remain open."
       ]
     },
     {
@@ -180814,6 +180820,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Reached SAT model-converter failed-clause, three insertion-form and invalid-later-entry TRACE/CTRACE sites at sat_model_converter.cpp:108,142,152,163,181",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_model_converter_trace.go",
+          "tests": ["TestSATModelConverterInsertSourceTraces", "TestSATModelConverterFailedClauseSourceTrace", "TestSATModelConverterInvariantSourceTraceBeforeAssertion"]
+        },
+        {
           "name": "Reached SAT equivalence-elimination clause normalization, model deletion, invalid-literal CTRACE and full-solver display sites at sat_elim_eqs.cpp:81,104,138,187,205,216",
           "status": "ported",
           "go_target": "pkg/sat/sat_elim_eqs_trace.go",
@@ -182715,6 +182727,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached SAT model-converter failed-clause, three insertion-form and invalid-later-entry TRACE/CTRACE sites at sat_model_converter.cpp:108,142,152,163,181",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_model_converter_trace.go",
+          "tests": ["TestSATModelConverterInsertSourceTraces", "TestSATModelConverterFailedClauseSourceTrace", "TestSATModelConverterInvariantSourceTraceBeforeAssertion"]
+        },
         {
           "name": "Reached SAT equivalence-elimination clause normalization, model deletion, invalid-literal CTRACE and full-solver display sites at sat_elim_eqs.cpp:81,104,138,187,205,216",
           "status": "ported",

@@ -3,6 +3,7 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 
@@ -34,6 +35,7 @@ type satModelConversionEntryRef struct {
 type satModelConverter struct {
 	self                      *satModelConverter
 	budget                    *arena.Budget
+	traceTags                 *diagnostic.TraceTags
 	entries                   []satModelConversionEntry
 	origin, epoch, ownerBytes uint64
 	constructed, closed       bool
@@ -179,7 +181,11 @@ func (m *satModelConverter) InsertLiterals(r satModelConversionEntryRef, lits []
 }
 func (m *satModelConverter) InsertBinary(r satModelConversionEntryRef, a, b Literal) error {
 	lits := [2]Literal{a, b}
-	return m.InsertLiterals(r, lits[:])
+	if err := m.InsertLiterals(r, lits[:]); err != nil {
+		return err
+	}
+	m.traceInsertBinary(a, b)
+	return nil
 }
 func (m *satModelConverter) InsertClause(r satModelConversionEntryRef, a *ClauseAllocator, c StoredClauseRef) error {
 	x, e := m.entry(r)
@@ -207,6 +213,7 @@ func (m *satModelConverter) InsertClause(r satModelConversionEntryRef, a *Clause
 		x.literals = append(x.literals, l)
 	}
 	x.literals = append(x.literals, DefaultLiteral())
+	m.traceInsertClause(a, c)
 	return nil
 }
 func (m *satModelConverter) InsertWrapper(r satModelConversionEntryRef, a *ClauseAllocator, c satClauseWrapper) error {
@@ -235,6 +242,7 @@ func (m *satModelConverter) InsertWrapper(r satModelConversionEntryRef, a *Claus
 		x.literals = append(x.literals, l)
 	}
 	x.literals = append(x.literals, DefaultLiteral())
+	m.traceInsertWrapper(a, c)
 	return nil
 }
 func (m *satModelConverter) Copy(src *satModelConverter) error {
@@ -384,14 +392,16 @@ func (m *satModelConverter) checkEntryModel(x *satModelConversionEntry, model Mo
 }
 func (m *satModelConverter) checkEntryModelSpan(x *satModelConversionEntry, model satSolverModelSpan) (bool, error) {
 	n := uint32(len(x.literals))
-	ok, sat := true, false
+	ok, sat, start := true, false, uint32(0)
 	for j := uint32(0); j < n; j++ {
 		l := x.literals[j]
 		if l == DefaultLiteral() {
 			if !sat {
+				m.traceFailedClause(x.literals[start:j])
 				ok = false
 			}
 			sat = false
+			start = j + 1
 			continue
 		}
 		if sat {
@@ -469,7 +479,11 @@ func (m *satModelConverter) CheckInvariant(numVars uint32) (bool, error) {
 			n := uint32(len(other.literals))
 			for k := uint32(0); k < n; k++ {
 				l := other.literals[k]
-				if uint32(l.variable()) == v || l != DefaultLiteral() && uint32(l.variable()) >= numVars {
+				if uint32(l.variable()) == v {
+					m.traceInvariantVar(BoolVar(v))
+					return false, ErrSATAssertion
+				}
+				if l != DefaultLiteral() && uint32(l.variable()) >= numVars {
 					return false, ErrSATAssertion
 				}
 			}
