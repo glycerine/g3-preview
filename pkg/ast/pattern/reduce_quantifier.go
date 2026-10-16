@@ -127,6 +127,9 @@ func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle,
 	if len(c.pendingPatternRefs) != 0 {
 		return out, false, ast.ErrASTPending
 	}
+	if err = c.traceReduceQuantifier(q, false); err != nil {
+		return out, false, err
+	}
 	forall, err := c.manager.IsForall(q)
 	if err != nil || !forall {
 		return out, false, err
@@ -319,6 +322,9 @@ func (c *patternCandidates) reduceQuantifierNoDatabase(q, newBody ast.ASTHandle,
 	}
 	if len(patterns) == 0 {
 		if err = c.quantifierWarning(opts, q, "failed to find a pattern for quantifier (quantifier id: %s)"); err != nil {
+			return out, false, err
+		}
+		if err = c.traceReduceQuantifier(q, true); err != nil {
 			return out, false, err
 		}
 		if newBody == oldBody {

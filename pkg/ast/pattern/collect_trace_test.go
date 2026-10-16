@@ -329,4 +329,35 @@ func TestPatternCollectInfoSourceSMT2Trace(t *testing.T) {
 		t.Fatal("disabled stage traces changed multi-pattern or emitted output", len(results), output.String())
 	}
 	patternMust(t, m.DelRef(&results[0]))
+	bareForall, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{boolSort}, Names: []symbol.Symbol{xName}, Body: x})
+	patternMust(t, err)
+	patternMust(t, m.IncRef(bareForall))
+	t.Cleanup(func() { patternMust(t, m.DecRef(bareForall)) })
+	output.Reset()
+	tags.Enable("pattern_inference")
+	tags.Enable("pi_failed")
+	reduced, changed, err := c.reduceQuantifierNoDatabase(bareForall, x, nil, quantifierInferenceOptions{arithmeticMode: arithmeticPatternsNo, noPatternWeight: -1})
+	patternMust(t, err)
+	if changed || reduced != (ast.ASTRef{}) {
+		t.Fatal("bare quantifier unexpectedly changed", changed, reduced)
+	}
+	if tags.ShouldTrace("pattern_inference") {
+		entry := "-------- [pattern_inference] reduce_quantifier src/ast/pattern/pattern_inference.cpp:584 ---------\n" +
+			"processing:\n(forall ((collect-x Bool)) collect-x)\n------------------------------------------------\n"
+		failed := "-------- [pi_failed] reduce_quantifier src/ast/pattern/pattern_inference.cpp:704 ---------\n" +
+			"(forall ((collect-x Bool)) collect-x)\n------------------------------------------------\n"
+		if !strings.HasPrefix(output.String(), entry) || !strings.HasSuffix(output.String(), failed) || strings.Count(output.String(), failed) != 1 {
+			t.Fatalf("quantifier entry/failure source order: got %q", output.String())
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("erased quantifier traces wrote output", output.String())
+	}
+	output.Reset()
+	tags.Disable("pattern_inference")
+	tags.Disable("pi_failed")
+	reduced, changed, err = c.reduceQuantifierNoDatabase(bareForall, x, nil, quantifierInferenceOptions{arithmeticMode: arithmeticPatternsNo, noPatternWeight: -1})
+	patternMust(t, err)
+	if changed || reduced != (ast.ASTRef{}) || output.Len() != 0 {
+		t.Fatal("disabled quantifier traces changed reduction or emitted output", changed, reduced, output.String())
+	}
 }

@@ -18752,6 +18752,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/reduce_quantifier_trace.go",
         "pkg/ast/pattern/pattern_stage_trace.go",
         "pkg/ast/pattern/smaller_pattern.go",
         "pkg/ast/pattern/candidates.go",
@@ -18878,6 +18879,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Reached reduce_quantifier entry and no-pattern-result TRACE sites (pattern_inference.cpp:584,704), including source ordering and process-bound SMT2 quantifier display",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/reduce_quantifier_trace.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
         {
           "name": "Reached mk_patterns initial, post-loop-filter, post-bigger-filter and post-sort candidate TRACE checkpoints (pattern_inference.cpp:531,542,551,562)",
           "status": "ported",
@@ -180691,6 +180698,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/reduce_quantifier_trace.go",
         "pkg/ast/pattern/pattern_stage_trace.go",
         "pkg/ast/pattern/preferred_pattern.go",
         "pkg/ast/pattern/contains_subpattern.go",
@@ -180896,6 +180904,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached reduce_quantifier entry and no-pattern-result TRACE sites (pattern_inference.cpp:584,704), including source ordering and process-bound SMT2 quantifier display",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/reduce_quantifier_trace.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
         {
           "name": "Reached mk_patterns initial, post-loop-filter, post-bigger-filter and post-sort candidate TRACE checkpoints (pattern_inference.cpp:531,542,551,562)",
           "status": "ported",
@@ -182651,6 +182665,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/reduce_quantifier_trace.go",
         "pkg/ast/pattern/pattern_stage_trace.go",
         "pkg/ast/pattern/preferred_pattern.go",
         "pkg/ast/pattern/contains_subpattern.go",
@@ -182864,6 +182879,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached reduce_quantifier entry and no-pattern-result TRACE sites (pattern_inference.cpp:584,704), including source ordering and process-bound SMT2 quantifier display",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/reduce_quantifier_trace.go",
+          "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
+        },
         {
           "name": "Reached mk_patterns initial, post-loop-filter, post-bigger-filter and post-sort candidate TRACE checkpoints (pattern_inference.cpp:531,542,551,562)",
           "status": "ported",
