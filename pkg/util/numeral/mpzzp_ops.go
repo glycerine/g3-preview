@@ -1,6 +1,8 @@
 // Source: src/util/mpzzp.h; src/util/mpzzp.cpp.
 package numeral
 
+import "github.com/glycerine/g3/pkg/util/diagnostic"
+
 func (m *IntegerModularManager) Reset(a *Int) error {
 	if e := m.check(); e != nil {
 		return e
@@ -519,8 +521,26 @@ func (m *IntegerModularManager) String(a *Int) (string, error) {
 	if e := m.check(); e != nil {
 		return "", e
 	}
-	if e := m.AssertNormalized(a); e != nil {
-		return "", e
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return "", e
+		}
+		if enabled {
+			ok, e := m.IsPNormalized(a)
+			if e != nil {
+				return "", e
+			}
+			if !ok {
+				if d == nil || !d.HasAssertionActions() {
+					return "", ErrModularAssertion
+				}
+				if e := diagnostic.DebugAssertionFailure(d, "src/util/mpzzp.h", 146, "is_p_normalized(a)"); e != nil {
+					return "", e
+				}
+			}
+		}
 	}
 	return m.manager.String(a)
 }

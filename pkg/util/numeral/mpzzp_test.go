@@ -388,8 +388,10 @@ func TestIntegerModularConversionOverloadsAndDisplay(t *testing.T) {
 	if e != nil || string(out[:n]) != "8" {
 		t.Fatal(n, e)
 	}
-	if _, e = m.String(&a); modularSourceDebug && !errors.Is(e, ErrModularAssertion) {
-		t.Fatal(e)
+	if modularSourceDebug {
+		if e = m.AssertNormalized(&a); !errors.Is(e, ErrModularAssertion) {
+			t.Fatal(e)
+		}
 	}
 	if v, e := m.IsUint64Mutable(&a); e != nil || !v {
 		t.Fatal(v, e)

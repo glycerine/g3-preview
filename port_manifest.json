@@ -169258,6 +169258,7 @@
         "TestIntegerModularHeaderRefusalAndWarm",
         "TestIntegerModularCompleteScalarRoutes",
         "TestIntegerModularConversionOverloadsAndDisplay",
+        "TestIntegerModularStringSourceAssertionActions",
         "TestIntegerModularPredictableFailurePrefixes",
         "TestIntegerModularPowerRawLocalSourceEndAndOwningRetry",
         "TestIntegerModularCloseRetainsStoppedDestructorSuffix",
@@ -169556,7 +169557,16 @@
           ]
         },
         {
-          "name": "All scalar predicates/arithmetic/fused/sets/const-mutable conversion/bit/log/root/formatting overloads",
+          "name": "mpzzp to_string source normalization SASSERT at mpzzp.h:146 with process switch, debugger Continue/Throw and ordinary erased path",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp_ops.go",
+          "tests": [
+            "TestIntegerModularStringSourceAssertionActions",
+            "TestIntegerModularConversionOverloadsAndDisplay"
+          ]
+        },
+        {
+          "name": "Remaining scalar predicates/arithmetic/fused/sets/const-mutable conversion/bit/log/root/formatting overloads beyond separately ported to_string assertion",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpzzp_ops.go",
           "tests": [
