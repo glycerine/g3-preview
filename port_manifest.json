@@ -128186,7 +128186,8 @@
         "pkg/util/numeral/inf_muldiv_entry_source_test.go",
         "pkg/util/numeral/inf_eps_rational_short_circuit_source_test.go",
         "pkg/util/numeral/inf_eps_string_short_circuit_source_test.go",
-        "pkg/util/numeral/inf_eps_round_unread_infinity_source_test.go"
+        "pkg/util/numeral/inf_eps_round_unread_infinity_source_test.go",
+        "pkg/util/numeral/inf_eps_fused_source_order_test.go"
       ],
       "tests": [
         "TestInfinitesimalSourceWholeStringStreamInsertion",
@@ -128275,7 +128276,8 @@
         "TestInfMulDivEntryForeignAndClosedBeforeActions",
         "TestInfEpsRationalComparisonSkipsUnreadFiniteOperand",
         "TestInfEpsStringSkipsUnreadNestedDenominators",
-        "TestInfEpsRoundSkipsUnreadInfinityStorage"
+        "TestInfEpsRoundSkipsUnreadInfinityStorage",
+        "TestInfEpsFusedKeepsEarlierTermsOnLateFailure"
       ],
       "conditionals": [
         {
@@ -128436,7 +128438,8 @@
             "TestInfEpsInfStructuralEqualityAndReturnCopy",
             "TestInfEpsInfPointerFreeWarmPaths",
             "TestInfEpsInfFormattingOneFinalAllocation",
-            "TestInfEpsInfConstructorSignedScalarShapes"
+            "TestInfEpsInfConstructorSignedScalarShapes",
+            "TestInfEpsFusedKeepsEarlierTermsOnLateFailure"
           ]
         },
         {

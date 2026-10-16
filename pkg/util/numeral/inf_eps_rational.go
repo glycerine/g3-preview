@@ -677,15 +677,24 @@ func (s *RationalService) infEpsInfFused(v *OwnedInfEpsInfRational, c *OwnedRati
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infEpsInfCheck(v); e != nil {
+	if e := s.infEpsScalarOwner(v); e != nil {
 		return e
 	}
 	if e := s.check(c); e != nil {
 		return e
 	}
-	if e := s.infEpsInfCheck(k); e != nil {
+	if e := s.infEpsScalarOwner(k); e != nil {
 		return e
 	}
+	if e := s.infScalarOwner(&v.numeral); e != nil {
+		return e
+	}
+	if e := s.infScalarOwner(&k.numeral); e != nil {
+		return e
+	}
+	// addmul/submul updates m_infty before m_r. Let each component's
+	// operation validate its own storage when reached, so a failure in the
+	// nested epsilon term keeps the earlier source-visible updates.
 	if e := s.infRatFused(&v.infinity, &c.Raw, &k.infinity, sub); e != nil {
 		return e
 	}
