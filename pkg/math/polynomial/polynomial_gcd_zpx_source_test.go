@@ -44,6 +44,10 @@ func TestPolynomialGCDGlexZPXIndependentCoefficientModel(t *testing.T) {
 func TestPolynomialGCDICCPZPXContentAndPrimitiveIndependentModel(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	c := full.core
+	var conditionalTrace bytes.Buffer
+	conditionalTags := diagnostic.NewTraceTagsWithWriter(&conditionalTrace)
+	conditionalTags.Enable("content_bug")
+	c.monomials.config.Trace = conditionalTags
 	_, e := c.monomials.MkVar()
 	serviceMust(t, e)
 	_, e = c.monomials.MkVar()
@@ -61,6 +65,9 @@ func TestPolynomialGCDICCPZPXContentAndPrimitiveIndependentModel(t *testing.T) {
 	serviceMust(t, full.iccpZPX(p, 0, &ci, &cr.root, &pr.root))
 	polynomialQueryExpect(t, c, cr.root.value, map[[3]uint32]int64{{1, 0, 0}: 1, {}: 1})
 	polynomialQueryExpect(t, c, pr.root.value, map[[3]uint32]int64{{0, 1, 0}: 1, {}: 2})
+	if conditionalTrace.Len() != 0 {
+		t.Fatalf("valid ZpX content emitted content_bug: %q", conditionalTrace.String())
+	}
 }
 
 func TestPolynomialGCDICCPZPXSourceShortcutTable(t *testing.T) {

@@ -337,6 +337,9 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 		return e
 	}
 	if !one {
+		if e = m.traceICCPZPXContentBug(g.value, pp.value, x, &s.dividesInvocation); e != nil {
+			return e
+		}
 		if e = content.assign(c, g.value); e != nil {
 			return e
 		}
