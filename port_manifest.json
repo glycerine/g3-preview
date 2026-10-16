@@ -102349,6 +102349,10 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "find_ite_bounds overloads and their TRACE sites (cpp:354-477) are unreachable: the only operator() call at cpp:505 is commented out",
+          "status": "dead_deleted"
+        },
+        {
           "name": "Concrete mk_var, expr2linear_pol and mk_linear_pol: arithmetic ADD, first-numeral binary MUL, opaque products, to_real normalization and exact mpq coefficient buffer (src/tactic/arith/propagate_ineqs_tactic.cpp:121-174)",
           "status": "ported",
           "go_target": "pkg/tactic/arith/polynomial_builder.go",
@@ -181519,6 +181523,10 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "find_ite_bounds TRACE sites (propagate_ineqs_tactic.cpp:355,366,383,393,406,415,428,440,452,477) are unreachable: the only operator() call is commented out",
+          "status": "dead_deleted"
+        },
+        {
           "name": "collect_subsumed1_core resolution_bug CTRACE removed-clause condition at sat_simplifier.cpp:393 has no single-goroutine emission: LAZY_USE_LIST iterator consume skips removed clauses before curr",
           "status": "reference_only"
         },
@@ -183838,6 +183846,10 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "find_ite_bounds TRACE sites (propagate_ineqs_tactic.cpp:355,366,383,393,406,415,428,440,452,477) are unreachable: the only operator() call is commented out",
+          "status": "dead_deleted"
+        },
         {
           "name": "collect_subsumed1_core resolution_bug CTRACE removed-clause condition at sat_simplifier.cpp:393 has no single-goroutine emission: LAZY_USE_LIST iterator consume skips removed clauses before curr",
           "status": "reference_only"
