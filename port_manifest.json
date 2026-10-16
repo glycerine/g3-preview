@@ -43179,6 +43179,12 @@
           ]
         },
         {
+          "name": "Retained polynomial iccp entry TRACE at polynomial.cpp:3454 before zero and constant shortcuts",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_iccp_trace.go",
+          "tests": ["TestPolynomialICCPEntrySourceTraceBeforeShortcuts"]
+        },
+        {
           "name": "Plain polynomial coeff overload source TRACE at polynomial.cpp:3267; reduct overload has no trace",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_coefficient_trace.go",
@@ -45963,6 +45969,12 @@
             "TestPolynomialVariableRecognitionLiteralWritePrefixes",
             "TestPolynomialVariableRecognitionBIGEveryActualPrefix"
           ]
+        },
+        {
+          "name": "Retained polynomial iccp entry TRACE at polynomial.cpp:3454 before zero and constant shortcuts",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_iccp_trace.go",
+          "tests": ["TestPolynomialICCPEntrySourceTraceBeforeShortcuts"]
         },
         {
           "name": "Plain polynomial coeff overload source TRACE at polynomial.cpp:3267; reduct overload has no trace",
@@ -183292,6 +183304,12 @@
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
         },
         {
+          "name": "Retained polynomial iccp entry TRACE at polynomial.cpp:3454 before zero and constant shortcuts",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_iccp_trace.go",
+          "tests": ["TestPolynomialICCPEntrySourceTraceBeforeShortcuts"]
+        },
+        {
           "name": "Plain polynomial coeff overload source TRACE at polynomial.cpp:3267; reduct overload has no trace",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_coefficient_trace.go",
@@ -185477,6 +185495,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
+        },
+        {
+          "name": "Retained polynomial iccp entry TRACE at polynomial.cpp:3454 before zero and constant shortcuts",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_iccp_trace.go",
+          "tests": ["TestPolynomialICCPEntrySourceTraceBeforeShortcuts"]
         },
         {
           "name": "Plain polynomial coeff overload source TRACE at polynomial.cpp:3267; reduct overload has no trace",

@@ -147,6 +147,9 @@ func (m *MultivariatePolynomialManager) iccpParts(p Polynomial, x uint32, i *unu
 }
 func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uint32, i *unumeral.Int, c, pp *polynomialReference, receipt *polynomialICCPInvocationReceipt) (err error) {
 	core := m.core
+	if e := core.traceICCPEntry(p, x); e != nil {
+		return e
+	}
 	zero, e := core.IsZero(p)
 	if e != nil {
 		return e
