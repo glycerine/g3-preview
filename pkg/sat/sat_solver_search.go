@@ -164,6 +164,9 @@ func (s *Solver) simplifyProblem() error {
 	if s.conflict.conflicts < s.nextSimplify {
 		return nil
 	}
+	if e := s.emitSimplifyNotice(); e != nil {
+		return e
+	}
 	s.traceSimplifyProblem()
 	if e := s.Lifecycle.pop(s.Variables.scopeLevel); e != nil {
 		return e

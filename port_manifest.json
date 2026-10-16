@@ -152057,7 +152057,8 @@
         "pkg/sat/sat_asymm_branch_report.go",
         "pkg/sat/sat_solver_stat_display.go",
         "pkg/sat/sat_solver_probing_report.go",
-        "pkg/sat/sat_simplifier_report.go"
+        "pkg/sat/sat_simplifier_report.go",
+        "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
         "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
@@ -152174,7 +152175,8 @@
         "TestSATReportsReadCompactStatsDuringStoppedContinuation",
         "TestSATSolverProbingReportAssignedStoppedAndSourceGates",
         "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
-        "TestSATSimplifierReportsActualSubsumptionAndResolution"
+        "TestSATSimplifierReportsActualSubsumptionAndResolution",
+        "TestSATSolverSimplifyAndRestartSourceVerboseLevels"
       ],
       "conditionals": [
         {
@@ -152831,6 +152833,14 @@
             "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
             "TestSATSimplifierReportsActualSubsumptionAndResolution"
           ]
+        },
+        {
+          "name": "Retained SAT restart mk_stat reads process allocation size before the source current-seconds report (src/sat/sat_solver.cpp:1350-1353; src/sat/sat_types.h:289-293)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_search_verbose.go",
+          "tests": [
+            "TestSATSolverSimplifyAndRestartSourceVerboseLevels"
+          ]
         }
       ],
       "ownership": [
@@ -152953,7 +152963,8 @@
         "pkg/sat/sat_asymm_branch_report.go",
         "pkg/sat/sat_solver_stat_display.go",
         "pkg/sat/sat_solver_probing_report.go",
-        "pkg/sat/sat_simplifier_report.go"
+        "pkg/sat/sat_simplifier_report.go",
+        "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
         "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
@@ -153055,7 +153066,8 @@
         "TestSATReportsReadCompactStatsDuringStoppedContinuation",
         "TestSATSolverProbingReportAssignedStoppedAndSourceGates",
         "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
-        "TestSATSimplifierReportsActualSubsumptionAndResolution"
+        "TestSATSimplifierReportsActualSubsumptionAndResolution",
+        "TestSATSolverSimplifyAndRestartSourceVerboseLevels"
       ],
       "conditionals": [
         {
@@ -153663,6 +153675,14 @@
           "tests": [
             "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
             "TestSATSimplifierReportsActualSubsumptionAndResolution"
+          ]
+        },
+        {
+          "name": "Retained SAT restart mk_stat reads process allocation size before the source current-seconds report (src/sat/sat_solver.cpp:1350-1353; src/sat/sat_types.h:289-293)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_search_verbose.go",
+          "tests": [
+            "TestSATSolverSimplifyAndRestartSourceVerboseLevels"
           ]
         }
       ],
@@ -184440,7 +184460,8 @@
         "pkg/sat/sat_solver_stat_display.go",
         "pkg/sat/sat_solver_probing_report.go",
         "pkg/sat/sat_simplifier_report.go",
-        "pkg/sat/sat_solver_gc_report.go"
+        "pkg/sat/sat_solver_gc_report.go",
+        "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184471,7 +184492,8 @@
         "TestSATSolverProbingReportAssignedStoppedAndSourceGates",
         "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
         "TestSATSimplifierReportsActualSubsumptionAndResolution",
-        "TestSATSolverGCReportsStrategiesDynamicCountsAndGate"
+        "TestSATSolverGCReportsStrategiesDynamicCountsAndGate",
+        "TestSATSolverSimplifyAndRestartSourceVerboseLevels"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -184617,6 +184639,14 @@
           "tests": [
             "TestSATSolverGCReportsStrategiesDynamicCountsAndGate"
           ]
+        },
+        {
+          "name": "Retained SAT solver simplify, restart, and level-thirty status IF_VERBOSE gates use the process-selected stream (src/sat/sat_solver.cpp:1195,1350-1354)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_search_verbose.go",
+          "tests": [
+            "TestSATSolverSimplifyAndRestartSourceVerboseLevels"
+          ]
         }
       ],
       "ownership": [
@@ -184682,7 +184712,8 @@
         "pkg/sat/sat_solver_stat_display.go",
         "pkg/sat/sat_solver_probing_report.go",
         "pkg/sat/sat_simplifier_report.go",
-        "pkg/sat/sat_solver_gc_report.go"
+        "pkg/sat/sat_solver_gc_report.go",
+        "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184740,7 +184771,8 @@
         "TestSATSolverProbingReportAssignedStoppedAndSourceGates",
         "TestSATSimplifierReportsSourceScopesAndVerbosityGate",
         "TestSATSimplifierReportsActualSubsumptionAndResolution",
-        "TestSATSolverGCReportsStrategiesDynamicCountsAndGate"
+        "TestSATSolverGCReportsStrategiesDynamicCountsAndGate",
+        "TestSATSolverSimplifyAndRestartSourceVerboseLevels"
       ],
       "conditionals": [
         {
@@ -185184,6 +185216,14 @@
           "go_target": "pkg/sat/sat_solver_gc_report.go",
           "tests": [
             "TestSATSolverGCReportsStrategiesDynamicCountsAndGate"
+          ]
+        },
+        {
+          "name": "Retained SAT solver simplify, restart, and level-thirty status IF_VERBOSE gates use the process-selected stream (src/sat/sat_solver.cpp:1195,1350-1354)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_search_verbose.go",
+          "tests": [
+            "TestSATSolverSimplifyAndRestartSourceVerboseLevels"
           ]
         }
       ],

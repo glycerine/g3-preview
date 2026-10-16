@@ -134,6 +134,9 @@ func (g *satSolverGC) restart() error {
 	}
 	g.restartStat++
 	g.restarts++
+	if e := g.emitRestartReport(); e != nil {
+		return e
+	}
 	s := g.conflict
 	if e := s.popReinit(s.analysis.propagation.variables.scopeLevel); e != nil {
 		return e
