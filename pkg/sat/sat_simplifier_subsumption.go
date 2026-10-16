@@ -359,6 +359,7 @@ func (s *satSimplifier) backSubsumption1(c1 StoredClauseRef) error {
 					}
 				}
 			}
+			s.traceSubsumed(c1, c2)
 			if e = s.removeClause(c2); e != nil {
 				return e
 			}
@@ -374,10 +375,12 @@ func (s *satSimplifier) backSubsumption1(c1 StoredClauseRef) error {
 				if e != nil {
 					return e
 				}
+				s.traceSubsumptionResolution(c1, c2, l)
 				if e = s.eliminateLiteral(c2, l); e != nil {
 					return e
 				}
 				s.numSubRes++
+				s.traceSubsumptionResult(c2)
 			}
 		}
 		if s.lifecycle.propagation.inconsistent {

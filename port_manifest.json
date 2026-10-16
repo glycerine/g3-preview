@@ -77284,6 +77284,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elim_lit_trace.go",
           "tests": ["TestSATSimplifierEliminateLiteralSourceTraceBranches"]
+        },
+        {
+          "name": "Reached back_subsumption1 subsumed/sub-ref/result TRACE sites at sat_simplifier.cpp:435,441,444, including binary dummy-clause reader",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_subsumption_trace.go",
+          "tests": ["TestSATSimplifierBackwardSubsumptionSourceTraces"]
         }
       ],
       "ownership": [
@@ -182308,6 +182314,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elim_lit_trace.go",
           "tests": ["TestSATSimplifierEliminateLiteralSourceTraceBranches"]
+        },
+        {
+          "name": "Reached back_subsumption1 subsumed/sub-ref/result TRACE sites at sat_simplifier.cpp:435,441,444, including binary dummy-clause reader",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_subsumption_trace.go",
+          "tests": ["TestSATSimplifierBackwardSubsumptionSourceTraces"]
         }
       ],
       "ownership": [
@@ -184102,6 +184114,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elim_lit_trace.go",
           "tests": ["TestSATSimplifierEliminateLiteralSourceTraceBranches"]
+        },
+        {
+          "name": "Reached back_subsumption1 subsumed/sub-ref/result TRACE sites at sat_simplifier.cpp:435,441,444, including binary dummy-clause reader",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_subsumption_trace.go",
+          "tests": ["TestSATSimplifierBackwardSubsumptionSourceTraces"]
         }
       ],
       "ownership": [
