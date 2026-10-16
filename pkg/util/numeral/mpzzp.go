@@ -422,7 +422,7 @@ func (m *IntegerModularManager) divWithAllocationContext(a, b, c *Int, context i
 		if !f {
 			return ErrModularAssertion
 		}
-		if e = m.AssertNormalized(a); e != nil {
+		if e = m.sourceAssertNormalized(a, 201); e != nil {
 			return e
 		}
 	}
@@ -435,7 +435,7 @@ func (m *IntegerModularManager) divWithAllocationContext(a, b, c *Int, context i
 	if e := m.mulWithSourceContext(a, &m.DivTmp, c, context); e != nil {
 		return e
 	}
-	return m.AssertNormalized(c)
+	return m.sourceAssertNormalized(c, 205)
 }
 func (m *IntegerModularManager) Divides(a, b *Int) (bool, error) {
 	return m.dividesWithAllocationContext(a, b, integerAllocationInvocationContext{})
@@ -447,16 +447,13 @@ func (m *IntegerModularManager) gcdWithSourceContext(a, b, c *Int, context integ
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.AssertNormalized(a); e != nil {
-		return e
-	}
-	if e := m.AssertNormalized(b); e != nil {
+	if e := m.sourceAssertNormalizedPair(a, b, 212); e != nil {
 		return e
 	}
 	if e := m.manager.gcdWithAllocationContext(a, b, c, context); e != nil {
 		return e
 	}
-	return m.AssertNormalized(c)
+	return m.sourceAssertNormalizedNamed(c, 214, "is_p_normalized(c)")
 }
 func (m *IntegerModularManager) GCDMany(as []Int, g *Int) error {
 	if e := m.check(); e != nil {
@@ -465,7 +462,7 @@ func (m *IntegerModularManager) GCDMany(as []Int, g *Int) error {
 	if e := m.manager.GCDMany(as, g); e != nil {
 		return e
 	}
-	return m.AssertNormalized(g)
+	return m.sourceAssertNormalizedNamed(g, 219, "is_p_normalized(g)")
 }
 func (m *IntegerModularManager) ExtendedGCD(r1, r2, a, b, g *Int) error {
 	return m.extendedGCDWithSourceContext(r1, r2, a, b, g, integerAllocationInvocationContext{})
@@ -474,10 +471,7 @@ func (m *IntegerModularManager) extendedGCDWithSourceContext(r1, r2, a, b, g *In
 	if e := m.check(); e != nil {
 		return e
 	}
-	if e := m.AssertNormalized(r1); e != nil {
-		return e
-	}
-	if e := m.AssertNormalized(r2); e != nil {
+	if e := m.sourceAssertNormalizedPairNamed(r1, r2, 223, "is_p_normalized(r1) && is_p_normalized(r2)"); e != nil {
 		return e
 	}
 	if e := m.manager.extendedGCDWithAllocationContext(r1, r2, a, b, g, context); e != nil {

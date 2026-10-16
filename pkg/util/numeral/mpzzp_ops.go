@@ -26,6 +26,10 @@ func (m *IntegerModularManager) sourceAssertNormalizedNamed(a *Int, line int32, 
 }
 
 func (m *IntegerModularManager) sourceAssertNormalizedPair(a, b *Int, line int32) error {
+	return m.sourceAssertNormalizedPairNamed(a, b, line, "is_p_normalized(a) && is_p_normalized(b)")
+}
+
+func (m *IntegerModularManager) sourceAssertNormalizedPairNamed(a, b *Int, line int32, condition string) error {
 	if !diagnostic.DebugBuild {
 		return nil
 	}
@@ -48,7 +52,7 @@ func (m *IntegerModularManager) sourceAssertNormalizedPair(a, b *Int, line int32
 	if ok {
 		return nil
 	}
-	return diagnostic.DebugAssertionFailure(d, "src/util/mpzzp.h", line, "is_p_normalized(a) && is_p_normalized(b)")
+	return diagnostic.DebugAssertionFailure(d, "src/util/mpzzp.h", line, condition)
 }
 
 func (m *IntegerModularManager) sourceAssertNormalizedTriple(a, b, c *Int, line int32) error {

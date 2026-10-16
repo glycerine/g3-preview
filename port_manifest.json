@@ -169584,6 +169584,24 @@
           ]
         },
         {
+          "name": "mpzzp div input/output normalization SASSERTs at mpzzp.h:201,205, including nested inverse and multiply source ordering",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp.go",
+          "tests": [
+            "TestIntegerModularScalarSourceAssertionActions",
+            "TestIntegerModularPredictableFailurePrefixes"
+          ]
+        },
+        {
+          "name": "mpzzp gcd pair input/result, array gcd result and extended gcd pair input SASSERTs at mpzzp.h:212,214,219,223",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp.go",
+          "tests": [
+            "TestIntegerModularScalarSourceAssertionActions",
+            "TestIntegerModularCompleteScalarRoutes"
+          ]
+        },
+        {
           "name": "Remaining scalar arithmetic/fused/sets/const-mutable conversion/bit/log/root/formatting overloads beyond separately ported source assertions",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpzzp_ops.go",

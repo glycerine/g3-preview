@@ -25,7 +25,7 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 	serviceMust(t, e)
 	in, e := os.CreateTemp(t.TempDir(), "mpzzp-assert-input-*")
 	serviceMust(t, e)
-	_, e = in.WriteString(strings.Repeat("CT", 12))
+	_, e = in.WriteString(strings.Repeat("CT", 12) + "TCCCTCTTT")
 	serviceMust(t, e)
 	_, e = in.Seek(0, 0)
 	serviceMust(t, e)
@@ -126,6 +126,34 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 	if e := m.Swap(&a, &b); !errors.As(e, &thrown) || a.Val != 8 || b.Val != 0 {
 		t.Fatal("Swap Throw must precede receiver mutation", a, b, e)
 	}
+	one := NewInt(1)
+	outValue = NewInt(99)
+	if e := m.Div(&a, &one, &outValue); !errors.As(e, &thrown) || outValue.Val != 99 {
+		t.Fatal("Div input Throw must precede divisor copy and output mutation", outValue, e)
+	}
+	if e := m.Div(&a, &one, &outValue); e != nil {
+		t.Fatal("Div input and nested Mul Continue must reach arithmetic", e)
+	}
+	modularValue(t, z, &outValue, 1)
+	outValue = NewInt(99)
+	if e := m.GCD(&a, &one, &outValue); e != nil {
+		t.Fatal("GCD input Continue must reach arithmetic", e)
+	}
+	modularValue(t, z, &outValue, 1)
+	outValue = NewInt(99)
+	if e := m.GCD(&a, &a, &outValue); !errors.As(e, &thrown) || outValue.Val != 99 {
+		t.Fatal("GCD input Throw must precede output mutation", outValue, e)
+	}
+	if e := m.GCD(&a, &a, &outValue); !errors.As(e, &thrown) || outValue.Val != 8 {
+		t.Fatal("GCD result Throw must retain published output", outValue, e)
+	}
+	if e := m.GCDMany([]Int{NewInt(8), NewInt(12)}, &outValue); !errors.As(e, &thrown) || outValue.Val != 4 {
+		t.Fatal("GCDMany result Throw must retain published output", outValue, e)
+	}
+	x, y, g := NewInt(91), NewInt(92), NewInt(93)
+	if e := m.ExtendedGCD(&a, &one, &x, &y, &g); !errors.As(e, &thrown) || x.Val != 91 || y.Val != 92 || g.Val != 93 {
+		t.Fatal("ExtendedGCD input Throw must precede output mutation", x, y, g, e)
+	}
 	serviceMust(t, d.EnableAssertions(false))
 	if got, e := m.String(&a); e != nil || got != "8" {
 		t.Fatal("disabled source assertion must leave numeral readable", got, e)
@@ -139,8 +167,8 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 	data, e := os.ReadFile(out.Name())
 	serviceMust(t, e)
 	if strings.Count(string(data), "File: src/util/mpzzp.h\nLine: 146\n") != 2 ||
-		strings.Count(string(data), "is_p_normalized(a)\n") != 12 ||
-		strings.Count(string(data), "is_p_normalized(a) && is_p_normalized(b)\n") != 9 ||
+		strings.Count(string(data), "is_p_normalized(a)\n") != 14 ||
+		strings.Count(string(data), "is_p_normalized(a) && is_p_normalized(b)\n") != 13 ||
 		strings.Count(string(data), "is_p_normalized(a) && is_p_normalized(b) && is_p_normalized(c)\n") != 1 ||
 		strings.Count(string(data), "Line: 161\nis_p_normalized(b)\n") != 1 ||
 		strings.Count(string(data), "Line: 162\nis_p_normalized(c)\n") != 1 {
@@ -152,13 +180,26 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 		}
 	}
 	for _, line := range []int{150, 151, 152, 153, 154, 156, 160, 161, 162, 188} {
-		if strings.Count(string(data), "Line: "+strconv.Itoa(line)+"\n") != 1 {
+		want := 1
+		if line == 154 {
+			want = 2
+		}
+		if strings.Count(string(data), "Line: "+strconv.Itoa(line)+"\n") != want {
 			t.Fatal("missing arithmetic assertion source line", line, string(data))
 		}
 	}
+	if strings.Count(string(data), "Line: 201\nis_p_normalized(a)\n") != 2 {
+		t.Fatal("missing division input assertion records", string(data))
+	}
+	if strings.Count(string(data), "Line: 212\nis_p_normalized(a) && is_p_normalized(b)\n") != 3 ||
+		strings.Count(string(data), "Line: 214\nis_p_normalized(c)\n") != 1 ||
+		strings.Count(string(data), "Line: 219\nis_p_normalized(g)\n") != 1 ||
+		strings.Count(string(data), "Line: 223\nis_p_normalized(r1) && is_p_normalized(r2)\n") != 1 {
+		t.Fatal("missing GCD source assertion records", string(data))
+	}
 	state, e := input.State()
 	serviceMust(t, e)
-	if state.Position != 24 {
+	if state.Position != 33 {
 		t.Fatal("disabled assertion consumed an action", state.Position)
 	}
 }
