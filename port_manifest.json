@@ -99402,7 +99402,8 @@
         "TestBoundEquationRetainedParameterReadsAndProgressCounts",
         "TestBoundEquationDisplaySourceOrderDeadConstraintAndWriterError",
         "TestBoundAssertionSourceTraceAndFalseAlarmOrder",
-        "TestBoundRelevanceSourceTraceOldValueAndSmallImprovement"
+        "TestBoundRelevanceSourceTraceOldValueAndSmallImprovement",
+        "TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds"
       ],
       "conditionals": [
         {
@@ -99560,6 +99561,12 @@
           "status": "ported",
           "go_target": "pkg/tactic/arith/bound_trace.go",
           "tests": ["TestBoundRelevanceSourceTraceOldValueAndSmallImprovement"]
+        },
+        {
+          "name": "Selected check_feasibility first-conflict TRACE after conflict publication, with concrete bound/equation display (bound_propagator.cpp:443-457)",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_trace.go",
+          "tests": ["TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds"]
         }
       ],
       "ownership": [
@@ -179934,7 +179941,8 @@
         "TestASTWellSortedNonBooleanRootTraceProfiles",
         "TestASTQuantifierPatternSourceTraceBeforeRegistration",
         "TestBoundAssertionSourceTraceAndFalseAlarmOrder",
-        "TestBoundRelevanceSourceTraceOldValueAndSmallImprovement"
+        "TestBoundRelevanceSourceTraceOldValueAndSmallImprovement",
+        "TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds"
       ],
       "conditionals": [
         {
@@ -181382,6 +181390,12 @@
           "status": "ported",
           "go_target": "pkg/tactic/arith/bound_trace.go",
           "tests": ["TestBoundRelevanceSourceTraceOldValueAndSmallImprovement"]
+        },
+        {
+          "name": "Retained bound_propagator first-conflict TRACE emits source header and borrowed display through sticky writer",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_trace.go",
+          "tests": ["TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds"]
         }
       ],
       "ownership": [
@@ -181553,7 +181567,8 @@
         "TestASTWellSortedNonBooleanRootTraceProfiles",
         "TestASTQuantifierPatternSourceTraceBeforeRegistration",
         "TestBoundAssertionSourceTraceAndFalseAlarmOrder",
-        "TestBoundRelevanceSourceTraceOldValueAndSmallImprovement"
+        "TestBoundRelevanceSourceTraceOldValueAndSmallImprovement",
+        "TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds"
       ],
       "conditionals": [
         {
@@ -183001,6 +183016,12 @@
           "status": "ported",
           "go_target": "pkg/tactic/arith/bound_trace.go",
           "tests": ["TestBoundRelevanceSourceTraceOldValueAndSmallImprovement"]
+        },
+        {
+          "name": "Retained check_feasibility TRACE macro site with tag gate before complete bound display",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_trace.go",
+          "tests": ["TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds"]
         }
       ],
       "ownership": [

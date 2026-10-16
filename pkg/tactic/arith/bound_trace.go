@@ -1,4 +1,4 @@
-// Source: src/tactic/arith/bound_propagator.cpp:279-305,331-357,382-411.
+// Source: src/tactic/arith/bound_propagator.cpp:279-305,331-357,382-411,457.
 package arith
 
 import (
@@ -120,4 +120,18 @@ func (s *BoundEquationStore) traceBoundSmallImprovement(candidate, old float64, 
 	}
 	body := label + " new: " + strconv.FormatFloat(candidate, 'g', 6, 64) + " old: " + strconv.FormatFloat(old, 'g', 6, 64) + " improvement is too small\n"
 	s.emitBoundTrace("bound_propagator", "relevant_bound", line, body)
+}
+
+func (s *BoundEquationStore) traceBoundConflict(x uint32) {
+	tags := s.boundTraceTags()
+	if !tags.ShouldTrace("bound_propagator") {
+		return
+	}
+	_ = tags.EmitConditional("bound_propagator", "check_feasibility", "src/tactic/arith/bound_propagator.cpp", 457,
+		func() bool { return true }, func(w io.Writer) error {
+			if _, err := io.WriteString(w, "inconsistency detected: x"+strconv.FormatUint(uint64(x), 10)+"\n"); err != nil {
+				return err
+			}
+			return s.Display(w)
+		})
 }

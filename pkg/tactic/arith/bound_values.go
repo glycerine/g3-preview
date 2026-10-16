@@ -140,6 +140,7 @@ func (s *BoundEquationStore) assertBound(x uint32, k *numeral.Rational, strict, 
 		}
 		if cmp > 0 || (cmp == 0 && (v.lower.strict || v.upper.strict)) {
 			s.conflict = x
+			s.traceBoundConflict(x)
 		}
 	}
 	return true, nil

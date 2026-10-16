@@ -131,3 +131,52 @@ func TestBoundRelevanceSourceTraceOldValueAndSmallImprovement(t *testing.T) {
 		t.Fatalf("relevance TRACE source records\n got: %q\nwant: %q", got, want)
 	}
 }
+
+func TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds(t *testing.T) {
+	m, _ := equationManager(t)
+	s, err := NewBoundEquationStore(m)
+	equationMust(t, err)
+	defer func() { equationMust(t, s.Close()) }()
+	equationMust(t, s.MkVar(0, false))
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("bound_propagator")
+	equationMust(t, s.BindTrace(tags))
+	value := numeral.NewRational()
+	defer func() { equationMust(t, m.Del(&value)) }()
+	equationMust(t, m.SetInt32(&value, 3))
+	accepted, err := s.AssertLower(0, &value, false)
+	equationMust(t, err)
+	if !accepted {
+		t.Fatal("lower bound was refused")
+	}
+	equationMust(t, m.SetInt32(&value, 2))
+	accepted, err = s.AssertUpper(0, &value, false)
+	equationMust(t, err)
+	if !accepted {
+		t.Fatal("conflicting upper bound was refused")
+	}
+	conflict, err := s.ConflictVar()
+	equationMust(t, err)
+	if conflict != 0 {
+		t.Fatal("conflict was not published before trace", conflict)
+	}
+	if !tags.ShouldTrace("bound_propagator") {
+		if output.Len() != 0 {
+			t.Fatal("erased conflict TRACE wrote output", output.String())
+		}
+		return
+	}
+	want := "-------- [bound_propagator] check_feasibility src/tactic/arith/bound_propagator.cpp:457 ---------\n" +
+		"inconsistency detected: x0\n" +
+		"3 | 3 <= x0 <= 2 | 2\n" +
+		"------------------------------------------------\n"
+	if got := output.String(); got != want {
+		t.Fatalf("conflict TRACE\n got: %q\nwant: %q", got, want)
+	}
+	_, err = s.AssertUpper(0, &value, false)
+	equationMust(t, err)
+	if output.String() != want {
+		t.Fatal("established conflict emitted a second check_feasibility TRACE")
+	}
+}
