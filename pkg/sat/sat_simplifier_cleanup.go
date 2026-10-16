@@ -71,6 +71,7 @@ func (s *satSimplifier) deleteCleanupClause(c StoredClauseRef) error {
 	return nil
 }
 func (s *satSimplifier) cleanupClauses(learned, varsEliminated, inUse bool) error {
+	s.traceCleanupClauses()
 	if e := s.beginCleanupClauses(learned); e != nil {
 		return e
 	}
