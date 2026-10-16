@@ -63,6 +63,21 @@ func TestFunctionInterpretationConsumedASTReleaseRetry(t *testing.T) {
 	if !function.closed || function.bytes != 0 {
 		t.Fatalf("owning retry did not complete: closed=%v bytes=%d", function.closed, function.bytes)
 	}
+	cacheValue, err := manager.MkFreshConst("cache-value", boolean)
+	must(err)
+	cached, err := NewFunctionInterpretation(manager, 0)
+	must(err)
+	must(manager.IncRef(cacheValue))
+	cached.cached = cacheValue
+	cacheID, err := manager.GetASTID(cacheValue)
+	must(err)
+	manager.DebugFreeIndices[cacheID] = struct{}{}
+	err = cached.resetCache()
+	if !errors.Is(err, ast.ErrASTDomain) || !cached.cached.IsNull() {
+		t.Fatalf("consumed cache release must clear the cache: err=%v cached=%v", err, cached.cached)
+	}
+	delete(manager.DebugFreeIndices, cacheID)
+	must(cached.Close())
 	oldValue, err := manager.MkVar(102, boolean)
 	must(err)
 	newValue, err := manager.MkVar(103, boolean)
