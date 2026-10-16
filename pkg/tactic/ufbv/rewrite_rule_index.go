@@ -2,6 +2,7 @@
 package ufbv
 
 import (
+	"errors"
 	"io"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -52,11 +53,15 @@ func (r *rewriteRuleIndex) check() error {
 	return nil
 }
 
-func (r *rewriteRuleIndex) traceInsert(quantifier ast.ASTHandle) error {
-	tags := r.trace
-	if tags == nil {
-		tags = diagnostic.BorrowProcessTraceTags()
+func (r *rewriteRuleIndex) traceTags() *diagnostic.TraceTags {
+	if r.trace != nil {
+		return r.trace
 	}
+	return diagnostic.BorrowProcessTraceTags()
+}
+
+func (r *rewriteRuleIndex) traceInsert(quantifier ast.ASTHandle) error {
+	tags := r.traceTags()
 	if !tags.ShouldTrace("demodulator_fwd") {
 		return nil
 	}
@@ -69,6 +74,84 @@ func (r *rewriteRuleIndex) traceInsert(quantifier ast.ASTHandle) error {
 				return e
 			}
 			_, _ = io.WriteString(w, "INSERT: "+body+"\n")
+			return nil
+		})
+	return operandErr
+}
+
+func (r *rewriteRuleIndex) traceTrying(f ast.ASTHandle, args []ast.ASTHandle) error {
+	tags := r.traceTags()
+	if !tags.ShouldTrace("demodulator_bug") {
+		return nil
+	}
+	var operandErr error
+	_ = tags.EmitConditional("demodulator_bug", "rewrite1", "src/tactic/ufbv/ufbv_rewriter.cpp", 290,
+		func() bool { return true }, func(w io.Writer) error {
+			name, e := r.manager.GetASTName(f)
+			if e == nil {
+				var display string
+				display, e = r.manager.Symbols.Display(name)
+				if e == nil {
+					_, _ = io.WriteString(w, "trying to rewrite: "+display+" args:\n")
+				}
+			}
+			if e != nil {
+				operandErr = e
+				return e
+			}
+			for _, arg := range args {
+				body, e := formulaTraceText(r.manager, arg)
+				if e != nil {
+					operandErr = e
+					return e
+				}
+				_, _ = io.WriteString(w, body+"\n")
+			}
+			return nil
+		})
+	return operandErr
+}
+
+func (r *rewriteRuleIndex) traceMatching(q ast.ASTHandle) error {
+	tags := r.traceTags()
+	if !tags.ShouldTrace("demodulator_bug") {
+		return nil
+	}
+	var operandErr error
+	_ = tags.EmitConditional("demodulator_bug", "rewrite1", "src/tactic/ufbv/ufbv_rewriter.cpp", 305,
+		func() bool { return true }, func(w io.Writer) error {
+			body, e := formulaTraceText(r.manager, q)
+			if e != nil {
+				operandErr = e
+				return e
+			}
+			_, _ = io.WriteString(w, "Matching with demodulator: "+body+"\n")
+			return nil
+		})
+	return operandErr
+}
+
+func (r *rewriteRuleIndex) traceSuccess(rhs, output ast.ASTHandle) error {
+	tags := r.traceTags()
+	if !tags.ShouldTrace("demodulator_bug") {
+		return nil
+	}
+	var operandErr error
+	_ = tags.EmitConditional("demodulator_bug", "rewrite1", "src/tactic/ufbv/ufbv_rewriter.cpp", 310,
+		func() bool { return true }, func(w io.Writer) error {
+			_, _ = io.WriteString(w, "succeeded...\n")
+			rhsText, e := formulaTraceText(r.manager, rhs)
+			if e != nil {
+				operandErr = e
+				return e
+			}
+			_, _ = io.WriteString(w, rhsText+"\n===>\n")
+			outText, e := formulaTraceText(r.manager, output)
+			if e != nil {
+				operandErr = e
+				return e
+			}
+			_, _ = io.WriteString(w, outText+"\n")
 			return nil
 		})
 	return operandErr
@@ -230,6 +313,9 @@ func (r *rewriteRuleIndex) tryRewrite(f ast.ASTHandle, args []ast.ASTHandle) (as
 	if set == nil {
 		return ast.ASTRef{}, false, nil
 	}
+	if e := r.traceTrying(f, args); e != nil {
+		return ast.ASTRef{}, false, e
+	}
 	for _, q := range set.values {
 		rule, found := r.rules[q]
 		if !found {
@@ -252,6 +338,9 @@ func (r *rewriteRuleIndex) tryRewrite(f ast.ASTHandle, args []ast.ASTHandle) (as
 		if int(count) != len(args) {
 			continue
 		}
+		if e := r.traceMatching(q); e != nil {
+			return ast.ASTRef{}, false, e
+		}
 		decl, e := r.manager.GetDecl(rule.lhs)
 		if e != nil {
 			return ast.ASTRef{}, false, e
@@ -267,8 +356,21 @@ func (r *rewriteRuleIndex) tryRewrite(f ast.ASTHandle, args []ast.ASTHandle) (as
 			return ast.ASTRef{}, false, ast.ErrASTDomain
 		}
 		out, matched, e := r.matcher.rewriteRule(rule.lhs, rule.rhs, args)
-		if e != nil || matched {
+		if e != nil {
 			return out, matched, e
+		}
+		if matched {
+			if !r.traceTags().ShouldTrace("demodulator_bug") {
+				return out, true, nil
+			}
+			h, getErr := r.manager.RefGet(out)
+			if getErr != nil {
+				return ast.ASTRef{}, false, errors.Join(getErr, r.manager.DelRef(&out))
+			}
+			if traceErr := r.traceSuccess(rule.rhs, h); traceErr != nil {
+				return ast.ASTRef{}, false, errors.Join(traceErr, r.manager.DelRef(&out))
+			}
+			return out, true, nil
 		}
 	}
 	return ast.ASTRef{}, false, nil
