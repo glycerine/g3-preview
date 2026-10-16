@@ -18,6 +18,7 @@ type ASTScopedExprSubstitution struct {
 }
 type astExprSubstTable struct {
 	entries insdict.Dict[uint64, astExprSubstEntry]
+	header  uint64
 }
 type astExprSubstEntry struct {
 	key, value astNodeRef
@@ -28,7 +29,9 @@ type astExprSubstPending struct {
 	which uint32
 }
 type astExprSubstState struct {
-	tables  [3]astExprSubstTable
+	base    astExprSubstTable
+	proof   *astExprSubstTable
+	dep     *astExprSubstTable
 	pending []astExprSubstPending
 	header  uint64
 }
@@ -59,7 +62,20 @@ func (m *ASTManager) substTable(s ASTExprSubstitution, which uint32) (*astExprSu
 	if which >= 3 {
 		return nil, ErrASTDomain
 	}
-	return &m.exprSubstitutions[s.record].tables[which], nil
+	state := m.exprSubstitutions[s.record]
+	switch which {
+	case 0:
+		return &state.base, nil
+	case 1:
+		if state.proof != nil {
+			return state.proof, nil
+		}
+	case 2:
+		if state.dep != nil {
+			return state.dep, nil
+		}
+	}
+	return nil, ErrASTDomain
 }
 func (m *ASTManager) newExprSubstitution(cores, proofs, explicit bool) (ASTExprSubstitution, error) {
 	header := uint64(reflect.TypeOf(astExprSubstState{}).Size())
@@ -71,7 +87,9 @@ func (m *ASTManager) newExprSubstitution(cores, proofs, explicit bool) (ASTExprS
 		m.BudgetField.Release(header)
 		return ASTExprSubstitution{}, e
 	}
+	state := &astExprSubstState{header: header}
 	fail := func(e error) (ASTExprSubstitution, error) {
+		m.releaseExprSubstOptionalTables(state)
 		m.allocator.Deallocate(astExprSubstBytes, r)
 		m.BudgetField.Release(header)
 		return ASTExprSubstitution{}, e
@@ -91,14 +109,27 @@ func (m *ASTManager) newExprSubstitution(cores, proofs, explicit bool) (ASTExprS
 			return fail(e)
 		}
 	}
+	if proofs {
+		state.proof, e = m.newExprSubstOptionalTable(29, "expr2proof")
+		if e != nil {
+			return fail(e)
+		}
+	}
+	if cores {
+		state.dep, e = m.newExprSubstOptionalTable(31, "expr2expr_dependency")
+		if e != nil {
+			return fail(e)
+		}
+	}
 	if m.exprSubstitutions == nil {
 		m.exprSubstitutions = make(map[arena.SmallBytesRef]*astExprSubstState)
 	}
-	m.exprSubstitutions[r] = &astExprSubstState{header: header}
+	m.exprSubstitutions[r] = state
 	return ASTExprSubstitution{m.origin, r}, nil
 }
 func (m *ASTManager) releaseExprSubstitutionsAfterNodeTeardown() {
 	for _, s := range m.exprSubstitutions {
+		m.releaseExprSubstOptionalTables(s)
 		m.BudgetField.Release(s.header)
 	}
 	m.exprSubstitutions = nil

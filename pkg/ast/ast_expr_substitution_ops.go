@@ -425,6 +425,7 @@ func (m *ASTManager) DelExprSubstitution(s *ASTExprSubstitution) error {
 	if e = m.allocator.Deallocate(astExprSubstBytes, s.record); e != nil {
 		return e
 	}
+	m.releaseExprSubstOptionalTables(state)
 	m.BudgetField.Release(state.header)
 	delete(m.exprSubstitutions, s.record)
 	*s = ASTExprSubstitution{}
