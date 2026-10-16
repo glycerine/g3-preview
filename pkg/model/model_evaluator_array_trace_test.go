@@ -12,8 +12,8 @@ import (
 )
 
 // Source: src/model/model_evaluator.cpp:435-497. Extraction emits entry,
-// successful else, absent else and non-ground else records from the real
-// function-backed array path.
+// successful else, absent else, non-ground entry and non-ground else records
+// from the real function-backed array path.
 func TestModelEvaluatorArrayExtractionSourceTrace(t *testing.T) {
 	m, md, ev, _, _, _ := evaluatorFixture(t)
 	_, err := m.RegisterArrayPlugin()
@@ -87,4 +87,17 @@ func TestModelEvaluatorArrayExtractionSourceTrace(t *testing.T) {
 	astTestMust(t, ev.Reset(nil))
 	astTestMust(t, ev.Evaluate(plain, out))
 	check(451, "no translation: untranslated-array\n")
+	output.Reset()
+	astTestMust(t, fi.SetElse(no))
+	err = fi.InsertEntry([]ast.ASTHandle{no}, v)
+	if ast.ASTSourceDebug {
+		if err != ast.ErrASTDomain || output.Len() != 0 {
+			t.Fatalf("source debug rejects non-ground function entry before extraction: %v %q", err, output.String())
+		}
+	} else {
+		astTestMust(t, err)
+		astTestMust(t, ev.Reset(nil))
+		astTestMust(t, ev.Evaluate(array, out))
+		check(468, "could not extract array interpretation: (_ as-array array-trace-f)\n(:var 0)\n")
+	}
 }

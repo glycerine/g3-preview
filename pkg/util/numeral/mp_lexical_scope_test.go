@@ -223,8 +223,9 @@ func TestLexicalFailedConstructorCompletedMemberOrder(t *testing.T) {
 	}
 }
 
-// This bounded fixture executes the exact cleanup shape of infDiv: four
-// scalar locals, two members of a named value and two returned-copy members.
+// This bounded fixture exercises lexical cleanup of four scalar locals, two
+// members of a named value and two returned-copy members. It does not claim
+// a retained source path for the removed approximation division functions.
 // It deliberately corrupts a physical layout after construction; no allocator
 // callback or budget refusal is presented as a source destructor exception.
 func lexicalEightRootFixture(s *RationalService, corrupt bool) (out OwnedInfRational, err error, broken NumericCellRef, requested uint64) {

@@ -57666,8 +57666,8 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Selected extract_array_func_interp model_evaluator TRACE at cpp:435,451,476,482,497 with source SMT2 array and fallback rendering; non-ground entry branch at 468 is wired but retained function-entry construction rejects its test input",
-          "status": "partial",
+          "name": "Selected extract_array_func_interp model_evaluator TRACE at cpp:435,451,468,476,482,497 with source SMT2 rendering; release reaches non-ground entry diagnostic, while debug rejects that entry at its source constructor assertion",
+          "status": "ported",
           "go_target": "pkg/model/model_evaluator_trace.go",
           "go_targets": ["pkg/model/model_evaluator_array_expansion.go"],
           "tests": ["TestModelEvaluatorArrayExtractionSourceTrace"]
@@ -128386,7 +128386,7 @@
           ]
         },
         {
-          "name": "Selected COPY/VALUE/DEFAULT local completion phases, nested source frames, completed-before-partial cleanup, InfDiv result assignment and InfPower prvalue move; external unframed callers and raw domains remain open",
+          "name": "Selected COPY/VALUE/DEFAULT local completion phases, nested source frames and completed-before-partial cleanup; external unframed callers and raw domains remain open",
           "status": "partial",
           "go_target": "pkg/util/numeral/rational_lexical_scope.go",
           "tests": [
@@ -128864,7 +128864,7 @@
           ]
         },
         {
-          "name": "Selected COPY/VALUE/DEFAULT local completion phases, nested source frames, completed-before-partial cleanup, InfDiv result assignment and InfPower prvalue move; external unframed callers and raw domains remain open",
+          "name": "Selected COPY/VALUE/DEFAULT local completion phases, nested source frames and completed-before-partial cleanup; external unframed callers and raw domains remain open",
           "status": "partial",
           "go_target": "pkg/util/numeral/rational_lexical_scope.go",
           "tests": [
@@ -174235,7 +174235,7 @@
           ]
         },
         {
-          "name": "Selected COPY/VALUE/DEFAULT local completion phases, nested source frames, completed-before-partial cleanup, InfDiv result assignment and InfPower prvalue move; remaining raw domains remain open",
+          "name": "Selected COPY/VALUE/DEFAULT local completion phases, nested source frames and completed-before-partial cleanup; remaining raw domains remain open",
           "status": "partial",
           "go_target": "pkg/util/numeral/rational_lexical_scope.go",
           "tests": [
@@ -181581,8 +181581,8 @@
           "tests": ["TestExtensionModelDefinitionSourceTraceReverseOrder", "TestExtensionModelTraceAttachedDeclarationInfo"]
         },
         {
-          "name": "Selected extract_array_func_interp model_evaluator TRACE at cpp:435,451,476,482,497 with source SMT2 array and fallback rendering; non-ground entry branch at 468 is wired but retained function-entry construction rejects its test input",
-          "status": "partial",
+          "name": "Selected extract_array_func_interp model_evaluator TRACE at cpp:435,451,468,476,482,497 with source SMT2 rendering; release reaches non-ground entry diagnostic, while debug rejects that entry at its source constructor assertion",
+          "status": "ported",
           "go_target": "pkg/model/model_evaluator_trace.go",
           "go_targets": ["pkg/model/model_evaluator_array_expansion.go"],
           "tests": ["TestModelEvaluatorArrayExtractionSourceTrace"]
@@ -183901,8 +183901,8 @@
           "tests": ["TestExtensionModelDefinitionSourceTraceReverseOrder", "TestExtensionModelTraceAttachedDeclarationInfo"]
         },
         {
-          "name": "Selected extract_array_func_interp model_evaluator TRACE at cpp:435,451,476,482,497 with source SMT2 array and fallback rendering; non-ground entry branch at 468 is wired but retained function-entry construction rejects its test input",
-          "status": "partial",
+          "name": "Selected extract_array_func_interp model_evaluator TRACE at cpp:435,451,468,476,482,497 with source SMT2 rendering; release reaches non-ground entry diagnostic, while debug rejects that entry at its source constructor assertion",
+          "status": "ported",
           "go_target": "pkg/model/model_evaluator_trace.go",
           "go_targets": ["pkg/model/model_evaluator_array_expansion.go"],
           "tests": ["TestModelEvaluatorArrayExtractionSourceTrace"]
