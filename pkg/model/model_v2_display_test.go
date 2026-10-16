@@ -1,0 +1,47 @@
+package model_test
+
+import (
+	"bytes"
+	"testing"
+
+	"github.com/glycerine/g3/pkg/ast"
+)
+
+// Source: src/model/model_v2_pp.cpp:22-83. Display keeps source registration
+// order, function-entry order and the distinct empty-entry else prefix.
+func TestModelV2DisplayConstantsFunctionsAndPartialElse(t *testing.T) {
+	m, md, _, context, _, config := evaluatorFixture(t)
+	no, err := m.MkFalse()
+	astTestMust(t, err)
+	yes, err := m.MkTrue()
+	astTestMust(t, err)
+	constant := goalTestAtom(t, m, "display-const")
+	d, err := m.GetDecl(constant)
+	astTestMust(t, err)
+	astTestMust(t, md.Core().RegisterConstant(d, no))
+	f := modelTestFunctionDecl(t, m, "display-f")
+	fi := modelTestFunction(t, m, 1)
+	astTestMust(t, fi.InsertEntry([]ast.ASTHandle{yes}, no))
+	astTestMust(t, fi.SetElse(yes))
+	astTestMust(t, md.Core().RegisterFunction(f, fi))
+	g := modelTestFunctionDecl(t, m, "display-g")
+	gi := modelTestFunction(t, m, 1)
+	astTestMust(t, gi.SetElse(no))
+	astTestMust(t, md.Core().RegisterFunction(g, gi))
+	var out bytes.Buffer
+	astTestMust(t, md.Core().WriteV2(&out, context, config.Globals, false))
+	want := "display-const -> false\n" +
+		"display-f -> {\n  true -> false\n  else -> true\n}\n" +
+		"display-g -> {\n  false\n}\n"
+	if out.String() != want {
+		t.Fatalf("source full model display: got %q, want %q", out.String(), want)
+	}
+	out.Reset()
+	astTestMust(t, md.Core().WriteV2(&out, context, config.Globals, true))
+	want = "display-const -> false\n" +
+		"display-f -> {\n  true -> false\n  else -> #unspecified\n}\n" +
+		"display-g -> {\n  #unspecified\n}\n"
+	if out.String() != want {
+		t.Fatalf("source partial model display: got %q, want %q", out.String(), want)
+	}
+}

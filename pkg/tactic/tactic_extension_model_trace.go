@@ -1,11 +1,13 @@
-// Source: src/tactic/extension_model_converter.cpp:59; src/util/trace.h:51.
+// Source: src/tactic/extension_model_converter.cpp:29-49,59,71; src/util/trace.h:51.
 package tactic
 
 import (
 	"errors"
 	"io"
+	"strconv"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/model"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
@@ -22,6 +24,10 @@ func (c *tacticExtensionModelConverter) writeExtensionSMT2(w io.Writer, h ast.AS
 	if err != nil {
 		return err
 	}
+	return c.writeExtensionFormat(w, format)
+}
+
+func (c *tacticExtensionModelConverter) writeExtensionFormat(w io.Writer, format ast.ASTHandle) (result error) {
 	out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: c.manager.Budget()})
 	if err != nil {
 		return err
@@ -37,6 +43,76 @@ func (c *tacticExtensionModelConverter) writeExtensionSMT2(w io.Writer, h ast.AS
 	}
 	_, err = io.WriteString(w, body)
 	return err
+}
+
+func (c *tacticExtensionModelConverter) writeExtensionSort(w io.Writer, sort ast.ASTHandle) error {
+	format, err := c.manager.SMT2PPSort(sort)
+	if err != nil {
+		return err
+	}
+	return c.writeExtensionFormat(w, format)
+}
+
+func (c *tacticExtensionModelConverter) traceExtensionModel(md *model.ModelCore, line int) error {
+	tags := c.extensionTraceTags()
+	if !tags.ShouldTrace("extension_mc") {
+		return nil
+	}
+	return tags.EmitConditional("extension_mc", "operator()", "src/tactic/extension_model_converter.cpp", line,
+		func() bool { return true }, func(w io.Writer) error {
+			if err := md.WriteV2(w, c.services.Context, c.services.Globals, false); err != nil {
+				return err
+			}
+			n, err := md.NumDeclarations()
+			if err != nil {
+				return err
+			}
+			for i := uint32(0); i < n; i++ {
+				d, err := md.Declaration(i)
+				if err != nil {
+					return err
+				}
+				name, err := c.manager.GetASTName(d)
+				if err != nil {
+					return err
+				}
+				spelling, err := c.manager.Symbols.String(name)
+				if err != nil {
+					return err
+				}
+				if _, err = io.WriteString(w, spelling+" ("); err != nil {
+					return err
+				}
+				arity, err := c.manager.GetArity(d)
+				if err != nil {
+					return err
+				}
+				for j := uint32(0); j < arity; j++ {
+					sort, err := c.manager.GetDomain(d, j)
+					if err != nil {
+						return err
+					}
+					if err = c.writeExtensionSort(w, sort); err != nil {
+						return err
+					}
+				}
+				sort, err := c.manager.GetRange(d)
+				if err != nil {
+					return err
+				}
+				if err = c.writeExtensionSort(w, sort); err != nil {
+					return err
+				}
+				id, err := c.manager.GetASTID(d)
+				if err != nil {
+					return err
+				}
+				if _, err = io.WriteString(w, ")  :id "+strconv.FormatUint(uint64(id), 10)+"\n"); err != nil {
+					return err
+				}
+			}
+			return nil
+		})
 }
 
 func (c *tacticExtensionModelConverter) traceExtensionDefinition(decl, definition, value ast.ASTHandle) error {

@@ -1242,6 +1242,7 @@
         "model_package_boundary.go",
         "model_sat_allocation.go",
         "model_universe_memory_trace.go",
+        "model_v2_display.go",
         "model_value.go"
       ]
     },

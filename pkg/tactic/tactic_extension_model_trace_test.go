@@ -2,6 +2,7 @@ package tactic
 
 import (
 	"bytes"
+	"strconv"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
@@ -38,12 +39,24 @@ func TestExtensionModelDefinitionSourceTraceReverseOrder(t *testing.T) {
 		}
 		return
 	}
+	idA, err := m.GetASTID(da)
+	satOK(t, err)
+	idB, err := m.GetASTID(db)
+	satOK(t, err)
+	modelBody := "extension-trace-b -> true\n" +
+		"extension-trace-a -> true\n" +
+		"extension-trace-b (Bool)  :id " + strconv.FormatUint(uint64(idB), 10) + "\n" +
+		"extension-trace-a (Bool)  :id " + strconv.FormatUint(uint64(idA), 10) + "\n"
+	modelRecord := func(line string) string {
+		return "-------- [extension_mc] operator() src/tactic/extension_model_converter.cpp:" + line + " ---------\n" +
+			modelBody + "------------------------------------------------\n"
+	}
 	record := func(name, definition string) string {
 		return "-------- [extension_mc] operator() src/tactic/extension_model_converter.cpp:59 ---------\n" +
 			name + " ->\n" + definition + "\n==>\ntrue\n" +
 			"------------------------------------------------\n"
 	}
-	want := record("extension-trace-b", "true") + record("extension-trace-a", "extension-trace-b")
+	want := modelRecord("49") + record("extension-trace-b", "true") + record("extension-trace-a", "extension-trace-b") + modelRecord("71")
 	if got := output.String(); got != want {
 		t.Fatalf("source extension definition records: got %q, want %q", got, want)
 	}

@@ -109,6 +109,9 @@ func (c *tacticExtensionModelConverter) ApplyModel(out *ModelRef, goal uint32) (
 	if md == nil || md.Manager() != c.manager {
 		return ast.ErrASTHandle
 	}
+	if e = c.traceExtensionModel(md, 49); e != nil {
+		return e
+	}
 	defer func() { err = errors.Join(err, c.drainInvocation()) }()
 	c.evaluator, e = model.NewModelEvaluator(md, c.services)
 	if e != nil {
@@ -159,7 +162,7 @@ func (c *tacticExtensionModelConverter) ApplyModel(out *ModelRef, goal uint32) (
 			c.function = nil
 		}
 	}
-	return nil
+	return c.traceExtensionModel(md, 71)
 }
 
 // Preserve the inherited source unindexed and labels no-op operations.
