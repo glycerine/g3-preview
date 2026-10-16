@@ -128948,7 +128948,7 @@
           ]
         },
         {
-          "name": "Raw FIRST receiver copy, selected references/hash/sign and DEBUG-only numerator/denominator EPS assertions; owning projection cleanup-refusal retention remains open",
+          "name": "Raw FIRST receiver copy and selected reference/hash/sign ownership branches; owning projection cleanup-refusal retention remains open. Both compiled numerator/denominator EPS assertions are ported separately",
           "status": "partial",
           "go_target": "pkg/util/numeral/inf_int_rational.go",
           "tests": [
@@ -129484,7 +129484,7 @@
           ]
         },
         {
-          "name": "Raw FIRST then EPS receiver copy, selected reference/hash/sign and DEBUG-only extraction EPS assertions; owning projection cleanup-refusal retention remains open",
+          "name": "Raw FIRST then EPS receiver copy and selected reference/hash/sign ownership branches; owning projection cleanup-refusal retention remains open. Both compiled extraction EPS assertions are ported separately",
           "status": "partial",
           "go_target": "pkg/util/numeral/inf_rational.go",
           "tests": [
