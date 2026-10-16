@@ -70175,7 +70175,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/parsers/smt2/local_environment.go", "pkg/parsers/smt2/local_lookup.go", "pkg/parsers/smt2/local_sort_stack.go", "pkg/parsers/smt2/local_expr_stack.go"],
-      "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders", "TestSMT2ParserQualifiedLocalSortAndIndexRefusals", "TestSMT2LocalReferenceStacksFrameShrinkAndReset"],
+      "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders", "TestSMT2ParserQualifiedLocalSortAndIndexRefusals", "TestSMT2LocalReferenceStacksFrameShrinkAndReset", "TestSMT2QualifiedLocalExpressionOwnerAndFrameCleanup"],
       "assertions": [
         {
           "line": 250,
@@ -70699,14 +70699,14 @@
           "name": "parse_qualified_name selected local sort/index checks after push_local, owning sort-stack pop on successful match, and expression-reference cleanup on refusal; parser frame integration remains open (smt2parser.cpp:1723-1729,1735-1754)",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/local_lookup.go",
-          "tests": ["TestSMT2ParserQualifiedLocalSortAndIndexRefusals"]
+          "tests": ["TestSMT2ParserQualifiedLocalSortAndIndexRefusals", "TestSMT2QualifiedLocalExpressionOwnerAndFrameCleanup"]
         },
         {
           "name": "Selected parser sort and expression reference stack ownership, command-frame shrink and reset (smt2parser.cpp:230-240,2818-2832,2992-3003); scanner and command execution integration remain open",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/local_expr_stack.go",
           "go_targets": ["pkg/parsers/smt2/local_sort_stack.go"],
-          "tests": ["TestSMT2LocalReferenceStacksFrameShrinkAndReset"]
+          "tests": ["TestSMT2LocalReferenceStacksFrameShrinkAndReset", "TestSMT2QualifiedLocalExpressionOwnerAndFrameCleanup"]
         }
       ],
       "ownership": [],

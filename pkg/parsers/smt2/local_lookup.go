@@ -46,6 +46,17 @@ func (e *smt2LocalEnv) resolveLocal(m *ast.ASTManager, shifter *rewriter.VarShif
 	return ref, true, nil
 }
 
+// pushLocal is the retained parse_expr_name local branch's expression-stack
+// action. The stack takes the reference produced by push_local.
+func (e *smt2LocalEnv) pushLocal(m *ast.ASTManager, shifter *rewriter.VarShifter, name usymbol.Symbol, numBindings uint32, exprs *localExprStack) (bool, error) {
+	ref, found, err := e.resolveLocal(m, shifter, name, numBindings)
+	if err != nil || !found {
+		return found, err
+	}
+	exprs.pushOwned(ref)
+	return true, nil
+}
+
 // resolveQualifiedLocal is the local branch of parse_qualified_name. Source
 // order is push_local, optional sort check, then rejection of index parameters.
 // A refused branch releases the newly pushed expression-stack reference.
@@ -78,4 +89,15 @@ func (e *smt2LocalEnv) resolveQualifiedLocal(m *ast.ASTManager, shifter *rewrite
 		return ast.ASTRef{}, true, errors.Join(errLocalIndexed, m.DelRef(&ref))
 	}
 	return ref, true, nil
+}
+
+// pushQualifiedLocal is the corresponding parse_qualified_name local branch.
+// A missing local remains available to the caller's nonlocal resolution path.
+func (e *smt2LocalEnv) pushQualifiedLocal(m *ast.ASTManager, shifter *rewriter.VarShifter, name usymbol.Symbol, numBindings uint32, sorts *localSortStack, hasSort bool, numIndices uint32, exprs *localExprStack) (bool, error) {
+	ref, found, err := e.resolveQualifiedLocal(m, shifter, name, numBindings, sorts, hasSort, numIndices)
+	if err != nil || !found {
+		return found, err
+	}
+	exprs.pushOwned(ref)
+	return true, nil
 }
