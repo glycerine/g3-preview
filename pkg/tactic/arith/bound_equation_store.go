@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -13,6 +14,7 @@ import (
 type BoundEquationStore struct {
 	self           *BoundEquationStore
 	manager        *numeral.RationalManager
+	trace          *diagnostic.TraceTags
 	equations      *LinearEquationManager
 	constraints    []equationConstraint
 	variables      []equationVariable
@@ -219,6 +221,7 @@ func (s *BoundEquationStore) Close() error {
 		return err
 	}
 	s.variables = nil
+	s.trace = nil
 	s.closed = true
 	return nil
 }

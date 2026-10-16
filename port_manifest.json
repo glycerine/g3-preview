@@ -99388,7 +99388,8 @@
         "pkg/tactic/arith/bound_config.go",
         "pkg/tactic/arith/bound_config_test.go",
         "pkg/tactic/arith/bound_display.go",
-        "pkg/tactic/arith/bound_display_test.go"
+        "pkg/tactic/arith/bound_display_test.go",
+        "pkg/tactic/arith/bound_trace.go"
       ],
       "tests": [
         "TestBoundEquationStoreVariablesWatchesAndConstraintOwnership",
@@ -99399,7 +99400,8 @@
         "TestBoundEquationNegativeCoefficientAndDeadConstraint",
         "TestBoundEquationFullyBoundedTighteningAndStrictness",
         "TestBoundEquationRetainedParameterReadsAndProgressCounts",
-        "TestBoundEquationDisplaySourceOrderDeadConstraintAndWriterError"
+        "TestBoundEquationDisplaySourceOrderDeadConstraintAndWriterError",
+        "TestBoundAssertionSourceTraceAndFalseAlarmOrder"
       ],
       "conditionals": [
         {
@@ -99545,6 +99547,12 @@
           "status": "unported",
           "go_target": null,
           "tests": []
+        },
+        {
+          "name": "Selected lower/upper assertion TRACE entry, derived success, false alarm and unrelaxed/relaxed approximation in source order (bound_propagator.cpp:279-305,331-357)",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_trace.go",
+          "tests": ["TestBoundAssertionSourceTraceAndFalseAlarmOrder"]
         }
       ],
       "ownership": [
@@ -179834,7 +179842,8 @@
         "pkg/tactic/aig/aig_max_sharing_trace.go",
         "pkg/tactic/aig/aig_and_trace.go",
         "pkg/ast/ast_well_sorted_trace.go",
-        "pkg/ast/ast_core_quantifier_pattern_trace.go"
+        "pkg/ast/ast_core_quantifier_pattern_trace.go",
+        "pkg/tactic/arith/bound_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -179916,7 +179925,8 @@
         "TestASTWellSortedWrongAritySourceTraceBeforeWarning",
         "TestASTWellSortedSortMismatchSourceTraceBeforeWarning",
         "TestASTWellSortedNonBooleanRootTraceProfiles",
-        "TestASTQuantifierPatternSourceTraceBeforeRegistration"
+        "TestASTQuantifierPatternSourceTraceBeforeRegistration",
+        "TestBoundAssertionSourceTraceAndFalseAlarmOrder"
       ],
       "conditionals": [
         {
@@ -181352,6 +181362,12 @@
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
+        },
+        {
+          "name": "Retained bound_propagator lower/upper TRACE records with compile/tag gates, borrowed stream and sticky writer state",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_trace.go",
+          "tests": ["TestBoundAssertionSourceTraceAndFalseAlarmOrder"]
         }
       ],
       "ownership": [
@@ -181440,7 +181456,8 @@
         "pkg/tactic/aig/aig_max_sharing_trace.go",
         "pkg/tactic/aig/aig_and_trace.go",
         "pkg/ast/ast_well_sorted_trace.go",
-        "pkg/ast/ast_core_quantifier_pattern_trace.go"
+        "pkg/ast/ast_core_quantifier_pattern_trace.go",
+        "pkg/tactic/arith/bound_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -181520,7 +181537,8 @@
         "TestASTWellSortedWrongAritySourceTraceBeforeWarning",
         "TestASTWellSortedSortMismatchSourceTraceBeforeWarning",
         "TestASTWellSortedNonBooleanRootTraceProfiles",
-        "TestASTQuantifierPatternSourceTraceBeforeRegistration"
+        "TestASTQuantifierPatternSourceTraceBeforeRegistration",
+        "TestBoundAssertionSourceTraceAndFalseAlarmOrder"
       ],
       "conditionals": [
         {
@@ -182956,6 +182974,12 @@
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
+        },
+        {
+          "name": "Retained bound_propagator TRACE macro call sites, including lazy body formatting and source header/footer",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/bound_trace.go",
+          "tests": ["TestBoundAssertionSourceTraceAndFalseAlarmOrder"]
         }
       ],
       "ownership": [

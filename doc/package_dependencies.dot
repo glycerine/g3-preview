@@ -236,6 +236,7 @@ digraph packages {
   "tactic/arith" -> "arena";
   "tactic/arith" -> "ast";
   "tactic/arith" -> "tactic";
+  "tactic/arith" -> "util/diagnostic";
   "tactic/arith" -> "util/numeral";
   "tactic/arith" -> "util/params";
   "tactic/bv" [style=filled, fillcolor="#eeeeee"];

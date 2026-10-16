@@ -1619,6 +1619,7 @@
         "arena",
         "ast",
         "tactic",
+        "util/diagnostic",
         "util/numeral",
         "util/params"
       ],
@@ -1627,6 +1628,7 @@
         "bound_display.go",
         "bound_equation_store.go",
         "bound_propagation.go",
+        "bound_trace.go",
         "bound_values.go",
         "linear_equation.go",
         "polynomial_builder.go",

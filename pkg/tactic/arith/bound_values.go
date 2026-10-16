@@ -71,6 +71,9 @@ func (s *BoundEquationStore) assertBound(x uint32, k *numeral.Rational, strict, 
 		}
 		strict = false
 	}
+	if err = s.traceBoundValue("bound_propagator_detail", lower, x, &working, strict, false); err != nil {
+		return false, err
+	}
 	old := v.upper
 	if lower {
 		old = v.lower
@@ -82,22 +85,39 @@ func (s *BoundEquationStore) assertBound(x uint32, k *numeral.Rational, strict, 
 		}
 		if (lower && cmp < 0) || (!lower && cmp > 0) || (cmp == 0 && (old.strict || !strict)) {
 			if derived {
+				s.traceBoundFalseAlarm(lower)
 				s.falseAlarms++
 			}
 			return false, nil
 		}
 	}
 	if derived {
+		if lower {
+			if err = s.traceBoundValue("bound_propagator_derived", lower, x, &working, strict, true); err != nil {
+				return false, err
+			}
+		}
 		s.propagations++
+		if !lower {
+			if err = s.traceBoundValue("bound_propagator_derived", lower, x, &working, strict, true); err != nil {
+				return false, err
+			}
+		}
 	}
 	approx, e := m.Float64(&working)
 	if e != nil {
 		return false, e
 	}
+	if err = s.traceBoundApprox(lower, x, &working, approx, false); err != nil {
+		return false, err
+	}
 	if lower {
 		approx = 0.000001 * math.Floor(approx*1000000+0.0000001)
 	} else {
 		approx = 0.000001 * math.Ceil(approx*1000000-0.0000001)
+	}
+	if err = s.traceBoundApprox(lower, x, &working, approx, true); err != nil {
+		return false, err
 	}
 	b := &equationBound{value: numeral.NewRational(), approx: approx,
 		strict: strict, x: x, lower: lower, timestamp: s.timestamp, prev: old}
