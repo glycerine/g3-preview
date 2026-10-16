@@ -39,6 +39,7 @@ func NewBVTrailing(extract *MkExtractProc) (*BVTrailing, error) {
 	}
 	p := &BVTrailing{extract: extract, manager: m, header: header}
 	p.self = p
+	p.traceImpAllocated()
 	return p, nil
 }
 
@@ -129,6 +130,7 @@ func (p *BVTrailing) cache(depth uint32, arg ast.ASTHandle, min, max uint32) err
 		if e != nil {
 			return e
 		}
+		p.traceTableAllocated(table)
 		p.tables[depth] = table
 	}
 	if ast.ASTSourceDebug {
@@ -168,6 +170,7 @@ func (p *BVTrailing) resetCache(condition uint32) error {
 		if e := table.close(p.manager); e != nil {
 			return e
 		}
+		p.traceTableDeallocated(table)
 		p.tables[depth] = nil
 	}
 	return nil
@@ -205,6 +208,7 @@ func (p *BVTrailing) Close() error {
 	}
 	p.manager.Budget().Release(p.header)
 	p.header = 0
+	p.traceImpDeallocated()
 	p.closed = true
 	return nil
 }
