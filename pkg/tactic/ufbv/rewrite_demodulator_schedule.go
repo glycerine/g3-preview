@@ -104,12 +104,12 @@ func (r *rewriteBackIndex) addDemodulator(index *rewriteRuleIndex, q ast.ASTHand
 	if e != nil {
 		return e
 	}
-	for f := range decls {
+	for _, f := range decls {
 		if _, e := r.ensureBackSet(f); e != nil {
 			return e
 		}
 	}
-	for f := range decls {
+	for _, f := range decls {
 		r.byDecl[f].values[q] = struct{}{}
 	}
 	return nil
@@ -164,7 +164,7 @@ func (r *rewriteBackIndex) rescheduleDemodulators(index *rewriteRuleIndex, f, lh
 		if e := index.remove(rule.function, q); e != nil {
 			return e
 		}
-		for d := range decls {
+		for _, d := range decls {
 			if set := r.byDecl[d]; set != nil {
 				delete(set.values, q)
 			}

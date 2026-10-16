@@ -108756,6 +108756,7 @@
           "go_target": "pkg/tactic/ufbv/rewrite_back_index.go",
           "tests": [
             "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations",
+            "TestRewriteBackIndexChildFirstAllocationRefusalPrefix",
             "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"
           ]
         },
@@ -153182,7 +153183,7 @@
           "name": "Concrete UFBV back expr_set allocation at ufbv_rewriter.cpp:485 and retained empty-set deallocation at obj_hashtable.h:220 through debug memory wrappers",
           "status": "platform_replacement",
           "go_target": "pkg/tactic/ufbv/rewrite_back_index_memory_trace.go",
-          "tests": ["TestRewriteBackSetMemoryWrapperRetainsEmptySetUntilClose", "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"]
+          "tests": ["TestRewriteBackSetMemoryWrapperRetainsEmptySetUntilClose", "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations", "TestRewriteBackIndexChildFirstAllocationRefusalPrefix"]
         },
         {
           "name": "Concrete extension model arity-positive func_interp allocation at extension_model_converter.cpp:66 and model-core destruction at model_core.cpp:29 through debug memory wrappers",
@@ -154130,7 +154131,7 @@
           "name": "Concrete UFBV back expr_set allocation at ufbv_rewriter.cpp:485 and retained empty-set deallocation at obj_hashtable.h:220 through debug memory wrappers",
           "status": "platform_replacement",
           "go_target": "pkg/tactic/ufbv/rewrite_back_index_memory_trace.go",
-          "tests": ["TestRewriteBackSetMemoryWrapperRetainsEmptySetUntilClose", "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations"]
+          "tests": ["TestRewriteBackSetMemoryWrapperRetainsEmptySetUntilClose", "TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations", "TestRewriteBackIndexChildFirstAllocationRefusalPrefix"]
         },
         {
           "name": "Concrete extension model arity-positive func_interp allocation at extension_model_converter.cpp:66 and model-core destruction at model_core.cpp:29 through debug memory wrappers",

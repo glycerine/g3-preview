@@ -57,6 +57,11 @@ func TestRewriteBackIndexReschedulesProcessedAcrossQuantifierAnnotations(t *test
 	r, e := newRewriteBackIndex(m)
 	cacheMust(t, e)
 	t.Cleanup(func() { cacheMust(t, r.close()) })
+	order, e := r.declarations(q)
+	cacheMust(t, e)
+	if len(order) != 2 || order[0] != f || order[1] != g {
+		t.Fatal("quantifier child visitation must reach body before no-pattern", order)
+	}
 	for _, h := range []ast.ASTHandle{both, q, ga} {
 		cacheMust(t, r.addProcessed(h))
 	}
@@ -118,5 +123,44 @@ func TestRewriteBackIndexSetAllocationRefusalCanRetry(t *testing.T) {
 	cacheMust(t, r.addProcessed(fx))
 	if len(r.byDecl[f].values) != 1 {
 		t.Fatal("retry did not index the expression", r.byDecl[f])
+	}
+}
+
+func TestRewriteBackIndexChildFirstAllocationRefusalPrefix(t *testing.T) {
+	m := cacheFixture(t)
+	b, e := m.MkBoolSort()
+	cacheMust(t, e)
+	x, e := m.MkVar(0, b)
+	cacheMust(t, e)
+	g, e := m.MkFuncDecl(symbol.Numerical(66), []ast.ASTHandle{b}, b, ast.ASTFuncDeclInfo{})
+	cacheMust(t, e)
+	f, e := m.MkFuncDecl(symbol.Numerical(67), []ast.ASTHandle{b}, b, ast.ASTFuncDeclInfo{})
+	cacheMust(t, e)
+	gx, e := m.MkApp(g, []ast.ASTHandle{x})
+	cacheMust(t, e)
+	fgx, e := m.MkApp(f, []ast.ASTHandle{gx})
+	cacheMust(t, e)
+	cacheMust(t, m.IncRef(fgx))
+	t.Cleanup(func() { cacheMust(t, m.DecRef(fgx)) })
+	r, e := newRewriteBackIndex(m)
+	cacheMust(t, e)
+	t.Cleanup(func() { cacheMust(t, r.close()) })
+	order, e := r.declarations(fgx)
+	cacheMust(t, e)
+	if len(order) != 2 || order[0] != g || order[1] != f {
+		t.Fatal("for_each_expr must process child declaration first", order)
+	}
+	before := m.Budget().Used()
+	m.Budget().FailAfter(1)
+	if e := r.addProcessed(fgx); !errors.Is(e, arena.ErrInjectedFailure) {
+		t.Fatal("second declaration allocation refusal", e)
+	}
+	if r.byDecl[g] == nil || r.byDecl[f] != nil || len(r.processed) != 0 || len(r.owned) != 0 || m.Budget().Used() != before+r.byDecl[g].header {
+		t.Fatal("source child-first allocation prefix", r.byDecl, r.processed, r.owned, m.Budget().Used())
+	}
+	m.Budget().FailAfter(-1)
+	cacheMust(t, r.addProcessed(fgx))
+	if len(r.byDecl[g].values) != 1 || len(r.byDecl[f].values) != 1 {
+		t.Fatal("retry did not complete both declaration memberships")
 	}
 }

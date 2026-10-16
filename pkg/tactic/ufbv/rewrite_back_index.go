@@ -37,80 +37,99 @@ func (r *rewriteBackIndex) check() error {
 	return nil
 }
 
-// declarations visits app arguments and quantifier annotations/body as the
-// source for_each_expr call does. Only nonconstant uninterpreted applications
-// contribute declarations to m_back_idx.
-func (r *rewriteBackIndex) declarations(root ast.ASTHandle) (map[ast.ASTHandle]struct{}, error) {
-	stack := []ast.ASTHandle{root}
+// declarations follows for_each_expr's postorder: application arguments from
+// left to right, and quantifier body, patterns, then no-patterns. The first
+// occurrence of each declaration fixes the back-set allocation order.
+func (r *rewriteBackIndex) declarations(root ast.ASTHandle) ([]ast.ASTHandle, error) {
+	type frame struct {
+		h    ast.ASTHandle
+		exit bool
+	}
+	stack := []frame{{h: root}}
 	seen := make(map[ast.ASTHandle]struct{})
-	decls := make(map[ast.ASTHandle]struct{})
+	seenDecls := make(map[ast.ASTHandle]struct{})
+	var decls []ast.ASTHandle
 	for len(stack) != 0 {
 		i := len(stack) - 1
-		h := stack[i]
+		fr := stack[i]
 		stack = stack[:i]
-		if _, present := seen[h]; present {
-			continue
-		}
-		seen[h] = struct{}{}
-		kind, e := r.manager.GetKind(h)
+		kind, e := r.manager.GetKind(fr.h)
 		if e != nil {
 			return nil, e
 		}
-		switch kind {
-		case ast.ASTVar:
-		case ast.ASTApp:
-			n, e := r.manager.GetNumArgs(h)
-			if e != nil {
-				return nil, e
-			}
-			if n > 0 {
-				family, e := r.manager.GetFamilyID(h)
+		if fr.exit {
+			if kind == ast.ASTApp {
+				n, e := r.manager.GetNumArgs(fr.h)
 				if e != nil {
 					return nil, e
 				}
-				if family == ast.NullFamilyID {
-					f, e := r.manager.GetDecl(h)
+				if n > 0 {
+					family, e := r.manager.GetFamilyID(fr.h)
 					if e != nil {
 						return nil, e
 					}
-					decls[f] = struct{}{}
+					if family == ast.NullFamilyID {
+						f, e := r.manager.GetDecl(fr.h)
+						if e != nil {
+							return nil, e
+						}
+						if _, present := seenDecls[f]; !present {
+							seenDecls[f] = struct{}{}
+							decls = append(decls, f)
+						}
+					}
 				}
 			}
+			continue
+		}
+		if _, present := seen[fr.h]; present {
+			continue
+		}
+		seen[fr.h] = struct{}{}
+		switch kind {
+		case ast.ASTVar:
+		case ast.ASTApp:
+			n, e := r.manager.GetNumArgs(fr.h)
+			if e != nil {
+				return nil, e
+			}
+			stack = append(stack, frame{h: fr.h, exit: true})
 			for j := n; j > 0; j-- {
-				child, e := r.manager.GetArg(h, j-1)
+				child, e := r.manager.GetArg(fr.h, j-1)
 				if e != nil {
 					return nil, e
 				}
-				stack = append(stack, child)
+				stack = append(stack, frame{h: child})
 			}
 		case ast.ASTQuantifier:
-			body, e := r.manager.GetQuantifierBody(h)
+			body, e := r.manager.GetQuantifierBody(fr.h)
 			if e != nil {
 				return nil, e
 			}
-			stack = append(stack, body)
-			n, e := r.manager.GetNumPatterns(h)
-			if e != nil {
-				return nil, e
-			}
-			for j := n; j > 0; j-- {
-				child, e := r.manager.GetPattern(h, j-1)
-				if e != nil {
-					return nil, e
-				}
-				stack = append(stack, child)
-			}
-			n, e = r.manager.GetNumNoPatterns(h)
+			stack = append(stack, frame{h: fr.h, exit: true})
+			n, e := r.manager.GetNumNoPatterns(fr.h)
 			if e != nil {
 				return nil, e
 			}
 			for j := n; j > 0; j-- {
-				child, e := r.manager.GetNoPattern(h, j-1)
+				child, e := r.manager.GetNoPattern(fr.h, j-1)
 				if e != nil {
 					return nil, e
 				}
-				stack = append(stack, child)
+				stack = append(stack, frame{h: child})
 			}
+			n, e = r.manager.GetNumPatterns(fr.h)
+			if e != nil {
+				return nil, e
+			}
+			for j := n; j > 0; j-- {
+				child, e := r.manager.GetPattern(fr.h, j-1)
+				if e != nil {
+					return nil, e
+				}
+				stack = append(stack, frame{h: child})
+			}
+			stack = append(stack, frame{h: body})
 		default:
 			return nil, ast.ErrASTDomain
 		}
@@ -129,7 +148,7 @@ func (r *rewriteBackIndex) addProcessed(expr ast.ASTHandle) error {
 	if _, present := r.processed[expr]; present {
 		return nil
 	}
-	for f := range decls {
+	for _, f := range decls {
 		if _, e := r.ensureBackSet(f); e != nil {
 			return e
 		}
@@ -141,7 +160,7 @@ func (r *rewriteBackIndex) addProcessed(expr ast.ASTHandle) error {
 	}
 	r.owned = append(r.owned, expr)
 	r.processed[expr] = struct{}{}
-	for f := range decls {
+	for _, f := range decls {
 		r.byDecl[f].values[expr] = struct{}{}
 	}
 	return nil
@@ -175,7 +194,7 @@ func (r *rewriteBackIndex) rescheduleProcessed(f ast.ASTHandle) error {
 		}
 		r.todo = append(r.todo, expr)
 		delete(r.processed, expr)
-		for d := range decls {
+		for _, d := range decls {
 			if set := r.byDecl[d]; set != nil {
 				delete(set.values, expr)
 			}
