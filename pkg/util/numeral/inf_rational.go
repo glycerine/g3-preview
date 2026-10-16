@@ -716,7 +716,7 @@ func (s *RationalService) infRound(v *OwnedInfRational, ceil bool) (_lexOut Owne
 		return OwnedRational{}, e
 	}
 	defer s.endLexicalRational(&_lexOut, &_lexErr)
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return OwnedRational{}, e
 	}
 	out := OwnedRational{Raw: NewRational(), ownerID: s.ownerID}
