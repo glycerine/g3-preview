@@ -43179,6 +43179,12 @@
           ]
         },
         {
+          "name": "Plain polynomial coeff overload source TRACE at polynomial.cpp:3267; reduct overload has no trace",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_coefficient_trace.go",
+          "tests": ["TestPolynomialCoefficientSourceTraceAndStreamRefusal"]
+        },
+        {
           "name": "Retained polynomial deletion TRACE before handlers and coefficient destruction at polynomial.cpp:2421, including cached teardown values",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_delete_trace.go",
@@ -45957,6 +45963,12 @@
             "TestPolynomialVariableRecognitionLiteralWritePrefixes",
             "TestPolynomialVariableRecognitionBIGEveryActualPrefix"
           ]
+        },
+        {
+          "name": "Plain polynomial coeff overload source TRACE at polynomial.cpp:3267; reduct overload has no trace",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_coefficient_trace.go",
+          "tests": ["TestPolynomialCoefficientSourceTraceAndStreamRefusal"]
         },
         {
           "name": "Retained polynomial deletion TRACE before handlers and coefficient destruction at polynomial.cpp:2421, including cached teardown values",
@@ -183280,6 +183292,12 @@
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
         },
         {
+          "name": "Plain polynomial coeff overload source TRACE at polynomial.cpp:3267; reduct overload has no trace",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_coefficient_trace.go",
+          "tests": ["TestPolynomialCoefficientSourceTraceAndStreamRefusal"]
+        },
+        {
           "name": "Retained polynomial deletion TRACE before handlers and coefficient destruction at polynomial.cpp:2421, including cached teardown values",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_delete_trace.go",
@@ -185459,6 +185477,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
+        },
+        {
+          "name": "Plain polynomial coeff overload source TRACE at polynomial.cpp:3267; reduct overload has no trace",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_coefficient_trace.go",
+          "tests": ["TestPolynomialCoefficientSourceTraceAndStreamRefusal"]
         },
         {
           "name": "Retained polynomial deletion TRACE before handlers and coefficient destruction at polynomial.cpp:2421, including cached teardown values",

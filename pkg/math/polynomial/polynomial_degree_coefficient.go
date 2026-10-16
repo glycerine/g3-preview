@@ -182,6 +182,11 @@ func (m *MultivariatePolynomialCore) coeffCoreWithReceipts(p Polynomial, x, k ui
 	if e := m.coefficientAssertions(x, reduct != nil); e != nil {
 		return Polynomial{}, e
 	}
+	if reduct == nil {
+		if e := m.traceCoefficientPolynomial(p, x, k); e != nil {
+			return Polynomial{}, e
+		}
+	}
 	n, e := m.readWord(p, 8)
 	if e != nil {
 		return Polynomial{}, e
