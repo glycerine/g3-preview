@@ -189,24 +189,6 @@ func (r *rewriteRuleIndex) remove(f, quantifier ast.ASTHandle) error {
 	return ast.ErrASTDomain
 }
 
-func (r *rewriteRuleIndex) consistent() bool {
-	if r.check() != nil {
-		return false
-	}
-	for f, set := range r.byFunc {
-		if set == nil {
-			return false
-		}
-		for _, q := range set.values {
-			rule, found := r.rules[q]
-			if !found || rule.removing || rule.function != f {
-				return false
-			}
-		}
-	}
-	return true
-}
-
 // tryRewrite is rewrite1: it skips arity mismatches and tries each indexed
 // rule until the concrete matcher produces an owned rewritten expression.
 func (r *rewriteRuleIndex) tryRewrite(f ast.ASTHandle, args []ast.ASTHandle) (ast.ASTRef, bool, error) {

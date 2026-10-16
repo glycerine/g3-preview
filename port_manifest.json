@@ -108715,6 +108715,11 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "UFBV check_fwd_idx_consistency and show_fwd_idx, including cpp259/272 SASSERT, have no production caller",
+          "status": "dead_deleted",
+          "tests": []
+        },
+        {
           "name": "UFBV add-back-index raw m_expr pointer sentinel SASSERT at cpp477 is replaced by validated owner/slot/generation AST handles",
           "status": "platform_replacement",
           "go_target": "pkg/tactic/ufbv/rewrite_back_index.go",
@@ -108803,7 +108808,7 @@
           ]
         },
         {
-          "name": "insert_fwd_idx, remove_fwd_idx, check_fwd_idx_consistency and rewrite1 concrete quantifier index and matcher dispatch",
+          "name": "insert_fwd_idx, remove_fwd_idx and rewrite1 concrete quantifier index and matcher dispatch",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
           "tests": [
@@ -108914,6 +108919,11 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "UFBV check_fwd_idx_consistency and show_fwd_idx, including cpp259/272 SASSERT, have no production caller",
+          "status": "dead_deleted",
+          "tests": []
+        },
         {
           "name": "rewrite_cache_map and plugin reference callbacks",
           "status": "partial",
@@ -123003,6 +123013,11 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "UFBV check_fwd_idx_consistency and show_fwd_idx, including cpp259/272 SASSERT, have no production caller",
+          "status": "dead_deleted",
+          "tests": []
+        },
+        {
           "name": "UFBV add-back-index raw m_expr pointer sentinel SASSERT at cpp477 is replaced by validated owner/slot/generation AST handles",
           "status": "platform_replacement",
           "go_target": "pkg/tactic/ufbv/rewrite_back_index.go",
@@ -123525,6 +123540,11 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "UFBV check_fwd_idx_consistency and show_fwd_idx, including cpp259/272 SASSERT, have no production caller",
+          "status": "dead_deleted",
+          "tests": []
+        },
         {
           "name": "UFBV add-back-index raw m_expr pointer sentinel SASSERT at cpp477 is replaced by validated owner/slot/generation AST handles",
           "status": "platform_replacement",

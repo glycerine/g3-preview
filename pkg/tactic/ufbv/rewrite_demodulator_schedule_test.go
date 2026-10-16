@@ -82,7 +82,7 @@ func TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot(t *testi
 	if len(back.todo) != 1 || back.todo[0] != qAnnotation || len(back.byDecl[f].values) != 3 {
 		t.Fatal("rescheduling must move only the matched quantified occurrence", back.todo, len(back.byDecl[f].values))
 	}
-	if !forward.consistent() {
+	if !ruleIndexConsistent(forward) {
 		t.Fatal("forward index inconsistent after rescheduling")
 	}
 	refs, e := m.GetRefCount(qAnnotation)
