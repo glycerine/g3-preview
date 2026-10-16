@@ -103077,9 +103077,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/tactic_stored_model_memory_trace.go",
         "pkg/tactic/tactic_model_converter.go"
       ],
       "tests": [
+        "TestStoredModelMemoryWrapperSourceAllocationAndRelease",
+        "TestStoredModelMemoryWrapperUsesASTProcessDuringFinalize",
         "TestTacticModelReferenceOwningAliasAndReplacement",
         "TestTacticModelConcatActualModelReverseOrderLabelsAndLifetime",
         "TestTacticModelConcatStarSubgoalDispatchAndDestruction",
@@ -103102,6 +103105,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete model2mc factory allocations at model_converter.cpp:167,173 and final converter.h:36 deallocation through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/tactic_stored_model_memory_trace.go",
+          "tests": ["TestStoredModelMemoryWrapperSourceAllocationAndRelease", "TestStoredModelMemoryWrapperUsesASTProcessDuringFinalize"]
+        },
         {
           "name": "model converter specialisation: counts, concat/star construction, cancellation and destruction",
           "status": "ported",
@@ -105408,12 +105417,15 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/tactic_stored_model_memory_trace.go",
         "pkg/model/model_lifecycle.go",
         "pkg/tactic/tactic_stored_model.go",
         "pkg/tactic/tactic_model_converter.go",
         "pkg/tactic/tactic_model_to_model.go"
       ],
       "tests": [
+        "TestStoredModelMemoryWrapperSourceAllocationAndRelease",
+        "TestStoredModelMemoryWrapperUsesASTProcessDuringFinalize",
         "TestModelDerivedConstructorAndVirtualReferenceDestruction",
         "TestModelDerivedUniverseOwnershipCopyAndInsertionOrder",
         "TestModelDerivedEmptyUniverseUpdateAndHashGrowth",
@@ -105442,6 +105454,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete model2mc factory allocations at model_converter.cpp:167,173 and final converter.h:36 deallocation through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/tactic_stored_model_memory_trace.go",
+          "tests": ["TestStoredModelMemoryWrapperSourceAllocationAndRelease", "TestStoredModelMemoryWrapperUsesASTProcessDuringFinalize"]
+        },
         {
           "name": "model_converter2model original derived allocation, owning assignment, indexed0 application",
           "status": "partial",
@@ -152285,6 +152303,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/tactic_stored_model_memory_trace.go",
         "pkg/ast/pattern/collect_memory_trace.go",
         "pkg/ast/pattern/multi_pattern_memory_trace.go",
         "pkg/api/api_goal_memory_trace.go",
@@ -152365,6 +152384,8 @@
         "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
+        "TestStoredModelMemoryWrapperSourceAllocationAndRelease",
+        "TestStoredModelMemoryWrapperUsesASTProcessDuringFinalize",
         "TestPatternCollectedInfoMemoryFollowsOwningProcessFinalization",
         "TestPatternCollectGroundChildAndInfoMemoryLifetime",
         "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
@@ -152538,6 +152559,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete model2mc factory allocations at model_converter.cpp:167,173 and final converter.h:36 deallocation through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/tactic_stored_model_memory_trace.go",
+          "tests": ["TestStoredModelMemoryWrapperSourceAllocationAndRelease", "TestStoredModelMemoryWrapperUsesASTProcessDuringFinalize"]
+        },
         {
           "name": "Pattern collect::info and pre_pattern debug deallocation wrappers honor the owning AST process finalization state even when their trace tags are unbound (memory_manager.cpp:202-205)",
           "status": "platform_replacement",
@@ -153220,6 +153247,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/tactic_stored_model_memory_trace.go",
         "pkg/ast/pattern/collect_memory_trace.go",
         "pkg/ast/pattern/multi_pattern_memory_trace.go",
         "pkg/api/api_goal_memory_trace.go",
@@ -153295,6 +153323,8 @@
         "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
+        "TestStoredModelMemoryWrapperSourceAllocationAndRelease",
+        "TestStoredModelMemoryWrapperUsesASTProcessDuringFinalize",
         "TestPatternCollectedInfoMemoryFollowsOwningProcessFinalization",
         "TestPatternCollectGroundChildAndInfoMemoryLifetime",
         "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
@@ -153457,6 +153487,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete model2mc factory allocations at model_converter.cpp:167,173 and final converter.h:36 deallocation through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/tactic_stored_model_memory_trace.go",
+          "tests": ["TestStoredModelMemoryWrapperSourceAllocationAndRelease", "TestStoredModelMemoryWrapperUsesASTProcessDuringFinalize"]
+        },
         {
           "name": "Pattern collect::info and pre_pattern debug deallocation wrappers honor the owning AST process finalization state even when their trace tags are unbound (memory_manager.cpp:202-205)",
           "status": "platform_replacement",

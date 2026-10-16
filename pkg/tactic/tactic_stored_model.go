@@ -6,7 +6,9 @@ import (
 	"errors"
 	"reflect"
 
+	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -16,8 +18,11 @@ import (
 // does not build or evaluate a model.
 type tacticStoredModelConverter struct {
 	tacticConverterBase
-	model  ModelRef
-	labels []usymbol.Symbol
+	model           ModelRef
+	labels          []usymbol.Symbol
+	memoryManager   *ast.ASTManager
+	memoryTrace     *diagnostic.TraceTags
+	memoryTraceLive bool
 }
 
 func NewStoredModel(md *model.ModelCore) (ModelConverter, error) {
@@ -34,6 +39,9 @@ func newTacticStoredModelWithLabels(md *model.ModelCore, labels []usymbol.Symbol
 	if err = c.init(c, md.Manager().Budget(), uint64(reflect.TypeOf(*c).Size())); err != nil {
 		return nil, err
 	}
+	c.memoryManager = md.Manager()
+	c.memoryTrace = c.memoryManager.BorrowMemoryTraceTags()
+	c.traceStoredModelAllocated(labels != nil)
 	defer func() {
 		if err != nil {
 			err = errors.Join(err, c.Close())
@@ -84,6 +92,7 @@ func (c *tacticStoredModelConverter) Close() error {
 	if e := c.model.Close(); e != nil {
 		return e
 	}
+	c.traceStoredModelDeallocated()
 	c.release()
 	return nil
 }
