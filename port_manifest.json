@@ -23709,6 +23709,12 @@
           ]
         },
         {
+          "name": "mk_blast_eq_value source SMT2 TRACE before numeral swap and guards (bv_rewriter.cpp:2283)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_blast_eq_trace.go",
+          "tests": ["TestBVRewriterBlastEqualitySourceTrace"]
+        },
+        {
           "name": "mk_bvsmul_no_underflow signed locals TRACE before comparison (bv_rewriter.cpp:2781)",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_mul_bounds_trace.go",
@@ -182959,6 +182965,12 @@
           "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
         },
         {
+          "name": "Retained BV blast-equality process-bound SMT2 TRACE at bv_rewriter.cpp:2283",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_blast_eq_trace.go",
+          "tests": ["TestBVRewriterBlastEqualitySourceTrace"]
+        },
+        {
           "name": "Retained BV signed multiply-underflow numeric TRACE at bv_rewriter.cpp:2781",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_mul_bounds_trace.go",
@@ -185114,6 +185126,12 @@
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
           "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
+        },
+        {
+          "name": "Retained BV blast-equality process-bound SMT2 TRACE at bv_rewriter.cpp:2283",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_blast_eq_trace.go",
+          "tests": ["TestBVRewriterBlastEqualitySourceTrace"]
         },
         {
           "name": "Retained BV signed multiply-underflow numeric TRACE at bv_rewriter.cpp:2781",

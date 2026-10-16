@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
@@ -15,6 +16,7 @@ import (
 type BVPolynomialRewriter struct {
 	self                     *BVPolynomialRewriter
 	manager                  *ast.ASTManager
+	trace                    *diagnostic.TraceTags
 	currentSort              ast.ASTHandle
 	positions                *bvPolynomialPositions
 	config                   *BVPolynomialConfiguration

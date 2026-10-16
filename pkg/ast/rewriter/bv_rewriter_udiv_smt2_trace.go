@@ -19,17 +19,21 @@ func (p *BVRewriter) bvTraceTags() *diagnostic.TraceTags {
 }
 
 func (p *BVRewriter) writeBVTraceSMT2(w io.Writer, h ast.ASTHandle, globals *uparams.GlobalParamsService) (result error) {
-	format, err := p.manager.SMT2PPExprTree(h, nil)
+	return writeBVTraceSMT2(p.manager, w, h, globals)
+}
+
+func writeBVTraceSMT2(m *ast.ASTManager, w io.Writer, h ast.ASTHandle, globals *uparams.GlobalParamsService) (result error) {
+	format, err := m.SMT2PPExprTree(h, nil)
 	if err != nil {
 		return err
 	}
-	stream, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: p.manager.Budget()})
+	stream, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: m.Budget()})
 	if err != nil {
 		return err
 	}
 	defer func() { result = errors.Join(result, stream.Close()) }()
 	empty := globals.Context.EmptyValue()
-	if err = p.manager.PrintFormat(stream, format, globals.Context, &empty, globals); err != nil {
+	if err = m.PrintFormat(stream, format, globals.Context, &empty, globals); err != nil {
 		return err
 	}
 	body, err := stream.String()

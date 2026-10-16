@@ -53,6 +53,9 @@ func (p *BVPolynomialRewriter) RewriteBlastEqualityValue(lhs, rhs ast.ASTHandle,
 	if width == 1 {
 		return
 	}
+	if err = p.traceBlastEqualityValue(width, lhs); err != nil {
+		return st, err
+	}
 	yes, e := m.IsBitVectorOperation(lhs, 0)
 	if e != nil {
 		return st, e

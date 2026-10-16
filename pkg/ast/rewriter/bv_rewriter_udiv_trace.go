@@ -11,6 +11,9 @@ func (p *BVRewriter) BindTrace(tags *diagnostic.TraceTags) error {
 	if err := p.open(); err != nil {
 		return err
 	}
+	if err := p.polynomial.BindTrace(tags); err != nil {
+		return err
+	}
 	p.trace = tags
 	return nil
 }
