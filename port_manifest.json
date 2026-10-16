@@ -108715,6 +108715,18 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained UFBV demodulator large-app SASSERT at ufbv_rewriter.cpp:716 before function lookup",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_demodulator_assert.go",
+          "tests": ["TestUFBVDemodulatorAndMatcherSourceAppAssertions"]
+        },
+        {
+          "name": "Retained UFBV match-substitution app and equal-ground SASSERT at ufbv_rewriter.cpp:838,844",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/match_subst.go",
+          "tests": ["TestUFBVDemodulatorAndMatcherSourceAppAssertions", "TestMatchSubstConcretePairCacheAndVariableBindings"]
+        },
+        {
           "name": "Retained UFBV post-rewrite fixed-point SASSERT at ufbv_rewriter.cpp:690 with a second checked rewrite",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_formula_assert.go",
@@ -122985,6 +122997,18 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained UFBV demodulator large-app SASSERT at ufbv_rewriter.cpp:716 before function lookup",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_demodulator_assert.go",
+          "tests": ["TestUFBVDemodulatorAndMatcherSourceAppAssertions"]
+        },
+        {
+          "name": "Retained UFBV match-substitution app and equal-ground SASSERT at ufbv_rewriter.cpp:838,844",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/match_subst.go",
+          "tests": ["TestUFBVDemodulatorAndMatcherSourceAppAssertions", "TestMatchSubstConcretePairCacheAndVariableBindings"]
+        },
+        {
           "name": "Retained UFBV post-rewrite fixed-point SASSERT at ufbv_rewriter.cpp:690 with a second checked rewrite",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_formula_assert.go",
@@ -123489,6 +123513,18 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained UFBV demodulator large-app SASSERT at ufbv_rewriter.cpp:716 before function lookup",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_formula_demodulator_assert.go",
+          "tests": ["TestUFBVDemodulatorAndMatcherSourceAppAssertions"]
+        },
+        {
+          "name": "Retained UFBV match-substitution app and equal-ground SASSERT at ufbv_rewriter.cpp:838,844",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/match_subst.go",
+          "tests": ["TestUFBVDemodulatorAndMatcherSourceAppAssertions", "TestMatchSubstConcretePairCacheAndVariableBindings"]
+        },
         {
           "name": "Retained UFBV post-rewrite fixed-point SASSERT at ufbv_rewriter.cpp:690 with a second checked rewrite",
           "status": "ported",

@@ -94,6 +94,13 @@ func TestMatchSubstConcretePairCacheAndVariableBindings(t *testing.T) {
 	if !ok || s.bindings[x] != a || s.bindings[y] != y {
 		t.Fatal("identical non-ground branch did not bind unbound y to itself", ok, s.bindings)
 	}
+	// The later variable pair makes the overall match nontrivial, so the
+	// earlier equal ground app reaches the source cpp844 assertion.
+	ok, e = s.isInstance(app(f, a, x), app(f, a, c))
+	cacheMust(t, e)
+	if !ok || s.bindings[x] != c {
+		t.Fatal("equal ground app did not preserve the variable binding", ok, s.bindings)
+	}
 
 	ok, e = s.isInstance(app(f, a, a), app(f, x, x))
 	cacheMust(t, e)

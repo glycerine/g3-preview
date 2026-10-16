@@ -230,6 +230,13 @@ func (s *matchSubst) matchArgs(lhs ast.ASTHandle, args []ast.ASTHandle) (bool, e
 			return false, nil
 		}
 		if pk != ast.ASTApp || ik != ast.ASTApp {
+			if enabled, e := forwardAssertionEnabled(); e != nil {
+				return false, e
+			} else if enabled {
+				if e := forwardAssertionFailure(838, "is_app(p.first) && is_app(p.second)"); e != nil {
+					return false, e
+				}
+			}
 			return false, ast.ErrASTDomain
 		}
 		groundPattern, e := s.manager.IsGround(p.pattern)
@@ -244,6 +251,19 @@ func (s *matchSubst) matchArgs(lhs ast.ASTHandle, args []ast.ASTHandle) (bool, e
 			return false, nil
 		}
 		if p.pattern == p.instance && groundPattern {
+			if enabled, e := forwardAssertionEnabled(); e != nil {
+				return false, e
+			} else if enabled {
+				groundAgain, e := s.manager.IsGround(p.instance)
+				if e != nil {
+					return false, e
+				}
+				if !groundAgain {
+					if e := forwardAssertionFailure(844, "to_app(p.second)->is_ground()"); e != nil {
+						return false, e
+					}
+				}
+			}
 			s.todo = s.todo[:i]
 			continue
 		}

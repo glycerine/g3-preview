@@ -173,7 +173,7 @@ func (r *formulaProcessor) processLast() (result error) {
 	if e != nil {
 		return e
 	}
-	f, e := m.GetDecl(lhs)
+	f, e := r.demodulatorFunction(lhs)
 	if e != nil {
 		return e
 	}
