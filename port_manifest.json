@@ -70174,7 +70174,7 @@
       "component": "parsers",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/parsers/smt2/local_environment.go", "pkg/parsers/smt2/local_lookup.go"],
+      "go_targets": ["pkg/parsers/smt2/local_environment.go", "pkg/parsers/smt2/local_lookup.go", "pkg/parsers/smt2/local_sort_stack.go"],
       "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders", "TestSMT2ParserQualifiedLocalSortAndIndexRefusals"],
       "assertions": [
         {
@@ -70696,7 +70696,7 @@
           "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders"]
         },
         {
-          "name": "parse_qualified_name selected local sort/index checks after push_local and owning reference cleanup on refusal; sort-stack pop and parser frame integration remain open (smt2parser.cpp:1735-1754)",
+          "name": "parse_qualified_name selected local sort/index checks after push_local, owning sort-stack pop on successful match, and expression-reference cleanup on refusal; parser frame integration remains open (smt2parser.cpp:1723-1729,1735-1754)",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/local_lookup.go",
           "tests": ["TestSMT2ParserQualifiedLocalSortAndIndexRefusals"]
@@ -173767,6 +173767,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/parsers/smt2/local_sort_stack.go",
         "pkg/model/model2expr_entry_condition.go",
         "pkg/ast/ast_ref.go",
         "pkg/util/sexpr/util_sexpr.go",
@@ -173798,6 +173799,7 @@
         "pkg/model/model_evaluator_array_equality.go"
       ],
       "tests": [
+        "TestSMT2ParserQualifiedLocalSortAndIndexRefusals",
         "TestModel2ExprEntryConditionSourceArityAndReferenceScope",
         "TestSexprAccessorsAndScalarIterator",
         "TestSexprBVGoScratchAndNumeralLifetime",
@@ -174100,6 +174102,12 @@
           "tests": [
             "TestPatternInferenceRepeatedBodiesResetCandidatesKeepPreferences"
           ]
+        },
+        {
+          "name": "SMT2 parser concrete sort_ref_vector owning push, back and pop for qualified local identifiers (ref_vector.h:96-101,104-110; smt2parser.cpp:1723-1729)",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/local_sort_stack.go",
+          "tests": ["TestSMT2ParserQualifiedLocalSortAndIndexRefusals"]
         }
       ],
       "ownership": [

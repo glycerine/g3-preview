@@ -1266,7 +1266,8 @@
       ],
       "production_files": [
         "local_environment.go",
-        "local_lookup.go"
+        "local_lookup.go",
+        "local_sort_stack.go"
       ]
     },
     {

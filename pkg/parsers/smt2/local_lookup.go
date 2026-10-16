@@ -49,7 +49,7 @@ func (e *smt2LocalEnv) resolveLocal(m *ast.ASTManager, shifter *rewriter.VarShif
 // resolveQualifiedLocal is the local branch of parse_qualified_name. Source
 // order is push_local, optional sort check, then rejection of index parameters.
 // A refused branch releases the newly pushed expression-stack reference.
-func (e *smt2LocalEnv) resolveQualifiedLocal(m *ast.ASTManager, shifter *rewriter.VarShifter, name usymbol.Symbol, numBindings uint32, expectedSort ast.ASTHandle, hasSort bool, numIndices uint32) (ast.ASTRef, bool, error) {
+func (e *smt2LocalEnv) resolveQualifiedLocal(m *ast.ASTManager, shifter *rewriter.VarShifter, name usymbol.Symbol, numBindings uint32, sorts *localSortStack, hasSort bool, numIndices uint32) (ast.ASTRef, bool, error) {
 	ref, found, err := e.resolveLocal(m, shifter, name, numBindings)
 	if err != nil || !found {
 		return ref, found, err
@@ -59,12 +59,19 @@ func (e *smt2LocalEnv) resolveQualifiedLocal(m *ast.ASTManager, shifter *rewrite
 		if e != nil {
 			return ast.ASTRef{}, true, errors.Join(e, m.DelRef(&ref))
 		}
+		expectedSort, e := sorts.top(m)
+		if e != nil {
+			return ast.ASTRef{}, true, errors.Join(e, m.DelRef(&ref))
+		}
 		sort, e := m.GetSort(h)
 		if e != nil {
 			return ast.ASTRef{}, true, errors.Join(e, m.DelRef(&ref))
 		}
 		if sort != expectedSort {
 			return ast.ASTRef{}, true, errors.Join(errLocalQualifiedSort, m.DelRef(&ref))
+		}
+		if e := sorts.pop(m); e != nil {
+			return ast.ASTRef{}, true, errors.Join(e, m.DelRef(&ref))
 		}
 	}
 	if numIndices != 0 {

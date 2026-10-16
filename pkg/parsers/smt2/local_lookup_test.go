@@ -211,6 +211,14 @@ func TestSMT2ParserQualifiedLocalSortAndIndexRefusals(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if err := m.IncRef(otherSort); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := m.DecRef(otherSort); err != nil {
+			t.Fatal(err)
+		}
+	})
 	variable, err := m.MkVar(0, boolSort)
 	if err != nil {
 		t.Fatal(err)
@@ -218,8 +226,12 @@ func TestSMT2ParserQualifiedLocalSortAndIndexRefusals(t *testing.T) {
 	var env smt2LocalEnv
 	name := usymbol.Numerical(23)
 	env.insert(name, smt2Local{term: variable, level: 1})
+	sorts := &localSortStack{}
 	before := m.Stats().LiveReferences
-	ref, found, err := env.resolveQualifiedLocal(m, shifter, name, 2, boolSort, true, 0)
+	if err := sorts.push(m, boolSort); err != nil {
+		t.Fatal(err)
+	}
+	ref, found, err := env.resolveQualifiedLocal(m, shifter, name, 2, sorts, true, 0)
 	if err != nil || !found {
 		t.Fatal("qualified local", found, err)
 	}
@@ -234,8 +246,8 @@ func TestSMT2ParserQualifiedLocalSortAndIndexRefusals(t *testing.T) {
 	if err := m.DelRef(&ref); err != nil {
 		t.Fatal(err)
 	}
-	if m.Stats().LiveReferences != before {
-		t.Fatal("qualified local retained a temporary reference")
+	if len(sorts.refs) != 0 || m.Stats().LiveReferences != before {
+		t.Fatal("qualified local did not consume its sort and temporary reference")
 	}
 	for _, tc := range []struct {
 		sort    ast.ASTHandle
@@ -247,16 +259,40 @@ func TestSMT2ParserQualifiedLocalSortAndIndexRefusals(t *testing.T) {
 		{boolSort, true, 1, errLocalIndexed},
 		{ast.ASTHandle{}, false, 1, errLocalIndexed},
 	} {
-		ref, found, err := env.resolveQualifiedLocal(m, shifter, name, 2, tc.sort, tc.hasSort, tc.indices)
+		if tc.hasSort {
+			if err := sorts.push(m, tc.sort); err != nil {
+				t.Fatal(err)
+			}
+		}
+		ref, found, err := env.resolveQualifiedLocal(m, shifter, name, 2, sorts, tc.hasSort, tc.indices)
 		if !found || ref != (ast.ASTRef{}) || !errors.Is(err, tc.want) {
 			t.Fatal("qualified local refusal", tc, found, ref, err)
+		}
+		if tc.want == errLocalQualifiedSort {
+			if len(sorts.refs) != 1 || m.Stats().LiveReferences != before+1 {
+				t.Fatal("sort mismatch consumed its requested sort")
+			}
+			if err := sorts.pop(m); err != nil {
+				t.Fatal(err)
+			}
+		} else if len(sorts.refs) != 0 {
+			t.Fatal("indexed local kept its checked sort")
 		}
 		if m.Stats().LiveReferences != before {
 			t.Fatal("refused qualified local retained expression-stack reference", tc)
 		}
 	}
-	ref, found, err = env.resolveQualifiedLocal(m, shifter, usymbol.Numerical(24), 2, otherSort, true, 1)
+	if err := sorts.push(m, otherSort); err != nil {
+		t.Fatal(err)
+	}
+	ref, found, err = env.resolveQualifiedLocal(m, shifter, usymbol.Numerical(24), 2, sorts, true, 1)
 	if found || err != nil || ref != (ast.ASTRef{}) {
 		t.Fatal("unknown qualified name reached local checks", found, ref, err)
+	}
+	if len(sorts.refs) != 1 {
+		t.Fatal("missing local consumed nonlocal requested sort")
+	}
+	if err := sorts.pop(m); err != nil {
+		t.Fatal(err)
 	}
 }
