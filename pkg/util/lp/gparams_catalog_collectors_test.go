@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -78,6 +79,35 @@ func TestLPParameterCatalogSchema(t *testing.T) {
 }
 
 func TestLPParameterCatalogReachedFailurePrefixes(t *testing.T) {
+	// The process default has interactive assertion actions. Bind a local
+	// refusal owner so each deliberate kind collision returns to this test.
+	b := arena.NewBudget(1 << 20)
+	r, err := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: b}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	debug, err := udiag.NewDebugContext(r, b)
+	if err != nil {
+		t.Fatal(err)
+	}
+	previous, err := udiag.BindProcessDebugContext(debug)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if _, err := udiag.BindProcessDebugContext(previous); err != nil {
+			t.Error(err)
+		}
+		if err := debug.Close(); err != nil {
+			t.Error(err)
+		}
+		if err := r.Close(); err != nil {
+			t.Error(err)
+		}
+		if b.Used() != 0 {
+			t.Error("debug fixture retained", b.Used())
+		}
+	})
 	keys := []string{"rep_freq", "min", "print_stats", "simplex_strategy", "bprop_on_pivoted_rows"}
 	for i, key := range keys {
 		t.Run(key, func(t *testing.T) {
@@ -87,7 +117,7 @@ func TestLPParameterCatalogReachedFailurePrefixes(t *testing.T) {
 			}
 			err := catalogCollectLpParams(d)
 			if sourceDebugEnabled {
-				if err != uparams.ErrParamDescrsPrecondition {
+				if err != udiag.ErrDebugAssertion {
 					t.Fatal("checked kind collision", err)
 				}
 			} else if err != nil {
