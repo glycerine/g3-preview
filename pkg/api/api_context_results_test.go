@@ -10,6 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	sattactic "github.com/glycerine/g3/pkg/sat/tactic"
 	"github.com/glycerine/g3/pkg/tactic"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
@@ -191,6 +192,13 @@ func TestAPIContextResultsCopiedAndForeignOwnerGuards(t *testing.T) {
 	}
 	foreign, other := apiResultsFixture(t, true)
 	p := apiResultsAtom(t, foreign, "foreign-result")
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := d.AssertionsEnabled()
+		astTestMust(t, e)
+		astTestMust(t, d.EnableAssertions(false))
+		t.Cleanup(func() { astTestMust(t, d.EnableAssertions(enabled)) })
+	}
 	if e := c.saveASTTrail(p); !errors.Is(e, ast.ErrASTHandle) {
 		t.Fatal("foreign AST entered the context trail", e)
 	}

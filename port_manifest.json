@@ -3778,7 +3778,8 @@
         "TestAPIContextGoalRootSurvivesExplicitResultResetAndDrains",
         "TestAPIContextResultsCopiedAndForeignOwnerGuards",
         "TestAPIContextObjectCloseUsesNativeFreeIDStorage",
-        "TestAPIContextNativeResultGrowthAndReferenceRelease"
+        "TestAPIContextNativeResultGrowthAndReferenceRelease",
+        "TestAPIContextSourceObjectAndTrailAssertions"
       ],
       "assertions": [
         {
@@ -3797,6 +3798,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained API object::dec_ref and context::save_ast_trail SASSERT gates at api_context.cpp:39,216",
+          "status": "ported",
+          "go_target": "pkg/api/api_context_results.go",
+          "tests": ["TestAPIContextSourceObjectAndTrailAssertions"]
+        },
         {
           "name": "API context destructor DEBUG_CODE warning_msg for each uncollected registered object before removal (api_context.cpp:109-117); Go concrete type names replace compiler RTTI spelling",
           "status": "ported",
@@ -3824,6 +3831,7 @@
         "API context result and automatic AST trails now own concrete native []ASTHandle backing. Each append acquires one AST reference; explicit single-result replacement retains the incoming alias across reset. Cleanup retires each consumed DEC before returning a destructor error and preserves only unread roots for retry. Close releases both backing slices. Only the real context cold header is reserved; no ASTRefVector wrapper, encoded vector record/payload or backing-growth reservation remains in these callers. A 4097-entry duplicate-root fixture checks actual reference counts, both result modes, reset/close and native growth under FailAfter0. See PORT_PROGRESS.md#native-api-context-result-roots."
       ],
       "deviations": [
+        "The api_context.cpp:39 zero-reference SASSERT follows the process assertion switch and debugger action before the Go invalid-owner guard; a continuing debugger action leaves the reference count intact. The api_context.cpp:216 membership SASSERT rejects null and foreign AST handles before the existing Go AST ownership guard.",
         "The api_context.cpp:114 DEBUG_CODE warning is emitted before each uncollected API object is removed, and warning_msg remains nonthrowing. Go uses the concrete destructor type name in place of compiler-specific C++ typeid(...).name() text; release builds erase the call.",
         "Native result storage supersedes former source vector header/growth/refusal credit in this member grouping. Real AST reference callbacks and object destructor ordering remain; native backing creates no emulated Runtime/Budget events. This does not claim a general ref_vector implementation or complete API context construction."
       ]

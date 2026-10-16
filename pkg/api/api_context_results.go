@@ -119,6 +119,25 @@ func (c *apiContextResults) saveASTTrail(h ast.ASTHandle) (err error) {
 	if e := c.open(); e != nil {
 		return e
 	}
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return e
+		}
+		if enabled {
+			contained := !h.IsNull()
+			if contained {
+				_, e = c.manager.GetKind(h)
+				contained = e == nil
+			}
+			if !contained {
+				if e = diagnostic.DebugAssertionFailure(d, "src/api/api_context.cpp", 216, "m().contains(n)"); e != nil {
+					return e
+				}
+			}
+		}
+	}
 	if !c.userRefCount {
 		return c.appendASTRoot(&c.astTrail, h)
 	}
@@ -270,6 +289,18 @@ func (o *apiObject) incRef() error {
 func (o *apiObject) decRef() error {
 	if e := o.open(); e != nil {
 		return e
+	}
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return e
+		}
+		if enabled && o.references == 0 {
+			if e = diagnostic.DebugAssertionFailure(d, "src/api/api_context.cpp", 39, "m_ref_count > 0"); e != nil {
+				return e
+			}
+		}
 	}
 	if o.references == 0 {
 		return errAPIObjectOwner
