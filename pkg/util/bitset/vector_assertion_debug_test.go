@@ -51,6 +51,14 @@ func TestBitVectorSourceAssertionGateOrder(t *testing.T) {
 	if e := shifted.ShiftRight(0); e != nil {
 		t.Fatal("zero shift must return before assertion", e)
 	}
+	short := bv(1, 0)
+	if e := short.ShiftRight(1); e != nil || short.size != 2 || short.words[0] != 2 {
+		t.Fatal("subword shift has no SASSERT iteration", short, e)
+	}
+	whole := bv(1, 0)
+	if e := whole.ShiftRight(32); e != nil || whole.size != 33 || whole.words[1] != 1 {
+		t.Fatal("whole-word shift bypasses DEBUG_CODE", whole, e)
+	}
 
 	left := bv(1, 0)
 	right := bv(35, 34)

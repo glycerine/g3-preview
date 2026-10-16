@@ -153,7 +153,8 @@ func (v *Vector) ShiftRight(k uint32) error {
 		}
 	}
 	if bits > 0 {
-		if diagnostic.DebugBuild {
+		// DEBUG_CODE's loop evaluates no SASSERT when word_shift is zero.
+		if diagnostic.DebugBuild && words > 0 {
 			d := diagnostic.BorrowProcessDebugContext()
 			enabled, e := diagnostic.SourceAssertionsEnabled(d)
 			if e != nil {
