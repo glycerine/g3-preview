@@ -49,6 +49,13 @@ func (m *ASTManager) smt2PPExprTree(root ASTHandle, names []usymbol.Symbol, requ
 	if err != nil {
 		return ASTHandle{}, err
 	}
+	rootKind, err := m.GetKind(root)
+	if err != nil {
+		return ASTHandle{}, err
+	}
+	if rootKind == ASTQuantifier {
+		return m.smt2PPQuantifierRoot(root, names)
+	}
 	// shared_occs visits each compound node's children once, but records a
 	// second incoming edge as shared. Its default profile ignores atomic nodes.
 	occurrences := make(map[ASTHandle]uint32)

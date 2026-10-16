@@ -65,6 +65,19 @@ func TestAIGExprCacheReleaseTracePrecedesLastReference(t *testing.T) {
 		}
 	}
 	aigMust(t, r.Close())
+	output.Reset()
+	binder, err := symbols.Intern("x")
+	aigMust(t, err)
+	bound, err := m.MkVar(0, sort)
+	aigMust(t, err)
+	quantifier, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []symbol.Symbol{binder}, Body: bound})
+	aigMust(t, err)
+	r, err = g.MkAIG(quantifier)
+	aigMust(t, err)
+	if tags.ShouldTrace("expr2aig") && !strings.Contains(output.String(), "caching:\n(forall ((x Bool)) x)\n---> #") {
+		t.Fatalf("quantifier variable cache result missing: %q", output.String())
+	}
+	aigMust(t, r.Close())
 	aigMust(t, g.Close())
 	if strings.Contains(output.String(), "aig_lit_count") {
 		t.Fatal("unenabled deletion tag emitted")
