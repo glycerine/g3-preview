@@ -10,11 +10,12 @@ import (
 	"github.com/glycerine/g3/pkg/model"
 
 	"github.com/glycerine/g3/pkg/util/cooperate"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
-func extensionFixture(t *testing.T) (*ast.ASTManager, *model.Model, *ModelRef, model.ModelEvaluatorConfig) {
+func extensionFixture(t *testing.T, traces ...*diagnostic.TraceTags) (*ast.ASTManager, *model.Model, *ModelRef, model.ModelEvaluatorConfig) {
 	ctx, sy, q := paramsTestOwner(t)
 	budget := arena.NewBudget(^uint64(0))
 	catalog, e := uparams.NewGlobalParamsCatalog(sy, uparams.GlobalParamsCatalogConfig{Budget: budget, Descriptions: arena.BytesRegionConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: budget}}, Text: arena.VectorConfig{PageSize: 64, Descriptors: arena.Config{PageSize: 2, Budget: budget}}})
@@ -35,7 +36,11 @@ func extensionFixture(t *testing.T) (*ast.ASTManager, *model.Model, *ModelRef, m
 			t.Fatal("extension fixture leak", budget.Used())
 		}
 	})
-	m, e := ast.NewASTManager(ast.ASTManagerConfig{Symbols: sy, Numerals: q, Budget: budget})
+	managerConfig := ast.ASTManagerConfig{Symbols: sy, Numerals: q, Budget: budget}
+	if len(traces) != 0 {
+		managerConfig.TraceTags = traces[0]
+	}
+	m, e := ast.NewASTManager(managerConfig)
 	satOK(t, e)
 	t.Cleanup(func() { satOK(t, m.Close()) })
 	md, e := model.NewModel(m)

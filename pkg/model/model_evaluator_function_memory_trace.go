@@ -7,6 +7,7 @@ import (
 	"io"
 	"strconv"
 
+	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
@@ -14,6 +15,19 @@ func (f *FunctionInterpretation) traceEvaluatorFunctionAllocated(tags *diagnosti
 	f.memoryTrace = tags
 	f.memoryTraceLive = true
 	f.traceFunctionAllocated("src/model/model_evaluator.cpp", 250)
+}
+
+// NewExtensionFunctionInterpretation owns the concrete function graph created
+// by the reached nonconstant extension-model reconstruction branch.
+func NewExtensionFunctionInterpretation(m *ast.ASTManager, arity uint32) (*FunctionInterpretation, error) {
+	f, err := NewFunctionInterpretation(m, arity)
+	if err != nil {
+		return nil, err
+	}
+	f.memoryTrace = m.BorrowMemoryTraceTags()
+	f.memoryTraceLive = true
+	f.traceFunctionAllocated("src/tactic/extension_model_converter.cpp", 66)
+	return f, nil
 }
 
 func (f *FunctionInterpretation) traceCopiedFunctionAllocated(tags *diagnostic.TraceTags) {

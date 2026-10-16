@@ -143,7 +143,7 @@ func (c *tacticExtensionModelConverter) ApplyModel(out *ModelRef, goal uint32) (
 				return e
 			}
 		} else {
-			c.function, e = model.NewFunctionInterpretation(c.manager, arity)
+			c.function, e = model.NewExtensionFunctionInterpretation(c.manager, arity)
 			if e != nil {
 				return e
 			}

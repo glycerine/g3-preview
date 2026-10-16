@@ -104644,9 +104644,11 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/model/model_evaluator_function_memory_trace.go",
         "pkg/tactic/tactic_extension_model.go"
       ],
       "tests": [
+        "TestExtensionModelFunctionMemoryWrapperFollowsModelCore",
         "TestTacticExtensionModelOriginalReverseDefinitionOrder",
         "TestTacticExtensionModelFunctionFallbackCompletionAndDefaultCallbacks",
         "TestTacticExtensionInvocationRefusalsCleanupAndReuse",
@@ -104671,6 +104673,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete extension model arity-positive func_interp allocation at extension_model_converter.cpp:66 and model-core destruction at model_core.cpp:29 through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/tactic_extension_model.go",
+          "tests": ["TestExtensionModelFunctionMemoryWrapperFollowsModelCore"]
+        },
         {
           "name": "extension_model_converter construction/destruction, insert and reverse-order indexed model reconstruction; inherited unindexed/labels/cancel no-op operations",
           "status": "partial",
@@ -152303,6 +152311,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/tactic_extension_model.go",
         "pkg/tactic/tactic_stored_model_memory_trace.go",
         "pkg/ast/pattern/collect_memory_trace.go",
         "pkg/ast/pattern/multi_pattern_memory_trace.go",
@@ -152384,6 +152393,7 @@
         "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
+        "TestExtensionModelFunctionMemoryWrapperFollowsModelCore",
         "TestStoredModelMemoryWrapperSourceAllocationAndRelease",
         "TestStoredModelMemoryWrapperUsesASTProcessDuringFinalize",
         "TestPatternCollectedInfoMemoryFollowsOwningProcessFinalization",
@@ -152559,6 +152569,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete extension model arity-positive func_interp allocation at extension_model_converter.cpp:66 and model-core destruction at model_core.cpp:29 through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/tactic_extension_model.go",
+          "tests": ["TestExtensionModelFunctionMemoryWrapperFollowsModelCore"]
+        },
         {
           "name": "Concrete model2mc factory allocations at model_converter.cpp:167,173 and final converter.h:36 deallocation through debug memory wrappers",
           "status": "platform_replacement",
@@ -153247,6 +153263,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/tactic_extension_model.go",
         "pkg/tactic/tactic_stored_model_memory_trace.go",
         "pkg/ast/pattern/collect_memory_trace.go",
         "pkg/ast/pattern/multi_pattern_memory_trace.go",
@@ -153323,6 +153340,7 @@
         "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
+        "TestExtensionModelFunctionMemoryWrapperFollowsModelCore",
         "TestStoredModelMemoryWrapperSourceAllocationAndRelease",
         "TestStoredModelMemoryWrapperUsesASTProcessDuringFinalize",
         "TestPatternCollectedInfoMemoryFollowsOwningProcessFinalization",
@@ -153487,6 +153505,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete extension model arity-positive func_interp allocation at extension_model_converter.cpp:66 and model-core destruction at model_core.cpp:29 through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/tactic_extension_model.go",
+          "tests": ["TestExtensionModelFunctionMemoryWrapperFollowsModelCore"]
+        },
         {
           "name": "Concrete model2mc factory allocations at model_converter.cpp:167,173 and final converter.h:36 deallocation through debug memory wrappers",
           "status": "platform_replacement",
