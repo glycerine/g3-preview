@@ -341,6 +341,14 @@ func (p *BVRewriter) bvOrMask(v *bvOrInvocation, arg ast.ASTHandle, width uint32
 	if e := n.Normalize(width); e != nil {
 		return ast.ASTHandle{}, e
 	}
+	maskValue := ""
+	if p.bvTraceTags().ShouldTrace("mask_bug") {
+		value, e := n.MaskValueString()
+		if e != nil {
+			return ast.ASTHandle{}, e
+		}
+		maskValue = value
+	}
 	if e := n.BeginMask(); e != nil {
 		return ast.ASTHandle{}, e
 	}
@@ -404,5 +412,12 @@ func (p *BVRewriter) bvOrMask(v *bvOrInvocation, arg ast.ASTHandle, width uint32
 	for i, j := 0, len(hs)-1; i < j; i, j = i+1, j-1 {
 		hs[i], hs[j] = hs[j], hs[i]
 	}
-	return p.manager.MkBitVectorConcat(hs)
+	result, e := p.manager.MkBitVectorConcat(hs)
+	if e != nil {
+		return ast.ASTHandle{}, e
+	}
+	if e = p.traceORMask(maskValue, width, arg, result); e != nil {
+		return ast.ASTHandle{}, e
+	}
+	return result, nil
 }

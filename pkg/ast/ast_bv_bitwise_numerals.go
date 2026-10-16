@@ -227,6 +227,15 @@ func (n *BitVectorBitwiseNumerals) Normalize(width uint32) error {
 	}
 	return n.End(7)
 }
+
+// MaskValueString snapshots the normalized coefficient before the mask loop shifts it.
+func (n *BitVectorBitwiseNumerals) MaskValueString() (string, error) {
+	if e := n.slot(0); e != nil {
+		return "", e
+	}
+	value, e := n.manager.numerals.String(&n.values[0])
+	return value, n.fail(e)
+}
 func (n *BitVectorBitwiseNumerals) BeginMask() error {
 	if e := n.place(2); e != nil {
 		return e
