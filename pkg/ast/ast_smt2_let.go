@@ -1,6 +1,8 @@
 // Source: src/ast/ast_smt2_pp.cpp:801-844.
 package ast
 
+import "strconv"
+
 // smt2LetBinding records an alias definition and the level of aliases used
 // by that definition. Definitions at the same level share one let form.
 type smt2LetBinding struct {
@@ -10,7 +12,13 @@ type smt2LetBinding struct {
 }
 
 func (m *ASTManager) smt2PPLet(body ASTHandle, bindings []smt2LetBinding) (ASTHandle, error) {
-	if err := m.traceSMT2Let(806, "old_sz: 0, sz: ", len(bindings)); err != nil {
+	return m.smt2PPLetAt(body, bindings, 0)
+}
+
+// oldSize is the enclosing alias count captured by begin_scope. The native
+// binding slice contains only declarations created in this scope.
+func (m *ASTManager) smt2PPLetAt(body ASTHandle, bindings []smt2LetBinding, oldSize int) (ASTHandle, error) {
+	if err := m.traceSMT2Let(806, "old_sz: "+strconv.Itoa(oldSize)+", sz: ", oldSize+len(bindings)); err != nil {
 		return ASTHandle{}, err
 	}
 	if len(bindings) == 0 {
