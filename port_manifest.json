@@ -23709,6 +23709,12 @@
           ]
         },
         {
+          "name": "mk_bv_udiv_core process-bound SMT2 divisor/option TRACE and symbolic result TRACE (bv_rewriter.cpp:1040,1097)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_udiv_smt2_trace.go",
+          "tests": ["TestBVRewriterUnsignedDivisionSMT2SourceTrace"]
+        },
+        {
           "name": "mk_bv_udiv_core configured inverse-attempt TRACE before modular inverse (bv_rewriter.cpp:1075)",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_udiv_trace.go",
@@ -182923,6 +182929,12 @@
           "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
         },
         {
+          "name": "Retained BV unsigned-division process-bound SMT2 divisor/option and symbolic-result TRACE at bv_rewriter.cpp:1040,1097",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_udiv_smt2_trace.go",
+          "tests": ["TestBVRewriterUnsignedDivisionSMT2SourceTrace"]
+        },
+        {
           "name": "Retained BV unsigned-division configured inverse-attempt TRACE at bv_rewriter.cpp:1075",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_udiv_trace.go",
@@ -185042,6 +185054,12 @@
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
           "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
+        },
+        {
+          "name": "Retained BV unsigned-division process-bound SMT2 divisor/option and symbolic-result TRACE at bv_rewriter.cpp:1040,1097",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_udiv_smt2_trace.go",
+          "tests": ["TestBVRewriterUnsignedDivisionSMT2SourceTrace"]
         },
         {
           "name": "Retained BV unsigned-division configured inverse-attempt TRACE at bv_rewriter.cpp:1075",
