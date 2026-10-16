@@ -14,7 +14,6 @@ var ErrModularOwner = errors.New("mpnum: invalid modular integer owner")
 
 var ErrModularPrimeUninitialized = errors.New("mpnum: source modular constructor left prime flag uninitialized")
 var ErrModularAssertion = errors.New("mpnum: source modular assertion failed")
-var ErrModularUnsupported = errors.New("mpnum: source modular operation unsupported")
 var ErrModularPowerPending = errors.New("mpnum: modular power raw integer cleanup pending")
 
 // IntegerModularManager owns seven source numerals and borrows its integer
@@ -665,7 +664,7 @@ func (m *IntegerModularManager) IsPerfectSquareWithReceipt(a, out *Int, receipt 
 		return false, e
 	}
 	if !m.z {
-		return false, ErrModularUnsupported
+		return false, diagnostic.BorrowProcessDebugContext().NotImplementedYet("src/util/mpzzp.h", 261)
 	}
 	return m.manager.isPerfectSquareTracked(a, out, integerAllocationInvocationContext{}, receipt)
 }

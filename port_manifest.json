@@ -169685,12 +169685,13 @@
           ]
         },
         {
-          "name": "mpzzp Z-mode inverse UNREACHABLE at mpzzp.h:169 and finite perfect-square NOT_IMPLEMENTED_YET at :261 through source process diagnostics",
+          "name": "mpzzp Z-mode inverse UNREACHABLE at mpzzp.h:169 and direct/receipt finite perfect-square NOT_IMPLEMENTED_YET at :261 through source process diagnostics",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpzzp.go",
           "tests": [
             "TestIntegerModularExplicitSourceDiagnostics",
-            "TestIntegerModularHeaderRefusalAndWarm"
+            "TestIntegerModularHeaderRefusalAndWarm",
+            "TestPerfectSquareIssuedReceipt"
           ]
         },
         {

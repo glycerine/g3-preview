@@ -22,7 +22,7 @@ func TestIntegerModularExplicitSourceDiagnostics(t *testing.T) {
 	serviceMust(t, e)
 	in, e := os.CreateTemp(t.TempDir(), "diagnostic-input-*")
 	serviceMust(t, e)
-	_, e = in.WriteString("CT")
+	_, e = in.WriteString("CTT")
 	serviceMust(t, e)
 	_, e = in.Seek(0, 0)
 	serviceMust(t, e)
@@ -61,16 +61,21 @@ func TestIntegerModularExplicitSourceDiagnostics(t *testing.T) {
 	if _, e := m.IsPerfectSquare(&a, &root); !errors.As(e, &thrown) || root.Val != 99 {
 		t.Fatal("finite square Throw must stop before root mutation", root, e)
 	}
+	var receipt integerPerfectSquareInvocationReceipt
+	if _, e := m.IsPerfectSquareWithReceipt(&a, &root, &receipt); !errors.As(e, &thrown) || root.Val != 99 {
+		t.Fatal("receipt path must share the finite source diagnostic", root, e)
+	}
 	state, e := input.State()
 	serviceMust(t, e)
-	if state.Position != 2 {
+	if state.Position != 3 {
 		t.Fatal(state)
 	}
 	got, e := os.ReadFile(out.Name())
 	serviceMust(t, e)
 	const prompt = "(C)ontinue, (A)bort, (S)top, (T)hrow exception, Invoke (G)DB\n"
+	const finite = "NOT IMPLEMENTED YET!\nASSERTION VIOLATION\nFile: src/util/mpzzp.h\nLine: 261\nUNREACHABLE CODE WAS REACHED.\n" + prompt
 	want := "ASSERTION VIOLATION\nFile: src/util/mpzzp.h\nLine: 169\nUNREACHABLE CODE WAS REACHED.\n" + prompt +
-		"NOT IMPLEMENTED YET!\nASSERTION VIOLATION\nFile: src/util/mpzzp.h\nLine: 261\nUNREACHABLE CODE WAS REACHED.\n" + prompt
+		finite + finite
 	if string(got) != want {
 		t.Fatalf("diagnostic output: got %q, want %q", got, want)
 	}
