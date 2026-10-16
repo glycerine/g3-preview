@@ -12,9 +12,13 @@ import (
 )
 
 func TestSATConflictMarkAssertionUsesProcessDebugTagAndActions(t *testing.T) {
-	s := satConflictFixture(t, 1)
+	s := satConflictFixture(t, 2)
 	s.analysis.propagation.variables.mark[0] = true
-	defer func() { s.analysis.propagation.variables.mark[0] = false }()
+	s.analysis.propagation.variables.mark[1] = true
+	defer func() {
+		s.analysis.propagation.variables.mark[0] = false
+		s.analysis.propagation.variables.mark[1] = false
+	}()
 	budget := arena.NewBudget(^uint64(0))
 	region, err := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: budget}})
 	satOK(t, err)
@@ -22,7 +26,7 @@ func TestSATConflictMarkAssertionUsesProcessDebugTagAndActions(t *testing.T) {
 	satOK(t, err)
 	inputFile, err := os.CreateTemp(t.TempDir(), "sat-mark-input-*")
 	satOK(t, err)
-	_, err = inputFile.WriteString("CT")
+	_, err = inputFile.WriteString("CCT")
 	satOK(t, err)
 	_, err = inputFile.Seek(0, 0)
 	satOK(t, err)
@@ -62,23 +66,24 @@ func TestSATConflictMarkAssertionUsesProcessDebugTagAndActions(t *testing.T) {
 		}
 		state, e := input.State()
 		satOK(t, e)
-		if state.Position != 2 {
+		if state.Position != 3 {
 			t.Fatalf("source debugger consumed %d actions", state.Position)
 		}
 		contents, e := os.ReadFile(outputFile.Name())
 		satOK(t, e)
-		want := "ASSERTION VIOLATION\nFile: src/sat/sat_solver.cpp\nLine: 1678\ncheck_marks()\n" +
+		want := "ASSERTION VIOLATION\nFile: src/sat/sat_solver.cpp\nLine: 2854\n!is_marked(v)\n" +
 			"(C)ontinue, (A)bort, (S)top, (T)hrow exception, Invoke (G)DB\n"
-		if got := string(contents); got != strings.Repeat(want, 2) {
-			t.Fatalf("source CASSERT records: got %q, want %q", got, strings.Repeat(want, 2))
+		if got := string(contents); got != strings.Repeat(want, 3) {
+			t.Fatalf("source inner SASSERT records: got %q, want %q", got, strings.Repeat(want, 3))
 		}
 		s.analysis.propagation.variables.mark[0] = false
+		s.analysis.propagation.variables.mark[1] = false
 		s.analysis.propagation.setConflict(satJustification{}, DefaultLiteral())
 		_, e = s.resolveConflict()
 		satOK(t, e)
 		state, e = input.State()
 		satOK(t, e)
-		if state.Position != 2 {
+		if state.Position != 3 {
 			t.Fatalf("valid conflict path consumed extra debugger action: %d", state.Position)
 		}
 	} else {

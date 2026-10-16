@@ -186,13 +186,4 @@ func TestSATCleanerConstructorAndStatistics(t *testing.T) {
 	if c.elimClauses != 0 || c.elimLiterals != 0 {
 		t.Fatal("source statistics reset")
 	}
-	c.debugInvariant = true
-	_, e = c.run(false)
-	if satStorageSourceDebug {
-		if !errors.Is(e, ErrSATMissingIntegrityBinding) {
-			t.Fatal(e)
-		}
-	} else {
-		satOK(t, e)
-	}
 }

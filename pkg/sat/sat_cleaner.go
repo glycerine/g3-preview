@@ -14,12 +14,12 @@ import (
 // The embedded interruption ledger owns only source-compaction ranges, never
 // all allocator-live objects. It is an explicit guarded exception adapter.
 type satCleaner struct {
-	self                                                           *satCleaner
-	lifecycle                                                      *satSolverClauseLifecycle
-	lastNumUnits, elimClauses, elimLiterals                        uint32
-	ownerBytes                                                     uint64
-	cursor, out, end, drainPrefix, drainSuffix                     uint32
-	interrupted, learned, closing, closed, debugInvariant, running bool
+	self                                           *satCleaner
+	lifecycle                                      *satSolverClauseLifecycle
+	lastNumUnits, elimClauses, elimLiterals        uint32
+	ownerBytes                                     uint64
+	cursor, out, end, drainPrefix, drainSuffix     uint32
+	interrupted, learned, closing, closed, running bool
 }
 
 func newSATCleaner(l *satSolverClauseLifecycle, b *arena.Budget) (*satCleaner, error) {
@@ -76,17 +76,11 @@ func (c *satCleaner) collectStatistics(s *statistics.Statistics, clauses, litera
 	s.UpdateUint(literals, c.elimLiterals)
 	return nil
 }
-func (c *satCleaner) invariant() error {
-	if satStorageSourceDebug && c.debugInvariant {
-		return c.lifecycle.checkInvariant()
-	}
-	return nil
-}
 func (c *satCleaner) run(force bool) (done bool, err error) {
 	if e := c.open(); e != nil {
 		return false, e
 	}
-	if e := c.invariant(); e != nil {
+	if e := c.assertInvariant(); e != nil {
 		return false, e
 	}
 	p := c.lifecycle.propagation
@@ -130,7 +124,7 @@ func (c *satCleaner) run(force bool) (done bool, err error) {
 	if _, e = p.propagateCore(false); e != nil {
 		return false, e
 	}
-	if e = c.invariant(); e != nil {
+	if e = c.assertInvariant(); e != nil {
 		return false, e
 	}
 	return true, nil

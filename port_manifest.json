@@ -74373,13 +74373,19 @@
             "TestSATIntegrityNaryBlockedAndReinitProfiles",
             "TestSATIntegrityAsymmActualEnabledWrapperSites"
           ]
+        },
+        {
+          "name": "Retained cleaner operator cleaner_bug process assertion/tag gate at entry and exit; nested checker SASSERT notifications remain open (sat_cleaner.cpp:184,200)",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_assertion.go",
+          "tests": ["TestSATCleanerInvariantUsesProcessDebugGate"]
         }
       ],
       "ownership": [
         "Caller abort/Close is distinct from source set_end. Actual graph names prefix[drainPrefix:out] plus unread[max(cursor,drainSuffix):end], unaffected other vector and raw candidate. No backing/counter repairs. Physical census compares named references to live allocator descriptors, full cold/vector/arena/Runtime bytes exactly once before fault disable."
       ],
       "deviations": [
-        "Actual enabled cleaner_bug and propagation-wrapper sat_propagate/sat_missed_prop diagnostics, EXT dispatch and verbose/TRACE remain open. Explicit owning interruption ledger retains actual prefix/unread suffix; stopped publication guard prevents new roots outside the captured range. No whole solver or registered assertion completion credit."
+        "Propagation-wrapper sat_propagate/sat_missed_prop diagnostics, EXT dispatch and verbose/TRACE remain open. Explicit owning interruption ledger retains actual prefix/unread suffix; stopped publication guard prevents new roots outside the captured range. No whole solver completion credit."
       ]
     },
     {
@@ -74443,7 +74449,7 @@
         "Caller abort/Close is distinct from source set_end. Actual graph names prefix[drainPrefix:out] plus unread[max(cursor,drainSuffix):end], unaffected other vector and raw candidate. No backing/counter repairs. Physical census compares named references to live allocator descriptors, full cold/vector/arena/Runtime bytes exactly once before fault disable."
       ],
       "deviations": [
-        "Actual enabled cleaner_bug and propagation-wrapper sat_propagate/sat_missed_prop diagnostics, EXT dispatch and verbose/TRACE remain open. Explicit owning interruption ledger retains actual prefix/unread suffix; stopped publication guard prevents new roots outside the captured range. No whole solver or registered assertion completion credit."
+        "Propagation-wrapper sat_propagate/sat_missed_prop diagnostics, EXT dispatch and verbose/TRACE remain open. Explicit owning interruption ledger retains actual prefix/unread suffix; stopped publication guard prevents new roots outside the captured range. No whole solver completion credit."
       ]
     },
     {
@@ -79081,7 +79087,7 @@
           ]
         },
         {
-          "name": "resolve_conflict1678 sat_check_marks CASSERT with process assertion/tag gate, mark scan and C/T debugger action",
+          "name": "resolve_conflict1678 sat_check_marks CASSERT with process assertion/tag gate and per-mark inner SASSERT2854 C/T debugger action",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_conflict_assertion.go",
           "tests": ["TestSATConflictMarkAssertionUsesProcessDebugTagAndActions"]
@@ -121822,10 +121828,16 @@
           "tests": ["TestASTNondeterminismTraceFollowsProcessDebugTag"]
         },
         {
-          "name": "Retained SAT resolve_conflict sat_check_marks CASSERT process assertion/tag gate, mark scan, notification and C/T debugger continuation (sat_solver.cpp:1678)",
+          "name": "Retained SAT resolve_conflict sat_check_marks CASSERT gate and per-mark inner SASSERT notification and C/T continuation (sat_solver.cpp:1678,2854)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_conflict_assertion.go",
           "tests": ["TestSATConflictMarkAssertionUsesProcessDebugTagAndActions"]
+        },
+        {
+          "name": "Retained SAT cleaner_bug CASSERT process assertion/tag gate and invariant call; nested checker SASSERT diagnostics remain open (sat_cleaner.cpp:184,200)",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_assertion.go",
+          "tests": ["TestSATCleanerInvariantUsesProcessDebugGate"]
         },
         {
           "name": "Process debug owner with default streams, tied input and interactive action; generated initializer borrowing and heap CASSERT state",
@@ -122164,10 +122176,16 @@
           "tests": ["TestASTNondeterminismTraceFollowsProcessDebugTag"]
         },
         {
-          "name": "Retained SAT resolve_conflict sat_check_marks CASSERT process assertion/tag gate, mark scan, notification and C/T debugger continuation (sat_solver.cpp:1678)",
+          "name": "Retained SAT resolve_conflict sat_check_marks CASSERT gate and per-mark inner SASSERT notification and C/T continuation (sat_solver.cpp:1678,2854)",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_conflict_assertion.go",
           "tests": ["TestSATConflictMarkAssertionUsesProcessDebugTagAndActions"]
+        },
+        {
+          "name": "Retained SAT cleaner_bug CASSERT process assertion/tag gate and invariant call; nested checker SASSERT diagnostics remain open (sat_cleaner.cpp:184,200)",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_assertion.go",
+          "tests": ["TestSATCleanerInvariantUsesProcessDebugGate"]
         },
         {
           "name": "Process debug owner with default streams, tied input and interactive action; generated initializer borrowing and heap CASSERT state",

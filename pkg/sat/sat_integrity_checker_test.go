@@ -164,14 +164,13 @@ func TestSATIntegrityActualEnabledConsumerBindings(t *testing.T) {
 	satOK(t, probing.propagate())
 	g.debugInvariant = true
 	satOK(t, g.invariant())
-	g.cleaner.debugInvariant = true
-	satOK(t, g.cleaner.invariant())
+	satOK(t, l.checkInvariant())
 	if satStorageSourceDebug {
 		if p.limit.Steps != before+3 {
 			t.Fatal("three reached check_invariant calls", before, p.limit.Steps)
 		}
-	} else if p.limit.Steps != before {
-		t.Fatal("CASSERT calls erased in release")
+	} else if p.limit.Steps != before+1 {
+		t.Fatal("explicit checker call reached in release")
 	}
 	original := satCleanerClause(t, l, []Literal{0, 2, 4}, false, false)
 	satOK(t, l.attachClause(original))
