@@ -2,10 +2,14 @@
 package polynomial
 
 import (
+	"bytes"
 	"fmt"
-	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"math/big"
+	"strings"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialGCDDefaultIntegerIndependentCommonFactors(t *testing.T) {
@@ -110,6 +114,10 @@ func TestPolynomialGCDDefaultIntegerEveryReservationPrefix(t *testing.T) {
 func TestPolynomialGCDDefaultIntegerCRAReconstruction(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	c := full.core
+	var trace bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&trace)
+	tags.Enable("mgcd")
+	c.monomials.config.Trace = tags
 	z := c.integer
 	// The common factor's constant exceeds every uint32 source prime. A single
 	// balanced modular image cannot be its integer factor; actual CRA is reached.
@@ -137,6 +145,9 @@ func TestPolynomialGCDDefaultIntegerCRAReconstruction(t *testing.T) {
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, full.CleanupGCD()); serviceMust(t, r.Close()) })
 	serviceMust(t, full.GCD(p, q, r))
+	if tags.ShouldTrace("mgcd") && !strings.Contains(trace.String(), "uni_mod_gcd src/math/polynomial/polynomial.cpp:3847 ---------\nnew combined:\n") {
+		t.Fatalf("missing reached CRA image trace: %q", trace.String())
+	}
 	same, e := c.Equal(common, r.root.value)
 	serviceMust(t, e)
 	if !same {
@@ -148,6 +159,10 @@ func TestPolynomialGCDDefaultIntegerCRAReconstruction(t *testing.T) {
 func TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	c := full.core
+	var trace bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&trace)
+	tags.Enable("mgcd")
+	c.monomials.config.Trace = tags
 	z := c.integer
 	// Every source prime divides the leading coefficient. Thus each literal
 	// modular-image degree check rejects its image before the source PRS fallback.
@@ -177,6 +192,9 @@ func TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS(t *testing.T) {
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, full.CleanupGCD()); serviceMust(t, r.Close()) })
 	serviceMust(t, full.GCD(p, q, r))
+	if tags.ShouldTrace("mgcd") && !strings.Contains(trace.String(), "uni_mod_gcd src/math/polynomial/polynomial.cpp:3811 ---------\nbad prime, leading coefficient vanished\n") {
+		t.Fatalf("missing rejected-prime trace: %q", trace.String())
+	}
 	same, e := c.Equal(common, r.root.value)
 	serviceMust(t, e)
 	if !same {

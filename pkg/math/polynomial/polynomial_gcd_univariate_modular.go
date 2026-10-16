@@ -42,6 +42,7 @@ func (m *MultivariatePolynomialManager) uniModImage(s *polynomialGCDFunctionScop
 		return false, e
 	}
 	if d < du {
+		m.traceUniModGCDLiteral(3811, "bad prime, leading coefficient vanished\n")
 		return true, nil
 	}
 	d, e = c.Degree(s.refs[3].root.value, x)
@@ -49,6 +50,7 @@ func (m *MultivariatePolynomialManager) uniModImage(s *polynomialGCDFunctionScop
 		return false, e
 	}
 	if d < dv {
+		m.traceUniModGCDLiteral(3815, "bad prime, leading coefficient vanished\n")
 		return true, nil
 	}
 	if e = m.gcdEuclid(s.refs[2].root.value, s.refs[3].root.value, &s.refs[5].root); e != nil {
@@ -77,6 +79,9 @@ func (m *MultivariatePolynomialManager) uniModImage(s *polynomialGCDFunctionScop
 }
 func (m *MultivariatePolynomialManager) uniModGCD(u, v Polynomial, r *polynomialReference) (err error) {
 	c := m.core
+	if err = m.traceUniModGCDPolynomials(3770, "univ_modular_gcd\nu: ", u, v); err != nil {
+		return err
+	}
 	if polynomialSourceDebug {
 		field, e := c.modular.Modular()
 		if e != nil {
@@ -204,6 +209,9 @@ func (m *MultivariatePolynomialManager) uniModGCD(u, v Polynomial, r *polynomial
 		if e != nil {
 			return e
 		}
+		if e = m.traceUniModGCDPrime(&s.nums[7]); e != nil {
+			return e
+		}
 		bad, e := m.uniModImage(s, x, du, dv)
 		if e != nil {
 			return e
@@ -211,11 +219,15 @@ func (m *MultivariatePolynomialManager) uniModGCD(u, v Polynomial, r *polynomial
 		if bad {
 			continue
 		}
+		if e = m.traceUniModGCDPolynomials(3825, "new q:\n", s.refs[5].root.value); e != nil {
+			return e
+		}
 		constant, e := c.IsConstant(s.refs[5].root.value)
 		if e != nil {
 			return e
 		}
 		if constant {
+			m.traceUniModGCDLiteral(3827, "done, modular gcd is one\n")
 			one, e := c.modular.IsOne(&s.nums[2])
 			if e != nil {
 				return e
@@ -246,6 +258,7 @@ func (m *MultivariatePolynomialManager) uniModGCD(u, v Polynomial, r *polynomial
 				return e
 			}
 			if dq < ds {
+				m.traceUniModGCDLiteral(3841, "discarding image\n")
 				if e = s.refs[4].root.assign(c, s.refs[5].root.value); e != nil {
 					return e
 				}
@@ -256,9 +269,15 @@ func (m *MultivariatePolynomialManager) uniModGCD(u, v Polynomial, r *polynomial
 				if e = m.gcdCRA(s.refs[5].root.value, &s.nums[7], s.refs[4].root.value, &s.nums[6], &s.refs[4]); e != nil {
 					return e
 				}
+				if e = m.traceUniModGCDPolynomials(3847, "new combined:\n", s.refs[4].root.value); e != nil {
+					return e
+				}
 			}
 		}
 		if e = m.gcdPrimitivePart(s.refs[4].root.value, x, &s.refs[6].root); e != nil {
+			return e
+		}
+		if e = m.traceUniModGCDPolynomials(3851, "candidate:\n", s.refs[6].root.value); e != nil {
 			return e
 		}
 		frontier := s.depth
@@ -291,6 +310,7 @@ func (m *MultivariatePolynomialManager) uniModGCD(u, v Polynomial, r *polynomial
 			}
 		}
 		if divides {
+			m.traceUniModGCDLiteral(3857, "found GCD\n")
 			unit, e := c.monomials.Unit()
 			if e != nil {
 				return e
@@ -302,7 +322,10 @@ func (m *MultivariatePolynomialManager) uniModGCD(u, v Polynomial, r *polynomial
 			if e = r.assign(c, result); e != nil {
 				return e
 			}
-			return m.flipLeadingSign(r)
+			if e = m.flipLeadingSign(r); e != nil {
+				return e
+			}
+			return m.traceUniModGCDPolynomials(3860, "r: ", r.value)
 		}
 		if e = m.finishGCDLocalsTo(s, frontier); e != nil {
 			return e

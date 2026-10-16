@@ -43179,6 +43179,12 @@
           ]
         },
         {
+          "name": "Retained univariate modular GCD mgcd TRACE at polynomial.cpp:3770-3860",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_univariate_trace.go",
+          "tests": ["TestPolynomialUnivariateModularGCDSourceTrace", "TestPolynomialGCDDefaultIntegerCRAReconstruction", "TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS"]
+        },
+        {
           "name": "Retained polynomial CRA image, inverse, bound and merge TRACE at polynomial.cpp:3678-3760",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_cra_trace.go",
@@ -46011,6 +46017,12 @@
             "TestPolynomialVariableRecognitionLiteralWritePrefixes",
             "TestPolynomialVariableRecognitionBIGEveryActualPrefix"
           ]
+        },
+        {
+          "name": "Retained univariate modular GCD mgcd TRACE at polynomial.cpp:3770-3860",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_univariate_trace.go",
+          "tests": ["TestPolynomialUnivariateModularGCDSourceTrace", "TestPolynomialGCDDefaultIntegerCRAReconstruction", "TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS"]
         },
         {
           "name": "Retained polynomial CRA image, inverse, bound and merge TRACE at polynomial.cpp:3678-3760",
@@ -183388,6 +183400,12 @@
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
         },
         {
+          "name": "Retained univariate modular GCD mgcd TRACE at polynomial.cpp:3770-3860",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_univariate_trace.go",
+          "tests": ["TestPolynomialUnivariateModularGCDSourceTrace", "TestPolynomialGCDDefaultIntegerCRAReconstruction", "TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS"]
+        },
+        {
           "name": "Retained polynomial CRA image, inverse, bound and merge TRACE at polynomial.cpp:3678-3760",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_cra_trace.go",
@@ -185621,6 +185639,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
+        },
+        {
+          "name": "Retained univariate modular GCD mgcd TRACE at polynomial.cpp:3770-3860",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_univariate_trace.go",
+          "tests": ["TestPolynomialUnivariateModularGCDSourceTrace", "TestPolynomialGCDDefaultIntegerCRAReconstruction", "TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS"]
         },
         {
           "name": "Retained polynomial CRA image, inverse, bound and merge TRACE at polynomial.cpp:3678-3760",
