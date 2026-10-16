@@ -181389,6 +181389,7 @@
       "go_targets": [
         "pkg/ast/ast_family.go",
         "pkg/parsers/smt2/local_environment.go",
+        "pkg/parsers/smt2/local_let.go",
         "pkg/parsers/smt2/local_lookup.go",
         "pkg/parsers/smt2/local_sorted_vars.go"
       ],
@@ -181396,6 +181397,7 @@
         "TestFamilySourceRegistrationAndQueries",
         "TestFamilySourceEnumerationOrderAndPrefixes",
         "TestSMT2LocalSymbolTableNestedAndRepeatedBindings",
+        "TestSMT2LetLocalsParallelBindingsAndScopeRestoration",
         "TestSMT2SortedVariablesReverseIndicesAndShadowRestoration",
         "TestSMT2ParserPushLocalShiftsFreeVariables",
         "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders",
@@ -181456,6 +181458,12 @@
           "tests": ["TestSMT2SortedVariablesReverseIndicesAndShadowRestoration", "TestSMT2SortedVariablesRejectMismatchedInputsBeforeScope", "TestSMT2SortedVariablesFailedSortRestoresPriorScope"]
         },
         {
+          "name": "SMT2 let-frame scoped concrete local insertion after parallel initializer evaluation, duplicate shadowing, and result-preserving declaration cleanup (smt2parser.cpp:1869-1900)",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/local_let.go",
+          "tests": ["TestSMT2LetLocalsParallelBindingsAndScopeRestoration", "TestSMT2LetLocalsRejectMalformedAndStaleStack"]
+        },
+        {
           "name": "Parser-local append/get_dom/get_range/get_scope_level have no direct production call; AST family enumeration is credited separately",
           "status": "reference_only",
           "tests": []
@@ -181463,7 +181471,7 @@
       ],
       "ownership": [
         "AST FamilyManager borrows its symbol manager, owns an insertion-ordered dictionary and registration-order name slice, and closes before the borrowed manager. Scoped undo tables and clone/assignment staging from the deleted generic translation are not retained.",
-        "The only other production instantiation is SMT2 parser local<expr*,unsigned>. Its concrete Go table and undo trail borrow expression handles without incrementing references; their lifetimes belong to enclosing parser AST owners. Begin_scope records a trail limit, insert saves the prior local or absent key, and end_scope restores or erases in reverse trail order. The selected local identifier lookup and sorted-variable registration use owning expression-stack ASTRefs; other parser integration remains open."
+        "The only other production instantiation is SMT2 parser local<expr*,unsigned>. Its concrete Go table and undo trail borrow expression handles without incrementing references; their lifetimes belong to enclosing parser AST owners. Begin_scope records a trail limit, insert saves the prior local or absent key, and end_scope restores or erases in reverse trail order. Selected local identifier lookup, sorted-variable registration, and let-frame binding/cleanup use owning expression-stack ASTRefs; other parser integration remains open."
       ],
       "deviations": [
         "The generic scoped Go symbol table and tests were deleted in 8e22e4f5. AST family_id operations now use insdict and native slices in pkg/ast/ast_family.go; that consumer never invokes begin_scope, end_scope, append, reset, or table cloning. Its enumeration uses insertion order. The SMT2 parser's concrete local environment uses a native map and undo slice; the selected local identifier branch uses the existing AST var_shifter, while the remaining parser call sites are unported."
