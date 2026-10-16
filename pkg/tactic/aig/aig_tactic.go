@@ -9,6 +9,7 @@ import (
 	"github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/cooperate"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -45,10 +46,7 @@ func (p *Pass) UpdateParams(c *uparams.ParamsContext, value *uparams.ParamsRef) 
 	if err != nil {
 		return err
 	}
-	limit := uint64(mb) << 20
-	if mb == math.MaxUint32 {
-		limit = math.MaxUint64
-	}
+	limit := umemory.MegabytesToBytes(mb)
 	p.maxMemory, p.DefaultGateEncoding, p.PerAssertion, p.paramsSymbols = limit, encoding, per, c.SymbolsField
 	return nil
 }

@@ -183965,7 +183965,12 @@
         "pkg/util/diagnostic/util_process_verbose.go",
         "pkg/util/params/util_env_params.go",
         "pkg/sat/sat_solver_find_mutexes.go",
-        "pkg/sat/tactic/sat_goal_to_sat.go"
+        "pkg/sat/tactic/sat_goal_to_sat.go",
+        "pkg/util/memory/megabytes.go",
+        "pkg/model/model_evaluator.go",
+        "pkg/sat/sat_solver_probing.go",
+        "pkg/tactic/bv/max_bv_sharing_goal.go",
+        "pkg/tactic/aig/aig_tactic.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184004,7 +184009,12 @@
         "TestProcessVerboseGlobalsDefaultAndBorrowedSelection",
         "TestUpdateProcessEnvParamsSharedVerbosityAndWarning",
         "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations",
-        "TestSATGoalTranslatorSourceMaxMemorySizeTSentinel"
+        "TestSATGoalTranslatorSourceMaxMemorySizeTSentinel",
+        "TestSourceMegabytesToBytesNativeAndNarrowSizeT",
+        "TestSATSolverProbingSourceDefaultsAndTypo",
+        "TestModelEvaluatorResourceLimitsAndReset",
+        "TestSharingGoalPassSourceParamsAndResourceLimits",
+        "TestAIGPassParamsBindMemoryEncodingAndWholeGoalBranch"
       ],
       "conditionals": [
         {
@@ -184292,6 +184302,13 @@
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat.go",
           "tests": ["TestSATGoalTranslatorSourceMaxMemorySizeTSentinel"]
+        },
+        {
+          "name": "Concrete megabytes_to_bytes helper for retained model-evaluator, SAT probing, BV sharing, AIG and goal2sat settings (util.h:391-398)",
+          "status": "ported",
+          "go_target": "pkg/util/memory/megabytes.go",
+          "go_targets": ["pkg/model/model_evaluator.go", "pkg/sat/sat_solver_probing.go", "pkg/tactic/bv/max_bv_sharing_goal.go", "pkg/tactic/aig/aig_tactic.go", "pkg/sat/tactic/sat_goal_to_sat.go"],
+          "tests": ["TestSourceMegabytesToBytesNativeAndNarrowSizeT", "TestSATSolverProbingSourceDefaultsAndTypo", "TestModelEvaluatorResourceLimitsAndReset", "TestSharingGoalPassSourceParamsAndResourceLimits", "TestAIGPassParamsBindMemoryEncodingAndWholeGoalBranch", "TestSATGoalTranslatorSourceMaxMemorySizeTSentinel"]
         },
         {
           "name": "compare_arrays concrete AST declaration domain, application argument, and quantifier sort/name/pattern/no-pattern identity/order (util.h:307-315; ast.cpp:451-490)",

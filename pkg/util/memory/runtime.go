@@ -400,11 +400,7 @@ func (m *Runtime) SetMaxSizeMegabytes(mb uint32) error {
 	if m.config.SizeTBits == 32 {
 		limit = uint64(^uint32(0))
 	}
-	bytes := uint64(mb) << 20
-	if mb == ^uint32(0) || bytes > limit {
-		bytes = limit
-	}
-	return m.SetMaxSize(bytes)
+	return m.SetMaxSize(megabytesToBytesLimit(mb, limit))
 }
 func (m *Runtime) SetMaxCount(n uint64) error {
 	if e := m.open(); e != nil {

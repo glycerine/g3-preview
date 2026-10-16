@@ -42,6 +42,11 @@ func TestSATSolverProbingSourceDefaultsAndTypo(t *testing.T) {
 	if s.cacheLimit != 0 {
 		t.Fatal("source typo key")
 	}
+	satOK(t, ctx.SetUIntName(&p, &k, ^uint32(0)))
+	satOK(t, s.updateParams(ctx, &p))
+	if s.cacheLimit != uint64(^uint(0)) {
+		t.Fatal("util.h UINT_MAX cache sentinel", s.cacheLimit)
+	}
 	copy := *s
 	if e := copy.Close(); !errors.Is(e, ErrSATOwner) {
 		t.Fatal(e)

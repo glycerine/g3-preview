@@ -8,6 +8,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/statistics"
 )
@@ -128,7 +129,7 @@ func (s *satSolverProbing) updateParams(c *uparams.ParamsContext, p *uparams.Par
 	if e != nil {
 		return e
 	}
-	s.cacheLimit = uint64(n) << 20
+	s.cacheLimit = umemory.MegabytesToBytes(n)
 	return nil
 }
 func (s *satSolverProbing) resetStatistics() { s.numAssigned = 0 }

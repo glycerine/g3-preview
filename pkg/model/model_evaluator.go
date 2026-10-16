@@ -296,7 +296,7 @@ func (c *evaluatorConfiguration) updateParams(local *uparams.ParamsRef) (err err
 	if e != nil {
 		return e
 	}
-	c.maxMemory = uint64(u) * 1024 * 1024
+	c.maxMemory = umemory.MegabytesToBytes(u)
 	u, e = o.FrameUInt(f, "max_steps", ^uint32(0))
 	if e != nil {
 		return e

@@ -90,10 +90,7 @@ func (p *SharingGoalPass) UpdateParams(c *uparams.ParamsContext, value *uparams.
 	if e != nil {
 		return e
 	}
-	limit := uint64(mem) << 20
-	if mem == math.MaxUint32 {
-		limit = math.MaxUint64
-	}
+	limit := memory.MegabytesToBytes(mem)
 	p.maxMemory, p.maxSteps, p.maxArgs = limit, steps, args
 	return nil
 }
