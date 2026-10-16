@@ -189,6 +189,7 @@
         "ast_core_boolean_factories.go",
         "ast_core_delete.go",
         "ast_core_delete_trace.go",
+        "ast_core_distinct_trace.go",
         "ast_core_factories.go",
         "ast_core_fresh_factories.go",
         "ast_core_nodebug.go",
@@ -1623,7 +1624,8 @@
         "tactic",
         "util/diagnostic",
         "util/numeral",
-        "util/params"
+        "util/params",
+        "util/text"
       ],
       "production_files": [
         "bound_config.go",

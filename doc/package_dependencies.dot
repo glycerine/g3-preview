@@ -240,6 +240,7 @@ digraph packages {
   "tactic/arith" -> "util/diagnostic";
   "tactic/arith" -> "util/numeral";
   "tactic/arith" -> "util/params";
+  "tactic/arith" -> "util/text";
   "tactic/bv" [style=filled, fillcolor="#eeeeee"];
   "tactic/bv" -> "arena";
   "tactic/bv" -> "ast";

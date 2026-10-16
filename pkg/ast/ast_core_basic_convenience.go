@@ -139,6 +139,16 @@ func (m *ASTManager) MkDistinctExpanded(args []ASTHandle) (result ASTHandle, err
 		}
 	}
 	r, e := m.mkFamilyApp(0, ASTOpAnd, nil, expanded)
+	if e == nil && m.distinctTraceEnabled() {
+		// The SMT2 printer takes this manager's lock itself. The source TRACE
+		// runs after construction and before the temporary disequalities die.
+		m.mu.Unlock()
+		traceErr := m.traceDistinctExpanded(m.external(r))
+		m.mu.Lock()
+		if traceErr != nil {
+			return ASTHandle{}, traceErr
+		}
+	}
 	return m.external(r), e
 }
 func (m *ASTManager) basicBooleanDeclaration(k int32, n uint32) (ASTHandle, error) {

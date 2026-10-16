@@ -9909,7 +9909,8 @@
         "pkg/ast/ast_parameter_memory_trace_debug_test.go",
         "pkg/ast/ast_info_memory_trace.go",
         "pkg/ast/ast_info_memory_trace_debug_test.go",
-        "pkg/ast/ast_core_quantifier_pattern_trace.go"
+        "pkg/ast/ast_core_quantifier_pattern_trace.go",
+        "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
         "TestASTResourceLimitSourceCanceledCountsAndScopes",
@@ -10061,7 +10062,8 @@
         "TestASTParameterRationalMemoryWrapperCopyMoveAssignAndDestroy",
         "TestASTInfoMemoryWrapperRegisteredSortAndDecl",
         "TestASTInfoMemoryWrapperDebugRetainsSourceAllocation",
-        "TestASTQuantifierPatternSourceTraceBeforeRegistration"
+        "TestASTQuantifierPatternSourceTraceBeforeRegistration",
+        "TestASTExpandedDistinctSourceTraceAfterConjunction"
       ],
       "conditionals": [
         {
@@ -11121,6 +11123,14 @@
           "tests": [
             "TestASTLabelConcreteSymbolBufferAndRecognition",
             "TestASTLabelTemporaryParametersOnReservationFailure"
+          ]
+        },
+        {
+          "name": "mk_distinct_expanded TRACE after conjunction construction and before temporary disequality release",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_distinct_trace.go",
+          "tests": [
+            "TestASTExpandedDistinctSourceTraceAfterConjunction"
           ]
         }
       ],
@@ -180015,7 +180025,8 @@
         "pkg/ast/ast_core_quantifier_pattern_trace.go",
         "pkg/tactic/arith/bound_trace.go",
         "pkg/tactic/arith/linear_equation_trace.go",
-        "pkg/tactic/arith/polynomial_trace.go"
+        "pkg/tactic/arith/polynomial_trace.go",
+        "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -180104,7 +180115,8 @@
         "TestBoundPropagationTraceVariableAndEquationSourceOrder",
         "TestBoundExactPropagationStepTraceWithEquationBounds",
         "TestLinearEquationSourceConstructionTrace",
-        "TestInequalityRestoredGoalSourceTrace"
+        "TestInequalityRestoredGoalSourceTrace",
+        "TestASTExpandedDistinctSourceTraceAfterConjunction"
       ],
       "conditionals": [
         {
@@ -181595,6 +181607,14 @@
           "tests": [
             "TestInequalityRestoredGoalSourceTrace"
           ]
+        },
+        {
+          "name": "Retained expanded-distinct TRACE with source header and SMT2 conjunction layout",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_distinct_trace.go",
+          "tests": [
+            "TestASTExpandedDistinctSourceTraceAfterConjunction"
+          ]
         }
       ],
       "ownership": [
@@ -181686,7 +181706,8 @@
         "pkg/ast/ast_core_quantifier_pattern_trace.go",
         "pkg/tactic/arith/bound_trace.go",
         "pkg/tactic/arith/linear_equation_trace.go",
-        "pkg/tactic/arith/polynomial_trace.go"
+        "pkg/tactic/arith/polynomial_trace.go",
+        "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -181773,7 +181794,8 @@
         "TestBoundPropagationTraceVariableAndEquationSourceOrder",
         "TestBoundExactPropagationStepTraceWithEquationBounds",
         "TestLinearEquationSourceConstructionTrace",
-        "TestInequalityRestoredGoalSourceTrace"
+        "TestInequalityRestoredGoalSourceTrace",
+        "TestASTExpandedDistinctSourceTraceAfterConjunction"
       ],
       "conditionals": [
         {
@@ -183263,6 +183285,14 @@
           "go_target": "pkg/tactic/arith/polynomial_trace.go",
           "tests": [
             "TestInequalityRestoredGoalSourceTrace"
+          ]
+        },
+        {
+          "name": "Retained expanded-distinct TRACE tag gate and source-order expression display",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_core_distinct_trace.go",
+          "tests": [
+            "TestASTExpandedDistinctSourceTraceAfterConjunction"
           ]
         }
       ],
