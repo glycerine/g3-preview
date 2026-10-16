@@ -95,6 +95,22 @@ func (h *Int) assertFailure(d *diagnostic.DebugContext, line int32, condition st
 	return d.InvokeAssertionDebugger()
 }
 
+// insert's outer SASSERT calls is_valid_value, whose own assertion reports
+// line 57. A continuing debugger action returns to the outer assertion before
+// the source's inverse-index write; the Go bounds guard below protects that
+// source-undefined write.
+func (h *Int) sassertInsertValue(v int32) error {
+	d := h.debugContext()
+	on, err := diagnostic.SourceAssertionsEnabled(d)
+	if err != nil || !on {
+		return err
+	}
+	if v < 0 || int64(v) >= int64(len(h.indices)) {
+		return h.assertFailure(d, 57, "v >= 0 && v < static_cast<int>(m_value2indices.size())")
+	}
+	return nil
+}
+
 func (h *Int) cassertInvariant() error {
 	d := h.debugContext()
 	on, err := diagnostic.SourceAssertionsEnabled(d)
@@ -231,6 +247,9 @@ func (h *Int) Insert(v int32) error {
 		return e
 	}
 	if e := h.cassert(232, "!contains(val)", func() bool { return !h.Contains(v) }); e != nil {
+		return e
+	}
+	if e := h.sassertInsertValue(v); e != nil {
 		return e
 	}
 	if v < 0 || int64(v) >= int64(len(h.indices)) || h.Contains(v) {

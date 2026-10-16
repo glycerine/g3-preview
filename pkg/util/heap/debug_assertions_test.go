@@ -11,7 +11,69 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
+
+func TestHeapInsertInvalidValueUsesNestedSourceAssertion(t *testing.T) {
+	b := arena.NewBudget(1 << 24)
+	region, err := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: b}})
+	heapMust(t, err)
+	d, err := diagnostic.NewDebugContext(region, b)
+	heapMust(t, err)
+	inputFile, err := os.CreateTemp(t.TempDir(), "heap-input-*")
+	heapMust(t, err)
+	_, err = inputFile.WriteString("CT")
+	heapMust(t, err)
+	_, err = inputFile.Seek(0, io.SeekStart)
+	heapMust(t, err)
+	outputFile, err := os.CreateTemp(t.TempDir(), "heap-output-*")
+	heapMust(t, err)
+	streams, err := diagnostic.NewMemoryStandardStreams(diagnostic.MemoryStandardStreamsConfig{Budget: b, Stdout: outputFile, Stderr: outputFile})
+	heapMust(t, err)
+	input, err := diagnostic.NewDebuggerCharInput(streams, inputFile)
+	heapMust(t, err)
+	actions, err := diagnostic.NewDebugActionContext(diagnostic.DebugActionConfig{Budget: b, Streams: streams, Input: input})
+	heapMust(t, err)
+	heapMust(t, d.BindAssertionStreams(streams))
+	heapMust(t, d.BindAssertionActions(actions))
+	h, err := New(2, Config{Budget: b, Debug: d})
+	heapMust(t, err)
+	t.Cleanup(func() {
+		heapMust(t, h.Close())
+		heapMust(t, actions.Close())
+		heapMust(t, input.Close())
+		heapMust(t, streams.Close())
+		heapMust(t, inputFile.Close())
+		heapMust(t, outputFile.Close())
+		heapMust(t, d.Close())
+		heapMust(t, region.Close())
+		if b.Used() != 0 {
+			t.Fatal("heap assertion owner leak", b.Used())
+		}
+	})
+	heapMust(t, d.EnableAssertions(false))
+	if e := h.Insert(-1); !errors.Is(e, ErrValue) {
+		t.Fatal("erased source assertion must reach the Go bounds guard", e)
+	}
+	heapMust(t, d.EnableAssertions(true))
+	// SASSERT is independent of the conditional "heap" debug tag.
+	if e := h.Insert(-1); !errors.Is(e, ErrValue) {
+		t.Fatal("continuing nested assertion must reach the bounds guard", e)
+	}
+	var thrown z3exception.DefaultException
+	if e := h.Insert(2); !errors.As(e, &thrown) {
+		t.Fatal("nested source assertion must run its T action", e)
+	}
+	if h.Size() != 0 {
+		t.Fatal("invalid values changed heap membership")
+	}
+	got, err := os.ReadFile(outputFile.Name())
+	heapMust(t, err)
+	want := "ASSERTION VIOLATION\nFile: src/util/heap.h\nLine: 57\nv >= 0 && v < static_cast<int>(m_value2indices.size())\n(C)ontinue, (A)bort, (S)top, (T)hrow exception, Invoke (G)DB\n"
+	if string(got) != want+want {
+		t.Fatalf("nested is_valid_value diagnostics:\ngot %q\nwant %q", got, want+want)
+	}
+}
 
 func TestHeapSourceConditionalAssertionsGateAndPreMutationFailure(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
