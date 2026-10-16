@@ -108715,6 +108715,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained UFBV rewrite entry and result TRACE at ufbv_rewriter.cpp:359,462",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_loop_trace.go",
+          "tests": ["TestUFBVTraversalSourceEntryAndResultTraces", "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"]
+        },
+        {
           "name": "Retained UFBV rule-matching TRACE at ufbv_rewriter.cpp:290,305,310",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
@@ -182211,6 +182217,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained UFBV rewrite entry and result TRACE at ufbv_rewriter.cpp:359,462",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_loop_trace.go",
+          "tests": ["TestUFBVTraversalSourceEntryAndResultTraces", "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"]
+        },
+        {
           "name": "Retained UFBV rule-matching TRACE at ufbv_rewriter.cpp:290,305,310",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
@@ -184586,6 +184598,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained UFBV rewrite entry and result TRACE at ufbv_rewriter.cpp:359,462",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_loop_trace.go",
+          "tests": ["TestUFBVTraversalSourceEntryAndResultTraces", "TestUFBVRewriteLoopNestedRulesBooleanAndQuantifier"]
+        },
         {
           "name": "Retained UFBV rule-matching TRACE at ufbv_rewriter.cpp:290,305,310",
           "status": "ported",

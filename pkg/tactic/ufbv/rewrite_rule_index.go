@@ -68,12 +68,13 @@ func (r *rewriteRuleIndex) traceInsert(quantifier ast.ASTHandle) error {
 	var operandErr error
 	_ = tags.EmitConditional("demodulator_fwd", "insert_fwd_idx", "src/tactic/ufbv/ufbv_rewriter.cpp", 220,
 		func() bool { return true }, func(w io.Writer) error {
+			_, _ = io.WriteString(w, "INSERT: ")
 			body, e := formulaTraceText(r.manager, quantifier)
 			if e != nil {
 				operandErr = e
 				return e
 			}
-			_, _ = io.WriteString(w, "INSERT: "+body+"\n")
+			_, _ = io.WriteString(w, body+"\n")
 			return nil
 		})
 	return operandErr
@@ -87,12 +88,13 @@ func (r *rewriteRuleIndex) traceTrying(f ast.ASTHandle, args []ast.ASTHandle) er
 	var operandErr error
 	_ = tags.EmitConditional("demodulator_bug", "rewrite1", "src/tactic/ufbv/ufbv_rewriter.cpp", 290,
 		func() bool { return true }, func(w io.Writer) error {
+			_, _ = io.WriteString(w, "trying to rewrite: ")
 			name, e := r.manager.GetASTName(f)
 			if e == nil {
 				var display string
 				display, e = r.manager.Symbols.Display(name)
 				if e == nil {
-					_, _ = io.WriteString(w, "trying to rewrite: "+display+" args:\n")
+					_, _ = io.WriteString(w, display+" args:\n")
 				}
 			}
 			if e != nil {
@@ -120,12 +122,13 @@ func (r *rewriteRuleIndex) traceMatching(q ast.ASTHandle) error {
 	var operandErr error
 	_ = tags.EmitConditional("demodulator_bug", "rewrite1", "src/tactic/ufbv/ufbv_rewriter.cpp", 305,
 		func() bool { return true }, func(w io.Writer) error {
+			_, _ = io.WriteString(w, "Matching with demodulator: ")
 			body, e := formulaTraceText(r.manager, q)
 			if e != nil {
 				operandErr = e
 				return e
 			}
-			_, _ = io.WriteString(w, "Matching with demodulator: "+body+"\n")
+			_, _ = io.WriteString(w, body+"\n")
 			return nil
 		})
 	return operandErr

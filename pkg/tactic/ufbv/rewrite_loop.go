@@ -22,6 +22,9 @@ func (r *rewriteTraversal) rewrite(index *rewriteRuleIndex, boolean *rewriter.Bo
 	if len(index.byFunc) == 0 {
 		return m.NewRef(root)
 	}
+	if e := r.traceRewrite(index, 359, "rewrite: ", root); e != nil {
+		return ast.ASTRef{}, e
+	}
 	if len(r.todo) != 0 {
 		if enabled, e := forwardAssertionEnabled(); e != nil {
 			return ast.ASTRef{}, e
@@ -249,6 +252,9 @@ func (r *rewriteTraversal) rewrite(index *rewriteRuleIndex, boolean *rewriter.Bo
 			}
 		}
 		return ast.ASTRef{}, ast.ErrASTPending
+	}
+	if e := r.traceRewrite(index, 462, "rewrite result: ", final.expr); e != nil {
+		return ast.ASTRef{}, e
 	}
 	return m.NewRef(final.expr)
 }
