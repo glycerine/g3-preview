@@ -122221,7 +122221,7 @@
           "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
         },
         {
-          "name": "Retained SAT cleaner check_watches SASSERT167-189 process assertion switch and C/T action for watch guards; associated CTRACE remains open",
+          "name": "Retained SAT cleaner check_watches SASSERT167-189 process assertion switch and C/T action for watch guards; companion CTRACE sites are credited under util trace",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
@@ -122631,7 +122631,7 @@
           "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
         },
         {
-          "name": "Retained SAT cleaner check_watches SASSERT167-189 process assertion switch and C/T action for watch guards; associated CTRACE remains open",
+          "name": "Retained SAT cleaner check_watches SASSERT167-189 process assertion switch and C/T action for watch guards; companion CTRACE sites are credited under util trace",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
