@@ -111935,9 +111935,7 @@
       ],
       "tests": [
         "TestInfRationalSource80Assertions",
-        "TestInfRationalApproximationFrozenBranches",
         "TestInfRationalOwnershipErrors",
-        "TestInfRationalIndependentFiniteBounds",
         "TestInfRationalFullHeaderQueriesAndAliases",
         "TestInfRationalRawStateComparisonRoutes",
         "TestInfRationalFailurePrefixesImmediateRoots",
@@ -112206,9 +112204,7 @@
           "go_target": "pkg/util/numeral/inf_rational_test.go",
           "tests": [
             "TestInfRationalSource80Assertions",
-            "TestInfRationalApproximationFrozenBranches",
             "TestInfRationalOwnershipErrors",
-            "TestInfRationalIndependentFiniteBounds",
             "TestInfRationalFullHeaderQueriesAndAliases",
             "TestInfRationalRawStateComparisonRoutes",
             "TestInfRationalFailurePrefixesImmediateRoots",
@@ -128121,9 +128117,6 @@
         "TestConstructorExpressionFailedCopyPhase",
         "TestInfApproxPublicRationalRawDependencies",
         "TestInfApproxSignedValueConstructionAndRawAssignments",
-        "TestInfApproxFirstCopyFailurePrecedesUnreadEPS",
-        "TestInfApproxRawProductSignedDenominators",
-        "TestInfApproxRawProductReachedZeroDenominators",
         "TestInfCompareSourceUnreadMembers",
         "TestInfCompareSourceNestedUnreadNumeral",
         "TestInfUnarySourceSequentialMutation",
@@ -128643,9 +128636,6 @@
         "TestConstructorExpressionFailedCopyPhase",
         "TestInfApproxPublicRationalRawDependencies",
         "TestInfApproxSignedValueConstructionAndRawAssignments",
-        "TestInfApproxFirstCopyFailurePrecedesUnreadEPS",
-        "TestInfApproxRawProductSignedDenominators",
-        "TestInfApproxRawProductReachedZeroDenominators",
         "TestInfCompareSourceUnreadMembers",
         "TestInfCompareSourceNestedUnreadNumeral",
         "TestInfUnarySourceSequentialMutation",
@@ -128974,15 +128964,11 @@
       "status": "ported",
       "go_targets": [
         "pkg/util/numeral/inf_rational.go",
-        "pkg/util/numeral/mp_lexical_constructor_test.go",
-        "pkg/util/numeral/inf_guard_profile_test.go",
-        "pkg/util/numeral/inf_approx_raw_test.go"
+        "pkg/util/numeral/mp_lexical_constructor_test.go"
       ],
       "tests": [
         "TestInfRationalSource80Assertions",
-        "TestInfRationalApproximationFrozenBranches",
         "TestInfRationalOwnershipErrors",
-        "TestInfRationalIndependentFiniteBounds",
         "TestInfRationalFullHeaderQueriesAndAliases",
         "TestInfRationalRawStateComparisonRoutes",
         "TestInfRationalFailurePrefixesImmediateRoots",
@@ -128998,34 +128984,9 @@
         "TestConstructorLexicalBoundaryAPI",
         "TestConstructorCompletedUnwindPrecedesOwningAbort",
         "TestConstructorEightRootsAndWarmBoundary",
-        "TestConstructorExpressionFailedCopyPhase",
-        "TestInfGuardZeroFirstDivisionProfiles",
-        "TestInfGuardUnreadDivisor",
-        "TestInfGuardAllocationPrecedenceAndWarmRoots",
-        "TestInfApproxPublicRationalRawDependencies",
-        "TestInfApproxSignedValueConstructionAndRawAssignments",
-        "TestInfApproxFirstCopyFailurePrecedesUnreadEPS",
-        "TestInfApproxRawProductSignedDenominators",
-        "TestInfApproxRawProductReachedZeroDenominators"
+        "TestConstructorExpressionFailedCopyPhase"
       ],
-      "assertions": [
-        {
-          "line": 82,
-          "text": "SASSERT(!r2.m_first.is_zero());"
-        },
-        {
-          "line": 99,
-          "text": "SASSERT(!r2.m_first.is_zero());"
-        },
-        {
-          "line": 169,
-          "text": "SASSERT(!r.is_neg());"
-        },
-        {
-          "line": 176,
-          "text": "SASSERT(!r.is_neg());"
-        }
-      ],
+      "assertions": [],
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
@@ -129038,26 +128999,8 @@
           "status": "dead_deleted"
         },
         {
-          "name": "complete inf_mult/sup_mult and inf_div/sup_div algorithms",
-          "status": "ported",
-          "go_target": "pkg/util/numeral/inf_rational.go",
-          "tests": [
-            "TestInfRationalSource80Assertions",
-            "TestInfRationalApproximationFrozenBranches",
-            "TestInfRationalOwnershipErrors",
-            "TestInfRationalIndependentFiniteBounds",
-            "TestInfRationalFullHeaderQueriesAndAliases",
-            "TestInfRationalRawStateComparisonRoutes",
-            "TestInfRationalFailurePrefixesImmediateRoots",
-            "TestInfRationalComponentAliasSourceRereads",
-            "TestInfRationalIncrementSourceRationalRoute",
-            "TestInfRationalCompoundReturnCopyFailure",
-            "TestInfRationalFusedComponentAlias",
-            "TestInfRationalIntegerConstructorCopyRoute",
-            "TestRationalServiceInfinitesimalHeaderOwnership",
-            "TestRationalServiceInfinitesimalConstructorFailureRefunds",
-            "TestRationalServiceInfinitesimalFinalizerTraversal"
-          ]
+          "name": "inf_mult/sup_mult and inf_div/sup_div have no retained production callers; removed test-only Go entry points under the retained-consumer rule",
+          "status": "dead_deleted"
         },
         {
           "name": "owner-local constant definitions and initialize/init/finalize wrappers",
@@ -129065,9 +129008,7 @@
           "go_target": "pkg/util/numeral/inf_rational.go",
           "tests": [
             "TestInfRationalSource80Assertions",
-            "TestInfRationalApproximationFrozenBranches",
             "TestInfRationalOwnershipErrors",
-            "TestInfRationalIndependentFiniteBounds",
             "TestInfRationalFullHeaderQueriesAndAliases",
             "TestInfRationalRawStateComparisonRoutes",
             "TestInfRationalFailurePrefixesImmediateRoots",
@@ -129079,27 +129020,6 @@
             "TestRationalServiceInfinitesimalHeaderOwnership",
             "TestRationalServiceInfinitesimalConstructorFailureRefunds",
             "TestRationalServiceInfinitesimalFinalizerTraversal"
-          ]
-        },
-        {
-          "name": "Selected inf_div/sup_div DEBUG scalar guards, reached raw fields and release DEFAULT/COPY routes with actual lexical cleanup",
-          "status": "ported",
-          "go_target": "pkg/util/numeral/inf_rational.go",
-          "tests": [
-            "TestInfGuardZeroFirstDivisionProfiles",
-                "TestInfGuardUnreadDivisor",
-            "TestInfGuardAllocationPrecedenceAndWarmRoots"
-          ]
-        },
-        {
-          "name": "inf_mult/sup_mult source branches, full-expression temporaries and selected reached raw scalar profiles",
-          "status": "ported",
-          "go_target": "pkg/util/numeral/inf_rational.go",
-          "tests": [
-            "TestInfApproxPublicRationalRawDependencies",
-            "TestInfApproxFirstCopyFailurePrecedesUnreadEPS",
-            "TestInfApproxRawProductSignedDenominators",
-            "TestInfApproxRawProductReachedZeroDenominators"
           ]
         }
       ],
@@ -129108,7 +129028,7 @@
       ],
       "deviations": [
         "Global constants/borrowed accessors replaced by owner-local constants and explicit independent copies; typed checked source-assertion errors. Signed INT_MIN constructor-negation uses widened defined adapter. Source trace/assertion-message infrastructure remains separate.",
-        "Inactive/commented general pair arithmetic and duplicate #if0 approximation declarations are not runtime implementations; root and power approximations have no retained production callers and their test-only Go entry points were removed."
+        "Inactive/commented general pair arithmetic and duplicate #if0 approximation declarations are not runtime implementations; all eight compiled approximation functions have no retained production callers and their test-only Go entry points were removed."
       ]
     },
     {
@@ -129118,7 +129038,6 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/numeral/inf_approx_raw_test.go",
-        "pkg/util/numeral/inf_guard_profile_test.go",
         "pkg/util/numeral/inf_rational.go",
         "pkg/util/numeral/inf_stream.go",
         "pkg/util/numeral/inf_scalar_projection_test.go",
@@ -129132,9 +129051,7 @@
       "tests": [
         "TestInfinitesimalSourceWholeStringStreamInsertion",
         "TestInfRationalSource80Assertions",
-        "TestInfRationalApproximationFrozenBranches",
         "TestInfRationalOwnershipErrors",
-        "TestInfRationalIndependentFiniteBounds",
         "TestInfRationalFullHeaderQueriesAndAliases",
         "TestInfRationalRawStateComparisonRoutes",
         "TestInfRationalFailurePrefixesImmediateRoots",
@@ -129177,14 +129094,8 @@
         "TestLexicalCallerDestructorLateMemberRead",
         "TestLexicalOriginalFailureAndCleanupCause",
         "TestLexicalRationalManagerOneRootContinuation",
-        "TestInfGuardZeroFirstDivisionProfiles",
-        "TestInfGuardUnreadDivisor",
-        "TestInfGuardAllocationPrecedenceAndWarmRoots",
         "TestInfApproxPublicRationalRawDependencies",
         "TestInfApproxSignedValueConstructionAndRawAssignments",
-        "TestInfApproxFirstCopyFailurePrecedesUnreadEPS",
-        "TestInfApproxRawProductSignedDenominators",
-        "TestInfApproxRawProductReachedZeroDenominators",
         "TestInfCompareSourceUnreadMembers",
         "TestInfCompareSourceNestedUnreadNumeral",
         "TestInfUnarySourceSequentialMutation",
@@ -129271,6 +129182,10 @@
           "status": "dead_deleted"
         },
         {
+          "name": "inf_mult/sup_mult and inf_div/sup_div have no retained production callers; removed test-only Go entry points under the retained-consumer rule",
+          "status": "dead_deleted"
+        },
+        {
           "name": "inf_rational ostream insertion of one complete to_string result (h459-463)",
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_stream.go",
@@ -129282,9 +129197,7 @@
           "go_target": "pkg/util/numeral/inf_rational.go",
           "tests": [
             "TestInfRationalSource80Assertions",
-            "TestInfRationalApproximationFrozenBranches",
             "TestInfRationalOwnershipErrors",
-            "TestInfRationalIndependentFiniteBounds",
             "TestInfRationalFullHeaderQueriesAndAliases",
             "TestInfRationalRawStateComparisonRoutes",
             "TestInfRationalFailurePrefixesImmediateRoots",
@@ -129364,9 +129277,7 @@
           "go_target": "pkg/util/numeral/inf_rational.go",
           "tests": [
             "TestInfRationalSource80Assertions",
-            "TestInfRationalApproximationFrozenBranches",
             "TestInfRationalOwnershipErrors",
-            "TestInfRationalIndependentFiniteBounds",
             "TestInfRationalFullHeaderQueriesAndAliases",
             "TestInfRationalRawStateComparisonRoutes",
             "TestInfRationalFailurePrefixesImmediateRoots",
@@ -129386,9 +129297,7 @@
           "go_target": "pkg/util/numeral/inf_rational.go",
           "tests": [
             "TestInfRationalSource80Assertions",
-            "TestInfRationalApproximationFrozenBranches",
             "TestInfRationalOwnershipErrors",
-            "TestInfRationalIndependentFiniteBounds",
             "TestInfRationalFullHeaderQueriesAndAliases",
             "TestInfRationalRawStateComparisonRoutes",
             "TestInfRationalFailurePrefixesImmediateRoots",
@@ -129487,16 +129396,6 @@
           ]
         },
         {
-          "name": "Selected inf_div/sup_div DEBUG scalar guards, reached raw fields and release DEFAULT/COPY routes with actual lexical cleanup",
-          "status": "ported",
-          "go_target": "pkg/util/numeral/inf_rational.go",
-          "tests": [
-            "TestInfGuardZeroFirstDivisionProfiles",
-                "TestInfGuardUnreadDivisor",
-            "TestInfGuardAllocationPrecedenceAndWarmRoots"
-          ]
-        },
-        {
           "name": "Selected Inf scalar setters and reached FIRST/EPS raw assignment phases; remaining overloads and structural stale-field profiles remain open",
           "status": "partial",
           "go_target": "pkg/util/numeral/inf_rational.go",
@@ -129571,7 +129470,7 @@
       ],
       "deviations": [
         "Global constants and older owned-output accessors use owner-local constants and explicit independent copies; get_first/get_rational/get_infinitesimal also have actual borrows in the locked numeric-borrow scope. Typed checked source-assertion errors and widened signed INT_MIN constructor-negation remain. Source trace/assertion-message infrastructure remains separate.",
-        "Inactive/commented general pair arithmetic and duplicate #if0 approximation declarations are not runtime implementations; root and power approximations have no retained production callers and their test-only Go entry points were removed.",
+        "Inactive/commented general pair arithmetic and duplicate #if0 approximation declarations are not runtime implementations; all eight compiled approximation functions have no retained production callers and their test-only Go entry points were removed.",
         "Source h135-143 component reference projections read only the selected component; BorrowInfFirst/BorrowInfInfinitesimal now expose those reads, including raw denominator0. The older InfFirst/InfRational/Infinitesimal owned-output adapters still perform copies. NUM-only sign/hash routes retain separate raw-domain debt.",
         "Malformed32-bit requested-byte layouts are labelled guarded Go boundary evidence, not ordinary valid C++ destructor allocation failure. Budget supplies actual allocation refusal/failed-copy token only, never simulated Del failure. Selected scope records preserve original vs cleanup causes; broader raw constructor/reset/alias/default-copy-constructor arithmetic temporaries, registry/global ownership and transport remain partial. Cross-owner staged CopyFrom is explicit Go ownership bridge, not a source alias transaction. No whole-unit/API/registered assertion promotion.",
         "No newly registered source assertion credit: sixteen added source-profile regressions complement existing active assertions. Selected ordinary whole-value preflights are replaced only where they precede actual source reads/mutations. Malformed ILP32 second temporary end-cursor test diagnoses physical requested-size guard after actual source first destruction, with no guard relabeling or allocator repair. Whole header and global service binding remain partial.",
@@ -173406,9 +173305,7 @@
         "TestRationalServiceInfinitesimalConstructorFailureRefunds",
         "TestRationalServiceInfinitesimalFinalizerTraversal",
         "TestInfRationalSource80Assertions",
-        "TestInfRationalApproximationFrozenBranches",
         "TestInfRationalOwnershipErrors",
-        "TestInfRationalIndependentFiniteBounds",
         "TestInfRationalFullHeaderQueriesAndAliases",
         "TestInfRationalRawStateComparisonRoutes",
         "TestInfRationalFailurePrefixesImmediateRoots",
@@ -173548,9 +173445,7 @@
             "TestRationalServiceInfinitesimalConstructorFailureRefunds",
             "TestRationalServiceInfinitesimalFinalizerTraversal",
             "TestInfRationalSource80Assertions",
-            "TestInfRationalApproximationFrozenBranches",
             "TestInfRationalOwnershipErrors",
-            "TestInfRationalIndependentFiniteBounds",
             "TestInfRationalFullHeaderQueriesAndAliases",
             "TestInfRationalRawStateComparisonRoutes",
             "TestInfRationalFailurePrefixesImmediateRoots",

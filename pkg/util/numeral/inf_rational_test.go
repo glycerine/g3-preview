@@ -274,30 +274,6 @@ func TestInfRationalSource80Assertions(t *testing.T) {
 	serviceMust(t, s.Del(&rat))
 }
 
-func TestInfRationalApproximationFrozenBranches(t *testing.T) {
-	s, _ := serviceNew(t)
-	x := infValue(t, s, 2, 1, "3")
-	y := infValue(t, s, 5, 1, "-7")
-	lo, e := s.InfLowerMult(&x, &y)
-	serviceMust(t, e)
-	hi, e := s.InfUpperMult(&x, &y)
-	serviceMust(t, e)
-	infText(t, s, &lo, "10")
-	infText(t, s, &hi, "(10 +e*1)")
-	serviceMust(t, s.InfDel(&lo))
-	serviceMust(t, s.InfDel(&hi))
-	// b=5,d=-7,positive numerator: upper denominator 5-5/2; lower5.
-	l, e := s.InfLowerDiv(&x, &y)
-	serviceMust(t, e)
-	u, e := s.InfUpperDiv(&x, &y)
-	serviceMust(t, e)
-	infText(t, s, &l, "(2/5 +e*3/5)")
-	infText(t, s, &u, "(4/5 +e*6/5)")
-	for _, v := range []*OwnedInfRational{&x, &y, &l, &u} {
-		serviceMust(t, s.InfDel(v))
-	}
-}
-
 func TestInfRationalOwnershipErrors(t *testing.T) {
 	s, _ := serviceNew(t)
 	other, _ := serviceNew(t)
@@ -307,83 +283,10 @@ func TestInfRationalOwnershipErrors(t *testing.T) {
 		t.Fatal(e)
 	}
 	z := infValue(t, s, 0, 1, "1")
-	div, e := s.InfLowerDiv(&v, &z)
-	if SourceExtendedGCDDebug {
-		if !errors.Is(e, ErrInfRationalDomain) {
-			t.Fatal(e)
-		}
-	} else {
-		serviceMust(t, e)
-		if div.First.Num.Val != 1 || div.First.Den.Val != 0 || div.Second.Num.Val != -1 || div.Second.Den.Val != 0 {
-			t.Fatal(div)
-		}
-		infAuditRoots(t, s, []*OwnedInfRational{&v, &z, &div}, nil)
-		serviceMust(t, s.InfDel(&div))
-	}
 	serviceMust(t, s.InfNeg(&z))
 	serviceMust(t, s.Close())
 	if _, e := s.InfHash(&v); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal(e)
-	}
-}
-
-func TestInfRationalIndependentFiniteBounds(t *testing.T) {
-	s, _ := serviceNew(t)
-	read := func(v *OwnedInfRational, first bool) *big.Rat {
-		t.Helper()
-		var q OwnedRational
-		var e error
-		if first {
-			q, e = s.InfGetRational(v)
-		} else {
-			q, e = s.InfGetInfinitesimal(v)
-		}
-		serviceMust(t, e)
-		text, e := s.String(&q)
-		serviceMust(t, e)
-		serviceMust(t, s.Del(&q))
-		r, ok := new(big.Rat).SetString(text)
-		if !ok {
-			t.Fatal(text)
-		}
-		return r
-	}
-	eval := func(v *OwnedInfRational) *big.Rat {
-		return new(big.Rat).Add(read(v, true), new(big.Rat).Mul(read(v, false), big.NewRat(1, 10000)))
-	}
-	for a := int64(-2); a <= 2; a++ {
-		for b := int64(-1); b <= 1; b++ {
-			for c := int64(-2); c <= 2; c++ {
-				for d := int64(-1); d <= 1; d++ {
-					x := infValue(t, s, a, 1, big.NewInt(b).String())
-					y := infValue(t, s, c, 1, big.NewInt(d).String())
-					actual := new(big.Rat).Mul(eval(&x), eval(&y))
-					lo, e := s.InfLowerMult(&x, &y)
-					serviceMust(t, e)
-					hi, e := s.InfUpperMult(&x, &y)
-					serviceMust(t, e)
-					if eval(&lo).Cmp(actual) > 0 || eval(&hi).Cmp(actual) < 0 {
-						t.Fatalf("mult bounds %d %d %d %d", a, b, c, d)
-					}
-					serviceMust(t, s.InfDel(&lo))
-					serviceMust(t, s.InfDel(&hi))
-					if c != 0 {
-						actual.Quo(eval(&x), eval(&y))
-						lo, e = s.InfLowerDiv(&x, &y)
-						serviceMust(t, e)
-						hi, e = s.InfUpperDiv(&x, &y)
-						serviceMust(t, e)
-						if eval(&lo).Cmp(actual) > 0 || eval(&hi).Cmp(actual) < 0 {
-							t.Fatalf("division bounds %d %d %d %d", a, b, c, d)
-						}
-						serviceMust(t, s.InfDel(&lo))
-						serviceMust(t, s.InfDel(&hi))
-					}
-					serviceMust(t, s.InfDel(&x))
-					serviceMust(t, s.InfDel(&y))
-				}
-			}
-		}
 	}
 }
 
@@ -609,7 +512,7 @@ func TestInfPairAndOffsetConstructorsOwnInputs(t *testing.T) {
 
 func TestInfRationalFailurePrefixesImmediateRoots(t *testing.T) {
 	for op := 0; op < 20; op++ {
-		if op == 5 || op == 6 { // unused source approximation powers
+		if op >= 1 && op <= 6 { // unused source approximation operations
 			continue
 		}
 		success := false
@@ -652,14 +555,6 @@ func TestInfRationalFailurePrefixesImmediateRoots(t *testing.T) {
 			switch op {
 			case 0:
 				value, e = s.InfAdd(&a, &b)
-			case 1:
-				value, e = s.InfLowerMult(&a, &b)
-			case 2:
-				value, e = s.InfUpperMult(&a, &b)
-			case 3:
-				value, e = s.InfLowerDiv(&a, &b)
-			case 4:
-				value, e = s.InfUpperDiv(&a, &b)
 			case 7:
 				e = s.InfAddMulAssign(&a, &c, &b)
 			case 8:
