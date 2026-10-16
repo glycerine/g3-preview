@@ -318,6 +318,7 @@ func (s *satSimplifier) addNonLearnedBinary(a, b Literal) error {
 				break
 			}
 		}
+		s.traceMissingReciprocalBinary(a, b, wa, wb, !found)
 		if satStorageSourceDebug && !found {
 			return ErrSATAssertion
 		}

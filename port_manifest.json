@@ -77334,6 +77334,12 @@
           "tests": ["TestSATSimplifierActualLearnedBinaryDemotionSourceTrace"]
         },
         {
+          "name": "Reached reciprocal-binary-watch resolve_bug CTRACE site at sat_simplifier.cpp:1241",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_resolve_trace.go",
+          "tests": ["TestSATSimplifierMissingReciprocalBinarySourceTrace"]
+        },
+        {
           "name": "Reached variable-ordering/elimination TRACE sites at sat_simplifier.cpp:1105,1133,1269,1280,1296,1302,1315,1338,1354,1365,1369,1375,1401",
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
@@ -182412,6 +182418,12 @@
           "tests": ["TestSATSimplifierActualLearnedBinaryDemotionSourceTrace"]
         },
         {
+          "name": "Reached reciprocal-binary-watch resolve_bug CTRACE site at sat_simplifier.cpp:1241",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_resolve_trace.go",
+          "tests": ["TestSATSimplifierMissingReciprocalBinarySourceTrace"]
+        },
+        {
           "name": "Reached variable-ordering/elimination TRACE sites at sat_simplifier.cpp:1105,1133,1269,1280,1296,1302,1315,1338,1354,1365,1369,1375,1401",
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
@@ -184258,6 +184270,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_mark_trace.go",
           "tests": ["TestSATSimplifierActualLearnedBinaryDemotionSourceTrace"]
+        },
+        {
+          "name": "Reached reciprocal-binary-watch resolve_bug CTRACE site at sat_simplifier.cpp:1241",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_resolve_trace.go",
+          "tests": ["TestSATSimplifierMissingReciprocalBinarySourceTrace"]
         },
         {
           "name": "Reached variable-ordering/elimination TRACE sites at sat_simplifier.cpp:1105,1133,1269,1280,1296,1302,1315,1338,1354,1365,1369,1375,1401",
