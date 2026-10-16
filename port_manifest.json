@@ -187058,7 +187058,7 @@
         "WarningService owns only the enable scalar and borrows optional io.Writer streams. EnvParamsRuntime updates the same warning-enable state used by warning emission; literal and selected formatted writes retain source prefix, newline, C-string boundary, selected Linux AMD64 custom-stream truncation and completed-output flush when the borrowed writer supports Flush."
       ],
       "deviations": [
-        "The prior unused warning translation was removed in 589e99f8. The now-retained EnvParamsRuntime toggle binds to concrete WarningService. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; Go io.Writer short writes retain the reached source insertion prefix but no longer escape warning_msg as a caller error. All three api_config_params.cpp catches, the well-sorted quantifier diagnostic and the two shell input-file warning branches have concrete owners, but detailed AST sort-mismatch warning, the full shell loop and other direct shell/AST/MUZ warning call sites remain open. No C varargs or C++ standard-stream implementation is introduced."
+        "The prior unused warning translation was removed in 589e99f8. The now-retained EnvParamsRuntime toggle binds to concrete WarningService. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; Go io.Writer short writes retain the reached source insertion prefix but no longer escape warning_msg as a caller error. All three api_config_params.cpp catches, the well-sorted quantifier diagnostic and the two shell input-file warning branches have concrete owners, but standalone AST fallback without process printer binding, the full shell loop and other direct shell/AST/MUZ warning call sites remain open. No C varargs or C++ standard-stream implementation is introduced."
       ]
     },
     {
@@ -187237,7 +187237,7 @@
         "WarningService borrows selected output streams and owns only its enable flag. A borrowed buffered writer is flushed after a complete warning. The unused warning_displayer class has no Go adapter."
       ],
       "deviations": [
-        "The concrete warning service is reached by EnvParamsRuntime. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; Go io.Writer short writes preserve the reached insertion prefix while warning_msg returns without a caller error. All three api_config_params.cpp catches, the well-sorted quantifier diagnostic and the two shell input-file warning branches have concrete owners, but detailed AST sort-mismatch warning, the full shell loop, format2ostream exception integration and other direct shell/AST/MUZ warning call sites remain open. C++ stream internals and C varargs are not copied."
+        "The concrete warning service is reached by EnvParamsRuntime. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; Go io.Writer short writes preserve the reached insertion prefix while warning_msg returns without a caller error. All three api_config_params.cpp catches, the well-sorted quantifier diagnostic and the two shell input-file warning branches have concrete owners, but standalone AST fallback without process printer binding, the full shell loop, format2ostream exception integration and other direct shell/AST/MUZ warning call sites remain open. C++ stream internals and C varargs are not copied."
       ]
     },
     {
