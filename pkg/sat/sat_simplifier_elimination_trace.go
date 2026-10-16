@@ -4,7 +4,6 @@ package sat
 import (
 	"io"
 	"strconv"
-	"strings"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
@@ -108,34 +107,12 @@ func (s *satSimplifier) traceEliminationFound(before, after uint32) {
 	})
 }
 
-func (s *satSimplifier) traceEliminationWrapper(c satClauseWrapper) (string, error) {
-	a := s.lifecycle.propagation.clauses
-	n, err := c.Size(a)
-	if err != nil {
-		return "", err
-	}
-	var b strings.Builder
-	b.WriteByte('(')
-	for i := uint32(0); i < n; i++ {
-		if i > 0 {
-			b.WriteByte(' ')
-		}
-		l, err := c.Literal(a, i)
-		if err != nil {
-			return "", err
-		}
-		b.WriteString(l.String())
-	}
-	b.WriteByte(')')
-	return b.String(), nil
-}
-
 func (s *satSimplifier) traceEliminationInputsAndResult(w io.Writer, first, second satClauseWrapper, trailingSpace bool) error {
-	a, err := s.traceEliminationWrapper(first)
+	a, err := satTraceClauseWrapper(s.lifecycle.propagation.clauses, first)
 	if err != nil {
 		return err
 	}
-	b, err := s.traceEliminationWrapper(second)
+	b, err := satTraceClauseWrapper(s.lifecycle.propagation.clauses, second)
 	if err != nil {
 		return err
 	}

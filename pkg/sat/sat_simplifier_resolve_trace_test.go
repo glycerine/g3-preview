@@ -48,3 +48,29 @@ func TestSATSimplifierMissingReciprocalBinarySourceTrace(t *testing.T) {
 		t.Fatal("missing reciprocal remains absent", n)
 	}
 }
+
+func TestSATSimplifierInvalidResolvePivotSourceTrace(t *testing.T) {
+	s, l := satSimplifierFixture(t, 3)
+	satOK(t, s.kernel.InitVisited(3))
+	s.kernel.elimCounter = 10
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("resolve_bug")
+	l.traceTags = tags
+	_, err := s.kernel.resolve(newSATBinaryWrapper(2, 4), newSATBinaryWrapper(1, 4), 0, s.literalStore, s.newCls)
+	if satStorageSourceDebug {
+		if err != ErrSATAssertion || s.kernel.elimCounter != 10 {
+			t.Fatal("source pivot assertion before cost mutation", err, s.kernel.elimCounter)
+		}
+	} else if err != nil {
+		t.Fatal(err)
+	}
+	want := ""
+	if tags.ShouldTrace("resolve_bug") {
+		want = "-------- [resolve_bug] resolve src/sat/sat_simplifier.cpp:1178 ---------\n" +
+			"(1 2)\n(-0 2)\nl: 0\n------------------------------------------------\n"
+	}
+	if got := output.String(); got != want {
+		t.Fatalf("source invalid resolver input: got %q, want %q", got, want)
+	}
+}

@@ -105,6 +105,7 @@ func newSATSimplifier(l *satSolverClauseLifecycle, c *satCleaner, d *satSolverDe
 	if s.kernel, err = newSATSimplifierKernel(l.propagation.clauses, s.useList, l.budget); err != nil {
 		return s, err
 	}
+	s.kernel.lifecycle = l
 	if err = s.kernel.bindDummy(s.dummy); err != nil {
 		return s, err
 	}

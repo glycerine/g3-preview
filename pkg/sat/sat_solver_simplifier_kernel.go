@@ -14,6 +14,7 @@ import (
 type satSimplifierKernel struct {
 	self                    *satSimplifierKernel
 	allocator               *ClauseAllocator
+	lifecycle               *satSolverClauseLifecycle
 	dummy                   *ClauseAllocator
 	useList                 *satClauseUseLists
 	budget                  *arena.Budget

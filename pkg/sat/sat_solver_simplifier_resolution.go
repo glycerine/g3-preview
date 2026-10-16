@@ -8,6 +8,7 @@ func (k *satSimplifierKernel) resolve(c1, c2 satClauseWrapper, pivot Literal, ou
 	if e := k.open(); e != nil {
 		return false, e
 	}
+	k.traceInvalidResolve(c1, c2, pivot)
 	if satStorageSourceDebug {
 		yes, e := c1.ContainsLiteral(k.allocator, pivot)
 		if e != nil {
