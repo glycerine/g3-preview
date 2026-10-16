@@ -109,6 +109,17 @@ func TestAIGExprCacheReleaseTracePrecedesLastReference(t *testing.T) {
 		t.Fatalf("annotated quantifier cache result missing: %q", output.String())
 	}
 	aigMust(t, r.Close())
+	output.Reset()
+	inner, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: false, Sorts: []ast.ASTHandle{sort}, Names: []symbol.Symbol{symbol.Numerical(0)}, Body: bound})
+	aigMust(t, err)
+	outer, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{sort}, Names: []symbol.Symbol{symbol.Numerical(0)}, Body: inner})
+	aigMust(t, err)
+	r, err = g.MkAIG(outer)
+	aigMust(t, err)
+	if tags.ShouldTrace("expr2aig") && !strings.Contains(output.String(), "caching:\n(forall ((x!1 Bool)) (exists ((x!2 Bool)) x!2))\n---> #") {
+		t.Fatalf("nested quantifier cache result missing: %q", output.String())
+	}
+	aigMust(t, r.Close())
 	aigMust(t, g.Close())
 	aigMust(t, m.DelRef(&boundPin))
 	if strings.Contains(output.String(), "aig_lit_count") {

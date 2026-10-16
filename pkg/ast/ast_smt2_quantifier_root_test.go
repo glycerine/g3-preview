@@ -78,4 +78,18 @@ func TestASTSMT2QuantifierRootSourceFormat(t *testing.T) {
 	if got := print(q); got != "(exists ((x Bool)) (! x :no-pattern (f x)))" {
 		t.Fatalf("no-pattern annotation format %q", got)
 	}
+	inner, err := m.MkQuantifier(ASTQuantifierSpec{Forall: false, Sorts: []ASTHandle{boolSort}, Names: []usymbol.Symbol{x}, Body: body})
+	paramsMust(t, err)
+	outer, err := m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{boolSort}, Names: []usymbol.Symbol{x}, Body: inner})
+	paramsMust(t, err)
+	if got := print(outer); got != "(forall ((x Bool)) (exists ((x!1 Bool)) x!1))" {
+		t.Fatalf("nested shadowed quantifier format %q", got)
+	}
+	truth, err := m.MkFamilyApp(0, ASTOpTrue, nil, nil)
+	paramsMust(t, err)
+	compound, err := m.MkAnd(inner, truth)
+	paramsMust(t, err)
+	if got := print(compound); got != "(and (exists ((x Bool)) x) true)" {
+		t.Fatalf("application with quantified child format %q", got)
+	}
 }

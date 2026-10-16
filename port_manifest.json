@@ -12688,7 +12688,7 @@
           ]
         },
         {
-          "name": "smt2_printer selected quantified Boolean root: source named/numerical/duplicate binders, collision suffixes, child-before-body pattern/no-pattern documents, weight/skolemid/qid attributes and mk_seq3 wrapper (ast_smt2_pp.cpp:872-989); nested quantifiers remain open",
+          "name": "smt2_printer selected quantified Boolean expressions: source named/numerical/duplicate binders, nested shadowing, child-before-body pattern/no-pattern documents, weight/skolemid/qid attributes and mk_seq3 wrapper (ast_smt2_pp.cpp:872-989); wider alias and expression profiles remain open",
           "status": "partial",
           "go_target": "pkg/ast/ast_smt2_quantifier_root.go",
           "tests": ["TestASTSMT2QuantifierRootSourceFormat"]
@@ -98806,7 +98806,7 @@
           ]
         },
         {
-          "name": "Selected expr2aig::cache_result TRACE at aig.cpp:452 prints source-default SMT2 Boolean AST through the process parameter owner before cache INC; non-Boolean, nested quantifier and other printer profiles remain open; selected annotated quantified Boolean roots render",
+          "name": "Selected expr2aig::cache_result TRACE at aig.cpp:452 prints source-default SMT2 Boolean AST through the process parameter owner before cache INC; non-Boolean and wider printer profiles remain open; selected annotated and nested quantified Boolean expressions render",
           "status": "partial",
           "go_target": "pkg/tactic/aig/aig_expr_cache_trace.go",
           "tests": [
@@ -181127,7 +181127,7 @@
           "tests": ["TestASTQuantifierPatternSourceTraceBeforeRegistration"]
         },
         {
-          "name": "Selected expr2aig cache_result TRACE emits process-bound SMT2 Boolean expression and AIG reference before cache INC (aig.cpp:452); nested quantifier and wider expression profiles remain open; selected annotated quantified Boolean roots render",
+          "name": "Selected expr2aig cache_result TRACE emits process-bound SMT2 Boolean expression and AIG reference before cache INC (aig.cpp:452); wider expression profiles remain open; selected annotated and nested quantified Boolean expressions render",
           "status": "partial",
           "go_target": "pkg/tactic/aig/aig_expr_cache_trace.go",
           "tests": [
@@ -182731,7 +182731,7 @@
           "tests": ["TestASTQuantifierPatternSourceTraceBeforeRegistration"]
         },
         {
-          "name": "Selected expr2aig cache_result TRACE emits process-bound SMT2 Boolean expression and AIG reference before cache INC (aig.cpp:452); nested quantifier and wider expression profiles remain open; selected annotated quantified Boolean roots render",
+          "name": "Selected expr2aig cache_result TRACE emits process-bound SMT2 Boolean expression and AIG reference before cache INC (aig.cpp:452); wider expression profiles remain open; selected annotated and nested quantified Boolean expressions render",
           "status": "partial",
           "go_target": "pkg/tactic/aig/aig_expr_cache_trace.go",
           "tests": [
