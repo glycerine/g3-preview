@@ -2,6 +2,7 @@ package ast
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
@@ -81,11 +82,14 @@ func TestASTWellSortedApplicationGuardBranches(t *testing.T) {
 	}
 	output.Reset()
 	oldSort := m.varAt(vr.slot).sort
+	id, e := m.GetASTID(variable)
+	astTestMust(t, e)
 	m.varAt(vr.slot).sort = or
 	good, e = m.IsWellSorted(app, warnings)
 	m.varAt(vr.slot).sort = oldSort
 	astTestMust(t, e)
-	if good || output.String() != "WARNING: Sort mismatch for argument 1\n" {
+	want := fmt.Sprintf("WARNING: Sort mismatch for argument 1 of decl guard :: (-> Bool Bool)\n#%d := (:var 0 OtherGuard)\n(guard #%d)\n\nExpected sort: Bool\nActual sort:   OtherGuard\nFunction sort: decl guard :: (-> Bool Bool).\n", id, id)
+	if good || output.String() != want {
 		t.Fatalf("sort guard: %v %q", good, output.String())
 	}
 }

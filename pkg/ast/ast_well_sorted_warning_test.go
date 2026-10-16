@@ -26,9 +26,9 @@ func TestASTWellSortedSourceMismatchPrinter(t *testing.T) {
 	paramsMust(t, err)
 	varRef, err := m.internal(variable)
 	paramsMust(t, err)
-	otherRef, err := m.internal(otherSort)
-	paramsMust(t, err)
 	id, err := m.GetASTID(variable)
+	paramsMust(t, err)
+	otherRef, err := m.internal(otherSort)
 	paramsMust(t, err)
 	var output bytes.Buffer
 	warnings := diagnostic.NewWarningService(&output)
@@ -51,5 +51,39 @@ func TestASTWellSortedSourceMismatchPrinter(t *testing.T) {
 	paramsMust(t, checkErr)
 	if good || output.String() != want {
 		t.Fatalf("process-bound source mismatch warning: good=%v\ngot  %q\nwant %q", good, output.String(), want)
+	}
+}
+
+func TestASTWellSortedStandaloneMismatchWarning(t *testing.T) {
+	m := astTestManager(t)
+	boolSort, err := m.MkBoolSort()
+	paramsMust(t, err)
+	otherSort, err := m.MkSort(astTestSymbol(t, m, "OtherStandalone"), ASTSortInfo{})
+	paramsMust(t, err)
+	variable, err := m.MkVar(0, boolSort)
+	paramsMust(t, err)
+	decl, err := m.MkFuncDecl(astTestSymbol(t, m, "guard"), []ASTHandle{boolSort}, boolSort, ASTFuncDeclInfo{})
+	paramsMust(t, err)
+	app, err := m.MkApp(decl, []ASTHandle{variable})
+	paramsMust(t, err)
+	varRef, err := m.internal(variable)
+	paramsMust(t, err)
+	id, err := m.GetASTID(variable)
+	paramsMust(t, err)
+	otherRef, err := m.internal(otherSort)
+	paramsMust(t, err)
+	old := m.varAt(varRef.slot).sort
+	m.varAt(varRef.slot).sort = otherRef
+	defer func() { m.varAt(varRef.slot).sort = old }()
+	var output bytes.Buffer
+	warnings := diagnostic.NewWarningService(&output)
+	good, err := m.IsWellSorted(app, warnings)
+	paramsMust(t, err)
+	if good {
+		t.Fatal("mismatched sort accepted")
+	}
+	want := fmt.Sprintf("WARNING: Sort mismatch for argument 1 of decl guard :: (-> Bool Bool)\n#%d := (:var 0 OtherStandalone)\n(guard #%d)\n\nExpected sort: Bool\nActual sort:   OtherStandalone\nFunction sort: decl guard :: (-> Bool Bool).\n", id, id)
+	if got := output.String(); got != want {
+		t.Fatalf("standalone source warning: got %q, want %q", got, want)
 	}
 }
