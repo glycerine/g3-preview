@@ -108715,6 +108715,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained UFBV rewrite entry SASSERT at ufbv_rewriter.cpp:362 after empty forward-index bypass",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_loop.go",
+          "tests": ["TestRewriteTraversalSourceEntryAssertionAfterEmptyIndexBypass"]
+        },
+        {
           "name": "Retained UFBV remove_fwd_idx absent-forward SASSERT at cpp252 before any rule-reference release",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
@@ -122967,6 +122973,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained UFBV rewrite entry SASSERT at ufbv_rewriter.cpp:362 after empty forward-index bypass",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_loop.go",
+          "tests": ["TestRewriteTraversalSourceEntryAssertionAfterEmptyIndexBypass"]
+        },
+        {
           "name": "Retained UFBV remove_fwd_idx absent-forward SASSERT at cpp252 before any rule-reference release",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
@@ -123453,6 +123465,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained UFBV rewrite entry SASSERT at ufbv_rewriter.cpp:362 after empty forward-index bypass",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_loop.go",
+          "tests": ["TestRewriteTraversalSourceEntryAssertionAfterEmptyIndexBypass"]
+        },
         {
           "name": "Retained UFBV remove_fwd_idx absent-forward SASSERT at cpp252 before any rule-reference release",
           "status": "ported",

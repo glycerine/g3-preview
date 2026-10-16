@@ -18,12 +18,19 @@ func (r *rewriteTraversal) rewrite(index *rewriteRuleIndex, boolean *rewriter.Bo
 	if e := index.check(); e != nil {
 		return ast.ASTRef{}, e
 	}
-	if len(r.todo) != 0 {
-		return ast.ASTRef{}, ast.ErrASTPending
-	}
 	m := r.manager
 	if len(index.byFunc) == 0 {
 		return m.NewRef(root)
+	}
+	if len(r.todo) != 0 {
+		if enabled, e := forwardAssertionEnabled(); e != nil {
+			return ast.ASTRef{}, e
+		} else if enabled {
+			if e := forwardAssertionFailure(362, "m_rewrite_todo.empty()"); e != nil {
+				return ast.ASTRef{}, e
+			}
+		}
+		return ast.ASTRef{}, ast.ErrASTPending
 	}
 	if e := r.cache.reset(); e != nil {
 		return ast.ASTRef{}, e
