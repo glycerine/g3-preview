@@ -37,6 +37,8 @@ func (c *satCleaner) cleanupClauses(learned bool) error {
 	for i := uint32(0); i < c.end; i++ {
 		// The original scalar pointer is captured before source front compaction.
 		r := (*vec)[i]
+		c.traceCleaningClause(r)
+		c.traceFrozenClauseBefore(r)
 		sz, e := a.Size(r)
 		if e != nil {
 			return e
@@ -66,6 +68,7 @@ func (c *satCleaner) cleanupClauses(learned bool) error {
 				j++
 			}
 		}
+		c.traceFrozenClauseAfter(r, satisfied, j)
 		if satisfied {
 			c.elimClauses++
 			if e = l.delClause(r); e != nil {
@@ -74,6 +77,7 @@ func (c *satCleaner) cleanupClauses(learned bool) error {
 			c.cursor = i + 1
 			continue
 		}
+		c.traceSmallClause(r, j)
 		if satStorageSourceDebug {
 			f, e := a.Frozen(r)
 			if e != nil {
@@ -125,6 +129,7 @@ func (c *satCleaner) cleanupClauses(learned bool) error {
 				}
 			}
 			if j == 2 {
+				c.traceBecameBinary(r)
 				x, e := a.Literal(r, 0)
 				if e != nil {
 					return e

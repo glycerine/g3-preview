@@ -74392,6 +74392,12 @@
           "go_target": "pkg/sat/sat_cleaner_source_assertion.go",
           "go_targets": ["pkg/sat/sat_cleaner.go"],
           "tests": ["TestSATCleanerFalseBinaryWatchSourceAssertion"]
+        },
+        {
+          "name": "Retained cleanup_clauses TRACE/CTRACE sites cpp86,88,108,117,137 with pre-clean clause values, frozen condition, compacted prefix, small-clause diagnostic and binary-conversion order",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_clause_trace.go",
+          "tests": ["TestSATCleanerClauseSourceTraceStages"]
         }
       ],
       "ownership": [
@@ -74469,6 +74475,12 @@
           "go_target": "pkg/sat/sat_cleaner_source_assertion.go",
           "go_targets": ["pkg/sat/sat_cleaner.go"],
           "tests": ["TestSATCleanerFalseBinaryWatchSourceAssertion"]
+        },
+        {
+          "name": "Retained cleanup_clauses TRACE/CTRACE sites cpp86,88,108,117,137 with pre-clean clause values, frozen condition, compacted prefix, small-clause diagnostic and binary-conversion order",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_clause_trace.go",
+          "tests": ["TestSATCleanerClauseSourceTraceStages"]
         }
       ],
       "ownership": [
@@ -182051,6 +182063,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_cleaner_watch_trace.go",
           "tests": ["TestSATCleanerWatchSourceTracesKeepAndDrop"]
+        },
+        {
+          "name": "Retained cleanup_clauses TRACE/CTRACE sites cpp86,88,108,117,137 with pre-clean clause values, frozen condition, compacted prefix, small-clause diagnostic and binary-conversion order",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_clause_trace.go",
+          "tests": ["TestSATCleanerClauseSourceTraceStages"]
         }
       ],
       "ownership": [
@@ -183815,6 +183833,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_cleaner_watch_trace.go",
           "tests": ["TestSATCleanerWatchSourceTracesKeepAndDrop"]
+        },
+        {
+          "name": "Retained cleanup_clauses TRACE/CTRACE sites cpp86,88,108,117,137 with pre-clean clause values, frozen condition, compacted prefix, small-clause diagnostic and binary-conversion order",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_clause_trace.go",
+          "tests": ["TestSATCleanerClauseSourceTraceStages"]
         }
       ],
       "ownership": [
