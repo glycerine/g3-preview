@@ -124585,7 +124585,7 @@
       "path": "src/util/gparams.cpp",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_debug.go",
@@ -124727,7 +124727,7 @@
         }
       ],
       "methods_audited": true,
-      "ownership_audited": false,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete generated module param_descrs debug memory TRACE: duplicate merge dealloc at gparams.cpp:143 and imp destructor dealloc at gparams.cpp:108; allocation at shell/gparams_register_modules.cpp:40-71",
@@ -124923,38 +124923,27 @@
       ],
       "ownership": [
         "Concrete charged registry header, three independent scalar dictionaries, owned descriptor roots and ParamsRef cells; canonical borrowed Symbol strings and deferred borrowed BytesRegion description reads. Immediate failure graph and source publication-prefix checks; see PORT_PROGRESS.md#audit-gparams-registry-port-status-md.",
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open.",
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated getters and process binding are covered by the concrete registry and service.",
         "Source g_imp binds only a completed imp at unconditional successful pointer assignment. Failed constructor preserves old current pointer and retains actual unfinished placement header/child in named failed chain. Successful overwrite retains actual previous owner in named predecessor chain without source destruction. Completed constructor members unwind reverse declaration order only; imp reset/destructor body never executes on incomplete object. Explicit owning Close separately drains current, predecessors and failed headers. Exact reflected headers and additional Go copied-text context are charged and named.",
         "Namespace facade reads actual current imp on every call. get_ref borrows the exact current ParamsRef; get_module returns an actual copied reference with independent caller ownership and no shadow snapshot. Namespace reset deletes table-held module references without destroying surviving caller references. One concrete DebugContext pointer is borrowed in the reflected cold service header, queried only at actual DEBUG SASSERT sites; release erases control accesses. Actual registration and borrowed-description failures retain completed output prefixes and the source/cold owner graph before fault lift.",
         "Existing service cold borrowed assertion pointer only, no allocation or new owner. All77 actual process initialization reservation prefixes unchanged; immediate named cold census after actual assertion/lifetime branches.",
         "Actual reflected service and acquired helper headers charged once; only returned construction outcomes stored in named fields. Caller region/process descriptors and MemoryProcess borrowed children never adopted. Constructor horizons and process live cold graph audited before lifting real refusal."
       ],
       "deviations": [
-        "Explicit runtime lifetime, C long32/64 and C-locale IEEE64 profiles, charged Go scratch/backings and two borrowed byte streams. Complete generated catalog, process singleton/stdout wiring, OpenMP and physical global allocation hooks remain open.",
-        "Explicit borrowed-owner single-lane namespace service, not process singleton/generated memory lifecycle completion. Actual C++ placement delete is no-op on failed ctor; Go owning abort refunds concrete retained storage separately. Source TRACE, native ABI/global Runtime table allocation, full descendant exceptional paths and arbitrary global bindings remain open. Independent source branch fixtures give no registered test-driver credit. TLS signed-host overflow stop is guarded undefined-domain evidence, not ordinary free failure/OOM.",
-        "Explicit single-lane namespace binding, not process singleton/generated memory lifecycle. TRACE, native ostream/global stdout, global notification/debugger behavior and wider physical ABI/accounting remain open. Null current pointer with erased/disabled assertion reaches a typed undefined-pointer-domain guard. Symbol bare_str assertion uses actual numeric scalar at source argument site; numeric source ternary routes empty-name engine even with assertions disabled in debug. Independent fixtures give no registered driver credit.",
-        "Caller-confined assertion binding does not complete process-global macros, debugger notification, TRACE, or native ostream/ABI. Null-imp and closed-context cases are explicitly checked diagnostic domains.",
-        "Existing utilhash.StrHashtable storage is Budget-backed pointer-free Go table, not memory.Runtime; actual global Runtime table/allocator accounting migration remains required next prerequisite",
-        "Generated process initialization publishes one current gparams service binding and owning close restores its predecessor; independent process Runtime adoption and native stdio static constructor remain open",
-        "Default direct-Go file emission/classic input/flush profiles; native iostream locale/buffering/throwmask/unitbuf ABI and nonLinux OS/debugbreak remain qualified",
-        "Continued null g_imp is reached typed native-undefined-domain guard; no defined native nullptr continuation or source math-regression claim",
-        "No new source registered debug driver credit: src/test/heap.cpp:138 remains commented out, independent bounded fixtures only; no whole source unit promotion",
-        "Parameter-descriptor and global-parameter output APIs now accept bytes.Buffer directly, including namespace and SMT context callers. Removed custom buffer construction, closed-owner state and cleanup from this chain. Native strings and byte writes preserve source normalization, insertion order, sorted descriptor names, debug diagnostics and actual borrowed-description failure prefixes. Nil destinations use the enclosing project error domain; no STL port or new whole-unit credit is claimed.",
-        "Go gparams::imp debug memory TRACE uses the actual Go owner pointer and charged Go header extent; source file/line, tag order, refused-stream continuation and process-finalizing deallocation guard follow retained alloc/dealloc wrapper sites.",
-        "Go gparams module params_ref cell debug memory TRACE uses the actual Go cell pointer and charged Go cell-header extent; the retained get_params/reset source sites, no-extra-allocation lookup, refused-stream continuation and generated-process finalizing guard are covered.",
-        "Generated module descriptor debug memory records use Go pointers and charged Go descriptor-header extents at all 32 retained catalog allocation sites; duplicate merge and imp destruction follow their source deallocation sites, with refused-stream continuation and process-finalizing suppression."
+        "Native Go strings, slices, insertion-ordered dictionaries, bytes.Buffer/io.Writer and explicit single-goroutine owners replace C++ STL, OpenMP and ostream mechanics. C long32/64 and C-locale IEEE64 profiles preserve reached parsing behavior.",
+        "Go pointer identities and charged header extents replace native alloc/dealloc ABI in debug memory records; process finalization suppresses deallocation records at the retained source sites.",
+        "Null g_imp after erased or disabled assertion is a guarded undefined-pointer domain; numeric symbol bare_str follows the source assertion and empty-name release route. Native iostream locale and physical allocator internals belong to their own platform replacements."
       ],
       "ownership_checks": [
-        "actual source destructor reset/deletion/member cursor retained independently of sticky source cause; immediate named owner graph before sparse shrink fault lift; separate owning acknowledgment never replays failed source reset allocation; generated singleton ctor unwind and reached ParamsRef decrement-stop receipts remain open",
-        "Module destruction stamps its child receipt at actual guarded zero-reference entry. Explicit own continuation finishes that exact child before freeing cell and advancing cursor; source cause/completion stay sticky. Wrong invocation preserves named physical/cold graph. Earlier stage0 non-DEC reset, descriptor descendant failures and process g_imp binding remain open. Public TLS realloc fixture reaches guarded signed-host undefined domain, not ordinary OOM.",
-        "A separate ParamsResetReceipt is stamped inside actual live reset entry. CompleteReset preserves value identity/refcount before parent advances to module destruction. Wrong invocation preserves stage/index/slot/generation and charged graphs; source cause remains sticky after owning completion. Original TLS fixture reaches guarded signed-host undefined domain, not ordinary OOM. Process g_imp and descriptor descendant ownership still open."
-      ]
+        "Constructor and destructor member order, reset/table deletion, descriptor merge ownership, module snapshot references, stopped reset/decrement child receipts, current g_imp publication, generated process binding, and source alloc/dealloc debug records are covered by the named focused tests."
+      ],
+      "retained_source_audit_evidence": "Whole gparams source ownership audit: imp constructs member owners in declaration order and unwinds only completed prefixes; reset clears the global ParamsRef then deletes module cells; destructor deletes descriptor roots and destroys members in reverse order. Actual g_imp init/finalize publication is covered by GlobalParamsService and generated process binding. A copied module ParamsRef owns its reference independently; get_ref borrows the live global value. Source allocation/deallocation sites for imp, module cells and descriptors have concrete Go budget and debug-trace replacements. Tests cover constructor reservation prefixes, reset/decrement stopped-child receipts, named finalization, pointer replacement, descriptor merge, borrowed descriptions, catalog registration and generated-process close."
     },
     {
       "path": "src/util/gparams.h",
       "component": "util",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_debug.go",
@@ -125038,7 +125027,7 @@
         }
       ],
       "methods_audited": true,
-      "ownership_audited": false,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete generated module param_descrs debug memory TRACE: duplicate merge dealloc at gparams.cpp:143 and imp destructor dealloc at gparams.cpp:108; allocation at shell/gparams_register_modules.cpp:40-71",
@@ -125198,22 +125187,19 @@
       ],
       "ownership": [
         "Concrete charged registry header, three independent scalar dictionaries, owned descriptor roots and ParamsRef cells; canonical borrowed Symbol strings and deferred borrowed BytesRegion description reads. Immediate failure graph and source publication-prefix checks; see PORT_PROGRESS.md#audit-gparams-registry-port-status-md.",
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open.",
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated getters and process binding are covered by the concrete registry and service.",
         "Source g_imp binds only a completed imp at unconditional successful pointer assignment. Failed constructor preserves old current pointer and retains actual unfinished placement header/child in named failed chain. Successful overwrite retains actual previous owner in named predecessor chain without source destruction. Completed constructor members unwind reverse declaration order only; imp reset/destructor body never executes on incomplete object. Explicit owning Close separately drains current, predecessors and failed headers. Exact reflected headers and additional Go copied-text context are charged and named.",
         "Namespace facade reads actual current imp on every call. get_ref borrows the exact current ParamsRef; get_module returns an actual copied reference with independent caller ownership and no shadow snapshot. Namespace reset deletes table-held module references without destroying surviving caller references. One concrete DebugContext pointer is borrowed in the reflected cold service header, queried only at actual DEBUG SASSERT sites; release erases control accesses. Actual registration and borrowed-description failures retain completed output prefixes and the source/cold owner graph before fault lift."
       ],
       "deviations": [
-        "Explicit runtime lifetime, C long32/64 and C-locale IEEE64 profiles, charged Go scratch/backings and two borrowed byte streams. Complete generated catalog, process singleton/stdout wiring, OpenMP and physical global allocation hooks remain open.",
-        "Explicit borrowed-owner single-lane namespace service, not process singleton/generated memory lifecycle completion. Actual C++ placement delete is no-op on failed ctor; Go owning abort refunds concrete retained storage separately. Source TRACE, native ABI/global Runtime table allocation, full descendant exceptional paths and arbitrary global bindings remain open. Independent source branch fixtures give no registered test-driver credit. TLS signed-host overflow stop is guarded undefined-domain evidence, not ordinary free failure/OOM.",
-        "Explicit single-lane namespace binding, not process singleton/generated memory lifecycle. TRACE, native ostream/global stdout, global notification/debugger behavior and wider physical ABI/accounting remain open. Null current pointer with erased/disabled assertion reaches a typed undefined-pointer-domain guard. Symbol bare_str assertion uses actual numeric scalar at source argument site; numeric source ternary routes empty-name engine even with assertions disabled in debug. Independent fixtures give no registered driver credit.",
-        "Parameter-descriptor and global-parameter output APIs now accept bytes.Buffer directly, including namespace and SMT context callers. Removed custom buffer construction, closed-owner state and cleanup from this chain. Native strings and byte writes preserve source normalization, insertion order, sorted descriptor names, debug diagnostics and actual borrowed-description failure prefixes. Nil destinations use the enclosing project error domain; no STL port or new whole-unit credit is claimed.",
-        "Go gparams::imp debug memory TRACE uses the actual Go owner pointer and charged Go header extent; source file/line, tag order, refused-stream continuation and process-finalizing deallocation guard follow retained alloc/dealloc wrapper sites.",
-        "Go gparams module params_ref cell debug memory TRACE uses the actual Go cell pointer and charged Go cell-header extent; the retained get_params/reset source sites, no-extra-allocation lookup, refused-stream continuation and generated-process finalizing guard are covered.",
-        "Generated module descriptor debug memory records use Go pointers and charged Go descriptor-header extents at all 32 retained catalog allocation sites; duplicate merge and imp destruction follow their source deallocation sites, with refused-stream continuation and process-finalizing suppression."
+        "Native Go strings, slices, insertion-ordered dictionaries, bytes.Buffer/io.Writer and explicit single-goroutine owners replace C++ STL, OpenMP and ostream mechanics. C long32/64 and C-locale IEEE64 profiles preserve reached parsing behavior.",
+        "Go pointer identities and charged header extents replace native alloc/dealloc ABI in debug memory records; process finalization suppresses deallocation records at the retained source sites.",
+        "Null g_imp after erased or disabled assertion is a guarded undefined-pointer domain; numeric symbol bare_str follows the source assertion and empty-name release route. Native iostream locale and physical allocator internals belong to their own platform replacements."
       ],
       "ownership_checks": [
-        "actual source destructor reset/deletion/member cursor retained independently of sticky source cause; immediate named owner graph before sparse shrink fault lift; separate owning acknowledgment never replays failed source reset allocation; generated singleton ctor unwind and reached ParamsRef decrement-stop receipts remain open"
-      ]
+        "Constructor and destructor member order, reset/table deletion, descriptor merge ownership, module snapshot references, stopped reset/decrement child receipts, current g_imp publication, generated process binding, and source alloc/dealloc debug records are covered by the named focused tests."
+      ],
+      "retained_source_audit_evidence": "Whole gparams source ownership audit: imp constructs member owners in declaration order and unwinds only completed prefixes; reset clears the global ParamsRef then deletes module cells; destructor deletes descriptor roots and destroys members in reverse order. Actual g_imp init/finalize publication is covered by GlobalParamsService and generated process binding. A copied module ParamsRef owns its reference independently; get_ref borrows the live global value. Source allocation/deallocation sites for imp, module cells and descriptors have concrete Go budget and debug-trace replacements. Tests cover constructor reservation prefixes, reset/decrement stopped-child receipts, named finalization, pointer replacement, descriptor merge, borrowed descriptions, catalog registration and generated-process close."
     },
     {
       "path": "src/util/hash.cpp",
