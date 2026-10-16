@@ -1,7 +1,13 @@
 // Source: src/ast/pattern/pattern_inference.cpp:121-267,485-499.
 package pattern
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"io"
+	"strconv"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+)
 
 type collectKey struct {
 	node  ast.ASTHandle
@@ -12,11 +18,6 @@ type collectedInfo struct {
 	node ast.ASTHandle
 	vars map[uint32]struct{}
 	size uint32
-}
-
-type collectFrame struct {
-	key  collectKey
-	post bool
 }
 
 func (c *patternCandidates) releaseCollectRefs() error {
@@ -215,54 +216,80 @@ func (c *patternCandidates) collect(body ast.ASTHandle) (err error) {
 		}
 	}()
 	cache := make(map[collectKey]*collectedInfo)
-	pending := make(map[collectKey]struct{})
-	stack := []collectFrame{{key: collectKey{node: body}}}
+	stack := []collectKey{{node: body}}
 	for len(stack) != 0 {
-		frame := stack[len(stack)-1]
-		stack = stack[:len(stack)-1]
-		if frame.post {
-			if err = c.collectNode(cache, frame.key, arith); err != nil {
-				return err
-			}
-			delete(pending, frame.key)
-			continue
+		key := stack[len(stack)-1]
+		if err = c.traceCollectVisit(key); err != nil {
+			return err
 		}
-		if _, done := cache[frame.key]; done {
-			continue
-		}
-		if _, queued := pending[frame.key]; queued {
-			continue
-		}
-		pending[frame.key] = struct{}{}
-		stack = append(stack, collectFrame{key: frame.key, post: true})
-		kind, e := c.manager.GetKind(frame.key.node)
+		kind, e := c.manager.GetKind(key.node)
 		if e != nil {
 			return e
 		}
+		visited := true
 		switch kind {
 		case ast.ASTApp:
-			count, e := c.manager.GetNumArgs(frame.key.node)
+			count, e := c.manager.GetNumArgs(key.node)
 			if e != nil {
 				return e
 			}
 			for i := count; i != 0; i-- {
-				child, e := c.manager.GetArg(frame.key.node, i-1)
+				child, e := c.manager.GetArg(key.node, i-1)
 				if e != nil {
 					return e
 				}
-				stack = append(stack, collectFrame{key: collectKey{node: child, delta: frame.key.delta}})
+				childKey := collectKey{node: child, delta: key.delta}
+				if _, done := cache[childKey]; !done {
+					stack = append(stack, childKey)
+					visited = false
+				}
 			}
 		case ast.ASTQuantifier:
-			count, e := c.manager.GetNumDeclarations(frame.key.node)
+			count, e := c.manager.GetNumDeclarations(key.node)
 			if e != nil {
 				return e
 			}
-			child, e := c.manager.GetQuantifierBody(frame.key.node)
+			child, e := c.manager.GetQuantifierBody(key.node)
 			if e != nil {
 				return e
 			}
-			stack = append(stack, collectFrame{key: collectKey{node: child, delta: frame.key.delta + count}})
+			childKey := collectKey{node: child, delta: key.delta + count}
+			if _, done := cache[childKey]; !done {
+				stack = append(stack, childKey)
+				visited = false
+			}
+		}
+		if visited {
+			stack = stack[:len(stack)-1]
+			if err = c.collectNode(cache, key, arith); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
+}
+
+// The source logs the current stack top on every visit, including a parent
+// revisited after its children and duplicate children queued before caching.
+func (c *patternCandidates) traceCollectVisit(key collectKey) error {
+	tags := c.traceTags
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	if !tags.ShouldTrace("collect") {
+		return nil
+	}
+	id, err := c.manager.GetASTID(key.node)
+	if err != nil {
+		return err
+	}
+	kind, err := c.manager.GetKind(key.node)
+	if err != nil {
+		return err
+	}
+	return tags.EmitConditional("collect", "operator()", "src/ast/pattern/pattern_inference.cpp", 131,
+		func() bool { return true }, func(w io.Writer) error {
+			_, err := io.WriteString(w, "processing: "+strconv.FormatUint(uint64(id), 10)+" "+strconv.FormatUint(uint64(key.delta), 10)+" kind: "+strconv.FormatUint(uint64(kind), 10)+"\n")
+			return err
+		})
 }

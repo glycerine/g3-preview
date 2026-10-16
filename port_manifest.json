@@ -18769,6 +18769,7 @@
         "pkg/smtcore/pattern_inference_rewriter.go"
       ],
       "tests": [
+        "TestPatternCollectSharedChildSourceStackTrace",
         "TestSmallerPatternConcretePairCacheAndExternalVariables",
         "TestSmallerPatternSaveTraceBeforePairPublication",
         "TestPatternInferenceLoopFilterConcreteCandidateOwnership",
@@ -18875,6 +18876,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "collect source stack revisit and duplicate-child queue order with line-131 TRACE before child traversal",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/collect.go",
+          "tests": ["TestPatternCollectSharedChildSourceStackTrace"]
+        },
         {
           "name": "smaller_pattern save/process/operator() concrete AST pair cache, candidate variable bindings and reverse worklist traversal",
           "status": "ported",
@@ -180646,6 +180653,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/collect.go",
         "pkg/model/model_evaluator_trace.go",
         "pkg/util/diagnostic/util_trace_tags.go",
         "pkg/util/diagnostic/util_trace_tags_memory_trace.go",
@@ -180727,6 +180735,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestPatternCollectSharedChildSourceStackTrace",
         "TestModelEvaluatorGetMacroSourceTraceBranches",
         "TestTraceTagsSourceControlAndFinalize",
         "TestTraceTagTableAllocationFollowsSourceGate",
@@ -180845,6 +180854,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached pattern collector collect TRACE at pattern_inference.cpp:131 on each source stack visit, including duplicate queued children and parent revisit",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/collect.go",
+          "tests": ["TestPatternCollectSharedChildSourceStackTrace"]
+        },
         {
           "name": "Reached SAT probing process_core pre-decrement TRACE site at sat_probing.cpp:111",
           "status": "ported",
@@ -182558,6 +182573,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/collect.go",
         "pkg/model/model_evaluator_trace.go",
         "pkg/util/diagnostic/util_trace_tags.go",
         "pkg/math/euclid/normalize_query_trace.go",
@@ -182637,6 +182653,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestPatternCollectSharedChildSourceStackTrace",
         "TestModelEvaluatorGetMacroSourceTraceBranches",
         "TestTraceTagsSourceControlAndFinalize",
         "TestEuclideanNormalizeQueryTraceBeforeAndAfterSubstitution",
@@ -182765,6 +182782,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached pattern collector collect TRACE at pattern_inference.cpp:131 on each source stack visit, including duplicate queued children and parent revisit",
+          "status": "ported",
+          "go_target": "pkg/ast/pattern/collect.go",
+          "tests": ["TestPatternCollectSharedChildSourceStackTrace"]
+        },
         {
           "name": "Reached SAT probing process_core pre-decrement TRACE site at sat_probing.cpp:111",
           "status": "ported",
