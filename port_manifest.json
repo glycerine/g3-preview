@@ -183970,7 +183970,12 @@
         "pkg/model/model_evaluator.go",
         "pkg/sat/sat_solver_probing.go",
         "pkg/tactic/bv/max_bv_sharing_goal.go",
-        "pkg/tactic/aig/aig_tactic.go"
+        "pkg/tactic/aig/aig_tactic.go",
+        "pkg/math/subpaving/arbitrary_context_params.go",
+        "pkg/math/subpaving/fixed_context_params.go",
+        "pkg/math/subpaving/fast_context_params.go",
+        "pkg/math/subpaving/rational_context_params.go",
+        "pkg/math/subpaving/hardware_context_root.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184014,7 +184019,12 @@
         "TestSATSolverProbingSourceDefaultsAndTypo",
         "TestModelEvaluatorResourceLimitsAndReset",
         "TestSharingGoalPassSourceParamsAndResourceLimits",
-        "TestAIGPassParamsBindMemoryEncodingAndWholeGoalBranch"
+        "TestAIGPassParamsBindMemoryEncodingAndWholeGoalBranch",
+        "TestArbitraryContextNamedParamsSourceOrderAndDescriptions",
+        "TestFixedContextNamedParamsSourceOrderAndStoppedOwner",
+        "TestFastContextNamedParamsSinglePassAndStoppedPrefix",
+        "TestRationalContextNamedParamsSinglePassAndDefaults",
+        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
       ],
       "conditionals": [
         {
@@ -184307,8 +184317,12 @@
           "name": "Concrete megabytes_to_bytes helper for retained model-evaluator, SAT probing, BV sharing, AIG and goal2sat settings (util.h:391-398)",
           "status": "ported",
           "go_target": "pkg/util/memory/megabytes.go",
-          "go_targets": ["pkg/model/model_evaluator.go", "pkg/sat/sat_solver_probing.go", "pkg/tactic/bv/max_bv_sharing_goal.go", "pkg/tactic/aig/aig_tactic.go", "pkg/sat/tactic/sat_goal_to_sat.go"],
-          "tests": ["TestSourceMegabytesToBytesNativeAndNarrowSizeT", "TestSATSolverProbingSourceDefaultsAndTypo", "TestModelEvaluatorResourceLimitsAndReset", "TestSharingGoalPassSourceParamsAndResourceLimits", "TestAIGPassParamsBindMemoryEncodingAndWholeGoalBranch", "TestSATGoalTranslatorSourceMaxMemorySizeTSentinel"]
+          "go_targets": ["pkg/model/model_evaluator.go", "pkg/sat/sat_solver_probing.go", "pkg/tactic/bv/max_bv_sharing_goal.go", "pkg/tactic/aig/aig_tactic.go", "pkg/sat/tactic/sat_goal_to_sat.go", "pkg/math/subpaving/arbitrary_context_params.go", "pkg/math/subpaving/fixed_context_params.go", "pkg/math/subpaving/fast_context_params.go", "pkg/math/subpaving/rational_context_params.go", "pkg/math/subpaving/hardware_context_root.go"],
+          "tests": ["TestSourceMegabytesToBytesNativeAndNarrowSizeT", "TestSATSolverProbingSourceDefaultsAndTypo", "TestModelEvaluatorResourceLimitsAndReset", "TestSharingGoalPassSourceParamsAndResourceLimits", "TestAIGPassParamsBindMemoryEncodingAndWholeGoalBranch", "TestSATGoalTranslatorSourceMaxMemorySizeTSentinel", "TestArbitraryContextNamedParamsSourceOrderAndDescriptions", "TestFixedContextNamedParamsSourceOrderAndStoppedOwner", "TestFastContextNamedParamsSinglePassAndStoppedPrefix", "TestRationalContextNamedParamsSinglePassAndDefaults", "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"]
+        },
+        {
+          "name": "next_power_of_two retained eq2bv and MUZ sparse-table/PDR uses await their concrete owning ports (util.h:92-100)",
+          "status": "unported"
         },
         {
           "name": "compare_arrays concrete AST declaration domain, application argument, and quantifier sort/name/pattern/no-pattern identity/order (util.h:307-315; ast.cpp:451-490)",

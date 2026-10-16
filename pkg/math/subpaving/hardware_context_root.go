@@ -184,11 +184,7 @@ func (c *HardwareContext) updateMaxBound(power uint32) error {
 }
 
 func (c *HardwareContext) updateMaxMemory(megabytes uint32) {
-	if megabytes == math.MaxUint32 {
-		c.maxMemory = math.MaxUint64
-	} else {
-		c.maxMemory = uint64(megabytes) * 1024 * 1024
-	}
+	c.maxMemory = memory.MegabytesToBytes(megabytes)
 }
 
 func (c *HardwareContext) updateRootPrecision(precision uint32) error {

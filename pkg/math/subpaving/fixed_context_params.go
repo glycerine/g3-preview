@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/control"
+	"github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/params"
 )
@@ -96,11 +97,7 @@ func (c *FixedContext) UpdateParamsRef(pc *params.ParamsContext, p *params.Param
 	if err != nil {
 		return err
 	}
-	if v == math.MaxUint32 {
-		c.maxMemory = math.MaxUint64
-	} else {
-		c.maxMemory = uint64(v) * 1024 * 1024
-	}
+	c.maxMemory = memory.MegabytesToBytes(v)
 	precision := "nth_root_precision"
 	v, err = pc.GetUIntName(p, &precision, 8192)
 	if err != nil {
