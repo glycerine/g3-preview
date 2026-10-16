@@ -1,9 +1,11 @@
 package smtcore
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -53,6 +55,10 @@ func TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit(t *testing
 				gDef = fApp
 			}
 			s := newHintSearchState()
+			var trace bytes.Buffer
+			tags := diagnostic.NewTraceTagsWithWriter(&trace)
+			tags.Enable("model_finder_hint")
+			s.trace = tags
 			s.infos[q[0]] = &hintQuantifierInfo{
 				nonGround: []ast.ASTHandle{f},
 				macros:    []hintConditionalMacro{{function: f, definition: gApp, satisfyAtom: true}},
@@ -69,6 +75,16 @@ func TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit(t *testing
 			}
 			found, e := s.searchFrom(m, f)
 			astTestMust(t, e)
+			if tags.ShouldTrace("model_finder_hint") {
+				const want = "-------- [model_finder_hint] greedy src/smt/smt_model_finder.cpp:2925 ---------\n" +
+					"candidates from residue:\nk!11 \n" +
+					"------------------------------------------------\n"
+				if got := trace.String(); got != want {
+					t.Fatalf("source residue-candidate TRACE: got %q, want %q", got, want)
+				}
+			} else if trace.Len() != 0 {
+				t.Fatal("erased residue-candidate TRACE", trace.String())
+			}
 			if found == cyclic {
 				t.Fatal("greedy result", found, "cyclic", cyclic)
 			}

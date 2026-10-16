@@ -90997,7 +90997,8 @@
         "pkg/smtcore/smt_model_finder_hint_indexes.go",
         "pkg/smtcore/smt_model_finder_hint_indexes_test.go",
         "pkg/smtcore/smt_model_finder_hint_greedy.go",
-        "pkg/smtcore/smt_model_finder_hint_greedy_test.go"
+        "pkg/smtcore/smt_model_finder_hint_greedy_test.go",
+        "pkg/smtcore/smt_model_finder_hint_trace.go"
       ],
       "tests": [
         "TestModelFinderScopedQuantifierSetTrailsAndEvents",
@@ -91449,6 +91450,12 @@
           "tests": [
             "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"
           ]
+        },
+        {
+          "name": "Retained hint_solver residue-candidate TRACE at smt_model_finder.cpp:2925 after candidate collection and before recursive selection",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_finder_hint_trace.go",
+          "tests": ["TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"]
         }
       ],
       "ownership": [
@@ -181743,7 +181750,8 @@
         "pkg/tactic/arith/bound_trace.go",
         "pkg/tactic/arith/linear_equation_trace.go",
         "pkg/tactic/arith/polynomial_trace.go",
-        "pkg/ast/ast_core_distinct_trace.go"
+        "pkg/ast/ast_core_distinct_trace.go",
+        "pkg/smtcore/smt_model_finder_hint_trace.go"
       ],
       "tests": [
         "TestSATGoalDependencyFormulaSourceTrace",
@@ -181848,7 +181856,8 @@
         "TestBoundExactPropagationStepTraceWithEquationBounds",
         "TestLinearEquationSourceConstructionTrace",
         "TestInequalityRestoredGoalSourceTrace",
-        "TestASTExpandedDistinctSourceTraceAfterConjunction"
+        "TestASTExpandedDistinctSourceTraceAfterConjunction",
+        "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"
       ],
       "conditionals": [
         {
@@ -183950,6 +183959,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_expr_abstract_trace.go",
           "tests": ["TestExprAbstractSourceTraceBothCallers"]
+        },
+        {
+          "name": "Retained hint_solver residue-candidate TRACE at smt_model_finder.cpp:2925 after candidate collection and before recursive selection",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_finder_hint_trace.go",
+          "tests": ["TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"]
         }
       ],
       "ownership": [
@@ -184057,7 +184072,8 @@
         "pkg/tactic/arith/bound_trace.go",
         "pkg/tactic/arith/linear_equation_trace.go",
         "pkg/tactic/arith/polynomial_trace.go",
-        "pkg/ast/ast_core_distinct_trace.go"
+        "pkg/ast/ast_core_distinct_trace.go",
+        "pkg/smtcore/smt_model_finder_hint_trace.go"
       ],
       "tests": [
         "TestSATGoalDependencyFormulaSourceTrace",
@@ -184160,7 +184176,8 @@
         "TestBoundExactPropagationStepTraceWithEquationBounds",
         "TestLinearEquationSourceConstructionTrace",
         "TestInequalityRestoredGoalSourceTrace",
-        "TestASTExpandedDistinctSourceTraceAfterConjunction"
+        "TestASTExpandedDistinctSourceTraceAfterConjunction",
+        "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"
       ],
       "conditionals": [
         {
@@ -186262,6 +186279,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_expr_abstract_trace.go",
           "tests": ["TestExprAbstractSourceTraceBothCallers"]
+        },
+        {
+          "name": "Retained hint_solver residue-candidate TRACE at smt_model_finder.cpp:2925 after candidate collection and before recursive selection",
+          "status": "ported",
+          "go_target": "pkg/smtcore/smt_model_finder_hint_trace.go",
+          "tests": ["TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit"]
         }
       ],
       "ownership": [

@@ -59,6 +59,7 @@ func (s *hintSearchState) greedyResidue(m *ast.ASTManager, depth uint32) (bool, 
 	if e != nil {
 		return false, e
 	}
+	s.traceResidueCandidates(m, candidates)
 	for f := range candidates {
 		found, e := s.greedyFunction(m, f, depth)
 		if e != nil || found {

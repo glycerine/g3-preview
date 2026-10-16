@@ -1,7 +1,10 @@
 // Source: src/smt/smt_model_finder.cpp:2738-2813,2848-2864.
 package smtcore
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+)
 
 // hintSearchState is the scoped satisfied/residue portion of hint_solver.
 // Quantifiers and function declarations are borrowed from its AST manager.
@@ -14,6 +17,7 @@ type hintSearchState struct {
 	qByFunction           map[ast.ASTHandle]map[ast.ASTHandle]struct{}
 	qByDefinition         map[hintFunctionDefinition]map[ast.ASTHandle]struct{}
 	defsByFunction        map[ast.ASTHandle]map[ast.ASTHandle]struct{}
+	trace                 *diagnostic.TraceTags
 }
 
 func newHintSearchState() *hintSearchState {
