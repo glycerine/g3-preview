@@ -291,6 +291,9 @@ func (m *MultivariatePolynomialCore) deleteCoreMode(p Polynomial, owning bool) e
 		return l.monomialDropCause
 	}
 	if l.deleteStage == 0 {
+		if e = m.traceDeletingPolynomial(p); e != nil {
+			return e
+		}
 		if e = m.deletionCallbacks(p); e != nil {
 			return e
 		}

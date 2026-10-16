@@ -653,6 +653,11 @@ func (m *MultivariatePolynomialCore) CloseChecked() error {
 	if e := m.translateBuffers.CloseChecked(); e != nil {
 		return e
 	}
+	// Deletion traces can create formatter frames while cached polynomials and
+	// SOM buffers are destroyed, after the initial cleanup of older frames.
+	if e := m.closeDisplayMetadata(); e != nil {
+		return e
+	}
 	if m.modular != nil && !m.modular.Closed() {
 		for _, a := range [3]*unumeral.Int{&m.minusOne, &m.negativeCoefficient, &m.constantCopy} {
 			if e := m.deleteNumeral(a); e != nil {

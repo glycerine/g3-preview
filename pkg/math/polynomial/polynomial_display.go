@@ -446,6 +446,10 @@ func (m *MultivariatePolynomialCore) DisplayInto(p Polynomial, sink PolynomialTe
 	if e := m.check(); e != nil {
 		return e
 	}
+	return m.displayIntoCore(p, sink, star)
+}
+
+func (m *MultivariatePolynomialCore) displayIntoCore(p Polynomial, sink PolynomialTextSink, star bool) error {
 	if sink == nil {
 		return ErrPolynomialOwner
 	}

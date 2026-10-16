@@ -8,7 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
-func (m *MonomialManager) multiplicationTraceTags() *diagnostic.TraceTags {
+func (m *MonomialManager) monomialTraceTags() *diagnostic.TraceTags {
 	if m.config.Trace != nil {
 		return m.config.Trace
 	}
@@ -123,7 +123,7 @@ func (m *MonomialManager) monomialTraceResult(w io.Writer, result Monomial) erro
 }
 
 func (m *MonomialManager) traceMultiplyBefore(left, right monomialInput, t *monomialTemp) {
-	tags := m.multiplicationTraceTags()
+	tags := m.monomialTraceTags()
 	if !tags.ShouldTrace("monomial_mul_bug") {
 		return
 	}
@@ -143,7 +143,7 @@ func (m *MonomialManager) traceMultiplyBefore(left, right monomialInput, t *mono
 }
 
 func (m *MonomialManager) traceMultiplyAfter(left, right monomialInput, t *monomialTemp, count uint32, result Monomial) {
-	tags := m.multiplicationTraceTags()
+	tags := m.monomialTraceTags()
 	if !tags.ShouldTrace("monomial_mul_bug") {
 		return
 	}

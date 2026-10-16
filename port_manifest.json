@@ -43179,6 +43179,12 @@
           ]
         },
         {
+          "name": "Retained polynomial deletion TRACE before handlers and coefficient destruction at polynomial.cpp:2421, including cached teardown values",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_delete_trace.go",
+          "tests": ["TestPolynomialDeletionSourceTraceBeforeHandlerAndDuringClose", "TestPolynomialDeletionTraceStreamRefusalStillDeletes"]
+        },
+        {
           "name": "monomial_manager::mul source TRACE around interning at polynomial.cpp:960,967",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_mul_trace.go",
@@ -45951,6 +45957,12 @@
             "TestPolynomialVariableRecognitionLiteralWritePrefixes",
             "TestPolynomialVariableRecognitionBIGEveryActualPrefix"
           ]
+        },
+        {
+          "name": "Retained polynomial deletion TRACE before handlers and coefficient destruction at polynomial.cpp:2421, including cached teardown values",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_delete_trace.go",
+          "tests": ["TestPolynomialDeletionSourceTraceBeforeHandlerAndDuringClose", "TestPolynomialDeletionTraceStreamRefusalStillDeletes"]
         },
         {
           "name": "monomial_manager::mul source TRACE around interning at polynomial.cpp:960,967",
@@ -183268,6 +183280,12 @@
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
         },
         {
+          "name": "Retained polynomial deletion TRACE before handlers and coefficient destruction at polynomial.cpp:2421, including cached teardown values",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_delete_trace.go",
+          "tests": ["TestPolynomialDeletionSourceTraceBeforeHandlerAndDuringClose", "TestPolynomialDeletionTraceStreamRefusalStillDeletes"]
+        },
+        {
           "name": "Retained monomial multiplication pre/post intern TRACE at polynomial.cpp:960,967",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_mul_trace.go",
@@ -185441,6 +185459,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
           "tests": ["TestSATSimplifierEliminationCostAndOrderSourceTraces", "TestSATSimplifierBinaryWatchRemovalSourceTraces", "TestSATSimplifierActualVariableEliminationSourceTraces", "TestSATSimplifierTooManyResolventsSourceTrace", "TestSATSimplifierActualResolventBodiesSourceTraces"]
+        },
+        {
+          "name": "Retained polynomial deletion TRACE before handlers and coefficient destruction at polynomial.cpp:2421, including cached teardown values",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_delete_trace.go",
+          "tests": ["TestPolynomialDeletionSourceTraceBeforeHandlerAndDuringClose", "TestPolynomialDeletionTraceStreamRefusalStillDeletes"]
         },
         {
           "name": "Retained monomial multiplication pre/post intern TRACE at polynomial.cpp:960,967",
