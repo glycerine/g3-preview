@@ -77266,6 +77266,12 @@
             "TestSATNativeCaseSplitQueueGrowthIndependentPriorityAndColdBudget",
             "TestSATNativeCaseSplitQueueOwnerBudgetAndIndexGuards"
           ]
+        },
+        {
+          "name": "Reached remove_clause_core resolution_bug TRACE after removed flag and before cleanup publication (sat_simplifier.cpp:103)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_remove_trace.go",
+          "tests": ["TestSATSimplifierRemoveClauseSourceTraceAfterMarkBeforeCleanup"]
         }
       ],
       "ownership": [
@@ -182272,6 +182278,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_mus_trace.go",
           "tests": ["TestSATActualMUSSourceTraceTransitions"]
+        },
+        {
+          "name": "Reached remove_clause_core resolution_bug TRACE after removed flag and before cleanup publication (sat_simplifier.cpp:103)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_remove_trace.go",
+          "tests": ["TestSATSimplifierRemoveClauseSourceTraceAfterMarkBeforeCleanup"]
         }
       ],
       "ownership": [
@@ -184048,6 +184060,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_mus_trace.go",
           "tests": ["TestSATActualMUSSourceTraceTransitions"]
+        },
+        {
+          "name": "Reached remove_clause_core resolution_bug TRACE after removed flag and before cleanup publication (sat_simplifier.cpp:103)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_remove_trace.go",
+          "tests": ["TestSATSimplifierRemoveClauseSourceTraceAfterMarkBeforeCleanup"]
         }
       ],
       "ownership": [

@@ -26,6 +26,7 @@ func (s *satSimplifier) removeClauseCore(c StoredClauseRef) error {
 	if e = a.SetRemoved(c, true); e != nil {
 		return e
 	}
+	s.traceRemovedClause(c)
 	s.needCleanup = true
 	return nil
 }
