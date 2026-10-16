@@ -39,29 +39,8 @@ func (s *satSolverConflictResolution) emitCoreReport() error {
 	if err = out.AppendCString("(sat.core: "); err != nil {
 		return err
 	}
-	n, err := s.core.Size()
-	if err != nil {
+	if err = satMUSWriteCore(out, &s.core); err != nil {
 		return err
-	}
-	for i := uint32(0); i < n; i++ {
-		if i != 0 {
-			if err = out.AppendCString(" "); err != nil {
-				return err
-			}
-		}
-		lit, readErr := s.core.Read(i)
-		if readErr != nil {
-			return readErr
-		}
-		value := Literal(lit)
-		if value.sign() {
-			if err = out.AppendCString("-"); err != nil {
-				return err
-			}
-		}
-		if err = out.AppendUint32(uint32(value.variable())); err != nil {
-			return err
-		}
 	}
 	return out.AppendCString(")\n")
 }

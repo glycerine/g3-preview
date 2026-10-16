@@ -228,6 +228,9 @@ func (m *satSolverMUSMembers) run() (lbool.LBool, error) {
 	oldActive := m.isActive
 	m.isActive = true
 	defer func() { m.isActive = oldActive; cfg.CoreMinimize = oldMin }()
+	if e := m.emitMUSEntry(); e != nil {
+		return lbool.Undef, e
+	}
 	if e := m.reset(); e != nil {
 		return lbool.Undef, e
 	}
@@ -281,6 +284,9 @@ func (m *satSolverMUSMembers) mus1() (lbool.LBool, error) {
 		if n == 0 {
 			break
 		}
+		if e = m.emitMUSProgress(n, partial); e != nil {
+			return lbool.Undef, e
+		}
 		if !m.solver.Limit.Inc() {
 			if e = m.setCore(); e != nil {
 				return lbool.Undef, e
@@ -304,6 +310,9 @@ func (m *satSolverMUSMembers) mus1() (lbool.LBool, error) {
 		lit := Literal(v)
 		result, e := m.scopedCheck(&m.core, lit)
 		if e != nil {
+			return lbool.Undef, e
+		}
+		if e = m.emitMUSResult(result); e != nil {
 			return lbool.Undef, e
 		}
 		switch result {
@@ -346,7 +355,11 @@ func (m *satSolverMUSMembers) mus1() (lbool.LBool, error) {
 			if e != nil {
 				return lbool.Undef, e
 			}
-			if !yes {
+			if yes {
+				if e = m.emitMUSUnitReduction(lit); e != nil {
+					return lbool.Undef, e
+				}
+			} else {
 				if e = m.core.Shrink(0); e != nil {
 					return lbool.Undef, e
 				}
@@ -376,6 +389,9 @@ func (m *satSolverMUSMembers) mus1() (lbool.LBool, error) {
 		}
 	}
 	if e = m.setCore(); e != nil {
+		return lbool.Undef, e
+	}
+	if e = m.emitMUSNewCore(); e != nil {
 		return lbool.Undef, e
 	}
 	return lbool.True, nil
@@ -436,8 +452,10 @@ func (m *satSolverMUSMembers) mus2() (r lbool.LBool, e error) {
 	if e = m.toVector(&f.sets[0], &f.vector); e != nil {
 		return lbool.Undef, e
 	}
-	e = satMUSAppend(&m.solver.conflict.core, &f.vector)
-	return r, e
+	if e = satMUSAppend(&m.solver.conflict.core, &f.vector); e != nil {
+		return r, e
+	}
+	return r, m.emitMUSNewCore()
 }
 func (m *satSolverMUSMembers) split(a, b *satMUSLiteralSet) (e error) {
 	n := a.size()

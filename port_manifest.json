@@ -76066,7 +76066,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/sat/sat_solver_mus.go"
+        "pkg/sat/sat_solver_mus.go",
+        "pkg/sat/sat_solver_mus_verbose.go"
       ],
       "tests": [
         "TestSATMUSCopiedOwnerRejectedBeforeSourceFieldPublication",
@@ -76082,7 +76083,9 @@
         "TestSATSolverMUSNativeScopePreservesNamedPhysicalRoots",
         "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
         "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
-        "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph"
+        "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph",
+        "TestSATSolverActualMUSSourceVerboseLevels",
+        "TestSATSolverActualMUSQXSourceFinalCoreVerbose"
       ],
       "assertions": [
         {
@@ -76112,6 +76115,15 @@
             "TestSATSolverMUSGetCoreUserScopeSwapPopOrder",
             "TestSATSolverMUSRedundantCoreAndPartialWindowActualChecks",
             "TestSATSolverMUSWarmSourceLexicalWorkRetainsBoundedPhysicalGraph"
+          ]
+        },
+        {
+          "name": "Retained SAT MUS level-one loop/check-result and level-three entry/unit-reduction/final-core IF_VERBOSE reports at sat_mus.cpp:53,68,95,117,133,145; verify_core has no production caller",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_mus_verbose.go",
+          "tests": [
+            "TestSATSolverActualMUSSourceVerboseLevels",
+            "TestSATSolverActualMUSQXSourceFinalCoreVerbose"
           ]
         }
       ],
@@ -184507,7 +184519,8 @@
         "pkg/sat/sat_solver_search_verbose.go",
         "pkg/sat/sat_solver_unsat_core_verbose.go",
         "pkg/sat/sat_solver_consequences.go",
-        "pkg/sat/sat_solver_consequence_verbose.go"
+        "pkg/sat/sat_solver_consequence_verbose.go",
+        "pkg/sat/sat_solver_mus_verbose.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184546,7 +184559,9 @@
         "TestSATSolverCheckSourceModelNotice",
         "TestSATSolverActualMUSCoreSourceVerboseReport",
         "TestSATSolverBoundedConsequencesSourceAbortVerbose",
-        "TestSATSolverActualConsequenceProgressSourceVerbose"
+        "TestSATSolverActualConsequenceProgressSourceVerbose",
+        "TestSATSolverActualMUSSourceVerboseLevels",
+        "TestSATSolverActualMUSQXSourceFinalCoreVerbose"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -184745,6 +184760,15 @@
             "TestSATSolverActualConsequenceProgressSourceVerbose",
             "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput"
           ]
+        },
+        {
+          "name": "Retained SAT MUS level-one loop/check-result and level-three entry/unit-reduction/final-core IF_VERBOSE reports at sat_mus.cpp:53,68,95,117,133,145; verify_core has no production caller",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_mus_verbose.go",
+          "tests": [
+            "TestSATSolverActualMUSSourceVerboseLevels",
+            "TestSATSolverActualMUSQXSourceFinalCoreVerbose"
+          ]
         }
       ],
       "ownership": [
@@ -184814,7 +184838,8 @@
         "pkg/sat/sat_solver_search_verbose.go",
         "pkg/sat/sat_solver_unsat_core_verbose.go",
         "pkg/sat/sat_solver_consequences.go",
-        "pkg/sat/sat_solver_consequence_verbose.go"
+        "pkg/sat/sat_solver_consequence_verbose.go",
+        "pkg/sat/sat_solver_mus_verbose.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184880,7 +184905,9 @@
         "TestSATSolverCheckSourceModelNotice",
         "TestSATSolverActualMUSCoreSourceVerboseReport",
         "TestSATSolverBoundedConsequencesSourceAbortVerbose",
-        "TestSATSolverActualConsequenceProgressSourceVerbose"
+        "TestSATSolverActualConsequenceProgressSourceVerbose",
+        "TestSATSolverActualMUSSourceVerboseLevels",
+        "TestSATSolverActualMUSQXSourceFinalCoreVerbose"
       ],
       "conditionals": [
         {
@@ -185377,6 +185404,15 @@
           "tests": [
             "TestSATSolverActualConsequenceProgressSourceVerbose",
             "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput"
+          ]
+        },
+        {
+          "name": "Retained SAT MUS level-one loop/check-result and level-three entry/unit-reduction/final-core IF_VERBOSE reports at sat_mus.cpp:53,68,95,117,133,145; verify_core has no production caller",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_mus_verbose.go",
+          "tests": [
+            "TestSATSolverActualMUSSourceVerboseLevels",
+            "TestSATSolverActualMUSQXSourceFinalCoreVerbose"
           ]
         }
       ],
