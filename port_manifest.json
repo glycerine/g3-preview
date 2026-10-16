@@ -124726,7 +124726,7 @@
           "text": "SASSERT(g_imp != 0);"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": false,
       "methods": [
         {
@@ -124774,6 +124774,7 @@
             "TestGlobalParamsCLongFilteredSaturationAndNarrow",
             "TestGlobalParamsConstructorUnwindAndColdOwnerGuards",
             "TestGlobalParamsDefaultLookupAndSourceHistoricalMessages",
+            "TestGlobalParamsGetValueModuleFallbackAfterFailedSet",
             "TestGlobalParamsDescriptionNullAndClosedReadPrefixes",
             "TestGlobalParamsNativeDescriptorMergeConsumesCallerOwner",
             "TestGlobalParamsModuleMergeDuplicateKindSourceAssertion",
@@ -124799,7 +124800,7 @@
           ]
         },
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; runtime getters are covered by the concrete registry methods",
           "status": "ported",
           "go_target": "pkg/util/params/util_gparams_catalog_collectors.go",
           "tests": [
@@ -125036,7 +125037,7 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
+      "methods_audited": true,
       "ownership_audited": false,
       "methods": [
         {
@@ -125084,6 +125085,7 @@
             "TestGlobalParamsCLongFilteredSaturationAndNarrow",
             "TestGlobalParamsConstructorUnwindAndColdOwnerGuards",
             "TestGlobalParamsDefaultLookupAndSourceHistoricalMessages",
+            "TestGlobalParamsGetValueModuleFallbackAfterFailedSet",
             "TestGlobalParamsDescriptionNullAndClosedReadPrefixes",
             "TestGlobalParamsNativeDescriptorMergeConsumesCallerOwner",
             "TestGlobalParamsModuleMergeDuplicateKindSourceAssertion",
@@ -125109,7 +125111,7 @@
           ]
         },
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; runtime getters are covered by the concrete registry methods",
           "status": "ported",
           "go_target": "pkg/util/params/util_gparams_catalog_collectors.go",
           "tests": [

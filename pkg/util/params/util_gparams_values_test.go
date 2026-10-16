@@ -161,6 +161,33 @@ func TestGlobalParamsValidationErrorDomainsAndPublishedEmptyModule(t *testing.T)
 		t.Fatal(e)
 	}
 }
+func TestGlobalParamsGetValueModuleFallbackAfterFailedSet(t *testing.T) {
+	g, ctx, sy, _ := gparamsRealRegistry(t)
+	if e := g.SetName("sat.not_known", "1"); e == nil {
+		t.Fatal("unknown parameter was accepted")
+	}
+	if g.ModuleParams.size() != 1 {
+		t.Fatal("source set must publish the empty module cell before the unknown-parameter error")
+	}
+	got, e := g.GetValueName("sat.seed")
+	paramsMust(t, e)
+	if got != "0" {
+		t.Fatal("empty module cell must fall back to registered default", got)
+	}
+	mod, e := sy.Intern("sat")
+	paramsMust(t, e)
+	snapshot, e := g.GetModule(mod)
+	paramsMust(t, e)
+	empty, e := ctx.Empty(&snapshot)
+	paramsMust(t, e)
+	paramsMust(t, ctx.Del(&snapshot))
+	if !empty {
+		t.Fatal("failed set populated the module cell")
+	}
+	if _, e = g.GetValueName("sat.not_known"); e == nil || !strings.Contains(e.Error(), "unknown parameter 'not_known' at module 'sat'") {
+		t.Fatal("missing descriptor did not take the module diagnostic path", e)
+	}
+}
 func TestGlobalParamsBorrowedStringAndSharedSnapshotPublication(t *testing.T) {
 	g, ctx, sy, _ := gparamsRealRegistry(t)
 	paramsMust(t, g.SetName("sat.text", "real\x00ignored"))
