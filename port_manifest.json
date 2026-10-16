@@ -75121,6 +75121,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityEliminatedClauseSourceTrace"]
+        },
+        {
+          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source clause and concrete empty/nonempty watch-list display (cpp69-73); later residual trace remains open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_clause_trace.go",
+          "tests": ["TestSATIntegrityMissingTernaryWatchSourceTrace"]
         }
       ],
       "ownership": [
@@ -75228,6 +75234,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityEliminatedClauseSourceTrace"]
+        },
+        {
+          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source clause and concrete empty/nonempty watch-list display (cpp69-73); later residual trace remains open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_clause_trace.go",
+          "tests": ["TestSATIntegrityMissingTernaryWatchSourceTrace"]
         }
       ],
       "ownership": [
@@ -181880,6 +181892,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityEliminatedClauseSourceTrace"]
+        },
+        {
+          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source clause and concrete empty/nonempty watch-list display (cpp69-73); later residual trace remains open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_clause_trace.go",
+          "tests": ["TestSATIntegrityMissingTernaryWatchSourceTrace"]
         }
       ],
       "ownership": [
@@ -183625,6 +183643,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityEliminatedClauseSourceTrace"]
+        },
+        {
+          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source clause and concrete empty/nonempty watch-list display (cpp69-73); later residual trace remains open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_clause_trace.go",
+          "tests": ["TestSATIntegrityMissingTernaryWatchSourceTrace"]
         }
       ],
       "ownership": [

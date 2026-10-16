@@ -192,6 +192,27 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 		return false, e
 	}
 	if n == 3 {
+		if tags.ShouldTrace("sat_ter_watch_bug") {
+			first, e := a.Literal(cl, 0)
+			if e != nil {
+				return false, e
+			}
+			second, e := a.Literal(cl, 1)
+			if e != nil {
+				return false, e
+			}
+			third, e := a.Literal(cl, 2)
+			if e != nil {
+				return false, e
+			}
+			watched, e := c.containsTernary(first.Negated().index(), second, third)
+			if e != nil {
+				return false, e
+			}
+			if !watched {
+				c.traceMissingTernaryWatch(cl, first.Negated().index())
+			}
+		}
 		// Each VERIFY expression independently reads its source fields, in order.
 		for k := uint32(0); k < 3; k++ {
 			x, e := a.Literal(cl, k)
