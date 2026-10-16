@@ -25,7 +25,7 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 	serviceMust(t, e)
 	in, e := os.CreateTemp(t.TempDir(), "mpzzp-assert-input-*")
 	serviceMust(t, e)
-	_, e = in.WriteString(strings.Repeat("CT", 12) + "TCCCTCTTT")
+	_, e = in.WriteString(strings.Repeat("CT", 12) + "TCCCTCTTTTCTT")
 	serviceMust(t, e)
 	_, e = in.Seek(0, 0)
 	serviceMust(t, e)
@@ -154,6 +154,18 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 	if e := m.ExtendedGCD(&a, &one, &x, &y, &g); !errors.As(e, &thrown) || x.Val != 91 || y.Val != 92 || g.Val != 93 {
 		t.Fatal("ExtendedGCD input Throw must precede output mutation", x, y, g, e)
 	}
+	zero := NewInt(0)
+	if e := m.Inv(&zero); !errors.As(e, &thrown) || zero.Val != 0 {
+		t.Fatal("inverse zero Throw must precede arithmetic", zero, e)
+	}
+	if e := m.Inv(&zero); !errors.As(e, &thrown) {
+		t.Fatal("inverse zero Continue must reach final gcd assertion", zero, e)
+	}
+	serviceMust(t, m.SetZPUint64(6))
+	two := NewInt(2)
+	if e := m.Inv(&two); !errors.As(e, &thrown) || two.Val != 1 {
+		t.Fatal("inverse gcd Throw must follow published swap", two, e)
+	}
 	serviceMust(t, d.EnableAssertions(false))
 	if got, e := m.String(&a); e != nil || got != "8" {
 		t.Fatal("disabled source assertion must leave numeral readable", got, e)
@@ -163,6 +175,10 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 	}
 	if e := m.Add(&a, &b, &outValue); e != nil {
 		t.Fatal("disabled arithmetic assertion must reach addition", e)
+	}
+	zero = NewInt(0)
+	if e := m.Inv(&zero); e != nil {
+		t.Fatal("disabled inverse assertions must not consume an action", e)
 	}
 	data, e := os.ReadFile(out.Name())
 	serviceMust(t, e)
@@ -197,9 +213,13 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 		strings.Count(string(data), "Line: 223\nis_p_normalized(r1) && is_p_normalized(r2)\n") != 1 {
 		t.Fatal("missing GCD source assertion records", string(data))
 	}
+	if strings.Count(string(data), "Line: 172\n!is_zero(a)\n") != 2 ||
+		strings.Count(string(data), "Line: 183\nm().is_one(m_inv_tmp3)\n") != 2 {
+		t.Fatal("missing inverse source assertion records", string(data))
+	}
 	state, e := input.State()
 	serviceMust(t, e)
-	if state.Position != 33 {
+	if state.Position != 37 {
 		t.Fatal("disabled assertion consumed an action", state.Position)
 	}
 }

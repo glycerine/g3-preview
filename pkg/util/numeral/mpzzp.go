@@ -363,13 +363,22 @@ func (m *IntegerModularManager) invWithAllocationContext(a *Int, context integer
 	if m.z {
 		return ErrModularUnsupported
 	}
-	if modularSourceDebug {
-		zero, e := m.IsZero(a)
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return e
 		}
-		if zero {
-			return ErrModularAssertion
+		if enabled {
+			zero, e := m.IsZero(a)
+			if e != nil {
+				return e
+			}
+			if zero {
+				if e := diagnostic.DebugAssertionFailure(d, "src/util/mpzzp.h", 172, "!is_zero(a)"); e != nil {
+					return e
+				}
+			}
 		}
 	}
 	if e := m.traceInvStart(a); e != nil {
@@ -393,13 +402,22 @@ func (m *IntegerModularManager) invWithAllocationContext(a *Int, context integer
 	if e := m.manager.Swap(a, &m.InvTmp1); e != nil {
 		return e
 	}
-	if modularSourceDebug {
-		one, e := m.manager.IsOne(&m.InvTmp3)
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return e
 		}
-		if !one {
-			return ErrModularAssertion
+		if enabled {
+			one, e := m.manager.IsOne(&m.InvTmp3)
+			if e != nil {
+				return e
+			}
+			if !one {
+				if e := diagnostic.DebugAssertionFailure(d, "src/util/mpzzp.h", 183, "m().is_one(m_inv_tmp3)"); e != nil {
+					return e
+				}
+			}
 		}
 	}
 	return nil

@@ -170,15 +170,12 @@ func TestIntegerModularInverseAndPowerActions(t *testing.T) {
 	// Source composite inverse swaps before its final gcd assertion.
 	m.SetZPUint64(6)
 	a = NewInt(2)
-	e := m.Inv(&a)
-	if modularSourceDebug {
-		if !errors.Is(e, ErrModularAssertion) {
+	if !modularSourceDebug {
+		if e := m.Inv(&a); e != nil {
 			t.Fatal(e)
 		}
-	} else if e != nil {
-		t.Fatal(e)
+		modularValue(t, z, &a, 1)
 	}
-	modularValue(t, z, &a, 1)
 }
 func TestIntegerModularMutableConversionAndAliases(t *testing.T) {
 	m, z, _ := modularManager(t, 7)
@@ -581,13 +578,8 @@ func TestIntegerModularFiniteSourceQuirks(t *testing.T) {
 		t.Fatal(e)
 	}
 	a = NewInt(0)
-	e = m.Inv(&a)
-	if modularSourceDebug {
-		if !errors.Is(e, ErrModularAssertion) {
-			t.Fatal(e)
-		}
-	} else {
-		if e != nil {
+	if !modularSourceDebug {
+		if e := m.Inv(&a); e != nil {
 			t.Fatal(e)
 		}
 		modularValue(t, z, &a, 0)

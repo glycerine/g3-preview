@@ -169602,6 +169602,16 @@
           ]
         },
         {
+          "name": "mpzzp inverse zero SASSERT at mpzzp.h:172 with nested is_zero assertion, and gcd-one SASSERT at :183 after the caller-value swap",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp.go",
+          "tests": [
+            "TestIntegerModularScalarSourceAssertionActions",
+            "TestIntegerModularInverseAndPowerActions",
+            "TestIntegerModularFiniteSourceQuirks"
+          ]
+        },
+        {
           "name": "Remaining scalar arithmetic/fused/sets/const-mutable conversion/bit/log/root/formatting overloads beyond separately ported source assertions",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpzzp_ops.go",
