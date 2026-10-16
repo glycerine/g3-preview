@@ -183956,7 +183956,8 @@
         "pkg/test/uint_set_test.go",
         "pkg/math/subpaving/hardware_context_root.go",
         "pkg/util/diagnostic/util_process_verbose.go",
-        "pkg/util/params/util_env_params.go"
+        "pkg/util/params/util_env_params.go",
+        "pkg/sat/sat_solver_find_mutexes.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -183993,7 +183994,8 @@
         "TestASTSomeValueProcFallbackReservationFailureRestores",
         "TestSubpavingHardwareContextBoundPolicyAndRootDispatch",
         "TestProcessVerboseGlobalsDefaultAndBorrowedSelection",
-        "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
+        "TestUpdateProcessEnvParamsSharedVerbosityAndWarning",
+        "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations"
       ],
       "conditionals": [
         {
@@ -184286,6 +184288,12 @@
           ]
         },
         {
+          "name": "default_eq<sat::literal_pair> in retained SAT find_mutexes membership (util.h:217-222; sat_solver.cpp:3125-3133)",
+          "status": "platform_replacement",
+          "go_target": "pkg/sat/sat_solver_find_mutexes.go",
+          "tests": ["TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations"]
+        },
+        {
           "name": "is_power_of_two uint32 primitive in retained mpz small-positive branch (util.h:85; mpz.cpp:1518)",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_power_shift.go",
@@ -184367,7 +184375,8 @@
         "The retained basic and bit-vector declaration caches grow native Go slices to the requested index, preserving prior handles and zero-valued gaps. Their backing is ordinary Go memory, not a charged arena allocation.",
         "Retained BV numeric extract, logical shift, and arithmetic shift paths use uint64 Go shifts; shift counts of 64 or more saturate to zero, including the source width-64 all-ones mask expression.",
         "The retained integer small-positive power-of-two predicate uses uint32 bit arithmetic; uint_set cardinality uses Go's 32-bit popcount over each source word. Other helper consumers in unported packages are not credited.",
-        "AST get_some_value temporarily replaces its borrowed callback pointer and restores the previous pointer on normal, nested, and failed returns. The concrete Go defer substitutes the source flet<some_value_proc*> destructor."
+        "AST get_some_value temporarily replaces its borrowed callback pointer and restores the previous pointer on normal, nested, and failed returns. The concrete Go defer substitutes the source flet<some_value_proc*> destructor.",
+        "SAT find_mutexes replaces default_eq<literal_pair> and the source hashtable with map[[2]uint32]struct{} keyed by both ordered literal indices. Its per-invocation frame owns the map; no standalone C++ equality functor or hash-table storage is reproduced."
       ],
       "deviations": [
         "Standard io.Writer and strings.Builder replace source ostream and custom buffer machinery. Quote, null, trim and indentation bytes are preserved; String refuses outputs above its explicit safe allocation bound. C++ ostream badbit, exception flags, and formatting state are standard-library internals rather than project escaped behavior and are excluded; Go Write reports io.Writer errors.",
