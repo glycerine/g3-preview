@@ -293,10 +293,16 @@ func (f *FunctionInterpretation) Close() error {
 		f.drain++
 	}
 	for _, h := range []*ast.ASTHandle{&f.fallback, &f.cached} {
-		if e := f.manager.DecRef(*h); e != nil {
+		consumed, e := f.manager.DecRefConsumed(*h)
+		if consumed {
+			*h = ast.ASTHandle{}
+		}
+		if e != nil {
 			return e
 		}
-		*h = ast.ASTHandle{}
+		if !consumed {
+			return ast.ErrASTPending
+		}
 	}
 	f.entries = nil
 	if f.pending != nil {
@@ -312,10 +318,16 @@ func (f *FunctionInterpretation) Close() error {
 		f.substitution = nil
 	}
 	if !f.replacement.IsNull() {
-		if e := f.manager.DecRef(f.replacement); e != nil {
+		consumed, e := f.manager.DecRefConsumed(f.replacement)
+		if consumed {
+			f.replacement = ast.ASTHandle{}
+		}
+		if e != nil {
 			return e
 		}
-		f.replacement = ast.ASTHandle{}
+		if !consumed {
+			return ast.ErrASTPending
+		}
 	}
 	f.manager.Budget().Release(f.bytes)
 	f.bytes = 0

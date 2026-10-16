@@ -141,22 +141,42 @@ func (f *FunctionEntry) close() error {
 		return nil
 	}
 	for f.drain < f.ownedArgs {
-		if e := f.manager.DecRef(f.args[f.drain]); e != nil {
+		consumed, e := f.manager.DecRefConsumed(f.args[f.drain])
+		if consumed {
+			f.args[f.drain] = ast.ASTHandle{}
+			f.drain++
+		}
+		if e != nil {
 			return e
 		}
-		f.drain++
+		if !consumed {
+			return ast.ErrASTPending
+		}
 	}
 	if f.resultOwned {
-		if e := f.manager.DecRef(f.result); e != nil {
+		consumed, e := f.manager.DecRefConsumed(f.result)
+		if consumed {
+			f.resultOwned = false
+			f.result = ast.ASTHandle{}
+		}
+		if e != nil {
 			return e
 		}
-		f.resultOwned = false
+		if !consumed {
+			return ast.ErrASTPending
+		}
 	}
 	if !f.replacement.IsNull() {
-		if e := f.manager.DecRef(f.replacement); e != nil {
+		consumed, e := f.manager.DecRefConsumed(f.replacement)
+		if consumed {
+			f.replacement = ast.ASTHandle{}
+		}
+		if e != nil {
 			return e
 		}
-		f.replacement = ast.ASTHandle{}
+		if !consumed {
+			return ast.ErrASTPending
+		}
 	}
 	f.manager.Budget().Release(f.bytes)
 	f.bytes = 0
