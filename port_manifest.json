@@ -23709,6 +23709,12 @@
           ]
         },
         {
+          "name": "mk_bv_udiv_core configured inverse-attempt TRACE before modular inverse (bv_rewriter.cpp:1075)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_udiv_trace.go",
+          "tests": ["TestBVRewriterUnsignedDivisionToMultiplySourceTrace"]
+        },
+        {
           "name": "mk_bv_udiv_core entry hi_div0 TRACE before is_numeral, with source Boolean text and enabled/erased build gates (bv_rewriter.cpp:1038)",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_udiv_trace.go",
@@ -182917,6 +182923,12 @@
           "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
         },
         {
+          "name": "Retained BV unsigned-division configured inverse-attempt TRACE at bv_rewriter.cpp:1075",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_udiv_trace.go",
+          "tests": ["TestBVRewriterUnsignedDivisionToMultiplySourceTrace"]
+        },
+        {
           "name": "Retained func_interp::set_else ITE-entry TRACE before each graph insertion (func_interp.cpp:146)",
           "status": "ported",
           "go_target": "pkg/model/function_interpretation_else_trace.go",
@@ -185030,6 +185042,12 @@
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
           "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
+        },
+        {
+          "name": "Retained BV unsigned-division configured inverse-attempt TRACE at bv_rewriter.cpp:1075",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_udiv_trace.go",
+          "tests": ["TestBVRewriterUnsignedDivisionToMultiplySourceTrace"]
         },
         {
           "name": "Retained func_interp::set_else ITE-entry TRACE before each graph insertion (func_interp.cpp:146)",

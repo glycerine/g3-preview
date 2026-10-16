@@ -109,6 +109,7 @@ func (p *BVRewriter) rewriteUnsignedDivision(lhs, rhs ast.ASTHandle, out ast.AST
 						st = Rewrite1
 					} else {
 						if p.polynomial.config.bitVector.UnsignedDivisionToMultiply {
+							p.traceUnsignedDivisionToMultiply()
 							invertible, e := n.Inverse(width)
 							if e != nil {
 								return st, e

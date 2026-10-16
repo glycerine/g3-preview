@@ -1,4 +1,4 @@
-// Source: src/ast/rewriter/bv_rewriter.cpp:1038; src/util/trace.h.
+// Source: src/ast/rewriter/bv_rewriter.cpp:1038,1075; src/util/trace.h.
 package rewriter
 
 import (
@@ -29,4 +29,15 @@ func (p *BVRewriter) traceUnsignedDivisionEntry(hiDiv0 bool) {
 	}
 	// std::ofstream failures set stream state and do not change the rewrite.
 	_ = tags.Emit("bv_udiv", "mk_bv_udiv_core", "src/ast/rewriter/bv_rewriter.cpp", 1038, body)
+}
+
+func (p *BVRewriter) traceUnsignedDivisionToMultiply() {
+	tags := p.trace
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	if !tags.ShouldTrace("udiv2mul") {
+		return
+	}
+	_ = tags.Emit("udiv2mul", "mk_bv_udiv_core", "src/ast/rewriter/bv_rewriter.cpp", 1075, "using udiv2mul\n")
 }
