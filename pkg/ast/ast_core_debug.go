@@ -30,7 +30,7 @@ func (m *ASTManager) registrationBefore(r astNodeRef) (bool, error) {
 				if e := m.traceNondeterminismCollision(curr, r); e != nil {
 					return false, e
 				}
-				return false, ErrASTDomain
+				return false, diagnostic.DebugAssertionFailure(debug, "src/ast/ast.cpp", 1671, "contains || slow_not_contains(n)")
 			}
 			if m.nodeAt(curr.slot).kind == ASTApp && m.nodeAt(r.slot).kind == ASTApp {
 				a, b := m.appAt(curr.slot), m.appAt(r.slot)

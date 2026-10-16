@@ -121810,8 +121810,8 @@
           "tests": []
         },
         {
-          "name": "Retained AST nondet_bug CASSERT process assertion/tag gate and structural scan before interning; assertion notification/action continuation remains open (ast.cpp:1669-1672)",
-          "status": "partial",
+          "name": "Retained AST nondet_bug CASSERT process assertion/tag gate, structural scan, notification and C/T debugger continuation before interning (ast.cpp:1669-1672)",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_debug.go",
           "tests": ["TestASTNondeterminismTraceFollowsProcessDebugTag"]
         },
@@ -122146,8 +122146,8 @@
           "tests": []
         },
         {
-          "name": "Retained AST nondet_bug CASSERT process assertion/tag gate and structural scan before interning; assertion notification/action continuation remains open (ast.cpp:1669-1672)",
-          "status": "partial",
+          "name": "Retained AST nondet_bug CASSERT process assertion/tag gate, structural scan, notification and C/T debugger continuation before interning (ast.cpp:1669-1672)",
+          "status": "ported",
           "go_target": "pkg/ast/ast_core_debug.go",
           "tests": ["TestASTNondeterminismTraceFollowsProcessDebugTag"]
         },

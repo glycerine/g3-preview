@@ -4,10 +4,13 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"os"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestASTNondeterminismTraceFollowsProcessDebugTag(t *testing.T) {
@@ -20,11 +23,32 @@ func TestASTNondeterminismTraceFollowsProcessDebugTag(t *testing.T) {
 	astTestMust(t, err)
 	debug, err := diagnostic.NewDebugContext(region, budget)
 	astTestMust(t, err)
+	inputFile, err := os.CreateTemp(t.TempDir(), "nondet-input-*")
+	astTestMust(t, err)
+	_, err = inputFile.WriteString("CCT")
+	astTestMust(t, err)
+	_, err = inputFile.Seek(0, 0)
+	astTestMust(t, err)
+	outputFile, err := os.CreateTemp(t.TempDir(), "nondet-output-*")
+	astTestMust(t, err)
+	streams, err := diagnostic.NewMemoryStandardStreams(diagnostic.MemoryStandardStreamsConfig{Budget: budget, Stdout: outputFile, Stderr: outputFile})
+	astTestMust(t, err)
+	input, err := diagnostic.NewDebuggerCharInput(streams, inputFile)
+	astTestMust(t, err)
+	action, err := diagnostic.NewDebugActionContext(diagnostic.DebugActionConfig{Budget: budget, Streams: streams, Input: input})
+	astTestMust(t, err)
+	astTestMust(t, debug.BindAssertionStreams(streams))
+	astTestMust(t, debug.BindAssertionActions(action))
 	previous, err := diagnostic.BindProcessDebugContext(debug)
 	astTestMust(t, err)
 	t.Cleanup(func() {
 		_, e := diagnostic.BindProcessDebugContext(previous)
 		astTestMust(t, e)
+		astTestMust(t, action.Close())
+		astTestMust(t, input.Close())
+		astTestMust(t, streams.Close())
+		astTestMust(t, inputFile.Close())
+		astTestMust(t, outputFile.Close())
 		astTestMust(t, debug.Close())
 		astTestMust(t, region.Close())
 	})
@@ -65,7 +89,7 @@ func TestASTNondeterminismTraceFollowsProcessDebugTag(t *testing.T) {
 		t.Errorf("disabled debug tag: %v, output %q", err, output.String())
 	}
 	astTestMust(t, debug.EnableDebug("nondet_bug"))
-	if err = check(); ASTSourceDebug && !errors.Is(err, ErrASTDomain) || !ASTSourceDebug && err != nil {
+	if err = check(); err != nil {
 		t.Errorf("enabled assertion without TRACE: %v", err)
 	}
 	if output.Len() != 0 {
@@ -78,7 +102,7 @@ func TestASTNondeterminismTraceFollowsProcessDebugTag(t *testing.T) {
 	}
 	astTestMust(t, debug.EnableAssertions(true))
 	err = check()
-	if ASTSourceDebug && !errors.Is(err, ErrASTDomain) || !ASTSourceDebug && err != nil {
+	if err != nil {
 		t.Errorf("conditional debug scan: %v", err)
 	}
 	if ASTSourceDebug && tags.ShouldTrace("nondet_bug") {
@@ -90,5 +114,26 @@ func TestASTNondeterminismTraceFollowsProcessDebugTag(t *testing.T) {
 		}
 	} else if output.Len() != 0 {
 		t.Errorf("erased nondeterminism trace wrote %q", output.String())
+	}
+	if ASTSourceDebug {
+		var ex z3exception.DefaultException
+		if err = check(); !errors.As(err, &ex) {
+			t.Errorf("T action did not transport source exception: %v", err)
+		}
+		if tags.ShouldTrace("nondet_bug") && strings.Count(output.String(), "[nondet_bug] slow_not_contains") != 2 {
+			t.Errorf("C and T actions did not both follow source TRACE: %q", output.String())
+		}
+		state, e := input.State()
+		astTestMust(t, e)
+		if state.Position != 3 {
+			t.Errorf("debug action input position: %d", state.Position)
+		}
+		contents, e := os.ReadFile(outputFile.Name())
+		astTestMust(t, e)
+		want := "ASSERTION VIOLATION\nFile: src/ast/ast.cpp\nLine: 1671\ncontains || slow_not_contains(n)\n" +
+			"(C)ontinue, (A)bort, (S)top, (T)hrow exception, Invoke (G)DB\n"
+		if got := string(contents); got != strings.Repeat(want, 3) {
+			t.Errorf("source assertion notifications/actions: got %q, want %q", got, strings.Repeat(want, 3))
+		}
 	}
 }
