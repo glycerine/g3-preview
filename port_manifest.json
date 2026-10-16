@@ -75683,10 +75683,10 @@
           "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
         },
         {
-          "name": "Selected eliminated-watch sat_bug CTRACE before SASSERT, source-ordered literal/watch/full-solver display prefixes (cpp162-167); nonempty solver profiles remain open",
-          "status": "partial",
+          "name": "Eliminated-watch sat_bug CTRACE before SASSERT, source-ordered literal/watch/full-solver display with nonempty learned clause and formatter refusal prefixes (cpp162-167)",
+          "status": "ported",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
-          "tests": ["TestSATIntegrityEliminatedWatchSourceTrace"]
+          "tests": ["TestSATIntegrityEliminatedWatchSourceTrace", "TestSATIntegrityEliminatedWatchTraceWithLiveSolverClause", "TestSATSolverInspectionExactSourceDisplays"]
         },
         {
           "name": "Selected reinit-stack SASSERT205 and operator SASSERT231-236 process gate, per-site C/T action through cleaner_bug; other nested checker methods remain partial",
@@ -75821,10 +75821,10 @@
           "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
         },
         {
-          "name": "Selected eliminated-watch sat_bug CTRACE before SASSERT, source-ordered literal/watch/full-solver display prefixes (cpp162-167); nonempty solver profiles remain open",
-          "status": "partial",
+          "name": "Eliminated-watch sat_bug CTRACE before SASSERT, source-ordered literal/watch/full-solver display with nonempty learned clause and formatter refusal prefixes (cpp162-167)",
+          "status": "ported",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
-          "tests": ["TestSATIntegrityEliminatedWatchSourceTrace"]
+          "tests": ["TestSATIntegrityEliminatedWatchSourceTrace", "TestSATIntegrityEliminatedWatchTraceWithLiveSolverClause", "TestSATSolverInspectionExactSourceDisplays"]
         },
         {
           "name": "Selected reinit-stack SASSERT205 and operator SASSERT231-236 process gate, per-site C/T action through cleaner_bug; other nested checker methods remain partial",
@@ -183723,10 +183723,10 @@
           "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
         },
         {
-          "name": "Retained SAT checker eliminated-watch sat_bug CTRACE with source-ordered literal/watch/full-solver display prefixes (sat_integrity_checker.cpp:162); nonempty solver profiles remain open",
-          "status": "partial",
+          "name": "Retained SAT checker eliminated-watch sat_bug CTRACE with source-ordered literal/watch/full-solver display, nonempty learned clause and formatter refusal prefixes (sat_integrity_checker.cpp:162)",
+          "status": "ported",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
-          "tests": ["TestSATIntegrityEliminatedWatchSourceTrace"]
+          "tests": ["TestSATIntegrityEliminatedWatchSourceTrace", "TestSATIntegrityEliminatedWatchTraceWithLiveSolverClause", "TestSATSolverInspectionExactSourceDisplays"]
         },
         {
           "name": "Retained SAT integrity-checker repeated-clause TRACE before false disjoint result (sat_integrity_checker.cpp:221)",
@@ -186057,10 +186057,10 @@
           "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
         },
         {
-          "name": "Retained SAT checker eliminated-watch sat_bug CTRACE with source-ordered literal/watch/full-solver display prefixes (sat_integrity_checker.cpp:162); nonempty solver profiles remain open",
-          "status": "partial",
+          "name": "Retained SAT checker eliminated-watch sat_bug CTRACE with source-ordered literal/watch/full-solver display, nonempty learned clause and formatter refusal prefixes (sat_integrity_checker.cpp:162)",
+          "status": "ported",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
-          "tests": ["TestSATIntegrityEliminatedWatchSourceTrace"]
+          "tests": ["TestSATIntegrityEliminatedWatchSourceTrace", "TestSATIntegrityEliminatedWatchTraceWithLiveSolverClause", "TestSATSolverInspectionExactSourceDisplays"]
         },
         {
           "name": "Retained SAT integrity-checker repeated-clause TRACE before false disjoint result (sat_integrity_checker.cpp:221)",

@@ -111,3 +111,41 @@ func TestSATIntegrityEliminatedWatchSourceTrace(t *testing.T) {
 		}
 	}
 }
+
+func TestSATIntegrityEliminatedWatchTraceWithLiveSolverClause(t *testing.T) {
+	s, _, _ := satSolverCheckFixture(t)
+	for i := 0; i < 3; i++ {
+		_, err := s.MkVar(false, true)
+		satOK(t, err)
+	}
+	satCleanerClause(t, s.Lifecycle, []Literal{0, 2, 4}, true, true)
+	list, err := s.Variables.watches.Get(0)
+	satOK(t, err)
+	watch, err := newSATExternalWatch(3)
+	satOK(t, err)
+	satOK(t, list.Push(watch))
+	s.Variables.eliminated[0] = true
+	defer func() {
+		s.Variables.eliminated[0] = false
+		satOK(t, list.SetEnd(0))
+	}()
+	debug, _, _ := satIntegrityActionFixture(t, "")
+	satOK(t, debug.EnableAssertions(false))
+	checker, err := newSATIntegrityChecker(s.Lifecycle, s.gc)
+	satOK(t, err)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	s.Lifecycle.traceTags = tags
+	tags.Enable("sat_bug")
+	yes, err := checker.checkWatches()
+	satOK(t, err)
+	want := ""
+	if tags.ShouldTrace("sat_bug") && satStorageSourceDebug {
+		want = "-------- [sat_bug] check_watches src/sat/sat_integrity_checker.cpp:162 ---------\n" +
+			"l: -0\n0: 3\n-0: \n1: \n-1: \n2: \n-2: \n(sat\n(0 1 2)+*\n)\n" +
+			"------------------------------------------------\n"
+	}
+	if !yes || output.String() != want {
+		t.Fatalf("nonempty solver display in eliminated-watch trace: result=%v, got %q, want %q", yes, output.String(), want)
+	}
+}
