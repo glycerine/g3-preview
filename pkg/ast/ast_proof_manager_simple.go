@@ -317,9 +317,10 @@ func (m *ASTManager) MkProofModusPonens(p, q ASTHandle) (ASTHandle, error) {
 	if p.IsNull() || q.IsNull() {
 		return ASTHandle{}, nil
 	}
+	traceEnabled := m.proofModusPonensTraceEnabled()
 	var f, g ASTHandle
 	var e error
-	if ASTSourceDebug || m.proofModusPonensTraceEnabled() {
+	if ASTSourceDebug || traceEnabled {
 		f, e = m.proofFact(p)
 		if e != nil {
 			return ASTHandle{}, e
@@ -329,7 +330,7 @@ func (m *ASTManager) MkProofModusPonens(p, q ASTHandle) (ASTHandle, error) {
 			return ASTHandle{}, e
 		}
 	}
-	if ASTSourceDebug || m.proofModusPonensTraceEnabled() {
+	if ASTSourceDebug || traceEnabled {
 		valid := false
 		for _, k := range [...]int32{ASTOpImplies, ASTOpIff, ASTOpOEq} {
 			yes, e := m.proofKind(g, k)
@@ -338,7 +339,7 @@ func (m *ASTManager) MkProofModusPonens(p, q ASTHandle) (ASTHandle, error) {
 			}
 			valid = valid || yes
 		}
-		if !valid && m.proofModusPonensTraceEnabled() {
+		if !valid && traceEnabled {
 			if e = m.traceProofModusPonensBadFact(p, q); e != nil {
 				return ASTHandle{}, e
 			}
@@ -347,13 +348,40 @@ func (m *ASTManager) MkProofModusPonens(p, q ASTHandle) (ASTHandle, error) {
 			return ASTHandle{}, ErrASTDomain
 		}
 	}
-	if ASTSourceDebug {
+	if ASTSourceDebug || traceEnabled {
 		a, e := m.proofArg(g, 0)
 		if e != nil {
 			return ASTHandle{}, e
 		}
-		if a != f {
+		if a != f && traceEnabled {
+			m.mu.Unlock()
+			traceErr := m.traceProofModusPonensSMT2(2645, "", f, g)
+			m.mu.Lock()
+			if traceErr != nil {
+				return ASTHandle{}, traceErr
+			}
+		}
+		if ASTSourceDebug && a != f {
 			return ASTHandle{}, ErrASTDomain
+		}
+	}
+	if traceEnabled {
+		for _, site := range [...]struct {
+			proof ASTHandle
+			line  int
+		}{{q, 2648}, {p, 2649}} {
+			nonground, err := m.proofModusPonensNonground(site.proof)
+			if err != nil {
+				return ASTHandle{}, err
+			}
+			if nonground {
+				m.mu.Unlock()
+				traceErr := m.traceProofModusPonensSMT2(site.line, "Non-ground: ", site.proof)
+				m.mu.Lock()
+				if traceErr != nil {
+					return ASTHandle{}, traceErr
+				}
+			}
 		}
 	}
 	if yes, e := m.proofKind(q, ASTPrReflexivity); e != nil {
