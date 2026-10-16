@@ -1636,6 +1636,7 @@
         "linear_equation_debug.go",
         "linear_equation_trace.go",
         "polynomial_builder.go",
+        "polynomial_trace.go",
         "propagate_ineq_clean.go",
         "propagate_ineq_tactic.go"
       ]

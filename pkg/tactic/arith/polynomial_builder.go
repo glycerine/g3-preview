@@ -565,7 +565,13 @@ func (b *PolynomialBuilder) Apply(input *goaltactic.Goal) (_ *goaltactic.Goal, r
 		}
 		return result, result.Assert(falsehood)
 	}
-	return result, b.RestoreBounds(result)
+	if err = b.RestoreBounds(result); err != nil {
+		return result, err
+	}
+	if err = b.traceResultGoal(result); err != nil {
+		return result, err
+	}
+	return result, nil
 }
 
 // LowerSubsumed and UpperSubsumed are the concrete rational-buffer callers in

@@ -101302,7 +101302,8 @@
         "pkg/tactic/arith/propagate_ineq_tactic.go",
         "pkg/tactic/arith/propagate_ineq_tactic_test.go",
         "pkg/tactic/arith/propagate_ineq_clean.go",
-        "pkg/tactic/arith/propagate_ineq_clean_test.go"
+        "pkg/tactic/arith/propagate_ineq_clean_test.go",
+        "pkg/tactic/arith/polynomial_trace.go"
       ],
       "tests": [
         "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer",
@@ -101313,7 +101314,8 @@
         "TestInequalityBuilderPublishesRetainedProgressOnRealGoal",
         "TestPropagateIneqTacticParameterSnapshotCleanupAndGoalReuse",
         "TestPropagateIneqTacticTranslateOwnsIndependentSnapshot",
-        "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild"
+        "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild",
+        "TestInequalityRestoredGoalSourceTrace"
       ],
       "assertions": [
         {
@@ -101401,6 +101403,14 @@
           "go_target": "pkg/tactic/arith/propagate_ineq_clean.go",
           "tests": [
             "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild"
+          ]
+        },
+        {
+          "name": "Restored-result goal TRACE at operator():510 after successful bound restoration",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/polynomial_trace.go",
+          "tests": [
+            "TestInequalityRestoredGoalSourceTrace"
           ]
         }
       ],
@@ -179987,7 +179997,8 @@
         "pkg/ast/ast_well_sorted_trace.go",
         "pkg/ast/ast_core_quantifier_pattern_trace.go",
         "pkg/tactic/arith/bound_trace.go",
-        "pkg/tactic/arith/linear_equation_trace.go"
+        "pkg/tactic/arith/linear_equation_trace.go",
+        "pkg/tactic/arith/polynomial_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -180075,7 +180086,8 @@
         "TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds",
         "TestBoundPropagationTraceVariableAndEquationSourceOrder",
         "TestBoundExactPropagationStepTraceWithEquationBounds",
-        "TestLinearEquationSourceConstructionTrace"
+        "TestLinearEquationSourceConstructionTrace",
+        "TestInequalityRestoredGoalSourceTrace"
       ],
       "conditionals": [
         {
@@ -181550,6 +181562,14 @@
           "tests": [
             "TestLinearEquationSourceConstructionTrace"
           ]
+        },
+        {
+          "name": "Retained propagate_ineqs_tactic restored-result TRACE with source header and exact goal display",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/polynomial_trace.go",
+          "tests": [
+            "TestInequalityRestoredGoalSourceTrace"
+          ]
         }
       ],
       "ownership": [
@@ -181640,7 +181660,8 @@
         "pkg/ast/ast_well_sorted_trace.go",
         "pkg/ast/ast_core_quantifier_pattern_trace.go",
         "pkg/tactic/arith/bound_trace.go",
-        "pkg/tactic/arith/linear_equation_trace.go"
+        "pkg/tactic/arith/linear_equation_trace.go",
+        "pkg/tactic/arith/polynomial_trace.go"
       ],
       "tests": [
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -181726,7 +181747,8 @@
         "TestBoundConflictTraceFollowsPublishedConflictAndDisplaysBounds",
         "TestBoundPropagationTraceVariableAndEquationSourceOrder",
         "TestBoundExactPropagationStepTraceWithEquationBounds",
-        "TestLinearEquationSourceConstructionTrace"
+        "TestLinearEquationSourceConstructionTrace",
+        "TestInequalityRestoredGoalSourceTrace"
       ],
       "conditionals": [
         {
@@ -183200,6 +183222,14 @@
           "go_target": "pkg/tactic/arith/linear_equation_trace.go",
           "tests": [
             "TestLinearEquationSourceConstructionTrace"
+          ]
+        },
+        {
+          "name": "Retained propagate_ineqs_tactic restored-result TRACE tag gate and source-order emission",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/polynomial_trace.go",
+          "tests": [
+            "TestInequalityRestoredGoalSourceTrace"
           ]
         }
       ],
