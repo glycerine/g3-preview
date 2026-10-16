@@ -77320,6 +77320,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_blocked_trace.go",
           "tests": ["TestSATSimplifierActualBlockedClauseSourceTraces"]
+        },
+        {
+          "name": "Reached variable-elimination TRACE sites at sat_simplifier.cpp:1296,1302,1315",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
+          "tests": ["TestSATSimplifierActualVariableEliminationSourceTraces"]
         }
       ],
       "ownership": [
@@ -182380,6 +182386,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_blocked_trace.go",
           "tests": ["TestSATSimplifierActualBlockedClauseSourceTraces"]
+        },
+        {
+          "name": "Reached variable-elimination TRACE sites at sat_simplifier.cpp:1296,1302,1315",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
+          "tests": ["TestSATSimplifierActualVariableEliminationSourceTraces"]
         }
       ],
       "ownership": [
@@ -184210,6 +184222,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_blocked_trace.go",
           "tests": ["TestSATSimplifierActualBlockedClauseSourceTraces"]
+        },
+        {
+          "name": "Reached variable-elimination TRACE sites at sat_simplifier.cpp:1296,1302,1315",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_elimination_trace.go",
+          "tests": ["TestSATSimplifierActualVariableEliminationSourceTraces"]
         }
       ],
       "ownership": [

@@ -439,6 +439,7 @@ func (s *satSimplifier) removeEliminatedClauses(u satClauseUseListView, l Litera
 		if e = s.subTodo.Erase(c); e != nil {
 			return e
 		}
+		s.traceEliminatedClause(c)
 		s.needCleanup = true
 	}
 	return nil
@@ -470,6 +471,7 @@ func (s *satSimplifier) occurrenceLiteralCount(u satClauseUseListView) (n uint32
 	return n, nil
 }
 func (s *satSimplifier) tryEliminate(v BoolVar) (bool, error) {
+	s.traceEliminationProcessing(v)
 	p := s.lifecycle.propagation
 	pos := Literal(uint32(v) * 2)
 	neg := pos.Negated()
@@ -506,6 +508,7 @@ func (s *satSimplifier) tryEliminate(v BoolVar) (bool, error) {
 	}
 	np += bp
 	nn += bn
+	s.traceEliminationOccurrences(v, np, nn)
 	if np >= s.occCutoff && nn >= s.occCutoff {
 		return false, nil
 	}
