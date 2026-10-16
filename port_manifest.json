@@ -101790,6 +101790,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Concrete linear_equation::del coefficient-order release with stopped Go numeral cleanup continuation (linear_equation.cpp:273-280)",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/linear_equation.go",
+          "tests": ["TestLinearEquationCloseResumesAfterStoppedCoefficientRelease"]
+        },
+        {
           "name": "concrete integer and rational equation constructors, exact duplicate coalescing, denominator clearing, sorting, gcd normalization and owned coefficient copy",
           "status": "ported",
           "go_target": "pkg/tactic/arith/linear_equation.go",
@@ -101901,6 +101907,12 @@
       "methods_audited": false,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Concrete owned linear_equation coefficient release and stopped Go cleanup continuation (linear_equation.cpp:273-280)",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/linear_equation.go",
+          "tests": ["TestLinearEquationCloseResumesAfterStoppedCoefficientRelease"]
+        },
         {
           "name": "concrete integer and rational equation constructors, exact duplicate coalescing, denominator clearing, sorting, gcd normalization and owned coefficient copy",
           "status": "ported",
@@ -167724,6 +167736,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained linear_equation::del consumer of mpz_manager::del, source-order coefficient release and stopped Go cleanup continuation (mpz.h:340-347; linear_equation.cpp:273-280)",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/linear_equation.go",
+          "tests": ["TestLinearEquationCloseResumesAfterStoppedCoefficientRelease"]
+        },
         {
           "name": "integer-owned Runtime explicitly joins the source process shared with rational parameter and environment consumers",
           "status": "ported",

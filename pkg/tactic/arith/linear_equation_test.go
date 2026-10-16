@@ -2,6 +2,7 @@ package arith
 
 import (
 	"bytes"
+	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -34,6 +35,42 @@ func equationManager(t *testing.T) (*numeral.RationalManager, *LinearEquationMan
 		}
 	})
 	return m, l
+}
+
+func TestLinearEquationCloseResumesAfterStoppedCoefficientRelease(t *testing.T) {
+	m, l := equationManager(t)
+	z := m.Integers()
+	as := []numeral.Int{numeral.NewInt(0), numeral.NewInt(0)}
+	for i, value := range []string{
+		"12345678901234567890123456789012345678901",
+		"12345678901234567890123456789012345678902",
+	} {
+		equationMust(t, z.SetString(&as[i], value))
+	}
+	defer func() {
+		for i := range as {
+			equationMust(t, z.Del(&as[i]))
+		}
+	}()
+	eq, err := l.MkInt(as, []uint32{1, 2}, true)
+	equationMust(t, err)
+	if eq.as[0].Cell == 0 || eq.as[1].Cell == 0 {
+		t.Fatal("fixture did not retain two physical coefficient cells")
+	}
+	second := eq.as[1].Cell
+	eq.as[1].Cell = ^numeral.NumericCellRef(0)
+	if err = eq.Close(); !errors.Is(err, arena.ErrInvalidSlot) {
+		t.Fatalf("stopped second coefficient release: %v", err)
+	}
+	if eq.closeIndex != 1 || eq.as[0].Cell != 0 || eq.closed {
+		t.Fatal("completed first coefficient was not retained as cleanup prefix")
+	}
+	eq.as[1].Cell = second
+	eq.as[0].Cell = ^numeral.NumericCellRef(0)
+	equationMust(t, eq.Close())
+	if !eq.closed {
+		t.Fatal("equation did not close after continuing at second coefficient")
+	}
 }
 
 func equationMust(t *testing.T, err error) {

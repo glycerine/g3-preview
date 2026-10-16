@@ -18,11 +18,12 @@ const noEquationPosition = ^uint32(0)
 // LinearEquation owns its exact integer coefficients and borrows its manager.
 // Variable IDs and approximate coefficients use native Go slices.
 type LinearEquation struct {
-	manager *numeral.RationalManager
-	as      []numeral.Int
-	approx  []float64
-	xs      []uint32
-	closed  bool
+	manager    *numeral.RationalManager
+	as         []numeral.Int
+	approx     []float64
+	xs         []uint32
+	closeIndex int
+	closed     bool
 }
 
 func (e *LinearEquation) Size() uint32 {
@@ -80,10 +81,11 @@ func (e *LinearEquation) Close() error {
 		return nil
 	}
 	z := e.manager.Integers()
-	for i := range e.as {
-		if err := z.Del(&e.as[i]); err != nil {
+	for e.closeIndex < len(e.as) {
+		if err := z.Del(&e.as[e.closeIndex]); err != nil {
 			return err
 		}
+		e.closeIndex++
 	}
 	e.as, e.approx, e.xs = nil, nil, nil
 	e.closed = true
