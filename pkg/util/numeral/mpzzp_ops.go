@@ -3,6 +3,18 @@ package numeral
 
 import "github.com/glycerine/g3/pkg/util/diagnostic"
 
+func (m *IntegerModularManager) sourceAssertFinite(line int32) error {
+	if !diagnostic.DebugBuild {
+		return nil
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil || !enabled || !m.z {
+		return e
+	}
+	return diagnostic.DebugAssertionFailure(d, "src/util/mpzzp.h", line, "!m_z")
+}
+
 // These sites share the same predicate, but retain their distinct source
 // locations and the left-before-right short circuit of binary assertions.
 func (m *IntegerModularManager) sourceAssertNormalized(a *Int, line int32) error {

@@ -22,8 +22,8 @@ func (m *IntegerModularManager) setPSquareWithAllocationContext(context integerA
 	if e := m.check(); e != nil {
 		return e
 	}
-	if modularSourceDebug && m.z {
-		return ErrModularAssertion
+	if e := m.sourceAssertFinite(125); e != nil {
+		return e
 	}
 	m.prime = false
 	m.primeKnown = true

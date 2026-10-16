@@ -502,12 +502,8 @@ func TestIntegerModularPredictableFailurePrefixes(t *testing.T) {
 }
 func TestIntegerModularReleaseSetupPreconditions(t *testing.T) {
 	m, z, _ := modularManager(t, 0)
-	e := m.SetZPUint64(1)
-	if modularSourceDebug {
-		if !errors.Is(e, ErrModularAssertion) {
-			t.Fatal(e)
-		}
-	} else {
+	if !modularSourceDebug {
+		e := m.SetZPUint64(1)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -516,28 +512,16 @@ func TestIntegerModularReleaseSetupPreconditions(t *testing.T) {
 			t.Fatal(e)
 		}
 		modularValue(t, z, &a, 0)
-	}
-	m.SetZ()
-	p := NewInt(7)
-	e = m.SetZPSwap(&p)
-	if modularSourceDebug {
-		if !errors.Is(e, ErrModularAssertion) {
-			t.Fatal(e)
-		}
-	} else {
+		m.SetZ()
+		p := NewInt(7)
+		e = m.SetZPSwap(&p)
 		if e != nil {
 			t.Fatal(e)
 		}
 		modularValue(t, z, &m.P, 7)
 		modularValue(t, z, &p, 1)
-	}
-	m.SetZ()
-	e = m.SetPSquare()
-	if modularSourceDebug {
-		if !errors.Is(e, ErrModularAssertion) {
-			t.Fatal(e)
-		}
-	} else {
+		m.SetZ()
+		e = m.SetPSquare()
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -557,12 +541,8 @@ func TestIntegerModularFiniteSourceQuirks(t *testing.T) {
 	}
 	modularValue(t, z, &a, 0) // delegated source output/input alias
 	p := NewInt(-7)
-	e := m.SetZP(&p)
-	if modularSourceDebug {
-		if !errors.Is(e, ErrModularAssertion) {
-			t.Fatal(e)
-		}
-	} else {
+	if !modularSourceDebug {
+		e := m.SetZP(&p)
 		if e != nil {
 			t.Fatal(e)
 		}
@@ -574,7 +554,7 @@ func TestIntegerModularFiniteSourceQuirks(t *testing.T) {
 		}
 		modularValue(t, z, &a, -13)
 	}
-	if e = m.SetZPUint64(7); e != nil {
+	if e := m.SetZPUint64(7); e != nil {
 		t.Fatal(e)
 	}
 	a = NewInt(0)

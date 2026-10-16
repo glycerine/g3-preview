@@ -169621,6 +169621,34 @@
           ]
         },
         {
+          "name": "mpzzp setup_p positive/non-unit modulus SASSERT at mpzzp.h:47, short-circuiting before evenness and centered-bound publication",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp.go",
+          "tests": [
+            "TestIntegerModularScalarSourceAssertionActions",
+            "TestIntegerModularReleaseSetupPreconditions",
+            "TestIntegerModularFiniteSourceQuirks"
+          ]
+        },
+        {
+          "name": "mpzzp set_p_sq Z-mode SASSERT at mpzzp.h:125 before prime-flag and modulus mutation",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp_context_ops.go",
+          "tests": [
+            "TestIntegerModularScalarSourceAssertionActions",
+            "TestIntegerModularReleaseSetupPreconditions"
+          ]
+        },
+        {
+          "name": "mpzzp set_zp_swap Z-mode SASSERT at mpzzp.h:126 before modulus exchange",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp.go",
+          "tests": [
+            "TestIntegerModularScalarSourceAssertionActions",
+            "TestIntegerModularReleaseSetupPreconditions"
+          ]
+        },
+        {
           "name": "Remaining scalar arithmetic/fused/sets/const-mutable conversion/bit/log/root/formatting overloads beyond separately ported source assertions",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpzzp_ops.go",

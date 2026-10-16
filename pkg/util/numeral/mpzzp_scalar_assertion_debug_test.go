@@ -25,7 +25,7 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 	serviceMust(t, e)
 	in, e := os.CreateTemp(t.TempDir(), "mpzzp-assert-input-*")
 	serviceMust(t, e)
-	_, e = in.WriteString(strings.Repeat("CT", 12) + "TCCCTCTTTTCTTTC")
+	_, e = in.WriteString(strings.Repeat("CT", 12) + "TCCCTCTTTTCTTTCTTCTCTC")
 	serviceMust(t, e)
 	_, e = in.Seek(0, 0)
 	serviceMust(t, e)
@@ -175,6 +175,35 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 		t.Fatal("nonprime Div Continue must reach inversion and multiplication", e)
 	}
 	modularValue(t, z, &outValue, 1)
+	negativeModulus := NewInt(-7)
+	if e := m.SetZP(&negativeModulus); !errors.As(e, &thrown) || m.P.Val != -7 || m.Upper.Val != 18 {
+		t.Fatal("negative setup Throw must stop before bounds", m.P, m.Upper, e)
+	}
+	if e := m.SetZPUint64(1); !errors.As(e, &thrown) || m.P.Val != 1 || m.Upper.Val != 18 {
+		t.Fatal("setup Throw must follow modulus publication but precede bounds", m.P, m.Upper, e)
+	}
+	serviceMust(t, m.SetZPUint64(1))
+	if m.Upper.Val != 0 || m.Lower.Val != 0 {
+		t.Fatal("setup Continue must reach centered bounds", m.Lower, m.Upper)
+	}
+	serviceMust(t, m.SetZPUint64(7))
+	serviceMust(t, m.SetZ())
+	if e := m.SetPSquare(); !errors.As(e, &thrown) || m.P.Val != 7 || !m.prime {
+		t.Fatal("SetPSquare Throw must precede flag and modulus mutation", m.P, m.prime, e)
+	}
+	serviceMust(t, m.SetPSquare())
+	if m.P.Val != 49 || m.prime || !m.z {
+		t.Fatal("SetPSquare Continue must retain source Z-mode state", m.P, m.prime, m.z)
+	}
+	nextModulus := NewInt(11)
+	if e := m.SetZPSwap(&nextModulus); !errors.As(e, &thrown) || m.P.Val != 49 || nextModulus.Val != 11 {
+		t.Fatal("SetZPSwap Throw must precede swap", m.P, nextModulus, e)
+	}
+	serviceMust(t, m.SetZPSwap(&nextModulus))
+	if m.P.Val != 11 || nextModulus.Val != 49 || !m.z {
+		t.Fatal("SetZPSwap Continue must keep source mode and swap values", m.P, nextModulus, m.z)
+	}
+	serviceMust(t, m.SetZPUint64(6))
 	serviceMust(t, d.EnableAssertions(false))
 	if got, e := m.String(&a); e != nil || got != "8" {
 		t.Fatal("disabled source assertion must leave numeral readable", got, e)
@@ -236,9 +265,14 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 	if strings.Count(string(data), "Line: 200\nm_p_prime\n") != 2 {
 		t.Fatal("missing prime-flag source assertion records", string(data))
 	}
+	if strings.Count(string(data), "Line: 47\nm().is_pos(m_p) && !m().is_one(m_p)\n") != 3 ||
+		strings.Count(string(data), "Line: 125\n!m_z\n") != 2 ||
+		strings.Count(string(data), "Line: 126\n!m_z\n") != 2 {
+		t.Fatal("missing setup/mode source assertion records", string(data))
+	}
 	state, e := input.State()
 	serviceMust(t, e)
-	if state.Position != 39 {
+	if state.Position != 46 {
 		t.Fatal("disabled assertion consumed an action", state.Position)
 	}
 }

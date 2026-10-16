@@ -170,22 +170,32 @@ func (m *IntegerModularManager) setupP() error {
 }
 func (m *IntegerModularManager) setupPWithAllocationContext(context integerAllocationInvocationContext) error {
 	z := m.manager
-	if modularSourceDebug {
-		pos, e := z.IsPos(&m.P)
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return e
 		}
-		if !pos {
-			return ErrModularAssertion
+		if enabled {
+			pos, e := z.IsPos(&m.P)
+			if e != nil {
+				return e
+			}
+			valid := pos
+			if pos {
+				one, e := z.IsOne(&m.P)
+				if e != nil {
+					return e
+				}
+				valid = !one
+			}
+			if !valid {
+				if e := diagnostic.DebugAssertionFailure(d, "src/util/mpzzp.h", 47, "m().is_pos(m_p) && !m().is_one(m_p)"); e != nil {
+					return e
+				}
+			}
 		}
-		one, e := z.IsOne(&m.P)
-		if e != nil {
-			return e
-		}
-		if one {
-			return ErrModularAssertion
-		}
-	} // source invalid modulus precondition
+	}
 	even, e := z.IsEven(&m.P)
 	if e != nil {
 		return e
@@ -249,8 +259,8 @@ func (m *IntegerModularManager) SetZPSwap(p *Int) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if modularSourceDebug && m.z {
-		return ErrModularAssertion
+	if e := m.sourceAssertFinite(126); e != nil {
+		return e
 	}
 	if e := m.manager.Swap(&m.P, p); e != nil {
 		return e
