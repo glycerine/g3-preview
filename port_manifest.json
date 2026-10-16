@@ -57239,6 +57239,7 @@
         "pkg/model/model_evaluator_function_memory_trace_debug_test.go"
       ],
       "tests": [
+        "TestModelEvaluatorDirectEntrySourceTrace",
         "TestModelEvaluatorGetMacroSourceTraceBranches",
         "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose",
         "TestModelEvaluatorImpMemoryTraceFailedConstructionOwnedClose",
@@ -57306,6 +57307,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Reached model_evaluator::reduce_app direct function-entry TRACE at model_evaluator.cpp:187-191, with evaluated SMT2 arguments and result",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "tests": ["TestModelEvaluatorDirectEntrySourceTrace"]
+        },
         {
           "name": "Reached model_evaluator::operator()(expr*, expr_ref&) entry TRACE at model_evaluator.cpp:566, with source SMT2 term before traversal",
           "status": "ported",
@@ -180865,6 +180872,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestModelEvaluatorDirectEntrySourceTrace",
         "TestPatternCollectInfoSourceSMT2Trace",
         "TestPatternCollectSharedChildSourceStackTrace",
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -180985,6 +180993,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached model_evaluator::reduce_app direct function-entry TRACE at model_evaluator.cpp:187-191, with evaluated SMT2 arguments and result",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "tests": ["TestModelEvaluatorDirectEntrySourceTrace"]
+        },
         {
           "name": "Reached model_evaluator::operator()(expr*, expr_ref&) entry TRACE at model_evaluator.cpp:566, with source SMT2 term before traversal",
           "status": "ported",
@@ -182842,6 +182856,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestModelEvaluatorDirectEntrySourceTrace",
         "TestPatternCollectInfoSourceSMT2Trace",
         "TestPatternCollectSharedChildSourceStackTrace",
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -182972,6 +182987,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached model_evaluator::reduce_app direct function-entry TRACE at model_evaluator.cpp:187-191, with evaluated SMT2 arguments and result",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "tests": ["TestModelEvaluatorDirectEntrySourceTrace"]
+        },
         {
           "name": "Reached model_evaluator::operator()(expr*, expr_ref&) entry TRACE at model_evaluator.cpp:566, with source SMT2 term before traversal",
           "status": "ported",

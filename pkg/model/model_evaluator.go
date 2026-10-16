@@ -488,6 +488,9 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 		return rewriter.RewriteFailed, e
 	}
 	if found {
+		if e = c.traceReduceApp(d, args, out); e != nil {
+			return rewriter.RewriteFailed, e
+		}
 		return rewriter.Rewrite1, nil
 	}
 	return rewriter.RewriteFailed, nil
