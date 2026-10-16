@@ -152055,7 +152055,8 @@
         "pkg/tactic/aig/aig_tactic_memory_trace.go",
         "pkg/tactic/aig/aig_imp_memory_trace.go",
         "pkg/sat/sat_asymm_branch_report.go",
-        "pkg/sat/sat_solver_stat_display.go"
+        "pkg/sat/sat_solver_stat_display.go",
+        "pkg/sat/sat_solver_probing_report.go"
       ],
       "tests": [
         "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
@@ -152169,7 +152170,8 @@
         "TestAIGTacticConstructorFailureMemoryTracePrefixes",
         "TestSATAsymmReportActualReductionAndSourceGates",
         "TestSATAsymmReportSurvivesCanceledSourceCatch",
-        "TestSATReportsReadCompactStatsDuringStoppedContinuation"
+        "TestSATReportsReadCompactStatsDuringStoppedContinuation",
+        "TestSATSolverProbingReportAssignedStoppedAndSourceGates"
       ],
       "conditionals": [
         {
@@ -152809,6 +152811,14 @@
           "tests": [
             "TestSATReportsReadCompactStatsDuringStoppedContinuation"
           ]
+        },
+        {
+          "name": "Retained SAT probing mem_stat process allocation read on complete, stopped, and canceled runs (src/sat/sat_probing.cpp:179-188; src/sat/sat_types.h:289-293)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_probing_report.go",
+          "tests": [
+            "TestSATSolverProbingReportAssignedStoppedAndSourceGates"
+          ]
         }
       ],
       "ownership": [
@@ -152929,7 +152939,8 @@
         "pkg/tactic/aig/aig_tactic_memory_trace.go",
         "pkg/tactic/aig/aig_imp_memory_trace.go",
         "pkg/sat/sat_asymm_branch_report.go",
-        "pkg/sat/sat_solver_stat_display.go"
+        "pkg/sat/sat_solver_stat_display.go",
+        "pkg/sat/sat_solver_probing_report.go"
       ],
       "tests": [
         "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
@@ -153028,7 +153039,8 @@
         "TestAIGTacticConstructorFailureMemoryTracePrefixes",
         "TestSATAsymmReportActualReductionAndSourceGates",
         "TestSATAsymmReportSurvivesCanceledSourceCatch",
-        "TestSATReportsReadCompactStatsDuringStoppedContinuation"
+        "TestSATReportsReadCompactStatsDuringStoppedContinuation",
+        "TestSATSolverProbingReportAssignedStoppedAndSourceGates"
       ],
       "conditionals": [
         {
@@ -153619,6 +153631,14 @@
           "go_target": "pkg/sat/sat_solver_stat_display.go",
           "tests": [
             "TestSATReportsReadCompactStatsDuringStoppedContinuation"
+          ]
+        },
+        {
+          "name": "Retained SAT probing mem_stat process allocation read on complete, stopped, and canceled runs (src/sat/sat_probing.cpp:179-188; src/sat/sat_types.h:289-293)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_probing_report.go",
+          "tests": [
+            "TestSATSolverProbingReportAssignedStoppedAndSourceGates"
           ]
         }
       ],
@@ -184393,7 +184413,8 @@
         "pkg/sat/sat_cleaner_report.go",
         "pkg/sat/sat_scc_report.go",
         "pkg/sat/sat_asymm_branch_report.go",
-        "pkg/sat/sat_solver_stat_display.go"
+        "pkg/sat/sat_solver_stat_display.go",
+        "pkg/sat/sat_solver_probing_report.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184420,7 +184441,8 @@
         "TestSATSCCReportActualEliminationAndSourceGates",
         "TestSATAsymmReportActualReductionAndSourceGates",
         "TestSATAsymmReportSurvivesCanceledSourceCatch",
-        "TestSATReportsReadCompactStatsDuringStoppedContinuation"
+        "TestSATReportsReadCompactStatsDuringStoppedContinuation",
+        "TestSATSolverProbingReportAssignedStoppedAndSourceGates"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -184541,6 +184563,14 @@
           "tests": [
             "TestSATReportsReadCompactStatsDuringStoppedContinuation"
           ]
+        },
+        {
+          "name": "Retained SAT probing report IF_VERBOSE(10) gate and process-selected stream (src/sat/sat_probing.cpp:171-188)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_probing_report.go",
+          "tests": [
+            "TestSATSolverProbingReportAssignedStoppedAndSourceGates"
+          ]
         }
       ],
       "ownership": [
@@ -184603,7 +184633,8 @@
         "pkg/sat/sat_cleaner_report.go",
         "pkg/sat/sat_scc_report.go",
         "pkg/sat/sat_asymm_branch_report.go",
-        "pkg/sat/sat_solver_stat_display.go"
+        "pkg/sat/sat_solver_stat_display.go",
+        "pkg/sat/sat_solver_probing_report.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184657,7 +184688,8 @@
         "TestSATSCCReportActualEliminationAndSourceGates",
         "TestSATAsymmReportActualReductionAndSourceGates",
         "TestSATAsymmReportSurvivesCanceledSourceCatch",
-        "TestSATReportsReadCompactStatsDuringStoppedContinuation"
+        "TestSATReportsReadCompactStatsDuringStoppedContinuation",
+        "TestSATSolverProbingReportAssignedStoppedAndSourceGates"
       ],
       "conditionals": [
         {
@@ -185076,6 +185108,14 @@
           "go_target": "pkg/sat/sat_solver_stat_display.go",
           "tests": [
             "TestSATReportsReadCompactStatsDuringStoppedContinuation"
+          ]
+        },
+        {
+          "name": "Retained SAT probing report IF_VERBOSE(10) gate and process-selected stream (src/sat/sat_probing.cpp:171-188)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_probing_report.go",
+          "tests": [
+            "TestSATSolverProbingReportAssignedStoppedAndSourceGates"
           ]
         }
       ],

@@ -293,18 +293,21 @@ func (s *satSolverProbing) run(force bool) (answer bool, err error) {
 		}
 	}
 	// Source lexical report starts here and stops on every normal/error unwind.
+	oldAssigned := s.numAssigned
 	var watch stopwatch.Stopwatch
 	if e := watch.Start(); e != nil {
 		return false, e
 	}
 	defer func() {
-		if e := watch.Stop(); e != nil && err == nil {
+		e := watch.Stop()
+		if e == nil {
+			e = s.emitReport(&watch, oldAssigned)
+		}
+		if e != nil && err == nil {
 			answer = false
 			err = e
 		}
 	}()
-	oldAssigned := s.numAssigned
-	// Verbose stream/mem_stat formatting remains a separate diagnostic binding.
 	result := true
 	p.probingCounter = 0
 	// uint32 to int32 is the selected source conversion. Negating INT_MIN is UB.
