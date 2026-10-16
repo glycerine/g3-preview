@@ -18,6 +18,25 @@ func (c *patternCandidates) patternMemoryTags() *diagnostic.TraceTags {
 	return diagnostic.BorrowProcessTraceTags()
 }
 
+func (c *patternCandidates) patternMemoryFinalizing(tags *diagnostic.TraceTags) bool {
+	if tags.MemoryFinalizing() {
+		return true
+	}
+	if c == nil || c.manager == nil {
+		return false
+	}
+	numerals := c.manager.NumeralService()
+	if numerals == nil {
+		return false
+	}
+	if runtime := numerals.RuntimeOwner(); runtime != nil {
+		if process := runtime.ProcessOwner(); process != nil {
+			return process.Finalizing()
+		}
+	}
+	return false
+}
+
 func (c *patternCandidates) tracePrePatternAllocated(p *prePattern, line int) {
 	tags := c.patternMemoryTags()
 	if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
@@ -37,7 +56,7 @@ func (c *patternCandidates) tracePrePatternDeallocated(p *prePattern) {
 		return
 	}
 	_ = tags.EmitConditional("memory", "deallocate", "src/util/memory_manager.cpp", 204,
-		func() bool { return !tags.MemoryFinalizing() }, func(w io.Writer) error {
+		func() bool { return !c.patternMemoryFinalizing(tags) }, func(w io.Writer) error {
 			_, _ = io.WriteString(w, "dealloc "+fmt.Sprintf("%p", p)+" src/util/util.h:171\n")
 			return nil
 		})

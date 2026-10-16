@@ -152345,6 +152345,7 @@
         "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
+        "TestPatternCollectedInfoMemoryFollowsOwningProcessFinalization",
         "TestPatternCollectGroundChildAndInfoMemoryLifetime",
         "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
         "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
@@ -152517,6 +152518,13 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Pattern collect::info and pre_pattern debug deallocation wrappers honor the owning AST process finalization state even when their trace tags are unbound (memory_manager.cpp:202-205)",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/multi_pattern_memory_trace.go",
+          "go_targets": ["pkg/ast/pattern/collect_memory_trace.go"],
+          "tests": ["TestPatternCollectedInfoMemoryFollowsOwningProcessFinalization"]
+        },
         {
           "name": "Concrete collect::info allocation at pattern_inference.cpp:186,188,205,238 and delete_proc reset at util.h:171 through debug memory wrappers, including duplicate child visits and source-order release",
           "status": "platform_replacement",
@@ -153267,6 +153275,7 @@
         "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
+        "TestPatternCollectedInfoMemoryFollowsOwningProcessFinalization",
         "TestPatternCollectGroundChildAndInfoMemoryLifetime",
         "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
         "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
@@ -153428,6 +153437,13 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Pattern collect::info and pre_pattern debug deallocation wrappers honor the owning AST process finalization state even when their trace tags are unbound (memory_manager.cpp:202-205)",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/multi_pattern_memory_trace.go",
+          "go_targets": ["pkg/ast/pattern/collect_memory_trace.go"],
+          "tests": ["TestPatternCollectedInfoMemoryFollowsOwningProcessFinalization"]
+        },
         {
           "name": "Concrete collect::info allocation at pattern_inference.cpp:186,188,205,238 and delete_proc reset at util.h:171 through debug memory wrappers, including duplicate child visits and source-order release",
           "status": "platform_replacement",

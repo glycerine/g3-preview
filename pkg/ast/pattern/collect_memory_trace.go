@@ -30,7 +30,7 @@ func (c *patternCandidates) traceCollectedInfoDeallocated(info *collectedInfo) {
 		return
 	}
 	_ = tags.EmitConditional("memory", "deallocate", "src/util/memory_manager.cpp", 204,
-		func() bool { return !tags.MemoryFinalizing() }, func(w io.Writer) error {
+		func() bool { return !c.patternMemoryFinalizing(tags) }, func(w io.Writer) error {
 			_, _ = io.WriteString(w, "dealloc "+fmt.Sprintf("%p", info)+" src/util/util.h:171\n")
 			return nil
 		})
