@@ -77328,6 +77328,12 @@
           "tests": ["TestSATSimplifierBlockedCleanupClausesSourceTrace"]
         },
         {
+          "name": "Unreachable removed-current CTRACE guard at sat_simplifier.cpp:393 under selected LAZY_USE_LIST consume-before-curr invariant",
+          "status": "dead_deleted",
+          "go_target": "pkg/sat/sat_solver_clause_use_lists.go",
+          "tests": ["TestSATSimplifierRemovedUseListEntrySkippedBeforeCollectorGuard"]
+        },
+        {
           "name": "Reached learned-binary demotion TRACE site at sat_simplifier.cpp:700",
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_mark_trace.go",
@@ -182412,6 +182418,12 @@
           "tests": ["TestSATSimplifierBlockedCleanupClausesSourceTrace"]
         },
         {
+          "name": "Unreachable removed-current CTRACE guard at sat_simplifier.cpp:393 under selected LAZY_USE_LIST consume-before-curr invariant",
+          "status": "dead_deleted",
+          "go_target": "pkg/sat/sat_solver_clause_use_lists.go",
+          "tests": ["TestSATSimplifierRemovedUseListEntrySkippedBeforeCollectorGuard"]
+        },
+        {
           "name": "Reached learned-binary demotion TRACE site at sat_simplifier.cpp:700",
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_mark_trace.go",
@@ -184264,6 +184276,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_cleanup_trace.go",
           "tests": ["TestSATSimplifierBlockedCleanupClausesSourceTrace"]
+        },
+        {
+          "name": "Unreachable removed-current CTRACE guard at sat_simplifier.cpp:393 under selected LAZY_USE_LIST consume-before-curr invariant",
+          "status": "dead_deleted",
+          "go_target": "pkg/sat/sat_solver_clause_use_lists.go",
+          "tests": ["TestSATSimplifierRemovedUseListEntrySkippedBeforeCollectorGuard"]
         },
         {
           "name": "Reached learned-binary demotion TRACE site at sat_simplifier.cpp:700",
