@@ -123016,7 +123016,7 @@
           ]
         },
         {
-          "name": "invoke_gdb cpp73-117 and NO_Z3_DEBUGGER h42-56: literal prompt/extract/switch, real exit/default exception and concrete Linux system/signal action chain",
+          "name": "invoke_gdb cpp73-117 and NO_Z3_DEBUGGER h42-56: portable prompt/extract/C-A-T-EOF actions independent of Linux host hooks, with Linux system/signal G-S chain",
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_debug_actions.go",
           "tests": [
@@ -123483,7 +123483,7 @@
           ]
         },
         {
-          "name": "invoke_gdb cpp73-117 and NO_Z3_DEBUGGER h42-56: literal prompt/extract/switch, real exit/default exception and concrete Linux system/signal action chain",
+          "name": "invoke_gdb cpp73-117 and NO_Z3_DEBUGGER h42-56: portable prompt/extract/C-A-T-EOF actions independent of Linux host hooks, with Linux system/signal G-S chain",
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_debug_actions.go",
           "tests": [

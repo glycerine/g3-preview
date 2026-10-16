@@ -111,9 +111,6 @@ func (a *DebugActionContext) InvokeDebugger() error {
 	if a.profile == DebugNoDebugger {
 		os.Exit(110)
 	}
-	if !debugHostLinux {
-		return ErrDebugHostUnsupported
-	}
 	for {
 		if e := a.emit("(C)ontinue, (A)bort, (S)top, (T)hrow exception, Invoke (G)DB\n"); e != nil {
 			return e
