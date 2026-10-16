@@ -40,3 +40,24 @@ func (s *localSortStack) pop(m *ast.ASTManager) error {
 	}
 	return err
 }
+
+// shrink mirrors ref_vector_core::shrink: release discarded slots in their
+// original order. If a release is pending, keep its slot for a later reset.
+func (s *localSortStack) shrink(m *ast.ASTManager, size int) error {
+	if s == nil || size < 0 || size > len(s.refs) {
+		return errLocalSortStack
+	}
+	var failure error
+	for i := size; i < len(s.refs); i++ {
+		if s.refs[i] == (ast.ASTRef{}) {
+			continue
+		}
+		failure = errors.Join(failure, m.DelRef(&s.refs[i]))
+	}
+	if failure == nil {
+		s.refs = s.refs[:size]
+	}
+	return failure
+}
+
+func (s *localSortStack) reset(m *ast.ASTManager) error { return s.shrink(m, 0) }

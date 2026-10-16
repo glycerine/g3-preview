@@ -70174,8 +70174,8 @@
       "component": "parsers",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/parsers/smt2/local_environment.go", "pkg/parsers/smt2/local_lookup.go", "pkg/parsers/smt2/local_sort_stack.go"],
-      "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders", "TestSMT2ParserQualifiedLocalSortAndIndexRefusals"],
+      "go_targets": ["pkg/parsers/smt2/local_environment.go", "pkg/parsers/smt2/local_lookup.go", "pkg/parsers/smt2/local_sort_stack.go", "pkg/parsers/smt2/local_expr_stack.go"],
+      "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders", "TestSMT2ParserQualifiedLocalSortAndIndexRefusals", "TestSMT2LocalReferenceStacksFrameShrinkAndReset"],
       "assertions": [
         {
           "line": 250,
@@ -70700,6 +70700,13 @@
           "status": "partial",
           "go_target": "pkg/parsers/smt2/local_lookup.go",
           "tests": ["TestSMT2ParserQualifiedLocalSortAndIndexRefusals"]
+        },
+        {
+          "name": "Selected parser sort and expression reference stack ownership, command-frame shrink and reset (smt2parser.cpp:230-240,2818-2832,2992-3003); scanner and command execution integration remain open",
+          "status": "partial",
+          "go_target": "pkg/parsers/smt2/local_expr_stack.go",
+          "go_targets": ["pkg/parsers/smt2/local_sort_stack.go"],
+          "tests": ["TestSMT2LocalReferenceStacksFrameShrinkAndReset"]
         }
       ],
       "ownership": [],
@@ -173796,7 +173803,8 @@
         "pkg/tactic/ufbv/rewrite_formula_process.go",
         "pkg/tactic/ufbv/rewrite_formula_process_test.go",
         "pkg/model/model_evaluator_array_expansion.go",
-        "pkg/model/model_evaluator_array_equality.go"
+        "pkg/model/model_evaluator_array_equality.go",
+        "pkg/parsers/smt2/local_expr_stack.go"
       ],
       "tests": [
         "TestSMT2ParserQualifiedLocalSortAndIndexRefusals",
@@ -173871,7 +173879,8 @@
         "TestModelEvaluatorOriginalArrayExpansionAllocationRefusals",
         "TestModelEvaluatorOriginalArrayEqualityTablesAndStorePrecedence",
         "TestModelEvaluatorOriginalArrayEqualitySymbolicIndexFallback",
-        "TestModelEvaluatorOriginalArrayEqualityAllocationRefusals"
+        "TestModelEvaluatorOriginalArrayEqualityAllocationRefusals",
+        "TestSMT2LocalReferenceStacksFrameShrinkAndReset"
       ],
       "conditionals": [
         {
@@ -174108,6 +174117,13 @@
           "status": "ported",
           "go_target": "pkg/parsers/smt2/local_sort_stack.go",
           "tests": ["TestSMT2ParserQualifiedLocalSortAndIndexRefusals"]
+        },
+        {
+          "name": "SMT2 concrete sort_ref_vector and expr_ref_vector owning slots, frame shrink and reset (ref_vector.h:41-55,62-70,96-110)",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/local_expr_stack.go",
+          "go_targets": ["pkg/parsers/smt2/local_sort_stack.go"],
+          "tests": ["TestSMT2LocalReferenceStacksFrameShrinkAndReset"]
         }
       ],
       "ownership": [
