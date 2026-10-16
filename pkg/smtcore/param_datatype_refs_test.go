@@ -39,3 +39,32 @@ func TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite(t *testing.T) {
 		t.Fatal("recursive indices did not use declaration positions", as)
 	}
 }
+
+func TestParamDatatypeValidationFirstMissingAndDuplicateAcrossConstructors(t *testing.T) {
+	a, b, c := usymbol.Numerical(61), usymbol.Numerical(62), usymbol.Numerical(63)
+	d := ParamDatatypeDecl{Constructors: []ParamDatatypeConstructor{
+		{Accessors: []ParamDatatypeAccessor{
+			{Name: a, SortKind: ParamMissingSort, MissingSort: b},
+			{Name: b, SortKind: ParamMissingSort, MissingSort: c},
+		}},
+		{Accessors: []ParamDatatypeAccessor{{Name: a, SortKind: ParamSort}}},
+	}}
+	if missing, found := d.HasMissingRef(); !found || missing != b {
+		t.Fatal("first missing accessor", missing, found)
+	}
+	if repeated, found := d.HasDuplicateAccessors(); !found || repeated != a {
+		t.Fatal("duplicate across constructors", repeated, found)
+	}
+	d.Constructors[0].Accessors[0].SortKind = ParamRecursiveSort
+	if missing, found := d.HasMissingRef(); !found || missing != c {
+		t.Fatal("next missing accessor", missing, found)
+	}
+	d.Constructors[0].Accessors[1].SortKind = ParamRecursiveSort
+	if missing, found := d.HasMissingRef(); found || missing != (usymbol.Symbol{}) {
+		t.Fatal("resolved datatype still reports missing accessor", missing, found)
+	}
+	other := ParamDatatypeDecl{Constructors: []ParamDatatypeConstructor{{Accessors: []ParamDatatypeAccessor{{Name: a, SortKind: ParamSort}}}}}
+	if repeated, found := other.HasDuplicateAccessors(); found || repeated != (usymbol.Symbol{}) {
+		t.Fatal("accessor namespace leaked across datatypes", repeated, found)
+	}
+}

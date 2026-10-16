@@ -31,6 +31,35 @@ type ParamDatatypeDecl struct {
 	Constructors []ParamDatatypeConstructor
 }
 
+// HasMissingRef follows the accessor walk used before datatype instantiation.
+func (d *ParamDatatypeDecl) HasMissingRef() (usymbol.Symbol, bool) {
+	for ci := range d.Constructors {
+		for ai := range d.Constructors[ci].Accessors {
+			a := &d.Constructors[ci].Accessors[ai]
+			if a.SortKind == ParamMissingSort {
+				return a.MissingSort, true
+			}
+		}
+	}
+	return usymbol.Symbol{}, false
+}
+
+// HasDuplicateAccessors checks one datatype across all its constructors.
+// Other datatypes in a recursive group have independent accessor namespaces.
+func (d *ParamDatatypeDecl) HasDuplicateAccessors() (usymbol.Symbol, bool) {
+	names := make(map[usymbol.Symbol]struct{})
+	for ci := range d.Constructors {
+		for ai := range d.Constructors[ci].Accessors {
+			name := d.Constructors[ci].Accessors[ai].Name
+			if _, found := names[name]; found {
+				return name, true
+			}
+			names[name] = struct{}{}
+		}
+	}
+	return usymbol.Symbol{}, false
+}
+
 // ParamDatatypeGroup is the concrete pdatatypes_decl name-resolution owner.
 // Declaration and accessor slices retain source order; equal datatype names
 // overwrite the previous dictionary index, as map::insert does.

@@ -31725,7 +31725,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/smtcore/param_datatype_refs.go"],
-      "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"],
+      "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite", "TestParamDatatypeValidationFirstMissingAndDuplicateAcrossConstructors"],
       "assertions": [
         {
           "line": 31,
@@ -31812,6 +31812,12 @@
           "status": "partial",
           "go_target": "pkg/smtcore/param_datatype_refs.go",
           "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"]
+        },
+        {
+          "name": "pdatatype_decl::has_missing_refs and has_duplicate_accessors: constructor/accessor source-order traversal and first duplicate within one datatype (pdecl.cpp:432-440,489-496,534-560)",
+          "status": "ported",
+          "go_target": "pkg/smtcore/param_datatype_refs.go",
+          "tests": ["TestParamDatatypeValidationFirstMissingAndDuplicateAcrossConstructors"]
         }
       ],
       "ownership": [],
@@ -31823,7 +31829,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/smtcore/param_datatype_refs.go"],
-      "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"],
+      "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite", "TestParamDatatypeValidationFirstMissingAndDuplicateAcrossConstructors"],
       "conditionals": [
         {
           "line": 19,
@@ -31868,6 +31874,12 @@
           "status": "partial",
           "go_target": "pkg/smtcore/param_datatype_refs.go",
           "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"]
+        },
+        {
+          "name": "Selected pdatatype_decl missing-reference and duplicate-accessor validation signatures over concrete declaration slices",
+          "status": "partial",
+          "go_target": "pkg/smtcore/param_datatype_refs.go",
+          "tests": ["TestParamDatatypeValidationFirstMissingAndDuplicateAcrossConstructors"]
         }
       ],
       "ownership": [],
@@ -124903,7 +124915,8 @@
         "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations",
         "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations",
         "TestSMT2SortAndDatatypeNameTablesSourceScopes",
-        "TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"
+        "TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite",
+        "TestParamDatatypeValidationFirstMissingAndDuplicateAcrossConstructors"
       ],
       "conditionals": [
         {
@@ -125254,6 +125267,12 @@
           "status": "platform_replacement",
           "go_target": "pkg/smtcore/param_datatype_refs.go",
           "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"]
+        },
+        {
+          "name": "pdatatype_decl concrete accessor-name set uses native typed Go symbol map for reached contains/insert across constructors",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/param_datatype_refs.go",
+          "tests": ["TestParamDatatypeValidationFirstMissingAndDuplicateAcrossConstructors"]
         }
       ],
       "ownership": [
