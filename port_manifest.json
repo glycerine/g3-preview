@@ -77272,6 +77272,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_remove_trace.go",
           "tests": ["TestSATSimplifierRemoveClauseSourceTraceAfterMarkBeforeCleanup"]
+        },
+        {
+          "name": "Reached scoped_finalize_fn after_simplifier cleanup/skip TRACE branches before their actions (sat_simplifier.cpp:210,216)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_finalize_trace.go",
+          "tests": ["TestSATSimplifierActualFinalizeCleanupBranchSourceTrace"]
         }
       ],
       "ownership": [
@@ -182284,6 +182290,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_remove_trace.go",
           "tests": ["TestSATSimplifierRemoveClauseSourceTraceAfterMarkBeforeCleanup"]
+        },
+        {
+          "name": "Reached scoped_finalize_fn after_simplifier cleanup/skip TRACE branches before their actions (sat_simplifier.cpp:210,216)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_finalize_trace.go",
+          "tests": ["TestSATSimplifierActualFinalizeCleanupBranchSourceTrace"]
         }
       ],
       "ownership": [
@@ -184066,6 +184078,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_remove_trace.go",
           "tests": ["TestSATSimplifierRemoveClauseSourceTraceAfterMarkBeforeCleanup"]
+        },
+        {
+          "name": "Reached scoped_finalize_fn after_simplifier cleanup/skip TRACE branches before their actions (sat_simplifier.cpp:210,216)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_finalize_trace.go",
+          "tests": ["TestSATSimplifierActualFinalizeCleanupBranchSourceTrace"]
         }
       ],
       "ownership": [

@@ -240,6 +240,7 @@ func (s *satSimplifier) scopedFinalize() error {
 		var e error
 		switch s.scopedStage {
 		case 0:
+			s.traceFinalizeCleanupBranch()
 			if s.needCleanup {
 				e = s.cleanupWatches()
 			}
