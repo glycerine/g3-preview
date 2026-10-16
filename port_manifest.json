@@ -169649,6 +169649,15 @@
           ]
         },
         {
+          "name": "mpzzp p_normalize_core finite-mode SASSERT at mpzzp.h:59 before remainder; core and wrapper normalized-result SASSERTs at :68 and :114 after their source stages",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp.go",
+          "tests": [
+            "TestIntegerModularScalarSourceAssertionActions",
+            "TestIntegerModularPredictableFailurePrefixes"
+          ]
+        },
+        {
           "name": "Remaining scalar arithmetic/fused/sets/const-mutable conversion/bit/log/root/formatting overloads beyond separately ported source assertions",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpzzp_ops.go",

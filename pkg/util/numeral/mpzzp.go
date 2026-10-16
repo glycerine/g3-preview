@@ -327,6 +327,9 @@ func (m *IntegerModularManager) PNormalizeWithFactorHistory(a *Int, receipt *int
 		}()
 	}
 	if !m.z {
+		if e := m.sourceAssertFinite(59); e != nil {
+			return e
+		}
 		// This execution flag only protects the actual numerical owner from
 		// returning-transport destruction. Allocation authority stays explicit.
 		previousExecuting := m.manager.NormalizationExecuting
@@ -357,11 +360,11 @@ func (m *IntegerModularManager) PNormalizeWithFactorHistory(a *Int, receipt *int
 				}
 			}
 		}
-		if e := m.AssertNormalized(a); e != nil {
+		if e := m.sourceAssertNormalizedNamed(a, 68, "is_p_normalized(x)"); e != nil {
 			return e
 		} // core diagnostic
 	}
-	return m.AssertNormalized(a)
+	return m.sourceAssertNormalizedNamed(a, 114, "is_p_normalized(x)")
 }
 func (m *IntegerModularManager) Inv(a *Int) error {
 	return m.invWithAllocationContext(a, integerAllocationInvocationContext{})

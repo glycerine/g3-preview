@@ -25,7 +25,7 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 	serviceMust(t, e)
 	in, e := os.CreateTemp(t.TempDir(), "mpzzp-assert-input-*")
 	serviceMust(t, e)
-	_, e = in.WriteString(strings.Repeat("CT", 12) + "TCCCTCTTTTCTTTCTTCTCTC")
+	_, e = in.WriteString(strings.Repeat("CT", 12) + "TCCCTCTTTTCTTTCTTCTCTCTCT")
 	serviceMust(t, e)
 	_, e = in.Seek(0, 0)
 	serviceMust(t, e)
@@ -204,6 +204,18 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 		t.Fatal("SetZPSwap Continue must keep source mode and swap values", m.P, nextModulus, m.z)
 	}
 	serviceMust(t, m.SetZPUint64(6))
+	// This interval can arise at an interrupted modulus setup. Exercise the
+	// two source postconditions through the real rem/add normalization path.
+	m.Lower, m.Upper = NewInt(1), NewInt(0)
+	unnormalized := NewInt(0)
+	if e := m.PNormalize(&unnormalized); !errors.As(e, &thrown) || unnormalized.Val != 6 {
+		t.Fatal("core normalization Throw must retain the mutated value", unnormalized, e)
+	}
+	unnormalized = NewInt(0)
+	if e := m.PNormalize(&unnormalized); !errors.As(e, &thrown) || unnormalized.Val != 6 {
+		t.Fatal("wrapper normalization Throw must follow core Continue", unnormalized, e)
+	}
+	serviceMust(t, m.SetZPUint64(6))
 	serviceMust(t, d.EnableAssertions(false))
 	if got, e := m.String(&a); e != nil || got != "8" {
 		t.Fatal("disabled source assertion must leave numeral readable", got, e)
@@ -270,9 +282,14 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 		strings.Count(string(data), "Line: 126\n!m_z\n") != 2 {
 		t.Fatal("missing setup/mode source assertion records", string(data))
 	}
+	if strings.Count(string(data), "Line: 68\nis_p_normalized(x)\n") != 2 ||
+		strings.Count(string(data), "Line: 114\nis_p_normalized(x)\n") != 1 ||
+		strings.Contains(string(data), "Line: 59\n") {
+		t.Fatal("normalization source assertion order", string(data))
+	}
 	state, e := input.State()
 	serviceMust(t, e)
-	if state.Position != 46 {
+	if state.Position != 49 {
 		t.Fatal("disabled assertion consumed an action", state.Position)
 	}
 }
