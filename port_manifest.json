@@ -77777,7 +77777,8 @@
         "pkg/sat/sat_var_queue_oracle_test.go",
         "pkg/sat/sat_solver_trail_test.go",
         "pkg/sat/sat_var_queue_native_test.go",
-        "pkg/sat/sat_solver_search_verbose.go"
+        "pkg/sat/sat_solver_search_verbose.go",
+        "pkg/sat/sat_solver_unsat_core_verbose.go"
       ],
       "tests": [
         "TestSATSolverScopesNativeGrowthAndPop",
@@ -78091,7 +78092,8 @@
         "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity",
         "TestSATSolverCheckSourceRestartLimitAbort",
         "TestSATSolverCheckVerboseFileFailureKeepsSearchResult",
-        "TestSATSolverCheckSourceModelNotice"
+        "TestSATSolverCheckSourceModelNotice",
+        "TestSATSolverActualMUSCoreSourceVerboseReport"
       ],
       "conditionals": [
         {
@@ -79402,6 +79404,15 @@
           "go_target": "pkg/sat/sat_solver_search_verbose.go",
           "tests": [
             "TestSATSolverCheckSourceModelNotice"
+          ]
+        },
+        {
+          "name": "Retained core-minimization IF_VERBOSE(1) shorter cached-core size notice before replacement and IF_VERBOSE(2) final literal-vector report after MUS/model publication (sat_solver.cpp:2074,2083)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_unsat_core_verbose.go",
+          "tests": [
+            "TestSATSolverActualMUSCoreSourceVerboseReport",
+            "TestSATSolverMUSActualThreeNecessaryAssumptions"
           ]
         }
       ],
@@ -184473,7 +184484,8 @@
         "pkg/sat/sat_solver_probing_report.go",
         "pkg/sat/sat_simplifier_report.go",
         "pkg/sat/sat_solver_gc_report.go",
-        "pkg/sat/sat_solver_search_verbose.go"
+        "pkg/sat/sat_solver_search_verbose.go",
+        "pkg/sat/sat_solver_unsat_core_verbose.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184509,7 +184521,8 @@
         "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity",
         "TestSATSolverCheckSourceRestartLimitAbort",
         "TestSATSolverCheckVerboseFileFailureKeepsSearchResult",
-        "TestSATSolverCheckSourceModelNotice"
+        "TestSATSolverCheckSourceModelNotice",
+        "TestSATSolverActualMUSCoreSourceVerboseReport"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -184682,6 +184695,15 @@
           "tests": [
             "TestSATSolverCheckSourceModelNotice"
           ]
+        },
+        {
+          "name": "Retained core-minimization IF_VERBOSE(1) shorter cached-core size notice before replacement and IF_VERBOSE(2) final literal-vector report after MUS/model publication (sat_solver.cpp:2074,2083)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_unsat_core_verbose.go",
+          "tests": [
+            "TestSATSolverActualMUSCoreSourceVerboseReport",
+            "TestSATSolverMUSActualThreeNecessaryAssumptions"
+          ]
         }
       ],
       "ownership": [
@@ -184748,7 +184770,8 @@
         "pkg/sat/sat_solver_probing_report.go",
         "pkg/sat/sat_simplifier_report.go",
         "pkg/sat/sat_solver_gc_report.go",
-        "pkg/sat/sat_solver_search_verbose.go"
+        "pkg/sat/sat_solver_search_verbose.go",
+        "pkg/sat/sat_solver_unsat_core_verbose.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184811,7 +184834,8 @@
         "TestSATSolverCheckSourceEntryAndZeroConflictAbortVerbosity",
         "TestSATSolverCheckSourceRestartLimitAbort",
         "TestSATSolverCheckVerboseFileFailureKeepsSearchResult",
-        "TestSATSolverCheckSourceModelNotice"
+        "TestSATSolverCheckSourceModelNotice",
+        "TestSATSolverActualMUSCoreSourceVerboseReport"
       ],
       "conditionals": [
         {
@@ -185282,6 +185306,15 @@
           "go_target": "pkg/sat/sat_solver_search_verbose.go",
           "tests": [
             "TestSATSolverCheckSourceModelNotice"
+          ]
+        },
+        {
+          "name": "Retained core-minimization IF_VERBOSE(1) shorter cached-core size notice before replacement and IF_VERBOSE(2) final literal-vector report after MUS/model publication (sat_solver.cpp:2074,2083)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_unsat_core_verbose.go",
+          "tests": [
+            "TestSATSolverActualMUSCoreSourceVerboseReport",
+            "TestSATSolverMUSActualThreeNecessaryAssumptions"
           ]
         }
       ],

@@ -254,6 +254,9 @@ func (s *satSolverConflictResolution) resolveConflictForUnsatCore() error {
 				return e
 			}
 			if mn < cn {
+				if e = s.emitCoreUpdateNotice(mn, cn); e != nil {
+					return e
+				}
 				if e = s.core.Shrink(0); e != nil {
 					return e
 				}
@@ -275,7 +278,10 @@ func (s *satSolverConflictResolution) resolveConflictForUnsatCore() error {
 		if _, e := s.solver.mus.run(); e != nil {
 			return e
 		}
-		return s.solver.setModel(&s.solver.mus.model)
+		if e = s.solver.setModel(&s.solver.mus.model); e != nil {
+			return e
+		}
+		return s.emitCoreReport()
 	}
 	return nil
 }
