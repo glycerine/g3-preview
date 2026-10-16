@@ -21,7 +21,7 @@ func (c *satSCC) emitReport() error {
 	if err = out.AppendUint32(c.numElim - c.reportNumElim); err != nil {
 		return err
 	}
-	if err = c.solver.displayCompactStat(out); err != nil {
+	if err = c.solver.appendCompactStat(out); err != nil {
 		return err
 	}
 	if err = out.AppendCString(" :time "); err != nil {

@@ -152054,7 +152054,8 @@
         "pkg/model/model_copy.go",
         "pkg/tactic/aig/aig_tactic_memory_trace.go",
         "pkg/tactic/aig/aig_imp_memory_trace.go",
-        "pkg/sat/sat_asymm_branch_report.go"
+        "pkg/sat/sat_asymm_branch_report.go",
+        "pkg/sat/sat_solver_stat_display.go"
       ],
       "tests": [
         "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
@@ -152167,7 +152168,8 @@
         "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
         "TestAIGTacticConstructorFailureMemoryTracePrefixes",
         "TestSATAsymmReportActualReductionAndSourceGates",
-        "TestSATAsymmReportSurvivesCanceledSourceCatch"
+        "TestSATAsymmReportSurvivesCanceledSourceCatch",
+        "TestSATReportsReadCompactStatsDuringStoppedContinuation"
       ],
       "conditionals": [
         {
@@ -152799,6 +152801,14 @@
             "TestSATAsymmReportActualReductionAndSourceGates",
             "TestSATAsymmReportSurvivesCanceledSourceCatch"
           ]
+        },
+        {
+          "name": "Retained SAT cleaner and SCC reports read process compact/memory stats during a stopped clause-owner continuation (src/sat/sat_cleaner.cpp:158-179; src/sat/sat_scc.cpp:43-58)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_stat_display.go",
+          "tests": [
+            "TestSATReportsReadCompactStatsDuringStoppedContinuation"
+          ]
         }
       ],
       "ownership": [
@@ -152918,7 +152928,8 @@
         "pkg/model/model_copy.go",
         "pkg/tactic/aig/aig_tactic_memory_trace.go",
         "pkg/tactic/aig/aig_imp_memory_trace.go",
-        "pkg/sat/sat_asymm_branch_report.go"
+        "pkg/sat/sat_asymm_branch_report.go",
+        "pkg/sat/sat_solver_stat_display.go"
       ],
       "tests": [
         "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
@@ -153016,7 +153027,8 @@
         "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
         "TestAIGTacticConstructorFailureMemoryTracePrefixes",
         "TestSATAsymmReportActualReductionAndSourceGates",
-        "TestSATAsymmReportSurvivesCanceledSourceCatch"
+        "TestSATAsymmReportSurvivesCanceledSourceCatch",
+        "TestSATReportsReadCompactStatsDuringStoppedContinuation"
       ],
       "conditionals": [
         {
@@ -153599,6 +153611,14 @@
           "tests": [
             "TestSATAsymmReportActualReductionAndSourceGates",
             "TestSATAsymmReportSurvivesCanceledSourceCatch"
+          ]
+        },
+        {
+          "name": "Retained SAT cleaner and SCC reports read process compact/memory stats during a stopped clause-owner continuation (src/sat/sat_cleaner.cpp:158-179; src/sat/sat_scc.cpp:43-58)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_stat_display.go",
+          "tests": [
+            "TestSATReportsReadCompactStatsDuringStoppedContinuation"
           ]
         }
       ],
@@ -184372,7 +184392,8 @@
         "pkg/util/params/util_env_params.go",
         "pkg/sat/sat_cleaner_report.go",
         "pkg/sat/sat_scc_report.go",
-        "pkg/sat/sat_asymm_branch_report.go"
+        "pkg/sat/sat_asymm_branch_report.go",
+        "pkg/sat/sat_solver_stat_display.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184398,7 +184419,8 @@
         "TestSATCleanerReportUsesProcessVerboseStreamAndSourceGate",
         "TestSATSCCReportActualEliminationAndSourceGates",
         "TestSATAsymmReportActualReductionAndSourceGates",
-        "TestSATAsymmReportSurvivesCanceledSourceCatch"
+        "TestSATAsymmReportSurvivesCanceledSourceCatch",
+        "TestSATReportsReadCompactStatsDuringStoppedContinuation"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -184511,6 +184533,14 @@
             "TestSATAsymmReportActualReductionAndSourceGates",
             "TestSATAsymmReportSurvivesCanceledSourceCatch"
           ]
+        },
+        {
+          "name": "Retained SAT cleaner and SCC reports read process compact/memory stats during a stopped clause-owner continuation (src/sat/sat_cleaner.cpp:158-179; src/sat/sat_scc.cpp:43-58)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_stat_display.go",
+          "tests": [
+            "TestSATReportsReadCompactStatsDuringStoppedContinuation"
+          ]
         }
       ],
       "ownership": [
@@ -184572,7 +184602,8 @@
         "pkg/math/subpaving/hardware_context_root.go",
         "pkg/sat/sat_cleaner_report.go",
         "pkg/sat/sat_scc_report.go",
-        "pkg/sat/sat_asymm_branch_report.go"
+        "pkg/sat/sat_asymm_branch_report.go",
+        "pkg/sat/sat_solver_stat_display.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184625,7 +184656,8 @@
         "TestSATCleanerReportUsesProcessVerboseStreamAndSourceGate",
         "TestSATSCCReportActualEliminationAndSourceGates",
         "TestSATAsymmReportActualReductionAndSourceGates",
-        "TestSATAsymmReportSurvivesCanceledSourceCatch"
+        "TestSATAsymmReportSurvivesCanceledSourceCatch",
+        "TestSATReportsReadCompactStatsDuringStoppedContinuation"
       ],
       "conditionals": [
         {
@@ -185036,6 +185068,14 @@
           "tests": [
             "TestSATAsymmReportActualReductionAndSourceGates",
             "TestSATAsymmReportSurvivesCanceledSourceCatch"
+          ]
+        },
+        {
+          "name": "Retained SAT cleaner and SCC reports read process compact/memory stats during a stopped clause-owner continuation (src/sat/sat_cleaner.cpp:158-179; src/sat/sat_scc.cpp:43-58)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_stat_display.go",
+          "tests": [
+            "TestSATReportsReadCompactStatsDuringStoppedContinuation"
           ]
         }
       ],

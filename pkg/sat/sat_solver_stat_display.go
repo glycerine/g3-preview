@@ -41,6 +41,12 @@ func (s *Solver) displayCompactStat(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}
+	return s.appendCompactStat(out)
+}
+
+// Source report destructors read the already constructed solver's counters
+// while a failed owner operation may still hold an interrupted continuation.
+func (s *Solver) appendCompactStat(out *utext.NumericTextStream) error {
 	if len(s.Lifecycle.Original) != 0 {
 		if e := out.AppendCString(" :clauses "); e != nil {
 			return e
@@ -71,5 +77,5 @@ func (s *Solver) displayCompactStat(out *utext.NumericTextStream) error {
 	if e := out.AppendUint32(s.gc.gcClauseStat); e != nil {
 		return e
 	}
-	return s.displayMemoryStat(out)
+	return appendSATMemoryStat(out, s.runtime.memory)
 }
