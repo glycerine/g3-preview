@@ -1144,7 +1144,7 @@ func (s *RationalService) InfInc(v *OwnedInfRational) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return e
 	}
 	return s.infRatStep(&v.First, false)
@@ -1176,7 +1176,7 @@ func (s *RationalService) InfDec(v *OwnedInfRational) error {
 		return e
 	}
 	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
+	if e := s.infScalarOwner(v); e != nil {
 		return e
 	}
 	return s.infRatStep(&v.First, true)
