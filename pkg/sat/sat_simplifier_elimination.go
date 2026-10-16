@@ -371,6 +371,7 @@ func (s *satSimplifier) removeBinaries(l Literal) error {
 					return e
 				}
 				if q == l {
+					s.traceRemovingBinary(l, q)
 					learned, e := y.Learned()
 					if e != nil {
 						return e
@@ -403,6 +404,7 @@ func (s *satSimplifier) removeBinaries(l Literal) error {
 			return e
 		}
 	}
+	s.traceCollapsingBinaryWatch(l)
 	return w.Finalize()
 }
 func (s *satSimplifier) removeEliminatedClauses(u satClauseUseListView, l Literal) (err error) {

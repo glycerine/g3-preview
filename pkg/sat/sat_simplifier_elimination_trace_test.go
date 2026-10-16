@@ -171,3 +171,26 @@ func TestSATSimplifierEliminationCostAndOrderSourceTraces(t *testing.T) {
 	}
 	satOK(t, s.closeElimination())
 }
+
+func TestSATSimplifierBinaryWatchRemovalSourceTraces(t *testing.T) {
+	s, l := satSimplifierFixture(t, 2)
+	satOK(t, l.mkBinClause(0, 2, false))
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("bin_clause_bug")
+	l.traceTags = tags
+	satOK(t, s.removeBinaries(0))
+	satOK(t, s.removeBinaries(1))
+	want := ""
+	if tags.ShouldTrace("bin_clause_bug") {
+		want = "-------- [bin_clause_bug] remove_bin_clauses src/sat/sat_simplifier.cpp:1269 ---------\n" +
+			"removing: 0 0\n------------------------------------------------\n" +
+			"-------- [bin_clause_bug] remove_bin_clauses src/sat/sat_simplifier.cpp:1280 ---------\n" +
+			"collapsing watch_list of: 0\n------------------------------------------------\n" +
+			"-------- [bin_clause_bug] remove_bin_clauses src/sat/sat_simplifier.cpp:1280 ---------\n" +
+			"collapsing watch_list of: -0\n------------------------------------------------\n"
+	}
+	if got := output.String(); got != want {
+		t.Fatalf("source binary-watch removal trace: got %q, want %q", got, want)
+	}
+}

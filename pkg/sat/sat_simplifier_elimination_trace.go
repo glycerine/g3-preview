@@ -53,6 +53,20 @@ func (s *satSimplifier) traceEliminationSortedCosts(costs []satSimplifierVarCost
 	})
 }
 
+func (s *satSimplifier) traceRemovingBinary(selected, other Literal) {
+	s.traceElimination("bin_clause_bug", "remove_bin_clauses", 1269, func(w io.Writer) error {
+		_, err := io.WriteString(w, "removing: "+selected.String()+" "+other.String()+"\n")
+		return err
+	})
+}
+
+func (s *satSimplifier) traceCollapsingBinaryWatch(l Literal) {
+	s.traceElimination("bin_clause_bug", "remove_bin_clauses", 1280, func(w io.Writer) error {
+		_, err := io.WriteString(w, "collapsing watch_list of: "+l.String()+"\n")
+		return err
+	})
+}
+
 func (s *satSimplifier) traceEliminationOccurrences(v BoolVar, pos, neg uint32) {
 	s.traceElimination("resolution", "try_eliminate", 1315, func(w io.Writer) error {
 		_, err := io.WriteString(w, strconv.FormatUint(uint64(v), 10)+
