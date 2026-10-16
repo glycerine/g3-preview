@@ -49,6 +49,7 @@ type satClauseAllocatorConfig struct {
 }
 type ClauseAllocator struct {
 	self                                   *ClauseAllocator
+	traceTags                              *udiag.TraceTags
 	origin                                 uint64
 	storage                                *arena.SmallBytes
 	ids                                    idgen.Generator
@@ -271,7 +272,11 @@ func (a *ClauseAllocator) mkClauseSpanPrefix(n uint32, span satSolverLiteralSpan
 	if prefix != nil {
 		prefix.unconstructed = false
 	}
-	return r, a.constructSpan(r, id, n, span, learned)
+	if e := a.constructSpan(r, id, n, span, learned); e != nil {
+		return r, e
+	}
+	a.traceAllocated(r, learned)
+	return r, nil
 }
 func (a *ClauseAllocator) release(r StoredClauseRef) error {
 	if e := a.validate(r); e != nil {
@@ -291,6 +296,7 @@ func (a *ClauseAllocator) Delete(r StoredClauseRef) error {
 	if e := a.validate(r); e != nil {
 		return e
 	}
+	a.traceDeleted(r)
 	if !a.temporary {
 		id, e := a.ID(r)
 		if e != nil {

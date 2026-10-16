@@ -127,6 +127,7 @@ func (s *satSolverProbing) processCore(id BoolVar) error {
 	if e := s.open(); e != nil {
 		return e
 	}
+	s.traceProcessing(id)
 	l := MakeLiteral(id, false)
 	if e := s.assertReady(l); e != nil {
 		return e

@@ -73532,6 +73532,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Reached clause-allocator allocation and pre-ID-recycle deletion TRACE sites at sat_clause.cpp:203,209",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_clause_storage_trace.go",
+          "tests": ["TestSATClauseAllocatorSourceAllocationAndDeletionTraces"]
+        },
+        {
           "name": "normal/temporary clause construction, extent allocation, ID recycle-before-delete and exact temporary reuse/destroy-before-grow",
           "status": "partial",
           "go_target": "pkg/sat/sat_clause_storage.go",
@@ -73555,7 +73561,7 @@
           ]
         },
         {
-          "name": "whole runtime conditional debug-tag/TRACE policy and remaining consumer integration",
+          "name": "whole runtime conditional debug-tag policy and remaining consumer integration",
           "status": "unported",
           "tests": []
         }
@@ -73564,7 +73570,7 @@
         "Concrete scalar clause locators are distinct from source IDs. Retained physical clause storage and its actual cold headers/directories/backing remain budgeted. Live clause, wrapper, binary-clause and activity consumers now use native Go slices; clause vectors retain borrowed allocator bindings in a native map. Only their actual cold owner headers are charged. The unused standalone watched-vector adapter and its template-only operations, iterator factories and slot metadata were removed. Solver watch-store backing now also uses native slices with checked iterator borrows."
       ],
       "deviations": [
-        "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and TRACE/printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
+        "Pointer ABI becomes owner/kind/slot/generation locators and explicit typed invalid-domain guards. No fake address ordering, global OOM service, external extension callback, solver result or propagation/search algorithm is provided by this storage packet. Source OutOfMemory callback is borrowed; source global policy, conditional CASSERT tag control and printer runtime remain open. Concrete vector aliases/invalid source instantiations and self-append/Fill nontermination adapters are recorded explicitly. No Go generics are used."
       ]
     },
     {
@@ -76469,6 +76475,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Reached probing process_core pre-decrement TRACE site at sat_probing.cpp:111",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_probing_algorithm_trace.go",
+          "tests": ["TestSATSolverProbingProcessCoreSourceTrace"]
+        },
         {
           "name": "Selected probing constructor/config/cache/try_lit/process/operator/finalize/assigned-set bodies with native literal-set slices and retained Runtime cache storage, literal defaults and probing_chache_limit key",
           "status": "ported",
@@ -180820,6 +180832,18 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Reached SAT probing process_core pre-decrement TRACE site at sat_probing.cpp:111",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_probing_algorithm_trace.go",
+          "tests": ["TestSATSolverProbingProcessCoreSourceTrace"]
+        },
+        {
+          "name": "Reached SAT clause-allocator allocation/deletion TRACE sites at sat_clause.cpp:203,209",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_clause_storage_trace.go",
+          "tests": ["TestSATClauseAllocatorSourceAllocationAndDeletionTraces"]
+        },
+        {
           "name": "Reached SAT model-converter failed-clause, three insertion-form and invalid-later-entry TRACE/CTRACE sites at sat_model_converter.cpp:108,142,152,163,181",
           "status": "ported",
           "go_target": "pkg/sat/sat_model_converter_trace.go",
@@ -182727,6 +182751,18 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached SAT probing process_core pre-decrement TRACE site at sat_probing.cpp:111",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_probing_algorithm_trace.go",
+          "tests": ["TestSATSolverProbingProcessCoreSourceTrace"]
+        },
+        {
+          "name": "Reached SAT clause-allocator allocation/deletion TRACE sites at sat_clause.cpp:203,209",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_clause_storage_trace.go",
+          "tests": ["TestSATClauseAllocatorSourceAllocationAndDeletionTraces"]
+        },
         {
           "name": "Reached SAT model-converter failed-clause, three insertion-form and invalid-later-entry TRACE/CTRACE sites at sat_model_converter.cpp:108,142,152,163,181",
           "status": "ported",

@@ -131,6 +131,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	if s.Clauses, err = NewSATClauseAllocator(satClauseAllocatorConfig{Storage: arena.SmallBytesConfig{Descriptors: arena.Config{Budget: c.Budget}}, OOMRuntime: c.Runtime.memory}); err != nil {
 		return s, err
 	}
+	s.Clauses.traceTags = c.TraceTags
 	// The following actual charged contexts contain empty bound vector headers.
 	// They are Go ownership metadata, not prematurely constructed source queue,
 	// MC payloads, probing parameters, or additional malloc accounting events.
