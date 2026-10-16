@@ -161550,7 +161550,7 @@
         },
         {
           "name": "div_n mpn_div TRACE operand insertions and opening numerator bracket before requested m+n+1 limb exceeds logical m+n buffer (mpn.cpp:350-354)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpn_divn_trace.go",
           "go_targets": [
             "pkg/util/numeral/mpn_indexed.go"
