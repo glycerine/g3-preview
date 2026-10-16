@@ -177,6 +177,9 @@ func (m *MultivariatePolynomialManager) gcdCRA(a Polynomial, b1 *unumeral.Int, b
 	if e := m.LexSort(b); e != nil {
 		return e
 	}
+	if e := m.traceCRAImages(a, b); e != nil {
+		return e
+	}
 	if polynomialSourceDebug {
 		size, e := c.cheap.ms.size(c)
 		if e != nil {
@@ -229,10 +232,16 @@ func (m *MultivariatePolynomialManager) gcdCRA(a Polynomial, b1 *unumeral.Int, b
 			return ErrPolynomialAssertion
 		}
 	}
+	if e = m.traceCRABezout(b1, b2, &n[0], &n[1]); e != nil {
+		return e
+	}
 	if e = m.craLeaf(3, &n[0], b2, &n[0]); e != nil {
 		return e
 	}
 	if e = m.craLeaf(3, &n[1], b1, &n[1]); e != nil {
+		return e
+	}
+	if e = m.traceCRAInverse(&n[0], &n[1]); e != nil {
 		return e
 	}
 	s.constructed = 5
@@ -240,6 +249,9 @@ func (m *MultivariatePolynomialManager) gcdCRA(a Polynomial, b1 *unumeral.Int, b
 		return e
 	}
 	if e = m.craLeaf(0, b1, &n[0], &n[4]); e != nil {
+		return e
+	}
+	if e = m.traceCRAMultipliers(&n[3], &n[4]); e != nil {
 		return e
 	}
 	s.constructed = 6
@@ -257,6 +269,9 @@ func (m *MultivariatePolynomialManager) gcdCRA(a Polynomial, b1 *unumeral.Int, b
 	if e = m.craLeaf(6, &n[6], nil, nil); e != nil {
 		return e
 	}
+	if e = m.traceCRABounds(&n[6], &n[7]); e != nil {
+		return e
+	}
 	sa, e := c.readWord(a, 8)
 	if e != nil {
 		return e
@@ -269,6 +284,7 @@ func (m *MultivariatePolynomialManager) gcdCRA(a Polynomial, b1 *unumeral.Int, b
 	for {
 		if ia == sa {
 			for ib < sb {
+				m.traceCRABranch(3729, "adding C2 rest\n")
 				if e = m.craAdd(Polynomial{}, 0, b, ib, Monomial{}, b, ib); e != nil {
 					return e
 				}
@@ -278,6 +294,7 @@ func (m *MultivariatePolynomialManager) gcdCRA(a Polynomial, b1 *unumeral.Int, b
 		}
 		if ib == sb {
 			for ia < sa {
+				m.traceCRABranch(3737, "adding C1 rest\n")
 				if e = m.craAdd(a, ia, Polynomial{}, 0, Monomial{}, a, ia); e != nil {
 					return e
 				}
@@ -299,12 +316,17 @@ func (m *MultivariatePolynomialManager) gcdCRA(a Polynomial, b1 *unumeral.Int, b
 		}
 		if order == 0 {
 			e = m.craAdd(a, ia, b, ib, ma, Polynomial{}, 0)
+			if e == nil {
+				e = m.traceCRAEqual(a, ia, b, ib, &n[8], &n[9], &n[10], &n[11])
+			}
 			ia++
 			ib++
 		} else if order > 0 {
+			m.traceCRABranch(3755, "C1 mon biggerr, adding it...\n")
 			e = m.craAdd(a, ia, Polynomial{}, 0, ma, Polynomial{}, 0)
 			ia++
 		} else {
+			m.traceCRABranch(3760, "C2 mon bigger, adding it...\n")
 			e = m.craAdd(Polynomial{}, 0, b, ib, mb, Polynomial{}, 0)
 			ib++
 		}
