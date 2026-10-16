@@ -184,6 +184,9 @@ func (tr *GoalTranslator) CompileGoal(g *tactic.Goal) (err error) {
 			}
 		}
 		if !skip {
+			if e = tr.traceGoalCompiledFormula(f); e != nil {
+				return e
+			}
 			if e = tr.processOwning(f); e != nil {
 				return e
 			}

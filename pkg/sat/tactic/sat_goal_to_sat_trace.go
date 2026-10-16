@@ -1,4 +1,4 @@
-// Source: src/sat/tactic/goal2sat.cpp:88-103,132,192,204,244,282,325,380-422;
+// Source: src/sat/tactic/goal2sat.cpp:88-103,132,192,204,244,282,325,380-422,480;
 // src/util/trace.h:40-46.
 package tactic
 
@@ -91,6 +91,22 @@ func (tr *GoalTranslator) traceGoalRemaining() error {
 	return tr.goalTraceTags().EmitConditional("goal2sat", "process", "src/sat/tactic/goal2sat.cpp", 421,
 		func() bool { return len(tr.results) != 0 }, func(w io.Writer) error {
 			_, err := io.WriteString(w, goalLiteralText(tr.results, false)+"\n")
+			return err
+		})
+}
+
+func (tr *GoalTranslator) traceGoalCompiledFormula(h ast.ASTHandle) error {
+	tags := tr.goalTraceTags()
+	if !tags.ShouldTrace("sat") {
+		return nil
+	}
+	return tags.EmitConditional("sat", "operator()", "src/sat/tactic/goal2sat.cpp", 480,
+		func() bool { return true }, func(w io.Writer) error {
+			formula, err := tr.traceGoalFormula(h)
+			if err != nil {
+				return err
+			}
+			_, err = io.WriteString(w, formula+"\n")
 			return err
 		})
 }

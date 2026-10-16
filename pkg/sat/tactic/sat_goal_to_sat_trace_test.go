@@ -12,8 +12,8 @@ import (
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
-func TestSATGoalTranslatorResultStackSourceTrace(t *testing.T) {
-	m := astTestManager(t)
+func goalTraceBindParams(t *testing.T, m *ast.ASTManager) {
+	t.Helper()
 	budget := m.BudgetField
 	context, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: budget})
 	astTestMust(t, err)
@@ -31,6 +31,11 @@ func TestSATGoalTranslatorResultStackSourceTrace(t *testing.T) {
 		astTestMust(t, catalog.Close())
 		astTestMust(t, context.Close())
 	})
+}
+
+func TestSATGoalTranslatorResultStackSourceTrace(t *testing.T) {
+	m := astTestManager(t)
+	goalTraceBindParams(t, m)
 	sort, err := m.MkBoolSort()
 	astTestMust(t, err)
 	astTestPin(t, m, sort)

@@ -81789,6 +81789,7 @@
         "pkg/ast/ast_resource_limit_test.go"
       ],
       "tests": [
+        "TestSATGoalDependencyFormulaSourceTrace",
         "TestSATGoalTranslatorResultStackSourceTrace",
         "TestSATGoalInverseLiteralOwnership",
         "TestSATGoalRecoveryIndependentBinaryTruthTables",
@@ -81899,6 +81900,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained goal overload sat TRACE of final formula before process, after self-label skip (cpp480)",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+          "tests": ["TestSATGoalDependencyFormulaSourceTrace"]
+        },
         {
           "name": "Retained imp atom, unsupported-operator, OR/AND/IFF and nonroot-AND-result TRACE sites (cpp132,192,204,244,282,325)",
           "status": "ported",
@@ -181107,6 +181114,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestSATGoalDependencyFormulaSourceTrace",
         "TestSATGoalTranslatorResultStackSourceTrace",
         "TestASTBitVectorAllOneSourceTrace",
         "TestUFBVRewriterPublishedGoalSourceTraceAndFormatterRefusal",
@@ -181239,6 +181247,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained goal2sat goal-overload sat TRACE after dependency guard construction (goal2sat.cpp:480)",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+          "tests": ["TestSATGoalDependencyFormulaSourceTrace"]
+        },
         {
           "name": "Retained goal2sat::imp atom and conversion TRACE sites (goal2sat.cpp:132,192,204,244,282,325)",
           "status": "ported",
@@ -183205,6 +183219,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestSATGoalDependencyFormulaSourceTrace",
         "TestSATGoalTranslatorResultStackSourceTrace",
         "TestASTBitVectorAllOneSourceTrace",
         "TestUFBVRewriterPublishedGoalSourceTraceAndFormatterRefusal",
@@ -183347,6 +183362,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained goal2sat goal-overload sat TRACE after dependency guard construction (goal2sat.cpp:480)",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+          "tests": ["TestSATGoalDependencyFormulaSourceTrace"]
+        },
         {
           "name": "Retained goal2sat::imp atom and conversion TRACE sites (goal2sat.cpp:132,192,204,244,282,325)",
           "status": "ported",
