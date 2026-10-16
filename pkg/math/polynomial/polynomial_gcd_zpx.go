@@ -95,6 +95,9 @@ func (m *MultivariatePolynomialManager) lcGlexZPX(p Polynomial, x uint32) (resul
 			return result, ErrPolynomialAssertion
 		}
 	}
+	if err = m.traceLCGlexZPXMax(max.value); err != nil {
+		return result, err
+	}
 	return c.som.mk(false)
 }
 

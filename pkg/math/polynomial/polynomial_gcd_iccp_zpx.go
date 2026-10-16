@@ -20,11 +20,15 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 			return ErrPolynomialAssertion
 		}
 	}
+	if err = m.traceICCPZPXEntry(p, x); err != nil {
+		return err
+	}
 	zero, e := c.IsZero(p)
 	if e != nil {
 		return e
 	}
 	if zero {
+		m.traceICCPZPXLiteral(3880, "iccp_ZpX, p is zero\n")
 		if e = c.modular.SetInt32(ci, 0); e != nil {
 			return e
 		}
@@ -38,6 +42,7 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 		return e
 	}
 	if constant {
+		m.traceICCPZPXLiteral(3887, "iccp_ZpX, p is constant\n")
 		a, e := c.coefficientCore(p, 0)
 		if e != nil {
 			return e
@@ -55,6 +60,7 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 		return e
 	}
 	if d == 0 {
+		m.traceICCPZPXLiteral(3895, "iccp_ZpX, degree(p, x) == 0\n")
 		if e = c.integerContentWithReceipt(p, ci, pp, contentReceipt); e != nil {
 			return e
 		}
@@ -113,6 +119,7 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 		if polynomialSourceDebug && uint32(len(ms.values)) != 0 {
 			return ErrPolynomialAssertion
 		}
+		m.traceICCPZPXFactor(x, minimum)
 		s.constructReference(c, 0)
 		s.constructReference(c, 1)
 		a, e := c.MkVariable(x, minimum)
@@ -196,6 +203,7 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 				return e
 			}
 		}
+		m.traceICCPZPXLiteral(3954, "iccp_ZpX, cheap case... invoking ic\n")
 		if e = c.integerContentWithReceipt(p, ci, pp, &s.contentInvocation); e != nil {
 			return e
 		}

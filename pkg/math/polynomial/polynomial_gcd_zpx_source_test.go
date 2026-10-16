@@ -2,9 +2,13 @@
 package polynomial
 
 import (
+	"bytes"
 	"errors"
-	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	"strings"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func TestPolynomialGCDGlexZPXIndependentCoefficientModel(t *testing.T) {
@@ -15,6 +19,10 @@ func TestPolynomialGCDGlexZPXIndependentCoefficientModel(t *testing.T) {
 	_, e = c.monomials.MkVar()
 	serviceMust(t, e)
 	serviceMust(t, c.modular.SetZPUint64(11))
+	var trace bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&trace)
+	tags.Enable("mgcd_detail")
+	c.monomials.config.Trace = tags
 	// Viewed over GF11[x], maximal remaining monomial y^2 has coefficient 3x+4.
 	p := polynomialQueryTerms(t, c, []int32{3, 4, 5, 1}, [][]MonomialPower{{{0, 1}, {1, 2}}, {{1, 2}}, {{0, 3}, {1, 1}}, nil})
 	a, e := full.lcGlexZPX(p, 0)
@@ -24,6 +32,13 @@ func TestPolynomialGCDGlexZPXIndependentCoefficientModel(t *testing.T) {
 	t.Cleanup(func() { serviceMust(t, r.Close()) })
 	serviceMust(t, r.root.assign(c, a))
 	polynomialQueryExpect(t, c, a, map[[3]uint32]int64{{1, 0, 0}: 3, {}: 4})
+	if tags.ShouldTrace("mgcd_detail") {
+		if !strings.Contains(trace.String(), "[mgcd_detail] lc_glex_ZpX src/math/polynomial/polynomial.cpp:4042 ---------\nmaximal monomial: x1^2\n") {
+			t.Fatalf("missing maximal-monomial source trace: %q", trace.String())
+		}
+	} else if trace.Len() != 0 {
+		t.Fatalf("ordinary build emitted trace: %q", trace.String())
+	}
 }
 
 func TestPolynomialGCDICCPZPXContentAndPrimitiveIndependentModel(t *testing.T) {
@@ -59,6 +74,10 @@ func TestPolynomialGCDICCPZPXSourceShortcutTable(t *testing.T) {
 		_, e = c.monomials.MkVar()
 		serviceMust(t, e)
 		serviceMust(t, c.modular.SetZPUint64(11))
+		var trace bytes.Buffer
+		tags := diagnostic.NewTraceTagsWithWriter(&trace)
+		tags.Enable("mgcd_detail")
+		c.monomials.config.Trace = tags
 		var p Polynomial
 		var cw, pw map[[3]uint32]int64
 		ciWant := int64(1)
@@ -101,6 +120,42 @@ func TestPolynomialGCDICCPZPXSourceShortcutTable(t *testing.T) {
 		}
 		polynomialQueryExpect(t, c, cr.root.value, cw)
 		polynomialQueryExpect(t, c, pr.root.value, pw)
+		if tags.ShouldTrace("mgcd_detail") {
+			got := trace.String()
+			if !strings.Contains(got, "[mgcd_detail] iccp_ZpX src/math/polynomial/polynomial.cpp:3878 ---------\niccp_ZpX, p: ") || !strings.Contains(got, "\nvar x0\n") {
+				t.Fatalf("missing source entry trace for route %d: %q", route, got)
+			}
+			branches := []string{
+				":3880 ---------\niccp_ZpX, p is zero\n",
+				":3887 ---------\niccp_ZpX, p is constant\n",
+				":3895 ---------\niccp_ZpX, degree(p, x) == 0\n",
+				":3922 ---------\niccp_ZpX, all monomials contain x0, dividing by x0^2\n",
+				":3954 ---------\niccp_ZpX, cheap case... invoking ic\n",
+			}
+			if !strings.Contains(got, branches[route]) {
+				t.Fatalf("missing source shortcut trace for route %d: %q", route, got)
+			}
+		} else if trace.Len() != 0 {
+			t.Fatalf("ordinary build emitted trace for route %d: %q", route, trace.String())
+		}
+		if route == 4 {
+			tags.Disable("mgcd_detail")
+			before := trace.String()
+			serviceMust(t, full.iccpZPX(p, 0, &ci, &cr.root, &pr.root))
+			if trace.String() != before {
+				t.Fatalf("disabled tag emitted source trace: %q", trace.String())
+			}
+			refused := &algebraicIntervalRefusingWriter{stop: 10, err: errors.New("trace refused")}
+			tags = diagnostic.NewTraceTagsWithWriter(refused)
+			tags.Enable("mgcd_detail")
+			c.monomials.config.Trace = tags
+			serviceMust(t, full.iccpZPX(p, 0, &ci, &cr.root, &pr.root))
+			polynomialQueryExpect(t, c, cr.root.value, cw)
+			polynomialQueryExpect(t, c, pr.root.value, pw)
+			if tags.ShouldTrace("mgcd_detail") && refused.writes != 10 {
+				t.Fatalf("refused source stream writes: %d", refused.writes)
+			}
+		}
 	}
 }
 
