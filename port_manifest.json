@@ -187333,7 +187333,7 @@
         },
         {
           "name": "Literal SET checked operator[] after completed incoming INC (vector.h:303-311)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_ref_vector_set.go",
           "tests": [
             "TestPolynomialPSCChain1AscendingSetAndLastUnitCallbackRefuseOwnerReentry",
@@ -187341,7 +187341,8 @@
             "TestPolynomialPSCChain1SubchainSourceStopPreservesActualChildAndHistory",
             "TestPolynomialPSCChain1ActualCoefficientAndSetEveryReservationPrefix",
             "TestPolynomialPSCChain1SourceDegreeIndexedCoefficientLayout",
-            "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse"
+            "TestPolynomialPSCChain1SubchainExactFrameAndCopiedOwnerRefuse",
+            "TestPolynomialSubresultantChainActualUnsignedResizeWrap"
           ]
         },
         {
