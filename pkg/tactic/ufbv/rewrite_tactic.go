@@ -14,6 +14,12 @@ import (
 
 var ErrRewriterUnsatCores = errors.New("g3: ufbv-rewriter does not support unsat cores")
 
+type rewriteTacticImp struct {
+	manager *ast.ASTManager
+	boolean *rewriter.BoolRewriter
+	header  uint64
+}
+
 // RewriterTactic owns the configured Boolean reducer used by the concrete
 // UFBV formula processor. Its AST and parameter services are borrowed.
 type RewriterTactic struct {
@@ -21,7 +27,8 @@ type RewriterTactic struct {
 	manager *ast.ASTManager
 	context *uparams.ParamsContext
 	globals *uparams.GlobalParamsService
-	boolean *rewriter.BoolRewriter
+	imp     *rewriteTacticImp
+	retired []*rewriteTacticImp
 	trace   *diagnostic.TraceTags
 	header  uint64
 	closed  bool
@@ -39,20 +46,13 @@ func NewRewriterTactic(m *ast.ASTManager, c *uparams.ParamsContext, g *uparams.G
 	}
 	t := &RewriterTactic{manager: m, context: c, globals: g, header: n}
 	t.self = t
-	local, e := c.NewValue()
-	if e != nil {
-		return t, e
-	}
-	key := "elim_and"
-	if e = c.SetBoolName(&local, &key, true); e != nil {
-		return t, errors.Join(e, c.Del(&local))
-	}
-	t.boolean, e = rewriter.NewBoolRewriter(m, c, g, &local)
-	return t, errors.Join(e, c.Del(&local))
+	imp, e := t.newImp(81)
+	t.imp = imp
+	return t, e
 }
 
 func (t *RewriterTactic) check() error {
-	if t == nil || t.self != t || t.closed || t.manager == nil || t.boolean == nil {
+	if t == nil || t.self != t || t.closed || t.manager == nil || t.imp == nil || t.imp.boolean == nil {
 		return ast.ErrASTHandle
 	}
 	_, e := t.manager.ProofsEnabled()
@@ -134,7 +134,7 @@ func (t *RewriterTactic) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error)
 			proofPins++
 		}
 	}
-	processor, e := newFormulaProcessor(t.manager, t.boolean)
+	processor, e := newFormulaProcessor(t.manager, t.imp.boolean)
 	if e != nil {
 		if processor != nil {
 			result = errors.Join(result, processor.close())
@@ -187,14 +187,54 @@ func (t *RewriterTactic) Close() error {
 	if t.closed {
 		return nil
 	}
-	if t.boolean != nil {
-		if e := t.boolean.Close(); e != nil {
+	for len(t.retired) != 0 {
+		if e := t.releaseImp(t.retired[0], 115); e != nil {
 			return e
 		}
-		t.boolean = nil
+		t.retired = t.retired[1:]
+	}
+	if t.imp != nil {
+		if e := t.releaseImp(t.imp, 89); e != nil {
+			return e
+		}
+		t.imp = nil
 	}
 	t.manager.Budget().Release(t.header)
 	t.header = 0
 	t.closed = true
+	return nil
+}
+
+// Cleanup constructs the replacement before retiring the previous imp, as
+// the source swap does. A stopped old-owner release remains reachable.
+func (t *RewriterTactic) Cleanup() error {
+	if e := t.check(); e != nil {
+		return e
+	}
+	for len(t.retired) != 0 {
+		if e := t.releaseImp(t.retired[0], 115); e != nil {
+			return e
+		}
+		t.retired = t.retired[1:]
+	}
+	next, e := t.newImp(113)
+	if e != nil {
+		if next != nil {
+			t.retired = append(t.retired, next)
+			releaseErr := t.releaseImp(next, 115)
+			if releaseErr == nil {
+				t.retired = t.retired[:len(t.retired)-1]
+			}
+			return errors.Join(e, releaseErr)
+		}
+		return e
+	}
+	old := t.imp
+	t.imp = next
+	t.retired = append(t.retired, old)
+	if e := t.releaseImp(old, 115); e != nil {
+		return e
+	}
+	t.retired = t.retired[1:]
 	return nil
 }

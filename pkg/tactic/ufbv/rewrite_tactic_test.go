@@ -40,6 +40,25 @@ func ufbvTacticServicesFixture(t *testing.T, m *ast.ASTManager) (*uparams.Params
 	return ctx, globals
 }
 
+func TestUFBVRewriterCleanupAllocationRefusalKeepsCurrentImplementation(t *testing.T) {
+	m := cacheFixture(t)
+	ctx, globals := ufbvTacticServicesFixture(t, m)
+	r, e := NewRewriterTactic(m, ctx, globals)
+	cacheMust(t, e)
+	t.Cleanup(func() { cacheMust(t, r.Close()) })
+	first := r.imp
+	before := m.Budget().Used()
+	m.Budget().FailAfter(0)
+	if e := r.Cleanup(); !errors.Is(e, arena.ErrInjectedFailure) || r.imp != first || len(r.retired) != 0 || m.Budget().Used() != before {
+		t.Fatal("refused replacement changed current implementation", e, r.imp, r.retired, m.Budget().Used(), before)
+	}
+	m.Budget().FailAfter(-1)
+	cacheMust(t, r.Cleanup())
+	if r.imp == first || first.header != 0 || len(r.retired) != 0 || m.Budget().Used() != before {
+		t.Fatal("retry did not replace and release the old implementation", r.imp, first, r.retired, m.Budget().Used(), before)
+	}
+}
+
 func TestUFBVRewriterTacticPublishesIndependentGoalReference(t *testing.T) {
 	m := cacheFixture(t)
 	ctx, globals := ufbvTacticServicesFixture(t, m)
