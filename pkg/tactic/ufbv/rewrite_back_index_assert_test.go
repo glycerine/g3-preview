@@ -89,3 +89,17 @@ func TestRewriteBackIndexPresentNilSetSourceGuards(t *testing.T) {
 		cacheMust(t, forward.close())
 	})
 }
+
+func TestRewriteBackIndexTypedRootRejectsInvalidSourcePointer(t *testing.T) {
+	m := cacheFixture(t)
+	r, e := newRewriteBackIndex(m)
+	cacheMust(t, e)
+	t.Cleanup(func() { cacheMust(t, r.close()) })
+	before := m.Budget().Used()
+	if e := r.addProcessed(ast.ASTHandle{}); !errors.Is(e, ast.ErrASTHandle) {
+		t.Fatal("invalid typed root reached the source back-index visitor", e)
+	}
+	if len(r.byDecl) != 0 || len(r.processed) != 0 || len(r.owned) != 0 || m.Budget().Used() != before {
+		t.Fatal("invalid root published back-index state", r.byDecl, r.processed, r.owned, m.Budget().Used(), before)
+	}
+}

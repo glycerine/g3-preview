@@ -108715,6 +108715,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "UFBV add-back-index raw m_expr pointer sentinel SASSERT at cpp477 is replaced by validated owner/slot/generation AST handles",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/rewrite_back_index.go",
+          "tests": ["TestRewriteBackIndexTypedRootRejectsInvalidSourcePointer"]
+        },
+        {
           "name": "Retained UFBV demodulator large-app SASSERT at ufbv_rewriter.cpp:716 before function lookup",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_formula_demodulator_assert.go",
@@ -122997,6 +123003,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "UFBV add-back-index raw m_expr pointer sentinel SASSERT at cpp477 is replaced by validated owner/slot/generation AST handles",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/rewrite_back_index.go",
+          "tests": ["TestRewriteBackIndexTypedRootRejectsInvalidSourcePointer"]
+        },
+        {
           "name": "Retained UFBV demodulator large-app SASSERT at ufbv_rewriter.cpp:716 before function lookup",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_formula_demodulator_assert.go",
@@ -123513,6 +123525,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "UFBV add-back-index raw m_expr pointer sentinel SASSERT at cpp477 is replaced by validated owner/slot/generation AST handles",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/rewrite_back_index.go",
+          "tests": ["TestRewriteBackIndexTypedRootRejectsInvalidSourcePointer"]
+        },
         {
           "name": "Retained UFBV demodulator large-app SASSERT at ufbv_rewriter.cpp:716 before function lookup",
           "status": "ported",
