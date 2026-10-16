@@ -79,14 +79,6 @@ func (c satIntegrityChecker) traceMissingBinaryWatch(literal, other Literal, lea
 	}
 	_ = tags.EmitConditional("sat_watched_bug", "check_watches", "src/sat/sat_integrity_checker.cpp", 172,
 		func() bool { return true }, func(w io.Writer) error {
-			currentText, err := c.watchListText(current)
-			if err != nil {
-				return err
-			}
-			reciprocalText, err := c.watchListText(reciprocal)
-			if err != nil {
-				return err
-			}
 			boolDigit := func(v bool) string {
 				if v {
 					return "1"
@@ -95,7 +87,18 @@ func (c satIntegrityChecker) traceMissingBinaryWatch(literal, other Literal, lea
 			}
 			_, _ = io.WriteString(w, "l: "+literal.String()+" l2: "+other.String()+"\n")
 			_, _ = io.WriteString(w, "was_eliminated1: "+boolDigit(ownGone)+" was_eliminated2: "+boolDigit(otherGone)+" learned: "+boolDigit(learned)+"\n")
-			_, _ = io.WriteString(w, currentText+"\n"+reciprocalText+"\n")
+			currentText, err := c.watchListText(current)
+			if err != nil {
+				return err
+			}
+			_, _ = io.WriteString(w, currentText)
+			_, _ = io.WriteString(w, "\n")
+			reciprocalText, err := c.watchListText(reciprocal)
+			if err != nil {
+				return err
+			}
+			_, _ = io.WriteString(w, reciprocalText)
+			_, _ = io.WriteString(w, "\n")
 			return nil
 		})
 }

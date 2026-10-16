@@ -59,4 +59,19 @@ func TestSATIntegrityMissingBinaryReciprocalSourceTrace(t *testing.T) {
 	if !yes || output.String() != want {
 		t.Fatalf("trace with assertions disabled: result=%v, got %q, want %q", yes, output.String(), want)
 	}
+	// The source writes the scalar fields before either watch-list display.
+	// Refusing the first formatter owner must preserve that reached prefix.
+	output.Reset()
+	l.budget.FailAfter(0)
+	defer l.budget.FailAfter(-1)
+	yes, err = c.checkWatches()
+	satOK(t, err)
+	want = ""
+	if tags.ShouldTrace("sat_watched_bug") && satStorageSourceDebug {
+		want = "-------- [sat_watched_bug] check_watches src/sat/sat_integrity_checker.cpp:172 ---------\n" +
+			"l: 0 l2: 1\nwas_eliminated1: 0 was_eliminated2: 0 learned: 0\n"
+	}
+	if !yes || output.String() != want {
+		t.Fatalf("refused watch-list formatter prefix: result=%v, got %q, want %q", yes, output.String(), want)
+	}
 }

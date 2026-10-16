@@ -183717,7 +183717,7 @@
           ]
         },
         {
-          "name": "Retained SAT checker sat_watched_bug missing-reciprocal CTRACE with two source watch-list displays (sat_integrity_checker.cpp:172)",
+          "name": "Retained SAT checker sat_watched_bug missing-reciprocal CTRACE with source-ordered scalar prefix and two watch-list displays (sat_integrity_checker.cpp:172)",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
           "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
@@ -186051,7 +186051,7 @@
           ]
         },
         {
-          "name": "Retained SAT checker sat_watched_bug missing-reciprocal CTRACE with two source watch-list displays (sat_integrity_checker.cpp:172)",
+          "name": "Retained SAT checker sat_watched_bug missing-reciprocal CTRACE with source-ordered scalar prefix and two watch-list displays (sat_integrity_checker.cpp:172)",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
           "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
