@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
@@ -62,7 +63,13 @@ func (m *ASTManager) ppAssertFormat(r astNodeRef, g *uparams.GlobalParamsService
 	if !ASTSourceDebug {
 		return nil
 	}
-	enabled, e := g.NamespaceAssertionsEnabled()
+	var enabled bool
+	var e error
+	if g == nil {
+		enabled, e = diagnostic.BorrowProcessDebugContext().AssertionsEnabled()
+	} else {
+		enabled, e = g.NamespaceAssertionsEnabled()
+	}
 	if e != nil {
 		return e
 	}
@@ -88,6 +95,9 @@ func (m *ASTManager) ppAssertFormat(r astNodeRef, g *uparams.GlobalParamsService
 		return e
 	}
 	if id != expected {
+		if g == nil {
+			return diagnostic.DebugAssertionFailure(diagnostic.BorrowProcessDebugContext(), "src/ast/pp.cpp", line, "f->get_family_id() == fm(m).get_family_id(\"format\")")
+		}
 		return g.NamespaceAssertionFailure("src/ast/pp.cpp", line, "f->get_family_id() == fm(m).get_family_id(\"format\")")
 	}
 	return nil
@@ -224,11 +234,13 @@ func (m *ASTManager) releasePPFrames() error {
 		// This owning path is invoked only after the actual containing AST table
 		// has ended: an already-consumed source child cannot be DEC'd again.
 		f.todo = nil
-		if e := f.parameters.CloseHelpers(); e != nil {
-			if f.ownCause == nil {
-				f.ownCause = e
+		if f.parameters.Self != nil {
+			if e := f.parameters.CloseHelpers(); e != nil {
+				if f.ownCause == nil {
+					f.ownCause = e
+				}
+				return e
 			}
-			return e
 		}
 	}
 	for f := m.ppFrames; f != nil; f = f.next {
@@ -239,13 +251,16 @@ func (m *ASTManager) releasePPFrames() error {
 	return nil
 }
 
+// A nil parameter-owner trio uses the source pp defaults for standalone AST
+// warning and trace callers. Bound owners keep their module-parameter scope.
 func (m *ASTManager) PrintFormat(out *utext.NumericTextStream, h ASTHandle, c *uparams.ParamsContext, p *uparams.ParamsRef, g *uparams.GlobalParamsService) (result error) {
 	f, e := m.lockFormat()
 	if e != nil {
 		return e
 	}
 	defer f.unlockFormat()
-	if out == nil || c == nil || c.CheckServices(f.Symbols, nil) != nil || g == nil || g.CheckOwner(c, f.BudgetField) != nil {
+	defaults := c == nil && p == nil && g == nil
+	if out == nil || !defaults && (c == nil || c.CheckServices(f.Symbols, nil) != nil || g == nil || g.CheckOwner(c, f.BudgetField) != nil) {
 		return uparams.ErrParamsOwner
 	}
 	r, e := f.requireExpr(h)
@@ -262,8 +277,6 @@ func (m *ASTManager) PrintFormat(out *utext.NumericTextStream, h ASTHandle, c *u
 	f.ppFrameSerial++
 	frame := &astFormatPPFrame{owner: f, header: n, invocation: f.ppFrameSerial, next: f.ppFrames}
 	f.ppFrames = frame
-	frame.parameters = uparams.ModuleParamsOwner{Context: c, Globals: g, Budget: f.BudgetField}
-	frame.parameters.Self = &frame.parameters
 	defer func() {
 		result = frame.sourceDestroy(result)
 		if result == nil && frame.sourceDone {
@@ -272,42 +285,38 @@ func (m *ASTManager) PrintFormat(out *utext.NumericTextStream, h ASTHandle, c *u
 			frame.header = 0
 		}
 	}()
-	frame.parameters.Running = true
-	frame.helper, e = frame.parameters.BeginHelper(p, "pp")
-	frame.parameters.Running = false
-	if e != nil {
-		return e
-	}
-	frame.parameters.Running = true
-	maxWidth, e := frame.parameters.FrameUInt(frame.helper, "max_width", 80)
-	if e != nil {
+	maxWidth, maxRibbon, maxLines, maxIndent := uint32(80), uint32(80), uint32(math.MaxUint32), uint32(math.MaxUint32)
+	bounded, singleLine := false, false
+	if !defaults {
+		frame.parameters = uparams.ModuleParamsOwner{Context: c, Globals: g, Budget: f.BudgetField}
+		frame.parameters.Self = &frame.parameters
+		frame.parameters.Running = true
+		frame.helper, e = frame.parameters.BeginHelper(p, "pp")
 		frame.parameters.Running = false
-		return e
-	}
-	maxRibbon, e := frame.parameters.FrameUInt(frame.helper, "max_ribbon", 80)
-	if e != nil {
+		if e != nil {
+			return e
+		}
+		frame.parameters.Running = true
+		maxWidth, e = frame.parameters.FrameUInt(frame.helper, "max_width", 80)
+		if e == nil {
+			maxRibbon, e = frame.parameters.FrameUInt(frame.helper, "max_ribbon", 80)
+		}
+		if e == nil {
+			maxLines, e = frame.parameters.FrameUInt(frame.helper, "max_num_lines", math.MaxUint32)
+		}
+		if e == nil {
+			maxIndent, e = frame.parameters.FrameUInt(frame.helper, "max_indent", math.MaxUint32)
+		}
+		if e == nil {
+			bounded, e = frame.parameters.FrameBool(frame.helper, "bounded", false)
+		}
+		if e == nil {
+			singleLine, e = frame.parameters.FrameBool(frame.helper, "single_line", false)
+		}
 		frame.parameters.Running = false
-		return e
-	}
-	maxLines, e := frame.parameters.FrameUInt(frame.helper, "max_num_lines", math.MaxUint32)
-	if e != nil {
-		frame.parameters.Running = false
-		return e
-	}
-	maxIndent, e := frame.parameters.FrameUInt(frame.helper, "max_indent", math.MaxUint32)
-	if e != nil {
-		frame.parameters.Running = false
-		return e
-	}
-	bounded, e := frame.parameters.FrameBool(frame.helper, "bounded", false)
-	if e != nil {
-		frame.parameters.Running = false
-		return e
-	}
-	singleLine, e := frame.parameters.FrameBool(frame.helper, "single_line", false)
-	frame.parameters.Running = false
-	if e != nil {
-		return e
+		if e != nil {
+			return e
+		}
 	}
 	var pos, ribbonPos, line uint32
 	if e = frame.push(r, 0); e != nil {

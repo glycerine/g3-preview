@@ -88,7 +88,7 @@ func TestASTWellSortedApplicationGuardBranches(t *testing.T) {
 	good, e = m.IsWellSorted(app, warnings)
 	m.varAt(vr.slot).sort = oldSort
 	astTestMust(t, e)
-	want := fmt.Sprintf("WARNING: Sort mismatch for argument 1 of decl guard :: (-> Bool Bool)\n#%d := (:var 0 OtherGuard)\n(guard #%d)\n\nExpected sort: Bool\nActual sort:   OtherGuard\nFunction sort: decl guard :: (-> Bool Bool).\n", id, id)
+	want := fmt.Sprintf("WARNING: Sort mismatch for argument 1 of decl guard :: (-> Bool Bool)\n#%d := (:var 0 OtherGuard)\n(guard #%d)\n\nExpected sort: Bool\nActual sort:   OtherGuard\nFunction sort: (declare-fun guard (Bool) Bool).\n", id, id)
 	if good || output.String() != want {
 		t.Fatalf("sort guard: %v %q", good, output.String())
 	}

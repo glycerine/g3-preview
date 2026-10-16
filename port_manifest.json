@@ -188573,10 +188573,11 @@
           "tests": ["TestPatternInferenceQuantifierRetriesWarningsAndWeights", "TestPatternInferencePullDirectNestedForallFindsPattern"]
         },
         {
-          "name": "Standalone AST manager sort-mismatch warning now renders the application, expected and actual sorts, and declaration through its low-level printer; SMT2 declaration formatting and enabled tc TRACE without a process parameter owner remain open",
-          "status": "partial",
+          "name": "Standalone AST well-sorted sort-mismatch warning and tc TRACE use source default SMT2 format settings without a process parameter owner",
+          "status": "ported",
           "go_target": "pkg/ast/ast_well_sorted_warning.go",
-          "tests": ["TestASTWellSortedApplicationGuardBranches", "TestASTWellSortedStandaloneMismatchWarning"]
+          "go_targets": ["pkg/ast/ast_format_pp.go", "pkg/ast/ast_well_sorted_trace.go"],
+          "tests": ["TestASTWellSortedApplicationGuardBranches", "TestASTWellSortedStandaloneMismatchWarning", "TestASTWellSortedStandaloneSortMismatchTrace", "TestASTFormatDefaultPrinterStoppedFrameOwningCleanup"]
         },
         {
           "name": "remaining live direct warning_msg callers in unported API, parser, SMT, MUZ, opt and AST owners outside the credited pattern inference and well-sorted branches",
@@ -188769,10 +188770,11 @@
           "tests": ["TestPatternInferenceQuantifierRetriesWarningsAndWeights", "TestPatternInferencePullDirectNestedForallFindsPattern"]
         },
         {
-          "name": "Standalone AST manager sort-mismatch warning now renders the application, expected and actual sorts, and declaration through its low-level printer; SMT2 declaration formatting and enabled tc TRACE without a process parameter owner remain open",
-          "status": "partial",
+          "name": "Standalone AST well-sorted sort-mismatch warning and tc TRACE use source default SMT2 format settings without a process parameter owner",
+          "status": "ported",
           "go_target": "pkg/ast/ast_well_sorted_warning.go",
-          "tests": ["TestASTWellSortedApplicationGuardBranches", "TestASTWellSortedStandaloneMismatchWarning"]
+          "go_targets": ["pkg/ast/ast_format_pp.go", "pkg/ast/ast_well_sorted_trace.go"],
+          "tests": ["TestASTWellSortedApplicationGuardBranches", "TestASTWellSortedStandaloneMismatchWarning", "TestASTWellSortedStandaloneSortMismatchTrace", "TestASTFormatDefaultPrinterStoppedFrameOwningCleanup"]
         },
         {
           "name": "remaining live direct warning_msg callers in unported API, parser, SMT, MUZ, opt and AST owners outside the credited pattern inference and well-sorted branches",

@@ -16,8 +16,8 @@ func (m *ASTManager) wellSortedTraceParams(c *uparams.ParamsContext, p *uparams.
 		return c, p, g, nil
 	}
 	g = uparams.BorrowProcessGlobalParamsService()
-	if g == nil || g.Context == nil {
-		return nil, nil, nil, uparams.ErrGlobalParamsOwner
+	if g == nil || g.Context == nil || g.CheckOwner(g.Context, m.BudgetField) != nil || g.Context.CheckServices(m.Symbols, m.numerals) != nil {
+		return nil, nil, nil, nil
 	}
 	c = g.Context
 	empty := c.EmptyValue()

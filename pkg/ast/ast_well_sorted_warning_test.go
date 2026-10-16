@@ -82,7 +82,7 @@ func TestASTWellSortedStandaloneMismatchWarning(t *testing.T) {
 	if good {
 		t.Fatal("mismatched sort accepted")
 	}
-	want := fmt.Sprintf("WARNING: Sort mismatch for argument 1 of decl guard :: (-> Bool Bool)\n#%d := (:var 0 OtherStandalone)\n(guard #%d)\n\nExpected sort: Bool\nActual sort:   OtherStandalone\nFunction sort: decl guard :: (-> Bool Bool).\n", id, id)
+	want := fmt.Sprintf("WARNING: Sort mismatch for argument 1 of decl guard :: (-> Bool Bool)\n#%d := (:var 0 OtherStandalone)\n(guard #%d)\n\nExpected sort: Bool\nActual sort:   OtherStandalone\nFunction sort: (declare-fun guard (Bool) Bool).\n", id, id)
 	if got := output.String(); got != want {
 		t.Fatalf("standalone source warning: got %q, want %q", got, want)
 	}

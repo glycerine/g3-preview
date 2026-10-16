@@ -3,7 +3,6 @@ package ast
 
 import (
 	"errors"
-	"strings"
 
 	uparams "github.com/glycerine/g3/pkg/util/params"
 	utext "github.com/glycerine/g3/pkg/util/text"
@@ -31,9 +30,6 @@ func (m *ASTManager) wellSortedMismatchWarning(w wellSortedWarning, c *uparams.P
 		return "", err
 	}
 	printSort := func(h ASTHandle) error {
-		if c == nil {
-			return m.DisplayLowLevel(out, h, false, true)
-		}
 		formatted, e := m.SMT2PPSort(h)
 		if e != nil {
 			return e
@@ -52,29 +48,12 @@ func (m *ASTManager) wellSortedMismatchWarning(w wellSortedWarning, c *uparams.P
 	if err = out.AppendCString("\nFunction sort: "); err != nil {
 		return "", err
 	}
-	if c == nil {
-		declOut, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: m.BudgetField})
-		if e != nil {
-			return "", e
-		}
-		if e = m.DisplayLowLevel(declOut, w.decl, false, true); e != nil {
-			return "", errors.Join(e, declOut.Close())
-		}
-		declText, e := declOut.String()
-		if e = errors.Join(e, declOut.Close()); e != nil {
-			return "", e
-		}
-		if err = out.AppendCString(strings.TrimSuffix(declText, "\n")); err != nil {
-			return "", err
-		}
-	} else {
-		decl, e := m.SMT2PPDeclareFun(w.decl)
-		if e != nil {
-			return "", e
-		}
-		if err = m.PrintFormat(out, decl, c, p, g); err != nil {
-			return "", err
-		}
+	decl, e := m.SMT2PPDeclareFun(w.decl)
+	if e != nil {
+		return "", e
+	}
+	if err = m.PrintFormat(out, decl, c, p, g); err != nil {
+		return "", err
 	}
 	if err = out.AppendCString("."); err != nil {
 		return "", err

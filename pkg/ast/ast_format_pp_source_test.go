@@ -56,6 +56,36 @@ func TestASTFormatPrettyPrinterLiteralWidthIndentAndSingleLine(t *testing.T) {
 	}
 }
 
+func TestASTFormatDefaultPrinterStoppedFrameOwningCleanup(t *testing.T) {
+	completed := false
+	for ordinal := int64(0); ordinal < 64; ordinal++ {
+		m := astTestManager(t)
+		word, e := m.FormatString("word")
+		paramsMust(t, e)
+		line, e := m.FormatLineBreak()
+		paramsMust(t, e)
+		root, e := m.FormatCompose([]ASTHandle{word, line, word})
+		paramsMust(t, e)
+		out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: m.BudgetField})
+		paramsMust(t, e)
+		m.BudgetField.FailAfter(ordinal)
+		call := m.PrintFormat(out, root, nil, nil, nil)
+		m.BudgetField.FailAfter(-1)
+		if call != nil && !errors.Is(call, arena.ErrInjectedFailure) {
+			t.Fatal("unexpected default formatter stop", ordinal, call)
+		}
+		paramsMust(t, out.Close())
+		paramsMust(t, m.Close())
+		if call == nil {
+			completed = true
+			break
+		}
+	}
+	if !completed {
+		t.Fatal("default formatter never completed")
+	}
+}
+
 func astFormatPrettyNamedCold(t *testing.T, m *ASTManager, g *uparams.GlobalParamsService, b *arena.Budget, out *utext.NumericTextStream) {
 	t.Helper()
 	total := m.Stats().AllocatedBytes + g.OwnerBytes + catalogGraph(g.Config.Catalog)

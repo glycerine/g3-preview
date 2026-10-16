@@ -96,6 +96,51 @@ func TestASTWellSortedSortMismatchSourceTraceBeforeWarning(t *testing.T) {
 	}
 }
 
+func TestASTWellSortedStandaloneSortMismatchTrace(t *testing.T) {
+	m := astTestManager(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("tc")
+	m.traceTags = tags
+	boolSort, err := m.MkBoolSort()
+	paramsMust(t, err)
+	otherSort, err := m.MkSort(astTestSymbol(t, m, "OtherStandalone"), ASTSortInfo{})
+	paramsMust(t, err)
+	arg, err := m.MkVar(0, boolSort)
+	paramsMust(t, err)
+	decl, err := m.MkFuncDecl(astTestSymbol(t, m, "guard"), []ASTHandle{boolSort}, boolSort, ASTFuncDeclInfo{})
+	paramsMust(t, err)
+	app, err := m.MkApp(decl, []ASTHandle{arg})
+	paramsMust(t, err)
+	id, err := m.GetASTID(arg)
+	paramsMust(t, err)
+	varRef, err := m.internal(arg)
+	paramsMust(t, err)
+	otherRef, err := m.internal(otherSort)
+	paramsMust(t, err)
+	old := m.varAt(varRef.slot).sort
+	m.varAt(varRef.slot).sort = otherRef
+	defer func() { m.varAt(varRef.slot).sort = old }()
+	warnings := diagnostic.NewWarningService(&output)
+	good, err := m.IsWellSorted(app, warnings)
+	paramsMust(t, err)
+	if good {
+		t.Fatal("sort mismatch accepted")
+	}
+	warning := fmt.Sprintf("WARNING: Sort mismatch for argument 1 of decl guard :: (-> Bool Bool)\n#%d := (:var 0 OtherStandalone)\n(guard #%d)\n\nExpected sort: Bool\nActual sort:   OtherStandalone\nFunction sort: (declare-fun guard (Bool) Bool).\n", id, id)
+	want := warning
+	if tags.ShouldTrace("tc") {
+		want = "-------- [tc] operator() src/ast/well_sorted.cpp:59 ---------\n" +
+			"sort mismatch on argument #0.\n" +
+			"(guard (:var 0))Sort mismatch for argument 1 of (guard (:var 0))\n" +
+			"Expected sort: Bool\nActual sort:   OtherStandalone\nFunction sort: (declare-fun guard (Bool) Bool)." +
+			"------------------------------------------------\n" + warning
+	}
+	if got := output.String(); got != want {
+		t.Fatalf("standalone tc/warning order: got %q, want %q", got, want)
+	}
+}
+
 func TestASTWellSortedNonBooleanRootTraceProfiles(t *testing.T) {
 	c, g, p, budget := dynAckSourceFixture(t)
 	var output bytes.Buffer
