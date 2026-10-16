@@ -73147,6 +73147,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Reached SAT asymm_branch solver display and process/reduction/unit TRACE sites at sat_asymm_branch.cpp:68,118,143,162,187",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_asymm_branch_trace.go",
+          "tests": ["TestSATAsymmBranchProcessSourceTraces", "TestSATAsymmBranchDisabledSourceTrace", "TestSATAsymmBranchFullSolverDisplaySourceTrace"]
+        },
+        {
           "name": "Selected constructor, parameters/statistics, complete asymmetric run/process and scoped-detach routes",
           "status": "partial",
           "go_target": "pkg/sat/sat_asymm_branch.go",
@@ -73184,7 +73190,7 @@
         "Actual sole propagation.asymmCounter; independent native []int8 phase snapshot, restored only on normal completion; source scoped detach before push; disjoint stable merge and clause compaction owners. Native snapshot cleanup preserves body errors without Runtime allocation or destruction. Actual remaining allocation refusals are audited immediately before fault disable."
       ],
       "deviations": [
-        "Full solver scheduler/constructor/search, enabled integrity and propagation-wrapper diagnostic bindings, TRACE/verbose and complete generated registration/default-empty parameter binding remain open. Concrete stable merge preserves descending size and equal ties, not C++ standard-library allocation topology or invocation schedule. Source exceptional scope is not popped automatically; only actual solver_exception triggers source suffix compaction and counter negation. Protocol stale-token and signed-overflow TLS fixtures do not claim ordinary valid-domain allocation failures. No whole solver/API/registered assertion completion credit."
+        "Full solver scheduler/constructor/search, enabled integrity and propagation-wrapper diagnostic bindings, verbose and complete generated registration/default-empty parameter binding remain open. Concrete stable merge preserves descending size and equal ties, not C++ standard-library allocation topology or invocation schedule. Source exceptional scope is not popped automatically; only actual solver_exception triggers source suffix compaction and counter negation. Protocol stale-token and signed-overflow TLS fixtures do not claim ordinary valid-domain allocation failures. No whole solver/API/registered assertion completion credit."
       ]
     },
     {
@@ -180810,6 +180816,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Reached SAT asymm_branch solver display and process/reduction/unit TRACE sites at sat_asymm_branch.cpp:68,118,143,162,187",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_asymm_branch_trace.go",
+          "tests": ["TestSATAsymmBranchProcessSourceTraces", "TestSATAsymmBranchDisabledSourceTrace", "TestSATAsymmBranchFullSolverDisplaySourceTrace"]
+        },
+        {
           "name": "Whole live MPZ TRACE/STRACE site inventory in mpz.cpp and mpz.h: integer arithmetic/division, divisibility, LCM, bitwise, shifts and root; array-GCD site at cpp875 is disabled",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_short_trace.go",
@@ -182693,6 +182705,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached SAT asymm_branch solver display and process/reduction/unit TRACE sites at sat_asymm_branch.cpp:68,118,143,162,187",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_asymm_branch_trace.go",
+          "tests": ["TestSATAsymmBranchProcessSourceTraces", "TestSATAsymmBranchDisabledSourceTrace", "TestSATAsymmBranchFullSolverDisplaySourceTrace"]
+        },
         {
           "name": "Whole live MPZ TRACE/STRACE site inventory in mpz.cpp and mpz.h: integer arithmetic/division, divisibility, LCM, bitwise, shifts and root; array-GCD site at cpp875 is disabled",
           "status": "ported",

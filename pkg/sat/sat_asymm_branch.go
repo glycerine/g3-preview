@@ -14,6 +14,7 @@ import (
 
 type satAsymmBranch struct {
 	self                                                                                  *satAsymmBranch
+	solver                                                                                *Solver
 	lifecycle                                                                             *satSolverClauseLifecycle
 	ownerBytes                                                                            uint64
 	enabled                                                                               bool
@@ -174,6 +175,7 @@ func (a *satAsymmBranch) run(force bool) (err error) {
 	if e := a.invariant(); e != nil {
 		return e
 	}
+	a.traceSolverDisplay()
 	a.report = stopwatch.Stopwatch{}
 	a.reportElimLiterals = a.elimLiterals
 	if e := a.report.Start(); e != nil {
@@ -322,6 +324,7 @@ func (a *satAsymmBranch) Close() error {
 
 	a.lifecycle.budget.Release(a.ownerBytes)
 	a.ownerBytes = 0
+	a.solver = nil
 	a.closed = true
 	return nil
 }

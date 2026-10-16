@@ -187,6 +187,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	if s.asymm, err = newSATAsymmBranch(s.Lifecycle, &c.Params); err != nil {
 		return s, err
 	}
+	s.asymm.solver = s
 	if err = s.probing.initializeSource(c.ParamsContext, &c.Params); err != nil {
 		return s, err
 	}

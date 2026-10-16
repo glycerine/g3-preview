@@ -19,6 +19,7 @@ func (a *satAsymmBranch) process(c StoredClauseRef) (keep bool, err error) {
 	p := l.propagation
 	v := p.variables
 	cl := p.clauses
+	a.traceProcessing(c)
 	var trail uint32
 	var e error
 	if satStorageSourceDebug {
@@ -94,6 +95,7 @@ func (a *satAsymmBranch) process(c StoredClauseRef) (keep bool, err error) {
 		if satStorageSourceDebug && p.inconsistent {
 			return false, ErrSATAssertion
 		}
+		a.traceAssign(x.Negated())
 		if e = p.assign(x.Negated(), satJustification{}); e != nil {
 			return false, e
 		}
@@ -129,6 +131,7 @@ func (a *satAsymmBranch) process(c StoredClauseRef) (keep bool, err error) {
 	if satStorageSourceDebug && (newSize < 1 || newSize >= sz) {
 		return false, ErrSATAssertion
 	}
+	a.traceReduced(c, newSize)
 	j := uint32(0)
 	for i = 0; i < newSize; i++ {
 		x, e := cl.Literal(c, i)
@@ -161,6 +164,7 @@ func (a *satAsymmBranch) process(c StoredClauseRef) (keep bool, err error) {
 		if e != nil {
 			return false, e
 		}
+		a.traceUnit(x)
 		if e = p.assign(x, satJustification{}); e != nil {
 			return false, e
 		}
