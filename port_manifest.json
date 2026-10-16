@@ -127149,10 +127149,10 @@
           ]
         },
         {
-          "name": "concrete Int heap CASSERT heap-tag gates and nested source SASSERT checks at construction, movement, mutation, swap and insert value-bounds check (heap.h:57,233)",
+          "name": "concrete Int heap CASSERT heap-tag gates and nested source SASSERT checks at construction, movement, mutation, swap, insertion and empty/absent value preconditions (heap.h:57,169,175-176,181,197,221,226,233)",
           "status": "ported",
           "go_target": "pkg/util/heap/heap.go",
-          "tests": ["TestHeapSourceConditionalAssertionsGateAndPreMutationFailure", "TestHeapBorrowsProcessDebugUnlessExplicit", "TestHeapInsertInvalidValueUsesNestedSourceAssertion"]
+          "tests": ["TestHeapSourceConditionalAssertionsGateAndPreMutationFailure", "TestHeapBorrowsProcessDebugUnlessExplicit", "TestHeapInvalidOperationsUseSourceAssertions"]
         },
         {
           "name": "move_up/move_down",

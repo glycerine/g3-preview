@@ -225,8 +225,10 @@ func TestHeapSourceShapeAndLifetime(t *testing.T) {
 	if !h.Empty() || h.Contains(0) {
 		t.Fatal("empty bounded heap")
 	}
-	if _, e := h.Min(); !errors.Is(e, ErrValue) {
-		t.Fatal("empty minimum", e)
+	if !diagnostic.DebugBuild {
+		if _, e := h.Min(); !errors.Is(e, ErrValue) {
+			t.Fatal("empty minimum", e)
+		}
 	}
 	// In a checked build, the source's nested SASSERT handles this invalid
 	// value; the dedicated action fixture covers its C/T outcomes.

@@ -111,6 +111,18 @@ func (h *Int) sassertInsertValue(v int32) error {
 	return nil
 }
 
+func (h *Int) sassert(line int32, condition string, test func() bool) error {
+	d := h.debugContext()
+	on, err := diagnostic.SourceAssertionsEnabled(d)
+	if err != nil || !on {
+		return err
+	}
+	if !test() {
+		return h.assertFailure(d, line, condition)
+	}
+	return nil
+}
+
 func (h *Int) cassertInvariant() error {
 	d := h.debugContext()
 	on, err := diagnostic.SourceAssertionsEnabled(d)
@@ -272,6 +284,9 @@ func (h *Int) Min() (int32, error) {
 	if e := h.alive(); e != nil {
 		return 0, e
 	}
+	if e := h.sassert(169, "!empty()", func() bool { return !h.Empty() }); e != nil {
+		return 0, e
+	}
 	if h.Empty() {
 		return 0, ErrValue
 	}
@@ -282,6 +297,12 @@ func (h *Int) EraseMin() (int32, error) {
 		return 0, e
 	}
 	if e := h.cassertInvariant(); e != nil {
+		return 0, e
+	}
+	if e := h.sassert(175, "!empty()", func() bool { return !h.Empty() }); e != nil {
+		return 0, e
+	}
+	if e := h.sassert(176, "m_values.size() >= 2", func() bool { return len(h.values) >= 2 }); e != nil {
 		return 0, e
 	}
 	if h.Empty() {
@@ -298,6 +319,8 @@ func (h *Int) EraseMin() (int32, error) {
 		if e := h.down(1); e != nil {
 			return 0, e
 		}
+	} else if e := h.sassert(181, "empty()", h.Empty); e != nil {
+		return 0, e
 	}
 	return v, h.cassertInvariant()
 }
@@ -306,6 +329,9 @@ func (h *Int) Erase(v int32) error {
 		return e
 	}
 	if e := h.cassertInvariant(); e != nil {
+		return e
+	}
+	if e := h.sassert(197, "contains(val)", func() bool { return h.Contains(v) }); e != nil {
 		return e
 	}
 	if !h.Contains(v) || h.indices[v] < 1 || int64(h.indices[v]) >= int64(len(h.values)) {
@@ -336,6 +362,9 @@ func (h *Int) Increased(v int32) error {
 	if e := h.canChange(); e != nil {
 		return e
 	}
+	if e := h.sassert(226, "contains(val)", func() bool { return h.Contains(v) }); e != nil {
+		return e
+	}
 	if !h.Contains(v) || h.indices[v] < 1 || int64(h.indices[v]) >= int64(len(h.values)) {
 		// Guard an invalid inverse position before indexing the native slice.
 		return ErrValue
@@ -348,6 +377,9 @@ func (h *Int) Increased(v int32) error {
 }
 func (h *Int) Decreased(v int32) error {
 	if e := h.canChange(); e != nil {
+		return e
+	}
+	if e := h.sassert(221, "contains(val)", func() bool { return h.Contains(v) }); e != nil {
 		return e
 	}
 	if !h.Contains(v) || h.indices[v] < 1 || int64(h.indices[v]) >= int64(len(h.values)) {

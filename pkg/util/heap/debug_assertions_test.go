@@ -14,7 +14,7 @@ import (
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-func TestHeapInsertInvalidValueUsesNestedSourceAssertion(t *testing.T) {
+func TestHeapInvalidOperationsUseSourceAssertions(t *testing.T) {
 	b := arena.NewBudget(1 << 24)
 	region, err := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: b}})
 	heapMust(t, err)
@@ -22,7 +22,7 @@ func TestHeapInsertInvalidValueUsesNestedSourceAssertion(t *testing.T) {
 	heapMust(t, err)
 	inputFile, err := os.CreateTemp(t.TempDir(), "heap-input-*")
 	heapMust(t, err)
-	_, err = inputFile.WriteString("CT")
+	_, err = inputFile.WriteString("CCCCCCCT")
 	heapMust(t, err)
 	_, err = inputFile.Seek(0, io.SeekStart)
 	heapMust(t, err)
@@ -55,10 +55,32 @@ func TestHeapInsertInvalidValueUsesNestedSourceAssertion(t *testing.T) {
 	if e := h.Insert(-1); !errors.Is(e, ErrValue) {
 		t.Fatal("erased source assertion must reach the Go bounds guard", e)
 	}
+	if _, e := h.Min(); !errors.Is(e, ErrValue) {
+		t.Fatal("erased minimum assertion must reach the Go guard", e)
+	}
+	if _, e := h.EraseMin(); !errors.Is(e, ErrValue) {
+		t.Fatal("erased erase-min assertions must reach the Go guard", e)
+	}
+	for _, action := range []func(int32) error{h.Erase, h.Decreased, h.Increased} {
+		if e := action(0); !errors.Is(e, ErrValue) {
+			t.Fatal("erased membership assertion must reach the Go guard", e)
+		}
+	}
 	heapMust(t, d.EnableAssertions(true))
 	// SASSERT is independent of the conditional "heap" debug tag.
 	if e := h.Insert(-1); !errors.Is(e, ErrValue) {
 		t.Fatal("continuing nested assertion must reach the bounds guard", e)
+	}
+	if _, e := h.Min(); !errors.Is(e, ErrValue) {
+		t.Fatal("continuing minimum assertion must reach the Go guard", e)
+	}
+	if _, e := h.EraseMin(); !errors.Is(e, ErrValue) {
+		t.Fatal("continuing erase-min assertions must reach the Go guard", e)
+	}
+	for _, action := range []func(int32) error{h.Erase, h.Decreased, h.Increased} {
+		if e := action(0); !errors.Is(e, ErrValue) {
+			t.Fatal("continuing membership assertion must reach the Go guard", e)
+		}
 	}
 	var thrown z3exception.DefaultException
 	if e := h.Insert(2); !errors.As(e, &thrown) {
@@ -69,9 +91,15 @@ func TestHeapInsertInvalidValueUsesNestedSourceAssertion(t *testing.T) {
 	}
 	got, err := os.ReadFile(outputFile.Name())
 	heapMust(t, err)
-	want := "ASSERTION VIOLATION\nFile: src/util/heap.h\nLine: 57\nv >= 0 && v < static_cast<int>(m_value2indices.size())\n(C)ontinue, (A)bort, (S)top, (T)hrow exception, Invoke (G)DB\n"
-	if string(got) != want+want {
-		t.Fatalf("nested is_valid_value diagnostics:\ngot %q\nwant %q", got, want+want)
+	record := func(line, condition string) string {
+		return "ASSERTION VIOLATION\nFile: src/util/heap.h\nLine: " + line + "\n" + condition + "\n(C)ontinue, (A)bort, (S)top, (T)hrow exception, Invoke (G)DB\n"
+	}
+	want := record("57", "v >= 0 && v < static_cast<int>(m_value2indices.size())") +
+		record("169", "!empty()") + record("175", "!empty()") + record("176", "m_values.size() >= 2") +
+		record("197", "contains(val)") + record("221", "contains(val)") + record("226", "contains(val)") +
+		record("57", "v >= 0 && v < static_cast<int>(m_value2indices.size())")
+	if string(got) != want {
+		t.Fatalf("heap source diagnostics:\ngot %q\nwant %q", got, want)
 	}
 }
 
