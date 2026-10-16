@@ -84,6 +84,9 @@ func (p *BVRewriter) RewriteMultiplyBound(args ast.AppArguments, out ast.ASTRef,
 			if e = n.NegativeLimit(); e != nil {
 				return st, e
 			}
+			if e = p.traceSignedMultiplyUnderflow(n); e != nil {
+				return st, e
+			}
 			result, e = n.Compare(4, 5, true)
 		} else {
 			if e = n.Product(2); e != nil {

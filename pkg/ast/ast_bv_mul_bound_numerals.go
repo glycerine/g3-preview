@@ -174,6 +174,22 @@ func (n *BitVectorMultiplyBoundNumerals) NegativeLimit() error {
 	}
 	return n.fail(e)
 }
+
+// SignedUnderflowTraceValues reads the four live locals at the source TRACE site.
+func (n *BitVectorMultiplyBoundNumerals) SignedUnderflowTraceValues() ([4]string, error) {
+	var text [4]string
+	for i, slot := range [...]int{0, 1, 4, 5} {
+		if e := n.slot(slot); e != nil {
+			return text, e
+		}
+		value, e := n.manager.numerals.String(&n.values[slot])
+		if e != nil {
+			return text, n.fail(e)
+		}
+		text[i] = value
+	}
+	return text, nil
+}
 func (n *BitVectorMultiplyBoundNumerals) Compare(a, b int, greaterEqual bool) (bool, error) {
 	if e := n.slot(a); e != nil {
 		return false, e
