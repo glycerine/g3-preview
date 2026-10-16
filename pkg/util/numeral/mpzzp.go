@@ -432,17 +432,26 @@ func (m *IntegerModularManager) divWithAllocationContext(a, b, c *Int, context i
 	if m.z {
 		return m.manager.divWithAllocationContext(a, b, c, context)
 	}
-	if modularSourceDebug {
-		f, e := m.Field()
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return e
 		}
-		if !f {
-			return ErrModularAssertion
+		if enabled {
+			f, e := m.Field()
+			if e != nil {
+				return e
+			}
+			if !f {
+				if e := diagnostic.DebugAssertionFailure(d, "src/util/mpzzp.h", 200, "m_p_prime"); e != nil {
+					return e
+				}
+			}
 		}
-		if e = m.sourceAssertNormalized(a, 201); e != nil {
-			return e
-		}
+	}
+	if e := m.sourceAssertNormalized(a, 201); e != nil {
+		return e
 	}
 	if e := m.manager.copyFromOwnerWithAllocationContext(&m.DivTmp, m.manager, b, nil, context); e != nil {
 		return e

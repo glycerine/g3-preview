@@ -25,7 +25,7 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 	serviceMust(t, e)
 	in, e := os.CreateTemp(t.TempDir(), "mpzzp-assert-input-*")
 	serviceMust(t, e)
-	_, e = in.WriteString(strings.Repeat("CT", 12) + "TCCCTCTTTTCTT")
+	_, e = in.WriteString(strings.Repeat("CT", 12) + "TCCCTCTTTTCTTTC")
 	serviceMust(t, e)
 	_, e = in.Seek(0, 0)
 	serviceMust(t, e)
@@ -166,6 +166,15 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 	if e := m.Inv(&two); !errors.As(e, &thrown) || two.Val != 1 {
 		t.Fatal("inverse gcd Throw must follow published swap", two, e)
 	}
+	serviceMust(t, m.SetPSquare())
+	outValue = NewInt(99)
+	if e := m.Div(&one, &one, &outValue); !errors.As(e, &thrown) || outValue.Val != 99 {
+		t.Fatal("nonprime Div Throw must precede divisor copy", outValue, e)
+	}
+	if e := m.Div(&one, &one, &outValue); e != nil {
+		t.Fatal("nonprime Div Continue must reach inversion and multiplication", e)
+	}
+	modularValue(t, z, &outValue, 1)
 	serviceMust(t, d.EnableAssertions(false))
 	if got, e := m.String(&a); e != nil || got != "8" {
 		t.Fatal("disabled source assertion must leave numeral readable", got, e)
@@ -179,6 +188,13 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 	zero = NewInt(0)
 	if e := m.Inv(&zero); e != nil {
 		t.Fatal("disabled inverse assertions must not consume an action", e)
+	}
+	unknown, e := NewIntegerModularManagerWithUint64(z, 7, false)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, unknown.Close()) })
+	outValue = NewInt(99)
+	if e := unknown.Div(&one, &one, &outValue); e != nil || outValue.Val != 1 {
+		t.Fatal("disabled prime assertion must not read the uninitialized flag", outValue, e)
 	}
 	data, e := os.ReadFile(out.Name())
 	serviceMust(t, e)
@@ -217,9 +233,12 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 		strings.Count(string(data), "Line: 183\nm().is_one(m_inv_tmp3)\n") != 2 {
 		t.Fatal("missing inverse source assertion records", string(data))
 	}
+	if strings.Count(string(data), "Line: 200\nm_p_prime\n") != 2 {
+		t.Fatal("missing prime-flag source assertion records", string(data))
+	}
 	state, e := input.State()
 	serviceMust(t, e)
-	if state.Position != 37 {
+	if state.Position != 39 {
 		t.Fatal("disabled assertion consumed an action", state.Position)
 	}
 }

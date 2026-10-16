@@ -169593,6 +169593,15 @@
           ]
         },
         {
+          "name": "mpzzp finite division prime-flag SASSERT at mpzzp.h:200: read only when process assertions are enabled, Continue/Throw before divisor copy",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp.go",
+          "tests": [
+            "TestIntegerModularScalarSourceAssertionActions",
+            "TestIntegerModularModeAndUnknownPrime"
+          ]
+        },
+        {
           "name": "mpzzp gcd pair input/result, array gcd result and extended gcd pair input SASSERTs at mpzzp.h:212,214,219,223",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpzzp.go",
