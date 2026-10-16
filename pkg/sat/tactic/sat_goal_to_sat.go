@@ -246,7 +246,7 @@ func (tr *GoalTranslator) emit(root, sign bool, l sat.Literal) error {
 		l = l.Negated()
 	}
 	if root {
-		return tr.solver.MkClause([]sat.Literal{l})
+		return tr.mkClause([]sat.Literal{l}, false)
 	}
 	return tr.pushResult(l)
 }
@@ -277,7 +277,7 @@ func (tr *GoalTranslator) convertAtom(h ast.ASTHandle, root, sign bool) error {
 				if e != nil {
 					return e
 				}
-				if e = tr.solver.MkClause([]sat.Literal{sat.MakeLiteral(tr.trueVar, false)}); e != nil {
+				if e = tr.mkClause([]sat.Literal{sat.MakeLiteral(tr.trueVar, false)}, false); e != nil {
 					return e
 				}
 			}
@@ -372,6 +372,9 @@ func (tr *GoalTranslator) Compile(formulas []ast.ASTHandle) (err error) {
 	return nil
 }
 func (tr *GoalTranslator) process(h ast.ASTHandle) error {
+	if e := tr.traceGoalStart(h); e != nil {
+		return e
+	}
 	done, e := tr.visit(h, true, false)
 	if e != nil || done {
 		return e
@@ -452,6 +455,9 @@ func (tr *GoalTranslator) process(h ast.ASTHandle) error {
 		}
 		tr.frames = tr.frames[:i]
 	}
+	if e := tr.traceGoalRemaining(); e != nil {
+		return e
+	}
 	if len(tr.results) != 0 {
 		return ast.ErrASTDomain
 	}
@@ -472,7 +478,6 @@ func (tr *GoalTranslator) convert(fr satGoalFrame, op int32, n int) error {
 		l = sat.MakeLiteral(v, false)
 		tr.cache[fr.term] = uint32(l)
 	}
-	clause := tr.solver.MkClause
 	switch op {
 	case ast.ASTOpOr, ast.ASTOpAnd:
 		if fr.root {
@@ -482,7 +487,7 @@ func (tr *GoalTranslator) convert(fr satGoalFrame, op int32, n int) error {
 					if fr.sign {
 						child = child.Negated()
 					}
-					if e := clause([]sat.Literal{child}); e != nil {
+					if e := tr.mkClause([]sat.Literal{child}, false); e != nil {
 						return e
 					}
 				}
@@ -492,7 +497,7 @@ func (tr *GoalTranslator) convert(fr satGoalFrame, op int32, n int) error {
 						tr.results[i] = tr.results[i].Negated()
 					}
 				}
-				if e := clause(tr.results); e != nil {
+				if e := tr.mkClause(tr.results, true); e != nil {
 					return e
 				}
 			}
@@ -502,7 +507,7 @@ func (tr *GoalTranslator) convert(fr satGoalFrame, op int32, n int) error {
 				if op == ast.ASTOpAnd {
 					pair = [2]sat.Literal{l.Negated(), child}
 				}
-				if e := clause(pair[:]); e != nil {
+				if e := tr.mkClause(pair[:], false); e != nil {
 					return e
 				}
 			}
@@ -516,7 +521,7 @@ func (tr *GoalTranslator) convert(fr satGoalFrame, op int32, n int) error {
 			if e := tr.pushResult(extra); e != nil {
 				return e
 			}
-			if e := clause(tr.results[base:]); e != nil {
+			if e := tr.mkClause(tr.results[base:], true); e != nil {
 				return e
 			}
 		}
@@ -530,10 +535,10 @@ func (tr *GoalTranslator) convert(fr satGoalFrame, op int32, n int) error {
 				t = t.Negated()
 				e = e.Negated()
 			}
-			if err := clause([]sat.Literal{c.Negated(), t}); err != nil {
+			if err := tr.mkClause([]sat.Literal{c.Negated(), t}, false); err != nil {
 				return err
 			}
-			if err := clause([]sat.Literal{c, e}); err != nil {
+			if err := tr.mkClause([]sat.Literal{c, e}, false); err != nil {
 				return err
 			}
 		} else {
@@ -543,7 +548,7 @@ func (tr *GoalTranslator) convert(fr satGoalFrame, op int32, n int) error {
 				count = 6
 			}
 			for i := 0; i < count; i++ {
-				if err := clause(triples[i][:]); err != nil {
+				if err := tr.mkClause(triples[i][:], false); err != nil {
 					return err
 				}
 			}
@@ -559,14 +564,14 @@ func (tr *GoalTranslator) convert(fr satGoalFrame, op int32, n int) error {
 				pairs = [2][2]sat.Literal{{l1, l2}, {l1.Negated(), l2.Negated()}}
 			}
 			for i := range pairs {
-				if e := clause(pairs[i][:]); e != nil {
+				if e := tr.mkClause(pairs[i][:], false); e != nil {
 					return e
 				}
 			}
 		} else {
 			triples := [4][3]sat.Literal{{l.Negated(), l1, l2.Negated()}, {l.Negated(), l1.Negated(), l2}, {l, l1, l2}, {l, l1.Negated(), l2.Negated()}}
 			for i := range triples {
-				if e := clause(triples[i][:]); e != nil {
+				if e := tr.mkClause(triples[i][:], false); e != nil {
 					return e
 				}
 			}

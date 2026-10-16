@@ -81900,6 +81900,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained imp::process start/remaining and four mk_clause overload TRACE sites (cpp88-103,380,421)",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+          "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
+        },
+        {
           "name": "Retained imp::process goal2sat_bug result-stack and converting TRACE checkpoints (cpp396,415)",
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
@@ -181228,6 +181234,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained goal2sat::imp::process and mk_clause TRACE/CTRACE sites (goal2sat.cpp:88-103,380,421)",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+          "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
+        },
+        {
           "name": "Reached post-publication ufbv-rewriter goal display TRACE at ufbv_rewriter_tactic.cpp:67",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_tactic_trace.go",
@@ -183323,6 +183335,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained goal2sat::imp::process and mk_clause TRACE/CTRACE sites (goal2sat.cpp:88-103,380,421)",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+          "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
+        },
         {
           "name": "Reached post-publication ufbv-rewriter goal display TRACE at ufbv_rewriter_tactic.cpp:67",
           "status": "ported",

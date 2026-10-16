@@ -52,6 +52,7 @@ func TestSATGoalTranslatorResultStackSourceTrace(t *testing.T) {
 		t.Fatalf("disabled goal trace: %v %q", err, output.String())
 	}
 	tags.Enable("goal2sat_bug")
+	tags.Enable("goal2sat")
 	satOK(t, tr.Compile([]ast.ASTHandle{formula}))
 	if !tags.ShouldTrace("goal2sat_bug") {
 		if output.Len() != 0 {
@@ -63,11 +64,39 @@ func TestSATGoalTranslatorResultStackSourceTrace(t *testing.T) {
 	satOK(t, err)
 	qvar, err := tr.Variable(q)
 	satOK(t, err)
-	want := "-------- [goal2sat_bug] process src/sat/tactic/goal2sat.cpp:396 ---------\n" +
+	want := "-------- [goal2sat] process src/sat/tactic/goal2sat.cpp:380 ---------\n" +
+		"converting: (and p q)\n------------------------------------------------\n" +
+		"-------- [goal2sat_bug] process src/sat/tactic/goal2sat.cpp:396 ---------\n" +
 		"result stack\n(and p q) root: 1 sign: 0\n\n------------------------------------------------\n" +
 		"-------- [goal2sat_bug] process src/sat/tactic/goal2sat.cpp:415 ---------\n" +
-		"converting\n(and p q) root: 1 sign: 0\n" + sat.MakeLiteral(pvar, false).String() + " " + sat.MakeLiteral(qvar, false).String() + "\n------------------------------------------------\n"
+		"converting\n(and p q) root: 1 sign: 0\n" + sat.MakeLiteral(pvar, false).String() + " " + sat.MakeLiteral(qvar, false).String() + "\n------------------------------------------------\n" +
+		"-------- [goal2sat] mk_clause src/sat/tactic/goal2sat.cpp:88 ---------\nmk_clause: " + sat.MakeLiteral(pvar, false).String() + "\n------------------------------------------------\n" +
+		"-------- [goal2sat] mk_clause src/sat/tactic/goal2sat.cpp:88 ---------\nmk_clause: " + sat.MakeLiteral(qvar, false).String() + "\n------------------------------------------------\n"
 	if got := output.String(); got != want {
 		t.Fatalf("source frame records: got %q, want %q", got, want)
+	}
+	output.Reset()
+	or, err := m.MkFamilyApp(0, ast.ASTOpOr, nil, []ast.ASTHandle{p, q})
+	astTestMust(t, err)
+	astTestPin(t, m, or)
+	satOK(t, tr.Compile([]ast.ASTHandle{or}))
+	want = "-------- [goal2sat] process src/sat/tactic/goal2sat.cpp:380 ---------\n" +
+		"converting: (or p q)\n------------------------------------------------\n" +
+		"-------- [goal2sat_bug] process src/sat/tactic/goal2sat.cpp:396 ---------\n" +
+		"result stack\n(or p q) root: 1 sign: 0\n\n------------------------------------------------\n" +
+		"-------- [goal2sat_bug] process src/sat/tactic/goal2sat.cpp:415 ---------\n" +
+		"converting\n(or p q) root: 1 sign: 0\n" + sat.MakeLiteral(pvar, false).String() + " " + sat.MakeLiteral(qvar, false).String() + "\n------------------------------------------------\n" +
+		"-------- [goal2sat] mk_clause src/sat/tactic/goal2sat.cpp:103 ---------\nmk_clause: " + sat.MakeLiteral(pvar, false).String() + " " + sat.MakeLiteral(qvar, false).String() + " \n------------------------------------------------\n"
+	if got := output.String(); got != want {
+		t.Fatalf("source array clause record: got %q, want %q", got, want)
+	}
+	output.Reset()
+	tr.results = append(tr.results, sat.MakeLiteral(pvar, false))
+	satOK(t, tr.traceGoalRemaining())
+	tr.results = tr.results[:0]
+	want = "-------- [goal2sat] process src/sat/tactic/goal2sat.cpp:421 ---------\n" +
+		sat.MakeLiteral(pvar, false).String() + "\n------------------------------------------------\n"
+	if got := output.String(); got != want {
+		t.Fatalf("conditional residual record: got %q, want %q", got, want)
 	}
 }
