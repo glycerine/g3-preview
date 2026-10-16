@@ -181586,6 +181586,12 @@
           "tests": ["TestASTUnitResolutionInputSourceTraces", "TestASTUnitResolutionDebugDiagnostics"]
         },
         {
+          "name": "Retained hyper-resolution premise and flattened-parameter TRACE records, including source AST IDs and signed positions (ast.cpp:3152,3167)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_proof_hyper_trace.go",
+          "tests": ["TestASTHyperResolveSourceTracePremisesAndParameters"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -183293,6 +183299,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_proof_resolution_input_trace.go",
           "tests": ["TestASTUnitResolutionInputSourceTraces", "TestASTUnitResolutionDebugDiagnostics"]
+        },
+        {
+          "name": "Retained hyper-resolution premise and flattened-parameter TRACE records, including source AST IDs and signed positions (ast.cpp:3152,3167)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_proof_hyper_trace.go",
+          "tests": ["TestASTHyperResolveSourceTracePremisesAndParameters"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

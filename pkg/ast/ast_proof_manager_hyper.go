@@ -2,6 +2,7 @@ package ast
 
 import (
 	"math"
+	"strconv"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
@@ -21,7 +22,16 @@ func (m *ASTManager) MkProofHyperResolve(premises []ASTHandle, conclusion ASTHan
 	if ASTSourceDebug && uint64(len(positions))+1 != uint64(len(substitutions)) {
 		return ASTHandle{}, ErrASTDomain
 	}
+	traceEnabled := m.proofHyperTraceEnabled()
 	for _, p := range premises {
+		if traceEnabled {
+			m.mu.Unlock()
+			traceErr := m.traceProofHyperPremise(p)
+			m.mu.Lock()
+			if traceErr != nil {
+				return ASTHandle{}, traceErr
+			}
+		}
 		_, e := m.proofFact(p)
 		if e != nil {
 			return ASTHandle{}, e
@@ -31,6 +41,7 @@ func (m *ASTManager) MkProofHyperResolve(premises []ASTHandle, conclusion ASTHan
 		return ASTHandle{}, e
 	}
 	var params []ASTParameter
+	var parameterDisplays []string
 	defer func() { m.dropProofParameters(params) }()
 	for i, v := range substitutions {
 		for _, h := range v {
@@ -39,6 +50,9 @@ func (m *ASTManager) MkProofHyperResolve(premises []ASTHandle, conclusion ASTHan
 				return ASTHandle{}, e
 			}
 			params = append(params, p)
+			if traceEnabled {
+				parameterDisplays = append(parameterDisplays, "#"+strconv.FormatUint(uint64(m.nodeAt(h.slot).id), 10))
+			}
 		}
 		if i+1 < len(substitutions) {
 			if i >= len(positions) {
@@ -49,11 +63,22 @@ func (m *ASTManager) MkProofHyperResolve(premises []ASTHandle, conclusion ASTHan
 				return ASTHandle{}, e
 			}
 			params = append(params, p)
+			if traceEnabled {
+				parameterDisplays = append(parameterDisplays, strconv.FormatInt(int64(int32(positions[i].First)), 10))
+			}
 			p, e = m.newParameterInt(int32(positions[i].Second))
 			if e != nil {
 				return ASTHandle{}, e
 			}
 			params = append(params, p)
+			if traceEnabled {
+				parameterDisplays = append(parameterDisplays, strconv.FormatInt(int64(int32(positions[i].Second)), 10))
+			}
+		}
+	}
+	if traceEnabled {
+		if e := m.traceProofHyperParameters(parameterDisplays); e != nil {
+			return ASTHandle{}, e
 		}
 	}
 	args := append([]ASTHandle(nil), premises...)
