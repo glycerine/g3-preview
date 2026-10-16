@@ -98,4 +98,45 @@ func TestSATIntegrityMissingBinaryReciprocalSourceTrace(t *testing.T) {
 			t.Fatalf("two-list trace at formatter reservation %d: result=%v, got %q, want %q", ordinal, yes, output.String(), want)
 		}
 	}
+	l.budget.FailAfter(-1)
+	clause, err := l.propagation.clauses.MkClause([]Literal{0, 2}, true)
+	satOK(t, err)
+	defer func() { satOK(t, l.propagation.clauses.Delete(clause)) }()
+	offset, err := l.propagation.clauses.Offset(clause)
+	satOK(t, err)
+	clauseWatch, err := newSATClauseWatch(2, offset)
+	satOK(t, err)
+	satOK(t, reciprocal.Push(clauseWatch))
+	externalWatch, err := newSATExternalWatch(3)
+	satOK(t, err)
+	satOK(t, reciprocal.Push(externalWatch))
+	output.Reset()
+	yes, err = c.checkWatches()
+	satOK(t, err)
+	want = ""
+	if tags.ShouldTrace("sat_watched_bug") && satStorageSourceDebug {
+		want = "-------- [sat_watched_bug] check_watches src/sat/sat_integrity_checker.cpp:172 ---------\n" +
+			"l: 0 l2: 1\nwas_eliminated1: 0 was_eliminated2: 0 learned: 0\n1\n(0 1) (1 (0 1)+*) 3\n" +
+			"------------------------------------------------\n"
+	}
+	if !yes || output.String() != want {
+		t.Fatalf("mixed binary/ternary/clause/external watch trace: result=%v, got %q, want %q", yes, output.String(), want)
+	}
+	satOK(t, list.SetEnd(0))
+	learnedWatch, err := newSATBinaryWatch(2, true)
+	satOK(t, err)
+	satOK(t, list.Push(learnedWatch))
+	output.Reset()
+	yes, err = c.checkWatches()
+	satOK(t, err)
+	want = ""
+	if tags.ShouldTrace("sat_watched_bug") && satStorageSourceDebug {
+		want = "-------- [sat_watched_bug] check_watches src/sat/sat_integrity_checker.cpp:172 ---------\n" +
+			"l: 0 l2: 1\nwas_eliminated1: 0 was_eliminated2: 0 learned: 1\n1*\n(0 1) (1 (0 1)+*) 3\n" +
+			"------------------------------------------------\n"
+	}
+	if !yes || output.String() != want {
+		t.Fatalf("learned missing-reciprocal trace: result=%v, got %q, want %q", yes, output.String(), want)
+	}
+	satOK(t, reciprocal.SetEnd(0))
 }

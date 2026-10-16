@@ -75677,8 +75677,8 @@
           "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
         },
         {
-          "name": "Selected binary missing-reciprocal sat_watched_bug CTRACE before SASSERT, source watch-list body and false/learned fields (cpp172-181)",
-          "status": "partial",
+          "name": "Binary missing-reciprocal sat_watched_bug CTRACE before SASSERT, source watch-list body across binary/ternary/clause/external kinds and false/learned fields (cpp172-181)",
+          "status": "ported",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
           "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
         },
@@ -75815,8 +75815,8 @@
           "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
         },
         {
-          "name": "Selected binary missing-reciprocal sat_watched_bug CTRACE before SASSERT, source watch-list body and false/learned fields (cpp172-181)",
-          "status": "partial",
+          "name": "Binary missing-reciprocal sat_watched_bug CTRACE before SASSERT, source watch-list body across binary/ternary/clause/external kinds and false/learned fields (cpp172-181)",
+          "status": "ported",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
           "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
         },
@@ -183717,8 +183717,8 @@
           ]
         },
         {
-          "name": "Retained SAT checker sat_watched_bug missing-reciprocal CTRACE with source-ordered scalar prefix, nonempty binary/ternary watch-list displays and formatter refusal prefixes (sat_integrity_checker.cpp:172)",
-          "status": "partial",
+          "name": "Retained SAT checker sat_watched_bug missing-reciprocal CTRACE with source-ordered scalar prefix, binary/ternary/clause/external watch-list displays and formatter refusal prefixes (sat_integrity_checker.cpp:172)",
+          "status": "ported",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
           "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
         },
@@ -186051,8 +186051,8 @@
           ]
         },
         {
-          "name": "Retained SAT checker sat_watched_bug missing-reciprocal CTRACE with source-ordered scalar prefix, nonempty binary/ternary watch-list displays and formatter refusal prefixes (sat_integrity_checker.cpp:172)",
-          "status": "partial",
+          "name": "Retained SAT checker sat_watched_bug missing-reciprocal CTRACE with source-ordered scalar prefix, binary/ternary/clause/external watch-list displays and formatter refusal prefixes (sat_integrity_checker.cpp:172)",
+          "status": "ported",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
           "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
         },
