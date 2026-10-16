@@ -108715,6 +108715,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "UFBV raw-pointer identity TRACE at ufbv_rewriter.cpp:241,367 uses stable Go AST origin/slot/generation tokens",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/rewrite_identity_trace.go",
+          "tests": ["TestUFBVForwardRemovalTypedIdentityTrace", "TestUFBVTraversalSourceEntryAndResultTraces"]
+        },
+        {
           "name": "Retained UFBV demodulator rescheduling TRACE at ufbv_rewriter.cpp:637",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_demodulator_schedule_trace.go",
@@ -182229,6 +182235,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "UFBV raw-pointer identity TRACE at ufbv_rewriter.cpp:241,367 uses stable Go AST origin/slot/generation tokens",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/rewrite_identity_trace.go",
+          "tests": ["TestUFBVForwardRemovalTypedIdentityTrace", "TestUFBVTraversalSourceEntryAndResultTraces"]
+        },
+        {
           "name": "Retained UFBV demodulator rescheduling TRACE at ufbv_rewriter.cpp:637",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_demodulator_schedule_trace.go",
@@ -184622,6 +184634,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "UFBV raw-pointer identity TRACE at ufbv_rewriter.cpp:241,367 uses stable Go AST origin/slot/generation tokens",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/ufbv/rewrite_identity_trace.go",
+          "tests": ["TestUFBVForwardRemovalTypedIdentityTrace", "TestUFBVTraversalSourceEntryAndResultTraces"]
+        },
         {
           "name": "Retained UFBV demodulator rescheduling TRACE at ufbv_rewriter.cpp:637",
           "status": "ported",

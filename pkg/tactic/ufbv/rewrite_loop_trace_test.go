@@ -2,6 +2,7 @@ package ufbv
 
 import (
 	"bytes"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -72,6 +73,36 @@ func TestUFBVTraversalSourceEntryAndResultTraces(t *testing.T) {
 	cacheMust(t, m.DelRef(&out))
 	if refusedTags.ShouldTrace("demodulator") && refused.calls != 1 {
 		t.Fatal("traversal stream refusal did not retain bad state", refused.calls)
+	}
+	var stackOutput bytes.Buffer
+	stackTags := diagnostic.NewTraceTagsWithWriter(&stackOutput)
+	stackTags.Enable("demodulator_stack")
+	index.trace = stackTags
+	out, e = loop.rewrite(index, boolean, a)
+	cacheMust(t, e)
+	cacheMust(t, m.DelRef(&out))
+	if stackTags.ShouldTrace("demodulator_stack") {
+		identity := "@" + strconv.FormatUint(a.Origin(), 16) + ":" +
+			strconv.FormatUint(uint64(a.Slot()), 16) + ":" +
+			strconv.FormatUint(uint64(a.Generation()), 16)
+		wantStack := "-------- [demodulator_stack] rewrite src/tactic/ufbv/ufbv_rewriter.cpp:367 ---------\n" +
+			"STACK: \n0: " + identity + " = k!903\n" +
+			"------------------------------------------------\n"
+		if got := stackOutput.String(); got != wantStack {
+			t.Fatalf("typed Go stack identity trace:\ngot  %q\nwant %q", got, wantStack)
+		}
+	} else if stackOutput.Len() != 0 {
+		t.Fatal("erased stack trace emitted", stackOutput.String())
+	}
+	stackRefused := &refusingUFBVTraceWriter{}
+	stackRefusedTags := diagnostic.NewTraceTagsWithWriter(stackRefused)
+	stackRefusedTags.Enable("demodulator_stack")
+	index.trace = stackRefusedTags
+	out, e = loop.rewrite(index, boolean, a)
+	cacheMust(t, e)
+	cacheMust(t, m.DelRef(&out))
+	if stackRefusedTags.ShouldTrace("demodulator_stack") && stackRefused.calls != 1 {
+		t.Fatal("stack trace stream refusal stopped rewrite", stackRefused.calls)
 	}
 	var prefix bytes.Buffer
 	prefixTags := diagnostic.NewTraceTagsWithWriter(&prefix)

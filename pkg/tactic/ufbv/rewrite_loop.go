@@ -58,6 +58,9 @@ func (r *rewriteTraversal) rewrite(index *rewriteRuleIndex, boolean *rewriter.Bo
 		return ast.ASTRef{}, e
 	}
 	for len(r.todo) != 0 {
+		if e := r.traceStack(); e != nil {
+			return ast.ASTRef{}, e
+		}
 		e := r.todo[len(r.todo)-1]
 		actual := e
 		if prior, found, err := r.cache.get(e); err != nil {

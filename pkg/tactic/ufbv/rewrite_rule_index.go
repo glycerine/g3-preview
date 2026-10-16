@@ -252,6 +252,7 @@ func (r *rewriteRuleIndex) remove(f, quantifier ast.ASTHandle) error {
 	if e := r.check(); e != nil {
 		return e
 	}
+	r.traceRemove(quantifier)
 	set, inForward := r.byFunc[f]
 	if !inForward {
 		if enabled, e := forwardAssertionEnabled(); e != nil {
