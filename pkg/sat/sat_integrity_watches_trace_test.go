@@ -74,4 +74,28 @@ func TestSATIntegrityMissingBinaryReciprocalSourceTrace(t *testing.T) {
 	if !yes || output.String() != want {
 		t.Fatalf("refused watch-list formatter prefix: result=%v, got %q, want %q", yes, output.String(), want)
 	}
+	l.budget.FailAfter(-1)
+	reciprocal, err := l.propagation.variables.watches.Get(3)
+	satOK(t, err)
+	ternary, err := newSATTernaryWatch(0, 2)
+	satOK(t, err)
+	satOK(t, reciprocal.Push(ternary))
+	defer func() { satOK(t, reciprocal.SetEnd(0)) }()
+	for ordinal, body := range []string{
+		"l: 0 l2: 1\nwas_eliminated1: 0 was_eliminated2: 0 learned: 0\n",
+		"l: 0 l2: 1\nwas_eliminated1: 0 was_eliminated2: 0 learned: 0\n1\n",
+		"l: 0 l2: 1\nwas_eliminated1: 0 was_eliminated2: 0 learned: 0\n1\n(0 1)\n------------------------------------------------\n",
+	} {
+		output.Reset()
+		l.budget.FailAfter(int64(ordinal))
+		yes, err = c.checkWatches()
+		satOK(t, err)
+		want = ""
+		if tags.ShouldTrace("sat_watched_bug") && satStorageSourceDebug {
+			want = "-------- [sat_watched_bug] check_watches src/sat/sat_integrity_checker.cpp:172 ---------\n" + body
+		}
+		if !yes || output.String() != want {
+			t.Fatalf("two-list trace at formatter reservation %d: result=%v, got %q, want %q", ordinal, yes, output.String(), want)
+		}
+	}
 }
