@@ -7,6 +7,7 @@ import (
 	"github.com/glycerine/g3/pkg/ast"
 	goaltactic "github.com/glycerine/g3/pkg/tactic"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	"github.com/glycerine/g3/pkg/util/numeral"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
@@ -77,10 +78,55 @@ func TestInequalityRestoredGoalSourceTrace(t *testing.T) {
 		}
 		return
 	}
-	want := "-------- [propagate_ineqs_tactic] operator() src/tactic/arith/propagate_ineqs_tactic.cpp:510 ---------\n" +
+	want := "-------- [propagate_ineqs_tactic] operator() src/tactic/arith/propagate_ineqs_tactic.cpp:492 ---------\n" +
+		"(goal\n  (>= trace-x 2.0))\n" +
+		"2 <= trace-x < oo\n" +
+		"bound propagator:\n" +
+		"2 | 2 <= x0 < oo\n" +
+		"------------------------------------------------\n" +
+		"-------- [propagate_ineqs_tactic] operator() src/tactic/arith/propagate_ineqs_tactic.cpp:509 ---------\n" +
+		"after propagation:\n" +
+		"2 <= trace-x < oo\n" +
+		"2 | 2 <= x0 < oo\n" +
+		"------------------------------------------------\n" +
+		"-------- [propagate_ineqs_tactic] operator() src/tactic/arith/propagate_ineqs_tactic.cpp:510 ---------\n" +
 		"(goal\n  (>= trace-x 2.0))\n" +
 		"------------------------------------------------\n"
 	if got := output.String(); got != want {
 		t.Fatalf("restored-goal TRACE = %q, want %q", got, want)
+	}
+}
+
+func TestInequalitySourceDisplayBoundsStrictAndUnbounded(t *testing.T) {
+	m, symbols, _, _ := polynomialASTManager(t)
+	owner, _ := equationManager(t)
+	store, err := NewBoundEquationStore(owner)
+	equationMust(t, err)
+	t.Cleanup(func() { equationMust(t, store.Close()) })
+	builder, err := NewPolynomialBuilder(m, store)
+	equationMust(t, err)
+	t.Cleanup(func() { equationMust(t, builder.Close()) })
+	polynomialTraceBindParams(t, m)
+	family, err := m.RegisterArithmeticPlugin()
+	equationMust(t, err)
+	sort, err := m.MkFamilySort(family, 0, nil)
+	equationMust(t, err)
+	for _, name := range []string{"bound-x", "bound-y"} {
+		symbol, e := symbols.Intern(name)
+		equationMust(t, e)
+		term, e := m.MkConst(symbol, sort)
+		equationMust(t, e)
+		_, e = builder.mkVar(term)
+		equationMust(t, e)
+	}
+	value := numeral.NewRational()
+	equationMust(t, owner.SetInt32(&value, 3))
+	_, err = store.AssertUpper(1, &value, true)
+	equationMust(t, err)
+	equationMust(t, owner.Del(&value))
+	var out bytes.Buffer
+	equationMust(t, builder.displayBounds(&out))
+	if got, want := out.String(), "-oo < bound-x < oo\n-oo < bound-y < 3\n"; got != want {
+		t.Fatalf("source bound display = %q, want %q", got, want)
 	}
 }

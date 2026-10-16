@@ -101315,7 +101315,8 @@
         "TestPropagateIneqTacticParameterSnapshotCleanupAndGoalReuse",
         "TestPropagateIneqTacticTranslateOwnsIndependentSnapshot",
         "TestCleanPropagateIneqFactoryDefaultParamsAndPerCallRebuild",
-        "TestInequalityRestoredGoalSourceTrace"
+        "TestInequalityRestoredGoalSourceTrace",
+        "TestInequalitySourceDisplayBoundsStrictAndUnbounded"
       ],
       "assertions": [
         {
@@ -101407,6 +101408,22 @@
         },
         {
           "name": "Restored-result goal TRACE at operator():510 after successful bound restoration",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/polynomial_trace.go",
+          "tests": [
+            "TestInequalityRestoredGoalSourceTrace"
+          ]
+        },
+        {
+          "name": "Source display_bounds expression-order lower/upper queries with strict and infinity output",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/polynomial_trace.go",
+          "tests": [
+            "TestInequalitySourceDisplayBoundsStrictAndUnbounded"
+          ]
+        },
+        {
+          "name": "operator() pre-propagation and post-restoration TRACE at lines 492 and 509 with goal, tactic bounds and bound-owner display",
           "status": "ported",
           "go_target": "pkg/tactic/arith/polynomial_trace.go",
           "tests": [
@@ -181570,6 +181587,14 @@
           "tests": [
             "TestInequalityRestoredGoalSourceTrace"
           ]
+        },
+        {
+          "name": "Retained propagate_ineqs_tactic pre-propagation and post-restoration TRACE records with source headers and complete displays",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/polynomial_trace.go",
+          "tests": [
+            "TestInequalityRestoredGoalSourceTrace"
+          ]
         }
       ],
       "ownership": [
@@ -183226,6 +183251,14 @@
         },
         {
           "name": "Retained propagate_ineqs_tactic restored-result TRACE tag gate and source-order emission",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/polynomial_trace.go",
+          "tests": [
+            "TestInequalityRestoredGoalSourceTrace"
+          ]
+        },
+        {
+          "name": "Retained propagate_ineqs_tactic before/after TRACE tag gates and source-order emission",
           "status": "ported",
           "go_target": "pkg/tactic/arith/polynomial_trace.go",
           "tests": [

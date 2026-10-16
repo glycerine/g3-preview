@@ -538,6 +538,9 @@ func (b *PolynomialBuilder) Apply(input *goaltactic.Goal) (_ *goaltactic.Goal, r
 		}
 		return input, nil
 	}
+	if err = b.traceBeforePropagation(input); err != nil {
+		return result, err
+	}
 	if err = b.store.Propagate(); err != nil {
 		return result, err
 	}
@@ -566,6 +569,9 @@ func (b *PolynomialBuilder) Apply(input *goaltactic.Goal) (_ *goaltactic.Goal, r
 		return result, result.Assert(falsehood)
 	}
 	if err = b.RestoreBounds(result); err != nil {
+		return result, err
+	}
+	if err = b.traceAfterPropagation(); err != nil {
 		return result, err
 	}
 	if err = b.traceResultGoal(result); err != nil {
