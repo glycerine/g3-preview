@@ -26,7 +26,7 @@ type satSolverConflictResolution struct {
 	assumptionSet                                                                   satLiteralSetStorage
 	conflictLevel, conflictStat, conflicts, conflictsSinceRestart, conflictsSinceGC uint32
 	phaseCounter                                                                    uint32
-	phaseCacheOn, minCoreValid, parallelPresent, debugCheckMarks                    bool
+	phaseCacheOn, minCoreValid, parallelPresent                                     bool
 	ownerBytes                                                                      uint64
 	closing, closed                                                                 bool
 }
@@ -111,8 +111,8 @@ func (s *satSolverConflictResolution) resolveConflict() (bool, error) {
 		if e != nil {
 			return false, e
 		}
-		if satStorageSourceDebug && s.debugCheckMarks {
-			if e = s.checkMarks(); e != nil {
+		if satStorageSourceDebug {
+			if e = s.assertNoMarks(); e != nil {
 				return false, e
 			}
 		}

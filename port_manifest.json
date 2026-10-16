@@ -79081,6 +79081,12 @@
           ]
         },
         {
+          "name": "resolve_conflict1678 sat_check_marks CASSERT with process assertion/tag gate, mark scan and C/T debugger action",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_conflict_assertion.go",
+          "tests": ["TestSATConflictMarkAssertionUsesProcessDebugTagAndActions"]
+        },
+        {
           "name": "Concrete source display2859-3017 and num_clauses2901-2924; exact punctuation, base/all trail, strict binary predicate, unsigned WCNF source spelling; memory-only transport adapter",
           "status": "partial",
           "go_target": "pkg/sat/sat_solver_display.go",
@@ -121816,6 +121822,12 @@
           "tests": ["TestASTNondeterminismTraceFollowsProcessDebugTag"]
         },
         {
+          "name": "Retained SAT resolve_conflict sat_check_marks CASSERT process assertion/tag gate, mark scan, notification and C/T debugger continuation (sat_solver.cpp:1678)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_conflict_assertion.go",
+          "tests": ["TestSATConflictMarkAssertionUsesProcessDebugTagAndActions"]
+        },
+        {
           "name": "Process debug owner with default streams, tied input and interactive action; generated initializer borrowing and heap CASSERT state",
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_debug_process.go",
@@ -122150,6 +122162,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_core_debug.go",
           "tests": ["TestASTNondeterminismTraceFollowsProcessDebugTag"]
+        },
+        {
+          "name": "Retained SAT resolve_conflict sat_check_marks CASSERT process assertion/tag gate, mark scan, notification and C/T debugger continuation (sat_solver.cpp:1678)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_conflict_assertion.go",
+          "tests": ["TestSATConflictMarkAssertionUsesProcessDebugTagAndActions"]
         },
         {
           "name": "Process debug owner with default streams, tied input and interactive action; generated initializer borrowing and heap CASSERT state",
