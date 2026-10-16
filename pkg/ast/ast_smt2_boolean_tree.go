@@ -209,13 +209,8 @@ func (m *ASTManager) smt2PPExprTreeWithInfo(root ASTHandle, names []usymbol.Symb
 					format, e = m.ppFloatBitVectorLiteral(h, true, nil)
 					return result{docs: []ASTHandle{format}, weight: 1, depth: 1}, e
 				}
-				family, e := m.GetFamilyID(h)
-				if e != nil {
-					return result{}, e
-				}
-				if family != NullFamilyID {
-					return result{}, ErrASTDomain
-				}
+				// The source pp_const falls through to pp_fdecl for other
+				// nullary built-ins, including indexed as-array declarations.
 			}
 			var labels []usymbol.Symbol
 			labeled, e := m.IsLabelLit(h, &labels)

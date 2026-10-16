@@ -12495,6 +12495,7 @@
         "pkg/ast/ast_smt2_arith_literal.go",
         "pkg/ast/ast_smt2_arith_literal_test.go",
         "pkg/ast/ast_smt2_boolean_tree.go",
+        "pkg/ast/ast_smt2_as_array_test.go",
         "pkg/ast/ast_smt2_let.go",
         "pkg/ast/ast_smt2_let_test.go",
         "pkg/ast/ast_smt2_declare_fun.go",
@@ -12525,6 +12526,7 @@
         "TestASTSMT2BooleanComparisonsWithFloatingPointLiterals",
         "TestASTWellSortedNonBooleanRootTraceProfiles",
         "TestASTSMT2BooleanTreeSourcePostorderAndLabels",
+        "TestASTSMT2AsArrayNullaryDeclaration",
         "TestASTSMT2DeclareFunSourceEntrypoint",
         "TestASTQuantifierPatternSourceTraceBeforeRegistration",
         "TestASTSMT2QuantifierRootSourceFormat"
@@ -12690,6 +12692,7 @@
           "go_target": "pkg/ast/ast_smt2_boolean_tree.go",
           "tests": [
             "TestASTSMT2BooleanTreeSourcePostorderAndLabels",
+            "TestASTSMT2AsArrayNullaryDeclaration",
             "TestASTSMT2BooleanComparisonsWithArithmeticLiterals",
             "TestASTSMT2BooleanComparisonsWithBitVectorLiterals",
             "TestASTSMT2BooleanComparisonsWithFloatingPointLiterals",
@@ -57225,6 +57228,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/model/model_evaluator_trace.go",
+        "pkg/model/model_evaluator_array_trace_test.go",
         "pkg/model/model_evaluator_memory_trace.go",
         "pkg/model/model_evaluator_memory_trace_debug_test.go",
         "pkg/model/model_evaluator.go",
@@ -57242,6 +57246,7 @@
       "tests": [
         "TestModelEvaluatorBooleanReductionSourceStatusTrace",
         "TestModelEvaluatorDirectEntrySourceTrace",
+        "TestModelEvaluatorArrayExtractionSourceTrace",
         "TestModelEvaluatorGetMacroSourceTraceBranches",
         "TestModelEvaluatorImpMemoryTraceConstructionCleanupAndClose",
         "TestModelEvaluatorImpMemoryTraceFailedConstructionOwnedClose",
@@ -57309,6 +57314,13 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Selected extract_array_func_interp model_evaluator TRACE at cpp:435,451,476,482,497 with source SMT2 array and fallback rendering; non-ground entry branch at 468 is wired but retained function-entry construction rejects its test input",
+          "status": "partial",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "go_targets": ["pkg/model/model_evaluator_array_expansion.go"],
+          "tests": ["TestModelEvaluatorArrayExtractionSourceTrace"]
+        },
         {
           "name": "Selected Boolean reduce_app BR_DONE application relookup and conditional result CTRACE at model_evaluator.cpp:194-202",
           "status": "partial",
@@ -180870,6 +180882,7 @@
         "pkg/ast/pattern/contains_subpattern.go",
         "pkg/ast/pattern/collect.go",
         "pkg/model/model_evaluator_trace.go",
+        "pkg/model/model_evaluator_array_trace_test.go",
         "pkg/util/diagnostic/util_trace_tags.go",
         "pkg/util/diagnostic/util_trace_tags_memory_trace.go",
         "pkg/util/process/initialize.go",
@@ -180953,6 +180966,7 @@
         "TestExtensionModelDefinitionSourceTraceReverseOrder",
         "TestModelEvaluatorBooleanReductionSourceStatusTrace",
         "TestModelEvaluatorDirectEntrySourceTrace",
+        "TestModelEvaluatorArrayExtractionSourceTrace",
         "TestPatternCollectInfoSourceSMT2Trace",
         "TestPatternCollectSharedChildSourceStackTrace",
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -181073,6 +181087,13 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Selected extract_array_func_interp model_evaluator TRACE at cpp:435,451,476,482,497 with source SMT2 array and fallback rendering; non-ground entry branch at 468 is wired but retained function-entry construction rejects its test input",
+          "status": "partial",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "go_targets": ["pkg/model/model_evaluator_array_expansion.go"],
+          "tests": ["TestModelEvaluatorArrayExtractionSourceTrace"]
+        },
         {
           "name": "Reached extension_model_converter::operator() per-definition extension_mc TRACE at extension_model_converter.cpp:59, reverse evaluated order and SMT2 values",
           "status": "ported",
@@ -182871,6 +182892,7 @@
         "pkg/ast/pattern/contains_subpattern.go",
         "pkg/ast/pattern/collect.go",
         "pkg/model/model_evaluator_trace.go",
+        "pkg/model/model_evaluator_array_trace_test.go",
         "pkg/util/diagnostic/util_trace_tags.go",
         "pkg/math/euclid/normalize_query_trace.go",
         "pkg/math/euclid/apply_solution_trace.go",
@@ -182952,6 +182974,7 @@
         "TestExtensionModelDefinitionSourceTraceReverseOrder",
         "TestModelEvaluatorBooleanReductionSourceStatusTrace",
         "TestModelEvaluatorDirectEntrySourceTrace",
+        "TestModelEvaluatorArrayExtractionSourceTrace",
         "TestPatternCollectInfoSourceSMT2Trace",
         "TestPatternCollectSharedChildSourceStackTrace",
         "TestModelEvaluatorGetMacroSourceTraceBranches",
@@ -183082,6 +183105,13 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Selected extract_array_func_interp model_evaluator TRACE at cpp:435,451,476,482,497 with source SMT2 array and fallback rendering; non-ground entry branch at 468 is wired but retained function-entry construction rejects its test input",
+          "status": "partial",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "go_targets": ["pkg/model/model_evaluator_array_expansion.go"],
+          "tests": ["TestModelEvaluatorArrayExtractionSourceTrace"]
+        },
         {
           "name": "Reached extension_model_converter::operator() per-definition extension_mc TRACE at extension_model_converter.cpp:59, reverse evaluated order and SMT2 values",
           "status": "ported",

@@ -1,4 +1,4 @@
-// Source: src/model/model_evaluator.cpp:187,200,223,228,247,566; src/util/trace.h.
+// Source: src/model/model_evaluator.cpp:187,200,223,228,247,435-497,566; src/util/trace.h.
 package model
 
 import (
@@ -132,6 +132,32 @@ func (c *evaluatorConfiguration) traceReduceStatus(status rewriter.RewriteStatus
 			}
 			_, err = io.WriteString(w, "\n")
 			return err
+		})
+}
+
+// traceArray records the reached extract_array_func_interp branches. The
+// source's mk_pp delegates to the SMT2 printer; each expression is rendered
+// only when the model_evaluator tag is active.
+func (c *evaluatorConfiguration) traceArray(line int, prefix string, terms ...ast.ASTHandle) error {
+	ev := c.owner
+	tags := ev.traceTags()
+	if !tags.ShouldTrace("model_evaluator") {
+		return nil
+	}
+	return tags.EmitConditional("model_evaluator", "extract_array_func_interp", "src/model/model_evaluator.cpp", line,
+		func() bool { return true }, func(w io.Writer) error {
+			if _, err := io.WriteString(w, prefix); err != nil {
+				return err
+			}
+			for _, term := range terms {
+				if err := ev.writeSMT2(w, term); err != nil {
+					return err
+				}
+				if _, err := io.WriteString(w, "\n"); err != nil {
+					return err
+				}
+			}
+			return nil
 		})
 }
 

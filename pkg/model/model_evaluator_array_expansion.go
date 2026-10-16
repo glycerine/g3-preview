@@ -162,6 +162,9 @@ func (c *evaluatorConfiguration) arrayArgsAreValues(v []ast.ASTHandle, unique *b
 func (c *evaluatorConfiguration) extractArray(a ast.ASTHandle, f *arrayExpansion) (bool, bool, error) {
 	m := c.owner.model.manager
 	values, unique := true, true
+	if e := c.traceArray(435, "", a); e != nil {
+		return false, unique, e
+	}
 	for {
 		stored, e := c.arrayOp(a, ast.ASTArrayOpStore)
 		if e != nil {
@@ -204,8 +207,11 @@ func (c *evaluatorConfiguration) extractArray(a ast.ASTHandle, f *arrayExpansion
 		return true, unique, m.SetRef(f.elseCase, value)
 	}
 	backed, e := c.arrayOp(a, ast.ASTArrayOpAsArray)
-	if e != nil || !backed {
+	if e != nil {
 		return false, unique, e
+	}
+	if !backed {
+		return false, unique, c.traceArray(451, "no translation: ", a)
 	}
 	d, e := m.AsArrayFunction(a)
 	if e != nil {
@@ -232,8 +238,11 @@ func (c *evaluatorConfiguration) extractArray(a ast.ASTHandle, f *arrayExpansion
 		}
 		for _, h := range f.row {
 			ground, e := m.IsGround(h)
-			if e != nil || !ground {
+			if e != nil {
 				return false, unique, e
+			}
+			if !ground {
+				return false, unique, c.traceArray(468, "could not extract array interpretation: ", a, h)
 			}
 		}
 		f.publishRow()
@@ -246,11 +255,14 @@ func (c *evaluatorConfiguration) extractArray(a ast.ASTHandle, f *arrayExpansion
 		return false, unique, e
 	}
 	if fallback.IsNull() {
-		return false, unique, nil
+		return false, unique, c.traceArray(476, "no else case ", a)
 	}
 	ground, e := m.IsGround(fallback)
-	if e != nil || !ground {
+	if e != nil {
 		return false, unique, e
+	}
+	if !ground {
+		return false, unique, c.traceArray(482, "non-ground else case ", a, fallback)
 	}
 	for i := len(f.stores); values && i > base; {
 		i--
@@ -271,7 +283,7 @@ func (c *evaluatorConfiguration) extractArray(a ast.ASTHandle, f *arrayExpansion
 			return false, unique, e
 		}
 	}
-	return true, unique, nil
+	return true, unique, c.traceArray(497, "else case: ", fallback)
 }
 func (c *evaluatorConfiguration) expandValue(out ast.ASTRef) (err error) {
 	m := c.owner.model.manager
