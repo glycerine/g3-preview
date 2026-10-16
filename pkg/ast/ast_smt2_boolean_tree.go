@@ -127,12 +127,15 @@ func (m *ASTManager) smt2PPExprTreeWithInfo(root ASTHandle, names []usymbol.Symb
 		usedNames[s] = true
 	}
 	nextAlias := uint32(1)
-	registerAlias := func(h ASTHandle, format ASTHandle, level uint32) (result, error) {
+	registerAlias := func(h ASTHandle, format ASTHandle, level, depth, weight uint32, shared bool) (result, error) {
 		for {
 			name := "a!" + strconv.FormatUint(uint64(nextAlias), 10)
 			nextAlias++
 			if usedNames[name] {
 				continue
+			}
+			if e := m.traceSMT2Alias(h, name, depth, weight, level, shared); e != nil {
+				return result{}, e
 			}
 			aliases[h] = len(bindings)
 			bindings = append(bindings, smt2LetBinding{name: name, format: format, level: level})
@@ -158,7 +161,7 @@ func (m *ASTManager) smt2PPExprTreeWithInfo(root ASTHandle, names []usymbol.Symb
 				return result{}, e
 			}
 			if h != root && (childInfo.depth >= 5 || occurrences[h] > 1) {
-				return registerAlias(h, format, 0)
+				return registerAlias(h, format, 0, childInfo.depth, childInfo.weight, occurrences[h] > 1)
 			}
 			return result{docs: []ASTHandle{format}, weight: childInfo.weight, depth: childInfo.depth}, nil
 		}
@@ -308,7 +311,7 @@ func (m *ASTManager) smt2PPExprTreeWithInfo(root ASTHandle, names []usymbol.Symb
 			return result{}, e
 		}
 		if h != root && (value.depth >= 5 || value.weight >= 10 && occurrences[h] > 1) {
-			return registerAlias(h, format, value.level)
+			return registerAlias(h, format, value.level, value.depth, value.weight, occurrences[h] > 1)
 		}
 		value.docs = []ASTHandle{format}
 		return value, nil

@@ -12496,6 +12496,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_smt2_alias_trace.go",
         "pkg/ast/ast_smt2_let_trace.go",
         "pkg/ast/ast_smt2_bv_literal.go",
         "pkg/ast/ast_smt2_bv_literal_source_test.go",
@@ -12521,6 +12522,7 @@
         "pkg/ast/ast_smt2_quantifier_root.go"
       ],
       "tests": [
+        "TestASTSMT2AliasSourceTraceBeforeLetRegistration",
         "TestASTSMT2LetSourceTraceEmptyAndAliased",
         "TestASTSMT2BitVectorLiteralRadixAndSignedOracle",
         "TestASTSMT2BitVectorLiteralEveryReachedReservation",
@@ -12698,6 +12700,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Reached SMT2 store_result alias-registration TRACE at ast_smt2_pp.cpp:708 with source depth, weight, level, ID, low-level expression and shared flag",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt2_alias_trace.go",
+          "tests": ["TestASTSMT2AliasSourceTraceBeforeLetRegistration"]
+        },
         {
           "name": "Selected root-scope pp_let alias-count, declaration-level, and open-let TRACE checkpoints at ast_smt2_pp.cpp:806,818,833; nested scope alias offset remains partial",
           "status": "partial",
@@ -180934,6 +180942,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_smt2_alias_trace.go",
         "pkg/ast/ast_smt2_let_trace.go",
         "pkg/tactic/tactic_extension_model_trace.go",
         "pkg/tactic/tactic_filter_model_trace.go",
@@ -181026,6 +181035,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestASTSMT2AliasSourceTraceBeforeLetRegistration",
         "TestASTSMT2LetSourceTraceEmptyAndAliased",
         "TestFilterModelSourceBeforeAfterTrace",
         "TestExtensionModelTraceAttachedDeclarationInfo",
@@ -181153,6 +181163,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached SMT2 store_result alias-registration TRACE at ast_smt2_pp.cpp:708 with source depth, weight, level, ID, low-level expression and shared flag",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt2_alias_trace.go",
+          "tests": ["TestASTSMT2AliasSourceTraceBeforeLetRegistration"]
+        },
         {
           "name": "Selected root-scope pp_let alias-count, declaration-level, and open-let TRACE checkpoints at ast_smt2_pp.cpp:806,818,833; nested scope alias offset remains partial",
           "status": "partial",
@@ -182971,6 +182987,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_smt2_alias_trace.go",
         "pkg/ast/ast_smt2_let_trace.go",
         "pkg/tactic/tactic_extension_model_trace.go",
         "pkg/tactic/tactic_filter_model_trace.go",
@@ -183061,6 +183078,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestASTSMT2AliasSourceTraceBeforeLetRegistration",
         "TestASTSMT2LetSourceTraceEmptyAndAliased",
         "TestFilterModelSourceBeforeAfterTrace",
         "TestExtensionModelTraceAttachedDeclarationInfo",
@@ -183198,6 +183216,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached SMT2 store_result alias-registration TRACE at ast_smt2_pp.cpp:708 with source depth, weight, level, ID, low-level expression and shared flag",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_smt2_alias_trace.go",
+          "tests": ["TestASTSMT2AliasSourceTraceBeforeLetRegistration"]
+        },
         {
           "name": "Selected root-scope pp_let alias-count, declaration-level, and open-let TRACE checkpoints at ast_smt2_pp.cpp:806,818,833; nested scope alias offset remains partial",
           "status": "partial",

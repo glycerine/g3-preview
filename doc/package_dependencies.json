@@ -283,6 +283,7 @@
         "ast_shared_occs.go",
         "ast_shared_occs_iterator.go",
         "ast_shared_occs_mark.go",
+        "ast_smt2_alias_trace.go",
         "ast_smt2_app_format.go",
         "ast_smt2_arith_literal.go",
         "ast_smt2_boolean_tree.go",
