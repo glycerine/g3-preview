@@ -122,6 +122,15 @@ func (c satIntegrityChecker) containsClause(index uint32, cl StoredClauseRef, of
 	}
 	return false, ErrSATAssertion
 }
+func (c satIntegrityChecker) verifyClauseWatch(line int32, condition string) error {
+	if c.debugActions && satStorageSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		if d.HasAssertionActions() {
+			return d.VerifyFailure("src/sat/sat_integrity_checker.cpp", line, condition)
+		}
+	}
+	return ErrSATAssertion
+}
 func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 	if e := c.open(); e != nil {
 		return false, e
@@ -255,7 +264,14 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 				return false, e
 			}
 			if !yes {
-				return false, ErrSATAssertion
+				conditions := [...]string{
+					"contains_watched(s.get_wlist(~c[0]), c[1], c[2])",
+					"contains_watched(s.get_wlist(~c[1]), c[0], c[2])",
+					"contains_watched(s.get_wlist(~c[2]), c[0], c[1])",
+				}
+				if e = c.verifyClauseWatch(int32(73+k), conditions[k]); e != nil {
+					return false, e
+				}
 			}
 		}
 	} else {
@@ -368,21 +384,13 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 				return false, e
 			}
 			if !yes {
-				if c.debugActions && satStorageSourceDebug {
-					d := diagnostic.BorrowProcessDebugContext()
-					if d.HasAssertionActions() {
-						line := int32(99 + k)
-						condition := "contains_watched(s.get_wlist(~c[0]), c, s.get_offset(c))"
-						if k != 0 {
-							condition = "contains_watched(s.get_wlist(~c[1]), c, s.get_offset(c))"
-						}
-						if e = d.VerifyFailure("src/sat/sat_integrity_checker.cpp", line, condition); e != nil {
-							return false, e
-						}
-						continue
-					}
+				condition := "contains_watched(s.get_wlist(~c[0]), c, s.get_offset(c))"
+				if k != 0 {
+					condition = "contains_watched(s.get_wlist(~c[1]), c, s.get_offset(c))"
 				}
-				return false, ErrSATAssertion
+				if e = c.verifyClauseWatch(int32(99+k), condition); e != nil {
+					return false, e
+				}
 			}
 		}
 	}

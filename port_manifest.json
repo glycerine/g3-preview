@@ -75146,6 +75146,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerMissingNaryWatchUnreachableThenVerify"]
+        },
+        {
+          "name": "Retained check_clause ternary VERIFY73-75 and nary VERIFY99-100 source stderr, UNREACHABLE action and C continuation through real cleaner; unbound direct checker retains explicit error",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerTernaryVerifySourceActions", "TestSATCleanerMissingNaryWatchUnreachableThenVerify"]
         }
       ],
       "ownership": [
@@ -75278,6 +75284,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerMissingNaryWatchUnreachableThenVerify"]
+        },
+        {
+          "name": "Retained check_clause ternary VERIFY73-75 and nary VERIFY99-100 source stderr, UNREACHABLE action and C continuation through real cleaner; unbound direct checker retains explicit error",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerTernaryVerifySourceActions", "TestSATCleanerMissingNaryWatchUnreachableThenVerify"]
         }
       ],
       "ownership": [
@@ -122126,6 +122138,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerMissingNaryWatchUnreachableThenVerify"]
+        },
+        {
+          "name": "Retained check_clause ternary VERIFY73-75 and nary VERIFY99-100 source stderr, UNREACHABLE action and C continuation through real cleaner; unbound direct checker retains explicit error",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerTernaryVerifySourceActions", "TestSATCleanerMissingNaryWatchUnreachableThenVerify"]
         }
       ],
       "ownership": [
@@ -122542,6 +122560,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerMissingNaryWatchUnreachableThenVerify"]
+        },
+        {
+          "name": "Retained check_clause ternary VERIFY73-75 and nary VERIFY99-100 source stderr, UNREACHABLE action and C continuation through real cleaner; unbound direct checker retains explicit error",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerTernaryVerifySourceActions", "TestSATCleanerMissingNaryWatchUnreachableThenVerify"]
         }
       ],
       "ownership": [
