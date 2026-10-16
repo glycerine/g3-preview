@@ -100784,7 +100784,8 @@
         "TestLinearEquationIntegerCancellationAndLargeOwnership",
         "TestLinearEquationRationalDenominatorClearingAndCombination",
         "TestLinearEquationSourceConstructionTrace",
-        "TestLinearEquationCoreSourceSortedDebugGuard"
+        "TestLinearEquationCoreSourceSortedDebugGuard",
+        "TestLinearEquationNormalizedSourceDuplicateDebugGuard"
       ],
       "assertions": [
         {
@@ -100861,6 +100862,14 @@
           "go_target": "pkg/tactic/arith/linear_equation_debug.go",
           "tests": [
             "TestLinearEquationCoreSourceSortedDebugGuard"
+          ]
+        },
+        {
+          "name": "Normalized integer constructor DEBUG_CODE mark trail and duplicate-variable SASSERT before sorting",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/linear_equation_debug.go",
+          "tests": [
+            "TestLinearEquationNormalizedSourceDuplicateDebugGuard"
           ]
         }
       ],
@@ -121690,7 +121699,8 @@
         "TestDebugActionPromptBeforeClosedTieRead",
         "TestDebugInteractiveInputMustStartTiedToItsOwnStdout",
         "TestNumericCharInputClosedTieFailsAtReachedFlush",
-        "TestLinearEquationCoreSourceSortedDebugGuard"
+        "TestLinearEquationCoreSourceSortedDebugGuard",
+        "TestLinearEquationNormalizedSourceDuplicateDebugGuard"
       ],
       "conditionals": [
         {
@@ -121807,6 +121817,14 @@
           "tests": [
             "TestLinearEquationCoreSourceSortedDebugGuard"
           ]
+        },
+        {
+          "name": "Retained normalized equation duplicate-variable assertion uses the process assertion switch and source debug action",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/linear_equation_debug.go",
+          "tests": [
+            "TestLinearEquationNormalizedSourceDuplicateDebugGuard"
+          ]
         }
       ],
       "ownership": [
@@ -121918,7 +121936,8 @@
         "TestDebugMacroActualEnsureAndNotImplementedExits",
         "TestDebugMacroCassertLiteralTagShortCircuitAndUninitializedCondition",
         "TestDebugMacroVerifyConditionIsNotErasedByAssertionSwitch",
-        "TestLinearEquationCoreSourceSortedDebugGuard"
+        "TestLinearEquationCoreSourceSortedDebugGuard",
+        "TestLinearEquationNormalizedSourceDuplicateDebugGuard"
       ],
       "conditionals": [
         {
@@ -122143,6 +122162,14 @@
           "go_target": "pkg/tactic/arith/linear_equation_debug.go",
           "tests": [
             "TestLinearEquationCoreSourceSortedDebugGuard"
+          ]
+        },
+        {
+          "name": "Retained normalized equation duplicate-variable DEBUG_CODE and SASSERT gate",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/linear_equation_debug.go",
+          "tests": [
+            "TestLinearEquationNormalizedSourceDuplicateDebugGuard"
           ]
         }
       ],

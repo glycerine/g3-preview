@@ -198,6 +198,8 @@ func (l *LinearEquationManager) MkInt(as []numeral.Int, xs []uint32, normalized 
 		if size <= 1 {
 			return nil, nil
 		}
+	} else if e := l.assertUniqueNormalizedEquationVars(xs); e != nil {
+		return nil, e
 	}
 	for i := 0; i < size; i++ {
 		x := xs[i]
