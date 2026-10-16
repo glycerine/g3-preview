@@ -430,8 +430,13 @@ func (c satIntegrityChecker) checkBoolVars() (bool, error) {
 				if e != nil {
 					return false, e
 				}
-				if size != 0 {
-					return false, ErrSATAssertion
+				line := int32(148 + sign)
+				condition := "s.get_wlist(literal(v, false)).empty()"
+				if sign != 0 {
+					condition = "s.get_wlist(literal(v, true)).empty()"
+				}
+				if e = satIntegrityAssertion(size == 0, c.debugActions, line, condition); e != nil {
+					return false, e
 				}
 			}
 		}
@@ -443,6 +448,13 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 		return false, e
 	}
 	if !satStorageSourceDebug {
+		return true, nil
+	}
+	enabled, e := diagnostic.BorrowProcessDebugContext().AssertionsEnabled()
+	if e != nil {
+		return false, e
+	}
+	if !enabled {
 		return true, nil
 	}
 	p := c.lifecycle.propagation
@@ -462,8 +474,8 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 			if e != nil {
 				return false, e
 			}
-			if size != 0 {
-				return false, ErrSATAssertion
+			if e = satIntegrityAssertion(size == 0, c.debugActions, 167, "!s.was_eliminated(l.var()) || wlist.empty()"); e != nil {
+				return false, e
 			}
 		}
 		ref, e := list.ref()
@@ -492,8 +504,8 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 				if e != nil {
 					return false, e
 				}
-				if gone {
-					return false, ErrSATAssertion
+				if e = satIntegrityAssertion(!gone, c.debugActions, 171, "!s.was_eliminated(w.get_literal().var())"); e != nil {
+					return false, e
 				}
 				counterpart, e := v.watches.Get(other.Negated().index())
 				if e != nil {
@@ -515,8 +527,8 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 				if e != nil {
 					return false, e
 				}
-				if !yes {
-					return false, ErrSATAssertion
+				if e = satIntegrityAssertion(yes, c.debugActions, 181, "s.get_wlist(~(w.get_literal())).contains(watched(l, w.is_learned()))"); e != nil {
+					return false, e
 				}
 			case 1:
 				one, e := w.Literal1()
@@ -527,8 +539,8 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 				if e != nil {
 					return false, e
 				}
-				if gone {
-					return false, ErrSATAssertion
+				if e = satIntegrityAssertion(!gone, c.debugActions, 184, "!s.was_eliminated(w.get_literal1().var())"); e != nil {
+					return false, e
 				}
 				two, e := w.Literal2()
 				if e != nil {
@@ -538,11 +550,11 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 				if e != nil {
 					return false, e
 				}
-				if gone {
-					return false, ErrSATAssertion
+				if e = satIntegrityAssertion(!gone, c.debugActions, 185, "!s.was_eliminated(w.get_literal2().var())"); e != nil {
+					return false, e
 				}
-				if one.index() >= two.index() {
-					return false, ErrSATAssertion
+				if e = satIntegrityAssertion(one.index() < two.index(), c.debugActions, 186, "w.get_literal1().index() < w.get_literal2().index()"); e != nil {
+					return false, e
 				}
 			case 2:
 				off, e := w.ClauseOffset()
@@ -557,8 +569,8 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 				if e != nil {
 					return false, e
 				}
-				if removed {
-					return false, ErrSATAssertion
+				if e = satIntegrityAssertion(!removed, c.debugActions, 189, "!s.m_cls_allocator.get_clause(w.get_clause_offset())->was_removed()"); e != nil {
+					return false, e
 				}
 			}
 		}

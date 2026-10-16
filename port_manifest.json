@@ -74375,10 +74375,10 @@
           ]
         },
         {
-          "name": "Retained cleaner operator cleaner_bug process assertion/tag gate at entry and exit; selected nested bool-variable SASSERT actions ported, other checker assertions remain open (sat_cleaner.cpp:184,200)",
+          "name": "Retained cleaner operator cleaner_bug process assertion/tag gate at entry and exit; selected nested Boolean-variable and watch SASSERT actions ported, other checker diagnostics remain open (sat_cleaner.cpp:184,200)",
           "status": "partial",
           "go_target": "pkg/sat/sat_cleaner_assertion.go",
-          "tests": ["TestSATCleanerInvariantUsesProcessDebugGate", "TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions"]
+          "tests": ["TestSATCleanerInvariantUsesProcessDebugGate", "TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
         }
       ],
       "ownership": [
@@ -75075,10 +75075,16 @@
           ]
         },
         {
-          "name": "Selected check_bool_vars SASSERT133-145 process assertion switch, source-order array lengths, per-site C/T action through cleaner_bug; other checker assertions remain open",
+          "name": "Selected check_bool_vars SASSERT133-149 process assertion switch, source-order array lengths and eliminated-watch emptiness, per-site C/T action through cleaner_bug; other checker assertions remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_assertion.go",
-          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions"]
+          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
+        },
+        {
+          "name": "Selected check_watches SASSERT167-189 process assertion switch, source-order watch guards and per-site C/T action through cleaner_bug; sat_bug/sat_watched_bug CTRACE remains open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
         }
       ],
       "ownership": [
@@ -75140,10 +75146,16 @@
           ]
         },
         {
-          "name": "Selected check_bool_vars SASSERT133-145 process assertion switch, source-order array lengths, per-site C/T action through cleaner_bug; other checker assertions remain open",
+          "name": "Selected check_bool_vars SASSERT133-149 process assertion switch, source-order array lengths and eliminated-watch emptiness, per-site C/T action through cleaner_bug; other checker assertions remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_assertion.go",
-          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions"]
+          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
+        },
+        {
+          "name": "Selected check_watches SASSERT167-189 process assertion switch, source-order watch guards and per-site C/T action through cleaner_bug; sat_bug/sat_watched_bug CTRACE remains open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
         }
       ],
       "ownership": [
@@ -121852,10 +121864,16 @@
           "tests": ["TestSATCleanerInvariantUsesProcessDebugGate"]
         },
         {
-          "name": "Retained SAT cleaner check_bool_vars SASSERT133-145 source-order notification and C/T action for independent array lengths; other nested checker sites remain open",
+          "name": "Retained SAT cleaner check_bool_vars SASSERT133-149 source-order notification and C/T action for array lengths and eliminated watches; other nested checker sites remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_assertion.go",
-          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions"]
+          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
+        },
+        {
+          "name": "Retained SAT cleaner check_watches SASSERT167-189 process assertion switch and C/T action for watch guards; associated CTRACE remains open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
         },
         {
           "name": "Process debug owner with default streams, tied input and interactive action; generated initializer borrowing and heap CASSERT state",
@@ -122206,10 +122224,16 @@
           "tests": ["TestSATCleanerInvariantUsesProcessDebugGate"]
         },
         {
-          "name": "Retained SAT cleaner check_bool_vars SASSERT133-145 source-order notification and C/T action for independent array lengths; other nested checker sites remain open",
+          "name": "Retained SAT cleaner check_bool_vars SASSERT133-149 source-order notification and C/T action for array lengths and eliminated watches; other nested checker sites remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_assertion.go",
-          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions"]
+          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
+        },
+        {
+          "name": "Retained SAT cleaner check_watches SASSERT167-189 process assertion switch and C/T action for watch guards; associated CTRACE remains open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder"]
         },
         {
           "name": "Process debug owner with default streams, tied input and interactive action; generated initializer borrowing and heap CASSERT state",

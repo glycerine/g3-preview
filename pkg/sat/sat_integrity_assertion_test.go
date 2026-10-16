@@ -10,13 +10,8 @@ import (
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
-func TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions(t *testing.T) {
-	g, _ := satGCFixture(t, 3)
-	c := g.cleaner
-	v := g.lifecycle().propagation.variables
-	decision, assigned := v.decision, v.assignedSinceGC
-	defer func() { v.decision, v.assignedSinceGC = decision, assigned }()
-	v.decision, v.assignedSinceGC = nil, nil
+func satIntegrityActionFixture(t *testing.T, choices string) (*diagnostic.DebugContext, *diagnostic.NumericCharInput, *os.File) {
+	t.Helper()
 	budget := arena.NewBudget(^uint64(0))
 	region, err := arena.NewBytesRegion(arena.BytesRegionConfig{DirectOnly: true, Descriptors: arena.Config{Budget: budget}})
 	satOK(t, err)
@@ -24,7 +19,7 @@ func TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions(t *testing.T)
 	satOK(t, err)
 	inputFile, err := os.CreateTemp(t.TempDir(), "sat-checker-actions-*")
 	satOK(t, err)
-	_, err = inputFile.WriteString("CCT")
+	_, err = inputFile.WriteString(choices)
 	satOK(t, err)
 	_, err = inputFile.Seek(0, 0)
 	satOK(t, err)
@@ -51,6 +46,18 @@ func TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions(t *testing.T)
 		satOK(t, debug.Close())
 		satOK(t, region.Close())
 	})
+	return debug, input, outputFile
+}
+
+func TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions(t *testing.T) {
+	g, _ := satGCFixture(t, 3)
+	c := g.cleaner
+	v := g.lifecycle().propagation.variables
+	decision, assigned := v.decision, v.assignedSinceGC
+	defer func() { v.decision, v.assignedSinceGC = decision, assigned }()
+	v.decision, v.assignedSinceGC = nil, nil
+	debug, input, outputFile := satIntegrityActionFixture(t, "CCT")
+	var err error
 	satOK(t, debug.EnableDebug("cleaner_bug"))
 	satOK(t, debug.EnableAssertions(false))
 	if err = c.assertInvariant(); err != nil {
