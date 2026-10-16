@@ -287,19 +287,6 @@ func (s *RationalService) InfSwap(a, b *OwnedInfRational) error {
 	}
 	return s.Manager.Swap(&a.Second, &b.Second)
 }
-func (s *RationalService) InfSetFraction(v *OwnedInfRational, n int64, d uint64) error {
-	if e := s.lock(); e != nil {
-		return e
-	}
-	defer s.mu.Unlock()
-	if e := s.infCheck(v); e != nil {
-		return e
-	}
-	if e := s.Manager.SetFraction(&v.First, n, d); e != nil {
-		return e
-	}
-	return s.Manager.Reset(&v.Second)
-}
 func (s *RationalService) InfSetRational(v *OwnedInfRational, a *OwnedRational) error {
 	if e := s.lock(); e != nil {
 		return e

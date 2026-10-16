@@ -11,16 +11,17 @@ import (
 
 func infValue(t *testing.T, s *RationalService, n, d int64, eps string) OwnedInfRational {
 	t.Helper()
-	v, e := s.NewInfValue()
-	serviceMust(t, e)
-	serviceMust(t, s.InfSetFraction(&v, n, uint64(d)))
-	if eps != "0" {
-		a := serviceValue(t, s, new(big.Rat).SetFrac(big.NewInt(n), big.NewInt(d)).RatString())
-		b := serviceValue(t, s, eps)
-		serviceMust(t, s.InfSetPair(&v, &a, &b))
-		serviceMust(t, s.Del(&a))
-		serviceMust(t, s.Del(&b))
+	a := serviceValue(t, s, new(big.Rat).SetFrac(big.NewInt(n), big.NewInt(d)).RatString())
+	defer func() { serviceMust(t, s.Del(&a)) }()
+	if eps == "0" {
+		v, e := s.InfFromRational(&a)
+		serviceMust(t, e)
+		return v
 	}
+	b := serviceValue(t, s, eps)
+	defer func() { serviceMust(t, s.Del(&b)) }()
+	v, e := s.InfFromPair(&a, &b)
+	serviceMust(t, e)
 	return v
 }
 func infEq(t *testing.T, s *RationalService, a, b *OwnedInfRational) bool {
