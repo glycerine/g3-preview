@@ -181467,10 +181467,10 @@
           "status": "dead_deleted"
         },
         {
-          "name": "AST mk_quantifier debug-only pattern TRACE at ast.cpp:2358 precedes each corresponding pattern assertion and node allocation; selected pattern application SMT2 profile",
+          "name": "AST mk_quantifier debug-only pattern TRACE at ast.cpp:2358 precedes each corresponding pattern assertion and node allocation; selected ground and uninterpreted multi-trigger SMT2 profiles",
           "status": "partial",
           "go_target": "pkg/ast/ast_core_quantifier_pattern_trace.go",
-          "tests": ["TestASTQuantifierPatternSourceTraceBeforeRegistration"]
+          "tests": ["TestASTQuantifierPatternSourceTraceBeforeRegistration", "TestASTQuantifierPatternTraceUninterpretedTrigger"]
         },
         {
           "name": "Selected expr2aig cache_result TRACE emits process-bound SMT2 Boolean expression and AIG reference before cache INC (aig.cpp:452); wider expression profiles remain open; selected annotated and nested quantified Boolean expressions render",
@@ -183182,10 +183182,10 @@
           "status": "dead_deleted"
         },
         {
-          "name": "AST mk_quantifier debug-only pattern TRACE at ast.cpp:2358 precedes each corresponding pattern assertion and node allocation; selected pattern application SMT2 profile",
+          "name": "AST mk_quantifier debug-only pattern TRACE at ast.cpp:2358 precedes each corresponding pattern assertion and node allocation; selected ground and uninterpreted multi-trigger SMT2 profiles",
           "status": "partial",
           "go_target": "pkg/ast/ast_core_quantifier_pattern_trace.go",
-          "tests": ["TestASTQuantifierPatternSourceTraceBeforeRegistration"]
+          "tests": ["TestASTQuantifierPatternSourceTraceBeforeRegistration", "TestASTQuantifierPatternTraceUninterpretedTrigger"]
         },
         {
           "name": "Selected expr2aig cache_result TRACE emits process-bound SMT2 Boolean expression and AIG reference before cache INC (aig.cpp:452); wider expression profiles remain open; selected annotated and nested quantified Boolean expressions render",

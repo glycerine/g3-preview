@@ -114,3 +114,44 @@ func TestASTQuantifierPatternSourceTraceBeforeRegistration(t *testing.T) {
 		paramsMust(t, err)
 	}
 }
+
+func TestASTQuantifierPatternTraceUninterpretedTrigger(t *testing.T) {
+	c, g, _, budget := dynAckSourceFixture(t)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	m, err := NewASTManager(ASTManagerConfig{Symbols: c.SymbolsField, Numerals: c.NumeralsField, Budget: budget, TraceTags: tags})
+	paramsMust(t, err)
+	defer func() { paramsMust(t, m.Close()) }()
+	previous, err := uparams.BindProcessGlobalParamsService(g)
+	paramsMust(t, err)
+	defer func() { _, e := uparams.BindProcessGlobalParamsService(previous); paramsMust(t, e) }()
+	sort, err := m.MkBoolSort()
+	paramsMust(t, err)
+	variable, err := m.MkVar(0, sort)
+	paramsMust(t, err)
+	f, err := m.MkFuncDecl(astTestSymbol(t, m, "trigger-f"), []ASTHandle{sort}, sort, ASTFuncDeclInfo{})
+	paramsMust(t, err)
+	gDecl, err := m.MkFuncDecl(astTestSymbol(t, m, "trigger-g"), []ASTHandle{sort}, sort, ASTFuncDeclInfo{})
+	paramsMust(t, err)
+	first, err := m.MkApp(f, []ASTHandle{variable})
+	paramsMust(t, err)
+	second, err := m.MkApp(gDecl, []ASTHandle{variable})
+	paramsMust(t, err)
+	pattern, err := m.MkFamilyApp(2, 0, nil, []ASTHandle{first, second})
+	paramsMust(t, err)
+	tags.Enable("ast")
+	output.Reset()
+	_, err = m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{sort}, Names: []usymbol.Symbol{astTestSymbol(t, m, "x")}, Body: first, Patterns: []ASTHandle{pattern}})
+	paramsMust(t, err)
+	if ASTSourceDebug && tags.ShouldTrace("ast") {
+		got := output.String()
+		body := "((trigger-f (:var 0)) (trigger-g (:var 0)))\n------------------------------------------------\n"
+		if !strings.HasPrefix(got, "-------- [ast] mk_quantifier src/ast/ast.cpp:2358 ---------\n0 ") ||
+			!strings.Contains(got, body) ||
+			strings.LastIndex(got, "register_node_core") < strings.Index(got, body) {
+			t.Fatalf("uninterpreted multi-trigger trace: %q", got)
+		}
+	} else if output.Len() != 0 {
+		t.Fatalf("erased multi-trigger trace emitted %q", output.String())
+	}
+}
