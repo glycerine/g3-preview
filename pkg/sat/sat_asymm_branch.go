@@ -17,7 +17,7 @@ type satAsymmBranch struct {
 	lifecycle                                                                             *satSolverClauseLifecycle
 	ownerBytes                                                                            uint64
 	enabled                                                                               bool
-	rounds, limit, elimLiterals                                                           uint32
+	rounds, limit, elimLiterals, reportElimLiterals                                       uint32
 	savedPhase                                                                            []int8
 	report                                                                                stopwatch.Stopwatch
 	debugPropagate, debugMissed                                                           bool
@@ -174,6 +174,8 @@ func (a *satAsymmBranch) run(force bool) (err error) {
 	if e := a.invariant(); e != nil {
 		return e
 	}
+	a.report = stopwatch.Stopwatch{}
+	a.reportElimLiterals = a.elimLiterals
 	if e := a.report.Start(); e != nil {
 		return e
 	}
@@ -288,6 +290,12 @@ func (a *satAsymmBranch) finishRun(cause error) error {
 			return errors.Join(cause, e)
 		}
 		a.reportActive = false
+		if e := a.emitReport(); e != nil {
+			if cause == nil {
+				return e
+			}
+			return errors.Join(cause, e)
+		}
 	}
 	return cause
 }

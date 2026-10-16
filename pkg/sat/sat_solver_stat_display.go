@@ -2,6 +2,7 @@
 package sat
 
 import (
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
@@ -13,7 +14,14 @@ func (s *Solver) displayMemoryStat(out *utext.NumericTextStream) error {
 	if e := s.open(); e != nil {
 		return e
 	}
-	bytes, e := s.runtime.memory.AllocationSize()
+	return appendSATMemoryStat(out, s.runtime.memory)
+}
+
+// The source mem_stat can be emitted while a solver operation is unwinding.
+// Its process allocation owner remains available even when solver.open refuses
+// interrupted operations, so report destructors use this concrete formatter.
+func appendSATMemoryStat(out *utext.NumericTextStream, memory *umemory.Runtime) error {
+	bytes, e := memory.AllocationSize()
 	if e != nil {
 		return e
 	}

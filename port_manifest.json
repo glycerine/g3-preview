@@ -152053,7 +152053,8 @@
         "pkg/model/model_evaluator_function_memory_trace_debug_test.go",
         "pkg/model/model_copy.go",
         "pkg/tactic/aig/aig_tactic_memory_trace.go",
-        "pkg/tactic/aig/aig_imp_memory_trace.go"
+        "pkg/tactic/aig/aig_imp_memory_trace.go",
+        "pkg/sat/sat_asymm_branch_report.go"
       ],
       "tests": [
         "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
@@ -152164,7 +152165,9 @@
         "TestModelEvaluatorCompletedFunctionMemoryWrapperReleaseSites",
         "TestModelCopiedFunctionMemoryWrapperOwnerTransfer",
         "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
-        "TestAIGTacticConstructorFailureMemoryTracePrefixes"
+        "TestAIGTacticConstructorFailureMemoryTracePrefixes",
+        "TestSATAsymmReportActualReductionAndSourceGates",
+        "TestSATAsymmReportSurvivesCanceledSourceCatch"
       ],
       "conditionals": [
         {
@@ -152787,6 +152790,15 @@
             "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
             "TestAIGTacticConstructorFailureMemoryTracePrefixes"
           ]
+        },
+        {
+          "name": "Retained SAT asymmetric-branch mem_stat process allocation read, including canceled source catch (src/sat/sat_asymm_branch.cpp:44-52; src/sat/sat_types.h:289-293)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_asymm_branch_report.go",
+          "tests": [
+            "TestSATAsymmReportActualReductionAndSourceGates",
+            "TestSATAsymmReportSurvivesCanceledSourceCatch"
+          ]
         }
       ],
       "ownership": [
@@ -152905,7 +152917,8 @@
         "pkg/model/model_evaluator_function_memory_trace_debug_test.go",
         "pkg/model/model_copy.go",
         "pkg/tactic/aig/aig_tactic_memory_trace.go",
-        "pkg/tactic/aig/aig_imp_memory_trace.go"
+        "pkg/tactic/aig/aig_imp_memory_trace.go",
+        "pkg/sat/sat_asymm_branch_report.go"
       ],
       "tests": [
         "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
@@ -153001,7 +153014,9 @@
         "TestModelEvaluatorCompletedFunctionMemoryWrapperReleaseSites",
         "TestModelCopiedFunctionMemoryWrapperOwnerTransfer",
         "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
-        "TestAIGTacticConstructorFailureMemoryTracePrefixes"
+        "TestAIGTacticConstructorFailureMemoryTracePrefixes",
+        "TestSATAsymmReportActualReductionAndSourceGates",
+        "TestSATAsymmReportSurvivesCanceledSourceCatch"
       ],
       "conditionals": [
         {
@@ -153575,6 +153590,15 @@
           "tests": [
             "TestAIGTacticMemoryWrapperSourceAllocationAndRelease",
             "TestAIGTacticConstructorFailureMemoryTracePrefixes"
+          ]
+        },
+        {
+          "name": "Retained SAT asymmetric-branch mem_stat process allocation read, including canceled source catch (src/sat/sat_asymm_branch.cpp:44-52; src/sat/sat_types.h:289-293)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_asymm_branch_report.go",
+          "tests": [
+            "TestSATAsymmReportActualReductionAndSourceGates",
+            "TestSATAsymmReportSurvivesCanceledSourceCatch"
           ]
         }
       ],
@@ -184347,7 +184371,8 @@
         "pkg/util/diagnostic/util_process_verbose.go",
         "pkg/util/params/util_env_params.go",
         "pkg/sat/sat_cleaner_report.go",
-        "pkg/sat/sat_scc_report.go"
+        "pkg/sat/sat_scc_report.go",
+        "pkg/sat/sat_asymm_branch_report.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184371,7 +184396,9 @@
         "TestProcessVerboseGlobalsDefaultAndBorrowedSelection",
         "TestUpdateProcessEnvParamsSharedVerbosityAndWarning",
         "TestSATCleanerReportUsesProcessVerboseStreamAndSourceGate",
-        "TestSATSCCReportActualEliminationAndSourceGates"
+        "TestSATSCCReportActualEliminationAndSourceGates",
+        "TestSATAsymmReportActualReductionAndSourceGates",
+        "TestSATAsymmReportSurvivesCanceledSourceCatch"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -184475,6 +184502,15 @@
           "tests": [
             "TestSATSCCReportActualEliminationAndSourceGates"
           ]
+        },
+        {
+          "name": "Retained SAT asymmetric-branch report IF_VERBOSE(10) gate and process-selected stream (src/sat/sat_asymm_branch.cpp:35-52)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_asymm_branch_report.go",
+          "tests": [
+            "TestSATAsymmReportActualReductionAndSourceGates",
+            "TestSATAsymmReportSurvivesCanceledSourceCatch"
+          ]
         }
       ],
       "ownership": [
@@ -184535,7 +184571,8 @@
         "pkg/math/subpaving/rational_context_params.go",
         "pkg/math/subpaving/hardware_context_root.go",
         "pkg/sat/sat_cleaner_report.go",
-        "pkg/sat/sat_scc_report.go"
+        "pkg/sat/sat_scc_report.go",
+        "pkg/sat/sat_asymm_branch_report.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184586,7 +184623,9 @@
         "TestRationalContextNamedParamsSinglePassAndDefaults",
         "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
         "TestSATCleanerReportUsesProcessVerboseStreamAndSourceGate",
-        "TestSATSCCReportActualEliminationAndSourceGates"
+        "TestSATSCCReportActualEliminationAndSourceGates",
+        "TestSATAsymmReportActualReductionAndSourceGates",
+        "TestSATAsymmReportSurvivesCanceledSourceCatch"
       ],
       "conditionals": [
         {
@@ -184988,6 +185027,15 @@
           "go_target": "pkg/sat/sat_scc_report.go",
           "tests": [
             "TestSATSCCReportActualEliminationAndSourceGates"
+          ]
+        },
+        {
+          "name": "Retained SAT asymmetric-branch report IF_VERBOSE(10) gate and process-selected stream (src/sat/sat_asymm_branch.cpp:35-52)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_asymm_branch_report.go",
+          "tests": [
+            "TestSATAsymmReportActualReductionAndSourceGates",
+            "TestSATAsymmReportSurvivesCanceledSourceCatch"
           ]
         }
       ],
