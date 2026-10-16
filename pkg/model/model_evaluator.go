@@ -161,6 +161,26 @@ func (ev *ModelEvaluator) Evaluate(t ast.ASTHandle, out ast.ASTRef) error {
 	}
 	return ev.cfg.expandValue(out)
 }
+
+// EvaluateValue is the source value-returning overload. Its entry TRACE runs
+// before constructing the local result reference; Evaluate then emits the
+// output-reference overload's second entry record.
+func (ev *ModelEvaluator) EvaluateValue(t ast.ASTHandle) (ast.ASTRef, error) {
+	if e := ev.open(); e != nil {
+		return ast.ASTRef{}, e
+	}
+	if e := ev.traceEvaluateAt(t, 572); e != nil {
+		return ast.ASTRef{}, e
+	}
+	result, e := ev.model.manager.NewRef(ast.ASTHandle{})
+	if e != nil {
+		return ast.ASTRef{}, e
+	}
+	if e = ev.Evaluate(t, result); e != nil {
+		return ast.ASTRef{}, errors.Join(e, ev.model.manager.DelRef(&result))
+	}
+	return result, nil
+}
 func (ev *ModelEvaluator) UpdtParams(p *uparams.ParamsRef) error {
 	if e := ev.open(); e != nil {
 		return e

@@ -57712,6 +57712,12 @@
           "tests": ["TestModelEvaluatorGetMacroSourceTraceBranches"]
         },
         {
+          "name": "Reached model_evaluator::operator()(expr*) value-returning entry TRACE at model_evaluator.cpp:572 before result-reference construction and the nested output-reference TRACE at 566",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "tests": ["TestModelEvaluatorValueOverloadOwnsResultAndTracesBothEntries"]
+        },
+        {
           "name": "Concrete model_evaluator::imp allocation, cleanup replacement and destructor debug memory records (model_evaluator.cpp:523,556-557,531)",
           "status": "platform_replacement",
           "go_target": "pkg/model/model_evaluator_memory_trace.go",
@@ -181734,6 +181740,12 @@
           "tests": ["TestModelEvaluatorGetMacroSourceTraceBranches"]
         },
         {
+          "name": "Reached model_evaluator::operator()(expr*) value-returning entry TRACE at model_evaluator.cpp:572 before result-reference construction and the nested output-reference TRACE at 566",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "tests": ["TestModelEvaluatorValueOverloadOwnsResultAndTracesBothEntries"]
+        },
+        {
           "name": "Reached pulled-quantifier TRACE after successful nested binder pull and pattern inference (pattern_inference.cpp:695), with complete process-bound SMT2 result",
           "status": "ported",
           "go_target": "pkg/ast/pattern/reduce_quantifier_trace.go",
@@ -184042,6 +184054,12 @@
           "status": "ported",
           "go_target": "pkg/model/model_evaluator_trace.go",
           "tests": ["TestModelEvaluatorGetMacroSourceTraceBranches"]
+        },
+        {
+          "name": "Reached model_evaluator::operator()(expr*) value-returning entry TRACE at model_evaluator.cpp:572 before result-reference construction and the nested output-reference TRACE at 566",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator_trace.go",
+          "tests": ["TestModelEvaluatorValueOverloadOwnsResultAndTracesBothEntries"]
         },
         {
           "name": "Reached pulled-quantifier TRACE after successful nested binder pull and pattern inference (pattern_inference.cpp:695), with complete process-bound SMT2 result",

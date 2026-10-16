@@ -50,12 +50,12 @@ func (ev *ModelEvaluator) BindTrace(tags *diagnostic.TraceTags) error {
 	return nil
 }
 
-func (ev *ModelEvaluator) traceEvaluate(t ast.ASTHandle) error {
+func (ev *ModelEvaluator) traceEvaluateAt(t ast.ASTHandle, line int) error {
 	tags := ev.traceTags()
 	if !tags.ShouldTrace("model_evaluator") {
 		return nil
 	}
-	return tags.EmitConditional("model_evaluator", "operator()", "src/model/model_evaluator.cpp", 566,
+	return tags.EmitConditional("model_evaluator", "operator()", "src/model/model_evaluator.cpp", line,
 		func() bool { return true }, func(w io.Writer) error {
 			if err := ev.writeSMT2(w, t); err != nil {
 				return err
@@ -63,6 +63,10 @@ func (ev *ModelEvaluator) traceEvaluate(t ast.ASTHandle) error {
 			_, err := io.WriteString(w, "\n")
 			return err
 		})
+}
+
+func (ev *ModelEvaluator) traceEvaluate(t ast.ASTHandle) error {
+	return ev.traceEvaluateAt(t, 566)
 }
 
 func (c *evaluatorConfiguration) traceReduceApp(d ast.ASTHandle, args ast.AppArguments, out ast.ASTRef) error {
