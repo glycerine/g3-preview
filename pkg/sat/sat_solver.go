@@ -171,6 +171,7 @@ func NewSATSolver(c SolverConfig) (s *Solver, err error) {
 	if s.cleaner, err = newSATCleaner(s.Lifecycle, c.Budget); err != nil {
 		return s, err
 	}
+	s.cleaner.solver = s
 	s.model.Bind(c.Runtime.memory)
 	if err = s.converter.initializeSource(); err != nil {
 		return s, err

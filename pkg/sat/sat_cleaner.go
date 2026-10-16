@@ -16,6 +16,7 @@ import (
 // all allocator-live objects. It is an explicit guarded exception adapter.
 type satCleaner struct {
 	self                                           *satCleaner
+	solver                                         *Solver // borrowed source owner for mk_stat in report
 	lifecycle                                      *satSolverClauseLifecycle
 	lastNumUnits, elimClauses, elimLiterals        uint32
 	ownerBytes                                     uint64
@@ -105,13 +106,18 @@ func (c *satCleaner) run(force bool) (done bool, err error) {
 	if !force && p.cleanerCounter > 0 {
 		return false, nil
 	}
-	// Source report starts only after all early exits; original error wins on Stop.
+	// Source report starts only after all early exits; original error wins on teardown.
 	var report stopwatch.Stopwatch
+	startClauses, startLiterals := c.elimClauses, c.elimLiterals
 	if e = report.Start(); e != nil {
 		return false, e
 	}
 	defer func() {
-		if e := report.Stop(); err == nil && e != nil {
+		e := report.Stop()
+		if e == nil && c.solver != nil {
+			e = c.emitReport(&report, startClauses, startLiterals)
+		}
+		if err == nil && e != nil {
 			err = e
 		}
 	}()

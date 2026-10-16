@@ -184345,7 +184345,8 @@
         "pkg/util/diagnostic/util_small_object_allocator.go",
         "pkg/util/diagnostic/util_small_object_allocator_stream.go",
         "pkg/util/diagnostic/util_process_verbose.go",
-        "pkg/util/params/util_env_params.go"
+        "pkg/util/params/util_env_params.go",
+        "pkg/sat/sat_cleaner_report.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184367,7 +184368,8 @@
         "TestVerboseContextClosedLevelReachedBeforeOutput",
         "TestVerboseContextWarmOutputAndNullAdapter",
         "TestProcessVerboseGlobalsDefaultAndBorrowedSelection",
-        "TestUpdateProcessEnvParamsSharedVerbosityAndWarning"
+        "TestUpdateProcessEnvParamsSharedVerbosityAndWarning",
+        "TestSATCleanerReportUsesProcessVerboseStreamAndSourceGate"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -184455,6 +184457,14 @@
         {
           "name": "uint64_log2 is reached only by the inactive 64-bit mpz digit branch; selected _MP_INTERNAL digits are uint32",
           "status": "dead_deleted"
+        },
+        {
+          "name": "Retained SAT cleaner report IF_VERBOSE(10) gate, process-selected stream, and source stopwatch/stat chain (src/sat/sat_cleaner.cpp:158-179)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_cleaner_report.go",
+          "tests": [
+            "TestSATCleanerReportUsesProcessVerboseStreamAndSourceGate"
+          ]
         }
       ],
       "ownership": [
@@ -184513,7 +184523,8 @@
         "pkg/math/subpaving/fixed_context_params.go",
         "pkg/math/subpaving/fast_context_params.go",
         "pkg/math/subpaving/rational_context_params.go",
-        "pkg/math/subpaving/hardware_context_root.go"
+        "pkg/math/subpaving/hardware_context_root.go",
+        "pkg/sat/sat_cleaner_report.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184562,7 +184573,8 @@
         "TestFixedContextNamedParamsSourceOrderAndStoppedOwner",
         "TestFastContextNamedParamsSinglePassAndStoppedPrefix",
         "TestRationalContextNamedParamsSinglePassAndDefaults",
-        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder"
+        "TestSubpavingHardwareContextReadsParamsRefInSourceOrder",
+        "TestSATCleanerReportUsesProcessVerboseStreamAndSourceGate"
       ],
       "conditionals": [
         {
@@ -184949,6 +184961,14 @@
         {
           "name": "TRUSTME macro fatal path at retained shell/MUZ callers; owning consumers remain unported",
           "status": "unported"
+        },
+        {
+          "name": "Retained SAT cleaner report IF_VERBOSE(10) gate, process-selected stream, and source stopwatch/stat chain (src/sat/sat_cleaner.cpp:158-179)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_cleaner_report.go",
+          "tests": [
+            "TestSATCleanerReportUsesProcessVerboseStreamAndSourceGate"
+          ]
         }
       ],
       "ownership": [
