@@ -108973,6 +108973,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained UFBV rewriter tactic entry and post-publication goal well-sorted SASSERT at cpp39,68 through the process debug gate",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_tactic_assert.go",
+          "tests": ["TestUFBVRewriterSourceWellSortedAssertions"]
+        },
+        {
           "name": "Reached post-publication ufbv-rewriter goal display TRACE at cpp:67, with result-reference cleanup after formatter refusal",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_tactic_trace.go",
@@ -122925,6 +122931,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained UFBV rewriter tactic entry and post-publication goal well-sorted SASSERT at cpp39,68 through the process debug gate",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_tactic_assert.go",
+          "tests": ["TestUFBVRewriterSourceWellSortedAssertions"]
+        },
+        {
           "name": "Whole direct debug.cpp definition audit: assertion switch, stderr notification, lazy tag-table init/finalize and enable/disable/query, and selected Linux invoke_gdb prompt/command/exit actions; remaining partial credit belongs to retained macro callers",
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_debug_context.go",
@@ -123387,6 +123399,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained UFBV rewriter tactic entry and post-publication goal well-sorted SASSERT at cpp39,68 through the process debug gate",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_tactic_assert.go",
+          "tests": ["TestUFBVRewriterSourceWellSortedAssertions"]
+        },
         {
           "name": "API context destructor DEBUG_CODE warning_msg for each uncollected registered object before removal (api_context.cpp:109-117); Go concrete type names replace compiler RTTI spelling",
           "status": "ported",

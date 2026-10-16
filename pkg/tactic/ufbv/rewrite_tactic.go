@@ -72,6 +72,9 @@ func (t *RewriterTactic) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error)
 	if e := goal.CheckOwner(); e != nil {
 		return nil, e
 	}
+	if e := assertRewriterGoalWellSorted(goal, 39); e != nil {
+		return nil, e
+	}
 	report, e := tactic.NewTacticReport("ufbv-rewriter", goal)
 	if e != nil {
 		return nil, e
@@ -169,6 +172,9 @@ func (t *RewriterTactic) Apply(goal *tactic.Goal) (_ *tactic.Goal, result error)
 		return nil, e
 	}
 	if e := t.tracePublishedGoal(goal); e != nil {
+		return nil, errors.Join(e, goal.DecRef())
+	}
+	if e := assertRewriterGoalWellSorted(goal, 68); e != nil {
 		return nil, errors.Join(e, goal.DecRef())
 	}
 	return goal, nil
