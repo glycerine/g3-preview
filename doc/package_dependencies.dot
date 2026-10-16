@@ -52,6 +52,7 @@ digraph packages {
   "ast/rewriter" -> "util/params";
   "ast/rewriter" -> "util/productiter";
   "ast/rewriter" -> "util/symbol";
+  "ast/rewriter" -> "util/text";
   "ast/rewriter/bit_blaster" [style=filled, fillcolor="#eeeeee"];
   "ast/rewriter/bit_blaster" -> "util/text";
   "clibrand" [style=filled, fillcolor="#eeeeee"];
@@ -191,8 +192,11 @@ digraph packages {
   "sat/tactic" -> "tactic";
   "sat/tactic" -> "util/control";
   "sat/tactic" -> "util/cooperate";
+  "sat/tactic" -> "util/diagnostic";
   "sat/tactic" -> "util/lbool";
   "sat/tactic" -> "util/memory";
+  "sat/tactic" -> "util/params";
+  "sat/tactic" -> "util/text";
   "shell" [style=filled, fillcolor="#eeeeee"];
   "shell" -> "arena";
   "shell" -> "util/control";
