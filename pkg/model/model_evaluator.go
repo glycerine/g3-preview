@@ -468,7 +468,14 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 		if status == rewriter.RewriteFailed {
 			return c.evaluatePartialTheory(d, args, out, proof)
 		}
-		return c.evaluateReducedApp(status, out)
+		final, e := c.evaluateReducedApp(status, out)
+		if e != nil || status == rewriter.RewriteDone && final == rewriter.Rewrite1 {
+			return final, e
+		}
+		if e = c.traceReduceStatus(final, out); e != nil {
+			return rewriter.RewriteFailed, e
+		}
+		return final, nil
 	}
 	if fid == 1 && args.Count() == 1 {
 		value, e := args.At(0)

@@ -2,10 +2,64 @@
 package model_test
 
 import (
+	"bytes"
+	"strings"
+	"testing"
+
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
-	"testing"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
+
+// Source: src/model/model_evaluator.cpp:169-202. A successful array select
+// rewrite reaches the shared conditional result record.
+func TestModelEvaluatorArraySelectSourceStatusTrace(t *testing.T) {
+	m, _, ev, _, _, _ := evaluatorFixture(t)
+	fid, e := m.RegisterArrayPlugin()
+	astTestMust(t, e)
+	boolSort := mustBoolSort(t, m)
+	bp, e := m.NewParameterAST(boolSort)
+	astTestMust(t, e)
+	defer func() { astTestMust(t, m.DelParameter(&bp)) }()
+	arraySort, e := m.MkFamilySort(fid, 0, []ast.ASTParameter{bp, bp})
+	astTestMust(t, e)
+	ap, e := m.NewParameterAST(arraySort)
+	astTestMust(t, e)
+	defer func() { astTestMust(t, m.DelParameter(&ap)) }()
+	no, e := m.MkFalse()
+	astTestMust(t, e)
+	yes, e := m.MkTrue()
+	astTestMust(t, e)
+	constant, e := m.MkFamilyApp(fid, ast.ASTArrayOpConst, []ast.ASTParameter{ap}, []ast.ASTHandle{no})
+	astTestMust(t, e)
+	astTestPin(t, m, constant)
+	term, e := m.MkFamilyApp(fid, ast.ASTArrayOpSelect, nil, []ast.ASTHandle{constant, yes})
+	astTestMust(t, e)
+	astTestPin(t, m, term)
+	out := astTestPin(t, m, ast.ASTHandle{})
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	astTestMust(t, ev.BindTrace(tags))
+	tags.Enable("model_evaluator")
+	astTestMust(t, ev.Evaluate(term, out))
+	got, e := m.RefGet(out)
+	astTestMust(t, e)
+	if got != no {
+		t.Fatal("array select rewrite", got)
+	}
+	if !tags.ShouldTrace("model_evaluator") {
+		if output.Len() != 0 {
+			t.Fatal("erased trace", output.String())
+		}
+		return
+	}
+	want := "-------- [model_evaluator] reduce_app src/model/model_evaluator.cpp:200 ---------\n" +
+		"false\n" +
+		"------------------------------------------------\n"
+	if got := output.String(); !strings.HasSuffix(got, want) {
+		t.Fatalf("array select status trace: got %q, want suffix %q", got, want)
+	}
+}
 
 func TestModelEvaluatorOriginalArrayStoreSelectDispatch(t *testing.T) {
 	m, md, ev, c, p, _ := evaluatorFixture(t)

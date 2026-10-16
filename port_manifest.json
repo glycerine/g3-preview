@@ -57686,6 +57686,13 @@
           "tests": ["TestModelEvaluatorLabelReductionSourceStatusTrace"]
         },
         {
+          "name": "Reached model_evaluator::reduce_app array-rewrite conditional result CTRACE at model_evaluator.cpp:169-202",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator.go",
+          "go_targets": ["pkg/model/model_evaluator_trace.go"],
+          "tests": ["TestModelEvaluatorArraySelectSourceStatusTrace"]
+        },
+        {
           "name": "Reached model_evaluator::reduce_app direct function-entry TRACE at model_evaluator.cpp:187-191, with evaluated SMT2 arguments and result",
           "status": "ported",
           "go_target": "pkg/model/model_evaluator_trace.go",
@@ -181644,6 +181651,13 @@
           "tests": ["TestModelEvaluatorLabelReductionSourceStatusTrace"]
         },
         {
+          "name": "Reached model_evaluator::reduce_app array-rewrite conditional result CTRACE at model_evaluator.cpp:169-202",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator.go",
+          "go_targets": ["pkg/model/model_evaluator_trace.go"],
+          "tests": ["TestModelEvaluatorArraySelectSourceStatusTrace"]
+        },
+        {
           "name": "Reached model_evaluator::reduce_app direct function-entry TRACE at model_evaluator.cpp:187-191, with evaluated SMT2 arguments and result",
           "status": "ported",
           "go_target": "pkg/model/model_evaluator_trace.go",
@@ -183938,6 +183952,13 @@
           "go_target": "pkg/model/model_evaluator.go",
           "go_targets": ["pkg/model/model_evaluator_trace.go"],
           "tests": ["TestModelEvaluatorLabelReductionSourceStatusTrace"]
+        },
+        {
+          "name": "Reached model_evaluator::reduce_app array-rewrite conditional result CTRACE at model_evaluator.cpp:169-202",
+          "status": "ported",
+          "go_target": "pkg/model/model_evaluator.go",
+          "go_targets": ["pkg/model/model_evaluator_trace.go"],
+          "tests": ["TestModelEvaluatorArraySelectSourceStatusTrace"]
         },
         {
           "name": "Reached model_evaluator::reduce_app direct function-entry TRACE at model_evaluator.cpp:187-191, with evaluated SMT2 arguments and result",
