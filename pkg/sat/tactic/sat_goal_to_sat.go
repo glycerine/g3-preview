@@ -297,6 +297,9 @@ func (tr *GoalTranslator) convertAtom(h ast.ASTHandle, root, sign bool) error {
 			}
 			tr.Atoms.Set(h, uint32(v))
 			l = sat.MakeLiteral(v, false)
+			if e = tr.traceGoalNewVar(v, h); e != nil {
+				return e
+			}
 			if !uninterpreted {
 				if e = tr.retainInterpreted(h); e != nil {
 					return e
@@ -343,6 +346,9 @@ func (tr *GoalTranslator) visit(h ast.ASTHandle, root, sign bool) (bool, error) 
 			return true, tr.convertAtom(h, root, sign)
 		}
 	case ast.ASTOpXor, ast.ASTOpImplies, ast.ASTOpDistinct:
+		if e := tr.traceGoalUnhandled(h); e != nil {
+			return true, e
+		}
 		// The source SMT2 pretty-printer message is a separate dependency. Carry
 		// the offending AST and operation rather than inventing its printed text.
 		return true, fmt.Errorf("%w (AST %d, operation %d)", ErrSATGoalUnsupported, h.Slot(), op)
@@ -464,6 +470,9 @@ func (tr *GoalTranslator) process(h ast.ASTHandle) error {
 	return nil
 }
 func (tr *GoalTranslator) convert(fr satGoalFrame, op int32, n int) error {
+	if err := tr.traceGoalConversion(op, fr); err != nil {
+		return err
+	}
 	sz := len(tr.results)
 	if sz < n || fr.root && sz != n {
 		return ast.ErrASTDomain
@@ -581,7 +590,12 @@ func (tr *GoalTranslator) convert(fr satGoalFrame, op int32, n int) error {
 	}
 	tr.results = tr.results[:base]
 	if !fr.root {
-		return tr.emit(false, fr.sign, l)
+		if err := tr.emit(false, fr.sign, l); err != nil {
+			return err
+		}
+		if op == ast.ASTOpAnd {
+			return tr.traceGoalAndResult()
+		}
 	}
 	return nil
 }

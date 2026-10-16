@@ -1,9 +1,11 @@
-// Source: src/sat/tactic/goal2sat.cpp:88-103,380-422; src/util/trace.h:40-46.
+// Source: src/sat/tactic/goal2sat.cpp:88-103,132,192,204,244,282,325,380-422;
+// src/util/trace.h:40-46.
 package tactic
 
 import (
 	"errors"
 	"io"
+	"strconv"
 	"strings"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -88,6 +90,90 @@ func (tr *GoalTranslator) traceGoalStart(h ast.ASTHandle) error {
 func (tr *GoalTranslator) traceGoalRemaining() error {
 	return tr.goalTraceTags().EmitConditional("goal2sat", "process", "src/sat/tactic/goal2sat.cpp", 421,
 		func() bool { return len(tr.results) != 0 }, func(w io.Writer) error {
+			_, err := io.WriteString(w, goalLiteralText(tr.results, false)+"\n")
+			return err
+		})
+}
+
+func (tr *GoalTranslator) traceGoalNewVar(v sat.BoolVar, h ast.ASTHandle) error {
+	tags := tr.goalTraceTags()
+	if !tags.ShouldTrace("goal2sat") {
+		return nil
+	}
+	return tags.EmitConditional("goal2sat", "convert_atom", "src/sat/tactic/goal2sat.cpp", 132,
+		func() bool { return true }, func(w io.Writer) error {
+			if _, err := io.WriteString(w, "new_var: "+strconv.FormatUint(uint64(v), 10)+"\n"); err != nil {
+				return err
+			}
+			formula, err := tr.traceGoalFormula(h)
+			if err != nil {
+				return err
+			}
+			_, err = io.WriteString(w, formula+"\n")
+			return err
+		})
+}
+
+func (tr *GoalTranslator) traceGoalUnhandled(h ast.ASTHandle) error {
+	tags := tr.goalTraceTags()
+	if !tags.ShouldTrace("goal2sat_not_handled") {
+		return nil
+	}
+	return tags.EmitConditional("goal2sat_not_handled", "visit", "src/sat/tactic/goal2sat.cpp", 192,
+		func() bool { return true }, func(w io.Writer) error {
+			formula, err := tr.traceGoalFormula(h)
+			if err != nil {
+				return err
+			}
+			_, err = io.WriteString(w, formula+"\n")
+			return err
+		})
+}
+
+func (tr *GoalTranslator) traceGoalConversion(op int32, fr satGoalFrame) error {
+	line, function, prefix := 0, "", ""
+	switch op {
+	case ast.ASTOpOr:
+		line, function, prefix = 204, "convert_or", "convert_or:\n"
+	case ast.ASTOpAnd:
+		line, function, prefix = 244, "convert_and", "convert_and:\n"
+	case ast.ASTOpIff, ast.ASTOpEq:
+		root, sign := "0", "0"
+		if fr.root {
+			root = "1"
+		}
+		if fr.sign {
+			sign = "1"
+		}
+		line, function, prefix = 325, "convert_iff", "convert_iff "+root+" "+sign+"\n"
+	default:
+		return nil
+	}
+	tags := tr.goalTraceTags()
+	if !tags.ShouldTrace("goal2sat") {
+		return nil
+	}
+	return tags.EmitConditional("goal2sat", function, "src/sat/tactic/goal2sat.cpp", line,
+		func() bool { return true }, func(w io.Writer) error {
+			if _, err := io.WriteString(w, prefix); err != nil {
+				return err
+			}
+			formula, err := tr.traceGoalFormula(fr.term)
+			if err != nil {
+				return err
+			}
+			_, err = io.WriteString(w, formula+"\n")
+			return err
+		})
+}
+
+func (tr *GoalTranslator) traceGoalAndResult() error {
+	tags := tr.goalTraceTags()
+	if !tags.ShouldTrace("goal2sat") {
+		return nil
+	}
+	return tags.EmitConditional("goal2sat", "convert_and", "src/sat/tactic/goal2sat.cpp", 282,
+		func() bool { return true }, func(w io.Writer) error {
 			_, err := io.WriteString(w, goalLiteralText(tr.results, false)+"\n")
 			return err
 		})

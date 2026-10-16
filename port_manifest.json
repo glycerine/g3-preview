@@ -81900,6 +81900,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained imp atom, unsupported-operator, OR/AND/IFF and nonroot-AND-result TRACE sites (cpp132,192,204,244,282,325)",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+          "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
+        },
+        {
           "name": "Retained imp::process start/remaining and four mk_clause overload TRACE sites (cpp88-103,380,421)",
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
@@ -181234,6 +181240,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained goal2sat::imp atom and conversion TRACE sites (goal2sat.cpp:132,192,204,244,282,325)",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+          "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
+        },
+        {
           "name": "Retained goal2sat::imp::process and mk_clause TRACE/CTRACE sites (goal2sat.cpp:88-103,380,421)",
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
@@ -183335,6 +183347,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained goal2sat::imp atom and conversion TRACE sites (goal2sat.cpp:132,192,204,244,282,325)",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+          "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
+        },
         {
           "name": "Retained goal2sat::imp::process and mk_clause TRACE/CTRACE sites (goal2sat.cpp:88-103,380,421)",
           "status": "ported",

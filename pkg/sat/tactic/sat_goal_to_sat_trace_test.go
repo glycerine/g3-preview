@@ -2,6 +2,8 @@ package tactic
 
 import (
 	"bytes"
+	"errors"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -68,8 +70,11 @@ func TestSATGoalTranslatorResultStackSourceTrace(t *testing.T) {
 		"converting: (and p q)\n------------------------------------------------\n" +
 		"-------- [goal2sat_bug] process src/sat/tactic/goal2sat.cpp:396 ---------\n" +
 		"result stack\n(and p q) root: 1 sign: 0\n\n------------------------------------------------\n" +
+		"-------- [goal2sat] convert_atom src/sat/tactic/goal2sat.cpp:132 ---------\nnew_var: " + sat.MakeLiteral(pvar, false).String() + "\np\n------------------------------------------------\n" +
+		"-------- [goal2sat] convert_atom src/sat/tactic/goal2sat.cpp:132 ---------\nnew_var: " + sat.MakeLiteral(qvar, false).String() + "\nq\n------------------------------------------------\n" +
 		"-------- [goal2sat_bug] process src/sat/tactic/goal2sat.cpp:415 ---------\n" +
 		"converting\n(and p q) root: 1 sign: 0\n" + sat.MakeLiteral(pvar, false).String() + " " + sat.MakeLiteral(qvar, false).String() + "\n------------------------------------------------\n" +
+		"-------- [goal2sat] convert_and src/sat/tactic/goal2sat.cpp:244 ---------\nconvert_and:\n(and p q)\n------------------------------------------------\n" +
 		"-------- [goal2sat] mk_clause src/sat/tactic/goal2sat.cpp:88 ---------\nmk_clause: " + sat.MakeLiteral(pvar, false).String() + "\n------------------------------------------------\n" +
 		"-------- [goal2sat] mk_clause src/sat/tactic/goal2sat.cpp:88 ---------\nmk_clause: " + sat.MakeLiteral(qvar, false).String() + "\n------------------------------------------------\n"
 	if got := output.String(); got != want {
@@ -86,6 +91,7 @@ func TestSATGoalTranslatorResultStackSourceTrace(t *testing.T) {
 		"result stack\n(or p q) root: 1 sign: 0\n\n------------------------------------------------\n" +
 		"-------- [goal2sat_bug] process src/sat/tactic/goal2sat.cpp:415 ---------\n" +
 		"converting\n(or p q) root: 1 sign: 0\n" + sat.MakeLiteral(pvar, false).String() + " " + sat.MakeLiteral(qvar, false).String() + "\n------------------------------------------------\n" +
+		"-------- [goal2sat] convert_or src/sat/tactic/goal2sat.cpp:204 ---------\nconvert_or:\n(or p q)\n------------------------------------------------\n" +
 		"-------- [goal2sat] mk_clause src/sat/tactic/goal2sat.cpp:103 ---------\nmk_clause: " + sat.MakeLiteral(pvar, false).String() + " " + sat.MakeLiteral(qvar, false).String() + " \n------------------------------------------------\n"
 	if got := output.String(); got != want {
 		t.Fatalf("source array clause record: got %q, want %q", got, want)
@@ -98,5 +104,35 @@ func TestSATGoalTranslatorResultStackSourceTrace(t *testing.T) {
 		sat.MakeLiteral(pvar, false).String() + "\n------------------------------------------------\n"
 	if got := output.String(); got != want {
 		t.Fatalf("conditional residual record: got %q, want %q", got, want)
+	}
+	output.Reset()
+	iff, err := m.MkFamilyApp(0, ast.ASTOpIff, nil, []ast.ASTHandle{p, q})
+	astTestMust(t, err)
+	astTestPin(t, m, iff)
+	satOK(t, tr.Compile([]ast.ASTHandle{iff}))
+	if got := output.String(); !strings.Contains(got, "[goal2sat] convert_iff src/sat/tactic/goal2sat.cpp:325 ---------\nconvert_iff 1 0\n(= p q)\n") {
+		t.Fatalf("source iff conversion record: %q", got)
+	}
+	output.Reset()
+	r, err := m.MkConst(astTestSymbol(t, m, "r"), sort)
+	astTestMust(t, err)
+	astTestPin(t, m, r)
+	outer, err := m.MkFamilyApp(0, ast.ASTOpOr, nil, []ast.ASTHandle{formula, r})
+	astTestMust(t, err)
+	astTestPin(t, m, outer)
+	satOK(t, tr.Compile([]ast.ASTHandle{outer}))
+	if got := output.String(); !strings.Contains(got, "[goal2sat] convert_and src/sat/tactic/goal2sat.cpp:282 ---------\n") {
+		t.Fatalf("source nonroot and result record: %q", got)
+	}
+	output.Reset()
+	tags.Enable("goal2sat_not_handled")
+	xor, err := m.MkFamilyApp(0, ast.ASTOpXor, nil, []ast.ASTHandle{p, q})
+	astTestMust(t, err)
+	astTestPin(t, m, xor)
+	if err = tr.Compile([]ast.ASTHandle{xor}); !errors.Is(err, ErrSATGoalUnsupported) {
+		t.Fatalf("source unsupported operator: %v", err)
+	}
+	if got := output.String(); !strings.Contains(got, "[goal2sat_not_handled] visit src/sat/tactic/goal2sat.cpp:192 ---------\n(xor p q)\n") {
+		t.Fatalf("source unsupported operator trace: %q", got)
 	}
 }
