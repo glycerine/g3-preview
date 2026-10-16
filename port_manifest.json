@@ -74385,6 +74385,13 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_cleaner_watch_trace.go",
           "tests": ["TestSATCleanerWatchSourceTracesKeepAndDrop"]
+        },
+        {
+          "name": "Retained cleanup_watches SASSERT45 and binary SASSERT56 process assertion gate, source-order short circuit and C/T actions for false binary watch",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_source_assertion.go",
+          "go_targets": ["pkg/sat/sat_cleaner.go"],
+          "tests": ["TestSATCleanerFalseBinaryWatchSourceAssertion"]
         }
       ],
       "ownership": [
@@ -74455,6 +74462,13 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_cleaner_watch_trace.go",
           "tests": ["TestSATCleanerWatchSourceTracesKeepAndDrop"]
+        },
+        {
+          "name": "Retained cleanup_watches SASSERT45 and binary SASSERT56 process assertion gate, source-order short circuit and C/T actions for false binary watch",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_source_assertion.go",
+          "go_targets": ["pkg/sat/sat_cleaner.go"],
+          "tests": ["TestSATCleanerFalseBinaryWatchSourceAssertion"]
         }
       ],
       "ownership": [
@@ -122156,6 +122170,13 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerTernaryVerifySourceActions", "TestSATCleanerMissingNaryWatchUnreachableThenVerify"]
+        },
+        {
+          "name": "Retained cleanup_watches SASSERT45 and binary SASSERT56 process assertion gate, source-order short circuit and C/T actions for false binary watch",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_source_assertion.go",
+          "go_targets": ["pkg/sat/sat_cleaner.go"],
+          "tests": ["TestSATCleanerFalseBinaryWatchSourceAssertion"]
         }
       ],
       "ownership": [
@@ -122578,6 +122599,13 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerTernaryVerifySourceActions", "TestSATCleanerMissingNaryWatchUnreachableThenVerify"]
+        },
+        {
+          "name": "Retained cleanup_watches SASSERT45 and binary SASSERT56 process assertion gate, source-order short circuit and C/T actions for false binary watch",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_cleaner_source_assertion.go",
+          "go_targets": ["pkg/sat/sat_cleaner.go"],
+          "tests": ["TestSATCleanerFalseBinaryWatchSourceAssertion"]
         }
       ],
       "ownership": [

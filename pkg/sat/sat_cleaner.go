@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 	"github.com/glycerine/g3/pkg/util/statistics"
 	"github.com/glycerine/g3/pkg/util/stopwatch"
@@ -20,6 +21,7 @@ type satCleaner struct {
 	ownerBytes                                     uint64
 	cursor, out, end, drainPrefix, drainSuffix     uint32
 	interrupted, learned, closing, closed, running bool
+	debugActions                                   bool
 }
 
 func newSATCleaner(l *satSolverClauseLifecycle, b *arena.Budget) (*satCleaner, error) {
@@ -80,6 +82,9 @@ func (c *satCleaner) run(force bool) (done bool, err error) {
 	if e := c.open(); e != nil {
 		return false, e
 	}
+	previousActions := c.debugActions
+	c.debugActions = true
+	defer func() { c.debugActions = previousActions }()
 	if e := c.assertInvariant(); e != nil {
 		return false, e
 	}
@@ -168,12 +173,19 @@ func (c *satCleaner) cleanupWatches() error {
 				return e
 			}
 			if satStorageSourceDebug {
-				sz, e := list.Size()
+				d := diagnostic.BorrowProcessDebugContext()
+				enabled, e := d.AssertionsEnabled()
 				if e != nil {
 					return e
 				}
-				if sz != 0 {
-					return ErrSATAssertion
+				if enabled {
+					sz, e := list.Size()
+					if e != nil {
+						return e
+					}
+					if e = c.sourceAssertion(sz == 0, 45, "it->empty()"); e != nil {
+						return e
+					}
 				}
 			}
 			continue
@@ -201,17 +213,26 @@ func (c *satCleaner) cleanupWatches() error {
 					return e
 				}
 				if satStorageSourceDebug {
-					a, e := v.valueLiteral(l)
+					d := diagnostic.BorrowProcessDebugContext()
+					enabled, e := d.AssertionsEnabled()
 					if e != nil {
 						return e
 					}
-					if a != lbool.True {
-						a, e = v.valueLiteral(l)
+					if enabled {
+						a, e := v.valueLiteral(l)
 						if e != nil {
 							return e
 						}
-						if a != lbool.Undef {
-							return ErrSATAssertion
+						valid := a == lbool.True
+						if !valid {
+							a, e = v.valueLiteral(l)
+							if e != nil {
+								return e
+							}
+							valid = a == lbool.Undef
+						}
+						if e = c.sourceAssertion(valid, 56, "s.value(it2->get_literal()) == l_true || s.value(it2->get_literal()) == l_undef"); e != nil {
+							return e
 						}
 					}
 				}
