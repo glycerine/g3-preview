@@ -171180,6 +171180,7 @@
         "pkg/util/params/util_params_assignment_source_test.go",
         "pkg/util/params/util_params_copy_all_kinds_source_test.go",
         "pkg/util/params/util_params_self_copy_all_kinds_source_test.go",
+        "pkg/util/params/util_params_self_copy_stopped_source_test.go",
         "pkg/util/params/util_params_copy_replacement_source_test.go",
         "pkg/util/params/util_params_reset_source.go",
         "pkg/util/params/util_params_reset_source_test.go",
@@ -171239,6 +171240,7 @@
         "TestParamsReferenceWarmOperationsAndGeneration",
         "TestParamsReferenceSelfCopySourceRatIdentity",
         "TestParamsSelfCopyAllKindsDetachesSharedBlock",
+        "TestParamsSelfCopyStoppedDetachRetainsSharedPredecessor",
         "TestParamsReferenceExactContextAccountingAndGrowthPeak",
         "TestParamsReferenceFiniteSignedRatAndNullDefaults",
         "TestParamsReferenceProvenanceBeforeMutation",
@@ -171575,7 +171577,8 @@
             "TestParamsReferenceCopyStopsAtMatchedNumeralDestruction",
             "TestParamsReferenceCopyStoppedReplacementOwningAbort",
             "TestParamsReferenceCopyMatchedNumeralAllocationRefusal",
-            "TestParamsReferenceCopyMatchedNumeralPendingPhysicalAllocation"
+            "TestParamsReferenceCopyMatchedNumeralPendingPhysicalAllocation",
+            "TestParamsSelfCopyStoppedDetachRetainsSharedPredecessor"
           ]
         },
         {
@@ -172039,6 +172042,7 @@
         "pkg/util/params/util_params_assignment_source_test.go",
         "pkg/util/params/util_params_copy_all_kinds_source_test.go",
         "pkg/util/params/util_params_self_copy_all_kinds_source_test.go",
+        "pkg/util/params/util_params_self_copy_stopped_source_test.go",
         "pkg/util/params/util_params_copy_replacement_source_test.go",
         "pkg/util/params/util_params_reset_source.go",
         "pkg/util/params/util_params_reset_source_test.go",
@@ -172094,6 +172098,7 @@
         "TestParamsReferenceWarmOperationsAndGeneration",
         "TestParamsReferenceSelfCopySourceRatIdentity",
         "TestParamsSelfCopyAllKindsDetachesSharedBlock",
+        "TestParamsSelfCopyStoppedDetachRetainsSharedPredecessor",
         "TestParamsReferenceExactContextAccountingAndGrowthPeak",
         "TestParamsReferenceFiniteSignedRatAndNullDefaults",
         "TestParamsReferenceProvenanceBeforeMutation",
@@ -172365,7 +172370,8 @@
             "TestParamsReferenceCopyStopsAtMatchedNumeralDestruction",
             "TestParamsReferenceCopyStoppedReplacementOwningAbort",
             "TestParamsReferenceCopyMatchedNumeralAllocationRefusal",
-            "TestParamsReferenceCopyMatchedNumeralPendingPhysicalAllocation"
+            "TestParamsReferenceCopyMatchedNumeralPendingPhysicalAllocation",
+            "TestParamsSelfCopyStoppedDetachRetainsSharedPredecessor"
           ]
         },
         {
