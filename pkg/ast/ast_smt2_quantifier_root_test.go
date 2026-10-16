@@ -1,6 +1,7 @@
 package ast
 
 import (
+	"strings"
 	"testing"
 
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
@@ -116,5 +117,22 @@ func TestASTSMT2QuantifierRootSourceFormat(t *testing.T) {
 	want = "(let ((a!1 (forall ((a!1 Bool))\n             (let ((a!2 (and a!1 a b c d e f g h)))\n               (and a!2 a!2)))))\n  (and a!1 a!1))"
 	if got := print(repeatedQuantifier); got != want {
 		t.Fatalf("shared quantifier format %q, want %q", got, want)
+	}
+	deepQuantifier := body
+	for i := 0; i < 4; i++ {
+		deepQuantifier, err = m.MkQuantifier(ASTQuantifierSpec{Forall: true, Sorts: []ASTHandle{boolSort}, Names: []usymbol.Symbol{x}, Body: deepQuantifier})
+		paramsMust(t, err)
+	}
+	deepParent, err := m.MkNot(deepQuantifier)
+	paramsMust(t, err)
+	var depthInfo smt2PPInfo
+	_, err = m.smt2PPExprTreeWithInfo(deepQuantifier, nil, false, &depthInfo)
+	paramsMust(t, err)
+	if depthInfo.weight != 9 || depthInfo.depth != 5 {
+		t.Fatalf("source quantified metadata: %+v", depthInfo)
+	}
+	deepText := print(deepParent)
+	if !strings.Contains(deepText, "(let ((a!1 (forall") || !strings.Contains(deepText, "(not a!1))") {
+		t.Fatalf("deep quantified child did not receive source depth alias: %q", deepText)
 	}
 }

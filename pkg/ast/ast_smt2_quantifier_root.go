@@ -9,7 +9,7 @@ import (
 )
 
 // smt2PPQuantifierRoot prints source binder names, children and annotations.
-func (m *ASTManager) smt2PPQuantifierRoot(q ASTHandle, outer []usymbol.Symbol) (ASTHandle, error) {
+func (m *ASTManager) smt2PPQuantifierRootWithInfo(q ASTHandle, outer []usymbol.Symbol, info *smt2PPInfo) (ASTHandle, error) {
 	count, err := m.GetNumDeclarations(q)
 	if err != nil || count == 0 {
 		return ASTHandle{}, ErrASTDomain
@@ -120,7 +120,8 @@ func (m *ASTManager) smt2PPQuantifierRoot(q ASTHandle, outer []usymbol.Symbol) (
 	if err != nil {
 		return ASTHandle{}, err
 	}
-	printedBody, err := m.smt2PPExprTree(body, scopedNames, false)
+	var bodyInfo smt2PPInfo
+	printedBody, err := m.smt2PPExprTreeWithInfo(body, scopedNames, false, &bodyInfo)
 	if err != nil {
 		return ASTHandle{}, err
 	}
@@ -225,6 +226,9 @@ func (m *ASTManager) smt2PPQuantifierRoot(q ASTHandle, outer []usymbol.Symbol) (
 	whole, err := m.FormatCompose([]ASTHandle{left, first, tail, right})
 	if err != nil {
 		return ASTHandle{}, err
+	}
+	if info != nil {
+		*info = smt2PPInfo{weight: bodyInfo.weight + 2*count + 8*bodyInfo.lets, depth: bodyInfo.depth + 1}
 	}
 	return m.FormatGroup(whole)
 }

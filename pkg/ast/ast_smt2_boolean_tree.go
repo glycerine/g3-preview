@@ -44,7 +44,13 @@ func (m *ASTManager) SMT2PPExprTree(root ASTHandle, names []usymbol.Symbol) (AST
 	return m.smt2PPExprTree(root, names, false)
 }
 
+type smt2PPInfo struct{ weight, depth, lets uint32 }
+
 func (m *ASTManager) smt2PPExprTree(root ASTHandle, names []usymbol.Symbol, requireBool bool) (ASTHandle, error) {
+	return m.smt2PPExprTreeWithInfo(root, names, requireBool, nil)
+}
+
+func (m *ASTManager) smt2PPExprTreeWithInfo(root ASTHandle, names []usymbol.Symbol, requireBool bool, info *smt2PPInfo) (ASTHandle, error) {
 	boolSort, err := m.MkBoolSort()
 	if err != nil {
 		return ASTHandle{}, err
@@ -54,7 +60,7 @@ func (m *ASTManager) smt2PPExprTree(root ASTHandle, names []usymbol.Symbol, requ
 		return ASTHandle{}, err
 	}
 	if rootKind == ASTQuantifier {
-		return m.smt2PPQuantifierRoot(root, names)
+		return m.smt2PPQuantifierRootWithInfo(root, names, info)
 	}
 	// shared_occs visits each compound node's children once, but records a
 	// second incoming edge as shared. Its default profile ignores atomic nodes
@@ -146,15 +152,15 @@ func (m *ASTManager) smt2PPExprTree(root ASTHandle, names []usymbol.Symbol, requ
 			return result{}, e
 		}
 		if kind == ASTQuantifier {
-			format, e := m.smt2PPQuantifierRoot(h, names)
+			var childInfo smt2PPInfo
+			format, e := m.smt2PPQuantifierRootWithInfo(h, names, &childInfo)
 			if e != nil {
 				return result{}, e
 			}
-			if h != root && occurrences[h] > 1 {
+			if h != root && (childInfo.depth >= 5 || occurrences[h] > 1) {
 				return registerAlias(h, format, 0)
 			}
-			decls, e := m.GetNumDeclarations(h)
-			return result{docs: []ASTHandle{format}, weight: 1 + 2*decls, depth: 2}, e
+			return result{docs: []ASTHandle{format}, weight: childInfo.weight, depth: childInfo.depth}, nil
 		}
 		if kind != ASTVar && kind != ASTApp {
 			return result{}, ErrASTDomain
@@ -315,6 +321,9 @@ func (m *ASTManager) smt2PPExprTree(root ASTHandle, names []usymbol.Symbol, requ
 	printed, err := visit(root, false)
 	if err != nil {
 		return ASTHandle{}, err
+	}
+	if info != nil {
+		*info = smt2PPInfo{weight: printed.weight, depth: printed.depth, lets: uint32(len(bindings))}
 	}
 	return m.smt2PPLet(printed.docs[0], bindings)
 }
