@@ -112,16 +112,28 @@ func (p *BVRewriter) RewriteEquality(lhs, rhs ast.ASTHandle, out ast.ASTRef) (st
 			return
 		}
 		err = p.trailing.ResetCache(1 << 12)
-		if err != nil || st != RewriteFailed {
+		if err != nil {
+			return
+		}
+		if st != RewriteFailed {
+			err = p.traceEqualityRewrite("eq_remove_trailing", 2548, lhs, rhs, out)
 			return
 		}
 	}
 	st, err = b.RewriteMultiplicationEquality(lhs, rhs, out)
-	if err != nil || st != RewriteFailed {
+	if err != nil {
+		return
+	}
+	if st != RewriteFailed {
+		err = p.traceEqualityRewrite("mk_mul_eq", 2555, lhs, rhs, out)
 		return
 	}
 	st, err = b.RewriteMultiplicationEquality(rhs, lhs, out)
-	if err != nil || st != RewriteFailed {
+	if err != nil {
+		return
+	}
+	if st != RewriteFailed {
+		err = p.traceEqualityRewrite("mk_mul_eq", 2561, lhs, rhs, out)
 		return
 	}
 	if options.BlastEqualityValue {

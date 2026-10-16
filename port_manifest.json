@@ -23709,6 +23709,12 @@
           ]
         },
         {
+          "name": "mk_eq_core reached trailing and both multiplication-equality process-bound SMT2 TRACE records (bv_rewriter.cpp:2548,2555,2561)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_equality_trace.go",
+          "tests": ["TestBVRewriterEqualityReductionSourceTrace"]
+        },
+        {
           "name": "mk_extract_core reached extraction-propagation process-bound SMT2 TRACE after rewritten node creation (bv_rewriter.cpp:776)",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_extract_trace.go",
@@ -182941,6 +182947,12 @@
           "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
         },
         {
+          "name": "Retained BV equality trailing/multiplication process-bound SMT2 TRACE at bv_rewriter.cpp:2548,2555,2561",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_equality_trace.go",
+          "tests": ["TestBVRewriterEqualityReductionSourceTrace"]
+        },
+        {
           "name": "Retained BV extract-propagation process-bound SMT2 TRACE at bv_rewriter.cpp:776",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/bv_rewriter_extract_trace.go",
@@ -185078,6 +185090,12 @@
           "status": "ported",
           "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
           "tests": ["TestSATGoalTranslatorResultStackSourceTrace"]
+        },
+        {
+          "name": "Retained BV equality trailing/multiplication process-bound SMT2 TRACE at bv_rewriter.cpp:2548,2555,2561",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/bv_rewriter_equality_trace.go",
+          "tests": ["TestBVRewriterEqualityReductionSourceTrace"]
         },
         {
           "name": "Retained BV extract-propagation process-bound SMT2 TRACE at bv_rewriter.cpp:776",
