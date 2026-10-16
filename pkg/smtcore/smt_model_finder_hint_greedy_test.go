@@ -33,6 +33,7 @@ func TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit(t *testing
 				q[i], e = m.MkQuantifier(ast.ASTQuantifierSpec{
 					Forall: true, Sorts: []ast.ASTHandle{b},
 					Names: []symbol.Symbol{symbol.Numerical(uint32(i))}, Body: v,
+					QID: symbol.Numerical(uint32(100 + i)),
 				})
 				astTestMust(t, e)
 				pin(q[i])
@@ -82,7 +83,7 @@ func TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit(t *testing
 				const candidates = "-------- [model_finder_hint] greedy src/smt/smt_model_finder.cpp:2925 ---------\n" +
 					"candidates from residue:\nk!11 \n" + footer
 				const second = "-------- [model_finder_hint] greedy src/smt/smt_model_finder.cpp:2841 ---------\n" +
-					"greedy depth: 1, f: k!11\nfs:\nk!10 \nsatisfied:\nnull \nresidue:\nnull \n" + footer
+					"greedy depth: 1, f: k!11\nfs:\nk!10 \nsatisfied:\nk!100 \nresidue:\nk!101 \n" + footer
 				prefix := first + candidates + second
 				got := trace.String()
 				if cyclic {
@@ -92,8 +93,11 @@ func TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit(t *testing
 				} else {
 					const foundHead = "-------- [model_finder_hint] greedy src/smt/smt_model_finder.cpp:2917 ---------\n" +
 						"found subset that is satisfied by macros\nfs:\n"
-					const foundTail = "\nsatisfied:\nnull null \nresidue:\n\n" + footer
-					if got != prefix+foundHead+"k!10 k!11 "+foundTail && got != prefix+foundHead+"k!11 k!10 "+foundTail {
+					const foundTailA = "\nsatisfied:\nk!100 k!101 \nresidue:\n\n" + footer
+					const foundTailB = "\nsatisfied:\nk!101 k!100 \nresidue:\n\n" + footer
+					fsA := prefix + foundHead + "k!10 k!11 "
+					fsB := prefix + foundHead + "k!11 k!10 "
+					if got != fsA+foundTailA && got != fsA+foundTailB && got != fsB+foundTailA && got != fsB+foundTailB {
 						t.Fatalf("source greedy TRACE: got %q", got)
 					}
 				}
