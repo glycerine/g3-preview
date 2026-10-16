@@ -75134,6 +75134,12 @@
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "go_targets": ["pkg/sat/sat_integrity_checker.go"],
           "tests": ["TestSATIntegrityNaryResidualSourceTraceAndAssertion"]
+        },
+        {
+          "name": "Retained nary contains_watched blocked-literal SASSERT43 process gate and source C/T action through the real cleaner; absent-watch UNREACHABLE remains separate",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerNaryBlockedLiteralUsesSourceAssertion"]
         }
       ],
       "ownership": [
@@ -75254,6 +75260,12 @@
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "go_targets": ["pkg/sat/sat_integrity_checker.go"],
           "tests": ["TestSATIntegrityNaryResidualSourceTraceAndAssertion"]
+        },
+        {
+          "name": "Retained nary contains_watched blocked-literal SASSERT43 process gate and source C/T action through the real cleaner; absent-watch UNREACHABLE remains separate",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerNaryBlockedLiteralUsesSourceAssertion"]
         }
       ],
       "ownership": [
@@ -122090,6 +122102,12 @@
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "go_targets": ["pkg/sat/sat_integrity_checker.go"],
           "tests": ["TestSATIntegrityNaryResidualSourceTraceAndAssertion"]
+        },
+        {
+          "name": "Retained nary contains_watched blocked-literal SASSERT43 process gate and source C/T action through the real cleaner; absent-watch UNREACHABLE remains separate",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerNaryBlockedLiteralUsesSourceAssertion"]
         }
       ],
       "ownership": [
@@ -122494,6 +122512,12 @@
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "go_targets": ["pkg/sat/sat_integrity_checker.go"],
           "tests": ["TestSATIntegrityNaryResidualSourceTraceAndAssertion"]
+        },
+        {
+          "name": "Retained nary contains_watched blocked-literal SASSERT43 process gate and source C/T action through the real cleaner; absent-watch UNREACHABLE remains separate",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_checker.go",
+          "tests": ["TestSATCleanerNaryBlockedLiteralUsesSourceAssertion"]
         }
       ],
       "ownership": [

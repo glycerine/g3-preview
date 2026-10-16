@@ -86,16 +86,22 @@ func (c satIntegrityChecker) containsClause(index uint32, cl StoredClauseRef, of
 			}
 			if off == offset {
 				if satStorageSourceDebug {
-					blocked, e := w.BlockedLiteral()
+					enabled, e := diagnostic.BorrowProcessDebugContext().AssertionsEnabled()
 					if e != nil {
 						return false, e
 					}
-					yes, e := p.clauses.ContainsLiteral(cl, blocked)
-					if e != nil {
-						return false, e
-					}
-					if !yes {
-						return false, ErrSATAssertion
+					if enabled {
+						blocked, e := w.BlockedLiteral()
+						if e != nil {
+							return false, e
+						}
+						yes, e := p.clauses.ContainsLiteral(cl, blocked)
+						if e != nil {
+							return false, e
+						}
+						if e = satIntegrityAssertion(yes, c.debugActions, 43, "c.contains(it->get_blocked_literal())"); e != nil {
+							return false, e
+						}
 					}
 				}
 				return true, nil
