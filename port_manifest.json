@@ -100776,13 +100776,15 @@
       "go_targets": [
         "pkg/tactic/arith/linear_equation.go",
         "pkg/tactic/arith/linear_equation_test.go",
-        "pkg/tactic/arith/linear_equation_trace.go"
+        "pkg/tactic/arith/linear_equation_trace.go",
+        "pkg/tactic/arith/linear_equation_debug.go"
       ],
       "tests": [
         "TestLinearEquationIntegerCoalesceSortNormalizeAndReuse",
         "TestLinearEquationIntegerCancellationAndLargeOwnership",
         "TestLinearEquationRationalDenominatorClearingAndCombination",
-        "TestLinearEquationSourceConstructionTrace"
+        "TestLinearEquationSourceConstructionTrace",
+        "TestLinearEquationCoreSourceSortedDebugGuard"
       ],
       "assertions": [
         {
@@ -100851,6 +100853,14 @@
           "go_target": "pkg/tactic/arith/linear_equation_trace.go",
           "tests": [
             "TestLinearEquationSourceConstructionTrace"
+          ]
+        },
+        {
+          "name": "mk_core sorted-variable DEBUG_CODE assertion before TRACE and numeral normalization",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/linear_equation_debug.go",
+          "tests": [
+            "TestLinearEquationCoreSourceSortedDebugGuard"
           ]
         }
       ],
@@ -121650,7 +121660,8 @@
         "pkg/util/diagnostic/util_debug_actions_source_test.go",
         "pkg/util/diagnostic/util_debug_action_binding.go",
         "pkg/util/params/util_gparams_service_ops.go",
-        "pkg/util/diagnostic/numeric_char_input_tie_boundary_test.go"
+        "pkg/util/diagnostic/numeric_char_input_tie_boundary_test.go",
+        "pkg/tactic/arith/linear_equation_debug.go"
       ],
       "tests": [
         "TestDebugTableMemoryTraceFollowsLazyLifetime",
@@ -121678,7 +121689,8 @@
         "TestDebugActionClosedOutputBadbitStillReachesInputAndThrow",
         "TestDebugActionPromptBeforeClosedTieRead",
         "TestDebugInteractiveInputMustStartTiedToItsOwnStdout",
-        "TestNumericCharInputClosedTieFailsAtReachedFlush"
+        "TestNumericCharInputClosedTieFailsAtReachedFlush",
+        "TestLinearEquationCoreSourceSortedDebugGuard"
       ],
       "conditionals": [
         {
@@ -121787,6 +121799,14 @@
           "go_target": "pkg/util/process/finalize.go",
           "go_targets": ["pkg/engine/default_process.go", "pkg/util/process/initialize.go", "pkg/util/diagnostic/util_debug_process.go", "pkg/util/params/util_gparams_service_ops.go"],
           "tests": ["TestProcessDebugDefaultOwnsSourceAssertionIO", "TestDefaultProcessBindsAssertionServicesAndReleasesOwners", "TestDefaultProcessActualAssertionAction", "TestGeneratedInitializeAndFinalizeConcreteServices", "TestGlobalParamsNamespaceAssertionBindingAtReachedSites", "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion"]
+        },
+        {
+          "name": "Retained linear-equation sorted-variable assertion reads the process assertion switch and routes failure to the source debug action",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/linear_equation_debug.go",
+          "tests": [
+            "TestLinearEquationCoreSourceSortedDebugGuard"
+          ]
         }
       ],
       "ownership": [
@@ -121864,7 +121884,8 @@
         "pkg/util/diagnostic/util_debug_action_binding.go",
         "pkg/util/diagnostic/util_debug_macros.go",
         "pkg/util/diagnostic/util_debug_macro_source_test.go",
-        "pkg/util/params/util_gparams_service_ops.go"
+        "pkg/util/params/util_gparams_service_ops.go",
+        "pkg/tactic/arith/linear_equation_debug.go"
       ],
       "tests": [
         "TestDebugNotificationExactStatementsSignedFlagsAndNoReservation",
@@ -121896,7 +121917,8 @@
         "TestDebugMacroExitSubprocessHelper",
         "TestDebugMacroActualEnsureAndNotImplementedExits",
         "TestDebugMacroCassertLiteralTagShortCircuitAndUninitializedCondition",
-        "TestDebugMacroVerifyConditionIsNotErasedByAssertionSwitch"
+        "TestDebugMacroVerifyConditionIsNotErasedByAssertionSwitch",
+        "TestLinearEquationCoreSourceSortedDebugGuard"
       ],
       "conditionals": [
         {
@@ -122114,6 +122136,14 @@
           "go_target": "pkg/util/process/finalize.go",
           "go_targets": ["pkg/engine/default_process.go", "pkg/util/process/initialize.go", "pkg/util/diagnostic/util_debug_process.go", "pkg/util/params/util_gparams_service_ops.go"],
           "tests": ["TestProcessDebugDefaultOwnsSourceAssertionIO", "TestDefaultProcessBindsAssertionServicesAndReleasesOwners", "TestDefaultProcessActualAssertionAction", "TestGeneratedInitializeAndFinalizeConcreteServices", "TestGlobalParamsNamespaceAssertionBindingAtReachedSites", "TestGlobalParamsNamespaceNumericBareStrAndDisabledAssertion"]
+        },
+        {
+          "name": "Retained linear-equation mk_core DEBUG_CODE and SASSERT sorted-variable condition",
+          "status": "ported",
+          "go_target": "pkg/tactic/arith/linear_equation_debug.go",
+          "tests": [
+            "TestLinearEquationCoreSourceSortedDebugGuard"
+          ]
         }
       ],
       "ownership": [

@@ -367,6 +367,9 @@ func (l *LinearEquationManager) mkCore(as []numeral.Int, xs []uint32) (out *Line
 	if len(as) == 0 || len(as) != len(xs) {
 		return nil, arena.ErrInvalidSlot
 	}
+	if err = l.assertSortedEquationVars(xs); err != nil {
+		return nil, err
+	}
 	z := l.manager.Integers()
 	if err = l.traceEquationCore(as, xs, nil); err != nil {
 		return nil, err
