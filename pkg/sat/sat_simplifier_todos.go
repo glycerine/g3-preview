@@ -130,6 +130,7 @@ func (s *satSimplifier) subsumeBinaries() (bool, error) {
 					if e != nil {
 						return false, e
 					}
+					s.traceMarkNotLearnedBinary(l2, x)
 					if e = x.MarkNotLearned(); e != nil {
 						return false, e
 					}
