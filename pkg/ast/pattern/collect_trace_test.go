@@ -122,4 +122,47 @@ func TestPatternCollectInfoSourceSMT2Trace(t *testing.T) {
 	if output.Len() != 0 {
 		t.Fatal("disabled collect_info trace wrote output", output.String())
 	}
+	fName, err := sy.Intern("collect-f")
+	patternMust(t, err)
+	xName, err := sy.Intern("collect-x")
+	patternMust(t, err)
+	decl, err := m.MkFuncDecl(fName, []ast.ASTHandle{boolSort}, boolSort, ast.ASTFuncDeclInfo{})
+	patternMust(t, err)
+	patternMust(t, m.IncRef(decl))
+	t.Cleanup(func() { patternMust(t, m.DecRef(decl)) })
+	app, err := m.MkApp(decl, []ast.ASTHandle{x})
+	patternMust(t, err)
+	patternMust(t, m.IncRef(app))
+	t.Cleanup(func() { patternMust(t, m.DecRef(app)) })
+	forall, err := m.MkQuantifier(ast.ASTQuantifierSpec{Forall: true, Sorts: []ast.ASTHandle{boolSort}, Names: []symbol.Symbol{xName}, Body: app})
+	patternMust(t, err)
+	patternMust(t, m.IncRef(forall))
+	t.Cleanup(func() { patternMust(t, m.DecRef(forall)) })
+	tags.Enable("collect_info")
+	infoRecord := func(body string) string {
+		return "-------- [collect_info] operator() src/ast/pattern/pattern_inference.cpp:132 ---------\n" + body + "\n------------------------------------------------\n"
+	}
+	patternMust(t, c.collect(app))
+	if tags.ShouldTrace("collect_info") {
+		appBody := "(collect-f (:var 0))"
+		want := infoRecord(appBody) + infoRecord("(:var 0)") + infoRecord(appBody)
+		if output.String() != want {
+			t.Fatalf("application stack display: got %q, want %q", output.String(), want)
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("erased application display wrote output", output.String())
+	}
+	patternMust(t, c.resetCandidates())
+	output.Reset()
+	patternMust(t, c.collect(forall))
+	if tags.ShouldTrace("collect_info") {
+		appBody := "(collect-f (:var 0))"
+		quantifierBody := "(forall ((collect-x Bool)) (collect-f collect-x))"
+		want := infoRecord(quantifierBody) + infoRecord(appBody) + infoRecord("(:var 0)") + infoRecord(appBody) + infoRecord(quantifierBody)
+		if output.String() != want {
+			t.Fatalf("quantifier stack display: got %q, want %q", output.String(), want)
+		}
+	} else if output.Len() != 0 {
+		t.Fatal("erased quantifier display wrote output", output.String())
+	}
 }

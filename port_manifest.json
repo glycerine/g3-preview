@@ -18878,8 +18878,8 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Selected pattern collector collect_info TRACE at pattern_inference.cpp:132 prints the process-bound SMT2 variable body after line-131 record; wider expression profiles remain open",
-          "status": "partial",
+          "name": "Reached pattern collector collect_info TRACE at pattern_inference.cpp:132 prints process-bound SMT2 variable, application and quantifier bodies after line-131 record",
+          "status": "ported",
           "go_target": "pkg/ast/pattern/collect.go",
           "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
         },
@@ -180863,8 +180863,8 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Selected pattern collector collect_info TRACE at pattern_inference.cpp:132 prints the process-bound SMT2 variable body after line-131 record; wider expression profiles remain open",
-          "status": "partial",
+          "name": "Reached pattern collector collect_info TRACE at pattern_inference.cpp:132 prints process-bound SMT2 variable, application and quantifier bodies after line-131 record",
+          "status": "ported",
           "go_target": "pkg/ast/pattern/collect.go",
           "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
         },
@@ -182798,8 +182798,8 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Selected pattern collector collect_info TRACE at pattern_inference.cpp:132 prints the process-bound SMT2 variable body after line-131 record; wider expression profiles remain open",
-          "status": "partial",
+          "name": "Reached pattern collector collect_info TRACE at pattern_inference.cpp:132 prints process-bound SMT2 variable, application and quantifier bodies after line-131 record",
+          "status": "ported",
           "go_target": "pkg/ast/pattern/collect.go",
           "tests": ["TestPatternCollectInfoSourceSMT2Trace"]
         },
