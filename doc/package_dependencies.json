@@ -1262,9 +1262,11 @@
       "imports": [
         "ast",
         "ast/rewriter",
+        "smtcore",
         "util/symbol"
       ],
       "production_files": [
+        "datatype_validation.go",
         "local_environment.go",
         "local_expr_stack.go",
         "local_lookup.go",

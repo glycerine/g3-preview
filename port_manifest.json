@@ -70200,8 +70200,8 @@
       "component": "parsers",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/parsers/smt2/local_environment.go", "pkg/parsers/smt2/local_lookup.go", "pkg/parsers/smt2/local_sort_stack.go", "pkg/parsers/smt2/local_expr_stack.go", "pkg/parsers/smt2/local_sort_names.go"],
-      "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders", "TestSMT2ParserQualifiedLocalSortAndIndexRefusals", "TestSMT2LocalReferenceStacksFrameShrinkAndReset", "TestSMT2QualifiedLocalExpressionOwnerAndFrameCleanup", "TestSMT2SortAndDatatypeNameTablesSourceScopes"],
+      "go_targets": ["pkg/parsers/smt2/local_environment.go", "pkg/parsers/smt2/local_lookup.go", "pkg/parsers/smt2/local_sort_stack.go", "pkg/parsers/smt2/local_expr_stack.go", "pkg/parsers/smt2/local_sort_names.go", "pkg/parsers/smt2/datatype_validation.go"],
+      "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders", "TestSMT2ParserQualifiedLocalSortAndIndexRefusals", "TestSMT2LocalReferenceStacksFrameShrinkAndReset", "TestSMT2QualifiedLocalExpressionOwnerAndFrameCleanup", "TestSMT2SortAndDatatypeNameTablesSourceScopes", "TestSMT2DatatypeNameChecksSourcePriorityAndPartialRewrite"],
       "assertions": [
         {
           "line": 250,
@@ -70739,6 +70739,13 @@
           "status": "partial",
           "go_target": "pkg/parsers/smt2/local_sort_names.go",
           "tests": ["TestSMT2SortAndDatatypeNameTablesSourceScopes"]
+        },
+        {
+          "name": "Selected parse_declare_datatype(s) name validation: single missing-first, multi-declaration fix_missing_refs before duplicate checks, exact positioned diagnostics; AST commit and command publication remain open (smt2parser.cpp:885-920,930-954,981-1001)",
+          "status": "partial",
+          "go_target": "pkg/parsers/smt2/datatype_validation.go",
+          "go_targets": ["pkg/smtcore/param_datatype_refs.go"],
+          "tests": ["TestSMT2DatatypeNameChecksSourcePriorityAndPartialRewrite"]
         }
       ],
       "ownership": [],

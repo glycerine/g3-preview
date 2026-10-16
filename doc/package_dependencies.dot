@@ -158,6 +158,7 @@ digraph packages {
   "parsers/smt2" [style=filled, fillcolor="#eeeeee"];
   "parsers/smt2" -> "ast";
   "parsers/smt2" -> "ast/rewriter";
+  "parsers/smt2" -> "smtcore";
   "parsers/smt2" -> "util/symbol";
   "parsers/util" [style=filled, fillcolor="#eeeeee"];
   "parsers/util" -> "util/params";
