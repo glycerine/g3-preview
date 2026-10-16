@@ -127791,6 +127791,10 @@
           "tests": ["TestInfFromInt32SourceConstructor"]
         },
         {
+          "name": "inf_rational(int,int) fraction constructor (inf_rational.h:80-83): literal integer-pair calls occur only in src/test/inf_rational.cpp; theory_lra.cpp:2331 passes lp::impq rational components and uses the separately ported rational-pair overload",
+          "status": "reference_only"
+        },
+        {
           "name": "inf_rational(rational const&, bool) FIRST then signed unit EPS copy (inf_rational.h:85-88); reached by opt_solver.cpp and theory_lra.cpp",
           "status": "ported",
           "go_target": "pkg/util/numeral/inf_rational.go",
