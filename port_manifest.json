@@ -171399,6 +171399,15 @@
           ]
         },
         {
+          "name": "param_descrs insert numerical-name and duplicate-kind SASSERT actions at params.cpp:75,78, with source-order Continue/Throw and disabled-switch behavior",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_param_descrs.go",
+          "tests": [
+            "TestParamDescrsInsertSourceAssertionActions",
+            "TestGlobalParamsModuleMergeDuplicateKindSourceAssertion"
+          ]
+        },
+        {
           "name": "param_descrs kind/default/description/module queries and namespace rewrite",
           "status": "ported",
           "go_target": "pkg/util/params/util_param_descrs.go",

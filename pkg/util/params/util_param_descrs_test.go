@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -26,6 +27,9 @@ func pdinsert(t *testing.T, d *ParamDescrs, n string, k ParamKind, descr, def, m
 	}
 }
 func TestParamDescrsSourceHistoryDefaultsAndDisplay(t *testing.T) {
+	if paramDescrsStreamSourceDebug {
+		bindProcessAssertionRefusal(t)
+	}
 	m := symbolManagerTest(t, nil, false)
 	d := pdnew(t, m, nil)
 	pdinsert(t, d, "Z_key", ParamUInt, pdstr("Z text"), pdstr(""), nil)
@@ -63,7 +67,7 @@ func TestParamDescrsSourceHistoryDefaultsAndDisplay(t *testing.T) {
 		t.Fatal(p, e)
 	}
 	if e = d.Insert(a, ParamBool, nil, nil, nil); paramDescrsStreamSourceDebug {
-		if e != ErrParamDescrsPrecondition {
+		if e != udiag.ErrDebugAssertion {
 			t.Fatal("checked kind assertion", e)
 		}
 	} else if e != nil {
@@ -76,7 +80,7 @@ func TestParamDescrsSourceHistoryDefaultsAndDisplay(t *testing.T) {
 	t.Cleanup(func() { paramsMust(t, other.Close()) })
 	paramsMust(t, other.Insert(a, ParamBool, pdstr("replacement"), nil, nil))
 	if e = d.Copy(other); paramDescrsStreamSourceDebug {
-		if e != ErrParamDescrsPrecondition {
+		if e != udiag.ErrDebugAssertion {
 			t.Fatal("checked copied-kind assertion", e)
 		}
 	} else if e != nil {
@@ -89,7 +93,7 @@ func TestParamDescrsSourceHistoryDefaultsAndDisplay(t *testing.T) {
 		t.Fatal("duplicate appended name history", n, e)
 	}
 	if e = d.Insert(usymbol.Numerical(7), ParamBool, nil, nil, nil); paramDescrsStreamSourceDebug {
-		if e != ErrParamDescrsPrecondition {
+		if e != udiag.ErrDebugAssertion {
 			t.Fatal("checked numerical-name assertion", e)
 		}
 		if k, e := d.Kind(usymbol.Numerical(7)); e != nil || k != ParamInvalid {

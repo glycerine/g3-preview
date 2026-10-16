@@ -5,9 +5,13 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 func TestGlobalParamsModuleMergeDuplicateKindSourceAssertion(t *testing.T) {
+	if paramDescrsStreamSourceDebug {
+		bindProcessAssertionRefusal(t)
+	}
 	ctx, symbols, _ := paramsTestOwner(t)
 	budget := arena.NewBudget(^uint64(0))
 	cfg := gparamsTestConfig(budget)
@@ -29,7 +33,7 @@ func TestGlobalParamsModuleMergeDuplicateKindSourceAssertion(t *testing.T) {
 	paramsMust(t, incoming.InsertName("seed", ParamBool, pdstr("replacement"), pdstr("false"), nil))
 	err = g.RegisterModule("sat", incoming)
 	if paramDescrsStreamSourceDebug {
-		if !errors.Is(err, ErrParamDescrsPrecondition) {
+		if !errors.Is(err, udiag.ErrDebugAssertion) {
 			t.Fatal("checked duplicate-kind assertion", err)
 		}
 		paramsMust(t, incoming.Close())

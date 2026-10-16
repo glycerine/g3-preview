@@ -22,3 +22,14 @@ func debugFixture(t *testing.T) (*udiag.DebugContext, *arena.BytesRegion, *arena
 	})
 	return d, r, b
 }
+
+func bindProcessAssertionRefusal(t *testing.T) {
+	t.Helper()
+	d, _, _ := debugFixture(t)
+	old, e := udiag.BindProcessDebugContext(d)
+	serviceMust(t, e)
+	t.Cleanup(func() {
+		_, e := udiag.BindProcessDebugContext(old)
+		serviceMust(t, e)
+	})
+}

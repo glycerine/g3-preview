@@ -11,6 +11,7 @@ import (
 	"sync"
 
 	"github.com/glycerine/g3/pkg/arena"
+	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	utext "github.com/glycerine/g3/pkg/util/text"
 	"github.com/glycerine/insdict"
@@ -216,12 +217,30 @@ func (d *ParamDescrs) prepareInsert(k usymbol.Symbol, kind ParamKind) (bool, err
 	if e != nil {
 		return false, e
 	}
-	if paramDescrsStreamSourceDebug && k.IsNumerical() {
-		return false, ErrParamDescrsPrecondition
+	if udiag.DebugBuild {
+		d := udiag.BorrowProcessDebugContext()
+		enabled, e := udiag.SourceAssertionsEnabled(d)
+		if e != nil {
+			return false, e
+		}
+		if enabled && k.IsNumerical() {
+			if e := udiag.DebugAssertionFailure(d, "src/util/params.cpp", 75, "!name.is_numerical()"); e != nil {
+				return false, e
+			}
+		}
 	}
 	if info, found := d.entries.Get2(k); found {
-		if paramDescrsStreamSourceDebug && info.kind != kind {
-			return false, ErrParamDescrsPrecondition
+		if udiag.DebugBuild {
+			d := udiag.BorrowProcessDebugContext()
+			enabled, e := udiag.SourceAssertionsEnabled(d)
+			if e != nil {
+				return false, e
+			}
+			if enabled && info.kind != kind {
+				if e := udiag.DebugAssertionFailure(d, "src/util/params.cpp", 78, "i.m_kind == k"); e != nil {
+					return false, e
+				}
+			}
 		}
 		return true, nil
 	}
