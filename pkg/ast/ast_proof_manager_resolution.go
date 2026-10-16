@@ -73,12 +73,20 @@ func (m *ASTManager) MkProofUnitResolution(ps []ASTHandle) (ASTHandle, error) {
 	if len(ps) == 2 && complement {
 		fact = m.external(m.falseApp)
 	} else {
-		if ASTSourceDebug {
+		if ASTSourceDebug || m.proofResolutionTraceEnabled("mk_unit_resolution_bug") {
 			yes, e := m.proofKind(f, ASTOpOr)
 			if e != nil {
 				return ASTHandle{}, e
 			}
-			if !yes {
+			if !yes && m.proofResolutionTraceEnabled("mk_unit_resolution_bug") {
+				m.mu.Unlock()
+				traceErr := m.traceUnitResolutionBadClause(f, g)
+				m.mu.Lock()
+				if traceErr != nil {
+					return ASTHandle{}, traceErr
+				}
+			}
+			if ASTSourceDebug && !yes {
 				return ASTHandle{}, ErrASTDomain
 			}
 		}
@@ -122,6 +130,11 @@ func (m *ASTManager) MkProofUnitResolution(ps []ASTHandle) (ASTHandle, error) {
 		if ASTSourceDebug && m.proofMode != ASTProofDisabled {
 			for j := 1; j < len(ps); j++ {
 				if j >= len(found) || !found[j] {
+					if m.proofResolutionTraceEnabled("mk_unit_resolution_bug") {
+						if e := m.traceUnitResolutionUnmatched(ps, j); e != nil {
+							return ASTHandle{}, e
+						}
+					}
 					return ASTHandle{}, ErrASTDomain
 				}
 			}
@@ -156,6 +169,14 @@ func (m *ASTManager) MkProofUnitResolutionFact(ps []ASTHandle, fact ASTHandle) (
 		return ASTHandle{}, e
 	}
 	defer m.mu.Unlock()
+	if m.proofResolutionTraceEnabled("unit_bug") {
+		m.mu.Unlock()
+		traceErr := m.traceUnitResolutionFactInput("unit_bug", 2969, ps, fact)
+		m.mu.Lock()
+		if traceErr != nil {
+			return ASTHandle{}, traceErr
+		}
+	}
 	var args []ASTHandle
 	args = append(args, ps...)
 	args = append(args, fact)
@@ -195,6 +216,14 @@ func (m *ASTManager) MkProofUnitResolutionFact(ps []ASTHandle, fact ASTHandle) (
 				return ASTHandle{}, e
 			}
 			n := m.appAt(r.slot).count
+			if len(ps) != int(n) && !(len(ps) == int(n)+1 && fact == m.external(m.falseApp)) && m.proofResolutionTraceEnabled("cunit_bug") {
+				m.mu.Unlock()
+				traceErr := m.traceUnitResolutionFactInput("cunit_bug", 2987, ps, fact)
+				m.mu.Lock()
+				if traceErr != nil {
+					return ASTHandle{}, traceErr
+				}
+			}
 			matches := uint32(0)
 			for i := uint32(0); i < n; i++ {
 				lit, e := m.proofArg(f, i)
@@ -218,6 +247,11 @@ func (m *ASTManager) MkProofUnitResolutionFact(ps []ASTHandle, fact ASTHandle) (
 					}
 				}
 				if !matched && fact != lit {
+					if m.proofResolutionTraceEnabled("unit_bug1") {
+						if e := m.traceUnitResolutionWrongFact(fact, lit); e != nil {
+							return ASTHandle{}, e
+						}
+					}
 					return ASTHandle{}, ErrASTDomain
 				}
 			}

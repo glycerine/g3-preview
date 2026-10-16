@@ -181580,6 +181580,12 @@
           "tests": ["TestASTLemmaAndAndElimSourceTracesBeforeGuards"]
         },
         {
+          "name": "Retained unit-resolution input and debug diagnostics for invalid clauses, unmatched complements, explicit facts, clause counts and wrong result literals (ast.cpp:2918-3006)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_proof_resolution_input_trace.go",
+          "tests": ["TestASTUnitResolutionInputSourceTraces", "TestASTUnitResolutionDebugDiagnostics"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -183281,6 +183287,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_proof_rule_trace.go",
           "tests": ["TestASTLemmaAndAndElimSourceTracesBeforeGuards"]
+        },
+        {
+          "name": "Retained unit-resolution input and debug diagnostics for invalid clauses, unmatched complements, explicit facts, clause counts and wrong result literals (ast.cpp:2918-3006)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_proof_resolution_input_trace.go",
+          "tests": ["TestASTUnitResolutionInputSourceTraces", "TestASTUnitResolutionDebugDiagnostics"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
