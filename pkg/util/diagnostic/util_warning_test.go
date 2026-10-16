@@ -96,6 +96,12 @@ func TestWarningBorrowedStreamFailurePersistsAcrossCalls(t *testing.T) {
 	if e := s.Warning("new"); e != nil || next.String() != "WARNING: new\n" {
 		t.Fatalf("new ostream inherited the old failed state: %q, %v", next.String(), e)
 	}
+	if e := s.SetWarningStream(w); e != nil {
+		t.Fatal(e)
+	}
+	if e := s.Warning("reselected"); e != nil || w.buf.String() != "WARNING: x" {
+		t.Fatalf("reselected failed ostream accepted insertion: %q, %v", w.buf.String(), e)
+	}
 }
 
 func TestWarningBorrowedFlushFailurePersistsAcrossCalls(t *testing.T) {

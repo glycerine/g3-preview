@@ -19,6 +19,8 @@ type WarningService struct {
 	enabled bool
 	// A selected ostream retains its failed state across warning_msg calls.
 	streamFailed bool
+	// Rebinding a borrowed ostream does not clear its own failed state.
+	failedStreams map[io.Writer]struct{}
 }
 
 // The source warning settings are process globals. Retained callers share this
@@ -70,6 +72,9 @@ func (s *WarningService) SetWarningStream(stream io.Writer) error {
 	}
 	s.stream = stream
 	s.streamFailed = false
+	if stream != nil && reflect.TypeOf(stream).Comparable() {
+		_, s.streamFailed = s.failedStreams[stream]
+	}
 	return nil
 }
 
@@ -164,6 +169,12 @@ func (s *WarningService) Warning(message string) error {
 		if e := f.Flush(); s.stream != nil && e != nil {
 			s.streamFailed = true
 		}
+	}
+	if s.streamFailed && s.stream != nil && reflect.TypeOf(s.stream).Comparable() {
+		if s.failedStreams == nil {
+			s.failedStreams = make(map[io.Writer]struct{})
+		}
+		s.failedStreams[s.stream] = struct{}{}
 	}
 	// warning_msg returns void: an ostream/FILE failure never unwinds its
 	// caller. The failed state belongs to the borrowed writer, not arithmetic
