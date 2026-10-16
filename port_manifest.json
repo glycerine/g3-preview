@@ -77298,6 +77298,12 @@
           "tests": ["TestSATSimplifierBackwardSubsumption0SourceTrace"]
         },
         {
+          "name": "Reached elim_dup_bins duplicate-binary subsumption TRACE before elimination count (sat_simplifier.cpp:769)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_duplicate_bins_trace.go",
+          "tests": ["TestSATSimplifierDuplicateBinarySourceTrace"]
+        },
+        {
           "name": "Reached subsume queue-size/next/binary/using TRACE sites at sat_simplifier.cpp:815,845,863,870",
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_todos_trace.go",
@@ -182400,6 +182406,12 @@
           "tests": ["TestSATSimplifierBackwardSubsumption0SourceTrace"]
         },
         {
+          "name": "Reached elim_dup_bins duplicate-binary subsumption TRACE before elimination count (sat_simplifier.cpp:769)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_duplicate_bins_trace.go",
+          "tests": ["TestSATSimplifierDuplicateBinarySourceTrace"]
+        },
+        {
           "name": "Reached subsume queue-size/next/binary/using TRACE sites at sat_simplifier.cpp:815,845,863,870",
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_todos_trace.go",
@@ -184264,6 +184276,12 @@
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_subsumption_trace.go",
           "tests": ["TestSATSimplifierBackwardSubsumption0SourceTrace"]
+        },
+        {
+          "name": "Reached elim_dup_bins duplicate-binary subsumption TRACE before elimination count (sat_simplifier.cpp:769)",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_simplifier_duplicate_bins_trace.go",
+          "tests": ["TestSATSimplifierDuplicateBinarySourceTrace"]
         },
         {
           "name": "Reached subsume queue-size/next/binary/using TRACE sites at sat_simplifier.cpp:815,845,863,870",

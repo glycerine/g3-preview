@@ -70,6 +70,7 @@ func (s *satSimplifier) eliminateDuplicateBinaries() error {
 				return e
 			}
 			if l == last {
+				s.traceDuplicateBinary(idx, l)
 				elim++
 			} else {
 				last, e = x.Literal()
