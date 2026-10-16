@@ -25,26 +25,19 @@ func (c satIntegrityChecker) watchListText(list satSolverWatchListView) (body st
 	return out.String()
 }
 
-func (c satIntegrityChecker) eliminatedWatchText(l Literal) (body string, result error) {
+func (c satIntegrityChecker) eliminatedWatchDisplayText(watches bool) (body string, result error) {
 	s := c.gc.conflict.solver
 	out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: c.lifecycle.budget})
 	if err != nil {
 		return "", err
 	}
 	defer func() { result = errors.Join(result, out.Close()) }()
-	if err = out.AppendCString("l: "); err != nil {
-		return "", err
+	if watches {
+		err = s.displayWatches(out)
+	} else {
+		err = s.displayInto(out)
 	}
-	if err = satLiteralInto(out, l); err != nil {
-		return "", err
-	}
-	if err = out.AppendCString("\n"); err != nil {
-		return "", err
-	}
-	if err = s.displayWatches(out); err != nil {
-		return "", err
-	}
-	if err = s.displayInto(out); err != nil {
+	if err != nil {
 		return "", err
 	}
 	return out.String()
@@ -60,12 +53,18 @@ func (c satIntegrityChecker) traceEliminatedWatch(l Literal) {
 	}
 	_ = tags.EmitConditional("sat_bug", "check_watches", "src/sat/sat_integrity_checker.cpp", 162,
 		func() bool { return true }, func(w io.Writer) error {
-			body, err := c.eliminatedWatchText(l)
+			_, _ = io.WriteString(w, "l: "+l.String()+"\n")
+			body, err := c.eliminatedWatchDisplayText(true)
 			if err != nil {
 				return err
 			}
-			_, err = io.WriteString(w, body)
-			return err
+			_, _ = io.WriteString(w, body)
+			body, err = c.eliminatedWatchDisplayText(false)
+			if err != nil {
+				return err
+			}
+			_, _ = io.WriteString(w, body)
+			return nil
 		})
 }
 

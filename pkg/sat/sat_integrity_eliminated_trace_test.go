@@ -66,6 +66,24 @@ func TestSATIntegrityEliminatedWatchSourceTrace(t *testing.T) {
 	if !yes || output.String() != want {
 		t.Fatalf("trace with assertions disabled: result=%v, got %q, want %q", yes, output.String(), want)
 	}
+	for ordinal, body := range []string{
+		"l: -0\n",
+		"l: -0\n0: 3\n-0: \n",
+		"l: -0\n0: 3\n-0: \n(sat\n)\n------------------------------------------------\n",
+	} {
+		output.Reset()
+		s.Lifecycle.budget.FailAfter(int64(ordinal))
+		yes, err = c.checkWatches()
+		satOK(t, err)
+		want = ""
+		if tags.ShouldTrace("sat_bug") && satStorageSourceDebug {
+			want = "-------- [sat_bug] check_watches src/sat/sat_integrity_checker.cpp:162 ---------\n" + body
+		}
+		if !yes || output.String() != want {
+			t.Fatalf("eliminated-watch formatter reservation %d: result=%v, got %q, want %q", ordinal, yes, output.String(), want)
+		}
+	}
+	s.Lifecycle.budget.FailAfter(-1)
 	satOK(t, debug.EnableAssertions(true))
 	satOK(t, debug.EnableDebug("cleaner_bug"))
 	output.Reset()

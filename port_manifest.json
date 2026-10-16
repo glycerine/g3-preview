@@ -75683,7 +75683,7 @@
           "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
         },
         {
-          "name": "Selected eliminated-watch sat_bug CTRACE before SASSERT, real solver display_watches and display body (cpp162-167); wider solver profiles remain open",
+          "name": "Selected eliminated-watch sat_bug CTRACE before SASSERT, source-ordered literal/watch/full-solver display prefixes (cpp162-167); nonempty solver profiles remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
           "tests": ["TestSATIntegrityEliminatedWatchSourceTrace"]
@@ -75821,7 +75821,7 @@
           "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
         },
         {
-          "name": "Selected eliminated-watch sat_bug CTRACE before SASSERT, real solver display_watches and display body (cpp162-167); wider solver profiles remain open",
+          "name": "Selected eliminated-watch sat_bug CTRACE before SASSERT, source-ordered literal/watch/full-solver display prefixes (cpp162-167); nonempty solver profiles remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
           "tests": ["TestSATIntegrityEliminatedWatchSourceTrace"]
@@ -183723,7 +183723,7 @@
           "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
         },
         {
-          "name": "Retained SAT checker eliminated-watch sat_bug CTRACE through real solver display owner (sat_integrity_checker.cpp:162); wider display profiles remain open",
+          "name": "Retained SAT checker eliminated-watch sat_bug CTRACE with source-ordered literal/watch/full-solver display prefixes (sat_integrity_checker.cpp:162); nonempty solver profiles remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
           "tests": ["TestSATIntegrityEliminatedWatchSourceTrace"]
@@ -186057,7 +186057,7 @@
           "tests": ["TestSATIntegrityMissingBinaryReciprocalSourceTrace"]
         },
         {
-          "name": "Retained SAT checker eliminated-watch sat_bug CTRACE through real solver display owner (sat_integrity_checker.cpp:162); wider display profiles remain open",
+          "name": "Retained SAT checker eliminated-watch sat_bug CTRACE with source-ordered literal/watch/full-solver display prefixes (sat_integrity_checker.cpp:162); nonempty solver profiles remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_watches_trace.go",
           "tests": ["TestSATIntegrityEliminatedWatchSourceTrace"]
