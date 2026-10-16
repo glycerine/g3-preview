@@ -13,6 +13,44 @@ func satBackwardSubsumptionTraceRecord(tag, line, body string) string {
 		body + "------------------------------------------------\n"
 }
 
+func TestSATSimplifierBackwardSubsumption0SourceTrace(t *testing.T) {
+	for _, enabled := range []bool{false, true} {
+		s, lifecycle := satSimplifierFixture(t, 4)
+		a := lifecycle.propagation.clauses
+		satOK(t, s.useList.Init(4))
+		satOK(t, s.kernel.InitVisited(4))
+		c1, err := a.MkClause([]Literal{0, 2, 4}, true)
+		satOK(t, err)
+		c2, err := a.MkClause([]Literal{0, 2, 4, 6}, false)
+		satOK(t, err)
+		for _, c := range []StoredClauseRef{c1, c2} {
+			satOK(t, lifecycle.pushClause(c == c1, c))
+			satOK(t, s.useList.Insert(c))
+		}
+		var output bytes.Buffer
+		tags := diagnostic.NewTraceTagsWithWriter(&output)
+		if enabled {
+			tags.Enable("subsumption")
+		}
+		lifecycle.traceTags = tags
+		satOK(t, s.backSubsumption0(c1))
+		want := ""
+		if tags.ShouldTrace("subsumption") {
+			want = "-------- [subsumption] back_subsumption0 src/sat/sat_simplifier.cpp:542 ---------\n" +
+				"(0 1 2)+ subsumed (0 1 2 3)+\n" +
+				"------------------------------------------------\n"
+		}
+		if got := output.String(); got != want {
+			t.Fatalf("enabled=%v: got %q, want %q", enabled, got, want)
+		}
+		learned, err := a.Learned(c1)
+		satOK(t, err)
+		if learned || s.numSubsumed != 1 {
+			t.Fatalf("source mutation: learned=%v, subsumed=%d", learned, s.numSubsumed)
+		}
+	}
+}
+
 func TestSATSimplifierBackwardSubsumptionSourceTraces(t *testing.T) {
 	for _, tc := range []struct {
 		name, tag string

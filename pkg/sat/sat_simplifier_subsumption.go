@@ -427,6 +427,7 @@ func (s *satSimplifier) backSubsumption0(c1 StoredClauseRef) error {
 				}
 			}
 		}
+		s.traceSubsumed0(c1, c2)
 		if e = s.removeClause(c2); e != nil {
 			return e
 		}
