@@ -74375,10 +74375,10 @@
           ]
         },
         {
-          "name": "Retained cleaner operator cleaner_bug process assertion/tag gate at entry and exit; nested checker SASSERT notifications remain open (sat_cleaner.cpp:184,200)",
+          "name": "Retained cleaner operator cleaner_bug process assertion/tag gate at entry and exit; selected nested bool-variable SASSERT actions ported, other checker assertions remain open (sat_cleaner.cpp:184,200)",
           "status": "partial",
           "go_target": "pkg/sat/sat_cleaner_assertion.go",
-          "tests": ["TestSATCleanerInvariantUsesProcessDebugGate"]
+          "tests": ["TestSATCleanerInvariantUsesProcessDebugGate", "TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions"]
         }
       ],
       "ownership": [
@@ -75073,6 +75073,12 @@
             "TestSATIntegrityNaryBlockedAndReinitProfiles",
             "TestSATIntegrityAsymmActualEnabledWrapperSites"
           ]
+        },
+        {
+          "name": "Selected check_bool_vars SASSERT133-145 process assertion switch, source-order array lengths, per-site C/T action through cleaner_bug; other checker assertions remain open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_assertion.go",
+          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions"]
         }
       ],
       "ownership": [
@@ -75132,6 +75138,12 @@
             "TestSATIntegrityNaryBlockedAndReinitProfiles",
             "TestSATIntegrityAsymmActualEnabledWrapperSites"
           ]
+        },
+        {
+          "name": "Selected check_bool_vars SASSERT133-145 process assertion switch, source-order array lengths, per-site C/T action through cleaner_bug; other checker assertions remain open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_assertion.go",
+          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions"]
         }
       ],
       "ownership": [
@@ -121840,6 +121852,12 @@
           "tests": ["TestSATCleanerInvariantUsesProcessDebugGate"]
         },
         {
+          "name": "Retained SAT cleaner check_bool_vars SASSERT133-145 source-order notification and C/T action for independent array lengths; other nested checker sites remain open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_assertion.go",
+          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions"]
+        },
+        {
           "name": "Process debug owner with default streams, tied input and interactive action; generated initializer borrowing and heap CASSERT state",
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_debug_process.go",
@@ -122186,6 +122204,12 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_cleaner_assertion.go",
           "tests": ["TestSATCleanerInvariantUsesProcessDebugGate"]
+        },
+        {
+          "name": "Retained SAT cleaner check_bool_vars SASSERT133-145 source-order notification and C/T action for independent array lengths; other nested checker sites remain open",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_assertion.go",
+          "tests": ["TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions"]
         },
         {
           "name": "Process debug owner with default streams, tied input and interactive action; generated initializer borrowing and heap CASSERT state",

@@ -3,6 +3,7 @@ package sat
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -11,8 +12,9 @@ import (
 // A source stack checker borrows the actual solver member owners. It owns no
 // clauses and has no separately allocated header. GC holds the sole frozen count.
 type satIntegrityChecker struct {
-	lifecycle *satSolverClauseLifecycle
-	gc        *satSolverGC
+	lifecycle    *satSolverClauseLifecycle
+	gc           *satSolverGC
+	debugActions bool
 }
 
 func newSATIntegrityChecker(l *satSolverClauseLifecycle, g *satSolverGC) (satIntegrityChecker, error) {
@@ -25,7 +27,7 @@ func newSATIntegrityChecker(l *satSolverClauseLifecycle, g *satSolverGC) (satInt
 	if g.closed || g.closing {
 		return satIntegrityChecker{}, arena.ErrClosed
 	}
-	return satIntegrityChecker{l, g}, nil
+	return satIntegrityChecker{lifecycle: l, gc: g}, nil
 }
 func (c satIntegrityChecker) open() error {
 	if c.lifecycle == nil {
@@ -356,54 +358,54 @@ func (c satIntegrityChecker) checkBoolVars() (bool, error) {
 		return false, e
 	}
 	v := c.lifecycle.propagation.variables
+	sourceAssertions := false
 	if satStorageSourceDebug {
-		n, e := v.numVarsChecked()
+		enabled, e := diagnostic.BorrowProcessDebugContext().AssertionsEnabled()
 		if e != nil {
 			return false, e
 		}
-		if uint32(len(v.watches.lists)) != n*2 {
-			return false, ErrSATAssertion
-		}
-		size := uint32(len(v.assignment))
-		if size != n*2 {
-			return false, ErrSATAssertion
-		}
-		size = uint32(len(v.literalMark))
-		if size != n*2 {
-			return false, ErrSATAssertion
-		}
-		size, e = v.justification.size()
-		if e != nil {
-			return false, e
-		}
-		if size != n {
-			return false, ErrSATAssertion
-		}
-		for _, flags := range [][]bool{v.decision, v.eliminated, v.external, v.assignedSinceGC} {
-			if uint32(len(flags)) != n {
-				return false, ErrSATAssertion
+		sourceAssertions = enabled
+		if enabled {
+			n, e := v.numVarsChecked()
+			if e != nil {
+				return false, e
 			}
-		}
-		size, e = v.numVarsChecked()
-		if e != nil {
-			return false, e
-		}
-		if size != n {
-			return false, ErrSATAssertion
-		}
-		size = uint32(len(v.mark))
-		if size != n {
-			return false, ErrSATAssertion
-		}
-		if e = v.activity.open(); e != nil {
-			return false, e
-		}
-		activitySize := uint32(len(v.activity.values))
-		if activitySize != n {
-			return false, ErrSATAssertion
-		}
-		if uint64(len(v.phase)) != uint64(n) || uint64(len(v.previousPhase)) != uint64(n) {
-			return false, ErrSATAssertion
+			checks := [...]struct {
+				got       uint32
+				want      uint32
+				line      int32
+				condition string
+			}{
+				{uint32(len(v.watches.lists)), n * 2, 133, "s.m_watches.size() == s.num_vars() * 2"},
+				{uint32(len(v.assignment)), n * 2, 134, "s.m_assignment.size() == s.num_vars() * 2"},
+				{uint32(len(v.literalMark)), n * 2, 135, "s.m_lit_mark.size() == s.num_vars() * 2"},
+				{0, n, 136, "s.m_justification.size() == s.num_vars()"},
+				{uint32(len(v.decision)), n, 137, "s.m_decision.size() == s.num_vars()"},
+				{uint32(len(v.eliminated)), n, 138, "s.m_eliminated.size() == s.num_vars()"},
+				{uint32(len(v.external)), n, 139, "s.m_external.size() == s.num_vars()"},
+				{uint32(len(v.level)), n, 140, "s.m_level.size() == s.num_vars()"},
+				{uint32(len(v.mark)), n, 141, "s.m_mark.size() == s.num_vars()"},
+				{0, n, 142, "s.m_activity.size() == s.num_vars()"},
+				{uint32(len(v.phase)), n, 143, "s.m_phase.size() == s.num_vars()"},
+				{uint32(len(v.previousPhase)), n, 144, "s.m_prev_phase.size() == s.num_vars()"},
+				{uint32(len(v.assignedSinceGC)), n, 145, "s.m_assigned_since_gc.size() == s.num_vars()"},
+			}
+			for i := range checks {
+				if checks[i].line == 136 {
+					checks[i].got, e = v.justification.size()
+				} else if checks[i].line == 142 {
+					e = v.activity.open()
+					if e == nil {
+						checks[i].got = uint32(len(v.activity.values))
+					}
+				}
+				if e != nil {
+					return false, e
+				}
+				if e = satIntegrityAssertion(checks[i].got == checks[i].want, c.debugActions, checks[i].line, checks[i].condition); e != nil {
+					return false, e
+				}
+			}
 		}
 	}
 	for variable := uint32(0); ; variable++ {
@@ -418,7 +420,7 @@ func (c satIntegrityChecker) checkBoolVars() (bool, error) {
 		if e != nil {
 			return false, e
 		}
-		if gone && satStorageSourceDebug {
+		if gone && sourceAssertions {
 			for sign := uint32(0); sign < 2; sign++ {
 				list, e := v.watches.Get(variable*2 + sign)
 				if e != nil {

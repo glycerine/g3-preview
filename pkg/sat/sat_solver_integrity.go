@@ -18,6 +18,9 @@ func (l *satSolverClauseLifecycle) bindIntegrity(g *satSolverGC) error {
 	return nil
 }
 func (l *satSolverClauseLifecycle) checkInvariant() error {
+	return l.checkInvariantWithActions(false)
+}
+func (l *satSolverClauseLifecycle) checkInvariantWithActions(actions bool) error {
 	if e := l.open(); e != nil {
 		return e
 	}
@@ -36,6 +39,7 @@ func (l *satSolverClauseLifecycle) checkInvariant() error {
 	if e != nil {
 		return e
 	}
+	c.debugActions = actions
 	yes, e := c.run()
 	if e != nil {
 		return e

@@ -13,7 +13,7 @@ func (c *satCleaner) assertInvariant() error {
 		return err
 	}
 	// check_invariant() returns true after its nested SASSERT(checker()).
-	// Preserve checker refusals until their distinct source assertions are
-	// represented; the outer CASSERT condition itself cannot be false.
-	return c.lifecycle.checkInvariant()
+	// Other nested checker refusals remain explicit until their source
+	// assertions are represented; the outer condition itself cannot be false.
+	return c.lifecycle.checkInvariantWithActions(true)
 }
