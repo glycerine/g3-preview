@@ -77316,10 +77316,10 @@
           "tests": ["TestSATActualSimplifierInitializeAndRunDisplaySourceTraces"]
         },
         {
-          "name": "Reached blocked-clause process/nary/binary TRACE sites at sat_simplifier.cpp:951,967,1008",
+          "name": "Reached blocked-clause process/nary/binary and full-solver display TRACE sites at sat_simplifier.cpp:951,967,1008,1079",
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_blocked_trace.go",
-          "tests": ["TestSATSimplifierActualBlockedClauseSourceTraces"]
+          "tests": ["TestSATSimplifierActualBlockedClauseSourceTraces", "TestSATActualBlockedEliminationSolverDisplaySourceTrace"]
         },
         {
           "name": "Reached variable-ordering/elimination TRACE sites at sat_simplifier.cpp:1105,1133,1269,1280,1296,1302,1315,1338,1354,1365,1369,1375,1401",
@@ -182382,10 +182382,10 @@
           "tests": ["TestSATActualSimplifierInitializeAndRunDisplaySourceTraces"]
         },
         {
-          "name": "Reached blocked-clause process/nary/binary TRACE sites at sat_simplifier.cpp:951,967,1008",
+          "name": "Reached blocked-clause process/nary/binary and full-solver display TRACE sites at sat_simplifier.cpp:951,967,1008,1079",
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_blocked_trace.go",
-          "tests": ["TestSATSimplifierActualBlockedClauseSourceTraces"]
+          "tests": ["TestSATSimplifierActualBlockedClauseSourceTraces", "TestSATActualBlockedEliminationSolverDisplaySourceTrace"]
         },
         {
           "name": "Reached variable-ordering/elimination TRACE sites at sat_simplifier.cpp:1105,1133,1269,1280,1296,1302,1315,1338,1354,1365,1369,1375,1401",
@@ -184218,10 +184218,10 @@
           "tests": ["TestSATActualSimplifierInitializeAndRunDisplaySourceTraces"]
         },
         {
-          "name": "Reached blocked-clause process/nary/binary TRACE sites at sat_simplifier.cpp:951,967,1008",
+          "name": "Reached blocked-clause process/nary/binary and full-solver display TRACE sites at sat_simplifier.cpp:951,967,1008,1079",
           "status": "ported",
           "go_target": "pkg/sat/sat_simplifier_blocked_trace.go",
-          "tests": ["TestSATSimplifierActualBlockedClauseSourceTraces"]
+          "tests": ["TestSATSimplifierActualBlockedClauseSourceTraces", "TestSATActualBlockedEliminationSolverDisplaySourceTrace"]
         },
         {
           "name": "Reached variable-ordering/elimination TRACE sites at sat_simplifier.cpp:1105,1133,1269,1280,1296,1302,1315,1338,1354,1365,1369,1375,1401",

@@ -51,6 +51,7 @@ func (s *satSimplifier) closeBlocked() error {
 	return nil
 }
 func (s *satSimplifier) eliminateBlocked() (err error) {
+	s.traceBlockedStart()
 	s.blockedReport = stopwatch.Stopwatch{}
 	s.blockedReportBlocked = s.numBlocked
 	if e := s.blockedReport.Start(); e != nil {
