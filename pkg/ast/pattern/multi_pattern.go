@@ -37,6 +37,14 @@ func (c *patternCandidates) selectMulti(candidates []ast.ASTHandle, maxPatterns 
 		return result, ast.ErrASTDomain
 	}
 	states := []*prePattern{{freeVars: make(map[uint32]struct{})}}
+	c.tracePrePatternAllocated(states[0], 439)
+	defer func() {
+		for _, state := range states {
+			if state != nil {
+				c.tracePrePatternDeallocated(state)
+			}
+		}
+	}()
 	var splits uint32
 	trace := c.traceTags
 	if trace == nil {
@@ -69,6 +77,7 @@ func (c *patternCandidates) selectMulti(candidates []ast.ASTHandle, maxPatterns 
 					freeVars: make(map[uint32]struct{}, len(current.freeVars)+len(info.freeVars)),
 					index:    current.index + 1,
 				}
+				c.tracePrePatternAllocated(next, 455)
 				for v := range current.freeVars {
 					next.freeVars[v] = struct{}{}
 				}

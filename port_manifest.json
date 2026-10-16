@@ -18752,6 +18752,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/multi_pattern_memory_trace.go",
         "pkg/ast/pattern/reduce_quantifier_trace.go",
         "pkg/ast/pattern/pattern_stage_trace.go",
         "pkg/ast/pattern/smaller_pattern.go",
@@ -18879,6 +18880,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete pattern pre_pattern queue allocation at pattern_inference.cpp:439,455 and delete_proc reset at util.h:171 through debug memory wrappers, including early-return cleanup and source queue order",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/multi_pattern_memory_trace.go",
+          "tests": ["TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn"]
+        },
         {
           "name": "Reached pulled-quantifier TRACE after successful nested binder pull and pattern inference (pattern_inference.cpp:695), with complete process-bound SMT2 result",
           "status": "ported",
@@ -152244,6 +152251,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/multi_pattern_memory_trace.go",
         "pkg/api/api_goal_memory_trace.go",
         "pkg/api/api_goal_memory_trace_debug_test.go",
         "pkg/util/diagnostic/util_memory_runtime.go",
@@ -152322,6 +152330,7 @@
         "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
+        "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
         "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
         "TestAPIGoalSourceMemoryWrapperReleaseSites",
         "TestAPIASTMapSourceMemoryWrapperReleaseSites",
@@ -152492,6 +152501,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete pattern pre_pattern queue allocation at pattern_inference.cpp:439,455 and delete_proc reset at util.h:171 through debug memory wrappers, including early-return cleanup and source queue order",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/multi_pattern_memory_trace.go",
+          "tests": ["TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn"]
+        },
         {
           "name": "Retained API goal wrapper allocation and context deallocation debug records at api_goal.cpp:35 and api_context.cpp:54,116",
           "status": "platform_replacement",
@@ -153155,6 +153170,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/multi_pattern_memory_trace.go",
         "pkg/api/api_goal_memory_trace.go",
         "pkg/api/api_goal_memory_trace_debug_test.go",
         "pkg/util/diagnostic/util_memory_runtime.go",
@@ -153228,6 +153244,7 @@
         "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
+        "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
         "TestAPIContextMemoryWrappersBindOwnProcessFinalization",
         "TestAPIGoalSourceMemoryWrapperReleaseSites",
         "TestAPIASTMapSourceMemoryWrapperReleaseSites",
@@ -153387,6 +153404,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete pattern pre_pattern queue allocation at pattern_inference.cpp:439,455 and delete_proc reset at util.h:171 through debug memory wrappers, including early-return cleanup and source queue order",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/multi_pattern_memory_trace.go",
+          "tests": ["TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn"]
+        },
         {
           "name": "Retained API goal wrapper allocation and context deallocation debug records at api_goal.cpp:35 and api_context.cpp:54,116",
           "status": "platform_replacement",
@@ -185395,6 +185418,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/pattern/multi_pattern_memory_trace.go",
         "pkg/util/productiter/next.go",
         "pkg/util/random/generator.go",
         "pkg/util/numeral/mpz_log.go",
@@ -185450,6 +185474,7 @@
         "pkg/sat/sat_solver_mus_verbose.go"
       ],
       "tests": [
+        "TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn",
         "TestSourceProductIteratorOrderCarryAndWrap",
         "TestSourceRandomVectors",
         "TestShuffleTraversal",
@@ -185688,6 +185713,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete pattern pre_pattern queue allocation at pattern_inference.cpp:439,455 and delete_proc reset at util.h:171 through debug memory wrappers, including early-return cleanup and source queue order",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/pattern/multi_pattern_memory_trace.go",
+          "tests": ["TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn"]
+        },
         {
           "name": "random_gen::operator()",
           "status": "ported",

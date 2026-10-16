@@ -3,6 +3,8 @@ package pattern
 import (
 	"bytes"
 	"fmt"
+	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
@@ -70,6 +72,45 @@ func TestPatternInferenceMultiPatternTraceQueueAndEarlyReturn(t *testing.T) {
 		t.Fatal("disabled queue trace changed result or emitted output", len(result), output.String())
 	}
 	patternMust(t, m.DelRef(&result[0]))
+	output.Reset()
+	trace.Enable("memory")
+	result, err = c.selectMulti([]ast.ASTHandle{a, d}, 1, nil)
+	patternMust(t, err)
+	if len(result) != 1 {
+		t.Fatal("source early-return multi-pattern with memory trace", len(result))
+	}
+	patternMust(t, m.DelRef(&result[0]))
+	if diagnostic.DebugBuild && trace.ShouldTrace("memory") {
+		got := output.String()
+		allocs := regexp.MustCompile(`alloc (0x[0-9a-f]+) src/ast/pattern/pattern_inference.cpp:(439|455) pre_pattern ([0-9]+)\n`).FindAllStringSubmatch(got, -1)
+		deallocs := regexp.MustCompile(`dealloc (0x[0-9a-f]+) src/util/util.h:171\n`).FindAllStringSubmatch(got, -1)
+		if len(allocs) != 4 || len(deallocs) != 4 || allocs[0][2] != "439" ||
+			allocs[1][2] != "455" || allocs[2][2] != "455" || allocs[3][2] != "455" {
+			t.Fatalf("source pre-pattern allocation sites or cleanup count: %q", got)
+		}
+		seen := make(map[string]struct{}, len(allocs))
+		for _, allocation := range allocs {
+			if _, duplicate := seen[allocation[1]]; duplicate || allocation[3] == "0" {
+				t.Fatalf("duplicate/zero pre-pattern allocation: %q", got)
+			}
+			seen[allocation[1]] = struct{}{}
+		}
+		for _, release := range deallocs {
+			if _, found := seen[release[1]]; !found {
+				t.Fatalf("pre-pattern deallocated without matching allocation: %q", got)
+			}
+			delete(seen, release[1])
+		}
+		if len(seen) != 0 || strings.Index(got, "\ndealloc ") < strings.LastIndex(got, "\nalloc ") ||
+			deallocs[0][1] != allocs[2][1] || deallocs[1][1] != allocs[1][1] ||
+			deallocs[2][1] != allocs[3][1] || deallocs[3][1] != allocs[0][1] ||
+			strings.Count(got, "[memory] allocate src/util/memory_manager.cpp:209") != 4 ||
+			strings.Count(got, "[memory] deallocate src/util/memory_manager.cpp:204") != 4 {
+			t.Fatalf("source pre-pattern reset order or records: %q", got)
+		}
+	} else if output.Len() != 0 {
+		t.Fatalf("erased pre-pattern memory trace emitted %q", output.String())
+	}
 }
 
 func TestPatternInferenceMultiPatternSplitOrderLimitAndResultOwnership(t *testing.T) {
