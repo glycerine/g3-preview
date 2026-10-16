@@ -75127,6 +75127,13 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityMissingTernaryWatchSourceTrace"]
+        },
+        {
+          "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, concrete status/value display and process-gated C/T actions; wider checker diagnostics remain partial",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_clause_trace.go",
+          "go_targets": ["pkg/sat/sat_integrity_checker.go"],
+          "tests": ["TestSATIntegrityNaryResidualSourceTraceAndAssertion"]
         }
       ],
       "ownership": [
@@ -75240,6 +75247,13 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityMissingTernaryWatchSourceTrace"]
+        },
+        {
+          "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, concrete status/value display and process-gated C/T actions; wider checker diagnostics remain partial",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_clause_trace.go",
+          "go_targets": ["pkg/sat/sat_integrity_checker.go"],
+          "tests": ["TestSATIntegrityNaryResidualSourceTraceAndAssertion"]
         }
       ],
       "ownership": [
@@ -122069,6 +122083,13 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
+        },
+        {
+          "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, concrete status/value display and process-gated C/T actions; wider checker diagnostics remain partial",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_clause_trace.go",
+          "go_targets": ["pkg/sat/sat_integrity_checker.go"],
+          "tests": ["TestSATIntegrityNaryResidualSourceTraceAndAssertion"]
         }
       ],
       "ownership": [
@@ -122466,6 +122487,13 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
+        },
+        {
+          "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, concrete status/value display and process-gated C/T actions; wider checker diagnostics remain partial",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_clause_trace.go",
+          "go_targets": ["pkg/sat/sat_integrity_checker.go"],
+          "tests": ["TestSATIntegrityNaryResidualSourceTraceAndAssertion"]
         }
       ],
       "ownership": [
@@ -181898,6 +181926,13 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityMissingTernaryWatchSourceTrace"]
+        },
+        {
+          "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, concrete status/value display and process-gated C/T actions; wider checker diagnostics remain partial",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_clause_trace.go",
+          "go_targets": ["pkg/sat/sat_integrity_checker.go"],
+          "tests": ["TestSATIntegrityNaryResidualSourceTraceAndAssertion"]
         }
       ],
       "ownership": [
@@ -183649,6 +183684,13 @@
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityMissingTernaryWatchSourceTrace"]
+        },
+        {
+          "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, concrete status/value display and process-gated C/T actions; wider checker diagnostics remain partial",
+          "status": "partial",
+          "go_target": "pkg/sat/sat_integrity_clause_trace.go",
+          "go_targets": ["pkg/sat/sat_integrity_checker.go"],
+          "tests": ["TestSATIntegrityNaryResidualSourceTraceAndAssertion"]
         }
       ],
       "ownership": [

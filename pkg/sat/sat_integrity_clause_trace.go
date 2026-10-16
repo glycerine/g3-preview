@@ -1,4 +1,4 @@
-// Source: src/sat/sat_integrity_checker.cpp:56-72; src/util/trace.h:40-46.
+// Source: src/sat/sat_integrity_checker.cpp:56-93; src/util/trace.h:40-46.
 package sat
 
 import (
@@ -92,6 +92,74 @@ func (c satIntegrityChecker) traceMissingTernaryWatch(cl StoredClauseRef, index 
 	_ = tags.EmitConditional("sat_ter_watch_bug", "check_clause", "src/sat/sat_integrity_checker.cpp", 69,
 		func() bool { return true }, func(w io.Writer) error {
 			body, err := c.missingTernaryWatchText(cl, index)
+			if err != nil {
+				return err
+			}
+			_, err = io.WriteString(w, body)
+			return err
+		})
+}
+
+func (c satIntegrityChecker) residualClauseText(cl StoredClauseRef) (body string, result error) {
+	p := c.lifecycle.propagation
+	out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: c.lifecycle.budget})
+	if err != nil {
+		return "", err
+	}
+	defer func() { result = errors.Join(result, out.Close()) }()
+	if err = p.clauses.DisplayInto(cl, out); err != nil {
+		return "", err
+	}
+	if err = out.AppendCString(" status: "); err != nil {
+		return "", err
+	}
+	status, err := p.status(cl)
+	if err != nil {
+		return "", err
+	}
+	if err = out.AppendCString(status.String() + "\n"); err != nil {
+		return "", err
+	}
+	for i := uint32(0); ; i++ {
+		n, e := p.clauses.Size(cl)
+		if e != nil {
+			return "", e
+		}
+		if i >= n {
+			break
+		}
+		if e = out.AppendCString("val("); e != nil {
+			return "", e
+		}
+		if e = out.AppendUint32(i); e != nil {
+			return "", e
+		}
+		if e = out.AppendCString("): "); e != nil {
+			return "", e
+		}
+		lit, e := p.clauses.Literal(cl, i)
+		if e != nil {
+			return "", e
+		}
+		value, e := p.variables.valueLiteral(lit)
+		if e != nil {
+			return "", e
+		}
+		if e = out.AppendCString(value.String() + "\n"); e != nil {
+			return "", e
+		}
+	}
+	return out.String()
+}
+
+func (c satIntegrityChecker) traceResidualClause(cl StoredClauseRef) {
+	tags := c.lifecycle.traceTags
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	_ = tags.EmitConditional("sat_bug", "check_clause", "src/sat/sat_integrity_checker.cpp", 90,
+		func() bool { return true }, func(w io.Writer) error {
+			body, err := c.residualClauseText(cl)
 			if err != nil {
 				return err
 			}

@@ -308,7 +308,7 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 						if i >= size {
 							break
 						}
-						if satStorageSourceDebug {
+						if tags.ShouldTrace("sat_bug") {
 							lit, e := a.Literal(cl, i)
 							if e != nil {
 								return false, e
@@ -318,7 +318,20 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 								return false, e
 							}
 							if val != lbool.False {
-								return false, ErrSATAssertion
+								c.traceResidualClause(cl)
+							}
+						}
+						if assertions {
+							lit, e := a.Literal(cl, i)
+							if e != nil {
+								return false, e
+							}
+							val, e := v.valueLiteral(lit)
+							if e != nil {
+								return false, e
+							}
+							if e = satIntegrityAssertion(val == lbool.False, c.debugActions, 93, "s.value(c[i]) == l_false"); e != nil {
+								return false, e
 							}
 						}
 					}
