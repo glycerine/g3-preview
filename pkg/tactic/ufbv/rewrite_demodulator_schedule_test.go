@@ -1,9 +1,12 @@
 package ufbv
 
 import (
+	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -59,6 +62,10 @@ func TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot(t *testi
 	cacheMust(t, e)
 	forward, e := newRewriteRuleIndex(m)
 	cacheMust(t, e)
+	var trace bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&trace)
+	tags.Enable("demodulator")
+	forward.trace = tags
 	t.Cleanup(func() { cacheMust(t, forward.close()) })
 	cacheMust(t, forward.insert(qAnnotation, gx, fa))
 	cacheMust(t, forward.insert(qDifferent, gx, fc))
@@ -73,6 +80,9 @@ func TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot(t *testi
 		t.Fatal("back index missed quantified annotation or processed occurrences", len(back.byDecl[f].values))
 	}
 	cacheMust(t, back.rescheduleDemodulators(forward, f, fa))
+	if tags.ShouldTrace("demodulator") && !strings.Contains(trace.String(), "reschedule_demodulators src/tactic/ufbv/ufbv_rewriter.cpp:637 ---------\nRescheduling: \n") {
+		t.Fatal("source matched-quantifier rescheduling trace", trace.String())
+	}
 	if _, found := forward.rules[qAnnotation]; found {
 		t.Fatal("matching annotation demodulator remained in forward index")
 	}

@@ -158,6 +158,9 @@ func (r *rewriteBackIndex) rescheduleDemodulators(index *rewriteRuleIndex, f, lh
 		if !can {
 			continue
 		}
+		if e := r.traceRescheduling(index, q); e != nil {
+			return e
+		}
 		decls, e := r.declarations(q)
 		if e != nil {
 			return e

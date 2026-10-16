@@ -108715,6 +108715,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained UFBV demodulator rescheduling TRACE at ufbv_rewriter.cpp:637",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_demodulator_schedule_trace.go",
+          "tests": ["TestUFBVReschedulingSourceTraceRecord", "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"]
+        },
+        {
           "name": "Retained UFBV cycle and rebuilt-application TRACE at ufbv_rewriter.cpp:336,423",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_loop_trace.go",
@@ -182223,6 +182229,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained UFBV demodulator rescheduling TRACE at ufbv_rewriter.cpp:637",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_demodulator_schedule_trace.go",
+          "tests": ["TestUFBVReschedulingSourceTraceRecord", "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"]
+        },
+        {
           "name": "Retained UFBV cycle and rebuilt-application TRACE at ufbv_rewriter.cpp:336,423",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_loop_trace.go",
@@ -184610,6 +184622,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained UFBV demodulator rescheduling TRACE at ufbv_rewriter.cpp:637",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_demodulator_schedule_trace.go",
+          "tests": ["TestUFBVReschedulingSourceTraceRecord", "TestRewriteDemodulatorRescheduleMatchesAnnotationsAndTransfersRoot"]
+        },
         {
           "name": "Retained UFBV cycle and rebuilt-application TRACE at ufbv_rewriter.cpp:336,423",
           "status": "ported",
