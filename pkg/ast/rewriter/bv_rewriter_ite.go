@@ -23,6 +23,9 @@ func (p *BVRewriter) RewriteIte(condition, then, otherwise ast.ASTHandle, out as
 	st = RewriteFailed
 	defer func() { p.running = false; p.fail(err) }()
 	m := p.manager
+	if err = p.traceITECore(condition, then, otherwise); err != nil {
+		return st, err
+	}
 	assign := func(value ast.ASTHandle) error { st = Rewrite1; return m.SetRef(out, value) }
 	equal, e := m.AreEqual(then, otherwise)
 	if e != nil {
