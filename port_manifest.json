@@ -104644,10 +104644,12 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/tactic_extension_model_trace.go",
         "pkg/model/model_evaluator_function_memory_trace.go",
         "pkg/tactic/tactic_extension_model.go"
       ],
       "tests": [
+        "TestExtensionModelDefinitionSourceTraceReverseOrder",
         "TestExtensionModelFunctionMemoryWrapperFollowsModelCore",
         "TestTacticExtensionModelOriginalReverseDefinitionOrder",
         "TestTacticExtensionModelFunctionFallbackCompletionAndDefaultCallbacks",
@@ -104673,6 +104675,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Reached extension_model_converter::operator() per-definition extension_mc TRACE at extension_model_converter.cpp:59, reverse evaluated order and SMT2 values",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_extension_model_trace.go",
+          "tests": ["TestExtensionModelDefinitionSourceTraceReverseOrder"]
+        },
         {
           "name": "Concrete extension model arity-positive func_interp allocation at extension_model_converter.cpp:66 and model-core destruction at model_core.cpp:29 through debug memory wrappers",
           "status": "platform_replacement",
@@ -180853,6 +180861,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/tactic_extension_model_trace.go",
         "pkg/ast/pattern/reduce_quantifier_trace.go",
         "pkg/ast/pattern/pattern_stage_trace.go",
         "pkg/ast/pattern/preferred_pattern.go",
@@ -180939,6 +180948,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestExtensionModelDefinitionSourceTraceReverseOrder",
         "TestModelEvaluatorBooleanReductionSourceStatusTrace",
         "TestModelEvaluatorDirectEntrySourceTrace",
         "TestPatternCollectInfoSourceSMT2Trace",
@@ -181061,6 +181071,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached extension_model_converter::operator() per-definition extension_mc TRACE at extension_model_converter.cpp:59, reverse evaluated order and SMT2 values",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_extension_model_trace.go",
+          "tests": ["TestExtensionModelDefinitionSourceTraceReverseOrder"]
+        },
         {
           "name": "Selected Boolean reduce_app BR_DONE application relookup and conditional result CTRACE at model_evaluator.cpp:194-202",
           "status": "partial",
@@ -182846,6 +182862,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/tactic_extension_model_trace.go",
         "pkg/ast/pattern/reduce_quantifier_trace.go",
         "pkg/ast/pattern/pattern_stage_trace.go",
         "pkg/ast/pattern/preferred_pattern.go",
@@ -182930,6 +182947,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestExtensionModelDefinitionSourceTraceReverseOrder",
         "TestModelEvaluatorBooleanReductionSourceStatusTrace",
         "TestModelEvaluatorDirectEntrySourceTrace",
         "TestPatternCollectInfoSourceSMT2Trace",
@@ -183062,6 +183080,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Reached extension_model_converter::operator() per-definition extension_mc TRACE at extension_model_converter.cpp:59, reverse evaluated order and SMT2 values",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_extension_model_trace.go",
+          "tests": ["TestExtensionModelDefinitionSourceTraceReverseOrder"]
+        },
         {
           "name": "Selected Boolean reduce_app BR_DONE application relookup and conditional result CTRACE at model_evaluator.cpp:194-202",
           "status": "partial",

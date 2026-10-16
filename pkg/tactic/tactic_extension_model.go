@@ -134,6 +134,9 @@ func (c *tacticExtensionModelConverter) ApplyModel(out *ModelRef, goal uint32) (
 			return e
 		}
 		d := c.vars[i]
+		if e = c.traceExtensionDefinition(d, c.defs[i], value); e != nil {
+			return e
+		}
 		arity, e := c.manager.GetArity(d)
 		if e != nil {
 			return e
