@@ -181568,6 +181568,12 @@
           "tests": ["TestASTModusPonensInvalidSecondFactSourceTrace", "TestASTModusPonensMismatchAndNongroundSourceTraces"]
         },
         {
+          "name": "Retained mk_transitivity declaration and middle-term CTRACE before source debug guards (ast.cpp:2717-2730)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_proof_transitivity_trace.go",
+          "tests": ["TestASTTransitivitySourceTracesBeforeDebugGuards"]
+        },
+        {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",
           "status": "partial",
           "tests": []
@@ -183257,6 +183263,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_proof_modus_ponens_trace.go",
           "tests": ["TestASTModusPonensInvalidSecondFactSourceTrace", "TestASTModusPonensMismatchAndNongroundSourceTraces"]
+        },
+        {
+          "name": "Retained mk_transitivity declaration and middle-term CTRACE before source debug guards (ast.cpp:2717-2730)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_proof_transitivity_trace.go",
+          "tests": ["TestASTTransitivitySourceTracesBeforeDebugGuards"]
         },
         {
           "name": "remaining TRACE_CODE/TRACE/STRACE/CTRACE call-site emission",

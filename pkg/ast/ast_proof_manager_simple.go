@@ -179,7 +179,8 @@ func (m *ASTManager) proofTransitivity(p, q ASTHandle) (ASTHandle, error) {
 	if q.IsNull() {
 		return p, nil
 	}
-	if ASTSourceDebug {
+	traceEnabled := m.proofTransitivityTraceEnabled()
+	if ASTSourceDebug || traceEnabled {
 		f, e := m.proofFact(p)
 		if e != nil {
 			return ASTHandle{}, e
@@ -196,8 +197,17 @@ func (m *ASTManager) proofTransitivity(p, q ASTHandle) (ASTHandle, error) {
 		if e != nil {
 			return ASTHandle{}, e
 		}
+		if d != other && traceEnabled {
+			firstDecl, secondDecl := m.external(d), m.external(other)
+			m.mu.Unlock()
+			traceErr := m.traceProofTransitivityDeclarations(f, g, firstDecl, secondDecl)
+			m.mu.Lock()
+			if traceErr != nil {
+				return ASTHandle{}, traceErr
+			}
+		}
 		compatible := d == other
-		if !compatible {
+		if ASTSourceDebug && !compatible {
 			fIff, e := m.proofKind(f, ASTOpIff)
 			if e != nil {
 				return ASTHandle{}, e
@@ -224,7 +234,18 @@ func (m *ASTManager) proofTransitivity(p, q ASTHandle) (ASTHandle, error) {
 			}
 			compatible = (fIff || fEq) && (gIff || gEq) || (fEq || fOEq) && (gEq || gOEq)
 		}
-		if !compatible || b != c {
+		if ASTSourceDebug && !compatible {
+			return ASTHandle{}, ErrASTDomain
+		}
+		if b != c && traceEnabled {
+			m.mu.Unlock()
+			traceErr := m.traceProofTransitivityMiddle(f, g, p, q)
+			m.mu.Lock()
+			if traceErr != nil {
+				return ASTHandle{}, traceErr
+			}
+		}
+		if ASTSourceDebug && b != c {
 			return ASTHandle{}, ErrASTDomain
 		}
 	}
