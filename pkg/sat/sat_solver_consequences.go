@@ -270,13 +270,15 @@ func (s *Solver) getLiteralConsequencesBody(asms, lits satConsequenceInput, out 
 			}
 			// Literal source false&&scope_lvl()==1 branch remains unreachable.
 		}
-		_ = fixed
 		_ = assigned // Source verbose-only counters; no fake report output.
 		if err = s.extractFixedSet(unfixed, assumptions, vars, out); err != nil {
 			return lbool.Undef, err
 		}
 		if isSat == lbool.True {
 			if s.Variables.scopeLevel == 1 && resolves > 0 {
+				if err = s.emitConsequenceBackjump(); err != nil {
+					return lbool.Undef, err
+				}
 				isSat = lbool.Undef
 			} else {
 				isSat, err = s.boundedSearch()
@@ -303,6 +305,9 @@ func (s *Solver) getLiteralConsequencesBody(asms, lits satConsequenceInput, out 
 			}
 		}
 		if err = s.updateUnfixed(unfixed, vars); err != nil {
+			return lbool.Undef, err
+		}
+		if err = s.emitConsequenceProgress(iterations, unfixed, out, isSat, fixed, lits); err != nil {
 			return lbool.Undef, err
 		}
 		n = unfixed.size()

@@ -77778,7 +77778,8 @@
         "pkg/sat/sat_solver_trail_test.go",
         "pkg/sat/sat_var_queue_native_test.go",
         "pkg/sat/sat_solver_search_verbose.go",
-        "pkg/sat/sat_solver_unsat_core_verbose.go"
+        "pkg/sat/sat_solver_unsat_core_verbose.go",
+        "pkg/sat/sat_solver_consequence_verbose.go"
       ],
       "tests": [
         "TestSATSolverScopesNativeGrowthAndPop",
@@ -78094,7 +78095,8 @@
         "TestSATSolverCheckVerboseFileFailureKeepsSearchResult",
         "TestSATSolverCheckSourceModelNotice",
         "TestSATSolverActualMUSCoreSourceVerboseReport",
-        "TestSATSolverBoundedConsequencesSourceAbortVerbose"
+        "TestSATSolverBoundedConsequencesSourceAbortVerbose",
+        "TestSATSolverActualConsequenceProgressSourceVerbose"
       ],
       "conditionals": [
         {
@@ -79422,6 +79424,15 @@
           "go_target": "pkg/sat/sat_solver_consequences.go",
           "tests": [
             "TestSATSolverBoundedConsequencesSourceAbortVerbose"
+          ]
+        },
+        {
+          "name": "Retained get_consequences level-one backjump notice and per-iteration variables/fixed/lbool/pre-assigned/unfixed progress line at sat_solver.cpp:3438,3457-3465, using actual loop counters and process verbose stream",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_consequence_verbose.go",
+          "tests": [
+            "TestSATSolverActualConsequenceProgressSourceVerbose",
+            "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput"
           ]
         }
       ],
@@ -184495,7 +184506,8 @@
         "pkg/sat/sat_solver_gc_report.go",
         "pkg/sat/sat_solver_search_verbose.go",
         "pkg/sat/sat_solver_unsat_core_verbose.go",
-        "pkg/sat/sat_solver_consequences.go"
+        "pkg/sat/sat_solver_consequences.go",
+        "pkg/sat/sat_solver_consequence_verbose.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184533,7 +184545,8 @@
         "TestSATSolverCheckVerboseFileFailureKeepsSearchResult",
         "TestSATSolverCheckSourceModelNotice",
         "TestSATSolverActualMUSCoreSourceVerboseReport",
-        "TestSATSolverBoundedConsequencesSourceAbortVerbose"
+        "TestSATSolverBoundedConsequencesSourceAbortVerbose",
+        "TestSATSolverActualConsequenceProgressSourceVerbose"
       ],
       "methods_audited": true,
       "ownership_audited": true,
@@ -184723,6 +184736,15 @@
           "tests": [
             "TestSATSolverBoundedConsequencesSourceAbortVerbose"
           ]
+        },
+        {
+          "name": "Retained get_consequences level-one backjump notice and per-iteration variables/fixed/lbool/pre-assigned/unfixed progress line at sat_solver.cpp:3438,3457-3465, using actual loop counters and process verbose stream",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_consequence_verbose.go",
+          "tests": [
+            "TestSATSolverActualConsequenceProgressSourceVerbose",
+            "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput"
+          ]
         }
       ],
       "ownership": [
@@ -184791,7 +184813,8 @@
         "pkg/sat/sat_solver_gc_report.go",
         "pkg/sat/sat_solver_search_verbose.go",
         "pkg/sat/sat_solver_unsat_core_verbose.go",
-        "pkg/sat/sat_solver_consequences.go"
+        "pkg/sat/sat_solver_consequences.go",
+        "pkg/sat/sat_solver_consequence_verbose.go"
       ],
       "tests": [
         "TestSourceProductIteratorOrderCarryAndWrap",
@@ -184856,7 +184879,8 @@
         "TestSATSolverCheckVerboseFileFailureKeepsSearchResult",
         "TestSATSolverCheckSourceModelNotice",
         "TestSATSolverActualMUSCoreSourceVerboseReport",
-        "TestSATSolverBoundedConsequencesSourceAbortVerbose"
+        "TestSATSolverBoundedConsequencesSourceAbortVerbose",
+        "TestSATSolverActualConsequenceProgressSourceVerbose"
       ],
       "conditionals": [
         {
@@ -185344,6 +185368,15 @@
           "go_target": "pkg/sat/sat_solver_consequences.go",
           "tests": [
             "TestSATSolverBoundedConsequencesSourceAbortVerbose"
+          ]
+        },
+        {
+          "name": "Retained get_consequences level-one backjump notice and per-iteration variables/fixed/lbool/pre-assigned/unfixed progress line at sat_solver.cpp:3438,3457-3465, using actual loop counters and process verbose stream",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_consequence_verbose.go",
+          "tests": [
+            "TestSATSolverActualConsequenceProgressSourceVerbose",
+            "TestSATSolverConsequencesSourceBooleanImplicationsAppendToOwnedOutput"
           ]
         }
       ],
