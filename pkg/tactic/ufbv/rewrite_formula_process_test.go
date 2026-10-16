@@ -53,6 +53,7 @@ func TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults(t *tes
 	tags := diagnostic.NewTraceTagsWithWriter(&trace)
 	tags.Enable("demodulator")
 	tags.Enable("demodulator_s")
+	tags.Enable("demodulator_fwd")
 	processor.trace = tags
 	t.Cleanup(func() { cacheMust(t, processor.close()) })
 	beforeQRefs, e := m.GetRefCount(q)
@@ -73,6 +74,9 @@ func TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults(t *tes
 	}
 	if tags.ShouldTrace("demodulator") && (!strings.Contains(trace.String(), "ufbv_rewriter.cpp:702 ---------\n") || !strings.Contains(trace.String(), "ufbv_rewriter.cpp:706 ---------\n") || !strings.Contains(trace.String(), "ufbv_rewriter.cpp:748 ---------\n") || !strings.Contains(trace.String(), "after demodulator:\n")) {
 		t.Fatal("source demodulator publication and final trace", trace.String())
+	}
+	if tags.ShouldTrace("demodulator_fwd") && !strings.Contains(trace.String(), "insert_fwd_idx src/tactic/ufbv/ufbv_rewriter.cpp:220 ---------\nINSERT: ") {
+		t.Fatal("source forward-index insertion trace", trace.String())
 	}
 	if e := processor.close(); e != nil {
 		t.Fatal(e)

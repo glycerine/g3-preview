@@ -63,6 +63,7 @@ func (r *formulaProcessor) run(formulas []ast.ASTHandle) (output []ast.ASTHandle
 		return nil, ast.ErrASTDomain
 	}
 	r.ran = true
+	r.index.trace = r.formulaTraceTags()
 	m := r.manager
 	defer func() {
 		if result != nil {

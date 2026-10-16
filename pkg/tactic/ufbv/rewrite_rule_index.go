@@ -1,7 +1,12 @@
-// Source: src/tactic/ufbv/ufbv_rewriter.cpp:226-267,287-317.
+// Source: src/tactic/ufbv/ufbv_rewriter.cpp:217-267,287-317.
 package ufbv
 
-import "github.com/glycerine/g3/pkg/ast"
+import (
+	"io"
+
+	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+)
 
 type rewriteForwardSet struct {
 	values    []ast.ASTHandle
@@ -19,6 +24,7 @@ type demodulatorRule struct {
 // Each indexed rule owns one reference to its quantifier, LHS and RHS.
 type rewriteRuleIndex struct {
 	manager *ast.ASTManager
+	trace   *diagnostic.TraceTags
 	matcher *matchSubst
 	byFunc  map[ast.ASTHandle]*rewriteForwardSet
 	rules   map[ast.ASTHandle]demodulatorRule
@@ -44,6 +50,28 @@ func (r *rewriteRuleIndex) check() error {
 		return ast.ErrASTHandle
 	}
 	return nil
+}
+
+func (r *rewriteRuleIndex) traceInsert(quantifier ast.ASTHandle) error {
+	tags := r.trace
+	if tags == nil {
+		tags = diagnostic.BorrowProcessTraceTags()
+	}
+	if !tags.ShouldTrace("demodulator_fwd") {
+		return nil
+	}
+	var operandErr error
+	_ = tags.EmitConditional("demodulator_fwd", "insert_fwd_idx", "src/tactic/ufbv/ufbv_rewriter.cpp", 220,
+		func() bool { return true }, func(w io.Writer) error {
+			body, e := formulaTraceText(r.manager, quantifier)
+			if e != nil {
+				operandErr = e
+				return e
+			}
+			_, _ = io.WriteString(w, "INSERT: "+body+"\n")
+			return nil
+		})
+	return operandErr
 }
 
 // insert follows insert_fwd_idx after is_demodulator has supplied its large
@@ -76,6 +104,9 @@ func (r *rewriteRuleIndex) insert(quantifier, lhs, rhs ast.ASTHandle) error {
 				return e
 			}
 		}
+	}
+	if e := r.traceInsert(quantifier); e != nil {
+		return e
 	}
 	if _, present := r.rules[quantifier]; present {
 		return ast.ErrASTDomain

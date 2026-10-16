@@ -108715,6 +108715,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained UFBV forward-index insertion TRACE at ufbv_rewriter.cpp:220",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
+          "tests": ["TestUFBVForwardIndexSourceInsertTrace", "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"]
+        },
+        {
           "name": "Retained UFBV equality-classifier TRACE at ufbv_rewriter.cpp:63",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_demodulator_classify.go",
@@ -182199,6 +182205,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained UFBV forward-index insertion TRACE at ufbv_rewriter.cpp:220",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
+          "tests": ["TestUFBVForwardIndexSourceInsertTrace", "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"]
+        },
+        {
           "name": "Retained UFBV equality-classifier TRACE at ufbv_rewriter.cpp:63",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_demodulator_classify.go",
@@ -184562,6 +184574,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained UFBV forward-index insertion TRACE at ufbv_rewriter.cpp:220",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_rule_index.go",
+          "tests": ["TestUFBVForwardIndexSourceInsertTrace", "TestUFBVFormulaProcessorReschedulesEarlierFormulaAndPublishesResults"]
+        },
         {
           "name": "Retained UFBV equality-classifier TRACE at ufbv_rewriter.cpp:63",
           "status": "ported",
