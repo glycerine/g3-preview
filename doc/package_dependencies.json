@@ -1503,6 +1503,7 @@
       "production_files": [
         "gparams_catalog_collectors.go",
         "owned_string_alias.go",
+        "param_datatype_refs.go",
         "pattern_inference_rewriter.go",
         "smt_dyn_ack_pairs.go",
         "smt_dyn_ack_schedule.go",

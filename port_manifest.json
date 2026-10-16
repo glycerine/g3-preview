@@ -31723,9 +31723,9 @@
       "path": "src/cmd_context/pdecl.cpp",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/smtcore/param_datatype_refs.go"],
+      "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"],
       "assertions": [
         {
           "line": 31,
@@ -31806,7 +31806,14 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "pdatatypes_decl::fix_missing_refs and accessor/constructor/datatype traversal: concrete declaration-order rewrite, first unknown name and prior mutations (pdecl.cpp:432-461,495-503,555-563,666-677)",
+          "status": "partial",
+          "go_target": "pkg/smtcore/param_datatype_refs.go",
+          "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -31814,9 +31821,9 @@
       "path": "src/cmd_context/pdecl.h",
       "component": "cmd_context",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/smtcore/param_datatype_refs.go"],
+      "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"],
       "conditionals": [
         {
           "line": 19,
@@ -31855,7 +31862,14 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Concrete ptype missing/recursive tags and parametric datatype accessor/constructor/group declarations for selected fix_missing_refs; manager instantiation remains open",
+          "status": "partial",
+          "go_target": "pkg/smtcore/param_datatype_refs.go",
+          "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -122455,7 +122469,8 @@
         "pkg/util/symbol/dictionary_int32.go",
         "pkg/ast/ast_builtin_plugins_user.go",
         "pkg/smtcore/tactic_manager.go",
-        "pkg/parsers/smt2/local_sort_names.go"
+        "pkg/parsers/smt2/local_sort_names.go",
+        "pkg/smtcore/param_datatype_refs.go"
       ],
       "tests": [
         "TestParamDescrsSourceHistoryDefaultsAndDisplay",
@@ -122489,7 +122504,8 @@
         "TestTacticManagerSourceProbeReferencesAndStructuralValues",
         "TestTacticManagerSourceDuplicateAssertionAndNamespaceSeparation",
         "TestTacticManagerNativeRegistrationGrowthAndOwnership",
-        "TestSMT2SortAndDatatypeNameTablesSourceScopes"
+        "TestSMT2SortAndDatatypeNameTablesSourceScopes",
+        "TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"
       ],
       "conditionals": [
         {
@@ -122580,6 +122596,12 @@
           "status": "platform_replacement",
           "go_target": "pkg/parsers/smt2/local_sort_names.go",
           "tests": ["TestSMT2SortAndDatatypeNameTablesSourceScopes"]
+        },
+        {
+          "name": "pdatatypes_decl concrete dictionary<int> name-to-recursive-index construction with equal-name overwrite and source-order lookup",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/param_datatype_refs.go",
+          "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"]
         }
       ],
       "ownership": [
@@ -124798,7 +124820,8 @@
         "pkg/util/hash/runtime/runtime_bytes_bounded.go",
         "pkg/ast/rewriter/bv_trailing_table.go",
         "pkg/ast/rewriter/used_vars_ufbv.go",
-        "pkg/parsers/smt2/local_sort_names.go"
+        "pkg/parsers/smt2/local_sort_names.go",
+        "pkg/smtcore/param_datatype_refs.go"
       ],
       "tests": [
         "TestModel2ExprFreshNameConcreteSymbolSetAndSequence",
@@ -124879,7 +124902,8 @@
         "TestBVTrailingEveryColdCountReservation",
         "TestSATSolverNativeMutexDedupGrowthWithoutBackingReservations",
         "TestUFBVUsedVarsExpressionDepthAndQuantifierAnnotations",
-        "TestSMT2SortAndDatatypeNameTablesSourceScopes"
+        "TestSMT2SortAndDatatypeNameTablesSourceScopes",
+        "TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"
       ],
       "conditionals": [
         {
@@ -125224,6 +125248,12 @@
           "status": "platform_replacement",
           "go_target": "pkg/parsers/smt2/local_sort_names.go",
           "tests": ["TestSMT2SortAndDatatypeNameTablesSourceScopes"]
+        },
+        {
+          "name": "Parametric datatype recursive-name dictionary uses native typed Go map storage; hash probing is not carried over",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/param_datatype_refs.go",
+          "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"]
         }
       ],
       "ownership": [
@@ -151034,7 +151064,8 @@
         "pkg/sat/sat_solver_index_set_test.go",
         "pkg/sat/sat_solver_index_iterator_source_test.go",
         "pkg/ast/pattern/collect.go",
-        "pkg/parsers/smt2/local_sort_names.go"
+        "pkg/parsers/smt2/local_sort_names.go",
+        "pkg/smtcore/param_datatype_refs.go"
       ],
       "tests": [
         "TestArbitraryFloatSourceConstructorUsesNativePowerDictionaries",
@@ -151072,7 +151103,8 @@
         "TestSATConsequenceNativeIndexIteratorBorrowLifetime",
         "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
         "TestPatternInferenceCollectorArithmeticNestedAndDivisionException",
-        "TestSMT2SortAndDatatypeNameTablesSourceScopes"
+        "TestSMT2SortAndDatatypeNameTablesSourceScopes",
+        "TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"
       ],
       "conditionals": [
         {
@@ -151270,6 +151302,12 @@
           "status": "platform_replacement",
           "go_target": "pkg/parsers/smt2/local_sort_names.go",
           "tests": ["TestSMT2SortAndDatatypeNameTablesSourceScopes"]
+        },
+        {
+          "name": "Parametric datatype recursive-name map uses native typed Go symbol keys and int32 indices for reached insert/find",
+          "status": "platform_replacement",
+          "go_target": "pkg/smtcore/param_datatype_refs.go",
+          "tests": ["TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"]
         }
       ],
       "ownership": [
