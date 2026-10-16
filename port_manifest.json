@@ -169658,6 +169658,33 @@
           ]
         },
         {
+          "name": "mpzzp power input normalization SASSERT at mpzzp.h:243 before its local power and result construction",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp.go",
+          "tests": [
+            "TestIntegerModularScalarSourceAssertionActions",
+            "TestIntegerModularInverseAndPowerActions"
+          ]
+        },
+        {
+          "name": "mpzzp in-place and out-of-place machine_div2k postconditions at mpzzp.h:276-277, with distinct integer-manager overloads",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp_ops.go",
+          "tests": [
+            "TestIntegerModularScalarSourceAssertionActions",
+            "TestIntegerModularExplicitInPlaceOverloads"
+          ]
+        },
+        {
+          "name": "mpzzp in-place and out-of-place root Z-mode SASSERTs at mpzzp.h:279-280 before integer root mutation",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpzzp.go",
+          "tests": [
+            "TestIntegerModularScalarSourceAssertionActions",
+            "TestIntegerModularHeaderRefusalAndWarm"
+          ]
+        },
+        {
           "name": "Remaining scalar arithmetic/fused/sets/const-mutable conversion/bit/log/root/formatting overloads beyond separately ported source assertions",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpzzp_ops.go",

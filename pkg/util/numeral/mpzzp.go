@@ -534,7 +534,7 @@ func (m *IntegerModularManager) powerWithSourceContext(a *Int, k uint32, b *Int,
 	if m.PowerPending {
 		return ErrModularPowerPending
 	}
-	if e := m.AssertNormalized(a); e != nil {
+	if e := m.sourceAssertNormalized(a, 243); e != nil {
 		return e
 	}
 	var localPower Int
@@ -624,8 +624,8 @@ func (m *IntegerModularManager) Root(a *Int, n uint32, out *Int) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
-	if modularSourceDebug && !m.z {
-		return false, ErrModularAssertion
+	if e := m.sourceAssertNotModular(280); e != nil {
+		return false, e
 	}
 	return m.manager.Root(a, n, out)
 }
@@ -636,8 +636,8 @@ func (m *IntegerModularManager) rootInPlaceWithReceipt(a *Int, n uint32, receipt
 	if e := m.check(); e != nil {
 		return false, e
 	}
-	if modularSourceDebug && !m.z {
-		return false, ErrModularAssertion
+	if e := m.sourceAssertNotModular(279); e != nil {
+		return false, e
 	}
 	return m.manager.rootInPlaceWithReceipt(a, n, receipt)
 }

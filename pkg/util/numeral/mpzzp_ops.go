@@ -15,6 +15,18 @@ func (m *IntegerModularManager) sourceAssertFinite(line int32) error {
 	return diagnostic.DebugAssertionFailure(d, "src/util/mpzzp.h", line, "!m_z")
 }
 
+func (m *IntegerModularManager) sourceAssertNotModular(line int32) error {
+	if !diagnostic.DebugBuild {
+		return nil
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil || !enabled || m.z {
+		return e
+	}
+	return diagnostic.DebugAssertionFailure(d, "src/util/mpzzp.h", line, "!modular()")
+}
+
 // These sites share the same predicate, but retain their distinct source
 // locations and the left-before-right short circuit of binary assertions.
 func (m *IntegerModularManager) sourceAssertNormalized(a *Int, line int32) error {
@@ -558,7 +570,7 @@ func (m *IntegerModularManager) MachineDiv2k(a *Int, k uint32, out *Int) error {
 	if e := m.manager.MachineDiv2k(a, k, out); e != nil {
 		return e
 	}
-	return m.AssertNormalized(out)
+	return m.sourceAssertNormalizedNamed(out, 277, "is_p_normalized(r)")
 }
 func (m *IntegerModularManager) IsSmall(a *Int) (bool, error) {
 	if e := m.check(); e != nil {
@@ -588,5 +600,11 @@ func (m *IntegerModularManager) FormatInto(a *Int, dst []byte) (int, error) {
 }
 func (m *IntegerModularManager) Mul2kInPlace(a *Int, k uint32) error { return m.Mul2k(a, k, a) }
 func (m *IntegerModularManager) MachineDiv2kInPlace(a *Int, k uint32) error {
-	return m.MachineDiv2k(a, k, a)
+	if e := m.check(); e != nil {
+		return e
+	}
+	if e := m.manager.MachineDiv2kInPlace(a, k); e != nil {
+		return e
+	}
+	return m.sourceAssertNormalized(a, 276)
 }

@@ -25,7 +25,7 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 	serviceMust(t, e)
 	in, e := os.CreateTemp(t.TempDir(), "mpzzp-assert-input-*")
 	serviceMust(t, e)
-	_, e = in.WriteString(strings.Repeat("CT", 12) + "TCCCTCTTTTCTTTCTTCTCTCTCT")
+	_, e = in.WriteString(strings.Repeat("CT", 12) + "TCCCTCTTTTCTTTCTTCTCTCTCTTCTCTCTCTC")
 	serviceMust(t, e)
 	_, e = in.Seek(0, 0)
 	serviceMust(t, e)
@@ -216,6 +216,44 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 		t.Fatal("wrapper normalization Throw must follow core Continue", unnormalized, e)
 	}
 	serviceMust(t, m.SetZPUint64(6))
+	powerInput, powerOutput := NewInt(8), NewInt(99)
+	if e := m.Power(&powerInput, 1, &powerOutput); !errors.As(e, &thrown) || powerOutput.Val != 99 {
+		t.Fatal("Power input Throw must precede local/output construction", powerOutput, e)
+	}
+	serviceMust(t, m.Power(&powerInput, 1, &powerOutput))
+	modularValue(t, z, &powerOutput, 2)
+	shift := NewInt(8)
+	if e := m.MachineDiv2kInPlace(&shift, 1); !errors.As(e, &thrown) || shift.Val != 4 {
+		t.Fatal("in-place shift Throw must retain published value", shift, e)
+	}
+	shift = NewInt(8)
+	serviceMust(t, m.MachineDiv2kInPlace(&shift, 1))
+	if shift.Val != 4 {
+		t.Fatal("in-place shift Continue must preserve raw quotient", shift)
+	}
+	shiftOutput := NewInt(99)
+	if e := m.MachineDiv2k(&powerInput, 1, &shiftOutput); !errors.As(e, &thrown) || shiftOutput.Val != 4 {
+		t.Fatal("out-of-place shift Throw must retain published value", shiftOutput, e)
+	}
+	shiftOutput = NewInt(99)
+	serviceMust(t, m.MachineDiv2k(&powerInput, 1, &shiftOutput))
+	if shiftOutput.Val != 4 {
+		t.Fatal("out-of-place shift Continue must preserve raw quotient", shiftOutput)
+	}
+	rootInput := NewInt(4)
+	if _, e := m.RootInPlace(&rootInput, 2); !errors.As(e, &thrown) || rootInput.Val != 4 {
+		t.Fatal("in-place root Throw must precede mutation", rootInput, e)
+	}
+	if ok, e := m.RootInPlace(&rootInput, 2); e != nil || !ok || rootInput.Val != 2 {
+		t.Fatal("in-place root Continue must reach integer root", ok, rootInput, e)
+	}
+	rootSource, rootOutput := NewInt(4), NewInt(99)
+	if _, e := m.Root(&rootSource, 2, &rootOutput); !errors.As(e, &thrown) || rootOutput.Val != 99 {
+		t.Fatal("out-of-place root Throw must precede output mutation", rootOutput, e)
+	}
+	if ok, e := m.Root(&rootSource, 2, &rootOutput); e != nil || !ok || rootOutput.Val != 2 {
+		t.Fatal("out-of-place root Continue must reach integer root", ok, rootOutput, e)
+	}
 	serviceMust(t, d.EnableAssertions(false))
 	if got, e := m.String(&a); e != nil || got != "8" {
 		t.Fatal("disabled source assertion must leave numeral readable", got, e)
@@ -237,10 +275,14 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 	if e := unknown.Div(&one, &one, &outValue); e != nil || outValue.Val != 1 {
 		t.Fatal("disabled prime assertion must not read the uninitialized flag", outValue, e)
 	}
+	rootOutput = NewInt(99)
+	if ok, e := m.Root(&rootSource, 2, &rootOutput); e != nil || !ok || rootOutput.Val != 2 {
+		t.Fatal("disabled modular root assertion must reach integer root", ok, rootOutput, e)
+	}
 	data, e := os.ReadFile(out.Name())
 	serviceMust(t, e)
 	if strings.Count(string(data), "File: src/util/mpzzp.h\nLine: 146\n") != 2 ||
-		strings.Count(string(data), "is_p_normalized(a)\n") != 14 ||
+		strings.Count(string(data), "is_p_normalized(a)\n") != 18 ||
 		strings.Count(string(data), "is_p_normalized(a) && is_p_normalized(b)\n") != 13 ||
 		strings.Count(string(data), "is_p_normalized(a) && is_p_normalized(b) && is_p_normalized(c)\n") != 1 ||
 		strings.Count(string(data), "Line: 161\nis_p_normalized(b)\n") != 1 ||
@@ -287,9 +329,20 @@ func TestIntegerModularScalarSourceAssertionActions(t *testing.T) {
 		strings.Contains(string(data), "Line: 59\n") {
 		t.Fatal("normalization source assertion order", string(data))
 	}
+	for _, record := range []string{
+		"Line: 243\nis_p_normalized(a)\n",
+		"Line: 276\nis_p_normalized(a)\n",
+		"Line: 277\nis_p_normalized(r)\n",
+		"Line: 279\n!modular()\n",
+		"Line: 280\n!modular()\n",
+	} {
+		if strings.Count(string(data), record) != 2 {
+			t.Fatal("missing power/shift/root source assertion records", record, string(data))
+		}
+	}
 	state, e := input.State()
 	serviceMust(t, e)
-	if state.Position != 49 {
+	if state.Position != 59 {
 		t.Fatal("disabled assertion consumed an action", state.Position)
 	}
 }
