@@ -128183,7 +128183,8 @@
         "pkg/util/numeral/rational_lexical_scope.go",
         "pkg/util/numeral/rational_numeric_borrow.go",
         "pkg/util/numeral/inf_arithmetic_entry_source_test.go",
-        "pkg/util/numeral/inf_muldiv_entry_source_test.go"
+        "pkg/util/numeral/inf_muldiv_entry_source_test.go",
+        "pkg/util/numeral/inf_eps_rational_short_circuit_source_test.go"
       ],
       "tests": [
         "TestInfinitesimalSourceWholeStringStreamInsertion",
@@ -128269,7 +128270,8 @@
         "TestInfMulDivEntryScalarMemberAliasRereads",
         "TestInfMulDivEntryRawDenominatorAndZero",
         "TestInfMulDivEntryInlineWarmZero",
-        "TestInfMulDivEntryForeignAndClosedBeforeActions"
+        "TestInfMulDivEntryForeignAndClosedBeforeActions",
+        "TestInfEpsRationalComparisonSkipsUnreadFiniteOperand"
       ],
       "conditionals": [
         {
@@ -128392,7 +128394,8 @@
             "TestInfEpsInfStructuralEqualityAndReturnCopy",
             "TestInfEpsInfPointerFreeWarmPaths",
             "TestInfEpsInfFormattingOneFinalAllocation",
-            "TestInfEpsInfConstructorSignedScalarShapes"
+            "TestInfEpsInfConstructorSignedScalarShapes",
+            "TestInfEpsRationalComparisonSkipsUnreadFiniteOperand"
           ]
         },
         {

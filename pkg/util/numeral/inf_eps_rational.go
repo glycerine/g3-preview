@@ -562,6 +562,8 @@ func (s *RationalService) infEpsInfLessRational(a *OwnedInfEpsInfRational, b *Ow
 			return false, nil
 		}
 	}
+	// The source infinity-sign branches never inspect the rational operand.
+	// The nested finite comparison validates it only after those branches.
 	return s.infLessRational(&a.numeral, b, reverse)
 }
 func (s *RationalService) infEpsInfEqualRational(a *OwnedInfEpsInfRational, b *OwnedRational, reverse bool) (bool, error) {
@@ -1140,9 +1142,6 @@ func (s *RationalService) InfEpsInfLessRational(a *OwnedInfEpsInfRational, b *Ow
 	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.rationalScalarOwner(b); e != nil {
-		return false, e
-	}
 	ok, e := s.infEpsInfLessRational(a, b, false)
 	return ok, e
 }
@@ -1154,9 +1153,6 @@ func (s *RationalService) InfEpsInfGreaterRational(a *OwnedInfEpsInfRational, b 
 	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.rationalScalarOwner(b); e != nil {
-		return false, e
-	}
 	ok, e := s.infEpsInfLessRational(a, b, true)
 	return ok, e
 }
@@ -1166,9 +1162,6 @@ func (s *RationalService) InfEpsInfLessEqualRational(a *OwnedInfEpsInfRational, 
 	}
 	defer s.mu.Unlock()
 	if e := s.infEpsScalarOwner(a); e != nil {
-		return false, e
-	}
-	if e := s.rationalScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfLessRational(a, b, true)
@@ -1183,9 +1176,6 @@ func (s *RationalService) InfEpsInfGreaterEqualRational(a *OwnedInfEpsInfRationa
 	}
 	defer s.mu.Unlock()
 	if e := s.infEpsScalarOwner(a); e != nil {
-		return false, e
-	}
-	if e := s.rationalScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfLessRational(a, b, false)
@@ -1233,9 +1223,6 @@ func (s *RationalService) InfEpsInfRationalLess(b *OwnedRational, a *OwnedInfEps
 	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.rationalScalarOwner(b); e != nil {
-		return false, e
-	}
 	ok, e := s.infEpsInfLessRational(a, b, true)
 	return ok, e
 }
@@ -1247,9 +1234,6 @@ func (s *RationalService) InfEpsInfRationalGreater(b *OwnedRational, a *OwnedInf
 	if e := s.infEpsScalarOwner(a); e != nil {
 		return false, e
 	}
-	if e := s.rationalScalarOwner(b); e != nil {
-		return false, e
-	}
 	ok, e := s.infEpsInfLessRational(a, b, false)
 	return ok, e
 }
@@ -1259,9 +1243,6 @@ func (s *RationalService) InfEpsInfRationalLessEqual(b *OwnedRational, a *OwnedI
 	}
 	defer s.mu.Unlock()
 	if e := s.infEpsScalarOwner(a); e != nil {
-		return false, e
-	}
-	if e := s.rationalScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfLessRational(a, b, false)
@@ -1276,9 +1257,6 @@ func (s *RationalService) InfEpsInfRationalGreaterEqual(b *OwnedRational, a *Own
 	}
 	defer s.mu.Unlock()
 	if e := s.infEpsScalarOwner(a); e != nil {
-		return false, e
-	}
-	if e := s.rationalScalarOwner(b); e != nil {
 		return false, e
 	}
 	ok, e := s.infEpsInfLessRational(a, b, true)
