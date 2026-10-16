@@ -8,6 +8,8 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/model"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
 // Original filter converter copies unmarked constants/functions and universes.
@@ -16,6 +18,8 @@ type tacticFilterModelConverter struct {
 	tacticConverterBase
 	manager      *ast.ASTManager
 	declarations []ast.ASTHandle // owning entries
+	trace        *diagnostic.TraceTags
+	globals      *uparams.GlobalParamsService
 }
 
 func NewFilterModel(m *ast.ASTManager) (*tacticFilterModelConverter, error) {
@@ -61,6 +65,9 @@ func (c *tacticFilterModelConverter) ApplyModel(out *ModelRef, _ uint32) (err er
 	}
 	if old == nil || old.Manager() != c.manager || old.DerivedModel() == nil {
 		return ast.ErrASTHandle
+	}
+	if e = c.traceFilterModel(old, 26); e != nil {
+		return e
 	}
 	m := c.manager
 	marks := make(map[ast.ASTHandle]bool, len(c.declarations))
@@ -129,7 +136,7 @@ func (c *tacticFilterModelConverter) ApplyModel(out *ModelRef, _ uint32) (err er
 		return e
 	}
 	published = true
-	return nil
+	return c.traceFilterModel(next.Core(), 51)
 }
 
 func (c *tacticFilterModelConverter) ApplyUnindexed(out *ModelRef) error {

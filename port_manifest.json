@@ -58108,11 +58108,11 @@
       "component": "model",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/model/model_v2_display.go", "pkg/model/model_v2_display_test.go"],
-      "tests": ["TestModelV2DisplayConstantsFunctionsAndPartialElse"],
+      "go_targets": ["pkg/model/model_v2_display.go", "pkg/model/model_v2_display_test.go", "pkg/tactic/tactic_filter_model_trace.go", "pkg/tactic/tactic_filter_model_trace_test.go"],
+      "tests": ["TestModelV2DisplayConstantsFunctionsAndPartialElse", "TestFilterModelSourceBeforeAfterTrace"],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [{"name": "retained model_v2_pp ordered constants and function entries, empty-entry else prefix and partial unspecified fallback for extension-model trace; other source caller and multiline formatting profiles remain open", "status": "partial", "go_target": "pkg/model/model_v2_display.go", "tests": ["TestModelV2DisplayConstantsFunctionsAndPartialElse"]}],
+      "methods": [{"name": "retained model_v2_pp ordered constants and function entries, empty-entry else prefix and partial unspecified fallback for extension/filter-model trace; other source caller and multiline formatting profiles remain open", "status": "partial", "go_target": "pkg/model/model_v2_display.go", "tests": ["TestModelV2DisplayConstantsFunctionsAndPartialElse"]}],
       "ownership": [],
       "deviations": ["Native io.Writer and SMT2 format owners replace C++ ostream and mk_pp temporary mechanics; project model ordering and text are retained for reached Boolean declarations."]
     },
@@ -58121,8 +58121,8 @@
       "component": "model",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/model/model_v2_display.go", "pkg/model/model_v2_display_test.go"],
-      "tests": ["TestModelV2DisplayConstantsFunctionsAndPartialElse"],
+      "go_targets": ["pkg/model/model_v2_display.go", "pkg/model/model_v2_display_test.go", "pkg/tactic/tactic_filter_model_trace.go", "pkg/tactic/tactic_filter_model_trace_test.go"],
+      "tests": ["TestModelV2DisplayConstantsFunctionsAndPartialElse", "TestFilterModelSourceBeforeAfterTrace"],
       "conditionals": [
         {
           "line": 18,
@@ -58135,7 +58135,7 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [{"name": "retained model_v2_pp ordered constants and function entries, empty-entry else prefix and partial unspecified fallback for extension-model trace; other source caller and multiline formatting profiles remain open", "status": "partial", "go_target": "pkg/model/model_v2_display.go", "tests": ["TestModelV2DisplayConstantsFunctionsAndPartialElse"]}],
+      "methods": [{"name": "retained model_v2_pp ordered constants and function entries, empty-entry else prefix and partial unspecified fallback for extension/filter-model trace; other source caller and multiline formatting profiles remain open", "status": "partial", "go_target": "pkg/model/model_v2_display.go", "tests": ["TestModelV2DisplayConstantsFunctionsAndPartialElse"]}],
       "ownership": [],
       "deviations": ["Native io.Writer and SMT2 format owners replace C++ ostream and mk_pp temporary mechanics; project model ordering and text are retained for reached Boolean declarations."]
     },
@@ -104800,10 +104800,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/tactic/tactic_filter_model.go"
+        "pkg/tactic/tactic_filter_model.go",
+        "pkg/tactic/tactic_filter_model_trace.go",
+        "pkg/tactic/tactic_filter_model_trace_test.go",
+        "pkg/model/model_v2_display.go"
       ],
       "tests": [
         "TestTacticFilterModelRealSATBindingsUniverseAndReplacement",
+        "TestFilterModelSourceBeforeAfterTrace",
         "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
         "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership",
         "TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource",
@@ -104818,6 +104822,13 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "reached filter_mc before and after model_v2_pp TRACE at filter_model_converter.cpp:26,51 plus ordered filter display; concrete constant and function graph snapshots",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_filter_model_trace.go",
+          "go_targets": ["pkg/model/model_v2_display.go"],
+          "tests": ["TestFilterModelSourceBeforeAfterTrace"]
+        },
         {
           "name": "operator()(model_ref&, unsigned) constants, function graph filtering/copy and universes",
           "status": "partial",
@@ -104855,10 +104866,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/tactic/tactic_filter_model.go"
+        "pkg/tactic/tactic_filter_model.go",
+        "pkg/tactic/tactic_filter_model_trace.go",
+        "pkg/tactic/tactic_filter_model_trace_test.go",
+        "pkg/model/model_v2_display.go"
       ],
       "tests": [
         "TestTacticFilterModelRealSATBindingsUniverseAndReplacement",
+        "TestFilterModelSourceBeforeAfterTrace",
         "TestTacticFilterModelEmptyFilterExternalModelAndNoopCallbacks",
         "TestTacticFilterModelDeclarationTrailGrowthDuplicatesAndOwnership",
         "TestTacticFilterModelCopiesUnfilteredFunctionsAndPreservesSource",
@@ -104877,6 +104892,13 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "reached filter_mc before and after model_v2_pp TRACE at filter_model_converter.cpp:26,51 plus ordered filter display; concrete constant and function graph snapshots",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_filter_model_trace.go",
+          "go_targets": ["pkg/model/model_v2_display.go"],
+          "tests": ["TestFilterModelSourceBeforeAfterTrace"]
+        },
         {
           "name": "constructor, insert, unindexed forwarding and no-op cancel",
           "status": "ported",
@@ -180905,6 +180927,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/tactic_extension_model_trace.go",
+        "pkg/tactic/tactic_filter_model_trace.go",
         "pkg/ast/ast_func_decl_info_text.go",
         "pkg/model/model_v2_display.go",
         "pkg/ast/pattern/reduce_quantifier_trace.go",
@@ -180994,6 +181017,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestFilterModelSourceBeforeAfterTrace",
         "TestExtensionModelTraceAttachedDeclarationInfo",
         "TestExtensionModelDefinitionSourceTraceReverseOrder",
         "TestModelEvaluatorBooleanReductionSourceStatusTrace",
@@ -181119,6 +181143,13 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "reached filter_mc before/after model_v2_pp TRACE at filter_model_converter.cpp:26,51 with concrete retained constant/function snapshots and ordered converter display",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_filter_model_trace.go",
+          "go_targets": ["pkg/model/model_v2_display.go"],
+          "tests": ["TestFilterModelSourceBeforeAfterTrace"]
+        },
         {
           "name": "Reached extension_mc pre/post model snapshots at extension_model_converter.cpp:49,71 using concrete model_v2_pp and attached func_decl_info metadata; non-finite double ostream profiles remain open",
           "status": "partial",
@@ -182925,6 +182956,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/tactic_extension_model_trace.go",
+        "pkg/tactic/tactic_filter_model_trace.go",
         "pkg/ast/ast_func_decl_info_text.go",
         "pkg/model/model_v2_display.go",
         "pkg/ast/pattern/reduce_quantifier_trace.go",
@@ -183012,6 +183044,7 @@
         "pkg/ast/ast_core_distinct_trace.go"
       ],
       "tests": [
+        "TestFilterModelSourceBeforeAfterTrace",
         "TestExtensionModelTraceAttachedDeclarationInfo",
         "TestExtensionModelDefinitionSourceTraceReverseOrder",
         "TestModelEvaluatorBooleanReductionSourceStatusTrace",
@@ -183147,6 +183180,13 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "reached filter_mc before/after model_v2_pp TRACE at filter_model_converter.cpp:26,51 with concrete retained constant/function snapshots and ordered converter display",
+          "status": "ported",
+          "go_target": "pkg/tactic/tactic_filter_model_trace.go",
+          "go_targets": ["pkg/model/model_v2_display.go"],
+          "tests": ["TestFilterModelSourceBeforeAfterTrace"]
+        },
         {
           "name": "Reached extension_mc pre/post model snapshots at extension_model_converter.cpp:49,71 using concrete model_v2_pp and attached func_decl_info metadata; non-finite double ostream profiles remain open",
           "status": "partial",

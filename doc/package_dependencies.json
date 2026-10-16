@@ -1626,6 +1626,7 @@
         "tactic_extension_model.go",
         "tactic_extension_model_trace.go",
         "tactic_filter_model.go",
+        "tactic_filter_model_trace.go",
         "tactic_goal.go",
         "tactic_goal_display.go",
         "tactic_goal_ownership.go",
