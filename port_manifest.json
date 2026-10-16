@@ -3798,6 +3798,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "API context destructor DEBUG_CODE warning_msg for each uncollected registered object before removal (api_context.cpp:109-117); Go concrete type names replace compiler RTTI spelling",
+          "status": "ported",
+          "go_target": "pkg/api/api_context_results.go",
+          "tests": ["TestAPIContextUncollectedObjectSourceWarningGate"]
+        },
+        {
           "name": "Retained API goal wrapper allocation and context deallocation debug records at api_goal.cpp:35 and api_context.cpp:54,116",
           "status": "platform_replacement",
           "go_target": "pkg/api/api_goal_memory_trace.go",
@@ -3818,6 +3824,7 @@
         "API context result and automatic AST trails now own concrete native []ASTHandle backing. Each append acquires one AST reference; explicit single-result replacement retains the incoming alias across reset. Cleanup retires each consumed DEC before returning a destructor error and preserves only unread roots for retry. Close releases both backing slices. Only the real context cold header is reserved; no ASTRefVector wrapper, encoded vector record/payload or backing-growth reservation remains in these callers. A 4097-entry duplicate-root fixture checks actual reference counts, both result modes, reset/close and native growth under FailAfter0. See PORT_PROGRESS.md#native-api-context-result-roots."
       ],
       "deviations": [
+        "The api_context.cpp:114 DEBUG_CODE warning is emitted before each uncollected API object is removed, and warning_msg remains nonthrowing. Go uses the concrete destructor type name in place of compiler-specific C++ typeid(...).name() text; release builds erase the call.",
         "Native result storage supersedes former source vector header/growth/refusal credit in this member grouping. Real AST reference callbacks and object destructor ordering remain; native backing creates no emulated Runtime/Budget events. This does not claim a general ref_vector implementation or complete API context construction."
       ]
     },
@@ -123296,6 +123303,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "API context destructor DEBUG_CODE warning_msg for each uncollected registered object before removal (api_context.cpp:109-117); Go concrete type names replace compiler RTTI spelling",
+          "status": "ported",
+          "go_target": "pkg/api/api_context_results.go",
+          "tests": ["TestAPIContextUncollectedObjectSourceWarningGate"]
+        },
+        {
           "name": "Selected assertion switch, lazy debug table initialization, enable/disable/query, finalize and short-circuit CASSERT gate; whole global macro and debugger bindings remain open",
           "status": "partial",
           "go_target": "pkg/util/diagnostic/util_debug_context.go",
@@ -123536,6 +123549,7 @@
         "One cold borrowed assertion-context interface is charged inside the actual reflected table owner/config, never in a hot entry and never a condition callback. Runtime debug tags bind their exact owning DebugContext. SASSERT checks only the assertion flag, without recursively looking up tag storage. Constructor condition follows real wrapper allocation and precedes the real entry array; strict returned allocation/copy/move owners remain named across actual transport refusal."
       ],
       "deviations": [
+        "The api_context.cpp:114 DEBUG_CODE warning is emitted before each uncollected API object is removed, and warning_msg remains nonthrowing. Go uses the concrete destructor type name in place of compiler-specific C++ typeid(...).name() text; release builds erase the call.",
         "Source process globals represented by an explicit single-goroutine cold owner; process-wide/context API macro binding remains open. CASSERT gate preserves assertions-before-tag order, but release consumers must erase its call; no source macro consumer completion claimed. notify_assertion_violation, invoke_gdb, interactive fatal/abort/throw/debugger profiles, output services and full global finalizer orchestration remain open. Existing real table/region Go accounting is not C++ global allocator identity. No registered assertion completion credit.",
         "Explicit borrowed context specializes source assertion/tag gates at actual call sites; process-global binding, notify/debugger/TRACE, source global allocation geometry, legacy heap and wrapped extent profiles remain open. Original tst_heap enable_debug(\"heap\") is commented out; new enabled-tag worlds are independent fixtures and do not add registered enabled-tag credit.",
         "Selected caller-confined assertion flag binding and libstdc++ formatting profile only; notification/debugger/fatal assertion transport, process global binding, arbitrary locale/native ostream buffering/throw masks remain OPEN.",
@@ -188566,6 +188580,12 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "API context destructor DEBUG_CODE warning_msg for each uncollected registered object before removal (api_context.cpp:109-117); Go concrete type names replace compiler RTTI spelling",
+          "status": "ported",
+          "go_target": "pkg/api/api_context_results.go",
+          "tests": ["TestAPIContextUncollectedObjectSourceWarningGate"]
+        },
+        {
           "name": "enable_warning_messages and borrowed set_warning_stream state",
           "status": "ported",
           "go_target": "pkg/util/diagnostic/util_warning.go",
@@ -188714,6 +188734,7 @@
         "WarningService owns only the enable scalar and borrows optional io.Writer streams. EnvParamsRuntime updates the same warning-enable state used by warning emission; literal and selected formatted writes retain source prefix, newline, C-string boundary, selected Linux AMD64 custom-stream truncation and completed-output flush when the borrowed writer supports Flush."
       ],
       "deviations": [
+        "The api_context.cpp:114 DEBUG_CODE warning is emitted before each uncollected API object is removed, and warning_msg remains nonthrowing. Go uses the concrete destructor type name in place of compiler-specific C++ typeid(...).name() text; release builds erase the call.",
         "The prior unused warning translation was removed in 589e99f8. The now-retained EnvParamsRuntime toggle binds to concrete WarningService. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; Go io.Writer short writes retain the reached source insertion prefix but no longer escape warning_msg as a caller error. All three api_config_params.cpp catches, the well-sorted quantifier diagnostic and the two shell input-file warning branches have concrete owners, but standalone AST fallback without process printer binding, the full shell loop and other direct shell/AST/MUZ warning call sites remain open. No C varargs or C++ standard-stream implementation is introduced."
       ]
     },
@@ -188769,6 +188790,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "API context destructor DEBUG_CODE warning_msg for each uncollected registered object before removal (api_context.cpp:109-117); Go concrete type names replace compiler RTTI spelling",
+          "status": "ported",
+          "go_target": "pkg/api/api_context_results.go",
+          "tests": ["TestAPIContextUncollectedObjectSourceWarningGate"]
+        },
         {
           "name": "warning state and literal message emission",
           "status": "ported",
@@ -188901,6 +188928,7 @@
         "WarningService borrows selected output streams and owns only its enable flag. A borrowed buffered writer is flushed after a complete warning. The unused warning_displayer class has no Go adapter."
       ],
       "deviations": [
+        "The api_context.cpp:114 DEBUG_CODE warning is emitted before each uncollected API object is removed, and warning_msg remains nonthrowing. Go uses the concrete destructor type name in place of compiler-specific C++ typeid(...).name() text; release builds erase the call.",
         "The concrete warning service is reached by EnvParamsRuntime. Retained %s/%d/%I64u warning calls use Go fmt with C-string input boundaries; Go io.Writer short writes preserve the reached insertion prefix while warning_msg returns without a caller error. All three api_config_params.cpp catches, the well-sorted quantifier diagnostic and the two shell input-file warning branches have concrete owners, but standalone AST fallback without process printer binding, the full shell loop, format2ostream exception integration and other direct shell/AST/MUZ warning call sites remain open. C++ stream internals and C varargs are not copied."
       ]
     },

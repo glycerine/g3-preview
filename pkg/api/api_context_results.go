@@ -325,6 +325,11 @@ func (c *apiContextResults) Close() error {
 		}
 		o := c.objects[id]
 		c.pendingDestroy = o
+		if diagnostic.DebugBuild {
+			// Source typeid(*val).name() is compiler-specific; the Go concrete
+			// destructor type identifies the same registered API object.
+			_ = diagnostic.BorrowProcessWarningService().Warningf("Uncollected memory: %d: %s", id, reflect.TypeOf(o.destructor).String())
+		}
 		c.allocated.Del(id)
 		if err := c.destroyObject(o, 116); err != nil {
 			return err
