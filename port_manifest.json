@@ -171175,7 +171175,8 @@
         "pkg/util/params/util_params_block_memory_trace.go",
         "pkg/util/params/util_params_block_memory_trace_debug_test.go",
         "pkg/util/params/util_params_rational_entry_memory_trace.go",
-        "pkg/util/params/util_params_rational_entry_memory_trace_debug_test.go"
+        "pkg/util/params/util_params_rational_entry_memory_trace_debug_test.go",
+        "pkg/util/params/util_params_unreachable_debug_test.go"
       ],
       "tests": [
         "TestParamNameNormalizationSourceBranches",
@@ -171274,7 +171275,8 @@
         "TestGlobalParamsImpMemoryTraceFinalizingSuppressesDeallocation",
         "TestGlobalParamsImpMemoryTraceRefusalDoesNotStopLifecycle",
         "TestParamsBlockMemoryTraceFirstCopyOnWriteAndStableIdentity",
-        "TestParamsRationalEntryMemoryTraceNewMatchedAndReleasePaths"
+        "TestParamsRationalEntryMemoryTraceNewMatchedAndReleasePaths",
+        "TestParamsInvalidEntrySourceUnreachableContinue"
       ],
       "conditionals": [
         {

@@ -551,6 +551,16 @@ func (c *ParamsContext) copyCoreWithNumeralReceipt(dst, src uint32, receipt *unu
 	n := c.Blocks[src-1].Size
 	for i := uint32(0); i < n; i++ {
 		x := c.Entry(&c.Blocks[src-1], i)
+		// The source switch leaves an unrecognized entry untouched after its
+		// UNREACHABLE action; a Continue action advances to the next entry.
+		switch x.Kind {
+		case ParamBool, ParamUInt, ParamDouble, ParamNumeral, ParamSymbol, ParamString:
+		default:
+			if e := udiag.BorrowProcessDebugContext().UnreachableSource("src/util/params.cpp", 592); e != nil {
+				return e
+			}
+			continue
+		}
 		if e := c.setCoreWithNumeralReceipt(dst, x.key, x.Kind, x.bits, x.symbol, nil, &x.Rat, &x.text, receipt); e != nil {
 			return e
 		}
@@ -1317,6 +1327,12 @@ func (c *ParamsContext) format(v *ParamsRef, key *usymbol.Symbol, module *string
 				if x.key != *key {
 					continue
 				}
+				// params::display(key) prints this literal for an unknown kind.
+				switch x.Kind {
+				case ParamBool, ParamUInt, ParamDouble, ParamNumeral, ParamSymbol, ParamString:
+				default:
+					return c.appendString("internal")
+				}
 				return c.appendValue(x)
 			}
 			if d != nil {
@@ -1346,6 +1362,23 @@ func (c *ParamsContext) format(v *ParamsRef, key *usymbol.Symbol, module *string
 			}
 			if e := c.appendSymbol(x.key, false, false); e != nil {
 				return e
+			}
+			switch x.Kind {
+			case ParamBool, ParamUInt, ParamDouble, ParamNumeral, ParamSymbol, ParamString:
+			default:
+				line := int32(434)
+				if d != nil {
+					line = 469
+				}
+				if e := udiag.BorrowProcessDebugContext().UnreachableSource("src/util/params.cpp", line); e != nil {
+					return e
+				}
+				if d != nil {
+					if e := c.appendString(")\n"); e != nil {
+						return e
+					}
+				}
+				continue
 			}
 			if e := c.appendByte(' '); e != nil {
 				return e
