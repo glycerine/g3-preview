@@ -7,11 +7,28 @@ import (
 
 	"github.com/glycerine/g3/pkg/ast"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	uparams "github.com/glycerine/g3/pkg/util/params"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
 func TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames(t *testing.T) {
 	m := patternManager(t)
+	ctx, err := uparams.NewParamsContext(m.Symbols, m.NumeralService(), uparams.ParamsConfig{Budget: m.BudgetField})
+	patternMust(t, err)
+	catalog, err := uparams.NewGlobalParamsCatalog(m.Symbols, uparams.GlobalParamsCatalogConfig{Budget: m.BudgetField})
+	patternMust(t, err)
+	global, err := uparams.NewGlobalParamsService(m.Symbols, ctx, uparams.GlobalParamsConfig{Budget: m.BudgetField, Catalog: catalog})
+	patternMust(t, err)
+	patternMust(t, global.InitializeSource())
+	previous, err := uparams.BindProcessGlobalParamsService(global)
+	patternMust(t, err)
+	t.Cleanup(func() {
+		_, e := uparams.BindProcessGlobalParamsService(previous)
+		patternMust(t, e)
+		patternMust(t, global.Close())
+		patternMust(t, catalog.Close())
+		patternMust(t, ctx.Close())
+	})
 	b, err := m.MkBoolSort()
 	patternMust(t, err)
 	pin := func(h ast.ASTHandle) ast.ASTHandle {
@@ -58,9 +75,15 @@ func TestPatternPullBooleanApplicationsShiftBindersAndFreshenNames(t *testing.T)
 	ref, err := c.pullNoProof(and)
 	patternMust(t, err)
 	if trace.ShouldTrace("pull_quant") {
-		want := "-------- [pull_quant] pull_quant1_core src/ast/normal_forms/pull_quant.cpp:102 ---------\nResult num decls:2\n------------------------------------------------\n"
+		want := "-------- [pull_quant] pull_quant1_core src/ast/normal_forms/pull_quant.cpp:102 ---------\nResult num decls:2\n------------------------------------------------\n" +
+			"-------- [pull_quant] pull_quant1_core src/ast/normal_forms/pull_quant.cpp:131 ---------\n" +
+			"shifted  bound: 1 shift1: 0 shift2: 1\n(k!950 (:var 0))\n---->\n(k!950 (:var 0))\n------------------------------------------------\n" +
+			"-------- [pull_quant] pull_quant1_core src/ast/normal_forms/pull_quant.cpp:131 ---------\n" +
+			"shifted  bound: 1 shift1: 1 shift2: 1\n(k!951 (:var 0))\n---->\n(k!951 (:var 1))\n------------------------------------------------\n" +
+			"-------- [pull_quant] pull_quant1_core src/ast/normal_forms/pull_quant.cpp:109 ---------\n" +
+			"shifted by: 2\n(:var 0)\n---->\n(:var 2)\n------------------------------------------------\n"
 		if traceOutput.String() != want {
-			t.Fatal("source declaration-count TRACE record", traceOutput.String())
+			t.Fatal("source declaration and shifted-child TRACE records", traceOutput.String())
 		}
 	} else if traceOutput.Len() != 0 {
 		t.Fatal("erased TRACE record wrote output", traceOutput.String())

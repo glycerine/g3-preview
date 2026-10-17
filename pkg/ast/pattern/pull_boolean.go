@@ -314,6 +314,9 @@ func (p *patternQuantifierPull) pullBooleanApp(decl ast.ASTHandle, operator int3
 		if e != nil {
 			return out, false, e
 		}
+		if e = p.tracePulledChild(kind == ast.ASTQuantifier, child, shifted, adjusted[i], count, bound, shift1, shift2); e != nil {
+			return out, false, e
+		}
 	}
 	for i, j := 0, len(sorts)-1; i < j; i, j = i+1, j-1 {
 		sorts[i], sorts[j] = sorts[j], sorts[i]
