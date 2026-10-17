@@ -24,6 +24,14 @@ func (m *ASTManager) RewriteFPAToIEEEBVNumeral(h ASTHandle, highUnspecified bool
 	if p == nil || p.self != p || !p.published || p.sourceEnded || m.bitVectorPlugin == nil {
 		return ASTHandle{}, false, false, ErrASTHandle
 	}
+	// Source line 765 precedes construction of the scoped MPF. SMT2 printing
+	// acquires this manager's lock, so release it for that source trace body.
+	m.mu.Unlock()
+	traceErr := m.traceFPAToIEEEBVArgument(h)
+	m.mu.Lock()
+	if traceErr != nil {
+		return ASTHandle{}, false, false, traceErr
+	}
 	previous := m.formatExecuting
 	m.formatExecuting = true
 	defer func() { m.formatExecuting = previous }()
@@ -44,6 +52,9 @@ func (m *ASTManager) RewriteFPAToIEEEBVNumeral(h ASTHandle, highUnspecified bool
 	found, result = p.isNumeral(r, &v.value, &v.copy)
 	if result != nil || !found {
 		return ASTHandle{}, found, false, result
+	}
+	if result = m.traceFPAToIEEEBVNumeral(&v.value); result != nil {
+		return ASTHandle{}, true, false, result
 	}
 	nan, err := p.numeric.IsNaN(&v.value)
 	if err != nil {

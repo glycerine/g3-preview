@@ -26898,6 +26898,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_fpa_to_ieee_bv_trace.go",
         "pkg/ast/ast_fpa_to_fp_arithmetic_trace.go",
         "pkg/ast/ast_fpa_classification_read.go", "pkg/ast/ast_fpa_smt_equality.go", "pkg/ast/ast_fpa_nan_sort.go", "pkg/ast/ast_fpa_unary_numeral.go", "pkg/ast/rewriter/fpa_classification.go", "pkg/ast/rewriter/fpa_comparisons.go", "pkg/ast/rewriter/fpa_unary.go",
         "pkg/ast/ast_fpa_remainder.go",
@@ -26926,6 +26927,7 @@
         "pkg/ast/ast_fpa_to_fp_ieee_bv.go",
         "pkg/ast/rewriter/fpa_to_fp_ieee_bv_test.go"],
       "tests": [
+        "TestASTFPAToIEEEBVSourceTrace",
         "TestASTFPAToFPAdjacentSourceTraces",
         "TestASTFPAToFPArithmeticInputSourceTrace",
         "TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestASTFPAUnaryScopedNumeralRetiresBeforeReturn", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
@@ -27365,6 +27367,12 @@
             "TestASTFPAToIEEEBVDeclarationFiniteAndNaNBranches",
             "TestFPAToIEEEBVDefaultAndHardwareNaNDispatch"
           ]
+        },
+        {
+          "name": "mk_to_ieee_bv argument and recognized MPF numeral TRACE in source order (fpa_rewriter.cpp:765,769)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_ieee_bv_trace.go",
+          "tests": ["TestASTFPAToIEEEBVSourceTrace"]
         }
       ],
       "ownership": ["Each classification call creates one caller-local scoped_mpf through the AST plugin's concrete numeral probe; successful source destruction retires it before the Boolean result is published. A stopped source destructor remains in the AST plugin's owning cleanup list.", "SMT and IEEE equality construct both scoped_mpf locals before operand probing and retire them in reverse order, preserving the short circuit when the first operand is symbolic."],
@@ -183667,6 +183675,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_fpa_to_ieee_bv_trace.go",
         "pkg/ast/ast_fpa_to_fp_arithmetic_trace.go",
         "pkg/sat/tactic/sat_goal_to_sat_trace.go",
         "pkg/ast/ast_bv_recognizers_trace.go",
@@ -186150,6 +186159,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_fpa_to_ieee_bv_trace.go",
         "pkg/ast/ast_fpa_to_fp_arithmetic_trace.go",
         "pkg/sat/tactic/sat_goal_to_sat_trace.go",
         "pkg/ast/ast_bv_recognizers_trace.go",
