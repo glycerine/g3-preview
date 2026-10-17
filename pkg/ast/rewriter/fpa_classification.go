@@ -6,10 +6,11 @@ import "github.com/glycerine/g3/pkg/ast"
 // FPARewriter currently owns the retained classification dispatch. It borrows
 // the AST manager and its floating-point numeral service.
 type FPARewriter struct {
-	self    *FPARewriter
-	manager *ast.ASTManager
-	family  ast.FamilyID
-	closed  bool
+	self            *FPARewriter
+	manager         *ast.ASTManager
+	family          ast.FamilyID
+	hiFPUnspecified bool
+	closed          bool
 }
 
 func NewFPARewriter(m *ast.ASTManager) (*FPARewriter, error) {
@@ -30,6 +31,15 @@ func (r *FPARewriter) Close() error {
 		return ast.ErrASTHandle
 	}
 	r.closed = true
+	return nil
+}
+
+// SetHighFPUnspecified applies the source hi_fp_unspecified Boolean parameter.
+func (r *FPARewriter) SetHighFPUnspecified(enabled bool) error {
+	if r == nil || r.self != r || r.closed {
+		return ast.ErrASTHandle
+	}
+	r.hiFPUnspecified = enabled
 	return nil
 }
 
@@ -57,6 +67,20 @@ func (r *FPARewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out ast.
 			return RewriteFailed, err
 		}
 		return RewriteDone, r.manager.SetRef(out, value)
+	}
+	if kind == ast.FPAOpToReal {
+		if args.Count() != 1 {
+			return RewriteFailed, ast.ErrASTDomain
+		}
+		value, err := args.At(0)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		answer, found, err := r.manager.RewriteFPAToRealNumeral(value, r.hiFPUnspecified)
+		if err != nil || !found {
+			return RewriteFailed, err
+		}
+		return RewriteDone, r.manager.SetRef(out, answer)
 	}
 	if kind == ast.FPAOpNeg || kind == ast.FPAOpAbs {
 		if args.Count() != 1 {

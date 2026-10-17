@@ -17415,7 +17415,8 @@
         "pkg/ast/ast_fpa_rounding_read.go",
         "pkg/ast/ast_fpa_rm_unary_decl.go",
         "pkg/ast/ast_fpa_fma_decl.go",
-        "pkg/ast/ast_fpa_rm_binary_decl.go"
+        "pkg/ast/ast_fpa_rm_binary_decl.go",
+        "pkg/ast/ast_fpa_to_real_decl.go"
       ],
       "tests": [
         "TestASTFloatingPointClassificationDeclarationsAndApplications",
@@ -17446,7 +17447,8 @@
         "TestASTFPAExtremaDeclarationsAndNumericBranches",
         "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup",
         "TestASTFPAFMADeclarationNumericAndScopedBranches",
-        "TestASTFPARMBinaryDeclarationsAndNumericCleanup"
+        "TestASTFPARMBinaryDeclarationsAndNumericCleanup",
+        "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches"
       ],
       "assertions": [
         {
@@ -17647,6 +17649,14 @@
           "go_target": "pkg/ast/ast_fpa_rm_binary_decl.go",
           "tests": [
             "TestASTFPARMBinaryDeclarationsAndNumericCleanup"
+          ]
+        },
+        {
+          "name": "Concrete fp.to_real unary declaration validates FloatingPoint domain and returns borrowed Real sort (fpa_decl_plugin.cpp:650-659)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_real_decl.go",
+          "tests": [
+            "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches"
           ]
         }
       ],
@@ -26775,7 +26785,8 @@
         "pkg/ast/rewriter/fpa_fma.go",
         "pkg/ast/ast_fpa_rm_binary.go",
         "pkg/ast/rewriter/fpa_rm_binary.go",
-        "pkg/ast/rewriter/fpa_constants_test.go"],
+        "pkg/ast/rewriter/fpa_constants_test.go",
+        "pkg/ast/ast_fpa_to_real.go"],
       "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestASTFPAUnaryScopedNumeralRetiresBeforeReturn", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
         "TestASTFPARemainderFiniteNumeralAndScopedCleanup",
         "TestFPARemainderNumericSpecialAndSymbolicRefusal",
@@ -26787,7 +26798,9 @@
         "TestFPAFMANumericSpecialAndSymbolicDispatch",
         "TestASTFPARMBinaryDeclarationsAndNumericCleanup",
         "TestFPARMBinaryNumericAndSubtractionRewrite",
-        "TestFPAConstantRewriteReturnsApplication"],
+        "TestFPAConstantRewriteReturnsApplication",
+        "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches",
+        "TestFPAToRealDispatchDefaultAndHardwareUnspecified"],
       "assertions": [
         {
           "line": 43,
@@ -27091,6 +27104,15 @@
           "tests": [
             "TestFPAConstantRewriteReturnsApplication"
           ]
+        },
+        {
+          "name": "mk_to_real finite MPF-to-rational conversion, NaN/infinity default refusal and hi_fp_unspecified zero; one scoped_mpf and finite scoped rational cleanup (fpa_rewriter.cpp:23-36,794-813)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_real.go",
+          "tests": [
+            "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches",
+            "TestFPAToRealDispatchDefaultAndHardwareUnspecified"
+          ]
         }
       ],
       "ownership": ["Each classification call creates one caller-local scoped_mpf through the AST plugin's concrete numeral probe; successful source destruction retires it before the Boolean result is published. A stopped source destructor remains in the AST plugin's owning cleanup list.", "SMT and IEEE equality construct both scoped_mpf locals before operand probing and retire them in reverse order, preserving the short circuit when the first operand is symbolic."],
@@ -27113,7 +27135,8 @@
         "TestFPARMUnarySqrtAndIntegralDispatch",
         "TestFPAFMANumericSpecialAndSymbolicDispatch",
         "TestFPARMBinaryNumericAndSubtractionRewrite",
-        "TestFPAConstantRewriteReturnsApplication"],
+        "TestFPAConstantRewriteReturnsApplication",
+        "TestFPAToRealDispatchDefaultAndHardwareUnspecified"],
       "conditionals": [
         {
           "line": 19,
@@ -27173,6 +27196,14 @@
           "go_target": "pkg/ast/rewriter/fpa_classification.go",
           "tests": [
             "TestFPAConstantRewriteReturnsApplication"
+          ]
+        },
+        {
+          "name": "Concrete mk_to_real dispatch and hi_fp_unspecified Boolean control (fpa_rewriter.h:29-45; fpa_rewriter.cpp:94-95,794-813)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_classification.go",
+          "tests": [
+            "TestFPAToRealDispatchDefaultAndHardwareUnspecified"
           ]
         }],
       "ownership": [],
@@ -178543,7 +178574,8 @@
         "pkg/ast/ast_fpa_extrema.go",
         "pkg/ast/ast_fpa_rm_unary.go",
         "pkg/ast/ast_fpa_fma.go",
-        "pkg/ast/ast_fpa_rm_binary.go"
+        "pkg/ast/ast_fpa_rm_binary.go",
+        "pkg/ast/ast_fpa_to_real.go"
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
@@ -178642,7 +178674,8 @@
         "TestASTFPAExtremaDeclarationsAndNumericBranches",
         "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup",
         "TestASTFPAFMADeclarationNumericAndScopedBranches",
-        "TestASTFPARMBinaryDeclarationsAndNumericCleanup"
+        "TestASTFPARMBinaryDeclarationsAndNumericCleanup",
+        "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches"
       ],
       "conditionals": [
         {
@@ -179001,6 +179034,14 @@
           "go_target": "pkg/ast/ast_fpa_rm_binary.go",
           "tests": [
             "TestASTFPARMBinaryDeclarationsAndNumericCleanup"
+          ]
+        },
+        {
+          "name": "Concrete mk_to_real scoped_mpf and finite scoped rational lexical lifetimes with reverse cleanup (fpa_rewriter.cpp:794-813; scoped_numeral.h:24-55)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_real.go",
+          "tests": [
+            "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches"
           ]
         }
       ],
