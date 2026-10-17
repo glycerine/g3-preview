@@ -171974,6 +171974,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/util/params/util_params_copy_empty_source_test.go",
         "pkg/util/params/util_param_name.go",
         "pkg/util/params/util_param_descrs.go",
         "pkg/util/params/util_params_ref.go",
@@ -172023,6 +172024,7 @@
         "pkg/util/params/util_params_unreachable_debug_test.go"
       ],
       "tests": [
+        "TestParamsReferenceCopyEmptySourceDetachesSharedDestination",
         "TestParamNameNormalizationSourceBranches",
         "TestParamNameNormalizationByteDomain",
         "TestParamNameSymbolOwnershipAndSourceRoutes",
@@ -172163,6 +172165,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "params_ref::copy/append of owner-scoped null source: shared destination detaches before copy_core null return; refused entry copy retains published new block and old reference until exact owning cleanup; unique destination reuses its block",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": ["TestParamsReferenceCopyEmptySourceDetachesSharedDestination"]
+        },
         {
           "name": "SET_RAT_VALUE alloc(rational) on new and matched-scalar entries and params::del_value dealloc(rational) debug memory TRACE with stable typed Go entry ownership (params.cpp:757,996,1004)",
           "status": "platform_replacement",
@@ -172838,6 +172846,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/util/params/util_params_copy_empty_source_test.go",
         "pkg/util/params/util_param_name.go",
         "pkg/util/params/util_param_descrs.go",
         "pkg/util/params/util_params_ref.go",
@@ -172883,6 +172892,7 @@
         "pkg/util/params/util_params_rational_entry_memory_trace_debug_test.go"
       ],
       "tests": [
+        "TestParamsReferenceCopyEmptySourceDetachesSharedDestination",
         "TestParamNameNormalizationSourceBranches",
         "TestParamNameNormalizationByteDomain",
         "TestParamNameSymbolOwnershipAndSourceRoutes",
@@ -172983,6 +172993,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "params_ref::copy/append of owner-scoped null source: shared destination detaches before copy_core null return; refused entry copy retains published new block and old reference until exact owning cleanup; unique destination reuses its block",
+          "status": "ported",
+          "go_target": "pkg/util/params/util_params_ref.go",
+          "tests": ["TestParamsReferenceCopyEmptySourceDetachesSharedDestination"]
+        },
         {
           "name": "SET_RAT_VALUE alloc(rational) on new and matched-scalar entries and params::del_value dealloc(rational) debug memory TRACE with stable typed Go entry ownership (params.cpp:757,996,1004)",
           "status": "platform_replacement",
