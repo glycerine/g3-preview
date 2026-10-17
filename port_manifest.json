@@ -166725,6 +166725,7 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_parse.go",
           "tests": [
+            "TestIntegerStringSetDigitAssertionSourceStop",
             "TestSourceStringAssertions",
             "TestIntegerParserByteQuirks",
             "TestRationalParserByteQuirksAndState",
@@ -168881,6 +168882,7 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_parse.go",
           "tests": [
+            "TestIntegerStringSetDigitAssertionSourceStop",
             "TestSourceStringAssertions",
             "TestIntegerParserByteQuirks",
             "TestRationalParserByteQuirksAndState",

@@ -1,6 +1,8 @@
 // Source: src/util/mpz.cpp:283-303; src/util/mpz.h:692.
 package numeral
 
+import "github.com/glycerine/g3/pkg/util/diagnostic"
+
 // numeralByte gives the finite Go-string boundary the source C-string's NUL
 // semantics. Embedded NUL ends parsing; bytes past it are never consumed.
 func numeralByte(text string, i int) byte {
@@ -61,6 +63,18 @@ func (m *IntegerManager) setStringWithBeginCapture(out *Int, text string, frame 
 	for numeralByte(text, s.index) != 0 {
 		ch := numeralByte(text, s.index)
 		if ch >= '0' && ch <= '9' {
+			if modularSourceDebug {
+				d := diagnostic.BorrowProcessDebugContext()
+				enabled, e := diagnostic.SourceAssertionsEnabled(d)
+				if e != nil {
+					return e
+				}
+				if enabled && ch-'0' > 9 {
+					if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 294, "str[0] - '0' <= 9"); e != nil {
+						return e
+					}
+				}
+			}
 			s.stage = 1
 			if e := m.mulWithAllocationContext(out, &s.ten, &s.tmp, c); e != nil {
 				return e
