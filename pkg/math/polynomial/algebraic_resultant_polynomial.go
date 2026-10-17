@@ -7,6 +7,8 @@ import "errors"
 // Their actual owning references are embedded in the charged algebraic core.
 type algebraicResultantPolynomialScope struct {
 	refs              [4]PolynomialRef
+	variables         [2]polynomialVariableInvocationReceipt
+	arithmetic        polynomialArithmeticInvocationReceipt
 	toPolynomial      [2]polynomialToPolynomialInvocationReceipt
 	resultant         polynomialGCDInvocationReceipt
 	conversion        polynomialFactorNumeralVectorReceipt
@@ -79,21 +81,7 @@ func (m *AlgebraicRootCore) binaryResultPolynomial(a, b *Algebraic, out UPolynom
 	}
 	*s = algebraicResultantPolynomialScope{active: true, executing: true}
 	defer func() {
-		s.executing = false
-		if m.multivariate == nil || s.constructed == 0 {
-			s.active = false
-			return
-		}
-		s.executing = true
-		defer func() { s.executing = false }()
-		for s.constructed > 0 {
-			if e := s.refs[s.constructed-1].root.closeValue(m.multivariate.core, false); e != nil {
-				s.sourceStop = e
-				cause = errors.Join(cause, e)
-				return
-			}
-			s.constructed--
-		}
+		cause = errors.Join(cause, m.finishResultantPolynomial())
 		if cause == nil {
 			s.active = false
 		}
@@ -159,6 +147,31 @@ func (m *AlgebraicRootCore) binaryResultPolynomial(a, b *Algebraic, out UPolynom
 	return mm.toNumeralVectorIntoSource(s.refs[3].root.value, 0, false, p, &destination.state, &s.conversion)
 }
 
+// Finish source reference destructors without acknowledging stopped children.
+func (m *AlgebraicRootCore) finishResultantPolynomial() error {
+	s := &m.resultant
+	s.executing = false
+	if m.multivariate == nil || s.constructed == 0 {
+		s.active = false
+		return nil
+	}
+	s.executing = true
+	defer func() { s.executing = false }()
+	c := m.multivariate.core
+	if e := c.arithmeticInvocationSourceCause(&s.arithmetic); e != nil {
+		s.sourceStop = e
+		return e
+	}
+	for s.constructed > 0 {
+		if e := s.refs[s.constructed-1].root.closeValue(c, false); e != nil {
+			s.sourceStop = e
+			return e
+		}
+		s.constructed--
+	}
+	return nil
+}
+
 func (m *AlgebraicRootCore) cleanupResultantPolynomial() error {
 	s := &m.resultant
 	if s.executing {
@@ -170,6 +183,9 @@ func (m *AlgebraicRootCore) cleanupResultantPolynomial() error {
 	s.executing = true
 	defer func() { s.executing = false }()
 	mm := m.multivariate
+	if e := mm.core.cleanupArithmeticInvocation(&s.arithmetic, false); e != nil {
+		return e
+	}
 	if e := mm.cleanupFactorNumeralVector(&s.conversion, false); e != nil {
 		return e
 	}
@@ -199,6 +215,14 @@ func (m *AlgebraicRootCore) cleanupResultantPolynomial() error {
 		if e := mm.cleanupToPolynomialInvocation(&s.toPolynomial[i], true); e != nil {
 			return e
 		}
+	}
+	for i := len(s.variables) - 1; i >= 0; i-- {
+		if e := mm.core.cleanupVariableInvocation(&s.variables[i], true); e != nil {
+			return e
+		}
+	}
+	if e := mm.core.cleanupArithmeticInvocation(&s.arithmetic, true); e != nil {
+		return e
 	}
 	s.active = false
 	return nil
