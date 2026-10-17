@@ -35779,7 +35779,8 @@
             "TestEuclideanEquationConstructionSortAndOwnedRelease",
             "TestEuclideanEquationHeaderRefusalPrecedesBufferMutation",
             "TestEuclideanEquationUnsortedDecompositionBranch",
-            "TestEuclideanEquationFailedConstantCopyReleasesConstructedPrefix"
+            "TestEuclideanEquationFailedConstantCopyReleasesConstructedPrefix",
+            "TestEuclideanEquationFailedConstructionRetainsStoppedDestructor"
           ]
         },
         {

@@ -1,8 +1,12 @@
 package euclid
 
 import (
+	"errors"
+	"math"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -144,4 +148,73 @@ func TestEuclideanEquationFailedConstantCopyReleasesConstructedPrefix(t *testing
 	euclidMust(t, ib.Close())
 	euclidMust(t, rb.Close())
 	euclidMust(t, z.Del(&a))
+}
+
+func TestEuclideanEquationFailedConstructionRetainsStoppedDestructor(t *testing.T) {
+	budget := arena.NewBudget(1 << 26)
+	runtime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: budget, ThreadLocal: true, SizeTBits: 64})
+	euclidMust(t, e)
+	m, e := numeral.NewRationalManager(numeral.RationalConfig{Synchronized: true, Integers: numeral.IntegerConfig{
+		Memory: runtime, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true},
+		Cells: arena.Config{Budget: budget, PageSize: 1},
+		Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}},
+	}})
+	euclidMust(t, e)
+	z := m.Integers()
+	ib, e := numeral.NewScopedIntVector(z)
+	euclidMust(t, e)
+	rb, e := numeral.NewScopedRationalVector(m)
+	euclidMust(t, e)
+	euclidMust(t, ib.Resize(1))
+	var a numeral.Int
+	digits := make([]uint32, 70)
+	digits[0], digits[69] = 1, 1
+	euclidMust(t, z.SetLimbs(&a, digits))
+	bad := numeral.Int{Val: 1, Cell: z.FailedRef}
+	first, e := runtime.Allocate(8)
+	euclidMust(t, e)
+	second, e := runtime.Allocate(8)
+	euclidMust(t, e)
+	initialDelta := int64(-1000000)
+	if e = runtime.Reallocate(&first, uint64(16)+uint64(initialDelta)-8); !errors.Is(e, arena.ErrBounds) {
+		t.Fatal("establish first TLS synchronization", e)
+	}
+	euclidMust(t, runtime.Deallocate(&first))
+	state := runtime.State()
+	target := int64(math.MinInt64) + 1000 - state.GlobalSize + 16
+	if e = runtime.Reallocate(&second, uint64(target)+16-8); !errors.Is(e, arena.ErrBounds) {
+		t.Fatal("establish near-minimum global accounting", e)
+	}
+	euclidMust(t, runtime.Deallocate(&second))
+	lane, e := runtime.Allocate(8)
+	euclidMust(t, e)
+	delta := int64(-100001) - runtime.State().LocalSize
+	if e = runtime.Reallocate(&lane, uint64(16)+uint64(delta)-8); !errors.Is(e, arena.ErrBounds) {
+		t.Fatal("establish deallocation boundary", e)
+	}
+	eq, e := makeEquation(m, []numeral.Int{a}, []uint32{0}, &bad, nil, nil, ib, rb, true, nil)
+	if !errors.Is(e, arena.ErrBounds) || !errors.Is(e, arena.ErrInvalidSlot) || eq == nil || len(eq.as) != 1 || eq.closed {
+		t.Fatal("stopped cleanup must return the partial owner", eq, e)
+	}
+	if !numeral.ValidNumericRef(z.Cells, eq.as[0].Cell) {
+		t.Fatal("stopped destruction lost the coefficient owner")
+	}
+	recovery, e := runtime.Allocate(200000)
+	euclidMust(t, e)
+	euclidMust(t, eq.Close())
+	euclidMust(t, ib.Close())
+	euclidMust(t, rb.Close())
+	euclidMust(t, z.Del(&a))
+	euclidMust(t, runtime.Deallocate(&lane))
+	state = runtime.State()
+	delta = int64(-500000) - state.GlobalSize - state.LocalSize
+	if e = runtime.Reallocate(&recovery, uint64(200000)+uint64(delta)); e == nil {
+		t.Fatal("restore accounting range before teardown")
+	}
+	euclidMust(t, runtime.Deallocate(&recovery))
+	euclidMust(t, m.CloseChecked())
+	euclidMust(t, runtime.Close())
+	if budget.Used() != 0 {
+		t.Fatal("retained equation leaked allocation", budget.Used())
+	}
 }
