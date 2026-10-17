@@ -4315,7 +4315,7 @@
       "component": "api",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/api/api_numeral_string.go", "pkg/api/api_numeral_string_test.go", "pkg/ast/ast_fpa_api_numeral_text.go", "pkg/ast/ast_fpa_api_numeral_text_test.go", "pkg/ast/ast_bv_api_numeral_text.go"],
+      "go_targets": ["pkg/api/api_numeral_string.go", "pkg/api/api_numeral_string_test.go", "pkg/ast/ast_fpa_api_numeral_text.go", "pkg/ast/ast_fpa_api_numeral_text_test.go", "pkg/ast/ast_bv_api_numeral_text.go", "pkg/ast/ast_datalog_finite.go"],
       "tests": ["TestAPINumeralStringArithmeticFPAAndRefusal", "TestASTFPANumeralStringAPIScopedMPFAndBranches"],
       "assertions": [
         {
@@ -4327,10 +4327,10 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Selected Z3_get_numeral_string arithmetic and BitVec rational probes followed by FPA rounding-mode/MPF fallback with caller-local scoped_mpf and temporary formatted text (api_numeral.cpp:158-165,187-228); datalog and external C string integration remain open",
+          "name": "Selected Z3_get_numeral_string arithmetic, BitVec and finite-domain datalog rational probes followed by FPA rounding-mode/MPF fallback with caller-local scoped_mpf and temporary formatted text (api_numeral.cpp:158-175,187-228); external C string integration remains open",
           "status": "partial",
           "go_target": "pkg/api/api_numeral_string.go",
-          "go_targets": ["pkg/ast/ast_fpa_api_numeral_text.go", "pkg/ast/ast_bv_api_numeral_text.go"],
+          "go_targets": ["pkg/ast/ast_fpa_api_numeral_text.go", "pkg/ast/ast_bv_api_numeral_text.go", "pkg/ast/ast_datalog_finite.go"],
           "tests": ["TestAPINumeralStringArithmeticFPAAndRefusal", "TestASTFPANumeralStringAPIScopedMPFAndBranches"]
         }
       ],
@@ -13409,7 +13409,8 @@
         "pkg/ast/ast_bv_sign_bit_invocation_test.go",
         "pkg/ast/ast_bv_signed_normalization_invocation_test.go",
         "pkg/ast/ast_native_plugin_caches_test.go",
-        "pkg/ast/ast_bv_api_numeral_text.go"
+        "pkg/ast/ast_bv_api_numeral_text.go",
+        "pkg/api/api_numeral_string_test.go"
       ],
       "tests": [
         "TestASTBitVectorAllOneSourceTrace",
@@ -14420,14 +14421,17 @@
       "path": "src/ast/dl_decl_plugin.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
+      "status": "partial",
       "go_targets": [
         "pkg/ast/ast_auxiliary_plugins.go",
-        "pkg/ast/ast_auxiliary_plugins_source_test.go"
+        "pkg/ast/ast_auxiliary_plugins_source_test.go",
+        "pkg/ast/ast_datalog_finite.go",
+        "pkg/api/api_numeral_string_test.go"
       ],
       "tests": [
         "TestASTDatalogAndPseudoBooleanActualConstructorMembers",
-        "TestASTAuxiliaryPluginEveryConstructorPrefix"
+        "TestASTAuxiliaryPluginEveryConstructorPrefix",
+        "TestAPINumeralStringArithmeticFPAAndRefusal"
       ],
       "assertions": [
         {
@@ -14474,6 +14478,13 @@
             "TestASTDatalogAndPseudoBooleanActualConstructorMembers",
             "TestASTAuxiliaryPluginEveryConstructorPrefix"
           ]
+        },
+        {
+          "name": "Selected DL_FINITE_SORT and OP_DL_CONSTANT construction and uint64 numeral read for retained API consumer (dl_decl_plugin.cpp:98-114,453-469,655-690)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_datalog_finite.go",
+          "go_targets": ["pkg/api/api_numeral_string_test.go"],
+          "tests": ["TestAPINumeralStringArithmeticFPAAndRefusal"]
         }
       ],
       "ownership": [

@@ -217,6 +217,8 @@ func (m *ASTManager) mkFamilyAppDomainArguments(fid FamilyID, k int32, ps []ASTP
 		}
 	} else if m.pluginAt(fid).kind == astFormatPlugin {
 		decl, e = m.formatDecl(k, ps, domain)
+	} else if m.pluginAt(fid).kind == astDatalogPlugin {
+		decl, e = m.datalogDecl(k, ps, domain)
 	} else {
 		decl, e = m.builtinDecl(fid, k, ps, domain)
 	}
@@ -300,6 +302,8 @@ func (m *ASTManager) mkFamilyFuncDecl(fid FamilyID, k int32, ps []ASTParameter, 
 		}
 	} else if m.pluginAt(fid).kind == astFormatPlugin {
 		r, e = m.formatDecl(k, ps, domain)
+	} else if m.pluginAt(fid).kind == astDatalogPlugin {
+		r, e = m.datalogDecl(k, ps, domain)
 	} else {
 		r, e = m.builtinDecl(fid, k, ps, domain)
 	}
@@ -322,6 +326,10 @@ func (m *ASTManager) mkFamilySort(fid FamilyID, k int32, ps []ASTParameter) (AST
 	var e error
 	if m.pluginAt(fid).kind == astBitVectorPlugin {
 		r, e = m.bitVectorSort(ps)
+		return m.external(r), e
+	}
+	if m.pluginAt(fid).kind == astDatalogPlugin {
+		r, e = m.datalogSort(fid, k, ps)
 		return m.external(r), e
 	}
 	if m.pluginAt(fid).kind == astFormatPlugin {

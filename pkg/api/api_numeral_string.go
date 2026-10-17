@@ -9,7 +9,7 @@ import (
 
 var errAPINumeralArgument = errors.New("api: invalid numeral argument")
 
-// numeralString is the retained arithmetic, BitVec and FPA portion of
+// numeralString is the retained arithmetic, BitVec, datalog and FPA portion of
 // Z3_get_numeral_string. The Go string owns its bytes after the source's
 // scoped MPF and temporary formatting context have been released.
 func (c *apiContextResults) numeralString(h ast.ASTHandle) (string, error) {
@@ -21,6 +21,10 @@ func (c *apiContextResults) numeralString(h ast.ASTHandle) (string, error) {
 		return value, err
 	}
 	value, matched, err = c.manager.BitVectorNumeralText(h)
+	if err != nil || matched {
+		return value, err
+	}
+	value, matched, err = c.manager.DatalogNumeralText(h)
 	if err != nil || matched {
 		return value, err
 	}
