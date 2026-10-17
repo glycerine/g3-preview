@@ -209,6 +209,29 @@ func (m *NaturalManager) divideViewOne(a limbView, b uint32, q limbView) {
 // divideMany is source Knuth Algorithm D, including estimate correction,
 // single-limb multiplication, modular subtraction, and conditional add-back.
 func (m *NaturalManager) divideMany(size, n uint32, q limbView) error {
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return e
+		}
+		if enabled && n <= 1 {
+			if e = diagnostic.DebugAssertionFailure(d, "src/util/mpn.cpp", 311, "denom.size() > 1"); e != nil {
+				return e
+			}
+		}
+		enabled, e = diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return e
+		}
+		// Source m is size_t(numer.size() - denom.size()); both sides wrap at
+		// the same width, but the second SASSERT still reads the switch.
+		if enabled && size != size-n+n {
+			if e = diagnostic.DebugAssertionFailure(d, "src/util/mpn.cpp", 317, "numer.size() == m+n"); e != nil {
+				return e
+			}
+		}
+	}
 	if n > math.MaxUint32-2 {
 		return arena.ErrBounds
 	}
