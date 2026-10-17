@@ -297,8 +297,8 @@ func (m *RationalManager) SetFraction(a *Rational, n int64, d uint64) error {
 	if e := m.checkSetter(a); e != nil {
 		return e
 	}
-	if modularSourceDebug && d == 0 {
-		return ErrIntegerAssertion
+	if e := rationalFractionDenominatorAssertion(d != 0, 690); e != nil {
+		return e
 	}
 	if e := m.Z.SetInt64(&a.Num, n); e != nil {
 		return e
@@ -316,8 +316,8 @@ func (m *RationalManager) SetFractionSigned(a *Rational, n, d int32) error {
 	if e := m.checkSetter(a); e != nil {
 		return e
 	}
-	if modularSourceDebug && d == 0 {
-		return ErrIntegerAssertion
+	if e := rationalFractionDenominatorAssertion(d != 0, 679); e != nil {
+		return e
 	}
 	nn, dd := int64(n), int64(d)
 	if dd < 0 {

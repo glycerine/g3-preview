@@ -16,8 +16,8 @@ func (m *RationalManager) setFractionSignedSourceWithAllocationContext(a *Ration
 	if e := m.checkSetter(a); e != nil {
 		return e
 	}
-	if modularSourceDebug && d == 0 {
-		return ErrIntegerAssertion
+	if e := rationalFractionDenominatorAssertion(d != 0, 679); e != nil {
+		return e
 	}
 	if d < 0 {
 		if n == math.MinInt32 {

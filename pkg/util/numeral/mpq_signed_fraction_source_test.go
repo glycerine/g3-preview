@@ -61,12 +61,15 @@ func TestRationalSignedFractionSourceReachedUndefinedNegation(t *testing.T) {
 }
 
 func TestRationalSignedFractionSourceZeroDenominator(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TTT")
+	}
 	m, _, _ := mpfNumeralHelpersFixture(t)
 	for _, n := range []int32{0, 1, -1} {
 		a := Rational{Num: NewInt(7), Den: NewInt(9)}
 		e := m.rational.SetFractionSignedSource(&a, n, 0)
 		if modularSourceDebug {
-			if !errors.Is(e, ErrIntegerAssertion) || a.Num.Val != 7 || a.Den.Val != 9 {
+			if !isMPNVerificationThrow(e) || a.Num.Val != 7 || a.Den.Val != 9 {
 				t.Fatal("source denominator assertion", n, e, a)
 			}
 		} else if n == 0 {

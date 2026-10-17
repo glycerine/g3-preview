@@ -165125,8 +165125,16 @@
             "TestRationalSignedFractionSourceEveryColdGCDReservation",
             "TestRationalSignedFractionSourceWarmReinitialization",
             "TestRationalSignedFractionSourceNumeratorReleaseStopsPublication",
-            "TestRationalSignedFractionSourceDriverTst0"
+            "TestRationalSignedFractionSourceDriverTst0",
+            "TestRationalFractionSourceAssertionActions"
           ]
+        },
+        {
+          "name": "mpq.h:689-695 int64/uint64 fraction SET debug assertion before numerator publication",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpq.go",
+          "go_targets": ["pkg/util/numeral/mpq_fraction_assertion.go"],
+          "tests": ["TestRationalFractionSourceAssertionActions", "TestRationalCheckedInitializationAndZero"]
         },
         {
           "name": "identity-checked caller observation/cleanup of actual synchronized rational comparison RAW invocation used by concrete LP priority queues",

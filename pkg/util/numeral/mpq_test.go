@@ -145,10 +145,13 @@ func TestRationalCheckedInitializationAndZero(t *testing.T) {
 	if e := m.SetInt64(&raw, 1); e != nil || raw != (Rational{Num: NewInt(1), Den: NewInt(1)}) {
 		t.Fatal("explicit scalar initialization", raw, e)
 	}
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TT")
+	}
 	e := m.SetFraction(&valid, 1, 0)
 	qopsAuditLiveOwnership(t, m, []*Int{&raw.Num, &raw.Den, &valid.Num, &valid.Den})
 	if modularSourceDebug {
-		if !errors.Is(e, ErrIntegerAssertion) || valid != NewRational() {
+		if !isMPNVerificationThrow(e) || valid != NewRational() {
 			t.Fatal(valid, e)
 		}
 	} else if e != nil || valid.Num != NewInt(1) || valid.Den != NewInt(0) {
@@ -156,9 +159,6 @@ func TestRationalCheckedInitializationAndZero(t *testing.T) {
 	}
 	// Reset the finite invalid output explicitly before the independent zero inverse.
 	qopsMust(t, m.Reset(&valid))
-	if modularSourceDebug {
-		bindMPNDebugActions(t, "T")
-	}
 	e = m.Inv(&valid, &valid)
 	divPublicationAudit(t, m, &valid)
 	if modularSourceDebug {

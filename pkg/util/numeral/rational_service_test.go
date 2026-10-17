@@ -480,6 +480,9 @@ func TestRationalServiceForeignSmallValuesAndInvalidGuards(t *testing.T) {
 	if _, e := a.String(&foreign); !errors.Is(e, ErrRationalServiceOwner) {
 		t.Fatal(e)
 	}
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TT")
+	}
 	for _, signed := range []bool{true, false} {
 		var e error
 		if signed {
@@ -489,7 +492,7 @@ func TestRationalServiceForeignSmallValuesAndInvalidGuards(t *testing.T) {
 		}
 		serviceAuditRationalRoots(t, a, &local.Raw)
 		if modularSourceDebug {
-			if !errors.Is(e, ErrIntegerAssertion) || local.Raw != (Rational{Num: NewInt(17), Den: NewInt(1)}) {
+			if !isMPNVerificationThrow(e) || local.Raw != (Rational{Num: NewInt(17), Den: NewInt(1)}) {
 				t.Fatal("debug source zero DEN assertion", local, e)
 			}
 		} else {
