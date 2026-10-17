@@ -103,6 +103,9 @@ func TestGCDPublicationZeroBigCopyRefusal(t *testing.T) {
 	}
 }
 func TestGCDPublicationRationalIntegralityProfiles(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TTTTTTTT")
+	}
 	for _, sync := range []bool{false, true} {
 		for operation := 0; operation < 4; operation++ {
 			m, _ := rationalManager(t, sync)
@@ -129,7 +132,7 @@ func TestGCDPublicationRationalIntegralityProfiles(t *testing.T) {
 			}
 			qopsAuditLiveOwnership(t, m, []*Int{&r1.Num, &r1.Den, &r2.Num, &r2.Den, &a.Num, &a.Den, &b.Num, &b.Den, &g.Num, &g.Den})
 			if modularSourceDebug {
-				if !errors.Is(e, ErrRationalNotInteger) || a != beforeA || b != beforeB || g != beforeG {
+				if !isMPNVerificationThrow(e) || a != beforeA || b != beforeB || g != beforeG {
 					t.Fatal("source integrality assertion before actions", operation, e, a, b, g)
 				}
 			} else {
@@ -163,6 +166,9 @@ func TestGCDPublicationRationalIntegralityProfiles(t *testing.T) {
 	}
 }
 func TestGCDPublicationRationalArrayVisitedFraction(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TT")
+	}
 	for _, sync := range []bool{false, true} {
 		m, _ := rationalManager(t, sync)
 		as := []Rational{{Num: NewInt(6), Den: NewInt(1)}, {Num: NewInt(10), Den: NewInt(1)}, {Num: NewInt(3), Den: NewInt(5)}}
@@ -170,7 +176,7 @@ func TestGCDPublicationRationalArrayVisitedFraction(t *testing.T) {
 		e := m.GCDMany(as, &g)
 		qopsAuditLiveOwnership(t, m, []*Int{&as[0].Num, &as[0].Den, &as[1].Num, &as[1].Den, &as[2].Num, &as[2].Den, &g.Num, &g.Den})
 		if modularSourceDebug {
-			if !errors.Is(e, ErrRationalNotInteger) || g.Num != NewInt(2) || g.Den != NewInt(1) {
+			if !isMPNVerificationThrow(e) || g.Num != NewInt(2) || g.Den != NewInt(1) {
 				t.Fatal("actual visited assertion prefix", e, g)
 			}
 		} else {

@@ -164540,7 +164540,8 @@
             "TestNumberTheoryCanonicalSourceCoefficients",
             "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
             "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
-            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing",
+            "TestRationalNumberTheorySourceAssertionActions"
           ]
         },
         {
@@ -164556,7 +164557,8 @@
             "TestNumberTheoryCanonicalSourceCoefficients",
             "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
             "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
-            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing",
+            "TestRationalNumberTheorySourceAssertionActions"
           ]
         },
         {
@@ -164572,7 +164574,8 @@
             "TestNumberTheoryCanonicalSourceCoefficients",
             "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
             "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
-            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing",
+            "TestRationalNumberTheorySourceAssertionActions"
           ]
         },
         {
@@ -164588,7 +164591,8 @@
             "TestNumberTheoryCanonicalSourceCoefficients",
             "TestNumberTheoryFailurePrefixRootsBeforeFormatting",
             "TestNumberTheoryLargeCanonicalCoefficientsAndLCM",
-            "TestNumberTheoryRationalResetPrefixAndOutputAliasing"
+            "TestNumberTheoryRationalResetPrefixAndOutputAliasing",
+            "TestRationalNumberTheorySourceAssertionActions"
           ]
         },
         {

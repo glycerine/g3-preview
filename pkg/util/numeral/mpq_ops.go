@@ -324,18 +324,6 @@ const (
 	qIntegerRem
 )
 
-func (m *RationalManager) integerOperands(a, b *Rational) error {
-	if e := m.check(a); e != nil {
-		return e
-	}
-	if e := m.check(b); e != nil {
-		return e
-	}
-	if modularSourceDebug && (!isIntegerRational(a) || !isIntegerRational(b)) {
-		return ErrRationalNotInteger
-	}
-	return nil
-}
 func (m *RationalManager) integerOperandsAt(a, b *Rational, line int32) error {
 	if e := m.check(a); e != nil {
 		return e
@@ -352,7 +340,11 @@ func (m *RationalManager) integerOperandsAt(a, b *Rational, line int32) error {
 		return e
 	}
 	if enabled && (!isIntegerRational(a) || !isIntegerRational(b)) {
-		return diagnostic.DebugAssertionFailure(d, "src/util/mpq.h", line, "is_int(a) && is_int(b)")
+		expression := "is_int(a) && is_int(b)"
+		if line == 610 {
+			expression = "is_int(r1) && is_int(r2)"
+		}
+		return diagnostic.DebugAssertionFailure(d, "src/util/mpq.h", line, expression)
 	}
 	return nil
 }

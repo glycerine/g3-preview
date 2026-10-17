@@ -6,7 +6,7 @@ import (
 )
 
 func (m *RationalManager) GCD(a, b, out *Rational) error {
-	if e := m.integerOperands(a, b); e != nil {
+	if e := m.integerOperandsAt(a, b, 602); e != nil {
 		return e
 	}
 	if e := m.check(out); e != nil {
@@ -55,7 +55,7 @@ func (m *RationalManager) ExtendedGCD(r1, r2, a, b, g *Rational) error {
 	return m.extendedGCDWithAllocationContext(r1, r2, a, b, g, integerAllocationInvocationContext{})
 }
 func (m *RationalManager) extendedGCDWithAllocationContext(r1, r2, a, b, g *Rational, context integerAllocationInvocationContext) error {
-	if e := m.integerOperands(r1, r2); e != nil {
+	if e := m.integerOperandsAt(r1, r2, 610); e != nil {
 		return e
 	}
 	for _, q := range []*Rational{a, b, g} {
@@ -75,7 +75,7 @@ func (m *RationalManager) extendedGCDWithAllocationContext(r1, r2, a, b, g *Rati
 	return m.Z.extendedGCDWithAllocationContext(&r1.Num, &r2.Num, &a.Num, &b.Num, &g.Num, context)
 }
 func (m *RationalManager) LCM(a, b, out *Rational) error {
-	if e := m.integerOperands(a, b); e != nil {
+	if e := m.integerOperandsAt(a, b, 620); e != nil {
 		return e
 	}
 	if e := m.check(out); e != nil {
@@ -87,7 +87,7 @@ func (m *RationalManager) LCM(a, b, out *Rational) error {
 	return m.resetDenominator(out)
 }
 func (m *RationalManager) Divides(a, b *Rational) (bool, error) {
-	if e := m.integerOperands(a, b); e != nil {
+	if e := m.integerOperandsAt(a, b, 628); e != nil {
 		return false, e
 	}
 	return m.Z.Divides(&a.Num, &b.Num)

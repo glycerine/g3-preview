@@ -103,6 +103,9 @@ func TestNumberTheoryIntegerFiniteOraclesAndSignedLCM(t *testing.T) {
 	}
 }
 func TestNumberTheoryArraySourceOrderAndRationalSingleton(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TT")
+	}
 	m, _ := integerManager(t)
 	a := []Int{NewInt(6), NewInt(10), NewInt(9)}
 	var out Int
@@ -146,7 +149,7 @@ func TestNumberTheoryArraySourceOrderAndRationalSingleton(t *testing.T) {
 		e := q.GCDMany(as, &g)
 		qopsAuditLiveOwnership(t, q, []*Int{&as[0].Num, &as[0].Den, &as[1].Num, &as[1].Den, &as[2].Num, &as[2].Den, &g.Num, &g.Den})
 		if modularSourceDebug {
-			if !errors.Is(e, ErrRationalNotInteger) || rationalString(t, q, &g) != "2" {
+			if !isMPNVerificationThrow(e) || rationalString(t, q, &g) != "2" {
 				t.Fatal("source debug visited integrality prefix", e)
 			}
 		} else if e != nil || g.Num != NewInt(1) || g.Den != NewInt(1) {
