@@ -177429,6 +177429,15 @@
           "tests": []
         },
         {
+          "name": "Concrete realclosure rational value_ref_buffer tail shrink and zero-tail pop in signed remainder (realclosure.cpp:2669-2674,2881-2915)",
+          "status": "ported",
+          "go_target": "pkg/math/realclosure/sign_polynomial_div.go",
+          "tests": [
+            "TestRealClosureRationalSturmSequenceOwnsBorrowedCoefficients",
+            "TestRealClosureSturmSequenceRefusedDestructorRetainsRows"
+          ]
+        },
+        {
           "name": "ref_buffer managed construction/copy and sref_buffer unmanaged construction",
           "status": "partial",
           "go_target": "",
