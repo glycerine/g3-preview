@@ -25853,7 +25853,8 @@
         "TestASTBitVectorTrailingInvocationEveryActualReservation",
         "TestBVTrailingRemovalUnreadOperandsAndZeroInputGuard",
         "TestBVTrailingLifecycleAndCountSourceTrace",
-        "TestBVTrailingEqualityAndRemovalSourceTrace"
+        "TestBVTrailingEqualityAndRemovalSourceTrace",
+        "TestBVTrailingTraceRefusalDoesNotStopSourceOperations"
       ],
       "assertions": [
         {
@@ -25946,7 +25947,8 @@
           "go_target": "pkg/ast/rewriter/bv_trailing_trace.go",
           "tests": [
             "TestBVTrailingLifecycleAndCountSourceTrace",
-            "TestBVTrailingEqualityAndRemovalSourceTrace"
+            "TestBVTrailingEqualityAndRemovalSourceTrace",
+            "TestBVTrailingTraceRefusalDoesNotStopSourceOperations"
           ]
         },
         {

@@ -2,6 +2,7 @@ package rewriter
 
 import (
 	"bytes"
+	"errors"
 	"strings"
 	"testing"
 
@@ -63,6 +64,63 @@ func TestBVTrailingLifecycleAndCountSourceTrace(t *testing.T) {
 		"-------- [bv-trailing] reset_cache src/ast/rewriter/bv_trailing.cpp:372 ---------\nreset cache 5\n------------------------------------------------\n"
 	if got := output.String(); got != want {
 		t.Fatalf("lifecycle and count trace got %q, want %q", got, want)
+	}
+}
+
+// A source ostream refusal leaves badbit set, but construction, counting,
+// equality reduction, removal and owning cleanup still run to completion.
+func TestBVTrailingTraceRefusalDoesNotStopSourceOperations(t *testing.T) {
+	symbols, numerals, budget := astTestOwners(t)
+	w := &refusingCacheTraceWriter{err: errors.New("trace writer refused")}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	m, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: symbols, Numerals: numerals, Budget: budget, TraceTags: tags})
+	astTestMust(t, err)
+	t.Cleanup(func() { astTestMust(t, m.Close()) })
+	bindBVTraceGlobals(t, m)
+	_, err = m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	_, err = m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	sort, err := m.BitVectorSort(8)
+	astTestMust(t, err)
+	x, err := m.MkVar(0, sort)
+	astTestMust(t, err)
+	astTestPin(t, m, x)
+	zero, err := m.BitVectorNumeralUnsigned(0, 8)
+	astTestMust(t, err)
+	astTestPin(t, m, zero)
+	extract, err := NewMkExtractProc(m)
+	astTestMust(t, err)
+	defer func() { astTestMust(t, extract.Close()) }()
+	tags.Enable("bv-trailing")
+	p, err := NewBVTrailing(extract)
+	astTestMust(t, err)
+	for i := 0; i < 2; i++ {
+		min, max, e := p.Count(x)
+		astTestMust(t, e)
+		if min != 0 || max != 8 {
+			t.Fatal("trace refusal changed count", min, max)
+		}
+	}
+	out := astTestPin(t, m, x)
+	status, err := p.EqRemoveTrailing(x, x, out)
+	astTestMust(t, err)
+	if status != RewriteFailed {
+		t.Fatal("trace refusal changed equality status", status)
+	}
+	removed, err := p.Remove(zero, 8, out)
+	astTestMust(t, err)
+	result, err := m.RefGet(out)
+	astTestMust(t, err)
+	if removed != 8 || !result.IsNull() {
+		t.Fatal("trace refusal changed removal", removed, result)
+	}
+	astTestMust(t, p.Close())
+	if tags.ShouldTrace("bv-trailing") && w.calls != 1 {
+		t.Fatal("failed stream was retried", w.calls)
+	}
+	if !tags.ShouldTrace("bv-trailing") && w.calls != 0 {
+		t.Fatal("erased trace reached writer", w.calls)
 	}
 }
 
