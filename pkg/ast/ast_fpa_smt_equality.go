@@ -6,6 +6,16 @@ package ast
 // numeral operands. It constructs both scoped_mpf locals before probing either
 // operand, then destroys them in reverse construction order.
 func (m *ASTManager) EqualFPANumerals(left, right ASTHandle) (found, equal bool, result error) {
+	return m.equalFPANumerals(left, right, false)
+}
+
+// EqualFPAIEEENumerals is the distinct fp.eq path: NaNs compare unequal and
+// opposite signed zeros compare equal, as in mpf_manager::eq.
+func (m *ASTManager) EqualFPAIEEENumerals(left, right ASTHandle) (found, equal bool, result error) {
+	return m.equalFPANumerals(left, right, true)
+}
+
+func (m *ASTManager) equalFPANumerals(left, right ASTHandle, ieee bool) (found, equal bool, result error) {
 	if err := m.lock(); err != nil {
 		return false, false, err
 	}
@@ -39,6 +49,10 @@ func (m *ASTManager) EqualFPANumerals(left, right ASTHandle) (found, equal bool,
 	found, result = p.isNumeral(b, &v2.value, &v2.copy)
 	if result != nil || !found {
 		return found, false, result
+	}
+	if ieee {
+		equal, result = p.numeric.Eq(&v1.value, &v2.value)
+		return true, equal, result
 	}
 	firstNaN, err := p.numeric.IsNaN(&v1.value)
 	if err != nil {

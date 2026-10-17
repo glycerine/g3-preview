@@ -17396,6 +17396,7 @@
       "go_targets": [
         "pkg/ast/ast_fpa_plugin.go",
         "pkg/ast/ast_fpa_classification_decl.go",
+        "pkg/ast/ast_fpa_equality_decl.go",
         "pkg/ast/ast_fpa_plugin_source_test.go",
         "pkg/ast/ast_fpa_numeral.go",
         "pkg/ast/ast_fpa_numeral_source_test.go",
@@ -17410,6 +17411,7 @@
       ],
       "tests": [
         "TestASTFloatingPointClassificationDeclarationsAndApplications",
+        "TestASTFPAIEEEEqualityDeclarationAndDomainValidation",
         "TestASTFloatingPointActualConstructorRegistrationAndSorts",
         "TestASTFloatingPointEveryActualConstructorAndPublicationPrefix",
         "TestASTFloatingPointSourceFinalizeAndOwnContextEndPreserveBorrowedNumerals",
@@ -17502,6 +17504,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_classification_decl.go",
           "tests": ["TestASTFloatingPointClassificationDeclarationsAndApplications"]
+        },
+        {
+          "name": "FPA fp.eq binary relation declaration: equal floating-point domains, chainable Boolean result, source kind and application dispatch (fpa_decl_plugin.cpp:292-311,724-730)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_equality_decl.go",
+          "tests": ["TestASTFPAIEEEEqualityDeclarationAndDomainValidation", "TestFPAIEEEEqualityDiffersFromSMTEquality"]
         },
         {
           "name": "ast_fpa_plugin concrete reached source counterpart (fpa_decl_plugin.cpp:23-49,182-231)",
@@ -26687,7 +26695,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/ast/ast_fpa_classification_read.go", "pkg/ast/ast_fpa_smt_equality.go", "pkg/ast/rewriter/fpa_classification.go"],
-      "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal"],
+      "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality"],
       "assertions": [
         {
           "line": 43,
@@ -26920,10 +26928,16 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_smt_equality.go",
           "tests": ["TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal"]
+        },
+        {
+          "name": "mk_float_eq and mk_app_core OP_FPA_EQ numeral reduction using mpf_manager::eq (fpa_rewriter.cpp:41-80,462-476)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_classification.go",
+          "tests": ["TestFPAIEEEEqualityDiffersFromSMTEquality"]
         }
       ],
-      "ownership": ["Each classification call creates one caller-local scoped_mpf through the AST plugin's concrete numeral probe; successful source destruction retires it before the Boolean result is published. A stopped source destructor remains in the AST plugin's owning cleanup list.", "SMT equality constructs both scoped_mpf locals before operand probing and retires them in reverse order, preserving the short circuit when the first operand is symbolic."],
-      "deviations": ["The partial Go FPA rewriter handles classification and SMT numeral equality; arithmetic, conversion, floating-point equality and remaining source cases are unported."]
+      "ownership": ["Each classification call creates one caller-local scoped_mpf through the AST plugin's concrete numeral probe; successful source destruction retires it before the Boolean result is published. A stopped source destructor remains in the AST plugin's owning cleanup list.", "SMT and IEEE equality construct both scoped_mpf locals before operand probing and retire them in reverse order, preserving the short circuit when the first operand is symbolic."],
+      "deviations": ["The partial Go FPA rewriter handles classification and both numeral equality modes; arithmetic, conversion, nonnumeric equality and remaining source cases are unported."]
     },
     {
       "path": "src/ast/rewriter/fpa_rewriter.h",
@@ -26931,7 +26945,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/ast/rewriter/fpa_classification.go"],
-      "tests": ["TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal"],
+      "tests": ["TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality"],
       "conditionals": [
         {
           "line": 19,
@@ -178634,6 +178648,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_smt_equality.go",
           "tests": ["TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal"]
+        },
+        {
+          "name": "Concrete fpa_rewriter mk_float_eq two scoped_mpf locals and reverse destruction with IEEE mpf_manager::eq (fpa_rewriter.cpp:462-476)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_smt_equality.go",
+          "tests": ["TestFPAIEEEEqualityDiffersFromSMTEquality"]
         },
         {
           "name": "Concrete context_mpq_wrapper scoped_mpq constant lifetime and destructor before context base (src/math/subpaving/subpaving.cpp:59-81; src/util/scoped_numeral.h:24-55)",

@@ -25,6 +25,7 @@ const (
 	astFPANaN              int32 = 8
 	astFPAPlusZero         int32 = 9
 	astFPAMinusZero        int32 = 10
+	astFPAEq               int32 = 23
 	astFPAIsNaN            int32 = 28
 	astFPAIsInf            int32 = 29
 	astFPAIsZero           int32 = 30

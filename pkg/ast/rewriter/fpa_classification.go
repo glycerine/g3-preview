@@ -48,6 +48,20 @@ func (r *FPARewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out ast.
 	if err != nil {
 		return RewriteFailed, err
 	}
+	if kind == ast.FPAOpEq {
+		if args.Count() != 2 {
+			return RewriteFailed, ast.ErrASTDomain
+		}
+		left, err := args.At(0)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		right, err := args.At(1)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		return r.MkFloatEq(left, right, out)
+	}
 	if kind < int32(ast.FPAIsNaN) || kind > int32(ast.FPAIsPositive) {
 		return RewriteFailed, nil
 	}
@@ -81,6 +95,27 @@ func (r *FPARewriter) MkEqCore(left, right ast.ASTHandle, out ast.ASTRef) (Rewri
 		return RewriteFailed, ast.ErrASTHandle
 	}
 	found, equal, err := r.manager.EqualFPANumerals(left, right)
+	if err != nil || !found {
+		return RewriteFailed, err
+	}
+	var answer ast.ASTHandle
+	if equal {
+		answer, err = r.manager.MkTrue()
+	} else {
+		answer, err = r.manager.MkFalse()
+	}
+	if err != nil {
+		return RewriteFailed, err
+	}
+	return RewriteDone, r.manager.SetRef(out, answer)
+}
+
+// MkFloatEq is the source fp.eq reducer, distinct from SMT equality.
+func (r *FPARewriter) MkFloatEq(left, right ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	if r == nil || r.self != r || r.closed {
+		return RewriteFailed, ast.ErrASTHandle
+	}
+	found, equal, err := r.manager.EqualFPAIEEENumerals(left, right)
 	if err != nil || !found {
 		return RewriteFailed, err
 	}
