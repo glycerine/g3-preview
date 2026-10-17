@@ -7,6 +7,7 @@ import (
 )
 
 type algebraicPredicateScope struct {
+	trace                                                                                      algebraicPredicateTraceInvocation
 	setter                                                                                     algebraicIntegerSetInvocation
 	integerComparison                                                                          unumeral.IntegerCopyAllocationReceipt
 	integerEvaluation                                                                          upolyIntegerEvaluationInvocationReceipt
@@ -181,7 +182,7 @@ func (m *AlgebraicRootCore) finishPredicate(cause error) error {
 	if !p.active {
 		return cause
 	}
-	if p.finishing || p.arithmeticExecuting || m.predicateQ.executing {
+	if p.finishing || p.arithmeticExecuting || m.predicateQ.executing || m.predicateDiagnosticRunning {
 		return errors.Join(cause, ErrAlgebraicPending)
 	}
 	p.finishing = true
@@ -234,7 +235,7 @@ func (m *AlgebraicRootCore) finishPredicate(cause error) error {
 		return cause
 	}
 	z := m.config.Rationals.Integers()
-	if m.integerSetterPending(&p.setter) || m.predicateQ.active || p.integerEvaluationPending(m) || z.MatchesCopyAllocationInvocation(&p.integerComparison) || unumeral.NumericAllocationPending(&p.numericRoots) || z.MatchesCopyAllocationInvocation(&p.savedCopy) || z.MatchesCopyAllocationInvocation(&p.leadingCopy) || z.MatchesCopyAllocationInvocation(&p.candidateCopy) {
+	if m.predicateTracePending(&p.trace) || m.integerSetterPending(&p.setter) || m.predicateQ.active || p.integerEvaluationPending(m) || z.MatchesCopyAllocationInvocation(&p.integerComparison) || unumeral.NumericAllocationPending(&p.numericRoots) || z.MatchesCopyAllocationInvocation(&p.savedCopy) || z.MatchesCopyAllocationInvocation(&p.leadingCopy) || z.MatchesCopyAllocationInvocation(&p.candidateCopy) {
 		return cause
 	}
 	m.predicate = algebraicPredicateScope{}
@@ -325,6 +326,12 @@ func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 	if r.flags&4 != 0 {
 		return false, nil
 	}
+	if m.predicate.active {
+		return false, ErrAlgebraicPending
+	}
+	if err = m.traceRationalPredicate(a, 0, 0); err != nil {
+		return false, err
+	}
 	if err = m.beginPredicate(); err != nil {
 		return false, err
 	}
@@ -356,6 +363,9 @@ func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 		return false, err
 	}
 	k++
+	if err = m.traceRationalPredicate(a, 1, k); err != nil {
+		return false, err
+	}
 	ok, err := m.refineAtWithReceipt(a, k, true, &p.refinement)
 	if err != nil {
 		p.childStop = m.refinementSourceStop(&p.refinement)
@@ -368,6 +378,9 @@ func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 			return false, err
 		}
 		return true, nil
+	}
+	if err = m.traceRationalPredicate(a, 2, k); err != nil {
+		return false, err
 	}
 	l, err = m.location(a)
 	if err != nil {

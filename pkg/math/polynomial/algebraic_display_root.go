@@ -81,6 +81,10 @@ func (m *AlgebraicRootCore) displayRootInto(out unumeral.RationalSourceStream, a
 	if e != nil {
 		return e
 	}
+	return m.displayRootAtLocation(out, l, smt)
+}
+func (m *AlgebraicRootCore) displayRootAtLocation(out unumeral.RationalSourceStream, l *algebraicLocation, smt bool) (cause error) {
+	var e error
 	if m.rootDisplay.active {
 		return ErrAlgebraicPending
 	}

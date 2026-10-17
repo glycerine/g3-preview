@@ -59,6 +59,7 @@ type AlgebraicRootCore struct {
 	representationCopy                                         unumeral.IntegerCopyAllocationReceipt
 	comparisonTraceRunning                                     bool
 	predicateDiagnosticRunning                                 bool
+	predicateTrace                                             algebraicPredicateTraceScope
 	rationalCopy                                               unumeral.IntegerCopyAllocationReceipt
 	manager                                                    *AlgebraicManager
 	coefficientCopy                                            unumeral.IntegerCopyAllocationReceipt
@@ -1023,6 +1024,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 		return e
 	}
 	if e := m.cleanupConstQ(); e != nil {
+		return e
+	}
+	if e := m.cleanupPredicateTrace(); e != nil {
 		return e
 	}
 	if e := m.config.Rationals.Integers().CleanupCopyAllocationInvocation(&m.coefficientCopy); e != nil {

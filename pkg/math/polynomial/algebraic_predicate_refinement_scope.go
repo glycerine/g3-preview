@@ -40,7 +40,7 @@ func (m *AlgebraicRootCore) cleanupPredicate() error {
 	if !p.active {
 		return nil
 	}
-	if p.finishing || p.arithmeticExecuting || m.predicateQ.active || m.integerSetterPending(&p.setter) {
+	if p.finishing || p.arithmeticExecuting || m.predicateDiagnosticRunning || m.predicateTracePending(&p.trace) || m.predicateQ.active || m.integerSetterPending(&p.setter) {
 		return ErrAlgebraicPending
 	}
 	if m.matchesRefinement(&p.refinement) && (m.refinement.pending(m) || m.refinementConversion.pending(m) || m.refinementQ.active) {

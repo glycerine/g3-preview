@@ -38347,7 +38347,9 @@
         "pkg/math/polynomial/algebraic_const_rational_scope.go",
         "pkg/math/polynomial/algebraic_const_rational_scope_test.go",
         "pkg/math/polynomial/algebraic_predicate_assertions.go",
-        "pkg/math/polynomial/algebraic_predicate_assertions_test.go"
+        "pkg/math/polynomial/algebraic_predicate_assertions_test.go",
+        "pkg/math/polynomial/algebraic_predicate_trace.go",
+        "pkg/math/polynomial/algebraic_predicate_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",
@@ -157723,7 +157725,8 @@
         "pkg/util/numeral/mpbq_debug_trace.go",
         "pkg/math/polynomial/algebraic_predicate_arithmetic_test.go",
         "pkg/math/polynomial/algebraic_predicate_comparison_test.go",
-        "pkg/math/polynomial/algebraic_predicate_integer_test.go"
+        "pkg/math/polynomial/algebraic_predicate_integer_test.go",
+        "pkg/math/polynomial/algebraic_predicate_trace_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -167728,7 +167731,8 @@
         "pkg/util/text/owned_string_stream_test.go",
         "pkg/util/numeral/mp_display_stream.go",
         "pkg/util/numeral/mp_display_stream_test.go",
-        "pkg/math/polynomial/algebraic_predicate_comparison_test.go"
+        "pkg/math/polynomial/algebraic_predicate_comparison_test.go",
+        "pkg/math/polynomial/algebraic_predicate_trace_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
