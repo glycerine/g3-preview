@@ -10,8 +10,8 @@ func (m *ArbitraryFloatManager) Div(mode ArbitraryFloatRoundingMode, x, y, out *
 	if m.div.active {
 		return ErrNumericPending
 	}
-	if modularSourceDebug && (x.SBits() != y.SBits() || x.EBits() != y.EBits()) {
-		return ErrIntegerAssertion
+	if e := mpfSourceAssertion(x.SBits() == y.SBits() && x.EBits() == y.EBits(), 668, "x.sbits == y.sbits && x.ebits == y.ebits"); e != nil {
+		return e
 	}
 	if e := m.traceFloatDebugValueChecked("div", "X = ", x, 670); e != nil {
 		return e
