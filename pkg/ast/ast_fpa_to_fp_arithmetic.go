@@ -99,6 +99,9 @@ func (m *ASTManager) RewriteFPAToFPArithmeticNumeral(decl, rm, value ASTHandle) 
 	if result != nil || !found {
 		return ASTHandle{}, found, result
 	}
+	if result = m.traceFPAToFPArithmeticInput(&r); result != nil {
+		return ASTHandle{}, true, result
+	}
 	qm, err := p.numeric.BorrowRationalManager()
 	if err != nil {
 		return ASTHandle{}, true, err

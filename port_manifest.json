@@ -26897,7 +26897,9 @@
       "component": "ast",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/ast/ast_fpa_classification_read.go", "pkg/ast/ast_fpa_smt_equality.go", "pkg/ast/ast_fpa_nan_sort.go", "pkg/ast/ast_fpa_unary_numeral.go", "pkg/ast/rewriter/fpa_classification.go", "pkg/ast/rewriter/fpa_comparisons.go", "pkg/ast/rewriter/fpa_unary.go",
+      "go_targets": [
+        "pkg/ast/ast_fpa_to_fp_arithmetic_trace.go",
+        "pkg/ast/ast_fpa_classification_read.go", "pkg/ast/ast_fpa_smt_equality.go", "pkg/ast/ast_fpa_nan_sort.go", "pkg/ast/ast_fpa_unary_numeral.go", "pkg/ast/rewriter/fpa_classification.go", "pkg/ast/rewriter/fpa_comparisons.go", "pkg/ast/rewriter/fpa_unary.go",
         "pkg/ast/ast_fpa_remainder.go",
         "pkg/ast/rewriter/fpa_remainder.go",
         "pkg/ast/ast_fpa_extrema.go",
@@ -26923,7 +26925,9 @@
         "pkg/ast/rewriter/fpa_to_fp_arithmetic_test.go",
         "pkg/ast/ast_fpa_to_fp_ieee_bv.go",
         "pkg/ast/rewriter/fpa_to_fp_ieee_bv_test.go"],
-      "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestASTFPAUnaryScopedNumeralRetiresBeforeReturn", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
+      "tests": [
+        "TestASTFPAToFPArithmeticInputSourceTrace",
+        "TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestASTFPAUnaryScopedNumeralRetiresBeforeReturn", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
         "TestASTFPARemainderFiniteNumeralAndScopedCleanup",
         "TestFPARemainderNumericSpecialAndSymbolicRefusal",
         "TestASTFPAExtremaDeclarationsAndNumericBranches",
@@ -27172,6 +27176,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained FPA mk_to_fp arithmetic-rational input TRACE before MPF conversion (fpa_rewriter.cpp:159)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_arithmetic_trace.go",
+          "tests": [
+            "TestASTFPAToFPArithmeticInputSourceTrace"
+          ]
+        },
         {
           "name": "mk_app_core seven unary classification cases and mk_is_zero/is_nan/is_inf/is_normal/is_subnormal/is_negative/is_positive concrete numeral reductions (fpa_rewriter.cpp:41-88,547-638)",
           "status": "ported",
@@ -183646,6 +183658,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_fpa_to_fp_arithmetic_trace.go",
         "pkg/sat/tactic/sat_goal_to_sat_trace.go",
         "pkg/ast/ast_bv_recognizers_trace.go",
         "pkg/tactic/ufbv/rewrite_tactic_trace.go",
@@ -183747,6 +183760,7 @@
         "pkg/ast/rewriter/var_substitution_trace.go"
       ],
       "tests": [
+        "TestASTFPAToFPArithmeticInputSourceTrace",
         "TestSATGoalDependencyFormulaSourceTrace",
         "TestSATGoalTranslatorResultStackSourceTrace",
         "TestASTBitVectorAllOneSourceTrace",
@@ -183885,6 +183899,14 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained FPA mk_to_fp arithmetic-rational input TRACE before MPF conversion (fpa_rewriter.cpp:159)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_arithmetic_trace.go",
+          "tests": [
+            "TestASTFPAToFPArithmeticInputSourceTrace"
+          ]
+        },
         {
           "name": "Selected live var_subst::operator() post-rewrite TRACE at var_subst.cpp:35 with Boolean binding/result SMT2",
           "status": "partial",
@@ -186110,6 +186132,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_fpa_to_fp_arithmetic_trace.go",
         "pkg/sat/tactic/sat_goal_to_sat_trace.go",
         "pkg/ast/ast_bv_recognizers_trace.go",
         "pkg/tactic/ufbv/rewrite_tactic_trace.go",
@@ -186209,6 +186232,7 @@
         "pkg/ast/rewriter/var_substitution_trace.go"
       ],
       "tests": [
+        "TestASTFPAToFPArithmeticInputSourceTrace",
         "TestSATGoalDependencyFormulaSourceTrace",
         "TestSATGoalTranslatorResultStackSourceTrace",
         "TestASTBitVectorAllOneSourceTrace",
@@ -186357,6 +186381,14 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained FPA mk_to_fp arithmetic-rational input TRACE before MPF conversion (fpa_rewriter.cpp:159)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_arithmetic_trace.go",
+          "tests": [
+            "TestASTFPAToFPArithmeticInputSourceTrace"
+          ]
+        },
         {
           "name": "Selected live var_subst::operator() post-rewrite TRACE at var_subst.cpp:35 with Boolean binding/result SMT2",
           "status": "partial",
