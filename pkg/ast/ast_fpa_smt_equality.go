@@ -2,20 +2,34 @@
 // src/util/scoped_numeral.h:24-33.
 package ast
 
+const (
+	fpaSMTEqMode  int32 = 0
+	fpaIEEEEqMode int32 = 1
+)
+
 // EqualFPANumerals evaluates the retained SMT equality branch over two
 // numeral operands. It constructs both scoped_mpf locals before probing either
 // operand, then destroys them in reverse construction order.
 func (m *ASTManager) EqualFPANumerals(left, right ASTHandle) (found, equal bool, result error) {
-	return m.equalFPANumerals(left, right, false)
+	return m.compareFPANumerals(left, right, fpaSMTEqMode)
 }
 
 // EqualFPAIEEENumerals is the distinct fp.eq path: NaNs compare unequal and
 // opposite signed zeros compare equal, as in mpf_manager::eq.
 func (m *ASTManager) EqualFPAIEEENumerals(left, right ASTHandle) (found, equal bool, result error) {
-	return m.equalFPANumerals(left, right, true)
+	return m.compareFPANumerals(left, right, fpaIEEEEqMode)
 }
 
-func (m *ASTManager) equalFPANumerals(left, right ASTHandle, ieee bool) (found, equal bool, result error) {
+// CompareFPANumerals is the reached numeric branch of fp.lt and fp.leq.
+// The source handles NaN/infinity special rewrites before calling this branch.
+func (m *ASTManager) CompareFPANumerals(left, right ASTHandle, kind int32) (found, comparison bool, result error) {
+	if kind != FPAOpLt && kind != FPAOpLe {
+		return false, false, ErrASTDomain
+	}
+	return m.compareFPANumerals(left, right, kind)
+}
+
+func (m *ASTManager) compareFPANumerals(left, right ASTHandle, mode int32) (found, equal bool, result error) {
 	if err := m.lock(); err != nil {
 		return false, false, err
 	}
@@ -50,7 +64,14 @@ func (m *ASTManager) equalFPANumerals(left, right ASTHandle, ieee bool) (found, 
 	if result != nil || !found {
 		return found, false, result
 	}
-	if ieee {
+	switch mode {
+	case FPAOpLt:
+		equal, result = p.numeric.Lt(&v1.value, &v2.value)
+		return true, equal, result
+	case FPAOpLe:
+		equal, result = p.numeric.Lte(&v1.value, &v2.value)
+		return true, equal, result
+	case fpaIEEEEqMode:
 		equal, result = p.numeric.Eq(&v1.value, &v2.value)
 		return true, equal, result
 	}

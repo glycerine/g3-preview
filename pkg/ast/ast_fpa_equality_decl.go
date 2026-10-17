@@ -4,11 +4,15 @@ package ast
 import "github.com/glycerine/g3/pkg/util/z3exception"
 
 const FPAOpEq int32 = astFPAEq
+const FPAOpLt int32 = astFPALt
+const FPAOpGt int32 = astFPAGt
+const FPAOpLe int32 = astFPALe
+const FPAOpGe int32 = astFPAGe
 
 // The source binary-relation constructor accepts arity >= 2, checks only the
 // first two equal FloatingPoint domains, and creates a two-argument chainable
 // declaration. Parameters and the requested range are ignored.
-func (m *ASTManager) floatingPointEqualityDecl(domain []ASTHandle) (astNodeRef, error) {
+func (m *ASTManager) floatingPointBinaryRelationDecl(kind int32, domain []ASTHandle) (astNodeRef, error) {
 	if len(domain) < 2 {
 		return astNodeRef{}, ASTException{z3exception.NewDefaultException("invalid number of arguments to floating point relation")}
 	}
@@ -32,9 +36,24 @@ func (m *ASTManager) floatingPointEqualityDecl(domain []ASTHandle) (astNodeRef, 
 	if !valid {
 		return astNodeRef{}, ASTException{z3exception.NewDefaultException("sort mismatch, expected equal FloatingPoint sorts as arguments")}
 	}
-	name, err := m.Symbols.Intern("fp.eq")
+	var text string
+	switch kind {
+	case astFPAEq:
+		text = "fp.eq"
+	case astFPALt:
+		text = "fp.lt"
+	case astFPAGt:
+		text = "fp.gt"
+	case astFPALe:
+		text = "fp.leq"
+	case astFPAGe:
+		text = "fp.geq"
+	default:
+		return astNodeRef{}, ErrASTDomain
+	}
+	name, err := m.Symbols.Intern(text)
 	if err != nil {
 		return astNodeRef{}, err
 	}
-	return m.pluginDecl(name, m.floatingPointPlugin.family, astFPAEq, nil, domain[:2], m.boolSort, ASTFuncFlags{Chainable: true}, false)
+	return m.pluginDecl(name, m.floatingPointPlugin.family, kind, nil, domain[:2], m.boolSort, ASTFuncFlags{Chainable: true}, false)
 }

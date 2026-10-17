@@ -39,6 +39,32 @@ func TestASTFPAIEEEEqualityDeclarationAndDomainValidation(t *testing.T) {
 	if resultSort != m.external(m.boolSort) {
 		t.Fatal("fp.eq application did not produce Bool")
 	}
+	for _, relation := range []struct {
+		kind int32
+		name string
+	}{
+		{astFPALt, "fp.lt"}, {astFPAGt, "fp.gt"},
+		{astFPALe, "fp.leq"}, {astFPAGe, "fp.geq"},
+	} {
+		decl, err := m.MkFamilyFuncDecl(family, relation.kind, nil, []ASTHandle{sort, sort}, ASTHandle{})
+		astTestMust(t, err)
+		r, err := m.internal(decl)
+		astTestMust(t, err)
+		name, err := m.Symbols.String(m.declAt(r.slot).name)
+		astTestMust(t, err)
+		info, err := m.funcInfo(m.declAt(r.slot).info)
+		astTestMust(t, err)
+		if name != relation.name || !info.flags.Chainable || m.declAt(r.slot).arity != 2 {
+			t.Fatalf("comparison declaration %d: %q", relation.kind, name)
+		}
+		app, err := m.MkFamilyApp(family, relation.kind, nil, []ASTHandle{zero, zero})
+		astTestMust(t, err)
+		resultSort, err := m.GetSort(app)
+		astTestMust(t, err)
+		if resultSort != m.external(m.boolSort) {
+			t.Fatalf("comparison %d did not produce Bool", relation.kind)
+		}
+	}
 	for _, tc := range []struct {
 		domain []ASTHandle
 		want   string

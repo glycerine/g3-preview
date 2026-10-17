@@ -178,12 +178,12 @@ func (m *ASTManager) mkFamilyAppDomainArguments(fid FamilyID, k int32, ps []ASTP
 		decl, e = m.basicDecl(k, ps, domain)
 	} else if m.pluginAt(fid).kind == astArrayPlugin {
 		decl, e = m.arrayDecl(k, ps, domain, ASTHandle{})
-	} else if m.pluginAt(fid).kind == astFloatingPointPlugin && k >= 0 && (k <= astFPAMinusZero || k == astFPAEq || k >= astFPAIsNaN && k <= astFPAIsPositive) {
+	} else if m.pluginAt(fid).kind == astFloatingPointPlugin && k >= 0 && (k <= astFPAMinusZero || k >= astFPAEq && k <= astFPAGe || k >= astFPAIsNaN && k <= astFPAIsPositive) {
 		previous := m.formatExecuting
 		m.formatExecuting = true
 		defer func() { m.formatExecuting = previous }()
-		if k == astFPAEq {
-			decl, e = m.floatingPointEqualityDecl(domain)
+		if k >= astFPAEq && k <= astFPAGe {
+			decl, e = m.floatingPointBinaryRelationDecl(k, domain)
 		} else if k >= astFPAIsNaN {
 			decl, e = m.floatingPointClassificationDecl(k, domain)
 		} else if k <= astFPARMTowardZero {
@@ -237,12 +237,12 @@ func (m *ASTManager) mkFamilyFuncDecl(fid FamilyID, k int32, ps []ASTParameter, 
 		r, e = m.basicDecl(k, ps, domain)
 	} else if m.pluginAt(fid).kind == astArrayPlugin {
 		r, e = m.arrayDecl(k, ps, domain, rangeSort)
-	} else if m.pluginAt(fid).kind == astFloatingPointPlugin && k >= 0 && (k <= astFPAMinusZero || k == astFPAEq || k >= astFPAIsNaN && k <= astFPAIsPositive) {
+	} else if m.pluginAt(fid).kind == astFloatingPointPlugin && k >= 0 && (k <= astFPAMinusZero || k >= astFPAEq && k <= astFPAGe || k >= astFPAIsNaN && k <= astFPAIsPositive) {
 		previous := m.formatExecuting
 		m.formatExecuting = true
 		defer func() { m.formatExecuting = previous }()
-		if k == astFPAEq {
-			r, e = m.floatingPointEqualityDecl(domain)
+		if k >= astFPAEq && k <= astFPAGe {
+			r, e = m.floatingPointBinaryRelationDecl(k, domain)
 		} else if k >= astFPAIsNaN {
 			r, e = m.floatingPointClassificationDecl(k, domain)
 		} else if k <= astFPARMTowardZero {

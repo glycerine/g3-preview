@@ -48,7 +48,7 @@ func (r *FPARewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out ast.
 	if err != nil {
 		return RewriteFailed, err
 	}
-	if kind == ast.FPAOpEq {
+	if kind >= ast.FPAOpEq && kind <= ast.FPAOpGe {
 		if args.Count() != 2 {
 			return RewriteFailed, ast.ErrASTDomain
 		}
@@ -60,7 +60,18 @@ func (r *FPARewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out ast.
 		if err != nil {
 			return RewriteFailed, err
 		}
-		return r.MkFloatEq(left, right, out)
+		switch kind {
+		case ast.FPAOpEq:
+			return r.MkFloatEq(left, right, out)
+		case ast.FPAOpLt:
+			return r.fpaLess(left, right, out)
+		case ast.FPAOpGt:
+			return r.fpaSwappedComparison(left, right, ast.FPAOpLt, out)
+		case ast.FPAOpLe:
+			return r.fpaLessEqual(left, right, out)
+		case ast.FPAOpGe:
+			return r.fpaSwappedComparison(left, right, ast.FPAOpLe, out)
+		}
 	}
 	if kind < int32(ast.FPAIsNaN) || kind > int32(ast.FPAIsPositive) {
 		return RewriteFailed, nil

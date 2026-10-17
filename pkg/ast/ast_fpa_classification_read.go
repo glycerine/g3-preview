@@ -68,3 +68,32 @@ func (m *ASTManager) ClassifyFPANumeral(h ASTHandle, kind FPAClassificationKind)
 	}
 	return found, value, result
 }
+
+// IsFPANegativeInfinity and IsFPAPositiveInfinity are the source fpa_util
+// special-value guards reached before mk_lt's two-numeral comparison.
+func (m *ASTManager) IsFPANegativeInfinity(h ASTHandle) (bool, error) {
+	return m.fpaIsInfinitySign(h, true)
+}
+
+func (m *ASTManager) IsFPAPositiveInfinity(h ASTHandle) (bool, error) {
+	return m.fpaIsInfinitySign(h, false)
+}
+
+func (m *ASTManager) fpaIsInfinitySign(h ASTHandle, negative bool) (bool, error) {
+	if err := m.lock(); err != nil {
+		return false, err
+	}
+	defer m.mu.Unlock()
+	r, err := m.requireExpr(h)
+	if err != nil {
+		return false, err
+	}
+	p := m.floatingPointPlugin
+	if p == nil || p.self != p || !p.published || p.sourceEnded {
+		return false, ErrASTHandle
+	}
+	if negative {
+		return p.isNumeralClass(r, astFloatNInf)
+	}
+	return p.isNumeralClass(r, astFloatPInf)
+}
