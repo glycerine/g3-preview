@@ -222,6 +222,7 @@
         "ast_expr_abstract_trace.go",
         "ast_expr_map.go",
         "ast_expr_substitution.go",
+        "ast_expr_substitution_memory_trace.go",
         "ast_expr_substitution_ops.go",
         "ast_expr_substitution_scope.go",
         "ast_expr_substitution_table.go",
@@ -283,6 +284,7 @@
         "ast_resource_limit.go",
         "ast_rewriter_access.go",
         "ast_seq_plugin.go",
+        "ast_seq_signature_memory_trace.go",
         "ast_shared_occs.go",
         "ast_shared_occs_iterator.go",
         "ast_shared_occs_mark.go",
@@ -369,6 +371,7 @@
         "pattern_stage_trace.go",
         "preferred_pattern.go",
         "pull_boolean.go",
+        "pull_boolean_trace.go",
         "pull_direct.go",
         "reduce_quantifier.go",
         "reduce_quantifier_trace.go",
@@ -379,10 +382,12 @@
     {
       "package": "ast/proofs",
       "imports": [
-        "ast"
+        "ast",
+        "util/diagnostic"
       ],
       "production_files": [
         "hypotheses.go",
+        "hypotheses_memory.go",
         "is_closed.go",
         "reduce_hypotheses.go"
       ]
@@ -404,11 +409,13 @@
         "array_rewriter_eq.go",
         "array_rewriter_map.go",
         "array_rewriter_set.go",
+        "array_rewriter_trace.go",
         "bool_rewriter.go",
         "bool_rewriter_config.go",
         "bool_rewriter_default_and.go",
         "bool_rewriter_eq.go",
         "bool_rewriter_ite.go",
+        "bool_rewriter_ite_value_trace.go",
         "bool_rewriter_local.go",
         "bool_rewriter_public.go",
         "bv_polynomial_add_core.go",
@@ -488,12 +495,16 @@
         "bv_trailing_count.go",
         "bv_trailing_eq.go",
         "bv_trailing_frame.go",
+        "bv_trailing_memory_trace.go",
         "bv_trailing_remove.go",
         "bv_trailing_table.go",
+        "bv_trailing_trace.go",
         "gparams_catalog_collectors.go",
         "mk_extract_proc.go",
+        "rewriter_cache_memory_trace.go",
         "rewriter_configuration.go",
         "rewriter_core.go",
+        "rewriter_core_cache_trace.go",
         "rewriter_engine.go",
         "rewriter_roots.go",
         "rewriter_types.go",
@@ -502,7 +513,9 @@
         "used_vars_ufbv.go",
         "var_shifter.go",
         "var_shifter_export.go",
-        "var_substitution.go"
+        "var_substitution.go",
+        "var_substitution_assert.go",
+        "var_substitution_trace.go"
       ]
     },
     {
@@ -590,7 +603,8 @@
         "solve_trace.go",
         "solved_queue.go",
         "solver.go",
-        "solver_setup.go"
+        "solver_setup.go",
+        "source_assertion.go"
       ]
     },
     {
@@ -669,6 +683,7 @@
         "polynomial_arithmetic.go",
         "polynomial_arithmetic_invocation.go",
         "polynomial_cache.go",
+        "polynomial_cache_memory_trace.go",
         "polynomial_callbacks.go",
         "polynomial_cell.go",
         "polynomial_cheap_append_receipt.go",
@@ -745,6 +760,7 @@
         "polynomial_imp_binding.go",
         "polynomial_imp_cleanup.go",
         "polynomial_imp_lifetime.go",
+        "polynomial_imp_memory_trace.go",
         "polynomial_invocation_receipts.go",
         "polynomial_lazard.go",
         "polynomial_lex_raw_pointer.go",
@@ -757,9 +773,11 @@
         "polynomial_mod_d.go",
         "polynomial_monomial.go",
         "polynomial_monomial_allocator_invocation.go",
+        "polynomial_monomial_allocator_memory_trace.go",
         "polynomial_monomial_array.go",
         "polynomial_monomial_display.go",
         "polynomial_monomial_factory.go",
+        "polynomial_monomial_imp_memory_trace.go",
         "polynomial_monomial_lifetime.go",
         "polynomial_monomial_mul_trace.go",
         "polynomial_monomial_ops.go",
@@ -776,6 +794,7 @@
         "polynomial_newton_source_finalize.go",
         "polynomial_newton_trace.go",
         "polynomial_newton_vector.go",
+        "polynomial_newton_vector_memory_trace.go",
         "polynomial_normalize.go",
         "polynomial_normalize_allocation_context.go",
         "polynomial_ownership.go",
@@ -809,6 +828,7 @@
         "polynomial_scoped_zp.go",
         "polynomial_sign.go",
         "polynomial_skeleton.go",
+        "polynomial_skeleton_memory_trace.go",
         "polynomial_skeleton_trace.go",
         "polynomial_skeleton_vector.go",
         "polynomial_som.go",
@@ -819,6 +839,7 @@
         "polynomial_som_owner.go",
         "polynomial_som_sort.go",
         "polynomial_som_vector.go",
+        "polynomial_som_vector_memory_trace.go",
         "polynomial_source_maxima.go",
         "polynomial_source_prefix.go",
         "polynomial_sparse_interpolation.go",
@@ -1318,9 +1339,11 @@
         "datatype_validation.go",
         "local_environment.go",
         "local_expr_stack.go",
+        "local_let.go",
         "local_lookup.go",
         "local_sort_names.go",
-        "local_sort_stack.go"
+        "local_sort_stack.go",
+        "local_sorted_vars.go"
       ]
     },
     {
@@ -1666,6 +1689,7 @@
         "tactic_filter_model_trace.go",
         "tactic_goal.go",
         "tactic_goal_display.go",
+        "tactic_goal_inequality_memory_trace.go",
         "tactic_goal_ownership.go",
         "tactic_model_converter.go",
         "tactic_model_to_model.go",
@@ -1735,6 +1759,8 @@
         "polynomial_builder.go",
         "polynomial_trace.go",
         "propagate_ineq_clean.go",
+        "propagate_ineq_memory_trace.go",
+        "propagate_ineq_outer_memory_trace.go",
         "propagate_ineq_tactic.go"
       ]
     },
@@ -1791,11 +1817,14 @@
         "rewrite_cache.go",
         "rewrite_demodulator_classify.go",
         "rewrite_demodulator_schedule.go",
+        "rewrite_demodulator_schedule_trace.go",
         "rewrite_formula_assert.go",
         "rewrite_formula_demodulator_assert.go",
         "rewrite_formula_process.go",
         "rewrite_formula_trace.go",
+        "rewrite_identity_trace.go",
         "rewrite_loop.go",
+        "rewrite_loop_trace.go",
         "rewrite_rule_index.go",
         "rewrite_rule_index_assert.go",
         "rewrite_rule_index_memory_trace.go",
@@ -2571,6 +2600,7 @@
         "mpq.go",
         "mpq_bitwise.go",
         "mpq_decimal_stream.go",
+        "mpq_fraction_assertion.go",
         "mpq_inf.go",
         "mpq_inspect.go",
         "mpq_number_theory.go",
