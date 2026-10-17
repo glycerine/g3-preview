@@ -2,6 +2,7 @@ package numeral
 
 import (
 	"bytes"
+	"io"
 	"testing"
 )
 
@@ -20,4 +21,12 @@ func TestMPNDisplayRawSourceLimbOrder(t *testing.T) {
 			t.Fatal(tc.limbs, out.String(), e, tc.want)
 		}
 	}
+}
+
+func TestMPNDisplayRawSourceInsertionRefusals(t *testing.T) {
+	var m NaturalManager
+	testNumeralDisplayParts(t,
+		func(w io.Writer) error { return m.DisplayRaw(w, []uint32{7, 0, ^uint32(0)}) },
+		"[4294967295|0|7]",
+		[]string{"[", "4294967295", "|", "0", "|", "7", "]"})
 }

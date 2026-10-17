@@ -161407,11 +161407,12 @@
           ]
         },
         {
-          "name": "display_raw descending limb text through a native Go writer; trace call-site integration remains",
+          "name": "display_raw descending limb text through a native Go writer with source insertion boundaries and retained trace call sites",
           "status": "platform_replacement",
           "go_target": "pkg/util/numeral/mpn_display_raw.go",
           "tests": [
-            "TestMPNDisplayRawSourceLimbOrder"
+            "TestMPNDisplayRawSourceLimbOrder",
+            "TestMPNDisplayRawSourceInsertionRefusals"
           ]
         },
         {
@@ -162056,11 +162057,12 @@
           ]
         },
         {
-          "name": "display_raw descending limb text through a native Go writer; trace call-site integration remains",
+          "name": "display_raw descending limb text through a native Go writer with source insertion boundaries and retained trace call sites",
           "status": "platform_replacement",
           "go_target": "pkg/util/numeral/mpn_display_raw.go",
           "tests": [
-            "TestMPNDisplayRawSourceLimbOrder"
+            "TestMPNDisplayRawSourceLimbOrder",
+            "TestMPNDisplayRawSourceInsertionRefusals"
           ]
         },
         {
