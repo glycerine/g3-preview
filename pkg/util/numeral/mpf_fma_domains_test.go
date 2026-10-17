@@ -51,6 +51,76 @@ func TestArbitraryFloatFMAEntryFormatSourceActions(t *testing.T) {
 	}
 }
 
+func TestArbitraryFloatFMAUnpackedWidthSourceAssertion(t *testing.T) {
+	if !modularSourceDebug {
+		t.Skip("source Z3DEBUG assertion only")
+	}
+	for _, tc := range []struct {
+		line       string
+		expression string
+		operand    int
+		sig        int32
+	}{
+		{"820", "m_mpz_manager.lt(a.significand(), m_powers2(x.sbits))", 0, 16},
+		{"821", "m_mpz_manager.lt(b.significand(), m_powers2(x.sbits))", 1, 16},
+		{"822", "m_mpz_manager.lt(c.significand(), m_powers2(x.sbits))", 2, 16},
+		{"823", "m_mpz_manager.ge(a.significand(), m_powers2(x.sbits-1))", 0, -1},
+		{"824", "m_mpz_manager.ge(b.significand(), m_powers2(x.sbits-1))", 1, -1},
+	} {
+		t.Run(tc.line, func(t *testing.T) {
+			_, log := bindMPNDebugActions(t, "T")
+			m, _, _ := mpfNumeralHelpersFixture(t)
+			var x, y, z, out ArbitraryFloat
+			serviceMust(t, m.MkOne(8, 4, false, &x))
+			serviceMust(t, m.MkOne(8, 4, false, &y))
+			serviceMust(t, m.MkZero(8, 4, false, &z))
+			serviceMust(t, m.MkOne(8, 4, false, &out))
+			operand := []*ArbitraryFloat{&x, &y, &z}[tc.operand]
+			operand.exponent = 0
+			operand.significand = NewInt(tc.sig)
+			before := out
+			if e := m.FMA(ArbitraryFloatNearestEven, &x, &y, &z, &out); !isMPNVerificationThrow(e) || out != before {
+				t.Fatal("unpacked width Throw before result mutation", e, out)
+			}
+			contents, e := os.ReadFile(log.Name())
+			serviceMust(t, e)
+			want := "File: src/util/mpf.cpp\nLine: " + tc.line + "\n" + tc.expression + "\n"
+			if n := strings.Count(string(contents), want); n != 1 {
+				t.Fatal("source FMA unpacked width assertion", n, string(contents))
+			}
+			serviceMust(t, m.CleanupFMA())
+			for _, v := range []*ArbitraryFloat{&out, &x, &y, &z} {
+				serviceMust(t, m.Del(v))
+			}
+		})
+	}
+}
+
+func TestArbitraryFloatFMAOverflowSourceAssertion(t *testing.T) {
+	if !modularSourceDebug {
+		t.Skip("source Z3DEBUG assertion only")
+	}
+	_, log := bindMPNDebugActions(t, "T")
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	value := ArbitraryFloat{format: arbitraryFloatFormat(2, 4, false), exponent: 1, significand: NewInt(7)}
+	x, y, z := value, value, value
+	var out ArbitraryFloat
+	serviceMust(t, m.MkOne(2, 4, false, &out))
+	if e := m.FMA(ArbitraryFloatNearestEven, &x, &y, &z, &out); !isMPNVerificationThrow(e) {
+		t.Fatal("FMA overflow source assertion", e)
+	}
+	contents, e := os.ReadFile(log.Name())
+	serviceMust(t, e)
+	want := "File: src/util/mpf.cpp\nLine: 908\nexp(res) < mk_max_exp(x.ebits)\n"
+	if n := strings.Count(string(contents), want); n != 1 {
+		t.Fatal("source FMA overflow assertion", n, string(contents))
+	}
+	serviceMust(t, m.CleanupFMA())
+	for _, v := range []*ArbitraryFloat{&out, &x, &y, &z} {
+		serviceMust(t, m.Del(v))
+	}
+}
+
 func TestArbitraryFloatFMASpecialsSignedZerosAndModes(t *testing.T) {
 	m, _, _ := mpfNumeralHelpersFixture(t)
 	values := []float64{0, math.Copysign(0, -1), 1, -1, math.Inf(1), math.Inf(-1), math.NaN()}

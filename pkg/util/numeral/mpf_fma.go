@@ -6,8 +6,12 @@ import (
 	"math"
 )
 
-func (s *arbitraryFloatFMAScope) assertPower(value *Int, n uint32, ge bool) error {
-	if !modularSourceDebug {
+func (s *arbitraryFloatFMAScope) assertPower(value *Int, n uint32, ge bool, line int32, expression string) error {
+	enabled, e := mpfSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if !enabled {
 		return nil
 	}
 	p, e := s.power(n)
@@ -18,10 +22,7 @@ func (s *arbitraryFloatFMAScope) assertPower(value *Int, n uint32, ge bool) erro
 	if e != nil {
 		return e
 	}
-	if ge && cmp < 0 || !ge && cmp >= 0 {
-		return ErrIntegerAssertion
-	}
-	return nil
+	return mpfSourceAssertion(ge && cmp >= 0 || !ge && cmp < 0, line, expression)
 }
 func (s *arbitraryFloatFMAScope) shiftInPlace(value *Int, n uint32) error {
 	z := s.manager.integer
@@ -162,13 +163,21 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 	if e := m.traceFMAUnpacked(&s.a, &s.b, &s.c); e != nil {
 		return e
 	}
-	for _, v := range [...]*Int{&s.a.significand, &s.b.significand, &s.c.significand} {
-		if e := s.assertPower(v, sb, false); e != nil {
+	for _, assertion := range [...]struct {
+		value      *Int
+		line       int32
+		expression string
+	}{{&s.a.significand, 820, "m_mpz_manager.lt(a.significand(), m_powers2(x.sbits))"}, {&s.b.significand, 821, "m_mpz_manager.lt(b.significand(), m_powers2(x.sbits))"}, {&s.c.significand, 822, "m_mpz_manager.lt(c.significand(), m_powers2(x.sbits))"}} {
+		if e := s.assertPower(assertion.value, sb, false, assertion.line, assertion.expression); e != nil {
 			return e
 		}
 	}
-	for _, v := range [...]*Int{&s.a.significand, &s.b.significand} {
-		if e := s.assertPower(v, sb-1, true); e != nil {
+	for _, assertion := range [...]struct {
+		value      *Int
+		line       int32
+		expression string
+	}{{&s.a.significand, 823, "m_mpz_manager.ge(a.significand(), m_powers2(x.sbits-1))"}, {&s.b.significand, 824, "m_mpz_manager.ge(b.significand(), m_powers2(x.sbits-1))"}} {
+		if e := s.assertPower(assertion.value, sb-1, true, assertion.line, assertion.expression); e != nil {
 			return e
 		}
 	}
@@ -187,10 +196,10 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 	if e := m.traceFMADecimalBinary("M = ", &s.mr, 830); e != nil {
 		return e
 	}
-	if e := s.assertPower(&s.mr.significand, 2*sb, false); e != nil {
+	if e := s.assertPower(&s.mr.significand, 2*sb, false, 834, "m_mpz_manager.lt(mr.significand(), m_powers2(2*x.sbits))"); e != nil {
 		return e
 	}
-	if e := s.assertPower(&s.mr.significand, 2*sb-2, true); e != nil {
+	if e := s.assertPower(&s.mr.significand, 2*sb-2, true, 835, "m_mpz_manager.ge(mr.significand(), m_powers2(2*x.sbits - 2))"); e != nil {
 		return e
 	}
 	// Self-significand scoped setters erase numerical SET, preserving ownership.
@@ -205,18 +214,25 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 	if e := m.traceFMADecimalBinary("C_= ", &s.c, 844); e != nil {
 		return e
 	}
-	if e := s.assertPower(&s.c.significand, 2*sb+3, false); e != nil {
+	if e := s.assertPower(&s.c.significand, 2*sb+3, false, 847, "m_mpz_manager.lt(c.significand(), m_powers2(2*x.sbits + 3))"); e != nil {
 		return e
 	}
-	if modularSourceDebug {
+	enabled, e := mpfSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled {
 		zero, e := im.IsZero(&s.c.significand)
 		if e != nil {
 			return e
 		}
+		const expression = "m_mpz_manager.is_zero(c.significand()) || m_mpz_manager.ge(c.significand(), m_powers2(2*x.sbits - 2 + 3))"
 		if !zero {
-			if e := s.assertPower(&s.c.significand, 2*sb+1, true); e != nil {
+			if e := s.assertPower(&s.c.significand, 2*sb+1, true, 848, expression); e != nil {
 				return e
 			}
+		} else if e := mpfSourceAssertion(true, 848, expression); e != nil {
+			return e
 		}
 	}
 	if s.c.exponent > s.mr.exponent {
@@ -227,8 +243,8 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 	if e != nil {
 		return e
 	}
-	if modularSourceDebug && delta < 0 {
-		return ErrIntegerAssertion
+	if e := mpfSourceAssertion(s.mr.exponent >= s.c.exponent && delta >= 0, 858, "exp(mr) >= exp(c) && exp_delta_w >= 0"); e != nil {
+		return e
 	}
 	if delta > int64(2*sb+3) {
 		delta = int64(2*sb + 3)
@@ -299,7 +315,7 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 		return e
 	}
 	renormSticky := false
-	if e := s.assertPower(&s.res.significand, 2*sb+4, false); e != nil {
+	if e := s.assertPower(&s.res.significand, 2*sb+4, false, 905, "m_mpz_manager.lt(res.significand(), m_powers2(2 * x.sbits + 1 + 3))"); e != nil {
 		return e
 	}
 	power, e = s.power(2*sb + 3)
@@ -311,13 +327,17 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 		return e
 	}
 	if cmp >= 0 {
-		if modularSourceDebug {
+		enabled, e := mpfSourceAssertionsEnabled()
+		if e != nil {
+			return e
+		}
+		if enabled {
 			max, e := m.maxExponent(eb)
 			if e != nil {
 				return e
 			}
-			if s.res.exponent >= max {
-				return ErrIntegerAssertion
+			if e := mpfSourceAssertion(s.res.exponent < max, 908, "exp(res) < mk_max_exp(x.ebits)"); e != nil {
+				return e
 			}
 		}
 		if s.res.exponent == math.MaxInt64 {
