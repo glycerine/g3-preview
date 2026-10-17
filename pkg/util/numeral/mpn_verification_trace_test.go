@@ -9,6 +9,7 @@ import (
 )
 
 func TestMPNDivisionVerificationConditionalTraceBeforeAssertion(t *testing.T) {
+	bindMPNDebugActions(t, "T")
 	m := naturalManager(t)
 	var output bytes.Buffer
 	tags := diagnostic.NewTraceTagsWithWriter(&output)
@@ -26,7 +27,7 @@ func TestMPNDivisionVerificationConditionalTraceBeforeAssertion(t *testing.T) {
 		}
 		return
 	}
-	if !errors.Is(err, ErrIntegerAssertion) {
+	if !isMPNVerificationThrow(err) {
 		t.Fatal("verification assertion", err)
 	}
 	if !tags.ShouldTrace("mpn_dbg") {
@@ -44,6 +45,7 @@ func TestMPNDivisionVerificationConditionalTraceBeforeAssertion(t *testing.T) {
 }
 
 func TestMPNDivisionVerificationConditionalTraceEndlRefusal(t *testing.T) {
+	bindMPNDebugActions(t, "T")
 	m := naturalManager(t)
 	w := &mpfEndlWriter{failAt: 1, refusal: errors.New("verification endl refused")}
 	tags := diagnostic.NewTraceTagsWithWriter(w)
@@ -57,7 +59,7 @@ func TestMPNDivisionVerificationConditionalTraceEndlRefusal(t *testing.T) {
 		}
 		return
 	}
-	if !errors.Is(err, ErrIntegerAssertion) {
+	if !isMPNVerificationThrow(err) {
 		t.Fatal("trace flush changed source assertion", err)
 	}
 	if !tags.ShouldTrace("mpn_dbg") {

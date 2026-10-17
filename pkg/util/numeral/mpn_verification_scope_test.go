@@ -2,7 +2,6 @@
 package numeral
 
 import (
-	"errors"
 	"testing"
 )
 
@@ -38,10 +37,11 @@ func TestNaturalNativeVerificationAssertionCleanup(t *testing.T) {
 	if !modularSourceDebug {
 		t.Skip("checked verification only")
 	}
+	bindMPNDebugActions(t, "T")
 	m := naturalManager(t)
 	view := func(n uint32) limbView { return limbView{external: []uint32{n}, size: 1} }
 	// The quotient is deliberately wrong: 4*2+0 != 10.
-	if e := m.sourceVerifyDivision(view(10), view(2), view(4), view(0)); !errors.Is(e, ErrIntegerAssertion) || len(m.verificationScratch) != 0 {
+	if e := m.sourceVerifyDivision(view(10), view(2), view(4), view(0)); !isMPNVerificationThrow(e) || len(m.verificationScratch) != 0 {
 		t.Fatal("assertion cleanup", e)
 	}
 	if e := m.sourceVerifyDivision(view(10), view(2), view(5), view(0)); e != nil || len(m.verificationScratch) != 0 {

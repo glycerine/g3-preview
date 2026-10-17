@@ -3,6 +3,7 @@ package numeral
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 // sourceVerifyDivision is the source Z3DEBUG lexical temp, after both outputs.
@@ -84,7 +85,14 @@ func (m *NaturalManager) sourceVerifyDivision(a, b, q, r limbView) error {
 	}
 	m.traceDivisionVerification(ok, out)
 	if !ok {
-		return ErrIntegerAssertion
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return e
+		}
+		if enabled {
+			return diagnostic.DebugAssertionFailure(d, "src/util/mpn.cpp", 216, "ok")
+		}
 	}
 	return nil
 }
