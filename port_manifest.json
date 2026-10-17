@@ -163461,7 +163461,8 @@
             "TestRationalDecimalStreamDenominatorCopyTransportGuards",
             "TestRationalDecimalStreamReachedEndLabelSourceStop",
             "TestRationalDecimalStreamLiteralRawNegativeDenominator",
-            "TestRationalDecimalStreamInlineCallKeepsOlderCopyAllocation"
+            "TestRationalDecimalStreamInlineCallKeepsOlderCopyAllocation",
+            "TestRationalDecimalSourceAssertionAfterDigitDivision"
           ]
         },
         {
@@ -165106,7 +165107,8 @@
             "TestRationalDecimalStreamDenominatorCopyTransportGuards",
             "TestRationalDecimalStreamReachedEndLabelSourceStop",
             "TestRationalDecimalStreamLiteralRawNegativeDenominator",
-            "TestRationalDecimalStreamInlineCallKeepsOlderCopyAllocation"
+            "TestRationalDecimalStreamInlineCallKeepsOlderCopyAllocation",
+            "TestRationalDecimalSourceAssertionAfterDigitDivision"
           ]
         },
         {

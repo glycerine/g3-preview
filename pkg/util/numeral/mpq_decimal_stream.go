@@ -2,13 +2,13 @@
 package numeral
 
 import (
-
-	// DisplayDecimalInto borrows the caller stream and follows the original
-	// unrounded Div/display/Rem loop. CleanupDecimalStream joins a failed body.
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
+// DisplayDecimalInto borrows the caller stream and follows the original
+// unrounded Div/display/Rem loop. CleanupDecimalStream joins a failed body.
 func (m *RationalManager) DisplayDecimalInto(out RationalSourceStream, a *Rational, precision uint32, truncate bool) (cause error) {
 	if e := m.checkScalarValue(a); e != nil {
 		return e
@@ -84,12 +84,21 @@ func (s *rationalDecimalStreamScope) run(out RationalSourceStream, a *Rational, 
 			return e
 		}
 		if modularSourceDebug {
-			less, e := z.Less(v, ten)
+			dbg := diagnostic.BorrowProcessDebugContext()
+			enabled, e := diagnostic.SourceAssertionsEnabled(dbg)
 			if e != nil {
 				return e
 			}
-			if !less {
-				return ErrIntegerAssertion
+			if enabled {
+				less, e := z.Less(v, ten)
+				if e != nil {
+					return e
+				}
+				if !less {
+					if e := diagnostic.DebugAssertionFailure(dbg, "src/util/mpq.cpp", 174, "lt(v1, ten)"); e != nil {
+						return e
+					}
+				}
 			}
 		}
 		if e := z.insertSourceIntegerTracked(out, v, nil, &s.insertion); e != nil {
