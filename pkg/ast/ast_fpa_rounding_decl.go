@@ -7,6 +7,9 @@ import (
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
+// FPAOpRMTowardZero is the source rounding-mode constant used for model values.
+const FPAOpRMTowardZero int32 = astFPARMTowardZero
+
 func (m *ASTManager) floatingPointRoundingDecl(k int32, ps []ASTParameter, domain []ASTHandle) (astNodeRef, error) {
 	if len(ps) != 0 {
 		return astNodeRef{}, ASTException{z3exception.NewDefaultException("rounding mode constant does not have parameters")}

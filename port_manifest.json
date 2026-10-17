@@ -17395,6 +17395,8 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_fpa_plugin.go",
+        "pkg/ast/ast_builtin_plugins_values.go",
+        "pkg/ast/ast_fpa_some_value_test.go",
         "pkg/ast/ast_fpa_classification_decl.go",
         "pkg/ast/ast_fpa_equality_decl.go",
         "pkg/ast/ast_fpa_unary_decl.go",
@@ -17429,6 +17431,8 @@
         "pkg/ast/ast_fpa_to_fp_ieee_bv_test.go"
       ],
       "tests": [
+        "TestASTFloatingPointSomeValueSourceDefaults",
+        "TestModelEvaluatorFPACompletionUsesPluginValues",
         "TestASTFloatingPointClassificationDeclarationsAndApplications",
         "TestASTFPAIEEEEqualityDeclarationAndDomainValidation",
         "TestASTFPAUnaryNegAbsDeclarationsAndApplications",
@@ -17741,6 +17745,15 @@
           ]
         },
         {
+          "name": "Reached fpa_decl_plugin::get_some_value FloatingPoint NaN and RoundingMode toward-zero defaults (fpa_decl_plugin.cpp:856-870) via existing concrete special-value declarations and model completion",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_builtin_plugins_values.go",
+          "tests": [
+            "TestASTFloatingPointSomeValueSourceDefaults",
+            "TestModelEvaluatorFPACompletionUsesPluginValues"
+          ]
+        },
+        {
           "name": "Concrete fp.to_ieee_bv unary declaration validates FloatingPoint domain and returns a BitVec sort of ebits+sbits (fpa_decl_plugin.cpp:661-674)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_ieee_bv_decl.go",
@@ -17762,6 +17775,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_builtin_plugins_values.go",
+        "pkg/ast/ast_fpa_some_value_test.go",
         "pkg/ast/ast_fpa_scoped_values.go",
         "pkg/ast/ast_fpa_scoped_values_source_test.go",
         "pkg/ast/ast_fpa_numeral_probe.go",
@@ -17769,6 +17784,8 @@
         "pkg/ast/ast_fpa_rounding_read.go"
       ],
       "tests": [
+        "TestASTFloatingPointSomeValueSourceDefaults",
+        "TestModelEvaluatorFPACompletionUsesPluginValues",
         "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
         "TestASTFloatingPointScopedValueActualReserveSetPublication",
         "TestASTFloatingPointScopedValueInlineErasesCopyAcquisition",
@@ -17832,6 +17849,15 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Reached fpa_decl_plugin::get_some_value declaration and two source sort defaults (fpa_decl_plugin.h:183; fpa_decl_plugin.cpp:856-870)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_builtin_plugins_values.go",
+          "tests": [
+            "TestASTFloatingPointSomeValueSourceDefaults",
+            "TestModelEvaluatorFPACompletionUsesPluginValues"
+          ]
+        },
         {
           "name": "ast_fpa_scoped_values concrete reached source counterpart (fpa_decl_plugin.h:109-122)",
           "status": "partial",
@@ -58352,6 +58378,7 @@
       ],
       "tests": [
         "TestModelEvaluatorFPAEqualityAndApplicationReduction",
+        "TestModelEvaluatorFPACompletionUsesPluginValues",
         "TestModelEvaluatorBooleanReductionSourceStatusTrace",
         "TestModelEvaluatorDirectEntrySourceTrace",
         "TestModelEvaluatorArrayExtractionSourceTrace",

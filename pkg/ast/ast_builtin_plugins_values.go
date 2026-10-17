@@ -191,7 +191,7 @@ func (m *ASTManager) getSomeValue(r astNodeRef) (ASTHandle, error) {
 			return value, nil
 		}
 	}
-	fid, _, e := m.declIdentity(r)
+	fid, kind, e := m.declIdentity(r)
 	if e != nil {
 		return ASTHandle{}, e
 	}
@@ -207,6 +207,20 @@ func (m *ASTManager) getSomeValue(r astNodeRef) (ASTHandle, error) {
 	}
 	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astArithmeticPlugin {
 		return m.arithmeticSomeValue(r)
+	}
+	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astFloatingPointPlugin {
+		switch kind {
+		case 0:
+			decl, e := m.floatingPointSpecialDecl(astFPANaN, nil, m.external(r))
+			if e != nil {
+				return ASTHandle{}, e
+			}
+			value, e := m.mkApp(decl, nil)
+			return m.external(value), e
+		case 1:
+			value, e := m.mkFamilyApp(fid, astFPARMTowardZero, nil, nil)
+			return m.external(value), e
+		}
 	}
 	// Actual manager fallback constructs two lexical parameters; AST-valued
 	// parameter construction doesn't retain until its declaration info attaches.

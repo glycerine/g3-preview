@@ -92,3 +92,44 @@ func TestModelEvaluatorFPAEqualityAndApplicationReduction(t *testing.T) {
 	astTestMust(t, ev.Cleanup(nil))
 	check("FPA rewriter after cleanup", ieeeEq, no)
 }
+
+func TestModelEvaluatorFPACompletionUsesPluginValues(t *testing.T) {
+	m, _, ev, _, _, _ := evaluatorFixture(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	_, err = m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	family, err := m.RegisterFloatingPointPlugin()
+	astTestMust(t, err)
+	floatSort, err := m.MkFamilySort(family, 3, nil)
+	astTestMust(t, err)
+	rmSort, err := m.MkFamilySort(family, 1, nil)
+	astTestMust(t, err)
+	floatConst, err := m.MkConst(astTestSymbol(t, m, "eval-fpa-completion"), floatSort)
+	astTestMust(t, err)
+	astTestPin(t, m, floatConst)
+	rmConst, err := m.MkConst(astTestSymbol(t, m, "eval-rm-completion"), rmSort)
+	astTestMust(t, err)
+	astTestPin(t, m, rmConst)
+	wantFloat, err := m.MkFPANaNOfSort(floatSort)
+	astTestMust(t, err)
+	wantRM, err := m.MkFamilyApp(family, ast.FPAOpRMTowardZero, nil, nil)
+	astTestMust(t, err)
+	astTestMust(t, ev.SetModelCompletion(true))
+	out := astTestPin(t, m, ast.ASTHandle{})
+	for _, tc := range []struct {
+		name  string
+		value ast.ASTHandle
+		want  ast.ASTHandle
+	}{
+		{"FloatingPoint", floatConst, wantFloat},
+		{"RoundingMode", rmConst, wantRM},
+	} {
+		astTestMust(t, ev.Evaluate(tc.value, out))
+		got, e := m.RefGet(out)
+		astTestMust(t, e)
+		if got != tc.want {
+			t.Fatalf("%s completion: got %v, want %v", tc.name, got, tc.want)
+		}
+	}
+}
