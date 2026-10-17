@@ -160,6 +160,27 @@ func (s *RationalService) InfEpsInfFromNumeral(n *OwnedInfRational) (OwnedInfEps
 	}
 	return s.infEpsInfFromNumeralLocked(n)
 }
+
+// InfEpsInfFromInt32 follows inf_eps_rational(int): default-construct the
+// infinity coefficient, then construct nested FIRST from n and default EPS.
+func (s *RationalService) InfEpsInfFromInt32(n int32) (_lexOut OwnedInfEpsInfRational, _lexErr error) {
+	if e := s.lock(); e != nil {
+		return OwnedInfEpsInfRational{}, e
+	}
+	defer s.mu.Unlock()
+	if e := s.beginLexical(); e != nil {
+		return OwnedInfEpsInfRational{}, e
+	}
+	defer s.endLexicalEps(&_lexOut, &_lexErr)
+	v := s.infEpsInfEmpty()
+	if e := s.Manager.SetInt64(&v.numeral.First, int64(n)); e != nil {
+		s.destroyLexicalRational(&v.infinity)
+		s.abortLexicalRational(&v.numeral.First)
+		return OwnedInfEpsInfRational{}, e
+	}
+	return v, nil
+}
+
 func (s *RationalService) InfEpsInfNewValue() (OwnedInfEpsInfRational, error) {
 	if e := s.lock(); e != nil {
 		return OwnedInfEpsInfRational{}, e

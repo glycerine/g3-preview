@@ -56,6 +56,7 @@ const (
 	astFPAToSBV            int32 = 39
 	astFPAToReal           int32 = 40
 	astFPAToIEEEBV         int32 = 41
+	astFPABVWrap           int32 = 42
 )
 
 func (p *astFloatingPointPluginOwner) numeralAssertionsEnabled() (bool, error) {

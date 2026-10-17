@@ -17396,6 +17396,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_fpa_bv_wrap_decl.go",
         "pkg/ast/ast_fpa_fp_decl.go",
         "pkg/ast/ast_fpa_plugin.go",
         "pkg/ast/ast_builtin_plugins_values.go",
@@ -17435,6 +17436,7 @@
         "pkg/ast/ast_fpa_to_fp_ieee_bv_test.go"
       ],
       "tests": [
+        "TestFPABVWrapSourceExtractIdentityAndRefusals",
         "TestASTFPAFPComponentsNumeralsAndTrace",
         "TestASTFloatingPointSomeValueSourceDefaults",
         "TestASTFloatingPointSomeValueRefusedMPFConstruction",
@@ -17542,6 +17544,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "bv_wrap declaration accepts FP or RM sort and derives BV result width (fpa_decl_plugin.cpp:689-710)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_bv_wrap_decl.go",
+          "tests": ["TestFPABVWrapSourceExtractIdentityAndRefusals"]
+        },
         {
           "name": "fp three-bit-vector declaration with one-bit sign and derived floating-point format (fpa_decl_plugin.cpp:591-606)",
           "status": "ported",
@@ -17788,6 +17796,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_fpa_bv_wrap_decl.go",
         "pkg/ast/ast_fpa_fp_decl.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_fpa_some_value.go",
@@ -17799,6 +17808,7 @@
         "pkg/ast/ast_fpa_rounding_read.go"
       ],
       "tests": [
+        "TestFPABVWrapSourceExtractIdentityAndRefusals",
         "TestASTFPAFPComponentsNumeralsAndTrace",
         "TestASTFloatingPointSomeValueSourceDefaults",
         "TestASTFloatingPointSomeValueRefusedMPFConstruction",
@@ -17866,6 +17876,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "bv_wrap retained declaration kind and FP/RM domain (fpa_decl_plugin.h:89,159; fpa_decl_plugin.cpp:689-710)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_bv_wrap_decl.go",
+          "tests": ["TestFPABVWrapSourceExtractIdentityAndRefusals"]
+        },
         {
           "name": "fp constructor declaration for retained three-BV application (fpa_decl_plugin.h; fpa_decl_plugin.cpp:591-606)",
           "status": "ported",
@@ -26914,6 +26930,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/rewriter/fpa_bv_wrap.go",
         "pkg/ast/ast_fpa_fp_trace.go",
         "pkg/ast/ast_fpa_fp_components.go",
         "pkg/ast/ast_fpa_to_ieee_bv_trace.go",
@@ -26945,6 +26962,7 @@
         "pkg/ast/ast_fpa_to_fp_ieee_bv.go",
         "pkg/ast/rewriter/fpa_to_fp_ieee_bv_test.go"],
       "tests": [
+        "TestFPABVWrapSourceExtractIdentityAndRefusals",
         "TestFPAFPComponentsDispatch",
         "TestASTFPAFPComponentsNumeralsAndTrace",
         "TestASTFPAToIEEEBVSourceTrace",
@@ -27200,6 +27218,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "mk_bvwrap three extracts from one exact-width BV, source accepts overlapping ranges and refuses other inputs (fpa_rewriter.cpp:815-847)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_bv_wrap.go",
+          "tests": ["TestFPABVWrapSourceExtractIdentityAndRefusals"]
+        },
+        {
           "name": "mk_fp concrete sign, significand, exponent numeral probes, MPF construction and TRACE before result publication (fpa_rewriter.cpp:684-705)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_fp_components.go",
@@ -27409,13 +27433,15 @@
       "component": "ast",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/ast/rewriter/fpa_classification.go",
+      "go_targets": [
+        "pkg/ast/rewriter/fpa_bv_wrap.go","pkg/ast/rewriter/fpa_classification.go",
         "pkg/ast/rewriter/fpa_remainder.go",
         "pkg/ast/rewriter/fpa_extrema.go",
         "pkg/ast/rewriter/fpa_rm_unary.go",
         "pkg/ast/rewriter/fpa_fma.go",
         "pkg/ast/rewriter/fpa_rm_binary.go"],
       "tests": [
+        "TestFPABVWrapSourceExtractIdentityAndRefusals",
         "TestFPAFPComponentsDispatch","TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
         "TestFPARemainderNumericSpecialAndSymbolicRefusal",
         "TestFPAExtremaNaNInfinitySignedZeroAndSymbolic",
@@ -27442,6 +27468,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "mk_bvwrap dispatch for retained FP constructor input (fpa_rewriter.h; fpa_rewriter.cpp:97,815-847)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_bv_wrap.go",
+          "tests": ["TestFPABVWrapSourceExtractIdentityAndRefusals"]
+        },
         {
           "name": "mk_fp dispatch for retained concrete three-BV constructor (fpa_rewriter.h; fpa_rewriter.cpp:89,684-705)",
           "status": "ported",
@@ -129468,6 +129500,7 @@
         "pkg/util/numeral/inf_eps_step_unread_components_source_test.go"
       ],
       "tests": [
+        "TestInfEpsInfFromInt32SourceConstructor",
         "TestInfinitesimalSourceWholeStringStreamInsertion",
         "TestInfEpsInfFiniteTripleOracles",
         "TestInfEpsInfSourceQuirksAndHeader",
@@ -129581,6 +129614,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "inf_eps_rational<inf_rational>(int) default infinity, nested FIRST integer construction and default EPS (inf_eps_rational.h:82-85)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/inf_eps_rational.go",
+          "tests": ["TestInfEpsInfFromInt32SourceConstructor"]
+        },
         {
           "name": "inf_eps_rational<inf_rational> ostream insertion of one complete to_string result (h431-435)",
           "status": "ported",

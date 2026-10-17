@@ -106,6 +106,30 @@ func TestInfEpsInfNumeralConstructorOwnsIndependentComponents(t *testing.T) {
 	}
 }
 
+func TestInfEpsInfFromInt32SourceConstructor(t *testing.T) {
+	s, _ := serviceNew(t)
+	for _, tc := range []struct {
+		input int32
+		text  string
+	}{
+		{0, "0"},
+		{1, "1"},
+		{-1, "-1"},
+		{-1 << 31, "-2147483648"},
+		{1<<31 - 1, "2147483647"},
+	} {
+		value, err := s.InfEpsInfFromInt32(tc.input)
+		serviceMust(t, err)
+		infEpsText(t, s, &value, tc.text)
+		finite, err := s.InfEpsInfIsFinite(&value)
+		serviceMust(t, err)
+		if !finite {
+			t.Fatalf("inf_eps_rational(%d) must be finite", tc.input)
+		}
+		serviceMust(t, s.InfEpsInfDel(&value))
+	}
+}
+
 func TestInfEpsInfFiniteTripleOracles(t *testing.T) {
 	s, _ := serviceNew(t)
 	for i := int64(-1); i <= 1; i++ {

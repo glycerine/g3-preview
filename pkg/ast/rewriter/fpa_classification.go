@@ -90,6 +90,20 @@ func (r *FPARewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out ast.
 		}
 		return RewriteDone, r.manager.SetRef(out, answer)
 	}
+	if kind == ast.FPAOpBVWrap {
+		if args.Count() != 1 {
+			return RewriteFailed, ast.ErrASTDomain
+		}
+		value, err := args.At(0)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		answer, found, err := r.rewriteFPABVWrap(value)
+		if err != nil || !found {
+			return RewriteFailed, err
+		}
+		return RewriteDone, r.manager.SetRef(out, answer)
+	}
 	if kind == ast.FPAOpToReal {
 		if args.Count() != 1 {
 			return RewriteFailed, ast.ErrASTDomain
