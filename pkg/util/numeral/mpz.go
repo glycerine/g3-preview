@@ -741,10 +741,7 @@ func (m *IntegerManager) allocateIfNeededWithPhysicalAllocationContext(a *Int, c
 	return nil
 }
 
-func (m *IntegerManager) setBig64(a *Int, v uint64, sign int32) error {
-	return m.setBig64WithAllocationContext(a, v, sign, integerAllocationInvocationContext{})
-}
-func (m *IntegerManager) setBig64WithAllocationContext(a *Int, v uint64, sign int32, context integerAllocationInvocationContext) error {
+func (m *IntegerManager) setBig64WithAllocationContext(a *Int, v uint64, sign int32, line int32, context integerAllocationInvocationContext) error {
 	ref := a.Cell
 	if ref == 0 {
 		var e error
@@ -752,18 +749,27 @@ func (m *IntegerManager) setBig64WithAllocationContext(a *Int, v uint64, sign in
 		if e != nil {
 			return e
 		}
+		a.Cell = ref
+		m.PublishCell(ref)
 	}
 	// mpz.cpp set_big_i64/set_big_ui64 assert capacity after optional
 	// allocation and before any sign or limb publication.
-	if modularSourceDebug && m.Cell(ref).Capacity < 6 {
-		return ErrIntegerAssertion
+	if modularSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return e
+		}
+		if enabled && m.Cell(ref).Capacity < 6 {
+			if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", line, "capacity(c) >= m_init_cell_capacity"); e != nil {
+				return e
+			}
+		}
 	}
 	size := uint32(1)
 	if v>>32 != 0 {
 		size = 2
 	}
-	a.Cell = ref
-	m.PublishCell(ref)
 	a.Val = sign
 	m.writeDigit(ref, 0, uint32(v))
 	m.writeDigit(ref, 1, uint32(v>>32))
@@ -790,7 +796,7 @@ func (m *IntegerManager) setInt64WithAllocationContext(a *Int, v int64, context 
 		sign = -1
 		magnitude = 0 - uint64(v)
 	}
-	return m.setBig64WithAllocationContext(a, magnitude, sign, context)
+	return m.setBig64WithAllocationContext(a, magnitude, sign, 170, context)
 }
 
 // SetUint64 preserves the source's strict < INT_MAX inline threshold.
@@ -804,7 +810,7 @@ func (m *IntegerManager) setUint64WithAllocationContext(a *Int, v uint64, contex
 	if v < math.MaxInt32 {
 		return m.setInt64WithAllocationContext(a, int64(v), context)
 	}
-	return m.setBig64WithAllocationContext(a, v, 1, context)
+	return m.setBig64WithAllocationContext(a, v, 1, 220, context)
 }
 
 // SetLimbs is the source unsigned digit-vector setter, with trailing zeros

@@ -127,6 +127,9 @@ func TestIntegerBigScalarSetterAllocationBeforeSign(t *testing.T) {
 
 func TestIntegerBigScalarSetterSourceCapacityAssertion(t *testing.T) {
 	for _, unsigned := range []bool{false, true} {
+		if modularSourceDebug {
+			bindMPNDebugActions(t, "T")
+		}
 		m, b := mpzPublicationOwner(t)
 		var out Int
 		if e := m.SetInt64(&out, -(1 << 40)); e != nil {
@@ -147,7 +150,7 @@ func TestIntegerBigScalarSetterSourceCapacityAssertion(t *testing.T) {
 		}
 		mpzPublicationAudit(t, m, &out)
 		if modularSourceDebug {
-			if !errors.Is(e, ErrIntegerAssertion) || out.Val != -1 || m.Digit(ref, 0) != 0 || m.Digit(ref, 1) != 256 {
+			if !isMPNVerificationThrow(e) || out.Val != -1 || m.Digit(ref, 0) != 0 || m.Digit(ref, 1) != 256 {
 				t.Fatal("capacity assertion precedes sign/digits", unsigned, out, e)
 			}
 		} else if e != nil || out.Val != 1 {

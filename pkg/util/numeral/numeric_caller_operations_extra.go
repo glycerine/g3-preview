@@ -177,12 +177,6 @@ func (o NumericIntegerOperations) AllocateIfNeeded(a *Int, capacity uint32) erro
 	}
 	return o.manager.allocateIfNeededWithAllocationContext(a, capacity, o.context)
 }
-func (o NumericIntegerOperations) SetBig64(a *Int, v uint64, sign int32) error {
-	if e := o.valid(); e != nil {
-		return e
-	}
-	return o.manager.setBig64WithAllocationContext(a, v, sign, o.context)
-}
 func (o NumericIntegerOperations) SetUint64(a *Int, v uint64) error {
 	if e := o.valid(); e != nil {
 		return e
