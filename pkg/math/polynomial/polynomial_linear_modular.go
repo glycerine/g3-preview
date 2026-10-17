@@ -208,6 +208,7 @@ func (s *ModularLinearSolver) Solve(xs []unumeral.Int) (bool, error) {
 		return false, e
 	}
 	for k := uint32(0); k < s.n; k++ {
+		s.traceIteration(k, 90)
 		i := k
 		for ; i < s.n; i++ {
 			r, e := s.row(i)
@@ -309,6 +310,7 @@ func (s *ModularLinearSolver) Solve(xs []unumeral.Int) (bool, error) {
 	k := s.n
 	for k > 0 {
 		k--
+		s.traceIteration(k, 124)
 		rk, e := s.row(k)
 		if e != nil {
 			return false, e

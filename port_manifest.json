@@ -39613,7 +39613,9 @@
         "pkg/util/numeral/numeric_source_delete.go",
         "pkg/math/polynomial/polynomial_linear_display.go",
         "pkg/math/polynomial/polynomial_linear_native_source_test.go",
-        "pkg/math/polynomial/polynomial_linear_local_constructor_source_test.go"
+        "pkg/math/polynomial/polynomial_linear_local_constructor_source_test.go",
+        "pkg/math/polynomial/polynomial_linear_trace.go",
+        "pkg/util/numeral/integer_trace_borrow.go"
       ],
       "tests": [
         "TestLinearRationalSourceDisplaySpacingAndOrder",
@@ -39637,7 +39639,9 @@
         "TestLinearNativeRHSBeforeReachedInput",
         "TestLinearNativeOutputsAndRHSAlias",
         "TestLinearModularNativeGrowthIndependentTriangularSystem",
-        "TestLinearNativeBigSelfCopyAliases"
+        "TestLinearNativeBigSelfCopyAliases",
+        "TestLinearRationalIterationTraceSourceStates",
+        "TestLinearModularIterationTraceSourceStates"
       ],
       "conditionals": [
         {
@@ -39738,7 +39742,8 @@
       "ownership": [
         "Native [][]util.Int/[]util.Int and [][]util.Rational/[]util.Rational own matrix/RHS cells. Rational defaults are explicitly 0/1. Native slice capacity is outside Runtime budget. Actual BIG numeral resources remain manager-owned and are independently audited after arithmetic refusal prefixes. Source destruction stops sticky; explicit owning continuation drains actual retained numeral fields.",
         "Source pivot swaps matrix rows only, never RHS; source behavior preserved. Add publishes RHS before reached caller coefficient read. Singular return precedes output writes; descending back substitution copies each output before changing lower RHS cells. Literal Flush deletes RHS then row entries in ascending order, then clears native containers. Source class finalization releases their slices.",
-        "Embedded solver has no separate header charge. Constructor source field guard precedes external header reservation. Add/Solve borrow concrete native slices at reached indices. Actual cell pointers preserve BIG self-copy aliases; empty Solve leaves nil output unread."
+        "Embedded solver has no separate header charge. Constructor source field guard precedes external header reservation. Add/Solve borrow concrete native slices at reached indices. Actual cell pointers preserve BIG self-copy aliases; empty Solve leaves nil output unread.",
+        "Both retained concrete linear solvers now emit the source linear_eq_solver TRACE at h:90 before pivot search/normalization and h:124 before each backward save/substitution. The actual numeric manager trace context is borrowed (including process fallback), so local sparse-interpolation solvers inherit the same tags without a separate solver configuration. Each body displays actual typed matrix/RHS storage through the existing source Display; disabled/erased tags skip formatting and reads. Independent diagonal-system tests verify forward/backward order 0,1,1,0, exact intermediate matrices, solved values, modular symmetric -2 for 9 mod 11, and empty output in the erased profile. Focused linear and sparse interpolation mathematical/trace checks run in ordinary and checked/debug/trace profiles on CPUs 8-16. Stream failure/callback/exception composition and full unit/polynomial/AST completion remain unaudited."
       ],
       "deviations": [
         "No Go generics: concrete rational and integer-modular specializations cover retained source clients. C++ vector capacity, allocation and relocation failure behavior intentionally replaced by native Go slices. Actual numerical allocation/refusal behavior and source arithmetic order remain. Global manager/assertion/TRACE binding remains open.",
