@@ -4,8 +4,10 @@ package ast
 import "github.com/glycerine/g3/pkg/util/z3exception"
 
 const FPAOpRem int32 = astFPARem
+const FPAOpMin int32 = astFPAMin
+const FPAOpMax int32 = astFPAMax
 
-func (m *ASTManager) floatingPointRemainderDecl(domain []ASTHandle) (astNodeRef, error) {
+func (m *ASTManager) floatingPointBinaryDecl(kind int32, domain []ASTHandle) (astNodeRef, error) {
 	if len(domain) != 2 {
 		return astNodeRef{}, ASTException{z3exception.NewDefaultException("invalid number of arguments to floating point operator")}
 	}
@@ -29,9 +31,20 @@ func (m *ASTManager) floatingPointRemainderDecl(domain []ASTHandle) (astNodeRef,
 	if !valid {
 		return astNodeRef{}, ASTException{z3exception.NewDefaultException("sort mismatch, expected arguments of equal FloatingPoint sorts")}
 	}
-	name, err := m.Symbols.Intern("fp.rem")
+	var text string
+	switch kind {
+	case astFPARem:
+		text = "fp.rem"
+	case astFPAMin:
+		text = "fp.min"
+	case astFPAMax:
+		text = "fp.max"
+	default:
+		return astNodeRef{}, ErrASTDomain
+	}
+	name, err := m.Symbols.Intern(text)
 	if err != nil {
 		return astNodeRef{}, err
 	}
-	return m.pluginDecl(name, m.floatingPointPlugin.family, astFPARem, nil, domain, first, ASTFuncFlags{}, false)
+	return m.pluginDecl(name, m.floatingPointPlugin.family, kind, nil, domain, first, ASTFuncFlags{}, false)
 }

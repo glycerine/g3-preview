@@ -17409,8 +17409,9 @@
         "pkg/ast/ast_fpa_native_value_table_test.go",
         "pkg/ast/ast_fpa_numeral_probe.go",
         "pkg/ast/ast_fpa_numeral_probe_test.go",
-        "pkg/ast/ast_fpa_remainder_decl.go",
-        "pkg/ast/ast_fpa_remainder_test.go"
+        "pkg/ast/ast_fpa_binary_decl.go",
+        "pkg/ast/ast_fpa_remainder_test.go",
+        "pkg/ast/ast_fpa_extrema_test.go"
       ],
       "tests": [
         "TestASTFloatingPointClassificationDeclarationsAndApplications",
@@ -17437,7 +17438,8 @@
         "TestASTFloatingPointConstructorDestructorFailureClearsResult",
         "TestASTFloatingPointSpecialNaNFailureRetainsScalar",
         "TestASTFloatingPointSignedZeroSortOverloads",
-        "TestASTFPARemainderDeclarationAndApplication"
+        "TestASTFPARemainderDeclarationAndApplication",
+        "TestASTFPAExtremaDeclarationsAndNumericBranches"
       ],
       "assertions": [
         {
@@ -17603,9 +17605,17 @@
         {
           "name": "Concrete fp.rem binary declaration validates exactly two equal FloatingPoint domains and returns the operand sort (fpa_decl_plugin.cpp:352-373)",
           "status": "ported",
-          "go_target": "pkg/ast/ast_fpa_remainder_decl.go",
+          "go_target": "pkg/ast/ast_fpa_binary_decl.go",
           "tests": [
             "TestASTFPARemainderDeclarationAndApplication"
+          ]
+        },
+        {
+          "name": "Concrete fp.min/fp.max binary declarations validate exactly two equal FloatingPoint domains and return the operand sort (fpa_decl_plugin.cpp:352-373)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_binary_decl.go",
+          "tests": [
+            "TestASTFPAExtremaDeclarationsAndNumericBranches"
           ]
         }
       ],
@@ -26715,10 +26725,14 @@
       "status": "partial",
       "go_targets": ["pkg/ast/ast_fpa_classification_read.go", "pkg/ast/ast_fpa_smt_equality.go", "pkg/ast/ast_fpa_nan_sort.go", "pkg/ast/ast_fpa_unary_numeral.go", "pkg/ast/rewriter/fpa_classification.go", "pkg/ast/rewriter/fpa_comparisons.go", "pkg/ast/rewriter/fpa_unary.go",
         "pkg/ast/ast_fpa_remainder.go",
-        "pkg/ast/rewriter/fpa_remainder.go"],
+        "pkg/ast/rewriter/fpa_remainder.go",
+        "pkg/ast/ast_fpa_extrema.go",
+        "pkg/ast/rewriter/fpa_extrema.go"],
       "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestASTFPAUnaryScopedNumeralRetiresBeforeReturn", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
         "TestASTFPARemainderFiniteNumeralAndScopedCleanup",
-        "TestFPARemainderNumericSpecialAndSymbolicRefusal"],
+        "TestFPARemainderNumericSpecialAndSymbolicRefusal",
+        "TestASTFPAExtremaDeclarationsAndNumericBranches",
+        "TestFPAExtremaNaNInfinitySignedZeroAndSymbolic"],
       "assertions": [
         {
           "line": 43,
@@ -26978,6 +26992,15 @@
             "TestASTFPARemainderFiniteNumeralAndScopedCleanup",
             "TestFPARemainderNumericSpecialAndSymbolicRefusal"
           ]
+        },
+        {
+          "name": "mk_min/mk_max source NaN short circuits, opposite-signed-zero refusal and three scoped_mpf numeric locals (fpa_rewriter.cpp:369-415)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_extrema.go",
+          "tests": [
+            "TestASTFPAExtremaDeclarationsAndNumericBranches",
+            "TestFPAExtremaNaNInfinitySignedZeroAndSymbolic"
+          ]
         }
       ],
       "ownership": ["Each classification call creates one caller-local scoped_mpf through the AST plugin's concrete numeral probe; successful source destruction retires it before the Boolean result is published. A stopped source destructor remains in the AST plugin's owning cleanup list.", "SMT and IEEE equality construct both scoped_mpf locals before operand probing and retire them in reverse order, preserving the short circuit when the first operand is symbolic."],
@@ -26989,9 +27012,11 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/ast/rewriter/fpa_classification.go",
-        "pkg/ast/rewriter/fpa_remainder.go"],
+        "pkg/ast/rewriter/fpa_remainder.go",
+        "pkg/ast/rewriter/fpa_extrema.go"],
       "tests": ["TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
-        "TestFPARemainderNumericSpecialAndSymbolicRefusal"],
+        "TestFPARemainderNumericSpecialAndSymbolicRefusal",
+        "TestFPAExtremaNaNInfinitySignedZeroAndSymbolic"],
       "conditionals": [
         {
           "line": 19,
@@ -27011,6 +27036,14 @@
           "go_target": "pkg/ast/rewriter/fpa_remainder.go",
           "tests": [
             "TestFPARemainderNumericSpecialAndSymbolicRefusal"
+          ]
+        },
+        {
+          "name": "Concrete mk_min/mk_max declarations and reached rewriter dispatch (fpa_rewriter.h; fpa_rewriter.cpp:70-71,369-415)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_extrema.go",
+          "tests": [
+            "TestFPAExtremaNaNInfinitySignedZeroAndSymbolic"
           ]
         }],
       "ownership": [],
@@ -178377,7 +178410,8 @@
         "pkg/math/interval/arbitrary_root.go",
         "pkg/math/interval/arbitrary_root_scratch_cleanup_test.go",
         "pkg/math/subpaving/hardware_split.go",
-        "pkg/ast/ast_fpa_remainder.go"
+        "pkg/ast/ast_fpa_remainder.go",
+        "pkg/ast/ast_fpa_extrema.go"
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
@@ -178472,7 +178506,8 @@
         "TestScopedArbitraryFloatSourceDeletionAndOwningRetry",
         "TestArbitraryRootScratchStoppedSourceSuffixAndOwningRetry",
         "TestHardwareMidpointSplitterRetainedBranchesAndRefusal",
-        "TestASTFPARemainderFiniteNumeralAndScopedCleanup"
+        "TestASTFPARemainderFiniteNumeralAndScopedCleanup",
+        "TestASTFPAExtremaDeclarationsAndNumericBranches"
       ],
       "conditionals": [
         {
@@ -178799,6 +178834,14 @@
           "go_target": "pkg/ast/ast_fpa_remainder.go",
           "tests": [
             "TestASTFPARemainderFiniteNumeralAndScopedCleanup"
+          ]
+        },
+        {
+          "name": "Concrete fpa_rewriter mk_min/mk_max operand and result scoped_mpf lifetimes, with result constructed after opposite signed-zero guard (fpa_rewriter.cpp:369-415; scoped_numeral.h:24-33)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_extrema.go",
+          "tests": [
+            "TestASTFPAExtremaDeclarationsAndNumericBranches"
           ]
         }
       ],

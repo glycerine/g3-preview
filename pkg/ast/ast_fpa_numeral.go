@@ -28,6 +28,8 @@ const (
 	astFPANeg              int32 = 13
 	astFPARem              int32 = 16
 	astFPAAbs              int32 = 17
+	astFPAMin              int32 = 18
+	astFPAMax              int32 = 19
 	astFPAEq               int32 = 23
 	astFPALt               int32 = 24
 	astFPAGt               int32 = 25
