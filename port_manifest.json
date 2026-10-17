@@ -39549,7 +39549,8 @@
         "pkg/math/polynomial/gparams_catalog_collectors.go",
         "pkg/util/params/util_gparams_catalog_dispatch.go",
         "pkg/math/polynomial/algebraic_manager.go",
-        "pkg/math/polynomial/algebraic_params.go"
+        "pkg/math/polynomial/algebraic_params.go",
+        "pkg/util/params/util_module_params_source.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -39561,7 +39562,9 @@
         "TestAlgebraicManagerConstructorParametersAndPublicUpdateNoop",
         "TestAlgebraicManagerGlobalParameterFallbackAndLocalPrecedence",
         "TestAlgebraicManagerEveryConstructorReservationAndCleanup",
-        "TestAlgebraicManagerStoppedYoungestMemberProtectsOlderOwners"
+        "TestAlgebraicManagerStoppedYoungestMemberProtectsOlderOwners",
+        "TestAlgebraicParametersAllGlobalFallbackLocalPrecedenceAndSnapshot",
+        "TestAlgebraicParameterDescriptorSchemaSourceOrder"
       ],
       "conditionals": [
         {
@@ -39577,7 +39580,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; broader runtime algorithms/getters remain open",
+          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; retained constructor getters now have separate evidence; broader helper composition remains open",
           "status": "ported",
           "go_target": "pkg/math/polynomial/gparams_catalog_collectors.go",
           "tests": [
@@ -39593,8 +39596,9 @@
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open.",
-        "Owning AlgebraicManager now composes the actual core header, binary-rational and interval managers, private multivariate manager, independent univariate manager, eager isolation descriptors/factors/vectors and add temporary in source member order (algebraic_numbers.cpp:64-126,2772-2786). It reserves the two private variables after parameter loading/statistics reset. Constructor parameters use one actual algebraic module helper with local precedence and signed32 magnitude conversion; public updt_params remains the empty source method (:2788-2789). qm/bqm return actual owner identities; statistics preserve source order. Reverse private destruction stops before older owners when the youngest destructor fails. Every constructor reservation frontier verifies retained-owner cleanup and retry; tests distinguish the borrowed Runtime directory cache from manager storage. Own and borrowed allocators/services, eager descriptors, arithmetic, parameter precedence and stopped destruction pass ordinary and checked/debug/trace profiles on CPUs 8-16. Standalone borrowed cores retain lazy compatibility. Full allocation/callback/destructor/TRACE composition and polynomial/AST completion remain pending; no whole-unit completion credit."
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; Retained value getters now have concrete constructor evidence; broader helper failure/callback composition remains open.",
+        "Owning AlgebraicManager now composes the actual core header, binary-rational and interval managers, private multivariate manager, independent univariate manager, eager isolation descriptors/factors/vectors and add temporary in source member order (algebraic_numbers.cpp:64-126,2772-2786). It reserves the two private variables after parameter loading/statistics reset. Constructor parameters use one actual algebraic module helper with local precedence and signed32 magnitude conversion; public updt_params remains the empty source method (:2788-2789). qm/bqm return actual owner identities; statistics preserve source order. Reverse private destruction stops before older owners when the youngest destructor fails. Every constructor reservation frontier verifies retained-owner cleanup and retry; tests distinguish the borrowed Runtime directory cache from manager storage. Own and borrowed allocators/services, eager descriptors, arithmetic, parameter precedence and stopped destruction pass ordinary and checked/debug/trace profiles on CPUs 8-16. Standalone borrowed cores retain lazy compatibility. Full allocation/callback/destructor/TRACE composition and polynomial/AST completion remain pending; no whole-unit completion credit.",
+        "Retained algebraic parameter schema/getter audit: source-wide algebraic_params references are only the polynomial CMake schema listing, generated header, algebraic_numbers.cpp descriptor delegation (:62), and constructor helper (:151). All six generated getters are concretely consumed by readConstructorParams; no unused public wrapper/template adapter is introduced. New all-global/all-local tests use distinct values for every setting, verify local precedence/global fallback and signed magnitude/accuracy translation, confirm the actual helper receipt ends at construction, mutate both caller/global dictionaries, and prove the captured configuration and empty public update remain unchanged. A direct production collector test checks all six descriptor names in source order, kinds, default strings, algebraic module and description presence; the existing independent full catalog metadata fixture verifies exact descriptions. Existing constructor reservation/cleanup/retry tests remain part of the evidence. The .pyg generated-input status is corrected from wholly unported to partial, reflecting its concrete schema output and retained consumers; generated helper failure/callback composition and whole polynomial/AST completion remain pending. Focused ordinary and checked/debug/trace manager/parameter checks run on CPUs 8-16."
       ],
       "deviations": []
     },
@@ -39602,13 +39606,25 @@
       "path": "src/math/polynomial/algebraic_params.pyg",
       "component": "math",
       "role": "generated_input",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/math/polynomial/algebraic_params.go",
+        "pkg/math/polynomial/algebraic_manager.go",
+        "pkg/math/polynomial/gparams_catalog_collectors.go",
+        "pkg/util/params/util_module_params_source.go"
+      ],
+      "tests": [
+        "TestAlgebraicParametersAllGlobalFallbackLocalPrecedenceAndSnapshot",
+        "TestAlgebraicParameterDescriptorSchemaSourceOrder",
+        "TestAlgebraicManagerEveryConstructorReservationAndCleanup",
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher"
+      ],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [],
-      "ownership": [],
+      "ownership": [
+        "Retained algebraic parameter schema/getter audit: source-wide algebraic_params references are only the polynomial CMake schema listing, generated header, algebraic_numbers.cpp descriptor delegation (:62), and constructor helper (:151). All six generated getters are concretely consumed by readConstructorParams; no unused public wrapper/template adapter is introduced. New all-global/all-local tests use distinct values for every setting, verify local precedence/global fallback and signed magnitude/accuracy translation, confirm the actual helper receipt ends at construction, mutate both caller/global dictionaries, and prove the captured configuration and empty public update remain unchanged. A direct production collector test checks all six descriptor names in source order, kinds, default strings, algebraic module and description presence; the existing independent full catalog metadata fixture verifies exact descriptions. Existing constructor reservation/cleanup/retry tests remain part of the evidence. The .pyg generated-input status is corrected from wholly unported to partial, reflecting its concrete schema output and retained consumers; generated helper failure/callback composition and whole polynomial/AST completion remain pending. Focused ordinary and checked/debug/trace manager/parameter checks run on CPUs 8-16."
+      ],
       "deviations": []
     },
     {
