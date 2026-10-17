@@ -51,6 +51,7 @@ type evaluatorConfiguration struct {
 	owner                              *ModelEvaluator
 	boolean                            *rewriter.BoolRewriter
 	array                              *rewriter.ArrayRewriter
+	fpa                                *rewriter.FPARewriter
 	arrayFamily                        ast.FamilyID
 	substitution                       *rewriter.VarSubstitution
 	params                             uparams.ModuleParamsOwner
@@ -239,6 +240,12 @@ func (ev *ModelEvaluator) closeImp() error {
 	if e := ev.cfg.params.CloseHelpers(); e != nil {
 		return e
 	}
+	if ev.cfg.fpa != nil {
+		if e := ev.cfg.fpa.Close(); e != nil {
+			return e
+		}
+		ev.cfg.fpa = nil
+	}
 	if ev.cfg.array != nil {
 		if e := ev.cfg.array.Close(); e != nil {
 			return e
@@ -398,6 +405,10 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 	if e != nil {
 		return rewriter.RewriteFailed, e
 	}
+	fpaFamily, e := m.ExistingFloatingPointFamilyID()
+	if e != nil {
+		return rewriter.RewriteFailed, e
+	}
 	consideredUninterpreted := false
 	if fid != ast.NullFamilyID {
 		consideredUninterpreted, e = m.IsConsideredUninterpreted(d)
@@ -460,6 +471,19 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 				if e != nil || status != rewriter.RewriteFailed {
 					return status, e
 				}
+			} else if fpaFamily != ast.NullFamilyID && sortFamily == fpaFamily {
+				right, e := args.At(1)
+				if e != nil {
+					return rewriter.RewriteFailed, e
+				}
+				rw, e := c.fpaRewriter()
+				if e != nil {
+					return rewriter.RewriteFailed, e
+				}
+				status, e := rw.MkEqCore(arg, right, out)
+				if e != nil || status != rewriter.RewriteFailed {
+					return status, e
+				}
 			} else if sortFamily > 4 {
 				return rewriter.RewriteFailed, ErrModelEvaluatorTheory
 			}
@@ -482,6 +506,27 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 	}
 	if fid == c.arrayFamily {
 		status, e := c.array.MkAppCore(d, args, out)
+		if e != nil {
+			return rewriter.RewriteFailed, e
+		}
+		if status == rewriter.RewriteFailed {
+			return c.evaluatePartialTheoryWithTrace(d, args, out, proof)
+		}
+		final, e := c.evaluateReducedApp(status, out)
+		if e != nil || status == rewriter.RewriteDone && final == rewriter.Rewrite1 {
+			return final, e
+		}
+		if e = c.traceReduceStatus(final, out); e != nil {
+			return rewriter.RewriteFailed, e
+		}
+		return final, nil
+	}
+	if fpaFamily != ast.NullFamilyID && fid == fpaFamily {
+		rw, e := c.fpaRewriter()
+		if e != nil {
+			return rewriter.RewriteFailed, e
+		}
+		status, e := rw.MkAppCore(d, args, out)
 		if e != nil {
 			return rewriter.RewriteFailed, e
 		}
@@ -542,6 +587,18 @@ func (c *evaluatorConfiguration) ReduceApp(d ast.ASTHandle, args ast.AppArgument
 		return rewriter.Rewrite1, nil
 	}
 	return rewriter.RewriteFailed, nil
+}
+
+func (c *evaluatorConfiguration) fpaRewriter() (*rewriter.FPARewriter, error) {
+	if c.fpa != nil {
+		return c.fpa, nil
+	}
+	rw, err := rewriter.NewFPARewriter(c.owner.model.manager)
+	if err != nil {
+		return nil, err
+	}
+	c.fpa = rw
+	return rw, nil
 }
 
 // Source: src/model/model_evaluator.cpp:194-202.

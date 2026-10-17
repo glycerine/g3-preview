@@ -179,6 +179,21 @@ func (m *ASTManager) RegisterFloatingPointPlugin() (FamilyID, error) {
 	defer func() { m.formatExecuting = false }()
 	return m.registerFloatingPointPlugin()
 }
+
+// ExistingFloatingPointFamilyID reads the registered family without creating
+// a plugin. Model evaluation uses it to dispatch only already reached FPA
+// declarations and sorts.
+func (m *ASTManager) ExistingFloatingPointFamilyID() (FamilyID, error) {
+	if e := m.lock(); e != nil {
+		return NullFamilyID, e
+	}
+	defer m.mu.Unlock()
+	p := m.floatingPointPlugin
+	if p == nil || p.self != p || !p.published || p.sourceEnded {
+		return NullFamilyID, nil
+	}
+	return p.family, nil
+}
 func (m *ASTManager) floatingPointSort(k int32, ps []ASTParameter) (astNodeRef, error) {
 	p := m.floatingPointPlugin
 	var ebits, sbits uint32

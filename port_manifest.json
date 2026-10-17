@@ -58334,6 +58334,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/model/model_evaluator_trace.go",
+        "pkg/model/model_evaluator_fpa_test.go",
         "pkg/model/model_evaluator_array_trace_test.go",
         "pkg/model/model_evaluator_memory_trace.go",
         "pkg/model/model_evaluator_memory_trace_debug_test.go",
@@ -58350,6 +58351,7 @@
         "pkg/model/model_evaluator_function_memory_trace_debug_test.go"
       ],
       "tests": [
+        "TestModelEvaluatorFPAEqualityAndApplicationReduction",
         "TestModelEvaluatorBooleanReductionSourceStatusTrace",
         "TestModelEvaluatorDirectEntrySourceTrace",
         "TestModelEvaluatorArrayExtractionSourceTrace",
@@ -58522,6 +58524,14 @@
           ]
         },
         {
+          "name": "original FPA reducer dispatch and floating-point SMT equality before Boolean fallback (src/model/model_evaluator.cpp:149-174), with distinct IEEE fp.eq, special-value application reduction and evaluator cleanup",
+          "status": "partial",
+          "go_target": "pkg/model/model_evaluator.go",
+          "tests": [
+            "TestModelEvaluatorFPAEqualityAndApplicationReduction"
+          ]
+        },
+        {
           "name": "original args_are_values, extract_array_func_interp and expand_value after evaluator traversal over existing AST value/groundness/equality primitives",
           "status": "partial",
           "go_target": "pkg/model/model_evaluator_array_expansion.go",
@@ -58561,12 +58571,13 @@
       "ownership": [
         "Evaluator borrows model, parameter, Runtime and Cooperation services. Concrete cold evaluator header embeds its configuration and parameter owner; separately charged public traversal and Boolean reducer keep existing member cleanup. Failed unpublished function graph remains named until Close; successful registration transfers it to the model. Function entries read the original borrowed argument view without allocating a copied array.",
         "Array reducer is constructed after Boolean reducer with evaluator constructor parameters and closed before it. Partial theory graph substitution keeps its lexical var_subst owner named through reverse cleanup; failed cleanup prevents another invocation from overwriting the owner. Borrowed argument bindings reuse the original beta engine copy protocol without a second argument array.",
+        "The FPA reducer is constructed lazily only for reached FPA declarations or equality on an FPA sort, borrows the AST manager, and closes before the array and Boolean reducers. An absent FPA family cannot match the null family of an uninterpreted declaration.",
         "Unspecified BV/arithmetic declarations reuse existing constant registration and partial-theory substitution/function-interpretation owners. Macro completion publishes the exact new interpretation after its else value; pending owners remain available to evaluator close on failed allocation. New plugin predicates borrow declaration metadata and do not construct an application or acquire numerical references.",
         "Native slice roots retain one actual AST reference per element, including partial appends. Cleanup retires consumed references before reporting errors and retains unread roots for retry. Borrowed tuple tables clear before their owning rows; original else, parameter and select owners retain existing lexical cleanup.",
         "The retained model-completion function interpretation now carries its source debug memory allocation identity through transfer to ModelCore, whose replacement, unregister and destructor paths emit their distinct source deallocation sites after owned Close."
       ],
       "deviations": [
-        "Boolean/uninterpreted and selected original array store/select and value extraction/expansion and nonidentity equality paths are integrated. Arithmetic/BV/datatype/PB/FPA/sequence reducers, considered-uninterpreted plugin dispatch remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited.",
+        "Boolean/uninterpreted and selected original array store/select and value extraction/expansion and nonidentity equality paths are integrated. FPA declarations and FPA-sort SMT equality now use the existing FPA rewriter; finite/special-value results are tested, while broader model evaluation and FPA partial-theory cases remain open. Arithmetic/BV/datatype/PB/sequence reducers and considered-uninterpreted plugin dispatch remain open. Array equality identity is handled before the expansion flag; disabled expansion falls through to the original Boolean reducer. Partial theory graph fallback is integrated for the known array dispatch, including source unconditional partial-graph completion and direct-order var_subst. Reached remaining unsupported theory paths explicitly refuse. Runtime AllocationSize remains the existing memory accounting owner; runtime-wide typed allocator wiring, proof generation, TRACE, whole-unit ownership/allocator ABI and broader failure campaigns remain uncredited.",
         "Selected extraction preserves store-prefix and function-entry order, all-entry groundness rejection, missing/nonground else rejection, and backwards else-equal pruning only while index values permit it. Concrete Go scalar owners and lexical vector storage remain explicit representations, without whole native allocation ABI credit.",
         "Original equality constraints deliberately retain two source limitations: finite-domain default equality is required even when explicit entries cover every index, and unknown matched rows remain in table1 for a later comparison with else2. Independent truth-table tests expose these source false negatives. No source algorithm correction or whole-unit native allocation/assertion credit is claimed.",
         "Original set declarations/reducers now reach evaluator traversal. Independent concrete Boolean membership/subset tests cover reducible aligned-store/constant cases and exact unresolved select/map/equality residuals for mismatched-index or mixed constant/store inputs. This preserves the source evaluator limitation rather than claiming full concrete set decision coverage.",
