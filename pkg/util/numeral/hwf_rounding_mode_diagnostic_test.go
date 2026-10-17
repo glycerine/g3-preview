@@ -2,6 +2,7 @@
 package numeral
 
 import (
+	"math"
 	"os"
 	"testing"
 )
@@ -34,5 +35,30 @@ func TestHardwareFloatUnsupportedModeSourceDiagnostic(t *testing.T) {
 		"(C)ontinue, (A)bort, (S)top, (T)hrow exception, Invoke (G)DB\n"
 	if string(got) != one+one+one {
 		t.Fatalf("source diagnostic: got %q, want %q", got, one+one+one)
+	}
+}
+
+func TestHardwareFloatUnsupportedModeContinueKeepsSelectedMode(t *testing.T) {
+	if !modularSourceDebug {
+		t.Skip("source debug Continue")
+	}
+	_, output := bindMPNDebugActions(t, "C")
+	previous := hwfSourceSelectedMode
+	t.Cleanup(func() { hwfSourceSelectedMode = previous })
+	first, second := NewHardwareFloatManager(), NewHardwareFloatManager()
+	x, y := HardwareFloat{1}, HardwareFloat{math.Ldexp(1, -53)}
+	var directed, continued HardwareFloat
+	serviceMust(t, first.Add(ArbitraryFloatTowardPositive, &x, &y, &directed))
+	serviceMust(t, second.Add(ArbitraryFloatNearestAway, &x, &y, &continued))
+	want := math.Nextafter(1, math.Inf(1))
+	if directed.value != want || continued.value != want || hwfSourceSelectedMode != ArbitraryFloatTowardPositive {
+		t.Fatal("debug Continue lost prior process mode", directed, continued, hwfSourceSelectedMode)
+	}
+	got, e := os.ReadFile(output.Name())
+	serviceMust(t, e)
+	const diagnosticText = "ASSERTION VIOLATION\nFile: src/util/hwf.cpp\nLine: 642\nUNREACHABLE CODE WAS REACHED.\n" +
+		"(C)ontinue, (A)bort, (S)top, (T)hrow exception, Invoke (G)DB\n"
+	if string(got) != diagnosticText {
+		t.Fatalf("source Continue diagnostic: got %q, want %q", got, diagnosticText)
 	}
 }

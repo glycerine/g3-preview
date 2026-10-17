@@ -9,17 +9,21 @@ import (
 )
 
 // The selected Linux set_rounding_mode switch has no nearest-away or unknown
-// mode. A debug Continue leaves the old host rounding mode in place; this Go
-// scalar replacement uses nearest-even for that otherwise undefined path.
+// mode. A debug Continue leaves the prior process rounding mode in place.
+// The current port is single-goroutine, so one selected mode represents that
+// process setting without changing Go's host FPU environment.
+var hwfSourceSelectedMode = ArbitraryFloatNearestEven
+
 func hwfSourceRoundingMode(mode ArbitraryFloatRoundingMode) (ArbitraryFloatRoundingMode, error) {
 	switch mode {
 	case ArbitraryFloatNearestEven, ArbitraryFloatTowardPositive, ArbitraryFloatTowardNegative, ArbitraryFloatTowardZero:
+		hwfSourceSelectedMode = mode
 		return mode, nil
 	default:
 		if e := diagnostic.BorrowProcessDebugContext().UnreachableSource("src/util/hwf.cpp", 642); e != nil {
 			return mode, e
 		}
-		return ArbitraryFloatNearestEven, nil
+		return hwfSourceSelectedMode, nil
 	}
 }
 

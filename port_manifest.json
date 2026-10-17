@@ -128531,6 +128531,7 @@
         "TestHardwareFloatArithmeticGuardsAndAliasing",
         "TestHardwareFloatRoundToIntegralSourceModes",
         "TestHardwareFloatUnsupportedModeSourceDiagnostic",
+        "TestHardwareFloatUnsupportedModeContinueKeepsSelectedMode",
         "TestHardwareFloatSourceRationalInputDirectedBounds",
         "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards",
         "TestHardwareFloatBorrowedRationalOwnerLifecycle",
@@ -129000,7 +129001,8 @@
           "tests": [
             "TestHardwareFloatDirectedArithmetic",
             "TestHardwareFloatRoundToIntegralSourceModes",
-            "TestHardwareFloatUnsupportedModeSourceDiagnostic"
+            "TestHardwareFloatUnsupportedModeSourceDiagnostic",
+            "TestHardwareFloatUnsupportedModeContinueKeepsSelectedMode"
           ]
         },
         {
@@ -129042,6 +129044,7 @@
         "TestHardwareFloatArithmeticGuardsAndAliasing",
         "TestHardwareFloatRoundToIntegralSourceModes",
         "TestHardwareFloatUnsupportedModeSourceDiagnostic",
+        "TestHardwareFloatUnsupportedModeContinueKeepsSelectedMode",
         "TestHardwareFloatSourceRationalInputDirectedBounds",
         "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards",
         "TestHardwareFloatBorrowedRationalOwnerLifecycle",
@@ -129159,7 +129162,8 @@
           "tests": [
             "TestHardwareFloatDirectedArithmetic",
             "TestHardwareFloatRoundToIntegralSourceModes",
-            "TestHardwareFloatUnsupportedModeSourceDiagnostic"
+            "TestHardwareFloatUnsupportedModeSourceDiagnostic",
+            "TestHardwareFloatUnsupportedModeContinueKeepsSelectedMode"
           ]
         },
         {
