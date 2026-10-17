@@ -272,6 +272,9 @@ func (g *GlobalParams) GetParams(k usymbol.Symbol) (*ParamsRef, error) {
 		return &g.globalParams, nil
 	}
 	if n, ok := g.ModuleParams.get(k); ok {
+		if e := g.sourceGetParamsAssertion(n != 0); e != nil {
+			return nil, e
+		}
 		if n == 0 || int(n) > len(g.Cells) || g.Cells[n-1] == nil {
 			return nil, ErrGlobalParamsOwner
 		}
@@ -309,7 +312,19 @@ func (g *GlobalParams) GetParams(k usymbol.Symbol) (*ParamsRef, error) {
 	} else {
 		g.Cells[slot] = cell
 	}
+	if e := g.sourceGetParamsAssertion(cell != nil); e != nil {
+		return nil, e
+	}
 	return &cell.value, nil
+}
+
+func (g *GlobalParams) sourceGetParamsAssertion(present bool) error {
+	d := udiag.BorrowProcessDebugContext()
+	enabled, e := udiag.SourceAssertionsEnabled(d)
+	if e != nil || !enabled || present {
+		return e
+	}
+	return udiag.DebugAssertionFailure(d, "src/util/gparams.cpp", 195, "p != 0")
 }
 func (g *GlobalParams) getModule(k usymbol.Symbol) (ParamsRef, error) {
 	if e := g.open(); e != nil {

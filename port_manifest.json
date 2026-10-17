@@ -126339,11 +126339,12 @@
           ]
         },
         {
-          "name": "imp::get_params alloc(params_ref) placement charge before module publication; repeated lookup shares the cell, reset and source destructor release after completed reference destruction (cpp188-196,113-120)",
+          "name": "imp::get_params alloc(params_ref) placement charge and module publication before line-195 SASSERT switch; repeated lookup shares the cell, reset and source destructor release after completed reference destruction (cpp188-196,113-120)",
           "status": "ported",
           "go_target": "pkg/util/params/util_gparams.go",
           "tests": [
             "TestGlobalParamsModuleCellAllocationAndRelease",
+            "TestGlobalParamsGetParamsReadsSourceAssertionAfterModulePublication",
             "TestGlobalParamsSetterUsesGoNormalizationStorage",
             "TestGlobalParamsSourceFinalizeFiniteNamedModuleOwners",
             "TestGlobalParamsSourceModuleDECStoppedChildOwningContinuation"
@@ -126639,11 +126640,12 @@
           ]
         },
         {
-          "name": "imp::get_params alloc(params_ref) placement charge before module publication; repeated lookup shares the cell, reset and source destructor release after completed reference destruction (cpp188-196,113-120)",
+          "name": "imp::get_params alloc(params_ref) placement charge and module publication before line-195 SASSERT switch; repeated lookup shares the cell, reset and source destructor release after completed reference destruction (cpp188-196,113-120)",
           "status": "ported",
           "go_target": "pkg/util/params/util_gparams.go",
           "tests": [
             "TestGlobalParamsModuleCellAllocationAndRelease",
+            "TestGlobalParamsGetParamsReadsSourceAssertionAfterModulePublication",
             "TestGlobalParamsSetterUsesGoNormalizationStorage",
             "TestGlobalParamsSourceFinalizeFiniteNamedModuleOwners",
             "TestGlobalParamsSourceModuleDECStoppedChildOwningContinuation"
