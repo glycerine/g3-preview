@@ -57,3 +57,20 @@ func TestMPNDivNReadsEstimateAssertionOnNextIteration(t *testing.T) {
 		t.Fatal("second quotient estimate assertion must stop before its multiplication/output", err, w.closeErr, w.writes, q, r)
 	}
 }
+
+func TestMPNToStringReadsNormalizationAssertionAfterEntryTrace(t *testing.T) {
+	d, _ := bindMPNDebugActions(t, "")
+	m := naturalManager(t)
+	w := &mpnCloseDebugOnTrace{debug: d}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpn_to_string")
+	if !tags.ShouldTrace("mpn_to_string") {
+		t.Skip("source decimal-entry TRACE erased")
+	}
+	m.trace = tags
+	dst := []byte("unchanged\x00")
+	err := m.sourceToCString(limbView{external: []uint32{0, 1}, size: 2}, sourceDecimalDestination{external: dst}, uint64(len(dst)))
+	if !errors.Is(err, arena.ErrClosed) || w.closeErr != nil || w.writes == 0 || string(dst) != "unchanged\x00" || m.Formatting.Active {
+		t.Fatal("normalization assertion must read closed owner before decimal writes", err, w.closeErr, w.writes, dst, m.Formatting.Active)
+	}
+}

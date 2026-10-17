@@ -168,7 +168,31 @@ func (m *NaturalManager) sourceCStringBodyScoped(a limbView, dst sourceDecimalDe
 	denom.write(0, uint32(10)<<d)
 	var j uint64
 	for temp.size > 0 && (temp.size > 1 || temp.read(0) != 0) {
+		if SourceExtendedGCDDebug {
+			dbg := diagnostic.BorrowProcessDebugContext()
+			enabled, e := diagnostic.SourceAssertionsEnabled(dbg)
+			if e != nil {
+				return e
+			}
+			if enabled && d >= 32 {
+				if e := diagnostic.DebugAssertionFailure(dbg, "src/util/mpn.cpp", 230, "d < DIGIT_BITS"); e != nil {
+					return e
+				}
+			}
+		}
 		numer.size = temp.size + 1
+		if SourceExtendedGCDDebug {
+			dbg := diagnostic.BorrowProcessDebugContext()
+			enabled, e := diagnostic.SourceAssertionsEnabled(dbg)
+			if e != nil {
+				return e
+			}
+			if enabled && denom.size == 0 {
+				if e := diagnostic.DebugAssertionFailure(dbg, "src/util/mpn.cpp", 243, "lden > 0"); e != nil {
+					return e
+				}
+			}
+		}
 		numer.write(temp.size, temp.read(temp.size-1)>>(32-d))
 		for i := temp.size - 1; i > 0; i-- {
 			numer.write(i, temp.read(i)<<d|temp.read(i-1)>>(32-d))
