@@ -161257,10 +161257,12 @@
           ]
         },
         {
-          "name": "div shared Algorithm D and source early-return bodies with reached lexical verification guard; broader public span-domain/profile completion remains open",
+          "name": "div shared Algorithm D and internal source early-return/all-zero denominator UNREACHABLE guards with reached lexical verification; broader public span-domain/profile completion remains open",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpn_indexed.go",
           "tests": [
+            "TestNaturalSourceAllZeroDenominatorStopsBeforeOutputs",
+            "TestNaturalSourceAllZeroDenominatorDebugAction",
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
@@ -161907,10 +161909,12 @@
           ]
         },
         {
-          "name": "div shared Algorithm D and source early-return bodies with reached lexical verification guard; broader public span-domain/profile completion remains open",
+          "name": "div shared Algorithm D and internal source early-return/all-zero denominator UNREACHABLE guards with reached lexical verification; broader public span-domain/profile completion remains open",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpn_indexed.go",
           "tests": [
+            "TestNaturalSourceAllZeroDenominatorStopsBeforeOutputs",
+            "TestNaturalSourceAllZeroDenominatorDebugAction",
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",

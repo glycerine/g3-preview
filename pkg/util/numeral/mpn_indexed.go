@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
@@ -91,6 +92,13 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 			r.write(i, v)
 		}
 		return false, nil
+	}
+	allZero := true
+	for i := uint32(0); i < nb && allZero; i++ {
+		allZero = b.read(i) == 0
+	}
+	if allZero {
+		return false, diagnostic.BorrowProcessDebugContext().UnreachableSource("src/util/mpn.cpp", 174)
 	}
 	if na == 1 && nb == 1 {
 		q.write(0, a.read(0)/b.read(0))

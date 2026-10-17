@@ -1,10 +1,12 @@
 package numeral
 
 import (
+	"errors"
 	"math/big"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 func TestNaturalSourceNoAddbackDoesNotPrepareAb(t *testing.T) {
@@ -112,6 +114,31 @@ func TestNaturalSourceShortNumeratorEarlyReturn(t *testing.T) {
 	budget.FailAfter(-1)
 	if e != nil || result || r != [2]uint32{7, 0} || n.RuntimeOwner().Stats().LiveBlocks != 0 {
 		t.Fatal("early source return", result, e, r)
+	}
+}
+
+func TestNaturalSourceAllZeroDenominatorStopsBeforeOutputs(t *testing.T) {
+	if modularSourceDebug {
+		t.Skip("debug UNREACHABLE action is checked with an explicit process binding")
+	}
+	n := naturalManager(t)
+	for _, denom := range [][]uint32{{0}, {0, 0}} {
+		a := make([]uint32, len(denom))
+		a[0] = 7
+		q := []uint32{99}
+		r := make([]uint32, len(denom))
+		for i := range r {
+			r[i] = 88
+		}
+		_, err := n.divide(limbView{external: a, size: uint32(len(a))}, limbView{external: denom, size: uint32(len(denom))}, limbView{external: q, size: 1}, limbView{external: r, size: uint32(len(r))})
+		if !errors.Is(err, diagnostic.ErrDebugNativeUnreachable) || q[0] != 99 {
+			t.Fatal("all-zero source guard", denom, err, q)
+		}
+		for _, v := range r {
+			if v != 88 {
+				t.Fatal("remainder changed before source guard", denom, r)
+			}
+		}
 	}
 }
 
