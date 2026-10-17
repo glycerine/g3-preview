@@ -340,12 +340,8 @@ func TestInfRationalFullHeaderQueriesAndAliases(t *testing.T) {
 	if rational || i64 || u64 {
 		t.Fatal("epsilon predicates")
 	}
-	if got, e := s.InfUint64(&a); modularSourceDebug {
-		if !errors.Is(e, ErrIntegerAssertion) {
-			t.Fatal(e)
-		}
-	} else if e != nil || got != 7 {
-		t.Fatal("release FIRST projection ignores nonzero epsilon", got, e)
+	if got, e := s.InfUint64(&a); e != nil || got != 7 {
+		t.Fatal("disabled assertions project FIRST despite nonzero epsilon", got, e)
 	}
 	minus, e := s.InfMinusOne()
 	serviceMust(t, e)

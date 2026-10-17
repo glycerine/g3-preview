@@ -415,10 +415,6 @@ func TestInfIntRationalConversionsAndMixedComparisons(t *testing.T) {
 			if e != nil || iv != q.Num().Int64() {
 				t.Fatal(iv, e)
 			}
-		} else if modularSourceDebug {
-			if !errors.Is(e, ErrIntegerAssertion) {
-				t.Fatal(e)
-			}
 		} else {
 			want := int64(projectionLowMagnitude(q.Num()))
 			if q.Sign() < 0 {
@@ -433,10 +429,6 @@ func TestInfIntRationalConversionsAndMixedComparisons(t *testing.T) {
 			if e != nil || uv != q.Num().Uint64() {
 				t.Fatal(uv, e)
 			}
-		} else if modularSourceDebug {
-			if !errors.Is(e, ErrIntegerAssertion) {
-				t.Fatal(e)
-			}
 		} else {
 			want := projectionLowMagnitude(q.Num())
 			if a.First.Num.IsSmall() {
@@ -448,31 +440,21 @@ func TestInfIntRationalConversionsAndMixedComparisons(t *testing.T) {
 		}
 		serviceAuditRationalRoots(t, s, &a.First, &r.Raw)
 		a.second = 1
-		if got, e := s.InfIntInt64(&a); modularSourceDebug && !wantI {
-			if !errors.Is(e, ErrIntegerAssertion) {
-				t.Fatal(e)
-			}
-		} else {
-			want := int64(projectionLowMagnitude(q.Num()))
-			if q.Sign() < 0 {
-				want = -want
-			}
-			if e != nil || got != want {
-				t.Fatal("release ignores epsilon signed", text, got, want, e)
-			}
+		gotI, e := s.InfIntInt64(&a)
+		wantIValue := int64(projectionLowMagnitude(q.Num()))
+		if q.Sign() < 0 {
+			wantIValue = -wantIValue
 		}
-		if got, e := s.InfIntUint64(&a); modularSourceDebug && !wantU {
-			if !errors.Is(e, ErrIntegerAssertion) {
-				t.Fatal(e)
-			}
-		} else {
-			want := projectionLowMagnitude(q.Num())
-			if a.First.Num.IsSmall() {
-				want = uint64(int64(a.First.Num.Val))
-			}
-			if e != nil || got != want {
-				t.Fatal("release ignores epsilon unsigned", text, got, want, e)
-			}
+		if e != nil || gotI != wantIValue {
+			t.Fatal("disabled assertions ignore epsilon signed", text, gotI, wantIValue, e)
+		}
+		gotU, e := s.InfIntUint64(&a)
+		wantUValue := projectionLowMagnitude(q.Num())
+		if a.First.Num.IsSmall() {
+			wantUValue = uint64(int64(a.First.Num.Val))
+		}
+		if e != nil || gotU != wantUValue {
+			t.Fatal("disabled assertions ignore epsilon unsigned", text, gotU, wantUValue, e)
 		}
 		b := infIntValue(t, s, text, 1)
 		ok, e = s.InfIntEqual(&a, &b)

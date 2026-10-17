@@ -124,6 +124,9 @@ func TestScalarProjectionRetainedSizeHeaderReads(t *testing.T) {
 }
 
 func TestScalarProjectionRationalRawNumeratorsAndPredicates(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, strings.Repeat("T", 128))
+	}
 	for _, sync := range []bool{false, true} {
 		m, _ := rationalManager(t, sync)
 		for _, n := range []int64{math.MinInt64, math.MinInt32, -7, 0, 1, math.MaxInt32, math.MaxUint32, math.MaxInt64} {
@@ -135,8 +138,8 @@ func TestScalarProjectionRationalRawNumeratorsAndPredicates(t *testing.T) {
 				u32, u32e := m.Unsigned(&a)
 				i32, i32e := m.Int32(&a)
 				qopsAuditLiveOwnership(t, m, []*Int{&a.Num, &a.Den})
-				projectionExpectError(t, ue, den != 1 || n < 0)
-				projectionExpectError(t, se, den != 1)
+				projectionExpectSourceGetterError(t, ue, den != 1 || n < 0)
+				projectionExpectSourceGetterError(t, se, den != 1)
 				projectionExpectError(t, u32e, den != 1 || n < 0 || uint64(n) > math.MaxUint32)
 				projectionExpectError(t, i32e, den != 1 || n < math.MinInt32 || n > math.MaxInt32)
 				wantU := uint64(n)

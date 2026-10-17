@@ -62,12 +62,15 @@ func TestInfApproxPublicRationalRawDependencies(t *testing.T) {
 	}
 }
 func TestInfApproxSignedValueConstructionAndRawAssignments(t *testing.T) {
+	if SourceExtendedGCDDebug {
+		bindMPNDebugActions(t, "TTTTTT")
+	}
 	for _, n := range []int32{-1, 0, 1} {
 		s, _ := serviceNew(t)
 		v := infApproxRaw(s, 7, 1, 3, 1)
 		e := s.InfSetFractionSigned(&v, n, 0)
 		if SourceExtendedGCDDebug {
-			if !errors.Is(e, ErrIntegerAssertion) {
+			if !isMPNVerificationThrow(e) {
 				t.Fatal(e)
 			}
 			infApproxRawEqual(t, &v, 7, 1, 3, 1)
@@ -82,7 +85,7 @@ func TestInfApproxSignedValueConstructionAndRawAssignments(t *testing.T) {
 		}
 		iv, err := s.InfIntFromFraction(n, 0)
 		if SourceExtendedGCDDebug {
-			if !errors.Is(err, ErrIntegerAssertion) {
+			if !isMPNVerificationThrow(err) {
 				t.Fatal(err)
 			}
 		} else if n == 0 {

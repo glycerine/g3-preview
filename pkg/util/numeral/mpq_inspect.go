@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 var ErrRationalFloatDomain = errors.New("mpnum: rational converted floating denominator must be positive")
@@ -106,12 +107,21 @@ func (m *RationalManager) Uint64(a *Rational) (uint64, error) {
 		return 0, e
 	}
 	if modularSourceDebug {
-		ok, e := m.IsUint64(a)
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return 0, e
 		}
-		if !ok {
-			return 0, ErrIntegerAssertion
+		if enabled {
+			ok, e := m.IsUint64(a)
+			if e != nil {
+				return 0, e
+			}
+			if !ok {
+				if e := diagnostic.DebugAssertionFailure(d, "src/util/mpq.h", 776, "is_uint64(a)"); e != nil {
+					return 0, e
+				}
+			}
 		}
 	}
 	return m.Z.Uint64(&a.Num)
@@ -121,12 +131,21 @@ func (m *RationalManager) Int64(a *Rational) (int64, error) {
 		return 0, e
 	}
 	if modularSourceDebug {
-		ok, e := m.IsInt64(a)
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return 0, e
 		}
-		if !ok {
-			return 0, ErrIntegerAssertion
+		if enabled {
+			ok, e := m.IsInt64(a)
+			if e != nil {
+				return 0, e
+			}
+			if !ok {
+				if e := diagnostic.DebugAssertionFailure(d, "src/util/mpq.h", 778, "is_int64(a)"); e != nil {
+					return 0, e
+				}
+			}
 		}
 	}
 	return m.Z.Int64(&a.Num)

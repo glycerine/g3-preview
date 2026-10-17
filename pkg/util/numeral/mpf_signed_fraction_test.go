@@ -180,6 +180,9 @@ func TestArbitraryFloatSignedFractionEntryAuthority(t *testing.T) {
 }
 
 func TestArbitraryFloatSignedFractionZeroDenominator(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TTT")
+	}
 	for _, n := range []int32{0, 1, -1} {
 		m, _, _ := mpfNumeralHelpersFixture(t)
 		var out ArbitraryFloat
@@ -187,7 +190,7 @@ func TestArbitraryFloatSignedFractionZeroDenominator(t *testing.T) {
 		before := out
 		body := m.SetFractionSigned(&out, 8, 24, ArbitraryFloatNearestEven, n, 0)
 		if modularSourceDebug {
-			if !errors.Is(body, ErrIntegerAssertion) || out != before || m.signedFraction.childInvocation != 0 {
+			if !isMPNVerificationThrow(body) || out != before || m.signedFraction.childInvocation != 0 {
 				t.Fatal("debug denominator reached conversion", n, body)
 			}
 		} else {

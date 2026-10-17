@@ -6,6 +6,7 @@ import (
 	"errors"
 	"math"
 	"math/big"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -63,23 +64,20 @@ func TestInfScalarProjectionAllGetterProfilesAndRawPredicates(t *testing.T) {
 				wantI, wantU := infProjectionWant(n, &a.First.Num)
 				fitI := den == 1 && epsilon == 0 && n.IsInt64()
 				fitU := den == 1 && epsilon == 0 && n.Sign() >= 0 && n.BitLen() <= 64
-				firstFitI := den == 1 && n.IsInt64()
-				firstFitU := den == 1 && n.Sign() >= 0 && n.BitLen() <= 64
 				for _, f := range []struct {
 					i                          func() (int64, error)
 					u                          func() (uint64, error)
 					ip, up, integral, rational func() (bool, error)
-					assertI, assertU           bool
 				}{
-					{func() (int64, error) { return s.InfIntInt64(&a) }, func() (uint64, error) { return s.InfIntUint64(&a) }, func() (bool, error) { return s.InfIntIsInt64(&a) }, func() (bool, error) { return s.InfIntIsUint64(&a) }, func() (bool, error) { return s.InfIntIsInt(&a) }, func() (bool, error) { return s.InfIntIsRational(&a) }, !firstFitI, !firstFitU},
-					{func() (int64, error) { return s.InfInt64(&b) }, func() (uint64, error) { return s.InfUint64(&b) }, func() (bool, error) { return s.InfIsInt64(&b) }, func() (bool, error) { return s.InfIsUint64(&b) }, func() (bool, error) { return s.InfIsInt(&b) }, func() (bool, error) { return s.InfIsRational(&b) }, !firstFitI, !firstFitU},
-					{func() (int64, error) { return s.InfEpsInfInt64(&c) }, func() (uint64, error) { return s.InfEpsInfUint64(&c) }, func() (bool, error) { return s.InfEpsInfIsInt64(&c) }, func() (bool, error) { return s.InfEpsInfIsUint64(&c) }, func() (bool, error) { return s.InfEpsInfIsInt(&c) }, func() (bool, error) { return s.InfEpsInfIsRational(&c) }, !firstFitI, !firstFitU},
+					{func() (int64, error) { return s.InfIntInt64(&a) }, func() (uint64, error) { return s.InfIntUint64(&a) }, func() (bool, error) { return s.InfIntIsInt64(&a) }, func() (bool, error) { return s.InfIntIsUint64(&a) }, func() (bool, error) { return s.InfIntIsInt(&a) }, func() (bool, error) { return s.InfIntIsRational(&a) }},
+					{func() (int64, error) { return s.InfInt64(&b) }, func() (uint64, error) { return s.InfUint64(&b) }, func() (bool, error) { return s.InfIsInt64(&b) }, func() (bool, error) { return s.InfIsUint64(&b) }, func() (bool, error) { return s.InfIsInt(&b) }, func() (bool, error) { return s.InfIsRational(&b) }},
+					{func() (int64, error) { return s.InfEpsInfInt64(&c) }, func() (uint64, error) { return s.InfEpsInfUint64(&c) }, func() (bool, error) { return s.InfEpsInfIsInt64(&c) }, func() (bool, error) { return s.InfEpsInfIsUint64(&c) }, func() (bool, error) { return s.InfEpsInfIsInt(&c) }, func() (bool, error) { return s.InfEpsInfIsRational(&c) }},
 				} {
 					iv, ie := f.i()
 					uv, ue := f.u()
 					serviceAuditRationalRoots(t, s, &a.First, &b.First, &b.Second, &c.infinity, &c.numeral.First, &c.numeral.Second)
-					projectionExpectError(t, ie, f.assertI)
-					projectionExpectError(t, ue, f.assertU)
+					projectionExpectError(t, ie, false) // process assertions are disabled above
+					projectionExpectError(t, ue, false)
 					if (ie == nil && iv != wantI) || (ue == nil && uv != wantU) {
 						t.Fatal("release delegates FIRST, ignoring epsilon/infinity", text, den, epsilon, iv, uv, wantI, wantU)
 					}
@@ -140,6 +138,9 @@ func TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit(t *testing.T) {
 }
 
 func TestInfScalarProjectionFacadeRawFieldsAndNarrowing(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, strings.Repeat("T", 48))
+	}
 	s, _ := serviceNew(t)
 	for _, den := range []int32{-1, 0, 1, 3} {
 		for _, num := range []int64{math.MinInt32, -1, 0, math.MaxInt32, math.MaxUint32, 1 << 32} {
@@ -152,8 +153,8 @@ func TestInfScalarProjectionFacadeRawFieldsAndNarrowing(t *testing.T) {
 			i32, i32e := s.Int32(&v)
 			u32, u32e := s.Unsigned(&v)
 			serviceAuditRationalRoots(t, s, &v.Raw)
-			projectionExpectError(t, ie, den != 1)
-			projectionExpectError(t, ue, den != 1 || num < 0)
+			projectionExpectSourceGetterError(t, ie, den != 1)
+			projectionExpectSourceGetterError(t, ue, den != 1 || num < 0)
 			projectionExpectError(t, i32e, den != 1 || num < math.MinInt32 || num > math.MaxInt32)
 			projectionExpectError(t, u32e, den != 1 || num < 0 || uint64(num) > math.MaxUint32)
 			wantU := uint64(num)
@@ -267,6 +268,9 @@ func TestInfScalarProjectionRegisteredDefaultGetter(t *testing.T) {
 }
 
 func TestInfScalarProjectionRawManagerEndangeredReads(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TTT")
+	}
 	m, _ := rationalManager(t, false)
 	var dead Int
 	setIntegerOracle(t, m.Z, &dead, new(big.Int).Lsh(big.NewInt(1), 100))
@@ -276,7 +280,7 @@ func TestInfScalarProjectionRawManagerEndangeredReads(t *testing.T) {
 	i, ie := m.Int64(&a)
 	u, ue := m.Uint64(&a)
 	if modularSourceDebug {
-		if !errors.Is(ie, ErrIntegerAssertion) || !errors.Is(ue, ErrIntegerAssertion) {
+		if !isMPNVerificationThrow(ie) || !isMPNVerificationThrow(ue) {
 			t.Fatal("DEBUG noninteger DEN structural check precedes NUM getter", ie, ue)
 		}
 	} else if ie != nil || ue != nil || i != 9 || u != 9 {
@@ -289,7 +293,7 @@ func TestInfScalarProjectionRawManagerEndangeredReads(t *testing.T) {
 		}
 	}
 	if _, e := m.Int64(&a); modularSourceDebug {
-		if !errors.Is(e, ErrIntegerAssertion) {
+		if !isMPNVerificationThrow(e) {
 			t.Fatal("DEBUG structural predicate fails before dead NUM getter", e)
 		}
 	} else if !errors.Is(e, arena.ErrInvalidSlot) {

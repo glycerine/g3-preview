@@ -110,6 +110,9 @@ func TestSourceRationalHashAssignmentHistory(t *testing.T) {
 	}
 }
 func TestRationalInspectionPredicatesAndBoundaries(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TTTT")
+	}
 	for _, synch := range []bool{false, true} {
 		m, _ := rationalManager(t, synch)
 		if !m.Precise() || !m.Field() {
@@ -202,7 +205,7 @@ func TestRationalInspectionPredicatesAndBoundaries(t *testing.T) {
 			t.Fatal("structural integer test", ok, e)
 		}
 		if v, e := m.Int64(&unreduced); modularSourceDebug {
-			if !errors.Is(e, ErrIntegerAssertion) {
+			if !isMPNVerificationThrow(e) {
 				t.Fatal(e)
 			}
 		} else if e != nil || v != 2 {
@@ -210,7 +213,7 @@ func TestRationalInspectionPredicatesAndBoundaries(t *testing.T) {
 		}
 		negative := Rational{Num: NewInt(-1), Den: NewInt(1)}
 		if v, e := m.Uint64(&negative); modularSourceDebug {
-			if !errors.Is(e, ErrIntegerAssertion) {
+			if !isMPNVerificationThrow(e) {
 				t.Fatal("rational accessor debug assertion", e)
 			}
 		} else if e != nil || v != math.MaxUint64 {
@@ -612,6 +615,9 @@ func TestRationalInspectionEveryFailurePrefix(t *testing.T) {
 	}
 }
 func TestRationalInspectionWarmAllocationAndIndependentValues(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TTTTTTTT")
+	}
 	for _, synch := range []bool{false, true} {
 		m, b := rationalManager(t, synch)
 		a, out := NewRational(), NewRational()
@@ -677,7 +683,7 @@ func TestRationalInspectionWarmAllocationAndIndependentValues(t *testing.T) {
 					t.Fatal(v, unsigned, ue)
 				}
 			} else if modularSourceDebug {
-				if !errors.Is(ue, ErrIntegerAssertion) {
+				if !isMPNVerificationThrow(ue) {
 					t.Fatal(v, ue)
 				}
 			} else {
