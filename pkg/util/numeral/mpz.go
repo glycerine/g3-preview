@@ -1148,8 +1148,17 @@ func (m *IntegerManager) ensureTmpWithAllocationContext(idx int, size uint32, co
 	}
 	m.Tmp[idx] = ref
 	m.PublishCell(ref)
-	if modularSourceDebug && m.Cell(ref).Capacity < size {
-		return ErrIntegerAssertion
+	if modularSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return e
+		}
+		if enabled && m.Cell(ref).Capacity < size {
+			if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.h", 162, "m_tmp[IDX]->m_capacity >= capacity"); e != nil {
+				return e
+			}
+		}
 	}
 	return nil
 }

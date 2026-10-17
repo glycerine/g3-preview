@@ -166347,6 +166347,7 @@
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz.go",
           "tests": [
+            "TestIntegerEnsureTmpPostAllocationSourceAssertionActions",
             "TestIntegerAllocateSourceCapacityAssertionActions",
             "TestIntegerSourceBug3",
             "TestIntegerSourceIntMinSubtraction",
@@ -168499,6 +168500,7 @@
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz.go",
           "tests": [
+            "TestIntegerEnsureTmpPostAllocationSourceAssertionActions",
             "TestIntegerAllocateSourceCapacityAssertionActions",
             "TestIntegerSourceBug3",
             "TestIntegerSourceIntMinSubtraction",

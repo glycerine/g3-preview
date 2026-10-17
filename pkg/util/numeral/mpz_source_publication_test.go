@@ -355,6 +355,9 @@ func TestIntegerSourcePairedDivisionPublishesQuotientBeforeMissingScratch(t *tes
 }
 
 func TestIntegerSourceTmpUnsignedCapacityGuardAfterOldFree(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "T")
+	}
 	m, b := mpzPublicationOwner(t)
 	old := m.Tmp[0]
 	oldObject := m.Cell(old).Backing.Object
@@ -399,7 +402,7 @@ func TestIntegerSourceTmpUnsignedCapacityGuardAfterOldFree(t *testing.T) {
 		// LP64 pooling rounds request4 to8; capacity succeeds and the new tmp
 		// pointer is published before the source debug capacity assertion.
 		if modularSourceDebug {
-			if e != ErrIntegerAssertion {
+			if !isMPNVerificationThrow(e) {
 				t.Fatal("source post-publication capacity assertion", e)
 			}
 		} else if e != nil {
@@ -487,7 +490,7 @@ func TestIntegerSourceDivModWrapperDestinationBeforeFailure(t *testing.T) {
 
 func TestIntegerSourceTmpFiniteWrappedCapacities(t *testing.T) {
 	for _, f := range []struct{ request, capacity uint32 }{{1431655767, 3}, {1431655773, 12}} {
-		if modularSourceDebug && f.capacity < 6 {
+		if modularSourceDebug {
 			bindMPNDebugActions(t, "T")
 		}
 		m, b := mpzPublicationOwner(t)
@@ -505,6 +508,9 @@ func TestIntegerSourceTmpFiniteWrappedCapacities(t *testing.T) {
 					t.Fatal("allocate capacity assertion did not follow old-free and precede replacement", f)
 				}
 				continue
+			}
+			if !isMPNVerificationThrow(e) {
+				t.Fatal("source post-publication capacity assertion action", f, e)
 			}
 		} else if e != nil {
 			t.Fatal("defined release finite wrapped allocation rejected", f, e)
@@ -672,12 +678,15 @@ func TestIntegerSourcePartialOwnedRationalCleanup(t *testing.T) {
 }
 
 func TestIntegerSourceScratchSpanGuardAfterFiniteWrappedAllocation(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "T")
+	}
 	m, b := mpzPublicationOwner(t)
 	// This unsigned request creates a real finite 12-word replacement before
 	// the source's invalid oversized memory span would be accessed.
 	e := m.EnsureTmp(0, 1431655773)
 	if modularSourceDebug {
-		if e != ErrIntegerAssertion {
+		if !isMPNVerificationThrow(e) {
 			t.Fatal(e)
 		}
 	} else if e != nil {
