@@ -19946,11 +19946,14 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/proofs/hypotheses.go",
+        "pkg/ast/proofs/hypotheses_memory.go",
         "pkg/ast/proofs/is_closed.go",
         "pkg/ast/proofs/reduce_hypotheses.go"
       ],
       "tests": [
         "TestProofHypothesesConcreteUnionAndInheritedCopy",
+        "TestProofHypothesisSetMemoryWrappers",
+        "TestProofLemmaEmptyHypothesisSetImmediateDeallocation",
         "TestProofIsClosedLemmaLiteralsAndScopeReset",
         "TestProofReduceHypothesesLemmaAndResolution",
         "TestProofReduceUnitResolutionLiteralAndClauseBranches",
@@ -20028,6 +20031,12 @@
           "tests": [
             "TestProofHypothesesConcreteUnionAndInheritedCopy"
           ]
+        },
+        {
+          "name": "reduce_hypotheses0 concrete expr_set allocation at proof_utils.cpp:398,412,517, ordered reset deletion at :365 and immediate empty lemma-set deletion at :569 with source debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/proofs/hypotheses_memory.go",
+          "tests": ["TestProofHypothesisSetMemoryWrappers", "TestProofLemmaEmptyHypothesisSetImmediateDeallocation"]
         },
         {
           "name": "proof_is_closed scoped-lemma literal and shared-visited proof traversal (proof_utils.cpp:751-814)",
@@ -154092,6 +154101,12 @@
           ]
         },
         {
+          "name": "Retained proof_utils reduce_hypotheses0 expr_set alloc sites :398/:412/:517 and delete_proc reset/immediate empty-lemma release :365/:569 over charged concrete Go set owners",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/proofs/hypotheses_memory.go",
+          "tests": ["TestProofHypothesisSetMemoryWrappers", "TestProofLemmaEmptyHypothesisSetImmediateDeallocation"]
+        },
+        {
           "name": "Retained AIG tactic alloc(aig_manager) at aig_tactic.cpp:34 and dealloc at line 39 over the charged concrete Go manager owner",
           "status": "platform_replacement",
           "go_target": "pkg/tactic/aig/aig_tactic_memory_trace.go",
@@ -155002,6 +155017,12 @@
           "tests": [
             "TestModelCopiedFunctionMemoryWrapperOwnerTransfer"
           ]
+        },
+        {
+          "name": "Retained proof_utils reduce_hypotheses0 expr_set alloc sites :398/:412/:517 and delete_proc reset/immediate empty-lemma release :365/:569 over charged concrete Go set owners",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/proofs/hypotheses_memory.go",
+          "tests": ["TestProofHypothesisSetMemoryWrappers", "TestProofLemmaEmptyHypothesisSetImmediateDeallocation"]
         },
         {
           "name": "Retained AIG tactic alloc(aig_manager) at aig_tactic.cpp:34 and dealloc at line 39 over the charged concrete Go manager owner",

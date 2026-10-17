@@ -5,6 +5,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -16,7 +17,7 @@ func proofMust(t *testing.T, err error) {
 	}
 }
 
-func proofManager(t *testing.T) *ast.ASTManager {
+func proofManager(t *testing.T, trace ...*diagnostic.TraceTags) *ast.ASTManager {
 	t.Helper()
 	b := arena.NewBudget(1 << 28)
 	sy, err := symbol.NewManager(symbol.Config{Budget: b})
@@ -25,7 +26,11 @@ func proofManager(t *testing.T) *ast.ASTManager {
 		Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}},
 	}})
 	proofMust(t, err)
-	m, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: sy, Numerals: n, Budget: b})
+	config := ast.ASTManagerConfig{Symbols: sy, Numerals: n, Budget: b}
+	if len(trace) != 0 {
+		config.TraceTags = trace[0]
+	}
+	m, err := ast.NewASTManager(config)
 	proofMust(t, err)
 	t.Cleanup(func() {
 		proofMust(t, m.Close())

@@ -298,11 +298,13 @@ func (r *hypothesisReducer) lemma(p ast.ASTHandle) (ast.ASTHandle, error) {
 	}
 	hyps := r.sets.byProof[child]
 	var remaining map[ast.ASTHandle]struct{}
+	var remainingOwner *hypothesisSetOwner
 	if hyps != nil {
-		remaining = make(map[ast.ASTHandle]struct{}, len(hyps))
-		for fact := range hyps {
-			remaining[fact] = struct{}{}
+		remainingOwner, err = r.sets.newOwnedSet(517, hyps)
+		if err != nil {
+			return ast.ASTHandle{}, err
 		}
+		remaining = remainingOwner.values
 	}
 	fact, err := r.manager.GetProofFact(p)
 	if err != nil {
@@ -362,6 +364,7 @@ func (r *hypothesisReducer) lemma(p ast.ASTHandle) (ast.ASTHandle, error) {
 		}
 	}
 	if len(remaining) == 0 {
+		r.sets.releaseOwnedSet(remainingOwner, "src/ast/proofs/proof_utils.cpp", 569)
 		remaining = nil
 	}
 	r.sets.byProof[result] = remaining

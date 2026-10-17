@@ -10,6 +10,7 @@ import "github.com/glycerine/g3/pkg/ast"
 type hypothesisSets struct {
 	manager *ast.ASTManager
 	byProof map[ast.ASTHandle]map[ast.ASTHandle]struct{}
+	owned   []*hypothesisSetOwner
 }
 
 func newHypothesisSets(m *ast.ASTManager) *hypothesisSets {
@@ -30,7 +31,12 @@ func (h *hypothesisSets) add(p ast.ASTHandle) error {
 		if e != nil {
 			return e
 		}
-		result = map[ast.ASTHandle]struct{}{fact: {}}
+		owner, e := h.newOwnedSet(398, nil)
+		if e != nil {
+			return e
+		}
+		owner.values[fact] = struct{}{}
+		result = owner.values
 	} else {
 		n, e := h.manager.GetProofNumParents(p)
 		if e != nil {
@@ -52,11 +58,11 @@ func (h *hypothesisSets) add(p ast.ASTHandle) error {
 				continue
 			}
 			if inherited {
-				copySet := make(map[ast.ASTHandle]struct{}, len(result)+len(other))
-				for expr := range result {
-					copySet[expr] = struct{}{}
+				owner, e := h.newOwnedSet(412, result)
+				if e != nil {
+					return e
 				}
-				result = copySet
+				result = owner.values
 				inherited = false
 			}
 			for expr := range other {
@@ -70,6 +76,10 @@ func (h *hypothesisSets) add(p ast.ASTHandle) error {
 
 func (h *hypothesisSets) reset() {
 	if h != nil {
+		for _, owner := range h.owned {
+			h.releaseOwnedSet(owner, "src/util/util.h", 224)
+		}
+		h.owned = nil
 		clear(h.byProof)
 	}
 }
