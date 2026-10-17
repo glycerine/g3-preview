@@ -261,6 +261,9 @@ func upolyIsolationCallerNumerators(m *UPolynomialManager, values ...*unumeral.B
 	}
 	return n
 }
+
+// The exhaustive checked precision-100 lane can exceed Go's default ten-minute
+// timeout. Select this campaign with -timeout 20m when running it in full.
 func TestUPolynomialRefinementFaultPrefixesImmediateRoots(t *testing.T) {
 	for route := 0; route < 2; route++ {
 		if !t.Run(fmt.Sprintf("%d", route), func(t *testing.T) {

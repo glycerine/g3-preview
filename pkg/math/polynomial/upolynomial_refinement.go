@@ -222,30 +222,21 @@ func (m *UPolynomialManager) RefineCore(v UPolynomialView, sa int, bqm *unumeral
 	if e := m.isolationBinary(bqm); e != nil {
 		return false, e
 	}
-	if polynomialSourceDebug {
-		s, e := m.EvalSignBinary(v, a)
-		if e != nil {
-			return false, e
-		}
-		if s != sa {
-			return false, ErrUPolynomialAssertion
-		}
+	if e := m.refinementSourceSignAssert(v, a, sa, 2758, "sign_a == eval_sign_at(sz, p, a)"); e != nil {
+		return false, e
 	}
 	if sa < math.MinInt32 || sa > math.MaxInt32 || sa == math.MinInt32 {
 		return false, arena.ErrBounds
 	}
 	sb := -sa
-	if polynomialSourceDebug {
-		s, e := m.EvalSignBinary(v, b)
-		if e != nil {
-			return false, e
-		}
-		if s != sb {
-			return false, ErrUPolynomialAssertion
-		}
-		if sa != -sb || sa == 0 || sb == 0 {
-			return false, ErrUPolynomialAssertion
-		}
+	if e := m.refinementSourceSignAssert(v, b, sb, 2761, "sign_b == eval_sign_at(sz, p, b)"); e != nil {
+		return false, e
+	}
+	if e := refinementSourceAssert(sa == -sb, 2762, "sign_a == -sign_b"); e != nil {
+		return false, e
+	}
+	if e := refinementSourceAssert(sa != 0 && sb != 0, 2763, "sign_a != 0 && sign_b != 0"); e != nil {
+		return false, e
 	}
 	var mid unumeral.BinaryRational
 	defer bqm.Del(&mid)
@@ -271,8 +262,8 @@ func (m *UPolynomialManager) RefineCore(v UPolynomialView, sa int, bqm *unumeral
 		}
 		return true, nil
 	}
-	if polynomialSourceDebug && sm != sb {
-		return false, ErrUPolynomialAssertion
+	if e := refinementSourceAssert(sm == sb, 2776, "sign_mid == sign_b"); e != nil {
+		return false, e
 	}
 	if e = bqm.Swap(&mid, b); e != nil {
 		return false, e
@@ -287,8 +278,8 @@ func (m *UPolynomialManager) Refine(v UPolynomialView, bqm *unumeral.BinaryRatio
 	if e != nil {
 		return false, e
 	}
-	if polynomialSourceDebug && sa == 0 {
-		return false, ErrUPolynomialAssertion
+	if e := refinementSourceAssert(sa != 0, 2784, "sign_a != 0"); e != nil {
+		return false, e
 	}
 	return m.RefineCore(v, sa, bqm, a, b)
 }
@@ -296,24 +287,14 @@ func (m *UPolynomialManager) RefineCoreToPrecision(v UPolynomialView, sa int, bq
 	if e := m.isolationBinary(bqm); e != nil {
 		return false, e
 	}
-	if polynomialSourceDebug {
-		if sa == 0 {
-			return false, ErrUPolynomialAssertion
-		}
-		s, e := m.EvalSignBinary(v, a)
-		if e != nil {
-			return false, e
-		}
-		if s != sa {
-			return false, ErrUPolynomialAssertion
-		}
-		s, e = m.EvalSignBinary(v, b)
-		if e != nil {
-			return false, e
-		}
-		if s != -sa {
-			return false, ErrUPolynomialAssertion
-		}
+	if e := refinementSourceAssert(sa != 0, 2794, "sign_a != 0"); e != nil {
+		return false, e
+	}
+	if e := m.refinementSourceSignAssert(v, a, sa, 2795, "sign_a  == eval_sign_at(sz, p, a)"); e != nil {
+		return false, e
+	}
+	if e := m.refinementSourceSignAssert(v, b, -sa, 2796, "-sign_a == eval_sign_at(sz, p, b)"); e != nil {
+		return false, e
 	}
 	var width unumeral.BinaryRational
 	defer bqm.Del(&width)
@@ -348,17 +329,11 @@ func (m *UPolynomialManager) RefineToPrecision(v UPolynomialView, bqm *unumeral.
 	if e != nil {
 		return false, e
 	}
-	if polynomialSourceDebug {
-		sb, e := m.EvalSignBinary(v, b)
-		if e != nil {
-			return false, e
-		}
-		if sb != -sa {
-			return false, ErrUPolynomialAssertion
-		}
-		if sa == 0 {
-			return false, ErrUPolynomialAssertion
-		}
+	if e := m.refinementSourceSignAssert(v, b, -sa, 2812, "eval_sign_at(sz, p, b) == -sign_a"); e != nil {
+		return false, e
+	}
+	if e := refinementSourceAssert(sa != 0, 2813, "sign_a != 0"); e != nil {
+		return false, e
 	}
 	return m.RefineCoreToPrecision(v, sa, bqm, a, b, k)
 }
