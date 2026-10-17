@@ -575,16 +575,9 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 	if !satStorageSourceDebug {
 		return true, nil
 	}
-	enabled, e := diagnostic.BorrowProcessDebugContext().AssertionsEnabled()
-	if e != nil {
-		return false, e
-	}
 	tags := c.lifecycle.traceTags
 	if tags == nil {
 		tags = diagnostic.BorrowProcessTraceTags()
-	}
-	if !enabled && !tags.ShouldTrace("sat_watched_bug") && !tags.ShouldTrace("sat_bug") {
-		return true, nil
 	}
 	p := c.lifecycle.propagation
 	v := p.variables
@@ -594,19 +587,35 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 		if e != nil {
 			return false, e
 		}
-		gone, e := v.wasEliminated(literal.variable())
-		if e != nil {
-			return false, e
-		}
-		if gone && (enabled || tags.ShouldTrace("sat_bug")) {
-			size, e := list.Size()
+		if tags.ShouldTrace("sat_bug") {
+			gone, e := v.wasEliminated(literal.variable())
 			if e != nil {
 				return false, e
 			}
-			if size != 0 {
-				c.traceEliminatedWatch(literal)
+			if gone {
+				size, e := list.Size()
+				if e != nil {
+					return false, e
+				}
+				if size != 0 {
+					c.traceEliminatedWatch(literal)
+				}
 			}
-			if enabled {
+		}
+		enabled, e := diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+		if e != nil {
+			return false, e
+		}
+		if enabled {
+			gone, e := v.wasEliminated(literal.variable())
+			if e != nil {
+				return false, e
+			}
+			if gone {
+				size, e := list.Size()
+				if e != nil {
+					return false, e
+				}
 				if e = satIntegrityAssertion(size == 0, c.debugActions, 167, "!s.was_eliminated(l.var()) || wlist.empty()"); e != nil {
 					return false, e
 				}
@@ -630,48 +639,99 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 			}
 			switch w.Kind() {
 			case 0:
-				other, e := w.Literal()
-				if e != nil {
-					return false, e
-				}
-				otherGone, e := v.wasEliminated(other.variable())
+				enabled, e := diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
 				if e != nil {
 					return false, e
 				}
 				if enabled {
+					other, e := w.Literal()
+					if e != nil {
+						return false, e
+					}
+					otherGone, e := v.wasEliminated(other.variable())
+					if e != nil {
+						return false, e
+					}
 					if e = satIntegrityAssertion(!otherGone, c.debugActions, 171, "!s.was_eliminated(w.get_literal().var())"); e != nil {
 						return false, e
 					}
 				}
-				counterpart, e := v.watches.Get(other.Negated().index())
+				traceBinary := tags.ShouldTrace("sat_watched_bug")
+				if traceBinary {
+					other, e := w.Literal()
+					if e != nil {
+						return false, e
+					}
+					counterpart, e := v.watches.Get(other.Negated().index())
+					if e != nil {
+						return false, e
+					}
+					ref, e := counterpart.ref()
+					if e != nil {
+						return false, e
+					}
+					learned, e := w.Learned()
+					if e != nil {
+						return false, e
+					}
+					expected, e := newSATBinaryWatch(literal, learned)
+					if e != nil {
+						return false, e
+					}
+					yes, e := v.watches.store.Contains(ref, expected)
+					if e != nil {
+						return false, e
+					}
+					if !yes {
+						gone, e := v.wasEliminated(literal.variable())
+						if e != nil {
+							return false, e
+						}
+						otherGone, e := v.wasEliminated(other.variable())
+						if e != nil {
+							return false, e
+						}
+						c.traceMissingBinaryWatch(literal, other, learned, gone, otherGone, list, counterpart)
+					}
+				}
+				enabled, e = diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
 				if e != nil {
 					return false, e
-				}
-				ref, e := counterpart.ref()
-				if e != nil {
-					return false, e
-				}
-				learned, e := w.Learned()
-				if e != nil {
-					return false, e
-				}
-				expected, e := newSATBinaryWatch(literal, learned)
-				if e != nil {
-					return false, e
-				}
-				yes, e := v.watches.store.Contains(ref, expected)
-				if e != nil {
-					return false, e
-				}
-				if !yes {
-					c.traceMissingBinaryWatch(literal, other, learned, gone, otherGone, list, counterpart)
 				}
 				if enabled {
+					other, e := w.Literal()
+					if e != nil {
+						return false, e
+					}
+					counterpart, e := v.watches.Get(other.Negated().index())
+					if e != nil {
+						return false, e
+					}
+					ref, e := counterpart.ref()
+					if e != nil {
+						return false, e
+					}
+					learned, e := w.Learned()
+					if e != nil {
+						return false, e
+					}
+					expected, e := newSATBinaryWatch(literal, learned)
+					if e != nil {
+						return false, e
+					}
+					yes, e := v.watches.store.Contains(ref, expected)
+					if e != nil {
+						return false, e
+					}
 					if e = satIntegrityAssertion(yes, c.debugActions, 181, "s.get_wlist(~(w.get_literal())).contains(watched(l, w.is_learned()))"); e != nil {
 						return false, e
 					}
 				}
 			case 1:
+				enabled, e := diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+				if e != nil {
+					return false, e
+				}
 				if !enabled {
 					continue
 				}
@@ -686,6 +746,13 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 				if e = satIntegrityAssertion(!gone, c.debugActions, 184, "!s.was_eliminated(w.get_literal1().var())"); e != nil {
 					return false, e
 				}
+				enabled, e = diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+				if e != nil {
+					return false, e
+				}
+				if !enabled {
+					continue
+				}
 				two, e := w.Literal2()
 				if e != nil {
 					return false, e
@@ -697,10 +764,21 @@ func (c satIntegrityChecker) checkWatches() (bool, error) {
 				if e = satIntegrityAssertion(!gone, c.debugActions, 185, "!s.was_eliminated(w.get_literal2().var())"); e != nil {
 					return false, e
 				}
+				enabled, e = diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+				if e != nil {
+					return false, e
+				}
+				if !enabled {
+					continue
+				}
 				if e = satIntegrityAssertion(one.index() < two.index(), c.debugActions, 186, "w.get_literal1().index() < w.get_literal2().index()"); e != nil {
 					return false, e
 				}
 			case 2:
+				enabled, e := diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+				if e != nil {
+					return false, e
+				}
 				if !enabled {
 					continue
 				}
