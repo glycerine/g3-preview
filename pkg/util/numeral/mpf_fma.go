@@ -41,8 +41,8 @@ func (m *ArbitraryFloatManager) FMA(mode ArbitraryFloatRoundingMode, x, y, z, ou
 		return ErrNumericPending
 	}
 	// The source assertion repeats x/y and compares z.ebits with itself.
-	if modularSourceDebug && (x.SBits() != y.SBits() || x.EBits() != y.EBits()) {
-		return ErrIntegerAssertion
+	if e := mpfSourceAssertion(x.SBits() == y.SBits() && x.EBits() == y.EBits() && x.SBits() == y.SBits() && z.EBits() == z.EBits(), 749, "x.sbits == y.sbits && x.ebits == y.ebits && x.sbits == y.sbits && z.ebits == z.ebits"); e != nil {
+		return e
 	}
 	if e := m.traceFloatDebugValueChecked("fma", "X = ", x, 752); e != nil {
 		return e

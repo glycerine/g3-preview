@@ -2,10 +2,54 @@
 package numeral
 
 import (
+	"errors"
 	"math"
 	"math/big"
+	"os"
+	"strings"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/arena"
 )
+
+func TestArbitraryFloatFMAEntryFormatSourceActions(t *testing.T) {
+	if !modularSourceDebug {
+		t.Skip("source Z3DEBUG assertion only")
+	}
+	d, log := bindMPNDebugActions(t, "TC")
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	var x, y, z, out ArbitraryFloat
+	serviceMust(t, m.MkZero(11, 53, false, &x))
+	serviceMust(t, m.MkOne(8, 24, false, &y))
+	serviceMust(t, m.MkInf(11, 53, true, &z))
+	serviceMust(t, m.MkOne(11, 53, false, &out))
+	before := out
+	if e := m.FMA(ArbitraryFloatNearestEven, &x, &y, &z, &out); !isMPNVerificationThrow(e) || out != before {
+		t.Fatal("entry format Throw before output publication", e, out)
+	}
+	contents, e := os.ReadFile(log.Name())
+	serviceMust(t, e)
+	want := "File: src/util/mpf.cpp\nLine: 749\nx.sbits == y.sbits && x.ebits == y.ebits && x.sbits == y.sbits && z.ebits == z.ebits\n"
+	if n := strings.Count(string(contents), want); n != 1 {
+		t.Fatal("source FMA format assertion", n, string(contents))
+	}
+	serviceMust(t, m.FMA(ArbitraryFloatNearestEven, &x, &y, &z, &out))
+	if out != z {
+		t.Fatal("Continue follows source infinity shortcut", out, z)
+	}
+	serviceMust(t, d.EnableAssertions(false))
+	serviceMust(t, m.FMA(ArbitraryFloatNearestEven, &x, &y, &z, &out))
+	if out != z {
+		t.Fatal("disabled assertions follow source infinity shortcut", out, z)
+	}
+	serviceMust(t, d.Close())
+	if e := m.FMA(ArbitraryFloatNearestEven, &x, &x, &z, &out); !errors.Is(e, arena.ErrClosed) {
+		t.Fatal("valid FMA reads closed assertion owner", e)
+	}
+	for _, v := range []*ArbitraryFloat{&out, &x, &y, &z} {
+		serviceMust(t, m.Del(v))
+	}
+}
 
 func TestArbitraryFloatFMASpecialsSignedZerosAndModes(t *testing.T) {
 	m, _, _ := mpfNumeralHelpersFixture(t)
