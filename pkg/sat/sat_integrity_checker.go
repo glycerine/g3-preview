@@ -400,15 +400,15 @@ func (c satIntegrityChecker) checkClauseVector(cs []StoredClauseRef) (bool, erro
 	if e := c.open(); e != nil {
 		return false, e
 	}
-	enabled := false
-	if satStorageSourceDebug {
-		on, e := diagnostic.BorrowProcessDebugContext().AssertionsEnabled()
-		if e != nil {
-			return false, e
-		}
-		enabled = on
-	}
 	for i := 0; i < len(cs); i++ {
+		enabled := false
+		if satStorageSourceDebug {
+			on, e := diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+			if e != nil {
+				return false, e
+			}
+			enabled = on
+		}
 		if enabled {
 			yes, e := c.checkClause(cs[i])
 			if e != nil {
@@ -799,54 +799,44 @@ func (c satIntegrityChecker) run() (bool, error) {
 		return true, nil
 	}
 	if satStorageSourceDebug {
-		enabled, e := diagnostic.BorrowProcessDebugContext().AssertionsEnabled()
-		if e != nil {
-			return false, e
-		}
-		if !enabled {
-			return true, nil
-		}
-		yes, e := c.checkClauses()
-		if e != nil {
-			return false, e
-		}
-		if e = satIntegrityAssertion(yes, c.debugActions, 231, "check_clauses()"); e != nil {
-			return false, e
-		}
-		yes, e = c.checkLearnedClauses()
-		if e != nil {
-			return false, e
-		}
-		if e = satIntegrityAssertion(yes, c.debugActions, 232, "check_learned_clauses()"); e != nil {
-			return false, e
-		}
-		yes, e = c.checkWatches()
-		if e != nil {
-			return false, e
-		}
-		if e = satIntegrityAssertion(yes, c.debugActions, 233, "check_watches()"); e != nil {
-			return false, e
-		}
-		yes, e = c.checkBoolVars()
-		if e != nil {
-			return false, e
-		}
-		if e = satIntegrityAssertion(yes, c.debugActions, 234, "check_bool_vars()"); e != nil {
-			return false, e
-		}
-		yes, e = c.checkReinitStack()
-		if e != nil {
-			return false, e
-		}
-		if e = satIntegrityAssertion(yes, c.debugActions, 235, "check_reinit_stack()"); e != nil {
-			return false, e
-		}
-		yes, e = c.checkDisjointClauses()
-		if e != nil {
-			return false, e
-		}
-		if e = satIntegrityAssertion(yes, c.debugActions, 236, "check_disjoint_clauses()"); e != nil {
-			return false, e
+		// Each SASSERT expansion reads the process switch at its own site.
+		// A debugger action can change that switch before the next site.
+		for line := int32(231); line <= 236; line++ {
+			enabled, e := diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+			if e != nil {
+				return false, e
+			}
+			if !enabled {
+				continue
+			}
+			var yes bool
+			var condition string
+			switch line {
+			case 231:
+				condition = "check_clauses()"
+				yes, e = c.checkClauses()
+			case 232:
+				condition = "check_learned_clauses()"
+				yes, e = c.checkLearnedClauses()
+			case 233:
+				condition = "check_watches()"
+				yes, e = c.checkWatches()
+			case 234:
+				condition = "check_bool_vars()"
+				yes, e = c.checkBoolVars()
+			case 235:
+				condition = "check_reinit_stack()"
+				yes, e = c.checkReinitStack()
+			case 236:
+				condition = "check_disjoint_clauses()"
+				yes, e = c.checkDisjointClauses()
+			}
+			if e != nil {
+				return false, e
+			}
+			if e = satIntegrityAssertion(yes, c.debugActions, line, condition); e != nil {
+				return false, e
+			}
 		}
 	}
 	return true, nil

@@ -76426,6 +76426,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/sat/sat_integrity_clause_vector_switch_test.go",
         "pkg/sat/sat_integrity_checker.go",
         "pkg/sat/sat_integrity_checker_test.go",
         "pkg/sat/sat_solver_integrity.go",
@@ -76657,7 +76658,7 @@
           "tests": ["TestSATIntegrityEliminatedWatchSourceTrace", "TestSATIntegrityEliminatedWatchTraceWithLiveSolverClause", "TestSATSolverInspectionExactSourceDisplays"]
         },
         {
-          "name": "Selected reinit-stack SASSERT205 per reached nonbinary wrapper and operator SASSERT231-236 process gate, per-site C/T action through cleaner_bug; other nested checker methods remain partial",
+          "name": "Selected reinit-stack SASSERT205 per reached nonbinary wrapper and operator SASSERT231-236 per-site process gate and C/T action through cleaner_bug; other nested checker methods remain partial",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityReinitAssertionReadsProcessAtReachedElement", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
@@ -76669,10 +76670,10 @@
           "tests": ["TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         },
         {
-          "name": "Selected check_clause SASSERT53,55,60,63, vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; other checker diagnostics remain open",
+          "name": "Selected check_clause SASSERT53,55,60,63, per-reached-element vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; other checker diagnostics remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
-          "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
+          "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions", "TestSATIntegrityEmptyClauseVectorSkipsSourceAssertionSwitch"]
         },
         {
           "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source-ordered literal/clause/solver display and stopped formatter prefixes (cpp56-60); wider checker diagnostics remain open",
@@ -76725,6 +76726,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/sat/sat_integrity_clause_vector_switch_test.go",
         "pkg/sat/sat_integrity_checker.go",
         "pkg/sat/sat_integrity_checker_test.go",
         "pkg/sat/sat_solver_integrity.go",
@@ -76796,7 +76798,7 @@
           "tests": ["TestSATIntegrityEliminatedWatchSourceTrace", "TestSATIntegrityEliminatedWatchTraceWithLiveSolverClause", "TestSATSolverInspectionExactSourceDisplays"]
         },
         {
-          "name": "Selected reinit-stack SASSERT205 per reached nonbinary wrapper and operator SASSERT231-236 process gate, per-site C/T action through cleaner_bug; other nested checker methods remain partial",
+          "name": "Selected reinit-stack SASSERT205 per reached nonbinary wrapper and operator SASSERT231-236 per-site process gate and C/T action through cleaner_bug; other nested checker methods remain partial",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityReinitAssertionReadsProcessAtReachedElement", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
@@ -76808,10 +76810,10 @@
           "tests": ["TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         },
         {
-          "name": "Selected check_clause SASSERT53,55,60,63, vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; other checker diagnostics remain open",
+          "name": "Selected check_clause SASSERT53,55,60,63, per-reached-element vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; other checker diagnostics remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
-          "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
+          "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions", "TestSATIntegrityEmptyClauseVectorSkipsSourceAssertionSwitch"]
         },
         {
           "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source-ordered literal/clause/solver display and stopped formatter prefixes (cpp56-60); wider checker diagnostics remain open",
@@ -124055,6 +124057,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/sat/sat_integrity_clause_vector_switch_test.go",
         "pkg/util/diagnostic/util_debug_context.go",
         "pkg/util/diagnostic/util_debug_table_memory_trace.go",
         "pkg/util/process/initialize.go",
@@ -124390,16 +124393,16 @@
           ]
         },
         {
-          "name": "Retained SAT reinit-stack SASSERT205 per reached nonbinary wrapper and operator SASSERT231-236 process gate and C/T actions; bool-var SASSERT133-149 re-read the switch at each reached site, while other nested checker sites remain partial",
+          "name": "Retained SAT reinit-stack SASSERT205 per reached nonbinary wrapper and operator SASSERT231-236 per-site process gate and C/T actions; bool-var SASSERT133-149 re-read the switch at each reached site, while other nested checker sites remain partial",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityReinitAssertionReadsProcessAtReachedElement", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         },
         {
-          "name": "Selected check_clause SASSERT53,55,60,63, vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; other checker diagnostics remain open",
+          "name": "Selected check_clause SASSERT53,55,60,63, per-reached-element vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; other checker diagnostics remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
-          "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
+          "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions", "TestSATIntegrityEmptyClauseVectorSkipsSourceAssertionSwitch"]
         },
         {
           "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, source-ordered clause/status/per-literal display, stopped formatter prefix and process-gated C/T actions; wider checker diagnostics remain partial",
@@ -124497,6 +124500,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/sat/sat_integrity_clause_vector_switch_test.go",
         "pkg/util/diagnostic/util_debug_context.go",
         "pkg/util/diagnostic/util_debug_context_test.go",
         "pkg/util/heap/heap.go",
@@ -124954,16 +124958,16 @@
           "tests": ["TestLinearEquationRationalSingletonSourceAssertionProfile"]
         },
         {
-          "name": "Retained SAT reinit-stack SASSERT205 per reached nonbinary wrapper and operator SASSERT231-236 process gate and C/T actions; bool-var SASSERT133-149 re-read the switch at each reached site, while other nested checker sites remain partial",
+          "name": "Retained SAT reinit-stack SASSERT205 per reached nonbinary wrapper and operator SASSERT231-236 per-site process gate and C/T actions; bool-var SASSERT133-149 re-read the switch at each reached site, while other nested checker sites remain partial",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityReinitAssertionReadsProcessAtReachedElement", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         },
         {
-          "name": "Selected check_clause SASSERT53,55,60,63, vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; other checker diagnostics remain open",
+          "name": "Selected check_clause SASSERT53,55,60,63, per-reached-element vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; other checker diagnostics remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
-          "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
+          "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions", "TestSATIntegrityEmptyClauseVectorSkipsSourceAssertionSwitch"]
         },
         {
           "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, source-ordered clause/status/per-literal display, stopped formatter prefix and process-gated C/T actions; wider checker diagnostics remain partial",
