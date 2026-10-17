@@ -28661,11 +28661,12 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Selected Boolean non-proof rewriter_core::cache_result TRACE at cpp52 before sort assertion and cache insertion; wider expression/stream profiles remain open",
+          "name": "Selected Boolean and quantified non-proof rewriter_core::cache_result TRACE at cpp52 before sort assertion and cache insertion; failed ostream continues with sticky state; wider expression profiles remain open",
           "status": "partial",
           "go_target": "pkg/ast/rewriter/rewriter_core_cache_trace.go",
           "tests": [
-            "TestRewriterCacheResultSourceTraceBeforeInsert"
+            "TestRewriterCacheResultSourceTraceBeforeInsert",
+            "TestRewriterCacheResultContinuesAfterTraceWriterRefusal"
           ]
         },
         {
@@ -182799,11 +182800,12 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Selected Boolean rewriter_core::cache_result SMT2 TRACE at rewriter.cpp:52 before cache publication; wider expression/stream profiles remain open",
+          "name": "Selected Boolean and quantified rewriter_core::cache_result SMT2 TRACE at rewriter.cpp:52 before cache publication; failed ostream continues with sticky state; wider expression profiles remain open",
           "status": "partial",
           "go_target": "pkg/ast/rewriter/rewriter_core_cache_trace.go",
           "tests": [
-            "TestRewriterCacheResultSourceTraceBeforeInsert"
+            "TestRewriterCacheResultSourceTraceBeforeInsert",
+            "TestRewriterCacheResultContinuesAfterTraceWriterRefusal"
           ]
         },
         {
@@ -185240,11 +185242,12 @@
       "ownership_audited": true,
       "methods": [
         {
-          "name": "Selected Boolean rewriter_core::cache_result SMT2 TRACE at rewriter.cpp:52 before cache publication; wider expression/stream profiles remain open",
+          "name": "Selected Boolean and quantified rewriter_core::cache_result SMT2 TRACE at rewriter.cpp:52 before cache publication; failed ostream continues with sticky state; wider expression profiles remain open",
           "status": "partial",
           "go_target": "pkg/ast/rewriter/rewriter_core_cache_trace.go",
           "tests": [
-            "TestRewriterCacheResultSourceTraceBeforeInsert"
+            "TestRewriterCacheResultSourceTraceBeforeInsert",
+            "TestRewriterCacheResultContinuesAfterTraceWriterRefusal"
           ]
         },
         {

@@ -74,6 +74,17 @@ func (t *TraceTags) ShouldTrace(tag string) bool {
 	return traceCompiled && t != nil && t.IsEnabled(tag)
 }
 
+// IsStreamFailure identifies an ostream refusal returned by an emit call.
+// Callers with source side effects can continue after the stream turns bad,
+// while still propagating errors from computing a trace operand.
+func (t *TraceTags) IsStreamFailure(err error) bool {
+	if t == nil || err == nil {
+		return false
+	}
+	return t.streamErr != nil && errors.Is(err, t.streamErr) ||
+		t.openErr != nil && errors.Is(err, t.openErr)
+}
+
 func (t *TraceTags) traceWriter() (io.Writer, error) {
 	if t.openErr != nil {
 		return nil, t.openErr

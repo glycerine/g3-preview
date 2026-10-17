@@ -21,7 +21,7 @@ func (c *rewriterCore) traceCacheResult(k, v ast.ASTHandle) error {
 	if globals == nil || globals.Context == nil {
 		return uparams.ErrGlobalParamsOwner
 	}
-	return tags.EmitConditional("rewriter_cache_result", "cache_result", "src/ast/rewriter/rewriter.cpp", 52,
+	err := tags.EmitConditional("rewriter_cache_result", "cache_result", "src/ast/rewriter/rewriter.cpp", 52,
 		func() bool { return true }, func(w io.Writer) error {
 			if err := writeBVTraceSMT2(c.manager, w, k, globals); err != nil {
 				return err
@@ -35,4 +35,8 @@ func (c *rewriterCore) traceCacheResult(k, v ast.ASTHandle) error {
 			_, err := io.WriteString(w, "\n")
 			return err
 		})
+	if tags.IsStreamFailure(err) {
+		return nil
+	}
+	return err
 }
