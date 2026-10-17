@@ -14619,11 +14619,13 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
-        "pkg/sat/tactic/sat_goal_to_sat.go"
+        "pkg/sat/tactic/sat_goal_to_sat.go",
+        "pkg/sat/tactic/sat_goal_to_sat_trace.go"
       ],
       "tests": [
         "TestSATGoalTranslatorAtomOwnershipAndClosedGuard",
-        "TestSATGoalTranslatorAtomMapGrowthAndModel"
+        "TestSATGoalTranslatorAtomMapGrowthAndModel",
+        "TestSATGoalInterpretedAtomExpr2VarTrace"
       ],
       "assertions": [
         {
@@ -14633,7 +14635,16 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Retained interpreted Boolean atom expr2var::insert TRACE before AST key pin and map publication (cpp27-34)",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+          "tests": [
+            "TestSATGoalInterpretedAtomExpr2VarTrace"
+          ]
+        }
+      ],
       "ownership": [],
       "deviations": [
         "Only translator atom insertion, lookup and retained key retirement are integrated; general expr2var scope push/pop/reset and recent-expression bookkeeping remain unported."
@@ -14643,9 +14654,14 @@
       "path": "src/ast/expr2var.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": [
+        "pkg/sat/tactic/sat_goal_to_sat.go"
+      ],
+      "tests": [
+        "TestSATGoalTranslatorAtomOwnershipAndClosedGuard",
+        "TestSATGoalInterpretedAtomExpr2VarTrace"
+      ],
       "conditionals": [
         {
           "line": 23,
@@ -14664,9 +14680,21 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Retained SAT atom map insert, lookup, interpreted flag and key retirement; general scope/recent/display/inversion facade remains open",
+          "status": "partial",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat.go",
+          "tests": [
+            "TestSATGoalTranslatorAtomOwnershipAndClosedGuard",
+            "TestSATGoalInterpretedAtomExpr2VarTrace"
+          ]
+        }
+      ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The SAT goal translator owns a concrete atom map and interpreted references; unrelated expr2var scope/recent/display/inverse operations remain unported."
+      ]
     },
     {
       "path": "src/ast/expr_abstract.cpp",
@@ -182762,6 +182790,14 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Retained interpreted SAT atom expr2var::insert TRACE at expr2var.cpp:29 before AST key pin and map publication",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+          "tests": [
+            "TestSATGoalInterpretedAtomExpr2VarTrace"
+          ]
+        },
+        {
           "name": "sat_solver.cpp:1130 sat TRACE is unreachable because reassert_min_core has no production caller",
           "status": "dead_deleted"
         },
@@ -185178,6 +185214,14 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained interpreted SAT atom expr2var::insert TRACE at expr2var.cpp:29 before AST key pin and map publication",
+          "status": "ported",
+          "go_target": "pkg/sat/tactic/sat_goal_to_sat_trace.go",
+          "tests": [
+            "TestSATGoalInterpretedAtomExpr2VarTrace"
+          ]
+        },
         {
           "name": "sat_solver.cpp:1130 sat TRACE is unreachable because reassert_min_core has no production caller",
           "status": "dead_deleted"

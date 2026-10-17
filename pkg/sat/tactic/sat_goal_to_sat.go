@@ -300,6 +300,11 @@ func (tr *GoalTranslator) convertAtom(h ast.ASTHandle, root, sign bool) error {
 			if e != nil {
 				return e
 			}
+			if !uninterpreted {
+				if e = tr.traceInterpretedAtom(h); e != nil {
+					return e
+				}
+			}
 			if e = tr.manager.IncRef(h); e != nil {
 				return e
 			}

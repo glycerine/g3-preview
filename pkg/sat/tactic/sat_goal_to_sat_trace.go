@@ -130,6 +130,26 @@ func (tr *GoalTranslator) traceGoalNewVar(v sat.BoolVar, h ast.ASTHandle) error 
 		})
 }
 
+// expr2var::insert traces interpreted atoms before retaining the AST key.
+func (tr *GoalTranslator) traceInterpretedAtom(h ast.ASTHandle) error {
+	tags := tr.goalTraceTags()
+	if !tags.ShouldTrace("expr2var") {
+		return nil
+	}
+	return tags.EmitConditional("expr2var", "insert", "src/ast/expr2var.cpp", 29,
+		func() bool { return true }, func(w io.Writer) error {
+			if _, err := io.WriteString(w, "interpreted:\n"); err != nil {
+				return err
+			}
+			formula, err := tr.traceGoalFormula(h)
+			if err != nil {
+				return err
+			}
+			_, err = io.WriteString(w, formula+"\n")
+			return err
+		})
+}
+
 func (tr *GoalTranslator) traceGoalUnhandled(h ast.ASTHandle) error {
 	tags := tr.goalTraceTags()
 	if !tags.ShouldTrace("goal2sat_not_handled") {
