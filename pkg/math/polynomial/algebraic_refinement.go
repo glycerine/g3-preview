@@ -2,7 +2,6 @@
 package polynomial
 
 import (
-	"errors"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -77,7 +76,7 @@ func (m *AlgebraicRootCore) RefineToPrecision(a *Algebraic, k uint32) error {
 	return e
 }
 func (m *AlgebraicRootCore) refineAt(a *Algebraic, k uint32, precision bool) (bool, error) {
-	if m != nil && m.self == m && (m.refinement.pending(m) || m.refinementConversion.pending(m)) {
+	if m != nil && m.self == m && (m.refinement.pending(m) || m.refinementConversion.pending(m) || m.refinementQ.active) {
 		return false, ErrAlgebraicPending
 	}
 	l, e := m.location(a)
@@ -111,7 +110,7 @@ func (m *AlgebraicRootCore) refineAt(a *Algebraic, k uint32, precision bool) (bo
 
 // The exact-root branch after refineRecord has published its interval.
 func (m *AlgebraicRootCore) promoteRefinedRoot(a *Algebraic, r *algebraicRecord) error {
-	if e := m.beginQ(); e != nil {
+	if e := m.beginRefinementQ(); e != nil {
 		return e
 	}
 	if e := m.refinementConversion.run(m, r.interval.BorrowLower(), &m.localQ); e != nil {
@@ -418,11 +417,7 @@ func (m *AlgebraicRootCore) refineRecord(l *algebraicLocation, r *algebraicRecor
 	return ok, m.save(l, r, cause)
 }
 
-// A source END stop in the converter precedes destruction of scoped_mpq r.
-// Core owning cleanup acknowledges the exact younger children before finishQ.
+// Promotion's source scoped_mpq destructor is separate from owning cleanup.
 func (m *AlgebraicRootCore) finishRefinementQ(cause error) error {
-	if m.refinementConversion.stop != nil {
-		return errors.Join(cause, m.refinementConversion.stop)
-	}
-	return m.finishQ(cause)
+	return m.refinementQ.finish(m, cause)
 }

@@ -49,6 +49,7 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	refinementQ                                                algebraicRefinementQScope
 	refinementConversion                                       algebraicConversionScope
 	refinement                                                 algebraicRefinementScope
 	representationNeg                                          algebraicRepresentationNegNumeric
@@ -200,7 +201,7 @@ func (m *AlgebraicRootCore) check() error {
 	if m != nil && m.self == m && m.arithmetic.executing {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing) {
+	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.inversion.executing {
@@ -985,7 +986,7 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	if m != nil && m.self == m && m.arithmetic.executing {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing) {
+	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.inversion.executing {
@@ -1060,6 +1061,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 		return e
 	}
 	if e := m.refinementConversion.cleanup(); e != nil {
+		return e
+	}
+	if e := m.refinementQ.cleanup(m); e != nil {
 		return e
 	}
 	if e := m.CleanupNegation(); e != nil {
@@ -1170,7 +1174,7 @@ func (m *AlgebraicRootCore) closeCoreMembers() error {
 	if m != nil && m.self == m && m.arithmetic.executing {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing) {
+	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.inversion.executing {
