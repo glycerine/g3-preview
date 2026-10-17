@@ -70998,9 +70998,9 @@
       "path": "src/opt/opt_context.cpp",
       "component": "opt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/opt/bound_expressions.go", "pkg/opt/bound_expressions_test.go"],
+      "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease"],
       "conditionals": [
         {
           "line": 271,
@@ -71055,7 +71055,14 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "context::to_exprs copies infinity, rational and infinitesimal components before appending three owning arithmetic numeral references in source order (opt_context.cpp:1343-1350)",
+          "status": "ported",
+          "go_target": "pkg/opt/bound_expressions.go",
+          "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease"]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -71063,9 +71070,9 @@
       "path": "src/opt/opt_context.h",
       "component": "opt",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/opt/bound_expressions.go", "pkg/opt/bound_expressions_test.go"],
+      "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease"],
       "conditionals": [
         {
           "line": 18,
@@ -71078,7 +71085,14 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "context::to_exprs bound-triplet append declaration and retained get_lower/get_upper vector callers (opt_context.h:213-214,250)",
+          "status": "partial",
+          "go_target": "pkg/opt/bound_expressions.go",
+          "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease"]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -129497,7 +129511,9 @@
         "pkg/util/numeral/inf_eps_string_short_circuit_source_test.go",
         "pkg/util/numeral/inf_eps_round_unread_infinity_source_test.go",
         "pkg/util/numeral/inf_eps_fused_source_order_test.go",
-        "pkg/util/numeral/inf_eps_step_unread_components_source_test.go"
+        "pkg/util/numeral/inf_eps_step_unread_components_source_test.go",
+        "pkg/opt/bound_expressions.go",
+        "pkg/opt/bound_expressions_test.go"
       ],
       "tests": [
         "TestInfEpsInfFromInt32SourceConstructor",
@@ -129589,7 +129605,8 @@
         "TestInfEpsStringSkipsUnreadNestedDenominators",
         "TestInfEpsRoundSkipsUnreadInfinityStorage",
         "TestInfEpsFusedKeepsEarlierTermsOnLateFailure",
-        "TestInfEpsPrefixStepsSkipUnreadInfinityAndEpsilon"
+        "TestInfEpsPrefixStepsSkipUnreadInfinityAndEpsilon",
+        "TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease"
       ],
       "conditionals": [
         {
@@ -129614,6 +129631,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained opt::context::to_exprs reads and independently copies the concrete infinity, rational and infinitesimal projections in source order before arithmetic numeral publication (opt_context.cpp:1343-1350)",
+          "status": "ported",
+          "go_target": "pkg/opt/bound_expressions.go",
+          "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease"]
+        },
         {
           "name": "inf_eps_rational<inf_rational>(int) default infinity, nested FIRST integer construction and default EPS (inf_eps_rational.h:82-85)",
           "status": "ported",
@@ -177722,7 +177745,9 @@
         "pkg/tactic/ufbv/rewrite_formula_process_test.go",
         "pkg/model/model_evaluator_array_expansion.go",
         "pkg/model/model_evaluator_array_equality.go",
-        "pkg/parsers/smt2/local_expr_stack.go"
+        "pkg/parsers/smt2/local_expr_stack.go",
+        "pkg/opt/bound_expressions.go",
+        "pkg/opt/bound_expressions_test.go"
       ],
       "tests": [
         "TestSMT2ParserQualifiedLocalSortAndIndexRefusals",
@@ -177798,7 +177823,8 @@
         "TestModelEvaluatorOriginalArrayEqualityTablesAndStorePrecedence",
         "TestModelEvaluatorOriginalArrayEqualitySymbolicIndexFallback",
         "TestModelEvaluatorOriginalArrayEqualityAllocationRefusals",
-        "TestSMT2LocalReferenceStacksFrameShrinkAndReset"
+        "TestSMT2LocalReferenceStacksFrameShrinkAndReset",
+        "TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease"
       ],
       "conditionals": [
         {
@@ -177835,6 +177861,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Concrete opt::context::to_exprs expr_ref_vector appends three independently pinned arithmetic numerals after ordered inf-epsilon projections (opt_context.cpp:1343-1350; ref_vector.h:96-101)",
+          "status": "ported",
+          "go_target": "pkg/opt/bound_expressions.go",
+          "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease"]
+        },
         {
           "name": "Concrete model2expr entry-condition expr_ref_vector pins generated equalities in source order and releases them forward with retryable consumed-reference cleanup (model2expr.cpp:67-77)",
           "status": "ported",
