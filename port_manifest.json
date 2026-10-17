@@ -17419,7 +17419,9 @@
         "pkg/ast/ast_fpa_to_real_decl.go",
         "pkg/ast/ast_fpa_to_ieee_bv_decl.go",
         "pkg/ast/ast_fpa_to_bv_decl.go",
-        "pkg/ast/ast_fpa_to_bv_test.go"
+        "pkg/ast/ast_fpa_to_bv_test.go",
+        "pkg/ast/ast_fpa_to_fp_unsigned_decl.go",
+        "pkg/ast/ast_fpa_to_fp_unsigned_test.go"
       ],
       "tests": [
         "TestASTFloatingPointClassificationDeclarationsAndApplications",
@@ -17453,7 +17455,8 @@
         "TestASTFPARMBinaryDeclarationsAndNumericCleanup",
         "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches",
         "TestASTFPAToIEEEBVDeclarationFiniteAndNaNBranches",
-        "TestASTFPAToBVSourceBoundsRoundingAndUnspecified"
+        "TestASTFPAToBVSourceBoundsRoundingAndUnspecified",
+        "TestASTFPAToFPUnsignedDeclarationRoundingAndRefusals"
       ],
       "assertions": [
         {
@@ -17670,6 +17673,14 @@
           "go_target": "pkg/ast/ast_fpa_to_bv_decl.go",
           "tests": [
             "TestASTFPAToBVSourceBoundsRoundingAndUnspecified"
+          ]
+        },
+        {
+          "name": "Concrete to_fp_unsigned declaration validates RoundingMode, BitVec, two integer format parameters and resulting FloatingPoint sort in source order (fpa_decl_plugin.cpp:567-591)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_unsigned_decl.go",
+          "tests": [
+            "TestASTFPAToFPUnsignedDeclarationRoundingAndRefusals"
           ]
         },
         {
@@ -26810,7 +26821,9 @@
         "pkg/ast/ast_fpa_to_real.go",
         "pkg/ast/ast_fpa_to_ieee_bv.go",
         "pkg/ast/ast_fpa_to_bv.go",
-        "pkg/ast/rewriter/fpa_to_bv_test.go"],
+        "pkg/ast/rewriter/fpa_to_bv_test.go",
+        "pkg/ast/ast_fpa_to_fp_unsigned.go",
+        "pkg/ast/rewriter/fpa_to_fp_unsigned_test.go"],
       "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestASTFPAUnaryScopedNumeralRetiresBeforeReturn", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
         "TestASTFPARemainderFiniteNumeralAndScopedCleanup",
         "TestFPARemainderNumericSpecialAndSymbolicRefusal",
@@ -26828,7 +26841,9 @@
         "TestASTFPAToIEEEBVDeclarationFiniteAndNaNBranches",
         "TestFPAToIEEEBVDefaultAndHardwareNaNDispatch",
         "TestASTFPAToBVSourceBoundsRoundingAndUnspecified",
-        "TestFPAToBVDispatchFiniteUnspecifiedAndSymbolic"],
+        "TestFPAToBVDispatchFiniteUnspecifiedAndSymbolic",
+        "TestASTFPAToFPUnsignedDeclarationRoundingAndRefusals",
+        "TestFPAToFPUnsignedNumericAndSymbolicDispatch"],
       "assertions": [
         {
           "line": 43,
@@ -27152,6 +27167,15 @@
           ]
         },
         {
+          "name": "mk_to_fp_unsigned concrete BV numeral and rounding-mode guard, owned rational to MPF conversion and result publication (fpa_rewriter.cpp:235-254)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_unsigned.go",
+          "tests": [
+            "TestASTFPAToFPUnsignedDeclarationRoundingAndRefusals",
+            "TestFPAToFPUnsignedNumericAndSymbolicDispatch"
+          ]
+        },
+        {
           "name": "mk_to_ieee_bv finite MPF bit encoding, default NaN refusal and hi_fp_unspecified four-part concat with BR_REWRITE1 (fpa_rewriter.cpp:764-792)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_ieee_bv.go",
@@ -27259,6 +27283,14 @@
           "go_target": "pkg/ast/rewriter/fpa_classification.go",
           "tests": [
             "TestFPAToBVDispatchFiniteUnspecifiedAndSymbolic"
+          ]
+        },
+        {
+          "name": "Concrete mk_to_fp_unsigned dispatch with two arguments and symbolic refusal (fpa_rewriter.h:80-81; fpa_rewriter.cpp:91,235-254)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_classification.go",
+          "tests": [
+            "TestFPAToFPUnsignedNumericAndSymbolicDispatch"
           ]
         },
         {
@@ -179115,6 +179147,14 @@
           "go_target": "pkg/ast/ast_fpa_to_bv.go",
           "tests": [
             "TestASTFPAToBVSourceBoundsRoundingAndUnspecified"
+          ]
+        },
+        {
+          "name": "Concrete mk_to_fp_unsigned scoped_mpf result lifetime after rounding-mode and BV numeral matches (fpa_rewriter.cpp:235-254; scoped_numeral.h:24-33)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_unsigned.go",
+          "tests": [
+            "TestASTFPAToFPUnsignedDeclarationRoundingAndRefusals"
           ]
         },
         {

@@ -49,6 +49,7 @@ const (
 	astFPAIsSubnormal      int32 = 32
 	astFPAIsNegative       int32 = 33
 	astFPAIsPositive       int32 = 34
+	astFPAToFPUnsigned     int32 = 37
 	astFPAToUBV            int32 = 38
 	astFPAToSBV            int32 = 39
 	astFPAToReal           int32 = 40
