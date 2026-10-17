@@ -48,6 +48,8 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	arithmetic                                             algebraicRationalArithmeticScope
+	addTmp                                                 UPolynomial
 	bounds                                                 algebraicBoundScope
 	inversion                                              algebraicInverseScope
 	negation                                               algebraicNegScope
@@ -132,6 +134,9 @@ func NewAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error) {
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m != nil && m.self == m && m.arithmetic.executing {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.bounds.executing {
 		return ErrAlgebraicPending
 	}
@@ -821,6 +826,9 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	return m.store(dl, &out)
 }
 func (m *AlgebraicRootCore) CleanupRetained() error {
+	if m != nil && m.self == m && m.arithmetic.executing {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.bounds.executing {
 		return ErrAlgebraicPending
 	}
@@ -832,6 +840,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	}
 	if m == nil || m.self != m || m.closed {
 		return ErrAlgebraicOwner
+	}
+	if e := m.cleanupRationalArithmetic(); e != nil {
+		return e
 	}
 	if e := m.cleanupInverse(); e != nil {
 		return e
@@ -860,6 +871,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.comparisonCleanup()
 }
 func (m *AlgebraicRootCore) Close() error {
+	if m != nil && m.self == m && m.arithmetic.executing {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.bounds.executing {
 		return ErrAlgebraicPending
 	}
@@ -904,6 +918,12 @@ func (m *AlgebraicRootCore) Close() error {
 	}
 	if e := m.CleanupRetained(); e != nil {
 		return e
+	}
+	// m_add_tmp is younger than the isolation vector members.
+	if m.addTmp.slot != 0 {
+		if e := m.config.Polynomials.DelPolynomial(&m.addTmp); e != nil {
+			return e
+		}
 	}
 	// Reverse declaration order of the selected actual source members.
 	for _, v := range []**BinaryRationalVector{&m.uppers, &m.lowers, &m.roots} {

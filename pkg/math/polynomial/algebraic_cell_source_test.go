@@ -150,6 +150,8 @@ func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPo
 	}
 	fields(reflect.ValueOf(c.inversion.values))
 	fields(reflect.ValueOf(c.bounds.values))
+	fields(reflect.ValueOf(c.arithmetic.q))
+	fields(reflect.ValueOf(c.arithmetic.b))
 	fields(reflect.ValueOf(c.predicate))
 	fields(reflect.ValueOf(c.isRationalTmp))
 	for _, vector := range []*BinaryRationalVector{c.roots, c.lowers, c.uppers} {
@@ -186,7 +188,7 @@ func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPo
 	if c.compareSequence != nil {
 		addState(&c.compareSequence.state.coefficients)
 	}
-	for _, poly := range []UPolynomial{c.tmp2, c.tmp3} {
+	for _, poly := range []UPolynomial{c.tmp2, c.tmp3, c.addTmp} {
 		if poly.slot != 0 {
 			polys = append(polys, poly)
 		}
