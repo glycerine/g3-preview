@@ -596,7 +596,13 @@ func (c *ParamsContext) CopyWithNumeralReceipt(dst, src *ParamsRef, receipt *unu
 	return c.copyCoreWithNumeralReceipt(dst.Slot, src.Slot, receipt)
 }
 func (c *ParamsContext) Append(dst, src *ParamsRef) error { return c.Copy(dst, src) }
-func (c *ParamsContext) keyCheck(k usymbol.Symbol) error  { _, e := c.SymbolsField.Hash(k); return e }
+
+// AppendWithNumeralReceipt exposes the same exact child cleanup authority as
+// CopyWithNumeralReceipt. Source params_ref::append calls copy directly.
+func (c *ParamsContext) AppendWithNumeralReceipt(dst, src *ParamsRef, receipt *unumeral.RationalCopyAllocationReceipt) error {
+	return c.CopyWithNumeralReceipt(dst, src, receipt)
+}
+func (c *ParamsContext) keyCheck(k usymbol.Symbol) error { _, e := c.SymbolsField.Hash(k); return e }
 func (c *ParamsContext) find(v *ParamsRef, k usymbol.Symbol, name *string, byName bool, kind ParamKind, matchAnyKind bool) (*paramEntry, error) {
 	if e := c.check(v); e != nil {
 		return nil, e
