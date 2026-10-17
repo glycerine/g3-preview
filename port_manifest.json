@@ -17397,6 +17397,7 @@
         "pkg/ast/ast_fpa_plugin.go",
         "pkg/ast/ast_fpa_classification_decl.go",
         "pkg/ast/ast_fpa_equality_decl.go",
+        "pkg/ast/ast_fpa_unary_decl.go",
         "pkg/ast/ast_fpa_plugin_source_test.go",
         "pkg/ast/ast_fpa_numeral.go",
         "pkg/ast/ast_fpa_numeral_source_test.go",
@@ -17412,6 +17413,7 @@
       "tests": [
         "TestASTFloatingPointClassificationDeclarationsAndApplications",
         "TestASTFPAIEEEEqualityDeclarationAndDomainValidation",
+        "TestASTFPAUnaryNegAbsDeclarationsAndApplications",
         "TestASTFloatingPointActualConstructorRegistrationAndSorts",
         "TestASTFloatingPointEveryActualConstructorAndPublicationPrefix",
         "TestASTFloatingPointSourceFinalizeAndOwnContextEndPreserveBorrowedNumerals",
@@ -17510,6 +17512,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_equality_decl.go",
           "tests": ["TestASTFPAIEEEEqualityDeclarationAndDomainValidation", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches"]
+        },
+        {
+          "name": "FPA fp.neg/fp.abs unary declarations: one FloatingPoint domain, same-sort range and exact source kinds (fpa_decl_plugin.cpp:333-350,738-742)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_unary_decl.go",
+          "tests": ["TestASTFPAUnaryNegAbsDeclarationsAndApplications", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg"]
         },
         {
           "name": "ast_fpa_plugin concrete reached source counterpart (fpa_decl_plugin.cpp:23-49,182-231)",
@@ -26694,8 +26702,8 @@
       "component": "ast",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/ast/ast_fpa_classification_read.go", "pkg/ast/ast_fpa_smt_equality.go", "pkg/ast/ast_fpa_nan_sort.go", "pkg/ast/rewriter/fpa_classification.go", "pkg/ast/rewriter/fpa_comparisons.go"],
-      "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches"],
+      "go_targets": ["pkg/ast/ast_fpa_classification_read.go", "pkg/ast/ast_fpa_smt_equality.go", "pkg/ast/ast_fpa_nan_sort.go", "pkg/ast/ast_fpa_unary_numeral.go", "pkg/ast/rewriter/fpa_classification.go", "pkg/ast/rewriter/fpa_comparisons.go", "pkg/ast/rewriter/fpa_unary.go"],
+      "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestASTFPAUnaryScopedNumeralRetiresBeforeReturn", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg"],
       "assertions": [
         {
           "line": 43,
@@ -26940,10 +26948,16 @@
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa_comparisons.go",
           "tests": ["TestFPAOrderedComparisonSourceSpecialAndNumericBranches"]
+        },
+        {
+          "name": "mk_neg/mk_abs and mk_app_core unary cases: NaN, infinity, double negation and one scoped_mpf numeric mutation (fpa_rewriter.cpp:41-70,308-370)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_unary.go",
+          "tests": ["TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg", "TestASTFPAUnaryScopedNumeralRetiresBeforeReturn"]
         }
       ],
       "ownership": ["Each classification call creates one caller-local scoped_mpf through the AST plugin's concrete numeral probe; successful source destruction retires it before the Boolean result is published. A stopped source destructor remains in the AST plugin's owning cleanup list.", "SMT and IEEE equality construct both scoped_mpf locals before operand probing and retire them in reverse order, preserving the short circuit when the first operand is symbolic."],
-      "deviations": ["The partial Go FPA rewriter handles classification, both numeral equality modes and ordered comparisons; arithmetic, conversion, nonnumeric equality and remaining source cases are unported."]
+      "deviations": ["The partial Go FPA rewriter handles classification, both numeral equality modes, ordered comparisons, negation and absolute value; binary arithmetic, conversion, nonnumeric equality and remaining source cases are unported."]
     },
     {
       "path": "src/ast/rewriter/fpa_rewriter.h",
@@ -26951,7 +26965,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/ast/rewriter/fpa_classification.go"],
-      "tests": ["TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches"],
+      "tests": ["TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg"],
       "conditionals": [
         {
           "line": 19,
@@ -178639,7 +178653,7 @@
           "tests": ["TestFixedShellExactCoefficientOwnerAndDirectedBound"]
         },
         {
-          "name": "Remaining concrete inherited scoped_mpf scalar lifetimes at retained AST FPA arithmetic/conversion rewriter, SMT theory and FPA API callers (src/util/scoped_numeral.h:24-171; src/util/mpf.h:300-324)",
+          "name": "Remaining concrete inherited scoped_mpf scalar lifetimes at retained AST FPA binary arithmetic/conversion rewriter, SMT theory and FPA API callers (src/util/scoped_numeral.h:24-171; src/util/mpf.h:300-324)",
           "status": "unported",
           "tests": []
         },
@@ -178666,6 +178680,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_smt_equality.go",
           "tests": ["TestFPAOrderedComparisonSourceSpecialAndNumericBranches"]
+        },
+        {
+          "name": "Concrete fpa_rewriter mk_neg/mk_abs caller-local scoped_mpf numeric mutation, destructor before result publication (fpa_rewriter.cpp:308-370)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_unary_numeral.go",
+          "tests": ["TestASTFPAUnaryScopedNumeralRetiresBeforeReturn", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg"]
         },
         {
           "name": "Concrete context_mpq_wrapper scoped_mpq constant lifetime and destructor before context base (src/math/subpaving/subpaving.cpp:59-81; src/util/scoped_numeral.h:24-55)",

@@ -48,6 +48,16 @@ func (r *FPARewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out ast.
 	if err != nil {
 		return RewriteFailed, err
 	}
+	if kind == ast.FPAOpNeg || kind == ast.FPAOpAbs {
+		if args.Count() != 1 {
+			return RewriteFailed, ast.ErrASTDomain
+		}
+		arg, err := args.At(0)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		return r.fpaUnary(arg, kind, out)
+	}
 	if kind >= ast.FPAOpEq && kind <= ast.FPAOpGe {
 		if args.Count() != 2 {
 			return RewriteFailed, ast.ErrASTDomain
