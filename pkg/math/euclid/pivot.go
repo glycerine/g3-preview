@@ -5,10 +5,27 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
 func (s *solverSetup) betterPivot(absA *numeral.Int, x uint32, eqSize int) (bool, error) {
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil {
+		return false, e
+	}
+	if enabled {
+		positive, e := s.manager.Integers().IsPos(absA)
+		if e != nil {
+			return false, e
+		}
+		if !positive {
+			if e := diagnostic.DebugAssertionFailure(d, "src/math/euclid/euclidean_solver.cpp", 226, "m().is_pos(a)"); e != nil {
+				return false, e
+			}
+		}
+	}
 	if x >= uint32(len(s.occurrences)) {
 		return false, arena.ErrBounds
 	}
@@ -70,6 +87,16 @@ func (s *solverSetup) selectNextVar() (bool, error) {
 	}
 	if len(s.equations) == 0 {
 		return false, nil
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil {
+		return false, e
+	}
+	if enabled && (len(s.equations) == 0 || s.equations[len(s.equations)-1] == nil) {
+		if e := diagnostic.DebugAssertionFailure(d, "src/math/euclid/euclidean_solver.cpp", 275, "!m_equations.empty() && m_equations.back() != 0"); e != nil {
+			return false, e
+		}
 	}
 	s.nextX = nullEquationIndex
 	for i := len(s.equations) - 1; i >= 0; i-- {
