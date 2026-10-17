@@ -25819,7 +25819,8 @@
         "pkg/ast/rewriter/bv_trailing_remove.go",
         "pkg/ast/rewriter/bv_trailing_eq.go",
         "pkg/ast/rewriter/bv_trailing_frame.go",
-        "pkg/ast/ast_bv_trailing_invocation.go"
+        "pkg/ast/ast_bv_trailing_invocation.go",
+        "pkg/ast/rewriter/bv_trailing_trace.go"
       ],
       "tests": [
         "TestASTBitVectorOriginalNumeralTrailingZeros",
@@ -25850,7 +25851,9 @@
         "TestBVTrailingEqualityReachedVerifyOverRemovalDomain",
         "TestASTBitVectorTrailingInvocationNamesActualChild",
         "TestASTBitVectorTrailingInvocationEveryActualReservation",
-        "TestBVTrailingRemovalUnreadOperandsAndZeroInputGuard"
+        "TestBVTrailingRemovalUnreadOperandsAndZeroInputGuard",
+        "TestBVTrailingLifecycleAndCountSourceTrace",
+        "TestBVTrailingEqualityAndRemovalSourceTrace"
       ],
       "assertions": [
         {
@@ -25938,6 +25941,15 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "retained bv-trailing TRACE/CTRACE sites for constructor, destructor, equality, count, removal result, cache insertion/hit and reset (src/ast/rewriter/bv_trailing.cpp:39,46,51,87,95-96,346,362,370,372)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/bv_trailing_trace.go",
+          "tests": [
+            "TestBVTrailingLifecycleAndCountSourceTrace",
+            "TestBVTrailingEqualityAndRemovalSourceTrace"
+          ]
+        },
+        {
           "name": "original count_trailing_core numeral loop and remove_trailing(size_t,numeral&) plus numeral removal publication branch (src/ast/rewriter/bv_trailing.cpp:213-234,311-327)",
           "status": "partial",
           "go_target": "pkg/ast/ast_bv_trailing_numeral.go",
@@ -26024,7 +26036,7 @@
         "Actual recursive call sites retain their entered structural frame and exact numerical invocation, captured before numerical copy/two/division allocations. Successful returns retire before loop reuse; failed call sites reject reuse after owning cleanup. Owning argument storage now uses native []ASTHandle: append acquires each reference, consumed-DEC cleanup retains unreleased roots on the actual frame. ADD ends tmp before arguments; MUL ends c_val then arguments then tmp; CONCAT ends arguments then new_last; equality ends out2 then out1. A stopped exact child blocks older source cleanup. Removed source vector placement/token/header/payload/push-growth receipts and the vector-to-slice bridge; factories borrow native roots directly. Reached frames remain on the owner list after body/source failure; owning Close drains youngest frames and actual numerical calls before older cache cleanup, preserving source history. Native slice storage adds no container/growth implementation credit."
       ],
       "deviations": [
-        "Selected count/cache/removal/equality algorithms remain partial at whole-unit scope. Standalone checked Go owners preserve pkg boundaries. Actual frames/numerical/reference owners remain charged; removal argument storage is native owning slices passed directly to factories, with no compact-vector bridge or simulated container growth. TRACE/CTRACE diagnostics, native stack/vtable/pointer/allocator/fatal/assertion/exception ABI and independently injected stopped numerical source DT remain open. Go returning-error cleanup does not claim native-fatal resumability or whole-unit completion.",
+        "Selected count/cache/removal/equality algorithms remain partial at whole-unit scope. Standalone checked Go owners preserve pkg boundaries. Actual frames/numerical/reference owners remain charged; removal argument storage is native owning slices passed directly to factories, with no compact-vector bridge or simulated container growth. The ten retained bv-trailing TRACE/CTRACE sites have source-site Go records for selected live expressions; wider formatter/stream domains and native stack/vtable/pointer/allocator/fatal/assertion/exception ABI and independently injected stopped numerical source DT remain open. Go returning-error cleanup does not claim native-fatal resumability or whole-unit completion.",
         "Source edge behavior is retained: concat passes the full request to every child and can over-remove; an unknown child leaves new_last unchanged, so concat(x,zero4) removal of six returns four/null in release and reaches the full-width SASSERT in g3debug. Complete coefficient removal in MUL reaches is_numeral(null) before its zero-width guard; the Go boundary returns ErrASTHandle for that native invalid-pointer domain. ADD/equality VERIFY checks run in all source builds and a failed exact-removal check reaches release UNREACHABLE/undefined behavior; Go rejects that domain with ErrASTDomain and retains unchanged final output. These are qualifications, not repaired algorithms."
       ]
     },

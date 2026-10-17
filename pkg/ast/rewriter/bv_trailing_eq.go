@@ -9,6 +9,9 @@ func (p *BVTrailing) EqRemoveTrailing(left, right ast.ASTHandle, out ast.ASTRef)
 	}
 	defer func() { p.leave(body) }()
 	m := p.manager
+	if e := p.traceEq(left, right); e != nil {
+		return RewriteFailed, e
+	}
 	if ast.ASTSourceDebug {
 		for _, arg := range []ast.ASTHandle{left, right} {
 			yes, e := m.IsBitVector(arg)

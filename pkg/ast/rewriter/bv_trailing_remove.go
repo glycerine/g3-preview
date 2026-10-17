@@ -13,6 +13,14 @@ func (p *BVTrailing) Remove(arg ast.ASTHandle, n uint32, out ast.ASTRef) (remove
 	return p.remove(arg, n, out, bvTrailingDepth, &p.removeCall)
 }
 func (p *BVTrailing) remove(arg ast.ASTHandle, n uint32, out ast.ASTRef, depth uint32, call *bvTrailingCall) (uint32, error) {
+	removed, err := p.removeCore(arg, n, out, depth, call)
+	if err != nil {
+		return removed, err
+	}
+	return removed, p.traceRemove(arg, out)
+}
+
+func (p *BVTrailing) removeCore(arg ast.ASTHandle, n uint32, out ast.ASTRef, depth uint32, call *bvTrailingCall) (uint32, error) {
 	m := p.manager
 	if ast.ASTSourceDebug {
 		yes, e := m.IsBitVector(arg)

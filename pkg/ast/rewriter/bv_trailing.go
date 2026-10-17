@@ -19,7 +19,7 @@ type BVTrailing struct {
 	manager                       *ast.ASTManager
 	tables                        [6]*bvTrailingTable
 	header                        uint64
-	running, closed               bool
+	running, closed, dtorTraced   bool
 	failure                       error
 	frames                        *bvTrailingFrame
 	countCall, removeCall, eqCall bvTrailingCall
@@ -40,6 +40,7 @@ func NewBVTrailing(extract *MkExtractProc) (*BVTrailing, error) {
 	p := &BVTrailing{extract: extract, manager: m, header: header}
 	p.self = p
 	p.traceImpAllocated()
+	p.traceLifecycle(false)
 	return p, nil
 }
 
@@ -101,11 +102,17 @@ func (p *BVTrailing) countTracked(arg ast.ASTHandle, depth uint32, call *bvTrail
 			return 0, 0, e
 		}
 		if found {
+			if e = p.traceCacheEntry(false, depth, arg, entry.min, entry.max); e != nil {
+				return 0, 0, e
+			}
 			return entry.min, entry.max, nil
 		}
 	}
 	min, max, body = p.countCore(arg, depth, call)
 	if body != nil {
+		return
+	}
+	if body = p.traceCount(arg, min, max); body != nil {
 		return
 	}
 	if ast.ASTSourceDebug {
@@ -148,7 +155,7 @@ func (p *BVTrailing) cache(depth uint32, arg ast.ASTHandle, min, max uint32) err
 	// Native insertion publishes the acquired reference without a fallible
 	// container-growth step between INC and transfer to the entry.
 	p.tables[depth].insert(arg, min, max)
-	return nil
+	return p.traceCacheEntry(true, depth, arg, min, max)
 }
 
 func (p *BVTrailing) ResetCache(condition uint32) (body error) {
@@ -164,9 +171,14 @@ func (p *BVTrailing) resetCache(condition uint32) error {
 	}
 	for depth := uint32(1); depth <= bvTrailingDepth; depth++ {
 		table := p.tables[depth]
-		if table == nil || condition != 0 && uint32(table.entries.Len()) < condition {
+		if table == nil {
 			continue
 		}
+		p.traceCacheReset(depth, condition, false)
+		if condition != 0 && uint32(table.entries.Len()) < condition {
+			continue
+		}
+		p.traceCacheReset(depth, condition, true)
 		if e := table.close(p.manager); e != nil {
 			return e
 		}
@@ -202,6 +214,10 @@ func (p *BVTrailing) Close() error {
 		if e := call.cleanup(p.manager); e != nil {
 			return e
 		}
+	}
+	if !p.dtorTraced {
+		p.dtorTraced = true
+		p.traceLifecycle(true)
 	}
 	if e := p.resetCache(0); e != nil {
 		return e
