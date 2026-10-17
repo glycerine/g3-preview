@@ -99,6 +99,26 @@ func TestParamsMatchedNumeralSymbolAssertionAfterDeleteAndKind(t *testing.T) {
 	}
 	paramsMust(t, c.Del(&v))
 	paramsMust(t, q.Del(&r))
+	paramsMust(t, d.EnableAssertions(true))
+	w, e := c.NewValue()
+	paramsMust(t, e)
+	s, e := q.NewValue()
+	paramsMust(t, e)
+	paramsMust(t, c.SetRat(&w, k, &s))
+	if e := c.SetSymbol(&w, k, usymbol.Numerical(8)); !errors.Is(e, usymbol.ErrInvalid) {
+		t.Fatal("second numerical bare_str assertion", e)
+	}
+	aborted, e := c.StoppedSetReplacement(&w)
+	paramsMust(t, e)
+	paramsMust(t, c.AbortSetReplacement(&w, aborted))
+	if x := c.Entry(&c.Blocks[w.Slot-1], 0); *x != (paramEntry{}) {
+		t.Fatal("owning abort retained partial symbol entry", *x)
+	}
+	if !errors.Is(c.CompleteSetReplacement(&w, aborted), ErrParamsPrecondition) {
+		t.Fatal("aborted assertion replayed")
+	}
+	paramsMust(t, c.Del(&w))
+	paramsMust(t, q.Del(&s))
 }
 
 func TestParamsMatchedScalarSymbolAssertionAfterKind(t *testing.T) {

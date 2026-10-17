@@ -172411,7 +172411,7 @@
         },
         {
           "name": "selected matched SET_SIMPLE/SET_SYM NUM leaf before kind/field publication and exact explicit owning continuation",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/params/util_params_set_replacement_source.go",
           "tests": [
             "TestParamsReferenceMatchedReplacementRejectsConsumedNUMReplay",
@@ -173173,7 +173173,7 @@
         },
         {
           "name": "selected matched SET_SIMPLE/SET_SYM NUM leaf before kind/field publication and exact explicit owning continuation",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/params/util_params_set_replacement_source.go",
           "tests": [
             "TestParamsReferenceMatchedReplacementRejectsConsumedNUMReplay",
