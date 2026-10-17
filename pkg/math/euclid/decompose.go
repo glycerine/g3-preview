@@ -126,6 +126,9 @@ func (s *solverSetup) decomposeAndEliminate() (err error) {
 			j++
 		}
 	}
+	if err = euclidSourceAssertion(677, "j < sz", j < size); err != nil {
+		return err
+	}
 	if j >= size {
 		return arena.ErrInvalidSlot
 	}

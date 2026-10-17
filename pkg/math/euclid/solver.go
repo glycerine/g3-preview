@@ -140,6 +140,9 @@ func (s *Solver) GetJustification() ([]uint32, error) {
 	if e := s.open(); e != nil {
 		return nil, e
 	}
+	if e := euclidSourceAssertion(569, "inconsistent()", s.setup.inconsistent != nullEquationIndex); e != nil {
+		return nil, e
+	}
 	i := s.setup.inconsistent
 	if i == nullEquationIndex || i >= uint32(len(s.setup.equations)) || s.setup.equations[i] == nil {
 		return nil, arena.ErrInvalidSlot

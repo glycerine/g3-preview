@@ -113,6 +113,9 @@ func (s *solverSetup) selectNextVar() (bool, error) {
 			}
 		}
 	}
+	if e := euclidSourceAssertion(287, "m_next_x != null_var", s.nextX != nullEquationIndex); e != nil {
+		return false, e
+	}
 	if s.nextX == nullEquationIndex {
 		return false, arena.ErrInvalidSlot
 	}
@@ -130,6 +133,9 @@ func (s *solverSetup) eraseOccurrence(x, eqIndex uint32) error {
 func (s *solverSetup) substituteMostRecentSolution(x uint32) error {
 	if len(s.solution) == 0 || x >= uint32(len(s.occurrences)) {
 		return arena.ErrInvalidSlot
+	}
+	if e := euclidSourceAssertion(582, "!m_solution.empty()", len(s.solution) != 0); e != nil {
+		return e
 	}
 	if e := s.traceMostRecentSolution(x, s.solution[len(s.solution)-1]); e != nil {
 		return e

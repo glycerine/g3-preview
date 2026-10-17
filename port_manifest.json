@@ -35796,13 +35796,14 @@
           ]
         },
         {
-          "name": "solved-equation ownership transfer and apply_solution sorted-row substitution with source SASSERT switch reads at cpp:427,432,434,435,443,448 and newly exposed solved-variable queue work at cpp:422-461,615-618",
+          "name": "solved-equation ownership transfer and apply_solution sorted-row substitution with source SASSERT switch reads at cpp:427,432,434,435,443,448,582 and newly exposed solved-variable queue work at cpp:422-461,615-618",
           "status": "partial",
           "go_target": "pkg/math/euclid/apply_solution.go",
           "go_targets": ["pkg/math/euclid/apply_solution_trace.go"],
           "tests": [
             "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
             "TestEuclideanApplySolutionAssertionStopsBeforeSubstitution",
+            "TestEuclideanJustificationAndRecentSolutionAssertionReads",
             "TestEuclideanApplySolutionTraceBeforeAndAfterIntegerSwap",
             "TestEuclideanNormalizeQuerySubstitutionPublishesConstantBeforeRationalRefusal"
           ]
@@ -35823,7 +35824,7 @@
           ]
         },
         {
-          "name": "select_next_var coefficient/occurrence/equation-size priority, source SASSERT switch reads at cpp:226,275,603, and elim_unit substitution of retained occurrences at cpp:224-284,575-622",
+          "name": "select_next_var coefficient/occurrence/equation-size priority, source SASSERT switch reads at cpp:226,275,287,603, and elim_unit substitution of retained occurrences at cpp:224-284,575-622",
           "status": "partial",
           "go_target": "pkg/math/euclid/pivot.go",
           "go_targets": ["pkg/math/euclid/pivot_decompose_trace.go"],
@@ -35835,7 +35836,7 @@
           ]
         },
         {
-          "name": "decompose signed quotient/remainder and decompose_and_elim parameter/auxiliary equation/occurrence substitution at cpp:624-705",
+          "name": "decompose signed quotient/remainder and decompose_and_elim parameter/auxiliary equation/occurrence substitution with source SASSERT switch read at cpp:677 (cpp:624-705)",
           "status": "partial",
           "go_target": "pkg/math/euclid/decompose.go",
           "go_targets": ["pkg/math/euclid/pivot_decompose_trace.go", "pkg/math/euclid/solver_setup.go"],
@@ -35874,7 +35875,7 @@
           ]
         },
         {
-          "name": "public solver wrapper, owned/borrowed numeral manager, reset, explanation, parameter query and display at cpp:485-501,788-845",
+          "name": "public solver wrapper, owned/borrowed numeral manager, reset, explanation with source SASSERT switch read at cpp:569, parameter query and display at cpp:485-501,788-845",
           "status": "partial",
           "go_target": "pkg/math/euclid/solver.go",
           "tests": [
@@ -35882,6 +35883,7 @@
             "TestEuclideanSolvedQueueBorrowsHeapDebugAcrossReset",
             "TestEuclideanPublicSolverOwnedManagerAndClosedGuards",
             "TestEuclideanPublicSolverContradictionExplanationAndDisplay",
+            "TestEuclideanJustificationAndRecentSolutionAssertionReads",
             "TestEuclideanPublicSolverResetAfterGuardedAssertionError"
           ]
         }
