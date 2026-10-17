@@ -68,6 +68,28 @@ func (r *FPARewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out ast.
 		}
 		return RewriteDone, r.manager.SetRef(out, value)
 	}
+	if kind == ast.FPAOpFP {
+		if args.Count() != 3 {
+			return RewriteFailed, ast.ErrASTDomain
+		}
+		sign, err := args.At(0)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		exponent, err := args.At(1)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		significand, err := args.At(2)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		answer, found, err := r.manager.RewriteFPAFPComponentsNumerals(d, sign, exponent, significand)
+		if err != nil || !found {
+			return RewriteFailed, err
+		}
+		return RewriteDone, r.manager.SetRef(out, answer)
+	}
 	if kind == ast.FPAOpToReal {
 		if args.Count() != 1 {
 			return RewriteFailed, ast.ErrASTDomain

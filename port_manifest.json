@@ -17396,6 +17396,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_fpa_fp_decl.go",
         "pkg/ast/ast_fpa_plugin.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_fpa_some_value.go",
@@ -17434,6 +17435,7 @@
         "pkg/ast/ast_fpa_to_fp_ieee_bv_test.go"
       ],
       "tests": [
+        "TestASTFPAFPComponentsNumeralsAndTrace",
         "TestASTFloatingPointSomeValueSourceDefaults",
         "TestASTFloatingPointSomeValueRefusedMPFConstruction",
         "TestModelEvaluatorFPACompletionUsesPluginValues",
@@ -17540,6 +17542,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "fp three-bit-vector declaration with one-bit sign and derived floating-point format (fpa_decl_plugin.cpp:591-606)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_fp_decl.go",
+          "tests": ["TestASTFPAFPComponentsNumeralsAndTrace"]
+        },
         {
           "name": "FPA classification unary relation declarations and applications: seven exact kinds, names, floating-point domain and Boolean range (fpa_decl_plugin.cpp:313-331,731-738)",
           "status": "ported",
@@ -17780,6 +17788,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_fpa_fp_decl.go",
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_fpa_some_value.go",
         "pkg/ast/ast_fpa_some_value_test.go",
@@ -17790,6 +17799,7 @@
         "pkg/ast/ast_fpa_rounding_read.go"
       ],
       "tests": [
+        "TestASTFPAFPComponentsNumeralsAndTrace",
         "TestASTFloatingPointSomeValueSourceDefaults",
         "TestASTFloatingPointSomeValueRefusedMPFConstruction",
         "TestModelEvaluatorFPACompletionUsesPluginValues",
@@ -17856,6 +17866,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "fp constructor declaration for retained three-BV application (fpa_decl_plugin.h; fpa_decl_plugin.cpp:591-606)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_fp_decl.go",
+          "tests": ["TestASTFPAFPComponentsNumeralsAndTrace"]
+        },
         {
           "name": "Reached fpa_decl_plugin::get_some_value declaration and two source sort defaults (fpa_decl_plugin.h:183; fpa_decl_plugin.cpp:856-870)",
           "status": "partial",
@@ -26898,6 +26914,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_fpa_fp_trace.go",
+        "pkg/ast/ast_fpa_fp_components.go",
         "pkg/ast/ast_fpa_to_ieee_bv_trace.go",
         "pkg/ast/ast_fpa_to_fp_arithmetic_trace.go",
         "pkg/ast/ast_fpa_classification_read.go", "pkg/ast/ast_fpa_smt_equality.go", "pkg/ast/ast_fpa_nan_sort.go", "pkg/ast/ast_fpa_unary_numeral.go", "pkg/ast/rewriter/fpa_classification.go", "pkg/ast/rewriter/fpa_comparisons.go", "pkg/ast/rewriter/fpa_unary.go",
@@ -26927,6 +26945,8 @@
         "pkg/ast/ast_fpa_to_fp_ieee_bv.go",
         "pkg/ast/rewriter/fpa_to_fp_ieee_bv_test.go"],
       "tests": [
+        "TestFPAFPComponentsDispatch",
+        "TestASTFPAFPComponentsNumeralsAndTrace",
         "TestASTFPAToIEEEBVSourceTrace",
         "TestASTFPAToFPAdjacentSourceTraces",
         "TestASTFPAToFPArithmeticInputSourceTrace",
@@ -27180,6 +27200,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "mk_fp concrete sign, significand, exponent numeral probes, MPF construction and TRACE before result publication (fpa_rewriter.cpp:684-705)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_fp_components.go",
+          "tests": ["TestASTFPAFPComponentsNumeralsAndTrace"]
+        },
+        {
           "name": "Retained mk_to_fp fp_rewriter TRACE at fpa_rewriter.cpp:143,168,177,179,195,209,226 across IEEE split, format, signed BV, exponent-rational and three-BV branches",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_fp_arithmetic_trace.go",
@@ -27389,7 +27415,8 @@
         "pkg/ast/rewriter/fpa_rm_unary.go",
         "pkg/ast/rewriter/fpa_fma.go",
         "pkg/ast/rewriter/fpa_rm_binary.go"],
-      "tests": ["TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
+      "tests": [
+        "TestFPAFPComponentsDispatch","TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
         "TestFPARemainderNumericSpecialAndSymbolicRefusal",
         "TestFPAExtremaNaNInfinitySignedZeroAndSymbolic",
         "TestFPARMUnarySqrtAndIntegralDispatch",
@@ -27415,6 +27442,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "mk_fp dispatch for retained concrete three-BV constructor (fpa_rewriter.h; fpa_rewriter.cpp:89,684-705)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_classification.go",
+          "tests": ["TestFPAFPComponentsDispatch"]
+        },
         {
           "name": "Concrete mk_rem declaration and reached rewriter dispatch (fpa_rewriter.h; fpa_rewriter.cpp:68,340-353)",
           "status": "ported",
@@ -159190,6 +159223,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_fpa_fp_components.go",
         "pkg/util/numeral/mpf_remainder_object_trace.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/arbitrary_context_params_test.go",
@@ -159366,6 +159400,7 @@
         "pkg/util/numeral/mpf_borrowed_accessors_test.go"
       ],
       "tests": [
+        "TestASTFPAFPComponentsNumeralsAndTrace",
         "TestArbitraryFloatScalarCopyReceiptEveryPrefix",
         "TestArbitraryFloatToRationalReachedUnpackOwnsDescriptorPrefix",
         "TestArbitraryFloatToRationalAllocationCallbackGuards",
@@ -159609,6 +159644,12 @@
       "methods_audited": true,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete mk_fp scoped_mpf value construction and retirement (fpa_rewriter.cpp:684-705; mpf.h:300-324)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_fp_components.go",
+          "tests": ["TestASTFPAFPComponentsNumeralsAndTrace"]
+        },
         {
           "name": "mpf.h:48 private unreachable copy assignment has no retained source call",
           "status": "dead_deleted"
@@ -178916,6 +178957,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_fpa_fp_components.go",
         "pkg/math/subpaving/arbitrary_shell_coefficients.go",
         "pkg/math/subpaving/fixed_shell_coefficients.go",
         "pkg/math/subpaving/rational_shell_coefficients.go",
@@ -178958,6 +179000,7 @@
         "pkg/ast/ast_fpa_to_ieee_bv.go"
       ],
       "tests": [
+        "TestASTFPAFPComponentsNumeralsAndTrace",
         "TestScopedNumeralSourceTstScoped",
         "TestRationalShellPersistentCoefficientGrowthAndContextTransfer",
         "TestScopedNumeralResizeUsesGoSliceStorage",
@@ -179071,6 +179114,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Concrete mk_fp caller-local scoped_mpf lifetime after three source numeral guards (fpa_rewriter.cpp:684-705; scoped_numeral.h:24-55)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_fp_components.go",
+          "tests": ["TestASTFPAFPComponentsNumeralsAndTrace"]
+        },
         {
           "name": "selected Int/Rational constructor, destructor, get/m borrow and deep copy/assignment",
           "status": "ported",
@@ -183675,6 +183724,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_fpa_fp_trace.go",
         "pkg/ast/ast_fpa_to_ieee_bv_trace.go",
         "pkg/ast/ast_fpa_to_fp_arithmetic_trace.go",
         "pkg/sat/tactic/sat_goal_to_sat_trace.go",
@@ -183778,6 +183828,7 @@
         "pkg/ast/rewriter/var_substitution_trace.go"
       ],
       "tests": [
+        "TestASTFPAFPComponentsNumeralsAndTrace",
         "TestASTFPAToFPAdjacentSourceTraces",
         "TestASTFPAToFPArithmeticInputSourceTrace",
         "TestSATGoalDependencyFormulaSourceTrace",
@@ -183918,6 +183969,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained mk_fp fp_rewriter TRACE at fpa_rewriter.cpp:700",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_fp_trace.go",
+          "tests": ["TestASTFPAFPComponentsNumeralsAndTrace"]
+        },
         {
           "name": "Retained mk_to_fp fp_rewriter TRACE at fpa_rewriter.cpp:143,168,177,179,195,209,226 across IEEE split, format, signed BV, exponent-rational and three-BV branches",
           "status": "ported",
@@ -186159,6 +186216,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_fpa_fp_trace.go",
         "pkg/ast/ast_fpa_to_ieee_bv_trace.go",
         "pkg/ast/ast_fpa_to_fp_arithmetic_trace.go",
         "pkg/sat/tactic/sat_goal_to_sat_trace.go",
@@ -186260,6 +186318,7 @@
         "pkg/ast/rewriter/var_substitution_trace.go"
       ],
       "tests": [
+        "TestASTFPAFPComponentsNumeralsAndTrace",
         "TestASTFPAToFPAdjacentSourceTraces",
         "TestASTFPAToFPArithmeticInputSourceTrace",
         "TestSATGoalDependencyFormulaSourceTrace",
@@ -186410,6 +186469,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained mk_fp fp_rewriter TRACE at fpa_rewriter.cpp:700",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_fp_trace.go",
+          "tests": ["TestASTFPAFPComponentsNumeralsAndTrace"]
+        },
         {
           "name": "Retained mk_to_fp fp_rewriter TRACE at fpa_rewriter.cpp:143,168,177,179,195,209,226 across IEEE split, format, signed BV, exponent-rational and three-BV branches",
           "status": "ported",
