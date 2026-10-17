@@ -178,7 +178,7 @@ func (m *ASTManager) mkFamilyAppDomainArguments(fid FamilyID, k int32, ps []ASTP
 		decl, e = m.basicDecl(k, ps, domain)
 	} else if m.pluginAt(fid).kind == astArrayPlugin {
 		decl, e = m.arrayDecl(k, ps, domain, ASTHandle{})
-	} else if m.pluginAt(fid).kind == astFloatingPointPlugin && k >= 0 && (k <= astFPAMinusZero || k >= astFPAAdd && k <= astFPARoundToIntegral || k >= astFPAEq && k <= astFPAGe || k >= astFPAIsNaN && k <= astFPAIsPositive || k == astFPAFP || k == astFPAToFP || k == astFPAToFPUnsigned || k == astFPAToUBV || k == astFPAToSBV || k == astFPAToReal || k == astFPAToIEEEBV || k == astFPABVWrap) {
+	} else if m.pluginAt(fid).kind == astFloatingPointPlugin && k >= 0 && (k <= astFPAMinusZero || k >= astFPAAdd && k <= astFPARoundToIntegral || k >= astFPAEq && k <= astFPAGe || k >= astFPAIsNaN && k <= astFPAIsPositive || k == astFPAFP || k == astFPAToFP || k == astFPAToFPUnsigned || k == astFPAToUBV || k == astFPAToSBV || k == astFPAToReal || k == astFPAToIEEEBV || k == astFPABVWrap || k == astFPABV2RM) {
 		previous := m.formatExecuting
 		m.formatExecuting = true
 		defer func() { m.formatExecuting = previous }()
@@ -198,6 +198,8 @@ func (m *ASTManager) mkFamilyAppDomainArguments(fid FamilyID, k int32, ps []ASTP
 			decl, e = m.floatingPointToIEEEBVDecl(domain)
 		} else if k == astFPABVWrap {
 			decl, e = m.floatingPointBVWrapDecl(ps, domain)
+		} else if k == astFPABV2RM {
+			decl, e = m.floatingPointBV2RMDecl(ps, domain, ASTHandle{})
 		} else if k == astFPAAdd || k == astFPASub || k == astFPAMul || k == astFPADiv {
 			decl, e = m.floatingPointRMBinaryDecl(k, domain)
 		} else if k == astFPARem || k == astFPAMin || k == astFPAMax {
@@ -263,7 +265,7 @@ func (m *ASTManager) mkFamilyFuncDecl(fid FamilyID, k int32, ps []ASTParameter, 
 		r, e = m.basicDecl(k, ps, domain)
 	} else if m.pluginAt(fid).kind == astArrayPlugin {
 		r, e = m.arrayDecl(k, ps, domain, rangeSort)
-	} else if m.pluginAt(fid).kind == astFloatingPointPlugin && k >= 0 && (k <= astFPAMinusZero || k >= astFPAAdd && k <= astFPARoundToIntegral || k >= astFPAEq && k <= astFPAGe || k >= astFPAIsNaN && k <= astFPAIsPositive || k == astFPAFP || k == astFPAToFP || k == astFPAToFPUnsigned || k == astFPAToUBV || k == astFPAToSBV || k == astFPAToReal || k == astFPAToIEEEBV || k == astFPABVWrap) {
+	} else if m.pluginAt(fid).kind == astFloatingPointPlugin && k >= 0 && (k <= astFPAMinusZero || k >= astFPAAdd && k <= astFPARoundToIntegral || k >= astFPAEq && k <= astFPAGe || k >= astFPAIsNaN && k <= astFPAIsPositive || k == astFPAFP || k == astFPAToFP || k == astFPAToFPUnsigned || k == astFPAToUBV || k == astFPAToSBV || k == astFPAToReal || k == astFPAToIEEEBV || k == astFPABVWrap || k == astFPABV2RM) {
 		previous := m.formatExecuting
 		m.formatExecuting = true
 		defer func() { m.formatExecuting = previous }()
@@ -283,6 +285,8 @@ func (m *ASTManager) mkFamilyFuncDecl(fid FamilyID, k int32, ps []ASTParameter, 
 			r, e = m.floatingPointToIEEEBVDecl(domain)
 		} else if k == astFPABVWrap {
 			r, e = m.floatingPointBVWrapDecl(ps, domain)
+		} else if k == astFPABV2RM {
+			r, e = m.floatingPointBV2RMDecl(ps, domain, rangeSort)
 		} else if k == astFPAAdd || k == astFPASub || k == astFPAMul || k == astFPADiv {
 			r, e = m.floatingPointRMBinaryDecl(k, domain)
 		} else if k == astFPARem || k == astFPAMin || k == astFPAMax {

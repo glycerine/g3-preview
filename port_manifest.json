@@ -17448,6 +17448,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_fpa_bv2rm_decl.go",
+        "pkg/ast/ast_fpa_bv2rm_decl_test.go",
         "pkg/ast/ast_fpa_bv_wrap_decl.go",
         "pkg/ast/ast_fpa_fp_decl.go",
         "pkg/ast/ast_fpa_plugin.go",
@@ -17490,6 +17492,7 @@
         "pkg/model/model_evaluator_fpa_test.go"
       ],
       "tests": [
+        "TestASTFPABV2RMDeclarationSortsAndImplicitRange",
         "TestFPABVWrapSourceExtractIdentityAndRefusals",
         "TestASTFPAFPComponentsNumeralsAndTrace",
         "TestASTFloatingPointSomeValueSourceDefaults",
@@ -17604,6 +17607,12 @@
           "go_target": "pkg/ast/ast_fpa_bv_wrap_decl.go",
           "go_targets": ["pkg/ast/rewriter/fpa_bv_wrap_test.go"],
           "tests": ["TestFPABVWrapSourceExtractIdentityAndRefusals"]
+        },
+        {
+          "name": "bv2rm declaration validates a three-bit BV domain and RoundingMode range (fpa_decl_plugin.cpp:675-686)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_bv2rm_decl.go",
+          "tests": ["TestASTFPABV2RMDeclarationSortsAndImplicitRange"]
         },
         {
           "name": "fp three-bit-vector declaration with one-bit sign and derived floating-point format (fpa_decl_plugin.cpp:591-606)",
@@ -17854,6 +17863,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/ast_fpa_bv2rm_decl.go",
+        "pkg/ast/ast_fpa_bv2rm_decl_test.go",
         "pkg/ast/ast_fpa_bv_wrap_decl.go",
         "pkg/ast/ast_fpa_fp_decl.go",
         "pkg/ast/ast_builtin_plugins_values.go",
@@ -17868,6 +17879,7 @@
         "pkg/model/model_evaluator_fpa_test.go"
       ],
       "tests": [
+        "TestASTFPABV2RMDeclarationSortsAndImplicitRange",
         "TestFPABVWrapSourceExtractIdentityAndRefusals",
         "TestASTFPAFPComponentsNumeralsAndTrace",
         "TestASTFloatingPointSomeValueSourceDefaults",
@@ -17942,6 +17954,12 @@
           "go_target": "pkg/ast/ast_fpa_bv_wrap_decl.go",
           "go_targets": ["pkg/ast/rewriter/fpa_bv_wrap_test.go"],
           "tests": ["TestFPABVWrapSourceExtractIdentityAndRefusals"]
+        },
+        {
+          "name": "bv2rm retained declaration kind and three-bit BV to RoundingMode sort contract (fpa_decl_plugin.h:90,159; fpa_decl_plugin.cpp:675-686)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_bv2rm_decl.go",
+          "tests": ["TestASTFPABV2RMDeclarationSortsAndImplicitRange"]
         },
         {
           "name": "fp constructor declaration for retained three-BV application (fpa_decl_plugin.h; fpa_decl_plugin.cpp:591-606)",
@@ -26992,6 +27010,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/rewriter/fpa_bv2rm.go",
+        "pkg/ast/rewriter/fpa_bv2rm_test.go",
         "pkg/ast/rewriter/fpa_bv_wrap.go",
         "pkg/ast/ast_fpa_fp_trace.go",
         "pkg/ast/ast_fpa_fp_components.go",
@@ -27024,6 +27044,7 @@
         "pkg/ast/ast_fpa_to_fp_ieee_bv.go",
         "pkg/ast/rewriter/fpa_to_fp_ieee_bv_test.go"],
       "tests": [
+        "TestFPABV2RMSourceNumeralsAndSymbolicRefusal",
         "TestFPABVWrapSourceExtractIdentityAndRefusals",
         "TestFPAFPComponentsDispatch",
         "TestASTFPAFPComponentsNumeralsAndTrace",
@@ -27286,6 +27307,12 @@
           "tests": ["TestFPABVWrapSourceExtractIdentityAndRefusals"]
         },
         {
+          "name": "mk_bv2rm concrete three-bit numeral to five RoundingMode constants, unknown encodings default to toward-zero (fpa_rewriter.cpp:663-680)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_bv2rm.go",
+          "tests": ["TestFPABV2RMSourceNumeralsAndSymbolicRefusal"]
+        },
+        {
           "name": "mk_fp concrete sign, significand, exponent numeral probes, MPF construction and TRACE before result publication (fpa_rewriter.cpp:684-705)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_fp_components.go",
@@ -27514,6 +27541,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/ast/rewriter/fpa_bv2rm.go",
+        "pkg/ast/rewriter/fpa_bv2rm_test.go",
         "pkg/ast/rewriter/fpa_bv_wrap.go","pkg/ast/rewriter/fpa_classification.go",
         "pkg/ast/rewriter/fpa_remainder.go",
         "pkg/ast/rewriter/fpa_extrema.go",
@@ -27521,6 +27550,7 @@
         "pkg/ast/rewriter/fpa_fma.go",
         "pkg/ast/rewriter/fpa_rm_binary.go"],
       "tests": [
+        "TestFPABV2RMSourceNumeralsAndSymbolicRefusal",
         "TestFPABVWrapSourceExtractIdentityAndRefusals",
         "TestFPAFPComponentsDispatch","TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
         "TestFPARemainderNumericSpecialAndSymbolicRefusal",
@@ -27553,6 +27583,12 @@
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa_bv_wrap.go",
           "tests": ["TestFPABVWrapSourceExtractIdentityAndRefusals"]
+        },
+        {
+          "name": "mk_bv2rm dispatch for concrete three-bit numeral and symbolic refusal (fpa_rewriter.h; fpa_rewriter.cpp:98,663-680)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_bv2rm.go",
+          "tests": ["TestFPABV2RMSourceNumeralsAndSymbolicRefusal"]
         },
         {
           "name": "mk_fp dispatch for retained concrete three-BV constructor (fpa_rewriter.h; fpa_rewriter.cpp:89,684-705)",
