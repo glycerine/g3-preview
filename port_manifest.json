@@ -115914,10 +115914,11 @@
           ]
         },
         {
-          "name": "Selected GCD caller Copy-before-Abs zero path, five Lehmer ge assertion switch reads, remaining Lehmer and intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
+          "name": "Selected GCD caller Copy-before-Abs zero path, five Lehmer ge and seven structural/estimate assertion switch reads, remaining intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
+            "TestLehmerGCDStructuralAssertionSourceActions",
             "TestLehmerGCDFirstSourceAssertionReadsAfterInputCopies",
             "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
             "TestGCDPublicationZeroBigCopyRefusal",
@@ -164527,10 +164528,11 @@
           ]
         },
         {
-          "name": "Selected GCD caller Copy-before-Abs zero path, five Lehmer ge assertion switch reads, remaining Lehmer and intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
+          "name": "Selected GCD caller Copy-before-Abs zero path, five Lehmer ge and seven structural/estimate assertion switch reads, remaining intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
+            "TestLehmerGCDStructuralAssertionSourceActions",
             "TestLehmerGCDFirstSourceAssertionReadsAfterInputCopies",
             "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
             "TestGCDPublicationZeroBigCopyRefusal",
@@ -166602,10 +166604,11 @@
           ]
         },
         {
-          "name": "scalar gcd selected internal LEHMER_GCD with reached ge assertion switch reads",
+          "name": "scalar gcd selected internal LEHMER_GCD with reached ge and structural/estimate assertion switch reads",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
+            "TestLehmerGCDStructuralAssertionSourceActions",
             "TestLehmerGCDFirstSourceAssertionReadsAfterInputCopies",
             "TestIntegerScalarGCD",
             "TestIntegerSourceGCDCoherence",
@@ -167125,10 +167128,11 @@
           ]
         },
         {
-          "name": "Selected GCD caller Copy-before-Abs zero path, five Lehmer ge assertion switch reads, remaining Lehmer and intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
+          "name": "Selected GCD caller Copy-before-Abs zero path, five Lehmer ge and seven structural/estimate assertion switch reads, remaining intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
+            "TestLehmerGCDStructuralAssertionSourceActions",
             "TestLehmerGCDFirstSourceAssertionReadsAfterInputCopies",
             "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
             "TestGCDPublicationZeroBigCopyRefusal",
@@ -168724,10 +168728,11 @@
           ]
         },
         {
-          "name": "scalar gcd selected internal LEHMER_GCD with reached ge assertion switch reads",
+          "name": "scalar gcd selected internal LEHMER_GCD with reached ge and structural/estimate assertion switch reads",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
+            "TestLehmerGCDStructuralAssertionSourceActions",
             "TestLehmerGCDFirstSourceAssertionReadsAfterInputCopies",
             "TestIntegerScalarGCD",
             "TestIntegerSourceGCDCoherence",
@@ -169323,10 +169328,11 @@
           ]
         },
         {
-          "name": "Selected GCD caller Copy-before-Abs zero path, five Lehmer ge assertion switch reads, remaining Lehmer and intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
+          "name": "Selected GCD caller Copy-before-Abs zero path, five Lehmer ge and seven structural/estimate assertion switch reads, remaining intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
+            "TestLehmerGCDStructuralAssertionSourceActions",
             "TestLehmerGCDFirstSourceAssertionReadsAfterInputCopies",
             "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
             "TestGCDPublicationZeroBigCopyRefusal",

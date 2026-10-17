@@ -14,6 +14,15 @@ func gcdSourceRequire(condition bool) error {
 	return nil
 }
 
+func gcdSourceRequireAt(condition bool, line int32, expression string) error {
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil || !enabled || condition {
+		return e
+	}
+	return diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", line, expression)
+}
+
 // Actual source ge expression, rather than an arithmetic postcondition oracle.
 func (m *IntegerManager) gcdSourceGreaterEqual(a, b *Int) error {
 	cmp, e := m.Compare(a, b)

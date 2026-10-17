@@ -246,16 +246,16 @@ func (m *IntegerManager) gcdWithAllocationContext(a, b, c *Int, context integerA
 			return m.Swap(c, a1)
 		}
 		if sourceGCDDebug {
-			if e = gcdSourceRequire(!a1.IsSmall()); e != nil {
+			if e = gcdSourceRequireAt(!a1.IsSmall(), 756, "!is_small(a1)"); e != nil {
 				return e
 			}
-			if e = gcdSourceRequire(!b1.IsSmall()); e != nil {
+			if e = gcdSourceRequireAt(!b1.IsSmall(), 757, "!is_small(b1)"); e != nil {
 				return e
 			}
 		}
 		asize, bsize := m.Cell(a1.Cell).Size, m.Cell(b1.Cell).Size
 		if sourceGCDDebug {
-			if e = gcdSourceRequire(bsize <= asize); e != nil {
+			if e = gcdSourceRequireAt(bsize <= asize, 760, "b_sz <= a_sz"); e != nil {
 				return e
 			}
 		}
@@ -268,16 +268,16 @@ func (m *IntegerManager) gcdWithAllocationContext(a, b, c *Int, context integerA
 		for {
 			if sourceGCDDebug {
 				limit := int64(math.MaxUint32) + 1
-				if e = gcdSourceRequire(ahat+A <= limit); e != nil {
+				if e = gcdSourceRequireAt(ahat+A <= limit, 769, "a_hat + A <= static_cast<int64_t>(UINT_MAX) + 1"); e != nil {
 					return e
 				}
-				if e = gcdSourceRequire(ahat+B < limit); e != nil {
+				if e = gcdSourceRequireAt(ahat+B < limit, 770, "a_hat + B < static_cast<int64_t>(UINT_MAX) + 1"); e != nil {
 					return e
 				}
-				if e = gcdSourceRequire(bhat+C < limit); e != nil {
+				if e = gcdSourceRequireAt(bhat+C < limit, 771, "b_hat + C < static_cast<int64_t>(UINT_MAX) + 1"); e != nil {
 					return e
 				}
-				if e = gcdSourceRequire(bhat+D <= limit); e != nil {
+				if e = gcdSourceRequireAt(bhat+D <= limit, 772, "b_hat + D <= static_cast<int64_t>(UINT_MAX) + 1"); e != nil {
 					return e
 				}
 			}
