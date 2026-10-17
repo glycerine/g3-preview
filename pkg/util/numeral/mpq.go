@@ -369,6 +369,9 @@ func (m *RationalManager) normalize(a *Rational) (_rawErr error) {
 	return m.normalizeWithAllocationContext(a, integerAllocationInvocationContext{})
 }
 func (m *RationalManager) normalizeWithAllocationContext(a *Rational, context integerAllocationInvocationContext) (_rawErr error) {
+	return m.normalizeWithAllocationContextAndReceipt(a, context, nil)
+}
+func (m *RationalManager) normalizeWithAllocationContextAndReceipt(a *Rational, context integerAllocationInvocationContext, receipt *RationalNormalizeInvocationReceipt) (_rawErr error) {
 	tmp := &m.NTmp
 	if m.Synchronized {
 		r := &m.RawArithmetic
@@ -389,6 +392,15 @@ func (m *RationalManager) normalizeWithAllocationContext(a *Rational, context in
 		r.normGuard = false
 		r.normCause = nil
 		tmp = &r.Norm
+		if receipt != nil {
+			*receipt = RationalNormalizeInvocationReceipt{manager: m, generation: generation, executing: true}
+			defer func() {
+				if r.normGeneration == generation && r.normEnd && r.normCause != nil {
+					receipt.sourceCause = r.normCause
+				}
+				receipt.executing = false
+			}()
+		}
 		defer m.finishRawNormalize(&_rawErr)
 	}
 	if e := m.Z.gcdWithAllocationContext(&a.Num, &a.Den, tmp, context); e != nil {

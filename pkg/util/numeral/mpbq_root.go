@@ -203,15 +203,20 @@ func (m *BinaryRationalManager) CleanupConvertImported() error {
 	return m.cleanupConvertImported()
 }
 func (m *BinaryRationalManager) ToRational(qm *RationalManager, a *BinaryRational, out *Rational) (err error) {
-	return m.toRationalWithPowerInvocation(qm, a, out, integerAllocationInvocationContext{}, nil)
+	return m.toRationalWithInvocation(qm, a, out, integerAllocationInvocationContext{}, nil)
 }
 
-// ToRationalWithPowerInvocation records the accepted power phase and passes
-// its concrete allocation context; later multiply/normalize phases are unchanged.
-func (m *BinaryRationalManager) ToRationalWithPowerInvocation(qm *RationalManager, a *BinaryRational, out *Rational, context NumericAllocationContext, power *RationalPowerInvocationReceipt) error {
-	return m.toRationalWithPowerInvocation(qm, a, out, context, power)
+// BinaryToRationalInvocation records actual RAW entries reached by to_mpq.
+// The allocation context owns only storage issued during this invocation.
+type BinaryToRationalInvocation struct {
+	Power     RationalPowerInvocationReceipt
+	Normalize RationalNormalizeInvocationReceipt
 }
-func (m *BinaryRationalManager) toRationalWithPowerInvocation(qm *RationalManager, a *BinaryRational, out *Rational, context integerAllocationInvocationContext, power *RationalPowerInvocationReceipt) (err error) {
+
+func (m *BinaryRationalManager) ToRationalWithInvocation(qm *RationalManager, a *BinaryRational, out *Rational, context NumericAllocationContext, receipt *BinaryToRationalInvocation) error {
+	return m.toRationalWithInvocation(qm, a, out, context, receipt)
+}
+func (m *BinaryRationalManager) toRationalWithInvocation(qm *RationalManager, a *BinaryRational, out *Rational, context integerAllocationInvocationContext, receipt *BinaryToRationalInvocation) (err error) {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -221,11 +226,17 @@ func (m *BinaryRationalManager) toRationalWithPowerInvocation(qm *RationalManage
 	if e := qm.check(out); e != nil {
 		return e
 	}
+	var power *RationalPowerInvocationReceipt
+	var normalize *RationalNormalizeInvocationReceipt
+	if receipt != nil {
+		power = &receipt.Power
+		normalize = &receipt.Normalize
+	}
 	two := Rational{Num: NewInt(2), Den: NewInt(1)}
 	if e := qm.powerWithAllocationContextAndReceipt(&two, a.KField, out, context, power); e != nil {
 		return e
 	}
-	if e := qm.Inv(out, out); e != nil {
+	if e := qm.invInPlaceWithAllocationContext(out, context); e != nil {
 		return e
 	}
 	n := &a.Num
@@ -245,7 +256,7 @@ func (m *BinaryRationalManager) toRationalWithPowerInvocation(qm *RationalManage
 		}
 		n = &m.toRationalImported
 	}
-	return qm.MulInt(n, out, out)
+	return qm.mulIntWithAllocationContextAndReceipt(n, out, out, context, normalize)
 }
 
 func (m *BinaryRationalManager) cleanupToRationalImported() error {

@@ -38322,7 +38322,9 @@
         "pkg/util/numeral/mpbq.go",
         "pkg/math/polynomial/algebraic_bound_power.go",
         "pkg/math/polynomial/algebraic_bound_power_test.go",
-        "pkg/util/numeral/rational_power_invocation.go"
+        "pkg/util/numeral/rational_power_invocation.go",
+        "pkg/util/numeral/rational_normalize_invocation.go",
+        "pkg/util/numeral/rational_normalize_invocation_test.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",
@@ -39187,7 +39189,11 @@
         "pkg/util/numeral/rational_raw_copy_receipt.go",
         "pkg/math/polynomial/algebraic_compare_trace.go",
         "pkg/math/polynomial/algebraic_representation_neg_numeric.go",
-        "pkg/util/numeral/mpbq.go"
+        "pkg/util/numeral/mpbq.go",
+        "pkg/math/polynomial/algebraic_bound_power.go",
+        "pkg/math/polynomial/algebraic_bound_power_test.go",
+        "pkg/util/numeral/rational_normalize_invocation.go",
+        "pkg/util/numeral/rational_normalize_invocation_test.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",

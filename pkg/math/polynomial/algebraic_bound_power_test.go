@@ -3,6 +3,7 @@ package polynomial
 import (
 	"errors"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	"strconv"
 	"testing"
 )
 
@@ -39,7 +40,7 @@ func TestAlgebraicBoundPowerActualEntryCleanupRetry(t *testing.T) {
 			}
 			pad := algebraicCellSourceTLSBoundary(t, c)
 			body := get()
-			if body == nil || !c.bounds.power.pending(c) {
+			if body == nil || !c.bounds.conversion.pending(c) {
 				t.Fatal("missing actual failed power entry", body)
 			}
 			if e := get(); !errors.Is(e, ErrAlgebraicPending) {
@@ -101,4 +102,83 @@ func TestAlgebraicBoundPowerPreservesOlderAllocation(t *testing.T) {
 	serviceMust(t, c.GetLowerRational(&root, &out))
 	serviceMust(t, q.Del(&out))
 	serviceMust(t, c.Del(&root))
+}
+
+func TestAlgebraicBoundConversionReachedReservationPrefixes(t *testing.T) {
+	for _, upper := range []bool{false, true} {
+		t.Run(map[bool]string{false: "lower", true: "upper"}[upper], func(t *testing.T) {
+			success, owned, gcd := false, false, false
+			for ordinal := int64(0); ordinal < 4096 && !success; ordinal++ {
+				t.Run(strconv.FormatInt(ordinal, 10), func(t *testing.T) {
+					c, _, _ := algebraicCompareFixture(t)
+					root := algebraicBigBinaryBoundsRoot(t, c)
+					q := c.config.Rationals
+					var out [32]unumeral.Rational
+					for i := range out {
+						out[i] = unumeral.NewRational()
+					}
+					get := func(v *unumeral.Rational) error {
+						if upper {
+							return c.GetUpperRational(&root, v)
+						}
+						return c.GetLowerRational(&root, v)
+					}
+					q.Budget().FailAfter(ordinal)
+					var body error
+					for i := range out {
+						body = get(&out[i])
+						if body != nil {
+							break
+						}
+					}
+					q.Budget().FailAfter(-1)
+					if body != nil && !numericPhysicalReservationRefusal(body) {
+						t.Fatal("unexpected conversion refusal", body)
+					}
+					s := &c.bounds.conversion
+					if s.pending(c) {
+						owned = true
+						for i := range s.raw {
+							if s.raw[i].Kind() == unumeral.IntegerRawGCD && q.Integers().MatchesRawInvocation(&s.raw[i]) {
+								gcd = true
+							}
+						}
+						if e := get(&out[0]); !errors.Is(e, ErrAlgebraicPending) {
+							t.Fatal("replacement conversion lost children", e)
+						}
+					}
+					serviceMust(t, c.CleanupRetained())
+					// Failed source scratch replacement is not repaired by owning cleanup.
+					// Only successful invocations are read as numerals.
+					if body == nil {
+						want := unumeral.NewRational()
+						text := "3260954456333195553/2305843009213693952"
+						if upper {
+							text = "26087635650665564425/18446744073709551616"
+						}
+						serviceMust(t, q.SetString(&want, text))
+						for i := range out {
+							equal, e := q.Equal(&out[i], &want)
+							serviceMust(t, e)
+							if !equal {
+								t.Fatal("converted bound changed", i, text)
+							}
+						}
+						serviceMust(t, q.Del(&want))
+					}
+					for i := range out {
+						serviceMust(t, q.Del(&out[i]))
+					}
+					serviceMust(t, c.Del(&root))
+					success = body == nil
+				})
+				if t.Failed() {
+					return
+				}
+			}
+			if !success || !owned || !gcd {
+				t.Fatal("missing completion/owned conversion/GCD frontier", success, owned, gcd)
+			}
+		})
+	}
 }

@@ -102,6 +102,9 @@ func (m *RationalManager) MulInt(a *Int, b, out *Rational) error {
 	return m.mulIntWithAllocationContext(a, b, out, integerAllocationInvocationContext{})
 }
 func (m *RationalManager) mulIntWithAllocationContext(a *Int, b, out *Rational, context integerAllocationInvocationContext) (err error) {
+	return m.mulIntWithAllocationContextAndReceipt(a, b, out, context, nil)
+}
+func (m *RationalManager) mulIntWithAllocationContextAndReceipt(a *Int, b, out *Rational, context integerAllocationInvocationContext, receipt *RationalNormalizeInvocationReceipt) (err error) {
 	if e := m.Z.check(a); e != nil {
 		return e
 	}
@@ -135,7 +138,7 @@ func (m *RationalManager) mulIntWithAllocationContext(a *Int, b, out *Rational, 
 	if e := m.Z.copyFromOwnerWithAllocationContext(&out.Den, m.Z, &b.Den, nil, context); e != nil {
 		return e
 	}
-	return m.normalizeWithAllocationContext(out, context)
+	return m.normalizeWithAllocationContextAndReceipt(out, context, receipt)
 }
 func (m *RationalManager) DivInt(a *Rational, b *Int, out *Rational) error {
 	return m.divIntWithAllocationContext(a, b, out, integerAllocationInvocationContext{})
