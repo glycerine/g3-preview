@@ -68,6 +68,7 @@ func (v *PolynomialNewtonVector) At(i uint32) (*PolynomialNewtonInterpolator, er
 		if e != nil {
 			return nil, e
 		}
+		v.traceNewtonAllocated(child)
 		v.children = append(v.children, child)
 	}
 	return v.children[i], nil
@@ -93,6 +94,13 @@ func (v *PolynomialNewtonVector) flushMode(owning bool) error {
 		if e := child.closeMode(owning, false); e != nil {
 			return e
 		}
+		if !child.closed && child.header != 0 {
+			// Source dealloc releases the heap header after the completed
+			// destructor body. Only unfinished child resources stay orphaned.
+			v.storage.integer.Budget().Release(child.header)
+			child.header = 0
+		}
+		v.traceNewtonDeallocated(child)
 		if !child.closed {
 			v.orphans = append(v.orphans, child)
 		}

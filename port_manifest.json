@@ -38246,6 +38246,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_newton_vector_memory_trace.go",
         "pkg/math/polynomial/polynomial_hash.go",
         "pkg/math/polynomial/polynomial_hash_source_test.go",
         "pkg/math/polynomial/polynomial_monomial.go",
@@ -38677,6 +38678,7 @@
         "pkg/math/polynomial/polynomial_monomial_table_native_test.go"
       ],
       "tests": [
+        "TestPolynomialNewtonVectorChildMemoryWrappers",
         "TestMonomialOrderSourceLexAssertions",
         "TestMonomialOrderBoundedModels",
         "TestMonomialOrderSourceRangesAndReadGuards",
@@ -40750,6 +40752,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained Newton interpolator vector child alloc at polynomial.cpp:2948 and ordered flush/deletion at :2936 over charged concrete child owners",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_newton_vector_memory_trace.go",
+          "tests": ["TestPolynomialNewtonVectorChildMemoryWrappers"]
+        },
         {
           "name": "Standalone monomial Lex, LexWithMinimum, GradedLex, ReverseLexRange, ReverseLex, GradedReverseLex source algorithms (cpp609\u2013764), source reference guards, size/variable reads and reached-only degree reads",
           "status": "ported",
@@ -153250,6 +153258,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_newton_vector_memory_trace.go",
         "pkg/math/polynomial/polynomial_cache_memory_trace.go",
         "pkg/tactic/tactic_extension_model.go",
         "pkg/tactic/tactic_stored_model_memory_trace.go",
@@ -154120,6 +154129,12 @@
           ]
         },
         {
+          "name": "Retained Newton vector child alloc at polynomial.cpp:2948 and ordered dealloc at :2936 through source debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_newton_vector_memory_trace.go",
+          "tests": ["TestPolynomialNewtonVectorChildMemoryWrappers"]
+        },
+        {
           "name": "Retained polynomial cache private imp alloc at polynomial_cache.cpp:207/:233 and reset/destructor dealloc at :232/:211 through source debug memory wrappers",
           "status": "platform_replacement",
           "go_target": "pkg/math/polynomial/polynomial_cache_memory_trace.go",
@@ -154243,6 +154258,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_newton_vector_memory_trace.go",
         "pkg/math/polynomial/polynomial_cache_memory_trace.go",
         "pkg/tactic/tactic_extension_model.go",
         "pkg/tactic/tactic_stored_model_memory_trace.go",
@@ -155043,6 +155059,12 @@
           "tests": [
             "TestModelCopiedFunctionMemoryWrapperOwnerTransfer"
           ]
+        },
+        {
+          "name": "Retained Newton vector child alloc at polynomial.cpp:2948 and ordered dealloc at :2936 through source debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_newton_vector_memory_trace.go",
+          "tests": ["TestPolynomialNewtonVectorChildMemoryWrappers"]
         },
         {
           "name": "Retained polynomial cache private imp alloc at polynomial_cache.cpp:207/:233 and reset/destructor dealloc at :232/:211 through source debug memory wrappers",
