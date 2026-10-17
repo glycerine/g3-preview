@@ -166893,6 +166893,7 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_root.go",
           "tests": [
+            "TestIntegerPerfectSquareLoopSourceAssertionStop",
             "TestIntegerSourceRoots",
             "TestIntegerRootIndependentAndAliases",
             "TestPerfectSquareIndependentAndSourceAlias",
@@ -169051,6 +169052,7 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_root.go",
           "tests": [
+            "TestIntegerPerfectSquareLoopSourceAssertionStop",
             "TestIntegerSourceRoots",
             "TestIntegerRootIndependentAndAliases",
             "TestPerfectSquareIndependentAndSourceAlias",

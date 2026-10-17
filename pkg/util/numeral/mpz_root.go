@@ -3,6 +3,8 @@ package numeral
 
 import (
 	"errors"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 var ErrRootDegreeZero = errors.New("mpnum: nonzero integer root with degree zero divides by zero in source")
@@ -309,26 +311,42 @@ func (m *IntegerManager) squareCoreTracked(a, out *Int, context integerAllocatio
 	two := NewInt(2)
 	for {
 		if modularSourceDebug {
-			cmp, x := m.Compare(lo, hi)
+			d := diagnostic.BorrowProcessDebugContext()
+			enabled, x := diagnostic.SourceAssertionsEnabled(d)
 			if x != nil {
 				return false, x
 			}
-			if cmp >= 0 {
-				return false, ErrIntegerAssertion
+			if enabled {
+				less, x := m.Less(lo, hi)
+				if x != nil {
+					return false, x
+				}
+				if !less {
+					if x = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 1891, "lt(lo, hi)"); x != nil {
+						return false, x
+					}
+				}
 			}
-			cmp, x = m.Compare(sqLo, a)
+			enabled, x = diagnostic.SourceAssertionsEnabled(d)
 			if x != nil {
 				return false, x
 			}
-			if cmp > 0 {
-				return false, ErrIntegerAssertion
-			}
-			cmp, x = m.Compare(a, sqHi)
-			if x != nil {
-				return false, x
-			}
-			if cmp >= 0 {
-				return false, ErrIntegerAssertion
+			if enabled {
+				bounds, x := m.LessEqual(sqLo, a)
+				if x != nil {
+					return false, x
+				}
+				if bounds {
+					bounds, x = m.Less(a, sqHi)
+					if x != nil {
+						return false, x
+					}
+				}
+				if !bounds {
+					if x = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 1892, "le(sq_lo, a) && lt(a, sq_hi)"); x != nil {
+						return false, x
+					}
+				}
 			}
 		}
 		same, e = m.Equal(sqLo, a)
@@ -367,19 +385,27 @@ func (m *IntegerManager) squareCoreTracked(a, out *Int, context integerAllocatio
 			return false, e
 		}
 		if modularSourceDebug {
-			cmp, x := m.Compare(lo, mid)
+			d := diagnostic.BorrowProcessDebugContext()
+			enabled, x := diagnostic.SourceAssertionsEnabled(d)
 			if x != nil {
 				return false, x
 			}
-			if cmp >= 0 {
-				return false, ErrIntegerAssertion
-			}
-			cmp, x = m.Compare(mid, hi)
-			if x != nil {
-				return false, x
-			}
-			if cmp >= 0 {
-				return false, ErrIntegerAssertion
+			if enabled {
+				bounds, x := m.Less(lo, mid)
+				if x != nil {
+					return false, x
+				}
+				if bounds {
+					bounds, x = m.Less(mid, hi)
+					if x != nil {
+						return false, x
+					}
+				}
+				if !bounds {
+					if x = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 1910, "lt(lo, mid) && lt(mid, hi)"); x != nil {
+						return false, x
+					}
+				}
 			}
 		}
 		if e = m.perfectSquareCallWithContext(2, mid, mid, sqMid, childContext); e != nil {
