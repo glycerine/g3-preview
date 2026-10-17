@@ -485,6 +485,9 @@ func TestRationalFacadeFusedSourceOperandRoutes(t *testing.T) {
 }
 
 func TestRationalFacadeModHatNumBitsAndPowerDomains(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TT")
+	}
 	s, _ := serviceNew(t)
 	a, _ := s.NewValue()
 	b, _ := s.NewValue()
@@ -520,12 +523,20 @@ func TestRationalFacadeModHatNumBitsAndPowerDomains(t *testing.T) {
 		}
 	}
 	serviceMust(t, s.SetInt64(&a, -1))
-	if _, e := s.NumBits(&a); !errors.Is(e, ErrRationalFacadeDomain) {
-		t.Fatal(e)
+	if v, e := s.NumBits(&a); modularSourceDebug {
+		if !isMPNVerificationThrow(e) {
+			t.Fatal(e)
+		}
+	} else if e != nil || v != 1 {
+		t.Fatal("release negative source quotient", v, e)
 	}
 	serviceMust(t, s.SetFraction(&a, 1, 2))
-	if _, e := s.NumBits(&a); !errors.Is(e, ErrRationalNotInteger) {
-		t.Fatal(e)
+	if v, e := s.NumBits(&a); modularSourceDebug {
+		if !isMPNVerificationThrow(e) {
+			t.Fatal(e)
+		}
+	} else if e != nil || v != 1 {
+		t.Fatal("release fractional source quotient", v, e)
 	}
 	serviceMust(t, s.SetInt64(&b, 0))
 	if _, e := s.ModHat(&a, &b); !errors.Is(e, ErrRationalFacadeDomain) {

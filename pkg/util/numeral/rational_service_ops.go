@@ -5,6 +5,8 @@ package numeral
 import (
 	"errors"
 	"sync/atomic"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 var ErrRationalFacadeDomain = errors.New("mpnum: rational facade source assertion domain")
@@ -1016,19 +1018,38 @@ func (s *RationalService) NumBits(a *OwnedRational) (_lexValue uint32, _lexErr e
 		return 0, e
 	}
 	twoComplete = true
-	integer, e := s.Manager.IsInt(&a.Raw)
-	if e != nil {
-		return 0, e
-	}
-	if !integer {
-		return 0, ErrRationalNotInteger
-	}
-	neg, e := s.Manager.IsNeg(&a.Raw)
-	if e != nil {
-		return 0, e
-	}
-	if neg {
-		return 0, ErrRationalFacadeDomain
+	if modularSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return 0, e
+		}
+		if enabled {
+			integer, e := s.Manager.IsInt(&a.Raw)
+			if e != nil {
+				return 0, e
+			}
+			if !integer {
+				if e := diagnostic.DebugAssertionFailure(d, "src/util/rational.h", 402, "is_int()"); e != nil {
+					return 0, e
+				}
+			}
+		}
+		enabled, e = diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return 0, e
+		}
+		if enabled {
+			neg, e := s.Manager.IsNeg(&a.Raw)
+			if e != nil {
+				return 0, e
+			}
+			if neg {
+				if e := diagnostic.DebugAssertionFailure(d, "src/util/rational.h", 403, "!is_neg()"); e != nil {
+					return 0, e
+				}
+			}
+		}
 	}
 	n := OwnedRational{Raw: NewRational(), ownerID: s.ownerID}
 	nComplete := false

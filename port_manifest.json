@@ -174938,6 +174938,7 @@
       "go_targets": [
         "pkg/util/numeral/inf_scalar_projection_test.go",
         "pkg/util/numeral/rational_32_getter_assertion_source_test.go",
+        "pkg/util/numeral/rational_num_bits_assertion_source_test.go",
         "pkg/util/numeral/mp_lexical_constructor_test.go",
         "pkg/util/numeral/mp_lexical_scope_test.go",
         "pkg/util/numeral/mp_raw_projection_test.go",
@@ -174998,6 +174999,7 @@
       ],
       "tests": [
         "TestRational32GetterSourceAssertionActions",
+        "TestRationalNumBitsSourceAssertionActions",
         "TestSourceRationalConversionAssertions",
         "TestSourceRationalHashAssignmentHistory",
         "TestRationalInspectionPredicatesAndBoundaries",
@@ -175426,6 +175428,7 @@
             "TestRationalFacadeScalarOverloadsPostfixAndExtraction",
             "TestRationalFacadeFusedSourceOperandRoutes",
             "TestRationalFacadeModHatNumBitsAndPowerDomains",
+            "TestRationalNumBitsSourceAssertionActions",
             "TestRationalFacadeAllocationFailureOwnership",
             "TestRationalFacadeProvenanceAndNoncanonicalSourceShapes",
             "TestRationalFacadeWarmZeroAllocations",
