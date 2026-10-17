@@ -128,7 +128,7 @@ func (m *AlgebraicRootCore) IsolateMultivariateRootsWithSigns(pm *MultivariatePo
 		return e
 	}
 	s := &m.isolationSigns
-	if s.active || m.multivariateIsolationRunning {
+	if s.active || m.rootConstruction.active || m.multivariateIsolationRunning {
 		return ErrAlgebraicPending
 	}
 	if pm.algebraicIsolationBorrowers == math.MaxUint32 {

@@ -38304,7 +38304,13 @@
         "pkg/math/polynomial/algebraic_isolation_signs_test.go",
         "pkg/math/polynomial/algebraic_isolation_signs_cancel_test.go",
         "pkg/math/polynomial/algebraic_isolation_signs_owner_test.go",
-        "pkg/math/polynomial/algebraic_isolation_signs_dt_test.go"
+        "pkg/math/polynomial/algebraic_isolation_signs_dt_test.go",
+        "pkg/math/polynomial/algebraic_root_construction.go",
+        "pkg/math/polynomial/algebraic_exception.go",
+        "pkg/math/polynomial/algebraic_root_construction_test.go",
+        "pkg/math/polynomial/algebraic_root_construction_cancel_test.go",
+        "pkg/math/polynomial/algebraic_root_construction_assert_test.go",
+        "pkg/math/polynomial/algebraic_root_construction_owner_test.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",
@@ -38425,7 +38431,16 @@
         "TestAlgebraicIsolationSignsPreservesOlderPolynomialEvaluator",
         "TestAlgebraicIsolationSignsExecutingOwnerRefusals",
         "TestAlgebraicIsolationSignsNonzeroAssertionAndErasedGate",
-        "TestAlgebraicIsolationSignsActualSampleDestructorStop"
+        "TestAlgebraicIsolationSignsActualSampleDestructorStop",
+        "TestAlgebraicPolynomialRootPersistentConversionAndIndices",
+        "TestAlgebraicSexprRootArithmeticAndPersistentReuse",
+        "TestAlgebraicSexprRootParsePrefixAndOutputPreservation",
+        "TestAlgebraicSexprRootBigCoefficientUsesBorrowedNumericService",
+        "TestAlgebraicRootConstructionEveryReachedCheckpointAndRetry",
+        "TestAlgebraicSexprRootIndexAssertionBeforeSyntaxAndErasedGate",
+        "TestAlgebraicPolynomialRootSourceAssertionsBeforeWorkspace",
+        "TestAlgebraicRootConstructionPreservesOlderFactorInvocation",
+        "TestAlgebraicSexprRootExecutingOwnerAndConverterRefusals"
       ],
       "conditionals": [
         {
@@ -38976,6 +38991,22 @@
             "TestAlgebraicIsolationSignsNonzeroAssertionAndErasedGate",
             "TestAlgebraicIsolationSignsActualSampleDestructorStop"
           ]
+        },
+        {
+          "name": "algebraic_numbers.cpp:665-680,2887-2893 polynomial-ref/expression mk_root overloads and algebraic_numbers.h:41-44 exception class; full failure/TRACE audit pending",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/algebraic_root_construction.go",
+          "tests": [
+            "TestAlgebraicPolynomialRootPersistentConversionAndIndices",
+            "TestAlgebraicSexprRootArithmeticAndPersistentReuse",
+            "TestAlgebraicSexprRootParsePrefixAndOutputPreservation",
+            "TestAlgebraicSexprRootBigCoefficientUsesBorrowedNumericService",
+            "TestAlgebraicRootConstructionEveryReachedCheckpointAndRetry",
+            "TestAlgebraicSexprRootIndexAssertionBeforeSyntaxAndErasedGate",
+            "TestAlgebraicPolynomialRootSourceAssertionsBeforeWorkspace",
+            "TestAlgebraicRootConstructionPreservesOlderFactorInvocation",
+            "TestAlgebraicSexprRootExecutingOwnerAndConverterRefusals"
+          ]
         }
       ],
       "ownership": [
@@ -39013,7 +39044,8 @@
         "Algebraic locator directories and owning scalar vectors now use native append. Removed geometric container capacity arithmetic and buffer reservations/refunds, using native vector length for isolation sorting/selection and cleanup. Relocated owning vector records are cleared once; actual cell/numeral allocations, mutable rational transfers, pending source copies, stable locator slot/generation checks and stopped numeric cleanup remain explicit. Variable-degree and monomial-position slices also use native append for extent growth.",
         "Concrete algebraic t_eval/t_eval_core (polynomial.cpp:6436-6522), required by algebraic_numbers.cpp:2387-2388,2406, now preserves recursive Horner grouping, borrowed mapped root cells, actual integer coefficient overloads and scoped algebraic auxiliaries. Actual accepted arithmetic and lexical-sort entries bind the evaluator caller; retained auxiliaries borrow their algebraic owner until explicit cleanup, and callbacks cannot close or clean executing owners. Independent 125-point rational grid, irrational bounds, exact single-term root square identity, early zero/constant lookup erasure, reached arithmetic checkpoint cancellation/retry, polynomial checkpoint cancellation, lookup stops and real lexical-sort ownership checks pass in ordinary and checked/debug/trace builds on CPUs 8-16. Full allocation/destructor/callback/TRACE audits, full multivariate isolation and whole polynomial/AST completion remain pending; source-unit statuses remain partial.",
         "Multivariate isolate_roots (algebraic_numbers.cpp:2268-2451,2879-2881) now follows rational-fragment substitution, stable defining-degree variable ordering, resultant elimination, univariate isolation and conjugate filtering. Vanished resultants evaluate actual coefficients: the linear branch computes -a0/a1; the higher-degree branch drops vanishing leading coefficients, converts lower terms to the local manager, introduces z*x^i and recurses with z mapped to the actual nonzero algebraic coefficient. Interleaved lexical reference/scalar lifetimes use concrete per-recursion frames. Only accepted substitution/conversion/evaluation/factor calls bind cleanup authority. Cancellation exposed the need to retain the actual factor frontend receipt and explicitly clean reached persistent isolation scratch vectors; cleanup now does so while preserving older refused factor calls. Tests independently cover exact root powers, signed root bounds, spurious conjugates, linear/nonlinear recovery, degree drop, vanished coefficients and variables, both checkpoint services through success/cleanup/retry, source output assertions and executing/older-owner refusals. Full allocation/destructor/callback/TRACE audit and eager constructor composition remain incomplete; polynomial and AST source units remain partial.",
-        "The retained signs-between-roots overload (algebraic_numbers.cpp:2549-2624,2883-2885; nlsat_evaluator.cpp:467) now isolates roots, refines each actual root to source precision two, and appends signs at an outside integer, between adjacent roots, and at the opposite outside integer. With no roots it evaluates at zero. Concrete ext2 mapping preserves contains/getter order, borrowing assigned cells and one shared fallback. Signs are native []int and retain raw qm.sign values and any existing/appended prefix. The actual scoped sample borrows its polynomial owner and survives a younger source destructor stop until owning cleanup. Accepted EvalSign and scalar-selection caller bindings preserve older refused evaluators; source cleanup errors are distinguished from body cancellation. IntLT/IntGT now invoke the actual SetInteger wrapper; younger scoped-rational stops protect older selection temporaries. Tests verify exact interval signs including raw -6/+6, repeated roots, rational/irrational inputs, actual precision, both reached checkpoint frontiers through success/cleanup/retry, partial output preservation, older real LexSort refusal, running-owner refusals, nonzero assertion Throw/erasure and a qualified actual BIG sample destructor stop followed by owning cleanup. Ordinary and checked/debug/trace focused checks use CPUs 8-16. Full allocation/callback/destructor/TRACE coverage, eager constructor composition and overall polynomial/AST completion remain incomplete."
+        "The retained signs-between-roots overload (algebraic_numbers.cpp:2549-2624,2883-2885; nlsat_evaluator.cpp:467) now isolates roots, refines each actual root to source precision two, and appends signs at an outside integer, between adjacent roots, and at the opposite outside integer. With no roots it evaluates at zero. Concrete ext2 mapping preserves contains/getter order, borrowing assigned cells and one shared fallback. Signs are native []int and retain raw qm.sign values and any existing/appended prefix. The actual scoped sample borrows its polynomial owner and survives a younger source destructor stop until owning cleanup. Accepted EvalSign and scalar-selection caller bindings preserve older refused evaluators; source cleanup errors are distinguished from body cancellation. IntLT/IntGT now invoke the actual SetInteger wrapper; younger scoped-rational stops protect older selection temporaries. Tests verify exact interval signs including raw -6/+6, repeated roots, rational/irrational inputs, actual precision, both reached checkpoint frontiers through success/cleanup/retry, partial output preservation, older real LexSort refusal, running-owner refusals, nonzero assertion Throw/erasure and a qualified actual BIG sample destructor stop followed by owning cleanup. Ordinary and checked/debug/trace focused checks use CPUs 8-16. Full allocation/callback/destructor/TRACE coverage, eager constructor composition and overall polynomial/AST completion remain incomplete.",
+        "The polynomial-ref and sexpr mk_root overloads (algebraic_numbers.cpp:665-680,2887-2893; retained AST arithmetic consumer arith_decl_plugin.cpp:95-98) now convert/parse directly into the actual persistent m_isolate_tmp1 and then invoke one-based distinct-real-root selection. Source index/univariate assertions precede workspace construction; with assertions erased, syntax and conversion still precede runtime index errors. Root construction throws the concrete algebraic_exception/default_exception class with unchanged source messages. A concrete construction owner retains only actually accepted dense conversion, parser lexical entry, factor frontend and private root vector; cleanup preserves older refused factor work. The converter records accepted lexical entry, refuses reentry/cleanup while converting, and can release completed native metadata without sweeping an unrelated lexical owner. Owning cleanup finishes younger children before private root vectors; conversion publications and caller output survive errors. Tests verify exact sqrt(2) identities, repeated-factor distinct indices, BIG linear coefficients, persistent descriptor/receiving owner, parser location and partial prefix, zero/out-of-range errors, assertion Throw/erasure ordering, both wrappers through every reached checkpoint/cleanup/retry, older actual factor refusal and parser/isolation callback owner guards. Focused ordinary and checked/debug/trace algebraic/evaluation/parser checks pass on CPUs 8-16. TRACE, full allocation/destructor/callback/eager-constructor composition and overall polynomial/AST completion remain incomplete."
       ]
     },
     {
@@ -39094,7 +39126,13 @@
         "pkg/math/polynomial/algebraic_isolation_signs_test.go",
         "pkg/math/polynomial/algebraic_isolation_signs_cancel_test.go",
         "pkg/math/polynomial/algebraic_isolation_signs_owner_test.go",
-        "pkg/math/polynomial/algebraic_isolation_signs_dt_test.go"
+        "pkg/math/polynomial/algebraic_isolation_signs_dt_test.go",
+        "pkg/math/polynomial/algebraic_root_construction.go",
+        "pkg/math/polynomial/algebraic_exception.go",
+        "pkg/math/polynomial/algebraic_root_construction_test.go",
+        "pkg/math/polynomial/algebraic_root_construction_cancel_test.go",
+        "pkg/math/polynomial/algebraic_root_construction_assert_test.go",
+        "pkg/math/polynomial/algebraic_root_construction_owner_test.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",
@@ -39213,7 +39251,16 @@
         "TestAlgebraicIsolationSignsPreservesOlderPolynomialEvaluator",
         "TestAlgebraicIsolationSignsExecutingOwnerRefusals",
         "TestAlgebraicIsolationSignsNonzeroAssertionAndErasedGate",
-        "TestAlgebraicIsolationSignsActualSampleDestructorStop"
+        "TestAlgebraicIsolationSignsActualSampleDestructorStop",
+        "TestAlgebraicPolynomialRootPersistentConversionAndIndices",
+        "TestAlgebraicSexprRootArithmeticAndPersistentReuse",
+        "TestAlgebraicSexprRootParsePrefixAndOutputPreservation",
+        "TestAlgebraicSexprRootBigCoefficientUsesBorrowedNumericService",
+        "TestAlgebraicRootConstructionEveryReachedCheckpointAndRetry",
+        "TestAlgebraicSexprRootIndexAssertionBeforeSyntaxAndErasedGate",
+        "TestAlgebraicPolynomialRootSourceAssertionsBeforeWorkspace",
+        "TestAlgebraicRootConstructionPreservesOlderFactorInvocation",
+        "TestAlgebraicSexprRootExecutingOwnerAndConverterRefusals"
       ],
       "conditionals": [
         {
@@ -39368,6 +39415,22 @@
             "TestAlgebraicIsolationSignsNonzeroAssertionAndErasedGate",
             "TestAlgebraicIsolationSignsActualSampleDestructorStop"
           ]
+        },
+        {
+          "name": "algebraic_numbers.cpp:665-680,2887-2893 polynomial-ref/expression mk_root overloads and algebraic_numbers.h:41-44 exception class; full failure/TRACE audit pending",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/algebraic_root_construction.go",
+          "tests": [
+            "TestAlgebraicPolynomialRootPersistentConversionAndIndices",
+            "TestAlgebraicSexprRootArithmeticAndPersistentReuse",
+            "TestAlgebraicSexprRootParsePrefixAndOutputPreservation",
+            "TestAlgebraicSexprRootBigCoefficientUsesBorrowedNumericService",
+            "TestAlgebraicRootConstructionEveryReachedCheckpointAndRetry",
+            "TestAlgebraicSexprRootIndexAssertionBeforeSyntaxAndErasedGate",
+            "TestAlgebraicPolynomialRootSourceAssertionsBeforeWorkspace",
+            "TestAlgebraicRootConstructionPreservesOlderFactorInvocation",
+            "TestAlgebraicSexprRootExecutingOwnerAndConverterRefusals"
+          ]
         }
       ],
       "ownership": [
@@ -39403,7 +39466,8 @@
         "Algebraic locator directories and owning scalar vectors now use native append. Removed geometric container capacity arithmetic and buffer reservations/refunds, using native vector length for isolation sorting/selection and cleanup. Relocated owning vector records are cleared once; actual cell/numeral allocations, mutable rational transfers, pending source copies, stable locator slot/generation checks and stopped numeric cleanup remain explicit. Variable-degree and monomial-position slices also use native append for extent growth.",
         "Concrete algebraic t_eval/t_eval_core (polynomial.cpp:6436-6522), required by algebraic_numbers.cpp:2387-2388,2406, now preserves recursive Horner grouping, borrowed mapped root cells, actual integer coefficient overloads and scoped algebraic auxiliaries. Actual accepted arithmetic and lexical-sort entries bind the evaluator caller; retained auxiliaries borrow their algebraic owner until explicit cleanup, and callbacks cannot close or clean executing owners. Independent 125-point rational grid, irrational bounds, exact single-term root square identity, early zero/constant lookup erasure, reached arithmetic checkpoint cancellation/retry, polynomial checkpoint cancellation, lookup stops and real lexical-sort ownership checks pass in ordinary and checked/debug/trace builds on CPUs 8-16. Full allocation/destructor/callback/TRACE audits, full multivariate isolation and whole polynomial/AST completion remain pending; source-unit statuses remain partial.",
         "Multivariate isolate_roots (algebraic_numbers.cpp:2268-2451,2879-2881) now follows rational-fragment substitution, stable defining-degree variable ordering, resultant elimination, univariate isolation and conjugate filtering. Vanished resultants evaluate actual coefficients: the linear branch computes -a0/a1; the higher-degree branch drops vanishing leading coefficients, converts lower terms to the local manager, introduces z*x^i and recurses with z mapped to the actual nonzero algebraic coefficient. Interleaved lexical reference/scalar lifetimes use concrete per-recursion frames. Only accepted substitution/conversion/evaluation/factor calls bind cleanup authority. Cancellation exposed the need to retain the actual factor frontend receipt and explicitly clean reached persistent isolation scratch vectors; cleanup now does so while preserving older refused factor calls. Tests independently cover exact root powers, signed root bounds, spurious conjugates, linear/nonlinear recovery, degree drop, vanished coefficients and variables, both checkpoint services through success/cleanup/retry, source output assertions and executing/older-owner refusals. Full allocation/destructor/callback/TRACE audit and eager constructor composition remain incomplete; polynomial and AST source units remain partial.",
-        "The retained signs-between-roots overload (algebraic_numbers.cpp:2549-2624,2883-2885; nlsat_evaluator.cpp:467) now isolates roots, refines each actual root to source precision two, and appends signs at an outside integer, between adjacent roots, and at the opposite outside integer. With no roots it evaluates at zero. Concrete ext2 mapping preserves contains/getter order, borrowing assigned cells and one shared fallback. Signs are native []int and retain raw qm.sign values and any existing/appended prefix. The actual scoped sample borrows its polynomial owner and survives a younger source destructor stop until owning cleanup. Accepted EvalSign and scalar-selection caller bindings preserve older refused evaluators; source cleanup errors are distinguished from body cancellation. IntLT/IntGT now invoke the actual SetInteger wrapper; younger scoped-rational stops protect older selection temporaries. Tests verify exact interval signs including raw -6/+6, repeated roots, rational/irrational inputs, actual precision, both reached checkpoint frontiers through success/cleanup/retry, partial output preservation, older real LexSort refusal, running-owner refusals, nonzero assertion Throw/erasure and a qualified actual BIG sample destructor stop followed by owning cleanup. Ordinary and checked/debug/trace focused checks use CPUs 8-16. Full allocation/callback/destructor/TRACE coverage, eager constructor composition and overall polynomial/AST completion remain incomplete."
+        "The retained signs-between-roots overload (algebraic_numbers.cpp:2549-2624,2883-2885; nlsat_evaluator.cpp:467) now isolates roots, refines each actual root to source precision two, and appends signs at an outside integer, between adjacent roots, and at the opposite outside integer. With no roots it evaluates at zero. Concrete ext2 mapping preserves contains/getter order, borrowing assigned cells and one shared fallback. Signs are native []int and retain raw qm.sign values and any existing/appended prefix. The actual scoped sample borrows its polynomial owner and survives a younger source destructor stop until owning cleanup. Accepted EvalSign and scalar-selection caller bindings preserve older refused evaluators; source cleanup errors are distinguished from body cancellation. IntLT/IntGT now invoke the actual SetInteger wrapper; younger scoped-rational stops protect older selection temporaries. Tests verify exact interval signs including raw -6/+6, repeated roots, rational/irrational inputs, actual precision, both reached checkpoint frontiers through success/cleanup/retry, partial output preservation, older real LexSort refusal, running-owner refusals, nonzero assertion Throw/erasure and a qualified actual BIG sample destructor stop followed by owning cleanup. Ordinary and checked/debug/trace focused checks use CPUs 8-16. Full allocation/callback/destructor/TRACE coverage, eager constructor composition and overall polynomial/AST completion remain incomplete.",
+        "The polynomial-ref and sexpr mk_root overloads (algebraic_numbers.cpp:665-680,2887-2893; retained AST arithmetic consumer arith_decl_plugin.cpp:95-98) now convert/parse directly into the actual persistent m_isolate_tmp1 and then invoke one-based distinct-real-root selection. Source index/univariate assertions precede workspace construction; with assertions erased, syntax and conversion still precede runtime index errors. Root construction throws the concrete algebraic_exception/default_exception class with unchanged source messages. A concrete construction owner retains only actually accepted dense conversion, parser lexical entry, factor frontend and private root vector; cleanup preserves older refused factor work. The converter records accepted lexical entry, refuses reentry/cleanup while converting, and can release completed native metadata without sweeping an unrelated lexical owner. Owning cleanup finishes younger children before private root vectors; conversion publications and caller output survive errors. Tests verify exact sqrt(2) identities, repeated-factor distinct indices, BIG linear coefficients, persistent descriptor/receiving owner, parser location and partial prefix, zero/out-of-range errors, assertion Throw/erasure ordering, both wrappers through every reached checkpoint/cleanup/retry, older actual factor refusal and parser/isolation callback owner guards. Focused ordinary and checked/debug/trace algebraic/evaluation/parser checks pass on CPUs 8-16. TRACE, full allocation/destructor/callback/eager-constructor composition and overall polynomial/AST completion remain incomplete."
       ]
     },
     {
@@ -48391,7 +48455,13 @@
         "pkg/math/polynomial/sexpr_upolynomial.go",
         "pkg/math/polynomial/sexpr_upolynomial_test.go",
         "pkg/math/polynomial/upolynomial_rational_context.go",
-        "pkg/math/polynomial/upolynomial_rational_context_test.go"
+        "pkg/math/polynomial/upolynomial_rational_context_test.go",
+        "pkg/math/polynomial/algebraic_root_construction.go",
+        "pkg/math/polynomial/algebraic_exception.go",
+        "pkg/math/polynomial/algebraic_root_construction_test.go",
+        "pkg/math/polynomial/algebraic_root_construction_cancel_test.go",
+        "pkg/math/polynomial/algebraic_root_construction_assert_test.go",
+        "pkg/math/polynomial/algebraic_root_construction_owner_test.go"
       ],
       "tests": [
         "TestSexprPolynomialSourceArithmetic",
@@ -48405,7 +48475,16 @@
         "TestUPolynomialContextVectorStopAPI",
         "TestUPolynomialContextExceptionBeforeCompletedDestructor",
         "TestUPolynomialContextPartialCopyWaitsForStoppedVector",
-        "TestUPolynomialContextVectorOnlyStopDoesNotPoisonService"
+        "TestUPolynomialContextVectorOnlyStopDoesNotPoisonService",
+        "TestAlgebraicPolynomialRootPersistentConversionAndIndices",
+        "TestAlgebraicSexprRootArithmeticAndPersistentReuse",
+        "TestAlgebraicSexprRootParsePrefixAndOutputPreservation",
+        "TestAlgebraicSexprRootBigCoefficientUsesBorrowedNumericService",
+        "TestAlgebraicRootConstructionEveryReachedCheckpointAndRetry",
+        "TestAlgebraicSexprRootIndexAssertionBeforeSyntaxAndErasedGate",
+        "TestAlgebraicPolynomialRootSourceAssertionsBeforeWorkspace",
+        "TestAlgebraicRootConstructionPreservesOlderFactorInvocation",
+        "TestAlgebraicSexprRootExecutingOwnerAndConverterRefusals"
       ],
       "methods_audited": false,
       "ownership_audited": false,
@@ -48438,7 +48517,9 @@
         }
       ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The polynomial-ref and sexpr mk_root overloads (algebraic_numbers.cpp:665-680,2887-2893; retained AST arithmetic consumer arith_decl_plugin.cpp:95-98) now convert/parse directly into the actual persistent m_isolate_tmp1 and then invoke one-based distinct-real-root selection. Source index/univariate assertions precede workspace construction; with assertions erased, syntax and conversion still precede runtime index errors. Root construction throws the concrete algebraic_exception/default_exception class with unchanged source messages. A concrete construction owner retains only actually accepted dense conversion, parser lexical entry, factor frontend and private root vector; cleanup preserves older refused factor work. The converter records accepted lexical entry, refuses reentry/cleanup while converting, and can release completed native metadata without sweeping an unrelated lexical owner. Owning cleanup finishes younger children before private root vectors; conversion publications and caller output survive errors. Tests verify exact sqrt(2) identities, repeated-factor distinct indices, BIG linear coefficients, persistent descriptor/receiving owner, parser location and partial prefix, zero/out-of-range errors, assertion Throw/erasure ordering, both wrappers through every reached checkpoint/cleanup/retry, older actual factor refusal and parser/isolation callback owner guards. Focused ordinary and checked/debug/trace algebraic/evaluation/parser checks pass on CPUs 8-16. TRACE, full allocation/destructor/callback/eager-constructor composition and overall polynomial/AST completion remain incomplete."
+      ]
     },
     {
       "path": "src/math/polynomial/sexpr2upolynomial.h",
@@ -48449,7 +48530,13 @@
         "pkg/math/polynomial/sexpr_upolynomial.go",
         "pkg/math/polynomial/sexpr_upolynomial_test.go",
         "pkg/math/polynomial/upolynomial_rational_context.go",
-        "pkg/math/polynomial/upolynomial_rational_context_test.go"
+        "pkg/math/polynomial/upolynomial_rational_context_test.go",
+        "pkg/math/polynomial/algebraic_root_construction.go",
+        "pkg/math/polynomial/algebraic_exception.go",
+        "pkg/math/polynomial/algebraic_root_construction_test.go",
+        "pkg/math/polynomial/algebraic_root_construction_cancel_test.go",
+        "pkg/math/polynomial/algebraic_root_construction_assert_test.go",
+        "pkg/math/polynomial/algebraic_root_construction_owner_test.go"
       ],
       "tests": [
         "TestSexprPolynomialSourceArithmetic",
@@ -48463,7 +48550,16 @@
         "TestUPolynomialContextVectorStopAPI",
         "TestUPolynomialContextExceptionBeforeCompletedDestructor",
         "TestUPolynomialContextPartialCopyWaitsForStoppedVector",
-        "TestUPolynomialContextVectorOnlyStopDoesNotPoisonService"
+        "TestUPolynomialContextVectorOnlyStopDoesNotPoisonService",
+        "TestAlgebraicPolynomialRootPersistentConversionAndIndices",
+        "TestAlgebraicSexprRootArithmeticAndPersistentReuse",
+        "TestAlgebraicSexprRootParsePrefixAndOutputPreservation",
+        "TestAlgebraicSexprRootBigCoefficientUsesBorrowedNumericService",
+        "TestAlgebraicRootConstructionEveryReachedCheckpointAndRetry",
+        "TestAlgebraicSexprRootIndexAssertionBeforeSyntaxAndErasedGate",
+        "TestAlgebraicPolynomialRootSourceAssertionsBeforeWorkspace",
+        "TestAlgebraicRootConstructionPreservesOlderFactorInvocation",
+        "TestAlgebraicSexprRootExecutingOwnerAndConverterRefusals"
       ],
       "conditionals": [
         {
@@ -48506,7 +48602,9 @@
         }
       ],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "The polynomial-ref and sexpr mk_root overloads (algebraic_numbers.cpp:665-680,2887-2893; retained AST arithmetic consumer arith_decl_plugin.cpp:95-98) now convert/parse directly into the actual persistent m_isolate_tmp1 and then invoke one-based distinct-real-root selection. Source index/univariate assertions precede workspace construction; with assertions erased, syntax and conversion still precede runtime index errors. Root construction throws the concrete algebraic_exception/default_exception class with unchanged source messages. A concrete construction owner retains only actually accepted dense conversion, parser lexical entry, factor frontend and private root vector; cleanup preserves older refused factor work. The converter records accepted lexical entry, refuses reentry/cleanup while converting, and can release completed native metadata without sweeping an unrelated lexical owner. Owning cleanup finishes younger children before private root vectors; conversion publications and caller output survive errors. Tests verify exact sqrt(2) identities, repeated-factor distinct indices, BIG linear coefficients, persistent descriptor/receiving owner, parser location and partial prefix, zero/out-of-range errors, assertion Throw/erasure ordering, both wrappers through every reached checkpoint/cleanup/retry, older actual factor refusal and parser/isolation callback owner guards. Focused ordinary and checked/debug/trace algebraic/evaluation/parser checks pass on CPUs 8-16. TRACE, full allocation/destructor/callback/eager-constructor composition and overall polynomial/AST completion remain incomplete."
+      ]
     },
     {
       "path": "src/math/polynomial/upolynomial.cpp",

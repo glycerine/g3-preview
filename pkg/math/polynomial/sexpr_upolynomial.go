@@ -36,6 +36,7 @@ type SexprPolynomialConverter struct {
 	depth      uint32
 	header     uint64
 	cause      error
+	converting bool
 	closed     bool
 }
 
@@ -89,16 +90,26 @@ func (c *SexprPolynomialConverter) Convert(h usexpr.SexprHandle, p UPolynomial) 
 	return c.convertAtDepth(h, p, 0)
 }
 func (c *SexprPolynomialConverter) convertAtDepth(h usexpr.SexprHandle, p UPolynomial, depth uint32) error {
+	return c.convertAtDepthForRoot(h, p, depth, nil)
+}
+func (c *SexprPolynomialConverter) convertAtDepthForRoot(h usexpr.SexprHandle, p UPolynomial, depth uint32, caller *algebraicRootConstructionScope) error {
 	if e := c.open(); e != nil {
 		return e
 	}
-	if c.cause != nil {
+	if c.cause != nil || c.converting {
 		return ErrSexprPolynomialPending
 	}
+	c.converting = true
+	defer func() { c.converting = false }()
 	return c.sexpr.WithBorrowedNodes(func(nodes *usexpr.SexprBorrowedNodes) error {
 		c.borrowed = nodes
 		defer func() { c.borrowed = nil }()
-		return numericRationalService_WithUPolynomialRationals(c.sexpr.Configuration().Rationals, c.polynomial, func(ctx *UPolynomialRationalContext) error { return c.convert(ctx, h, p, depth) })
+		return numericRationalService_WithUPolynomialRationals(c.sexpr.Configuration().Rationals, c.polynomial, func(ctx *UPolynomialRationalContext) error {
+			if caller != nil {
+				caller.parserAccepted = true
+			}
+			return c.convert(ctx, h, p, depth)
+		})
 	})
 }
 func (c *SexprPolynomialConverter) child(r usexpr.SexprBorrowedNode, i uint32) (usexpr.SexprHandle, error) {
@@ -243,6 +254,9 @@ func (c *SexprPolynomialConverter) convert(ctx *UPolynomialRationalContext, h us
 	}
 }
 func (c *SexprPolynomialConverter) Cleanup() error {
+	if c != nil && c.self == c && c.converting {
+		return ErrSexprPolynomialPending
+	}
 	if e := c.open(); e != nil {
 		return e
 	}
@@ -274,6 +288,20 @@ func (c *SexprPolynomialConverter) Close() error {
 	}
 	if e := c.Cleanup(); e != nil {
 		return e
+	}
+	return c.closeHeader()
+}
+func (c *SexprPolynomialConverter) closeHeader() error {
+	if e := c.open(); e != nil {
+		return e
+	}
+	if c.converting || c.depth != 0 || c.cause != nil {
+		return ErrSexprPolynomialPending
+	}
+	for i := range c.frames {
+		if c.frames[i].live {
+			return ErrSexprPolynomialPending
+		}
 	}
 	c.sexpr.Configuration().Budget.Release(c.header)
 	c.frames = nil

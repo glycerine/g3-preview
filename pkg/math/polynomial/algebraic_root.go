@@ -49,6 +49,7 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	rootConstruction                                           algebraicRootConstructionScope
 	isolationSigns                                             algebraicIsolationSignsScope
 	signEvaluationCaller                                       *algebraicIsolationSignsScope
 	localSelection                                             *algebraicSelectionScope
@@ -879,6 +880,9 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	return m.store(dl, &out)
 }
 func (m *AlgebraicRootCore) CleanupRetained() error {
+	if m != nil && m.self == m && (m.rootConstruction.running || m.rootConstruction.finishing) {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && (m.isolationSigns.running || m.isolationSigns.finishing) {
 		return ErrAlgebraicPending
 	}
@@ -1017,9 +1021,15 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	if e := m.comparisonCleanup(); e != nil {
 		return e
 	}
+	if e := m.cleanupRootConstruction(); e != nil {
+		return e
+	}
 	return m.cleanupMultivariateIsolation()
 }
 func (m *AlgebraicRootCore) Close() error {
+	if m != nil && m.self == m && (m.rootConstruction.running || m.rootConstruction.finishing) {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && (m.isolationSigns.running || m.isolationSigns.finishing) {
 		return ErrAlgebraicPending
 	}
@@ -1101,6 +1111,11 @@ func (m *AlgebraicRootCore) Close() error {
 	}
 	if m.callers != privateCallers || m.vectors != privateVectors {
 		return ErrAlgebraicLive
+	}
+	if m.rootConstruction.active {
+		if e := m.CleanupRetained(); e != nil {
+			return e
+		}
 	}
 	if e := m.CleanupNegation(); e != nil {
 		return e

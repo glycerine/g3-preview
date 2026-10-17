@@ -15,7 +15,9 @@ type algebraicIsolationConversionScope struct {
 }
 
 func (m *AlgebraicRootCore) cleanupIsolationConversion() error {
-	s := &m.isolationConversion
+	return m.cleanupIsolationConversionScope(&m.isolationConversion)
+}
+func (m *AlgebraicRootCore) cleanupIsolationConversionScope(s *algebraicIsolationConversionScope) error {
 	if s.running {
 		return ErrAlgebraicPending
 	}
@@ -84,7 +86,7 @@ func (m *AlgebraicRootCore) isolatePolynomialRootsForMultivariate(pm *Multivaria
 		return e
 	}
 	s := &m.isolationConversion
-	if s.active || s.running {
+	if m.rootConstruction.active || s.active || s.running {
 		return ErrAlgebraicPending
 	}
 	d, enabled, e := algebraicAssertionSwitch()

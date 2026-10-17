@@ -18,6 +18,9 @@ func (m *AlgebraicRootCore) IsolateMultivariateRoots(pm *MultivariatePolynomialM
 	return m.isolateMultivariateRootsEntry(pm, p, values, roots, nil)
 }
 func (m *AlgebraicRootCore) isolateMultivariateRootsEntry(pm *MultivariatePolynomialManager, p Polynomial, values PolynomialAlgebraicEvaluation, roots *AlgebraicVector, caller *algebraicIsolationSignsScope) error {
+	if m != nil && m.self == m && m.rootConstruction.active {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.isolationSigns.active && caller != &m.isolationSigns {
 		return ErrAlgebraicPending
 	}

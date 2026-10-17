@@ -282,14 +282,20 @@ func (m *AlgebraicRootCore) rootSift(v *AlgebraicVector, root, end uint32) error
 	return nil
 }
 func (m *AlgebraicRootCore) MkRoot(v UPolynomialView, index uint32, out *Algebraic) (err error) {
+	return m.mkRootWithConstruction(v, index, out, nil)
+}
+func (m *AlgebraicRootCore) mkRootWithConstruction(v UPolynomialView, index uint32, out *Algebraic, caller *algebraicRootConstructionScope) (err error) {
 	if e := m.check(); e != nil {
 		return e
 	}
+	if m.rootConstruction.active && caller != &m.rootConstruction {
+		return ErrAlgebraicPending
+	}
 	if index == 0 {
-		return errors.New("invalid root object, root index must be greater than 0")
+		return newAlgebraicException("invalid root object, root index must be greater than 0")
 	}
 	if v.count == 0 {
-		return errors.New("invalid root object, polynomial must not be the zero polynomial")
+		return newAlgebraicException("invalid root object, polynomial must not be the zero polynomial")
 	}
 	if m.rootSelection != nil {
 		return ErrAlgebraicPending
@@ -299,7 +305,17 @@ func (m *AlgebraicRootCore) MkRoot(v UPolynomialView, index uint32, out *Algebra
 		return err
 	}
 	m.rootSelection = r
+	if caller != nil {
+		caller.selection = r
+	}
 	defer func() {
+		if caller != nil {
+			if stop := caller.childSourceCause(); stop != nil {
+				caller.sourceStop = stop
+				err = errors.Join(err, stop)
+				return
+			}
+		}
 		e := r.Close()
 		if e == nil {
 			m.rootSelection = nil
@@ -307,17 +323,27 @@ func (m *AlgebraicRootCore) MkRoot(v UPolynomialView, index uint32, out *Algebra
 			err = errors.Join(err, e)
 		}
 	}()
-	if err = m.IsolateRoots(v, r); err != nil {
+	var conversion *algebraicIsolationConversionScope
+	if caller != nil {
+		conversion = &caller.conversion
+	}
+	if err = m.isolateRootsForPolynomial(v, r, conversion); err != nil {
 		return err
 	}
 	if uint64(index) > uint64(len(r.values)) {
-		return errors.New("invalid root object, polynomial does have sufficient roots")
+		return newAlgebraicException("invalid root object, polynomial does have sufficient roots")
 	}
 	return m.Copy(out, &r.values[index-1])
 }
 
 // CleanupIsolation retries only explicitly retained source lexical/vector roots.
 func (m *AlgebraicRootCore) CleanupIsolation() error {
+	if m != nil && m.self == m && m.rootConstruction.active {
+		return ErrAlgebraicPending
+	}
+	if m != nil && m.self == m && (m.rootConstruction.running || m.rootConstruction.finishing) {
+		return ErrAlgebraicPending
+	}
 	if m.rootSelection != nil {
 		if e := m.rootSelection.Close(); e != nil {
 			return e
