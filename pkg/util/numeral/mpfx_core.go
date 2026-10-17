@@ -172,6 +172,22 @@ func (m *FixedPointManager) publishAddOverflow(dst *FixedPoint, value *big.Int) 
 	dst.sourceZeroNegative = false
 }
 
+// mul sets c's sign after ensuring its word slot and before it checks the
+// product buffer for overflow. The old destination words are still in place.
+func (m *FixedPointManager) publishMulOverflowSign(dst *FixedPoint, negative bool) {
+	if dst.scaled.Sign() == 0 {
+		dst.sourceZeroSlot = true
+		dst.sourceZeroNegative = negative
+		return
+	}
+	dst.scaled.Abs(&dst.scaled)
+	if negative {
+		dst.scaled.Neg(&dst.scaled)
+	}
+	dst.sourceZeroSlot = false
+	dst.sourceZeroNegative = false
+}
+
 func (m *FixedPointManager) Reset(dst *FixedPoint) error {
 	if err := m.check(dst); err != nil {
 		return err
@@ -424,6 +440,7 @@ func (m *FixedPointManager) Mul(a, b, out *FixedPoint) error {
 		return err
 	}
 	if err := m.publish(out, q); err != nil {
+		m.publishMulOverflowSign(out, negative)
 		return err
 	}
 	if q.Sign() == 0 && retainsSlot {

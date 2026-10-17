@@ -264,3 +264,71 @@ func TestFixedPointAddSubOverflowPublishesWrappedWords(t *testing.T) {
 		check(dst, "-1/2")
 	}
 }
+
+func TestFixedPointMultiplyOverflowPublishesSignBeforeProductWords(t *testing.T) {
+	m, err := NewFixedPointManager(1, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a, _ := m.New()
+	b, _ := m.New()
+	out, _ := m.New()
+	defer func() {
+		for _, v := range []*FixedPoint{a, b, out} {
+			if err := v.Close(); err != nil {
+				t.Error(err)
+			}
+		}
+		if err := m.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
+	must := func(err error) {
+		t.Helper()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("mpfx_trace")
+	must(m.BindTrace(tags))
+	check := func(v *FixedPoint, want string, zeroSlot bool) {
+		t.Helper()
+		got, err := m.String(v)
+		if err != nil || got != want {
+			t.Fatal("old product words with new sign", got, want, err)
+		}
+		zero, err := m.IsZero(v)
+		if err != nil || zero || v.sourceZeroSlot != zeroSlot {
+			t.Fatal("source product slot after failure", zero, v.sourceZeroSlot, zeroSlot, err)
+		}
+		if tags.ShouldTrace("mpfx_trace") && (!strings.Contains(output.String(), " <= ") && !strings.Contains(output.String(), " >= ") || strings.HasSuffix(output.String(), want+"\n")) {
+			t.Fatal("source multiplication reached result trace after overflow", output.String())
+		}
+		output.Reset()
+	}
+	must(m.SetUint64(a, (1<<32)-1))
+	must(m.SetInt64(b, 2))
+	must(m.SetInt64(out, -3))
+	if err := m.Mul(a, b, out); !errors.Is(err, ErrFixedPointOverflow) {
+		t.Fatal("positive multiplication overflow", err)
+	}
+	check(out, "3", false)
+	must(m.Neg(a))
+	must(m.Reset(out))
+	if err := m.Mul(a, b, out); !errors.Is(err, ErrFixedPointOverflow) {
+		t.Fatal("negative multiplication overflow into canonical zero", err)
+	}
+	check(out, "-0", true)
+	must(m.Neg(a))
+	if err := m.Mul(a, b, out); !errors.Is(err, ErrFixedPointOverflow) {
+		t.Fatal("positive multiplication overflow into allocated zero", err)
+	}
+	check(out, "0", true)
+	must(m.Neg(b))
+	if err := m.Mul(a, b, a); !errors.Is(err, ErrFixedPointOverflow) {
+		t.Fatal("aliased multiplication overflow", err)
+	}
+	check(a, "-4294967295", false)
+}
