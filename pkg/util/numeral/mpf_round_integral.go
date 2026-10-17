@@ -11,8 +11,8 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 	if m.integralRound.active {
 		return ErrNumericPending
 	}
-	if modularSourceDebug && (x.EBits() == 0 || x.SBits() == 0) {
-		return ErrIntegerAssertion
+	if e := mpfSourceAssertion(x.EBits() > 0 && x.SBits() > 0, 1048, "x.ebits > 0 && x.sbits > 0"); e != nil {
+		return e
 	}
 	if e := m.traceFloatDebugValueChecked("round_to_integral", "X = ", x, 1050); e != nil {
 		return e
@@ -58,8 +58,8 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 			}
 			return m.MkOne(x.EBits(), x.SBits(), false, out)
 		default:
-			if modularSourceDebug && mode != ArbitraryFloatNearestEven && mode != ArbitraryFloatNearestAway {
-				return ErrIntegerAssertion
+			if e := mpfSourceAssertion(mode == ArbitraryFloatNearestEven || mode == ArbitraryFloatNearestAway, 1074, "rm == MPF_ROUND_NEAREST_TEVEN || rm == MPF_ROUND_NEAREST_TAWAY"); e != nil {
+				return e
 			}
 			sigZero, e := m.integer.IsZero(&x.significand)
 			if e != nil {

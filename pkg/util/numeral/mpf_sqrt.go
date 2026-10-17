@@ -10,8 +10,8 @@ func (m *ArbitraryFloatManager) Sqrt(mode ArbitraryFloatRoundingMode, x, out *Ar
 	if m.sqrt.active {
 		return ErrNumericPending
 	}
-	if modularSourceDebug && (x.EBits() == 0 || x.SBits() == 0) {
-		return ErrIntegerAssertion
+	if e := mpfSourceAssertion(x.EBits() > 0 && x.SBits() > 0, 1006, "x.ebits > 0 && x.sbits > 0"); e != nil {
+		return e
 	}
 	if e := m.traceFloatDebugValueChecked("sqrt", "X = ", x, 1008); e != nil {
 		return e

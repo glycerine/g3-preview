@@ -2,12 +2,14 @@
 package numeral
 
 import (
-	"errors"
 	"math"
 	"testing"
 )
 
 func TestArbitraryFloatRoundToIntegralInvalidModeSourceBranches(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TTTTT")
+	}
 	m, _, _ := mpfNumeralHelpersFixture(t)
 	invalid := ArbitraryFloatRoundingMode(255)
 	for _, input := range []float64{0, math.Copysign(0, -1), math.Inf(1), math.Inf(-1), math.NaN(), .25, .5, .75, -.5, 1, 1.5, -1.5, 2.5} {
@@ -17,7 +19,7 @@ func TestArbitraryFloatRoundToIntegralInvalidModeSourceBranches(t *testing.T) {
 		before := out
 		body := m.RoundToIntegral(invalid, &x, &out)
 		if modularSourceDebug && input != 0 && math.Abs(input) < 1 {
-			if !errors.Is(body, ErrIntegerAssertion) || out != before {
+			if !isMPNVerificationThrow(body) || out != before {
 				t.Fatal("reached scalar rounding-mode assertion", input, body, out)
 			}
 		} else {
@@ -46,7 +48,7 @@ func TestArbitraryFloatRoundToIntegralInvalidModeSourceBranches(t *testing.T) {
 		var input, out ArbitraryFloat
 		serviceMust(t, m.MkOne(11, 53, true, &out))
 		before := out
-		if e := m.RoundToIntegral(ArbitraryFloatNearestEven, &input, &out); !errors.Is(e, ErrIntegerAssertion) || out != before {
+		if e := m.RoundToIntegral(ArbitraryFloatNearestEven, &input, &out); !isMPNVerificationThrow(e) || out != before {
 			t.Fatal("initial format assertion", e, out)
 		}
 		serviceMust(t, m.Del(&out))
