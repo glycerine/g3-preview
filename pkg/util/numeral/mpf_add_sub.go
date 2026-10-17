@@ -102,20 +102,30 @@ func (m *ArbitraryFloatManager) addSubtract(mode ArbitraryFloatRoundingMode, x, 
 	}
 	out.assignEbits(x.EBits())
 	out.assignSbits(x.SBits())
-	if modularSourceDebug {
-		for _, v := range [...]*ArbitraryFloat{x, y} {
+	for _, assertion := range [...]struct {
+		v          *ArbitraryFloat
+		line       int32
+		expression string
+	}{{x, 518, "is_normal(x) || is_denormal(x)"}, {y, 519, "is_normal(y) || is_denormal(y)"}} {
+		enabled, e := mpfSourceAssertionsEnabled()
+		if e != nil {
+			return e
+		}
+		if enabled {
+			v := assertion.v
 			normal, e := m.IsNormal(v)
 			if e != nil {
 				return e
 			}
+			denormal := false
 			if !normal {
-				denormal, e := m.IsDenormal(v)
+				denormal, e = m.IsDenormal(v)
 				if e != nil {
 					return e
 				}
-				if !denormal {
-					return ErrIntegerAssertion
-				}
+			}
+			if e := mpfSourceAssertion(normal || denormal, assertion.line, assertion.expression); e != nil {
+				return e
 			}
 		}
 	}
@@ -157,8 +167,11 @@ func (m *ArbitraryFloatManager) addSubtract(mode ArbitraryFloatRoundingMode, x, 
 	if e != nil {
 		return e
 	}
-	if modularSourceDebug && delta < 0 {
-		return ErrIntegerAssertion
+	if e := mpfSourceAssertion(s.a.exponent >= s.b.exponent, 535, "exp(a) >= exp(b)"); e != nil {
+		return e
+	}
+	if e := mpfSourceAssertion(delta >= 0, 536, "exp_delta >= 0"); e != nil {
+		return e
 	}
 	if delta > int64(x.SBits()+2) {
 		delta = int64(x.SBits() + 2)
@@ -174,6 +187,9 @@ func (m *ArbitraryFloatManager) addSubtract(mode ArbitraryFloatRoundingMode, x, 
 		return e
 	}
 	if e := z.shiftWithAllocationContext(&s.b.significand, 3, &s.b.significand, true, context); e != nil {
+		return e
+	}
+	if e := mpfSourceAssertion(delta <= 1<<31-1, 550, "exp_delta <= INT_MAX"); e != nil {
 		return e
 	}
 	s.stickyLive = true
