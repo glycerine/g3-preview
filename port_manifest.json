@@ -161329,10 +161329,12 @@
           ]
         },
         {
-          "name": "div_1",
+          "name": "div_1 with source q_hat UNREACHABLE and per-step SASSERT switch/action before quotient writes",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpn_indexed.go",
           "tests": [
+            "TestMPNDiv1ReadsDebugSwitchAfterNormalizationTrace",
+            "TestMPNDiv1OversizedEstimateSourceActions",
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
@@ -161986,10 +161988,12 @@
           ]
         },
         {
-          "name": "div_1",
+          "name": "div_1 with source q_hat UNREACHABLE and per-step SASSERT switch/action before quotient writes",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpn_indexed.go",
           "tests": [
+            "TestMPNDiv1ReadsDebugSwitchAfterNormalizationTrace",
+            "TestMPNDiv1OversizedEstimateSourceActions",
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",

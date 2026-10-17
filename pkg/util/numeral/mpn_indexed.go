@@ -165,7 +165,9 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 	}
 	m.traceDivisionNormalize(m.Division[u][:na+1], m.Division[v][:nb])
 	if nb == 1 {
-		m.divideViewOne(limbView{external: m.Division[u], size: na + 1}, m.sourceDivRead(v, 0), q)
+		if e := m.divideViewOne(limbView{external: m.Division[u], size: na + 1}, m.sourceDivRead(v, 0), q); e != nil {
+			return false, e
+		}
 	} else {
 		if e := m.divideMany(na+1, nb, q); e != nil {
 			return false, e
@@ -185,13 +187,27 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 	m.traceMPNDivisionOutputs(a, b, q, r)
 	return true, m.sourceVerifyDivision(a, b, q, r)
 }
-func (m *NaturalManager) divideViewOne(a limbView, b uint32, q limbView) {
+func (m *NaturalManager) divideViewOne(a limbView, b uint32, q limbView) error {
 	denom := uint64(b)
 	for j := a.size - 1; j > 0; j-- {
 		temp := uint64(a.read(j))<<32 | uint64(a.read(j-1))
 		qh := temp / denom
 		if qh >= uint64(1)<<32 {
-			panic("mpnum: unnormalized single-limb quotient")
+			if e := diagnostic.BorrowProcessDebugContext().UnreachableSource("src/util/mpn.cpp", 284); e != nil {
+				return e
+			}
+		}
+		if diagnostic.DebugBuild {
+			d := diagnostic.BorrowProcessDebugContext()
+			enabled, e := diagnostic.SourceAssertionsEnabled(d)
+			if e != nil {
+				return e
+			}
+			if enabled && qh >= uint64(1)<<32 {
+				if e = diagnostic.DebugAssertionFailure(d, "src/util/mpn.cpp", 286, "q_hat < BASE"); e != nil {
+					return e
+				}
+			}
 		}
 		ms := temp - qh*denom
 		borrow := ms > temp
@@ -204,6 +220,7 @@ func (m *NaturalManager) divideViewOne(a limbView, b uint32, q limbView) {
 		}
 		m.traceDivisionOneStep(j, qh, temp, denom, ms, a, borrow)
 	}
+	return nil
 }
 
 // divideMany is source Knuth Algorithm D, including estimate correction,
