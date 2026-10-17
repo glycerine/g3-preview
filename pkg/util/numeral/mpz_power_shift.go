@@ -10,30 +10,23 @@ import (
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
-var ErrInvalidPower = errors.New("mpnum: integer zero to zero violates source power precondition")
 var ErrNonterminatingPower = errors.New("mpnum: source power mask would not terminate")
 
 type PowerDomainReason uint8
 
 const (
-	PowerZeroToZero PowerDomainReason = iota + 1
-	PowerMaskOverflow
+	PowerMaskOverflow PowerDomainReason = 2
 )
 
-// PowerDomainError observes a source assertion or the actual mask-wrap boundary.
+// PowerDomainError observes the actual mask-wrap boundary.
 // Completed arithmetic/publication before that boundary remains visible.
 type PowerDomainError struct {
 	Exponent uint32
 	Reason   PowerDomainReason
 }
 
-func (e *PowerDomainError) Error() string { return e.Unwrap().Error() }
-func (e *PowerDomainError) Unwrap() error {
-	if e.Reason == PowerZeroToZero {
-		return ErrInvalidPower
-	}
-	return ErrNonterminatingPower
-}
+func (e *PowerDomainError) Error() string  { return ErrNonterminatingPower.Error() }
+func (e *PowerDomainError) Unwrap() error { return ErrNonterminatingPower }
 
 // ensureOwnedCapacity translates ensure_capacity, including requested capacity
 // six and INT_MIN promotion. Old ownership is released after replacement exists.
@@ -193,14 +186,32 @@ func (m *IntegerManager) powerCoreWithPhysicalContext(a *Int, p uint32, out *Int
 			}
 			size := p/32 + 1
 			shift := p % 32
-			if modularSourceDebug && size == 0 {
-				return ErrIntegerAssertion
+			if modularSourceDebug {
+				d := diagnostic.BorrowProcessDebugContext()
+				enabled, e := diagnostic.SourceAssertionsEnabled(d)
+				if e != nil {
+					return e
+				}
+				if enabled && size == 0 {
+					if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 1471, "sz > 0"); e != nil {
+						return e
+					}
+				}
 			}
 			if e := m.allocateIfNeededWithPhysicalAllocationContext(out, size, context, receiver); e != nil {
 				return e
 			}
-			if modularSourceDebug && m.Cell(out.Cell).Capacity < size {
-				return ErrIntegerAssertion
+			if modularSourceDebug {
+				d := diagnostic.BorrowProcessDebugContext()
+				enabled, e := diagnostic.SourceAssertionsEnabled(d)
+				if e != nil {
+					return e
+				}
+				if enabled && m.Cell(out.Cell).Capacity < size {
+					if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 1473, "b.m_ptr->m_capacity >= sz"); e != nil {
+						return e
+					}
+				}
 			}
 			// The physical Go span is guarded at its actual access, after
 			// all source allocation and sign-publication actions.
@@ -216,8 +227,17 @@ func (m *IntegerManager) powerCoreWithPhysicalContext(a *Int, p uint32, out *Int
 			out.Val = 1
 			return receiver.publishValue(out)
 		case 0:
-			if modularSourceDebug && p == 0 {
-				return &PowerDomainError{Exponent: p, Reason: PowerZeroToZero}
+			if modularSourceDebug {
+				d := diagnostic.BorrowProcessDebugContext()
+				enabled, e := diagnostic.SourceAssertionsEnabled(d)
+				if e != nil {
+					return e
+				}
+				if enabled && p == 0 {
+					if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 1483, "p != 0"); e != nil {
+						return e
+					}
+				}
 			}
 			return m.Reset(out)
 		case 1:

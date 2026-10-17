@@ -143,11 +143,14 @@ func TestBinaryIntervalFailurePrefixes(t *testing.T) {
 	serviceMust(t, m.Del(&a))
 	// Power publishes lower1 before the upper source debug assertion; release
 	// executes upper Reset0. Both retain the same completed endpoint values.
+	if SourceExtendedGCDDebug {
+		bindMPNDebugActions(t, "T")
+	}
 	a = BinaryInterval{lower: NewBinaryInt(2), upper: NewBinaryInt(0)}
 	var c BinaryInterval
 	e = m.Power(&a, 0, &c)
 	intervalAudit(t, m, &a, &c)
-	if (SourceExtendedGCDDebug && !errors.Is(e, ErrInvalidPower)) || (!SourceExtendedGCDDebug && e != nil) || c.lower.Num.Val != 1 || c.upper.Num.Val != 0 {
+	if (SourceExtendedGCDDebug && !isMPNVerificationThrow(e)) || (!SourceExtendedGCDDebug && e != nil) || c.lower.Num.Val != 1 || c.upper.Num.Val != 0 {
 		t.Fatal("power source prefix", e, c)
 	}
 	serviceMust(t, m.Del(&a))

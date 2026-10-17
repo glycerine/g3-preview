@@ -345,6 +345,9 @@ func TestSourceShiftDefectAndPowerDomains(t *testing.T) {
 	m.Del(&bigMin)
 	for _, base := range []int32{0, 1, 2, 3, -1, -2} {
 		for _, p := range []uint32{0, 1 << 31, math.MaxUint32} {
+			if base == 0 && p == 0 && modularSourceDebug {
+				bindMPNDebugActions(t, "T")
+			}
 			// Generic enormous bases exercise precedence at bit31; bounded
 			// -1 above/below covers the complete MaxUint32 wrap route.
 			if p == math.MaxUint32 && (base == 3 || base == -2) {
@@ -371,7 +374,7 @@ func TestSourceShiftDefectAndPowerDomains(t *testing.T) {
 				budget.FailAfter(-1)
 				m.Del(&out)
 			} else if base == 0 && p == 0 && modularSourceDebug {
-				if !errors.Is(e, ErrInvalidPower) || out != NewInt(17) {
+				if !isMPNVerificationThrow(e) || out != NewInt(17) {
 					t.Fatal("source assertion before Reset", e, out)
 				}
 			} else if base == -1 && p >= 1<<31 {
@@ -649,6 +652,9 @@ func TestShiftUnsignedBoundsAndPromotions(t *testing.T) {
 }
 
 func TestPowerDomainAliases(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "T")
+	}
 	m, budget := integerManager(t)
 	for _, base := range []int32{0, 3, -1} {
 		a := NewInt(base)
@@ -665,7 +671,7 @@ func TestPowerDomainAliases(t *testing.T) {
 		switch base {
 		case 0:
 			if modularSourceDebug {
-				if !errors.Is(e, ErrInvalidPower) || a != NewInt(0) {
+				if !isMPNVerificationThrow(e) || a != NewInt(0) {
 					t.Fatal(base, a, e)
 				}
 			} else if e != nil || a != NewInt(0) {

@@ -62,12 +62,15 @@ func TestPowerPublicationWrappedShiftHeaderAccessOrder(t *testing.T) {
 }
 
 func TestPowerPublicationIntegerZeroZeroProfile(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "T")
+	}
 	m, _ := mpzPublicationOwner(t)
 	zero, out := NewInt(0), NewInt(17)
 	e := m.Power(&zero, 0, &out)
 	mpzPublicationAudit(t, m, &zero, &out)
 	if modularSourceDebug {
-		if !errors.Is(e, ErrInvalidPower) || out != NewInt(17) {
+		if !isMPNVerificationThrow(e) || out != NewInt(17) {
 			t.Fatal("source debug assertion before reset", out, e)
 		}
 	} else if e != nil || out != NewInt(0) {

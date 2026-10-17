@@ -166663,6 +166663,8 @@
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_power_shift.go",
           "tests": [
+            "TestIntegerPowerTwoSourceAssertionBeforeCapacity",
+            "TestIntegerPowerZeroSourceAssertionActions",
             "TestIntegerSourceShiftTable",
             "TestIntegerPowerAndShiftIndependent",
             "TestIntegerPowerBigCellSmallValueGeneralLoop",
@@ -168810,6 +168812,8 @@
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_power_shift.go",
           "tests": [
+            "TestIntegerPowerTwoSourceAssertionBeforeCapacity",
+            "TestIntegerPowerZeroSourceAssertionActions",
             "TestIntegerSourceShiftTable",
             "TestIntegerPowerAndShiftIndependent",
             "TestIntegerPowerBigCellSmallValueGeneralLoop",
