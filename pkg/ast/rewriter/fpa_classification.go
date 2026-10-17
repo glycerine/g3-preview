@@ -112,7 +112,21 @@ func (r *FPARewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out ast.
 		if err != nil {
 			return RewriteFailed, err
 		}
-		answer, found, err := r.manager.RewriteFPAToFPSignedBVNumeral(d, rm, value)
+		secondDomain, err := r.manager.GetDomain(d, 1)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		isBV, err := r.manager.IsBitVectorSort(secondDomain)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		var answer ast.ASTHandle
+		var found bool
+		if isBV {
+			answer, found, err = r.manager.RewriteFPAToFPSignedBVNumeral(d, rm, value)
+		} else {
+			answer, found, err = r.manager.RewriteFPAToFPFormatNumeral(d, rm, value)
+		}
 		if err != nil || !found {
 			return RewriteFailed, err
 		}

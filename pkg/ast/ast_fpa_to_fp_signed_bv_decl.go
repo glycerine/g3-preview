@@ -1,4 +1,4 @@
-// Source: src/ast/fpa_decl_plugin.cpp:452-468 (RoundingMode, BitVec overload).
+// Source: src/ast/fpa_decl_plugin.cpp:452-489 (RoundingMode, BitVec or FP).
 package ast
 
 import "github.com/glycerine/g3/pkg/util/z3exception"
@@ -6,7 +6,7 @@ import "github.com/glycerine/g3/pkg/util/z3exception"
 const FPAOpToFP int32 = astFPAToFP
 
 func (m *ASTManager) floatingPointToFPDecl(ps []ASTParameter, domain []ASTHandle) (astNodeRef, error) {
-	// The remaining source to_fp overloads are separate live branches.
+	// The other source to_fp arities and arithmetic-sort overloads remain open.
 	if len(domain) != 2 {
 		return astNodeRef{}, ErrASTDomain
 	}
@@ -23,7 +23,7 @@ func (m *ASTManager) floatingPointToFPDecl(ps []ASTParameter, domain []ASTHandle
 			return astNodeRef{}, err
 		}
 		if i == 0 && (info.family != m.floatingPointPlugin.family || info.kind != 1) ||
-			i == 1 && (info.family != m.bitVectorPlugin.family || info.kind != 0) {
+			i == 1 && !((info.family == m.bitVectorPlugin.family || info.family == m.floatingPointPlugin.family) && info.kind == 0) {
 			return astNodeRef{}, ErrASTDomain
 		}
 	}
