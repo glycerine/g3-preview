@@ -3830,7 +3830,7 @@
           ]
         },
         {
-          "name": "API context::check_sorts shallow AST check, application warning and sort-error state at api_context.cpp:284-307; constructor call sites and full error handler remain unported",
+          "name": "API context::check_sorts shallow AST check, application warning, set_error_code publication and borrowed nonzero-code handler dispatch at api_context.cpp:147-151,284-307; constructor call sites and default error handler remain unported",
           "status": "partial",
           "go_target": "pkg/api/api_context_check_sorts.go",
           "tests": ["TestAPIContextSortCheckWarningAndErrorState"]

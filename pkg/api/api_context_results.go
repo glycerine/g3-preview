@@ -32,6 +32,7 @@ type apiContextResults struct {
 	ownerBytes                    uint64
 	trace                         *diagnostic.TraceTags
 	warnings                      *diagnostic.WarningService
+	errorHandler                  func(*apiContextResults, uint32)
 	memoryProcess                 *memory.ProcessAccounting
 	pendingDestroyLine            int
 	errorCode                     uint32

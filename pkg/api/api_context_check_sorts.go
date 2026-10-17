@@ -10,6 +10,16 @@ import (
 
 const apiSortErrorCode uint32 = 1 // Z3_SORT_ERROR in src/api/z3_api.h.
 
+// setErrorCode publishes the code before invoking the borrowed handler, as
+// context::set_error_code does. The full API context constructor supplies its
+// default handler; this selected member owner has no default handler yet.
+func (c *apiContextResults) setErrorCode(code uint32) {
+	c.errorCode = code
+	if code != 0 && c.errorHandler != nil {
+		c.errorHandler(c, code)
+	}
+}
+
 // checkSorts performs the source context's second warning after the AST
 // manager's caught shallow check, then publishes Z3_SORT_ERROR. Constructors
 // that already own an application may call it after saving the AST trail.
@@ -24,7 +34,7 @@ func (c *apiContextResults) checkSorts(h ast.ASTHandle) error {
 	if h.IsNull() {
 		// The source warns in ast_manager and then dereferences null in the
 		// switch. A typed Go boundary preserves the first warning and error.
-		c.errorCode = apiSortErrorCode
+		c.setErrorCode(apiSortErrorCode)
 		return nil
 	}
 	kind, e := c.manager.GetKind(h)
@@ -38,7 +48,7 @@ func (c *apiContextResults) checkSorts(h ast.ASTHandle) error {
 		}
 		_ = c.warnings.Warning(message)
 	}
-	c.errorCode = apiSortErrorCode
+	c.setErrorCode(apiSortErrorCode)
 	return nil
 }
 
