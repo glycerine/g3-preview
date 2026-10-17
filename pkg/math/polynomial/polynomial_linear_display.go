@@ -24,6 +24,17 @@ func linearWriteText(out io.Writer, text string) error {
 	return nil
 }
 func (s *RationalLinearSolver) Display(out io.Writer) error {
+	if s != nil && s.self == s && s.running {
+		return ErrPolynomialPending
+	}
+	if e := s.open(); e != nil {
+		return e
+	}
+	s.running = true
+	defer func() { s.running = false }()
+	return s.displaySource(out)
+}
+func (s *RationalLinearSolver) displaySource(out io.Writer) error {
 	if e := s.open(); e != nil {
 		return e
 	}
@@ -73,6 +84,17 @@ func (s *RationalLinearSolver) Display(out io.Writer) error {
 	return nil
 }
 func (s *ModularLinearSolver) Display(out io.Writer) error {
+	if s != nil && s.self == s && s.running {
+		return ErrPolynomialPending
+	}
+	if e := s.open(); e != nil {
+		return e
+	}
+	s.running = true
+	defer func() { s.running = false }()
+	return s.displaySource(out)
+}
+func (s *ModularLinearSolver) displaySource(out io.Writer) error {
 	if e := s.open(); e != nil {
 		return e
 	}

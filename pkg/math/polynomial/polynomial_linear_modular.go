@@ -146,13 +146,19 @@ func (s *ModularLinearSolver) RightHandSide(i uint32) (unumeral.Int, error) {
 	return s.load(&s.b, i)
 }
 func (s *ModularLinearSolver) Resize(n uint32) error {
+	if s != nil && s.self == s && s.running {
+		return ErrPolynomialPending
+	}
+
 	if e := s.open(); e != nil {
 		return e
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	if s.n == n {
 		return nil
 	}
-	if e := s.Flush(); e != nil {
+	if e := s.flushSource(); e != nil {
 		return e
 	}
 	s.n = n
@@ -164,9 +170,15 @@ func (s *ModularLinearSolver) Resize(n uint32) error {
 	return nil
 }
 func (s *ModularLinearSolver) Reset() error {
+	if s != nil && s.self == s && s.running {
+		return ErrPolynomialPending
+	}
+
 	if e := s.open(); e != nil {
 		return e
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	for i := uint32(0); i < s.n; i++ {
 		r, e := s.row(i)
 		if e != nil {
@@ -184,9 +196,15 @@ func (s *ModularLinearSolver) Reset() error {
 	return nil
 }
 func (s *ModularLinearSolver) Add(i uint32, as []unumeral.Int, b *unumeral.Int) error {
+	if s != nil && s.self == s && s.running {
+		return ErrPolynomialPending
+	}
+
 	if e := s.open(); e != nil {
 		return e
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	if e := linearSourceAssert(i < s.n, 78, "i < n"); e != nil {
 		return e
 	}
@@ -208,9 +226,15 @@ func (s *ModularLinearSolver) Add(i uint32, as []unumeral.Int, b *unumeral.Int) 
 	return nil
 }
 func (s *ModularLinearSolver) Solve(xs []unumeral.Int) (bool, error) {
+	if s != nil && s.self == s && s.running {
+		return false, ErrPolynomialPending
+	}
+
 	if e := s.open(); e != nil {
 		return false, e
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	for k := uint32(0); k < s.n; k++ {
 		if e := s.traceIteration(k, 90); e != nil {
 			return false, e
@@ -441,12 +465,22 @@ func (s *ModularLinearSolver) flushSource() (err error) {
 	return nil
 }
 func (s *ModularLinearSolver) Flush() error {
+	if s != nil && s.self == s && s.running {
+		return ErrPolynomialPending
+	}
+
 	if e := s.open(); e != nil {
 		return e
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	return s.flushSource()
 }
 func (s *ModularLinearSolver) SourceFinalize() (err error) {
+	if s != nil && s.self == s && s.running {
+		return ErrPolynomialPending
+	}
+
 	if e := s.identity(); e != nil {
 		return e
 	}
@@ -459,6 +493,8 @@ func (s *ModularLinearSolver) SourceFinalize() (err error) {
 	if s.sourceCause != nil {
 		return s.sourceCause
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	defer func() {
 		if err != nil {
 			s.sourceCause = err
@@ -477,6 +513,10 @@ func (s *ModularLinearSolver) SourceFinalize() (err error) {
 	return nil
 }
 func (s *ModularLinearSolver) Close() error {
+	if s != nil && s.self == s && s.running {
+		return ErrPolynomialPending
+	}
+
 	if s == nil || s.self != s {
 		return ErrPolynomialOwner
 	}
@@ -492,6 +532,8 @@ func (s *ModularLinearSolver) Close() error {
 			return e
 		}
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	// Explicit owning continuation releases actual numeral resources after a stopped source destructor.
 	for i := range s.A {
 		for j := range s.A[i] {

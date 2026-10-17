@@ -125,13 +125,19 @@ func (s *RationalLinearSolver) RightHandSide(i uint32) (unumeral.Rational, error
 	return s.load(&s.b, i)
 }
 func (s *RationalLinearSolver) Resize(n uint32) error {
+	if s != nil && s.self == s && s.running {
+		return ErrPolynomialPending
+	}
+
 	if e := s.open(); e != nil {
 		return e
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	if s.n == n {
 		return nil
 	}
-	if e := s.Flush(); e != nil {
+	if e := s.flushSource(); e != nil {
 		return e
 	}
 	s.n = n
@@ -147,9 +153,15 @@ func (s *RationalLinearSolver) Resize(n uint32) error {
 	return nil
 }
 func (s *RationalLinearSolver) Reset() error {
+	if s != nil && s.self == s && s.running {
+		return ErrPolynomialPending
+	}
+
 	if e := s.open(); e != nil {
 		return e
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	for i := uint32(0); i < s.n; i++ {
 		r, e := s.row(i)
 		if e != nil {
@@ -167,9 +179,15 @@ func (s *RationalLinearSolver) Reset() error {
 	return nil
 }
 func (s *RationalLinearSolver) Add(i uint32, as []unumeral.Rational, b *unumeral.Rational) error {
+	if s != nil && s.self == s && s.running {
+		return ErrPolynomialPending
+	}
+
 	if e := s.open(); e != nil {
 		return e
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	if e := linearSourceAssert(i < s.n, 78, "i < n"); e != nil {
 		return e
 	}
@@ -191,9 +209,15 @@ func (s *RationalLinearSolver) Add(i uint32, as []unumeral.Rational, b *unumeral
 	return nil
 }
 func (s *RationalLinearSolver) Solve(xs []unumeral.Rational) (bool, error) {
+	if s != nil && s.self == s && s.running {
+		return false, ErrPolynomialPending
+	}
+
 	if e := s.open(); e != nil {
 		return false, e
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	for k := uint32(0); k < s.n; k++ {
 		if e := s.traceIteration(k, 90); e != nil {
 			return false, e
@@ -419,12 +443,22 @@ func (s *RationalLinearSolver) flushSource() (err error) {
 	return nil
 }
 func (s *RationalLinearSolver) Flush() error {
+	if s != nil && s.self == s && s.running {
+		return ErrPolynomialPending
+	}
+
 	if e := s.open(); e != nil {
 		return e
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	return s.flushSource()
 }
 func (s *RationalLinearSolver) SourceFinalize() (err error) {
+	if s != nil && s.self == s && s.running {
+		return ErrPolynomialPending
+	}
+
 	if e := s.identity(); e != nil {
 		return e
 	}
@@ -437,6 +471,8 @@ func (s *RationalLinearSolver) SourceFinalize() (err error) {
 	if s.sourceCause != nil {
 		return s.sourceCause
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	defer func() {
 		if err != nil {
 			s.sourceCause = err
@@ -455,6 +491,10 @@ func (s *RationalLinearSolver) SourceFinalize() (err error) {
 	return nil
 }
 func (s *RationalLinearSolver) Close() error {
+	if s != nil && s.self == s && s.running {
+		return ErrPolynomialPending
+	}
+
 	if s == nil || s.self != s {
 		return ErrPolynomialOwner
 	}
@@ -470,6 +510,8 @@ func (s *RationalLinearSolver) Close() error {
 			return e
 		}
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	// Explicit owning continuation releases actual numeral resources after a stopped source destructor.
 	for i := range s.A {
 		for j := range s.A[i] {

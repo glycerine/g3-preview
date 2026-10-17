@@ -16,7 +16,7 @@ func (s *RationalLinearSolver) traceIteration(k uint32, line int) error {
 		func() bool { return true }, func(w io.Writer) error {
 			out := linearTraceWriter{w}
 			_ = linearWriteText(out, "iteration "+strconv.FormatUint(uint64(k), 10)+"\n")
-			computation = s.Display(out)
+			computation = s.displaySource(out)
 			return computation
 		})
 	return computation
@@ -31,7 +31,7 @@ func (s *ModularLinearSolver) traceIteration(k uint32, line int) error {
 		func() bool { return true }, func(w io.Writer) error {
 			out := linearTraceWriter{w}
 			_ = linearWriteText(out, "iteration "+strconv.FormatUint(uint64(k), 10)+"\n")
-			computation = s.Display(out)
+			computation = s.displaySource(out)
 			return computation
 		})
 	return computation

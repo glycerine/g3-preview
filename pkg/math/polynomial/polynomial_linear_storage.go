@@ -7,6 +7,7 @@ import (
 )
 
 type linearStorage struct {
+	running                          bool
 	integer                          *unumeral.IntegerManager
 	n                                uint32
 	header                           uint64
