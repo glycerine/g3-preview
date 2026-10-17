@@ -58,6 +58,7 @@ type AlgebraicRootCore struct {
 	representationNormalize                                    unumeral.IntegerNormalizeInvocationReceipt
 	representationCopy                                         unumeral.IntegerCopyAllocationReceipt
 	comparisonTraceRunning                                     bool
+	predicateDiagnosticRunning                                 bool
 	rationalCopy                                               unumeral.IntegerCopyAllocationReceipt
 	manager                                                    *AlgebraicManager
 	coefficientCopy                                            unumeral.IntegerCopyAllocationReceipt
@@ -188,7 +189,7 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
-	if m != nil && m.self == m && m.comparisonTraceRunning {
+	if m != nil && m.self == m && (m.comparisonTraceRunning || m.predicateDiagnosticRunning) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && (m.cellAllocationRunning || m.cellPending.Block() != (umemory.Block{})) {
@@ -929,7 +930,7 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.cleanupRetainedCore()
 }
 func (m *AlgebraicRootCore) cleanupRetainedCore() error {
-	if m != nil && m.self == m && m.comparisonTraceRunning {
+	if m != nil && m.self == m && (m.comparisonTraceRunning || m.predicateDiagnosticRunning) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.cellAllocationRunning {
@@ -1123,7 +1124,7 @@ func (m *AlgebraicRootCore) Close() error {
 	return m.closeCoreMembers()
 }
 func (m *AlgebraicRootCore) closeCoreMembers() error {
-	if m != nil && m.self == m && m.comparisonTraceRunning {
+	if m != nil && m.self == m && (m.comparisonTraceRunning || m.predicateDiagnosticRunning) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.cellAllocationRunning {

@@ -266,6 +266,9 @@ func (m *AlgebraicRootCore) IsInt(a *Algebraic) (result bool, err error) {
 		return false, err
 	}
 	if !ok {
+		if err = m.predicateBasicAssert(a, 251); err != nil {
+			return false, err
+		}
 		return m.IsInt(a)
 	}
 	l, err = m.location(a)
@@ -284,15 +287,10 @@ func (m *AlgebraicRootCore) IsInt(a *Algebraic) (result bool, err error) {
 	if err = m.floorPredicateCandidate(r.interval.BorrowUpper()); err != nil {
 		return false, err
 	}
-	if polynomialSourceDebug {
-		less, e := m.lessPredicateInteger(r.interval.BorrowUpper())
-		if e != nil {
-			return false, e
-		}
-		if less {
-			return false, ErrAlgebraicAssertion
-		}
+	if err = m.predicateUpperAssert(r.interval.BorrowUpper(), false); err != nil {
+		return false, err
 	}
+
 	less, err := m.lessPredicateInteger(r.interval.BorrowLower())
 	if err != nil || !less {
 		return false, err
@@ -366,6 +364,9 @@ func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 		return false, err
 	}
 	if !ok {
+		if err = m.predicateBasicAssert(a, 306); err != nil {
+			return false, err
+		}
 		return true, nil
 	}
 	l, err = m.location(a)
@@ -389,15 +390,10 @@ func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 	if err = m.setPredicateQParts(&p.candidate, &m.isRationalTmp); err != nil {
 		return false, err
 	}
-	if polynomialSourceDebug {
-		less, e := m.lessPredicateRational(r.interval.BorrowUpper())
-		if e != nil {
-			return false, e
-		}
-		if less {
-			return false, ErrAlgebraicAssertion
-		}
+	if err = m.predicateUpperAssert(r.interval.BorrowUpper(), true); err != nil {
+		return false, err
 	}
+
 	less, err := m.lessPredicateRational(r.interval.BorrowLower())
 	if err != nil {
 		return false, err

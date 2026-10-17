@@ -38345,7 +38345,9 @@
         "pkg/math/polynomial/algebraic_predicate_integer_test.go",
         "pkg/math/polynomial/algebraic_predicate_integer_stop_test.go",
         "pkg/math/polynomial/algebraic_const_rational_scope.go",
-        "pkg/math/polynomial/algebraic_const_rational_scope_test.go"
+        "pkg/math/polynomial/algebraic_const_rational_scope_test.go",
+        "pkg/math/polynomial/algebraic_predicate_assertions.go",
+        "pkg/math/polynomial/algebraic_predicate_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",
