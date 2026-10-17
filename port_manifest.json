@@ -128530,6 +128530,7 @@
         "TestHardwareFloatDirectedArithmetic",
         "TestHardwareFloatArithmeticGuardsAndAliasing",
         "TestHardwareFloatRoundToIntegralSourceModes",
+        "TestHardwareFloatUnsupportedModeSourceDiagnostic",
         "TestHardwareFloatSourceRationalInputDirectedBounds",
         "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards",
         "TestHardwareFloatBorrowedRationalOwnerLifecycle",
@@ -128993,12 +128994,13 @@
           ]
         },
         {
-          "name": "Process-wide FPU rounding and Windows precision setup replaced by per-operation exact binary64 rounding",
+          "name": "Process-wide FPU rounding replaced by local binary64 rounding; selected Linux invalid-mode UNREACHABLE at hwf.cpp:642 retained",
           "status": "platform_replacement",
           "go_target": "pkg/util/numeral/hwf_arithmetic.go",
           "tests": [
             "TestHardwareFloatDirectedArithmetic",
-            "TestHardwareFloatRoundToIntegralSourceModes"
+            "TestHardwareFloatRoundToIntegralSourceModes",
+            "TestHardwareFloatUnsupportedModeSourceDiagnostic"
           ]
         },
         {
@@ -129039,6 +129041,7 @@
         "TestHardwareFloatDirectedArithmetic",
         "TestHardwareFloatArithmeticGuardsAndAliasing",
         "TestHardwareFloatRoundToIntegralSourceModes",
+        "TestHardwareFloatUnsupportedModeSourceDiagnostic",
         "TestHardwareFloatSourceRationalInputDirectedBounds",
         "TestHardwareFloatSourceRationalInputLargeIntegerAndGuards",
         "TestHardwareFloatBorrowedRationalOwnerLifecycle",
@@ -129150,12 +129153,13 @@
           ]
         },
         {
-          "name": "Source set_rounding_mode and platform precision controls replaced by local Go binary64 rounding",
+          "name": "Source set_rounding_mode and platform precision controls replaced by local Go binary64 rounding with selected Linux invalid-mode diagnostic",
           "status": "platform_replacement",
           "go_target": "pkg/util/numeral/hwf_arithmetic.go",
           "tests": [
             "TestHardwareFloatDirectedArithmetic",
-            "TestHardwareFloatRoundToIntegralSourceModes"
+            "TestHardwareFloatRoundToIntegralSourceModes",
+            "TestHardwareFloatUnsupportedModeSourceDiagnostic"
           ]
         },
         {

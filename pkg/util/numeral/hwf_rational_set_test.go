@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 func TestHardwareFloatSourceRationalInputDirectedBounds(t *testing.T) {
@@ -65,7 +66,10 @@ func TestHardwareFloatSourceRationalInputLargeIntegerAndGuards(t *testing.T) {
 		t.Fatal("large integer source radix projection", down, up)
 	}
 	before := up.RawBits()
-	if e := m.SetRational(&up, ArbitraryFloatNearestAway, qm, &q); !errors.Is(e, ErrHardwareFloatRoundingMode) || up.RawBits() != before {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "T")
+	}
+	if e := m.SetRational(&up, ArbitraryFloatNearestAway, qm, &q); (modularSourceDebug && !isMPNVerificationThrow(e)) || (!modularSourceDebug && !errors.Is(e, diagnostic.ErrDebugNativeUnreachable)) || up.RawBits() != before {
 		t.Fatal("rejected rounding changed output", up, e)
 	}
 	if e := m.SetRational(&up, ArbitraryFloatNearestEven, nil, &q); !errors.Is(e, ErrNumericOwner) || up.RawBits() != before {

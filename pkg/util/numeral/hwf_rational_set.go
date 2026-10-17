@@ -49,8 +49,9 @@ func (m *HardwareFloatManager) SetRational(out *HardwareFloat, mode ArbitraryFlo
 	if m == nil || out == nil || qm == nil {
 		return ErrNumericOwner
 	}
-	if mode != ArbitraryFloatNearestEven && mode != ArbitraryFloatTowardPositive && mode != ArbitraryFloatTowardNegative && mode != ArbitraryFloatTowardZero {
-		return ErrHardwareFloatRoundingMode
+	mode, e := hwfSourceRoundingMode(mode)
+	if e != nil {
+		return e
 	}
 	if e := qm.checkScalarValue(value); e != nil {
 		return e

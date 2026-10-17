@@ -4,6 +4,8 @@ import (
 	"errors"
 	"math"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 func TestHardwareFloatRoundToIntegralSourceModes(t *testing.T) {
@@ -29,7 +31,10 @@ func TestHardwareFloatRoundToIntegralSourceModes(t *testing.T) {
 		}
 	}
 	a := HardwareFloat{1.25}
-	if err := m.RoundToIntegral(ArbitraryFloatNearestAway, &a, &a); !errors.Is(err, ErrHardwareFloatRoundingMode) || a.value != 1.25 {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "T")
+	}
+	if err := m.RoundToIntegral(ArbitraryFloatNearestAway, &a, &a); (modularSourceDebug && !isMPNVerificationThrow(err)) || (!modularSourceDebug && !errors.Is(err, diagnostic.ErrDebugNativeUnreachable)) || a.value != 1.25 {
 		t.Fatal("unsupported rounding changed value", a, err)
 	}
 }

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"math"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 func TestHardwareFloatDirectedArithmetic(t *testing.T) {
@@ -62,7 +64,10 @@ func TestHardwareFloatArithmeticGuardsAndAliasing(t *testing.T) {
 		t.Fatal(x, err)
 	}
 	before := x.RawBits()
-	if err := m.Add(ArbitraryFloatNearestAway, &x, &y, &x); !errors.Is(err, ErrHardwareFloatRoundingMode) || x.RawBits() != before {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "T")
+	}
+	if err := m.Add(ArbitraryFloatNearestAway, &x, &y, &x); (modularSourceDebug && !isMPNVerificationThrow(err)) || (!modularSourceDebug && !errors.Is(err, diagnostic.ErrDebugNativeUnreachable)) || x.RawBits() != before {
 		t.Fatal("unsupported rounding changed output", err)
 	}
 	if err := m.Add(ArbitraryFloatNearestEven, &x, nil, &x); !errors.Is(err, ErrNumericOwner) || x.RawBits() != before {

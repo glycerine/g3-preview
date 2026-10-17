@@ -9,6 +9,10 @@ func (m *HardwareFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode, 
 	if m == nil || in == nil || out == nil {
 		return ErrNumericOwner
 	}
+	mode, e := hwfSourceRoundingMode(mode)
+	if e != nil {
+		return e
+	}
 	x := in.value
 	switch mode {
 	case ArbitraryFloatNearestEven:
@@ -19,8 +23,6 @@ func (m *HardwareFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode, 
 		out.value = math.Floor(x)
 	case ArbitraryFloatTowardZero:
 		out.value = math.Trunc(x)
-	default:
-		return ErrHardwareFloatRoundingMode
 	}
 	return nil
 }

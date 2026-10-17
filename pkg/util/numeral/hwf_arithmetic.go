@@ -2,12 +2,26 @@
 package numeral
 
 import (
-	"errors"
 	"math"
 	"math/big"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
-var ErrHardwareFloatRoundingMode = errors.New("numeral: unsupported hardware-float rounding mode")
+// The selected Linux set_rounding_mode switch has no nearest-away or unknown
+// mode. A debug Continue leaves the old host rounding mode in place; this Go
+// scalar replacement uses nearest-even for that otherwise undefined path.
+func hwfSourceRoundingMode(mode ArbitraryFloatRoundingMode) (ArbitraryFloatRoundingMode, error) {
+	switch mode {
+	case ArbitraryFloatNearestEven, ArbitraryFloatTowardPositive, ArbitraryFloatTowardNegative, ArbitraryFloatTowardZero:
+		return mode, nil
+	default:
+		if e := diagnostic.BorrowProcessDebugContext().UnreachableSource("src/util/hwf.cpp", 642); e != nil {
+			return mode, e
+		}
+		return ArbitraryFloatNearestEven, nil
+	}
+}
 
 // roundHardwareFloat rounds an exact finite result to binary64. Rat.Float64
 // supplies nearest-even; one adjacent value gives each directed result.
@@ -43,9 +57,9 @@ func (m *HardwareFloatManager) arithmetic(mode ArbitraryFloatRoundingMode, x, y,
 	if m == nil || x == nil || y == nil || out == nil {
 		return ErrNumericOwner
 	}
-	// The source's set_rounding_mode rejects nearest-away on this platform.
-	if mode != ArbitraryFloatNearestEven && mode != ArbitraryFloatTowardPositive && mode != ArbitraryFloatTowardNegative && mode != ArbitraryFloatTowardZero {
-		return ErrHardwareFloatRoundingMode
+	mode, e := hwfSourceRoundingMode(mode)
+	if e != nil {
+		return e
 	}
 	a, b := x.value, y.value
 	if math.IsNaN(a) || math.IsNaN(b) || math.IsInf(a, 0) || math.IsInf(b, 0) || op == '/' && b == 0 {
