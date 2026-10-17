@@ -459,3 +459,12 @@ func (o NumericBinaryRationalOperations) MulInteger(a *BinaryRational, b *Int, o
 	}
 	return o.manager.mulIntegerWithAllocationContext(a, b, out, o.context)
 }
+
+// FloorWithCopyAllocationReceipt preserves the numerator-copy receipt and carries
+// caller allocation ownership through the later negative-value correction.
+func (o NumericBinaryRationalOperations) FloorWithCopyAllocationReceipt(a *BinaryRational, out *Int, receipt *IntegerCopyAllocationReceipt) error {
+	if e := o.valid(); e != nil {
+		return e
+	}
+	return o.manager.roundWithAllocationContext(a, o.manager.Z, out, false, receipt, o.context)
+}

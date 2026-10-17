@@ -116,3 +116,50 @@ func TestAlgebraicPredicateScaledBoundsRejectCallbackReentry(t *testing.T) {
 	serviceMust(t, c.CleanupRetained())
 	serviceMust(t, c.Del(&root))
 }
+
+// Construct -(2^256+1)/2 without warming arithmetic scratch through parsing.
+// The source correction changes the truncated -2^255 into -2^255-1.
+func TestAlgebraicPredicateNegativeFloorAllocationPrefixes(t *testing.T) {
+	success, refused, correction := false, false, false
+	for ordinal := int64(0); ordinal < 128 && !success; ordinal++ {
+		t.Run(strconv.FormatInt(ordinal, 10), func(t *testing.T) {
+			c, _ := algebraicCellSourceFixtureProfile(t, true)
+			z, b := c.config.Rationals.Integers(), c.config.Binary
+			n := unumeral.NewInt(0)
+			digits := make([]uint32, 9)
+			digits[0], digits[8] = 1, 1
+			serviceMust(t, z.SetLimbs(&n, digits))
+			serviceMust(t, z.Neg(&n))
+			var input unumeral.BinaryRational
+			serviceMust(t, b.SetIntegerPower(&input, &n, 1))
+			serviceMust(t, z.Del(&n))
+			serviceMust(t, c.beginPredicate())
+			z.Budget().FailAfter(ordinal)
+			body := c.floorPredicateCandidate(&input)
+			z.Budget().FailAfter(-1)
+			if body != nil {
+				refused = true
+				if !numericPhysicalReservationRefusal(body) {
+					t.Fatal(body)
+				}
+				text, e := z.String(&c.predicate.candidate)
+				if e == nil && text == "-57896044618658097711785492504343953926634992332820282019728792003956564819968" {
+					correction = true
+				}
+			} else {
+				success = true
+				text, e := z.String(&c.predicate.candidate)
+				serviceMust(t, e)
+				if text != "-57896044618658097711785492504343953926634992332820282019728792003956564819969" {
+					t.Fatal("negative floor", text)
+				}
+			}
+			_ = c.finishPredicate(body)
+			serviceMust(t, c.CleanupRetained())
+			serviceMust(t, b.Del(&input))
+		})
+	}
+	if !success || !refused || (!polynomialSourceDebug && !correction) {
+		t.Fatal("missing floor success/copy or correction refusal", success, refused, correction)
+	}
+}

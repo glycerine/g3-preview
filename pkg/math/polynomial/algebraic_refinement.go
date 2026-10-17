@@ -488,6 +488,10 @@ func (m *AlgebraicRootCore) scalePredicateBounds(r *algebraicRecord) error {
 }
 func (m *AlgebraicRootCore) floorPredicateCandidate(upper *unumeral.BinaryRational) error {
 	p := &m.predicate
+	if e := p.beginArithmetic(m); e != nil {
+		return e
+	}
+	defer func() { p.arithmeticExecuting = false }()
 	p.candidateActive = true
-	return m.config.Binary.FloorWithCopyAllocationReceipt(upper, &p.candidate, &p.candidateCopy)
+	return m.config.Binary.WithAllocationContext(p.numericContext()).FloorWithCopyAllocationReceipt(upper, &p.candidate, &p.candidateCopy)
 }

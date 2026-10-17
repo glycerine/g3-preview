@@ -77,6 +77,9 @@ func (m *BinaryRationalManager) round(a *BinaryRational, z *IntegerManager, out 
 	return m.roundWithCopyAllocationReceipt(a, z, out, ceil, nil)
 }
 func (m *BinaryRationalManager) roundWithCopyAllocationReceipt(a *BinaryRational, z *IntegerManager, out *Int, ceil bool, receipt *IntegerCopyAllocationReceipt) (err error) {
+	return m.roundWithAllocationContext(a, z, out, ceil, receipt, integerAllocationInvocationContext{})
+}
+func (m *BinaryRationalManager) roundWithAllocationContext(a *BinaryRational, z *IntegerManager, out *Int, ceil bool, receipt *IntegerCopyAllocationReceipt, context integerAllocationInvocationContext) (err error) {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -112,10 +115,10 @@ func (m *BinaryRationalManager) roundWithCopyAllocationReceipt(a *BinaryRational
 	}
 	one := NewInt(1)
 	if ceil && pos {
-		return z.Add(out, &one, out)
+		return z.addSubWithAllocationContext(out, &one, out, false, context)
 	}
 	if !ceil && neg {
-		return z.Sub(out, &one, out)
+		return z.addSubWithAllocationContext(out, &one, out, true, context)
 	}
 	return nil
 }
