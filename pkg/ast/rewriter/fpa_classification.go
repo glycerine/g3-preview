@@ -82,6 +82,24 @@ func (r *FPARewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out ast.
 		}
 		return RewriteDone, r.manager.SetRef(out, answer)
 	}
+	if kind == ast.FPAOpToIEEEBV {
+		if args.Count() != 1 {
+			return RewriteFailed, ast.ErrASTDomain
+		}
+		value, err := args.At(0)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		answer, found, rewriteOne, err := r.manager.RewriteFPAToIEEEBVNumeral(value, r.hiFPUnspecified)
+		if err != nil || !found {
+			return RewriteFailed, err
+		}
+		status := RewriteDone
+		if rewriteOne {
+			status = Rewrite1
+		}
+		return status, r.manager.SetRef(out, answer)
+	}
 	if kind == ast.FPAOpNeg || kind == ast.FPAOpAbs {
 		if args.Count() != 1 {
 			return RewriteFailed, ast.ErrASTDomain

@@ -17416,7 +17416,8 @@
         "pkg/ast/ast_fpa_rm_unary_decl.go",
         "pkg/ast/ast_fpa_fma_decl.go",
         "pkg/ast/ast_fpa_rm_binary_decl.go",
-        "pkg/ast/ast_fpa_to_real_decl.go"
+        "pkg/ast/ast_fpa_to_real_decl.go",
+        "pkg/ast/ast_fpa_to_ieee_bv_decl.go"
       ],
       "tests": [
         "TestASTFloatingPointClassificationDeclarationsAndApplications",
@@ -17448,7 +17449,8 @@
         "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup",
         "TestASTFPAFMADeclarationNumericAndScopedBranches",
         "TestASTFPARMBinaryDeclarationsAndNumericCleanup",
-        "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches"
+        "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches",
+        "TestASTFPAToIEEEBVDeclarationFiniteAndNaNBranches"
       ],
       "assertions": [
         {
@@ -17657,6 +17659,14 @@
           "go_target": "pkg/ast/ast_fpa_to_real_decl.go",
           "tests": [
             "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches"
+          ]
+        },
+        {
+          "name": "Concrete fp.to_ieee_bv unary declaration validates FloatingPoint domain and returns a BitVec sort of ebits+sbits (fpa_decl_plugin.cpp:661-674)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_ieee_bv_decl.go",
+          "tests": [
+            "TestASTFPAToIEEEBVDeclarationFiniteAndNaNBranches"
           ]
         }
       ],
@@ -26786,7 +26796,8 @@
         "pkg/ast/ast_fpa_rm_binary.go",
         "pkg/ast/rewriter/fpa_rm_binary.go",
         "pkg/ast/rewriter/fpa_constants_test.go",
-        "pkg/ast/ast_fpa_to_real.go"],
+        "pkg/ast/ast_fpa_to_real.go",
+        "pkg/ast/ast_fpa_to_ieee_bv.go"],
       "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestASTFPAUnaryScopedNumeralRetiresBeforeReturn", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
         "TestASTFPARemainderFiniteNumeralAndScopedCleanup",
         "TestFPARemainderNumericSpecialAndSymbolicRefusal",
@@ -26800,7 +26811,9 @@
         "TestFPARMBinaryNumericAndSubtractionRewrite",
         "TestFPAConstantRewriteReturnsApplication",
         "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches",
-        "TestFPAToRealDispatchDefaultAndHardwareUnspecified"],
+        "TestFPAToRealDispatchDefaultAndHardwareUnspecified",
+        "TestASTFPAToIEEEBVDeclarationFiniteAndNaNBranches",
+        "TestFPAToIEEEBVDefaultAndHardwareNaNDispatch"],
       "assertions": [
         {
           "line": 43,
@@ -27113,6 +27126,15 @@
             "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches",
             "TestFPAToRealDispatchDefaultAndHardwareUnspecified"
           ]
+        },
+        {
+          "name": "mk_to_ieee_bv finite MPF bit encoding, default NaN refusal and hi_fp_unspecified four-part concat with BR_REWRITE1 (fpa_rewriter.cpp:764-792)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_ieee_bv.go",
+          "tests": [
+            "TestASTFPAToIEEEBVDeclarationFiniteAndNaNBranches",
+            "TestFPAToIEEEBVDefaultAndHardwareNaNDispatch"
+          ]
         }
       ],
       "ownership": ["Each classification call creates one caller-local scoped_mpf through the AST plugin's concrete numeral probe; successful source destruction retires it before the Boolean result is published. A stopped source destructor remains in the AST plugin's owning cleanup list.", "SMT and IEEE equality construct both scoped_mpf locals before operand probing and retire them in reverse order, preserving the short circuit when the first operand is symbolic."],
@@ -27136,7 +27158,8 @@
         "TestFPAFMANumericSpecialAndSymbolicDispatch",
         "TestFPARMBinaryNumericAndSubtractionRewrite",
         "TestFPAConstantRewriteReturnsApplication",
-        "TestFPAToRealDispatchDefaultAndHardwareUnspecified"],
+        "TestFPAToRealDispatchDefaultAndHardwareUnspecified",
+        "TestFPAToIEEEBVDefaultAndHardwareNaNDispatch"],
       "conditionals": [
         {
           "line": 19,
@@ -27204,6 +27227,14 @@
           "go_target": "pkg/ast/rewriter/fpa_classification.go",
           "tests": [
             "TestFPAToRealDispatchDefaultAndHardwareUnspecified"
+          ]
+        },
+        {
+          "name": "Concrete mk_to_ieee_bv dispatch under hi_fp_unspecified control (fpa_rewriter.h:29-45; fpa_rewriter.cpp:94,764-792)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_classification.go",
+          "tests": [
+            "TestFPAToIEEEBVDefaultAndHardwareNaNDispatch"
           ]
         }],
       "ownership": [],
@@ -178575,7 +178606,8 @@
         "pkg/ast/ast_fpa_rm_unary.go",
         "pkg/ast/ast_fpa_fma.go",
         "pkg/ast/ast_fpa_rm_binary.go",
-        "pkg/ast/ast_fpa_to_real.go"
+        "pkg/ast/ast_fpa_to_real.go",
+        "pkg/ast/ast_fpa_to_ieee_bv.go"
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
@@ -178675,7 +178707,8 @@
         "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup",
         "TestASTFPAFMADeclarationNumericAndScopedBranches",
         "TestASTFPARMBinaryDeclarationsAndNumericCleanup",
-        "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches"
+        "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches",
+        "TestASTFPAToIEEEBVDeclarationFiniteAndNaNBranches"
       ],
       "conditionals": [
         {
@@ -179042,6 +179075,14 @@
           "go_target": "pkg/ast/ast_fpa_to_real.go",
           "tests": [
             "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches"
+          ]
+        },
+        {
+          "name": "Concrete mk_to_ieee_bv scoped_mpf and non-NaN scoped_mpz caller lifetimes with reverse cleanup (fpa_rewriter.cpp:764-792; scoped_numeral.h:24-55)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_ieee_bv.go",
+          "tests": [
+            "TestASTFPAToIEEEBVDeclarationFiniteAndNaNBranches"
           ]
         }
       ],

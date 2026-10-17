@@ -50,6 +50,7 @@ const (
 	astFPAIsNegative       int32 = 33
 	astFPAIsPositive       int32 = 34
 	astFPAToReal           int32 = 40
+	astFPAToIEEEBV         int32 = 41
 )
 
 func (p *astFloatingPointPluginOwner) numeralAssertionsEnabled() (bool, error) {
