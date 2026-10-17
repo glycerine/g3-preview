@@ -55,7 +55,7 @@ func (v *algebraicBasicRationals) Rational(x uint32) (*unumeral.Rational, error)
 		v.borrowed[x] = r
 	}
 	if l == nil {
-		r.value = unumeral.NewRational()
+		r.value = v.owner.zero
 	} else {
 		*r, e = v.owner.load(l)
 		if e != nil {

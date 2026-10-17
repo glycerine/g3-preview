@@ -18,8 +18,8 @@ type algebraicResultantPolynomialScope struct {
 	sourceStop        error
 }
 
-// The borrowed prerequisite core materializes this source member on first
-// use. The complete algebraic constructor will construct it in member order.
+// Standalone borrowed cores materialize this member on first use. The owning
+// AlgebraicManager already constructed it and its variables in source order.
 func (m *AlgebraicRootCore) ensureMultivariate() error {
 	if m.multivariate == nil {
 		var e error

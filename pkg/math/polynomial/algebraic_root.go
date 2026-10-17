@@ -1,7 +1,7 @@
 // Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577,2933-2935.
-// Selected algebraic-number bodies over borrowed numeric services. The real
-// multivariate member is materialized when needed; the complete source imp
-// constructor and its ownership composition remain a separate porting step.
+// The standalone numerical core borrows services and materializes workspaces
+// on demand. AlgebraicManager supplies eager source-ordered ownership around
+// these same numerical operations.
 package polynomial
 
 import (
@@ -49,6 +49,8 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	manager                                                    *AlgebraicManager
+	zero                                                       unumeral.Rational
 	rootConstruction                                           algebraicRootConstructionScope
 	isolationSigns                                             algebraicIsolationSignsScope
 	signEvaluationCaller                                       *algebraicIsolationSignsScope
@@ -148,15 +150,18 @@ func NewAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error) {
 	if _, e := c.Allocator.NumFreeObjects(); e != nil {
 		return nil, e
 	}
+	return allocateAlgebraicRootCore(c)
+}
+func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error) {
 	n := uint64(reflect.TypeOf(AlgebraicRootCore{}).Size())
-	if e := z.Budget().Reserve(n); e != nil {
+	if e := c.Rationals.Integers().Budget().Reserve(n); e != nil {
 		return nil, e
 	}
 	var id uint64
 	for {
 		old := algebraicOrigins.Load()
 		if old == math.MaxUint64 {
-			z.Budget().Release(n)
+			c.Rationals.Integers().Budget().Release(n)
 			return nil, arena.ErrSlotLimit
 		}
 		if algebraicOrigins.CompareAndSwap(old, old+1) {
@@ -164,7 +169,7 @@ func NewAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error) {
 			break
 		}
 	}
-	m := &AlgebraicRootCore{config: c, origin: id, header: n, minMagnitude: -16, factor: true, factorParams: UPolynomialFactorParams{MaxPrime: 31, PrimeTrials: 1, MaxSearchSize: 5000}}
+	m := &AlgebraicRootCore{config: c, origin: id, header: n, zero: unumeral.NewRational(), minMagnitude: -16, factor: true, factorParams: UPolynomialFactorParams{MaxPrime: 31, PrimeTrials: 1, MaxSearchSize: 5000}}
 	m.self = m
 	return m, nil
 }
@@ -190,7 +195,7 @@ func (m *AlgebraicRootCore) check() error {
 	if m == nil || m.self != m {
 		return ErrAlgebraicOwner
 	}
-	if m.closed || m.closing {
+	if m.closed || m.closing || m.manager != nil && !m.manager.completed {
 		return arena.ErrClosed
 	}
 	return m.config.Rationals.CheckOwnerReady()
@@ -880,6 +885,12 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	return m.store(dl, &out)
 }
 func (m *AlgebraicRootCore) CleanupRetained() error {
+	if m != nil && m.self == m && m.manager != nil && (m.manager.constructing || m.manager.finishing) {
+		return ErrAlgebraicPending
+	}
+	return m.cleanupRetainedCore()
+}
+func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	if m != nil && m.self == m && (m.rootConstruction.running || m.rootConstruction.finishing) {
 		return ErrAlgebraicPending
 	}
@@ -1027,6 +1038,12 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.cleanupMultivariateIsolation()
 }
 func (m *AlgebraicRootCore) Close() error {
+	if m != nil && m.self == m && m.manager != nil {
+		return m.manager.Close()
+	}
+	return m.closeCoreMembers()
+}
+func (m *AlgebraicRootCore) closeCoreMembers() error {
 	if m != nil && m.self == m && (m.rootConstruction.running || m.rootConstruction.finishing) {
 		return ErrAlgebraicPending
 	}
@@ -1113,7 +1130,7 @@ func (m *AlgebraicRootCore) Close() error {
 		return ErrAlgebraicLive
 	}
 	if m.rootConstruction.active {
-		if e := m.CleanupRetained(); e != nil {
+		if e := m.cleanupRetainedCore(); e != nil {
 			return e
 		}
 	}
@@ -1131,13 +1148,8 @@ func (m *AlgebraicRootCore) Close() error {
 		}
 		m.rootSelection = nil
 	}
-	if e := m.CleanupRetained(); e != nil {
+	if e := m.cleanupRetainedCore(); e != nil {
 		return e
-	}
-	if m.evalSignTmp.slot != 0 {
-		if e := m.config.Polynomials.DelPolynomial(&m.evalSignTmp); e != nil {
-			return e
-		}
 	}
 	// m_add_tmp is younger than the isolation vector members.
 	if m.addTmp.slot != 0 {
@@ -1160,6 +1172,11 @@ func (m *AlgebraicRootCore) Close() error {
 		}
 		m.factors = nil
 	}
+	if m.evalSignTmp.slot != 0 {
+		if e := m.config.Polynomials.DelPolynomial(&m.evalSignTmp); e != nil {
+			return e
+		}
+	}
 	for _, p := range []*UPolynomial{&m.tmp3, &m.tmp2, &m.isolateTmp1} {
 		if p.slot != 0 {
 			if e := m.config.Polynomials.DelPolynomial(p); e != nil {
@@ -1167,8 +1184,13 @@ func (m *AlgebraicRootCore) Close() error {
 			}
 		}
 	}
-	if e := m.config.Rationals.Integers().Del(&m.isRationalTmp); e != nil {
-		return e
+	if m.manager == nil || m.manager.rationalTemporaryConstructed {
+		if e := m.config.Rationals.Integers().Del(&m.isRationalTmp); e != nil {
+			return e
+		}
+	}
+	if m.manager != nil {
+		return nil
 	}
 	if m.multivariate != nil {
 		if e := m.multivariate.CloseChecked(); e != nil {
@@ -1176,6 +1198,9 @@ func (m *AlgebraicRootCore) Close() error {
 		}
 		m.multivariate = nil
 	}
+	return m.releaseCoreStorage()
+}
+func (m *AlgebraicRootCore) releaseCoreStorage() error {
 	b := m.config.Rationals.Budget()
 	m.negationHistory = nil
 	m.evalSignVariables.values = nil

@@ -38310,7 +38310,9 @@
         "pkg/math/polynomial/algebraic_root_construction_test.go",
         "pkg/math/polynomial/algebraic_root_construction_cancel_test.go",
         "pkg/math/polynomial/algebraic_root_construction_assert_test.go",
-        "pkg/math/polynomial/algebraic_root_construction_owner_test.go"
+        "pkg/math/polynomial/algebraic_root_construction_owner_test.go",
+        "pkg/math/polynomial/algebraic_manager.go",
+        "pkg/math/polynomial/algebraic_params.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",
@@ -38440,7 +38442,12 @@
         "TestAlgebraicSexprRootIndexAssertionBeforeSyntaxAndErasedGate",
         "TestAlgebraicPolynomialRootSourceAssertionsBeforeWorkspace",
         "TestAlgebraicRootConstructionPreservesOlderFactorInvocation",
-        "TestAlgebraicSexprRootExecutingOwnerAndConverterRefusals"
+        "TestAlgebraicSexprRootExecutingOwnerAndConverterRefusals",
+        "TestAlgebraicManagerEagerMembersBorrowedServicesAndArithmetic",
+        "TestAlgebraicManagerConstructorParametersAndPublicUpdateNoop",
+        "TestAlgebraicManagerGlobalParameterFallbackAndLocalPrecedence",
+        "TestAlgebraicManagerEveryConstructorReservationAndCleanup",
+        "TestAlgebraicManagerStoppedYoungestMemberProtectsOlderOwners"
       ],
       "conditionals": [
         {
@@ -39012,7 +39019,8 @@
       "ownership": [
         "RootCore is an explicit prerequisite borrowing actual same-cohort rational/polynomial/factor/binary/interval/runtime allocator services; it does not implement source imp constructor cpp65\u2013126 or fabricate multivariate x/y.",
         "Actual scalar cell fields are encoded in real SmallAllocator payloads; pointer-free locator metadata contains no duplicate owning numerals. Coefficients use actual owning typed UPolynomial backing with declared storage extent/initialization adaptation. Caller/vector values, pending construction, lexical rational/predicate intervals, private factor/isolation vectors and comparison sequence remain distinct named roots.",
-        "Source Del guards endangered partial construction reads; explicit owning abort drains genuine fields and retains physical cleanup progress. Owning close rejects caller roots instead of sweeping the locator registry."
+        "Source Del guards endangered partial construction reads; explicit owning abort drains genuine fields and retains physical cleanup progress. Owning close rejects caller roots instead of sweeping the locator registry.",
+        "Owning AlgebraicManager now composes the actual core header, binary-rational and interval managers, private multivariate manager, independent univariate manager, eager isolation descriptors/factors/vectors and add temporary in source member order (algebraic_numbers.cpp:64-126,2772-2786). It reserves the two private variables after parameter loading/statistics reset. Constructor parameters use one actual algebraic module helper with local precedence and signed32 magnitude conversion; public updt_params remains the empty source method (:2788-2789). qm/bqm return actual owner identities; statistics preserve source order. Reverse private destruction stops before older owners when the youngest destructor fails. Every constructor reservation frontier verifies retained-owner cleanup and retry; tests distinguish the borrowed Runtime directory cache from manager storage. Own and borrowed allocators/services, eager descriptors, arithmetic, parameter precedence and stopped destruction pass ordinary and checked/debug/trace profiles on CPUs 8-16. Standalone borrowed cores retain lazy compatibility. Full allocation/callback/destructor/TRACE composition and polynomial/AST completion remain pending; no whole-unit completion credit."
       ],
       "deviations": [
         "Retained algebraic polynomial-evaluation coefficient overload prerequisites (cpp:2861-2865,2911-2915; polynomial.cpp:6436-6522 instantiated by algebraic_numbers.cpp:2387-2388,2406): SetInteger constructs its actual scoped rational before the ordinary algebraic setter; AddInteger constructs a real scoped algebraic coefficient, sets it and invokes Add. The wrapper temporaries are held in distinct owning scopes, with synchronous owner-close/cleanup refusal while running. Actual accepted beginQ and mixed-addition entries bind their wrapper parent so a younger scoped cleanup stop does not run the older wrapper destructor; explicit owning cleanup uses actual scalar-cell ownership. Tests cover zero/signed small and BIG coefficients, root-plus-integer inverse identities, an independent aliased sqrt(2)-2 bound, basic normalization to null zero, destination aliasing and workspace reuse. Ordinary and checked/debug/trace algebraic checks pass on CPUs 8-16. Full allocation-failure/callback/destructor composition and the concrete recursive algebraic polynomial evaluator remain partial; these overloads do not establish multivariate isolation or whole-unit completion.",
@@ -39132,7 +39140,9 @@
         "pkg/math/polynomial/algebraic_root_construction_test.go",
         "pkg/math/polynomial/algebraic_root_construction_cancel_test.go",
         "pkg/math/polynomial/algebraic_root_construction_assert_test.go",
-        "pkg/math/polynomial/algebraic_root_construction_owner_test.go"
+        "pkg/math/polynomial/algebraic_root_construction_owner_test.go",
+        "pkg/math/polynomial/algebraic_manager.go",
+        "pkg/math/polynomial/algebraic_params.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",
@@ -39260,7 +39270,12 @@
         "TestAlgebraicSexprRootIndexAssertionBeforeSyntaxAndErasedGate",
         "TestAlgebraicPolynomialRootSourceAssertionsBeforeWorkspace",
         "TestAlgebraicRootConstructionPreservesOlderFactorInvocation",
-        "TestAlgebraicSexprRootExecutingOwnerAndConverterRefusals"
+        "TestAlgebraicSexprRootExecutingOwnerAndConverterRefusals",
+        "TestAlgebraicManagerEagerMembersBorrowedServicesAndArithmetic",
+        "TestAlgebraicManagerConstructorParametersAndPublicUpdateNoop",
+        "TestAlgebraicManagerGlobalParameterFallbackAndLocalPrecedence",
+        "TestAlgebraicManagerEveryConstructorReservationAndCleanup",
+        "TestAlgebraicManagerStoppedYoungestMemberProtectsOlderOwners"
       ],
       "conditionals": [
         {
@@ -39436,7 +39451,8 @@
       "ownership": [
         "RootCore is an explicit prerequisite borrowing actual same-cohort rational/polynomial/factor/binary/interval/runtime allocator services; it does not implement source imp constructor cpp65\u2013126 or fabricate multivariate x/y.",
         "Actual scalar cell fields are encoded in real SmallAllocator payloads; pointer-free locator metadata contains no duplicate owning numerals. Coefficients use actual owning typed UPolynomial backing with declared storage extent/initialization adaptation. Caller/vector values, pending construction, lexical rational/predicate intervals, private factor/isolation vectors and comparison sequence remain distinct named roots.",
-        "Source Del guards endangered partial construction reads; explicit owning abort drains genuine fields and retains physical cleanup progress. Owning close rejects caller roots instead of sweeping the locator registry."
+        "Source Del guards endangered partial construction reads; explicit owning abort drains genuine fields and retains physical cleanup progress. Owning close rejects caller roots instead of sweeping the locator registry.",
+        "Owning AlgebraicManager now composes the actual core header, binary-rational and interval managers, private multivariate manager, independent univariate manager, eager isolation descriptors/factors/vectors and add temporary in source member order (algebraic_numbers.cpp:64-126,2772-2786). It reserves the two private variables after parameter loading/statistics reset. Constructor parameters use one actual algebraic module helper with local precedence and signed32 magnitude conversion; public updt_params remains the empty source method (:2788-2789). qm/bqm return actual owner identities; statistics preserve source order. Reverse private destruction stops before older owners when the youngest destructor fails. Every constructor reservation frontier verifies retained-owner cleanup and retry; tests distinguish the borrowed Runtime directory cache from manager storage. Own and borrowed allocators/services, eager descriptors, arithmetic, parameter precedence and stopped destruction pass ordinary and checked/debug/trace profiles on CPUs 8-16. Standalone borrowed cores retain lazy compatibility. Full allocation/callback/destructor/TRACE composition and polynomial/AST completion remain pending; no whole-unit completion credit."
       ],
       "deviations": [
         "Retained algebraic polynomial-evaluation coefficient overload prerequisites (cpp:2861-2865,2911-2915; polynomial.cpp:6436-6522 instantiated by algebraic_numbers.cpp:2387-2388,2406): SetInteger constructs its actual scoped rational before the ordinary algebraic setter; AddInteger constructs a real scoped algebraic coefficient, sets it and invokes Add. The wrapper temporaries are held in distinct owning scopes, with synchronous owner-close/cleanup refusal while running. Actual accepted beginQ and mixed-addition entries bind their wrapper parent so a younger scoped cleanup stop does not run the older wrapper destructor; explicit owning cleanup uses actual scalar-cell ownership. Tests cover zero/signed small and BIG coefficients, root-plus-integer inverse identities, an independent aliased sqrt(2)-2 bound, basic normalization to null zero, destination aliasing and workspace reuse. Ordinary and checked/debug/trace algebraic checks pass on CPUs 8-16. Full allocation-failure/callback/destructor composition and the concrete recursive algebraic polynomial evaluator remain partial; these overloads do not establish multivariate isolation or whole-unit completion.",
@@ -39479,14 +39495,21 @@
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
         "pkg/math/polynomial/gparams_catalog_collectors.go",
-        "pkg/util/params/util_gparams_catalog_dispatch.go"
+        "pkg/util/params/util_gparams_catalog_dispatch.go",
+        "pkg/math/polynomial/algebraic_manager.go",
+        "pkg/math/polynomial/algebraic_params.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
         "TestGlobalParamsCatalogConcreteHookGuardsAndIndependentReuse",
         "TestGlobalParamsCatalogConstructorFailureAndDomains",
         "TestGlobalParamsCatalogDescriptionBorrowReadAndClosedPublicationPrefix",
-        "TestGlobalParamsCatalogDispatcherFaultRoots"
+        "TestGlobalParamsCatalogDispatcherFaultRoots",
+        "TestAlgebraicManagerEagerMembersBorrowedServicesAndArithmetic",
+        "TestAlgebraicManagerConstructorParametersAndPublicUpdateNoop",
+        "TestAlgebraicManagerGlobalParameterFallbackAndLocalPrecedence",
+        "TestAlgebraicManagerEveryConstructorReservationAndCleanup",
+        "TestAlgebraicManagerStoppedYoungestMemberProtectsOlderOwners"
       ],
       "conditionals": [
         {
@@ -39518,7 +39541,8 @@
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open."
+        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; generated value accessors, alternative catalogs and process/runtime binding remain open.",
+        "Owning AlgebraicManager now composes the actual core header, binary-rational and interval managers, private multivariate manager, independent univariate manager, eager isolation descriptors/factors/vectors and add temporary in source member order (algebraic_numbers.cpp:64-126,2772-2786). It reserves the two private variables after parameter loading/statistics reset. Constructor parameters use one actual algebraic module helper with local precedence and signed32 magnitude conversion; public updt_params remains the empty source method (:2788-2789). qm/bqm return actual owner identities; statistics preserve source order. Reverse private destruction stops before older owners when the youngest destructor fails. Every constructor reservation frontier verifies retained-owner cleanup and retry; tests distinguish the borrowed Runtime directory cache from manager storage. Own and borrowed allocators/services, eager descriptors, arithmetic, parameter precedence and stopped destruction pass ordinary and checked/debug/trace profiles on CPUs 8-16. Standalone borrowed cores retain lazy compatibility. Full allocation/callback/destructor/TRACE composition and polynomial/AST completion remain pending; no whole-unit completion credit."
       ],
       "deviations": []
     },

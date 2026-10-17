@@ -81,7 +81,7 @@ func (m *AlgebraicRootCore) selectionValue(a *Algebraic) (r algebraicRecord, bas
 		return r, false, e
 	}
 	if l == nil {
-		r.value = unumeral.NewRational()
+		r.value = m.zero
 		return r, true, nil
 	}
 	r, e = m.load(l)
