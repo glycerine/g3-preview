@@ -9,7 +9,7 @@ import (
 
 func (m *AlgebraicRootCore) checkpoint() error {
 	if !m.config.Checkpoint() {
-		return ErrUPolynomialCanceled
+		return newAlgebraicCancellation()
 	}
 	return m.config.Cooperation()
 }
