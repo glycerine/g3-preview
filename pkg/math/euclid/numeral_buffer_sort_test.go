@@ -2,6 +2,7 @@ package euclid
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -73,6 +74,79 @@ func TestEuclideanIntegerBufferSortCopyBudgetBoundary(t *testing.T) {
 	}
 	for i := range coeff {
 		euclidMust(t, z.Del(&coeff[i]))
+	}
+}
+
+func TestEuclideanIntegerBufferSortStoppedCopyPrefix(t *testing.T) {
+	// Each coefficient exceeds the small-object threshold, so each buffer copy
+	// reaches a distinct charged allocation: refusal before the first copy,
+	// refusal after one completed copy, then successful sorting.
+	var sawSecondCopyRefusal bool
+	for ordinal := int64(0); ordinal <= 2; ordinal++ {
+		t.Run(strconv.FormatInt(ordinal, 10), func(t *testing.T) {
+			m := euclidNumeralManager(t)
+			z := m.Integers()
+			buffer, e := numeral.NewScopedIntVector(z)
+			euclidMust(t, e)
+			euclidMust(t, buffer.Resize(3))
+			coeff := []numeral.Int{{}, {}}
+			values := []string{strings.Repeat("1234567890", 120), strings.Repeat("9876543210", 120)}
+			for i := range coeff {
+				euclidMust(t, z.SetString(&coeff[i], values[i]))
+			}
+			ids := []uint32{2, 0}
+			z.Budget().FailAfter(ordinal)
+			e = sortInt(coeff, ids, buffer)
+			z.Budget().FailAfter(-1)
+			if (ordinal < 2) != (e != nil) {
+				t.Fatal("copy allocation boundary", ordinal, e)
+			}
+			if e != nil {
+				var failure umemory.Failure
+				if !errors.As(e, &failure) || failure.Kind != umemory.FailureMemout || !equalUint32Slices(ids, []uint32{2, 0}) {
+					t.Fatal("stopped before ID sort on numeral copy refusal", e, ids)
+				}
+				first, err := buffer.BorrowSlot(2)
+				euclidMust(t, err)
+				second, err := buffer.BorrowSlot(0)
+				euclidMust(t, err)
+				if ordinal == 0 && (!z.IsFailureRef(first.Cell) || second.Cell != 0) {
+					t.Fatal("first copy refusal reached later buffer slot", first, second)
+				}
+				if !z.IsFailureRef(first.Cell) {
+					got, err := z.String(first)
+					euclidMust(t, err)
+					if got != values[0] {
+						t.Fatal("first copied numeral lost", got)
+					}
+					if !z.IsFailureRef(second.Cell) || ordinal != 1 {
+						t.Fatal("second copy refusal prefix", second, ordinal)
+					}
+					sawSecondCopyRefusal = true
+				}
+				euclidMust(t, buffer.Cleanup())
+			} else {
+				if !equalUint32Slices(ids, []uint32{0, 2}) {
+					t.Fatal("completed IDs", ids)
+				}
+				euclidMust(t, buffer.Close())
+			}
+			for i := range coeff {
+				want := values[i]
+				if e == nil {
+					want = values[1-i]
+				}
+				got, err := z.String(&coeff[i])
+				euclidMust(t, err)
+				if got != want {
+					t.Fatal("borrowed coefficient after copy-sort", ordinal, i, got, want)
+				}
+				euclidMust(t, z.Del(&coeff[i]))
+			}
+		})
+	}
+	if !sawSecondCopyRefusal {
+		t.Fatal("allocation campaign never reached second-copy refusal")
 	}
 }
 

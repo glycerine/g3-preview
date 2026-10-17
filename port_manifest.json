@@ -36221,6 +36221,7 @@
         "TestEuclideanRationalBufferCoreAndRawSwap",
         "TestEuclideanBufferSortCoreUsesPublishedSlots",
         "TestEuclideanIntegerBufferSortCopyBudgetBoundary",
+        "TestEuclideanIntegerBufferSortStoppedCopyPrefix",
         "TestEuclideanNormalizeQueryCopyRefusalRetainsOwnedBuffer",
         "TestEuclideanNormalizeQuerySubstitutionPublishesConstantBeforeRationalRefusal",
         "TestEuclideanNormalizeQueryTraceBeforeAndAfterSubstitution",
@@ -36338,11 +36339,12 @@
         },
         {
           "name": "concrete mpz sort copy-then-sort path and stopped numeral copy ownership at cpp:147-155; rational sort template has no retained call",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/euclid/numeral_buffer_sort.go",
           "tests": [
             "TestEuclideanIntegerBufferSortAndRawSwap",
             "TestEuclideanIntegerBufferSortCopyBudgetBoundary",
+            "TestEuclideanIntegerBufferSortStoppedCopyPrefix",
             "TestEuclideanNormalizeQueryCopyRefusalRetainsOwnedBuffer"
           ]
         },
@@ -171786,6 +171788,7 @@
       ],
       "tests": [
         "TestEuclideanIntegerBufferSortAndRawSwap",
+        "TestEuclideanIntegerBufferSortStoppedCopyPrefix",
         "TestIntegerNumeralBufferSourceReserveIndexesAndOwnsSlots",
         "TestEuclideanRationalBufferCoreAndRawSwap",
         "TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue",
@@ -171829,6 +171832,7 @@
           ],
           "tests": [
             "TestEuclideanIntegerBufferSortAndRawSwap",
+            "TestEuclideanIntegerBufferSortStoppedCopyPrefix",
             "TestEuclideanRationalBufferCoreAndRawSwap",
             "TestEuclideanSetupVariableJustificationAndEquationOwnership"
           ]
