@@ -48,6 +48,7 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	bounds                                                 algebraicBoundScope
 	inversion                                              algebraicInverseScope
 	negation                                               algebraicNegScope
 	negationHistory                                        []algebraicNegHistory
@@ -131,6 +132,9 @@ func NewAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error) {
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m != nil && m.self == m && m.bounds.executing {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.inversion.executing {
 		return ErrAlgebraicPending
 	}
@@ -817,6 +821,9 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	return m.store(dl, &out)
 }
 func (m *AlgebraicRootCore) CleanupRetained() error {
+	if m != nil && m.self == m && m.bounds.executing {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.inversion.executing {
 		return ErrAlgebraicPending
 	}
@@ -827,6 +834,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 		return ErrAlgebraicOwner
 	}
 	if e := m.cleanupInverse(); e != nil {
+		return e
+	}
+	if e := m.cleanupBounds(); e != nil {
 		return e
 	}
 	if e := m.CleanupNegation(); e != nil {
@@ -850,6 +860,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.comparisonCleanup()
 }
 func (m *AlgebraicRootCore) Close() error {
+	if m != nil && m.self == m && m.bounds.executing {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.inversion.executing {
 		return ErrAlgebraicPending
 	}

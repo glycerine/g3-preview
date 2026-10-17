@@ -1,0 +1,224 @@
+// Source: src/math/polynomial/algebraic_numbers.cpp:1905-1924,2721-2730,
+// 2748-2769,2983-3040.
+package polynomial
+
+import (
+	"errors"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+)
+
+// GetPolynomial copies the defining polynomial, without minimizing a root's
+// polynomial. A rational n/d is represented by d*x-n; zero is represented by x.
+func (m *AlgebraicRootCore) GetPolynomial(a *Algebraic, out UPolynomial) error {
+	l, e := m.location(a)
+	if e != nil {
+		return e
+	}
+	p := m.config.Polynomials
+	d, e := p.descriptor(out)
+	if e != nil {
+		return e
+	}
+	m.bounds.executing = true
+	defer func() { m.bounds.executing = false }()
+	if l != nil && l.kind == 1 {
+		r, e := m.load(l)
+		if e != nil {
+			return e
+		}
+		v, e := m.sourcePolynomial(&r)
+		if e != nil {
+			return e
+		}
+		return p.setView(&d.state, v)
+	}
+	if e = p.reserve(&d.state, 2); e != nil {
+		return e
+	}
+	values := p.values(&d.state)
+	z := m.config.Rationals.Integers()
+	if l == nil {
+		if e = z.SetInt32(&values[0], 0); e != nil {
+			return e
+		}
+		if e = z.SetInt32(&values[1], 1); e != nil {
+			return e
+		}
+	} else {
+		r, e := m.load(l)
+		if e != nil {
+			return e
+		}
+		if e = z.Copy(&values[0], r.value.BorrowNumerator()); e != nil {
+			return e
+		}
+		if e = z.Copy(&values[1], r.value.BorrowDenominator()); e != nil {
+			return e
+		}
+		if e = z.Neg(&values[0]); e != nil {
+			return e
+		}
+	}
+	return p.setSize(&d.state, 2)
+}
+
+// These source overloads require an irrational root. The precision overloads
+// below additionally accept basic values, including zero.
+func (m *AlgebraicRootCore) GetLower(a *Algebraic, out *unumeral.BinaryRational) error {
+	return m.copyBinaryBound(a, out, false)
+}
+func (m *AlgebraicRootCore) GetUpper(a *Algebraic, out *unumeral.BinaryRational) error {
+	return m.copyBinaryBound(a, out, true)
+}
+func (m *AlgebraicRootCore) irrationalBoundRecord(a *Algebraic, upper bool) (algebraicRecord, error) {
+	if e := m.check(); e != nil {
+		return algebraicRecord{}, e
+	}
+	if polynomialSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return algebraicRecord{}, e
+		}
+		if enabled {
+			rational, e := m.IsRational(a)
+			if e != nil {
+				return algebraicRecord{}, e
+			}
+			if rational {
+				line := int32(2988)
+				if upper {
+					line = 3015
+				}
+				if e = diagnostic.DebugAssertionFailure(d, "src/math/polynomial/algebraic_numbers.cpp", line, "!is_rational(a)"); e != nil {
+					return algebraicRecord{}, e
+				}
+			}
+		}
+	}
+	l, e := m.location(a)
+	if e != nil {
+		return algebraicRecord{}, e
+	}
+	if l == nil || l.kind != 1 {
+		return algebraicRecord{}, ErrAlgebraicOwner
+	}
+	return m.load(l)
+}
+func (m *AlgebraicRootCore) copyBinaryBound(a *Algebraic, out *unumeral.BinaryRational, upper bool) error {
+	r, e := m.irrationalBoundRecord(a, upper)
+	if e != nil {
+		return e
+	}
+	bound := r.interval.BorrowLower()
+	if upper {
+		bound = r.interval.BorrowUpper()
+	}
+	m.bounds.executing = true
+	defer func() { m.bounds.executing = false }()
+	return m.config.Binary.Copy(out, bound)
+}
+
+type algebraicBoundScope struct {
+	values    [2]unumeral.BinaryRational
+	remaining uint8
+	executing bool
+}
+
+func (m *AlgebraicRootCore) cleanupBounds() error {
+	s := &m.bounds
+	if s.executing {
+		return ErrAlgebraicPending
+	}
+	s.executing = true
+	defer func() { s.executing = false }()
+	for s.remaining != 0 {
+		if e := m.config.Binary.Del(&s.values[s.remaining-1]); e != nil {
+			return e
+		}
+		s.remaining--
+	}
+	return nil
+}
+
+func (m *AlgebraicRootCore) GetLowerRational(a *Algebraic, out *unumeral.Rational) error {
+	return m.rationalBound(a, out, false, false, 0)
+}
+func (m *AlgebraicRootCore) GetUpperRational(a *Algebraic, out *unumeral.Rational) error {
+	return m.rationalBound(a, out, true, false, 0)
+}
+func (m *AlgebraicRootCore) GetLowerRationalAtPrecision(a *Algebraic, out *unumeral.Rational, precision uint32) error {
+	return m.rationalBound(a, out, false, true, precision)
+}
+func (m *AlgebraicRootCore) GetUpperRationalAtPrecision(a *Algebraic, out *unumeral.Rational, precision uint32) error {
+	return m.rationalBound(a, out, true, true, precision)
+}
+
+func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, upper, refine bool, precision uint32) (cause error) {
+	l, e := m.location(a)
+	if e != nil {
+		return e
+	}
+	s := &m.bounds
+	if s.remaining != 0 {
+		return ErrAlgebraicPending
+	}
+	r := algebraicRecord{value: unumeral.NewRational()}
+	if refine {
+		if l != nil {
+			r, e = m.load(l)
+		}
+	} else {
+		r, e = m.irrationalBoundRecord(a, upper)
+	}
+	if e != nil {
+		return e
+	}
+	s.executing = true
+	defer func() {
+		s.executing = false
+		cause = errors.Join(cause, m.cleanupBounds())
+	}()
+	if refine && (l == nil || l.kind == 0) {
+		return m.config.Rationals.Copy(out, &r.value)
+	}
+	b := m.config.Binary
+	s.values = [2]unumeral.BinaryRational{}
+	s.remaining = 1
+	if refine {
+		s.remaining = 2
+		if _, e = m.intervalAtPrecision(&r, &s.values[0], &s.values[1], precision); e != nil {
+			return e
+		}
+	} else {
+		bound := r.interval.BorrowLower()
+		if upper {
+			bound = r.interval.BorrowUpper()
+		}
+		if e = b.Copy(&s.values[0], bound); e != nil {
+			return e
+		}
+	}
+	selected := &s.values[0]
+	if upper && refine {
+		selected = &s.values[1]
+	}
+	return b.ToRational(m.config.Rationals, selected, out)
+}
+
+func (m *AlgebraicRootCore) intervalAtPrecision(r *algebraicRecord, lower, upper *unumeral.BinaryRational, precision uint32) (bool, error) {
+	b := m.config.Binary
+	if e := b.Copy(lower, r.interval.BorrowLower()); e != nil {
+		return false, e
+	}
+	if e := b.Copy(upper, r.interval.BorrowUpper()); e != nil {
+		return false, e
+	}
+	v, e := m.sourcePolynomial(r)
+	if e != nil {
+		return false, e
+	}
+	return m.config.Polynomials.RefineToPrecision(v, b, lower, upper, precision*4)
+}

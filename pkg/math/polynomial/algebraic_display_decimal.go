@@ -53,17 +53,7 @@ func (m *AlgebraicRootCore) DisplayDecimal(w io.Writer, a *Algebraic, precision 
 	lower, upper := unumeral.NewBinaryRational(), unumeral.NewBinaryRational()
 	defer func() { err = errors.Join(err, b.Del(&lower)) }()
 	defer func() { err = errors.Join(err, b.Del(&upper)) }()
-	if err = b.Copy(&lower, &(*r.interval.BorrowLower())); err != nil {
-		return err
-	}
-	if err = b.Copy(&upper, &(*r.interval.BorrowUpper())); err != nil {
-		return err
-	}
-	view, err := m.sourcePolynomial(&r)
-	if err != nil {
-		return err
-	}
-	interval, err := m.config.Polynomials.RefineToPrecision(view, b, &lower, &upper, precision*4)
+	interval, err := m.intervalAtPrecision(&r, &lower, &upper, precision)
 	if err != nil {
 		return err
 	}
