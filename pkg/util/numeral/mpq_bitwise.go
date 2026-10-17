@@ -2,6 +2,8 @@
 // output-denominator reset. Arithmetic remains the concrete integer algorithm.
 package numeral
 
+import "github.com/glycerine/g3/pkg/util/diagnostic"
+
 func (m *RationalManager) BitwiseOr(a, b, out *Rational) error {
 	return m.rationalBitwise(a, b, out, 0)
 }
@@ -15,14 +17,15 @@ func (m *RationalManager) rationalBitwise(a, b, out *Rational, op uint8) error {
 	return m.rationalBitwiseWithAllocationContext(a, b, out, op, integerAllocationInvocationContext{})
 }
 func (m *RationalManager) rationalBitwiseWithAllocationContext(a, b, out *Rational, op uint8, context integerAllocationInvocationContext) error {
-	if e := m.check(a); e != nil {
-		return e
+	line := int32(635)
+	switch op {
+	case 1:
+		line = 643
+	case 2:
+		line = 651
 	}
-	if e := m.check(b); e != nil {
+	if e := m.integerOperandsAt(a, b, line); e != nil {
 		return e
-	}
-	if modularSourceDebug && (!isIntegerRational(a) || !isIntegerRational(b)) {
-		return ErrRationalNotInteger
 	}
 	if e := m.check(out); e != nil {
 		return e
@@ -43,8 +46,17 @@ func (m *RationalManager) bitwiseNotWithAllocationContext(width uint32, a, out *
 	if e := m.check(out); e != nil {
 		return e
 	}
-	if modularSourceDebug && !isIntegerRational(a) {
-		return ErrRationalNotInteger
+	if modularSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return e
+		}
+		if enabled && !isIntegerRational(a) {
+			if e := diagnostic.DebugAssertionFailure(d, "src/util/mpq.h", 659, "is_int(a)"); e != nil {
+				return e
+			}
+		}
 	}
 	if e := m.Z.bitwiseNotWithAllocationContext(width, &a.Num, &out.Num, context); e != nil {
 		return e

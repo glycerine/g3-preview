@@ -2,7 +2,6 @@
 package numeral
 
 import (
-	"errors"
 	"math/big"
 	"strings"
 	"testing"
@@ -60,9 +59,12 @@ func TestRationalBitwiseForwardingIndependentAndAliases(t *testing.T) {
 	a, b, out := NewRational(), NewRational(), NewRational()
 	m.SetFraction(&a, 1, 2)
 	m.SetInt64(&b, 3)
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "T")
+	}
 	e := m.BitwiseOr(&a, &b, &out)
 	if modularSourceDebug {
-		if !errors.Is(e, ErrRationalNotInteger) || out != NewRational() {
+		if !isMPNVerificationThrow(e) || out != NewRational() {
 			t.Fatal(e)
 		}
 	} else {

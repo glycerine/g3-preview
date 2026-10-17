@@ -164721,7 +164721,8 @@
             "TestBitwisePublicationServiceValueRoutes",
             "TestBitwisePublicationServiceFailureRoots",
             "TestBitwisePublicationBigNotZeroWidthCopyOrder",
-            "TestBitwisePublicationSignedSmallBoundaryAliases"
+            "TestBitwisePublicationSignedSmallBoundaryAliases",
+            "TestRationalBitwiseSourceAssertionActions"
           ]
         },
         {

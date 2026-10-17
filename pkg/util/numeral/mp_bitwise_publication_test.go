@@ -163,6 +163,9 @@ func TestBitwisePublicationCallerPrefixes(t *testing.T) {
 	}
 }
 func TestBitwisePublicationRationalRawProfile(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, strings.Repeat("T", 8))
+	}
 	for _, sync := range []bool{false, true} {
 		for op := 0; op < 4; op++ {
 			m, _ := rationalManager(t, sync)
@@ -183,7 +186,7 @@ func TestBitwisePublicationRationalRawProfile(t *testing.T) {
 			}
 			qopsAuditLiveOwnership(t, m, []*Int{&a.Num, &a.Den, &b.Num, &b.Den, &out.Num, &out.Den})
 			if modularSourceDebug {
-				if !errors.Is(e, ErrRationalNotInteger) {
+				if !isMPNVerificationThrow(e) {
 					t.Fatal(e)
 				}
 			} else {
