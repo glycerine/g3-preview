@@ -6,6 +6,7 @@ import "errors"
 // The source functors declare pa_x, pa_x_y (or pa_x_div_y), pb_y, r_x.
 // Their actual owning references are embedded in the charged algebraic core.
 type algebraicResultantPolynomialScope struct {
+	polynomialCaller  *polynomialAlgebraicEvaluationScope
 	refs              [4]PolynomialRef
 	variables         [2]polynomialVariableInvocationReceipt
 	arithmetic        polynomialArithmeticInvocationReceipt
@@ -79,7 +80,7 @@ func (m *AlgebraicRootCore) binaryResultPolynomial(a, b *Algebraic, out UPolynom
 	if s.active {
 		return ErrAlgebraicPending
 	}
-	*s = algebraicResultantPolynomialScope{active: true, executing: true}
+	*s = algebraicResultantPolynomialScope{polynomialCaller: m.polynomialCaller, active: true, executing: true}
 	defer func() {
 		cause = errors.Join(cause, m.finishResultantPolynomial())
 		if cause == nil {

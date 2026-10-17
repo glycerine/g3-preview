@@ -8,15 +8,17 @@ import (
 )
 
 type algebraicIntegerSetScope struct {
-	value           unumeral.Rational
-	addition        *algebraicIntegerAddScope
-	active, running bool
-	sourceStop      error
+	polynomialCaller *polynomialAlgebraicEvaluationScope
+	value            unumeral.Rational
+	addition         *algebraicIntegerAddScope
+	active, running  bool
+	sourceStop       error
 }
 type algebraicIntegerAddScope struct {
-	value           Algebraic
-	active, running bool
-	sourceStop      error
+	polynomialCaller *polynomialAlgebraicEvaluationScope
+	value            Algebraic
+	active, running  bool
+	sourceStop       error
 }
 
 func (m *AlgebraicRootCore) cleanupIntegerSet() error {
@@ -67,7 +69,7 @@ func (m *AlgebraicRootCore) SetInteger(out *Algebraic, n *unumeral.Int) (cause e
 	if s.active {
 		return ErrAlgebraicPending
 	}
-	*s = algebraicIntegerSetScope{value: unumeral.NewRational(), active: true, running: true}
+	*s = algebraicIntegerSetScope{polynomialCaller: m.polynomialCaller, value: unumeral.NewRational(), active: true, running: true}
 	if m.integerAdd.running {
 		s.addition = &m.integerAdd
 	}
@@ -100,7 +102,7 @@ func (m *AlgebraicRootCore) AddInteger(a *Algebraic, n *unumeral.Int, out *Algeb
 	if s.active {
 		return ErrAlgebraicPending
 	}
-	*s = algebraicIntegerAddScope{active: true, running: true}
+	*s = algebraicIntegerAddScope{polynomialCaller: m.polynomialCaller, active: true, running: true}
 	defer func() {
 		s.running = false
 		var stopped error

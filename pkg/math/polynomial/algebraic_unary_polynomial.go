@@ -22,7 +22,7 @@ func (m *AlgebraicRootCore) unaryResultPolynomial(a *Algebraic, k uint32, out UP
 	if s.active {
 		return ErrAlgebraicPending
 	}
-	*s = algebraicResultantPolynomialScope{active: true, executing: true}
+	*s = algebraicResultantPolynomialScope{polynomialCaller: m.polynomialCaller, active: true, executing: true}
 	defer func() {
 		cause = errors.Join(cause, m.finishResultantPolynomial())
 		if cause == nil {

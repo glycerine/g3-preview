@@ -64,7 +64,7 @@ func (m *AlgebraicRootCore) MulRational(a *Algebraic, b *unumeral.Rational, out 
 			}
 		}
 	}
-	*s = algebraicRationalArithmeticScope{active: true, qCount: 1, executing: true}
+	*s = algebraicRationalArithmeticScope{polynomialCaller: m.polynomialCaller, active: true, qCount: 1, executing: true}
 	s.q[0] = unumeral.NewRational()
 	defer func() {
 		s.executing = false

@@ -16,6 +16,7 @@ type algebraicSavedInterval struct {
 	owned, constructed, restored bool
 }
 type algebraicBinaryScope struct {
+	polynomialCaller                     *polynomialAlgebraicEvaluationScope
 	p, f                                 UPolynomial
 	factors                              *UPolynomialFactors
 	factorReceipt                        upolyFactorFrontendInvocationReceipt
@@ -230,7 +231,7 @@ func (m *AlgebraicRootCore) makeBinary(a, b, out *Algebraic, kind uint8) (cause 
 	if e := m.assertBinaryRoot(b, 1006, "!b.is_basic()"); e != nil {
 		return e
 	}
-	*s = algebraicBinaryScope{active: true, running: true}
+	*s = algebraicBinaryScope{polynomialCaller: m.polynomialCaller, active: true, running: true}
 	defer func() {
 		s.executing = false
 		var cleanup error

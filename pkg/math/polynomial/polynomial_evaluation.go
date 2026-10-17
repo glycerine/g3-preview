@@ -421,7 +421,7 @@ func (m *MultivariatePolynomialManager) evaluateRationalForAlgebraic(p Polynomia
 		return m.evaluationEarlyRational(q, &n, out)
 	}
 	s := &m.evaluation
-	if s.active {
+	if s.active || m.algebraicEvaluation.active {
 		return ErrPolynomialPending
 	}
 	s.bodyCause = nil
@@ -588,6 +588,9 @@ func (m *MultivariatePolynomialManager) CleanupEvaluation() error {
 	return nil
 }
 func (m *MultivariatePolynomialManager) closeEvaluationFrames() error {
+	if e := m.closeAlgebraicEvaluationFrames(); e != nil {
+		return e
+	}
 	if m.evaluation.active {
 		return ErrPolynomialPending
 	}
@@ -1227,7 +1230,7 @@ func (m *MultivariatePolynomialManager) UnivariateEvaluate(p Polynomial, x uint3
 		return m.evaluationEarlyInteger(&n, out)
 	}
 	s := &m.evaluation
-	if s.active {
+	if s.active || m.algebraicEvaluation.active {
 		return ErrPolynomialPending
 	}
 	s.bodyCause = nil
@@ -1328,7 +1331,7 @@ func (m *MultivariatePolynomialManager) evaluateIntervalForAlgebraic(p Polynomia
 		return m.evaluationEarlyInterval(vm, &n, out)
 	}
 	s := &m.evaluation
-	if s.active {
+	if s.active || m.algebraicEvaluation.active {
 		return ErrPolynomialPending
 	}
 	s.bodyCause = nil

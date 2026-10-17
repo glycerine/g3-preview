@@ -49,58 +49,60 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
-	integerSet                                             algebraicIntegerSetScope
-	integerAdd                                             algebraicIntegerAddScope
-	localIntegerSet                                        *algebraicIntegerSetScope
-	localIntegerAdd                                        *algebraicIntegerAddScope
-	isolationConversion                                    algebraicIsolationConversionScope
-	isolateTmp1                                            UPolynomial
-	filterRootsRunning                                     bool
-	signEvaluationRunning                                  bool
-	signResultant                                          algebraicSignResultantScope
-	evalSignTmp                                            UPolynomial
-	signInterval                                           algebraicSignIntervalScope
-	evalSignVariables                                      PolynomialVariableDegrees
-	zeroAccuracy                                           int32
-	signSubstitution                                       algebraicSignSubstitutionScope
-	rationalSign                                           algebraicRationalSignScope
-	rootDisplay                                            algebraicRootDisplayScope
-	selection                                              algebraicSelectionScope
-	basicRootScope                                         algebraicBasicRootScope
-	division                                               algebraicDivisionScope
-	binary                                                 algebraicBinaryScope
-	multivariate                                           *MultivariatePolynomialManager
-	resultant                                              algebraicResultantPolynomialScope
-	resultantVariables                                     [2]uint32
-	resultantVariableCount                                 uint8
-	arithmetic                                             algebraicRationalArithmeticScope
-	addTmp                                                 UPolynomial
-	bounds                                                 algebraicBoundScope
-	inversion                                              algebraicInverseScope
-	negation                                               algebraicNegScope
-	negationHistory                                        []algebraicNegHistory
-	predicate                                              algebraicPredicateScope
-	isRationalTmp                                          unumeral.Int
-	rootSelection                                          *AlgebraicVector
-	self                                                   *AlgebraicRootCore
-	config                                                 AlgebraicRootConfig
-	origin, header                                         uint64
-	locations                                              []algebraicLocation
-	closed, closing                                        bool
-	factors                                                *UPolynomialFactors
-	roots, lowers, uppers                                  *BinaryRationalVector
-	tmp2, tmp3                                             UPolynomial
-	pending                                                Algebraic
-	minMagnitude                                           int32
-	factor                                                 bool
-	factorParams                                           UPolynomialFactorParams
-	compareCheap, comparePoly, compareRefine, compareSturm uint32
-	compareSequence                                        *UPolynomialSequence
-	callers, vectors                                       uint32
-	localQ                                                 unumeral.Rational
-	localActive                                            bool
-	localOriginal, localCleanup                            error
-	constructionStage                                      uint8
+	polynomialCaller, localPolynomialCaller                    *polynomialAlgebraicEvaluationScope
+	polynomialEvaluationBorrowers, polynomialEvaluationRunning uint32
+	integerSet                                                 algebraicIntegerSetScope
+	integerAdd                                                 algebraicIntegerAddScope
+	localIntegerSet                                            *algebraicIntegerSetScope
+	localIntegerAdd                                            *algebraicIntegerAddScope
+	isolationConversion                                        algebraicIsolationConversionScope
+	isolateTmp1                                                UPolynomial
+	filterRootsRunning                                         bool
+	signEvaluationRunning                                      bool
+	signResultant                                              algebraicSignResultantScope
+	evalSignTmp                                                UPolynomial
+	signInterval                                               algebraicSignIntervalScope
+	evalSignVariables                                          PolynomialVariableDegrees
+	zeroAccuracy                                               int32
+	signSubstitution                                           algebraicSignSubstitutionScope
+	rationalSign                                               algebraicRationalSignScope
+	rootDisplay                                                algebraicRootDisplayScope
+	selection                                                  algebraicSelectionScope
+	basicRootScope                                             algebraicBasicRootScope
+	division                                                   algebraicDivisionScope
+	binary                                                     algebraicBinaryScope
+	multivariate                                               *MultivariatePolynomialManager
+	resultant                                                  algebraicResultantPolynomialScope
+	resultantVariables                                         [2]uint32
+	resultantVariableCount                                     uint8
+	arithmetic                                                 algebraicRationalArithmeticScope
+	addTmp                                                     UPolynomial
+	bounds                                                     algebraicBoundScope
+	inversion                                                  algebraicInverseScope
+	negation                                                   algebraicNegScope
+	negationHistory                                            []algebraicNegHistory
+	predicate                                                  algebraicPredicateScope
+	isRationalTmp                                              unumeral.Int
+	rootSelection                                              *AlgebraicVector
+	self                                                       *AlgebraicRootCore
+	config                                                     AlgebraicRootConfig
+	origin, header                                             uint64
+	locations                                                  []algebraicLocation
+	closed, closing                                            bool
+	factors                                                    *UPolynomialFactors
+	roots, lowers, uppers                                      *BinaryRationalVector
+	tmp2, tmp3                                                 UPolynomial
+	pending                                                    Algebraic
+	minMagnitude                                               int32
+	factor                                                     bool
+	factorParams                                               UPolynomialFactorParams
+	compareCheap, comparePoly, compareRefine, compareSturm     uint32
+	compareSequence                                            *UPolynomialSequence
+	callers, vectors                                           uint32
+	localQ                                                     unumeral.Rational
+	localActive                                                bool
+	localOriginal, localCleanup                                error
+	constructionStage                                          uint8
 }
 
 // Scalar codec is actual Go-adapter extent: basic 24, root 56 bytes. It is not
@@ -479,6 +481,7 @@ func (m *AlgebraicRootCore) beginQ() error {
 	}
 	m.localQ = unumeral.NewRational()
 	m.localActive = true
+	m.localPolynomialCaller = m.polynomialCaller
 	m.localIntegerSet = nil
 	m.localIntegerAdd = nil
 	if m.integerSet.running {
@@ -865,6 +868,9 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	return m.store(dl, &out)
 }
 func (m *AlgebraicRootCore) CleanupRetained() error {
+	if m != nil && m.self == m && m.polynomialEvaluationRunning != 0 {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && (m.integerSet.running || m.integerAdd.running) {
 		return ErrAlgebraicPending
 	}
@@ -991,6 +997,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.comparisonCleanup()
 }
 func (m *AlgebraicRootCore) Close() error {
+	if m != nil && m.self == m && m.polynomialEvaluationBorrowers != 0 {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && (m.integerSet.running || m.integerAdd.running) {
 		return ErrAlgebraicPending
 	}

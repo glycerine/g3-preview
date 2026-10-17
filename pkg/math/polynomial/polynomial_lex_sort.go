@@ -142,6 +142,9 @@ func (m *MultivariatePolynomialManager) lexRange(p Polynomial, start, end, x uin
 	return nil
 }
 func (m *MultivariatePolynomialManager) LexSort(p Polynomial) error {
+	return m.lexSortForAlgebraic(p, nil)
+}
+func (m *MultivariatePolynomialManager) lexSortForAlgebraic(p Polynomial, caller *polynomialAlgebraicEvaluationScope) error {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -174,6 +177,9 @@ func (m *MultivariatePolynomialManager) LexSort(p Polynomial) error {
 		return ErrPolynomialPending
 	}
 	m.lexGeneration++
+	if caller != nil {
+		caller.lexGeneration = m.lexGeneration
+	}
 	if e = m.lexRange(p, 0, n, x); e != nil {
 		m.lexPending = true
 		m.lexCause = e

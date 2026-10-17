@@ -8,6 +8,7 @@ import (
 )
 
 type algebraicRationalArithmeticScope struct {
+	polynomialCaller  *polynomialAlgebraicEvaluationScope
 	integerAddition   *algebraicIntegerAddScope
 	q                 [3]unumeral.Rational       // nbv (or basic result), il, iu
 	b                 [2]unumeral.BinaryRational // l, u
@@ -132,7 +133,7 @@ func (m *AlgebraicRootCore) addSubRational(a *Algebraic, b *unumeral.Rational, o
 	if s.active || m.localActive || m.negation.active {
 		return ErrAlgebraicPending
 	}
-	*s = algebraicRationalArithmeticScope{active: true, qCount: 1}
+	*s = algebraicRationalArithmeticScope{polynomialCaller: m.polynomialCaller, active: true, qCount: 1}
 	if m.integerAdd.running {
 		s.integerAddition = &m.integerAdd
 	}

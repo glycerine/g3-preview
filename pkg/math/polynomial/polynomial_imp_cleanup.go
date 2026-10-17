@@ -103,6 +103,9 @@ func (m *MultivariatePolynomialManager) callerGuard() error {
 	return nil
 }
 func (m *MultivariatePolynomialManager) CloseChecked() error {
+	if m != nil && m.self == m && (m.algebraicEvaluation.active || m.algebraicEvaluation.executing) {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && m.factorInline.manager != nil && m.factorInline.manager.matchesFactorConstantInvocation(&m.factorInline) && m.factorInline.frame.active {
 		return ErrPolynomialPending
 	}

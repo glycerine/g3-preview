@@ -15,7 +15,7 @@ func (m *AlgebraicRootCore) makeUnary(a, out *Algebraic, k uint32, root bool) (c
 	if e := m.assertBinaryRoot(a, 1088, "!a.is_basic()"); e != nil {
 		return e
 	}
-	*s = algebraicBinaryScope{active: true, running: true}
+	*s = algebraicBinaryScope{polynomialCaller: m.polynomialCaller, active: true, running: true}
 	defer func() {
 		s.executing = false
 		var cleanup error
