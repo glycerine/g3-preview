@@ -144,7 +144,23 @@ func TestFixedPointPowerAliasExtraSquareAndCeilOverflow(t *testing.T) {
 		t.Fatalf("positive ceiling overflow = %v", err)
 	}
 	r, err = m.Rational(out)
-	if err != nil || r.RatString() != "8589934591/2" {
-		t.Fatalf("ceiling overflow changed source operand: %v, %v", r, err)
+	if err != nil || r.Sign() != 0 {
+		t.Fatalf("ceiling overflow did not wrap source words to zero: %v, %v", r, err)
+	}
+	if err := m.SetUint64(a, (1<<32)-1); err != nil {
+		t.Fatal(err)
+	}
+	if err := m.SetRatio(out, -1, 2); err != nil {
+		t.Fatal(err)
+	}
+	if err := m.Sub(out, a, out); err != nil {
+		t.Fatal(err)
+	}
+	if err := m.Floor(out); !errors.Is(err, ErrFixedPointOverflow) {
+		t.Fatalf("negative floor overflow = %v", err)
+	}
+	r, err = m.Rational(out)
+	if err != nil || r.Sign() != 0 {
+		t.Fatalf("floor overflow did not wrap source words to zero: %v, %v", r, err)
 	}
 }

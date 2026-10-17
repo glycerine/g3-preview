@@ -16,6 +16,9 @@ func (m *FixedPointManager) Floor(a *FixedPoint) error {
 	}
 	rounded.Mul(&q, &m.scale)
 	if err := m.publish(a, &rounded); err != nil {
+		// Source clears the fractional words before inc wraps every integer
+		// word to zero and reports overflow.
+		a.scaled.SetInt64(0)
 		return err
 	}
 	m.traceFixedRoundIntegral(a, false, true)
@@ -35,6 +38,9 @@ func (m *FixedPointManager) Ceil(a *FixedPoint) error {
 	}
 	rounded.Mul(&q, &m.scale)
 	if err := m.publish(a, &rounded); err != nil {
+		// The in-place integer-word increment wraps after the source has
+		// cleared all fractional words.
+		a.scaled.SetInt64(0)
 		return err
 	}
 	m.traceFixedRoundIntegral(a, true, true)
