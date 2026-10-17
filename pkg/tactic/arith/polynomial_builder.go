@@ -525,6 +525,9 @@ func (b *PolynomialBuilder) Apply(input *goaltactic.Goal) (_ *goaltactic.Goal, r
 	if err != nil {
 		return nil, err
 	}
+	if err = result.BindInequalitySourceAllocation(); err != nil {
+		return result, err
+	}
 	if err = result.IncDepth(); err != nil {
 		return result, err
 	}

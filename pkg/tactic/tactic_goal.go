@@ -43,6 +43,7 @@ type Goal struct {
 	precision                                                       GoalPrecision
 	modelsEnabled, proofsEnabled, coreEnabled, inconsistent, Closed bool
 	ownerBytes                                                      uint64
+	inequalitySourceAllocation                                      bool
 }
 
 func NewGoal(m *ast.ASTManager, proofs, models, cores bool) (*Goal, error) {
@@ -246,6 +247,7 @@ func (g *Goal) Close() error {
 	}
 	g.manager.Budget().Release(g.ownerBytes)
 	g.ownerBytes = 0
+	g.traceSourceMemoryDeallocated()
 	g.Closed = true
 	return nil
 }

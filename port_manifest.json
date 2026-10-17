@@ -102416,6 +102416,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/tactic_goal_inequality_memory_trace.go",
         "pkg/tactic/arith/propagate_ineq_memory_trace.go",
         "pkg/tactic/arith/polynomial_builder.go",
         "pkg/tactic/arith/polynomial_builder_test.go",
@@ -102465,6 +102466,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete propagate-inequalities copied-goal allocation at cpp483 and final goal.h:85 deallocation through source memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/tactic_goal_inequality_memory_trace.go",
+          "tests": [
+            "TestPropagateIneqImplementationMemoryWrapperSourceLifetime"
+          ]
+        },
         {
           "name": "Concrete propagate_ineqs_tactic imp allocation, cleanup replacement and destruction memory wrappers (cpp517,546,548,521)",
           "status": "platform_replacement",
@@ -105810,12 +105819,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/tactic_goal_inequality_memory_trace.go",
         "pkg/tactic/tactic_goal.go",
         "pkg/tactic/tactic_goal_ownership.go",
         "pkg/tactic/tactic_package_boundary.go",
         "pkg/tactic/tactic_goal_display.go"
       ],
       "tests": [
+        "TestPropagateIneqImplementationMemoryWrapperSourceLifetime",
         "TestTacticGoalAssertionSplittingAndSourceOrder",
         "TestTacticGoalFalseReplacesAllAndResetAttributes",
         "TestTacticGoalUpdateAndEliminateTrue",
@@ -105847,6 +105858,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete propagate-inequalities copied-goal allocation at cpp483 and final goal.h:85 deallocation through source memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/tactic_goal_inequality_memory_trace.go",
+          "tests": [
+            "TestPropagateIneqImplementationMemoryWrapperSourceLifetime"
+          ]
+        },
         {
           "name": "goal assertion, update, retained arrays, redundancy elimination, reset/copy, precision and source reference controls",
           "status": "ported",
@@ -153280,6 +153299,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/tactic_goal_inequality_memory_trace.go",
         "pkg/tactic/arith/propagate_ineq_memory_trace.go",
         "pkg/math/polynomial/polynomial_skeleton_memory_trace.go",
         "pkg/math/polynomial/polynomial_skeleton_memory_trace_test.go",
@@ -153549,6 +153569,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete propagate-inequalities copied-goal allocation at cpp483 and final goal.h:85 deallocation through source memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/tactic_goal_inequality_memory_trace.go",
+          "tests": [
+            "TestPropagateIneqImplementationMemoryWrapperSourceLifetime"
+          ]
+        },
         {
           "name": "Concrete propagate_ineqs_tactic imp allocation, cleanup replacement and destruction memory wrappers (cpp517,546,548,521)",
           "status": "platform_replacement",
@@ -154321,6 +154349,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/tactic_goal_inequality_memory_trace.go",
         "pkg/tactic/arith/propagate_ineq_memory_trace.go",
         "pkg/math/polynomial/polynomial_imp_memory_trace.go",
         "pkg/math/polynomial/polynomial_monomial_allocator_memory_trace.go",
@@ -154572,6 +154601,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete propagate-inequalities copied-goal allocation at cpp483 and final goal.h:85 deallocation through source memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/tactic_goal_inequality_memory_trace.go",
+          "tests": [
+            "TestPropagateIneqImplementationMemoryWrapperSourceLifetime"
+          ]
+        },
         {
           "name": "Concrete propagate_ineqs_tactic imp allocation, cleanup replacement and destruction memory wrappers (cpp517,546,548,521)",
           "status": "platform_replacement",
