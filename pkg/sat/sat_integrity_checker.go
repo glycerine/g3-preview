@@ -728,17 +728,16 @@ func (c satIntegrityChecker) checkReinitStack() (bool, error) {
 	if e := c.open(); e != nil {
 		return false, e
 	}
-	enabled := false
-	if satStorageSourceDebug {
-		on, e := diagnostic.BorrowProcessDebugContext().AssertionsEnabled()
-		if e != nil {
-			return false, e
-		}
-		enabled = on
-	}
 	for _, w := range c.lifecycle.reinit {
 		if w.Binary() {
 			continue
+		}
+		if !satStorageSourceDebug {
+			continue
+		}
+		enabled, e := diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+		if e != nil {
+			return false, e
 		}
 		if enabled {
 			cl, e := w.ClauseRef()

@@ -6,8 +6,37 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
+
+func TestSATIntegrityReinitAssertionReadsProcessAtReachedElement(t *testing.T) {
+	g, _ := satGCFixture(t, 2)
+	l := g.lifecycle()
+	checker, e := newSATIntegrityChecker(l, g)
+	satOK(t, e)
+	debug, _, _ := satIntegrityActionFixture(t, "")
+	satOK(t, debug.Close())
+	previous := l.reinit
+	defer func() { l.reinit = previous }()
+	l.reinit = nil
+	if yes, e := checker.checkReinitStack(); e != nil || !yes {
+		t.Fatal("empty stack read erased assertion owner", yes, e)
+	}
+	l.reinit = []satClauseWrapper{newSATBinaryWrapper(0, 2)}
+	if yes, e := checker.checkReinitStack(); e != nil || !yes {
+		t.Fatal("binary wrapper read erased assertion owner", yes, e)
+	}
+	l.reinit = append(l.reinit, newSATClauseWrapper(StoredClauseRef{}))
+	yes, e := checker.checkReinitStack()
+	if satStorageSourceDebug {
+		if yes || !errors.Is(e, arena.ErrClosed) {
+			t.Fatal("nonbinary wrapper skipped reached assertion switch", yes, e)
+		}
+	} else if e != nil || !yes {
+		t.Fatal("release SASSERT was not erased", yes, e)
+	}
+}
 
 func TestSATCleanerReinitStackAssertionUsesSourceActions(t *testing.T) {
 	g, _ := satGCFixture(t, 5)

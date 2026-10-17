@@ -75697,7 +75697,7 @@
           "name": "Retained cleaner operator cleaner_bug process assertion/tag gate and actual invariant call at entry and exit (sat_cleaner.cpp:184,200); nested checker diagnostics have separate method rows",
           "status": "ported",
           "go_target": "pkg/sat/sat_cleaner_assertion.go",
-          "tests": ["TestSATCleanerInvariantUsesProcessDebugGate", "TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder", "TestSATIntegrityEliminatedWatchSourceTrace", "TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
+          "tests": ["TestSATCleanerInvariantUsesProcessDebugGate", "TestSATCleanerNestedBoolVarAssertionsUseSourceOrderAndActions", "TestSATCleanerEliminatedWatchAssertionsFollowSourceOrder", "TestSATIntegrityEliminatedWatchSourceTrace", "TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityReinitAssertionReadsProcessAtReachedElement", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         },
         {
           "name": "Retained cleanup_watches cleanup_bug TRACE at cpp48 for each unassigned list and cpp61 for each visited binary watch, including source keeping record on drop",
@@ -76475,10 +76475,10 @@
           "tests": ["TestSATIntegrityEliminatedWatchSourceTrace", "TestSATIntegrityEliminatedWatchTraceWithLiveSolverClause", "TestSATSolverInspectionExactSourceDisplays"]
         },
         {
-          "name": "Selected reinit-stack SASSERT205 and operator SASSERT231-236 process gate, per-site C/T action through cleaner_bug; other nested checker methods remain partial",
+          "name": "Selected reinit-stack SASSERT205 per reached nonbinary wrapper and operator SASSERT231-236 process gate, per-site C/T action through cleaner_bug; other nested checker methods remain partial",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
-          "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
+          "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityReinitAssertionReadsProcessAtReachedElement", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         },
         {
           "name": "check_disjoint_clauses repeated-ID TRACE before false return (cpp220-222)",
@@ -76614,10 +76614,10 @@
           "tests": ["TestSATIntegrityEliminatedWatchSourceTrace", "TestSATIntegrityEliminatedWatchTraceWithLiveSolverClause", "TestSATSolverInspectionExactSourceDisplays"]
         },
         {
-          "name": "Selected reinit-stack SASSERT205 and operator SASSERT231-236 process gate, per-site C/T action through cleaner_bug; other nested checker methods remain partial",
+          "name": "Selected reinit-stack SASSERT205 per reached nonbinary wrapper and operator SASSERT231-236 process gate, per-site C/T action through cleaner_bug; other nested checker methods remain partial",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
-          "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
+          "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityReinitAssertionReadsProcessAtReachedElement", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         },
         {
           "name": "check_disjoint_clauses repeated-ID TRACE before false return (cpp220-222)",
@@ -124204,10 +124204,10 @@
           ]
         },
         {
-          "name": "Retained SAT reinit-stack SASSERT205 and operator SASSERT231-236 process gate and C/T actions; bool-var SASSERT133-149 re-read the switch at each reached site, while other nested checker sites remain partial",
+          "name": "Retained SAT reinit-stack SASSERT205 per reached nonbinary wrapper and operator SASSERT231-236 process gate and C/T actions; bool-var SASSERT133-149 re-read the switch at each reached site, while other nested checker sites remain partial",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
-          "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
+          "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityReinitAssertionReadsProcessAtReachedElement", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         },
         {
           "name": "Selected check_clause SASSERT53,55,60,63, vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; other checker diagnostics remain open",
@@ -124768,10 +124768,10 @@
           "tests": ["TestLinearEquationRationalSingletonSourceAssertionProfile"]
         },
         {
-          "name": "Retained SAT reinit-stack SASSERT205 and operator SASSERT231-236 process gate and C/T actions; bool-var SASSERT133-149 re-read the switch at each reached site, while other nested checker sites remain partial",
+          "name": "Retained SAT reinit-stack SASSERT205 per reached nonbinary wrapper and operator SASSERT231-236 process gate and C/T actions; bool-var SASSERT133-149 re-read the switch at each reached site, while other nested checker sites remain partial",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
-          "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
+          "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityReinitAssertionReadsProcessAtReachedElement", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         },
         {
           "name": "Selected check_clause SASSERT53,55,60,63, vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; other checker diagnostics remain open",
