@@ -32,8 +32,8 @@ func position(xs []uint32, x uint32) uint32 {
 }
 
 // solverSetup owns the currently reached Euclidean variable, equation,
-// substitution, normalization and unit-pivot state. It borrows its rational
-// manager; non-unit decomposition and the public solver remain pending.
+// substitution, normalization, and pivot state. It borrows its rational
+// manager; the public Solver owns and resets this state.
 type solverSetup struct {
 	self               *solverSetup
 	manager            *numeral.RationalManager

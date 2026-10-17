@@ -35850,7 +35850,7 @@
         },
         {
           "name": "solve loop unit/non-unit dispatch, completion and inconsistency exits at cpp:708-730",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/euclid/solve.go",
           "go_targets": ["pkg/math/euclid/solve_trace.go"],
           "tests": [
