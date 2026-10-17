@@ -46,3 +46,31 @@ func TestASTFloatingPointSomeValueSourceDefaults(t *testing.T) {
 		t.Fatal("get_some_value retained a completed MPF local")
 	}
 }
+
+func TestASTFloatingPointSomeValueRefusedMPFConstruction(t *testing.T) {
+	m := astTestManager(t)
+	_, err := m.RegisterArithmeticPlugin()
+	astTestMust(t, err)
+	_, err = m.RegisterBitVectorPlugin()
+	astTestMust(t, err)
+	family, err := m.RegisterFloatingPointPlugin()
+	astTestMust(t, err)
+	sort, err := m.MkFamilySort(family, 3, nil)
+	astTestMust(t, err)
+	baseline := m.Budget().Used()
+	m.Budget().FailAfter(0)
+	value, err := m.GetSomeValue(sort)
+	m.Budget().FailAfter(-1)
+	if err == nil || !value.IsNull() {
+		t.Fatal("refused MPF construction published a value", value, err)
+	}
+	frame := m.floatingPointPlugin.numeralProbeFrames
+	if frame == nil || frame.bodyCause == nil || !frame.sourceDone || !frame.consumed || m.Budget().Used() != baseline {
+		t.Fatalf("refused MPF construction lost its stopped record or local cleanup: frame=%+v budget=%d baseline=%d", frame, m.Budget().Used(), baseline)
+	}
+	value, err = m.GetSomeValue(sort)
+	astTestMust(t, err)
+	if value.IsNull() || m.floatingPointPlugin.numeralProbeFrames != frame {
+		t.Fatal("later FPA value did not recover while failed invocation remained owned")
+	}
+}

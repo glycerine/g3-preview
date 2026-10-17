@@ -17433,6 +17433,7 @@
       ],
       "tests": [
         "TestASTFloatingPointSomeValueSourceDefaults",
+        "TestASTFloatingPointSomeValueRefusedMPFConstruction",
         "TestModelEvaluatorFPACompletionUsesPluginValues",
         "TestASTFloatingPointClassificationDeclarationsAndApplications",
         "TestASTFPAIEEEEqualityDeclarationAndDomainValidation",
@@ -17751,6 +17752,7 @@
           "go_target": "pkg/ast/ast_fpa_some_value.go",
           "tests": [
             "TestASTFloatingPointSomeValueSourceDefaults",
+            "TestASTFloatingPointSomeValueRefusedMPFConstruction",
             "TestModelEvaluatorFPACompletionUsesPluginValues"
           ]
         },
@@ -17787,6 +17789,7 @@
       ],
       "tests": [
         "TestASTFloatingPointSomeValueSourceDefaults",
+        "TestASTFloatingPointSomeValueRefusedMPFConstruction",
         "TestModelEvaluatorFPACompletionUsesPluginValues",
         "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
         "TestASTFloatingPointScopedValueActualReserveSetPublication",
@@ -17857,6 +17860,7 @@
           "go_target": "pkg/ast/ast_fpa_some_value.go",
           "tests": [
             "TestASTFloatingPointSomeValueSourceDefaults",
+            "TestASTFloatingPointSomeValueRefusedMPFConstruction",
             "TestModelEvaluatorFPACompletionUsesPluginValues"
           ]
         },
@@ -160191,6 +160195,16 @@
           "go_target": "pkg/ast/ast_fpa_numeral_probe.go",
           "tests": [
             "TestASTFloatingPointSignedZeroSortOverloads"
+          ]
+        },
+        {
+          "name": "Retained fpa_decl_plugin::get_some_value caller-local MPF NaN construction, numeral registration, source-order deletion and refused-construction continuation (fpa_decl_plugin.cpp:856-863; mpf.h)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_fpa_some_value.go",
+          "tests": [
+            "TestASTFloatingPointSomeValueSourceDefaults",
+            "TestASTFloatingPointSomeValueRefusedMPFConstruction",
+            "TestModelEvaluatorFPACompletionUsesPluginValues"
           ]
         },
         {
