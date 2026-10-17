@@ -158854,7 +158854,8 @@
             "TestArbitraryFloatToSBVMPQWarmInlineAndModeBranchAuthority",
             "TestArbitraryFloatToSBVMPQSourceAssertionSites",
             "TestArbitraryFloatToSBVMPQReachedExponentOverflow",
-            "TestArbitraryFloatToSBVMPQIndependentRoundingOracle"
+            "TestArbitraryFloatToSBVMPQIndependentRoundingOracle",
+            "TestArbitraryFloatSBVInvalidModeSourceUnreachable"
           ]
         },
         {
@@ -160014,7 +160015,8 @@
             "TestArbitraryFloatToSBVMPQWarmInlineAndModeBranchAuthority",
             "TestArbitraryFloatToSBVMPQSourceAssertionSites",
             "TestArbitraryFloatToSBVMPQReachedExponentOverflow",
-            "TestArbitraryFloatToSBVMPQIndependentRoundingOracle"
+            "TestArbitraryFloatToSBVMPQIndependentRoundingOracle",
+            "TestArbitraryFloatSBVInvalidModeSourceUnreachable"
           ]
         },
         {

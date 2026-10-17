@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 func TestArbitraryFloatToSBVMPQEveryColdReservationAndOutputPrefix(t *testing.T) {
@@ -108,10 +109,12 @@ func TestArbitraryFloatToSBVMPQWarmInlineAndModeBranchAuthority(t *testing.T) {
 	}
 	b.FailAfter(-1)
 	// Source switches on mode only for a negative effective exponent.
-	if e := m.ToSBVMPQ(ArbitraryFloatRoundingMode(255), &x, &out); !errors.Is(e, ErrIntegerAssertion) {
-		t.Fatal("negative exponent invalid mode", e)
+	if !modularSourceDebug {
+		if e := m.ToSBVMPQ(ArbitraryFloatRoundingMode(255), &x, &out); !errors.Is(e, diagnostic.ErrDebugNativeUnreachable) {
+			t.Fatal("negative exponent invalid mode", e)
+		}
+		serviceMust(t, m.CleanupToSBVMPQ())
 	}
-	serviceMust(t, m.CleanupToSBVMPQ())
 	x.exponent = 4
 	serviceMust(t, m.ToSBVMPQ(ArbitraryFloatRoundingMode(255), &x, &out))
 	if out.Num != NewInt(24) {
