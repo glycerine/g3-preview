@@ -9,6 +9,6 @@ func gcdSourceRequireAt(condition bool, line int32, expression string) error {
 	return nil
 }
 func (m *IntegerManager) gcdSourceGreaterEqual(a, b *Int) error { return nil }
-func (m *IntegerManager) gcdSourceGreaterEqualAt(a, b *Int, line int32) error {
+func (m *IntegerManager) gcdSourceGreaterEqualAt(a, b *Int, line int32, expression string) error {
 	return nil
 }

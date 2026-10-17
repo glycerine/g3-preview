@@ -222,7 +222,7 @@ func (m *IntegerManager) gcdWithAllocationContext(a, b, c *Int, context integerA
 		}
 	}
 	for {
-		if e = m.gcdSourceGreaterEqualAt(a1, b1, 738); e != nil {
+		if e = m.gcdSourceGreaterEqualAt(a1, b1, 738, "ge(a1, b1)"); e != nil {
 			return e
 		}
 		if b1.IsSmall() {
@@ -230,7 +230,7 @@ func (m *IntegerManager) gcdWithAllocationContext(a, b, c *Int, context integerA
 				return m.setInt64WithAllocationContext(c, int64(U32GCD(uint32(a1.Val), uint32(b1.Val))), context)
 			}
 			for b1.Val != 0 {
-				if e = m.gcdSourceGreaterEqualAt(a1, b1, 747); e != nil {
+				if e = m.gcdSourceGreaterEqualAt(a1, b1, 747, "ge(a1, b1)"); e != nil {
 					return e
 				}
 				if e = m.remWithAllocationContext(a1, b1, tmp, context); e != nil {
@@ -298,7 +298,7 @@ func (m *IntegerManager) gcdWithAllocationContext(a, b, c *Int, context integerA
 			ahat = bhat
 			bhat = T
 		}
-		if e = m.gcdSourceGreaterEqualAt(a1, b1, 789); e != nil {
+		if e = m.gcdSourceGreaterEqualAt(a1, b1, 789, "ge(a1, b1)"); e != nil {
 			return e
 		}
 		if B == 0 {
@@ -311,7 +311,7 @@ func (m *IntegerManager) gcdWithAllocationContext(a, b, c *Int, context integerA
 			if e = m.Swap(b1, t); e != nil {
 				return e
 			}
-			if e = m.gcdSourceGreaterEqualAt(a1, b1, 794); e != nil {
+			if e = m.gcdSourceGreaterEqualAt(a1, b1, 794, "ge(a1, b1)"); e != nil {
 				return e
 			}
 		} else {
@@ -345,7 +345,7 @@ func (m *IntegerManager) gcdWithAllocationContext(a, b, c *Int, context integerA
 			if e = m.Swap(b1, r); e != nil {
 				return e
 			}
-			if e = m.gcdSourceGreaterEqualAt(a1, b1, 813); e != nil {
+			if e = m.gcdSourceGreaterEqualAt(a1, b1, 813, "ge(a1, b1)"); e != nil {
 				return e
 			}
 		}

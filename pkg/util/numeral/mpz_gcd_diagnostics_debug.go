@@ -32,7 +32,7 @@ func (m *IntegerManager) gcdSourceGreaterEqual(a, b *Int) error {
 	return gcdSourceRequire(cmp >= 0)
 }
 
-func (m *IntegerManager) gcdSourceGreaterEqualAt(a, b *Int, line int32) error {
+func (m *IntegerManager) gcdSourceGreaterEqualAt(a, b *Int, line int32, expression string) error {
 	d := diagnostic.BorrowProcessDebugContext()
 	enabled, e := diagnostic.SourceAssertionsEnabled(d)
 	if e != nil || !enabled {
@@ -42,5 +42,5 @@ func (m *IntegerManager) gcdSourceGreaterEqualAt(a, b *Int, line int32) error {
 	if e != nil || cmp >= 0 {
 		return e
 	}
-	return diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", line, "ge(a1, b1)")
+	return diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", line, expression)
 }

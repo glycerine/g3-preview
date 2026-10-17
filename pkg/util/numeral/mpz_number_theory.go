@@ -122,7 +122,7 @@ func (m *IntegerManager) extendedGCDWithAllocationContext(r1, r2, a, b, g *Int, 
 		}
 	}
 	for tmp2.Val > 0 {
-		if e = m.gcdSourceGreaterEqual(tmp1, tmp2); e != nil {
+		if e = m.gcdSourceGreaterEqualAt(tmp1, tmp2, 937, "ge(tmp1, tmp2)"); e != nil {
 			return e
 		}
 		if e = m.copyFromOwnerWithAllocationContext(aux, m, tmp2, nil, context); e != nil {

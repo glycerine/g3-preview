@@ -115914,10 +115914,12 @@
           ]
         },
         {
-          "name": "Selected GCD caller Copy-before-Abs zero path, five Lehmer ge and seven structural/estimate assertion switch reads, remaining intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
+          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and ExtendedGCD order assertion switch reads, remaining ExtendedGCD debug equality site, raw rational number-theory forwarding profiles",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
+            "TestExtendedGCDOrderAssertionReadsAfterInitialPublication",
+            "TestExtendedGCDOrderAssertionSourceAction",
             "TestLehmerGCDStructuralAssertionSourceActions",
             "TestLehmerGCDFirstSourceAssertionReadsAfterInputCopies",
             "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
@@ -164528,10 +164530,12 @@
           ]
         },
         {
-          "name": "Selected GCD caller Copy-before-Abs zero path, five Lehmer ge and seven structural/estimate assertion switch reads, remaining intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
+          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and ExtendedGCD order assertion switch reads, remaining ExtendedGCD debug equality site, raw rational number-theory forwarding profiles",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
+            "TestExtendedGCDOrderAssertionReadsAfterInitialPublication",
+            "TestExtendedGCDOrderAssertionSourceAction",
             "TestLehmerGCDStructuralAssertionSourceActions",
             "TestLehmerGCDFirstSourceAssertionReadsAfterInputCopies",
             "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
@@ -167010,10 +167014,12 @@
           ]
         },
         {
-          "name": "gcd extended selected release coefficient/action sequence",
+          "name": "gcd extended selected coefficient/action sequence with order assertion switch read",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_number_theory.go",
           "tests": [
+            "TestExtendedGCDOrderAssertionReadsAfterInitialPublication",
+            "TestExtendedGCDOrderAssertionSourceAction",
             "TestNumberTheorySourceRationalGCDAndSignedSequence",
             "TestNumberTheorySourceInverse999Cases",
             "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
@@ -167128,10 +167134,12 @@
           ]
         },
         {
-          "name": "Selected GCD caller Copy-before-Abs zero path, five Lehmer ge and seven structural/estimate assertion switch reads, remaining intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
+          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and ExtendedGCD order assertion switch reads, remaining ExtendedGCD debug equality site, raw rational number-theory forwarding profiles",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
+            "TestExtendedGCDOrderAssertionReadsAfterInitialPublication",
+            "TestExtendedGCDOrderAssertionSourceAction",
             "TestLehmerGCDStructuralAssertionSourceActions",
             "TestLehmerGCDFirstSourceAssertionReadsAfterInputCopies",
             "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
@@ -169135,10 +169143,12 @@
           ]
         },
         {
-          "name": "gcd extended selected release coefficient/action sequence",
+          "name": "gcd extended selected coefficient/action sequence with order assertion switch read",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_number_theory.go",
           "tests": [
+            "TestExtendedGCDOrderAssertionReadsAfterInitialPublication",
+            "TestExtendedGCDOrderAssertionSourceAction",
             "TestNumberTheorySourceRationalGCDAndSignedSequence",
             "TestNumberTheorySourceInverse999Cases",
             "TestNumberTheoryIntegerFiniteOraclesAndSignedLCM",
@@ -169328,10 +169338,12 @@
           ]
         },
         {
-          "name": "Selected GCD caller Copy-before-Abs zero path, five Lehmer ge and seven structural/estimate assertion switch reads, remaining intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
+          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and ExtendedGCD order assertion switch reads, remaining ExtendedGCD debug equality site, raw rational number-theory forwarding profiles",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
+            "TestExtendedGCDOrderAssertionReadsAfterInitialPublication",
+            "TestExtendedGCDOrderAssertionSourceAction",
             "TestLehmerGCDStructuralAssertionSourceActions",
             "TestLehmerGCDFirstSourceAssertionReadsAfterInputCopies",
             "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
