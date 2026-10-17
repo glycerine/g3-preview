@@ -1,6 +1,8 @@
 // Source: src/util/mpf.cpp:1487-1517; src/util/mpf.h:119,122,137-138.
 package numeral
 
+import "github.com/glycerine/g3/pkg/util/diagnostic"
+
 func (m *ArbitraryFloatManager) Le(x, y *ArbitraryFloat) (bool, error) { return m.Lte(x, y) }
 func (m *ArbitraryFloatManager) Ge(x, y *ArbitraryFloat) (bool, error) { return m.Gte(x, y) }
 func (m *ArbitraryFloatManager) Maximum(x, y, out *ArbitraryFloat) error {
@@ -38,7 +40,11 @@ func (m *ArbitraryFloatManager) extremum(x, y, out *ArbitraryFloat, maximum bool
 		return e
 	}
 	if zero && x.Sign() != y.Sign() {
-		return ErrIntegerAssertion
+		line := int32(1509)
+		if maximum {
+			line = 1493
+		}
+		return diagnostic.BorrowProcessDebugContext().UnreachableSource("src/util/mpf.cpp", line)
 	} // Source UNREACHABLE; no chosen signed-zero result.
 	// The source evaluates the zero predicates again in this separate else-if.
 	zero, e = m.bothZero(x, y)

@@ -158586,12 +158586,13 @@
           ]
         },
         {
-          "name": "mpf.cpp:1487-1517 maximum/minimum literal selection",
+          "name": "mpf.cpp:1487-1517 maximum/minimum literal selection and opposite-signed-zero UNREACHABLE diagnostics",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_extrema.go",
           "tests": [
             "TestArbitraryFloatExtremaSourceCasesAndAliases",
-            "TestArbitraryFloatExtremaSelectedCopyPrefixes"
+            "TestArbitraryFloatExtremaSelectedCopyPrefixes",
+            "TestArbitraryFloatExtremaMixedZeroSourceUnreachable"
           ]
         },
         {

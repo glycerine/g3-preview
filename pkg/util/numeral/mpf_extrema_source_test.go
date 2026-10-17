@@ -2,9 +2,11 @@
 package numeral
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 func extremaTestNumeral(bits uint32) ArbitraryFloat {
@@ -32,6 +34,9 @@ func TestArbitraryFloatExtremaSourceCasesAndAliases(t *testing.T) {
 		{0, 0x80000000, 0, 0, true}, {0x80000000, 0, 0, 0, true},
 	}
 	for _, tc := range cases {
+		if modularSourceDebug && tc.unsupported {
+			continue // Debug UNREACHABLE needs an explicit action input.
+		}
 		for _, maximum := range []bool{false, true} {
 			for alias := 0; alias < 3; alias++ {
 				x, y := extremaTestNumeral(tc.x), extremaTestNumeral(tc.y)
@@ -50,7 +55,7 @@ func TestArbitraryFloatExtremaSourceCasesAndAliases(t *testing.T) {
 					e = m.Minimum(&x, &y, dst)
 				}
 				if tc.unsupported {
-					if e != ErrIntegerAssertion || *dst != before {
+					if !errors.Is(e, diagnostic.ErrDebugNativeUnreachable) || *dst != before {
 						t.Fatal("source mixed-zero unreachable changed destination", tc, maximum, alias, e, *dst, before)
 					}
 					continue
