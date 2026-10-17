@@ -127,8 +127,8 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 		if e != nil {
 			return e
 		}
-		if c >= 0 {
-			return ErrIntegerAssertion
+		if e := mpfSourceAssertion(c < 0, 1102, "m_mpz_manager.lt(a.significand(), m_powers2(x.sbits))"); e != nil {
+			return e
 		}
 		p, e = s.power(x.SBits() - 1)
 		if e != nil {
@@ -138,8 +138,8 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 		if e != nil {
 			return e
 		}
-		if c < 0 {
-			return ErrIntegerAssertion
+		if e := mpfSourceAssertion(c >= 0, 1103, "m_mpz_manager.ge(a.significand(), m_powers2(x.sbits - 1))"); e != nil {
+			return e
 		}
 	}
 	out.exponent = s.a.exponent
@@ -199,8 +199,8 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 				incKind = 1
 			}
 		} else {
-			if modularSourceDebug && !less && !more {
-				return ErrIntegerAssertion
+			if e := mpfSourceAssertion(less || more, 1134, "less_than_tie || more_than_tie"); e != nil {
+				return e
 			}
 			inc = more
 			if inc {
@@ -238,8 +238,8 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 		if e != nil {
 			return e
 		}
-		if c < 0 {
-			return ErrIntegerAssertion
+		if e := mpfSourceAssertion(c >= 0, 1156, "m_mpz_manager.ge(o.significand, m_powers2(o.sbits - 1))"); e != nil {
+			return e
 		}
 	}
 	for {

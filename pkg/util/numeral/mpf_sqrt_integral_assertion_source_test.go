@@ -82,3 +82,37 @@ func TestArbitraryFloatRoundIntegralModeSourceActions(t *testing.T) {
 	serviceMust(t, m.Del(&out))
 	serviceMust(t, m.Del(&x))
 }
+
+func TestArbitraryFloatRoundIntegralUnpackedBoundsSourceActions(t *testing.T) {
+	if !modularSourceDebug {
+		t.Skip("source Z3DEBUG assertions only")
+	}
+	for _, tc := range []struct {
+		name string
+		sig  int32
+		line string
+		expression string
+	}{
+		{"above width", 8, "1102", "m_mpz_manager.lt(a.significand(), m_powers2(x.sbits))"},
+		{"below hidden bit", -1, "1103", "m_mpz_manager.ge(a.significand(), m_powers2(x.sbits - 1))"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			_, log := bindMPNDebugActions(t, "T")
+			m, _, _ := mpfNumeralHelpersFixture(t)
+			var x, out ArbitraryFloat
+			sig := NewInt(tc.sig)
+			serviceMust(t, m.SetComponents(&x, 11, 4, false, 0, &sig))
+			serviceMust(t, m.SetDouble(&out, 11, 4, 3))
+			if e := m.RoundToIntegral(ArbitraryFloatNearestEven, &x, &out); !isMPNVerificationThrow(e) {
+				t.Fatal("unpacked significand source Throw", e)
+			}
+			contents, e := os.ReadFile(log.Name())
+			serviceMust(t, e)
+			if n := strings.Count(string(contents), "File: src/util/mpf.cpp\nLine: "+tc.line+"\n"+tc.expression+"\n"); n != 1 {
+				t.Fatal("source unpacked significand assertion site", n, string(contents))
+			}
+			serviceMust(t, m.Del(&out))
+			serviceMust(t, m.Del(&x))
+		})
+	}
+}
