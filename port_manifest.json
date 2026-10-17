@@ -181795,7 +181795,7 @@
           ]
         },
         {
-          "name": "contains/size/source signed-char lt",
+          "name": "str/contains/size/source signed-char lt and reached assertion-switch reads",
           "status": "ported",
           "go_target": "pkg/util/symbol/symbol.go",
           "tests": [
@@ -181804,6 +181804,7 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
+            "TestSymbolReadsRetainedSourceAssertionSwitches",
             "TestSymbolDuplicateLookupAndInvalidTokens"
           ]
         },
@@ -181998,7 +181999,7 @@
           ]
         },
         {
-          "name": "contains/size/source signed-char lt",
+          "name": "str/contains/size/source signed-char lt and reached assertion-switch reads",
           "status": "ported",
           "go_target": "pkg/util/symbol/symbol.go",
           "tests": [
@@ -182007,6 +182008,7 @@
             "TestSymbolOwnerFailureLifetimeAndWarmIntern",
             "TestSymbolConcurrentInternIdentity",
             "TestSymbolIndependentBytesAndPrefixOrder",
+            "TestSymbolReadsRetainedSourceAssertionSwitches",
             "TestSymbolDuplicateLookupAndInvalidTokens"
           ]
         },

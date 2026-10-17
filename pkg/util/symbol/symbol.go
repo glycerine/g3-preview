@@ -284,6 +284,12 @@ func (m *Manager) text(s Symbol, display bool) (string, error) {
 func (m *Manager) String(s Symbol) (string, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+	if e := m.checkPlain(s); e != nil {
+		return "", e
+	}
+	if e := m.sourceAssertion(89, !s.IsMarked(), "!is_marked()"); e != nil {
+		return "", e
+	}
 	return m.text(s, false)
 }
 func (m *Manager) Display(s Symbol) (string, error) {
@@ -372,6 +378,9 @@ func (m *Manager) Contains(s Symbol, ch byte) (bool, error) {
 	if e := m.checkPlain(s); e != nil {
 		return false, e
 	}
+	if e := m.sourceAssertion(104, !s.IsMarked(), "!is_marked()"); e != nil {
+		return false, e
+	}
 	if s.IsNumerical() {
 		return false, nil
 	}
@@ -388,6 +397,9 @@ func (m *Manager) Size(s Symbol) (uint32, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	if e := m.checkPlain(s); e != nil {
+		return 0, e
+	}
+	if e := m.sourceAssertion(114, !s.IsMarked(), "!is_marked()"); e != nil {
 		return 0, e
 	}
 	if s.IsNumerical() {
@@ -449,13 +461,25 @@ func (m *Manager) Less(a, b Symbol) (bool, error) {
 		return a.Value < b.Value, nil
 	}
 	if b.IsNumerical() {
+		if e := m.sourceAssertion(139, !a.IsNumerical(), "!s1.is_numerical()"); e != nil {
+			return false, e
+		}
 		return false, nil
+	}
+	if e := m.sourceAssertion(142, !a.IsNumerical() && !b.IsNumerical(), "!s1.is_numerical() && !s2.is_numerical()"); e != nil {
+		return false, e
 	}
 	if a.Value == 0 || b.Value == 0 {
 		return false, ErrInvalid
 	}
+	if e := m.sourceAssertion(96, !a.IsNumerical(), "!is_numerical()"); e != nil {
+		return false, e
+	}
 	x, e := m.spelling(a)
 	if e != nil {
+		return false, e
+	}
+	if e := m.sourceAssertion(96, !b.IsNumerical(), "!is_numerical()"); e != nil {
 		return false, e
 	}
 	y, e := m.spelling(b)
@@ -474,15 +498,35 @@ func (m *Manager) Less(a, b Symbol) (bool, error) {
 			return true, nil
 		}
 		if p != q {
+			if e := m.sourceAssertion(162, int8(p) > int8(q), "*str1 > *str2"); e != nil {
+				return false, e
+			}
 			return false, nil
 		}
 		if i+1 >= len(x) {
+			if e := m.sourceAssertion(153, i+1 < len(y), "*str2"); e != nil {
+				return false, e
+			}
 			return true, nil
 		}
 		if i+1 >= len(y) {
+			if e := m.sourceAssertion(157, i+1 < len(x), "*str1"); e != nil {
+				return false, e
+			}
 			return false, nil
 		}
 	}
+}
+
+func (m *Manager) sourceAssertion(line int32, predicate bool, expression string) error {
+	if !sourceDebug {
+		return nil
+	}
+	enabled, e := diagnostic.SourceAssertionsEnabled(m.debug)
+	if e != nil || !enabled || predicate {
+		return e
+	}
+	return diagnostic.DebugAssertionFailure(m.debug, "src/util/symbol.cpp", line, expression)
 }
 func (m *Manager) Stats() Stats {
 	m.mu.Lock()
