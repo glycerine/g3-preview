@@ -179809,7 +179809,9 @@
         "pkg/math/polynomial/upolynomial_vector.go",
         "pkg/math/polynomial/upolynomial_source_test.go",
         "pkg/math/subpaving/tactic/expr_converter.go",
-        "pkg/math/subpaving/tactic/expr_converter_test.go"
+        "pkg/math/subpaving/tactic/expr_converter_test.go",
+        "pkg/math/subpaving/tactic/arbitrary_expr_converter.go",
+        "pkg/math/subpaving/tactic/arbitrary_expr_converter_test.go"
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
@@ -179892,7 +179894,8 @@
         "TestUPolynomialRawMutableScalarOverloads",
         "TestUPolynomialNativeDescriptorAndBackingDirectories",
         "TestUPolynomialNativeBorrowedStoreDirectory",
-        "TestHardwareExprConverterTerms"
+        "TestHardwareExprConverterTerms",
+        "TestArbitraryExprConverterTermsAndClause"
       ],
       "conditionals": [
         {
@@ -180022,6 +180025,12 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_shell_coefficients.go",
           "tests": ["TestFixedShellExactCoefficientOwnerAndDirectedBound"]
+        },
+        {
+          "name": "Concrete expr2subpaving scoped_mpz_vector cached numerator and denominator deep copies, indexed cache reads and ascending close after cached AST keys (expr2subpaving.cpp:50-51,90-92,129-140,340-341)",
+          "status": "ported",
+          "go_target": "pkg/math/subpaving/tactic/arbitrary_expr_converter.go",
+          "tests": ["TestArbitraryExprConverterTermsAndClause"]
         },
         {
           "name": "remaining retained concrete scoped numeral vector specializations in unported owning consumers",

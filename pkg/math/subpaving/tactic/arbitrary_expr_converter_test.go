@@ -150,8 +150,24 @@ func TestArbitraryExprConverterTermsAndClause(t *testing.T) {
 	if got, err := qm.Z.String(&d); err != nil || got != "1" {
 		t.Fatal("sum denominator", got, err)
 	}
+	wantNumerator, err := qm.Z.String(&n)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := qm.Z.SetInt32(&n, 17); err != nil {
+		t.Fatal(err)
+	}
+	if err := qm.Z.SetInt32(&d, 19); err != nil {
+		t.Fatal(err)
+	}
 	if again, err := converter.InternalizeTerm(sum, &n, &d); err != nil || again != variable {
 		t.Fatal("cached sum", again, err)
+	}
+	if got, err := qm.Z.String(&n); err != nil || got != wantNumerator {
+		t.Fatal("cached numerator was not independently copied", got, wantNumerator, err)
+	}
+	if got, err := qm.Z.String(&d); err != nil || got != "1" {
+		t.Fatal("cached denominator was not independently copied", got, err)
 	}
 	if refs, err := m.GetRefCount(sum); err != nil || refs != 3 {
 		t.Fatal("cached AST ownership", refs, err)
