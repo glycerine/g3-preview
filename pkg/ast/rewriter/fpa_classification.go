@@ -125,7 +125,15 @@ func (r *FPARewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out ast.
 		if isBV {
 			answer, found, err = r.manager.RewriteFPAToFPSignedBVNumeral(d, rm, value)
 		} else {
-			answer, found, err = r.manager.RewriteFPAToFPFormatNumeral(d, rm, value)
+			arithFamily, sortErr := r.manager.GetFamilyID(secondDomain)
+			if sortErr != nil {
+				return RewriteFailed, sortErr
+			}
+			if arithFamily != r.family {
+				answer, found, err = r.manager.RewriteFPAToFPArithmeticNumeral(d, rm, value)
+			} else {
+				answer, found, err = r.manager.RewriteFPAToFPFormatNumeral(d, rm, value)
+			}
 		}
 		if err != nil || !found {
 			return RewriteFailed, err

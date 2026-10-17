@@ -1,4 +1,4 @@
-// Source: src/ast/fpa_decl_plugin.cpp:452-489 (RoundingMode, BitVec or FP).
+// Source: src/ast/fpa_decl_plugin.cpp:452-489,531-564.
 package ast
 
 import "github.com/glycerine/g3/pkg/util/z3exception"
@@ -6,10 +6,11 @@ import "github.com/glycerine/g3/pkg/util/z3exception"
 const FPAOpToFP int32 = astFPAToFP
 
 func (m *ASTManager) floatingPointToFPDecl(ps []ASTParameter, domain []ASTHandle) (astNodeRef, error) {
-	// The other source to_fp arities and arithmetic-sort overloads remain open.
+	// The other source to_fp arities remain open.
 	if len(domain) != 2 {
 		return astNodeRef{}, ErrASTDomain
 	}
+	arithmetic := false
 	for i := range domain {
 		ref, err := m.internal(domain[i])
 		if err != nil {
@@ -22,8 +23,11 @@ func (m *ASTManager) floatingPointToFPDecl(ps []ASTParameter, domain []ASTHandle
 		if err != nil {
 			return astNodeRef{}, err
 		}
+		if i == 1 {
+			arithmetic = ref == m.floatingPointPlugin.real || ref == m.floatingPointPlugin.integer
+		}
 		if i == 0 && (info.family != m.floatingPointPlugin.family || info.kind != 1) ||
-			i == 1 && !((info.family == m.bitVectorPlugin.family || info.family == m.floatingPointPlugin.family) && info.kind == 0) {
+			i == 1 && !arithmetic && !((info.family == m.bitVectorPlugin.family || info.family == m.floatingPointPlugin.family) && info.kind == 0) {
 			return astNodeRef{}, ErrASTDomain
 		}
 	}
@@ -31,11 +35,17 @@ func (m *ASTManager) floatingPointToFPDecl(ps []ASTParameter, domain []ASTHandle
 		return astNodeRef{}, ASTException{z3exception.NewDefaultException(message)}
 	}
 	if len(ps) != 2 {
+		if arithmetic {
+			return fail("expecting two integer parameters to to_fp")
+		}
 		return fail("invalid number of parameters to to_fp")
 	}
 	eParam, eErr := m.parameterOfKind(ps[0], ASTParameterInt)
 	sParam, sErr := m.parameterOfKind(ps[1], ASTParameterInt)
 	if eErr != nil || sErr != nil {
+		if arithmetic {
+			return fail("expecting two integer parameters to to_fp")
+		}
 		return fail("invalid parameter type to to_fp")
 	}
 	fpSort, err := m.mkFloatSort(uint32(eParam.integer), uint32(sParam.integer))

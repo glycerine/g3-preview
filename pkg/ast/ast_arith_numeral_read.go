@@ -17,6 +17,10 @@ func (m *ASTManager) ArithmeticNumeralValueWithInvocation(family FamilyID, h AST
 	if e != nil {
 		return false, e
 	}
+	return m.readArithmeticNumeralWithInvocation(family, r, out, integer, c)
+}
+
+func (m *ASTManager) readArithmeticNumeralWithInvocation(family FamilyID, r astNodeRef, out *unumeral.OwnedRational, integer *bool, c *unumeral.RationalServiceInvocation) (bool, error) {
 	if m.nodeAt(r.slot).kind != ASTApp {
 		return false, nil
 	}

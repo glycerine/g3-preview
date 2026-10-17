@@ -17424,7 +17424,8 @@
         "pkg/ast/ast_fpa_to_fp_unsigned_test.go",
         "pkg/ast/ast_fpa_to_fp_signed_bv_decl.go",
         "pkg/ast/ast_fpa_to_fp_signed_bv_test.go",
-        "pkg/ast/ast_fpa_to_fp_format_test.go"
+        "pkg/ast/ast_fpa_to_fp_format_test.go",
+        "pkg/ast/ast_fpa_to_fp_arithmetic_test.go"
       ],
       "tests": [
         "TestASTFloatingPointClassificationDeclarationsAndApplications",
@@ -17461,7 +17462,8 @@
         "TestASTFPAToBVSourceBoundsRoundingAndUnspecified",
         "TestASTFPAToFPUnsignedDeclarationRoundingAndRefusals",
         "TestASTFPAToFPSignedBVSourceNormalizationAndRounding",
-        "TestASTFPAToFPFormatRoundingSpecialsAndRefusals"
+        "TestASTFPAToFPFormatRoundingSpecialsAndRefusals",
+        "TestASTFPAToFPArithmeticRealIntRoundingAndRefusals"
       ],
       "assertions": [
         {
@@ -17694,6 +17696,14 @@
           "go_target": "pkg/ast/ast_fpa_to_fp_signed_bv_decl.go",
           "tests": [
             "TestASTFPAToFPFormatRoundingSpecialsAndRefusals"
+          ]
+        },
+        {
+          "name": "Concrete to_fp RoundingMode plus Real/Int overloads with two integer target-format parameters (fpa_decl_plugin.cpp:531-564)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_signed_bv_decl.go",
+          "tests": [
+            "TestASTFPAToFPArithmeticRealIntRoundingAndRefusals"
           ]
         },
         {
@@ -26848,7 +26858,9 @@
         "pkg/ast/ast_fpa_to_fp_signed_bv.go",
         "pkg/ast/rewriter/fpa_to_fp_signed_bv_test.go",
         "pkg/ast/ast_fpa_to_fp_format.go",
-        "pkg/ast/rewriter/fpa_to_fp_format_test.go"],
+        "pkg/ast/rewriter/fpa_to_fp_format_test.go",
+        "pkg/ast/ast_fpa_to_fp_arithmetic.go",
+        "pkg/ast/rewriter/fpa_to_fp_arithmetic_test.go"],
       "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestASTFPAUnaryScopedNumeralRetiresBeforeReturn", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
         "TestASTFPARemainderFiniteNumeralAndScopedCleanup",
         "TestFPARemainderNumericSpecialAndSymbolicRefusal",
@@ -26872,7 +26884,9 @@
         "TestASTFPAToFPSignedBVSourceNormalizationAndRounding",
         "TestFPAToFPSignedBVNumericAndSymbolicDispatch",
         "TestASTFPAToFPFormatRoundingSpecialsAndRefusals",
-        "TestFPAToFPFormatSpecialAndSymbolicDispatch"],
+        "TestFPAToFPFormatSpecialAndSymbolicDispatch",
+        "TestASTFPAToFPArithmeticRealIntRoundingAndRefusals",
+        "TestFPAToFPArithmeticRealIntDispatch"],
       "assertions": [
         {
           "line": 43,
@@ -27214,6 +27228,15 @@
           ]
         },
         {
+          "name": "mk_to_fp RoundingMode plus Real/Int numerals via source arithmetic numeral read, rational copy and MPF SetRational (fpa_rewriter.cpp:106-119,154-165)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_arithmetic.go",
+          "tests": [
+            "TestASTFPAToFPArithmeticRealIntRoundingAndRefusals",
+            "TestFPAToFPArithmeticRealIntDispatch"
+          ]
+        },
+        {
           "name": "mk_to_fp_unsigned concrete BV numeral and rounding-mode guard, owned rational to MPF conversion and result publication (fpa_rewriter.cpp:235-254)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_fp_unsigned.go",
@@ -27233,7 +27256,7 @@
         }
       ],
       "ownership": ["Each classification call creates one caller-local scoped_mpf through the AST plugin's concrete numeral probe; successful source destruction retires it before the Boolean result is published. A stopped source destructor remains in the AST plugin's owning cleanup list.", "SMT and IEEE equality construct both scoped_mpf locals before operand probing and retire them in reverse order, preserving the short circuit when the first operand is symbolic."],
-      "deviations": ["The partial Go FPA rewriter handles selected arithmetic and conversion branches; other to_fp overloads, model/theory integration and remaining source cases are unported."]
+      "deviations": ["The partial Go FPA rewriter handles selected arithmetic and conversion branches; other to_fp arities, model/theory integration and remaining source cases are unported."]
     },
     {
       "path": "src/ast/rewriter/fpa_rewriter.h",
@@ -27256,7 +27279,8 @@
         "TestFPAToRealDispatchDefaultAndHardwareUnspecified",
         "TestFPAToIEEEBVDefaultAndHardwareNaNDispatch",
         "TestFPAToFPSignedBVNumericAndSymbolicDispatch",
-        "TestFPAToFPFormatSpecialAndSymbolicDispatch"],
+        "TestFPAToFPFormatSpecialAndSymbolicDispatch",
+        "TestFPAToFPArithmeticRealIntDispatch"],
       "conditionals": [
         {
           "line": 19,
@@ -27348,6 +27372,14 @@
           "go_target": "pkg/ast/rewriter/fpa_classification.go",
           "tests": [
             "TestFPAToFPFormatSpecialAndSymbolicDispatch"
+          ]
+        },
+        {
+          "name": "Concrete mk_to_fp RoundingMode plus Real/Int dispatch with two arguments and symbolic refusal (fpa_rewriter.h:80-81; fpa_rewriter.cpp:90,154-165)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_classification.go",
+          "tests": [
+            "TestFPAToFPArithmeticRealIntDispatch"
           ]
         },
         {
@@ -179228,6 +179260,14 @@
           "go_target": "pkg/ast/ast_fpa_to_fp_format.go",
           "tests": [
             "TestASTFPAToFPFormatRoundingSpecialsAndRefusals"
+          ]
+        },
+        {
+          "name": "Concrete mk_to_fp outer and arithmetic-result scoped_mpf lifetimes around Real/Int numeral conversion (fpa_rewriter.cpp:106-119,154-165; scoped_numeral.h:24-33)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_arithmetic.go",
+          "tests": [
+            "TestASTFPAToFPArithmeticRealIntRoundingAndRefusals"
           ]
         },
         {
