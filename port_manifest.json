@@ -172503,7 +172503,9 @@
         "pkg/ast/ast_bv_polynomial_sub_literal.go",
         "pkg/ast/ast_bv_polynomial_neg_sub_lifetime_test.go",
         "pkg/ast/pattern/collect.go",
-        "pkg/ast/pattern/reduce_quantifier.go"
+        "pkg/ast/pattern/reduce_quantifier.go",
+        "pkg/ast/rewriter/unused_vars_ufbv.go",
+        "pkg/ast/rewriter/unused_vars_ufbv_test.go"
       ],
       "tests": [
         "TestSexprAccessorsAndScalarIterator",
@@ -172556,7 +172558,8 @@
         "TestPatternInferenceCollectorNestedDepthForbiddenAndOwnership",
         "TestPatternInferenceCollectorArithmeticNestedAndDivisionException",
         "TestPatternInferenceQuantifierRetriesWarningsAndWeights",
-        "TestPatternInferenceQuantifierNoPatternReturnAndGuards"
+        "TestPatternInferenceQuantifierNoPatternReturnAndGuards",
+        "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers"
       ],
       "conditionals": [
         {
@@ -172577,6 +172580,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete UFBV elim_unused_vars new_expr and reused tmp expr_ref scalar acquisition, overwrite and reverse destruction after pattern buffers (var_subst.cpp:118-146; obj_ref.h:39-43,83-89)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/unused_vars_ufbv.go",
+          "tests": ["TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers"]
+        },
         {
           "name": "Concrete ast_ref move construction, swap and steal ownership transfer without INC/DEC at obj_ref.h:56-60,100-110",
           "status": "ported",
