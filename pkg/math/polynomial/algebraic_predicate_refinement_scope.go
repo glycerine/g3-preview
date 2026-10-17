@@ -40,7 +40,7 @@ func (m *AlgebraicRootCore) cleanupPredicate() error {
 	if !p.active {
 		return nil
 	}
-	if p.finishing {
+	if p.finishing || p.arithmeticExecuting {
 		return ErrAlgebraicPending
 	}
 	if m.matchesRefinement(&p.refinement) && (m.refinement.pending(m) || m.refinementConversion.pending(m) || m.refinementQ.active) {
@@ -49,6 +49,12 @@ func (m *AlgebraicRootCore) cleanupPredicate() error {
 	p.finishing = true
 	defer func() { p.finishing = false }()
 	z := m.config.Rationals.Integers()
+	if e := p.numericRoots.Cleanup(z); e != nil {
+		if p.ownCause == nil {
+			p.ownCause = e
+		}
+		return e
+	}
 	if e := z.CleanupCopyAllocationInvocation(&p.candidateCopy); e != nil {
 		if p.ownCause == nil {
 			p.ownCause = e
@@ -105,5 +111,35 @@ func (m *AlgebraicRootCore) cleanupPredicate() error {
 		p.ownStage++
 	}
 	p.active = false
+	return nil
+}
+
+// The actual predicate arithmetic frame grants numerical allocation ownership.
+func (p *algebraicPredicateScope) NumericBound(executing bool) bool {
+	m := p.numericOwner
+	return m != nil && m.self == m && !m.closed && p == &m.predicate && p.active && (!executing || p.arithmeticExecuting)
+}
+func (p *algebraicPredicateScope) NumericRoots(z *unumeral.IntegerManager, local *unumeral.NumericAllocationRoots) *unumeral.NumericAllocationRoots {
+	if !p.NumericBound(true) || p.numericOwner.config.Rationals.Integers() != z {
+		return nil
+	}
+	if local != nil {
+		return local
+	}
+	return &p.numericRoots
+}
+func (p *algebraicPredicateScope) numericContext() unumeral.NumericAllocationContext {
+	return unumeral.NumericAllocationContext{}.WithCaller(&p.numericHooks)
+}
+func (p *algebraicPredicateScope) beginArithmetic(m *AlgebraicRootCore) error {
+	if m == nil || m.self != m || p != &m.predicate {
+		return ErrAlgebraicOwner
+	}
+	if !p.active || p.finishing || p.arithmeticExecuting || unumeral.NumericAllocationPending(&p.numericRoots) {
+		return ErrAlgebraicPending
+	}
+	p.numericOwner = m
+	p.numericHooks.Policy = p
+	p.arithmeticExecuting = true
 	return nil
 }

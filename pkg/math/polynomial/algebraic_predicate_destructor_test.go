@@ -5,6 +5,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	"reflect"
 	"testing"
 )
 
@@ -92,7 +93,7 @@ func TestAlgebraicPredicateOwnDestructorJoinsBodyAndRetainsOlderValues(t *testin
 	if e := c.finishPredicate(nil); !errors.Is(e, arena.ErrBounds) {
 		t.Fatal("stopped source finalizer did not remain stopped", e)
 	}
-	if state != *s || used != z.Budget().Used() || stats != runtime.Stats() {
+	if !reflect.DeepEqual(state, *s) || used != z.Budget().Used() || stats != runtime.Stats() {
 		t.Fatal("source finalizer replayed consumed release")
 	}
 	contextTLSFinish(t, runtime, c.CleanupRetained)
@@ -153,7 +154,7 @@ func TestAlgebraicPredicateSavedDestructorCursorAndBodyError(t *testing.T) {
 	if e := c.finishPredicate(nil); !errors.Is(e, arena.ErrBounds) {
 		t.Fatal("stopped saved destructor resumed", e)
 	}
-	if before != *s || used != z.Budget().Used() || stats != z.RuntimeOwner().Stats() {
+	if !reflect.DeepEqual(before, *s) || used != z.Budget().Used() || stats != z.RuntimeOwner().Stats() {
 		t.Fatal("saved destructor replayed source release")
 	}
 	cell = z.Cell(originalUpper)

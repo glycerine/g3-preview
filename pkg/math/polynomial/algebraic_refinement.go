@@ -7,6 +7,10 @@ import (
 )
 
 type algebraicPredicateScope struct {
+	numericOwner                                                                               *AlgebraicRootCore
+	numericHooks                                                                               unumeral.NumericInvocationHooks
+	numericRoots                                                                               unumeral.NumericAllocationRoots
+	arithmeticExecuting                                                                        bool
 	candidateCopy                                                                              unumeral.IntegerCopyAllocationReceipt
 	sourceStop                                                                                 error
 	savedSourceCursor, savedOwnCursor                                                          uint8
@@ -174,7 +178,7 @@ func (m *AlgebraicRootCore) finishPredicate(cause error) error {
 	if !p.active {
 		return cause
 	}
-	if p.finishing {
+	if p.finishing || p.arithmeticExecuting {
 		return errors.Join(cause, ErrAlgebraicPending)
 	}
 	p.finishing = true
@@ -227,7 +231,7 @@ func (m *AlgebraicRootCore) finishPredicate(cause error) error {
 		return cause
 	}
 	z := m.config.Rationals.Integers()
-	if z.MatchesCopyAllocationInvocation(&p.savedCopy) || z.MatchesCopyAllocationInvocation(&p.leadingCopy) || z.MatchesCopyAllocationInvocation(&p.candidateCopy) {
+	if unumeral.NumericAllocationPending(&p.numericRoots) || z.MatchesCopyAllocationInvocation(&p.savedCopy) || z.MatchesCopyAllocationInvocation(&p.leadingCopy) || z.MatchesCopyAllocationInvocation(&p.candidateCopy) {
 		return cause
 	}
 	m.predicate = algebraicPredicateScope{}
@@ -470,12 +474,17 @@ func (m *AlgebraicRootCore) constructPredicateSaved(a *Algebraic, r *algebraicRe
 }
 func (m *AlgebraicRootCore) scalePredicateBounds(r *algebraicRecord) error {
 	p := &m.predicate
-	p.lowerActive = true
-	p.upperActive = true
-	if e := m.config.Binary.MulInteger(r.interval.BorrowLower(), &m.isRationalTmp, &p.lower); e != nil {
+	if e := p.beginArithmetic(m); e != nil {
 		return e
 	}
-	return m.config.Binary.MulInteger(r.interval.BorrowUpper(), &m.isRationalTmp, &p.upper)
+	defer func() { p.arithmeticExecuting = false }()
+	ops := m.config.Binary.WithAllocationContext(p.numericContext())
+	p.lowerActive = true
+	p.upperActive = true
+	if e := ops.MulInteger(r.interval.BorrowLower(), &m.isRationalTmp, &p.lower); e != nil {
+		return e
+	}
+	return ops.MulInteger(r.interval.BorrowUpper(), &m.isRationalTmp, &p.upper)
 }
 func (m *AlgebraicRootCore) floorPredicateCandidate(upper *unumeral.BinaryRational) error {
 	p := &m.predicate

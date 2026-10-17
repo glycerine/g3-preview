@@ -165,6 +165,9 @@ func (m *BinaryRationalManager) Mul(a, b, r *BinaryRational) (err error) {
 	return m.debugArithmetic(&da, &db, r, 2, 0)
 }
 func (m *BinaryRationalManager) MulInteger(a *BinaryRational, b *Int, r *BinaryRational) (err error) {
+	return m.mulIntegerWithAllocationContext(a, b, r, integerAllocationInvocationContext{})
+}
+func (m *BinaryRationalManager) mulIntegerWithAllocationContext(a *BinaryRational, b *Int, r *BinaryRational, context integerAllocationInvocationContext) (err error) {
 	if e := m.pair(a, r); e != nil {
 		return e
 	}
@@ -189,11 +192,11 @@ func (m *BinaryRationalManager) MulInteger(a *BinaryRational, b *Int, r *BinaryR
 			err = cleanup
 		}
 	}()
-	if e = m.Z.Mul(&a.Num, b, &r.Num); e != nil {
+	if e = m.Z.WithAllocationContext(context).Mul(&a.Num, b, &r.Num); e != nil {
 		return e
 	}
 	r.KField = a.KField
-	if e = m.normalize(r); e != nil {
+	if e = m.normalizeWithAllocationContext(r, context); e != nil {
 		return e
 	}
 	return m.debugArithmetic(&da, &db, r, 2, 0)

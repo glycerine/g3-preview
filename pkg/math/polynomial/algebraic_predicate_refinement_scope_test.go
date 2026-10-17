@@ -81,7 +81,7 @@ func algebraicPredicateRefinementStopCase(t *testing.T, predicateFirst bool) {
 				if _, e := c.IsRational(&root); !errors.Is(e, ErrAlgebraicPending) {
 					t.Fatal("stopped predicate replaced", e)
 				}
-				if before != *s || used != z.Budget().Used() || stats != runtime.Stats() {
+				if !reflect.DeepEqual(before, *s) || used != z.Budget().Used() || stats != runtime.Stats() {
 					t.Fatal("replacement mutated retained predicate")
 				}
 				if e := c.cleanupPredicate(); !errors.Is(e, ErrAlgebraicPending) {

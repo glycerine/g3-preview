@@ -38335,7 +38335,8 @@
         "pkg/math/polynomial/algebraic_refinement_rational_scope_test.go",
         "pkg/math/polynomial/algebraic_predicate_refinement_scope.go",
         "pkg/math/polynomial/algebraic_predicate_refinement_scope_test.go",
-        "pkg/math/polynomial/algebraic_predicate_destructor_test.go"
+        "pkg/math/polynomial/algebraic_predicate_destructor_test.go",
+        "pkg/math/polynomial/algebraic_predicate_arithmetic_test.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",
@@ -157705,7 +157706,8 @@
         "pkg/util/numeral/mpbq_decimal_stream.go",
         "pkg/util/numeral/mpbq_decimal_stream_test.go",
         "pkg/util/numeral/mpbq_select_trace.go",
-        "pkg/util/numeral/mpbq_debug_trace.go"
+        "pkg/util/numeral/mpbq_debug_trace.go",
+        "pkg/math/polynomial/algebraic_predicate_arithmetic_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",

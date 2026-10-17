@@ -452,3 +452,10 @@ func (o NumericBinaryRationalOperations) LessOneDiv2k(a *BinaryRational, k uint3
 	}
 	return o.manager.lessOneDiv2kWithAllocationContext(a, k, o.context)
 }
+
+func (o NumericBinaryRationalOperations) MulInteger(a *BinaryRational, b *Int, out *BinaryRational) error {
+	if e := o.valid(); e != nil {
+		return e
+	}
+	return o.manager.mulIntegerWithAllocationContext(a, b, out, o.context)
+}
