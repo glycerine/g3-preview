@@ -158,11 +158,15 @@ digraph packages {
   "nlsat" [style=filled, fillcolor="#eeeeee"];
   "nlsat" -> "util/params";
   "opt" [style=filled, fillcolor="#eeeeee"];
+  "opt" -> "arena";
+  "opt" -> "ast";
+  "opt" -> "util/numeral";
   "opt" -> "util/params";
   "parsers/smt2" [style=filled, fillcolor="#eeeeee"];
   "parsers/smt2" -> "ast";
   "parsers/smt2" -> "ast/rewriter";
   "parsers/smt2" -> "smtcore";
+  "parsers/smt2" -> "util/diagnostic";
   "parsers/smt2" -> "util/symbol";
   "parsers/util" [style=filled, fillcolor="#eeeeee"];
   "parsers/util" -> "util/params";
