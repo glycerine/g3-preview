@@ -113,7 +113,7 @@ func (s *ContextParams) DotProofFile() string {
 	return s.dotProof
 }
 
-func contextCString(text string) string {
+func sourceCStringPrefix(text string) string {
 	if i := strings.IndexByte(text, 0); i >= 0 {
 		return text[:i]
 	}
@@ -225,7 +225,7 @@ func (s *ContextParams) update(p *uparams.ParamsRef) error {
 	if e != nil {
 		return e
 	}
-	s.traceFile = contextCString(traceFileText)
+	s.traceFile = sourceCStringPrefix(traceFileText)
 	kdotProof := "dot_proof_file"
 	ddotProof := "proof.dot"
 	vdotProof, e := s.context.GetStringViewFallbackName(p, &kdotProof, nil, &ddotProof)
@@ -236,7 +236,7 @@ func (s *ContextParams) update(p *uparams.ParamsRef) error {
 	if e != nil {
 		return e
 	}
-	s.dotProof = contextCString(dotProofText)
+	s.dotProof = sourceCStringPrefix(dotProofText)
 	kUnsatCore := "unsat_core"
 	vUnsatCore, e := s.context.GetBoolName(p, &kUnsatCore, s.state.UnsatCore)
 	if e != nil {

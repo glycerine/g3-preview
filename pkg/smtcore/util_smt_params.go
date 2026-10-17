@@ -331,8 +331,8 @@ func (s *SMTParams) endBasesSource() {
 		s.endedBases |= 1 << 3
 	}
 	if s.completedBases&(1<<2) != 0 && s.endedBases&(1<<2) == 0 {
-		s.qi.newGen.SourceDestroy()
-		s.qi.cost.SourceDestroy()
+		s.qi.newGen = ""
+		s.qi.cost = ""
 		s.qi.closed = true
 		s.endedBases |= 1 << 2
 	}

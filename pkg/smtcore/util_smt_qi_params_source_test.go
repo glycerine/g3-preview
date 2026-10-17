@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -15,7 +16,7 @@ import (
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
-func TestSMTQILiteralDefaultsUninitializedEMatchingAndOwnedText(t *testing.T) {
+func TestSMTQILiteralDefaultsUninitializedEMatchingAndGoText(t *testing.T) {
 	c, g, p, b := dynAckSourceFixture(t)
 	v, e := NewSMTQIParams(c, p, g, b)
 	paramsMust(t, e)
@@ -27,8 +28,7 @@ func TestSMTQILiteralDefaultsUninitializedEMatchingAndOwnedText(t *testing.T) {
 	}
 	cost, e := v.CostText()
 	paramsMust(t, e)
-	text, e := cost.String()
-	paramsMust(t, e)
+	text := cost
 	if text != "(+ weight generation)" {
 		t.Fatal("owned default cost", text)
 	}
@@ -43,6 +43,35 @@ func TestSMTQILiteralDefaultsUninitializedEMatchingAndOwnedText(t *testing.T) {
 		t.Fatal("literal label before uninitialized source read", text)
 	}
 	paramsMust(t, out.Close())
+}
+
+func TestSMTQIGoStringCostBoundaryAndCountedDisplay(t *testing.T) {
+	c, g, p, b := dynAckSourceFixture(t)
+	v, e := NewSMTQIParams(c, p, g, b)
+	paramsMust(t, e)
+	paramsMust(t, v.SetEmatching(true))
+	before, e := v.CostText()
+	paramsMust(t, e)
+	key, value := "qi.cost", "short\x00ignored"
+	paramsMust(t, c.SetStringName(p, &key, &value))
+	paramsMust(t, v.Update(p))
+	after, e := v.CostText()
+	paramsMust(t, e)
+	if before != "(+ weight generation)" || after != "short" {
+		t.Fatal("Go string snapshot and C-string input boundary", before, after)
+	}
+	v.cost = "a\x00b"
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: b})
+	paramsMust(t, e)
+	paramsMust(t, v.Display(out))
+	got, e := out.String()
+	paramsMust(t, e)
+	if !strings.Contains(got, "m_qi_cost=a\x00b\n") {
+		t.Fatal("counted Go string output", got)
+	}
+	paramsMust(t, out.Close())
+	paramsMust(t, v.Close())
+	qiNamedColdGraph(t, nil, g, b)
 }
 
 func qiNamedColdGraph(t *testing.T, v *SMTQIParams, g *uparams.GlobalParamsService, b *arena.Budget) {
@@ -61,7 +90,7 @@ func qiNamedColdGraph(t *testing.T, v *SMTQIParams, g *uparams.GlobalParamsServi
 		if v.self != v || v.Budget != b {
 			t.Fatal("exact QI wrapper identity")
 		}
-		n += v.header + uint64(v.cost.StorageBytes()+v.newGen.StorageBytes())
+		n += v.header
 		for f := v.Helpers; f != nil; f = f.Next {
 			if f.Self != f || f.Owner != &v.ModuleParamsOwner {
 				t.Fatal("actual QI helper")
@@ -73,7 +102,7 @@ func qiNamedColdGraph(t *testing.T, v *SMTQIParams, g *uparams.GlobalParamsServi
 		t.Fatal("actual once-only cold/payload graph before fault lift", n, b.Used())
 	}
 }
-func TestSMTQIEveryConstructorReservationAndOwnedMemberUnwind(t *testing.T) {
+func TestSMTQIEveryConstructorReservationAndGoStringUnwind(t *testing.T) {
 	first := -1
 	for ordinal := int64(0); ordinal < 16; ordinal++ {
 		c, g, p, b := dynAckSourceFixture(t)
@@ -89,7 +118,7 @@ func TestSMTQIEveryConstructorReservationAndOwnedMemberUnwind(t *testing.T) {
 			if v.state.DefaultsInitialized != (ordinal >= 1) {
 				t.Fatal("actual scalar initialization frontier", ordinal, v.state.DefaultsInitialized)
 			}
-			if v.constructorReady || v.Helpers != nil || v.cost.StorageBytes() != 0 || v.newGen.StorageBytes() != 0 {
+			if v.constructorReady || v.Helpers != nil {
 				t.Fatal("completed member reverse source unwind", ordinal, v.completed)
 			}
 			copyOwner := *v
@@ -111,7 +140,7 @@ func TestSMTQIEveryConstructorReservationAndOwnedMemberUnwind(t *testing.T) {
 		t.Fatal("wrapper then helper; Go text is not arena-allocated", first)
 	}
 }
-func TestSMTQIUpdateBorrowedIDOwnedCostAndLateAllocationPrefix(t *testing.T) {
+func TestSMTQIUpdateBorrowedIDGoCostAndLateAllocationPrefix(t *testing.T) {
 	c, g, p, b := dynAckSourceFixture(t)
 	v, e := NewSMTQIParams(c, p, g, b)
 	paramsMust(t, e)
@@ -135,14 +164,13 @@ func TestSMTQIUpdateBorrowedIDOwnedCostAndLateAllocationPrefix(t *testing.T) {
 	}
 	qiNamedColdGraph(t, v, g, b)
 	b.FailAfter(-1)
-	if _, e = old.Byte(0); !errors.Is(e, arena.ErrInvalidSlot) {
-		t.Fatal("released old data pointer lifetime", e)
+	if old != "(+ weight generation)" {
+		t.Fatal("old Go string snapshot", old)
 	}
 	owned, e := v.CostText()
 	paramsMust(t, e)
 	paramsMust(t, c.Reset(p))
-	txt, e := owned.String()
-	paramsMust(t, e)
+	txt := owned
 	if txt != cost {
 		t.Fatal("Go text did not copy borrowed chars", txt)
 	}
@@ -331,8 +359,7 @@ func TestSMTQIAllFourteenGettersIndependentFallbackAndUnchangedFields(t *testing
 			case 4:
 				text, e := v.CostText()
 				paramsMust(t, e)
-				got, e := text.String()
-				paramsMust(t, e)
+				got := text
 				if got != wantText {
 					t.Fatal("owned cost precedence", tc, mode, got, wantText)
 				}
@@ -367,7 +394,7 @@ func TestSMTQIEveryUnwarmedSharedModuleAcquisitionReservation(t *testing.T) {
 		v, cause := NewSMTQIParams(c, &local, g, b)
 		n := g.OwnerBytes + catalogGraph(catalog) + gparamsGraph(g.Current) + astTestSymbolGraph(sy) + sy.Stats().Table.RetainedBytes
 		if v != nil {
-			n += v.header + uint64(v.cost.StorageBytes()+v.newGen.StorageBytes())
+			n += v.header
 			for f := v.Helpers; f != nil; f = f.Next {
 				n += f.Header
 			}
@@ -462,7 +489,7 @@ func TestSMTQIShowPosAndFileBadbitStillReachesBorrowedCString(t *testing.T) {
 	paramsMust(t, out.Close())
 	qiNamedColdGraph(t, v, g, b)
 }
-func TestSMTQIOwnedStringSameCapacityAliasAndNullCostPrefix(t *testing.T) {
+func TestSMTQIGoStringSnapshotAndNullCostPrefix(t *testing.T) {
 	c, g, p, b := dynAckSourceFixture(t)
 	v, e := NewSMTQIParams(c, p, g, b)
 	paramsMust(t, e)
@@ -472,10 +499,10 @@ func TestSMTQIOwnedStringSameCapacityAliasAndNullCostPrefix(t *testing.T) {
 	key, text := "qi.cost", "abcd"
 	paramsMust(t, c.SetStringName(p, &key, &text))
 	paramsMust(t, v.Update(p))
-	if _, e = old.Byte(0); !errors.Is(e, arena.ErrInvalidSlot) {
-		t.Fatal("assignment invalidates checked view", e)
+	if old != "(+ weight generation)" {
+		t.Fatal("previous Go string snapshot", old)
 	}
-	if !v.cost.Matches(text) {
+	if v.cost != text {
 		t.Fatal("assigned text")
 	}
 	paramsMust(t, c.SetStringName(p, &key, nil))
@@ -487,8 +514,7 @@ func TestSMTQIOwnedStringSameCapacityAliasAndNullCostPrefix(t *testing.T) {
 	}
 	current, e := v.CostText()
 	paramsMust(t, e)
-	got, e := current.String()
-	paramsMust(t, e)
+	got := current
 	if got != text {
 		t.Fatal("unread replacement on null pointer", got)
 	}
@@ -500,13 +526,13 @@ func TestSMTQIOwnedStringSameCapacityAliasAndNullCostPrefix(t *testing.T) {
 		t.Fatal("completed object source-valid retry")
 	}
 	paramsMust(t, v.Close())
-	if _, e = old.Byte(0); !errors.Is(e, arena.ErrInvalidSlot) {
-		t.Fatal("actual ended owned string view", e)
+	if old != "(+ weight generation)" {
+		t.Fatal("closed owner changed Go string snapshot", old)
 	}
 	qiNamedColdGraph(t, nil, g, b)
 }
 
-func TestSMTQIEveryOwnedCostReplacementReservation(t *testing.T) {
+func TestSMTQIEveryGoCostReplacementReservation(t *testing.T) {
 	first := -1
 	for ordinal := int64(0); ordinal < 8; ordinal++ {
 		c, g, p, b := dynAckSourceFixture(t)
@@ -525,8 +551,7 @@ func TestSMTQIEveryOwnedCostReplacementReservation(t *testing.T) {
 			if !errors.Is(cause, arena.ErrInjectedFailure) || v.state.MaxEagerMultipatterns != 0 {
 				t.Fatal("actual frame then char array refusal prefix", ordinal, cause)
 			}
-			got, e := old.String()
-			paramsMust(t, e)
+			got := old
 			if got != "(+ weight generation)" {
 				t.Fatal("old payload before replacement publication", got)
 			}
@@ -534,13 +559,12 @@ func TestSMTQIEveryOwnedCostReplacementReservation(t *testing.T) {
 			if v.state.MaxEagerMultipatterns != 19 {
 				t.Fatal("actual geometric array and final getter publication")
 			}
-			got, e := v.cost.View().String()
-			paramsMust(t, e)
+			got := v.cost
 			if got != text {
 				t.Fatal("ascending copied bytes", got)
 			}
-			if _, e = old.Byte(0); !errors.Is(e, arena.ErrInvalidSlot) {
-				t.Fatal("old address invalidated only by replacement", e)
+			if old != "(+ weight generation)" {
+				t.Fatal("old string snapshot after replacement", old)
 			}
 		}
 		b.FailAfter(-1)

@@ -119,7 +119,6 @@ func smtParamsNamedCold(t *testing.T, s *SMTParams, g *uparams.GlobalParamsServi
 				n += f.Header
 			}
 		}
-		n += uint64(s.qi.cost.StorageBytes() + s.qi.newGen.StorageBytes())
 	}
 	if g.Symbols.Budget == b {
 		n += astTestSymbolGraph(g.Symbols) + g.Symbols.Stats().Table.RetainedBytes
@@ -813,7 +812,7 @@ func TestSMTParamsCompletedSourceFinalizeEndsBasesBeforeOwningHeaderRefund(t *te
 	// Source destruction ends completed bases; the Go placement header remains
 	// an explicit owning obligation and borrowed providers remain caller-owned.
 	paramsMust(t, s.SourceFinalize())
-	if s.endedBases != 511 || !s.closed || s.header != header || !s.qi.closed || !s.preprocess.closed || s.qi.cost.External != nil || s.qi.newGen.External != nil {
+	if s.endedBases != 511 || !s.closed || s.header != header || !s.qi.closed || !s.preprocess.closed || s.qi.cost != "" || s.qi.newGen != "" {
 		t.Fatal("actual reverse completed source lifetime", s.endedBases, s.header)
 	}
 	if b.Used() > before {

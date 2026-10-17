@@ -12,8 +12,8 @@ import (
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
-// DefaultsInitialized records the actual scalar initializer frontier after
-// both string constructors; State otherwise exposes diagnostic Go storage only.
+// DefaultsInitialized records the scalar initializer frontier after the
+// Go string members; State otherwise exposes diagnostic Go storage only.
 type SMTQIState struct {
 	DefaultsInitialized                                bool
 	Ematching, EmatchingInitialized                    bool
@@ -33,7 +33,7 @@ type SMTQIParams struct {
 	uparams.ModuleParamsOwner
 	self                     *SMTQIParams
 	state                    SMTQIState
-	cost, newGen             OwnedString
+	cost, newGen             string
 	header                   uint64
 	completed                uint8
 	constructorReady, closed bool
@@ -67,16 +67,9 @@ func (s *SMTQIParams) constructSource(c *uparams.ParamsContext, p *uparams.Param
 	*s = SMTQIParams{ModuleParamsOwner: uparams.ModuleParamsOwner{Context: c, Globals: g, Budget: b}, header: s.header}
 	s.self = s
 	s.ModuleParamsOwner.Self = &s.ModuleParamsOwner
-	if e := s.cost.Construct(b, "(+ weight generation)"); e != nil {
-		s.constructorCause = e
-		return e
-	}
+	s.cost = "(+ weight generation)"
 	s.completed = 1
-	if e := s.newGen.Construct(b, "cost"); e != nil {
-		s.cost.SourceDestroy()
-		s.constructorCause = e
-		return e
-	}
+	s.newGen = "cost"
 	s.completed = 2
 	// Actual later scalar initializers run only after both earlier members.
 	s.state = SMTQIState{EagerThreshold: 10, LazyThreshold: 20, MaxLazyMultipatternMatching: 2, ProfileFrequency: 4294967295, LazyQuickChecker: true, PromoteUnsat: true, MaxInstances: 4294967295, MBQI: true, MaxCexs: 1, MaxCexsIncrement: 1, MaxIterations: 1000, ForceTemplate: 10}
@@ -86,8 +79,8 @@ func (s *SMTQIParams) constructSource(c *uparams.ParamsContext, p *uparams.Param
 		s.constructorCause = e
 		// A younger stopped lexical DT protects older automatic members as well.
 		if s.DestructorCause == nil {
-			s.newGen.SourceDestroy()
-			s.cost.SourceDestroy()
+			s.newGen = ""
+			s.cost = ""
 		}
 	} else {
 		s.constructorReady = true
@@ -109,14 +102,14 @@ func (s *SMTQIParams) State() (SMTQIState, error) {
 	}
 	return s.state, nil
 }
-func (s *SMTQIParams) CostText() (QITextView, error) {
+func (s *SMTQIParams) CostText() (string, error) {
 	if e := s.open(); e != nil {
-		return QITextView{}, e
+		return "", e
 	}
 	if !s.constructorReady {
-		return QITextView{}, uparams.ErrParamsPrecondition
+		return "", uparams.ErrParamsPrecondition
 	}
-	return s.cost.View(), nil
+	return s.cost, nil
 }
 func (s *SMTQIParams) SetEmatching(v bool) error {
 	if e := s.open(); e != nil {
@@ -222,9 +215,7 @@ func (s *SMTQIParams) update(local *uparams.ParamsRef) (result error) {
 	if e != nil {
 		return e
 	}
-	if e = s.cost.Assign(cost); e != nil {
-		return e
-	}
+	s.cost = sourceCStringPrefix(cost)
 	u, e = s.FrameUInt(p, "qi.max_multi_patterns", 0)
 	if e != nil {
 		return e
@@ -245,8 +236,8 @@ func (s *SMTQIParams) Close() error {
 	if e := s.CloseHelpers(); e != nil {
 		return e
 	}
-	s.newGen.OwnAbort()
-	s.cost.OwnAbort()
+	s.newGen = ""
+	s.cost = ""
 	s.Budget.Release(s.header)
 	s.header = 0
 	s.closed = true
@@ -282,7 +273,7 @@ func (s *SMTQIParams) Display(out *utext.NumericTextStream) error {
 	if e := out.AppendCString("m_qi_cost="); e != nil {
 		return e
 	}
-	if e := s.cost.AppendTo(out); e != nil {
+	if e := out.AppendString(s.cost); e != nil {
 		return e
 	}
 	if e := out.AppendByte('\n'); e != nil {
@@ -294,7 +285,7 @@ func (s *SMTQIParams) Display(out *utext.NumericTextStream) error {
 	if e := out.AppendCString("m_qi_new_gen="); e != nil {
 		return e
 	}
-	if e := s.newGen.AppendTo(out); e != nil {
+	if e := out.AppendString(s.newGen); e != nil {
 		return e
 	}
 	if e := out.AppendByte('\n'); e != nil {

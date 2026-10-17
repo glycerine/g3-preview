@@ -235,14 +235,14 @@ func (s *ContextParams) SetViews(param, value uparams.ParamsStringView) (result 
 		if e != nil {
 			return e
 		}
-		s.traceFile = contextCString(text)
+		s.traceFile = sourceCStringPrefix(text)
 		return nil
 	case f.key == "dot_proof_file":
 		text, e := value.String()
 		if e != nil {
 			return e
 		}
-		s.dotProof = contextCString(text)
+		s.dotProof = sourceCStringPrefix(text)
 		return nil
 	case f.key == "unsat_core":
 		return s.setSourceBool(f, &s.state.UnsatCore, param, value)

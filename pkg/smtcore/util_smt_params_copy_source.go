@@ -9,7 +9,7 @@ import (
 
 // Compiler-generated copies copy source members, never Go owner/receipt history.
 // Borrowed global services need not be touched while copying inline values and
-// already-owned string storage. Ended or source-stopped owners are a Go guard.
+// Go strings. Ended or source-stopped owners are a Go guard.
 
 func (s *SMTParams) copySourceReady() error {
 	if e := s.open(); e != nil {
@@ -56,17 +56,12 @@ func (s *SMTParams) Clone() (*SMTParams, error) {
 	d.completedBases |= 2
 	d.initCopyOwner(&d.qi.ModuleParamsOwner)
 	d.qi.self = &d.qi
-	// m_qi_ematching is declared before the two actual string constructors.
+	// m_qi_ematching is declared before the two Go string members.
 	d.qi.state.Ematching = s.qi.state.Ematching
 	d.qi.state.EmatchingInitialized = s.qi.state.EmatchingInitialized
-	if e := d.qi.cost.CopyConstruct(d.Budget, &s.qi.cost); e != nil {
-		return d, d.copyConstructorFailure(e)
-	}
+	d.qi.cost = s.qi.cost
 	d.qi.completed = 1
-	if e := d.qi.newGen.CopyConstruct(d.Budget, &s.qi.newGen); e != nil {
-		d.qi.cost.SourceDestroy()
-		return d, d.copyConstructorFailure(e)
-	}
+	d.qi.newGen = s.qi.newGen
 	d.qi.completed = 3
 	d.qi.state = s.qi.state
 	d.qi.constructorReady = true
@@ -100,12 +95,6 @@ func (s *SMTParams) Clone() (*SMTParams, error) {
 	d.constructorReady = true
 	return d, nil
 }
-func (s *SMTParams) copyConstructorFailure(e error) error {
-	s.constructorCause = e
-	s.qi.constructorCause = e
-	s.endBasesSource() // Only the actually completed preprocessor/dyn bases.
-	return e
-}
 func (s *SMTParams) Assign(src *SMTParams) error {
 	if e := s.admitMutation(); e != nil {
 		return e
@@ -130,12 +119,8 @@ func (s *SMTParams) Assign(src *SMTParams) error {
 	s.dyn.state = src.dyn.state
 	s.qi.state.Ematching = src.qi.state.Ematching
 	s.qi.state.EmatchingInitialized = src.qi.state.EmatchingInitialized
-	if e := s.qi.cost.CopyAssign(&src.qi.cost); e != nil {
-		return s.copyAssignmentFailure(e)
-	}
-	if e := s.qi.newGen.CopyAssign(&src.qi.newGen); e != nil {
-		return s.copyAssignmentFailure(e)
-	}
+	s.qi.cost = src.qi.cost
+	s.qi.newGen = src.qi.newGen
 	s.qi.state = src.qi.state
 	s.arith.state = src.arith.state
 	s.array.state = src.array.state
@@ -145,10 +130,4 @@ func (s *SMTParams) Assign(src *SMTParams) error {
 	s.datatype = src.datatype
 	s.state = src.state
 	return nil
-}
-func (s *SMTParams) copyAssignmentFailure(e error) error {
-	if s.copyCause == nil {
-		s.copyCause = e
-	}
-	return e
 }
