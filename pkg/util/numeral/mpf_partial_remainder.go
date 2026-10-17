@@ -52,23 +52,6 @@ func (s *arbitraryFloatPartialRemainderScope) power(n uint32) (Int, error) {
 	}
 	return w.Capture()
 }
-func (s *arbitraryFloatPartialRemainderScope) assertPower(v *Int, n uint32, ge bool) error {
-	if !modularSourceDebug {
-		return nil
-	}
-	p, e := s.power(n)
-	if e != nil {
-		return e
-	}
-	cmp, e := s.manager.integer.Compare(v, &p)
-	if e != nil {
-		return e
-	}
-	if ge && cmp < 0 || !ge && cmp >= 0 {
-		return ErrIntegerAssertion
-	}
-	return nil
-}
 func (s *arbitraryFloatPartialRemainderScope) sourceAssertPower(v *Int, n uint32, ge bool, line int32, expression string) error {
 	enabled, e := mpfSourceAssertionsEnabled()
 	if e != nil || !enabled {
@@ -220,19 +203,23 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 			return nil
 		}
 	}
-	if modularSourceDebug {
+	assertionsEnabled, e := mpfSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if assertionsEnabled {
 		empty, e := z.IsZero(q)
 		if e != nil {
 			return e
 		}
-		if empty {
-			return ErrIntegerAssertion
+		if e := mpfSourceAssertion(!empty, 1339, "!m_mpz_manager.is_zero(Q_sig)"); e != nil {
+			return e
 		}
 	}
-	if e := s.assertPower(q, sb, false); e != nil {
+	if e := s.sourceAssertPower(q, sb, false, 1340, "m_mpz_manager.lt(Q_sig, m_powers2(sbits))"); e != nil {
 		return e
 	}
-	if e := s.assertPower(q, sb-1, true); e != nil {
+	if e := s.sourceAssertPower(q, sb-1, true, 1341, "m_mpz_manager.ge(Q_sig, m_powers2(sbits - 1))"); e != nil {
 		return e
 	}
 	s.live[6] = true
@@ -250,10 +237,14 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 	if e := m.tracePartialRemainderProduct(x.Sign(), pe, product, eb, sb); e != nil {
 		return e
 	}
-	if e := s.assertPower(product, 2*sb-1, false); e != nil {
+	if e := s.sourceAssertPower(product, 2*sb-1, false, 1358, "m_mpz_manager.lt(YQ_sig, m_powers2(2*sbits-1))"); e != nil {
 		return e
 	}
-	if modularSourceDebug {
+	assertionsEnabled, e = mpfSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if assertionsEnabled {
 		p, e := s.power(2*sb - 2)
 		if e != nil {
 			return e
@@ -262,14 +253,16 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 		if e != nil {
 			return e
 		}
-		if !ge {
+		predicate := ge
+		if !predicate {
 			bottom, e := m.bottomExponent(eb)
 			if e != nil {
 				return e
 			}
-			if pe > bottom {
-				return ErrIntegerAssertion
-			}
+			predicate = pe <= bottom
+		}
+		if e := mpfSourceAssertion(predicate, 1359, "m_mpz_manager.ge(YQ_sig, m_powers2(2*sbits-2)) || YQ_exp <= mk_bot_exp(ebits)"); e != nil {
+			return e
 		}
 	}
 	re := x.exponent
@@ -280,8 +273,8 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 		return e
 	}
 	m.tracePartialRemainderExponentDelta(delta)
-	if modularSourceDebug && !(delta > -2147483648 && delta <= 2147483647) {
-		return ErrIntegerAssertion
+	if e := mpfSourceAssertion(delta > -2147483648 && delta <= 2147483647, 1366, "INT_MIN < exp_delta && exp_delta <= INT_MAX"); e != nil {
+		return e
 	}
 	s.live[8], s.live[9], s.live[10] = true, true, true
 	minuend, subtrahend, xLarge := &s.values[8], &s.values[9], &s.values[10]
@@ -294,13 +287,17 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 	if e := s.copyValue(subtrahend, product); e != nil {
 		return e
 	}
-	for _, v := range [...]*Int{minuend, subtrahend} {
-		if e := s.assertPower(v, 2*sb-1, false); e != nil {
-			return e
-		}
-		if e := s.assertPower(v, 2*sb-2, true); e != nil {
-			return e
-		}
+	if e := s.sourceAssertPower(minuend, 2*sb-1, false, 1375, "m_mpz_manager.lt(minuend, m_powers2(2*sbits-1))"); e != nil {
+		return e
+	}
+	if e := s.sourceAssertPower(minuend, 2*sb-2, true, 1376, "m_mpz_manager.ge(minuend, m_powers2(2*sbits-2))"); e != nil {
+		return e
+	}
+	if e := s.sourceAssertPower(subtrahend, 2*sb-1, false, 1377, "m_mpz_manager.lt(subtrahend, m_powers2(2*sbits-1))"); e != nil {
+		return e
+	}
+	if e := s.sourceAssertPower(subtrahend, 2*sb-2, true, 1378, "m_mpz_manager.ge(subtrahend, m_powers2(2*sbits-2))"); e != nil {
+		return e
 	}
 	if delta != 0 {
 		s.live[11] = true
@@ -321,6 +318,9 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 				return e
 			}
 		} else {
+			if e := mpfSourceAssertion(delta < 0, 1388, "exp_delta < 0"); e != nil {
+				return e
+			}
 			if delta == -1<<63 {
 				return arena.ErrBounds
 			}
@@ -383,7 +383,7 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 	if e := m.tracePartialRemainderDifference(minuend, subtrahend, sign, re, result, eb, sb); e != nil {
 		return e
 	}
-	if e := s.assertPower(result, 2*sb-1, false); e != nil {
+	if e := s.sourceAssertPower(result, 2*sb-1, false, 1418, "m_mpz_manager.lt(X_YQ_sig, m_powers2(2*sbits-1))"); e != nil {
 		return e
 	}
 	s.live[12] = true

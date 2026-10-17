@@ -100,3 +100,58 @@ func TestArbitraryFloatPartialRemainderPartialQuotientSourceAssertion(t *testing
 	serviceMust(t, m.Del(&y))
 	serviceMust(t, m.Del(&x))
 }
+
+func TestArbitraryFloatPartialRemainderAlignmentExponentSourceAssertion(t *testing.T) {
+	if !modularSourceDebug {
+		t.Skip("source Z3DEBUG assertion only")
+	}
+	_, log := bindMPNDebugActions(t, "T")
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	var x, y ArbitraryFloat
+	sig := NewInt(8)
+	serviceMust(t, m.SetComponents(&x, 11, 4, false, 1<<32, &sig))
+	serviceMust(t, m.SetComponents(&y, 11, 4, false, 0, &sig))
+	beforeX, beforeY := x, y
+	if e := m.PartialRemainder(&x, &y, 0, false); !isMPNVerificationThrow(e) || x != beforeX || y != beforeY {
+		t.Fatal("alignment exponent assertion before aligned operands", e, x, y)
+	}
+	contents, e := os.ReadFile(log.Name())
+	serviceMust(t, e)
+	if n := strings.Count(string(contents), "File: src/util/mpf.cpp\nLine: 1366\nINT_MIN < exp_delta && exp_delta <= INT_MAX\n"); n != 1 {
+		t.Fatal("source alignment exponent assertion site", n, string(contents))
+	}
+	serviceMust(t, m.CleanupPartialRemainder())
+	serviceMust(t, m.Del(&y))
+	serviceMust(t, m.Del(&x))
+}
+
+func TestArbitraryFloatPartialRemainderProductLowerBoundSourceAction(t *testing.T) {
+	if !modularSourceDebug {
+		t.Skip("source Z3DEBUG assertions only")
+	}
+	_, log := bindMPNDebugActions(t, "CCCT")
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	var x, y ArbitraryFloat
+	xSig, ySig := NewInt(0), NewInt(8)
+	serviceMust(t, m.SetComponents(&x, 11, 4, false, 0, &xSig))
+	serviceMust(t, m.SetComponents(&y, 11, 4, false, 0, &ySig))
+	beforeX, beforeY := x, y
+	if e := m.PartialRemainder(&x, &y, 0, false); !isMPNVerificationThrow(e) || x != beforeX || y != beforeY {
+		t.Fatal("source product lower bound after continued earlier assertions", e, x, y)
+	}
+	contents, e := os.ReadFile(log.Name())
+	serviceMust(t, e)
+	for _, site := range []string{
+		"Line: 1288\nm_mpz_manager.ge(x.significand, m_powers2(sbits - 1))\n",
+		"Line: 1339\n!m_mpz_manager.is_zero(Q_sig)\n",
+		"Line: 1341\nm_mpz_manager.ge(Q_sig, m_powers2(sbits - 1))\n",
+		"Line: 1359\nm_mpz_manager.ge(YQ_sig, m_powers2(2*sbits-2)) || YQ_exp <= mk_bot_exp(ebits)\n",
+	} {
+		if n := strings.Count(string(contents), site); n != 1 {
+			t.Fatal("source continued assertion sequence", site, n, string(contents))
+		}
+	}
+	serviceMust(t, m.CleanupPartialRemainder())
+	serviceMust(t, m.Del(&y))
+	serviceMust(t, m.Del(&x))
+}
