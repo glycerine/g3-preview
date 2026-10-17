@@ -35642,7 +35642,7 @@
         "TestEuclideanEquationHeaderRefusalPrecedesBufferMutation",
         "TestEuclideanEquationUnsortedDecompositionBranch",
         "TestEuclideanIntegerBufferSortAndRawSwap",
-        "TestEuclideanRationalBufferSortAndRawSwap",
+        "TestEuclideanRationalBufferCoreAndRawSwap",
         "TestEuclideanBufferSortCoreUsesPublishedSlots",
         "TestEuclideanIntegerBufferSortCopyBudgetBoundary",
         "TestEuclideanNormalizeQueryCopyRefusalRetainsOwnedBuffer",
@@ -35757,19 +35757,23 @@
           "tests": [
             "TestEuclideanBufferSortCoreUsesPublishedSlots",
             "TestEuclideanIntegerBufferSortAndRawSwap",
-            "TestEuclideanRationalBufferSortAndRawSwap"
+            "TestEuclideanRationalBufferCoreAndRawSwap"
           ]
         },
         {
-          "name": "concrete mpz/mpq sort copy-then-sort paths and stopped numeral copy ownership at cpp:147-155",
+          "name": "concrete mpz sort copy-then-sort path and stopped numeral copy ownership at cpp:147-155; rational sort template has no retained call",
           "status": "partial",
           "go_target": "pkg/math/euclid/numeral_buffer_sort.go",
           "tests": [
             "TestEuclideanIntegerBufferSortAndRawSwap",
-            "TestEuclideanRationalBufferSortAndRawSwap",
             "TestEuclideanIntegerBufferSortCopyBudgetBoundary",
             "TestEuclideanNormalizeQueryCopyRefusalRetainsOwnedBuffer"
           ]
+        },
+        {
+          "name": "sort<mpq> copy-then-sort template has no retained call; mk_eq uses sort_core<mpq> instead (cpp:145-166,746)",
+          "status": "reference_only",
+          "tests": []
         },
         {
           "name": "equation construction mk_eq and del_eq owned numeral release at cpp:153-170,291-312",
@@ -171174,7 +171178,7 @@
       "tests": [
         "TestEuclideanIntegerBufferSortAndRawSwap",
         "TestIntegerNumeralBufferSourceReserveIndexesAndOwnsSlots",
-        "TestEuclideanRationalBufferSortAndRawSwap",
+        "TestEuclideanRationalBufferCoreAndRawSwap",
         "TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue",
         "TestEuclideanRationalAddmulMergedJustifications",
         "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
@@ -171216,7 +171220,7 @@
           ],
           "tests": [
             "TestEuclideanIntegerBufferSortAndRawSwap",
-            "TestEuclideanRationalBufferSortAndRawSwap",
+            "TestEuclideanRationalBufferCoreAndRawSwap",
             "TestEuclideanSetupVariableJustificationAndEquationOwnership"
           ]
         },

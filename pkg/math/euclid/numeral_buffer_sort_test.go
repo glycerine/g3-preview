@@ -125,7 +125,7 @@ func TestEuclideanIntegerBufferSortAndRawSwap(t *testing.T) {
 	}
 }
 
-func TestEuclideanRationalBufferSortAndRawSwap(t *testing.T) {
+func TestEuclideanRationalBufferCoreAndRawSwap(t *testing.T) {
 	m := euclidNumeralManager(t)
 	b, e := numeral.NewScopedRationalVector(m)
 	euclidMust(t, e)
@@ -136,7 +136,10 @@ func TestEuclideanRationalBufferSortAndRawSwap(t *testing.T) {
 		euclidMust(t, m.SetString(&coeff[i], input[i]))
 	}
 	ids := []uint32{4, 0, 2}
-	euclidMust(t, sortRational(coeff, ids, b))
+	for i, id := range ids {
+		euclidMust(t, b.Set(id, &coeff[i]))
+	}
+	euclidMust(t, sortRationalCore(coeff, ids, b))
 	want := []string{"-3", "5/13", input[0]}
 	for i := range coeff {
 		got, e := m.String(&coeff[i])

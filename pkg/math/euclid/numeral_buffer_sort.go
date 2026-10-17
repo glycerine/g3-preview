@@ -68,18 +68,3 @@ func sortRationalCore(as []numeral.Rational, xs []uint32, buffer *numeral.Scoped
 	}
 	return nil
 }
-
-func sortRational(as []numeral.Rational, xs []uint32, buffer *numeral.ScopedRationalVector) error {
-	if len(as) != len(xs) {
-		return arena.ErrBounds
-	}
-	if _, e := buffer.Manager(); e != nil {
-		return e
-	}
-	for i, x := range xs {
-		if e := buffer.Set(x, &as[i]); e != nil {
-			return e
-		}
-	}
-	return sortRationalCore(as, xs, buffer)
-}
