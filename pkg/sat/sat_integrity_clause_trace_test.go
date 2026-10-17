@@ -53,6 +53,29 @@ func TestSATIntegrityEliminatedClauseSourceTrace(t *testing.T) {
 	if got := output.String(); got != want {
 		t.Fatalf("eliminated-clause source trace: got %q, want %q", got, want)
 	}
+	for ordinal, body := range []string{
+		"l: 0\nc: ",
+		"l: 0\nc: (0 1 2)+*\n",
+	} {
+		output.Reset()
+		s.Lifecycle.budget.FailAfter(int64(ordinal))
+		_, err = c.checkClause(cl)
+		if satStorageSourceDebug {
+			if !errors.Is(err, ErrSATAssertion) {
+				t.Fatalf("eliminated clause assertion after formatter refusal: %v", err)
+			}
+		} else {
+			satOK(t, err)
+		}
+		wantPrefix := ""
+		if tags.ShouldTrace("sat_bug") {
+			wantPrefix = "-------- [sat_bug] check_clause src/sat/sat_integrity_checker.cpp:56 ---------\n" + body
+		}
+		if got := output.String(); got != wantPrefix {
+			t.Fatalf("formatter refusal %d: got %q, want %q", ordinal, got, wantPrefix)
+		}
+	}
+	s.Lifecycle.budget.FailAfter(-1)
 	debug, input, assertionFile := satIntegrityActionFixture(t, "T")
 	satOK(t, debug.EnableAssertions(false))
 	output.Reset()

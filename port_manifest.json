@@ -76431,19 +76431,19 @@
           "tests": ["TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         },
         {
-          "name": "Selected check_clause SASSERT53,55,60,63, vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; clause sat_bug CTRACE56 and other diagnostics remain open",
+          "name": "Selected check_clause SASSERT53,55,60,63, vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; other checker diagnostics remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
         },
         {
-          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source clause and real solver display (cpp56-60); later ternary and residual trace sites remain open",
+          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source-ordered literal/clause/solver display and stopped formatter prefixes (cpp56-60); later ternary and residual trace sites remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityEliminatedClauseSourceTrace"]
         },
         {
-          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source clause and concrete empty/nonempty watch-list display (cpp69-73); later residual trace remains open",
+          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source-ordered clause and empty/nonempty watch-list display with stopped formatter prefixes (cpp69-73); later residual trace remains open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityMissingTernaryWatchSourceTrace"]
@@ -76570,19 +76570,19 @@
           "tests": ["TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         },
         {
-          "name": "Selected check_clause SASSERT53,55,60,63, vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; clause sat_bug CTRACE56 and other diagnostics remain open",
+          "name": "Selected check_clause SASSERT53,55,60,63, vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; other checker diagnostics remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
         },
         {
-          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source clause and real solver display (cpp56-60); later ternary and residual trace sites remain open",
+          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source-ordered literal/clause/solver display and stopped formatter prefixes (cpp56-60); later ternary and residual trace sites remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityEliminatedClauseSourceTrace"]
         },
         {
-          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source clause and concrete empty/nonempty watch-list display (cpp69-73); later residual trace remains open",
+          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source-ordered clause and empty/nonempty watch-list display with stopped formatter prefixes (cpp69-73); later residual trace remains open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityMissingTernaryWatchSourceTrace"]
@@ -124150,7 +124150,7 @@
           "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         },
         {
-          "name": "Selected check_clause SASSERT53,55,60,63, vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; clause sat_bug CTRACE56 and other diagnostics remain open",
+          "name": "Selected check_clause SASSERT53,55,60,63, vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; other checker diagnostics remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
@@ -124714,7 +124714,7 @@
           "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         },
         {
-          "name": "Selected check_clause SASSERT53,55,60,63, vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; clause sat_bug CTRACE56 and other diagnostics remain open",
+          "name": "Selected check_clause SASSERT53,55,60,63, vector SASSERT107 and learned frozen-count SASSERT124 process gate and source C/T actions; other checker diagnostics remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
@@ -185731,13 +185731,13 @@
           "tests": ["TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         },
         {
-          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source clause and real solver display (cpp56-60); later ternary and residual trace sites remain open",
+          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source-ordered literal/clause/solver display and stopped formatter prefixes (cpp56-60); later ternary and residual trace sites remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityEliminatedClauseSourceTrace"]
         },
         {
-          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source clause and concrete empty/nonempty watch-list display (cpp69-73); later residual trace remains open",
+          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source-ordered clause and empty/nonempty watch-list display with stopped formatter prefixes (cpp69-73); later residual trace remains open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityMissingTernaryWatchSourceTrace"]
@@ -188191,13 +188191,13 @@
           "tests": ["TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         },
         {
-          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source clause and real solver display (cpp56-60); later ternary and residual trace sites remain open",
+          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source-ordered literal/clause/solver display and stopped formatter prefixes (cpp56-60); later ternary and residual trace sites remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityEliminatedClauseSourceTrace"]
         },
         {
-          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source clause and concrete empty/nonempty watch-list display (cpp69-73); later residual trace remains open",
+          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source-ordered clause and empty/nonempty watch-list display with stopped formatter prefixes (cpp69-73); later residual trace remains open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityMissingTernaryWatchSourceTrace"]

@@ -56,6 +56,22 @@ func TestSATIntegrityMissingTernaryWatchSourceTrace(t *testing.T) {
 	if got := output.String(); got != want {
 		t.Fatalf("nonempty watch-list source trace: got %q, want %q", got, want)
 	}
+	for ordinal, body := range []string{"", "(0 1 2)+*\nwatch_list:\n"} {
+		output.Reset()
+		s.Lifecycle.budget.FailAfter(int64(ordinal))
+		_, err = c.checkClause(cl)
+		if !errors.Is(err, ErrSATAssertion) {
+			t.Fatalf("missing ternary after formatter refusal %d: %v", ordinal, err)
+		}
+		wantPrefix := ""
+		if tags.ShouldTrace("sat_ter_watch_bug") {
+			wantPrefix = "-------- [sat_ter_watch_bug] check_clause src/sat/sat_integrity_checker.cpp:69 ---------\n" + body
+		}
+		if got := output.String(); got != wantPrefix {
+			t.Fatalf("formatter refusal %d: got %q, want %q", ordinal, got, wantPrefix)
+		}
+	}
+	s.Lifecycle.budget.FailAfter(-1)
 	satOK(t, list.SetEnd(0))
 	satOK(t, s.Lifecycle.attachClause(cl))
 	output.Reset()

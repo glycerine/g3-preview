@@ -4,33 +4,19 @@ package sat
 import (
 	"errors"
 	"io"
+	"strconv"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
-func (c satIntegrityChecker) eliminatedClauseText(cl StoredClauseRef, variable uint32) (body string, result error) {
+func (c satIntegrityChecker) eliminatedClauseDisplayText(cl StoredClauseRef) (body string, result error) {
 	out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: c.lifecycle.budget})
 	if err != nil {
 		return "", err
 	}
 	defer func() { result = errors.Join(result, out.Close()) }()
-	if err = out.AppendCString("l: "); err != nil {
-		return "", err
-	}
-	if err = out.AppendUint32(variable); err != nil {
-		return "", err
-	}
-	if err = out.AppendCString("\nc: "); err != nil {
-		return "", err
-	}
 	if err = c.lifecycle.propagation.clauses.DisplayInto(cl, out); err != nil {
-		return "", err
-	}
-	if err = out.AppendCString("\n"); err != nil {
-		return "", err
-	}
-	if err = c.gc.conflict.solver.displayInto(out); err != nil {
 		return "", err
 	}
 	return out.String()
@@ -43,42 +29,23 @@ func (c satIntegrityChecker) traceEliminatedClause(cl StoredClauseRef, variable 
 	}
 	_ = tags.EmitConditional("sat_bug", "check_clause", "src/sat/sat_integrity_checker.cpp", 56,
 		func() bool { return true }, func(w io.Writer) error {
-			body, err := c.eliminatedClauseText(cl, variable)
+			_, _ = io.WriteString(w, "l: ")
+			_, _ = io.WriteString(w, strconv.FormatUint(uint64(variable), 10))
+			_, _ = io.WriteString(w, "\n")
+			_, _ = io.WriteString(w, "c: ")
+			body, err := c.eliminatedClauseDisplayText(cl)
 			if err != nil {
 				return err
 			}
-			_, err = io.WriteString(w, body)
-			return err
+			_, _ = io.WriteString(w, body)
+			_, _ = io.WriteString(w, "\n")
+			body, err = c.eliminatedWatchDisplayText(false)
+			if err != nil {
+				return err
+			}
+			_, _ = io.WriteString(w, body)
+			return nil
 		})
-}
-
-func (c satIntegrityChecker) missingTernaryWatchText(cl StoredClauseRef, index uint32) (body string, result error) {
-	out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: c.lifecycle.budget})
-	if err != nil {
-		return "", err
-	}
-	defer func() { result = errors.Join(result, out.Close()) }()
-	if err = c.lifecycle.propagation.clauses.DisplayInto(cl, out); err != nil {
-		return "", err
-	}
-	if err = out.AppendCString("\nwatch_list:\n"); err != nil {
-		return "", err
-	}
-	list, err := c.lifecycle.propagation.variables.watches.Get(index)
-	if err != nil {
-		return "", err
-	}
-	ref, err := list.ref()
-	if err != nil {
-		return "", err
-	}
-	if err = list.owner.store.DisplayInto(ref, c.lifecycle.propagation.clauses, out); err != nil {
-		return "", err
-	}
-	if err = out.AppendCString("\n"); err != nil {
-		return "", err
-	}
-	return out.String()
 }
 
 func (c satIntegrityChecker) traceMissingTernaryWatch(cl StoredClauseRef, index uint32) {
@@ -91,12 +58,24 @@ func (c satIntegrityChecker) traceMissingTernaryWatch(cl StoredClauseRef, index 
 	}
 	_ = tags.EmitConditional("sat_ter_watch_bug", "check_clause", "src/sat/sat_integrity_checker.cpp", 69,
 		func() bool { return true }, func(w io.Writer) error {
-			body, err := c.missingTernaryWatchText(cl, index)
+			body, err := c.eliminatedClauseDisplayText(cl)
 			if err != nil {
 				return err
 			}
-			_, err = io.WriteString(w, body)
-			return err
+			_, _ = io.WriteString(w, body)
+			_, _ = io.WriteString(w, "\n")
+			_, _ = io.WriteString(w, "watch_list:\n")
+			list, err := c.lifecycle.propagation.variables.watches.Get(index)
+			if err != nil {
+				return err
+			}
+			body, err = c.watchListText(list)
+			if err != nil {
+				return err
+			}
+			_, _ = io.WriteString(w, body)
+			_, _ = io.WriteString(w, "\n")
+			return nil
 		})
 }
 
