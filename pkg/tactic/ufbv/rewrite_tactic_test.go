@@ -59,6 +59,36 @@ func TestUFBVRewriterCleanupAllocationRefusalKeepsCurrentImplementation(t *testi
 	}
 }
 
+func TestUFBVRewriterTranslateOwnsDestinationImplementation(t *testing.T) {
+	sourceManager := cacheFixture(t)
+	sourceContext, sourceGlobals := ufbvTacticServicesFixture(t, sourceManager)
+	source, err := NewRewriterTactic(sourceManager, sourceContext, sourceGlobals)
+	cacheMust(t, err)
+	t.Cleanup(func() { cacheMust(t, source.Close()) })
+	destinationManager := cacheFixture(t)
+	destinationContext, destinationGlobals := ufbvTacticServicesFixture(t, destinationManager)
+	translated, err := source.Translate(destinationManager, destinationContext, destinationGlobals)
+	cacheMust(t, err)
+	t.Cleanup(func() { cacheMust(t, translated.Close()) })
+	if translated == source || translated.imp == source.imp || translated.manager != destinationManager || translated.imp.manager != destinationManager {
+		t.Fatal("translated tactic must own destination implementation")
+	}
+	goal, err := tactic.NewGoal(destinationManager, false, false, false)
+	cacheMust(t, err)
+	cacheMust(t, goal.IncRef())
+	result, err := translated.Apply(goal)
+	cacheMust(t, err)
+	if result != goal || goal.RefCount != 2 {
+		t.Fatal("translated tactic did not publish destination goal", result, goal.RefCount)
+	}
+	cacheMust(t, goal.DecRef())
+	cacheMust(t, result.DecRef())
+	cacheMust(t, source.Close())
+	if _, err := source.Translate(destinationManager, destinationContext, destinationGlobals); !errors.Is(err, ast.ErrASTHandle) {
+		t.Fatal("closed source translated", err)
+	}
+}
+
 func TestUFBVRewriterTacticPublishesIndependentGoalReference(t *testing.T) {
 	m := cacheFixture(t)
 	ctx, globals := ufbvTacticServicesFixture(t, m)

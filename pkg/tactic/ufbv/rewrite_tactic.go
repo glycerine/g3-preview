@@ -23,20 +23,25 @@ type rewriteTacticImp struct {
 // RewriterTactic owns the configured Boolean reducer used by the concrete
 // UFBV formula processor. Its AST and parameter services are borrowed.
 type RewriterTactic struct {
-	self    *RewriterTactic
-	manager *ast.ASTManager
-	context *uparams.ParamsContext
-	globals *uparams.GlobalParamsService
-	imp     *rewriteTacticImp
-	retired []*rewriteTacticImp
-	trace   *diagnostic.TraceTags
-	header  uint64
-	closed  bool
+	self           *RewriterTactic
+	manager        *ast.ASTManager
+	context        *uparams.ParamsContext
+	globals        *uparams.GlobalParamsService
+	imp            *rewriteTacticImp
+	retired        []*rewriteTacticImp
+	trace          *diagnostic.TraceTags
+	header         uint64
+	allocationLine int
+	closed         bool
 }
 
 // NewRewriterTactic applies the source's fixed elim_and=true setting to its
 // internal Boolean reducer. Other tactic parameters do not change this pass.
 func NewRewriterTactic(m *ast.ASTManager, c *uparams.ParamsContext, g *uparams.GlobalParamsService) (*RewriterTactic, error) {
+	return newRewriterTactic(m, c, g, 121)
+}
+
+func newRewriterTactic(m *ast.ASTManager, c *uparams.ParamsContext, g *uparams.GlobalParamsService, sourceLine int) (*RewriterTactic, error) {
 	if m == nil || c == nil || g == nil || c.SymbolsField != m.Symbols || g.Context != c {
 		return nil, uparams.ErrParamsOwner
 	}
@@ -44,12 +49,21 @@ func NewRewriterTactic(m *ast.ASTManager, c *uparams.ParamsContext, g *uparams.G
 	if e := m.Budget().Reserve(n); e != nil {
 		return nil, e
 	}
-	t := &RewriterTactic{manager: m, context: c, globals: g, header: n}
+	t := &RewriterTactic{manager: m, context: c, globals: g, header: n, allocationLine: sourceLine}
 	t.self = t
 	t.traceOuterAllocated()
 	imp, e := t.newImp(81)
 	t.imp = imp
 	return t, e
+}
+
+// Translate constructs the source virtual tactic for another AST manager.
+// The caller provides the destination manager's parameter services.
+func (t *RewriterTactic) Translate(m *ast.ASTManager, c *uparams.ParamsContext, g *uparams.GlobalParamsService) (*RewriterTactic, error) {
+	if err := t.check(); err != nil {
+		return nil, err
+	}
+	return newRewriterTactic(m, c, g, 85)
 }
 
 func (t *RewriterTactic) check() error {

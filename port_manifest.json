@@ -108225,6 +108225,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/ufbv/rewrite_tactic_outer_memory_trace.go",
         "pkg/tactic/arith/propagate_ineq_outer_memory_trace.go",
         "pkg/tactic/tactic_report.go",
         "pkg/tactic/tactic_report_test.go",
@@ -108232,6 +108233,8 @@
         "pkg/tactic/ufbv/rewrite_tactic.go"
       ],
       "tests": [
+        "TestUFBVRewriterTranslateOwnsDestinationImplementation",
+        "TestUFBVRewriterImpMemoryCleanupSwapAndClose",
         "TestPropagateIneqOuterMemoryWrapperFactoryAndTranslate",
         "TestTacticReportReadsProcessMemoryAndWritesSourceOrder",
         "TestTacticProgressPositiveVerboseGateAndSourceFormat",
@@ -108265,10 +108268,10 @@
           ]
         },
         {
-          "name": "Concrete UFBV rewriter tactic outer allocation at ufbv_rewriter_tactic.cpp:121 and final reference-counted deallocation at tactic.h:43 through debug memory wrappers",
+          "name": "Concrete UFBV rewriter tactic outer allocations at ufbv_rewriter_tactic.cpp:85,121 and final reference-counted deallocation at tactic.h:43 through debug memory wrappers",
           "status": "platform_replacement",
           "go_target": "pkg/tactic/ufbv/rewrite_tactic_outer_memory_trace.go",
-          "tests": ["TestUFBVRewriterImpMemoryCleanupSwapAndClose"]
+          "tests": ["TestUFBVRewriterTranslateOwnsDestinationImplementation", "TestUFBVRewriterImpMemoryCleanupSwapAndClose"]
         },
         {
           "name": "tactic_report source verbosity level and scoped constructor/destructor for retained BV/UFBV tactics (tactic.h:103-120)",
@@ -109202,10 +109205,13 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/ufbv/rewrite_tactic_outer_memory_trace.go",
         "pkg/tactic/ufbv/rewrite_tactic_trace.go",
         "pkg/tactic/ufbv/rewrite_tactic.go"
       ],
       "tests": [
+        "TestUFBVRewriterTranslateOwnsDestinationImplementation",
+        "TestUFBVRewriterImpMemoryCleanupSwapAndClose",
         "TestUFBVRewriterPublishedGoalSourceTraceAndFormatterRefusal",
         "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal",
         "TestUFBVRewriterTacticProofModePreservesFormulaAndProof",
@@ -109225,10 +109231,16 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Concrete UFBV rewriter tactic outer allocation at ufbv_rewriter_tactic.cpp:121 and final reference-counted deallocation at tactic.h:43 through debug memory wrappers",
+          "name": "Translate constructs a separate UFBV tactic implementation for the destination AST manager (cpp84-86)",
+          "status": "ported",
+          "go_target": "pkg/tactic/ufbv/rewrite_tactic.go",
+          "tests": ["TestUFBVRewriterTranslateOwnsDestinationImplementation"]
+        },
+        {
+          "name": "Concrete UFBV rewriter tactic outer allocations at ufbv_rewriter_tactic.cpp:85,121 and final reference-counted deallocation at tactic.h:43 through debug memory wrappers",
           "status": "platform_replacement",
           "go_target": "pkg/tactic/ufbv/rewrite_tactic_outer_memory_trace.go",
-          "tests": ["TestUFBVRewriterImpMemoryCleanupSwapAndClose"]
+          "tests": ["TestUFBVRewriterTranslateOwnsDestinationImplementation", "TestUFBVRewriterImpMemoryCleanupSwapAndClose"]
         },
         {
           "name": "Concrete ufbv_rewriter_tactic::imp allocation at cpp81, cleanup replacement at cpp113-115 and destructor release at cpp89",
@@ -153319,6 +153331,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/ufbv/rewrite_tactic_outer_memory_trace.go",
         "pkg/tactic/arith/propagate_ineq_outer_memory_trace.go",
         "pkg/tactic/tactic_goal_inequality_memory_trace.go",
         "pkg/tactic/arith/propagate_ineq_memory_trace.go",
@@ -153413,6 +153426,8 @@
         "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
+        "TestUFBVRewriterTranslateOwnsDestinationImplementation",
+        "TestUFBVRewriterImpMemoryCleanupSwapAndClose",
         "TestPropagateIneqOuterMemoryWrapperFactoryAndTranslate",
         "TestPropagateIneqImplementationMemoryWrapperSourceLifetime",
         "TestExtensionModelFunctionMemoryWrapperFollowsModelCore",
@@ -153616,10 +153631,10 @@
           ]
         },
         {
-          "name": "Concrete UFBV rewriter tactic outer allocation at ufbv_rewriter_tactic.cpp:121 and final reference-counted deallocation at tactic.h:43 through debug memory wrappers",
+          "name": "Concrete UFBV rewriter tactic outer allocations at ufbv_rewriter_tactic.cpp:85,121 and final reference-counted deallocation at tactic.h:43 through debug memory wrappers",
           "status": "platform_replacement",
           "go_target": "pkg/tactic/ufbv/rewrite_tactic_outer_memory_trace.go",
-          "tests": ["TestUFBVRewriterImpMemoryCleanupSwapAndClose"]
+          "tests": ["TestUFBVRewriterTranslateOwnsDestinationImplementation", "TestUFBVRewriterImpMemoryCleanupSwapAndClose"]
         },
         {
           "name": "Concrete ufbv_rewriter_tactic::imp allocation at cpp81, cleanup replacement at cpp113-115 and destructor release at cpp89",
@@ -154379,6 +154394,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/ufbv/rewrite_tactic_outer_memory_trace.go",
         "pkg/tactic/arith/propagate_ineq_outer_memory_trace.go",
         "pkg/tactic/tactic_goal_inequality_memory_trace.go",
         "pkg/tactic/arith/propagate_ineq_memory_trace.go",
@@ -154466,6 +154482,8 @@
         "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
+        "TestUFBVRewriterTranslateOwnsDestinationImplementation",
+        "TestUFBVRewriterImpMemoryCleanupSwapAndClose",
         "TestPropagateIneqOuterMemoryWrapperFactoryAndTranslate",
         "TestPropagateIneqImplementationMemoryWrapperSourceLifetime",
         "TestExtensionModelFunctionMemoryWrapperFollowsModelCore",
@@ -154658,10 +154676,10 @@
           ]
         },
         {
-          "name": "Concrete UFBV rewriter tactic outer allocation at ufbv_rewriter_tactic.cpp:121 and final reference-counted deallocation at tactic.h:43 through debug memory wrappers",
+          "name": "Concrete UFBV rewriter tactic outer allocations at ufbv_rewriter_tactic.cpp:85,121 and final reference-counted deallocation at tactic.h:43 through debug memory wrappers",
           "status": "platform_replacement",
           "go_target": "pkg/tactic/ufbv/rewrite_tactic_outer_memory_trace.go",
-          "tests": ["TestUFBVRewriterImpMemoryCleanupSwapAndClose"]
+          "tests": ["TestUFBVRewriterTranslateOwnsDestinationImplementation", "TestUFBVRewriterImpMemoryCleanupSwapAndClose"]
         },
         {
           "name": "Concrete ufbv_rewriter_tactic::imp allocation at cpp81, cleanup replacement at cpp113-115 and destructor release at cpp89",

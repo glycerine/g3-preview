@@ -54,6 +54,13 @@ func TestUFBVRewriterImpMemoryCleanupSwapAndClose(t *testing.T) {
 	if second == first || second == nil || second.header != size || first.header != 0 || len(r.retired) != 0 {
 		t.Fatal("cleanup must swap before retiring the old implementation", first, second, r.retired)
 	}
+	translated, e := r.Translate(m, ctx, globals)
+	cacheMust(t, e)
+	if translated == r || translated.imp == second {
+		t.Fatal("translation must own a distinct tactic and implementation")
+	}
+	translatedImp := translated.imp
+	cacheMust(t, translated.Close())
 	cacheMust(t, r.Close())
 	if b.Used() != start {
 		t.Fatal("implementation and tactic headers not released", b.Used(), start)
@@ -62,10 +69,15 @@ func TestUFBVRewriterImpMemoryCleanupSwapAndClose(t *testing.T) {
 		return "-------- [memory] " + action + " src/util/memory_manager.cpp:" + strconv.Itoa(line) + " ---------\n" + body + "\n------------------------------------------------\n"
 	}
 	id, id1, id2 := fmt.Sprintf("%p", r), fmt.Sprintf("%p", first), fmt.Sprintf("%p", second)
+	translatedID, translatedImpID := fmt.Sprintf("%p", translated), fmt.Sprintf("%p", translatedImp)
 	want := record("allocate", 209, "alloc "+id+" src/tactic/ufbv/ufbv_rewriter_tactic.cpp:121 ufbv_rewriter_tactic "+strconv.FormatUint(outerSize, 10)) +
 		record("allocate", 209, "alloc "+id1+" src/tactic/ufbv/ufbv_rewriter_tactic.cpp:81 imp "+strconv.FormatUint(size, 10)) +
 		record("allocate", 209, "alloc "+id2+" src/tactic/ufbv/ufbv_rewriter_tactic.cpp:113 imp "+strconv.FormatUint(size, 10)) +
 		record("deallocate", 204, "dealloc "+id1+" src/tactic/ufbv/ufbv_rewriter_tactic.cpp:115") +
+		record("allocate", 209, "alloc "+translatedID+" src/tactic/ufbv/ufbv_rewriter_tactic.cpp:85 ufbv_rewriter_tactic "+strconv.FormatUint(outerSize, 10)) +
+		record("allocate", 209, "alloc "+translatedImpID+" src/tactic/ufbv/ufbv_rewriter_tactic.cpp:81 imp "+strconv.FormatUint(size, 10)) +
+		record("deallocate", 204, "dealloc "+translatedImpID+" src/tactic/ufbv/ufbv_rewriter_tactic.cpp:89") +
+		record("deallocate", 204, "dealloc "+translatedID+" src/tactic/tactic.h:43") +
 		record("deallocate", 204, "dealloc "+id2+" src/tactic/ufbv/ufbv_rewriter_tactic.cpp:89") +
 		record("deallocate", 204, "dealloc "+id+" src/tactic/tactic.h:43")
 	got := output.String()

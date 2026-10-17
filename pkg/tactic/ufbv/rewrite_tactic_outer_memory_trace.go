@@ -17,7 +17,7 @@ func (t *RewriterTactic) traceOuterAllocated() {
 	}
 	_ = tags.EmitConditional("memory", "allocate", "src/util/memory_manager.cpp", 209,
 		func() bool { return true }, func(w io.Writer) error {
-			_, _ = io.WriteString(w, "alloc "+fmt.Sprintf("%p", t)+" src/tactic/ufbv/ufbv_rewriter_tactic.cpp:121 ufbv_rewriter_tactic "+strconv.FormatUint(t.header, 10)+"\n")
+			_, _ = io.WriteString(w, "alloc "+fmt.Sprintf("%p", t)+" src/tactic/ufbv/ufbv_rewriter_tactic.cpp:"+strconv.Itoa(t.allocationLine)+" ufbv_rewriter_tactic "+strconv.FormatUint(t.header, 10)+"\n")
 			return nil
 		})
 }
