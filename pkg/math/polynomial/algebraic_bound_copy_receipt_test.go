@@ -8,6 +8,9 @@ import (
 )
 
 func algebraicBigBinaryBoundsRoot(t *testing.T, c *AlgebraicRootCore) Algebraic {
+	return algebraicBigBinaryBoundsRootWithMinimal(t, c, true)
+}
+func algebraicBigBinaryBoundsRootWithMinimal(t *testing.T, c *AlgebraicRootCore, minimal bool) Algebraic {
 	t.Helper()
 	p, z, b := c.config.Polynomials, c.config.Rationals.Integers(), c.config.Binary
 	poly, e := p.NewPolynomial()
@@ -22,7 +25,7 @@ func algebraicBigBinaryBoundsRoot(t *testing.T, c *AlgebraicRootCore) Algebraic 
 	serviceMust(t, z.SetString(&n, "26087635650665564425"))
 	serviceMust(t, b.SetIntegerPower(&upper, &n, 64))
 	var root Algebraic
-	serviceMust(t, c.SetRoot(&root, view, &lower, &upper, true))
+	serviceMust(t, c.SetRoot(&root, view, &lower, &upper, minimal))
 	serviceMust(t, b.Del(&upper))
 	serviceMust(t, b.Del(&lower))
 	serviceMust(t, z.Del(&n))

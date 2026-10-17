@@ -201,7 +201,7 @@ func (m *AlgebraicRootCore) check() error {
 	if m != nil && m.self == m && m.arithmetic.executing {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing) {
+	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicate.finishing) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.inversion.executing {
@@ -986,7 +986,7 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	if m != nil && m.self == m && m.arithmetic.executing {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing) {
+	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicate.finishing) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.inversion.executing {
@@ -1093,7 +1093,7 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 		}
 		m.constructionStage = 0
 	}
-	if e := m.finishPredicate(nil); e != nil {
+	if e := m.cleanupPredicate(); e != nil {
 		return e
 	}
 	if e := m.comparisonCleanup(); e != nil {
@@ -1174,7 +1174,7 @@ func (m *AlgebraicRootCore) closeCoreMembers() error {
 	if m != nil && m.self == m && m.arithmetic.executing {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing) {
+	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicate.finishing) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.inversion.executing {

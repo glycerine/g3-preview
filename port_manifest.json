@@ -38332,7 +38332,9 @@
         "pkg/math/polynomial/algebraic_refinement_owner_test.go",
         "pkg/math/polynomial/algebraic_refinement_promotion_test.go",
         "pkg/math/polynomial/algebraic_refinement_rational_scope.go",
-        "pkg/math/polynomial/algebraic_refinement_rational_scope_test.go"
+        "pkg/math/polynomial/algebraic_refinement_rational_scope_test.go",
+        "pkg/math/polynomial/algebraic_predicate_refinement_scope.go",
+        "pkg/math/polynomial/algebraic_predicate_refinement_scope_test.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",
@@ -39209,7 +39211,9 @@
         "pkg/math/polynomial/algebraic_refinement_owner_test.go",
         "pkg/math/polynomial/algebraic_refinement_promotion_test.go",
         "pkg/math/polynomial/algebraic_refinement_rational_scope.go",
-        "pkg/math/polynomial/algebraic_refinement_rational_scope_test.go"
+        "pkg/math/polynomial/algebraic_refinement_rational_scope_test.go",
+        "pkg/math/polynomial/algebraic_predicate_refinement_scope.go",
+        "pkg/math/polynomial/algebraic_predicate_refinement_scope_test.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",

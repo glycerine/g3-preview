@@ -4,7 +4,10 @@
 // diagnostic service ownership; this policy covers the numerical body.
 package polynomial
 
-import unumeral "github.com/glycerine/g3/pkg/util/numeral"
+import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	"math"
+)
 
 const (
 	boundRefinementWidth = 0
@@ -12,6 +15,7 @@ const (
 )
 
 type algebraicRefinementScope struct {
+	invocation uint64
 	evaluation upolyBinaryEvaluationInvocationReceipt
 	owner      *AlgebraicRootCore
 	values     [2]unumeral.BinaryRational
@@ -129,6 +133,10 @@ func (s *algebraicRefinementScope) begin(m *AlgebraicRootCore) error {
 	if s.executing || s.pending(m) {
 		return ErrAlgebraicPending
 	}
+	if s.invocation == math.MaxUint64 {
+		return ErrAlgebraicPending
+	}
+	s.invocation++
 	s.owner = m
 	s.hooks.Policy = s
 	s.evaluation = upolyBinaryEvaluationInvocationReceipt{}

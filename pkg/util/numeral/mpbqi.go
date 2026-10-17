@@ -179,6 +179,9 @@ func (m *BinaryIntervalManager) ordered(l, u *BinaryRational) error {
 	return nil
 }
 func (m *BinaryIntervalManager) SetBounds(a *BinaryInterval, l, u *BinaryRational) error {
+	return m.setBoundsWithAllocationReceipt(a, l, u, nil)
+}
+func (m *BinaryIntervalManager) setBoundsWithAllocationReceipt(a *BinaryInterval, l, u *BinaryRational, receipt *IntegerCopyAllocationReceipt) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -188,16 +191,19 @@ func (m *BinaryIntervalManager) SetBounds(a *BinaryInterval, l, u *BinaryRationa
 	if e := m.ordered(l, u); e != nil {
 		return e
 	}
-	if e := m.bounds.Copy(&a.lower, l); e != nil {
+	if e := m.bounds.CopyWithAllocationReceipt(&a.lower, l, receipt); e != nil {
 		return e
 	}
-	return m.bounds.Copy(&a.upper, u)
+	return m.bounds.CopyWithAllocationReceipt(&a.upper, u, receipt)
 }
 func (m *BinaryIntervalManager) Copy(dst, src *BinaryInterval) error {
+	return m.CopyWithAllocationReceipt(dst, src, nil)
+}
+func (m *BinaryIntervalManager) CopyWithAllocationReceipt(dst, src *BinaryInterval, receipt *IntegerCopyAllocationReceipt) error {
 	if e := m.pair(dst, src); e != nil {
 		return e
 	}
-	return m.SetBounds(dst, &src.lower, &src.upper)
+	return m.setBoundsWithAllocationReceipt(dst, &src.lower, &src.upper, receipt)
 }
 func (m *BinaryIntervalManager) SetPoint(a *BinaryInterval, n *BinaryRational) error {
 	if e := m.check(a); e != nil {

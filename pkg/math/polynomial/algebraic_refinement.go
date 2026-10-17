@@ -2,10 +2,17 @@
 package polynomial
 
 import (
+	"errors"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 type algebraicPredicateScope struct {
+	leadingCopy                                                                                unumeral.IntegerCopyAllocationReceipt
+	savedCopy                                                                                  unumeral.IntegerCopyAllocationReceipt
+	refinement                                                                                 algebraicRefinementInvocation
+	childStop, ownCause                                                                        error
+	ownStage                                                                                   uint8
+	finishing                                                                                  bool
 	saved                                                                                      unumeral.BinaryInterval
 	owner                                                                                      Algebraic
 	lower, upper                                                                               unumeral.BinaryRational
@@ -76,6 +83,9 @@ func (m *AlgebraicRootCore) RefineToPrecision(a *Algebraic, k uint32) error {
 	return e
 }
 func (m *AlgebraicRootCore) refineAt(a *Algebraic, k uint32, precision bool) (bool, error) {
+	return m.refineAtWithReceipt(a, k, precision, nil)
+}
+func (m *AlgebraicRootCore) refineAtWithReceipt(a *Algebraic, k uint32, precision bool, receipt *algebraicRefinementInvocation) (bool, error) {
 	if m != nil && m.self == m && (m.refinement.pending(m) || m.refinementConversion.pending(m) || m.refinementQ.active) {
 		return false, ErrAlgebraicPending
 	}
@@ -98,7 +108,7 @@ func (m *AlgebraicRootCore) refineAt(a *Algebraic, k uint32, precision bool) (bo
 	if r.flags&2 != 0 {
 		s = -1
 	}
-	ok, e := m.refineRecord(l, &r, v, s, k, precision)
+	ok, e := m.refineRecordWithReceipt(l, &r, v, s, k, precision, receipt)
 	if e != nil {
 		return false, e
 	}
@@ -161,7 +171,17 @@ func (m *AlgebraicRootCore) finishPredicate(cause error) error {
 	if !p.active {
 		return cause
 	}
-	p.cause = cause
+	if p.finishing {
+		return errors.Join(cause, ErrAlgebraicPending)
+	}
+	p.finishing = true
+	defer func() { p.finishing = false }()
+	if p.cause == nil {
+		p.cause = cause
+	}
+	if p.childStop != nil {
+		return errors.Join(cause, p.childStop)
+	}
 	// Actual scoped locals destruct in reverse declaration order. A failed saved
 	// constructor has no source destructor; its partial fields get owning cleanup.
 	for p.stage < 5 {
@@ -182,7 +202,7 @@ func (m *AlgebraicRootCore) finishPredicate(cause error) error {
 		case 3:
 			e = m.restoreSaved()
 		case 4:
-			if p.savedActive {
+			if p.savedActive && p.savedConstructed {
 				e = m.config.Intervals.Del(&p.saved)
 			}
 		}
@@ -194,6 +214,13 @@ func (m *AlgebraicRootCore) finishPredicate(cause error) error {
 			return e
 		}
 		p.stage++
+	}
+	if p.savedActive && !p.savedConstructed {
+		return cause
+	}
+	z := m.config.Rationals.Integers()
+	if z.MatchesCopyAllocationInvocation(&p.savedCopy) || z.MatchesCopyAllocationInvocation(&p.leadingCopy) {
+		return cause
 	}
 	m.predicate = algebraicPredicateScope{}
 	return cause
@@ -296,7 +323,7 @@ func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 	p := &m.predicate
 	p.savedActive = true
 	p.owner = *a
-	if err = m.config.Intervals.Copy(&p.saved, &r.interval); err != nil {
+	if err = m.config.Intervals.CopyWithAllocationReceipt(&p.saved, &r.interval, &p.savedCopy); err != nil {
 		return false, err
 	}
 	p.savedConstructed = true
@@ -309,7 +336,7 @@ func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 		return false, err
 	}
 	z := m.config.Rationals.Integers()
-	if err = z.Copy(&m.isRationalTmp, lead); err != nil {
+	if err = z.CopyFromOwnerWithReceipt(&m.isRationalTmp, z, lead, &p.leadingCopy); err != nil {
 		return false, err
 	}
 	if err = z.Abs(&m.isRationalTmp); err != nil {
@@ -320,7 +347,10 @@ func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 		return false, err
 	}
 	k++
-	ok, err := m.refineAt(a, k, true)
+	ok, err := m.refineAtWithReceipt(a, k, true, &p.refinement)
+	if err != nil {
+		p.childStop = m.refinementSourceStop(&p.refinement)
+	}
 	if err != nil {
 		return false, err
 	}
@@ -402,9 +432,15 @@ func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 // Store every interval publication, including partial body/error results,
 // before releasing the executing span. Rational-root promotion follows it.
 func (m *AlgebraicRootCore) refineRecord(l *algebraicLocation, r *algebraicRecord, v UPolynomialView, sign int, k uint32, precision bool) (ok bool, cause error) {
+	return m.refineRecordWithReceipt(l, r, v, sign, k, precision, nil)
+}
+func (m *AlgebraicRootCore) refineRecordWithReceipt(l *algebraicLocation, r *algebraicRecord, v UPolynomialView, sign int, k uint32, precision bool, receipt *algebraicRefinementInvocation) (ok bool, cause error) {
 	s := &m.refinement
 	if e := s.begin(m); e != nil {
 		return false, e
+	}
+	if receipt != nil {
+		*receipt = algebraicRefinementInvocation{m, s, s.invocation}
 	}
 	defer func() { s.executing = false }()
 	p, b := m.config.Polynomials, m.config.Binary
