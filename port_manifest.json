@@ -29643,7 +29643,8 @@
         "pkg/ast/rewriter/var_substitution.go",
         "pkg/ast/rewriter/var_substitution_test.go",
         "pkg/ast/rewriter/unused_vars_ufbv.go",
-        "pkg/ast/rewriter/var_substitution_trace.go"
+        "pkg/ast/rewriter/var_substitution_trace.go",
+        "pkg/ast/rewriter/var_substitution_assert.go"
       ],
       "tests": [
         "TestVarSubstitutionOriginalRegisteredIdentities",
@@ -29653,7 +29654,8 @@
         "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal",
         "TestVarSubstitutionBorrowedAppArgumentsOrderAndReset",
         "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers",
-        "TestVarSubstitutionResultSourceTrace"
+        "TestVarSubstitutionResultSourceTrace",
+        "TestVarSubstitutionSourceWellSortedAssertionSites"
       ],
       "assertions": [
         {
@@ -29692,6 +29694,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "retained var_subst operator pre/post is_well_sorted SASSERT switch at var_subst.cpp:27,34 before reset and TRACE",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/var_substitution_assert.go",
+          "tests": [
+            "TestVarSubstitutionSourceWellSortedAssertionSites"
+          ]
+        },
         {
           "name": "selected live var_subst operator post-rewrite var_subst_bug TRACE with binding order and result (var_subst.cpp:35-40)",
           "status": "partial",
@@ -29740,7 +29750,7 @@
         "Borrowed AppArguments input is copied directly by the existing binding engine in source normal/inverse order; Substitute and SubstituteArguments share the same reset/binding/traversal path. The UFBV unused-variable caller now pins every constructed variable mapping until substitution and result publication finish, then releases those pins after its younger substitution/result owners."
       ],
       "deviations": [
-        "is_well_sorted pre/post SASSERT remain unported dependencies; the selected post-rewrite TRACE is covered for a live Boolean binding, while wider expression/stream profiles remain open. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. The UFBV empty-params unused-variable elimination path is now concrete; nondefault parameters, instantiate, free-variable enumeration and other consumers remain open. Explicit boolean constructor argument supplies the C++ standard-order option; selected model function interpretation/evaluator integration now uses this owner; broader theory integration remains open."
+        "The live operator now evaluates source debug-gated pre/post is_well_sorted assertions around reset/rewrite and before TRACE; invalid input preserves prior bindings/output. The post site is exercised directly; a rewritten ill-sorted output and interactive C/T action profile remain open. The selected post-rewrite TRACE is covered for a live Boolean binding, while wider expression/stream profiles remain open. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. The UFBV empty-params unused-variable elimination path is now concrete; nondefault parameters, instantiate, free-variable enumeration and other consumers remain open. Explicit boolean constructor argument supplies the C++ standard-order option; selected model function interpretation/evaluator integration now uses this owner; broader theory integration remains open."
       ]
     },
     {
@@ -123253,7 +123263,8 @@
         "pkg/api/api_context_results.go",
         "pkg/util/numeral/inf_eps_rational.go",
         "pkg/util/numeral/inf_rational.go",
-        "pkg/util/numeral/inf_int_rational.go"
+        "pkg/util/numeral/inf_int_rational.go",
+        "pkg/ast/rewriter/var_substitution_assert.go"
       ],
       "tests": [
         "TestDebugTableMemoryTraceFollowsLazyLifetime",
@@ -123284,7 +123295,8 @@
         "TestNumericCharInputClosedTieFailsAtReachedFlush",
         "TestLinearEquationCoreSourceSortedDebugGuard",
         "TestLinearEquationNormalizedSourceDuplicateDebugGuard",
-        "TestLinearEquationCombineZeroMultiplierSourceAssertionProfile"
+        "TestLinearEquationCombineZeroMultiplierSourceAssertionProfile",
+        "TestVarSubstitutionSourceWellSortedAssertionSites"
       ],
       "conditionals": [
         {
@@ -123307,6 +123319,14 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Selected var_subst pre/post well-sorted SASSERT process gate and diagnostic action at var_subst.cpp:27,34",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/var_substitution_assert.go",
+          "tests": [
+            "TestVarSubstitutionSourceWellSortedAssertionSites"
+          ]
+        },
         {
           "name": "UFBV check_fwd_idx_consistency and show_fwd_idx, including cpp259/272 SASSERT, have no production caller",
           "status": "dead_deleted",
@@ -123687,7 +123707,8 @@
         "pkg/api/api_context_results.go",
         "pkg/util/numeral/inf_eps_rational.go",
         "pkg/util/numeral/inf_rational.go",
-        "pkg/util/numeral/inf_int_rational.go"
+        "pkg/util/numeral/inf_int_rational.go",
+        "pkg/ast/rewriter/var_substitution_assert.go"
       ],
       "tests": [
         "TestDebugNotificationExactStatementsSignedFlagsAndNoReservation",
@@ -123722,7 +123743,8 @@
         "TestDebugMacroVerifyConditionIsNotErasedByAssertionSwitch",
         "TestLinearEquationCoreSourceSortedDebugGuard",
         "TestLinearEquationNormalizedSourceDuplicateDebugGuard",
-        "TestLinearEquationCombineZeroMultiplierSourceAssertionProfile"
+        "TestLinearEquationCombineZeroMultiplierSourceAssertionProfile",
+        "TestVarSubstitutionSourceWellSortedAssertionSites"
       ],
       "conditionals": [
         {
@@ -123835,6 +123857,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Selected var_subst pre/post well-sorted SASSERT process gate and diagnostic action at var_subst.cpp:27,34",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/var_substitution_assert.go",
+          "tests": [
+            "TestVarSubstitutionSourceWellSortedAssertionSites"
+          ]
+        },
         {
           "name": "UFBV check_fwd_idx_consistency and show_fwd_idx, including cpp259/272 SASSERT, have no production caller",
           "status": "dead_deleted",

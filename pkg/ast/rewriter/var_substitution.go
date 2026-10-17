@@ -49,6 +49,12 @@ func (s *VarSubstitution) SubstituteArguments(term ast.ASTHandle, args ast.AppAr
 		return ast.ErrASTHandle
 	}
 	r := &s.reducer.engine
+	if e := r.open(); e != nil {
+		return e
+	}
+	if e := s.assertWellSorted(term, 27); e != nil {
+		return e
+	}
 	if e := r.Reset(); e != nil {
 		return e
 	}
@@ -56,6 +62,9 @@ func (s *VarSubstitution) SubstituteArguments(term ast.ASTHandle, args ast.AppAr
 		return e
 	}
 	if e := r.Rewrite(term, out); e != nil {
+		return e
+	}
+	if e := s.assertResultWellSorted(out); e != nil {
 		return e
 	}
 	return s.traceSubstitution(term, args, out)
