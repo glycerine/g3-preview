@@ -115,6 +115,12 @@ func (m *AlgebraicRootCore) irrationalBoundRecord(a *Algebraic, upper bool) (alg
 	return m.load(l)
 }
 func (m *AlgebraicRootCore) copyBinaryBound(a *Algebraic, out *unumeral.BinaryRational, upper bool) error {
+	if e := m.check(); e != nil {
+		return e
+	}
+	if m.bounds.remaining != 0 || m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.bounds.copy) {
+		return ErrAlgebraicPending
+	}
 	r, e := m.irrationalBoundRecord(a, upper)
 	if e != nil {
 		return e
@@ -125,22 +131,29 @@ func (m *AlgebraicRootCore) copyBinaryBound(a *Algebraic, out *unumeral.BinaryRa
 	}
 	m.bounds.executing = true
 	defer func() { m.bounds.executing = false }()
-	return m.config.Binary.Copy(out, bound)
+	return m.config.Binary.CopyWithAllocationReceipt(out, bound, &m.bounds.copy)
 }
 
 type algebraicBoundScope struct {
+	copy      unumeral.IntegerCopyAllocationReceipt
 	values    [2]unumeral.BinaryRational
 	remaining uint8
 	executing bool
 }
 
-func (m *AlgebraicRootCore) cleanupBounds() error {
+func (m *AlgebraicRootCore) cleanupBounds() error { return m.finishBounds(true) }
+func (m *AlgebraicRootCore) finishBounds(owning bool) error {
 	s := &m.bounds
 	if s.executing {
 		return ErrAlgebraicPending
 	}
 	s.executing = true
 	defer func() { s.executing = false }()
+	if owning {
+		if e := m.config.Rationals.Integers().CleanupCopyAllocationInvocation(&s.copy); e != nil {
+			return e
+		}
+	}
 	for s.remaining != 0 {
 		if e := m.config.Binary.Del(&s.values[s.remaining-1]); e != nil {
 			return e
@@ -169,7 +182,7 @@ func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, 
 		return e
 	}
 	s := &m.bounds
-	if s.remaining != 0 {
+	if s.remaining != 0 || m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&s.copy) {
 		return ErrAlgebraicPending
 	}
 	r := algebraicRecord{value: unumeral.NewRational()}
@@ -186,17 +199,17 @@ func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, 
 	s.executing = true
 	defer func() {
 		s.executing = false
-		cause = errors.Join(cause, m.cleanupBounds())
+		cause = errors.Join(cause, m.finishBounds(false))
 	}()
 	if refine && (l == nil || l.kind == 0) {
-		return m.config.Rationals.Copy(out, &r.value)
+		return m.config.Rationals.CopyWithAllocationReceipt(out, &r.value, &s.copy)
 	}
 	b := m.config.Binary
 	s.values = [2]unumeral.BinaryRational{}
 	s.remaining = 1
 	if refine {
 		s.remaining = 2
-		if _, e = m.intervalAtPrecision(&r, &s.values[0], &s.values[1], precision); e != nil {
+		if _, e = m.intervalAtPrecisionWithReceipt(&r, &s.values[0], &s.values[1], precision, &s.copy); e != nil {
 			return e
 		}
 	} else {
@@ -204,7 +217,7 @@ func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, 
 		if upper {
 			bound = r.interval.BorrowUpper()
 		}
-		if e = b.Copy(&s.values[0], bound); e != nil {
+		if e = b.CopyWithAllocationReceipt(&s.values[0], bound, &s.copy); e != nil {
 			return e
 		}
 	}
@@ -216,11 +229,14 @@ func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, 
 }
 
 func (m *AlgebraicRootCore) intervalAtPrecision(r *algebraicRecord, lower, upper *unumeral.BinaryRational, precision uint32) (bool, error) {
+	return m.intervalAtPrecisionWithReceipt(r, lower, upper, precision, nil)
+}
+func (m *AlgebraicRootCore) intervalAtPrecisionWithReceipt(r *algebraicRecord, lower, upper *unumeral.BinaryRational, precision uint32, receipt *unumeral.IntegerCopyAllocationReceipt) (bool, error) {
 	b := m.config.Binary
-	if e := b.Copy(lower, r.interval.BorrowLower()); e != nil {
+	if e := b.CopyWithAllocationReceipt(lower, r.interval.BorrowLower(), receipt); e != nil {
 		return false, e
 	}
-	if e := b.Copy(upper, r.interval.BorrowUpper()); e != nil {
+	if e := b.CopyWithAllocationReceipt(upper, r.interval.BorrowUpper(), receipt); e != nil {
 		return false, e
 	}
 	v, e := m.sourcePolynomial(r)

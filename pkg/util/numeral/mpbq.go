@@ -360,10 +360,19 @@ func (m *BinaryRationalManager) Swap(a, b *BinaryRational) error {
 	return nil
 }
 func (m *BinaryRationalManager) Copy(dst, src *BinaryRational) error {
+	return m.copyWithAllocationReceipt(dst, src, nil)
+}
+
+// CopyWithAllocationReceipt records only the actually reached integer copy.
+// The denominator exponent is published after that copy succeeds.
+func (m *BinaryRationalManager) CopyWithAllocationReceipt(dst, src *BinaryRational, receipt *IntegerCopyAllocationReceipt) error {
+	return m.copyWithAllocationReceipt(dst, src, receipt)
+}
+func (m *BinaryRationalManager) copyWithAllocationReceipt(dst, src *BinaryRational, receipt *integerCopyAllocationReceipt) error {
 	if e := m.pair(dst, src); e != nil {
 		return e
 	}
-	if e := m.Z.Copy(&dst.Num, &src.Num); e != nil {
+	if e := m.Z.CopyFromOwnerWithReceipt(&dst.Num, m.Z, &src.Num, receipt); e != nil {
 		return e
 	}
 	dst.KField = src.KField
