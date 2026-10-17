@@ -487,6 +487,9 @@ func TestIntegerSourceDivModWrapperDestinationBeforeFailure(t *testing.T) {
 
 func TestIntegerSourceTmpFiniteWrappedCapacities(t *testing.T) {
 	for _, f := range []struct{ request, capacity uint32 }{{1431655767, 3}, {1431655773, 12}} {
+		if modularSourceDebug && f.capacity < 6 {
+			bindMPNDebugActions(t, "T")
+		}
 		m, b := mpzPublicationOwner(t)
 		before := mpzPublicationSnapshot(m, b)
 		e := m.EnsureTmp(0, f.request)
@@ -495,6 +498,9 @@ func TestIntegerSourceTmpFiniteWrappedCapacities(t *testing.T) {
 				t.Fatal("missing source capacity assertion", f)
 			}
 			if f.capacity < 6 {
+				if !isMPNVerificationThrow(e) {
+					t.Fatal("source allocate assertion action", f, e)
+				}
 				if m.Tmp[0] != 0 || m.Cells.Stats().Live+1 != before.cells {
 					t.Fatal("allocate capacity assertion did not follow old-free and precede replacement", f)
 				}

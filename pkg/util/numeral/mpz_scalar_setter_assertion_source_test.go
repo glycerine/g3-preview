@@ -58,10 +58,12 @@ func TestIntegerBigScalarSetterSourceAssertionActions(t *testing.T) {
 				t.Fatal("source setter location and action count", n, string(contents))
 			}
 		})
-		t.Run(name+"-closed-after-allocation", func(t *testing.T) {
+		t.Run(name+"-closed-existing-cell", func(t *testing.T) {
 			d, _ := bindMPNDebugActions(t, "")
 			m, _ := integerManager(t)
-			a := NewInt(17)
+			var a Int
+			serviceMust(t, m.SetInt64(&a, -(1<<40)))
+			ref := a.Cell
 			serviceMust(t, d.Close())
 			var err error
 			if unsigned {
@@ -69,11 +71,11 @@ func TestIntegerBigScalarSetterSourceAssertionActions(t *testing.T) {
 			} else {
 				err = m.SetInt64(&a, 1<<40)
 			}
-			if !errors.Is(err, arena.ErrClosed) || a.Cell == 0 || a.Val != 17 {
-				t.Fatal("source pointer must publish before setter assertion", err, a)
+			if !errors.Is(err, arena.ErrClosed) || a.Cell != ref || a.Val != -1 {
+				t.Fatal("setter assertion must stop before sign and digit writes", err, a)
 			}
-			if cell := m.Cell(a.Cell); cell.Unpublished || cell.Size != 0 || cell.Capacity != 6 {
-				t.Fatal("source setter stopped before sign and digit writes", cell)
+			if cell := m.Cell(ref); cell.Size != 2 || cell.Capacity != 6 || m.Digit(ref, 0) != 0 || m.Digit(ref, 1) != 256 {
+				t.Fatal("old big setter cell changed", cell)
 			}
 		})
 	}

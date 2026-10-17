@@ -10,7 +10,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 )
 
-func TestLehmerGCDFirstSourceAssertionReadsAfterInputCopies(t *testing.T) {
+func TestLehmerGCDNestedAllocateAssertionStopsSecondInputCopy(t *testing.T) {
 	if !sourceGCDDebug {
 		t.Skip("source Z3DEBUG assertion only")
 	}
@@ -23,11 +23,10 @@ func TestLehmerGCDFirstSourceAssertionReadsAfterInputCopies(t *testing.T) {
 	serviceMust(t, d.Close())
 	err := m.GCD(&a, &b, &c)
 	if !errors.Is(err, arena.ErrClosed) || c.Val != 99 || c.Cell != 0 {
-		t.Fatal("first Lehmer assertion must stop before result publication", err, c)
+		t.Fatal("nested allocator assertion must stop before result publication", err, c)
 	}
-	if m.GcdRaw.Values[0].Cell == 0 || m.GcdRaw.Values[1].Cell == 0 ||
-		m.GcdRaw.Values[0].Val <= 0 || m.GcdRaw.Values[1].Val <= 0 {
-		t.Fatal("first assertion must follow the two positive source copies", m.GcdRaw.Values[0], m.GcdRaw.Values[1])
+	if m.GcdRaw.Values[0].Cell == 0 || m.GcdRaw.Values[1] != NewInt(0) || m.GcdRaw.Values[0].Val <= 0 {
+		t.Fatal("first copy precedes nested allocator assertion in second copy", m.GcdRaw.Values[0], m.GcdRaw.Values[1])
 	}
 }
 

@@ -361,9 +361,6 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 	if context.rationalService != nil && context.rationalServiceFrame(m) == nil {
 		return 0, arena.ErrInvalidSlot
 	}
-	if modularSourceDebug && capacity < 6 {
-		return 0, ErrIntegerAssertion
-	}
 	if m.PendingCell.Object != (umemory.ObjectRef{}) {
 		return 0, umemory.ErrAllocatorPending
 	}
@@ -402,6 +399,18 @@ func (m *IntegerManager) allocateWithSourceContext(capacity, size uint32, s *int
 	}
 	if e := context.prepareCaller(m, "factor-history"); e != nil {
 		return 0, e
+	}
+	if modularSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return 0, e
+		}
+		if enabled && capacity < 6 {
+			if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.h", 125, "capacity >= m_init_cell_capacity"); e != nil {
+				return 0, e
+			}
+		}
 	}
 	backing, e := allocateSourceCellWithOutcome(m.Allocator, capacity, out)
 	// Capture the physical prefix before charged descriptor preparation.

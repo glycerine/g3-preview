@@ -43,7 +43,7 @@ func TestMPZBitwiseSourcePreconditionThrowAndContinue(t *testing.T) {
 	}
 }
 
-func TestMPZBitwiseNotChunkTracePrecedesResultAssertion(t *testing.T) {
+func TestMPZBitwiseNotChunkTracePrecedesNestedAllocateAssertion(t *testing.T) {
 	if !modularSourceDebug {
 		t.Skip("source Z3DEBUG assertions only")
 	}
@@ -59,8 +59,8 @@ func TestMPZBitwiseNotChunkTracePrecedesResultAssertion(t *testing.T) {
 	a, out := NewInt(1), NewInt(77)
 	err := m.BitwiseNot(64, &a, &out)
 	if !errors.Is(err, arena.ErrClosed) || w.closeErr != nil || w.flushes == 0 || out != NewInt(0) ||
-		m.BitwiseNotRaw.Values[3].Cell == 0 {
-		t.Fatal("chunk trace and temporary setter must precede result assertion read", err, w.closeErr, w.flushes, out, m.BitwiseNotRaw.Values[3])
+		m.BitwiseNotRaw.Values[3] != NewInt(0) {
+		t.Fatal("chunk trace must precede nested allocation assertion and temporary setter", err, w.closeErr, w.flushes, out, m.BitwiseNotRaw.Values[3])
 	}
 }
 
