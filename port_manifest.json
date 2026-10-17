@@ -156833,6 +156833,7 @@
         "pkg/util/numeral/mpf_renormalize_failure_test.go",
         "pkg/util/numeral/mpf_renormalize_callback_test.go",
         "pkg/util/numeral/mpf_partial_remainder.go",
+        "pkg/util/numeral/mpf_partial_remainder_assertion_source_test.go",
         "pkg/util/numeral/mpf_partial_remainder_scope.go",
         "pkg/util/numeral/mpf_partial_remainder_test.go",
         "pkg/util/numeral/mpf_partial_remainder_failure_test.go",
@@ -157115,6 +157116,8 @@
         "TestArbitraryFloatRenormalizeSignedExponentPublication",
         "TestArbitraryFloatRenormalizeReturningTransportAndOwnerGuards",
         "TestArbitraryFloatPartialRemainderIndependentQuotientOracle",
+        "TestArbitraryFloatPartialRemainderEntrySourceAssertions",
+        "TestArbitraryFloatPartialRemainderInitialSignificandSourceAssertions",
         "TestArbitraryFloatPartialRemainderEveryColdReservation",
         "TestArbitraryFloatPartialRemainderReturningTransportAndOwnerGuards",
         "TestArbitraryFloatPartialRemainderLiteralAlignmentAndRoundConstant",
@@ -158122,6 +158125,8 @@
           "go_target": "pkg/util/numeral/mpf_partial_remainder.go",
           "tests": [
             "TestArbitraryFloatPartialRemainderIndependentQuotientOracle",
+            "TestArbitraryFloatPartialRemainderEntrySourceAssertions",
+            "TestArbitraryFloatPartialRemainderInitialSignificandSourceAssertions",
             "TestArbitraryFloatPartialRemainderEveryColdReservation",
             "TestArbitraryFloatPartialRemainderReturningTransportAndOwnerGuards",
             "TestArbitraryFloatPartialRemainderLiteralAlignmentAndRoundConstant"
@@ -158540,6 +158545,7 @@
         "pkg/util/numeral/mpf_renormalize_failure_test.go",
         "pkg/util/numeral/mpf_renormalize_callback_test.go",
         "pkg/util/numeral/mpf_partial_remainder.go",
+        "pkg/util/numeral/mpf_partial_remainder_assertion_source_test.go",
         "pkg/util/numeral/mpf_partial_remainder_scope.go",
         "pkg/util/numeral/mpf_partial_remainder_test.go",
         "pkg/util/numeral/mpf_partial_remainder_failure_test.go",
@@ -158735,6 +158741,8 @@
         "TestArbitraryFloatRenormalizeSignedExponentPublication",
         "TestArbitraryFloatRenormalizeReturningTransportAndOwnerGuards",
         "TestArbitraryFloatPartialRemainderIndependentQuotientOracle",
+        "TestArbitraryFloatPartialRemainderEntrySourceAssertions",
+        "TestArbitraryFloatPartialRemainderInitialSignificandSourceAssertions",
         "TestArbitraryFloatPartialRemainderEveryColdReservation",
         "TestArbitraryFloatPartialRemainderReturningTransportAndOwnerGuards",
         "TestArbitraryFloatPartialRemainderLiteralAlignmentAndRoundConstant",
@@ -159248,6 +159256,8 @@
           "go_target": "pkg/util/numeral/mpf_partial_remainder.go",
           "tests": [
             "TestArbitraryFloatPartialRemainderIndependentQuotientOracle",
+            "TestArbitraryFloatPartialRemainderEntrySourceAssertions",
+            "TestArbitraryFloatPartialRemainderInitialSignificandSourceAssertions",
             "TestArbitraryFloatPartialRemainderEveryColdReservation",
             "TestArbitraryFloatPartialRemainderReturningTransportAndOwnerGuards",
             "TestArbitraryFloatPartialRemainderLiteralAlignmentAndRoundConstant"

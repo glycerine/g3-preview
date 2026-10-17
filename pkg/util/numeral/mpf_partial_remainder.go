@@ -21,6 +21,12 @@ func (m *ArbitraryFloatManager) PartialRemainder(x, y *ArbitraryFloat, expDiff i
 			return e
 		}
 	}
+	if e := mpfSourceAssertion(expDiff >= -1 && expDiff < math.MaxInt64, 1276, "-1 <= exp_diff && exp_diff < INT64_MAX"); e != nil {
+		return e
+	}
+	if e := mpfSourceAssertion(expDiff < int64(x.EBits()+x.SBits()) || partial, 1277, "exp_diff < ebits+sbits || partial"); e != nil {
+		return e
+	}
 	s := &m.partialRemainder
 	if s.invocation == ^uint64(0) {
 		return ErrNumericPending
@@ -63,6 +69,21 @@ func (s *arbitraryFloatPartialRemainderScope) assertPower(v *Int, n uint32, ge b
 	}
 	return nil
 }
+func (s *arbitraryFloatPartialRemainderScope) sourceAssertPower(v *Int, n uint32, ge bool, line int32, expression string) error {
+	enabled, e := mpfSourceAssertionsEnabled()
+	if e != nil || !enabled {
+		return e
+	}
+	p, e := s.power(n)
+	if e != nil {
+		return e
+	}
+	cmp, e := s.manager.integer.Compare(v, &p)
+	if e != nil {
+		return e
+	}
+	return mpfSourceAssertion(ge && cmp >= 0 || !ge && cmp < 0, line, expression)
+}
 func (s *arbitraryFloatPartialRemainderScope) shift(v *Int, n uint32) error {
 	z := s.manager.integer
 	if e := z.check(v); e != nil {
@@ -96,21 +117,22 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 	}
 	m, z, c := s.manager, s.manager.integer, s.context()
 	eb, sb := x.EBits(), x.SBits()
-	if modularSourceDebug && (expDiff < -1 || expDiff == 1<<63-1 || expDiff >= int64(eb+sb) && !partial) {
-		return ErrIntegerAssertion
-	}
 	d := int64(int32(expDiff))
 	n := int64(sb - 1)
 	if e := m.tracePartialRemainderEntry(x, y, d, partial); e != nil {
 		return e
 	}
-	for _, v := range [...]*Int{&x.significand, &y.significand} {
-		if e := s.assertPower(v, sb, false); e != nil {
-			return e
-		}
-		if e := s.assertPower(v, sb-1, true); e != nil {
-			return e
-		}
+	if e := s.sourceAssertPower(&x.significand, sb, false, 1287, "m_mpz_manager.lt(x.significand, m_powers2(sbits))"); e != nil {
+		return e
+	}
+	if e := s.sourceAssertPower(&x.significand, sb-1, true, 1288, "m_mpz_manager.ge(x.significand, m_powers2(sbits - 1))"); e != nil {
+		return e
+	}
+	if e := s.sourceAssertPower(&y.significand, sb, false, 1289, "m_mpz_manager.lt(y.significand, m_powers2(sbits))"); e != nil {
+		return e
+	}
+	if e := s.sourceAssertPower(&y.significand, sb-1, true, 1290, "m_mpz_manager.ge(y.significand, m_powers2(sbits - 1))"); e != nil {
+		return e
 	}
 	// Actual source declarations: shifted numerator, large quotient, its
 	// remainder, and the unused x_rem_y_sig are all constructed here.
