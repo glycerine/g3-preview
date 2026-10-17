@@ -10,6 +10,7 @@ import (
 )
 
 func TestSourceCStringBoundedBytesAndLbuf(t *testing.T) {
+	bindMPNDebugActions(t, "T")
 	m := naturalManager(t)
 	for _, test := range []struct {
 		limit uint64
@@ -28,7 +29,7 @@ func TestSourceCStringBoundedBytesAndLbuf(t *testing.T) {
 	dst := []byte{'o', 'l', 'd', 0}
 	e := m.sourceToCString(limbView{external: []uint32{123}, size: 1}, sourceDecimalDestination{external: dst}, 0)
 	if SourceExtendedGCDDebug {
-		if !errors.Is(e, ErrIntegerAssertion) {
+		if !isMPNVerificationThrow(e) {
 			t.Fatal("source lbuf assertion", e)
 		}
 	} else if e != nil || string(dst) != "old\x00" {

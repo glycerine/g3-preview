@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 // Ephemeral by-value borrowed destinations; no interface, slice or pointer is
@@ -88,8 +89,17 @@ func (m *NaturalManager) sourceToCStringScopedTracked(a limbView, dst sourceDeci
 	if e := m.check(); e != nil {
 		return e
 	}
-	if SourceExtendedGCDDebug && (lbuf == 0 || (dst.character == nil && dst.assembly == nil && dst.external == nil)) {
-		return ErrIntegerAssertion
+	if SourceExtendedGCDDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return e
+		}
+		if enabled && (lbuf == 0 || (dst.character == nil && dst.assembly == nil && dst.external == nil)) {
+			if e := diagnostic.DebugAssertionFailure(d, "src/util/mpn.cpp", 361, "buf && lbuf > 0"); e != nil {
+				return e
+			}
+		}
 	}
 	m.traceToCStringInput(a)
 	if a.size == 1 {

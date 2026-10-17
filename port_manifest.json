@@ -161371,10 +161371,11 @@
           ]
         },
         {
-          "name": "to_string selected digit32 non-Windows physical caller-buffer/lbuf and size_t reversal kernel plus lexical limb scope; full profiles/transport remain open",
+          "name": "to_string selected digit32 non-Windows caller-buffer/lbuf, entry SASSERT switch/actions and size_t reversal plus lexical limb scope; full profiles/transport remain open",
           "status": "partial",
           "go_target": "pkg/util/numeral/mp_format.go",
           "tests": [
+            "TestMPNToStringSourceEntryAssertionActions",
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
@@ -162025,10 +162026,11 @@
           ]
         },
         {
-          "name": "to_string selected digit32 non-Windows physical caller-buffer/lbuf and size_t reversal kernel plus lexical limb scope; full profiles/transport remain open",
+          "name": "to_string selected digit32 non-Windows caller-buffer/lbuf, entry SASSERT switch/actions and size_t reversal plus lexical limb scope; full profiles/transport remain open",
           "status": "partial",
           "go_target": "pkg/util/numeral/mp_format.go",
           "tests": [
+            "TestMPNToStringSourceEntryAssertionActions",
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
