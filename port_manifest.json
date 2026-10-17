@@ -17425,7 +17425,8 @@
         "pkg/ast/ast_fpa_to_fp_signed_bv_decl.go",
         "pkg/ast/ast_fpa_to_fp_signed_bv_test.go",
         "pkg/ast/ast_fpa_to_fp_format_test.go",
-        "pkg/ast/ast_fpa_to_fp_arithmetic_test.go"
+        "pkg/ast/ast_fpa_to_fp_arithmetic_test.go",
+        "pkg/ast/ast_fpa_to_fp_ieee_bv_test.go"
       ],
       "tests": [
         "TestASTFloatingPointClassificationDeclarationsAndApplications",
@@ -17463,7 +17464,8 @@
         "TestASTFPAToFPUnsignedDeclarationRoundingAndRefusals",
         "TestASTFPAToFPSignedBVSourceNormalizationAndRounding",
         "TestASTFPAToFPFormatRoundingSpecialsAndRefusals",
-        "TestASTFPAToFPArithmeticRealIntRoundingAndRefusals"
+        "TestASTFPAToFPArithmeticRealIntRoundingAndRefusals",
+        "TestASTFPAToFPIEEEBVExactFieldsAndRefusals"
       ],
       "assertions": [
         {
@@ -17704,6 +17706,14 @@
           "go_target": "pkg/ast/ast_fpa_to_fp_signed_bv_decl.go",
           "tests": [
             "TestASTFPAToFPArithmeticRealIntRoundingAndRefusals"
+          ]
+        },
+        {
+          "name": "Concrete to_fp one-BitVec IEEE field overload validates two integer format parameters and exact ebits+sbits domain width (fpa_decl_plugin.cpp:437-451)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_signed_bv_decl.go",
+          "tests": [
+            "TestASTFPAToFPIEEEBVExactFieldsAndRefusals"
           ]
         },
         {
@@ -26860,7 +26870,9 @@
         "pkg/ast/ast_fpa_to_fp_format.go",
         "pkg/ast/rewriter/fpa_to_fp_format_test.go",
         "pkg/ast/ast_fpa_to_fp_arithmetic.go",
-        "pkg/ast/rewriter/fpa_to_fp_arithmetic_test.go"],
+        "pkg/ast/rewriter/fpa_to_fp_arithmetic_test.go",
+        "pkg/ast/ast_fpa_to_fp_ieee_bv.go",
+        "pkg/ast/rewriter/fpa_to_fp_ieee_bv_test.go"],
       "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestASTFPAUnaryScopedNumeralRetiresBeforeReturn", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
         "TestASTFPARemainderFiniteNumeralAndScopedCleanup",
         "TestFPARemainderNumericSpecialAndSymbolicRefusal",
@@ -26886,7 +26898,9 @@
         "TestASTFPAToFPFormatRoundingSpecialsAndRefusals",
         "TestFPAToFPFormatSpecialAndSymbolicDispatch",
         "TestASTFPAToFPArithmeticRealIntRoundingAndRefusals",
-        "TestFPAToFPArithmeticRealIntDispatch"],
+        "TestFPAToFPArithmeticRealIntDispatch",
+        "TestASTFPAToFPIEEEBVExactFieldsAndRefusals",
+        "TestFPAToFPIEEEBVNumericAndSymbolicDispatch"],
       "assertions": [
         {
           "line": 43,
@@ -27237,6 +27251,15 @@
           ]
         },
         {
+          "name": "mk_to_fp one-BV IEEE field split into significand, exponent and sign before MPF SetComponents (fpa_rewriter.cpp:106-153)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_ieee_bv.go",
+          "tests": [
+            "TestASTFPAToFPIEEEBVExactFieldsAndRefusals",
+            "TestFPAToFPIEEEBVNumericAndSymbolicDispatch"
+          ]
+        },
+        {
           "name": "mk_to_fp_unsigned concrete BV numeral and rounding-mode guard, owned rational to MPF conversion and result publication (fpa_rewriter.cpp:235-254)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_fp_unsigned.go",
@@ -27280,7 +27303,8 @@
         "TestFPAToIEEEBVDefaultAndHardwareNaNDispatch",
         "TestFPAToFPSignedBVNumericAndSymbolicDispatch",
         "TestFPAToFPFormatSpecialAndSymbolicDispatch",
-        "TestFPAToFPArithmeticRealIntDispatch"],
+        "TestFPAToFPArithmeticRealIntDispatch",
+        "TestFPAToFPIEEEBVNumericAndSymbolicDispatch"],
       "conditionals": [
         {
           "line": 19,
@@ -27380,6 +27404,14 @@
           "go_target": "pkg/ast/rewriter/fpa_classification.go",
           "tests": [
             "TestFPAToFPArithmeticRealIntDispatch"
+          ]
+        },
+        {
+          "name": "Concrete mk_to_fp one-BV IEEE field dispatch with symbolic refusal (fpa_rewriter.h:80-81; fpa_rewriter.cpp:90,106-153)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_classification.go",
+          "tests": [
+            "TestFPAToFPIEEEBVNumericAndSymbolicDispatch"
           ]
         },
         {
@@ -179268,6 +179300,14 @@
           "go_target": "pkg/ast/ast_fpa_to_fp_arithmetic.go",
           "tests": [
             "TestASTFPAToFPArithmeticRealIntRoundingAndRefusals"
+          ]
+        },
+        {
+          "name": "Concrete mk_to_fp outer scoped_mpf and one-BV scoped_mpz sign/exponent/significand lifetimes (fpa_rewriter.cpp:106-153; scoped_numeral.h:24-33)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_ieee_bv.go",
+          "tests": [
+            "TestASTFPAToFPIEEEBVExactFieldsAndRefusals"
           ]
         },
         {

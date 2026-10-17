@@ -101,6 +101,17 @@ func (r *FPARewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out ast.
 		return RewriteDone, r.manager.SetRef(out, answer)
 	}
 	if kind == ast.FPAOpToFP {
+		if args.Count() == 1 {
+			value, err := args.At(0)
+			if err != nil {
+				return RewriteFailed, err
+			}
+			answer, found, err := r.manager.RewriteFPAToFPIEEEBVNumeral(d, value)
+			if err != nil || !found {
+				return RewriteFailed, err
+			}
+			return RewriteDone, r.manager.SetRef(out, answer)
+		}
 		if args.Count() != 2 {
 			return RewriteFailed, ast.ErrASTDomain
 		}
