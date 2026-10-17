@@ -17395,6 +17395,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/ast_fpa_plugin.go",
+        "pkg/ast/ast_fpa_classification_decl.go",
         "pkg/ast/ast_fpa_plugin_source_test.go",
         "pkg/ast/ast_fpa_numeral.go",
         "pkg/ast/ast_fpa_numeral_source_test.go",
@@ -17408,6 +17409,7 @@
         "pkg/ast/ast_fpa_numeral_probe_test.go"
       ],
       "tests": [
+        "TestASTFloatingPointClassificationDeclarationsAndApplications",
         "TestASTFloatingPointActualConstructorRegistrationAndSorts",
         "TestASTFloatingPointEveryActualConstructorAndPublicationPrefix",
         "TestASTFloatingPointSourceFinalizeAndOwnContextEndPreserveBorrowedNumerals",
@@ -17495,6 +17497,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "FPA classification unary relation declarations and applications: seven exact kinds, names, floating-point domain and Boolean range (fpa_decl_plugin.cpp:313-331,731-738)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_classification_decl.go",
+          "tests": ["TestASTFloatingPointClassificationDeclarationsAndApplications"]
+        },
         {
           "name": "ast_fpa_plugin concrete reached source counterpart (fpa_decl_plugin.cpp:23-49,182-231)",
           "status": "partial",

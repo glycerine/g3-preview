@@ -6,9 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 
 	umemory "github.com/glycerine/g3/pkg/util/memory"
-	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"math/big"
 	"testing"
 )
@@ -78,6 +78,15 @@ func TestASTBitVectorExtendedRotationEveryActualReservation(t *testing.T) {
 }
 
 func TestASTBitVectorExtendedRotationSignedRemainderThenUnsignedRead(t *testing.T) {
+	if ASTSourceDebug {
+		debug, _, _ := debugDiagnosticFixture(t)
+		previous, err := diagnostic.BindProcessDebugContext(debug)
+		astTestMust(t, err)
+		t.Cleanup(func() {
+			_, err := diagnostic.BindProcessDebugContext(previous)
+			astTestMust(t, err)
+		})
+	}
 	m := bvOffsetRuntimeTestManager(t)
 	_, e := m.RegisterArithmeticPlugin()
 	astTestMust(t, e)
@@ -97,7 +106,7 @@ func TestASTBitVectorExtendedRotationSignedRemainderThenUnsignedRead(t *testing.
 	}
 	shift, body := n.Shift(width)
 	if ASTSourceDebug {
-		if !errors.Is(body, unumeral.ErrIntegerAssertion) || !n.placed[1] || !n.placed[2] {
+		if !errors.Is(body, diagnostic.ErrDebugAssertion) || !n.placed[1] || !n.placed[2] {
 			t.Fatal("original unsigned assertion before expression end", body, n.placed)
 		}
 		text, e := m.numerals.String(&n.values[2])

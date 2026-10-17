@@ -46,7 +46,7 @@ func TestASTExprSubstitutionOptionalMapMemoryWrappers(t *testing.T) {
 	astTestMust(t, m.ExprSubstitutionCleanup(s)) // Keeps both map owners alive.
 	astTestMust(t, m.DelExprSubstitution(&s))
 	got := output.String()
-	if !udiag.DebugBuild {
+	if !udiag.DebugBuild || !tags.ShouldTrace("memory") {
 		if got != "" {
 			t.Fatal("source Z3DEBUG wrappers must erase", got)
 		}
@@ -103,7 +103,7 @@ func TestASTExprSubstitutionSecondOptionalMapRefusalUnwindsFirst(t *testing.T) {
 			t.Fatal("constructor prefix retained owner storage", stop, e, len(m.exprSubstitutions), budget.Used(), used)
 		}
 		got := output.String()
-		if !udiag.DebugBuild {
+		if !udiag.DebugBuild || !tags.ShouldTrace("memory") {
 			if got != "" {
 				t.Fatal("erased memory wrapper after refusal", got)
 			}
@@ -118,7 +118,7 @@ func TestASTExprSubstitutionSecondOptionalMapRefusalUnwindsFirst(t *testing.T) {
 			break
 		}
 	}
-	if !seenFailure || udiag.DebugBuild && !found {
+	if !seenFailure || udiag.DebugBuild && tags.ShouldTrace("memory") && !found {
 		t.Fatal("missing completed proof-map unwind at a dependency-map refusal")
 	}
 }

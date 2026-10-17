@@ -38,7 +38,7 @@ func TestASTSequenceSignatureMemoryWrappersSourceOrder(t *testing.T) {
 		t.Fatal("sequence signature owners retained", budget.Used())
 	}
 	got := output.String()
-	if !udiag.DebugBuild {
+	if !udiag.DebugBuild || !tags.ShouldTrace("memory") {
 		if got != "" {
 			t.Fatal("source Z3DEBUG signature wrappers must erase", got)
 		}

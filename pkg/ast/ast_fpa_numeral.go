@@ -25,6 +25,13 @@ const (
 	astFPANaN              int32 = 8
 	astFPAPlusZero         int32 = 9
 	astFPAMinusZero        int32 = 10
+	astFPAIsNaN            int32 = 28
+	astFPAIsInf            int32 = 29
+	astFPAIsZero           int32 = 30
+	astFPAIsNormal         int32 = 31
+	astFPAIsSubnormal      int32 = 32
+	astFPAIsNegative       int32 = 33
+	astFPAIsPositive       int32 = 34
 )
 
 func (p *astFloatingPointPluginOwner) numeralAssertionsEnabled() (bool, error) {
