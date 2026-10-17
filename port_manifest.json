@@ -102480,6 +102480,9 @@
           "name": "Concrete propagate-inequalities copied-goal allocation at cpp483 and final goal.h:85 deallocation through source memory wrappers",
           "status": "platform_replacement",
           "go_target": "pkg/tactic/tactic_goal_inequality_memory_trace.go",
+          "go_targets": [
+            "pkg/tactic/arith/propagate_ineq_memory_trace.go"
+          ],
           "tests": [
             "TestPropagateIneqImplementationMemoryWrapperSourceLifetime"
           ]
@@ -105830,6 +105833,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/tactic/tactic_goal_inequality_memory_trace.go",
+        "pkg/tactic/arith/propagate_ineq_memory_trace.go",
         "pkg/tactic/tactic_goal.go",
         "pkg/tactic/tactic_goal_ownership.go",
         "pkg/tactic/tactic_package_boundary.go",
@@ -105872,6 +105876,9 @@
           "name": "Concrete propagate-inequalities copied-goal allocation at cpp483 and final goal.h:85 deallocation through source memory wrappers",
           "status": "platform_replacement",
           "go_target": "pkg/tactic/tactic_goal_inequality_memory_trace.go",
+          "go_targets": [
+            "pkg/tactic/arith/propagate_ineq_memory_trace.go"
+          ],
           "tests": [
             "TestPropagateIneqImplementationMemoryWrapperSourceLifetime"
           ]
@@ -153618,6 +153625,9 @@
           "name": "Concrete propagate-inequalities copied-goal allocation at cpp483 and final goal.h:85 deallocation through source memory wrappers",
           "status": "platform_replacement",
           "go_target": "pkg/tactic/tactic_goal_inequality_memory_trace.go",
+          "go_targets": [
+            "pkg/tactic/arith/propagate_ineq_memory_trace.go"
+          ],
           "tests": [
             "TestPropagateIneqImplementationMemoryWrapperSourceLifetime"
           ]
@@ -154663,6 +154673,9 @@
           "name": "Concrete propagate-inequalities copied-goal allocation at cpp483 and final goal.h:85 deallocation through source memory wrappers",
           "status": "platform_replacement",
           "go_target": "pkg/tactic/tactic_goal_inequality_memory_trace.go",
+          "go_targets": [
+            "pkg/tactic/arith/propagate_ineq_memory_trace.go"
+          ],
           "tests": [
             "TestPropagateIneqImplementationMemoryWrapperSourceLifetime"
           ]
@@ -167808,6 +167821,14 @@
         },
         {
           "name": "array-GCD size-sorting TRACE in disabled #if 0 optimization (mpz.cpp:875)",
+          "status": "dead_deleted"
+        },
+        {
+          "name": "Default _MP_INTERNAL profile excludes BINARY_GCD (mpz.cpp:590-632), EUCLID_GCD (634-663; selected only for _MP_GMP), and LS_BINARY_GCD (665-723, including SASSERT at 694,713-714); selected scalar path is LEHMER_GCD (725-817)",
+          "status": "dead_deleted"
+        },
+        {
+          "name": "Default _MP_INTERNAL profile excludes GMP-only digit-set assertion (mpz.cpp:342) and log2/mlog2 assertions (1834,1857)",
           "status": "dead_deleted"
         }
       ],
