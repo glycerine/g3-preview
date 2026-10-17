@@ -166701,6 +166701,7 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_power_shift.go",
           "tests": [
+            "TestIntegerShiftSourceAssertionSwitchOrder",
             "TestIntegerSourceShiftTable",
             "TestIntegerPowerAndShiftIndependent",
             "TestSourceShiftDefectAndPowerDomains",
@@ -168847,6 +168848,7 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_power_shift.go",
           "tests": [
+            "TestIntegerShiftSourceAssertionSwitchOrder",
             "TestIntegerSourceShiftTable",
             "TestIntegerPowerAndShiftIndependent",
             "TestSourceShiftDefectAndPowerDomains",

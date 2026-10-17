@@ -7,6 +7,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 var ErrInvalidPower = errors.New("mpnum: integer zero to zero violates source power precondition")
@@ -338,8 +339,17 @@ func (m *IntegerManager) machineDiv2kCore(a *Int, k uint32) error {
 	bitShift := k % 32
 	compShift := 32 - bitShift
 	newSize := size - digitShift
-	if modularSourceDebug && newSize < 1 {
-		return ErrIntegerAssertion
+	if modularSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return e
+		}
+		if enabled && newSize < 1 {
+			if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 1649, "new_sz >= 1"); e != nil {
+				return e
+			}
+		}
 	}
 	m.traceMachineDiv2k(bitShift, compShift, newSize, size)
 	if newSize < size {
@@ -356,8 +366,26 @@ func (m *IntegerManager) machineDiv2kCore(a *Int, k uint32) error {
 			}
 		}
 	} else {
-		if modularSourceDebug && (newSize != size || bitShift == 0) {
-			return ErrIntegerAssertion
+		if modularSourceDebug {
+			d := diagnostic.BorrowProcessDebugContext()
+			enabled, e := diagnostic.SourceAssertionsEnabled(d)
+			if e != nil {
+				return e
+			}
+			if enabled && newSize != size {
+				if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 1671, "new_sz == sz"); e != nil {
+					return e
+				}
+			}
+			enabled, e = diagnostic.SourceAssertionsEnabled(d)
+			if e != nil {
+				return e
+			}
+			if enabled && bitShift == 0 {
+				if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 1672, "bit_shift != 0"); e != nil {
+					return e
+				}
+			}
 		}
 		var i uint32
 		for ; i < newSize-1; i++ {
@@ -390,8 +418,17 @@ func (m *IntegerManager) mul2kCoreWithAllocationContext(a *Int, k uint32, contex
 		return e
 	}
 	m.traceMul2kCapacity(a, wordShift, bitShift, oldSize, newSize)
-	if modularSourceDebug && a.IsSmall() {
-		return ErrIntegerAssertion
+	if modularSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return e
+		}
+		if enabled && a.IsSmall() {
+			if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 1711, "!is_small(a)"); e != nil {
+				return e
+			}
+		}
 	}
 	// Guard the actual encoded backing access after source capacity preparation.
 	if a.IsSmall() {
@@ -438,12 +475,21 @@ func (m *IntegerManager) mul2kCoreWithAllocationContext(a *Int, k uint32, contex
 	}
 	if bitShift > 0 {
 		if modularSourceDebug {
+			d := diagnostic.BorrowProcessDebugContext()
 			for i := uint32(0); i < wordShift; i++ {
-				if i >= cell.Capacity || i >= span {
-					return arena.ErrBounds
+				enabled, e := diagnostic.SourceAssertionsEnabled(d)
+				if e != nil {
+					return e
 				}
-				if m.Digit(a.Cell, i) != 0 {
-					return ErrIntegerAssertion
+				if enabled {
+					if i >= cell.Capacity || i >= span {
+						return arena.ErrBounds
+					}
+					if m.Digit(a.Cell, i) != 0 {
+						if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 1734, "ds[i] == 0"); e != nil {
+							return e
+						}
+					}
 				}
 			}
 		}
