@@ -32,6 +32,7 @@ func TestMPNToStringSourceEntryExitAndShortDestinationTrace(t *testing.T) {
 	}{
 		{[]uint32{42}, 16, "42", "[42]"},
 		{[]uint32{123}, 2, "1", "[123]"},
+		{[]uint32{^uint32(0)}, 11, "4294967295", "[4294967295]"},
 		{[]uint32{0, 1}, 32, "4294967296", "[1|0]"},
 	} {
 		var dst [32]byte

@@ -2,6 +2,8 @@
 package numeral
 
 import (
+	"strconv"
+
 	"github.com/glycerine/g3/pkg/arena"
 )
 
@@ -95,28 +97,19 @@ func (m *NaturalManager) sourceToCStringScopedTracked(a limbView, dst sourceDeci
 		if e != nil {
 			return e
 		}
-		var digits [10]byte
-		n := 0
-		for {
-			digits[n] = '0' + byte(value%10)
-			n++
-			value /= 10
-			if value == 0 {
-				break
-			}
-		}
+		formatted := strconv.FormatUint(uint64(value), 10)
 		// snprintf's zero-size case writes nothing. Its return count is ignored
 		// in source; Cptr insertion subsequently reads the existing destination.
 		if lbuf == 0 {
 			m.traceToCStringResult(dst)
 			return nil
 		}
-		count := uint64(n)
+		count := uint64(len(formatted))
 		if count >= lbuf {
 			count = lbuf - 1
 		}
 		for i := uint64(0); i < count; i++ {
-			if e = dst.write(i, digits[n-1-int(i)]); e != nil {
+			if e = dst.write(i, formatted[i]); e != nil {
 				return e
 			}
 		}
