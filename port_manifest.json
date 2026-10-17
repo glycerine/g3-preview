@@ -17717,6 +17717,14 @@
           ]
         },
         {
+          "name": "Concrete to_fp three-BitVec overload derives exponent and significand format parameters from BV domain widths (fpa_decl_plugin.cpp:423-437)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_signed_bv_decl.go",
+          "tests": [
+            "TestASTFPAToFPThreeBVFieldsAndRefusal"
+          ]
+        },
+        {
           "name": "Concrete to_fp_unsigned declaration validates RoundingMode, BitVec, two integer format parameters and resulting FloatingPoint sort in source order (fpa_decl_plugin.cpp:567-591)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_fp_unsigned_decl.go",
@@ -27257,6 +27265,15 @@
           "tests": [
             "TestASTFPAToFPIEEEBVExactFieldsAndRefusals",
             "TestFPAToFPIEEEBVNumericAndSymbolicDispatch"
+          ]
+        },
+        {
+          "name": "mk_to_fp three-BV concrete sign, biased exponent and significand fields through MPF SetComponents (fpa_rewriter.cpp:106-119,212-230)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_three_bv.go",
+          "tests": [
+            "TestASTFPAToFPThreeBVFieldsAndRefusal",
+            "TestFPAToFPThreeBVDispatch"
           ]
         },
         {

@@ -1,12 +1,18 @@
-// Source: src/ast/fpa_decl_plugin.cpp:437-489,531-564.
+// Source: src/ast/fpa_decl_plugin.cpp:423-489,531-564.
 package ast
 
-import "github.com/glycerine/g3/pkg/util/z3exception"
+import (
+	"errors"
+
+	"github.com/glycerine/g3/pkg/util/z3exception"
+)
 
 const FPAOpToFP int32 = astFPAToFP
 
 func (m *ASTManager) floatingPointToFPDecl(ps []ASTParameter, domain []ASTHandle) (astNodeRef, error) {
-	// The other source to_fp arities remain open.
+	if len(domain) == 3 {
+		return m.floatingPointToFPThreeBVDecl(domain)
+	}
 	if len(domain) == 1 {
 		ref, err := m.internal(domain[0])
 		if err != nil {
@@ -100,4 +106,51 @@ func (m *ASTManager) floatingPointToFPDecl(ps []ASTParameter, domain []ASTHandle
 		return astNodeRef{}, err
 	}
 	return m.pluginDecl(name, m.floatingPointPlugin.family, astFPAToFP, ps, domain, fpSort, ASTFuncFlags{}, false)
+}
+
+// The three-BV overload derives its format parameters from the exponent and
+// significand domains; caller-supplied parameters are ignored by the source.
+func (m *ASTManager) floatingPointToFPThreeBVDecl(domain []ASTHandle) (decl astNodeRef, result error) {
+	var widths [3]uint32
+	for i, sort := range domain {
+		ref, err := m.internal(sort)
+		if err != nil {
+			return astNodeRef{}, err
+		}
+		if ref.slot == 0 || m.nodeAt(ref.slot).kind != ASTSort {
+			return astNodeRef{}, ErrASTDomain
+		}
+		isBV, err := m.bitVectorSortRecognized(ref)
+		if err != nil {
+			return astNodeRef{}, err
+		}
+		if !isBV {
+			return astNodeRef{}, ErrASTDomain
+		}
+		widths[i], err = m.bitVectorSortSize(ref, nil)
+		if err != nil {
+			return astNodeRef{}, err
+		}
+	}
+	ebits, sbits := widths[1], widths[2]+1
+	fpSort, err := m.mkFloatSort(ebits, sbits)
+	if err != nil {
+		return astNodeRef{}, err
+	}
+	name, err := m.Symbols.Intern("to_fp")
+	if err != nil {
+		return astNodeRef{}, err
+	}
+	eParam, err := m.newParameterInt(int32(ebits))
+	if err != nil {
+		return astNodeRef{}, err
+	}
+	defer func() { result = errors.Join(result, m.dropParameter(eParam)) }()
+	sParam, err := m.newParameterInt(int32(sbits))
+	if err != nil {
+		return astNodeRef{}, err
+	}
+	defer func() { result = errors.Join(result, m.dropParameter(sParam)) }()
+	return m.pluginDecl(name, m.floatingPointPlugin.family, astFPAToFP,
+		[]ASTParameter{eParam, sParam}, domain, fpSort, ASTFuncFlags{}, false)
 }
