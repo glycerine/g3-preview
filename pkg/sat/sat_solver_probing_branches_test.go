@@ -131,12 +131,24 @@ func TestSATSolverProbingConstructorRefusalAndCohort(t *testing.T) {
 }
 func TestSATSolverProbingConditionalDiagnosticsSourceSites(t *testing.T) {
 	s, life := satProbingFixture(t, 0)
-	s.debugProbing = true
+	debug, _, _ := satIntegrityActionFixture(t, "")
 	before := life.propagation.limit.Count()
 	_, e := s.run(true)
+	satOK(t, e)
+	if life.propagation.limit.Count() != before {
+		t.Fatal("disabled probing tag reached checker")
+	}
+	satOK(t, debug.EnableDebug("probing"))
+	_, e = s.run(true)
 	if satStorageSourceDebug {
 		if !errors.Is(e, ErrSATMissingIntegrityBinding) || life.propagation.limit.Count() != before+1 {
 			t.Fatal(e)
+		}
+		satOK(t, debug.EnableAssertions(false))
+		_, e = s.run(true)
+		satOK(t, e)
+		if life.propagation.limit.Count() != before+1 {
+			t.Fatal("disabled process assertions reached checker")
 		}
 	} else {
 		satOK(t, e)
@@ -145,6 +157,27 @@ func TestSATSolverProbingConditionalDiagnosticsSourceSites(t *testing.T) {
 		}
 	}
 }
+
+func TestSATProbingConditionalInvariantChecksBothReachedSites(t *testing.T) {
+	g, _ := satGCFixture(t, 0)
+	s := g.conflict.dynamic.probing
+	debug, _, _ := satIntegrityActionFixture(t, "")
+	satOK(t, debug.EnableDebug("probing"))
+	before := g.lifecycle().propagation.limit.Count()
+	yes, err := s.run(true)
+	satOK(t, err)
+	if !yes {
+		t.Fatal("empty probing round")
+	}
+	want := uint64(0)
+	if satStorageSourceDebug {
+		want = 2
+	}
+	if got := g.lifecycle().propagation.limit.Count() - before; got != want {
+		t.Fatal("entry and exit CASSERT reachability", got, want)
+	}
+}
+
 func TestSATSolverProbingMissedPropagationTruthTable(t *testing.T) {
 	for pattern := 0; pattern < 27; pattern++ {
 		t.Run(fmt.Sprint(pattern), func(t *testing.T) {

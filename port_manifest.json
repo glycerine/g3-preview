@@ -77920,6 +77920,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/sat/sat_solver_probing_branches_test.go",
+        "pkg/sat/sat_solver_probing_conditional.go",
         "pkg/sat/sat_solver_probing_assertion.go",
         "pkg/sat/sat_solver_probing_assertion_test.go",
         "pkg/sat/sat_solver_probing.go",
@@ -77992,6 +77994,13 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained probing operator entry/exit CASSERT(probing) at sat_probing.cpp:200,241 reads the process assertion/tag gate separately and invokes the concrete solver checker",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_probing_conditional.go",
+          "go_targets": ["pkg/sat/sat_solver_probing_algorithm.go"],
+          "tests": ["TestSATSolverProbingConditionalDiagnosticsSourceSites", "TestSATProbingConditionalInvariantChecksBothReachedSites"]
+        },
         {
           "name": "Retained probing try_lit/process_core/operator SASSERT61-62,112-113,199 read the process switch at each reached site and use source C/T actions",
           "status": "ported",
@@ -78098,6 +78107,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/sat/sat_solver_probing_branches_test.go",
+        "pkg/sat/sat_solver_probing_conditional.go",
         "pkg/sat/sat_solver_probing_assertion.go",
         "pkg/sat/sat_solver_probing_assertion_test.go",
         "pkg/sat/sat_solver_probing.go",
@@ -78150,6 +78161,13 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained probing operator entry/exit CASSERT(probing) at sat_probing.cpp:200,241 reads the process assertion/tag gate separately and invokes the concrete solver checker",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_probing_conditional.go",
+          "go_targets": ["pkg/sat/sat_solver_probing_algorithm.go"],
+          "tests": ["TestSATSolverProbingConditionalDiagnosticsSourceSites", "TestSATProbingConditionalInvariantChecksBothReachedSites"]
+        },
         {
           "name": "Retained probing try_lit/process_core/operator SASSERT61-62,112-113,199 read the process switch at each reached site and use source C/T actions",
           "status": "ported",
@@ -124079,6 +124097,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/sat/sat_solver_probing_branches_test.go",
+        "pkg/sat/sat_solver_probing_conditional.go",
         "pkg/sat/sat_solver_probing_assertion.go",
         "pkg/sat/sat_solver_probing_assertion_test.go",
         "pkg/sat/sat_integrity_clause_switch_trace_test.go",
@@ -124161,6 +124181,13 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained probing operator entry/exit CASSERT(probing) at sat_probing.cpp:200,241 reads the process assertion/tag gate separately and invokes the concrete solver checker",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_probing_conditional.go",
+          "go_targets": ["pkg/sat/sat_solver_probing_algorithm.go"],
+          "tests": ["TestSATSolverProbingConditionalDiagnosticsSourceSites", "TestSATProbingConditionalInvariantChecksBothReachedSites"]
+        },
         {
           "name": "Retained probing try_lit/process_core/operator SASSERT61-62,112-113,199 read the process switch at each reached site and use source C/T actions",
           "status": "ported",
@@ -124533,6 +124560,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/sat/sat_solver_probing_branches_test.go",
+        "pkg/sat/sat_solver_probing_conditional.go",
         "pkg/sat/sat_solver_probing_assertion.go",
         "pkg/sat/sat_solver_probing_assertion_test.go",
         "pkg/sat/sat_integrity_clause_switch_trace_test.go",
@@ -124711,6 +124740,13 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained probing operator entry/exit CASSERT(probing) at sat_probing.cpp:200,241 reads the process assertion/tag gate separately and invokes the concrete solver checker",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_probing_conditional.go",
+          "go_targets": ["pkg/sat/sat_solver_probing_algorithm.go"],
+          "tests": ["TestSATSolverProbingConditionalDiagnosticsSourceSites", "TestSATProbingConditionalInvariantChecksBothReachedSites"]
+        },
         {
           "name": "Retained probing try_lit/process_core/operator SASSERT61-62,112-113,199 read the process switch at each reached site and use source C/T actions",
           "status": "ported",

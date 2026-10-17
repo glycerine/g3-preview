@@ -269,10 +269,8 @@ func (s *satSolverProbing) run(force bool) (answer bool, err error) {
 		if e := s.assertQHead(199); e != nil {
 			return false, e
 		}
-		if s.debugProbing {
-			if e := s.checkInvariant(); e != nil {
-				return false, e
-			}
+		if e := s.assertConditionalInvariant(); e != nil {
+			return false, e
 		}
 	}
 	if !force && p.probingCounter > 0 {
@@ -369,10 +367,8 @@ func (s *satSolverProbing) run(force bool) (answer bool, err error) {
 		}
 		p.probingCounter *= 2
 	}
-	if satStorageSourceDebug && s.debugProbing {
-		if e := s.checkInvariant(); e != nil {
-			return false, e
-		}
+	if e := s.assertConditionalInvariant(); e != nil {
+		return false, e
 	}
 	if e := s.finalize(); e != nil {
 		return false, e

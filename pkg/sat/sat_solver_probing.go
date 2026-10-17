@@ -17,18 +17,18 @@ var ErrSATMissingIntegrityBinding = errors.New("g3: missing source SAT integrity
 // This is the actual probing member family, not solver construction/search.
 // Borrowed lifecycle, propagation, parameters and Runtime must outlive it.
 type satSolverProbing struct {
-	self                                      *satSolverProbing
-	lifecycle                                 *satSolverClauseLifecycle
-	budget                                    *arena.Budget
-	assigned                                  satLiteralSetStorage
-	toAssert                                  satUintColumn
-	cacheWork                                 satUintColumn // embedded workspace; native slices move back on return.
-	cache                                     satProbingCache
-	stoppedAt, limit, numAssigned             uint32
-	cacheLimit, ownerBytes                    uint64
-	enabled, cacheEnabled, binaryEnabled      bool
-	debugProbing, debugPropagate, debugMissed bool
-	constructed, closing, closed              bool
+	self                                 *satSolverProbing
+	lifecycle                            *satSolverClauseLifecycle
+	budget                               *arena.Budget
+	assigned                             satLiteralSetStorage
+	toAssert                             satUintColumn
+	cacheWork                            satUintColumn // embedded workspace; native slices move back on return.
+	cache                                satProbingCache
+	stoppedAt, limit, numAssigned        uint32
+	cacheLimit, ownerBytes               uint64
+	enabled, cacheEnabled, binaryEnabled bool
+	debugPropagate, debugMissed          bool
+	constructed, closing, closed         bool
 }
 
 // The cold header and bound empty vectors are explicit Go ownership context;
@@ -270,9 +270,6 @@ func (s *satSolverProbing) Close() error {
 	return nil
 }
 
-// Source check_invariant consumes real resource before constructing checker.
-// Enabled diagnostic sites delegate to the actual shared lifecycle checker.
-func (s *satSolverProbing) checkInvariant() error { return s.lifecycle.checkInvariant() }
 func (s *satSolverProbing) propagate() error {
 	_, e := s.lifecycle.propagate(false, s.debugPropagate, s.debugMissed)
 	return e
