@@ -160233,7 +160233,7 @@
         },
         {
           "name": "Retained fpa_decl_plugin::get_some_value caller-local MPF NaN construction, numeral registration, source-order deletion and refused-construction continuation (fpa_decl_plugin.cpp:856-863; mpf.h)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/ast/ast_fpa_some_value.go",
           "tests": [
             "TestASTFloatingPointSomeValueSourceDefaults",
