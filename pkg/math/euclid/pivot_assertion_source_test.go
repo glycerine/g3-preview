@@ -34,7 +34,17 @@ func TestEuclideanPivotReadsSourceAssertionSwitches(t *testing.T) {
 			t.Fatal("borrowed pivot debug owner", budget.Used())
 		}
 	})
+	found, err := s.selectNextVar()
+	if !found || err != nil || s.nextX != 0 {
+		t.Fatal("source unit pivot setup", found, err, s.nextX)
+	}
 	euclidMust(t, d.Close())
+	if diagnostic.DebugBuild {
+		if err := s.eliminateUnit(); !errors.Is(err, arena.ErrClosed) || s.equations[0] == nil || len(s.solution) != 0 || len(s.occurrences[0]) != 1 {
+			t.Fatal("elim_unit assertion before equation and occurrence mutation", err, s.equations[0], len(s.solution), s.occurrences[0])
+		}
+	}
+	s.nextX = nullEquationIndex
 	one := numeral.NewInt(1)
 	better, err := s.betterPivot(&one, 0, 1)
 	if diagnostic.DebugBuild {
@@ -44,7 +54,7 @@ func TestEuclideanPivotReadsSourceAssertionSwitches(t *testing.T) {
 	} else if !better || err != nil {
 		t.Fatal("erased is_better source assertion", better, err)
 	}
-	found, err := empty.selectNextVar()
+	found, err = empty.selectNextVar()
 	if found || err != nil {
 		t.Fatal("empty source branch bypasses assertion", found, err)
 	}

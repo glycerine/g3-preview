@@ -35821,7 +35821,7 @@
           ]
         },
         {
-          "name": "select_next_var coefficient/occurrence/equation-size priority, source SASSERT switch reads at cpp:226,275, and elim_unit substitution of retained occurrences at cpp:224-284,575-622",
+          "name": "select_next_var coefficient/occurrence/equation-size priority, source SASSERT switch reads at cpp:226,275,603, and elim_unit substitution of retained occurrences at cpp:224-284,575-622",
           "status": "partial",
           "go_target": "pkg/math/euclid/pivot.go",
           "go_targets": ["pkg/math/euclid/pivot_decompose_trace.go"],

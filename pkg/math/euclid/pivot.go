@@ -168,14 +168,24 @@ func (s *solverSetup) eliminateUnit() error {
 	if e := s.open(); e != nil {
 		return e
 	}
-	if s.nextX == nullEquationIndex || s.nextEq >= uint32(len(s.equations)) ||
-		s.equations[s.nextEq] == nil {
-		return arena.ErrInvalidSlot
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil {
+		return e
 	}
 	z := s.manager.Integers()
 	one, e := z.IsOne(&s.nextA)
 	if e != nil {
 		return e
+	}
+	if enabled && !one {
+		if e := diagnostic.DebugAssertionFailure(d, "src/math/euclid/euclidean_solver.cpp", 603, "m().is_one(m_next_a)"); e != nil {
+			return e
+		}
+	}
+	if s.nextX == nullEquationIndex || s.nextEq >= uint32(len(s.equations)) ||
+		s.equations[s.nextEq] == nil {
+		return arena.ErrInvalidSlot
 	}
 	if !one {
 		return arena.ErrInvalidSlot
