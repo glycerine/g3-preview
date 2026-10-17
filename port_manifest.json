@@ -177850,6 +177850,7 @@
       ],
       "tests": [
         "TestSMT2ParserQualifiedLocalSortAndIndexRefusals",
+        "TestSMT2LocalRefVectorSourceAssertionsBeforeRelease",
         "TestModel2ExprEntryConditionSourceArityAndReferenceScope",
         "TestSexprAccessorsAndScalarIterator",
         "TestSexprBVGoScratchAndNumeralLifetime",
@@ -178180,6 +178181,13 @@
           "go_target": "pkg/parsers/smt2/local_expr_stack.go",
           "go_targets": ["pkg/parsers/smt2/local_sort_stack.go"],
           "tests": ["TestSMT2LocalReferenceStacksFrameShrinkAndReset"]
+        },
+        {
+          "name": "SMT2 concrete sort/expr reference stack source shrink and pop assertions before reference release (ref_vector.h:91,103)",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/local_sort_stack.go",
+          "go_targets": ["pkg/parsers/smt2/local_expr_stack.go"],
+          "tests": ["TestSMT2LocalRefVectorSourceAssertionsBeforeRelease", "TestSMT2LocalReferenceStacksFrameShrinkAndReset"]
         }
       ],
       "ownership": [

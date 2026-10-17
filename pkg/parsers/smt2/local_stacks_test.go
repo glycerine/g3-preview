@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -65,8 +66,10 @@ func TestSMT2LocalReferenceStacksFrameShrinkAndReset(t *testing.T) {
 	if err := exprs.shrink(m, -1); err != errLocalExprStack {
 		t.Fatal("invalid expression frame position", err)
 	}
-	if err := sorts.shrink(m, 1); err != errLocalSortStack {
-		t.Fatal("invalid sort frame position", err)
+	if !diagnostic.DebugBuild {
+		if err := sorts.shrink(m, 1); err != errLocalSortStack {
+			t.Fatal("invalid sort frame position", err)
+		}
 	}
 }
 

@@ -25,9 +25,19 @@ func (s *localExprStack) top(m *ast.ASTManager) (ast.ASTHandle, error) {
 // shrink releases removed expression slots in source-forward order. A pending
 // release retains its slot so a later cleanup can retry it.
 func (s *localExprStack) shrink(m *ast.ASTManager, size int) error {
-	if s == nil || size < 0 || size > len(s.refs) {
+	if s == nil || size < 0 {
 		return errLocalExprStack
 	}
+	if err := sourceAssertLocalRefVector(size <= len(s.refs), 91, "sz <= m_nodes.size()"); err != nil {
+		return err
+	}
+	if size > len(s.refs) {
+		return errLocalExprStack
+	}
+	return s.releaseSuffix(m, size)
+}
+
+func (s *localExprStack) releaseSuffix(m *ast.ASTManager, size int) error {
 	var failure error
 	for i := size; i < len(s.refs); i++ {
 		if s.refs[i] == (ast.ASTRef{}) {
@@ -41,4 +51,9 @@ func (s *localExprStack) shrink(m *ast.ASTManager, size int) error {
 	return failure
 }
 
-func (s *localExprStack) reset(m *ast.ASTManager) error { return s.shrink(m, 0) }
+func (s *localExprStack) reset(m *ast.ASTManager) error {
+	if s == nil {
+		return errLocalExprStack
+	}
+	return s.releaseSuffix(m, 0)
+}
