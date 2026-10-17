@@ -30,6 +30,7 @@ type polynomialEvalRationalFrame struct {
 // remain reachable on a stopped destructor. Their actual headers are charged; the
 // pointer directories use native slices without simulated container charges.
 type polynomialEvaluationScope struct {
+	rationalCaller                       *algebraicRationalSignScope
 	rationalFrames                       []*polynomialEvalRationalFrame
 	depth                                uint32
 	lexGeneration                        uint64
@@ -371,7 +372,10 @@ func (m *MultivariatePolynomialManager) evaluationRationalCore(p Polynomial, v P
 	}
 	return nil
 }
-func (m *MultivariatePolynomialManager) EvaluateRational(p Polynomial, v PolynomialRationalEvaluation, out *unumeral.Rational) (cause error) {
+func (m *MultivariatePolynomialManager) EvaluateRational(p Polynomial, v PolynomialRationalEvaluation, out *unumeral.Rational) error {
+	return m.evaluateRationalForAlgebraic(p, v, out, nil)
+}
+func (m *MultivariatePolynomialManager) evaluateRationalForAlgebraic(p Polynomial, v PolynomialRationalEvaluation, out *unumeral.Rational, caller *algebraicRationalSignScope) (cause error) {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -422,6 +426,10 @@ func (m *MultivariatePolynomialManager) EvaluateRational(p Polynomial, v Polynom
 	s.bodyCause = nil
 	s.sourceCause = nil
 	s.cleanupCause = nil
+	s.rationalCaller = caller
+	if caller != nil {
+		caller.evaluation = m
+	}
 	s.active = true
 	s.executing = true
 	s.rational = q
@@ -1223,6 +1231,7 @@ func (m *MultivariatePolynomialManager) UnivariateEvaluate(p Polynomial, x uint3
 	s.bodyCause = nil
 	s.sourceCause = nil
 	s.cleanupCause = nil
+	s.rationalCaller = nil
 	s.active = true
 	s.executing = true
 	s.modular = m.core.modular
@@ -1319,6 +1328,7 @@ func (m *MultivariatePolynomialManager) EvaluateInterval(p Polynomial, v Polynom
 	s.bodyCause = nil
 	s.sourceCause = nil
 	s.cleanupCause = nil
+	s.rationalCaller = nil
 	s.active = true
 	s.executing = true
 	s.interval = vm
@@ -1376,6 +1386,7 @@ func (m *MultivariatePolynomialManager) evaluationEarlyRoots(beforeCell umemory.
 	}
 	if m.evaluationPending() {
 		if !s.active {
+			s.rationalCaller = nil
 			s.bodyCause = cause
 		}
 		s.active = true

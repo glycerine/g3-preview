@@ -38228,6 +38228,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/algebraic_sign_rational.go",
+        "pkg/math/polynomial/algebraic_sign_rational_test.go",
         "pkg/math/polynomial/algebraic_display_mathematica.go",
         "pkg/math/polynomial/algebraic_display_mathematica_test.go",
         "pkg/math/polynomial/algebraic_display_root.go",
@@ -38278,6 +38280,9 @@
         "pkg/math/polynomial/algebraic_display_decimal_test.go"
       ],
       "tests": [
+        "TestAlgebraicOptimisticSignExactRationalGrid",
+        "TestAlgebraicOptimisticSignRootSentinelAndLookupFailure",
+        "TestAlgebraicOptimisticSignCancellationAndForeignPendingScope",
         "TestAlgebraicMathematicaRationalsRootsAndSharedCache",
         "TestAlgebraicMathematicaEveryInsertionFailure",
         "TestAlgebraicRootDisplayLiteralAndCachedIndex",
@@ -38881,6 +38886,7 @@
         "Source Del guards endangered partial construction reads; explicit owning abort drains genuine fields and retains physical cleanup progress. Owning close rejects caller roots instead of sweeping the locator registry."
       ],
       "deviations": [
+        "Algebraic sign-evaluation prerequisite (algebraic_numbers.cpp:1933-1949,1979-1997): a concrete typed algebraic assignment and optimistic rational adapter now borrow encoded basic values at actual evaluation lookups. Stable per-variable snapshots carry borrowed numeral tokens without owning copies. A private nonbasic sentinel selects the later fallback; arbitrary lookup errors propagate, and constants never scan unused assignments. The source rational scoped value is owned separately from the evaluator recursive frames. The actual recursive EvaluateRational entry binds its algebraic caller; refused older engines issue no parent cleanup authority, and new integer/interval/early retained starts clear that binding. Source child stops precede the older rational destructor, while explicit owning cleanup can release only the actually bound evaluator. Independent reduced-rational grid tests preserve the full inline numerator returned by source qm().sign; root sentinel, lookup failure, cancellation/retry and a real older LexSort bounds stop are tested. Interval/refinement/resultant fallback, early-route allocation-failure composition, full callback/TRACE transport and whole-unit completion remain pending.",
         "Mathematica display (cpp:2658-2674), retained by nlsat_solver.cpp:2589, now emits basic rational source insertions or Root[polynomial &, index]. Root cells share the actual packed lazy-index cache with plain/SMT2 display, and polynomial formatting uses #1 with explicit stars. Basic output inserts integer numerator, slash and denominator through exact numeral insertion receipts; each completed receipt is retired before the next insertion reuses the character frame. Interrupted insertions remain bound for source versus owning cleanup. Tests cover zero, signed fractions, BIG numerator/denominator, literal root text, cross-format cache reuse, and every reached stream insertion failure with prefix/cleanup/retry. Full allocation-refusal/source-destructor/callback composition and containing NLSAT trace integration remain partial; no whole-unit completion credit.",
         "Root-object formatting increment (cpp:2626-2656,2676-2706), including retained ast_smt2_pp.cpp:363 consumer prerequisite: DisplayRootInto and DisplayRootSMT2Into now emit source null/basic/root spellings through actual UP display streams. Root-cell m_i is lazily computed from GetRootID after polynomial output, published in the actual upper 29 packed cell bits before later index output, and reused by warm displays. Basic formatting copies and negates the numerator, duplicates independent numerator/denominator coefficient fields in native UP storage, and releases coefficients in forward order before the older negative numerator. Current borrowed core uses its existing integer service for these fields; complete source unsynch-manager construction/ownership remains a separate partial constructor audit. Tests verify exact plain/SMT2 output, zero, signed rationals, BIG copies, positive/negative root IDs, warm-cache checkpoint suppression, each reached stream insertion failure with prefix/cleanup/retry, and cache publication on either side of polynomial output. Mathematica display now has separate formatting evidence. Full numeric failure/callback/source-destructor transport and containing AST printer integration remain partial; no whole-unit completion credit.",
         "Retained NLSAT sample consumers (nlsat_interval_set.cpp:700,708,718; nlsat_solver.cpp:1271) now have algebraic IntLT, IntGT and Select bodies (cpp:2462-2548,2861-2865). Basic values use floor-1/ceil+1; root values use floor(lower)/ceil(upper). Separate follows the source branch-specific refinement and early break when a cell becomes basic; Select uses actual binary/rational small-selection overloads and scoped binary/rational values with reverse destruction. Tests cover all four operand shapes, output aliases, zero, rational discovery, signed basic outside integers and source Throw gates before local construction. A regression records the exact-refinement touching-bound branch: with source assertion expressions erased, separate can break with equal basic/root bounds and the existing Go small-selection helper returns ErrBinaryInterval without changing output. This remains a qualified path, not a universal successful-selection claim. Full allocator/callback/TRACE composition and whole-unit completion remain pending.",
@@ -38910,6 +38916,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/algebraic_sign_rational.go",
+        "pkg/math/polynomial/algebraic_sign_rational_test.go",
         "pkg/math/polynomial/algebraic_display_mathematica.go",
         "pkg/math/polynomial/algebraic_display_mathematica_test.go",
         "pkg/math/polynomial/algebraic_display_root.go",
@@ -38956,6 +38964,9 @@
         "pkg/math/polynomial/algebraic_native_storage_test.go"
       ],
       "tests": [
+        "TestAlgebraicOptimisticSignExactRationalGrid",
+        "TestAlgebraicOptimisticSignRootSentinelAndLookupFailure",
+        "TestAlgebraicOptimisticSignCancellationAndForeignPendingScope",
         "TestAlgebraicMathematicaRationalsRootsAndSharedCache",
         "TestAlgebraicMathematicaEveryInsertionFailure",
         "TestAlgebraicRootDisplayLiteralAndCachedIndex",
@@ -39161,6 +39172,7 @@
         "Source Del guards endangered partial construction reads; explicit owning abort drains genuine fields and retains physical cleanup progress. Owning close rejects caller roots instead of sweeping the locator registry."
       ],
       "deviations": [
+        "Algebraic sign-evaluation prerequisite (algebraic_numbers.cpp:1933-1949,1979-1997): a concrete typed algebraic assignment and optimistic rational adapter now borrow encoded basic values at actual evaluation lookups. Stable per-variable snapshots carry borrowed numeral tokens without owning copies. A private nonbasic sentinel selects the later fallback; arbitrary lookup errors propagate, and constants never scan unused assignments. The source rational scoped value is owned separately from the evaluator recursive frames. The actual recursive EvaluateRational entry binds its algebraic caller; refused older engines issue no parent cleanup authority, and new integer/interval/early retained starts clear that binding. Source child stops precede the older rational destructor, while explicit owning cleanup can release only the actually bound evaluator. Independent reduced-rational grid tests preserve the full inline numerator returned by source qm().sign; root sentinel, lookup failure, cancellation/retry and a real older LexSort bounds stop are tested. Interval/refinement/resultant fallback, early-route allocation-failure composition, full callback/TRACE transport and whole-unit completion remain pending.",
         "Mathematica display (cpp:2658-2674), retained by nlsat_solver.cpp:2589, now emits basic rational source insertions or Root[polynomial &, index]. Root cells share the actual packed lazy-index cache with plain/SMT2 display, and polynomial formatting uses #1 with explicit stars. Basic output inserts integer numerator, slash and denominator through exact numeral insertion receipts; each completed receipt is retired before the next insertion reuses the character frame. Interrupted insertions remain bound for source versus owning cleanup. Tests cover zero, signed fractions, BIG numerator/denominator, literal root text, cross-format cache reuse, and every reached stream insertion failure with prefix/cleanup/retry. Full allocation-refusal/source-destructor/callback composition and containing NLSAT trace integration remain partial; no whole-unit completion credit.",
         "Root-object formatting increment (cpp:2626-2656,2676-2706), including retained ast_smt2_pp.cpp:363 consumer prerequisite: DisplayRootInto and DisplayRootSMT2Into now emit source null/basic/root spellings through actual UP display streams. Root-cell m_i is lazily computed from GetRootID after polynomial output, published in the actual upper 29 packed cell bits before later index output, and reused by warm displays. Basic formatting copies and negates the numerator, duplicates independent numerator/denominator coefficient fields in native UP storage, and releases coefficients in forward order before the older negative numerator. Current borrowed core uses its existing integer service for these fields; complete source unsynch-manager construction/ownership remains a separate partial constructor audit. Tests verify exact plain/SMT2 output, zero, signed rationals, BIG copies, positive/negative root IDs, warm-cache checkpoint suppression, each reached stream insertion failure with prefix/cleanup/retry, and cache publication on either side of polynomial output. Mathematica display now has separate formatting evidence. Full numeric failure/callback/source-destructor transport and containing AST printer integration remain partial; no whole-unit completion credit.",
         "Retained NLSAT sample consumers (nlsat_interval_set.cpp:700,708,718; nlsat_solver.cpp:1271) now have algebraic IntLT, IntGT and Select bodies (cpp:2462-2548,2861-2865). Basic values use floor-1/ceil+1; root values use floor(lower)/ceil(upper). Separate follows the source branch-specific refinement and early break when a cell becomes basic; Select uses actual binary/rational small-selection overloads and scoped binary/rational values with reverse destruction. Tests cover all four operand shapes, output aliases, zero, rational discovery, signed basic outside integers and source Throw gates before local construction. A regression records the exact-refinement touching-bound branch: with source assertion expressions erased, separate can break with equal basic/root bounds and the existing Go small-selection helper returns ErrBinaryInterval without changing output. This remains a qualified path, not a universal successful-selection claim. Full allocator/callback/TRACE composition and whole-unit completion remain pending.",
@@ -39399,6 +39411,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/algebraic_sign_rational.go",
+        "pkg/math/polynomial/algebraic_sign_rational_test.go",
         "pkg/math/polynomial/polynomial_composition_horner_cancel_test.go",
         "pkg/math/polynomial/polynomial_som_vector_memory_trace.go",
         "pkg/math/polynomial/polynomial_newton_vector_memory_trace.go",
@@ -39833,6 +39847,9 @@
         "pkg/math/polynomial/polynomial_monomial_table_native_test.go"
       ],
       "tests": [
+        "TestAlgebraicOptimisticSignExactRationalGrid",
+        "TestAlgebraicOptimisticSignRootSentinelAndLookupFailure",
+        "TestAlgebraicOptimisticSignCancellationAndForeignPendingScope",
         "TestPolynomialCompositionHornerChildCancellationCleanupAndRetry",
         "TestAlgebraicBinaryEveryReachedCancellationAndRetry",
         "TestPolynomialSOMVectorPublishedChildMemoryWrappers",
@@ -44727,6 +44744,7 @@
         "Newton inputs and inverses now use owning []util.Int collections. A zero slot is published before actual modular Copy; partial numeric SET and ascending Del continuation remain in the owning slice. Reset retains only inverse zero, and source destruction clears inverse then input slices after polynomial references. Native growth/free has no Runtime blocks or faultpoints. Removed obsolete partial zero-inverse constructor roots and TLS/header-corruption fixtures. Independent 4097-entry growth/reuse checks run with Runtime reservations disabled; a 2^64 input campaign retains actual numeric allocation refusals and checks balanced residue -36 modulo 97. This does not convert other remaining polynomial numeral vectors or claim util split readiness."
       ],
       "deviations": [
+        "Algebraic sign-evaluation prerequisite (algebraic_numbers.cpp:1933-1949,1979-1997): a concrete typed algebraic assignment and optimistic rational adapter now borrow encoded basic values at actual evaluation lookups. Stable per-variable snapshots carry borrowed numeral tokens without owning copies. A private nonbasic sentinel selects the later fallback; arbitrary lookup errors propagate, and constants never scan unused assignments. The source rational scoped value is owned separately from the evaluator recursive frames. The actual recursive EvaluateRational entry binds its algebraic caller; refused older engines issue no parent cleanup authority, and new integer/interval/early retained starts clear that binding. Source child stops precede the older rational destructor, while explicit owning cleanup can release only the actually bound evaluator. Independent reduced-rational grid tests preserve the full inline numerator returned by source qm().sign; root sentinel, lookup failure, cancellation/retry and a real older LexSort bounds stop are tested. Interval/refinement/resultant fallback, early-route allocation-failure composition, full callback/TRACE transport and whole-unit completion remain pending.",
         "The real two-root cancellation sweep exposed a composition retry failure: its last Horner MulAdd child retained partial shared SOM terms without an issued child tuple in the parent. Composition now calls the existing receipt-bearing MulAdd engine, propagates an actual child source-destructor stop before older local destruction, and false-acknowledges the child before parent owning cleanup with true acknowledgment afterward. A focused independent x^2-2 composed with x-y regression cancels at the second actual MulAdd checkpoint, cleans up and verifies the polynomial on retry. The algebraic factor/Sturm sweep exercises the same real call chain. No monomial locator sweep, source hashing or invented vector repair is used; broader composition fault/callback closure remains partial.",
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
         "Actual polynomial imp template overload consumers remain open; concrete borrowed array loops preserve only the template iteration body. Runtime handles replace raw pointer ABI. Source invalid-memory continuation is guarded explicitly. No registered source assertion completion credit.",
@@ -44863,6 +44881,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/algebraic_sign_rational.go",
+        "pkg/math/polynomial/algebraic_sign_rational_test.go",
         "pkg/math/polynomial/polynomial_composition_horner_cancel_test.go",
         "pkg/math/polynomial/polynomial_monomial.go",
         "pkg/math/polynomial/polynomial_monomial_display.go",
@@ -45132,6 +45152,9 @@
         "pkg/math/polynomial/polynomial_monomial_table_native_test.go"
       ],
       "tests": [
+        "TestAlgebraicOptimisticSignExactRationalGrid",
+        "TestAlgebraicOptimisticSignRootSentinelAndLookupFailure",
+        "TestAlgebraicOptimisticSignCancellationAndForeignPendingScope",
         "TestPolynomialCompositionHornerChildCancellationCleanupAndRetry",
         "TestAlgebraicBinaryEveryReachedCancellationAndRetry",
         "TestMonomialOrderSourceLexAssertions",
@@ -47539,6 +47562,7 @@
         "Newton inputs and inverses now use owning []util.Int collections. A zero slot is published before actual modular Copy; partial numeric SET and ascending Del continuation remain in the owning slice. Reset retains only inverse zero, and source destruction clears inverse then input slices after polynomial references. Native growth/free has no Runtime blocks or faultpoints. Removed obsolete partial zero-inverse constructor roots and TLS/header-corruption fixtures. Independent 4097-entry growth/reuse checks run with Runtime reservations disabled; a 2^64 input campaign retains actual numeric allocation refusals and checks balanced residue -36 modulo 97. This does not convert other remaining polynomial numeral vectors or claim util split readiness."
       ],
       "deviations": [
+        "Algebraic sign-evaluation prerequisite (algebraic_numbers.cpp:1933-1949,1979-1997): a concrete typed algebraic assignment and optimistic rational adapter now borrow encoded basic values at actual evaluation lookups. Stable per-variable snapshots carry borrowed numeral tokens without owning copies. A private nonbasic sentinel selects the later fallback; arbitrary lookup errors propagate, and constants never scan unused assignments. The source rational scoped value is owned separately from the evaluator recursive frames. The actual recursive EvaluateRational entry binds its algebraic caller; refused older engines issue no parent cleanup authority, and new integer/interval/early retained starts clear that binding. Source child stops precede the older rational destructor, while explicit owning cleanup can release only the actually bound evaluator. Independent reduced-rational grid tests preserve the full inline numerator returned by source qm().sign; root sentinel, lookup failure, cancellation/retry and a real older LexSort bounds stop are tested. Interval/refinement/resultant fallback, early-route allocation-failure composition, full callback/TRACE transport and whole-unit completion remain pending.",
         "The real two-root cancellation sweep exposed a composition retry failure: its last Horner MulAdd child retained partial shared SOM terms without an issued child tuple in the parent. Composition now calls the existing receipt-bearing MulAdd engine, propagates an actual child source-destructor stop before older local destruction, and false-acknowledges the child before parent owning cleanup with true acknowledgment afterward. A focused independent x^2-2 composed with x-y regression cancels at the second actual MulAdd checkpoint, cleans up and verifies the polynomial on retry. The algebraic factor/Sturm sweep exercises the same real call chain. No monomial locator sweep, source hashing or invented vector repair is used; broader composition fault/callback closure remains partial.",
         "Selected signed-size conversion uses int32 profile with typed guard at actual INT32_MIN minus one source UB. TRACE/ostream and C++ sorting functor type adapters remain open. Whole polynomial source family is partial; tests project dormant source polynomial expressions onto actual monomial construction rather than claim full polynomial expression constructor coverage.",
         "Actual polynomial imp template overload consumers remain open; concrete borrowed array loops preserve only the template iteration body. Runtime handles replace raw pointer ABI. Source invalid-memory continuation is guarded explicitly. No registered source assertion completion credit.",
