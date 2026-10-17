@@ -49,6 +49,9 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	signEvaluationRunning                                  bool
+	signResultant                                          algebraicSignResultantScope
+	evalSignTmp                                            UPolynomial
 	signInterval                                           algebraicSignIntervalScope
 	evalSignVariables                                      PolynomialVariableDegrees
 	zeroAccuracy                                           int32
@@ -847,6 +850,12 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	return m.store(dl, &out)
 }
 func (m *AlgebraicRootCore) CleanupRetained() error {
+	if m != nil && m.self == m && m.signEvaluationRunning {
+		return ErrAlgebraicPending
+	}
+	if m != nil && m.self == m && m.signResultant.running {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.signInterval.running {
 		return ErrAlgebraicPending
 	}
@@ -913,6 +922,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	if e := m.cleanupRationalSign(); e != nil {
 		return e
 	}
+	if e := m.cleanupSignResultant(); e != nil {
+		return e
+	}
 	if e := m.cleanupSignInterval(); e != nil {
 		return e
 	}
@@ -946,6 +958,12 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.comparisonCleanup()
 }
 func (m *AlgebraicRootCore) Close() error {
+	if m != nil && m.self == m && m.signEvaluationRunning {
+		return ErrAlgebraicPending
+	}
+	if m != nil && m.self == m && m.signResultant.running {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.signInterval.running {
 		return ErrAlgebraicPending
 	}
@@ -1020,6 +1038,11 @@ func (m *AlgebraicRootCore) Close() error {
 	}
 	if e := m.CleanupRetained(); e != nil {
 		return e
+	}
+	if m.evalSignTmp.slot != 0 {
+		if e := m.config.Polynomials.DelPolynomial(&m.evalSignTmp); e != nil {
+			return e
+		}
 	}
 	// m_add_tmp is younger than the isolation vector members.
 	if m.addTmp.slot != 0 {

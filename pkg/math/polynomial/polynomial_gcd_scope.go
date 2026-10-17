@@ -251,6 +251,10 @@ func (m *MultivariatePolynomialManager) finishGCDLocalsTo(s *polynomialGCDFuncti
 	pending := (s.child != nil && s.child.active && s.child.invocation == s.childInvocation) || m.matchesICCPInvocation(&s.iccpInvocation) || m.matchesICCPShortcutContent(&s.iccpInvocation) || m.core.matchesContentInvocation(&s.contentInvocation) || s.returned.value != (Polynomial{}) || s.returned.assigning || s.zp.active || s.topOwner && m.core.pscPending()
 	pending = pending || m.matchesNormalizeInvocation(&s.normalizeInvocation)
 	pending = pending || (m.matchesDerivativeInvocation(&s.derivativeInvocation) || m.derivativeInvocationHasOrphans(&s.derivativeInvocation)) || m.core.matchesExactDivInvocation(&s.divisionInvocation) || m.core.dividesInvocationPending(&s.dividesInvocation)
+	// Exact division can finish its lexical NUM/reference suffix while its
+	// earlier persistent remainder-buffer invocation still owns appended rows.
+	// Keep the actual receipt until the owning caller can acknowledge it.
+	pending = pending || m.core.matchesArithmeticInvocation(&s.divisionInvocation.prelude)
 	pending = pending || m.quadraticPending(s) || m.core.matchesPowerInvocation(&s.resultantPower) || m.core.matchesPseudoInvocation(&s.resultantPseudo) || m.core.matchesArithmeticInvocation(&s.resultantArithmetic) || m.resultantConcreteChildrenPending(s)
 	pending = pending || s.newSkeleton != nil
 	for i := range s.monomials {

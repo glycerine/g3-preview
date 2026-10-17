@@ -605,13 +605,20 @@ func (m *UPolynomialManager) knuthNegativeWithContext(v UPolynomialView, context
 	}
 	return r, nil
 }
-func (m *UPolynomialManager) NonzeroRootLowerBound(v UPolynomialView) (bound uint32, cause error) {
+func (m *UPolynomialManager) NonzeroRootLowerBound(v UPolynomialView) (uint32, error) {
+	return m.nonzeroRootLowerBoundWithReceipt(v, nil)
+}
+func (m *UPolynomialManager) nonzeroRootLowerBoundWithReceipt(v UPolynomialView, receipt *upolyKnuthInvocationReceipt) (bound uint32, cause error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
 	q, e := m.beginKnuth(v, 2)
 	if e != nil {
 		return 0, e
+	}
+	if receipt != nil {
+		*receipt = m.knuthReceipt()
+		defer func() { receipt.history = q.history }()
 	}
 	z := m.config.Integer
 	old, oldN := knuthCaller(z), knuthCaller(z.Naturals())

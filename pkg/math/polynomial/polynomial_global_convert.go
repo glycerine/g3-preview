@@ -10,6 +10,7 @@ import (
 )
 
 type polynomialGlobalConversionScope struct {
+	algebraicCaller                      *algebraicSignResultantScope
 	ms                                   []Monomial
 	as                                   unumeral.ScopedIntegerModularBuffer128
 	orphans                              []Monomial
@@ -20,7 +21,10 @@ type polynomialGlobalConversionScope struct {
 	bodyCause, sourceCause, cleanupCause error
 }
 
-func ConvertPolynomial(sm *MultivariatePolynomialManager, p Polynomial, tm *MultivariatePolynomialManager, x, maxD uint32) (out Polynomial, cause error) {
+func ConvertPolynomial(sm *MultivariatePolynomialManager, p Polynomial, tm *MultivariatePolynomialManager, x, maxD uint32) (Polynomial, error) {
+	return convertPolynomialForAlgebraic(sm, p, tm, x, maxD, nil)
+}
+func convertPolynomialForAlgebraic(sm *MultivariatePolynomialManager, p Polynomial, tm *MultivariatePolynomialManager, x, maxD uint32, caller *algebraicSignResultantScope) (out Polynomial, cause error) {
 	if e := sm.ready(); e != nil {
 		return Polynomial{}, e
 	}
@@ -31,6 +35,10 @@ func ConvertPolynomial(sm *MultivariatePolynomialManager, p Polynomial, tm *Mult
 		return Polynomial{}, e
 	}
 	s := &tm.conversion
+	s.algebraicCaller = caller
+	if caller != nil {
+		caller.conversionManager = tm
+	}
 	defer func() {
 		cause = tm.finishConversion(cause)
 		if cause != nil {
