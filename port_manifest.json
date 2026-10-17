@@ -26926,6 +26926,7 @@
         "pkg/ast/ast_fpa_to_fp_ieee_bv.go",
         "pkg/ast/rewriter/fpa_to_fp_ieee_bv_test.go"],
       "tests": [
+        "TestASTFPAToFPAdjacentSourceTraces",
         "TestASTFPAToFPArithmeticInputSourceTrace",
         "TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestASTFPAUnaryScopedNumeralRetiresBeforeReturn", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
         "TestASTFPARemainderFiniteNumeralAndScopedCleanup",
@@ -27176,6 +27177,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained mk_to_fp fp_rewriter TRACE at fpa_rewriter.cpp:168,177,179,195,209,226 across format, signed BV, exponent-rational and three-BV branches",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_arithmetic_trace.go",
+          "tests": [
+            "TestASTFPAToFPAdjacentSourceTraces"
+          ]
+        },
         {
           "name": "Retained FPA mk_to_fp arithmetic-rational input TRACE before MPF conversion (fpa_rewriter.cpp:159)",
           "status": "ported",
@@ -183760,6 +183769,7 @@
         "pkg/ast/rewriter/var_substitution_trace.go"
       ],
       "tests": [
+        "TestASTFPAToFPAdjacentSourceTraces",
         "TestASTFPAToFPArithmeticInputSourceTrace",
         "TestSATGoalDependencyFormulaSourceTrace",
         "TestSATGoalTranslatorResultStackSourceTrace",
@@ -183899,6 +183909,14 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained mk_to_fp fp_rewriter TRACE at fpa_rewriter.cpp:168,177,179,195,209,226 across format, signed BV, exponent-rational and three-BV branches",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_arithmetic_trace.go",
+          "tests": [
+            "TestASTFPAToFPAdjacentSourceTraces"
+          ]
+        },
         {
           "name": "Retained FPA mk_to_fp arithmetic-rational input TRACE before MPF conversion (fpa_rewriter.cpp:159)",
           "status": "ported",
@@ -186232,6 +186250,7 @@
         "pkg/ast/rewriter/var_substitution_trace.go"
       ],
       "tests": [
+        "TestASTFPAToFPAdjacentSourceTraces",
         "TestASTFPAToFPArithmeticInputSourceTrace",
         "TestSATGoalDependencyFormulaSourceTrace",
         "TestSATGoalTranslatorResultStackSourceTrace",
@@ -186381,6 +186400,14 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained mk_to_fp fp_rewriter TRACE at fpa_rewriter.cpp:168,177,179,195,209,226 across format, signed BV, exponent-rational and three-BV branches",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_arithmetic_trace.go",
+          "tests": [
+            "TestASTFPAToFPAdjacentSourceTraces"
+          ]
+        },
         {
           "name": "Retained FPA mk_to_fp arithmetic-rational input TRACE before MPF conversion (fpa_rewriter.cpp:159)",
           "status": "ported",

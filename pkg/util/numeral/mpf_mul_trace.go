@@ -55,6 +55,12 @@ func (m *ArbitraryFloatManager) formatFloatTraceValue(value *ArbitraryFloat) (re
 	return string(data), nil
 }
 
+// ToString exposes the concrete MPF manager formatter to retained AST TRACE
+// callers while keeping its owned text context and cleanup in one place.
+func (m *ArbitraryFloatManager) ToString(value *ArbitraryFloat) (string, error) {
+	return m.formatFloatTraceValue(value)
+}
+
 func (m *ArbitraryFloatManager) traceFloatString(w io.Writer, value *ArbitraryFloat) error {
 	text, e := m.formatFloatTraceValue(value)
 	if e != nil {

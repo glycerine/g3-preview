@@ -97,6 +97,9 @@ func (m *ASTManager) RewriteFPAToFPThreeBVNumerals(decl, sign, exponent, signifi
 	if result != nil {
 		return ASTHandle{}, true, result
 	}
+	if result = m.traceFPAToFPValue(226, "v = ", &v.value); result != nil {
+		return ASTHandle{}, true, result
+	}
 	m.formatExecuting = previous
 	node, result = p.mkNumeral(&v.value, nil)
 	return ASTHandle{}, true, result

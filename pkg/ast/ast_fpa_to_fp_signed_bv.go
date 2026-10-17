@@ -90,6 +90,9 @@ func (m *ASTManager) RewriteFPAToFPSignedBVNumeral(decl, rm, bv ASTHandle) (out 
 	if result != nil || !found {
 		return ASTHandle{}, found, result
 	}
+	if result = m.traceFPAToFPRational(177, "r1: ", &r); result != nil {
+		return ASTHandle{}, true, result
+	}
 	qm, err := p.numeric.BorrowRationalManager()
 	if err != nil {
 		return ASTHandle{}, true, err
@@ -122,6 +125,9 @@ func (m *ASTManager) RewriteFPAToFPSignedBVNumeral(decl, rm, bv ASTHandle) (out 
 		if result = owner.Sub(&q.Num, &full, &q.Num); result != nil {
 			return ASTHandle{}, true, result
 		}
+	}
+	if result = m.traceFPAToFPRawRational(179, "r1 norm: ", &q); result != nil {
+		return ASTHandle{}, true, result
 	}
 	result = p.numeric.SetRational(&v.value, ebits, sbits, mode, &q)
 	if result != nil {

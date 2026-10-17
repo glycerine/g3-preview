@@ -85,6 +85,9 @@ func (m *ASTManager) RewriteFPAToFPFormatNumeral(decl, rm, value ASTHandle) (out
 	if result != nil || !found {
 		return ASTHandle{}, found, result
 	}
+	if result = m.traceFPAToFPValue(168, "v: ", &v.value); result != nil {
+		return ASTHandle{}, true, result
+	}
 	vf, err := p.beginNumeralProbe()
 	if err != nil {
 		return ASTHandle{}, true, err

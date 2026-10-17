@@ -106,6 +106,13 @@ func (m *ASTManager) RewriteFPAToFPExponentRationalNumerals(decl, rm, firstArg, 
 			return ASTHandle{}, found, result
 		}
 	}
+	traceLine := 195
+	if secondDomain == p.integer {
+		traceLine = 209
+	}
+	if result = m.traceFPAToFPRationalPair(traceLine, &values[0], &values[1]); result != nil {
+		return ASTHandle{}, true, result
+	}
 	realIndex, integerIndex := 0, 1
 	if secondDomain == p.integer {
 		realIndex, integerIndex = 1, 0
