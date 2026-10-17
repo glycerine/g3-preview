@@ -148,6 +148,10 @@ func TestNaturalSourceAllZeroDenominatorStopsBeforeOutputs(t *testing.T) {
 		t.Skip("debug UNREACHABLE action is checked with an explicit process binding")
 	}
 	n := naturalManager(t)
+	_, err := n.Div([]uint32{7}, nil, nil, nil)
+	if !errors.Is(err, diagnostic.ErrDebugNativeUnreachable) {
+		t.Fatal("empty denominator source guard", err)
+	}
 	for _, denom := range [][]uint32{{0}, {0, 0}} {
 		a := make([]uint32, len(denom))
 		a[0] = 7

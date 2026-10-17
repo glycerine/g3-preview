@@ -13,7 +13,7 @@ import (
 )
 
 func TestNaturalSourceAllZeroDenominatorDebugAction(t *testing.T) {
-	d, out := bindMPNDebugActions(t, "TTC")
+	d, out := bindMPNDebugActions(t, "TTTC")
 	serviceMust(t, d.EnableAssertions(false))
 	n := naturalManager(t)
 	q, r := []uint32{99}, []uint32{88}
@@ -26,6 +26,10 @@ func TestNaturalSourceAllZeroDenominatorDebugAction(t *testing.T) {
 	serviceMust(t, err)
 	if !strings.Contains(string(contents), "File: src/util/mpn.cpp\nLine: 174\nUNREACHABLE CODE WAS REACHED.") {
 		t.Fatal("wrong source diagnostic", string(contents))
+	}
+	_, err = n.Div([]uint32{7}, nil, nil, nil)
+	if !errors.As(err, &thrown) {
+		t.Fatal("empty denominator debug source guard", err)
 	}
 	serviceMust(t, d.EnableAssertions(true))
 	bad := []uint32{1, 0}

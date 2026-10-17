@@ -46,14 +46,15 @@ func (v limbView) write(i, n uint32) {
 
 // Div retains the source branch boolean. Invalid source buffer preconditions
 // panic. The ordinary branch requires len(a)>=len(b), q with
-// len(a)-len(b)+1 limbs, and r with len(b). The source's
+// len(a)-len(b)+1 limbs, and r with len(b); an empty denominator reaches the
+// source unreachable diagnostic before output shape matters. The source's
 // earlier short-numerator branch only reads the input and writes the reached
 // q/r prefix, with bounds checked at each write. Neither output overlaps an
 // input or the other output. The integer manager stages permitted aliases.
 // Division and checked verification use reusable native slices. The source
 // arithmetic and quotient/remainder publication order are preserved.
 func (m *NaturalManager) Div(a, b, q, r []uint32) (bool, error) {
-	if len(b) == 0 || len(a) >= len(b) && (len(q) != len(a)-len(b)+1 || len(r) != len(b)) {
+	if len(b) != 0 && len(a) >= len(b) && (len(q) != len(a)-len(b)+1 || len(r) != len(b)) {
 		panic("mpnum: invalid division operands or buffers")
 	}
 	if uint64(len(a)) >= math.MaxUint32 {
