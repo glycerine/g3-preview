@@ -106,7 +106,7 @@ func (c *PolynomialCache) Factor(p Polynomial, out *PolynomialRefVector) error {
 	if e != nil {
 		return c.finishFactorOwner(fs, e)
 	}
-	result := make([]Polynomial, n)
+	entry.result = make([]Polynomial, n)
 	for i := uint32(0); i < n; i++ {
 		value, e := fs.factor(i)
 		if e != nil {
@@ -119,13 +119,13 @@ func (c *PolynomialCache) Factor(p Polynomial, out *PolynomialRefVector) error {
 		if e := out.Push(value); e != nil {
 			return c.finishFactorOwner(fs, e)
 		}
-		result[i] = value
+		entry.result[i] = value
 	}
+	// The cache is filled before the local source factors destructor runs.
+	entry.complete = true
 	if e := c.finishFactorOwner(fs, nil); e != nil {
 		return e
 	}
-	entry.result = result
-	entry.complete = true
 	return nil
 }
 
@@ -233,7 +233,7 @@ func (c *PolynomialCache) PSCChain(p, q Polynomial, x uint32, out *PolynomialRef
 	if e != nil {
 		return c.finishPSC(e)
 	}
-	result := make([]Polynomial, n)
+	entry.result = make([]Polynomial, n)
 	for i := uint32(0); i < n; i++ {
 		value, e := out.Get(i)
 		if e != nil {
@@ -246,9 +246,8 @@ func (c *PolynomialCache) PSCChain(p, q Polynomial, x uint32, out *PolynomialRef
 		if e := out.setWithReceipt(i, value, nil); e != nil {
 			return c.finishPSC(e)
 		}
-		result[i] = value
+		entry.result[i] = value
 	}
-	entry.result = result
 	entry.complete = true
 	return nil
 }

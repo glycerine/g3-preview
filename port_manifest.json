@@ -47382,6 +47382,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Cache miss result-array publication before element canonicalization; factor cache completed before local factors destruction (polynomial_cache.cpp:164-173,192-201)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "tests": ["TestPolynomialCachePSCResultReplacementStoppedDeletion", "TestPolynomialCacheFactorTemporaryStoppedDeletion"]
+        },
+        {
           "name": "Polynomial cache private imp allocation at polynomial_cache.cpp:207, reset deallocation/replacement at :232-233 and destructor deallocation at :211 over a charged concrete Go owner",
           "status": "platform_replacement",
           "go_target": "pkg/math/polynomial/polynomial_cache_memory_trace.go",
@@ -47428,6 +47434,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Cache miss result-array publication before element canonicalization; factor cache completed before local factors destruction (polynomial_cache.cpp:164-173,192-201)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "tests": ["TestPolynomialCachePSCResultReplacementStoppedDeletion", "TestPolynomialCacheFactorTemporaryStoppedDeletion"]
+        },
         {
           "name": "Polynomial cache private imp allocation at polynomial_cache.cpp:207, reset deallocation/replacement at :232-233 and destructor deallocation at :211 over a charged concrete Go owner",
           "status": "platform_replacement",
@@ -47522,7 +47534,7 @@
       "path": "src/math/polynomial/rpolynomial.cpp",
       "component": "math",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -47753,13 +47765,15 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Liveness audit: repository-wide rpolynomial/rpolynomial_ref/RPOLYNOMIAL searches find only definitions in rpolynomial.cpp/.h and the CMake source listing. No retained production, test, example, or script consumer constructs this dense-recursive manager or includes its header. The base AST component uses polynomial and algebraic_numbers, not rpolynomial. Under AGENTS.md live-consumer policy, retain as reference-only; do not introduce an unused Go manager. Re-audit if a source consumer is retained later."
+      ]
     },
     {
       "path": "src/math/polynomial/rpolynomial.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
+      "status": "reference_only",
       "go_targets": [],
       "tests": [],
       "conditionals": [
@@ -47776,7 +47790,9 @@
       "ownership_audited": false,
       "methods": [],
       "ownership": [],
-      "deviations": []
+      "deviations": [
+        "Liveness audit: repository-wide rpolynomial/rpolynomial_ref/RPOLYNOMIAL searches find only definitions in rpolynomial.cpp/.h and the CMake source listing. No retained production, test, example, or script consumer constructs this dense-recursive manager or includes its header. The base AST component uses polynomial and algebraic_numbers, not rpolynomial. Under AGENTS.md live-consumer policy, retain as reference-only; do not introduce an unused Go manager. Re-audit if a source consumer is retained later."
+      ]
     },
     {
       "path": "src/math/polynomial/sexpr2upolynomial.cpp",

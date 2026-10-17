@@ -145,6 +145,11 @@ func TestPolynomialCachePSCResultReplacementStoppedDeletion(t *testing.T) {
 	if len(c.psc) != 1 {
 		t.Fatal("failed result replacement lost inserted cache entry")
 	}
+	for _, entry := range c.psc {
+		if entry.complete || len(entry.result) != int(n) || entry.result[0] != (Polynomial{}) {
+			t.Fatal("failed result SET lost the published array or prematurely stored its element", entry)
+		}
+	}
 	serviceMust(t, c.CleanupPSC())
 	serviceMust(t, out.Close())
 	info, e = m.core.Info(canonical[0])
@@ -213,6 +218,10 @@ func TestPolynomialCacheFactorTemporaryStoppedDeletion(t *testing.T) {
 	if c.pendingFactors.closed || len(c.pendingFactors.phases) != 1 || c.pendingFactors.phases[0] != factorLastDrop {
 		t.Fatal("stopped temporary factor lost consumed final-decrement receipt")
 	}
+	entry := c.factors[canonicalInput]
+	if !entry.complete || len(entry.result) != 1 || entry.result[0] != canonicalFactor {
+		t.Fatal("temporary factor destruction preceded publication of the completed cache result", entry)
+	}
 	if e := c.Factor(p, out); !errors.Is(e, ErrPolynomialPending) {
 		t.Fatal("stopped temporary factor permitted cache reentry", e)
 	}
@@ -224,6 +233,20 @@ func TestPolynomialCacheFactorTemporaryStoppedDeletion(t *testing.T) {
 	serviceMust(t, e)
 	if info.RefCount != 2 {
 		t.Fatal("cleanup changed cached and caller factor references", info.RefCount)
+	}
+	// The source cache is already filled before the local factors destructor.
+	// After owning cleanup, a hit must replay it without recomputing the body.
+	m.originalBudget.FailAfter(0)
+	replayErr := c.Factor(p, out)
+	m.originalBudget.FailAfter(-1)
+	serviceMust(t, replayErr)
+	if c.factors[canonicalInput] != entry {
+		t.Fatal("factor replay replaced the completed entry")
+	}
+	value, e := out.Get(0)
+	serviceMust(t, e)
+	if value != canonicalFactor {
+		t.Fatal("factor replay lost its canonical representative")
 	}
 	serviceMust(t, c.Reset())
 	serviceMust(t, c.Factor(p, out))
