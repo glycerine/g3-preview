@@ -36216,6 +36216,9 @@
         "TestEuclideanImpMemoryWrappersResetSites",
         "TestEuclideanImpMemoryResetRefusalAfterOldDeallocation",
         "TestEuclideanEquationHeaderRefusalPrecedesBufferMutation",
+        "TestEuclideanEquationIntegerCopyRefusalKeepsBufferOwner",
+        "TestEuclideanEquationRationalCopyRefusalAndBufferCleanup",
+        "TestEuclideanStoppedRationalEquationCleanup",
         "TestEuclideanEquationUnsortedDecompositionBranch",
         "TestEuclideanIntegerBufferSortAndRawSwap",
         "TestEuclideanRationalBufferCoreAndRawSwap",
@@ -36355,11 +36358,14 @@
         },
         {
           "name": "equation construction mk_eq and del_eq owned numeral release at cpp:153-170,291-312",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/euclid/equation.go",
           "tests": [
             "TestEuclideanEquationConstructionSortAndOwnedRelease",
             "TestEuclideanEquationHeaderRefusalPrecedesBufferMutation",
+            "TestEuclideanEquationIntegerCopyRefusalKeepsBufferOwner",
+            "TestEuclideanEquationRationalCopyRefusalAndBufferCleanup",
+            "TestEuclideanStoppedRationalEquationCleanup",
             "TestEuclideanEquationUnsortedDecompositionBranch",
             "TestEuclideanEquationFailedConstantCopyReleasesConstructedPrefix",
             "TestEuclideanEquationFailedConstructionRetainsStoppedDestructor"

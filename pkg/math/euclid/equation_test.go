@@ -3,6 +3,8 @@ package euclid
 import (
 	"errors"
 	"math"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -123,6 +125,44 @@ func TestEuclideanEquationHeaderRefusalPrecedesBufferMutation(t *testing.T) {
 	euclidMust(t, rb.Close())
 }
 
+func TestEuclideanEquationIntegerCopyRefusalKeepsBufferOwner(t *testing.T) {
+	m := euclidNumeralManager(t)
+	z := m.Integers()
+	ib, e := numeral.NewScopedIntVector(z)
+	euclidMust(t, e)
+	rb, e := numeral.NewScopedRationalVector(m)
+	euclidMust(t, e)
+	euclidMust(t, ib.Resize(1))
+	a := numeral.NewInt(0)
+	value := strings.Repeat("1234567890", 120)
+	euclidMust(t, z.SetString(&a, value))
+	c := numeral.NewInt(11)
+	before := m.BudgetField.Used()
+	m.BudgetField.FailAfter(1) // equation header succeeds; first big coefficient copy fails.
+	eq, e := makeEquation(m, []numeral.Int{a}, []uint32{0}, &c, nil, nil, ib, rb, true, nil)
+	m.BudgetField.FailAfter(-1)
+	var failure umemory.Failure
+	if eq != nil || !errors.As(e, &failure) || failure.Kind != umemory.FailureMemout {
+		t.Fatal("source integer copy refusal", eq, e)
+	}
+	slot, e := ib.BorrowSlot(0)
+	euclidMust(t, e)
+	if !z.IsFailureRef(slot.Cell) {
+		t.Fatal("failed buffer numeral ownership", slot)
+	}
+	euclidMust(t, ib.Cleanup())
+	euclidMust(t, rb.Close())
+	if m.BudgetField.Used() != before {
+		t.Fatal("failed equation retained header or numeral", before, m.BudgetField.Used())
+	}
+	got, e := z.String(&a)
+	euclidMust(t, e)
+	if got != value || c.Val != 11 {
+		t.Fatal("borrowed input changed", got, c)
+	}
+	euclidMust(t, z.Del(&a))
+}
+
 func TestEuclideanEquationFailedConstantCopyReleasesConstructedPrefix(t *testing.T) {
 	m := euclidNumeralManager(t)
 	z := m.Integers()
@@ -148,6 +188,97 @@ func TestEuclideanEquationFailedConstantCopyReleasesConstructedPrefix(t *testing
 	euclidMust(t, ib.Close())
 	euclidMust(t, rb.Close())
 	euclidMust(t, z.Del(&a))
+}
+
+func TestEuclideanEquationRationalCopyRefusalAndBufferCleanup(t *testing.T) {
+	for ordinal := int64(0); ordinal <= 3; ordinal++ {
+		t.Run(strconv.FormatInt(ordinal, 10), func(t *testing.T) {
+			m := euclidNumeralManager(t)
+			z := m.Integers()
+			ib, e := numeral.NewScopedIntVector(z)
+			euclidMust(t, e)
+			rb, e := numeral.NewScopedRationalVector(m)
+			euclidMust(t, e)
+			euclidMust(t, ib.Resize(1))
+			euclidMust(t, rb.Resize(1))
+			input := numeral.NewRational()
+			value := strings.Repeat("1234567890", 120) + "/" + strings.Repeat("9876543210", 120) + "7"
+			euclidMust(t, m.SetString(&input, value))
+			value, e = m.String(&input)
+			euclidMust(t, e)
+			as := []numeral.Int{numeral.NewInt(7)}
+			c := numeral.NewInt(11)
+			before := m.BudgetField.Used()
+			m.BudgetField.FailAfter(ordinal)
+			eq, e := makeEquation(m, as, []uint32{0}, &c, []numeral.Rational{input},
+				[]uint32{0}, ib, rb, true, nil)
+			m.BudgetField.FailAfter(-1)
+			if (ordinal < 3) != (e != nil) {
+				t.Fatal("header, numerator, denominator allocation sequence", ordinal, eq, e)
+			}
+			if e != nil {
+				var failure umemory.Failure
+				if !errors.Is(e, arena.ErrInjectedFailure) &&
+					(!errors.As(e, &failure) || failure.Kind != umemory.FailureMemout) {
+					t.Fatal("rational copy refusal", ordinal, e)
+				}
+				if eq != nil {
+					t.Fatal("completed equation retained after source copy refusal", ordinal)
+				}
+				slot, err := rb.BorrowSlot(0)
+				euclidMust(t, err)
+				if ordinal == 1 && !z.IsFailureRef(slot.Num.Cell) {
+					t.Fatal("numerator copy refusal prefix", slot)
+				}
+				if ordinal == 2 && (z.IsFailureRef(slot.Num.Cell) || !z.IsFailureRef(slot.Den.Cell)) {
+					t.Fatal("denominator refusal retains copied numerator", slot)
+				}
+				euclidMust(t, rb.Cleanup())
+			} else {
+				got, err := m.String(&eq.bs[0])
+				euclidMust(t, err)
+				if got != value {
+					t.Fatal("copied justification", got)
+				}
+				euclidMust(t, eq.Close())
+				euclidMust(t, rb.Close())
+			}
+			euclidMust(t, ib.Close())
+			if m.BudgetField.Used() != before {
+				t.Fatal("partial equation or buffer retained budget", ordinal, before, m.BudgetField.Used())
+			}
+			got, err := m.String(&input)
+			euclidMust(t, err)
+			if got != value || as[0].Val != 7 || c.Val != 11 {
+				t.Fatal("borrowed equation inputs changed", ordinal, got, as, c)
+			}
+			euclidMust(t, m.Del(&input))
+		})
+	}
+}
+
+func TestEuclideanStoppedRationalEquationCleanup(t *testing.T) {
+	m := euclidNumeralManager(t)
+	s, e := newSolverSetup(m)
+	euclidMust(t, e)
+	_, e = s.mkVar(false)
+	euclidMust(t, e)
+	j, e := s.mkJustification()
+	euclidMust(t, e)
+	input := numeral.NewRational()
+	value := strings.Repeat("1234567890", 120) + "/" + strings.Repeat("9876543210", 120) + "7"
+	euclidMust(t, m.SetString(&input, value))
+	a, c := numeral.NewInt(7), numeral.NewInt(11)
+	m.BudgetField.FailAfter(2)
+	_, e = s.addEquation([]numeral.Int{a}, []uint32{0}, &c,
+		[]numeral.Rational{input}, []uint32{j}, true)
+	m.BudgetField.FailAfter(-1)
+	var failure umemory.Failure
+	if !errors.As(e, &failure) || failure.Kind != umemory.FailureMemout || s.stop == nil {
+		t.Fatal("denominator copy stopped equation owner", e)
+	}
+	euclidMust(t, s.Close())
+	euclidMust(t, m.Del(&input))
 }
 
 func TestEuclideanEquationFailedConstructionRetainsStoppedDestructor(t *testing.T) {
