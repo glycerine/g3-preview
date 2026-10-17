@@ -3,6 +3,8 @@
 // Source: src/util/mpz.cpp selected Lehmer and ExtendedGCD SASSERT sites.
 package numeral
 
+import "github.com/glycerine/g3/pkg/util/diagnostic"
+
 const sourceGCDDebug = true
 
 func gcdSourceRequire(condition bool) error {
@@ -19,4 +21,17 @@ func (m *IntegerManager) gcdSourceGreaterEqual(a, b *Int) error {
 		return e
 	}
 	return gcdSourceRequire(cmp >= 0)
+}
+
+func (m *IntegerManager) gcdSourceGreaterEqualAt(a, b *Int, line int32) error {
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil || !enabled {
+		return e
+	}
+	cmp, e := m.Compare(a, b)
+	if e != nil || cmp >= 0 {
+		return e
+	}
+	return diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", line, "ge(a1, b1)")
 }

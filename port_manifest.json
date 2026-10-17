@@ -115914,10 +115914,11 @@
           ]
         },
         {
-          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
+          "name": "Selected GCD caller Copy-before-Abs zero path, five Lehmer ge assertion switch reads, remaining Lehmer and intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
+            "TestLehmerGCDFirstSourceAssertionReadsAfterInputCopies",
             "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
             "TestGCDPublicationZeroBigCopyRefusal",
             "TestGCDPublicationRationalIntegralityProfiles",
@@ -164526,10 +164527,11 @@
           ]
         },
         {
-          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
+          "name": "Selected GCD caller Copy-before-Abs zero path, five Lehmer ge assertion switch reads, remaining Lehmer and intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
+            "TestLehmerGCDFirstSourceAssertionReadsAfterInputCopies",
             "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
             "TestGCDPublicationZeroBigCopyRefusal",
             "TestGCDPublicationRationalIntegralityProfiles",
@@ -166600,10 +166602,11 @@
           ]
         },
         {
-          "name": "scalar gcd selected internal LEHMER_GCD",
+          "name": "scalar gcd selected internal LEHMER_GCD with reached ge assertion switch reads",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
+            "TestLehmerGCDFirstSourceAssertionReadsAfterInputCopies",
             "TestIntegerScalarGCD",
             "TestIntegerSourceGCDCoherence",
             "TestIntegerGCDSignedLimbAliases",
@@ -167122,10 +167125,11 @@
           ]
         },
         {
-          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
+          "name": "Selected GCD caller Copy-before-Abs zero path, five Lehmer ge assertion switch reads, remaining Lehmer and intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
+            "TestLehmerGCDFirstSourceAssertionReadsAfterInputCopies",
             "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
             "TestGCDPublicationZeroBigCopyRefusal",
             "TestGCDPublicationRationalIntegralityProfiles",
@@ -168720,10 +168724,11 @@
           ]
         },
         {
-          "name": "scalar gcd selected internal LEHMER_GCD",
+          "name": "scalar gcd selected internal LEHMER_GCD with reached ge assertion switch reads",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
+            "TestLehmerGCDFirstSourceAssertionReadsAfterInputCopies",
             "TestIntegerScalarGCD",
             "TestIntegerSourceGCDCoherence",
             "TestIntegerGCDSignedLimbAliases",
@@ -169318,10 +169323,11 @@
           ]
         },
         {
-          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
+          "name": "Selected GCD caller Copy-before-Abs zero path, five Lehmer ge assertion switch reads, remaining Lehmer and intermediate ExtendedGCD debug sites, raw rational number-theory forwarding profiles",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
+            "TestLehmerGCDFirstSourceAssertionReadsAfterInputCopies",
             "TestGCDPublicationZeroCopyBeforeMinimumPromotion",
             "TestGCDPublicationZeroBigCopyRefusal",
             "TestGCDPublicationRationalIntegralityProfiles",
