@@ -137,6 +137,18 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 			return false, arena.ErrBounds
 		}
 	}
+	if diagnostic.DebugBuild {
+		dbg := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(dbg)
+		if e != nil {
+			return false, e
+		}
+		if enabled && d >= 32 {
+			if e := diagnostic.DebugAssertionFailure(dbg, "src/util/mpn.cpp", 230, "d < DIGIT_BITS"); e != nil {
+				return false, e
+			}
+		}
+	}
 	if e := m.ResizeDiv(0, na+1); e != nil {
 		return false, e
 	}
@@ -153,6 +165,18 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 			m.sourceDivWrite(v, i, b.read(i))
 		}
 	} else {
+		if diagnostic.DebugBuild {
+			dbg := diagnostic.BorrowProcessDebugContext()
+			enabled, e := diagnostic.SourceAssertionsEnabled(dbg)
+			if e != nil {
+				return false, e
+			}
+			if enabled && nb == 0 {
+				if e := diagnostic.DebugAssertionFailure(dbg, "src/util/mpn.cpp", 243, "lden > 0"); e != nil {
+					return false, e
+				}
+			}
+		}
 		m.sourceDivWrite(u, na, a.read(na-1)>>(32-d))
 		for i := na - 1; i > 0; i-- {
 			m.sourceDivWrite(u, i, a.read(i)<<d|a.read(i-1)>>(32-d))
