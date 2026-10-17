@@ -20711,7 +20711,8 @@
         "pkg/ast/rewriter/array_rewriter_map.go",
         "pkg/ast/rewriter/array_rewriter_set.go",
         "pkg/ast/rewriter/array_rewriter_eq.go",
-        "pkg/model/model_evaluator_store_eq_test.go"
+        "pkg/model/model_evaluator_store_eq_test.go",
+        "pkg/ast/rewriter/array_rewriter_trace.go"
       ],
       "tests": [
         "TestArrayRewriterOriginalStoreSelectAndFirstUncertainIndex",
@@ -20728,7 +20729,8 @@
         "TestArrayRewriterOriginalStoreEqualityFlagBaseAndConstraintOrder",
         "TestArrayRewriterOriginalStoreEqualityBufferRefusals",
         "TestArrayRewriterOriginalParameterDescriptionWrapper",
-        "TestOriginalStoreEqualityExpansionIndependentBooleanModels"
+        "TestOriginalStoreEqualityExpansionIndependentBooleanModels",
+        "TestArrayRewriterAppCoreSourceTrace"
       ],
       "assertions": [
         {
@@ -20812,6 +20814,14 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "retained mk_app_core declaration and ordered argument TRACE before array operation dispatch (array_rewriter.cpp:38-42)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/array_rewriter_trace.go",
+          "tests": [
+            "TestArrayRewriterAppCoreSourceTrace"
+          ]
+        },
+        {
           "name": "configured constructor/update, compare_args, selected store/select core and fallback wrappers",
           "status": "partial",
           "go_target": "pkg/ast/rewriter/array_rewriter.go",
@@ -20884,7 +20894,7 @@
         "Store equality retains native borrowed constraint/argument slices and actual temporary owning references on its embedded continuation. Cleanup ends tmp2/tmp1 then clears args/formulas; interrupted cleanup retains exact owners and blocks reuse until Close. Raw constraint nodes retain manager-owned child references. Warm reference/factory reservation campaigns restore output and charge. No inline/spill or native allocator ABI credit is added."
       ],
       "deviations": [
-        "Store/select rules preserve first-uncertain-index comparison, original structural store sorting and rewrite statuses. Parameter lookup follows local/module/default order and resets select-ITE expansion. TRACE, complete ownership/allocator campaigns and exact native exception/assertion transport remain open. These focused tests add no registered source driver credit.",
+        "Store/select rules preserve first-uncertain-index comparison, original structural store sorting and rewrite statuses. Parameter lookup follows local/module/default order and resets select-ITE expansion. The mk_app_core TRACE is covered for a live select declaration and ordered arguments; wider expression/stream profiles, complete ownership/allocator campaigns and exact native exception/assertion transport remain open. These focused tests add no registered source driver credit.",
         "Original unary map over a constant array explicitly reuses its input array sort; a mapped function with a different output range reaches the existing type precondition, whereas the multi-array constant rule constructs the new range. This source limitation is exposed by a focused test and preserved rather than silently corrected. Selected map rules add no registered driver or whole-unit native allocator/assertion credit.",
         "Set app rules are integrated into the original switch. Bare-array complement declines rather than inventing a raw-map fallback. Union/intersection applications with more than two operands are source right-associated binary trees; a direct variadic core callback reaches the original map factory exact Boolean function arity guard. Unknown-index/mixed-shape maps and their select/subset residuals are preserved; no new select-over-map algorithm is fabricated. Native exception/assertion and whole-unit ABI/allocator campaigns remain open.",
         "Original store equality expansion and public class wrappers are implemented, including early disabled flag before operand reads, base identity refusal, left-before-right store traversal, duplicate constraints, one-step select wrapper behavior and raw empty conjunction. Independent 32-assignment two-element array models verify both original equality and expanded constraints. The source class algorithms are covered selectively; exact source assertion/TRACE/exception transport, implicit owning copy and whole-unit native allocator/ABI audits remain uncredited."
@@ -182686,7 +182696,8 @@
         "pkg/ast/ast_core_distinct_trace.go",
         "pkg/smtcore/smt_model_finder_hint_trace.go",
         "pkg/smtcore/param_datatype_refs.go",
-        "pkg/ast/rewriter/bool_rewriter_ite_value_trace.go"
+        "pkg/ast/rewriter/bool_rewriter_ite_value_trace.go",
+        "pkg/ast/rewriter/array_rewriter_trace.go"
       ],
       "tests": [
         "TestSATGoalDependencyFormulaSourceTrace",
@@ -182794,7 +182805,8 @@
         "TestASTExpandedDistinctSourceTraceAfterConjunction",
         "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit",
         "TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite",
-        "TestBoolRewriterTryITEValueFalseSourceTrace"
+        "TestBoolRewriterTryITEValueFalseSourceTrace",
+        "TestArrayRewriterAppCoreSourceTrace"
       ],
       "conditionals": [
         {
@@ -182825,6 +182837,14 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Selected array_rewriter::mk_app_core declaration and ordered-argument TRACE at array_rewriter.cpp:38 before dispatch",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/array_rewriter_trace.go",
+          "tests": [
+            "TestArrayRewriterAppCoreSourceTrace"
+          ]
+        },
         {
           "name": "Retained bool_rewriter::try_ite_value TRACE/CTRACE at bool_rewriter.cpp:594,665,670 with typed Go identities replacing raw expr pointers",
           "status": "platform_replacement",
@@ -185128,7 +185148,8 @@
         "pkg/ast/ast_core_distinct_trace.go",
         "pkg/smtcore/smt_model_finder_hint_trace.go",
         "pkg/smtcore/param_datatype_refs.go",
-        "pkg/ast/rewriter/bool_rewriter_ite_value_trace.go"
+        "pkg/ast/rewriter/bool_rewriter_ite_value_trace.go",
+        "pkg/ast/rewriter/array_rewriter_trace.go"
       ],
       "tests": [
         "TestSATGoalDependencyFormulaSourceTrace",
@@ -185234,7 +185255,8 @@
         "TestASTExpandedDistinctSourceTraceAfterConjunction",
         "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit",
         "TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite",
-        "TestBoolRewriterTryITEValueFalseSourceTrace"
+        "TestBoolRewriterTryITEValueFalseSourceTrace",
+        "TestArrayRewriterAppCoreSourceTrace"
       ],
       "conditionals": [
         {
@@ -185277,6 +185299,14 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Selected array_rewriter::mk_app_core declaration and ordered-argument TRACE at array_rewriter.cpp:38 before dispatch",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/array_rewriter_trace.go",
+          "tests": [
+            "TestArrayRewriterAppCoreSourceTrace"
+          ]
+        },
         {
           "name": "Retained bool_rewriter::try_ite_value TRACE/CTRACE at bool_rewriter.cpp:594,665,670 with typed Go identities replacing raw expr pointers",
           "status": "platform_replacement",

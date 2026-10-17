@@ -210,6 +210,9 @@ func (rw *ArrayRewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out a
 	if fid != rw.family {
 		return RewriteFailed, ast.ErrASTDomain
 	}
+	if e := rw.traceAppCore(d, args); e != nil {
+		return RewriteFailed, e
+	}
 	op, e := rw.manager.GetDeclKind(d)
 	if e != nil {
 		return RewriteFailed, e
