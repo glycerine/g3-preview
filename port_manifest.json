@@ -156840,6 +156840,7 @@
         "pkg/util/numeral/mpf_partial_remainder_callback_test.go",
         "pkg/util/numeral/mpf_partial_remainder_literal_test.go",
         "pkg/util/numeral/mpf_rem.go",
+        "pkg/util/numeral/mpf_rem_assertion_source_test.go",
         "pkg/util/numeral/mpf_rem_scope.go",
         "pkg/util/numeral/mpf_rem_test.go",
         "pkg/util/numeral/mpf_rem_oracle_test.go",
@@ -157130,6 +157131,7 @@
         "TestArbitraryFloatRemUnpackTransportAndOwnerGuards",
         "TestArbitraryFloatRemSpecialMatrixAndSharedIdentity",
         "TestArbitraryFloatRemEveryColdSpecialReservation",
+        "TestArbitraryFloatRemFormatSourceActions",
         "TestArbitraryFloatRemWarmChildrenAndLaterInvocation",
         "TestArbitraryFloatToMPZIndependentTruncationAndOwners",
         "TestArbitraryFloatToMPZSourceBitFieldExponentAndOverflowPrefix",
@@ -158149,6 +158151,7 @@
             "TestArbitraryFloatRemUnpackTransportAndOwnerGuards",
             "TestArbitraryFloatRemSpecialMatrixAndSharedIdentity",
             "TestArbitraryFloatRemEveryColdSpecialReservation",
+            "TestArbitraryFloatRemFormatSourceActions",
             "TestArbitraryFloatRemWarmChildrenAndLaterInvocation"
           ]
         },
@@ -158558,6 +158561,7 @@
         "pkg/util/numeral/mpf_partial_remainder_callback_test.go",
         "pkg/util/numeral/mpf_partial_remainder_literal_test.go",
         "pkg/util/numeral/mpf_rem.go",
+        "pkg/util/numeral/mpf_rem_assertion_source_test.go",
         "pkg/util/numeral/mpf_rem_scope.go",
         "pkg/util/numeral/mpf_rem_test.go",
         "pkg/util/numeral/mpf_rem_oracle_test.go",
@@ -158761,6 +158765,7 @@
         "TestArbitraryFloatRemUnpackTransportAndOwnerGuards",
         "TestArbitraryFloatRemSpecialMatrixAndSharedIdentity",
         "TestArbitraryFloatRemEveryColdSpecialReservation",
+        "TestArbitraryFloatRemFormatSourceActions",
         "TestArbitraryFloatRemWarmChildrenAndLaterInvocation",
         "TestArbitraryFloatToMPZIndependentTruncationAndOwners",
         "TestArbitraryFloatToMPZSourceBitFieldExponentAndOverflowPrefix",
@@ -159286,6 +159291,7 @@
             "TestArbitraryFloatRemUnpackTransportAndOwnerGuards",
             "TestArbitraryFloatRemSpecialMatrixAndSharedIdentity",
             "TestArbitraryFloatRemEveryColdSpecialReservation",
+            "TestArbitraryFloatRemFormatSourceActions",
             "TestArbitraryFloatRemWarmChildrenAndLaterInvocation"
           ]
         },

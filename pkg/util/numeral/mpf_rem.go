@@ -15,8 +15,8 @@ func (m *ArbitraryFloatManager) Rem(x, y, out *ArbitraryFloat) (cause error) {
 			return e
 		}
 	}
-	if modularSourceDebug && (x.SBits() != y.SBits() || x.EBits() != y.EBits()) {
-		return ErrIntegerAssertion
+	if e := mpfSourceAssertion(x.SBits() == y.SBits() && x.EBits() == y.EBits(), 1439, "x.sbits == y.sbits && x.ebits == y.ebits"); e != nil {
+		return e
 	}
 	if e := m.traceRemObjects(x, y); e != nil {
 		return e
@@ -66,15 +66,24 @@ func (m *ArbitraryFloatManager) Rem(x, y, out *ArbitraryFloat) (cause error) {
 	if zero {
 		return m.Copy(out, x)
 	}
-	if modularSourceDebug {
-		for _, v := range [...]*ArbitraryFloat{x, y} {
-			regular, e := m.IsRegular(v)
+	assertionsEnabled, e := mpfSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if assertionsEnabled {
+		xRegular, e := m.IsRegular(x)
+		if e != nil {
+			return e
+		}
+		yRegular := false
+		if xRegular {
+			yRegular, e = m.IsRegular(y)
 			if e != nil {
 				return e
 			}
-			if !regular {
-				return ErrIntegerAssertion
-			}
+		}
+		if e := mpfSourceAssertion(xRegular && yRegular, 1455, "is_regular(x) && is_regular(y)"); e != nil {
+			return e
 		}
 	}
 	s := &m.rem
