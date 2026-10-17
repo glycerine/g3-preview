@@ -22,8 +22,14 @@ func NewRationalLinearSolver(m *unumeral.RationalManager) (*RationalLinearSolver
 	if e := m.CheckOwnerReady(); e != nil {
 		return nil, e
 	}
-	if polynomialSourceDebug && !m.Field() {
-		return nil, ErrPolynomialAssertion
+	enabled, e := linearSourceAssertionsEnabled()
+	if e != nil {
+		return nil, e
+	}
+	if enabled && !m.Field() {
+		if e := linearSourceAssertionFailure(33, "m.field()"); e != nil {
+			return nil, e
+		}
 	}
 	h := uint64(reflect.TypeOf(RationalLinearSolver{}).Size())
 	if e := m.Integers().Budget().Reserve(h); e != nil {
@@ -164,8 +170,8 @@ func (s *RationalLinearSolver) Add(i uint32, as []unumeral.Rational, b *unumeral
 	if e := s.open(); e != nil {
 		return e
 	}
-	if polynomialSourceDebug && i >= s.n {
-		return ErrPolynomialAssertion
+	if e := linearSourceAssert(i < s.n, 78, "i < n"); e != nil {
+		return e
 	}
 	if e := s.copyInto(&s.b, i, b); e != nil {
 		return e
@@ -225,13 +231,19 @@ func (s *RationalLinearSolver) Solve(xs []unumeral.Rational) (bool, error) {
 		if e != nil {
 			return false, e
 		}
-		if polynomialSourceDebug {
+		enabled, e := linearSourceAssertionsEnabled()
+		if e != nil {
+			return false, e
+		}
+		if enabled {
 			zero, e := s.manager.IsZero(&pivot)
 			if e != nil {
 				return false, e
 			}
 			if zero {
-				return false, ErrPolynomialAssertion
+				if e := linearSourceAssertionFailure(102, "!m.is_zero(A_k_k)"); e != nil {
+					return false, e
+				}
 			}
 		}
 		for j := k + 1; j < s.n; j++ {
@@ -247,6 +259,13 @@ func (s *RationalLinearSolver) Solve(xs []unumeral.Rational) (bool, error) {
 		}
 		if polynomialSourceDebug {
 			for j := uint32(0); j < k; j++ {
+				enabled, e := linearSourceAssertionsEnabled()
+				if e != nil {
+					return false, e
+				}
+				if !enabled {
+					continue
+				}
 				a, e := s.load(rk, j)
 				if e != nil {
 					return false, e
@@ -256,7 +275,9 @@ func (s *RationalLinearSolver) Solve(xs []unumeral.Rational) (bool, error) {
 					return false, e
 				}
 				if !zero {
-					return false, ErrPolynomialAssertion
+					if e := linearSourceAssertionFailure(109, "m.is_zero(A_k[i])"); e != nil {
+						return false, e
+					}
 				}
 			}
 		}
@@ -300,7 +321,11 @@ func (s *RationalLinearSolver) Solve(xs []unumeral.Rational) (bool, error) {
 		if e != nil {
 			return false, e
 		}
-		if polynomialSourceDebug {
+		enabled, e := linearSourceAssertionsEnabled()
+		if e != nil {
+			return false, e
+		}
+		if enabled {
 			a, e := s.load(rk, k)
 			if e != nil {
 				return false, e
@@ -310,7 +335,9 @@ func (s *RationalLinearSolver) Solve(xs []unumeral.Rational) (bool, error) {
 				return false, e
 			}
 			if !one {
-				return false, ErrPolynomialAssertion
+				if e := linearSourceAssertionFailure(125, "m.is_one(A[k][k])"); e != nil {
+					return false, e
+				}
 			}
 		}
 		b, e := s.load(&s.b, k)
@@ -354,8 +381,8 @@ func (s *RationalLinearSolver) flushSource() (err error) {
 		}
 	}()
 	if s.flushStage == 0 {
-		if polynomialSourceDebug && len(s.b) != len(s.A) {
-			return ErrPolynomialAssertion
+		if e := linearSourceAssert(len(s.b) == len(s.A), 37, "b.size() == A.size()"); e != nil {
+			return e
 		}
 		s.flushStage = 1
 	}
@@ -370,8 +397,8 @@ func (s *RationalLinearSolver) flushSource() (err error) {
 			}
 			s.flushStage = 2
 		}
-		if polynomialSourceDebug && uint64(len(*r)) != uint64(s.n) {
-			return ErrPolynomialAssertion
+		if e := linearSourceAssert(uint64(len(*r)) == uint64(s.n), 42, "as.size() == n"); e != nil {
+			return e
 		}
 		for s.flushColumn < s.n {
 			if e = s.deleteInto(r, s.flushColumn, false); e != nil {

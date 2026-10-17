@@ -35,8 +35,8 @@ func (s *RationalLinearSolver) Display(out io.Writer) error {
 		}
 		if polynomialSourceDebug {
 			size := uint32(len(*row))
-			if size != s.n {
-				return ErrPolynomialAssertion
+			if e := linearSourceAssert(size == s.n, 141, "A[i].size() == n"); e != nil {
+				return e
 			}
 		}
 		for j := uint32(0); j < s.n; j++ {
@@ -84,8 +84,8 @@ func (s *ModularLinearSolver) Display(out io.Writer) error {
 		}
 		if polynomialSourceDebug {
 			size := uint32(len(*row))
-			if size != s.n {
-				return ErrPolynomialAssertion
+			if e := linearSourceAssert(size == s.n, 141, "A[i].size() == n"); e != nil {
+				return e
 			}
 		}
 		for j := uint32(0); j < s.n; j++ {

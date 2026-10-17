@@ -13,6 +13,9 @@ func TestLinearConcreteLocalConstructorGuardAndNoHeaderReservation(t *testing.T)
 			prime = 97
 		}
 		m, z, budget := modularManager(t, prime)
+		if !field && polynomialSourceDebug {
+			polynomialThrowAssertionFixture(t)
+		}
 		before := budget.Used()
 		budget.FailAfter(0)
 		var local ModularLinearSolver
