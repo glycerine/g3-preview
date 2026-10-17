@@ -17725,6 +17725,14 @@
           ]
         },
         {
+          "name": "Concrete to_fp RoundingMode/Real/Int and RoundingMode/Int/Real overloads require two integer FP format parameters (fpa_decl_plugin.cpp:489-517)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_signed_bv_decl.go",
+          "tests": [
+            "TestASTFPAToFPExponentRationalOrdersAndRefusals"
+          ]
+        },
+        {
           "name": "Concrete to_fp_unsigned declaration validates RoundingMode, BitVec, two integer format parameters and resulting FloatingPoint sort in source order (fpa_decl_plugin.cpp:567-591)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_fp_unsigned_decl.go",
@@ -27274,6 +27282,15 @@
           "tests": [
             "TestASTFPAToFPThreeBVFieldsAndRefusal",
             "TestFPAToFPThreeBVDispatch"
+          ]
+        },
+        {
+          "name": "mk_to_fp RoundingMode with Real significand and Int exponent in either order through MPF SetExponentRational (fpa_rewriter.cpp:106-119,189-213)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_exponent_rational.go",
+          "tests": [
+            "TestASTFPAToFPExponentRationalOrdersAndRefusals",
+            "TestFPAToFPExponentRationalBothOrdersDispatch"
           ]
         },
         {
@@ -179325,6 +179342,14 @@
           "go_target": "pkg/ast/ast_fpa_to_fp_ieee_bv.go",
           "tests": [
             "TestASTFPAToFPIEEEBVExactFieldsAndRefusals"
+          ]
+        },
+        {
+          "name": "Concrete mk_to_fp caller-local scoped_mpf lifetime around both Real/Int exponent-rational forms (fpa_rewriter.cpp:106-119,189-213; scoped_numeral.h:24-33)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_exponent_rational.go",
+          "tests": [
+            "TestASTFPAToFPExponentRationalOrdersAndRefusals"
           ]
         },
         {

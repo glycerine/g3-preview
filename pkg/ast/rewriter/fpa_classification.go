@@ -102,19 +102,33 @@ func (r *FPARewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out ast.
 	}
 	if kind == ast.FPAOpToFP {
 		if args.Count() == 3 {
-			sign, err := args.At(0)
+			first, err := args.At(0)
 			if err != nil {
 				return RewriteFailed, err
 			}
-			exponent, err := args.At(1)
+			second, err := args.At(1)
 			if err != nil {
 				return RewriteFailed, err
 			}
-			significand, err := args.At(2)
+			third, err := args.At(2)
 			if err != nil {
 				return RewriteFailed, err
 			}
-			answer, found, err := r.manager.RewriteFPAToFPThreeBVNumerals(d, sign, exponent, significand)
+			firstDomain, err := r.manager.GetDomain(d, 0)
+			if err != nil {
+				return RewriteFailed, err
+			}
+			isBV, err := r.manager.IsBitVectorSort(firstDomain)
+			if err != nil {
+				return RewriteFailed, err
+			}
+			var answer ast.ASTHandle
+			var found bool
+			if isBV {
+				answer, found, err = r.manager.RewriteFPAToFPThreeBVNumerals(d, first, second, third)
+			} else {
+				answer, found, err = r.manager.RewriteFPAToFPExponentRationalNumerals(d, first, second, third)
+			}
 			if err != nil || !found {
 				return RewriteFailed, err
 			}
