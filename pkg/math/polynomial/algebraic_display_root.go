@@ -10,13 +10,15 @@ import (
 )
 
 type algebraicRootDisplayScope struct {
+	insertions      [2]unumeral.NumeralInsertionReceipt
 	negative        unumeral.Int
 	coefficients    UPolynomial
 	negativeOwned   bool
 	active, running bool
 }
 
-func (m *AlgebraicRootCore) cleanupRootDisplay() error {
+func (m *AlgebraicRootCore) cleanupRootDisplay() error { return m.finishRootDisplay(true) }
+func (m *AlgebraicRootCore) finishRootDisplay(owning bool) error {
 	s := &m.rootDisplay
 	if s.running {
 		return ErrAlgebraicPending
@@ -24,6 +26,25 @@ func (m *AlgebraicRootCore) cleanupRootDisplay() error {
 	if !s.active {
 		return nil
 	}
+	for i := len(s.insertions) - 1; i >= 0; i-- {
+		if !s.insertions[i].Active() {
+			continue
+		}
+		if !owning {
+			if e := s.insertions[i].SourceCause(); e != nil {
+				return e
+			}
+		}
+		if e := s.insertions[i].Complete(m.config.Rationals.Integers().Natural, false); e != nil {
+			return e
+		}
+		if owning {
+			if e := s.insertions[i].Complete(m.config.Rationals.Integers().Natural, true); e != nil {
+				return e
+			}
+		}
+	}
+
 	if s.coefficients.slot != 0 {
 		if e := m.config.Polynomials.DelPolynomial(&s.coefficients); e != nil {
 			return e
@@ -36,6 +57,11 @@ func (m *AlgebraicRootCore) cleanupRootDisplay() error {
 		s.negativeOwned = false
 	}
 	s.active = false
+	for i := range s.insertions {
+		if s.insertions[i].Active() {
+			s.active = true
+		}
+	}
 	return nil
 }
 
@@ -72,7 +98,7 @@ func (m *AlgebraicRootCore) displayRootInto(out unumeral.RationalSourceStream, a
 	var view UPolynomialView
 	s := &m.rootDisplay
 	*s = algebraicRootDisplayScope{active: true, running: true}
-	defer func() { s.running = false; cause = errors.Join(cause, m.cleanupRootDisplay()) }()
+	defer func() { s.running = false; cause = errors.Join(cause, m.finishRootDisplay(false)) }()
 	if l.kind == 0 {
 		s.negativeOwned = true
 		z := m.config.Rationals.Integers()
@@ -125,37 +151,16 @@ func (m *AlgebraicRootCore) displayRootInto(out unumeral.RationalSourceStream, a
 		}
 		return out.AppendCString(", 1)")
 	}
-	// m_i occupies the upper 29 bits of the source packed cell word.
-	// Publish only after get_root_id returns, and before the following output.
-	r, e = m.load(l)
-	if e != nil {
-		return e
-	}
-	index := r.flags >> 3
-	if index == 0 {
-		index, e = p.GetRootID(view, r.interval.BorrowLower())
-		if e != nil {
-			return e
-		}
-		index = (index + 1) & 0x1fffffff
-		r.flags = r.flags&7 | index<<3
-		if e = m.store(l, &r); e != nil {
-			return e
-		}
-	}
-	d, enabled, e := algebraicAssertionSwitch()
-	if e != nil {
-		return e
-	}
+
 	line := int32(2652)
 	if smt {
 		line = 2702
 	}
-	if enabled && index == 0 {
-		if e = diagnostic.DebugAssertionFailure(d, "src/math/polynomial/algebraic_numbers.cpp", line, "c->m_i > 0"); e != nil {
-			return e
-		}
+	index, e := m.displayRootIndex(l, view, line)
+	if e != nil {
+		return e
 	}
+
 	if e = out.AppendCString(separator); e != nil {
 		return e
 	}
@@ -163,4 +168,36 @@ func (m *AlgebraicRootCore) displayRootInto(out unumeral.RationalSourceStream, a
 		return e
 	}
 	return out.AppendCString(suffix)
+}
+
+func (m *AlgebraicRootCore) displayRootIndex(l *algebraicLocation, view UPolynomialView, line int32) (uint32, error) {
+	// m_i occupies the upper 29 bits of the source packed cell word.
+	// Publish only after get_root_id returns, and before the following output.
+	r, e := m.load(l)
+	if e != nil {
+		return 0, e
+	}
+	index := r.flags >> 3
+	if index == 0 {
+		index, e = m.config.Polynomials.GetRootID(view, r.interval.BorrowLower())
+		if e != nil {
+			return 0, e
+		}
+		index = (index + 1) & 0x1fffffff
+		r.flags = r.flags&7 | index<<3
+		if e = m.store(l, &r); e != nil {
+			return 0, e
+		}
+	}
+
+	d, enabled, e := algebraicAssertionSwitch()
+	if e != nil {
+		return 0, e
+	}
+	if enabled && index == 0 {
+		if e = diagnostic.DebugAssertionFailure(d, "src/math/polynomial/algebraic_numbers.cpp", line, "c->m_i > 0"); e != nil {
+			return 0, e
+		}
+	}
+	return index, nil
 }
