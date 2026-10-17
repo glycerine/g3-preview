@@ -77920,6 +77920,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/sat/sat_solver_probing_assertion.go",
+        "pkg/sat/sat_solver_probing_assertion_test.go",
         "pkg/sat/sat_solver_probing.go",
         "pkg/sat/sat_solver_probing_algorithm.go",
         "pkg/sat/sat_solver_literal_set_storage.go",
@@ -77990,6 +77992,13 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained probing try_lit/process_core/operator SASSERT61-62,112-113,199 read the process switch at each reached site and use source C/T actions",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_probing_assertion.go",
+          "go_targets": ["pkg/sat/sat_solver_probing_algorithm.go"],
+          "tests": ["TestSATProbingReadinessAssertionsUseSeparateSourceActions", "TestSATProbingRunReadsReachedSourceAssertionSwitch"]
+        },
         {
           "name": "Reached probing process_core pre-decrement TRACE site at sat_probing.cpp:111",
           "status": "ported",
@@ -78089,6 +78098,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/sat/sat_solver_probing_assertion.go",
+        "pkg/sat/sat_solver_probing_assertion_test.go",
         "pkg/sat/sat_solver_probing.go",
         "pkg/sat/sat_solver_probing_algorithm.go",
         "pkg/sat/sat_solver_literal_set_storage.go",
@@ -78139,6 +78150,13 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained probing try_lit/process_core/operator SASSERT61-62,112-113,199 read the process switch at each reached site and use source C/T actions",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_probing_assertion.go",
+          "go_targets": ["pkg/sat/sat_solver_probing_algorithm.go"],
+          "tests": ["TestSATProbingReadinessAssertionsUseSeparateSourceActions", "TestSATProbingRunReadsReachedSourceAssertionSwitch"]
+        },
         {
           "name": "Selected probing constructor/config/cache/try_lit/process/operator/finalize/assigned-set bodies with native literal-set slices and retained Runtime cache storage, literal defaults and probing_chache_limit key",
           "status": "ported",
@@ -124061,6 +124079,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/sat/sat_solver_probing_assertion.go",
+        "pkg/sat/sat_solver_probing_assertion_test.go",
         "pkg/sat/sat_integrity_clause_switch_trace_test.go",
         "pkg/sat/sat_integrity_watches_switch_test.go",
         "pkg/sat/sat_integrity_clause_vector_switch_test.go",
@@ -124141,6 +124161,13 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained probing try_lit/process_core/operator SASSERT61-62,112-113,199 read the process switch at each reached site and use source C/T actions",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_probing_assertion.go",
+          "go_targets": ["pkg/sat/sat_solver_probing_algorithm.go"],
+          "tests": ["TestSATProbingReadinessAssertionsUseSeparateSourceActions", "TestSATProbingRunReadsReachedSourceAssertionSwitch"]
+        },
         {
           "name": "Selected var_subst pre/post well-sorted SASSERT process gate and diagnostic action at var_subst.cpp:27,34",
           "status": "partial",
@@ -124506,6 +124533,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/sat/sat_solver_probing_assertion.go",
+        "pkg/sat/sat_solver_probing_assertion_test.go",
         "pkg/sat/sat_integrity_clause_switch_trace_test.go",
         "pkg/sat/sat_integrity_watches_switch_test.go",
         "pkg/sat/sat_integrity_clause_vector_switch_test.go",
@@ -124682,6 +124711,13 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained probing try_lit/process_core/operator SASSERT61-62,112-113,199 read the process switch at each reached site and use source C/T actions",
+          "status": "ported",
+          "go_target": "pkg/sat/sat_solver_probing_assertion.go",
+          "go_targets": ["pkg/sat/sat_solver_probing_algorithm.go"],
+          "tests": ["TestSATProbingReadinessAssertionsUseSeparateSourceActions", "TestSATProbingRunReadsReachedSourceAssertionSwitch"]
+        },
         {
           "name": "Selected var_subst pre/post well-sorted SASSERT process gate and diagnostic action at var_subst.cpp:27,34",
           "status": "partial",

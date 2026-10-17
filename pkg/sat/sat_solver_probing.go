@@ -3,7 +3,6 @@ package sat
 
 import (
 	"errors"
-	"github.com/glycerine/g3/pkg/util/lbool"
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -277,25 +276,4 @@ func (s *satSolverProbing) checkInvariant() error { return s.lifecycle.checkInva
 func (s *satSolverProbing) propagate() error {
 	_, e := s.lifecycle.propagate(false, s.debugPropagate, s.debugMissed)
 	return e
-}
-func (s *satSolverProbing) assertReady(l Literal) error {
-	if !satStorageSourceDebug {
-		return nil
-	}
-	v := s.propagation().variables
-	n, e := v.trail.Size(v.trailRef)
-	if e != nil {
-		return e
-	}
-	if v.qhead != n {
-		return ErrSATAssertion
-	}
-	a, e := v.valueVar(l.variable())
-	if e != nil {
-		return e
-	}
-	if a != lbool.Undef {
-		return ErrSATAssertion
-	}
-	return nil
 }

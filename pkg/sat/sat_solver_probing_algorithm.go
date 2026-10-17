@@ -10,7 +10,7 @@ func (s *satSolverProbing) tryLit(l Literal, updateCache bool) (bool, error) {
 	if e := s.open(); e != nil {
 		return false, e
 	}
-	if e := s.assertReady(l); e != nil {
+	if e := s.assertReady(l, 61, "s.value(l.var()) == l_undef"); e != nil {
 		return false, e
 	}
 	var implied satProbingCacheBorrow
@@ -129,7 +129,7 @@ func (s *satSolverProbing) processCore(id BoolVar) error {
 	}
 	s.traceProcessing(id)
 	l := MakeLiteral(id, false)
-	if e := s.assertReady(l); e != nil {
+	if e := s.assertReady(l, 112, "s.value(v) == l_undef"); e != nil {
 		return e
 	}
 	if e := s.decrement(); e != nil {
@@ -266,15 +266,11 @@ func (s *satSolverProbing) run(force bool) (answer bool, err error) {
 		return true, nil
 	}
 	if satStorageSourceDebug {
-		n, e := v.trail.Size(v.trailRef)
-		if e != nil {
+		if e := s.assertQHead(199); e != nil {
 			return false, e
 		}
-		if v.qhead != n {
-			return false, ErrSATAssertion
-		}
 		if s.debugProbing {
-			if e = s.checkInvariant(); e != nil {
+			if e := s.checkInvariant(); e != nil {
 				return false, e
 			}
 		}
