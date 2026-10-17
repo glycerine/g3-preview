@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 // SetComponentsUint64 is the scalar-significand overload used by the FPA API.
@@ -33,37 +34,62 @@ func (m *ArbitraryFloatManager) SetComponentsUint64WithReceipt(out *ArbitraryFlo
 	m.valueExecuting = false
 	out.exponent = exponent
 	if modularSourceDebug {
-		if sbits == 0 {
-			return arena.ErrBounds
-		}
-		power, e := m.powerTwoWrapper(sbits-1, false)
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return e
 		}
-		bound, e := power.Capture()
+		if enabled {
+			if sbits == 0 {
+				return arena.ErrBounds
+			}
+			power, e := m.powerTwoWrapper(sbits-1, false)
+			if e != nil {
+				return e
+			}
+			bound, e := power.Capture()
+			if e != nil {
+				return e
+			}
+			less, e := m.integer.Less(&out.significand, &bound)
+			if e != nil {
+				return e
+			}
+			if !less {
+				if e := diagnostic.DebugAssertionFailure(d, "src/util/mpf.cpp", 312, "m_mpz_manager.lt(o.significand, m_powers2(sbits-1))"); e != nil {
+					return e
+				}
+			}
+		}
+		enabled, e = diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return e
 		}
-		less, e := m.integer.Less(&out.significand, &bound)
+		if enabled {
+			top, e := m.topExponent(ebits)
+			if e != nil {
+				return e
+			}
+			if exponent > top {
+				if e := diagnostic.DebugAssertionFailure(d, "src/util/mpf.cpp", 313, "o.exponent <= mk_top_exp(ebits)"); e != nil {
+					return e
+				}
+			}
+		}
+		enabled, e = diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return e
 		}
-		if !less {
-			return ErrIntegerAssertion
-		}
-		top, e := m.topExponent(ebits)
-		if e != nil {
-			return e
-		}
-		if exponent > top {
-			return ErrIntegerAssertion
-		}
-		bottom, e := m.bottomExponent(ebits)
-		if e != nil {
-			return e
-		}
-		if exponent < bottom {
-			return ErrIntegerAssertion
+		if enabled {
+			bottom, e := m.bottomExponent(ebits)
+			if e != nil {
+				return e
+			}
+			if exponent < bottom {
+				if e := diagnostic.DebugAssertionFailure(d, "src/util/mpf.cpp", 314, "o.exponent >= mk_bot_exp(ebits)"); e != nil {
+					return e
+				}
+			}
 		}
 	}
 	return nil
@@ -145,8 +171,8 @@ func (m *ArbitraryFloatManager) SetDoubleWithReceipt(out *ArbitraryFloat, ebits,
 	exp := int64((raw&0x7ff0000000000000)>>52) - 1023
 	sig := raw & 0x000fffffffffffff
 	m.traceSetNativeInput(value, 64, raw, sig, sign, exp, 124)
-	if modularSourceDebug && (exp < -1023 || exp > 1024) {
-		return ErrIntegerAssertion
+	if e := mpfSourceAssertion(-1023 <= exp && exp <= 1024, 127, "-1023 <= e && e <= +1024"); e != nil {
+		return e
 	}
 	out.assignEbits(ebits)
 	out.assignSbits(sbits)
@@ -190,8 +216,8 @@ func (m *ArbitraryFloatManager) SetFloatWithReceipt(out *ArbitraryFloat, ebits, 
 	exp := int64(int32((raw&0x7f800000)>>23) - 127)
 	sig := raw & 0x007fffff
 	m.traceSetNativeInput(float64(value), 32, uint64(raw), uint64(sig), sign, exp, 160)
-	if modularSourceDebug && (exp < -127 || exp > 128) {
-		return ErrIntegerAssertion
+	if e := mpfSourceAssertion(-127 <= exp && exp <= 128, 163, "-127 <= e && e <= +128"); e != nil {
+		return e
 	}
 	out.assignEbits(ebits)
 	out.assignSbits(sbits)

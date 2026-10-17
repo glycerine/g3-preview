@@ -40,11 +40,12 @@ func TestArbitraryFloatUint64ComponentsDebugAssertionAfterPublication(t *testing
 	if !modularSourceDebug {
 		t.Skip("source SASSERT is disabled")
 	}
+	bindMPNDebugActions(t, "T")
 	b := arena.NewBudget(1 << 25)
 	m, e := NewArbitraryFloatManager(serviceConfig(b).Integers)
 	serviceMust(t, e)
 	var out ArbitraryFloat
-	if e := m.SetComponentsUint64(&out, 8, 4, true, 3, 8); e != ErrIntegerAssertion {
+	if e := m.SetComponentsUint64(&out, 8, 4, true, 3, 8); !isMPNVerificationThrow(e) {
 		t.Fatal("reached significand assertion", e)
 	}
 	if out.EBits() != 8 || out.SBits() != 4 || !out.Sign() || out.Exponent() != 3 {

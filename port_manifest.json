@@ -156707,6 +156707,7 @@
         "pkg/util/numeral/mpf_value_ieee_lifetime_source_test.go",
         "pkg/util/numeral/mpf_value_ieee_signed_shift_source_test.go",
         "pkg/util/numeral/mpf_value_input.go",
+        "pkg/util/numeral/mpf_value_input_assertion_source_test.go",
         "pkg/util/numeral/mpf_native_input_bits_source_test.go",
         "pkg/util/numeral/mpf_value_input_invocation.go",
         "pkg/util/numeral/mpf_value_input_driver_source_test.go",
@@ -156969,6 +156970,8 @@
         "TestArbitraryFloatToRationalLiteralFiniteInputs",
         "TestArbitraryFloatToRationalActualReusedFrameRejectsSavedContext",
         "TestArbitraryFloatToRationalUndefinedSignedNegationGuard",
+        "TestArbitraryFloatUint64ComponentsSourceAssertionActions",
+        "TestArbitraryFloatNativeInputSourceRangeAssertionSites",
         "TestArbitraryFloatIEEEOriginalAssertionsAdapted",
         "TestArbitraryFloatIEEEIndependentBranchBitsAndWarmNoAllocation",
         "TestArbitraryFloatIEEERepresentedShiftGuardDomains",
@@ -157749,6 +157752,7 @@
           "tests": [
             "TestArbitraryFloatUint64ComponentsSourcePublication",
             "TestArbitraryFloatUint64ComponentsDebugAssertionAfterPublication",
+            "TestArbitraryFloatUint64ComponentsSourceAssertionActions",
             "TestArbitraryFloatUint64ComponentsAllocationPrefix",
             "TestArbitraryFloatUint64ComponentsDebugCacheAfterPublication"
           ]
@@ -157832,6 +157836,7 @@
           "tests": [
             "TestArbitraryFloatOriginalSetIntAndDoubleDriverAssertions",
             "TestArbitraryFloatNativeInputIndependentIEEEFieldOracle",
+            "TestArbitraryFloatNativeInputSourceRangeAssertionSites",
             "TestArbitraryFloatInputReachedSETAndShiftAllocationReceipt",
             "TestArbitraryFloatInputMultiplePendingAndInlineHistory",
             "TestArbitraryFloatInputActualAllocationTransportOwnerGuards",
