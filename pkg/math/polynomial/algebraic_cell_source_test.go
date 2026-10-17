@@ -148,6 +148,7 @@ func algebraicCellSourcePhysical(t *testing.T, c *AlgebraicRootCore, polys []UPo
 	if c.localActive {
 		fields(reflect.ValueOf(c.localQ))
 	}
+	fields(reflect.ValueOf(c.inversion.values))
 	fields(reflect.ValueOf(c.predicate))
 	fields(reflect.ValueOf(c.isRationalTmp))
 	for _, vector := range []*BinaryRationalVector{c.roots, c.lowers, c.uppers} {

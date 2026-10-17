@@ -11,6 +11,11 @@ import (
 // Bind a source T action for fixtures that deliberately reach a failed SASSERT.
 func polynomialThrowAssertionFixture(t *testing.T) {
 	t.Helper()
+	polynomialAssertionActionsFixture(t, "T")
+}
+
+func polynomialAssertionActionsFixture(t *testing.T, choices string) {
+	t.Helper()
 	if !polynomialSourceDebug {
 		return
 	}
@@ -21,7 +26,7 @@ func polynomialThrowAssertionFixture(t *testing.T) {
 	serviceMust(t, e)
 	inputFile, e := os.CreateTemp(t.TempDir(), "polynomial-assert-input-*")
 	serviceMust(t, e)
-	_, e = inputFile.WriteString("T")
+	_, e = inputFile.WriteString(choices)
 	serviceMust(t, e)
 	_, e = inputFile.Seek(0, 0)
 	serviceMust(t, e)
