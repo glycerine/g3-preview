@@ -53,7 +53,7 @@ func (m *FixedPointManager) SetFromRational(dst *FixedPoint, rationals *Rational
 		scaled.Mul(q.Num(), &m.scale)
 		return m.publish(dst, &scaled)
 	}
-	negative := dst.scaled.Sign() < 0 || dst.sourceZeroSlot && dst.sourceZeroNegative
+	negative := dst.sourceNegative()
 	var numerator big.Int
 	numerator.Abs(q.Num())
 	numerator.Mul(&numerator, &m.scale)
@@ -64,7 +64,16 @@ func (m *FixedPointManager) SetFromRational(dst *FixedPoint, rationals *Rational
 	if err != nil {
 		return err
 	}
-	return m.publish(dst, rounded)
+	if err := m.publish(dst, rounded); err != nil {
+		return err
+	}
+	if rounded.Sign() == 0 {
+		// The noninteger source branch allocates n before division and
+		// copies the zero quotient words without resetting its slot.
+		dst.sourceZeroSlot = true
+		dst.sourceZeroNegative = negative
+	}
+	return nil
 }
 
 // ToInteger is the reached exactness check after integer-to-fixed conversion.
@@ -127,7 +136,7 @@ func (m *FixedPointManager) Display(w io.Writer, a *FixedPoint) error {
 	if err := m.check(a); err != nil {
 		return err
 	}
-	if a.scaled.Sign() < 0 || a.sourceZeroSlot && a.sourceZeroNegative {
+	if a.sourceNegative() {
 		if err := writeFixedPointPart(w, "-"); err != nil {
 			return err
 		}

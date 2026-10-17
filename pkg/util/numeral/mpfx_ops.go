@@ -87,7 +87,7 @@ func (m *FixedPointManager) Power(a *FixedPoint, exponent uint32, out *FixedPoin
 			m.traceFixedPower(input, exponent, out)
 		}
 	}()
-	if a.scaled.Sign() == 0 && !a.sourceZeroSlot {
+	if a.sourceIsZero() {
 		if exponent == 0 {
 			return ErrFixedPointDomain
 		}

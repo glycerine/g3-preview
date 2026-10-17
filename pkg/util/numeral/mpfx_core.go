@@ -53,6 +53,14 @@ type FixedPoint struct {
 	closed             bool
 }
 
+func (v *FixedPoint) sourceIsZero() bool {
+	return v.scaled.Sign() == 0 && !v.sourceZeroSlot
+}
+
+func (v *FixedPoint) sourceNegative() bool {
+	return v.scaled.Sign() < 0 || v.sourceZeroSlot && v.sourceZeroNegative
+}
+
 func NewFixedPointManager(intWords, fracWords uint32) (*FixedPointManager, error) {
 	if intWords == 0 || fracWords == 0 || uint64(intWords)+uint64(fracWords) > 1<<20 {
 		return nil, ErrFixedPointOwner
@@ -269,7 +277,7 @@ func (m *FixedPointManager) IsZero(a *FixedPoint) (bool, error) {
 	if err := m.check(a); err != nil {
 		return false, err
 	}
-	return a.scaled.Sign() == 0 && !a.sourceZeroSlot, nil
+	return a.sourceIsZero(), nil
 }
 
 func (m *FixedPointManager) IsInt(a *FixedPoint) (bool, error) {
@@ -358,6 +366,8 @@ func (m *FixedPointManager) Mul(a, b, out *FixedPoint) error {
 		return err
 	}
 	m.traceFixedProduct(a, b, out, false, false)
+	retainsSlot := !a.sourceIsZero() && !b.sourceIsZero()
+	negative := a.sourceNegative() != b.sourceNegative()
 	var product big.Int
 	product.Mul(&a.scaled, &b.scaled)
 	q, err := m.roundMagnitude(&product, &m.scale)
@@ -366,6 +376,12 @@ func (m *FixedPointManager) Mul(a, b, out *FixedPoint) error {
 	}
 	if err := m.publish(out, q); err != nil {
 		return err
+	}
+	if q.Sign() == 0 && retainsSlot {
+		// Source enters the nonzero-operand branch, allocates c, then copies
+		// zero product words without calling reset.
+		out.sourceZeroSlot = true
+		out.sourceZeroNegative = negative
 	}
 	m.traceFixedProduct(a, b, out, false, true)
 	return nil

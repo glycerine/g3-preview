@@ -7,28 +7,28 @@ func (m *FixedPointManager) IsPos(a *FixedPoint) (bool, error) {
 	if err := m.check(a); err != nil {
 		return false, err
 	}
-	return a.scaled.Sign() > 0 || a.sourceZeroSlot && !a.sourceZeroNegative, nil
+	return !a.sourceIsZero() && !a.sourceNegative(), nil
 }
 
 func (m *FixedPointManager) IsNeg(a *FixedPoint) (bool, error) {
 	if err := m.check(a); err != nil {
 		return false, err
 	}
-	return a.scaled.Sign() < 0 || a.sourceZeroSlot && a.sourceZeroNegative, nil
+	return a.sourceNegative(), nil
 }
 
 func (m *FixedPointManager) IsNonPos(a *FixedPoint) (bool, error) {
 	if err := m.check(a); err != nil {
 		return false, err
 	}
-	return !(a.scaled.Sign() > 0 || a.sourceZeroSlot && !a.sourceZeroNegative), nil
+	return a.sourceIsZero() || a.sourceNegative(), nil
 }
 
 func (m *FixedPointManager) IsNonNeg(a *FixedPoint) (bool, error) {
 	if err := m.check(a); err != nil {
 		return false, err
 	}
-	return !(a.scaled.Sign() < 0 || a.sourceZeroSlot && a.sourceZeroNegative), nil
+	return !a.sourceNegative(), nil
 }
 
 func (m *FixedPointManager) IsOne(a *FixedPoint) (bool, error) {
