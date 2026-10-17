@@ -49,6 +49,9 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	isolationConversion                                    algebraicIsolationConversionScope
+	isolateTmp1                                            UPolynomial
+	filterRootsRunning                                     bool
 	signEvaluationRunning                                  bool
 	signResultant                                          algebraicSignResultantScope
 	evalSignTmp                                            UPolynomial
@@ -850,6 +853,12 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	return m.store(dl, &out)
 }
 func (m *AlgebraicRootCore) CleanupRetained() error {
+	if m != nil && m.self == m && m.isolationConversion.running {
+		return ErrAlgebraicPending
+	}
+	if m != nil && m.self == m && m.filterRootsRunning {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.signEvaluationRunning {
 		return ErrAlgebraicPending
 	}
@@ -931,6 +940,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	if e := m.cleanupSignSubstitution(); e != nil {
 		return e
 	}
+	if e := m.cleanupIsolationConversion(); e != nil {
+		return e
+	}
 	if e := m.cleanupDivision(); e != nil {
 		return e
 	}
@@ -958,6 +970,12 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.comparisonCleanup()
 }
 func (m *AlgebraicRootCore) Close() error {
+	if m != nil && m.self == m && m.isolationConversion.running {
+		return ErrAlgebraicPending
+	}
+	if m != nil && m.self == m && m.filterRootsRunning {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.signEvaluationRunning {
 		return ErrAlgebraicPending
 	}
@@ -1065,7 +1083,7 @@ func (m *AlgebraicRootCore) Close() error {
 		}
 		m.factors = nil
 	}
-	for _, p := range []*UPolynomial{&m.tmp3, &m.tmp2} {
+	for _, p := range []*UPolynomial{&m.tmp3, &m.tmp2, &m.isolateTmp1} {
 		if p.slot != 0 {
 			if e := m.config.Polynomials.DelPolynomial(p); e != nil {
 				return e
