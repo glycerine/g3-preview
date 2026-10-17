@@ -24,7 +24,12 @@ func TestAPINumeralStringArithmeticFPAAndRefusal(t *testing.T) {
 	astTestMust(t, m.NumeralService().SetString(&value, "7/3"))
 	numeral, err := m.ArithmeticNumeral(&value, false)
 	astTestMust(t, err)
+	astTestMust(t, m.NumeralService().SetString(&value, "18446744073709551617"))
+	wideBV, err := m.BitVectorNumeral(&value, 65)
+	astTestMust(t, err)
 	astTestMust(t, m.NumeralService().Del(&value))
+	byteBV, err := m.BitVectorNumeralUint64(255, 8)
+	astTestMust(t, err)
 	floatSort, err := m.MkFamilySort(fpa, 3, nil)
 	astTestMust(t, err)
 	zero, err := m.MkFPAZeroOfSort(floatSort, true)
@@ -38,6 +43,8 @@ func TestAPINumeralStringArithmeticFPAAndRefusal(t *testing.T) {
 		want string
 	}{
 		{numeral, "7/3"},
+		{byteBV, "255"},
+		{wideBV, "18446744073709551617"},
 		{zero, "-zero"},
 		{rm, "roundTowardZero"},
 	} {
@@ -50,6 +57,13 @@ func TestAPINumeralStringArithmeticFPAAndRefusal(t *testing.T) {
 	astTestMust(t, err)
 	if got, err := c.numeralString(symbolic); got != "" || !errors.Is(err, errAPINumeralArgument) {
 		t.Fatal("source invalid numeral argument", got, err)
+	}
+	bvSort, err := m.GetSort(byteBV)
+	astTestMust(t, err)
+	symbolicBV, err := m.MkVar(1, bvSort)
+	astTestMust(t, err)
+	if got, err := c.numeralString(symbolicBV); got != "" || !errors.Is(err, errAPINumeralArgument) {
+		t.Fatal("source symbolic BitVec refusal", got, err)
 	}
 	astTestMust(t, c.Close())
 }

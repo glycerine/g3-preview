@@ -4315,7 +4315,7 @@
       "component": "api",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/api/api_numeral_string.go", "pkg/api/api_numeral_string_test.go", "pkg/ast/ast_fpa_api_numeral_text.go", "pkg/ast/ast_fpa_api_numeral_text_test.go"],
+      "go_targets": ["pkg/api/api_numeral_string.go", "pkg/api/api_numeral_string_test.go", "pkg/ast/ast_fpa_api_numeral_text.go", "pkg/ast/ast_fpa_api_numeral_text_test.go", "pkg/ast/ast_bv_api_numeral_text.go"],
       "tests": ["TestAPINumeralStringArithmeticFPAAndRefusal", "TestASTFPANumeralStringAPIScopedMPFAndBranches"],
       "assertions": [
         {
@@ -4327,10 +4327,10 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Selected Z3_get_numeral_string arithmetic rational and FPA rounding-mode/MPF fallback with caller-local scoped_mpf and temporary formatted text (api_numeral.cpp:187-228); BV/datalog and external C string integration remain open",
+          "name": "Selected Z3_get_numeral_string arithmetic and BitVec rational probes followed by FPA rounding-mode/MPF fallback with caller-local scoped_mpf and temporary formatted text (api_numeral.cpp:158-165,187-228); datalog and external C string integration remain open",
           "status": "partial",
           "go_target": "pkg/api/api_numeral_string.go",
-          "go_targets": ["pkg/ast/ast_fpa_api_numeral_text.go"],
+          "go_targets": ["pkg/ast/ast_fpa_api_numeral_text.go", "pkg/ast/ast_bv_api_numeral_text.go"],
           "tests": ["TestAPINumeralStringArithmeticFPAAndRefusal", "TestASTFPANumeralStringAPIScopedMPFAndBranches"]
         }
       ],
@@ -13408,7 +13408,8 @@
         "pkg/ast/ast_numeric_util_families_test.go",
         "pkg/ast/ast_bv_sign_bit_invocation_test.go",
         "pkg/ast/ast_bv_signed_normalization_invocation_test.go",
-        "pkg/ast/ast_native_plugin_caches_test.go"
+        "pkg/ast/ast_native_plugin_caches_test.go",
+        "pkg/ast/ast_bv_api_numeral_text.go"
       ],
       "tests": [
         "TestASTBitVectorAllOneSourceTrace",
@@ -13499,7 +13500,8 @@
         "TestASTBitVectorSignBitInvocationEveryActualReservation",
         "TestASTBitVectorSignBitInvocationAssertionBeforeInput",
         "TestASTBitVectorSignedNormalizationDistinctReturnAndCopy",
-        "TestASTBitVectorNativeCacheGrowthPreservesValidationAndOwnership"
+        "TestASTBitVectorNativeCacheGrowthPreservesValidationAndOwnership",
+        "TestAPINumeralStringArithmeticFPAAndRefusal"
       ],
       "conditionals": [
         {
@@ -13779,6 +13781,13 @@
             "TestASTBitVectorNumeralReadCopiesBeforeReachedWidthError",
             "TestASTBitVectorNumeralReadEveryActualCopyReservation"
           ]
+        },
+        {
+          "name": "Concrete API numeral-string BitVec probe copies the stored unsigned rational, reads width after copy, formats the value and deletes the caller temporary (api_numeral.cpp:158-165,187-194; bv_decl_plugin.cpp:778-790)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_bv_api_numeral_text.go",
+          "go_targets": ["pkg/api/api_numeral_string.go"],
+          "tests": ["TestAPINumeralStringArithmeticFPAAndRefusal"]
         },
         {
           "name": "Exact optional caller invocation around existing all-one recognizer body and real copied numeral/power/subtraction condition frame, without ambient numerical adoption (src/ast/bv_decl_plugin.cpp:794-803; src/ast/rewriter/bv_rewriter.h:38)",
