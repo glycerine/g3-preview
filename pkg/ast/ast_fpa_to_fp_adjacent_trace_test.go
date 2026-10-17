@@ -2,11 +2,25 @@ package ast
 
 import (
 	"bytes"
+	"io"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
+
+type astFPASignPrefixStopWriter struct{ bytes.Buffer }
+
+func (w *astFPASignPrefixStopWriter) Write(p []byte) (int, error) {
+	if strings.HasSuffix(w.Buffer.String(), "sgn: ") {
+		return 0, io.ErrClosedPipe
+	}
+	return w.Buffer.Write(p)
+}
+func (w *astFPASignPrefixStopWriter) WriteString(s string) (int, error) {
+	return w.Write([]byte(s))
+}
 
 func TestASTFPAToFPAdjacentSourceTraces(t *testing.T) {
 	m := astTestManager(t)
@@ -32,6 +46,10 @@ func TestASTFPAToFPAdjacentSourceTraces(t *testing.T) {
 	rm, err := m.MkFamilyApp(family, astFPARMNearestEven, nil, nil)
 	astTestMust(t, err)
 	formatDecl, err := m.MkFamilyFuncDecl(family, FPAOpToFP, ps, []ASTHandle{rmSort, fpSort}, ASTHandle{})
+	astTestMust(t, err)
+	ieeeSort, err := m.BitVectorSort(32)
+	astTestMust(t, err)
+	ieeeDecl, err := m.MkFamilyFuncDecl(family, FPAOpToFP, ps, []ASTHandle{ieeeSort}, ASTHandle{})
 	astTestMust(t, err)
 	signedSort, err := m.BitVectorSort(8)
 	astTestMust(t, err)
@@ -73,6 +91,10 @@ func TestASTFPAToFPAdjacentSourceTraces(t *testing.T) {
 	astTestMust(t, err)
 	signed, err := m.BitVectorNumeralUint64(255, 8)
 	astTestMust(t, err)
+	ieee, err := m.BitVectorNumeralUint64(0x3fc00000, 32)
+	astTestMust(t, err)
+	negativeIEEE, err := m.BitVectorNumeralUint64(0xbf800000, 32)
+	astTestMust(t, err)
 	var output bytes.Buffer
 	tags := diagnostic.NewTraceTagsWithWriter(&output)
 	tags.Enable("fp_rewriter")
@@ -83,7 +105,11 @@ func TestASTFPAToFPAdjacentSourceTraces(t *testing.T) {
 			t.Fatalf("FPA source trace branch: found=%v err=%v", found, e)
 		}
 	}
-	_, found, e := m.RewriteFPAToFPFormatNumeral(formatDecl, rm, m.external(inputRef))
+	_, found, e := m.RewriteFPAToFPIEEEBVNumeral(ieeeDecl, ieee)
+	check(found, e)
+	_, found, e = m.RewriteFPAToFPIEEEBVNumeral(ieeeDecl, negativeIEEE)
+	check(found, e)
+	_, found, e = m.RewriteFPAToFPFormatNumeral(formatDecl, rm, m.external(inputRef))
 	check(found, e)
 	_, found, e = m.RewriteFPAToFPSignedBVNumeral(signedDecl, rm, signed)
 	check(found, e)
@@ -99,7 +125,11 @@ func TestASTFPAToFPAdjacentSourceTraces(t *testing.T) {
 		}
 		return
 	}
-	want := "-------- [fp_rewriter] mk_to_fp src/ast/rewriter/fpa_rewriter.cpp:168 ---------\n" +
+	want := "-------- [fp_rewriter] mk_to_fp src/ast/rewriter/fpa_rewriter.cpp:143 ---------\n" +
+		"sgn: 0\nsig: 4194304\nexp: 0\nv: 1.5 0\n------------------------------------------------\n" +
+		"-------- [fp_rewriter] mk_to_fp src/ast/rewriter/fpa_rewriter.cpp:143 ---------\n" +
+		"sgn: 1\nsig: 0\nexp: 0\nv: -1.0 0\n------------------------------------------------\n" +
+		"-------- [fp_rewriter] mk_to_fp src/ast/rewriter/fpa_rewriter.cpp:168 ---------\n" +
 		"v: 1.5 0\n------------------------------------------------\n" +
 		"-------- [fp_rewriter] mk_to_fp src/ast/rewriter/fpa_rewriter.cpp:177 ---------\n" +
 		"r1: 255\n------------------------------------------------\n" +
@@ -119,6 +149,16 @@ func TestASTFPAToFPAdjacentSourceTraces(t *testing.T) {
 	_, found, e = m.RewriteFPAToFPFormatNumeral(formatDecl, rm, symbolic)
 	if e != nil || found || output.String() != want {
 		t.Fatalf("symbolic input reached a TRACE branch: found=%v err=%v trace=%q", found, e, output.String())
+	}
+	stopped := &astFPASignPrefixStopWriter{}
+	stoppedTags := diagnostic.NewTraceTagsWithWriter(stopped)
+	stoppedTags.Enable("fp_rewriter")
+	m.traceTags = stoppedTags
+	_, found, e = m.RewriteFPAToFPIEEEBVNumeral(ieeeDecl, ieee)
+	check(found, e)
+	wantPrefix := "-------- [fp_rewriter] mk_to_fp src/ast/rewriter/fpa_rewriter.cpp:143 ---------\nsgn: "
+	if got := stopped.String(); got != wantPrefix {
+		t.Fatalf("stopped source field prefix got %q, want %q", got, wantPrefix)
 	}
 	refused := diagnostic.NewTraceTagsWithWriter(astAppTraceRefusingWriter{})
 	refused.Enable("fp_rewriter")

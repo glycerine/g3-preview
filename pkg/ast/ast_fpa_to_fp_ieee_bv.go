@@ -131,6 +131,9 @@ func (m *ASTManager) RewriteFPAToFPIEEEBVNumeral(decl, bv ASTHandle) (out ASTHan
 	if result != nil {
 		return ASTHandle{}, true, result
 	}
+	if result = m.traceFPAToFPIEEEBVFields(!signFieldZero, &sig, exponent, &v.value); result != nil {
+		return ASTHandle{}, true, result
+	}
 	m.formatExecuting = previous
 	node, result = p.mkNumeral(&v.value, nil)
 	return ASTHandle{}, true, result
