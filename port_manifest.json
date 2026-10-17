@@ -156749,6 +156749,7 @@
         "pkg/util/numeral/mpf_formatted_set_scope.go",
         "pkg/util/numeral/mpf_formatted_set_source_test.go",
         "pkg/util/numeral/mpf_rational_set.go",
+        "pkg/util/numeral/mpf_rational_set_assertion_actions_test.go",
         "pkg/util/numeral/mpf_rational_set_allocation.go",
         "pkg/util/numeral/mpf_rational_set_allocation_source_test.go",
         "pkg/util/numeral/mpf_rational_set_callback_source_test.go",
@@ -157032,6 +157033,7 @@
         "TestArbitraryFloatExponentRationalSetSourceAliasAndBIGExponent",
         "TestArbitraryFloatExponentRationalSetZeroUnreadForeignFields",
         "TestArbitraryFloatExponentRationalSetAssertionHelperPrefix",
+        "TestArbitraryFloatRationalSetNormalizedSourceActions",
         "TestArbitraryFloatPlainRationalSetCallbackOwnerRefusal",
         "TestArbitraryFloatPlainRationalSetFirstOwnRawStopHistory",
         "TestArbitraryFloatPlainRationalSetEveryActualPrefix",
@@ -157936,7 +157938,8 @@
             "TestArbitraryFloatExponentRationalSetLiteralNormalization",
             "TestArbitraryFloatExponentRationalSetSourceAliasAndBIGExponent",
             "TestArbitraryFloatExponentRationalSetZeroUnreadForeignFields",
-            "TestArbitraryFloatExponentRationalSetAssertionHelperPrefix"
+            "TestArbitraryFloatExponentRationalSetAssertionHelperPrefix",
+            "TestArbitraryFloatRationalSetNormalizedSourceActions"
           ]
         },
         {

@@ -3,6 +3,7 @@ package numeral
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
@@ -199,9 +200,17 @@ func (m *ArbitraryFloatManager) setExponentRationalWithPlainCaller(out *Arbitrar
 	return m.traceSetOrdinaryResult(out, 300)
 }
 
-// Source: src/util/mpf.cpp:279. This helper retains the actual assertion
+// Source: src/util/mpf.cpp:274. This helper retains the actual assertion
 // operands and short circuit; it adds no source construction or acquisition.
 func (m *ArbitraryFloatManager) assertRationalSetNormalized(sig *Rational, c integerAllocationInvocationContext) error {
+	if !modularSourceDebug {
+		return nil
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil || !enabled {
+		return e
+	}
 	one, two := NewRational(), NewRational()
 	one.Num, two.Num = NewInt(1), NewInt(2)
 	low, e := m.rational.compareWithAllocationContext(&one, sig, c)
@@ -209,14 +218,14 @@ func (m *ArbitraryFloatManager) assertRationalSetNormalized(sig *Rational, c int
 		return e
 	}
 	if low > 0 {
-		return ErrIntegerAssertion
+		return diagnostic.DebugAssertionFailure(d, "src/util/mpf.cpp", 274, "(m_mpq_manager.le(1, sig) && m_mpq_manager.lt(sig, 2))")
 	}
 	high, e := m.rational.compareWithAllocationContext(sig, &two, c)
 	if e != nil {
 		return e
 	}
 	if high >= 0 {
-		return ErrIntegerAssertion
+		return diagnostic.DebugAssertionFailure(d, "src/util/mpf.cpp", 274, "(m_mpq_manager.le(1, sig) && m_mpq_manager.lt(sig, 2))")
 	}
 	return nil
 }
