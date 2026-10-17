@@ -62,6 +62,7 @@ type solverSetup struct {
 	equationCloseIndex int
 	solutionCloseIndex int
 	header             uint64
+	memoryDeallocLine  int
 	closed             bool
 	stop               error
 }
@@ -71,6 +72,10 @@ func newSolverSetup(m *numeral.RationalManager) (*solverSetup, error) {
 }
 
 func newSolverSetupWithDebug(m *numeral.RationalManager, debug *diagnostic.DebugContext) (*solverSetup, error) {
+	return newSolverSetupWithDebugTrace(m, debug, nil, 784)
+}
+
+func newSolverSetupWithDebugTrace(m *numeral.RationalManager, debug *diagnostic.DebugContext, tags *diagnostic.TraceTags, allocLine int) (*solverSetup, error) {
 	if m == nil || m.BudgetField == nil || m.Integers() == nil {
 		return nil, arena.ErrInvalidSlot
 	}
@@ -78,6 +83,10 @@ func newSolverSetupWithDebug(m *numeral.RationalManager, debug *diagnostic.Debug
 	if e := m.BudgetField.Reserve(header); e != nil {
 		return nil, e
 	}
+	s := &solverSetup{manager: m, trace: tags, inconsistent: nullEquationIndex,
+		nextX: nullEquationIndex, nextEq: nullEquationIndex, header: header, memoryDeallocLine: 788}
+	s.self = s
+	s.traceImpAllocated(allocLine)
 	decompose, e := numeral.NewScopedIntVector(m.Integers())
 	if e != nil {
 		m.BudgetField.Release(header)
@@ -113,9 +122,7 @@ func newSolverSetupWithDebug(m *numeral.RationalManager, debug *diagnostic.Debug
 		m.BudgetField.Release(header)
 		return nil, e
 	}
-	s := &solverSetup{manager: m, decomposeBuffer: decompose, asBuffer: as, bsBuffer: bs, tmpAs: tmpAs, tmpBs: tmpBs,
-		inconsistent: nullEquationIndex, nextX: nullEquationIndex, nextEq: nullEquationIndex, header: header}
-	s.self = s
+	s.decomposeBuffer, s.asBuffer, s.bsBuffer, s.tmpAs, s.tmpBs = decompose, as, bs, tmpAs, tmpBs
 	s.queue = solvedQueue{owner: s, debug: debug, bounds: 16, positions: make(map[int32]int)}
 	return s, nil
 }
@@ -277,6 +284,7 @@ func (s *solverSetup) Close() error {
 		return e
 	}
 	s.manager.BudgetField.Release(s.header)
+	s.traceImpDeallocated()
 	s.header = 0
 	s.parameter, s.solved, s.occurrences, s.equations, s.solution = nil, nil, nil, nil, nil
 	s.closed = true

@@ -46,7 +46,7 @@ func NewSolverWithDebug(m *numeral.RationalManager, debug *diagnostic.DebugConte
 	} else if e := m.CheckOwnerReady(); e != nil {
 		return nil, e
 	}
-	setup, e := newSolverSetupWithDebug(m, debug)
+	setup, e := newSolverSetupWithDebugTrace(m, debug, nil, 784)
 	if e != nil {
 		if owned {
 			e = errors.Join(e, m.CloseChecked())
@@ -184,12 +184,13 @@ func (s *Solver) Reset() error {
 		return e
 	}
 	if s.setup != nil {
+		s.setup.memoryDeallocLine = 799
 		if e := s.setup.Close(); e != nil {
 			return e
 		}
 		s.setup = nil
 	}
-	setup, e := newSolverSetupWithDebug(s.manager, s.debug)
+	setup, e := newSolverSetupWithDebugTrace(s.manager, s.debug, s.trace, 800)
 	if e != nil {
 		s.stop = e
 		return e
@@ -208,6 +209,9 @@ func (s *Solver) Close() error {
 		return nil
 	}
 	if s.setup != nil {
+		if s.setup.memoryDeallocLine != 799 {
+			s.setup.memoryDeallocLine = 788
+		}
 		if e := s.setup.Close(); e != nil {
 			return e
 		}
