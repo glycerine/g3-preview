@@ -497,6 +497,9 @@ func (m *BinaryRationalManager) IsNonNeg(a *BinaryRational) (bool, error) {
 	return m.Z.IsNonNeg(&a.Num)
 }
 func (m *BinaryRationalManager) normalize(a *BinaryRational) (err error) {
+	return m.normalizeWithAllocationContext(a, integerAllocationInvocationContext{})
+}
+func (m *BinaryRationalManager) normalizeWithAllocationContext(a *BinaryRational, context integerAllocationInvocationContext) (err error) {
 	if a.KField == 0 {
 		return nil
 	}
@@ -520,7 +523,7 @@ func (m *BinaryRationalManager) normalize(a *BinaryRational) (err error) {
 	if k > a.KField {
 		k = a.KField
 	}
-	if e = m.Z.MachineDiv2k(&a.Num, k, &a.Num); e != nil {
+	if e = m.Z.shiftWithAllocationContext(&a.Num, k, &a.Num, false, context); e != nil {
 		return e
 	}
 	a.KField -= k

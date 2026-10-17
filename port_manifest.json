@@ -38326,7 +38326,9 @@
         "pkg/util/numeral/rational_normalize_invocation.go",
         "pkg/util/numeral/rational_normalize_invocation_test.go",
         "pkg/math/polynomial/algebraic_bound_evaluation.go",
-        "pkg/math/polynomial/algebraic_bound_evaluation_test.go"
+        "pkg/math/polynomial/algebraic_bound_evaluation_test.go",
+        "pkg/math/polynomial/algebraic_bound_refinement.go",
+        "pkg/math/polynomial/algebraic_bound_refinement_test.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",
@@ -39197,7 +39199,9 @@
         "pkg/util/numeral/rational_normalize_invocation.go",
         "pkg/util/numeral/rational_normalize_invocation_test.go",
         "pkg/math/polynomial/algebraic_bound_evaluation.go",
-        "pkg/math/polynomial/algebraic_bound_evaluation_test.go"
+        "pkg/math/polynomial/algebraic_bound_evaluation_test.go",
+        "pkg/math/polynomial/algebraic_bound_refinement.go",
+        "pkg/math/polynomial/algebraic_bound_refinement_test.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",
@@ -48903,7 +48907,9 @@
         "pkg/math/polynomial/upolynomial_refinement_assertions.go",
         "pkg/math/polynomial/upolynomial_refinement_assertions_test.go",
         "pkg/math/polynomial/algebraic_bound_evaluation.go",
-        "pkg/math/polynomial/algebraic_bound_evaluation_test.go"
+        "pkg/math/polynomial/algebraic_bound_evaluation_test.go",
+        "pkg/math/polynomial/algebraic_bound_refinement.go",
+        "pkg/math/polynomial/algebraic_bound_refinement_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",

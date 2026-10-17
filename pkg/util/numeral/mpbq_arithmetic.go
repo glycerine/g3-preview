@@ -5,6 +5,9 @@ package numeral
 func (m *BinaryRationalManager) Add(a, b, r *BinaryRational) error { return m.addSub(a, b, r, false) }
 func (m *BinaryRationalManager) Sub(a, b, r *BinaryRational) error { return m.addSub(a, b, r, true) }
 func (m *BinaryRationalManager) addSub(a, b, r *BinaryRational, sub bool) (err error) {
+	return m.addSubWithAllocationContext(a, b, r, sub, integerAllocationInvocationContext{})
+}
+func (m *BinaryRationalManager) addSubWithAllocationContext(a, b, r *BinaryRational, sub bool, context integerAllocationInvocationContext) (err error) {
 	if e := m.triple(a, b, r); e != nil {
 		return e
 	}
@@ -29,7 +32,7 @@ func (m *BinaryRationalManager) addSub(a, b, r *BinaryRational, sub bool) (err e
 	x, y := &a.Num, &b.Num
 	k := a.KField
 	if a.KField < b.KField {
-		if e = m.Z.Mul2k(&a.Num, b.KField-a.KField, &m.Tmp); e != nil {
+		if e = m.Z.shiftWithAllocationContext(&a.Num, b.KField-a.KField, &m.Tmp, true, context); e != nil {
 			return e
 		}
 		k = b.KField
@@ -40,21 +43,21 @@ func (m *BinaryRationalManager) addSub(a, b, r *BinaryRational, sub bool) (err e
 		}
 	}
 	if a.KField > b.KField {
-		if e = m.Z.Mul2k(&b.Num, a.KField-b.KField, &m.Tmp); e != nil {
+		if e = m.Z.shiftWithAllocationContext(&b.Num, a.KField-b.KField, &m.Tmp, true, context); e != nil {
 			return e
 		}
 		x, y = &a.Num, &m.Tmp
 	}
 	if sub {
-		e = m.Z.Sub(x, y, &r.Num)
+		e = m.Z.addSubWithAllocationContext(x, y, &r.Num, true, context)
 	} else {
-		e = m.Z.Add(x, y, &r.Num)
+		e = m.Z.addSubWithAllocationContext(x, y, &r.Num, false, context)
 	}
 	if e != nil {
 		return e
 	}
 	r.KField = k
-	if e = m.normalize(r); e != nil {
+	if e = m.normalizeWithAllocationContext(r, context); e != nil {
 		return e
 	}
 	op := uint8(0)
@@ -229,13 +232,16 @@ func (m *BinaryRationalManager) negWithSourceContext(a *BinaryRational, context 
 	return m.Z.negWithAllocationContext(&a.Num, context)
 }
 func (m *BinaryRationalManager) Div2(a *BinaryRational) error {
+	return m.div2WithAllocationContext(a, integerAllocationInvocationContext{})
+}
+func (m *BinaryRationalManager) div2WithAllocationContext(a *BinaryRational, context integerAllocationInvocationContext) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
 	old := a.KField == 0
 	a.KField++
 	if old {
-		return m.normalize(a)
+		return m.normalizeWithAllocationContext(a, context)
 	}
 	return nil
 }
@@ -527,6 +533,9 @@ func (m *BinaryRationalManager) MagnitudeUpper(a *BinaryRational) (int32, error)
 	return int32(v - a.KField), e
 }
 func (m *BinaryRationalManager) LessOneDiv2k(a *BinaryRational, k uint32) (bool, error) {
+	return m.lessOneDiv2kWithAllocationContext(a, k, integerAllocationInvocationContext{})
+}
+func (m *BinaryRationalManager) lessOneDiv2kWithAllocationContext(a *BinaryRational, k uint32, context integerAllocationInvocationContext) (bool, error) {
 	if e := m.check(a); e != nil {
 		return false, e
 	}
@@ -537,7 +546,7 @@ func (m *BinaryRationalManager) LessOneDiv2k(a *BinaryRational, k uint32) (bool,
 		return false, nil
 	}
 	one := NewInt(1)
-	if e := m.Z.Mul2k(&one, a.KField-k, &m.Tmp); e != nil {
+	if e := m.Z.shiftWithAllocationContext(&one, a.KField-k, &m.Tmp, true, context); e != nil {
 		return false, e
 	}
 	return m.Z.Less(&a.Num, &m.Tmp)

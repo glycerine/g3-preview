@@ -433,3 +433,22 @@ func (m *IntegerModularManager) NegWithReceipt(a *Int, r *IntegerNormalizeInvoca
 func (m *IntegerModularManager) RootInPlaceWithReceipt(a *Int, n uint32, r *IntegerRootInvocationReceipt) (bool, error) {
 	return m.rootInPlaceWithReceipt(a, n, r)
 }
+
+func (o NumericBinaryRationalOperations) AddSub(a, b, out *BinaryRational, subtract bool) error {
+	if e := o.valid(); e != nil {
+		return e
+	}
+	return o.manager.addSubWithAllocationContext(a, b, out, subtract, o.context)
+}
+func (o NumericBinaryRationalOperations) Div2(a *BinaryRational) error {
+	if e := o.valid(); e != nil {
+		return e
+	}
+	return o.manager.div2WithAllocationContext(a, o.context)
+}
+func (o NumericBinaryRationalOperations) LessOneDiv2k(a *BinaryRational, k uint32) (bool, error) {
+	if e := o.valid(); e != nil {
+		return false, e
+	}
+	return o.manager.lessOneDiv2kWithAllocationContext(a, k, o.context)
+}
