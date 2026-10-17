@@ -3,6 +3,7 @@ package numeral
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
@@ -335,15 +336,36 @@ func (m *RationalManager) integerOperands(a, b *Rational) error {
 	}
 	return nil
 }
-func (m *RationalManager) integerOpWithAllocationContext(a, b *Rational, out *Int, operation uint8, context integerAllocationInvocationContext) error {
+func (m *RationalManager) integerOperandsAt(a, b *Rational, line int32) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
 	if e := m.check(b); e != nil {
 		return e
 	}
-	if modularSourceDebug && (!isIntegerRational(a) || !isIntegerRational(b)) {
-		return ErrRationalNotInteger
+	if !modularSourceDebug {
+		return nil
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil {
+		return e
+	}
+	if enabled && (!isIntegerRational(a) || !isIntegerRational(b)) {
+		return diagnostic.DebugAssertionFailure(d, "src/util/mpq.h", line, "is_int(a) && is_int(b)")
+	}
+	return nil
+}
+func (m *RationalManager) integerOpWithAllocationContext(a, b *Rational, out *Int, operation uint8, context integerAllocationInvocationContext) error {
+	line := int32(524)
+	switch operation {
+	case qIntegerMachineDiv:
+		line = 513
+	case qIntegerRem:
+		line = 537
+	}
+	if e := m.integerOperandsAt(a, b, line); e != nil {
+		return e
 	}
 	// Direct output identity preserves the source base-manager's divisor/output
 	// alias quirks for Euclidean division and remainder.
@@ -384,7 +406,7 @@ func (m *RationalManager) modWithAllocationContext(a, b, out *Rational, context 
 	if e := m.check(out); e != nil {
 		return e
 	}
-	if e := m.integerOperands(a, b); e != nil {
+	if e := m.integerOperandsAt(a, b, 550); e != nil {
 		return e
 	}
 	if e := m.Z.modWithAllocationContext(&a.Num, &b.Num, &out.Num, context); e != nil {

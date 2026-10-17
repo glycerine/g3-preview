@@ -3,7 +3,6 @@
 package numeral
 
 import (
-	"errors"
 	"math/big"
 	"testing"
 )
@@ -173,6 +172,9 @@ func TestRationalOpsIntegerWrappersOracleAndSourceAliasQuirks(t *testing.T) {
 	}
 }
 func TestRationalOpsIntegerProductsRatDivQuirksAndGuards(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TT")
+	}
 	for _, synch := range []bool{false, true} {
 		m, _ := rationalManager(t, synch)
 		q := NewRational()
@@ -202,7 +204,7 @@ func TestRationalOpsIntegerProductsRatDivQuirksAndGuards(t *testing.T) {
 		e := m.IDiv(&x, &y, &q)
 		divPublicationAudit(t, m, &q, &x, &y)
 		if modularSourceDebug {
-			if !errors.Is(e, ErrRationalNotInteger) || q != NewRational() {
+			if !isMPNVerificationThrow(e) || q != NewRational() {
 				t.Fatal(e)
 			}
 		} else {

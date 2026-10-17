@@ -5,6 +5,7 @@ package numeral
 import (
 	"errors"
 	"math/big"
+	"strings"
 	"testing"
 )
 
@@ -226,6 +227,9 @@ func TestDivisionPublicationSourceThreeAssertions(t *testing.T) {
 	}
 }
 func TestDivisionPublicationFractionalIntegerForwardProfiles(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, strings.Repeat("T", 8))
+	}
 	for _, sync := range []bool{false, true} {
 		for op := 0; op < 4; op++ {
 			m, _ := rationalManager(t, sync)
@@ -246,7 +250,7 @@ func TestDivisionPublicationFractionalIntegerForwardProfiles(t *testing.T) {
 			}
 			qopsAuditLiveOwnership(t, m, []*Int{&a.Num, &a.Den, &b.Num, &b.Den, &out.Num, &out.Den})
 			if modularSourceDebug {
-				if !errors.Is(e, ErrRationalNotInteger) || out.Num != NewInt(7) || out.Den != NewInt(9) {
+				if !isMPNVerificationThrow(e) || out.Num != NewInt(7) || out.Den != NewInt(9) {
 					t.Fatal(e)
 				}
 			} else {
@@ -457,6 +461,9 @@ func TestDivisionPublicationServiceInvalidResultCopyAndCleanup(t *testing.T) {
 }
 
 func TestDivisionPublicationIntegerForwardRawSignsAliases(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, strings.Repeat("T", 2*15*6*4*4))
+	}
 	for _, sync := range []bool{false, true} {
 		m, _ := rationalManager(t, sync)
 		for x := int32(-7); x <= 7; x++ {
@@ -495,7 +502,7 @@ func TestDivisionPublicationIntegerForwardRawSignsAliases(t *testing.T) {
 						}
 						qopsAuditLiveOwnership(t, m, []*Int{&a.Num, &a.Den, &b.Num, &b.Den, &out.Num, &out.Den})
 						if modularSourceDebug {
-							if !errors.Is(e, ErrRationalNotInteger) {
+							if !isMPNVerificationThrow(e) {
 								t.Fatal(e)
 							}
 							continue

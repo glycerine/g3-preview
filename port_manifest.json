@@ -115712,7 +115712,8 @@
             "TestDivisionPublicationZeroDivisorOutputAliases",
             "TestDivisionPublicationInverseCopyFailureBeforeDebugAssertion",
             "TestDivisionPublicationInverseTwoMinNegActions",
-            "TestRationalInverseSourceAssertionActions"
+            "TestRationalInverseSourceAssertionActions",
+            "TestRationalIntegerForwardSourceAssertionActions"
           ]
         },
         {
@@ -164496,7 +164497,8 @@
             "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
             "TestRationalOpsSourceComponentAliasActionOrder",
             "TestRationalOpsLargeLimbScratchBranchesAndWarm",
-            "TestRationalOpsAllPredictableFailurePrefixes"
+            "TestRationalOpsAllPredictableFailurePrefixes",
+            "TestRationalIntegerForwardSourceAssertionActions"
           ]
         },
         {
@@ -164516,7 +164518,8 @@
             "TestRationalOpsIntegerProductsRatDivQuirksAndGuards",
             "TestRationalOpsSourceComponentAliasActionOrder",
             "TestRationalOpsLargeLimbScratchBranchesAndWarm",
-            "TestRationalOpsAllPredictableFailurePrefixes"
+            "TestRationalOpsAllPredictableFailurePrefixes",
+            "TestRationalIntegerForwardSourceAssertionActions"
           ]
         },
         {

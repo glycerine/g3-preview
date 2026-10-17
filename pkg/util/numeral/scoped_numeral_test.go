@@ -176,10 +176,13 @@ func TestScopedNumeralScalarFailureAndAllThinOperations(t *testing.T) {
 		b.FailAfter(-1)
 		fraction := NewRational()
 		m.SetFraction(&fraction, 1, 2)
+		if modularSourceDebug {
+			bindMPNDebugActions(t, "T")
+		}
 		e = s.RemAssign(&fraction)
 		divPublicationAudit(t, m, &s.num, &fraction)
 		if modularSourceDebug {
-			if !errors.Is(e, ErrRationalNotInteger) {
+			if !isMPNVerificationThrow(e) {
 				t.Fatal(e)
 			}
 			if text, _ := s.Display(); text != "3" {
