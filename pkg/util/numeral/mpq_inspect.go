@@ -166,12 +166,21 @@ func (m *RationalManager) Unsigned(a *Rational) (uint32, error) {
 		return 0, e
 	}
 	if modularSourceDebug {
-		ok, e := m.IsUnsigned(a)
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return 0, e
 		}
-		if !ok {
-			return 0, ErrIntegerAssertion
+		if enabled {
+			ok, e := m.IsUnsigned(a)
+			if e != nil {
+				return 0, e
+			}
+			if !ok {
+				if e := diagnostic.DebugAssertionFailure(d, "src/util/rational.h", 108, "is_unsigned()"); e != nil {
+					return 0, e
+				}
+			}
 		}
 	}
 	v, e := m.Uint64(a)
@@ -199,12 +208,21 @@ func (m *RationalManager) Int32(a *Rational) (int32, error) {
 		return 0, e
 	}
 	if modularSourceDebug {
-		ok, e := m.IsInt32(a)
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return 0, e
 		}
-		if !ok {
-			return 0, ErrIntegerAssertion
+		if enabled {
+			ok, e := m.IsInt32(a)
+			if e != nil {
+				return 0, e
+			}
+			if !ok {
+				if e := diagnostic.DebugAssertionFailure(d, "src/util/rational.h", 121, "is_int32()"); e != nil {
+					return 0, e
+				}
+			}
 		}
 	}
 	v, e := m.Int64(a)

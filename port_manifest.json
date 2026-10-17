@@ -174937,6 +174937,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/numeral/inf_scalar_projection_test.go",
+        "pkg/util/numeral/rational_32_getter_assertion_source_test.go",
         "pkg/util/numeral/mp_lexical_constructor_test.go",
         "pkg/util/numeral/mp_lexical_scope_test.go",
         "pkg/util/numeral/mp_raw_projection_test.go",
@@ -174996,6 +174997,7 @@
         "pkg/util/lp/solver_expression_exact_test.go"
       ],
       "tests": [
+        "TestRational32GetterSourceAssertionActions",
         "TestSourceRationalConversionAssertions",
         "TestSourceRationalHashAssignmentHistory",
         "TestRationalInspectionPredicatesAndBoundaries",
@@ -175242,6 +175244,7 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpq_inspect.go",
           "tests": [
+            "TestRational32GetterSourceAssertionActions",
             "TestSourceRationalConversionAssertions",
             "TestSourceRationalHashAssignmentHistory",
             "TestRationalInspectionPredicatesAndBoundaries",
@@ -175260,6 +175263,7 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpq_inspect.go",
           "tests": [
+            "TestRational32GetterSourceAssertionActions",
             "TestSourceRationalConversionAssertions",
             "TestSourceRationalHashAssignmentHistory",
             "TestRationalInspectionPredicatesAndBoundaries",

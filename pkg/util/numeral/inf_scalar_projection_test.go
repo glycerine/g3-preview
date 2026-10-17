@@ -155,8 +155,8 @@ func TestInfScalarProjectionFacadeRawFieldsAndNarrowing(t *testing.T) {
 			serviceAuditRationalRoots(t, s, &v.Raw)
 			projectionExpectSourceGetterError(t, ie, den != 1)
 			projectionExpectSourceGetterError(t, ue, den != 1 || num < 0)
-			projectionExpectError(t, i32e, den != 1 || num < math.MinInt32 || num > math.MaxInt32)
-			projectionExpectError(t, u32e, den != 1 || num < 0 || uint64(num) > math.MaxUint32)
+			projectionExpectSourceGetterError(t, i32e, den != 1 || num < math.MinInt32 || num > math.MaxInt32)
+			projectionExpectSourceGetterError(t, u32e, den != 1 || num < 0 || uint64(num) > math.MaxUint32)
 			wantU := uint64(num)
 			if !v.Raw.Num.IsSmall() && num < 0 {
 				wantU = uint64(-num)

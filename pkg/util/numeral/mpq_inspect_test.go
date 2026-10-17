@@ -7,6 +7,7 @@ import (
 	"math"
 	"math/big"
 	"math/rand"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -111,7 +112,7 @@ func TestSourceRationalHashAssignmentHistory(t *testing.T) {
 }
 func TestRationalInspectionPredicatesAndBoundaries(t *testing.T) {
 	if modularSourceDebug {
-		bindMPNDebugActions(t, "TTTT")
+		bindMPNDebugActions(t, strings.Repeat("T", 32))
 	}
 	for _, synch := range []bool{false, true} {
 		m, _ := rationalManager(t, synch)
@@ -164,7 +165,7 @@ func TestRationalInspectionPredicatesAndBoundaries(t *testing.T) {
 			} else {
 				v, e := m.Unsigned(&a)
 				if modularSourceDebug {
-					if !errors.Is(e, ErrIntegerAssertion) {
+					if !isMPNVerificationThrow(e) {
 						t.Fatal(e)
 					}
 				} else {
@@ -187,7 +188,7 @@ func TestRationalInspectionPredicatesAndBoundaries(t *testing.T) {
 			} else {
 				v, e := m.Int32(&a)
 				if modularSourceDebug {
-					if !errors.Is(e, ErrIntegerAssertion) {
+					if !isMPNVerificationThrow(e) {
 						t.Fatal(e)
 					}
 				} else {
