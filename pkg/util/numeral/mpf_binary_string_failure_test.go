@@ -137,8 +137,9 @@ func TestArbitraryFloatBinaryStringEntryAuthority(t *testing.T) {
 	}
 	m.binaryString.invocation = 0
 	if modularSourceDebug {
+		bindMPNDebugActions(t, "T")
 		x.significand = NewInt(-1)
-		if e := m.ToStringBinary(&x, 0, 0, &later); !errors.Is(e, ErrIntegerAssertion) {
+		if e := m.ToStringBinary(&x, 0, 0, &later); !isMPNVerificationThrow(e) {
 			t.Fatal("source nonnegative assertion", e)
 		}
 		serviceMust(t, m.CleanupBinaryString())

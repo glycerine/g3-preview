@@ -190,8 +190,18 @@ func (s *arbitraryFloatBinaryStringScope) run(x *ArbitraryFloat, upper, lower ui
 		}
 		return s.assignExpr()
 	}
-	if modularSourceDebug && x.significand.Val < 0 {
-		return ErrIntegerAssertion
+	assertionsEnabled, e := mpfSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if assertionsEnabled {
+		negative, e := z.IsNeg(&x.significand)
+		if e != nil {
+			return e
+		}
+		if e := mpfSourceAssertion(!negative, 1654, "m_mpz_manager.is_nonneg(sig(x))"); e != nil {
+			return e
+		}
 	}
 	if e := s.beginExpr(); e != nil {
 		return e
