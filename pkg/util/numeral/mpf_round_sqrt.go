@@ -4,6 +4,8 @@ package numeral
 import (
 	"errors"
 	"io"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 // RoundSqrt follows the source's specialized guard-bit switch. The caller owns
@@ -99,7 +101,9 @@ func (m *ArbitraryFloatManager) RoundSqrtWithReceipt(mode ArbitraryFloatRounding
 	case ArbitraryFloatTowardPositive:
 		inc = round || sticky
 	default:
-		return ErrIntegerAssertion
+		if e := diagnostic.BorrowProcessDebugContext().UnreachableSource("src/util/mpf.cpp", 2120); e != nil {
+			return e
+		}
 	}
 	m.traceRoundSqrtDecision(last, round, sticky, inc)
 	if inc {

@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
@@ -308,7 +309,9 @@ func (m *ArbitraryFloatManager) roundWithParentContext(mode ArbitraryFloatRoundi
 		inc = x.Sign() && (round || sticky)
 	case ArbitraryFloatTowardZero:
 	default:
-		return ErrIntegerAssertion
+		if e := diagnostic.BorrowProcessDebugContext().UnreachableSource("src/util/mpf.cpp", 2052); e != nil {
+			return e
+		}
 	}
 	m.traceRoundFlag(2055, "Rounding increment -> significand +", inc)
 	if inc {

@@ -157674,6 +157674,7 @@
         "TestArbitraryFloatRoundSqrtRawFieldEveryNumericPrefix",
         "TestArbitraryFloatRoundSqrtLiteralBitModes",
         "TestArbitraryFloatRoundSqrtActualTLSAllocationReceipt",
+        "TestArbitraryFloatRoundDefaultsReachSourceUnreachable",
         "TestArbitraryFloatSignSourceBranches",
         "TestArbitraryFloatSignCopyAllocationPrefixes",
         "TestArbitraryFloatSignErasedAllocationPaths",
@@ -158547,7 +158548,8 @@
             "TestArbitraryFloatRoundYoungerStickyNUMStopsOlderClass",
             "TestArbitraryFloatRoundColdCachedPowerAndNumericPrefixes",
             "TestArbitraryFloatRoundLiteralHalfwayModes",
-            "TestArbitraryFloatRoundWidthSourceAssertion"
+            "TestArbitraryFloatRoundWidthSourceAssertion",
+            "TestArbitraryFloatRoundDefaultsReachSourceUnreachable"
           ]
         },
         {
@@ -158560,7 +158562,8 @@
             "TestArbitraryFloatRoundSqrtDetachedDescriptorAcrossOlderScratchStop",
             "TestArbitraryFloatRoundSqrtRawFieldEveryNumericPrefix",
             "TestArbitraryFloatRoundSqrtLiteralBitModes",
-            "TestArbitraryFloatRoundSqrtActualTLSAllocationReceipt"
+            "TestArbitraryFloatRoundSqrtActualTLSAllocationReceipt",
+            "TestArbitraryFloatRoundDefaultsReachSourceUnreachable"
           ]
         },
         {
