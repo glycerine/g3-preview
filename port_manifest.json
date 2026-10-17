@@ -17414,7 +17414,8 @@
         "pkg/ast/ast_fpa_extrema_test.go",
         "pkg/ast/ast_fpa_rounding_read.go",
         "pkg/ast/ast_fpa_rm_unary_decl.go",
-        "pkg/ast/ast_fpa_fma_decl.go"
+        "pkg/ast/ast_fpa_fma_decl.go",
+        "pkg/ast/ast_fpa_rm_binary_decl.go"
       ],
       "tests": [
         "TestASTFloatingPointClassificationDeclarationsAndApplications",
@@ -17444,7 +17445,8 @@
         "TestASTFPARemainderDeclarationAndApplication",
         "TestASTFPAExtremaDeclarationsAndNumericBranches",
         "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup",
-        "TestASTFPAFMADeclarationNumericAndScopedBranches"
+        "TestASTFPAFMADeclarationNumericAndScopedBranches",
+        "TestASTFPARMBinaryDeclarationsAndNumericCleanup"
       ],
       "assertions": [
         {
@@ -17637,6 +17639,14 @@
           "go_target": "pkg/ast/ast_fpa_fma_decl.go",
           "tests": [
             "TestASTFPAFMADeclarationNumericAndScopedBranches"
+          ]
+        },
+        {
+          "name": "Concrete fp.add/fp.sub/fp.mul/fp.div rounding-mode binary declarations with three exact domains and floating-point result (fpa_decl_plugin.cpp:374-392)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_rm_binary_decl.go",
+          "tests": [
+            "TestASTFPARMBinaryDeclarationsAndNumericCleanup"
           ]
         }
       ],
@@ -26762,7 +26772,9 @@
         "pkg/ast/ast_fpa_rm_unary.go",
         "pkg/ast/rewriter/fpa_rm_unary.go",
         "pkg/ast/ast_fpa_fma.go",
-        "pkg/ast/rewriter/fpa_fma.go"],
+        "pkg/ast/rewriter/fpa_fma.go",
+        "pkg/ast/ast_fpa_rm_binary.go",
+        "pkg/ast/rewriter/fpa_rm_binary.go"],
       "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestASTFPAUnaryScopedNumeralRetiresBeforeReturn", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
         "TestASTFPARemainderFiniteNumeralAndScopedCleanup",
         "TestFPARemainderNumericSpecialAndSymbolicRefusal",
@@ -26771,7 +26783,9 @@
         "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup",
         "TestFPARMUnarySqrtAndIntegralDispatch",
         "TestASTFPAFMADeclarationNumericAndScopedBranches",
-        "TestFPAFMANumericSpecialAndSymbolicDispatch"],
+        "TestFPAFMANumericSpecialAndSymbolicDispatch",
+        "TestASTFPARMBinaryDeclarationsAndNumericCleanup",
+        "TestFPARMBinaryNumericAndSubtractionRewrite"],
       "assertions": [
         {
           "line": 43,
@@ -27058,6 +27072,15 @@
             "TestASTFPAFMADeclarationNumericAndScopedBranches",
             "TestFPAFMANumericSpecialAndSymbolicDispatch"
           ]
+        },
+        {
+          "name": "mk_add/mk_mul/mk_div numeric branches with mode guard and three scoped_mpf locals; mk_sub unconditional add-of-negation structural rewrite (fpa_rewriter.cpp:256-307)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_rm_binary.go",
+          "tests": [
+            "TestASTFPARMBinaryDeclarationsAndNumericCleanup",
+            "TestFPARMBinaryNumericAndSubtractionRewrite"
+          ]
         }
       ],
       "ownership": ["Each classification call creates one caller-local scoped_mpf through the AST plugin's concrete numeral probe; successful source destruction retires it before the Boolean result is published. A stopped source destructor remains in the AST plugin's owning cleanup list.", "SMT and IEEE equality construct both scoped_mpf locals before operand probing and retire them in reverse order, preserving the short circuit when the first operand is symbolic."],
@@ -27072,12 +27095,14 @@
         "pkg/ast/rewriter/fpa_remainder.go",
         "pkg/ast/rewriter/fpa_extrema.go",
         "pkg/ast/rewriter/fpa_rm_unary.go",
-        "pkg/ast/rewriter/fpa_fma.go"],
+        "pkg/ast/rewriter/fpa_fma.go",
+        "pkg/ast/rewriter/fpa_rm_binary.go"],
       "tests": ["TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
         "TestFPARemainderNumericSpecialAndSymbolicRefusal",
         "TestFPAExtremaNaNInfinitySignedZeroAndSymbolic",
         "TestFPARMUnarySqrtAndIntegralDispatch",
-        "TestFPAFMANumericSpecialAndSymbolicDispatch"],
+        "TestFPAFMANumericSpecialAndSymbolicDispatch",
+        "TestFPARMBinaryNumericAndSubtractionRewrite"],
       "conditionals": [
         {
           "line": 19,
@@ -27121,6 +27146,14 @@
           "go_target": "pkg/ast/rewriter/fpa_fma.go",
           "tests": [
             "TestFPAFMANumericSpecialAndSymbolicDispatch"
+          ]
+        },
+        {
+          "name": "Concrete mk_add/mk_sub/mk_mul/mk_div declarations and reached dispatch (fpa_rewriter.h; fpa_rewriter.cpp:62-67,256-307)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_rm_binary.go",
+          "tests": [
+            "TestFPARMBinaryNumericAndSubtractionRewrite"
           ]
         }],
       "ownership": [],
@@ -178490,7 +178523,8 @@
         "pkg/ast/ast_fpa_remainder.go",
         "pkg/ast/ast_fpa_extrema.go",
         "pkg/ast/ast_fpa_rm_unary.go",
-        "pkg/ast/ast_fpa_fma.go"
+        "pkg/ast/ast_fpa_fma.go",
+        "pkg/ast/ast_fpa_rm_binary.go"
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
@@ -178588,7 +178622,8 @@
         "TestASTFPARemainderFiniteNumeralAndScopedCleanup",
         "TestASTFPAExtremaDeclarationsAndNumericBranches",
         "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup",
-        "TestASTFPAFMADeclarationNumericAndScopedBranches"
+        "TestASTFPAFMADeclarationNumericAndScopedBranches",
+        "TestASTFPARMBinaryDeclarationsAndNumericCleanup"
       ],
       "conditionals": [
         {
@@ -178939,6 +178974,14 @@
           "go_target": "pkg/ast/ast_fpa_fma.go",
           "tests": [
             "TestASTFPAFMADeclarationNumericAndScopedBranches"
+          ]
+        },
+        {
+          "name": "Concrete mk_add/mk_mul/mk_div two operand and one result scoped_mpf lifetimes after rounding-mode guard (fpa_rewriter.cpp:256-307; scoped_numeral.h:24-33)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_rm_binary.go",
+          "tests": [
+            "TestASTFPARMBinaryDeclarationsAndNumericCleanup"
           ]
         }
       ],

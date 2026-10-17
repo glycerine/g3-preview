@@ -178,12 +178,14 @@ func (m *ASTManager) mkFamilyAppDomainArguments(fid FamilyID, k int32, ps []ASTP
 		decl, e = m.basicDecl(k, ps, domain)
 	} else if m.pluginAt(fid).kind == astArrayPlugin {
 		decl, e = m.arrayDecl(k, ps, domain, ASTHandle{})
-	} else if m.pluginAt(fid).kind == astFloatingPointPlugin && k >= 0 && (k <= astFPAMinusZero || k == astFPANeg || k >= astFPARem && k <= astFPARoundToIntegral || k >= astFPAEq && k <= astFPAGe || k >= astFPAIsNaN && k <= astFPAIsPositive) {
+	} else if m.pluginAt(fid).kind == astFloatingPointPlugin && k >= 0 && (k <= astFPAMinusZero || k >= astFPAAdd && k <= astFPARoundToIntegral || k >= astFPAEq && k <= astFPAGe || k >= astFPAIsNaN && k <= astFPAIsPositive) {
 		previous := m.formatExecuting
 		m.formatExecuting = true
 		defer func() { m.formatExecuting = previous }()
 		if k == astFPANeg || k == astFPAAbs {
 			decl, e = m.floatingPointUnaryDecl(k, domain)
+		} else if k == astFPAAdd || k == astFPASub || k == astFPAMul || k == astFPADiv {
+			decl, e = m.floatingPointRMBinaryDecl(k, domain)
 		} else if k == astFPARem || k == astFPAMin || k == astFPAMax {
 			decl, e = m.floatingPointBinaryDecl(k, domain)
 		} else if k == astFPASqrt || k == astFPARoundToIntegral {
@@ -245,12 +247,14 @@ func (m *ASTManager) mkFamilyFuncDecl(fid FamilyID, k int32, ps []ASTParameter, 
 		r, e = m.basicDecl(k, ps, domain)
 	} else if m.pluginAt(fid).kind == astArrayPlugin {
 		r, e = m.arrayDecl(k, ps, domain, rangeSort)
-	} else if m.pluginAt(fid).kind == astFloatingPointPlugin && k >= 0 && (k <= astFPAMinusZero || k == astFPANeg || k >= astFPARem && k <= astFPARoundToIntegral || k >= astFPAEq && k <= astFPAGe || k >= astFPAIsNaN && k <= astFPAIsPositive) {
+	} else if m.pluginAt(fid).kind == astFloatingPointPlugin && k >= 0 && (k <= astFPAMinusZero || k >= astFPAAdd && k <= astFPARoundToIntegral || k >= astFPAEq && k <= astFPAGe || k >= astFPAIsNaN && k <= astFPAIsPositive) {
 		previous := m.formatExecuting
 		m.formatExecuting = true
 		defer func() { m.formatExecuting = previous }()
 		if k == astFPANeg || k == astFPAAbs {
 			r, e = m.floatingPointUnaryDecl(k, domain)
+		} else if k == astFPAAdd || k == astFPASub || k == astFPAMul || k == astFPADiv {
+			r, e = m.floatingPointRMBinaryDecl(k, domain)
 		} else if k == astFPARem || k == astFPAMin || k == astFPAMax {
 			r, e = m.floatingPointBinaryDecl(k, domain)
 		} else if k == astFPASqrt || k == astFPARoundToIntegral {

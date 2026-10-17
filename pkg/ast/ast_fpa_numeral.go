@@ -25,7 +25,11 @@ const (
 	astFPANaN              int32 = 8
 	astFPAPlusZero         int32 = 9
 	astFPAMinusZero        int32 = 10
+	astFPAAdd              int32 = 11
+	astFPASub              int32 = 12
 	astFPANeg              int32 = 13
+	astFPAMul              int32 = 14
+	astFPADiv              int32 = 15
 	astFPARem              int32 = 16
 	astFPAAbs              int32 = 17
 	astFPAMin              int32 = 18

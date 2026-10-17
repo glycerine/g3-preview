@@ -58,6 +58,27 @@ func (r *FPARewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out ast.
 		}
 		return r.fpaUnary(arg, kind, out)
 	}
+	if kind == ast.FPAOpAdd || kind == ast.FPAOpSub || kind == ast.FPAOpMul || kind == ast.FPAOpDiv {
+		if args.Count() != 3 {
+			return RewriteFailed, ast.ErrASTDomain
+		}
+		rm, err := args.At(0)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		left, err := args.At(1)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		right, err := args.At(2)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		if kind == ast.FPAOpSub {
+			return r.fpaSub(rm, left, right, out)
+		}
+		return r.fpaRMBinary(rm, left, right, kind, out)
+	}
 	if kind == ast.FPAOpRem {
 		if args.Count() != 2 {
 			return RewriteFailed, ast.ErrASTDomain
