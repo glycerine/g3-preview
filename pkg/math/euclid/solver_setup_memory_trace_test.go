@@ -2,12 +2,14 @@ package euclid
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
 	"strings"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -18,6 +20,37 @@ func euclidImpMemoryRecord(prefix string, s *solverSetup, line int) string {
 		record += " imp " + strconv.FormatUint(uint64(reflect.TypeOf(solverSetup{}).Size()), 10)
 	}
 	return record + "\n"
+}
+
+func TestEuclideanImpMemoryResetRefusalAfterOldDeallocation(t *testing.T) {
+	m := euclidNumeralManager(t)
+	baseline := m.BudgetField.Used()
+	s, err := NewSolver(m)
+	euclidMust(t, err)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("memory")
+	euclidMust(t, s.BindTrace(tags))
+	old := s.setup
+	m.BudgetField.FailAfter(0)
+	err = s.Reset()
+	m.BudgetField.FailAfter(-1)
+	if !errors.Is(err, arena.ErrInjectedFailure) || s.setup != nil || s.stop == nil {
+		t.Fatalf("reset replacement did not stop after old owner teardown: %v %#v", err, s.setup)
+	}
+	if diagnostic.DebugBuild {
+		want := euclidImpMemoryRecord("dealloc ", old, 799)
+		got := output.String()
+		if strings.Count(got, want) != 1 || strings.Contains(got, "src/math/euclid/euclidean_solver.cpp:800 imp ") {
+			t.Fatalf("reset refusal memory prefix: %q", got)
+		}
+	} else if output.Len() != 0 {
+		t.Fatalf("ordinary build emitted memory records: %q", output.String())
+	}
+	euclidMust(t, s.Close())
+	if got := m.BudgetField.Used(); got != baseline {
+		t.Fatalf("reset refusal retained solver bytes: %d, baseline %d", got, baseline)
+	}
 }
 
 func TestEuclideanImpMemoryWrappersEncloseEquationLifetime(t *testing.T) {

@@ -35638,6 +35638,7 @@
         "TestEuclideanEquationMemoryDeallocationSuppressedDuringFinalize",
         "TestEuclideanImpMemoryWrappersEncloseEquationLifetime",
         "TestEuclideanImpMemoryWrappersResetSites",
+        "TestEuclideanImpMemoryResetRefusalAfterOldDeallocation",
         "TestEuclideanEquationHeaderRefusalPrecedesBufferMutation",
         "TestEuclideanEquationUnsortedDecompositionBranch",
         "TestEuclideanIntegerBufferSortAndRawSwap",
@@ -35790,7 +35791,8 @@
             "TestEuclideanSetupHeaderRefusalBeforeBuffers",
             "TestEuclideanSetupSolvedVariableQueue",
             "TestEuclideanImpMemoryWrappersEncloseEquationLifetime",
-            "TestEuclideanImpMemoryWrappersResetSites"
+            "TestEuclideanImpMemoryWrappersResetSites",
+            "TestEuclideanImpMemoryResetRefusalAfterOldDeallocation"
           ]
         },
         {
@@ -35886,7 +35888,7 @@
         },
         {
           "name": "public solver wrapper, owned/borrowed numeral manager, reset, explanation with source SASSERT switch read at cpp:569, parameter query and display at cpp:485-501,788-845",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/euclid/solver.go",
           "tests": [
             "TestEuclideanPublicSolverBorrowedManagerSolveNormalizeReset",
@@ -35894,7 +35896,8 @@
             "TestEuclideanPublicSolverOwnedManagerAndClosedGuards",
             "TestEuclideanPublicSolverContradictionExplanationAndDisplay",
             "TestEuclideanJustificationAndRecentSolutionAssertionReads",
-            "TestEuclideanPublicSolverResetAfterGuardedAssertionError"
+            "TestEuclideanPublicSolverResetAfterGuardedAssertionError",
+            "TestEuclideanImpMemoryResetRefusalAfterOldDeallocation"
           ]
         }
       ],
@@ -35943,13 +35946,14 @@
       "methods": [
         {
           "name": "constructor/destructor, manager, reset, mk_var, mk_justification, assert_eq, solve, get_justification, inconsistent, is_parameter, normalize and display",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/euclid/solver.go",
           "tests": [
             "TestEuclideanPublicSolverBorrowedManagerSolveNormalizeReset",
             "TestEuclideanPublicSolverOwnedManagerAndClosedGuards",
             "TestEuclideanPublicSolverContradictionExplanationAndDisplay",
-            "TestEuclideanPublicSolverResetAfterGuardedAssertionError"
+            "TestEuclideanPublicSolverResetAfterGuardedAssertionError",
+            "TestEuclideanImpMemoryResetRefusalAfterOldDeallocation"
           ]
         }
       ],
@@ -154036,7 +154040,8 @@
           "go_target": "pkg/math/euclid/solver_setup_memory_trace.go",
           "tests": [
             "TestEuclideanImpMemoryWrappersEncloseEquationLifetime",
-            "TestEuclideanImpMemoryWrappersResetSites"
+            "TestEuclideanImpMemoryWrappersResetSites",
+            "TestEuclideanImpMemoryResetRefusalAfterOldDeallocation"
           ]
         },
         {
@@ -155093,7 +155098,8 @@
           "go_target": "pkg/math/euclid/solver_setup_memory_trace.go",
           "tests": [
             "TestEuclideanImpMemoryWrappersEncloseEquationLifetime",
-            "TestEuclideanImpMemoryWrappersResetSites"
+            "TestEuclideanImpMemoryWrappersResetSites",
+            "TestEuclideanImpMemoryResetRefusalAfterOldDeallocation"
           ]
         },
         {
