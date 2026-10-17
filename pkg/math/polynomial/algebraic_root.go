@@ -49,6 +49,7 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	selection                                              algebraicSelectionScope
 	basicRootScope                                         algebraicBasicRootScope
 	division                                               algebraicDivisionScope
 	binary                                                 algebraicBinaryScope
@@ -840,6 +841,9 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	return m.store(dl, &out)
 }
 func (m *AlgebraicRootCore) CleanupRetained() error {
+	if m != nil && m.self == m && m.selection.running {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.basicRootScope.running {
 		return ErrAlgebraicPending
 	}
@@ -882,6 +886,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	if e := m.cleanupBasicRoot(); e != nil {
 		return e
 	}
+	if e := m.cleanupSelection(); e != nil {
+		return e
+	}
 	if e := m.cleanupDivision(); e != nil {
 		return e
 	}
@@ -909,6 +916,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.comparisonCleanup()
 }
 func (m *AlgebraicRootCore) Close() error {
+	if m != nil && m.self == m && m.selection.running {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.basicRootScope.running {
 		return ErrAlgebraicPending
 	}
