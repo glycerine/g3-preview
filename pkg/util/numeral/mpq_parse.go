@@ -5,12 +5,30 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 var ErrMixedNotation = errors.New("mpnum: mixing rational/scientific notation")
 var ErrExponentTooLarge = errors.New("mpnum: exponent is too big")
+
+// The two reached digit guards in mpq_manager::set have the same source
+// assertion but distinct locations and occur before distinct mutations.
+func rationalParserDigitAssertion(b byte, line int32) error {
+	if !modularSourceDebug {
+		return nil
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil {
+		return e
+	}
+	if enabled && b-'0' > 9 {
+		return diagnostic.DebugAssertionFailure(d, "src/util/mpq.cpp", line, "str[0] - '0' <= 9")
+	}
+	return nil
+}
 
 // The three parser-owned rational values have fixed source declaration order:
 // b, _exp, _ten. Their destructors run in the reverse order.
@@ -115,6 +133,9 @@ func (m *RationalManager) SetString(out *Rational, text string) (err error) {
 			break
 		}
 		if b >= '0' && b <= '9' {
+			if e := rationalParserDigitAssertion(b, 197); e != nil {
+				return e
+			}
 			digit := NewInt(int32(b - '0'))
 			if e := m.Z.Mul(&out.Num, &ten, &tmp); e != nil {
 				return e
@@ -208,6 +229,9 @@ func (m *RationalManager) parseRationalSuffix(work *Rational, text string, i int
 		for ; numeralByte(text, i) != 0; i++ {
 			b := numeralByte(text, i)
 			if b >= '0' && b <= '9' {
+				if e := rationalParserDigitAssertion(b, 235); e != nil {
+					return e
+				}
 				exponent = 10*exponent + uint64(b-'0')
 			} else if b == '/' {
 				return &ParseError{Reason: ParseMixedNotation}

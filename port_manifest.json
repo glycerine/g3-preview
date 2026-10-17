@@ -163089,7 +163089,8 @@
             "TestParserBudgetFailureCleanup",
             "TestParserWarmLifetimeAndInitialization",
             "TestSourceParserLiteralInventory",
-            "TestParserSourceIntMinRepresentation"
+            "TestParserSourceIntMinRepresentation",
+            "TestRationalParserDigitSourceAssertionStops"
           ]
         },
         {
@@ -164264,7 +164265,8 @@
             "TestParserBudgetFailureCleanup",
             "TestParserWarmLifetimeAndInitialization",
             "TestSourceParserLiteralInventory",
-            "TestParserSourceIntMinRepresentation"
+            "TestParserSourceIntMinRepresentation",
+            "TestRationalParserDigitSourceAssertionStops"
           ]
         },
         {
