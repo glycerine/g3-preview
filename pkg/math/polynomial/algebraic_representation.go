@@ -118,7 +118,7 @@ func (m *AlgebraicRootCore) copyBinaryBound(a *Algebraic, out *unumeral.BinaryRa
 	if e := m.check(); e != nil {
 		return e
 	}
-	if m.bounds.remaining != 0 || m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.bounds.copy) || m.bounds.conversion.pending(m) {
+	if m.bounds.remaining != 0 || m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.bounds.copy) || m.bounds.conversion.pending(m) || m.bounds.evaluationPending(m) {
 		return ErrAlgebraicPending
 	}
 	r, e := m.irrationalBoundRecord(a, upper)
@@ -135,6 +135,7 @@ func (m *AlgebraicRootCore) copyBinaryBound(a *Algebraic, out *unumeral.BinaryRa
 }
 
 type algebraicBoundScope struct {
+	evaluation upolyBinaryEvaluationInvocationReceipt
 	conversion algebraicBoundConversion
 	copy       unumeral.IntegerCopyAllocationReceipt
 	values     [2]unumeral.BinaryRational
@@ -150,10 +151,16 @@ func (m *AlgebraicRootCore) finishBounds(owning bool) error {
 	}
 	s.executing = true
 	defer func() { s.executing = false }()
+	if !owning && s.evaluationSourceCause(m) != nil {
+		return s.evaluationSourceCause(m)
+	}
 	if !owning && s.conversion.stop != nil {
 		return s.conversion.stop
 	}
 	if owning {
+		if e := s.cleanupEvaluation(m); e != nil {
+			return e
+		}
 		if e := s.conversion.cleanup(); e != nil {
 			return e
 		}
@@ -189,9 +196,10 @@ func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, 
 		return e
 	}
 	s := &m.bounds
-	if s.remaining != 0 || m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&s.copy) || s.conversion.pending(m) {
+	if s.remaining != 0 || m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&s.copy) || s.conversion.pending(m) || s.evaluationPending(m) {
 		return ErrAlgebraicPending
 	}
+	s.evaluation = upolyBinaryEvaluationInvocationReceipt{}
 	r := algebraicRecord{value: unumeral.NewRational()}
 	if refine {
 		if l != nil {
@@ -216,7 +224,7 @@ func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, 
 	s.remaining = 1
 	if refine {
 		s.remaining = 2
-		if _, e = m.intervalAtPrecisionWithReceipt(&r, &s.values[0], &s.values[1], precision, &s.copy); e != nil {
+		if _, e = m.intervalAtPrecisionWithReceipt(&r, &s.values[0], &s.values[1], precision, &s.copy, &s.evaluation); e != nil {
 			return e
 		}
 	} else {
@@ -236,9 +244,9 @@ func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, 
 }
 
 func (m *AlgebraicRootCore) intervalAtPrecision(r *algebraicRecord, lower, upper *unumeral.BinaryRational, precision uint32) (bool, error) {
-	return m.intervalAtPrecisionWithReceipt(r, lower, upper, precision, nil)
+	return m.intervalAtPrecisionWithReceipt(r, lower, upper, precision, nil, nil)
 }
-func (m *AlgebraicRootCore) intervalAtPrecisionWithReceipt(r *algebraicRecord, lower, upper *unumeral.BinaryRational, precision uint32, receipt *unumeral.IntegerCopyAllocationReceipt) (bool, error) {
+func (m *AlgebraicRootCore) intervalAtPrecisionWithReceipt(r *algebraicRecord, lower, upper *unumeral.BinaryRational, precision uint32, receipt *unumeral.IntegerCopyAllocationReceipt, evaluation *upolyBinaryEvaluationInvocationReceipt) (bool, error) {
 	b := m.config.Binary
 	if e := b.CopyWithAllocationReceipt(lower, r.interval.BorrowLower(), receipt); e != nil {
 		return false, e
@@ -250,7 +258,7 @@ func (m *AlgebraicRootCore) intervalAtPrecisionWithReceipt(r *algebraicRecord, l
 	if e != nil {
 		return false, e
 	}
-	return m.config.Polynomials.RefineToPrecision(v, b, lower, upper, precision*4)
+	return m.config.Polynomials.refineToPrecisionWithEvaluationReceipt(v, b, lower, upper, precision*4, evaluation)
 }
 
 // Preserve reserve, ascending numeral SET and final size adjustment from

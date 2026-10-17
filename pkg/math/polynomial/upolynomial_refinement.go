@@ -219,17 +219,20 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *unumer
 	}
 }
 func (m *UPolynomialManager) RefineCore(v UPolynomialView, sa int, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational) (bool, error) {
+	return m.refineCoreWithEvaluationReceipt(v, sa, bqm, a, b, nil)
+}
+func (m *UPolynomialManager) refineCoreWithEvaluationReceipt(v UPolynomialView, sa int, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational, receipt *upolyBinaryEvaluationInvocationReceipt) (bool, error) {
 	if e := m.isolationBinary(bqm); e != nil {
 		return false, e
 	}
-	if e := m.refinementSourceSignAssert(v, a, sa, 2758, "sign_a == eval_sign_at(sz, p, a)"); e != nil {
+	if e := m.refinementSourceSignAssert(v, a, sa, 2758, "sign_a == eval_sign_at(sz, p, a)", receipt); e != nil {
 		return false, e
 	}
 	if sa < math.MinInt32 || sa > math.MaxInt32 || sa == math.MinInt32 {
 		return false, arena.ErrBounds
 	}
 	sb := -sa
-	if e := m.refinementSourceSignAssert(v, b, sb, 2761, "sign_b == eval_sign_at(sz, p, b)"); e != nil {
+	if e := m.refinementSourceSignAssert(v, b, sb, 2761, "sign_b == eval_sign_at(sz, p, b)", receipt); e != nil {
 		return false, e
 	}
 	if e := refinementSourceAssert(sa == -sb, 2762, "sign_a == -sign_b"); e != nil {
@@ -246,7 +249,7 @@ func (m *UPolynomialManager) RefineCore(v UPolynomialView, sa int, bqm *unumeral
 	if e := bqm.Div2(&mid); e != nil {
 		return false, e
 	}
-	sm, e := m.EvalSignBinary(v, &mid)
+	sm, e := m.evalSignBinaryWithNegScopeAndReceipt(v, &mid, nil, receipt)
 	if e != nil {
 		return false, e
 	}
@@ -284,16 +287,19 @@ func (m *UPolynomialManager) Refine(v UPolynomialView, bqm *unumeral.BinaryRatio
 	return m.RefineCore(v, sa, bqm, a, b)
 }
 func (m *UPolynomialManager) RefineCoreToPrecision(v UPolynomialView, sa int, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational, k uint32) (bool, error) {
+	return m.refineCoreToPrecisionWithEvaluationReceipt(v, sa, bqm, a, b, k, nil)
+}
+func (m *UPolynomialManager) refineCoreToPrecisionWithEvaluationReceipt(v UPolynomialView, sa int, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational, k uint32, receipt *upolyBinaryEvaluationInvocationReceipt) (bool, error) {
 	if e := m.isolationBinary(bqm); e != nil {
 		return false, e
 	}
 	if e := refinementSourceAssert(sa != 0, 2794, "sign_a != 0"); e != nil {
 		return false, e
 	}
-	if e := m.refinementSourceSignAssert(v, a, sa, 2795, "sign_a  == eval_sign_at(sz, p, a)"); e != nil {
+	if e := m.refinementSourceSignAssert(v, a, sa, 2795, "sign_a  == eval_sign_at(sz, p, a)", receipt); e != nil {
 		return false, e
 	}
-	if e := m.refinementSourceSignAssert(v, b, -sa, 2796, "-sign_a == eval_sign_at(sz, p, b)"); e != nil {
+	if e := m.refinementSourceSignAssert(v, b, -sa, 2796, "-sign_a == eval_sign_at(sz, p, b)", receipt); e != nil {
 		return false, e
 	}
 	var width unumeral.BinaryRational
@@ -312,7 +318,7 @@ func (m *UPolynomialManager) RefineCoreToPrecision(v UPolynomialView, sa int, bq
 		if less {
 			return true, nil
 		}
-		interval, e := m.RefineCore(v, sa, bqm, a, b)
+		interval, e := m.refineCoreWithEvaluationReceipt(v, sa, bqm, a, b, receipt)
 		if e != nil {
 			return false, e
 		}
@@ -322,20 +328,23 @@ func (m *UPolynomialManager) RefineCoreToPrecision(v UPolynomialView, sa int, bq
 	}
 }
 func (m *UPolynomialManager) RefineToPrecision(v UPolynomialView, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational, k uint32) (bool, error) {
+	return m.refineToPrecisionWithEvaluationReceipt(v, bqm, a, b, k, nil)
+}
+func (m *UPolynomialManager) refineToPrecisionWithEvaluationReceipt(v UPolynomialView, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational, k uint32, receipt *upolyBinaryEvaluationInvocationReceipt) (bool, error) {
 	if e := m.isolationBinary(bqm); e != nil {
 		return false, e
 	}
-	sa, e := m.EvalSignBinary(v, a)
+	sa, e := m.evalSignBinaryWithNegScopeAndReceipt(v, a, nil, receipt)
 	if e != nil {
 		return false, e
 	}
-	if e := m.refinementSourceSignAssert(v, b, -sa, 2812, "eval_sign_at(sz, p, b) == -sign_a"); e != nil {
+	if e := m.refinementSourceSignAssert(v, b, -sa, 2812, "eval_sign_at(sz, p, b) == -sign_a", receipt); e != nil {
 		return false, e
 	}
 	if e := refinementSourceAssert(sa != 0, 2813, "sign_a != 0"); e != nil {
 		return false, e
 	}
-	return m.RefineCoreToPrecision(v, sa, bqm, a, b, k)
+	return m.refineCoreToPrecisionWithEvaluationReceipt(v, sa, bqm, a, b, k, receipt)
 }
 func (m *UPolynomialManager) ConvertRationalToBinaryInterval(v UPolynomialView, qm *unumeral.RationalManager, a, b *unumeral.Rational, bqm *unumeral.BinaryRationalManager, c, d *unumeral.BinaryRational) (bool, error) {
 	if e := m.isolationBinary(bqm); e != nil {

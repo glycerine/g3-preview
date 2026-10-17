@@ -33,12 +33,12 @@ func refinementSourceAssert(predicate bool, line int32, expression string) error
 
 // The numerical operand belongs inside SASSERT: disabling or erasing the
 // assertion must skip Horner evaluation, its allocations and its guards.
-func (m *UPolynomialManager) refinementSourceSignAssert(v UPolynomialView, b *unumeral.BinaryRational, want int, line int32, expression string) error {
+func (m *UPolynomialManager) refinementSourceSignAssert(v UPolynomialView, b *unumeral.BinaryRational, want int, line int32, expression string, receipt *upolyBinaryEvaluationInvocationReceipt) error {
 	enabled, e := refinementSourceAssertionsEnabled()
 	if e != nil || !enabled {
 		return e
 	}
-	sign, e := m.EvalSignBinary(v, b)
+	sign, e := m.evalSignBinaryWithNegScopeAndReceipt(v, b, nil, receipt)
 	if e != nil {
 		return e
 	}

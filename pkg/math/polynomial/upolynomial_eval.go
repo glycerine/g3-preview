@@ -149,6 +149,9 @@ func (m *UPolynomialManager) EvalSignBinary(v UPolynomialView, b *unumeral.Binar
 	return m.evalSignBinaryWithNegScope(v, b, nil)
 }
 func (m *UPolynomialManager) evalSignBinaryWithNegScope(v UPolynomialView, b *unumeral.BinaryRational, parent *algebraicNegScope) (value int, cause error) {
+	return m.evalSignBinaryWithNegScopeAndReceipt(v, b, parent, nil)
+}
+func (m *UPolynomialManager) evalSignBinaryWithNegScopeAndReceipt(v UPolynomialView, b *unumeral.BinaryRational, parent *algebraicNegScope, receipt *upolyBinaryEvaluationInvocationReceipt) (value int, cause error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
@@ -170,6 +173,13 @@ func (m *UPolynomialManager) evalSignBinaryWithNegScope(v UPolynomialView, b *un
 		q, e := m.beginBinaryEvaluation()
 		if e != nil {
 			return 0, e
+		}
+		// Stamp only this accepted entry. Its diagnostic history can be
+		// materialized by the body or destructor, so attach that same
+		// frame's history after source finalization has returned.
+		if receipt != nil {
+			*receipt = upolyBinaryEvaluationInvocationReceipt{m, q, q.invocation, q.history}
+			defer func() { receipt.history = q.history }()
 		}
 		q.target = v
 		values = &q.values
