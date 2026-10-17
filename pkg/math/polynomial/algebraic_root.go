@@ -51,6 +51,7 @@ type algebraicLocation struct {
 type AlgebraicRootCore struct {
 	refinementQ                                                algebraicRefinementQScope
 	predicateQ                                                 algebraicPredicateQScope
+	constQ                                                     algebraicConstQScope
 	refinementConversion                                       algebraicConversionScope
 	refinement                                                 algebraicRefinementScope
 	representationNeg                                          algebraicRepresentationNegNumeric
@@ -202,7 +203,7 @@ func (m *AlgebraicRootCore) check() error {
 	if m != nil && m.self == m && m.arithmetic.executing {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || m.integerSet.finishing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
+	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || m.integerSet.finishing || m.constQ.executing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.inversion.executing {
@@ -536,6 +537,9 @@ func (m *AlgebraicRootCore) beginQ() error {
 	return nil
 }
 func (m *AlgebraicRootCore) finishQ(cause error) error {
+	if m.constQ.active {
+		return errors.Join(cause, ErrAlgebraicPending)
+	}
 	if !m.localActive {
 		return cause
 	}
@@ -578,11 +582,12 @@ func (m *AlgebraicRootCore) SetRational(a *Algebraic, q *unumeral.Rational) (err
 	if _, err = m.location(a); err != nil {
 		return err
 	}
-	if err = m.beginQ(); err != nil {
+	if err = m.beginConstQ(); err != nil {
 		return err
 	}
-	defer func() { err = m.finishQ(err) }()
-	if err = m.config.Rationals.CopyWithAllocationReceipt(&m.localQ, q, &m.rationalCopy); err != nil {
+	defer func() { m.constQ.running = false; err = m.finishConstQ(err) }()
+	err = m.copyConstQ(q)
+	if err != nil {
 		return err
 	}
 	return m.SetTake(a, &m.localQ)
@@ -942,7 +947,7 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	if m != nil && m.self == m && m.polynomialEvaluationRunning != 0 {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.integerSet.running || m.integerAdd.running) {
+	if m != nil && m.self == m && (m.integerSet.running || m.integerAdd.running || m.constQ.running) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.isolationConversion.running {
@@ -987,7 +992,7 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	if m != nil && m.self == m && m.arithmetic.executing {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || m.integerSet.finishing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
+	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || m.integerSet.finishing || m.constQ.executing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.inversion.executing {
@@ -1014,6 +1019,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 		return e
 	}
 	if e := m.config.Rationals.Integers().CleanupCopyAllocationInvocation(&m.rationalCopy); e != nil {
+		return e
+	}
+	if e := m.cleanupConstQ(); e != nil {
 		return e
 	}
 	if e := m.config.Rationals.Integers().CleanupCopyAllocationInvocation(&m.coefficientCopy); e != nil {
@@ -1133,7 +1141,7 @@ func (m *AlgebraicRootCore) closeCoreMembers() error {
 	if m != nil && m.self == m && m.polynomialEvaluationBorrowers != 0 {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.integerSet.running || m.integerAdd.running) {
+	if m != nil && m.self == m && (m.integerSet.running || m.integerAdd.running || m.constQ.running) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.isolationConversion.running {
@@ -1178,7 +1186,7 @@ func (m *AlgebraicRootCore) closeCoreMembers() error {
 	if m != nil && m.self == m && m.arithmetic.executing {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || m.integerSet.finishing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
+	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || m.integerSet.finishing || m.constQ.executing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.inversion.executing {
