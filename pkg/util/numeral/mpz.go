@@ -1230,6 +1230,9 @@ func (m *IntegerManager) addSubWithAllocationContext(a, b, c *Int, subtract bool
 		if e := m.prepareTmpSpan(0, n+1); e != nil {
 			return e
 		}
+		m.Natural.traceMPNBinaryView(
+			limbView{allocator: m.Allocator, backing: m.Cell(ca).Backing, size: na},
+			limbView{allocator: m.Allocator, backing: m.Cell(cb).Backing, size: nb}, "+")
 		if diagnostic.DebugBuild {
 			d := diagnostic.BorrowProcessDebugContext()
 			enabled, e := diagnostic.SourceAssertionsEnabled(d)
@@ -1271,6 +1274,7 @@ func (m *IntegerManager) addSubWithAllocationContext(a, b, c *Int, subtract bool
 					return e
 				}
 			}
+			m.Natural.traceMPNUnaryView(limbView{allocator: m.Allocator, backing: m.Cell(m.Tmp[0]).Backing, size: realSize}, 427, true)
 			enabled, e = diagnostic.SourceAssertionsEnabled(d)
 			if e != nil {
 				return e
