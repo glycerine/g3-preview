@@ -1,6 +1,7 @@
 package polynomial
 
 import (
+	"errors"
 	"math"
 	"strconv"
 	"testing"
@@ -129,7 +130,7 @@ func TestAlgebraicBoundsExactAndCopiedPrecision(t *testing.T) {
 }
 
 func TestAlgebraicDefiningPolynomialMinimumIntegerReservationPrefixes(t *testing.T) {
-	succeeded, refused := false, false
+	succeeded, refused, retained := false, false, false
 	for prefix := int64(0); prefix < 64 && !succeeded; prefix++ {
 		t.Run(strconv.FormatInt(prefix, 10), func(t *testing.T) {
 			c, p := algebraicCellSourceFixture(t)
@@ -161,14 +162,32 @@ func TestAlgebraicDefiningPolynomialMinimumIntegerReservationPrefixes(t *testing
 					t.Fatal("negated minimum numerator", text)
 				}
 			}
-			serviceMust(t, qm.Integers().CleanupPendingAllocation())
+			if unumeral.NumericAllocationPending(&c.representationNeg.roots) {
+				retained = true
+				if e := c.GetPolynomial(&a, out); !errors.Is(e, ErrAlgebraicPending) {
+					t.Fatal("pending negation root lost replacement guard", e)
+				}
+			}
+			serviceMust(t, c.CleanupRetained())
+			serviceMust(t, p.Reset(out))
+			serviceMust(t, c.GetPolynomial(&a, out))
+			retry, e := p.wholeView(out)
+			serviceMust(t, e)
+			first, e := p.read(retry, 0)
+			serviceMust(t, e)
+			text, e := qm.Integers().String(first)
+			serviceMust(t, e)
+			if text != "2147483648" {
+				t.Fatal("negation retry coefficient", text)
+			}
+
 			serviceMust(t, c.Del(&a))
 			serviceMust(t, p.DelPolynomial(&out))
 			serviceMust(t, qm.Del(&q))
 		})
 	}
-	if !succeeded || !refused {
-		t.Fatal("missing defining-polynomial allocation frontier", succeeded, refused)
+	if !succeeded || !refused || !retained {
+		t.Fatal("missing defining-polynomial allocation frontier", succeeded, refused, retained)
 	}
 }
 

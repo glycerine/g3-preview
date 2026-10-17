@@ -16,7 +16,7 @@ func (m *AlgebraicRootCore) GetPolynomial(a *Algebraic, out UPolynomial) error {
 	if e != nil {
 		return e
 	}
-	if m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.representationCopy) || m.config.Polynomials.modular.MatchesPNormalizeInvocation(&m.representationNormalize) {
+	if m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.representationCopy) || m.config.Polynomials.modular.MatchesPNormalizeInvocation(&m.representationNormalize) || unumeral.NumericAllocationPending(&m.representationNeg.roots) {
 		return ErrAlgebraicPending
 	}
 	p := m.config.Polynomials
@@ -60,7 +60,11 @@ func (m *AlgebraicRootCore) GetPolynomial(a *Algebraic, out UPolynomial) error {
 		if e = z.CopyFromOwnerWithReceipt(&values[1], z, r.value.BorrowDenominator(), &m.representationCopy); e != nil {
 			return e
 		}
-		if e = z.Neg(&values[0]); e != nil {
+		s := &m.representationNeg
+		s.owner = m
+		s.hooks.Policy = s
+		context := unumeral.NumericAllocationContext{}.WithCaller(&s.hooks)
+		if e = z.WithAllocationContext(context).Neg(&values[0]); e != nil {
 			return e
 		}
 	}

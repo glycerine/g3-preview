@@ -49,6 +49,7 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	representationNeg                                          algebraicRepresentationNegNumeric
 	representationNormalize                                    unumeral.IntegerNormalizeInvocationReceipt
 	representationCopy                                         unumeral.IntegerCopyAllocationReceipt
 	comparisonTraceRunning                                     bool
@@ -995,6 +996,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 		return ErrAlgebraicOwner
 	}
 	if e := m.cleanupCellAllocation(); e != nil {
+		return e
+	}
+	if e := m.representationNeg.roots.Cleanup(m.config.Rationals.Integers()); e != nil {
 		return e
 	}
 	if p := m.config.Polynomials; p != nil {
