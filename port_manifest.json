@@ -38246,6 +38246,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_som_vector_memory_trace.go",
         "pkg/math/polynomial/polynomial_newton_vector_memory_trace.go",
         "pkg/math/polynomial/polynomial_hash.go",
         "pkg/math/polynomial/polynomial_hash_source_test.go",
@@ -38678,6 +38679,7 @@
         "pkg/math/polynomial/polynomial_monomial_table_native_test.go"
       ],
       "tests": [
+        "TestPolynomialSOMVectorPublishedChildMemoryWrappers",
         "TestPolynomialNewtonVectorChildMemoryWrappers",
         "TestMonomialOrderSourceLexAssertions",
         "TestMonomialOrderBoundedModels",
@@ -40752,6 +40754,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Published SOM buffer vector child alloc at polynomial.cpp:2166 and ordered destructor dealloc at :2182 over charged concrete Go child owners",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_som_vector_memory_trace.go",
+          "tests": ["TestPolynomialSOMVectorPublishedChildMemoryWrappers"]
+        },
         {
           "name": "Retained Newton interpolator vector child alloc at polynomial.cpp:2948 and ordered flush/deletion at :2936 over charged concrete child owners",
           "status": "platform_replacement",
@@ -153258,6 +153266,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_som_vector_memory_trace.go",
         "pkg/math/polynomial/polynomial_newton_vector_memory_trace.go",
         "pkg/math/polynomial/polynomial_cache_memory_trace.go",
         "pkg/tactic/tactic_extension_model.go",
@@ -154129,6 +154138,12 @@
           ]
         },
         {
+          "name": "Published SOM vector child alloc at polynomial.cpp:2166 and destructor dealloc at :2182 through source debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_som_vector_memory_trace.go",
+          "tests": ["TestPolynomialSOMVectorPublishedChildMemoryWrappers"]
+        },
+        {
           "name": "Retained Newton vector child alloc at polynomial.cpp:2948 and ordered dealloc at :2936 through source debug memory wrappers",
           "status": "platform_replacement",
           "go_target": "pkg/math/polynomial/polynomial_newton_vector_memory_trace.go",
@@ -154258,6 +154273,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_som_vector_memory_trace.go",
         "pkg/math/polynomial/polynomial_newton_vector_memory_trace.go",
         "pkg/math/polynomial/polynomial_cache_memory_trace.go",
         "pkg/tactic/tactic_extension_model.go",
@@ -155059,6 +155075,12 @@
           "tests": [
             "TestModelCopiedFunctionMemoryWrapperOwnerTransfer"
           ]
+        },
+        {
+          "name": "Published SOM vector child alloc at polynomial.cpp:2166 and destructor dealloc at :2182 through source debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_som_vector_memory_trace.go",
+          "tests": ["TestPolynomialSOMVectorPublishedChildMemoryWrappers"]
         },
         {
           "name": "Retained Newton vector child alloc at polynomial.cpp:2948 and ordered dealloc at :2936 through source debug memory wrappers",

@@ -110,6 +110,7 @@ func (v *PolynomialSOMVector) At(i uint32) (*PolynomialSOMBuffer, error) {
 				return nil, e
 			}
 		}
+		v.traceSOMChildAllocated(b)
 		v.children = append(v.children, b)
 		v.pending = nil
 		n = uint32(len(v.children))
@@ -194,6 +195,7 @@ func (v *PolynomialSOMVector) CloseChecked() error {
 			if e := b.CloseChecked(); e != nil {
 				return e
 			}
+			v.traceSOMChildDeallocated(b)
 			v.children[v.closeCursor] = nil
 		}
 		v.closeCursor++
