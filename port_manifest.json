@@ -159082,6 +159082,11 @@
           "status": "partial"
         },
         {
+          "name": "Concrete fpa_rewriter mk_is_zero/is_nan/is_inf/is_normal/is_subnormal/is_negative/is_positive and mk_eq_core caller-local scoped_mpf values; mk_app_core and model_evaluator/th_rewriter retain these paths (fpa_rewriter.cpp:41-104,547-667)",
+          "status": "unported",
+          "tests": []
+        },
+        {
           "name": "Concrete AST fpa_decl_plugin scoped_mpf_vector value storage: native indexed growth, source set and ascending owned-value release (fpa_decl_plugin.cpp:23-61; mpf.h:327)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_scoped_values.go",
@@ -178594,6 +178599,11 @@
         },
         {
           "name": "Remaining concrete inherited scoped_mpf scalar lifetimes at retained AST FPA rewriter, SMT theory and FPA API callers (src/util/scoped_numeral.h:24-171; src/util/mpf.h:300-324)",
+          "status": "unported",
+          "tests": []
+        },
+        {
+          "name": "Concrete fpa_rewriter classification and mk_eq_core scoped_mpf lexical construction, successful reverse destruction and stopped-copy owning continuation in retained model_evaluator/th_rewriter callers (fpa_rewriter.cpp:547-667)",
           "status": "unported",
           "tests": []
         },
