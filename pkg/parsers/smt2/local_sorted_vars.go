@@ -43,7 +43,7 @@ func (e *smt2LocalEnv) bindSortedVariables(m *ast.ASTManager, names []symbol.Sym
 			}
 		}
 		if err != nil {
-			return numBindings, errors.Join(err, e.endScope(), exprs.shrink(m, base))
+			return numBindings, errors.Join(err, e.endScopeWithOwningCleanup(), exprs.shrink(m, base))
 		}
 	}
 	return level, nil

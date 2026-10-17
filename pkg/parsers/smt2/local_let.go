@@ -54,7 +54,7 @@ func (e *smt2LocalEnv) finishLetLocalExprs(m *ast.ASTManager, exprs *localExprSt
 		exprs.pushOwned(result)
 		return err
 	}
-	if err := e.endScope(); err != nil {
+	if err := e.endScopeWithOwningCleanup(); err != nil {
 		exprs.pushOwned(result)
 		return err
 	}

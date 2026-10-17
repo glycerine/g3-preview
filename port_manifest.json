@@ -183329,7 +183329,14 @@
           "name": "SMT2 parser local<expr*,level> find/contains/insert and begin/end_scope with shadow restoration (smt2parser.cpp:52,1256-1279,1338-1348,1474,1509,1712,1748,1872-1899,1959,2217,2302-2337)",
           "status": "partial",
           "go_target": "pkg/parsers/smt2/local_environment.go",
-          "tests": ["TestSMT2LocalSymbolTableNestedAndRepeatedBindings"]
+          "tests": ["TestSMT2LocalSymbolTableNestedAndRepeatedBindings", "TestSMT2SortedVariablesSourceAssertionReadsProcessDebugAndRollsBack"]
+        },
+        {
+          "name": "SMT2 local symbol-table end_scope reads its two source assertion switches after limit pop and after trail restoration (symbol_table.h:168,181), with explicit owning parser cleanup after a stopped switch",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/local_environment.go",
+          "go_targets": ["pkg/parsers/smt2/local_sorted_vars.go", "pkg/parsers/smt2/local_let.go"],
+          "tests": ["TestSMT2SortedVariablesSourceAssertionReadsProcessDebugAndRollsBack", "TestSMT2LocalSymbolTableNestedAndRepeatedBindings"]
         },
         {
           "name": "SMT2 parse_match_pattern named non-constructor branch inserts a borrowed var at the pre-increment binding level within its case scope (smt2parser.cpp:1499-1510)",

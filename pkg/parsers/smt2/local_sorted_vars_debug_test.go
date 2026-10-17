@@ -45,6 +45,20 @@ func TestSMT2SortedVariablesSourceAssertionReadsProcessDebugAndRollsBack(t *test
 	if err := debug.Close(); err != nil {
 		t.Fatal(err)
 	}
+	var direct smt2LocalEnv
+	name := symbol.Numerical(70)
+	direct.beginScope()
+	direct.insert(name, smt2Local{level: 1})
+	if err := direct.endScope(); !errors.Is(err, arena.ErrClosed) {
+		t.Fatal("source symbol-table assertion switch", err)
+	}
+	if len(direct.limits) != 0 || len(direct.trail) != 1 || !direct.contains(name) {
+		t.Fatal("first end_scope assertion did not preserve its source prefix")
+	}
+	direct.unwindScope(0)
+	if len(direct.trail) != 0 || direct.contains(name) {
+		t.Fatal("stopped source scope did not release its borrowed binding")
+	}
 	var env smt2LocalEnv
 	var exprs localExprStack
 	baseline := m.Stats().LiveReferences

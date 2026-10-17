@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -72,8 +73,25 @@ func (e *smt2LocalEnv) endScope() error {
 	last := len(e.limits) - 1
 	limit := e.limits[last]
 	e.limits = e.limits[:last]
+	if err := e.sourceAssertTrail(limit <= len(e.trail), 168, "old_size <= curr_size"); err != nil {
+		return err
+	}
+	e.unwindScope(limit)
+	return e.sourceAssertTrail(len(e.trail) == limit, 181, "m_trail_stack.size() == old_size")
+}
+
+func (e *smt2LocalEnv) sourceAssertTrail(ok bool, line int32, expression string) error {
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, err := diagnostic.SourceAssertionsEnabled(d)
+	if err != nil || !enabled || ok {
+		return err
+	}
+	return diagnostic.DebugAssertionFailure(d, "src/util/symbol_table.h", line, expression)
+}
+
+func (e *smt2LocalEnv) unwindScope(limit int) {
 	for len(e.trail) > limit {
-		last = len(e.trail) - 1
+		last := len(e.trail) - 1
 		undo := e.trail[last]
 		e.trail[last] = smt2LocalUndo{}
 		e.trail = e.trail[:last]
@@ -83,5 +101,18 @@ func (e *smt2LocalEnv) endScope() error {
 			delete(e.bindings, undo.name)
 		}
 	}
-	return nil
+}
+
+// A source assertion may stop after the scope limit is popped. The parser
+// still owns the remaining trail and releases it on its explicit error path.
+func (e *smt2LocalEnv) endScopeWithOwningCleanup() error {
+	if len(e.limits) == 0 {
+		return errSMT2LocalScope
+	}
+	limit := e.limits[len(e.limits)-1]
+	err := e.endScope()
+	if err != nil {
+		e.unwindScope(limit)
+	}
+	return err
 }
