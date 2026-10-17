@@ -11,6 +11,7 @@ import (
 
 type polynomialGlobalConversionScope struct {
 	algebraicCaller                      *algebraicSignResultantScope
+	isolationCaller                      *algebraicMultivariateIsolationFrame
 	ms                                   []Monomial
 	as                                   unumeral.ScopedIntegerModularBuffer128
 	orphans                              []Monomial
@@ -25,6 +26,9 @@ func ConvertPolynomial(sm *MultivariatePolynomialManager, p Polynomial, tm *Mult
 	return convertPolynomialForAlgebraic(sm, p, tm, x, maxD, nil)
 }
 func convertPolynomialForAlgebraic(sm *MultivariatePolynomialManager, p Polynomial, tm *MultivariatePolynomialManager, x, maxD uint32, caller *algebraicSignResultantScope) (out Polynomial, cause error) {
+	return convertPolynomialForIsolation(sm, p, tm, x, maxD, caller, nil)
+}
+func convertPolynomialForIsolation(sm *MultivariatePolynomialManager, p Polynomial, tm *MultivariatePolynomialManager, x, maxD uint32, caller *algebraicSignResultantScope, isolation *algebraicMultivariateIsolationFrame) (out Polynomial, cause error) {
 	if e := sm.ready(); e != nil {
 		return Polynomial{}, e
 	}
@@ -36,6 +40,10 @@ func convertPolynomialForAlgebraic(sm *MultivariatePolynomialManager, p Polynomi
 	}
 	s := &tm.conversion
 	s.algebraicCaller = caller
+	s.isolationCaller = isolation
+	if isolation != nil {
+		isolation.conversionManager = tm
+	}
 	if caller != nil {
 		caller.conversionManager = tm
 	}

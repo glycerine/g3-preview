@@ -10,8 +10,10 @@ import (
 // The scoped inverse belongs to the division invocation, including when a
 // nested multiplication retains borrowed inputs pending owning cleanup.
 type algebraicDivisionScope struct {
-	inverse         Algebraic
-	active, running bool
+	polynomialCaller *polynomialAlgebraicEvaluationScope
+	sourceStop       error
+	inverse          Algebraic
+	active, running  bool
 }
 
 func (m *AlgebraicRootCore) cleanupDivision() error {
@@ -50,11 +52,16 @@ func (m *AlgebraicRootCore) Div(a, b, out *Algebraic) (cause error) {
 		return ErrAlgebraicDivisionByZero
 	}
 	s.active, s.running = true, true
+	s.polynomialCaller = m.polynomialCaller
 	defer func() {
 		s.running = false
 		// The binary selector borrows the inverse until its local scope ends.
 		if !m.binary.active && m.inversion.remaining == 0 {
-			cause = errors.Join(cause, m.cleanupDivision())
+			cleanup := m.cleanupDivision()
+			if cleanup != nil {
+				s.sourceStop = cleanup
+			}
+			cause = errors.Join(cause, cleanup)
 		}
 	}()
 	if e = m.Copy(&s.inverse, b); e != nil {

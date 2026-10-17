@@ -7,8 +7,11 @@ import (
 )
 
 type algebraicIsolationConversionScope struct {
+	caller          *algebraicMultivariateIsolationFrame
+	factor          upolyFactorFrontendInvocationReceipt
 	receipt         polynomialFactorNumeralVectorReceipt
 	active, running bool
+	scratchStarted  bool
 }
 
 func (m *AlgebraicRootCore) cleanupIsolationConversion() error {
@@ -18,6 +21,33 @@ func (m *AlgebraicRootCore) cleanupIsolationConversion() error {
 	}
 	if !s.active {
 		return nil
+	}
+	if r := &s.factor; r.service != nil {
+		if e := r.service.cleanupFactorFrontendInvocation(r, false); e != nil {
+			return e
+		}
+		if e := r.service.cleanupFactorFrontendInvocation(r, true); e != nil {
+			return e
+		}
+	}
+	if s.scratchStarted {
+		for _, v := range []*BinaryRationalVector{m.uppers, m.lowers, m.roots} {
+			if v == nil {
+				continue
+			}
+			if e := v.CleanupManagerReset(); e != nil {
+				return e
+			}
+			if e := v.CleanupDrop(); e != nil {
+				return e
+			}
+			v.state.dropPending = true
+			v.state.dropCursor, v.state.dropTo = 0, 0
+			if e := upolyBinaryFinishDrop(v.manager, &v.state, false); e != nil {
+				return e
+			}
+		}
+		s.scratchStarted = false
 	}
 	if pm := s.receipt.manager; pm != nil {
 		if e := pm.cleanupFactorNumeralVector(&s.receipt, false); e != nil {
@@ -35,6 +65,9 @@ func (m *AlgebraicRootCore) cleanupIsolationConversion() error {
 // Zero leaves the output untouched; otherwise conversion writes the actual
 // persistent m_isolate_tmp1 before invoking the existing UP root isolator.
 func (m *AlgebraicRootCore) IsolatePolynomialRoots(pm *MultivariatePolynomialManager, p Polynomial, out *AlgebraicVector) error {
+	return m.isolatePolynomialRootsForMultivariate(pm, p, out, nil)
+}
+func (m *AlgebraicRootCore) isolatePolynomialRootsForMultivariate(pm *MultivariatePolynomialManager, p Polynomial, out *AlgebraicVector, caller *algebraicMultivariateIsolationFrame) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -73,7 +106,7 @@ func (m *AlgebraicRootCore) IsolatePolynomialRoots(pm *MultivariatePolynomialMan
 	if e != nil || zero {
 		return e
 	}
-	*s = algebraicIsolationConversionScope{active: true, running: true}
+	*s = algebraicIsolationConversionScope{caller: caller, active: true, running: true}
 	defer func() { s.running = false }()
 	up := m.config.Polynomials
 	if m.isolateTmp1.slot == 0 {
@@ -89,10 +122,13 @@ func (m *AlgebraicRootCore) IsolatePolynomialRoots(pm *MultivariatePolynomialMan
 	if e = pm.toNumeralVectorIntoSource(p, 0, false, up, &target.state, &s.receipt); e != nil {
 		return e
 	}
-	s.active = false
 	view, e := up.wholeView(m.isolateTmp1)
 	if e != nil {
 		return e
 	}
-	return m.IsolateRoots(view, out)
+	e = m.isolateRootsForPolynomial(view, out, s)
+	if e == nil {
+		s.active = false
+	}
+	return e
 }

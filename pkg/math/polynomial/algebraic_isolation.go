@@ -80,6 +80,9 @@ func (m *AlgebraicRootCore) pushNew(v *AlgebraicVector, a *Algebraic) error {
 	return nil
 }
 func (m *AlgebraicRootCore) IsolateRoots(v UPolynomialView, out *AlgebraicVector) (err error) {
+	return m.isolateRootsForPolynomial(v, out, nil)
+}
+func (m *AlgebraicRootCore) isolateRootsForPolynomial(v UPolynomialView, out *AlgebraicVector, invocation *algebraicIsolationConversionScope) (err error) {
 	if err = m.check(); err != nil {
 		return err
 	}
@@ -124,7 +127,12 @@ func (m *AlgebraicRootCore) IsolateRoots(v UPolynomialView, out *AlgebraicVector
 			return err
 		}
 	}
+	before := m.config.Factors.frontend.receipt
 	full, err := m.factorPolynomial(v)
+	frontend := &m.config.Factors.frontend
+	if invocation != nil && frontend.receipt != before && frontend.receipt.invocation != 0 && frontend.result == m.factors {
+		invocation.factor = frontend.receipt
+	}
 	if err != nil {
 		return err
 	}
@@ -173,6 +181,9 @@ func (m *AlgebraicRootCore) IsolateRoots(v UPolynomialView, out *AlgebraicVector
 		}
 		if polynomialSourceDebug && (m.roots.state.size != 0 || m.lowers.state.size != 0 || m.uppers.state.size != 0) {
 			return m.finishQ(ErrUPolynomialAssertion)
+		}
+		if invocation != nil {
+			invocation.scratchStarted = true
 		}
 		if err = m.config.Polynomials.SquareFreeIsolateRoots(f, m.config.Binary, m.roots, m.lowers, m.uppers); err != nil {
 			return m.finishQ(err)

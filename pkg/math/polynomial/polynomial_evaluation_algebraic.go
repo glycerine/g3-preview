@@ -18,6 +18,7 @@ type polynomialEvalAlgebraicFrame struct {
 	constructed bool
 }
 type polynomialAlgebraicEvaluationScope struct {
+	isolationCaller             *algebraicMultivariateIsolationFrame
 	frames                      []*polynomialEvalAlgebraicFrame
 	vm                          *AlgebraicRootCore
 	depth                       uint32
@@ -87,6 +88,9 @@ func (s *polynomialAlgebraicEvaluationScope) releaseBorrow() {
 // On a stopped arithmetic call, its algebraic owner is cleaned explicitly
 // before CleanupAlgebraicEvaluation releases retained lexical auxiliaries.
 func (m *MultivariatePolynomialManager) EvaluateAlgebraic(p Polynomial, vm *AlgebraicRootCore, v PolynomialAlgebraicEvaluation, out *Algebraic) (cause error) {
+	return m.evaluateAlgebraicForIsolation(p, vm, v, out, nil)
+}
+func (m *MultivariatePolynomialManager) evaluateAlgebraicForIsolation(p Polynomial, vm *AlgebraicRootCore, v PolynomialAlgebraicEvaluation, out *Algebraic, caller *algebraicMultivariateIsolationFrame) (cause error) {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -137,6 +141,10 @@ func (m *MultivariatePolynomialManager) EvaluateAlgebraic(p Polynomial, vm *Alge
 	if vm.polynomialEvaluationBorrowers == math.MaxUint32 {
 		return arena.ErrSlotLimit
 	}
+	s.isolationCaller = caller
+	if caller != nil {
+		caller.evaluation = m
+	}
 	s.vm = vm
 	s.active = true
 	s.executing = true
@@ -175,6 +183,12 @@ func (s *polynomialAlgebraicEvaluationScope) childSourceCause() error {
 	vm := s.vm
 	if vm == nil {
 		return nil
+	}
+	if vm.inversion.polynomialCaller == s && vm.inversion.remaining != 0 && vm.inversion.sourceStop != nil {
+		return vm.inversion.sourceStop
+	}
+	if vm.division.polynomialCaller == s && vm.division.active && vm.division.sourceStop != nil {
+		return vm.division.sourceStop
 	}
 	if vm.binary.polynomialCaller == s && vm.binary.active && vm.binary.sourceStop != nil {
 		return vm.binary.sourceStop

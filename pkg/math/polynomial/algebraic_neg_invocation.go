@@ -175,6 +175,9 @@ func (m *AlgebraicRootCore) CleanupNegation() error {
 }
 
 func (m *AlgebraicRootCore) Neg(a *Algebraic) (cause error) {
+	return m.negWithReceipt(a, nil)
+}
+func (m *AlgebraicRootCore) negWithReceipt(a *Algebraic, receipt *algebraicNegInvocationReceipt) (cause error) {
 	l, e := m.location(a)
 	if e != nil || l == nil {
 		return e
@@ -188,6 +191,9 @@ func (m *AlgebraicRootCore) Neg(a *Algebraic) (cause error) {
 	}
 	nonce := q.invocation + 1
 	*q = algebraicNegScope{owner: m, target: *a, invocation: nonce, active: true, executing: true}
+	if receipt != nil {
+		*receipt = algebraicNegInvocationReceipt{owner: m, frame: q, invocation: nonce}
+	}
 	z := m.config.Rationals.Integers()
 	up := m.config.Polynomials
 	previousZ, previousUP := algebraicNegCaller(z), up.algebraicNegCaller

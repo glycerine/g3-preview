@@ -49,6 +49,10 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	multivariateIsolationFrames                                []*algebraicMultivariateIsolationFrame
+	multivariateIsolationDepth                                 uint32
+	multivariateIsolationRunning                               bool
+	isolateRootsVariables                                      PolynomialVariableDegrees
 	polynomialCaller, localPolynomialCaller                    *polynomialAlgebraicEvaluationScope
 	polynomialEvaluationBorrowers, polynomialEvaluationRunning uint32
 	integerSet                                                 algebraicIntegerSetScope
@@ -868,6 +872,9 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	return m.store(dl, &out)
 }
 func (m *AlgebraicRootCore) CleanupRetained() error {
+	if m != nil && m.self == m && m.multivariateIsolationRunning {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.polynomialEvaluationRunning != 0 {
 		return ErrAlgebraicPending
 	}
@@ -994,9 +1001,15 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	if e := m.finishPredicate(nil); e != nil {
 		return e
 	}
-	return m.comparisonCleanup()
+	if e := m.comparisonCleanup(); e != nil {
+		return e
+	}
+	return m.cleanupMultivariateIsolation()
 }
 func (m *AlgebraicRootCore) Close() error {
+	if m != nil && m.self == m && m.multivariateIsolationRunning {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.polynomialEvaluationBorrowers != 0 {
 		return ErrAlgebraicPending
 	}
@@ -1135,6 +1148,9 @@ func (m *AlgebraicRootCore) Close() error {
 	b := m.config.Rationals.Budget()
 	m.negationHistory = nil
 	m.evalSignVariables.values = nil
+	m.isolateRootsVariables.values = nil
+	b.Release(uint64(len(m.multivariateIsolationFrames)) * uint64(reflect.TypeOf(algebraicMultivariateIsolationFrame{}).Size()))
+	m.multivariateIsolationFrames = nil
 	b.Release(m.header)
 	m.locations = nil
 	m.header = 0

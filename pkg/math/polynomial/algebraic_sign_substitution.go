@@ -73,7 +73,9 @@ type algebraicSignSubstitutionScope struct {
 
 func (m *AlgebraicRootCore) cleanupSignSubstitution() error { return m.finishSignSubstitution(true) }
 func (m *AlgebraicRootCore) finishSignSubstitution(owning bool) error {
-	s := &m.signSubstitution
+	return m.finishBasicSubstitution(&m.signSubstitution, owning)
+}
+func (m *AlgebraicRootCore) finishBasicSubstitution(s *algebraicSignSubstitutionScope, owning bool) error {
 	if s.running {
 		return ErrAlgebraicPending
 	}

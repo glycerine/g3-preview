@@ -38294,7 +38294,12 @@
         "pkg/math/polynomial/algebraic_display_decimal_test.go",
         "pkg/math/polynomial/polynomial_evaluation_algebraic.go",
         "pkg/math/polynomial/polynomial_evaluation_algebraic_core.go",
-        "pkg/math/polynomial/polynomial_evaluation_algebraic_test.go"
+        "pkg/math/polynomial/polynomial_evaluation_algebraic_test.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_scope.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_test.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_cancel_test.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_owner_test.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",
@@ -38400,7 +38405,14 @@
         "TestPolynomialEvaluationAlgebraicRootsAndEarlyRoutes",
         "TestPolynomialEvaluationAlgebraicCancellationAndRetry",
         "TestPolynomialEvaluationAlgebraicLexOwnershipAndReadStop",
-        "TestPolynomialEvaluationAlgebraicExecutingOwnersAndSingleTerm"
+        "TestPolynomialEvaluationAlgebraicExecutingOwnersAndSingleTerm",
+        "TestAlgebraicMultivariateIsolationConjugateFiltering",
+        "TestAlgebraicMultivariateIsolationVanishedResultantBranches",
+        "TestAlgebraicMultivariateIsolationRationalEliminationAndVanishingVariable",
+        "TestAlgebraicMultivariateIsolationEveryReachedCheckpoint",
+        "TestAlgebraicMultivariateIsolationPreservesOlderFactorInvocation",
+        "TestAlgebraicMultivariateIsolationExecutingOwnerRefusals",
+        "TestAlgebraicMultivariateIsolationEmptyOutputAssertionBeforeLocals"
       ],
       "conditionals": [
         {
@@ -38922,6 +38934,20 @@
           "tests": [
             "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement"
           ]
+        },
+        {
+          "name": "algebraic_numbers.cpp:2268-2451,2879-2881 multivariate root isolation including both vanished-resultant recovery branches; full failure/TRACE audit pending",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/algebraic_isolation_multivariate.go",
+          "tests": [
+            "TestAlgebraicMultivariateIsolationConjugateFiltering",
+            "TestAlgebraicMultivariateIsolationVanishedResultantBranches",
+            "TestAlgebraicMultivariateIsolationRationalEliminationAndVanishingVariable",
+            "TestAlgebraicMultivariateIsolationEveryReachedCheckpoint",
+            "TestAlgebraicMultivariateIsolationPreservesOlderFactorInvocation",
+            "TestAlgebraicMultivariateIsolationExecutingOwnerRefusals",
+            "TestAlgebraicMultivariateIsolationEmptyOutputAssertionBeforeLocals"
+          ]
         }
       ],
       "ownership": [
@@ -38957,7 +38983,8 @@
         "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added.",
         "The four Algorithm D workspaces now use native Go uint32 slices. Division retains normalization, quotient estimate correction, product/subtraction, conditional add-back and output publication order. No Runtime events, inline16/doubling emulation, initialization masks, pending storage blocks or division-buffer receipts remain. Numeric and polynomial caller buffer hooks/cleanup/history transport are removed; actual numeral/RAW/cell allocation ownership stays live. Source and owning close release the native workspace; warmed division allocates nothing. New randomized math/big comparisons cover one/many-limb operands, normalization, size changes and scratch regrowth; the explicit add-back fixture remains. Obsolete buffer topology/fault tests are retired. This removes infrastructure emulation without adding whole-unit completion credit.",
         "Algebraic locator directories and owning scalar vectors now use native append. Removed geometric container capacity arithmetic and buffer reservations/refunds, using native vector length for isolation sorting/selection and cleanup. Relocated owning vector records are cleared once; actual cell/numeral allocations, mutable rational transfers, pending source copies, stable locator slot/generation checks and stopped numeric cleanup remain explicit. Variable-degree and monomial-position slices also use native append for extent growth.",
-        "Concrete algebraic t_eval/t_eval_core (polynomial.cpp:6436-6522), required by algebraic_numbers.cpp:2387-2388,2406, now preserves recursive Horner grouping, borrowed mapped root cells, actual integer coefficient overloads and scoped algebraic auxiliaries. Actual accepted arithmetic and lexical-sort entries bind the evaluator caller; retained auxiliaries borrow their algebraic owner until explicit cleanup, and callbacks cannot close or clean executing owners. Independent 125-point rational grid, irrational bounds, exact single-term root square identity, early zero/constant lookup erasure, reached arithmetic checkpoint cancellation/retry, polynomial checkpoint cancellation, lookup stops and real lexical-sort ownership checks pass in ordinary and checked/debug/trace builds on CPUs 8-16. Full allocation/destructor/callback/TRACE audits, full multivariate isolation and whole polynomial/AST completion remain pending; source-unit statuses remain partial."
+        "Concrete algebraic t_eval/t_eval_core (polynomial.cpp:6436-6522), required by algebraic_numbers.cpp:2387-2388,2406, now preserves recursive Horner grouping, borrowed mapped root cells, actual integer coefficient overloads and scoped algebraic auxiliaries. Actual accepted arithmetic and lexical-sort entries bind the evaluator caller; retained auxiliaries borrow their algebraic owner until explicit cleanup, and callbacks cannot close or clean executing owners. Independent 125-point rational grid, irrational bounds, exact single-term root square identity, early zero/constant lookup erasure, reached arithmetic checkpoint cancellation/retry, polynomial checkpoint cancellation, lookup stops and real lexical-sort ownership checks pass in ordinary and checked/debug/trace builds on CPUs 8-16. Full allocation/destructor/callback/TRACE audits, full multivariate isolation and whole polynomial/AST completion remain pending; source-unit statuses remain partial.",
+        "Multivariate isolate_roots (algebraic_numbers.cpp:2268-2451,2879-2881) now follows rational-fragment substitution, stable defining-degree variable ordering, resultant elimination, univariate isolation and conjugate filtering. Vanished resultants evaluate actual coefficients: the linear branch computes -a0/a1; the higher-degree branch drops vanishing leading coefficients, converts lower terms to the local manager, introduces z*x^i and recurses with z mapped to the actual nonzero algebraic coefficient. Interleaved lexical reference/scalar lifetimes use concrete per-recursion frames. Only accepted substitution/conversion/evaluation/factor calls bind cleanup authority. Cancellation exposed the need to retain the actual factor frontend receipt and explicitly clean reached persistent isolation scratch vectors; cleanup now does so while preserving older refused factor calls. Tests independently cover exact root powers, signed root bounds, spurious conjugates, linear/nonlinear recovery, degree drop, vanished coefficients and variables, both checkpoint services through success/cleanup/retry, source output assertions and executing/older-owner refusals. Full allocation/destructor/callback/TRACE audit and eager constructor composition remain incomplete; polynomial and AST source units remain partial. The signs-between-roots overload is still unported."
       ]
     },
     {
@@ -39028,7 +39055,12 @@
         "pkg/math/polynomial/algebraic_native_storage_test.go",
         "pkg/math/polynomial/polynomial_evaluation_algebraic.go",
         "pkg/math/polynomial/polynomial_evaluation_algebraic_core.go",
-        "pkg/math/polynomial/polynomial_evaluation_algebraic_test.go"
+        "pkg/math/polynomial/polynomial_evaluation_algebraic_test.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_scope.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_test.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_cancel_test.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_owner_test.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",
@@ -39132,7 +39164,14 @@
         "TestPolynomialEvaluationAlgebraicRootsAndEarlyRoutes",
         "TestPolynomialEvaluationAlgebraicCancellationAndRetry",
         "TestPolynomialEvaluationAlgebraicLexOwnershipAndReadStop",
-        "TestPolynomialEvaluationAlgebraicExecutingOwnersAndSingleTerm"
+        "TestPolynomialEvaluationAlgebraicExecutingOwnersAndSingleTerm",
+        "TestAlgebraicMultivariateIsolationConjugateFiltering",
+        "TestAlgebraicMultivariateIsolationVanishedResultantBranches",
+        "TestAlgebraicMultivariateIsolationRationalEliminationAndVanishingVariable",
+        "TestAlgebraicMultivariateIsolationEveryReachedCheckpoint",
+        "TestAlgebraicMultivariateIsolationPreservesOlderFactorInvocation",
+        "TestAlgebraicMultivariateIsolationExecutingOwnerRefusals",
+        "TestAlgebraicMultivariateIsolationEmptyOutputAssertionBeforeLocals"
       ],
       "conditionals": [
         {
@@ -39258,6 +39297,20 @@
             "TestAlgebraicNegMinimumEveryActualReservationPrefix",
             "TestAlgebraicNegRootHornerEveryActualReservationPrefix"
           ]
+        },
+        {
+          "name": "algebraic_numbers.cpp:2268-2451,2879-2881 multivariate root isolation including both vanished-resultant recovery branches; full failure/TRACE audit pending",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/algebraic_isolation_multivariate.go",
+          "tests": [
+            "TestAlgebraicMultivariateIsolationConjugateFiltering",
+            "TestAlgebraicMultivariateIsolationVanishedResultantBranches",
+            "TestAlgebraicMultivariateIsolationRationalEliminationAndVanishingVariable",
+            "TestAlgebraicMultivariateIsolationEveryReachedCheckpoint",
+            "TestAlgebraicMultivariateIsolationPreservesOlderFactorInvocation",
+            "TestAlgebraicMultivariateIsolationExecutingOwnerRefusals",
+            "TestAlgebraicMultivariateIsolationEmptyOutputAssertionBeforeLocals"
+          ]
         }
       ],
       "ownership": [
@@ -39291,7 +39344,8 @@
         "Selected IsPos/IsNeg and Degree queries dispatch to actual null/basic/algebraic cells. Root sign uses actual BinaryIntervalManager predicates; degree reports stored m_p_sz\u22121 without minimizing or refining. Queries construct no source locals and allocate no archive/NUM/backing, including repeated FailAfter(0) calls. Invalid Go copied/foreign/stale owner fixtures prove guard refusal/nonmutation. New sign/degree output assertions are independent checks, not invented registered ENSURE coverage. Existing registered algebraic root drivers provide reached cells; no whole algebraic or UP unit promotion.",
         "Selected Neg ports algebraic_numbers.cpp:1565-1577,383-388,2933-2935 and its reached typed binary Horner child upolynomial.cpp:1734-1764 using literal r/ak declarations and ak then r destruction. Null returns without frame/history reservation, preserving older failed roots under FailAfter(0). Charged diagnostic-only records materialize at actual Integer/Natural allocating branches, retain final first body/source/own causes and captured child tuples through reuse, and carry no NUM/root/cleanup authority. Real MIN and BIG Horner prefixes audit named physical/cold ownership before fault lift. The returning-allocation plus signed-host TLS fixture reaches later ADD refusal with published BIG TMP, completed inline ak DT and consumed r DT Bounds; false child acknowledgment precedes caller Del and true exact unjoined abort. This qualifies the signed-host returning-transport guard domain, not ordinary native overflow. Copied/foreign/stale metadata guard fixtures are separate from source allocation credit. Actual Rational owner reentry RED is closed by an exact executing registered caller guard. Registered src/test/algebraic.cpp:376-379 reaches negation, but later multivariate evaluation is not claimed; new output assertions independently verify literal null/basic/root/p(-x)/lower-sign behavior. Public unrelated EvalSignBinary nil-route lifetimes remain separately qualified; no whole algebraic or UP driver/unit promotion. Actual core-owning lifecycle successor closes a genuine caller-Del then Close RED where header/history were refunded with BIG AddMul TMP still retained. CleanupRetained and Close now invoke exact false/true child acknowledgment; beginQ refuses actual pending Neg instead of silently aborting it. True abort refuses a still-live captured input token (a borrowed destruction-frontier identity, no INC/root acquisition). A real sticky Horner NUM-DT stop previously allowed direct caller Del to cross the younger stop; public Del/private delClosing/CleanupValue now protect only that exact caller token until completed-child false acknowledgment. The actual source/own TLS test proves caller-Del refusal with identical named graph, false ACK then caller Del, actual true-own Bounds protecting older core fields/header/history, and successful owning retry preserving original returned body/source/first-own histories and source cursor. Closed-core history queries end at the actual owner context; no archived diagnostic record authorizes cleanup.",
         "Algebraic locator directories and owning scalar vectors now use native append. Removed geometric container capacity arithmetic and buffer reservations/refunds, using native vector length for isolation sorting/selection and cleanup. Relocated owning vector records are cleared once; actual cell/numeral allocations, mutable rational transfers, pending source copies, stable locator slot/generation checks and stopped numeric cleanup remain explicit. Variable-degree and monomial-position slices also use native append for extent growth.",
-        "Concrete algebraic t_eval/t_eval_core (polynomial.cpp:6436-6522), required by algebraic_numbers.cpp:2387-2388,2406, now preserves recursive Horner grouping, borrowed mapped root cells, actual integer coefficient overloads and scoped algebraic auxiliaries. Actual accepted arithmetic and lexical-sort entries bind the evaluator caller; retained auxiliaries borrow their algebraic owner until explicit cleanup, and callbacks cannot close or clean executing owners. Independent 125-point rational grid, irrational bounds, exact single-term root square identity, early zero/constant lookup erasure, reached arithmetic checkpoint cancellation/retry, polynomial checkpoint cancellation, lookup stops and real lexical-sort ownership checks pass in ordinary and checked/debug/trace builds on CPUs 8-16. Full allocation/destructor/callback/TRACE audits, full multivariate isolation and whole polynomial/AST completion remain pending; source-unit statuses remain partial."
+        "Concrete algebraic t_eval/t_eval_core (polynomial.cpp:6436-6522), required by algebraic_numbers.cpp:2387-2388,2406, now preserves recursive Horner grouping, borrowed mapped root cells, actual integer coefficient overloads and scoped algebraic auxiliaries. Actual accepted arithmetic and lexical-sort entries bind the evaluator caller; retained auxiliaries borrow their algebraic owner until explicit cleanup, and callbacks cannot close or clean executing owners. Independent 125-point rational grid, irrational bounds, exact single-term root square identity, early zero/constant lookup erasure, reached arithmetic checkpoint cancellation/retry, polynomial checkpoint cancellation, lookup stops and real lexical-sort ownership checks pass in ordinary and checked/debug/trace builds on CPUs 8-16. Full allocation/destructor/callback/TRACE audits, full multivariate isolation and whole polynomial/AST completion remain pending; source-unit statuses remain partial.",
+        "Multivariate isolate_roots (algebraic_numbers.cpp:2268-2451,2879-2881) now follows rational-fragment substitution, stable defining-degree variable ordering, resultant elimination, univariate isolation and conjugate filtering. Vanished resultants evaluate actual coefficients: the linear branch computes -a0/a1; the higher-degree branch drops vanishing leading coefficients, converts lower terms to the local manager, introduces z*x^i and recurses with z mapped to the actual nonzero algebraic coefficient. Interleaved lexical reference/scalar lifetimes use concrete per-recursion frames. Only accepted substitution/conversion/evaluation/factor calls bind cleanup authority. Cancellation exposed the need to retain the actual factor frontend receipt and explicitly clean reached persistent isolation scratch vectors; cleanup now does so while preserving older refused factor calls. Tests independently cover exact root powers, signed root bounds, spurious conjugates, linear/nonlinear recovery, degree drop, vanished coefficients and variables, both checkpoint services through success/cleanup/retry, source output assertions and executing/older-owner refusals. Full allocation/destructor/callback/TRACE audit and eager constructor composition remain incomplete; polynomial and AST source units remain partial. The signs-between-roots overload is still unported."
       ]
     },
     {
@@ -39955,7 +40009,12 @@
         "pkg/math/polynomial/polynomial_monomial_table_native_test.go",
         "pkg/math/polynomial/polynomial_evaluation_algebraic.go",
         "pkg/math/polynomial/polynomial_evaluation_algebraic_core.go",
-        "pkg/math/polynomial/polynomial_evaluation_algebraic_test.go"
+        "pkg/math/polynomial/polynomial_evaluation_algebraic_test.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_scope.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_test.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_cancel_test.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_owner_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -40800,7 +40859,14 @@
         "TestPolynomialEvaluationAlgebraicRootsAndEarlyRoutes",
         "TestPolynomialEvaluationAlgebraicCancellationAndRetry",
         "TestPolynomialEvaluationAlgebraicLexOwnershipAndReadStop",
-        "TestPolynomialEvaluationAlgebraicExecutingOwnersAndSingleTerm"
+        "TestPolynomialEvaluationAlgebraicExecutingOwnersAndSingleTerm",
+        "TestAlgebraicMultivariateIsolationConjugateFiltering",
+        "TestAlgebraicMultivariateIsolationVanishedResultantBranches",
+        "TestAlgebraicMultivariateIsolationRationalEliminationAndVanishingVariable",
+        "TestAlgebraicMultivariateIsolationEveryReachedCheckpoint",
+        "TestAlgebraicMultivariateIsolationPreservesOlderFactorInvocation",
+        "TestAlgebraicMultivariateIsolationExecutingOwnerRefusals",
+        "TestAlgebraicMultivariateIsolationEmptyOutputAssertionBeforeLocals"
       ],
       "conditionals": [
         {
@@ -45006,7 +45072,8 @@
         "Monomial scratch (four manager temporaries, borrowed temporaries and imp tmp1) and MkFromVariables counting storage now use concrete []MonomialPower slices. Removed inline128 buffers, byte/header codecs, manual capacity growth, copied/pending storage, container allocation/free faults and handwritten sorting. Go sort.Slice preserves unsigned ascending variable order; the project cached hash and live object interning/refcount/allocation remain. Native scratch writes grow the active slice, so partial-prefix reads use native length/bounds rather than initialized spare bytes. Cold growth/shrink/reset through 4097 powers and independent 129-variable counting/interning succeed under disabled Runtime reservations with unchanged accounting. Nine obsolete container-only tests are retired; actual numeric, factory, table and stopped destructor tests remain. No whole-unit completion credit is added.",
         "Monomial interning and lexical rename tables now use concrete insertion-ordered insdict.Dict v0.10.1 entries and native map[uint32][]uint32 project-hash buckets. Stable entry IDs retain temporary factory publication and replacement by completed objects. Removed C++ primary/cellar/free-list geometry, physical codecs, rehash/growth/collision counters and table allocation/free failures. Native []bool validates debug rename permutations; Go sort.Slice replaces the remaining monomial heap sort. Rename iterates deterministic insertion order and swaps only after all mutations/inserts complete. Cached project hash/equality still read actual reached object powers; real object allocations, refcounts and stopped source destructor continuations remain. Owning token cleanup uses the stored bucket after partial key mutation; constructor/source table destruction records removal of any pending factory edge. Independent cold growth and duplicate/delete/order coverage spans 4097 actual monomials under disabled Runtime reservations, two renames preserve every canonical identity, forced collisions preserve distinct powers, and source/owning pending cleanup is verified. The obsolete polynomial rename table-allocation sweep is replaced by allocation-disabled exact-value checks; warm ModD/PSC tests now audit real Runtime/numeric storage independently of native Go allocations. No whole-unit completion credit is added.",
         "Persistent found-variable flags shared by substitution and Vars now use native []bool. Removed cap/size byte codecs, source 3/2 growth, Runtime binding/pending/interrupted state, container allocation/free failures and raw-root census adapters. Growth preserves old flags and initializes new flags false; reserve does not shrink. The original reached term/query reset loops remain, including visited flags surviving a source body failure. Native bounds retain debug assertions and release arena.ErrBounds; scalar member cleanup releases the slice. Native cold growth through 4097 flags and cold Vars output publication run under disabled Runtime reservations with unchanged accounting. An actual reached malformed-variable bounds fixture checks the published visited prefix and retained flags without inventing a source failure/reentry from deleted container allocation. Three obsolete container-only tests are retired. Real substitution numeric/factory/destructor and owner guards remain. No whole-unit completion credit is added.",
-        "Concrete algebraic t_eval/t_eval_core (polynomial.cpp:6436-6522), required by algebraic_numbers.cpp:2387-2388,2406, now preserves recursive Horner grouping, borrowed mapped root cells, actual integer coefficient overloads and scoped algebraic auxiliaries. Actual accepted arithmetic and lexical-sort entries bind the evaluator caller; retained auxiliaries borrow their algebraic owner until explicit cleanup, and callbacks cannot close or clean executing owners. Independent 125-point rational grid, irrational bounds, exact single-term root square identity, early zero/constant lookup erasure, reached arithmetic checkpoint cancellation/retry, polynomial checkpoint cancellation, lookup stops and real lexical-sort ownership checks pass in ordinary and checked/debug/trace builds on CPUs 8-16. Full allocation/destructor/callback/TRACE audits, full multivariate isolation and whole polynomial/AST completion remain pending; source-unit statuses remain partial."
+        "Concrete algebraic t_eval/t_eval_core (polynomial.cpp:6436-6522), required by algebraic_numbers.cpp:2387-2388,2406, now preserves recursive Horner grouping, borrowed mapped root cells, actual integer coefficient overloads and scoped algebraic auxiliaries. Actual accepted arithmetic and lexical-sort entries bind the evaluator caller; retained auxiliaries borrow their algebraic owner until explicit cleanup, and callbacks cannot close or clean executing owners. Independent 125-point rational grid, irrational bounds, exact single-term root square identity, early zero/constant lookup erasure, reached arithmetic checkpoint cancellation/retry, polynomial checkpoint cancellation, lookup stops and real lexical-sort ownership checks pass in ordinary and checked/debug/trace builds on CPUs 8-16. Full allocation/destructor/callback/TRACE audits, full multivariate isolation and whole polynomial/AST completion remain pending; source-unit statuses remain partial.",
+        "Multivariate isolate_roots (algebraic_numbers.cpp:2268-2451,2879-2881) now follows rational-fragment substitution, stable defining-degree variable ordering, resultant elimination, univariate isolation and conjugate filtering. Vanished resultants evaluate actual coefficients: the linear branch computes -a0/a1; the higher-degree branch drops vanishing leading coefficients, converts lower terms to the local manager, introduces z*x^i and recurses with z mapped to the actual nonzero algebraic coefficient. Interleaved lexical reference/scalar lifetimes use concrete per-recursion frames. Only accepted substitution/conversion/evaluation/factor calls bind cleanup authority. Cancellation exposed the need to retain the actual factor frontend receipt and explicitly clean reached persistent isolation scratch vectors; cleanup now does so while preserving older refused factor calls. Tests independently cover exact root powers, signed root bounds, spurious conjugates, linear/nonlinear recovery, degree drop, vanished coefficients and variables, both checkpoint services through success/cleanup/retry, source output assertions and executing/older-owner refusals. Full allocation/destructor/callback/TRACE audit and eager constructor composition remain incomplete; polynomial and AST source units remain partial. The signs-between-roots overload is still unported."
       ]
     },
     {
@@ -45294,7 +45361,12 @@
         "pkg/math/polynomial/polynomial_monomial_table_native_test.go",
         "pkg/math/polynomial/polynomial_evaluation_algebraic.go",
         "pkg/math/polynomial/polynomial_evaluation_algebraic_core.go",
-        "pkg/math/polynomial/polynomial_evaluation_algebraic_test.go"
+        "pkg/math/polynomial/polynomial_evaluation_algebraic_test.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_scope.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_test.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_cancel_test.go",
+        "pkg/math/polynomial/algebraic_isolation_multivariate_owner_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -45876,7 +45948,14 @@
         "TestPolynomialEvaluationAlgebraicRootsAndEarlyRoutes",
         "TestPolynomialEvaluationAlgebraicCancellationAndRetry",
         "TestPolynomialEvaluationAlgebraicLexOwnershipAndReadStop",
-        "TestPolynomialEvaluationAlgebraicExecutingOwnersAndSingleTerm"
+        "TestPolynomialEvaluationAlgebraicExecutingOwnersAndSingleTerm",
+        "TestAlgebraicMultivariateIsolationConjugateFiltering",
+        "TestAlgebraicMultivariateIsolationVanishedResultantBranches",
+        "TestAlgebraicMultivariateIsolationRationalEliminationAndVanishingVariable",
+        "TestAlgebraicMultivariateIsolationEveryReachedCheckpoint",
+        "TestAlgebraicMultivariateIsolationPreservesOlderFactorInvocation",
+        "TestAlgebraicMultivariateIsolationExecutingOwnerRefusals",
+        "TestAlgebraicMultivariateIsolationEmptyOutputAssertionBeforeLocals"
       ],
       "conditionals": [
         {
@@ -47803,7 +47882,8 @@
         "Monomial scratch (four manager temporaries, borrowed temporaries and imp tmp1) and MkFromVariables counting storage now use concrete []MonomialPower slices. Removed inline128 buffers, byte/header codecs, manual capacity growth, copied/pending storage, container allocation/free faults and handwritten sorting. Go sort.Slice preserves unsigned ascending variable order; the project cached hash and live object interning/refcount/allocation remain. Native scratch writes grow the active slice, so partial-prefix reads use native length/bounds rather than initialized spare bytes. Cold growth/shrink/reset through 4097 powers and independent 129-variable counting/interning succeed under disabled Runtime reservations with unchanged accounting. Nine obsolete container-only tests are retired; actual numeric, factory, table and stopped destructor tests remain. No whole-unit completion credit is added.",
         "Monomial interning and lexical rename tables now use concrete insertion-ordered insdict.Dict v0.10.1 entries and native map[uint32][]uint32 project-hash buckets. Stable entry IDs retain temporary factory publication and replacement by completed objects. Removed C++ primary/cellar/free-list geometry, physical codecs, rehash/growth/collision counters and table allocation/free failures. Native []bool validates debug rename permutations; Go sort.Slice replaces the remaining monomial heap sort. Rename iterates deterministic insertion order and swaps only after all mutations/inserts complete. Cached project hash/equality still read actual reached object powers; real object allocations, refcounts and stopped source destructor continuations remain. Owning token cleanup uses the stored bucket after partial key mutation; constructor/source table destruction records removal of any pending factory edge. Independent cold growth and duplicate/delete/order coverage spans 4097 actual monomials under disabled Runtime reservations, two renames preserve every canonical identity, forced collisions preserve distinct powers, and source/owning pending cleanup is verified. The obsolete polynomial rename table-allocation sweep is replaced by allocation-disabled exact-value checks; warm ModD/PSC tests now audit real Runtime/numeric storage independently of native Go allocations. No whole-unit completion credit is added.",
         "Persistent found-variable flags shared by substitution and Vars now use native []bool. Removed cap/size byte codecs, source 3/2 growth, Runtime binding/pending/interrupted state, container allocation/free failures and raw-root census adapters. Growth preserves old flags and initializes new flags false; reserve does not shrink. The original reached term/query reset loops remain, including visited flags surviving a source body failure. Native bounds retain debug assertions and release arena.ErrBounds; scalar member cleanup releases the slice. Native cold growth through 4097 flags and cold Vars output publication run under disabled Runtime reservations with unchanged accounting. An actual reached malformed-variable bounds fixture checks the published visited prefix and retained flags without inventing a source failure/reentry from deleted container allocation. Three obsolete container-only tests are retired. Real substitution numeric/factory/destructor and owner guards remain. No whole-unit completion credit is added.",
-        "Concrete algebraic t_eval/t_eval_core (polynomial.cpp:6436-6522), required by algebraic_numbers.cpp:2387-2388,2406, now preserves recursive Horner grouping, borrowed mapped root cells, actual integer coefficient overloads and scoped algebraic auxiliaries. Actual accepted arithmetic and lexical-sort entries bind the evaluator caller; retained auxiliaries borrow their algebraic owner until explicit cleanup, and callbacks cannot close or clean executing owners. Independent 125-point rational grid, irrational bounds, exact single-term root square identity, early zero/constant lookup erasure, reached arithmetic checkpoint cancellation/retry, polynomial checkpoint cancellation, lookup stops and real lexical-sort ownership checks pass in ordinary and checked/debug/trace builds on CPUs 8-16. Full allocation/destructor/callback/TRACE audits, full multivariate isolation and whole polynomial/AST completion remain pending; source-unit statuses remain partial."
+        "Concrete algebraic t_eval/t_eval_core (polynomial.cpp:6436-6522), required by algebraic_numbers.cpp:2387-2388,2406, now preserves recursive Horner grouping, borrowed mapped root cells, actual integer coefficient overloads and scoped algebraic auxiliaries. Actual accepted arithmetic and lexical-sort entries bind the evaluator caller; retained auxiliaries borrow their algebraic owner until explicit cleanup, and callbacks cannot close or clean executing owners. Independent 125-point rational grid, irrational bounds, exact single-term root square identity, early zero/constant lookup erasure, reached arithmetic checkpoint cancellation/retry, polynomial checkpoint cancellation, lookup stops and real lexical-sort ownership checks pass in ordinary and checked/debug/trace builds on CPUs 8-16. Full allocation/destructor/callback/TRACE audits, full multivariate isolation and whole polynomial/AST completion remain pending; source-unit statuses remain partial.",
+        "Multivariate isolate_roots (algebraic_numbers.cpp:2268-2451,2879-2881) now follows rational-fragment substitution, stable defining-degree variable ordering, resultant elimination, univariate isolation and conjugate filtering. Vanished resultants evaluate actual coefficients: the linear branch computes -a0/a1; the higher-degree branch drops vanishing leading coefficients, converts lower terms to the local manager, introduces z*x^i and recurses with z mapped to the actual nonzero algebraic coefficient. Interleaved lexical reference/scalar lifetimes use concrete per-recursion frames. Only accepted substitution/conversion/evaluation/factor calls bind cleanup authority. Cancellation exposed the need to retain the actual factor frontend receipt and explicitly clean reached persistent isolation scratch vectors; cleanup now does so while preserving older refused factor calls. Tests independently cover exact root powers, signed root bounds, spurious conjugates, linear/nonlinear recovery, degree drop, vanished coefficients and variables, both checkpoint services through success/cleanup/retry, source output assertions and executing/older-owner refusals. Full allocation/destructor/callback/TRACE audit and eager constructor composition remain incomplete; polynomial and AST source units remain partial. The signs-between-roots overload is still unported."
       ]
     },
     {
@@ -50603,7 +50683,7 @@
       "path": "src/math/polynomial/upolynomial_factorization.cpp",
       "component": "math",
       "role": "production",
-      "status": "unported",
+      "status": "partial",
       "go_targets": [
         "pkg/util/numeral/integer_allocation_invocation_context.go",
         "pkg/util/numeral/mpz_power_shift.go",
@@ -51244,7 +51324,7 @@
       "path": "src/math/polynomial/upolynomial_factorization_int.h",
       "component": "math",
       "role": "production",
-      "status": "unported",
+      "status": "partial",
       "go_targets": [
         "pkg/math/polynomial/upolynomial_factor_hensel.go",
         "pkg/math/polynomial/upolynomial_prime_trial_invocation.go",

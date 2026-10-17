@@ -12,9 +12,11 @@ var ErrAlgebraicDivisionByZero = errors.New("division by zero")
 
 // The two source scoped rationals survive a refused destruction in the owner.
 type algebraicInverseScope struct {
-	values    [2]unumeral.Rational // inv_lower, inv_upper
-	remaining uint8
-	executing bool
+	polynomialCaller *polynomialAlgebraicEvaluationScope
+	sourceStop       error
+	values           [2]unumeral.Rational // inv_lower, inv_upper
+	remaining        uint8
+	executing        bool
 }
 
 func (m *AlgebraicRootCore) cleanupInverse() error {
@@ -124,10 +126,16 @@ func (m *AlgebraicRootCore) Inv(a *Algebraic) (cause error) {
 		return e
 	}
 	q := &m.inversion
+	q.polynomialCaller = m.polynomialCaller
+	q.sourceStop = nil
 	q.executing = true
 	defer func() {
 		q.executing = false
-		cause = errors.Join(cause, m.cleanupInverse())
+		cleanup := m.cleanupInverse()
+		if cleanup != nil {
+			q.sourceStop = cleanup
+		}
+		cause = errors.Join(cause, cleanup)
 	}()
 	if l.kind == 0 {
 		e = m.config.Rationals.InvInPlace(&r.value)
