@@ -40,3 +40,20 @@ func TestMPNDivNReadsDebugSwitchAfterNormalizationTrace(t *testing.T) {
 		t.Fatal("div_n assertion must read closed owner before ms resize or output", err, w.closeErr, w.writes, q, r, naturalDivisionCapacities(m))
 	}
 }
+
+func TestMPNDivNReadsEstimateAssertionOnNextIteration(t *testing.T) {
+	d, _ := bindMPNDebugActions(t, "")
+	m := naturalManager(t)
+	w := &mpnCloseDebugOnTrace{debug: d}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("mpn_div")
+	if !tags.ShouldTrace("mpn_div") {
+		t.Skip("source division TRACE erased")
+	}
+	m.trace = tags
+	q, r := []uint32{99, 99}, []uint32{88, 88}
+	_, err := m.Div([]uint32{5, 2, 1}, []uint32{1, 1}, q, r)
+	if !errors.Is(err, arena.ErrClosed) || w.closeErr != nil || w.writes == 0 || q[0] != 99 || q[1] == 99 || r[0] != 88 || r[1] != 88 {
+		t.Fatal("second quotient estimate assertion must stop before its multiplication/output", err, w.closeErr, w.writes, q, r)
+	}
+}

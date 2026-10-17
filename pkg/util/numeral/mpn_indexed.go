@@ -256,8 +256,17 @@ func (m *NaturalManager) divideMany(size, n uint32, q limbView) error {
 				break
 			}
 		}
-		if qh >= base {
-			panic("mpnum: invalid quotient estimate")
+		if diagnostic.DebugBuild {
+			d := diagnostic.BorrowProcessDebugContext()
+			enabled, e := diagnostic.SourceAssertionsEnabled(d)
+			if e != nil {
+				return e
+			}
+			if enabled && qh >= base {
+				if e = diagnostic.DebugAssertionFailure(d, "src/util/mpn.cpp", 335, "q_hat < BASE"); e != nil {
+					return e
+				}
+			}
 		}
 		small := uint32(qh)
 		// Source mul(&small,1,v,n,ms), Algorithm M with the zero-digit branch.
