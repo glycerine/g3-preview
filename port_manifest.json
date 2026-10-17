@@ -38329,7 +38329,8 @@
         "pkg/math/polynomial/algebraic_bound_evaluation_test.go",
         "pkg/math/polynomial/algebraic_bound_refinement.go",
         "pkg/math/polynomial/algebraic_bound_refinement_test.go",
-        "pkg/math/polynomial/algebraic_refinement_owner_test.go"
+        "pkg/math/polynomial/algebraic_refinement_owner_test.go",
+        "pkg/math/polynomial/algebraic_refinement_promotion_test.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",
@@ -39203,7 +39204,8 @@
         "pkg/math/polynomial/algebraic_bound_evaluation_test.go",
         "pkg/math/polynomial/algebraic_bound_refinement.go",
         "pkg/math/polynomial/algebraic_bound_refinement_test.go",
-        "pkg/math/polynomial/algebraic_refinement_owner_test.go"
+        "pkg/math/polynomial/algebraic_refinement_owner_test.go",
+        "pkg/math/polynomial/algebraic_refinement_promotion_test.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",

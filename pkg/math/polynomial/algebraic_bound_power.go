@@ -3,7 +3,7 @@ package polynomial
 import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 
 // Actual RAW and physical children reached by the retained to_mpq call.
-type algebraicBoundConversion struct {
+type algebraicConversionScope struct {
 	owner      *AlgebraicRootCore
 	hooks      unumeral.NumericInvocationHooks
 	roots      unumeral.NumericAllocationRoots
@@ -13,11 +13,17 @@ type algebraicBoundConversion struct {
 	executing  bool
 }
 
-func (s *algebraicBoundConversion) NumericBound(executing bool) bool {
+func (s *algebraicConversionScope) NumericBound(executing bool) bool {
 	m := s.owner
-	return m != nil && m.self == m && !m.closed && s == &m.bounds.conversion && (!executing || s.executing && m.bounds.executing)
+	if m == nil || m.self != m || m.closed {
+		return false
+	}
+	if s == &m.bounds.conversion {
+		return !executing || s.executing && m.bounds.executing
+	}
+	return s == &m.refinementConversion && (!executing || s.executing && m.localActive)
 }
-func (s *algebraicBoundConversion) NumericRoots(z *unumeral.IntegerManager, local *unumeral.NumericAllocationRoots) *unumeral.NumericAllocationRoots {
+func (s *algebraicConversionScope) NumericRoots(z *unumeral.IntegerManager, local *unumeral.NumericAllocationRoots) *unumeral.NumericAllocationRoots {
 	if !s.NumericBound(true) || s.owner.config.Rationals.Integers() != z {
 		return nil
 	}
@@ -26,12 +32,12 @@ func (s *algebraicBoundConversion) NumericRoots(z *unumeral.IntegerManager, loca
 	}
 	return &s.roots
 }
-func (s *algebraicBoundConversion) NumericRecord(z *unumeral.IntegerManager, _ string, r unumeral.NumericInvocationReceipt) {
+func (s *algebraicConversionScope) NumericRecord(z *unumeral.IntegerManager, _ string, r unumeral.NumericInvocationReceipt) {
 	if s.NumericBound(true) && s.owner.config.Rationals.Integers() == z && r.Raw != nil {
 		s.raw = append(s.raw, *r.Raw)
 	}
 }
-func (s *algebraicBoundConversion) pending(m *AlgebraicRootCore) bool {
+func (s *algebraicConversionScope) pending(m *AlgebraicRootCore) bool {
 	if s.owner != m {
 		return false
 	}
@@ -45,9 +51,12 @@ func (s *algebraicBoundConversion) pending(m *AlgebraicRootCore) bool {
 	}
 	return false
 }
-func (s *algebraicBoundConversion) cleanup() error {
+func (s *algebraicConversionScope) cleanup() error {
 	if s.owner == nil {
 		return nil
+	}
+	if !s.NumericBound(false) {
+		return ErrAlgebraicOwner
 	}
 	if s.executing {
 		return ErrAlgebraicPending
@@ -73,7 +82,15 @@ func (s *algebraicBoundConversion) cleanup() error {
 	return nil
 }
 func (m *AlgebraicRootCore) boundToRational(a *unumeral.BinaryRational, out *unumeral.Rational) error {
-	s := &m.bounds.conversion
+	return m.bounds.conversion.run(m, a, out)
+}
+func (s *algebraicConversionScope) run(m *AlgebraicRootCore, a *unumeral.BinaryRational, out *unumeral.Rational) error {
+	if m == nil || m.self != m || (s != &m.bounds.conversion && s != &m.refinementConversion) {
+		return ErrAlgebraicOwner
+	}
+	if s == &m.refinementConversion && (!m.localActive || out != &m.localQ) {
+		return ErrAlgebraicOwner
+	}
 	if s.pending(m) {
 		return ErrAlgebraicPending
 	}

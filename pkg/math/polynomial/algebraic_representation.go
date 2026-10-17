@@ -136,7 +136,7 @@ func (m *AlgebraicRootCore) copyBinaryBound(a *Algebraic, out *unumeral.BinaryRa
 
 type algebraicBoundScope struct {
 	refinement algebraicRefinementScope
-	conversion algebraicBoundConversion
+	conversion algebraicConversionScope
 	copy       unumeral.IntegerCopyAllocationReceipt
 	values     [2]unumeral.BinaryRational
 	remaining  uint8
