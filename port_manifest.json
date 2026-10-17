@@ -38228,6 +38228,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/algebraic_division.go",
+        "pkg/math/polynomial/algebraic_division_test.go",
         "pkg/math/polynomial/algebraic_binary.go",
         "pkg/math/polynomial/algebraic_binary_test.go",
         "pkg/math/polynomial/algebraic_resultant_polynomial.go",
@@ -38265,6 +38267,10 @@
         "pkg/math/polynomial/algebraic_display_decimal_test.go"
       ],
       "tests": [
+        "TestAlgebraicDivisionRootsAndAliases",
+        "TestAlgebraicDivisionSelfAndZeroNumerator",
+        "TestAlgebraicDivisionZeroDivisorBeforeNumerator",
+        "TestAlgebraicDivisionCancellationCleanupAndRetry",
         "TestAlgebraicBinaryRootArithmeticAndAliases",
         "TestAlgebraicBinaryQuadraticCubicRootSelection",
         "TestAlgebraicBinaryMixedDispatchAndRefinementFallback",
@@ -38845,6 +38851,7 @@
         "Source Del guards endangered partial construction reads; explicit owning abort drains genuine fields and retains physical cleanup progress. Owning close rejects caller roots instead of sweeping the locator registry."
       ],
       "deviations": [
+        "Division (cpp:1648-1667,2929-2931), retained by api_algebraic.cpp:191-207, now copies the divisor into an invocation-owned scoped algebraic value, inverts it and multiplies. The copy remains alive while binary selection borrows it; CleanupRetained releases child locals before this older scoped inverse. Independent bounds, destination aliases, self division, zero numerator, zero-divisor diagnostic before numerator read, and every reached checkpoint cancellation/cleanup/retry pass in ordinary and checked/debug/trace builds. Full nested allocation-failure and callback transport remains partial.",
         "Public Add/Sub/Mul now connect zero/basic/mixed dispatch to actual resultant factorization or square-free reduction, per-factor Sturm sequences, interval candidate elimination, input refinement and set_core conversion. Discarded sequence owners are destroyed at the source set operation; remaining sequence owners are destroyed in forward order. Saved intervals follow the source magnitude restoration, including the duplicate saved_a restoration call in the rational fallback. Results support input/output aliases, zero roots, repeated factors, negative roots and quadratic/cubic combinations. Process assertion gates precede reached root-tag, sequence-count and set_core comparisons. An exact issued factor frontend tuple bound to the local factors owner provides cleanup authority; unjoined failed Sturm sequence construction is retained for explicit owning cleanup. Every reached checkpoint allowance for a cold sum is tested through cancellation, cleanup and retry in factored and square-free profiles. Independent value identities, rational bounds, saved-interval restoration and entry debugger-owner/T-action tests pass. Complete allocation-failure, nested callback/constructor transport, source TRACE and the full algebraic owner constructor remain partial; no original whole-driver completion is claimed.",
         "The concrete two-root resultant polynomial builders now use a private actual MultivariatePolynomialManager sharing the existing integer/rational services and small allocator. Its two variables and owner persist; four embedded source polynomial references retain reverse destruction. Addition uses pa(x-y), subtraction pa(x+y), and multiplication the homogeneous y^n*pa(x/y), each followed by resultant_y with pb(y) and conversion directly into the algebraic dense owner. Tests independently verify quadratic and mixed quadratic/cubic identities, distinguish sum from difference with odd coefficients, retain repeated/zero resultant factors, reuse the owner and prove actual checkpoint cancellation/owning cleanup/retry. This prerequisite core materializes the multivariate member lazily; the complete eager algebraic constructor, mk_binary mathematical factor/Sturm selection has separate evidence; TRACE and full nested failure/callback composition remain partial. No full two-root arithmetic API or original driver completion is claimed.",
         "MulRational ports the retained rational-operand multiplication route, including zero-left short circuit before the second operand read. A root checks the actual process assertion switch at cpp1501 before scoped arithmetic values, then copies the reciprocal scalar, copies coefficients into the shared m_add_tmp without an invented reset, composes p(q*x), restores the original scalar, scales endpoints and reverses them for a negative multiplier. Non-dyadic factors use rational endpoints and the existing rational-to-binary interval converter. Source minimality, final interval normalization and iu/il then u/l then nbv cleanup are retained. Independent coefficient identities and multiply/reciprocal round trips cover quadratic/cubic roots, both signs, aliases and addition/subtraction workspace reuse. Closed debug owner and source T-action fixtures verify the entry diagnostic precedes locals and output mutation. A separate non-dyadic multiplier (2^64+1)/3 checks BIG coefficients against math/big and an inverse-scaling round trip. This reaches the rational multiplication consumer at src/test/algebraic.cpp:151 without claiming its surrounding driver complete. Two-root mathematical arithmetic has separate evidence; source TRACE, full constructor composition and complete nested failure/callback transport remain open.",
@@ -38868,6 +38875,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/algebraic_division.go",
+        "pkg/math/polynomial/algebraic_division_test.go",
         "pkg/math/polynomial/algebraic_binary.go",
         "pkg/math/polynomial/algebraic_binary_test.go",
         "pkg/math/polynomial/algebraic_resultant_polynomial.go",
@@ -38901,6 +38910,10 @@
         "pkg/math/polynomial/algebraic_native_storage_test.go"
       ],
       "tests": [
+        "TestAlgebraicDivisionRootsAndAliases",
+        "TestAlgebraicDivisionSelfAndZeroNumerator",
+        "TestAlgebraicDivisionZeroDivisorBeforeNumerator",
+        "TestAlgebraicDivisionCancellationCleanupAndRetry",
         "TestAlgebraicBinaryRootArithmeticAndAliases",
         "TestAlgebraicBinaryQuadraticCubicRootSelection",
         "TestAlgebraicBinaryMixedDispatchAndRefinementFallback",
@@ -39083,6 +39096,7 @@
         "Source Del guards endangered partial construction reads; explicit owning abort drains genuine fields and retains physical cleanup progress. Owning close rejects caller roots instead of sweeping the locator registry."
       ],
       "deviations": [
+        "Division (cpp:1648-1667,2929-2931), retained by api_algebraic.cpp:191-207, now copies the divisor into an invocation-owned scoped algebraic value, inverts it and multiplies. The copy remains alive while binary selection borrows it; CleanupRetained releases child locals before this older scoped inverse. Independent bounds, destination aliases, self division, zero numerator, zero-divisor diagnostic before numerator read, and every reached checkpoint cancellation/cleanup/retry pass in ordinary and checked/debug/trace builds. Full nested allocation-failure and callback transport remains partial.",
         "Public Add/Sub/Mul now connect zero/basic/mixed dispatch to actual resultant factorization or square-free reduction, per-factor Sturm sequences, interval candidate elimination, input refinement and set_core conversion. Discarded sequence owners are destroyed at the source set operation; remaining sequence owners are destroyed in forward order. Saved intervals follow the source magnitude restoration, including the duplicate saved_a restoration call in the rational fallback. Results support input/output aliases, zero roots, repeated factors, negative roots and quadratic/cubic combinations. Process assertion gates precede reached root-tag, sequence-count and set_core comparisons. An exact issued factor frontend tuple bound to the local factors owner provides cleanup authority; unjoined failed Sturm sequence construction is retained for explicit owning cleanup. Every reached checkpoint allowance for a cold sum is tested through cancellation, cleanup and retry in factored and square-free profiles. Independent value identities, rational bounds, saved-interval restoration and entry debugger-owner/T-action tests pass. Complete allocation-failure, nested callback/constructor transport, source TRACE and the full algebraic owner constructor remain partial; no original whole-driver completion is claimed.",
         "The concrete two-root resultant polynomial builders now use a private actual MultivariatePolynomialManager sharing the existing integer/rational services and small allocator. Its two variables and owner persist; four embedded source polynomial references retain reverse destruction. Addition uses pa(x-y), subtraction pa(x+y), and multiplication the homogeneous y^n*pa(x/y), each followed by resultant_y with pb(y) and conversion directly into the algebraic dense owner. Tests independently verify quadratic and mixed quadratic/cubic identities, distinguish sum from difference with odd coefficients, retain repeated/zero resultant factors, reuse the owner and prove actual checkpoint cancellation/owning cleanup/retry. This prerequisite core materializes the multivariate member lazily; the complete eager algebraic constructor, mk_binary mathematical factor/Sturm selection has separate evidence; TRACE and full nested failure/callback composition remain partial. No full two-root arithmetic API or original driver completion is claimed.",
         "MulRational ports the retained rational-operand multiplication route, including zero-left short circuit before the second operand read. A root checks the actual process assertion switch at cpp1501 before scoped arithmetic values, then copies the reciprocal scalar, copies coefficients into the shared m_add_tmp without an invented reset, composes p(q*x), restores the original scalar, scales endpoints and reverses them for a negative multiplier. Non-dyadic factors use rational endpoints and the existing rational-to-binary interval converter. Source minimality, final interval normalization and iu/il then u/l then nbv cleanup are retained. Independent coefficient identities and multiply/reciprocal round trips cover quadratic/cubic roots, both signs, aliases and addition/subtraction workspace reuse. Closed debug owner and source T-action fixtures verify the entry diagnostic precedes locals and output mutation. A separate non-dyadic multiplier (2^64+1)/3 checks BIG coefficients against math/big and an inverse-scaling round trip. This reaches the rational multiplication consumer at src/test/algebraic.cpp:151 without claiming its surrounding driver complete. Two-root mathematical arithmetic has separate evidence; source TRACE, full constructor composition and complete nested failure/callback transport remain open.",
