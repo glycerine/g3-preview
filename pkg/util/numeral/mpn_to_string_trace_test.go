@@ -103,3 +103,50 @@ func TestMPNToStringSourceEndlFlushAndRefusedStream(t *testing.T) {
 		}
 	}
 }
+
+func TestMPNToStringTraceShortInsertionKeepsConversion(t *testing.T) {
+	for _, part := range []string{"[mpn] to_string ", "|", "4294967296"} {
+		m, _ := integerManager(t)
+		full := &numeralDisplayWrites{}
+		tags := diagnostic.NewTraceTagsWithWriter(full)
+		tags.Enable("mpn_to_string")
+		if !tags.ShouldTrace("mpn_to_string") {
+			return
+		}
+		if err := m.BindTrace(tags); err != nil {
+			t.Fatal(err)
+		}
+		var dst [32]byte
+		input := limbView{external: []uint32{0, 1}, size: 2}
+		if err := m.Natural.sourceToCString(input, sourceDecimalDestination{external: dst[:]}, uint64(len(dst))); err != nil {
+			t.Fatal(err)
+		}
+		at := 0
+		for i, written := range full.parts {
+			if written == part {
+				at = i + 1
+				break
+			}
+		}
+		if at == 0 {
+			t.Fatalf("missing trace insertion %q in %q", part, full.parts)
+		}
+		m, _ = integerManager(t)
+		short := &numeralDisplayWrites{at: at}
+		tags = diagnostic.NewTraceTagsWithWriter(short)
+		tags.Enable("mpn_to_string")
+		if err := m.BindTrace(tags); err != nil {
+			t.Fatal(err)
+		}
+		clear(dst[:])
+		if err := m.Natural.sourceToCString(input, sourceDecimalDestination{external: dst[:]}, uint64(len(dst))); err != nil {
+			t.Fatal(err)
+		}
+		if got := string(dst[:10]); got != "4294967296" {
+			t.Fatal("trace refusal altered conversion", part, got)
+		}
+		if len(short.parts) != at || short.String() != full.String()[:len(short.String())] {
+			t.Fatal("trace continued physical insertion after short write", part, short.parts)
+		}
+	}
+}

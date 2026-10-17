@@ -12,22 +12,31 @@ import (
 func (m *NaturalManager) traceToCStringInput(a limbView) {
 	_ = m.sourceTraceTags().EmitConditional("mpn_to_string", "to_string", "src/util/mpn.cpp", 362,
 		func() bool { return true }, func(w io.Writer) error {
-			_ = writeNumeralDisplayPart(w, "[mpn] to_string ")
-			_ = writeNumeralDisplayPart(w, "[")
+			if err := writeNumeralDisplayPart(w, "[mpn] to_string "); err != nil {
+				return err
+			}
+			if err := writeNumeralDisplayPart(w, "["); err != nil {
+				return err
+			}
 			for i := a.size; i > 0; {
 				i--
 				v, err := readDecimalLimb(a, i)
 				if err != nil {
 					return err
 				}
-				_ = writeNumeralDisplayPart(w, strconv.FormatUint(uint64(v), 10))
+				if err := writeNumeralDisplayPart(w, strconv.FormatUint(uint64(v), 10)); err != nil {
+					return err
+				}
 				if i != 0 {
-					_ = writeNumeralDisplayPart(w, "|")
+					if err := writeNumeralDisplayPart(w, "|"); err != nil {
+						return err
+					}
 				}
 			}
-			_ = writeNumeralDisplayPart(w, "]")
-			_ = writeNumeralDisplayPart(w, " == ")
-			return nil
+			if err := writeNumeralDisplayPart(w, "]"); err != nil {
+				return err
+			}
+			return writeNumeralDisplayPart(w, " == ")
 		})
 }
 
@@ -41,9 +50,10 @@ func (m *NaturalManager) traceToCStringResult(dst sourceDecimalDestination) {
 					return err
 				}
 				if c == 0 {
-					_ = writeNumeralDisplayPart(w, out.String())
-					_ = diagnostic.WriteTraceEndl(w)
-					return nil
+					if err := writeNumeralDisplayPart(w, out.String()); err != nil {
+						return err
+					}
+					return diagnostic.WriteTraceEndl(w)
 				}
 				out.WriteByte(c)
 			}
