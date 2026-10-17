@@ -62,11 +62,13 @@ type MultivariatePolynomialManager struct {
 	newton                                                     PolynomialNewtonVector
 	skeletons                                                  PolynomialSkeletonVector
 	originalBudget                                             *arena.Budget
+	memoryTraceTags                                            *diagnostic.TraceTags
 	header                                                     uint64
 	constructed                                                uint8
 	memberStage, bodyStage, cleanupStage                       uint8
 	useSparseGCD, usePRSGCD                                    bool
 	completed, sourceStarted, sourceFinalized, closing, closed bool
+	memoryTraceLive                                            bool
 	originalCause, sourceCause, cleanupCause, unwindCause      error
 	squareRoot                                                 polynomialSquareRootScope
 	derivative                                                 polynomialDerivativeScope
@@ -98,8 +100,14 @@ func NewMultivariatePolynomialManager(c MultivariatePolynomialManagerConfig) (*M
 	if e := c.Core.Integer.Budget().Reserve(h); e != nil {
 		return nil, e
 	}
-	m := &MultivariatePolynomialManager{header: h, originalBudget: c.Core.Integer.Budget(), factorConfig: c.Factorization}
+	m := &MultivariatePolynomialManager{header: h, originalBudget: c.Core.Integer.Budget(), factorConfig: c.Factorization, memoryTraceTags: c.Trace}
 	m.self = m
+	m.memoryTraceLive = true
+	line := 6931
+	if c.Allocator != nil {
+		line = 6935
+	}
+	m.tracePolynomialImpAllocated(line)
 	fail := func(e error) (*MultivariatePolynomialManager, error) {
 		if m.core != nil && e == m.core {
 			e = m.core.originalCause

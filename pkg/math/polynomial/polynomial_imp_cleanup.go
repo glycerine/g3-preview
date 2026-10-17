@@ -295,6 +295,10 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 	m.closeFactorUnivariateHistory()
 	m.closeFactorCoreHistory()
 	m.originalBudget.Release(m.header)
+	if m.memoryTraceLive && m.completed {
+		m.tracePolynomialImpDeallocated()
+		m.memoryTraceLive = false
+	}
 	m.header = 0
 	m.closed = true
 	m.cleanupCause = nil
