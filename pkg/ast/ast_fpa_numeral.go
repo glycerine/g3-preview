@@ -26,6 +26,7 @@ const (
 	astFPAPlusZero         int32 = 9
 	astFPAMinusZero        int32 = 10
 	astFPANeg              int32 = 13
+	astFPARem              int32 = 16
 	astFPAAbs              int32 = 17
 	astFPAEq               int32 = 23
 	astFPALt               int32 = 24

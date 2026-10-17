@@ -178,12 +178,14 @@ func (m *ASTManager) mkFamilyAppDomainArguments(fid FamilyID, k int32, ps []ASTP
 		decl, e = m.basicDecl(k, ps, domain)
 	} else if m.pluginAt(fid).kind == astArrayPlugin {
 		decl, e = m.arrayDecl(k, ps, domain, ASTHandle{})
-	} else if m.pluginAt(fid).kind == astFloatingPointPlugin && k >= 0 && (k <= astFPAMinusZero || k == astFPANeg || k == astFPAAbs || k >= astFPAEq && k <= astFPAGe || k >= astFPAIsNaN && k <= astFPAIsPositive) {
+	} else if m.pluginAt(fid).kind == astFloatingPointPlugin && k >= 0 && (k <= astFPAMinusZero || k == astFPANeg || k == astFPARem || k == astFPAAbs || k >= astFPAEq && k <= astFPAGe || k >= astFPAIsNaN && k <= astFPAIsPositive) {
 		previous := m.formatExecuting
 		m.formatExecuting = true
 		defer func() { m.formatExecuting = previous }()
 		if k == astFPANeg || k == astFPAAbs {
 			decl, e = m.floatingPointUnaryDecl(k, domain)
+		} else if k == astFPARem {
+			decl, e = m.floatingPointRemainderDecl(domain)
 		} else if k >= astFPAEq && k <= astFPAGe {
 			decl, e = m.floatingPointBinaryRelationDecl(k, domain)
 		} else if k >= astFPAIsNaN {
@@ -239,12 +241,14 @@ func (m *ASTManager) mkFamilyFuncDecl(fid FamilyID, k int32, ps []ASTParameter, 
 		r, e = m.basicDecl(k, ps, domain)
 	} else if m.pluginAt(fid).kind == astArrayPlugin {
 		r, e = m.arrayDecl(k, ps, domain, rangeSort)
-	} else if m.pluginAt(fid).kind == astFloatingPointPlugin && k >= 0 && (k <= astFPAMinusZero || k == astFPANeg || k == astFPAAbs || k >= astFPAEq && k <= astFPAGe || k >= astFPAIsNaN && k <= astFPAIsPositive) {
+	} else if m.pluginAt(fid).kind == astFloatingPointPlugin && k >= 0 && (k <= astFPAMinusZero || k == astFPANeg || k == astFPARem || k == astFPAAbs || k >= astFPAEq && k <= astFPAGe || k >= astFPAIsNaN && k <= astFPAIsPositive) {
 		previous := m.formatExecuting
 		m.formatExecuting = true
 		defer func() { m.formatExecuting = previous }()
 		if k == astFPANeg || k == astFPAAbs {
 			r, e = m.floatingPointUnaryDecl(k, domain)
+		} else if k == astFPARem {
+			r, e = m.floatingPointRemainderDecl(domain)
 		} else if k >= astFPAEq && k <= astFPAGe {
 			r, e = m.floatingPointBinaryRelationDecl(k, domain)
 		} else if k >= astFPAIsNaN {
