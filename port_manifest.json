@@ -167964,7 +167964,7 @@
         "TestIntegerFacadeDupAndScalarComparison",
         "TestIntegerFacadeFiniteMathAndIncDecAliases",
         "TestIntegerFacadeDupIncDecFailureRoots",
-        "TestIntegerFacadeUnsupportedAndLifetime",
+        "TestIntegerFacadeLifetimeAndDup",
         "TestIntegerFacadeRepresentationEqualityAndWarmReads",
         "TestIntegerSourceTmpFreeBeforeReplacementFailure",
         "TestIntegerSourceResultPublishedBeforeMissingTmpFailure",
@@ -169250,7 +169250,7 @@
             "TestIntegerFacadeDupAndScalarComparison",
             "TestIntegerFacadeFiniteMathAndIncDecAliases",
             "TestIntegerFacadeDupIncDecFailureRoots",
-            "TestIntegerFacadeUnsupportedAndLifetime",
+            "TestIntegerFacadeLifetimeAndDup",
             "TestIntegerFacadeRepresentationEqualityAndWarmReads"
           ]
         },
@@ -169264,7 +169264,7 @@
             "TestIntegerFacadeDupAndScalarComparison",
             "TestIntegerFacadeFiniteMathAndIncDecAliases",
             "TestIntegerFacadeDupIncDecFailureRoots",
-            "TestIntegerFacadeUnsupportedAndLifetime",
+            "TestIntegerFacadeLifetimeAndDup",
             "TestIntegerFacadeRepresentationEqualityAndWarmReads"
           ]
         },
@@ -169278,7 +169278,7 @@
             "TestIntegerFacadeDupAndScalarComparison",
             "TestIntegerFacadeFiniteMathAndIncDecAliases",
             "TestIntegerFacadeDupIncDecFailureRoots",
-            "TestIntegerFacadeUnsupportedAndLifetime",
+            "TestIntegerFacadeLifetimeAndDup",
             "TestIntegerFacadeRepresentationEqualityAndWarmReads"
           ]
         },
@@ -169292,7 +169292,7 @@
             "TestIntegerFacadeDupAndScalarComparison",
             "TestIntegerFacadeFiniteMathAndIncDecAliases",
             "TestIntegerFacadeDupIncDecFailureRoots",
-            "TestIntegerFacadeUnsupportedAndLifetime",
+            "TestIntegerFacadeLifetimeAndDup",
             "TestIntegerFacadeRepresentationEqualityAndWarmReads"
           ]
         },
@@ -169306,23 +169306,13 @@
             "TestIntegerFacadeDupAndScalarComparison",
             "TestIntegerFacadeFiniteMathAndIncDecAliases",
             "TestIntegerFacadeDupIncDecFailureRoots",
-            "TestIntegerFacadeUnsupportedAndLifetime",
+            "TestIntegerFacadeLifetimeAndDup",
             "TestIntegerFacadeRepresentationEqualityAndWarmReads"
           ]
         },
         {
-          "name": "inv unsupported source assertion, explicit typed Go-domain adapter",
-          "status": "ported",
-          "go_target": "pkg/util/numeral/mpz_facade_extra.go",
-          "tests": [
-            "TestIntegerFacadeSourceTst1ComparisonAssertions",
-            "TestIntegerFacadeSignedPredicatesAndSetterShape",
-            "TestIntegerFacadeDupAndScalarComparison",
-            "TestIntegerFacadeFiniteMathAndIncDecAliases",
-            "TestIntegerFacadeDupIncDecFailureRoots",
-            "TestIntegerFacadeUnsupportedAndLifetime",
-            "TestIntegerFacadeRepresentationEqualityAndWarmReads"
-          ]
+          "name": "inv SASSERT(false) stub has no retained mpz consumer; interval/subpaving production instances use other numeral managers",
+          "status": "reference_only"
         },
         {
           "name": "selected internal MPZ allocation/publication prefixes and guarded cleanup continuation",
@@ -169906,7 +169896,7 @@
         "Complete caller-buffer output is prepared before publication, adapting source partial ostream failure effects. Host String allocates only final caller-owned text. Signed raw denominators and unreduced rationals retain source action text.",
         "B12 replaces the one-global-manager ownership assumption with explicit cross-manager deep copy. No foreign handle or serialization is passed into destination arithmetic; destination outlives source Close. This is an ownership adaptation, not AST translation completion.",
         "Selected release ExtendedGCD preserves finite aliases and modified-input sign rereads. Source Z3DEBUG diagnostic arithmetic remains unported; g3checked selects reference validation only. ext_gcd.h wrapper algorithm remains separate and is not credited from manager inverse properties.",
-        "Inv source SASSERT(false) is always typed ErrIntegerInvUnsupported in Go, unlike release C++ no-op. Backend alternatives, disabled GCD variants and remaining diagnostics stay open; this public facade does not close the entire source unit.",
+        "The mpz_manager::inv SASSERT(false) stub has no retained source or Go consumer, so the unused Go unsupported-domain adapter was removed. Backend alternatives, disabled GCD variants and remaining diagnostics stay open; this public facade does not close the entire source unit.",
         "Go continuation for source undefined allocation failure: permanently dead failed token and missing-scratch guards; finite unsigned wrapped allocations retained before actual span ErrBounds. Higher-level staged wrappers remain fidelity work, not completion evidence.",
         "Nonterminating Power guard occurs only at uint32 mask wrap after completed source iterations; earlier finite allocation refusal takes precedence. Malformed left-shift headers are guarded at actual physical accesses after source size publication. Existing numeric access-span setup is a concrete storage adapter. Other arithmetic staging, source allocator topology and nonselected backends remain open.",
         "The registered randomized GCD campaign preserves all 168 primes, conditional Power/Mul and sign draw order using an explicit hermetic RNG adapter, not libc sequence identity. Independent table enumeration and arithmetic checks add no ENSURE credit; print-only minimum GCD expectation is additional verification. Actual allocator topology, cleanup exceptions, alternate backends and full source-unit completion remain open.",

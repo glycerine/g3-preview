@@ -305,18 +305,18 @@ func TestIntegerFacadeDupIncDecFailureRoots(t *testing.T) {
 	}
 }
 
-func TestIntegerFacadeUnsupportedAndLifetime(t *testing.T) {
+func TestIntegerFacadeLifetimeAndDup(t *testing.T) {
 	m, b := integerManager(t)
 	a := NewInt(17)
 	baseline := b.Used()
 	b.FailAfter(0)
-	e := m.Inv(&a)
 	copy, ce := m.Dup(&a)
 	b.FailAfter(-1)
-	if !errors.Is(e, ErrIntegerInvUnsupported) || ce != nil || a.Val != 17 || copy.Val != 17 || !copy.IsSmall() || b.Used() != baseline {
-		t.Fatal("unsupported/small Dup", e, ce)
+	if ce != nil || a.Val != 17 || copy.Val != 17 || !copy.IsSmall() || b.Used() != baseline {
+		t.Fatal("small Dup", ce)
 	}
-	for op := 0; op < 4; op++ {
+	for op := 0; op < 3; op++ {
+		var e error
 		switch op {
 		case 0:
 			_, e = m.Sign(nil)
@@ -324,15 +324,13 @@ func TestIntegerFacadeUnsupportedAndLifetime(t *testing.T) {
 			e = m.Inc(nil)
 		case 2:
 			_, e = m.Dup(nil)
-		case 3:
-			e = m.Inv(nil)
 		}
 		if !errors.Is(e, arena.ErrInvalidSlot) {
 			t.Fatal("nil guard", op, e)
 		}
 	}
 	m.Close()
-	if _, e = m.IsZero(&a); !errors.Is(e, arena.ErrClosed) {
+	if _, e := m.IsZero(&a); !errors.Is(e, arena.ErrClosed) {
 		t.Fatal(e)
 	}
 }

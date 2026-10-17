@@ -1,12 +1,6 @@
 // Concrete public-method closure of src/util/mpz.h, internal 32-bit digits.
 package numeral
 
-import (
-	"errors"
-)
-
-var ErrIntegerInvUnsupported = errors.New("mpnum: integer inverse violates source non-field precondition")
-
 // Sign is the source m_val: full inline int32, or -1/+1 for a big numeral.
 func (m *IntegerManager) Sign(a *Int) (int32, error) {
 	if e := m.check(a); e != nil {
@@ -141,14 +135,4 @@ func (m *IntegerManager) Dup(a *Int) (Int, error) {
 		return Int{}, e
 	}
 	return out, nil
-}
-
-// Source inv contains only SASSERT(false): no supported integer-field inverse
-// exists. Release C++ otherwise does nothing. This checked-domain adaptation
-// always diagnoses the unsupported call, preserving the input and its budget.
-func (m *IntegerManager) Inv(a *Int) error {
-	if e := m.check(a); e != nil {
-		return e
-	}
-	return ErrIntegerInvUnsupported
 }
