@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -33,6 +34,12 @@ func (e *smt2LocalEnv) bindSortedVariables(m *ast.ASTManager, names []symbol.Sym
 			if err == nil {
 				exprs.pushOwned(ref)
 				e.insert(name, smt2Local{term: v, level: level})
+				debug := diagnostic.BorrowProcessDebugContext()
+				var enabled bool
+				enabled, err = diagnostic.SourceAssertionsEnabled(debug)
+				if err == nil && enabled && !e.contains(name) {
+					err = diagnostic.DebugAssertionFailure(debug, "src/parsers/smt2/smt2parser.cpp", 1279, "m_env.contains(*sym_it)")
+				}
 			}
 		}
 		if err != nil {

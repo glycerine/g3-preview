@@ -182192,6 +182192,7 @@
         "TestSMT2LocalSymbolTableNestedAndRepeatedBindings",
         "TestSMT2LetLocalsParallelBindingsAndScopeRestoration",
         "TestSMT2SortedVariablesReverseIndicesAndShadowRestoration",
+        "TestSMT2SortedVariablesSourceAssertionReadsProcessDebugAndRollsBack",
         "TestSMT2ParserPushLocalShiftsFreeVariables",
         "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders",
         "TestSMT2ParserQualifiedLocalSortAndIndexRefusals"
@@ -182248,7 +182249,7 @@
           "name": "SMT2 parse_sorted_vars concrete local insertion with reverse de Bruijn indices, expression-stack ownership and nested scope restoration (smt2parser.cpp:1253-1280)",
           "status": "ported",
           "go_target": "pkg/parsers/smt2/local_sorted_vars.go",
-          "tests": ["TestSMT2SortedVariablesReverseIndicesAndShadowRestoration", "TestSMT2SortedVariablesRejectMismatchedInputsBeforeScope", "TestSMT2SortedVariablesFailedSortRestoresPriorScope"]
+          "tests": ["TestSMT2SortedVariablesReverseIndicesAndShadowRestoration", "TestSMT2SortedVariablesRejectMismatchedInputsBeforeScope", "TestSMT2SortedVariablesFailedSortRestoresPriorScope", "TestSMT2SortedVariablesSourceAssertionReadsProcessDebugAndRollsBack"]
         },
         {
           "name": "SMT2 let-frame scoped concrete local insertion after parallel initializer evaluation, duplicate shadowing, and result-preserving declaration cleanup (smt2parser.cpp:1869-1900)",
