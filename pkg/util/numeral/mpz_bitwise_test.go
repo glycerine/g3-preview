@@ -190,6 +190,9 @@ func TestIntegerBitwiseFailurePublicationAndWarm(t *testing.T) {
 }
 
 func TestIntegerBitwiseSourcePreconditions(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TTTT")
+	}
 	m, _ := integerManager(t)
 	a, b, out := NewInt(-1), NewInt(3), NewInt(77)
 	for i, f := range []func() error{func() error { return m.BitwiseOr(&a, &b, &out) }, func() error { return m.BitwiseAnd(&b, &a, &out) }, func() error { return m.BitwiseXor(&a, &a, &out) }, func() error { return m.BitwiseNot(32, &a, &out) }} {
@@ -197,7 +200,7 @@ func TestIntegerBitwiseSourcePreconditions(t *testing.T) {
 		e := f()
 		mpzPublicationAudit(t, m, &a, &b, &out)
 		if modularSourceDebug {
-			if !errors.Is(e, ErrBitwiseDomain) || out != NewInt(77) {
+			if !isMPNVerificationThrow(e) || out != NewInt(77) {
 				t.Fatal("source debug precondition", e)
 			}
 		} else {

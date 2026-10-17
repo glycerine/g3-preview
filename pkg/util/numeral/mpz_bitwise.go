@@ -3,6 +3,8 @@ package numeral
 
 import (
 	"errors"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 // BitwiseOperation identifies the source binary chunk loop.
@@ -21,7 +23,17 @@ type BitwiseNonterminationError struct{ Operation BitwiseOperation }
 func (e *BitwiseNonterminationError) Error() string { return ErrNonterminatingBitwise.Error() }
 func (e *BitwiseNonterminationError) Unwrap() error { return ErrNonterminatingBitwise }
 
-var ErrBitwiseDomain = errors.New("mpnum: bitwise source operand must be nonnegative")
+func bitwiseSourceNonnegative(a *Int, line int32, expression string) error {
+	if !modularSourceDebug {
+		return nil
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil || !enabled || a.Val >= 0 {
+		return e
+	}
+	return diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", line, expression)
+}
 
 func (m *IntegerManager) BitwiseOr(a, b, out *Int) error  { return m.bitwiseBinary(a, b, out, 0) }
 func (m *IntegerManager) BitwiseAnd(a, b, out *Int) error { return m.bitwiseBinary(a, b, out, 1) }
@@ -41,8 +53,17 @@ func (m *IntegerManager) bitwiseBinaryWithAllocationContext(a, b, out *Int, op u
 			return e
 		}
 	}
-	if modularSourceDebug && (a.Val < 0 || b.Val < 0) {
-		return ErrBitwiseDomain
+	first, second := int32(1019), int32(1020)
+	if op == 1 {
+		first, second = 1069, 1070
+	} else if op == 2 {
+		first, second = 1107, 1108
+	}
+	if e := bitwiseSourceNonnegative(a, first, "is_nonneg(a)"); e != nil {
+		return e
+	}
+	if e := bitwiseSourceNonnegative(b, second, "is_nonneg(b)"); e != nil {
+		return e
 	}
 	if op == 0 {
 		m.traceBitwiseOrStart(a, b)
@@ -193,8 +214,8 @@ func (m *IntegerManager) bitwiseNotWithAllocationContext(width uint32, a, out *I
 	if e := m.check(out); e != nil {
 		return e
 	}
-	if modularSourceDebug && a.Val < 0 {
-		return ErrBitwiseDomain
+	if e := bitwiseSourceNonnegative(a, 1152, "is_nonneg(a)"); e != nil {
+		return e
 	}
 	if a.IsSmall() && width <= 63 {
 		mask := (uint64(1) << width) - 1
@@ -238,8 +259,17 @@ func (m *IntegerManager) bitwiseNotWithAllocationContext(width uint32, a, out *I
 			return e
 		}
 		v := ^n
-		if modularSourceDebug && ^v != n {
-			return ErrIntegerAssertion
+		if modularSourceDebug {
+			d := diagnostic.BorrowProcessDebugContext()
+			enabled, e := diagnostic.SourceAssertionsEnabled(d)
+			if e != nil {
+				return e
+			}
+			if enabled && ^v != n {
+				if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 1166, "~v == n"); e != nil {
+					return e
+				}
+			}
 		}
 		if width < 64 {
 			v &= (uint64(1) << width) - 1
@@ -249,12 +279,21 @@ func (m *IntegerManager) bitwiseNotWithAllocationContext(width uint32, a, out *I
 			return e
 		}
 		if modularSourceDebug {
-			got, err := m.Uint64(tmp)
-			if err != nil {
-				return err
+			d := diagnostic.BorrowProcessDebugContext()
+			enabled, e := diagnostic.SourceAssertionsEnabled(d)
+			if e != nil {
+				return e
 			}
-			if got != v {
-				return ErrIntegerAssertion
+			if enabled {
+				got, e := m.Uint64(tmp)
+				if e != nil {
+					return e
+				}
+				if got != v {
+					if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 1173, "get_uint64(tmp) == v"); e != nil {
+						return e
+					}
+				}
 			}
 		}
 		if e = m.mulWithAllocationContext(tmp, mult, tmp, context); e != nil {

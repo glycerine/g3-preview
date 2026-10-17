@@ -5,6 +5,7 @@ package numeral
 import (
 	"errors"
 	"math/big"
+	"strings"
 	"testing"
 )
 
@@ -81,6 +82,9 @@ func bitPublicationPrefix(t *testing.T, m *IntegerManager, out *Int, old string,
 }
 
 func TestBitwisePublicationNegativeInlineProfile(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, strings.Repeat("T", 512))
+	}
 	for op := 0; op < 4; op++ {
 		for alias := 0; alias < 3; alias++ {
 			m, _ := mpzPublicationOwner(t)
@@ -94,7 +98,7 @@ func TestBitwisePublicationNegativeInlineProfile(t *testing.T) {
 			}
 			mpzPublicationAudit(t, m, &a, &b, &out)
 			if modularSourceDebug {
-				if !errors.Is(e, ErrBitwiseDomain) {
+				if !isMPNVerificationThrow(e) {
 					t.Fatal(op, e)
 				}
 				continue
@@ -194,6 +198,9 @@ func TestBitwisePublicationRationalRawProfile(t *testing.T) {
 }
 
 func TestBitwisePublicationActualNonterminationBoundary(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, strings.Repeat("T", 512))
+	}
 	for op := 0; op < 3; op++ {
 		m, _ := mpzPublicationOwner(t)
 		var a, b, out Int
@@ -203,7 +210,7 @@ func TestBitwisePublicationActualNonterminationBoundary(t *testing.T) {
 		e := bitPublicationCall(m, op, &a, &b, &out)
 		mpzPublicationAudit(t, m, &a, &b, &out)
 		if modularSourceDebug {
-			if !errors.Is(e, ErrBitwiseDomain) {
+			if !isMPNVerificationThrow(e) {
 				t.Fatal(e)
 			}
 		} else {
@@ -233,6 +240,9 @@ func TestBitwisePublicationActualNonterminationBoundary(t *testing.T) {
 }
 
 func TestBitwisePublicationFiniteMixedSignsAndWidthAliases(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, strings.Repeat("T", 512))
+	}
 	for _, text := range []string{"-3", "-18446744073709551617", "0", "18446744073709551621"} {
 		for op := 0; op < 4; op++ {
 			for alias := 0; alias < 4; alias++ {
@@ -265,7 +275,7 @@ func TestBitwisePublicationFiniteMixedSignsAndWidthAliases(t *testing.T) {
 				e := bitPublicationCall(m, op, left, right, dst)
 				mpzPublicationAudit(t, m, &a, &b, &out)
 				if modularSourceDebug && (aa.Sign() < 0 || op != 3 && bb.Sign() < 0) {
-					if !errors.Is(e, ErrBitwiseDomain) {
+					if !isMPNVerificationThrow(e) {
 						t.Fatal(e)
 					}
 				} else {
@@ -565,6 +575,9 @@ func TestBitwisePublicationBigNotZeroWidthCopyOrder(t *testing.T) {
 }
 
 func TestBitwisePublicationSignedSmallBoundaryAliases(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, strings.Repeat("T", 512))
+	}
 	for _, av := range []int32{-2147483648, -1, -3} {
 		for _, bv := range []int32{-2147483648, -1, 6} {
 			for op := 0; op < 3; op++ {
@@ -585,7 +598,7 @@ func TestBitwisePublicationSignedSmallBoundaryAliases(t *testing.T) {
 					e := bitPublicationCall(m, op, left, right, dst)
 					mpzPublicationAudit(t, m, &a, &b, &out)
 					if modularSourceDebug {
-						if !errors.Is(e, ErrBitwiseDomain) {
+						if !isMPNVerificationThrow(e) {
 							t.Fatal(e)
 						}
 					} else {

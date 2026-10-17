@@ -166733,10 +166733,12 @@
           ]
         },
         {
-          "name": "bitwise_or",
+          "name": "bitwise_or with source nonnegative assertion switch and Throw/Continue actions",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_bitwise.go",
           "tests": [
+            "TestMPZBitwiseSourcePreconditionThrowAndContinue",
+            "TestMPZBitwisePreconditionSwitchDisabledAndClosed",
             "TestIntegerSourceBitwiseBug4",
             "TestIntegerBitwiseIndependentOracleAndAliases",
             "TestIntegerBitwiseFailurePublicationAndWarm",
@@ -166758,10 +166760,12 @@
           ]
         },
         {
-          "name": "bitwise_and",
+          "name": "bitwise_and with source nonnegative assertion switch and Throw/Continue actions",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_bitwise.go",
           "tests": [
+            "TestMPZBitwiseSourcePreconditionThrowAndContinue",
+            "TestMPZBitwisePreconditionSwitchDisabledAndClosed",
             "TestIntegerSourceBitwiseBug4",
             "TestIntegerBitwiseIndependentOracleAndAliases",
             "TestIntegerBitwiseFailurePublicationAndWarm",
@@ -166783,10 +166787,12 @@
           ]
         },
         {
-          "name": "bitwise_xor",
+          "name": "bitwise_xor with source nonnegative assertion switch and Throw/Continue actions",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_bitwise.go",
           "tests": [
+            "TestMPZBitwiseSourcePreconditionThrowAndContinue",
+            "TestMPZBitwisePreconditionSwitchDisabledAndClosed",
             "TestIntegerSourceBitwiseBug4",
             "TestIntegerBitwiseIndependentOracleAndAliases",
             "TestIntegerBitwiseFailurePublicationAndWarm",
@@ -166808,10 +166814,13 @@
           ]
         },
         {
-          "name": "bitwise_not",
+          "name": "bitwise_not with source precondition and chunk-loop assertion switch/action order",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_bitwise.go",
           "tests": [
+            "TestMPZBitwiseNotChunkTracePrecedesResultAssertion",
+            "TestMPZBitwiseSourcePreconditionThrowAndContinue",
+            "TestMPZBitwisePreconditionSwitchDisabledAndClosed",
             "TestIntegerSourceBitwiseBug4",
             "TestIntegerBitwiseIndependentOracleAndAliases",
             "TestIntegerBitwiseFailurePublicationAndWarm",
@@ -168870,10 +168879,12 @@
           ]
         },
         {
-          "name": "bitwise_or",
+          "name": "bitwise_or with source nonnegative assertion switch and Throw/Continue actions",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_bitwise.go",
           "tests": [
+            "TestMPZBitwiseSourcePreconditionThrowAndContinue",
+            "TestMPZBitwisePreconditionSwitchDisabledAndClosed",
             "TestIntegerSourceBitwiseBug4",
             "TestIntegerBitwiseIndependentOracleAndAliases",
             "TestIntegerBitwiseFailurePublicationAndWarm",
@@ -168895,10 +168906,12 @@
           ]
         },
         {
-          "name": "bitwise_and",
+          "name": "bitwise_and with source nonnegative assertion switch and Throw/Continue actions",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_bitwise.go",
           "tests": [
+            "TestMPZBitwiseSourcePreconditionThrowAndContinue",
+            "TestMPZBitwisePreconditionSwitchDisabledAndClosed",
             "TestIntegerSourceBitwiseBug4",
             "TestIntegerBitwiseIndependentOracleAndAliases",
             "TestIntegerBitwiseFailurePublicationAndWarm",
@@ -168920,10 +168933,12 @@
           ]
         },
         {
-          "name": "bitwise_xor",
+          "name": "bitwise_xor with source nonnegative assertion switch and Throw/Continue actions",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_bitwise.go",
           "tests": [
+            "TestMPZBitwiseSourcePreconditionThrowAndContinue",
+            "TestMPZBitwisePreconditionSwitchDisabledAndClosed",
             "TestIntegerSourceBitwiseBug4",
             "TestIntegerBitwiseIndependentOracleAndAliases",
             "TestIntegerBitwiseFailurePublicationAndWarm",
@@ -168945,10 +168960,13 @@
           ]
         },
         {
-          "name": "bitwise_not",
+          "name": "bitwise_not with source precondition and chunk-loop assertion switch/action order",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_bitwise.go",
           "tests": [
+            "TestMPZBitwiseNotChunkTracePrecedesResultAssertion",
+            "TestMPZBitwiseSourcePreconditionThrowAndContinue",
+            "TestMPZBitwisePreconditionSwitchDisabledAndClosed",
             "TestIntegerSourceBitwiseBug4",
             "TestIntegerBitwiseIndependentOracleAndAliases",
             "TestIntegerBitwiseFailurePublicationAndWarm",

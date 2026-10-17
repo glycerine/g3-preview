@@ -71,9 +71,12 @@ func TestRationalBitwiseForwardingIndependentAndAliases(t *testing.T) {
 	}
 	m.SetInt64(&a, -1)
 	beforeOut := out
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "T")
+	}
 	e = m.BitwiseNot(32, &a, &out)
 	if modularSourceDebug {
-		if !errors.Is(e, ErrBitwiseDomain) || out != beforeOut {
+		if !isMPNVerificationThrow(e) || out != beforeOut {
 			t.Fatal(e)
 		}
 	} else {
