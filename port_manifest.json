@@ -163147,7 +163147,8 @@
             "TestIntegerRootAndSquareFailureCleanup",
             "TestRationalRootSquareFailureCleanup",
             "TestRootWarmStorageAndClosedOutputs",
-            "TestRationalRootWarmStorage"
+            "TestRationalRootWarmStorage",
+            "TestRationalIntegerSquareSourceAssertionActions"
           ]
         },
         {
@@ -164323,7 +164324,8 @@
             "TestIntegerRootAndSquareFailureCleanup",
             "TestRationalRootSquareFailureCleanup",
             "TestRootWarmStorageAndClosedOutputs",
-            "TestRationalRootWarmStorage"
+            "TestRationalRootWarmStorage",
+            "TestRationalIntegerSquareSourceAssertionActions"
           ]
         },
         {

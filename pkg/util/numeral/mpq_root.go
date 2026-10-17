@@ -1,6 +1,8 @@
 // Source: src/util/mpq.cpp root and mpq.h square predicates/output wrappers.
 package numeral
 
+import "github.com/glycerine/g3/pkg/util/diagnostic"
+
 // Root follows the source direct caller order: the numerator Root publishes
 // into out.Num before the denominator Root is considered. An inexact numerator
 // leaves the old output denominator untouched; a failing call keeps its actual
@@ -38,8 +40,23 @@ func (m *RationalManager) perfectSquare(a, out *Rational, integerOnly bool) (boo
 		return false, e
 	}
 	integer := isIntegerRational(a)
-	if integerOnly && !integer {
-		return false, &RootDomainError{Reason: RootRequiresInteger}
+	if integerOnly {
+		if modularSourceDebug {
+			d := diagnostic.BorrowProcessDebugContext()
+			enabled, e := diagnostic.SourceAssertionsEnabled(d)
+			if e != nil {
+				return false, e
+			}
+			if enabled && !integer {
+				if e := diagnostic.DebugAssertionFailure(d, "src/util/mpq.h", 839, "is_int(a)"); e != nil {
+					return false, e
+				}
+			}
+		}
+		if e := m.resetDenominator(out); e != nil {
+			return false, e
+		}
+		return m.Z.IsPerfectSquare(&a.Num, &out.Num)
 	}
 	if integer {
 		if e := m.resetDenominator(out); e != nil {

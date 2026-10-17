@@ -8,17 +8,14 @@ import (
 )
 
 var ErrRootDegreeZero = errors.New("mpnum: nonzero integer root with degree zero divides by zero in source")
-var ErrRootIntegerRequired = errors.New("mpnum: integer perfect-square query requires an integer rational")
 
 type RootDomainReason uint8
 
 const (
 	RootZeroDegree RootDomainReason = iota + 1
-	RootRequiresInteger
 )
 
-// RootDomainError guards host-undefined division and the retained rational
-// integer-only query. Source assertion actions are handled separately.
+// RootDomainError guards host-undefined zero-degree division.
 type RootDomainError struct {
 	Degree uint32
 	Reason RootDomainReason
@@ -26,12 +23,7 @@ type RootDomainError struct {
 
 func (e *RootDomainError) Error() string { return e.Unwrap().Error() }
 func (e *RootDomainError) Unwrap() error {
-	switch e.Reason {
-	case RootRequiresInteger:
-		return ErrRootIntegerRequired
-	default:
-		return ErrRootDegreeZero
-	}
+	return ErrRootDegreeZero
 }
 func rootDomain(a *Int, n uint32) error {
 	if modularSourceDebug {

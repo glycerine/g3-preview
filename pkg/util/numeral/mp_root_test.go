@@ -256,8 +256,16 @@ func TestRootDomainsAndInitialization(t *testing.T) {
 	rm, _ := rationalManager(t, false)
 	a, out := NewRational(), NewRational()
 	rm.SetFraction(&a, 1, 2)
-	if _, e := rm.IsIntPerfectSquare(&a, &out); !errors.Is(e, ErrRootIntegerRequired) {
-		t.Fatal(e)
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "T")
+	}
+	exact, e := rm.IsIntPerfectSquare(&a, &out)
+	if modularSourceDebug {
+		if exact || !isMPNVerificationThrow(e) || out != NewRational() {
+			t.Fatal("source assertion Throw before output reset", exact, e, out)
+		}
+	} else if !exact || e != nil || out.Num != NewInt(1) || out.Den != NewInt(1) {
+		t.Fatal("release checks numerator despite fractional denominator", exact, e, out)
 	}
 	var raw Rational
 	if _, e := rm.Root(&raw, 2, &out); !errors.Is(e, ErrUninitializedRational) {
