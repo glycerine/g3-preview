@@ -26774,7 +26774,8 @@
         "pkg/ast/ast_fpa_fma.go",
         "pkg/ast/rewriter/fpa_fma.go",
         "pkg/ast/ast_fpa_rm_binary.go",
-        "pkg/ast/rewriter/fpa_rm_binary.go"],
+        "pkg/ast/rewriter/fpa_rm_binary.go",
+        "pkg/ast/rewriter/fpa_constants_test.go"],
       "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestASTFPAUnaryScopedNumeralRetiresBeforeReturn", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
         "TestASTFPARemainderFiniteNumeralAndScopedCleanup",
         "TestFPARemainderNumericSpecialAndSymbolicRefusal",
@@ -26785,7 +26786,8 @@
         "TestASTFPAFMADeclarationNumericAndScopedBranches",
         "TestFPAFMANumericSpecialAndSymbolicDispatch",
         "TestASTFPARMBinaryDeclarationsAndNumericCleanup",
-        "TestFPARMBinaryNumericAndSubtractionRewrite"],
+        "TestFPARMBinaryNumericAndSubtractionRewrite",
+        "TestFPAConstantRewriteReturnsApplication"],
       "assertions": [
         {
           "line": 43,
@@ -27081,6 +27083,14 @@
             "TestASTFPARMBinaryDeclarationsAndNumericCleanup",
             "TestFPARMBinaryNumericAndSubtractionRewrite"
           ]
+        },
+        {
+          "name": "mk_app_core rounding-mode and floating-point zero-argument constant cases return the original declaration application with BR_DONE (fpa_rewriter.cpp:41-61)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_classification.go",
+          "tests": [
+            "TestFPAConstantRewriteReturnsApplication"
+          ]
         }
       ],
       "ownership": ["Each classification call creates one caller-local scoped_mpf through the AST plugin's concrete numeral probe; successful source destruction retires it before the Boolean result is published. A stopped source destructor remains in the AST plugin's owning cleanup list.", "SMT and IEEE equality construct both scoped_mpf locals before operand probing and retire them in reverse order, preserving the short circuit when the first operand is symbolic."],
@@ -27102,7 +27112,8 @@
         "TestFPAExtremaNaNInfinitySignedZeroAndSymbolic",
         "TestFPARMUnarySqrtAndIntegralDispatch",
         "TestFPAFMANumericSpecialAndSymbolicDispatch",
-        "TestFPARMBinaryNumericAndSubtractionRewrite"],
+        "TestFPARMBinaryNumericAndSubtractionRewrite",
+        "TestFPAConstantRewriteReturnsApplication"],
       "conditionals": [
         {
           "line": 19,
@@ -27154,6 +27165,14 @@
           "go_target": "pkg/ast/rewriter/fpa_rm_binary.go",
           "tests": [
             "TestFPARMBinaryNumericAndSubtractionRewrite"
+          ]
+        },
+        {
+          "name": "Concrete zero-argument constant dispatch including rounding modes and special values (fpa_rewriter.cpp:41-61)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_classification.go",
+          "tests": [
+            "TestFPAConstantRewriteReturnsApplication"
           ]
         }],
       "ownership": [],
