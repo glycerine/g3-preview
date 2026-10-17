@@ -1,6 +1,8 @@
 // Source: src/sat/sat_solver.cpp:711–716,2845–2850,3053–3075.
 package sat
 
+import "github.com/glycerine/g3/pkg/util/diagnostic"
+
 func (l *satSolverClauseLifecycle) bindIntegrity(g *satSolverGC) error {
 	if e := l.open(); e != nil {
 		return e
@@ -49,19 +51,30 @@ func (l *satSolverClauseLifecycle) checkInvariantWithActions(actions bool) error
 	}
 	return nil
 }
-func (l *satSolverClauseLifecycle) propagate(update, checkInvariant, checkMissed bool) (bool, error) {
+func (l *satSolverClauseLifecycle) propagate(update bool) (bool, error) {
 	result, e := l.propagation.propagateCore(update)
 	if e != nil {
 		return result, e
 	}
-	if satStorageSourceDebug && checkInvariant {
-		if e = l.checkInvariant(); e != nil {
+	if satStorageSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := d.ConditionalAssertionEnabled("sat_propagate")
+		if e != nil {
 			return result, e
 		}
-	}
-	if satStorageSourceDebug && checkMissed {
-		if e = l.checkMissedPropagation(); e != nil {
+		if enabled {
+			if e = l.checkInvariantWithActions(true); e != nil {
+				return result, e
+			}
+		}
+		enabled, e = d.ConditionalAssertionEnabled("sat_missed_prop")
+		if e != nil {
 			return result, e
+		}
+		if enabled {
+			if e = l.checkMissedPropagation(); e != nil {
+				return result, e
+			}
 		}
 	}
 	return result, nil

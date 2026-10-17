@@ -21,7 +21,6 @@ type satAsymmBranch struct {
 	rounds, limit, elimLiterals, reportElimLiterals                                       uint32
 	savedPhase                                                                            []int8
 	report                                                                                stopwatch.Stopwatch
-	debugPropagate, debugMissed                                                           bool
 	reportActive, closing, closed, debugInvariant, running, interrupted                   bool
 	cursor, out, end, drainPrefix, drainSuffix                                            uint32
 	detachedClause, discardedClause                                                       StoredClauseRef
@@ -163,7 +162,7 @@ func (a *satAsymmBranch) run(force bool) (err error) {
 	if !a.enabled {
 		return nil
 	}
-	if _, e := a.lifecycle.propagate(false, a.debugPropagate, a.debugMissed); e != nil {
+	if _, e := a.lifecycle.propagate(false); e != nil {
 		return e
 	}
 	if p.inconsistent {

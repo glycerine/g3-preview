@@ -108,7 +108,7 @@ func (s *Solver) consequenceInitialize(asms satConsequenceInput) (result lbool.L
 		return lbool.Undef, err
 	}
 	s.traceSearchInitialized()
-	if _, err = s.Lifecycle.propagate(false, false, false); err != nil {
+	if _, err = s.Lifecycle.propagate(false); err != nil {
 		return lbool.Undef, err
 	}
 	if s.propagation.inconsistent {
@@ -131,7 +131,7 @@ func (s *Solver) consequenceInitialize(asms satConsequenceInput) (result lbool.L
 	if err != nil {
 		return lbool.Undef, err
 	}
-	if _, err = s.Lifecycle.propagate(false, false, false); err != nil {
+	if _, err = s.Lifecycle.propagate(false); err != nil {
 		return lbool.Undef, err
 	}
 	bad, e := s.checkInconsistent()
@@ -201,7 +201,7 @@ func (s *Solver) getLiteralConsequencesBody(asms, lits satConsequenceInput, out 
 				return lbool.Undef, err
 			}
 		}
-		if _, err = s.Lifecycle.propagate(false, false, false); err != nil {
+		if _, err = s.Lifecycle.propagate(false); err != nil {
 			return lbool.Undef, err
 		}
 		iterations++
@@ -249,7 +249,7 @@ func (s *Solver) getLiteralConsequencesBody(asms, lits satConsequenceInput, out 
 			if err = s.propagation.assign(lit.Negated(), satJustification{}); err != nil {
 				return lbool.Undef, err
 			}
-			if _, err = s.Lifecycle.propagate(false, false, false); err != nil {
+			if _, err = s.Lifecycle.propagate(false); err != nil {
 				return lbool.Undef, err
 			}
 			for s.propagation.inconsistent {
@@ -263,7 +263,7 @@ func (s *Solver) getLiteralConsequencesBody(asms, lits satConsequenceInput, out 
 					isSat = lbool.Undef
 					break
 				}
-				if _, err = s.Lifecycle.propagate(false, false, false); err != nil {
+				if _, err = s.Lifecycle.propagate(false); err != nil {
 					return lbool.Undef, err
 				}
 				resolves++

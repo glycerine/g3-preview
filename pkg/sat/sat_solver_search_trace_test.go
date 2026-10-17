@@ -30,7 +30,7 @@ func TestSATBackjumpCleanupConflictSourceTrace(t *testing.T) {
 	satOK(t, p.assign(0, satJustification{}))
 	satOK(t, p.assign(2, satJustification{}))
 	satOK(t, p.assign(4, satJustification{}))
-	_, e = s.Lifecycle.propagate(false, false, false)
+	_, e = s.Lifecycle.propagate(false)
 	satOK(t, e)
 	satOK(t, s.Lifecycle.push())
 	satOK(t, p.assign(6, satJustification{}))

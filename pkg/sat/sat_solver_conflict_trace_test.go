@@ -81,7 +81,7 @@ func TestSATConflictFullSolverPostBackjumpDisplayTrace(t *testing.T) {
 	p := s.propagation
 	satOK(t, s.Lifecycle.push())
 	satOK(t, p.assign(0, satJustification{}))
-	_, err := s.Lifecycle.propagate(false, false, false)
+	_, err := s.Lifecycle.propagate(false)
 	satOK(t, err)
 	satOK(t, s.Lifecycle.push())
 	satOK(t, p.assign(2, satJustification{}))

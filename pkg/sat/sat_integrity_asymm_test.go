@@ -17,8 +17,9 @@ func TestSATIntegrityAsymmActualEnabledWrapperSites(t *testing.T) {
 	satOK(t, e)
 	t.Cleanup(func() { satOK(t, a.Close()) })
 	a.debugInvariant = true
-	a.debugPropagate = true
-	a.debugMissed = true
+	debug, _, _ := satIntegrityActionFixture(t, "")
+	satOK(t, debug.EnableDebug("sat_propagate"))
+	satOK(t, debug.EnableDebug("sat_missed_prop"))
 	before := p.limit.Count()
 	satOK(t, a.run(true))
 	want := uint64(0)

@@ -439,6 +439,6 @@ func (s *Solver) UserPop(scopes uint32) error {
 		}
 	}
 	s.Variables.qhead = 0
-	_, e := s.Lifecycle.propagate(false, false, false)
+	_, e := s.Lifecycle.propagate(false)
 	return e
 }

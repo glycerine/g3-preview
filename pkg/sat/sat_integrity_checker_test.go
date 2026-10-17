@@ -159,8 +159,9 @@ func TestSATIntegrityActualEnabledConsumerBindings(t *testing.T) {
 	p := l.propagation
 	before := p.limit.Steps
 	probing := g.conflict.dynamic.probing
-	probing.debugPropagate = true
-	probing.debugMissed = true
+	debug, _, _ := satIntegrityActionFixture(t, "")
+	satOK(t, debug.EnableDebug("sat_propagate"))
+	satOK(t, debug.EnableDebug("sat_missed_prop"))
 	satOK(t, probing.propagate())
 	g.debugInvariant = true
 	satOK(t, g.invariant())
@@ -181,6 +182,48 @@ func TestSATIntegrityActualEnabledConsumerBindings(t *testing.T) {
 		t.Fatal("real missed unit in BOTH profiles", e)
 	}
 	satGCAudit(t, g)
+}
+
+func TestSATPropagateIndependentProcessAssertionTags(t *testing.T) {
+	g, _ := satGCFixture(t, 3)
+	l := g.lifecycle()
+	p := l.propagation
+	debug, _, _ := satIntegrityActionFixture(t, "")
+	before := p.limit.Steps
+	_, e := l.propagate(false)
+	satOK(t, e)
+	if p.limit.Steps != before {
+		t.Fatal("disabled sat_propagate tag ran the invariant checker")
+	}
+	satOK(t, debug.EnableDebug("sat_propagate"))
+	_, e = l.propagate(false)
+	satOK(t, e)
+	want := before
+	if satStorageSourceDebug {
+		want++
+	}
+	if p.limit.Steps != want {
+		t.Fatal("sat_propagate tag did not independently gate the checker", p.limit.Steps, want)
+	}
+	satOK(t, debug.DisableDebug("sat_propagate"))
+	satCleanerClause(t, l, []Literal{0, 2, 4}, false, false)
+	satOK(t, p.assign(1, satJustification{}))
+	satOK(t, p.assign(3, satJustification{}))
+	_, e = l.propagate(false)
+	satOK(t, e)
+	satOK(t, debug.EnableDebug("sat_missed_prop"))
+	beforeMissed := p.limit.Steps
+	_, e = l.propagate(false)
+	if satStorageSourceDebug {
+		if !errors.Is(e, ErrSATAssertion) {
+			t.Fatal("sat_missed_prop tag did not find the unattached unit clause", e)
+		}
+	} else {
+		satOK(t, e)
+	}
+	if p.limit.Steps != beforeMissed {
+		t.Fatal("sat_missed_prop unexpectedly ran the invariant checker")
+	}
 }
 func TestSATIntegrityDisjointFreshSetEveryRefusal(t *testing.T) {
 	failures := 0

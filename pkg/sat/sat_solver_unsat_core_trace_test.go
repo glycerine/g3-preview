@@ -18,7 +18,7 @@ func TestSATUnsatCoreSourceTraceStartJustificationAndLowerLevel(t *testing.T) {
 		satOK(t, err)
 	}
 	satOK(t, s.propagation.assign(0, satJustification{}))
-	_, err := s.Lifecycle.propagate(false, false, false)
+	_, err := s.Lifecycle.propagate(false)
 	satOK(t, err)
 	satOK(t, s.Lifecycle.push())
 	satOK(t, s.propagation.assign(2, newSATBinaryJustification(1)))

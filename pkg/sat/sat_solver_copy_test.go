@@ -124,7 +124,7 @@ func TestSATSolverCopyUsesOnlySourceBaseTrailAndPopsDestination(t *testing.T) {
 		satOK(t, e)
 	}
 	satOK(t, src.propagation.assign(0, satJustification{}))
-	_, e := src.Lifecycle.propagate(false, false, false)
+	_, e := src.Lifecycle.propagate(false)
 	satOK(t, e)
 	satOK(t, src.Lifecycle.push())
 	satOK(t, src.propagation.assign(2, satJustification{}))

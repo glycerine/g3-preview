@@ -96,7 +96,7 @@ func (s *Solver) initAssumptionsSpan(count uint32, span satSolverLiteralSpan) er
 	if e = s.Lifecycle.push(); e != nil {
 		return e
 	}
-	if _, e = s.Lifecycle.propagate(false, false, false); e != nil {
+	if _, e = s.Lifecycle.propagate(false); e != nil {
 		return e
 	}
 	if s.propagation.inconsistent {
@@ -226,7 +226,7 @@ func (s *Solver) simplifyProblem() error {
 }
 func (s *Solver) backjumpStep() (lbool.LBool, bool, error) {
 	done := true
-	if _, e := s.Lifecycle.propagate(true, false, false); e != nil {
+	if _, e := s.Lifecycle.propagate(true); e != nil {
 		return lbool.Undef, done, e
 	}
 	if !s.propagation.inconsistent {
@@ -356,7 +356,7 @@ func (s *Solver) checkCoreSpan(count uint32, span satSolverLiteralSpan) (lbool.L
 		return lbool.Undef, e
 	}
 	s.traceSearchInitialized()
-	if _, e := s.Lifecycle.propagate(false, false, false); e != nil {
+	if _, e := s.Lifecycle.propagate(false); e != nil {
 		return lbool.Undef, e
 	}
 	if s.propagation.inconsistent {
@@ -365,7 +365,7 @@ func (s *Solver) checkCoreSpan(count uint32, span satSolverLiteralSpan) (lbool.L
 	if e := s.initAssumptionsSpan(count, span); e != nil {
 		return lbool.Undef, e
 	}
-	if _, e := s.Lifecycle.propagate(false, false, false); e != nil {
+	if _, e := s.Lifecycle.propagate(false); e != nil {
 		return lbool.Undef, e
 	}
 	yes, e := s.checkInconsistent()

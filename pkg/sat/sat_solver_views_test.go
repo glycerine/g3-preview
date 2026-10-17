@@ -208,7 +208,7 @@ func TestSATSolverBorrowedIndependentAssignmentAndScopeViews(t *testing.T) {
 						}
 					}
 				}
-				_, e := s.Lifecycle.propagate(false, false, false)
+				_, e := s.Lifecycle.propagate(false)
 				satOK(t, e)
 				satOK(t, s.Lifecycle.push())
 				n, e := s.sourceScopeLevel()

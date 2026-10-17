@@ -74669,6 +74669,7 @@
             "TestSATIntegrityDisjointComparesIDsNotPointers",
             "TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask",
             "TestSATIntegrityActualEnabledConsumerBindings",
+            "TestSATPropagateIndependentProcessAssertionTags",
             "TestSATIntegrityDisjointFreshSetEveryRefusal",
             "TestSATIntegrityNaryBlockedAndReinitProfiles",
             "TestSATIntegrityAsymmActualEnabledWrapperSites"
@@ -75870,6 +75871,7 @@
             "TestSATIntegrityDisjointComparesIDsNotPointers",
             "TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask",
             "TestSATIntegrityActualEnabledConsumerBindings",
+            "TestSATPropagateIndependentProcessAssertionTags",
             "TestSATIntegrityDisjointFreshSetEveryRefusal",
             "TestSATIntegrityNaryBlockedAndReinitProfiles",
             "TestSATIntegrityAsymmActualEnabledWrapperSites"
@@ -80586,6 +80588,7 @@
             "TestSATIntegrityDisjointComparesIDsNotPointers",
             "TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask",
             "TestSATIntegrityActualEnabledConsumerBindings",
+            "TestSATPropagateIndependentProcessAssertionTags",
             "TestSATIntegrityDisjointFreshSetEveryRefusal",
             "TestSATIntegrityNaryBlockedAndReinitProfiles",
             "TestSATIntegrityAsymmActualEnabledWrapperSites"
@@ -81876,6 +81879,7 @@
             "TestSATIntegrityDisjointComparesIDsNotPointers",
             "TestSATIntegrityWatchesAndBoolFieldsReleaseReadMask",
             "TestSATIntegrityActualEnabledConsumerBindings",
+            "TestSATPropagateIndependentProcessAssertionTags",
             "TestSATIntegrityDisjointFreshSetEveryRefusal",
             "TestSATIntegrityNaryBlockedAndReinitProfiles",
             "TestSATIntegrityAsymmActualEnabledWrapperSites"

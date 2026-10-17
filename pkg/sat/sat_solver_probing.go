@@ -27,7 +27,6 @@ type satSolverProbing struct {
 	stoppedAt, limit, numAssigned        uint32
 	cacheLimit, ownerBytes               uint64
 	enabled, cacheEnabled, binaryEnabled bool
-	debugPropagate, debugMissed          bool
 	constructed, closing, closed         bool
 }
 
@@ -271,6 +270,6 @@ func (s *satSolverProbing) Close() error {
 }
 
 func (s *satSolverProbing) propagate() error {
-	_, e := s.lifecycle.propagate(false, s.debugPropagate, s.debugMissed)
+	_, e := s.lifecycle.propagate(false)
 	return e
 }
