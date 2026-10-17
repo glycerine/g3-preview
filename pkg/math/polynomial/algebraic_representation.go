@@ -118,7 +118,7 @@ func (m *AlgebraicRootCore) copyBinaryBound(a *Algebraic, out *unumeral.BinaryRa
 	if e := m.check(); e != nil {
 		return e
 	}
-	if m.bounds.remaining != 0 || m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.bounds.copy) {
+	if m.bounds.remaining != 0 || m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.bounds.copy) || m.bounds.power.pending(m) {
 		return ErrAlgebraicPending
 	}
 	r, e := m.irrationalBoundRecord(a, upper)
@@ -135,6 +135,7 @@ func (m *AlgebraicRootCore) copyBinaryBound(a *Algebraic, out *unumeral.BinaryRa
 }
 
 type algebraicBoundScope struct {
+	power     algebraicBoundPower
 	copy      unumeral.IntegerCopyAllocationReceipt
 	values    [2]unumeral.BinaryRational
 	remaining uint8
@@ -149,7 +150,13 @@ func (m *AlgebraicRootCore) finishBounds(owning bool) error {
 	}
 	s.executing = true
 	defer func() { s.executing = false }()
+	if !owning && s.power.stop != nil {
+		return s.power.stop
+	}
 	if owning {
+		if e := s.power.cleanup(); e != nil {
+			return e
+		}
 		if e := m.config.Rationals.Integers().CleanupCopyAllocationInvocation(&s.copy); e != nil {
 			return e
 		}
@@ -182,7 +189,7 @@ func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, 
 		return e
 	}
 	s := &m.bounds
-	if s.remaining != 0 || m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&s.copy) {
+	if s.remaining != 0 || m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&s.copy) || s.power.pending(m) {
 		return ErrAlgebraicPending
 	}
 	r := algebraicRecord{value: unumeral.NewRational()}
@@ -225,7 +232,7 @@ func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, 
 	if upper && refine {
 		selected = &s.values[1]
 	}
-	return b.ToRational(m.config.Rationals, selected, out)
+	return m.boundToRational(selected, out)
 }
 
 func (m *AlgebraicRootCore) intervalAtPrecision(r *algebraicRecord, lower, upper *unumeral.BinaryRational, precision uint32) (bool, error) {

@@ -203,6 +203,15 @@ func (m *BinaryRationalManager) CleanupConvertImported() error {
 	return m.cleanupConvertImported()
 }
 func (m *BinaryRationalManager) ToRational(qm *RationalManager, a *BinaryRational, out *Rational) (err error) {
+	return m.toRationalWithPowerInvocation(qm, a, out, integerAllocationInvocationContext{}, nil)
+}
+
+// ToRationalWithPowerInvocation records the accepted power phase and passes
+// its concrete allocation context; later multiply/normalize phases are unchanged.
+func (m *BinaryRationalManager) ToRationalWithPowerInvocation(qm *RationalManager, a *BinaryRational, out *Rational, context NumericAllocationContext, power *RationalPowerInvocationReceipt) error {
+	return m.toRationalWithPowerInvocation(qm, a, out, context, power)
+}
+func (m *BinaryRationalManager) toRationalWithPowerInvocation(qm *RationalManager, a *BinaryRational, out *Rational, context integerAllocationInvocationContext, power *RationalPowerInvocationReceipt) (err error) {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -213,7 +222,7 @@ func (m *BinaryRationalManager) ToRational(qm *RationalManager, a *BinaryRationa
 		return e
 	}
 	two := Rational{Num: NewInt(2), Den: NewInt(1)}
-	if e := qm.Power(&two, a.KField, out); e != nil {
+	if e := qm.powerWithAllocationContextAndReceipt(&two, a.KField, out, context, power); e != nil {
 		return e
 	}
 	if e := qm.Inv(out, out); e != nil {

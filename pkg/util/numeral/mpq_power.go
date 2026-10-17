@@ -8,6 +8,9 @@ func (m *RationalManager) Power(a *Rational, p uint32, out *Rational) error {
 	return m.powerWithAllocationContext(a, p, out, integerAllocationInvocationContext{})
 }
 func (m *RationalManager) powerWithAllocationContext(a *Rational, p uint32, out *Rational, context integerAllocationInvocationContext) (_rawErr error) {
+	return m.powerWithAllocationContextAndReceipt(a, p, out, context, nil)
+}
+func (m *RationalManager) powerWithAllocationContextAndReceipt(a *Rational, p uint32, out *Rational, context integerAllocationInvocationContext, receipt *RationalPowerInvocationReceipt) (_rawErr error) {
 	if e := m.checkScalarValue(a); e != nil {
 		return e
 	}
@@ -33,6 +36,15 @@ func (m *RationalManager) powerWithAllocationContext(a *Rational, p uint32, out 
 	r.powerCursor = 0
 	r.powerCause = nil
 	power := &r.Power
+	if receipt != nil {
+		*receipt = RationalPowerInvocationReceipt{manager: m, generation: generation, executing: true}
+		defer func() {
+			if r.PowerGeneration == generation && r.powerEnd && r.powerCause != nil {
+				receipt.sourceCause = r.powerCause
+			}
+			receipt.executing = false
+		}()
+	}
 	defer m.finishRawPower(&_rawErr)
 	if e := m.copyWithAllocationContext(power, a, context); e != nil {
 		return e
