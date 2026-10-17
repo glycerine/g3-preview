@@ -17,8 +17,8 @@ func (m *ArbitraryFloatManager) addSubtract(mode ArbitraryFloatRoundingMode, x, 
 	if m.addSub.active {
 		return ErrNumericPending
 	}
-	if modularSourceDebug && (x.SBits() != y.SBits() || x.EBits() != y.EBits()) {
-		return ErrIntegerAssertion
+	if e := mpfSourceAssertion(x.SBits() == y.SBits() && x.EBits() == y.EBits(), 479, "x.sbits == y.sbits && x.ebits == y.ebits"); e != nil {
+		return e
 	}
 	signY := y.Sign() != sub
 	nan, e := m.IsNaN(x)

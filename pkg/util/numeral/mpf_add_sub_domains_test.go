@@ -3,10 +3,15 @@ package numeral
 
 import (
 	"errors"
+	"os"
+	"strings"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/arena"
 )
 
 func TestArbitraryFloatAddSubDebugFormatGuardAndErasedMode(t *testing.T) {
+	d, log := bindMPNDebugActions(t, "TC")
 	m, _, b := mpfNumeralHelpersFixture(t)
 	var x, y, out ArbitraryFloat
 	serviceMust(t, m.MkZero(11, 53, false, &x))
@@ -17,13 +22,36 @@ func TestArbitraryFloatAddSubDebugFormatGuardAndErasedMode(t *testing.T) {
 	// release the zero shortcut copies y and never consults the rounding mode.
 	e := m.Add(ArbitraryFloatRoundingMode(255), &x, &y, &out)
 	if modularSourceDebug {
-		if !errors.Is(e, ErrIntegerAssertion) || out != before || b.Used() != used || m.addSub.manager != nil {
+		if !isMPNVerificationThrow(e) || out != before || b.Used() != used || m.addSub.manager != nil {
 			t.Fatal("initial format assertion", e, out)
+		}
+		contents, readErr := os.ReadFile(log.Name())
+		serviceMust(t, readErr)
+		want := "File: src/util/mpf.cpp\nLine: 479\nx.sbits == y.sbits && x.ebits == y.ebits\n"
+		if n := strings.Count(string(contents), want); n != 1 {
+			t.Fatal("source add/sub format assertion", n, string(contents))
+		}
+		e = m.Add(ArbitraryFloatRoundingMode(255), &x, &y, &out)
+		serviceMust(t, e)
+		if out != y {
+			t.Fatal("Continue follows source zero shortcut", out, y)
+		}
+		serviceMust(t, d.EnableAssertions(false))
+		e = m.Add(ArbitraryFloatRoundingMode(255), &x, &y, &out)
+		serviceMust(t, e)
+		if out != y {
+			t.Fatal("disabled format assertion", out, y)
 		}
 	} else {
 		serviceMust(t, e)
 		if out != y || m.addSub.manager != nil {
 			t.Fatal("release format and mode erasure", out, y)
+		}
+	}
+	if modularSourceDebug {
+		serviceMust(t, d.Close())
+		if e := m.Add(ArbitraryFloatNearestEven, &y, &y, &out); !errors.Is(e, arena.ErrClosed) {
+			t.Fatal("valid add reads closed source assertion owner", e)
 		}
 	}
 	serviceMust(t, m.Del(&out))
