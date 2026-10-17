@@ -79,58 +79,6 @@ func (c satIntegrityChecker) traceMissingTernaryWatch(cl StoredClauseRef, index 
 		})
 }
 
-func (c satIntegrityChecker) residualClauseText(cl StoredClauseRef) (body string, result error) {
-	p := c.lifecycle.propagation
-	out, err := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: c.lifecycle.budget})
-	if err != nil {
-		return "", err
-	}
-	defer func() { result = errors.Join(result, out.Close()) }()
-	if err = p.clauses.DisplayInto(cl, out); err != nil {
-		return "", err
-	}
-	if err = out.AppendCString(" status: "); err != nil {
-		return "", err
-	}
-	status, err := p.status(cl)
-	if err != nil {
-		return "", err
-	}
-	if err = out.AppendCString(status.String() + "\n"); err != nil {
-		return "", err
-	}
-	for i := uint32(0); ; i++ {
-		n, e := p.clauses.Size(cl)
-		if e != nil {
-			return "", e
-		}
-		if i >= n {
-			break
-		}
-		if e = out.AppendCString("val("); e != nil {
-			return "", e
-		}
-		if e = out.AppendUint32(i); e != nil {
-			return "", e
-		}
-		if e = out.AppendCString("): "); e != nil {
-			return "", e
-		}
-		lit, e := p.clauses.Literal(cl, i)
-		if e != nil {
-			return "", e
-		}
-		value, e := p.variables.valueLiteral(lit)
-		if e != nil {
-			return "", e
-		}
-		if e = out.AppendCString(value.String() + "\n"); e != nil {
-			return "", e
-		}
-	}
-	return out.String()
-}
-
 func (c satIntegrityChecker) traceResidualClause(cl StoredClauseRef) {
 	tags := c.lifecycle.traceTags
 	if tags == nil {
@@ -138,11 +86,41 @@ func (c satIntegrityChecker) traceResidualClause(cl StoredClauseRef) {
 	}
 	_ = tags.EmitConditional("sat_bug", "check_clause", "src/sat/sat_integrity_checker.cpp", 90,
 		func() bool { return true }, func(w io.Writer) error {
-			body, err := c.residualClauseText(cl)
+			p := c.lifecycle.propagation
+			body, err := c.eliminatedClauseDisplayText(cl)
 			if err != nil {
 				return err
 			}
-			_, err = io.WriteString(w, body)
-			return err
+			_, _ = io.WriteString(w, body)
+			_, _ = io.WriteString(w, " status: ")
+			status, err := p.status(cl)
+			if err != nil {
+				return err
+			}
+			_, _ = io.WriteString(w, status.String())
+			_, _ = io.WriteString(w, "\n")
+			for i := uint32(0); ; i++ {
+				n, e := p.clauses.Size(cl)
+				if e != nil {
+					return e
+				}
+				if i >= n {
+					break
+				}
+				_, _ = io.WriteString(w, "val(")
+				_, _ = io.WriteString(w, strconv.FormatUint(uint64(i), 10))
+				_, _ = io.WriteString(w, "): ")
+				lit, e := p.clauses.Literal(cl, i)
+				if e != nil {
+					return e
+				}
+				value, e := p.variables.valueLiteral(lit)
+				if e != nil {
+					return e
+				}
+				_, _ = io.WriteString(w, value.String())
+				_, _ = io.WriteString(w, "\n")
+			}
+			return nil
 		})
 }

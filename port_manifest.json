@@ -76437,19 +76437,19 @@
           "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
         },
         {
-          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source-ordered literal/clause/solver display and stopped formatter prefixes (cpp56-60); later ternary and residual trace sites remain open",
+          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source-ordered literal/clause/solver display and stopped formatter prefixes (cpp56-60); wider checker diagnostics remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityEliminatedClauseSourceTrace"]
         },
         {
-          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source-ordered clause and empty/nonempty watch-list display with stopped formatter prefixes (cpp69-73); later residual trace remains open",
+          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source-ordered clause and empty/nonempty watch-list display with stopped formatter prefixes (cpp69-73); wider checker diagnostics remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityMissingTernaryWatchSourceTrace"]
         },
         {
-          "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, concrete status/value display and process-gated C/T actions; wider checker diagnostics remain partial",
+          "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, source-ordered clause/status/per-literal display, stopped formatter prefix and process-gated C/T actions; wider checker diagnostics remain partial",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "go_targets": ["pkg/sat/sat_integrity_checker.go"],
@@ -76576,19 +76576,19 @@
           "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
         },
         {
-          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source-ordered literal/clause/solver display and stopped formatter prefixes (cpp56-60); later ternary and residual trace sites remain open",
+          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source-ordered literal/clause/solver display and stopped formatter prefixes (cpp56-60); wider checker diagnostics remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityEliminatedClauseSourceTrace"]
         },
         {
-          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source-ordered clause and empty/nonempty watch-list display with stopped formatter prefixes (cpp69-73); later residual trace remains open",
+          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source-ordered clause and empty/nonempty watch-list display with stopped formatter prefixes (cpp69-73); wider checker diagnostics remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityMissingTernaryWatchSourceTrace"]
         },
         {
-          "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, concrete status/value display and process-gated C/T actions; wider checker diagnostics remain partial",
+          "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, source-ordered clause/status/per-literal display, stopped formatter prefix and process-gated C/T actions; wider checker diagnostics remain partial",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "go_targets": ["pkg/sat/sat_integrity_checker.go"],
@@ -124156,7 +124156,7 @@
           "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
         },
         {
-          "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, concrete status/value display and process-gated C/T actions; wider checker diagnostics remain partial",
+          "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, source-ordered clause/status/per-literal display, stopped formatter prefix and process-gated C/T actions; wider checker diagnostics remain partial",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "go_targets": ["pkg/sat/sat_integrity_checker.go"],
@@ -124720,7 +124720,7 @@
           "tests": ["TestSATCleanerFrozenClauseEliminatedLiteralUsesSourceAssertion", "TestSATCleanerFrozenCountAssertionUsesSourceActions"]
         },
         {
-          "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, concrete status/value display and process-gated C/T actions; wider checker diagnostics remain partial",
+          "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, source-ordered clause/status/per-literal display, stopped formatter prefix and process-gated C/T actions; wider checker diagnostics remain partial",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "go_targets": ["pkg/sat/sat_integrity_checker.go"],
@@ -185731,19 +185731,19 @@
           "tests": ["TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         },
         {
-          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source-ordered literal/clause/solver display and stopped formatter prefixes (cpp56-60); later ternary and residual trace sites remain open",
+          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source-ordered literal/clause/solver display and stopped formatter prefixes (cpp56-60); wider checker diagnostics remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityEliminatedClauseSourceTrace"]
         },
         {
-          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source-ordered clause and empty/nonempty watch-list display with stopped formatter prefixes (cpp69-73); later residual trace remains open",
+          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source-ordered clause and empty/nonempty watch-list display with stopped formatter prefixes (cpp69-73); wider checker diagnostics remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityMissingTernaryWatchSourceTrace"]
         },
         {
-          "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, concrete status/value display and process-gated C/T actions; wider checker diagnostics remain partial",
+          "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, source-ordered clause/status/per-literal display, stopped formatter prefix and process-gated C/T actions; wider checker diagnostics remain partial",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "go_targets": ["pkg/sat/sat_integrity_checker.go"],
@@ -188191,19 +188191,19 @@
           "tests": ["TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
         },
         {
-          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source-ordered literal/clause/solver display and stopped formatter prefixes (cpp56-60); later ternary and residual trace sites remain open",
+          "name": "Retained check_clause eliminated-variable sat_bug CTRACE before line-60 SASSERT, source-ordered literal/clause/solver display and stopped formatter prefixes (cpp56-60); wider checker diagnostics remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityEliminatedClauseSourceTrace"]
         },
         {
-          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source-ordered clause and empty/nonempty watch-list display with stopped formatter prefixes (cpp69-73); later residual trace remains open",
+          "name": "Retained check_clause sat_ter_watch_bug CTRACE before first ternary VERIFY, source-ordered clause and empty/nonempty watch-list display with stopped formatter prefixes (cpp69-73); wider checker diagnostics remain open",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "tests": ["TestSATIntegrityMissingTernaryWatchSourceTrace"]
         },
         {
-          "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, concrete status/value display and process-gated C/T actions; wider checker diagnostics remain partial",
+          "name": "Retained check_clause nary residual sat_bug CTRACE90 before SASSERT93, source-ordered clause/status/per-literal display, stopped formatter prefix and process-gated C/T actions; wider checker diagnostics remain partial",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_clause_trace.go",
           "go_targets": ["pkg/sat/sat_integrity_checker.go"],

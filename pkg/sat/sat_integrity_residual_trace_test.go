@@ -62,6 +62,24 @@ func TestSATIntegrityNaryResidualSourceTraceAndAssertion(t *testing.T) {
 	if got := output.String(); got != strings.Repeat(record, wantCount) {
 		t.Fatalf("residual source trace: got %q, want %q", got, strings.Repeat(record, wantCount))
 	}
+	output.Reset()
+	s.Lifecycle.budget.FailAfter(0)
+	_, err = c.checkClause(cl)
+	if satStorageSourceDebug {
+		if !errors.Is(err, ErrSATAssertion) {
+			t.Fatalf("residual assertion after formatter refusal: %v", err)
+		}
+	} else {
+		satOK(t, err)
+	}
+	prefix := ""
+	if tags.ShouldTrace("sat_bug") {
+		prefix = "-------- [sat_bug] check_clause src/sat/sat_integrity_checker.cpp:90 ---------\n"
+	}
+	if got := output.String(); got != strings.Repeat(prefix, wantCount) {
+		t.Fatalf("residual formatter refusal: got %q, want %q", got, strings.Repeat(prefix, wantCount))
+	}
+	s.Lifecycle.budget.FailAfter(-1)
 	debug, input, assertionFile := satIntegrityActionFixture(t, "CT")
 	satOK(t, debug.EnableAssertions(false))
 	output.Reset()
