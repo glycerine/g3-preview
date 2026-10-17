@@ -35,6 +35,8 @@ type polynomialSubstitutionState struct {
 	bodyCause, cleanupCause error
 }
 type polynomialSubstitutionScope struct {
+	powerNumeric                                     polynomialSubstitutionPowerNumeric
+	algebraicCaller                                  *algebraicSignSubstitutionScope
 	som                                              polynomialSOMNormalizeInvocationReceipt
 	sourceCause, ownCause                            error
 	ownStage                                         uint8

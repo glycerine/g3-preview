@@ -49,6 +49,7 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	signSubstitution                                       algebraicSignSubstitutionScope
 	rationalSign                                           algebraicRationalSignScope
 	rootDisplay                                            algebraicRootDisplayScope
 	selection                                              algebraicSelectionScope
@@ -843,6 +844,9 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	return m.store(dl, &out)
 }
 func (m *AlgebraicRootCore) CleanupRetained() error {
+	if m != nil && m.self == m && m.signSubstitution.running {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.rationalSign.running {
 		return ErrAlgebraicPending
 	}
@@ -903,6 +907,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	if e := m.cleanupRationalSign(); e != nil {
 		return e
 	}
+	if e := m.cleanupSignSubstitution(); e != nil {
+		return e
+	}
 	if e := m.cleanupDivision(); e != nil {
 		return e
 	}
@@ -930,6 +937,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.comparisonCleanup()
 }
 func (m *AlgebraicRootCore) Close() error {
+	if m != nil && m.self == m && m.signSubstitution.running {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.rationalSign.running {
 		return ErrAlgebraicPending
 	}

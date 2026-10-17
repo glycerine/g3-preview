@@ -233,6 +233,9 @@ func (m *MultivariatePolynomialCore) CleanupSubstitution() error {
 		}
 		m.substitution.scope.modularPowerPending = false
 	}
+	if e := m.substitution.scope.powerNumeric.roots.Cleanup(m.integer); e != nil {
+		return e
+	}
 	if e := m.substitutionCleanup(true); e != nil {
 		if m.substitution.scope.ownCause == nil {
 			m.substitution.scope.ownCause = e
@@ -287,7 +290,11 @@ func (m *MultivariatePolynomialCore) CleanupSubstitution() error {
 }
 func (m *MultivariatePolynomialCore) substitutionModularPower(a *unumeral.Int, k uint32, out *unumeral.Int) error {
 	before := m.modular.PowerPending
-	e := m.modular.Power(a, k, out)
+	numeric := &m.substitution.scope.powerNumeric
+	numeric.owner = m
+	numeric.hooks.Policy = numeric
+	context := unumeral.NumericAllocationContext{}.WithCaller(&numeric.hooks)
+	e := m.modular.WithAllocationContext(context).Power(a, k, out)
 	if !before && m.modular.PowerPending {
 		m.substitution.scope.modularPowerPending = true
 	}
@@ -546,8 +553,15 @@ func (m *MultivariatePolynomialCore) SubstituteRationals(p Polynomial, n uint32,
 	return m.substituteRationalMap(p, &m.substitution.array)
 }
 func (m *MultivariatePolynomialCore) SubstituteRationalMap(p Polynomial, x2v PolynomialRationalSubstitution) (Polynomial, error) {
+	return m.substituteRationalForAlgebraic(p, x2v, nil)
+}
+func (m *MultivariatePolynomialCore) substituteRationalForAlgebraic(p Polynomial, x2v PolynomialRationalSubstitution, caller *algebraicSignSubstitutionScope) (Polynomial, error) {
 	if e := m.beginSubstitution(2); e != nil {
 		return Polynomial{}, e
+	}
+	m.substitution.scope.algebraicCaller = caller
+	if caller != nil {
+		caller.core = m
 	}
 	return m.substituteRationalMap(p, x2v)
 }
