@@ -8,6 +8,7 @@ import (
 )
 
 type algebraicIntegerSetScope struct {
+	selection        *algebraicSelectionScope
 	polynomialCaller *polynomialAlgebraicEvaluationScope
 	value            unumeral.Rational
 	addition         *algebraicIntegerAddScope
@@ -70,6 +71,9 @@ func (m *AlgebraicRootCore) SetInteger(out *Algebraic, n *unumeral.Int) (cause e
 		return ErrAlgebraicPending
 	}
 	*s = algebraicIntegerSetScope{polynomialCaller: m.polynomialCaller, value: unumeral.NewRational(), active: true, running: true}
+	if m.selection.running {
+		s.selection = &m.selection
+	}
 	if m.integerAdd.running {
 		s.addition = &m.integerAdd
 	}

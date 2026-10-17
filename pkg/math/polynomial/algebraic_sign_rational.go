@@ -61,6 +61,7 @@ func (v *algebraicOptimisticRationals) Rational(x uint32) (*unumeral.Rational, e
 }
 
 type algebraicRationalSignScope struct {
+	sourceStop      error
 	value           unumeral.Rational
 	evaluation      *MultivariatePolynomialManager
 	active, running bool
@@ -70,7 +71,7 @@ type algebraicRationalSignScope struct {
 func (m *AlgebraicRootCore) cleanupRationalSign() error {
 	return m.finishRationalSign(true)
 }
-func (m *AlgebraicRootCore) finishRationalSign(owning bool) error {
+func (m *AlgebraicRootCore) finishRationalSign(owning bool) (cause error) {
 	s := &m.rationalSign
 	if s.running {
 		return ErrAlgebraicPending
@@ -78,6 +79,11 @@ func (m *AlgebraicRootCore) finishRationalSign(owning bool) error {
 	if !s.active {
 		return nil
 	}
+	defer func() {
+		if !owning && cause != nil && s.sourceStop == nil {
+			s.sourceStop = cause
+		}
+	}()
 	// This pointer is published only at the actual recursive engine entry.
 	// An older active engine refusal gives this parent no cleanup authority.
 	if c := s.evaluation; owning && c != nil && c.evaluation.rationalCaller == s && c.evaluation.active {

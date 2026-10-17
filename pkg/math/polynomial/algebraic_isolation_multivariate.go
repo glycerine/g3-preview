@@ -15,6 +15,12 @@ import (
 // at the original assignment. Output mutation is incremental, as in C++.
 // After an error, call CleanupRetained and reset any partial output before retry.
 func (m *AlgebraicRootCore) IsolateMultivariateRoots(pm *MultivariatePolynomialManager, p Polynomial, values PolynomialAlgebraicEvaluation, roots *AlgebraicVector) error {
+	return m.isolateMultivariateRootsEntry(pm, p, values, roots, nil)
+}
+func (m *AlgebraicRootCore) isolateMultivariateRootsEntry(pm *MultivariatePolynomialManager, p Polynomial, values PolynomialAlgebraicEvaluation, roots *AlgebraicVector, caller *algebraicIsolationSignsScope) error {
+	if m != nil && m.self == m && m.isolationSigns.active && caller != &m.isolationSigns {
+		return ErrAlgebraicPending
+	}
 	if e := m.check(); e != nil {
 		return e
 	}

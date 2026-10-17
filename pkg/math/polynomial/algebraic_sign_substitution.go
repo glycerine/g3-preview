@@ -66,6 +66,7 @@ func (v *algebraicBasicRationals) Rational(x uint32) (*unumeral.Rational, error)
 }
 
 type algebraicSignSubstitutionScope struct {
+	sourceStop      error
 	prime           PolynomialRef
 	core            *MultivariatePolynomialCore
 	active, running bool
@@ -75,13 +76,18 @@ func (m *AlgebraicRootCore) cleanupSignSubstitution() error { return m.finishSig
 func (m *AlgebraicRootCore) finishSignSubstitution(owning bool) error {
 	return m.finishBasicSubstitution(&m.signSubstitution, owning)
 }
-func (m *AlgebraicRootCore) finishBasicSubstitution(s *algebraicSignSubstitutionScope, owning bool) error {
+func (m *AlgebraicRootCore) finishBasicSubstitution(s *algebraicSignSubstitutionScope, owning bool) (cause error) {
 	if s.running {
 		return ErrAlgebraicPending
 	}
 	if !s.active {
 		return nil
 	}
+	defer func() {
+		if !owning && cause != nil && s.sourceStop == nil {
+			s.sourceStop = cause
+		}
+	}()
 	c := s.prime.owner
 	if c == nil {
 		return ErrAlgebraicOwner

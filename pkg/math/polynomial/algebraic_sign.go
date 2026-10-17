@@ -12,6 +12,9 @@ import (
 // Like the source, the rational phase returns qm().sign (the signed inline
 // numerator for small values); the interval phase returns -1, 0 or 1.
 func (m *AlgebraicRootCore) EvalSign(pm *MultivariatePolynomialManager, p Polynomial, values PolynomialAlgebraicEvaluation) (int, error) {
+	return m.evalSignForIsolationSigns(pm, p, values, nil)
+}
+func (m *AlgebraicRootCore) evalSignForIsolationSigns(pm *MultivariatePolynomialManager, p Polynomial, values PolynomialAlgebraicEvaluation, caller *algebraicIsolationSignsScope) (int, error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
@@ -21,6 +24,7 @@ func (m *AlgebraicRootCore) EvalSign(pm *MultivariatePolynomialManager, p Polyno
 	if m.signEvaluationRunning || m.signResultant.active || m.signInterval.active || m.signSubstitution.active || m.rationalSign.active {
 		return 0, ErrAlgebraicPending
 	}
+	m.signEvaluationCaller = caller
 	m.signEvaluationRunning = true
 	defer func() { m.signEvaluationRunning = false }()
 	for {

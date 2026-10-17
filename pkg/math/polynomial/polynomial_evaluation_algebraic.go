@@ -184,6 +184,9 @@ func (s *polynomialAlgebraicEvaluationScope) childSourceCause() error {
 	if vm == nil {
 		return nil
 	}
+	if vm.selection.polynomialCaller == s && vm.selection.active && vm.selection.sourceStop != nil {
+		return vm.selection.sourceStop
+	}
 	if vm.inversion.polynomialCaller == s && vm.inversion.remaining != 0 && vm.inversion.sourceStop != nil {
 		return vm.inversion.sourceStop
 	}

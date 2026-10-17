@@ -49,6 +49,9 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	isolationSigns                                             algebraicIsolationSignsScope
+	signEvaluationCaller                                       *algebraicIsolationSignsScope
+	localSelection                                             *algebraicSelectionScope
 	multivariateIsolationFrames                                []*algebraicMultivariateIsolationFrame
 	multivariateIsolationDepth                                 uint32
 	multivariateIsolationRunning                               bool
@@ -486,6 +489,10 @@ func (m *AlgebraicRootCore) beginQ() error {
 	m.localQ = unumeral.NewRational()
 	m.localActive = true
 	m.localPolynomialCaller = m.polynomialCaller
+	m.localSelection = nil
+	if m.selection.running {
+		m.localSelection = &m.selection
+	}
 	m.localIntegerSet = nil
 	m.localIntegerAdd = nil
 	if m.integerSet.running {
@@ -872,6 +879,9 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	return m.store(dl, &out)
 }
 func (m *AlgebraicRootCore) CleanupRetained() error {
+	if m != nil && m.self == m && (m.isolationSigns.running || m.isolationSigns.finishing) {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.multivariateIsolationRunning {
 		return ErrAlgebraicPending
 	}
@@ -950,9 +960,6 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	if e := m.cleanupBasicRoot(); e != nil {
 		return e
 	}
-	if e := m.cleanupSelection(); e != nil {
-		return e
-	}
 	if e := m.cleanupRootDisplay(); e != nil {
 		return e
 	}
@@ -991,6 +998,12 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	if e := m.cleanupIntegerAdd(true); e != nil {
 		return e
 	}
+	if e := m.cleanupSelection(); e != nil {
+		return e
+	}
+	if e := m.finishIsolationSigns(true); e != nil {
+		return e
+	}
 	if m.pending.slot != 0 {
 		l := &m.locations[m.pending.slot-1]
 		if e := m.deleteLocation(&m.pending, l); e != nil {
@@ -1007,6 +1020,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.cleanupMultivariateIsolation()
 }
 func (m *AlgebraicRootCore) Close() error {
+	if m != nil && m.self == m && (m.isolationSigns.running || m.isolationSigns.finishing) {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.multivariateIsolationRunning {
 		return ErrAlgebraicPending
 	}

@@ -9,6 +9,8 @@ import (
 )
 
 type algebraicSelectionScope struct {
+	polynomialCaller                         *polynomialAlgebraicEvaluationScope
+	sourceStop                               error
 	integer                                  unumeral.Int
 	binary                                   unumeral.BinaryRational
 	rational                                 unumeral.Rational
@@ -44,6 +46,32 @@ func (m *AlgebraicRootCore) cleanupSelection() error {
 	}
 	s.active = false
 	return nil
+}
+
+func (m *AlgebraicRootCore) finishSelectionSource() (cause error) {
+	s := &m.selection
+	if s.running {
+		return ErrAlgebraicPending
+	}
+	if !s.active {
+		return nil
+	}
+	if s.sourceStop != nil {
+		return s.sourceStop
+	}
+	if m.localSelection == s && m.localActive && m.localCleanup != nil {
+		s.sourceStop = m.localCleanup
+		return s.sourceStop
+	}
+	if m.integerSet.selection == s && m.integerSet.active && m.integerSet.sourceStop != nil {
+		s.sourceStop = m.integerSet.sourceStop
+		return s.sourceStop
+	}
+	cause = m.cleanupSelection()
+	if cause != nil {
+		s.sourceStop = cause
+	}
+	return cause
 }
 
 // selectionValue treats the source null algebraic cell as its basic zero.
@@ -141,8 +169,8 @@ func (m *AlgebraicRootCore) selectInteger(a, out *Algebraic, upper bool) (cause 
 	if s.active {
 		return ErrAlgebraicPending
 	}
-	*s = algebraicSelectionScope{active: true, running: true, integerOwned: true}
-	defer func() { s.running = false; cause = errors.Join(cause, m.cleanupSelection()) }()
+	*s = algebraicSelectionScope{polynomialCaller: m.polynomialCaller, active: true, running: true, integerOwned: true}
+	defer func() { s.running = false; cause = errors.Join(cause, m.finishSelectionSource()) }()
 	r, basic, e := m.selectionValue(a)
 	if e != nil {
 		return e
@@ -170,13 +198,7 @@ func (m *AlgebraicRootCore) selectInteger(a, out *Algebraic, upper bool) (cause 
 	if e != nil {
 		return e
 	}
-	// manager::set(mpz) delegates to the ordinary rational-cell setter.
-	s.rational = unumeral.NewRational()
-	s.rationalOwned = true
-	if e = q.SetInteger(&s.rational, &s.integer); e != nil {
-		return e
-	}
-	return m.SetRational(out, &s.rational)
+	return m.SetInteger(out, &s.integer)
 }
 
 // Select chooses the source small binary rational strictly between prev and
@@ -196,8 +218,8 @@ func (m *AlgebraicRootCore) Select(prev, curr, out *Algebraic) (cause error) {
 	if e := m.separate(prev, curr); e != nil {
 		return e
 	}
-	*s = algebraicSelectionScope{active: true, running: true, binaryOwned: true}
-	defer func() { s.running = false; cause = errors.Join(cause, m.cleanupSelection()) }()
+	*s = algebraicSelectionScope{polynomialCaller: m.polynomialCaller, active: true, running: true, binaryOwned: true}
+	defer func() { s.running = false; cause = errors.Join(cause, m.finishSelectionSource()) }()
 	a, ab, e := m.selectionValue(prev)
 	if e != nil {
 		return e

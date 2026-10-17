@@ -61,13 +61,14 @@ func (v *algebraicRootIntervals) Interval(x uint32) (*unumeral.BinaryInterval, e
 }
 
 type algebraicSignIntervalScope struct {
+	sourceStop                   error
 	interval                     unumeral.BinaryInterval
 	evaluation                   *MultivariatePolynomialManager
 	active, running, constructed bool
 }
 
 func (m *AlgebraicRootCore) cleanupSignInterval() error { return m.finishSignInterval(true) }
-func (m *AlgebraicRootCore) finishSignInterval(owning bool) error {
+func (m *AlgebraicRootCore) finishSignInterval(owning bool) (cause error) {
 	s := &m.signInterval
 	if s.running {
 		return ErrAlgebraicPending
@@ -75,6 +76,11 @@ func (m *AlgebraicRootCore) finishSignInterval(owning bool) error {
 	if !s.active {
 		return nil
 	}
+	defer func() {
+		if !owning && cause != nil && s.sourceStop == nil {
+			s.sourceStop = cause
+		}
+	}()
 	child := s.evaluation != nil && s.evaluation.evaluation.intervalCaller == s
 	if child && !owning && s.evaluation.evaluation.sourceCause != nil {
 		return s.evaluation.evaluation.sourceCause
