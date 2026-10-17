@@ -318,6 +318,43 @@ func TestSATSolverModelConverterDebugAssertionBeforeLaterInvalidLiteral(t *testi
 	satConverterAssertActualCharges(t, m, b)
 }
 
+func TestSATSolverModelConverterReadsProcessAssertionSwitchAtReachedSites(t *testing.T) {
+	m, _ := satConverterTestOwner(t)
+	r, e := m.Mk(satModelElimVar, 0)
+	paramsMust(t, e)
+	paramsMust(t, m.InsertBinary(r, MakeLiteral(0, false), MakeLiteral(1, false)))
+	debug, _, _ := satIntegrityActionFixture(t, "")
+	model := Model{lbool.True, lbool.False}
+	if e = m.Apply(model); satStorageSourceDebug {
+		if !errors.Is(e, ErrSATAssertion) {
+			t.Fatalf("enabled eliminated-variable assertion: %v", e)
+		}
+	} else {
+		paramsMust(t, e)
+	}
+	paramsMust(t, debug.EnableAssertions(false))
+	paramsMust(t, m.Apply(model))
+	if satStorageSourceDebug {
+		x := &satModelConversionEntry{literals: []Literal{DefaultLiteral()}}
+		paramsMust(t, m.assertEntryModelSpan(x, satSolverModelSpan{slice: model}))
+		paramsMust(t, debug.EnableAssertions(true))
+		if e = m.assertEntryModelSpan(x, satSolverModelSpan{slice: model}); !errors.Is(e, ErrSATAssertion) {
+			t.Fatalf("enabled per-clause assertion: %v", e)
+		}
+		paramsMust(t, debug.Close())
+		if e = m.Apply(model); !errors.Is(e, arena.ErrClosed) {
+			t.Fatalf("reached eliminated-variable switch on closed owner: %v", e)
+		}
+		if e = m.assertEntryModelSpan(x, satSolverModelSpan{slice: model}); !errors.Is(e, arena.ErrClosed) {
+			t.Fatalf("reached per-clause switch on closed owner: %v", e)
+		}
+		satisfied := &satModelConversionEntry{literals: []Literal{MakeLiteral(0, false), DefaultLiteral()}}
+		if e = m.assertEntryModelSpan(satisfied, satSolverModelSpan{slice: model}); !errors.Is(e, arena.ErrClosed) {
+			t.Fatalf("satisfied clause must still read its reached assertion switch: %v", e)
+		}
+	}
+}
+
 func TestSATSolverNativeModelEntryGrowthStableRefsAndCopy(t *testing.T) {
 	src, sb := satConverterTestOwner(t)
 	dst, db := satConverterTestOwner(t)

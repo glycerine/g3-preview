@@ -293,13 +293,19 @@ func (m *satModelConverter) applyModelSpan(model satSolverModelSpan) error {
 			return e
 		}
 		v := BoolVar(x.varKind & 0x7fffffff)
-		if satStorageSourceDebug && satModelConversionKind(x.varKind>>31) == satModelElimVar {
-			value, e := model.read(v)
+		if satStorageSourceDebug {
+			enabled, e := diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
 			if e != nil {
 				return e
 			}
-			if value != lbool.Undef {
-				return ErrSATAssertion
+			if enabled && satModelConversionKind(x.varKind>>31) == satModelElimVar {
+				value, e := model.read(v)
+				if e != nil {
+					return e
+				}
+				if value != lbool.Undef {
+					return ErrSATAssertion
+				}
 			}
 		}
 		sat, sign := false, false
@@ -370,7 +376,11 @@ func (m *satModelConverter) assertEntryModelSpan(x *satModelConversionEntry, mod
 	for j := uint32(0); j < n; j++ {
 		l := x.literals[j]
 		if l == DefaultLiteral() {
-			if !sat {
+			enabled, e := diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+			if e != nil {
+				return e
+			}
+			if enabled && !sat {
 				return ErrSATAssertion
 			}
 			sat = false
