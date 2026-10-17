@@ -173,12 +173,8 @@ func TestSimpleAlgebraicValuesCopyReservationPrefixes(t *testing.T) {
 					}
 				}
 			}
-			// The fixture separately owns the cell allocator; its pending block
-			// can precede the numeric coefficient child. This explicit caller
-			// acknowledgement grants no allocator authority to the mapping.
-			// Coefficient-copy storage is acknowledged by the core
-			// through its actual issued receipt; no global integer cleanup.
-			serviceMust(t, c.config.Allocator.CleanupPending())
+			// The core acknowledges only its exact issued cell and numeric
+			// coefficient allocations; no global allocator cleanup is used.
 			if z.MatchesCopyAllocationInvocation(&c.coefficientCopy) {
 				ownedReceipt = true
 				var untouched Algebraic

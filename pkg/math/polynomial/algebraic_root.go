@@ -51,6 +51,9 @@ type algebraicLocation struct {
 type AlgebraicRootCore struct {
 	manager                                                    *AlgebraicManager
 	coefficientCopy                                            unumeral.IntegerCopyAllocationReceipt
+	cellAllocation                                             umemory.SmallAllocatorAllocationOutcome
+	cellPending                                                umemory.SmallAllocatorPendingAllocation
+	cellAllocationRunning                                      bool
 	zero                                                       unumeral.Rational
 	rootConstruction                                           algebraicRootConstructionScope
 	isolationSigns                                             algebraicIsolationSignsScope
@@ -175,6 +178,9 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m != nil && m.self == m && (m.cellAllocationRunning || m.cellPending.Block() != (umemory.Block{})) {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.binary.executing {
 		return ErrAlgebraicPending
 	}
@@ -264,7 +270,9 @@ func (m *AlgebraicRootCore) allocate(kind uint8) (Algebraic, error) {
 	if kind == 1 {
 		n = 56
 	}
-	raw, e := m.config.Allocator.Allocate(n)
+	m.cellAllocationRunning = true
+	defer func() { m.cellAllocationRunning = false }()
+	raw, e := m.config.Allocator.AllocateWithOutcome(n, &m.cellAllocation)
 	l.raw = raw
 	if e != nil {
 		if raw.LogicalAddress() == 0 {
@@ -898,6 +906,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.cleanupRetainedCore()
 }
 func (m *AlgebraicRootCore) cleanupRetainedCore() error {
+	if m != nil && m.self == m && m.cellAllocationRunning {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && (m.rootConstruction.running || m.rootConstruction.finishing) {
 		return ErrAlgebraicPending
 	}
@@ -966,6 +977,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	}
 	if m == nil || m.self != m || m.closed {
 		return ErrAlgebraicOwner
+	}
+	if e := m.cleanupCellAllocation(); e != nil {
+		return e
 	}
 	if e := m.config.Rationals.Integers().CleanupCopyAllocationInvocation(&m.coefficientCopy); e != nil {
 		return e
@@ -1054,6 +1068,9 @@ func (m *AlgebraicRootCore) Close() error {
 	return m.closeCoreMembers()
 }
 func (m *AlgebraicRootCore) closeCoreMembers() error {
+	if m != nil && m.self == m && m.cellAllocationRunning {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && (m.rootConstruction.running || m.rootConstruction.finishing) {
 		return ErrAlgebraicPending
 	}

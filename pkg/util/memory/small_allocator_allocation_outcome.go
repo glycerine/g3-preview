@@ -44,3 +44,10 @@ func (a *SmallAllocator) AllocationOutcomeInvocation(o *SmallAllocatorAllocation
 	}
 	return o.invocation
 }
+
+// MatchesPendingAllocationOutcome identifies the still-unjoined raw block from
+// this exact accepted allocation. External cleanup or a later allocation revokes
+// this authority even when an older outcome remains in the caller's storage.
+func (a *SmallAllocator) MatchesPendingAllocationOutcome(o *SmallAllocatorAllocationOutcome) bool {
+	return a != nil && a.self == a && a.MatchesAllocationOutcome(o) && o.Pending != (Block{}) && o.Pending == a.pending && o.Object == (ObjectRef{}) && o.FreshRaw
+}
