@@ -172,9 +172,9 @@ func (m *FixedPointManager) publishAddOverflow(dst *FixedPoint, value *big.Int) 
 	dst.sourceZeroNegative = false
 }
 
-// mul sets c's sign after ensuring its word slot and before it checks the
-// product buffer for overflow. The old destination words are still in place.
-func (m *FixedPointManager) publishMulOverflowSign(dst *FixedPoint, negative bool) {
+// mul and div set c's sign after ensuring its word slot and before checking
+// their temporary result buffers. The old destination words stay in place.
+func (m *FixedPointManager) publishProductOverflowSign(dst *FixedPoint, negative bool) {
 	if dst.scaled.Sign() == 0 {
 		dst.sourceZeroSlot = true
 		dst.sourceZeroNegative = negative
@@ -440,7 +440,7 @@ func (m *FixedPointManager) Mul(a, b, out *FixedPoint) error {
 		return err
 	}
 	if err := m.publish(out, q); err != nil {
-		m.publishMulOverflowSign(out, negative)
+		m.publishProductOverflowSign(out, negative)
 		return err
 	}
 	if q.Sign() == 0 && retainsSlot {
@@ -464,6 +464,7 @@ func (m *FixedPointManager) Div(a, b, out *FixedPoint) error {
 		return ErrFixedPointDivZero
 	}
 	m.traceFixedProduct(a, b, out, true, false)
+	negative := a.sourceNegative() != b.sourceNegative()
 	var numerator big.Int
 	numerator.Mul(&a.scaled, &m.scale)
 	q, err := m.roundMagnitude(&numerator, &b.scaled)
@@ -471,6 +472,7 @@ func (m *FixedPointManager) Div(a, b, out *FixedPoint) error {
 		return err
 	}
 	if err := m.publish(out, q); err != nil {
+		m.publishProductOverflowSign(out, negative)
 		return err
 	}
 	m.traceFixedProduct(a, b, out, true, true)

@@ -332,3 +332,67 @@ func TestFixedPointMultiplyOverflowPublishesSignBeforeProductWords(t *testing.T)
 	}
 	check(a, "-4294967295", false)
 }
+
+func TestFixedPointDivideOverflowPublishesSignBeforeQuotientWords(t *testing.T) {
+	m, err := NewFixedPointManager(1, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a, _ := m.New()
+	b, _ := m.New()
+	out, _ := m.New()
+	defer func() {
+		for _, v := range []*FixedPoint{a, b, out} {
+			if err := v.Close(); err != nil {
+				t.Error(err)
+			}
+		}
+		if err := m.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
+	must := func(err error) {
+		t.Helper()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("mpfx_trace")
+	must(m.BindTrace(tags))
+	check := func(v *FixedPoint, want string, slot bool) {
+		t.Helper()
+		got, err := m.String(v)
+		if err != nil || got != want || v.sourceZeroSlot != slot {
+			t.Fatal("source quotient failure prefix", got, want, v.sourceZeroSlot, slot, err)
+		}
+		if tags.ShouldTrace("mpfx_trace") && (!strings.Contains(output.String(), " / ") || strings.HasSuffix(output.String(), want+"\n")) {
+			t.Fatal("division overflow reached result trace", output.String())
+		}
+		output.Reset()
+	}
+	must(m.SetUint64(a, (1<<32)-1))
+	must(m.SetRatio(b, 1, 2))
+	must(m.SetInt64(out, -3))
+	if err := m.Div(a, b, out); !errors.Is(err, ErrFixedPointOverflow) {
+		t.Fatal("positive division overflow", err)
+	}
+	check(out, "3", false)
+	must(m.Neg(a))
+	must(m.Reset(out))
+	if err := m.Div(a, b, out); !errors.Is(err, ErrFixedPointOverflow) {
+		t.Fatal("negative division overflow into canonical zero", err)
+	}
+	check(out, "-0", true)
+	must(m.Neg(a))
+	if err := m.Div(a, b, out); !errors.Is(err, ErrFixedPointOverflow) {
+		t.Fatal("positive division overflow into allocated zero", err)
+	}
+	check(out, "0", true)
+	must(m.Neg(b))
+	if err := m.Div(a, b, a); !errors.Is(err, ErrFixedPointOverflow) {
+		t.Fatal("aliased division overflow", err)
+	}
+	check(a, "-4294967295", false)
+}
