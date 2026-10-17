@@ -142,6 +142,18 @@ func TestNaturalSourceAllZeroDenominatorStopsBeforeOutputs(t *testing.T) {
 	}
 }
 
+func TestNaturalSourceUnnormalizedDenominatorShiftGuard(t *testing.T) {
+	if modularSourceDebug {
+		t.Skip("debug assertion action is checked with an explicit process binding")
+	}
+	n := naturalManager(t)
+	q, r := []uint32{99}, []uint32{88, 88}
+	_, err := n.divide(limbView{external: []uint32{7, 1}, size: 2}, limbView{external: []uint32{1, 0}, size: 2}, limbView{external: q, size: 1}, limbView{external: r, size: 2})
+	if !errors.Is(err, arena.ErrBounds) || q[0] != 99 || r[0] != 88 || r[1] != 88 {
+		t.Fatal("guard first undefined source shift", err, q, r)
+	}
+}
+
 func TestNaturalSourceUnsignedQuotientGuardAtWrite(t *testing.T) {
 	budget := arena.NewBudget(1 << 24)
 	n, e := NewNaturalManager(arena.VectorConfig{Descriptors: arena.Config{Budget: budget}})

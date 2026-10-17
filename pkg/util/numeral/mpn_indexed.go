@@ -100,6 +100,18 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 	if allZero {
 		return false, diagnostic.BorrowProcessDebugContext().UnreachableSource("src/util/mpn.cpp", 174)
 	}
+	if b.read(nb-1) == 0 && diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return false, e
+		}
+		if enabled {
+			if e = diagnostic.DebugAssertionFailure(d, "src/util/mpn.cpp", 179, "denom[lden-1] != 0"); e != nil {
+				return false, e
+			}
+		}
+	}
 	if na == 1 && nb == 1 {
 		q.write(0, a.read(0)/b.read(0))
 		r.write(0, a.read(0)%b.read(0))
@@ -120,6 +132,10 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 	var d uint
 	for b.read(nb-1)<<d&0x80000000 == 0 {
 		d++
+		if d == 32 {
+			// The next source shift would exceed mpn_digit's width.
+			return false, arena.ErrBounds
+		}
 	}
 	if e := m.ResizeDiv(0, na+1); e != nil {
 		return false, e

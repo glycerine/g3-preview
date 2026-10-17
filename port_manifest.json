@@ -161257,12 +161257,13 @@
           ]
         },
         {
-          "name": "div shared Algorithm D and internal source early-return/all-zero denominator UNREACHABLE guards with reached lexical verification; broader public span-domain/profile completion remains open",
+          "name": "div shared Algorithm D, internal early-return/all-zero guards and top-limb SASSERT with first undefined-shift guard; broader public span-domain/profile completion remains open",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpn_indexed.go",
           "tests": [
             "TestNaturalSourceAllZeroDenominatorStopsBeforeOutputs",
             "TestNaturalSourceAllZeroDenominatorDebugAction",
+            "TestNaturalSourceUnnormalizedDenominatorShiftGuard",
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
@@ -161909,12 +161910,13 @@
           ]
         },
         {
-          "name": "div shared Algorithm D and internal source early-return/all-zero denominator UNREACHABLE guards with reached lexical verification; broader public span-domain/profile completion remains open",
+          "name": "div shared Algorithm D, internal early-return/all-zero guards and top-limb SASSERT with first undefined-shift guard; broader public span-domain/profile completion remains open",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpn_indexed.go",
           "tests": [
             "TestNaturalSourceAllZeroDenominatorStopsBeforeOutputs",
             "TestNaturalSourceAllZeroDenominatorDebugAction",
+            "TestNaturalSourceUnnormalizedDenominatorShiftGuard",
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
