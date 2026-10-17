@@ -39615,7 +39615,8 @@
         "pkg/math/polynomial/polynomial_linear_native_source_test.go",
         "pkg/math/polynomial/polynomial_linear_local_constructor_source_test.go",
         "pkg/math/polynomial/polynomial_linear_trace.go",
-        "pkg/util/numeral/integer_trace_borrow.go"
+        "pkg/util/numeral/integer_trace_borrow.go",
+        "pkg/math/polynomial/polynomial_linear_trace_failure_test.go"
       ],
       "tests": [
         "TestLinearRationalSourceDisplaySpacingAndOrder",
@@ -39641,7 +39642,10 @@
         "TestLinearModularNativeGrowthIndependentTriangularSystem",
         "TestLinearNativeBigSelfCopyAliases",
         "TestLinearRationalIterationTraceSourceStates",
-        "TestLinearModularIterationTraceSourceStates"
+        "TestLinearModularIterationTraceSourceStates",
+        "TestLinearRationalTraceFailbitStillReachesGuardBeforeSolveMutation",
+        "TestLinearModularTraceFailbitStillReachesGuardBeforeSolveMutation",
+        "TestLinearTraceStreamFailureDoesNotCancelValidSolve"
       ],
       "conditionals": [
         {
@@ -39743,7 +39747,8 @@
         "Native [][]util.Int/[]util.Int and [][]util.Rational/[]util.Rational own matrix/RHS cells. Rational defaults are explicitly 0/1. Native slice capacity is outside Runtime budget. Actual BIG numeral resources remain manager-owned and are independently audited after arithmetic refusal prefixes. Source destruction stops sticky; explicit owning continuation drains actual retained numeral fields.",
         "Source pivot swaps matrix rows only, never RHS; source behavior preserved. Add publishes RHS before reached caller coefficient read. Singular return precedes output writes; descending back substitution copies each output before changing lower RHS cells. Literal Flush deletes RHS then row entries in ascending order, then clears native containers. Source class finalization releases their slices.",
         "Embedded solver has no separate header charge. Constructor source field guard precedes external header reservation. Add/Solve borrow concrete native slices at reached indices. Actual cell pointers preserve BIG self-copy aliases; empty Solve leaves nil output unread.",
-        "Both retained concrete linear solvers now emit the source linear_eq_solver TRACE at h:90 before pivot search/normalization and h:124 before each backward save/substitution. The actual numeric manager trace context is borrowed (including process fallback), so local sparse-interpolation solvers inherit the same tags without a separate solver configuration. Each body displays actual typed matrix/RHS storage through the existing source Display; disabled/erased tags skip formatting and reads. Independent diagonal-system tests verify forward/backward order 0,1,1,0, exact intermediate matrices, solved values, modular symmetric -2 for 9 mod 11, and empty output in the erased profile. Focused linear and sparse interpolation mathematical/trace checks run in ordinary and checked/debug/trace profiles on CPUs 8-16. Stream failure/callback/exception composition and full unit/polynomial/AST completion remain unaudited."
+        "Both retained concrete linear solvers now emit the source linear_eq_solver TRACE at h:90 before pivot search/normalization and h:124 before each backward save/substitution. The actual numeric manager trace context is borrowed (including process fallback), so local sparse-interpolation solvers inherit the same tags without a separate solver configuration. Each body displays actual typed matrix/RHS storage through the existing source Display; disabled/erased tags skip formatting and reads. Independent diagonal-system tests verify forward/backward order 0,1,1,0, exact intermediate matrices, solved values, modular symmetric -2 for 9 mod 11, and empty output in the erased profile. Focused linear and sparse interpolation mathematical/trace checks run in ordinary and checked/debug/trace profiles on CPUs 8-16. Stream failure/callback/exception composition and full unit/polynomial/AST completion remain unaudited.",
+        "Linear TRACE failure semantics corrected: a call-local bridge suppresses only ostream insertion failures while the diagnostic sticky writer retains failbit; later numerical/display operands still execute. Actual Display computation errors are captured separately and propagated from Solve at the source pre-pivot/pre-back-substitution TRACE position. Valid rational solve tests retain solution 3 after the trace stream refuses its first write and verify no underlying retry. Rational/modular guarded tests deliberately truncate the actual RHS extent, observe its debug assertion/bounds guard after stream failure, and verify off-diagonal coefficient 4 has not yet been normalized. The malformed extent is restored solely for fixture destruction and is not malloc-refusal evidence. Existing iteration-state/erased-trace and sparse-interpolation checks pass ordinary and checked/debug/trace on CPUs 8-16. Broader writer callback/exception/destructor composition and full polynomial/AST audits remain pending."
       ],
       "deviations": [
         "No Go generics: concrete rational and integer-modular specializations cover retained source clients. C++ vector capacity, allocation and relocation failure behavior intentionally replaced by native Go slices. Actual numerical allocation/refusal behavior and source arithmetic order remain. Global manager/assertion/TRACE binding remains open.",

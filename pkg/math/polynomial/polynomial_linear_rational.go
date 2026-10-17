@@ -189,7 +189,9 @@ func (s *RationalLinearSolver) Solve(xs []unumeral.Rational) (bool, error) {
 		return false, e
 	}
 	for k := uint32(0); k < s.n; k++ {
-		s.traceIteration(k, 90)
+		if e := s.traceIteration(k, 90); e != nil {
+			return false, e
+		}
 		i := k
 		for ; i < s.n; i++ {
 			r, e := s.row(i)
@@ -291,7 +293,9 @@ func (s *RationalLinearSolver) Solve(xs []unumeral.Rational) (bool, error) {
 	k := s.n
 	for k > 0 {
 		k--
-		s.traceIteration(k, 124)
+		if e := s.traceIteration(k, 124); e != nil {
+			return false, e
+		}
 		rk, e := s.row(k)
 		if e != nil {
 			return false, e
