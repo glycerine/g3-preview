@@ -28661,6 +28661,14 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Selected Boolean non-proof rewriter_core::cache_result TRACE at cpp52 before sort assertion and cache insertion; wider expression/stream profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/rewriter_core_cache_trace.go",
+          "tests": [
+            "TestRewriterCacheResultSourceTraceBeforeInsert"
+          ]
+        },
+        {
           "name": "rewriter_core constructors/destructor; scoped cache ownership and lookup; reset/free_memory/cleanup; direct-child detection; proof compaction",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/rewriter_core.go",
@@ -182791,6 +182799,14 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Selected Boolean rewriter_core::cache_result SMT2 TRACE at rewriter.cpp:52 before cache publication; wider expression/stream profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/rewriter_core_cache_trace.go",
+          "tests": [
+            "TestRewriterCacheResultSourceTraceBeforeInsert"
+          ]
+        },
+        {
           "name": "Retained pull_quant1_core declaration-count and shifted-expression TRACE at pull_quant.cpp:102,109,131",
           "status": "ported",
           "go_target": "pkg/ast/pattern/pull_boolean_trace.go",
@@ -185223,6 +185239,14 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Selected Boolean rewriter_core::cache_result SMT2 TRACE at rewriter.cpp:52 before cache publication; wider expression/stream profiles remain open",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/rewriter_core_cache_trace.go",
+          "tests": [
+            "TestRewriterCacheResultSourceTraceBeforeInsert"
+          ]
+        },
         {
           "name": "Retained pull_quant1_core declaration-count and shifted-expression TRACE at pull_quant.cpp:102,109,131",
           "status": "ported",

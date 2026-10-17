@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 // Concrete source frame. The flags retain the original 1/1/2/2/26-bit fields;
@@ -49,6 +50,7 @@ func (c *rewriterCore) closeRewriterCaches(caches *[]*ast.ActivityCache) error {
 type rewriterCore struct {
 	self                  *rewriterCore
 	manager               *ast.ASTManager
+	traceTags             *diagnostic.TraceTags
 	proofGen, cancelCheck bool
 	cacheStack            []*ast.ActivityCache
 	cache                 *ast.ActivityCache
@@ -149,10 +151,13 @@ func (c *rewriterCore) cacheResult(k, v ast.ASTHandle) error {
 	if e := c.open(); e != nil {
 		return e
 	}
+	if ast.ASTSourceDebug && c.proofGen {
+		return ast.ErrASTDomain
+	}
+	if e := c.traceCacheResult(k, v); e != nil {
+		return e
+	}
 	if ast.ASTSourceDebug {
-		if c.proofGen {
-			return ast.ErrASTDomain
-		}
 		a, e := c.manager.GetSort(k)
 		if e != nil {
 			return e
