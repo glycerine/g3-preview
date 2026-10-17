@@ -23,17 +23,23 @@ type inequalityImplementation struct {
 // PropagateIneqTactic owns one concrete implementation and a parameter copy.
 // The AST manager, rational manager, parameter context and goals are borrowed.
 type PropagateIneqTactic struct {
-	self    *PropagateIneqTactic
-	manager *ast.ASTManager
-	numbers *numeral.RationalManager
-	context *params.ParamsContext
-	params  params.ParamsRef
-	current inequalityImplementation
-	retired []inequalityImplementation
-	closed  bool
+	self             *PropagateIneqTactic
+	manager          *ast.ASTManager
+	numbers          *numeral.RationalManager
+	context          *params.ParamsContext
+	params           params.ParamsRef
+	current          inequalityImplementation
+	retired          []inequalityImplementation
+	outerSourceLine  int
+	outerConstructed bool
+	closed           bool
 }
 
 func NewPropagateIneqTactic(m *ast.ASTManager, numbers *numeral.RationalManager, context *params.ParamsContext, value *params.ParamsRef) (*PropagateIneqTactic, error) {
+	return newPropagateIneqTactic(m, numbers, context, value, 0)
+}
+
+func newPropagateIneqTactic(m *ast.ASTManager, numbers *numeral.RationalManager, context *params.ParamsContext, value *params.ParamsRef, sourceLine int) (*PropagateIneqTactic, error) {
 	if m == nil || numbers == nil {
 		return nil, arena.ErrInvalidSlot
 	}
@@ -42,6 +48,11 @@ func NewPropagateIneqTactic(m *ast.ASTManager, numbers *numeral.RationalManager,
 	}
 	if _, err := m.ProofsEnabled(); err != nil {
 		return nil, err
+	}
+	t := &PropagateIneqTactic{manager: m, numbers: numbers, context: context, outerSourceLine: sourceLine}
+	t.self = t
+	if sourceLine != 0 {
+		t.traceOuterAllocated()
 	}
 	owned, err := context.NewValue()
 	if err != nil {
@@ -52,11 +63,11 @@ func NewPropagateIneqTactic(m *ast.ASTManager, numbers *numeral.RationalManager,
 			return nil, errors.Join(err, context.Del(&owned))
 		}
 	}
-	t := &PropagateIneqTactic{manager: m, numbers: numbers, context: context, params: owned}
-	t.self = t
+	t.params = owned
 	if t.current, err = t.build(517); err != nil {
 		return nil, errors.Join(err, t.Close())
 	}
+	t.outerConstructed = true
 	return t, nil
 }
 
@@ -108,7 +119,7 @@ func (t *PropagateIneqTactic) Translate(m *ast.ASTManager, numbers *numeral.Rati
 	if err := t.open(); err != nil {
 		return nil, err
 	}
-	return NewPropagateIneqTactic(m, numbers, t.context, &t.params)
+	return newPropagateIneqTactic(m, numbers, t.context, &t.params, 47)
 }
 
 func (t *PropagateIneqTactic) UpdateParams(value *params.ParamsRef) error {
@@ -187,6 +198,10 @@ func (t *PropagateIneqTactic) Close() error {
 	}
 	if err := t.context.Del(&t.params); err != nil {
 		return err
+	}
+	if t.outerConstructed && t.outerSourceLine != 0 {
+		t.traceOuterDeallocated()
+		t.outerConstructed = false
 	}
 	t.closed = true
 	return nil

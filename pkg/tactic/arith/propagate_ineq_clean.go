@@ -20,7 +20,7 @@ type CleanPropagateIneqTactic struct {
 
 // A nil parameter value selects the source factory's default empty params_ref.
 func NewCleanPropagateIneqTactic(m *ast.ASTManager, numbers *numeral.RationalManager, context *params.ParamsContext, value *params.ParamsRef) (*CleanPropagateIneqTactic, error) {
-	core, err := NewPropagateIneqTactic(m, numbers, context, value)
+	core, err := newPropagateIneqTactic(m, numbers, context, value, 61)
 	if err != nil {
 		return nil, err
 	}

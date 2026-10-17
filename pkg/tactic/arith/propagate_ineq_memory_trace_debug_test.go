@@ -119,3 +119,60 @@ func TestPropagateIneqImplementationMemoryWrapperSourceLifetime(t *testing.T) {
 		}
 	}
 }
+
+func TestPropagateIneqOuterMemoryWrapperFactoryAndTranslate(t *testing.T) {
+	b := arena.NewBudget(1 << 26)
+	sy, err := symbol.NewManager(symbol.Config{Budget: b})
+	equationMust(t, err)
+	q, err := numeral.NewRationalService(numeral.RationalServiceConfig{Integers: numeral.IntegerConfig{
+		Cells: arena.Config{Budget: b}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}},
+	}})
+	equationMust(t, err)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("memory")
+	m, err := ast.NewASTManager(ast.ASTManagerConfig{Symbols: sy, Numerals: q, Budget: b, TraceTags: tags})
+	equationMust(t, err)
+	t.Cleanup(func() {
+		equationMust(t, m.Close())
+		equationMust(t, q.Close())
+		equationMust(t, sy.Close())
+		if b.Used() != 0 {
+			t.Fatal("AST owner retained bytes", b.Used())
+		}
+	})
+	numbers, _ := equationManager(t)
+	context, value := boundParams(t)
+	factory, err := NewCleanPropagateIneqTactic(m, numbers, context, value)
+	equationMust(t, err)
+	translated, err := factory.Translate(m, numbers)
+	equationMust(t, err)
+	equationMust(t, translated.Close())
+	equationMust(t, factory.Close())
+
+	size := strconv.FormatUint(uint64(unsafe.Sizeof(PropagateIneqTactic{})), 10)
+	factoryID, translatedID := fmt.Sprintf("%p", factory.core), fmt.Sprintf("%p", translated.core)
+	if factoryID == translatedID {
+		t.Fatal("translation reused outer tactic")
+	}
+	want := []string{
+		"alloc " + factoryID + " src/tactic/arith/propagate_ineqs_tactic.cpp:61 propagate_ineqs_tactic " + size + "\n",
+		"alloc " + translatedID + " src/tactic/arith/propagate_ineqs_tactic.cpp:47 propagate_ineqs_tactic " + size + "\n",
+		"dealloc " + translatedID + " src/tactic/tactic.h:43\n",
+		"dealloc " + factoryID + " src/tactic/tactic.h:43\n",
+	}
+	got, previous := output.String(), -1
+	for _, line := range want {
+		at := strings.Index(got, line)
+		if at <= previous || strings.Count(got, line) != 1 {
+			t.Fatal("source outer tactic allocation/translation/close order", line, got)
+		}
+		previous = at
+	}
+	for _, id := range []string{factoryID, translatedID} {
+		outer := strings.Index(got, "alloc "+id+" src/tactic/arith/propagate_ineqs_tactic.cpp:")
+		if outer < 0 || strings.Index(got[outer:], " src/tactic/arith/propagate_ineqs_tactic.cpp:517 imp ") < 0 {
+			t.Fatal("outer tactic precedes its constructed implementation", id, got)
+		}
+	}
+}

@@ -102416,6 +102416,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/arith/propagate_ineq_outer_memory_trace.go",
         "pkg/tactic/tactic_goal_inequality_memory_trace.go",
         "pkg/tactic/arith/propagate_ineq_memory_trace.go",
         "pkg/tactic/arith/polynomial_builder.go",
@@ -102432,6 +102433,7 @@
         "pkg/tactic/arith/polynomial_trace.go"
       ],
       "tests": [
+        "TestPropagateIneqOuterMemoryWrapperFactoryAndTranslate",
         "TestPropagateIneqImplementationMemoryWrapperSourceLifetime",
         "TestInequalityPolynomialBuilderArithmeticASTAndRationalBuffer",
         "TestInequalityPolynomialSubsumptionUsesOwnedCoefficientBuffer",
@@ -102466,6 +102468,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete propagate_ineqs_tactic outer allocations at cpp47 and cpp61 and final tactic.h:43 deallocation through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/arith/propagate_ineq_outer_memory_trace.go",
+          "tests": [
+            "TestPropagateIneqOuterMemoryWrapperFactoryAndTranslate"
+          ]
+        },
         {
           "name": "Concrete propagate-inequalities copied-goal allocation at cpp483 and final goal.h:85 deallocation through source memory wrappers",
           "status": "platform_replacement",
@@ -108215,12 +108225,14 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/arith/propagate_ineq_outer_memory_trace.go",
         "pkg/tactic/tactic_report.go",
         "pkg/tactic/tactic_report_test.go",
         "pkg/tactic/bv/max_bv_sharing_goal.go",
         "pkg/tactic/ufbv/rewrite_tactic.go"
       ],
       "tests": [
+        "TestPropagateIneqOuterMemoryWrapperFactoryAndTranslate",
         "TestTacticReportReadsProcessMemoryAndWritesSourceOrder",
         "TestTacticProgressPositiveVerboseGateAndSourceFormat",
         "TestUFBVRewriterTacticGoalTransitionAndCoreRefusal"
@@ -108244,6 +108256,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete propagate_ineqs_tactic outer allocations at cpp47 and cpp61 and final tactic.h:43 deallocation through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/arith/propagate_ineq_outer_memory_trace.go",
+          "tests": [
+            "TestPropagateIneqOuterMemoryWrapperFactoryAndTranslate"
+          ]
+        },
         {
           "name": "Concrete UFBV rewriter tactic outer allocation at ufbv_rewriter_tactic.cpp:121 and final reference-counted deallocation at tactic.h:43 through debug memory wrappers",
           "status": "platform_replacement",
@@ -153299,6 +153319,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/arith/propagate_ineq_outer_memory_trace.go",
         "pkg/tactic/tactic_goal_inequality_memory_trace.go",
         "pkg/tactic/arith/propagate_ineq_memory_trace.go",
         "pkg/math/polynomial/polynomial_skeleton_memory_trace.go",
@@ -153392,6 +153413,7 @@
         "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
+        "TestPropagateIneqOuterMemoryWrapperFactoryAndTranslate",
         "TestPropagateIneqImplementationMemoryWrapperSourceLifetime",
         "TestExtensionModelFunctionMemoryWrapperFollowsModelCore",
         "TestStoredModelMemoryWrapperSourceAllocationAndRelease",
@@ -153569,6 +153591,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete propagate_ineqs_tactic outer allocations at cpp47 and cpp61 and final tactic.h:43 deallocation through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/arith/propagate_ineq_outer_memory_trace.go",
+          "tests": [
+            "TestPropagateIneqOuterMemoryWrapperFactoryAndTranslate"
+          ]
+        },
         {
           "name": "Concrete propagate-inequalities copied-goal allocation at cpp483 and final goal.h:85 deallocation through source memory wrappers",
           "status": "platform_replacement",
@@ -154349,6 +154379,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/tactic/arith/propagate_ineq_outer_memory_trace.go",
         "pkg/tactic/tactic_goal_inequality_memory_trace.go",
         "pkg/tactic/arith/propagate_ineq_memory_trace.go",
         "pkg/math/polynomial/polynomial_imp_memory_trace.go",
@@ -154435,6 +154466,7 @@
         "pkg/sat/sat_solver_search_verbose.go"
       ],
       "tests": [
+        "TestPropagateIneqOuterMemoryWrapperFactoryAndTranslate",
         "TestPropagateIneqImplementationMemoryWrapperSourceLifetime",
         "TestExtensionModelFunctionMemoryWrapperFollowsModelCore",
         "TestStoredModelMemoryWrapperSourceAllocationAndRelease",
@@ -154601,6 +154633,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete propagate_ineqs_tactic outer allocations at cpp47 and cpp61 and final tactic.h:43 deallocation through debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/tactic/arith/propagate_ineq_outer_memory_trace.go",
+          "tests": [
+            "TestPropagateIneqOuterMemoryWrapperFactoryAndTranslate"
+          ]
+        },
         {
           "name": "Concrete propagate-inequalities copied-goal allocation at cpp483 and final goal.h:85 deallocation through source memory wrappers",
           "status": "platform_replacement",
