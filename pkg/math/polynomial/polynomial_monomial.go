@@ -99,6 +99,7 @@ type MonomialManager struct {
 	idsInitialized                                                            bool
 	allocatorOwned, memoryOwned, completed, closing, closed, sourceFinalizing bool
 	memoryTraceLive                                                           bool
+	allocatorMemoryTraceLive                                                  bool
 	sourceStage                                                               uint8
 	originalCause, cleanupCause                                               error
 }
@@ -190,6 +191,8 @@ func NewMonomialManager(c MonomialManagerConfig) (*MonomialManager, error) {
 		}
 		m.allocator = a
 		m.allocatorOwned = true
+		m.allocatorMemoryTraceLive = true
+		m.traceOwnedAllocatorAllocated()
 	}
 	unit, e := m.MkMonomial(nil)
 	if e != nil {

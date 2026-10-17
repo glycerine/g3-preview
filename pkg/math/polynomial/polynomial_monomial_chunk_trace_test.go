@@ -2,6 +2,8 @@ package polynomial
 
 import (
 	"bytes"
+	"fmt"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -28,6 +30,8 @@ func TestMonomialConstructorBindsMemoryChunkTrace(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	ownedAllocator := m.allocator
+	ownerExtent := ownedAllocator.Stats().OwnerBytes
 	if err = m.CloseChecked(); err != nil {
 		t.Fatal(err)
 	}
@@ -38,6 +42,12 @@ func TestMonomialConstructorBindsMemoryChunkTrace(t *testing.T) {
 		t.Fatal("retained constructor charge", budget.Used())
 	}
 	if tags.ShouldTrace("memory") {
+		address := fmt.Sprintf("%p", ownedAllocator)
+		alloc := "alloc " + address + " src/math/polynomial/polynomial.cpp:783 small_object_allocator " + strconv.FormatUint(ownerExtent, 10) + "\n"
+		dealloc := "dealloc " + address + " src/math/polynomial/polynomial.cpp:803\n"
+		if strings.Count(output.String(), alloc) != 1 || strings.Count(output.String(), dealloc) != 1 || strings.Index(output.String(), alloc) >= strings.Index(output.String(), dealloc) {
+			t.Fatal("direct monomial close allocator trace", output.String())
+		}
 		for _, want := range []string{"alloc 0x", "src/util/small_object_allocator.cpp:132 chunk 8192\n", "dealloc 0x", "src/util/small_object_allocator.cpp:44\n"} {
 			if !strings.Contains(output.String(), want) {
 				t.Fatal("monomial constructor trace", want, output.String())

@@ -73,6 +73,10 @@ func (m *MonomialManager) SourceFinalize() error {
 			if e := m.allocator.Close(); e != nil {
 				return e
 			}
+			if m.allocatorMemoryTraceLive {
+				m.traceOwnedAllocatorDeallocated()
+				m.allocatorMemoryTraceLive = false
+			}
 		}
 		m.sourceStage++
 	}
@@ -254,6 +258,10 @@ func (m *MonomialManager) CloseChecked() error {
 		if e := m.allocator.Close(); e != nil {
 			return e
 		}
+		if m.allocatorMemoryTraceLive && m.completed && !m.sourceFinalizing {
+			m.traceOwnedAllocatorDeallocated()
+			m.allocatorMemoryTraceLive = false
+		}
 	}
 	if m.memoryOwned {
 		if e := m.memory.Close(); e != nil {
@@ -262,7 +270,7 @@ func (m *MonomialManager) CloseChecked() error {
 	}
 	m.locations = nil
 	m.config.Budget.Release(m.header)
-	if m.memoryTraceLive && m.completed {
+	if m.memoryTraceLive && m.completed && (!m.sourceFinalizing || m.sourceStage >= 10) {
 		m.tracePolynomialImpDeallocated()
 		m.memoryTraceLive = false
 	}

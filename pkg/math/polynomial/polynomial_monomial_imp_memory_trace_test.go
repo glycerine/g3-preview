@@ -40,6 +40,8 @@ func TestPolynomialImpOwnedMonomialManagerMemoryWrappers(t *testing.T) {
 			})
 			serviceMust(t, err)
 			child := full.core.monomials
+			childAllocator := child.allocator
+			allocatorExtent := childAllocator.Stats().OwnerBytes
 			serviceMust(t, full.CloseChecked())
 			if allocator != nil {
 				serviceMust(t, allocator.Close())
@@ -70,6 +72,18 @@ func TestPolynomialImpOwnedMonomialManagerMemoryWrappers(t *testing.T) {
 				strings.Index(got, parentAlloc) >= strings.Index(got, alloc) ||
 				strings.Index(got, dealloc) >= strings.Index(got, parentDealloc) {
 				t.Fatalf("source polynomial imp nesting: %q", got)
+			}
+			allocatorAddress := fmt.Sprintf("%p", childAllocator)
+			allocatorAlloc := "alloc " + allocatorAddress + " src/math/polynomial/polynomial.cpp:783 small_object_allocator " + strconv.FormatUint(allocatorExtent, 10) + "\n"
+			allocatorDealloc := "dealloc " + allocatorAddress + " src/math/polynomial/polynomial.cpp:803\n"
+			if borrowedAllocator {
+				if strings.Contains(got, allocatorAlloc) || strings.Contains(got, allocatorDealloc) {
+					t.Fatalf("borrowed allocator gained source ownership: %q", got)
+				}
+			} else if strings.Count(got, allocatorAlloc) != 1 || strings.Count(got, allocatorDealloc) != 1 ||
+				strings.Index(got, alloc) >= strings.Index(got, allocatorAlloc) ||
+				strings.Index(got, allocatorDealloc) >= strings.Index(got, dealloc) {
+				t.Fatalf("owned allocator source memory order: %q", got)
 			}
 			if budget.Used() == 0 {
 				t.Fatal("borrowed rational manager was unexpectedly closed")
@@ -134,5 +148,32 @@ func TestPolynomialImpMonomialFailedPlacementMemoryRecord(t *testing.T) {
 	if strings.Count(got, "alloc "+address+" src/math/polynomial/polynomial.cpp:2330 monomial_manager ") != 1 ||
 		strings.Contains(got, "dealloc "+address+" src/math/polynomial/polynomial.cpp:814") {
 		t.Fatalf("failed monomial placement memory record: %q", got)
+	}
+}
+
+func TestPolynomialMonomialAllocatorFailedConstructorMemoryRecord(t *testing.T) {
+	q, budget := rationalManager(t, false)
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("memory")
+	budget.FailAfter(2) // monomial and allocator headers succeed; unit construction fails.
+	child, err := NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: q.Integers().Memory, Trace: tags})
+	budget.FailAfter(-1)
+	if child == nil || err == nil || child.completed || !child.allocatorOwned {
+		t.Fatalf("expected failed monomial body after owned allocator allocation: %p %v", child, err)
+	}
+	allocator := child.allocator
+	serviceMust(t, child.CloseChecked())
+	got := output.String()
+	if !diagnostic.DebugBuild {
+		if got != "" {
+			t.Fatal("ordinary build emitted memory records", got)
+		}
+		return
+	}
+	address := fmt.Sprintf("%p", allocator)
+	if strings.Count(got, "alloc "+address+" src/math/polynomial/polynomial.cpp:783 small_object_allocator ") != 1 ||
+		strings.Contains(got, "dealloc "+address+" src/math/polynomial/polynomial.cpp:803") {
+		t.Fatalf("failed monomial body allocator memory record: %q", got)
 	}
 }
