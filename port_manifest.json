@@ -17417,7 +17417,9 @@
         "pkg/ast/ast_fpa_fma_decl.go",
         "pkg/ast/ast_fpa_rm_binary_decl.go",
         "pkg/ast/ast_fpa_to_real_decl.go",
-        "pkg/ast/ast_fpa_to_ieee_bv_decl.go"
+        "pkg/ast/ast_fpa_to_ieee_bv_decl.go",
+        "pkg/ast/ast_fpa_to_bv_decl.go",
+        "pkg/ast/ast_fpa_to_bv_test.go"
       ],
       "tests": [
         "TestASTFloatingPointClassificationDeclarationsAndApplications",
@@ -17450,7 +17452,8 @@
         "TestASTFPAFMADeclarationNumericAndScopedBranches",
         "TestASTFPARMBinaryDeclarationsAndNumericCleanup",
         "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches",
-        "TestASTFPAToIEEEBVDeclarationFiniteAndNaNBranches"
+        "TestASTFPAToIEEEBVDeclarationFiniteAndNaNBranches",
+        "TestASTFPAToBVSourceBoundsRoundingAndUnspecified"
       ],
       "assertions": [
         {
@@ -17659,6 +17662,14 @@
           "go_target": "pkg/ast/ast_fpa_to_real_decl.go",
           "tests": [
             "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches"
+          ]
+        },
+        {
+          "name": "Concrete fp.to_ubv/fp.to_sbv declarations validate arity, width parameter and two domain sorts in source order (fpa_decl_plugin.cpp:608-649)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_bv_decl.go",
+          "tests": [
+            "TestASTFPAToBVSourceBoundsRoundingAndUnspecified"
           ]
         },
         {
@@ -26797,7 +26808,9 @@
         "pkg/ast/rewriter/fpa_rm_binary.go",
         "pkg/ast/rewriter/fpa_constants_test.go",
         "pkg/ast/ast_fpa_to_real.go",
-        "pkg/ast/ast_fpa_to_ieee_bv.go"],
+        "pkg/ast/ast_fpa_to_ieee_bv.go",
+        "pkg/ast/ast_fpa_to_bv.go",
+        "pkg/ast/rewriter/fpa_to_bv_test.go"],
       "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestASTFPAUnaryScopedNumeralRetiresBeforeReturn", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
         "TestASTFPARemainderFiniteNumeralAndScopedCleanup",
         "TestFPARemainderNumericSpecialAndSymbolicRefusal",
@@ -26813,7 +26826,9 @@
         "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches",
         "TestFPAToRealDispatchDefaultAndHardwareUnspecified",
         "TestASTFPAToIEEEBVDeclarationFiniteAndNaNBranches",
-        "TestFPAToIEEEBVDefaultAndHardwareNaNDispatch"],
+        "TestFPAToIEEEBVDefaultAndHardwareNaNDispatch",
+        "TestASTFPAToBVSourceBoundsRoundingAndUnspecified",
+        "TestFPAToBVDispatchFiniteUnspecifiedAndSymbolic"],
       "assertions": [
         {
           "line": 43,
@@ -27128,6 +27143,15 @@
           ]
         },
         {
+          "name": "mk_to_ubv/mk_to_sbv scoped MPF and MPQ rounding, exact signed/unsigned bounds, default refusal and hi_fp_unspecified zero (fpa_rewriter.cpp:708-763)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_bv.go",
+          "tests": [
+            "TestASTFPAToBVSourceBoundsRoundingAndUnspecified",
+            "TestFPAToBVDispatchFiniteUnspecifiedAndSymbolic"
+          ]
+        },
+        {
           "name": "mk_to_ieee_bv finite MPF bit encoding, default NaN refusal and hi_fp_unspecified four-part concat with BR_REWRITE1 (fpa_rewriter.cpp:764-792)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_ieee_bv.go",
@@ -27227,6 +27251,14 @@
           "go_target": "pkg/ast/rewriter/fpa_classification.go",
           "tests": [
             "TestFPAToRealDispatchDefaultAndHardwareUnspecified"
+          ]
+        },
+        {
+          "name": "Concrete mk_to_ubv/mk_to_sbv dispatch under hi_fp_unspecified control (fpa_rewriter.h:29-45; fpa_rewriter.cpp:91-94,708-763)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_classification.go",
+          "tests": [
+            "TestFPAToBVDispatchFiniteUnspecifiedAndSymbolic"
           ]
         },
         {
@@ -179075,6 +179107,14 @@
           "go_target": "pkg/ast/ast_fpa_to_real.go",
           "tests": [
             "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches"
+          ]
+        },
+        {
+          "name": "Concrete mk_to_bv scoped_mpf and finite scoped_mpq caller lifetimes with reverse cleanup (fpa_rewriter.cpp:708-763; scoped_numeral.h:24-55)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_bv.go",
+          "tests": [
+            "TestASTFPAToBVSourceBoundsRoundingAndUnspecified"
           ]
         },
         {
