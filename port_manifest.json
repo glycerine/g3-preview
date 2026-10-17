@@ -70999,8 +70999,8 @@
       "component": "opt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/opt/bound_expressions.go", "pkg/opt/bound_expressions_test.go"],
-      "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease"],
+      "go_targets": ["pkg/opt/bound_expressions.go", "pkg/opt/bound_expressions_test.go", "pkg/opt/bound_expression.go", "pkg/opt/bound_expression_test.go"],
+      "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease", "TestOptBoundExpressionSourceBranchesAndOwnedResult"],
       "conditionals": [
         {
           "line": 271,
@@ -71061,6 +71061,12 @@
           "status": "ported",
           "go_target": "pkg/opt/bound_expressions.go",
           "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease"]
+        },
+        {
+          "name": "context::to_expr builds the zero/singleton/add expression from source-ordered infinity, finite and epsilon terms, including Int-sort fractional-infinity refusal (opt_context.cpp:1352-1381)",
+          "status": "ported",
+          "go_target": "pkg/opt/bound_expression.go",
+          "tests": ["TestOptBoundExpressionSourceBranchesAndOwnedResult"]
         }
       ],
       "ownership": [],
@@ -71071,8 +71077,8 @@
       "component": "opt",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/opt/bound_expressions.go", "pkg/opt/bound_expressions_test.go"],
-      "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease"],
+      "go_targets": ["pkg/opt/bound_expressions.go", "pkg/opt/bound_expressions_test.go", "pkg/opt/bound_expression.go", "pkg/opt/bound_expression_test.go"],
+      "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease", "TestOptBoundExpressionSourceBranchesAndOwnedResult"],
       "conditionals": [
         {
           "line": 18,
@@ -71091,6 +71097,12 @@
           "status": "partial",
           "go_target": "pkg/opt/bound_expressions.go",
           "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease"]
+        },
+        {
+          "name": "context::to_expr bound-expression declaration and retained get_lower/get_upper scalar callers (opt_context.h:210-211,249)",
+          "status": "partial",
+          "go_target": "pkg/opt/bound_expression.go",
+          "tests": ["TestOptBoundExpressionSourceBranchesAndOwnedResult"]
         }
       ],
       "ownership": [],
@@ -129513,7 +129525,9 @@
         "pkg/util/numeral/inf_eps_fused_source_order_test.go",
         "pkg/util/numeral/inf_eps_step_unread_components_source_test.go",
         "pkg/opt/bound_expressions.go",
-        "pkg/opt/bound_expressions_test.go"
+        "pkg/opt/bound_expressions_test.go",
+        "pkg/opt/bound_expression.go",
+        "pkg/opt/bound_expression_test.go"
       ],
       "tests": [
         "TestInfEpsInfFromInt32SourceConstructor",
@@ -129606,7 +129620,8 @@
         "TestInfEpsRoundSkipsUnreadInfinityStorage",
         "TestInfEpsFusedKeepsEarlierTermsOnLateFailure",
         "TestInfEpsPrefixStepsSkipUnreadInfinityAndEpsilon",
-        "TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease"
+        "TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease",
+        "TestOptBoundExpressionSourceBranchesAndOwnedResult"
       ],
       "conditionals": [
         {
@@ -129636,6 +129651,12 @@
           "status": "ported",
           "go_target": "pkg/opt/bound_expressions.go",
           "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease"]
+        },
+        {
+          "name": "Retained opt::context::to_expr reads and copies concrete infinity, rational and infinitesimal projections before its source-order zero/singleton/add construction (opt_context.cpp:1352-1381)",
+          "status": "ported",
+          "go_target": "pkg/opt/bound_expression.go",
+          "tests": ["TestOptBoundExpressionSourceBranchesAndOwnedResult"]
         },
         {
           "name": "inf_eps_rational<inf_rational>(int) default infinity, nested FIRST integer construction and default EPS (inf_eps_rational.h:82-85)",
@@ -177747,7 +177768,9 @@
         "pkg/model/model_evaluator_array_equality.go",
         "pkg/parsers/smt2/local_expr_stack.go",
         "pkg/opt/bound_expressions.go",
-        "pkg/opt/bound_expressions_test.go"
+        "pkg/opt/bound_expressions_test.go",
+        "pkg/opt/bound_expression.go",
+        "pkg/opt/bound_expression_test.go"
       ],
       "tests": [
         "TestSMT2ParserQualifiedLocalSortAndIndexRefusals",
@@ -177824,7 +177847,8 @@
         "TestModelEvaluatorOriginalArrayEqualitySymbolicIndexFallback",
         "TestModelEvaluatorOriginalArrayEqualityAllocationRefusals",
         "TestSMT2LocalReferenceStacksFrameShrinkAndReset",
-        "TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease"
+        "TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease",
+        "TestOptBoundExpressionSourceBranchesAndOwnedResult"
       ],
       "conditionals": [
         {
@@ -177866,6 +177890,12 @@
           "status": "ported",
           "go_target": "pkg/opt/bound_expressions.go",
           "tests": ["TestOptBoundExpressionsRetainSourceTripleAfterBoundRelease"]
+        },
+        {
+          "name": "Concrete opt::context::to_expr expr_ref_vector owns source-ordered infinity, finite and epsilon terms through zero/singleton/add result publication and releases its terms forward (opt_context.cpp:1352-1381; ref_vector.h:96-101)",
+          "status": "ported",
+          "go_target": "pkg/opt/bound_expression.go",
+          "tests": ["TestOptBoundExpressionSourceBranchesAndOwnedResult"]
         },
         {
           "name": "Concrete model2expr entry-condition expr_ref_vector pins generated equalities in source order and releases them forward with retryable consumed-reference cleanup (model2expr.cpp:67-77)",
