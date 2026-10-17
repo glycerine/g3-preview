@@ -4,6 +4,7 @@ package numeral
 
 import (
 	"bytes"
+	"errors"
 	"strings"
 	"testing"
 
@@ -202,4 +203,64 @@ func TestFixedPointAddSubAllocatedZeroWordBranches(t *testing.T) {
 	want("0", false)
 	must(m.Add(other, other, out))
 	want("-0", false)
+}
+
+func TestFixedPointAddSubOverflowPublishesWrappedWords(t *testing.T) {
+	m, err := NewFixedPointManager(1, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a, _ := m.New()
+	b, _ := m.New()
+	out, _ := m.New()
+	defer func() {
+		for _, v := range []*FixedPoint{a, b, out} {
+			if err := v.Close(); err != nil {
+				t.Error(err)
+			}
+		}
+		if err := m.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
+	must := func(err error) {
+		t.Helper()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	must(m.SetRatio(b, 3, 2))
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("mpfx")
+	tags.Enable("mpfx_trace")
+	must(m.BindTrace(tags))
+	check := func(v *FixedPoint, want string) {
+		t.Helper()
+		got, err := m.String(v)
+		if err != nil || got != want {
+			t.Fatal("wrapped source words", got, want, err)
+		}
+		if tags.ShouldTrace("mpfx") && strings.Contains(output.String(), "result: ") {
+			t.Fatal("source overflow reached post-add TRACE", output.String())
+		}
+		output.Reset()
+	}
+	for _, alias := range []bool{false, true} {
+		must(m.SetUint64(a, (1<<32)-1))
+		dst := out
+		if alias {
+			dst = a
+		}
+		if err := m.Add(a, b, dst); !errors.Is(err, ErrFixedPointOverflow) {
+			t.Fatal("positive add carry", alias, err)
+		}
+		check(dst, "1/2")
+		must(m.SetUint64(a, (1<<32)-1))
+		must(m.Neg(a))
+		if err := m.Sub(a, b, dst); !errors.Is(err, ErrFixedPointOverflow) {
+			t.Fatal("negative sub carry", alias, err)
+		}
+		check(dst, "-1/2")
+	}
 }

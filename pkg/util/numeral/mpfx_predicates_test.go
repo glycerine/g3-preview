@@ -96,12 +96,14 @@ func TestFixedPointRetainedOrderingSignsIncrementAndSwap(t *testing.T) {
 	if err := m.Inc(a); !errors.Is(err, ErrFixedPointOverflow) {
 		t.Fatalf("increment overflow = %v", err)
 	}
-	want(a, "8589934591/2")
+	want(a, "1/2")
+	must(m.SetUint64(a, (1<<32)-1))
+	must(m.Add(a, b, a))
 	must(m.Neg(a))
 	if err := m.Dec(a); !errors.Is(err, ErrFixedPointOverflow) {
 		t.Fatalf("decrement overflow = %v", err)
 	}
-	want(a, "-8589934591/2")
+	want(a, "-1/2")
 	other, err := NewFixedPointManager(1, 1)
 	must(err)
 	foreign, err := other.New()

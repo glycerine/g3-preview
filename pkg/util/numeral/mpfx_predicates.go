@@ -89,7 +89,11 @@ func (m *FixedPointManager) Inc(a *FixedPoint) error {
 	}
 	var next big.Int
 	next.Add(&a.scaled, &m.scale)
-	return m.publish(a, &next)
+	if err := m.publish(a, &next); err != nil {
+		m.publishAddOverflow(a, &next)
+		return err
+	}
+	return nil
 }
 
 func (m *FixedPointManager) Dec(a *FixedPoint) error {
@@ -98,7 +102,11 @@ func (m *FixedPointManager) Dec(a *FixedPoint) error {
 	}
 	var next big.Int
 	next.Sub(&a.scaled, &m.scale)
-	return m.publish(a, &next)
+	if err := m.publish(a, &next); err != nil {
+		m.publishAddOverflow(a, &next)
+		return err
+	}
+	return nil
 }
 
 // Swap exchanges owned values without exchanging their manager bindings.

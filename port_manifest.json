@@ -160726,7 +160726,8 @@
             "TestFixedPointRetainedArithmeticAndDirectedRounding",
             "TestFixedPointRangeOwnershipAndPublication",
             "TestFixedPointProductUnderflowRetainsAllocatedZeroWords",
-            "TestFixedPointAddSubAllocatedZeroWordBranches"
+            "TestFixedPointAddSubAllocatedZeroWordBranches",
+            "TestFixedPointAddSubOverflowPublishesWrappedWords"
           ]
         },
         {
@@ -160817,7 +160818,7 @@
         }
       ],
       "ownership": [
-        "FixedPointManager owns configuration and tracks live concrete numerals; each FixedPoint owns an independent signed scaled big.Int plus the exceptional allocated-zero-slot/sign marker. Publication stages ordinary arithmetic before mutating destination, including aliased inputs."
+        "FixedPointManager owns configuration and tracks live concrete numerals; each FixedPoint owns an independent signed scaled big.Int plus the exceptional allocated-zero-slot/sign marker. Ordinary arithmetic stages before publication, including aliased inputs; fixed-width add/sub carry overflow publishes its wrapped low words and sign before returning the source error."
       ],
       "deviations": [
         "Go big.Int stores the signed scaled value in place of source mpfx word-pool/id_gen storage. Retained numerical bounds and rounding are preserved; source pool allocation, diagnostic assertion and failure timing are not claimed. The retained production mpfx consumer is subpaving via subpaving_mpfx.h, subpaving.cpp and subpaving_tactic.cpp. Its interval and definition paths use the covered manager operations. div2k, is_power_of_two, epsilon setters, machine-word queries and decimal/SMT2/raw formats have no retained production mpfx call site; remaining optional trace sites stay tracked by trace.cpp/.h. The unfinished subpaving solver remains tracked by its separate source units.",
@@ -160878,7 +160879,8 @@
             "TestFixedPointRetainedArithmeticAndDirectedRounding",
             "TestFixedPointRangeOwnershipAndPublication",
             "TestFixedPointProductUnderflowRetainsAllocatedZeroWords",
-            "TestFixedPointAddSubAllocatedZeroWordBranches"
+            "TestFixedPointAddSubAllocatedZeroWordBranches",
+            "TestFixedPointAddSubOverflowPublishesWrappedWords"
           ]
         },
         {
@@ -160939,7 +160941,7 @@
         }
       ],
       "ownership": [
-        "FixedPointManager owns configuration and tracks live concrete numerals; each FixedPoint owns an independent signed scaled big.Int plus the exceptional allocated-zero-slot/sign marker. Publication stages ordinary arithmetic before mutating destination, including aliased inputs."
+        "FixedPointManager owns configuration and tracks live concrete numerals; each FixedPoint owns an independent signed scaled big.Int plus the exceptional allocated-zero-slot/sign marker. Ordinary arithmetic stages before publication, including aliased inputs; fixed-width add/sub carry overflow publishes its wrapped low words and sign before returning the source error."
       ],
       "deviations": [
         "Go big.Int stores the signed scaled value in place of source mpfx word-pool/id_gen storage. Retained numerical bounds and rounding are preserved; source pool allocation, diagnostic assertion and failure timing are not claimed. The retained production mpfx consumer is subpaving via subpaving_mpfx.h, subpaving.cpp and subpaving_tactic.cpp. Its interval and definition paths use the covered manager operations. div2k, is_power_of_two, epsilon setters, machine-word queries and decimal/SMT2/raw formats have no retained production mpfx call site; remaining optional trace sites stay tracked by trace.cpp/.h. The unfinished subpaving solver remains tracked by its separate source units.",

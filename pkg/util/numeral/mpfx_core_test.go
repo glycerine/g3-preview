@@ -187,8 +187,11 @@ func TestFixedPointRangeOwnershipAndPublication(t *testing.T) {
 		t.Fatalf("addition overflow = %v", err)
 	}
 	r, err := m.Rational(c)
-	if err != nil || r.RatString() != "7" {
-		t.Fatalf("overflow changed destination: %v, %v", r, err)
+	if err != nil || r.Sign() != 0 {
+		t.Fatalf("overflow did not publish wrapped destination words: %v, %v", r, err)
+	}
+	if zero, err := m.IsZero(c); err != nil || zero {
+		t.Fatalf("wrapped allocated zero slot became canonical: %v, %v", zero, err)
 	}
 	if err := m.Close(); !errors.Is(err, ErrFixedPointOwner) {
 		t.Fatalf("manager close with live values = %v", err)

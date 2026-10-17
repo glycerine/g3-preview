@@ -151,6 +151,27 @@ func (m *FixedPointManager) publish(dst *FixedPoint, scaled *big.Int) error {
 	return nil
 }
 
+// add_sub's fixed-width ::add writes all destination words before returning
+// its carry. Preserve that physical publication when its caller throws.
+func (m *FixedPointManager) publishAddOverflow(dst *FixedPoint, value *big.Int) {
+	var magnitude big.Int
+	magnitude.Abs(value)
+	magnitude.Mod(&magnitude, &m.magnitudeLimit)
+	negative := value.Sign() < 0
+	if magnitude.Sign() == 0 {
+		dst.scaled.SetInt64(0)
+		dst.sourceZeroSlot = true
+		dst.sourceZeroNegative = negative
+		return
+	}
+	if negative {
+		magnitude.Neg(&magnitude)
+	}
+	dst.scaled.Set(&magnitude)
+	dst.sourceZeroSlot = false
+	dst.sourceZeroNegative = false
+}
+
 func (m *FixedPointManager) Reset(dst *FixedPoint) error {
 	if err := m.check(dst); err != nil {
 		return err
@@ -342,6 +363,7 @@ func (m *FixedPointManager) Add(a, b, out *FixedPoint) error {
 	var v big.Int
 	v.Add(&a.scaled, &b.scaled)
 	if err := m.publish(out, &v); err != nil {
+		m.publishAddOverflow(out, &v)
 		return err
 	}
 	if v.Sign() == 0 && retainsSlot {
@@ -371,6 +393,7 @@ func (m *FixedPointManager) Sub(a, b, out *FixedPoint) error {
 	var v big.Int
 	v.Sub(&a.scaled, &b.scaled)
 	if err := m.publish(out, &v); err != nil {
+		m.publishAddOverflow(out, &v)
 		return err
 	}
 	if v.Sign() == 0 && retainsSlot {
