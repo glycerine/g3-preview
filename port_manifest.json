@@ -166469,10 +166469,11 @@
           ]
         },
         {
-          "name": "is_abs_uint64/big_abs_to_uint64/is_uint64/is_int64/get_uint64/get_int64",
-          "status": "ported",
+          "name": "is_abs_uint64/big_abs_to_uint64/is_uint64/is_int64/get_uint64/get_int64 with reached assertion switch reads; false-predicate source actions remain",
+          "status": "partial",
           "go_target": "pkg/util/numeral/mpz.go",
           "tests": [
+            "TestMPZScalarGetterSourceSwitchReadAndDisabledConditions",
             "TestIntegerSourceBug3",
             "TestIntegerSourceIntMinSubtraction",
             "TestIntegerConstructorOwnership",
@@ -167165,10 +167166,11 @@
           ]
         },
         {
-          "name": "Selected Integer scalar getters: source release low-word/cast behavior and DEBUG-only fit assertions; strict predicates",
-          "status": "ported",
+          "name": "Selected Integer scalar getters: source low-word/cast behavior, DEBUG assertion switch reads and strict predicates; false-predicate source actions remain",
+          "status": "partial",
           "go_target": "pkg/util/numeral/mpz.go",
           "tests": [
+            "TestMPZScalarGetterSourceSwitchReadAndDisabledConditions",
             "TestScalarProjectionIntegerLowWordsAndDebugProfiles",
             "TestScalarProjectionRetainedSizeHeaderReads",
             "TestScalarProjectionRationalRawNumeratorsAndPredicates",
@@ -168599,10 +168601,11 @@
           ]
         },
         {
-          "name": "is_abs_uint64/big_abs_to_uint64/is_uint64/is_int64/get_uint64/get_int64",
-          "status": "ported",
+          "name": "is_abs_uint64/big_abs_to_uint64/is_uint64/is_int64/get_uint64/get_int64 with reached assertion switch reads; false-predicate source actions remain",
+          "status": "partial",
           "go_target": "pkg/util/numeral/mpz.go",
           "tests": [
+            "TestMPZScalarGetterSourceSwitchReadAndDisabledConditions",
             "TestIntegerSourceBug3",
             "TestIntegerSourceIntMinSubtraction",
             "TestIntegerConstructorOwnership",
@@ -169358,10 +169361,11 @@
           ]
         },
         {
-          "name": "Selected Integer scalar getters: source release low-word/cast behavior and DEBUG-only fit assertions; strict predicates",
-          "status": "ported",
+          "name": "Selected Integer scalar getters: source low-word/cast behavior, DEBUG assertion switch reads and strict predicates; false-predicate source actions remain",
+          "status": "partial",
           "go_target": "pkg/util/numeral/mpz.go",
           "tests": [
+            "TestMPZScalarGetterSourceSwitchReadAndDisabledConditions",
             "TestScalarProjectionIntegerLowWordsAndDebugProfiles",
             "TestScalarProjectionRetainedSizeHeaderReads",
             "TestScalarProjectionRationalRawNumeratorsAndPredicates",

@@ -1345,8 +1345,22 @@ func (m *IntegerManager) addSubWithAllocationContext(a, b, c *Int, subtract bool
 
 func (m *IntegerManager) absUint64(a *Int) (uint64, error) {
 	c := m.Cell(a.Cell)
-	if modularSourceDebug && c.Size > 2 {
-		return 0, ErrIntegerAssertion
+	if modularSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return 0, e
+		}
+		if enabled && c.Size > 2 {
+			return 0, ErrIntegerAssertion
+		}
+		enabled, e = diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return 0, e
+		}
+		if enabled && a.IsSmall() {
+			return 0, ErrIntegerAssertion
+		}
 	}
 	// The source size==1 branch reads only D0; every other size reads D1/D0.
 	// These are physical reads, including retained words under a malformed
@@ -1401,8 +1415,15 @@ func (m *IntegerManager) Uint64(a *Int) (uint64, error) {
 	if a.IsSmall() {
 		return uint64(int64(a.Val)), nil
 	}
-	if modularSourceDebug && m.Cell(a.Cell).Size == 0 {
-		return 0, ErrIntegerAssertion
+	if modularSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return 0, e
+		}
+		if enabled && m.Cell(a.Cell).Size == 0 {
+			return 0, ErrIntegerAssertion
+		}
 	}
 	return m.absUint64(a)
 }
@@ -1414,12 +1435,19 @@ func (m *IntegerManager) Int64(a *Int) (int64, error) {
 		return int64(a.Val), nil
 	}
 	if modularSourceDebug {
-		ok, e := m.IsInt64(a)
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return 0, e
 		}
-		if !ok {
-			return 0, ErrIntegerAssertion
+		if enabled {
+			ok, e := m.IsInt64(a)
+			if e != nil {
+				return 0, e
+			}
+			if !ok {
+				return 0, ErrIntegerAssertion
+			}
 		}
 	}
 	v, e := m.absUint64(a)
