@@ -92,6 +92,10 @@ func (c *satCleaner) cleanupClauses(learned bool) error {
 			}
 		}
 		if j < 2 {
+			assertions, e = c.assertionsEnabled()
+			if e != nil {
+				return e
+			}
 			if assertions {
 				f, e := a.Frozen(r)
 				if e != nil {
@@ -121,6 +125,10 @@ func (c *satCleaner) cleanupClauses(learned bool) error {
 			}
 			c.cursor = i + 1
 		} else {
+			assertions, e = c.assertionsEnabled()
+			if e != nil {
+				return e
+			}
 			if assertions {
 				first, e := a.Literal(r, 0)
 				if e != nil {
