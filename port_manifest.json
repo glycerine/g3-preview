@@ -159618,13 +159618,15 @@
           ]
         },
         {
-          "name": "Remaining caller-local scoped_mpf scalar specializations in FPA conversion, rewriting, API, SMT and subpaving beyond separately credited concrete callers",
+          "name": "Remaining caller-local scoped_mpf scalar specializations in retained FPA API and SMT callers beyond separately credited AST rewriter and subpaving paths",
           "status": "partial"
         },
         {
-          "name": "Concrete fpa_rewriter mk_is_zero/is_nan/is_inf/is_normal/is_subnormal/is_negative/is_positive and mk_eq_core caller-local scoped_mpf values; mk_app_core and model_evaluator/th_rewriter retain these paths (fpa_rewriter.cpp:41-104,547-667)",
-          "status": "unported",
-          "tests": []
+          "name": "Concrete fpa_rewriter classification and mk_eq_core caller-local scoped_mpf values are ported; model_evaluator/th_rewriter integration remains open (fpa_rewriter.cpp:41-104,547-667)",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_fpa_classification_read.go",
+          "go_targets": ["pkg/ast/ast_fpa_smt_equality.go"],
+          "tests": ["TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit"]
         },
         {
           "name": "Concrete AST fpa_decl_plugin scoped_mpf_vector value storage: native indexed growth, source set and ascending owned-value release (fpa_decl_plugin.cpp:23-61; mpf.h:327)",
@@ -179152,7 +179154,7 @@
           "tests": ["TestFixedShellExactCoefficientOwnerAndDirectedBound"]
         },
         {
-          "name": "Remaining concrete inherited scoped_mpf scalar lifetimes at retained AST FPA binary arithmetic/conversion rewriter, SMT theory and FPA API callers (src/util/scoped_numeral.h:24-171; src/util/mpf.h:300-324)",
+          "name": "Remaining concrete inherited scoped_mpf scalar lifetimes at retained SMT theory and FPA API callers; AST FPA rewriter numeric branches are separately credited below (src/util/scoped_numeral.h:24-171; src/util/mpf.h:300-324)",
           "status": "unported",
           "tests": []
         },
@@ -179342,6 +179344,14 @@
           "go_target": "pkg/ast/ast_fpa_to_fp_ieee_bv.go",
           "tests": [
             "TestASTFPAToFPIEEEBVExactFieldsAndRefusals"
+          ]
+        },
+        {
+          "name": "Concrete mk_to_fp outer scoped_mpf lifetime around three-BV numeric probes and component assignment (fpa_rewriter.cpp:106-119,212-230; scoped_numeral.h:24-33)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_three_bv.go",
+          "tests": [
+            "TestASTFPAToFPThreeBVFieldsAndRefusal"
           ]
         },
         {
