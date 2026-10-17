@@ -945,24 +945,46 @@ func (s *RationalService) ModHat(a, b *OwnedRational) (_lexOut OwnedRational, _l
 	if e := s.check(b); e != nil {
 		return OwnedRational{}, e
 	}
-	pos, e := s.Manager.IsPos(&b.Raw)
-	if e != nil {
-		return OwnedRational{}, e
-	}
-	if !pos {
-		return OwnedRational{}, ErrRationalFacadeDomain
+	if modularSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return OwnedRational{}, e
+		}
+		if enabled {
+			pos, e := s.Manager.IsPos(&b.Raw)
+			if e != nil {
+				return OwnedRational{}, e
+			}
+			if !pos {
+				if e := diagnostic.DebugAssertionFailure(d, "src/util/rational.h", 209, "b.is_pos()"); e != nil {
+					return OwnedRational{}, e
+				}
+			}
+		}
 	}
 	r, e := s.facadeValueLocked(a, b, rationalFacadeMod)
 	if e != nil {
 		return OwnedRational{}, e
 	}
 	defer s.destroyLexicalRational(&r.Raw)
-	nonneg, e := s.Manager.IsNonNeg(&r.Raw)
-	if e != nil {
-		return OwnedRational{}, e
-	}
-	if !nonneg {
-		return OwnedRational{}, ErrRationalFacadeDomain
+	if modularSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return OwnedRational{}, e
+		}
+		if enabled {
+			nonneg, e := s.Manager.IsNonNeg(&r.Raw)
+			if e != nil {
+				return OwnedRational{}, e
+			}
+			if !nonneg {
+				if e := diagnostic.DebugAssertionFailure(d, "src/util/rational.h", 211, "r.is_nonneg()"); e != nil {
+					return OwnedRational{}, e
+				}
+			}
+		}
 	}
 	r2 := OwnedRational{Raw: NewRational(), ownerID: s.ownerID}
 	r2Complete := false
