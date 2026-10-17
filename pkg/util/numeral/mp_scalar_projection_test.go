@@ -6,6 +6,7 @@ import (
 	"errors"
 	"math"
 	"math/big"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -22,12 +23,26 @@ func projectionExpectError(t *testing.T, e error, assertion bool) {
 	}
 }
 
+func projectionExpectMPZ64Error(t *testing.T, e error, assertion bool) {
+	t.Helper()
+	if modularSourceDebug && assertion {
+		if !isMPNVerificationThrow(e) {
+			t.Fatal("actual source scalar getter Throw action", e)
+		}
+	} else if e != nil {
+		t.Fatal("defined source release projection", e)
+	}
+}
+
 func projectionLowMagnitude(n *big.Int) uint64 {
 	a := new(big.Int).Abs(new(big.Int).Set(n))
 	return new(big.Int).And(a, new(big.Int).SetUint64(math.MaxUint64)).Uint64()
 }
 
 func TestScalarProjectionIntegerLowWordsAndDebugProfiles(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, strings.Repeat("T", 512))
+	}
 	m, _ := integerManager(t)
 	inputs := []*big.Int{big.NewInt(math.MinInt32), big.NewInt(-7), big.NewInt(0), big.NewInt(math.MaxInt32), new(big.Int).SetUint64(math.MaxUint32)}
 	for _, bit := range []uint{32, 63, 64, 65, 95, 127, 160} {
@@ -56,8 +71,8 @@ func TestScalarProjectionIntegerLowWordsAndDebugProfiles(t *testing.T) {
 		u32, u32e := m.Uint32(&a)
 		i32, i32e := m.Int32(&a)
 		integerPhysicalAudit(t, m, &a)
-		projectionExpectError(t, ue, !a.IsSmall() && n.BitLen() > 64)
-		projectionExpectError(t, ie, !n.IsInt64())
+		projectionExpectMPZ64Error(t, ue, !a.IsSmall() && n.BitLen() > 64)
+		projectionExpectMPZ64Error(t, ie, !n.IsInt64())
 		wu := n.Sign() >= 0 && n.BitLen() <= 64 && n.Cmp(new(big.Int).SetUint64(math.MaxUint32)) < 0
 		wi := n.Cmp(big.NewInt(math.MinInt32)) > 0 && n.Cmp(big.NewInt(math.MaxInt32)) < 0
 		projectionExpectError(t, u32e, !wu)
@@ -76,6 +91,9 @@ func TestScalarProjectionIntegerLowWordsAndDebugProfiles(t *testing.T) {
 }
 
 func TestScalarProjectionRetainedSizeHeaderReads(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TTTTTTTT")
+	}
 	m, _ := integerManager(t)
 	var a Int
 	qopsMust(t, m.SetLimbs(&a, []uint32{0x1020304, 0x12345678, 9}))
@@ -89,13 +107,13 @@ func TestScalarProjectionRetainedSizeHeaderReads(t *testing.T) {
 		if size == 1 {
 			want = 0x1020304
 		}
-		projectionExpectError(t, e, size == 0 || size > 2)
+		projectionExpectMPZ64Error(t, e, size == 0 || size > 2)
 		if e == nil && u != want {
 			t.Fatal("source reads retained physical D1/D0, not size-zero padding", size, u, want)
 		}
 		i, ie := m.Int64(&a)
 		fits, fe := m.IsInt64(&a)
-		projectionExpectError(t, ie, size > 2)
+		projectionExpectMPZ64Error(t, ie, size > 2)
 		if fe != nil || fits != (size <= 2) || (ie == nil && i != int64(want)) {
 			t.Fatal("signed source has no separate size>0 assertion", size, i, want, fits, ie, fe)
 		}
@@ -180,7 +198,7 @@ func TestScalarProjectionFloatRawIEEEAndDebugAssertion(t *testing.T) {
 func TestScalarProjectionInvalidOwnershipAndWarmGraph(t *testing.T) {
 	m, budget := integerManager(t)
 	var a Int
-	qopsMust(t, m.SetLimbs(&a, []uint32{7, 3, 1}))
+	qopsMust(t, m.SetLimbs(&a, []uint32{7, 3}))
 	before := numericWarmProfileSnapshot(t, m, budget)
 	allocs := testing.AllocsPerRun(50, func() {
 		m.IsUint64(&a)

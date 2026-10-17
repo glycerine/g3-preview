@@ -55,9 +55,12 @@ func TestArbitraryFloatPublicExponentBoundsSignedBoundary(t *testing.T) {
 	if bot != -math.MaxInt64 || lo != 1-math.MaxInt64 || hi != math.MaxInt64 {
 		t.Fatal("signed64 bounds", bot, lo, hi)
 	}
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "T")
+	}
 	top, e := m.MkTopExp(64)
 	if modularSourceDebug {
-		if !errors.Is(e, ErrIntegerAssertion) {
+		if !isMPNVerificationThrow(e) {
 			t.Fatal("source signed get_int64 assertion", top, e)
 		}
 		for _, get := range []func(uint32) (int64, error){m.MkTopExp, m.MkBotExp} {

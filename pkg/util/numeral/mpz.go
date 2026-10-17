@@ -1352,14 +1352,18 @@ func (m *IntegerManager) absUint64(a *Int) (uint64, error) {
 			return 0, e
 		}
 		if enabled && c.Size > 2 {
-			return 0, ErrIntegerAssertion
+			if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.h", 232, "is_abs_uint64(a)"); e != nil {
+				return 0, e
+			}
 		}
 		enabled, e = diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return 0, e
 		}
 		if enabled && a.IsSmall() {
-			return 0, ErrIntegerAssertion
+			if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.h", 233, "!is_small(a)"); e != nil {
+				return 0, e
+			}
 		}
 	}
 	// The source size==1 branch reads only D0; every other size reads D1/D0.
@@ -1422,7 +1426,9 @@ func (m *IntegerManager) Uint64(a *Int) (uint64, error) {
 			return 0, e
 		}
 		if enabled && m.Cell(a.Cell).Size == 0 {
-			return 0, ErrIntegerAssertion
+			if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 1314, "a.m_ptr->m_size > 0"); e != nil {
+				return 0, e
+			}
 		}
 	}
 	return m.absUint64(a)
@@ -1446,7 +1452,9 @@ func (m *IntegerManager) Int64(a *Int) (int64, error) {
 				return 0, e
 			}
 			if !ok {
-				return 0, ErrIntegerAssertion
+				if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 1339, "is_int64(a)"); e != nil {
+					return 0, e
+				}
 			}
 		}
 	}
