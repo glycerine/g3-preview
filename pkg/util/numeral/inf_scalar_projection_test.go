@@ -139,7 +139,7 @@ func TestInfScalarProjectionUnreadFieldsAndNestedShortCircuit(t *testing.T) {
 
 func TestInfScalarProjectionFacadeRawFieldsAndNarrowing(t *testing.T) {
 	if modularSourceDebug {
-		bindMPNDebugActions(t, strings.Repeat("T", 48))
+		bindMPNDebugActions(t, strings.Repeat("T", 128))
 	}
 	s, _ := serviceNew(t)
 	for _, den := range []int32{-1, 0, 1, 3} {
@@ -174,7 +174,7 @@ func TestInfScalarProjectionFacadeRawFieldsAndNarrowing(t *testing.T) {
 			}
 			f, fe := s.Float64(&v)
 			if modularSourceDebug && den <= 0 {
-				if !errors.Is(fe, ErrRationalFloatDomain) {
+				if !isMPNVerificationThrow(fe) {
 					t.Fatal(fe)
 				}
 			} else {

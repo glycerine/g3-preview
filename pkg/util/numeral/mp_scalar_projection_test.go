@@ -163,6 +163,9 @@ func TestScalarProjectionRationalRawNumeratorsAndPredicates(t *testing.T) {
 }
 
 func TestScalarProjectionFloatRawIEEEAndDebugAssertion(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, strings.Repeat("T", 12))
+	}
 	for _, sync := range []bool{false, true} {
 		m, _ := rationalManager(t, sync)
 		for _, tc := range []struct{ n, d int32 }{{2, -3}, {1, 0}, {-1, 0}, {0, 0}, {0, -1}, {2, 3}} {
@@ -170,7 +173,7 @@ func TestScalarProjectionFloatRawIEEEAndDebugAssertion(t *testing.T) {
 			v, e := m.Float64(&a)
 			qopsAuditLiveOwnership(t, m, []*Int{&a.Num, &a.Den})
 			if modularSourceDebug && tc.d <= 0 {
-				if !errors.Is(e, ErrRationalFloatDomain) {
+				if !isMPNVerificationThrow(e) {
 					t.Fatal("DEBUG after converted denominator", tc, e)
 				}
 			} else {
@@ -188,7 +191,7 @@ func TestScalarProjectionFloatRawIEEEAndDebugAssertion(t *testing.T) {
 		v, e := m.Float64(&a)
 		qopsAuditLiveOwnership(t, m, []*Int{&a.Num, &a.Den})
 		if modularSourceDebug {
-			if !errors.Is(e, ErrRationalFloatDomain) {
+			if !isMPNVerificationThrow(e) {
 				t.Fatal("NaN fails actual DEBUG d>0", e)
 			}
 		} else if e != nil || !math.IsNaN(v) {

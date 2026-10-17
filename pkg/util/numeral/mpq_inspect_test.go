@@ -309,6 +309,9 @@ func TestRationalInspectionExtractionAndThinAliases(t *testing.T) {
 	}
 }
 func TestRationalInspectionStatisticsFloatAndDomains(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "T")
+	}
 	m, _ := rationalManager(t, false)
 	for n := int64(-30); n <= 30; n++ {
 		for d := int64(1); d <= 9; d++ {
@@ -344,7 +347,7 @@ func TestRationalInspectionStatisticsFloatAndDomains(t *testing.T) {
 	}
 	a.Den = NewInt(-2)
 	if v, e := m.Float64(&a); modularSourceDebug {
-		if !errors.Is(e, ErrRationalFloatDomain) {
+		if !isMPNVerificationThrow(e) {
 			t.Fatal("source positive floating denominator assertion", e)
 		}
 	} else if e != nil || v != -float64(math.MaxUint32)/2 {
@@ -363,6 +366,9 @@ func TestRationalInspectionStatisticsFloatAndDomains(t *testing.T) {
 }
 
 func TestRationalInspectionFloatExceptionalBranches(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "T")
+	}
 	m, _ := rationalManager(t, false)
 	a := NewRational()
 	limbs := make([]uint32, 35)
@@ -380,7 +386,7 @@ func TestRationalInspectionFloatExceptionalBranches(t *testing.T) {
 		t.Fatal(e)
 	}
 	if v, e := m.Float64(&a); modularSourceDebug {
-		if !errors.Is(e, ErrRationalFloatDomain) {
+		if !isMPNVerificationThrow(e) {
 			t.Fatal("converted denominator NaN assertion", e)
 		}
 	} else if e != nil || !math.IsNaN(v) {

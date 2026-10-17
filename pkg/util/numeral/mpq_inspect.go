@@ -266,8 +266,17 @@ func (m *RationalManager) Float64(a *Rational) (float64, error) {
 	if e != nil {
 		return 0, e
 	}
-	if modularSourceDebug && !(d > 0) {
-		return 0, ErrRationalFloatDomain
+	if modularSourceDebug {
+		dbg := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(dbg)
+		if e != nil {
+			return 0, e
+		}
+		if enabled && !(d > 0) {
+			if e := diagnostic.DebugAssertionFailure(dbg, "src/util/mpq.cpp", 302, "d > 0.0"); e != nil {
+				return 0, e
+			}
+		}
 	}
 	return n / d, nil
 }
