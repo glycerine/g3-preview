@@ -12,8 +12,12 @@ import (
 )
 
 type inequalityImplementation struct {
-	store   *BoundEquationStore
-	builder *PolynomialBuilder
+	store       *BoundEquationStore
+	builder     *PolynomialBuilder
+	owner       *PropagateIneqTactic
+	traceID     uint64
+	constructed bool
+	deallocLine int
 }
 
 // PropagateIneqTactic owns one concrete implementation and a parameter copy.
@@ -50,18 +54,20 @@ func NewPropagateIneqTactic(m *ast.ASTManager, numbers *numeral.RationalManager,
 	}
 	t := &PropagateIneqTactic{manager: m, numbers: numbers, context: context, params: owned}
 	t.self = t
-	if t.current, err = t.build(); err != nil {
+	if t.current, err = t.build(517); err != nil {
 		return nil, errors.Join(err, t.Close())
 	}
 	return t, nil
 }
 
-func (t *PropagateIneqTactic) build() (inequalityImplementation, error) {
+func (t *PropagateIneqTactic) build(sourceLine int) (inequalityImplementation, error) {
+	imp := inequalityImplementation{owner: t, traceID: nextInequalityMemoryIdentity(), deallocLine: 521}
+	t.traceImpAllocated(&imp, sourceLine)
 	store, err := NewBoundEquationStore(t.numbers)
 	if err != nil {
-		return inequalityImplementation{}, err
+		return imp, err
 	}
-	imp := inequalityImplementation{store: store}
+	imp.store = store
 	if err = store.UpdateParams(t.context, &t.params); err != nil {
 		return imp, err
 	}
@@ -69,6 +75,7 @@ func (t *PropagateIneqTactic) build() (inequalityImplementation, error) {
 	if err != nil {
 		return imp, err
 	}
+	imp.constructed = true
 	return imp, nil
 }
 
@@ -130,6 +137,10 @@ func closeInequalityImplementation(imp *inequalityImplementation) error {
 		}
 		imp.store = nil
 	}
+	if imp.constructed {
+		imp.owner.traceImpDeallocated(imp)
+		imp.constructed = false
+	}
 	return nil
 }
 
@@ -140,7 +151,7 @@ func (t *PropagateIneqTactic) Cleanup() error {
 	if err := t.open(); err != nil {
 		return err
 	}
-	fresh, err := t.build()
+	fresh, err := t.build(546)
 	if err != nil {
 		if closeErr := closeInequalityImplementation(&fresh); closeErr != nil {
 			t.retired = append(t.retired, fresh)
@@ -149,6 +160,7 @@ func (t *PropagateIneqTactic) Cleanup() error {
 		return err
 	}
 	old := t.current
+	old.deallocLine = 548
 	t.current = fresh
 	if err = closeInequalityImplementation(&old); err != nil {
 		t.retired = append(t.retired, old)
