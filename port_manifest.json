@@ -129631,10 +129631,11 @@
           "status": "reference_only"
         },
         {
-          "name": "actual inf_rational specialization constructors/copy/destruction/reset/swap",
-          "status": "partial",
+          "name": "Retained owner-backed inf_rational specialization constructors, copy, destruction, reset and swap; raw and unframed failure domains remain separately partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/inf_eps_rational.go",
           "tests": [
+            "TestInfEpsInfFromInt32SourceConstructor",
             "TestInfEpsInfFiniteTripleOracles",
             "TestInfEpsInfSourceQuirksAndHeader",
             "TestInfEpsInfConstantsPredicatesAndMixedRoutes",
