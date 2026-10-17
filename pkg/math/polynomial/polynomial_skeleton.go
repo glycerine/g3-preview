@@ -30,6 +30,7 @@ type PolynomialSkeleton struct {
 	entryDropping, originalDropping                            bool
 	generated                                                  Monomial
 	generatedActive, calleeCreation                            bool
+	memoryTraceLive                                            bool
 }
 
 func NewPolynomialSkeleton(m *MultivariatePolynomialCore, p Polynomial, x uint32) (*PolynomialSkeleton, error) {

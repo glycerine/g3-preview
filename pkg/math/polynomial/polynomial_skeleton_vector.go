@@ -91,13 +91,17 @@ func (v *PolynomialSkeletonVector) Push(p *PolynomialSkeleton) error {
 	}
 	return nil
 }
-func (v *PolynomialSkeletonVector) deleteChild(p *PolynomialSkeleton) error {
+func (v *PolynomialSkeletonVector) deleteChild(p *PolynomialSkeleton, line int) error {
 	if p == nil {
 		return nil
 	}
 	if e := p.SourceFinalize(); e != nil {
 		v.sourceCause = e
 		return e
+	}
+	if p.memoryTraceLive {
+		p.traceGCDSkeletonDeallocated(line)
+		p.memoryTraceLive = false
 	}
 	return nil
 }
@@ -113,7 +117,7 @@ func (v *PolynomialSkeletonVector) Set(i uint32, p *PolynomialSkeleton) error {
 		return nil
 	}
 	// Source destruction of old precedes validation and publication of new.
-	if e = v.deleteChild(old); e != nil {
+	if e = v.deleteChild(old, 38); e != nil {
 		return e
 	}
 	e = v.prepare(p)
@@ -156,7 +160,7 @@ func (v *PolynomialSkeletonVector) Resize(n uint32) error {
 			if e != nil {
 				return e
 			}
-			if e = v.deleteChild(p); e != nil {
+			if e = v.deleteChild(p, 46); e != nil {
 				return e
 			}
 		}
@@ -177,7 +181,7 @@ func (v *PolynomialSkeletonVector) resetSource() error {
 		if e != nil {
 			return e
 		}
-		if e = v.deleteChild(p); e != nil {
+		if e = v.deleteChild(p, 171); e != nil {
 			return e
 		}
 		v.cursor++
@@ -229,6 +233,10 @@ func (v *PolynomialSkeletonVector) CloseChecked() error {
 		if p != nil {
 			if e := p.CloseChecked(); e != nil {
 				return e
+			}
+			if p.memoryTraceLive && p.sourceCause == nil {
+				p.traceGCDSkeletonDeallocated(171)
+				p.memoryTraceLive = false
 			}
 		}
 		v.children[v.closeCursor] = nil

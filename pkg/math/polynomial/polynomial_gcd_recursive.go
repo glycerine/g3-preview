@@ -378,6 +378,8 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 				if e = m.skeletons.Set(idx, s.newSkeleton); e != nil {
 					return e
 				}
+				s.newSkeleton.memoryTraceLive = true
+				s.newSkeleton.traceGCDSkeletonAllocated()
 				s.newSkeleton = nil
 			}
 			return nil

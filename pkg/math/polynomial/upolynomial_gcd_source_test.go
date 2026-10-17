@@ -633,6 +633,7 @@ func TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks(t *testing.T) {
 
 func TestUPolynomialPrimitiveRawAliasReserveAndMonicPrefixes(t *testing.T) {
 	m, _, _ := upolySourceOwner(t)
+	polynomialThrowAssertionFixture(t)
 	p := upolySourceNew(t, m, []int32{2, 4})
 	captured := mustUPolyView(t, m, p)
 	if e := m.Shrink(p, 1); e != nil {

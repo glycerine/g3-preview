@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestPolynomialGCDGlexZPXIndependentCoefficientModel(t *testing.T) {
@@ -169,6 +170,7 @@ func TestPolynomialGCDICCPZPXSourceShortcutTable(t *testing.T) {
 func TestPolynomialGCDIntegerContentFieldChangeSourceInputAssertion(t *testing.T) {
 	full := polynomialPSCFullFixture(t)
 	c := full.core
+	polynomialThrowAssertionFixture(t)
 	_, e := c.monomials.MkVar()
 	serviceMust(t, e)
 	_, e = c.monomials.MkVar()
@@ -185,7 +187,8 @@ func TestPolynomialGCDIntegerContentFieldChangeSourceInputAssertion(t *testing.T
 	serviceMust(t, c.CleanupIntegerContent())
 	polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, r.root.value, r.root.incoming}, []*unumeral.Int{&content}, r.header)
 	if polynomialSourceDebug {
-		if !errors.Is(e, unumeral.ErrModularAssertion) {
+		var thrown z3exception.DefaultException
+		if !errors.As(e, &thrown) {
 			t.Fatalf("source div requires normalized dividend: %v", e)
 		}
 		return

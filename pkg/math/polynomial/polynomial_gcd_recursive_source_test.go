@@ -2,11 +2,17 @@
 package polynomial
 
 import (
+	"bytes"
 	"errors"
+	"fmt"
+	"reflect"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/clibrand"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -75,6 +81,10 @@ func TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor(t *testing.T
 	t.Cleanup(func() { clibrand.Srand(1) })
 	full := polynomialPSCFullFixture(t)
 	c := full.core
+	var memoryOutput bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&memoryOutput)
+	c.monomials.config.Trace = tags
+	tags.Enable("memory")
 	_, e := c.monomials.MkVar()
 	serviceMust(t, e)
 	_, e = c.monomials.MkVar()
@@ -115,6 +125,20 @@ func TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor(t *testing.T
 	serviceMust(t, e)
 	if !same {
 		t.Fatal("actual recursive field GCD independent common factor")
+	}
+	serviceMust(t, full.skeletons.Reset())
+	got := memoryOutput.String()
+	if !diagnostic.DebugBuild {
+		if got != "" {
+			t.Fatal("ordinary build emitted memory records", got)
+		}
+		return
+	}
+	alloc := "alloc " + fmt.Sprintf("%p", saved) + " src/math/polynomial/polynomial.cpp:4226 skeleton " +
+		strconv.FormatUint(uint64(reflect.TypeOf(PolynomialSkeleton{}).Size()), 10) + "\n"
+	dealloc := "dealloc " + fmt.Sprintf("%p", saved) + " src/util/util.h:171\n"
+	if strings.Count(got, alloc) != 1 || strings.Count(got, dealloc) != 1 || strings.Index(got, alloc) >= strings.Index(got, dealloc) {
+		t.Fatalf("saved skeleton allocation/reset memory records: %q", got)
 	}
 }
 

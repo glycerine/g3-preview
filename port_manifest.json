@@ -178372,6 +178372,7 @@
         "pkg/math/polynomial/polynomial_skeleton.go",
         "pkg/math/polynomial/polynomial_skeleton_test.go",
         "pkg/math/polynomial/polynomial_skeleton_vector.go",
+        "pkg/math/polynomial/polynomial_skeleton_memory_trace.go",
         "pkg/math/polynomial/polynomial_skeleton_vector_test.go",
         "pkg/math/polynomial/polynomial_newton_vector.go",
         "pkg/math/polynomial/polynomial_newton_source_finalize.go",
@@ -178392,7 +178393,8 @@
         "TestPolynomialSkeletonVectorSetNativeChildRecycle",
         "TestPolynomialNewtonVectorSourceFinalizeNativeStorage",
         "TestPolynomialSkeletonNativePointerGrowthAndOwningHistory",
-        "TestPolynomialSOMNativeChildrenHaveOnlyActualOwnerCharges"
+        "TestPolynomialSOMNativeChildrenHaveOnlyActualOwnerCharges",
+        "TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor"
       ],
       "conditionals": [
         {
@@ -178438,7 +178440,7 @@
         }
       ],
       "ownership": [
-        "The polynomial manager owns m_mgcd_skeletons; its Go skeleton vector owns published children, destroys an old child before publishing a replacement, resets in ascending slot order, and retains real stopped children for later owning completion. The tactical parallel pointer vectors occur only after use_seq returns; _NO_OMP_ forces use_seq in the current single-goroutine port. Other live specializations have separate owners and cannot be credited from this one."
+        "The polynomial manager owns m_mgcd_skeletons; its Go skeleton vector owns published children, destroys an old child before publishing a replacement, resets in ascending slot order, and retains real stopped children for later owning completion. Published GCD skeletons emit allocation at polynomial.cpp:4226 and deallocation on successful set, shrink, reset, or owning close through their reached source sites. The tactical parallel pointer vectors occur only after use_seq returns; _NO_OMP_ forces use_seq in the current single-goroutine port. Other live specializations have separate owners and cannot be credited from this one."
       ],
       "deviations": [
         "No generic scoped pointer vector exists in Go. Current polynomial targets use concrete typed vectors and explicit cleanup; remaining live specializations should be implemented beside their consumers.",

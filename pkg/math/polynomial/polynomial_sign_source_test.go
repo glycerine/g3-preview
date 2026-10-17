@@ -3,8 +3,10 @@ package polynomial
 
 import (
 	"errors"
-	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 // No corresponding assertions occur in the original polynomial driver. These
@@ -142,6 +144,7 @@ func TestPolynomialSignSourceZeroCoefficientAndOwnerGuards(t *testing.T) {
 
 func TestPolynomialSignSourceModularCoefficientBoundary(t *testing.T) {
 	m, _, ms := polynomialLexFixture(t)
+	polynomialThrowAssertionFixture(t)
 	c := m.core
 	p, e := c.MkTerms([]unumeral.Int{unumeral.NewInt(7)}, []Monomial{ms[4]})
 	serviceMust(t, e)
@@ -150,7 +153,8 @@ func TestPolynomialSignSourceModularCoefficientBoundary(t *testing.T) {
 	serviceMust(t, c.modular.SetZPUint64(5))
 	_, e = m.Sign(p, nil)
 	if polynomialSourceDebug {
-		if !errors.Is(e, unumeral.ErrModularAssertion) {
+		var thrown z3exception.DefaultException
+		if !errors.As(e, &thrown) {
 			t.Fatal("literal reached modular is_pos guard", e)
 		}
 	} else {
