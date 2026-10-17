@@ -73,3 +73,25 @@ func (r *FPARewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out ast.
 	}
 	return RewriteDone, r.manager.SetRef(out, answer)
 }
+
+// MkEqCore is SMT equality on floating-point expressions. Unlike fp.eq,
+// paired NaNs compare equal and signed zeros remain distinct.
+func (r *FPARewriter) MkEqCore(left, right ast.ASTHandle, out ast.ASTRef) (RewriteStatus, error) {
+	if r == nil || r.self != r || r.closed {
+		return RewriteFailed, ast.ErrASTHandle
+	}
+	found, equal, err := r.manager.EqualFPANumerals(left, right)
+	if err != nil || !found {
+		return RewriteFailed, err
+	}
+	var answer ast.ASTHandle
+	if equal {
+		answer, err = r.manager.MkTrue()
+	} else {
+		answer, err = r.manager.MkFalse()
+	}
+	if err != nil {
+		return RewriteFailed, err
+	}
+	return RewriteDone, r.manager.SetRef(out, answer)
+}

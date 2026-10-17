@@ -26686,8 +26686,8 @@
       "component": "ast",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/ast/ast_fpa_classification_read.go", "pkg/ast/rewriter/fpa_classification.go"],
-      "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal"],
+      "go_targets": ["pkg/ast/ast_fpa_classification_read.go", "pkg/ast/ast_fpa_smt_equality.go", "pkg/ast/rewriter/fpa_classification.go"],
+      "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal"],
       "assertions": [
         {
           "line": 43,
@@ -26914,10 +26914,16 @@
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa_classification.go",
           "tests": ["TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPAClassificationOneScopedNumeralPerCall"]
+        },
+        {
+          "name": "mk_eq_core SMT numeral equality with two scoped_mpf locals, NaN pair, signed-zero distinction and structural fallback (fpa_rewriter.cpp:648-667)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_smt_equality.go",
+          "tests": ["TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal"]
         }
       ],
-      "ownership": ["Each classification call creates one caller-local scoped_mpf through the AST plugin's concrete numeral probe; successful source destruction retires it before the Boolean result is published. A stopped source destructor remains in the AST plugin's owning cleanup list."],
-      "deviations": ["The partial Go FPA rewriter dispatch currently handles classification only; arithmetic, conversion, equality and remaining source cases are unported."]
+      "ownership": ["Each classification call creates one caller-local scoped_mpf through the AST plugin's concrete numeral probe; successful source destruction retires it before the Boolean result is published. A stopped source destructor remains in the AST plugin's owning cleanup list.", "SMT equality constructs both scoped_mpf locals before operand probing and retires them in reverse order, preserving the short circuit when the first operand is symbolic."],
+      "deviations": ["The partial Go FPA rewriter handles classification and SMT numeral equality; arithmetic, conversion, floating-point equality and remaining source cases are unported."]
     },
     {
       "path": "src/ast/rewriter/fpa_rewriter.h",
@@ -26925,7 +26931,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": ["pkg/ast/rewriter/fpa_classification.go"],
-      "tests": ["TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal"],
+      "tests": ["TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal"],
       "conditionals": [
         {
           "line": 19,
@@ -178613,7 +178619,7 @@
           "tests": ["TestFixedShellExactCoefficientOwnerAndDirectedBound"]
         },
         {
-          "name": "Remaining concrete inherited scoped_mpf scalar lifetimes at retained AST FPA equality/arithmetic rewriter, SMT theory and FPA API callers (src/util/scoped_numeral.h:24-171; src/util/mpf.h:300-324)",
+          "name": "Remaining concrete inherited scoped_mpf scalar lifetimes at retained AST FPA arithmetic/conversion rewriter, SMT theory and FPA API callers (src/util/scoped_numeral.h:24-171; src/util/mpf.h:300-324)",
           "status": "unported",
           "tests": []
         },
@@ -178624,9 +178630,10 @@
           "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal"]
         },
         {
-          "name": "Concrete fpa_rewriter mk_eq_core two scoped_mpf locals and reverse destruction in retained model_evaluator/th_rewriter callers (fpa_rewriter.cpp:640-667)",
-          "status": "unported",
-          "tests": []
+          "name": "Concrete fpa_rewriter mk_eq_core two scoped_mpf locals and reverse destruction (fpa_rewriter.cpp:648-667); model_evaluator/th_rewriter dispatch integration remains open",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_smt_equality.go",
+          "tests": ["TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal"]
         },
         {
           "name": "Concrete context_mpq_wrapper scoped_mpq constant lifetime and destructor before context base (src/math/subpaving/subpaving.cpp:59-81; src/util/scoped_numeral.h:24-55)",
