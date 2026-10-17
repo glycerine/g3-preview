@@ -5,6 +5,8 @@ package numeral
 import (
 	"errors"
 	"math"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 var ErrDivideByZero = errors.New("mpnum: integer division by zero")
@@ -82,7 +84,10 @@ func (m *IntegerManager) machineDivWithAllocationContext(a, b, c *Int, context i
 		return m.setInt64WithAllocationContext(c, int64(a.Val)/int64(b.Val), context)
 	}
 	var dummy Int
-	return m.quotRemWithAllocationContext(a, b, c, &dummy, quotientOnly, context)
+	if e := m.quotRemWithAllocationContext(a, b, c, &dummy, quotientOnly, context); e != nil {
+		return e
+	}
+	return m.assertDivisionDummyZero(&dummy, 530)
 }
 func (m *IntegerManager) Rem(a, b, c *Int) error { return m.remWithPNReceipt(a, b, c, nil) }
 func (m *IntegerManager) remWithPNReceipt(a, b, c *Int, pn *integerPNormalizeScope) error {
@@ -107,7 +112,25 @@ func (m *IntegerManager) remWithAllocationContext(a, b, c *Int, context integerA
 		return m.setInt64WithAllocationContext(c, int64(a.Val)%int64(b.Val), context)
 	}
 	var dummy Int
-	return m.quotRemWithAllocationContext(a, b, &dummy, c, remainderOnly, context)
+	if e := m.quotRemWithAllocationContext(a, b, &dummy, c, remainderOnly, context); e != nil {
+		return e
+	}
+	return m.assertDivisionDummyZero(&dummy, 547)
+}
+
+func (m *IntegerManager) assertDivisionDummyZero(dummy *Int, line int32) error {
+	if !diagnostic.DebugBuild {
+		return nil
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil || !enabled {
+		return e
+	}
+	if dummy.Val != 0 {
+		return diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", line, "is_zero(dummy)")
+	}
+	return nil
 }
 
 // Div implements the source Euclidean quotient adjustment for a negative

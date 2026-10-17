@@ -166519,10 +166519,11 @@
           ]
         },
         {
-          "name": "machine_div/big_div",
+          "name": "machine_div/big_div with post-publication source dummy assertion",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_div.go",
           "tests": [
+            "TestMPZDivisionDummyAssertionReadsAfterPublication",
             "TestIntegerSignedDivisionExhaustive",
             "TestIntegerMulDivisionLimbOracle",
             "TestIntegerDivisionCorrectionFixtures",
@@ -166535,10 +166536,11 @@
           ]
         },
         {
-          "name": "rem/big_rem",
+          "name": "rem/big_rem with post-publication source dummy assertion",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_div.go",
           "tests": [
+            "TestMPZDivisionDummyAssertionReadsAfterPublication",
             "TestIntegerSignedDivisionExhaustive",
             "TestIntegerMulDivisionLimbOracle",
             "TestIntegerDivisionCorrectionFixtures",
@@ -168637,10 +168639,11 @@
           ]
         },
         {
-          "name": "machine_div/big_div",
+          "name": "machine_div/big_div with post-publication source dummy assertion",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_div.go",
           "tests": [
+            "TestMPZDivisionDummyAssertionReadsAfterPublication",
             "TestIntegerSignedDivisionExhaustive",
             "TestIntegerMulDivisionLimbOracle",
             "TestIntegerDivisionCorrectionFixtures",
@@ -168653,10 +168656,11 @@
           ]
         },
         {
-          "name": "rem/big_rem",
+          "name": "rem/big_rem with post-publication source dummy assertion",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_div.go",
           "tests": [
+            "TestMPZDivisionDummyAssertionReadsAfterPublication",
             "TestIntegerSignedDivisionExhaustive",
             "TestIntegerMulDivisionLimbOracle",
             "TestIntegerDivisionCorrectionFixtures",
