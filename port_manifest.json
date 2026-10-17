@@ -157118,6 +157118,7 @@
         "TestArbitraryFloatPartialRemainderIndependentQuotientOracle",
         "TestArbitraryFloatPartialRemainderEntrySourceAssertions",
         "TestArbitraryFloatPartialRemainderInitialSignificandSourceAssertions",
+        "TestArbitraryFloatPartialRemainderPartialQuotientSourceAssertion",
         "TestArbitraryFloatPartialRemainderEveryColdReservation",
         "TestArbitraryFloatPartialRemainderReturningTransportAndOwnerGuards",
         "TestArbitraryFloatPartialRemainderLiteralAlignmentAndRoundConstant",
@@ -158127,6 +158128,7 @@
             "TestArbitraryFloatPartialRemainderIndependentQuotientOracle",
             "TestArbitraryFloatPartialRemainderEntrySourceAssertions",
             "TestArbitraryFloatPartialRemainderInitialSignificandSourceAssertions",
+            "TestArbitraryFloatPartialRemainderPartialQuotientSourceAssertion",
             "TestArbitraryFloatPartialRemainderEveryColdReservation",
             "TestArbitraryFloatPartialRemainderReturningTransportAndOwnerGuards",
             "TestArbitraryFloatPartialRemainderLiteralAlignmentAndRoundConstant"
@@ -158743,6 +158745,7 @@
         "TestArbitraryFloatPartialRemainderIndependentQuotientOracle",
         "TestArbitraryFloatPartialRemainderEntrySourceAssertions",
         "TestArbitraryFloatPartialRemainderInitialSignificandSourceAssertions",
+        "TestArbitraryFloatPartialRemainderPartialQuotientSourceAssertion",
         "TestArbitraryFloatPartialRemainderEveryColdReservation",
         "TestArbitraryFloatPartialRemainderReturningTransportAndOwnerGuards",
         "TestArbitraryFloatPartialRemainderLiteralAlignmentAndRoundConstant",
@@ -159258,6 +159261,7 @@
             "TestArbitraryFloatPartialRemainderIndependentQuotientOracle",
             "TestArbitraryFloatPartialRemainderEntrySourceAssertions",
             "TestArbitraryFloatPartialRemainderInitialSignificandSourceAssertions",
+            "TestArbitraryFloatPartialRemainderPartialQuotientSourceAssertion",
             "TestArbitraryFloatPartialRemainderEveryColdReservation",
             "TestArbitraryFloatPartialRemainderReturningTransportAndOwnerGuards",
             "TestArbitraryFloatPartialRemainderLiteralAlignmentAndRoundConstant"

@@ -158,8 +158,8 @@ func (s *arbitraryFloatPartialRemainderScope) run(x, y *ArbitraryFloat, expDiff 
 	}
 	qShift := (sb - 1) + (sb + 3) - uint32(chosen)
 	if partial {
-		if modularSourceDebug && !(0 < n && n < qe && qe < 2147483647) {
-			return ErrIntegerAssertion
+		if e := mpfSourceAssertion(0 < n && n < qe && qe < 2147483647, 1313, "0 < N && N < Q_exp && Q_exp < INT_MAX"); e != nil {
+			return e
 		}
 		if e := z.shiftWithAllocationContext(large, qShift, q, false, c); e != nil {
 			return e

@@ -76,3 +76,27 @@ func TestArbitraryFloatPartialRemainderInitialSignificandSourceAssertions(t *tes
 		})
 	}
 }
+
+func TestArbitraryFloatPartialRemainderPartialQuotientSourceAssertion(t *testing.T) {
+	if !modularSourceDebug {
+		t.Skip("source Z3DEBUG assertion only")
+	}
+	_, log := bindMPNDebugActions(t, "T")
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	var x, y ArbitraryFloat
+	sig := NewInt(8)
+	serviceMust(t, m.SetComponents(&x, 11, 4, false, 0, &sig))
+	serviceMust(t, m.SetComponents(&y, 11, 4, false, 0, &sig))
+	beforeX, beforeY := x, y
+	if e := m.PartialRemainder(&x, &y, 0, true); !isMPNVerificationThrow(e) || x != beforeX || y != beforeY {
+		t.Fatal("partial quotient assertion before shift", e, x, y)
+	}
+	contents, e := os.ReadFile(log.Name())
+	serviceMust(t, e)
+	if n := strings.Count(string(contents), "File: src/util/mpf.cpp\nLine: 1313\n0 < N && N < Q_exp && Q_exp < INT_MAX\n"); n != 1 {
+		t.Fatal("source partial quotient assertion site", n, string(contents))
+	}
+	serviceMust(t, m.CleanupPartialRemainder())
+	serviceMust(t, m.Del(&y))
+	serviceMust(t, m.Del(&x))
+}
