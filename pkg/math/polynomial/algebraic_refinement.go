@@ -7,6 +7,9 @@ import (
 )
 
 type algebraicPredicateScope struct {
+	candidateCopy                                                                              unumeral.IntegerCopyAllocationReceipt
+	sourceStop                                                                                 error
+	savedSourceCursor, savedOwnCursor                                                          uint8
 	leadingCopy                                                                                unumeral.IntegerCopyAllocationReceipt
 	savedCopy                                                                                  unumeral.IntegerCopyAllocationReceipt
 	refinement                                                                                 algebraicRefinementInvocation
@@ -179,8 +182,8 @@ func (m *AlgebraicRootCore) finishPredicate(cause error) error {
 	if p.cause == nil {
 		p.cause = cause
 	}
-	if p.childStop != nil {
-		return errors.Join(cause, p.childStop)
+	if p.childStop != nil || p.sourceStop != nil {
+		return errors.Join(cause, p.childStop, p.sourceStop)
 	}
 	// Actual scoped locals destruct in reverse declaration order. A failed saved
 	// constructor has no source destructor; its partial fields get owning cleanup.
@@ -189,29 +192,34 @@ func (m *AlgebraicRootCore) finishPredicate(cause error) error {
 		switch p.stage {
 		case 0:
 			if p.candidateActive {
-				e = m.config.Rationals.Integers().Del(&p.candidate)
+				e = unumeral.SourceIntegerDel(m.config.Rationals.Integers(), &p.candidate)
 			}
 		case 1:
 			if p.upperActive {
-				e = m.config.Binary.Del(&p.upper)
+				e = unumeral.SourceIntegerDel(m.config.Rationals.Integers(), p.upper.BorrowNumerator())
 			}
 		case 2:
 			if p.lowerActive {
-				e = m.config.Binary.Del(&p.lower)
+				e = unumeral.SourceIntegerDel(m.config.Rationals.Integers(), p.lower.BorrowNumerator())
 			}
 		case 3:
 			e = m.restoreSaved()
 		case 4:
 			if p.savedActive && p.savedConstructed {
-				e = m.config.Intervals.Del(&p.saved)
+				fields := [2]*unumeral.Int{p.saved.BorrowLower().BorrowNumerator(), p.saved.BorrowUpper().BorrowNumerator()}
+				for p.savedSourceCursor < 2 {
+					e = unumeral.SourceIntegerDel(m.config.Rationals.Integers(), fields[p.savedSourceCursor])
+					if e != nil {
+						break
+					}
+					p.savedSourceCursor++
+				}
 			}
 		}
 		if e != nil {
 			p.cleanup = e
-			if cause != nil {
-				return cause
-			}
-			return e
+			p.sourceStop = e
+			return errors.Join(cause, e)
 		}
 		p.stage++
 	}
@@ -219,7 +227,7 @@ func (m *AlgebraicRootCore) finishPredicate(cause error) error {
 		return cause
 	}
 	z := m.config.Rationals.Integers()
-	if z.MatchesCopyAllocationInvocation(&p.savedCopy) || z.MatchesCopyAllocationInvocation(&p.leadingCopy) {
+	if z.MatchesCopyAllocationInvocation(&p.savedCopy) || z.MatchesCopyAllocationInvocation(&p.leadingCopy) || z.MatchesCopyAllocationInvocation(&p.candidateCopy) {
 		return cause
 	}
 	m.predicate = algebraicPredicateScope{}
@@ -263,8 +271,7 @@ func (m *AlgebraicRootCore) IsInt(a *Algebraic) (result bool, err error) {
 	}
 	defer func() { err = m.finishPredicate(err) }()
 	p := &m.predicate
-	p.candidateActive = true
-	if err = m.config.Binary.Floor(&(*r.interval.BorrowUpper()), &p.candidate); err != nil {
+	if err = m.floorPredicateCandidate(r.interval.BorrowUpper()); err != nil {
 		return false, err
 	}
 	if polynomialSourceDebug {
@@ -321,12 +328,9 @@ func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 	// this actual caller for safe ownership; this is not defined C++ cleanup.
 	defer func() { m.predicate.owner = *a; err = m.finishPredicate(err) }()
 	p := &m.predicate
-	p.savedActive = true
-	p.owner = *a
-	if err = m.config.Intervals.CopyWithAllocationReceipt(&p.saved, &r.interval, &p.savedCopy); err != nil {
+	if err = m.constructPredicateSaved(a, &r); err != nil {
 		return false, err
 	}
-	p.savedConstructed = true
 	v, err := m.sourcePolynomial(&r)
 	if err != nil {
 		return false, err
@@ -365,16 +369,10 @@ func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 	if err != nil {
 		return false, err
 	}
-	p.lowerActive = true
-	if err = m.config.Binary.MulInteger(&(*r.interval.BorrowLower()), &m.isRationalTmp, &p.lower); err != nil {
+	if err = m.scalePredicateBounds(&r); err != nil {
 		return false, err
 	}
-	p.upperActive = true
-	if err = m.config.Binary.MulInteger(&(*r.interval.BorrowUpper()), &m.isRationalTmp, &p.upper); err != nil {
-		return false, err
-	}
-	p.candidateActive = true
-	if err = m.config.Binary.Floor(&p.upper, &p.candidate); err != nil {
+	if err = m.floorPredicateCandidate(&p.upper); err != nil {
 		return false, err
 	}
 	if err = m.beginQ(); err != nil {
@@ -456,4 +454,31 @@ func (m *AlgebraicRootCore) refineRecordWithReceipt(l *algebraicLocation, r *alg
 // Promotion's source scoped_mpq destructor is separate from owning cleanup.
 func (m *AlgebraicRootCore) finishRefinementQ(cause error) error {
 	return m.refinementQ.finish(m, cause)
+}
+
+// Concrete retained predicate declaration phases. No source reservation is
+// added by these helpers; each active flag follows its actual construction.
+func (m *AlgebraicRootCore) constructPredicateSaved(a *Algebraic, r *algebraicRecord) error {
+	p := &m.predicate
+	p.savedActive = true
+	p.owner = *a
+	if e := m.config.Intervals.CopyWithAllocationReceipt(&p.saved, &r.interval, &p.savedCopy); e != nil {
+		return e
+	}
+	p.savedConstructed = true
+	return nil
+}
+func (m *AlgebraicRootCore) scalePredicateBounds(r *algebraicRecord) error {
+	p := &m.predicate
+	p.lowerActive = true
+	p.upperActive = true
+	if e := m.config.Binary.MulInteger(r.interval.BorrowLower(), &m.isRationalTmp, &p.lower); e != nil {
+		return e
+	}
+	return m.config.Binary.MulInteger(r.interval.BorrowUpper(), &m.isRationalTmp, &p.upper)
+}
+func (m *AlgebraicRootCore) floorPredicateCandidate(upper *unumeral.BinaryRational) error {
+	p := &m.predicate
+	p.candidateActive = true
+	return m.config.Binary.FloorWithCopyAllocationReceipt(upper, &p.candidate, &p.candidateCopy)
 }

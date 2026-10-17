@@ -49,6 +49,12 @@ func (m *AlgebraicRootCore) cleanupPredicate() error {
 	p.finishing = true
 	defer func() { p.finishing = false }()
 	z := m.config.Rationals.Integers()
+	if e := z.CleanupCopyAllocationInvocation(&p.candidateCopy); e != nil {
+		if p.ownCause == nil {
+			p.ownCause = e
+		}
+		return e
+	}
 	if e := z.CleanupCopyAllocationInvocation(&p.leadingCopy); e != nil {
 		if p.ownCause == nil {
 			p.ownCause = e
@@ -80,10 +86,13 @@ func (m *AlgebraicRootCore) cleanupPredicate() error {
 			e = m.restoreSaved()
 		case 4:
 			if p.savedActive {
-				for _, v := range [2]*unumeral.Int{p.saved.BorrowLower().BorrowNumerator(), p.saved.BorrowUpper().BorrowNumerator()} {
-					if e = z.CleanupRawNumeral(v); e != nil {
+				fields := [2]*unumeral.Int{p.saved.BorrowLower().BorrowNumerator(), p.saved.BorrowUpper().BorrowNumerator()}
+				for p.savedOwnCursor < 2 {
+					e = z.CleanupRawNumeral(fields[p.savedOwnCursor])
+					if e != nil {
 						break
 					}
+					p.savedOwnCursor++
 				}
 			}
 		}

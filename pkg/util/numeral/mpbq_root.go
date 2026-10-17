@@ -52,6 +52,15 @@ func (m *BinaryRationalManager) Floor(a *BinaryRational, out *Int) error {
 	}
 	return m.FloorInto(a, m.Z, out)
 }
+
+// FloorWithCopyAllocationReceipt records only the actual numerator-copy
+// allocation; the later shift and negative-floor correction retain their bodies.
+func (m *BinaryRationalManager) FloorWithCopyAllocationReceipt(a *BinaryRational, out *Int, receipt *IntegerCopyAllocationReceipt) error {
+	if e := m.open(); e != nil {
+		return e
+	}
+	return m.roundWithCopyAllocationReceipt(a, m.Z, out, false, receipt)
+}
 func (m *BinaryRationalManager) Ceil(a *BinaryRational, out *Int) error {
 	if e := m.open(); e != nil {
 		return e
@@ -65,6 +74,9 @@ func (m *BinaryRationalManager) CeilInto(a *BinaryRational, z *IntegerManager, o
 	return m.round(a, z, out, true)
 }
 func (m *BinaryRationalManager) round(a *BinaryRational, z *IntegerManager, out *Int, ceil bool) (err error) {
+	return m.roundWithCopyAllocationReceipt(a, z, out, ceil, nil)
+}
+func (m *BinaryRationalManager) roundWithCopyAllocationReceipt(a *BinaryRational, z *IntegerManager, out *Int, ceil bool, receipt *IntegerCopyAllocationReceipt) (err error) {
 	if e := m.check(a); e != nil {
 		return e
 	}
@@ -92,10 +104,10 @@ func (m *BinaryRationalManager) round(a *BinaryRational, z *IntegerManager, out 
 		input = &m.roundImported
 	}
 	if a.KField == 0 {
-		return z.Copy(out, input)
+		return z.CopyFromOwnerWithReceipt(out, z, input, receipt)
 	}
 	neg, pos := a.Num.Val < 0, a.Num.Val > 0
-	if e := z.MachineDiv2k(input, a.KField, out); e != nil {
+	if e := z.shiftWithAllocationContextAndReceipt(input, a.KField, out, false, integerAllocationInvocationContext{}, receipt); e != nil {
 		return e
 	}
 	one := NewInt(1)

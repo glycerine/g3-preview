@@ -338,13 +338,16 @@ func (m *IntegerManager) shift(a *Int, k uint32, out *Int, left bool) error {
 	return m.shiftWithAllocationContext(a, k, out, left, integerAllocationInvocationContext{})
 }
 func (m *IntegerManager) shiftWithAllocationContext(a *Int, k uint32, out *Int, left bool, context integerAllocationInvocationContext) error {
+	return m.shiftWithAllocationContextAndReceipt(a, k, out, left, context, nil)
+}
+func (m *IntegerManager) shiftWithAllocationContextAndReceipt(a *Int, k uint32, out *Int, left bool, context integerAllocationInvocationContext, receipt *IntegerCopyAllocationReceipt) error {
 	if e := m.check(a); e != nil {
 		return e
 	}
 	if e := m.check(out); e != nil {
 		return e
 	}
-	if e := m.copyFromOwnerWithAllocationContext(out, m, a, nil, context); e != nil {
+	if e := m.copyFromOwnerWithAllocationContext(out, m, a, receipt, context); e != nil {
 		return e
 	}
 	if left {
