@@ -115711,7 +115711,8 @@
             "TestDivisionPublicationWarmStorage",
             "TestDivisionPublicationZeroDivisorOutputAliases",
             "TestDivisionPublicationInverseCopyFailureBeforeDebugAssertion",
-            "TestDivisionPublicationInverseTwoMinNegActions"
+            "TestDivisionPublicationInverseTwoMinNegActions",
+            "TestRationalInverseSourceAssertionActions"
           ]
         },
         {

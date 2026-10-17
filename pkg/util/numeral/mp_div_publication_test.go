@@ -17,6 +17,9 @@ func divPublicationAudit(t *testing.T, m *RationalManager, values ...*Rational) 
 	qopsAuditLiveOwnership(t, m, roots)
 }
 func TestDivisionPublicationInverseZeroProfileAndCleanup(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TTTT")
+	}
 	for _, sync := range []bool{false, true} {
 		for _, alias := range []bool{false, true} {
 			m, _ := rationalManager(t, sync)
@@ -29,7 +32,7 @@ func TestDivisionPublicationInverseZeroProfileAndCleanup(t *testing.T) {
 			e := m.Inv(&a, dst)
 			divPublicationAudit(t, m, &a, &out)
 			if modularSourceDebug {
-				if !errors.Is(e, ErrIntegerAssertion) || dst.Num != NewInt(0) || dst.Den != NewInt(1) {
+				if !isMPNVerificationThrow(e) || dst.Num != NewInt(0) || dst.Den != NewInt(1) {
 					t.Fatal("Copy before source inverse assertion", alias, e, *dst)
 				}
 			} else {

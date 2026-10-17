@@ -156,10 +156,13 @@ func TestRationalCheckedInitializationAndZero(t *testing.T) {
 	}
 	// Reset the finite invalid output explicitly before the independent zero inverse.
 	qopsMust(t, m.Reset(&valid))
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "T")
+	}
 	e = m.Inv(&valid, &valid)
 	divPublicationAudit(t, m, &valid)
 	if modularSourceDebug {
-		if !errors.Is(e, ErrIntegerAssertion) || valid != NewRational() {
+		if !isMPNVerificationThrow(e) || valid != NewRational() {
 			t.Fatal(e)
 		}
 	} else {

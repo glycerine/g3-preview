@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
@@ -425,8 +426,17 @@ func (m *RationalManager) invInPlaceWithAllocationContext(a *Rational, context i
 	if e := m.check(a); e != nil {
 		return e
 	}
-	if modularSourceDebug && a.Num.Val == 0 {
-		return ErrIntegerAssertion
+	if modularSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return e
+		}
+		if enabled && a.Num.Val == 0 {
+			if e := diagnostic.DebugAssertionFailure(d, "src/util/mpq.h", 444, "!is_zero(a)"); e != nil {
+				return e
+			}
+		}
 	}
 	if a.Num.Val < 0 {
 		if e := m.Z.negWithAllocationContext(&a.Num, context); e != nil {
