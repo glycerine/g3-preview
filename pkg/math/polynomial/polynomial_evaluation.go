@@ -31,6 +31,7 @@ type polynomialEvalRationalFrame struct {
 // pointer directories use native slices without simulated container charges.
 type polynomialEvaluationScope struct {
 	rationalCaller                       *algebraicRationalSignScope
+	intervalCaller                       *algebraicSignIntervalScope
 	rationalFrames                       []*polynomialEvalRationalFrame
 	depth                                uint32
 	lexGeneration                        uint64
@@ -426,6 +427,7 @@ func (m *MultivariatePolynomialManager) evaluateRationalForAlgebraic(p Polynomia
 	s.bodyCause = nil
 	s.sourceCause = nil
 	s.cleanupCause = nil
+	s.intervalCaller = nil
 	s.rationalCaller = caller
 	if caller != nil {
 		caller.evaluation = m
@@ -1232,6 +1234,7 @@ func (m *MultivariatePolynomialManager) UnivariateEvaluate(p Polynomial, x uint3
 	s.sourceCause = nil
 	s.cleanupCause = nil
 	s.rationalCaller = nil
+	s.intervalCaller = nil
 	s.active = true
 	s.executing = true
 	s.modular = m.core.modular
@@ -1277,7 +1280,10 @@ func (m *MultivariatePolynomialManager) UnivariateEvaluate(p Polynomial, x uint3
 	}
 	return m.evaluationIntegerCore(p, &values, 0, n, max, out)
 }
-func (m *MultivariatePolynomialManager) EvaluateInterval(p Polynomial, v PolynomialIntervalEvaluation, out *unumeral.BinaryInterval) (cause error) {
+func (m *MultivariatePolynomialManager) EvaluateInterval(p Polynomial, v PolynomialIntervalEvaluation, out *unumeral.BinaryInterval) error {
+	return m.evaluateIntervalForAlgebraic(p, v, out, nil)
+}
+func (m *MultivariatePolynomialManager) evaluateIntervalForAlgebraic(p Polynomial, v PolynomialIntervalEvaluation, out *unumeral.BinaryInterval, caller *algebraicSignIntervalScope) (cause error) {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -1329,6 +1335,10 @@ func (m *MultivariatePolynomialManager) EvaluateInterval(p Polynomial, v Polynom
 	s.sourceCause = nil
 	s.cleanupCause = nil
 	s.rationalCaller = nil
+	s.intervalCaller = caller
+	if caller != nil {
+		caller.evaluation = m
+	}
 	s.active = true
 	s.executing = true
 	s.interval = vm
@@ -1387,6 +1397,7 @@ func (m *MultivariatePolynomialManager) evaluationEarlyRoots(beforeCell umemory.
 	if m.evaluationPending() {
 		if !s.active {
 			s.rationalCaller = nil
+			s.intervalCaller = nil
 			s.bodyCause = cause
 		}
 		s.active = true

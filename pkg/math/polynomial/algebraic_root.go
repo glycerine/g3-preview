@@ -49,6 +49,9 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	signInterval                                           algebraicSignIntervalScope
+	evalSignVariables                                      PolynomialVariableDegrees
+	zeroAccuracy                                           int32
 	signSubstitution                                       algebraicSignSubstitutionScope
 	rationalSign                                           algebraicRationalSignScope
 	rootDisplay                                            algebraicRootDisplayScope
@@ -844,6 +847,9 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	return m.store(dl, &out)
 }
 func (m *AlgebraicRootCore) CleanupRetained() error {
+	if m != nil && m.self == m && m.signInterval.running {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.signSubstitution.running {
 		return ErrAlgebraicPending
 	}
@@ -907,6 +913,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	if e := m.cleanupRationalSign(); e != nil {
 		return e
 	}
+	if e := m.cleanupSignInterval(); e != nil {
+		return e
+	}
 	if e := m.cleanupSignSubstitution(); e != nil {
 		return e
 	}
@@ -937,6 +946,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.comparisonCleanup()
 }
 func (m *AlgebraicRootCore) Close() error {
+	if m != nil && m.self == m && m.signInterval.running {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.signSubstitution.running {
 		return ErrAlgebraicPending
 	}
@@ -1048,6 +1060,7 @@ func (m *AlgebraicRootCore) Close() error {
 	}
 	b := m.config.Rationals.Budget()
 	m.negationHistory = nil
+	m.evalSignVariables.values = nil
 	b.Release(m.header)
 	m.locations = nil
 	m.header = 0
