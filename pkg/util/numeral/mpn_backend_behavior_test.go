@@ -156,7 +156,7 @@ func TestNaturalSourceAllZeroDenominatorStopsBeforeOutputs(t *testing.T) {
 		for i := range r {
 			r[i] = 88
 		}
-		_, err := n.divide(limbView{external: a, size: uint32(len(a))}, limbView{external: denom, size: uint32(len(denom))}, limbView{external: q, size: 1}, limbView{external: r, size: uint32(len(r))})
+		_, err := n.Div(a, denom, q, r)
 		if !errors.Is(err, diagnostic.ErrDebugNativeUnreachable) || q[0] != 99 {
 			t.Fatal("all-zero source guard", denom, err, q)
 		}
@@ -174,7 +174,7 @@ func TestNaturalSourceUnnormalizedDenominatorShiftGuard(t *testing.T) {
 	}
 	n := naturalManager(t)
 	q, r := []uint32{99}, []uint32{88, 88}
-	_, err := n.divide(limbView{external: []uint32{7, 1}, size: 2}, limbView{external: []uint32{1, 0}, size: 2}, limbView{external: q, size: 1}, limbView{external: r, size: 2})
+	_, err := n.Div([]uint32{7, 1}, []uint32{1, 0}, q, r)
 	if !errors.Is(err, arena.ErrBounds) || q[0] != 99 || r[0] != 88 || r[1] != 88 {
 		t.Fatal("guard first undefined source shift", err, q, r)
 	}

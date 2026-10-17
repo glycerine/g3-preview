@@ -161620,7 +161620,7 @@
           ]
         },
         {
-          "name": "div shared Algorithm D, internal guards and top-limb/normalization/div_n-entry/quotient-estimate/verification SASSERT switch reads/actions; broader public span-domain/profile completion remains open",
+          "name": "div public/shared Algorithm D, short-numerator prefix, zero-denominator and top-limb source diagnostics, normalization/div_n-entry/quotient-estimate/verification SASSERT switch reads/actions; broader output-span/profile completion remains open",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpn_indexed.go",
           "tests": [
@@ -162289,7 +162289,7 @@
           ]
         },
         {
-          "name": "div shared Algorithm D, internal guards and top-limb/normalization/div_n-entry/quotient-estimate/verification SASSERT switch reads/actions; broader public span-domain/profile completion remains open",
+          "name": "div public/shared Algorithm D, short-numerator prefix, zero-denominator and top-limb source diagnostics, normalization/div_n-entry/quotient-estimate/verification SASSERT switch reads/actions; broader output-span/profile completion remains open",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpn_indexed.go",
           "tests": [
