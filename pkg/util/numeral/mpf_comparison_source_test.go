@@ -2,7 +2,11 @@
 package numeral
 
 import (
+	"errors"
 	"math"
+	"os"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -118,6 +122,7 @@ func TestArbitraryFloatComparisonLiteralShortCircuits(t *testing.T) {
 }
 
 func TestArbitraryFloatComparisonSourceFormatAssertion(t *testing.T) {
+	d, log := bindMPNDebugActions(t, "TTTTT")
 	b := arena.NewBudget(1 << 26)
 	m, e := NewArbitraryFloatManager(serviceConfig(b).Integers)
 	serviceMust(t, e)
@@ -130,22 +135,67 @@ func TestArbitraryFloatComparisonSourceFormatAssertion(t *testing.T) {
 	serviceMust(t, e)
 	before := b.Used()
 	b.FailAfter(0)
-	for _, call := range []func(*ArbitraryFloat, *ArbitraryFloat) (bool, error){m.Eq, m.Lt, m.Lte, m.Gt, m.Gte} {
-		_, e := call(&x, &y)
+	for _, tc := range []struct {
+		line int
+		call func(*ArbitraryFloat, *ArbitraryFloat) (bool, error)
+	}{{417, m.Eq}, {429, m.Lt}, {451, m.Lte}, {456, m.Gt}, {466, m.Gte}} {
+		_, e := tc.call(&x, &y)
 		if modularSourceDebug {
-			if e != ErrIntegerAssertion {
-				t.Fatal("source format SASSERT", e)
+			if !isMPNVerificationThrow(e) {
+				t.Fatal("source format SASSERT", tc.line, e)
 			}
 		} else {
 			serviceMust(t, e)
+		}
+		if modularSourceDebug {
+			contents, readErr := os.ReadFile(log.Name())
+			serviceMust(t, readErr)
+			want := "File: src/util/mpf.cpp\nLine: " + strconv.Itoa(tc.line) + "\nx.sbits == y.sbits && x.ebits == y.ebits\n"
+			if n := strings.Count(string(contents), want); n != 1 {
+				t.Fatal("source comparison assertion site", tc.line, n, string(contents))
+			}
 		}
 	}
 	if b.Used() != before {
 		t.Fatal("format assertion acquired storage")
 	}
 	b.FailAfter(-1)
+	if modularSourceDebug {
+		serviceMust(t, d.Close())
+		if _, e := m.Eq(&x, &x); !errors.Is(e, arena.ErrClosed) {
+			t.Fatal("valid comparison reads closed assertion owner", e)
+		}
+	}
 	serviceMust(t, m.Close())
 	if b.Used() != 0 {
 		t.Fatal(b.Used())
 	}
+}
+
+func TestArbitraryFloatComparisonSourceFormatContinue(t *testing.T) {
+	if !modularSourceDebug {
+		t.Skip("source Z3DEBUG assertion only")
+	}
+	d, log := bindMPNDebugActions(t, "CCC")
+	m, _, _ := mpfNumeralHelpersFixture(t)
+	var x, y ArbitraryFloat
+	serviceMust(t, m.MkZero(8, 24, false, &x))
+	serviceMust(t, m.MkZero(8, 25, false, &y))
+	if got, e := m.Lte(&x, &y); e != nil || !got {
+		t.Fatal("Continue follows nested lte/lt/eq source calls", got, e)
+	}
+	contents, e := os.ReadFile(log.Name())
+	serviceMust(t, e)
+	for _, line := range []string{"451", "429", "417"} {
+		want := "File: src/util/mpf.cpp\nLine: " + line + "\nx.sbits == y.sbits && x.ebits == y.ebits\n"
+		if n := strings.Count(string(contents), want); n != 1 {
+			t.Fatal("nested comparison assertion site", line, n, string(contents))
+		}
+	}
+	serviceMust(t, d.EnableAssertions(false))
+	if got, e := m.Lte(&x, &y); e != nil || !got {
+		t.Fatal("disabled assertions retain source comparison", got, e)
+	}
+	serviceMust(t, m.Del(&x))
+	serviceMust(t, m.Del(&y))
 }

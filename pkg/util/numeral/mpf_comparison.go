@@ -1,17 +1,14 @@
 // Source: src/util/mpf.cpp:416-469; src/util/mpf.h:116-123.
 package numeral
 
-func (m *ArbitraryFloatManager) comparisonGuard(x, y *ArbitraryFloat) error {
+func (m *ArbitraryFloatManager) comparisonGuard(x, y *ArbitraryFloat, line int32) error {
 	if e := m.valueGuard(x); e != nil {
 		return e
 	}
 	if e := m.valueGuard(y); e != nil {
 		return e
 	}
-	if modularSourceDebug && (x.SBits() != y.SBits() || x.EBits() != y.EBits()) {
-		return ErrIntegerAssertion
-	}
-	return nil
+	return mpfSourceAssertion(x.SBits() == y.SBits() && x.EBits() == y.EBits(), line, "x.sbits == y.sbits && x.ebits == y.ebits")
 }
 func (m *ArbitraryFloatManager) eitherNaN(x, y *ArbitraryFloat) (bool, error) {
 	nan, e := m.IsNaN(x)
@@ -28,7 +25,7 @@ func (m *ArbitraryFloatManager) bothZero(x, y *ArbitraryFloat) (bool, error) {
 	return m.IsZero(y)
 }
 func (m *ArbitraryFloatManager) Eq(x, y *ArbitraryFloat) (bool, error) {
-	if e := m.comparisonGuard(x, y); e != nil {
+	if e := m.comparisonGuard(x, y, 417); e != nil {
 		return false, e
 	}
 	if nan, e := m.eitherNaN(x, y); e != nil || nan {
@@ -44,7 +41,7 @@ func (m *ArbitraryFloatManager) Eq(x, y *ArbitraryFloat) (bool, error) {
 	return c == 0, e
 }
 func (m *ArbitraryFloatManager) Lt(x, y *ArbitraryFloat) (bool, error) {
-	if e := m.comparisonGuard(x, y); e != nil {
+	if e := m.comparisonGuard(x, y, 429); e != nil {
 		return false, e
 	}
 	if nan, e := m.eitherNaN(x, y); e != nil || nan {
@@ -73,7 +70,7 @@ func (m *ArbitraryFloatManager) Lt(x, y *ArbitraryFloat) (bool, error) {
 	return c < 0, e
 }
 func (m *ArbitraryFloatManager) Lte(x, y *ArbitraryFloat) (bool, error) {
-	if e := m.comparisonGuard(x, y); e != nil {
+	if e := m.comparisonGuard(x, y, 451); e != nil {
 		return false, e
 	}
 	less, e := m.Lt(x, y)
@@ -83,7 +80,7 @@ func (m *ArbitraryFloatManager) Lte(x, y *ArbitraryFloat) (bool, error) {
 	return m.Eq(x, y)
 }
 func (m *ArbitraryFloatManager) Gt(x, y *ArbitraryFloat) (bool, error) {
-	if e := m.comparisonGuard(x, y); e != nil {
+	if e := m.comparisonGuard(x, y, 456); e != nil {
 		return false, e
 	}
 	if nan, e := m.eitherNaN(x, y); e != nil || nan {
@@ -99,7 +96,7 @@ func (m *ArbitraryFloatManager) Gt(x, y *ArbitraryFloat) (bool, error) {
 	return !lessEqual, nil
 }
 func (m *ArbitraryFloatManager) Gte(x, y *ArbitraryFloat) (bool, error) {
-	if e := m.comparisonGuard(x, y); e != nil {
+	if e := m.comparisonGuard(x, y, 466); e != nil {
 		return false, e
 	}
 	greater, e := m.Gt(x, y)
