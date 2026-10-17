@@ -138,21 +138,16 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 	p := c.lifecycle.propagation
 	a := p.clauses
 	v := p.variables
-	assertions := false
-	if satStorageSourceDebug {
-		enabled, e := diagnostic.BorrowProcessDebugContext().AssertionsEnabled()
-		if e != nil {
-			return false, e
-		}
-		assertions = enabled
-	}
 	tags := c.lifecycle.traceTags
 	if tags == nil {
 		tags = diagnostic.BorrowProcessTraceTags()
 	}
-	traceClause := tags.ShouldTrace("sat_bug") && c.gc != nil && c.gc.conflict != nil && c.gc.conflict.solver != nil
-	if assertions || traceClause {
-		if assertions {
+	if satStorageSourceDebug {
+		enabled, e := diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+		if e != nil {
+			return false, e
+		}
+		if enabled {
 			removed, e := a.Removed(cl)
 			if e != nil {
 				return false, e
@@ -161,19 +156,25 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 				return false, e
 			}
 		}
-		for i := uint32(0); ; i++ {
-			n, e := a.Size(cl)
+	}
+	for i := uint32(0); ; i++ {
+		n, e := a.Size(cl)
+		if e != nil {
+			return false, e
+		}
+		if i >= n {
+			break
+		}
+		if satStorageSourceDebug {
+			enabled, e := diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
 			if e != nil {
 				return false, e
 			}
-			if i >= n {
-				break
-			}
-			lit, e := a.Literal(cl, i)
-			if e != nil {
-				return false, e
-			}
-			if assertions {
+			if enabled {
+				lit, e := a.Literal(cl, i)
+				if e != nil {
+					return false, e
+				}
 				vars, e := v.numVarsChecked()
 				if e != nil {
 					return false, e
@@ -182,20 +183,46 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 					return false, e
 				}
 			}
+		}
+		if tags.ShouldTrace("sat_bug") && c.gc != nil && c.gc.conflict != nil && c.gc.conflict.solver != nil {
+			lit, e := a.Literal(cl, i)
+			if e != nil {
+				return false, e
+			}
 			gone, e := c.eliminated(lit.variable())
 			if e != nil {
 				return false, e
 			}
-			if gone && traceClause {
+			if gone {
 				c.traceEliminatedClause(cl, uint32(lit.variable()))
 			}
-			if assertions {
+		}
+		if satStorageSourceDebug {
+			enabled, e := diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+			if e != nil {
+				return false, e
+			}
+			if enabled {
+				lit, e := a.Literal(cl, i)
+				if e != nil {
+					return false, e
+				}
+				gone, e := c.eliminated(lit.variable())
+				if e != nil {
+					return false, e
+				}
 				if e = satIntegrityAssertion(!gone, c.debugActions, 60, "!s.was_eliminated(c[i].var())"); e != nil {
 					return false, e
 				}
 			}
 		}
-		if assertions {
+	}
+	if satStorageSourceDebug {
+		enabled, e := diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+		if e != nil {
+			return false, e
+		}
+		if enabled {
 			yes, e := a.CheckApprox(cl)
 			if e != nil {
 				return false, e
@@ -353,7 +380,14 @@ func (c satIntegrityChecker) checkClause(cl StoredClauseRef) (bool, error) {
 								c.traceResidualClause(cl)
 							}
 						}
-						if assertions {
+						if satStorageSourceDebug {
+							enabled, e := diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+							if e != nil {
+								return false, e
+							}
+							if !enabled {
+								continue
+							}
 							lit, e := a.Literal(cl, i)
 							if e != nil {
 								return false, e
