@@ -5,8 +5,30 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
+
+func sourceAddmulShapeAssertions(first, firstIDs, second, secondIDs int) error {
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil {
+		return e
+	}
+	if enabled && first != firstIDs {
+		if e := diagnostic.DebugAssertionFailure(d, "src/math/euclid/euclidean_solver.cpp", 352, "as1.size() == xs1.size()"); e != nil {
+			return e
+		}
+	}
+	enabled, e = diagnostic.SourceAssertionsEnabled(d)
+	if e != nil {
+		return e
+	}
+	if enabled && second != secondIDs {
+		return diagnostic.DebugAssertionFailure(d, "src/math/euclid/euclidean_solver.cpp", 353, "as2.size() == xs2.size()")
+	}
+	return nil
+}
 
 // addmulInt is the reached mpz specialization of the source sorted-row merge.
 // newAs and newXs are reusable output buffers, distinct from both input rows.
@@ -22,6 +44,9 @@ func (s *solverSetup) addmulInt(as1 []numeral.Int, xs1 []uint32, k *numeral.Int,
 	z := s.manager.Integers()
 	newA := numeral.NewInt(0)
 	defer func() { err = errors.Join(err, z.Del(&newA)) }()
+	if err = sourceAddmulShapeAssertions(len(as1), len(xs1), len(as2), len(xs2)); err != nil {
+		return err
+	}
 	if err = newAs.Reset(); err != nil {
 		return err
 	}
@@ -97,6 +122,9 @@ func (s *solverSetup) addmulRational(bs1 []numeral.Rational, js1 []uint32, k *nu
 	m := s.manager
 	newB := numeral.NewRational()
 	defer func() { err = errors.Join(err, m.Del(&newB)) }()
+	if err = sourceAddmulShapeAssertions(len(bs1), len(js1), len(bs2), len(js2)); err != nil {
+		return err
+	}
 	if err = newBs.Reset(); err != nil {
 		return err
 	}

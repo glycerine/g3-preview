@@ -35784,13 +35784,14 @@
           ]
         },
         {
-          "name": "concrete mpz and mpq addmul sorted-row merge with occurrence and queue updates at cpp:329-419",
+          "name": "concrete mpz and mpq addmul sorted-row merge, source SASSERT switch reads at cpp:352-353 before output reset, and occurrence/queue updates at cpp:329-419",
           "status": "partial",
           "go_target": "pkg/math/euclid/addmul.go",
           "go_targets": ["pkg/math/euclid/addmul_trace.go"],
           "tests": [
             "TestEuclideanIntAddmulMergedRowsOccurrencesAndQueue",
             "TestEuclideanRationalAddmulMergedJustifications",
+            "TestEuclideanAddmulAssertionStopsBeforeOutputReset",
             "TestEuclideanAddMulTraceConcreteIntegerAndRationalCancellation"
           ]
         },
