@@ -339,6 +339,20 @@ func (m *RationalManager) setPartsFromIntegerOwner(a *Rational, n, d *Int, sourc
 	return m.setPartsFromIntegerOwnerWithAllocationContext(a, n, d, sourceOwner, integerAllocationInvocationContext{})
 }
 func (m *RationalManager) setPartsFromIntegerOwnerWithAllocationContext(a *Rational, n, d *Int, sourceOwner *IntegerManager, context integerAllocationInvocationContext) error {
+	return m.setPartsWithInvocation(a, n, d, sourceOwner, context, nil)
+}
+
+// RationalPartsInvocation retains only allocations actually issued by SET and
+// the reached synchronized normalization scope.
+type RationalPartsInvocation struct {
+	Numerator, Denominator IntegerCopyAllocationReceipt
+	Normalize              RationalNormalizeInvocationReceipt
+}
+
+func (m *RationalManager) SetPartsWithInvocation(a *Rational, n, d *Int, context NumericAllocationContext, receipt *RationalPartsInvocation) error {
+	return m.setPartsWithInvocation(a, n, d, m.Z, context, receipt)
+}
+func (m *RationalManager) setPartsWithInvocation(a *Rational, n, d *Int, sourceOwner *IntegerManager, context integerAllocationInvocationContext, receipt *RationalPartsInvocation) error {
 	if e := m.checkSetter(a); e != nil {
 		return e
 	}
@@ -349,10 +363,18 @@ func (m *RationalManager) setPartsFromIntegerOwnerWithAllocationContext(a *Ratio
 		return e
 	}
 	negative := d.Val < 0 // source branch decision precedes both caller Copies
-	if e := m.Z.copyFromOwnerWithAllocationContext(&a.Num, sourceOwner, n, nil, context); e != nil {
+	copyContext := context
+	var nr, dr *IntegerCopyAllocationReceipt
+	var norm *RationalNormalizeInvocationReceipt
+	if receipt != nil {
+		nr, dr, norm = &receipt.Numerator, &receipt.Denominator, &receipt.Normalize
+		// The copy receipt owns its exact physical allocation independently.
+		copyContext = integerAllocationInvocationContext{}
+	}
+	if e := m.Z.copyFromOwnerWithAllocationContext(&a.Num, sourceOwner, n, nr, copyContext); e != nil {
 		return e
 	}
-	if e := m.Z.copyFromOwnerWithAllocationContext(&a.Den, sourceOwner, d, nil, context); e != nil {
+	if e := m.Z.copyFromOwnerWithAllocationContext(&a.Den, sourceOwner, d, dr, copyContext); e != nil {
 		return e
 	}
 	if negative {
@@ -363,7 +385,7 @@ func (m *RationalManager) setPartsFromIntegerOwnerWithAllocationContext(a *Ratio
 			return e
 		}
 	}
-	return m.normalizeWithAllocationContext(a, context)
+	return m.normalizeWithAllocationContextAndReceipt(a, context, norm)
 }
 func (m *RationalManager) normalize(a *Rational) (_rawErr error) {
 	return m.normalizeWithAllocationContext(a, integerAllocationInvocationContext{})

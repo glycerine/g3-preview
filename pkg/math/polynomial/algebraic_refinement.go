@@ -178,7 +178,7 @@ func (m *AlgebraicRootCore) finishPredicate(cause error) error {
 	if !p.active {
 		return cause
 	}
-	if p.finishing || p.arithmeticExecuting {
+	if p.finishing || p.arithmeticExecuting || m.predicateQ.executing {
 		return errors.Join(cause, ErrAlgebraicPending)
 	}
 	p.finishing = true
@@ -231,7 +231,7 @@ func (m *AlgebraicRootCore) finishPredicate(cause error) error {
 		return cause
 	}
 	z := m.config.Rationals.Integers()
-	if unumeral.NumericAllocationPending(&p.numericRoots) || z.MatchesCopyAllocationInvocation(&p.savedCopy) || z.MatchesCopyAllocationInvocation(&p.leadingCopy) || z.MatchesCopyAllocationInvocation(&p.candidateCopy) {
+	if m.predicateQ.active || unumeral.NumericAllocationPending(&p.numericRoots) || z.MatchesCopyAllocationInvocation(&p.savedCopy) || z.MatchesCopyAllocationInvocation(&p.leadingCopy) || z.MatchesCopyAllocationInvocation(&p.candidateCopy) {
 		return cause
 	}
 	m.predicate = algebraicPredicateScope{}
@@ -379,11 +379,11 @@ func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 	if err = m.floorPredicateCandidate(&p.upper); err != nil {
 		return false, err
 	}
-	if err = m.beginQ(); err != nil {
+	if err = m.beginPredicateQ(); err != nil {
 		return false, err
 	}
-	defer func() { err = m.finishQ(err) }()
-	if err = m.config.Rationals.SetParts(&m.localQ, &p.candidate, &m.isRationalTmp); err != nil {
+	defer func() { err = m.finishPredicateQ(err) }()
+	if err = m.setPredicateQParts(&p.candidate, &m.isRationalTmp); err != nil {
 		return false, err
 	}
 	if polynomialSourceDebug {

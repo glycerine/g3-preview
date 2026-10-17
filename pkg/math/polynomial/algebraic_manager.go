@@ -221,7 +221,7 @@ func (m *AlgebraicManager) Close() error {
 	if m.closed {
 		return nil
 	}
-	if m.constructing || m.finishing || m.AlgebraicRootCore != nil && (m.comparisonTraceRunning || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
+	if m.constructing || m.finishing || m.AlgebraicRootCore != nil && (m.comparisonTraceRunning || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
 		return ErrAlgebraicPending
 	}
 	e := m.finish(true)
