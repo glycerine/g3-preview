@@ -98,4 +98,38 @@ func TestFixedPointRetainedRationalIntegerConversionAndDisplay(t *testing.T) {
 		t.Fatalf("integer-word overflow = %v", err)
 	}
 	want("18446744073709551615")
+	must(q.Manager.Z.SetString(&integer, "-18446744073709551616"))
+	must(m.SetInt64(a, 7))
+	if err := m.SetFromInteger(a, q.Manager.Z, &integer); !errors.Is(err, ErrFixedPointOverflow) {
+		t.Fatalf("negative integer-word overflow = %v", err)
+	}
+	want("-7") // sign assignment precedes size refusal; old words remain
+	must(m.Reset(a))
+	if err := m.SetFromInteger(a, q.Manager.Z, &integer); !errors.Is(err, ErrFixedPointOverflow) {
+		t.Fatalf("integer overflow from canonical zero = %v", err)
+	}
+	want("-0")
+	if zero, err := m.IsZero(a); err != nil || zero {
+		t.Fatal("integer conversion did not acquire source slot", zero, err)
+	}
+	must(q.Manager.SetString(&rational, "55340232221128654849/3"))
+	must(m.SetInt64(a, -7))
+	if err := m.SetFromRational(a, q.Manager, &rational); !errors.Is(err, ErrFixedPointOverflow) {
+		t.Fatalf("noninteger rational overflow = %v", err)
+	}
+	want("-7") // noninteger branch retains the destination's prior sign
+	must(m.Reset(a))
+	if err := m.SetFromRational(a, q.Manager, &rational); !errors.Is(err, ErrFixedPointOverflow) {
+		t.Fatalf("rational overflow from canonical zero = %v", err)
+	}
+	want("0")
+	if zero, err := m.IsZero(a); err != nil || zero {
+		t.Fatal("rational conversion did not acquire source slot", zero, err)
+	}
+	must(q.Manager.SetString(&rational, "-18446744073709551616"))
+	must(m.SetInt64(a, 7))
+	if err := m.SetFromRational(a, q.Manager, &rational); !errors.Is(err, ErrFixedPointOverflow) {
+		t.Fatalf("integer-valued rational overflow = %v", err)
+	}
+	want("-7") // integer branch takes the incoming sign
 }

@@ -27,7 +27,11 @@ func (m *FixedPointManager) SetFromInteger(dst *FixedPoint, integers *IntegerMan
 		return ErrFixedPointDomain
 	}
 	n.Mul(n, &m.scale)
-	return m.publish(dst, n)
+	if err := m.publish(dst, n); err != nil {
+		m.publishSignBeforeWords(dst, n.Sign() < 0)
+		return err
+	}
+	return nil
 }
 
 // SetFromRational follows the source's two conversion branches. For a
@@ -51,7 +55,11 @@ func (m *FixedPointManager) SetFromRational(dst *FixedPoint, rationals *Rational
 	if q.IsInt() {
 		var scaled big.Int
 		scaled.Mul(q.Num(), &m.scale)
-		return m.publish(dst, &scaled)
+		if err := m.publish(dst, &scaled); err != nil {
+			m.publishSignBeforeWords(dst, scaled.Sign() < 0)
+			return err
+		}
+		return nil
 	}
 	negative := dst.sourceNegative()
 	var numerator big.Int
@@ -65,6 +73,7 @@ func (m *FixedPointManager) SetFromRational(dst *FixedPoint, rationals *Rational
 		return err
 	}
 	if err := m.publish(dst, rounded); err != nil {
+		m.publishSignBeforeWords(dst, negative)
 		return err
 	}
 	if rounded.Sign() == 0 {

@@ -172,9 +172,9 @@ func (m *FixedPointManager) publishAddOverflow(dst *FixedPoint, value *big.Int) 
 	dst.sourceZeroNegative = false
 }
 
-// mul and div set c's sign after ensuring its word slot and before checking
-// their temporary result buffers. The old destination words stay in place.
-func (m *FixedPointManager) publishProductOverflowSign(dst *FixedPoint, negative bool) {
+// Product and numeral-conversion paths acquire the destination slot and set
+// its sign before checking temporary result size. Old words stay in place.
+func (m *FixedPointManager) publishSignBeforeWords(dst *FixedPoint, negative bool) {
 	if dst.scaled.Sign() == 0 {
 		dst.sourceZeroSlot = true
 		dst.sourceZeroNegative = negative
@@ -440,7 +440,7 @@ func (m *FixedPointManager) Mul(a, b, out *FixedPoint) error {
 		return err
 	}
 	if err := m.publish(out, q); err != nil {
-		m.publishProductOverflowSign(out, negative)
+		m.publishSignBeforeWords(out, negative)
 		return err
 	}
 	if q.Sign() == 0 && retainsSlot {
@@ -472,7 +472,7 @@ func (m *FixedPointManager) Div(a, b, out *FixedPoint) error {
 		return err
 	}
 	if err := m.publish(out, q); err != nil {
-		m.publishProductOverflowSign(out, negative)
+		m.publishSignBeforeWords(out, negative)
 		return err
 	}
 	m.traceFixedProduct(a, b, out, true, true)
