@@ -30,6 +30,9 @@ func (m *UPolynomialManager) signAt(v UPolynomialView, i uint32) (int, error) {
 	return m.sign(a)
 }
 func (m *UPolynomialManager) EvalSignInt(v UPolynomialView, b *unumeral.Int) (sign int, cause error) {
+	return m.evalSignIntegerWithReceipt(v, b, nil)
+}
+func (m *UPolynomialManager) evalSignIntegerWithReceipt(v UPolynomialView, b *unumeral.Int, receipt *upolyIntegerEvaluationInvocationReceipt) (sign int, cause error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
@@ -46,12 +49,22 @@ func (m *UPolynomialManager) EvalSignInt(v UPolynomialView, b *unumeral.Int) (si
 	if e != nil {
 		return 0, e
 	}
+	if receipt != nil {
+		*receipt = upolyIntegerEvaluationInvocationReceipt{owner: m, frame: q, invocation: q.invocation}
+	}
 	q.target = v
 	context := q.context()
 	z := m.config.Integer
 	prior := integerEvaluationCaller(z)
 	setIntegerEvaluationCaller(z, m)
-	defer func() { q.executing = false; cause = q.finish(cause); setIntegerEvaluationCaller(z, prior) }()
+	defer func() {
+		q.executing = false
+		cause = q.finish(cause)
+		if receipt != nil {
+			receipt.history = q.history
+		}
+		setIntegerEvaluationCaller(z, prior)
+	}()
 	r := &q.values[0]
 	a, e := m.read(v, v.count-1)
 	if e != nil {

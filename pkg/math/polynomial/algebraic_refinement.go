@@ -7,6 +7,9 @@ import (
 )
 
 type algebraicPredicateScope struct {
+	setter                                                                                     algebraicIntegerSetInvocation
+	integerComparison                                                                          unumeral.IntegerCopyAllocationReceipt
+	integerEvaluation                                                                          upolyIntegerEvaluationInvocationReceipt
 	numericOwner                                                                               *AlgebraicRootCore
 	numericHooks                                                                               unumeral.NumericInvocationHooks
 	numericRoots                                                                               unumeral.NumericAllocationRoots
@@ -231,7 +234,7 @@ func (m *AlgebraicRootCore) finishPredicate(cause error) error {
 		return cause
 	}
 	z := m.config.Rationals.Integers()
-	if m.predicateQ.active || unumeral.NumericAllocationPending(&p.numericRoots) || z.MatchesCopyAllocationInvocation(&p.savedCopy) || z.MatchesCopyAllocationInvocation(&p.leadingCopy) || z.MatchesCopyAllocationInvocation(&p.candidateCopy) {
+	if m.integerSetterPending(&p.setter) || m.predicateQ.active || p.integerEvaluationPending(m) || z.MatchesCopyAllocationInvocation(&p.integerComparison) || unumeral.NumericAllocationPending(&p.numericRoots) || z.MatchesCopyAllocationInvocation(&p.savedCopy) || z.MatchesCopyAllocationInvocation(&p.leadingCopy) || z.MatchesCopyAllocationInvocation(&p.candidateCopy) {
 		return cause
 	}
 	m.predicate = algebraicPredicateScope{}
@@ -254,6 +257,9 @@ func (m *AlgebraicRootCore) IsInt(a *Algebraic) (result bool, err error) {
 	}
 	if r.flags&4 != 0 {
 		return false, nil
+	}
+	if m.predicate.active {
+		return false, ErrAlgebraicPending
 	}
 	ok, err := m.refineAt(a, 1, true)
 	if err != nil {
@@ -279,15 +285,15 @@ func (m *AlgebraicRootCore) IsInt(a *Algebraic) (result bool, err error) {
 		return false, err
 	}
 	if polynomialSourceDebug {
-		ok, e := m.config.Binary.GreaterEqualInteger(&(*r.interval.BorrowUpper()), &p.candidate)
+		less, e := m.lessPredicateInteger(r.interval.BorrowUpper())
 		if e != nil {
 			return false, e
 		}
-		if !ok {
+		if less {
 			return false, ErrAlgebraicAssertion
 		}
 	}
-	less, err := m.config.Binary.LessInteger(&(*r.interval.BorrowLower()), &p.candidate)
+	less, err := m.lessPredicateInteger(r.interval.BorrowLower())
 	if err != nil || !less {
 		return false, err
 	}
@@ -295,20 +301,17 @@ func (m *AlgebraicRootCore) IsInt(a *Algebraic) (result bool, err error) {
 	if err != nil {
 		return false, err
 	}
-	s, err := m.config.Polynomials.EvalSignInt(v, &p.candidate)
+	s, err := m.evalPredicateInteger(v)
 	if err != nil || s != 0 {
 		return false, err
 	}
-	if err = m.beginQ(); err != nil {
-		return false, err
+	err = m.setIntegerWithInvocation(a, &p.candidate, &p.setter)
+	if m.matchesIntegerSetter(&p.setter) && m.integerSet.active {
+		p.childStop = m.integerSet.sourceStop
 	}
-	err = m.config.Rationals.SetInteger(&m.localQ, &p.candidate)
-	if err == nil {
-		err = m.SetTake(a, &m.localQ)
-	}
-	err = m.finishQ(err)
 	return err == nil, err
 }
+
 func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 	l, err := m.location(a)
 	if err != nil {

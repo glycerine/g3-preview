@@ -341,6 +341,11 @@ func (m *RationalManager) DenominatorRational(a, out *Rational) error {
 // SetInteger and the thin setters publish source numerator actions followed by
 // reset_denominator. Errors retain actual Integer publication prefixes and leave
 // DEN untouched if NUM fails. No borrowed limb slice remains.
+// SetIntegerWithCopyAllocationReceipt preserves NUM SET before DEN reset and
+// records only that actual numerator copy's allocation.
+func (m *RationalManager) SetIntegerWithCopyAllocationReceipt(a *Rational, n *Int, receipt *IntegerCopyAllocationReceipt) error {
+	return m.setIntegerFromOwnerWithReceiptAndAllocationContext(a, m.Z, n, receipt, integerAllocationInvocationContext{})
+}
 func (m *RationalManager) SetInteger(a *Rational, n *Int) error {
 	return m.setIntegerWithAllocationContext(a, n, integerAllocationInvocationContext{})
 }

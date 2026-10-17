@@ -479,3 +479,10 @@ func (o NumericBinaryRationalOperations) LessRationalWithCopyAllocationReceipt(a
 	}
 	return o.manager.compareRationalWithAllocationContext(a, qm, b, 1, o.context, receipt)
 }
+
+func (o NumericBinaryRationalOperations) LessIntegerWithCopyAllocationReceipt(a *BinaryRational, b *Int, receipt *IntegerCopyAllocationReceipt) (bool, error) {
+	if e := o.valid(); e != nil {
+		return false, e
+	}
+	return o.manager.compareIntegerWithAllocationContext(a, b, false, o.context, receipt)
+}

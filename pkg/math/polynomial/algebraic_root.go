@@ -202,7 +202,7 @@ func (m *AlgebraicRootCore) check() error {
 	if m != nil && m.self == m && m.arithmetic.executing {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
+	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || m.integerSet.finishing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.inversion.executing {
@@ -987,7 +987,7 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	if m != nil && m.self == m && m.arithmetic.executing {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
+	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || m.integerSet.finishing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.inversion.executing {
@@ -1178,7 +1178,7 @@ func (m *AlgebraicRootCore) closeCoreMembers() error {
 	if m != nil && m.self == m && m.arithmetic.executing {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
+	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || m.integerSet.finishing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.inversion.executing {

@@ -362,6 +362,9 @@ func (m *BinaryRationalManager) NotEqualInteger(a *BinaryRational, b *Int) (bool
 	return !v, nil
 }
 func (m *BinaryRationalManager) compareInteger(a *BinaryRational, b *Int, le bool) (bool, error) {
+	return m.compareIntegerWithAllocationContext(a, b, le, integerAllocationInvocationContext{}, nil)
+}
+func (m *BinaryRationalManager) compareIntegerWithAllocationContext(a *BinaryRational, b *Int, le bool, context integerAllocationInvocationContext, receipt *IntegerCopyAllocationReceipt) (bool, error) {
 	if e := m.check(a); e != nil {
 		return false, e
 	}
@@ -370,7 +373,7 @@ func (m *BinaryRationalManager) compareInteger(a *BinaryRational, b *Int, le boo
 	}
 	y := b
 	if a.KField != 0 {
-		if e := m.Z.Mul2k(b, a.KField, &m.Tmp); e != nil {
+		if e := m.Z.shiftWithAllocationContextAndReceipt(b, a.KField, &m.Tmp, true, context, receipt); e != nil {
 			return false, e
 		}
 		y = &m.Tmp

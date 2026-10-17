@@ -38340,7 +38340,10 @@
         "pkg/math/polynomial/algebraic_predicate_rational_scope.go",
         "pkg/math/polynomial/algebraic_predicate_rational_scope_test.go",
         "pkg/math/polynomial/algebraic_predicate_evaluation_test.go",
-        "pkg/math/polynomial/algebraic_predicate_comparison_test.go"
+        "pkg/math/polynomial/algebraic_predicate_comparison_test.go",
+        "pkg/math/polynomial/algebraic_predicate_integer_scope.go",
+        "pkg/math/polynomial/algebraic_predicate_integer_test.go",
+        "pkg/math/polynomial/algebraic_predicate_integer_stop_test.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",
@@ -48930,7 +48933,9 @@
         "pkg/math/polynomial/algebraic_bound_refinement.go",
         "pkg/math/polynomial/algebraic_bound_refinement_test.go",
         "pkg/math/polynomial/algebraic_refinement_owner_test.go",
-        "pkg/math/polynomial/algebraic_predicate_evaluation_test.go"
+        "pkg/math/polynomial/algebraic_predicate_evaluation_test.go",
+        "pkg/math/polynomial/algebraic_predicate_integer_test.go",
+        "pkg/math/polynomial/algebraic_predicate_integer_stop_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -157713,7 +157718,8 @@
         "pkg/util/numeral/mpbq_select_trace.go",
         "pkg/util/numeral/mpbq_debug_trace.go",
         "pkg/math/polynomial/algebraic_predicate_arithmetic_test.go",
-        "pkg/math/polynomial/algebraic_predicate_comparison_test.go"
+        "pkg/math/polynomial/algebraic_predicate_comparison_test.go",
+        "pkg/math/polynomial/algebraic_predicate_integer_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -165851,7 +165857,9 @@
         "pkg/util/numeral/mpq_binary_trace_test.go",
         "pkg/util/numeral/mpq_mixed_div_trace_test.go",
         "pkg/util/numeral/mpq_parse_trace.go",
-        "pkg/math/polynomial/algebraic_predicate_rational_scope_test.go"
+        "pkg/math/polynomial/algebraic_predicate_rational_scope_test.go",
+        "pkg/math/polynomial/algebraic_predicate_integer_test.go",
+        "pkg/math/polynomial/algebraic_predicate_integer_stop_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -180391,7 +180399,8 @@
         "pkg/api/api_numeral_string.go",
         "pkg/api/api_numeral_string_test.go",
         "pkg/math/polynomial/algebraic_predicate_rational_scope.go",
-        "pkg/math/polynomial/algebraic_predicate_rational_scope_test.go"
+        "pkg/math/polynomial/algebraic_predicate_rational_scope_test.go",
+        "pkg/math/polynomial/algebraic_predicate_integer_stop_test.go"
       ],
       "tests": [
         "TestASTFPAFPComponentsNumeralsAndTrace",

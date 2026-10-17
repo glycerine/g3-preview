@@ -40,7 +40,7 @@ func (m *AlgebraicRootCore) cleanupPredicate() error {
 	if !p.active {
 		return nil
 	}
-	if p.finishing || p.arithmeticExecuting || m.predicateQ.active {
+	if p.finishing || p.arithmeticExecuting || m.predicateQ.active || m.integerSetterPending(&p.setter) {
 		return ErrAlgebraicPending
 	}
 	if m.matchesRefinement(&p.refinement) && (m.refinement.pending(m) || m.refinementConversion.pending(m) || m.refinementQ.active) {
@@ -49,6 +49,12 @@ func (m *AlgebraicRootCore) cleanupPredicate() error {
 	p.finishing = true
 	defer func() { p.finishing = false }()
 	z := m.config.Rationals.Integers()
+	if e := p.cleanupIntegerEvaluation(m); e != nil {
+		return e
+	}
+	if e := z.CleanupCopyAllocationInvocation(&p.integerComparison); e != nil {
+		return e
+	}
 	if e := p.numericRoots.Cleanup(z); e != nil {
 		if p.ownCause == nil {
 			p.ownCause = e
@@ -135,7 +141,7 @@ func (p *algebraicPredicateScope) beginArithmetic(m *AlgebraicRootCore) error {
 	if m == nil || m.self != m || p != &m.predicate {
 		return ErrAlgebraicOwner
 	}
-	if !p.active || p.finishing || p.arithmeticExecuting || unumeral.NumericAllocationPending(&p.numericRoots) {
+	if !p.active || p.finishing || p.arithmeticExecuting || p.integerEvaluationPending(m) || m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&p.integerComparison) || unumeral.NumericAllocationPending(&p.numericRoots) {
 		return ErrAlgebraicPending
 	}
 	p.numericOwner = m
