@@ -30,6 +30,8 @@ const (
 	astFPAAbs              int32 = 17
 	astFPAMin              int32 = 18
 	astFPAMax              int32 = 19
+	astFPASqrt             int32 = 21
+	astFPARoundToIntegral  int32 = 22
 	astFPAEq               int32 = 23
 	astFPALt               int32 = 24
 	astFPAGt               int32 = 25

@@ -17411,7 +17411,9 @@
         "pkg/ast/ast_fpa_numeral_probe_test.go",
         "pkg/ast/ast_fpa_binary_decl.go",
         "pkg/ast/ast_fpa_remainder_test.go",
-        "pkg/ast/ast_fpa_extrema_test.go"
+        "pkg/ast/ast_fpa_extrema_test.go",
+        "pkg/ast/ast_fpa_rounding_read.go",
+        "pkg/ast/ast_fpa_rm_unary_decl.go"
       ],
       "tests": [
         "TestASTFloatingPointClassificationDeclarationsAndApplications",
@@ -17439,7 +17441,8 @@
         "TestASTFloatingPointSpecialNaNFailureRetainsScalar",
         "TestASTFloatingPointSignedZeroSortOverloads",
         "TestASTFPARemainderDeclarationAndApplication",
-        "TestASTFPAExtremaDeclarationsAndNumericBranches"
+        "TestASTFPAExtremaDeclarationsAndNumericBranches",
+        "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup"
       ],
       "assertions": [
         {
@@ -17617,6 +17620,14 @@
           "tests": [
             "TestASTFPAExtremaDeclarationsAndNumericBranches"
           ]
+        },
+        {
+          "name": "Concrete is_rm_numeral five-kind mapping and fp.sqrt/fp.roundToIntegral rounding-mode unary declarations (fpa_decl_plugin.cpp:141-168,393-412)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_rm_unary_decl.go",
+          "tests": [
+            "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup"
+          ]
         }
       ],
       "ownership": [
@@ -17635,7 +17646,8 @@
         "pkg/ast/ast_fpa_scoped_values.go",
         "pkg/ast/ast_fpa_scoped_values_source_test.go",
         "pkg/ast/ast_fpa_numeral_probe.go",
-        "pkg/ast/ast_fpa_numeral_probe_test.go"
+        "pkg/ast/ast_fpa_numeral_probe_test.go",
+        "pkg/ast/ast_fpa_rounding_read.go"
       ],
       "tests": [
         "TestASTFloatingPointScopedValueNativeGrowthAndDefaults",
@@ -17647,7 +17659,8 @@
         "TestASTFloatingPointSpecialConstructorsScopedValue",
         "TestASTFloatingPointConstructorDestructorFailureClearsResult",
         "TestASTFloatingPointSpecialNaNFailureRetainsScalar",
-        "TestASTFloatingPointSignedZeroSortOverloads"
+        "TestASTFloatingPointSignedZeroSortOverloads",
+        "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup"
       ],
       "conditionals": [
         {
@@ -17755,6 +17768,14 @@
           "tests": [
             "TestASTFloatingPointRoundingDeclarationsAndApplications",
             "TestASTFloatingPointRoundingValidationOrder"
+          ]
+        },
+        {
+          "name": "Retained is_rm_numeral value query used by sqrt and roundToIntegral reducers (fpa_decl_plugin.h:192-193,249-250)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_rounding_read.go",
+          "tests": [
+            "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup"
           ]
         }
       ],
@@ -26727,12 +26748,16 @@
         "pkg/ast/ast_fpa_remainder.go",
         "pkg/ast/rewriter/fpa_remainder.go",
         "pkg/ast/ast_fpa_extrema.go",
-        "pkg/ast/rewriter/fpa_extrema.go"],
+        "pkg/ast/rewriter/fpa_extrema.go",
+        "pkg/ast/ast_fpa_rm_unary.go",
+        "pkg/ast/rewriter/fpa_rm_unary.go"],
       "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestASTFPAUnaryScopedNumeralRetiresBeforeReturn", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
         "TestASTFPARemainderFiniteNumeralAndScopedCleanup",
         "TestFPARemainderNumericSpecialAndSymbolicRefusal",
         "TestASTFPAExtremaDeclarationsAndNumericBranches",
-        "TestFPAExtremaNaNInfinitySignedZeroAndSymbolic"],
+        "TestFPAExtremaNaNInfinitySignedZeroAndSymbolic",
+        "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup",
+        "TestFPARMUnarySqrtAndIntegralDispatch"],
       "assertions": [
         {
           "line": 43,
@@ -27001,6 +27026,15 @@
             "TestASTFPAExtremaDeclarationsAndNumericBranches",
             "TestFPAExtremaNaNInfinitySignedZeroAndSymbolic"
           ]
+        },
+        {
+          "name": "mk_sqrt/mk_round_to_integral rounding-mode guard, scoped operand/result numerals, numeric reductions and symbolic refusal (fpa_rewriter.cpp:433-466)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_rm_unary.go",
+          "tests": [
+            "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup",
+            "TestFPARMUnarySqrtAndIntegralDispatch"
+          ]
         }
       ],
       "ownership": ["Each classification call creates one caller-local scoped_mpf through the AST plugin's concrete numeral probe; successful source destruction retires it before the Boolean result is published. A stopped source destructor remains in the AST plugin's owning cleanup list.", "SMT and IEEE equality construct both scoped_mpf locals before operand probing and retire them in reverse order, preserving the short circuit when the first operand is symbolic."],
@@ -27013,10 +27047,12 @@
       "status": "partial",
       "go_targets": ["pkg/ast/rewriter/fpa_classification.go",
         "pkg/ast/rewriter/fpa_remainder.go",
-        "pkg/ast/rewriter/fpa_extrema.go"],
+        "pkg/ast/rewriter/fpa_extrema.go",
+        "pkg/ast/rewriter/fpa_rm_unary.go"],
       "tests": ["TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
         "TestFPARemainderNumericSpecialAndSymbolicRefusal",
-        "TestFPAExtremaNaNInfinitySignedZeroAndSymbolic"],
+        "TestFPAExtremaNaNInfinitySignedZeroAndSymbolic",
+        "TestFPARMUnarySqrtAndIntegralDispatch"],
       "conditionals": [
         {
           "line": 19,
@@ -27044,6 +27080,14 @@
           "go_target": "pkg/ast/rewriter/fpa_extrema.go",
           "tests": [
             "TestFPAExtremaNaNInfinitySignedZeroAndSymbolic"
+          ]
+        },
+        {
+          "name": "Concrete mk_sqrt/mk_round_to_integral declarations and reached dispatch (fpa_rewriter.h; fpa_rewriter.cpp:72-73,433-466)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_rm_unary.go",
+          "tests": [
+            "TestFPARMUnarySqrtAndIntegralDispatch"
           ]
         }],
       "ownership": [],
@@ -178411,7 +178455,8 @@
         "pkg/math/interval/arbitrary_root_scratch_cleanup_test.go",
         "pkg/math/subpaving/hardware_split.go",
         "pkg/ast/ast_fpa_remainder.go",
-        "pkg/ast/ast_fpa_extrema.go"
+        "pkg/ast/ast_fpa_extrema.go",
+        "pkg/ast/ast_fpa_rm_unary.go"
       ],
       "tests": [
         "TestScopedNumeralSourceTstScoped",
@@ -178507,7 +178552,8 @@
         "TestArbitraryRootScratchStoppedSourceSuffixAndOwningRetry",
         "TestHardwareMidpointSplitterRetainedBranchesAndRefusal",
         "TestASTFPARemainderFiniteNumeralAndScopedCleanup",
-        "TestASTFPAExtremaDeclarationsAndNumericBranches"
+        "TestASTFPAExtremaDeclarationsAndNumericBranches",
+        "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup"
       ],
       "conditionals": [
         {
@@ -178842,6 +178888,14 @@
           "go_target": "pkg/ast/ast_fpa_extrema.go",
           "tests": [
             "TestASTFPAExtremaDeclarationsAndNumericBranches"
+          ]
+        },
+        {
+          "name": "Concrete mk_sqrt/mk_round_to_integral operand and result scoped_mpf lifetimes after rounding-mode guard (fpa_rewriter.cpp:433-466; scoped_numeral.h:24-33)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_rm_unary.go",
+          "tests": [
+            "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup"
           ]
         }
       ],

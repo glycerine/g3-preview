@@ -86,6 +86,20 @@ func (r *FPARewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out ast.
 		}
 		return r.fpaExtremum(left, right, kind, out)
 	}
+	if kind == ast.FPAOpSqrt || kind == ast.FPAOpRoundToIntegral {
+		if args.Count() != 2 {
+			return RewriteFailed, ast.ErrASTDomain
+		}
+		rm, err := args.At(0)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		value, err := args.At(1)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		return r.fpaRMUnary(rm, value, kind, out)
+	}
 	if kind >= ast.FPAOpEq && kind <= ast.FPAOpGe {
 		if args.Count() != 2 {
 			return RewriteFailed, ast.ErrASTDomain
