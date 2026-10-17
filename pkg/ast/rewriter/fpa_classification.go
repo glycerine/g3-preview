@@ -100,6 +100,19 @@ func (r *FPARewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out ast.
 		}
 		return r.fpaRMUnary(rm, value, kind, out)
 	}
+	if kind == ast.FPAOpFMA {
+		if args.Count() != 4 {
+			return RewriteFailed, ast.ErrASTDomain
+		}
+		var operands [4]ast.ASTHandle
+		for i := range operands {
+			operands[i], err = args.At(uint32(i))
+			if err != nil {
+				return RewriteFailed, err
+			}
+		}
+		return r.fpaFMA(operands[0], operands[1], operands[2], operands[3], out)
+	}
 	if kind >= ast.FPAOpEq && kind <= ast.FPAOpGe {
 		if args.Count() != 2 {
 			return RewriteFailed, ast.ErrASTDomain
