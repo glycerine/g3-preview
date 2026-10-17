@@ -79284,6 +79284,10 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "update_min_core (cpp1102-1108) and reassert_min_core (cpp1125-1140), including sat TRACE at cpp1130, have declarations/definitions but no production call in src/",
+          "status": "dead_deleted"
+        },
+        {
           "name": "simplify_clause_core and scope dispatch; select_watch_lit; select_learned_watch_lit (source367\u2013465); native Go sort over captured literal slice replaces hand-written heapsort",
           "status": "ported",
           "go_target": "pkg/sat/sat_solver_clause_core.go",
@@ -80671,6 +80675,10 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "update_min_core and reassert_min_core private declarations (h347-348) have no production call in src/",
+          "status": "dead_deleted"
+        },
         {
           "name": "Complete source135\u2013160 MkVar body on actual variable columns/watch lists/activity/queue and borrowed elimination todo",
           "status": "ported",
@@ -182754,6 +182762,10 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "sat_solver.cpp:1130 sat TRACE is unreachable because reassert_min_core has no production caller",
+          "status": "dead_deleted"
+        },
+        {
           "name": "UFBV raw-pointer identity TRACE at ufbv_rewriter.cpp:241,367 uses stable Go AST origin/slot/generation tokens",
           "status": "platform_replacement",
           "go_target": "pkg/tactic/ufbv/rewrite_identity_trace.go",
@@ -185166,6 +185178,10 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "sat_solver.cpp:1130 sat TRACE is unreachable because reassert_min_core has no production caller",
+          "status": "dead_deleted"
+        },
         {
           "name": "UFBV raw-pointer identity TRACE at ufbv_rewriter.cpp:241,367 uses stable Go AST origin/slot/generation tokens",
           "status": "platform_replacement",
