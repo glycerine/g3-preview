@@ -845,6 +845,18 @@ func (m *IntegerManager) SetLimbs(a *Int, digits []uint32) error {
 	ref := a.Cell
 	if ref == 0 || m.Cell(ref).Capacity < size {
 		if ref != 0 {
+			if modularSourceDebug {
+				d := diagnostic.BorrowProcessDebugContext()
+				enabled, e := diagnostic.SourceAssertionsEnabled(d)
+				if e != nil {
+					return e
+				}
+				if enabled && size <= 6 {
+					if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 326, "sz > m_init_cell_capacity"); e != nil {
+						return e
+					}
+				}
+			}
 			if e := m.free(ref); e != nil {
 				return e
 			}
@@ -854,7 +866,11 @@ func (m *IntegerManager) SetLimbs(a *Int, digits []uint32) error {
 			a.Cell = m.FailedNullRef
 		}
 		var e error
-		ref, e = m.Allocate(max(size, 6), size)
+		capacity := size
+		if a.Cell == m.FailedNullRef {
+			capacity = max(size, 6)
+		}
+		ref, e = m.Allocate(capacity, size)
 		if e != nil {
 			return e
 		}

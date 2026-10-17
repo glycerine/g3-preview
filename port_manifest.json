@@ -166380,6 +166380,7 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz.go",
           "tests": [
+            "TestIntegerDigitSetterSourceAssertionBeforeOldCellRelease",
             "TestIntegerSourceBug3",
             "TestIntegerSourceIntMinSubtraction",
             "TestIntegerConstructorOwnership",
@@ -168535,6 +168536,7 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz.go",
           "tests": [
+            "TestIntegerDigitSetterSourceAssertionBeforeOldCellRelease",
             "TestIntegerSourceBug3",
             "TestIntegerSourceIntMinSubtraction",
             "TestIntegerConstructorOwnership",
