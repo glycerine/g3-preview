@@ -2,6 +2,7 @@
 package sat
 
 import (
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/lbool"
 )
 
@@ -82,22 +83,54 @@ func (s *satSolverClauseLifecycle) checkMissedClauseVector(cs []StoredClauseRef)
 		}
 		if empty || unit {
 			s.traceMissedPropagation(c)
-			return ErrSATAssertion
-		} // source UNREACHABLE at actual dispatch.
+			if !satStorageSourceDebug {
+				return ErrSATAssertion
+			}
+			d := diagnostic.BorrowProcessDebugContext()
+			if !d.HasAssertionActions() {
+				return ErrSATAssertion
+			}
+			if e = d.UnreachableSource("src/sat/sat_solver.cpp", 3063); e != nil {
+				return e
+			}
+		}
 		if satStorageSourceDebug {
-			empty, e = s.clauseEmpty(c)
+			d := diagnostic.BorrowProcessDebugContext()
+			enabled, e := d.AssertionsEnabled()
 			if e != nil {
 				return e
 			}
-			if empty {
-				return ErrSATAssertion
+			if enabled {
+				empty, e = s.clauseEmpty(c)
+				if e != nil {
+					return e
+				}
+				if empty {
+					if !d.HasAssertionActions() {
+						return ErrSATAssertion
+					}
+					if e = diagnostic.DebugAssertionFailure(d, "src/sat/sat_solver.cpp", 3065, "!is_empty(c)"); e != nil {
+						return e
+					}
+				}
 			}
-			unit, e = s.clauseUnit(c)
+			enabled, e = d.AssertionsEnabled()
 			if e != nil {
 				return e
 			}
-			if unit {
-				return ErrSATAssertion
+			if enabled {
+				unit, e = s.clauseUnit(c)
+				if e != nil {
+					return e
+				}
+				if unit {
+					if !d.HasAssertionActions() {
+						return ErrSATAssertion
+					}
+					if e = diagnostic.DebugAssertionFailure(d, "src/sat/sat_solver.cpp", 3066, "!is_unit(c)"); e != nil {
+						return e
+					}
+				}
 			}
 		}
 	}

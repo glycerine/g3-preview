@@ -4,6 +4,8 @@ package sat
 import (
 	"errors"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestSATIntegrityCompleteSourceMethodsAndResourceOrder(t *testing.T) {
@@ -159,7 +161,7 @@ func TestSATIntegrityActualEnabledConsumerBindings(t *testing.T) {
 	p := l.propagation
 	before := p.limit.Steps
 	probing := g.conflict.dynamic.probing
-	debug, _, _ := satIntegrityActionFixture(t, "")
+	debug, _, _ := satIntegrityActionFixture(t, "T")
 	satOK(t, debug.EnableDebug("sat_propagate"))
 	satOK(t, debug.EnableDebug("sat_missed_prop"))
 	satOK(t, probing.propagate())
@@ -178,8 +180,13 @@ func TestSATIntegrityActualEnabledConsumerBindings(t *testing.T) {
 	satOK(t, l.checkMissedPropagation())
 	satOK(t, p.assign(1, satJustification{}))
 	satOK(t, p.assign(3, satJustification{}))
-	if e := l.checkMissedPropagation(); !errors.Is(e, ErrSATAssertion) {
-		t.Fatal("real missed unit in BOTH profiles", e)
+	if e := l.checkMissedPropagation(); satStorageSourceDebug {
+		var ex z3exception.DefaultException
+		if !errors.As(e, &ex) {
+			t.Fatal("real missed unit reached source UNREACHABLE", e)
+		}
+	} else if !errors.Is(e, ErrSATAssertion) {
+		t.Fatal("real missed unit release guard", e)
 	}
 	satGCAudit(t, g)
 }
@@ -188,7 +195,7 @@ func TestSATPropagateIndependentProcessAssertionTags(t *testing.T) {
 	g, _ := satGCFixture(t, 3)
 	l := g.lifecycle()
 	p := l.propagation
-	debug, _, _ := satIntegrityActionFixture(t, "")
+	debug, _, _ := satIntegrityActionFixture(t, "T")
 	before := p.limit.Steps
 	_, e := l.propagate(false)
 	satOK(t, e)
@@ -215,7 +222,8 @@ func TestSATPropagateIndependentProcessAssertionTags(t *testing.T) {
 	beforeMissed := p.limit.Steps
 	_, e = l.propagate(false)
 	if satStorageSourceDebug {
-		if !errors.Is(e, ErrSATAssertion) {
+		var ex z3exception.DefaultException
+		if !errors.As(e, &ex) {
 			t.Fatal("sat_missed_prop tag did not find the unattached unit clause", e)
 		}
 	} else {

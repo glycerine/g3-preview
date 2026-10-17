@@ -9,6 +9,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/lbool"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func TestSATSolverProbingCachedTryLitAndFailedBranchStatistic(t *testing.T) {
@@ -182,6 +183,7 @@ func TestSATSolverProbingMissedPropagationTruthTable(t *testing.T) {
 	for pattern := 0; pattern < 27; pattern++ {
 		t.Run(fmt.Sprint(pattern), func(t *testing.T) {
 			s, life := satProbingFixture(t, 3)
+			satIntegrityActionFixture(t, "T")
 			c, e := life.propagation.clauses.MkClause([]Literal{0, 2, 4}, true)
 			satOK(t, e)
 			satOK(t, life.pushClause(true, c))
@@ -209,7 +211,8 @@ func TestSATSolverProbingMissedPropagationTruthTable(t *testing.T) {
 			e = s.checkMissedPropagation()
 			bad := empty || unit
 			if bad {
-				if !errors.Is(e, ErrSATAssertion) {
+				var ex z3exception.DefaultException
+				if satStorageSourceDebug && !errors.As(e, &ex) || !satStorageSourceDebug && !errors.Is(e, ErrSATAssertion) {
 					t.Fatal(pattern, e)
 				}
 			} else {
