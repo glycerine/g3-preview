@@ -81,4 +81,8 @@ func TestMPNDivisionVerificationSourceActionAndAssertionSwitch(t *testing.T) {
 	if got := strings.Count(string(contents), "File: src/util/mpn.cpp\nLine: 216\nok\n"); got != 2 {
 		t.Fatal("source assertion count/order", got, string(contents))
 	}
+	serviceMust(t, d.Close())
+	if err := m.sourceVerifyDivision(view(10), view(2), view(5), view(0)); !errors.Is(err, arena.ErrClosed) || len(m.verificationScratch) != 0 {
+		t.Fatal("successful verification must read source assertion switch", err)
+	}
 }

@@ -84,15 +84,13 @@ func (m *NaturalManager) sourceVerifyDivision(a, b, q, r limbView) error {
 		ok = false
 	}
 	m.traceDivisionVerification(ok, out)
-	if !ok {
-		d := diagnostic.BorrowProcessDebugContext()
-		enabled, e := diagnostic.SourceAssertionsEnabled(d)
-		if e != nil {
-			return e
-		}
-		if enabled {
-			return diagnostic.DebugAssertionFailure(d, "src/util/mpn.cpp", 216, "ok")
-		}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil {
+		return e
+	}
+	if enabled && !ok {
+		return diagnostic.DebugAssertionFailure(d, "src/util/mpn.cpp", 216, "ok")
 	}
 	return nil
 }

@@ -161257,7 +161257,7 @@
           ]
         },
         {
-          "name": "div shared Algorithm D, internal early-return/all-zero guards, top-limb SASSERT and verification SASSERT actions; broader public span-domain/profile completion remains open",
+          "name": "div shared Algorithm D, internal early-return/all-zero guards, top-limb and verification SASSERT switch reads/actions; broader public span-domain/profile completion remains open",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpn_indexed.go",
           "tests": [
@@ -161911,7 +161911,7 @@
           ]
         },
         {
-          "name": "div shared Algorithm D, internal early-return/all-zero guards, top-limb SASSERT and verification SASSERT actions; broader public span-domain/profile completion remains open",
+          "name": "div shared Algorithm D, internal early-return/all-zero guards, top-limb and verification SASSERT switch reads/actions; broader public span-domain/profile completion remains open",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpn_indexed.go",
           "tests": [

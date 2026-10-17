@@ -100,13 +100,13 @@ func (m *NaturalManager) divide(a, b, q, r limbView) (bool, error) {
 	if allZero {
 		return false, diagnostic.BorrowProcessDebugContext().UnreachableSource("src/util/mpn.cpp", 174)
 	}
-	if b.read(nb-1) == 0 && diagnostic.DebugBuild {
+	if diagnostic.DebugBuild {
 		d := diagnostic.BorrowProcessDebugContext()
 		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return false, e
 		}
-		if enabled {
+		if enabled && b.read(nb-1) == 0 {
 			if e = diagnostic.DebugAssertionFailure(d, "src/util/mpn.cpp", 179, "denom[lden-1] != 0"); e != nil {
 				return false, e
 			}

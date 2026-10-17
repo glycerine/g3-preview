@@ -49,4 +49,10 @@ func TestNaturalSourceAllZeroDenominatorDebugAction(t *testing.T) {
 	if !errors.Is(err, arena.ErrBounds) || q[0] != 99 || r[0] != 88 || r[1] != 88 {
 		t.Fatal("disabled assertion must stop at first undefined shift", err, q, r)
 	}
+	serviceMust(t, d.Close())
+	q, r = []uint32{99}, []uint32{88}
+	_, err = n.divide(limbView{external: []uint32{7}, size: 1}, limbView{external: []uint32{3}, size: 1}, limbView{external: q, size: 1}, limbView{external: r, size: 1})
+	if !errors.Is(err, arena.ErrClosed) || q[0] != 99 || r[0] != 88 {
+		t.Fatal("valid denominator must read source assertion switch before output", err, q, r)
+	}
 }
