@@ -23,8 +23,8 @@ func (m *ArbitraryFloatManager) Mul(mode ArbitraryFloatRoundingMode, x, y, out *
 			cause = m.traceMulResult(out)
 		}
 	}()
-	if modularSourceDebug && (x.SBits() != y.SBits() || x.EBits() != y.EBits()) {
-		return ErrIntegerAssertion
+	if e := mpfSourceAssertion(x.SBits() == y.SBits() && x.EBits() == y.EBits(), 593, "x.sbits == y.sbits && x.ebits == y.ebits"); e != nil {
+		return e
 	}
 	if e := m.traceFloatDebugValueChecked("mul", "X = ", x, 595); e != nil {
 		return e

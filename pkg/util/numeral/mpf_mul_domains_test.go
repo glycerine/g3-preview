@@ -4,6 +4,8 @@ package numeral
 import (
 	"errors"
 	"math"
+	"os"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -69,6 +71,7 @@ func TestArbitraryFloatMulReachedUndefinedExponentAddition(t *testing.T) {
 }
 
 func TestArbitraryFloatMulDebugFormatGuardAndErasedMode(t *testing.T) {
+	d, log := bindMPNDebugActions(t, "TC")
 	m, _, b := mpfNumeralHelpersFixture(t)
 	var x, y, out ArbitraryFloat
 	serviceMust(t, m.MkZero(11, 53, false, &x))
@@ -77,15 +80,35 @@ func TestArbitraryFloatMulDebugFormatGuardAndErasedMode(t *testing.T) {
 	before, used := out, b.Used()
 	e := m.Mul(ArbitraryFloatRoundingMode(255), &x, &y, &out)
 	if modularSourceDebug {
-		if !errors.Is(e, ErrIntegerAssertion) || out != before || b.Used() != used || m.mul.manager != nil {
+		if !isMPNVerificationThrow(e) || out != before || b.Used() != used || m.mul.manager != nil {
 			t.Fatal("initial source format assertion", e, out)
 		}
+		contents, readErr := os.ReadFile(log.Name())
+		serviceMust(t, readErr)
+		want := "File: src/util/mpf.cpp\nLine: 593\nx.sbits == y.sbits && x.ebits == y.ebits\n"
+		if n := strings.Count(string(contents), want); n != 1 {
+			t.Fatal("source mul format assertion", n, string(contents))
+		}
+		serviceMust(t, m.Mul(ArbitraryFloatRoundingMode(255), &x, &y, &out))
+		zero, e := m.IsZero(&out)
+		serviceMust(t, e)
+		if !zero || !out.Sign() || out.EBits() != 11 || out.SBits() != 53 {
+			t.Fatal("Continue follows source zero shortcut", out)
+		}
+		serviceMust(t, d.EnableAssertions(false))
+		serviceMust(t, m.Mul(ArbitraryFloatRoundingMode(255), &x, &y, &out))
 	} else {
 		serviceMust(t, e)
 		zero, e := m.IsZero(&out)
 		serviceMust(t, e)
 		if !zero || !out.Sign() || out.EBits() != 11 || out.SBits() != 53 || m.mul.manager != nil {
 			t.Fatal("release format and rounding-mode erasure", out)
+		}
+	}
+	if modularSourceDebug {
+		serviceMust(t, d.Close())
+		if e := m.Mul(ArbitraryFloatNearestEven, &y, &y, &out); !errors.Is(e, arena.ErrClosed) {
+			t.Fatal("valid mul reads closed source assertion owner", e)
 		}
 	}
 	serviceMust(t, m.Del(&out))
