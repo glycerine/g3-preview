@@ -172522,7 +172522,7 @@
         },
         {
           "name": "selected SET_RAT ADD literal acquired local Copy before append; actual interrupted local retained and explicit exact owning abort",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/params/util_params_set_rat_source.go",
           "tests": [
             "TestParamsReferenceSetRatAppendRefusalRetainsActualLocal",
@@ -173284,7 +173284,7 @@
         },
         {
           "name": "selected SET_RAT ADD literal acquired local Copy before append; actual interrupted local retained and explicit exact owning abort",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/params/util_params_set_rat_source.go",
           "tests": [
             "TestParamsReferenceSetRatAppendRefusalRetainsActualLocal",
