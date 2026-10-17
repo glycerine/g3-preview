@@ -165,6 +165,7 @@ func (s *solverSetup) decomposeAndEliminate() (err error) {
 	aux, e := makeEquation(s.manager, coefficients, s.tmpXs, &newC, nil, nil,
 		s.asBuffer, s.bsBuffer, false, s.trace)
 	if e != nil {
+		s.pendingEq = aux
 		return e
 	}
 	s.pendingEq = aux

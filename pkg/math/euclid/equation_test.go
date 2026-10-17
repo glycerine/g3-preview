@@ -118,3 +118,30 @@ func TestEuclideanEquationHeaderRefusalPrecedesBufferMutation(t *testing.T) {
 	euclidMust(t, ib.Close())
 	euclidMust(t, rb.Close())
 }
+
+func TestEuclideanEquationFailedConstantCopyReleasesConstructedPrefix(t *testing.T) {
+	m := euclidNumeralManager(t)
+	z := m.Integers()
+	ib, e := numeral.NewScopedIntVector(z)
+	euclidMust(t, e)
+	rb, e := numeral.NewScopedRationalVector(m)
+	euclidMust(t, e)
+	euclidMust(t, ib.Resize(1))
+	var a numeral.Int
+	euclidMust(t, z.SetString(&a, "123456789012345678901"))
+	bad := numeral.Int{Val: 1, Cell: z.FailedRef}
+	before := m.BudgetField.Used()
+	eq, e := makeEquation(m, []numeral.Int{a}, []uint32{0}, &bad, nil, nil, ib, rb, true, nil)
+	if e == nil || eq != nil {
+		t.Fatal("failed constant copy must clean the partial equation", eq, e)
+	}
+	if m.BudgetField.Used() != before {
+		t.Fatal("partial equation header remained charged")
+	}
+	if got, e := z.String(&a); e != nil || got != "123456789012345678901" {
+		t.Fatal("input lost its independent value", got, e)
+	}
+	euclidMust(t, ib.Close())
+	euclidMust(t, rb.Close())
+	euclidMust(t, z.Del(&a))
+}

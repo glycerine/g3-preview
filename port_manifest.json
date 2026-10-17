@@ -35778,7 +35778,8 @@
           "tests": [
             "TestEuclideanEquationConstructionSortAndOwnedRelease",
             "TestEuclideanEquationHeaderRefusalPrecedesBufferMutation",
-            "TestEuclideanEquationUnsortedDecompositionBranch"
+            "TestEuclideanEquationUnsortedDecompositionBranch",
+            "TestEuclideanEquationFailedConstantCopyReleasesConstructedPrefix"
           ]
         },
         {

@@ -146,6 +146,7 @@ func (s *solverSetup) assertEquation(as []numeral.Int, xs []uint32, c *numeral.I
 	}
 	eq, e := makeEquation(s.manager, as, xs, c, bs, js, s.asBuffer, s.bsBuffer, true, s.trace)
 	if e != nil {
+		s.pendingEq = eq
 		s.stop = e
 		return e
 	}

@@ -39,7 +39,11 @@ func makeEquation(m *numeral.RationalManager, as []numeral.Int, xs []uint32, c *
 	eq.traceAllocated()
 	defer func() {
 		if err != nil {
-			err = errors.Join(err, eq.Close())
+			if closeErr := eq.Close(); closeErr != nil {
+				// The caller must retain an owner whose destruction stopped.
+				result = eq
+				err = errors.Join(err, closeErr)
+			}
 		}
 	}()
 	for i, x := range xs {

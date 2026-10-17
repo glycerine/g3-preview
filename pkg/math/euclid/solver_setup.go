@@ -212,6 +212,7 @@ func (s *solverSetup) addEquation(as []numeral.Int, xs []uint32, c *numeral.Int,
 	}
 	eq, e := makeEquation(s.manager, as, xs, c, bs, js, s.asBuffer, s.bsBuffer, sortJustifications, s.trace)
 	if e != nil {
+		s.pendingEq = eq
 		s.stop = e
 		return nil, e
 	}
