@@ -211,11 +211,7 @@ func (m *ASTManager) getSomeValue(r astNodeRef) (ASTHandle, error) {
 	if fid >= 0 && m.pluginAt(fid).present && m.pluginAt(fid).kind == astFloatingPointPlugin {
 		switch kind {
 		case 0:
-			decl, e := m.floatingPointSpecialDecl(astFPANaN, nil, m.external(r))
-			if e != nil {
-				return ASTHandle{}, e
-			}
-			value, e := m.mkApp(decl, nil)
+			value, e := m.floatingPointSomeValue(r)
 			return m.external(value), e
 		case 1:
 			value, e := m.mkFamilyApp(fid, astFPARMTowardZero, nil, nil)

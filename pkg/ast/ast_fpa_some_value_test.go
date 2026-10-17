@@ -42,4 +42,7 @@ func TestASTFloatingPointSomeValueSourceDefaults(t *testing.T) {
 	if customNaN != wantCustom || customNaN == nan {
 		t.Fatal("custom floating-point format default", customNaN, wantCustom, nan)
 	}
+	if m.floatingPointPlugin.numeralProbeFrames != nil {
+		t.Fatal("get_some_value retained a completed MPF local")
+	}
 }
