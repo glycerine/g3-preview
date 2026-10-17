@@ -48227,14 +48227,20 @@
       "path": "src/math/polynomial/polynomial_primes.h",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/math/polynomial/upolynomial_gcd_primes.go",
-        "pkg/math/polynomial/upolynomial_gcd_source_test.go"
+        "pkg/math/polynomial/upolynomial_gcd_source_test.go",
+        "pkg/math/polynomial/upolynomial_gcd_modular.go",
+        "pkg/math/polynomial/polynomial_gcd_univariate_modular.go",
+        "pkg/math/polynomial/polynomial_gcd_modular.go"
       ],
       "tests": [
         "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
-        "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime"
+        "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime",
+        "TestPolynomialGCDDefaultIntegerIndependentCommonFactors",
+        "TestPolynomialGCDDefaultIntegerCRAReconstruction",
+        "TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS"
       ],
       "conditionals": [
         {
@@ -48258,13 +48264,13 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "selected active ordered NUM_BIG_PRIMES231/g_big_primes table",
           "status": "ported",
-          "go_target": "pkg/math/polynomial/upolynomial_gcd_source_test.go",
+          "go_target": "pkg/math/polynomial/upolynomial_gcd_primes.go",
           "tests": [
             "TestUPolynomialModularGCDCRAAndAllPrimeFallback",
             "TestUPolynomialModularGCDUnluckyDegreeAndInitialBadPrime"
@@ -48272,10 +48278,12 @@
         }
       ],
       "ownership": [
-        "Immutable package-level scalar table; no per-entry roots or allocations. Coordinator compared all231 ordered literals directly with the preserved active source branch."
+        "Immutable package-level scalar table; no per-entry roots or allocations. Coordinator compared all231 ordered literals directly with the preserved active source branch.",
+        "Retained-unit completion audit: all 231 ordered active g_big_primes literals and active NUM_BIG_PRIMES=231 were directly compared against the Go [231]uint32 declaration without source hashing. The only source read consumers are upolynomial.cpp:750-751 and polynomial.cpp:3803-3804,4286-4302; their concrete Go counterparts all iterate upolyBigPrimes by value in original order (upolynomial_gcd_modular.go, polynomial_gcd_univariate_modular.go, polynomial_gcd_modular.go). The header has no functions, dynamic initializers, assertions, TRACE sites, per-entry allocations or ownership actions. The private fixed Go array is not exposed or mutated by retained consumers. Source-wide g_small_primes/NUM_SMALL_PRIMES searches find declarations only; this unused table is excluded by the live-consumer policy. The #if 0 alternative remains unselected and excluded. Focused reconstruction, unlucky/initial-bad-prime, and all-prime exhaustion/fallback checks run ordinary and checked/debug/trace on CPUs 8-16. This proves this retained constant-data unit, not the consuming GCD units or the overall polynomial/AST ports."
       ],
       "deviations": [
-        "Inactive #if0 alternative prime table remains inventoried and untranslated; selected active table is exact."
+        "Inactive #if0 alternative prime table remains inventoried and untranslated; selected active table is exact.",
+        "The active g_small_primes/NUM_SMALL_PRIMES declaration has no retained source consumer; excluded under AGENTS.md rather than adding unused Go data."
       ]
     },
     {
