@@ -17,6 +17,8 @@ type SimpleAlgebraicValues struct {
 	variables                []uint32
 	values                   *AlgebraicVector
 	header                   uint64
+	failedCopy               bool
+	failedIndex              int
 	running, closing, closed bool
 }
 
@@ -63,11 +65,25 @@ func (s *SimpleAlgebraicValues) Push(x uint32, v *Algebraic) error {
 	if e := s.check(); e != nil {
 		return e
 	}
+	if s.failedCopy {
+		return ErrAlgebraicPending
+	}
 	s.running = true
 	defer func() { s.running = false }()
-	// Preserve the published variable prefix when the subsequent value copy fails.
+	// Both source vectors publish their new slots before manager::set copies
+	// into the actual owning last element (scoped_numeral_vector.h:44-46).
 	s.variables = append(s.variables, x)
-	return s.values.PushCopy(v)
+	var zero Algebraic
+	if e := s.values.pushTake(&zero); e != nil {
+		return e
+	}
+	index := len(s.values.values) - 1
+	e := s.core.Copy(&s.values.values[index], v)
+	if e != nil {
+		s.failedCopy = true
+		s.failedIndex = index
+	}
+	return e
 }
 func (s *SimpleAlgebraicValues) Contains(x uint32) (bool, error) {
 	if e := s.check(); e != nil {
@@ -115,5 +131,30 @@ func (s *SimpleAlgebraicValues) Close() error {
 	s.core.config.Rationals.Budget().Release(s.header)
 	s.header = 0
 	s.closed = true
+	return nil
+}
+
+// CleanupRetained is an explicit owning acknowledgement of the actual failed
+// copy destination. It releases only that issued cell's constructed prefix;
+// it does not repair the source destructor or clean unrelated manager work.
+// Finish the core's retained numeric work before releasing this destination.
+func (s *SimpleAlgebraicValues) CleanupRetained() error {
+	if s == nil || s.self != s {
+		return ErrAlgebraicOwner
+	}
+	if s.closed {
+		return arena.ErrClosed
+	}
+	if s.running {
+		return ErrAlgebraicPending
+	}
+	if !s.failedCopy {
+		return nil
+	}
+	cell := &s.values.values[s.failedIndex]
+	if e := s.core.CleanupValue(cell); e != nil {
+		return e
+	}
+	s.failedCopy = false
 	return nil
 }
