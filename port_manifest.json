@@ -71637,8 +71637,8 @@
       "component": "parsers",
       "role": "production",
       "status": "partial",
-      "go_targets": ["pkg/parsers/smt2/local_environment.go", "pkg/parsers/smt2/local_lookup.go", "pkg/parsers/smt2/local_sort_stack.go", "pkg/parsers/smt2/local_expr_stack.go", "pkg/parsers/smt2/local_sort_names.go", "pkg/parsers/smt2/datatype_validation.go"],
-      "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders", "TestSMT2ParserQualifiedLocalSortAndIndexRefusals", "TestSMT2LocalReferenceStacksFrameShrinkAndReset", "TestSMT2QualifiedLocalExpressionOwnerAndFrameCleanup", "TestSMT2SortAndDatatypeNameTablesSourceScopes", "TestSMT2DatatypeNameChecksSourcePriorityAndPartialRewrite"],
+      "go_targets": ["pkg/parsers/smt2/local_environment.go", "pkg/parsers/smt2/local_lookup.go", "pkg/parsers/smt2/local_sort_stack.go", "pkg/parsers/smt2/local_expr_stack.go", "pkg/parsers/smt2/local_sort_names.go", "pkg/parsers/smt2/datatype_validation.go", "pkg/parsers/smt2/local_match_variable.go", "pkg/parsers/smt2/local_match_variable_test.go"],
+      "tests": ["TestSMT2ParserPushLocalShiftsFreeVariables", "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders", "TestSMT2ParserQualifiedLocalSortAndIndexRefusals", "TestSMT2LocalReferenceStacksFrameShrinkAndReset", "TestSMT2QualifiedLocalExpressionOwnerAndFrameCleanup", "TestSMT2SortAndDatatypeNameTablesSourceScopes", "TestSMT2DatatypeNameChecksSourcePriorityAndPartialRewrite", "TestSMT2MatchVariableSourceBindingLevelAndCaseScope"],
       "assertions": [
         {
           "line": 250,
@@ -72152,6 +72152,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "parse_match_pattern non-constructor variable inserts a borrowed local at the pre-increment binding level after pushing its owned var (smt2parser.cpp:1499-1510)",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/local_match_variable.go",
+          "tests": ["TestSMT2MatchVariableSourceBindingLevelAndCaseScope"]
+        },
         {
           "name": "push_local and parse_expr_name selected local-binding branch: borrowed ground/same-level term or source var_shifter free-index adjustment, then owning expression-stack reference (smt2parser.cpp:1695-1721)",
           "status": "ported",
@@ -183170,7 +183176,9 @@
         "pkg/parsers/smt2/local_environment.go",
         "pkg/parsers/smt2/local_let.go",
         "pkg/parsers/smt2/local_lookup.go",
-        "pkg/parsers/smt2/local_sorted_vars.go"
+        "pkg/parsers/smt2/local_sorted_vars.go",
+        "pkg/parsers/smt2/local_match_variable.go",
+        "pkg/parsers/smt2/local_match_variable_test.go"
       ],
       "tests": [
         "TestFamilySourceRegistrationAndQueries",
@@ -183181,7 +183189,8 @@
         "TestSMT2SortedVariablesSourceAssertionReadsProcessDebugAndRollsBack",
         "TestSMT2ParserPushLocalShiftsFreeVariables",
         "TestSMT2ParserPushLocalRespectsNestedQuantifierBinders",
-        "TestSMT2ParserQualifiedLocalSortAndIndexRefusals"
+        "TestSMT2ParserQualifiedLocalSortAndIndexRefusals",
+        "TestSMT2MatchVariableSourceBindingLevelAndCaseScope"
       ],
       "conditionals": [
         {
@@ -183224,6 +183233,12 @@
           "status": "partial",
           "go_target": "pkg/parsers/smt2/local_environment.go",
           "tests": ["TestSMT2LocalSymbolTableNestedAndRepeatedBindings"]
+        },
+        {
+          "name": "SMT2 parse_match_pattern named non-constructor branch inserts a borrowed var at the pre-increment binding level within its case scope (smt2parser.cpp:1499-1510)",
+          "status": "ported",
+          "go_target": "pkg/parsers/smt2/local_match_variable.go",
+          "tests": ["TestSMT2MatchVariableSourceBindingLevelAndCaseScope"]
         },
         {
           "name": "SMT2 parser local<expr*,level> reset discards bindings and open scopes at smt2parser.cpp:3003",
