@@ -119,27 +119,39 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 		return e
 	}
 	if modularSourceDebug {
-		p, e := s.power(x.SBits())
+		enabled, e := mpfSourceAssertionsEnabled()
 		if e != nil {
 			return e
 		}
-		c, e := m.integer.Compare(&s.a.significand, &p)
+		if enabled {
+			p, e := s.power(x.SBits())
+			if e != nil {
+				return e
+			}
+			c, e := m.integer.Compare(&s.a.significand, &p)
+			if e != nil {
+				return e
+			}
+			if e := mpfSourceAssertion(c < 0, 1102, "m_mpz_manager.lt(a.significand(), m_powers2(x.sbits))"); e != nil {
+				return e
+			}
+		}
+		enabled, e = mpfSourceAssertionsEnabled()
 		if e != nil {
 			return e
 		}
-		if e := mpfSourceAssertion(c < 0, 1102, "m_mpz_manager.lt(a.significand(), m_powers2(x.sbits))"); e != nil {
-			return e
-		}
-		p, e = s.power(x.SBits() - 1)
-		if e != nil {
-			return e
-		}
-		c, e = m.integer.Compare(&s.a.significand, &p)
-		if e != nil {
-			return e
-		}
-		if e := mpfSourceAssertion(c >= 0, 1103, "m_mpz_manager.ge(a.significand(), m_powers2(x.sbits - 1))"); e != nil {
-			return e
+		if enabled {
+			p, e := s.power(x.SBits() - 1)
+			if e != nil {
+				return e
+			}
+			c, e := m.integer.Compare(&s.a.significand, &p)
+			if e != nil {
+				return e
+			}
+			if e := mpfSourceAssertion(c >= 0, 1103, "m_mpz_manager.ge(a.significand(), m_powers2(x.sbits - 1))"); e != nil {
+				return e
+			}
 		}
 	}
 	out.exponent = s.a.exponent
@@ -230,16 +242,22 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 		return e
 	}
 	if modularSourceDebug {
-		p, e := s.power(out.SBits() - 1)
+		enabled, e := mpfSourceAssertionsEnabled()
 		if e != nil {
 			return e
 		}
-		c, e := m.integer.Compare(&out.significand, &p)
-		if e != nil {
-			return e
-		}
-		if e := mpfSourceAssertion(c >= 0, 1156, "m_mpz_manager.ge(o.significand, m_powers2(o.sbits - 1))"); e != nil {
-			return e
+		if enabled {
+			p, e := s.power(out.SBits() - 1)
+			if e != nil {
+				return e
+			}
+			c, e := m.integer.Compare(&out.significand, &p)
+			if e != nil {
+				return e
+			}
+			if e := mpfSourceAssertion(c >= 0, 1156, "m_mpz_manager.ge(o.significand, m_powers2(o.sbits - 1))"); e != nil {
+				return e
+			}
 		}
 	}
 	for {

@@ -23,6 +23,13 @@ func mpfSourceAssertion(predicate bool, line int32, expression string) error {
 	return nil
 }
 
+func mpfSourceAssertionsEnabled() (bool, error) {
+	if !modularSourceDebug {
+		return false, nil
+	}
+	return diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+}
+
 // ToDouble follows the source uint64 significand read, signed shifts, exponent
 // classification, and memcpy bit interpretation. Cached bounds keep their
 // existing exact persistent Power owner; this body declares no source NUM.
