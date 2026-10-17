@@ -216,7 +216,6 @@ func TestNaturalInvalidPreconditions(t *testing.T) {
 		func() { m.Sub([]uint32{1}, nil, nil) },
 		func() { m.Mul([]uint32{1}, []uint32{2}, nil) },
 		func() { m.Div([]uint32{1}, []uint32{0}, []uint32{0}, []uint32{0}) },
-		func() { m.Div([]uint32{1}, []uint32{1, 1}, nil, make([]uint32, 2)) },
 	}
 	for i, call := range cases {
 		func() {

@@ -117,6 +117,32 @@ func TestNaturalSourceShortNumeratorEarlyReturn(t *testing.T) {
 	}
 }
 
+func TestNaturalPublicShortNumeratorSourceWrites(t *testing.T) {
+	n := naturalManager(t)
+	state, stats := n.RuntimeOwner().State(), n.RuntimeOwner().Stats()
+	n.budget.FailAfter(0)
+	defer n.budget.FailAfter(-1)
+	r := []uint32{99, 99}
+	branch, err := n.Div([]uint32{7}, []uint32{0, 0}, nil, r)
+	if err != nil || branch || r[0] != 7 || r[1] != 0 {
+		t.Fatal("public short-numerator branch precedes denominator validation", branch, err, r)
+	}
+	q := []uint32{99}
+	one := []uint32{88}
+	branch, err = n.Div(nil, []uint32{0}, q, one)
+	if err != nil || branch || q[0] != 99 || one[0] != 0 {
+		t.Fatal("empty numerator leaves zero-length quotient untouched", branch, err, q, one)
+	}
+	r = []uint32{88, 88, 88}
+	branch, err = n.Div([]uint32{7}, []uint32{0, 0, 0}, q, r)
+	if !errors.Is(err, arena.ErrBounds) || branch || q[0] != 0 || r[0] != 88 || r[1] != 88 || r[2] != 88 {
+		t.Fatal("wrapped quotient length stops at first out-of-bounds write", branch, err, q, r)
+	}
+	if n.RuntimeOwner().State() != state || n.RuntimeOwner().Stats() != stats {
+		t.Fatal("short source branch acquired Runtime storage")
+	}
+}
+
 func TestNaturalSourceAllZeroDenominatorStopsBeforeOutputs(t *testing.T) {
 	if modularSourceDebug {
 		t.Skip("debug UNREACHABLE action is checked with an explicit process binding")
