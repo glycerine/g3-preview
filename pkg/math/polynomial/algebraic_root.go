@@ -50,6 +50,7 @@ type algebraicLocation struct {
 }
 type AlgebraicRootCore struct {
 	manager                                                    *AlgebraicManager
+	coefficientCopy                                            unumeral.IntegerCopyAllocationReceipt
 	zero                                                       unumeral.Rational
 	rootConstruction                                           algebraicRootConstructionScope
 	isolationSigns                                             algebraicIsolationSignsScope
@@ -612,6 +613,9 @@ func (m *AlgebraicRootCore) SetTake(a *Algebraic, q *unumeral.Rational) error {
 	return nil
 }
 func (m *AlgebraicRootCore) copyPolynomial(l *algebraicLocation, r *algebraicRecord, v UPolynomialView) error {
+	if m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.coefficientCopy) {
+		return ErrAlgebraicPending
+	}
 	r.size = v.count
 	l.coefficientInitialized = 0
 	l.coefficientCursor = 0
@@ -642,7 +646,7 @@ func (m *AlgebraicRootCore) copyPolynomial(l *algebraicLocation, r *algebraicRec
 		if e != nil {
 			return e
 		}
-		if e = m.config.Rationals.Integers().Copy(&p.values(&d.state)[i], a); e != nil {
+		if e = m.config.Rationals.Integers().CopyFromOwnerWithReceipt(&p.values(&d.state)[i], m.config.Rationals.Integers(), a, &m.coefficientCopy); e != nil {
 			return e
 		}
 	}
@@ -819,6 +823,9 @@ func (m *AlgebraicRootCore) SetRoot(a *Algebraic, p UPolynomialView, lower, uppe
 	return nil
 }
 func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
+	if m != nil && m.self == m && m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.coefficientCopy) {
+		return ErrAlgebraicPending
+	}
 	sl, e := m.location(src)
 	if e != nil {
 		return e
@@ -959,6 +966,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	}
 	if m == nil || m.self != m || m.closed {
 		return ErrAlgebraicOwner
+	}
+	if e := m.config.Rationals.Integers().CleanupCopyAllocationInvocation(&m.coefficientCopy); e != nil {
+		return e
 	}
 	if e := m.cleanupResultantPolynomial(); e != nil {
 		return e

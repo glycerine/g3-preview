@@ -107,7 +107,7 @@ func TestSimpleAlgebraicValuesMissingAndFailedPushPrefix(t *testing.T) {
 }
 
 func TestSimpleAlgebraicValuesCopyReservationPrefixes(t *testing.T) {
-	success, retained, stopped := false, false, false
+	success, retained, stopped, ownedReceipt := false, false, false, false
 	for ordinal := int64(0); ordinal < 256 && !success; ordinal++ {
 		t.Run(strconv.FormatInt(ordinal, 10), func(t *testing.T) {
 			c, up, _ := algebraicCompareFixture(t)
@@ -173,11 +173,19 @@ func TestSimpleAlgebraicValuesCopyReservationPrefixes(t *testing.T) {
 					}
 				}
 			}
-			// This isolated fixture owns both borrowed allocators; all pending
-			// allocations here were issued by this copy. This is explicit
-			// caller acknowledgement, not authority granted to the mapping.
-			serviceMust(t, z.CleanupPendingAllocation())
+			// The fixture separately owns the cell allocator; its pending block
+			// can precede the numeric coefficient child. This explicit caller
+			// acknowledgement grants no allocator authority to the mapping.
+			// Coefficient-copy storage is acknowledged by the core
+			// through its actual issued receipt; no global integer cleanup.
 			serviceMust(t, c.config.Allocator.CleanupPending())
+			if z.MatchesCopyAllocationInvocation(&c.coefficientCopy) {
+				ownedReceipt = true
+				var untouched Algebraic
+				if e := c.Copy(&untouched, &root); !errors.Is(e, ErrAlgebraicPending) || untouched != (Algebraic{}) {
+					t.Fatal("pending copy replaced its own receipt", e)
+				}
+			}
 			serviceMust(t, c.CleanupRetained())
 			serviceMust(t, values.CleanupRetained())
 			serviceMust(t, values.Close())
@@ -203,7 +211,7 @@ func TestSimpleAlgebraicValuesCopyReservationPrefixes(t *testing.T) {
 			return
 		}
 	}
-	if !success || !retained || !stopped {
-		t.Fatal("missing success/published partial-root/stopped-destructor frontier", success, retained, stopped)
+	if !success || !retained || !stopped || !ownedReceipt {
+		t.Fatal("missing success/published partial-root/stopped-destructor/issued-receipt frontier", success, retained, stopped, ownedReceipt)
 	}
 }
