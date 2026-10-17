@@ -23,20 +23,24 @@ func (m *ArbitraryFloatManager) ToSBVMPQ(mode ArbitraryFloatRoundingMode, x *Arb
 	if e := m.rational.checkSetter(out); e != nil {
 		return e
 	}
-	if modularSourceDebug {
+	assertionsEnabled, e := mpfSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if assertionsEnabled {
 		nan, e := m.IsNaN(x)
 		if e != nil {
 			return e
 		}
-		if nan {
-			return ErrIntegerAssertion
+		inf := false
+		if !nan {
+			inf, e = m.IsInf(x)
+			if e != nil {
+				return e
+			}
 		}
-		inf, e := m.IsInf(x)
-		if e != nil {
+		if e := mpfSourceAssertion(!nan && !inf, 1184, "!is_nan(x) && !is_inf(x)"); e != nil {
 			return e
-		}
-		if inf {
-			return ErrIntegerAssertion
 		}
 	}
 	s := &m.sbv
@@ -71,8 +75,8 @@ func (s *arbitraryFloatSBVScope) run(mode ArbitraryFloatRoundingMode, x *Arbitra
 	if e := m.unpackRationalNumeral(&s.a, true, c); e != nil {
 		return e
 	}
-	if modularSourceDebug && s.a.exponent >= math.MaxInt32 {
-		return ErrIntegerAssertion
+	if e := mpfSourceAssertion(s.a.exponent < math.MaxInt32, 1192, "t.exponent() < INT_MAX"); e != nil {
+		return e
 	}
 	if e := z.copyFromOwnerWithAllocationContext(&s.z, z, &s.a.significand, &s.copyZ, c); e != nil {
 		return e

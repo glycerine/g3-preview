@@ -156847,6 +156847,7 @@
         "pkg/util/numeral/mpf_rem_special_test.go",
         "pkg/util/numeral/mpf_rem_child_test.go",
         "pkg/util/numeral/mpf_to_mpz.go",
+        "pkg/util/numeral/mpf_bitvector_assertion_source_test.go",
         "pkg/util/numeral/mpf_to_mpz_scope.go",
         "pkg/util/numeral/mpf_to_mpz_test.go",
         "pkg/util/numeral/mpf_to_mpz_failure_test.go",
@@ -157126,12 +157127,14 @@
         "TestArbitraryFloatRemWarmChildrenAndLaterInvocation",
         "TestArbitraryFloatToMPZIndependentTruncationAndOwners",
         "TestArbitraryFloatToMPZSourceBitFieldExponentAndOverflowPrefix",
+        "TestArbitraryFloatToMPZSourceAssertionAction",
         "TestArbitraryFloatToMPZEveryColdReservationAndOwners",
         "TestArbitraryFloatToMPZWarmInlineAndEndedContext",
         "TestArbitraryFloatToMPZForeignTransportAndBothOwners",
         "TestArbitraryFloatToSBVMPQUnpackTransportAndOwnerGuards",
         "TestArbitraryFloatToSBVMPQEveryColdReservationAndOutputPrefix",
         "TestArbitraryFloatToSBVMPQWarmInlineAndModeBranchAuthority",
+        "TestArbitraryFloatToSBVMPQSourceAssertionSites",
         "TestArbitraryFloatToSBVMPQReachedExponentOverflow",
         "TestArbitraryFloatToSBVMPQIndependentRoundingOracle",
         "TestArbitraryFloatToIEEEBVWarmAuthorityAndLiteralAlias",
@@ -158145,6 +158148,7 @@
           "tests": [
             "TestArbitraryFloatToMPZIndependentTruncationAndOwners",
             "TestArbitraryFloatToMPZSourceBitFieldExponentAndOverflowPrefix",
+            "TestArbitraryFloatToMPZSourceAssertionAction",
             "TestArbitraryFloatToMPZEveryColdReservationAndOwners",
             "TestArbitraryFloatToMPZWarmInlineAndEndedContext",
             "TestArbitraryFloatToMPZForeignTransportAndBothOwners"
@@ -158158,6 +158162,7 @@
             "TestArbitraryFloatToSBVMPQUnpackTransportAndOwnerGuards",
             "TestArbitraryFloatToSBVMPQEveryColdReservationAndOutputPrefix",
             "TestArbitraryFloatToSBVMPQWarmInlineAndModeBranchAuthority",
+            "TestArbitraryFloatToSBVMPQSourceAssertionSites",
             "TestArbitraryFloatToSBVMPQReachedExponentOverflow",
             "TestArbitraryFloatToSBVMPQIndependentRoundingOracle"
           ]
@@ -158549,6 +158554,7 @@
         "pkg/util/numeral/mpf_rem_special_test.go",
         "pkg/util/numeral/mpf_rem_child_test.go",
         "pkg/util/numeral/mpf_to_mpz.go",
+        "pkg/util/numeral/mpf_bitvector_assertion_source_test.go",
         "pkg/util/numeral/mpf_to_mpz_scope.go",
         "pkg/util/numeral/mpf_to_mpz_test.go",
         "pkg/util/numeral/mpf_to_mpz_failure_test.go",
@@ -158741,12 +158747,14 @@
         "TestArbitraryFloatRemWarmChildrenAndLaterInvocation",
         "TestArbitraryFloatToMPZIndependentTruncationAndOwners",
         "TestArbitraryFloatToMPZSourceBitFieldExponentAndOverflowPrefix",
+        "TestArbitraryFloatToMPZSourceAssertionAction",
         "TestArbitraryFloatToMPZEveryColdReservationAndOwners",
         "TestArbitraryFloatToMPZWarmInlineAndEndedContext",
         "TestArbitraryFloatToMPZForeignTransportAndBothOwners",
         "TestArbitraryFloatToSBVMPQUnpackTransportAndOwnerGuards",
         "TestArbitraryFloatToSBVMPQEveryColdReservationAndOutputPrefix",
         "TestArbitraryFloatToSBVMPQWarmInlineAndModeBranchAuthority",
+        "TestArbitraryFloatToSBVMPQSourceAssertionSites",
         "TestArbitraryFloatToSBVMPQReachedExponentOverflow",
         "TestArbitraryFloatToSBVMPQIndependentRoundingOracle",
         "TestArbitraryFloatToIEEEBVWarmAuthorityAndLiteralAlias",
@@ -159266,6 +159274,7 @@
           "tests": [
             "TestArbitraryFloatToMPZIndependentTruncationAndOwners",
             "TestArbitraryFloatToMPZSourceBitFieldExponentAndOverflowPrefix",
+            "TestArbitraryFloatToMPZSourceAssertionAction",
             "TestArbitraryFloatToMPZEveryColdReservationAndOwners",
             "TestArbitraryFloatToMPZWarmInlineAndEndedContext",
             "TestArbitraryFloatToMPZForeignTransportAndBothOwners"
@@ -159279,6 +159288,7 @@
             "TestArbitraryFloatToSBVMPQUnpackTransportAndOwnerGuards",
             "TestArbitraryFloatToSBVMPQEveryColdReservationAndOutputPrefix",
             "TestArbitraryFloatToSBVMPQWarmInlineAndModeBranchAuthority",
+            "TestArbitraryFloatToSBVMPQSourceAssertionSites",
             "TestArbitraryFloatToSBVMPQReachedExponentOverflow",
             "TestArbitraryFloatToSBVMPQIndependentRoundingOracle"
           ]

@@ -21,14 +21,21 @@ func (m *ArbitraryFloatManager) ToIEEEBVMPZ(x *ArbitraryFloat, out *Int) (cause 
 	if e := m.integer.check(out); e != nil {
 		return e
 	}
-	if modularSourceDebug {
+	assertionsEnabled, e := mpfSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if assertionsEnabled {
 		nan, e := m.IsNaN(x)
 		if e != nil {
 			return e
 		}
-		if nan || x.exponent >= math.MaxInt32 {
-			return ErrIntegerAssertion
+		if e := mpfSourceAssertion(!nan, 1229, "!is_nan(x)"); e != nil {
+			return e
 		}
+	}
+	if e := mpfSourceAssertion(x.exponent < math.MaxInt32, 1230, "exp(x) < INT_MAX"); e != nil {
+		return e
 	}
 	s := &m.ieeeBV
 	if s.invocation == ^uint64(0) {

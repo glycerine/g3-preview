@@ -4,6 +4,8 @@ package numeral
 import (
 	"errors"
 	"math"
+	"os"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -71,19 +73,30 @@ func TestArbitraryFloatBiasExpIndependentBounds(t *testing.T) {
 }
 
 func TestArbitraryFloatToIEEEBVSourceAssertionsAndBiasOverflow(t *testing.T) {
+	var logFile *os.File
+	if modularSourceDebug {
+		_, logFile = bindMPNDebugActions(t, "TT")
+	}
 	m, _, _ := mpfNumeralHelpersFixture(t)
 	out := NewInt(7)
 	if modularSourceDebug {
 		var x ArbitraryFloat
 		serviceMust(t, m.MkNaN(8, 24, &x, nil))
 		before := m.ieeeBV.invocation
-		if e := m.ToIEEEBVMPZ(&x, &out); !errors.Is(e, ErrIntegerAssertion) || out != NewInt(7) || m.ieeeBV.invocation != before || m.ieeeBV.active || m.ieeeBV.biasedExpLive {
+		if e := m.ToIEEEBVMPZ(&x, &out); !isMPNVerificationThrow(e) || out != NewInt(7) || m.ieeeBV.invocation != before || m.ieeeBV.active || m.ieeeBV.biasedExpLive {
 			t.Fatal("NaN assertion must precede scope", e, out)
 		}
 		serviceMust(t, m.Del(&x))
 		x = ArbitraryFloat{format: arbitraryFloatFormat(32, 24, false), exponent: math.MaxInt32, significand: NewInt(0)}
-		if e := m.ToIEEEBVMPZ(&x, &out); !errors.Is(e, ErrIntegerAssertion) || out != NewInt(7) || m.ieeeBV.invocation != before || m.ieeeBV.active || m.ieeeBV.biasedExpLive {
+		if e := m.ToIEEEBVMPZ(&x, &out); !isMPNVerificationThrow(e) || out != NewInt(7) || m.ieeeBV.invocation != before || m.ieeeBV.active || m.ieeeBV.biasedExpLive {
 			t.Fatal("exponent assertion before output SET", e, out)
+		}
+		contents, e := os.ReadFile(logFile.Name())
+		serviceMust(t, e)
+		for _, site := range []string{"Line: 1229\n!is_nan(x)\n", "Line: 1230\nexp(x) < INT_MAX\n"} {
+			if n := strings.Count(string(contents), site); n != 1 {
+				t.Fatal("source IEEE bit-vector assertion site", site, n, string(contents))
+			}
 		}
 	} else {
 		x := ArbitraryFloat{format: arbitraryFloatFormat(63, 24, false), exponent: math.MaxInt64, significand: NewInt(0)}

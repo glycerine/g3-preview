@@ -26,8 +26,8 @@ func (m *ArbitraryFloatManager) ToMPZ(x *ArbitraryFloat, output *IntegerManager,
 	if e := output.check(out); e != nil {
 		return e
 	}
-	if modularSourceDebug && x.exponent >= math.MaxInt32 {
-		return ErrIntegerAssertion
+	if e := mpfSourceAssertion(x.exponent < math.MaxInt32, 1172, "x.exponent < INT_MAX"); e != nil {
+		return e
 	}
 	s := &m.toMPZ
 	if s.invocation == ^uint64(0) {
