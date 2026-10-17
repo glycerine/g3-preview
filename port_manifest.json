@@ -4314,9 +4314,9 @@
       "path": "src/api/api_numeral.cpp",
       "component": "api",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/api/api_numeral_string.go", "pkg/api/api_numeral_string_test.go", "pkg/ast/ast_fpa_api_numeral_text.go", "pkg/ast/ast_fpa_api_numeral_text_test.go"],
+      "tests": ["TestAPINumeralStringArithmeticFPAAndRefusal", "TestASTFPANumeralStringAPIScopedMPFAndBranches"],
       "assertions": [
         {
           "line": 337,
@@ -4325,7 +4325,15 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Selected Z3_get_numeral_string arithmetic rational and FPA rounding-mode/MPF fallback with caller-local scoped_mpf and temporary formatted text (api_numeral.cpp:187-228); BV/datalog and external C string integration remain open",
+          "status": "partial",
+          "go_target": "pkg/api/api_numeral_string.go",
+          "go_targets": ["pkg/ast/ast_fpa_api_numeral_text.go"],
+          "tests": ["TestAPINumeralStringArithmeticFPAAndRefusal", "TestASTFPANumeralStringAPIScopedMPFAndBranches"]
+        }
+      ],
       "ownership": [],
       "deviations": []
     },
@@ -159487,7 +159495,11 @@
         "pkg/ast/ast_fpa_plugin.go",
         "pkg/ast/ast_fpa_plugin_source_test.go",
         "pkg/util/numeral/mpf_borrowed_accessors.go",
-        "pkg/util/numeral/mpf_borrowed_accessors_test.go"
+        "pkg/util/numeral/mpf_borrowed_accessors_test.go",
+        "pkg/ast/ast_fpa_api_numeral_text.go",
+        "pkg/ast/ast_fpa_api_numeral_text_test.go",
+        "pkg/api/api_numeral_string.go",
+        "pkg/api/api_numeral_string_test.go"
       ],
       "tests": [
         "TestASTFPAFPComponentsNumeralsAndTrace",
@@ -159719,7 +159731,9 @@
         "TestASTSMT2FloatDefaultBitVectorFields",
         "TestASTSMT2FloatRealLiteralEveryActualReservationPrefix",
         "TestASTSMT2FloatDefaultEveryActualReservation",
-        "TestArbitraryFloatBorrowedFPAComponentsAndManagerLifetime"
+        "TestArbitraryFloatBorrowedFPAComponentsAndManagerLifetime",
+        "TestASTFPANumeralStringAPIScopedMPFAndBranches",
+        "TestAPINumeralStringArithmeticFPAAndRefusal"
       ],
       "conditionals": [
         {
@@ -159853,6 +159867,13 @@
             "TestMPFPowerWrapperMemoryTraceMissHitAndSourceDeletion",
             "TestMPFPowerWrapperMemoryTraceFailedPayloadAndFinalizeGuard"
           ]
+        },
+        {
+          "name": "Retained API numeral-string caller-local scoped_mpf is constructed before rounding-mode recognition and MPF formatting, then deleted after the detached result is built (api_numeral.cpp:194-226)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_api_numeral_text.go",
+          "go_targets": ["pkg/api/api_numeral_string.go"],
+          "tests": ["TestASTFPANumeralStringAPIScopedMPFAndBranches", "TestAPINumeralStringArithmeticFPAAndRefusal"]
         },
         {
           "name": "Remaining caller-local scoped_mpf scalar specializations in retained FPA API and SMT callers beyond separately credited AST rewriter and subpaving paths",
@@ -179120,7 +179141,11 @@
         "pkg/ast/ast_fpa_fma.go",
         "pkg/ast/ast_fpa_rm_binary.go",
         "pkg/ast/ast_fpa_to_real.go",
-        "pkg/ast/ast_fpa_to_ieee_bv.go"
+        "pkg/ast/ast_fpa_to_ieee_bv.go",
+        "pkg/ast/ast_fpa_api_numeral_text.go",
+        "pkg/ast/ast_fpa_api_numeral_text_test.go",
+        "pkg/api/api_numeral_string.go",
+        "pkg/api/api_numeral_string_test.go"
       ],
       "tests": [
         "TestASTFPAFPComponentsNumeralsAndTrace",
@@ -179222,7 +179247,9 @@
         "TestASTFPAFMADeclarationNumericAndScopedBranches",
         "TestASTFPARMBinaryDeclarationsAndNumericCleanup",
         "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches",
-        "TestASTFPAToIEEEBVDeclarationFiniteAndNaNBranches"
+        "TestASTFPAToIEEEBVDeclarationFiniteAndNaNBranches",
+        "TestASTFPANumeralStringAPIScopedMPFAndBranches",
+        "TestAPINumeralStringArithmeticFPAAndRefusal"
       ],
       "conditionals": [
         {
@@ -179443,6 +179470,13 @@
           "status": "ported",
           "go_target": "pkg/math/subpaving/fixed_shell_coefficients.go",
           "tests": ["TestFixedShellExactCoefficientOwnerAndDirectedBound"]
+        },
+        {
+          "name": "Concrete API Z3_get_numeral_string fallback constructs one scoped_mpf before rounding-mode recognition, borrows an FPA numeral for formatting and releases its local after result publication (api_numeral.cpp:194-226)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_api_numeral_text.go",
+          "go_targets": ["pkg/api/api_numeral_string.go"],
+          "tests": ["TestASTFPANumeralStringAPIScopedMPFAndBranches", "TestAPINumeralStringArithmeticFPAAndRefusal"]
         },
         {
           "name": "Remaining concrete inherited scoped_mpf scalar lifetimes at retained SMT theory and FPA API callers; AST FPA rewriter numeric branches are separately credited below (src/util/scoped_numeral.h:24-171; src/util/mpf.h:300-324)",
