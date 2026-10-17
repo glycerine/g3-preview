@@ -8,9 +8,9 @@ import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-var ErrAlgebraicZeroPower = errors.New("0^0 is indeterminate")
-var ErrAlgebraicZeroRoot = errors.New("0-th root is indeterminate")
-var ErrAlgebraicEvenNegativeRoot = errors.New("even root of negative number is not real")
+var ErrAlgebraicZeroPower error = newAlgebraicException("0^0 is indeterminate")
+var ErrAlgebraicZeroRoot error = newAlgebraicException("0-th root is indeterminate")
+var ErrAlgebraicEvenNegativeRoot error = newAlgebraicException("even root of negative number is not real")
 
 // Power and Root may refine the input and allow the destination to alias it.
 func (m *AlgebraicRootCore) Power(a *Algebraic, k uint32, out *Algebraic) error {

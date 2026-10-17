@@ -8,7 +8,7 @@ import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-var ErrAlgebraicDivisionByZero = errors.New("division by zero")
+var ErrAlgebraicDivisionByZero error = newAlgebraicException("division by zero")
 
 // The two source scoped rationals survive a refused destruction in the owner.
 type algebraicInverseScope struct {
