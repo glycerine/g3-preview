@@ -33,7 +33,7 @@ func (m *IntegerManager) extendedGCDDiagnosticWithAllocationContext(r1, r2, a, b
 		return e
 	}
 	if comparison != 0 {
-		return errExtendedGCDInvariant
+		return diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 973, "eq(nexta, tmp1)")
 	}
 	return nil
 }

@@ -3,15 +3,12 @@
 package numeral
 
 import (
-	"errors"
 	"io"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
-
-var errExtendedGCDInvariant = errors.New("mpnum: source extended gcd Bezout assertion failed")
 
 // GCDMany preserves active source sequential order, including destination
 // aliases to future array elements and early-one skipping of remaining inputs.

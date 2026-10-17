@@ -3,7 +3,6 @@
 package numeral
 
 import (
-	"errors"
 	"math/big"
 	"testing"
 )
@@ -38,9 +37,10 @@ func TestExtendedGCDDebugSourceAssertion(t *testing.T) {
 	qopsMust(t, m.SetInt64(&r1, -26))
 	qopsMust(t, m.SetInt64(&r2, 7))
 	qopsMust(t, m.SetInt64(&g, 17))
+	bindMPNDebugActions(t, "T")
 	e := m.ExtendedGCD(&r1, &r2, &r1, &b, &g)
 	qopsAuditLiveOwnership(t, owner, []*Int{&r1, &r2, &a, &b, &g})
-	if !errors.Is(e, errExtendedGCDInvariant) {
+	if !isMPNVerificationThrow(e) {
 		t.Fatal(e)
 	}
 	if integerString(t, m, &r1) != "3" || integerString(t, m, &b) != "-11" || integerString(t, m, &g) != "17" {

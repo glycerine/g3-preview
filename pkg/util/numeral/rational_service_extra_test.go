@@ -507,11 +507,14 @@ func TestRationalServiceExtraIndependentRootsAndCoefficients(t *testing.T) {
 	}
 	// Source manager coefficients alias one another, so their publication order
 	// is deliberately not replaced by staged independent output records.
+	if SourceExtendedGCDDebug {
+		bindMPNDebugActions(t, "TTTTTTTT")
+	}
 	serviceMust(t, s.SetInt64(&a, 120))
 	serviceMust(t, s.SetInt64(&b, 84))
 	gcd, e := s.GCDCoefficients(&a, &b, &x, &x)
 	if SourceExtendedGCDDebug {
-		if !errors.Is(e, errExtendedGCDInvariant) || gcd.ownerID != 0 {
+		if !isMPNVerificationThrow(e) || gcd.ownerID != 0 {
 			t.Fatal("source debug assertion before gcd value return", e)
 		}
 	} else {
@@ -546,7 +549,7 @@ func TestRationalServiceExtraIndependentRootsAndCoefficients(t *testing.T) {
 		}
 		gcd, e := s.GCDCoefficients(&a, &b, xp, yp)
 		if SourceExtendedGCDDebug {
-			if !errors.Is(e, errExtendedGCDInvariant) || gcd.ownerID != 0 {
+			if !isMPNVerificationThrow(e) || gcd.ownerID != 0 {
 				t.Fatal("source debug assertion before gcd value return", f, e)
 			}
 		} else {

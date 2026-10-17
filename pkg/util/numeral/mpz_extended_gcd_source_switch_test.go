@@ -73,3 +73,27 @@ func TestExtendedGCDEqualityAssertionSwitchAfterArithmetic(t *testing.T) {
 		}
 	})
 }
+
+func TestExtendedGCDEqualitySourceThrowAndContinue(t *testing.T) {
+	if !SourceExtendedGCDDebug {
+		t.Skip("source Z3DEBUG diagnostic only")
+	}
+	_, out := bindMPNDebugActions(t, "TC")
+	m, _ := integerManager(t)
+	r1, r2, a, b, expected := NewInt(2), NewInt(3), NewInt(1), NewInt(0), NewInt(0)
+	nexta, nextb := NewInt(99), NewInt(99)
+	run := func() error {
+		return m.extendedGCDDiagnostic(&r1, &r2, &a, &b, &expected, &nexta, &nextb)
+	}
+	if err := run(); !isMPNVerificationThrow(err) || nexta.Val != 2 || nextb.Val != 0 {
+		t.Fatal("source equality Throw must follow completed arithmetic", err, nexta, nextb)
+	}
+	if err := run(); err != nil || nexta.Val != 2 || nextb.Val != 0 {
+		t.Fatal("source equality Continue must keep the computed false result", err, nexta, nextb)
+	}
+	contents, err := os.ReadFile(out.Name())
+	serviceMust(t, err)
+	if got := strings.Count(string(contents), "File: src/util/mpz.cpp\nLine: 973\neq(nexta, tmp1)\n"); got != 2 {
+		t.Fatal("source equality action locations", got, string(contents))
+	}
+}

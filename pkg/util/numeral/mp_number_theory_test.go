@@ -164,6 +164,9 @@ func TestNumberTheoryArraySourceOrderAndRationalSingleton(t *testing.T) {
 }
 func TestNumberTheoryFrozenExtendedGCDAliases(t *testing.T) {
 	m, _ := integerManager(t)
+	if SourceExtendedGCDDebug {
+		bindMPNDebugActions(t, "TTTTTTTT")
+	}
 	// Fixed release-source control-flow results; aliased coefficient identities
 	// need not satisfy the ordinary Bezout postcondition after source overwrites.
 	for _, tc := range []struct {
@@ -176,7 +179,7 @@ func TestNumberTheoryFrozenExtendedGCDAliases(t *testing.T) {
 		// the final gcd copy. The other identities still reach publication.
 		debugFailure := SourceExtendedGCDDebug && (tc.a == 0 || tc.b == 1 || tc.a == tc.b)
 		if debugFailure {
-			if !errors.Is(e, errExtendedGCDInvariant) {
+			if !isMPNVerificationThrow(e) {
 				t.Fatal("source debug assertion", tc, e)
 			}
 			tc.want[tc.g] = 0
@@ -320,16 +323,19 @@ func TestNumberTheoryRationalResetPrefixAndOutputAliasing(t *testing.T) {
 	qopsMust(t, m.Z.CleanupExtendedGCD())
 	qopsMust(t, m.SetInt64(&r1, -26))
 	qopsMust(t, m.SetInt64(&r2, 7))
+	if SourceExtendedGCDDebug {
+		bindMPNDebugActions(t, "TTTT")
+	}
 	// The selected actual direct refusal precedes source scratch use. The
 	// intact-scratch alias repeats cpp962 sign rereads; DEBUG cpp968-975 stops
 	// before publishing g, while native cpp977 publishes gcd1.
 	e = m.ExtendedGCD(&r1, &r2, &r1, &b, &g)
 	qopsAuditLiveOwnership(t, m, []*Int{&r1.Num, &r1.Den, &r2.Num, &r2.Den, &a.Num, &a.Den, &b.Num, &b.Den, &g.Num, &g.Den})
-	var wantContinuation error
 	if SourceExtendedGCDDebug {
-		wantContinuation = errExtendedGCDInvariant
-	}
-	if !errors.Is(e, wantContinuation) {
+		if !isMPNVerificationThrow(e) {
+			t.Fatal("source-profile completed prefix continuation", e)
+		}
+	} else if e != nil {
 		t.Fatal("source-profile completed prefix continuation", e)
 	}
 	wantContinuedG := "1"
@@ -353,7 +359,7 @@ func TestNumberTheoryRationalResetPrefixAndOutputAliasing(t *testing.T) {
 	e = m.ExtendedGCD(&r1, &r2, &r1, &b, &g)
 	wantG := "1"
 	if SourceExtendedGCDDebug {
-		if !errors.Is(e, errExtendedGCDInvariant) {
+		if !isMPNVerificationThrow(e) {
 			t.Fatal("source debug assertion", e)
 		}
 		wantG = "23"
