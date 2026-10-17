@@ -181598,7 +181598,7 @@
         },
         {
           "name": "SMT2 parser local<expr*,level> reset discards bindings and open scopes at smt2parser.cpp:3003",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/parsers/smt2/local_environment.go",
           "tests": ["TestSMT2LocalSymbolTableResetDiscardsOpenScopes"]
         },
