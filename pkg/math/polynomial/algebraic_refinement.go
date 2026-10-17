@@ -387,15 +387,15 @@ func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 		return false, err
 	}
 	if polynomialSourceDebug {
-		ok, e := m.config.Binary.GreaterEqualRational(&(*r.interval.BorrowUpper()), m.config.Rationals, &m.localQ)
+		less, e := m.lessPredicateRational(r.interval.BorrowUpper())
 		if e != nil {
 			return false, e
 		}
-		if !ok {
+		if less {
 			return false, ErrAlgebraicAssertion
 		}
 	}
-	less, err := m.config.Binary.LessRational(&(*r.interval.BorrowLower()), m.config.Rationals, &m.localQ)
+	less, err := m.lessPredicateRational(r.interval.BorrowLower())
 	if err != nil {
 		return false, err
 	}
@@ -404,7 +404,7 @@ func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 		if err != nil {
 			return false, err
 		}
-		s, e := m.config.Polynomials.EvalSignRational(v, &m.localQ)
+		s, e := m.evalPredicateRational(v)
 		if e != nil {
 			return false, e
 		}

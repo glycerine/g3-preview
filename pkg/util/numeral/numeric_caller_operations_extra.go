@@ -468,3 +468,14 @@ func (o NumericBinaryRationalOperations) FloorWithCopyAllocationReceipt(a *Binar
 	}
 	return o.manager.roundWithAllocationContext(a, o.manager.Z, out, false, receipt, o.context)
 }
+
+func (o NumericBinaryRationalOperations) LessRationalWithCopyAllocationReceipt(a *BinaryRational, qm *RationalManager, b *Rational, receipt *IntegerCopyAllocationReceipt) (bool, error) {
+	if e := o.valid(); e != nil {
+		return false, e
+	}
+	// Retained polynomial callers borrow this exact integer owner.
+	if qm == nil || qm.Integers() != o.manager.Z {
+		return false, ErrBinaryOwner
+	}
+	return o.manager.compareRationalWithAllocationContext(a, qm, b, 1, o.context, receipt)
+}

@@ -347,7 +347,13 @@ func (m *IntegerManager) shiftWithAllocationContextAndReceipt(a *Int, k uint32, 
 	if e := m.check(out); e != nil {
 		return e
 	}
-	if e := m.copyFromOwnerWithAllocationContext(out, m, a, receipt, context); e != nil {
+	// An explicit copy receipt keeps its own allocation authority; later
+	// shift growth belongs to the supplied numerical caller context.
+	copyContext := context
+	if receipt != nil {
+		copyContext = integerAllocationInvocationContext{}
+	}
+	if e := m.copyFromOwnerWithAllocationContext(out, m, a, receipt, copyContext); e != nil {
 		return e
 	}
 	if left {

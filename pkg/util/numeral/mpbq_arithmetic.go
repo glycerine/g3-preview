@@ -401,6 +401,9 @@ func (m *BinaryRationalManager) GreaterEqualInteger(a *BinaryRational, b *Int) (
 	return !v, nil
 }
 func (m *BinaryRationalManager) compareRational(a *BinaryRational, qm *RationalManager, b *Rational, op uint8) (result bool, err error) {
+	return m.compareRationalWithAllocationContext(a, qm, b, op, integerAllocationInvocationContext{}, nil)
+}
+func (m *BinaryRationalManager) compareRationalWithAllocationContext(a *BinaryRational, qm *RationalManager, b *Rational, op uint8, context integerAllocationInvocationContext, receipt *IntegerCopyAllocationReceipt) (result bool, err error) {
 	if e := m.check(a); e != nil {
 		return false, e
 	}
@@ -424,18 +427,18 @@ func (m *BinaryRationalManager) compareRational(a *BinaryRational, qm *RationalM
 	x, y := &a.Num, &q.Num
 	if a.KField != 0 || !isOneInteger(&q.Den) {
 		if op == 0 {
-			if e = m.Z.Mul2k(&q.Num, a.KField, &m.Tmp); e != nil {
+			if e = m.Z.shiftWithAllocationContextAndReceipt(&q.Num, a.KField, &m.Tmp, true, context, receipt); e != nil {
 				return false, e
 			}
-			if e = m.Z.Mul(&a.Num, &q.Den, &m.Tmp2); e != nil {
+			if e = m.Z.WithAllocationContext(context).Mul(&a.Num, &q.Den, &m.Tmp2); e != nil {
 				return false, e
 			}
 			x, y = &m.Tmp, &m.Tmp2
 		} else {
-			if e = m.Z.Mul(&a.Num, &q.Den, &m.Tmp); e != nil {
+			if e = m.Z.WithAllocationContext(context).Mul(&a.Num, &q.Den, &m.Tmp); e != nil {
 				return false, e
 			}
-			if e = m.Z.Mul2k(&q.Num, a.KField, &m.Tmp2); e != nil {
+			if e = m.Z.shiftWithAllocationContextAndReceipt(&q.Num, a.KField, &m.Tmp2, true, context, receipt); e != nil {
 				return false, e
 			}
 			x, y = &m.Tmp, &m.Tmp2

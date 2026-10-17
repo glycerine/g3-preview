@@ -10,6 +10,8 @@ import (
 // Payload is the existing core.localQ, constructed only at accepted beginQ.
 // Source destruction and explicit owning acknowledgement have separate cursors.
 type algebraicPredicateQScope struct {
+	comparisonCopy                                 unumeral.IntegerCopyAllocationReceipt
+	evaluation                                     upolyRationalEvaluationInvocationReceipt
 	owner                                          *AlgebraicRootCore
 	hooks                                          unumeral.NumericInvocationHooks
 	roots                                          unumeral.NumericAllocationRoots
@@ -74,7 +76,7 @@ func (m *AlgebraicRootCore) setPredicateQParts(n, d *unumeral.Int) error {
 func (s *algebraicPredicateQScope) childrenPending() bool {
 	m := s.owner
 	z := m.config.Rationals.Integers()
-	if unumeral.NumericAllocationPending(&s.roots) || z.MatchesCopyAllocationInvocation(&s.parts.Numerator) || z.MatchesCopyAllocationInvocation(&s.parts.Denominator) || m.config.Rationals.MatchesRawNormalizeInvocation(&s.parts.Normalize) {
+	if z.MatchesCopyAllocationInvocation(&s.comparisonCopy) || s.evaluationPending() || unumeral.NumericAllocationPending(&s.roots) || z.MatchesCopyAllocationInvocation(&s.parts.Numerator) || z.MatchesCopyAllocationInvocation(&s.parts.Denominator) || m.config.Rationals.MatchesRawNormalizeInvocation(&s.parts.Normalize) {
 		return true
 	}
 	for i := range s.raw {
@@ -149,6 +151,12 @@ func (m *AlgebraicRootCore) cleanupPredicateQ() error {
 func (m *AlgebraicRootCore) cleanupPredicateQBody() error {
 	s := &m.predicateQ
 	z := m.config.Rationals.Integers()
+	if e := s.cleanupEvaluation(); e != nil {
+		return e
+	}
+	if e := z.CleanupCopyAllocationInvocation(&s.comparisonCopy); e != nil {
+		return e
+	}
 	if e := s.roots.Cleanup(z); e != nil {
 		return e
 	}
@@ -178,4 +186,57 @@ func (m *AlgebraicRootCore) cleanupPredicateQBody() error {
 	m.localOriginal = nil
 	m.localCleanup = nil
 	return nil
+}
+
+func (m *UPolynomialManager) matchesRationalEvaluationReceipt(r *upolyRationalEvaluationInvocationReceipt) bool {
+	if m == nil || m.self != m || r == nil {
+		return false
+	}
+	q := &m.rationalEvaluation
+	return r.owner == m && r.frame == q && q.owner == m && r.invocation != 0 && r.invocation == q.invocation && r.history == q.history
+}
+func (s *algebraicPredicateQScope) evaluationPending() bool {
+	p := s.owner.config.Polynomials
+	return p.matchesRationalEvaluationReceipt(&s.evaluation) && p.rationalEvaluation.active
+}
+func (s *algebraicPredicateQScope) cleanupEvaluation() error {
+	if s.evaluation.owner == nil {
+		return nil
+	}
+	p := s.owner.config.Polynomials
+	if e := p.cleanupRationalEvaluationWithReceipt(&s.evaluation, false); e != nil {
+		return e
+	}
+	return p.cleanupRationalEvaluationWithReceipt(&s.evaluation, true)
+}
+func (m *AlgebraicRootCore) evalPredicateRational(v UPolynomialView) (int, error) {
+	s := &m.predicateQ
+	if !s.NumericBound(false) {
+		return 0, ErrAlgebraicOwner
+	}
+	if s.executing || s.evaluationPending() {
+		return 0, ErrAlgebraicPending
+	}
+	s.executing = true
+	defer func() { s.executing = false }()
+	p := m.config.Polynomials
+	sign, e := p.evalSignRationalWithReceipt(v, &m.localQ, &s.evaluation)
+	if p.matchesRationalEvaluationReceipt(&s.evaluation) && s.childStop == nil {
+		s.childStop = p.rationalEvaluation.sourceCause
+	}
+	return sign, e
+}
+
+func (m *AlgebraicRootCore) lessPredicateRational(a *unumeral.BinaryRational) (bool, error) {
+	s := &m.predicateQ
+	if !s.NumericBound(false) {
+		return false, ErrAlgebraicOwner
+	}
+	if s.executing || s.childrenPending() {
+		return false, ErrAlgebraicPending
+	}
+	s.executing = true
+	defer func() { s.executing = false }()
+	context := unumeral.NumericAllocationContext{}.WithCaller(&s.hooks)
+	return m.config.Binary.WithAllocationContext(context).LessRationalWithCopyAllocationReceipt(a, m.config.Rationals, &m.localQ, &s.comparisonCopy)
 }

@@ -82,6 +82,9 @@ func (m *UPolynomialManager) EvalSignInt(v UPolynomialView, b *unumeral.Int) (si
 	return m.sign(r)
 }
 func (m *UPolynomialManager) EvalSignRational(v UPolynomialView, b *unumeral.Rational) (sign int, cause error) {
+	return m.evalSignRationalWithReceipt(v, b, nil)
+}
+func (m *UPolynomialManager) evalSignRationalWithReceipt(v UPolynomialView, b *unumeral.Rational, receipt *upolyRationalEvaluationInvocationReceipt) (sign int, cause error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
@@ -98,12 +101,22 @@ func (m *UPolynomialManager) EvalSignRational(v UPolynomialView, b *unumeral.Rat
 	if e != nil {
 		return 0, e
 	}
+	if receipt != nil {
+		*receipt = upolyRationalEvaluationInvocationReceipt{owner: m, frame: q, invocation: q.invocation}
+	}
 	q.target = v
 	context := q.context()
 	z := m.config.Integer
 	prior := rationalEvaluationCaller(z)
 	setRationalEvaluationCaller(z, m)
-	defer func() { q.executing = false; cause = q.finish(cause); setRationalEvaluationCaller(z, prior) }()
+	defer func() {
+		q.executing = false
+		cause = q.finish(cause)
+		if receipt != nil {
+			receipt.history = q.history
+		}
+		setRationalEvaluationCaller(z, prior)
+	}()
 	di, r, ak := &q.values[0], &q.values[1], &q.values[2]
 	if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Copy(di, &(*b.BorrowDenominator())); e != nil {
 		return 0, e
