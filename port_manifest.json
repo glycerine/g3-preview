@@ -26685,9 +26685,9 @@
       "path": "src/ast/rewriter/fpa_rewriter.cpp",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/ast/ast_fpa_classification_read.go", "pkg/ast/rewriter/fpa_classification.go"],
+      "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal"],
       "assertions": [
         {
           "line": 43,
@@ -26908,17 +26908,24 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
-      "ownership": [],
-      "deviations": []
+      "methods": [
+        {
+          "name": "mk_app_core seven unary classification cases and mk_is_zero/is_nan/is_inf/is_normal/is_subnormal/is_negative/is_positive concrete numeral reductions (fpa_rewriter.cpp:41-88,547-638)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_classification.go",
+          "tests": ["TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPAClassificationOneScopedNumeralPerCall"]
+        }
+      ],
+      "ownership": ["Each classification call creates one caller-local scoped_mpf through the AST plugin's concrete numeral probe; successful source destruction retires it before the Boolean result is published. A stopped source destructor remains in the AST plugin's owning cleanup list."],
+      "deviations": ["The partial Go FPA rewriter dispatch currently handles classification only; arithmetic, conversion, equality and remaining source cases are unported."]
     },
     {
       "path": "src/ast/rewriter/fpa_rewriter.h",
       "component": "ast",
       "role": "production",
-      "status": "unported",
-      "go_targets": [],
-      "tests": [],
+      "status": "partial",
+      "go_targets": ["pkg/ast/rewriter/fpa_classification.go"],
+      "tests": ["TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal"],
       "conditionals": [
         {
           "line": 19,
@@ -178606,12 +178613,18 @@
           "tests": ["TestFixedShellExactCoefficientOwnerAndDirectedBound"]
         },
         {
-          "name": "Remaining concrete inherited scoped_mpf scalar lifetimes at retained AST FPA rewriter, SMT theory and FPA API callers (src/util/scoped_numeral.h:24-171; src/util/mpf.h:300-324)",
+          "name": "Remaining concrete inherited scoped_mpf scalar lifetimes at retained AST FPA equality/arithmetic rewriter, SMT theory and FPA API callers (src/util/scoped_numeral.h:24-171; src/util/mpf.h:300-324)",
           "status": "unported",
           "tests": []
         },
         {
-          "name": "Concrete fpa_rewriter classification and mk_eq_core scoped_mpf lexical construction, successful reverse destruction and stopped-copy owning continuation in retained model_evaluator/th_rewriter callers (fpa_rewriter.cpp:547-667)",
+          "name": "Concrete fpa_rewriter classification scoped_mpf lexical construction, successful destruction and stopped-copy owning continuation (fpa_rewriter.cpp:547-638)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_classification_read.go",
+          "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal"]
+        },
+        {
+          "name": "Concrete fpa_rewriter mk_eq_core two scoped_mpf locals and reverse destruction in retained model_evaluator/th_rewriter callers (fpa_rewriter.cpp:640-667)",
           "status": "unported",
           "tests": []
         },
