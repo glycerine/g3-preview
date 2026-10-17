@@ -166491,10 +166491,11 @@
           ]
         },
         {
-          "name": "mul/big_mul/internal Algorithm M",
+          "name": "mul/big_mul/internal Algorithm M with reached MPN operand/result TRACE",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_mul.go",
           "tests": [
+            "TestMPNMulLiveIntegerSourceTraceOrder",
             "TestIntegerSourceMultiplication",
             "TestIntegerMulDivisionLimbOracle",
             "TestIntegerMultiplicationFailurePointsAndAliases",
@@ -168608,10 +168609,11 @@
           ]
         },
         {
-          "name": "mul/big_mul/internal Algorithm M",
+          "name": "mul/big_mul/internal Algorithm M with reached MPN operand/result TRACE",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_mul.go",
           "tests": [
+            "TestMPNMulLiveIntegerSourceTraceOrder",
             "TestIntegerSourceMultiplication",
             "TestIntegerMulDivisionLimbOracle",
             "TestIntegerMultiplicationFailurePointsAndAliases",
