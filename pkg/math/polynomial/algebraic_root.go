@@ -1,6 +1,7 @@
 // Source: src/math/polynomial/algebraic_numbers.cpp:1565-1577,2933-2935.
-// Selected algebraic_numbers.cpp cell/univariate bodies. This prerequisite
-// borrows real services; it is NOT the missing multivariate manager constructor.
+// Selected algebraic-number bodies over borrowed numeric services. The real
+// multivariate member is materialized when needed; the complete source imp
+// constructor and its ownership composition remain a separate porting step.
 package polynomial
 
 import (
@@ -48,6 +49,10 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	multivariate                                           *MultivariatePolynomialManager
+	resultant                                              algebraicResultantPolynomialScope
+	resultantVariables                                     [2]uint32
+	resultantVariableCount                                 uint8
 	arithmetic                                             algebraicRationalArithmeticScope
 	addTmp                                                 UPolynomial
 	bounds                                                 algebraicBoundScope
@@ -134,6 +139,9 @@ func NewAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error) {
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m != nil && m.self == m && m.resultant.executing {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.arithmetic.executing {
 		return ErrAlgebraicPending
 	}
@@ -826,6 +834,9 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	return m.store(dl, &out)
 }
 func (m *AlgebraicRootCore) CleanupRetained() error {
+	if m != nil && m.self == m && m.resultant.executing {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.arithmetic.executing {
 		return ErrAlgebraicPending
 	}
@@ -840,6 +851,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	}
 	if m == nil || m.self != m || m.closed {
 		return ErrAlgebraicOwner
+	}
+	if e := m.cleanupResultantPolynomial(); e != nil {
+		return e
 	}
 	if e := m.cleanupRationalArithmetic(); e != nil {
 		return e
@@ -871,6 +885,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.comparisonCleanup()
 }
 func (m *AlgebraicRootCore) Close() error {
+	if m != nil && m.self == m && m.resultant.executing {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.arithmetic.executing {
 		return ErrAlgebraicPending
 	}
@@ -949,6 +966,12 @@ func (m *AlgebraicRootCore) Close() error {
 	}
 	if e := m.config.Rationals.Integers().Del(&m.isRationalTmp); e != nil {
 		return e
+	}
+	if m.multivariate != nil {
+		if e := m.multivariate.CloseChecked(); e != nil {
+			return e
+		}
+		m.multivariate = nil
 	}
 	b := m.config.Rationals.Budget()
 	m.negationHistory = nil

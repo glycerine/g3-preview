@@ -38228,6 +38228,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/algebraic_resultant_polynomial.go",
+        "pkg/math/polynomial/algebraic_resultant_polynomial_test.go",
         "pkg/math/polynomial/algebraic_rational_multiply.go",
         "pkg/math/polynomial/algebraic_rational_multiply_test.go",
         "pkg/math/polynomial/algebraic_rational_arithmetic.go",
@@ -38261,6 +38263,8 @@
         "pkg/math/polynomial/algebraic_display_decimal_test.go"
       ],
       "tests": [
+        "TestAlgebraicResultantSumDifferenceAndProductPolynomials",
+        "TestAlgebraicResultantPolynomialCancellationCleanupAndRetry",
         "TestAlgebraicRationalMultiplyRootsSignsAndAlias",
         "TestAlgebraicRationalMultiplyBasicAndZeroShortCircuit",
         "TestAlgebraicRationalMultiplySourceAssertionBeforeLocals",
@@ -38709,6 +38713,12 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "algebraic_numbers.cpp:794-839 retained mk_add_polynomial<true/false> and mk_mul_polynomial through real multivariate composition/resultants and caller-owned dense conversion; mk_binary root selection remains open",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/algebraic_resultant_polynomial.go",
+          "tests": ["TestAlgebraicResultantSumDifferenceAndProductPolynomials", "TestAlgebraicResultantPolynomialCancellationCleanupAndRetry"]
+        },
+        {
           "name": "algebraic_numbers.cpp:1490-1563 concrete basic/rational and root/rational multiplication, source assertion gate at 1501, shared m_add_tmp composition and negative-factor interval reversal; two-root resultant route and complete child failure composition remain open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_rational_multiply.go",
@@ -38821,6 +38831,7 @@
         "Source Del guards endangered partial construction reads; explicit owning abort drains genuine fields and retains physical cleanup progress. Owning close rejects caller roots instead of sweeping the locator registry."
       ],
       "deviations": [
+        "The concrete two-root resultant polynomial builders now use a private actual MultivariatePolynomialManager sharing the existing integer/rational services and small allocator. Its two variables and owner persist; four embedded source polynomial references retain reverse destruction. Addition uses pa(x-y), subtraction pa(x+y), and multiplication the homogeneous y^n*pa(x/y), each followed by resultant_y with pb(y) and conversion directly into the algebraic dense owner. Tests independently verify quadratic and mixed quadratic/cubic identities, distinguish sum from difference with odd coefficients, retain repeated/zero resultant factors, reuse the owner and prove actual checkpoint cancellation/owning cleanup/retry. This prerequisite core materializes the multivariate member lazily; the complete eager algebraic constructor, mk_binary factor/Sturm root selection, TRACE and full nested failure/callback composition remain partial. No full two-root arithmetic API or original driver completion is claimed.",
         "MulRational ports the retained rational-operand multiplication route, including zero-left short circuit before the second operand read. A root checks the actual process assertion switch at cpp1501 before scoped arithmetic values, then copies the reciprocal scalar, copies coefficients into the shared m_add_tmp without an invented reset, composes p(q*x), restores the original scalar, scales endpoints and reverses them for a negative multiplier. Non-dyadic factors use rational endpoints and the existing rational-to-binary interval converter. Source minimality, final interval normalization and iu/il then u/l then nbv cleanup are retained. Independent coefficient identities and multiply/reciprocal round trips cover quadratic/cubic roots, both signs, aliases and addition/subtraction workspace reuse. Closed debug owner and source T-action fixtures verify the entry diagnostic precedes locals and output mutation. A separate non-dyadic multiplier (2^64+1)/3 checks BIG coefficients against math/big and an inverse-scaling round trip. This reaches the rational multiplication consumer at src/test/algebraic.cpp:151 without claiming its surrounding driver complete. Two-root resultants/root selection, source TRACE, full constructor composition and complete nested failure/callback transport remain open.",
         "AddRational/SubRational port the concrete rational operand routes and Normalize ports result interval normalization. The source mixed helper translates the defining polynomial by the signed rational offset, shifts dyadic bounds directly or converts shifted rational endpoints back to binary, preserves minimality and normalizes zero-crossing results. In-place output aliases are supported. The source sub(0,b,c) route publishes b before Neg; a real minimum-integer refusal verifies that prefix with physical ownership audit and the existing exact Neg child cleanup contract. Persistent m_add_tmp is lazily materialized in this borrowed prerequisite core and destroyed before isolation members; complete source constructor composition remains open. Owner-held locals preserve iu/il then u/l then nbv cleanup, and a stopped inner destructor is not retried by automatic outer cleanup. Independent coefficient/round-trip and actual cancellation/retry tests pass. Two-algebraic-value resultants/root selection, source TRACE, complete nested failure/callback composition and original whole-driver completion remain open.",
         "Defining polynomial and bound accessors are reached by purify_arith_tactic.cpp:469-472. GetPolynomial copies the stored polynomial without minimizing, or constructs d*x-n for a rational and x for zero, preserving coefficient copy/negation/size order. Binary and nonprecision rational getters use the source irrationality assertion; precision rational getters support zero/basic values and refine independent interval copies using precision*4 binary bits. The source upper getter ignores exact-root refinement return and retains its current upper endpoint. Two actual bound temporaries retain reverse cleanup in the core; executing accessor operations protect the input owner. Existing decimal output uses the same get_interval helper. Independent value/ownership tests and a real minimum-integer allocation-prefix audit pass; full root-child failure/callback composition and tactic integration remain partial.",
@@ -38842,6 +38853,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/algebraic_resultant_polynomial.go",
+        "pkg/math/polynomial/algebraic_resultant_polynomial_test.go",
         "pkg/math/polynomial/algebraic_rational_multiply.go",
         "pkg/math/polynomial/algebraic_rational_multiply_test.go",
         "pkg/math/polynomial/algebraic_rational_arithmetic.go",
@@ -38871,6 +38884,8 @@
         "pkg/math/polynomial/algebraic_native_storage_test.go"
       ],
       "tests": [
+        "TestAlgebraicResultantSumDifferenceAndProductPolynomials",
+        "TestAlgebraicResultantPolynomialCancellationCleanupAndRetry",
         "TestAlgebraicRationalMultiplyRootsSignsAndAlias",
         "TestAlgebraicRationalMultiplyBasicAndZeroShortCircuit",
         "TestAlgebraicRationalMultiplySourceAssertionBeforeLocals",
@@ -38936,6 +38951,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "algebraic_numbers.cpp:794-839 retained mk_add_polynomial<true/false> and mk_mul_polynomial through real multivariate composition/resultants and caller-owned dense conversion; mk_binary root selection remains open",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/algebraic_resultant_polynomial.go",
+          "tests": ["TestAlgebraicResultantSumDifferenceAndProductPolynomials", "TestAlgebraicResultantPolynomialCancellationCleanupAndRetry"]
+        },
         {
           "name": "algebraic_numbers.cpp:1490-1563 concrete basic/rational and root/rational multiplication, source assertion gate at 1501, shared m_add_tmp composition and negative-factor interval reversal; two-root resultant route and complete child failure composition remain open",
           "status": "partial",
@@ -39033,6 +39054,7 @@
         "Source Del guards endangered partial construction reads; explicit owning abort drains genuine fields and retains physical cleanup progress. Owning close rejects caller roots instead of sweeping the locator registry."
       ],
       "deviations": [
+        "The concrete two-root resultant polynomial builders now use a private actual MultivariatePolynomialManager sharing the existing integer/rational services and small allocator. Its two variables and owner persist; four embedded source polynomial references retain reverse destruction. Addition uses pa(x-y), subtraction pa(x+y), and multiplication the homogeneous y^n*pa(x/y), each followed by resultant_y with pb(y) and conversion directly into the algebraic dense owner. Tests independently verify quadratic and mixed quadratic/cubic identities, distinguish sum from difference with odd coefficients, retain repeated/zero resultant factors, reuse the owner and prove actual checkpoint cancellation/owning cleanup/retry. This prerequisite core materializes the multivariate member lazily; the complete eager algebraic constructor, mk_binary factor/Sturm root selection, TRACE and full nested failure/callback composition remain partial. No full two-root arithmetic API or original driver completion is claimed.",
         "MulRational ports the retained rational-operand multiplication route, including zero-left short circuit before the second operand read. A root checks the actual process assertion switch at cpp1501 before scoped arithmetic values, then copies the reciprocal scalar, copies coefficients into the shared m_add_tmp without an invented reset, composes p(q*x), restores the original scalar, scales endpoints and reverses them for a negative multiplier. Non-dyadic factors use rational endpoints and the existing rational-to-binary interval converter. Source minimality, final interval normalization and iu/il then u/l then nbv cleanup are retained. Independent coefficient identities and multiply/reciprocal round trips cover quadratic/cubic roots, both signs, aliases and addition/subtraction workspace reuse. Closed debug owner and source T-action fixtures verify the entry diagnostic precedes locals and output mutation. A separate non-dyadic multiplier (2^64+1)/3 checks BIG coefficients against math/big and an inverse-scaling round trip. This reaches the rational multiplication consumer at src/test/algebraic.cpp:151 without claiming its surrounding driver complete. Two-root resultants/root selection, source TRACE, full constructor composition and complete nested failure/callback transport remain open.",
         "AddRational/SubRational port the concrete rational operand routes and Normalize ports result interval normalization. The source mixed helper translates the defining polynomial by the signed rational offset, shifts dyadic bounds directly or converts shifted rational endpoints back to binary, preserves minimality and normalizes zero-crossing results. In-place output aliases are supported. The source sub(0,b,c) route publishes b before Neg; a real minimum-integer refusal verifies that prefix with physical ownership audit and the existing exact Neg child cleanup contract. Persistent m_add_tmp is lazily materialized in this borrowed prerequisite core and destroyed before isolation members; complete source constructor composition remains open. Owner-held locals preserve iu/il then u/l then nbv cleanup, and a stopped inner destructor is not retried by automatic outer cleanup. Independent coefficient/round-trip and actual cancellation/retry tests pass. Two-algebraic-value resultants/root selection, source TRACE, complete nested failure/callback composition and original whole-driver completion remain open.",
         "Defining polynomial and bound accessors are reached by purify_arith_tactic.cpp:469-472. GetPolynomial copies the stored polynomial without minimizing, or constructs d*x-n for a rational and x for zero, preserving coefficient copy/negation/size order. Binary and nonprecision rational getters use the source irrationality assertion; precision rational getters support zero/basic values and refine independent interval copies using precision*4 binary bits. The source upper getter ignores exact-root refinement return and retains its current upper endpoint. Two actual bound temporaries retain reverse cleanup in the core; executing accessor operations protect the input owner. Existing decimal output uses the same get_interval helper. Independent value/ownership tests and a real minimum-integer allocation-prefix audit pass; full root-child failure/callback composition and tactic integration remain partial.",
@@ -49578,6 +49600,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_to_numeral_external_test.go",
         "pkg/math/polynomial/upolynomial.go",
         "pkg/math/polynomial/upolynomial_eval.go",
         "pkg/math/polynomial/upolynomial_modes.go",
@@ -49637,6 +49660,9 @@
         "pkg/math/polynomial/upolynomial_native_isolation_storage_test.go"
       ],
       "tests": [
+        "TestPolynomialToNumeralExternalOwnerAndNumeralMode",
+        "TestPolynomialToNumeralExternalRejectsOtherIntegerService",
+        "TestAlgebraicResultantSumDifferenceAndProductPolynomials",
         "TestUPolynomialNativeCoefficientScratchGrowthAndReset",
         "TestUPolynomialNativeCoefficientGrowthMovesActualBIGAndView",
         "TestUPolynomialSourceNinePretranslationENSURE",
@@ -49777,6 +49803,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "upolynomial.h:401-424 actual external UP receiver for algebraic_numbers.cpp:812,837, same concrete integer service; output normalization and cleanup use the bound receiving numeral manager",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_to_numeral_variable.go",
+          "tests": ["TestPolynomialToNumeralExternalOwnerAndNumeralMode", "TestPolynomialToNumeralExternalRejectsOtherIntegerService", "TestAlgebraicResultantSumDifferenceAndProductPolynomials"]
+        },
         {
           "name": "selected complete dense storage/core arithmetic/sign evaluation and actual core/derived constructor/destructor/checkpoint actions",
           "status": "ported",
@@ -50200,6 +50232,7 @@
         "upolynomial.h:151-156: only actual executing trial caller chains refuse mode changes; idle retained scopes do not introduce a new busy refusal."
       ],
       "deviations": [
+        "ToNumeralVectorInto removes the old assumption that the destination belongs to polynomial::manager internal UP owner. The actual receiving UP manager owns reserve/read/reset/copy/set_size, its numeral-mode normalization and the captured cleanup service. No coefficient-store borrowing or intermediate polynomial copy is added. Existing internal conversion delegates to that same engine. Tests verify a BIG coefficient, the actual external receiver in Z and GF(7), rejection of an unrelated integer service before scope construction, and the live algebraic resultant consumer. Full cross-owner failure/callback matrix and broader UP/header ownership remain partial.",
         "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
         "Registered tests retain explicit dense input conversion adapters. Unported multivariate conversion, root isolation/refinement/factorization and remaining registered test actions keep each complete source unit partial. Explicit cleanup on Go errors preserves rooted completed prefixes; it does not claim native C++ exception continuation.",
         "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks.",

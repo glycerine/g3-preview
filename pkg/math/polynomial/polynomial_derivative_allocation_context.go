@@ -82,7 +82,7 @@ func numericIntegerModularManager_normalizeWithSourceContext(m *unumeral.Integer
 		return e
 	}
 
-	if r := context.factorNumeralVector; r != nil && numericIntegerManager_factorNumeralVectorRoots(m.Integers(), context) != nil && r.manager.upm.modular == m {
+	if r := context.factorNumeralVector; r != nil && numericIntegerManager_factorNumeralVectorRoots(m.Integers(), context) != nil && r.frame.outputManager != nil && r.frame.outputManager.modular == m {
 		e := m.WithAllocationContext((context).utility(m.Integers())).PNormalizeWithFactorHistoryTracked(out, &r.frame.normalize)
 		if r.frame.sourceCause == nil {
 			r.frame.sourceCause = nil

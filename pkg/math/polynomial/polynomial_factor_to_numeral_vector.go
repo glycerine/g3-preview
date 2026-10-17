@@ -23,6 +23,7 @@ type polynomialFactorNumeralVectorScope struct {
 	active, executing, finishing, constructed bool
 	direct                                    polynomialFactorNumeralVectorReceipt
 	output                                    *upolyVectorState
+	outputManager                             *UPolynomialManager
 	np                                        polynomialReference
 	normalization                             polynomialNormalizeInvocationReceipt
 	numeric                                   polynomialNumericRoots
@@ -38,6 +39,10 @@ func numericIntegerManager_factorNumeralVectorRoots(m *unumeral.IntegerManager, 
 	if m == nil || !m.ValidOwner() || r == nil || !r.manager.matchesFactorNumeralVector(r) || context.factorNumeralVectorInvocation != r.invocation || r.manager.core.integer != m || !r.frame.active || !r.frame.executing || r.manager.core.callbackDepth != 0 {
 		return nil
 	}
+	output := r.frame.outputManager
+	if output == nil || output.self != output || output.config.Integer != m {
+		return nil
+	}
 	return &r.frame.numeric
 }
 func (m *MultivariatePolynomialManager) toNumeralVectorWithReceipt(p Polynomial, output *upolyVectorState, r *polynomialFactorNumeralVectorReceipt) error {
@@ -47,11 +52,20 @@ func (m *MultivariatePolynomialManager) toNumeralVectorVariableWithReceipt(p Pol
 	return m.toNumeralVectorSource(p, variable, true, output, r)
 }
 func (m *MultivariatePolynomialManager) toNumeralVectorSource(p Polynomial, variable uint32, selected bool, output *upolyVectorState, r *polynomialFactorNumeralVectorReceipt) (cause error) {
+	if m == nil {
+		return ErrPolynomialOwner
+	}
+	return m.toNumeralVectorIntoSource(p, variable, selected, m.upm, output, r)
+}
+func (m *MultivariatePolynomialManager) toNumeralVectorIntoSource(p Polynomial, variable uint32, selected bool, outputManager *UPolynomialManager, output *upolyVectorState, r *polynomialFactorNumeralVectorReceipt) (cause error) {
 	if e := m.ready(); e != nil {
 		return e
 	}
-	if output == nil {
+	if output == nil || outputManager == nil || outputManager.config.Integer != m.core.integer {
 		return ErrUPolynomialOwner
+	}
+	if e := outputManager.check(); e != nil {
+		return e
 	}
 	c := m.core
 	if polynomialSourceDebug && !selected {
@@ -67,7 +81,7 @@ func (m *MultivariatePolynomialManager) toNumeralVectorSource(p Polynomial, vari
 	if s.active || s.executing || s.finishing || c.callbackDepth != 0 || s.invocation == ^uint64(0) {
 		return ErrPolynomialPending
 	}
-	*s = polynomialFactorNumeralVectorScope{owner: m, invocation: s.invocation + 1, active: true, executing: true, constructed: true, referenceConstructed: true, output: output}
+	*s = polynomialFactorNumeralVectorScope{owner: m, invocation: s.invocation + 1, active: true, executing: true, constructed: true, referenceConstructed: true, output: output, outputManager: outputManager}
 	s.direct = polynomialFactorNumeralVectorReceipt{manager: m, frame: s, invocation: s.invocation}
 	previousCaller := factorNumeralVectorCaller(c.integer)
 	setFactorNumeralVectorCaller(c.integer, m)
@@ -110,15 +124,15 @@ func (m *MultivariatePolynomialManager) toNumeralVectorSource(p Polynomial, vari
 	if e != nil {
 		return e
 	}
-	if e = m.upm.reserve(output, degree+1); e != nil {
+	if e = outputManager.reserve(output, degree+1); e != nil {
 		return e
 	}
 	for i := uint32(0); i <= degree; i++ {
-		value, e := m.upm.read(m.upm.stateView(output), i)
+		value, e := outputManager.read(outputManager.stateView(output), i)
 		if e != nil {
 			return e
 		}
-		if e = m.upm.modular.Reset(value); e != nil {
+		if e = outputManager.modular.Reset(value); e != nil {
 			return e
 		}
 	}
@@ -155,7 +169,7 @@ func (m *MultivariatePolynomialManager) toNumeralVectorSource(p Polynomial, vari
 		if polynomialSourceDebug && !selected && k > degree {
 			return ErrPolynomialAssertion
 		}
-		value, e := m.upm.read(m.upm.stateView(output), k)
+		value, e := outputManager.read(outputManager.stateView(output), k)
 		if e != nil {
 			return e
 		}
@@ -167,13 +181,13 @@ func (m *MultivariatePolynomialManager) toNumeralVectorSource(p Polynomial, vari
 		if e := s.numeric.operation.enter(c.integer); e != nil {
 			return e
 		}
-		e = m.upm.modular.WithAllocationContext((context).utility(m.upm.modular.Integers())).Copy(value, &coefficient)
+		e = outputManager.modular.WithAllocationContext((context).utility(outputManager.modular.Integers())).Copy(value, &coefficient)
 		s.numeric.operation.leave()
 		if e != nil {
 			return e
 		}
 	}
-	return m.upm.setSize(output, degree+1)
+	return outputManager.setSize(output, degree+1)
 }
 func (m *MultivariatePolynomialManager) finishFactorNumeralVectorSource() error {
 	s := &m.factorNumeralVector
@@ -204,7 +218,7 @@ func (m *MultivariatePolynomialManager) finishFactorNumeralVectorSource() error 
 		s.constructed = false
 		s.sourceReferenceDone = true
 	}
-	if !polynomialNegNumericPending(&s.numeric) && !m.upm.modular.MatchesPNormalizeInvocation(&s.normalize) && !m.matchesNormalizeInvocation(&s.normalization) {
+	if !polynomialNegNumericPending(&s.numeric) && !s.outputManager.modular.MatchesPNormalizeInvocation(&s.normalize) && !m.matchesNormalizeInvocation(&s.normalization) {
 		s.active = false
 	}
 	return nil
@@ -235,7 +249,7 @@ func (m *MultivariatePolynomialManager) cleanupFactorNumeralVector(r *polynomial
 		r.diagnostic = s.direct.diagnostic
 		r.returned = true
 	}()
-	if e := m.upm.modular.CleanupPNormalizeInvocation(&s.normalize, false); e != nil {
+	if e := s.outputManager.modular.CleanupPNormalizeInvocation(&s.normalize, false); e != nil {
 		return e
 	}
 	if e := m.cleanupNormalizeInvocation(&s.normalization, false); e != nil {
@@ -250,7 +264,7 @@ func (m *MultivariatePolynomialManager) cleanupFactorNumeralVector(r *polynomial
 	if !abort {
 		return nil
 	}
-	if e := m.upm.modular.CleanupPNormalizeInvocation(&s.normalize, true); e != nil {
+	if e := s.outputManager.modular.CleanupPNormalizeInvocation(&s.normalize, true); e != nil {
 		return e
 	}
 	if e := m.cleanupNormalizeInvocation(&s.normalization, true); e != nil {

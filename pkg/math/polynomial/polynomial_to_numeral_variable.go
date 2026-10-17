@@ -1,6 +1,23 @@
 // Source: src/math/polynomial/upolynomial.h:426-450.
 package polynomial
 
+// ToNumeralVectorInto converts a univariate polynomial into the concrete dense
+// owner used by the caller. The two owners must share the actual integer
+// service; no coefficient-store alias or intermediate polynomial is created.
+func (m *MultivariatePolynomialManager) ToNumeralVectorInto(p Polynomial, outputManager *UPolynomialManager, output UPolynomial) error {
+	if e := m.ready(); e != nil {
+		return e
+	}
+	if outputManager == nil || outputManager.config.Integer != m.core.integer {
+		return ErrUPolynomialOwner
+	}
+	d, e := outputManager.descriptor(output)
+	if e != nil {
+		return e
+	}
+	return m.toNumeralVectorIntoSource(p, 0, false, outputManager, &d.state, nil)
+}
+
 // UnivariateManager returns the actual dense manager owned by this manager.
 // The caller must keep its owner alive while using the borrowed manager.
 func (m *MultivariatePolynomialManager) UnivariateManager() (*UPolynomialManager, error) {
