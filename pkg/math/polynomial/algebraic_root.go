@@ -49,6 +49,8 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	representationNormalize                                    unumeral.IntegerNormalizeInvocationReceipt
+	representationCopy                                         unumeral.IntegerCopyAllocationReceipt
 	comparisonTraceRunning                                     bool
 	rationalCopy                                               unumeral.IntegerCopyAllocationReceipt
 	manager                                                    *AlgebraicManager
@@ -993,6 +995,14 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 		return ErrAlgebraicOwner
 	}
 	if e := m.cleanupCellAllocation(); e != nil {
+		return e
+	}
+	if p := m.config.Polynomials; p != nil {
+		if e := p.modular.CleanupPNormalizeInvocation(&m.representationNormalize, true); e != nil {
+			return e
+		}
+	}
+	if e := m.config.Rationals.Integers().CleanupCopyAllocationInvocation(&m.representationCopy); e != nil {
 		return e
 	}
 	if e := m.config.Rationals.Integers().CleanupCopyAllocationInvocation(&m.rationalCopy); e != nil {

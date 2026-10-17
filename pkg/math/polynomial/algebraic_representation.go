@@ -16,6 +16,9 @@ func (m *AlgebraicRootCore) GetPolynomial(a *Algebraic, out UPolynomial) error {
 	if e != nil {
 		return e
 	}
+	if m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.representationCopy) || m.config.Polynomials.modular.MatchesPNormalizeInvocation(&m.representationNormalize) {
+		return ErrAlgebraicPending
+	}
 	p := m.config.Polynomials
 	d, e := p.descriptor(out)
 	if e != nil {
@@ -32,7 +35,7 @@ func (m *AlgebraicRootCore) GetPolynomial(a *Algebraic, out UPolynomial) error {
 		if e != nil {
 			return e
 		}
-		return p.setView(&d.state, v)
+		return m.copyDefiningCoefficients(&d.state, v)
 	}
 	if e = p.reserve(&d.state, 2); e != nil {
 		return e
@@ -51,10 +54,10 @@ func (m *AlgebraicRootCore) GetPolynomial(a *Algebraic, out UPolynomial) error {
 		if e != nil {
 			return e
 		}
-		if e = z.Copy(&values[0], r.value.BorrowNumerator()); e != nil {
+		if e = z.CopyFromOwnerWithReceipt(&values[0], z, r.value.BorrowNumerator(), &m.representationCopy); e != nil {
 			return e
 		}
-		if e = z.Copy(&values[1], r.value.BorrowDenominator()); e != nil {
+		if e = z.CopyFromOwnerWithReceipt(&values[1], z, r.value.BorrowDenominator(), &m.representationCopy); e != nil {
 			return e
 		}
 		if e = z.Neg(&values[0]); e != nil {
@@ -221,4 +224,30 @@ func (m *AlgebraicRootCore) intervalAtPrecision(r *algebraicRecord, lower, upper
 		return false, e
 	}
 	return m.config.Polynomials.RefineToPrecision(v, b, lower, upper, precision*4)
+}
+
+// Preserve reserve, ascending numeral SET and final size adjustment from
+// upm().set, retaining the actual receiving manager and its normalization.
+func (m *AlgebraicRootCore) copyDefiningCoefficients(out *upolyVectorState, v UPolynomialView) error {
+	p := m.config.Polynomials
+	if p.alias(v, out) {
+		if polynomialSourceDebug && out.size != v.count {
+			return ErrUPolynomialAssertion
+		}
+		return nil
+	}
+	if e := p.reserve(out, v.count); e != nil {
+		return e
+	}
+	z := m.config.Rationals.Integers()
+	for i := uint32(0); i < v.count; i++ {
+		value, e := p.read(v, i)
+		if e != nil {
+			return e
+		}
+		if e = p.modular.CopyFromOwnerTracked(&p.values(out)[i], z, value, &m.representationCopy, &m.representationNormalize); e != nil {
+			return e
+		}
+	}
+	return p.setSize(out, v.count)
 }
