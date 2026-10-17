@@ -166425,10 +166425,12 @@
           ]
         },
         {
-          "name": "add/sub/big_add_sub with reached MPN add operand/result TRACE and MPN/MPZ source assertion switch reads",
+          "name": "add/sub/big_add_sub with reached MPN add and compare/subtract operand/result TRACE and MPN/MPZ source assertion switch reads",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz.go",
           "tests": [
+            "TestMPNOppositeSignIntegerSourceTraceOrder",
+            "TestMPNSubResultTracePrecedesMPZBorrowAssertion",
             "TestMPNAddSourceAssertionsThroughIntegerConsumer",
             "TestMPNAddLiveIntegerSourceTraceOrder",
             "TestMPNAddOperandTracePrecedesSourceAssertion",
@@ -168540,10 +168542,12 @@
           ]
         },
         {
-          "name": "add/sub/big_add_sub with reached MPN add operand/result TRACE and MPN/MPZ source assertion switch reads",
+          "name": "add/sub/big_add_sub with reached MPN add and compare/subtract operand/result TRACE and MPN/MPZ source assertion switch reads",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz.go",
           "tests": [
+            "TestMPNOppositeSignIntegerSourceTraceOrder",
+            "TestMPNSubResultTracePrecedesMPZBorrowAssertion",
             "TestMPNAddSourceAssertionsThroughIntegerConsumer",
             "TestMPNAddLiveIntegerSourceTraceOrder",
             "TestMPNAddOperandTracePrecedesSourceAssertion",

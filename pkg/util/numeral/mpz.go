@@ -1287,7 +1287,10 @@ func (m *IntegerManager) addSubWithAllocationContext(a, b, c *Int, subtract bool
 		}
 		return m.publishTmpAtWithAllocationContext(0, c, sign, realSize, context)
 	}
+	m.Natural.traceMPNUnaryView(limbView{allocator: m.Allocator, backing: m.Cell(ca).Backing, size: na}, 420, false)
 	cmp := m.compareCells(ca, cb)
+	m.Natural.traceMPNCompareResult(cmp)
+	m.Natural.traceMPNUnaryView(limbView{allocator: m.Allocator, backing: m.Cell(cb).Backing, size: nb}, 427, true)
 	if cmp == 0 {
 		return m.Reset(c)
 	}
@@ -1304,6 +1307,9 @@ func (m *IntegerManager) addSubWithAllocationContext(a, b, c *Int, subtract bool
 	if e := m.prepareTmpSpan(0, n); e != nil {
 		return e
 	}
+	m.Natural.traceMPNBinaryView(
+		limbView{allocator: m.Allocator, backing: m.Cell(ca).Backing, size: n},
+		limbView{allocator: m.Allocator, backing: m.Cell(cb).Backing, size: m.Cell(cb).Size}, "-")
 	var k uint32
 	for j := uint32(0); j < n; j++ {
 		u, v := m.Digit(ca, j), m.Digit(cb, j)
@@ -1317,8 +1323,22 @@ func (m *IntegerManager) addSubWithAllocationContext(a, b, c *Int, subtract bool
 			k = 1
 		}
 	}
-	if k != 0 {
-		panic("mpnum: unexpected subtraction borrow")
+	m.Natural.traceMPNUnaryView(limbView{allocator: m.Allocator, backing: m.Cell(m.Tmp[0]).Backing, size: n}, 427, true)
+	if diagnostic.DebugBuild {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return e
+		}
+		if enabled && k != 0 {
+			line := int32(406)
+			if cmp < 0 {
+				line = 393
+			}
+			if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", line, "borrow == 0"); e != nil {
+				return e
+			}
+		}
 	}
 	return m.publishTmpAtWithAllocationContext(0, c, sign, n, context)
 }
