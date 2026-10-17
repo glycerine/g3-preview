@@ -25,7 +25,7 @@ type PowerDomainError struct {
 	Reason   PowerDomainReason
 }
 
-func (e *PowerDomainError) Error() string  { return ErrNonterminatingPower.Error() }
+func (e *PowerDomainError) Error() string { return ErrNonterminatingPower.Error() }
 func (e *PowerDomainError) Unwrap() error { return ErrNonterminatingPower }
 
 // ensureOwnedCapacity translates ensure_capacity, including requested capacity
@@ -52,20 +52,32 @@ func (m *IntegerManager) ensureOwnedCapacityWithAllocationContext(a *Int, capaci
 	if e != nil {
 		return e
 	}
-	if modularSourceDebug && m.Cell(ref).Capacity != capacity {
-		if e := m.free(ref); e != nil {
+	if old == 0 {
+		a.Cell = ref
+		m.PublishCell(ref)
+	} // source small pointer publication precedes the assertion and digit writes
+	if modularSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
 			return e
 		}
-		return ErrIntegerAssertion
+		if enabled && m.Cell(ref).Capacity != capacity {
+			line := int32(1563)
+			expression := "a.m_ptr->m_capacity == capacity"
+			if old != 0 {
+				line = 1586
+				expression = "new_cell->m_capacity == capacity"
+			}
+			if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", line, expression); e != nil {
+				return e
+			}
+		}
 	}
 	sign := a.Val
 	if old != 0 {
 		m.ResizeCell(ref, size)
 	}
-	if old == 0 {
-		a.Cell = ref
-		m.PublishCell(ref)
-	} // source small pointer publication precedes digit writes
 	if old != 0 {
 		for i := uint32(0); i < size; i++ {
 			m.writeDigit(ref, i, m.Digit(old, i))
@@ -87,8 +99,10 @@ func (m *IntegerManager) ensureOwnedCapacityWithAllocationContext(a *Int, capaci
 			return e
 		}
 	}
-	a.Cell = ref
-	m.PublishCell(ref)
+	if old != 0 {
+		a.Cell = ref
+		m.PublishCell(ref)
+	}
 	a.Val = sign
 	if old == 0 {
 		m.ResizeCell(ref, size)

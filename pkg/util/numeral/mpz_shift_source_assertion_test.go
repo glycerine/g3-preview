@@ -44,10 +44,16 @@ func TestIntegerShiftSourceAssertionSwitchOrder(t *testing.T) {
 		d, _ := bindMPNDebugActions(t, "")
 		m, _ := integerManager(t)
 		a := NewInt(1)
-		serviceMust(t, d.Close())
+		w := &mpnCloseDebugOnFlush{debug: d, closeAt: 2}
+		tags := diagnostic.NewTraceTagsWithWriter(w)
+		tags.Enable("mpz_mul2k")
+		if !tags.ShouldTrace("mpz_mul2k") {
+			t.Skip("source multiplication TRACE erased")
+		}
+		serviceMust(t, m.BindTrace(tags))
 		err := m.Mul2kInPlace(&a, 32)
-		if !errors.Is(err, arena.ErrClosed) || a.IsSmall() || m.Cell(a.Cell).Size != 1 || m.Digit(a.Cell, 0) != 1 {
-			t.Fatal("multiply assertion switch must follow capacity preparation and precede shift", err, a)
+		if !errors.Is(err, arena.ErrClosed) || w.closeErr != nil || w.flushes < 2 || a.IsSmall() || m.Cell(a.Cell).Size != 1 || m.Digit(a.Cell, 0) != 1 {
+			t.Fatal("multiply assertion switch must follow capacity preparation and precede shift", err, w.closeErr, w.flushes, a)
 		}
 	})
 }
