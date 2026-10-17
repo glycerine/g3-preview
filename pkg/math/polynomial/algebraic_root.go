@@ -49,6 +49,7 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	refinement                                                 algebraicRefinementScope
 	representationNeg                                          algebraicRepresentationNegNumeric
 	representationNormalize                                    unumeral.IntegerNormalizeInvocationReceipt
 	representationCopy                                         unumeral.IntegerCopyAllocationReceipt
@@ -198,7 +199,7 @@ func (m *AlgebraicRootCore) check() error {
 	if m != nil && m.self == m && m.arithmetic.executing {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && m.bounds.executing {
+	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.inversion.executing {
@@ -983,7 +984,7 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	if m != nil && m.self == m && m.arithmetic.executing {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && m.bounds.executing {
+	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.inversion.executing {
@@ -1052,6 +1053,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 		return e
 	}
 	if e := m.cleanupBounds(); e != nil {
+		return e
+	}
+	if e := m.refinement.cleanup(); e != nil {
 		return e
 	}
 	if e := m.CleanupNegation(); e != nil {
@@ -1162,7 +1166,7 @@ func (m *AlgebraicRootCore) closeCoreMembers() error {
 	if m != nil && m.self == m && m.arithmetic.executing {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && m.bounds.executing {
+	if m != nil && m.self == m && (m.bounds.executing || m.refinement.executing) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.inversion.executing {

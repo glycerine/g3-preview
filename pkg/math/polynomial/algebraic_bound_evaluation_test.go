@@ -22,7 +22,7 @@ func TestAlgebraicPrecisionBoundOwnsActualHornerChild(t *testing.T) {
 			}
 			pad := algebraicCellSourceTLSBoundary(t, c)
 			body := get()
-			if body == nil || !c.bounds.evaluationPending(c) || !p.matchesBinaryEvaluationReceipt(&c.bounds.evaluation) {
+			if body == nil || !c.bounds.evaluationPending(c) || !p.matchesBinaryEvaluationReceipt(&c.bounds.refinement.evaluation) {
 				t.Fatal("missing actual failed Horner child", body)
 			}
 			if e := get(); !errors.Is(e, ErrAlgebraicPending) {
@@ -81,7 +81,7 @@ func TestAlgebraicPrecisionBoundPreservesOlderHornerChild(t *testing.T) {
 	serviceMust(t, runtime.Deallocate(&pad))
 	out := unumeral.NewRational()
 	body = c.GetLowerRationalAtPrecision(&root, &out, 0)
-	if !errors.Is(body, ErrUPolynomialCleanupPending) || c.bounds.evaluation.owner != nil {
+	if !errors.Is(body, ErrUPolynomialCleanupPending) || c.bounds.refinement.evaluation.owner != nil {
 		t.Fatal("refused getter acquired older evaluation", body)
 	}
 	state, used, stats := p.binaryEvaluation, p.config.Integer.Budget().Used(), runtime.Stats()

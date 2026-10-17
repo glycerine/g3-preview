@@ -76,6 +76,9 @@ func (m *AlgebraicRootCore) RefineToPrecision(a *Algebraic, k uint32) error {
 	return e
 }
 func (m *AlgebraicRootCore) refineAt(a *Algebraic, k uint32, precision bool) (bool, error) {
+	if m != nil && m.self == m && m.refinement.pending(m) {
+		return false, ErrAlgebraicPending
+	}
 	l, e := m.location(a)
 	if e != nil {
 		return false, e
@@ -95,13 +98,8 @@ func (m *AlgebraicRootCore) refineAt(a *Algebraic, k uint32, precision bool) (bo
 	if r.flags&2 != 0 {
 		s = -1
 	}
-	var ok bool
-	if precision {
-		ok, e = m.config.Polynomials.RefineCoreToPrecision(v, s, m.config.Binary, &(*r.interval.BorrowLower()), &(*r.interval.BorrowUpper()), k)
-	} else {
-		ok, e = m.config.Polynomials.RefineCore(v, s, m.config.Binary, &(*r.interval.BorrowLower()), &(*r.interval.BorrowUpper()))
-	}
-	if e = m.save(l, &r, e); e != nil {
+	ok, e := m.refineRecord(l, &r, v, s, k, precision)
+	if e != nil {
 		return false, e
 	}
 	if ok {
@@ -394,4 +392,22 @@ func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 	}
 	r.flags |= 4
 	return false, m.store(l, &r)
+}
+
+// Store every interval publication, including partial body/error results,
+// before releasing the executing span. Rational-root promotion follows it.
+func (m *AlgebraicRootCore) refineRecord(l *algebraicLocation, r *algebraicRecord, v UPolynomialView, sign int, k uint32, precision bool) (ok bool, cause error) {
+	s := &m.refinement
+	if e := s.begin(m); e != nil {
+		return false, e
+	}
+	defer func() { s.executing = false }()
+	p, b := m.config.Polynomials, m.config.Binary
+	if precision {
+		// cpp:773 recomputes the sign via refine, unlike refine_core(c):730.
+		ok, cause = p.refineToPrecisionWithEvaluationReceipt(v, b, r.interval.BorrowLower(), r.interval.BorrowUpper(), k, &s.evaluation, s)
+	} else {
+		ok, cause = p.refineCoreWithEvaluationReceipt(v, sign, b, r.interval.BorrowLower(), r.interval.BorrowUpper(), &s.evaluation, s)
+	}
+	return ok, m.save(l, r, cause)
 }

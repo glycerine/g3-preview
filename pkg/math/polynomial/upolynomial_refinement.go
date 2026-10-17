@@ -222,7 +222,7 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *unumer
 func (m *UPolynomialManager) RefineCore(v UPolynomialView, sa int, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational) (bool, error) {
 	return m.refineCoreWithEvaluationReceipt(v, sa, bqm, a, b, nil, nil)
 }
-func (m *UPolynomialManager) refineCoreWithEvaluationReceipt(v UPolynomialView, sa int, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational, receipt *upolyBinaryEvaluationInvocationReceipt, temporaries *algebraicBoundRefinement) (interval bool, cause error) {
+func (m *UPolynomialManager) refineCoreWithEvaluationReceipt(v UPolynomialView, sa int, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational, receipt *upolyBinaryEvaluationInvocationReceipt, temporaries *algebraicRefinementScope) (interval bool, cause error) {
 	if e := m.isolationBinary(bqm); e != nil {
 		return false, e
 	}
@@ -311,7 +311,7 @@ func (m *UPolynomialManager) Refine(v UPolynomialView, bqm *unumeral.BinaryRatio
 func (m *UPolynomialManager) RefineCoreToPrecision(v UPolynomialView, sa int, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational, k uint32) (bool, error) {
 	return m.refineCoreToPrecisionWithEvaluationReceipt(v, sa, bqm, a, b, k, nil, nil)
 }
-func (m *UPolynomialManager) refineCoreToPrecisionWithEvaluationReceipt(v UPolynomialView, sa int, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational, k uint32, receipt *upolyBinaryEvaluationInvocationReceipt, temporaries *algebraicBoundRefinement) (interval bool, cause error) {
+func (m *UPolynomialManager) refineCoreToPrecisionWithEvaluationReceipt(v UPolynomialView, sa int, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational, k uint32, receipt *upolyBinaryEvaluationInvocationReceipt, temporaries *algebraicRefinementScope) (interval bool, cause error) {
 	if e := m.isolationBinary(bqm); e != nil {
 		return false, e
 	}
@@ -374,7 +374,7 @@ func (m *UPolynomialManager) refineCoreToPrecisionWithEvaluationReceipt(v UPolyn
 func (m *UPolynomialManager) RefineToPrecision(v UPolynomialView, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational, k uint32) (bool, error) {
 	return m.refineToPrecisionWithEvaluationReceipt(v, bqm, a, b, k, nil, nil)
 }
-func (m *UPolynomialManager) refineToPrecisionWithEvaluationReceipt(v UPolynomialView, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational, k uint32, receipt *upolyBinaryEvaluationInvocationReceipt, temporaries *algebraicBoundRefinement) (interval bool, cause error) {
+func (m *UPolynomialManager) refineToPrecisionWithEvaluationReceipt(v UPolynomialView, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational, k uint32, receipt *upolyBinaryEvaluationInvocationReceipt, temporaries *algebraicRefinementScope) (interval bool, cause error) {
 	if e := m.isolationBinary(bqm); e != nil {
 		return false, e
 	}

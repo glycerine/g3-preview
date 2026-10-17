@@ -9,18 +9,18 @@ func (m *UPolynomialManager) matchesBinaryEvaluationReceipt(r *upolyBinaryEvalua
 	q := &m.binaryEvaluation
 	return r.owner == m && r.frame == q && q.owner == m && r.invocation != 0 && r.invocation == q.invocation && r.history == q.history
 }
-func (s *algebraicBoundScope) evaluationPending(m *AlgebraicRootCore) bool {
+func (s *algebraicRefinementScope) evaluationPending(m *AlgebraicRootCore) bool {
 	p := m.config.Polynomials
 	return p.matchesBinaryEvaluationReceipt(&s.evaluation) && p.binaryEvaluation.active
 }
-func (s *algebraicBoundScope) evaluationSourceCause(m *AlgebraicRootCore) error {
+func (s *algebraicRefinementScope) evaluationSourceCause(m *AlgebraicRootCore) error {
 	p := m.config.Polynomials
 	if p.matchesBinaryEvaluationReceipt(&s.evaluation) {
 		return p.binaryEvaluation.sourceCause
 	}
 	return nil
 }
-func (s *algebraicBoundScope) cleanupEvaluation(m *AlgebraicRootCore) error {
+func (s *algebraicRefinementScope) cleanupEvaluation(m *AlgebraicRootCore) error {
 	if s.evaluation.owner == nil {
 		return nil
 	}
@@ -29,4 +29,11 @@ func (s *algebraicBoundScope) cleanupEvaluation(m *AlgebraicRootCore) error {
 		return e
 	}
 	return p.cleanupBinaryEvaluationWithReceipt(&s.evaluation, true)
+}
+
+func (s *algebraicBoundScope) evaluationPending(m *AlgebraicRootCore) bool {
+	return s.refinement.evaluationPending(m)
+}
+func (s *algebraicBoundScope) evaluationSourceCause(m *AlgebraicRootCore) error {
+	return s.refinement.evaluationSourceCause(m)
 }

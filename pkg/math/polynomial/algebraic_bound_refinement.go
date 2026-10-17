@@ -1,5 +1,5 @@
 // Source: src/math/polynomial/upolynomial.cpp:2764-2778,2797-2807, reached
-// by src/math/polynomial/algebraic_numbers.cpp:2721-2767.
+// by src/math/polynomial/algebraic_numbers.cpp:730,743,773,2721-2767.
 // Width outlives each midpoint. MPBQ_DEBUG snapshots retain their separate
 // diagnostic service ownership; this policy covers the numerical body.
 package polynomial
@@ -11,21 +11,28 @@ const (
 	boundRefinementMid   = 1
 )
 
-type algebraicBoundRefinement struct {
-	owner     *AlgebraicRootCore
-	values    [2]unumeral.BinaryRational
-	live      uint8
-	hooks     unumeral.NumericInvocationHooks
-	roots     unumeral.NumericAllocationRoots
-	stop      error
-	executing bool
+type algebraicRefinementScope struct {
+	evaluation upolyBinaryEvaluationInvocationReceipt
+	owner      *AlgebraicRootCore
+	values     [2]unumeral.BinaryRational
+	live       uint8
+	hooks      unumeral.NumericInvocationHooks
+	roots      unumeral.NumericAllocationRoots
+	stop       error
+	executing  bool
 }
 
-func (s *algebraicBoundRefinement) NumericBound(executing bool) bool {
+func (s *algebraicRefinementScope) NumericBound(executing bool) bool {
 	m := s.owner
-	return m != nil && m.self == m && !m.closed && s == &m.bounds.refinement && (!executing || s.executing && m.bounds.executing)
+	if m == nil || m.self != m || m.closed {
+		return false
+	}
+	if s == &m.bounds.refinement {
+		return !executing || s.executing && m.bounds.executing
+	}
+	return s == &m.refinement && (!executing || s.executing)
 }
-func (s *algebraicBoundRefinement) NumericRoots(z *unumeral.IntegerManager, local *unumeral.NumericAllocationRoots) *unumeral.NumericAllocationRoots {
+func (s *algebraicRefinementScope) NumericRoots(z *unumeral.IntegerManager, local *unumeral.NumericAllocationRoots) *unumeral.NumericAllocationRoots {
 	if !s.NumericBound(true) || s.owner.config.Rationals.Integers() != z {
 		return nil
 	}
@@ -34,20 +41,20 @@ func (s *algebraicBoundRefinement) NumericRoots(z *unumeral.IntegerManager, loca
 	}
 	return &s.roots
 }
-func (s *algebraicBoundRefinement) pending(m *AlgebraicRootCore) bool {
+func (s *algebraicRefinementScope) pending(m *AlgebraicRootCore) bool {
 	if s.owner != m {
 		return false
 	}
-	if s.live != 0 || s.stop != nil || unumeral.NumericAllocationPending(&s.roots) {
+	if s.live != 0 || s.stop != nil || unumeral.NumericAllocationPending(&s.roots) || s.evaluationPending(m) {
 		return true
 	}
 
 	return false
 }
-func (s *algebraicBoundRefinement) context() unumeral.NumericAllocationContext {
+func (s *algebraicRefinementScope) context() unumeral.NumericAllocationContext {
 	return unumeral.NumericAllocationContext{}.WithCaller(&s.hooks)
 }
-func (s *algebraicBoundRefinement) construct(which uint8) (*unumeral.BinaryRational, error) {
+func (s *algebraicRefinementScope) construct(which uint8) (*unumeral.BinaryRational, error) {
 	if !s.NumericBound(true) || s.live&(1<<which) != 0 {
 		return nil, ErrAlgebraicPending
 	}
@@ -55,12 +62,12 @@ func (s *algebraicBoundRefinement) construct(which uint8) (*unumeral.BinaryRatio
 	s.live |= 1 << which
 	return &s.values[which], nil
 }
-func (s *algebraicBoundRefinement) sourceFinish(which uint8) error {
+func (s *algebraicRefinementScope) sourceFinish(which uint8) error {
 	if s.stop != nil {
 		return s.stop
 	}
 	m := s.owner
-	if e := m.bounds.evaluationSourceCause(m); e != nil {
+	if e := s.evaluationSourceCause(m); e != nil {
 		s.stop = e
 		return e
 	}
@@ -76,12 +83,18 @@ func (s *algebraicBoundRefinement) sourceFinish(which uint8) error {
 	s.live &^= 1 << which
 	return nil
 }
-func (s *algebraicBoundRefinement) cleanup() error {
+func (s *algebraicRefinementScope) cleanup() error {
 	if s.owner == nil {
 		return nil
 	}
+	if !s.NumericBound(false) {
+		return ErrAlgebraicOwner
+	}
 	if s.executing {
 		return ErrAlgebraicPending
+	}
+	if e := s.cleanupEvaluation(s.owner); e != nil {
+		return e
 	}
 	z := s.owner.config.Rationals.Integers()
 	if e := s.roots.Cleanup(z); e != nil {
@@ -102,12 +115,23 @@ func (s *algebraicBoundRefinement) cleanup() error {
 }
 func (m *AlgebraicRootCore) refineBoundInterval(v UPolynomialView, lower, upper *unumeral.BinaryRational, k uint32) (bool, error) {
 	s := &m.bounds.refinement
-	if s.pending(m) {
-		return false, ErrAlgebraicPending
+	if e := s.begin(m); e != nil {
+		return false, e
+	}
+	defer func() { s.executing = false }()
+	return m.config.Polynomials.refineToPrecisionWithEvaluationReceipt(v, m.config.Binary, lower, upper, k, &s.evaluation, s)
+}
+
+func (s *algebraicRefinementScope) begin(m *AlgebraicRootCore) error {
+	if m == nil || m.self != m || (s != &m.bounds.refinement && s != &m.refinement) {
+		return ErrAlgebraicOwner
+	}
+	if s.executing || s.pending(m) {
+		return ErrAlgebraicPending
 	}
 	s.owner = m
 	s.hooks.Policy = s
+	s.evaluation = upolyBinaryEvaluationInvocationReceipt{}
 	s.executing = true
-	defer func() { s.executing = false }()
-	return m.config.Polynomials.refineToPrecisionWithEvaluationReceipt(v, m.config.Binary, lower, upper, k, &m.bounds.evaluation, s)
+	return nil
 }
