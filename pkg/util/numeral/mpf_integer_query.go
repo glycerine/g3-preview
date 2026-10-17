@@ -32,6 +32,9 @@ func (m *ArbitraryFloatManager) IsInt(x *ArbitraryFloat) (result bool, cause err
 	if x.exponent < 0 {
 		return false, nil
 	}
+	if e := mpfSourceAssertion(x.exponent >= 0 && x.exponent < int64(x.SBits()-1), 1805, "x.exponent >= 0 && x.exponent < x.sbits-1"); e != nil {
+		return false, e
+	}
 	s := &m.integerQuery
 	*s = arbitraryFloatIntegerQueryScope{constructed: true, active: true, executing: true}
 	m.valueExecuting = true

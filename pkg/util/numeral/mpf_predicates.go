@@ -30,8 +30,8 @@ func (m *ArbitraryFloatManager) MkMaxExp(ebits uint32) (int64, error) {
 }
 
 func (m *ArbitraryFloatManager) topExponent(e uint32) (int64, error) {
-	if modularSourceDebug && e < 2 {
-		return 0, ErrIntegerAssertion
+	if assertion := mpfSourceAssertion(e >= 2, 1835, "ebits >= 2"); assertion != nil {
+		return 0, assertion
 	}
 	w, err := m.powerTwoWrapper(e-1, false)
 	if err != nil {
@@ -44,8 +44,8 @@ func (m *ArbitraryFloatManager) topExponent(e uint32) (int64, error) {
 	return m.integer.Int64(&a)
 }
 func (m *ArbitraryFloatManager) bottomExponent(e uint32) (int64, error) {
-	if modularSourceDebug && e < 2 {
-		return 0, ErrIntegerAssertion
+	if assertion := mpfSourceAssertion(e >= 2, 1830, "ebits >= 2"); assertion != nil {
+		return 0, assertion
 	}
 	w, err := m.powerTwoMinusOneWrapper(e-1, true)
 	if err != nil {
@@ -200,8 +200,8 @@ func (m *ArbitraryFloatManager) IsPositiveZero(a *ArbitraryFloat) (bool, error) 
 // Source: src/util/mpf.cpp:1840-1848. These bounds have their own ebits>0
 // assertion; reusing bottomExponent would incorrectly reject ebits=1.
 func (m *ArbitraryFloatManager) minExponent(e uint32) (int64, error) {
-	if modularSourceDebug && e == 0 {
-		return 0, ErrIntegerAssertion
+	if assertion := mpfSourceAssertion(e > 0, 1840, "ebits > 0"); assertion != nil {
+		return 0, assertion
 	}
 	w, err := m.powerTwoMinusOneWrapper(e-1, true)
 	if err != nil {
@@ -218,8 +218,8 @@ func (m *ArbitraryFloatManager) minExponent(e uint32) (int64, error) {
 	return r + 1, nil
 }
 func (m *ArbitraryFloatManager) maxExponent(e uint32) (int64, error) {
-	if modularSourceDebug && e == 0 {
-		return 0, ErrIntegerAssertion
+	if assertion := mpfSourceAssertion(e > 0, 1846, "ebits > 0"); assertion != nil {
+		return 0, assertion
 	}
 	w, err := m.powerTwoMinusOneWrapper(e-1, false)
 	if err != nil {

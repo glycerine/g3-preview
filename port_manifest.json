@@ -156773,6 +156773,7 @@
         "pkg/util/numeral/mpf_numeral_helpers.go",
         "pkg/util/numeral/mpf_numeral_helpers_test.go",
         "pkg/util/numeral/mpf_integer_query.go",
+        "pkg/util/numeral/mpf_exponent_assertion_source_test.go",
         "pkg/util/numeral/mpf_integer_query_test.go",
         "pkg/util/numeral/mpf_round_integral.go",
         "pkg/util/numeral/mpf_round_integral_scope.go",
@@ -157158,6 +157159,7 @@
         "TestArbitraryFloatMkMaxValueWarmInline",
         "TestArbitraryFloatPublicExponentBoundsIndependentAndWarm",
         "TestArbitraryFloatPublicExponentBoundsSignedBoundary",
+        "TestArbitraryFloatExponentBoundSourceAssertionSites",
         "TestArbitraryFloatPublicExponentBoundsEveryColdReservation",
         "TestArbitraryFloatPublicExponentBoundsCacheTransportGuards",
         "TestArbitraryFloatRawStringLiteralClassification",
@@ -158222,6 +158224,7 @@
           "tests": [
             "TestArbitraryFloatPublicExponentBoundsIndependentAndWarm",
             "TestArbitraryFloatPublicExponentBoundsSignedBoundary",
+            "TestArbitraryFloatExponentBoundSourceAssertionSites",
             "TestArbitraryFloatPublicExponentBoundsEveryColdReservation",
             "TestArbitraryFloatPublicExponentBoundsCacheTransportGuards"
           ]
@@ -158502,6 +158505,7 @@
         "pkg/util/numeral/mpf_numeral_helpers.go",
         "pkg/util/numeral/mpf_numeral_helpers_test.go",
         "pkg/util/numeral/mpf_integer_query.go",
+        "pkg/util/numeral/mpf_exponent_assertion_source_test.go",
         "pkg/util/numeral/mpf_integer_query_test.go",
         "pkg/util/numeral/mpf_round_integral.go",
         "pkg/util/numeral/mpf_round_integral_scope.go",
@@ -158795,6 +158799,7 @@
         "TestArbitraryFloatMkMaxValueWarmInline",
         "TestArbitraryFloatPublicExponentBoundsIndependentAndWarm",
         "TestArbitraryFloatPublicExponentBoundsSignedBoundary",
+        "TestArbitraryFloatExponentBoundSourceAssertionSites",
         "TestArbitraryFloatPublicExponentBoundsEveryColdReservation",
         "TestArbitraryFloatPublicExponentBoundsCacheTransportGuards",
         "TestArbitraryFloatRawStringLiteralClassification",
@@ -159365,6 +159370,7 @@
           "tests": [
             "TestArbitraryFloatPublicExponentBoundsIndependentAndWarm",
             "TestArbitraryFloatPublicExponentBoundsSignedBoundary",
+            "TestArbitraryFloatExponentBoundSourceAssertionSites",
             "TestArbitraryFloatPublicExponentBoundsEveryColdReservation",
             "TestArbitraryFloatPublicExponentBoundsCacheTransportGuards"
           ]
