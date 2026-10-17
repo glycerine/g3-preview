@@ -86,6 +86,19 @@ func (s *Solver) BindTrace(tags *diagnostic.TraceTags) error {
 	}
 	s.trace = tags
 	s.setup.trace = tags
+	for _, eq := range s.setup.equations {
+		if eq != nil {
+			eq.trace = tags
+		}
+	}
+	for _, eq := range s.setup.solution {
+		if eq != nil {
+			eq.trace = tags
+		}
+	}
+	if s.setup.pendingEq != nil {
+		s.setup.pendingEq.trace = tags
+	}
 	return nil
 }
 

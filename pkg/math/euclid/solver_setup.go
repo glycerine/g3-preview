@@ -203,7 +203,7 @@ func (s *solverSetup) addEquation(as []numeral.Int, xs []uint32, c *numeral.Int,
 	if e := s.open(); e != nil {
 		return nil, e
 	}
-	eq, e := makeEquation(s.manager, as, xs, c, bs, js, s.asBuffer, s.bsBuffer, sortJustifications)
+	eq, e := makeEquation(s.manager, as, xs, c, bs, js, s.asBuffer, s.bsBuffer, sortJustifications, s.trace)
 	if e != nil {
 		s.stop = e
 		return nil, e

@@ -144,7 +144,7 @@ func (s *solverSetup) assertEquation(as []numeral.Int, xs []uint32, c *numeral.I
 		}
 		bs, js = []numeral.Rational{one}, []uint32{justification}
 	}
-	eq, e := makeEquation(s.manager, as, xs, c, bs, js, s.asBuffer, s.bsBuffer, true)
+	eq, e := makeEquation(s.manager, as, xs, c, bs, js, s.asBuffer, s.bsBuffer, true, s.trace)
 	if e != nil {
 		s.stop = e
 		return e

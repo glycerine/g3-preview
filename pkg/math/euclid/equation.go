@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -13,6 +14,7 @@ import (
 // IDs and justification IDs are scalar values; buffers remain separate owners.
 type equation struct {
 	manager              *numeral.RationalManager
+	trace                *diagnostic.TraceTags
 	as                   []numeral.Int
 	xs                   []uint32
 	c                    numeral.Int
@@ -25,7 +27,7 @@ type equation struct {
 
 func makeEquation(m *numeral.RationalManager, as []numeral.Int, xs []uint32, c *numeral.Int,
 	bs []numeral.Rational, js []uint32, asBuffer *numeral.ScopedIntVector,
-	bsBuffer *numeral.ScopedRationalVector, sortJustifications bool) (result *equation, err error) {
+	bsBuffer *numeral.ScopedRationalVector, sortJustifications bool, tags *diagnostic.TraceTags) (result *equation, err error) {
 	if m == nil || c == nil || asBuffer == nil || bsBuffer == nil || len(as) != len(xs) || len(bs) != len(js) {
 		return nil, arena.ErrInvalidSlot
 	}
@@ -33,7 +35,8 @@ func makeEquation(m *numeral.RationalManager, as []numeral.Int, xs []uint32, c *
 	if err = m.BudgetField.Reserve(header); err != nil {
 		return nil, err
 	}
-	eq := &equation{manager: m, header: header}
+	eq := &equation{manager: m, trace: tags, header: header}
+	eq.traceAllocated()
 	defer func() {
 		if err != nil {
 			err = errors.Join(err, eq.Close())
@@ -92,7 +95,10 @@ func (e *equation) Close() error {
 		e.bsCursor++
 	}
 	e.as, e.xs, e.bs, e.js = nil, nil, nil, nil
-	e.manager.BudgetField.Release(e.header)
+	if e.header != 0 {
+		e.manager.BudgetField.Release(e.header)
+		e.traceDeallocated()
+	}
 	e.header = 0
 	e.closed = true
 	return nil

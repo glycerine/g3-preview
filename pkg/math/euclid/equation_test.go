@@ -23,7 +23,7 @@ func TestEuclideanEquationConstructionSortAndOwnedRelease(t *testing.T) {
 	bs := []numeral.Rational{numeral.NewRational(), numeral.NewRational()}
 	euclidMust(t, m.SetString(&bs[0], "23/11"))
 	euclidMust(t, m.SetString(&bs[1], "-5/13"))
-	eq, e := makeEquation(m, as, []uint32{4, 1}, &c, bs, []uint32{3, 0}, ib, rb, true)
+	eq, e := makeEquation(m, as, []uint32{4, 1}, &c, bs, []uint32{3, 0}, ib, rb, true, nil)
 	euclidMust(t, e)
 	if len(eq.as) != 2 || len(eq.bs) != 2 || eq.xs[0] != 1 || eq.xs[1] != 4 || eq.js[0] != 0 || eq.js[1] != 3 {
 		t.Fatal("equation source scalar order", eq.xs, eq.js)
@@ -84,7 +84,7 @@ func TestEuclideanEquationUnsortedDecompositionBranch(t *testing.T) {
 	euclidMust(t, ib.Resize(3))
 	as := []numeral.Int{numeral.NewInt(2), numeral.NewInt(-1)}
 	c := numeral.NewInt(0)
-	eq, e := makeEquation(m, as, []uint32{2, 0}, &c, nil, nil, ib, rb, false)
+	eq, e := makeEquation(m, as, []uint32{2, 0}, &c, nil, nil, ib, rb, false, nil)
 	euclidMust(t, e)
 	if len(eq.bs) != 0 || eq.xs[0] != 0 || eq.xs[1] != 2 || eq.as[0].Val != -1 || eq.as[1].Val != 2 {
 		t.Fatal("decomposition equation sort/justification", eq.xs, eq.as, eq.bs)
@@ -105,7 +105,7 @@ func TestEuclideanEquationHeaderRefusalPrecedesBufferMutation(t *testing.T) {
 	m.BudgetField.FailAfter(0)
 	a := []numeral.Int{numeral.NewInt(9)}
 	c := numeral.NewInt(2)
-	eq, e := makeEquation(m, a, []uint32{0}, &c, nil, nil, ib, rb, true)
+	eq, e := makeEquation(m, a, []uint32{0}, &c, nil, nil, ib, rb, true, nil)
 	if e == nil || eq != nil {
 		t.Fatal("equation header refusal", eq, e)
 	}

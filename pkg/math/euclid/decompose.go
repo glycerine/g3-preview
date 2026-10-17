@@ -163,7 +163,7 @@ func (s *solverSetup) decomposeAndEliminate() (err error) {
 		return e
 	}
 	aux, e := makeEquation(s.manager, coefficients, s.tmpXs, &newC, nil, nil,
-		s.asBuffer, s.bsBuffer, false)
+		s.asBuffer, s.bsBuffer, false, s.trace)
 	if e != nil {
 		return e
 	}
