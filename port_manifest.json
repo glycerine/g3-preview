@@ -32096,9 +32096,10 @@
         "TestGlobalParamsCatalogDispatcherFaultRoots",
         "TestContextParamsDefaultConstructorAndGlobalUpdate",
         "TestContextParamsNestedBoolAndCurrentScalarFallbackButLiteralStrings",
-        "TestContextParamsEveryConstructorReservationAndReverseStringUnwind",
+        "TestContextParamsGoStringSnapshotsAndCStringBoundary",
+        "TestContextParamsEveryConstructorReservationAndGoStringUnwind",
         "TestContextParamsUpdateStringRefusalPrefixAndIncompleteOwnerGuards",
-        "TestContextParamsEveryUpdateAllocationAndReachedStringViewLifetime",
+        "TestContextParamsEveryUpdateAllocationAndGoStringSnapshots",
         "TestContextParamsAllBooleanUpdateFieldsWrongKindsAndGlobalReRead",
         "TestContextParamsSetASCIINormalizationLiteralBoolAndLP64UIntParsing",
         "TestContextParamsUnknownSetNormalizedKeyLeavesUnusedValueUnreadAndListsExactDescriptors",
@@ -32139,9 +32140,10 @@
           "tests": [
             "TestContextParamsDefaultConstructorAndGlobalUpdate",
             "TestContextParamsNestedBoolAndCurrentScalarFallbackButLiteralStrings",
-            "TestContextParamsEveryConstructorReservationAndReverseStringUnwind",
+            "TestContextParamsGoStringSnapshotsAndCStringBoundary",
+            "TestContextParamsEveryConstructorReservationAndGoStringUnwind",
             "TestContextParamsUpdateStringRefusalPrefixAndIncompleteOwnerGuards",
-            "TestContextParamsEveryUpdateAllocationAndReachedStringViewLifetime",
+            "TestContextParamsEveryUpdateAllocationAndGoStringSnapshots",
             "TestContextParamsAllBooleanUpdateFieldsWrongKindsAndGlobalReRead"
           ]
         },
@@ -32215,9 +32217,9 @@
         "TestGlobalParamsCatalogDispatcherFaultRoots",
         "TestContextParamsDefaultConstructorAndGlobalUpdate",
         "TestContextParamsNestedBoolAndCurrentScalarFallbackButLiteralStrings",
-        "TestContextParamsEveryConstructorReservationAndReverseStringUnwind",
+        "TestContextParamsEveryConstructorReservationAndGoStringUnwind",
         "TestContextParamsUpdateStringRefusalPrefixAndIncompleteOwnerGuards",
-        "TestContextParamsEveryUpdateAllocationAndReachedStringViewLifetime",
+        "TestContextParamsEveryUpdateAllocationAndGoStringSnapshots",
         "TestContextParamsAllBooleanUpdateFieldsWrongKindsAndGlobalReRead",
         "TestContextParamsSetASCIINormalizationLiteralBoolAndLP64UIntParsing",
         "TestContextParamsUnknownSetNormalizedKeyLeavesUnusedValueUnreadAndListsExactDescriptors",
@@ -32266,9 +32268,9 @@
           "tests": [
             "TestContextParamsDefaultConstructorAndGlobalUpdate",
             "TestContextParamsNestedBoolAndCurrentScalarFallbackButLiteralStrings",
-            "TestContextParamsEveryConstructorReservationAndReverseStringUnwind",
+            "TestContextParamsEveryConstructorReservationAndGoStringUnwind",
             "TestContextParamsUpdateStringRefusalPrefixAndIncompleteOwnerGuards",
-            "TestContextParamsEveryUpdateAllocationAndReachedStringViewLifetime",
+            "TestContextParamsEveryUpdateAllocationAndGoStringSnapshots",
             "TestContextParamsAllBooleanUpdateFieldsWrongKindsAndGlobalReRead"
           ]
         },

@@ -3,17 +3,19 @@
 package smtcore
 
 import (
+	"strings"
+
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
 
-// Concrete call-local filename reader: borrowed c_str address identity remains
-// distinct from owned string/Params storage. No copied path is retained here.
+// Concrete call-local filename reader. Go strings retain their own bytes across
+// a later ContextParams update while the AST constructor reads this snapshot.
 
 type astTraceFilename struct {
 	params    uparams.ParamsStringView
-	owned     QITextView
+	owned     string
 	ownedMode bool
 }
 
@@ -21,28 +23,22 @@ func (n astTraceFilename) Byte(i uint64) (byte, error) {
 	if !n.ownedMode {
 		return n.params.Byte(i)
 	}
-	v := n.owned
-	if v.Owner == nil || v.Owner.Self != v.Owner || v.Owner.Closed || !v.Owner.Ready || v.Generation != v.Owner.Generation {
-		return 0, arena.ErrInvalidSlot
-	}
-	if i > v.Length {
+	if i > uint64(len(n.owned)) {
 		return 0, arena.ErrBounds
 	}
-	return v.Owner.CStringByte(i)
+	if i == uint64(len(n.owned)) {
+		return 0, nil
+	}
+	return n.owned[i], nil
 }
 func (n astTraceFilename) Length() (uint64, error) {
 	if !n.ownedMode {
 		return n.params.Length()
 	}
-	for i := uint64(0); ; i++ {
-		b, e := n.Byte(i)
-		if e != nil {
-			return 0, e
-		}
-		if b == 0 {
-			return i, nil
-		}
+	if i := strings.IndexByte(n.owned, 0); i >= 0 {
+		return uint64(i), nil
 	}
+	return uint64(len(n.owned)), nil
 }
 
 // MkASTManager returns the actual placement-new failed owner on constructor
@@ -61,7 +57,7 @@ func (s *ContextParams) MkASTManager(c ast.ASTManagerConfig) (*ast.ASTManager, e
 	}
 	var filename ast.TraceFilename
 	if s.state.Trace {
-		n := astTraceFilename{owned: s.traceFile.View(), ownedMode: true}
+		n := astTraceFilename{owned: s.traceFile, ownedMode: true}
 		filename = n
 	}
 	s.executing = true

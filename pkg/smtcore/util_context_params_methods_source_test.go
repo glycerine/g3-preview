@@ -167,7 +167,7 @@ func contextMethodsCold(t *testing.T, s *ContextParams, g *uparams.GlobalParamsS
 		n += gparamsGraph(x)
 	}
 	if s != nil {
-		n += s.header + uint64(s.dotProof.StorageBytes()+s.traceFile.StorageBytes())
+		n += s.header
 		for f := s.frames; f != nil; f = f.next {
 			if f.self != f || f.owner != s || f.invocation == 0 {
 				t.Fatal("actual lexical owner binding")
@@ -230,8 +230,7 @@ func TestContextParamsActualLongStringSetEveryAllocationAndErrorScanRefusal(t *t
 		c, g, _, b := dynAckSourceFixture(t)
 		s, e := NewContextParams(c, g, b)
 		paramsMust(t, e)
-		old, e := s.TraceFile().String()
-		paramsMust(t, e)
+		old := s.TraceFile()
 		key, value := "TRACE-FILE-NAME", strings.Repeat("f", 81)
 		b.FailAfter(ordinal)
 		e = s.Set(&key, &value)
@@ -242,15 +241,13 @@ func TestContextParamsActualLongStringSetEveryAllocationAndErrorScanRefusal(t *t
 		if ordinal == 1 && e != nil {
 			t.Fatal("Go string replacement after frame", e)
 		}
-		got, x := s.TraceFile().String()
-		paramsMust(t, x)
+		got := s.TraceFile()
 		if (ordinal == 0 && got != old) || (ordinal == 1 && got != value) {
 			t.Fatal("header refusal versus successful Go text assignment", got)
 		}
 		b.FailAfter(-1)
 		paramsMust(t, s.Set(&key, &value))
-		got, x = s.TraceFile().String()
-		paramsMust(t, x)
+		got = s.TraceFile()
 		if got != value {
 			t.Fatal(got)
 		}

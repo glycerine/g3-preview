@@ -27,7 +27,7 @@ func contextParamsCold(t *testing.T, v *ContextParams, g *uparams.GlobalParamsSe
 		if v.self != v || v.budget != b {
 			t.Fatal("exact owner")
 		}
-		n += v.header + uint64(v.dotProof.StorageBytes()+v.traceFile.StorageBytes())
+		n += v.header
 	}
 	if n != b.Used() {
 		t.Fatal("before-lift named cold graph", n, b.Used())
@@ -48,10 +48,8 @@ func TestContextParamsDefaultConstructorAndGlobalUpdate(t *testing.T) {
 	if s != want {
 		t.Fatal("source defaults/global constructor update", s, want)
 	}
-	a, e := v.TraceFile().String()
-	paramsMust(t, e)
-	d, e := v.DotProofFile().String()
-	paramsMust(t, e)
+	a := v.TraceFile()
+	d := v.DotProofFile()
 	if a != "z3.log" || d != "proof.dot" {
 		t.Fatal(a, d)
 	}
@@ -83,8 +81,7 @@ func TestContextParamsNestedBoolAndCurrentScalarFallbackButLiteralStrings(t *tes
 	paramsMust(t, v.Update(&empty))
 	s, e = v.State()
 	paramsMust(t, e)
-	a, e := v.TraceFile().String()
-	paramsMust(t, e)
+	a := v.TraceFile()
 	if s.Timeout != 17 || a != "z3.log" {
 		t.Fatal("scalar current fallback versus fixed string literal", s, a)
 	}
@@ -92,7 +89,39 @@ func TestContextParamsNestedBoolAndCurrentScalarFallbackButLiteralStrings(t *tes
 	// both are source reads, with no extra module reference or lexical frame.
 	contextParamsCold(t, v, g, b)
 }
-func TestContextParamsEveryConstructorReservationAndReverseStringUnwind(t *testing.T) {
+
+func TestContextParamsGoStringSnapshotsAndCStringBoundary(t *testing.T) {
+	c, g, p, b := dynAckSourceFixture(t)
+	v, e := NewContextParams(c, g, b)
+	paramsMust(t, e)
+	oldTrace, oldProof := v.TraceFile(), v.DotProofFile()
+	traceKey, trace := "trace_file_name", "trace.log\x00ignored"
+	proofKey, proof := "dot_proof_file", "proof.dot\x00ignored"
+	paramsMust(t, c.SetStringName(p, &traceKey, &trace))
+	paramsMust(t, c.SetStringName(p, &proofKey, &proof))
+	paramsMust(t, v.Update(p))
+	if v.TraceFile() != "trace.log" || v.DotProofFile() != "proof.dot" {
+		t.Fatal("C string parameter boundary", v.TraceFile(), v.DotProofFile())
+	}
+	if oldTrace != "z3.log" || oldProof != "proof.dot" {
+		t.Fatal("earlier Go string snapshots", oldTrace, oldProof)
+	}
+	name := astTraceFilename{owned: v.TraceFile(), ownedMode: true}
+	length, e := name.Length()
+	paramsMust(t, e)
+	last, e := name.Byte(length)
+	paramsMust(t, e)
+	if length != uint64(len("trace.log")) || last != 0 {
+		t.Fatal("trace filename terminator", length, last)
+	}
+	contextParamsCold(t, v, g, b)
+	paramsMust(t, v.Close())
+	if name.owned != "trace.log" {
+		t.Fatal("borrowed string snapshot changed at close", name.owned)
+	}
+	contextParamsCold(t, nil, g, b)
+}
+func TestContextParamsEveryConstructorReservationAndGoStringUnwind(t *testing.T) {
 	for ordinal := int64(0); ; ordinal++ {
 		c, g, _, b := dynAckSourceFixture(t)
 		p, e := g.SourceGetRef()
@@ -110,8 +139,8 @@ func TestContextParamsEveryConstructorReservationAndReverseStringUnwind(t *testi
 			if !errors.Is(e, arena.ErrInjectedFailure) {
 				t.Fatal(e)
 			}
-			if v != nil && (!v.dotProof.Closed || !v.traceFile.Closed || !v.state.DefaultsInitialized) {
-				t.Fatal("completed strings source unwind before return")
+			if v != nil && !v.state.DefaultsInitialized {
+				t.Fatal("constructor state before return")
 			}
 			if v != nil {
 				before := b.Used()
@@ -159,8 +188,7 @@ func TestContextParamsUpdateStringRefusalPrefixAndIncompleteOwnerGuards(t *testi
 	paramsMust(t, v.Update(p))
 	state, e := v.State()
 	paramsMust(t, e)
-	text, e := v.TraceFile().String()
-	paramsMust(t, e)
+	text := v.TraceFile()
 	if state.Timeout != 29 || !state.UnsatCore || text != value || b.Used() != before {
 		t.Fatal("Go strings must not stop the project update on an arena fault", state, text)
 	}
@@ -172,7 +200,7 @@ func TestContextParamsUpdateStringRefusalPrefixAndIncompleteOwnerGuards(t *testi
 	}
 }
 
-func TestContextParamsEveryUpdateAllocationAndReachedStringViewLifetime(t *testing.T) {
+func TestContextParamsEveryUpdateAllocationAndGoStringSnapshots(t *testing.T) {
 	c, g, p, b := dynAckSourceFixture(t)
 	v, e := NewContextParams(c, g, b)
 	paramsMust(t, e)
@@ -189,23 +217,21 @@ func TestContextParamsEveryUpdateAllocationAndReachedStringViewLifetime(t *testi
 	paramsMust(t, v.Update(p))
 	state, e := v.State()
 	paramsMust(t, e)
-	text, e := v.TraceFile().String()
-	paramsMust(t, e)
-	proof, e := v.DotProofFile().String()
-	paramsMust(t, e)
+	text := v.TraceFile()
+	proof := v.DotProofFile()
 	if text != trace || proof != dot || !state.UnsatCore {
 		t.Fatal("complete Go text update", state, text, proof)
 	}
-	if _, e = old.Byte(0); !errors.Is(e, arena.ErrInvalidSlot) {
-		t.Fatal("old view", e)
+	if old != "z3.log" {
+		t.Fatal("previous Go string snapshot", old)
 	}
 	contextParamsCold(t, v, g, b)
 	current := v.TraceFile()
 	b.FailAfter(-1)
 	paramsMust(t, v.Close())
 	contextParamsCold(t, nil, g, b)
-	if _, e = current.Byte(0); !errors.Is(e, arena.ErrInvalidSlot) {
-		t.Fatal("closed view", e)
+	if current != trace {
+		t.Fatal("closed owner does not mutate Go string snapshot", current)
 	}
 }
 

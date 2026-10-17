@@ -4,6 +4,7 @@ package smtcore
 
 import (
 	"reflect"
+	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
 	uparams "github.com/glycerine/g3/pkg/util/params"
@@ -21,7 +22,7 @@ type ContextParams struct {
 	context                    *uparams.ParamsContext
 	globals                    *uparams.GlobalParamsService
 	budget                     *arena.Budget
-	dotProof, traceFile        OwnedString
+	dotProof, traceFile        string
 	state                      ContextParamsState
 	header                     uint64
 	ready, closed, executing   bool
@@ -58,16 +59,6 @@ func newContextParams(c *uparams.ParamsContext, g *uparams.GlobalParamsService, 
 	if onAllocated != nil {
 		onAllocated(s)
 	}
-	// Default std::string members construct in declaration order before the body.
-	if e := s.dotProof.Construct(b, ""); e != nil {
-		s.constructorCause = e
-		return s, e
-	}
-	if e := s.traceFile.Construct(b, ""); e != nil {
-		s.dotProof.SourceDestroy()
-		s.constructorCause = e
-		return s, e
-	}
 	s.state.UnsatCore = false
 	s.state.Model = true
 	s.state.ModelValidate = false
@@ -89,8 +80,6 @@ func newContextParams(c *uparams.ParamsContext, g *uparams.GlobalParamsService, 
 	s.executing = false
 	if e != nil {
 		s.constructorCause = e
-		s.traceFile.SourceDestroy()
-		s.dotProof.SourceDestroy()
 	} else {
 		s.ready = true
 	}
@@ -111,17 +100,24 @@ func (s *ContextParams) State() (ContextParamsState, error) {
 	}
 	return s.state, nil
 }
-func (s *ContextParams) TraceFile() QITextView {
+func (s *ContextParams) TraceFile() string {
 	if e := s.open(); e != nil {
 		panic(e)
 	}
-	return s.traceFile.View()
+	return s.traceFile
 }
-func (s *ContextParams) DotProofFile() QITextView {
+func (s *ContextParams) DotProofFile() string {
 	if e := s.open(); e != nil {
 		panic(e)
 	}
-	return s.dotProof.View()
+	return s.dotProof
+}
+
+func contextCString(text string) string {
+	if i := strings.IndexByte(text, 0); i >= 0 {
+		return text[:i]
+	}
+	return text
 }
 func (s *ContextParams) Update(p *uparams.ParamsRef) error {
 	if e := s.open(); e != nil {
@@ -229,9 +225,7 @@ func (s *ContextParams) update(p *uparams.ParamsRef) error {
 	if e != nil {
 		return e
 	}
-	if e = s.traceFile.Assign(traceFileText); e != nil {
-		return e
-	}
+	s.traceFile = contextCString(traceFileText)
 	kdotProof := "dot_proof_file"
 	ddotProof := "proof.dot"
 	vdotProof, e := s.context.GetStringViewFallbackName(p, &kdotProof, nil, &ddotProof)
@@ -242,9 +236,7 @@ func (s *ContextParams) update(p *uparams.ParamsRef) error {
 	if e != nil {
 		return e
 	}
-	if e = s.dotProof.Assign(dotProofText); e != nil {
-		return e
-	}
+	s.dotProof = contextCString(dotProofText)
 	kUnsatCore := "unsat_core"
 	vUnsatCore, e := s.context.GetBoolName(p, &kUnsatCore, s.state.UnsatCore)
 	if e != nil {
@@ -278,11 +270,8 @@ func (s *ContextParams) Close() error {
 	if e := s.closeSourceFrames(); e != nil {
 		return e
 	}
-	// Reverse actual automatic string members, then separate own unjoined arrays.
-	s.traceFile.SourceDestroy()
-	s.dotProof.SourceDestroy()
-	s.traceFile.OwnAbort()
-	s.dotProof.OwnAbort()
+	s.traceFile = ""
+	s.dotProof = ""
 	s.budget.Release(s.header)
 	s.header = 0
 	s.closed = true
