@@ -27011,6 +27011,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/rewriter/fpa_bv2rm.go",
+        "pkg/ast/rewriter/fpa_bv2rm_debug_test.go",
         "pkg/ast/rewriter/fpa_bv2rm_test.go",
         "pkg/ast/rewriter/fpa_bv_wrap.go",
         "pkg/ast/ast_fpa_fp_trace.go",
@@ -27044,6 +27045,7 @@
         "pkg/ast/ast_fpa_to_fp_ieee_bv.go",
         "pkg/ast/rewriter/fpa_to_fp_ieee_bv_test.go"],
       "tests": [
+        "TestFPABV2RMReachedSourceAssertionSwitch",
         "TestFPABV2RMSourceNumeralsAndSymbolicRefusal",
         "TestFPABVWrapSourceExtractIdentityAndRefusals",
         "TestFPAFPComponentsDispatch",
@@ -27310,7 +27312,7 @@
           "name": "mk_bv2rm concrete three-bit numeral to five RoundingMode constants, unknown encodings default to toward-zero (fpa_rewriter.cpp:663-680)",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa_bv2rm.go",
-          "tests": ["TestFPABV2RMSourceNumeralsAndSymbolicRefusal"]
+          "tests": ["TestFPABV2RMSourceNumeralsAndSymbolicRefusal", "TestFPABV2RMReachedSourceAssertionSwitch"]
         },
         {
           "name": "mk_fp concrete sign, significand, exponent numeral probes, MPF construction and TRACE before result publication (fpa_rewriter.cpp:684-705)",
@@ -27542,6 +27544,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/ast/rewriter/fpa_bv2rm.go",
+        "pkg/ast/rewriter/fpa_bv2rm_debug_test.go",
         "pkg/ast/rewriter/fpa_bv2rm_test.go",
         "pkg/ast/rewriter/fpa_bv_wrap.go","pkg/ast/rewriter/fpa_classification.go",
         "pkg/ast/rewriter/fpa_remainder.go",
@@ -27550,6 +27553,7 @@
         "pkg/ast/rewriter/fpa_fma.go",
         "pkg/ast/rewriter/fpa_rm_binary.go"],
       "tests": [
+        "TestFPABV2RMReachedSourceAssertionSwitch",
         "TestFPABV2RMSourceNumeralsAndSymbolicRefusal",
         "TestFPABVWrapSourceExtractIdentityAndRefusals",
         "TestFPAFPComponentsDispatch","TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
@@ -27588,7 +27592,7 @@
           "name": "mk_bv2rm dispatch for concrete three-bit numeral and symbolic refusal (fpa_rewriter.h; fpa_rewriter.cpp:98,663-680)",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa_bv2rm.go",
-          "tests": ["TestFPABV2RMSourceNumeralsAndSymbolicRefusal"]
+          "tests": ["TestFPABV2RMSourceNumeralsAndSymbolicRefusal", "TestFPABV2RMReachedSourceAssertionSwitch"]
         },
         {
           "name": "mk_fp dispatch for retained concrete three-BV constructor (fpa_rewriter.h; fpa_rewriter.cpp:89,684-705)",
@@ -124192,7 +124196,9 @@
         "pkg/util/numeral/inf_eps_rational.go",
         "pkg/util/numeral/inf_rational.go",
         "pkg/util/numeral/inf_int_rational.go",
-        "pkg/ast/rewriter/var_substitution_assert.go"
+        "pkg/ast/rewriter/var_substitution_assert.go",
+        "pkg/ast/rewriter/fpa_bv2rm.go",
+        "pkg/ast/rewriter/fpa_bv2rm_debug_test.go"
       ],
       "tests": [
         "TestDebugTableMemoryTraceFollowsLazyLifetime",
@@ -124224,7 +124230,8 @@
         "TestLinearEquationCoreSourceSortedDebugGuard",
         "TestLinearEquationNormalizedSourceDuplicateDebugGuard",
         "TestLinearEquationCombineZeroMultiplierSourceAssertionProfile",
-        "TestVarSubstitutionSourceWellSortedAssertionSites"
+        "TestVarSubstitutionSourceWellSortedAssertionSites",
+        "TestFPABV2RMReachedSourceAssertionSwitch"
       ],
       "conditionals": [
         {
@@ -124247,6 +124254,12 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained FPA bv2rm SASSERT(bv_val.is_uint64()) reads the process switch after a numeral match at fpa_rewriter.cpp:668",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_bv2rm.go",
+          "tests": ["TestFPABV2RMReachedSourceAssertionSwitch"]
+        },
         {
           "name": "Retained probing operator entry/exit CASSERT(probing) at sat_probing.cpp:200,241 reads the process assertion/tag gate separately and invokes the concrete solver checker",
           "status": "ported",
@@ -124657,7 +124670,9 @@
         "pkg/util/numeral/inf_eps_rational.go",
         "pkg/util/numeral/inf_rational.go",
         "pkg/util/numeral/inf_int_rational.go",
-        "pkg/ast/rewriter/var_substitution_assert.go"
+        "pkg/ast/rewriter/var_substitution_assert.go",
+        "pkg/ast/rewriter/fpa_bv2rm.go",
+        "pkg/ast/rewriter/fpa_bv2rm_debug_test.go"
       ],
       "tests": [
         "TestDebugNotificationExactStatementsSignedFlagsAndNoReservation",
@@ -124693,7 +124708,8 @@
         "TestLinearEquationCoreSourceSortedDebugGuard",
         "TestLinearEquationNormalizedSourceDuplicateDebugGuard",
         "TestLinearEquationCombineZeroMultiplierSourceAssertionProfile",
-        "TestVarSubstitutionSourceWellSortedAssertionSites"
+        "TestVarSubstitutionSourceWellSortedAssertionSites",
+        "TestFPABV2RMReachedSourceAssertionSwitch"
       ],
       "conditionals": [
         {
@@ -124806,6 +124822,12 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained FPA bv2rm SASSERT(bv_val.is_uint64()) reads the process switch after a numeral match at fpa_rewriter.cpp:668",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_bv2rm.go",
+          "tests": ["TestFPABV2RMReachedSourceAssertionSwitch"]
+        },
         {
           "name": "Retained probing operator entry/exit CASSERT(probing) at sat_probing.cpp:200,241 reads the process assertion/tag gate separately and invokes the concrete solver checker",
           "status": "ported",

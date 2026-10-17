@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/glycerine/g3/pkg/ast"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 // fpaBV2RM maps the source's three-bit numeral encoding to an FP rounding
@@ -25,6 +26,22 @@ func (r *FPARewriter) fpaBV2RM(arg ast.ASTHandle, out ast.ASTRef) (status Rewrit
 	found, err := r.manager.BitVectorNumeralValue(arg, &v, &width)
 	if err != nil || !found {
 		return RewriteFailed, err
+	}
+	debug := diagnostic.BorrowProcessDebugContext()
+	enabled, err := diagnostic.SourceAssertionsEnabled(debug)
+	if err != nil {
+		return RewriteFailed, err
+	}
+	if enabled {
+		ok, e := s.IsUint64(&v)
+		if e != nil {
+			return RewriteFailed, e
+		}
+		if !ok {
+			if e = diagnostic.DebugAssertionFailure(debug, "src/ast/rewriter/fpa_rewriter.cpp", 668, "bv_val.is_uint64()"); e != nil {
+				return RewriteFailed, e
+			}
+		}
 	}
 	n, err := s.Uint64(&v)
 	if err != nil {
