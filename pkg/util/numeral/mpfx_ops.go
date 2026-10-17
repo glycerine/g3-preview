@@ -19,6 +19,8 @@ func (m *FixedPointManager) Floor(a *FixedPoint) error {
 		// Source clears the fractional words before inc wraps every integer
 		// word to zero and reports overflow.
 		a.scaled.SetInt64(0)
+		a.sourceZeroSlot = true
+		a.sourceZeroNegative = true
 		return err
 	}
 	m.traceFixedRoundIntegral(a, false, true)
@@ -41,6 +43,8 @@ func (m *FixedPointManager) Ceil(a *FixedPoint) error {
 		// The in-place integer-word increment wraps after the source has
 		// cleared all fractional words.
 		a.scaled.SetInt64(0)
+		a.sourceZeroSlot = true
+		a.sourceZeroNegative = false
 		return err
 	}
 	m.traceFixedRoundIntegral(a, true, true)
@@ -83,7 +87,7 @@ func (m *FixedPointManager) Power(a *FixedPoint, exponent uint32, out *FixedPoin
 			m.traceFixedPower(input, exponent, out)
 		}
 	}()
-	if a.scaled.Sign() == 0 {
+	if a.scaled.Sign() == 0 && !a.sourceZeroSlot {
 		if exponent == 0 {
 			return ErrFixedPointDomain
 		}

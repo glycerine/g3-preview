@@ -7,28 +7,28 @@ func (m *FixedPointManager) IsPos(a *FixedPoint) (bool, error) {
 	if err := m.check(a); err != nil {
 		return false, err
 	}
-	return a.scaled.Sign() > 0, nil
+	return a.scaled.Sign() > 0 || a.sourceZeroSlot && !a.sourceZeroNegative, nil
 }
 
 func (m *FixedPointManager) IsNeg(a *FixedPoint) (bool, error) {
 	if err := m.check(a); err != nil {
 		return false, err
 	}
-	return a.scaled.Sign() < 0, nil
+	return a.scaled.Sign() < 0 || a.sourceZeroSlot && a.sourceZeroNegative, nil
 }
 
 func (m *FixedPointManager) IsNonPos(a *FixedPoint) (bool, error) {
 	if err := m.check(a); err != nil {
 		return false, err
 	}
-	return a.scaled.Sign() <= 0, nil
+	return !(a.scaled.Sign() > 0 || a.sourceZeroSlot && !a.sourceZeroNegative), nil
 }
 
 func (m *FixedPointManager) IsNonNeg(a *FixedPoint) (bool, error) {
 	if err := m.check(a); err != nil {
 		return false, err
 	}
-	return a.scaled.Sign() >= 0, nil
+	return !(a.scaled.Sign() < 0 || a.sourceZeroSlot && a.sourceZeroNegative), nil
 }
 
 func (m *FixedPointManager) IsOne(a *FixedPoint) (bool, error) {
@@ -57,7 +57,7 @@ func (m *FixedPointManager) Less(a, b *FixedPoint) (bool, error) {
 		return false, err
 	}
 	m.traceFixedLess(a, b, false, false)
-	less := a.scaled.Cmp(&b.scaled) < 0
+	less := compareFixedPointSource(a, b) < 0
 	m.traceFixedLess(a, b, true, less)
 	return less, nil
 }
@@ -111,7 +111,10 @@ func (m *FixedPointManager) Swap(a, b *FixedPoint) error {
 	}
 	var temp big.Int
 	temp.Set(&a.scaled)
+	tempSlot, tempNegative := a.sourceZeroSlot, a.sourceZeroNegative
 	a.scaled.Set(&b.scaled)
+	a.sourceZeroSlot, a.sourceZeroNegative = b.sourceZeroSlot, b.sourceZeroNegative
 	b.scaled.Set(&temp)
+	b.sourceZeroSlot, b.sourceZeroNegative = tempSlot, tempNegative
 	return nil
 }

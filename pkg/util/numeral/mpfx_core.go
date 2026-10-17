@@ -45,10 +45,12 @@ type FixedPointManager struct {
 // FixedPoint is an owned concrete mpfx numeral. Its signed value is
 // scaled / 2^(32*fracWords); zero has no negative representation.
 type FixedPoint struct {
-	self    *FixedPoint
-	manager *FixedPointManager
-	scaled  big.Int
-	closed  bool
+	self               *FixedPoint
+	manager            *FixedPointManager
+	scaled             big.Int
+	sourceZeroSlot     bool
+	sourceZeroNegative bool
+	closed             bool
 }
 
 func NewFixedPointManager(intWords, fracWords uint32) (*FixedPointManager, error) {
@@ -100,6 +102,8 @@ func (v *FixedPoint) Close() error {
 		return nil
 	}
 	v.scaled.SetInt64(0)
+	v.sourceZeroSlot = false
+	v.sourceZeroNegative = false
 	v.closed = true
 	v.manager.live--
 	return nil
@@ -134,6 +138,8 @@ func (m *FixedPointManager) publish(dst *FixedPoint, scaled *big.Int) error {
 		return ErrFixedPointOverflow
 	}
 	dst.scaled.Set(scaled)
+	dst.sourceZeroSlot = false
+	dst.sourceZeroNegative = false
 	return nil
 }
 
@@ -142,6 +148,8 @@ func (m *FixedPointManager) Reset(dst *FixedPoint) error {
 		return err
 	}
 	dst.scaled.SetInt64(0)
+	dst.sourceZeroSlot = false
+	dst.sourceZeroNegative = false
 	return nil
 }
 
@@ -169,6 +177,8 @@ func (m *FixedPointManager) Copy(dst, src *FixedPoint) error {
 		return err
 	}
 	dst.scaled.Set(&src.scaled)
+	dst.sourceZeroSlot = src.sourceZeroSlot
+	dst.sourceZeroNegative = src.sourceZeroNegative
 	return nil
 }
 
@@ -225,14 +235,41 @@ func (m *FixedPointManager) Compare(a, b *FixedPoint) (int, error) {
 	if err := m.pair(a, b); err != nil {
 		return 0, err
 	}
-	return a.scaled.Cmp(&b.scaled), nil
+	return compareFixedPointSource(a, b), nil
+}
+
+func compareFixedPointSource(a, b *FixedPoint) int {
+	if cmp := a.scaled.Cmp(&b.scaled); cmp != 0 {
+		return cmp
+	}
+	if a.scaled.Sign() != 0 {
+		return 0
+	}
+	// Source is_zero uses the word-slot ID, so the two zero-word slots
+	// remain ordered on either side of the canonical unallocated zero.
+	rank := func(v *FixedPoint) int {
+		if !v.sourceZeroSlot {
+			return 0
+		}
+		if v.sourceZeroNegative {
+			return -1
+		}
+		return 1
+	}
+	if rank(a) < rank(b) {
+		return -1
+	}
+	if rank(a) > rank(b) {
+		return 1
+	}
+	return 0
 }
 
 func (m *FixedPointManager) IsZero(a *FixedPoint) (bool, error) {
 	if err := m.check(a); err != nil {
 		return false, err
 	}
-	return a.scaled.Sign() == 0, nil
+	return a.scaled.Sign() == 0 && !a.sourceZeroSlot, nil
 }
 
 func (m *FixedPointManager) IsInt(a *FixedPoint) (bool, error) {
@@ -248,7 +285,11 @@ func (m *FixedPointManager) Neg(a *FixedPoint) error {
 	if err := m.check(a); err != nil {
 		return err
 	}
-	a.scaled.Neg(&a.scaled)
+	if a.sourceZeroSlot {
+		a.sourceZeroNegative = !a.sourceZeroNegative
+	} else {
+		a.scaled.Neg(&a.scaled)
+	}
 	return nil
 }
 
@@ -257,6 +298,7 @@ func (m *FixedPointManager) Abs(a *FixedPoint) error {
 		return err
 	}
 	a.scaled.Abs(&a.scaled)
+	a.sourceZeroNegative = false
 	return nil
 }
 

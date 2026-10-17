@@ -47,7 +47,7 @@ func (m *FixedPointManager) traceFixedPower(input string, exponent uint32, out *
 }
 
 func (m *FixedPointManager) displayFixedRawTrace(w io.Writer, n *FixedPoint) error {
-	if n.scaled.Sign() < 0 {
+	if n.scaled.Sign() < 0 || n.sourceZeroSlot && n.sourceZeroNegative {
 		if err := writeFixedPointPart(w, "-"); err != nil {
 			return err
 		}

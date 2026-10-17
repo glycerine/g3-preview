@@ -164,3 +164,81 @@ func TestFixedPointPowerAliasExtraSquareAndCeilOverflow(t *testing.T) {
 		t.Fatalf("floor overflow did not wrap source words to zero: %v, %v", r, err)
 	}
 }
+
+func TestFixedPointOverflowRetainsSourceZeroSlotAndSign(t *testing.T) {
+	m, err := NewFixedPointManager(1, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	positive, _ := m.New()
+	negative, _ := m.New()
+	canonical, _ := m.New()
+	defer func() {
+		for _, v := range []*FixedPoint{positive, negative, canonical} {
+			if err := v.Close(); err != nil {
+				t.Error(err)
+			}
+		}
+		if err := m.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
+	must := func(err error) {
+		t.Helper()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	must(m.SetUint64(positive, (1<<32)-1))
+	must(m.SetRatio(negative, 1, 2))
+	must(m.Add(positive, negative, positive))
+	if err := m.Ceil(positive); !errors.Is(err, ErrFixedPointOverflow) {
+		t.Fatal("positive carry overflow", err)
+	}
+	if zero, err := m.IsZero(positive); err != nil || zero {
+		t.Fatal("source allocated zero words are not canonical zero", zero, err)
+	}
+	if pos, err := m.IsPos(positive); err != nil || !pos {
+		t.Fatal("positive sign survives carry overflow", pos, err)
+	}
+	if equal, err := m.Equal(positive, canonical); err != nil || equal {
+		t.Fatal("allocated and canonical zero differ in source eq", equal, err)
+	}
+	if less, err := m.Less(canonical, positive); err != nil || !less {
+		t.Fatal("canonical zero sorts before positive allocated zero", less, err)
+	}
+	must(m.Power(positive, 0, canonical))
+	if one, err := m.IsOne(canonical); err != nil || !one {
+		t.Fatal("allocated source zero takes the nonzero power branch", one, err)
+	}
+	must(m.Reset(canonical))
+	must(m.Copy(negative, positive))
+	if pos, err := m.IsPos(negative); err != nil || !pos {
+		t.Fatal("copy lost allocated zero slot", pos, err)
+	}
+	must(m.Neg(negative))
+	if neg, err := m.IsNeg(negative); err != nil || !neg {
+		t.Fatal("neg did not toggle retained source sign", neg, err)
+	}
+	if text, err := m.String(negative); err != nil || text != "-0" {
+		t.Fatal("negative zero-word display", text, err)
+	}
+	if less, err := m.Less(negative, canonical); err != nil || !less {
+		t.Fatal("negative allocated zero sorts before canonical zero", less, err)
+	}
+	must(m.Swap(positive, canonical))
+	if zero, err := m.IsZero(positive); err != nil || !zero {
+		t.Fatal("swap did not transfer canonical zero", zero, err)
+	}
+	if pos, err := m.IsPos(canonical); err != nil || !pos {
+		t.Fatal("swap did not transfer allocated slot", pos, err)
+	}
+	must(m.Abs(negative))
+	if pos, err := m.IsPos(negative); err != nil || !pos {
+		t.Fatal("abs did not clear retained source sign", pos, err)
+	}
+	must(m.Reset(negative))
+	if zero, err := m.IsZero(negative); err != nil || !zero {
+		t.Fatal("reset did not release allocated zero slot", zero, err)
+	}
+}

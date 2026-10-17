@@ -53,7 +53,7 @@ func (m *FixedPointManager) SetFromRational(dst *FixedPoint, rationals *Rational
 		scaled.Mul(q.Num(), &m.scale)
 		return m.publish(dst, &scaled)
 	}
-	negative := dst.scaled.Sign() < 0
+	negative := dst.scaled.Sign() < 0 || dst.sourceZeroSlot && dst.sourceZeroNegative
 	var numerator big.Int
 	numerator.Abs(q.Num())
 	numerator.Mul(&numerator, &m.scale)
@@ -102,6 +102,9 @@ func (m *FixedPointManager) String(a *FixedPoint) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	if a.sourceZeroSlot && a.sourceZeroNegative {
+		return "-0", nil
+	}
 	if r.IsInt() {
 		return r.Num().String(), nil
 	}
@@ -124,7 +127,7 @@ func (m *FixedPointManager) Display(w io.Writer, a *FixedPoint) error {
 	if err := m.check(a); err != nil {
 		return err
 	}
-	if a.scaled.Sign() < 0 {
+	if a.scaled.Sign() < 0 || a.sourceZeroSlot && a.sourceZeroNegative {
 		if err := writeFixedPointPart(w, "-"); err != nil {
 			return err
 		}
