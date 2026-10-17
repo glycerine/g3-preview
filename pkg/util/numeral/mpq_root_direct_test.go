@@ -1,11 +1,14 @@
 package numeral
 
 import (
-	"errors"
 	"testing"
 )
 
 func TestRationalRootDenominatorErrorKeepsPublishedNumerator(t *testing.T) {
+	if !modularSourceDebug {
+		t.Skip("source Z3DEBUG assertion only")
+	}
+	_, _ = bindMPNDebugActions(t, "TTTT")
 	for _, synchronized := range []bool{false, true} {
 		for _, alias := range []bool{false, true} {
 			m, _ := rationalManager(t, synchronized)
@@ -18,7 +21,7 @@ func TestRationalRootDenominatorErrorKeepsPublishedNumerator(t *testing.T) {
 				dst = &a
 			}
 			exact, e := m.Root(&a, 2, dst)
-			if exact || !errors.Is(e, ErrRootNegativeEven) {
+			if exact || !isMPNVerificationThrow(e) {
 				t.Fatalf("denominator domain error: sync=%v alias=%v exact=%v error=%v", synchronized, alias, exact, e)
 			}
 			if got := integerString(t, m.Z, &dst.Num); got != "3" {

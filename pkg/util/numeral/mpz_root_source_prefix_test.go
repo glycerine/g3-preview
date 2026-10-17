@@ -52,7 +52,7 @@ func TestIntegerRootCopyPrecedesDomainGuardAndAlias(t *testing.T) {
 		a    int32
 		n    uint32
 		want error
-	}{{-5, 2, ErrRootNegativeEven}, {2, 0, ErrRootDegreeZero}} {
+	}{{2, 0, ErrRootDegreeZero}} {
 		a, out := NewInt(tc.a), NewInt(7)
 		_, e := m.Root(&a, tc.n, &out)
 		if !errors.Is(e, tc.want) || out != a {

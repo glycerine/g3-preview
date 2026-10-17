@@ -8,19 +8,17 @@ import (
 )
 
 var ErrRootDegreeZero = errors.New("mpnum: nonzero integer root with degree zero divides by zero in source")
-var ErrRootNegativeEven = errors.New("mpnum: negative integer root with even degree violates source assertion")
 var ErrRootIntegerRequired = errors.New("mpnum: integer perfect-square query requires an integer rational")
 
 type RootDomainReason uint8
 
 const (
 	RootZeroDegree RootDomainReason = iota + 1
-	RootEvenNegative
 	RootRequiresInteger
 )
 
-// RootDomainError replaces source invalid division/assertion domains. Valid
-// source false-result roots are ordinary successful calls, not domain errors.
+// RootDomainError guards host-undefined division and the retained rational
+// integer-only query. Source assertion actions are handled separately.
 type RootDomainError struct {
 	Degree uint32
 	Reason RootDomainReason
@@ -29,8 +27,6 @@ type RootDomainError struct {
 func (e *RootDomainError) Error() string { return e.Unwrap().Error() }
 func (e *RootDomainError) Unwrap() error {
 	switch e.Reason {
-	case RootEvenNegative:
-		return ErrRootNegativeEven
 	case RootRequiresInteger:
 		return ErrRootIntegerRequired
 	default:
@@ -38,8 +34,17 @@ func (e *RootDomainError) Unwrap() error {
 	}
 }
 func rootDomain(a *Int, n uint32) error {
-	if a.Val < 0 && n%2 == 0 {
-		return &RootDomainError{Degree: n, Reason: RootEvenNegative}
+	if modularSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return e
+		}
+		if enabled && n%2 == 0 && a.Val < 0 {
+			if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 1943, "n % 2 != 0 || is_nonneg(a)"); e != nil {
+				return e
+			}
+		}
 	}
 	if a.Val != 0 && n == 0 {
 		return &RootDomainError{Degree: n, Reason: RootZeroDegree}

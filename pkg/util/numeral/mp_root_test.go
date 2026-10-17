@@ -222,7 +222,7 @@ func TestRootDomainsAndInitialization(t *testing.T) {
 		a        int32
 		n        uint32
 		sentinel error
-	}{{1, 0, ErrRootDegreeZero}, {-1, 2, ErrRootNegativeEven}, {-1, 0, ErrRootNegativeEven}, {-2, math.MaxUint32, ErrNonterminatingPower}} {
+	}{{1, 0, ErrRootDegreeZero}, {-2, math.MaxUint32, ErrNonterminatingPower}} {
 		a, out := NewInt(f.a), NewInt(29)
 		before := b.Used()
 		precise, e := m.Root(&a, f.n, &out)

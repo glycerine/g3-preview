@@ -100,7 +100,7 @@ func TestRationalServiceExtraRootSourcePublicationAndAliases(t *testing.T) {
 		in     string
 		degree uint32
 		want   error
-	}{{"1", 0, ErrRootDegreeZero}, {"-4", 2, ErrRootNegativeEven}} {
+	}{{"1", 0, ErrRootDegreeZero}} {
 		in := serviceValue(t, s, f.in)
 		out := serviceValue(t, s, "7/13")
 		exact, e := s.Root(&in, f.degree, &out)

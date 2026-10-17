@@ -253,13 +253,16 @@ func TestBinarySourceShapeDomainsAndPrefixes(t *testing.T) {
 	if ok || a.KField != 0 {
 		t.Fatal("raw zero exactness flag", ok, a)
 	}
-	a = NewBinaryIntPower(-3, 2)
-	var copiedOutput BinaryRational
-	_, e = m.RootLower(&a, 2, &copiedOutput)
-	if !errors.Is(e, ErrRootNegativeEven) || copiedOutput.Num.Val != -3 || copiedOutput.KField != 2 {
-		t.Fatal("copy precedes root domain diagnostic", e, copiedOutput)
+	if modularSourceDebug {
+		_, _ = bindMPNDebugActions(t, "T")
+		a = NewBinaryIntPower(-3, 2)
+		var copiedOutput BinaryRational
+		_, e = m.RootLower(&a, 2, &copiedOutput)
+		if !isMPNVerificationThrow(e) || copiedOutput.Num.Val != -3 || copiedOutput.KField != 2 {
+			t.Fatal("copy precedes root source assertion", e, copiedOutput)
+		}
+		serviceMust(t, m.Del(&copiedOutput))
 	}
-	serviceMust(t, m.Del(&copiedOutput))
 	a = NewBinaryInt(0)
 	if _, e = m.RootUpperInPlace(&a, 0); !errors.Is(e, ErrBinaryRootDegreeZero) {
 		t.Fatal(e)

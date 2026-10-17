@@ -166854,10 +166854,11 @@
         },
         {
           "name": "root in-place and copy-output overloads",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpz_root.go",
           "tests": [
-            "TestIntegerRootInitialBoundsSourceAssertionStop",
+            "TestIntegerRootEntrySourceAssertionActions",
+            "TestIntegerRootNegativeEvenReleaseContinues",
             "TestIntegerSourceRoots",
             "TestIntegerRootIndependentAndAliases",
             "TestPerfectSquareIndependentAndSourceAlias",
@@ -166873,10 +166874,11 @@
         },
         {
           "name": "root div_l/div_u bounds and bisection",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpz_root.go",
           "tests": [
-            "TestIntegerRootInitialBoundsSourceAssertionStop",
+            "TestIntegerRootEntrySourceAssertionActions",
+            "TestIntegerRootNegativeEvenReleaseContinues",
             "TestIntegerSourceRoots",
             "TestIntegerRootIndependentAndAliases",
             "TestPerfectSquareIndependentAndSourceAlias",
@@ -169014,10 +169016,11 @@
         },
         {
           "name": "root in-place and copy-output overloads",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpz_root.go",
           "tests": [
-            "TestIntegerRootInitialBoundsSourceAssertionStop",
+            "TestIntegerRootEntrySourceAssertionActions",
+            "TestIntegerRootNegativeEvenReleaseContinues",
             "TestIntegerSourceRoots",
             "TestIntegerRootIndependentAndAliases",
             "TestPerfectSquareIndependentAndSourceAlias",
@@ -169034,10 +169037,11 @@
         },
         {
           "name": "root div_l/div_u bounds and bisection",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpz_root.go",
           "tests": [
-            "TestIntegerRootInitialBoundsSourceAssertionStop",
+            "TestIntegerRootEntrySourceAssertionActions",
+            "TestIntegerRootNegativeEvenReleaseContinues",
             "TestIntegerSourceRoots",
             "TestIntegerRootIndependentAndAliases",
             "TestPerfectSquareIndependentAndSourceAlias",
