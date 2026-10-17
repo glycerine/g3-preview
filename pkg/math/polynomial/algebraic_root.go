@@ -49,6 +49,10 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	integerSet                                             algebraicIntegerSetScope
+	integerAdd                                             algebraicIntegerAddScope
+	localIntegerSet                                        *algebraicIntegerSetScope
+	localIntegerAdd                                        *algebraicIntegerAddScope
 	isolationConversion                                    algebraicIsolationConversionScope
 	isolateTmp1                                            UPolynomial
 	filterRootsRunning                                     bool
@@ -475,6 +479,14 @@ func (m *AlgebraicRootCore) beginQ() error {
 	}
 	m.localQ = unumeral.NewRational()
 	m.localActive = true
+	m.localIntegerSet = nil
+	m.localIntegerAdd = nil
+	if m.integerSet.running {
+		m.localIntegerSet = &m.integerSet
+	}
+	if m.integerAdd.running {
+		m.localIntegerAdd = &m.integerAdd
+	}
 	m.localOriginal = nil
 	m.localCleanup = nil
 	return nil
@@ -853,6 +865,9 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	return m.store(dl, &out)
 }
 func (m *AlgebraicRootCore) CleanupRetained() error {
+	if m != nil && m.self == m && (m.integerSet.running || m.integerAdd.running) {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.isolationConversion.running {
 		return ErrAlgebraicPending
 	}
@@ -957,6 +972,12 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 			return e
 		}
 	}
+	if e := m.cleanupIntegerSet(); e != nil {
+		return e
+	}
+	if e := m.cleanupIntegerAdd(true); e != nil {
+		return e
+	}
 	if m.pending.slot != 0 {
 		l := &m.locations[m.pending.slot-1]
 		if e := m.deleteLocation(&m.pending, l); e != nil {
@@ -970,6 +991,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.comparisonCleanup()
 }
 func (m *AlgebraicRootCore) Close() error {
+	if m != nil && m.self == m && (m.integerSet.running || m.integerAdd.running) {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.isolationConversion.running {
 		return ErrAlgebraicPending
 	}

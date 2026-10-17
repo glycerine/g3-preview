@@ -8,6 +8,7 @@ import (
 )
 
 type algebraicRationalArithmeticScope struct {
+	integerAddition   *algebraicIntegerAddScope
 	q                 [3]unumeral.Rational       // nbv (or basic result), il, iu
 	b                 [2]unumeral.BinaryRational // l, u
 	qCount, bCount    uint8
@@ -132,11 +133,18 @@ func (m *AlgebraicRootCore) addSubRational(a *Algebraic, b *unumeral.Rational, o
 		return ErrAlgebraicPending
 	}
 	*s = algebraicRationalArithmeticScope{active: true, qCount: 1}
+	if m.integerAdd.running {
+		s.integerAddition = &m.integerAdd
+	}
 	s.q[0] = unumeral.NewRational()
 	defer func() {
 		s.executing = false
 		if s.sourceStop == nil {
-			cause = errors.Join(cause, m.cleanupRationalArithmetic())
+			cleanup := m.cleanupRationalArithmetic()
+			if cleanup != nil {
+				s.sourceStop = cleanup
+			}
+			cause = errors.Join(cause, cleanup)
 		}
 	}()
 	if l.kind == 0 {
