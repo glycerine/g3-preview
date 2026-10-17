@@ -156703,6 +156703,7 @@
         "pkg/util/numeral/mpf_value_ieee.go",
         "pkg/util/numeral/mpf_value_ieee_source_test.go",
         "pkg/util/numeral/mpf_value_ieee_branch_source_test.go",
+        "pkg/util/numeral/mpf_value_ieee_assertion_source_test.go",
         "pkg/util/numeral/mpf_value_ieee_lifetime_source_test.go",
         "pkg/util/numeral/mpf_value_ieee_signed_shift_source_test.go",
         "pkg/util/numeral/mpf_value_input.go",
@@ -157814,10 +157815,12 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpf_value_ieee.go",
           "tests": [
+        "TestArbitraryFloatIEEESourceAssertionActions",
             "TestArbitraryFloatIEEEOriginalAssertionsAdapted",
             "TestArbitraryFloatIEEEIndependentBranchBitsAndWarmNoAllocation",
             "TestArbitraryFloatIEEERepresentedShiftGuardDomains",
             "TestArbitraryFloatIEEECompiledWidthAssertionLeavesSignificandUnread",
+            "TestArbitraryFloatIEEESourceAssertionActions",
             "TestArbitraryFloatIEEEEveryReachedCacheReservationPrefix",
             "TestArbitraryFloatIEEEActualCacheTransportRetainsEarlierCall"
           ]
@@ -158375,7 +158378,7 @@
         "Retained mpf_manager::mul emits mpf_mul_bug entry before the format assertion and a result after completed shortcut or general multiplication, including aliased output. The inner mpf_dbg records follow operand, unpacked, significand and pre-round product source order; shortcuts omit the inner records. Trace-enabled and erased-build focused tests cover source line headers and value text; the broader MPF port remains partial.",
         "mpf.cpp:1519-1569 numerical body and mpq.cpp:156-185 caller-specific decimal engine are integrated through the owned MPF text result and AST SMT2 float-real literal printer; the enclosing MPF and rational source units still require whole-unit audit. No new active original-driver assertions or whole MPF/rational unit completion credit. Default decimal/no-flags stream profile only; native locale/ABI profiles remain open. Qualified signed-host TLS test proves reached q NUM DT protection; guessed youngest verification-DT recipe is diagnostic only.",
         "mpf.cpp:1695-1711 represented Go INT64_MIN input refuses at reached undefined signed negation; no C++ assertion-prefix equivalence claimed. Signed-host TLS destructor-stop tests are actual owner-primitive guard domain, not ordinary mathematical allocation failure. New ToRational tests are adapted source assertions; no direct original mpf.cpp driver coverage or whole-unit completion credit.",
-        "mpf.cpp:1712-1769 C++ undefined signed shifts/addition and oversized shift counts have explicit reached represented-Go guard, distinct from compiled SASSERT width checks. uint32 exponent/float shift/addition source wrapping is retained. Narrow denormal to_double follows literal double bottom-exponent mapping rather than a general format conversion. src/test/mpf.cpp:23-82 all18 ENSURE output values adapted using explicit source fields; original int/double/float SET dependencies remain separately unported, so no complete active-driver or whole MPF unit credit.",
+        "mpf.cpp:1712-1769 C++ undefined signed shifts/addition and oversized shift counts have explicit reached represented-Go guards after source assertion actions at 1713,1740,1745,1755. uint32 exponent/float shift/addition source wrapping is retained. Narrow denormal to_double follows literal double bottom-exponent mapping rather than a general format conversion. src/test/mpf.cpp:23-82 all18 ENSURE output values adapted using explicit source fields; original int/double/float SET dependencies remain separately unported, so no complete active-driver or whole MPF unit credit.",
         "mpf.cpp:1963-2098 represented undefined signed exponent arithmetic refuses at the reached expression without scoped NUM constructor credit. TLS negative-size stops are signed-host owner-primitive guard profile, not ordinary mathematical OOM. Independent branch tests add no active original-driver assertions; src/test/mpf.cpp:23-89 has only the earlier eighteen SET outputs. Literal scratch old-free/allocation-before-assignment may leave a guard-only InvalidSlot on retry; no scratch repair is inserted. TRACE remains diagnostic.",
         "mpf.cpp:2100-2131 independent forty-case guard-bit checks validate the literal specialized switch, not new src/test/mpf.cpp driver assertions. BIG raw-field profiles use defined source-object integer arithmetic; they do not claim normalized sqrt-caller mathematics. Real pooled/direct descriptor refusal after literal scratch publication leaves tmp0 null; the actual older Integer source destructor reaches its null-header guard before allocator end, preserving the detached descriptor until explicit owning abort. No allocator-source-end physical-consumption credit or scratch repair is inferred from this fixture. TLS first-own release stops are signed-host Runtime guard profile, not ordinary mathematical OOM.",
         "mpf.cpp:1493,1509 source mixed-signed-zero UNREACHABLE is guarded by ErrIntegerAssertion. No defined zero choice or compiler-undefined execution is invented; global assertion/debugger transport remains outside this selected numeric slice.",

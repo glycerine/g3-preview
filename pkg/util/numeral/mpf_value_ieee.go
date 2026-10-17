@@ -5,7 +5,23 @@ import (
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
+
+func mpfIEEEAssertion(predicate bool, line int32, expression string) error {
+	if !modularSourceDebug {
+		return nil
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil {
+		return e
+	}
+	if enabled && !predicate {
+		return diagnostic.DebugAssertionFailure(d, "src/util/mpf.cpp", line, expression)
+	}
+	return nil
+}
 
 // ToDouble follows the source uint64 significand read, signed shifts, exponent
 // classification, and memcpy bit interpretation. Cached bounds keep their
@@ -14,8 +30,8 @@ func (m *ArbitraryFloatManager) ToDouble(x *ArbitraryFloat) (float64, error) {
 	if e := m.valueGuard(x); e != nil {
 		return 0, e
 	}
-	if modularSourceDebug && (x.EBits() > 11 || x.SBits() > 53) {
-		return 0, ErrIntegerAssertion
+	if e := mpfIEEEAssertion(x.EBits() <= 11 && x.SBits() <= 53, 1713, "x.ebits <= 11 && x.sbits <= 53"); e != nil {
+		return 0, e
 	}
 	sig, e := m.integer.Uint64(&x.significand)
 	if e != nil {
@@ -70,15 +86,15 @@ func (m *ArbitraryFloatManager) ToFloat(x *ArbitraryFloat) (float32, error) {
 	if e := m.valueGuard(x); e != nil {
 		return 0, e
 	}
-	if modularSourceDebug && (x.EBits() > 8 || x.SBits() > 24) {
-		return 0, ErrIntegerAssertion
+	if e := mpfIEEEAssertion(x.EBits() <= 8 && x.SBits() <= 24, 1740, "x.ebits <= 8 && x.sbits <= 24"); e != nil {
+		return 0, e
 	}
 	q, e := m.integer.Uint64(&x.significand)
 	if e != nil {
 		return 0, e
 	}
-	if modularSourceDebug && q >= 1<<32 {
-		return 0, ErrIntegerAssertion
+	if e := mpfIEEEAssertion(q < 1<<32, 1745, "q < 4294967296ull"); e != nil {
+		return 0, e
 	}
 	sig := uint32(q)
 	shift := uint32(24) - x.SBits()
@@ -101,8 +117,8 @@ func (m *ArbitraryFloatManager) ToFloat(x *ArbitraryFloat) (float32, error) {
 		if bottom {
 			exp = uint32(0xffffff81)
 		} else {
-			if modularSourceDebug && x.exponent >= 1<<32 {
-				return 0, ErrIntegerAssertion
+			if e := mpfIEEEAssertion(x.exponent < 1<<32, 1755, "q < 4294967296ll"); e != nil {
+				return 0, e
 			}
 			exp = uint32(x.exponent)
 		}

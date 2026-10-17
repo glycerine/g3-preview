@@ -80,6 +80,9 @@ func TestArbitraryFloatIEEEIndependentBranchBitsAndWarmNoAllocation(t *testing.T
 }
 
 func TestArbitraryFloatIEEERepresentedShiftGuardDomains(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "T")
+	}
 	b := arena.NewBudget(1 << 26)
 	m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
@@ -88,7 +91,7 @@ func TestArbitraryFloatIEEERepresentedShiftGuardDomains(t *testing.T) {
 	serviceMust(t, m.SetComponents(&x, 8, 54, false, 0, &one))
 	_, e = m.ToDouble(&x)
 	if modularSourceDebug {
-		if e != ErrIntegerAssertion {
+		if !isMPNVerificationThrow(e) {
 			t.Fatal(e)
 		}
 	} else if e != arena.ErrBounds {
@@ -113,6 +116,7 @@ func TestArbitraryFloatIEEECompiledWidthAssertionLeavesSignificandUnread(t *test
 	if !modularSourceDebug {
 		return
 	}
+	bindMPNDebugActions(t, "TT")
 	b := arena.NewBudget(1 << 26)
 	m, e := NewArbitraryFloatManager(IntegerConfig{Cells: arena.Config{Budget: b, PageSize: 1}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: b}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 	serviceMust(t, e)
@@ -124,11 +128,11 @@ func TestArbitraryFloatIEEECompiledWidthAssertionLeavesSignificandUnread(t *test
 	stale := x
 	serviceMust(t, m.Del(&x))
 	used := b.Used()
-	if _, e := m.ToDouble(&stale); e != ErrIntegerAssertion {
+	if _, e := m.ToDouble(&stale); !isMPNVerificationThrow(e) {
 		t.Fatal("width assertion read stale significand", e)
 	}
 	stale.format = arbitraryFloatFormat(8, 25, false)
-	if _, e := m.ToFloat(&stale); e != ErrIntegerAssertion {
+	if _, e := m.ToFloat(&stale); !isMPNVerificationThrow(e) {
 		t.Fatal("width assertion read stale significand", e)
 	}
 	copied := *m
