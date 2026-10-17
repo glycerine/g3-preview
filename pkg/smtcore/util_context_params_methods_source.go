@@ -7,6 +7,7 @@ import (
 	"errors"
 	"math"
 	"reflect"
+	"strings"
 
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/ast"
@@ -20,7 +21,7 @@ type contextParamsFrame struct {
 	owner                                                                    *ContextParams
 	next                                                                     *contextParamsFrame
 	invocation, header                                                       uint64
-	key                                                                      OwnedString
+	key                                                                      string
 	descriptor                                                               uparams.ParamDescrs
 	buffer                                                                   bytes.Buffer
 	value                                                                    uparams.ParamsRef
@@ -90,7 +91,8 @@ func (s *ContextParams) endSourceFrame(f *contextParamsFrame, body error) error 
 		}
 	}
 	if f.keyComplete {
-		f.key.SourceDestroy()
+		f.key = ""
+		f.keyComplete = false
 	}
 	f.sourceDone = true
 	// An incomplete descriptor's actual copied-text context, or an exact failed
@@ -156,7 +158,8 @@ func (s *ContextParams) closeSourceFrames() error {
 				return e
 			}
 		}
-		f.key.OwnAbort()
+		f.key = ""
+		f.keyComplete = false
 		s.dropSourceFrame(f)
 	}
 	return nil
@@ -195,58 +198,55 @@ func (s *ContextParams) SetViews(param, value uparams.ParamsStringView) (result 
 	if e != nil {
 		return e
 	}
-	if e = f.key.Construct(s.budget, key); e != nil {
-		return e
+	if i := strings.IndexByte(key, 0); i >= 0 {
+		key = key[:i]
 	}
-	f.keyComplete = true
-	n := uint32(f.key.Length)
-	for i := uint32(0); i < n; i++ {
-		ch, readErr := f.key.View().Byte(uint64(i))
-		if readErr != nil {
-			return readErr
-		}
+	keyBytes := []byte(key)
+	for i, ch := range keyBytes {
 		if ch >= 'A' && ch <= 'Z' {
-			f.key.Put(uint64(i), ch-'A'+'a')
+			keyBytes[i] = ch - 'A' + 'a'
 		} else if ch == '-' {
-			f.key.Put(uint64(i), '_')
+			keyBytes[i] = '_'
 		}
 	}
+	f.key = string(keyBytes)
+	f.keyComplete = true
 	switch {
-	case f.key.Matches("timeout"):
+	case f.key == "timeout":
 		return s.setSourceUInt(f, &s.state.Timeout, param, value)
-	case f.key.Matches("rlimit"):
+	case f.key == "rlimit":
 		return s.setSourceUInt(f, &s.state.RLimit, param, value)
-	case f.key.Matches("type_check"), f.key.Matches("well_sorted_check"):
+	case f.key == "type_check", f.key == "well_sorted_check":
 		return s.setSourceBool(f, &s.state.WellSortedCheck, param, value)
-	case f.key.Matches("auto_config"):
+	case f.key == "auto_config":
 		return s.setSourceBool(f, &s.state.AutoConfig, param, value)
-	case f.key.Matches("proof"):
+	case f.key == "proof":
 		return s.setSourceBool(f, &s.state.Proof, param, value)
-	case f.key.Matches("model"):
+	case f.key == "model":
 		return s.setSourceBool(f, &s.state.Model, param, value)
-	case f.key.Matches("model_validate"):
+	case f.key == "model_validate":
 		return s.setSourceBool(f, &s.state.ModelValidate, param, value)
-	case f.key.Matches("dump_models"):
+	case f.key == "dump_models":
 		return s.setSourceBool(f, &s.state.DumpModels, param, value)
-	case f.key.Matches("trace"):
+	case f.key == "trace":
 		return s.setSourceBool(f, &s.state.Trace, param, value)
-	case f.key.Matches("trace_file_name"):
+	case f.key == "trace_file_name":
 		text, e := value.String()
 		if e != nil {
 			return e
 		}
 		return s.traceFile.Assign(text)
-	case f.key.Matches("dot_proof_file"):
+	case f.key == "dot_proof_file":
 		text, e := value.String()
 		if e != nil {
 			return e
 		}
 		return s.dotProof.Assign(text)
-	case f.key.Matches("unsat_core"):
+	case f.key == "unsat_core":
 		return s.setSourceBool(f, &s.state.UnsatCore, param, value)
-	case f.key.Matches("debug_ref_count"):
+	case f.key == "debug_ref_count":
 		return s.setSourceBool(f, &s.state.DebugRefCount, param, value)
-	case f.key.Matches("smtlib2_compliant"):
+	case f.key == "smtlib2_compliant":
 		return s.setSourceBool(f, &s.state.SMTLib2Compliant, param, value)
 	}
 	f.descriptorAttempted = true
@@ -258,13 +258,7 @@ func (s *ContextParams) SetViews(param, value uparams.ParamsStringView) (result 
 	}
 	f.bufferComplete = true
 	f.buffer.WriteString("unknown parameter '")
-	for i := uint64(0); i < f.key.Length; i++ {
-		ch, readErr := f.key.View().Byte(uint64(i))
-		if readErr != nil {
-			return readErr
-		}
-		f.buffer.WriteByte(ch)
-	}
+	f.buffer.WriteString(f.key)
 	f.buffer.WriteString("'\n")
 	f.buffer.WriteString("Legal parameters are:\n")
 	if e = f.descriptor.DisplayInto(&f.buffer, 2, false, false); e != nil {

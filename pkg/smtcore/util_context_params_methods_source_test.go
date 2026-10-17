@@ -43,6 +43,11 @@ func TestContextParamsSetASCIINormalizationLiteralBoolAndLP64UIntParsing(t *test
 	if !s.state.WellSortedCheck {
 		t.Fatal("source ASCII normalization")
 	}
+	k, v = "TiMeOuT\x00ignored", "23"
+	paramsMust(t, s.Set(&k, &v))
+	if s.state.Timeout != 23 {
+		t.Fatal("C-string key terminator changed option lookup")
+	}
 	k, v = "MODEL", "false"
 	paramsMust(t, s.Set(&k, &v))
 	if s.state.Model {
@@ -167,7 +172,7 @@ func contextMethodsCold(t *testing.T, s *ContextParams, g *uparams.GlobalParamsS
 			if f.self != f || f.owner != s || f.invocation == 0 {
 				t.Fatal("actual lexical owner binding")
 			}
-			n += f.header + f.key.StorageBytes()
+			n += f.header
 			d := &f.descriptor
 			if d.Self != nil {
 				if d.Self != d || d.OwnerBytes != 0 {
@@ -204,7 +209,7 @@ func TestContextParamsEveryUnknownDescriptorAndErrorBufferReservation(t *testing
 			t.Fatal("no invented field publication")
 		}
 		for f := s.frames; f != nil; f = f.next {
-			if !f.descriptorAttempted || f.descriptor.ConstructorReady() || f.descriptor.Closed() || f.keyComplete && !f.key.Closed {
+			if !f.descriptorAttempted || f.descriptor.ConstructorReady() || f.descriptor.Closed() || f.keyComplete {
 				t.Fatal("incomplete descriptor context retained, older completed key ended")
 			}
 		}
@@ -469,7 +474,7 @@ func TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral(t *testin
 	paramsMust(t, x)
 	older, x := s3.beginSourceFrame()
 	paramsMust(t, x)
-	paramsMust(t, older.key.Construct(b, strings.Repeat("k", 81)))
+	older.key = strings.Repeat("k", 81)
 	older.keyComplete = true
 	younger, x := s3.beginSourceFrame()
 	paramsMust(t, x)
@@ -483,7 +488,7 @@ func TestContextParamsGetSolverCopyOOMRetainsExactUntransferredNumeral(t *testin
 	}
 	otherBody := errors.New("older body diagnostic")
 	x = s3.endSourceFrame(older, otherBody)
-	if !errors.Is(x, otherBody) || !errors.Is(x, arena.ErrBounds) || older.key.Closed || older.key.Length != 81 {
+	if !errors.Is(x, otherBody) || !errors.Is(x, arena.ErrBounds) || !older.keyComplete || len(older.key) != 81 {
 		t.Fatal("younger stop protects older lexical storage", x)
 	}
 	upolyHenselAuditPhysical(t, []*polynomial.UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{RationalServices: []*unumeral.RationalService{q}, ParamsValues: []paramsPhysicalValueOwner{{c, &younger.value}}})
