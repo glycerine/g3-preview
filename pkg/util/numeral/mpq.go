@@ -468,6 +468,20 @@ func (m *RationalManager) Equal(a, b *Rational) (bool, error) {
 func (m *RationalManager) Compare(a, b *Rational) (int, error) {
 	return m.compareWithAllocationContext(a, b, integerAllocationInvocationContext{})
 }
+func rationalCompareSourceAssertion(predicate bool, line int32, expression string) error {
+	if !modularSourceDebug {
+		return nil
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil {
+		return e
+	}
+	if enabled && !predicate {
+		return diagnostic.DebugAssertionFailure(d, "src/util/mpq.cpp", line, expression)
+	}
+	return nil
+}
 func (m *RationalManager) compareWithAllocationContext(a, b *Rational, context integerAllocationInvocationContext) (_rawValue int, _rawErr error) {
 	if e := m.checkScalarValue(a); e != nil {
 		return 0, e
@@ -486,16 +500,27 @@ func (m *RationalManager) compareWithAllocationContext(a, b *Rational, context i
 		if sb > 0 {
 			return -1, nil
 		}
+		if e := rationalCompareSourceAssertion(sb <= 0, 49, "sign_b <= 0"); e != nil {
+			return 0, e
+		}
 		if sb < 0 {
 			return 1, nil
 		}
 		return 0, nil
 	}
-	if sa > 0 && sb <= 0 {
-		return 1, nil
+	if sa > 0 {
+		if e := rationalCompareSourceAssertion(sa > 0, 52, "sign_a > 0"); e != nil {
+			return 0, e
+		}
+		if sb <= 0 {
+			return 1, nil
+		}
 	}
 	if sa < 0 && sb == 0 {
 		return -1, nil
+	}
+	if e := rationalCompareSourceAssertion((sa > 0 && sb > 0) || (sa < 0 && sb < 0), 55, "(sign_a > 0 && sign_b > 0) || (sign_a < 0 && sign_b < 0)"); e != nil {
+		return 0, e
 	}
 	one, two := &m.LtTmp1, &m.LtTmp2
 	if m.Synchronized {

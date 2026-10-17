@@ -162578,6 +162578,7 @@
       "status": "partial",
       "go_targets": [
         "pkg/util/numeral/mpq.go",
+        "pkg/util/numeral/mpq_compare_assertion_source_test.go",
         "pkg/util/numeral/mpq_round.go",
         "pkg/util/numeral/mpq_power.go",
         "pkg/util/numeral/mpq_parse.go",
@@ -162637,6 +162638,7 @@
         "pkg/util/numeral/mpq_parse_trace.go"
       ],
       "tests": [
+        "TestRationalCompareSourceSignAssertionSites",
         "TestRationalSourceDivAndInverseAliases",
         "TestRationalConstructorLifecycleAndBudget",
         "TestRationalCheckedInitializationAndZero",
@@ -162992,6 +162994,7 @@
           "status": "ported",
           "go_target": "pkg/util/numeral/mpq.go",
           "tests": [
+            "TestRationalCompareSourceSignAssertionSites",
             "TestRationalSourceDivAndInverseAliases",
             "TestRationalConstructorLifecycleAndBudget",
             "TestRationalCheckedInitializationAndZero",
