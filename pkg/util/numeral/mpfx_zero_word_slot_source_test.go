@@ -3,9 +3,12 @@
 package numeral
 
 import (
+	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 func TestFixedPointProductUnderflowRetainsAllocatedZeroWords(t *testing.T) {
@@ -115,4 +118,88 @@ func TestFixedPointNonintegerRationalUnderflowRetainsDestinationSign(t *testing.
 	if zero, err := m.IsZero(out); err != nil || !zero {
 		t.Fatal("integer zero setter did not reset slot", zero, err)
 	}
+}
+
+func TestFixedPointAddSubAllocatedZeroWordBranches(t *testing.T) {
+	m, err := NewFixedPointManager(2, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	values := make([]*FixedPoint, 6)
+	for i := range values {
+		values[i], err = m.New()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	epsilon, half, slot, other, out, zero := values[0], values[1], values[2], values[3], values[4], values[5]
+	defer func() {
+		for _, v := range values {
+			if err := v.Close(); err != nil {
+				t.Error(err)
+			}
+		}
+		if err := m.Close(); err != nil {
+			t.Error(err)
+		}
+	}()
+	must := func(err error) {
+		t.Helper()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	must(m.SetRatio(epsilon, 1, 1<<32))
+	must(m.SetRatio(half, 1, 2))
+	must(m.Mul(epsilon, half, slot))
+	must(m.Copy(other, slot))
+	var output bytes.Buffer
+	tags := diagnostic.NewTraceTagsWithWriter(&output)
+	tags.Enable("mpfx")
+	must(m.BindTrace(tags))
+	want := func(text string, canonical bool) {
+		t.Helper()
+		got, err := m.String(out)
+		if err != nil || got != text {
+			t.Fatal("zero-word text", got, text, err)
+		}
+		isZero, err := m.IsZero(out)
+		if err != nil || isZero != canonical {
+			t.Fatal("source zero-slot classification", isZero, canonical, err)
+		}
+	}
+	must(m.Add(slot, zero, out))
+	want("0", false)
+	if output.Len() != 0 {
+		t.Fatal("source shortcut emitted inner trace", output.String())
+	}
+	must(m.Sub(zero, slot, out))
+	want("-0", false)
+	if output.Len() != 0 {
+		t.Fatal("source negated shortcut emitted inner trace", output.String())
+	}
+	must(m.Add(slot, zero, slot))
+	if pos, err := m.IsPos(slot); err != nil || !pos {
+		t.Fatal("aliased copy shortcut lost allocated slot", pos, err)
+	}
+	must(m.Sub(zero, slot, slot))
+	if neg, err := m.IsNeg(slot); err != nil || !neg {
+		t.Fatal("aliased negate shortcut lost allocated slot", neg, err)
+	}
+	must(m.Neg(slot))
+	must(m.Add(slot, other, out))
+	want("0", false)
+	if tags.ShouldTrace("mpfx") && !strings.Contains(output.String(), "add(0, 0)") {
+		t.Fatal("allocated zero operands skipped source inner trace", output.String())
+	}
+	output.Reset()
+	must(m.Sub(slot, other, out))
+	want("0", true)
+	must(m.Neg(other))
+	must(m.Add(slot, other, out))
+	want("0", true)
+	must(m.Sub(slot, other, out))
+	want("0", false)
+	must(m.Add(other, other, out))
+	want("-0", false)
 }

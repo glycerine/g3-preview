@@ -310,6 +310,22 @@ func (m *FixedPointManager) Abs(a *FixedPoint) error {
 	return nil
 }
 
+// addSubZeroSlot preserves the source's allocated zero-word result when its
+// shortcut copies a zero-word operand or equal-sign zero words are added.
+// Capture this before publication because out may alias either operand.
+func addSubZeroSlot(a, b *FixedPoint, sub bool) (bool, bool) {
+	if a.sourceIsZero() {
+		return b.sourceZeroSlot, b.sourceNegative() != sub
+	}
+	if b.sourceIsZero() {
+		return a.sourceZeroSlot, a.sourceNegative()
+	}
+	if a.sourceZeroSlot && b.sourceZeroSlot && a.sourceNegative() == (b.sourceNegative() != sub) {
+		return true, a.sourceNegative()
+	}
+	return false, false
+}
+
 func (m *FixedPointManager) Add(a, b, out *FixedPoint) error {
 	if err := m.pair(a, b); err != nil {
 		return err
@@ -318,7 +334,8 @@ func (m *FixedPointManager) Add(a, b, out *FixedPoint) error {
 		return err
 	}
 	m.traceFixedAddSubOuter(a, b, out, false, true)
-	inner := a.scaled.Sign() != 0 && b.scaled.Sign() != 0
+	inner := !a.sourceIsZero() && !b.sourceIsZero()
+	retainsSlot, negative := addSubZeroSlot(a, b, false)
 	if inner {
 		m.traceFixedAddSubInner(a, b, out, false, true)
 	}
@@ -326,6 +343,10 @@ func (m *FixedPointManager) Add(a, b, out *FixedPoint) error {
 	v.Add(&a.scaled, &b.scaled)
 	if err := m.publish(out, &v); err != nil {
 		return err
+	}
+	if v.Sign() == 0 && retainsSlot {
+		out.sourceZeroSlot = true
+		out.sourceZeroNegative = negative
 	}
 	if inner {
 		m.traceFixedAddSubInner(a, b, out, false, false)
@@ -342,7 +363,8 @@ func (m *FixedPointManager) Sub(a, b, out *FixedPoint) error {
 		return err
 	}
 	m.traceFixedAddSubOuter(a, b, out, true, true)
-	inner := a.scaled.Sign() != 0 && b.scaled.Sign() != 0
+	inner := !a.sourceIsZero() && !b.sourceIsZero()
+	retainsSlot, negative := addSubZeroSlot(a, b, true)
 	if inner {
 		m.traceFixedAddSubInner(a, b, out, true, true)
 	}
@@ -350,6 +372,10 @@ func (m *FixedPointManager) Sub(a, b, out *FixedPoint) error {
 	v.Sub(&a.scaled, &b.scaled)
 	if err := m.publish(out, &v); err != nil {
 		return err
+	}
+	if v.Sign() == 0 && retainsSlot {
+		out.sourceZeroSlot = true
+		out.sourceZeroNegative = negative
 	}
 	if inner {
 		m.traceFixedAddSubInner(a, b, out, true, false)

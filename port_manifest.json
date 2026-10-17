@@ -160725,7 +160725,8 @@
           "tests": [
             "TestFixedPointRetainedArithmeticAndDirectedRounding",
             "TestFixedPointRangeOwnershipAndPublication",
-            "TestFixedPointProductUnderflowRetainsAllocatedZeroWords"
+            "TestFixedPointProductUnderflowRetainsAllocatedZeroWords",
+            "TestFixedPointAddSubAllocatedZeroWordBranches"
           ]
         },
         {
@@ -160820,7 +160821,7 @@
       ],
       "deviations": [
         "Go big.Int stores the signed scaled value in place of source mpfx word-pool/id_gen storage. Retained numerical bounds and rounding are preserved; source pool allocation, diagnostic assertion and failure timing are not claimed. The retained production mpfx consumer is subpaving via subpaving_mpfx.h, subpaving.cpp and subpaving_tactic.cpp. Its interval and definition paths use the covered manager operations. div2k, is_power_of_two, epsilon setters, machine-word queries and decimal/SMT2/raw formats have no retained production mpfx call site; remaining optional trace sites stay tracked by trace.cpp/.h. The unfinished subpaving solver remains tracked by its separate source units.",
-        "The source 32-bit power mask loop does not terminate after wrapping at a high-bit exponent; Go reports ErrFixedPointDomain for that input. Floor/ceil carry overflow, multiplication underflow and the noninteger rational setter retain the source allocated-slot and sign state in concrete Go fields when their numeric words are zero. Source predicates, comparison, copy, swap, reset, display and the power zero branch read that state. Physical word-pool ownership, source assertions and remaining arithmetic on an inconsistent zero-word slot remain partial.",
+        "The source 32-bit power mask loop does not terminate after wrapping at a high-bit exponent; Go reports ErrFixedPointDomain for that input. Floor/ceil carry overflow, multiplication underflow and the noninteger rational setter retain the source allocated-slot and sign state in concrete Go fields when their numeric words are zero. Source predicates, comparison, copy, swap, reset, display, add/sub shortcut and same-sign zero-word routes, and the power zero branch read that state. Physical word-pool ownership, source assertions and other arithmetic on an inconsistent zero-word slot remain partial.",
         "The source noninteger mpq setter reads the existing destination sign (mpfx.cpp:285), even when the incoming rational has the opposite sign. The concrete Go setter preserves this observed branch; the integer mpq branch uses the input sign. Go conversion crosses manager owners through exact numeral text rather than copying C++ limbs."
       ]
     },
@@ -160876,7 +160877,8 @@
           "tests": [
             "TestFixedPointRetainedArithmeticAndDirectedRounding",
             "TestFixedPointRangeOwnershipAndPublication",
-            "TestFixedPointProductUnderflowRetainsAllocatedZeroWords"
+            "TestFixedPointProductUnderflowRetainsAllocatedZeroWords",
+            "TestFixedPointAddSubAllocatedZeroWordBranches"
           ]
         },
         {
@@ -160941,7 +160943,7 @@
       ],
       "deviations": [
         "Go big.Int stores the signed scaled value in place of source mpfx word-pool/id_gen storage. Retained numerical bounds and rounding are preserved; source pool allocation, diagnostic assertion and failure timing are not claimed. The retained production mpfx consumer is subpaving via subpaving_mpfx.h, subpaving.cpp and subpaving_tactic.cpp. Its interval and definition paths use the covered manager operations. div2k, is_power_of_two, epsilon setters, machine-word queries and decimal/SMT2/raw formats have no retained production mpfx call site; remaining optional trace sites stay tracked by trace.cpp/.h. The unfinished subpaving solver remains tracked by its separate source units.",
-        "The source 32-bit power mask loop does not terminate after wrapping at a high-bit exponent; Go reports ErrFixedPointDomain for that input. Floor/ceil carry overflow, multiplication underflow and the noninteger rational setter retain the source allocated-slot and sign state in concrete Go fields when their numeric words are zero. Source predicates, comparison, copy, swap, reset, display and the power zero branch read that state. Physical word-pool ownership, source assertions and remaining arithmetic on an inconsistent zero-word slot remain partial.",
+        "The source 32-bit power mask loop does not terminate after wrapping at a high-bit exponent; Go reports ErrFixedPointDomain for that input. Floor/ceil carry overflow, multiplication underflow and the noninteger rational setter retain the source allocated-slot and sign state in concrete Go fields when their numeric words are zero. Source predicates, comparison, copy, swap, reset, display, add/sub shortcut and same-sign zero-word routes, and the power zero branch read that state. Physical word-pool ownership, source assertions and other arithmetic on an inconsistent zero-word slot remain partial.",
         "The source noninteger mpq setter reads the existing destination sign (mpfx.cpp:285), even when the incoming rational has the opposite sign. The concrete Go setter preserves this observed branch; the integer mpq branch uses the input sign. Go conversion crosses manager owners through exact numeral text rather than copying C++ limbs."
       ]
     },
