@@ -29642,7 +29642,8 @@
       "go_targets": [
         "pkg/ast/rewriter/var_substitution.go",
         "pkg/ast/rewriter/var_substitution_test.go",
-        "pkg/ast/rewriter/unused_vars_ufbv.go"
+        "pkg/ast/rewriter/unused_vars_ufbv.go",
+        "pkg/ast/rewriter/var_substitution_trace.go"
       ],
       "tests": [
         "TestVarSubstitutionOriginalRegisteredIdentities",
@@ -29651,7 +29652,8 @@
         "TestVarSubstitutionColdConstructionCleanup",
         "TestVarSubstitutionFreeReplacementShiftAndDeepTraversal",
         "TestVarSubstitutionBorrowedAppArgumentsOrderAndReset",
-        "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers"
+        "TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers",
+        "TestVarSubstitutionResultSourceTrace"
       ],
       "assertions": [
         {
@@ -29690,6 +29692,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "selected live var_subst operator post-rewrite var_subst_bug TRACE with binding order and result (var_subst.cpp:35-40)",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/var_substitution_trace.go",
+          "tests": [
+            "TestVarSubstitutionResultSourceTrace"
+          ]
+        },
         {
           "name": "Original var_subst constructor, std_order and reset with embedded beta_reducer (var_subst.h:35-53)",
           "status": "ported",
@@ -29730,7 +29740,7 @@
         "Borrowed AppArguments input is copied directly by the existing binding engine in source normal/inverse order; Substitute and SubstituteArguments share the same reset/binding/traversal path. The UFBV unused-variable caller now pins every constructed variable mapping until substitution and result publication finish, then releases those pins after its younger substitution/result owners."
       ],
       "deviations": [
-        "is_well_sorted pre/post SASSERT and TRACE formatting remain unported dependencies; operator gains only partial credit. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. The UFBV empty-params unused-variable elimination path is now concrete; nondefault parameters, instantiate, free-variable enumeration and other consumers remain open. Explicit boolean constructor argument supplies the C++ standard-order option; selected model function interpretation/evaluator integration now uses this owner; broader theory integration remains open."
+        "is_well_sorted pre/post SASSERT remain unported dependencies; the selected post-rewrite TRACE is covered for a live Boolean binding, while wider expression/stream profiles remain open. The two registered var_subst.cpp ENSURE canonical identities are replayed through the new owner. The UFBV empty-params unused-variable elimination path is now concrete; nondefault parameters, instantiate, free-variable enumeration and other consumers remain open. Explicit boolean constructor argument supplies the C++ standard-order option; selected model function interpretation/evaluator integration now uses this owner; broader theory integration remains open."
       ]
     },
     {
@@ -182697,7 +182707,8 @@
         "pkg/smtcore/smt_model_finder_hint_trace.go",
         "pkg/smtcore/param_datatype_refs.go",
         "pkg/ast/rewriter/bool_rewriter_ite_value_trace.go",
-        "pkg/ast/rewriter/array_rewriter_trace.go"
+        "pkg/ast/rewriter/array_rewriter_trace.go",
+        "pkg/ast/rewriter/var_substitution_trace.go"
       ],
       "tests": [
         "TestSATGoalDependencyFormulaSourceTrace",
@@ -182806,7 +182817,8 @@
         "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit",
         "TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite",
         "TestBoolRewriterTryITEValueFalseSourceTrace",
-        "TestArrayRewriterAppCoreSourceTrace"
+        "TestArrayRewriterAppCoreSourceTrace",
+        "TestVarSubstitutionResultSourceTrace"
       ],
       "conditionals": [
         {
@@ -182837,6 +182849,14 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Selected live var_subst::operator() post-rewrite TRACE at var_subst.cpp:35 with Boolean binding/result SMT2",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/var_substitution_trace.go",
+          "tests": [
+            "TestVarSubstitutionResultSourceTrace"
+          ]
+        },
         {
           "name": "Selected array_rewriter::mk_app_core declaration and ordered-argument TRACE at array_rewriter.cpp:38 before dispatch",
           "status": "partial",
@@ -185149,7 +185169,8 @@
         "pkg/smtcore/smt_model_finder_hint_trace.go",
         "pkg/smtcore/param_datatype_refs.go",
         "pkg/ast/rewriter/bool_rewriter_ite_value_trace.go",
-        "pkg/ast/rewriter/array_rewriter_trace.go"
+        "pkg/ast/rewriter/array_rewriter_trace.go",
+        "pkg/ast/rewriter/var_substitution_trace.go"
       ],
       "tests": [
         "TestSATGoalDependencyFormulaSourceTrace",
@@ -185256,7 +185277,8 @@
         "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit",
         "TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite",
         "TestBoolRewriterTryITEValueFalseSourceTrace",
-        "TestArrayRewriterAppCoreSourceTrace"
+        "TestArrayRewriterAppCoreSourceTrace",
+        "TestVarSubstitutionResultSourceTrace"
       ],
       "conditionals": [
         {
@@ -185299,6 +185321,14 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Selected live var_subst::operator() post-rewrite TRACE at var_subst.cpp:35 with Boolean binding/result SMT2",
+          "status": "partial",
+          "go_target": "pkg/ast/rewriter/var_substitution_trace.go",
+          "tests": [
+            "TestVarSubstitutionResultSourceTrace"
+          ]
+        },
         {
           "name": "Selected array_rewriter::mk_app_core declaration and ordered-argument TRACE at array_rewriter.cpp:38 before dispatch",
           "status": "partial",

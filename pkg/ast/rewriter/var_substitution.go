@@ -55,7 +55,10 @@ func (s *VarSubstitution) SubstituteArguments(term ast.ASTHandle, args ast.AppAr
 	if e := r.setBindingArguments(args, s.standardOrder); e != nil {
 		return e
 	}
-	return r.Rewrite(term, out)
+	if e := r.Rewrite(term, out); e != nil {
+		return e
+	}
+	return s.traceSubstitution(term, args, out)
 }
 func (s *VarSubstitution) Reset() error {
 	if s == nil {
