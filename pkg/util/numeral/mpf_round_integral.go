@@ -86,6 +86,9 @@ func (m *ArbitraryFloatManager) RoundToIntegral(mode ArbitraryFloatRoundingMode,
 	if x.exponent >= int64(x.SBits()-1) {
 		return m.Copy(out, x)
 	}
+	if e := mpfSourceAssertion(x.exponent >= 0 && x.exponent < int64(x.SBits()-1), 1090, "x.exponent >= 0 && x.exponent < x.sbits-1"); e != nil {
+		return e
+	}
 	out.assignEbits(x.EBits())
 	out.assignSbits(x.SBits())
 	out.assignSign(x.Sign())
