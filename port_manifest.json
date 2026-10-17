@@ -17461,7 +17461,9 @@
         "pkg/ast/ast_fpa_to_fp_signed_bv_test.go",
         "pkg/ast/ast_fpa_to_fp_format_test.go",
         "pkg/ast/ast_fpa_to_fp_arithmetic_test.go",
-        "pkg/ast/ast_fpa_to_fp_ieee_bv_test.go"
+        "pkg/ast/ast_fpa_to_fp_ieee_bv_test.go",
+        "pkg/ast/rewriter/fpa_bv_wrap_test.go",
+        "pkg/model/model_evaluator_fpa_test.go"
       ],
       "tests": [
         "TestFPABVWrapSourceExtractIdentityAndRefusals",
@@ -17576,6 +17578,7 @@
           "name": "bv_wrap declaration accepts FP or RM sort and derives BV result width (fpa_decl_plugin.cpp:689-710)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_bv_wrap_decl.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_bv_wrap_test.go"],
           "tests": ["TestFPABVWrapSourceExtractIdentityAndRefusals"]
         },
         {
@@ -17594,12 +17597,14 @@
           "name": "FPA fp.eq/lt/gt/leq/geq binary relation declarations: equal floating-point domains, chainable Boolean results, source kinds and application dispatch (fpa_decl_plugin.cpp:292-311,724-730)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_equality_decl.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_comparisons_test.go", "pkg/ast/rewriter/fpa_ieee_equality_test.go"],
           "tests": ["TestASTFPAIEEEEqualityDeclarationAndDomainValidation", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches"]
         },
         {
           "name": "FPA fp.neg/fp.abs unary declarations: one FloatingPoint domain, same-sort range and exact source kinds (fpa_decl_plugin.cpp:333-350,738-742)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_unary_decl.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_unary_test.go"],
           "tests": ["TestASTFPAUnaryNegAbsDeclarationsAndApplications", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg"]
         },
         {
@@ -17796,6 +17801,7 @@
           "name": "Reached fpa_decl_plugin::get_some_value FloatingPoint NaN and RoundingMode toward-zero defaults (fpa_decl_plugin.cpp:856-870), with MPF construction, numeral registration and local deletion in source order",
           "status": "partial",
           "go_target": "pkg/ast/ast_fpa_some_value.go",
+          "go_targets": ["pkg/model/model_evaluator_fpa_test.go"],
           "tests": [
             "TestASTFloatingPointSomeValueSourceDefaults",
             "TestASTFloatingPointSomeValueRefusedMPFConstruction",
@@ -17833,7 +17839,9 @@
         "pkg/ast/ast_fpa_scoped_values_source_test.go",
         "pkg/ast/ast_fpa_numeral_probe.go",
         "pkg/ast/ast_fpa_numeral_probe_test.go",
-        "pkg/ast/ast_fpa_rounding_read.go"
+        "pkg/ast/ast_fpa_rounding_read.go",
+        "pkg/ast/rewriter/fpa_bv_wrap_test.go",
+        "pkg/model/model_evaluator_fpa_test.go"
       ],
       "tests": [
         "TestFPABVWrapSourceExtractIdentityAndRefusals",
@@ -17908,6 +17916,7 @@
           "name": "bv_wrap retained declaration kind and FP/RM domain (fpa_decl_plugin.h:89,159; fpa_decl_plugin.cpp:689-710)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_bv_wrap_decl.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_bv_wrap_test.go"],
           "tests": ["TestFPABVWrapSourceExtractIdentityAndRefusals"]
         },
         {
@@ -17920,6 +17929,7 @@
           "name": "Reached fpa_decl_plugin::get_some_value declaration and two source sort defaults (fpa_decl_plugin.h:183; fpa_decl_plugin.cpp:856-870)",
           "status": "partial",
           "go_target": "pkg/ast/ast_fpa_some_value.go",
+          "go_targets": ["pkg/model/model_evaluator_fpa_test.go"],
           "tests": [
             "TestASTFloatingPointSomeValueSourceDefaults",
             "TestASTFloatingPointSomeValueRefusedMPFConstruction",
@@ -27277,12 +27287,14 @@
           "name": "mk_app_core seven unary classification cases and mk_is_zero/is_nan/is_inf/is_normal/is_subnormal/is_negative/is_positive concrete numeral reductions (fpa_rewriter.cpp:41-88,547-638)",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa_classification.go",
+          "go_targets": ["pkg/ast/ast_fpa_classification_read_test.go"],
           "tests": ["TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPAClassificationOneScopedNumeralPerCall"]
         },
         {
           "name": "mk_eq_core SMT numeral equality with two scoped_mpf locals, NaN pair, signed-zero distinction and structural fallback (fpa_rewriter.cpp:648-667)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_smt_equality.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_smt_equality_test.go"],
           "tests": ["TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal"]
         },
         {
@@ -27301,12 +27313,14 @@
           "name": "mk_neg/mk_abs and mk_app_core unary cases: NaN, infinity, double negation and one scoped_mpf numeric mutation (fpa_rewriter.cpp:41-70,308-370)",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa_unary.go",
+          "go_targets": ["pkg/ast/ast_fpa_unary_numeral_test.go"],
           "tests": ["TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg", "TestASTFPAUnaryScopedNumeralRetiresBeforeReturn"]
         },
         {
           "name": "mk_rem numeric reduction with two operand scoped_mpf locals, later result local, reverse cleanup and symbolic refusal (fpa_rewriter.cpp:340-353)",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa_remainder.go",
+          "go_targets": ["pkg/ast/ast_fpa_remainder_test.go"],
           "tests": [
             "TestASTFPARemainderFiniteNumeralAndScopedCleanup",
             "TestFPARemainderNumericSpecialAndSymbolicRefusal"
@@ -27316,6 +27330,7 @@
           "name": "mk_min/mk_max source NaN short circuits, opposite-signed-zero refusal and three scoped_mpf numeric locals (fpa_rewriter.cpp:369-415)",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa_extrema.go",
+          "go_targets": ["pkg/ast/ast_fpa_extrema_test.go"],
           "tests": [
             "TestASTFPAExtremaDeclarationsAndNumericBranches",
             "TestFPAExtremaNaNInfinitySignedZeroAndSymbolic"
@@ -27325,6 +27340,7 @@
           "name": "mk_sqrt/mk_round_to_integral rounding-mode guard, scoped operand/result numerals, numeric reductions and symbolic refusal (fpa_rewriter.cpp:433-466)",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa_rm_unary.go",
+          "go_targets": ["pkg/ast/ast_fpa_rm_unary_test.go"],
           "tests": [
             "TestASTFPARMUnaryDeclarationsModesAndNumericCleanup",
             "TestFPARMUnarySqrtAndIntegralDispatch"
@@ -27334,6 +27350,7 @@
           "name": "mk_fma rounding guard, three operand scoped_mpf locals before short-circuit probes, fourth result local and numeric fused reduction (fpa_rewriter.cpp:417-431)",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa_fma.go",
+          "go_targets": ["pkg/ast/ast_fpa_fma_test.go"],
           "tests": [
             "TestASTFPAFMADeclarationNumericAndScopedBranches",
             "TestFPAFMANumericSpecialAndSymbolicDispatch"
@@ -27343,6 +27360,7 @@
           "name": "mk_add/mk_mul/mk_div numeric branches with mode guard and three scoped_mpf locals; mk_sub unconditional add-of-negation structural rewrite (fpa_rewriter.cpp:256-307)",
           "status": "ported",
           "go_target": "pkg/ast/rewriter/fpa_rm_binary.go",
+          "go_targets": ["pkg/ast/ast_fpa_rm_binary_test.go"],
           "tests": [
             "TestASTFPARMBinaryDeclarationsAndNumericCleanup",
             "TestFPARMBinaryNumericAndSubtractionRewrite"
@@ -27360,6 +27378,7 @@
           "name": "mk_to_real finite MPF-to-rational conversion, NaN/infinity default refusal and hi_fp_unspecified zero; one scoped_mpf and finite scoped rational cleanup (fpa_rewriter.cpp:23-36,794-813)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_real.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_to_real_test.go"],
           "tests": [
             "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches",
             "TestFPAToRealDispatchDefaultAndHardwareUnspecified"
@@ -27369,6 +27388,7 @@
           "name": "mk_to_ubv/mk_to_sbv scoped MPF and MPQ rounding, exact signed/unsigned bounds, default refusal and hi_fp_unspecified zero (fpa_rewriter.cpp:708-763)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_bv.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_to_bv_test.go"],
           "tests": [
             "TestASTFPAToBVSourceBoundsRoundingAndUnspecified",
             "TestFPAToBVDispatchFiniteUnspecifiedAndSymbolic"
@@ -27378,6 +27398,7 @@
           "name": "mk_to_fp RoundingMode plus signed BV numeral branch with exact two's-complement normalization and MPF rounding (fpa_rewriter.cpp:106-119,155-182)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_fp_signed_bv.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_to_fp_signed_bv_test.go"],
           "tests": [
             "TestASTFPAToFPSignedBVSourceNormalizationAndRounding",
             "TestFPAToFPSignedBVNumericAndSymbolicDispatch"
@@ -27387,6 +27408,7 @@
           "name": "mk_to_fp RoundingMode plus FP numeral branch with target-format MPF and source SetFormat rounding (fpa_rewriter.cpp:106-119,166-175)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_fp_format.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_to_fp_format_test.go"],
           "tests": [
             "TestASTFPAToFPFormatRoundingSpecialsAndRefusals",
             "TestFPAToFPFormatSpecialAndSymbolicDispatch"
@@ -27396,6 +27418,7 @@
           "name": "mk_to_fp RoundingMode plus Real/Int numerals via source arithmetic numeral read, rational copy and MPF SetRational (fpa_rewriter.cpp:106-119,154-165)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_fp_arithmetic.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_to_fp_arithmetic_test.go"],
           "tests": [
             "TestASTFPAToFPArithmeticRealIntRoundingAndRefusals",
             "TestFPAToFPArithmeticRealIntDispatch"
@@ -27405,6 +27428,7 @@
           "name": "mk_to_fp one-BV IEEE field split into significand, exponent and sign before MPF SetComponents (fpa_rewriter.cpp:106-153)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_fp_ieee_bv.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_to_fp_ieee_bv_test.go"],
           "tests": [
             "TestASTFPAToFPIEEEBVExactFieldsAndRefusals",
             "TestFPAToFPIEEEBVNumericAndSymbolicDispatch"
@@ -27414,6 +27438,7 @@
           "name": "mk_to_fp three-BV concrete sign, biased exponent and significand fields through MPF SetComponents (fpa_rewriter.cpp:106-119,212-230)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_fp_three_bv.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_to_fp_three_bv_test.go"],
           "tests": [
             "TestASTFPAToFPThreeBVFieldsAndRefusal",
             "TestFPAToFPThreeBVDispatch"
@@ -27423,6 +27448,7 @@
           "name": "mk_to_fp RoundingMode with Real significand and Int exponent in either order through MPF SetExponentRational (fpa_rewriter.cpp:106-119,189-213)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_fp_exponent_rational.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_to_fp_exponent_rational_test.go"],
           "tests": [
             "TestASTFPAToFPExponentRationalOrdersAndRefusals",
             "TestFPAToFPExponentRationalBothOrdersDispatch"
@@ -27432,6 +27458,7 @@
           "name": "mk_to_fp_unsigned concrete BV numeral and rounding-mode guard, owned rational to MPF conversion and result publication (fpa_rewriter.cpp:235-254)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_fp_unsigned.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_to_fp_unsigned_test.go"],
           "tests": [
             "TestASTFPAToFPUnsignedDeclarationRoundingAndRefusals",
             "TestFPAToFPUnsignedNumericAndSymbolicDispatch"
@@ -27441,6 +27468,7 @@
           "name": "mk_to_ieee_bv finite MPF bit encoding, default NaN refusal and hi_fp_unspecified four-part concat with BR_REWRITE1 (fpa_rewriter.cpp:764-792)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_ieee_bv.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_to_ieee_bv_test.go"],
           "tests": [
             "TestASTFPAToIEEEBVDeclarationFiniteAndNaNBranches",
             "TestFPAToIEEEBVDefaultAndHardwareNaNDispatch"
@@ -159903,7 +159931,7 @@
           "name": "Concrete fpa_rewriter classification and mk_eq_core caller-local scoped_mpf values are ported; model_evaluator/th_rewriter integration remains open (fpa_rewriter.cpp:41-104,547-667)",
           "status": "partial",
           "go_target": "pkg/ast/ast_fpa_classification_read.go",
-          "go_targets": ["pkg/ast/ast_fpa_smt_equality.go"],
+          "go_targets": ["pkg/ast/ast_fpa_smt_equality.go", "pkg/ast/rewriter/fpa_classification_test.go"],
           "tests": ["TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit"]
         },
         {
@@ -160436,6 +160464,7 @@
           "name": "Retained fpa_decl_plugin::get_some_value caller-local MPF NaN construction, numeral registration, source-order deletion and refused-construction continuation (fpa_decl_plugin.cpp:856-863; mpf.h)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_some_value.go",
+          "go_targets": ["pkg/model/model_evaluator_fpa_test.go"],
           "tests": [
             "TestASTFloatingPointSomeValueSourceDefaults",
             "TestASTFloatingPointSomeValueRefusedMPFConstruction",
@@ -179507,30 +179536,35 @@
           "name": "Concrete fpa_rewriter classification scoped_mpf lexical construction, successful destruction and stopped-copy owning continuation (fpa_rewriter.cpp:547-638)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_classification_read.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_classification_test.go"],
           "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal"]
         },
         {
           "name": "Concrete fpa_rewriter mk_eq_core two scoped_mpf locals and reverse destruction (fpa_rewriter.cpp:648-667); model_evaluator/th_rewriter dispatch integration remains open",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_smt_equality.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_smt_equality_test.go"],
           "tests": ["TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal"]
         },
         {
           "name": "Concrete fpa_rewriter mk_float_eq two scoped_mpf locals and reverse destruction with IEEE mpf_manager::eq (fpa_rewriter.cpp:462-476)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_smt_equality.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_ieee_equality_test.go"],
           "tests": ["TestFPAIEEEEqualityDiffersFromSMTEquality"]
         },
         {
           "name": "Concrete fpa_rewriter mk_lt/mk_le two scoped_mpf numeric locals and source reverse destruction after special-value guards (fpa_rewriter.cpp:476-545)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_smt_equality.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_comparisons_test.go"],
           "tests": ["TestFPAOrderedComparisonSourceSpecialAndNumericBranches"]
         },
         {
           "name": "Concrete fpa_rewriter mk_neg/mk_abs caller-local scoped_mpf numeric mutation, destructor before result publication (fpa_rewriter.cpp:308-370)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_unary_numeral.go",
+          "go_targets": ["pkg/ast/rewriter/fpa_unary_test.go"],
           "tests": ["TestASTFPAUnaryScopedNumeralRetiresBeforeReturn", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg"]
         },
         {
