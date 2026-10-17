@@ -76,6 +76,9 @@ func (rw *boolRewriter) tryITEValue(ite, val ast.ASTHandle, out ast.ASTRef) (brS
 	if tv && fv {
 		switch {
 		case t != val && f != val:
+			if e := rw.traceTryITEValueFalse(t, f, val); e != nil {
+				return brFailed, e
+			}
 			h, e := m.MkFalse()
 			if e != nil {
 				return brFailed, e
@@ -243,6 +246,9 @@ func (rw *boolRewriter) mkEqCore(lhs, rhs ast.ASTHandle, out ast.ASTRef) (brStat
 	status := brFailed
 	if leftITE && rightValue {
 		status, e = rw.tryITEValue(lhs, rhs, out)
+		if e == nil {
+			e = rw.traceITEValueResult(lhs, rhs, out, status, 665)
+		}
 	} else {
 		rightITE, e2 := rw.isOperator(rhs, ast.ASTOpIte)
 		if e2 != nil {
@@ -254,6 +260,9 @@ func (rw *boolRewriter) mkEqCore(lhs, rhs ast.ASTHandle, out ast.ASTRef) (brStat
 		}
 		if rightITE && leftValue {
 			status, e = rw.tryITEValue(rhs, lhs, out)
+			if e == nil {
+				e = rw.traceITEValueResult(lhs, rhs, out, status, 670)
+			}
 		}
 	}
 	if e != nil || status != brFailed {

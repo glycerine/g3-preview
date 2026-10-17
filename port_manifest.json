@@ -21736,7 +21736,8 @@
         "pkg/ast/rewriter/rewriter_configuration.go",
         "pkg/ast/rewriter/bool_rewriter_public.go",
         "pkg/ast/rewriter/bool_rewriter_bv_distinct_test.go",
-        "pkg/ast/rewriter/bool_rewriter_native_context_test.go"
+        "pkg/ast/rewriter/bool_rewriter_native_context_test.go",
+        "pkg/ast/rewriter/bool_rewriter_ite_value_trace.go"
       ],
       "tests": [
         "TestModel2ExprEntryConditionSourceArityAndReferenceScope",
@@ -21769,7 +21770,8 @@
         "TestBoolRewriterPublicCoreThroughOriginalTraversal",
         "TestBoolRewriterOriginalBitVectorOffsetEquality",
         "TestBoolRewriterNativeLocalContextGrowthAndReferences",
-        "TestBoolRewriterNativeMembershipLeavesForeignMarks"
+        "TestBoolRewriterNativeMembershipLeavesForeignMarks",
+        "TestBoolRewriterTryITEValueFalseSourceTrace"
       ],
       "conditionals": [
         {
@@ -21834,6 +21836,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained try_ite_value three-value TRACE and both successful mk_eq_core CTRACE orientations at bool_rewriter.cpp:594,665,670; raw expr pointer text uses stable typed Go AST identities",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/rewriter/bool_rewriter_ite_value_trace.go",
+          "tests": [
+            "TestBoolRewriterTryITEValueFalseSourceTrace"
+          ]
+        },
         {
           "name": "Concrete default Boolean AND core for model2expr entry conditions, including zero/one result and raw-AND fallback (bool_rewriter.cpp:89-168)",
           "status": "ported",
@@ -182675,7 +182685,8 @@
         "pkg/tactic/arith/polynomial_trace.go",
         "pkg/ast/ast_core_distinct_trace.go",
         "pkg/smtcore/smt_model_finder_hint_trace.go",
-        "pkg/smtcore/param_datatype_refs.go"
+        "pkg/smtcore/param_datatype_refs.go",
+        "pkg/ast/rewriter/bool_rewriter_ite_value_trace.go"
       ],
       "tests": [
         "TestSATGoalDependencyFormulaSourceTrace",
@@ -182782,7 +182793,8 @@
         "TestInequalityRestoredGoalSourceTrace",
         "TestASTExpandedDistinctSourceTraceAfterConjunction",
         "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit",
-        "TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"
+        "TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite",
+        "TestBoolRewriterTryITEValueFalseSourceTrace"
       ],
       "conditionals": [
         {
@@ -182813,6 +182825,14 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained bool_rewriter::try_ite_value TRACE/CTRACE at bool_rewriter.cpp:594,665,670 with typed Go identities replacing raw expr pointers",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/rewriter/bool_rewriter_ite_value_trace.go",
+          "tests": [
+            "TestBoolRewriterTryITEValueFalseSourceTrace"
+          ]
+        },
         {
           "name": "Selected Boolean and quantified rewriter_core::cache_result SMT2 TRACE at rewriter.cpp:52 before cache publication; failed ostream continues with sticky state; wider expression profiles remain open",
           "status": "partial",
@@ -185107,7 +185127,8 @@
         "pkg/tactic/arith/polynomial_trace.go",
         "pkg/ast/ast_core_distinct_trace.go",
         "pkg/smtcore/smt_model_finder_hint_trace.go",
-        "pkg/smtcore/param_datatype_refs.go"
+        "pkg/smtcore/param_datatype_refs.go",
+        "pkg/ast/rewriter/bool_rewriter_ite_value_trace.go"
       ],
       "tests": [
         "TestSATGoalDependencyFormulaSourceTrace",
@@ -185212,7 +185233,8 @@
         "TestInequalityRestoredGoalSourceTrace",
         "TestASTExpandedDistinctSourceTraceAfterConjunction",
         "TestModelFinderHintGreedyNestedSuccessCycleRollbackAndDepthLimit",
-        "TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite"
+        "TestParamDatatypeFixMissingRefsSourceOrderAndOverwrite",
+        "TestBoolRewriterTryITEValueFalseSourceTrace"
       ],
       "conditionals": [
         {
@@ -185255,6 +185277,14 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained bool_rewriter::try_ite_value TRACE/CTRACE at bool_rewriter.cpp:594,665,670 with typed Go identities replacing raw expr pointers",
+          "status": "platform_replacement",
+          "go_target": "pkg/ast/rewriter/bool_rewriter_ite_value_trace.go",
+          "tests": [
+            "TestBoolRewriterTryITEValueFalseSourceTrace"
+          ]
+        },
         {
           "name": "Selected Boolean and quantified rewriter_core::cache_result SMT2 TRACE at rewriter.cpp:52 before cache publication; failed ostream continues with sticky state; wider expression profiles remain open",
           "status": "partial",

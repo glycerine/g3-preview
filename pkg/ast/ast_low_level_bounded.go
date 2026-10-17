@@ -9,6 +9,20 @@ import (
 	utext "github.com/glycerine/g3/pkg/util/text"
 )
 
+// DisplayBoundedLowLevel is the retained mk_bounded_pp path used by source
+// diagnostics. The caller supplies the source depth (three by default).
+func (m *ASTManager) DisplayBoundedLowLevel(out *utext.NumericTextStream, h ASTHandle, depth uint32) error {
+	if e := m.lock(); e != nil {
+		return e
+	}
+	defer m.mu.Unlock()
+	r, e := m.internal(h)
+	if e != nil {
+		return e
+	}
+	return m.boundedLowLevelPrint(out, r, depth)
+}
+
 func (m *ASTManager) boundedLowLevelPrint(out *utext.NumericTextStream, r astNodeRef, depth uint32) (result error) {
 	f := &m.LowLevel
 	if f.Active {
