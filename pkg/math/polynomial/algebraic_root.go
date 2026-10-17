@@ -49,6 +49,7 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	binary                                                 algebraicBinaryScope
 	multivariate                                           *MultivariatePolynomialManager
 	resultant                                              algebraicResultantPolynomialScope
 	resultantVariables                                     [2]uint32
@@ -139,6 +140,9 @@ func NewAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error) {
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m != nil && m.self == m && m.binary.executing {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.resultant.executing {
 		return ErrAlgebraicPending
 	}
@@ -834,6 +838,9 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	return m.store(dl, &out)
 }
 func (m *AlgebraicRootCore) CleanupRetained() error {
+	if m != nil && m.self == m && (m.binary.running || m.binary.cleaning) {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.resultant.executing {
 		return ErrAlgebraicPending
 	}
@@ -853,6 +860,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 		return ErrAlgebraicOwner
 	}
 	if e := m.cleanupResultantPolynomial(); e != nil {
+		return e
+	}
+	if e := m.cleanupBinary(); e != nil {
 		return e
 	}
 	if e := m.cleanupRationalArithmetic(); e != nil {
@@ -885,6 +895,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.comparisonCleanup()
 }
 func (m *AlgebraicRootCore) Close() error {
+	if m != nil && m.self == m && (m.binary.running || m.binary.cleaning) {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.resultant.executing {
 		return ErrAlgebraicPending
 	}

@@ -19,6 +19,7 @@ type polynomialCompositionScope struct {
 	active, executing, stopped              bool
 	local                                   polynomialReference
 	localCompleted                          bool
+	arithmetic                              polynomialArithmeticInvocationReceipt
 	degreeInput                             Polynomial
 	degreeCompleted                         bool
 	degreeStored                            uint32
@@ -50,6 +51,12 @@ func (m *MultivariatePolynomialManager) finishComposition(cause error) error {
 	s.executing = false
 	if s.bodyCause == nil {
 		s.bodyCause = cause
+	}
+	if e := m.core.arithmeticInvocationSourceCause(&s.arithmetic); e != nil {
+		s.stopped = true
+		if s.sourceCause == nil {
+			s.sourceCause = e
+		}
 	}
 	if s.constantGeneration != 0 && m.core.constantGeneration == s.constantGeneration && m.core.constantScope.stopped {
 		s.stopped = true
@@ -707,7 +714,7 @@ func (m *MultivariatePolynomialManager) composeBody(p, q Polynomial, r *Polynomi
 		} else if e = m.compositionNumeral(2, nil, 0, &s.a); e != nil {
 			return e
 		}
-		next, e := m.core.MulAdd(q, r.root.value, &s.a)
+		next, e := m.core.mulAddWithReceipt(q, r.root.value, &s.a, &s.arithmetic)
 		if e != nil {
 			return e
 		}
@@ -964,6 +971,9 @@ func (m *MultivariatePolynomialManager) CleanupComposition() error {
 	if s.executing {
 		return ErrPolynomialPending
 	}
+	if e := c.cleanupArithmeticInvocation(&s.arithmetic, false); e != nil {
+		return e
+	}
 	if s.constantGeneration != 0 {
 		if c.constantGeneration == s.constantGeneration && c.constantScope.active {
 			if e := c.cleanupConstantScope(); e != nil {
@@ -1126,6 +1136,9 @@ func (m *MultivariatePolynomialManager) CleanupComposition() error {
 			}
 			*roots = [3]umemory.Block{}
 		}
+	}
+	if e := c.cleanupArithmeticInvocation(&s.arithmetic, true); e != nil {
+		return e
 	}
 	s.active = false
 	s.cleanupCause = nil

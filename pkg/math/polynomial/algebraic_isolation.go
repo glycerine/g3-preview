@@ -42,8 +42,11 @@ func (m *AlgebraicRootCore) ensureIsolation() error {
 	return nil
 }
 func (m *AlgebraicRootCore) factorPolynomial(v UPolynomialView) (bool, error) {
+	return m.factorPolynomialInto(v, m.factors)
+}
+func (m *AlgebraicRootCore) factorPolynomialInto(v UPolynomialView, factors *UPolynomialFactors) (bool, error) {
 	if m.factor {
-		return m.config.Factors.Factor(v, m.factors, m.factorParams)
+		return m.config.Factors.Factor(v, factors, m.factorParams)
 	}
 	if m.tmp3.slot == 0 {
 		var e error
@@ -59,7 +62,7 @@ func (m *AlgebraicRootCore) factorPolynomial(v UPolynomialView) (bool, error) {
 	if e != nil {
 		return false, e
 	}
-	return false, m.factors.PushCopy(w, 1)
+	return false, factors.PushCopy(w, 1)
 }
 func (m *AlgebraicRootCore) pushNew(v *AlgebraicVector, a *Algebraic) error {
 	if e := v.pushTake(a); e != nil {
