@@ -88,6 +88,32 @@ func TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers(t *testing.T) {
 		t.Fatal("remaining no-pattern must be substituted with the body", got, wantAnnotated)
 	}
 	satOK(t, m.DelRef(&out))
+	annotation2, e := m.MkApp(d, []ast.ASTHandle{v[1]})
+	satOK(t, e)
+	astTestPin(t, m, annotation2)
+	threeSorts := []ast.ASTHandle{b, b, b}
+	threeNames := []symbol.Symbol{symbol.Numerical(20), symbol.Numerical(21), symbol.Numerical(22)}
+	withTwoNoPatterns := makeQ(threeSorts, threeNames, v[0], []ast.ASTHandle{annotation, annotation2})
+	wantTwoNoPatterns := makeQ(twoSorts, threeNames[1:], v[0], []ast.ASTHandle{annotation, annotation2})
+	firstBefore, e := m.GetRefCount(annotation)
+	satOK(t, e)
+	secondBefore, e := m.GetRefCount(annotation2)
+	satOK(t, e)
+	out, e = ElimUnusedVarsUFBV(m, withTwoNoPatterns)
+	satOK(t, e)
+	got, e = m.RefGet(out)
+	satOK(t, e)
+	if got != wantTwoNoPatterns {
+		t.Fatal("two no-patterns must survive shared tmp substitution", got, wantTwoNoPatterns)
+	}
+	satOK(t, m.DelRef(&out))
+	firstAfter, e := m.GetRefCount(annotation)
+	satOK(t, e)
+	secondAfter, e := m.GetRefCount(annotation2)
+	satOK(t, e)
+	if firstAfter != firstBefore || secondAfter != secondBefore {
+		t.Fatal("no-pattern ref_buffer retained a temporary reference", firstBefore, firstAfter, secondBefore, secondAfter)
+	}
 
 	outerOnly := makeQ(twoSorts, twoNames, v[2], nil)
 	out, e = ElimUnusedVarsUFBV(m, outerOnly)

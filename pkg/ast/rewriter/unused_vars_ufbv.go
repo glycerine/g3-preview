@@ -139,31 +139,43 @@ func ElimUnusedVarsUFBV(m *ast.ASTManager, q ast.ASTHandle) (_ ast.ASTRef, resul
 		}
 		return ast.ASTRef{}, errors.Join(e, result)
 	}
-	var refs []ast.ASTRef
+	var newExpr, tmp ast.ASTRef
+	var patternRefs, noPatternRefs []ast.ASTHandle
 	defer func() {
-		for i := len(refs) - 1; i >= 0; i-- {
-			result = errors.Join(result, m.DelRef(&refs[i]))
+		// Source destroys new_no_patterns, then new_patterns; each ref_buffer
+		// decrements its entries from begin to end. The shared tmp and new_expr
+		// scalar references are destroyed after both buffers.
+		for _, h := range noPatternRefs {
+			result = errors.Join(result, m.DecRef(h))
+		}
+		for _, h := range patternRefs {
+			result = errors.Join(result, m.DecRef(h))
+		}
+		if tmp != (ast.ASTRef{}) {
+			result = errors.Join(result, m.DelRef(&tmp))
+		}
+		if newExpr != (ast.ASTRef{}) {
+			result = errors.Join(result, m.DelRef(&newExpr))
 		}
 		result = errors.Join(result, subst.Close())
 	}()
-	apply := func(expr ast.ASTHandle) (ast.ASTHandle, error) {
-		ref, e := m.NewRef(ast.ASTHandle{})
-		if e != nil {
-			return ast.ASTHandle{}, e
-		}
-		refs = append(refs, ref)
-		at := len(refs) - 1
-		if e := subst.Substitute(expr, bindings, refs[at]); e != nil {
-			return ast.ASTHandle{}, e
-		}
-		return m.RefGet(refs[at])
+	newExpr, e = m.NewRef(ast.ASTHandle{})
+	if e != nil {
+		return ast.ASTRef{}, e
 	}
-	newBody, e := apply(body)
+	if e := subst.Substitute(body, bindings, newExpr); e != nil {
+		return ast.ASTRef{}, e
+	}
+	newBody, e := m.RefGet(newExpr)
 	if e != nil {
 		return ast.ASTRef{}, e
 	}
 	if removed == n {
 		return m.NewRef(newBody)
+	}
+	tmp, e = m.NewRef(ast.ASTHandle{})
+	if e != nil {
+		return ast.ASTRef{}, e
 	}
 	patterns := make([]ast.ASTHandle, patternsN)
 	for i := range patterns {
@@ -171,10 +183,17 @@ func ElimUnusedVarsUFBV(m *ast.ASTManager, q ast.ASTHandle) (_ ast.ASTRef, resul
 		if e != nil {
 			return ast.ASTRef{}, e
 		}
-		patterns[i], e = apply(old)
+		if e = subst.Substitute(old, bindings, tmp); e != nil {
+			return ast.ASTRef{}, e
+		}
+		patterns[i], e = m.RefGet(tmp)
 		if e != nil {
 			return ast.ASTRef{}, e
 		}
+		if e = m.IncRef(patterns[i]); e != nil {
+			return ast.ASTRef{}, e
+		}
+		patternRefs = append(patternRefs, patterns[i])
 	}
 	noPatterns := make([]ast.ASTHandle, noPatternsN)
 	for i := range noPatterns {
@@ -182,10 +201,17 @@ func ElimUnusedVarsUFBV(m *ast.ASTManager, q ast.ASTHandle) (_ ast.ASTRef, resul
 		if e != nil {
 			return ast.ASTRef{}, e
 		}
-		noPatterns[i], e = apply(old)
+		if e = subst.Substitute(old, bindings, tmp); e != nil {
+			return ast.ASTRef{}, e
+		}
+		noPatterns[i], e = m.RefGet(tmp)
 		if e != nil {
 			return ast.ASTRef{}, e
 		}
+		if e = m.IncRef(noPatterns[i]); e != nil {
+			return ast.ASTRef{}, e
+		}
+		noPatternRefs = append(noPatternRefs, noPatterns[i])
 	}
 	forall, e := m.IsForall(q)
 	if e != nil {

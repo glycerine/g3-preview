@@ -177216,6 +177216,12 @@
           "tests": ["TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers"]
         },
         {
+          "name": "Concrete UFBV elim_unused_vars new_patterns and new_no_patterns expr_ref_buffer: shared tmp substitution, independent INC-before-push, and forward DEC after quantifier publication (var_subst.cpp:118-146)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/unused_vars_ufbv.go",
+          "tests": ["TestElimUnusedVarsUFBVGroundAllUsedAndRemappedQuantifiers"]
+        },
+        {
           "name": "Concrete UFBV rewriter goal_ref_buffer single-result push acquires an independent goal reference after depth increment (ufbv_rewriter_tactic.cpp:65-66)",
           "status": "ported",
           "go_target": "pkg/tactic/ufbv/rewrite_tactic.go",
