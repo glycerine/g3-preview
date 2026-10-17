@@ -2,6 +2,7 @@ package numeral
 
 import (
 	"errors"
+	"math"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -17,12 +18,14 @@ func TestMPZDivisionDummyAssertionReadsAfterPublication(t *testing.T) {
 		want   int32
 	}{
 		{"quotient", true, 0},
-		{"remainder", false, 7},
+		{"remainder", false, math.MinInt32},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			d, _ := bindMPNDebugActions(t, "")
 			m, _ := integerManager(t)
-			a := NewInt(7)
+			// INT_MIN uses the source's prebuilt cell and skips the earlier
+			// get_sign_cell argument-size assertion.
+			a := NewInt(math.MinInt32)
 			var b Int
 			serviceMust(t, m.SetLimbs(&b, []uint32{0, 1}))
 			c := NewInt(99)

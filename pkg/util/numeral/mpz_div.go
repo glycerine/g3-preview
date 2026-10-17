@@ -250,8 +250,14 @@ func (m *IntegerManager) quotRemWithPNReceipt(a, b, q, r *Int, mode int, pn *int
 	return m.quotRemWithAllocationContext(a, b, q, r, mode, pnAllocationContext(pn))
 }
 func (m *IntegerManager) quotRemWithAllocationContext(a, b, q, r *Int, mode int, context integerAllocationInvocationContext) error {
-	sa, ca := m.signCell(a, 0)
-	sb, cb := m.signCell(b, 1)
+	sa, ca, e := m.signCell(a, 0)
+	if e != nil {
+		return e
+	}
+	sb, cb, e := m.signCell(b, 1)
+	if e != nil {
+		return e
+	}
 	na, nb := m.Cell(ca).Size, m.Cell(cb).Size
 	if nb > na {
 		if mode != quotientOnly {

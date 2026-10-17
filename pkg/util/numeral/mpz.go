@@ -1059,12 +1059,24 @@ func (m *IntegerManager) absWithAllocationContext(a *Int, context integerAllocat
 	return nil
 }
 
-func (m *IntegerManager) signCell(a *Int, idx int) (int32, NumericCellRef) {
+func (m *IntegerManager) signCell(a *Int, idx int) (int32, NumericCellRef, error) {
 	if !a.IsSmall() {
-		return a.Val, a.Cell
+		return a.Val, a.Cell, nil
 	}
 	if a.Val == math.MinInt32 {
-		return -1, m.IntMin.Cell
+		return -1, m.IntMin.Cell, nil
+	}
+	if modularSourceDebug {
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
+		if e != nil {
+			return 0, 0, e
+		}
+		if enabled && m.Cell(m.Arg[idx]).Size != 1 {
+			if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.h", 253, "cell->m_size == 1"); e != nil {
+				return 0, 0, e
+			}
+		}
 	}
 	sign := int32(1)
 	v := a.Val
@@ -1073,7 +1085,7 @@ func (m *IntegerManager) signCell(a *Int, idx int) (int32, NumericCellRef) {
 		v = -v
 	}
 	m.writeDigit(m.Arg[idx], 0, uint32(v))
-	return sign, m.Arg[idx]
+	return sign, m.Arg[idx], nil
 }
 func (m *IntegerManager) compareCells(a, b NumericCellRef) int {
 	for i := max(m.Cell(a).Size, m.Cell(b).Size); i > 0; i-- {
@@ -1103,8 +1115,14 @@ func (m *IntegerManager) Compare(a, b *Int) (int, error) {
 		}
 		return 0, nil
 	}
-	sa, ca := m.signCell(a, 0)
-	sb, cb := m.signCell(b, 1)
+	sa, ca, e := m.signCell(a, 0)
+	if e != nil {
+		return 0, e
+	}
+	sb, cb, e := m.signCell(b, 1)
+	if e != nil {
+		return 0, e
+	}
 	if sa > 0 {
 		if sb > 0 {
 			return m.compareCells(ca, cb), nil
@@ -1236,8 +1254,14 @@ func (m *IntegerManager) addSubWithAllocationContext(a, b, c *Int, subtract bool
 		}
 		return m.setInt64WithAllocationContext(c, int64(a.Val)+v, context)
 	}
-	sa, ca := m.signCell(a, 0)
-	sb, cb := m.signCell(b, 1)
+	sa, ca, e := m.signCell(a, 0)
+	if e != nil {
+		return e
+	}
+	sb, cb, e := m.signCell(b, 1)
+	if e != nil {
+		return e
+	}
 	if subtract {
 		sb = -sb
 	}

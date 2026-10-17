@@ -28,8 +28,14 @@ func (m *IntegerManager) mulWithAllocationContext(a, b, c *Int, context integerA
 	if a.IsSmall() && b.IsSmall() {
 		return m.setInt64WithAllocationContext(c, int64(a.Val)*int64(b.Val), context)
 	}
-	sa, ca := m.signCell(a, 0)
-	sb, cb := m.signCell(b, 1)
+	sa, ca, e := m.signCell(a, 0)
+	if e != nil {
+		return e
+	}
+	sb, cb, e := m.signCell(b, 1)
+	if e != nil {
+		return e
+	}
 	size := uint64(m.Cell(ca).Size) + uint64(m.Cell(cb).Size)
 	if size > math.MaxUint32 {
 		return arena.ErrBounds
