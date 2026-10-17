@@ -17421,7 +17421,9 @@
         "pkg/ast/ast_fpa_to_bv_decl.go",
         "pkg/ast/ast_fpa_to_bv_test.go",
         "pkg/ast/ast_fpa_to_fp_unsigned_decl.go",
-        "pkg/ast/ast_fpa_to_fp_unsigned_test.go"
+        "pkg/ast/ast_fpa_to_fp_unsigned_test.go",
+        "pkg/ast/ast_fpa_to_fp_signed_bv_decl.go",
+        "pkg/ast/ast_fpa_to_fp_signed_bv_test.go"
       ],
       "tests": [
         "TestASTFloatingPointClassificationDeclarationsAndApplications",
@@ -17456,7 +17458,8 @@
         "TestASTFPAToRealDeclarationFiniteAndUnspecifiedBranches",
         "TestASTFPAToIEEEBVDeclarationFiniteAndNaNBranches",
         "TestASTFPAToBVSourceBoundsRoundingAndUnspecified",
-        "TestASTFPAToFPUnsignedDeclarationRoundingAndRefusals"
+        "TestASTFPAToFPUnsignedDeclarationRoundingAndRefusals",
+        "TestASTFPAToFPSignedBVSourceNormalizationAndRounding"
       ],
       "assertions": [
         {
@@ -17673,6 +17676,14 @@
           "go_target": "pkg/ast/ast_fpa_to_bv_decl.go",
           "tests": [
             "TestASTFPAToBVSourceBoundsRoundingAndUnspecified"
+          ]
+        },
+        {
+          "name": "Concrete to_fp RoundingMode plus signed BitVec overload with two integer format parameters (fpa_decl_plugin.cpp:452-468)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_signed_bv_decl.go",
+          "tests": [
+            "TestASTFPAToFPSignedBVSourceNormalizationAndRounding"
           ]
         },
         {
@@ -26823,7 +26834,9 @@
         "pkg/ast/ast_fpa_to_bv.go",
         "pkg/ast/rewriter/fpa_to_bv_test.go",
         "pkg/ast/ast_fpa_to_fp_unsigned.go",
-        "pkg/ast/rewriter/fpa_to_fp_unsigned_test.go"],
+        "pkg/ast/rewriter/fpa_to_fp_unsigned_test.go",
+        "pkg/ast/ast_fpa_to_fp_signed_bv.go",
+        "pkg/ast/rewriter/fpa_to_fp_signed_bv_test.go"],
       "tests": ["TestASTFPAClassificationOneScopedNumeralPerCall", "TestFPAClassificationCoreSpecialValuesAndSymbolicRefusal", "TestASTFPASMTEqualityTwoScopedNumeralsAndShortCircuit", "TestFPASMTEqualityNaNsSignedZerosAndSymbolicRefusal", "TestFPAIEEEEqualityDiffersFromSMTEquality", "TestFPAOrderedComparisonSourceSpecialAndNumericBranches", "TestASTFPAUnaryScopedNumeralRetiresBeforeReturn", "TestFPAUnaryNegAbsSpecialNumericAndDoubleNeg",
         "TestASTFPARemainderFiniteNumeralAndScopedCleanup",
         "TestFPARemainderNumericSpecialAndSymbolicRefusal",
@@ -26843,7 +26856,9 @@
         "TestASTFPAToBVSourceBoundsRoundingAndUnspecified",
         "TestFPAToBVDispatchFiniteUnspecifiedAndSymbolic",
         "TestASTFPAToFPUnsignedDeclarationRoundingAndRefusals",
-        "TestFPAToFPUnsignedNumericAndSymbolicDispatch"],
+        "TestFPAToFPUnsignedNumericAndSymbolicDispatch",
+        "TestASTFPAToFPSignedBVSourceNormalizationAndRounding",
+        "TestFPAToFPSignedBVNumericAndSymbolicDispatch"],
       "assertions": [
         {
           "line": 43,
@@ -27167,6 +27182,15 @@
           ]
         },
         {
+          "name": "mk_to_fp RoundingMode plus signed BV numeral branch with exact two's-complement normalization and MPF rounding (fpa_rewriter.cpp:106-119,155-182)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_signed_bv.go",
+          "tests": [
+            "TestASTFPAToFPSignedBVSourceNormalizationAndRounding",
+            "TestFPAToFPSignedBVNumericAndSymbolicDispatch"
+          ]
+        },
+        {
           "name": "mk_to_fp_unsigned concrete BV numeral and rounding-mode guard, owned rational to MPF conversion and result publication (fpa_rewriter.cpp:235-254)",
           "status": "ported",
           "go_target": "pkg/ast/ast_fpa_to_fp_unsigned.go",
@@ -27186,7 +27210,7 @@
         }
       ],
       "ownership": ["Each classification call creates one caller-local scoped_mpf through the AST plugin's concrete numeral probe; successful source destruction retires it before the Boolean result is published. A stopped source destructor remains in the AST plugin's owning cleanup list.", "SMT and IEEE equality construct both scoped_mpf locals before operand probing and retire them in reverse order, preserving the short circuit when the first operand is symbolic."],
-      "deviations": ["The partial Go FPA rewriter handles classification, both numeral equality modes, ordered comparisons, negation and absolute value; binary arithmetic, conversion, nonnumeric equality and remaining source cases are unported."]
+      "deviations": ["The partial Go FPA rewriter handles selected arithmetic and conversion branches; other to_fp overloads, model/theory integration and remaining source cases are unported."]
     },
     {
       "path": "src/ast/rewriter/fpa_rewriter.h",
@@ -27207,7 +27231,8 @@
         "TestFPARMBinaryNumericAndSubtractionRewrite",
         "TestFPAConstantRewriteReturnsApplication",
         "TestFPAToRealDispatchDefaultAndHardwareUnspecified",
-        "TestFPAToIEEEBVDefaultAndHardwareNaNDispatch"],
+        "TestFPAToIEEEBVDefaultAndHardwareNaNDispatch",
+        "TestFPAToFPSignedBVNumericAndSymbolicDispatch"],
       "conditionals": [
         {
           "line": 19,
@@ -27283,6 +27308,14 @@
           "go_target": "pkg/ast/rewriter/fpa_classification.go",
           "tests": [
             "TestFPAToBVDispatchFiniteUnspecifiedAndSymbolic"
+          ]
+        },
+        {
+          "name": "Concrete mk_to_fp RoundingMode plus signed BV dispatch with two arguments and symbolic refusal (fpa_rewriter.h:80-81; fpa_rewriter.cpp:90,106-119,155-182)",
+          "status": "ported",
+          "go_target": "pkg/ast/rewriter/fpa_classification.go",
+          "tests": [
+            "TestFPAToFPSignedBVNumericAndSymbolicDispatch"
           ]
         },
         {
@@ -179147,6 +179180,14 @@
           "go_target": "pkg/ast/ast_fpa_to_bv.go",
           "tests": [
             "TestASTFPAToBVSourceBoundsRoundingAndUnspecified"
+          ]
+        },
+        {
+          "name": "Concrete mk_to_fp outer scoped_mpf lifetime constructed before rounding-mode and signed BV numeral guards (fpa_rewriter.cpp:106-119,155-182; scoped_numeral.h:24-33)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_fpa_to_fp_signed_bv.go",
+          "tests": [
+            "TestASTFPAToFPSignedBVSourceNormalizationAndRounding"
           ]
         },
         {

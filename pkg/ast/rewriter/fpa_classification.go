@@ -100,6 +100,24 @@ func (r *FPARewriter) MkAppCore(d ast.ASTHandle, args ast.AppArguments, out ast.
 		}
 		return RewriteDone, r.manager.SetRef(out, answer)
 	}
+	if kind == ast.FPAOpToFP {
+		if args.Count() != 2 {
+			return RewriteFailed, ast.ErrASTDomain
+		}
+		rm, err := args.At(0)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		value, err := args.At(1)
+		if err != nil {
+			return RewriteFailed, err
+		}
+		answer, found, err := r.manager.RewriteFPAToFPSignedBVNumeral(d, rm, value)
+		if err != nil || !found {
+			return RewriteFailed, err
+		}
+		return RewriteDone, r.manager.SetRef(out, answer)
+	}
 	if kind == ast.FPAOpToUBV || kind == ast.FPAOpToSBV {
 		if args.Count() != 2 {
 			return RewriteFailed, ast.ErrASTDomain
