@@ -9865,6 +9865,8 @@
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_core.go",
         "pkg/ast/ast_core_accessors.go",
+        "pkg/ast/ast_check_sorts.go",
+        "pkg/ast/ast_check_sorts_test.go",
         "pkg/ast/ast_core_allocate.go",
         "pkg/ast/ast_core_debug.go",
         "pkg/ast/ast_core_delete.go",
@@ -10690,6 +10692,12 @@
           "tests": ["TestASTFuncDeclInfoSourceText", "TestASTFuncDeclInfoDoubleRegistrationAndSourceTextDomain"]
         },
         {
+          "name": "ast_manager::check_sort/check_sorts_core/check_sorts shallow arity, domain, associative-child and int/real compatibility checks with caught warning (ast.cpp:1958-2030)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_check_sorts.go",
+          "tests": ["TestASTCheckSortsShallowWarningsAndAssociativeChild", "TestASTCheckSortsArithmeticCoercionUsesSourceFamily"]
+        },
+        {
           "name": "PARAM_DOUBLE non-finite or out-of-range declaration metadata stops at undefined source unsigned hash conversion; Go registration refuses it",
           "status": "platform_replacement",
           "go_target": "pkg/ast/ast_parameter.go",
@@ -11258,6 +11266,8 @@
         "pkg/ast/ast_builtin_plugins_values.go",
         "pkg/ast/ast_core.go",
         "pkg/ast/ast_core_accessors.go",
+        "pkg/ast/ast_check_sorts.go",
+        "pkg/ast/ast_check_sorts_test.go",
         "pkg/ast/ast_core_allocate.go",
         "pkg/ast/ast_core_debug.go",
         "pkg/ast/ast_core_delete.go",
@@ -11743,6 +11753,12 @@
           "status": "ported",
           "go_target": "pkg/ast/ast_func_decl_info_text.go",
           "tests": ["TestASTFuncDeclInfoSourceText", "TestASTFuncDeclInfoDoubleRegistrationAndSourceTextDomain"]
+        },
+        {
+          "name": "ast_manager::check_sort/check_sorts_core/check_sorts shallow arity, domain, associative-child and int/real compatibility checks with caught warning (ast.cpp:1958-2030)",
+          "status": "ported",
+          "go_target": "pkg/ast/ast_check_sorts.go",
+          "tests": ["TestASTCheckSortsShallowWarningsAndAssociativeChild", "TestASTCheckSortsArithmeticCoercionUsesSourceFamily"]
         },
         {
           "name": "PARAM_DOUBLE non-finite or out-of-range declaration metadata stops at undefined source unsigned hash conversion; Go registration refuses it",
@@ -191616,7 +191632,9 @@
         "pkg/api/api_global_params.go",
         "pkg/api/api_config_params.go",
         "pkg/ast/ast_well_sorted.go",
-        "pkg/ast/ast_well_sorted_warning.go"
+        "pkg/ast/ast_well_sorted_warning.go",
+        "pkg/ast/ast_check_sorts.go",
+        "pkg/ast/ast_check_sorts_test.go"
       ],
       "tests": [
         "TestASTWellSortedSourceMismatchPrinter",
@@ -191762,9 +191780,10 @@
           "tests": ["TestASTWellSortedApplicationGuardBranches", "TestASTWellSortedStandaloneMismatchWarning", "TestASTWellSortedStandaloneSortMismatchTrace", "TestASTFormatDefaultPrinterStoppedFrameOwningCleanup"]
         },
         {
-          "name": "ast_manager::check_sorts caught ast_exception warning at ast.cpp:2025, reached by API context sort checks at api_context.cpp:284-288",
-          "status": "unported",
-          "tests": []
+          "name": "ast_manager::check_sorts caught ast_exception warning at ast.cpp:2025; API context sort-check callers at api_context.cpp:284-288 remain unported",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_check_sorts.go",
+          "tests": ["TestASTCheckSortsShallowWarningsAndAssociativeChild", "TestASTCheckSortsArithmeticCoercionUsesSourceFamily"]
         },
         {
           "name": "remaining live direct warning_msg callers in unported API, parser, SMT, MUZ, opt and AST owners outside the credited pattern inference and well-sorted branches",
@@ -191868,7 +191887,9 @@
         "pkg/api/api_global_params.go",
         "pkg/api/api_config_params.go",
         "pkg/ast/ast_well_sorted.go",
-        "pkg/ast/ast_well_sorted_warning.go"
+        "pkg/ast/ast_well_sorted_warning.go",
+        "pkg/ast/ast_check_sorts.go",
+        "pkg/ast/ast_check_sorts_test.go"
       ],
       "tests": [
         "TestASTWellSortedSourceMismatchPrinter",
@@ -191971,9 +191992,10 @@
           "tests": ["TestASTWellSortedApplicationGuardBranches", "TestASTWellSortedStandaloneMismatchWarning", "TestASTWellSortedStandaloneSortMismatchTrace", "TestASTFormatDefaultPrinterStoppedFrameOwningCleanup"]
         },
         {
-          "name": "ast_manager::check_sorts caught ast_exception warning at ast.cpp:2025, reached by API context sort checks at api_context.cpp:284-288",
-          "status": "unported",
-          "tests": []
+          "name": "ast_manager::check_sorts caught ast_exception warning at ast.cpp:2025; API context sort-check callers at api_context.cpp:284-288 remain unported",
+          "status": "partial",
+          "go_target": "pkg/ast/ast_check_sorts.go",
+          "tests": ["TestASTCheckSortsShallowWarningsAndAssociativeChild", "TestASTCheckSortsArithmeticCoercionUsesSourceFamily"]
         },
         {
           "name": "remaining live direct warning_msg callers in unported API, parser, SMT, MUZ, opt and AST owners outside the credited pattern inference and well-sorted branches",
