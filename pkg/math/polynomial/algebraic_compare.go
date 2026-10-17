@@ -93,6 +93,9 @@ func (m *AlgebraicRootCore) CompareRational(a *Algebraic, b *unumeral.Rational) 
 }
 
 func (m *AlgebraicRootCore) Compare(a, b *Algebraic) (int, error) {
+	if e := m.traceComparison(a, b); e != nil {
+		return 0, e
+	}
 	al, e := m.location(a)
 	if e != nil {
 		return 0, e

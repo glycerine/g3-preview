@@ -49,6 +49,7 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	comparisonTraceRunning                                     bool
 	rationalCopy                                               unumeral.IntegerCopyAllocationReceipt
 	manager                                                    *AlgebraicManager
 	coefficientCopy                                            unumeral.IntegerCopyAllocationReceipt
@@ -179,6 +180,9 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m != nil && m.self == m && m.comparisonTraceRunning {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && (m.cellAllocationRunning || m.cellPending.Block() != (umemory.Block{})) {
 		return ErrAlgebraicPending
 	}
@@ -913,6 +917,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.cleanupRetainedCore()
 }
 func (m *AlgebraicRootCore) cleanupRetainedCore() error {
+	if m != nil && m.self == m && m.comparisonTraceRunning {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.cellAllocationRunning {
 		return ErrAlgebraicPending
 	}
@@ -1078,6 +1085,9 @@ func (m *AlgebraicRootCore) Close() error {
 	return m.closeCoreMembers()
 }
 func (m *AlgebraicRootCore) closeCoreMembers() error {
+	if m != nil && m.self == m && m.comparisonTraceRunning {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.cellAllocationRunning {
 		return ErrAlgebraicPending
 	}

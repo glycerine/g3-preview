@@ -27,6 +27,10 @@ func (m *AlgebraicRootCore) DisplayInterval(w io.Writer, a *Algebraic) error {
 	if err != nil {
 		return err
 	}
+	return m.displayIntervalAtLocation(w, l)
+}
+
+func (m *AlgebraicRootCore) displayIntervalAtLocation(w io.Writer, l *algebraicLocation) error {
 	if l != nil && l.kind == 1 {
 		r, err := m.load(l)
 		if err != nil {

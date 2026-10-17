@@ -164,6 +164,9 @@ func (m *AlgebraicRootCore) cleanupNegation(r *algebraicNegInvocationReceipt, ab
 // CleanupNegation explicitly acknowledges only the actual current call. The
 // caller's algebraic value is never disposed by this child acknowledgment.
 func (m *AlgebraicRootCore) CleanupNegation() error {
+	if m != nil && m.self == m && m.comparisonTraceRunning {
+		return ErrAlgebraicPending
+	}
 	if m == nil || m.self != m {
 		return ErrAlgebraicOwner
 	}
