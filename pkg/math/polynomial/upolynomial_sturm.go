@@ -137,6 +137,9 @@ func (m *UPolynomialManager) FourierSequence(p UPolynomialView, s *UPolynomialSe
 	return nil
 }
 func (m *UPolynomialManager) sequenceVariations(s *upolySequenceState, location uint8, b *unumeral.BinaryRational) (uint32, error) {
+	return m.sequenceVariationsWithReceipt(s, location, b, nil)
+}
+func (m *UPolynomialManager) sequenceVariationsWithReceipt(s *upolySequenceState, location uint8, b *unumeral.BinaryRational, receipt *upolyBinaryEvaluationInvocationReceipt) (uint32, error) {
 	if uint32(len(s.sizes)) <= 1 {
 		return 0, nil
 	}
@@ -164,7 +167,7 @@ func (m *UPolynomialManager) sequenceVariations(s *upolySequenceState, location 
 		case 2:
 			sign, e = m.EvalSignZero(v)
 		case 3:
-			sign, e = m.EvalSignBinary(v, b)
+			sign, e = m.evalSignBinaryWithNegScopeAndReceipt(v, b, nil, receipt)
 		}
 		if e != nil {
 			return 0, e
@@ -207,24 +210,53 @@ func (m *UPolynomialManager) SignVariationsBinary(s *UPolynomialSequence, b *unu
 	return m.sequenceVariations(&s.state, 3, b)
 }
 func (m *UPolynomialManager) GetRootID(p UPolynomialView, b *unumeral.BinaryRational) (uint32, error) {
+	return m.getRootIDWithReceipt(p, b, nil)
+}
+func (m *UPolynomialManager) getRootIDWithReceipt(p UPolynomialView, b *unumeral.BinaryRational, receipt *upolyRootIDInvocationReceipt) (value uint32, cause error) {
+	q, e := m.beginRootID(p, receipt)
+	if e != nil {
+		return 0, e
+	}
+	defer func() { cause = q.finish(cause) }()
+	if e = q.sturm(p); e != nil {
+		return 0, e
+	}
+	return q.evaluate(b)
+}
+func (m *UPolynomialManager) beginRootID(p UPolynomialView, receipt *upolyRootIDInvocationReceipt) (*upolyRootIDScope, error) {
 	if e := m.check(); e != nil {
-		return 0, e
+		return nil, e
 	}
-	var seq upolySequenceState
-	defer m.sequenceDestroy(&seq)
-	if e := m.sturmUnary(p, &seq); e != nil {
-		return 0, e
+	q := &m.rootID
+	if q.active || q.invocation == ^uint64(0) {
+		return nil, ErrUPolynomialCleanupPending
 	}
-	s0, e := m.sequenceVariations(&seq, 1, nil)
+	*q = upolyRootIDScope{owner: m, invocation: q.invocation + 1, active: true, executing: true, target: p}
+	q.live[2] = true
+	if receipt != nil {
+		*receipt = upolyRootIDInvocationReceipt{m, q, q.invocation}
+	}
+	return q, nil
+}
+func (q *upolyRootIDScope) finish(cause error) error {
+	defer func() { q.executing = false }()
+	return q.finishVector(2, cause)
+}
+func (q *upolyRootIDScope) evaluate(b *unumeral.BinaryRational) (uint32, error) {
+	m := q.owner
+	s0, e := m.sequenceVariations(&q.sequence, 1, nil)
 	if e != nil {
 		return 0, e
 	}
-	s1, e := m.sequenceVariations(&seq, 3, b)
+	s1, e := m.sequenceVariationsWithReceipt(&q.sequence, 3, b, &q.evaluation)
+	if m.matchesBinaryEvaluationReceipt(&q.evaluation) && q.childStop == nil {
+		q.childStop = m.binaryEvaluation.sourceCause
+	}
 	if e != nil {
 		return 0, e
 	}
-	if polynomialSourceDebug && s0 < s1 {
-		return 0, ErrUPolynomialAssertion
+	if e = refinementSourceAssert(s0 >= s1, 2956, "s0 >= s1"); e != nil {
+		return 0, e
 	}
 	return s0 - s1, nil
 }

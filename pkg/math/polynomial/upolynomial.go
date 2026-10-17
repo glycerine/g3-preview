@@ -30,6 +30,7 @@ type UPolynomialConfig struct {
 // are required, even though operations without a checkpoint do not call them.
 // Cold ownership and every actual typed backing are charged to Integer's budget.
 type UPolynomialManager struct {
+	rootID                         upolyRootIDScope
 	rationalContext                UPolynomialRationalContext
 	oneHalfRoot                    upolyOneHalfRootScope
 	oneHalfRootHistory             *upolyOneHalfRootHistory
@@ -216,6 +217,10 @@ func (m *UPolynomialManager) DelPolynomial(p *UPolynomial) error {
 	if e != nil {
 		return e
 	}
+	qrid := &m.rootID
+	if qrid.owner == m && qrid.active && qrid.target.origin == m.origin && qrid.target.backing == d.state.backing && qrid.target.generation == d.state.generation && (qrid.executing || qrid.finishing || qrid.sourceStop != nil || qrid.childStop != nil) {
+		return ErrUPolynomialCleanupPending
+	}
 	qh := &m.oneHalfRoot
 	if qh.owner == m && qh.active && !qh.falseAcknowledged && qh.target.origin == m.origin && qh.target.backing == d.state.backing && qh.target.generation == d.state.generation && (qh.executing || qh.finishing || qh.sourceCause != nil) {
 		return ErrUPolynomialCleanupPending
@@ -270,7 +275,7 @@ func (m *UPolynomialManager) closeWithHenselOwners(r *upolyHenselPairInvocationR
 	return m.closeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
-	if m.removeOneHalfRootExecuting() || m.oneHalfRootExecuting() || m.knuthExecuting() || m.rootUpperBoundExecuting() || m.integerEvaluationExecuting() || m.rationalEvaluationExecuting() || m.binaryEvaluationExecuting() {
+	if m.rootIDExecuting() || m.removeOneHalfRootExecuting() || m.oneHalfRootExecuting() || m.knuthExecuting() || m.rootUpperBoundExecuting() || m.integerEvaluationExecuting() || m.rationalEvaluationExecuting() || m.binaryEvaluationExecuting() {
 		return ErrUPolynomialCleanupPending
 	}
 	if m != nil && m.self == m && m.algebraicNegCaller != nil && m.algebraicNegCaller.negationExecuting() {
@@ -287,6 +292,9 @@ func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationR
 	}
 	if m.live != 0 || m.liveSequences != 0 || m.liveFactors != 0 {
 		return ErrUPolynomialLive
+	}
+	if e := m.CleanupRootID(); e != nil {
+		return e
 	}
 	if e := m.CleanupOneHalfRoot(); e != nil {
 		return e

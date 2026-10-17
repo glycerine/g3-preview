@@ -10,6 +10,7 @@ import (
 )
 
 type algebraicRootDisplayScope struct {
+	rootID          upolyRootIDInvocationReceipt
 	insertions      [2]unumeral.NumeralInsertionReceipt
 	negative        unumeral.Int
 	coefficients    UPolynomial
@@ -25,6 +26,16 @@ func (m *AlgebraicRootCore) finishRootDisplay(owning bool) error {
 	}
 	if !s.active {
 		return nil
+	}
+	p := m.config.Polynomials
+	if p.matchesRootID(&s.rootID) && p.rootID.active {
+		if !owning {
+			if e := errors.Join(p.rootID.sourceStop, p.rootID.childStop); e != nil {
+				return e
+			}
+		} else if e := p.cleanupRootIDWithReceipt(&s.rootID); e != nil {
+			return e
+		}
 	}
 	for i := len(s.insertions) - 1; i >= 0; i-- {
 		if !s.insertions[i].Active() {
@@ -56,7 +67,7 @@ func (m *AlgebraicRootCore) finishRootDisplay(owning bool) error {
 		}
 		s.negativeOwned = false
 	}
-	s.active = false
+	s.active = p.matchesRootID(&s.rootID) && p.rootID.active
 	for i := range s.insertions {
 		if s.insertions[i].Active() {
 			s.active = true
@@ -183,7 +194,7 @@ func (m *AlgebraicRootCore) displayRootIndex(l *algebraicLocation, view UPolynom
 	}
 	index := r.flags >> 3
 	if index == 0 {
-		index, e = m.config.Polynomials.GetRootID(view, r.interval.BorrowLower())
+		index, e = m.config.Polynomials.getRootIDWithReceipt(view, r.interval.BorrowLower(), &m.rootDisplay.rootID)
 		if e != nil {
 			return 0, e
 		}

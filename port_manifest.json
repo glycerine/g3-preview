@@ -38349,7 +38349,8 @@
         "pkg/math/polynomial/algebraic_predicate_assertions.go",
         "pkg/math/polynomial/algebraic_predicate_assertions_test.go",
         "pkg/math/polynomial/algebraic_predicate_trace.go",
-        "pkg/math/polynomial/algebraic_predicate_trace_test.go"
+        "pkg/math/polynomial/algebraic_predicate_trace_test.go",
+        "pkg/math/polynomial/upolynomial_root_id_scope_test.go"
       ],
       "tests": [
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",
@@ -48941,7 +48942,9 @@
         "pkg/math/polynomial/algebraic_refinement_owner_test.go",
         "pkg/math/polynomial/algebraic_predicate_evaluation_test.go",
         "pkg/math/polynomial/algebraic_predicate_integer_test.go",
-        "pkg/math/polynomial/algebraic_predicate_integer_stop_test.go"
+        "pkg/math/polynomial/algebraic_predicate_integer_stop_test.go",
+        "pkg/math/polynomial/upolynomial_root_id_scope.go",
+        "pkg/math/polynomial/upolynomial_root_id_scope_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -50435,7 +50438,9 @@
         "pkg/math/polynomial/upolynomial_factor_degree.go",
         "pkg/math/polynomial/upolynomial_factors.go",
         "pkg/math/polynomial/upolynomial_native_factor_storage_test.go",
-        "pkg/math/polynomial/upolynomial_native_isolation_storage_test.go"
+        "pkg/math/polynomial/upolynomial_native_isolation_storage_test.go",
+        "pkg/math/polynomial/upolynomial_root_id_scope.go",
+        "pkg/math/polynomial/upolynomial_root_id_scope_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
