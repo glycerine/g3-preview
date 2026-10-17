@@ -166854,9 +166854,10 @@
         },
         {
           "name": "root in-place and copy-output overloads",
-          "status": "ported",
+          "status": "partial",
           "go_target": "pkg/util/numeral/mpz_root.go",
           "tests": [
+            "TestIntegerRootInitialBoundsSourceAssertionStop",
             "TestIntegerSourceRoots",
             "TestIntegerRootIndependentAndAliases",
             "TestPerfectSquareIndependentAndSourceAlias",
@@ -166872,9 +166873,10 @@
         },
         {
           "name": "root div_l/div_u bounds and bisection",
-          "status": "ported",
+          "status": "partial",
           "go_target": "pkg/util/numeral/mpz_root.go",
           "tests": [
+            "TestIntegerRootInitialBoundsSourceAssertionStop",
             "TestIntegerSourceRoots",
             "TestIntegerRootIndependentAndAliases",
             "TestPerfectSquareIndependentAndSourceAlias",
@@ -169012,9 +169014,10 @@
         },
         {
           "name": "root in-place and copy-output overloads",
-          "status": "ported",
+          "status": "partial",
           "go_target": "pkg/util/numeral/mpz_root.go",
           "tests": [
+            "TestIntegerRootInitialBoundsSourceAssertionStop",
             "TestIntegerSourceRoots",
             "TestIntegerRootIndependentAndAliases",
             "TestPerfectSquareIndependentAndSourceAlias",
@@ -169031,9 +169034,10 @@
         },
         {
           "name": "root div_l/div_u bounds and bisection",
-          "status": "ported",
+          "status": "partial",
           "go_target": "pkg/util/numeral/mpz_root.go",
           "tests": [
+            "TestIntegerRootInitialBoundsSourceAssertionStop",
             "TestIntegerSourceRoots",
             "TestIntegerRootIndependentAndAliases",
             "TestPerfectSquareIndependentAndSourceAlias",

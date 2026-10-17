@@ -145,12 +145,21 @@ func (m *IntegerManager) rootCoreWithReceiptAndContext(a *Int, n uint32, receipt
 		}
 	}
 	if modularSourceDebug {
-		le, e := m.LessEqual(lower, upper)
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return false, e
 		}
-		if !le {
-			return false, ErrIntegerAssertion
+		if enabled {
+			le, e := m.LessEqual(lower, upper)
+			if e != nil {
+				return false, e
+			}
+			if !le {
+				if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 1977, "le(lower, upper)"); e != nil {
+					return false, e
+				}
+			}
 		}
 	}
 	equal, e := m.Equal(lower, upper)
@@ -211,12 +220,21 @@ func (m *IntegerManager) rootCoreWithReceiptAndContext(a *Int, n uint32, receipt
 			e = m.Swap(mid, lower)
 		} else {
 			if modularSourceDebug {
-				less, e := m.Less(a, midN)
+				d := diagnostic.BorrowProcessDebugContext()
+				enabled, e := diagnostic.SourceAssertionsEnabled(d)
 				if e != nil {
 					return false, e
 				}
-				if !less {
-					return false, ErrIntegerAssertion
+				if enabled {
+					less, e := m.Less(a, midN)
+					if e != nil {
+						return false, e
+					}
+					if !less {
+						if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 2004, "lt(a, mid_n)"); e != nil {
+							return false, e
+						}
+					}
 				}
 			}
 			e = m.Swap(mid, upper)
