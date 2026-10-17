@@ -49,6 +49,7 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	rationalCopy                                               unumeral.IntegerCopyAllocationReceipt
 	manager                                                    *AlgebraicManager
 	coefficientCopy                                            unumeral.IntegerCopyAllocationReceipt
 	cellAllocation                                             umemory.SmallAllocatorAllocationOutcome
@@ -495,6 +496,9 @@ func (m *AlgebraicRootCore) destroyPolynomial(l *algebraicLocation, r *algebraic
 	return m.store(l, r)
 }
 func (m *AlgebraicRootCore) beginQ() error {
+	if m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.rationalCopy) {
+		return ErrAlgebraicPending
+	}
 	if m.negation.active {
 		return ErrAlgebraicPending
 	}
@@ -567,12 +571,15 @@ func (m *AlgebraicRootCore) SetRational(a *Algebraic, q *unumeral.Rational) (err
 		return err
 	}
 	defer func() { err = m.finishQ(err) }()
-	if err = m.config.Rationals.Copy(&m.localQ, q); err != nil {
+	if err = m.config.Rationals.CopyWithAllocationReceipt(&m.localQ, q, &m.rationalCopy); err != nil {
 		return err
 	}
 	return m.SetTake(a, &m.localQ)
 }
 func (m *AlgebraicRootCore) SetTake(a *Algebraic, q *unumeral.Rational) error {
+	if m != nil && m.self == m && m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.rationalCopy) {
+		return ErrAlgebraicPending
+	}
 	l, e := m.location(a)
 	if e != nil {
 		return e
@@ -595,7 +602,7 @@ func (m *AlgebraicRootCore) SetTake(a *Algebraic, q *unumeral.Rational) error {
 		if e != nil {
 			return e
 		}
-		e = m.config.Rationals.Copy(&r.value, q)
+		e = m.config.Rationals.CopyWithAllocationReceipt(&r.value, q, &m.rationalCopy)
 		return m.save(l, &r, e)
 	}
 	if m.pending.slot != 0 {
@@ -979,6 +986,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 		return ErrAlgebraicOwner
 	}
 	if e := m.cleanupCellAllocation(); e != nil {
+		return e
+	}
+	if e := m.config.Rationals.Integers().CleanupCopyAllocationInvocation(&m.rationalCopy); e != nil {
 		return e
 	}
 	if e := m.config.Rationals.Integers().CleanupCopyAllocationInvocation(&m.coefficientCopy); e != nil {

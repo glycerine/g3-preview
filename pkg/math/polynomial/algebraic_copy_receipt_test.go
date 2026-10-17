@@ -1,6 +1,7 @@
 package polynomial
 
 import (
+	"errors"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"strconv"
 	"testing"
@@ -31,6 +32,15 @@ func TestAlgebraicCleanupPreservesOlderIntegerCopyReceipt(t *testing.T) {
 			if z.MatchesCopyAllocationInvocation(&older) {
 				found = true
 				state, used := z.CopyAllocation, z.Budget().Used()
+				borrowed := unumeral.Rational{Num: z.Two64, Den: unumeral.NewInt(1)}
+				var untouched Algebraic
+				if e := c.SetRational(&untouched, &borrowed); !errors.Is(e, unumeral.ErrNumericPending) || untouched != (Algebraic{}) {
+					t.Fatal("refused rational copy", e)
+				}
+				if z.MatchesCopyAllocationInvocation(&c.rationalCopy) {
+					t.Fatal("refused setter acquired older copy receipt")
+				}
+
 				serviceMust(t, c.CleanupRetained())
 				if !z.MatchesCopyAllocationInvocation(&older) || z.CopyAllocation != state || z.Budget().Used() != used {
 					t.Fatal("unrelated algebraic cleanup acquired older copy authority")
