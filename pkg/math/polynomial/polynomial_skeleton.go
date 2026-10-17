@@ -34,6 +34,16 @@ type PolynomialSkeleton struct {
 }
 
 func NewPolynomialSkeleton(m *MultivariatePolynomialCore, p Polynomial, x uint32) (*PolynomialSkeleton, error) {
+	return newPolynomialSkeleton(m, p, x, false)
+}
+
+// Only the persistent sparse-GCD child is allocated by the source
+// polynomial.cpp:4226 alloc site. Other Go skeleton construction is local.
+func newGCDPolynomialSkeleton(m *MultivariatePolynomialCore, p Polynomial, x uint32) (*PolynomialSkeleton, error) {
+	return newPolynomialSkeleton(m, p, x, true)
+}
+
+func newPolynomialSkeleton(m *MultivariatePolynomialCore, p Polynomial, x uint32, gcdAllocation bool) (*PolynomialSkeleton, error) {
 	if e := m.check(); e != nil {
 		return nil, e
 	}
@@ -46,6 +56,11 @@ func NewPolynomialSkeleton(m *MultivariatePolynomialCore, p Polynomial, x uint32
 	}
 	s := &PolynomialSkeleton{owner: m, x: x, header: h}
 	s.self = s
+	if gcdAllocation {
+		// C++ alloc emits its memory record after storage allocation and
+		// before the placement constructor evaluates its first member.
+		s.traceGCDSkeletonAllocated()
+	}
 	fail := func(e error) (*PolynomialSkeleton, error) {
 		s.originalCause = e
 		return s, s

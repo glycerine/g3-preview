@@ -85,6 +85,7 @@ func TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor(t *testing.T
 	tags := diagnostic.NewTraceTagsWithWriter(&memoryOutput)
 	c.monomials.config.Trace = tags
 	tags.Enable("memory")
+	tags.Enable("skeleton")
 	_, e := c.monomials.MkVar()
 	serviceMust(t, e)
 	_, e = c.monomials.MkVar()
@@ -139,6 +140,10 @@ func TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor(t *testing.T
 	dealloc := "dealloc " + fmt.Sprintf("%p", saved) + " src/util/util.h:171\n"
 	if strings.Count(got, alloc) != 1 || strings.Count(got, dealloc) != 1 || strings.Index(got, alloc) >= strings.Index(got, dealloc) {
 		t.Fatalf("saved skeleton allocation/reset memory records: %q", got)
+	}
+	constructor := "-------- [skeleton] skeleton src/math/polynomial/polynomial.cpp:3012 ---------\n"
+	if tags.ShouldTrace("skeleton") && (strings.Count(got, constructor) != 1 || strings.Index(got, alloc) >= strings.Index(got, constructor)) {
+		t.Fatalf("GCD allocation must precede skeleton construction trace: %q", got)
 	}
 }
 

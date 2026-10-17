@@ -153266,6 +153266,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_skeleton_memory_trace.go",
+        "pkg/math/polynomial/polynomial_skeleton_memory_trace_test.go",
         "pkg/math/polynomial/polynomial_som_vector_memory_trace.go",
         "pkg/math/polynomial/polynomial_newton_vector_memory_trace.go",
         "pkg/math/polynomial/polynomial_cache_memory_trace.go",
@@ -178373,6 +178375,7 @@
         "pkg/math/polynomial/polynomial_skeleton_test.go",
         "pkg/math/polynomial/polynomial_skeleton_vector.go",
         "pkg/math/polynomial/polynomial_skeleton_memory_trace.go",
+        "pkg/math/polynomial/polynomial_skeleton_memory_trace_test.go",
         "pkg/math/polynomial/polynomial_skeleton_vector_test.go",
         "pkg/math/polynomial/polynomial_newton_vector.go",
         "pkg/math/polynomial/polynomial_newton_source_finalize.go",
@@ -178394,7 +178397,8 @@
         "TestPolynomialNewtonVectorSourceFinalizeNativeStorage",
         "TestPolynomialSkeletonNativePointerGrowthAndOwningHistory",
         "TestPolynomialSOMNativeChildrenHaveOnlyActualOwnerCharges",
-        "TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor"
+        "TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor",
+        "TestPolynomialGCDSkeletonFailedConstructorAllocationRecord"
       ],
       "conditionals": [
         {

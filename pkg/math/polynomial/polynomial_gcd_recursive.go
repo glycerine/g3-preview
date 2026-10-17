@@ -371,7 +371,7 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 			if sk == nil && m.useSparseGCD {
 				// Source raw new_sk becomes owned by the persistent vector only after
 				// its Set publication succeeds. Retain the actual returned pointer.
-				s.newSkeleton, e = NewPolynomialSkeleton(c, h.value, x)
+				s.newSkeleton, e = newGCDPolynomialSkeleton(c, h.value, x)
 				if e != nil {
 					return e
 				}
@@ -379,7 +379,6 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 					return e
 				}
 				s.newSkeleton.memoryTraceLive = true
-				s.newSkeleton.traceGCDSkeletonAllocated()
 				s.newSkeleton = nil
 			}
 			return nil
