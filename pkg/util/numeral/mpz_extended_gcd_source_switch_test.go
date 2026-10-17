@@ -45,3 +45,31 @@ func TestExtendedGCDOrderAssertionSourceAction(t *testing.T) {
 		t.Fatal("disabled source assertion must continue", err)
 	}
 }
+
+func TestExtendedGCDEqualityAssertionSwitchAfterArithmetic(t *testing.T) {
+	if !SourceExtendedGCDDebug {
+		t.Skip("source Z3DEBUG diagnostic only")
+	}
+	t.Run("closed-valid", func(t *testing.T) {
+		d, _ := bindMPNDebugActions(t, "")
+		m, _ := integerManager(t)
+		r1, r2 := NewInt(26), NewInt(0)
+		a, b, g := NewInt(99), NewInt(99), NewInt(99)
+		serviceMust(t, d.Close())
+		err := m.ExtendedGCD(&r1, &r2, &a, &b, &g)
+		if !errors.Is(err, arena.ErrClosed) || a.Val != 1 || b.Val != 0 || g.Val != 99 ||
+			m.ExtendedRaw.Values[4].Val != 26 || m.ExtendedRaw.Values[5].Val != 0 {
+			t.Fatal("equality switch must follow diagnostic arithmetic and precede GCD output", err, a, b, g, m.ExtendedRaw.Values)
+		}
+	})
+	t.Run("disabled-false", func(t *testing.T) {
+		d, _ := bindMPNDebugActions(t, "")
+		m, _ := integerManager(t)
+		serviceMust(t, d.EnableAssertions(false))
+		r1, r2, a, b, expected := NewInt(2), NewInt(3), NewInt(1), NewInt(0), NewInt(0)
+		nexta, nextb := NewInt(99), NewInt(99)
+		if err := m.extendedGCDDiagnostic(&r1, &r2, &a, &b, &expected, &nexta, &nextb); err != nil || nexta.Val != 2 || nextb.Val != 0 {
+			t.Fatal("disabled source assertion must skip the false equality", err, nexta, nextb)
+		}
+	})
+}

@@ -3,6 +3,8 @@
 // Source: src/util/mpz.cpp extended gcd Z3DEBUG diagnostic.
 package numeral
 
+import "github.com/glycerine/g3/pkg/util/diagnostic"
+
 const SourceExtendedGCDDebug = true
 
 // Keep the source action order and reread the actual inputs, including aliases.
@@ -19,6 +21,11 @@ func (m *IntegerManager) extendedGCDDiagnosticWithAllocationContext(r1, r2, a, b
 		return e
 	}
 	if e := m.addSubWithAllocationContext(nexta, nextb, nexta, false, context); e != nil {
+		return e
+	}
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil || !enabled {
 		return e
 	}
 	comparison, e := m.Compare(nexta, expected)

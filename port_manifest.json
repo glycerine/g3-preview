@@ -115914,7 +115914,7 @@
           ]
         },
         {
-          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and ExtendedGCD order assertion switch reads, remaining ExtendedGCD debug equality site, raw rational number-theory forwarding profiles",
+          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and ExtendedGCD order assertion switch reads, remaining ExtendedGCD equality false-action, raw rational number-theory forwarding profiles",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
@@ -164530,7 +164530,7 @@
           ]
         },
         {
-          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and ExtendedGCD order assertion switch reads, remaining ExtendedGCD debug equality site, raw rational number-theory forwarding profiles",
+          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and ExtendedGCD order assertion switch reads, remaining ExtendedGCD equality false-action, raw rational number-theory forwarding profiles",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
@@ -167065,10 +167065,11 @@
           ]
         },
         {
-          "name": "extended gcd Z3DEBUG diagnostic mul/mul/add/equality sequence",
-          "status": "ported",
+          "name": "extended gcd Z3DEBUG diagnostic mul/mul/add/equality with reached assertion switch read; false-predicate source action remains",
+          "status": "partial",
           "go_target": "pkg/util/numeral/mpz_extended_gcd_debug.go",
           "tests": [
+            "TestExtendedGCDEqualityAssertionSwitchAfterArithmetic",
             "TestExtendedGCDDebugSourceAssertion",
             "TestExtendedGCDDebugDiagnosticOrderAndFailures"
           ]
@@ -167134,7 +167135,7 @@
           ]
         },
         {
-          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and ExtendedGCD order assertion switch reads, remaining ExtendedGCD debug equality site, raw rational number-theory forwarding profiles",
+          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and ExtendedGCD order assertion switch reads, remaining ExtendedGCD equality false-action, raw rational number-theory forwarding profiles",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
@@ -169338,7 +169339,7 @@
           ]
         },
         {
-          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and ExtendedGCD order assertion switch reads, remaining ExtendedGCD debug equality site, raw rational number-theory forwarding profiles",
+          "name": "Selected GCD caller Copy-before-Abs zero path, twelve Lehmer and ExtendedGCD order assertion switch reads, remaining ExtendedGCD equality false-action, raw rational number-theory forwarding profiles",
           "status": "partial",
           "go_target": "pkg/util/numeral/mpz_gcd.go",
           "tests": [
