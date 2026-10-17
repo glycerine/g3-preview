@@ -70,6 +70,9 @@ func TestArbitraryFloatRegularSourceClassesAndDefaultErasure(t *testing.T) {
 }
 
 func TestArbitraryFloatPrevPowerSourceFormulaAndDebugDomains(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TTTT")
+	}
 	m, _, _ := mpfNumeralHelpersFixture(t)
 	for _, sb := range []uint32{1, 2, 24, 53, 120, 4000, 65535} {
 		for _, exp := range []int64{math.MinInt64, -65536, -4000, -120, -53, -24, -2, -1, 0, 1, 127, 129, math.MaxInt32, math.MaxUint32, math.MaxInt64 - 65535} {
@@ -96,7 +99,7 @@ func TestArbitraryFloatPrevPowerSourceFormulaAndDebugDomains(t *testing.T) {
 			x := ArbitraryFloat{format: arbitraryFloatFormat(8, 24, sign), exponent: 128, significand: NewInt(sig)}
 			got, e := m.PrevPowerOfTwo(&x)
 			if modularSourceDebug {
-				if !errors.Is(e, ErrIntegerAssertion) {
+				if !isMPNVerificationThrow(e) {
 					t.Fatal("debug special-value assertion", sign, sig, got, e)
 				}
 			} else {

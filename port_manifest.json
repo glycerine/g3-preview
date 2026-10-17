@@ -156717,6 +156717,7 @@
         "pkg/util/numeral/mpf_value_input_source_end_test.go",
         "pkg/util/numeral/mpf_value_input_guard_source_test.go",
         "pkg/util/numeral/mpf_round.go",
+        "pkg/util/numeral/mpf_round_prev_power_assertion_source_test.go",
         "pkg/util/numeral/mpf_round_allocation.go",
         "pkg/util/numeral/mpf_round_branch_source_test.go",
         "pkg/util/numeral/mpf_round_cache_source_test.go",
@@ -157001,6 +157002,7 @@
         "TestArbitraryFloatRoundYoungerStickyNUMStopsOlderClass",
         "TestArbitraryFloatRoundColdCachedPowerAndNumericPrefixes",
         "TestArbitraryFloatRoundLiteralHalfwayModes",
+        "TestArbitraryFloatRoundWidthSourceAssertion",
         "TestArbitraryFloatRoundSqrtColdPowerAndNumericPrefixes",
         "TestArbitraryFloatRoundSqrtActualTransportOwnerGuards",
         "TestArbitraryFloatRoundSqrtDetachedDescriptorAcrossOlderScratchStop",
@@ -157048,6 +157050,7 @@
         "TestArbitraryFloatPlainRationalSetLiteralCaller",
         "TestArbitraryFloatRegularSourceClassesAndDefaultErasure",
         "TestArbitraryFloatPrevPowerSourceFormulaAndDebugDomains",
+        "TestArbitraryFloatPrevPowerSpecialSourceActions",
         "TestArbitraryFloatMkOneAndResetReplaceBIGNumerals",
         "TestArbitraryFloatNumeralHelpersEveryColdReservation",
         "TestArbitraryFloatIsIntIndependentDyadicOracle",
@@ -157878,7 +157881,8 @@
             "TestArbitraryFloatRoundActualTransportOwnerGuards",
             "TestArbitraryFloatRoundYoungerStickyNUMStopsOlderClass",
             "TestArbitraryFloatRoundColdCachedPowerAndNumericPrefixes",
-            "TestArbitraryFloatRoundLiteralHalfwayModes"
+            "TestArbitraryFloatRoundLiteralHalfwayModes",
+            "TestArbitraryFloatRoundWidthSourceAssertion"
           ]
         },
         {
@@ -157990,6 +157994,7 @@
           "go_target": "pkg/util/numeral/mpf_numeral_helpers.go",
           "tests": [
             "TestArbitraryFloatPrevPowerSourceFormulaAndDebugDomains",
+            "TestArbitraryFloatPrevPowerSpecialSourceActions",
             "TestArbitraryFloatNumeralHelpersEveryColdReservation"
           ]
         },
@@ -158692,6 +158697,7 @@
         "TestArbitraryFloatPlainRationalSetLiteralCaller",
         "TestArbitraryFloatRegularSourceClassesAndDefaultErasure",
         "TestArbitraryFloatPrevPowerSourceFormulaAndDebugDomains",
+        "TestArbitraryFloatPrevPowerSpecialSourceActions",
         "TestArbitraryFloatMkOneAndResetReplaceBIGNumerals",
         "TestArbitraryFloatNumeralHelpersEveryColdReservation",
         "TestArbitraryFloatIsIntIndependentDyadicOracle",

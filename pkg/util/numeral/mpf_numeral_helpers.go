@@ -53,27 +53,31 @@ func (m *ArbitraryFloatManager) PrevPowerOfTwo(a *ArbitraryFloat) (uint32, error
 	if e := m.valueGuard(a); e != nil {
 		return 0, e
 	}
-	if modularSourceDebug {
+	assertionsEnabled, e := mpfSourceAssertionsEnabled()
+	if e != nil {
+		return 0, e
+	}
+	if assertionsEnabled {
 		nan, e := m.IsNaN(a)
 		if e != nil {
 			return 0, e
 		}
-		if nan {
-			return 0, ErrIntegerAssertion
+		positiveInf := false
+		if !nan {
+			positiveInf, e = m.IsPositiveInf(a)
+			if e != nil {
+				return 0, e
+			}
 		}
-		inf, e := m.IsPositiveInf(a)
-		if e != nil {
+		negativeInf := false
+		if !nan && !positiveInf {
+			negativeInf, e = m.IsNegativeInf(a)
+			if e != nil {
+				return 0, e
+			}
+		}
+		if e := mpfSourceAssertion(!nan && !positiveInf && !negativeInf, 2134, "!is_nan(a) && !is_pinf(a) && !is_ninf(a)"); e != nil {
 			return 0, e
-		}
-		if inf {
-			return 0, ErrIntegerAssertion
-		}
-		inf, e = m.IsNegativeInf(a)
-		if e != nil {
-			return 0, e
-		}
-		if inf {
-			return 0, ErrIntegerAssertion
 		}
 	}
 	positive, e := m.IsPositive(a)

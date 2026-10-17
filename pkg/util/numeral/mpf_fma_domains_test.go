@@ -2,7 +2,6 @@
 package numeral
 
 import (
-	"errors"
 	"math"
 	"math/big"
 	"testing"
@@ -55,6 +54,9 @@ func TestArbitraryFloatFMASpecialsSignedZerosAndModes(t *testing.T) {
 }
 
 func TestArbitraryFloatFMALiteralFormatAssertionAndSmallPrecision(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TT")
+	}
 	m, _, _ := mpfNumeralHelpersFixture(t)
 	var x, y, z, out ArbitraryFloat
 	serviceMust(t, m.MkOne(11, 53, false, &x))
@@ -73,7 +75,7 @@ func TestArbitraryFloatFMALiteralFormatAssertionAndSmallPrecision(t *testing.T) 
 		}
 		body := m.FMA(ArbitraryFloatNearestEven, &x, &y, &z, &out)
 		if modularSourceDebug {
-			if !errors.Is(body, ErrIntegerAssertion) || m.fma.roundFrame != &m.RoundScope || m.RoundScope.bodyCause != ErrIntegerAssertion {
+			if !isMPNVerificationThrow(body) || m.fma.roundFrame != &m.RoundScope || !isMPNVerificationThrow(m.RoundScope.bodyCause) {
 				t.Fatal("literal small-precision shift reaches Round assertion", sb, body)
 			}
 		} else {

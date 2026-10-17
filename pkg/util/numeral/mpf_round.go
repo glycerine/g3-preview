@@ -143,12 +143,18 @@ func (m *ArbitraryFloatManager) roundWithParentContext(mode ArbitraryFloatRoundi
 		if e != nil {
 			return e
 		}
-		c, e := z.Compare(&x.significand, &p)
+		enabled, e := mpfSourceAssertionsEnabled()
 		if e != nil {
 			return e
 		}
-		if c >= 0 {
-			return ErrIntegerAssertion
+		if enabled {
+			c, e := z.Compare(&x.significand, &p)
+			if e != nil {
+				return e
+			}
+			if e := mpfSourceAssertion(c < 0, 1972, "m_mpz_manager.lt(o.significand, p_m3)"); e != nil {
+				return e
+			}
 		}
 	}
 	emax, e := m.roundBound(eb, false)
