@@ -847,7 +847,20 @@ func (c *ParamsContext) set(v *ParamsRef, k usymbol.Symbol, name *string, byName
 			return e
 		}
 	}
+	matchedNumeral := false
 	if kind == ParamSymbol && sym.IsNumerical() {
+		// A matched numeral must reach bare_str only after del_value and the
+		// CPK_SYMBOL kind store. The replacement frame owns that continuation.
+		b := &c.Blocks[v.Slot-1]
+		for i := uint32(0); i < b.Size; i++ {
+			x := c.Entry(b, i)
+			if x.key == k {
+				matchedNumeral = x.Kind == ParamNumeral
+				break
+			}
+		}
+	}
+	if kind == ParamSymbol && sym.IsNumerical() && !matchedNumeral {
 		// params::set_sym stores bare_str(), which is an empty C string for
 		// a numerical symbol after the source assertion is erased/continued.
 		spelling, _, e := c.SymbolsField.BareString(sym)

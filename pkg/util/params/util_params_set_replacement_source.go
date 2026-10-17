@@ -69,14 +69,32 @@ func (c *ParamsContext) continueReplacement(slot uint32, publish bool) error {
 		f.phase = 1
 	}
 	if publish {
-		// Source SET_SIMPLE/SET_SYM publishes kind before its scalar field. The
-		// following cold stores cannot allocate or invoke a borrowed service.
-		entry.Kind = f.next.Kind
-		entry.bits = f.next.bits
-		entry.symbol = f.next.symbol
-		entry.Rat = f.next.Rat
-		entry.ratTraceID = 0
-		entry.text = f.next.text
+		if f.phase == 1 {
+			// SET_SYM publishes the kind before reaching v.bare_str(). A
+			// stopped assertion keeps this frame after consuming the old leaf.
+			entry.Kind = f.next.Kind
+			entry.bits = f.next.bits
+			entry.Rat = f.next.Rat
+			entry.ratTraceID = 0
+			entry.text = f.next.text
+			f.phase = 2
+		}
+		if f.next.Kind == ParamSymbol && f.next.symbol.IsNumerical() {
+			spelling, _, e := c.SymbolsField.BareString(f.next.symbol)
+			if e == nil {
+				entry.symbol, e = c.SymbolsField.Intern(spelling)
+			}
+			if e != nil {
+				if f.cause == nil {
+					f.cause = e
+				} else if f.cleanupCause == nil {
+					f.cleanupCause = e
+				}
+				return e
+			}
+		} else {
+			entry.symbol = f.next.symbol
+		}
 	} else {
 		// Context owning abort is distinct from resuming the failed setter body.
 		// It discards only the actual prepared argument and consumed old leaf.

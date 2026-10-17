@@ -2,10 +2,12 @@
 package params
 
 import (
+	"errors"
 	"os"
 	"testing"
 
 	udiag "github.com/glycerine/g3/pkg/util/diagnostic"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
 
@@ -57,4 +59,44 @@ func TestParamsNumericalSymbolValueContinuesSourceAssertion(t *testing.T) {
 		t.Fatal("setter must emit one reached bare_str assertion", string(data))
 	}
 	paramsMust(t, c.Del(&v))
+}
+
+func TestParamsMatchedNumeralSymbolAssertionAfterDeleteAndKind(t *testing.T) {
+	if !udiag.DebugBuild {
+		return
+	}
+	d, _, _ := debugFixture(t)
+	c, sy, q := paramsTestOwner(t)
+	paramsMust(t, sy.BindDebug(d))
+	paramsMust(t, d.EnableAssertions(true))
+	v, e := c.NewValue()
+	paramsMust(t, e)
+	k := internSymbol(t, sy, "numeric-replacement")
+	r, e := q.NewValue()
+	paramsMust(t, e)
+	paramsMust(t, c.SetRat(&v, k, &r))
+	if e := c.SetSymbol(&v, k, usymbol.Numerical(7)); !errors.Is(e, usymbol.ErrInvalid) {
+		t.Fatal("numerical bare_str assertion", e)
+	}
+	b := &c.Blocks[v.Slot-1]
+	x := c.Entry(b, 0)
+	if x.Kind != ParamSymbol || x.Rat != (unumeral.OwnedRational{}) {
+		t.Fatal("source assertion precedes kind or leaf deletion", *x)
+	}
+	stopped, e := c.StoppedSetReplacement(&v)
+	paramsMust(t, e)
+	if f := c.replacementFrames[v.Slot-1]; f.phase != 2 || f.leaf != (unumeral.OwnedRational{}) {
+		t.Fatal("source stop did not pass the old leaf deletion", f)
+	}
+	paramsMust(t, d.EnableAssertions(false))
+	paramsMust(t, c.CompleteSetReplacement(&v, stopped))
+	got, e := c.GetSymbol(&v, k, usymbol.Symbol{})
+	paramsMust(t, e)
+	spelling, present, e := sy.BareString(got)
+	paramsMust(t, e)
+	if got.IsNumerical() || !present || spelling != "" {
+		t.Fatal("source empty-symbol continuation", got, spelling)
+	}
+	paramsMust(t, c.Del(&v))
+	paramsMust(t, q.Del(&r))
 }
