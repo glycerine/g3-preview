@@ -16,6 +16,14 @@ func (m *ASTManager) MkFPAInfinityOfSort(sort ASTHandle, negative bool) (ASTHand
 	return m.mkFPASpecialOfSort(sort, astFPAPlusInf)
 }
 
+// MkFPAZeroOfSort is the concrete fpa_util::mk_pzero/mk_nzero(sort*) call.
+func (m *ASTManager) MkFPAZeroOfSort(sort ASTHandle, negative bool) (ASTHandle, error) {
+	if negative {
+		return m.mkFPASpecialOfSort(sort, astFPAMinusZero)
+	}
+	return m.mkFPASpecialOfSort(sort, astFPAPlusZero)
+}
+
 func (m *ASTManager) mkFPASpecialOfSort(sort ASTHandle, kind int32) (ASTHandle, error) {
 	if err := m.lock(); err != nil {
 		return ASTHandle{}, err
