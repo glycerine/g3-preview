@@ -468,13 +468,11 @@ func (c satIntegrityChecker) checkBoolVars() (bool, error) {
 		return false, e
 	}
 	v := c.lifecycle.propagation.variables
-	sourceAssertions := false
 	if satStorageSourceDebug {
 		enabled, e := diagnostic.BorrowProcessDebugContext().AssertionsEnabled()
 		if e != nil {
 			return false, e
 		}
-		sourceAssertions = enabled
 		if enabled {
 			n, e := v.numVarsChecked()
 			if e != nil {
@@ -501,6 +499,16 @@ func (c satIntegrityChecker) checkBoolVars() (bool, error) {
 				{uint32(len(v.assignedSinceGC)), n, 145, "s.m_assigned_since_gc.size() == s.num_vars()"},
 			}
 			for i := range checks {
+				reached := enabled
+				if i != 0 {
+					reached, e = diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+					if e != nil {
+						return false, e
+					}
+				}
+				if !reached {
+					continue
+				}
 				if checks[i].line == 136 {
 					checks[i].got, e = v.justification.size()
 				} else if checks[i].line == 142 {
@@ -530,8 +538,15 @@ func (c satIntegrityChecker) checkBoolVars() (bool, error) {
 		if e != nil {
 			return false, e
 		}
-		if gone && sourceAssertions {
+		if gone && satStorageSourceDebug {
 			for sign := uint32(0); sign < 2; sign++ {
+				reached, e := diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+				if e != nil {
+					return false, e
+				}
+				if !reached {
+					continue
+				}
 				list, e := v.watches.Get(variable*2 + sign)
 				if e != nil {
 					return false, e

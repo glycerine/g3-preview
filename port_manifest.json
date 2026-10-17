@@ -124204,7 +124204,7 @@
           ]
         },
         {
-          "name": "Retained SAT reinit-stack SASSERT205 and integrity-checker operator SASSERT231-236 process gate and C/T actions; other nested checker sites remain partial",
+          "name": "Retained SAT reinit-stack SASSERT205 and operator SASSERT231-236 process gate and C/T actions; bool-var SASSERT133-149 re-read the switch at each reached site, while other nested checker sites remain partial",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
@@ -124768,7 +124768,7 @@
           "tests": ["TestLinearEquationRationalSingletonSourceAssertionProfile"]
         },
         {
-          "name": "Retained SAT reinit-stack SASSERT205 and integrity-checker operator SASSERT231-236 process gate and C/T actions; other nested checker sites remain partial",
+          "name": "Retained SAT reinit-stack SASSERT205 and operator SASSERT231-236 process gate and C/T actions; bool-var SASSERT133-149 re-read the switch at each reached site, while other nested checker sites remain partial",
           "status": "partial",
           "go_target": "pkg/sat/sat_integrity_checker.go",
           "tests": ["TestSATCleanerReinitStackAssertionUsesSourceActions", "TestSATIntegrityRepeatedClauseTraceAndOperatorAssertion"]
