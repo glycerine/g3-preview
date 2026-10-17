@@ -121,13 +121,17 @@ func MyMPZSqrt(m *IntegerManager, sbits uint32, oddExp bool, input, out *Int) (c
 			}
 			continue
 		}
-		if modularSourceDebug {
+		enabled, e := mpfSourceAssertionsEnabled()
+		if e != nil {
+			return e
+		}
+		if enabled {
 			equal, e := m.Equal(product, input)
 			if e != nil {
 				return e
 			}
-			if !equal {
-				return ErrIntegerAssertion
+			if e := mpfSourceAssertion(equal, 998, "m.eq(product, in)"); e != nil {
+				return e
 			}
 		}
 		return s.copyValue(out, mid)
