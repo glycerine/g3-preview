@@ -15,8 +15,8 @@ import (
 
 var errAPIObjectOwner = errors.New("api: invalid, copied or retired context result/object owner")
 
-// This is the result/object member portion of api::context, borrowing the real
-// AST manager. It is not a replacement for the unported context constructor,
+// This is the result/object and selected sort-check portion of api::context,
+// borrowing the real AST manager. It is not a replacement for the unported context constructor,
 // which must also own its services, plugin utilities and tactic registry.
 // The insertion-ordered dictionary gives deterministic teardown without
 // reproducing the source hash table's physical buckets. Values index a cold
@@ -31,8 +31,10 @@ type apiContextResults struct {
 	freeIDs                       []uint32
 	ownerBytes                    uint64
 	trace                         *diagnostic.TraceTags
+	warnings                      *diagnostic.WarningService
 	memoryProcess                 *memory.ProcessAccounting
 	pendingDestroyLine            int
+	errorCode                     uint32
 	userRefCount, closing, closed bool
 }
 
@@ -59,7 +61,7 @@ func newAPIContextResults(m *ast.ASTManager, rc bool) (c *apiContextResults, err
 	if err = m.Budget().Reserve(n); err != nil {
 		return nil, err
 	}
-	c = &apiContextResults{manager: m, userRefCount: rc, ownerBytes: n, trace: diagnostic.BorrowProcessTraceTags()}
+	c = &apiContextResults{manager: m, userRefCount: rc, ownerBytes: n, trace: diagnostic.BorrowProcessTraceTags(), warnings: diagnostic.BorrowProcessWarningService()}
 	c.self = c
 	if q := m.NumeralService(); q != nil {
 		if runtime := q.RuntimeOwner(); runtime != nil {

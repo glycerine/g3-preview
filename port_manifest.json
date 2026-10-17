@@ -3766,6 +3766,7 @@
         "pkg/api/api_goal_memory_trace.go",
         "pkg/api/api_goal_memory_trace_debug_test.go",
         "pkg/api/api_context_results.go",
+        "pkg/api/api_context_check_sorts.go",
         "pkg/api/api_context_warning.go",
         "pkg/api/api_ast_map_memory_trace.go",
         "pkg/api/api_goal_object.go",
@@ -3782,7 +3783,8 @@
         "TestAPIContextResultsCopiedAndForeignOwnerGuards",
         "TestAPIContextObjectCloseUsesNativeFreeIDStorage",
         "TestAPIContextNativeResultGrowthAndReferenceRelease",
-        "TestAPIContextSourceObjectAndTrailAssertions"
+        "TestAPIContextSourceObjectAndTrailAssertions",
+        "TestAPIContextSortCheckWarningAndErrorState"
       ],
       "assertions": [
         {
@@ -3826,6 +3828,12 @@
           "tests": [
             "TestAPIGoalSourceMemoryWrapperReleaseSites"
           ]
+        },
+        {
+          "name": "API context::check_sorts shallow AST check, application warning and sort-error state at api_context.cpp:284-307; constructor call sites and full error handler remain unported",
+          "status": "partial",
+          "go_target": "pkg/api/api_context_check_sorts.go",
+          "tests": ["TestAPIContextSortCheckWarningAndErrorState"]
         },
         {
           "name": "AST-map wrapper deallocation debug memory records at context.cpp:54 and 116",
@@ -191634,7 +191642,9 @@
         "pkg/ast/ast_well_sorted.go",
         "pkg/ast/ast_well_sorted_warning.go",
         "pkg/ast/ast_check_sorts.go",
-        "pkg/ast/ast_check_sorts_test.go"
+        "pkg/ast/ast_check_sorts_test.go",
+        "pkg/api/api_context_check_sorts.go",
+        "pkg/api/api_context_check_sorts_test.go"
       ],
       "tests": [
         "TestASTWellSortedSourceMismatchPrinter",
@@ -191780,10 +191790,11 @@
           "tests": ["TestASTWellSortedApplicationGuardBranches", "TestASTWellSortedStandaloneMismatchWarning", "TestASTWellSortedStandaloneSortMismatchTrace", "TestASTFormatDefaultPrinterStoppedFrameOwningCleanup"]
         },
         {
-          "name": "ast_manager::check_sorts caught ast_exception warning at ast.cpp:2025; API context sort-check callers at api_context.cpp:284-288 remain unported",
+          "name": "ast_manager::check_sorts caught ast_exception warning at ast.cpp:2025 and selected API context::check_sorts warning at api_context.cpp:284-307; constructor call sites remain unported",
           "status": "partial",
           "go_target": "pkg/ast/ast_check_sorts.go",
-          "tests": ["TestASTCheckSortsShallowWarningsAndAssociativeChild", "TestASTCheckSortsArithmeticCoercionUsesSourceFamily"]
+          "go_targets": ["pkg/api/api_context_check_sorts.go"],
+          "tests": ["TestASTCheckSortsShallowWarningsAndAssociativeChild", "TestASTCheckSortsArithmeticCoercionUsesSourceFamily", "TestAPIContextSortCheckWarningAndErrorState"]
         },
         {
           "name": "remaining live direct warning_msg callers in unported API, parser, SMT, MUZ, opt and AST owners outside the credited pattern inference and well-sorted branches",
@@ -191889,7 +191900,9 @@
         "pkg/ast/ast_well_sorted.go",
         "pkg/ast/ast_well_sorted_warning.go",
         "pkg/ast/ast_check_sorts.go",
-        "pkg/ast/ast_check_sorts_test.go"
+        "pkg/ast/ast_check_sorts_test.go",
+        "pkg/api/api_context_check_sorts.go",
+        "pkg/api/api_context_check_sorts_test.go"
       ],
       "tests": [
         "TestASTWellSortedSourceMismatchPrinter",
@@ -191992,10 +192005,11 @@
           "tests": ["TestASTWellSortedApplicationGuardBranches", "TestASTWellSortedStandaloneMismatchWarning", "TestASTWellSortedStandaloneSortMismatchTrace", "TestASTFormatDefaultPrinterStoppedFrameOwningCleanup"]
         },
         {
-          "name": "ast_manager::check_sorts caught ast_exception warning at ast.cpp:2025; API context sort-check callers at api_context.cpp:284-288 remain unported",
+          "name": "ast_manager::check_sorts caught ast_exception warning at ast.cpp:2025 and selected API context::check_sorts warning at api_context.cpp:284-307; constructor call sites remain unported",
           "status": "partial",
           "go_target": "pkg/ast/ast_check_sorts.go",
-          "tests": ["TestASTCheckSortsShallowWarningsAndAssociativeChild", "TestASTCheckSortsArithmeticCoercionUsesSourceFamily"]
+          "go_targets": ["pkg/api/api_context_check_sorts.go"],
+          "tests": ["TestASTCheckSortsShallowWarningsAndAssociativeChild", "TestASTCheckSortsArithmeticCoercionUsesSourceFamily", "TestAPIContextSortCheckWarningAndErrorState"]
         },
         {
           "name": "remaining live direct warning_msg callers in unported API, parser, SMT, MUZ, opt and AST owners outside the credited pattern inference and well-sorted branches",
