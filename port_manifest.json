@@ -153268,6 +153268,8 @@
       "go_targets": [
         "pkg/math/polynomial/polynomial_skeleton_memory_trace.go",
         "pkg/math/polynomial/polynomial_skeleton_memory_trace_test.go",
+        "pkg/math/polynomial/polynomial_monomial_imp_memory_trace.go",
+        "pkg/math/polynomial/polynomial_monomial_imp_memory_trace_test.go",
         "pkg/math/polynomial/polynomial_som_vector_memory_trace.go",
         "pkg/math/polynomial/polynomial_newton_vector_memory_trace.go",
         "pkg/math/polynomial/polynomial_cache_memory_trace.go",
@@ -154140,6 +154142,12 @@
           ]
         },
         {
+          "name": "Retained polynomial imp monomial_manager allocations at polynomial.cpp:2330/2341 and final dec_ref deallocation at :814 through source debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_monomial_imp_memory_trace.go",
+          "tests": ["TestPolynomialImpOwnedMonomialManagerMemoryWrappers", "TestPolynomialImpMonomialFailedPlacementMemoryRecord"]
+        },
+        {
           "name": "Published SOM vector child alloc at polynomial.cpp:2166 and destructor dealloc at :2182 through source debug memory wrappers",
           "status": "platform_replacement",
           "go_target": "pkg/math/polynomial/polynomial_som_vector_memory_trace.go",
@@ -154275,6 +154283,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_monomial_imp_memory_trace.go",
+        "pkg/math/polynomial/polynomial_monomial_imp_memory_trace_test.go",
         "pkg/math/polynomial/polynomial_som_vector_memory_trace.go",
         "pkg/math/polynomial/polynomial_newton_vector_memory_trace.go",
         "pkg/math/polynomial/polynomial_cache_memory_trace.go",
@@ -155077,6 +155087,12 @@
           "tests": [
             "TestModelCopiedFunctionMemoryWrapperOwnerTransfer"
           ]
+        },
+        {
+          "name": "Retained polynomial imp monomial_manager allocations at polynomial.cpp:2330/2341 and final dec_ref deallocation at :814 through source debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_monomial_imp_memory_trace.go",
+          "tests": ["TestPolynomialImpOwnedMonomialManagerMemoryWrappers", "TestPolynomialImpMonomialFailedPlacementMemoryRecord"]
         },
         {
           "name": "Published SOM vector child alloc at polynomial.cpp:2166 and destructor dealloc at :2182 through source debug memory wrappers",

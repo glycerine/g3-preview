@@ -29,11 +29,12 @@ type Monomial struct {
 type MonomialPower struct{ Var, Degree uint32 }
 type MonomialInfo struct{ RefCount, ID, TotalDegree, Size, Hash uint32 }
 type MonomialManagerConfig struct {
-	Budget    *arena.Budget
-	Memory    *umemory.Runtime
-	Allocator *umemory.SmallAllocator
-	Profile   umemory.SmallAllocatorProfile
-	Trace     *diagnostic.TraceTags
+	Budget                      *arena.Budget
+	Memory                      *umemory.Runtime
+	Allocator                   *umemory.SmallAllocator
+	Profile                     umemory.SmallAllocatorProfile
+	Trace                       *diagnostic.TraceTags
+	polynomialImpAllocationLine int
 }
 type monomialLocation struct {
 	toPolynomialCohort                 *polynomialToPolynomialScope
@@ -97,6 +98,7 @@ type MonomialManager struct {
 	nextVar, managerRefs, publishedObjects                                    uint32
 	idsInitialized                                                            bool
 	allocatorOwned, memoryOwned, completed, closing, closed, sourceFinalizing bool
+	memoryTraceLive                                                           bool
 	sourceStage                                                               uint8
 	originalCause, cleanupCause                                               error
 }
@@ -153,6 +155,10 @@ func NewMonomialManager(c MonomialManagerConfig) (*MonomialManager, error) {
 	}
 	m := &MonomialManager{config: c, memory: r, memoryOwned: owned, header: h}
 	m.self = m
+	if c.polynomialImpAllocationLine != 0 {
+		m.memoryTraceLive = true
+		m.tracePolynomialImpAllocated()
+	}
 	for {
 		old := monomialOrigins.Load()
 		if old == math.MaxUint64 {

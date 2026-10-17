@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
@@ -17,6 +18,7 @@ type MultivariatePolynomialManagerConfig struct {
 	Core          MultivariatePolynomialConfig
 	Allocator     *umemory.SmallAllocator
 	Factorization UPolynomialFactorizationConfig
+	Trace         *diagnostic.TraceTags
 }
 
 // The core is the actual cell/arithmetic implementation object. These are real
@@ -149,7 +151,11 @@ func NewMultivariatePolynomialManager(c MultivariatePolynomialManagerConfig) (*M
 	variableEmbedded(&d.positions.positions, m.core.memory, true)
 	m.constructed = 5
 	if m.core.monomials == nil {
-		m.core.monomials, e = NewMonomialManager(MonomialManagerConfig{Budget: c.Core.Integer.Budget(), Memory: c.Core.Integer.RuntimeOwner(), Allocator: c.Allocator})
+		line := 2330
+		if c.Allocator != nil {
+			line = 2341
+		}
+		m.core.monomials, e = NewMonomialManager(MonomialManagerConfig{Budget: c.Core.Integer.Budget(), Memory: c.Core.Integer.RuntimeOwner(), Allocator: c.Allocator, Trace: c.Trace, polynomialImpAllocationLine: line})
 		m.mmConstructed = m.core.monomials != nil
 		if e != nil {
 			return fail(e)

@@ -262,6 +262,10 @@ func (m *MonomialManager) CloseChecked() error {
 	}
 	m.locations = nil
 	m.config.Budget.Release(m.header)
+	if m.memoryTraceLive && m.completed {
+		m.tracePolynomialImpDeallocated()
+		m.memoryTraceLive = false
+	}
 	m.header = 0
 	m.closed = true
 	m.cleanupCause = nil
