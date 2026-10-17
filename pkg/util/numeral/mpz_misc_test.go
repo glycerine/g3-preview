@@ -1,7 +1,6 @@
 package numeral
 
 import (
-	"errors"
 	uhash "github.com/glycerine/g3/pkg/util/hash"
 	"math"
 	"math/big"
@@ -10,6 +9,9 @@ import (
 )
 
 func TestIntegerScalarStrictConversions(t *testing.T) {
+	if modularSourceDebug {
+		bindMPNDebugActions(t, "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
+	}
 	m, _ := integerManager(t)
 	for _, v := range []int64{math.MinInt64, math.MinInt32, math.MinInt32 + 1, -1, 0, 1, math.MaxInt32 - 1, math.MaxInt32, math.MaxUint32 - 1, math.MaxUint32, math.MaxInt64} {
 		var a Int
@@ -31,7 +33,7 @@ func TestIntegerScalarStrictConversions(t *testing.T) {
 				t.Fatal(v, iv, ie)
 			}
 		} else if modularSourceDebug {
-			if !errors.Is(ie, ErrIntegerAssertion) {
+			if !isMPNVerificationThrow(ie) {
 				t.Fatal(v, ie)
 			}
 		} else if ie != nil || iv != int32(v) {
@@ -42,7 +44,7 @@ func TestIntegerScalarStrictConversions(t *testing.T) {
 				t.Fatal(v, uv, ue)
 			}
 		} else if modularSourceDebug {
-			if !errors.Is(ue, ErrIntegerAssertion) {
+			if !isMPNVerificationThrow(ue) {
 				t.Fatal(v, ue)
 			}
 		} else {

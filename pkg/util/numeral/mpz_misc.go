@@ -1,7 +1,10 @@
 // Scalar inspection from src/util/mpz.h/.cpp, internal 32-bit digit baseline.
 package numeral
 
-import uhash "github.com/glycerine/g3/pkg/util/hash"
+import (
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+	uhash "github.com/glycerine/g3/pkg/util/hash"
+)
 
 func (m *IntegerManager) Precise() bool { return true }
 func (m *IntegerManager) Field() bool   { return false }
@@ -17,12 +20,21 @@ func (m *IntegerManager) IsUint32(a *Int) (bool, error) {
 }
 func (m *IntegerManager) Uint32(a *Int) (uint32, error) {
 	if modularSourceDebug {
-		ok, e := m.IsUint32(a)
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return 0, e
 		}
-		if !ok {
-			return 0, ErrIntegerAssertion
+		if enabled {
+			ok, e := m.IsUint32(a)
+			if e != nil {
+				return 0, e
+			}
+			if !ok {
+				if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.h", 738, "is_uint(a)"); e != nil {
+					return 0, e
+				}
+			}
 		}
 	}
 	v, e := m.Uint64(a)
@@ -40,12 +52,21 @@ func (m *IntegerManager) IsInt32(a *Int) (bool, error) {
 }
 func (m *IntegerManager) Int32(a *Int) (int32, error) {
 	if modularSourceDebug {
-		ok, e := m.IsInt32(a)
+		d := diagnostic.BorrowProcessDebugContext()
+		enabled, e := diagnostic.SourceAssertionsEnabled(d)
 		if e != nil {
 			return 0, e
 		}
-		if !ok {
-			return 0, ErrIntegerAssertion
+		if enabled {
+			ok, e := m.IsInt32(a)
+			if e != nil {
+				return 0, e
+			}
+			if !ok {
+				if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.h", 742, "is_int(a)"); e != nil {
+					return 0, e
+				}
+			}
 		}
 	}
 	v, e := m.Int64(a)

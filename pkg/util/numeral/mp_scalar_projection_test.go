@@ -23,7 +23,7 @@ func projectionExpectError(t *testing.T, e error, assertion bool) {
 	}
 }
 
-func projectionExpectMPZ64Error(t *testing.T, e error, assertion bool) {
+func projectionExpectSourceGetterError(t *testing.T, e error, assertion bool) {
 	t.Helper()
 	if modularSourceDebug && assertion {
 		if !isMPNVerificationThrow(e) {
@@ -71,12 +71,12 @@ func TestScalarProjectionIntegerLowWordsAndDebugProfiles(t *testing.T) {
 		u32, u32e := m.Uint32(&a)
 		i32, i32e := m.Int32(&a)
 		integerPhysicalAudit(t, m, &a)
-		projectionExpectMPZ64Error(t, ue, !a.IsSmall() && n.BitLen() > 64)
-		projectionExpectMPZ64Error(t, ie, !n.IsInt64())
+		projectionExpectSourceGetterError(t, ue, !a.IsSmall() && n.BitLen() > 64)
+		projectionExpectSourceGetterError(t, ie, !n.IsInt64())
 		wu := n.Sign() >= 0 && n.BitLen() <= 64 && n.Cmp(new(big.Int).SetUint64(math.MaxUint32)) < 0
 		wi := n.Cmp(big.NewInt(math.MinInt32)) > 0 && n.Cmp(big.NewInt(math.MaxInt32)) < 0
-		projectionExpectError(t, u32e, !wu)
-		projectionExpectError(t, i32e, !wi)
+		projectionExpectSourceGetterError(t, u32e, !wu)
+		projectionExpectSourceGetterError(t, i32e, !wi)
 		if (ue == nil && uv != u) || (ie == nil && iv != s) || (u32e == nil && u32 != uint32(u)) || (i32e == nil && i32 != int32(s)) || a != before {
 			t.Fatal("low-word source projection/preserved input", n, uv, iv, u32, i32, u, s)
 		}
@@ -107,13 +107,13 @@ func TestScalarProjectionRetainedSizeHeaderReads(t *testing.T) {
 		if size == 1 {
 			want = 0x1020304
 		}
-		projectionExpectMPZ64Error(t, e, size == 0 || size > 2)
+		projectionExpectSourceGetterError(t, e, size == 0 || size > 2)
 		if e == nil && u != want {
 			t.Fatal("source reads retained physical D1/D0, not size-zero padding", size, u, want)
 		}
 		i, ie := m.Int64(&a)
 		fits, fe := m.IsInt64(&a)
-		projectionExpectMPZ64Error(t, ie, size > 2)
+		projectionExpectSourceGetterError(t, ie, size > 2)
 		if fe != nil || fits != (size <= 2) || (ie == nil && i != int64(want)) {
 			t.Fatal("signed source has no separate size>0 assertion", size, i, want, fits, ie, fe)
 		}
@@ -196,6 +196,10 @@ func TestScalarProjectionFloatRawIEEEAndDebugAssertion(t *testing.T) {
 }
 
 func TestScalarProjectionInvalidOwnershipAndWarmGraph(t *testing.T) {
+	if modularSourceDebug {
+		d, _ := bindMPNDebugActions(t, "")
+		serviceMust(t, d.EnableAssertions(false))
+	}
 	m, budget := integerManager(t)
 	var a Int
 	qopsMust(t, m.SetLimbs(&a, []uint32{7, 3}))

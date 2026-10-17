@@ -167167,10 +167167,13 @@
           ]
         },
         {
-          "name": "Selected Integer scalar getters: source 64-bit switch/actions and low-word casts; 32-bit getter assertion actions remain",
-          "status": "partial",
+          "name": "Selected Integer scalar getters: source 32/64-bit assertion switch/actions, low-word casts and strict predicates",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpz.go",
+          "go_targets": ["pkg/util/numeral/mpz_misc.go"],
           "tests": [
+            "TestMPZ32BitGetterSourceThrowContinueAndDisabled",
+            "TestIntegerScalarStrictConversions",
             "TestMPZScalarGetterSourceThrowAndContinue",
             "TestMPZScalarGetterSourceSwitchReadAndDisabledConditions",
             "TestScalarProjectionIntegerLowWordsAndDebugProfiles",
@@ -169364,10 +169367,13 @@
           ]
         },
         {
-          "name": "Selected Integer scalar getters: source 64-bit switch/actions and low-word casts; 32-bit getter assertion actions remain",
-          "status": "partial",
+          "name": "Selected Integer scalar getters: source 32/64-bit assertion switch/actions, low-word casts and strict predicates",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpz.go",
+          "go_targets": ["pkg/util/numeral/mpz_misc.go"],
           "tests": [
+            "TestMPZ32BitGetterSourceThrowContinueAndDisabled",
+            "TestIntegerScalarStrictConversions",
             "TestMPZScalarGetterSourceThrowAndContinue",
             "TestMPZScalarGetterSourceSwitchReadAndDisabledConditions",
             "TestScalarProjectionIntegerLowWordsAndDebugProfiles",
