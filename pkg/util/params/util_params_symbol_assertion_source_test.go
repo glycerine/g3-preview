@@ -100,3 +100,45 @@ func TestParamsMatchedNumeralSymbolAssertionAfterDeleteAndKind(t *testing.T) {
 	paramsMust(t, c.Del(&v))
 	paramsMust(t, q.Del(&r))
 }
+
+func TestParamsMatchedScalarSymbolAssertionAfterKind(t *testing.T) {
+	if !udiag.DebugBuild {
+		return
+	}
+	for _, byName := range []bool{false, true} {
+		t.Run(map[bool]string{false: "symbol-key", true: "name-key"}[byName], func(t *testing.T) {
+			d, _, _ := debugFixture(t)
+			c, sy, _ := paramsTestOwner(t)
+			paramsMust(t, sy.BindDebug(d))
+			paramsMust(t, d.EnableAssertions(true))
+			v, e := c.NewValue()
+			paramsMust(t, e)
+			name := "matched-scalar"
+			k := internSymbol(t, sy, name)
+			setUInt := func() error { return c.SetUInt(&v, k, 42) }
+			setSymbol := func() error { return c.SetSymbol(&v, k, usymbol.Numerical(7)) }
+			if byName {
+				setUInt = func() error { return c.SetUIntName(&v, &name, 42) }
+				setSymbol = func() error { return c.SetSymbolName(&v, &name, usymbol.Numerical(7)) }
+			}
+			paramsMust(t, setUInt())
+			if e := setSymbol(); !errors.Is(e, usymbol.ErrInvalid) {
+				t.Fatal("numerical bare_str assertion", e)
+			}
+			x := c.Entry(&c.Blocks[v.Slot-1], 0)
+			if x.key != k || x.Kind != ParamSymbol || x.symbol != (usymbol.Symbol{}) {
+				t.Fatal("source assertion must follow scalar deletion and kind store", *x)
+			}
+			paramsMust(t, d.EnableAssertions(false))
+			paramsMust(t, setSymbol())
+			got, e := c.GetSymbol(&v, k, usymbol.Symbol{})
+			paramsMust(t, e)
+			spelling, present, e := sy.BareString(got)
+			paramsMust(t, e)
+			if got.IsNumerical() || !present || spelling != "" {
+				t.Fatal("source empty-symbol retry", got, spelling)
+			}
+			paramsMust(t, c.Del(&v))
+		})
+	}
+}

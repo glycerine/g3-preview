@@ -172420,6 +172420,7 @@
             "TestParamsReferenceMatchedReplacementNativeText",
             "TestParamsReferenceMatchedReplacementIndependentFramesAndReuse",
             "TestParamsMatchedNumeralSymbolAssertionAfterDeleteAndKind",
+            "TestParamsMatchedScalarSymbolAssertionAfterKind",
             "TestParamsReferenceCopyStopsAtMatchedNumeralDestruction"
           ]
         },
@@ -173181,6 +173182,7 @@
             "TestParamsReferenceMatchedReplacementNativeText",
             "TestParamsReferenceMatchedReplacementIndependentFramesAndReuse",
             "TestParamsMatchedNumeralSymbolAssertionAfterDeleteAndKind",
+            "TestParamsMatchedScalarSymbolAssertionAfterKind",
             "TestParamsReferenceCopyStopsAtMatchedNumeralDestruction"
           ]
         },
