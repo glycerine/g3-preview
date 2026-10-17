@@ -1230,6 +1230,18 @@ func (m *IntegerManager) addSubWithAllocationContext(a, b, c *Int, subtract bool
 		if e := m.prepareTmpSpan(0, n+1); e != nil {
 			return e
 		}
+		if diagnostic.DebugBuild {
+			d := diagnostic.BorrowProcessDebugContext()
+			enabled, e := diagnostic.SourceAssertionsEnabled(d)
+			if e != nil {
+				return e
+			}
+			if enabled && (m.Cell(m.Tmp[0]).span != n+1 || n == 0) {
+				if e = diagnostic.DebugAssertionFailure(d, "src/util/mpn.cpp", 68, "lngc_alloc == len+1 && len > 0"); e != nil {
+					return e
+				}
+			}
+		}
 		var k uint32
 		for j := uint32(0); j < n; j++ {
 			u, v := m.Digit(ca, j), m.Digit(cb, j)
@@ -1244,7 +1256,32 @@ func (m *IntegerManager) addSubWithAllocationContext(a, b, c *Int, subtract bool
 			}
 		}
 		m.writeDigit(m.Tmp[0], n, k)
-		return m.publishTmpAtWithAllocationContext(0, c, sign, n+1, context)
+		realSize := n + 1
+		for realSize > 1 && m.Digit(m.Tmp[0], realSize-1) == 0 {
+			realSize--
+		}
+		if diagnostic.DebugBuild {
+			d := diagnostic.BorrowProcessDebugContext()
+			enabled, e := diagnostic.SourceAssertionsEnabled(d)
+			if e != nil {
+				return e
+			}
+			if enabled && (realSize == 0 || realSize > n+1) {
+				if e = diagnostic.DebugAssertionFailure(d, "src/util/mpn.cpp", 82, "os > 0 && os <= len+1"); e != nil {
+					return e
+				}
+			}
+			enabled, e = diagnostic.SourceAssertionsEnabled(d)
+			if e != nil {
+				return e
+			}
+			if enabled && realSize > n+1 {
+				if e = diagnostic.DebugAssertionFailure(d, "src/util/mpz.cpp", 373, "real_sz <= sz"); e != nil {
+					return e
+				}
+			}
+		}
+		return m.publishTmpAtWithAllocationContext(0, c, sign, realSize, context)
 	}
 	cmp := m.compareCells(ca, cb)
 	if cmp == 0 {

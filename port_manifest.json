@@ -161191,10 +161191,14 @@
           ]
         },
         {
-          "name": "add",
+          "name": "add with retained MPZ caller's source length/output-size SASSERT switch reads",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpn.go",
+          "go_targets": [
+            "pkg/util/numeral/mpz.go"
+          ],
           "tests": [
+            "TestMPNAddSourceAssertionsThroughIntegerConsumer",
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
@@ -161850,10 +161854,14 @@
           ]
         },
         {
-          "name": "add",
+          "name": "add with retained MPZ caller's source length/output-size SASSERT switch reads",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpn.go",
+          "go_targets": [
+            "pkg/util/numeral/mpz.go"
+          ],
           "tests": [
+            "TestMPNAddSourceAssertionsThroughIntegerConsumer",
             "TestNaturalArithmeticOracle",
             "TestNaturalExactAliases",
             "TestNaturalDivisionAndDecimal",
@@ -166411,10 +166419,11 @@
           ]
         },
         {
-          "name": "add/sub/big_add_sub",
+          "name": "add/sub/big_add_sub with reached MPN and MPZ add-path source assertion switch reads",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz.go",
           "tests": [
+            "TestMPNAddSourceAssertionsThroughIntegerConsumer",
             "TestIntegerSourceBug3",
             "TestIntegerSourceIntMinSubtraction",
             "TestIntegerConstructorOwnership",
@@ -168522,10 +168531,11 @@
           ]
         },
         {
-          "name": "add/sub/big_add_sub",
+          "name": "add/sub/big_add_sub with reached MPN and MPZ add-path source assertion switch reads",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz.go",
           "tests": [
+            "TestMPNAddSourceAssertionsThroughIntegerConsumer",
             "TestIntegerSourceBug3",
             "TestIntegerSourceIntMinSubtraction",
             "TestIntegerConstructorOwnership",
