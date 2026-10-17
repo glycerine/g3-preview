@@ -21,6 +21,7 @@ type PolynomialCache struct {
 	pendingFactors *PolynomialFactors
 	pendingPSC     bool
 	header         uint64
+	imp            *polynomialCacheImpOwner
 	resetting      bool
 	closing        bool
 	closed         bool
@@ -51,6 +52,10 @@ func NewPolynomialCache(m *MultivariatePolynomialManager) (*PolynomialCache, err
 	}
 	c := &PolynomialCache{manager: m, header: header, buckets: make(map[uint32][]Polynomial), ids: make(map[uint32]bool), psc: make(map[polynomialPSCKey]*polynomialPSCEntry), factors: make(map[Polynomial]*polynomialFactorCacheEntry)}
 	c.self = c
+	if e := c.newImp(207); e != nil {
+		m.core.integer.Budget().Release(header)
+		return nil, e
+	}
 	return c, nil
 }
 
@@ -315,6 +320,11 @@ func (c *PolynomialCache) Reset() error {
 	}
 	clear(c.buckets)
 	clear(c.ids)
+	c.releaseImp(232)
+	if e := c.newImp(233); e != nil {
+		c.resetting = true
+		return e
+	}
 	return nil
 }
 
@@ -335,6 +345,12 @@ func (c *PolynomialCache) CleanupReset() error {
 	clear(c.ids)
 	clear(c.psc)
 	clear(c.factors)
+	c.releaseImp(232)
+	if c.imp == nil {
+		if e := c.newImp(233); e != nil {
+			return e
+		}
+	}
 	c.resetting = false
 	return nil
 }
@@ -356,6 +372,7 @@ func (c *PolynomialCache) Close() error {
 	if e := c.refs.close(c.manager.core); e != nil {
 		return e
 	}
+	c.releaseImp(211)
 	c.manager.core.integer.Budget().Release(c.header)
 	c.header = 0
 	c.buckets = nil

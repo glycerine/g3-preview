@@ -46432,10 +46432,12 @@
       "status": "partial",
       "go_targets": [
         "pkg/math/polynomial/polynomial_cache.go",
+        "pkg/math/polynomial/polynomial_cache_memory_trace.go",
         "pkg/math/polynomial/polynomial_cache_source_test.go"
       ],
       "tests": [
         "TestPolynomialCacheCanonicalizationAndReset",
+        "TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal",
         "TestPolynomialCacheConstructorBudgetAndRefusal",
         "TestPolynomialCachePSCChainCanonicalKeyAndReplay",
         "TestPolynomialCacheFactorDistinctReplayAndReset",
@@ -46447,7 +46449,14 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Polynomial cache private imp allocation at polynomial_cache.cpp:207, reset deallocation/replacement at :232-233 and destructor deallocation at :211 over a charged concrete Go owner",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_cache_memory_trace.go",
+          "tests": ["TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal"]
+        }
+      ],
       "ownership": [],
       "deviations": [
         "The retained NLSAT cache's mk_unique path uses native Go hash buckets and an embedded owning polynomial reference vector. PSC-chain results are memoized by canonical ordered inputs and variable. Factor results are memoized by canonical input, with source-order output reset and distinct-factor canonicalization. Actual stopped factor and PSC body refusals finish their source scopes and permit reset/retry. A real PSC result SET deletion-callback refusal retains the acquired canonical reference until caller-vector close. A real temporary factor final-decrement refusal retains the factors owner and its consumed-drop receipt until CleanupFactor. Other stopped result-vector/destructor paths and NLSAT integration remain open."
@@ -46460,10 +46469,12 @@
       "status": "partial",
       "go_targets": [
         "pkg/math/polynomial/polynomial_cache.go",
+        "pkg/math/polynomial/polynomial_cache_memory_trace.go",
         "pkg/math/polynomial/polynomial_cache_source_test.go"
       ],
       "tests": [
         "TestPolynomialCacheCanonicalizationAndReset",
+        "TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal",
         "TestPolynomialCacheConstructorBudgetAndRefusal",
         "TestPolynomialCachePSCChainCanonicalKeyAndReplay",
         "TestPolynomialCacheFactorDistinctReplayAndReset",
@@ -46485,7 +46496,14 @@
       ],
       "methods_audited": false,
       "ownership_audited": false,
-      "methods": [],
+      "methods": [
+        {
+          "name": "Polynomial cache private imp allocation at polynomial_cache.cpp:207, reset deallocation/replacement at :232-233 and destructor deallocation at :211 over a charged concrete Go owner",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_cache_memory_trace.go",
+          "tests": ["TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal"]
+        }
+      ],
       "ownership": [],
       "deviations": [
         "The concrete PolynomialCache exposes retained mk_unique, PSC-chain and factor memoization, and reset behavior with borrowed canonical handles. Selected actual stopped source scopes, a PSC result SET deletion refusal, and a temporary factor final-decrement refusal finish before retry; other result-vector/destructor cleanup and NLSAT integration remain open."
@@ -153232,6 +153250,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_cache_memory_trace.go",
         "pkg/tactic/tactic_extension_model.go",
         "pkg/tactic/tactic_stored_model_memory_trace.go",
         "pkg/ast/pattern/collect_memory_trace.go",
@@ -154101,6 +154120,12 @@
           ]
         },
         {
+          "name": "Retained polynomial cache private imp alloc at polynomial_cache.cpp:207/:233 and reset/destructor dealloc at :232/:211 through source debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_cache_memory_trace.go",
+          "tests": ["TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal"]
+        },
+        {
           "name": "Retained proof_utils reduce_hypotheses0 expr_set alloc sites :398/:412/:517 and delete_proc reset/immediate empty-lemma release :365/:569 over charged concrete Go set owners",
           "status": "platform_replacement",
           "go_target": "pkg/ast/proofs/hypotheses_memory.go",
@@ -154218,6 +154243,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_cache_memory_trace.go",
         "pkg/tactic/tactic_extension_model.go",
         "pkg/tactic/tactic_stored_model_memory_trace.go",
         "pkg/ast/pattern/collect_memory_trace.go",
@@ -155017,6 +155043,12 @@
           "tests": [
             "TestModelCopiedFunctionMemoryWrapperOwnerTransfer"
           ]
+        },
+        {
+          "name": "Retained polynomial cache private imp alloc at polynomial_cache.cpp:207/:233 and reset/destructor dealloc at :232/:211 through source debug memory wrappers",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_cache_memory_trace.go",
+          "tests": ["TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal"]
         },
         {
           "name": "Retained proof_utils reduce_hypotheses0 expr_set alloc sites :398/:412/:517 and delete_proc reset/immediate empty-lemma release :365/:569 over charged concrete Go set owners",
