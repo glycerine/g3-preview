@@ -3,8 +3,18 @@ package euclid
 
 import (
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"github.com/glycerine/g3/pkg/util/numeral"
 )
+
+func sourceApplyAssertion(line int32, condition string, holds bool) error {
+	d := diagnostic.BorrowProcessDebugContext()
+	enabled, e := diagnostic.SourceAssertionsEnabled(d)
+	if e != nil || !enabled || holds {
+		return e
+	}
+	return diagnostic.DebugAssertionFailure(d, "src/math/euclid/euclidean_solver.cpp", line, condition)
+}
 
 // promoteSolvedEquation performs the source ownership transfer after a pivot
 // equation has been normalized to coefficient -1 for x. The caller removes
@@ -48,6 +58,9 @@ func (s *solverSetup) applySolutionOnce(x uint32, target *equation,
 		s.solved[x] >= uint32(len(s.solution)) {
 		return arena.ErrInvalidSlot
 	}
+	if e := sourceApplyAssertion(427, "solved(x)", s.solved[x] != nullEquationIndex); e != nil {
+		return e
+	}
 	p := position(target.xs, x)
 	if p == nullEquationIndex {
 		return nil
@@ -58,6 +71,9 @@ func (s *solverSetup) applySolutionOnce(x uint32, target *equation,
 	if e != nil {
 		return e
 	}
+	if e := sourceApplyAssertion(432, "!m().is_zero(a1)", !zero); e != nil {
+		return e
+	}
 	if zero {
 		return arena.ErrInvalidSlot
 	}
@@ -66,11 +82,17 @@ func (s *solverSetup) applySolutionOnce(x uint32, target *equation,
 		return arena.ErrInvalidSlot
 	}
 	sp := position(sol.xs, x)
+	if e := sourceApplyAssertion(434, "eq2.pos_x(x) != UINT_MAX", sp != nullEquationIndex); e != nil {
+		return e
+	}
 	if sp == nullEquationIndex {
 		return arena.ErrInvalidSlot
 	}
 	minus, e := z.IsMinusOne(&sol.as[sp])
 	if e != nil {
+		return e
+	}
+	if e := sourceApplyAssertion(435, "m().is_minus_one(eq2.a(eq2.pos_x(x)))", minus); e != nil {
 		return e
 	}
 	if !minus {
@@ -93,6 +115,9 @@ func (s *solverSetup) applySolutionOnce(x uint32, target *equation,
 		return e
 	}
 	target.xs, s.tmpXs = s.tmpXs, target.xs
+	if e = sourceApplyAssertion(443, "as.size() == xs.size()", len(target.as) == len(target.xs)); e != nil {
+		return e
+	}
 	if e = s.traceApplyAfter(target); e != nil {
 		return e
 	}
@@ -103,6 +128,9 @@ func (s *solverSetup) applySolutionOnce(x uint32, target *equation,
 		return e
 	}
 	target.js, s.tmpXs = s.tmpXs, target.js
+	if e = sourceApplyAssertion(448, "pos(xs, x) == UINT_MAX", position(target.xs, x) == nullEquationIndex); e != nil {
+		return e
+	}
 	return nil
 }
 

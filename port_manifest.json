@@ -35796,12 +35796,13 @@
           ]
         },
         {
-          "name": "solved-equation ownership transfer and apply_solution sorted-row substitution with newly exposed solved-variable queue work at cpp:422-461,615-618",
+          "name": "solved-equation ownership transfer and apply_solution sorted-row substitution with source SASSERT switch reads at cpp:427,432,434,435,443,448 and newly exposed solved-variable queue work at cpp:422-461,615-618",
           "status": "partial",
           "go_target": "pkg/math/euclid/apply_solution.go",
           "go_targets": ["pkg/math/euclid/apply_solution_trace.go"],
           "tests": [
             "TestEuclideanApplySolutionChainedSolvedQueueAndOwnedSwap",
+            "TestEuclideanApplySolutionAssertionStopsBeforeSubstitution",
             "TestEuclideanApplySolutionTraceBeforeAndAfterIntegerSwap",
             "TestEuclideanNormalizeQuerySubstitutionPublishesConstantBeforeRationalRefusal"
           ]
