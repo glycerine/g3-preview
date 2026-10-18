@@ -452,3 +452,14 @@ func (c *PolynomialCache) cleanupPSCInvocation() error {
 	}
 	return core.cleanupPSCAborts(generation)
 }
+
+// Manager borrows the source cache::m() polynomial manager.
+func (c *PolynomialCache) Manager() (*MultivariatePolynomialManager, error) {
+	if e := c.ready(); e != nil {
+		return nil, e
+	}
+	return c.manager, nil
+}
+
+// PM is the source cache::pm() alias.
+func (c *PolynomialCache) PM() (*MultivariatePolynomialManager, error) { return c.Manager() }

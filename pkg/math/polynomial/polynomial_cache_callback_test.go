@@ -54,6 +54,12 @@ func polynomialCacheCallbackProbe(t *testing.T, cache *PolynomialCache, p Polyno
 			t.Error("callback acquired executing cache", e)
 		}
 	}
+	for _, get := range []func() (*MultivariatePolynomialManager, error){cache.Manager, cache.PM} {
+		value, e := get()
+		if value != nil || !errors.Is(e, ErrPolynomialPending) {
+			t.Error("callback borrowed executing cache manager", value, e)
+		}
+	}
 	value, e := cache.MkUnique(p)
 	if !errors.Is(e, ErrPolynomialPending) || value != (Polynomial{}) {
 		t.Error("callback acquired canonicalization", value, e)

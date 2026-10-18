@@ -48192,7 +48192,8 @@
         "pkg/math/polynomial/polynomial_cache_memory_trace.go",
         "pkg/math/polynomial/polynomial_cache_source_test.go",
         "pkg/math/polynomial/polynomial_cache_child_owner_test.go",
-        "pkg/math/polynomial/polynomial_cache_callback_test.go"
+        "pkg/math/polynomial/polynomial_cache_callback_test.go",
+        "pkg/math/polynomial/polynomial_cache_manager_test.go"
       ],
       "tests": [
         "TestPolynomialCacheCanonicalizationAndReset",
@@ -48250,6 +48251,15 @@
             "TestPolynomialCachePSCResultReplacementStoppedDeletion",
             "TestPolynomialCacheFactorTemporaryStoppedDeletion"
           ]
+        },
+        {
+          "name": "cache::m() and inline cache::pm() borrow the actual polynomial manager (polynomial_cache.cpp:214-216, polynomial_cache.h:35-36), used by NLSAT todo_set reference-vector construction",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "tests": [
+            "TestPolynomialCacheBorrowedManagerSupportsRetainedReferenceConsumer",
+            "TestPolynomialCacheManagerAccessorOwnerAndResetLifetime"
+          ]
         }
       ],
       "ownership": [],
@@ -48267,7 +48277,8 @@
         "pkg/math/polynomial/polynomial_cache_memory_trace.go",
         "pkg/math/polynomial/polynomial_cache_source_test.go",
         "pkg/math/polynomial/polynomial_cache_child_owner_test.go",
-        "pkg/math/polynomial/polynomial_cache_callback_test.go"
+        "pkg/math/polynomial/polynomial_cache_callback_test.go",
+        "pkg/math/polynomial/polynomial_cache_manager_test.go"
       ],
       "tests": [
         "TestPolynomialCacheCanonicalizationAndReset",
@@ -48305,6 +48316,15 @@
           "status": "platform_replacement",
           "go_target": "pkg/math/polynomial/polynomial_cache_memory_trace.go",
           "tests": ["TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal"]
+        },
+        {
+          "name": "cache::m() and inline cache::pm() borrow the actual polynomial manager (polynomial_cache.cpp:214-216, polynomial_cache.h:35-36), used by NLSAT todo_set reference-vector construction",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "tests": [
+            "TestPolynomialCacheBorrowedManagerSupportsRetainedReferenceConsumer",
+            "TestPolynomialCacheManagerAccessorOwnerAndResetLifetime"
+          ]
         }
       ],
       "ownership": [],
