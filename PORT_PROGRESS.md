@@ -44212,3 +44212,23 @@ ordinary (0.121s) and checked/debug/trace (0.307s), on CPUs8–16. Initial linki
 ran out of disk; bounded removal of4.017GiB of task cache data older than one
 hour allowed verification to finish. Source and vectors were untouched.
 Whole polynomial then AST completion remains active; no full-suite rerun.
+
+Parameter evidence correction: the broad util GlobalParams catalog test binds
+fixture collectors, so its frozen metadata assertions do not independently
+validate the production polynomial collector's exact descriptions. Strengthened
+TestAlgebraicParameterDescriptorSchemaSourceOrder to invoke the real production
+collector and compare every description exactly against the six source schema
+constants, alongside existing key/order/kind/default/module checks. Values are
+frozen in the test; no source file is read or hashed at Go test runtime.
+
+An exploratory production DisplayModule probe in the isolated polynomial test
+binary reaches an explicit missing catalogCollectContextParams registration.
+That probe was diagnostic and removed; it is not passing integration evidence.
+No extra cross-package imports or substitute collectors were introduced to
+force a passing bootstrap. Manifest notes now distinguish fixture-catalog
+coverage from production metadata coverage and retain both generated parameter
+units as partial for full bootstrap/helper composition. The complete polynomial
+then AST objective remains open.
+
+Focused algebraic parameter/manager suites pass ordinary and checked/debug/trace
+(0.016s each), on CPUs8–16. No full-suite repetition for this verification change.
