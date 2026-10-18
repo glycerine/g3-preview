@@ -45344,3 +45344,35 @@ No full native repeat after the recent successful 68-package run.
 Broader focused checks pass ordinary17.134s and checked/debug/trace27.972s,
 CPUs8-16. portcheck and diff checks pass:2103 units,677 APIs;211 ported,
 340 partial,1495 unported,11 dead/deleted. No whole source-unit status changed.
+
+2026-10-18: Berlekamp matrix formatter and whole matrix TRACE records
+
+Implemented berlekamp_matrix::display (factorization.cpp:238-245) and complete
+records at142 and198 after construction/diagonalization. They read the actual
+normalized matrix in source row order, retain the trailing tab after every
+column, row endl flushes and final blank line. Row count uses actual logical
+storage size divided by width, preserving the source's unused trailing scratch
+cell for the retained degree-two case. Native Go coefficient/string storage is
+used; no STL character/container internals or numerical formatting storage is
+introduced. Direct formatting passes with Runtime reservations disabled and
+unchanged charged storage.
+
+A synchronous matrix/actual-manager borrow covers header/body/footer while the
+constructor or diagonalization's scoped NUM remains live. Callback attempts to
+initialize, diagonalize, extract a null vector or close the matrix preserve its
+actual values, pivots and cursor; core retirement is refused. Stream failure
+preserves the actual matrix/rank and releases all borrow bindings.
+
+Actual x^2+1 over Z3 checks exact pre/post-diagonal matrices and row flushes.
+The public retained factorization consumer emits both complete records, retains
+one irreducible factor and reproduces the input product. Its source rank-one
+return is false (no nontrivial split); the test explicitly checks that contract.
+Focused checked/debug/trace checks pass0.005s.
+
+Constructor entry TRACE97, other helper diagnostics, verbose output and broader
+method/ownership audits remain open. No whole class/unit completion is claimed;
+polynomial then AST remain unfinished. No full native repeat since the recent
+successful68-package run. All commands remain on CPUs8-16.
+Broader factor/Hensel/recombination/degree/display/Berlekamp checks pass ordinary
+16.673s and checked/debug/trace28.503s on CPUs8-16. portcheck and diff checks
+pass:2103 units,677 APIs;211 ported,340 partial,1495 unported,11 dead/deleted.

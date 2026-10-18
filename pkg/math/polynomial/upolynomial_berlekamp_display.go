@@ -1,0 +1,69 @@
+package polynomial
+
+import (
+	"io"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
+)
+
+// Source: factorization.cpp:238-245. Each actual normalized numeral is
+// followed by a tab, including the last column; each complete row has endl.
+func (q *upolyBerlekampMatrix) display(out io.Writer) error {
+	for i := uint32(0); i < q.values.size/q.size; i++ {
+		for j := uint32(0); j < q.size; j++ {
+			value, e := q.get(i, j)
+			if e != nil {
+				return e
+			}
+			text, e := q.m.modular.String(value)
+			if e != nil {
+				return e
+			}
+			if e = linearWriteText(out, text); e != nil {
+				return e
+			}
+			if e = linearWriteText(out, "\t"); e != nil {
+				return e
+			}
+		}
+		if e := diagnostic.WriteTraceEndl(out); e != nil {
+			return e
+		}
+	}
+	return nil
+}
+
+// Complete source records at142 and198. The borrow spans header/body/footer,
+// including source row flushes, while constructor/diagonalization NUMs live.
+func (q *upolyBerlekampMatrix) traceMatrix(line int) error {
+	tags := q.m.modular.BorrowTraceTags()
+	if !tags.ShouldTrace("polynomial::factorization::bughunt") {
+		return nil
+	}
+	if q.displaying {
+		return ErrUPolynomialCleanupPending
+	}
+	q.displaying = true
+	defer func() { q.displaying = false }()
+	if e := q.traceBorrow.bindManagers([3]*UPolynomialManager{q.m}, tags); e != nil {
+		return e
+	}
+	defer q.traceBorrow.unbind()
+	name, caption := "berlekamp_matrix", "polynomial::berlekamp_matrix():"
+	if line == 198 {
+		name, caption = "diagonalize", "polynomial::diagonalize():"
+	}
+	var computation error
+	_ = tags.EmitConditional("polynomial::factorization::bughunt", name, "src/math/polynomial/upolynomial_factorization.cpp", line,
+		func() bool { return true }, func(raw io.Writer) error {
+			out := factorizationTraceWriter{raw}
+			_ = linearWriteText(out, caption)
+			_ = diagnostic.WriteTraceEndl(out)
+			if e := q.display(out); e != nil {
+				computation = e
+				return e
+			}
+			return diagnostic.WriteTraceEndl(out)
+		})
+	return computation
+}

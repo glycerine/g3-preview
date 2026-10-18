@@ -57,6 +57,8 @@ func (m *UPolynomialManager) scopedPush(s *upolyVectorState, value *unumeral.Int
 // The source matrix is lexical: its slice headers stay on the caller stack;
 // both geometrically grown pivot arrays and the numeral backing are individually charged.
 type upolyBerlekampMatrix struct {
+	displaying    bool
+	traceBorrow   upolyFactorTraceBorrow
 	m             *UPolynomialManager
 	values        upolyVectorState
 	size, nullRow uint32
@@ -64,6 +66,9 @@ type upolyBerlekampMatrix struct {
 }
 
 func (q *upolyBerlekampMatrix) close() {
+	if q.displaying {
+		return
+	}
 	m := q.m
 	// Source destructor body deletes matrix numerals ascending, then implicit
 	// member destructors release row, column and matrix physical storage.
@@ -84,6 +89,9 @@ func (q *upolyBerlekampMatrix) get(i, j uint32) (*unumeral.Int, error) {
 	return q.m.read(q.m.stateView(&q.values), uint32(index))
 }
 func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) error {
+	if q.displaying {
+		return ErrUPolynomialCleanupPending
+	}
 	q.m = m
 	q.size = upolyViewDegree(f)
 	q.nullRow = 1
@@ -179,9 +187,12 @@ func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) er
 			return e
 		}
 	}
-	return nil
+	return q.traceMatrix(142)
 }
 func (q *upolyBerlekampMatrix) diagonalize() (uint32, error) {
+	if q.displaying {
+		return 0, ErrUPolynomialCleanupPending
+	}
 	m := q.m
 	var multiplier unumeral.Int
 	defer m.modular.Del(&multiplier)
@@ -254,9 +265,15 @@ func (q *upolyBerlekampMatrix) diagonalize() (uint32, error) {
 			nullRank++
 		}
 	}
+	if e := q.traceMatrix(198); e != nil {
+		return 0, e
+	}
 	return nullRank, nil
 }
 func (q *upolyBerlekampMatrix) next(v *upolyVectorState) (bool, error) {
+	if q.displaying {
+		return false, ErrUPolynomialCleanupPending
+	}
 	m := q.m
 	if polynomialSourceDebug && v.size > q.size {
 		return false, ErrUPolynomialAssertion

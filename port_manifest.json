@@ -53117,7 +53117,9 @@
         "pkg/math/polynomial/upolynomial_hensel_pair_trace_test.go",
         "pkg/math/polynomial/upolynomial_hensel_quadratic_failure_trace_test.go",
         "pkg/math/polynomial/upolynomial_hensel_product_failure_trace_test.go",
-        "pkg/math/polynomial/upolynomial_hensel_pair_failure_trace_test.go"
+        "pkg/math/polynomial/upolynomial_hensel_pair_failure_trace_test.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_display.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_display_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53251,7 +53253,11 @@
         "TestUPolynomialHenselProductFailureTraceStreamFailure",
         "TestUPolynomialHenselPairFailureTraceOriginalInputs",
         "TestUPolynomialHenselPairFailureTraceExactBIGChild",
-        "TestUPolynomialHenselPairFailureTraceStreamFailureStillComputes"
+        "TestUPolynomialHenselPairFailureTraceStreamFailureStillComputes",
+        "TestUPolynomialBerlekampDisplayActualMatrixRows",
+        "TestUPolynomialBerlekampWholeMatrixTracesAndBorrowedOwner",
+        "TestUPolynomialBerlekampMatrixTraceStreamFailure",
+        "TestUPolynomialBerlekampMatrixTraceRetainedFactorizationConsumer"
       ],
       "conditionals": [
         {
@@ -53364,6 +53370,22 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "berlekamp_matrix::display and whole constructed/diagonalized matrix TRACE records (238-245,142,198)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_berlekamp_display.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_field.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_display_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialBerlekampDisplayActualMatrixRows",
+            "TestUPolynomialBerlekampWholeMatrixTracesAndBorrowedOwner",
+            "TestUPolynomialBerlekampMatrixTraceStreamFailure",
+            "TestUPolynomialBerlekampMatrixTraceRetainedFactorizationConsumer"
+          ],
+          "notes": "Formats actual normalized matrix values in source row order, preserving trailing tabs, row endl flushes, logical matrix-size/width truncation and the whole records final blank line. Uses existing native coefficient storage and Go strings, without porting STL buffers or adding numerical allocations; direct formatting passes with Runtime reservations disabled and unchanged charged storage. A synchronous whole-record matrix/actual-manager borrow spans header/body/footer while constructor or diagonalization NUMs remain live. Callback init/diagonalize/next/cleanup attempts preserve matrix and pivot state, and core retirement is refused. Sticky output failure preserves matrix/rank and releases the borrow. Actual x^2+1 over Z3 gives exact pre/post-diagonal matrices, and the public retained factorization consumer checks both records, source rank-one false return, one factor and unchanged product. Constructor entry TRACE97, other helper diagnostics and broader method/ownership audits remain open; no whole class/unit completion credit."
+        },
         {
           "name": "Whole failed two-factor Hensel product-check TRACE with original inputs and checker destruction frontier (536-544)",
           "status": "ported",
