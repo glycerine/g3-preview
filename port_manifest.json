@@ -48544,6 +48544,14 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Successful cache factor miss runs literal local factors destructor (reset then numeral/member destruction) after complete array publication; stopped source decrement retains exact local prefix for explicit owning abort (polynomial_cache.cpp:187-202, polynomial.cpp:1617-1630)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "tests": [
+            "TestPolynomialCacheFactorTemporaryStoppedDeletion"
+          ]
+        },
+        {
           "name": "Nonzero PSC cache partial publication preserves committed prefix and refuses replay of unwritten raw-array slots until reset (polynomial_cache.cpp:164-173,151-156)",
           "status": "platform_replacement",
           "go_target": "pkg/math/polynomial/polynomial_cache.go",
