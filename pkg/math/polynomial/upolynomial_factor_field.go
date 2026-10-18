@@ -78,8 +78,28 @@ func (q *upolyBerlekampMatrix) close() {
 	m.freeBacking(&q.values)
 }
 func (q *upolyBerlekampMatrix) get(i, j uint32) (*unumeral.Int, error) {
-	if polynomialSourceDebug && (i >= q.size || j >= q.size) {
-		return nil, ErrUPolynomialAssertion
+	return q.getSource(i, j, 74)
+}
+func (q *upolyBerlekampMatrix) getConst(i, j uint32) (*unumeral.Int, error) {
+	return q.getSource(i, j, 79)
+}
+func (q *upolyBerlekampMatrix) getSource(i, j uint32, line int32) (*unumeral.Int, error) {
+	enabled, e := factorHeaderAssertionsEnabled()
+	if e != nil {
+		return nil, e
+	}
+	if enabled && !(i < q.size && j < q.size) {
+		if !q.displaying {
+			q.displaying = true
+			defer func() { q.displaying = false }()
+			if e := q.traceBorrow.bindManagers([3]*UPolynomialManager{q.m}, q.m.modular.BorrowTraceTags()); e != nil {
+				return nil, e
+			}
+			defer q.traceBorrow.unbind()
+		}
+		if e := berlekampAssertionFailure(line); e != nil {
+			return nil, e
+		}
 	}
 	// Typed backing/domain adapter: avoid a wrapped matrix index aliasing cells.
 	index := uint64(i)*uint64(q.size) + uint64(j)

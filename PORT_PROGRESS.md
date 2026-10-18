@@ -45376,3 +45376,31 @@ successful68-package run. All commands remain on CPUs8-16.
 Broader factor/Hensel/recombination/degree/display/Berlekamp checks pass ordinary
 16.673s and checked/debug/trace28.503s on CPUs8-16. portcheck and diff checks
 pass:2103 units,677 APIs;211 ported,340 partial,1495 unported,11 dead/deleted.
+
+2026-10-18: Berlekamp mutable/const accessor runtime assertion semantics
+
+A manifest/source review found the accessors still returned a fixed debug error
+instead of using source SASSERT runtime behavior. Implemented the actual process
+assertion switch and debugger Throw/Continue at factorization.cpp:74 and79.
+The runtime switch precedes the literal i<size && j<size predicate; Throw stops
+before the physical read, while Continue/disabled/release reaches the actual
+bounded flat matrix field. The formatter now uses the const source accessor.
+Failed-assertion actions borrow actual matrix/numeric owners through diagnostics
+and the reached read, then release all bindings.
+
+Tests use a genuinely constructed degree-two matrix and an invalid column that
+reaches the next real row's numeral. No matrix fields, ownership, construction
+counts or numerical scratch are fabricated/repaired. Both overloads cover
+Throw,Continue,disabled/release; a valid predicate with a closed debug-context
+owner proves that the switch is read before the field. Focused both-overload/
+matrix checks pass checked/debug/trace0.009s. Existing explicit Go physical
+index-overflow/domain guards remain separately identified.
+
+The review also confirms the manifest still records incomplete multivariate
+manager/resultant/PSC and other lifetime audits; method-level test coverage does
+not prove those whole units complete. No whole source-unit completion is claimed.
+Polynomial then AST remain unfinished. Commands remain on CPUs8-16; no full
+native repeat after the recent successful68-package run.
+Broader factor/Hensel/recombination/degree/display/Berlekamp checks pass ordinary
+16.670s and checked/debug/trace27.862s,CPUs8-16. portcheck and diff checks pass:
+2103 units,677 APIs;211 ported,340 partial,1495 unported,11 dead/deleted.

@@ -53119,7 +53119,9 @@
         "pkg/math/polynomial/upolynomial_hensel_product_failure_trace_test.go",
         "pkg/math/polynomial/upolynomial_hensel_pair_failure_trace_test.go",
         "pkg/math/polynomial/upolynomial_berlekamp_display.go",
-        "pkg/math/polynomial/upolynomial_berlekamp_display_test.go"
+        "pkg/math/polynomial/upolynomial_berlekamp_display_test.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_assertions.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_assertions_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53257,7 +53259,9 @@
         "TestUPolynomialBerlekampDisplayActualMatrixRows",
         "TestUPolynomialBerlekampWholeMatrixTracesAndBorrowedOwner",
         "TestUPolynomialBerlekampMatrixTraceStreamFailure",
-        "TestUPolynomialBerlekampMatrixTraceRetainedFactorizationConsumer"
+        "TestUPolynomialBerlekampMatrixTraceRetainedFactorizationConsumer",
+        "TestUPolynomialBerlekampGetRuntimeAssertionActions",
+        "TestUPolynomialBerlekampGetClosedRuntimeSwitchPrecedesRead"
       ],
       "conditionals": [
         {
@@ -53370,6 +53374,22 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Berlekamp mutable/const get project SASSERT runtime switch, Throw/Continue and reached physical read (74,79)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_berlekamp_assertions.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_field.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_display.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialBerlekampGetRuntimeAssertionActions",
+            "TestUPolynomialBerlekampGetClosedRuntimeSwitchPrecedesRead",
+            "TestUPolynomialBerlekampWholeMatrixTracesAndBorrowedOwner"
+          ],
+          "notes": "Replaces the fixed debug error with the actual process runtime assertion switch and source DebugAssertionFailure at cpp74/cpp79. Source && operands are gated by the switch; Throw precedes the physical field read, while Continue/disabled/release reaches the actual bounded flat matrix field. A genuine constructed degree-two matrix supplies the next-row numeral for an invalid column argument; tests do not alter source construction counts, ownership or matrix values. Valid predicates still observe a closed debug-context owner before reading. Assertion actions borrow the actual matrix and numeric owner across diagnostics and the reached read; borrowed bindings end on all returns. The formatter now uses the const source accessor. Source physical overflow/domain adapters remain explicit; other matrix/factorization algorithms and full-unit audits remain partial."
+        },
         {
           "name": "berlekamp_matrix::display and whole constructed/diagonalized matrix TRACE records (238-245,142,198)",
           "status": "ported",

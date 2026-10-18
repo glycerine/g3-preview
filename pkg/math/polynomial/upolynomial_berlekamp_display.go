@@ -11,7 +11,7 @@ import (
 func (q *upolyBerlekampMatrix) display(out io.Writer) error {
 	for i := uint32(0); i < q.values.size/q.size; i++ {
 		for j := uint32(0); j < q.size; j++ {
-			value, e := q.get(i, j)
+			value, e := q.getConst(i, j)
 			if e != nil {
 				return e
 			}
