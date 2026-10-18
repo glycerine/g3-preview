@@ -106,6 +106,14 @@ func (s *PolynomialSparseInterpolator) CleanupInterpolation() error {
 	if s == nil || s.self != s {
 		return ErrPolynomialOwner
 	}
+	if s.running {
+		return ErrPolynomialPending
+	}
+	s.running = true
+	defer func() { s.running = false }()
+	return s.cleanupInterpolation()
+}
+func (s *PolynomialSparseInterpolator) cleanupInterpolation() error {
 	f := &s.interpolation
 	if !f.active {
 		return nil
@@ -155,6 +163,8 @@ func (s *PolynomialSparseInterpolator) Interpolate(out *PolynomialRef) (ok bool,
 	if e := s.open(); e != nil {
 		return false, e
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	m := s.owner.core
 	if out == nil || out.owner != m {
 		return false, ErrPolynomialOwner
@@ -188,7 +198,7 @@ func (s *PolynomialSparseInterpolator) Interpolate(out *PolynomialRef) (ok bool,
 			pending = pending || root != (umemory.Block{})
 		}
 		if !pending {
-			if e := s.CleanupInterpolation(); e != nil {
+			if e := s.cleanupInterpolation(); e != nil {
 				err = errors.Join(err, e)
 			}
 		}

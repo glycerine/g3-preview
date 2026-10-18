@@ -25,6 +25,8 @@ type PolynomialSparseInterpolator struct {
 	resetActive                                                  bool
 	interpolation                                                polynomialSparseInterpolationScope
 	numeric                                                      polynomialNumericRoots
+
+	running bool
 }
 
 func NewPolynomialSparseInterpolator(m *MultivariatePolynomialManager, sk *PolynomialSkeleton) (s *PolynomialSparseInterpolator, err error) {
@@ -96,6 +98,9 @@ func (s *PolynomialSparseInterpolator) identity() error {
 	return s.owner.ready()
 }
 func (s *PolynomialSparseInterpolator) open() error {
+	if s != nil && s.self == s && s.running {
+		return ErrPolynomialPending
+	}
 	if e := s.identity(); e != nil {
 		return e
 	}
@@ -133,6 +138,8 @@ func (s *PolynomialSparseInterpolator) Add(in *unumeral.Int, q Polynomial) (bool
 	if e := s.open(); e != nil {
 		return false, e
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	if s.skeleton == nil {
 		if polynomialSourceDebug {
 			return false, ErrPolynomialAssertion
@@ -244,9 +251,14 @@ func (s *PolynomialSparseInterpolator) sourceFinish() (err error) {
 	return nil
 }
 func (s *PolynomialSparseInterpolator) SourceFinalize() error {
+	if s != nil && s.self == s && s.running {
+		return ErrPolynomialPending
+	}
 	if e := s.identity(); e != nil {
 		return e
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	if s.sourceFinalized {
 		return nil
 	}
@@ -256,11 +268,16 @@ func (s *PolynomialSparseInterpolator) CloseChecked() error {
 	if s == nil || s.self != s {
 		return ErrPolynomialOwner
 	}
+	if s.running {
+		return ErrPolynomialPending
+	}
 	if s.closed {
 		return nil
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	s.closing = true
-	if e := s.CleanupInterpolation(); e != nil {
+	if e := s.cleanupInterpolation(); e != nil {
 		return e
 	}
 	m := s.owner.core
@@ -294,6 +311,8 @@ func (s *PolynomialSparseInterpolator) Reset() (err error) {
 	if e := s.open(); e != nil {
 		return e
 	}
+	s.running = true
+	defer func() { s.running = false }()
 	if s.resetCause != nil {
 		return s.resetCause
 	}

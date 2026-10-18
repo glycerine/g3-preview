@@ -39860,6 +39860,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_sparse_reentry_test.go",
         "pkg/math/polynomial/algebraic_sign.go",
         "pkg/math/polynomial/algebraic_sign_resultant.go",
         "pkg/math/polynomial/algebraic_sign_test.go",
@@ -40329,6 +40330,7 @@
         "pkg/math/polynomial/polynomial_substitution_numeric_epoch_test.go"
       ],
       "tests": [
+        "TestPolynomialSparseExecutingTraceRefusesOwnerMutation",
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
         "TestAlgebraicEvalSignEveryExactCheckpointCleanupRetry",
         "TestAlgebraicEvalSignPublicRationalShortCircuit",
@@ -42454,6 +42456,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Executing sparse interpolation refuses callback reentry into Add/Reset/Interpolate/CleanupInterpolation/class source or owning destruction before touching borrowed samples and local solver; accepted lexical cleanup uses private continuation",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_sparse_interpolator.go",
+          "tests": [
+            "TestPolynomialSparseExecutingTraceRefusesOwnerMutation"
+          ]
+        },
         {
           "name": "Substitution modular-power numeric hooks carry the actual substitution invocation generation; a context captured through a real rational-map callback cannot acquire a replacement body",
           "status": "platform_replacement",
