@@ -115,6 +115,11 @@ func TestUPolynomialBerlekampNumericCleanupPreservesIndependentGCD(t *testing.T)
 }
 
 func TestUPolynomialBerlekampActualNumericTransportProtectsCaller(t *testing.T) {
+	for _, route := range []string{"constructor", "gcd", "division"} {
+		t.Run(route, func(t *testing.T) { berlekampActualNumericTransport(t, route) })
+	}
+}
+func berlekampActualNumericTransport(t *testing.T, route string) {
 	b := arena.NewBudget(1 << 26)
 	var matrix upolyBerlekampMatrix
 	armed, calls := false, 0
@@ -150,6 +155,9 @@ func TestUPolynomialBerlekampActualNumericTransportProtectsCaller(t *testing.T) 
 	serviceMust(t, e)
 	matrix.m = m
 	var held umemory.Block
+	var driver, divisor, out UPolynomial
+	var outState *upolyVectorState
+	var divisorView UPolynomialView
 	var big unumeral.Int
 	f, e := m.NewPolynomial()
 	serviceMust(t, e)
@@ -159,6 +167,11 @@ func TestUPolynomialBerlekampActualNumericTransportProtectsCaller(t *testing.T) 
 		serviceMust(t, rt.SetMaxSize(0))
 		serviceMust(t, m.CleanupBerlekampMatrix())
 		matrix.close()
+		for _, p := range []*UPolynomial{&driver, &divisor, &out} {
+			if *p != (UPolynomial{}) {
+				serviceMust(t, m.DelPolynomial(p))
+			}
+		}
 		serviceMust(t, m.DelPolynomial(&f))
 		serviceMust(t, q.Integers().Del(&big))
 		serviceMust(t, rt.Deallocate(&held))
@@ -177,6 +190,22 @@ func TestUPolynomialBerlekampActualNumericTransportProtectsCaller(t *testing.T) 
 	serviceMust(t, q.Integers().SetLimbs(&big, words))
 	serviceMust(t, m.SetInts(f, []unumeral.Int{big, big, unumeral.NewInt(1)}))
 	view := mustUPolyView(t, m, f)
+	if route != "constructor" {
+		serviceMust(t, m.SetZP(&three))
+		driver, e = m.NewPolynomial()
+		serviceMust(t, e)
+		serviceMust(t, m.SetInts(driver, []unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(0), unumeral.NewInt(1)}))
+		divisor, e = m.NewPolynomial()
+		serviceMust(t, e)
+		serviceMust(t, m.SetInts(divisor, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}))
+		out, e = m.NewPolynomial()
+		serviceMust(t, e)
+		d, e := m.descriptor(out)
+		serviceMust(t, e)
+		outState = &d.state
+		divisorView = mustUPolyView(t, m, divisor)
+		serviceMust(t, matrix.init(m, mustUPolyView(t, m, driver)))
+	}
 	pad := int64(99996) - rt.State().LocalSize - 12
 	if pad <= 0 {
 		t.Fatal("actual runtime threshold", rt.State())
@@ -185,7 +214,12 @@ func TestUPolynomialBerlekampActualNumericTransportProtectsCaller(t *testing.T) 
 	serviceMust(t, e)
 	serviceMust(t, rt.SetMaxSize(1))
 	armed = true
-	body := matrix.init(m, view)
+	var body error
+	if route == "constructor" {
+		body = matrix.init(m, view)
+	} else {
+		body = matrix.vectorNumericCall(route == "division", view, divisorView, outState)
+	}
 	armed = false
 	serviceMust(t, rt.SetMaxSize(0))
 	if calls == 0 || !numericPhysicalReservationRefusal(body) {

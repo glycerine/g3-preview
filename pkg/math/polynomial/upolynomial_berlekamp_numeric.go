@@ -129,8 +129,8 @@ func (n *upolyBerlekampNumeric) cleanup(abort bool) error {
 	return nil
 }
 
-// op selects only the concrete numeral operations reached by this matrix.
-func (q *upolyBerlekampMatrix) numericCall(op uint8, a, b, c, out *unumeral.Int) (cause error) {
+// Each admitted scalar or vector call borrows this exact matrix owner.
+func (q *upolyBerlekampMatrix) beginNumeric(borrow *upolyFactorTraceBorrow) error {
 	n := &q.numeric
 	if n.executing || n.cleaning || n.pending() || n.generation == ^uint64(0) {
 		return ErrUPolynomialCleanupPending
@@ -140,25 +140,37 @@ func (q *upolyBerlekampMatrix) numericCall(op uint8, a, b, c, out *unumeral.Int)
 	n.hooks.Policy = n
 	n.hooks.Generation = n.generation
 	n.executing = true
-	var borrow upolyFactorTraceBorrow
-	defer func() {
-		borrow.unbind()
-		n.executing = false
-		if n.pending() {
-			if q.m.pendingBerlekamp == nil || q.m.pendingBerlekamp == q {
-				q.m.pendingBerlekamp = q
-			}
-			if q.closeCause == nil {
-				q.closeCause = n.sourceCause()
-				if q.closeCause == nil {
-					q.closeCause = cause
-				}
-			}
-		}
-	}()
 	if e := borrow.bindManagers([3]*UPolynomialManager{q.m}, q.m.modular.BorrowTraceTags()); e != nil {
+		n.executing = false
 		return e
 	}
+	return nil
+}
+func (q *upolyBerlekampMatrix) endNumeric(borrow *upolyFactorTraceBorrow, cause error) {
+	n := &q.numeric
+	borrow.unbind()
+	n.executing = false
+	if n.pending() {
+		if q.m.pendingBerlekamp == nil || q.m.pendingBerlekamp == q {
+			q.m.pendingBerlekamp = q
+		}
+		if q.closeCause == nil {
+			q.closeCause = n.sourceCause()
+			if q.closeCause == nil {
+				q.closeCause = cause
+			}
+		}
+	}
+}
+
+// op selects only concrete numeral operations reached by this matrix.
+func (q *upolyBerlekampMatrix) numericCall(op uint8, a, b, c, out *unumeral.Int) (cause error) {
+	var borrow upolyFactorTraceBorrow
+	if e := q.beginNumeric(&borrow); e != nil {
+		return e
+	}
+	defer func() { q.endNumeric(&borrow, cause) }()
+	n := &q.numeric
 	ops := q.m.modular.WithAllocationContext(unumeral.NumericAllocationContext{}.WithCaller(&n.hooks))
 	switch op {
 	case 0:
@@ -178,4 +190,19 @@ func (q *upolyBerlekampMatrix) numericCall(op uint8, a, b, c, out *unumeral.Int)
 	default:
 		return ErrUPolynomialOwner
 	}
+}
+
+// Actual live callers at factorization.cpp:474 and :480. Their scalar leaves
+// share the matrix's concrete ownership policy, not an ambient manager scan.
+func (q *upolyBerlekampMatrix) vectorNumericCall(divide bool, a, b UPolynomialView, out *upolyVectorState) (cause error) {
+	var borrow upolyFactorTraceBorrow
+	if e := q.beginNumeric(&borrow); e != nil {
+		return e
+	}
+	defer func() { q.endNumeric(&borrow, cause) }()
+	context := integerAllocationInvocationContext{berlekamp: &q.numeric, berlekampGeneration: q.numeric.generation}
+	if divide {
+		return q.m.divStateWithSourceContext(a, b, out, context)
+	}
+	return q.m.gcdWithSourceContext(a, b, out, context)
 }

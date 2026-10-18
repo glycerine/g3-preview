@@ -50754,7 +50754,8 @@
         "pkg/math/polynomial/upolynomial_exception.go",
         "pkg/math/polynomial/upolynomial_exception_test.go",
         "pkg/math/polynomial/upolynomial_division_assertions.go",
-        "pkg/math/polynomial/upolynomial_division_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_division_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_vector_numeric_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -50967,7 +50968,9 @@
         "TestUPolynomialCheckpointSourceExceptionAndCooperationOrder",
         "TestUPolynomialScalarDivisionAssertionCoefficientFrontiers",
         "TestUPolynomialScalarDivisionZeroThrowAndClosedRuntimeSwitch",
-        "TestUPolynomialHenselPairPreconditionSourceActions"
+        "TestUPolynomialHenselPairPreconditionSourceActions",
+        "TestUPolynomialBerlekampVectorHelperActualAllocationPrefixes",
+        "TestUPolynomialBerlekampActualNumericTransportProtectsCaller"
       ],
       "conditionals": [
         {
@@ -51556,6 +51559,19 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Quotient-only div wrapper preserves explicit retained caller context into div_rem_core (upolynomial.cpp:506-513)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_division.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_vector_numeric_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialBerlekampVectorHelperActualAllocationPrefixes",
+            "TestUPolynomialBerlekampActualNumericTransportProtectsCaller"
+          ],
+          "notes": "The existing public/default quotient path delegates with an empty context and keeps the original temporary reset/swap order. The concrete retained Berlekamp caller supplies its exact allocation context to the same division core. Direct actual-allocation prefix and physical transport tests cover GCD and quotient call boundaries; wider kernel-local source/owning end audits remain partial."
+        },
         {
           "name": "Scalar division zero/divisibility SASSERT runtime operand gates and per-coefficient Throw/Continue (404,409)",
           "status": "ported",
@@ -53201,7 +53217,8 @@
         "pkg/math/polynomial/upolynomial_berlekamp_outcome_trace_test.go",
         "pkg/math/polynomial/upolynomial_berlekamp_split_scope.go",
         "pkg/math/polynomial/upolynomial_berlekamp_split_trace.go",
-        "pkg/math/polynomial/upolynomial_berlekamp_split_trace_test.go"
+        "pkg/math/polynomial/upolynomial_berlekamp_split_trace_test.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_vector_numeric_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53371,7 +53388,8 @@
         "TestUPolynomialBerlekampOutcomeExactFactorDisplayBeforeMatrixDT",
         "TestUPolynomialBerlekampCompleteSplitSourceRecords",
         "TestUPolynomialBerlekampSplitOutcomeStopsBeforeLocalVectorDT",
-        "TestUPolynomialBerlekampSplitTraceStickyStreamPreservesResult"
+        "TestUPolynomialBerlekampSplitTraceStickyStreamPreservesResult",
+        "TestUPolynomialBerlekampVectorHelperActualAllocationPrefixes"
       ],
       "conditionals": [
         {
@@ -53484,6 +53502,22 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Berlekamp live nonempty GCD and quotient helper caller-context propagation (upolynomial_factorization.cpp:474,480)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_berlekamp_numeric.go",
+            "pkg/math/polynomial/numeric_utility_aliases.go",
+            "pkg/math/polynomial/upolynomial_division.go",
+            "pkg/math/polynomial/upolynomial_remove_one_half_invocation.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_vector_numeric_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialBerlekampVectorHelperActualAllocationPrefixes",
+            "TestUPolynomialBerlekampActualNumericTransportProtectsCaller"
+          ],
+          "notes": "Both actual splitting helper calls now enter the concrete matrix numeric generation and borrow the real owner throughout helper execution. The explicit polynomial context validates exact integer owner/generation before reaching the existing utility hooks; the quotient-only wrapper no longer discards that context before the shared division core. Reached remainder SubMul calls receive only this accepted caller AddMul receipt. Fresh debug-allocator fixtures enumerate actual BIG SET/normalization allocation prefixes for both helpers in ordinary and checked/debug/trace builds, preserve exact retained owner identity, verify independently normalized GCD x+1 and quotient x-1, and refund all owners. These are qualified direct matrix-owner adapters with actual registered caller inputs/outputs; the old BIG input is not claimed field-normalized at entry. Physical runtime-limit transports now cover constructor, GCD and division, proving callback refusal of matrix mutation/cleanup/core retirement at the actual allocation boundary. No new numerical algorithm or ambient ownership scan is introduced. Helper-local am and monic lc/lc_inv source-end obligations remain separately partial; this closes caller allocation propagation, not whole helper lifetime auditing."
+        },
         {
           "name": "Berlekamp splitting records and actual reverse local-vector source/owning destruction (upolynomial_factorization.cpp:432-440,443-448,482-486,498)",
           "status": "ported",

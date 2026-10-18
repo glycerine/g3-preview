@@ -582,11 +582,11 @@ func (m *UPolynomialManager) factorZPBerlekamp(f UPolynomialView, fs *UPolynomia
 					return false, e
 				}
 				current := &fs.factors[i]
-				if e = m.gcd(m.stateView(v), m.stateView(current), gcd); e != nil {
+				if e = matrix.vectorNumericCall(false, m.stateView(v), m.stateView(current), gcd); e != nil {
 					return false, e
 				}
 				if gcd.size != 1 && gcd.size != current.size {
-					if e = m.divState(m.stateView(current), m.stateView(gcd), div); e != nil {
+					if e = matrix.vectorNumericCall(true, m.stateView(current), m.stateView(gcd), div); e != nil {
 						return false, e
 					}
 					if e := matrix.traceSplitOperands(m.stateView(current)); e != nil {

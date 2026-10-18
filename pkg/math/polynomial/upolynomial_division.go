@@ -312,12 +312,18 @@ func (m *UPolynomialManager) DivRem(a, b, q, r UPolynomial, d *uint32) error {
 	return m.DivRemViews(av, bv, q, r, d)
 }
 func (m *UPolynomialManager) divState(a, b UPolynomialView, q *upolyVectorState) error {
+	return m.divStateWithSourceContext(a, b, q, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) divStateWithSourceContext(a, b UPolynomialView, q *upolyVectorState, context integerAllocationInvocationContext) error {
 	span := upolyDivisorSpan{view: b}
-	return m.divSpanState(a, &span, q)
+	return m.divSpanStateWithSourceContext(a, &span, q, context)
 }
 func (m *UPolynomialManager) divSpanState(a UPolynomialView, b *upolyDivisorSpan, q *upolyVectorState) error {
+	return m.divSpanStateWithSourceContext(a, b, q, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) divSpanStateWithSourceContext(a UPolynomialView, b *upolyDivisorSpan, q *upolyVectorState, context integerAllocationInvocationContext) error {
 	var d uint32
-	if e := m.divRemCoreSpan(a, b, &d, &m.div2, &m.div1); e != nil {
+	if e := m.divRemCoreSpanWithSourceContext(a, b, &d, &m.div2, &m.div1, nil, nil, context); e != nil {
 		return e
 	}
 	if e := m.reset(&m.div1); e != nil {

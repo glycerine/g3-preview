@@ -340,6 +340,9 @@ func (q *upolyRemoveOneHalfRootScope) finishAmSource(body error) error {
 	return errors.Join(body, q.sourceCause)
 }
 func removeOrHenselAddMulChild(context integerAllocationInvocationContext, r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope) *unumeral.IntegerAddMulInvocationReceipt {
+	if n := context.berlekamp; n != nil && n.NumericBound(true) && context.berlekampGeneration == n.generation {
+		return &n.addMul
+	}
 	if q := context.removeOneHalfRoot; q != nil && q.owner != nil && context.removeOneHalfRootFrame(q.owner.config.Integer) != nil {
 		return &q.addMul
 	}

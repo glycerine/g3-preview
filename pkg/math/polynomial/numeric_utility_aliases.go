@@ -49,6 +49,12 @@ func (r *polynomialNumericRoots) NumericRoots(z *unumeral.IntegerManager, local 
 	return &current.NumericAllocationRoots
 }
 func (c integerAllocationInvocationContext) utility(z *unumeral.IntegerManager) unumeral.NumericAllocationContext {
+	if n := c.berlekamp; n != nil {
+		if !n.NumericBound(true) || n.owner.m.config.Integer != z || c.berlekampGeneration == 0 || c.berlekampGeneration != n.generation {
+			return unumeral.NumericAllocationContext{}.WithCaller(&invalidPolynomialNumericHooks)
+		}
+		return unumeral.NumericAllocationContext{}.WithCaller(&n.hooks)
+	}
 	if c.sexprArithmetic != nil {
 		q := c.sexprArithmeticFrame(z)
 		if q == nil {

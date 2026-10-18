@@ -12,6 +12,8 @@ import (
 // creates no source numeral, reservation, or ambient callback owner hook.
 
 type integerAllocationInvocationContext struct {
+	berlekamp                 *upolyBerlekampNumeric
+	berlekampGeneration       uint64
 	sexprArithmetic           *sexprPolynomialArithmeticScope
 	sexprArithmeticInvocation uint64
 	sturmIsolation            *upolySturmIsolationScope
