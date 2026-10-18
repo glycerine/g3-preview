@@ -153,14 +153,14 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 		if e = m.traceModGCDRecPoint(x, &s.nums[3]); e != nil {
 			return e
 		}
-		a, e = c.SubstituteInteger(pu.value, x, &s.nums[3])
+		a, e = c.substituteIntegerWithReceipt(pu.value, x, &s.nums[3], &s.directSubstitution)
 		if e != nil {
 			return e
 		}
 		if e = u1.assign(c, a); e != nil {
 			return e
 		}
-		a, e = c.SubstituteInteger(pv.value, x, &s.nums[3])
+		a, e = c.substituteIntegerWithReceipt(pv.value, x, &s.nums[3], &s.directSubstitution)
 		if e != nil {
 			return e
 		}

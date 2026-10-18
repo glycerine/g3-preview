@@ -15,6 +15,7 @@ import (
 // PRS has nine references and three numerals. The dispatcher instead begins
 // with its two actual sbuffer<power,32> objects.
 type polynomialGCDFunctionScope struct {
+	directSubstitution  polynomialSubstitutionInvocationReceipt
 	directMonic         polynomialMonicInvocationReceipt
 	zpxCalleeGeneration uint64
 	zpxAllocator        monomialAllocatorInvocationReceipt
@@ -289,7 +290,7 @@ func (m *MultivariatePolynomialManager) finishGCDLocalsTo(s *polynomialGCDFuncti
 	}
 	if !pending {
 		h := s.header
-		*s = polynomialGCDFunctionScope{header: h, invocation: s.invocation, product: s.product, directMonic: s.directMonic, directArithmetic: s.directArithmetic, directConstant: s.directConstant, directNeg: s.directNeg, directCoefficient: s.directCoefficient, directAppend: s.directAppend, directFactory: s.directFactory, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, normalizeInvocation: s.normalizeInvocation, resultantPower: s.resultantPower, resultantPseudo: s.resultantPseudo, resultantArithmetic: s.resultantArithmetic, resultantCoefficient: s.resultantCoefficient, resultantAppend: s.resultantAppend, resultantFactory: s.resultantFactory, resultantNeg: s.resultantNeg}
+		*s = polynomialGCDFunctionScope{header: h, invocation: s.invocation, product: s.product, directSubstitution: s.directSubstitution, directMonic: s.directMonic, directArithmetic: s.directArithmetic, directConstant: s.directConstant, directNeg: s.directNeg, directCoefficient: s.directCoefficient, directAppend: s.directAppend, directFactory: s.directFactory, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, normalizeInvocation: s.normalizeInvocation, resultantPower: s.resultantPower, resultantPseudo: s.resultantPseudo, resultantArithmetic: s.resultantArithmetic, resultantCoefficient: s.resultantCoefficient, resultantAppend: s.resultantAppend, resultantFactory: s.resultantFactory, resultantNeg: s.resultantNeg}
 	}
 	return nil
 }

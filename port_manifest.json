@@ -40323,7 +40323,9 @@
         "pkg/math/polynomial/polynomial_gcd_zpx_created.go",
         "pkg/math/polynomial/polynomial_gcd_independent_scope_test.go",
         "pkg/math/polynomial/polynomial_glex_monic_invocation.go",
-        "pkg/math/polynomial/polynomial_gcd_scale_receipt_test.go"
+        "pkg/math/polynomial/polynomial_gcd_scale_receipt_test.go",
+        "pkg/math/polynomial/polynomial_substitution_invocation.go",
+        "pkg/math/polynomial/polynomial_substitution_invocation_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -41192,7 +41194,8 @@
         "TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes",
         "TestPolynomialGCDCleanupPreservesIndependentLazard",
         "TestPolynomialGCDIndependentLazardReservationPrefixes",
-        "TestPolynomialGCDContentScaleReceiptReservationPrefixes"
+        "TestPolynomialGCDContentScaleReceiptReservationPrefixes",
+        "TestPolynomialSubstitutionInvocationReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -42449,6 +42452,15 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Recursive GCD integer substitutions retain only the accepted core/frame/invocation; completed-local owning cleanup precedes separate construction abort; copied, refused and stale receipts grant no cleanup authority",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_substitution_invocation.go",
+          "tests": [
+            "TestPolynomialSubstitutionInvocationReservationPrefixes",
+            "TestPolynomialSubstitutionEveryReservationNamedPrefixes"
+          ]
+        },
         {
           "name": "Nine reached GCD content/PRS/modular/univariate/recursive Scale calls pass concrete arithmetic receipts to the existing scaling engine; source-specific callback and suffix composition remains partial",
           "status": "partial",
@@ -45804,7 +45816,9 @@
         "pkg/math/polynomial/polynomial_gcd_zpx_created.go",
         "pkg/math/polynomial/polynomial_gcd_independent_scope_test.go",
         "pkg/math/polynomial/polynomial_glex_monic_invocation.go",
-        "pkg/math/polynomial/polynomial_gcd_scale_receipt_test.go"
+        "pkg/math/polynomial/polynomial_gcd_scale_receipt_test.go",
+        "pkg/math/polynomial/polynomial_substitution_invocation.go",
+        "pkg/math/polynomial/polynomial_substitution_invocation_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -46408,7 +46422,8 @@
         "TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes",
         "TestPolynomialGCDCleanupPreservesIndependentLazard",
         "TestPolynomialGCDIndependentLazardReservationPrefixes",
-        "TestPolynomialGCDContentScaleReceiptReservationPrefixes"
+        "TestPolynomialGCDContentScaleReceiptReservationPrefixes",
+        "TestPolynomialSubstitutionInvocationReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -46437,6 +46452,15 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Recursive GCD integer substitutions retain only the accepted core/frame/invocation; completed-local owning cleanup precedes separate construction abort; copied, refused and stale receipts grant no cleanup authority",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_substitution_invocation.go",
+          "tests": [
+            "TestPolynomialSubstitutionInvocationReservationPrefixes",
+            "TestPolynomialSubstitutionEveryReservationNamedPrefixes"
+          ]
+        },
         {
           "name": "Nine reached GCD content/PRS/modular/univariate/recursive Scale calls pass concrete arithmetic receipts to the existing scaling engine; source-specific callback and suffix composition remains partial",
           "status": "partial",

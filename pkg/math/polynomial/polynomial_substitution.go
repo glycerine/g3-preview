@@ -42,11 +42,11 @@ func (m *MultivariatePolynomialCore) beginSubstitution(kind uint8) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if m.substitution.scope.active || m.pending.substitutionOwned || m.powerLocal.substitutionOwned || m.substitution.borrowedReceipt != 0 || m.substitution.generatedCalleeReceipt != 0 || m.substitution.generatedReceipt != (Monomial{}) {
+	if m.substitutionNumericPending() || m.substitution.scope.invocation == ^uint64(0) || m.substitution.scope.active || m.pending.substitutionOwned || m.powerLocal.substitutionOwned || m.substitution.borrowedReceipt != 0 || m.substitution.generatedCalleeReceipt != 0 || m.substitution.generatedReceipt != (Monomial{}) {
 		return ErrPolynomialPending
 	}
 	m.substitution.bodyCause, m.substitution.cleanupCause = nil, nil
-	m.substitution.scope = polynomialSubstitutionScope{active: true, executing: true, kind: kind}
+	m.substitution.scope = polynomialSubstitutionScope{invocation: m.substitution.scope.invocation + 1, active: true, executing: true, kind: kind}
 	return nil
 }
 func (m *MultivariatePolynomialCore) finishSubstitution(cause error) error {
@@ -73,6 +73,9 @@ func (m *MultivariatePolynomialCore) finishSubstitution(cause error) error {
 // lexical order. Failed copy constructor roots/unjoined assignment INC remain
 // named until a distinct owning abort; no destructor is invented for them.
 func (m *MultivariatePolynomialCore) substitutionCleanup(owning bool) error {
+	return m.substitutionCleanupPhase(owning, owning)
+}
+func (m *MultivariatePolynomialCore) substitutionCleanupPhase(owning, abort bool) error {
 	s := &m.substitution.scope
 	if !s.active {
 		return nil
@@ -205,6 +208,9 @@ func (m *MultivariatePolynomialCore) substitutionCleanup(owning bool) error {
 	if s.returned != (Polynomial{}) && !owning {
 		return nil
 	}
+	if owning && !abort {
+		return nil
+	}
 	if owning && s.returned != (Polynomial{}) {
 		if e := m.CleanupValue(&s.returned); e != nil {
 			return e
@@ -226,6 +232,9 @@ func (m *MultivariatePolynomialCore) substitutionCleanup(owning bool) error {
 func (m *MultivariatePolynomialCore) CleanupSubstitution() error {
 	if m == nil || m.self != m {
 		return ErrPolynomialOwner
+	}
+	if m.substitution.scope.executing {
+		return ErrPolynomialPending
 	}
 	if m.substitution.scope.modularPowerPending {
 		if e := m.modular.CleanupPowerTemporary(); e != nil {
@@ -351,6 +360,9 @@ func (m *MultivariatePolynomialCore) addSubstitutionTerm(a *unumeral.Int, term M
 // Source integer-array and single-value overloads. Raw arrays remain borrowed;
 // there is no copied-value staging or global component preflight.
 func (m *MultivariatePolynomialCore) SubstituteInteger(p Polynomial, x uint32, v *unumeral.Int) (Polynomial, error) {
+	return m.substituteIntegerWithReceipt(p, x, v, nil)
+}
+func (m *MultivariatePolynomialCore) substituteIntegerWithReceipt(p Polynomial, x uint32, v *unumeral.Int, receipt *polynomialSubstitutionInvocationReceipt) (Polynomial, error) {
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
@@ -358,16 +370,22 @@ func (m *MultivariatePolynomialCore) SubstituteInteger(p Polynomial, x uint32, v
 		return Polynomial{}, arena.ErrConfig
 	}
 	// The scalar overload is the same engine with one actual source pointer.
-	return m.substituteIntegers(p, 1, PolynomialVariablesView{}, nil, &x, v)
+	return m.substituteIntegersWithReceipt(p, 1, PolynomialVariablesView{}, nil, &x, v, receipt)
 }
 func (m *MultivariatePolynomialCore) SubstituteIntegers(p Polynomial, n uint32, xs PolynomialVariablesView, values []unumeral.Int) (Polynomial, error) {
 	return m.substituteIntegers(p, n, xs, values, nil, nil)
 }
 func (m *MultivariatePolynomialCore) substituteIntegers(p Polynomial, n uint32, xs PolynomialVariablesView, values []unumeral.Int, oneX *uint32, oneValue *unumeral.Int) (result Polynomial, err error) {
+	return m.substituteIntegersWithReceipt(p, n, xs, values, oneX, oneValue, nil)
+}
+func (m *MultivariatePolynomialCore) substituteIntegersWithReceipt(p Polynomial, n uint32, xs PolynomialVariablesView, values []unumeral.Int, oneX *uint32, oneValue *unumeral.Int, receipt *polynomialSubstitutionInvocationReceipt) (result Polynomial, err error) {
 	if e := m.beginSubstitution(1); e != nil {
 		return Polynomial{}, e
 	}
 	s := &m.substitution.scope
+	if receipt != nil {
+		*receipt = polynomialSubstitutionInvocationReceipt{m, s, s.invocation}
+	}
 	// The one-scalar header overload has one call-local var address. It cannot
 	// escape this frame. The shared array algorithm reads that pointer directly.
 	if oneX != nil {
@@ -396,7 +414,7 @@ func (m *MultivariatePolynomialCore) substituteIntegers(p Polynomial, n uint32, 
 		err = m.finishSubstitution(err)
 		if err == nil {
 			m.substitution.array.values = nil
-			*s = polynomialSubstitutionScope{}
+			*s = polynomialSubstitutionScope{invocation: s.invocation}
 		}
 	}()
 	if e := m.som.reset(); e != nil {
@@ -571,7 +589,7 @@ func (m *MultivariatePolynomialCore) substituteRationalMap(p Polynomial, x2v Pol
 		err = m.finishSubstitution(err)
 		if err == nil {
 			m.substitution.array.values = nil
-			*s = polynomialSubstitutionScope{}
+			*s = polynomialSubstitutionScope{invocation: s.invocation}
 		}
 	}()
 	if e := m.substitution.max.Init(p); e != nil {
@@ -792,7 +810,7 @@ func (m *MultivariatePolynomialCore) SubstitutePolynomialFraction(r Polynomial, 
 		err = m.finishSubstitution(err)
 		if err == nil {
 			m.substitution.array.values = nil
-			*s = polynomialSubstitutionScope{}
+			*s = polynomialSubstitutionScope{invocation: s.invocation}
 		}
 	}()
 	if e = result.root.assign(m, Polynomial{}); e != nil {
