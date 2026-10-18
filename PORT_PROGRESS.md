@@ -44104,3 +44104,20 @@ Broader focused display/comparison/predicate/conversion/bound suites pass
 ordinary (0.161s) and checked/debug/trace (0.397s), on CPUs8–16. Display source
 units remain partial for broader source suffix/assertion/stream auditing; the
 complete polynomial then AST goal remains active. No full-suite rerun.
+
+Complete ordinary polynomial verification after owning-bound and display
+lifetime changes: go test ./math/polynomial -count=1 -timeout=10m passes in
+88.384s. Log: /mnt/oldrog/tmp/g3-polynomial-post-display-full.log. Commands use
+CPUs8–16; this full run was launched about ninety minutes after the previous
+complete ordinary run. This is not checked-suite completion evidence.
+
+A new, currently uncommitted decimal precision20 reservation campaign passes
+ordinary (0.088s). Its first checked horizon exercised4096 refusals without a
+numerical/ownership assertion failure, then correctly failed the campaign's
+required-first-success gate because the horizon was too short (47.203s).
+The horizon is now32768; the existing checked continuation overlaps ordinal4000
+and continues through actual first success, with sentinel0. That process is
+still live at this update; do not treat it as passed or restart it based on
+silence. Log: /mnt/oldrog/tmp/g3-decimal-refinement-faults-checked-tail.log.
+The new test stays uncommitted pending its terminal verification. Polynomial
+then AST completion remains active.
