@@ -59,6 +59,7 @@ func (m *UPolynomialManager) scopedPush(s *upolyVectorState, value *unumeral.Int
 type upolyBerlekampMatrix struct {
 	displaying    bool
 	traceBorrow   upolyFactorTraceBorrow
+	entryTrace    upolyDisplayInvocationReceipt
 	m             *UPolynomialManager
 	values        upolyVectorState
 	size, nullRow uint32
@@ -66,7 +67,7 @@ type upolyBerlekampMatrix struct {
 }
 
 func (q *upolyBerlekampMatrix) close() {
-	if q.displaying {
+	if q.displaying || q.m != nil && q.m.displayReceiptPending(&q.entryTrace) {
 		return
 	}
 	m := q.m
@@ -106,7 +107,7 @@ func (q *upolyBerlekampMatrix) getSource(i, j uint32, line int32) (*unumeral.Int
 	return q.m.read(q.m.stateView(&q.values), uint32(index))
 }
 func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) error {
-	if q.displaying {
+	if q.displaying || q.m != nil && q.m.displayReceiptPending(&q.entryTrace) {
 		return ErrUPolynomialCleanupPending
 	}
 	q.m = m
@@ -121,6 +122,9 @@ func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) er
 	}
 	p, e := m.factorPrime()
 	if e != nil {
+		return e
+	}
+	if e = q.traceConstructor(f, p); e != nil {
 		return e
 	}
 
@@ -207,7 +211,7 @@ func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) er
 	return q.traceMatrix(142)
 }
 func (q *upolyBerlekampMatrix) diagonalize() (uint32, error) {
-	if q.displaying {
+	if q.displaying || q.m != nil && q.m.displayReceiptPending(&q.entryTrace) {
 		return 0, ErrUPolynomialCleanupPending
 	}
 	m := q.m
@@ -288,7 +292,7 @@ func (q *upolyBerlekampMatrix) diagonalize() (uint32, error) {
 	return nullRank, nil
 }
 func (q *upolyBerlekampMatrix) next(v *upolyVectorState) (bool, error) {
-	if q.displaying {
+	if q.displaying || q.m != nil && q.m.displayReceiptPending(&q.entryTrace) {
 		return false, ErrUPolynomialCleanupPending
 	}
 	m := q.m

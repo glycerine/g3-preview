@@ -53188,7 +53188,8 @@
         "pkg/math/polynomial/upolynomial_factorization_field_source_test.go",
         "pkg/math/polynomial/upolynomial_hensel_precondition_assertions_test.go",
         "pkg/math/polynomial/upolynomial_primitive_assertions_test.go",
-        "pkg/math/polynomial/upolynomial_factor_remainder_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_factor_remainder_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_constructor_trace_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53341,7 +53342,9 @@
         "TestUPolynomialHenselFactorAssertionActionsAndModulusFrontier",
         "TestUPolynomialPrimitiveContentAssertionPublicActions",
         "TestUPolynomialPrimitiveDisabledAssertionStillComputesDebugContent",
-        "TestUPolynomialRecombinationConstantRemainderAssertionActions"
+        "TestUPolynomialRecombinationConstantRemainderAssertionActions",
+        "TestUPolynomialBerlekampConstructorTraceBeforeMatrixValues",
+        "TestUPolynomialBerlekampConstructorTraceExactDisplayRefusal"
       ],
       "conditionals": [
         {
@@ -53454,6 +53457,23 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Berlekamp constructor entry TRACE before matrix coefficients and scoped tmp (upolynomial_factorization.cpp:97)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_berlekamp_display.go",
+            "pkg/math/polynomial/upolynomial_factor_field.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_constructor_trace_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialBerlekampConstructorTraceBeforeMatrixValues",
+            "TestUPolynomialBerlekampConstructorTraceExactDisplayRefusal",
+            "TestUPolynomialBerlekampWholeMatrixTracesAndBorrowedOwner",
+            "TestUPolynomialBerlekampMatrixTraceStreamFailure",
+            "TestUPolynomialBerlekampMatrixTraceRetainedFactorizationConsumer"
+          ],
+          "notes": "Exact constructor text displays the actual input and extracted uint32 prime after pivot initialization and before the first matrix coefficient. The whole record borrows the actual matrix and numeric manager; callbacks cannot initialize, diagonalize, extract vectors, destroy pivots or retire the core. Sticky physical output failure preserves later display evaluation and increases actual record flush count to three. A qualified direct-constructor integer-mode prefix with remembered p=3 supplies a genuine BIG operand and descriptor exhaustion at its literal display copy; this is not valid finite-field factorization evidence. The exact accepted display receipt retains the interrupted child; older pivot members and further matrix operations remain protected until exact cleanup. A stale constructor receipt cannot clean an independently accepted replacement display. Ordinary finite-field matrix/rank/product evidence stays unchanged. Broader matrix destructor/numeric failure and whole-unit ownership audits remain partial."
+        },
         {
           "name": "Primitive-content and final constant-remainder SASSERT runtime gates and debugger actions (upolynomial_factorization.cpp:1033,1291)",
           "status": "ported",
@@ -53568,7 +53588,7 @@
             "TestUPolynomialBerlekampMatrixTraceStreamFailure",
             "TestUPolynomialBerlekampMatrixTraceRetainedFactorizationConsumer"
           ],
-          "notes": "Formats actual normalized matrix values in source row order, preserving trailing tabs, row endl flushes, logical matrix-size/width truncation and the whole records final blank line. Uses existing native coefficient storage and Go strings, without porting STL buffers or adding numerical allocations; direct formatting passes with Runtime reservations disabled and unchanged charged storage. A synchronous whole-record matrix/actual-manager borrow spans header/body/footer while constructor or diagonalization NUMs remain live. Callback init/diagonalize/next/cleanup attempts preserve matrix and pivot state, and core retirement is refused. Sticky output failure preserves matrix/rank and releases the borrow. Actual x^2+1 over Z3 gives exact pre/post-diagonal matrices, and the public retained factorization consumer checks both records, source rank-one false return, one factor and unchanged product. Constructor entry TRACE97, other helper diagnostics and broader method/ownership audits remain open; no whole class/unit completion credit."
+          "notes": "Formats actual normalized matrix values in source row order, preserving trailing tabs, row endl flushes, logical matrix-size/width truncation and the whole records final blank line. Uses existing native coefficient storage and Go strings, without porting STL buffers or adding numerical allocations; direct formatting passes with Runtime reservations disabled and unchanged charged storage. A synchronous whole-record matrix/actual-manager borrow spans header/body/footer while constructor or diagonalization NUMs remain live. Callback init/diagonalize/next/cleanup attempts preserve matrix and pivot state, and core retirement is refused. Sticky output failure preserves matrix/rank and releases the borrow. Actual x^2+1 over Z3 gives exact pre/post-diagonal matrices, and the public retained factorization consumer checks both records, source rank-one false return, one factor and unchanged product. Constructor entry TRACE97 is covered separately below; other helper diagnostics and broader method/ownership audits remain open; no whole class/unit completion credit."
         },
         {
           "name": "Whole failed two-factor Hensel product-check TRACE with original inputs and checker destruction frontier (536-544)",

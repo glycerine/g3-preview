@@ -102,7 +102,7 @@ func TestUPolynomialBerlekampWholeMatrixTracesAndBorrowedOwner(t *testing.T) {
 		t.Fatal("matrix trace changed null rank")
 	}
 	if tags.ShouldTrace("polynomial::factorization::bughunt") {
-		for _, part := range []string{":142 ", "polynomial::berlekamp_matrix():\n0\t0\t\n0\t1\t\n\n", ":198 ", "polynomial::diagonalize():\n0\t0\t\n0\t-1\t\n\n"} {
+		for _, part := range []string{":97 ", "polynomial::berlekamp_matrix(x^2 + 1, 3)\n", ":142 ", "polynomial::berlekamp_matrix():\n0\t0\t\n0\t1\t\n\n", ":198 ", "polynomial::diagonalize():\n0\t0\t\n0\t-1\t\n\n"} {
 			if !strings.Contains(w.text.String(), part) {
 				t.Fatal("whole matrix source record", part, w.text.String())
 			}
@@ -136,7 +136,7 @@ func TestUPolynomialBerlekampMatrixTraceStreamFailure(t *testing.T) {
 		t.Fatal("stream refusal changed matrix/source borrow")
 	}
 	if tags.ShouldTrace("polynomial::factorization::bughunt") {
-		if w.calls != 1 || w.flushes != 2 {
+		if w.calls != 1 || w.flushes != 3 {
 			t.Fatal("sticky output or final record flushes", w.calls, w.flushes)
 		}
 	} else if w.calls != 0 {

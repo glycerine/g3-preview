@@ -45542,3 +45542,11 @@ Ported factorization.cpp:1033 and :1291 to actual runtime assertion gates and de
 The final constant remainder now short-circuits its combined size/unit predicate exactly. Tests cover empty, nonunit and unit vectors, all actions, preserved source values/output/budget, actual constructed related-owner fixtures, read-only physical graph audits and completed source-call cleanup. Existing remainder assertion tests remain unchanged in their original file; new factor-remainder tests are separate.
 
 Broader factorization/recombination/primitive/Mignotte/Hensel tests passed ordinary (15.851s) and g3checked/g3debug/g3trace (27.700s). The added disabled-GCD focused check passed checked/debug/trace (0.007s). All commands ran on CPUs 8–16. Whole polynomial and AST completion remains unproven and incomplete; constructor trace and broader source-unit/ownership audits remain open.
+
+### Berlekamp constructor entry trace
+
+Ported factorization.cpp:97 at its actual constructor frontier: pivot members exist; matrix coefficients and scoped tmp do not. The exact record displays the real polynomial and extracted prime, borrows actual matrix/core owners throughout output callbacks, and preserves sticky stream failure with continued operand evaluation. Existing whole-matrix and retained public factorization tests now include the constructor record; the three source records produce three final flushes after a failed stream.
+
+New tests observe actual empty coefficient backing and initialized pivots at the prefix. A qualified integer-mode direct constructor prefix with genuine remembered p=3 permits BIG-display descriptor refusal before finite-field arithmetic; this is deliberately not claimed as valid finite-field input. The accepted exact display receipt protects pivot members and further matrix operations until cleanup. Stale receipts cannot adopt an independently accepted replacement display.
+
+Broader Berlekamp/factorization/recombination/primitive/Mignotte/Hensel tests pass ordinary (15.852s) and g3checked/g3debug/g3trace (27.578s); focused checked Berlekamp tests pass (0.015s). All commands stay on CPUs 8–16. Matrix destructor and numerical failure ownership audits, other helper diagnostics and broader polynomial/AST completion remain open.

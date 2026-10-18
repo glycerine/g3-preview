@@ -2,6 +2,7 @@ package polynomial
 
 import (
 	"io"
+	"strconv"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
@@ -63,6 +64,44 @@ func (q *upolyBerlekampMatrix) traceMatrix(line int) error {
 				computation = e
 				return e
 			}
+			return diagnostic.WriteTraceEndl(out)
+		})
+	return computation
+}
+
+// Source: factorization.cpp:97. Pivot members already exist, but neither
+// the first matrix coefficient nor the constructor's scoped tmp exists yet.
+func (q *upolyBerlekampMatrix) traceConstructor(f UPolynomialView, p uint32) error {
+	tags := q.m.modular.BorrowTraceTags()
+	if !tags.ShouldTrace("polynomial::factorization::bughunt") {
+		return nil
+	}
+	if q.displaying {
+		return ErrUPolynomialCleanupPending
+	}
+	q.displaying = true
+	defer func() { q.displaying = false }()
+	if e := q.traceBorrow.bindManagers([3]*UPolynomialManager{q.m}, tags); e != nil {
+		return e
+	}
+	defer q.traceBorrow.unbind()
+	var computation error
+	_ = tags.EmitConditional("polynomial::factorization::bughunt", "berlekamp_matrix", "src/math/polynomial/upolynomial_factorization.cpp", 97,
+		func() bool { return true }, func(raw io.Writer) error {
+			out := factorizationTraceWriter{raw}
+			_ = linearWriteText(out, "polynomial::berlekamp_matrix(")
+			var issued upolyDisplayInvocationReceipt
+			e := q.m.displayIntoWithReceipt(f, factorizationTraceStream{out}, "x", false, &issued)
+			if q.m.matchesDisplayReceipt(&issued) {
+				q.entryTrace = issued
+			}
+			if e != nil {
+				computation = e
+				return e
+			}
+			_ = linearWriteText(out, ", ")
+			_ = linearWriteText(out, strconv.FormatUint(uint64(p), 10))
+			_ = linearWriteText(out, ")")
 			return diagnostic.WriteTraceEndl(out)
 		})
 	return computation
