@@ -44269,3 +44269,25 @@ checked/debug/trace (0.018s), exclusively on CPUs8–16. Added evidence to schem
 and generated-header entries while preserving their distinct completion states:
 static .pyg complete, runtime header helper broader composition still partial.
 Whole polynomial then AST completion remains active; no full-suite rerun.
+
+Retained-consumer audit found a concrete polynomial prerequisite still missing
+for AST: arith_decl_plugin::translate (cpp104–111) passes a source-plugin anum
+to target.aw().mk_id, which copies it with the target algebraic manager. Current
+Go AlgebraicRootCore.Copy accepts only locators from its own core; polynomial
+and interval copy also assume the receiver's univariate/numeral owner. This
+cannot implement translation between independent arithmetic plugins. Added an
+explicit unported retained-method entry to both algebraic source units, rather
+than treating same-owner Copy tests as evidence for this required consumer.
+
+Next implementation requires concrete source-core ownership on coefficient and
+bound copies, original cell/flag publication order and exact allocation
+receipts. Source values and their core must remain alive through target
+callbacks and retained cleanup; a lower IntegerManager guard alone cannot
+protect deletion of the source polynomial/cell. Preserve copied flags and
+avoid normalization, textual round trips or universal adapters.
+
+The full checked polynomial run remains live on CPUs8–16, with47 completed
+top-level tests and no failures observed at the latest poll; its decimal sweep
+has reached ordinal7728. Log: /mnt/oldrog/tmp/g3-polynomial-full-checked-current.jsonl.
+No numerical source was changed during this run. Polynomial then AST goal
+remains active; this is a newly identified retained feature gap, not completion.
