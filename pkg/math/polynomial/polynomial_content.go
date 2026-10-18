@@ -6,21 +6,21 @@ import (
 )
 
 type polynomialContentScope struct {
-	invocation                uint64
-	executing                 bool
-	receipt                   polynomialContentInvocationReceipt
-	normalize                 unumeral.IntegerNormalizeInvocationReceipt
-	division, extended        unumeral.IntegerRawInvocationReceipt
-	gcd                       unumeral.IntegerRawInvocationReceipt
-	aiConstructed             bool
-	entered                   bool
-	ai                        unumeral.Int
-	active, aiEnded, topOwner bool
-	generation                uint64
-	append                    polynomialCheapAppendInvocationReceipt
-	factory                   polynomialFactoryInvocationReceipt
-	numeric                   polynomialNumericRoots
-	bodyCause, cleanupCause   error
+	invocation              uint64
+	executing               bool
+	receipt                 polynomialContentInvocationReceipt
+	normalize               unumeral.IntegerNormalizeInvocationReceipt
+	division, extended      unumeral.IntegerRawInvocationReceipt
+	gcd                     unumeral.IntegerRawInvocationReceipt
+	aiConstructed           bool
+	entered                 bool
+	ai                      unumeral.Int
+	active, aiEnded         bool
+	generation              uint64
+	append                  polynomialCheapAppendInvocationReceipt
+	factory                 polynomialFactoryInvocationReceipt
+	numeric                 polynomialNumericRoots
+	bodyCause, cleanupCause error
 }
 
 func (m *MultivariatePolynomialCore) finishIntegerContent(owning bool) error {
@@ -120,7 +120,6 @@ func (m *MultivariatePolynomialCore) finishIntegerContentPhase(owning, abort boo
 	for _, p := range s.numeric.PendingAllocatorBlocks() {
 		pending = pending || p.OwnerID() != 0
 	}
-	pending = pending || (s.topOwner && m.pscPending())
 	if !pending {
 		*s = polynomialContentScope{invocation: s.invocation, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, gcd: s.gcd, division: s.division, extended: s.extended, normalize: s.normalize}
 	}
@@ -251,12 +250,10 @@ func (m *MultivariatePolynomialCore) integerContentWithReceipts(p Polynomial, i 
 	// This is the literal reached scoped_numeral ai constructor, after reset.
 	s.ai = unumeral.Int{}
 	s.aiConstructed = true
-	top := m.pscReceipts.depth == 0
 	if e = m.pscEnter(); e != nil {
 		return e
 	}
 	s.entered = true
-	s.topOwner = top
 	s.generation = m.pscExecutingOwner()
 	for j := uint32(0); j < n; j++ {
 		term, e := m.monomialCore(p, j)
@@ -351,13 +348,7 @@ func (m *MultivariatePolynomialCore) CleanupIntegerContent() error {
 	if m == nil || m.self != m {
 		return ErrPolynomialOwner
 	}
-	s := &m.contentLocal
-	top, g := s.topOwner, s.generation
-	if e := m.finishIntegerContent(true); e != nil {
-		return e
-	}
-	if top && g != 0 && m.pscReceipts.generation == g {
-		return m.CleanupPSC()
-	}
-	return nil
+	// This lexical invocation owns only its recorded numeric, append and
+	// factory children. It has no PSC/Lazard child to acknowledge.
+	return m.finishIntegerContent(true)
 }

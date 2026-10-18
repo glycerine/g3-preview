@@ -40312,7 +40312,8 @@
         "pkg/math/polynomial/algebraic_isolation_multivariate_owner_test.go",
         "pkg/math/polynomial/polynomial_cache_child_owner_test.go",
         "pkg/math/polynomial/polynomial_cache_borrowed_owner_test.go",
-        "pkg/math/polynomial/polynomial_cache_pending_psc_test.go"
+        "pkg/math/polynomial/polynomial_cache_pending_psc_test.go",
+        "pkg/math/polynomial/polynomial_content_independent_scope_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -41167,7 +41168,9 @@
         "TestAlgebraicMultivariateIsolationEmptyOutputAssertionBeforeLocals",
         "TestPolynomialCachePendingPSCOriginalStop",
         "TestPolynomialCachePSCCleanupPreservesIndependentLazard",
-        "TestPolynomialCachePSCExactCleanupReservationPrefixes"
+        "TestPolynomialCachePSCExactCleanupReservationPrefixes",
+        "TestPolynomialIntegerContentCleanupPreservesIndependentLazard",
+        "TestPolynomialIntegerContentIndependentLazardReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -42424,6 +42427,15 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Integer content source retirement and explicit owning continuation retain only its issued numeric, append and factory children; independent stopped PSC/Lazard scopes grant no lifetime or cleanup authority (polynomial.cpp:3384-3430)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_content.go",
+          "tests": [
+            "TestPolynomialIntegerContentCleanupPreservesIndependentLazard",
+            "TestPolynomialIntegerContentIndependentLazardReservationPrefixes"
+          ]
+        },
         {
           "name": "Horner composition exact MulAdd child binding and false/true owning acknowledgment before retry (polynomial.cpp:4798-4818); shared SOM cancellation state no longer strands borrowed linear monomials",
           "status": "partial",
@@ -45667,7 +45679,8 @@
         "pkg/math/polynomial/algebraic_isolation_multivariate_scope.go",
         "pkg/math/polynomial/algebraic_isolation_multivariate_test.go",
         "pkg/math/polynomial/algebraic_isolation_multivariate_cancel_test.go",
-        "pkg/math/polynomial/algebraic_isolation_multivariate_owner_test.go"
+        "pkg/math/polynomial/algebraic_isolation_multivariate_owner_test.go",
+        "pkg/math/polynomial/polynomial_content_independent_scope_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -46256,7 +46269,9 @@
         "TestAlgebraicMultivariateIsolationEveryReachedCheckpoint",
         "TestAlgebraicMultivariateIsolationPreservesOlderFactorInvocation",
         "TestAlgebraicMultivariateIsolationExecutingOwnerRefusals",
-        "TestAlgebraicMultivariateIsolationEmptyOutputAssertionBeforeLocals"
+        "TestAlgebraicMultivariateIsolationEmptyOutputAssertionBeforeLocals",
+        "TestPolynomialIntegerContentCleanupPreservesIndependentLazard",
+        "TestPolynomialIntegerContentIndependentLazardReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -46285,6 +46300,15 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Integer content source retirement and explicit owning continuation retain only its issued numeric, append and factory children; independent stopped PSC/Lazard scopes grant no lifetime or cleanup authority (polynomial.cpp:3384-3430)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_content.go",
+          "tests": [
+            "TestPolynomialIntegerContentCleanupPreservesIndependentLazard",
+            "TestPolynomialIntegerContentIndependentLazardReservationPrefixes"
+          ]
+        },
         {
           "name": "Horner composition exact MulAdd child binding and false/true owning acknowledgment before retry (polynomial.cpp:4798-4818); shared SOM cancellation state no longer strands borrowed linear monomials",
           "status": "partial",
