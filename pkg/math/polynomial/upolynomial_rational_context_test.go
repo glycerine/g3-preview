@@ -123,7 +123,7 @@ func contextTLSOwner(t *testing.T) (*unumeral.RationalService, *UPolynomialManag
 	serviceMust(t, e)
 	t.Cleanup(func() {
 		b.FailAfter(-1)
-		serviceMust(t, numericRationalService_CleanupUPolynomialRationals(s, func() error { return nil }))
+		serviceMust(t, numericRationalService_CleanupUPolynomialRationals(s, m, func() error { return nil }))
 		contextTLSFinish(t, r, func() error { return m.Close() })
 		contextTLSFinish(t, r, func() error { return s.Close() })
 		contextTLSFinish(t, r, func() error { return r.Close() })
@@ -201,7 +201,7 @@ func TestUPolynomialContextExceptionBeforeCompletedDestructor(t *testing.T) {
 		t.Fatal("physical free did not precede TLS guard", cell)
 	}
 	contextAudit(t, s, &a, m, p)
-	serviceMust(t, numericRationalService_CleanupUPolynomialRationals(s, func() error { return nil }))
+	serviceMust(t, numericRationalService_CleanupUPolynomialRationals(s, m, func() error { return nil }))
 	contextTLSDelete(t, s, &a, r)
 	serviceMust(t, m.DelPolynomial(&p))
 }
@@ -244,7 +244,7 @@ func TestUPolynomialContextPartialCopyWaitsForStoppedVector(t *testing.T) {
 	contextAudit(t, s, &a, m, p)
 	b.FailAfter(-1)
 	serviceMust(t, s.Manager.Z.CleanupPendingAllocation())
-	serviceMust(t, numericRationalService_CleanupUPolynomialRationals(s, func() error { return m.DelPolynomial(&p) }))
+	serviceMust(t, numericRationalService_CleanupUPolynomialRationals(s, m, func() error { return m.DelPolynomial(&p) }))
 	if s.Lexical.Pending() {
 		t.Fatal("cleanup did not finish")
 	}
@@ -314,6 +314,6 @@ func TestUPolynomialContextVectorOnlyStopDoesNotPoisonService(t *testing.T) {
 	contextAuditAll(t, s, &a, m, []UPolynomial{p}, &zero, &out)
 	serviceMust(t, s.Del(&zero))
 	contextTLSDelete(t, s, &out, r)
-	serviceMust(t, numericRationalService_CleanupUPolynomialRationals(s, func() error { return m.DelPolynomial(&p) }))
+	serviceMust(t, numericRationalService_CleanupUPolynomialRationals(s, m, func() error { return m.DelPolynomial(&p) }))
 	contextTLSDelete(t, s, &a, r)
 }

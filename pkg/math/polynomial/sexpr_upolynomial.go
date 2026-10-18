@@ -267,7 +267,7 @@ func (c *SexprPolynomialConverter) Cleanup() error {
 	if e := c.open(); e != nil {
 		return e
 	}
-	err := numericRationalService_CleanupUPolynomialRationals(c.sexpr.Configuration().Rationals, func() error {
+	err := numericRationalService_CleanupUPolynomialRationals(c.sexpr.Configuration().Rationals, c.polynomial, func() error {
 		if e := c.polynomial.CleanupRationalInput(); e != nil {
 			return e
 		}

@@ -43,6 +43,7 @@ type RationalServiceStats struct {
 // the Budget safe for concurrent use. Never shallow-copy this owner.
 type RationalService struct {
 	numericBorrow                                         RationalNumericBorrow
+	numericReceiver                                       atomic.Value // rationalNumericReceiver; actual synchronous allocator owner
 	lexicalPrepared, lexicalExecuting, lexicalInvocations *RationalServiceInvocation
 	lexicalSerial                                         uint64
 	sourceRuntimeExecuting                                uint32 // actual held lower-allocation invocation stamp
@@ -494,6 +495,13 @@ func (s *RationalService) Close() error { return s.CloseChecked() }
 // The Runtime callback is a caller-confined Go adapter domain, distinct from
 // ordinary concurrent service calls, which continue to serialize on mu.
 func (s *RationalService) runtimeTransportExecuting() bool {
+	// A locked numeric borrow can invoke a different owner's allocator. Its
+	// actual transport callback must not reenter this service's held mutex.
+	if v := s.numericReceiver.Load(); v != nil {
+		if r := v.(rationalNumericReceiver).runtime; r != nil && r.FailureTransportActive() {
+			return true
+		}
+	}
 	if atomic.LoadUint32(&s.sourceRuntimeExecuting) == 0 {
 		return false
 	}

@@ -17,8 +17,14 @@ func TestRationalNumericBorrowCopiesLexicalScalarAndExpires(t *testing.T) {
 		if copy.Valid() {
 			t.Fatal("copied borrower accepted")
 		}
+		if e := copy.WithReceivingInteger(s.Manager.Z, func() error { t.Fatal("copied borrow acquired receiving allocator"); return nil }); !errors.Is(e, ErrRationalServiceOwner) {
+			t.Fatal("copied receiving borrow", e)
+		}
 		if !b.Valid() || b.Integers() != s.Manager.Z {
 			t.Fatal("missing actual utility owner")
+		}
+		if s.runtimeTransportExecuting() {
+			t.Fatal("ordinary numeric borrow was classified as allocator callback reentry")
 		}
 		return b.WithLexical(func() error {
 			return b.WithCopiedScalar(&a, func(value Rational) error {
@@ -35,6 +41,12 @@ func TestRationalNumericBorrowCopiesLexicalScalarAndExpires(t *testing.T) {
 	}))
 	if retained.Valid() {
 		t.Fatal("borrow survived callback")
+	}
+	if v := s.numericReceiver.Load(); v != nil && v.(rationalNumericReceiver).runtime != nil {
+		t.Fatal("completed numeric borrow retained allocator owner")
+	}
+	if e := retained.WithReceivingInteger(s.Manager.Z, func() error { t.Fatal("expired borrow acquired receiving allocator"); return nil }); !errors.Is(e, ErrRationalServiceOwner) {
+		t.Fatal("expired receiving borrow", e)
 	}
 	if _, _, e := retained.Exponent(&a); !errors.Is(e, ErrRationalServiceOwner) {
 		t.Fatal("expired access accepted", e)

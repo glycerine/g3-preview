@@ -44540,3 +44540,48 @@ debug/trace 1.191s on CPUs 8-16. No full repeat after the recent 93.929s ordinar
 polynomial pass. Whole-unit statuses and the complete polynomial then AST
 objective remain open; normalization/callback fault composition and the owning
 AST lazy wrapper are not claimed complete.
+
+Foreign rational coefficient callback ownership: an actual receiving TLS
+allocation failure exposed that rational SET protected the receiving integer
+owner but left the donor integer owner without a synchronous caller guard.
+TestSexprPolynomialForeignCoefficientAllocationCallback first failed on that
+missing donor binding. The receiving input scope now binds both actual integer
+and natural owners, in reverse-unbind order. Only its actual source owner
+pointer remains while an issued child needs cleanup; the converter's owning
+continuation rebinds that donor and clears the pointer after acknowledgement.
+
+The same cross-runtime boundary required source rational-service lock protection:
+its numeric borrow holds the global mutex while the distinct receiver allocator
+calls a borrowed failure transport. Added concrete WithReceivingInteger to the
+existing numeric borrow. It publishes the actual Runtime through atomic.Value
+and restores the previous immutable owner snapshot on exit; the default borrow
+publishes its own numeric Runtime. SET and owning vector cleanup select the
+actual receiver for their duration. Source service preflight observes only the
+actual Runtime's atomic FailureTransportActive indication, avoiding mutex
+reentry without rejecting ordinary calls merely because a borrow is held.
+No numeral payload staging, source counters, or algorithm callback adapters
+are introduced. An earlier draft inspected mutable borrow/binding metadata
+before the mutex; replaced it with the atomic owner snapshot before commit.
+
+The actual TLS callback verifies UP cleanup/Close/SourceFinalize/value deletion,
+converter Close/cleanup, both integer owners' Close/SourceFinalize, and the
+source service's Close/SourceFinalize/ordinary API all refuse before acquiring
+ownership or the held mutex. An exact receiving copy receipt survives failure;
+bindings restore on return, cleanup clears donor/receiver references, and a
+subsequent ordinary source service call succeeds. Existing utility borrow tests
+also reject copied/expired receiving boundaries and verify an ordinary borrow
+is not classified as a transport callback and retains no Runtime after return.
+
+Focused polynomial selections (S-expression, context, source finalization,
+algebraic S-expression/private/Copy/Manager) passed ordinary 0.682s and checked/
+debug/trace 1.021s. RationalService/NumericBorrow focused utility tests passed
+ordinary 2.408s. Commands stayed on CPUs 8-16. Build verification initially hit
+no space left on device; removed 4295478388 bytes from dedicated Go cache *-d
+entries older than one hour, without touching sources, test vectors or recent
+build entries, then rebuilt successfully. No full suite repeat after the recent
+93.929s ordinary polynomial pass. Full polynomial then AST completion remains
+open; manifest methods retain partial status for broader fault composition and
+AST wrapper integration.
+Checked/debug/trace RationalService/NumericBorrow selection passed (2.771s).
+portcheck passed with unchanged counts (2103 units,677 APIs;208 ported,343 partial,
+1495 unported,11 dead/deleted). git diff --check passed before commit.

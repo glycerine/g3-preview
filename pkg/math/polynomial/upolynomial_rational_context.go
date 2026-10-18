@@ -79,7 +79,9 @@ func (c *UPolynomialRationalContext) SetConstant(p UPolynomial, a *unumeral.Owne
 		if !integer {
 			return nonInteger()
 		}
-		return c.polynomial.setRationalsFromOwner(p, c.borrow.Integers(), []unumeral.Rational{value})
+		return c.borrow.WithReceivingInteger(c.polynomial.config.Integer, func() error {
+			return c.polynomial.setRationalsFromOwner(p, c.borrow.Integers(), []unumeral.Rational{value})
+		})
 	})
 }
 func (c *UPolynomialRationalContext) Exponent(a *unumeral.OwnedRational) (uint32, bool, error) {
@@ -94,6 +96,8 @@ func (c *UPolynomialRationalContext) SetIdentity(p UPolynomial) error {
 	}
 	return c.polynomial.SetRationals(p, []unumeral.Rational{unumeral.NewRational(), unumeral.RationalFromBorrowedNumerals(unumeral.NewInt(1), unumeral.NewInt(1))})
 }
-func numericRationalService_CleanupUPolynomialRationals(s *unumeral.RationalService, vectors func() error) error {
-	return s.WithNumericBorrow(func(b *unumeral.RationalNumericBorrow) error { return b.CleanupAfterVectors(vectors) })
+func numericRationalService_CleanupUPolynomialRationals(s *unumeral.RationalService, m *UPolynomialManager, vectors func() error) error {
+	return s.WithNumericBorrow(func(b *unumeral.RationalNumericBorrow) error {
+		return b.WithReceivingInteger(m.config.Integer, func() error { return b.CleanupAfterVectors(vectors) })
+	})
 }

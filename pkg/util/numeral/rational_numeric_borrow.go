@@ -4,6 +4,7 @@ package numeral
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // RationalNumericBorrow is valid only inside WithNumericBorrow's synchronous
@@ -12,6 +13,28 @@ type RationalNumericBorrow struct {
 	self    *RationalNumericBorrow
 	service *RationalService
 	active  bool
+}
+
+type rationalNumericReceiver struct{ runtime *umemory.Runtime }
+
+// WithReceivingInteger holds the concrete receiving allocator's callback
+// boundary while the service mutex is already held. Only actual transport
+// reentry is rejected; ordinary service calls continue to serialize on mu.
+func (b *RationalNumericBorrow) WithReceivingInteger(z *IntegerManager, body func() error) error {
+	if !b.Valid() {
+		return ErrRationalServiceOwner
+	}
+	if z == nil || !z.ValidOwner() || body == nil {
+		return arena.ErrConfig
+	}
+	s := b.service
+	previous := rationalNumericReceiver{}
+	if v := s.numericReceiver.Load(); v != nil {
+		previous = v.(rationalNumericReceiver)
+	}
+	s.numericReceiver.Store(rationalNumericReceiver{runtime: z.RuntimeOwner()})
+	defer s.numericReceiver.Store(previous)
+	return body()
 }
 
 func (b *RationalNumericBorrow) Valid() bool {
@@ -31,7 +54,7 @@ func (s *RationalService) WithNumericBorrow(body func(*RationalNumericBorrow) er
 	}
 	*b = RationalNumericBorrow{self: b, service: s, active: true}
 	defer func() { *b = RationalNumericBorrow{} }()
-	return body(b)
+	return b.WithReceivingInteger(s.Manager.Z, func() error { return body(b) })
 }
 func (b *RationalNumericBorrow) Ready() error {
 	if !b.Valid() {

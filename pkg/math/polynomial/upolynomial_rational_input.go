@@ -6,32 +6,42 @@ import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 // Receiving numerical children outlive a stopped global-rational borrow. The
 // source temporary remains with that service's existing lexical owner.
 type upolyRationalInputScope struct {
-	copy             unumeral.IntegerCopyAllocationReceipt
-	normalize        unumeral.IntegerNormalizeInvocationReceipt
-	integer, natural unumeral.NumericCallerBinding
-	running          bool
+	copy      unumeral.IntegerCopyAllocationReceipt
+	normalize unumeral.IntegerNormalizeInvocationReceipt
+	bindings  [4]unumeral.NumericCallerBinding
+	bound     uint8
+	running   bool
+	source    *unumeral.IntegerManager
 }
 
 func (s *upolyRationalInputScope) NumericExecuting() bool { return s.running }
 func (s *upolyRationalInputScope) pending(m *UPolynomialManager) bool {
 	return m.config.Integer.MatchesCopyAllocationInvocation(&s.copy) || m.modular.MatchesPNormalizeInvocation(&s.normalize)
 }
-func (s *upolyRationalInputScope) bind(z *unumeral.IntegerManager) error {
-	if e := z.BindCaller(&s.integer, s, 0); e != nil {
-		return e
-	}
-	if e := z.Natural.BindCaller(&s.natural, s, 0); e != nil {
-		_ = s.integer.Unbind()
-		return e
+func (s *upolyRationalInputScope) bind(z, source *unumeral.IntegerManager) error {
+	for i, owner := range [2]*unumeral.IntegerManager{z, source} {
+		if owner == nil || i == 1 && owner == z {
+			continue
+		}
+		if e := owner.BindCaller(&s.bindings[s.bound], s, 0); e != nil {
+			s.unbind()
+			return e
+		}
+		s.bound++
+		if e := owner.Natural.BindCaller(&s.bindings[s.bound], s, 0); e != nil {
+			s.unbind()
+			return e
+		}
+		s.bound++
 	}
 	return nil
 }
 func (s *upolyRationalInputScope) unbind() {
-	if e := s.natural.Unbind(); e != nil {
-		panic(e)
-	}
-	if e := s.integer.Unbind(); e != nil {
-		panic(e)
+	for s.bound != 0 {
+		s.bound--
+		if e := s.bindings[s.bound].Unbind(); e != nil {
+			panic(e)
+		}
 	}
 }
 
@@ -46,14 +56,21 @@ func (m *UPolynomialManager) CleanupRationalInput() error {
 		return ErrUPolynomialCleanupPending
 	}
 	if !s.pending(m) {
+		s.source = nil
 		return nil
 	}
 	s.running = true
-	if e := s.bind(m.config.Integer); e != nil {
+	if e := s.bind(m.config.Integer, s.source); e != nil {
 		s.running = false
 		return e
 	}
-	defer func() { s.unbind(); s.running = false }()
+	defer func() {
+		s.unbind()
+		s.running = false
+		if !s.pending(m) {
+			s.source = nil
+		}
+	}()
 	if e := m.config.Integer.CleanupCopyAllocationInvocation(&s.copy); e != nil {
 		return e
 	}

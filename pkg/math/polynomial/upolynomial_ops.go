@@ -35,11 +35,19 @@ func (m *UPolynomialManager) setRationalsFromOwner(p UPolynomial, source *unumer
 		return arena.ErrBounds
 	}
 	s.running = true
-	if e := s.bind(m.config.Integer); e != nil {
+	s.source = source
+	if e := s.bind(m.config.Integer, source); e != nil {
 		s.running = false
+		s.source = nil
 		return e
 	}
-	defer func() { s.unbind(); s.running = false }()
+	defer func() {
+		s.unbind()
+		s.running = false
+		if !s.pending(m) {
+			s.source = nil
+		}
+	}()
 	n := uint32(len(a))
 	if e = m.reserve(&d.state, n); e != nil {
 		return e
