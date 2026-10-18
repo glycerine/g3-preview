@@ -1,4 +1,4 @@
-// Source: upolynomial.cpp:532,535,551; reached by get_root_id's Sturm loop.
+// Source: upolynomial.cpp:532,535,551; retained root-ID/public Sturm traces.
 package polynomial
 
 import (
@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-type upolyRootIDRemainderTrace struct {
+type upolySturmRemainderTrace struct {
 	displays   [2]upolyDisplayInvocationReceipt
 	insertions [2]unumeral.NumeralInsertionReceipt
 }
@@ -26,45 +26,45 @@ func (s upolyRemainderTraceStream) AppendInt32(v int32) error {
 	return s.AppendCString(strconv.FormatInt(int64(v), 10))
 }
 
-func (q *upolyRootIDScope) remainderTracePending() bool {
-	for i := range q.remainderTrace.displays {
-		if q.owner.displayReceiptPending(&q.remainderTrace.displays[i]) {
+func (r *upolySturmRemainderTrace) pending(m *UPolynomialManager) bool {
+	for i := range r.displays {
+		if m.displayReceiptPending(&r.displays[i]) {
 			return true
 		}
 	}
-	for i := range q.remainderTrace.insertions {
-		if q.remainderTrace.insertions[i].Active() {
+	for i := range r.insertions {
+		if r.insertions[i].Active() {
 			return true
 		}
 	}
 	return false
 }
-func (q *upolyRootIDScope) remainderTraceSourceCause() error {
-	for i := range q.remainderTrace.displays {
-		if e := q.owner.displayReceiptSourceCause(&q.remainderTrace.displays[i]); e != nil {
+func (r *upolySturmRemainderTrace) sourceCause(m *UPolynomialManager) error {
+	for i := range r.displays {
+		if e := m.displayReceiptSourceCause(&r.displays[i]); e != nil {
 			return e
 		}
 	}
-	for i := range q.remainderTrace.insertions {
-		if e := q.remainderTrace.insertions[i].SourceCause(); e != nil {
+	for i := range r.insertions {
+		if e := r.insertions[i].SourceCause(); e != nil {
 			return e
 		}
 	}
 	return nil
 }
-func (q *upolyRootIDScope) cleanupRemainderTrace(abort bool) error {
-	z := q.owner.config.Integer
-	for i := len(q.remainderTrace.insertions) - 1; i >= 0; i-- {
-		r := &q.remainderTrace.insertions[i]
-		if r.Active() {
-			if e := r.Complete(z.Naturals(), abort); e != nil {
+func (r *upolySturmRemainderTrace) cleanup(m *UPolynomialManager, abort bool) error {
+	z := m.config.Integer
+	for i := len(r.insertions) - 1; i >= 0; i-- {
+		child := &r.insertions[i]
+		if child.Active() {
+			if e := child.Complete(z.Naturals(), abort); e != nil {
 				return e
 			}
 		}
 	}
 	if !abort {
-		for i := len(q.remainderTrace.displays) - 1; i >= 0; i-- {
-			if e := q.owner.cleanupDisplayReceipt(&q.remainderTrace.displays[i]); e != nil {
+		for i := len(r.displays) - 1; i >= 0; i-- {
+			if e := m.cleanupDisplayReceipt(&r.displays[i]); e != nil {
 				return e
 			}
 		}
@@ -72,10 +72,16 @@ func (q *upolyRootIDScope) cleanupRemainderTrace(abort bool) error {
 	return nil
 }
 
+func (q *upolyRootIDScope) remainderTracePending() bool { return q.remainderTrace.pending(q.owner) }
+func (q *upolyRootIDScope) remainderTraceSourceCause() error {
+	return q.remainderTrace.sourceCause(q.owner)
+}
+func (q *upolyRootIDScope) cleanupRemainderTrace(abort bool) error {
+	return q.remainderTrace.cleanup(q.owner, abort)
+}
 func (q *upolyRootIDScope) traceRemainder(phase uint8, b UPolynomialView, r *upolyVectorState, bn *unumeral.Int) error {
 	m := q.owner
-	tags := m.config.Integer.BorrowTraceTags()
-	if !tags.ShouldTrace("rem_bug") {
+	if !m.config.Integer.BorrowTraceTags().ShouldTrace("rem_bug") {
 		return nil
 	}
 	if q.context().rootIDFrame(m.config.Integer) != q || !q.scalar.constructed {
@@ -84,6 +90,11 @@ func (q *upolyRootIDScope) traceRemainder(phase uint8, b UPolynomialView, r *upo
 	if q.remainderTracePending() {
 		return ErrUPolynomialCleanupPending
 	}
+	return q.remainderTrace.emit(m, phase, b, r, bn, &q.scalar.value)
+}
+
+func (trace *upolySturmRemainderTrace) emit(m *UPolynomialManager, phase uint8, b UPolynomialView, r *upolyVectorState, bn, scalar *unumeral.Int) error {
+	tags := m.config.Integer.BorrowTraceTags()
 	line := 532
 	if phase == 1 {
 		line = 535
@@ -99,10 +110,10 @@ func (q *upolyRootIDScope) traceRemainder(phase uint8, b UPolynomialView, r *upo
 		switch phase {
 		case 0:
 			_ = out.AppendCString("rem loop, p2:\n")
-			e = m.displayIntoWithReceipt(b, out, "x", false, &q.remainderTrace.displays[0])
+			e = m.displayIntoWithReceipt(b, out, "x", false, &trace.displays[0])
 			if e == nil {
 				_ = out.AppendCString("\nbuffer:\n")
-				e = m.displayIntoWithReceipt(m.stateView(r), out, "x", false, &q.remainderTrace.displays[1])
+				e = m.displayIntoWithReceipt(m.stateView(r), out, "x", false, &trace.displays[1])
 			}
 			if e == nil {
 				_ = out.AppendCString("\n")
@@ -110,14 +121,14 @@ func (q *upolyRootIDScope) traceRemainder(phase uint8, b UPolynomialView, r *upo
 		case 1:
 			_ = out.AppendCString("finished\n")
 		case 2:
-			for i, a := range [2]*unumeral.Int{&q.scalar.value, bn} {
+			for i, a := range [2]*unumeral.Int{scalar, bn} {
 				if i == 0 {
 					_ = out.AppendCString("a_m: ")
 				} else {
 					_ = out.AppendCString(", b_n: ")
 				}
 				var text bytes.Buffer
-				e = m.config.Integer.InsertSourceIntegerTracked(upolyNormalizeStringStream{&text}, a, &q.remainderTrace.insertions[i], nil)
+				e = m.config.Integer.InsertSourceIntegerTracked(upolyNormalizeStringStream{&text}, a, &trace.insertions[i], nil)
 				if e != nil {
 					break
 				}

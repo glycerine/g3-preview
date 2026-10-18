@@ -62,6 +62,9 @@ func (q *upolySequenceSturmScope) finishRemainderScalar(cause error) error {
 		s.bodyCause = cause
 	}
 	if s.childStop == nil {
+		s.childStop = q.remainderTraceSourceCause()
+	}
+	if s.childStop == nil {
 		s.childStop = z.AddMulInvocationSourceCause(&s.addMul)
 	}
 	for i := len(q.raw) - 1; i >= 0 && s.childStop == nil; i-- {
@@ -97,6 +100,9 @@ func (q *upolySequenceSturmScope) cleanupRemainderNumerics() error {
 	if e := q.cleanupNormalization(); e != nil {
 		return e
 	}
+	if e := q.cleanupRemainderTrace(false); e != nil {
+		return e
+	}
 	s := &q.scalar
 	if e := z.CleanupAddMulInvocation(&s.addMul, false); e != nil {
 		return e
@@ -113,6 +119,9 @@ func (q *upolySequenceSturmScope) cleanupRemainderNumerics() error {
 		}
 		s.ownCursor = 1
 		s.constructed = false
+	}
+	if e := q.cleanupRemainderTrace(true); e != nil {
+		return e
 	}
 	for i := len(q.raw) - 1; i >= 0; i-- {
 		if e := z.CleanupRawInvocation(&q.raw[i], true); e != nil {
@@ -181,4 +190,27 @@ func (m *UPolynomialManager) pendingSturmSourceCause() error {
 		return ErrUPolynomialCleanupPending
 	}
 	return nil
+}
+
+func (q *upolySequenceSturmScope) remainderTracePending() bool {
+	return q.remainderTrace.pending(q.owner.manager)
+}
+func (q *upolySequenceSturmScope) remainderTraceSourceCause() error {
+	return q.remainderTrace.sourceCause(q.owner.manager)
+}
+func (q *upolySequenceSturmScope) cleanupRemainderTrace(abort bool) error {
+	return q.remainderTrace.cleanup(q.owner.manager, abort)
+}
+func (q *upolySequenceSturmScope) traceRemainder(phase uint8, b UPolynomialView, r *upolyVectorState, bn *unumeral.Int) error {
+	m := q.owner.manager
+	if !m.config.Integer.BorrowTraceTags().ShouldTrace("rem_bug") {
+		return nil
+	}
+	if q.context().sequenceSturmFrame(m.config.Integer) != q || !q.scalar.constructed {
+		return ErrUPolynomialOwner
+	}
+	if q.remainderTracePending() {
+		return ErrUPolynomialCleanupPending
+	}
+	return q.remainderTrace.emit(m, phase, b, r, bn, &q.scalar.value)
 }

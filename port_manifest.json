@@ -48972,7 +48972,8 @@
         "pkg/math/polynomial/upolynomial_sequence_sturm_derivative.go",
         "pkg/math/polynomial/upolynomial_sequence_sturm_derivative_test.go",
         "pkg/math/polynomial/upolynomial_sequence_sturm_product_test.go",
-        "pkg/math/polynomial/upolynomial_mul_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_mul_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_sequence_sturm_remainder_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",

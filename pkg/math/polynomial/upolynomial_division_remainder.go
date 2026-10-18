@@ -76,10 +76,16 @@ func (m *UPolynomialManager) remStateWithSourceContext(a, b UPolynomialView, d *
 			if e = q.traceRemainder(0, b, r, bn); e != nil {
 				return e
 			}
+		} else if q := context.sequenceSturmFrame(m.config.Integer); q != nil {
+			if e = q.traceRemainder(0, b, r, bn); e != nil {
+				return e
+			}
 		}
 		n := r.size
 		if n < b.count {
 			if q := context.rootIDFrame(m.config.Integer); q != nil {
+				return q.traceRemainder(1, b, r, bn)
+			} else if q := context.sequenceSturmFrame(m.config.Integer); q != nil {
 				return q.traceRemainder(1, b, r, bn)
 			}
 			return nil
@@ -110,6 +116,10 @@ func (m *UPolynomialManager) remStateWithSourceContext(a, b UPolynomialView, d *
 				return e
 			}
 			if q := context.rootIDFrame(m.config.Integer); q != nil {
+				if e = q.traceRemainder(2, b, r, bn); e != nil {
+					return e
+				}
+			} else if q := context.sequenceSturmFrame(m.config.Integer); q != nil {
 				if e = q.traceRemainder(2, b, r, bn); e != nil {
 					return e
 				}

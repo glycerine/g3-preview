@@ -7,6 +7,7 @@ import (
 )
 
 type upolySequenceSturmScope struct {
+	remainderTrace                 upolySturmRemainderTrace
 	product                        unumeral.IntegerAddMulInvocationReceipt
 	derivative                     unumeral.Int
 	derivativeRetired              *upolySturmDerivativeRaw
@@ -292,7 +293,7 @@ func (q *upolySequenceSturmScope) unbindNumericOwners() error {
 
 func (q *upolySequenceSturmScope) pending() bool {
 	m := q.owner.manager
-	return m.config.Integer.MatchesAddMulInvocation(&q.product) || q.derivative.NativeCellToken() != 0 || q.derivativeRetired != nil || q.normalizePending() || q.remainderNumericPending() || q.live[0] || q.live[1] || m.config.Integer.MatchesCopyAllocationInvocation(&q.copy) || m.modular.MatchesPNormalizeInvocation(&q.normalize)
+	return q.remainderTracePending() || m.config.Integer.MatchesAddMulInvocation(&q.product) || q.derivative.NativeCellToken() != 0 || q.derivativeRetired != nil || q.normalizePending() || q.remainderNumericPending() || q.live[0] || q.live[1] || m.config.Integer.MatchesCopyAllocationInvocation(&q.copy) || m.modular.MatchesPNormalizeInvocation(&q.normalize)
 }
 
 // Source seq.push(m(),sz,p): preserve metadata/default construction before
