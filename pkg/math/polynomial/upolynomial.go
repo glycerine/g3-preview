@@ -30,6 +30,7 @@ type UPolynomialConfig struct {
 // are required, even though operations without a checkpoint do not call them.
 // Cold ownership and every actual typed backing are charged to Integer's budget.
 type UPolynomialManager struct {
+	refinable                               upolyRefinableScope
 	defaultNormalization                    upolyDefaultNormalizeScope
 	factorTrace                             *upolyFactorTraceBorrow
 	factorsDisplay, pendingFactorsDisplay   *upolyFactorsDisplayScope
@@ -165,6 +166,9 @@ func newUPolynomialManager(c UPolynomialConfig, store *UPolynomialCoefficientSto
 	return m, nil
 }
 func (m *UPolynomialManager) check() error {
+	if m != nil && m.self == m && m.refinable.active && (!m.refinable.executing || m.refinable.borrow.callback()) && !m.refinable.sourceReadAllowed() {
+		return ErrUPolynomialCleanupPending
+	}
 	if m != nil && m.self == m && m.defaultNormalization.active && (!m.defaultNormalization.executing || m.defaultNormalization.borrow.callback()) && !m.defaultNormalization.sourceExecuting {
 		return ErrUPolynomialCleanupPending
 	}
@@ -360,6 +364,11 @@ func (m *UPolynomialManager) closeWithHenselOwners(r *upolyHenselPairInvocationR
 	return m.closeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
+	if m != nil && m.refinable.active {
+		if e := m.CleanupRefinable(); e != nil {
+			return e
+		}
+	}
 	if m != nil && m.defaultNormalization.active {
 		if e := m.CleanupNormalization(); e != nil {
 			return e

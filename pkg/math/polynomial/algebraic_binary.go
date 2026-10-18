@@ -16,6 +16,7 @@ type algebraicSavedInterval struct {
 	owned, constructed, restored bool
 }
 type algebraicBinaryScope struct {
+	refinable                            upolyRefinableInvocationReceipt
 	polynomialCaller                     *polynomialAlgebraicEvaluationScope
 	p, f                                 UPolynomial
 	factors                              *UPolynomialFactors
@@ -130,6 +131,15 @@ func (m *AlgebraicRootCore) restoreBinaryInterval(saved *algebraicSavedInterval)
 
 func (m *AlgebraicRootCore) finishBinaryLocals() error {
 	s := &m.binary
+	p := m.config.Polynomials
+	if p.refinableReceiptPending(&s.refinable) {
+		if e := p.refinableReceiptSourceCause(&s.refinable); e != nil {
+			return e
+		}
+		// Only this actual parent's source unwind may read past an unjoined body child.
+		p.refinable.parentSourceExecuting = true
+		defer func() { p.refinable.parentSourceExecuting = false }()
+	}
 	if s.qConstructed {
 		if e := m.config.Rationals.Del(&s.localQ); e != nil {
 			return e
@@ -195,6 +205,9 @@ func (m *AlgebraicRootCore) cleanupBinary() error {
 	}
 	s.cleaning = true
 	defer func() { s.cleaning = false }()
+	if e := m.config.Polynomials.cleanupRefinableReceipt(&s.refinable); e != nil {
+		return e
+	}
 	if r := &s.factorReceipt; r.service != nil {
 		if e := r.service.cleanupFactorFrontendInvocation(r, false); e != nil {
 			return e
@@ -535,7 +548,7 @@ func (m *AlgebraicRootCore) setBinaryCore(out *Algebraic, seq *UPolynomialSequen
 	if e != nil {
 		return e
 	}
-	refinable, e := p.IsolatingToRefinable(v, bm, s.interval.BorrowLower(), s.interval.BorrowUpper())
+	refinable, e := p.isolatingToRefinableWithReceipt(v, bm, s.interval.BorrowLower(), s.interval.BorrowUpper(), &s.refinable)
 	if e != nil {
 		return e
 	}

@@ -7,6 +7,7 @@ import (
 )
 
 type algebraicIsolationConversionScope struct {
+	refinable       upolyRefinableInvocationReceipt
 	caller          *algebraicMultivariateIsolationFrame
 	factor          upolyFactorFrontendInvocationReceipt
 	receipt         polynomialFactorNumeralVectorReceipt
@@ -23,6 +24,9 @@ func (m *AlgebraicRootCore) cleanupIsolationConversionScope(s *algebraicIsolatio
 	}
 	if !s.active {
 		return nil
+	}
+	if e := m.config.Polynomials.cleanupRefinableReceipt(&s.refinable); e != nil {
+		return e
 	}
 	if r := &s.factor; r.service != nil {
 		if e := r.service.cleanupFactorFrontendInvocation(r, false); e != nil {

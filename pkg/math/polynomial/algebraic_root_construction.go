@@ -25,6 +25,11 @@ type algebraicRootConstructionScope struct {
 }
 
 func (s *algebraicRootConstructionScope) childSourceCause() error {
+	if s.owner != nil {
+		if e := s.owner.config.Polynomials.refinableReceiptSourceCause(&s.conversion.refinable); e != nil {
+			return e
+		}
+	}
 	if e := s.calls.childSourceCause(); e != nil {
 		return e
 	}

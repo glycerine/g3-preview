@@ -18,15 +18,27 @@ func (m *UPolynomialManager) isolationBinary(b *unumeral.BinaryRationalManager) 
 	return b.Open()
 }
 func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational) (bool, error) {
+	return m.isolatingToRefinableWithReceipt(v, bqm, a, b, nil)
+}
+func (m *UPolynomialManager) isolatingToRefinableWithReceipt(v UPolynomialView, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational, receipt *upolyRefinableInvocationReceipt) (result bool, cause error) {
 	if e := m.isolationBinary(bqm); e != nil {
 		return false, e
 	}
-	sa, e := m.EvalSignBinary(v, a)
+	q, e := m.beginRefinable(bqm, receipt)
 	if e != nil {
 		return false, e
 	}
-	sb, e := m.EvalSignBinary(v, b)
+	defer func() { cause = q.finish(cause) }()
+	ops := bqm.WithAllocationContext(unumeral.NumericAllocationContext{}.WithCaller(&q.hooks))
+	sa, e := q.eval(v, a)
 	if e != nil {
+		return false, e
+	}
+	sb, e := q.eval(v, b)
+	if e != nil {
+		return false, e
+	}
+	if e = q.traceSigns(sa, sb); e != nil {
 		return false, e
 	}
 	if sa != 0 && sb != 0 {
@@ -36,21 +48,23 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *unumer
 		return true, nil
 	}
 	if sa == 0 && sb != 0 {
-		var next unumeral.BinaryRational
-		defer bqm.Del(&next)
-		if e = bqm.Add(a, b, &next); e != nil {
+		next := q.construct()
+		if e = ops.AddSub(a, b, next, false); e != nil {
 			return false, e
 		}
-		if e = bqm.Div2(&next); e != nil {
+		if e = ops.Div2(next); e != nil {
 			return false, e
 		}
 		for {
-			sn, e := m.EvalSignBinary(v, &next)
+			if e = q.traceInterval(2615, [6]*unumeral.BinaryRational{a, b, next}); e != nil {
+				return false, e
+			}
+			sn, e := q.eval(v, next)
 			if e != nil {
 				return false, e
 			}
 			if sn != sb {
-				if e = bqm.Swap(&next, a); e != nil {
+				if e = bqm.Swap(next, a); e != nil {
 					return false, e
 				}
 				if e := m.refinableSignAssertion(2619, sn, sb); e != nil {
@@ -61,28 +75,30 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *unumer
 			if e := m.refinableSignAssertion(2624, sn, sb); e != nil {
 				return false, e
 			}
-			if e = bqm.Swap(b, &next); e != nil {
+			if e = bqm.Swap(b, next); e != nil {
 				return false, e
 			}
-			if e = bqm.Add(b, a, &next); e != nil {
+			if e = ops.AddSub(b, a, next, false); e != nil {
 				return false, e
 			}
-			if e = bqm.Div2(&next); e != nil {
+			if e = ops.Div2(next); e != nil {
 				return false, e
 			}
 		}
 	}
 	if sa != 0 && sb == 0 {
-		var next unumeral.BinaryRational
-		defer bqm.Del(&next)
-		if e = bqm.Add(a, b, &next); e != nil {
+		next := q.construct()
+		if e = ops.AddSub(a, b, next, false); e != nil {
 			return false, e
 		}
-		if e = bqm.Div2(&next); e != nil {
+		if e = ops.Div2(next); e != nil {
 			return false, e
 		}
 		for {
-			sn, e := m.EvalSignBinary(v, &next)
+			if e = q.traceInterval(2640, [6]*unumeral.BinaryRational{a, b, next}); e != nil {
+				return false, e
+			}
+			sn, e := q.eval(v, next)
 			if e != nil {
 				return false, e
 			}
@@ -91,9 +107,9 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *unumer
 					return false, e
 				}
 				if sn == 0 {
-					e = bqm.Swap(&next, a)
+					e = bqm.Swap(next, a)
 				} else {
-					e = bqm.Swap(&next, b)
+					e = bqm.Swap(next, b)
 				}
 				if e != nil {
 					return false, e
@@ -103,13 +119,13 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *unumer
 			if e := m.refinableSignAssertion(2652, sn, sa); e != nil {
 				return false, e
 			}
-			if e = bqm.Swap(a, &next); e != nil {
+			if e = bqm.Swap(a, next); e != nil {
 				return false, e
 			}
-			if e = bqm.Add(b, a, &next); e != nil {
+			if e = ops.AddSub(b, a, next, false); e != nil {
 				return false, e
 			}
-			if e = bqm.Div2(&next); e != nil {
+			if e = ops.Div2(next); e != nil {
 				return false, e
 			}
 		}
@@ -117,78 +133,77 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *unumer
 	if e := m.refinableSignAssertion(2661, sa, sb); e != nil {
 		return false, e
 	}
-	var b1, a2, newA, newB unumeral.BinaryRational
-	defer bqm.Del(&b1)
-	defer bqm.Del(&a2)
-	defer bqm.Del(&newA)
-	defer bqm.Del(&newB)
-	if e = bqm.Add(a, b, &b1); e != nil {
+	b1, a2, newA, newB := q.construct(), q.construct(), q.construct(), q.construct()
+	if e = ops.AddSub(a, b, b1, false); e != nil {
 		return false, e
 	}
-	if e = bqm.Div2(&b1); e != nil {
+	if e = ops.Div2(b1); e != nil {
 		return false, e
 	}
-	if e = bqm.Copy(&a2, &b1); e != nil {
+	if e = bqm.CopyWithAllocationReceipt(a2, b1, &q.copy); e != nil {
 		return false, e
 	}
-	s1, e := m.EvalSignBinary(v, &b1)
+	s1, e := q.eval(v, b1)
 	if e != nil {
 		return false, e
 	}
 	s2 := s1
 	if s1 == 0 {
-		if e = bqm.Swap(&b1, a); e != nil {
+		if e = bqm.Swap(b1, a); e != nil {
 			return false, e
 		}
 		return false, nil
 	}
-	if e = bqm.Add(a, &b1, &newA); e != nil {
+	if e = ops.AddSub(a, b1, newA, false); e != nil {
 		return false, e
 	}
-	if e = bqm.Div2(&newA); e != nil {
+	if e = ops.Div2(newA); e != nil {
 		return false, e
 	}
-	if e = bqm.Add(&a2, b, &newB); e != nil {
+	if e = ops.AddSub(a2, b, newB, false); e != nil {
 		return false, e
 	}
-	if e = bqm.Div2(&newB); e != nil {
+	if e = ops.Div2(newB); e != nil {
 		return false, e
 	}
 	for {
-		snA, e := m.EvalSignBinary(v, &newA)
+		if e = q.traceInterval(2693, [6]*unumeral.BinaryRational{a, b1, newA, a2, b, newB}); e != nil {
+			return false, e
+		}
+		snA, e := q.eval(v, newA)
 		if e != nil {
 			return false, e
 		}
 		if snA == 0 {
-			if e = bqm.Swap(&newA, a); e != nil {
+			if e = bqm.Swap(newA, a); e != nil {
 				return false, e
 			}
 			return false, nil
 		}
 		if snA == -s1 {
-			if e = bqm.Swap(&newA, a); e != nil {
+			if e = bqm.Swap(newA, a); e != nil {
 				return false, e
 			}
-			if e = bqm.Swap(&b1, b); e != nil {
+			if e = bqm.Swap(b1, b); e != nil {
 				return false, e
 			}
 			return true, nil
 		}
-		snB, e := m.EvalSignBinary(v, &newB)
+		snB, e := q.eval(v, newB)
 		if e != nil {
 			return false, e
 		}
 		if snB == 0 {
-			if e = bqm.Swap(&newB, a); e != nil {
+			if e = bqm.Swap(newB, a); e != nil {
 				return false, e
 			}
 			return false, nil
 		}
 		if snB == -s2 {
-			if e = bqm.Swap(&a2, a); e != nil {
+			if e = bqm.Swap(a2, a); e != nil {
 				return false, e
 			}
-			if e = bqm.Swap(&newB, b); e != nil {
+			if e = bqm.Swap(newB, b); e != nil {
 				return false, e
 			}
 			return true, nil
@@ -196,25 +211,25 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *unumer
 		if e := m.refinableSignAssertion(2727, snA, s1); e != nil {
 			return false, e
 		}
-		if e = bqm.Swap(&b1, &newA); e != nil {
+		if e = bqm.Swap(b1, newA); e != nil {
 			return false, e
 		}
-		if e = bqm.Add(&b1, a, &newA); e != nil {
+		if e = ops.AddSub(b1, a, newA, false); e != nil {
 			return false, e
 		}
-		if e = bqm.Div2(&newA); e != nil {
+		if e = ops.Div2(newA); e != nil {
 			return false, e
 		}
 		if e := m.refinableSignAssertion(2734, snB, s2); e != nil {
 			return false, e
 		}
-		if e = bqm.Swap(&a2, &newB); e != nil {
+		if e = bqm.Swap(a2, newB); e != nil {
 			return false, e
 		}
-		if e = bqm.Add(b, &a2, &newB); e != nil {
+		if e = ops.AddSub(b, a2, newB, false); e != nil {
 			return false, e
 		}
-		if e = bqm.Div2(&newB); e != nil {
+		if e = ops.Div2(newB); e != nil {
 			return false, e
 		}
 	}

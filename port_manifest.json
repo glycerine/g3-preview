@@ -50836,7 +50836,14 @@
         "pkg/math/polynomial/upolynomial_default_normalize_test.go",
         "pkg/math/polynomial/numeric_utility_aliases.go",
         "pkg/math/polynomial/integer_allocation_invocation_context.go",
-        "pkg/math/polynomial/upolynomial_berlekamp_numeric.go"
+        "pkg/math/polynomial/upolynomial_berlekamp_numeric.go",
+        "pkg/math/polynomial/upolynomial_refinable_scope.go",
+        "pkg/math/polynomial/upolynomial_refinable_trace_test.go",
+        "pkg/math/polynomial/algebraic_binary.go",
+        "pkg/math/polynomial/algebraic_isolation.go",
+        "pkg/math/polynomial/algebraic_isolation_polynomial.go",
+        "pkg/math/polynomial/algebraic_root.go",
+        "pkg/math/polynomial/algebraic_root_construction.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51189,7 +51196,11 @@
         "TestUPolynomialDefaultNormalizeActualReservationPrefixes",
         "TestUPolynomialDefaultNormalizeActualTraceReadStops",
         "TestUPolynomialDefaultNormalizeContextGenerationAndEarlyReturns",
-        "TestUPolynomialDefaultNormalizeEndedReceiptDoesNotOwnLater"
+        "TestUPolynomialDefaultNormalizeEndedReceiptDoesNotOwnLater",
+        "TestUPolynomialRefinableTraceSourceRecords",
+        "TestUPolynomialRefinableActualReservationPrefixes",
+        "TestUPolynomialRefinableTraceActualReadStops",
+        "TestUPolynomialRefinableTraceErasureAndEndedReceipt"
       ],
       "conditionals": [
         {
@@ -51778,6 +51789,31 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Isolating-to-refinable four trace records and actual lexical scope (upolynomial.cpp:2599-2744; mpbq.cpp:384-392)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_refinable_scope.go",
+            "pkg/math/polynomial/upolynomial_refinable_trace_test.go",
+            "pkg/math/polynomial/upolynomial_refinement.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_modes.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/upolynomial_hensel_physical_source_test.go",
+            "pkg/math/polynomial/algebraic_binary.go",
+            "pkg/math/polynomial/algebraic_isolation.go",
+            "pkg/math/polynomial/algebraic_isolation_polynomial.go",
+            "pkg/math/polynomial/algebraic_root.go",
+            "pkg/math/polynomial/algebraic_root_construction.go"
+          ],
+          "tests": [
+            "TestUPolynomialRefinableTraceSourceRecords",
+            "TestUPolynomialRefinableActualReservationPrefixes",
+            "TestUPolynomialRefinableTraceActualReadStops",
+            "TestUPolynomialRefinableTraceErasureAndEndedReceipt"
+          ],
+          "notes": "Entry signs and case2/case3/case4 interval traces retain actual source ordering. All binary to_string operands use actual tracked integer formatting then source denominator-power suffix in native Go strings. A concrete invocation holds exactly the reached one/four binary locals, actual binary-evaluation/copy/allocation/character children, reverse source NUM destruction and distinct owning cursors. Body-only children do not block older source destruction; actual child/destructor stops retain their source cause/count. Exact receipts connect algebraic isolation, conversion, root construction and binary selection callers; ended receipts do not acquire later invocations or independently reused formatter frames. Whole-record integer/binary/polynomial callback guards protect actual owners. A genuine scaled BIG two-step allocation campaign runs to success with independent endpoint oracle; unscaled case4 text/oracle covers all four iterations. Actual endpoint versus temporary read-guard failures prove distinct source suffixes, including sticky outer stream failure. Wider polynomial/algebraic numerical/source-lifetime audits remain partial."
+        },
         {
           "name": "Default normalization conditional diagnostic and actual lexical caller scope (upolynomial.cpp:366-401,391-393)",
           "status": "ported",
@@ -53387,7 +53423,14 @@
         "pkg/math/polynomial/numeric_utility_aliases.go",
         "pkg/math/polynomial/integer_allocation_invocation_context.go",
         "pkg/math/polynomial/upolynomial_hensel_physical_source_test.go",
-        "pkg/math/polynomial/upolynomial_berlekamp_numeric.go"
+        "pkg/math/polynomial/upolynomial_berlekamp_numeric.go",
+        "pkg/math/polynomial/upolynomial_refinable_scope.go",
+        "pkg/math/polynomial/upolynomial_refinable_trace_test.go",
+        "pkg/math/polynomial/algebraic_binary.go",
+        "pkg/math/polynomial/algebraic_isolation.go",
+        "pkg/math/polynomial/algebraic_isolation_polynomial.go",
+        "pkg/math/polynomial/algebraic_root.go",
+        "pkg/math/polynomial/algebraic_root_construction.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -53524,7 +53567,11 @@
         "TestUPolynomialDefaultNormalizeActualReservationPrefixes",
         "TestUPolynomialDefaultNormalizeActualTraceReadStops",
         "TestUPolynomialDefaultNormalizeContextGenerationAndEarlyReturns",
-        "TestUPolynomialDefaultNormalizeEndedReceiptDoesNotOwnLater"
+        "TestUPolynomialDefaultNormalizeEndedReceiptDoesNotOwnLater",
+        "TestUPolynomialRefinableTraceSourceRecords",
+        "TestUPolynomialRefinableActualReservationPrefixes",
+        "TestUPolynomialRefinableTraceActualReadStops",
+        "TestUPolynomialRefinableTraceErasureAndEndedReceipt"
       ],
       "conditionals": [
         {
@@ -53553,6 +53600,31 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Isolating-to-refinable four trace records and actual lexical scope (upolynomial.cpp:2599-2744; mpbq.cpp:384-392)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_refinable_scope.go",
+            "pkg/math/polynomial/upolynomial_refinable_trace_test.go",
+            "pkg/math/polynomial/upolynomial_refinement.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_modes.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/upolynomial_hensel_physical_source_test.go",
+            "pkg/math/polynomial/algebraic_binary.go",
+            "pkg/math/polynomial/algebraic_isolation.go",
+            "pkg/math/polynomial/algebraic_isolation_polynomial.go",
+            "pkg/math/polynomial/algebraic_root.go",
+            "pkg/math/polynomial/algebraic_root_construction.go"
+          ],
+          "tests": [
+            "TestUPolynomialRefinableTraceSourceRecords",
+            "TestUPolynomialRefinableActualReservationPrefixes",
+            "TestUPolynomialRefinableTraceActualReadStops",
+            "TestUPolynomialRefinableTraceErasureAndEndedReceipt"
+          ],
+          "notes": "Entry signs and case2/case3/case4 interval traces retain actual source ordering. All binary to_string operands use actual tracked integer formatting then source denominator-power suffix in native Go strings. A concrete invocation holds exactly the reached one/four binary locals, actual binary-evaluation/copy/allocation/character children, reverse source NUM destruction and distinct owning cursors. Body-only children do not block older source destruction; actual child/destructor stops retain their source cause/count. Exact receipts connect algebraic isolation, conversion, root construction and binary selection callers; ended receipts do not acquire later invocations or independently reused formatter frames. Whole-record integer/binary/polynomial callback guards protect actual owners. A genuine scaled BIG two-step allocation campaign runs to success with independent endpoint oracle; unscaled case4 text/oracle covers all four iterations. Actual endpoint versus temporary read-guard failures prove distinct source suffixes, including sticky outer stream failure. Wider polynomial/algebraic numerical/source-lifetime audits remain partial."
+        },
         {
           "name": "Default normalization conditional diagnostic and actual lexical caller scope (upolynomial.cpp:366-401,391-393)",
           "status": "ported",

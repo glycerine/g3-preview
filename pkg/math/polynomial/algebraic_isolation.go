@@ -209,8 +209,15 @@ func (m *AlgebraicRootCore) isolateRootsForPolynomial(v UPolynomialView, out *Al
 				return m.finishQ(arena.ErrBounds)
 			}
 			lo, hi := &m.lowers.state.values[j], &m.uppers.state.values[j]
-			irr, e := m.config.Polynomials.IsolatingToRefinable(f, m.config.Binary, lo, hi)
+			refinement := &m.isolateRefinable
+			if invocation != nil {
+				refinement = &invocation.refinable
+			}
+			irr, e := m.config.Polynomials.isolatingToRefinableWithReceipt(f, m.config.Binary, lo, hi, refinement)
 			if e != nil {
+				if stop := m.config.Polynomials.refinableReceiptSourceCause(refinement); stop != nil {
+					return errors.Join(e, stop)
+				}
 				return m.finishQ(e)
 			}
 			var a Algebraic
