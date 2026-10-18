@@ -50818,7 +50818,8 @@
         "pkg/math/polynomial/upolynomial_quadratic_scalar_trace_test.go",
         "pkg/util/numeral/mpzzp_string_source.go",
         "pkg/math/polynomial/upolynomial_factor_verbose.go",
-        "pkg/math/polynomial/upolynomial_factor_verbose_test.go"
+        "pkg/math/polynomial/upolynomial_factor_verbose_test.go",
+        "pkg/math/polynomial/upolynomial_normalization_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51140,7 +51141,13 @@
         "TestUPolynomialQuadraticScalarTraceActualReadStops",
         "TestUPolynomialFactorVerboseThresholdAndResult",
         "TestUPolynomialFactorVerboseUsesNumericFlags",
-        "TestUPolynomialFactorVerboseClosedFileAndFailedBody"
+        "TestUPolynomialFactorVerboseClosedFileAndFailedBody",
+        "TestUPolynomialDefaultNormalizationIdentityActions",
+        "TestUPolynomialDefaultNormalizationRuntimeOracle",
+        "TestUPolynomialNormalizationIdentityClosedAndErased",
+        "TestUPolynomialRootIDNormalizeTraceTextAndAssertionActions",
+        "TestUPolynomialSequenceSturmNormalizeTraceTextAndAssertionActions",
+        "TestUPolynomialSturmIsolationNormalizeTraceTextAndAssertionActions"
       ],
       "conditionals": [
         {
@@ -51729,6 +51736,24 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "General normalization DEBUG identity runtime actions (upolynomial.cpp:393)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_content.go",
+            "pkg/math/polynomial/upolynomial_root_id_normalize.go",
+            "pkg/math/polynomial/upolynomial_normalization_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialDefaultNormalizationIdentityActions",
+            "TestUPolynomialDefaultNormalizationRuntimeOracle",
+            "TestUPolynomialNormalizationIdentityClosedAndErased",
+            "TestUPolynomialRootIDNormalizeTraceTextAndAssertionActions",
+            "TestUPolynomialSequenceSturmNormalizeTraceTextAndAssertionActions",
+            "TestUPolynomialSturmIsolationNormalizeTraceTextAndAssertionActions"
+          ],
+          "notes": "General/default and frontend coefficient normalization now shares the existing root/Sturm runtime-gated identity assertion; failed actions additionally borrow the actual receiving manager. Actual DEBUG old-copy and product remain computed when runtime assertions are disabled; only equality predicate is erased. Qualified direct coefficient-helper adapter uses independent divisor2 on caller coefficient3, without altering scratch after GCD or claiming valid full normalization chooses inconsistent GCD: actual division publishes1 before T/C. Valid enabled/disabled [-6,0,12] normalizes to[-1,0,2]. Erased predicate skips nil operands and closed gate precedes valid equality. Default/frontend CTRACE391 and broader numerical lifetime audits remain open."
+        },
         {
           "name": "Public factor normal-return verbose distinct-factor summary (upolynomial.cpp:3113-3117; upolynomial.h:33)",
           "status": "ported",

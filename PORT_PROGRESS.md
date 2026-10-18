@@ -45961,3 +45961,12 @@ Tests cover levels999/1000/1001 with zero, constant7 and split x^2-1. Ten genuin
 
 Focused tests passed ordinary (0.006s) and checked/debug/trace (0.007s); broader affected factorization/frontend/GCD/Euclidean/CRA/content/storage/closed/basic/rational/raw-scalar/quadratic checks pass checked/debug/trace (31.674s). All commands remain on CPUs8–16. Wider polynomial numerical/source-lifetime completion audits remain open, followed by AST. No full native suite repeated within the hourly interval; completed9825 remains historical evidence with its recorded shared-worktree caveat.
 Final broader ordinary checks pass (21.158s); manifest validation passes.
+
+### General normalization DEBUG identity runtime actions
+
+Ported upolynomial.cpp:393 for general/default and actual frontend coefficient normalization by routing through the existing root/Sturm runtime-gated identity predicate. Failed actions now additionally borrow the actual receiving manager. Actual DEBUG old-coefficient copy and g*quotient product remain outside runtime erasure; disabled assertions skip only equality evaluation. No numerical scratch, source construction counters or quotas are rewritten.
+
+A qualified direct coefficient-helper adapter supplies independent divisor2 to coefficient3, without modifying scratch after a GCD or claiming full valid normalization selected an inconsistent GCD. Actual truncating division publishes1 before Throw/Continue; enabled/disabled valid whole normalization [-6,0,12] produces[-1,0,2]. Erased equality skips nil operands, while closed runtime rejects valid numerals before the predicate. Existing root-ID/sequence-Sturm/isolation normalization trace/action profiles remain green with receiver borrowing.
+
+Focused normalization/root/Sturm checks pass ordinary (0.026s) and checked/debug/trace (0.055s). Broader affected polynomial checks pass checked/debug/trace (34.682s); manifest validation passes. All commands stay on CPUs8–16. Default/frontend normalization CTRACE391 and wider numerical/source-lifetime completion audits remain open, followed by AST. No native full suite repeated yet within the hourly interval; completed9825 remains historical evidence with its recorded shared-worktree caveat.
+Final broader ordinary checks pass (20.738s).

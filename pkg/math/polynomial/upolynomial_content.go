@@ -303,13 +303,7 @@ func (m *UPolynomialManager) normalizeCoefficientWithSourceContext(v UPolynomial
 		if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Mul(g, x, tmp); e != nil {
 			return e
 		}
-		ok, e := m.modular.Equal(tmp, old)
-		if e != nil {
-			return e
-		}
-		if !ok {
-			return ErrUPolynomialAssertion
-		}
+		return m.normalizationCoefficientAssert(tmp, old)
 	}
 	return nil
 }

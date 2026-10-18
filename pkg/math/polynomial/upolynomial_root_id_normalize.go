@@ -154,7 +154,7 @@ func (m *UPolynomialManager) normalizationCoefficientAssert(tmp, old *unumeral.I
 		return e
 	}
 	if !equal {
-		return refinementSourceAssertionFailure(393, "tmp == old_p_i")
+		return m.scalarDivisionAssertionFailure(393, "tmp == old_p_i")
 	}
 	return nil
 }
