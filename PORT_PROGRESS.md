@@ -43995,3 +43995,26 @@ is a verified full-package limit. No fault horizon or source algorithm changed.
 All commands used CPUs8–16.
 Focused complete cache checks including the new ID-only regression pass ordinary
 (0.063s) and checked/debug/trace (0.026s); manifest validation and diff checks pass.
+
+Retained algebraic global-rational bound overloads are now implemented:
+GetLowerOwnedRational/GetUpperOwnedRational and both AtPrecision variants,
+matching cpp2998–3012/3025–3039. Consumers include api_arith.cpp:142/160 and
+purify_arith_tactic.cpp:471/472. The concrete dispatch reuses the existing
+raw/global local sequence: scoped raw result, distinct global rational
+construction, caller assignment, then reverse source destruction. These
+wrappers share CleanupToOwnedRational with the existing conversion wrapper.
+No any-valued numerical or callback adapter was introduced.
+
+Actual raw bound entry now carries invocation identity. Wrapper cleanup joins
+only the raw bound it entered; a refused call cannot acquire older work, and
+replacement calls do not grant cleanup authority. Bound wrappers also avoid
+claiming the separate raw ToRational copy receipt. Tests cover distinct global
+owners, strict sqrt(2) bounds including precision20, zero/basic precision,
+every global service reservation through success for big rational bounds,
+actual TLS power refusal with accepted-child cleanup/retry and unchanged caller
+output, and preservation of an independent older stopped raw conversion.
+The new manifest method remains partial: broader callback/destructor-stop and
+TRACE evidence is still needed. Whole polynomial and AST completion stays open.
+
+Focused bound/representation/global conversion checks pass ordinary (3.264s)
+and g3checked,g3debug,g3trace (0.161s), on CPUs8–16. No full-suite claim is made.

@@ -135,6 +135,7 @@ func (m *AlgebraicRootCore) copyBinaryBound(a *Algebraic, out *unumeral.BinaryRa
 }
 
 type algebraicBoundScope struct {
+	invocation uint64 // actual entered raw bound call; owning wrapper identity
 	refinement algebraicRefinementScope
 	conversion algebraicConversionScope
 	copy       unumeral.IntegerCopyAllocationReceipt
@@ -201,6 +202,10 @@ func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, 
 	s := &m.bounds
 	if s.remaining != 0 || m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&s.copy) || s.conversion.pending(m) || s.evaluationPending(m) || s.refinement.pending(m) {
 		return ErrAlgebraicPending
+	}
+	s.invocation++
+	if s.invocation == 0 {
+		s.invocation++
 	}
 	s.refinement.evaluation = upolyBinaryEvaluationInvocationReceipt{}
 	r := algebraicRecord{value: unumeral.NewRational()}
