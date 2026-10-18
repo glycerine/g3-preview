@@ -7,6 +7,7 @@ import (
 )
 
 type upolySequenceSturmScope struct {
+	product                        unumeral.IntegerAddMulInvocationReceipt
 	derivative                     unumeral.Int
 	derivativeRetired              *upolySturmDerivativeRaw
 	normalization                  upolySturmNormalizeScope
@@ -44,6 +45,9 @@ func (q *upolySequenceSturmScope) vector(which uint8) *upolyVectorState {
 func (q *upolySequenceSturmScope) finishVector(which uint8, cause error) error {
 	if q.bodyCause == nil {
 		q.bodyCause = cause
+	}
+	if q.childStop == nil {
+		q.childStop = q.owner.manager.config.Integer.AddMulInvocationSourceCause(&q.product)
 	}
 	if q.childStop == nil {
 		for i := len(q.raw) - 1; i >= 0; i-- {
@@ -153,7 +157,7 @@ func (s *UPolynomialSequence) buildSturm(a, b UPolynomialView, kind uint8) (caus
 		return e
 	}
 	if kind == 2 {
-		if e := m.mul(m.stateView(&q.prime), b, &q.prime); e != nil {
+		if e := m.mulWithSourceContext(m.stateView(&q.prime), b, &q.prime, &q.product, q.context()); e != nil {
 			return e
 		}
 	}
@@ -223,6 +227,9 @@ func (s *UPolynomialSequence) CleanupSturm() (cause error) {
 	}
 	defer func() { cause = errors.Join(cause, q.unbindNumericOwners()) }()
 	m := s.manager
+	if e := m.config.Integer.CleanupAddMulInvocation(&q.product, false); e != nil {
+		return e
+	}
 	if e := q.cleanupRemainderNumerics(); e != nil {
 		return e
 	}
@@ -250,6 +257,9 @@ func (s *UPolynomialSequence) CleanupSturm() (cause error) {
 		state.size = 0
 		m.freeBacking(state)
 		q.live[which] = false
+	}
+	if e := m.config.Integer.CleanupAddMulInvocation(&q.product, true); e != nil {
+		return e
 	}
 	q.active = false
 	q.releasePending()
@@ -282,7 +292,7 @@ func (q *upolySequenceSturmScope) unbindNumericOwners() error {
 
 func (q *upolySequenceSturmScope) pending() bool {
 	m := q.owner.manager
-	return q.derivative.NativeCellToken() != 0 || q.derivativeRetired != nil || q.normalizePending() || q.remainderNumericPending() || q.live[0] || q.live[1] || m.config.Integer.MatchesCopyAllocationInvocation(&q.copy) || m.modular.MatchesPNormalizeInvocation(&q.normalize)
+	return m.config.Integer.MatchesAddMulInvocation(&q.product) || q.derivative.NativeCellToken() != 0 || q.derivativeRetired != nil || q.normalizePending() || q.remainderNumericPending() || q.live[0] || q.live[1] || m.config.Integer.MatchesCopyAllocationInvocation(&q.copy) || m.modular.MatchesPNormalizeInvocation(&q.normalize)
 }
 
 // Source seq.push(m(),sz,p): preserve metadata/default construction before

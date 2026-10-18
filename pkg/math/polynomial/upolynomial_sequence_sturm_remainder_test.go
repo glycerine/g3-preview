@@ -107,7 +107,7 @@ func TestUPolynomialSequenceSturmNumericContextRejectsCheckpointAndRetirement(t 
 		used := z.Budget().Used()
 		var untouched upolyVectorState
 		d := uint32(77)
-		for _, e := range []error{m.setViewWithSourceContext(&untouched, v, context), m.derivativeStateWithSourceContext(v, &untouched, context), m.remStateWithSourceContext(v, v, &d, &untouched, context), m.signedRemStateWithSourceContext(v, v, &untouched, context)} {
+		for _, e := range []error{m.setViewWithSourceContext(&untouched, v, context), m.derivativeStateWithSourceContext(v, &untouched, context), m.mulWithSourceContext(v, v, &untouched, nil, context), m.remStateWithSourceContext(v, v, &d, &untouched, context), m.signedRemStateWithSourceContext(v, v, &untouched, context)} {
 			if !errors.Is(e, ErrUPolynomialOwner) {
 				t.Fatal("checkpoint acquired numeric context before native storage", e)
 			}

@@ -226,6 +226,9 @@ func (m *UPolynomialManager) mulWithHensel(a, b UPolynomialView, out *upolyVecto
 	return m.mulWithSourceContext(a, b, out, henselAddMulChild(receipt), context)
 }
 func (m *UPolynomialManager) mulWithSourceContext(a, b UPolynomialView, out *upolyVectorState, child *unumeral.IntegerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
+	if context.sequenceSturm != nil && context.sequenceSturmFrame(m.config.Integer) == nil {
+		return ErrUPolynomialOwner
+	}
 
 	s := &m.basic
 	if polynomialSourceDebug && (m.alias(a, s) || m.alias(b, s)) {
