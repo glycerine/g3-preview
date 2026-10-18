@@ -53191,7 +53191,9 @@
         "pkg/math/polynomial/upolynomial_factor_remainder_assertions_test.go",
         "pkg/math/polynomial/upolynomial_berlekamp_constructor_trace_test.go",
         "pkg/math/polynomial/upolynomial_berlekamp_cleanup.go",
-        "pkg/math/polynomial/upolynomial_berlekamp_destructor_test.go"
+        "pkg/math/polynomial/upolynomial_berlekamp_destructor_test.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_scoped_numeral.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_scoped_numeral_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53349,7 +53351,8 @@
         "TestUPolynomialBerlekampConstructorTraceExactDisplayRefusal",
         "TestUPolynomialBerlekampDestructorRetainsAscendingGuardPrefix",
         "TestUPolynomialBerlekampDestructorCompleteThenReuse",
-        "TestUPolynomialBerlekampFailedConstructorHasOnlyOwningMemberAbort"
+        "TestUPolynomialBerlekampFailedConstructorHasOnlyOwningMemberAbort",
+        "TestUPolynomialBerlekampScopedNumeralDestructorRefusal"
       ],
       "conditionals": [
         {
@@ -53462,6 +53465,20 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Constructor tmp and diagonalization multiplier scoped NUM destructor frontiers (upolynomial_factorization.cpp:110,160)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_field.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_scoped_numeral.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_scoped_numeral_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialBerlekampScopedNumeralDestructorRefusal",
+            "TestUPolynomialBerlekampDisplayActualMatrixRows"
+          ],
+          "notes": "Actual tmp and multiplier numerals live in concrete retained matrix fields instead of disappearing behind ignored deferred Del errors. Their source NUM destructors run after the reached final TRACE and report errors joined with the body. Constructor completion is published only after tmp destruction succeeds. A stopped NUM retains the exact matrix/core owner before any older matrix member deletion; further null-vector/trace work refuses. Source destructor execution borrows the real numeric owner. Owning cleanup destroys the retained multiplier then constructor tmp before member coefficients, using independent owning completion and preserving the source cause/frontier. Ordinary finite-field tests verify successful NUM source destruction, unchanged actual matrices/rank and no owning-abort substitution. Qualified BIG tests use integer-mode actual constructor/diagonalization execution, a fresh direct uninitialized-capacity query backing, and restoration of genuine backing before owning cleanup. The diagonal BIG route explicitly chooses DEBUG Continue at integer-mode inv UNREACHABLE (which performs no inversion); it is not release or valid finite-field factorization evidence. Broader scalar arithmetic RAW/normalization invocation ownership remains partial."
+        },
         {
           "name": "Berlekamp ascending matrix destructor prefix and exact retained owning cleanup (upolynomial_factorization.cpp:148-152)",
           "status": "ported",

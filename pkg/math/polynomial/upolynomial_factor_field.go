@@ -63,6 +63,7 @@ type upolyBerlekampMatrix struct {
 	ownIndex                             uint32
 	ownStarted                           bool
 	closeCause                           error
+	constructorTemp, diagonalTemp        upolyBerlekampScopedNumeral
 	traceBorrow                          upolyFactorTraceBorrow
 	entryTrace                           upolyDisplayInvocationReceipt
 	m                                    *UPolynomialManager
@@ -92,6 +93,14 @@ func (q *upolyBerlekampMatrix) closeSource() error {
 	}
 	if q.m.displayReceiptPending(&q.entryTrace) {
 		return ErrUPolynomialCleanupPending
+	}
+	for _, local := range []*upolyBerlekampScopedNumeral{&q.diagonalTemp, &q.constructorTemp} {
+		if local.declared && !local.sourceEnded && !local.ownEnded {
+			if local.cause != nil {
+				return local.cause
+			}
+			return ErrUPolynomialCleanupPending
+		}
 	}
 	if q.values.backing == 0 && q.column == nil && q.row == nil {
 		return nil
@@ -131,6 +140,14 @@ func (q *upolyBerlekampMatrix) releaseMembers() {
 // Owning cleanup does not retry a stopped source capacity read. It uses only
 // the remaining concrete member values, preserving the original source cause.
 func (q *upolyBerlekampMatrix) closeOwnedMembers() error {
+	for _, local := range []*upolyBerlekampScopedNumeral{&q.diagonalTemp, &q.constructorTemp} {
+		if local.declared && !local.sourceEnded && !local.ownEnded {
+			if e := q.m.config.Integer.CleanupRawNumeral(&local.value); e != nil {
+				return e
+			}
+			local.ownEnded = true
+		}
+	}
 	if !q.ownStarted {
 		q.ownIndex, q.ownStarted = q.deleteIndex, true
 	}
@@ -171,7 +188,7 @@ func (q *upolyBerlekampMatrix) getSource(i, j uint32, line int32) (*unumeral.Int
 	}
 	return q.m.read(q.m.stateView(&q.values), uint32(index))
 }
-func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) error {
+func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) (cause error) {
 	if m != nil && m.pendingBerlekamp != nil {
 		return ErrUPolynomialCleanupPending
 	}
@@ -183,6 +200,7 @@ func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) er
 	}
 	q.deleteIndex, q.closeCause, q.sourceGuard, q.constructed = 0, nil, false, false
 	q.ownIndex, q.ownStarted = 0, false
+	q.constructorTemp, q.diagonalTemp = upolyBerlekampScopedNumeral{}, upolyBerlekampScopedNumeral{}
 	q.m = m
 	q.size = upolyViewDegree(f)
 	q.nullRow = 1
@@ -211,8 +229,12 @@ func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) er
 			return e
 		}
 	}
-	var tmp unumeral.Int
-	defer m.modular.Del(&tmp)
+	q.constructorTemp.declared = true
+	tmp := &q.constructorTemp.value
+	defer func() {
+		cause = q.finishScopedNumeral(&q.constructorTemp, cause)
+		q.constructed = cause == nil
+	}()
 	row, previous := uint32(0), uint32(0)
 	for k := uint32(1); ; k++ {
 		if p == 0 {
@@ -233,7 +255,7 @@ func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) er
 		if e != nil {
 			return e
 		}
-		if e = m.modular.Copy(&tmp, top); e != nil {
+		if e = m.modular.Copy(tmp, top); e != nil {
 			return e
 		}
 		for j := n - 1; j > 0; j-- {
@@ -249,7 +271,7 @@ func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) er
 			if e != nil {
 				return e
 			}
-			if e = m.modular.SubMul(old, &tmp, fj, out); e != nil {
+			if e = m.modular.SubMul(old, tmp, fj, out); e != nil {
 				return e
 			}
 		}
@@ -261,7 +283,7 @@ func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) er
 		if e != nil {
 			return e
 		}
-		if e = m.modular.Mul(f0, &tmp, out); e != nil {
+		if e = m.modular.Mul(f0, tmp, out); e != nil {
 			return e
 		}
 		if e = m.modular.Neg(out); e != nil {
@@ -284,16 +306,19 @@ func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) er
 	if e := q.traceMatrix(142); e != nil {
 		return e
 	}
-	q.constructed = true
 	return nil
 }
-func (q *upolyBerlekampMatrix) diagonalize() (uint32, error) {
+func (q *upolyBerlekampMatrix) diagonalize() (answer uint32, cause error) {
 	if q.displaying || q.m != nil && q.m.displayReceiptPending(&q.entryTrace) {
 		return 0, ErrUPolynomialCleanupPending
 	}
+	if q.m.pendingBerlekamp != nil {
+		return 0, ErrUPolynomialCleanupPending
+	}
 	m := q.m
-	var multiplier unumeral.Int
-	defer m.modular.Del(&multiplier)
+	q.diagonalTemp = upolyBerlekampScopedNumeral{declared: true}
+	multiplier := &q.diagonalTemp.value
+	defer func() { cause = q.finishScopedNumeral(&q.diagonalTemp, cause) }()
 	nullRank := uint32(0)
 	for i := uint32(0); i < q.size; i++ {
 		found := false
@@ -315,13 +340,13 @@ func (q *upolyBerlekampMatrix) diagonalize() (uint32, error) {
 			found = true
 			q.column[j] = int32(i)
 			q.row[i] = int32(j)
-			if e = m.modular.Copy(&multiplier, a); e != nil {
+			if e = m.modular.Copy(multiplier, a); e != nil {
 				return 0, e
 			}
-			if e = m.modular.Inv(&multiplier); e != nil {
+			if e = m.modular.Inv(multiplier); e != nil {
 				return 0, e
 			}
-			if e = m.modular.Neg(&multiplier); e != nil {
+			if e = m.modular.Neg(multiplier); e != nil {
 				return 0, e
 			}
 			for k := q.nullRow; k < q.size; k++ {
@@ -329,7 +354,7 @@ func (q *upolyBerlekampMatrix) diagonalize() (uint32, error) {
 				if e != nil {
 					return 0, e
 				}
-				if e = m.modular.Mul(a, &multiplier, a); e != nil {
+				if e = m.modular.Mul(a, multiplier, a); e != nil {
 					return 0, e
 				}
 			}
@@ -341,7 +366,7 @@ func (q *upolyBerlekampMatrix) diagonalize() (uint32, error) {
 				if e != nil {
 					return 0, e
 				}
-				if e = m.modular.Copy(&multiplier, a); e != nil {
+				if e = m.modular.Copy(multiplier, a); e != nil {
 					return 0, e
 				}
 				for k := q.nullRow; k < q.size; k++ {
@@ -353,7 +378,7 @@ func (q *upolyBerlekampMatrix) diagonalize() (uint32, error) {
 					if e != nil {
 						return 0, e
 					}
-					if e = m.modular.AddMul(a, &multiplier, pivot, a); e != nil {
+					if e = m.modular.AddMul(a, multiplier, pivot, a); e != nil {
 						return 0, e
 					}
 				}
@@ -369,6 +394,9 @@ func (q *upolyBerlekampMatrix) diagonalize() (uint32, error) {
 	return nullRank, nil
 }
 func (q *upolyBerlekampMatrix) next(v *upolyVectorState) (bool, error) {
+	if q.m != nil && q.m.pendingBerlekamp != nil {
+		return false, ErrUPolynomialCleanupPending
+	}
 	if q.displaying || q.m != nil && q.m.displayReceiptPending(&q.entryTrace) {
 		return false, ErrUPolynomialCleanupPending
 	}

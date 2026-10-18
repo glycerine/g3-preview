@@ -37,6 +37,9 @@ func (q *upolyBerlekampMatrix) display(out io.Writer) error {
 // Complete source records at142 and198. The borrow spans header/body/footer,
 // including source row flushes, while constructor/diagonalization NUMs live.
 func (q *upolyBerlekampMatrix) traceMatrix(line int) error {
+	if q.m != nil && q.m.pendingBerlekamp != nil {
+		return ErrUPolynomialCleanupPending
+	}
 	tags := q.m.modular.BorrowTraceTags()
 	if !tags.ShouldTrace("polynomial::factorization::bughunt") {
 		return nil

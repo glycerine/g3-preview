@@ -25,6 +25,9 @@ func TestUPolynomialBerlekampDisplayActualMatrixRows(t *testing.T) {
 	q := upolyBerlekampMatrix{m: m}
 	t.Cleanup(q.close)
 	serviceMust(t, q.init(m, mustUPolyView(t, m, f)))
+	if !q.constructorTemp.declared || !q.constructorTemp.sourceEnded || q.constructorTemp.ownEnded || q.constructorTemp.value.Cell != 0 || !q.constructed {
+		t.Fatal("actual constructor NUM source destruction", q.constructorTemp)
+	}
 	if q.size != 2 || q.values.size != 5 {
 		t.Fatal("actual source matrix dimensions", q.size, q.values.size)
 	}
@@ -41,6 +44,9 @@ func TestUPolynomialBerlekampDisplayActualMatrixRows(t *testing.T) {
 	serviceMust(t, e)
 	if rank != 1 {
 		t.Fatal("actual null rank", rank)
+	}
+	if !q.diagonalTemp.declared || !q.diagonalTemp.sourceEnded || q.diagonalTemp.ownEnded || q.diagonalTemp.value.Cell != 0 {
+		t.Fatal("actual multiplier NUM source destruction", q.diagonalTemp)
 	}
 	w = berlekampDisplaySink{}
 	serviceMust(t, q.display(&w))

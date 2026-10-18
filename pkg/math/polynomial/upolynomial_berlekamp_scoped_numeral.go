@@ -1,0 +1,43 @@
+package polynomial
+
+import (
+	"errors"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+)
+
+// The actual scoped_numeral at factorization.cpp:110 or :160. Source
+// destruction and separate owning cleanup retain independent completion.
+type upolyBerlekampScopedNumeral struct {
+	value                           unumeral.Int
+	declared, sourceEnded, ownEnded bool
+	cause                           error
+}
+
+func (q *upolyBerlekampMatrix) finishScopedNumeral(local *upolyBerlekampScopedNumeral, body error) error {
+	if !local.declared || local.sourceEnded {
+		return body
+	}
+	if local.cause != nil {
+		return errors.Join(body, local.cause)
+	}
+	q.destroying = true
+	defer func() { q.destroying = false }()
+	var borrow upolyFactorTraceBorrow
+	e := borrow.bindManagers([3]*UPolynomialManager{q.m}, q.m.modular.BorrowTraceTags())
+	if e == nil {
+		defer borrow.unbind()
+		_, e = upolynomialSourceNumeralDel(q.m.config.Integer, &local.value)
+	}
+	if e == nil {
+		local.sourceEnded = true
+		return body
+	}
+	local.cause = e
+	if q.closeCause == nil {
+		q.closeCause = e
+	}
+	if q.m.pendingBerlekamp == nil || q.m.pendingBerlekamp == q {
+		q.m.pendingBerlekamp = q
+	}
+	return errors.Join(body, e)
+}
