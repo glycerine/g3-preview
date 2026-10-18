@@ -43,7 +43,7 @@ func (m *UPolynomialManager) refinementSourceSignAssert(v UPolynomialView, b *un
 		return e
 	}
 	if sign != want {
-		return refinementSourceAssertionFailure(line, expression)
+		return m.scalarDivisionAssertionFailure(line, expression)
 	}
 	return nil
 }

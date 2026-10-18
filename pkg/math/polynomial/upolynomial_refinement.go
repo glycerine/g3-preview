@@ -619,24 +619,19 @@ func (m *UPolynomialManager) NormalizeIntervalCore(v UPolynomialView, sa int, bq
 		if e != nil {
 			return false, e
 		}
-	} else if polynomialSourceDebug {
-		s, e := m.EvalSignBinary(v, a)
-		if e != nil {
+	} else {
+		if e := m.refinementSourceSignAssert(v, a, sa, 2926, "sign_a == eval_sign_at(sz, p, a)", nil); e != nil {
 			return false, e
 		}
-		if s != sa {
-			return false, ErrUPolynomialAssertion
-		}
 	}
-	if polynomialSourceDebug {
-		sb, e := m.EvalSignBinary(v, b)
-		if e != nil {
-			return false, e
-		}
-		if -sa != sb || sa == 0 || sb == 0 {
-			return false, ErrUPolynomialAssertion
-		}
+	sb := -sa
+	if e := m.refinementSourceSignAssert(v, b, sb, 2930, "sign_b == eval_sign_at(sz, p, b)", nil); e != nil {
+		return false, e
 	}
+	if e := m.normalizeIntervalNonzeroAssertion(sa, sb); e != nil {
+		return false, e
+	}
+
 	zero, e := m.HasZeroRoots(v)
 	if e != nil {
 		return false, e
@@ -656,19 +651,10 @@ func (m *UPolynomialManager) NormalizeIntervalCore(v UPolynomialView, sa int, bq
 	if e != nil {
 		return false, e
 	}
-	if polynomialSourceDebug {
-		sa, e = m.EvalSignBinary(v, a)
-		if e != nil {
-			return false, e
-		}
-		sb, e := m.EvalSignBinary(v, b)
-		if e != nil {
-			return false, e
-		}
-		if sa != -sb {
-			return false, ErrUPolynomialAssertion
-		}
+	if e := m.normalizeIntervalFinalSignAssertion(v, a, b); e != nil {
+		return false, e
 	}
+
 	return true, nil
 }
 func (m *UPolynomialManager) NormalizeInterval(v UPolynomialView, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational) (bool, error) {

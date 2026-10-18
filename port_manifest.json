@@ -50827,7 +50827,9 @@
         "pkg/math/polynomial/upolynomial_convert_bound_assertions.go",
         "pkg/math/polynomial/upolynomial_convert_bound_assertions_test.go",
         "pkg/math/polynomial/upolynomial_convert_final_assertions.go",
-        "pkg/math/polynomial/upolynomial_convert_final_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_convert_final_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_normalize_interval_assertions.go",
+        "pkg/math/polynomial/upolynomial_normalize_interval_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51167,7 +51169,11 @@
         "TestUPolynomialConvertBoundPredicateErasure",
         "TestUPolynomialConvertFinalAssertionActions",
         "TestUPolynomialConvertFinalPredicateErasure",
-        "TestUPolynomialConvertFinalAliasedSourceActions"
+        "TestUPolynomialConvertFinalAliasedSourceActions",
+        "TestUPolynomialNormalizeIntervalSeparateActions",
+        "TestUPolynomialNormalizeIntervalRuntimeOracles",
+        "TestUPolynomialNormalizeIntervalErasureAndEarlyReturn",
+        "TestUPolynomialNormalizeIntervalNonzeroAction"
       ],
       "conditionals": [
         {
@@ -51756,6 +51762,23 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Interval normalization separate runtime assertion actions (upolynomial.cpp:2926,2930-2931,2942)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_refinement.go",
+            "pkg/math/polynomial/upolynomial_refinement_assertions.go",
+            "pkg/math/polynomial/upolynomial_normalize_interval_assertions.go",
+            "pkg/math/polynomial/upolynomial_normalize_interval_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialNormalizeIntervalSeparateActions",
+            "TestUPolynomialNormalizeIntervalRuntimeOracles",
+            "TestUPolynomialNormalizeIntervalErasureAndEarlyReturn",
+            "TestUPolynomialNormalizeIntervalNonzeroAction"
+          ],
+          "notes": "Preserves non-straddling and zero-root early returns. Actual supplied/opposite sign evaluations and final two endpoint evaluations execute only inside their runtime gates. Failed actions borrow the receiving manager. Independently supplied wrong/zero signs reach distinct T/CT/CCT/CCC public source actions without rewriting evaluator results; invalid-sign Continue returns are not valid bracket claims. Enabled/disabled exact x-1, x and x+1 interval oracles verify endpoint reset order. Shared refinement sign assertion failures now borrow their actual receiving manager. Numerical/source-lifetime and trace audits remain partial."
+        },
         {
           "name": "Remaining rational-to-binary interval runtime assertion actions (upolynomial.cpp:2864,2879,2887-2888,2892-2894,2912-2915)",
           "status": "ported",
