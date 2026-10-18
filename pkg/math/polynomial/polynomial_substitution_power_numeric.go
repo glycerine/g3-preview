@@ -12,7 +12,7 @@ type polynomialSubstitutionPowerNumeric struct {
 
 func (s *polynomialSubstitutionPowerNumeric) NumericBound(executing bool) bool {
 	m := s.owner
-	return m != nil && m.self == m && s == &m.substitution.scope.powerNumeric && (!executing || m.substitution.scope.executing)
+	return m != nil && m.self == m && s == &m.substitution.scope.powerNumeric && m.substitution.scope.invocation != 0 && s.hooks.Generation == m.substitution.scope.invocation && (!executing || m.substitution.scope.executing)
 }
 func (s *polynomialSubstitutionPowerNumeric) NumericRoots(z *unumeral.IntegerManager, local *unumeral.NumericAllocationRoots) *unumeral.NumericAllocationRoots {
 	if !s.NumericBound(true) || s.owner.integer != z {

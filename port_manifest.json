@@ -40325,7 +40325,8 @@
         "pkg/math/polynomial/polynomial_glex_monic_invocation.go",
         "pkg/math/polynomial/polynomial_gcd_scale_receipt_test.go",
         "pkg/math/polynomial/polynomial_substitution_invocation.go",
-        "pkg/math/polynomial/polynomial_substitution_invocation_test.go"
+        "pkg/math/polynomial/polynomial_substitution_invocation_test.go",
+        "pkg/math/polynomial/polynomial_substitution_numeric_epoch_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -41195,7 +41196,8 @@
         "TestPolynomialGCDCleanupPreservesIndependentLazard",
         "TestPolynomialGCDIndependentLazardReservationPrefixes",
         "TestPolynomialGCDContentScaleReceiptReservationPrefixes",
-        "TestPolynomialSubstitutionInvocationReservationPrefixes"
+        "TestPolynomialSubstitutionInvocationReservationPrefixes",
+        "TestPolynomialSubstitutionNumericContextRejectsReplacementEpoch"
       ],
       "conditionals": [
         {
@@ -42452,6 +42454,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Substitution modular-power numeric hooks carry the actual substitution invocation generation; a context captured through a real rational-map callback cannot acquire a replacement body",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_substitution_power_numeric.go",
+          "tests": [
+            "TestPolynomialSubstitutionNumericContextRejectsReplacementEpoch"
+          ]
+        },
         {
           "name": "Recursive GCD integer substitutions retain only the accepted core/frame/invocation; completed-local owning cleanup precedes separate construction abort; copied, refused and stale receipts grant no cleanup authority",
           "status": "partial",
@@ -45818,7 +45828,8 @@
         "pkg/math/polynomial/polynomial_glex_monic_invocation.go",
         "pkg/math/polynomial/polynomial_gcd_scale_receipt_test.go",
         "pkg/math/polynomial/polynomial_substitution_invocation.go",
-        "pkg/math/polynomial/polynomial_substitution_invocation_test.go"
+        "pkg/math/polynomial/polynomial_substitution_invocation_test.go",
+        "pkg/math/polynomial/polynomial_substitution_numeric_epoch_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -46423,7 +46434,8 @@
         "TestPolynomialGCDCleanupPreservesIndependentLazard",
         "TestPolynomialGCDIndependentLazardReservationPrefixes",
         "TestPolynomialGCDContentScaleReceiptReservationPrefixes",
-        "TestPolynomialSubstitutionInvocationReservationPrefixes"
+        "TestPolynomialSubstitutionInvocationReservationPrefixes",
+        "TestPolynomialSubstitutionNumericContextRejectsReplacementEpoch"
       ],
       "conditionals": [
         {
@@ -46452,6 +46464,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Substitution modular-power numeric hooks carry the actual substitution invocation generation; a context captured through a real rational-map callback cannot acquire a replacement body",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_substitution_power_numeric.go",
+          "tests": [
+            "TestPolynomialSubstitutionNumericContextRejectsReplacementEpoch"
+          ]
+        },
         {
           "name": "Recursive GCD integer substitutions retain only the accepted core/frame/invocation; completed-local owning cleanup precedes separate construction abort; copied, refused and stale receipts grant no cleanup authority",
           "status": "partial",

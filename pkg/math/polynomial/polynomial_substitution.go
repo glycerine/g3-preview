@@ -301,6 +301,7 @@ func (m *MultivariatePolynomialCore) substitutionModularPower(a *unumeral.Int, k
 	before := m.modular.PowerPending
 	numeric := &m.substitution.scope.powerNumeric
 	numeric.owner = m
+	numeric.hooks.Generation = m.substitution.scope.invocation
 	numeric.hooks.Policy = numeric
 	context := unumeral.NumericAllocationContext{}.WithCaller(&numeric.hooks)
 	e := m.modular.WithAllocationContext(context).Power(a, k, out)
