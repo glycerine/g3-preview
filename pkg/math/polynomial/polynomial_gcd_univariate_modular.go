@@ -71,7 +71,7 @@ func (m *MultivariatePolynomialManager) uniModImage(s *polynomialGCDFunctionScop
 	if e != nil {
 		return false, e
 	}
-	q, e = c.Scale(&s.nums[8], unit, s.refs[5].root.value)
+	q, e = c.scaleWithReceipt(&s.nums[8], unit, s.refs[5].root.value, &s.directArithmetic)
 	if e != nil {
 		return false, e
 	}
@@ -315,7 +315,7 @@ func (m *MultivariatePolynomialManager) uniModGCD(u, v Polynomial, r *polynomial
 			if e != nil {
 				return e
 			}
-			result, e := c.Scale(&s.nums[2], unit, s.refs[6].root.value)
+			result, e := c.scaleWithReceipt(&s.nums[2], unit, s.refs[6].root.value, &s.directArithmetic)
 			if e != nil {
 				return e
 			}

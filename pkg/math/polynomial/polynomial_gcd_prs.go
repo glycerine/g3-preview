@@ -66,7 +66,7 @@ func (m *MultivariatePolynomialManager) gcdContent(u Polynomial, x uint32, v Pol
 	if e != nil {
 		return e
 	}
-	q, e := c.Scale(&s.nums[0], unit, s.refs[0].root.value)
+	q, e := c.scaleWithReceipt(&s.nums[0], unit, s.refs[0].root.value, &s.directArithmetic)
 	if e != nil {
 		return e
 	}
@@ -204,7 +204,7 @@ func (m *MultivariatePolynomialManager) gcdPRS(u, v Polynomial, x uint32, r *pol
 			if e != nil {
 				return e
 			}
-			q, e := c.Scale(&s.nums[2], unit, dr.value)
+			q, e := c.scaleWithReceipt(&s.nums[2], unit, dr.value, &s.directArithmetic)
 			if e != nil {
 				return e
 			}

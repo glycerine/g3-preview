@@ -181,7 +181,7 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 		if e != nil {
 			return e
 		}
-		a, e = c.Scale(&s.nums[4], unit, q.value)
+		a, e = c.scaleWithReceipt(&s.nums[4], unit, q.value, &s.directArithmetic)
 		if e != nil {
 			return e
 		}
@@ -336,7 +336,7 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 				if e != nil {
 					return e
 				}
-				a, e = c.Scale(&s.nums[2], unit, r.value)
+				a, e = c.scaleWithReceipt(&s.nums[2], unit, r.value, &s.directArithmetic)
 				if e != nil {
 					return e
 				}
@@ -352,7 +352,7 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 				if e != nil {
 					return e
 				}
-				a, e = c.Scale(&s.nums[2], unit, r.value)
+				a, e = c.scaleWithReceipt(&s.nums[2], unit, r.value, &s.directArithmetic)
 				if e != nil {
 					return e
 				}

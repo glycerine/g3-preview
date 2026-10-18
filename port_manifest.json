@@ -40322,7 +40322,8 @@
         "pkg/math/polynomial/polynomial_gcd_zpx_receipt_test.go",
         "pkg/math/polynomial/polynomial_gcd_zpx_created.go",
         "pkg/math/polynomial/polynomial_gcd_independent_scope_test.go",
-        "pkg/math/polynomial/polynomial_glex_monic_invocation.go"
+        "pkg/math/polynomial/polynomial_glex_monic_invocation.go",
+        "pkg/math/polynomial/polynomial_gcd_scale_receipt_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -41190,7 +41191,8 @@
         "TestPolynomialCRAIndependentLazardReservationPrefixes",
         "TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes",
         "TestPolynomialGCDCleanupPreservesIndependentLazard",
-        "TestPolynomialGCDIndependentLazardReservationPrefixes"
+        "TestPolynomialGCDIndependentLazardReservationPrefixes",
+        "TestPolynomialGCDContentScaleReceiptReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -42447,6 +42449,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Nine reached GCD content/PRS/modular/univariate/recursive Scale calls pass concrete arithmetic receipts to the existing scaling engine; source-specific callback and suffix composition remains partial",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_direct_children.go",
+          "tests": [
+            "TestPolynomialGCDContentScaleReceiptReservationPrefixes"
+          ]
+        },
         {
           "name": "Compatibility PSC cleanup and GCD pending observation select only the entered source cohort; GCD retains an exact accepted monic child and separate completed-local/owning-abort phases, preserving independent older Lazard work",
           "status": "partial",
@@ -45793,7 +45803,8 @@
         "pkg/math/polynomial/polynomial_gcd_zpx_receipt_test.go",
         "pkg/math/polynomial/polynomial_gcd_zpx_created.go",
         "pkg/math/polynomial/polynomial_gcd_independent_scope_test.go",
-        "pkg/math/polynomial/polynomial_glex_monic_invocation.go"
+        "pkg/math/polynomial/polynomial_glex_monic_invocation.go",
+        "pkg/math/polynomial/polynomial_gcd_scale_receipt_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -46396,7 +46407,8 @@
         "TestPolynomialCRAIndependentLazardReservationPrefixes",
         "TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes",
         "TestPolynomialGCDCleanupPreservesIndependentLazard",
-        "TestPolynomialGCDIndependentLazardReservationPrefixes"
+        "TestPolynomialGCDIndependentLazardReservationPrefixes",
+        "TestPolynomialGCDContentScaleReceiptReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -46425,6 +46437,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Nine reached GCD content/PRS/modular/univariate/recursive Scale calls pass concrete arithmetic receipts to the existing scaling engine; source-specific callback and suffix composition remains partial",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_direct_children.go",
+          "tests": [
+            "TestPolynomialGCDContentScaleReceiptReservationPrefixes"
+          ]
+        },
         {
           "name": "Compatibility PSC cleanup and GCD pending observation select only the entered source cohort; GCD retains an exact accepted monic child and separate completed-local/owning-abort phases, preserving independent older Lazard work",
           "status": "partial",
