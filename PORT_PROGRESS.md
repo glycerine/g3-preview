@@ -44084,3 +44084,23 @@ text. Broader root/display/comparison/predicate/conversion/owning-bound checks
 pass ordinary (0.409s) and checked/debug/trace (0.126s), on CPUs8–16. The new
 manifest method stays partial for the wider display suffix/assertion/stream
 audit. Full polynomial then AST completion remains active; no full-suite rerun.
+
+Extended algebraic display lifetime protection to interval and decimal writer
+paths. Their real call execution now excludes ordinary core reentry and core
+Close/CleanupRetained, matching the existing root-display lifetime guard.
+Interval's private source helper is covered too, including retained TRACE
+callers. Decimal's guard spans its local bound destruction through deferred
+unwind; flags are cleared on every return. No source numerical algorithm or
+output spelling changed.
+
+Writer regressions exercise actual Write and WriteString callbacks for both
+root and basic-rational inputs. Del, CleanupValue, Swap, Copy, Close and
+CleanupRetained all refuse during execution; original input identities and
+exact interval/decimal outputs survive. The initial fixture exposed an inherited
+bytes.Buffer.WriteString shortcut that bypassed Write; overriding both writer
+entrypoints ensures the final assertions exercise actual callbacks.
+
+Broader focused display/comparison/predicate/conversion/bound suites pass
+ordinary (0.161s) and checked/debug/trace (0.397s), on CPUs8–16. Display source
+units remain partial for broader source suffix/assertion/stream auditing; the
+complete polynomial then AST goal remains active. No full-suite rerun.

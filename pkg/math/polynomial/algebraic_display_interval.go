@@ -31,6 +31,11 @@ func (m *AlgebraicRootCore) DisplayInterval(w io.Writer, a *Algebraic) error {
 }
 
 func (m *AlgebraicRootCore) displayIntervalAtLocation(w io.Writer, l *algebraicLocation) error {
+	if m.intervalDisplayRunning {
+		return ErrAlgebraicPending
+	}
+	m.intervalDisplayRunning = true
+	defer func() { m.intervalDisplayRunning = false }()
 	if l != nil && l.kind == 1 {
 		r, err := m.load(l)
 		if err != nil {

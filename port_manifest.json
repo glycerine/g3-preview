@@ -38913,7 +38913,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Executing algebraic root/SMT2/Mathematica display protects borrowed cell and coefficient inputs across stream callbacks",
+          "name": "Executing algebraic root/SMT2/Mathematica/interval/decimal displays protect borrowed inputs across stream and writer callbacks",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_root.go",
           "go_targets": [
@@ -38921,9 +38921,10 @@
             "pkg/math/polynomial/algebraic_display_callback_test.go"
           ],
           "tests": [
+            "TestAlgebraicIntervalDecimalRejectWriterMutation",
             "TestAlgebraicRootDisplaysRejectInputMutationFromStream"
           ],
-          "notes": "A real first-insertion callback previously deleted the root input successfully. Public core access now rejects reentry while the existing rootDisplay.running span borrows input records and coefficient views. Regression exercises Del, CleanupValue, Swap and Copy in all three displays and checks exact original output and unchanged identities. Broader display source/owning suffix, scalar assertion and stream audit remains open."
+          "notes": "A real first-insertion callback previously deleted the root input successfully. Public core access now rejects reentry while the existing rootDisplay.running span borrows input records and coefficient views. Regression exercises Del, CleanupValue, Swap and Copy in all three displays and checks exact original output and unchanged identities. Interval and decimal displays now likewise protect their actual full call spans, including deferred local destruction; writer regressions exercise root and basic values through both Write and WriteString. Broader display source/owning suffix, scalar assertion and stream audit remains open."
         },
         {
           "name": "Global rational bound overloads cpp2998-3012,3025-3039 retained by api_arith and purify_arith_tactic; raw/global local sequence and exact raw-bound cleanup binding",
@@ -39510,7 +39511,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Executing algebraic root/SMT2/Mathematica display protects borrowed cell and coefficient inputs across stream callbacks",
+          "name": "Executing algebraic root/SMT2/Mathematica/interval/decimal displays protect borrowed inputs across stream and writer callbacks",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_root.go",
           "go_targets": [
@@ -39518,9 +39519,10 @@
             "pkg/math/polynomial/algebraic_display_callback_test.go"
           ],
           "tests": [
+            "TestAlgebraicIntervalDecimalRejectWriterMutation",
             "TestAlgebraicRootDisplaysRejectInputMutationFromStream"
           ],
-          "notes": "A real first-insertion callback previously deleted the root input successfully. Public core access now rejects reentry while the existing rootDisplay.running span borrows input records and coefficient views. Regression exercises Del, CleanupValue, Swap and Copy in all three displays and checks exact original output and unchanged identities. Broader display source/owning suffix, scalar assertion and stream audit remains open."
+          "notes": "A real first-insertion callback previously deleted the root input successfully. Public core access now rejects reentry while the existing rootDisplay.running span borrows input records and coefficient views. Regression exercises Del, CleanupValue, Swap and Copy in all three displays and checks exact original output and unchanged identities. Interval and decimal displays now likewise protect their actual full call spans, including deferred local destruction; writer regressions exercise root and basic values through both Write and WriteString. Broader display source/owning suffix, scalar assertion and stream audit remains open."
         },
         {
           "name": "Global rational bound overloads cpp2998-3012,3025-3039 retained by api_arith and purify_arith_tactic; raw/global local sequence and exact raw-bound cleanup binding",

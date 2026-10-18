@@ -34,6 +34,8 @@ func (m *AlgebraicRootCore) DisplayDecimal(w io.Writer, a *Algebraic, precision 
 	if err != nil {
 		return err
 	}
+	m.decimalDisplayRunning = true
+	defer func() { m.decimalDisplayRunning = false }()
 	if l == nil || l.kind == 0 {
 		q := unumeral.NewRational()
 		if l != nil {

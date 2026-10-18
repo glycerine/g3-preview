@@ -60,6 +60,7 @@ type AlgebraicRootCore struct {
 	representationNeg                                          algebraicRepresentationNegNumeric
 	representationNormalize                                    unumeral.IntegerNormalizeInvocationReceipt
 	representationCopy                                         unumeral.IntegerCopyAllocationReceipt
+	intervalDisplayRunning, decimalDisplayRunning              bool
 	comparisonTraceRunning                                     bool
 	predicateDiagnosticRunning                                 bool
 	predicateTrace                                             algebraicPredicateTraceScope
@@ -195,7 +196,7 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 func (m *AlgebraicRootCore) check() error {
 	// Display retains cell/coefficients across borrowed stream callbacks.
 	// Public reentry must not delete or replace those inputs mid-format.
-	if m != nil && m.self == m && m.rootDisplay.running {
+	if m != nil && m.self == m && (m.rootDisplay.running || m.intervalDisplayRunning || m.decimalDisplayRunning) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.toOwnedRational.active && !m.toOwnedRational.running {
@@ -987,7 +988,7 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	if m != nil && m.self == m && m.rationalSign.running {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && m.rootDisplay.running {
+	if m != nil && m.self == m && (m.rootDisplay.running || m.intervalDisplayRunning || m.decimalDisplayRunning) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.selection.running {
@@ -1193,7 +1194,7 @@ func (m *AlgebraicRootCore) closeCoreMembers() error {
 	if m != nil && m.self == m && m.rationalSign.running {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && m.rootDisplay.running {
+	if m != nil && m.self == m && (m.rootDisplay.running || m.intervalDisplayRunning || m.decimalDisplayRunning) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.selection.running {
