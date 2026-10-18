@@ -50811,7 +50811,9 @@
         "pkg/math/polynomial/upolynomial_factor_verify.go",
         "pkg/math/polynomial/upolynomial_factor_verify_test.go",
         "pkg/math/polynomial/upolynomial_factor_core_trace.go",
-        "pkg/math/polynomial/upolynomial_factor_core_trace_test.go"
+        "pkg/math/polynomial/upolynomial_factor_core_trace_test.go",
+        "pkg/math/polynomial/upolynomial_factor_quadratic_trace.go",
+        "pkg/math/polynomial/upolynomial_factor_quadratic_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51127,7 +51129,9 @@
         "TestUPolynomialFactorExactDivisionVerifyActions",
         "TestUPolynomialFactorExactDivisionVerifySuccessfulOperand",
         "TestUPolynomialFactorCoreTraceRecordsAndStickyStream",
-        "TestUPolynomialFactorCoreTraceRetainsActualFrontend"
+        "TestUPolynomialFactorCoreTraceRetainsActualFrontend",
+        "TestUPolynomialQuadraticPolynomialTraceRecords",
+        "TestUPolynomialQuadraticPolynomialTraceStops"
       ],
       "conditionals": [
         {
@@ -51716,6 +51720,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Quadratic input/factor-pair polynomial diagnostics and source suffix retention (upolynomial.cpp:2969,3003)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_quadratic_trace.go",
+            "pkg/math/polynomial/upolynomial_factor_quadratic_trace_test.go",
+            "pkg/math/polynomial/upolynomial_factor_core.go",
+            "pkg/math/polynomial/upolynomial_factor_frontend_invocation.go"
+          ],
+          "tests": [
+            "TestUPolynomialQuadraticPolynomialTraceRecords",
+            "TestUPolynomialQuadraticPolynomialTraceStops"
+          ],
+          "notes": "Exact factor/factor_2_sqf_pp ordinary polynomial records before coefficient references/all quadratic NUMs and after factor normalization/before DEBUG product. Uses actual frontend accepted display/history slot and whole-record borrowing. Pending factor-pair display stops quadratic reverse source destruction before six older NUM/vector objects; frontend cleanup finishes exact display first. Public Factor descriptor-quota BIG formatting failures verify entry quadratic frontier0 and either f1/f2 frontier6, no factor publication, retained source causes and owning cleanup. Independent x^2-1 exact records/product and sticky first-write refusal/footer count checked. Scalar to_string records at2974/2990 remain open, as do broader diagnostics/numerical lifetime audits."
+        },
         {
           "name": "Factor-core repeated-factor polynomial diagnostics and exact frontend cleanup (upolynomial.cpp:3075,3080,3093,3099,3106)",
           "status": "ported",

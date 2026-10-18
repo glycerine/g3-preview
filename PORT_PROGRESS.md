@@ -45928,3 +45928,12 @@ Independent (x-1)^3 factorization verifies the ten source records over three ite
 
 Focused tests pass ordinary (0.007s) and checked/debug/trace (0.019s). Broader factorization/frontend/GCD/Euclidean/CRA/content/storage/closed/basic/rational/raw-scalar/quadratic tests pass checked/debug/trace (31.949s); manifest validation passes. All commands stay on CPUs8–16. Wider quadratic/other diagnostic and numerical/source-lifetime completion audits remain open for polynomial, followed by AST. No native full suite repeated within its hourly interval; completed process9825 remains historical evidence with the recorded shared-worktree caveat.
 Final broader ordinary affected checks pass (19.834s).
+
+### Quadratic input/factor-pair polynomial diagnostics and lexical retention
+
+Ported upolynomial.cpp:2969,3003 with exact factor/factor_2_sqf_pp records, ordinary display spacing and raw newlines. Entry display precedes coefficient references and every quadratic NUM. The normalized f1/f2 record precedes DEBUG product construction. Both use the real frontend's exact accepted display/history slot under whole-record borrowing. A pending factor-pair display now stops quadratic source destruction before its six older NUM/vector objects; frontend owning cleanup finishes the exact display before those objects.
+
+Independent x^2-1 verifies exact records, factors/product, sticky first-write refusal and two reached footer flushes. Public Factor on independently expanded (x+3000000001)*(x+3000000003) reaches actual BIG descriptor-quota failures at entry and either f1/f2 display. Entry failure retains quadratic construction frontier0; factor-pair failure retains frontier6 before product declaration and factor publication. Tests verify actual accepted history, pending source retirement guard and preserved source/body causes after owning cleanup. No numerical scratch, constructor counts or quotas are repaired.
+
+Focused tests pass ordinary (0.006s) and checked/debug/trace (0.013s). Broader factorization/frontend/GCD/Euclidean/CRA/content/storage/closed/basic/rational/raw-scalar/quadratic checks pass checked/debug/trace (31.191s); manifest validation passes. All commands stay on CPUs8–16. Scalar to_string records2974/2990 and wider diagnostic/numerical/source-lifetime completion audits remain open for polynomial, followed by AST. No full suite repeated within the hourly interval; completed native9825 remains historical evidence with its recorded shared-worktree limitation.
+Final broader ordinary affected checks pass (19.556s).

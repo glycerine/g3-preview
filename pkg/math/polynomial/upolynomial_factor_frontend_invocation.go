@@ -1478,6 +1478,9 @@ func (q *upolyFactorQuadraticScope) finish(body error) error {
 	if q.bodyCause == nil {
 		q.bodyCause = body
 	}
+	if q.sourceCause == nil {
+		q.sourceCause = q.owner.coreTrace.sourceBlocker()
+	}
 	if q.sourceCause != nil {
 		return errors.Join(q.bodyCause, q.sourceCause)
 	}

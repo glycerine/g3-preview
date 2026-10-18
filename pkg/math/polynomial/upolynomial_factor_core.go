@@ -68,6 +68,9 @@ func (s *UPolynomialFactorizationService) factorQuadratic(p *upolyVectorState, f
 			return e
 		}
 	}
+	if e := s.traceFactorQuadraticPolynomials(m.factorFrontendCaller, p, 2969); e != nil {
+		return e
+	}
 	a, e := m.read(m.stateView(p), 2)
 	if e != nil {
 		return e
@@ -147,6 +150,9 @@ func (s *UPolynomialFactorizationService) factorQuadratic(p *upolyVectorState, f
 		return e
 	}
 	if e = (m).normalizeWithSourceContext(m.stateView(f2), context); e != nil {
+		return e
+	}
+	if e := s.traceFactorQuadraticPolynomials(o, p, 3003); e != nil {
 		return e
 	}
 	if polynomialSourceDebug {
