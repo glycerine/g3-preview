@@ -273,6 +273,9 @@ func (q *upolyDisplayScope) smtMonomial(out unumeral.RationalSourceStream, a *un
 	return out.AppendCString(")")
 }
 func (m *UPolynomialManager) DisplaySequenceInto(seq *UPolynomialSequence, out unumeral.RationalSourceStream, variable string) error {
+	return m.displaySequenceIntoWithReceipt(seq, out, variable, nil)
+}
+func (m *UPolynomialManager) displaySequenceIntoWithReceipt(seq *UPolynomialSequence, out unumeral.RationalSourceStream, variable string, receipt *upolyDisplayInvocationReceipt) error {
 	if m == nil || m.self != m || seq == nil || seq.self != seq || seq.manager != m {
 		return ErrUPolynomialOwner
 	}
@@ -306,7 +309,7 @@ func (m *UPolynomialManager) DisplaySequenceInto(seq *UPolynomialSequence, out u
 		if e != nil {
 			return e
 		}
-		if e = m.DisplayInto(row, out, variable, false); e != nil {
+		if e = m.displayIntoWithReceipt(row, out, variable, false, receipt); e != nil {
 			return e
 		}
 		if e = out.AppendCString("\n"); e != nil {

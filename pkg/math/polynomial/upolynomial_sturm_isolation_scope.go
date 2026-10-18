@@ -7,6 +7,8 @@ import (
 )
 
 type upolySturmIsolationScope struct {
+	traceDisplays                     [2]upolyDisplayInvocationReceipt
+	traceInsertions                   [3]unumeral.NumeralInsertionReceipt
 	normalization                     upolySturmNormalizeScope
 	hooks                             unumeral.NumericInvocationHooks
 	numeric                           unumeral.NumericAllocationRoots
@@ -78,9 +80,12 @@ func (q *upolySturmIsolationScope) pending() bool {
 			return true
 		}
 	}
-	return q.normalizePending() || q.numericPending() || q.knuthPending() || q.owner.modular.MatchesPNormalizeInvocation(&q.prepareNormalize) || q.preparedLive || q.sequence.sturm.active || q.sequence.evaluationPending() || q.owner.matchesBinaryEvaluationReceipt(&q.endpoint) && q.owner.binaryEvaluation.active || q.owner.config.Integer.MatchesCopyAllocationInvocation(&q.copy)
+	return q.tracePending() || q.normalizePending() || q.numericPending() || q.knuthPending() || q.owner.modular.MatchesPNormalizeInvocation(&q.prepareNormalize) || q.preparedLive || q.sequence.sturm.active || q.sequence.evaluationPending() || q.owner.matchesBinaryEvaluationReceipt(&q.endpoint) && q.owner.binaryEvaluation.active || q.owner.config.Integer.MatchesCopyAllocationInvocation(&q.copy)
 }
 func (q *upolySturmIsolationScope) sourceChild() error {
+	if e := q.traceSourceCause(); e != nil {
+		return e
+	}
 	if q.normalization.sourceStop != nil {
 		return q.normalization.sourceStop
 	}
@@ -233,6 +238,9 @@ func (m *UPolynomialManager) CleanupSturmIsolation() (cause error) {
 	}
 	defer func() { cause = errors.Join(cause, q.unbind()) }()
 	z := m.config.Integer
+	if e := q.cleanupTrace(false); e != nil {
+		return e
+	}
 	if e := q.cleanupNumeric(false); e != nil {
 		return e
 	}
@@ -315,6 +323,9 @@ func (m *UPolynomialManager) CleanupSturmIsolation() (cause error) {
 	if e := m.cleanupKnuthWithReceipt(&q.knuth, true); e != nil {
 		return e
 	}
+	if e := q.cleanupTrace(true); e != nil {
+		return e
+	}
 	if e := q.cleanupNumeric(true); e != nil {
 		return e
 	}
@@ -385,4 +396,16 @@ func (q *upolySturmIsolationScope) constructPrepared(v UPolynomialView) error {
 	}
 	q.preparedLive = true
 	return q.setPrepared(v)
+}
+
+// The source frame stack is declared only after sturm_seq returns successfully.
+func (q *upolySturmIsolationScope) constructStack() error {
+	if !q.entryValid() {
+		return ErrUPolynomialOwner
+	}
+	if q.live[4] {
+		return ErrUPolynomialCleanupPending
+	}
+	q.live[4] = true
+	return nil
 }

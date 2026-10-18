@@ -48982,7 +48982,9 @@
         "pkg/math/polynomial/upolynomial_sturm_isolation_normalize.go",
         "pkg/math/polynomial/upolynomial_sturm_isolation_normalize_trace.go",
         "pkg/math/polynomial/upolynomial_sturm_isolation_normalize_test.go",
-        "pkg/math/polynomial/upolynomial_sturm_isolation_normalize_trace_test.go"
+        "pkg/math/polynomial/upolynomial_sturm_isolation_normalize_trace_test.go",
+        "pkg/math/polynomial/upolynomial_sturm_isolation_trace.go",
+        "pkg/math/polynomial/upolynomial_sturm_isolation_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -157772,7 +157774,8 @@
         "pkg/math/polynomial/algebraic_predicate_integer_test.go",
         "pkg/math/polynomial/algebraic_predicate_trace_test.go",
         "pkg/math/polynomial/upolynomial_sturm_isolation_scope_test.go",
-        "pkg/math/polynomial/upolynomial_sturm_isolation_numeric_test.go"
+        "pkg/math/polynomial/upolynomial_sturm_isolation_numeric_test.go",
+        "pkg/math/polynomial/upolynomial_sturm_isolation_trace_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",

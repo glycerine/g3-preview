@@ -172,8 +172,13 @@ func (q *upolySturmIsolationScope) isolate(v UPolynomialView, neg, pos uint32, b
 	if e := q.sequence.buildSturm(v, UPolynomialView{}, 0); e != nil {
 		return e
 	}
-	q.live[4] = true
+	if e := q.constructStack(); e != nil {
+		return e
+	}
 	s := &q.stack
+	if e := q.traceInitial(v); e != nil {
+		return e
+	}
 	minus, e := m.sequenceVariations(seq, 1, nil)
 	if e != nil {
 		return e
@@ -229,6 +234,9 @@ func (q *upolySturmIsolationScope) isolate(v UPolynomialView, neg, pos uint32, b
 			return e
 		}
 		if e = ops.Div2(mid); e != nil {
+			return e
+		}
+		if e := q.traceMidpoint(minus, plus); e != nil {
 			return e
 		}
 		midSV, e := q.sequence.signVariationsBinary(mid)
