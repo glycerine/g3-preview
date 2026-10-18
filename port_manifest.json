@@ -53198,7 +53198,10 @@
         "pkg/math/polynomial/upolynomial_berlekamp_numeric_test.go",
         "pkg/math/polynomial/upolynomial_berlekamp_entry_trace_test.go",
         "pkg/math/polynomial/upolynomial_berlekamp_outcome_trace.go",
-        "pkg/math/polynomial/upolynomial_berlekamp_outcome_trace_test.go"
+        "pkg/math/polynomial/upolynomial_berlekamp_outcome_trace_test.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_split_scope.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_split_trace.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_split_trace_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53365,7 +53368,10 @@
         "TestUPolynomialBerlekampPublicEntryTraceRetainsExactDisplay",
         "TestUPolynomialBerlekampPublicEntryTraceStickyStreamFailure",
         "TestUPolynomialBerlekampIrreducibleOutcomeTrace",
-        "TestUPolynomialBerlekampOutcomeExactFactorDisplayBeforeMatrixDT"
+        "TestUPolynomialBerlekampOutcomeExactFactorDisplayBeforeMatrixDT",
+        "TestUPolynomialBerlekampCompleteSplitSourceRecords",
+        "TestUPolynomialBerlekampSplitOutcomeStopsBeforeLocalVectorDT",
+        "TestUPolynomialBerlekampSplitTraceStickyStreamPreservesResult"
       ],
       "conditionals": [
         {
@@ -53478,6 +53484,23 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Berlekamp splitting records and actual reverse local-vector source/owning destruction (upolynomial_factorization.cpp:432-440,443-448,482-486,498)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_berlekamp_split_scope.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_split_trace.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_split_trace_test.go",
+            "pkg/math/polynomial/upolynomial_factor_field.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_outcome_trace.go"
+          ],
+          "tests": [
+            "TestUPolynomialBerlekampCompleteSplitSourceRecords",
+            "TestUPolynomialBerlekampSplitOutcomeStopsBeforeLocalVectorDT",
+            "TestUPolynomialBerlekampSplitTraceStickyStreamPreservesResult"
+          ],
+          "notes": "Actual gcd/div/v_k source vectors are retained in the matrix owner only after rank!=1 and the line432 record. Their literal source destructors run v_k, div, gcd with ascending coefficient deletion and independent retained source cursor/guard; owning abort has separate cursors and preserves source history. This replaces ignored dropLocalVector errors. Rank, null vector before trim (including trailing spaces), current factor/gcd/div before swap/publication, and successful factors/total degree records execute at exact source locations under whole-owner borrowing. Public x^2-1 over Z3 verifies full literal records/order, callback refusals before/after publication, two distinct factors and exact product. Sticky ostream failure performs one host write while numerical operands/endl and the successful split still execute. A qualified nonnormalized old caller factor, with its debug precondition disabled, exhausts genuine descriptor slots at the final factor display after a real two-factor split. The accepted display stops before any local-vector deletion; v_k/div/gcd actual extents/backings, matrix and three published caller factors survive. Exact owning cleanup releases display then locals then older matrix while preserving the original source cursor/cause and caller output. No coefficient data or construction counters are rewritten. GCD/division deeper helper invocation audits and square-free-decomposition diagnostics remain partial; no whole source-unit completion credit."
+        },
         {
           "name": "Irreducible Berlekamp outcome TRACE with exact polynomial/factor-display ownership (upolynomial_factorization.cpp:428)",
           "status": "ported",

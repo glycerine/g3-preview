@@ -65,6 +65,7 @@ type upolyBerlekampMatrix struct {
 	closeCause                           error
 	constructorTemp, diagonalTemp        upolyBerlekampScopedNumeral
 	numeric                              upolyBerlekampNumeric
+	split                                upolyBerlekampSplit
 	traceBorrow                          upolyFactorTraceBorrow
 	entryTrace                           upolyDisplayInvocationReceipt
 	outcomeFactors                       upolyFactorsDisplayReceipt
@@ -93,8 +94,14 @@ func (q *upolyBerlekampMatrix) closeSource() error {
 	if q.m == nil {
 		return nil
 	}
-	if e := q.outcomeFactors.sourceBlocker(); e != nil {
+	if e := q.traceSourceBlocker(); e != nil {
 		return e
+	}
+	if q.split.declared && q.split.sourceRemaining != 0 && !q.split.ownEnded {
+		if q.split.cause != nil {
+			return q.split.cause
+		}
+		return ErrUPolynomialCleanupPending
 	}
 	if e := q.numeric.sourceCause(); e != nil {
 		return e
@@ -148,6 +155,9 @@ func (q *upolyBerlekampMatrix) releaseMembers() {
 // Owning cleanup does not retry a stopped source capacity read. It uses only
 // the remaining concrete member values, preserving the original source cause.
 func (q *upolyBerlekampMatrix) closeOwnedMembers() error {
+	if e := q.cleanupSplitOwned(); e != nil {
+		return e
+	}
 	for _, local := range []*upolyBerlekampScopedNumeral{&q.diagonalTemp, &q.constructorTemp} {
 		if local.declared && !local.sourceEnded && !local.ownEnded {
 			if e := q.m.config.Integer.CleanupRawNumeral(&local.value); e != nil {
@@ -209,6 +219,7 @@ func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) (c
 	q.deleteIndex, q.closeCause, q.sourceGuard, q.constructed = 0, nil, false, false
 	q.ownIndex, q.ownStarted = 0, false
 	q.constructorTemp, q.diagonalTemp = upolyBerlekampScopedNumeral{}, upolyBerlekampScopedNumeral{}
+	q.split = upolyBerlekampSplit{}
 	q.m = m
 	q.size = upolyViewDegree(f)
 	q.nullRow = 1
@@ -537,19 +548,24 @@ func (m *UPolynomialManager) factorZPBerlekamp(f UPolynomialView, fs *UPolynomia
 		}
 		return false, nil
 	}
-	var gcd, div, v upolyVectorState
-	defer m.dropLocalVector(&gcd)
-	defer m.dropLocalVector(&div)
-	defer m.dropLocalVector(&v)
+	if e := matrix.traceSplitRank(rank); e != nil {
+		return false, e
+	}
+	matrix.split = upolyBerlekampSplit{declared: true, sourceRemaining: 3}
+	gcd, div, v := &matrix.split.gcd, &matrix.split.div, &matrix.split.vector
+	defer func() { cause = matrix.finishSplitSource(cause) }()
 	for {
-		has, e := matrix.next(&v)
+		has, e := matrix.next(v)
 		if e != nil {
 			return false, e
 		}
 		if !has {
 			break
 		}
-		if e = m.trim(&v); e != nil {
+		if e := matrix.traceNullVector(); e != nil {
+			return false, e
+		}
+		if e = m.trim(v); e != nil {
 			return false, e
 		}
 		end := fs.count
@@ -558,19 +574,22 @@ func (m *UPolynomialManager) factorZPBerlekamp(f UPolynomialView, fs *UPolynomia
 				continue
 			}
 			for s := uint32(0); s < p; s++ {
-				v0, e := m.read(m.stateView(&v), 0)
+				v0, e := m.read(m.stateView(v), 0)
 				if e != nil {
 					return false, e
 				}
-				if e = m.modular.Dec(v0); e != nil {
+				if e = matrix.numericCall(6, nil, nil, nil, v0); e != nil {
 					return false, e
 				}
 				current := &fs.factors[i]
-				if e = m.gcd(m.stateView(&v), m.stateView(current), &gcd); e != nil {
+				if e = m.gcd(m.stateView(v), m.stateView(current), gcd); e != nil {
 					return false, e
 				}
 				if gcd.size != 1 && gcd.size != current.size {
-					if e = m.divState(m.stateView(current), m.stateView(&gcd), &div); e != nil {
+					if e = m.divState(m.stateView(current), m.stateView(gcd), div); e != nil {
+						return false, e
+					}
+					if e := matrix.traceSplitOperands(m.stateView(current)); e != nil {
 						return false, e
 					}
 					degree, e := fs.multiplicity(i)
@@ -578,13 +597,16 @@ func (m *UPolynomialManager) factorZPBerlekamp(f UPolynomialView, fs *UPolynomia
 						return false, e
 					}
 					fs.totalDegree -= upolyStateDegree(current) * degree
-					fs.totalDegree += upolyStateDegree(&div) * degree
-					*current, div = div, *current
-					if e = fs.PushCopy(m.stateView(&gcd), 1); e != nil {
+					fs.totalDegree += upolyStateDegree(div) * degree
+					*current, *div = *div, *current
+					if e = fs.PushCopy(m.stateView(gcd), 1); e != nil {
 						return false, e
 					}
 				}
 				if fs.count-first == rank {
+					if e := matrix.traceSplitOutcome(f, fs, p); e != nil {
+						return false, e
+					}
 					return true, nil
 				}
 			}
