@@ -39015,6 +39015,7 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_refinement.go",
           "tests": [
+            "TestAlgebraicIsIntReadsOnlyReachedDenominatorFields",
             "TestAlgebraicPredicatesReadCachedIrrationalFlagFirst",
             "TestAlgebraicIndependentRefinementAndRationalConversion",
             "TestAlgebraicSourceUnsignedMagnitude"
@@ -39571,6 +39572,7 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_refinement.go",
           "tests": [
+            "TestAlgebraicIsIntReadsOnlyReachedDenominatorFields",
             "TestAlgebraicPredicatesReadCachedIrrationalFlagFirst",
             "TestAlgebraicIndependentRefinementAndRationalConversion",
             "TestAlgebraicSourceUnsignedMagnitude"

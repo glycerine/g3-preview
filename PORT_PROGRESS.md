@@ -43928,3 +43928,15 @@ branch only; the larger predicate/refinement source audit remains partial.
 
 Focused algebraic predicate, conversion, degree and sign tests passed ordinary
 (0.072s) and g3checked,g3debug,g3trace (0.229s), using CPUs8–16 exclusively.
+
+Algebraic IsInt basic dispatch now matches basic_value cpp235–241 and
+mpq.h:253/mpz.h:758: the null zero reaches its actual basic_value assertion
+switch; nonnull basic values also reach to_basic's switch, then only the
+DEN pointer and, if that pointer is null, DEN.m_val. No NUM words or unrelated
+cell members are required. Regression tests leave NUM genuinely uninitialized,
+exercise nonnull-DEN short circuit before missing DEN.m_val, and check closed
+debug-owner behavior for both null/basic IsInt while IsRational still returns
+true directly. Broader predicate/refinement coverage remains partial.
+
+Focused algebraic predicates/conversion/refinement/query checks passed ordinary
+(0.222s) and g3checked,g3debug,g3trace (0.072s), exclusively on CPUs8–16.

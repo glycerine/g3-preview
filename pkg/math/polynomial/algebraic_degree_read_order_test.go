@@ -166,3 +166,48 @@ func TestAlgebraicPredicatesReadCachedIrrationalFlagFirst(t *testing.T) {
 		}
 	}
 }
+
+func TestAlgebraicIsIntReadsOnlyReachedDenominatorFields(t *testing.T) {
+	c, _, _ := algebraicCompareFixture(t)
+	a := algebraicQueryRawCell(t, c, 0)
+	l, e := c.location(&a)
+	serviceMust(t, e)
+	// A nonnull denominator cell makes is_one false without reading m_val.
+	serviceMust(t, c.config.Allocator.WriteUint32(l.raw, 16, 1))
+	serviceMust(t, c.config.Allocator.WriteUint32(l.raw, 20, 0))
+	v, e := c.IsInt(&a)
+	serviceMust(t, e)
+	if v {
+		t.Fatal("nonnull denominator cell classified as one")
+	}
+	serviceMust(t, c.config.Allocator.WriteUint32(l.raw, 16, 0))
+	if _, e := c.IsInt(&a); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
+		t.Fatal("small denominator did not reach m_val", e)
+	}
+	for _, den := range []uint32{1, 2, 0} {
+		serviceMust(t, c.config.Allocator.WriteUint32(l.raw, 12, den))
+		v, e := c.IsInt(&a)
+		serviceMust(t, e)
+		if v != (den == 1) {
+			t.Fatal("literal denominator one test", den, v)
+		}
+	}
+	for _, offset := range []uint64{0, 4, 8} {
+		if _, e := c.config.Allocator.ReadUint32(l.raw, offset); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
+			t.Fatal("numerator unexpectedly initialized", offset, e)
+		}
+	}
+	if polynomialSourceDebug {
+		polynomialAssertionActionsFixture(t, "T")
+		serviceMust(t, diagnostic.BorrowProcessDebugContext().Close())
+		var zero Algebraic
+		for _, value := range []*Algebraic{&zero, &a} {
+			if _, e := c.IsInt(value); !errors.Is(e, arena.ErrClosed) {
+				t.Fatal("basic_value assertion switch skipped", e)
+			}
+			if v, e := c.IsRational(value); e != nil || !v {
+				t.Fatal("is_rational basic branch reached unrelated assertion", v, e)
+			}
+		}
+	}
+}

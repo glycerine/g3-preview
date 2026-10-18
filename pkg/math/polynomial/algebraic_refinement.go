@@ -246,15 +246,29 @@ func (m *AlgebraicRootCore) IsInt(a *Algebraic) (result bool, err error) {
 	if err != nil {
 		return false, err
 	}
-	if l == nil {
-		return true, nil
-	}
-	if l.kind == 0 {
-		r, err := m.load(l)
-		if err != nil {
+	if l == nil || l.kind == 0 {
+		// basic_value asserts even for the canonical null zero (cpp236).
+		if err = algebraicQueryTagAssertionSwitch(); err != nil {
 			return false, err
 		}
-		return m.config.Rationals.IsInt(&r.value)
+		if l == nil {
+			return true, nil
+		}
+		if err = algebraicQueryTagAssertionSwitch(); err != nil {
+			return false, err
+		}
+		// mpq::is_int reaches only denominator.is_one; mpz::is_one
+		// short circuits on a nonnull cell before reading m_val.
+		lo, e := m.config.Allocator.ReadUint32(l.raw, 16)
+		if e != nil {
+			return false, e
+		}
+		hi, e := m.config.Allocator.ReadUint32(l.raw, 20)
+		if e != nil || lo != 0 || hi != 0 {
+			return false, e
+		}
+		value, e := m.config.Allocator.ReadUint32(l.raw, 12)
+		return value == 1, e
 	}
 	if err = algebraicQueryTagAssertionSwitch(); err != nil {
 		return false, err
