@@ -231,8 +231,8 @@ func (m *UPolynomialManager) mulWithSourceContext(a, b UPolynomialView, out *upo
 	}
 
 	s := &m.basic
-	if polynomialSourceDebug && (m.alias(a, s) || m.alias(b, s)) {
-		return ErrUPolynomialAssertion
+	if e := m.mulAliasAssertions(a, b, s); e != nil {
+		return e
 	}
 	if a.count == 0 {
 		if e := m.reset(s); e != nil {
@@ -298,6 +298,28 @@ func (m *UPolynomialManager) mulWithSourceContext(a, b UPolynomialView, out *upo
 	*out, *s = *s, *out
 	return nil
 }
+
+// Source: upolynomial.cpp:307-308. Each assertion resolves its own runtime
+// action; Continue reaches the next assertion and then the ordinary body.
+func (m *UPolynomialManager) mulAliasAssertions(a, b UPolynomialView, buffer *upolyVectorState) error {
+	for i, v := range [2]UPolynomialView{a, b} {
+		enabled, e := refinementSourceAssertionsEnabled()
+		if e != nil {
+			return e
+		}
+		if enabled && m.alias(v, buffer) {
+			expression := "!is_alias(p1, buffer)"
+			if i == 1 {
+				expression = "!is_alias(p2, buffer)"
+			}
+			if e := refinementSourceAssertionFailure(307+int32(i), expression); e != nil {
+				return e
+			}
+		}
+	}
+	return nil
+}
+
 func (m *UPolynomialManager) Mul(p, q, out UPolynomial) error {
 	a, e := m.wholeView(p)
 	if e != nil {
