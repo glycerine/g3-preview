@@ -48958,7 +48958,9 @@
         "pkg/math/polynomial/upolynomial_root_id_remainder_trace_test.go",
         "pkg/math/polynomial/upolynomial_root_id_trace_allocation_test.go",
         "pkg/math/polynomial/upolynomial_sequence_evaluation.go",
-        "pkg/math/polynomial/upolynomial_sequence_evaluation_test.go"
+        "pkg/math/polynomial/upolynomial_sequence_evaluation_test.go",
+        "pkg/math/polynomial/upolynomial_sequence_sturm.go",
+        "pkg/math/polynomial/upolynomial_sequence_sturm_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",

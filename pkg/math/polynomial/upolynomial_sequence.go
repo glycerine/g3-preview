@@ -14,6 +14,7 @@ type upolySequenceState struct {
 	begins, sizes []uint32
 }
 type UPolynomialSequence struct {
+	sturm                upolySequenceSturmScope
 	evaluation           upolyBinaryEvaluationInvocationReceipt
 	evaluationSourceStop error
 	evaluating           bool
@@ -173,13 +174,16 @@ func (m *UPolynomialManager) sequenceDestroy(s *upolySequenceState) error {
 	return nil
 }
 func (s *UPolynomialSequence) Close() error {
-	if s != nil && s.self == s && (s.displaying || s.evaluating) {
+	if s != nil && s.self == s && (s.displaying || s.evaluating || s.sturm.executing || s.sturm.finishing) {
 		return ErrUPolynomialCleanupPending
 	}
 	if e := s.check(); e != nil {
 		return e
 	}
 	if e := s.CleanupEvaluation(); e != nil {
+		return e
+	}
+	if e := s.CleanupSturm(); e != nil {
 		return e
 	}
 	if e := s.manager.sequenceDestroy(&s.state); e != nil {

@@ -61,80 +61,28 @@ func (m *UPolynomialManager) sturmUnary(p UPolynomialView, s *upolySequenceState
 	return m.sturmSequenceCore(s)
 }
 func (m *UPolynomialManager) SturmSequence(p UPolynomialView, s *UPolynomialSequence) error {
-	if e := m.sequenceMutationOutput(s); e != nil {
+	if e := m.sequenceOutput(s); e != nil {
 		return e
 	}
-	return m.sturmUnary(p, &s.state)
+	return s.buildSturm(p, UPolynomialView{}, 0)
 }
 func (m *UPolynomialManager) SturmSequencePair(a, b UPolynomialView, s *UPolynomialSequence) error {
-	if e := m.sequenceMutationOutput(s); e != nil {
+	if e := m.sequenceOutput(s); e != nil {
 		return e
 	}
-	if e := m.sequenceReset(&s.state); e != nil {
-		return e
-	}
-	if e := m.sequencePush(&s.state, a, false); e != nil {
-		return e
-	}
-	if e := m.sequencePush(&s.state, b, false); e != nil {
-		return e
-	}
-	return m.sturmSequenceCore(&s.state)
+	return s.buildSturm(a, b, 1)
 }
 func (m *UPolynomialManager) SturmTarskiSequence(a, b UPolynomialView, s *UPolynomialSequence) error {
-	if e := m.sequenceMutationOutput(s); e != nil {
+	if e := m.sequenceOutput(s); e != nil {
 		return e
 	}
-	if e := m.sequenceReset(&s.state); e != nil {
-		return e
-	}
-	var product upolyVectorState
-	defer m.dropLocalVector(&product)
-	if e := m.sequencePush(&s.state, a, false); e != nil {
-		return e
-	}
-	if e := m.derivativeState(a, &product); e != nil {
-		return e
-	}
-	if e := m.mul(m.stateView(&product), b, &product); e != nil {
-		return e
-	}
-	if e := m.sequencePush(&s.state, m.stateView(&product), true); e != nil {
-		return e
-	}
-	return m.sturmSequenceCore(&s.state)
+	return s.buildSturm(a, b, 2)
 }
 func (m *UPolynomialManager) FourierSequence(p UPolynomialView, s *UPolynomialSequence) error {
-	if e := m.sequenceMutationOutput(s); e != nil {
+	if e := m.sequenceOutput(s); e != nil {
 		return e
 	}
-	if e := m.sequenceReset(&s.state); e != nil {
-		return e
-	}
-	var prime upolyVectorState
-	defer m.dropLocalVector(&prime)
-	if e := m.sequencePush(&s.state, p, false); e != nil {
-		return e
-	}
-	if p.count == 0 {
-		return nil
-	}
-	for i := uint32(0); i < p.count-1; i++ {
-		v, e := m.sequenceRow(&s.state, uint32(len(s.state.sizes))-1)
-		if e != nil {
-			return e
-		}
-		if e = m.derivativeState(v, &prime); e != nil {
-			return e
-		}
-		if e = m.normalize(m.stateView(&prime)); e != nil {
-			return e
-		}
-		if e = m.sequencePush(&s.state, m.stateView(&prime), true); e != nil {
-			return e
-		}
-	}
-	return nil
+	return s.buildSturm(p, UPolynomialView{}, 3)
 }
 func (m *UPolynomialManager) sequenceVariations(s *upolySequenceState, location uint8, b *unumeral.BinaryRational) (uint32, error) {
 	return m.sequenceVariationsWithReceipt(s, location, b, nil)

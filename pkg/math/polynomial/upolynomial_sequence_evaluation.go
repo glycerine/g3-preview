@@ -7,7 +7,7 @@ func (s *UPolynomialSequence) evaluationPending() bool {
 	return s != nil && s.self == s && s.manager != nil && s.manager.matchesBinaryEvaluationReceipt(&s.evaluation) && s.manager.binaryEvaluation.active
 }
 func (s *UPolynomialSequence) mutationPending() bool {
-	return s != nil && s.self == s && (s.displaying || s.evaluating || s.evaluationPending())
+	return s != nil && s.self == s && (s.displaying || s.evaluating || s.evaluationPending() || s.sturm.active)
 }
 
 // CleanupEvaluation acknowledges only the Horner invocation accepted by this
