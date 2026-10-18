@@ -22,9 +22,10 @@ func TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard(t *testing.T) {
 	}
 	serviceMust(t, b.Del(&a))
 	p := upolySourceNew(t, m, []int32{1})
+	polynomialAssertionActionsFixture(t, "T")
 	err := m.SquareFreeIsolateRoots(mustUPolyView(t, m, p).WithCount(0), b, roots, lowers, uppers)
 	if polynomialSourceDebug {
-		if !errors.Is(err, ErrUPolynomialAssertion) {
+		if !errors.Is(err, ErrUPolynomialAssertion) || !linearThrownAssertion(err) {
 			t.Fatal("expected source zero-size assertion", err)
 		}
 	} else if !errors.Is(err, arena.ErrBounds) {

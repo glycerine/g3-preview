@@ -12,8 +12,8 @@ func (m *UPolynomialManager) HasZeroRoots(v UPolynomialView) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
-	if polynomialSourceDebug && v.count == 0 {
-		return false, ErrUPolynomialAssertion
+	if e := m.zeroRootsNonemptyAssertion(v.count, true); e != nil {
+		return false, e
 	}
 	a, e := m.read(v, 0)
 	if e != nil {
@@ -29,8 +29,8 @@ func (m *UPolynomialManager) RemoveZeroRoots(v UPolynomialView, out UPolynomial)
 	return m.removeZeroRootsState(v, &d.state)
 }
 func (m *UPolynomialManager) removeZeroRootsState(v UPolynomialView, out *upolyVectorState) error {
-	if polynomialSourceDebug && v.count == 0 {
-		return ErrUPolynomialAssertion
+	if e := m.zeroRootsNonemptyAssertion(v.count, false); e != nil {
+		return e
 	}
 	a, e := m.read(v, 0)
 	if e != nil {
@@ -45,8 +45,14 @@ func (m *UPolynomialManager) removeZeroRootsState(v UPolynomialView, out *upolyV
 	}
 	i := uint32(0)
 	for {
-		if polynomialSourceDebug && i >= v.count {
-			return ErrUPolynomialAssertion
+		enabled, e := refinementSourceAssertionsEnabled()
+		if e != nil {
+			return e
+		}
+		if enabled && i >= v.count {
+			if e := m.scalarDivisionAssertionFailure(1284, "i < sz"); e != nil {
+				return e
+			}
 		}
 		a, e = m.read(v, i)
 		if e != nil {

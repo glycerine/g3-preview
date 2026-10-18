@@ -50776,7 +50776,9 @@
         "pkg/math/polynomial/upolynomial_extended_gcd_assertions.go",
         "pkg/math/polynomial/upolynomial_extended_gcd_assertions_test.go",
         "pkg/math/polynomial/upolynomial_extended_gcd_identity_test.go",
-        "pkg/math/polynomial/upolynomial_display_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_display_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_zero_roots_assertions.go",
+        "pkg/math/polynomial/upolynomial_zero_roots_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51030,7 +51032,11 @@
         "TestUPolynomialExtendedGCDIdentitySourceActions",
         "TestUPolynomialExtendedGCDIdentityGateErasure",
         "TestUPolynomialDisplaySMT2IndexAssertionActions",
-        "TestUPolynomialDisplayExponentAssertionProfiles"
+        "TestUPolynomialDisplayExponentAssertionProfiles",
+        "TestUPolynomialZeroRootsAssertionActions",
+        "TestUPolynomialZeroRootsClosedAssertionBeforeRead",
+        "TestUPolynomialZeroRootsValidAssertionProfiles",
+        "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard"
       ],
       "conditionals": [
         {
@@ -51619,6 +51625,23 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Zero-root query/removal nonempty and traversal assertion actions (upolynomial.h:589; upolynomial.cpp:1275,1284)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_root_bounds.go",
+            "pkg/math/polynomial/upolynomial_zero_roots_assertions.go",
+            "pkg/math/polynomial/upolynomial_zero_roots_assertions_test.go",
+            "pkg/math/polynomial/upolynomial_native_isolation_storage_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialZeroRootsAssertionActions",
+            "TestUPolynomialZeroRootsClosedAssertionBeforeRead",
+            "TestUPolynomialZeroRootsValidAssertionProfiles",
+            "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard"
+          ],
+          "notes": "Nonempty assertions gate before first coefficient reads; removal traversal gates i<sz before each reached scan read. Actual debugger Throw/Continue borrows the receiving numeric owner. Header query reports its actual header file/line rather than a surrogate cpp location. Registered raw-count-zero adapters and an all-zero initialized buffer built with public Reset/Reserve reach source failures without scratch/counter manipulation. Throw preserves caller output; Continue/disabled/release reach existing Go guarded raw bounds reads, with output still unchanged. Valid x^2*(6-3x) removes the x^2 factor in enabled/disabled profiles. Closed assertion owner stops valid predicates before reads/copies. This verifies source assertions and existing guarded raw-pointer adaptation, not valid numerical results on invalid zero-polynomial removal. Broader root-bound/source-unit auditing remains partial. The existing isolation zero-count regression supplies an explicit real Throw and verifies root-output reset remains before the reached header assertion."
+        },
         {
           "name": "Ordinary and SMT2 display source assertion runtime actions (upolynomial.cpp:1129,1207)",
           "status": "ported",
@@ -52652,7 +52675,9 @@
         "pkg/math/polynomial/upolynomial_exception_test.go",
         "pkg/math/polynomial/upolynomial_berlekamp_division_am_test.go",
         "pkg/math/polynomial/upolynomial_berlekamp_monic.go",
-        "pkg/math/polynomial/upolynomial_berlekamp_monic_test.go"
+        "pkg/math/polynomial/upolynomial_berlekamp_monic_test.go",
+        "pkg/math/polynomial/upolynomial_zero_roots_assertions.go",
+        "pkg/math/polynomial/upolynomial_zero_roots_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -52780,7 +52805,11 @@
         "TestUPolynomialBerlekampDivisionAMSourceStopAndOwningCleanup",
         "TestUPolynomialBerlekampDivisionAMSuccessfulSourceEnd",
         "TestUPolynomialBerlekampMonicRawBodyFailureAndExplicitEnds",
-        "TestUPolynomialBerlekampMonicExplicitLCGuardStopsInverseEnd"
+        "TestUPolynomialBerlekampMonicExplicitLCGuardStopsInverseEnd",
+        "TestUPolynomialZeroRootsAssertionActions",
+        "TestUPolynomialZeroRootsClosedAssertionBeforeRead",
+        "TestUPolynomialZeroRootsValidAssertionProfiles",
+        "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard"
       ],
       "conditionals": [
         {
@@ -52809,6 +52838,23 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Zero-root query/removal nonempty and traversal assertion actions (upolynomial.h:589; upolynomial.cpp:1275,1284)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_root_bounds.go",
+            "pkg/math/polynomial/upolynomial_zero_roots_assertions.go",
+            "pkg/math/polynomial/upolynomial_zero_roots_assertions_test.go",
+            "pkg/math/polynomial/upolynomial_native_isolation_storage_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialZeroRootsAssertionActions",
+            "TestUPolynomialZeroRootsClosedAssertionBeforeRead",
+            "TestUPolynomialZeroRootsValidAssertionProfiles",
+            "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard"
+          ],
+          "notes": "Nonempty assertions gate before first coefficient reads; removal traversal gates i<sz before each reached scan read. Actual debugger Throw/Continue borrows the receiving numeric owner. Header query reports its actual header file/line rather than a surrogate cpp location. Registered raw-count-zero adapters and an all-zero initialized buffer built with public Reset/Reserve reach source failures without scratch/counter manipulation. Throw preserves caller output; Continue/disabled/release reach existing Go guarded raw bounds reads, with output still unchanged. Valid x^2*(6-3x) removes the x^2 factor in enabled/disabled profiles. Closed assertion owner stops valid predicates before reads/copies. This verifies source assertions and existing guarded raw-pointer adaptation, not valid numerical results on invalid zero-polynomial removal. Broader root-bound/source-unit auditing remains partial. The existing isolation zero-count regression supplies an explicit real Throw and verifies root-output reset remains before the reached header assertion."
+        },
         {
           "name": "Concrete Berlekamp division a_m scoped NUM and mk_monic raw lc/lc_inv source ends (upolynomial.cpp:460; upolynomial.h:363)",
           "status": "ported",
