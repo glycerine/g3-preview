@@ -277,6 +277,13 @@ func (m *MultivariatePolynomialCore) check() error {
 	return m.monomials.check()
 }
 func (m *MultivariatePolynomialCore) incRefCore(p Polynomial) error {
+	l, e := m.polynomialLocation(p)
+	if e != nil {
+		return e
+	}
+	if l.deletionStarted {
+		return ErrPolynomialPending
+	}
 	r, e := m.readWord(p, 0)
 	if e != nil {
 		return e

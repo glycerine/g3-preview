@@ -40013,6 +40013,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_reference_deletion_test.go",
         "pkg/math/polynomial/polynomial_factors_multiply_callback_test.go",
         "pkg/math/polynomial/polynomial_monomial_query_trace.go",
         "pkg/math/polynomial/polynomial_monomial_query_trace_test.go",
@@ -42615,6 +42616,24 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "polynomial.cpp:1370,2420-2460,7012; polynomial.h:260 concrete reference acquisition refuses committed deletion before trace/callback publication",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_manager.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_manager.go",
+            "pkg/math/polynomial/polynomial_cell.go",
+            "pkg/math/polynomial/polynomial_ref.go",
+            "pkg/math/polynomial/polynomial_reference_deletion_test.go"
+          ],
+          "tests": [
+            "TestPolynomialDeletingValueCannotAcquireReferences",
+            "TestPolynomialFreshZeroReferenceAfterDeletionReuse"
+          ],
+          "notes": [
+            "A real last-reference deletion handler reproduced successful public/internal INC and owning reference assignment against its zero-RC deleting value. The accepted deleteCoreMode now marks the concrete locator as deletionStarted before source TRACE, handlers or stage advancement, and the shared increment engine refuses acquisition from that committed lifetime. Public IncRef delegates to that same engine. This is explicit Go lifetime safety for a source raw pointer that will be destroyed despite a callback INC, not a new C++ algorithm branch or zero-RC heuristic. Fresh factory zero-RC objects remain acquirable. Tests retain the original actual handler stop, preserve an older owning reference and empty refused assignment prefix, exercise the earlier trace writer boundary before callbackStarted, grow the real cold locator directory with 32 independently retained peers, and reuse the retired descriptor in a later factory generation. The latter accepts both owning and public increments. Broader reference/constructor/deletion source audits remain partial."
+          ]
+        },
         {
           "name": "polynomial.cpp:322-348,356-373 max_smaller_than runtime assertion actions and conditional poly_bug trace; broader query audit remains partial",
           "status": "partial",
@@ -45815,6 +45834,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_reference_deletion_test.go",
         "pkg/math/polynomial/polynomial_factors_multiply_callback_test.go",
         "pkg/math/polynomial/polynomial_monomial_query_trace.go",
         "pkg/math/polynomial/polynomial_monomial_query_trace_test.go",
@@ -46753,6 +46773,24 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "polynomial.cpp:1370,2420-2460,7012; polynomial.h:260 concrete reference acquisition refuses committed deletion before trace/callback publication",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_manager.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_manager.go",
+            "pkg/math/polynomial/polynomial_cell.go",
+            "pkg/math/polynomial/polynomial_ref.go",
+            "pkg/math/polynomial/polynomial_reference_deletion_test.go"
+          ],
+          "tests": [
+            "TestPolynomialDeletingValueCannotAcquireReferences",
+            "TestPolynomialFreshZeroReferenceAfterDeletionReuse"
+          ],
+          "notes": [
+            "A real last-reference deletion handler reproduced successful public/internal INC and owning reference assignment against its zero-RC deleting value. The accepted deleteCoreMode now marks the concrete locator as deletionStarted before source TRACE, handlers or stage advancement, and the shared increment engine refuses acquisition from that committed lifetime. Public IncRef delegates to that same engine. This is explicit Go lifetime safety for a source raw pointer that will be destroyed despite a callback INC, not a new C++ algorithm branch or zero-RC heuristic. Fresh factory zero-RC objects remain acquirable. Tests retain the original actual handler stop, preserve an older owning reference and empty refused assignment prefix, exercise the earlier trace writer boundary before callbackStarted, grow the real cold locator directory with 32 independently retained peers, and reuse the retired descriptor in a later factory generation. The latter accepts both owning and public increments. Broader reference/constructor/deletion source audits remain partial."
+          ]
+        },
         {
           "name": "polynomial.cpp:322-348,356-373 max_smaller_than runtime assertion actions and conditional poly_bug trace; broader query audit remains partial",
           "status": "partial",

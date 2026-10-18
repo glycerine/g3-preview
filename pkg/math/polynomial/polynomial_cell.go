@@ -23,6 +23,7 @@ type polynomialLocation struct {
 	callback                                                             *PolynomialDeletionHandler
 	callbackCause                                                        error
 	callbackStarted, callbackInvoked                                     bool
+	deletionStarted                                                      bool // Go lifetime metadata, before source TRACE/callbacks
 	raw                                                                  umemory.ObjectRef
 	monomialBase                                                         uint64
 	generation, requested, initializedCoefficients, initializedMonomials uint32
@@ -176,11 +177,7 @@ func (m *MultivariatePolynomialCore) IncRef(p Polynomial) error {
 	if e := m.check(); e != nil {
 		return e
 	}
-	r, e := m.readWord(p, 0)
-	if e != nil {
-		return e
-	}
-	return m.writeWord(p, 0, r+1)
+	return m.incRefCore(p)
 }
 func (m *MultivariatePolynomialCore) DecRef(p Polynomial) error {
 	if e := m.check(); e != nil {
@@ -290,6 +287,9 @@ func (m *MultivariatePolynomialCore) deleteCoreMode(p Polynomial, owning bool) e
 	if !owning && l.monomialDropCause != nil {
 		return l.monomialDropCause
 	}
+	// Deletion's TRACE precedes handler invocation and deleteStage advancement.
+	// A retained zero-RC descriptor is cleanup authority, never a new result.
+	l.deletionStarted = true
 	if l.deleteStage == 0 {
 		if e = m.traceDeletingPolynomial(p); e != nil {
 			return e
