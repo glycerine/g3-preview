@@ -27,6 +27,9 @@ func (m *AlgebraicRootCore) GetPolynomial(a *Algebraic, out UPolynomial) error {
 	m.bounds.executing = true
 	defer func() { m.bounds.executing = false }()
 	if l != nil && l.kind == 1 {
+		if e = algebraicQueryTagAssertionSwitch(); e != nil {
+			return e
+		}
 		r, e := m.load(l)
 		if e != nil {
 			return e
@@ -50,6 +53,14 @@ func (m *AlgebraicRootCore) GetPolynomial(a *Algebraic, out UPolynomial) error {
 			return e
 		}
 	} else {
+		// Source basic_value is reached after reserve(2), and asserts both
+		// at cpp236 and through nonnull anum::to_basic (header372).
+		if e = algebraicQueryTagAssertionSwitch(); e != nil {
+			return e
+		}
+		if e = algebraicQueryTagAssertionSwitch(); e != nil {
+			return e
+		}
 		r, e := m.load(l)
 		if e != nil {
 			return e

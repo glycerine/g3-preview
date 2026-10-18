@@ -44054,3 +44054,17 @@ Focused owning/raw bound/conversion suites pass ordinary (0.201s) and
 checked/debug/trace (3.368s); manifest validation and diff checks pass. Commands
 use CPUs8–16. These are selected callback profiles, not a universal callback or
 TRACE completion claim. Whole polynomial then AST completion remains active.
+
+Defining-polynomial extraction now preserves its reached tag assertion switches
+(cpp1905–1924, basic_value cpp236 and anum accessors header372/373). Root
+access asserts before loading the root record; the nonzero basic branch first
+reserves its two output fields, then reaches basic_value/to_basic assertions
+before loading the value. A raw-prefix regression with closed actual debug
+ownership verifies both missing-member precedence and actual output state:
+root output remains empty/unallocated, basic output has its two constructed
+numeral fields. Existing mathematical zero/basic/nonminimal-root tests remain.
+No source cell constructor completion is claimed by the raw-prefix fixture.
+
+Focused defining-polynomial/representation/owning-bound/conversion suites pass
+ordinary (0.361s) and checked/debug/trace (0.104s), on CPUs8–16. Broader source
+unit and polynomial then AST completion remain open; no full-suite rerun.

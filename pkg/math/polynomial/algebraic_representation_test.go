@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -252,6 +253,38 @@ func TestAlgebraicIrrationalBoundAssertionActions(t *testing.T) {
 					t.Fatal("bound assertion retained execution guard")
 				}
 			})
+		}
+	}
+}
+
+func TestAlgebraicDefiningPolynomialAccessorAndReserveOrder(t *testing.T) {
+	if !polynomialSourceDebug {
+		t.Skip("source accessor assertions erased")
+	}
+	c, p, _ := algebraicCompareFixture(t)
+	root := algebraicQueryRawCell(t, c, 1)
+	basic := algebraicQueryRawCell(t, c, 0)
+	outputs := [2]UPolynomial{}
+	for i := range outputs {
+		var e error
+		outputs[i], e = p.NewPolynomial()
+		serviceMust(t, e)
+	}
+	t.Cleanup(func() {
+		for i := range outputs {
+			serviceMust(t, p.DelPolynomial(&outputs[i]))
+		}
+	})
+	polynomialAssertionActionsFixture(t, "T")
+	serviceMust(t, diagnostic.BorrowProcessDebugContext().Close())
+	for i, a := range []*Algebraic{&root, &basic} {
+		if e := c.GetPolynomial(a, outputs[i]); !errors.Is(e, arena.ErrClosed) {
+			t.Fatal("accessor switch did not precede missing cell members", i, e)
+		}
+		d, e := p.descriptor(outputs[i])
+		serviceMust(t, e)
+		if (i == 0 && (d.state.size != 0 || d.state.backing != 0)) || (i == 1 && (d.state.size != 2 || len(p.values(&d.state)) < 2)) {
+			t.Fatal("source reserve/tag ordering", i, d.state)
 		}
 	}
 }

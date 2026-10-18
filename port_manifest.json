@@ -39004,6 +39004,7 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_representation.go",
           "tests": [
+            "TestAlgebraicDefiningPolynomialAccessorAndReserveOrder",
             "TestAlgebraicIrrationalBoundAssertionActions","TestAlgebraicDefiningPolynomialZeroBasicAndNonminimalRoot", "TestAlgebraicBoundsExactAndCopiedPrecision", "TestAlgebraicDefiningPolynomialMinimumIntegerReservationPrefixes", "TestAlgebraicBoundsDiscoveredRootKeepsSourceUpperEndpoint"]
         },
         {
@@ -39587,6 +39588,7 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_representation.go",
           "tests": [
+            "TestAlgebraicDefiningPolynomialAccessorAndReserveOrder",
             "TestAlgebraicIrrationalBoundAssertionActions","TestAlgebraicDefiningPolynomialZeroBasicAndNonminimalRoot", "TestAlgebraicBoundsExactAndCopiedPrecision", "TestAlgebraicDefiningPolynomialMinimumIntegerReservationPrefixes", "TestAlgebraicBoundsDiscoveredRootKeepsSourceUpperEndpoint"]
         },
         {
