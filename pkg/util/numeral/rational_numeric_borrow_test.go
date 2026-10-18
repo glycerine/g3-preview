@@ -3,6 +3,8 @@ package numeral
 import (
 	"errors"
 	"testing"
+
+	"github.com/glycerine/g3/pkg/arena"
 )
 
 func TestRationalNumericBorrowCopiesLexicalScalarAndExpires(t *testing.T) {
@@ -25,6 +27,16 @@ func TestRationalNumericBorrowCopiesLexicalScalarAndExpires(t *testing.T) {
 		}
 		if s.runtimeTransportExecuting() {
 			t.Fatal("ordinary numeric borrow was classified as allocator callback reentry")
+		}
+		for _, close := range []func() error{s.Manager.Z.CloseChecked, s.Manager.Z.SourceFinalize} {
+			if e := close(); !errors.Is(e, ErrNumericPending) {
+				t.Fatal("numeric borrow lost its source owner", e)
+			}
+		}
+		for _, close := range []func() error{s.Manager.Z.Natural.CloseChecked, s.Manager.Z.Natural.SourceFinalize} {
+			if e := close(); !errors.Is(e, arena.ErrInvalidSlot) {
+				t.Fatal("numeric borrow lost its natural owner", e)
+			}
 		}
 		return b.WithLexical(func() error {
 			return b.WithCopiedScalar(&a, func(value Rational) error {

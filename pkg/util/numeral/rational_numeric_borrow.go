@@ -10,10 +10,13 @@ import (
 // RationalNumericBorrow is valid only inside WithNumericBorrow's synchronous
 // callback. The service lock and all lexical numeric ownership remain in util.
 type RationalNumericBorrow struct {
-	self    *RationalNumericBorrow
-	service *RationalService
-	active  bool
+	integerBinding, naturalBinding NumericCallerBinding
+	self                           *RationalNumericBorrow
+	service                        *RationalService
+	active                         bool
 }
+
+func (b *RationalNumericBorrow) NumericExecuting() bool { return b.Valid() }
 
 type rationalNumericReceiver struct{ runtime *umemory.Runtime }
 
@@ -54,6 +57,22 @@ func (s *RationalService) WithNumericBorrow(body func(*RationalNumericBorrow) er
 	}
 	*b = RationalNumericBorrow{self: b, service: s, active: true}
 	defer func() { *b = RationalNumericBorrow{} }()
+	if e := s.Manager.Z.BindCaller(&b.integerBinding, b, 0); e != nil {
+		return e
+	}
+	defer func() {
+		if e := b.integerBinding.Unbind(); e != nil {
+			panic(e)
+		}
+	}()
+	if e := s.Manager.Z.Natural.BindCaller(&b.naturalBinding, b, 0); e != nil {
+		return e
+	}
+	defer func() {
+		if e := b.naturalBinding.Unbind(); e != nil {
+			panic(e)
+		}
+	}()
 	return b.WithReceivingInteger(s.Manager.Z, func() error { return body(b) })
 }
 func (b *RationalNumericBorrow) Ready() error {

@@ -14,13 +14,17 @@ import (
 // limit. Small coefficient copies still finish before the interval assertion's
 // exponent alignment acquires physical storage and cannot publish a cell.
 func algebraicCopyBoundedTarget(t *testing.T) *AlgebraicRootCore {
+	return algebraicCopyBoundedTargetSlots(t, 8)
+}
+
+func algebraicCopyBoundedTargetSlots(t *testing.T, slots uint32) *AlgebraicRootCore {
 	t.Helper()
 	budget := arena.NewBudget(1 << 24)
 	diagnostics, e := unumeral.NewRationalService(serviceConfig(budget))
 	serviceMust(t, e)
 	profile := umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{
-		Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget},
+		Cells: arena.Config{PageSize: 8, SlotLimit: slots, Budget: budget},
 		Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: profile,
 	}})
 	serviceMust(t, e)

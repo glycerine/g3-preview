@@ -528,6 +528,10 @@ func (m *UPolynomialManager) PowerView(v UPolynomialView, k uint32, out UPolynom
 
 // powerState preserves core_manager::pw on an actual lexical numeral vector.
 func (m *UPolynomialManager) powerState(v UPolynomialView, k uint32, out *upolyVectorState) error {
+	return m.powerStateWithSourceContext(v, k, out, nil, integerAllocationInvocationContext{})
+}
+
+func (m *UPolynomialManager) powerStateWithSourceContext(v UPolynomialView, k uint32, out *upolyVectorState, child *unumeral.IntegerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
 	var e error
 	if k == 0 {
 		if polynomialSourceDebug && v.count == 0 {
@@ -536,7 +540,7 @@ func (m *UPolynomialManager) powerState(v UPolynomialView, k uint32, out *upolyV
 		if e = m.reserve(out, 1); e != nil {
 			return e
 		}
-		if e = m.modular.SetInt32(&m.values(out)[0], 1); e != nil {
+		if e = m.modular.WithAllocationContext(context.utility(m.config.Integer)).SetInt32(&m.values(out)[0], 1); e != nil {
 			return e
 		}
 		return m.setSize(out, 1)
@@ -553,13 +557,13 @@ func (m *UPolynomialManager) powerState(v UPolynomialView, k uint32, out *upolyV
 		}
 	}
 	if shortcut {
-		return m.setView(out, v)
+		return m.setViewWithSourceContext(out, v, context)
 	}
-	if e = m.setView(&m.pw, v); e != nil {
+	if e = m.setViewWithSourceContext(&m.pw, v, context); e != nil {
 		return e
 	}
 	for i := uint32(1); i < k; i++ {
-		if e = m.mul(m.stateView(&m.pw), v, &m.pw); e != nil {
+		if e = m.mulWithSourceContext(m.stateView(&m.pw), v, &m.pw, child, context); e != nil {
 			return e
 		}
 	}

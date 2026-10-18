@@ -44735,3 +44735,25 @@ trace 1.290s on CPUs 8-16. No full suite repeat after the recent 94.230s ordinar
 polynomial run. Parser/univariate source units remain partial for broader fault
 composition, and complete polynomial then AST remains active.
 portcheck and git diff --check passed; unit/API status counts remain unchanged.
+
+S-expression arithmetic now carries a concrete converter-owned numerical scope
+through the existing add/subtract, multiply, negate and power algorithms. Operand
+order and the power workspace algorithm are preserved. Only actually issued raw,
+AddMul, normalization and numeric-root children survive a stopped call; cleanup
+acknowledges those exact children before destroying older argument vectors.
+Actual bounded-owner descriptor-after-physical refusals cover addition,
+subtraction, multiplication and nested power. An idle second converter closes
+without acquiring the first converter's retained child or physical token.
+Pending work refuses polynomial owner destruction until owning cleanup finishes.
+
+The synchronous global rational numeric borrow also binds the actual source
+integer and natural managers. Focused tests verify both owning close and source
+finalization are refused during the borrow, while normal arithmetic and service
+use continue and the bindings expire on callback return.
+
+Focused polynomial and numeral selections passed ordinary and
+checked/debug/trace builds on CPUs 8-16. The checked runs took 1.197s and 2.560s
+respectively. Broader arithmetic callback/destructor fault composition remains
+open; the affected parser/univariate units remain partial. Complete polynomial
+then AST remains unfinished. Manifest counts are unchanged: 210 ported,
+341 partial, 1495 unported, 11 dead/deleted (2103 units, 677 APIs).

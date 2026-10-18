@@ -30,39 +30,40 @@ type UPolynomialConfig struct {
 // are required, even though operations without a checkpoint do not call them.
 // Cold ownership and every actual typed backing are charged to Integer's budget.
 type UPolynomialManager struct {
-	rationalInput                  upolyRationalInputScope
-	algebraicCopyBorrowers         uint32
-	sturmIsolation                 upolySturmIsolationScope
-	sturmPending                   *upolySequenceSturmScope
-	rootID                         upolyRootIDScope
-	rationalContext                UPolynomialRationalContext
-	oneHalfRoot                    upolyOneHalfRootScope
-	oneHalfRootHistory             *upolyOneHalfRootHistory
-	oneHalfRootHistoryBytes        uint64
-	knuth                          upolyKnuthScope
-	knuthHistory                   *upolyKnuthHistory
-	knuthHistoryBytes              uint64
-	rootUpperBound                 upolyRootUpperBoundScope
-	removeOneHalfRoot              upolyRemoveOneHalfRootScope
-	rootUpperBoundHistory          *upolyRootUpperBoundHistory
-	removeOneHalfRootHistory       *upolyRemoveOneHalfRootHistory
-	removeOneHalfRootFirstHistory  upolyRemoveOneHalfRootHistory
-	rootUpperBoundHistoryBytes     uint64
-	removeOneHalfRootHistoryBytes  uint64
-	integerEvaluation              upolyIntegerEvaluationScope
-	integerEvaluationHistory       *upolyIntegerEvaluationHistory
-	integerEvaluationHistoryBytes  uint64
-	rationalEvaluation             upolyRationalEvaluationScope
-	rationalEvaluationHistory      *upolyRationalEvaluationHistory
-	rationalEvaluationHistoryBytes uint64
-	binaryEvaluation               upolyBinaryEvaluationScope
-	binaryEvaluationHistory        *upolyBinaryEvaluationHistory
-	binaryEvaluationHistoryBytes   uint64
-	algebraicNegCaller             *AlgebraicRootCore
-	display                        upolyDisplayScope
-	displaySequence                *UPolynomialSequence
-	currentDisplay, displayFrames  *upolyDisplayScope
-	displayNonce                   uint64
+	sexprArithmetic, pendingSexprArithmetic *sexprPolynomialArithmeticScope
+	rationalInput                           upolyRationalInputScope
+	algebraicCopyBorrowers                  uint32
+	sturmIsolation                          upolySturmIsolationScope
+	sturmPending                            *upolySequenceSturmScope
+	rootID                                  upolyRootIDScope
+	rationalContext                         UPolynomialRationalContext
+	oneHalfRoot                             upolyOneHalfRootScope
+	oneHalfRootHistory                      *upolyOneHalfRootHistory
+	oneHalfRootHistoryBytes                 uint64
+	knuth                                   upolyKnuthScope
+	knuthHistory                            *upolyKnuthHistory
+	knuthHistoryBytes                       uint64
+	rootUpperBound                          upolyRootUpperBoundScope
+	removeOneHalfRoot                       upolyRemoveOneHalfRootScope
+	rootUpperBoundHistory                   *upolyRootUpperBoundHistory
+	removeOneHalfRootHistory                *upolyRemoveOneHalfRootHistory
+	removeOneHalfRootFirstHistory           upolyRemoveOneHalfRootHistory
+	rootUpperBoundHistoryBytes              uint64
+	removeOneHalfRootHistoryBytes           uint64
+	integerEvaluation                       upolyIntegerEvaluationScope
+	integerEvaluationHistory                *upolyIntegerEvaluationHistory
+	integerEvaluationHistoryBytes           uint64
+	rationalEvaluation                      upolyRationalEvaluationScope
+	rationalEvaluationHistory               *upolyRationalEvaluationHistory
+	rationalEvaluationHistoryBytes          uint64
+	binaryEvaluation                        upolyBinaryEvaluationScope
+	binaryEvaluationHistory                 *upolyBinaryEvaluationHistory
+	binaryEvaluationHistoryBytes            uint64
+	algebraicNegCaller                      *AlgebraicRootCore
+	display                                 upolyDisplayScope
+	displaySequence                         *UPolynomialSequence
+	currentDisplay, displayFrames           *upolyDisplayScope
+	displayNonce                            uint64
 
 	factorFrontendCaller         *upolyFactorFrontendScope
 	factorFrontendConstantCaller *UPolynomialFactorizationService
@@ -148,6 +149,9 @@ func newUPolynomialManager(c UPolynomialConfig, store *UPolynomialCoefficientSto
 	return m, nil
 }
 func (m *UPolynomialManager) check() error {
+	if m != nil && m.self == m && (m.pendingSexprArithmetic != nil || m.sexprArithmeticExecuting() && (m.callbackDepth != 0 || m.config.Integer.RuntimeOwner().FailureTransportActive())) {
+		return ErrUPolynomialCleanupPending
+	}
 	if m != nil && m.self == m && m.rationalInput.running {
 		return ErrUPolynomialCleanupPending
 	}
@@ -191,6 +195,9 @@ func (m *UPolynomialManager) descriptor(p UPolynomial) (*upolyDescriptor, error)
 	return d, nil
 }
 func (m *UPolynomialManager) NewPolynomial() (UPolynomial, error) {
+	if m.sexprArithmeticExecuting() {
+		return UPolynomial{}, ErrUPolynomialCleanupPending
+	}
 	if e := m.check(); e != nil {
 		return UPolynomial{}, e
 	}
@@ -217,6 +224,9 @@ func (m *UPolynomialManager) NewPolynomial() (UPolynomial, error) {
 	return UPolynomial{m.origin, uint32((len(m.pages)-1)*32 + 1), 1}, nil
 }
 func (m *UPolynomialManager) DelPolynomial(p *UPolynomial) error {
+	if m.sexprArithmeticExecuting() {
+		return ErrUPolynomialCleanupPending
+	}
 	if p == nil {
 		return ErrUPolynomialOwner
 	}
@@ -286,6 +296,9 @@ func (m *UPolynomialManager) closeWithHenselOwners(r *upolyHenselPairInvocationR
 	return m.closeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
+	if m != nil && m.self == m && (m.sexprArithmeticExecuting() || m.pendingSexprArithmetic != nil) {
+		return ErrUPolynomialCleanupPending
+	}
 	if m != nil && m.self == m && m.rationalInput.running {
 		return ErrUPolynomialCleanupPending
 	}

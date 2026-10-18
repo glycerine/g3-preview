@@ -50102,6 +50102,24 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "S-expression arithmetic issued-child ownership before older argument-vector destruction (sexpr2upolynomial.cpp:39-85)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/sexpr_upolynomial_arithmetic.go",
+          "go_targets": [
+            "pkg/math/polynomial/sexpr_upolynomial_arithmetic_test.go",
+            "pkg/math/polynomial/sexpr_upolynomial.go",
+            "pkg/math/polynomial/upolynomial_ops.go",
+            "pkg/util/numeral/rational_numeric_borrow.go",
+            "pkg/util/numeral/rational_numeric_borrow_test.go"
+          ],
+          "tests": [
+            "TestSexprPolynomialArithmeticRefusalRetainsOlderArguments",
+            "TestSexprPolynomialSourceArithmetic",
+            "TestRationalNumericBorrowCopiesLexicalScalarAndExpires"
+          ],
+          "notes": "Concrete converter arithmetic scope passes the existing allocation context through addition, subtraction, multiplication, negation and power without changing source operand order or algorithms. Only actually issued raw, AddMul, normalization and numerical-root children are retained. Actual descriptor-after-physical refusals in +, -, * and nested power retain the older argument vector until exact child cleanup; an idle converter cannot acquire that pending arithmetic. Pending or executing work protects the borrowed polynomial owner. The synchronous global numeric borrow also binds its actual source integer/natural owners and restores those bindings on return. Broader arithmetic callback/destructor fault composition remains partial."
+        },
+        {
           "name": "S-expression receiving-input invocation ownership and older argument-vector destruction frontier (sexpr2upolynomial.cpp:47-74,90-97)",
           "status": "partial",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
@@ -50244,6 +50262,24 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "S-expression arithmetic issued-child ownership before older argument-vector destruction (sexpr2upolynomial.cpp:39-85)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/sexpr_upolynomial_arithmetic.go",
+          "go_targets": [
+            "pkg/math/polynomial/sexpr_upolynomial_arithmetic_test.go",
+            "pkg/math/polynomial/sexpr_upolynomial.go",
+            "pkg/math/polynomial/upolynomial_ops.go",
+            "pkg/util/numeral/rational_numeric_borrow.go",
+            "pkg/util/numeral/rational_numeric_borrow_test.go"
+          ],
+          "tests": [
+            "TestSexprPolynomialArithmeticRefusalRetainsOlderArguments",
+            "TestSexprPolynomialSourceArithmetic",
+            "TestRationalNumericBorrowCopiesLexicalScalarAndExpires"
+          ],
+          "notes": "Concrete converter arithmetic scope passes the existing allocation context through addition, subtraction, multiplication, negation and power without changing source operand order or algorithms. Only actually issued raw, AddMul, normalization and numerical-root children are retained. Actual descriptor-after-physical refusals in +, -, * and nested power retain the older argument vector until exact child cleanup; an idle converter cannot acquire that pending arithmetic. Pending or executing work protects the borrowed polynomial owner. The synchronous global numeric borrow also binds its actual source integer/natural owners and restores those bindings on return. Broader arithmetic callback/destructor fault composition remains partial."
+        },
         {
           "name": "S-expression receiving-input invocation ownership and older argument-vector destruction frontier (sexpr2upolynomial.cpp:47-74,90-97)",
           "status": "partial",
@@ -51312,6 +51348,24 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "S-expression arithmetic issued-child ownership before older argument-vector destruction (sexpr2upolynomial.cpp:39-85)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/sexpr_upolynomial_arithmetic.go",
+          "go_targets": [
+            "pkg/math/polynomial/sexpr_upolynomial_arithmetic_test.go",
+            "pkg/math/polynomial/sexpr_upolynomial.go",
+            "pkg/math/polynomial/upolynomial_ops.go",
+            "pkg/util/numeral/rational_numeric_borrow.go",
+            "pkg/util/numeral/rational_numeric_borrow_test.go"
+          ],
+          "tests": [
+            "TestSexprPolynomialArithmeticRefusalRetainsOlderArguments",
+            "TestSexprPolynomialSourceArithmetic",
+            "TestRationalNumericBorrowCopiesLexicalScalarAndExpires"
+          ],
+          "notes": "Concrete converter arithmetic scope passes the existing allocation context through addition, subtraction, multiplication, negation and power without changing source operand order or algorithms. Only actually issued raw, AddMul, normalization and numerical-root children are retained. Actual descriptor-after-physical refusals in +, -, * and nested power retain the older argument vector until exact child cleanup; an idle converter cannot acquire that pending arithmetic. Pending or executing work protects the borrowed polynomial owner. The synchronous global numeric borrow also binds its actual source integer/natural owners and restores those bindings on return. Broader arithmetic callback/destructor fault composition remains partial."
+        },
+        {
           "name": "S-expression receiving-input invocation ownership and older argument-vector destruction frontier (sexpr2upolynomial.cpp:47-74,90-97)",
           "status": "partial",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
@@ -52205,6 +52259,24 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "S-expression arithmetic issued-child ownership before older argument-vector destruction (sexpr2upolynomial.cpp:39-85)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/sexpr_upolynomial_arithmetic.go",
+          "go_targets": [
+            "pkg/math/polynomial/sexpr_upolynomial_arithmetic_test.go",
+            "pkg/math/polynomial/sexpr_upolynomial.go",
+            "pkg/math/polynomial/upolynomial_ops.go",
+            "pkg/util/numeral/rational_numeric_borrow.go",
+            "pkg/util/numeral/rational_numeric_borrow_test.go"
+          ],
+          "tests": [
+            "TestSexprPolynomialArithmeticRefusalRetainsOlderArguments",
+            "TestSexprPolynomialSourceArithmetic",
+            "TestRationalNumericBorrowCopiesLexicalScalarAndExpires"
+          ],
+          "notes": "Concrete converter arithmetic scope passes the existing allocation context through addition, subtraction, multiplication, negation and power without changing source operand order or algorithms. Only actually issued raw, AddMul, normalization and numerical-root children are retained. Actual descriptor-after-physical refusals in +, -, * and nested power retain the older argument vector until exact child cleanup; an idle converter cannot acquire that pending arithmetic. Pending or executing work protects the borrowed polynomial owner. The synchronous global numeric borrow also binds its actual source integer/natural owners and restores those bindings on return. Broader arithmetic callback/destructor fault composition remains partial."
+        },
         {
           "name": "S-expression receiving-input invocation ownership and older argument-vector destruction frontier (sexpr2upolynomial.cpp:47-74,90-97)",
           "status": "partial",

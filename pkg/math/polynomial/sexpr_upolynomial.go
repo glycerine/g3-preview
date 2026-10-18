@@ -35,6 +35,7 @@ type sexprPolynomialFrame struct {
 // Native frames retain actual source scoped vectors, including stopped cleanup.
 // The converter header and actual numerical owners are charged separately.
 type SexprPolynomialConverter struct {
+	arithmetic   sexprPolynomialArithmeticScope
 	inputReceipt upolyRationalInputInvocationReceipt
 	borrowed     *usexpr.SexprBorrowedNodes
 	self         *SexprPolynomialConverter
@@ -49,6 +50,9 @@ type SexprPolynomialConverter struct {
 }
 
 func NewSexprPolynomialConverter(s *usexpr.SexprManager, m *UPolynomialManager) (out *SexprPolynomialConverter, cause error) {
+	if m != nil && (m.sexprArithmeticExecuting() || m.pendingSexprArithmetic != nil) {
+		return nil, ErrUPolynomialCleanupPending
+	}
 	cause = s.WithBorrowedNodes(func(*usexpr.SexprBorrowedNodes) error {
 		if e := numericRationalService_WithUPolynomialRationals(s.Configuration().Rationals, m, func(*UPolynomialRationalContext) error { return nil }); e != nil {
 			return e
@@ -104,7 +108,7 @@ func (c *SexprPolynomialConverter) convertAtDepthForRoot(h usexpr.SexprHandle, p
 	if e := c.open(); e != nil {
 		return e
 	}
-	if c.cause != nil || c.converting {
+	if c.cause != nil || c.converting || c.arithmetic.active || c.polynomial.sexprArithmeticExecuting() || c.polynomial.pendingSexprArithmetic != nil {
 		return ErrSexprPolynomialPending
 	}
 	c.converting = true
@@ -188,10 +192,10 @@ func (c *SexprPolynomialConverter) convert(ctx *UPolynomialRationalContext, h us
 			if !ok {
 				return c.parseError(exponent, "invalid univariate polynomial, exponent must be an unsigned integer")
 			}
-			return c.polynomial.Power(p, n, p)
+			return c.arithmeticCall(ctx, "^", p, UPolynomial{}, n)
 		}
 		if op == "-" && num == 2 {
-			return c.polynomial.NegInPlace(p)
+			return c.arithmeticCall(ctx, "neg", p, UPolynomial{}, 0)
 		}
 		index, e := c.frame()
 		if e != nil {
@@ -200,7 +204,7 @@ func (c *SexprPolynomialConverter) convert(ctx *UPolynomialRationalContext, h us
 		defer func() {
 			c.depth--
 			// Child numeric cleanup must finish before this older completed vector.
-			if c.cause != nil || ctx.Pending() || c.polynomial.rationalInputPending(&c.inputReceipt) {
+			if c.cause != nil || ctx.Pending() || c.polynomial.rationalInputPending(&c.inputReceipt) || c.arithmetic.active {
 				if c.cause == nil {
 					c.cause = ErrSexprPolynomialPending
 				}
@@ -233,14 +237,7 @@ func (c *SexprPolynomialConverter) convert(ctx *UPolynomialRationalContext, h us
 			if e = c.convert(ctx, ch, arg, depth+1); e != nil {
 				return e
 			}
-			switch op {
-			case "+":
-				e = c.polynomial.Add(arg, p, p)
-			case "-":
-				e = c.polynomial.Sub(p, arg, p)
-			case "*":
-				e = c.polynomial.Mul(arg, p, p)
-			}
+			e = c.arithmeticCall(ctx, op, p, arg, 0)
 			if e != nil {
 				return e
 			}
@@ -270,6 +267,9 @@ func (c *SexprPolynomialConverter) Cleanup() error {
 		return e
 	}
 	err := numericRationalService_CleanupUPolynomialRationals(c.sexpr.Configuration().Rationals, c.polynomial, func() error {
+		if e := c.cleanupArithmetic(); e != nil {
+			return e
+		}
 		if e := c.polynomial.cleanupRationalInputInvocation(&c.inputReceipt); e != nil {
 			return e
 		}

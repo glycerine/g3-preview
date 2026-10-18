@@ -12,6 +12,10 @@ func numericIntegerModularManager_upolynomialCallerExecuting(m *unumeral.Integer
 	z := m.Integers()
 	for binding := z.CallerBindings(); binding != nil; binding = binding.Previous() {
 		switch binding.Kind() {
+		case 20:
+			if q, ok := binding.Guard().(*sexprPolynomialArithmeticScope); ok && q.NumericExecuting() && q.owner.polynomial.modular == m {
+				return true
+			}
 		case 17:
 			if q, ok := binding.Guard().(*upolySequenceSturmScope); ok && q.NumericExecuting() && q.owner.manager.modular == m {
 				return true
