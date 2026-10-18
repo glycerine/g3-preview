@@ -10,9 +10,10 @@ import (
 type polynomialMonicScope struct {
 	inv, newA               unumeral.Int
 	numeric                 polynomialNumericRoots
-	active, topOwner        bool
+	active                  bool
 	cursor                  uint8
-	generation              uint64
+	append                  polynomialCheapAppendInvocationReceipt
+	factory                 polynomialFactoryInvocationReceipt
 	bodyCause, cleanupCause error
 }
 
@@ -23,10 +24,6 @@ func (m *MultivariatePolynomialManager) finishGlexMonicSource() (err error) {
 	}
 	if s.cleanupCause != nil {
 		return s.cleanupCause
-	}
-	if e := m.core.pscSourceStopped(); e != nil {
-		s.cleanupCause = e
-		return e
 	}
 	defer func() {
 		if err != nil {
@@ -65,10 +62,11 @@ func (m *MultivariatePolynomialManager) CleanupGlexMonic() error {
 	if e := s.numeric.cleanup(c.integer); e != nil {
 		return e
 	}
-	if s.topOwner && s.generation == c.pscReceipts.generation {
-		if e := c.CleanupPSC(); e != nil {
-			return e
-		}
+	if e := c.cleanupFactoryInvocation(&s.factory, true); e != nil {
+		return e
+	}
+	if e := c.cheap.cleanupAppendInvocation(&s.append, true); e != nil {
+		return e
 	}
 	*s = polynomialMonicScope{}
 	return nil
@@ -113,19 +111,26 @@ func (m *MultivariatePolynomialManager) GlexMonic(p Polynomial) (result Polynomi
 	if s.active {
 		return Polynomial{}, ErrPolynomialPending
 	}
-	top := c.pscReceipts.depth == 0
 	if e = c.pscEnter(); e != nil {
 		return Polynomial{}, e
 	}
-	*s = polynomialMonicScope{active: true, topOwner: top, generation: c.pscReceipts.generation}
+	*s = polynomialMonicScope{active: true}
 	defer func() {
 		c.pscLeave()
 		s.bodyCause = err
 		if e := m.finishGlexMonicSource(); e != nil {
+			result = Polynomial{}
 			err = errors.Join(err, e)
 			return
 		}
-		if s.newA.NativeCellToken() == 0 && s.inv.NativeCellToken() == 0 && s.numeric.PendingObject().OwnerID() == 0 && !(s.topOwner && c.pscPending()) {
+		if err == nil {
+			if e := c.transferFactoryResult(&s.factory, result); e != nil {
+				result = Polynomial{}
+				err = e
+				return
+			}
+		}
+		if s.newA.NativeCellToken() == 0 && s.inv.NativeCellToken() == 0 && s.numeric.PendingObject().OwnerID() == 0 && !c.matchesFactoryInvocation(&s.factory) && !c.cheap.matchesAppendInvocation(&s.append) {
 			hasRaw := false
 			for _, p := range s.numeric.PendingAllocatorBlocks() {
 				hasRaw = hasRaw || p.OwnerID() != 0
@@ -195,7 +200,7 @@ func (m *MultivariatePolynomialManager) GlexMonic(p Polynomial) (result Polynomi
 		if e != nil {
 			return Polynomial{}, e
 		}
-		e = c.cheap.add(&s.newA, mono, false)
+		e = c.cheap.addWithAppendReceipt(&s.newA, mono, false, &s.append)
 		e = polynomialNewtonJoin(e, s.numeric.after(c.integer, before))
 		if e != nil {
 			return Polynomial{}, e
@@ -205,6 +210,6 @@ func (m *MultivariatePolynomialManager) GlexMonic(p Polynomial) (result Polynomi
 	if e != nil {
 		return Polynomial{}, e
 	}
-	result, e = c.cheap.mk(false)
+	result, e = c.cheap.mkWithAppendReceipt(false, &s.append, &s.factory)
 	return result, polynomialNewtonJoin(e, s.numeric.after(c.integer, before))
 }

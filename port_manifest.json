@@ -40313,7 +40313,8 @@
         "pkg/math/polynomial/polynomial_cache_child_owner_test.go",
         "pkg/math/polynomial/polynomial_cache_borrowed_owner_test.go",
         "pkg/math/polynomial/polynomial_cache_pending_psc_test.go",
-        "pkg/math/polynomial/polynomial_content_independent_scope_test.go"
+        "pkg/math/polynomial/polynomial_content_independent_scope_test.go",
+        "pkg/math/polynomial/polynomial_glex_monic_independent_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -41170,7 +41171,9 @@
         "TestPolynomialCachePSCCleanupPreservesIndependentLazard",
         "TestPolynomialCachePSCExactCleanupReservationPrefixes",
         "TestPolynomialIntegerContentCleanupPreservesIndependentLazard",
-        "TestPolynomialIntegerContentIndependentLazardReservationPrefixes"
+        "TestPolynomialIntegerContentIndependentLazardReservationPrefixes",
+        "TestPolynomialGlexMonicCleanupPreservesIndependentLazard",
+        "TestPolynomialGlexMonicIndependentLazardReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -42427,6 +42430,17 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "GlexMonic owns exact cheap append/factory receipts and transfers the raw returned polynomial only after source new_a/inv_c destruction; cleanup preserves independent stopped Lazard frames (polynomial.cpp:6843-6862)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_glex_monic.go",
+          "tests": [
+            "TestPolynomialGlexMonicCleanupPreservesIndependentLazard",
+            "TestPolynomialGlexMonicIndependentLazardReservationPrefixes",
+            "TestPolynomialGlexMonicEveryActualReservationPrefix",
+            "TestPolynomialGlexMonicBigFieldEveryNumericPrefix"
+          ]
+        },
         {
           "name": "Integer content source retirement and explicit owning continuation retain only its issued numeric, append and factory children; independent stopped PSC/Lazard scopes grant no lifetime or cleanup authority (polynomial.cpp:3384-3430)",
           "status": "ported",
@@ -45680,7 +45694,8 @@
         "pkg/math/polynomial/algebraic_isolation_multivariate_test.go",
         "pkg/math/polynomial/algebraic_isolation_multivariate_cancel_test.go",
         "pkg/math/polynomial/algebraic_isolation_multivariate_owner_test.go",
-        "pkg/math/polynomial/polynomial_content_independent_scope_test.go"
+        "pkg/math/polynomial/polynomial_content_independent_scope_test.go",
+        "pkg/math/polynomial/polynomial_glex_monic_independent_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -46271,7 +46286,9 @@
         "TestAlgebraicMultivariateIsolationExecutingOwnerRefusals",
         "TestAlgebraicMultivariateIsolationEmptyOutputAssertionBeforeLocals",
         "TestPolynomialIntegerContentCleanupPreservesIndependentLazard",
-        "TestPolynomialIntegerContentIndependentLazardReservationPrefixes"
+        "TestPolynomialIntegerContentIndependentLazardReservationPrefixes",
+        "TestPolynomialGlexMonicCleanupPreservesIndependentLazard",
+        "TestPolynomialGlexMonicIndependentLazardReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -46300,6 +46317,17 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "GlexMonic owns exact cheap append/factory receipts and transfers the raw returned polynomial only after source new_a/inv_c destruction; cleanup preserves independent stopped Lazard frames (polynomial.cpp:6843-6862)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_glex_monic.go",
+          "tests": [
+            "TestPolynomialGlexMonicCleanupPreservesIndependentLazard",
+            "TestPolynomialGlexMonicIndependentLazardReservationPrefixes",
+            "TestPolynomialGlexMonicEveryActualReservationPrefix",
+            "TestPolynomialGlexMonicBigFieldEveryNumericPrefix"
+          ]
+        },
         {
           "name": "Integer content source retirement and explicit owning continuation retain only its issued numeric, append and factory children; independent stopped PSC/Lazard scopes grant no lifetime or cleanup authority (polynomial.cpp:3384-3430)",
           "status": "ported",
