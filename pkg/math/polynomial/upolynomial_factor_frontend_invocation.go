@@ -14,6 +14,7 @@ type upolyFactorFrontendInvocationReceipt struct {
 	history    *upolyFactorFrontendHistory
 }
 type upolyFactorFrontendHistory struct {
+	scalarTrace                                                                       [3]unumeral.NumeralInsertionReceipt
 	coreTrace                                                                         upolyDisplayInvocationReceipt
 	euclidTrace                                                                       upolyDisplayInvocationReceipt
 	modGCDTrace                                                                       upolyDisplayInvocationReceipt
@@ -186,6 +187,7 @@ type upolyFactorFlipScope struct {
 }
 
 type upolyFactorFrontendScope struct {
+	scalarTrace     [3]unumeral.NumeralInsertionReceipt
 	coreTrace       upolyDisplayInvocationReceipt
 	euclidTrace     upolyDisplayInvocationReceipt
 	modGCDTrace     upolyDisplayInvocationReceipt
@@ -284,6 +286,9 @@ func (q *upolyFactorFrontendScope) finish(body error) error {
 		q.bodyCause = body
 	}
 	if q.sourceCause == nil {
+		q.sourceCause = q.scalarTraceBlocker()
+	}
+	if q.sourceCause == nil {
 		q.sourceCause = q.coreTrace.sourceBlocker()
 	}
 	if q.sourceCause == nil {
@@ -369,6 +374,9 @@ func (q *upolyFactorFrontendScope) own(abort bool) (cause error) {
 		q.recordHistory()
 	}()
 	if e := q.cra.trace.cleanup(); e != nil {
+		return e
+	}
+	if e := q.cleanupScalarTrace(); e != nil {
 		return e
 	}
 	if e := q.coreTrace.cleanupOwned(); e != nil {
@@ -502,6 +510,9 @@ func (q *upolyFactorFrontendScope) own(abort bool) (cause error) {
 // Retention is decided from exact captured child tuples and directly stamped
 // leaves; a nil square-free class frame does not imply diagnostic completion.
 func (q *upolyFactorFrontendScope) hasUnjoined() bool {
+	if q.scalarTracePending() {
+		return true
+	}
 	if q.service.manager.displayReceiptPending(&q.coreTrace) {
 		return true
 	}
@@ -567,6 +578,7 @@ func (q *upolyFactorFrontendScope) recordHistory() {
 	if h == nil || h.self != h || h.service != q.service || h.invocation != q.invocation || h.header == 0 {
 		return
 	}
+	h.scalarTrace = q.scalarTrace
 	h.coreTrace = q.coreTrace
 	h.euclidTrace = q.euclidTrace
 	h.modGCDTrace = q.modGCDTrace
@@ -1477,6 +1489,9 @@ func (q *upolyFactorQuadraticScope) finish(body error) error {
 	}
 	if q.bodyCause == nil {
 		q.bodyCause = body
+	}
+	if q.sourceCause == nil {
+		q.sourceCause = q.owner.scalarTraceBlocker()
 	}
 	if q.sourceCause == nil {
 		q.sourceCause = q.owner.coreTrace.sourceBlocker()

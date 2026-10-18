@@ -39,12 +39,12 @@ func TestUPolynomialQuadraticPolynomialTraceRecords(t *testing.T) {
 				return
 			}
 			if refused {
-				if bad.calls != 1 || bad.flushes != 2 {
+				if bad.calls != 1 || bad.flushes != 4 {
 					t.Fatal("sticky quadratic records", bad.calls, bad.flushes)
 				}
 				return
 			}
-			want := "-------- [factor] factor_2_sqf_pp src/math/polynomial/upolynomial.cpp:2969 ---------\nfactor square free (degree == 2):\nx^2 - 1\n------------------------------------------------\n-------- [factor] factor_2_sqf_pp src/math/polynomial/upolynomial.cpp:3003 ---------\nf1: x - 1\nf2: x + 1\n------------------------------------------------\n"
+			want := "-------- [factor] factor_2_sqf_pp src/math/polynomial/upolynomial.cpp:2969 ---------\nfactor square free (degree == 2):\nx^2 - 1\n------------------------------------------------\n-------- [factor] factor_2_sqf_pp src/math/polynomial/upolynomial.cpp:2974 ---------\na: 1\nb: 0\nc: -1\n------------------------------------------------\n-------- [factor] factor_2_sqf_pp src/math/polynomial/upolynomial.cpp:2990 ---------\ndisc_sqrt: 2\n------------------------------------------------\n-------- [factor] factor_2_sqf_pp src/math/polynomial/upolynomial.cpp:3003 ---------\nf1: x - 1\nf2: x + 1\n------------------------------------------------\n"
 			if text.String() != want {
 				t.Fatal("quadratic polynomial records", text.String(), want)
 			}

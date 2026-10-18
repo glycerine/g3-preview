@@ -87,6 +87,9 @@ func (s *UPolynomialFactorizationService) factorQuadratic(p *upolyVectorState, f
 	if o == nil || !o.actual() || !o.executing || o.result != fs {
 		return ErrUPolynomialOwner
 	}
+	if e := s.traceFactorQuadraticScalars(o, [3]*unumeral.Int{a, b, c}, 2974); e != nil {
+		return e
+	}
 	q := &o.quadratic
 	if q.constructed != 0 || q.executing || q.invocation == ^uint64(0) {
 		return ErrUPolynomialCleanupPending
@@ -117,6 +120,9 @@ func (s *UPolynomialFactorizationService) factorQuadratic(p *upolyVectorState, f
 	}
 	if !square {
 		return fs.pushCopyWithSourceContext(m.stateView(p), k, numericIntegerModularManager_factorFrontendAllocationContext(m.modular, m.factorFrontendCaller))
+	}
+	if e := s.traceFactorQuadraticScalars(o, [3]*unumeral.Int{root}, 2990); e != nil {
+		return e
 	}
 	f1, f2 := &q.f1, &q.f2
 	q.constructed = 6

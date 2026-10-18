@@ -50813,7 +50813,10 @@
         "pkg/math/polynomial/upolynomial_factor_core_trace.go",
         "pkg/math/polynomial/upolynomial_factor_core_trace_test.go",
         "pkg/math/polynomial/upolynomial_factor_quadratic_trace.go",
-        "pkg/math/polynomial/upolynomial_factor_quadratic_trace_test.go"
+        "pkg/math/polynomial/upolynomial_factor_quadratic_trace_test.go",
+        "pkg/math/polynomial/upolynomial_factor_quadratic_scalar_trace.go",
+        "pkg/math/polynomial/upolynomial_quadratic_scalar_trace_test.go",
+        "pkg/util/numeral/mpzzp_string_source.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51131,7 +51134,8 @@
         "TestUPolynomialFactorCoreTraceRecordsAndStickyStream",
         "TestUPolynomialFactorCoreTraceRetainsActualFrontend",
         "TestUPolynomialQuadraticPolynomialTraceRecords",
-        "TestUPolynomialQuadraticPolynomialTraceStops"
+        "TestUPolynomialQuadraticPolynomialTraceStops",
+        "TestUPolynomialQuadraticScalarTraceActualReadStops"
       ],
       "conditionals": [
         {
@@ -51720,6 +51724,25 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Quadratic scalar to_string records and exact frontend insertion ownership (upolynomial.cpp:2974,2990)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_quadratic_scalar_trace.go",
+            "pkg/math/polynomial/upolynomial_quadratic_scalar_trace_test.go",
+            "pkg/math/polynomial/upolynomial_factor_quadratic_trace_test.go",
+            "pkg/math/polynomial/upolynomial_factor_core.go",
+            "pkg/math/polynomial/upolynomial_factor_frontend_invocation.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/util/numeral/mpzzp_string_source.go"
+          ],
+          "tests": [
+            "TestUPolynomialQuadraticScalarTraceActualReadStops",
+            "TestUPolynomialQuadraticPolynomialTraceRecords"
+          ],
+          "notes": "Exact a/b/c and discriminant-root records use normalized source to_string before outer insertion, native Go string assembly and actual tracked numeral insertion (no STL internals). Separate actual accepted receipts per frontend operand; pending numerical formatting protects parent suffix and quadratic frontier0/coefficient or4/root, with exact reverse owning completion/history. Whole-record borrowing and sticky outer stream failure still evaluate to_string. Qualified query-only backing projects readable actual size/unreadable capacity/limbs onto genuine BIG b/root without changing numerical values; genuine backing restored before owning cleanup. Actual public Factor reaches guarded formatting errors, including refused outer write; later independently accepted character invocation survives stale frontend cleanup. These are read-guard profiles, not quota evidence. Broader numerical/source-lifetime audits remain partial. An unjoined insertion body failure permits only actual parent source-unwind reads, excluding runtime/output reentry; it does not synthesize an older destructor stop. Guarded coefficient b reaches actual primitive-vector destruction at stage2/index1 after younger vectors end; guarded root stops its actual NUM destruction at quadratic frontier4. Original source-destructor causes survive owning cleanup. CleanupSourceString uses the existing exact owning insertion cleanup: an ended old receipt is retired without inspecting a later frame generation. Tests start a later independent guarded formatting invocation BEFORE old frontend cleanup and prove it remains active and unchanged."
+        },
         {
           "name": "Quadratic input/factor-pair polynomial diagnostics and source suffix retention (upolynomial.cpp:2969,3003)",
           "status": "ported",
@@ -176085,7 +176108,10 @@
         "pkg/math/polynomial/polynomial_som_normalize_allocation_context.go",
         "pkg/math/polynomial/polynomial_variable_recognition_owner_source_test.go",
         "pkg/util/numeral/numeric_caller_operations_extra.go",
-        "pkg/math/polynomial/upolynomial_berlekamp_numeric.go"
+        "pkg/math/polynomial/upolynomial_berlekamp_numeric.go",
+        "pkg/util/numeral/mpzzp_string_source.go",
+        "pkg/math/polynomial/upolynomial_quadratic_scalar_trace_test.go",
+        "pkg/math/polynomial/upolynomial_factor_quadratic_trace_test.go"
       ],
       "tests": [
         "TestIntegerModularCenteredOracle",
@@ -176156,7 +176182,9 @@
         "TestPolynomialVariableRecognitionExecutingIntegerOwnerRefusesFinalize",
         "TestIntegerPNormalizeNilReturningTransportOwnerRefusal",
         "TestIntegerModularFusedLargeAliasOracle",
-        "TestUPolynomialBerlekampConstructorActualNumericReservationPrefixes"
+        "TestUPolynomialBerlekampConstructorActualNumericReservationPrefixes",
+        "TestUPolynomialQuadraticScalarTraceActualReadStops",
+        "TestUPolynomialQuadraticPolynomialTraceRecords"
       ],
       "conditionals": [
         {
@@ -176345,6 +176373,20 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Tracked normalized to_string for retained polynomial quadratic diagnostics (mpzzp.h:145-148; mpz.cpp:1432-1436)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/numeral/mpzzp_string_source.go",
+            "pkg/math/polynomial/upolynomial_quadratic_scalar_trace_test.go",
+            "pkg/math/polynomial/upolynomial_factor_quadratic_trace_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialQuadraticScalarTraceActualReadStops",
+            "TestUPolynomialQuadraticPolynomialTraceRecords"
+          ],
+          "notes": "Concrete modular-numeral SourceStringTracked preserves normalization assertion146 then actual source integer display into native Go string storage. Accepted receipt retains actual project character/formatting scopes only. C++ standard-library stream/string internals are intentionally replaced by Go strings.Builder/strconv; no synthetic NUM construction or string-allocation quota. Retained polynomial caller tests verify formatting text, guarded reads and exact cleanup/reuse identity. CleanupSourceString uses the existing exact owning insertion cleanup: an ended old receipt is retired without inspecting a later frame generation. Tests start a later independent guarded formatting invocation BEFORE old frontend cleanup and prove it remains active and unchanged."
+        },
         {
           "name": "Dec context carries the retained Berlekamp Q-I diagonal through the existing scalar decrement and normalization (mpzzp.h:153)",
           "status": "ported",
