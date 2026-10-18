@@ -11,6 +11,7 @@ import (
 // PolynomialCache owns canonical representatives and memoized results used by
 // the retained NLSAT cache.
 type PolynomialCache struct {
+	executing      bool
 	pscCall        polynomialPSCInvocationReceipt
 	factorCall     polynomialFactorCoreInvocationReceipt
 	self           *PolynomialCache
@@ -67,6 +68,8 @@ func (c *PolynomialCache) Factor(p Polynomial, out *PolynomialRefVector) error {
 	if e := c.ready(); e != nil {
 		return e
 	}
+	c.executing = true
+	defer func() { c.executing = false }()
 	if out == nil || out.owner != c.manager.core {
 		return ErrPolynomialOwner
 	}
@@ -74,7 +77,7 @@ func (c *PolynomialCache) Factor(p Polynomial, out *PolynomialRefVector) error {
 		return e
 	}
 	var e error
-	p, e = c.MkUnique(p)
+	p, e = c.mkUnique(p)
 	if e != nil {
 		return e
 	}
@@ -117,7 +120,7 @@ func (c *PolynomialCache) Factor(p Polynomial, out *PolynomialRefVector) error {
 		if e != nil {
 			return c.finishFactorOwner(fs, e)
 		}
-		value, e = c.MkUnique(value)
+		value, e = c.mkUnique(value)
 		if e != nil {
 			return c.finishFactorOwner(fs, e)
 		}
@@ -153,9 +156,17 @@ func (c *PolynomialCache) CleanupFactor() error {
 	if c == nil || c.self != c {
 		return ErrPolynomialOwner
 	}
+	if c.executing {
+		return ErrPolynomialPending
+	}
 	if c.closed {
 		return arena.ErrClosed
 	}
+	c.executing = true
+	defer func() { c.executing = false }()
+	return c.cleanupFactor()
+}
+func (c *PolynomialCache) cleanupFactor() error {
 	if c.pendingFactors == nil {
 		return nil
 	}
@@ -183,9 +194,17 @@ func (c *PolynomialCache) CleanupPSC() error {
 	if c == nil || c.self != c {
 		return ErrPolynomialOwner
 	}
+	if c.executing {
+		return ErrPolynomialPending
+	}
 	if c.closed {
 		return arena.ErrClosed
 	}
+	c.executing = true
+	defer func() { c.executing = false }()
+	return c.cleanupPSC()
+}
+func (c *PolynomialCache) cleanupPSC() error {
 	if !c.pendingPSC {
 		return nil
 	}
@@ -203,12 +222,14 @@ func (c *PolynomialCache) PSCChain(p, q Polynomial, x uint32, out *PolynomialRef
 	if e := c.ready(); e != nil {
 		return e
 	}
+	c.executing = true
+	defer func() { c.executing = false }()
 	var e error
-	p, e = c.MkUnique(p)
+	p, e = c.mkUnique(p)
 	if e != nil {
 		return e
 	}
-	q, e = c.MkUnique(q)
+	q, e = c.mkUnique(q)
 	if e != nil {
 		return e
 	}
@@ -247,7 +268,7 @@ func (c *PolynomialCache) PSCChain(p, q Polynomial, x uint32, out *PolynomialRef
 		if e != nil {
 			return c.finishPSC(e)
 		}
-		value, e = c.MkUnique(value)
+		value, e = c.mkUnique(value)
 		if e != nil {
 			return c.finishPSC(e)
 		}
@@ -263,6 +284,9 @@ func (c *PolynomialCache) PSCChain(p, q Polynomial, x uint32, out *PolynomialRef
 func (c *PolynomialCache) ready() error {
 	if c == nil || c.self != c {
 		return ErrPolynomialOwner
+	}
+	if c.executing {
+		return ErrPolynomialPending
 	}
 	if c.closed || c.closing {
 		return arena.ErrClosed
@@ -285,6 +309,11 @@ func (c *PolynomialCache) MkUnique(p Polynomial) (Polynomial, error) {
 	if e := c.ready(); e != nil {
 		return Polynomial{}, e
 	}
+	c.executing = true
+	defer func() { c.executing = false }()
+	return c.mkUnique(p)
+}
+func (c *PolynomialCache) mkUnique(p Polynomial) (Polynomial, error) {
 	info, e := c.manager.core.Info(p)
 	if e != nil {
 		return Polynomial{}, e
@@ -319,6 +348,8 @@ func (c *PolynomialCache) Reset() error {
 	if e := c.ready(); e != nil {
 		return e
 	}
+	c.executing = true
+	defer func() { c.executing = false }()
 	clear(c.psc)
 	clear(c.factors)
 	if e := c.refs.reset(c.manager.core); e != nil {
@@ -339,9 +370,14 @@ func (c *PolynomialCache) CleanupReset() error {
 	if c == nil || c.self != c {
 		return ErrPolynomialOwner
 	}
+	if c.executing {
+		return ErrPolynomialPending
+	}
 	if c.closed {
 		return arena.ErrClosed
 	}
+	c.executing = true
+	defer func() { c.executing = false }()
 	if !c.resetting {
 		return nil
 	}
@@ -366,14 +402,19 @@ func (c *PolynomialCache) Close() error {
 	if c == nil || c.self != c {
 		return ErrPolynomialOwner
 	}
+	if c.executing {
+		return ErrPolynomialPending
+	}
 	if c.closed {
 		return nil
 	}
+	c.executing = true
+	defer func() { c.executing = false }()
 	c.closing = true
-	if e := c.CleanupPSC(); e != nil {
+	if e := c.cleanupPSC(); e != nil {
 		return e
 	}
-	if e := c.CleanupFactor(); e != nil {
+	if e := c.cleanupFactor(); e != nil {
 		return e
 	}
 	if e := c.refs.close(c.manager.core); e != nil {

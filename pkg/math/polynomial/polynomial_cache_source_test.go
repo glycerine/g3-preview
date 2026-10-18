@@ -157,6 +157,7 @@ func TestPolynomialCachePSCResultReplacementStoppedDeletion(t *testing.T) {
 	h, e := NewPolynomialDeletionHandler(m.originalBudget, func(_ *PolynomialDeletionHandler, core *MultivariatePolynomialCore, value Polynomial) error {
 		if armed && !core.pscLocal.active && value != canonical[0] && len(out.state.values) > 0 && out.state.values[0] == value {
 			fired = true
+			polynomialCacheCallbackProbe(t, c, p)
 			return stop
 		}
 		return nil
@@ -238,6 +239,7 @@ func TestPolynomialCacheFactorTemporaryStoppedDeletion(t *testing.T) {
 		}
 		if same {
 			fired = true
+			polynomialCacheCallbackProbe(t, c, p)
 			return stop
 		}
 		return nil

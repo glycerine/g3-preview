@@ -48191,7 +48191,8 @@
         "pkg/math/polynomial/polynomial_cache.go",
         "pkg/math/polynomial/polynomial_cache_memory_trace.go",
         "pkg/math/polynomial/polynomial_cache_source_test.go",
-        "pkg/math/polynomial/polynomial_cache_child_owner_test.go"
+        "pkg/math/polynomial/polynomial_cache_child_owner_test.go",
+        "pkg/math/polynomial/polynomial_cache_callback_test.go"
       ],
       "tests": [
         "TestPolynomialCacheCanonicalizationAndReset",
@@ -48238,6 +48239,17 @@
             "TestPolynomialCacheFactorStoppedBodyCleanupAndRetry",
             "TestPolynomialCachePSCStoppedBodyCleanupAndRetry"
           ]
+        },
+        {
+          "name": "Cache execution/owning continuation rejects callback reentry before output reset, canonicalization, cache mutation or owner destruction",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "tests": [
+            "TestPolynomialCacheFactorOutputResetCallbackCannotCloseCache",
+            "TestPolynomialCacheResetAndCloseCallbacksRetainExecutingOwner",
+            "TestPolynomialCachePSCResultReplacementStoppedDeletion",
+            "TestPolynomialCacheFactorTemporaryStoppedDeletion"
+          ]
         }
       ],
       "ownership": [],
@@ -48254,7 +48266,8 @@
         "pkg/math/polynomial/polynomial_cache.go",
         "pkg/math/polynomial/polynomial_cache_memory_trace.go",
         "pkg/math/polynomial/polynomial_cache_source_test.go",
-        "pkg/math/polynomial/polynomial_cache_child_owner_test.go"
+        "pkg/math/polynomial/polynomial_cache_child_owner_test.go",
+        "pkg/math/polynomial/polynomial_cache_callback_test.go"
       ],
       "tests": [
         "TestPolynomialCacheCanonicalizationAndReset",
