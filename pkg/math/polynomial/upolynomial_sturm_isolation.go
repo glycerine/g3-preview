@@ -59,14 +59,27 @@ func numericBinaryRationalManager_addSSInterval(b *unumeral.BinaryRationalManage
 	}
 	return b.Copy(&u.state.values[u.state.size-1], upper)
 }
-func (m *UPolynomialManager) pushSSFrame(v UPolynomialView, b *unumeral.BinaryRationalManager, s *upolySSStack, r, l, u *BinaryRationalVector, lowerSV, upperSV uint32, lower, upper *unumeral.BinaryRational) error {
-	if polynomialSourceDebug {
+func (m *UPolynomialManager) pushSSFrame(v UPolynomialView, b *unumeral.BinaryRationalManager, s *upolySSStack, r, l, u *BinaryRationalVector, lowerSV, upperSV uint32, lower, upper *unumeral.BinaryRational, sourceLine int32) error {
+	if enabled, e := refinementSourceAssertionsEnabled(); e != nil {
+		return e
+	} else if enabled {
 		same, e := b.Equal(lower, upper)
 		if e != nil {
 			return e
 		}
 		if same {
-			return ErrUPolynomialAssertion
+			expression := "!bqm.eq(curr_lower, zero)"
+			switch sourceLine {
+			case 2442:
+				expression = "!bqm.eq(zero, curr_upper)"
+			case 2463:
+				expression = "!bqm.eq(curr_lower, mid)"
+			case 2464:
+				expression = "!bqm.eq(mid, curr_upper)"
+			}
+			if e := refinementSourceAssertionFailure(sourceLine, expression); e != nil {
+				return e
+			}
 		}
 	}
 	if lowerSV == upperSV {
@@ -103,14 +116,8 @@ func (m *UPolynomialManager) SturmIsolateRootsWithBounds(v UPolynomialView, neg,
 	if e := m.isolationOwners(b, r, l, u); e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
-		zero, e := m.HasZeroRoots(v)
-		if e != nil {
-			return e
-		}
-		if zero {
-			return ErrUPolynomialAssertion
-		}
+	if e := m.sturmIsolationNoZeroAssertion(v); e != nil {
+		return e
 	}
 	var seq upolySequenceState
 	defer m.sequenceDestroy(&seq)
@@ -149,10 +156,10 @@ func (m *UPolynomialManager) SturmIsolateRootsWithBounds(v UPolynomialView, neg,
 		return e
 	}
 	zero := unumeral.NewBinaryInt(0)
-	if e = m.pushSSFrame(v, b, &s, r, l, u, minus, zeroSV, &lower, &zero); e != nil {
+	if e = m.pushSSFrame(v, b, &s, r, l, u, minus, zeroSV, &lower, &zero, 2441); e != nil {
 		return e
 	}
-	if e = m.pushSSFrame(v, b, &s, r, l, u, zeroSV, plus, &zero, &upper); e != nil {
+	if e = m.pushSSFrame(v, b, &s, r, l, u, zeroSV, plus, &zero, &upper, 2442); e != nil {
 		return e
 	}
 	for uint32(len(s.values)) != 0 {
@@ -170,8 +177,8 @@ func (m *UPolynomialManager) SturmIsolateRootsWithBounds(v UPolynomialView, neg,
 		if e = numericBinaryRationalManager_popSS(b, &s); e != nil {
 			return e
 		}
-		if polynomialSourceDebug && minus <= plus+1 {
-			return ErrUPolynomialAssertion
+		if e = refinementSourceAssert(minus > plus+1, 2452, "lower_sv > upper_sv + 1"); e != nil {
+			return e
 		}
 		if e = b.Add(&lower, &upper, &mid); e != nil {
 			return e
@@ -183,10 +190,10 @@ func (m *UPolynomialManager) SturmIsolateRootsWithBounds(v UPolynomialView, neg,
 		if e != nil {
 			return e
 		}
-		if e = m.pushSSFrame(v, b, &s, r, l, u, minus, midSV, &lower, &mid); e != nil {
+		if e = m.pushSSFrame(v, b, &s, r, l, u, minus, midSV, &lower, &mid, 2463); e != nil {
 			return e
 		}
-		if e = m.pushSSFrame(v, b, &s, r, l, u, midSV, plus, &mid, &upper); e != nil {
+		if e = m.pushSSFrame(v, b, &s, r, l, u, midSV, plus, &mid, &upper, 2464); e != nil {
 			return e
 		}
 	}
@@ -196,8 +203,8 @@ func (m *UPolynomialManager) SturmIsolateRoots(v UPolynomialView, b *unumeral.Bi
 	if e := m.isolationOwners(b, r, l, u); e != nil {
 		return e
 	}
-	if polynomialSourceDebug && l.state.size != u.state.size {
-		return ErrUPolynomialAssertion
+	if e := refinementSourceAssert(l.state.size == u.state.size, 2469, "lowers.size() == uppers.size()"); e != nil {
+		return e
 	}
 	var p upolyVectorState
 	defer m.dropLocalVector(&p)
@@ -216,4 +223,20 @@ func (m *UPolynomialManager) SturmIsolateRoots(v UPolynomialView, b *unumeral.Bi
 		return e
 	}
 	return m.SturmIsolateRootsWithBounds(m.stateView(&p), neg, pos, b, r, l, u)
+}
+
+// The operand is inside SASSERT and must not execute in erased/disabled builds.
+func (m *UPolynomialManager) sturmIsolationNoZeroAssertion(v UPolynomialView) error {
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil || !enabled {
+		return e
+	}
+	zero, e := m.HasZeroRoots(v)
+	if e != nil {
+		return e
+	}
+	if zero {
+		return refinementSourceAssertionFailure(2394, "!has_zero_roots(sz, p)")
+	}
+	return nil
 }
