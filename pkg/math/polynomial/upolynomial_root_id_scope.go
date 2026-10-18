@@ -11,7 +11,7 @@ type upolyRootIDScope struct {
 	normalization                              upolyRootIDNormalizeScope
 	derivative                                 unumeral.Int
 	derivativeRetired                          *upolyRootIDDerivativeRaw
-	scalar                                     upolyRootIDRemainderScalar
+	scalar                                     upolySturmRemainderScalar
 	hooks                                      unumeral.NumericInvocationHooks
 	numeric                                    unumeral.NumericAllocationRoots
 	raw                                        []unumeral.IntegerRawInvocationReceipt

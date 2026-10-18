@@ -10,6 +10,9 @@ func (m *UPolynomialManager) remState(a, b UPolynomialView, d *uint32, r *upolyV
 	return m.remStateWithSourceContext(a, b, d, r, integerAllocationInvocationContext{})
 }
 func (m *UPolynomialManager) remStateWithSourceContext(a, b UPolynomialView, d *uint32, r *upolyVectorState, context integerAllocationInvocationContext) (cause error) {
+	if context.sequenceSturm != nil && context.sequenceSturmFrame(m.config.Integer) == nil {
+		return ErrUPolynomialOwner
+	}
 	if context.rootID != nil && context.rootIDFrame(m.config.Integer) == nil {
 		return ErrUPolynomialOwner
 	}
@@ -56,6 +59,12 @@ func (m *UPolynomialManager) remStateWithSourceContext(a, b UPolynomialView, d *
 		}
 		am = &q.scalar.value
 		defer func() { cause = q.finishRemainderScalar(cause) }()
+	} else if q := context.sequenceSturmFrame(m.config.Integer); q != nil {
+		if e = q.beginRemainderScalar(); e != nil {
+			return e
+		}
+		am = &q.scalar.value
+		defer func() { cause = q.finishRemainderScalar(cause) }()
 	} else {
 		defer m.modular.Del(am)
 	}
@@ -92,6 +101,8 @@ func (m *UPolynomialManager) remStateWithSourceContext(a, b UPolynomialView, d *
 			*d++
 			if q := context.rootIDFrame(m.config.Integer); q != nil {
 				e = m.modular.CopyFromOwnerTracked(am, m.config.Integer, &m.values(r)[n-1], &q.scalar.copy, &q.scalar.normalize)
+			} else if q := context.sequenceSturmFrame(m.config.Integer); q != nil {
+				e = m.modular.CopyFromOwnerTracked(am, m.config.Integer, &m.values(r)[n-1], &q.scalar.copy, &q.scalar.normalize)
 			} else {
 				e = m.modular.WithAllocationContext(context.utility(m.modular.Integers())).Copy(am, &m.values(r)[n-1])
 			}
@@ -123,6 +134,8 @@ func (m *UPolynomialManager) remStateWithSourceContext(a, b UPolynomialView, d *
 			if frame != nil {
 				child = &frame.addMul
 			} else if q := context.rootIDFrame(m.config.Integer); q != nil {
+				child = &q.scalar.addMul
+			} else if q := context.sequenceSturmFrame(m.config.Integer); q != nil {
 				child = &q.scalar.addMul
 			}
 			if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).SubMul(dst, am, x, dst, child); e != nil {
@@ -156,6 +169,9 @@ func (m *UPolynomialManager) signedRemState(a, b UPolynomialView, r *upolyVector
 	return m.signedRemStateWithSourceContext(a, b, r, integerAllocationInvocationContext{})
 }
 func (m *UPolynomialManager) signedRemStateWithSourceContext(a, b UPolynomialView, r *upolyVectorState, context integerAllocationInvocationContext) error {
+	if context.sequenceSturm != nil && context.sequenceSturmFrame(m.config.Integer) == nil {
+		return ErrUPolynomialOwner
+	}
 	if context.rootID != nil && context.rootIDFrame(m.config.Integer) == nil {
 		return ErrUPolynomialOwner
 	}

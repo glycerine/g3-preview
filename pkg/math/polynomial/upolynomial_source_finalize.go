@@ -21,7 +21,7 @@ func (m *UPolynomialManager) sourceFinalizeWithHenselOwners(r *upolyHenselPairIn
 	return m.sourceFinalizeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) sourceFinalizeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
-	if m.rootIDExecuting() || m.removeOneHalfRootExecuting() || m.oneHalfRootExecuting() || m.knuthExecuting() || m.rootUpperBoundExecuting() || m.integerEvaluationExecuting() || m.rationalEvaluationExecuting() || m.binaryEvaluationExecuting() {
+	if m.sequenceSturmExecuting() || m.rootIDExecuting() || m.removeOneHalfRootExecuting() || m.oneHalfRootExecuting() || m.knuthExecuting() || m.rootUpperBoundExecuting() || m.integerEvaluationExecuting() || m.rationalEvaluationExecuting() || m.binaryEvaluationExecuting() {
 		return ErrUPolynomialCleanupPending
 	}
 	if m != nil && m.self == m && m.algebraicNegCaller != nil && m.algebraicNegCaller.negationExecuting() {
@@ -29,6 +29,9 @@ func (m *UPolynomialManager) sourceFinalizeWithCallerOwners(r *upolyHenselPairIn
 	}
 	if m == nil || m.self != m || m.config.Integer == nil {
 		return ErrUPolynomialOwner
+	}
+	if e := m.pendingSturmSourceCause(); e != nil {
+		return e
 	}
 	if m.rootID.active && (m.rootID.sourceStop != nil || m.rootID.childStop != nil) {
 		return errors.Join(m.rootID.sourceStop, m.rootID.childStop)

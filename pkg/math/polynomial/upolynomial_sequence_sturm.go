@@ -7,6 +7,15 @@ import (
 )
 
 type upolySequenceSturmScope struct {
+	next                           *upolySequenceSturmScope
+	retained                       bool
+	scalar                         upolySturmRemainderScalar
+	hooks                          unumeral.NumericInvocationHooks
+	numeric                        unumeral.NumericAllocationRoots
+	raw                            []unumeral.IntegerRawInvocationReceipt
+	remainderCopy                  unumeral.IntegerCopyAllocationReceipt
+	remainderNormalize             unumeral.IntegerNormalizeInvocationReceipt
+	childStop                      error
 	copy                           unumeral.IntegerCopyAllocationReceipt
 	normalize                      unumeral.IntegerNormalizeInvocationReceipt
 	integerBinding, naturalBinding unumeral.NumericCallerBinding
@@ -33,8 +42,16 @@ func (q *upolySequenceSturmScope) finishVector(which uint8, cause error) error {
 	if q.bodyCause == nil {
 		q.bodyCause = cause
 	}
-	if q.sourceStop != nil {
-		return errors.Join(cause, q.sourceStop)
+	if q.childStop == nil {
+		for i := len(q.raw) - 1; i >= 0; i-- {
+			if stop := q.owner.manager.config.Integer.RawInvocationSourceCause(&q.raw[i]); stop != nil {
+				q.childStop = stop
+				break
+			}
+		}
+	}
+	if q.sourceStop != nil || q.childStop != nil {
+		return errors.Join(cause, q.sourceStop, q.childStop)
 	}
 	if !q.live[which] {
 		return cause
@@ -70,7 +87,7 @@ func (q *upolySequenceSturmScope) core() (cause error) {
 		if e != nil {
 			return e
 		}
-		if e = m.signedRemState(a, b, &q.remainder); e != nil {
+		if e = m.signedRemStateWithSourceContext(a, b, &q.remainder, q.context()); e != nil {
 			return e
 		}
 		if q.remainder.size == 0 {
@@ -94,6 +111,7 @@ func (s *UPolynomialSequence) buildSturm(a, b UPolynomialView, kind uint8) (caus
 		return ErrUPolynomialCleanupPending
 	}
 	*q = upolySequenceSturmScope{owner: s, invocation: q.invocation + 1, active: true, executing: true}
+	q.hooks.Policy = q
 	if e := q.bindNumericOwners(); e != nil {
 		q.executing = false
 		q.active = false
@@ -107,6 +125,8 @@ func (s *UPolynomialSequence) buildSturm(a, b UPolynomialView, kind uint8) (caus
 		q.executing = false
 		if !q.pending() {
 			q.active = false
+		} else {
+			q.retainPending()
 		}
 	}()
 	if e := m.sequenceReset(&s.state); e != nil {
@@ -182,6 +202,9 @@ func (s *UPolynomialSequence) CleanupSturm() (cause error) {
 	}
 	defer func() { cause = errors.Join(cause, q.unbindNumericOwners()) }()
 	m := s.manager
+	if e := q.cleanupRemainderNumerics(); e != nil {
+		return e
+	}
 	if e := m.modular.CleanupPNormalizeInvocation(&q.normalize, true); e != nil {
 		return e
 	}
@@ -205,6 +228,7 @@ func (s *UPolynomialSequence) CleanupSturm() (cause error) {
 		q.live[which] = false
 	}
 	q.active = false
+	q.releasePending()
 	return nil
 }
 
@@ -234,7 +258,7 @@ func (q *upolySequenceSturmScope) unbindNumericOwners() error {
 
 func (q *upolySequenceSturmScope) pending() bool {
 	m := q.owner.manager
-	return q.live[0] || q.live[1] || m.config.Integer.MatchesCopyAllocationInvocation(&q.copy) || m.modular.MatchesPNormalizeInvocation(&q.normalize)
+	return q.remainderNumericPending() || q.live[0] || q.live[1] || m.config.Integer.MatchesCopyAllocationInvocation(&q.copy) || m.modular.MatchesPNormalizeInvocation(&q.normalize)
 }
 
 // Source seq.push(m(),sz,p): preserve metadata/default construction before

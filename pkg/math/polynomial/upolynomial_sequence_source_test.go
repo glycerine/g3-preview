@@ -312,6 +312,9 @@ func TestUPolynomialSturmFailureAndCancellationImmediateGraph(t *testing.T) {
 				t.Fatal(size, e)
 			}
 		}
+		if e = seq.CleanupSturm(); e != nil {
+			t.Fatal("retained Sturm child cleanup", fault, e)
+		}
 		if e = seq.Reset(); e != nil {
 			t.Fatal("failed-prefix cleanup", fault, e)
 		}

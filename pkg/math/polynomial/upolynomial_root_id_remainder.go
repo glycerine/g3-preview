@@ -6,7 +6,7 @@ import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-type upolyRootIDRemainderScalar struct {
+type upolySturmRemainderScalar struct {
 	value                            unumeral.Int
 	copy                             unumeral.IntegerCopyAllocationReceipt
 	normalize                        unumeral.IntegerNormalizeInvocationReceipt
@@ -61,7 +61,7 @@ func (q *upolyRootIDScope) beginRemainderScalar() error {
 	if q.scalarPending() || q.scalar.invocation == ^uint64(0) {
 		return ErrUPolynomialCleanupPending
 	}
-	q.scalar = upolyRootIDRemainderScalar{invocation: q.scalar.invocation + 1, constructed: true}
+	q.scalar = upolySturmRemainderScalar{invocation: q.scalar.invocation + 1, constructed: true}
 	return nil
 }
 func (q *upolyRootIDScope) finishRemainderScalar(cause error) error {

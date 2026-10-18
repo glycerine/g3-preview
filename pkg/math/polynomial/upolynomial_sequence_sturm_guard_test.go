@@ -45,6 +45,11 @@ func TestUPolynomialSequenceSturmProtectsBorrowedNumericOwners(t *testing.T) {
 			return false
 		}
 		used, stats := z.Budget().Used(), z.RuntimeOwner().Stats()
+		for _, e := range []error{m.SourceFinalize(), m.Close()} {
+			if !errors.Is(e, ErrUPolynomialCleanupPending) {
+				t.Error("checkpoint acquired executing polynomial manager", e)
+			}
+		}
 		sequenceBefore := s.Stats()
 		if e := s.sturm.pushCopy(v); !errors.Is(e, ErrUPolynomialOwner) || sequenceBefore != s.Stats() {
 			t.Error("checkpoint entered paused coefficient copy", e)
