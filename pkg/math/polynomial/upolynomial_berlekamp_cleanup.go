@@ -25,6 +25,9 @@ func (m *UPolynomialManager) cleanupBerlekamp() error {
 	if q.displaying || q.destroying || q.numeric.executing || q.numeric.cleaning {
 		return ErrUPolynomialCleanupPending
 	}
+	if e := q.outcomeFactors.cleanup(); e != nil {
+		return e
+	}
 	if e := m.cleanupDisplayReceipt(&q.entryTrace); e != nil {
 		return e
 	}

@@ -53196,7 +53196,9 @@
         "pkg/math/polynomial/upolynomial_berlekamp_scoped_numeral_test.go",
         "pkg/math/polynomial/upolynomial_berlekamp_numeric.go",
         "pkg/math/polynomial/upolynomial_berlekamp_numeric_test.go",
-        "pkg/math/polynomial/upolynomial_berlekamp_entry_trace_test.go"
+        "pkg/math/polynomial/upolynomial_berlekamp_entry_trace_test.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_outcome_trace.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_outcome_trace_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53361,7 +53363,9 @@
         "TestUPolynomialBerlekampActualNumericTransportProtectsCaller",
         "TestUPolynomialBerlekampEntryTraceBeforeMonicAssertion",
         "TestUPolynomialBerlekampPublicEntryTraceRetainsExactDisplay",
-        "TestUPolynomialBerlekampPublicEntryTraceStickyStreamFailure"
+        "TestUPolynomialBerlekampPublicEntryTraceStickyStreamFailure",
+        "TestUPolynomialBerlekampIrreducibleOutcomeTrace",
+        "TestUPolynomialBerlekampOutcomeExactFactorDisplayBeforeMatrixDT"
       ],
       "conditionals": [
         {
@@ -53474,6 +53478,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Irreducible Berlekamp outcome TRACE with exact polynomial/factor-display ownership (upolynomial_factorization.cpp:428)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_berlekamp_outcome_trace.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_outcome_trace_test.go",
+            "pkg/math/polynomial/upolynomial_factor_field.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_cleanup.go"
+          ],
+          "tests": [
+            "TestUPolynomialBerlekampIrreducibleOutcomeTrace",
+            "TestUPolynomialBerlekampOutcomeExactFactorDisplayBeforeMatrixDT"
+          ],
+          "notes": "The exact rank-one return record displays actual input, extracted prime and already published factors, before later gcd/div/v_k source vectors exist. Whole-record borrowing protects the actual core, matrix and caller factors during output callbacks. Polynomial and factor displays retain only their accepted receipts; factor display cleanup precedes older polynomial-display and matrix cleanup. A valid finite-field irreducible call verifies complete text, callback rejection and unchanged public product. A separate qualified caller-prefix profile creates a genuine BIG old factor before switching the manager to Z3, disables its violated normalization precondition, and exhausts real descriptor slots only at the outcome arrow. Actual finite-field matrix construction/diagonalization and new factor publication complete, but the old BIG display stops before its normalization: the matrix remains fully constructed with source deletion cursor zero and both constructor/diagonal NUMs source-ended. Exact owning cleanup releases display then matrix and preserves both published factors. This is source-prefix access/ownership evidence, not field-validity evidence for the deliberately nonnormalized old factor. Splitting/outcome-at-success and wider source audits remain open."
+        },
         {
           "name": "Public finite-field Berlekamp entry TRACE before monic assertion and matrix construction (upolynomial_factorization.cpp:414)",
           "status": "ported",

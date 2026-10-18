@@ -67,6 +67,7 @@ type upolyBerlekampMatrix struct {
 	numeric                              upolyBerlekampNumeric
 	traceBorrow                          upolyFactorTraceBorrow
 	entryTrace                           upolyDisplayInvocationReceipt
+	outcomeFactors                       upolyFactorsDisplayReceipt
 	m                                    *UPolynomialManager
 	values                               upolyVectorState
 	size, nullRow                        uint32
@@ -91,6 +92,9 @@ func (q *upolyBerlekampMatrix) closeSource() error {
 	}
 	if q.m == nil {
 		return nil
+	}
+	if e := q.outcomeFactors.sourceBlocker(); e != nil {
+		return e
 	}
 	if e := q.numeric.sourceCause(); e != nil {
 		return e
@@ -528,6 +532,9 @@ func (m *UPolynomialManager) factorZPBerlekamp(f UPolynomialView, fs *UPolynomia
 		return false, e
 	}
 	if rank == 1 {
+		if e := matrix.traceIrreducible(f, fs, p); e != nil {
+			return false, e
+		}
 		return false, nil
 	}
 	var gcd, div, v upolyVectorState
