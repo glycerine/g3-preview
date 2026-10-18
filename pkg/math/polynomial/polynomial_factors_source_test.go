@@ -52,6 +52,7 @@ func TestPolynomialFactorsSourceControlAndOwnership(t *testing.T) {
 	}
 }
 func TestPolynomialFactorsSourceDegreeQuirkAndWrap(t *testing.T) {
+	polynomialThrowAssertionFixture(t)
 	m, p, _ := polynomialEvalFixture(t, nil)
 	f, e := NewPolynomialFactors(m)
 	serviceMust(t, e)

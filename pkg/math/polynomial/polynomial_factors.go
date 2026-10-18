@@ -43,6 +43,7 @@ type PolynomialFactors struct {
 	multiplyRunning                                                    bool
 	resetRunning                                                       bool
 	cleanupRunning                                                     bool
+	assertionRunning                                                   bool
 	powerGeneration, factoryGeneration, constantGeneration, generation uint64
 	singleton                                                          Monomial
 	singletonGeneration                                                uint64
@@ -106,7 +107,7 @@ func (f *PolynomialFactors) open() error {
 	if e := f.ready(); e != nil {
 		return e
 	}
-	if f.cleanupRunning || f.memberSet.active || f.constantInvocation.active || f.sourceCause != nil || f.resetting || f.multiplyActive || f.localActive || f.numeric.PendingObject() != (umemory.ObjectRef{}) || f.numeric.PendingAllocatorBlocks() != ([3]umemory.Block{}) {
+	if f.assertionRunning || f.cleanupRunning || f.memberSet.active || f.constantInvocation.active || f.sourceCause != nil || f.resetting || f.multiplyActive || f.localActive || f.numeric.PendingObject() != (umemory.ObjectRef{}) || f.numeric.PendingAllocatorBlocks() != ([3]umemory.Block{}) {
 		return ErrPolynomialPending
 	}
 	if frame := f.displayReceipt; frame != nil && frame.generation == f.displayGeneration && frame.active && frame.sink == nil {
@@ -177,8 +178,8 @@ func (f *PolynomialFactors) Push(p Polynomial, d uint32) (err error) {
 	if e := f.open(); e != nil {
 		return e
 	}
-	if polynomialSourceDebug && (p == (Polynomial{}) || d == 0) {
-		return ErrPolynomialAssertion
+	if e := f.sourceScalarAssert(1633, "p != 0 && degree > 0", p != (Polynomial{}) && d > 0); e != nil {
+		return e
 	}
 	m := f.manager.core
 	n := len(f.factors)
@@ -205,8 +206,8 @@ func (f *PolynomialFactors) SetDegree(i, d uint32) error {
 	if e := f.open(); e != nil {
 		return e
 	}
-	if polynomialSourceDebug && i == 0 {
-		return ErrPolynomialAssertion
+	if e := f.sourceScalarAssert(1676, "i > 0", i > 0); e != nil {
+		return e
 	}
 	old, e := f.degree(i)
 	if e != nil {

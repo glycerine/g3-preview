@@ -40013,6 +40013,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_factors_assertions.go",
+        "pkg/math/polynomial/polynomial_factors_assertions_test.go",
         "pkg/math/polynomial/polynomial_deletion_execution_test.go",
         "pkg/math/polynomial/polynomial_reference_deletion_test.go",
         "pkg/math/polynomial/polynomial_factors_multiply_callback_test.go",
@@ -42617,6 +42619,25 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "polynomial.cpp:1633,1676 factors push_back/set_degree project SASSERT runtime switch and debugger actions",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_factors_assertions.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_factors_assertions.go",
+            "pkg/math/polynomial/polynomial_factors_assertions_test.go",
+            "pkg/math/polynomial/polynomial_factors.go",
+            "pkg/math/polynomial/polynomial_factors_source_test.go"
+          ],
+          "tests": [
+            "TestPolynomialFactorsSourceScalarAssertionActions",
+            "TestPolynomialFactorsSourceScalarAssertionClosedOwner",
+            "TestPolynomialFactorsSourceDegreeQuirkAndWrap"
+          ],
+          "notes": [
+            "The two literal scalar project SASSERT predicates read the actual runtime assertion switch, then use the source file/line/expression and real debugger Throw/Continue action. Throw precedes factor/degree publication; Continue, disabled assertions and release preserve the source zero-degree push and index-zero degree-update behavior. Positive predicates still observe a closed debug owner before index/array mutation. Returning debugger actions permit subsequent normal class calls; the actual diagnostic span protects class mutation and lifetime entrypoints. This audits only the two project assertion sequences, not container/STL internals or the complete factors class/source unit."
+          ]
+        },
         {
           "name": "polynomial.cpp:1370,2420-2460,7012; polynomial.h:260 concrete reference acquisition refuses committed deletion before trace/callback publication",
           "status": "partial",
@@ -45842,6 +45863,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_factors_assertions.go",
+        "pkg/math/polynomial/polynomial_factors_assertions_test.go",
         "pkg/math/polynomial/polynomial_deletion_execution_test.go",
         "pkg/math/polynomial/polynomial_reference_deletion_test.go",
         "pkg/math/polynomial/polynomial_factors_multiply_callback_test.go",
@@ -46782,6 +46805,25 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "polynomial.cpp:1633,1676 factors push_back/set_degree project SASSERT runtime switch and debugger actions",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_factors_assertions.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_factors_assertions.go",
+            "pkg/math/polynomial/polynomial_factors_assertions_test.go",
+            "pkg/math/polynomial/polynomial_factors.go",
+            "pkg/math/polynomial/polynomial_factors_source_test.go"
+          ],
+          "tests": [
+            "TestPolynomialFactorsSourceScalarAssertionActions",
+            "TestPolynomialFactorsSourceScalarAssertionClosedOwner",
+            "TestPolynomialFactorsSourceDegreeQuirkAndWrap"
+          ],
+          "notes": [
+            "The two literal scalar project SASSERT predicates read the actual runtime assertion switch, then use the source file/line/expression and real debugger Throw/Continue action. Throw precedes factor/degree publication; Continue, disabled assertions and release preserve the source zero-degree push and index-zero degree-update behavior. Positive predicates still observe a closed debug owner before index/array mutation. Returning debugger actions permit subsequent normal class calls; the actual diagnostic span protects class mutation and lifetime entrypoints. This audits only the two project assertion sequences, not container/STL internals or the complete factors class/source unit."
+          ]
+        },
         {
           "name": "polynomial.cpp:1370,2420-2460,7012; polynomial.h:260 concrete reference acquisition refuses committed deletion before trace/callback publication",
           "status": "partial",
