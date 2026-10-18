@@ -211,3 +211,48 @@ func TestSimpleAlgebraicValuesCopyReservationPrefixes(t *testing.T) {
 		t.Fatal("missing success/published partial-root/stopped-destructor/issued-receipt frontier", success, retained, stopped, ownedReceipt)
 	}
 }
+
+func TestSimpleAlgebraicValuesConstructorRollbackAndCopiedOwner(t *testing.T) {
+	c, _, _ := algebraicCompareFixture(t)
+	budget := c.config.Rationals.Budget()
+	for prefix := int64(0); prefix < 3; prefix++ {
+		before, vectors := budget.Used(), c.vectors
+		budget.FailAfter(prefix)
+		values, body := NewSimpleAlgebraicValues(c)
+		budget.FailAfter(-1)
+		if prefix < 2 {
+			if !numericPhysicalReservationRefusal(body) || values != nil || budget.Used() != before || c.vectors != vectors {
+				t.Fatal("constructor refusal changed borrowed owner", prefix, body)
+			}
+			continue
+		}
+		serviceMust(t, body)
+		if c.vectors != vectors+1 {
+			t.Fatal("completed mapping did not own its vector")
+		}
+		copied := *values
+		attempts := []func() error{
+			func() error { _, e := copied.Manager(); return e },
+			func() error { _, e := copied.Contains(0); return e },
+			func() error { _, e := copied.Algebraic(0); return e },
+			func() error { return copied.Push(0, nil) }, copied.Close, copied.CleanupRetained,
+		}
+		used := budget.Used()
+		for _, attempt := range attempts {
+			if e := attempt(); !errors.Is(e, ErrAlgebraicOwner) {
+				t.Fatal("copied mapping acquired ownership", e)
+			}
+		}
+		if budget.Used() != used || values.closed || values.values.Len() != 0 || c.vectors != vectors+1 {
+			t.Fatal("copied owner changed original")
+		}
+		serviceMust(t, values.Close())
+		serviceMust(t, values.Close())
+		if budget.Used() != before || c.vectors != vectors {
+			t.Fatal("mapping close did not refund exact constructor ownership")
+		}
+		if _, e := values.Manager(); !errors.Is(e, arena.ErrClosed) {
+			t.Fatal("closed mapping borrowed manager", e)
+		}
+	}
+}
