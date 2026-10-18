@@ -532,11 +532,20 @@ func (m *UPolynomialManager) exactDivStateWithSourceContext(a, b UPolynomialView
 	if e = m.reserve(q, deg+1); e != nil {
 		return false, e
 	}
+	if e = m.traceExactDivPointers(a); e != nil {
+		return false, e
+	}
 	if e = m.setViewWithSourceContext(r, a, context); e != nil {
 		return false, e
 	}
-	if polynomialSourceDebug && r.size != a.count {
-		return false, ErrUPolynomialAssertion
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil {
+		return false, e
+	}
+	if enabled && r.size != a.count {
+		if e = m.scalarDivisionAssertionFailure(626, "_p1.size() == sz1"); e != nil {
+			return false, e
+		}
 	}
 	n := a.count
 	for {

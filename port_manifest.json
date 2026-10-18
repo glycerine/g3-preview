@@ -50759,7 +50759,9 @@
         "pkg/math/polynomial/upolynomial_berlekamp_division_am_test.go",
         "pkg/math/polynomial/upolynomial_berlekamp_monic.go",
         "pkg/math/polynomial/upolynomial_berlekamp_monic_test.go",
-        "pkg/math/polynomial/upolynomial_division_core_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_division_core_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_exact_div_pointer_trace.go",
+        "pkg/math/polynomial/upolynomial_exact_div_assertion_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -50981,7 +50983,10 @@
         "TestUPolynomialBerlekampMonicExplicitLCGuardStopsInverseEnd",
         "TestUPolynomialDivRemCoreAliasAssertionSourceActions",
         "TestUPolynomialDivRemCoreDivisorAssertionFrontiers",
-        "TestUPolynomialDivRemCoreClosedAssertionSwitchBeforeD"
+        "TestUPolynomialDivRemCoreClosedAssertionSwitchBeforeD",
+        "TestUPolynomialExactDivCopiedSizeAssertionActions",
+        "TestUPolynomialExactDivPointerRecordUsesActualPreCopyStorage",
+        "TestUPolynomialExactDivPointerRecordStickyStreamFailure"
       ],
       "conditionals": [
         {
@@ -51570,6 +51575,22 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Exact division copied-size SASSERT runtime actions and pre-copy native pointer TRACE (upolynomial.cpp:624,626)",
+          "status": "platform_replacement",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_division.go",
+            "pkg/math/polynomial/upolynomial_division_assertions.go",
+            "pkg/math/polynomial/upolynomial_exact_div_pointer_trace.go",
+            "pkg/math/polynomial/upolynomial_exact_div_assertion_trace_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialExactDivCopiedSizeAssertionActions",
+            "TestUPolynomialExactDivPointerRecordUsesActualPreCopyStorage",
+            "TestUPolynomialExactDivPointerRecordStickyStreamFailure"
+          ],
+          "notes": "The project size predicate is gated after the real input copy and before the loop, invoking the real debugger action rather than a fixed error. A registered input with an actual public-Reserve initialized trailing zero verifies Throw after private quotient preparation/copied-size normalization but before caller output publication; Continue/disabled/release consume actual initialized native backing slots without scratch repair. The factor_bug record at624 evaluates actual native Go input/previous-private-buffer addresses and previous logical size before set(sz1,p1,_p1), replacing platform-specific C++ pointer text with actual Go pointer projections; no source hashing, surrogate pointer tokens or STL formatting port is introduced. A real preceding DivRem creates the old private remainder state used by the test, avoiding synthetic numerical scratch. Whole-record borrowing prevents callback retirement/display cleanup; sticky physical stream failure preserves computation and quotient and performs only the final record flush. The project assertion behavior is ported; native-address rendering is the explicit platform replacement. Exact-division loop diagnostics and broader kernel source audits remain partial."
+        },
         {
           "name": "div_rem_core separate alias/divisor SASSERT runtime gates, debugger actions and publication frontiers (upolynomial.cpp:434-437,459)",
           "status": "ported",
