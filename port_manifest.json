@@ -40318,7 +40318,8 @@
         "pkg/math/polynomial/polynomial_sparse_independent_scope_test.go",
         "pkg/math/polynomial/polynomial_iccp_independent_scope_test.go",
         "pkg/math/polynomial/polynomial_gcd_direct_children.go",
-        "pkg/math/polynomial/polynomial_cra_independent_scope_test.go"
+        "pkg/math/polynomial/polynomial_cra_independent_scope_test.go",
+        "pkg/math/polynomial/polynomial_gcd_zpx_receipt_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -41183,7 +41184,8 @@
         "TestPolynomialICCPCleanupPreservesIndependentLazard",
         "TestPolynomialICCPIndependentLazardReservationPrefixes",
         "TestPolynomialCRACleanupPreservesIndependentLazard",
-        "TestPolynomialCRAIndependentLazardReservationPrefixes"
+        "TestPolynomialCRAIndependentLazardReservationPrefixes",
+        "TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -42440,6 +42442,15 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "lc_glex_ZpX source SOM reset/add/mk now captures its actual per-segment arithmetic/append/factory invocation; monomial construction and full source-suffix audit remain open (polynomial.cpp:4018-4051)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_zpx.go",
+          "tests": [
+            "TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes",
+            "TestPolynomialGCDGlexZPXIndependentCoefficientModel"
+          ]
+        },
         {
           "name": "CRA reconstruction records actual cheap append/factory children and output-reference transfer; source retirement and owning cleanup preserve independent stopped Lazard work (polynomial.cpp:3675-3767)",
           "status": "ported",
@@ -45755,7 +45766,8 @@
         "pkg/math/polynomial/polynomial_sparse_independent_scope_test.go",
         "pkg/math/polynomial/polynomial_iccp_independent_scope_test.go",
         "pkg/math/polynomial/polynomial_gcd_direct_children.go",
-        "pkg/math/polynomial/polynomial_cra_independent_scope_test.go"
+        "pkg/math/polynomial/polynomial_cra_independent_scope_test.go",
+        "pkg/math/polynomial/polynomial_gcd_zpx_receipt_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -46355,7 +46367,8 @@
         "TestPolynomialICCPIndependentLazardReservationPrefixes",
         "TestPolynomialICCPFirstCoefficientChildPreservesConstructedEmptyCI",
         "TestPolynomialCRACleanupPreservesIndependentLazard",
-        "TestPolynomialCRAIndependentLazardReservationPrefixes"
+        "TestPolynomialCRAIndependentLazardReservationPrefixes",
+        "TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -46384,6 +46397,15 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "lc_glex_ZpX source SOM reset/add/mk now captures its actual per-segment arithmetic/append/factory invocation; monomial construction and full source-suffix audit remain open (polynomial.cpp:4018-4051)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_zpx.go",
+          "tests": [
+            "TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes",
+            "TestPolynomialGCDGlexZPXIndependentCoefficientModel"
+          ]
+        },
         {
           "name": "CRA reconstruction records actual cheap append/factory children and output-reference transfer; source retirement and owning cleanup preserve independent stopped Lazard work (polynomial.cpp:3675-3767)",
           "status": "ported",

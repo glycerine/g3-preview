@@ -58,6 +58,9 @@ func (m *MultivariatePolynomialManager) lcGlexZPX(p Polynomial, x uint32) (resul
 			if e = c.som.reset(); e != nil {
 				return result, e
 			}
+			if e = c.som.acquireArithmeticInvocation(&s.product); e != nil {
+				return result, e
+			}
 			if e = max.assign(c, term); e != nil {
 				return result, e
 			}
@@ -69,7 +72,7 @@ func (m *MultivariatePolynomialManager) lcGlexZPX(p Polynomial, x uint32) (resul
 			if e != nil {
 				return result, e
 			}
-			if e = c.som.add(&a, mono, false); e != nil {
+			if e = c.som.addWithArithmeticReceipt(&a, mono, &s.product); e != nil {
 				return result, e
 			}
 		} else if max.value == term {
@@ -81,7 +84,7 @@ func (m *MultivariatePolynomialManager) lcGlexZPX(p Polynomial, x uint32) (resul
 			if e != nil {
 				return result, e
 			}
-			if e = c.som.add(&a, mono, false); e != nil {
+			if e = c.som.addWithArithmeticReceipt(&a, mono, &s.product); e != nil {
 				return result, e
 			}
 		}
@@ -98,7 +101,7 @@ func (m *MultivariatePolynomialManager) lcGlexZPX(p Polynomial, x uint32) (resul
 	if err = m.traceLCGlexZPXMax(max.value); err != nil {
 		return result, err
 	}
-	return c.som.mk(false)
+	return c.som.mkWithArithmeticReceipt(false, &s.product)
 }
 
 func (m *MultivariatePolynomialManager) primitiveZPX(p Polynomial, x uint32, out *polynomialReference) (err error) {
