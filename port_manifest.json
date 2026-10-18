@@ -124612,6 +124612,23 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Concrete foreign-owner MPBQ comparison and interval SET for algebraic-manager translation, with receiver scaling scratch and exact caller transport",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpbq_compare_owner.go",
+          "go_targets": [
+            "pkg/util/numeral/mpbq_compare_owner.go",
+            "pkg/util/numeral/mpbq_compare_owner_test.go"
+          ],
+          "tests": [
+            "TestBinaryComparisonFromIndependentOwner",
+            "TestBinaryIntervalCopyFromIndependentOwner",
+            "TestBinaryIntervalForeignCopyAssertionActions",
+            "TestBinaryForeignComparisonGrowthUsesCallerRoots",
+            "TestBinaryIntervalForeignCopyRetainsLowerBeforeUpperRefusal"
+          ],
+          "notes": "Foreign comparison preserves equal-exponent direct comparison and unequal-exponent receiver TMP copy then in-place shift. Exact NUM copy receipts remain separate from caller-owned numeric roots for subsequent growth. Interval copy evaluates the runtime source ordering assertion before lower/upper copies, honors Throw/Continue/disabled actions, and publishes each exponent only after its NUM copy. Independent signed multiword/exponent math oracle, actual post-backing descriptor refusal for shift growth, expired caller rejection, and upper-copy refusal preserving lower publication are verified. The enclosing algebraic source/target core lifetime pins and full cell copy remain unported; this bridge does not supply that parent ownership."
+        },
+        {
           "name": "MPBQ/open lifecycle, bounds, setters, predicates, subset/disjoint and all precedes overloads",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpbqi.go",
@@ -159309,6 +159326,23 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Concrete foreign-owner MPBQ comparison and interval SET for algebraic-manager translation, with receiver scaling scratch and exact caller transport",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpbq_compare_owner.go",
+          "go_targets": [
+            "pkg/util/numeral/mpbq_compare_owner.go",
+            "pkg/util/numeral/mpbq_compare_owner_test.go"
+          ],
+          "tests": [
+            "TestBinaryComparisonFromIndependentOwner",
+            "TestBinaryIntervalCopyFromIndependentOwner",
+            "TestBinaryIntervalForeignCopyAssertionActions",
+            "TestBinaryForeignComparisonGrowthUsesCallerRoots",
+            "TestBinaryIntervalForeignCopyRetainsLowerBeforeUpperRefusal"
+          ],
+          "notes": "Foreign comparison preserves equal-exponent direct comparison and unequal-exponent receiver TMP copy then in-place shift. Exact NUM copy receipts remain separate from caller-owned numeric roots for subsequent growth. Interval copy evaluates the runtime source ordering assertion before lower/upper copies, honors Throw/Continue/disabled actions, and publishes each exponent only after its NUM copy. Independent signed multiword/exponent math oracle, actual post-backing descriptor refusal for shift growth, expired caller rejection, and upper-copy refusal preserving lower publication are verified. The enclosing algebraic source/target core lifetime pins and full cell copy remain unported; this bridge does not supply that parent ownership."
+        },
+        {
           "name": "Concrete cross-owner mpbq numerator SET then exponent publication for retained algebraic-manager translation",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpbq.go",
@@ -159634,6 +159668,23 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Concrete foreign-owner MPBQ comparison and interval SET for algebraic-manager translation, with receiver scaling scratch and exact caller transport",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpbq_compare_owner.go",
+          "go_targets": [
+            "pkg/util/numeral/mpbq_compare_owner.go",
+            "pkg/util/numeral/mpbq_compare_owner_test.go"
+          ],
+          "tests": [
+            "TestBinaryComparisonFromIndependentOwner",
+            "TestBinaryIntervalCopyFromIndependentOwner",
+            "TestBinaryIntervalForeignCopyAssertionActions",
+            "TestBinaryForeignComparisonGrowthUsesCallerRoots",
+            "TestBinaryIntervalForeignCopyRetainsLowerBeforeUpperRefusal"
+          ],
+          "notes": "Foreign comparison preserves equal-exponent direct comparison and unequal-exponent receiver TMP copy then in-place shift. Exact NUM copy receipts remain separate from caller-owned numeric roots for subsequent growth. Interval copy evaluates the runtime source ordering assertion before lower/upper copies, honors Throw/Continue/disabled actions, and publishes each exponent only after its NUM copy. Independent signed multiword/exponent math oracle, actual post-backing descriptor refusal for shift growth, expired caller rejection, and upper-copy refusal preserving lower publication are verified. The enclosing algebraic source/target core lifetime pins and full cell copy remain unported; this bridge does not supply that parent ownership."
+        },
         {
           "name": "Concrete cross-owner mpbq numerator SET then exponent publication for retained algebraic-manager translation",
           "status": "ported",

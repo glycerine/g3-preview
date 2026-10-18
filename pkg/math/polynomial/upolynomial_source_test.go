@@ -346,6 +346,9 @@ func TestUPolynomialViewOverloadsAndModularShape(t *testing.T) {
 
 func TestUPolynomialRawViewActualReadTiming(t *testing.T) {
 	m, _, _ := upolySourceOwner(t)
+	// The stale scratch view also aliases the source multiplication buffer.
+	// Debug builds reach that SASSERT before the guarded backing read.
+	polynomialThrowAssertionFixture(t)
 	p := upolySourceNew(t, m, []int32{2, 3})
 	out := upolySourceNew(t, m, nil)
 	empty, e := m.View(p, 0, 0)

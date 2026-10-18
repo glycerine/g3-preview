@@ -44339,3 +44339,35 @@ observed1515 top-level passes, no failures, and UP refinement fault ordinal13135
 Its compiled binary predates the new comparison bridge; current bridge changes
 have the focused evidence above. Do not count this live process as a full pass
 or restart it based on silence. Whole polynomial then AST goal remains active.
+
+Cross-owner binary comparison/interval SET bridge is implemented through concrete
+NumericBinaryRationalOperations/NumericBinaryIntervalOperations. Equal powers
+compare actual foreign NUMs directly. Unequal powers copy into receiver TMP,
+shift that same field, then compare with explicit owners. The accepted copy
+receipt is separate from the caller's numeric allocation roots for subsequent
+shift growth. Interval SET evaluates its runtime ordering assertion, honoring
+Throw/Continue/disabled actions, then copies lower before upper without extra
+staging or normalization.
+
+Tests verify294 signed/exponent cases against math/big, source fields unchanged,
+exact caller-owned physical backing after a shift-growth descriptor refusal,
+expired caller rejection, runtime assertion actions/operand erasure, and an
+upper NUM refusal that preserves the committed lower bound and old upper
+exponent. Focused new bridge/copy/comparison suites pass ordinary (0.299s) and
+checked/debug/trace (0.040s), on CPUs8–16. Parent algebraic-core/value lifetime
+pins and complete cross-core numeral copy remain unported for the AST consumer.
+
+Full checked run terminal evidence: /mnt/oldrog/tmp/g3-polynomial-full-checked-current.jsonl
+ended unsuccessfully after1550.164s, with1611 top-level tests passed. The next
+test, TestUPolynomialRawViewActualReadTiming, reached its captured multiplication
+buffer alias SASSERT at upolynomial.cpp307 without bound debugger input. Bound
+an explicit Throw action in that deliberate invalid-view fixture; ordinary
+behavior still reaches the backing guard. Its ordinary focused check passes
+(0.003s). All47 tests from that test through the package suffix pass checked
+(0.260s), log /mnt/oldrog/tmp/g3-polynomial-checked-suffix-current.jsonl.
+
+All1658 listed top-level tests have thus been exercised across the long prefix
+and rebuilt suffix. This is split-build evidence, not a clean single full
+checked pass: the long prefix binary predates the new owner-aware utility
+bridges, which have separate focused checks. No full test process remains live.
+The complete polynomial then AST goal remains active.
