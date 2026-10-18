@@ -50102,6 +50102,23 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "S-expression receiving-input invocation ownership and older argument-vector destruction frontier (sexpr2upolynomial.cpp:47-74,90-97)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_ops.go",
+            "pkg/math/polynomial/upolynomial_rational_input.go",
+            "pkg/math/polynomial/upolynomial_rational_context.go",
+            "pkg/math/polynomial/sexpr_upolynomial_owner_test.go"
+          ],
+          "tests": [
+            "TestSexprPolynomialForeignChildRetainsOlderArgumentVector",
+            "TestSexprPolynomialRefusedInputPreservesIndependentReceivingCopy",
+            "TestAlgebraicPrivateSexprFailureRetainsReceivingChildAndParser"
+          ],
+          "notes": "An actual private receiving constant-copy descriptor refusal exposed that the converter deferred argument destructor checked only global lexical children, so it destroyed the older argument vector before receiving-child acknowledgement. The deferred frontier now recognizes only its accepted receiving invocation. A concrete manager/frame/invocation receipt is issued after actual rational-input entry and propagated through constant and identity conversion. Refused entry preserves the prior receipt; cleanup matches that exact invocation rather than acknowledging manager-wide input state. A stale completed converter receipt cannot acquire a newer independent copy; its physical token and primitive receipt survive refused conversion and converter cleanup. Nested (+ 1 BIG) retains its argument until receiving cleanup, preserves the completed first argument and leaves the global rational service healthy; retry (+ 1 1) succeeds. The actual MkSexprRoot path retains the parser/argument and receiving child after (+ (^ x 2) BIG) fails, then owning cleanup closes that exact parser sequence and preserves the x^2 workspace prefix. The invocation is cold Go call-identity metadata, not a source numeral count or construction flag. Broader parser/normalization/destructor composition remains partial."
+        },
+        {
           "name": "Retained global-rational coefficients into a distinct private polynomial numeral owner (sexpr2upolynomial.cpp:90-97; upolynomial.cpp:204-211)",
           "status": "partial",
           "go_target": "pkg/math/polynomial/upolynomial_rational_input.go",
@@ -50227,6 +50244,23 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "S-expression receiving-input invocation ownership and older argument-vector destruction frontier (sexpr2upolynomial.cpp:47-74,90-97)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_ops.go",
+            "pkg/math/polynomial/upolynomial_rational_input.go",
+            "pkg/math/polynomial/upolynomial_rational_context.go",
+            "pkg/math/polynomial/sexpr_upolynomial_owner_test.go"
+          ],
+          "tests": [
+            "TestSexprPolynomialForeignChildRetainsOlderArgumentVector",
+            "TestSexprPolynomialRefusedInputPreservesIndependentReceivingCopy",
+            "TestAlgebraicPrivateSexprFailureRetainsReceivingChildAndParser"
+          ],
+          "notes": "An actual private receiving constant-copy descriptor refusal exposed that the converter deferred argument destructor checked only global lexical children, so it destroyed the older argument vector before receiving-child acknowledgement. The deferred frontier now recognizes only its accepted receiving invocation. A concrete manager/frame/invocation receipt is issued after actual rational-input entry and propagated through constant and identity conversion. Refused entry preserves the prior receipt; cleanup matches that exact invocation rather than acknowledging manager-wide input state. A stale completed converter receipt cannot acquire a newer independent copy; its physical token and primitive receipt survive refused conversion and converter cleanup. Nested (+ 1 BIG) retains its argument until receiving cleanup, preserves the completed first argument and leaves the global rational service healthy; retry (+ 1 1) succeeds. The actual MkSexprRoot path retains the parser/argument and receiving child after (+ (^ x 2) BIG) fails, then owning cleanup closes that exact parser sequence and preserves the x^2 workspace prefix. The invocation is cold Go call-identity metadata, not a source numeral count or construction flag. Broader parser/normalization/destructor composition remains partial."
+        },
         {
           "name": "Retained global-rational coefficients into a distinct private polynomial numeral owner (sexpr2upolynomial.cpp:90-97; upolynomial.cpp:204-211)",
           "status": "partial",
@@ -51278,6 +51312,23 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "S-expression receiving-input invocation ownership and older argument-vector destruction frontier (sexpr2upolynomial.cpp:47-74,90-97)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_ops.go",
+            "pkg/math/polynomial/upolynomial_rational_input.go",
+            "pkg/math/polynomial/upolynomial_rational_context.go",
+            "pkg/math/polynomial/sexpr_upolynomial_owner_test.go"
+          ],
+          "tests": [
+            "TestSexprPolynomialForeignChildRetainsOlderArgumentVector",
+            "TestSexprPolynomialRefusedInputPreservesIndependentReceivingCopy",
+            "TestAlgebraicPrivateSexprFailureRetainsReceivingChildAndParser"
+          ],
+          "notes": "An actual private receiving constant-copy descriptor refusal exposed that the converter deferred argument destructor checked only global lexical children, so it destroyed the older argument vector before receiving-child acknowledgement. The deferred frontier now recognizes only its accepted receiving invocation. A concrete manager/frame/invocation receipt is issued after actual rational-input entry and propagated through constant and identity conversion. Refused entry preserves the prior receipt; cleanup matches that exact invocation rather than acknowledging manager-wide input state. A stale completed converter receipt cannot acquire a newer independent copy; its physical token and primitive receipt survive refused conversion and converter cleanup. Nested (+ 1 BIG) retains its argument until receiving cleanup, preserves the completed first argument and leaves the global rational service healthy; retry (+ 1 1) succeeds. The actual MkSexprRoot path retains the parser/argument and receiving child after (+ (^ x 2) BIG) fails, then owning cleanup closes that exact parser sequence and preserves the x^2 workspace prefix. The invocation is cold Go call-identity metadata, not a source numeral count or construction flag. Broader parser/normalization/destructor composition remains partial."
+        },
+        {
           "name": "Retained global-rational coefficients into a distinct private polynomial numeral owner (sexpr2upolynomial.cpp:90-97; upolynomial.cpp:204-211)",
           "status": "partial",
           "go_target": "pkg/math/polynomial/upolynomial_rational_input.go",
@@ -52154,6 +52205,23 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "S-expression receiving-input invocation ownership and older argument-vector destruction frontier (sexpr2upolynomial.cpp:47-74,90-97)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_ops.go",
+            "pkg/math/polynomial/upolynomial_rational_input.go",
+            "pkg/math/polynomial/upolynomial_rational_context.go",
+            "pkg/math/polynomial/sexpr_upolynomial_owner_test.go"
+          ],
+          "tests": [
+            "TestSexprPolynomialForeignChildRetainsOlderArgumentVector",
+            "TestSexprPolynomialRefusedInputPreservesIndependentReceivingCopy",
+            "TestAlgebraicPrivateSexprFailureRetainsReceivingChildAndParser"
+          ],
+          "notes": "An actual private receiving constant-copy descriptor refusal exposed that the converter deferred argument destructor checked only global lexical children, so it destroyed the older argument vector before receiving-child acknowledgement. The deferred frontier now recognizes only its accepted receiving invocation. A concrete manager/frame/invocation receipt is issued after actual rational-input entry and propagated through constant and identity conversion. Refused entry preserves the prior receipt; cleanup matches that exact invocation rather than acknowledging manager-wide input state. A stale completed converter receipt cannot acquire a newer independent copy; its physical token and primitive receipt survive refused conversion and converter cleanup. Nested (+ 1 BIG) retains its argument until receiving cleanup, preserves the completed first argument and leaves the global rational service healthy; retry (+ 1 1) succeeds. The actual MkSexprRoot path retains the parser/argument and receiving child after (+ (^ x 2) BIG) fails, then owning cleanup closes that exact parser sequence and preserves the x^2 workspace prefix. The invocation is cold Go call-identity metadata, not a source numeral count or construction flag. Broader parser/normalization/destructor composition remains partial."
+        },
         {
           "name": "Retained global-rational coefficients into a distinct private polynomial numeral owner (sexpr2upolynomial.cpp:90-97; upolynomial.cpp:204-211)",
           "status": "partial",

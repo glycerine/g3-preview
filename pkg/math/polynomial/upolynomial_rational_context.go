@@ -25,10 +25,11 @@ func NewUPolynomialManagerFromRationalService(s *unumeral.RationalService, c UPo
 // The polynomial context belongs to its actual caller, borrowing primitive
 // service access only during the locked callback.
 type UPolynomialRationalContext struct {
-	self       *UPolynomialRationalContext
-	borrow     *unumeral.RationalNumericBorrow
-	polynomial *UPolynomialManager
-	active     bool
+	inputReceipt *upolyRationalInputInvocationReceipt
+	self         *UPolynomialRationalContext
+	borrow       *unumeral.RationalNumericBorrow
+	polynomial   *UPolynomialManager
+	active       bool
 }
 
 func numericRationalService_WithUPolynomialRationals(s *unumeral.RationalService, m *UPolynomialManager, body func(*UPolynomialRationalContext) error) error {
@@ -80,7 +81,7 @@ func (c *UPolynomialRationalContext) SetConstant(p UPolynomial, a *unumeral.Owne
 			return nonInteger()
 		}
 		return c.borrow.WithReceivingInteger(c.polynomial.config.Integer, func() error {
-			return c.polynomial.setRationalsFromOwner(p, c.borrow.Integers(), []unumeral.Rational{value})
+			return c.polynomial.setRationalsFromOwnerWithReceipt(p, c.borrow.Integers(), []unumeral.Rational{value}, c.inputReceipt)
 		})
 	})
 }
@@ -94,7 +95,9 @@ func (c *UPolynomialRationalContext) SetIdentity(p UPolynomial) error {
 	if !c.valid() {
 		return unumeral.ErrRationalServiceOwner
 	}
-	return c.polynomial.SetRationals(p, []unumeral.Rational{unumeral.NewRational(), unumeral.RationalFromBorrowedNumerals(unumeral.NewInt(1), unumeral.NewInt(1))})
+	return c.borrow.WithReceivingInteger(c.polynomial.config.Integer, func() error {
+		return c.polynomial.setRationalsFromOwnerWithReceipt(p, c.polynomial.config.Integer, []unumeral.Rational{unumeral.NewRational(), unumeral.RationalFromBorrowedNumerals(unumeral.NewInt(1), unumeral.NewInt(1))}, c.inputReceipt)
+	})
 }
 func numericRationalService_CleanupUPolynomialRationals(s *unumeral.RationalService, m *UPolynomialManager, vectors func() error) error {
 	return s.WithNumericBorrow(func(b *unumeral.RationalNumericBorrow) error {

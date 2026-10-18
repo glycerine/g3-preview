@@ -118,6 +118,108 @@ func TestSexprPolynomialForeignCoefficientPhysicalRefusal(t *testing.T) {
 	serviceMust(t, globals.Manager.CheckOwnerReady())
 }
 
+func TestSexprPolynomialForeignChildRetainsOlderArgumentVector(t *testing.T) {
+	sx, sy, globals := sxOwner(t, arena.NewBudget(1<<24))
+	target := algebraicCopyBoundedTarget(t)
+	m := target.config.Polynomials
+	out, e := m.NewPolynomial()
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, m.DelPolynomial(&out)) })
+	c, e := NewSexprPolynomialConverter(sx, m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, c.Close()) })
+	one := sxPolyNum(t, sx, globals, "1")
+	big := sxPolyNum(t, sx, globals, "1267650600228229401496703205377")
+	expr := sxPolyApp(t, sx, sy, "+", one, big)
+	body := c.Convert(expr, out)
+	if !errors.Is(body, arena.ErrSlotLimit) || !m.rationalInput.pending(m) {
+		t.Fatal("foreign child did not retain an actual receiving allocation", body)
+	}
+	if len(c.frames) != 1 || !c.frames[0].live || c.cause == nil || c.depth != 0 {
+		t.Fatal("older argument vector was destroyed before receiving child acknowledgement")
+	}
+	d, e := m.descriptor(out)
+	serviceMust(t, e)
+	if d.state.size != 1 || m.values(&d.state)[0].NativeScalar() != 1 {
+		t.Fatal("failed later argument changed the completed first-argument prefix")
+	}
+	zero, e := globals.Zero()
+	serviceMust(t, e)
+	serviceMust(t, globals.Del(&zero))
+	serviceMust(t, c.Cleanup())
+	if c.frames[0].live || c.cause != nil || m.rationalInput.pending(m) {
+		t.Fatal("converter cleanup did not acknowledge child before older vector")
+	}
+	serviceMust(t, c.Convert(sxPolyApp(t, sx, sy, "+", one, one), out))
+	sxPolyCoefficients(t, m, out, []int32{2})
+}
+
+func TestSexprPolynomialRefusedInputPreservesIndependentReceivingCopy(t *testing.T) {
+	sx, _, globals := sxOwner(t, arena.NewBudget(1<<24))
+	target := algebraicCopyBoundedTarget(t)
+	m, z := target.config.Polynomials, target.config.Rationals.Integers()
+	older, e := m.NewPolynomial()
+	serviceMust(t, e)
+	refused, e := m.NewPolynomial()
+	serviceMust(t, e)
+	t.Cleanup(func() {
+		serviceMust(t, m.CleanupRationalInput())
+		serviceMust(t, m.DelPolynomial(&refused))
+		serviceMust(t, m.DelPolynomial(&older))
+	})
+	c, e := NewSexprPolynomialConverter(sx, m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, c.Close()) })
+	big := sxNumber(t, globals, "1267650600228229401496703205377")
+	t.Cleanup(func() { serviceMust(t, globals.Del(&big)) })
+	one := sxPolyNum(t, sx, globals, "1")
+	// Retain an older completed converter receipt as well: same frame alone
+	// must not grant authority over the following independent invocation.
+	serviceMust(t, c.Convert(one, refused))
+	body := m.setRationalsFromOwner(older, globals.Manager.Integers(), []unumeral.Rational{big.Raw})
+	if !errors.Is(body, arena.ErrSlotLimit) || !m.rationalInput.pending(m) {
+		t.Fatal("independent receiving copy did not acquire physical storage", body)
+	}
+	issued, physical := m.rationalInput.copy, z.PendingCell.Object
+	if e := c.Convert(one, refused); !errors.Is(e, ErrUPolynomialCleanupPending) {
+		t.Fatal("converter replaced independent pending input", e)
+	}
+	serviceMust(t, c.Cleanup())
+	if !z.MatchesCopyAllocationInvocation(&issued) || z.PendingCell.Object != physical {
+		t.Error("refused converter cleanup acquired independent receiving copy")
+	}
+	serviceMust(t, m.CleanupRationalInput())
+}
+
+func TestAlgebraicPrivateSexprFailureRetainsReceivingChildAndParser(t *testing.T) {
+	sx, sy, globals := sxOwner(t, arena.NewBudget(1<<24))
+	target := algebraicCopyBoundedTarget(t)
+	x := sxPolySym(t, sx, sy, "x")
+	two := sxPolyNum(t, sx, globals, "2")
+	big := sxPolyNum(t, sx, globals, "1267650600228229401496703205377")
+	power := sxPolyApp(t, sx, sy, "^", x, two)
+	expr := sxPolyApp(t, sx, sy, "+", power, big)
+	var out Algebraic
+	t.Cleanup(func() {
+		serviceMust(t, target.CleanupRetained())
+		serviceMust(t, target.CleanupValue(&out))
+	})
+	body := target.MkSexprRoot(sx, expr, 2, &out)
+	s := &target.rootConstruction
+	if !errors.Is(body, arena.ErrSlotLimit) || out != (Algebraic{}) || !s.active || s.parser == nil {
+		t.Fatal("private root parser did not retain failed receiving child", body)
+	}
+	parser := s.parser
+	if !target.config.Polynomials.rationalInputPending(&parser.inputReceipt) || len(parser.frames) != 1 || !parser.frames[0].live {
+		t.Fatal("root parser lost exact receiving child or older argument vector")
+	}
+	serviceMust(t, target.CleanupRetained())
+	if s.active || s.parser != nil || !parser.closed || len(parser.frames) != 0 || target.config.Polynomials.rationalInput.pending(target.config.Polynomials) {
+		t.Fatal("root owning cleanup did not release its actual child/parser sequence")
+	}
+	sxPolyCoefficients(t, target.config.Polynomials, target.isolateTmp1, []int32{0, 0, 1})
+}
+
 func TestAlgebraicPrivateOwnerSexprRoot(t *testing.T) {
 	cfg, context, budget := algebraicManagerFixture(t)
 	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: serviceConfig(budget).Integers})

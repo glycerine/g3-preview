@@ -23,18 +23,26 @@ func (m *UPolynomialManager) SetRationals(p UPolynomial, a []unumeral.Rational) 
 }
 
 func (m *UPolynomialManager) setRationalsFromOwner(p UPolynomial, source *unumeral.IntegerManager, a []unumeral.Rational) error {
+	return m.setRationalsFromOwnerWithReceipt(p, source, a, nil)
+}
+
+func (m *UPolynomialManager) setRationalsFromOwnerWithReceipt(p UPolynomial, source *unumeral.IntegerManager, a []unumeral.Rational, receipt *upolyRationalInputInvocationReceipt) error {
 	d, e := m.descriptor(p)
 	if e != nil {
 		return e
 	}
 	s := &m.rationalInput
-	if s.pending(m) {
+	if s.pending(m) || s.invocation == math.MaxUint64 {
 		return ErrUPolynomialCleanupPending
 	}
 	if uint64(len(a)) > math.MaxUint32 {
 		return arena.ErrBounds
 	}
 	s.running = true
+	s.invocation++
+	if receipt != nil {
+		*receipt = upolyRationalInputInvocationReceipt{m, s, s.invocation}
+	}
 	s.source = source
 	if e := s.bind(m.config.Integer, source); e != nil {
 		s.running = false

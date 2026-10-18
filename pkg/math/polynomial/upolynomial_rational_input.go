@@ -6,12 +6,34 @@ import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 // Receiving numerical children outlive a stopped global-rational borrow. The
 // source temporary remains with that service's existing lexical owner.
 type upolyRationalInputScope struct {
-	copy      unumeral.IntegerCopyAllocationReceipt
-	normalize unumeral.IntegerNormalizeInvocationReceipt
-	bindings  [4]unumeral.NumericCallerBinding
-	bound     uint8
-	running   bool
-	source    *unumeral.IntegerManager
+	invocation uint64
+	copy       unumeral.IntegerCopyAllocationReceipt
+	normalize  unumeral.IntegerNormalizeInvocationReceipt
+	bindings   [4]unumeral.NumericCallerBinding
+	bound      uint8
+	running    bool
+	source     *unumeral.IntegerManager
+}
+
+// Issued by actual accepted input-call entry. A refused entry leaves the
+// caller's prior receipt unchanged and grants no cleanup of another call.
+type upolyRationalInputInvocationReceipt struct {
+	manager    *UPolynomialManager
+	frame      *upolyRationalInputScope
+	invocation uint64
+}
+
+func (m *UPolynomialManager) matchesRationalInput(r *upolyRationalInputInvocationReceipt) bool {
+	return m != nil && m.self == m && r != nil && r.manager == m && r.frame == &m.rationalInput && r.invocation != 0 && r.invocation == m.rationalInput.invocation
+}
+func (m *UPolynomialManager) rationalInputPending(r *upolyRationalInputInvocationReceipt) bool {
+	return m.matchesRationalInput(r) && m.rationalInput.pending(m)
+}
+func (m *UPolynomialManager) cleanupRationalInputInvocation(r *upolyRationalInputInvocationReceipt) error {
+	if !m.matchesRationalInput(r) {
+		return nil
+	}
+	return m.CleanupRationalInput()
 }
 
 func (s *upolyRationalInputScope) NumericExecuting() bool { return s.running }

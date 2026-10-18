@@ -44699,3 +44699,39 @@ explicit platform deviations. This closes the cache library audit; it does not
 close the broader polynomial/factor/algebraic source units or the overall goal.
 portcheck passed:2103 units,677 APIs;210 ported,341 partial,1495 unported,
 11 dead/deleted. The full polynomial then AST objective remains active.
+
+S-expression private-receiver argument lifetime: a new actual descriptor-after-
+physical refusal in (+ 1 BIG) reproduced premature destruction of the older
+argument vector. The deferred frontier checked only global lexical children,
+while the real receiving integer owner had a retained constant-copy child.
+It now retains the argument until its actual receiving child is acknowledged,
+preserving the completed first-argument polynomial prefix and leaving the
+global rational service usable. Cleanup then releases the argument; a small
+(+ 1 1) retry succeeds.
+
+Review exposed a second concrete ownership gap: converter cleanup called the
+manager-wide CleanupRationalInput even when its input entry had been refused.
+An independent pending copy test reproduced that acquisition. Added a concrete
+manager/frame/invocation receipt issued only after real input-call acceptance;
+refused entry preserves the prior receipt. Constants and identity inputs
+propagate it through the synchronous context. Converter pending checks and
+owning cleanup now match exactly that invocation. A stale completed converter
+receipt cannot clean a newer independent copy on the same manager/frame. The
+independent primitive receipt and physical token remain live until their
+explicit owner acknowledges them. Invocation IDs are cold Go call identity,
+not source numeral counts, constructors or synthetic acquisition flags.
+
+The parent MkSexprRoot failure path is also covered: (+ (^ x 2) BIG) retains its
+actual parser, older argument vector and exact receiving child after refusal.
+Owning root cleanup closes that child/parser sequence and preserves the x^2
+persistent workspace prefix, without publishing an algebraic result or rolling
+back prior polynomial output. The query uses a real bounded private numerical
+owner and real global S-expression coefficients.
+
+Both ownership regressions failed before their fixes. Final focused selections
+(SexprPolynomial, UPolynomialContext/SourceFinalize and algebraic S-expression,
+private-owner, Copy and Manager tests) passed ordinary 0.734s and checked/debug/
+trace 1.290s on CPUs 8-16. No full suite repeat after the recent 94.230s ordinary
+polynomial run. Parser/univariate source units remain partial for broader fault
+composition, and complete polynomial then AST remains active.
+portcheck and git diff --check passed; unit/API status counts remain unchanged.

@@ -35,16 +35,17 @@ type sexprPolynomialFrame struct {
 // Native frames retain actual source scoped vectors, including stopped cleanup.
 // The converter header and actual numerical owners are charged separately.
 type SexprPolynomialConverter struct {
-	borrowed   *usexpr.SexprBorrowedNodes
-	self       *SexprPolynomialConverter
-	sexpr      *usexpr.SexprManager
-	polynomial *UPolynomialManager
-	frames     []sexprPolynomialFrame
-	depth      uint32
-	header     uint64
-	cause      error
-	converting bool
-	closed     bool
+	inputReceipt upolyRationalInputInvocationReceipt
+	borrowed     *usexpr.SexprBorrowedNodes
+	self         *SexprPolynomialConverter
+	sexpr        *usexpr.SexprManager
+	polynomial   *UPolynomialManager
+	frames       []sexprPolynomialFrame
+	depth        uint32
+	header       uint64
+	cause        error
+	converting   bool
+	closed       bool
 }
 
 func NewSexprPolynomialConverter(s *usexpr.SexprManager, m *UPolynomialManager) (out *SexprPolynomialConverter, cause error) {
@@ -112,6 +113,7 @@ func (c *SexprPolynomialConverter) convertAtDepthForRoot(h usexpr.SexprHandle, p
 		c.borrowed = nodes
 		defer func() { c.borrowed = nil }()
 		return numericRationalService_WithUPolynomialRationals(c.sexpr.Configuration().Rationals, c.polynomial, func(ctx *UPolynomialRationalContext) error {
+			ctx.inputReceipt = &c.inputReceipt
 			if caller != nil {
 				caller.parserAccepted = true
 			}
@@ -198,7 +200,7 @@ func (c *SexprPolynomialConverter) convert(ctx *UPolynomialRationalContext, h us
 		defer func() {
 			c.depth--
 			// Child numeric cleanup must finish before this older completed vector.
-			if c.cause != nil || ctx.Pending() {
+			if c.cause != nil || ctx.Pending() || c.polynomial.rationalInputPending(&c.inputReceipt) {
 				if c.cause == nil {
 					c.cause = ErrSexprPolynomialPending
 				}
@@ -268,7 +270,7 @@ func (c *SexprPolynomialConverter) Cleanup() error {
 		return e
 	}
 	err := numericRationalService_CleanupUPolynomialRationals(c.sexpr.Configuration().Rationals, c.polynomial, func() error {
-		if e := c.polynomial.CleanupRationalInput(); e != nil {
+		if e := c.polynomial.cleanupRationalInputInvocation(&c.inputReceipt); e != nil {
 			return e
 		}
 		for i := len(c.frames) - 1; i >= 0; i-- {
