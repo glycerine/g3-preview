@@ -45952,3 +45952,12 @@ Final focused checked scalar/polynomial tests pass (0.017s), including actual so
 
 Scalar string owning cleanup uses the existing exact insertion-abort engine through CleanupSourceString. An ended old receipt is retired without inspecting a later frame generation. Final guarded-read tests start the later independent character invocation BEFORE old frontend cleanup, then verify both that owning cleanup and stale repeated cleanup preserve its active receipt unchanged. Focused checked tests pass (0.017s) with this stronger ordering.
 Final broader checks after exact source-unwind/owning-cleanup distinctions pass ordinary (19.760s) and checked/debug/trace (31.499s); manifest validation passes.
+
+### Public factor normal-return verbosity summary
+
+Ported upolynomial.cpp:3113-3117 and upolynomial.h:33 for the selected non-_EXTERNAL_RELEASE profile (consistent with the ordinary source selection already documented in sat_solver_model.go). The verbosity1000 comparison happens only after normal factor_core return. Actual numeric verbose-stream insertion prints the distinct entry count and newline/flush, preserving integer formatting flags. Zero/constant core early returns reach the summary; abnormal/cancelled core return skips it. No standard-library stream internals or additional build profile are introduced.
+
+Tests cover levels999/1000/1001 with zero, constant7 and split x^2-1. Ten genuine factor entries with differing multiplicities print0xa under hex/showbase, proving actual numeric insertion and entry count rather than total multiplicity/host decimal formatting. A closed physical file sets the source sticky badbit while factorization succeeds; cancelled factorization leaves that stream untouched. Receiving-manager borrowing protects diagnostic transport.
+
+Focused tests passed ordinary (0.006s) and checked/debug/trace (0.007s); broader affected factorization/frontend/GCD/Euclidean/CRA/content/storage/closed/basic/rational/raw-scalar/quadratic checks pass checked/debug/trace (31.674s). All commands remain on CPUs8–16. Wider polynomial numerical/source-lifetime completion audits remain open, followed by AST. No full native suite repeated within the hourly interval; completed9825 remains historical evidence with its recorded shared-worktree caveat.
+Final broader ordinary checks pass (21.158s); manifest validation passes.

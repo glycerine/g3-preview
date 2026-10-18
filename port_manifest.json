@@ -50816,7 +50816,9 @@
         "pkg/math/polynomial/upolynomial_factor_quadratic_trace_test.go",
         "pkg/math/polynomial/upolynomial_factor_quadratic_scalar_trace.go",
         "pkg/math/polynomial/upolynomial_quadratic_scalar_trace_test.go",
-        "pkg/util/numeral/mpzzp_string_source.go"
+        "pkg/util/numeral/mpzzp_string_source.go",
+        "pkg/math/polynomial/upolynomial_factor_verbose.go",
+        "pkg/math/polynomial/upolynomial_factor_verbose_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51135,7 +51137,10 @@
         "TestUPolynomialFactorCoreTraceRetainsActualFrontend",
         "TestUPolynomialQuadraticPolynomialTraceRecords",
         "TestUPolynomialQuadraticPolynomialTraceStops",
-        "TestUPolynomialQuadraticScalarTraceActualReadStops"
+        "TestUPolynomialQuadraticScalarTraceActualReadStops",
+        "TestUPolynomialFactorVerboseThresholdAndResult",
+        "TestUPolynomialFactorVerboseUsesNumericFlags",
+        "TestUPolynomialFactorVerboseClosedFileAndFailedBody"
       ],
       "conditionals": [
         {
@@ -51724,6 +51729,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Public factor normal-return verbose distinct-factor summary (upolynomial.cpp:3113-3117; upolynomial.h:33)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_core.go",
+            "pkg/math/polynomial/upolynomial_factor_verbose.go",
+            "pkg/math/polynomial/upolynomial_factor_verbose_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorVerboseThresholdAndResult",
+            "TestUPolynomialFactorVerboseUsesNumericFlags",
+            "TestUPolynomialFactorVerboseClosedFileAndFailedBody"
+          ],
+          "notes": "Selected non-_EXTERNAL_RELEASE source profile, consistent with retained ordinary profile elsewhere in pkg: level1000 summary executes only after normal factor_core return, including zero/constant early returns, using actual numeric verbose stream insertion and endl-equivalent newline/flush. Source integer flags preserved (10 actual entries display0xa under hex/showbase), count differs from multiplicity. Physical file refusal keeps sticky badbit and successful numerical factorization; cancelled body skips stream entirely. Receiving-manager borrow guards diagnostic transport. Does not introduce another build profile or port standard-library stream internals. Broader polynomial completion audits remain partial."
+        },
         {
           "name": "Quadratic scalar to_string records and exact frontend insertion ownership (upolynomial.cpp:2974,2990)",
           "status": "ported",

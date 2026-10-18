@@ -13,7 +13,11 @@ func (s *UPolynomialFactorizationService) Factor(f UPolynomialView, out *UPolyno
 	if e := s.manager.checkFactors(out); e != nil {
 		return false, e
 	}
-	return s.factorCore(f, out, params)
+	result, e := s.factorCore(f, out, params)
+	if e != nil {
+		return result, e
+	}
+	return result, s.verboseFactorCount(out)
 }
 func (s *UPolynomialFactorizationService) flipFactorConstant(fs *UPolynomialFactors) (cause error) {
 	m := s.manager
