@@ -44018,3 +44018,23 @@ TRACE evidence is still needed. Whole polynomial and AST completion stays open.
 
 Focused bound/representation/global conversion checks pass ordinary (3.264s)
 and g3checked,g3debug,g3trace (0.161s), on CPUs8–16. No full-suite claim is made.
+
+Owning algebraic bound lifetime verification now covers both retained precision
+wrappers at each global/raw NUM/DEN source destructor stop. The existing actual
+TLS/runtime failure fixture is shared with conversion through concrete operation
+dispatch; no source completion flags or failure state are fabricated. Every
+case reaches assignment failure after global temporary construction, induces
+an actual signed runtime guard during selected deletion, checks physical
+release and reverse source order, preserves the original failure and stopped
+suffix, and confirms owning cleanup leaves the caller assignment prefix intact.
+
+A separate global-construction refusal test establishes the public replacement
+rule: while an owning wrapper is stopped, the core refuses a new raw bound
+before advancing its invocation or acquiring a numerical child. After wrapper
+cleanup, that same raw call succeeds. The initial attempt to create replacement
+work through the public API was correctly refused; no replacement is fabricated
+to claim otherwise. These checks strengthen the partial bound-wrapper audit;
+broader callback/TRACE and whole polynomial/AST completion remain open.
+
+Focused owning/raw bound and conversion suites pass ordinary (3.262s) and
+checked/debug/trace (0.187s), exclusively on CPUs8–16. No full-suite rerun.

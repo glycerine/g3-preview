@@ -156,3 +156,29 @@ func TestAlgebraicOwnedBoundCleansAcceptedRawStop(t *testing.T) {
 	serviceMust(t, service.Del(&out))
 	serviceMust(t, c.Del(&root))
 }
+
+func TestAlgebraicOwnedBoundRejectsReplacementRawCall(t *testing.T) {
+	c, _ := algebraicCellSourceFixtureProfile(t, true)
+	service, budget := serviceNew(t)
+	root := algebraicTinyBinaryBoundsRoot(t, c)
+	out, e := service.NewValue()
+	serviceMust(t, e)
+	budget.FailAfter(0)
+	body := c.GetUpperOwnedRational(&root, service, &out)
+	budget.FailAfter(-1)
+	if body == nil || !c.toOwnedRational.active || c.toOwnedRational.boundInvocation == 0 {
+		t.Fatal("did not stop global result construction after raw bound", body)
+	}
+	old := c.toOwnedRational.boundInvocation
+	raw := unumeral.NewRational()
+	body = c.GetUpperRational(&root, &raw)
+	if !errors.Is(body, ErrAlgebraicPending) || c.bounds.invocation != old || c.bounds.conversion.pending(c) {
+		t.Fatal("stopped owning wrapper permitted raw replacement", body)
+	}
+	serviceMust(t, c.CleanupToOwnedRational())
+	serviceMust(t, c.GetUpperRational(&root, &raw))
+	serviceMust(t, c.CleanupRetained())
+	serviceMust(t, c.config.Rationals.Del(&raw))
+	serviceMust(t, service.Del(&out))
+	serviceMust(t, c.Del(&root))
+}

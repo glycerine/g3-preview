@@ -27,6 +27,22 @@ func TestAlgebraicToOwnedRationalGlobalDenominatorDestructorStop(t *testing.T) {
 }
 
 func algebraicOwnedRationalDestructorStopCase(t *testing.T, globalDestructor, denominator bool) {
+	algebraicOwnedRationalDestructorStopOperation(t, globalDestructor, denominator, 0)
+}
+
+func TestAlgebraicOwnedBoundOrderedDestructorStops(t *testing.T) {
+	for _, operation := range []uint8{3, 4} {
+		for _, global := range []bool{false, true} {
+			for _, denominator := range []bool{false, true} {
+				t.Run(strconv.Itoa(int(operation))+"/"+strconv.FormatBool(global)+"/"+strconv.FormatBool(denominator), func(t *testing.T) {
+					algebraicOwnedRationalDestructorStopOperation(t, global, denominator, operation)
+				})
+			}
+		}
+	}
+}
+
+func algebraicOwnedRationalDestructorStopOperation(t *testing.T, globalDestructor, denominator bool, operation uint8) {
 	reached := false
 	for prefix := int64(0); prefix < 128 && !reached; prefix++ {
 		t.Run(strconv.FormatInt(prefix, 10), func(t *testing.T) {
@@ -79,7 +95,15 @@ func algebraicOwnedRationalDestructorStopCase(t *testing.T, globalDestructor, de
 			serviceMust(t, global.SetInt64(&out, 99))
 			budget.FailAfter(prefix)
 			armed = true
-			body := c.ToOwnedRational(&input, global, &out)
+			var body error
+			switch operation {
+			case 3:
+				body = c.GetLowerOwnedRationalAtPrecision(&input, global, &out, 2)
+			case 4:
+				body = c.GetUpperOwnedRationalAtPrecision(&input, global, &out, 2)
+			default:
+				body = c.ToOwnedRational(&input, global, &out)
+			}
 			armed = false
 			budget.FailAfter(-1)
 			if reached {

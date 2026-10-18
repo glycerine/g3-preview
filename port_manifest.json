@@ -38917,17 +38917,20 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_to_owned_rational.go",
           "go_targets": [
+            "pkg/math/polynomial/algebraic_to_owned_rational_destructor_test.go",
             "pkg/math/polynomial/algebraic_to_owned_rational.go",
             "pkg/math/polynomial/algebraic_representation.go",
             "pkg/math/polynomial/algebraic_owned_bound_test.go"
           ],
           "tests": [
+            "TestAlgebraicOwnedBoundRejectsReplacementRawCall",
+            "TestAlgebraicOwnedBoundOrderedDestructorStops",
             "TestAlgebraicOwnedBoundsDistinctGlobalOwner",
             "TestAlgebraicOwnedBoundGlobalReservationPrefixes",
             "TestAlgebraicOwnedBoundRefusalPreservesOlderRawBound",
             "TestAlgebraicOwnedBoundCleansAcceptedRawStop"
           ],
-          "notes": "All four concrete global-rational wrappers now execute the raw bound child, construct a distinct rational temporary and assign caller output before reverse source destruction. Entered raw bounds have actual invocation identity; rejected wrappers do not own older raw calls, and owning cleanup cannot consume a replacement call. Focused cross-owner mathematical, global reservation and older raw continuation tests; complete raw/global callback, destructor-stop and source TRACE audits remain open."
+          "notes": "All four concrete global-rational wrappers now execute the raw bound child, construct a distinct rational temporary and assign caller output before reverse source destruction. Entered raw bounds have actual invocation identity; rejected wrappers do not own older raw calls, and owning cleanup cannot consume a replacement call. Focused cross-owner mathematical, global reservation and older raw continuation tests. Both precision-bound wrappers also reach actual global/raw numerator/denominator destructor stops with real runtime operations, retain reverse source order and assignment provenance, and preserve caller output through owning cleanup. A stopped wrapper rejects public replacement raw calls before entering a new invocation. Broader raw/global callback and source TRACE audits remain open."
         },
         {
           "name": "Raw mpq to_rational overload always evaluates VERIFY(is_rational), then both basic assertions and NUM/DEN copy from the reached basic/zero value (cpp:235-241,337-341,2831-2833)",
@@ -39494,17 +39497,20 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_to_owned_rational.go",
           "go_targets": [
+            "pkg/math/polynomial/algebraic_to_owned_rational_destructor_test.go",
             "pkg/math/polynomial/algebraic_to_owned_rational.go",
             "pkg/math/polynomial/algebraic_representation.go",
             "pkg/math/polynomial/algebraic_owned_bound_test.go"
           ],
           "tests": [
+            "TestAlgebraicOwnedBoundRejectsReplacementRawCall",
+            "TestAlgebraicOwnedBoundOrderedDestructorStops",
             "TestAlgebraicOwnedBoundsDistinctGlobalOwner",
             "TestAlgebraicOwnedBoundGlobalReservationPrefixes",
             "TestAlgebraicOwnedBoundRefusalPreservesOlderRawBound",
             "TestAlgebraicOwnedBoundCleansAcceptedRawStop"
           ],
-          "notes": "All four concrete global-rational wrappers now execute the raw bound child, construct a distinct rational temporary and assign caller output before reverse source destruction. Entered raw bounds have actual invocation identity; rejected wrappers do not own older raw calls, and owning cleanup cannot consume a replacement call. Focused cross-owner mathematical, global reservation and older raw continuation tests; complete raw/global callback, destructor-stop and source TRACE audits remain open."
+          "notes": "All four concrete global-rational wrappers now execute the raw bound child, construct a distinct rational temporary and assign caller output before reverse source destruction. Entered raw bounds have actual invocation identity; rejected wrappers do not own older raw calls, and owning cleanup cannot consume a replacement call. Focused cross-owner mathematical, global reservation and older raw continuation tests. Both precision-bound wrappers also reach actual global/raw numerator/denominator destructor stops with real runtime operations, retain reverse source order and assignment provenance, and preserve caller output through owning cleanup. A stopped wrapper rejects public replacement raw calls before entering a new invocation. Broader raw/global callback and source TRACE audits remain open."
         },
         {
           "name": "Raw mpq to_rational overload always evaluates VERIFY(is_rational), then both basic assertions and NUM/DEN copy from the reached basic/zero value (cpp:235-241,337-341,2831-2833)",
