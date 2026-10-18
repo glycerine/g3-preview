@@ -198,6 +198,9 @@ func (m *RationalManager) RatDiv(a, b *Int, out *Rational) error {
 func (m *RationalManager) AddMul(a, b, c, out *Rational) error { return m.fused(a, b, c, out, false) }
 func (m *RationalManager) SubMul(a, b, c, out *Rational) error { return m.fused(a, b, c, out, true) }
 func (m *RationalManager) fused(a, b, c, out *Rational, subtract bool) error {
+	return m.fusedWithAllocationContext(a, b, c, out, subtract, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) fusedWithAllocationContext(a, b, c, out *Rational, subtract bool, context integerAllocationInvocationContext) error {
 	for _, q := range []*Rational{a, b, c, out} {
 		if e := m.check(q); e != nil {
 			return e
@@ -205,9 +208,9 @@ func (m *RationalManager) fused(a, b, c, out *Rational, subtract bool) error {
 	}
 	if isIntegerRational(b) && b.Num.IsSmall() && (b.Num.Val == 1 || b.Num.Val == -1) {
 		if subtract == (b.Num.Val == 1) {
-			return m.Sub(a, c, out)
+			return m.addSubWithAllocationContext(a, c, out, true, context)
 		}
-		return m.Add(a, c, out)
+		return m.addSubWithAllocationContext(a, c, out, false, context)
 	}
 	tmp := &m.AddMulTmp
 	if m.Synchronized {
@@ -215,14 +218,14 @@ func (m *RationalManager) fused(a, b, c, out *Rational, subtract bool) error {
 		tmp = &m.fusedTemporary
 		defer func() { m.fusedExecuting = false }()
 	}
-	if e := m.Mul(b, c, tmp); e != nil {
+	if e := m.mulWithAllocationContext(b, c, tmp, context); e != nil {
 		return e
 	}
 	if subtract {
-		if e := m.Sub(a, tmp, out); e != nil {
+		if e := m.addSubWithAllocationContext(a, tmp, out, true, context); e != nil {
 			return e
 		}
-	} else if e := m.Add(a, tmp, out); e != nil {
+	} else if e := m.addSubWithAllocationContext(a, tmp, out, false, context); e != nil {
 		return e
 	}
 	if m.Synchronized {

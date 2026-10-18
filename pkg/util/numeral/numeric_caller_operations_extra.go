@@ -507,3 +507,16 @@ func (o NumericBinaryRationalOperations) PowerOfTwo(p uint32, out *BinaryRationa
 	out.KField *= p
 	return m.Z.powerWithAllocationContext(&out.Num, p, &out.Num, nil, o.context)
 }
+
+func (o NumericRationalOperations) Div(a, b, out *Rational) error {
+	if e := o.valid(); e != nil {
+		return e
+	}
+	return o.manager.divWithAllocationContext(a, b, out, o.context)
+}
+func (o NumericRationalOperations) SubMul(a, b, c, out *Rational) error {
+	if e := o.valid(); e != nil {
+		return e
+	}
+	return o.manager.fusedWithAllocationContext(a, b, c, out, true, o.context)
+}

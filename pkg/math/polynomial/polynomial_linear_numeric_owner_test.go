@@ -168,3 +168,68 @@ func TestLinearModularArithmeticOwnsEveryReservationPrefix(t *testing.T) {
 		t.Fatal("arithmetic campaign missed reached callers or endpoint", failures, success, sawDivision, sawExtended, sawAddMul)
 	}
 }
+
+func TestLinearRationalCopyRefusalOwnsExactNumericRoot(t *testing.T) {
+	for _, replacement := range []bool{false, true} {
+		name := "owned"
+		if replacement {
+			name = "replacement"
+		}
+		t.Run(name, func(t *testing.T) {
+			budget := arena.NewBudget(1 << 24)
+			q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
+			serviceMust(t, e)
+			t.Cleanup(func() {
+				q.Close()
+				if budget.Used() != 0 {
+					t.Errorf("remaining actual bytes %d", budget.Used())
+				}
+			})
+			s, e := NewRationalLinearSolver(q)
+			serviceMust(t, e)
+			t.Cleanup(func() {
+				if e := s.Close(); e != nil {
+					serviceMust(t, s.Close())
+				}
+			})
+			serviceMust(t, s.Resize(1))
+			rhs := unumeral.Rational{Num: q.Z.Two64, Den: unumeral.NewInt(1)}
+			body := s.Add(0, []unumeral.Rational{unumeral.NewRational()}, &rhs)
+			if !errors.Is(body, arena.ErrSlotLimit) || q.Z.PendingCell.Object == (umemory.ObjectRef{}) {
+				t.Fatal("actual rational copy refusal missing", body)
+			}
+			root := q.Z.PendingCell
+			if s.numericRoots.Cell != root {
+				t.Fatal("rational caller lost actual allocation receipt")
+			}
+			before := budget.Used()
+			if e := s.Add(0, nil, nil); !errors.Is(e, ErrPolynomialPending) || budget.Used() != before || q.Z.PendingCell != root {
+				t.Fatal("pending rational copy reached new operands", e)
+			}
+			if replacement {
+				serviceMust(t, q.Z.CleanupPendingAllocation())
+				foreign := unumeral.NewInt(19)
+				e = q.Z.Copy(&foreign, &q.Z.Two64)
+				if !errors.Is(e, arena.ErrSlotLimit) || q.Z.PendingCell.Object == root.Object {
+					t.Fatal("actual foreign replacement missing", e)
+				}
+				newer := q.Z.PendingCell
+				if e := s.Close(); e != nil {
+					serviceMust(t, s.Close())
+				}
+				if q.Z.PendingCell != newer {
+					t.Fatal("rational solver consumed foreign allocation")
+				}
+				serviceMust(t, q.Z.CleanupPendingAllocation())
+				serviceMust(t, q.Z.Del(&foreign))
+			} else {
+				if e := s.Close(); e != nil {
+					serviceMust(t, s.Close())
+				}
+				if q.Z.PendingAllocationObject() != (umemory.ObjectRef{}) {
+					t.Fatal("rational solver retained its allocation")
+				}
+			}
+		})
+	}
+}

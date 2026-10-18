@@ -743,7 +743,10 @@ func (m *RationalManager) mulWithAllocationContext(a, b, out *Rational, context 
 
 // Div preserves the actual divisor/destination branch and component order.
 // Errors retain completed caller fields; no staged pair masks normalization.
-func (m *RationalManager) Div(a, b, out *Rational) (_rawErr error) {
+func (m *RationalManager) Div(a, b, out *Rational) error {
+	return m.divWithAllocationContext(a, b, out, integerAllocationInvocationContext{})
+}
+func (m *RationalManager) divWithAllocationContext(a, b, out *Rational, context integerAllocationInvocationContext) (_rawErr error) {
 	for _, n := range []*Rational{a, b, out} {
 		if e := m.checkScalarValue(n); e != nil {
 			return e
@@ -769,33 +772,33 @@ func (m *RationalManager) Div(a, b, out *Rational) (_rawErr error) {
 		r.DivActive, r.divEnd, r.divGuard = true, false, false
 		r.divCursor, r.divCause = 0, nil
 		defer m.finishRawDiv(&_rawErr)
-		if e := m.Z.Mul(&a.Num, &b.Den, &r.Div); e != nil {
+		if e := m.Z.mulWithAllocationContext(&a.Num, &b.Den, &r.Div, context); e != nil {
 			return e
 		}
-		if e := m.Z.Mul(&a.Den, &b.Num, &out.Den); e != nil {
+		if e := m.Z.mulWithAllocationContext(&a.Den, &b.Num, &out.Den, context); e != nil {
 			return e
 		}
-		if e := m.Z.Copy(&out.Num, &r.Div); e != nil {
+		if e := m.Z.copyFromOwnerWithAllocationContext(&out.Num, m.Z, &r.Div, nil, context); e != nil {
 			return e
 		}
 		if e := m.rawDivEnd(); e != nil {
 			return e
 		}
 	} else {
-		if e := m.Z.Mul(&a.Num, &b.Den, &out.Num); e != nil {
+		if e := m.Z.mulWithAllocationContext(&a.Num, &b.Den, &out.Num, context); e != nil {
 			return e
 		}
-		if e := m.Z.Mul(&a.Den, &b.Num, &out.Den); e != nil {
+		if e := m.Z.mulWithAllocationContext(&a.Den, &b.Num, &out.Den, context); e != nil {
 			return e
 		}
 	}
 	if out.Den.Val < 0 {
-		if e := m.Z.Neg(&out.Num); e != nil {
+		if e := m.Z.negWithAllocationContext(&out.Num, context); e != nil {
 			return e
 		}
-		if e := m.Z.Neg(&out.Den); e != nil {
+		if e := m.Z.negWithAllocationContext(&out.Den, context); e != nil {
 			return e
 		}
 	}
-	return m.normalize(out)
+	return m.normalizeWithAllocationContext(out, context)
 }

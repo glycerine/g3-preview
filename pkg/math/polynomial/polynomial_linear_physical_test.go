@@ -3,6 +3,7 @@ package polynomial
 
 import (
 	"errors"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -288,6 +289,9 @@ func TestLinearRationalArithmeticEveryReservationPrefix(t *testing.T) {
 			}
 			for _, a := range roots {
 				serviceMust(t, q.Del(a))
+			}
+			if q.Z.PendingAllocationObject() != (umemory.ObjectRef{}) || q.Z.DivisionRaw.Active || q.Z.GcdRaw.Active {
+				t.Fatal("rational solver left its numerical allocation/child pending", solve, ordinal)
 			}
 			serviceMust(t, q.CloseChecked())
 			if b.Used() != 0 {

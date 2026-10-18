@@ -14,8 +14,15 @@ type RationalLinearSolver struct {
 	self    *RationalLinearSolver
 	manager *unumeral.RationalManager
 	linearStorage
-	A [][]unumeral.Rational
-	b []unumeral.Rational
+	A                 [][]unumeral.Rational
+	b                 []unumeral.Rational
+	numericRoots      unumeral.NumericAllocationRoots
+	numericHooks      unumeral.NumericInvocationHooks
+	numericGeneration uint64
+	numericExecuting  bool
+	rawChildren       [2]unumeral.IntegerRawInvocationReceipt
+	rawOrder          [2]uint8
+	rawCount          uint8
 }
 
 func NewRationalLinearSolver(m *unumeral.RationalManager) (*RationalLinearSolver, error) {
@@ -55,6 +62,9 @@ func (s *RationalLinearSolver) open() error {
 	if s.sourceCause != nil {
 		return s.sourceCause
 	}
+	if s.numericPending() {
+		return ErrPolynomialPending
+	}
 	return nil
 }
 func (s *RationalLinearSolver) row(i uint32) (*[]unumeral.Rational, error) {
@@ -89,25 +99,40 @@ func (s *RationalLinearSolver) copyInto(v *[]unumeral.Rational, i uint32, a *unu
 	if _, e := s.load(v, i); e != nil {
 		return e
 	}
-	return s.manager.Copy(&(*v)[i], a)
+	return s.copyWithRoots(&(*v)[i], a)
 }
 func (s *RationalLinearSolver) setInto(v *[]unumeral.Rational, i uint32, value int64) error {
 	if _, e := s.load(v, i); e != nil {
 		return e
 	}
-	return s.manager.SetInt64(&(*v)[i], value)
+	ops, e := s.beginNumeric()
+	if e != nil {
+		return e
+	}
+	defer s.endNumeric()
+	return ops.SetInt64(&(*v)[i], value)
 }
 func (s *RationalLinearSolver) divideInto(v *[]unumeral.Rational, i uint32, divisor *unumeral.Rational) error {
 	if _, e := s.load(v, i); e != nil {
 		return e
 	}
-	return s.manager.Div(&(*v)[i], divisor, &(*v)[i])
+	ops, e := s.beginNumeric()
+	if e != nil {
+		return e
+	}
+	defer s.endNumeric()
+	return ops.Div(&(*v)[i], divisor, &(*v)[i])
 }
 func (s *RationalLinearSolver) submulInto(v *[]unumeral.Rational, i uint32, b, c *unumeral.Rational) error {
 	if _, e := s.load(v, i); e != nil {
 		return e
 	}
-	return s.manager.SubMul(&(*v)[i], b, c, &(*v)[i])
+	ops, e := s.beginNumeric()
+	if e != nil {
+		return e
+	}
+	defer s.endNumeric()
+	return ops.SubMul(&(*v)[i], b, c, &(*v)[i])
 }
 func (s *RationalLinearSolver) deleteInto(v *[]unumeral.Rational, i uint32, owning bool) error {
 	if uint64(i) >= uint64(len(*v)) {
@@ -371,7 +396,7 @@ func (s *RationalLinearSolver) Solve(xs []unumeral.Rational) (bool, error) {
 		if uint64(k) >= uint64(len(xs)) {
 			return false, arena.ErrBounds
 		}
-		if e = s.manager.Copy(&xs[k], &s.b[k]); e != nil {
+		if e = s.copyWithRoots(&xs[k], &s.b[k]); e != nil {
 			return false, e
 		}
 		i := k
@@ -513,6 +538,9 @@ func (s *RationalLinearSolver) Close() error {
 	s.running = true
 	defer func() { s.running = false }()
 	// Explicit owning continuation releases actual numeral resources after a stopped source destructor.
+	if e := s.cleanupNumericChildren(false); e != nil {
+		return e
+	}
 	for i := range s.A {
 		for j := range s.A[i] {
 			if e := s.deleteInto(&s.A[i], uint32(j), true); e != nil {
@@ -525,9 +553,93 @@ func (s *RationalLinearSolver) Close() error {
 			return e
 		}
 	}
+	if e := s.cleanupNumericChildren(true); e != nil {
+		return e
+	}
+	if e := s.numericRoots.Cleanup(s.integer); e != nil {
+		return e
+	}
 	s.A, s.b = nil, nil
 	s.integer.Budget().Release(s.header)
 	s.header = 0
 	s.closed = true
+	return nil
+}
+
+func (s *RationalLinearSolver) beginNumeric() (unumeral.NumericRationalOperations, error) {
+	if !s.running || s.numericExecuting || s.numericGeneration == ^uint64(0) {
+		return unumeral.NumericRationalOperations{}, ErrPolynomialPending
+	}
+	s.numericExecuting = true
+	s.numericGeneration++
+	s.numericHooks.Policy = s
+	s.numericHooks.Generation = s.numericGeneration
+	return s.manager.WithAllocationContext(unumeral.NumericAllocationContext{}.WithCaller(&s.numericHooks)), nil
+}
+func (s *RationalLinearSolver) endNumeric() { s.numericExecuting = false }
+func (s *RationalLinearSolver) copyWithRoots(dst, src *unumeral.Rational) error {
+	ops, e := s.beginNumeric()
+	if e != nil {
+		return e
+	}
+	defer s.endNumeric()
+	return ops.Copy(dst, src)
+}
+func (s *RationalLinearSolver) NumericBound(executing bool) bool {
+	return s != nil && s.self == s && s.manager != nil && s.numericGeneration != 0 && s.numericHooks.Generation == s.numericGeneration && !s.closed && (!executing || (s.running && s.numericExecuting))
+}
+func (s *RationalLinearSolver) NumericRoots(z *unumeral.IntegerManager, local *unumeral.NumericAllocationRoots) *unumeral.NumericAllocationRoots {
+	if !s.NumericBound(true) || s.integer != z {
+		return nil
+	}
+	if local != nil {
+		return local
+	}
+	return &s.numericRoots
+}
+func (s *RationalLinearSolver) NumericRecord(z *unumeral.IntegerManager, _ string, receipt unumeral.NumericInvocationReceipt) {
+	if !s.NumericBound(true) || s.integer != z || receipt.Raw == nil || !receipt.Raw.Matches(z) {
+		return
+	}
+	var index uint8
+	switch receipt.Raw.Kind() {
+	case unumeral.IntegerRawDivision:
+		index = 0
+	case unumeral.IntegerRawGCD:
+		index = 1
+	default:
+		return
+	}
+	s.rawChildren[index] = *receipt.Raw
+	for i := uint8(0); i < s.rawCount; i++ {
+		if s.rawOrder[i] == index {
+			copy(s.rawOrder[i:s.rawCount-1], s.rawOrder[i+1:s.rawCount])
+			s.rawCount--
+			break
+		}
+	}
+	s.rawOrder[s.rawCount] = index
+	s.rawCount++
+}
+func (s *RationalLinearSolver) numericPending() bool {
+	if unumeral.NumericAllocationPending(&s.numericRoots) {
+		return true
+	}
+	for i := uint8(0); i < s.rawCount; i++ {
+		if s.rawChildren[s.rawOrder[i]].Matches(s.integer) {
+			return true
+		}
+	}
+	return false
+}
+func (s *RationalLinearSolver) cleanupNumericChildren(abort bool) error {
+	for i := int(s.rawCount) - 1; i >= 0; i-- {
+		r := &s.rawChildren[s.rawOrder[i]]
+		if r.Matches(s.integer) {
+			if e := r.Cleanup(abort); e != nil {
+				return e
+			}
+		}
+	}
 	return nil
 }

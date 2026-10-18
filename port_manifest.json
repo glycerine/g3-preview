@@ -39697,6 +39697,11 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/util/numeral/mpq_test.go",
+        "pkg/util/numeral/mpq_ops_test.go",
+        "pkg/util/numeral/numeric_caller_operations_extra.go",
+        "pkg/util/numeral/mpq.go",
+        "pkg/util/numeral/mpq_ops.go",
         "pkg/math/polynomial/polynomial_linear_numeric_owner_test.go",
         "pkg/math/polynomial/polynomial_linear_rational.go",
         "pkg/math/polynomial/polynomial_linear_modular.go",
@@ -39711,6 +39716,7 @@
         "pkg/math/polynomial/polynomial_linear_assertions.go"
       ],
       "tests": [
+        "TestLinearRationalCopyRefusalOwnsExactNumericRoot",
         "TestLinearModularArithmeticOwnsEveryReservationPrefix",
         "TestLinearModularCopyRefusalOwnsExactNumericRoot",
         "TestLinearModularCopyContextInactiveDuringSolveTrace",
@@ -39793,6 +39799,17 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained unsynchronized rational Copy/Set/Div/SubMul calls transport exact integer allocations and accepted GCD/division RAW receipts; owning solver cleanup releases these before header retirement and preserves foreign replacements",
+          "status": "partial",
+          "go_targets": ["pkg/math/polynomial/polynomial_linear_rational.go", "pkg/util/numeral/mpq.go", "pkg/util/numeral/mpq_ops.go", "pkg/util/numeral/numeric_caller_operations_extra.go"],
+          "tests": [
+            "TestLinearRationalArithmeticEveryReservationPrefix",
+            "TestLinearRationalCopyRefusalOwnsExactNumericRoot",
+            "TestRationalSourceDivAndInverseAliases",
+            "TestRationalOpsFusedAllOutputAliases"
+          ]
+        },
         {
           "name": "Concrete modular Set/Div/SubMul calls retain their actual numerical allocation context, direct multiply-subtract child and accepted RAW children in acquisition order; owning cleanup uses exact completed-local then abort phases",
           "status": "partial",
