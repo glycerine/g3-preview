@@ -24,8 +24,14 @@ func (s *UPolynomialFactorizationService) mignotteBound(f UPolynomialView, p *un
 func (s *UPolynomialFactorizationService) mignotteBoundWithReceipt(f UPolynomialView, p *unumeral.Int, child *upolyMignotteInvocationReceipt) (answer uint32, cause error) {
 	m := s.manager
 	nm := m.modular
-	if polynomialSourceDebug && upolyViewDegree(f) < 2 {
-		return 0, ErrUPolynomialAssertion
+	enabled, e := factorHeaderAssertionsEnabled()
+	if e != nil {
+		return 0, e
+	}
+	if enabled && upolyViewDegree(f) < 2 {
+		if e = m.factorizationAssertionFailure(982, "upm.degree(f) >= 2"); e != nil {
+			return 0, e
+		}
 	}
 	n := upolyViewDegree(f) / 2
 	r, e := s.beginMignotteInvocation()

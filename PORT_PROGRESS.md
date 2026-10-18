@@ -45528,3 +45528,9 @@ method/lifetime audits remain open; polynomial then AST remain unfinished.
 No full native repeat after the recently successful68-package run.
 portcheck and diff checks pass:2103 units,677 APIs;211 ported,340 partial,
 1495 unported,11 dead/deleted. Whole source-unit statuses remain unchanged.
+
+### Mignotte degree assertion source actions
+
+Ported the factorization.cpp:982 process assertion gate and real debugger Throw/Continue actions before Mignotte local construction. Refactored the degree-precondition fixture to an independently registered degree-one polynomial and a direct adapter with zero constructed caller locals. Throw preserves the unaccepted receipt, invocation nonce and budget; Continue, disabled assertions and release compute the literal exponent 2 and finish the actual numeral destructors.
+
+Focused `TestUPolynomialMignotte*` passed in ordinary (0.014s) and g3checked/g3debug/g3trace (0.169s) builds, restricted to CPUs 8–16. Factorization and the overall polynomial/AST ports remain incomplete; primitive-content and final-remainder assertion sites still need runtime-action auditing.

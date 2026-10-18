@@ -2,7 +2,9 @@
 package polynomial
 
 import (
+	"errors"
 	"fmt"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -103,25 +105,42 @@ func TestUPolynomialMignotteBIGEveryActualSourcePrefix(t *testing.T) {
 }
 
 func TestUPolynomialMignotteSourceDegreeAssertionBeforeNUM(t *testing.T) {
-	q, s := mignotteDirectFixture(t)
-	c, e := s.newSquareFreeScope()
-	serviceMust(t, e)
-	c.constructed = 1
-	coefficients := []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(0), unumeral.NewInt(1)}
-	if polynomialSourceDebug {
-		coefficients = []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(1)}
+	for _, action := range []string{"T", "C", "disabled"} {
+		t.Run(action, func(t *testing.T) {
+			q, s := mignotteDirectFixture(t)
+			// The direct adapter owns no C++ caller locals. Its input is an
+			// independently registered polynomial, not a fabricated f_pp.
+			c, e := s.newSquareFreeScope()
+			serviceMust(t, e)
+			f := upolySourceNew(t, s.manager, []int32{1, 1})
+			view := mustUPolyView(t, s.manager, f)
+			choice := action
+			if action == "disabled" {
+				choice = ""
+			}
+			polynomialAssertionActionsFixture(t, choice)
+			if polynomialSourceDebug && action == "disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+			}
+			prime := unumeral.NewInt(2)
+			before := q.Budget().Used()
+			var receipt upolyMignotteInvocationReceipt
+			got, e := s.mignotteBoundWithReceipt(view, &prime, &receipt)
+			if polynomialSourceDebug && action == "T" {
+				if !errors.Is(e, ErrUPolynomialAssertion) || !linearThrownAssertion(e) || c.mignotte.invocation != 0 || c.mignotte.constructed != 0 || q.Budget().Used() != before || receipt.frame != nil {
+					t.Fatal("source degree Throw precedes NUM construction and receipt acceptance", e, c.mignotte)
+				}
+			} else {
+				serviceMust(t, e)
+				// Degree one gives n=0: floor(sqrt(2))+1=2, and 2^2>2.
+				if got != 2 || receipt.frame == nil || c.mignotte.active || c.mignotte.sourceRemaining != 0 {
+					t.Fatal("literal degree-one continuation and completed NUM destruction", got, c.mignotte)
+				}
+			}
+			if c.constructed != 0 || s.manager.factorTrace != nil {
+				t.Fatal("direct adapter invented source locals or retained debugger borrow")
+			}
+			serviceMust(t, s.CleanupRetained())
+		})
 	}
-	serviceMust(t, s.manager.set(&c.fpp, coefficients))
-	prime := unumeral.NewInt(2)
-	before := q.Budget().Used()
-	_, e = s.mignotteBound(s.manager.stateView(&c.fpp), &prime)
-	if polynomialSourceDebug {
-		if e != ErrUPolynomialAssertion || c.mignotte.invocation != 0 || c.mignotte.constructed != 0 || q.Budget().Used() != before {
-			t.Fatal("source degree assertion must precede lexical NUM construction", e, c.mignotte)
-		}
-	} else {
-		serviceMust(t, e)
-	}
-	mignotteScopePhysicalAudit(t, q, s, &prime)
-	serviceMust(t, s.CleanupRetained())
 }

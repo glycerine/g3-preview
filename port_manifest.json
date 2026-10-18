@@ -53450,6 +53450,15 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Mignotte degree precondition runtime gate and debugger action before local numeral construction (upolynomial_factorization.cpp:982)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_recombine.go",
+          "tests": [
+            "TestUPolynomialMignotteSourceDegreeAssertionBeforeNUM"
+          ],
+          "notes": "The process assertion gate precedes the degree predicate and actual Mignotte invocation. Throw preserves the unaccepted receipt, invocation nonce, numeral construction frontier and charged budget. Continue and disabled/release assertions calculate the literal degree-one bound exponent 2. The direct test adapter owns zero caller source locals and uses an independently registered polynomial; no fabricated f_pp construction count."
+        },
+        {
           "name": "Hensel GCD/unit-factor/multiplicity SASSERT runtime gates and source publication frontiers (728,874,880,902)",
           "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_hensel.go",
