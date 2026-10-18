@@ -121,11 +121,17 @@ func (m *MultivariatePolynomialCore) generatedRemoveVariable(term Monomial, x ui
 	return m.generatedRemoveVariableWithCoefficient(term, x, nil)
 }
 func (m *MultivariatePolynomialCore) generatedRemoveVariableWithCoefficient(term Monomial, x uint32, scope *polynomialCoefficientScope) (Monomial, error) {
+	return m.generatedRemoveVariableWithOutcome(term, x, scope, nil)
+}
+func (m *MultivariatePolynomialCore) generatedRemoveVariableWithOutcome(term Monomial, x uint32, scope *polynomialCoefficientScope, result *monomialFactoryOutcome) (Monomial, error) {
 	if m.generatedActive {
 		return Monomial{}, ErrPolynomialPending
 	}
 	outcome := monomialFactoryOutcome{}
 	a, e := m.monomials.removeVariableCreated(term, x, &outcome)
+	if result != nil {
+		*result = outcome
+	}
 	if scope != nil && scope == &m.coefficientInvocation && scope.active && scope.executing {
 		for i, root := range outcome.allocator {
 			if root != (umemory.Block{}) {

@@ -118,6 +118,9 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 		if e := c.cleanupArithmeticInvocation(&s.product, true); e != nil {
 			return e
 		}
+		if e := m.cleanupGCDZPXMonomial(s); e != nil {
+			return e
+		}
 		if e := m.cleanupGCDDirectChildren(s, true); e != nil {
 			return e
 		}

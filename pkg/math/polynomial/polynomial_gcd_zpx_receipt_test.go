@@ -4,7 +4,7 @@ package polynomial
 import "testing"
 
 func TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes(t *testing.T) {
-	success, captured := false, false
+	success, captured, monomialCaptured := false, false, false
 	for prefix := int64(0); prefix < 128 && !success; prefix++ {
 		full := polynomialPSCFullFixture(t)
 		c := full.core
@@ -22,6 +22,17 @@ func TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes(t *testing.T) {
 			}
 			polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p}, nil, 0)
 			continue
+		}
+		s := full.gcdFrames[0]
+		if body != nil && s.zpxCalleeGeneration != 0 {
+			monomialCaptured = true
+			if c.monomials.creation.generation != s.zpxCalleeGeneration || c.monomials.creation.parent != c {
+				t.Fatal("ZPX lost actual constructor binding", prefix)
+			}
+			serviceMust(t, full.cleanupGCDZPXMonomial(s))
+			if full.gcdZPXMonomialPending(s) {
+				t.Fatal("exact monomial acknowledgement retained work", prefix)
+			}
 		}
 		r := full.gcdFrames[0].product
 		if body != nil && c.matchesArithmeticInvocation(&r) {
@@ -45,7 +56,7 @@ func TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes(t *testing.T) {
 		}
 		polynomialImpPhysicalAuditNamed(t, full, []Polynomial{p, result}, nil, 0)
 	}
-	if !success || !captured {
-		t.Fatal("missed successful result or retained actual buffer receipt", success, captured)
+	if !success || !captured || !monomialCaptured {
+		t.Fatal("missed successful result or retained actual buffer receipt", success, captured, monomialCaptured)
 	}
 }

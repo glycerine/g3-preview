@@ -37,7 +37,7 @@ func (m *MultivariatePolynomialManager) lcGlexZPX(p Polynomial, x uint32) (resul
 			return result, e
 		}
 		if k != 0 {
-			a, e := c.generatedRemoveVariable(term, x)
+			a, e := m.gcdZPXMonomial(s, term, x, 0, false)
 			if e != nil {
 				return result, e
 			}
@@ -68,7 +68,7 @@ func (m *MultivariatePolynomialManager) lcGlexZPX(p Polynomial, x uint32) (resul
 			if e != nil {
 				return result, e
 			}
-			mono, e := c.generatedVariable(x, k)
+			mono, e := m.gcdZPXMonomial(s, Monomial{}, x, k, true)
 			if e != nil {
 				return result, e
 			}
@@ -80,7 +80,7 @@ func (m *MultivariatePolynomialManager) lcGlexZPX(p Polynomial, x uint32) (resul
 			if e != nil {
 				return result, e
 			}
-			mono, e := c.generatedVariable(x, k)
+			mono, e := m.gcdZPXMonomial(s, Monomial{}, x, k, true)
 			if e != nil {
 				return result, e
 			}
