@@ -13,12 +13,15 @@ import (
 // Actual returning failure transport and signed-host destructor guard. The
 // saved interval is constructed before the reached refinement/Horner child.
 func TestAlgebraicRationalPredicateRefinementStopRetainsSavedInterval(t *testing.T) {
-	algebraicPredicateRefinementStopCase(t, true)
+	algebraicPredicateRefinementStopCase(t, true, false)
 }
 func TestAlgebraicRationalPredicateDoesNotAdoptOlderRefinementStop(t *testing.T) {
-	algebraicPredicateRefinementStopCase(t, false)
+	algebraicPredicateRefinementStopCase(t, false, false)
 }
-func algebraicPredicateRefinementStopCase(t *testing.T, predicateFirst bool) {
+func TestAlgebraicToOwnedRationalPredicateRefinementStop(t *testing.T) {
+	algebraicPredicateRefinementStopCase(t, true, true)
+}
+func algebraicPredicateRefinementStopCase(t *testing.T, predicateFirst, ownedWrapper bool) {
 	reached := false
 	for offset := int64(0); offset < 4096 && !reached; offset += 4 {
 		t.Run(strconv.FormatInt(offset, 10), func(t *testing.T) {
@@ -50,6 +53,15 @@ func algebraicPredicateRefinementStopCase(t *testing.T, predicateFirst bool) {
 			var p *UPolynomialManager
 			c, p, runtime = algebraicNegTLSFixture(t, transport)
 			root := algebraicBigBinaryBoundsRootWithMinimal(t, c, false)
+			var global *unumeral.RationalService
+			var out unumeral.OwnedRational
+			if ownedWrapper {
+				global, _ = serviceNew(t)
+				var e error
+				out, e = global.NewValue()
+				serviceMust(t, e)
+				serviceMust(t, global.SetInt64(&out, 99))
+			}
 			n := int64(100000) - runtime.State().LocalSize - offset - 8
 			if n <= 0 {
 				t.Fatal("TLS extent", runtime.State())
@@ -59,7 +71,9 @@ func algebraicPredicateRefinementStopCase(t *testing.T, predicateFirst bool) {
 			serviceMust(t, runtime.SetMaxSize(1))
 			armed = true
 			var body error
-			if predicateFirst {
+			if ownedWrapper {
+				body = c.ToOwnedRational(&root, global, &out)
+			} else if predicateFirst {
 				_, body = c.IsRational(&root)
 			} else {
 				body = c.RefineToPrecision(&root, 1)
@@ -90,6 +104,9 @@ func algebraicPredicateRefinementStopCase(t *testing.T, predicateFirst bool) {
 				if !p.binaryEvaluation.active {
 					t.Fatal("actual reached Horner child was not retained")
 				}
+				if ownedWrapper && (!c.toOwnedRational.active || c.toOwnedRational.constructed || out.Raw.Num != unumeral.NewInt(99)) {
+					t.Fatal("wrapper published output or lost actual predicate stop")
+				}
 			}
 			if reached && !predicateFirst {
 				old := c.refinement
@@ -108,6 +125,12 @@ func algebraicPredicateRefinementStopCase(t *testing.T, predicateFirst bool) {
 			}
 			if c.predicate.active {
 				t.Fatal("owning cleanup retained predicate")
+			}
+			if ownedWrapper {
+				if c.toOwnedRational.active || out.Raw.Num != unumeral.NewInt(99) {
+					t.Fatal("core cleanup retained wrapper or consumed caller output")
+				}
+				serviceMust(t, global.Del(&out))
 			}
 			contextTLSFinish(t, runtime, func() error { return c.Del(&root) })
 			for _, block := range []*umemory.Block{&lane, &pad} {

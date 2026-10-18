@@ -215,3 +215,64 @@ func TestAlgebraicToOwnedRationalIrrationalAndForeignOutput(t *testing.T) {
 	}
 	serviceMust(t, foreign.Del(&out))
 }
+
+func TestAlgebraicToOwnedRationalNonminimalEveryReservation(t *testing.T) {
+	success, failed := false, false
+	for prefix := int64(0); prefix < 1024 && !success; prefix++ {
+		t.Run(strconv.FormatInt(prefix, 10), func(t *testing.T) {
+			c, _, _ := algebraicCompareFixture(t)
+			s, _ := serviceNew(t)
+			root := algebraicCompareRoot(t, c, []int32{-1, 2, 3}, 0, 0, 1, 0, false)
+			original := root
+			out, e := s.NewValue()
+			serviceMust(t, e)
+			serviceMust(t, s.SetInt64(&out, 99))
+			budget := c.config.Rationals.Integers().Budget()
+			budget.FailAfter(prefix)
+			body := c.ToOwnedRational(&root, s, &out)
+			budget.FailAfter(-1)
+			if body != nil {
+				failed = true
+				if !numericPhysicalReservationRefusal(body) {
+					t.Fatal("unexpected rationality/conversion failure", body)
+				}
+				if out.Raw.Num != unumeral.NewInt(99) || out.Raw.Den != unumeral.NewInt(1) {
+					t.Fatal("predicate failure published caller output", out)
+				}
+				if root == (Algebraic{}) {
+					// Source deletes the old algebraic cell before allocating its
+					// basic replacement (cpp:434-436). No rollback is promised.
+					l := &c.locations[original.slot-1]
+					if l.kind != 0 || l.generation == original.generation || l.published {
+						t.Fatal("lost input without the actual basic replacement attempt")
+					}
+				}
+			}
+			serviceMust(t, c.CleanupRetained())
+			if c.predicate.active || c.predicateQ.active || c.toOwnedRational.active {
+				t.Fatal("core cleanup retained reached conversion child")
+			}
+			algebraicCellSourcePhysical(t, c, nil, nil, nil, &root)
+			if body != nil {
+				if root == (Algebraic{}) {
+					root = algebraicCompareRoot(t, c, []int32{-1, 2, 3}, 0, 0, 1, 0, false)
+				}
+				serviceMust(t, c.ToOwnedRational(&root, s, &out))
+			}
+			got, e := s.String(&out)
+			serviceMust(t, e)
+			if got != "1/3" {
+				t.Fatal("retry or original conversion lost exact root", got)
+			}
+			serviceMust(t, s.Del(&out))
+			serviceMust(t, c.Del(&root))
+			success = body == nil
+		})
+		if t.Failed() {
+			return
+		}
+	}
+	if !success || !failed {
+		t.Fatal("missing actual predicate failure or success", failed, success)
+	}
+}
