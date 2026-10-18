@@ -53,20 +53,26 @@ func (s *upolyFactorDegreeState) init(fs *UPolynomialFactors) error {
 			}
 		}
 	}
-	if polynomialSourceDebug {
+	enabled, e := factorHeaderAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled {
 		zero, e := s.get(0)
 		if e != nil {
 			return e
 		}
-		if !zero {
-			return ErrUPolynomialAssertion
+		total := false
+		if zero {
+			total, e = s.get(fs.totalDegree)
+			if e != nil {
+				return e
+			}
 		}
-		total, e := s.get(fs.totalDegree)
-		if e != nil {
-			return e
-		}
-		if !total {
-			return ErrUPolynomialAssertion
+		if !zero || !total {
+			if e := factorHeaderAssertionFailure(84, "in_set(0) && in_set(factors.get_degree())"); e != nil {
+				return e
+			}
 		}
 	}
 	return nil

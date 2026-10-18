@@ -27,8 +27,11 @@ func (s *upolyFactorCombinationState) init(fs *UPolynomialFactors, ds *upolyFact
 	s.degrees = ds
 	s.total = int32(fs.count)
 	s.max = int32(fs.count / 2)
-	if polynomialSourceDebug && (fs.totalFactors <= 1 || fs.totalFactors != fs.count) {
-		return ErrUPolynomialAssertion
+	if e := factorHeaderAssert(fs.totalFactors > 1, 170, "factors.total_factors() > 1"); e != nil {
+		return e
+	}
+	if e := factorHeaderAssert(fs.totalFactors == fs.count, 171, "factors.total_factors() == factors.distinct_factors()"); e != nil {
+		return e
 	}
 	if fs.count > math.MaxInt32 {
 		return arena.ErrBounds
@@ -91,8 +94,8 @@ func (s *upolyFactorCombinationState) next(remove bool) (bool, error) {
 		idx := s.size - 1
 		value := int32(-1)
 		if remove {
-			if polynomialSourceDebug && s.size <= 0 {
-				return false, ErrUPolynomialAssertion
+			if e := factorHeaderAssert(s.size > 0, 202, "m_current_size > 0"); e != nil {
+				return false, e
 			}
 			if s.size <= 0 {
 				return false, arena.ErrBounds
@@ -102,8 +105,8 @@ func (s *upolyFactorCombinationState) next(remove bool) (bool, error) {
 				if chosen < 0 || uint32(chosen) >= uint32(len(s.enabled)) {
 					return false, arena.ErrBounds
 				}
-				if polynomialSourceDebug && !s.enabled[chosen] {
-					return false, ErrUPolynomialAssertion
+				if e := factorHeaderAssert(s.enabled[chosen], 205, "m_enabled[m_current[current_i]]"); e != nil {
+					return false, e
 				}
 				s.enabled[chosen] = false
 				s.current[idx] = upper
@@ -112,8 +115,8 @@ func (s *upolyFactorCombinationState) next(remove bool) (bool, error) {
 			if chosen < 0 || uint32(chosen) >= uint32(len(s.enabled)) {
 				return false, arena.ErrBounds
 			}
-			if polynomialSourceDebug && !s.enabled[chosen] {
-				return false, ErrUPolynomialAssertion
+			if e := factorHeaderAssert(s.enabled[chosen], 210, "m_enabled[m_current[0]]"); e != nil {
+				return false, e
 			}
 			s.enabled[chosen] = false
 			remove = false
@@ -191,8 +194,8 @@ func (s *upolyFactorCombinationState) left(out *upolyVectorState) error {
 }
 func (s *upolyFactorCombinationState) leftWithSourceContext(out *upolyVectorState, child *unumeral.IntegerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
 	m := s.factors.manager
-	if polynomialSourceDebug && s.size <= 0 {
-		return ErrUPolynomialAssertion
+	if e := factorHeaderAssert(s.size > 0, 347, "m_current_size > 0"); e != nil {
+		return e
 	}
 	if s.size <= 0 {
 		return arena.ErrBounds
@@ -244,8 +247,8 @@ func (s *upolyFactorCombinationState) right(value, out *unumeral.Int, polynomial
 func (s *upolyFactorCombinationState) rightWithSourceContext(value, out *unumeral.Int, polynomial *upolyVectorState, child *unumeral.IntegerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
 	m := s.factors.manager
 	if polynomial != nil {
-		if polynomialSourceDebug && s.size <= 0 {
-			return ErrUPolynomialAssertion
+		if e := factorHeaderAssert(s.size > 0, 389, "m_current_size > 0"); e != nil {
+			return e
 		}
 		if e := m.reset(polynomial); e != nil {
 			return e
@@ -265,13 +268,23 @@ func (s *upolyFactorCombinationState) rightWithSourceContext(value, out *unumera
 			continue
 		}
 		if selection >= s.factors.count+1 || int32(current) < s.current[selection] {
-			if polynomialSourceDebug {
+			enabled, e := factorHeaderAssertionsEnabled()
+			if e != nil {
+				return e
+			}
+			if enabled {
 				mult, e := s.factors.multiplicity(current)
 				if e != nil {
 					return e
 				}
 				if mult != 1 {
-					return ErrUPolynomialAssertion
+					line := int32(377)
+					if polynomial != nil {
+						line = 403
+					}
+					if e := factorHeaderAssertionFailure(line, "m_factors.get_degree(current) == 1"); e != nil {
+						return e
+					}
 				}
 			}
 			fv := m.stateView(&s.factors.factors[current])

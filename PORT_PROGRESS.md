@@ -44880,3 +44880,37 @@ newly ported: 2103 units,677 APIs;211 ported,340 partial,1495 unported,
 incomplete; this generated-header completion claims no transitive completion.
 No full native repetition for these focused test/manifest changes after the
 recent successful full native verification.
+
+Internal univariate factorization header project assertions now honor the
+source runtime switch and debugger actions at h:84,170-171,202,205,210,347,
+377,389,403. The old code returned a fixed Go assertion error whenever compiled
+for debug, so it ignored Continue and disabled assertions and lost the actual
+source default_exception class/message on Throw. Constructor-action and
+multiplicity-erasure regressions failed before the fix.
+
+A concrete header assertion helper now preserves the source file/line/expression,
+Throw classification and literal continued body. The degree-set compound check
+preserves its short-circuit. Right-tail and right-polynomial multiplicity reads
+are inside the runtime assertion gate, so disabled/erased assertions do not read
+that operand. Existing native index bounds remain separate Go safety guards;
+no deleted STL assertions/containers are reconstructed.
+
+New tests cover constructor Throw/Continue/erasure; empty-selection Throw before
+independent native bounds; disabled multiplicity read erasure; polynomial Reset
+and tail Copy publication before the multiplicity assertion; actual right-product
+multiplication after Continue; and degree-set final-assertion actions. Deliberate
+metadata/extent fixtures are restored for teardown and are not presented as
+allocation-failure evidence. Existing mathematical combination/subset, factor,
+Hensel and recombination checks pass ordinary (16.419s) and checked/debug/trace
+(27.812s), all on CPUs 8-16. No full native repetition after the recent successful
+full verification. Only these project assertion sites receive method credit;
+the internal header and the complete polynomial/AST objective remain open.
+
+A retained source gap identified for subsequent work: factorization_degree_set
+Display is called by the production bughunt TRACE at cpp:1144,1157,1195. Its
+source representation can be emitted from native []bool (descending logical
+bits per bit_vector.cpp:188-201), without recreating bit-vector storage or STL
+machinery. The current Go degree-set owner has no Display method. This remains
+unported evidence rather than inferred source-unit completion.
+portcheck and git diff --check pass; counts remain 2103 units,677 APIs:
+211 ported,340 partial,1495 unported and 11 dead/deleted.

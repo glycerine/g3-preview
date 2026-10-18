@@ -53771,6 +53771,24 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Project degree-set/combination assertions at h:84,170-171,202,205,210,347,377,389,403 honor runtime enablement and source debugger actions",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_assertions.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_combination.go",
+            "pkg/math/polynomial/upolynomial_factor_degree.go",
+            "pkg/math/polynomial/upolynomial_factor_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorCombinationConstructorAssertionActions",
+            "TestUPolynomialFactorCombinationAssertionErasesMultiplicityRead",
+            "TestUPolynomialFactorCombinationSelectionAssertionActions",
+            "TestUPolynomialFactorCombinationRightMultiplicityAssertionPrefixes",
+            "TestUPolynomialFactorDegreeSetFinalAssertionActions"
+          ],
+          "notes": "Fixed compile-debug-only early Go errors that ignored the source runtime assertion switch and debugger Continue. Actual project assertions now preserve default_exception assertion-violation classification for Throw while errors.Is retains the Go assertion class; Continue executes the literal body and disabled/erased sites skip source failure handling. Right-tail/right-polynomial multiplicity operands are read only after the runtime gate. The final degree-set compound assertion preserves short-circuit order. Tests prove constructor Throw/Continue/erasure, selection assertion before independent native bounds protection, skipped multiplicity-vector access under disabled assertions, reset/copy prefixes before multiplicity Throw and source multiplication after Continue, and continued degree-set construction after its final assertion. Malformed metadata/extent fixtures are explicitly source-precondition/read-order tests, restored for teardown, not allocation-refusal evidence. Native container bounds remain separate Go guards; no STL assertions or container internals are introduced. Whole internal header/frontends and polynomial/AST completion remain partial."
+        },
+        {
           "name": "upolynomial_factorization_int.h:42-52 selected actual prime-trial RAW SET and move publication",
           "status": "partial",
           "go_target": "pkg/math/polynomial/upolynomial_factor_hensel.go",
