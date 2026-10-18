@@ -167,6 +167,15 @@ func (m *UPolynomialManager) normalize(v UPolynomialView) error {
 
 // Source: src/math/polynomial/upolynomial.cpp:366-401.
 func (m *UPolynomialManager) normalizeWithSourceContext(v UPolynomialView, context integerAllocationInvocationContext) (cause error) {
+	if context.rootID != nil {
+		q := context.rootIDFrame(m.config.Integer)
+		if q == nil {
+			return ErrUPolynomialOwner
+		}
+		if v.count > 1 {
+			return q.normalizeView(v)
+		}
+	}
 	if v.count == 0 {
 		return nil
 	}

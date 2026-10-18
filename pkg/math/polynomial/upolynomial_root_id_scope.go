@@ -7,6 +7,7 @@ import (
 )
 
 type upolyRootIDScope struct {
+	normalization                              upolyRootIDNormalizeScope
 	derivative                                 unumeral.Int
 	derivativeRetired                          *upolyRootIDDerivativeRaw
 	scalar                                     upolyRootIDRemainderScalar
@@ -51,7 +52,7 @@ func (q *upolyRootIDScope) vector(which uint8) *upolyVectorState {
 }
 func (q *upolyRootIDScope) pending() bool {
 	m := q.owner
-	if q.derivative.NativeCellToken() != 0 || q.derivativeRetired != nil || q.scalarPending() || unumeral.NumericAllocationPending(&q.numeric) || m.config.Integer.MatchesCopyAllocationInvocation(&q.remainderCopy) || q.live[0] || q.live[1] || q.live[2] || m.config.Integer.MatchesCopyAllocationInvocation(&q.initialCopy) || m.modular.MatchesPNormalizeInvocation(&q.normalize) {
+	if q.normalizePending() || q.derivative.NativeCellToken() != 0 || q.derivativeRetired != nil || q.scalarPending() || unumeral.NumericAllocationPending(&q.numeric) || m.config.Integer.MatchesCopyAllocationInvocation(&q.remainderCopy) || q.live[0] || q.live[1] || q.live[2] || m.config.Integer.MatchesCopyAllocationInvocation(&q.initialCopy) || m.modular.MatchesPNormalizeInvocation(&q.normalize) {
 		return true
 	}
 	return m.matchesBinaryEvaluationReceipt(&q.evaluation) && m.binaryEvaluation.active
@@ -151,7 +152,7 @@ func (q *upolyRootIDScope) sturmCore() (cause error) {
 		if q.remainder.size == 0 {
 			return nil
 		}
-		if e = m.normalize(m.stateView(&q.remainder)); e != nil {
+		if e = q.normalizeView(m.stateView(&q.remainder)); e != nil {
 			return e
 		}
 		if e = m.sequencePush(&q.sequence, m.stateView(&q.remainder), true); e != nil {
