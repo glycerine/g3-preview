@@ -148,6 +148,9 @@ func (s *UPolynomialFactorizationService) henselPairWithCaller(a, b, r *unumeral
 			}
 		}
 	}()
+	if e = s.traceHenselPairEntry(h, a, b, r); e != nil {
+		return e
+	}
 	rm, e := NewRelatedUPolynomialManager(m)
 	if e != nil {
 		return e
@@ -176,22 +179,43 @@ func (s *UPolynomialFactorizationService) henselPairWithCaller(a, b, r *unumeral
 	if e = rm.toZPInPlaceWithHensel(&h.f, &receipt); e != nil {
 		return e
 	}
+	if e = s.traceHenselPairStage(h, 614); e != nil {
+		return e
+	}
 	h.constructed = 5
+	if e = s.traceHenselPairStage(h, 637); e != nil {
+		return e
+	}
 	if e = rm.mulWithHensel(h.borrowedInput(2), rm.stateView(&h.f), &h.Vf, &receipt); e != nil {
+		return e
+	}
+	if e = s.traceHenselPairStage(h, 641); e != nil {
 		return e
 	}
 	var d uint32
 	if e = rm.divRemCoreWithHensel(rm.stateView(&h.Vf), h.borrowedInput(1), &d, &h.t, &h.S, &receipt); e != nil {
 		return e
 	}
+	if e = s.traceHenselPairStage(h, 646); e != nil {
+		return e
+	}
 	h.constructed = 7
 	if e = rm.mulWithHensel(h.borrowedInput(0), rm.stateView(&h.f), &h.T, &receipt); e != nil {
+		return e
+	}
+	if e = s.traceHenselPairStage(h, 653); e != nil {
 		return e
 	}
 	if e = rm.mulWithHensel(h.borrowedInput(3), rm.stateView(&h.t), &h.tmp, &receipt); e != nil {
 		return e
 	}
+	if e = s.traceHenselPairStage(h, 658); e != nil {
+		return e
+	}
 	if e = rm.addSubStateWithHensel(rm.stateView(&h.T), rm.stateView(&h.tmp), &h.T, false, &receipt); e != nil {
+		return e
+	}
+	if e = s.traceHenselPairStage(h, 663); e != nil {
 		return e
 	}
 	if e = m.mulScalarStateWithHensel(&h.S, b, &receipt); e != nil {

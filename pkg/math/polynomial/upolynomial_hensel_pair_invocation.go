@@ -19,6 +19,8 @@ type upolyHenselPairInvocationReceipt struct {
 // Stable, cached cold storage for the actual lexical declarations. A frame's
 // storage is charged once; no Runtime ticket stands in for lexical construction.
 type upolyHenselPairScope struct {
+	trace                           upolyDisplayInvocationReceipt
+	traceBorrow                     upolyFactorTraceBorrow
 	inputs                          [5]upolyHenselInputBorrow
 	check                           upolyHenselCheckScope
 	am                              unumeral.Int
@@ -120,6 +122,9 @@ func (s *UPolynomialFactorizationService) henselPairInvocationSourceCause(r *upo
 	if !s.matchesHenselPairHistory(r) {
 		return nil
 	}
+	if e := r.frame.traceSourceBlocker(); e != nil {
+		return e
+	}
 	return r.frame.sourceCause
 }
 
@@ -144,6 +149,9 @@ func (s *UPolynomialFactorizationService) finishHenselPairSource(r *upolyHenselP
 	if !h.sourceStarted {
 		h.sourceStarted = true
 		h.sourceRemaining = h.constructed
+	}
+	if h.sourceCause == nil {
+		h.sourceCause = h.traceSourceBlocker()
 	}
 	if h.sourceCause == nil {
 		h.sourceCause = h.numericSourceCause()
@@ -193,6 +201,9 @@ func (s *UPolynomialFactorizationService) cleanupHenselPairInvocation(r *upolyHe
 	h.ownExecuting = true
 	h.enterCall()
 	defer func() { h.leaveCall(); h.ownExecuting = false }()
+	if e := s.manager.cleanupDisplayReceipt(&h.trace); e != nil {
+		return e
+	}
 	if e := h.cleanupNumeric(false); e != nil {
 		return e
 	}

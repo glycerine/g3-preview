@@ -194,7 +194,7 @@ func TestUPolynomialFactorDegreeTraceRetainedRecordsAndOwners(t *testing.T) {
 	serviceMust(t, e)
 	if tags.ShouldTrace("polynomial::factorization::bughunt") {
 		text := w.seen.String()
-		for _, site := range []string{":886 ", ":960 ", "polynomial::hansel_lift(x^2 + 3 x + 2, 1 * (x)^1 * (x + 1)^1) => 1 * (x + 2)^1 * (x + 1)^1\n", ":906 ", ":921 ", ":927 ", "A = x\n", "C = x^2 + x\n", "B = x + 1\n", ":1274 ", "factors = 1 * (x + 2)^1\nf_pp*lc(f_pp) = x + 1\nlc(f_pp) = 1\n", ":1239 ", ":1246 ", "result = true\n", ":1052 ", ":1100 ", "sage: f_pp = x^2 + 3 x + 2\n", "sage: Rp.<x_p> = GF(2)['x_p']\nsage: f_pp_zp = x_p^2 + x_p\n", ":1163 ", "out p = 2, and we'll work p^e for e = 4\n", ":1088 ", "sage: if (not (gcd(2, 1)) == 1): print 'Error, wrong gcd'\n", ":1141 ", ":1155 ", ":1192 ", "best degree set: [0, 1, 2] represented by 111\n", "degree_set = [0, 1, 2] represented by 111\n", "STARTING TRIAL DIVISION\nzpe_fs1 * ("} {
+		for _, site := range []string{":637 ", ":641 ", ":646 ", ":653 ", ":658 ", ":663 ", ":886 ", ":960 ", "polynomial::hansel_lift(x^2 + 3 x + 2, 1 * (x)^1 * (x + 1)^1) => 1 * (x + 2)^1 * (x + 1)^1\n", ":906 ", ":921 ", ":927 ", "A = x\n", "C = x^2 + x\n", "B = x + 1\n", ":1274 ", "factors = 1 * (x + 2)^1\nf_pp*lc(f_pp) = x + 1\nlc(f_pp) = 1\n", ":1239 ", ":1246 ", "result = true\n", ":1052 ", ":1100 ", "sage: f_pp = x^2 + 3 x + 2\n", "sage: Rp.<x_p> = GF(2)['x_p']\nsage: f_pp_zp = x_p^2 + x_p\n", ":1163 ", "out p = 2, and we'll work p^e for e = 4\n", ":1088 ", "sage: if (not (gcd(2, 1)) == 1): print 'Error, wrong gcd'\n", ":1141 ", ":1155 ", ":1192 ", "best degree set: [0, 1, 2] represented by 111\n", "degree_set = [0, 1, 2] represented by 111\n", "STARTING TRIAL DIVISION\nzpe_fs1 * ("} {
 			if !strings.Contains(text, site) {
 				t.Fatal("missing source trace record", site, text)
 			}
@@ -281,6 +281,9 @@ func TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands(t *testing.T
 	serviceMust(t, s.traceHenselVectors(nil, 935))
 	serviceMust(t, s.traceHenselFactors(nil, UPolynomialView{}, nil, nil, false))
 	serviceMust(t, s.traceHenselFactors(nil, UPolynomialView{}, nil, nil, true))
+	serviceMust(t, s.traceHenselPairStage(nil, 614))
+	serviceMust(t, s.traceHenselPairStage(nil, 637))
+	serviceMust(t, s.traceHenselPairEntry(nil, nil, nil, nil))
 	if s.scope != nil || s.manager.config.Integer.Budget().Used() != before {
 		t.Fatal("disabled trace acquired operands or scope")
 	}

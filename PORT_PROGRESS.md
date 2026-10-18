@@ -45159,3 +45159,34 @@ No full native repeat this soon after the recent successful run.
 Broader factor/Hensel/recombination/degree/display checks pass ordinary16.825s
 and checked/debug/trace28.238s on CPUs8-16. portcheck and diff checks pass:
 2103 units,677 APIs;211 ported,340 partial,1495 unported,11 dead/deleted.
+
+2026-10-18: eight whole two-factor Hensel TRACE records
+
+Implemented factorization.cpp:590-600,614-616,637-639,641-644,646-650,
+653-656,658-661,663-666. Entry uses actual scalar/borrowed polynomial operands
+before related-core construction. Later records use actual residual,V,Vf,t,S,
+T,tmp, preserving even the source's T=B*tmp caption, exact tag selection and
+reached endl. Native Go formatting remains in use; no STL internals are ported.
+
+The actual charged pair invocation now owns an exact accepted polynomial-display
+receipt and concrete whole-record root/related-manager borrow. Source cleanup
+stops at an unfinished display before older vectors/core; exact pair cleanup
+acknowledges that child first. Source-cause queries read the exact pending child.
+Callbacks cannot retire either core or clean the executing pair. Tests exercise
+actual construction stages0,2,5,7. Independent small inputs verify all eight
+complete records and resulting factors A=x+3,B=x-2.
+
+Actual BIG inputs with C=AB-p*n exercise two descriptor-after-physical display
+refusals. Entry retains only the accepted display, with no related core or pair
+locals constructed. Residual output retains constructed=2, the computed BIG
+residual -n and its actual related core. Physical owner auditing and exact
+invocation cleanup pass; test padding uses actual caller-owned BIG numerals,
+without quota, scratch or source-count repair. Disabled tags skip absent pair
+and scalar operands. Focused checked/debug/trace tests pass0.009s.
+
+Other helper diagnostics, verbose output and broader factorization method/
+ownership audits remain open; no whole-unit completion is claimed. Polynomial
+and then AST remain unfinished. No full native repeat after the recent run.
+Final broader factor/Hensel/recombination/degree/display checks pass ordinary
+16.981s and checked/debug/trace28.657s on CPUs8-16. portcheck and diff checks
+pass:2103 units,677 APIs;211 ported,340 partial,1495 unported,11 dead/deleted.

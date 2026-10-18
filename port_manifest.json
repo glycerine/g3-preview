@@ -53112,7 +53112,9 @@
         "pkg/math/polynomial/upolynomial_factor_entry_trace_test.go",
         "pkg/math/polynomial/upolynomial_factor_recombination_trace_test.go",
         "pkg/math/polynomial/upolynomial_factor_hensel_trace.go",
-        "pkg/math/polynomial/upolynomial_factor_hensel_trace_test.go"
+        "pkg/math/polynomial/upolynomial_factor_hensel_trace_test.go",
+        "pkg/math/polynomial/upolynomial_hensel_pair_trace.go",
+        "pkg/math/polynomial/upolynomial_hensel_pair_trace_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53233,7 +53235,9 @@
         "TestUPolynomialFactorHenselLiftTraceSeparateTagAndOwners",
         "TestUPolynomialFactorHenselTraceChildRefusalStopsOuterVectors",
         "TestUPolynomialFactorHenselVectorTraceIndependentPublicCores",
-        "TestUPolynomialFactorHenselBoundaryTraceExactChildren"
+        "TestUPolynomialFactorHenselBoundaryTraceExactChildren",
+        "TestUPolynomialHenselPairTraceRecordsAndBorrowedOwners",
+        "TestUPolynomialHenselPairTraceActualBIGChildren"
       ],
       "conditionals": [
         {
@@ -53346,6 +53350,24 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Whole two-factor Hensel entry and intermediate TRACE records (590-600,614-616,637-639,641-644,646-650,653-656,658-661,663-666)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_hensel_pair_trace.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_hensel_pair_invocation.go",
+            "pkg/math/polynomial/upolynomial_hensel_pair_trace_test.go",
+            "pkg/math/polynomial/upolynomial_factor_hensel.go"
+          ],
+          "tests": [
+            "TestUPolynomialHenselPairTraceRecordsAndBorrowedOwners",
+            "TestUPolynomialHenselPairTraceActualBIGChildren",
+            "TestUPolynomialFactorDegreeTraceRetainedRecordsAndOwners",
+            "TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands",
+            "TestUPolynomialFactorDegreeTraceStreamFailureStillComputesDisplays"
+          ],
+          "notes": "Prints actual scalar and borrowed polynomial entry operands before constructing the related core; formats actual residual, V,Vf,t,S,T,tmp at their source insertion points with source captions, tags and endl. The actual charged pair invocation embeds its own exact accepted display receipt and whole-record root/related-manager borrow. Source cleanup stops at an unfinished display before older pair vectors/core, and exact invocation cleanup acknowledges that child first; source-cause queries also read the exact pending child. Independent small inputs verify all eight records and output A=x+3,B=x-2. Actual BIG inputs C=AB-p*n force descriptor-after-physical display refusal at entry (constructed=0,no related core) and after computing residual -n (constructed=2,residual and related core retained). Physical graph and exact cleanup pass without quota/scratch/construction repairs. Callback probes cover actual construction stages0,2,5,7. Other helper diagnostics, verbose output and broader source-unit audits remain open; no whole-unit completion credit."
+        },
         {
           "name": "Whole Hensel entry and exit bughunt TRACE records (886-888,960-962), including final inverse destruction frontier",
           "status": "ported",
