@@ -428,7 +428,7 @@ func (m *UPolynomialManager) gcd(a, b UPolynomialView, out *upolyVectorState) er
 	return m.gcdWithSourceContext(a, b, out, integerAllocationInvocationContext{})
 }
 func (m *UPolynomialManager) gcdWithSourceContext(a, b UPolynomialView, out *upolyVectorState, context integerAllocationInvocationContext) error {
-	done, e := m.gcdEmpty(a, b, out)
+	done, e := m.gcdEmpty(a, b, out, 859)
 	if done {
 		return e
 	}

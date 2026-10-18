@@ -50768,7 +50768,8 @@
         "pkg/math/polynomial/upolynomial_factor_polynomial_trace.go",
         "pkg/math/polynomial/upolynomial_cra_assertions_test.go",
         "pkg/math/polynomial/upolynomial_modular_gcd_assertions_test.go",
-        "pkg/math/polynomial/upolynomial_modular_gcd_fallback_context_test.go"
+        "pkg/math/polynomial/upolynomial_modular_gcd_fallback_context_test.go",
+        "pkg/math/polynomial/upolynomial_gcd_alias_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51004,7 +51005,11 @@
         "TestUPolynomialModularGCDEntryAssertionActions",
         "TestUPolynomialModularGCDEmptyThenModeAssertionOrder",
         "TestUPolynomialModularGCDClosedAssertionSwitchBeforeCopies",
-        "TestUPolynomialFactorFrontendActualAllPrimeFallbackContext"
+        "TestUPolynomialFactorFrontendActualAllPrimeFallbackContext",
+        "TestUPolynomialGCDAliasAssertionSourceActions",
+        "TestUPolynomialGCDSeparateAliasDebuggerActions",
+        "TestUPolynomialGCDClosedAliasAssertionSwitchBeforeCopy",
+        "TestUPolynomialGCDAliasNonemptyContinuation"
       ],
       "conditionals": [
         {
@@ -51593,6 +51598,23 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "GCD, Euclidean-GCD and subresultant-GCD separate alias assertion actions (upolynomial.cpp:816,859,877)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_gcd.go",
+            "pkg/math/polynomial/upolynomial_gcd_modular.go",
+            "pkg/math/polynomial/upolynomial_division_assertions.go",
+            "pkg/math/polynomial/upolynomial_gcd_alias_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialGCDAliasAssertionSourceActions",
+            "TestUPolynomialGCDSeparateAliasDebuggerActions",
+            "TestUPolynomialGCDClosedAliasAssertionSwitchBeforeCopy",
+            "TestUPolynomialGCDAliasNonemptyContinuation"
+          ],
+          "notes": "The common empty-input dispatch receives each actual C++ source line. Both alias assertions independently gate their predicates and invoke actual debugger Throw/Continue before empty-input copies or kernel declarations/copies. Disabled/release profiles erase alias predicates. Registered owners cover either aliased input in each of three algorithms, Throw preserving input/output, literal empty-return same-base copy plus sign flip, and nonempty continuation with independently known gcd x+1. An actual first-Continue/second-Throw profile proves the assertions do not collapse into a combined guard. A closed process assertion owner stops even nonalias inputs before the empty-input copy. Borrowing ends after actual debugger actions. Broader GCD diagnostics and caller-specific lifetime audits remain partial."
+        },
         {
           "name": "Modular-GCD final scaling and all-primes fallback caller context (upolynomial.cpp:803,812,838,852)",
           "status": "partial",

@@ -179,9 +179,21 @@ func (m *UPolynomialManager) MakeMonicWithLeadingInverse(p UPolynomial, lc, inv 
 	}
 	return m.MakeMonicWithLeadingInverseView(v, lc, inv)
 }
-func (m *UPolynomialManager) gcdEmpty(a, b UPolynomialView, out *upolyVectorState) (bool, error) {
-	if polynomialSourceDebug && (m.alias(a, out) || m.alias(b, out)) {
-		return true, ErrUPolynomialAssertion
+func (m *UPolynomialManager) gcdEmpty(a, b UPolynomialView, out *upolyVectorState, line int32) (bool, error) {
+	for i, input := range [2]UPolynomialView{a, b} {
+		enabled, e := refinementSourceAssertionsEnabled()
+		if e != nil {
+			return true, e
+		}
+		if enabled && m.alias(input, out) {
+			expression := "!is_alias(p1, buffer)"
+			if i == 1 {
+				expression = "!is_alias(p2, buffer)"
+			}
+			if e := m.scalarDivisionAssertionFailure(line, expression); e != nil {
+				return true, e
+			}
+		}
 	}
 	if a.count == 0 {
 		if e := m.setView(out, b); e != nil {
@@ -211,7 +223,7 @@ func (m *UPolynomialManager) euclidGCD(a, b UPolynomialView, out *upolyVectorSta
 	return m.euclidGCDWithSourceContext(a, b, out, integerAllocationInvocationContext{})
 }
 func (m *UPolynomialManager) euclidGCDWithSourceContext(a, b UPolynomialView, out *upolyVectorState, context integerAllocationInvocationContext) error {
-	done, e := m.gcdEmpty(a, b, out)
+	done, e := m.gcdEmpty(a, b, out, 816)
 	if done {
 		return e
 	}
@@ -267,7 +279,7 @@ func (m *UPolynomialManager) EuclidGCD(a, b, g UPolynomial) error {
 	return m.EuclidGCDViews(av, bv, g)
 }
 func (m *UPolynomialManager) subresultantGCD(a, b UPolynomialView, out *upolyVectorState) error {
-	done, e := m.gcdEmpty(a, b, out)
+	done, e := m.gcdEmpty(a, b, out, 877)
 	if done {
 		return e
 	}

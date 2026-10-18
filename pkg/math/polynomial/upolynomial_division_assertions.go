@@ -1,6 +1,6 @@
 package polynomial
 
-// Source: upolynomial.cpp:404,409,434-437,459,626,664-665,671,727-728,797. Bind the actual receiving numeric owner
+// Source: upolynomial.cpp:404,409,434-437,459,626,664-665,671,727-728,797,816,859,877. Bind the actual receiving numeric owner
 // only during a failed source assertion's debugger actions.
 func (m *UPolynomialManager) scalarDivisionAssertionFailure(line int32, expression string) error {
 	var borrow upolyFactorTraceBorrow
