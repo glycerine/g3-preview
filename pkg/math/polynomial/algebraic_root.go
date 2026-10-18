@@ -67,6 +67,8 @@ type AlgebraicRootCore struct {
 	rationalCopy                                               unumeral.IntegerCopyAllocationReceipt
 	manager                                                    *AlgebraicManager
 	coefficientCopy                                            unumeral.IntegerCopyAllocationReceipt
+	foreignCopy                                                algebraicForeignCopyScope
+	foreignCopyBorrowers                                       uint32
 	cellAllocation                                             umemory.SmallAllocatorAllocationOutcome
 	cellPending                                                umemory.SmallAllocatorPendingAllocation
 	cellAllocationRunning                                      bool
@@ -194,6 +196,9 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m != nil && m.self == m && (m.foreignCopyBorrowers != 0 || m.foreignCopy.active) {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.rootDisplay.active && !m.rootDisplay.running {
 		return ErrAlgebraicPending
 	}
@@ -272,6 +277,13 @@ func (m *AlgebraicRootCore) allocate(kind uint8) (Algebraic, error) {
 	if e := m.check(); e != nil {
 		return Algebraic{}, e
 	}
+	return m.allocateCell(kind)
+}
+
+// allocateCell is used only after the enclosing invocation validates its core.
+// It preserves the ordinary allocation and publication sequence while public
+// callback reentry remains excluded by that invocation's lifetime guard.
+func (m *AlgebraicRootCore) allocateCell(kind uint8) (Algebraic, error) {
 	i := len(m.locations)
 	for j := range m.locations {
 		if !m.locations[j].live && m.locations[j].generation != math.MaxUint32 {
@@ -953,6 +965,14 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.cleanupRetainedCore()
 }
 func (m *AlgebraicRootCore) cleanupRetainedCore() error {
+	if m != nil && m.self == m && (m.foreignCopyBorrowers != 0 || m.foreignCopy.running || m.foreignCopy.cleaning) {
+		return ErrAlgebraicPending
+	}
+	if m != nil && m.self == m && m.foreignCopy.active {
+		if e := m.cleanupForeignCopy(); e != nil {
+			return e
+		}
+	}
 	if m != nil && m.self == m && m.toOwnedRational.running {
 		return ErrAlgebraicPending
 	}
@@ -1159,6 +1179,9 @@ func (m *AlgebraicRootCore) Close() error {
 	return m.closeCoreMembers()
 }
 func (m *AlgebraicRootCore) closeCoreMembers() error {
+	if m != nil && m.self == m && (m.foreignCopyBorrowers != 0 || m.foreignCopy.running || m.foreignCopy.cleaning) {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.toOwnedRational.running {
 		return ErrAlgebraicPending
 	}

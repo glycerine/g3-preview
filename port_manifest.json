@@ -38914,10 +38914,24 @@
       "methods": [
         {
           "name": "Retained arith_decl_plugin::translate cross-manager numeral set (arith_decl_plugin.cpp:104-111; algebraic_numbers.cpp:509-539)",
-          "status": "unported",
-          "go_target": "",
-          "tests": [],
-          "notes": "The retained source target.aw().mk_id(source.aw().idx2anum(id)) passes an algebraic value owned by a distinct arithmetic-plugin manager. Current AlgebraicRootCore.Copy validates both locators against its own core. Its shared copyPolynomialFromOwner helper now reads the explicit source univariate store and copies from its IntegerManager into receiving-owned coefficient cells; TestAlgebraicCopyPolynomialFromOwner verifies independent BIG coefficient ownership after source polynomial deletion. Same-core Copy uses the recorded source cell extent (TestAlgebraicCopyUsesRecordedPolynomialSize). The public cross-core entry and integrated interval/lifetime handling are still missing, so this does not implement cross-core translation. Required next work: a concrete explicit-source-core copy using actual source coefficient/lower/upper owners, source branch/publication order, exact receiving allocation receipts, and source-core/value lifetime exclusion across target allocation callbacks and retained cleanup. Preserve minimal/sign/not-rational/index flags and avoid normalization, display/parse round trips or any-valued adapters. The basic-value branch must follow actual retained consumer reachability; the normal irrational external-ID translation path is the immediate AST prerequisite."
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/algebraic_copy_core.go",
+          "go_targets": [
+            "pkg/math/polynomial/algebraic_root.go",
+            "pkg/math/polynomial/algebraic_manager.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/algebraic_copy_owner_test.go"
+          ],
+          "tests": [
+            "TestAlgebraicCopyFromCoreBranches",
+            "TestAlgebraicCopyFromCoreReservationPrefixes",
+            "TestAlgebraicCopyFromCoreAllocationCallback",
+            "TestAlgebraicCopyFromCoreOwningManagerLifetime",
+            "TestAlgebraicCopyPolynomialFromOwner",
+            "TestAlgebraicCopyUsesRecordedPolynomialSize"
+          ],
+          "notes": "CopyFromCore now implements the concrete distinct-core zero/basic/root set branches, including root-to-basic deletion before the const scoped-mpq construction, NUM then DEN cross-owner SET, original destination allocation/publication order, recorded coefficient extent, receiving interval assertion/lower/upper SET, and packed flag copying without normalization. Source core and both univariate owners remain borrowed across stopped invocations until exact receiving copy/shift/cell allocation and scoped-rational cleanup completes. Synchronous integer/natural bindings exclude numeral owner destruction during actual allocation/cleanup callbacks. Nine branch combinations, independent BIG coefficients/basic NUM/DEN, every reached reservation prefix through success, actual TLS allocation callback refusal, and full owning-source manager lifetime are covered. The owning-source manager closes successfully after copy and the receiving value remains readable. Same-core calls delegate existing Copy. Remaining work includes source destructor/cleanup callback fault composition, explicit shifted-bound physical refusal through this integrated caller, and the owning AST algebraic wrapper/ID translation consumer. This partial method does not claim that arith_decl_plugin translation or the whole algebraic/polynomial/AST port is complete."
         },
         {
           "name": "Root/SMT2/Mathematica display cached m_i lookup and packed-word publication cpp2648-2654,2666-2672,2698-2704; broader display audit remains open",
@@ -39546,10 +39560,24 @@
       "methods": [
         {
           "name": "Retained arith_decl_plugin::translate cross-manager numeral set (arith_decl_plugin.cpp:104-111; algebraic_numbers.cpp:509-539)",
-          "status": "unported",
-          "go_target": "",
-          "tests": [],
-          "notes": "The retained source target.aw().mk_id(source.aw().idx2anum(id)) passes an algebraic value owned by a distinct arithmetic-plugin manager. Current AlgebraicRootCore.Copy validates both locators against its own core. Its shared copyPolynomialFromOwner helper now reads the explicit source univariate store and copies from its IntegerManager into receiving-owned coefficient cells; TestAlgebraicCopyPolynomialFromOwner verifies independent BIG coefficient ownership after source polynomial deletion. Same-core Copy uses the recorded source cell extent (TestAlgebraicCopyUsesRecordedPolynomialSize). The public cross-core entry and integrated interval/lifetime handling are still missing, so this does not implement cross-core translation. Required next work: a concrete explicit-source-core copy using actual source coefficient/lower/upper owners, source branch/publication order, exact receiving allocation receipts, and source-core/value lifetime exclusion across target allocation callbacks and retained cleanup. Preserve minimal/sign/not-rational/index flags and avoid normalization, display/parse round trips or any-valued adapters. The basic-value branch must follow actual retained consumer reachability; the normal irrational external-ID translation path is the immediate AST prerequisite."
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/algebraic_copy_core.go",
+          "go_targets": [
+            "pkg/math/polynomial/algebraic_root.go",
+            "pkg/math/polynomial/algebraic_manager.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/algebraic_copy_owner_test.go"
+          ],
+          "tests": [
+            "TestAlgebraicCopyFromCoreBranches",
+            "TestAlgebraicCopyFromCoreReservationPrefixes",
+            "TestAlgebraicCopyFromCoreAllocationCallback",
+            "TestAlgebraicCopyFromCoreOwningManagerLifetime",
+            "TestAlgebraicCopyPolynomialFromOwner",
+            "TestAlgebraicCopyUsesRecordedPolynomialSize"
+          ],
+          "notes": "CopyFromCore now implements the concrete distinct-core zero/basic/root set branches, including root-to-basic deletion before the const scoped-mpq construction, NUM then DEN cross-owner SET, original destination allocation/publication order, recorded coefficient extent, receiving interval assertion/lower/upper SET, and packed flag copying without normalization. Source core and both univariate owners remain borrowed across stopped invocations until exact receiving copy/shift/cell allocation and scoped-rational cleanup completes. Synchronous integer/natural bindings exclude numeral owner destruction during actual allocation/cleanup callbacks. Nine branch combinations, independent BIG coefficients/basic NUM/DEN, every reached reservation prefix through success, actual TLS allocation callback refusal, and full owning-source manager lifetime are covered. The owning-source manager closes successfully after copy and the receiving value remains readable. Same-core calls delegate existing Copy. Remaining work includes source destructor/cleanup callback fault composition, explicit shifted-bound physical refusal through this integrated caller, and the owning AST algebraic wrapper/ID translation consumer. This partial method does not claim that arith_decl_plugin translation or the whole algebraic/polynomial/AST port is complete."
         },
         {
           "name": "Root/SMT2/Mathematica display cached m_i lookup and packed-word publication cpp2648-2654,2666-2672,2698-2704; broader display audit remains open",

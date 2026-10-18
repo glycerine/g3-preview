@@ -44394,3 +44394,49 @@ publication, flags, normalization and deletion/allocation order tests passed
 (0.006s). portcheck passed: 2103 units, 677 APIs; status counts unchanged at
 208 ported, 343 partial, 1495 unported, 11 dead/deleted. No full suite rerun.
 The complete polynomial then AST objective remains open.
+
+Cross-manager algebraic set now has a concrete CopyFromCore entry, implementing
+all nine zero/basic/root source/destination combinations. It delegates same-core
+calls to Copy and validates both actual owners before borrowing anything. The
+root-to-basic branch deletes the old cell before constructing the const scoped
+mpq; NUM then DEN SET reads the foreign integer owner, followed by the existing
+mutable basic-cell copy/swap/publication order and literal scoped destructor.
+Root copies reuse or allocate/publish the destination cell in source order,
+copy the recorded coefficient extent from the source UP/integer owner, perform
+receiving-manager interval ordering assertion/lower/upper SET, and finally copy
+all packed source flags without normalization.
+
+The concrete embedded foreign-copy scope holds the source core and both UP
+owners until successful return or explicit owning cleanup after a failure.
+Public source/receiver core mutation, destruction and cleanup reentry are
+excluded. The owning AlgebraicManager refuses before advancing destruction;
+both UP Close and SourceFinalize refuse while borrowed. Integer and natural
+caller bindings protect both numeral owners on the synchronous execution and
+cleanup chains, then unbind in reverse order. No bindings remain attached
+between calls. Only exact receiving coefficient/bound/scoped-rational receipts,
+shift roots and cell allocation outcomes are acknowledged before releasing the
+source borrow; partial published destinations remain caller-owned.
+
+Tests cover nine branch combinations, BIG basic NUM/DEN, BIG cross-owner
+coefficient copying, cached root flags and bound exponents, every reached
+reservation prefix through success for six nonzero source/destination pairs,
+and actual TLS allocation callbacks refusing both cores' and UP/numeral owners'
+lifecycles. Those callback failures retain an actual accepted const-NUM receipt
+or root-cell allocation outcome, respectively. Existing equal-capacity basic
+assignment needs no reservation, so its zero-reservation success is preserved.
+The full owning-source manager test verifies refusal before destructor progress,
+cleanup/retry, successful source manager closure and independent target reads.
+
+Validation on CPUs8-16: Copy tests passed ordinary (0.039s) and checked/debug/
+trace (0.056s); expanded checked Copy/CellSource/ConstRational/Manager/
+NativeCoefficient/UP SourceFinalize selection passed (0.093s). Strengthened
+accepted-receipt callback assertions passed checked (0.005s). Full ordinary
+polynomial suite passed (93.929s), log:
+/mnt/oldrog/tmp/g3-polynomial-cross-core-full.log. portcheck passed with unchanged
+unit counts: 208 ported, 343 partial, 1495 unported, 11 dead/deleted; 2103 units,
+677 APIs. The new method is partial: integrated shifted-bound physical refusal,
+source-destructor/cleanup callback composition, and the owning AST algebraic
+wrapper/ID translation consumer remain to audit/implement. Complete polynomial
+then AST remains the active objective.
+Final rebuilt ordinary Copy selection, including strengthened receipt assertions,
+passed (0.022s); git diff --check passed before commit.
