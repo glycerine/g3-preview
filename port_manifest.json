@@ -53109,7 +53109,8 @@
         "pkg/math/polynomial/upolynomial_factor_degree_trace_test.go",
         "pkg/math/polynomial/upolynomial_factor_polynomial_trace.go",
         "pkg/math/polynomial/upolynomial_factor_entry_trace.go",
-        "pkg/math/polynomial/upolynomial_factor_entry_trace_test.go"
+        "pkg/math/polynomial/upolynomial_factor_entry_trace_test.go",
+        "pkg/math/polynomial/upolynomial_factor_recombination_trace_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53224,7 +53225,9 @@
         "TestUPolynomialFactorPrimitiveTraceChildRefusalStopsPrimitiveVector",
         "TestUPolynomialFactorEntryTraceBeforePrimitiveDebug",
         "TestUPolynomialFactorEntryTraceExactChildBeforeAnyLocal",
-        "TestUPolynomialFactorEntryTraceDisabledSkipsView"
+        "TestUPolynomialFactorEntryTraceDisabledSkipsView",
+        "TestUPolynomialFactorRecombinationTraceInexactDivision",
+        "TestUPolynomialFactorRecombinationTraceChildRefusalStopsOlderLocals"
       ],
       "conditionals": [
         {
@@ -53337,6 +53340,25 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Whole pre-division, division-result and post-publication recombination bughunt TRACE records (1239-1242,1246-1250,1274-1278)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_polynomial_trace.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_recombine.go",
+            "pkg/math/polynomial/upolynomial_recombination_step_invocation.go",
+            "pkg/math/polynomial/upolynomial_factor_recombination_trace_test.go",
+            "pkg/math/polynomial/upolynomial_factor_squarefree_invocation.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorDegreeTraceRetainedRecordsAndOwners",
+            "TestUPolynomialFactorRecombinationTraceInexactDivision",
+            "TestUPolynomialFactorRecombinationTraceChildRefusalStopsOlderLocals",
+            "TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands",
+            "TestUPolynomialFactorDegreeTraceStreamFailureStillComputesDisplays"
+          ],
+          "notes": "Formats actual primitive/trial/quotient vectors before division and before the exact/inexact branch, including a quotient and false result after an inexact division. After the actual publication/rejection branch, prints actual output factors, remaining primitive vector and raw scoped leading numeral through Integer.String (scoped_numeral.h186-187; mpzzp.h149). Whole-record root/prime/lift borrows and exact polynomial/factor-display receipts preserve callback and source destruction order. Actual descriptor-after-physical refusals cover pre-division, computed quotient and published factor states; the published caller-owned factor participates explicitly in the independent physical audit. The irreducible x^4+1 case verifies inexact division and unchanged factor product. Earlier helper records, verbose output and broader unit audit remain open; no whole source-unit completion credit. The enclosing issued square-free invocation reads the exact pending trace child even when root guards stop the normal epilogue before recording a source cause; the body preserves its descriptor error while the retained child reports CleanupPending."
+        },
         {
           "name": "Whole entry bughunt TRACE before primitive debug and square-free locals (1020-1025)",
           "status": "ported",

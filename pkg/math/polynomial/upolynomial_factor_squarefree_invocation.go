@@ -76,6 +76,9 @@ func (s *UPolynomialFactorizationService) factorSquareFreeInvocationSourceCause(
 		return r.history.sourceCause
 	}
 	if r.frame != nil {
+		if e := r.frame.traceSourceBlocker(); e != nil {
+			return e
+		}
 		return r.frame.sourceCause
 	}
 	return nil

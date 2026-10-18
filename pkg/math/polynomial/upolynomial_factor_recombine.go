@@ -380,8 +380,14 @@ func (s *UPolynomialFactorizationService) publishRecombinationTrial(fs *UPolynom
 	if e = zpe.mulScalarStateWithRecombination(&c.trial, &c.leading, q); e != nil {
 		return false, e
 	}
+	if e = s.traceRecombinationDivision(1239, false); e != nil {
+		return false, e
+	}
 	exact, e := m.exactDivStateWithSourceContext(m.stateView(&c.fpp), m.stateView(&c.trial), &c.quotient, &q.addMul, context)
 	if e != nil {
+		return false, e
+	}
+	if e = s.traceRecombinationDivision(1246, exact); e != nil {
 		return false, e
 	}
 	if exact {
@@ -407,10 +413,11 @@ func (s *UPolynomialFactorizationService) publishRecombinationTrial(fs *UPolynom
 		if e = m.mulScalarStateWithRecombination(&c.fpp, &c.leading, q); e != nil {
 			return false, e
 		}
-		return true, nil
-	} else {
-		return false, nil
 	}
+	if e = s.traceRecombinationFactors(fs); e != nil {
+		return false, e
+	}
+	return exact, nil
 }
 
 // Source: src/math/polynomial/upolynomial_factorization.cpp:1285-1292.

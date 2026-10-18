@@ -45060,3 +45060,43 @@ this soon after the successful 68-package run.
 Broader factor/Hensel/recombination/degree/display checks pass ordinary17.205s
 and checked/debug/trace28.671s on CPUs8-16. portcheck and git diff --check pass:
 2103 units,677 APIs;211 ported,340 partial,1495 unported,11 dead/deleted.
+
+2026-10-18: whole recombination division and publication TRACE records
+
+Implemented factorization.cpp:1239-1242,1246-1250,1274-1278 at the actual
+pre-division, post-division/pre-branch and post-publication/rejection points.
+They print actual primitive/trial/quotient views, exact true/false text, actual
+output factors and the remaining leading numeral. The scoped numeral insertion
+uses raw Integer.String, following scoped_numeral.h186-187 and mpzzp.h149 rather
+than adding a modular normalization assertion. All records retain reached endl,
+sticky-stream computation and whole-record actual root/prime/lift borrows.
+
+Exact accepted polynomial/factor display receipts now participate in the
+recombination step's child cause and pending checks before older source cleanup.
+Actual descriptor-after-physical failures test three reached states: before
+division, with the computed quotient, and after publishing one actual factor.
+They preserve fourteen square-free locals and the exact unfinished child;
+explicit cleanup consumes that child before older owners. The physical audit
+reads actual acquisition fields independently of guarded public borrow APIs,
+which intentionally refuse access during a pending factor display. The caller's
+published factor owner is explicitly included in that graph; no allocator
+liveness is used to invent ownership. All three cases pass.
+
+The actual irreducible polynomial x^4+1 exercises inexact division: its record
+still prints the actual quotient and result=false, and the returned factor
+product equals the original input. Source-order/callback checks now cover root
+output factors as well as prime/lift collections. Disabled records skip absent
+scope/factor operands. Focused checked/debug/trace tests pass (0.061s).
+
+Earlier helper records, verbose output and broader factorization/source-unit
+ownership audits remain open. Whole polynomial and then AST remain unfinished.
+No full native repeat since the recent successful run.
+The enclosing square-free invocation now queries its exact trace child before
+relying on the normal epilogue's recorded source cause. This matters after root
+output-factor display refusal, when root guards can stop that epilogue before
+it records a source cause. Tests use actual issued outer receipts: the body
+retains ErrSlotLimit while the exact retained child reports CleanupPending to
+the enclosing source consumer, protecting that consumer's older inputs.
+Final broader factor/Hensel/recombination/degree/display checks pass ordinary
+16.701s and checked/debug/trace28.645s, CPUs8-16. portcheck and diff checks pass;
+2103 units,677 APIs;211 ported,340 partial,1495 unported,11 dead/deleted.

@@ -56,6 +56,9 @@ func (q *upolyRecombinationStepScope) managers() [2]*UPolynomialManager {
 	return [2]*UPolynomialManager{q.owner.manager, q.related}
 }
 func (q *upolyRecombinationStepScope) childCause() error {
+	if e := q.owner.traceSourceBlocker(); e != nil {
+		return e
+	}
 	z := q.owner.manager.config.Integer
 	if e := z.DividesNumeralInvocationSourceCause(&q.boolNumeral); e != nil {
 		return e
@@ -107,6 +110,9 @@ func (q *upolyRecombinationStepScope) finish(r *upolyRecombinationStepInvocation
 	return q.bodyCause
 }
 func (q *upolyRecombinationStepScope) pending() bool {
+	if q.owner.tracePending() {
+		return true
+	}
 	z := q.owner.manager.config.Integer
 	if polynomialNegNumericPending(&q.numeric) || z.MatchesDividesNumeralInvocation(&q.boolNumeral) || z.MatchesAddMulInvocation(&q.addMul) {
 		return true

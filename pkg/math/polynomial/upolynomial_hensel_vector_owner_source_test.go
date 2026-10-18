@@ -1,12 +1,9 @@
 package polynomial
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"testing"
-
-	"github.com/glycerine/g3/pkg/arena"
 )
 
 func TestUPolynomialHenselConcreteVectorOwnerCensus(t *testing.T) {
@@ -200,45 +197,54 @@ func upolyHenselCheckVectorOwners(cores []*UPolynomialManager, factors []*UPolyn
 
 // Only actual declared retained lexical owner fields are roots. Accessors borrow
 // the charged owners; no live-descriptor registry can manufacture ownership.
+// Read actual acquisition fields independently of public borrow APIs: a pending
+// factor display deliberately refuses those APIs even for the root manager.
 func upolyPhysicalRetainedOwners(cores []*UPolynomialManager, factors []*UPolynomialFactors, extras []upolyPhysicalExtraOwners) ([]*UPolynomialManager, []*UPolynomialFactors, error) {
 	cs := append([]*UPolynomialManager(nil), cores...)
 	fs := append([]*UPolynomialFactors(nil), factors...)
+	addCore := func(m *UPolynomialManager) {
+		if m == nil {
+			return
+		}
+		for _, old := range cs {
+			if old == m {
+				return
+			}
+		}
+		cs = append(cs, m)
+	}
+	addFactors := func(f *UPolynomialFactors) {
+		if f == nil {
+			return
+		}
+		for _, old := range fs {
+			if old == f {
+				return
+			}
+		}
+		fs = append(fs, f)
+	}
 	for _, extra := range extras {
 		for _, service := range extra.Services {
-			for i := uint32(0); ; i++ {
-				c, e := service.RetainedCleanupCore(i)
-				if errors.Is(e, arena.ErrBounds) {
-					break
+			if service == nil || service.self != service || service.closed || service.manager == nil || service.manager.self != service.manager {
+				return nil, nil, ErrUPolynomialOwner
+			}
+			if c := service.scope; c != nil {
+				if c.self != c || c.service != service {
+					return nil, nil, ErrUPolynomialOwner
 				}
-				if e != nil {
-					return nil, nil, e
+				for _, m := range [3]*UPolynomialManager{c.zpe, c.zp, c.hensel.related} {
+					addCore(m)
 				}
-				found := false
-				for _, old := range cs {
-					if old == c {
-						found = true
-					}
-				}
-				if !found {
-					cs = append(cs, c)
+				for _, f := range [3]*UPolynomialFactors{c.primeTrial.current, c.lifted, c.best} {
+					addFactors(f)
 				}
 			}
-			for i := uint32(0); i < 3; i++ {
-				f, e := service.RetainedCleanupFactors(i)
-				if errors.Is(e, arena.ErrBounds) {
-					break
-				}
-				if e != nil {
-					return nil, nil, e
-				}
-				found := false
-				for _, old := range fs {
-					if old == f {
-						found = true
+			for h := service.henselPairs; h != nil; h = h.next {
+				for _, m := range [3]*UPolynomialManager{h.check.bCore, h.check.brCore, h.rm} {
+					if m != nil && !m.closed {
+						addCore(m)
 					}
-				}
-				if !found {
-					fs = append(fs, f)
 				}
 			}
 		}
