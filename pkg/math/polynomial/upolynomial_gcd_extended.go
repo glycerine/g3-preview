@@ -195,8 +195,14 @@ func (m *UPolynomialManager) ExtendedGCD(a, b, u, v, d UPolynomial) error {
 	return m.ExtendedGCDViews(av, bv, u, v, d)
 }
 func (m *UPolynomialManager) squareFree(v UPolynomialView, out *upolyVectorState) error {
-	if polynomialSourceDebug && m.alias(v, out) {
-		return ErrUPolynomialAssertion
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled && m.alias(v, out) {
+		if e := m.scalarDivisionAssertionFailure(963, "!is_alias(p, buffer)"); e != nil {
+			return e
+		}
 	}
 	if v.count <= 1 {
 		return m.setView(out, v)

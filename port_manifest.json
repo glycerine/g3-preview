@@ -50771,7 +50771,8 @@
         "pkg/math/polynomial/upolynomial_modular_gcd_fallback_context_test.go",
         "pkg/math/polynomial/upolynomial_gcd_alias_assertions_test.go",
         "pkg/math/polynomial/upolynomial_subresultant_assertions.go",
-        "pkg/math/polynomial/upolynomial_subresultant_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_subresultant_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_square_free_power_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51014,7 +51015,10 @@
         "TestUPolynomialGCDAliasNonemptyContinuation",
         "TestUPolynomialSubresultantAssertionActions",
         "TestUPolynomialSubresultantAssertionErasureAndClosedGate",
-        "TestUPolynomialSubresultantDegreeGapAssertionProfiles"
+        "TestUPolynomialSubresultantDegreeGapAssertionProfiles",
+        "TestUPolynomialSquareFreeAliasAssertionActions",
+        "TestUPolynomialZeroPowerAssertionActions",
+        "TestUPolynomialSquareFreePowerClosedAssertionBeforeWrites"
       ],
       "conditionals": [
         {
@@ -51603,6 +51607,22 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Square-free alias and zero-exponent power assertion runtime actions (upolynomial.cpp:963,995)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_gcd_extended.go",
+            "pkg/math/polynomial/upolynomial_ops.go",
+            "pkg/math/polynomial/upolynomial_division_assertions.go",
+            "pkg/math/polynomial/upolynomial_square_free_power_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialSquareFreeAliasAssertionActions",
+            "TestUPolynomialZeroPowerAssertionActions",
+            "TestUPolynomialSquareFreePowerClosedAssertionBeforeWrites"
+          ],
+          "notes": "The square-free alias predicate gates before constant copy or derivative/GCD scratch setup. Zero-exponent power gates the nonempty-input predicate inside k==0 before reserve/SET/set_size. Actual debugger Throw/Continue actions borrow the receiving owner, while disabled/release erase predicates. Public square-free same-owner tests cover constant copy and repeated polynomial (x-1)^2, Throw preserving inputs/private derivative/GCD frontiers and Continue yielding primitive x-1. Public zero-polynomial exponent-zero tests preserve prior caller [7,8] on Throw and publish [1] on Continue/disabled/release without entering iterative scratch. Closed assertion owner stops valid predicates before output writes or derivative setup. Broader helper lifetime and source-unit audits remain partial."
+        },
         {
           "name": "Subresultant degree, exponent and exact-divisibility assertion runtime actions (upolynomial.cpp:902,952,955)",
           "status": "ported",

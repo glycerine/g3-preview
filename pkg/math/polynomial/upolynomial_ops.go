@@ -534,8 +534,14 @@ func (m *UPolynomialManager) powerState(v UPolynomialView, k uint32, out *upolyV
 func (m *UPolynomialManager) powerStateWithSourceContext(v UPolynomialView, k uint32, out *upolyVectorState, child *unumeral.IntegerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
 	var e error
 	if k == 0 {
-		if polynomialSourceDebug && v.count == 0 {
-			return ErrUPolynomialAssertion
+		enabled, e := refinementSourceAssertionsEnabled()
+		if e != nil {
+			return e
+		}
+		if enabled && v.count == 0 {
+			if e := m.scalarDivisionAssertionFailure(995, "sz != 0"); e != nil {
+				return e
+			}
 		}
 		if e = m.reserve(out, 1); e != nil {
 			return e
