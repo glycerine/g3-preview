@@ -412,7 +412,7 @@ func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, o
 			}
 		}
 		if ok {
-			if e = m.mulScalarState(q, cg); e != nil {
+			if e = m.mulScalarStateWithSourceContext(q, cg, context); e != nil {
 				return e
 			}
 			if e = m.flipSign(q); e != nil {
@@ -422,7 +422,7 @@ func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, o
 			return nil
 		}
 	}
-	return m.euclidGCD(a, b, out)
+	return m.euclidGCDWithSourceContext(a, b, out, context)
 }
 func (m *UPolynomialManager) gcd(a, b UPolynomialView, out *upolyVectorState) error {
 	return m.gcdWithSourceContext(a, b, out, integerAllocationInvocationContext{})

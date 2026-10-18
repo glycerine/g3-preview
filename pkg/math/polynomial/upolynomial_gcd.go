@@ -45,6 +45,16 @@ func (m *UPolynomialManager) mulScalarStateWithHensel(s *upolyVectorState, b *un
 	}
 	return m.MulScalarViewWithHensel(m.stateView(s), b, receipt)
 }
+func (m *UPolynomialManager) mulScalarStateWithSourceContext(s *upolyVectorState, b *unumeral.Int, context integerAllocationInvocationContext) error {
+	zero, e := m.modular.IsZero(b)
+	if e != nil {
+		return e
+	}
+	if zero {
+		return m.reset(s)
+	}
+	return m.mulScalarViewWithSourceContext(m.stateView(s), b, context)
+}
 func (m *UPolynomialManager) monic(v UPolynomialView, lc, inv *unumeral.Int) error {
 	return m.monicWithSourceContext(v, lc, inv, integerAllocationInvocationContext{})
 }
@@ -187,6 +197,16 @@ func (m *UPolynomialManager) gcdEmpty(a, b UPolynomialView, out *upolyVectorStat
 	}
 	return false, nil
 }
+
+// The retained frontend owns the concrete vector-normalization scope. Other
+// callers retain their existing normalization path until their own scope is
+// implemented; a frontend scope must never be fabricated for another owner.
+func (m *UPolynomialManager) normalizeEuclidWithSourceContext(v UPolynomialView, context integerAllocationInvocationContext) error {
+	if context.factorFrontend != nil {
+		return m.normalizeWithSourceContext(v, context)
+	}
+	return m.normalize(v)
+}
 func (m *UPolynomialManager) euclidGCD(a, b UPolynomialView, out *upolyVectorState) error {
 	return m.euclidGCDWithSourceContext(a, b, out, integerAllocationInvocationContext{})
 }
@@ -208,7 +228,7 @@ func (m *UPolynomialManager) euclidGCDWithSourceContext(a, b UPolynomialView, ou
 	}
 	for {
 		if B.size == 0 {
-			if e = m.normalize(m.stateView(A)); e != nil {
+			if e = m.normalizeEuclidWithSourceContext(m.stateView(A), context); e != nil {
 				return e
 			}
 			*out, *A = *A, *out
@@ -221,7 +241,7 @@ func (m *UPolynomialManager) euclidGCDWithSourceContext(a, b UPolynomialView, ou
 		if e = m.remStateWithSourceContext(m.stateView(A), m.stateView(B), &d, out, context); e != nil {
 			return e
 		}
-		if e = m.normalize(m.stateView(out)); e != nil {
+		if e = m.normalizeEuclidWithSourceContext(m.stateView(out), context); e != nil {
 			return e
 		}
 		*A, *B = *B, *A

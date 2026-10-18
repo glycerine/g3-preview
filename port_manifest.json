@@ -50767,7 +50767,8 @@
         "pkg/math/polynomial/upolynomial_recombination_step_invocation.go",
         "pkg/math/polynomial/upolynomial_factor_polynomial_trace.go",
         "pkg/math/polynomial/upolynomial_cra_assertions_test.go",
-        "pkg/math/polynomial/upolynomial_modular_gcd_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_modular_gcd_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_modular_gcd_fallback_context_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51002,7 +51003,8 @@
         "TestUPolynomialCRASeparateOddnessDebuggerActions",
         "TestUPolynomialModularGCDEntryAssertionActions",
         "TestUPolynomialModularGCDEmptyThenModeAssertionOrder",
-        "TestUPolynomialModularGCDClosedAssertionSwitchBeforeCopies"
+        "TestUPolynomialModularGCDClosedAssertionSwitchBeforeCopies",
+        "TestUPolynomialFactorFrontendActualAllPrimeFallbackContext"
       ],
       "conditionals": [
         {
@@ -51591,6 +51593,19 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Modular-GCD final scaling and all-primes fallback caller context (upolynomial.cpp:803,812,838,852)",
+          "status": "partial",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_gcd.go",
+            "pkg/math/polynomial/upolynomial_gcd_modular.go",
+            "pkg/math/polynomial/upolynomial_modular_gcd_fallback_context_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorFrontendActualAllPrimeFallbackContext"
+          ],
+          "notes": "Passes the actual allocation context through final content scaling and all-primes Euclidean fallback. Euclidean normalization uses the already implemented concrete frontend vector-normalization owner when that is the actual caller; other caller normalization owners remain a separate obligation rather than fabricating frontend scopes. Public Factor on (1+P*x)^2, with P computed as the exact product of every retained trial prime, reaches every actual bad-prime image before integer fallback. Reservation-prefix failures are armed only at the genuine fallback checkpoint; actual owner audits and owning cleanup cover each prefix through completion. At the next real frontend checkpoint the successful path verifies independently known GCD 1+P*x and cancels before further factor work; source cleanup may then legitimately destroy caller locals. This is reservation-prefix evidence, not physical descriptor-quota evidence. The frontend final content scalar is a unit on this retained route; no unused BIG content instantiation is invented. Broader Euclidean caller-local am/normalization, diagnostics and source-unit completion remain partial."
+        },
         {
           "name": "Modular-GCD entry SASSERT runtime gates and debugger actions (upolynomial.cpp:727-728)",
           "status": "ported",
