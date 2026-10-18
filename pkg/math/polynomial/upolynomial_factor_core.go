@@ -201,16 +201,13 @@ func (s *UPolynomialFactorizationService) factorSqfPrimitiveWithReceipt(p *upoly
 	}
 	return s.factorSquareFreeWithReceipt(m.stateView(p), fs, k, params, r)
 }
-func (s *UPolynomialFactorizationService) exactDivVerify(a, b UPolynomialView, out *upolyVectorState) error {
-	return s.exactDivVerifyWithSourceContext(a, b, out, nil, integerAllocationInvocationContext{})
-}
-func (s *UPolynomialFactorizationService) exactDivVerifyWithSourceContext(a, b UPolynomialView, out *upolyVectorState, child *unumeral.IntegerAddMulInvocationReceipt, context integerAllocationInvocationContext) error {
+func (s *UPolynomialFactorizationService) exactDivVerifyWithSourceContext(a, b UPolynomialView, out *upolyVectorState, child *unumeral.IntegerAddMulInvocationReceipt, context integerAllocationInvocationContext, line int32) error {
 	yes, e := s.manager.exactDivStateWithSourceContext(a, b, out, child, context)
 	if e != nil {
 		return e
 	}
-	if polynomialSourceDebug && !yes {
-		return ErrUPolynomialAssertion
+	if !yes {
+		return s.manager.factorExactDivisionVerifyFailure(line)
 	}
 	return nil
 }
@@ -266,7 +263,7 @@ func (s *UPolynomialFactorizationService) factorCore(f UPolynomialView, fs *UPol
 			result = false
 		}
 	} else {
-		if e := s.exactDivVerifyWithSourceContext(m.stateView(pp), m.stateView(B), A, &q.addMul, numericIntegerModularManager_factorFrontendAllocationContext(m.modular, q)); e != nil {
+		if e := s.exactDivVerifyWithSourceContext(m.stateView(pp), m.stateView(B), A, &q.addMul, numericIntegerModularManager_factorFrontendAllocationContext(m.modular, q), 3074); e != nil {
 			return false, e
 		}
 		for j := uint32(1); A.size > 1; j++ {
@@ -276,7 +273,7 @@ func (s *UPolynomialFactorizationService) factorCore(f UPolynomialView, fs *UPol
 			if e := m.gcdWithSourceContext(m.stateView(A), m.stateView(B), D, numericIntegerModularManager_factorFrontendAllocationContext(m.modular, q)); e != nil {
 				return false, e
 			}
-			if e := s.exactDivVerifyWithSourceContext(m.stateView(A), m.stateView(D), pp, &q.addMul, numericIntegerModularManager_factorFrontendAllocationContext(m.modular, q)); e != nil {
+			if e := s.exactDivVerifyWithSourceContext(m.stateView(A), m.stateView(D), pp, &q.addMul, numericIntegerModularManager_factorFrontendAllocationContext(m.modular, q), 3085); e != nil {
 				return false, e
 			}
 			if pp.size > 1 {
@@ -312,7 +309,7 @@ func (s *UPolynomialFactorizationService) factorCore(f UPolynomialView, fs *UPol
 					}
 				}
 			}
-			if e := s.exactDivVerifyWithSourceContext(m.stateView(B), m.stateView(D), B, &q.addMul, numericIntegerModularManager_factorFrontendAllocationContext(m.modular, q)); e != nil {
+			if e := s.exactDivVerifyWithSourceContext(m.stateView(B), m.stateView(D), B, &q.addMul, numericIntegerModularManager_factorFrontendAllocationContext(m.modular, q), 3100); e != nil {
 				return false, e
 			}
 			*A, *D = *D, *A

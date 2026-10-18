@@ -45910,3 +45910,12 @@ Qualified direct failed-invariant adapters use genuine independent caller polyno
 
 Broader factorization/frontend/GCD/Euclidean/CRA/content/storage/closed/basic/rational/raw-scalar/quadratic tests pass checked/debug/trace (31.380s); manifest validation passes. All commands stay on CPUs8–16. Broader factor-core diagnostic/VERIFY/numerical lifetime audits remain open for polynomial, followed by AST. The completed native process9825 remains historical evidence with its recorded shared-worktree scope caveat; no new full suite was started within the hourly interval.
 Final broader ordinary affected checks pass (19.222s).
+
+### Factor-core exact-division VERIFY source actions
+
+Ported upolynomial.cpp:3074,3085,3100 using actual util/debug.h VERIFY behavior, not assertion-switch gating. Each retained caller evaluates exact_div in every build before its false leaf. False verification prints the exact expression then reaches DEBUG UNREACHABLE debugger Throw/Continue even when assertions are disabled; the selected GNU release profile returns the existing typed undefined-domain guard instead of pretending to continue. Receiving-manager borrowing protects diagnostic callbacks. Removed the unused no-context wrapper; three retained consumers now carry their real source lines/expressions.
+
+Direct call-site adapters divide x^2+1 by x+1, producing actual remainder2 and the source's reset result before reporting VERIFY failure. The third site uses real dividend/output alias, matching exact_div(B,D,B). Tests check all three diagnostic lines/expressions, T/C, disabled assertions and GNU release guard; these false invariant adapters are not claimed as valid factor-core algebra failures and manufacture no frontend NUM frame. A successful disabled-assertion division of x^2-1 by x-1 still publishes x+1 without diagnostics. No values, construction counts or quotas are repaired.
+
+Focused tests pass ordinary (0.008s) and checked/debug/trace (0.010s). Broader factorization/frontend/GCD/Euclidean/CRA/content/storage/closed/basic/rational/raw-scalar/quadratic checks pass checked/debug/trace (32.379s). All commands stay on CPUs8–16. Broader factor-core trace/numerical failure/source-lifetime and polynomial completion audits remain open, followed by AST. No full native run repeated within the hourly interval; completed process9825 remains historical evidence with its recorded scope caveat.
+Final broader ordinary affected checks pass (19.859s); manifest validation passes.

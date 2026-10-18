@@ -50807,7 +50807,9 @@
         "pkg/math/polynomial/upolynomial_quadratic_assertions.go",
         "pkg/math/polynomial/upolynomial_quadratic_assertions_test.go",
         "pkg/math/polynomial/upolynomial_factor_loop_assertions.go",
-        "pkg/math/polynomial/upolynomial_factor_loop_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_factor_loop_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_factor_verify.go",
+        "pkg/math/polynomial/upolynomial_factor_verify_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51119,7 +51121,9 @@
         "TestUPolynomialQuadraticPredicatesClosedAndErased",
         "TestUPolynomialFactorLoopPredicateActions",
         "TestUPolynomialFactorConstantSeparateActionsAndErasure",
-        "TestUPolynomialFactorLoopRuntimeOracles"
+        "TestUPolynomialFactorLoopRuntimeOracles",
+        "TestUPolynomialFactorExactDivisionVerifyActions",
+        "TestUPolynomialFactorExactDivisionVerifySuccessfulOperand"
       ],
       "conditionals": [
         {
@@ -51708,6 +51712,20 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Factor-core exact-division VERIFY actions (upolynomial.cpp:3074,3085,3100)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_core.go",
+            "pkg/math/polynomial/upolynomial_factor_verify.go",
+            "pkg/math/polynomial/upolynomial_factor_verify_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorExactDivisionVerifyActions",
+            "TestUPolynomialFactorExactDivisionVerifySuccessfulOperand"
+          ],
+          "notes": "All three retained VERIFY consumers evaluate actual exact_div in every build before the false diagnostic leaf, independently of assertions_enabled. Exact source expressions/sites select existing DebugContext.VerifyFailure under receiving-manager borrowing: failed verification message then actual DEBUG UNREACHABLE debugger T/C, or GNU release typed undefined-domain guard. Direct nonexact-division adapters exercise actual remainder2/result reset, including third site dividend/output alias, with disabled assertions still reporting failure. Successful disabled-assertion division publishes x+1 with no diagnostic. False cases are direct call-site adapters, not claimed as failures of valid factor-core algebraic invariants; no manufactured frontend NUM frames. Removed unused no-context wrapper. Broader trace/numerical failure/source-lifetime audits remain partial."
+        },
         {
           "name": "Factor-core squarefree/constant/final-one runtime assertion actions (upolynomial.cpp:3067,3094,3095,3107)",
           "status": "ported",
