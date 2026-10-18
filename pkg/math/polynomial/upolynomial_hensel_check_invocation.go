@@ -59,6 +59,9 @@ func (h *upolyHenselPairScope) finishHenselCheckSource(body error) error {
 		c.sourceRemaining = c.constructed
 	}
 	if c.sourceCause == nil {
+		c.sourceCause = h.traceSourceBlocker()
+	}
+	if c.sourceCause == nil {
 		c.sourceCause = h.numericSourceCause()
 	}
 	if c.sourceCause != nil || c.sourceEnded {

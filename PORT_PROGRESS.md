@@ -45315,3 +45315,32 @@ unfinished. All commands remain on CPUs8-16.
 Broader focused checks pass ordinary16.707s and checked/debug/trace28.473s,
 CPUs8-16. portcheck and diff checks pass:2103 units,677 APIs;211 ported,
 340 partial,1495 unported,11 dead/deleted. No whole source-unit status changed.
+
+2026-10-18: failed two-factor Hensel product-check diagnostic
+
+Implemented the whole factorization.cpp:536-544 record only when the reduced
+C-A_lifted*B_lifted is nonzero. The diagnostic deliberately prints original
+A,B,C, not lifted outputs, followed by actual b*r and the exact Sage text/endl.
+The pair's exact accepted display receipt and whole-record actual manager
+borrow protect the numerical child. Checker source cleanup stops at that child
+before test1, its related br manager and scoped br numeral; the enclosing pair
+also preserves its older lexical objects.
+
+Tests run the actual public Hensel pair algorithm with invalid Bezout inputs,
+reaching the final conditional failure naturally, rather than fabricating a
+constructed parent frame for a direct checker call. Correct Bezout inputs stay
+silent for this diagnostic. Exact original-input text and callback guards cover
+the actual checker manager too. A real BIG descriptor-after-physical display
+refusal retains seven pair objects and three checker objects, with no second
+checker manager constructed. Physical graph auditing and exact cleanup pass.
+
+Output refusal in this record still computes all three actual original-input
+displays. Sticky badbit suppresses subsequent host writes, and the source final
+conditional assertion/result and normal numeric cleanup remain unchanged.
+Disabled diagnostics skip absent pair/views. Focused checked/debug/trace tests
+pass0.009s. Other helper diagnostics, verbose output and broader factorization
+method/ownership audits remain open; whole polynomial then AST remain unfinished.
+No full native repeat after the recent successful 68-package run.
+Broader focused checks pass ordinary17.134s and checked/debug/trace27.972s,
+CPUs8-16. portcheck and diff checks pass:2103 units,677 APIs;211 ported,
+340 partial,1495 unported,11 dead/deleted. No whole source-unit status changed.

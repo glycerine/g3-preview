@@ -295,6 +295,7 @@ func TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands(t *testing.T
 	serviceMust(t, s.traceQuadraticCheckFailure(nil, nil, UPolynomialView{}, UPolynomialView{}, UPolynomialView{}, UPolynomialView{}))
 	serviceMust(t, s.traceHenselProductFailure(nil, UPolynomialView{}, nil, nil, false))
 	serviceMust(t, s.traceHenselProductFailure(nil, UPolynomialView{}, nil, nil, true))
+	serviceMust(t, s.traceHenselPairCheckFailure(nil, UPolynomialView{}, UPolynomialView{}, UPolynomialView{}))
 	if s.scope != nil || s.manager.config.Integer.Budget().Used() != before {
 		t.Fatal("disabled trace acquired operands or scope")
 	}

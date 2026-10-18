@@ -133,3 +133,48 @@ func (s *UPolynomialFactorizationService) traceHenselPairEntry(h *upolyHenselPai
 		})
 	return computation
 }
+
+// Source: factorization.cpp:536-544. Print original A/B/C, exactly as
+// the failed product check requests, before destroying test1 or br's owner.
+func (s *UPolynomialFactorizationService) traceHenselPairCheckFailure(h *upolyHenselPairScope, A, B, C UPolynomialView) error {
+	tags := s.manager.modular.BorrowTraceTags()
+	if !tags.ShouldTrace("polynomial::factorization::bughunt") {
+		return nil
+	}
+	if h == nil || h.self != h || h.service != s || !h.active {
+		return ErrUPolynomialOwner
+	}
+	if e := h.traceBorrow.bindFamily([4]*UPolynomialManager{s.manager, h.rm, h.check.brCore, h.check.bCore}, tags); e != nil {
+		return e
+	}
+	defer h.traceBorrow.unbind()
+	var computation error
+	_ = tags.EmitConditional("polynomial::factorization::bughunt", "check_hansel_lift", "src/math/polynomial/upolynomial_factorization.cpp", 536,
+		func() bool { return true }, func(raw io.Writer) error {
+			out := factorizationTraceWriter{raw}
+			_ = linearWriteText(out, "sage: R.<x> = ZZ['x']")
+			_ = diagnostic.WriteTraceEndl(out)
+			for i, v := range [3]UPolynomialView{A, B, C} {
+				_ = linearWriteText(out, [3]string{"sage: A = ", "sage: B = ", "sage: C = "}[i])
+				if e := s.manager.displayIntoWithReceipt(v, factorizationTraceStream{out}, "x", false, &h.trace); e != nil {
+					computation = e
+					return e
+				}
+				_ = diagnostic.WriteTraceEndl(out)
+			}
+			_ = linearWriteText(out, "sage: test1 = C - AB")
+			_ = diagnostic.WriteTraceEndl(out)
+			_ = linearWriteText(out, "sage: print test1.change_ring(GF(")
+			br, e := s.manager.config.Integer.String(&h.check.br)
+			if e != nil {
+				computation = e
+				return e
+			}
+			_ = linearWriteText(out, br)
+			_ = linearWriteText(out, "))")
+			_ = diagnostic.WriteTraceEndl(out)
+			_ = linearWriteText(out, "sage: print 'expected 0'")
+			return diagnostic.WriteTraceEndl(out)
+		})
+	return computation
+}

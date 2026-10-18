@@ -103,17 +103,21 @@ func henselPairTraceActualBIGChild(t *testing.T, entry bool) {
 }
 
 type henselPairTraceProbe struct {
-	t      *testing.T
-	s      *UPolynomialFactorizationService
-	text   strings.Builder
-	stages map[uint8]bool
+	t             *testing.T
+	s             *UPolynomialFactorizationService
+	text          strings.Builder
+	stages        map[uint8]bool
+	checkBorrowed bool
 }
 
 func (w *henselPairTraceProbe) Write(p []byte) (int, error) {
 	for h := w.s.henselPairs; h != nil; h = h.next {
-		if h.traceBorrow.executing && !w.stages[h.constructed] {
+		if h.traceBorrow.executing && (!w.stages[h.constructed] || (h.check.brCore != nil && !w.checkBorrowed)) {
 			w.stages[h.constructed] = true
-			for _, m := range [2]*UPolynomialManager{w.s.manager, h.rm} {
+			if h.check.brCore != nil {
+				w.checkBorrowed = true
+			}
+			for _, m := range [4]*UPolynomialManager{w.s.manager, h.rm, h.check.brCore, h.check.bCore} {
 				if m == nil {
 					continue
 				}

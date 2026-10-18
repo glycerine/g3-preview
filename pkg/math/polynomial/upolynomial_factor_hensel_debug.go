@@ -57,6 +57,9 @@ func (s *UPolynomialFactorizationService) checkHenselPair(C UPolynomialView, a, 
 		return false, e
 	}
 	if test1.size != 0 {
+		if e := s.traceHenselPairCheckFailure(h, A, B, C); e != nil {
+			return false, e
+		}
 		return false, nil
 	}
 	bCore, e := NewRelatedUPolynomialManager(m)
