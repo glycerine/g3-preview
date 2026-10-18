@@ -2,12 +2,99 @@ package polynomial
 
 import (
 	"bytes"
+	"strconv"
 	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
 	uparams "github.com/glycerine/g3/pkg/util/params"
 )
+
+func TestAlgebraicParametersColdNamesAndConstructorReservationFrontiers(t *testing.T) {
+	failures, success := 0, false
+	for ordinal := int64(0); ordinal < 256 && !success; ordinal++ {
+		if !t.Run(strconv.FormatInt(ordinal, 10), func(t *testing.T) {
+			cfg, context, budget := algebraicManagerFixtureWithParameterKeys(t, false)
+			// A nonempty primary dictionary reaches the generated getter's real
+			// name lookup. None of the six generated key strings is pre-interned.
+			other := "unrelated_parameter"
+			serviceMust(t, context.SetBoolName(cfg.Params, &other, true))
+			module, e := cfg.Globals.Symbols.Intern("algebraic")
+			serviceMust(t, e)
+			global, e := cfg.Globals.Current.GetParams(module)
+			serviceMust(t, e)
+			serviceMust(t, context.SetBoolName(global, &other, false))
+			localRefs := context.Blocks[cfg.Params.Slot-1].Refs
+			globalRefs := context.Blocks[global.Slot-1].Refs
+			symbols := cfg.Globals.Symbols.Stats().Symbols
+			budget.FailAfter(ordinal)
+			m, body := NewAlgebraicManager(cfg)
+			budget.FailAfter(-1)
+			success = body == nil
+			if body != nil && !numericPhysicalReservationRefusal(body) {
+				t.Fatal("unexpected constructor refusal", body)
+			}
+			if body != nil {
+				failures++
+			}
+			if m != nil {
+				t.Cleanup(func() { serviceMust(t, m.Close()) })
+				if body != nil && m.params.Serial != 0 {
+					t.Fatal("native generated lookups introduced a reservation after helper entry", body)
+				}
+				if m.params.Helpers != nil || m.params.DestructorCause != nil || m.params.Running {
+					t.Fatal("generated helper survived constructor exit")
+				}
+				if body == nil && (m.params.Serial != 1 || m.minMagnitude != -16 || !m.factor || m.zeroAccuracy != 0 || m.factorParams != (UPolynomialFactorParams{MaxPrime: 31, PrimeTrials: 1, MaxSearchSize: 5000})) {
+					t.Fatal("cold generated defaults or helper lifetime", m.params.Serial, m.minMagnitude, m.factorParams)
+				}
+				serviceMust(t, m.Close())
+			}
+			if context.Blocks[cfg.Params.Slot-1].Refs != localRefs || context.Blocks[global.Slot-1].Refs != globalRefs {
+				t.Fatal("generated helper retained or decremented borrowed local/global references")
+			}
+			if cfg.Globals.Symbols.Stats().Symbols != symbols {
+				t.Fatal("generated literal-key getter interned an unused symbol")
+			}
+		}) {
+			return
+		}
+	}
+	if !success || failures == 0 {
+		t.Fatal("cold constructor did not reach refusals and completion", failures, success)
+	}
+	t.Log("actual cold constructor refusals before completed helper", failures)
+}
+
+func TestAlgebraicParameterCollectorNativeStorageWithReservationsDisabled(t *testing.T) {
+	cfg, _, budget := algebraicManagerFixtureWithParameterKeys(t, false)
+	d, e := uparams.NewParamDescrs(cfg.Globals.Symbols, uparams.ParamDescrsConfig{Budget: budget})
+	serviceMust(t, e)
+	t.Cleanup(func() { budget.FailAfter(-1); serviceMust(t, d.Close()) })
+	before := budget.Used()
+	budget.FailAfter(0)
+	serviceMust(t, CollectAlgebraicParamDescriptions(d))
+	serviceMust(t, CollectAlgebraicParamDescriptions(d))
+	want := []string{"zero_accuracy", "min_mag", "factor", "factor_max_prime", "factor_num_primes", "factor_search_size"}
+	n, e := d.Size()
+	serviceMust(t, e)
+	if n != uint32(len(want)) {
+		t.Fatal("source schema size after repeated collection", n)
+	}
+	for i := uint32(0); i < n; i++ {
+		name, e := d.ParamName(i)
+		serviceMust(t, e)
+		equal, e := cfg.Globals.Symbols.EqualString(name, &want[i])
+		serviceMust(t, e)
+		if !equal {
+			t.Fatal("source descriptor insertion order", i)
+		}
+	}
+	if budget.Used() != before {
+		t.Fatal("native schema storage acquired Runtime budget", before, budget.Used())
+	}
+	budget.FailAfter(-1)
+}
 
 func TestAlgebraicParametersAllGlobalFallbackLocalPrecedenceAndSnapshot(t *testing.T) {
 	for _, local := range []bool{false, true} {

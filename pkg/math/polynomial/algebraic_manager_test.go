@@ -15,6 +15,10 @@ import (
 )
 
 func algebraicManagerFixture(t *testing.T) (AlgebraicManagerConfig, *uparams.ParamsContext, *arena.Budget) {
+	return algebraicManagerFixtureWithParameterKeys(t, true)
+}
+
+func algebraicManagerFixtureWithParameterKeys(t *testing.T, warm bool) (AlgebraicManagerConfig, *uparams.ParamsContext, *arena.Budget) {
 	t.Helper()
 	b := arena.NewBudget(1 << 27)
 	_, sy, q := sxOwner(t, b)
@@ -35,9 +39,11 @@ func algebraicManagerFixture(t *testing.T) (AlgebraicManagerConfig, *uparams.Par
 	serviceMust(t, e)
 	// Source namespace symbols are borrowed global services, independent of the
 	// constructor under test. Keep their cold interning outside its fault sweep.
-	for _, name := range []string{"algebraic", "min_mag", "factor", "factor_max_prime", "factor_num_primes", "factor_search_size", "zero_accuracy"} {
-		_, e = sy.Intern(name)
-		serviceMust(t, e)
+	if warm {
+		for _, name := range []string{"algebraic", "min_mag", "factor", "factor_max_prime", "factor_num_primes", "factor_search_size", "zero_accuracy"} {
+			_, e = sy.Intern(name)
+			serviceMust(t, e)
+		}
 	}
 	t.Cleanup(func() {
 		b.FailAfter(-1)

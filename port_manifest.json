@@ -39931,7 +39931,7 @@
       "path": "src/math/polynomial/algebraic_params.hpp",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/util/params/util_gparams.go",
         "pkg/util/params/util_gparams_catalog.go",
@@ -39957,7 +39957,9 @@
         "TestAlgebraicParametersAllGlobalFallbackLocalPrecedenceAndSnapshot",
         "TestAlgebraicParameterDescriptorSchemaSourceOrder",
         "TestAlgebraicParameterProductionCatalogRegistration",
-        "TestAlgebraicParameterWrongKindsUseFallbackThenDefaults"
+        "TestAlgebraicParameterWrongKindsUseFallbackThenDefaults",
+        "TestAlgebraicParametersColdNamesAndConstructorReservationFrontiers",
+        "TestAlgebraicParameterCollectorNativeStorageWithReservationsDisabled"
       ],
       "conditionals": [
         {
@@ -39969,11 +39971,11 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
-          "name": "complete preserved static descriptor collection and selected full test-catalog registration order; retained constructor getters now have separate evidence; broader helper composition remains open",
+          "name": "collect_param_descrs: all six source rows, exact insertion order, names, kinds, descriptions, defaults and algebraic module; production catalog registration",
           "status": "ported",
           "go_target": "pkg/math/polynomial/gparams_catalog_collectors.go",
           "tests": [
@@ -39986,16 +39988,112 @@
           "go_targets": [
             "pkg/util/params/util_gparams_catalog_test.go"
           ]
+        },
+        {
+          "name": "algebraic_params(_p): borrowed local p, acquired algebraic module g, and source params_ref member destruction in the retained imp::updt_params consumer",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/algebraic_params.go",
+          "go_targets": [
+            "pkg/util/params/util_module_params_source.go",
+            "pkg/math/polynomial/algebraic_manager.go",
+            "pkg/math/polynomial/algebraic_params_source_test.go"
+          ],
+          "tests": [
+            "TestAlgebraicParametersColdNamesAndConstructorReservationFrontiers",
+            "TestAlgebraicParametersAllGlobalFallbackLocalPrecedenceAndSnapshot",
+            "TestAlgebraicManagerEveryConstructorReservationAndCleanup"
+          ]
+        },
+        {
+          "name": "zero_accuracy() const: UINT local match, algebraic module fallback, generated default 0",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/algebraic_params.go",
+          "go_targets": [
+            "pkg/util/params/util_module_params_source.go"
+          ],
+          "tests": [
+            "TestAlgebraicParametersAllGlobalFallbackLocalPrecedenceAndSnapshot",
+            "TestAlgebraicParameterWrongKindsUseFallbackThenDefaults",
+            "TestAlgebraicManagerConstructorParametersAndPublicUpdateNoop"
+          ]
+        },
+        {
+          "name": "min_mag() const: UINT local match, algebraic module fallback, generated default 16",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/algebraic_params.go",
+          "go_targets": [
+            "pkg/util/params/util_module_params_source.go"
+          ],
+          "tests": [
+            "TestAlgebraicParametersAllGlobalFallbackLocalPrecedenceAndSnapshot",
+            "TestAlgebraicParameterWrongKindsUseFallbackThenDefaults",
+            "TestAlgebraicManagerConstructorParametersAndPublicUpdateNoop"
+          ]
+        },
+        {
+          "name": "factor() const: BOOL local match, algebraic module fallback, generated default true",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/algebraic_params.go",
+          "go_targets": [
+            "pkg/util/params/util_module_params_source.go"
+          ],
+          "tests": [
+            "TestAlgebraicParametersAllGlobalFallbackLocalPrecedenceAndSnapshot",
+            "TestAlgebraicParameterWrongKindsUseFallbackThenDefaults",
+            "TestAlgebraicManagerConstructorParametersAndPublicUpdateNoop"
+          ]
+        },
+        {
+          "name": "factor_max_prime() const: UINT local match, algebraic module fallback, generated default 31",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/algebraic_params.go",
+          "go_targets": [
+            "pkg/util/params/util_module_params_source.go"
+          ],
+          "tests": [
+            "TestAlgebraicParametersAllGlobalFallbackLocalPrecedenceAndSnapshot",
+            "TestAlgebraicParameterWrongKindsUseFallbackThenDefaults",
+            "TestAlgebraicManagerConstructorParametersAndPublicUpdateNoop"
+          ]
+        },
+        {
+          "name": "factor_num_primes() const: UINT local match, algebraic module fallback, generated default 1",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/algebraic_params.go",
+          "go_targets": [
+            "pkg/util/params/util_module_params_source.go"
+          ],
+          "tests": [
+            "TestAlgebraicParametersAllGlobalFallbackLocalPrecedenceAndSnapshot",
+            "TestAlgebraicParameterWrongKindsUseFallbackThenDefaults",
+            "TestAlgebraicManagerConstructorParametersAndPublicUpdateNoop"
+          ]
+        },
+        {
+          "name": "factor_search_size() const: UINT local match, algebraic module fallback, generated default 5000",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/algebraic_params.go",
+          "go_targets": [
+            "pkg/util/params/util_module_params_source.go"
+          ],
+          "tests": [
+            "TestAlgebraicParametersAllGlobalFallbackLocalPrecedenceAndSnapshot",
+            "TestAlgebraicParameterWrongKindsUseFallbackThenDefaults",
+            "TestAlgebraicManagerConstructorParametersAndPublicUpdateNoop"
+          ]
         }
       ],
       "ownership": [
-        "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; Retained value getters now have concrete constructor evidence; broader helper failure/callback composition remains open.",
-        "Owning AlgebraicManager now composes the actual core header, binary-rational and interval managers, private multivariate manager, independent univariate manager, eager isolation descriptors/factors/vectors and add temporary in source member order (algebraic_numbers.cpp:64-126,2772-2786). It reserves the two private variables after parameter loading/statistics reset. Constructor parameters use one actual algebraic module helper with local precedence and signed32 magnitude conversion; public updt_params remains the empty source method (:2788-2789). qm/bqm return actual owner identities; statistics preserve source order. Reverse private destruction stops before older owners when the youngest destructor fails. Every constructor reservation frontier verifies retained-owner cleanup and retry; tests distinguish the borrowed Runtime directory cache from manager storage. Own and borrowed allocators/services, eager descriptors, arithmetic, parameter precedence and stopped destruction pass ordinary and checked/debug/trace profiles on CPUs 8-16. Standalone borrowed cores retain lazy compatibility. Full allocation/callback/destructor/TRACE composition and polynomial/AST completion remain pending; no whole-unit completion credit.",
-        "Retained algebraic parameter schema/getter audit: source-wide algebraic_params references are only the polynomial CMake schema listing, generated header, algebraic_numbers.cpp descriptor delegation (:62), and constructor helper (:151). All six generated getters are concretely consumed by readConstructorParams; no unused public wrapper/template adapter is introduced. New all-global/all-local tests use distinct values for every setting, verify local precedence/global fallback and signed magnitude/accuracy translation, confirm the actual helper receipt ends at construction, mutate both caller/global dictionaries, and prove the captured configuration and empty public update remain unchanged. A direct production collector test checks all six descriptor names in source order, kinds, default strings, algebraic module and now exact source descriptions. The broad util catalog test uses fixture collectors, so it does not independently prove this production collector. An isolated production DisplayModule probe encounters the unlinked catalogCollectContextParams collector; full catalog bootstrap/composition remains unverified in the polynomial-only package. Existing constructor reservation/cleanup/retry tests remain part of the evidence. The .pyg generated-input status is corrected from wholly unported to partial, reflecting its concrete schema output and retained consumers; generated helper failure/callback composition and whole polynomial/AST completion remain pending. Focused ordinary and checked/debug/trace manager/parameter checks run on CPUs 8-16.",
-        "Production catalog linkage verification now passes in polynomial tests after an external polynomial_test imports the actual collector-owner packages, following existing smtcore/model/rewriter integration-test patterns. TestAlgebraicParameterProductionCatalogRegistration verifies actual exported algebraic module dispatch, exact module description and all six fields. This resolves the previously recorded isolated missing Context collector probe without fixture substitutes or new production dependency edges. Generated header helper failure/destructor/callback composition remains partial.",
-        "Typed generated-getter evidence: all five UINT fields and the BOOL field ignore a primary entry with the wrong source kind, use a correctly typed module fallback, and use their individual generated defaults when both layers have wrong kinds. The real manager constructor completes and releases its actual module helper frame in both cases. Source params.cpp GET_VALUE/GET_VALUE2 kind matching is preserved; no coercion, validation substitute, or additional getter allocation is introduced. Larger generated header failure/destructor/callback composition remains partial."
+        "Retained-use inventory: algebraic_numbers.cpp:62 delegates descriptor collection and :151-159 constructs one generated helper with explicit _p and consumes all six getters in order min_mag, factor, factor_max_prime, factor_num_primes, factor_search_size, zero_accuracy. Generated shell/API/test gparams_register_modules.cpp:55 use the same static collector. No other retained constructor/getter use exists; no unused standalone Go generated-helper wrapper is introduced.",
+        "The local params reference is borrowed, never incremented or destroyed. ModuleParamsOwner.BeginHelper obtains the actual SourceGetModuleName(algebraic) reference, and FinishHelper releases only that acquired reference on normal exit or body failure. Cold constructor tests use real nonempty local/global dictionaries, cover all 29 actual reservation refusals through success, compare their actual reference counts before/after, verify no surviving helper/running/destructor state, and confirm one completed helper invocation. Owning manager and all fixture storage close with zero charged residue.",
+        "Each UINT/BOOL getter uses its own exact key/kind/default and the actual parameter fallback engine. Wrong-kind primary entries fall back; wrong kinds in both dictionaries use the generated default. Distinct local/global values independently detect swapped keys and precedence errors. Constructor capture and later local/global mutations verify that no helper reference survives; the public empty update method does not replace that snapshot. The constructor consumes unsigned magnitude/accuracy through the retained signed32 conversion, including above-INT_MAX tests.",
+        "The six descriptor rows are independently checked against frozen source names, order, kinds, default strings, complete descriptions and module. Production catalog DisplayModule links the actual collector-owner packages and verifies the algebraic module description and all fields. Repeated cold collection with Runtime reservations disabled preserves six rows and order and leaves charged storage unchanged, consistent with the native Go containers/string policy.",
+        "The getter body performs literal name comparisons rather than symbol interning. The cold nonempty-map constructor test verifies unchanged symbol count and no reservation failure after accepted helper entry. With valid retained globals the module map retains its own reference, so helper destruction is a shared-reference decrement, not an unmodeled last-owner destructor callback. Broader algebraic-number algorithms, utility source units, catalog lifecycle implementations and AST remain separate audits; completing this generated header claims no transitive unit completion."
       ],
-      "deviations": []
+      "deviations": [
+        "Native Go strings, symbol maps, insertion-ordered descriptor dictionaries and slices replace C++ containers. Their STL capacities, rehashing and allocation-refusal behavior are not ported. Actual charged owner headers/reference lifetimes remain explicit.",
+        "The generated helper is implemented at its concrete retained constructor/collector consumers. ModuleParamsFrame is charged Go lifetime metadata; it does not claim an extra C++ allocation or numeral construction. The unused standalone default-argument wrapper is omitted under the retained-consumer policy."
+      ]
     },
     {
       "path": "src/math/polynomial/algebraic_params.pyg",

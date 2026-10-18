@@ -44846,3 +44846,37 @@ unfinished; source-unit status counts stay unchanged.
 The final checked/debug/trace numeral selection also passed in 18.731s.
 portcheck and git diff --check pass: 2103 units, 677 APIs; 210 ported,
 341 partial, 1495 unported and 11 dead/deleted. Commands remain on CPUs 8-16.
+
+Closed the retained generated algebraic_params.hpp audit. The finite source
+inventory is one constructor, six typed getters and one static six-row collector.
+The constructor/getters are consumed only by algebraic_numbers.cpp:151-159;
+descriptor collection is also used by the generated shell/API/test registration
+code and algebraic_numbers.cpp:62. Each method now has an explicit manifest
+mapping and tests. No unused standalone generated-helper wrapper is added.
+
+The new cold-name constructor campaign covers 29 real reservation refusals and
+successful completion using nonempty local/global dictionaries. It verifies
+unchanged actual local/global reference counts, no retained helper, one completed
+helper entry, all six defaults and unchanged symbol count. Inspection corrected
+an initial assumption: literal-key getters compare directly against existing
+spellings; they do not intern keys or allocate. Thus no synthetic getter-failure
+frontier is added. The local reference is borrowed; the module helper copies and
+releases one real global reference while the global map retains its own owner.
+With valid retained globals, that helper destructor is a shared decrement.
+
+Repeated production descriptor collection with Runtime reservations disabled
+verifies all six ordered rows and unchanged charged storage. Descriptor and
+symbol containers/strings are native Go replacements, so deleted STL allocation
+failure behavior is not reconstructed. Existing frozen-schema checks verify exact
+names, kinds, descriptions, defaults and module; real production catalog linkage
+verifies module registration/description. All six getter local/fallback/wrong-kind
+and constructor snapshot/signed32 consumption checks remain part of the audit.
+
+Focused algebraic parameter/manager and global catalog selections pass ordinary
+(polynomial 0.025s, params 0.013s) and checked/debug/trace (0.025s/0.014s) on
+CPUs 8-16. portcheck and git diff --check pass. Only algebraic_params.hpp is
+newly ported: 2103 units,677 APIs;211 ported,340 partial,1495 unported,
+11 dead/deleted. The larger algebraic-number/polynomial units and AST remain
+incomplete; this generated-header completion claims no transitive completion.
+No full native repetition for these focused test/manifest changes after the
+recent successful full native verification.
