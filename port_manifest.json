@@ -38921,7 +38921,8 @@
             "pkg/math/polynomial/algebraic_manager.go",
             "pkg/math/polynomial/upolynomial.go",
             "pkg/math/polynomial/upolynomial_source_finalize.go",
-            "pkg/math/polynomial/algebraic_copy_owner_test.go"
+            "pkg/math/polynomial/algebraic_copy_owner_test.go",
+            "pkg/math/polynomial/algebraic_copy_shift_test.go"
           ],
           "tests": [
             "TestAlgebraicCopyFromCoreBranches",
@@ -38929,9 +38930,10 @@
             "TestAlgebraicCopyFromCoreAllocationCallback",
             "TestAlgebraicCopyFromCoreOwningManagerLifetime",
             "TestAlgebraicCopyPolynomialFromOwner",
-            "TestAlgebraicCopyUsesRecordedPolynomialSize"
+            "TestAlgebraicCopyUsesRecordedPolynomialSize",
+            "TestAlgebraicCopyFromCoreBoundShiftPhysicalRefusal"
           ],
-          "notes": "CopyFromCore now implements the concrete distinct-core zero/basic/root set branches, including root-to-basic deletion before the const scoped-mpq construction, NUM then DEN cross-owner SET, original destination allocation/publication order, recorded coefficient extent, receiving interval assertion/lower/upper SET, and packed flag copying without normalization. Source core and both univariate owners remain borrowed across stopped invocations until exact receiving copy/shift/cell allocation and scoped-rational cleanup completes. Synchronous integer/natural bindings exclude numeral owner destruction during actual allocation/cleanup callbacks. Nine branch combinations, independent BIG coefficients/basic NUM/DEN, every reached reservation prefix through success, actual TLS allocation callback refusal, and full owning-source manager lifetime are covered. The owning-source manager closes successfully after copy and the receiving value remains readable. Same-core calls delegate existing Copy. Remaining work includes source destructor/cleanup callback fault composition, explicit shifted-bound physical refusal through this integrated caller, and the owning AST algebraic wrapper/ID translation consumer. This partial method does not claim that arith_decl_plugin translation or the whole algebraic/polynomial/AST port is complete."
+          "notes": "CopyFromCore now implements the concrete distinct-core zero/basic/root set branches, including root-to-basic deletion before the const scoped-mpq construction, NUM then DEN cross-owner SET, original destination allocation/publication order, recorded coefficient extent, receiving interval assertion/lower/upper SET, and packed flag copying without normalization. Source core and both univariate owners remain borrowed across stopped invocations until exact receiving copy/shift/cell allocation and scoped-rational cleanup completes. Synchronous integer/natural bindings exclude numeral owner destruction during actual allocation/cleanup callbacks. Nine branch combinations, independent BIG coefficients/basic NUM/DEN, every reached reservation prefix through success, actual TLS allocation callback refusal, and full owning-source manager lifetime are covered. The owning-source manager closes successfully after copy and the receiving value remains readable. Same-core calls delegate existing Copy. The integrated checked interval assertion now has a real descriptor-after-physical shift refusal with a full eight-cell receiver: all coefficients finish, no interval endpoint is assigned, source borrow stays live, and owning cleanup releases the exact shift backing. An independent replacement allocation and its issued copy receipt remain untouched by algebraic cleanup. The ordinary profile verifies assertion erasure and no exponent-alignment scratch use. Remaining work includes source destructor/cleanup callback fault composition and the owning AST algebraic wrapper/ID translation consumer. This partial method does not claim that arith_decl_plugin translation or the whole algebraic/polynomial/AST port is complete."
         },
         {
           "name": "Root/SMT2/Mathematica display cached m_i lookup and packed-word publication cpp2648-2654,2666-2672,2698-2704; broader display audit remains open",
@@ -39567,7 +39569,8 @@
             "pkg/math/polynomial/algebraic_manager.go",
             "pkg/math/polynomial/upolynomial.go",
             "pkg/math/polynomial/upolynomial_source_finalize.go",
-            "pkg/math/polynomial/algebraic_copy_owner_test.go"
+            "pkg/math/polynomial/algebraic_copy_owner_test.go",
+            "pkg/math/polynomial/algebraic_copy_shift_test.go"
           ],
           "tests": [
             "TestAlgebraicCopyFromCoreBranches",
@@ -39575,9 +39578,10 @@
             "TestAlgebraicCopyFromCoreAllocationCallback",
             "TestAlgebraicCopyFromCoreOwningManagerLifetime",
             "TestAlgebraicCopyPolynomialFromOwner",
-            "TestAlgebraicCopyUsesRecordedPolynomialSize"
+            "TestAlgebraicCopyUsesRecordedPolynomialSize",
+            "TestAlgebraicCopyFromCoreBoundShiftPhysicalRefusal"
           ],
-          "notes": "CopyFromCore now implements the concrete distinct-core zero/basic/root set branches, including root-to-basic deletion before the const scoped-mpq construction, NUM then DEN cross-owner SET, original destination allocation/publication order, recorded coefficient extent, receiving interval assertion/lower/upper SET, and packed flag copying without normalization. Source core and both univariate owners remain borrowed across stopped invocations until exact receiving copy/shift/cell allocation and scoped-rational cleanup completes. Synchronous integer/natural bindings exclude numeral owner destruction during actual allocation/cleanup callbacks. Nine branch combinations, independent BIG coefficients/basic NUM/DEN, every reached reservation prefix through success, actual TLS allocation callback refusal, and full owning-source manager lifetime are covered. The owning-source manager closes successfully after copy and the receiving value remains readable. Same-core calls delegate existing Copy. Remaining work includes source destructor/cleanup callback fault composition, explicit shifted-bound physical refusal through this integrated caller, and the owning AST algebraic wrapper/ID translation consumer. This partial method does not claim that arith_decl_plugin translation or the whole algebraic/polynomial/AST port is complete."
+          "notes": "CopyFromCore now implements the concrete distinct-core zero/basic/root set branches, including root-to-basic deletion before the const scoped-mpq construction, NUM then DEN cross-owner SET, original destination allocation/publication order, recorded coefficient extent, receiving interval assertion/lower/upper SET, and packed flag copying without normalization. Source core and both univariate owners remain borrowed across stopped invocations until exact receiving copy/shift/cell allocation and scoped-rational cleanup completes. Synchronous integer/natural bindings exclude numeral owner destruction during actual allocation/cleanup callbacks. Nine branch combinations, independent BIG coefficients/basic NUM/DEN, every reached reservation prefix through success, actual TLS allocation callback refusal, and full owning-source manager lifetime are covered. The owning-source manager closes successfully after copy and the receiving value remains readable. Same-core calls delegate existing Copy. The integrated checked interval assertion now has a real descriptor-after-physical shift refusal with a full eight-cell receiver: all coefficients finish, no interval endpoint is assigned, source borrow stays live, and owning cleanup releases the exact shift backing. An independent replacement allocation and its issued copy receipt remain untouched by algebraic cleanup. The ordinary profile verifies assertion erasure and no exponent-alignment scratch use. Remaining work includes source destructor/cleanup callback fault composition and the owning AST algebraic wrapper/ID translation consumer. This partial method does not claim that arith_decl_plugin translation or the whole algebraic/polynomial/AST port is complete."
         },
         {
           "name": "Root/SMT2/Mathematica display cached m_i lookup and packed-word publication cpp2648-2654,2666-2672,2698-2704; broader display audit remains open",

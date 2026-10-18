@@ -44440,3 +44440,30 @@ wrapper/ID translation consumer remain to audit/implement. Complete polynomial
 then AST remains the active objective.
 Final rebuilt ordinary Copy selection, including strengthened receipt assertions,
 passed (0.022s); git diff --check passed before commit.
+
+Integrated foreign-copy interval assertion audit: added a concrete receiving
+core with eight real integer descriptors, all held by the constructor caches.
+The source root of 2*x^2-1 is bracketed by 2^-128 and 1. Coefficient copies are
+small and complete; checked lower/upper ordering then copies a scalar into the
+receiving binary TMP and shifts by 128, acquiring physical backing before the
+real descriptor limit refuses publication. The foreign scope holds actual
+NumericAllocationRoots (not a completed coefficient or bound-copy receipt),
+the entire initialized coefficient prefix, untouched interval endpoints and
+the source-core borrow. Cleanup releases the exact physical backing and then
+the source borrow. The ordinary profile verifies erased assertion evaluation
+and untouched exponent-alignment scratch instead of expecting a refusal.
+
+A second case explicitly acknowledges that shift allocation through its
+independent owning API, obtains a later failed foreign SET allocation with a
+distinct physical generation and exact IntegerCopyAllocationReceipt, and proves
+algebraic CleanupRetained preserves both. Only that independent receipt can
+release its backing. Fixture teardown verifies a zero charged budget.
+
+TestAlgebraicCopyFromCoreBoundShiftPhysicalRefusal passed checked/debug/trace
+(0.004s initially); the complete Copy selection including owned/replacement
+cases passed ordinary (0.023s) and checked/debug/trace (0.041s), all on CPUs8-16.
+No production algorithm change was needed. The manifest records the stronger
+integrated evidence and keeps cross-manager set partial for destructor/cleanup
+callback composition and the owning AST wrapper consumer. No full suite repeat
+after the preceding 93.929s ordinary pass. Complete polynomial then AST remains
+active.
