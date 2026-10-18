@@ -5,18 +5,19 @@ import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 // Concrete ownership for the actual scalar calls in matrix construction and
 // diagonalization. A fresh generation is admitted only after older work ends.
 type upolyBerlekampNumeric struct {
-	owner               *upolyBerlekampMatrix
-	hooks               unumeral.NumericInvocationHooks
-	roots               unumeral.NumericAllocationRoots
-	generation          uint64
-	executing, cleaning bool
-	raw                 [3]unumeral.IntegerRawInvocationReceipt
-	order               [3]uint8
-	count               uint8
-	addMul              unumeral.IntegerAddMulInvocationReceipt
-	normalize           unumeral.IntegerNormalizeInvocationReceipt
-	divisionAM          upolyBerlekampScopedNumeral
-	monic               upolyBerlekampMonic
+	defaultNormalization upolyDefaultNormalizeReceipt
+	owner                *upolyBerlekampMatrix
+	hooks                unumeral.NumericInvocationHooks
+	roots                unumeral.NumericAllocationRoots
+	generation           uint64
+	executing, cleaning  bool
+	raw                  [3]unumeral.IntegerRawInvocationReceipt
+	order                [3]uint8
+	count                uint8
+	addMul               unumeral.IntegerAddMulInvocationReceipt
+	normalize            unumeral.IntegerNormalizeInvocationReceipt
+	divisionAM           upolyBerlekampScopedNumeral
+	monic                upolyBerlekampMonic
 }
 
 func (n *upolyBerlekampNumeric) NumericBound(executing bool) bool {
@@ -73,6 +74,9 @@ func (n *upolyBerlekampNumeric) pending() bool {
 		return false
 	}
 	m := n.owner.m
+	if m.defaultNormalizationReceiptPending(&n.defaultNormalization) {
+		return true
+	}
 	z := m.config.Integer
 	if n.monic.declared && n.monic.sourceIndex < 2 && !n.monic.ownEnded {
 		return true
@@ -93,6 +97,11 @@ func (n *upolyBerlekampNumeric) pending() bool {
 func (n *upolyBerlekampNumeric) sourceCause() error {
 	if n.owner == nil {
 		return nil
+	}
+	if n.owner.m.defaultNormalizationReceiptPending(&n.defaultNormalization) {
+		if e := n.owner.m.defaultNormalization.sourceCause; e != nil {
+			return e
+		}
 	}
 	if n.divisionAM.declared && !n.divisionAM.sourceEnded && !n.divisionAM.ownEnded && n.divisionAM.cause != nil {
 		return n.divisionAM.cause
@@ -125,6 +134,9 @@ func (n *upolyBerlekampNumeric) cleanup(abort bool) error {
 	}
 	n.cleaning = true
 	defer func() { n.cleaning = false }()
+	if e := n.owner.m.cleanupDefaultNormalizationReceipt(&n.defaultNormalization); e != nil {
+		return e
+	}
 	z := n.owner.m.config.Integer
 	if e := n.owner.m.modular.CleanupPNormalizeInvocation(&n.normalize, abort); e != nil {
 		return e

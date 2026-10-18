@@ -314,6 +314,8 @@ func TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph(t *testing.T) {
 
 				upolyHenselAuditPhysical(t, []*UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{BinaryManagers: []*unumeral.BinaryRationalManager{b}, BinaryVectors: []*BinaryRationalVector{r, l, u}})
 				budget.FailAfter(-1)
+				// DRS preparation can retain a distinct default normalization child.
+				serviceMust(t, m.CleanupNormalization())
 				serviceMust(t, m.CleanupSturmIsolation())
 				if e != nil {
 					failures++

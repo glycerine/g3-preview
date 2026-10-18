@@ -12,18 +12,20 @@ import (
 // creates no source numeral, reservation, or ambient callback owner hook.
 
 type integerAllocationInvocationContext struct {
-	berlekamp                 *upolyBerlekampNumeric
-	berlekampGeneration       uint64
-	sexprArithmetic           *sexprPolynomialArithmeticScope
-	sexprArithmeticInvocation uint64
-	sturmIsolation            *upolySturmIsolationScope
-	sturmIsolationInvocation  uint64
-	sequenceSturm             *upolySequenceSturmScope
-	sequenceSturmInvocation   uint64
-	rootID                    *upolyRootIDScope
-	rootIDInvocation          uint64
-	knuth                     *upolyKnuthScope
-	knuthInvocation           uint64
+	defaultNormalization           *upolyDefaultNormalizeScope
+	defaultNormalizationInvocation uint64
+	berlekamp                      *upolyBerlekampNumeric
+	berlekampGeneration            uint64
+	sexprArithmetic                *sexprPolynomialArithmeticScope
+	sexprArithmeticInvocation      uint64
+	sturmIsolation                 *upolySturmIsolationScope
+	sturmIsolationInvocation       uint64
+	sequenceSturm                  *upolySequenceSturmScope
+	sequenceSturmInvocation        uint64
+	rootID                         *upolyRootIDScope
+	rootIDInvocation               uint64
+	knuth                          *upolyKnuthScope
+	knuthInvocation                uint64
 
 	rootUpperBound              *upolyRootUpperBoundScope
 	removeOneHalfRoot           *upolyRemoveOneHalfRootScope

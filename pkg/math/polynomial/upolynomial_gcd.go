@@ -217,6 +217,12 @@ func (m *UPolynomialManager) normalizeEuclidWithSourceContext(v UPolynomialView,
 	if context.factorFrontend != nil {
 		return m.normalizeWithSourceContext(v, context)
 	}
+	if n := context.berlekamp; n != nil {
+		if !n.NumericBound(true) || n.owner.m != m || context.berlekampGeneration != n.generation {
+			return ErrUPolynomialOwner
+		}
+		return m.normalizeDefaultViewWithReceipt(v, &n.defaultNormalization)
+	}
 	return m.normalize(v)
 }
 func (m *UPolynomialManager) euclidGCD(a, b UPolynomialView, out *upolyVectorState) error {

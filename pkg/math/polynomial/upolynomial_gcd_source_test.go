@@ -422,6 +422,8 @@ func TestUPolynomialGCDChainImmediateFailureRoots(t *testing.T) {
 			}
 			upolyHenselAuditPhysical(t, []*UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Integers: []*unumeral.Int{&content, &lc, &inv}, RationalManagers: []*unumeral.RationalManager{q}})
 			b.FailAfter(-1)
+			// Normalize now retains its exact failed children until owning cleanup.
+			serviceMust(t, m.CleanupNormalization())
 			for _, x := range []*unumeral.Int{&inv, &lc, &content} {
 				if e := q.Integers().Del(x); e != nil {
 					t.Fatal(e)

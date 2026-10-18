@@ -50831,7 +50831,12 @@
         "pkg/math/polynomial/upolynomial_normalize_interval_assertions.go",
         "pkg/math/polynomial/upolynomial_normalize_interval_assertions_test.go",
         "pkg/math/polynomial/upolynomial_frontend_normalize_trace.go",
-        "pkg/math/polynomial/upolynomial_frontend_normalize_trace_test.go"
+        "pkg/math/polynomial/upolynomial_frontend_normalize_trace_test.go",
+        "pkg/math/polynomial/upolynomial_default_normalize.go",
+        "pkg/math/polynomial/upolynomial_default_normalize_test.go",
+        "pkg/math/polynomial/numeric_utility_aliases.go",
+        "pkg/math/polynomial/integer_allocation_invocation_context.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_numeric.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51179,7 +51184,12 @@
         "TestUPolynomialFrontendNormalizeTraceOperands",
         "TestUPolynomialFrontendNormalizeTraceErasureAndCondition",
         "TestUPolynomialFrontendNormalizeTraceExactChildren",
-        "TestUPolynomialFrontendNormalizeTraceValidFactorization"
+        "TestUPolynomialFrontendNormalizeTraceValidFactorization",
+        "TestUPolynomialDefaultNormalizeTraceSourceActions",
+        "TestUPolynomialDefaultNormalizeActualReservationPrefixes",
+        "TestUPolynomialDefaultNormalizeActualTraceReadStops",
+        "TestUPolynomialDefaultNormalizeContextGenerationAndEarlyReturns",
+        "TestUPolynomialDefaultNormalizeEndedReceiptDoesNotOwnLater"
       ],
       "conditionals": [
         {
@@ -51768,6 +51778,37 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Default normalization conditional diagnostic and actual lexical caller scope (upolynomial.cpp:366-401,391-393)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_default_normalize.go",
+            "pkg/math/polynomial/upolynomial_default_normalize_test.go",
+            "pkg/math/polynomial/upolynomial_content.go",
+            "pkg/math/polynomial/numeric_utility_aliases.go",
+            "pkg/math/polynomial/integer_allocation_invocation_context.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_modes.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/upolynomial_gcd_source_test.go",
+            "pkg/math/polynomial/upolynomial_hensel_physical_source_test.go",
+            "pkg/math/polynomial/upolynomial_gcd.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_numeric.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_monic_test.go",
+            "pkg/math/polynomial/upolynomial_isolation_model_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialDefaultNormalizeTraceSourceActions",
+            "TestUPolynomialDefaultNormalizeActualReservationPrefixes",
+            "TestUPolynomialDefaultNormalizeActualTraceReadStops",
+            "TestUPolynomialDefaultNormalizeContextGenerationAndEarlyReturns",
+            "TestUPolynomialGCDChainImmediateFailureRoots",
+            "TestUPolynomialDefaultNormalizeEndedReceiptDoesNotOwnLater",
+            "TestUPolynomialBerlekampMonicRawBodyFailureAndExplicitEnds",
+            "TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph"
+          ],
+          "notes": "Default Normalize/NormalizeView now construct the actual GCD and DEBUG old/product locals in a concrete persistent scope with accepted copy, normalization, raw arithmetic and numeral insertion receipts. Default coefficient-helper calls construct only their actual old/product locals, borrowing the independently supplied divisor. Source NUM destruction is product then old then GCD; only actual child source causes stop older destruction. Owning cursors are separate and preserve body/source history, and clean only accepted children, including failed raw invocations. DEBUG-only lazy div_bug output precedes separate runtime-gated identity actions; runtime assertion disabling does not erase CTRACE. Native Go strings replace STL. Whole-record callbacks and stale numerical contexts cannot acquire execution/cleanup authority. Four actual operand read guards preserve genuine values/backing for destruction and prove later independent formatter-frame reuse survives old cleanup. Physical census includes concrete locals; allocation-prefix sweep reaches success with independent [1,3,2] oracle. The existing immediate GCD refusal test explicitly cleans the newly retained default scope before manager reuse. Broader polynomial numerical/source-lifetime audits remain open. Matrix GCD callers now receive a callee-issued default-normalization receipt, retain it in their concrete numerical owner and clean only that accepted child. Ended receipts cannot acquire later normalizations. Actual finite-field p_normalize children are captured through the default caller policy. DRS bounded preparation refusal testing explicitly cleans its distinct default child after the immediate physical audit."
+        },
         {
           "name": "Retained factor frontend normalization conditional diagnostic (upolynomial.cpp:391-392)",
           "status": "ported",
@@ -53340,7 +53381,13 @@
         "pkg/math/polynomial/upolynomial_berlekamp_monic.go",
         "pkg/math/polynomial/upolynomial_berlekamp_monic_test.go",
         "pkg/math/polynomial/upolynomial_zero_roots_assertions.go",
-        "pkg/math/polynomial/upolynomial_zero_roots_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_zero_roots_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_default_normalize.go",
+        "pkg/math/polynomial/upolynomial_default_normalize_test.go",
+        "pkg/math/polynomial/numeric_utility_aliases.go",
+        "pkg/math/polynomial/integer_allocation_invocation_context.go",
+        "pkg/math/polynomial/upolynomial_hensel_physical_source_test.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_numeric.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -53472,7 +53519,12 @@
         "TestUPolynomialZeroRootsAssertionActions",
         "TestUPolynomialZeroRootsClosedAssertionBeforeRead",
         "TestUPolynomialZeroRootsValidAssertionProfiles",
-        "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard"
+        "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard",
+        "TestUPolynomialDefaultNormalizeTraceSourceActions",
+        "TestUPolynomialDefaultNormalizeActualReservationPrefixes",
+        "TestUPolynomialDefaultNormalizeActualTraceReadStops",
+        "TestUPolynomialDefaultNormalizeContextGenerationAndEarlyReturns",
+        "TestUPolynomialDefaultNormalizeEndedReceiptDoesNotOwnLater"
       ],
       "conditionals": [
         {
@@ -53501,6 +53553,37 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Default normalization conditional diagnostic and actual lexical caller scope (upolynomial.cpp:366-401,391-393)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_default_normalize.go",
+            "pkg/math/polynomial/upolynomial_default_normalize_test.go",
+            "pkg/math/polynomial/upolynomial_content.go",
+            "pkg/math/polynomial/numeric_utility_aliases.go",
+            "pkg/math/polynomial/integer_allocation_invocation_context.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_modes.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/upolynomial_gcd_source_test.go",
+            "pkg/math/polynomial/upolynomial_hensel_physical_source_test.go",
+            "pkg/math/polynomial/upolynomial_gcd.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_numeric.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_monic_test.go",
+            "pkg/math/polynomial/upolynomial_isolation_model_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialDefaultNormalizeTraceSourceActions",
+            "TestUPolynomialDefaultNormalizeActualReservationPrefixes",
+            "TestUPolynomialDefaultNormalizeActualTraceReadStops",
+            "TestUPolynomialDefaultNormalizeContextGenerationAndEarlyReturns",
+            "TestUPolynomialGCDChainImmediateFailureRoots",
+            "TestUPolynomialDefaultNormalizeEndedReceiptDoesNotOwnLater",
+            "TestUPolynomialBerlekampMonicRawBodyFailureAndExplicitEnds",
+            "TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph"
+          ],
+          "notes": "Default Normalize/NormalizeView now construct the actual GCD and DEBUG old/product locals in a concrete persistent scope with accepted copy, normalization, raw arithmetic and numeral insertion receipts. Default coefficient-helper calls construct only their actual old/product locals, borrowing the independently supplied divisor. Source NUM destruction is product then old then GCD; only actual child source causes stop older destruction. Owning cursors are separate and preserve body/source history, and clean only accepted children, including failed raw invocations. DEBUG-only lazy div_bug output precedes separate runtime-gated identity actions; runtime assertion disabling does not erase CTRACE. Native Go strings replace STL. Whole-record callbacks and stale numerical contexts cannot acquire execution/cleanup authority. Four actual operand read guards preserve genuine values/backing for destruction and prove later independent formatter-frame reuse survives old cleanup. Physical census includes concrete locals; allocation-prefix sweep reaches success with independent [1,3,2] oracle. The existing immediate GCD refusal test explicitly cleans the newly retained default scope before manager reuse. Broader polynomial numerical/source-lifetime audits remain open. Matrix GCD callers now receive a callee-issued default-normalization receipt, retain it in their concrete numerical owner and clean only that accepted child. Ended receipts cannot acquire later normalizations. Actual finite-field p_normalize children are captured through the default caller policy. DRS bounded preparation refusal testing explicitly cleans its distinct default child after the immediate physical audit."
+        },
         {
           "name": "Zero-root query/removal nonempty and traversal assertion actions (upolynomial.h:589; upolynomial.cpp:1275,1284)",
           "status": "ported",

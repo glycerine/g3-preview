@@ -224,24 +224,20 @@ func (m *UPolynomialManager) normalizeWithSourceContext(v UPolynomialView, conte
 		}
 		return m.modular.WithAllocationContext((context).utility(m.modular.Integers())).SetInt64(x, -1)
 	}
-	var legacy unumeral.Int
-	g := &legacy
-	var q *upolyFactorVectorNormalizeScope
-	if context != (integerAllocationInvocationContext{}) {
-		o := context.factorFrontendFrame(m.config.Integer)
-		if o == nil || !o.executing || o.service.manager != m {
-			return ErrUPolynomialOwner
-		}
-		q = &o.vectorNormalize
-		if q.constructed != 0 || q.executing || q.invocation == ^uint64(0) {
-			return ErrUPolynomialCleanupPending
-		}
-		*q = upolyFactorVectorNormalizeScope{owner: o, invocation: q.invocation + 1, constructed: 1, peak: 1, executing: true}
-		g = &q.g
-		defer func() { q.executing = false; cause = q.finish(cause) }()
-	} else {
-		defer m.modular.Del(g)
+	if context == (integerAllocationInvocationContext{}) {
+		return m.normalizeDefaultView(v)
 	}
+	o := context.factorFrontendFrame(m.config.Integer)
+	if o == nil || !o.executing || o.service.manager != m {
+		return ErrUPolynomialOwner
+	}
+	q := &o.vectorNormalize
+	if q.constructed != 0 || q.executing || q.invocation == ^uint64(0) {
+		return ErrUPolynomialCleanupPending
+	}
+	*q = upolyFactorVectorNormalizeScope{owner: o, invocation: q.invocation + 1, constructed: 1, peak: 1, executing: true}
+	g := &q.g
+	defer func() { q.executing = false; cause = q.finish(cause) }()
 	if e := m.gcdSpanWithSourceContext(v, g, context); e != nil {
 		return e
 	}
@@ -260,23 +256,23 @@ func (m *UPolynomialManager) normalizeCoefficient(v UPolynomialView, i uint32, g
 	return m.normalizeCoefficientWithSourceContext(v, i, g, nil, integerAllocationInvocationContext{})
 }
 func (m *UPolynomialManager) normalizeCoefficientWithSourceContext(v UPolynomialView, i uint32, g *unumeral.Int, q *upolyFactorVectorNormalizeScope, context integerAllocationInvocationContext) (cause error) {
-	var legacyOld, legacyTmp unumeral.Int
-	old, tmp := &legacyOld, &legacyTmp
+	if q == nil && context == (integerAllocationInvocationContext{}) {
+		return m.normalizeDefaultCoefficient(v, i, g)
+	}
+	if q == nil {
+		return ErrUPolynomialOwner
+	}
+	old, tmp := &q.old, &q.tmp
 	// Source Z3DEBUG lexical temporaries are destroyed tmp then old.
 	if polynomialSourceDebug {
-		if q != nil {
-			if !q.valid() || !q.executing || q.constructed != 1 {
-				return ErrUPolynomialOwner
-			}
-			q.old = unumeral.Int{}
-			q.constructed = 2
-			q.peak = 2
-			q.coefficientExecuting = true
-			old, tmp = &q.old, &q.tmp
-			defer func() { q.coefficientExecuting = false; cause = q.finishCoefficient(cause) }()
-		} else {
-			defer m.modular.Del(old)
+		if !q.valid() || !q.executing || q.constructed != 1 {
+			return ErrUPolynomialOwner
 		}
+		q.old = unumeral.Int{}
+		q.constructed = 2
+		q.peak = 2
+		q.coefficientExecuting = true
+		defer func() { q.coefficientExecuting = false; cause = q.finishCoefficient(cause) }()
 		x, e := m.read(v, i)
 		if e != nil {
 			return e
@@ -293,20 +289,14 @@ func (m *UPolynomialManager) normalizeCoefficientWithSourceContext(v UPolynomial
 		return e
 	}
 	if polynomialSourceDebug {
-		if q != nil {
-			q.tmp = unumeral.Int{}
-			q.constructed = 3
-			q.peak = 3
-		} else {
-			defer m.modular.Del(tmp)
-		}
+		q.tmp = unumeral.Int{}
+		q.constructed = 3
+		q.peak = 3
 		if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Mul(g, x, tmp); e != nil {
 			return e
 		}
-		if q != nil {
-			if e = m.traceFrontendNormalization(q.owner, old, g, x, tmp); e != nil {
-				return e
-			}
+		if e = m.traceFrontendNormalization(q.owner, old, g, x, tmp); e != nil {
+			return e
 		}
 		return m.normalizationCoefficientAssert(tmp, old)
 	}

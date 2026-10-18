@@ -174,6 +174,10 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*UPolynomialManager, factors
 			store = testFieldBySourceName(bindings.Index(i), "store")
 			stores[store.Pointer()] = store.Elem()
 		}
+		normalizationValues := testFieldBySourceName(testFieldBySourceName(core, "defaultNormalization"), "values")
+		for i := 0; i < normalizationValues.Len(); i++ {
+			addInt(normalizationValues.Index(i))
+		}
 		modular := testFieldBySourceName(core, "modular").Elem()
 		for _, field := range []string{"p", "lower", "upper", "invTmp1", "invTmp2", "invTmp3", "divTmp"} {
 			addInt(testFieldBySourceName(modular, field))

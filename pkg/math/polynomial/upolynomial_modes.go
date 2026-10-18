@@ -99,6 +99,11 @@ func (m *UPolynomialManager) Stats() UPolynomialStats {
 		}
 	}
 	s.OwnedNumeralCells += m.modular.OwnedNumeralCells()
+	for i := range m.defaultNormalization.values {
+		if z.IsLiveCellToken(m.defaultNormalization.values[i].NativeCellToken()) {
+			s.OwnedNumeralCells++
+		}
+	}
 
 	for _, page := range m.pages {
 		for i := range page.rows {
