@@ -43940,3 +43940,15 @@ true directly. Broader predicate/refinement coverage remains partial.
 
 Focused algebraic predicates/conversion/refinement/query checks passed ordinary
 (0.222s) and g3checked,g3debug,g3trace (0.072s), exclusively on CPUs8–16.
+
+Algebraic interval magnitude now preserves its cpp704 SASSERT runtime gate,
+left-to-right || short circuit, and actual debugger Throw/Continue action.
+Previously debug builds unconditionally evaluated both sign operands and
+returned a fixed assertion error; disabled assertions could still inspect
+numerals. The shared source diagnostic helper retains its execution guard.
+Regression coverage exercises actual T/C choices, runtime disable, erased
+ordinary builds, and a true first operand with an invalid upper operand.
+The broader magnitude/refinement source unit remains partial.
+
+Focused algebraic magnitude/predicate/comparison/refinement/conversion checks
+passed ordinary (0.206s) and g3checked,g3debug,g3trace (0.074s), on CPUs8–16.

@@ -36,18 +36,8 @@ type algebraicPredicateScope struct {
 func (m *AlgebraicRootCore) magnitude(l, u *unumeral.BinaryRational) (int32, error) {
 	b := m.config.Binary
 	z := m.config.Rationals.Integers()
-	if polynomialSourceDebug {
-		nn, e := b.IsNonNeg(l)
-		if e != nil {
-			return 0, e
-		}
-		np, e := b.IsNonPos(u)
-		if e != nil {
-			return 0, e
-		}
-		if !nn && !np {
-			return 0, ErrAlgebraicAssertion
-		}
+	if e := m.magnitudeSignAssert(l, u); e != nil {
+		return 0, e
 	}
 	if l.K() == u.K() {
 		return b.MagnitudeUpper(l)

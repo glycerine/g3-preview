@@ -129,3 +129,37 @@ func TestAlgebraicPredicateEnabledAssertionOwnsNumericalRefusal(t *testing.T) {
 	serviceMust(t, c.CleanupRetained())
 	serviceMust(t, b.Del(&upper))
 }
+
+func TestAlgebraicMagnitudeSignAssertionActionsAndShortCircuit(t *testing.T) {
+	for _, action := range []string{"T", "C", "disabled"} {
+		t.Run(action, func(t *testing.T) {
+			c, _, _ := algebraicCompareFixture(t)
+			choices := action
+			if action == "disabled" {
+				choices = ""
+			}
+			polynomialAssertionActionsFixture(t, choices)
+			if polynomialSourceDebug && action == "disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+			}
+			lower, upper := unumeral.NewBinaryInt(-1), unumeral.NewBinaryInt(1)
+			e := c.magnitudeSignAssert(&lower, &upper)
+			if polynomialSourceDebug && action == "T" {
+				if !errors.Is(e, ErrAlgebraicAssertion) || !linearThrownAssertion(e) {
+					t.Fatal("magnitude SASSERT did not honor Throw", e)
+				}
+			} else {
+				serviceMust(t, e)
+			}
+			if c.predicateDiagnosticRunning {
+				t.Fatal("assertion retained execution guard")
+			}
+			zero := unumeral.NewBinaryInt(0)
+			// A true first operand must not inspect the invalid second operand.
+			serviceMust(t, c.magnitudeSignAssert(&zero, nil))
+			if action == "disabled" || !polynomialSourceDebug {
+				serviceMust(t, c.magnitudeSignAssert(nil, nil))
+			}
+		})
+	}
+}
