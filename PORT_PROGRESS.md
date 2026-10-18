@@ -44914,3 +44914,38 @@ machinery. The current Go degree-set owner has no Display method. This remains
 unported evidence rather than inferred source-unit completion.
 portcheck and git diff --check pass; counts remain 2103 units,677 APIs:
 211 ported,340 partial,1495 unported and 11 dead/deleted.
+
+Implemented the retained factorization_degree_set::display formatter
+(upolynomial_factorization_int.h:112-120; descending logical bit output from
+bit_vector.cpp:188-201) over the existing native []bool state. It writes literal
+[0, ascending included degrees beginning at one, ] represented by , then logical
+bits from the highest index to zero, with no trailing newline. Removing degree
+zero changes the bit text but intentionally does not remove the source literal
+zero prefix. No packed-word storage, bit-vector machinery or STL capacity/
+allocation semantics are restored.
+
+Concrete public Display borrows its writer for the synchronous call. An actual
+output callback cannot remove/intersect/swap/close that owner or recursively
+Display it; read-only queries remain usable. The borrow ends on normal, host
+error, short-write and nil-writer return. Independent actual factor collections
+cover the empty collection, even-degree subsets and the 32/64 boundary. Display
+runs under disabled Runtime reservations with unchanged charged storage and
+zero packed-word bytes. Output refusal retains the exact emitted prefix and a
+later display succeeds.
+
+This closes the formatter dependency, not the production TRACE records.
+Source cpp1144,1157,1195 also call core_manager::factors::display (upolynomial.cpp:
+97-106), which has no current Go display implementation. That routine formats
+the actual constant with nm().to_string, then each actual polynomial through
+m_upm.display, and its multiplicity. The three whole records must preserve these
+prior computations, source endl flushes and ostream failbit behavior. Wiring them
+must carry the actual accepted display-child receipts before older prime-trial/
+square-free locals are destroyed, protect their borrowed owners during host
+callbacks, and avoid manager-wide cleanup of unrelated retained children.
+No partial record or fixed numeral substitute has been installed.
+
+Broader factor, Hensel, recombination and degree checks pass ordinary (16.467s)
+and checked/debug/trace (27.212s), using CPUs 8-16. portcheck and git diff --check
+pass: 2103 units,677 APIs;211 ported,340 partial,1495 unported,11 dead/deleted.
+Source-unit statuses remain partial and the polynomial then AST goal remains
+unfinished. No full native repeat after the recent successful full verification.

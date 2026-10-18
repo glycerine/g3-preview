@@ -53771,6 +53771,21 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "factorization_degree_set::display logical subset list and descending bit representation (h:112-120; bit_vector.cpp:188-201); production TRACE composition remains open",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_degree_display.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_degree.go",
+            "pkg/math/polynomial/upolynomial_factor_degree_display_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorDegreeDisplayLogicalBitsAndSourceZeroPrefix",
+            "TestUPolynomialFactorDegreeDisplayCallbackProtectsNativeOwner",
+            "TestUPolynomialFactorDegreeDisplayOutputRefusalReleasesBorrow"
+          ],
+          "notes": "Ports the retained logical formatter over native []bool: literal [0 prefix, ascending included degrees from one, ] represented by , then descending logical bits with no trailing newline. No packed bit-vector storage, shifts, STL capacity or container failure machinery is recreated. Tests construct actual factor collections for empty, even-degree and 32/64-boundary subsets; removing bit zero changes the bit text while retaining the literal source zero prefix. Runtime reservations remain disabled during display, with no charged or packed-word storage acquisition. A concrete public display borrow blocks Remove/Intersect/Swap/Close and recursive Display during actual writer callbacks while permitting read-only queries, and ends after normal/error/short/nil-writer return. Direct io.Writer output uses the cold default-decimal Go adapter. This is the formatter dependency only: production bughunt TRACE records at cpp1144,1157,1195 also print actual factors first; their factor-display and accepted numeric-child lifetime integration remains unported. No whole header or factorization-unit completion credit."
+        },
+        {
           "name": "Project degree-set/combination assertions at h:84,170-171,202,205,210,347,377,389,403 honor runtime enablement and source debugger actions",
           "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_assertions.go",

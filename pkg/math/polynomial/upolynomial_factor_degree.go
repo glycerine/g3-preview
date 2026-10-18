@@ -104,11 +104,12 @@ func (s *upolyFactorDegreeState) trivial() (bool, error) {
 }
 
 type UPolynomialDegreeSet struct {
-	self   *UPolynomialDegreeSet
-	budget *arena.Budget
-	state  upolyFactorDegreeState
-	header uint64
-	closed bool
+	self       *UPolynomialDegreeSet
+	budget     *arena.Budget
+	state      upolyFactorDegreeState
+	header     uint64
+	closed     bool
+	displaying bool
 }
 
 // WordBytes stays zero. CapacityWords reports logical groups of 32 degrees
@@ -145,6 +146,15 @@ func (d *UPolynomialDegreeSet) check() error {
 	}
 	return nil
 }
+func (d *UPolynomialDegreeSet) checkMutable() error {
+	if e := d.check(); e != nil {
+		return e
+	}
+	if d.displaying {
+		return ErrUPolynomialCleanupPending
+	}
+	return nil
+}
 func (d *UPolynomialDegreeSet) MaxDegree() (uint32, error) {
 	if e := d.check(); e != nil {
 		return 0, e
@@ -164,13 +174,13 @@ func (d *UPolynomialDegreeSet) IsTrivial() (bool, error) {
 	return d.state.trivial()
 }
 func (d *UPolynomialDegreeSet) Remove(k uint32) error {
-	if e := d.check(); e != nil {
+	if e := d.checkMutable(); e != nil {
 		return e
 	}
 	return d.state.set(k, false)
 }
 func (d *UPolynomialDegreeSet) Intersect(other *UPolynomialDegreeSet) error {
-	if e := d.check(); e != nil {
+	if e := d.checkMutable(); e != nil {
 		return e
 	}
 	if e := other.check(); e != nil {
@@ -179,17 +189,17 @@ func (d *UPolynomialDegreeSet) Intersect(other *UPolynomialDegreeSet) error {
 	return d.state.intersect(&other.state)
 }
 func (d *UPolynomialDegreeSet) Swap(other *UPolynomialDegreeSet) error {
-	if e := d.check(); e != nil {
+	if e := d.checkMutable(); e != nil {
 		return e
 	}
-	if e := other.check(); e != nil {
+	if e := other.checkMutable(); e != nil {
 		return e
 	}
 	d.state, other.state = other.state, d.state
 	return nil
 }
 func (d *UPolynomialDegreeSet) Close() error {
-	if e := d.check(); e != nil {
+	if e := d.checkMutable(); e != nil {
 		return e
 	}
 	d.state.close()
