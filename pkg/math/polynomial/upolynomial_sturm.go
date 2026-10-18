@@ -79,8 +79,8 @@ func (m *UPolynomialManager) sequenceVariationsWithReceipt(s *upolySequenceState
 		if sign == 0 {
 			continue
 		}
-		if polynomialSourceDebug && sign != 1 && sign != -1 {
-			return 0, ErrUPolynomialAssertion
+		if e := m.sturmVariationSignAssertion(sign); e != nil {
+			return 0, e
 		}
 		if sign != previous && previous != 0 {
 			result++
@@ -171,4 +171,16 @@ func (q *upolyRootIDScope) evaluateLower(b *unumeral.BinaryRational, s0 uint32) 
 		return 0, e
 	}
 	return s0 - s1, nil
+}
+
+// Source: upolynomial.cpp:1877, after skipping zero and before counting.
+func (m *UPolynomialManager) sturmVariationSignAssertion(sign int) error {
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil || !enabled {
+		return e
+	}
+	if sign != 1 && sign != -1 {
+		return m.scalarDivisionAssertionFailure(1877, "sign == 1 || sign == -1")
+	}
+	return nil
 }

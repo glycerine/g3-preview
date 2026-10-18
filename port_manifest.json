@@ -50784,7 +50784,8 @@
         "pkg/math/polynomial/upolynomial_nonzero_bound_assertions_test.go",
         "pkg/math/polynomial/upolynomial_remove_one_half_assertions_test.go",
         "pkg/math/polynomial/upolynomial_transform_assertions.go",
-        "pkg/math/polynomial/upolynomial_transform_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_transform_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_sturm_sign_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51053,7 +51054,10 @@
         "TestUPolynomialRemoveOneHalfRootDisabledPreservesOlderHorner",
         "TestUPolynomialTransformInvariantAssertionActions",
         "TestUPolynomialTransformAssertionProfiles",
-        "TestUPolynomialReciprocalClosedGateBeforeSwap"
+        "TestUPolynomialReciprocalClosedGateBeforeSwap",
+        "TestUPolynomialSturmSignAssertionActions",
+        "TestUPolynomialSturmVariationAssertionProfiles",
+        "TestUPolynomialSturmSignClosedGateAndEmptyReturn"
       ],
       "conditionals": [
         {
@@ -51642,6 +51646,20 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Sturm sign-variation nonzero-sign assertion runtime actions (upolynomial.cpp:1877)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_sturm.go",
+            "pkg/math/polynomial/upolynomial_sturm_sign_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialSturmSignAssertionActions",
+            "TestUPolynomialSturmVariationAssertionProfiles",
+            "TestUPolynomialSturmSignClosedGateAndEmptyReturn"
+          ],
+          "notes": "The nonzero-sign invariant gates after zero skipping and before variation counting, dispatching actual debugger Throw/Continue with receiving numeric owner borrowing. Retained location evaluators produce only -1,0,1; qualified direct predicate adapters cover failed sign2 without modifying sequence coefficients/evaluator output and do not claim a reached invalid numerical sign. Enabled/disabled Sturm sequence x^2-1 verifies independent variations2,0,1 at minus infinity/plus infinity/zero and0 at binary point2, including zero-sign skipping. Closed runtime context stops a valid sign predicate, while the empty-sequence early return remains before assertions. Broader diagnostic/source-unit and lifetime audits remain partial."
+        },
         {
           "name": "Reciprocal pre-swap and binary-composition final-exponent assertion actions (upolynomial.cpp:1610,1702)",
           "status": "ported",
