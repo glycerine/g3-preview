@@ -45502,3 +45502,29 @@ diagnostic sites (including scalar CTRACE408) and broader source-unit audits
 remain open. Whole polynomial then AST remain unfinished.
 portcheck and diff checks pass:2103 units,677 APIs;211 ported,340 partial,
 1495 unported,11 dead/deleted. No whole source-unit status changed.
+
+2026-10-18: remaining Hensel unit-factor/GCD/multiplicity runtime gates
+
+Implemented actual project SASSERT gates/actions at factorization.cpp:728,874,
+880,902 instead of fixed debug errors. Each site rereads the runtime switch.
+The D.size()==1 condition short-circuits the modular IsOne operand; constant
+checking retains the source raw integer manager, and multiplicity is read only
+when its enclosing assertion is enabled.
+
+Public Hensel calls over actual independent root/prime/lift cores cover empty
+factors, a non-unit factor constant, repeated multiplicity and a non-unit
+polynomial GCD. Throw at the early sites preserves modulus25; later multiplicity/
+GCD Throw observes source-updated modulus5 and no published lifted factor.
+Continue/disabled/release executes actual e=1 source bodies and verifies their
+modular factor products. The multiplicity Continue case consumes real debugger
+responses at902 and728, rather than skipping the later check. All objects are
+actually constructed; no source count, numerical scratch or quota repair is
+used. Products are owned and checked by the actual lifted core.
+
+Focused checked/debug/trace Hensel factor checks pass0.014s. Broader arithmetic/
+GCD/Hensel/factorization checks pass ordinary16.814s and checked/debug/trace
+28.746s on CPUs8-16. Other assertion/diagnostic sites and broader source-unit
+method/lifetime audits remain open; polynomial then AST remain unfinished.
+No full native repeat after the recently successful68-package run.
+portcheck and diff checks pass:2103 units,677 APIs;211 ported,340 partial,
+1495 unported,11 dead/deleted. Whole source-unit statuses remain unchanged.

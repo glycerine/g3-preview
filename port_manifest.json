@@ -53335,7 +53335,8 @@
         "TestUPolynomialFactorBerlekampEmptyReleaseAndDebug",
         "TestUPolynomialSquareFreeEntryAssertionConstantPublication",
         "TestUPolynomialSquareFreeClosedAssertionSwitchBeforeConstantCopy",
-        "TestUPolynomialHenselPairPreconditionSourceActions"
+        "TestUPolynomialHenselPairPreconditionSourceActions",
+        "TestUPolynomialHenselFactorAssertionActionsAndModulusFrontier"
       ],
       "conditionals": [
         {
@@ -53448,6 +53449,18 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Hensel GCD/unit-factor/multiplicity SASSERT runtime gates and source publication frontiers (728,874,880,902)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_hensel.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_hensel_precondition_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialHenselFactorAssertionActionsAndModulusFrontier"
+          ],
+          "notes": "Replaces fixed debug errors with actual per-site runtime switches and debugger Throw/Continue. D.size()==1 guards the reached modular IsOne operand; empty-factor, raw constant-one and multiplicity-one checks preserve separate switches and original numeral managers. Public independent-core calls with real empty, non-unit constant, repeated multiplicity and repeated-factor GCD inputs exercise all four sites. Throw before modulus setup preserves25; later multiplicity/GCD Throw observes already-set5 and publishes no lifted factor. Continue/disabled/release reaches source e=1 outputs and actual modular products. The repeated-multiplicity Continue input supplies both real debugger responses at902 and728. Tests construct actual manager/factor/vector owners and perform no count, scratch or quota repair. Other assertions/diagnostics and broader unit audits remain open; no whole-unit completion credit."
+        },
         {
           "name": "Square-free and two-factor Hensel entry SASSERT runtime actions/short circuit before publication (262,604,605)",
           "status": "ported",

@@ -63,3 +63,119 @@ func TestUPolynomialHenselPairPreconditionSourceActions(t *testing.T) {
 		}
 	}
 }
+
+func TestUPolynomialHenselFactorAssertionActionsAndModulusFrontier(t *testing.T) {
+	for _, route := range []string{"empty", "constant", "multiplicity", "gcd-unit"} {
+		for _, action := range []string{"T", "C", "disabled"} {
+			t.Run(route+"/"+action, func(t *testing.T) {
+				_, s := preparationPhysicalFixture(t)
+				m := s.manager
+				zp, e := NewRelatedUPolynomialManager(m)
+				serviceMust(t, e)
+				zpe, e := NewRelatedUPolynomialManager(m)
+				serviceMust(t, e)
+				pf, e := zp.NewFactors()
+				serviceMust(t, e)
+				lf, e := zpe.NewFactors()
+				serviceMust(t, e)
+				t.Cleanup(func() {
+					serviceMust(t, s.CleanupRetained())
+					serviceMust(t, lf.Close())
+					serviceMust(t, pf.Close())
+					serviceMust(t, zpe.Close())
+					serviceMust(t, zp.Close())
+				})
+				five, twentyFive := unumeral.NewInt(5), unumeral.NewInt(25)
+				serviceMust(t, zp.SetZP(&five))
+				serviceMust(t, zpe.SetZP(&twentyFive))
+				fcoeff := []int32{-1, 0, 1}
+				if route != "empty" {
+					for i, coeff := range [][]int32{{-1, 1}, {1, 1}} {
+						if route == "gcd-unit" && i == 1 {
+							coeff = []int32{-1, 1}
+						}
+						poly := upolySourceNew(t, m, coeff)
+						degree := uint32(1)
+						if route == "multiplicity" && i == 0 {
+							degree = 2
+						}
+						serviceMust(t, pf.PushCopy(mustUPolyView(t, m, poly), degree))
+					}
+				}
+				if route == "constant" {
+					two := unumeral.NewInt(2)
+					serviceMust(t, pf.SetConstant(&two))
+				}
+				if route == "gcd-unit" {
+					fcoeff = []int32{1, -2, 1}
+				}
+				if route == "multiplicity" {
+					fcoeff = []int32{1, -1, -1, 1}
+				}
+				f := upolySourceNew(t, m, fcoeff)
+				choice := action
+				if action == "C" && route == "multiplicity" {
+					choice = "CC"
+				}
+				if action == "disabled" {
+					choice = ""
+				}
+				polynomialAssertionActionsFixture(t, choice)
+				if polynomialSourceDebug && action == "disabled" {
+					serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+				}
+				e = s.HenselLiftFactors(mustUPolyView(t, m, f), pf, 1, lf)
+				throwing := polynomialSourceDebug && action == "T"
+				if throwing {
+					if !errors.Is(e, ErrUPolynomialAssertion) || !linearThrownAssertion(e) {
+						t.Fatal("factor source Throw", route, e)
+					}
+				} else {
+					serviceMust(t, e)
+				}
+				count, e := lf.DistinctFactors()
+				serviceMust(t, e)
+				p, e := zpe.modular.BorrowedModulus()
+				serviceMust(t, e)
+				modulus, e := m.config.Integer.Int64(p)
+				serviceMust(t, e)
+				wantMod := int64(5)
+				if throwing && (route == "empty" || route == "constant") {
+					wantMod = 25
+				}
+				if modulus != wantMod {
+					t.Fatal("source modulus mutation frontier", route, action, modulus, wantMod)
+				}
+				if throwing {
+					if count != 0 {
+						t.Fatal("Throw passed lifted-factor publication", count)
+					}
+				} else {
+					want := uint32(2)
+					if route == "empty" {
+						want = 1
+					}
+					if count != want {
+						t.Fatal("continued source factors", route, count)
+					}
+					product := upolySourceNew(t, zpe, nil)
+					serviceMust(t, lf.Multiply(product))
+					expected := []int32(nil)
+					if route == "constant" {
+						expected = []int32{-2, 0, 2}
+					}
+					if route == "multiplicity" || route == "gcd-unit" {
+						expected = fcoeff
+					}
+					p := upolySourceNew(t, zpe, expected)
+					same, e := zpe.Equal(product, p)
+					serviceMust(t, e)
+					if !same {
+						t.Fatal("continued literal factor product", route, action, upolyDivisionValues(t, zpe, product))
+					}
+				}
+				serviceMust(t, s.CleanupRetained())
+			})
+		}
+	}
+}

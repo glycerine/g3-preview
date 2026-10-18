@@ -309,16 +309,22 @@ func (s *UPolynomialFactorizationService) henselQuadraticWithCaller(C UPolynomia
 	if err = zp.extendedGCDWithCaller(zp.stateView(A), zp.stateView(B), U, V, D, caller); err != nil {
 		return err
 	}
-	if polynomialSourceDebug {
-		if D.size != 1 {
-			return ErrUPolynomialAssertion
-		}
-		one, err := zp.modular.IsOne(&zp.values(D)[0])
-		if err != nil {
-			return err
+	enabled, err := factorHeaderAssertionsEnabled()
+	if err != nil {
+		return err
+	}
+	if enabled {
+		one := false
+		if D.size == 1 {
+			one, err = zp.modular.IsOne(&zp.values(D)[0])
+			if err != nil {
+				return err
+			}
 		}
 		if !one {
-			return ErrUPolynomialAssertion
+			if err = m.factorizationAssertionFailure(728, "D.size() == 1 && zp_upm.m().is_one(D[0])"); err != nil {
+				return err
+			}
 		}
 	}
 	if caller == nil {
@@ -539,16 +545,28 @@ func (s *UPolynomialFactorizationService) henselFactorsWithCaller(f UPolynomialV
 			caller.executing = false
 		}()
 	}
-	if polynomialSourceDebug {
-		if pf.totalFactors == 0 {
-			return ErrUPolynomialAssertion
+	enabled, err := factorHeaderAssertionsEnabled()
+	if err != nil {
+		return err
+	}
+	if enabled && !(pf.totalFactors > 0) {
+		if err = m.factorizationAssertionFailure(874, "zp_fs.total_factors() > 0"); err != nil {
+			return err
 		}
+	}
+	enabled, err = factorHeaderAssertionsEnabled()
+	if err != nil {
+		return err
+	}
+	if enabled {
 		one, err := m.config.Integer.IsOne(&pf.constant)
 		if err != nil {
 			return err
 		}
 		if !one {
-			return ErrUPolynomialAssertion
+			if err = m.factorizationAssertionFailure(880, "nm.is_one(zp_fs.get_constant())"); err != nil {
+				return err
+			}
 		}
 	}
 	p, err := zp.modular.BorrowedModulus()
@@ -591,13 +609,19 @@ func (s *UPolynomialFactorizationService) henselFactorsWithCaller(f UPolynomialV
 	// Source converts unsigned count-1 to signed int for loop endpoint.
 	end := int32(pf.count - 1)
 	for i := int32(0); i < end; i++ {
-		if polynomialSourceDebug {
+		enabled, err = factorHeaderAssertionsEnabled()
+		if err != nil {
+			return err
+		}
+		if enabled {
 			mult, err := pf.multiplicity(uint32(i))
 			if err != nil {
 				return err
 			}
 			if mult != 1 {
-				return ErrUPolynomialAssertion
+				if err = m.factorizationAssertionFailure(902, "zp_fs.get_degree(i) == 1"); err != nil {
+					return err
+				}
 			}
 		}
 		if err = zp.setViewWithCaller(A, zp.stateView(&pf.factors[i]), caller); err != nil {
