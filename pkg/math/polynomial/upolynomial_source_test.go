@@ -692,6 +692,7 @@ func TestUPolynomialSourceCopyAndRationalPrefixes(t *testing.T) {
 		t.Fatal(e)
 	}
 	target := upolySourceNew(t, m, nil)
+	polynomialAssertionActionsFixture(t, "TT")
 	e := m.SetRationals(target, []unumeral.Rational{one, fraction})
 	if polynomialSourceDebug {
 		if !errors.Is(e, ErrUPolynomialAssertion) {
@@ -1058,6 +1059,7 @@ func TestUPolynomialRawMutableScalarOverloads(t *testing.T) {
 		t.Fatal(e)
 	}
 	zero := unumeral.NewInt(0)
+	polynomialAssertionActionsFixture(t, "T")
 	e := m.MulScalarView(v, &zero)
 	if polynomialSourceDebug {
 		if !errors.Is(e, ErrUPolynomialAssertion) {

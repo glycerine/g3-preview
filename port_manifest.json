@@ -50800,7 +50800,8 @@
         "pkg/math/polynomial/upolynomial_factor_assertion_actions_test.go",
         "pkg/math/polynomial/upolynomial_storage_assertion_actions_test.go",
         "pkg/math/polynomial/upolynomial_content_assertion_actions_test.go",
-        "pkg/math/polynomial/upolynomial_basic_alias_assertion_test.go"
+        "pkg/math/polynomial/upolynomial_basic_alias_assertion_test.go",
+        "pkg/math/polynomial/upolynomial_input_scalar_assertion_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51101,7 +51102,9 @@
         "TestUPolynomialPrimitiveContentNonzeroOracle",
         "TestUPolynomialPrimitiveContentClosedGate",
         "TestUPolynomialBasicAliasAssertionActions",
-        "TestUPolynomialBasicAliasClosedGate"
+        "TestUPolynomialBasicAliasClosedGate",
+        "TestUPolynomialRationalInputAssertionActions",
+        "TestUPolynomialRawScalarZeroAssertionActions"
       ],
       "conditionals": [
         {
@@ -51690,6 +51693,22 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Rational-input integrality and raw scalar nonzero runtime assertions (upolynomial.cpp:207,415)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_ops.go",
+            "pkg/math/polynomial/upolynomial_input_scalar_assertion_test.go",
+            "pkg/math/polynomial/upolynomial_source_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialRationalInputAssertionActions",
+            "TestUPolynomialRawScalarZeroAssertionActions",
+            "TestUPolynomialSourceCopyAndRationalPrefixes",
+            "TestUPolynomialRawMutableScalarOverloads"
+          ],
+          "notes": "Runtime gates precede actual denominator-one/nonzero-scalar predicates; failed actions use debugger Throw/Continue under receiving-owner borrowing and existing actual rational-input owner bindings. SetRationals reserves full extent before per-element checks: T preserves completed prefix [7,0,0], CT reaches second fractional coefficient after numerator3 publication, CC/disabled/release copy numerators [7,3,5] without rational division. Raw zero multiplier Continue writes zero coefficients while preserving vector size; vector overload retains its earlier zero-reset branch. Existing legacy tests now explicitly supply actual Throw actions, including both rational and same-base copy failures. Wider source/numerical lifetime audits remain partial."
+        },
         {
           "name": "Negation/addition/subtraction core alias runtime assertions (upolynomial.cpp:243,259-260,284-285)",
           "status": "ported",

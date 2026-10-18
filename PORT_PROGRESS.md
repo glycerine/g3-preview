@@ -45871,3 +45871,13 @@ A genuine public Neg swaps an earlier output backing into the real private basic
 
 Focused checks pass ordinary (0.008s) and checked/debug/trace (0.024s). Broader factorization/frontend/GCD/Euclidean/CRA/content/storage/closed-state/ordinary and finite arithmetic/multiplication action checks pass ordinary (18.145s) and checked/debug/trace (29.847s); manifest validation passes. All commands stay on CPUs8–16. Wider source arithmetic/failure/lifetime completion audits remain open for polynomial, followed by AST. Native process9825 remains confirmed live, unchanged log/scope caveat recorded above; no second native run was started.
 Final checked alias checks pass (0.024s), including private-buffer preservation on Throw.
+
+### Rational-input integrality and raw scalar multiplier assertion actions
+
+Ported upolynomial.cpp:207,415 with runtime gating before actual denominator-one and nonzero-scalar predicates. Failed actions use real debugger Throw/Continue under receiving-manager borrowing; rational input retains its actual existing receiving/source owner bindings. Disabled/release erases the predicates.
+
+Actual rational input [7,3/2,5/3] reserves all three coefficients before checks. Throw preserves completed prefix [7,0,0]; CT continues through numerator3 then Throws before numerator5; CC and disabled/release copy numerators [7,3,5], without dividing or converting rationals. Raw scalar zero Continue writes both coefficients to zero while preserving raw size2. The vector overload keeps its earlier zero-reset return before the raw assertion.
+
+Legacy rational-copy and raw-mutable tests now explicitly supply debugger Throw. The rational-copy fixture requires two Throws because its later same-base zero-count copy reaches the separate assertion194 already ported, rather than a fixed returned error. No numerical values, quotas or construction counters are repaired. Focused ordinary checks passed (0.029s); manifest validation passes. All execution stays on CPUs8–16. Wider polynomial source/numerical lifetime audits remain open, followed by AST. Native process9825 remains live at LP with the shared-worktree scope caveat documented above; no duplicate suite was started.
+
+Final broader factorization/frontend/GCD/Euclidean/CRA/content/storage/closed-state/basic/rational/raw-scalar checks pass ordinary (18.075s) and checked/debug/trace (30.043s), including the corrected two-Throw legacy fixture.

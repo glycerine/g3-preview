@@ -62,13 +62,19 @@ func (m *UPolynomialManager) setRationalsFromOwnerWithReceipt(p UPolynomial, sou
 	}
 	dst := m.values(&d.state)
 	for i := uint32(0); i < n; i++ {
-		if polynomialSourceDebug {
+		enabled, e := refinementSourceAssertionsEnabled()
+		if e != nil {
+			return e
+		}
+		if enabled {
 			one, e := source.IsOne(&(*a[i].BorrowDenominator()))
 			if e != nil {
 				return e
 			}
 			if !one {
-				return ErrUPolynomialAssertion
+				if e := m.scalarDivisionAssertionFailure(207, "p[i].is_int()"); e != nil {
+					return e
+				}
 			}
 		}
 		if e = m.modular.CopyFromOwnerTracked(&dst[i], source, a[i].BorrowNumerator(), &s.copy, &s.normalize); e != nil {
@@ -611,13 +617,19 @@ func (m *UPolynomialManager) mulScalarViewWithSourceContext(v UPolynomialView, b
 	if e := m.check(); e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled {
 		zero, e := m.modular.IsZero(b)
 		if e != nil {
 			return e
 		}
 		if zero {
-			return ErrUPolynomialAssertion
+			if e := m.scalarDivisionAssertionFailure(415, "!m().is_zero(b)"); e != nil {
+				return e
+			}
 		}
 	}
 	one, e := m.modular.IsOne(b)
