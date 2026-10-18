@@ -25,13 +25,14 @@ func polynomialReferenceDrop(m *MultivariatePolynomialCore, p *Polynomial, start
 		*started = false
 		return nil
 	}
-	e := m.decRefCore(*p)
+	var outcome polynomialDecrementOutcome
+	e := m.decRefCoreOutcome(*p, &outcome)
 	if e != nil {
-		l, x := m.polynomialLocation(*p)
-		if x == nil {
-			if l.deleteStage != 0 || l.callbackStarted {
-				*started = true
-			}
+		// This caller's completed last DEC grants the owning continuation,
+		// including a stop in TRACE before callbacks/stage publication. A
+		// refused call cannot adopt an older deletion's descriptor state.
+		if outcome.consumed && outcome.last {
+			*started = true
 		}
 		return e
 	}
