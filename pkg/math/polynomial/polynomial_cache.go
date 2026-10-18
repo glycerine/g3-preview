@@ -339,11 +339,17 @@ func (c *PolynomialCache) MkUnique(p Polynomial) (Polynomial, error) {
 	return c.mkUnique(p)
 }
 func (c *PolynomialCache) mkUnique(p Polynomial) (Polynomial, error) {
-	info, e := c.manager.core.Info(p)
+	// cpp143/146: pid reaches only polynomial::id, not the reference
+	// count or term count exposed by the whole-header Info adaptation.
+	if e := c.manager.core.check(); e != nil {
+		return Polynomial{}, e
+	}
+	flags, e := c.manager.core.readWord(p, 4)
 	if e != nil {
 		return Polynomial{}, e
 	}
-	if c.ids[info.ID] {
+	id := flags & 0x7fffffff
+	if c.ids[id] {
 		return p, nil
 	}
 	h, e := c.manager.Hash(p)
@@ -363,7 +369,7 @@ func (c *PolynomialCache) mkUnique(p Polynomial) (Polynomial, error) {
 		return Polynomial{}, e
 	}
 	c.buckets[h] = append(c.buckets[h], p)
-	c.ids[info.ID] = true
+	c.ids[id] = true
 	return p, nil
 }
 

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 func TestPolynomialCacheFactorStoppedBodyCleanupAndRetry(t *testing.T) {
@@ -723,4 +724,41 @@ func TestPolynomialCacheFactorConstructorRefusalRetainsInsertedKey(t *testing.T)
 	}
 	serviceMust(t, c.Reset())
 	serviceMust(t, c.Factor(p, out))
+}
+
+func TestPolynomialCacheKnownIDReadsOnlyIDField(t *testing.T) {
+	m := polynomialPSCFullFixture(t)
+	cache, e := NewPolynomialCache(m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, cache.Close()) })
+	p := polynomialQueryTerms(t, m.core, []int32{1}, [][]MonomialPower{nil})
+	_, e = cache.MkUnique(p)
+	serviceMust(t, e)
+	flags, e := m.core.readWord(p, 4)
+	serviceMust(t, e)
+	l, e := m.core.polynomialLocation(p)
+	serviceMust(t, e)
+	allocator := m.core.monomials.allocator
+	raw, e := allocator.Allocate(12)
+	serviceMust(t, e)
+	// Substitute a raw scalar prefix only during this query. This makes no
+	// construction/publication claim; restore the genuine owning record before
+	// either the cache or manager can destroy its completed polynomial.
+	original := l.raw
+	l.raw = raw
+	defer func() {
+		l.raw = original
+		serviceMust(t, allocator.Deallocate(12, raw))
+	}()
+	serviceMust(t, allocator.WriteUint32(raw, 4, flags))
+	got, e := cache.MkUnique(p)
+	serviceMust(t, e)
+	if got != p {
+		t.Fatal("known ID did not return source input identity")
+	}
+	for _, offset := range []uint64{0, 8} {
+		if _, e := allocator.ReadUint32(raw, offset); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
+			t.Fatal("unrelated scalar field initialized", offset, e)
+		}
+	}
 }

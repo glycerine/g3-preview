@@ -49006,6 +49006,7 @@
         "pkg/math/polynomial/polynomial_cache_pending_psc_test.go"
       ],
       "tests": [
+        "TestPolynomialCacheKnownIDReadsOnlyIDField",
         "TestPolynomialCacheDeferredFactorLocalDestructor",
         "TestPolynomialCacheFailedFactorRunsConstructedLocalDestructor",
         "TestPolynomialCacheFailedFactorRetainsDestructorStop",
@@ -49163,6 +49164,7 @@
         "pkg/math/polynomial/polynomial_cache_pending_psc_test.go"
       ],
       "tests": [
+        "TestPolynomialCacheKnownIDReadsOnlyIDField",
         "TestPolynomialCacheCanonicalizationAndReset",
         "TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal",
         "TestPolynomialCacheConstructorBudgetAndRefusal",

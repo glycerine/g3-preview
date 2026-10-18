@@ -43975,3 +43975,23 @@ The wider bound/representation source audit remains partial.
 
 Focused bounds/defining-polynomial/predicate/refinement-promotion tests passed
 ordinary (0.251s) and g3checked,g3debug,g3trace (0.089s), on CPUs8–16.
+
+Polynomial cache mk_unique now reads only the packed ID field for cpp143/146
+pid/m_in_cache dispatch, instead of Info's unrelated reference-count and term-
+count fields. A known-ID regression temporarily substitutes a raw scalar
+prefix with only ID initialized, then restores the genuine completed owning
+record before cleanup. This does not claim constructor completion for the raw
+prefix. Cache source units remain partial.
+
+Checked refinement verification: a deliberately one-minute isolated probe
+advanced through refusal ordinal4645 before its terminal timeout; this is
+incomplete verification, not a passing campaign. The previously interrupted
+late precision range (sentinel0 and every ordinal15900 onward through actual
+first success) passes in47.713s with a five-minute limit. Logs are retained at
+/mnt/oldrog/tmp/g3-refinement-checked-isolated.log and
+/mnt/oldrog/tmp/g3-refinement-checked-late.log. The complete checked suite remains
+unverified. Corrected the campaign comment to avoid suggesting twenty minutes
+is a verified full-package limit. No fault horizon or source algorithm changed.
+All commands used CPUs8–16.
+Focused complete cache checks including the new ID-only regression pass ordinary
+(0.063s) and checked/debug/trace (0.026s); manifest validation and diff checks pass.
