@@ -211,3 +211,34 @@ func TestAlgebraicIsIntReadsOnlyReachedDenominatorFields(t *testing.T) {
 		}
 	}
 }
+
+func TestAlgebraicRefinementRootAccessorBeforeRecord(t *testing.T) {
+	c, _, _ := algebraicCompareFixture(t)
+	root := algebraicQueryRawCell(t, c, 1)
+	basic := algebraicQueryRawCell(t, c, 0)
+	var zero Algebraic
+	if polynomialSourceDebug {
+		polynomialAssertionActionsFixture(t, "T")
+		serviceMust(t, diagnostic.BorrowProcessDebugContext().Close())
+	}
+	for _, precision := range []bool{false, true} {
+		for _, a := range []*Algebraic{&zero, &basic} {
+			ok, e := c.refineAt(a, 3, precision)
+			serviceMust(t, e)
+			if ok != precision {
+				t.Fatal("basic branch return differs from source", precision, ok)
+			}
+		}
+		_, e := c.refineAt(&root, 3, precision)
+		if polynomialSourceDebug {
+			if !errors.Is(e, arena.ErrClosed) {
+				t.Fatal("root accessor switch did not precede missing record", precision, e)
+			}
+		} else if !errors.Is(e, umemory.ErrRuntimeUninitialized) {
+			t.Fatal("erased accessor did not reach missing record", precision, e)
+		}
+		if c.refinement.pending(c) || c.refinementQ.active {
+			t.Fatal("failed accessor created a refinement continuation")
+		}
+	}
+}

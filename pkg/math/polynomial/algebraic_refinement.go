@@ -97,6 +97,11 @@ func (m *AlgebraicRootCore) refineAtWithReceipt(a *Algebraic, k uint32, precisio
 	if l == nil || l.kind == 0 {
 		return precision, nil
 	}
+	// Both refine and refine_until_prec reach anum::to_algebraic only
+	// after the basic tag short circuit (cpp748,770; header373).
+	if e = algebraicQueryTagAssertionSwitch(); e != nil {
+		return false, e
+	}
 	r, e := m.load(l)
 	if e != nil {
 		return false, e

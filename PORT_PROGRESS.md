@@ -43952,3 +43952,14 @@ The broader magnitude/refinement source unit remains partial.
 
 Focused algebraic magnitude/predicate/comparison/refinement/conversion checks
 passed ordinary (0.206s) and g3checked,g3debug,g3trace (0.074s), on CPUs8–16.
+
+Algebraic refine/refine_until_prec now evaluate the actual anum::to_algebraic
+assertion switch at cpp748/770 (header373) after their basic-tag short circuit
+and before loading the root record. A raw-prefix regression tests both routes,
+null zero and nonnull basic returns, closed debug ownership before the missing
+root record, ordinary erased assertions, and absence of a child continuation
+after the failed accessor. This establishes this dispatch boundary only;
+refinement and the complete polynomial/AST port remain in progress.
+
+Focused refinement/comparison/predicate/conversion/magnitude checks passed
+ordinary (0.256s) and g3checked,g3debug,g3trace (0.083s), on CPUs8–16.
