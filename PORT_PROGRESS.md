@@ -44157,3 +44157,17 @@ completion is claimed. Focused display/comparison/predicate checks pass
 ordinary (0.047s) and checked/debug/trace (0.118s), exclusively on CPUs8–16.
 The wider display and whole polynomial then AST audits remain open. No full
 suite repetition after the recently recorded complete ordinary pass.
+
+Display root-index miss no longer requires a whole root record. It decodes
+only the actual lower binary endpoint used by get_root_id and uses the
+polynomial view already supplied by display. Cached publication still touches
+only the packed flags word. A raw-prefix regression supplies actual x^2-2 and
+lower1 while leaving stored polynomial/size and all upper endpoint words
+uninitialized. Actual Sturm root-ID returns2 for positive sqrt(2), preserves
+low metadata bits5, and does not initialize any unrelated words. The fixture
+claims no completed source constructor for its raw prefix.
+
+Focused display/index/comparison/predicate tests pass ordinary (0.124s) and
+checked/debug/trace (0.049s), on CPUs8–16. The wider cold-path/read-order and
+whole-display ownership/stream audit remains partial; this does not promote
+the whole source unit or complete polynomial/AST. No full-suite repetition.

@@ -194,11 +194,17 @@ func (m *AlgebraicRootCore) displayRootIndex(l *algebraicLocation, view UPolynom
 	}
 	index := flags >> 3
 	if index == 0 {
-		r, e := m.load(l)
-		if e != nil {
-			return 0, e
+		// The polynomial view is supplied by the preceding display. Only
+		// lower(c), not the opposite endpoint or other cell members, is used.
+		var words [4]uint32
+		for i := range words {
+			words[i], e = m.config.Allocator.ReadUint32(l.raw, 24+uint64(i)*4)
+			if e != nil {
+				return 0, e
+			}
 		}
-		index, e = m.config.Polynomials.getRootIDWithReceipt(view, r.interval.BorrowLower(), &m.rootDisplay.rootID)
+		lower := unumeral.BinaryRationalFromBorrowedNumeral(algebraicWordsInt(words[:3]), words[3])
+		index, e = m.config.Polynomials.getRootIDWithReceipt(view, &lower, &m.rootDisplay.rootID)
 		if e != nil {
 			return 0, e
 		}
