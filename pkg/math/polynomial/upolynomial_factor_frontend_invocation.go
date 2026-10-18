@@ -14,6 +14,7 @@ type upolyFactorFrontendInvocationReceipt struct {
 	history    *upolyFactorFrontendHistory
 }
 type upolyFactorFrontendHistory struct {
+	coreTrace                                                                         upolyDisplayInvocationReceipt
 	euclidTrace                                                                       upolyDisplayInvocationReceipt
 	modGCDTrace                                                                       upolyDisplayInvocationReceipt
 	exactTrace                                                                        upolyDisplayInvocationReceipt
@@ -185,6 +186,7 @@ type upolyFactorFlipScope struct {
 }
 
 type upolyFactorFrontendScope struct {
+	coreTrace       upolyDisplayInvocationReceipt
 	euclidTrace     upolyDisplayInvocationReceipt
 	modGCDTrace     upolyDisplayInvocationReceipt
 	exactTrace      upolyDisplayInvocationReceipt
@@ -282,6 +284,9 @@ func (q *upolyFactorFrontendScope) finish(body error) error {
 		q.bodyCause = body
 	}
 	if q.sourceCause == nil {
+		q.sourceCause = q.coreTrace.sourceBlocker()
+	}
+	if q.sourceCause == nil {
 		q.sourceCause = q.euclidTrace.sourceBlocker()
 	}
 	if q.sourceCause == nil {
@@ -364,6 +369,9 @@ func (q *upolyFactorFrontendScope) own(abort bool) (cause error) {
 		q.recordHistory()
 	}()
 	if e := q.cra.trace.cleanup(); e != nil {
+		return e
+	}
+	if e := q.coreTrace.cleanupOwned(); e != nil {
 		return e
 	}
 	if e := q.euclidTrace.cleanupOwned(); e != nil {
@@ -494,6 +502,9 @@ func (q *upolyFactorFrontendScope) own(abort bool) (cause error) {
 // Retention is decided from exact captured child tuples and directly stamped
 // leaves; a nil square-free class frame does not imply diagnostic completion.
 func (q *upolyFactorFrontendScope) hasUnjoined() bool {
+	if q.service.manager.displayReceiptPending(&q.coreTrace) {
+		return true
+	}
 	if q.service.manager.displayReceiptPending(&q.euclidTrace) {
 		return true
 	}
@@ -556,6 +567,7 @@ func (q *upolyFactorFrontendScope) recordHistory() {
 	if h == nil || h.self != h || h.service != q.service || h.invocation != q.invocation || h.header == 0 {
 		return
 	}
+	h.coreTrace = q.coreTrace
 	h.euclidTrace = q.euclidTrace
 	h.modGCDTrace = q.modGCDTrace
 	h.exactTrace = q.exactTrace

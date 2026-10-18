@@ -50809,7 +50809,9 @@
         "pkg/math/polynomial/upolynomial_factor_loop_assertions.go",
         "pkg/math/polynomial/upolynomial_factor_loop_assertions_test.go",
         "pkg/math/polynomial/upolynomial_factor_verify.go",
-        "pkg/math/polynomial/upolynomial_factor_verify_test.go"
+        "pkg/math/polynomial/upolynomial_factor_verify_test.go",
+        "pkg/math/polynomial/upolynomial_factor_core_trace.go",
+        "pkg/math/polynomial/upolynomial_factor_core_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51123,7 +51125,9 @@
         "TestUPolynomialFactorConstantSeparateActionsAndErasure",
         "TestUPolynomialFactorLoopRuntimeOracles",
         "TestUPolynomialFactorExactDivisionVerifyActions",
-        "TestUPolynomialFactorExactDivisionVerifySuccessfulOperand"
+        "TestUPolynomialFactorExactDivisionVerifySuccessfulOperand",
+        "TestUPolynomialFactorCoreTraceRecordsAndStickyStream",
+        "TestUPolynomialFactorCoreTraceRetainsActualFrontend"
       ],
       "conditionals": [
         {
@@ -51712,6 +51716,24 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Factor-core repeated-factor polynomial diagnostics and exact frontend cleanup (upolynomial.cpp:3075,3080,3093,3099,3106)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_core_trace.go",
+            "pkg/math/polynomial/upolynomial_factor_core_trace_test.go",
+            "pkg/math/polynomial/upolynomial_factor_core.go",
+            "pkg/math/polynomial/upolynomial_factor_frontend_invocation.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/upolynomial_exact_div_loop_trace.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorCoreTraceRecordsAndStickyStream",
+            "TestUPolynomialFactorCoreTraceRetainsActualFrontend"
+          ],
+          "notes": "Exact factor_bug/factor records at five actual frontend source frontiers, ordinary display spacing and raw newlines, unsigned j formatted with native Go standard library. Whole-record owner borrowing. Actual frontend captures accepted display receipt/history, protects older source suffix, blocks new core/source retirement and owns exact receipt before older objects; no default or replacement display adoption. Independent cube (x-1)^3 verifies all ten repeated-loop records and exact product; sticky first-write refusal preserves computation and footer count. Public Factor on independently expanded (x+3000000001)^3 reaches genuine descriptor-quota BIG formatting failures at3075/3080/3099, retaining actual six-object frontend suffix/vectors and original causes until owning cleanup. No repaired values/counters/quotas. Wider quadratic/other diagnostic and numerical lifetime audits remain partial."
+        },
         {
           "name": "Factor-core exact-division VERIFY actions (upolynomial.cpp:3074,3085,3100)",
           "status": "ported",
