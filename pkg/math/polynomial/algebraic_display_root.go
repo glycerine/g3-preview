@@ -188,19 +188,23 @@ func (m *AlgebraicRootCore) displayRootAtLocation(out unumeral.RationalSourceStr
 func (m *AlgebraicRootCore) displayRootIndex(l *algebraicLocation, view UPolynomialView, line int32) (uint32, error) {
 	// m_i occupies the upper 29 bits of the source packed cell word.
 	// Publish only after get_root_id returns, and before the following output.
-	r, e := m.load(l)
+	flags, e := m.config.Allocator.ReadUint32(l.raw, 16)
 	if e != nil {
 		return 0, e
 	}
-	index := r.flags >> 3
+	index := flags >> 3
 	if index == 0 {
+		r, e := m.load(l)
+		if e != nil {
+			return 0, e
+		}
 		index, e = m.config.Polynomials.getRootIDWithReceipt(view, r.interval.BorrowLower(), &m.rootDisplay.rootID)
 		if e != nil {
 			return 0, e
 		}
 		index = (index + 1) & 0x1fffffff
-		r.flags = r.flags&7 | index<<3
-		if e = m.store(l, &r); e != nil {
+		flags = flags&7 | index<<3
+		if e = m.config.Allocator.WriteUint32(l.raw, 16, flags); e != nil {
 			return 0, e
 		}
 	}

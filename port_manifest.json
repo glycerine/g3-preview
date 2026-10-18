@@ -38913,6 +38913,23 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Root/SMT2/Mathematica display cached m_i lookup and packed-word publication cpp2648-2654,2666-2672,2698-2704; broader display audit remains open",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/algebraic_display_root.go",
+          "go_targets": [
+            "pkg/math/polynomial/algebraic_display_root.go",
+            "pkg/math/polynomial/algebraic_display_index_read_test.go",
+            "pkg/math/polynomial/algebraic_display_root_test.go",
+            "pkg/math/polynomial/algebraic_display_mathematica_test.go"
+          ],
+          "tests": [
+            "TestAlgebraicCachedDisplayIndexReadsOnlyPackedFlags",
+            "TestAlgebraicDisplayIndexFlagReadPrecedesAssertionSwitch",
+            "TestAlgebraicMathematicaRationalsRootsAndSharedCache"
+          ],
+          "notes": "The cached branch reads only actual offset16 packed m_i/flags, preserving all low bits and reaching the runtime assertion switch after the word read. Raw-prefix tests leave every other root word uninitialized and supply no polynomial view. A cache miss still computes actual get_root_id and publishes only the packed word instead of rewriting the whole record. Remaining whole-display scalar/stream and cold-path ownership audits are not promoted."
+        },
+        {
           "name": "Executing algebraic root/SMT2/Mathematica/interval/decimal displays protect borrowed inputs across stream and writer callbacks",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_root.go",
@@ -39515,6 +39532,23 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Root/SMT2/Mathematica display cached m_i lookup and packed-word publication cpp2648-2654,2666-2672,2698-2704; broader display audit remains open",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/algebraic_display_root.go",
+          "go_targets": [
+            "pkg/math/polynomial/algebraic_display_root.go",
+            "pkg/math/polynomial/algebraic_display_index_read_test.go",
+            "pkg/math/polynomial/algebraic_display_root_test.go",
+            "pkg/math/polynomial/algebraic_display_mathematica_test.go"
+          ],
+          "tests": [
+            "TestAlgebraicCachedDisplayIndexReadsOnlyPackedFlags",
+            "TestAlgebraicDisplayIndexFlagReadPrecedesAssertionSwitch",
+            "TestAlgebraicMathematicaRationalsRootsAndSharedCache"
+          ],
+          "notes": "The cached branch reads only actual offset16 packed m_i/flags, preserving all low bits and reaching the runtime assertion switch after the word read. Raw-prefix tests leave every other root word uninitialized and supply no polynomial view. A cache miss still computes actual get_root_id and publishes only the packed word instead of rewriting the whole record. Remaining whole-display scalar/stream and cold-path ownership audits are not promoted."
+        },
         {
           "name": "Executing algebraic root/SMT2/Mathematica/interval/decimal displays protect borrowed inputs across stream and writer callbacks",
           "status": "partial",

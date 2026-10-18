@@ -44140,3 +44140,20 @@ the complete ordinary package including this campaign passes in88.384s as
 recorded above. Added the test to both decimal method manifest entries; no
 whole-source-unit promotion or full checked-suite completion claim. All work
 used CPUs8–16. Polynomial then AST completion remains active.
+
+Root/SMT2/Mathematica display index cache now follows its scalar source member
+boundary: cached lookup reads only the packed flags/index word at offset16,
+and successful get_root_id publication updates only that word. Previously even
+a cached index required the whole root record, and miss publication rewrote
+polynomial and interval members unrelated to m_i. The actual root-ID engine,
+29-bit truncation and subsequent source assertion switch remain intact.
+
+Raw-prefix regressions exercise cached indices1,7 and maximum29-bit with both
+low-bit extremes, leaving every polynomial/size/interval word uninitialized.
+They also establish missing-word precedence before the assertion switch and
+closed-debug-owner failure after a valid cached word. Existing complete display
+outputs/shared-index tests continue to pass. No raw-prefix constructor
+completion is claimed. Focused display/comparison/predicate checks pass
+ordinary (0.047s) and checked/debug/trace (0.118s), exclusively on CPUs8–16.
+The wider display and whole polynomial then AST audits remain open. No full
+suite repetition after the recently recorded complete ordinary pass.
