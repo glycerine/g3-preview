@@ -48544,6 +48544,14 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Nonzero PSC cache partial publication preserves committed prefix and refuses replay of unwritten raw-array slots until reset (polynomial_cache.cpp:164-173,151-156)",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "tests": [
+            "TestPolynomialCachePSCResultReplacementStoppedDeletion"
+          ]
+        },
+        {
           "name": "Cache PSC owning continuation follows only its accepted concrete frame and child receipts; preserves an independently stopped Lazard source invocation (polynomial_cache.cpp:159-173, polynomial.cpp:5659-5831)",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_cache.go",
