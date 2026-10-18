@@ -33,13 +33,30 @@ func TestPolynomialCacheFactorStoppedBodyCleanupAndRetry(t *testing.T) {
 			if !m.matchesFactorCore(&c.factorCall) || c.factorCall != m.factorRoot {
 				t.Fatal("accepted cache factor receipt lost actual root identity")
 			}
-			if e := c.Factor(p, out); !errors.Is(e, ErrPolynomialPending) {
-				t.Fatal("incomplete factor entry permitted replay", e)
+			if c.pendingFactors != nil {
+				if e := c.Factor(p, out); !errors.Is(e, ErrPolynomialPending) {
+					t.Fatal("retained factor owner permitted reentry", e)
+				}
 			}
 			serviceMust(t, c.CleanupFactor())
 			if c.pendingFactors != nil {
 				t.Fatal("stopped factorization retained temporary factors")
 			}
+			entry, invocation := c.factors[p], m.factorCoreInvocation
+			if len(entry.result) != 0 {
+				t.Fatal("failure did not precede result publication")
+			}
+			serviceMust(t, out.Push(p))
+			b.FailAfter(0)
+			replay := c.Factor(p, out)
+			b.FailAfter(-1)
+			serviceMust(t, replay)
+			n, e := out.Size()
+			serviceMust(t, e)
+			if n != 0 || c.factors[p] != entry || entry.complete || m.factorCoreInvocation != invocation {
+				t.Fatal("empty factor hit changed source entry", n)
+			}
+
 			serviceMust(t, c.Reset())
 			serviceMust(t, c.Factor(p, out))
 		})
@@ -81,8 +98,20 @@ func TestPolynomialCachePSCStoppedBodyCleanupAndRetry(t *testing.T) {
 			if m.core.pscReceipts.factory != 0 {
 				t.Fatal("completed PSC parent left an owning factory receipt")
 			}
-			if e = c.PSCChain(p, q, 1, out); !errors.Is(e, ErrPolynomialPending) {
-				t.Fatal("incomplete PSC entry permitted replay", e)
+			key := polynomialPSCKey{p: p, q: q, x: 1}
+			entry, invocation := c.psc[key], m.core.pscLocal.invocation
+			if entry == nil || len(entry.result) != 0 {
+				t.Fatal("failure did not precede PSC result publication")
+			}
+			serviceMust(t, out.Push(p))
+			b.FailAfter(0)
+			replay := c.PSCChain(p, q, 1, out)
+			b.FailAfter(-1)
+			serviceMust(t, replay)
+			n, e := out.Size()
+			serviceMust(t, e)
+			if n != 0 || c.psc[key] != entry || entry.complete || m.core.pscLocal.invocation != invocation {
+				t.Fatal("empty PSC hit recomputed source entry", n)
 			}
 			serviceMust(t, out.Close())
 			serviceMust(t, c.Reset())
@@ -468,8 +497,16 @@ func TestPolynomialCacheFactorConstructorRefusalRetainsInsertedKey(t *testing.T)
 	if len(c.factors) != 1 || c.factors[p].complete {
 		t.Fatal("source cache entry not inserted before factor constructor")
 	}
-	if e = c.Factor(p, out); !errors.Is(e, ErrPolynomialPending) {
-		t.Fatal("incomplete factor entry replayed", e)
+	entry, invocation := c.factors[p], m.factorCoreInvocation
+	serviceMust(t, out.Push(p))
+	b.FailAfter(0)
+	replay := c.Factor(p, out)
+	b.FailAfter(-1)
+	serviceMust(t, replay)
+	n, e := out.Size()
+	serviceMust(t, e)
+	if n != 0 || c.factors[p] != entry || entry.complete || m.factorCoreInvocation != invocation {
+		t.Fatal("source empty entry replay recomputed or published a result", n)
 	}
 	serviceMust(t, c.Reset())
 	serviceMust(t, c.Factor(p, out))

@@ -79,7 +79,9 @@ func (c *PolynomialCache) Factor(p Polynomial, out *PolynomialRefVector) error {
 		return e
 	}
 	if entry, ok := c.factors[p]; ok {
-		if !entry.complete {
+		// Source entries start with result size0; interruption alone does not
+		// invalidate a later empty hit. Unwritten published slots are not values.
+		if !entry.complete && len(entry.result) != 0 {
 			return ErrPolynomialPending
 		}
 		if e := out.Reset(); e != nil {
@@ -195,7 +197,8 @@ func (c *PolynomialCache) CleanupPSC() error {
 }
 
 // PSCChain memoizes the source ordered pair and variable after canonicalizing
-// both inputs. A failed computation retains its inserted entry until Reset.
+// both inputs. A pre-publication failure leaves the source empty cache entry.
+// Published arrays with unwritten elements remain unavailable for safe replay.
 func (c *PolynomialCache) PSCChain(p, q Polynomial, x uint32, out *PolynomialRefVector) error {
 	if e := c.ready(); e != nil {
 		return e
@@ -211,7 +214,8 @@ func (c *PolynomialCache) PSCChain(p, q Polynomial, x uint32, out *PolynomialRef
 	}
 	key := polynomialPSCKey{p: p, q: q, x: x}
 	if entry, ok := c.psc[key]; ok {
-		if !entry.complete {
+		// Preserve the source's size0 hit before result-array publication.
+		if !entry.complete && len(entry.result) != 0 {
 			return ErrPolynomialPending
 		}
 		if out == nil || out.owner != c.manager.core {

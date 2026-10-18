@@ -48228,6 +48228,16 @@
             "TestPolynomialCacheRefusedFactorPreservesOlderInvocation",
             "TestPolynomialCacheRefusedPSCPreservesOlderInvocation"
           ]
+        },
+        {
+          "name": "Inserted zero-result factor/PSC entries replay empty after pre-publication failure without recomputation (polynomial_cache.cpp:151-156,179-184)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "tests": [
+            "TestPolynomialCacheFactorConstructorRefusalRetainsInsertedKey",
+            "TestPolynomialCacheFactorStoppedBodyCleanupAndRetry",
+            "TestPolynomialCachePSCStoppedBodyCleanupAndRetry"
+          ]
         }
       ],
       "ownership": [],
