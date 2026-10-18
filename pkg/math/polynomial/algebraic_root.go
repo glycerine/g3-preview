@@ -49,6 +49,8 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	toRationalCopy                                             unumeral.IntegerCopyAllocationReceipt
+	toRationalRunning                                          bool
 	refinementQ                                                algebraicRefinementQScope
 	predicateQ                                                 algebraicPredicateQScope
 	constQ                                                     algebraicConstQScope
@@ -190,7 +192,7 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
-	if m != nil && m.self == m && (m.comparisonTraceRunning || m.predicateDiagnosticRunning) {
+	if m != nil && m.self == m && (m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && (m.cellAllocationRunning || m.cellPending.Block() != (umemory.Block{})) {
@@ -931,7 +933,7 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.cleanupRetainedCore()
 }
 func (m *AlgebraicRootCore) cleanupRetainedCore() error {
-	if m != nil && m.self == m && (m.comparisonTraceRunning || m.predicateDiagnosticRunning) {
+	if m != nil && m.self == m && (m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.cellAllocationRunning {
@@ -1016,6 +1018,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 		if e := p.modular.CleanupPNormalizeInvocation(&m.representationNormalize, true); e != nil {
 			return e
 		}
+	}
+	if e := m.config.Rationals.Integers().CleanupCopyAllocationInvocation(&m.toRationalCopy); e != nil {
+		return e
 	}
 	if e := m.config.Rationals.Integers().CleanupCopyAllocationInvocation(&m.representationCopy); e != nil {
 		return e
@@ -1128,7 +1133,7 @@ func (m *AlgebraicRootCore) Close() error {
 	return m.closeCoreMembers()
 }
 func (m *AlgebraicRootCore) closeCoreMembers() error {
-	if m != nil && m.self == m && (m.comparisonTraceRunning || m.predicateDiagnosticRunning) {
+	if m != nil && m.self == m && (m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.cellAllocationRunning {

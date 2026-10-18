@@ -13,6 +13,9 @@ func TestAlgebraicCleanupPreservesOlderIntegerCopyReceipt(t *testing.T) {
 		t.Run(strconv.FormatInt(ordinal, 10), func(t *testing.T) {
 			c, _, _ := algebraicCompareFixture(t)
 			z := c.config.Rationals.Integers()
+			var input Algebraic
+			source := unumeral.Rational{Num: z.Two64, Den: unumeral.NewInt(1)}
+			serviceMust(t, c.SetRational(&input, &source))
 			// Keep real copied numerals alive to cross descriptor-page growth without
 			// warming and recycling those pages through a large parsing prelude.
 			var destinations [32]unumeral.Int
@@ -32,6 +35,15 @@ func TestAlgebraicCleanupPreservesOlderIntegerCopyReceipt(t *testing.T) {
 			if z.MatchesCopyAllocationInvocation(&older) {
 				found = true
 				state, used := z.CopyAllocation, z.Budget().Used()
+				out := unumeral.NewRational()
+				if e := c.ToRational(&input, &out); !errors.Is(e, unumeral.ErrNumericPending) || out.Num.NativeScalar() != 1 || out.Num.Cell != z.FailedNullRef {
+					t.Fatal("refused conversion lost source copy prefix", e, out)
+				}
+				if z.MatchesCopyAllocationInvocation(&c.toRationalCopy) {
+					t.Fatal("refused conversion acquired independent copy")
+				}
+				serviceMust(t, c.CleanupToRational())
+				serviceMust(t, c.config.Rationals.Del(&out))
 				borrowed := unumeral.Rational{Num: z.Two64, Den: unumeral.NewInt(1)}
 				var untouched Algebraic
 				if e := c.SetRational(&untouched, &borrowed); !errors.Is(e, unumeral.ErrNumericPending) || untouched != (Algebraic{}) {
@@ -47,6 +59,7 @@ func TestAlgebraicCleanupPreservesOlderIntegerCopyReceipt(t *testing.T) {
 				}
 			}
 			serviceMust(t, z.CleanupCopyAllocationInvocation(&older))
+			serviceMust(t, c.Del(&input))
 			for i := range destinations {
 				serviceMust(t, z.Del(&destinations[i]))
 			}

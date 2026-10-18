@@ -38228,6 +38228,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/algebraic_to_rational.go",
+        "pkg/math/polynomial/algebraic_to_rational_test.go",
         "pkg/math/polynomial/algebraic_integer.go",
         "pkg/math/polynomial/algebraic_integer_test.go",
         "pkg/math/polynomial/algebraic_filter_roots.go",
@@ -38353,6 +38355,9 @@
         "pkg/math/polynomial/upolynomial_root_id_scope_test.go"
       ],
       "tests": [
+        "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
+        "TestAlgebraicToRationalEveryCopyReservationPrefix",
+        "TestAlgebraicToRationalRejectsIrrationalBeforeOutput",
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",
         "TestAlgebraicIntegerAddBasicZeroAndDestinationAlias",
         "TestAlgebraicFilterRootsConjugatesAndStableOrder",
@@ -38907,6 +38912,21 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Raw mpq to_rational overload always evaluates VERIFY(is_rational), then both basic assertions and NUM/DEN copy from the reached basic/zero value (cpp:235-241,337-341,2831-2833)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/algebraic_to_rational.go",
+          "tests": [
+            "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
+            "TestAlgebraicToRationalEveryCopyReservationPrefix",
+            "TestAlgebraicToRationalRejectsIrrationalBeforeOutput",
+            "TestAlgebraicCleanupPreservesOlderIntegerCopyReceipt"
+          ]
+        },
+        {
+          "name": "Global rational to_rational overload with scoped mpq and rational tmp2 lifetime (cpp:343-348,2835-2837), retained by arithmetic-plugin root numerals",
+          "status": "unported"
+        },
+        {
           "name": "algebraic_numbers.cpp:844-889,897-1084,1440-1563 concrete Add/Sub/Mul dispatch, factor/Sturm binary root selection, saved intervals, set_core zero handling and rational fallback; complete fault/callback and TRACE coverage remain open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_binary.go",
@@ -39128,6 +39148,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/algebraic_to_rational.go",
+        "pkg/math/polynomial/algebraic_to_rational_test.go",
         "pkg/math/polynomial/algebraic_integer.go",
         "pkg/math/polynomial/algebraic_integer_test.go",
         "pkg/math/polynomial/algebraic_filter_roots.go",
@@ -39233,6 +39255,9 @@
         "pkg/math/polynomial/algebraic_predicate_destructor_test.go"
       ],
       "tests": [
+        "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
+        "TestAlgebraicToRationalEveryCopyReservationPrefix",
+        "TestAlgebraicToRationalRejectsIrrationalBeforeOutput",
         "TestAlgebraicIntegerSetAndAdditionSourceOverloads",
         "TestAlgebraicIntegerAddBasicZeroAndDestinationAlias",
         "TestAlgebraicFilterRootsConjugatesAndStableOrder",
@@ -39404,6 +39429,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Raw mpq to_rational overload always evaluates VERIFY(is_rational), then both basic assertions and NUM/DEN copy from the reached basic/zero value (cpp:235-241,337-341,2831-2833)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/algebraic_to_rational.go",
+          "tests": [
+            "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
+            "TestAlgebraicToRationalEveryCopyReservationPrefix",
+            "TestAlgebraicToRationalRejectsIrrationalBeforeOutput",
+            "TestAlgebraicCleanupPreservesOlderIntegerCopyReceipt"
+          ]
+        },
+        {
+          "name": "Global rational to_rational overload with scoped mpq and rational tmp2 lifetime (cpp:343-348,2835-2837), retained by arithmetic-plugin root numerals",
+          "status": "unported"
+        },
         {
           "name": "algebraic_numbers.cpp:844-889,897-1084,1440-1563 concrete Add/Sub/Mul dispatch, factor/Sturm binary root selection, saved intervals, set_core zero handling and rational fallback; complete fault/callback and TRACE coverage remain open",
           "status": "partial",
