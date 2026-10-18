@@ -22,6 +22,10 @@ type polynomialFactorsCallbackState struct {
 	foreignScalar                         unumeral.Int
 	guardTarget                           *PolynomialFactors
 	guardSource, guardCleanup, guardClose error
+	mutate                                bool
+	mutationPolynomial                    Polynomial
+	push, setDegree, setConstant          error
+	mutationUnchanged                     bool
 }
 
 var polynomialFactorsCallback *polynomialFactorsCallbackState
@@ -38,6 +42,15 @@ func polynomialFactorsDeletionCopy(h *PolynomialDeletionHandler, m *Multivariate
 			s.guardSource = s.guardTarget.SourceFinalize()
 			s.guardCleanup = s.guardTarget.Cleanup()
 			s.guardClose = s.guardTarget.CloseChecked()
+			if s.mutate {
+				f := s.guardTarget
+				n, total, degree, constant, body := len(f.factors), f.total, f.degrees[1], f.constant, f.bodyCause
+				s.push = s.guardTarget.Push(s.mutationPolynomial, 9)
+				s.setDegree = s.guardTarget.SetDegree(1, 7)
+				value := unumeral.NewInt(23)
+				s.setConstant = s.guardTarget.SetConstant(&value)
+				s.mutationUnchanged = len(f.factors) == n && f.total == total && f.degrees[1] == degree && f.constant == constant && f.bodyCause == body
+			}
 		}
 		if s.foreignFactory {
 			m.integer.Budget().FailAfter(0)

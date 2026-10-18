@@ -44320,7 +44320,8 @@
             "TestPolynomialFactorsSourceDegreeQuirkAndWrap",
             "TestPolynomialFactorsSourceFinalizeAndClosedGuards",
             "TestPolynomialFactorsNativePushGrowthAndReferenceOwnership",
-            "TestPolynomialFactorsResetDeletionCannotReenterCaller"
+            "TestPolynomialFactorsResetDeletionCannotReenterCaller",
+            "TestPolynomialFactorsCleanupDeletionCannotMutateCaller"
           ],
           "go_targets": [
             "pkg/math/polynomial/polynomial_factors.go",
@@ -44329,7 +44330,8 @@
             "pkg/math/polynomial/polynomial_factors_lifetime_test.go"
           ],
           "notes": [
-            "Actual last-reference deletion callbacks reproduced index-out-of-range panics in both sourceReset and owning Cleanup when nested class lifetime operations emptied the active progress slice. Separate synchronous resetRunning and cleanupRunning spans now refuse source/owning lifecycle reentry before mutation. Persistent resetting/source-error state remains available after return for the existing owning continuation. The same concrete handler verifies Reset, SourceFinalize, Cleanup and CloseChecked outer calls: one actual deletion, all three nested lifetime calls refused, correct source versus owning completion flags, physical refunds and permitted later finalization. Display retains its separately tested source behavior; no universal class freeze or synthetic pending flags are introduced."
+            "Actual last-reference deletion callbacks reproduced index-out-of-range panics in both sourceReset and owning Cleanup when nested class lifetime operations emptied the active progress slice. Separate synchronous resetRunning and cleanupRunning spans now refuse source/owning lifecycle reentry before mutation. Persistent resetting/source-error state remains available after return for the existing owning continuation. The same concrete handler verifies Reset, SourceFinalize, Cleanup and CloseChecked outer calls: one actual deletion, all three nested lifetime calls refused, correct source versus owning completion flags, physical refunds and permitted later finalization. Display retains its separately tested source behavior; no universal class freeze or synthetic pending flags are introduced.",
+            "A real deletion callback during owning Cleanup also reproduced accepted Push and SetDegree calls whose newly published work was subsequently drained by the same cleanup. The common mutating open guard now refuses while cleanupRunning is active, before index/operand evaluation or factor/degree/constant/history publication. A two-factor regression verifies all three mutation APIs refuse, the actual callback snapshot of count/total/degree/constant/body cause stays unchanged, physical owners balance, and a subsequent ordinary Push/Reset succeeds after cleanup returns. The pre-existing source display callback behavior remains unchanged."
           ]
         },
         {
@@ -48299,7 +48301,8 @@
             "TestPolynomialFactorsSourceDegreeQuirkAndWrap",
             "TestPolynomialFactorsSourceFinalizeAndClosedGuards",
             "TestPolynomialFactorsNativePushGrowthAndReferenceOwnership",
-            "TestPolynomialFactorsResetDeletionCannotReenterCaller"
+            "TestPolynomialFactorsResetDeletionCannotReenterCaller",
+            "TestPolynomialFactorsCleanupDeletionCannotMutateCaller"
           ],
           "go_targets": [
             "pkg/math/polynomial/polynomial_factors.go",
@@ -48308,7 +48311,8 @@
             "pkg/math/polynomial/polynomial_factors_lifetime_test.go"
           ],
           "notes": [
-            "Actual last-reference deletion callbacks reproduced index-out-of-range panics in both sourceReset and owning Cleanup when nested class lifetime operations emptied the active progress slice. Separate synchronous resetRunning and cleanupRunning spans now refuse source/owning lifecycle reentry before mutation. Persistent resetting/source-error state remains available after return for the existing owning continuation. The same concrete handler verifies Reset, SourceFinalize, Cleanup and CloseChecked outer calls: one actual deletion, all three nested lifetime calls refused, correct source versus owning completion flags, physical refunds and permitted later finalization. Display retains its separately tested source behavior; no universal class freeze or synthetic pending flags are introduced."
+            "Actual last-reference deletion callbacks reproduced index-out-of-range panics in both sourceReset and owning Cleanup when nested class lifetime operations emptied the active progress slice. Separate synchronous resetRunning and cleanupRunning spans now refuse source/owning lifecycle reentry before mutation. Persistent resetting/source-error state remains available after return for the existing owning continuation. The same concrete handler verifies Reset, SourceFinalize, Cleanup and CloseChecked outer calls: one actual deletion, all three nested lifetime calls refused, correct source versus owning completion flags, physical refunds and permitted later finalization. Display retains its separately tested source behavior; no universal class freeze or synthetic pending flags are introduced.",
+            "A real deletion callback during owning Cleanup also reproduced accepted Push and SetDegree calls whose newly published work was subsequently drained by the same cleanup. The common mutating open guard now refuses while cleanupRunning is active, before index/operand evaluation or factor/degree/constant/history publication. A two-factor regression verifies all three mutation APIs refuse, the actual callback snapshot of count/total/degree/constant/body cause stays unchanged, physical owners balance, and a subsequent ordinary Push/Reset succeeds after cleanup returns. The pre-existing source display callback behavior remains unchanged."
           ]
         },
         {

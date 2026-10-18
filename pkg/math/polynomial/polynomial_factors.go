@@ -106,7 +106,7 @@ func (f *PolynomialFactors) open() error {
 	if e := f.ready(); e != nil {
 		return e
 	}
-	if f.memberSet.active || f.constantInvocation.active || f.sourceCause != nil || f.resetting || f.multiplyActive || f.localActive || f.numeric.PendingObject() != (umemory.ObjectRef{}) || f.numeric.PendingAllocatorBlocks() != ([3]umemory.Block{}) {
+	if f.cleanupRunning || f.memberSet.active || f.constantInvocation.active || f.sourceCause != nil || f.resetting || f.multiplyActive || f.localActive || f.numeric.PendingObject() != (umemory.ObjectRef{}) || f.numeric.PendingAllocatorBlocks() != ([3]umemory.Block{}) {
 		return ErrPolynomialPending
 	}
 	if frame := f.displayReceipt; frame != nil && frame.generation == f.displayGeneration && frame.active && frame.sink == nil {

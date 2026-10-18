@@ -117,3 +117,41 @@ func TestPolynomialFactorsResetDeletionCannotReenterCaller(t *testing.T) {
 		})
 	}
 }
+
+func TestPolynomialFactorsCleanupDeletionCannotMutateCaller(t *testing.T) {
+	m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{1, 0, 0}}, {1, [3]uint32{}}})
+	value := unumeral.NewInt(17)
+	q, e := m.core.MkConstantTake(&value)
+	serviceMust(t, e)
+	f, e := NewPolynomialFactors(m)
+	serviceMust(t, e)
+	serviceMust(t, f.Push(q, 2))
+	serviceMust(t, f.Push(p, 3))
+	state := &polynomialFactorsCallbackState{target: q, guardTarget: f, mutate: true, mutationPolynomial: p}
+	polynomialFactorsCallback = state
+	h, e := NewPolynomialDeletionHandler(m.core.integer.Budget(), polynomialFactorsDeletionCopy)
+	serviceMust(t, e)
+	serviceMust(t, m.core.AddDeletionHandler(h))
+	t.Cleanup(func() {
+		polynomialFactorsCallback = nil
+		serviceMust(t, f.CloseChecked())
+		serviceMust(t, m.core.RemoveDeletionHandler(h))
+		serviceMust(t, h.CloseChecked())
+	})
+	serviceMust(t, f.Cleanup())
+	if state.calls != 1 {
+		t.Fatal("actual cleanup deletion callback not reached exactly once", state.calls)
+	}
+	for _, e := range []error{state.push, state.setDegree, state.setConstant} {
+		if !errors.Is(e, ErrPolynomialPending) {
+			t.Fatal("owning cleanup accepted new factors work from its deletion callback", state.push, state.setDegree, state.setConstant)
+		}
+	}
+	if !state.mutationUnchanged {
+		t.Fatal("refused callback published a factor/degree/constant or foreign cause")
+	}
+	polynomialFactorsAuditExtra(t, f, []Polynomial{p}, []*unumeral.Int{&state.source, &state.foreign}, h.header)
+	// Retiring the synchronous cleanup span must permit the next source call.
+	serviceMust(t, f.Push(p, 1))
+	serviceMust(t, f.Reset())
+}
