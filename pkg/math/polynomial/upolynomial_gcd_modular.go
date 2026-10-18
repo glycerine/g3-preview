@@ -314,8 +314,8 @@ func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, o
 			}
 		}
 	}
-	var local [6]unumeral.Int
-	values := &local
+	values := &m.modGCDScalars.values
+
 	var frame *upolyFactorModularGCDScope
 	if owner := context.factorFrontendFrame(m.config.Integer); owner != nil {
 		frame = &owner.modularGCD
@@ -326,12 +326,13 @@ func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, o
 		values = &frame.values
 		defer func() { frame.executing = false; cause = frame.finish(cause) }()
 	} else {
-		defer func() {
-			for i := 5; i >= 0; i-- {
-				m.modular.Del(&local[i])
-			}
-		}()
+		if m.modGCDScalars.ownRemaining != 0 || m.modGCDScalars.executing {
+			return ErrUPolynomialCleanupPending
+		}
+		m.modGCDScalars = upolyModGCDTraceScalars{constructed: 2, executing: true}
+		defer func() { cause = m.modGCDScalars.finish(m, cause); m.modGCDScalars.executing = false }()
 	}
+
 	cu, cv, cg, lcg, p, bound := &values[0], &values[1], &values[2], &values[3], &values[4], &values[5]
 	u, v, q, C := &m.mgcd[0], &m.mgcd[1], &m.mgcd[4], &m.mgcd[5]
 	if e := m.primitiveStateWithSourceContext(a, u, cu, context); e != nil {
@@ -342,6 +343,8 @@ func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, o
 	}
 	if frame != nil {
 		frame.constructed = 3
+	} else {
+		m.modGCDScalars.constructed = 3
 	}
 	if e := m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Gcd(cu, cv, cg); e != nil {
 		return e
@@ -357,12 +360,16 @@ func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, o
 	}
 	if frame != nil {
 		frame.constructed = 4
+	} else {
+		m.modGCDScalars.constructed = 4
 	}
 	if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Gcd(lu, lv, lcg); e != nil {
 		return e
 	}
 	if frame != nil {
 		frame.constructed = 6
+	} else {
+		m.modGCDScalars.constructed = 6
 	}
 	for i, prime := range upolyBigPrimes {
 		if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).SetUint32(p, prime); e != nil {
@@ -377,6 +384,9 @@ func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, o
 		}
 		if bad {
 			continue
+		}
+		if e = m.traceModGCDPolynomial(772, "new q:\n", m.stateView(q), context); e != nil {
+			return e
 		}
 		if e = m.trim(q); e != nil {
 			return e
@@ -426,8 +436,14 @@ func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, o
 			if e = m.combineImagesWithSourceContext(q, p, C, bound, context); e != nil {
 				return e
 			}
+			if e = m.traceModGCDPolynomial(792, "new combined:\n", m.stateView(C), context); e != nil {
+				return e
+			}
 		}
 		if e = m.primitiveWithSourceContext(m.stateView(C), q, context); e != nil {
+			return e
+		}
+		if e = m.traceModGCDPolynomial(796, "candidate:\n", m.stateView(q), context); e != nil {
 			return e
 		}
 		enabled, e := refinementSourceAssertionsEnabled()
@@ -470,7 +486,7 @@ func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, o
 				return e
 			}
 			*q, *out = *out, *q
-			return nil
+			return m.traceModGCDPolynomial(806, "r: ", m.stateView(out), context)
 		}
 	}
 	return m.euclidGCDWithSourceContext(a, b, out, context)

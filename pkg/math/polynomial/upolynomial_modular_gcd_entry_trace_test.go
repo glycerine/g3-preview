@@ -57,7 +57,7 @@ func TestUPolynomialModularGCDEntryDisplayReceipt(t *testing.T) {
 				t.Skip("source trace erased")
 			}
 			e := m.GCD(a, b, g)
-			receipt := m.modGCDEntryTrace
+			receipt := m.modGCDTrace
 			if !errors.Is(e, arena.ErrSlotLimit) || !w.armed || !m.displayReceiptPending(&receipt) {
 				t.Fatal("actual entry display stop", e)
 			}
@@ -74,7 +74,7 @@ func TestUPolynomialModularGCDEntryDisplayReceipt(t *testing.T) {
 				t.Fatal("source finalization crossed display")
 			}
 			serviceMust(t, m.CleanupModularGCDEntryTrace())
-			if m.pendingModGCDEntryTrace != nil || m.displayReceiptPending(&receipt) {
+			if m.pendingModGCDTrace != nil || m.displayReceiptPending(&receipt) {
 				t.Fatal("accepted entry receipt survived owning cleanup")
 			}
 			upolyGCDExpect(t, m, g, []int64{99})
@@ -147,20 +147,20 @@ func TestUPolynomialModularGCDEntryRetainsActualFactorFrontend(t *testing.T) {
 	}
 	_, body := s.Factor(mustUPolyView(t, m, a), fs, DefaultUPolynomialFactorParams())
 	frame := &s.frontend
-	if !errors.Is(body, arena.ErrSlotLimit) || !w.captured || !w.armed || !frame.active || !m.displayReceiptPending(&frame.modGCDEntryTrace) || frame.constructed != w.constructed || frame.sourceIndex != w.sourceIndex || [5]upolyVectorState{frame.pp, frame.prime, frame.A, frame.B, frame.D} != w.vectors {
+	if !errors.Is(body, arena.ErrSlotLimit) || !w.captured || !w.armed || !frame.active || !m.displayReceiptPending(&frame.modGCDTrace) || frame.constructed != w.constructed || frame.sourceIndex != w.sourceIndex || [5]upolyVectorState{frame.pp, frame.prime, frame.A, frame.B, frame.D} != w.vectors {
 		t.Fatal("real frontend source suffix crossed entry trace child", body, frame.constructed, w.constructed)
 	}
-	if frame.history.modGCDEntryTrace != frame.modGCDEntryTrace || frame.sourceCause == nil {
+	if frame.history.modGCDTrace != frame.modGCDTrace || frame.sourceCause == nil {
 		t.Fatal("accepted frontend trace/history lost")
 	}
 	originalSource, originalBody := frame.sourceCause, frame.bodyCause
 	// The public default kernel cleanup has no authority over this caller slot.
 	serviceMust(t, m.CleanupModularGCDEntryTrace())
-	if !m.displayReceiptPending(&frame.modGCDEntryTrace) {
+	if !m.displayReceiptPending(&frame.modGCDTrace) {
 		t.Fatal("default entry cleanup adopted frontend trace")
 	}
 	serviceMust(t, s.CleanupRetained())
-	if frame.active || m.displayReceiptPending(&frame.modGCDEntryTrace) || frame.sourceCause != originalSource || frame.bodyCause != originalBody {
+	if frame.active || m.displayReceiptPending(&frame.modGCDTrace) || frame.sourceCause != originalSource || frame.bodyCause != originalBody {
 		t.Fatal("entry owning frontend cleanup lost source history")
 	}
 }

@@ -11,15 +11,16 @@ import (
 
 func TestUPolynomialModularGCDLiteralTrace(t *testing.T) {
 	for _, f := range []struct {
-		a, b  []int32
-		want  []int64
-		lines []int
+		a, b           []int32
+		want           []int64
+		lines          []int
+		displayRecords int
 	}{
-		{[]int32{1, 1}, []int32{2, 1}, []int64{1}, []int{752, 774}},
-		{[]int32{-200000, -99998, 1}, []int32{-300000, -99997, 1}, []int64{-100000, 1}, []int{752, 752, 802}},
-		{[]int32{-2, 1, 1}, []int32{-39105, 39104, 1}, []int64{-1, 1}, []int{752, 752, 786, 802}},
-		{[]int32{-2, 78205, 39103}, []int32{-3, 117308, 39103}, []int64{-1, 39103}, []int{752, 758, 752, 786, 752, 802}},
-		{[]int32{-1, 0, 1}, []int32{-2, -39101, 39103}, []int64{-1, 1}, []int{752, 762, 752, 786, 802}},
+		{[]int32{1, 1}, []int32{2, 1}, []int64{1}, []int{752, 774}, 1},
+		{[]int32{-200000, -99998, 1}, []int32{-300000, -99997, 1}, []int64{-100000, 1}, []int{752, 752, 802}, 6},
+		{[]int32{-2, 1, 1}, []int32{-39105, 39104, 1}, []int64{-1, 1}, []int{752, 752, 786, 802}, 5},
+		{[]int32{-2, 78205, 39103}, []int32{-3, 117308, 39103}, []int64{-1, 39103}, []int{752, 758, 752, 786, 752, 802}, 6},
+		{[]int32{-1, 0, 1}, []int32{-2, -39101, 39103}, []int64{-1, 1}, []int{752, 762, 752, 786, 802}, 3},
 	} {
 		for _, refused := range []bool{false, true} {
 			t.Run(fmt.Sprint(f.lines, refused), func(t *testing.T) {
@@ -43,7 +44,7 @@ func TestUPolynomialModularGCDLiteralTrace(t *testing.T) {
 					return
 				}
 				if refused {
-					if bad.calls != 1 || bad.flushes != len(f.lines)+1 {
+					if bad.calls != 1 || bad.flushes != len(f.lines)+1+f.displayRecords {
 						t.Fatal("sticky writes/footer flushes", bad.calls, bad.flushes, f.lines)
 					}
 					return
@@ -70,6 +71,21 @@ func TestUPolynomialModularGCDLiteralTrace(t *testing.T) {
 					t.Fatal("missing entry record", text.String())
 				}
 				got := text.String()[entryEnd+len("------------------------------------------------\n"):]
+				for _, line := range []int{772, 792, 796, 806} {
+					prefix := fmt.Sprintf("-------- [mgcd] mod_gcd src/math/polynomial/upolynomial.cpp:%d ---------\n", line)
+					for {
+						a := strings.Index(got, prefix)
+						if a < 0 {
+							break
+						}
+						b := strings.Index(got[a:], "------------------------------------------------\n")
+						if b < 0 {
+							t.Fatal("unterminated display", got)
+						}
+						got = got[:a] + got[a+b+len("------------------------------------------------\n"):]
+					}
+				}
+
 				if got != want.String() {
 					t.Fatalf("records:\n%s\nwant:\n%s", text.String(), want.String())
 				}

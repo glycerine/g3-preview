@@ -85,8 +85,9 @@ type UPolynomialManager struct {
 	craTrace                     upolyCRATrace
 	craValues                    [12]unumeral.Int
 	pendingCRATrace              *upolyCRATrace
-	modGCDEntryTrace             upolyDisplayInvocationReceipt
-	pendingModGCDEntryTrace      *upolyDisplayInvocationReceipt
+	modGCDScalars                upolyModGCDTraceScalars
+	modGCDTrace                  upolyDisplayInvocationReceipt
+	pendingModGCDTrace           *upolyDisplayInvocationReceipt
 	exactDivTrace                upolyDisplayInvocationReceipt
 	pendingExactDivTrace         *upolyDisplayInvocationReceipt
 	origin                       uint64
@@ -159,7 +160,13 @@ func newUPolynomialManager(c UPolynomialConfig, store *UPolynomialCoefficientSto
 	return m, nil
 }
 func (m *UPolynomialManager) check() error {
-	if m != nil && m.self == m && m.pendingModGCDEntryTrace != nil && m.displayReceiptPending(m.pendingModGCDEntryTrace) && !m.pendingModGCDEntryTrace.frame.executing {
+	if m != nil && m.self == m && m.modGCDScalars.executing && (m.callbackDepth != 0 || m.config.Integer.RuntimeOwner().FailureTransportActive() || m.config.Integer.BorrowTraceTags().OutputCallbackActive()) {
+		return ErrUPolynomialCleanupPending
+	}
+	if m != nil && m.modGCDScalars.ownRemaining != 0 && !m.modGCDScalars.executing {
+		return ErrUPolynomialCleanupPending
+	}
+	if m != nil && m.self == m && m.pendingModGCDTrace != nil && m.displayReceiptPending(m.pendingModGCDTrace) && !m.pendingModGCDTrace.frame.executing {
 		return ErrUPolynomialCleanupPending
 	}
 	if m != nil && m.pendingCRATrace != nil && m.pendingCRATrace.pending() && !m.pendingCRATrace.executing && !m.pendingCRATrace.sourceReadAllowed() {
@@ -336,6 +343,14 @@ func (m *UPolynomialManager) closeWithHenselOwners(r *upolyHenselPairInvocationR
 	return m.closeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
+	if m != nil && m.modGCDScalars.executing {
+		return ErrUPolynomialCleanupPending
+	}
+	if m != nil && m.modGCDScalars.ownRemaining != 0 {
+		if e := m.CleanupModularGCDTrace(); e != nil {
+			return e
+		}
+	}
 	if m != nil && m.craTrace.executing {
 		return ErrUPolynomialCleanupPending
 	}

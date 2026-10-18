@@ -50792,7 +50792,9 @@
         "pkg/math/polynomial/upolynomial_euclid_pointer_trace.go",
         "pkg/math/polynomial/upolynomial_euclid_pointer_trace_test.go",
         "pkg/math/polynomial/upolynomial_modular_gcd_entry_trace.go",
-        "pkg/math/polynomial/upolynomial_modular_gcd_entry_trace_test.go"
+        "pkg/math/polynomial/upolynomial_modular_gcd_entry_trace_test.go",
+        "pkg/math/polynomial/upolynomial_modular_gcd_trace_scalars.go",
+        "pkg/math/polynomial/upolynomial_modular_gcd_display_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51075,7 +51077,10 @@
         "TestUPolynomialModularGCDPrimeTableSmallInsertion",
         "TestUPolynomialModularGCDEntryDisplay",
         "TestUPolynomialModularGCDEntryDisplayReceipt",
-        "TestUPolynomialModularGCDEntryRetainsActualFactorFrontend"
+        "TestUPolynomialModularGCDEntryRetainsActualFactorFrontend",
+        "TestUPolynomialModularGCDLaterDisplayReceipts",
+        "TestUPolynomialModularGCDLaterDisplayRecords",
+        "TestUPolynomialModularGCDLaterDisplayRetainsFactorFrontend"
       ],
       "conditionals": [
         {
@@ -51664,6 +51669,28 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Modular GCD image/combined/candidate/result displays and lexical NUM stop (upolynomial.cpp:772,792,796,806)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_modular_gcd_entry_trace.go",
+            "pkg/math/polynomial/upolynomial_modular_gcd_trace_scalars.go",
+            "pkg/math/polynomial/upolynomial_modular_gcd_display_trace_test.go",
+            "pkg/math/polynomial/upolynomial_gcd_modular.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/upolynomial_factor_frontend_invocation.go",
+            "pkg/math/polynomial/upolynomial_exact_div_loop_trace.go"
+          ],
+          "tests": [
+            "TestUPolynomialModularGCDLaterDisplayReceipts",
+            "TestUPolynomialModularGCDLaterDisplayRecords",
+            "TestUPolynomialModularGCDLaterDisplayRetainsFactorFrontend",
+            "TestUPolynomialModularGCDLiteralTrace",
+            "TestUPolynomialGCDAndDivisionWarmPhysicalPlateau"
+          ],
+          "notes": "Actual display_star at all four later source records, including image before constant check, combined only after CRA, candidate before assertion/divisibility and result after final swap. A single exact accepted receipt per actual default/frontend caller replaces only completed prior displays. Default lexical NUM backing is reusable concrete storage; actual declaration frontiers2,3,4,6 and separate source/own destruction cursors retain older NUMs on display/younger numerical stops, with original error identity when no source failure. Frontend source suffix stops at its display before six NUMs; owning cleanup finishes its exact receipt before older objects. Actual descriptor-quota failures exercise combined/candidate/result BIG formatting for default and combined/candidate via public Factor. Output publication frontier and preserved source history verified. Exact small-image/reconstruction text, multi-prime record counts and sticky output failure checked. Broader polynomial/source-lifetime audits remain partial."
+        },
         {
           "name": "Modular GCD entry polynomial displays and exact caller receipt (upolynomial.cpp:726)",
           "status": "ported",
