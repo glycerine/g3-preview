@@ -193,6 +193,11 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	// Display retains cell/coefficients across borrowed stream callbacks.
+	// Public reentry must not delete or replace those inputs mid-format.
+	if m != nil && m.self == m && m.rootDisplay.running {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.toOwnedRational.active && !m.toOwnedRational.running {
 		return errors.Join(ErrAlgebraicPending, m.toOwnedRational.sourceCause)
 	}

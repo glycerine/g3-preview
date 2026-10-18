@@ -44068,3 +44068,19 @@ No source cell constructor completion is claimed by the raw-prefix fixture.
 Focused defining-polynomial/representation/owning-bound/conversion suites pass
 ordinary (0.361s) and checked/debug/trace (0.104s), on CPUs8–16. Broader source
 unit and polynomial then AST completion remain open; no full-suite rerun.
+
+Reproduced and fixed a concrete algebraic display callback lifetime bug: during
+a real first-insertion stream callback, Del of the displayed root previously
+succeeded, freeing a cell whose polynomial/interval display work was still
+executing. Existing Close/Cleanup guards covered rootDisplay.running, but
+ordinary core access did not. The core now rejects public reentry during that
+same actual running span, preserving the borrowed cell/coefficient lifetime.
+No source counters or replacement source algorithm were introduced.
+
+Regression coverage invokes Del, explicit CleanupValue, Swap and Copy from
+actual stream callbacks in root, SMT2 and Mathematica displays; all refuse
+before changing input identities, and each display completes the exact original
+text. Broader root/display/comparison/predicate/conversion/owning-bound checks
+pass ordinary (0.409s) and checked/debug/trace (0.126s), on CPUs8–16. The new
+manifest method stays partial for the wider display suffix/assertion/stream
+audit. Full polynomial then AST completion remains active; no full-suite rerun.
