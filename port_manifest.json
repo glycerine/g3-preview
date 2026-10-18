@@ -48953,7 +48953,9 @@
         "pkg/math/polynomial/upolynomial_root_id_normalize_trace.go",
         "pkg/math/polynomial/upolynomial_root_id_normalize_trace_test.go",
         "pkg/math/polynomial/upolynomial_remainder_assertions.go",
-        "pkg/math/polynomial/upolynomial_remainder_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_remainder_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_root_id_remainder_trace.go",
+        "pkg/math/polynomial/upolynomial_root_id_remainder_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",

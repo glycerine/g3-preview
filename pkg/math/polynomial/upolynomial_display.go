@@ -11,10 +11,16 @@ import (
 
 // Output is a call-local borrowed stream. It never stores an assembled decimal
 // string; BIG insertion uses the existing exact lexical numeric stream engine.
-func (m *UPolynomialManager) DisplayInto(p UPolynomialView, out unumeral.RationalSourceStream, variable string, star bool) (cause error) {
+func (m *UPolynomialManager) DisplayInto(p UPolynomialView, out unumeral.RationalSourceStream, variable string, star bool) error {
+	return m.displayIntoWithReceipt(p, out, variable, star, nil)
+}
+func (m *UPolynomialManager) displayIntoWithReceipt(p UPolynomialView, out unumeral.RationalSourceStream, variable string, star bool, receipt *upolyDisplayInvocationReceipt) (cause error) {
 	q, e := m.beginDisplay(false)
 	if e != nil {
 		return e
+	}
+	if receipt != nil {
+		*receipt = upolyDisplayInvocationReceipt{m, q, q.invocation}
 	}
 	defer func() { q.executing = false; cause = q.finish(cause); q.endCall() }()
 	if out == nil {

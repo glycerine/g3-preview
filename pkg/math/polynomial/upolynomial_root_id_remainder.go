@@ -71,6 +71,9 @@ func (q *upolyRootIDScope) finishRemainderScalar(cause error) error {
 		s.bodyCause = cause
 	}
 	if s.childStop == nil {
+		s.childStop = q.remainderTraceSourceCause()
+	}
+	if s.childStop == nil {
 		s.childStop = z.AddMulInvocationSourceCause(&s.addMul)
 	}
 	for i := len(q.raw) - 1; i >= 0 && s.childStop == nil; i-- {
@@ -103,6 +106,9 @@ func (q *upolyRootIDScope) cleanupRemainderNumerics() error {
 	if e := q.cleanupNormalization(); e != nil {
 		return e
 	}
+	if e := q.cleanupRemainderTrace(false); e != nil {
+		return e
+	}
 	s := &q.scalar
 	if e := z.CleanupAddMulInvocation(&s.addMul, false); e != nil {
 		return e
@@ -119,6 +125,9 @@ func (q *upolyRootIDScope) cleanupRemainderNumerics() error {
 		}
 		s.ownCursor = 1
 		s.constructed = false
+	}
+	if e := q.cleanupRemainderTrace(true); e != nil {
+		return e
 	}
 	for i := len(q.raw) - 1; i >= 0; i-- {
 		if e := z.CleanupRawInvocation(&q.raw[i], true); e != nil {

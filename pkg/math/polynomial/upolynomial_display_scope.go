@@ -312,3 +312,30 @@ func (q *upolyDisplayScope) NumericCharacterValid(n *unumeral.NaturalManager, ex
 	return !executing || q.executing && q.owner.currentDisplay == q && q.owner.callbackDepth == 0
 }
 func (q *upolyDisplayScope) NumericCharacterPrepare() error { return q.prepareStorage() }
+
+// Ownership is granted only by an accepted beginDisplay, including the exact
+// frame used when an older independently retained display already exists.
+type upolyDisplayInvocationReceipt struct {
+	owner      *UPolynomialManager
+	frame      *upolyDisplayScope
+	invocation uint64
+}
+
+func (m *UPolynomialManager) matchesDisplayReceipt(r *upolyDisplayInvocationReceipt) bool {
+	return m != nil && m.self == m && r != nil && r.owner == m && r.frame != nil && r.frame.owner == m && r.invocation != 0 && r.invocation == r.frame.invocation && r.frame.actual()
+}
+func (m *UPolynomialManager) displayReceiptPending(r *upolyDisplayInvocationReceipt) bool {
+	return m.matchesDisplayReceipt(r) && r.frame.active
+}
+func (m *UPolynomialManager) displayReceiptSourceCause(r *upolyDisplayInvocationReceipt) error {
+	if m.matchesDisplayReceipt(r) {
+		return r.frame.sourceCause
+	}
+	return nil
+}
+func (m *UPolynomialManager) cleanupDisplayReceipt(r *upolyDisplayInvocationReceipt) error {
+	if !m.matchesDisplayReceipt(r) {
+		return nil
+	}
+	return m.cleanupDisplayFrame(r.frame)
+}

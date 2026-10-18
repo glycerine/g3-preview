@@ -63,8 +63,16 @@ func (m *UPolynomialManager) remStateWithSourceContext(a, b UPolynomialView, d *
 		if e = m.checkpoint(); e != nil {
 			return e
 		}
+		if q := context.rootIDFrame(m.config.Integer); q != nil {
+			if e = q.traceRemainder(0, b, r, bn); e != nil {
+				return e
+			}
+		}
 		n := r.size
 		if n < b.count {
+			if q := context.rootIDFrame(m.config.Integer); q != nil {
+				return q.traceRemainder(1, b, r, bn)
+			}
 			return nil
 		}
 		delta := n - b.count
@@ -89,6 +97,11 @@ func (m *UPolynomialManager) remStateWithSourceContext(a, b UPolynomialView, d *
 			}
 			if e != nil {
 				return e
+			}
+			if q := context.rootIDFrame(m.config.Integer); q != nil {
+				if e = q.traceRemainder(2, b, r, bn); e != nil {
+					return e
+				}
 			}
 			for i := uint32(0); i < n-1; i++ {
 				bn, e = m.read(b, b.count-1)
