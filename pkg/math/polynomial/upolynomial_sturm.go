@@ -16,50 +16,6 @@ func (m *UPolynomialManager) sequenceOutput(s *UPolynomialSequence) error {
 	}
 	return nil
 }
-func (m *UPolynomialManager) sturmSequenceCore(s *upolySequenceState) error {
-	var r upolyVectorState
-	defer m.dropLocalVector(&r)
-	for {
-		n := uint32(len(s.sizes))
-		a, e := m.sequenceRow(s, n-2)
-		if e != nil {
-			return e
-		}
-		b, e := m.sequenceRow(s, n-1)
-		if e != nil {
-			return e
-		}
-		if e = m.signedRemState(a, b, &r); e != nil {
-			return e
-		}
-		if r.size == 0 {
-			return nil
-		}
-		if e = m.normalize(m.stateView(&r)); e != nil {
-			return e
-		}
-		if e = m.sequencePush(s, m.stateView(&r), true); e != nil {
-			return e
-		}
-	}
-}
-func (m *UPolynomialManager) sturmUnary(p UPolynomialView, s *upolySequenceState) error {
-	if e := m.sequenceReset(s); e != nil {
-		return e
-	}
-	var prime upolyVectorState
-	defer m.dropLocalVector(&prime)
-	if e := m.sequencePush(s, p, false); e != nil {
-		return e
-	}
-	if e := m.derivativeState(p, &prime); e != nil {
-		return e
-	}
-	if e := m.sequencePush(s, m.stateView(&prime), true); e != nil {
-		return e
-	}
-	return m.sturmSequenceCore(s)
-}
 func (m *UPolynomialManager) SturmSequence(p UPolynomialView, s *UPolynomialSequence) error {
 	if e := m.sequenceOutput(s); e != nil {
 		return e

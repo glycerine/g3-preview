@@ -563,13 +563,19 @@ func (m *UPolynomialManager) KnuthPositiveRootUpperBound(v UPolynomialView) (uin
 	}
 	return maximum + 1, nil
 }
-func (m *UPolynomialManager) KnuthNegativeRootUpperBound(v UPolynomialView) (bound uint32, cause error) {
+func (m *UPolynomialManager) KnuthNegativeRootUpperBound(v UPolynomialView) (uint32, error) {
+	return m.knuthNegativeRootUpperBoundWithReceipt(v, nil)
+}
+func (m *UPolynomialManager) knuthNegativeRootUpperBoundWithReceipt(v UPolynomialView, receipt *upolyKnuthInvocationReceipt) (bound uint32, cause error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
 	q, e := m.beginKnuth(v, 1)
 	if e != nil {
 		return 0, e
+	}
+	if receipt != nil {
+		*receipt = m.knuthReceipt()
 	}
 	z := m.config.Integer
 	old, oldN := knuthCaller(z), knuthCaller(z.Naturals())

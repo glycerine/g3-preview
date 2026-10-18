@@ -10,6 +10,19 @@ func numericIntegerModularManager_upolynomialCallerExecuting(m *unumeral.Integer
 		return false
 	}
 	z := m.Integers()
+	for binding := z.CallerBindings(); binding != nil; binding = binding.Previous() {
+		switch binding.Kind() {
+		case 17:
+			if q, ok := binding.Guard().(*upolySequenceSturmScope); ok && q.NumericExecuting() && q.owner.manager.modular == m {
+				return true
+			}
+		case 18:
+			if q, ok := binding.Guard().(*upolySturmIsolationScope); ok && q.NumericExecuting() && q.owner.modular == m {
+				return true
+			}
+		}
+	}
+
 	if p := oneHalfRootCaller(z); p != nil && p.config.Integer == z && p.modular == m && p.oneHalfRootExecuting() {
 		return true
 	}

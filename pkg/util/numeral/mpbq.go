@@ -194,6 +194,13 @@ func (m *BinaryRationalManager) CloseChecked() error {
 	if m == nil || m.self != m {
 		return ErrBinaryOwner
 	}
+	for binding := m.Z.CallerBindings(); binding != nil; binding = binding.Previous() {
+		if guard, ok := binding.Guard().(interface {
+			NumericBinaryExecuting(*BinaryRationalManager) bool
+		}); ok && guard.NumericBinaryExecuting(m) {
+			return ErrNumericPending
+		}
+	}
 	if m.selectIntExecuting || m.selectRationalExecuting {
 		return ErrBinarySelectPending
 	}

@@ -314,6 +314,7 @@ func TestUPolynomialIsolationBoundedFaultAndCancelImmediateGraph(t *testing.T) {
 
 				upolyHenselAuditPhysical(t, []*UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{BinaryManagers: []*unumeral.BinaryRationalManager{b}, BinaryVectors: []*BinaryRationalVector{r, l, u}})
 				budget.FailAfter(-1)
+				serviceMust(t, m.CleanupSturmIsolation())
 				if e != nil {
 					failures++
 					if !numericStorageReservationRefusal(e) {
