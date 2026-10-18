@@ -7,11 +7,13 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 
+	ucmdexception "github.com/glycerine/g3/pkg/util/cmdexception"
 	"github.com/glycerine/g3/pkg/util/control"
 	"github.com/glycerine/g3/pkg/util/cooperate"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usexpr "github.com/glycerine/g3/pkg/util/sexpr"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
+	"github.com/glycerine/g3/pkg/util/z3exception"
 )
 
 func sxPolyOwner(t *testing.T) (*SexprPolynomialConverter, *usexpr.SexprManager, *usymbol.Manager, *unumeral.RationalService, *UPolynomialManager, UPolynomial) {
@@ -121,6 +123,23 @@ func TestSexprPolynomialErrorsAndCompletedPrefix(t *testing.T) {
 	for _, a := range cases {
 		sxMust(t, p.SetInts(out, []unumeral.Int{unumeral.NewInt(41)}))
 		err := c.Convert(a.h, out)
+		var source z3exception.Z3Exception
+		if !errors.As(err, &source) || source.Message() != a.message || source.HasErrorCode() {
+			t.Fatal("polynomial exception lost source base classification", err)
+		}
+		var command ucmdexception.CmdException
+		if !errors.As(err, &command) || !command.HasPos() {
+			t.Fatal("polynomial exception lost command base", err)
+		}
+		line, le := command.Line()
+		pos, pe := command.Pos()
+		if le != nil || pe != nil || line != a.line || pos != a.pos {
+			t.Fatal("command base location changed", line, pos, le, pe)
+		}
+		var base z3exception.DefaultException
+		if !errors.As(err, &base) || base.Error() != a.message {
+			t.Fatal("polynomial exception lost default base", err)
+		}
 		var e *SexprPolynomialError
 		if !errors.As(err, &e) || e.Message != a.message || e.Line != a.line || e.Pos != a.pos {
 			t.Fatal(err, a)

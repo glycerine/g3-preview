@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/math/polynomial"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 	"github.com/glycerine/g3/pkg/util/z3exception"
 )
@@ -128,5 +129,19 @@ func TestCmdExceptionIndependentByteDomainsAndOwnerAccounting(t *testing.T) {
 		if b.Used() != 0 {
 			t.Fatal(b.Used())
 		}
+	}
+}
+
+func TestCmdExceptionPolynomialDerivedCatchCompatibility(t *testing.T) {
+	var err error = &polynomial.SexprPolynomialError{Message: "invalid polynomial", Line: 23, Pos: 29}
+	var command CmdException
+	var base z3exception.DefaultException
+	if !errors.As(err, &command) || !errors.As(err, &base) {
+		t.Fatal("polynomial error no longer catches as source command/default exception", err)
+	}
+	line, le := command.Line()
+	pos, pe := command.Pos()
+	if le != nil || pe != nil || line != 23 || pos != 29 || base.Error() != err.Error() {
+		t.Fatal("derived exception lost source payload", line, pos, le, pe)
 	}
 }

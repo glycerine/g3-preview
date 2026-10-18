@@ -7,6 +7,7 @@ import (
 
 	"github.com/glycerine/g3/pkg/arena"
 
+	ucmdexception "github.com/glycerine/g3/pkg/util/cmdexception"
 	usexpr "github.com/glycerine/g3/pkg/util/sexpr"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -17,6 +18,12 @@ type SexprPolynomialError struct {
 }
 
 func (e *SexprPolynomialError) Error() string { return e.Message }
+
+// The source converter exception derives from cmd_exception. Keep its public
+// Go location fields while exposing the same base class to errors.As callers.
+func (e *SexprPolynomialError) Unwrap() error {
+	return ucmdexception.NewCmdExceptionAt(e.Message, e.Line, e.Pos)
+}
 
 var ErrSexprPolynomialPending = errors.New("g3: polynomial conversion cleanup pending")
 

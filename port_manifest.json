@@ -49265,6 +49265,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/util/cmdexception/cmd_exception.go",
+        "pkg/smtcore/util_cmd_exception.go",
         "pkg/math/polynomial/sexpr_upolynomial.go",
         "pkg/math/polynomial/sexpr_upolynomial_test.go",
         "pkg/math/polynomial/upolynomial_rational_context.go",
@@ -49303,7 +49305,21 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Recursive sexpr-to-upolynomial source arithmetic, error locations/depth/published prefixes and scoped vector/rational lifetime on real same-owner services; arithmetic plugin consumer and general cmd_exception integration remain open",
+          "name": "sexpr2upolynomial_exception retains cmd_exception and default_exception base catches through shared concrete utility error, preserving message and signed line/position (cpp:22-24,h:26-29)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
+          "go_targets": [
+            "pkg/util/cmdexception/cmd_exception.go",
+            "pkg/smtcore/util_cmd_exception.go"
+          ],
+          "tests": [
+            "TestSexprPolynomialErrorsAndCompletedPrefix",
+            "TestSharedCmdExceptionBaseClassificationAndLocation",
+            "TestCmdExceptionPolynomialDerivedCatchCompatibility"
+          ]
+        },
+        {
+          "name": "Recursive sexpr-to-upolynomial source arithmetic, error locations/depth/published prefixes and scoped vector/rational lifetime on real same-owner services; arithmetic plugin consumer remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
           "tests": [
@@ -49340,6 +49356,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/util/cmdexception/cmd_exception.go",
+        "pkg/smtcore/util_cmd_exception.go",
         "pkg/math/polynomial/sexpr_upolynomial.go",
         "pkg/math/polynomial/sexpr_upolynomial_test.go",
         "pkg/math/polynomial/upolynomial_rational_context.go",
@@ -49388,7 +49406,21 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "Recursive sexpr-to-upolynomial source arithmetic, error locations/depth/published prefixes and scoped vector/rational lifetime on real same-owner services; arithmetic plugin consumer and general cmd_exception integration remain open",
+          "name": "sexpr2upolynomial_exception retains cmd_exception and default_exception base catches through shared concrete utility error, preserving message and signed line/position (cpp:22-24,h:26-29)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
+          "go_targets": [
+            "pkg/util/cmdexception/cmd_exception.go",
+            "pkg/smtcore/util_cmd_exception.go"
+          ],
+          "tests": [
+            "TestSexprPolynomialErrorsAndCompletedPrefix",
+            "TestSharedCmdExceptionBaseClassificationAndLocation",
+            "TestCmdExceptionPolynomialDerivedCatchCompatibility"
+          ]
+        },
+        {
+          "name": "Recursive sexpr-to-upolynomial source arithmetic, error locations/depth/published prefixes and scoped vector/rational lifetime on real same-owner services; arithmetic plugin consumer remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
           "tests": [
@@ -125410,6 +125442,9 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/util/cmdexception/cmd_exception.go",
+        "pkg/util/cmdexception/cmd_exception_debug.go",
+        "pkg/util/cmdexception/cmd_exception_nodebug.go",
         "pkg/util/params/util_param_descrs.go",
         "pkg/smtcore/util_cmd_exception.go"
       ],
@@ -125448,6 +125483,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Shared concrete cmd_exception lives below polynomial/AST/SMT consumers; source default_exception inheritance is exposed through errors.As, existing SMT API aliases preserve concrete catch identity",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/cmdexception/cmd_exception.go",
+          "go_targets": [
+            "pkg/smtcore/util_cmd_exception.go"
+          ],
+          "tests": [
+            "TestSharedCmdExceptionBaseClassificationAndLocation",
+            "TestCmdExceptionPolynomialDerivedCatchCompatibility",
+            "TestCmdExceptionSourceConstructorRoutesAndLocationGuards",
+            "TestCmdExceptionSourceSymbolCompositionAndBorrowedLifetime",
+            "TestCmdExceptionIndependentByteDomainsAndOwnerAccounting"
+          ]
+        },
         {
           "name": "cmd_arg_kind exact enum values and complete source label switch",
           "status": "ported",
