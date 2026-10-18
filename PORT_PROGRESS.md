@@ -44792,3 +44792,17 @@ without touching sources/test vectors. The failed run is terminal; a serial
 package retry is running, logged in
 /mnt/oldrog/tmp/g3-polynomial-lexical-native-full-retry.log.
 Parser/univariate and broader polynomial/AST units remain partial.
+
+Linear solver display insertion fidelity (linear_eq_solver.h:143-146,
+mpq.cpp:130-139, mpz.cpp:1385-1408): the source calls numeral display, while the
+Go solver previously formatted a whole value with String before writing it.
+A negative BIG rational insertion test reproduced the mismatch. Both concrete
+solvers now delegate to the existing numeral DisplayTo methods, preserving sign
+before magnitude formatting and numerator/slash/denominator insertion positions.
+The modular specialization still uses its underlying integer without a modular
+normalization assertion; an unnormalized negative BIG coefficient is covered.
+Existing matrix/RHS order, owner/manager reentry, trace failure, sparse
+interpolation and mathematical checks pass ordinary (0.244s) and
+checked/debug/trace (0.357s) on CPUs 8-16. These checks cover the final display
+increment; the full native run started before that increment and is still live.
+Full stream flags/exception composition and source-unit completion remain open.

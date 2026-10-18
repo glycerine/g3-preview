@@ -5,9 +5,62 @@ import (
 	"errors"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"io"
+	"reflect"
 	"strings"
 	"testing"
 )
+
+type linearDisplayParts struct{ parts []string }
+
+func (w *linearDisplayParts) Write(p []byte) (int, error) {
+	w.parts = append(w.parts, string(p))
+	return len(p), nil
+}
+
+func TestLinearRationalDisplayPreservesNumeralInsertions(t *testing.T) {
+	q, _ := rationalManager(t, false)
+	s, e := NewRationalLinearSolver(q)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, s.Close()) })
+	serviceMust(t, s.Resize(1))
+	a := unumeral.NewRational()
+	serviceMust(t, q.Integers().SetString(&a.Num, "-1267650600228229401496703205377"))
+	a.Den = unumeral.NewInt(3)
+	b := unumeral.NewRational()
+	serviceMust(t, q.SetInt64(&b, 5))
+	serviceMust(t, s.Add(0, []unumeral.Rational{a}, &b))
+	serviceMust(t, q.Del(&a))
+	serviceMust(t, q.Del(&b))
+	var out linearDisplayParts
+	serviceMust(t, s.Display(&out))
+	want := []string{"-", "1267650600228229401496703205377", "/", "3", " ", "5", "\n"}
+	if !reflect.DeepEqual(out.parts, want) {
+		t.Fatal("source numeral insertion boundaries", out.parts, want)
+	}
+}
+
+func TestLinearModularDisplayPreservesIntegerInsertions(t *testing.T) {
+	q, _ := rationalManager(t, false)
+	m, e := unumeral.NewIntegerModularManager(q.Integers())
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, m.Close()) })
+	serviceMust(t, m.SetZPUint64(7))
+	s, e := NewModularLinearSolver(m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, s.Close()) })
+	serviceMust(t, s.Resize(1))
+	row, e := s.row(0)
+	serviceMust(t, e)
+	// The source display reads the underlying integer even when the stored
+	// coefficient is outside the modular field's normalized interval.
+	serviceMust(t, q.Integers().SetString(&(*row)[0], "-1267650600228229401496703205377"))
+	var out linearDisplayParts
+	serviceMust(t, s.Display(&out))
+	want := []string{"-", "1267650600228229401496703205377", " ", "0", "\n"}
+	if !reflect.DeepEqual(out.parts, want) {
+		t.Fatal("source integer insertion boundaries", out.parts, want)
+	}
+}
 
 func TestLinearRationalSourceDisplaySpacingAndOrder(t *testing.T) {
 	q, _ := rationalManager(t, false)

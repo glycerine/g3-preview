@@ -57,11 +57,7 @@ func (s *RationalLinearSolver) displaySource(out io.Writer) error {
 			if e != nil {
 				return e
 			}
-			text, e := s.manager.String(&a)
-			if e != nil {
-				return e
-			}
-			if e = linearWriteText(out, text); e != nil {
+			if e = s.manager.DisplayTo(out, &a); e != nil {
 				return e
 			}
 			if e = linearWriteText(out, " "); e != nil {
@@ -72,11 +68,7 @@ func (s *RationalLinearSolver) displaySource(out io.Writer) error {
 		if e != nil {
 			return e
 		}
-		text, e := s.manager.String(&b)
-		if e != nil {
-			return e
-		}
-		if e = linearWriteText(out, text); e != nil {
+		if e = s.manager.DisplayTo(out, &b); e != nil {
 			return e
 		}
 		if e = linearWriteText(out, "\n"); e != nil {
@@ -121,11 +113,7 @@ func (s *ModularLinearSolver) displaySource(out io.Writer) error {
 			}
 			// mpzzp.h display calls the integer manager directly, without the
 			// normalization assertion of the separate modular String API.
-			text, e := s.manager.Integers().String(&a)
-			if e != nil {
-				return e
-			}
-			if e = linearWriteText(out, text); e != nil {
+			if e = s.manager.Integers().DisplayTo(out, &a); e != nil {
 				return e
 			}
 			if e = linearWriteText(out, " "); e != nil {
@@ -136,11 +124,7 @@ func (s *ModularLinearSolver) displaySource(out io.Writer) error {
 		if e != nil {
 			return e
 		}
-		text, e := s.manager.Integers().String(&b)
-		if e != nil {
-			return e
-		}
-		if e = linearWriteText(out, text); e != nil {
+		if e = s.manager.Integers().DisplayTo(out, &b); e != nil {
 			return e
 		}
 		if e = linearWriteText(out, "\n"); e != nil {

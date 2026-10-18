@@ -40157,6 +40157,21 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Concrete linear display delegates each numeral insertion at the reached matrix/RHS position (linear_eq_solver.h:143-146; mpq.cpp:130-139; mpz.cpp:1385-1408)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_linear_display.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_linear_display_test.go"
+          ],
+          "tests": [
+            "TestLinearRationalDisplayPreservesNumeralInsertions",
+            "TestLinearModularDisplayPreservesIntegerInsertions",
+            "TestLinearRationalSourceDisplaySpacingAndOrder",
+            "TestLinearModularSourceDisplayUsesUnderlyingInteger"
+          ],
+          "notes": "The source calls the actual manager display, not to_string. Replaced whole-rational/integer String snapshots with existing concrete DisplayTo methods. Negative BIG values now insert sign before magnitude formatting; rational numerator, slash and denominator retain separate reached insertions before the solver space/newline. Modular display still delegates directly to the underlying integer without asserting normalization. Actual writer callbacks observe the independent expected insertion sequence for a negative BIG rational and an unnormalized negative BIG modular coefficient; the rational test failed before the fix. Existing owner reentry, trace failure, sparse interpolation and mathematical checks remain in the focused selection. Full stream flag/exception and whole-unit audits remain partial."
+        },
+        {
           "name": "Concrete linear operations bind borrowed integer/natural/modular managers for actual execution; direct Display and Solve TRACE callbacks cannot destroy managers or replace the borrowed field; nested owners restore exact outer bindings",
           "status": "platform_replacement",
           "go_targets": [
