@@ -176,7 +176,7 @@ func TestUPolynomialFactorDegreeTraceRetainedRecordsAndOwners(t *testing.T) {
 	serviceMust(t, e)
 	if tags.ShouldTrace("polynomial::factorization::bughunt") {
 		text := w.seen.String()
-		for _, site := range []string{":1141 ", ":1155 ", ":1192 ", "best degree set: [0, 1, 2] represented by 111\n", "degree_set = [0, 1, 2] represented by 111\n", "STARTING TRIAL DIVISION\nzpe_fs1 * ("} {
+		for _, site := range []string{":1088 ", "sage: if (not (gcd(2, 1)) == 1): print 'Error, wrong gcd'\n", ":1141 ", ":1155 ", ":1192 ", "best degree set: [0, 1, 2] represented by 111\n", "degree_set = [0, 1, 2] represented by 111\n", "STARTING TRIAL DIVISION\nzpe_fs1 * ("} {
 			if !strings.Contains(text, site) {
 				t.Fatal("missing source trace record", site, text)
 			}
@@ -253,7 +253,36 @@ func TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands(t *testing.T
 	t.Cleanup(func() { s.manager.config.Integer.Budget().FailAfter(-1) })
 	// No enclosing source scope or factor operand exists at this erased site.
 	serviceMust(t, s.traceFactorDegreeSet(nil, 1155, false))
+	serviceMust(t, s.traceFactorPrimeGCD(nil))
 	if s.scope != nil || s.manager.config.Integer.Budget().Used() != before {
 		t.Fatal("disabled trace acquired operands or scope")
+	}
+}
+
+func TestUPolynomialFactorPrimeGCDTraceRejectedPrimeOrder(t *testing.T) {
+	_, s := preparationPhysicalFixture(t)
+	m := s.manager
+	var text strings.Builder
+	tags := diagnostic.NewTraceTagsWithWriter(&text)
+	tags.Enable("polynomial::factorization::bughunt")
+	serviceMust(t, m.modular.BindTrace(tags))
+	t.Cleanup(func() { serviceMust(t, m.modular.BindTrace(nil)) })
+	// The first candidate divides the actual leading coefficient and is rejected.
+	p := upolySourceNew(t, m, []int32{1, 1, 2})
+	fs, e := m.NewFactors()
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, fs.Close()) })
+	_, e = s.FactorSquareFreeDefault(mustUPolyView(t, m, p), fs, DefaultUPolynomialFactorParams())
+	serviceMust(t, e)
+	if !tags.ShouldTrace("polynomial::factorization::bughunt") {
+		if text.Len() != 0 {
+			t.Fatal("erased GCD trace wrote output")
+		}
+		return
+	}
+	a := strings.Index(text.String(), "sage: if (not (gcd(2, 2)) == 2): print 'Error, wrong gcd'\n")
+	b := strings.Index(text.String(), "sage: if (not (gcd(3, 2)) == 1): print 'Error, wrong gcd'\n")
+	if a < 0 || b <= a {
+		t.Fatal("rejected and accepted prime trace order", text.String())
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // The diagnostic writer retains ostream failure. Suppress insertion errors
@@ -78,6 +79,52 @@ func (s *UPolynomialFactorizationService) traceFactorDegreeSet(fs *UPolynomialFa
 				computation = e
 				return e
 			}
+			return diagnostic.WriteTraceEndl(out)
+		})
+	return computation
+}
+
+// Source: upolynomial_factorization.cpp:1088-1091. Each to_string is
+// evaluated at its insertion point, including after an ostream failure.
+func (s *UPolynomialFactorizationService) traceFactorPrimeGCD(top *unumeral.Int) error {
+	tags := s.manager.modular.BorrowTraceTags()
+	if !tags.ShouldTrace("polynomial::factorization::bughunt") {
+		return nil
+	}
+	c := s.scope
+	if c == nil || c.self != c {
+		return ErrUPolynomialOwner
+	}
+	if e := c.traceBorrow.bind(c, tags); e != nil {
+		return e
+	}
+	defer c.traceBorrow.unbind()
+	var computation error
+	_ = tags.EmitConditional("polynomial::factorization::bughunt", "factor_square_free", "src/math/polynomial/upolynomial_factorization.cpp", 1088,
+		func() bool { return true }, func(raw io.Writer) error {
+			out := factorizationTraceWriter{raw}
+			_ = linearWriteText(out, "sage: if (not (gcd(")
+			p, e := s.manager.modular.String(&c.p)
+			if e != nil {
+				computation = e
+				return e
+			}
+			_ = linearWriteText(out, p)
+			_ = linearWriteText(out, ", ")
+			leading, e := s.manager.modular.String(top)
+			if e != nil {
+				computation = e
+				return e
+			}
+			_ = linearWriteText(out, leading)
+			_ = linearWriteText(out, ")) == ")
+			gcd, e := s.manager.modular.String(&c.gcdTmp)
+			if e != nil {
+				computation = e
+				return e
+			}
+			_ = linearWriteText(out, gcd)
+			_ = linearWriteText(out, "): print 'Error, wrong gcd'")
 			return diagnostic.WriteTraceEndl(out)
 		})
 	return computation

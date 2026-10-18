@@ -53216,7 +53216,8 @@
         "TestUPolynomialFactorDegreeTraceRetainedRecordsAndOwners",
         "TestUPolynomialFactorDegreeTraceChildRefusalStopsOlderLocals",
         "TestUPolynomialFactorDegreeTraceStreamFailureStillComputesDisplays",
-        "TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands"
+        "TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands",
+        "TestUPolynomialFactorPrimeGCDTraceRejectedPrimeOrder"
       ],
       "conditionals": [
         {
@@ -53329,6 +53330,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Prime-candidate GCD bughunt TRACE before rejection branch (1088-1091)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_degree_trace.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_prime_preparation.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorPrimeGCDTraceRejectedPrimeOrder",
+            "TestUPolynomialFactorDegreeTraceRetainedRecordsAndOwners",
+            "TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands",
+            "TestUPolynomialFactorDegreeTraceStreamFailureStillComputesDisplays"
+          ],
+          "notes": "Formats actual prime, leading coefficient and computed GCD at their source insertion points, before testing coprimality. Uses the enclosing whole-record root/prime numeric-owner borrow and sticky-stream adapter, preserving reached endl and later numeral computations after output refusal. Disabled traces skip the scope and numeral operands. Actual polynomial 2*x^2+x+1 verifies rejected prime 2 (GCD 2) before accepted prime 3 (GCD 1). Other records and the whole factorization source unit remain partial."
+        },
         {
           "name": "Whole degree-set bughunt TRACE records at 1141,1155,1192 with actual factor display and accepted child lifetime",
           "status": "ported",

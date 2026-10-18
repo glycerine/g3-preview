@@ -98,6 +98,9 @@ func (s *UPolynomialFactorizationService) nextPreparedPrime(fs *UPolynomialFacto
 		if e = nm.WithAllocationContext((context).utility(nm.Integers())).Gcd(&c.p, top, &c.gcdTmp); e != nil {
 			return false, e
 		}
+		if e = s.traceFactorPrimeGCD(top); e != nil {
+			return false, e
+		}
 		one, e := nm.IsOne(&c.gcdTmp)
 		if e != nil {
 			return false, e

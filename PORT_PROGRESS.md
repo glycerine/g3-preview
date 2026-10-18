@@ -44973,3 +44973,18 @@ The hourly full native suite is running; its result will be recorded separately.
 Other bughunt records (including entry, f_pp, GCD, f_pp_zp and Mignotte output)
 and the broader factorization audit remain open. Polynomial and then AST remain
 unfinished. Source-unit statuses and completion counts are unchanged.
+
+2026-10-18: prime-candidate GCD TRACE source order
+
+Implemented the complete bughunt TRACE at factorization.cpp:1088-1091 before
+the coprimality rejection branch. It formats the actual prime, actual leading
+coefficient and computed GCD at their insertion points, preserving endl and
+numeric evaluation after stream refusal. The existing whole-record borrow
+protects the enclosing actual root/prime and numeric owners. Disabled traces
+skip even a nil numeral operand and absent enclosing scope.
+
+The actual polynomial 2*x^2+x+1 verifies rejected prime 2/GCD 2 followed by
+prime 3/GCD 1. Focused trace and prime-preparation checks pass ordinary (0.375s)
+and checked/debug/trace (0.342s), on CPUs 8-16. Whole source-unit completion is
+still not claimed; entry, f_pp, f_pp_zp, Mignotte and other records remain open.
+The prior full native suite remains running against commit 0e99e7de.
