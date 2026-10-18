@@ -102,15 +102,10 @@ func (s *UPolynomialFactorizationService) factorQuadratic(p *upolyVectorState, f
 	if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).AddMulTracked(b2, &minus4, ac, disc, &o.addMul); e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
-		zero, e := m.modular.IsZero(disc)
-		if e != nil {
-			return e
-		}
-		if zero {
-			return ErrUPolynomialAssertion
-		}
+	if e := m.quadraticDiscriminantAssertion(disc); e != nil {
+		return e
 	}
+
 	q.constructed = 4
 	q.peak = 4
 	square, e := m.modular.WithAllocationContext((context).utility(m.modular.Integers())).IsPerfectSquare(disc, root)
@@ -172,14 +167,7 @@ func (s *UPolynomialFactorizationService) quadraticDiagnosticWithFrontend(p, f1,
 	if e := m.mulWithSourceContext(m.stateView(f1), m.stateView(f2), &q.product, &q.owner.addMul, context); e != nil {
 		return e
 	}
-	same, e := m.EqualViews(m.stateView(&q.product), m.stateView(p))
-	if e != nil {
-		return e
-	}
-	if !same {
-		return ErrUPolynomialAssertion
-	}
-	return nil
+	return m.quadraticProductAssertion(m.stateView(&q.product), m.stateView(p))
 }
 func (s *UPolynomialFactorizationService) factorSqfPrimitive(p *upolyVectorState, fs *UPolynomialFactors, k uint32, params UPolynomialFactorParams) (bool, error) {
 	return s.factorSqfPrimitiveWithReceipt(p, fs, k, params, nil)

@@ -45890,3 +45890,14 @@ The short-quadratic test is explicitly a qualified direct invariant adapter: T s
 
 Focused tests pass ordinary (0.004s) and checked/debug/trace (0.007s); broader factorization/frontend/GCD/Euclidean/CRA/content/storage/closed/basic/rational/raw-scalar checks pass checked/debug/trace (30.093s). Manifest validation passes. All commands remain on CPUs8–16. Broader quadratic diagnostics/numerical failure/source-lifetime audits remain open for polynomial, followed by AST. Periodic native process9825 remains confirmed live at LP; its shared-worktree scope limitation remains as recorded above, and no duplicate suite was launched.
 Final broader ordinary affected checks pass (18.240s).
+
+### Quadratic discriminant and DEBUG product runtime assertion actions
+
+Ported upolynomial.cpp:2983,3007 with runtime gates enclosing actual zero-discriminant and polynomial-equality predicates. Failed actions use real debugger Throw/Continue under receiving-manager borrowing. DEBUG product construction and source destruction remain outside the runtime assertion gate; disabling assertions erases only equality evaluation, preserving actual declaration peak7 in split debug cases (6 in release). Irreducible cases reach peak4 as source.
+
+Qualified direct predicate adapters use an independent zero numeral or distinct caller polynomials, without rewriting algorithm scratch, constructing parent frames, or claiming these invariant failures arise from valid squarefree inputs. Public Factor oracles x^2-1 and x^2-2 verify actual split/irreducible results and product reconstruction with assertions enabled/disabled. Invalid operands are skipped only under erased predicates; closed runtime rejects valid predicates before numerical evaluation. No construction counters or quotas are repaired.
+
+Focused tests pass ordinary (0.006s) and checked/debug/trace (0.011s). Broader factorization/frontend/GCD/Euclidean/CRA/content/storage/closed/basic/rational/raw-scalar/quadratic checks pass checked/debug/trace (31.012s). All commands stay on CPUs8–16. Wider quadratic diagnostic/source-lifetime and overall polynomial completion audits remain open, followed by AST.
+
+Periodic native process9825 is now terminal exit0: 68 packages passed,11 have no tests, polynomial93.098s, LP687.637s. Log: /mnt/oldrog/tmp/g3-storage-actions-native-full.log. The run began at4b51ff8f while subsequent shared-worktree edits continued; it is broad integration evidence, not proof of one exact later commit. Focused final checks validate each subsequent increment. Future periodic native runs should use a fixed separate checkout when edits continue concurrently. No duplicate suite was started.
+Final broader ordinary checks pass (19.977s); manifest validation passes.

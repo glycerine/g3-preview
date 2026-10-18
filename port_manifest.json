@@ -50803,7 +50803,9 @@
         "pkg/math/polynomial/upolynomial_basic_alias_assertion_test.go",
         "pkg/math/polynomial/upolynomial_input_scalar_assertion_test.go",
         "pkg/math/polynomial/upolynomial_factor_core.go",
-        "pkg/math/polynomial/upolynomial_factor_core_assertion_test.go"
+        "pkg/math/polynomial/upolynomial_factor_core_assertion_test.go",
+        "pkg/math/polynomial/upolynomial_quadratic_assertions.go",
+        "pkg/math/polynomial/upolynomial_quadratic_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51109,7 +51111,10 @@
         "TestUPolynomialRawScalarZeroAssertionActions",
         "TestUPolynomialFactorPrimitiveLeadingAssertionActions",
         "TestUPolynomialFactorQuadraticSizeAssertionActions",
-        "TestUPolynomialFactorPrimitiveEmptyClosedGate"
+        "TestUPolynomialFactorPrimitiveEmptyClosedGate",
+        "TestUPolynomialQuadraticPredicateAssertionActions",
+        "TestUPolynomialQuadraticRuntimeAssertionOracles",
+        "TestUPolynomialQuadraticPredicatesClosedAndErased"
       ],
       "conditionals": [
         {
@@ -51698,6 +51703,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Quadratic discriminant and DEBUG product runtime assertion actions (upolynomial.cpp:2983,3007)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_core.go",
+            "pkg/math/polynomial/upolynomial_quadratic_assertions.go",
+            "pkg/math/polynomial/upolynomial_quadratic_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialQuadraticPredicateAssertionActions",
+            "TestUPolynomialQuadraticRuntimeAssertionOracles",
+            "TestUPolynomialQuadraticPredicatesClosedAndErased"
+          ],
+          "notes": "Runtime gates enclose only discriminant-zero and product-equality numerical predicates. Actual DEBUG product construction/source destruction remains reached with runtime assertions disabled. Failed actions use actual debugger Throw/Continue under receiving-owner borrowing. Qualified direct predicate adapters use independent zero discriminant/mismatched caller polynomials, without manufacturing parent frames or altering algorithm scratch; not claimed as failures reached by valid squarefree inputs. Public Factor enabled/disabled oracles verify x^2-1 split/product and x^2-2 irreducibility, actual quadratic declaration peaks7(DEBUG)/6(release) and4, and completed source destruction. Invalid operands skipped under erased predicates; closed runtime rejects valid operands before evaluation. Broader diagnostics/source lifetime audit remains partial."
+        },
         {
           "name": "Quadratic-size and primitive-factor leading-coefficient runtime assertions (upolynomial.cpp:2968,3015)",
           "status": "ported",
