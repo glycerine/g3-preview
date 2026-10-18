@@ -40310,7 +40310,8 @@
         "pkg/math/polynomial/algebraic_isolation_multivariate_test.go",
         "pkg/math/polynomial/algebraic_isolation_multivariate_cancel_test.go",
         "pkg/math/polynomial/algebraic_isolation_multivariate_owner_test.go",
-        "pkg/math/polynomial/polynomial_cache_child_owner_test.go"
+        "pkg/math/polynomial/polynomial_cache_child_owner_test.go",
+        "pkg/math/polynomial/polynomial_cache_borrowed_owner_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -48193,7 +48194,8 @@
         "pkg/math/polynomial/polynomial_cache_source_test.go",
         "pkg/math/polynomial/polynomial_cache_child_owner_test.go",
         "pkg/math/polynomial/polynomial_cache_callback_test.go",
-        "pkg/math/polynomial/polynomial_cache_manager_test.go"
+        "pkg/math/polynomial/polynomial_cache_manager_test.go",
+        "pkg/math/polynomial/polynomial_cache_borrowed_owner_test.go"
       ],
       "tests": [
         "TestPolynomialCacheCanonicalizationAndReset",
@@ -48260,6 +48262,16 @@
             "TestPolynomialCacheBorrowedManagerSupportsRetainedReferenceConsumer",
             "TestPolynomialCacheManagerAccessorOwnerAndResetLifetime"
           ]
+        },
+        {
+          "name": "Executing cache operations and owning continuation bind the exact borrowed polynomial core before callbacks; full/core source and owning destruction refuse before members, with nested cache restoration",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "tests": [
+            "TestPolynomialCacheCallbackProtectsBorrowedCoreSourceLifetime",
+            "TestPolynomialCacheNestedCallsRestoreBorrowedCoreBinding",
+            "TestPolynomialCacheResetAndCloseCallbacksRetainExecutingOwner"
+          ]
         }
       ],
       "ownership": [],
@@ -48278,7 +48290,8 @@
         "pkg/math/polynomial/polynomial_cache_source_test.go",
         "pkg/math/polynomial/polynomial_cache_child_owner_test.go",
         "pkg/math/polynomial/polynomial_cache_callback_test.go",
-        "pkg/math/polynomial/polynomial_cache_manager_test.go"
+        "pkg/math/polynomial/polynomial_cache_manager_test.go",
+        "pkg/math/polynomial/polynomial_cache_borrowed_owner_test.go"
       ],
       "tests": [
         "TestPolynomialCacheCanonicalizationAndReset",

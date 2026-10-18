@@ -11,6 +11,7 @@ import (
 // PolynomialCache owns canonical representatives and memoized results used by
 // the retained NLSAT cache.
 type PolynomialCache struct {
+	previous       *PolynomialCache
 	executing      bool
 	pscCall        polynomialPSCInvocationReceipt
 	factorCall     polynomialFactorCoreInvocationReceipt
@@ -68,8 +69,8 @@ func (c *PolynomialCache) Factor(p Polynomial, out *PolynomialRefVector) error {
 	if e := c.ready(); e != nil {
 		return e
 	}
-	c.executing = true
-	defer func() { c.executing = false }()
+	c.beginExecution()
+	defer c.endExecution()
 	if out == nil || out.owner != c.manager.core {
 		return ErrPolynomialOwner
 	}
@@ -162,8 +163,8 @@ func (c *PolynomialCache) CleanupFactor() error {
 	if c.closed {
 		return arena.ErrClosed
 	}
-	c.executing = true
-	defer func() { c.executing = false }()
+	c.beginExecution()
+	defer c.endExecution()
 	return c.cleanupFactor()
 }
 func (c *PolynomialCache) cleanupFactor() error {
@@ -200,8 +201,8 @@ func (c *PolynomialCache) CleanupPSC() error {
 	if c.closed {
 		return arena.ErrClosed
 	}
-	c.executing = true
-	defer func() { c.executing = false }()
+	c.beginExecution()
+	defer c.endExecution()
 	return c.cleanupPSC()
 }
 func (c *PolynomialCache) cleanupPSC() error {
@@ -222,8 +223,8 @@ func (c *PolynomialCache) PSCChain(p, q Polynomial, x uint32, out *PolynomialRef
 	if e := c.ready(); e != nil {
 		return e
 	}
-	c.executing = true
-	defer func() { c.executing = false }()
+	c.beginExecution()
+	defer c.endExecution()
 	var e error
 	p, e = c.mkUnique(p)
 	if e != nil {
@@ -309,8 +310,8 @@ func (c *PolynomialCache) MkUnique(p Polynomial) (Polynomial, error) {
 	if e := c.ready(); e != nil {
 		return Polynomial{}, e
 	}
-	c.executing = true
-	defer func() { c.executing = false }()
+	c.beginExecution()
+	defer c.endExecution()
 	return c.mkUnique(p)
 }
 func (c *PolynomialCache) mkUnique(p Polynomial) (Polynomial, error) {
@@ -348,8 +349,8 @@ func (c *PolynomialCache) Reset() error {
 	if e := c.ready(); e != nil {
 		return e
 	}
-	c.executing = true
-	defer func() { c.executing = false }()
+	c.beginExecution()
+	defer c.endExecution()
 	clear(c.psc)
 	clear(c.factors)
 	if e := c.refs.reset(c.manager.core); e != nil {
@@ -376,8 +377,8 @@ func (c *PolynomialCache) CleanupReset() error {
 	if c.closed {
 		return arena.ErrClosed
 	}
-	c.executing = true
-	defer func() { c.executing = false }()
+	c.beginExecution()
+	defer c.endExecution()
 	if !c.resetting {
 		return nil
 	}
@@ -408,8 +409,8 @@ func (c *PolynomialCache) Close() error {
 	if c.closed {
 		return nil
 	}
-	c.executing = true
-	defer func() { c.executing = false }()
+	c.beginExecution()
+	defer c.endExecution()
 	c.closing = true
 	if e := c.cleanupPSC(); e != nil {
 		return e
@@ -463,3 +464,32 @@ func (c *PolynomialCache) Manager() (*MultivariatePolynomialManager, error) {
 
 // PM is the source cache::pm() alias.
 func (c *PolynomialCache) PM() (*MultivariatePolynomialManager, error) { return c.Manager() }
+
+// Bind only synchronous accepted calls, not a registry of idle caches. Nested
+// distinct caches restore the enclosing borrow before returning to its callback.
+func (c *PolynomialCache) beginExecution() {
+	core := c.manager.core
+	c.previous = core.cacheCaller
+	c.executing = true
+	core.cacheCaller = c
+}
+func (c *PolynomialCache) endExecution() {
+	core := c.manager.core
+	if core.cacheCaller != c {
+		panic(ErrPolynomialOwner)
+	}
+	core.cacheCaller = c.previous
+	c.previous = nil
+	c.executing = false
+}
+func (m *MultivariatePolynomialCore) cacheExecuting() bool {
+	if m == nil || m.self != m {
+		return false
+	}
+	for c := m.cacheCaller; c != nil; c = c.previous {
+		if c.self == c && c.manager != nil && c.manager.self == c.manager && c.manager.core == m && c.executing {
+			return true
+		}
+	}
+	return false
+}

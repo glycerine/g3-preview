@@ -49,6 +49,18 @@ func polynomialCacheCallbackProbe(t *testing.T, cache *PolynomialCache, p Polyno
 	refs := append([]Polynomial(nil), cache.refs.values...)
 	counts := [4]int{len(cache.buckets), len(cache.ids), len(cache.psc), len(cache.factors)}
 	used := cache.manager.originalBudget.Used()
+	manager := cache.manager
+	core := manager.core
+	source, stage, started := core.sourceStage, manager.bodyStage, manager.sourceStarted
+	for _, e := range []error{manager.SourceFinalize(), manager.CloseChecked(), core.SourceFinalizePrefix(), core.CloseChecked()} {
+		if !errors.Is(e, ErrPolynomialPending) {
+			t.Error("cache callback acquired borrowed polynomial owner", e)
+		}
+	}
+	if source != core.sourceStage || stage != manager.bodyStage || started != manager.sourceStarted || core.cacheCaller != cache {
+		t.Error("borrowed manager refusal changed source lifetime")
+	}
+
 	for _, e := range []error{cache.Factor(p, nil), cache.PSCChain(p, p, 0, nil), cache.Reset(), cache.CleanupReset(), cache.CleanupFactor(), cache.CleanupPSC(), cache.Close()} {
 		if !errors.Is(e, ErrPolynomialPending) {
 			t.Error("callback acquired executing cache", e)
@@ -103,6 +115,9 @@ func TestPolynomialCacheResetAndCloseCallbacksRetainExecutingOwner(t *testing.T)
 				calls++
 				polynomialCacheCallbackProbe(t, cache, input)
 				serviceMust(t, other.CleanupPSC())
+				if m.core.cacheCaller != cache {
+					t.Error("independent nested cleanup lost outer binding")
+				}
 				if continuing {
 					resumed = true
 				}
