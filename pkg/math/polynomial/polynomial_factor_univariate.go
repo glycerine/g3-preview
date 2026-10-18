@@ -402,6 +402,9 @@ func (f *PolynomialFactors) factorCallerExecuting() bool {
 	if f == nil || f.self != f || f.manager == nil || f.manager.self != f.manager {
 		return false
 	}
+	if f.multiplyRunning {
+		return true
+	}
 	for _, frame := range f.manager.factorFrames {
 		if frame.target == f && (frame.executing || frame.finishing) {
 			return true

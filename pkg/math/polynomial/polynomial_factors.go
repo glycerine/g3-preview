@@ -40,6 +40,7 @@ type PolynomialFactors struct {
 	localActive                                                        bool
 	numeric                                                            polynomialNumericRoots
 	multiplyActive, executing                                          bool
+	multiplyRunning                                                    bool
 	powerGeneration, factoryGeneration, constantGeneration, generation uint64
 	singleton                                                          Monomial
 	singletonGeneration                                                uint64

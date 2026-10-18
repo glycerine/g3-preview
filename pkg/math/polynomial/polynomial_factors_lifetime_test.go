@@ -14,12 +14,14 @@ import (
 )
 
 type polynomialFactorsCallbackState struct {
-	target          Polynomial
-	source, foreign unumeral.Int
-	calls           uint32
-	power           bool
-	foreignFactory  bool
-	foreignScalar   unumeral.Int
+	target                                Polynomial
+	source, foreign                       unumeral.Int
+	calls                                 uint32
+	power                                 bool
+	foreignFactory                        bool
+	foreignScalar                         unumeral.Int
+	guardTarget                           *PolynomialFactors
+	guardSource, guardCleanup, guardClose error
 }
 
 var polynomialFactorsCallback *polynomialFactorsCallbackState
@@ -32,6 +34,11 @@ func polynomialFactorsDeletionCopy(h *PolynomialDeletionHandler, m *Multivariate
 	}
 	if s != nil && p == s.target {
 		s.calls++
+		if s.guardTarget != nil {
+			s.guardSource = s.guardTarget.SourceFinalize()
+			s.guardCleanup = s.guardTarget.Cleanup()
+			s.guardClose = s.guardTarget.CloseChecked()
+		}
 		if s.foreignFactory {
 			m.integer.Budget().FailAfter(0)
 			_, e := m.MkConstantTake(&s.foreignScalar)
@@ -210,7 +217,7 @@ func TestPolynomialFactorsYoungerPowerStop(t *testing.T) {
 	serviceMust(t, f.Push(p, 3))
 	r, e := NewPolynomialRef(m.core)
 	serviceMust(t, e)
-	state := &polynomialFactorsCallbackState{power: true}
+	state := &polynomialFactorsCallbackState{power: true, guardTarget: f}
 	digits := make([]uint32, 80)
 	digits[79] = 1
 	serviceMust(t, m.core.integer.SetLimbs(&state.source, digits))
@@ -223,6 +230,14 @@ func TestPolynomialFactorsYoungerPowerStop(t *testing.T) {
 	cause := f.Multiply(r)
 	if !numericPhysicalReservationRefusal(cause) || state.calls != 1 || !f.currentActive || !m.core.powerLocal.active || f.sourceCause == nil {
 		t.Fatal("younger actual source stop", cause, state.calls, f.currentActive, m.core.powerLocal.active)
+	}
+	for _, e := range []error{state.guardSource, state.guardCleanup, state.guardClose} {
+		if !errors.Is(e, ErrPolynomialPending) {
+			t.Fatal("actual power deletion callback crossed caller lifetime", e)
+		}
+	}
+	if f.closing || f.closed || f.sourceStarted {
+		t.Fatal("refused power callback changed source destructor progress")
 	}
 	polynomialFactorsAuditExtra(t, f, []Polynomial{p, state.target}, []*unumeral.Int{&state.source, &state.foreign}, h.header, r)
 	sourceCause := f.sourceCause

@@ -66,6 +66,11 @@ func (f *PolynomialFactors) Multiply(out *PolynomialRef) (cause error) {
 	}
 	f.generation++
 	f.multiplyActive = true
+	// executing is temporarily suspended at external cooperation boundaries
+	// so their independent primitive work is not attributed to this caller.
+	// Its source/owning lifetime remains protected through the final current DT.
+	f.multiplyRunning = true
+	defer func() { f.multiplyRunning = false }()
 	defer func() {
 		cause = f.finishCurrent(cause)
 		if cause == nil {
