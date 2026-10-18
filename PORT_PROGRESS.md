@@ -45834,3 +45834,13 @@ Independent (x+1)(x+2),(x+1)(x+3) oracles check actual loop states, terminal ite
 
 Broader checked/debug/trace frontend/factorization/exact-division/modular-GCD/CRA/Euclidean/warm checks pass (2.685s); manifest validation passes. All commands stay on CPUs8–16. Finite-field diagnostic failure inventories and wider polynomial source completion audits remain open, followed by AST. No full ordinary/native suite repeated immediately after the preceding full polynomial pass.
 Final broader ordinary affected checks pass (1.530s).
+
+### Factor insertion and zero-constant multiplication runtime assertions
+
+Ported upolynomial.cpp:57,66,78 with runtime assertion gates and actual debugger Throw/Continue under receiving-manager borrowing. PushCopy and PushMove Throw before factor/degree append or source move; Continue inserts a zero-multiplicity factor exactly as source, with count1 and total factors/degree0. Source multiply's degree>1 branch still multiplies that degree0 factor once. Disabled/release profiles erase the predicates.
+
+Zero-constant multiply resets output before its nonempty-factor assertion. Throw and Continue preserve this reset and the older factor collection. Closed debug-runtime state stops valid positive-multiplicity copy/move before mutation. The closed-runtime test inspects captured actual backing rather than invoking ordinary formatting that itself reaches a closed assertion gate. No numerical scratch, construction counts or quotas are repaired. Independent T/C/disabled oracles exercise both insertion forms and the zero-constant path.
+
+Manifest validation passes. All execution remains on CPUs8–16. Broader polynomial source assertion/failure inventories and completion audits remain open, followed by AST. The hourly native run is not yet due from its20:25UTC start; no redundant full suite was launched.
+
+Broader factorization/frontend/modular-GCD/Euclidean/CRA/warm tests pass ordinary (19.171s) and g3checked/g3debug/g3trace (31.360s). Focused ordinary factor assertion/lifecycle checks pass (0.007s). Worktree validation has no whitespace errors.

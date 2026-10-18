@@ -213,8 +213,8 @@ func (fs *UPolynomialFactors) pushCopyWithSourceContext(v UPolynomialView, degre
 	if e := fs.check(); e != nil {
 		return e
 	}
-	if polynomialSourceDebug && degree == 0 {
-		return ErrUPolynomialAssertion
+	if e := fs.multiplicitySourceAssertion(degree, 57); e != nil {
+		return e
 	}
 	out, e := fs.pushEmpty()
 	if e != nil {
@@ -231,8 +231,8 @@ func (fs *UPolynomialFactors) pushCopyWithSourceContext(v UPolynomialView, degre
 	return nil
 }
 func (fs *UPolynomialFactors) pushSwap(source *UPolynomialManager, p *upolyVectorState, degree uint32) error {
-	if polynomialSourceDebug && degree == 0 {
-		return ErrUPolynomialAssertion
+	if e := fs.multiplicitySourceAssertion(degree, 66); e != nil {
+		return e
 	}
 	out, e := fs.pushEmpty()
 	if e != nil {
@@ -394,8 +394,14 @@ func (fs *UPolynomialFactors) multiplyWithCaller(out *upolyVectorState, caller *
 		return e
 	}
 	if zero {
-		if polynomialSourceDebug && fs.count != 0 {
-			return ErrUPolynomialAssertion
+		enabled, e := refinementSourceAssertionsEnabled()
+		if e != nil {
+			return e
+		}
+		if enabled && fs.count != 0 {
+			if e := m.scalarDivisionAssertionFailure(78, "m_factors.empty()"); e != nil {
+				return e
+			}
 		}
 		return nil
 	}
@@ -468,4 +474,17 @@ func (fs *UPolynomialFactors) Stats() UPolynomialFactorsStats {
 	}
 	st.TotalBytes = st.OwnerBytes + st.OuterBytes + st.MultiplicityBytes
 	return st
+}
+
+// Source: upolynomial.cpp:57,66. Continue preserves zero-degree insertion and
+// its literal unsigned counter/multiply behavior; runtime erasure skips it.
+func (fs *UPolynomialFactors) multiplicitySourceAssertion(degree uint32, line int32) error {
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil || !enabled {
+		return e
+	}
+	if degree == 0 {
+		return fs.manager.scalarDivisionAssertionFailure(line, "degree > 0")
+	}
+	return nil
 }

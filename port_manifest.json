@@ -50796,7 +50796,8 @@
         "pkg/math/polynomial/upolynomial_modular_gcd_trace_scalars.go",
         "pkg/math/polynomial/upolynomial_modular_gcd_display_trace_test.go",
         "pkg/math/polynomial/upolynomial_euclid_display_trace.go",
-        "pkg/math/polynomial/upolynomial_euclid_display_trace_test.go"
+        "pkg/math/polynomial/upolynomial_euclid_display_trace_test.go",
+        "pkg/math/polynomial/upolynomial_factor_assertion_actions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51085,7 +51086,11 @@
         "TestUPolynomialModularGCDLaterDisplayRetainsFactorFrontend",
         "TestUPolynomialEuclidPolynomialRecords",
         "TestUPolynomialEuclidDisplayReceipts",
-        "TestUPolynomialEuclidDisplayRetainsActualFactorFallback"
+        "TestUPolynomialEuclidDisplayRetainsActualFactorFallback",
+        "TestUPolynomialFactorMultiplicityAssertionActions",
+        "TestUPolynomialFactorZeroConstantAssertionActions",
+        "TestUPolynomialFactorClosedAssertionGate",
+        "TestUPolynomialFactorsZeroMultiplicityAndUnsignedCounterQuirks"
       ],
       "conditionals": [
         {
@@ -51674,6 +51679,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Factor insertion multiplicity and zero-constant multiply assertion actions (upolynomial.cpp:57,66,78)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factors.go",
+            "pkg/math/polynomial/upolynomial_factor_assertion_actions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorMultiplicityAssertionActions",
+            "TestUPolynomialFactorZeroConstantAssertionActions",
+            "TestUPolynomialFactorClosedAssertionGate",
+            "TestUPolynomialFactorsZeroMultiplicityAndUnsignedCounterQuirks"
+          ],
+          "notes": "Runtime gates precede source predicates; failed actions use actual debugger Throw/Continue under receiving-manager borrowing. Zero-multiplicity copy/move Continue performs literal insertion, with count1 and total factors/degree0; multiply still consumes degree0 factor once via source degree>1 branch. Throw stops before factor/degree append or input move. Zero-constant multiply resets output before assertion; Throw/Continue both preserve that reset and older factors. Closed debug runtime stops even valid positive-multiplicity insertion before mutation. Disabled/release erases predicates. Wider factor lifetime/source completion audit remains partial."
+        },
         {
           "name": "Euclidean GCD loop/result polynomial records and exact caller cleanup (upolynomial.cpp:836,847-848)",
           "status": "ported",
