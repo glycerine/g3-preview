@@ -50956,7 +50956,9 @@
         "pkg/math/polynomial/upolynomial_convert_entry_trace_test.go",
         "pkg/math/polynomial/algebraic_rational_arithmetic.go",
         "pkg/math/polynomial/algebraic_rational_multiply.go",
-        "pkg/math/polynomial/algebraic_inverse.go"
+        "pkg/math/polynomial/algebraic_inverse.go",
+        "pkg/util/numeral/mpbq_string_source.go",
+        "pkg/util/numeral/mpbq_string_source_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51317,7 +51319,9 @@
         "TestUPolynomialConvertEntryTraceSourceRecord",
         "TestUPolynomialConvertEntryTraceAfterAssertionsAndErasure",
         "TestUPolynomialConvertEntryTraceActualReadStops",
-        "TestAlgebraicInverseConversionEntryActualSourceStop"
+        "TestAlgebraicInverseConversionEntryActualSourceStop",
+        "TestBinarySourceStringRawShapeAndScalarPower",
+        "TestBinarySourceStringLargeZeroNumeralBudget"
       ],
       "conditionals": [
         {
@@ -51906,6 +51910,23 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Refinable traces use concrete shared binary to_string (upolynomial.cpp:2615,2640,2693; mpbq.cpp:384-392)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/numeral/mpbq_string_source.go",
+            "pkg/util/numeral/mpbq_string_source_test.go",
+            "pkg/math/polynomial/upolynomial_refinable_scope.go",
+            "pkg/math/polynomial/upolynomial_refinable_trace_test.go"
+          ],
+          "tests": [
+            "TestBinarySourceStringRawShapeAndScalarPower",
+            "TestBinarySourceStringLargeZeroNumeralBudget",
+            "TestUPolynomialRefinableTraceSourceRecords",
+            "TestUPolynomialRefinableTraceActualReadStops"
+          ],
+          "notes": "Removes the local duplicate numerator/denominator-power formatting algorithm from the actual retained refinable trace consumer. Binary source-string cleanup follows exact receipts without inspecting unrelated binary-manager operations or later formatter generations. Existing golden records, actual read guards, allocation-prefix and algebraic comparison/inverse consumers remain verified. Remaining conversion bound/display records and broader polynomial/AST completion remain open."
+        },
         {
           "name": "Rational-to-binary conversion entry trace before binary temporaries (upolynomial.cpp:2823-2827)",
           "status": "ported",
@@ -161764,7 +161785,11 @@
         "pkg/math/polynomial/algebraic_predicate_trace_test.go",
         "pkg/math/polynomial/upolynomial_sturm_isolation_scope_test.go",
         "pkg/math/polynomial/upolynomial_sturm_isolation_numeric_test.go",
-        "pkg/math/polynomial/upolynomial_sturm_isolation_trace_test.go"
+        "pkg/math/polynomial/upolynomial_sturm_isolation_trace_test.go",
+        "pkg/util/numeral/mpbq_string_source.go",
+        "pkg/util/numeral/mpbq_string_source_test.go",
+        "pkg/math/polynomial/upolynomial_refinable_scope.go",
+        "pkg/math/polynomial/upolynomial_refinable_trace_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -161799,7 +161824,11 @@
         "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement",
         "TestBinaryRationalDecimalSourceStreamAndRawScope",
         "TestBinarySelectSmallRationalLowerRetainedTrace",
-        "TestBinaryRetainedDebugArithmeticTraceSites"
+        "TestBinaryRetainedDebugArithmeticTraceSites",
+        "TestBinarySourceStringRawShapeAndScalarPower",
+        "TestBinarySourceStringLargeZeroNumeralBudget",
+        "TestUPolynomialRefinableTraceSourceRecords",
+        "TestUPolynomialRefinableTraceActualReadStops"
       ],
       "conditionals": [
         {
@@ -162084,6 +162113,24 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained binary to_string with actual formatting receipt (mpbq.cpp:384-392; upolynomial.cpp:2615,2640,2693)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/numeral/mpbq_string_source.go",
+            "pkg/util/numeral/mpbq_string_source_test.go",
+            "pkg/math/polynomial/upolynomial_refinable_scope.go",
+            "pkg/math/polynomial/upolynomial_refinable_trace_test.go"
+          ],
+          "tests": [
+            "TestBinarySourceStringRawShapeAndScalarPower",
+            "TestBinarySourceStringLargeZeroNumeralBudget",
+            "TestUPolynomialRefinableTraceSourceRecords",
+            "TestUPolynomialRefinableTraceActualReadStops"
+          ],
+          "notes": "Concrete BinaryRationalManager.SourceStringTracked now owns the actual integer-character/formatter receipt and reads the scalar denominator power only after numerator formatting completes. Native Go strings and buffer storage replace STL. Source raw numeral shape is preserved, including unnormalized2/2 and maximal uint32 exponent without constructing 2^k. Refinable interval traces use this shared live source routine and clean only its exact captured children, preserving later independent formatter reuse. A 300-limb negative-number oracle verifies complete text, unchanged numeral and success with the numeral reservation gate closed; format buffers are native Go storage, so this is explicitly not a project-allocation failure campaign. Actual numerical backing read failures remain covered through the real polynomial consumer.",
+          "go_target": "pkg/util/numeral/mpbq_string_source.go"
+        },
         {
           "name": "Concrete foreign-owner MPBQ comparison and interval SET for algebraic-manager translation, with receiver scaling scratch and exact caller transport",
           "status": "ported",
@@ -162377,7 +162424,11 @@
         "pkg/util/numeral/mpbq_decimal_stream.go",
         "pkg/util/numeral/mpbq_decimal_stream_test.go",
         "pkg/util/numeral/mpbq_select_trace.go",
-        "pkg/util/numeral/mpbq_debug_trace.go"
+        "pkg/util/numeral/mpbq_debug_trace.go",
+        "pkg/util/numeral/mpbq_string_source.go",
+        "pkg/util/numeral/mpbq_string_source_test.go",
+        "pkg/math/polynomial/upolynomial_refinable_scope.go",
+        "pkg/math/polynomial/upolynomial_refinable_trace_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -162412,7 +162463,11 @@
         "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement",
         "TestBinaryRationalDecimalSourceStreamAndRawScope",
         "TestBinarySelectSmallRationalLowerRetainedTrace",
-        "TestBinaryRetainedDebugArithmeticTraceSites"
+        "TestBinaryRetainedDebugArithmeticTraceSites",
+        "TestBinarySourceStringRawShapeAndScalarPower",
+        "TestBinarySourceStringLargeZeroNumeralBudget",
+        "TestUPolynomialRefinableTraceSourceRecords",
+        "TestUPolynomialRefinableTraceActualReadStops"
       ],
       "conditionals": [
         {
@@ -162427,6 +162482,24 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained binary to_string with actual formatting receipt (mpbq.cpp:384-392; upolynomial.cpp:2615,2640,2693)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/numeral/mpbq_string_source.go",
+            "pkg/util/numeral/mpbq_string_source_test.go",
+            "pkg/math/polynomial/upolynomial_refinable_scope.go",
+            "pkg/math/polynomial/upolynomial_refinable_trace_test.go"
+          ],
+          "tests": [
+            "TestBinarySourceStringRawShapeAndScalarPower",
+            "TestBinarySourceStringLargeZeroNumeralBudget",
+            "TestUPolynomialRefinableTraceSourceRecords",
+            "TestUPolynomialRefinableTraceActualReadStops"
+          ],
+          "notes": "Concrete BinaryRationalManager.SourceStringTracked now owns the actual integer-character/formatter receipt and reads the scalar denominator power only after numerator formatting completes. Native Go strings and buffer storage replace STL. Source raw numeral shape is preserved, including unnormalized2/2 and maximal uint32 exponent without constructing 2^k. Refinable interval traces use this shared live source routine and clean only its exact captured children, preserving later independent formatter reuse. A 300-limb negative-number oracle verifies complete text, unchanged numeral and success with the numeral reservation gate closed; format buffers are native Go storage, so this is explicitly not a project-allocation failure campaign. Actual numerical backing read failures remain covered through the real polynomial consumer.",
+          "go_target": "pkg/util/numeral/mpbq_string_source.go"
+        },
         {
           "name": "Concrete foreign-owner MPBQ comparison and interval SET for algebraic-manager translation, with receiver scaling scratch and exact caller transport",
           "status": "ported",

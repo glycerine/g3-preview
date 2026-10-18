@@ -6,7 +6,6 @@ import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"io"
 	"strconv"
-	"strings"
 )
 
 type upolyRefinableInvocationReceipt struct {
@@ -180,7 +179,7 @@ func (m *UPolynomialManager) CleanupRefinable() error {
 		}
 	}()
 	for i := len(q.insertions) - 1; i >= 0; i-- {
-		if e := m.modular.CleanupSourceString(&q.insertions[i]); e != nil {
+		if e := q.binary.CleanupSourceString(&q.insertions[i]); e != nil {
 			return e
 		}
 	}
@@ -247,19 +246,12 @@ func (q *upolyRefinableScope) traceInterval(line int, values [6]*unumeral.Binary
 		out := factorizationTraceWriter{raw}
 		for i := 0; i < count; i++ {
 			_ = linearWriteText(out, labels[i])
-			var text strings.Builder
-			if e := q.owner.config.Integer.InsertSourceIntegerTracked(factorizationTraceStream{&text}, values[i].BorrowNumerator(), &q.insertions[i], nil); e != nil {
+			text, e := q.binary.SourceStringTracked(values[i], &q.insertions[i])
+			if e != nil {
 				computation = e
 				return e
 			}
-			k := values[i].K()
-			if k == 1 {
-				text.WriteString("/2")
-			} else if k > 1 {
-				text.WriteString("/2^")
-				text.WriteString(strconv.FormatUint(uint64(k), 10))
-			}
-			_ = linearWriteText(out, text.String())
+			_ = linearWriteText(out, text)
 		}
 		_ = linearWriteText(out, "\n")
 		return nil
