@@ -44612,3 +44612,35 @@ commands used CPUs 8-16. Full polynomial then AST remains active, with source
 units still partial; no full repeat after the recent 93.929s ordinary suite.
 Final rebuilt ordinary Hash/Cache/LexSort selection passed (0.032s). portcheck
 and git diff --check passed; whole-unit status counts remain unchanged.
+
+Continued retained cache/hash audit found two further source differences in
+poly_chasher (cpp 2468-2471). Polynomial hashing decoded monomial Info to obtain
+Hash, reading refcount/ID/degree/size unnecessarily; it also eagerly computed
+an ascending child slice before the composite helper, whose larger-input source
+order visits descending children. Added concrete MonomialManager.Hash for the
+actual scalar hash getter (cpp 210), reading only the codec hash word 16. The
+polynomial child hasher now executes directly through the existing typed uint32
+Composite helper. The first guarded error is retained, later callback entries
+perform no source reads, and failed public Hash still returns 0. The ascending
+staging slice is removed. No any-valued algorithm layer or unused template is
+introduced.
+
+A query-only monomial prefix with only Hash initialized yields the same hash
+as the genuine complete polynomial, leaving all other scalar bytes unreadable.
+A four-term guarded fixture gives the last child an out-of-bounds monomial
+hash and the first child an uninitialized coefficient. The observed bounds
+error proves that the composite helper visits the last child first; eager
+ascending evaluation would instead report uninitialized bytes. Genuine owning
+records are restored before destruction, without construction/ownership claims.
+C++ argument evaluation order within hash_u_u itself is not asserted.
+
+Checked/debug/trace Hash/Cache/LexSort selection passed 0.077s on CPUs 8-16.
+Started one full ordinary polynomial run approximately fifty minutes after the
+preceding full run; its terminal result is recorded below when available.
+Whole polynomial and monomial source units remain partial, and the complete
+polynomial then AST objective remains active.
+Full ordinary polynomial run completed successfully; terminal evidence is in
+/mnt/oldrog/tmp/g3-polynomial-hash-child-full.log. portcheck and git diff --check
+passed; whole-unit counts remain unchanged (2103 units,677 APIs;208 ported,
+343 partial,1495 unported,11 dead/deleted).
+Full ordinary elapsed time:94.230s. The checked focused selection passed0.077s.

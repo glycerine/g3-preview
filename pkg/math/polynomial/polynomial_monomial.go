@@ -313,6 +313,18 @@ func (m *MonomialManager) Info(a Monomial) (MonomialInfo, error) {
 	}
 	return m.headerCore(a)
 }
+
+// Hash is the retained monomial::hash() scalar getter (polynomial.cpp:210).
+func (m *MonomialManager) Hash(a Monomial) (uint32, error) {
+	if e := m.check(); e != nil {
+		return 0, e
+	}
+	l, e := m.location(a)
+	if e != nil {
+		return 0, e
+	}
+	return m.allocator.ReadUint32(l.raw, 16)
+}
 func (m *MonomialManager) powerCore(a Monomial, i uint32) (MonomialPower, error) {
 	var out MonomialPower
 	l, e := m.location(a)

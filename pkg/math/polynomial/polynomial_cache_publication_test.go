@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/arena"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
@@ -64,6 +65,76 @@ func TestPolynomialHashNonzeroDoesNotReadReferenceCount(t *testing.T) {
 	}
 	if _, e := a.ReadUint32(raw, 0); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
 		t.Fatal("nonzero hashing initialized refcount", e)
+	}
+}
+
+func TestPolynomialHashChildReadsOnlyMonomialHash(t *testing.T) {
+	m := polynomialPSCFullFixture(t)
+	p := polynomialQueryTerms(t, m.core, []int32{7}, [][]MonomialPower{{{0, 2}}})
+	want, e := m.Hash(p)
+	serviceMust(t, e)
+	mono, e := m.core.monomialCore(p, 0)
+	serviceMust(t, e)
+	l, e := m.core.monomials.location(mono)
+	serviceMust(t, e)
+	a := m.core.monomials.allocator
+	h, e := a.ReadUint32(l.raw, 16)
+	serviceMust(t, e)
+	raw, e := a.Allocate(20)
+	serviceMust(t, e)
+	original := l.raw
+	l.raw = raw
+	defer func() { l.raw = original; serviceMust(t, a.Deallocate(20, raw)) }()
+	serviceMust(t, a.WriteUint32(raw, 16, h))
+	got, e := m.Hash(p)
+	serviceMust(t, e)
+	if got != want {
+		t.Fatal("cached monomial hash changed polynomial hash", got, want)
+	}
+	for offset := uint64(0); offset < 16; offset += 4 {
+		if _, e := a.ReadUint32(raw, offset); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
+			t.Fatal("child hasher touched unrelated monomial header", offset, e)
+		}
+	}
+}
+
+func TestPolynomialHashCompositeVisitsLastChildBeforeFirst(t *testing.T) {
+	m := polynomialPSCFullFixture(t)
+	p := polynomialQueryTerms(t, m.core, []int32{7, 3, 5, 11}, [][]MonomialPower{nil, {{0, 2}}, {{1, 1}}, {{0, 1}}})
+	_, e := m.Hash(p) // Complete real lexical sorting before raw-prefix queries.
+	serviceMust(t, e)
+	pl, e := m.core.polynomialLocation(p)
+	serviceMust(t, e)
+	last, e := m.core.monomialCore(p, 3)
+	serviceMust(t, e)
+	ml, e := m.core.monomials.location(last)
+	serviceMust(t, e)
+	a := m.core.monomials.allocator
+	n := uint64(polynomialCodecBytes(4))
+	polyRaw, e := a.Allocate(n)
+	serviceMust(t, e)
+	monoRaw, e := a.Allocate(16) // Hash word at offset16 is out of bounds.
+	serviceMust(t, e)
+	oldPoly, oldMono := pl.raw, ml.raw
+	defer func() {
+		pl.raw, ml.raw = oldPoly, oldMono
+		serviceMust(t, a.Deallocate(n, polyRaw))
+		serviceMust(t, a.Deallocate(16, monoRaw))
+	}()
+	for offset := uint64(0); offset < n; offset += 4 {
+		if offset == 12 { // First coefficient's scalar remains uninitialized.
+			continue
+		}
+		word, e := a.ReadUint32(oldPoly, offset)
+		serviceMust(t, e)
+		serviceMust(t, a.WriteUint32(polyRaw, offset, word))
+	}
+	pl.raw, ml.raw = polyRaw, monoRaw
+	// get_composite_hash visits3 first for size4. Ascending precomputation
+	// instead reaches coefficient0 and reports uninitialized bytes.
+	h, e := m.Hash(p)
+	if !errors.Is(e, arena.ErrBounds) || h != 0 {
+		t.Fatal("composite child source access order", h, e)
 	}
 }
 

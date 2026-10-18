@@ -42881,6 +42881,21 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Concrete polynomial hash child reads only monomial hash and follows composite child visitation (polynomial.cpp:210,2468-2480)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_hash.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_monomial.go",
+            "pkg/math/polynomial/polynomial_cache_publication_test.go"
+          ],
+          "tests": [
+            "TestPolynomialHashChildReadsOnlyMonomialHash",
+            "TestPolynomialHashCompositeVisitsLastChildBeforeFirst",
+            "TestPolynomialHashCacheKeysAndLexicalOrder"
+          ],
+          "notes": "Added the retained concrete MonomialManager.Hash scalar getter reading only codec hash word16; polynomial hashing no longer decodes monomial refcount, ID, degree or size through Info. The polynomial child hasher now executes through the existing uint32 Composite helper instead of precomputing an ascending child slice, so larger source inputs visit descending children in the helper's actual order. The first guarded child error is retained and later callback entries perform no source reads; the public failed hash remains zero. A raw monomial prefix with only its hash initialized produces the genuine polynomial hash. A size4 fixture gives child3 an out-of-bounds monomial hash and child0 an unreadable coefficient; the reported bounds error proves the source helper reaches child3 first. Genuine owning polynomial/monomial records are restored before destruction; no construction/ownership claims are synthesized. Exact argument evaluation order inside the C++ hash_u_u call is not asserted. Whole monomial/polynomial manager audits remain partial."
+        },
+        {
           "name": "Hash size-first scalar access and zero early return without reference-count reads (polynomial.cpp:2475-2480)",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_hash.go",
@@ -47080,6 +47095,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete polynomial hash child reads only monomial hash and follows composite child visitation (polynomial.cpp:210,2468-2480)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_hash.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_monomial.go",
+            "pkg/math/polynomial/polynomial_cache_publication_test.go"
+          ],
+          "tests": [
+            "TestPolynomialHashChildReadsOnlyMonomialHash",
+            "TestPolynomialHashCompositeVisitsLastChildBeforeFirst",
+            "TestPolynomialHashCacheKeysAndLexicalOrder"
+          ],
+          "notes": "Added the retained concrete MonomialManager.Hash scalar getter reading only codec hash word16; polynomial hashing no longer decodes monomial refcount, ID, degree or size through Info. The polynomial child hasher now executes through the existing uint32 Composite helper instead of precomputing an ascending child slice, so larger source inputs visit descending children in the helper's actual order. The first guarded child error is retained and later callback entries perform no source reads; the public failed hash remains zero. A raw monomial prefix with only its hash initialized produces the genuine polynomial hash. A size4 fixture gives child3 an out-of-bounds monomial hash and child0 an unreadable coefficient; the reported bounds error proves the source helper reaches child3 first. Genuine owning polynomial/monomial records are restored before destruction; no construction/ownership claims are synthesized. Exact argument evaluation order inside the C++ hash_u_u call is not asserted. Whole monomial/polynomial manager audits remain partial."
+        },
         {
           "name": "Hash size-first scalar access and zero early return without reference-count reads (polynomial.cpp:2475-2480)",
           "status": "ported",

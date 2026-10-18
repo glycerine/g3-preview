@@ -23,25 +23,37 @@ func (m *MultivariatePolynomialManager) Hash(p Polynomial) (uint32, error) {
 	if e != nil {
 		return 0, e
 	}
-	children := make([]uint32, size)
-	for i := range children {
-		mono, e := m.core.monomialCore(p, uint32(i))
-		if e != nil {
-			return 0, e
+	var cause error
+	h := uhash.Composite(17, size, func(i uint32) uint32 {
+		if cause != nil {
+			return 0
 		}
-		mi, e := m.core.monomials.Info(mono)
-		if e != nil {
-			return 0, e
-		}
-		coefficient, e := m.core.coefficientCore(p, uint32(i))
-		if e != nil {
-			return 0, e
-		}
-		valueHash, e := m.core.modular.Hash(&coefficient)
-		if e != nil {
-			return 0, e
-		}
-		children[i] = uhash.UintPair(mi.Hash, valueHash)
+		var child uint32
+		child, cause = m.polynomialHashChild(p, i)
+		return child
+	})
+	if cause != nil {
+		return 0, cause
 	}
-	return uhash.Composite(17, size, func(i uint32) uint32 { return children[i] }), nil
+	return h, nil
+}
+
+func (m *MultivariatePolynomialManager) polynomialHashChild(p Polynomial, i uint32) (uint32, error) {
+	mono, e := m.core.monomialCore(p, i)
+	if e != nil {
+		return 0, e
+	}
+	monomialHash, e := m.core.monomials.Hash(mono)
+	if e != nil {
+		return 0, e
+	}
+	coefficient, e := m.core.coefficientCore(p, i)
+	if e != nil {
+		return 0, e
+	}
+	valueHash, e := m.core.modular.Hash(&coefficient)
+	if e != nil {
+		return 0, e
+	}
+	return uhash.UintPair(monomialHash, valueHash), nil
 }
