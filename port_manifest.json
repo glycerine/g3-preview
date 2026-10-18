@@ -50821,7 +50821,9 @@
         "pkg/math/polynomial/upolynomial_factor_verbose_test.go",
         "pkg/math/polynomial/upolynomial_normalization_assertions_test.go",
         "pkg/math/polynomial/upolynomial_refinable_sign_assertions.go",
-        "pkg/math/polynomial/upolynomial_refinable_sign_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_refinable_sign_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_convert_entry_assertions.go",
+        "pkg/math/polynomial/upolynomial_convert_entry_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51153,7 +51155,10 @@
         "TestUPolynomialRefinableSignInvariantActions",
         "TestUPolynomialRefinableSameSignSourceActions",
         "TestUPolynomialRefinableSignRuntimeOracles",
-        "TestUPolynomialRefinableSignClosedGate"
+        "TestUPolynomialRefinableSignClosedGate",
+        "TestUPolynomialConvertEntrySeparateSourceActions",
+        "TestUPolynomialConvertEntryContinueAndErasure",
+        "TestUPolynomialConvertEntryValidOracle"
       ],
       "conditionals": [
         {
@@ -51742,6 +51747,23 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Rational-to-binary interval separate entry sign actions (upolynomial.cpp:2820-2821)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_refinement.go",
+            "pkg/math/polynomial/upolynomial_convert_entry_assertions.go",
+            "pkg/math/polynomial/upolynomial_convert_entry_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialConvertEntrySeparateSourceActions",
+            "TestUPolynomialConvertEntryContinueAndErasure",
+            "TestUPolynomialConvertEntryValidOracle",
+            "TestUPolynomialQ2BQNineRegisteredIntervals",
+            "TestUPolynomialQ2BQAliasedOutputSourceDebugSite"
+          ],
+          "notes": "Two runtime-gated source predicates replace one combined fixed error: nonzero endpoint signs first, opposite signs second. Actual debugger T and CT on a public root endpoint prove independent actions before conversion temporaries/output publication. Direct primitive-sign CC/disabled adapters do not manufacture evaluator results or claim invalid intervals are valid. Enabled/disabled x-1 interval[0,2] converts exactly to dyadic[0,2]; registered conversion/precision/aliased-output routes verified. Actual receiver borrowing during failed actions. Later conversion predicates/traces and numerical lifetime audits remain partial."
+        },
         {
           "name": "isolating2refinable sign runtime actions (upolynomial.cpp:2605,2619,2624,2643,2652,2661,2727,2734)",
           "status": "ported",

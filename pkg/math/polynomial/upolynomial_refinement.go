@@ -405,8 +405,8 @@ func (m *UPolynomialManager) ConvertRationalToBinaryInterval(v UPolynomialView, 
 	if e != nil {
 		return false, e
 	}
-	if polynomialSourceDebug && (sa == 0 || sb == 0 || sa != -sb) {
-		return false, ErrUPolynomialAssertion
+	if e := m.convertIntervalEntryAssertions(sa, sb); e != nil {
+		return false, e
 	}
 	foundD := false
 	var lower, upper unumeral.BinaryRational
