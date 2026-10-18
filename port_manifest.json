@@ -50819,7 +50819,9 @@
         "pkg/util/numeral/mpzzp_string_source.go",
         "pkg/math/polynomial/upolynomial_factor_verbose.go",
         "pkg/math/polynomial/upolynomial_factor_verbose_test.go",
-        "pkg/math/polynomial/upolynomial_normalization_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_normalization_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_refinable_sign_assertions.go",
+        "pkg/math/polynomial/upolynomial_refinable_sign_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51147,7 +51149,11 @@
         "TestUPolynomialNormalizationIdentityClosedAndErased",
         "TestUPolynomialRootIDNormalizeTraceTextAndAssertionActions",
         "TestUPolynomialSequenceSturmNormalizeTraceTextAndAssertionActions",
-        "TestUPolynomialSturmIsolationNormalizeTraceTextAndAssertionActions"
+        "TestUPolynomialSturmIsolationNormalizeTraceTextAndAssertionActions",
+        "TestUPolynomialRefinableSignInvariantActions",
+        "TestUPolynomialRefinableSameSignSourceActions",
+        "TestUPolynomialRefinableSignRuntimeOracles",
+        "TestUPolynomialRefinableSignClosedGate"
       ],
       "conditionals": [
         {
@@ -51736,6 +51742,23 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "isolating2refinable sign runtime actions (upolynomial.cpp:2605,2619,2624,2643,2652,2661,2727,2734)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_refinement.go",
+            "pkg/math/polynomial/upolynomial_refinable_sign_assertions.go",
+            "pkg/math/polynomial/upolynomial_refinable_sign_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialRefinableSignInvariantActions",
+            "TestUPolynomialRefinableSameSignSourceActions",
+            "TestUPolynomialRefinableSignRuntimeOracles",
+            "TestUPolynomialRefinableSignClosedGate",
+            "TestUPolynomialRefinableNineRegisteredCalls"
+          ],
+          "notes": "Separate runtime-gated concrete sign predicates retain original swap/check ordering and actual debugger Throw/Continue under receiving-manager borrowing. Public x^2-1 interval[2,3] reaches genuine same-sign entry failure; C/disabled/release literal true return is explicitly outside isolating precondition, not claimed as valid bracket. Other failed invariant adapters use independent sign arguments2,1, without altering evaluator results or numerical scratch; several follow tautologically from branch guards. Enabled/disabled independent bracket, endpoint-narrowing, exact endpoint and both-root-midpoint oracles verify exact rational endpoints. Closed runtime checked before valid predicate. Fourth-case update assertions2727/2734 are also runtime gated; an independent cubic x*(10x-29)*(x-3) with endpoint roots0,3 exercises both repeated updates and returns dyadic bracket[45/16,93/32] around29/10. Other refinement traces/lifetimes remain partial."
+        },
         {
           "name": "General normalization DEBUG identity runtime actions (upolynomial.cpp:393)",
           "status": "ported",

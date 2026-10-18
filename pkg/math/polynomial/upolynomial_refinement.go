@@ -30,8 +30,8 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *unumer
 		return false, e
 	}
 	if sa != 0 && sb != 0 {
-		if polynomialSourceDebug && sa != -sb {
-			return false, ErrUPolynomialAssertion
+		if e := m.refinableSignAssertion(2605, sa, sb); e != nil {
+			return false, e
 		}
 		return true, nil
 	}
@@ -53,13 +53,13 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *unumer
 				if e = bqm.Swap(&next, a); e != nil {
 					return false, e
 				}
-				if polynomialSourceDebug && sn != 0 && sn != -sb {
-					return false, ErrUPolynomialAssertion
+				if e := m.refinableSignAssertion(2619, sn, sb); e != nil {
+					return false, e
 				}
 				return sn != 0, nil
 			}
-			if polynomialSourceDebug && sn != sb {
-				return false, ErrUPolynomialAssertion
+			if e := m.refinableSignAssertion(2624, sn, sb); e != nil {
+				return false, e
 			}
 			if e = bqm.Swap(b, &next); e != nil {
 				return false, e
@@ -87,8 +87,8 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *unumer
 				return false, e
 			}
 			if sn != sa {
-				if polynomialSourceDebug && sn != 0 && sn != -sa {
-					return false, ErrUPolynomialAssertion
+				if e := m.refinableSignAssertion(2643, sn, sa); e != nil {
+					return false, e
 				}
 				if sn == 0 {
 					e = bqm.Swap(&next, a)
@@ -100,8 +100,8 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *unumer
 				}
 				return sn != 0, nil
 			}
-			if polynomialSourceDebug && sn != sa {
-				return false, ErrUPolynomialAssertion
+			if e := m.refinableSignAssertion(2652, sn, sa); e != nil {
+				return false, e
 			}
 			if e = bqm.Swap(a, &next); e != nil {
 				return false, e
@@ -114,8 +114,8 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *unumer
 			}
 		}
 	}
-	if polynomialSourceDebug && (sa != 0 || sb != 0) {
-		return false, ErrUPolynomialAssertion
+	if e := m.refinableSignAssertion(2661, sa, sb); e != nil {
+		return false, e
 	}
 	var b1, a2, newA, newB unumeral.BinaryRational
 	defer bqm.Del(&b1)
@@ -193,8 +193,8 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *unumer
 			}
 			return true, nil
 		}
-		if polynomialSourceDebug && snA != s1 {
-			return false, ErrUPolynomialAssertion
+		if e := m.refinableSignAssertion(2727, snA, s1); e != nil {
+			return false, e
 		}
 		if e = bqm.Swap(&b1, &newA); e != nil {
 			return false, e
@@ -205,8 +205,8 @@ func (m *UPolynomialManager) IsolatingToRefinable(v UPolynomialView, bqm *unumer
 		if e = bqm.Div2(&newA); e != nil {
 			return false, e
 		}
-		if polynomialSourceDebug && snB != s2 {
-			return false, ErrUPolynomialAssertion
+		if e := m.refinableSignAssertion(2734, snB, s2); e != nil {
+			return false, e
 		}
 		if e = bqm.Swap(&a2, &newB); e != nil {
 			return false, e
