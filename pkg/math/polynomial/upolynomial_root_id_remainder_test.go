@@ -408,6 +408,9 @@ func TestUPolynomialRootIDNumericalContextRejectsCheckpointAndRetirement(t *test
 		if e := p.derivativeStateWithSourceContext(v, &untouched, context); !errors.Is(e, ErrUPolynomialOwner) || untouched != (upolyVectorState{}) {
 			t.Fatal("checkpoint acquired derivative vector before context validation", e)
 		}
+		if e := p.signedRemStateWithSourceContext(v, v, &untouched, context); !errors.Is(e, ErrUPolynomialOwner) || untouched != (upolyVectorState{}) {
+			t.Fatal("checkpoint acquired signed remainder before context validation", e)
+		}
 		if e := p.normalizeWithSourceContext(v, context); !errors.Is(e, ErrUPolynomialOwner) {
 			t.Fatal("checkpoint acquired normalization context", e)
 		}

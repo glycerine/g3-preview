@@ -16,12 +16,12 @@ func (m *UPolynomialManager) remStateWithSourceContext(a, b UPolynomialView, d *
 	if d == nil {
 		return arena.ErrBounds
 	}
-	if polynomialSourceDebug && (m.alias(a, r) || m.alias(b, r)) {
-		return ErrUPolynomialAssertion
+	if e := m.remainderAliasAssertions(a, b, r, 517); e != nil {
+		return e
 	}
 	*d = 0
-	if polynomialSourceDebug && b.count == 0 {
-		return ErrUPolynomialAssertion
+	if e := refinementSourceAssert(b.count > 0, 519, "sz2 > 0"); e != nil {
+		return e
 	}
 	if b.count == 1 {
 		return m.reset(r)
@@ -36,14 +36,8 @@ func (m *UPolynomialManager) remStateWithSourceContext(a, b UPolynomialView, d *
 	if e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
-		zero, e := m.modular.IsZero(bn)
-		if e != nil {
-			return e
-		}
-		if zero {
-			return ErrUPolynomialAssertion
-		}
+	if e = m.remainderLeadingAssertion(bn); e != nil {
+		return e
 	}
 	var local unumeral.Int
 	am := &local
@@ -149,8 +143,11 @@ func (m *UPolynomialManager) signedRemState(a, b UPolynomialView, r *upolyVector
 	return m.signedRemStateWithSourceContext(a, b, r, integerAllocationInvocationContext{})
 }
 func (m *UPolynomialManager) signedRemStateWithSourceContext(a, b UPolynomialView, r *upolyVectorState, context integerAllocationInvocationContext) error {
-	if polynomialSourceDebug && (m.alias(a, r) || m.alias(b, r)) {
-		return ErrUPolynomialAssertion
+	if context.rootID != nil && context.rootIDFrame(m.config.Integer) == nil {
+		return ErrUPolynomialOwner
+	}
+	if e := m.remainderAliasAssertions(a, b, r, 568); e != nil {
+		return e
 	}
 	var d uint32
 	if e := m.remStateWithSourceContext(a, b, &d, r, context); e != nil {

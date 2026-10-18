@@ -465,10 +465,12 @@ func TestUPolynomialGCDRawZeroCountsAndSourceAliases(t *testing.T) {
 	if e = m.SetInts(a, []unumeral.Int{unumeral.NewInt(2), unumeral.NewInt(1)}); e != nil {
 		t.Fatal(e)
 	}
+	// The deliberate alias now reaches the actual source debugger action.
+	polynomialAssertionActionsFixture(t, "T")
 	var power uint32
 	e = m.Rem(a, b, a, &power)
 	if polynomialSourceDebug {
-		if !errors.Is(e, ErrUPolynomialAssertion) {
+		if !errors.Is(e, ErrUPolynomialAssertion) || !linearThrownAssertion(e) {
 			t.Fatal(e)
 		}
 	} else {
