@@ -159309,6 +159309,21 @@
       "ownership_audited": true,
       "methods": [
         {
+          "name": "Concrete cross-owner mpbq numerator SET then exponent publication for retained algebraic-manager translation",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpbq.go",
+          "go_targets": [
+            "pkg/util/numeral/mpbq.go",
+            "pkg/util/numeral/mpbq_copy_owner_test.go"
+          ],
+          "tests": [
+            "TestBinaryCopyFromIndependentOwnerReservationPrefixes",
+            "TestBinaryCopyIndependentOwnerSurvivesSourceClose",
+            "TestBinaryCopyFromOwnerRetainsExactDescriptorRefusal"
+          ],
+          "notes": "CopyFromOwnerWithAllocationReceipt validates source and receiver in their explicit concrete BinaryRationalManager/IntegerManager domains, uses the existing destructive source integer copy with its exact allocation receipt, and publishes K only after NUM succeeds. Same-owner operations reuse the existing path. Cross-owner alias of one mutable field is rejected. Tests cover every budget refusal through success, all65 limbs/sign/exponent of an independent negative input, source-owner closure after completed copy, and actual physical backing acquired before descriptor refusal with exact receipt cleanup. Enclosing algebraic-core/value lifetime pins and cross-owner interval assertion composition are still required in the unported AST translation consumer."
+        },
+        {
           "name": "constructor/destructor/reset(vector), normalize and magnitudes",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpbq.go",
@@ -159619,6 +159634,21 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Concrete cross-owner mpbq numerator SET then exponent publication for retained algebraic-manager translation",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpbq.go",
+          "go_targets": [
+            "pkg/util/numeral/mpbq.go",
+            "pkg/util/numeral/mpbq_copy_owner_test.go"
+          ],
+          "tests": [
+            "TestBinaryCopyFromIndependentOwnerReservationPrefixes",
+            "TestBinaryCopyIndependentOwnerSurvivesSourceClose",
+            "TestBinaryCopyFromOwnerRetainsExactDescriptorRefusal"
+          ],
+          "notes": "CopyFromOwnerWithAllocationReceipt validates source and receiver in their explicit concrete BinaryRationalManager/IntegerManager domains, uses the existing destructive source integer copy with its exact allocation receipt, and publishes K only after NUM succeeds. Same-owner operations reuse the existing path. Cross-owner alias of one mutable field is rejected. Tests cover every budget refusal through success, all65 limbs/sign/exponent of an independent negative input, source-owner closure after completed copy, and actual physical backing acquired before descriptor refusal with exact receipt cleanup. Enclosing algebraic-core/value lifetime pins and cross-owner interval assertion composition are still required in the unported AST translation consumer."
+        },
         {
           "name": "mpbq constructors/k/numerator-copy/swap, manager setters/predicates, inline forwarding, scoped int32/Int macros",
           "status": "ported",

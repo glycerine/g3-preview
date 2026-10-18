@@ -44291,3 +44291,28 @@ top-level tests and no failures observed at the latest poll; its decimal sweep
 has reached ordinal7728. Log: /mnt/oldrog/tmp/g3-polynomial-full-checked-current.jsonl.
 No numerical source was changed during this run. Polynomial then AST goal
 remains active; this is a newly identified retained feature gap, not completion.
+
+Cross-manager algebraic translation prerequisite: added concrete
+BinaryRationalManager.CopyFromOwnerWithAllocationReceipt. It reads the source
+numerator through its actual source IntegerManager, copies destructively with
+the existing exact integer allocation receipt, then publishes the exponent.
+Same-owner calls use the original implementation. The enclosing caller remains
+responsible for source/target core lifetimes; this is not a completed algebraic
+cross-core copy or an any-valued adaptation layer.
+
+Independent-owner tests cover every budget refusal through first success,
+unchanged source ownership, exponent publication after successful NUM only,
+all65 expected limbs of a negative large numerator, and target validity after
+source manager and integer-owner closure. A separate real descriptor-slot
+refusal occurs after physical backing acquisition and verifies exact receipt
+ownership/cleanup and physical-root accounting. Budget failures in the first
+campaign did not themselves retain an accepted child, so the dedicated physical
+refusal test supplies that evidence without fabricating a receipt.
+
+Focused binary cross-owner/integer source-copy checks pass ordinary and
+checked/debug/trace (0.008s each), on CPUs8–16. Cross-owner interval assertion
+composition and the full algebraic cell copy/lifetime pins remain open for AST.
+The existing full checked polynomial process remains live, with401 top-level
+tests completed and no failures at the latest poll. Its compiled binary predates
+this additive bound-copy API; the new primitive has separate focused checks.
+No full-suite pass is claimed while the process remains live.

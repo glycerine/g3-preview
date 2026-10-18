@@ -385,6 +385,31 @@ func (m *BinaryRationalManager) copyWithAllocationReceipt(dst, src *BinaryRation
 	dst.KField = src.KField
 	return nil
 }
+
+// CopyFromOwnerWithAllocationReceipt is the concrete cross-manager mpbq SET
+// used when algebraic cells move between independent arithmetic plugins.
+// Preserve numerator SET before exponent publication, including its exact
+// accepted destructive allocation receipt. The caller owns enclosing lifetimes.
+func (m *BinaryRationalManager) CopyFromOwnerWithAllocationReceipt(dst *BinaryRational, source *BinaryRationalManager, src *BinaryRational, receipt *IntegerCopyAllocationReceipt) error {
+	if source == m {
+		return m.CopyWithAllocationReceipt(dst, src, receipt)
+	}
+	if e := m.check(dst); e != nil {
+		return e
+	}
+	if source == nil || dst == src {
+		return arena.ErrConfig
+	}
+	if e := source.check(src); e != nil {
+		return e
+	}
+	if e := m.Z.CopyFromOwnerWithReceipt(&dst.Num, source.Z, &src.Num, receipt); e != nil {
+		return e
+	}
+	dst.KField = src.KField
+	return nil
+}
+
 func (m *BinaryRationalManager) SetInt32(a *BinaryRational, n int32) error {
 	if e := m.check(a); e != nil {
 		return e
