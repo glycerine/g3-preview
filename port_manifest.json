@@ -50825,7 +50825,9 @@
         "pkg/math/polynomial/upolynomial_convert_entry_assertions.go",
         "pkg/math/polynomial/upolynomial_convert_entry_assertions_test.go",
         "pkg/math/polynomial/upolynomial_convert_bound_assertions.go",
-        "pkg/math/polynomial/upolynomial_convert_bound_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_convert_bound_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_convert_final_assertions.go",
+        "pkg/math/polynomial/upolynomial_convert_final_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51162,7 +51164,10 @@
         "TestUPolynomialConvertEntryContinueAndErasure",
         "TestUPolynomialConvertEntryValidOracle",
         "TestUPolynomialConvertBoundPredicateActions",
-        "TestUPolynomialConvertBoundPredicateErasure"
+        "TestUPolynomialConvertBoundPredicateErasure",
+        "TestUPolynomialConvertFinalAssertionActions",
+        "TestUPolynomialConvertFinalPredicateErasure",
+        "TestUPolynomialConvertFinalAliasedSourceActions"
       ],
       "conditionals": [
         {
@@ -51751,6 +51756,28 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Remaining rational-to-binary interval runtime assertion actions (upolynomial.cpp:2864,2879,2887-2888,2892-2894,2912-2915)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_refinement.go",
+            "pkg/math/polynomial/upolynomial_convert_bound_assertions.go",
+            "pkg/math/polynomial/upolynomial_convert_bound_assertions_test.go",
+            "pkg/math/polynomial/upolynomial_convert_final_assertions.go",
+            "pkg/math/polynomial/upolynomial_convert_final_assertions_test.go",
+            "pkg/math/polynomial/upolynomial_refinement_source_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialConvertBoundPredicateActions",
+            "TestUPolynomialConvertBoundPredicateErasure",
+            "TestUPolynomialConvertFinalAssertionActions",
+            "TestUPolynomialConvertFinalPredicateErasure",
+            "TestUPolynomialConvertFinalAliasedSourceActions",
+            "TestUPolynomialQ2BQNineRegisteredIntervals",
+            "TestUPolynomialQ2BQAliasedOutputSourceDebugSite"
+          ],
+          "notes": "All remaining convert_q2bq_interval assertions now use actual runtime gates/debugger T/C and receiver borrowing. Upper-end mixed/binary comparisons retain source order; final2913 encloses both actual polynomial evaluations, erased with assertions disabled. Qualified failed-invariant adapters use independent caller values/signs, not rewritten scratch. Public aliased outputs exercise T at2912, CT at2913 and CC/disabled literal true return with already-published endpoint2; this is not claimed as a valid interval. Legacy alias fixture now explicitly supplies real Throw action and checks joined exception identity. Registered interval and actual algebraic comparison/inverse consumers verified. Conversion traces and numerical/source-lifetime audits remain partial."
+        },
         {
           "name": "Rational interval lower-end conversion bound runtime actions (upolynomial.cpp:2833,2844,2845,2849)",
           "status": "ported",

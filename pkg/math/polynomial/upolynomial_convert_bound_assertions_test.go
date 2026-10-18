@@ -9,7 +9,7 @@ import (
 )
 
 func TestUPolynomialConvertBoundPredicateActions(t *testing.T) {
-	for _, line := range []int32{2833, 2844, 2845, 2849} {
+	for _, line := range []int32{2833, 2844, 2845, 2849, 2879, 2887, 2888, 2894, 2914, 2915} {
 		for _, action := range []string{"T", "C", "disabled"} {
 			t.Run(fmt.Sprint(line)+"/"+action, func(t *testing.T) {
 				m, q, budget := upolySourceOwner(t)
@@ -17,7 +17,7 @@ func TestUPolynomialConvertBoundPredicateActions(t *testing.T) {
 				y := unumeral.NewRational()
 				serviceMust(t, q.SetFraction(&y, 3, 2))
 				n := int32(2)
-				if line == 2845 {
+				if line == 2845 || line == 2887 || line == 2914 {
 					n = 1
 				}
 				x := unumeral.NewBinaryIntPower(n, 0)
@@ -53,7 +53,7 @@ func TestUPolynomialConvertBoundPredicateErasure(t *testing.T) {
 	if polynomialSourceDebug {
 		serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
 	}
-	for _, line := range []int32{2833, 2844, 2845, 2849} {
+	for _, line := range []int32{2833, 2844, 2845, 2849, 2879, 2887, 2888, 2894, 2914, 2915} {
 		serviceMust(t, m.convertBoundAssertion(line, nil, nil, nil, nil))
 	}
 }

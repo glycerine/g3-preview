@@ -483,8 +483,8 @@ func (m *UPolynomialManager) ConvertRationalToBinaryInterval(v UPolynomialView, 
 				}
 				break
 			}
-			if polynomialSourceDebug && sign != sb {
-				return false, ErrUPolynomialAssertion
+			if e := m.convertUpperSignAssertion(sign, sb); e != nil {
+				return false, e
 			}
 			if !foundD {
 				foundD = true
@@ -506,14 +506,8 @@ func (m *UPolynomialManager) ConvertRationalToBinaryInterval(v UPolynomialView, 
 			if e = bqm.Swap(d, &lower); e != nil {
 				return false, e
 			}
-			if polynomialSourceDebug {
-				eq, e := bqm.EqualRational(d, qm, b)
-				if e != nil {
-					return false, e
-				}
-				if !eq {
-					return false, ErrUPolynomialAssertion
-				}
+			if e := m.convertBoundAssertion(2879, bqm, d, qm, b); e != nil {
+				return false, e
 			}
 		} else {
 			if e = bqm.Copy(&upper, &lower); e != nil {
@@ -529,22 +523,13 @@ func (m *UPolynomialManager) ConvertRationalToBinaryInterval(v UPolynomialView, 
 			if neg {
 				lower, upper = upper, lower
 			}
-			if polynomialSourceDebug {
-				gt, e := bqm.GreaterRational(&upper, qm, b)
-				if e != nil {
-					return false, e
-				}
-				if !gt {
-					return false, ErrUPolynomialAssertion
-				}
-				lt, e := bqm.LessRational(&lower, qm, b)
-				if e != nil {
-					return false, e
-				}
-				if !lt {
-					return false, ErrUPolynomialAssertion
-				}
+			if e := m.convertBoundAssertion(2887, bqm, &upper, qm, b); e != nil {
+				return false, e
 			}
+			if e := m.convertBoundAssertion(2888, bqm, &lower, qm, b); e != nil {
+				return false, e
+			}
+
 			for {
 				le, e := bqm.LessEqual(&lower, c)
 				if e != nil {
@@ -557,29 +542,16 @@ func (m *UPolynomialManager) ConvertRationalToBinaryInterval(v UPolynomialView, 
 					return false, e
 				}
 			}
-			if polynomialSourceDebug {
-				lt, e := bqm.Less(c, &lower)
-				if e != nil {
-					return false, e
-				}
-				if !lt {
-					return false, ErrUPolynomialAssertion
-				}
-				lt, e = bqm.Less(&lower, &upper)
-				if e != nil {
-					return false, e
-				}
-				if !lt {
-					return false, ErrUPolynomialAssertion
-				}
-				lt, e = bqm.LessRational(&lower, qm, b)
-				if e != nil {
-					return false, e
-				}
-				if !lt {
-					return false, ErrUPolynomialAssertion
-				}
+			if e := m.convertBinaryOrderAssertion(2892, bqm, c, &lower); e != nil {
+				return false, e
 			}
+			if e := m.convertBinaryOrderAssertion(2893, bqm, &lower, &upper); e != nil {
+				return false, e
+			}
+			if e := m.convertBoundAssertion(2894, bqm, &lower, qm, b); e != nil {
+				return false, e
+			}
+
 			for {
 				sign, e := m.EvalSignBinary(v, &lower)
 				if e != nil {
@@ -609,40 +581,19 @@ func (m *UPolynomialManager) ConvertRationalToBinaryInterval(v UPolynomialView, 
 			}
 		}
 	}
-	if polynomialSourceDebug {
-		lt, e := bqm.Less(c, d)
-		if e != nil {
-			return false, e
-		}
-		if !lt {
-			return false, ErrUPolynomialAssertion
-		}
-		sc, e := m.EvalSignBinary(v, c)
-		if e != nil {
-			return false, e
-		}
-		sd, e := m.EvalSignBinary(v, d)
-		if e != nil {
-			return false, e
-		}
-		if sc != -sd {
-			return false, ErrUPolynomialAssertion
-		}
-		ge, e := bqm.GreaterEqualRational(c, qm, a)
-		if e != nil {
-			return false, e
-		}
-		if !ge {
-			return false, ErrUPolynomialAssertion
-		}
-		le, e := bqm.LessEqualRational(d, qm, b)
-		if e != nil {
-			return false, e
-		}
-		if !le {
-			return false, ErrUPolynomialAssertion
-		}
+	if e := m.convertBinaryOrderAssertion(2912, bqm, c, d); e != nil {
+		return false, e
 	}
+	if e := m.convertFinalSignAssertion(v, c, d); e != nil {
+		return false, e
+	}
+	if e := m.convertBoundAssertion(2914, bqm, c, qm, a); e != nil {
+		return false, e
+	}
+	if e := m.convertBoundAssertion(2915, bqm, d, qm, b); e != nil {
+		return false, e
+	}
+
 	return true, nil
 }
 func (m *UPolynomialManager) NormalizeIntervalCore(v UPolynomialView, sa int, bqm *unumeral.BinaryRationalManager, a, b *unumeral.BinaryRational) (bool, error) {

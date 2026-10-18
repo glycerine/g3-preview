@@ -1,6 +1,7 @@
 package polynomial
 
 import (
+	"errors"
 	"fmt"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"math/big"
@@ -224,9 +225,10 @@ func TestUPolynomialQ2BQAliasedOutputSourceDebugSite(t *testing.T) {
 		t.Fatal(e)
 	}
 	out := unumeral.NewBinaryInt(37)
+	polynomialAssertionActionsFixture(t, "T")
 	interval, e := m.ConvertRationalToBinaryInterval(mustUPolyView(t, m, p), q, &a, &b, bqm, &out, &out)
 	if polynomialSourceDebug {
-		if e != ErrUPolynomialAssertion {
+		if !errors.Is(e, ErrUPolynomialAssertion) || !linearThrownAssertion(e) {
 			t.Fatal("actual final c<d assertion", interval, e)
 		}
 	} else if e != nil || !interval {
