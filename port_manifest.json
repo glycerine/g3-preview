@@ -48213,6 +48213,16 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Stopped cache invocations retain the exact borrowed manager until explicit cleanup; full and core destructors refuse pending cache work without advancing source stages",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "tests": [
+            "TestPolynomialCacheStoppedResetRetainsBorrowedManager",
+            "TestPolynomialCacheMultiplePendingBorrowsReleaseIndependently",
+            "TestPolynomialCacheStoppedDeletionRetainsBorrowedManager"
+          ]
+        },
+        {
           "name": "Cache miss result-array publication before element canonicalization; factor cache completed before local factors destruction (polynomial_cache.cpp:164-173,192-201)",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_cache.go",

@@ -11,6 +11,9 @@ import (
 // PolynomialCache owns canonical representatives and memoized results used by
 // the retained NLSAT cache.
 type PolynomialCache struct {
+	nextPending    *PolynomialCache
+	pendingBound   bool
+	pendingCause   error
 	previous       *PolynomialCache
 	executing      bool
 	pscCall        polynomialPSCInvocationReceipt
@@ -481,6 +484,7 @@ func (c *PolynomialCache) endExecution() {
 	core.cacheCaller = c.previous
 	c.previous = nil
 	c.executing = false
+	c.syncPendingBorrow()
 }
 func (m *MultivariatePolynomialCore) cacheExecuting() bool {
 	if m == nil || m.self != m {
@@ -492,4 +496,74 @@ func (m *MultivariatePolynomialCore) cacheExecuting() bool {
 		}
 	}
 	return false
+}
+
+func (c *PolynomialCache) hasPendingWork() bool {
+	return !c.closed && (c.pendingFactors != nil || c.pendingPSC || c.resetting || c.closing)
+}
+func (c *PolynomialCache) currentPendingCause() error {
+	if c.pendingFactors != nil {
+		if c.pendingFactors.sourceCause != nil {
+			return c.pendingFactors.sourceCause
+		}
+		if c.pendingFactors.cleanupCause != nil {
+			return c.pendingFactors.cleanupCause
+		}
+	}
+	if c.pendingPSC && c.manager.core.matchesPSCInvocation(&c.pscCall) {
+		if e := c.manager.core.pscInvocationSourceCause(&c.pscCall); e != nil {
+			return e
+		}
+		if e := c.pscCall.frame.cleanupCause; e != nil {
+			return e
+		}
+	}
+	if c.resetting || c.closing {
+		return c.refs.cleanupCause
+	}
+	return nil
+}
+
+// Only actually stopped cache invocations enter this list. No idle-cache scan
+// or manager-global callee state supplies ownership or cleanup authority.
+func (c *PolynomialCache) syncPendingBorrow() {
+	core := c.manager.core
+	if c.hasPendingWork() {
+		if !c.pendingBound {
+			c.pendingCause = c.currentPendingCause()
+			c.nextPending = core.pendingCaches
+			core.pendingCaches = c
+			c.pendingBound = true
+		}
+		return
+	}
+	if !c.pendingBound {
+		return
+	}
+	link := &core.pendingCaches
+	for *link != nil {
+		if *link == c {
+			*link = c.nextPending
+			c.nextPending = nil
+			c.pendingBound = false
+			return
+		}
+		link = &(*link).nextPending
+	}
+	panic(ErrPolynomialOwner)
+}
+func (m *MultivariatePolynomialCore) pendingCacheCause() error {
+	if m == nil || m.self != m {
+		return nil
+	}
+	for c := m.pendingCaches; c != nil; c = c.nextPending {
+		if c.self != c || c.manager == nil || c.manager.self != c.manager || c.manager.core != m || !c.pendingBound || !c.hasPendingWork() {
+			return ErrPolynomialOwner
+		}
+		if c.pendingCause != nil {
+			return c.pendingCause
+		}
+		return ErrPolynomialPending
+	}
+	return nil
 }

@@ -97,3 +97,107 @@ func TestPolynomialCacheNestedCallsRestoreBorrowedCoreBinding(t *testing.T) {
 		t.Fatal("nested cache lifecycle incomplete", outerReached, innerReached)
 	}
 }
+
+func TestPolynomialCacheStoppedResetRetainsBorrowedManager(t *testing.T) {
+	m := polynomialPSCFullFixture(t)
+	cache, e := NewPolynomialCache(m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, cache.Close()) })
+	budget := m.core.integer.Budget()
+	budget.FailAfter(0)
+	body := cache.Reset()
+	budget.FailAfter(-1)
+	if body == nil || !cache.resetting || cache.imp != nil {
+		t.Fatal("actual reset replacement refusal not reached", body)
+	}
+	stage, source, started := m.bodyStage, m.core.sourceStage, m.sourceStarted
+	for _, e := range []error{m.SourceFinalize(), m.CloseChecked(), m.core.SourceFinalizePrefix(), m.core.CloseChecked()} {
+		if !errors.Is(e, ErrPolynomialPending) {
+			t.Error("stopped cache lost its borrowed manager", e)
+		}
+	}
+	if stage != m.bodyStage || source != m.core.sourceStage || started != m.sourceStarted {
+		t.Error("manager crossed pending cache before cleanup")
+	}
+	serviceMust(t, cache.CleanupReset())
+	if cache.pendingBound || m.core.pendingCaches != nil {
+		t.Fatal("completed reset retained manager borrow")
+	}
+	value, e := cache.Manager()
+	serviceMust(t, e)
+	if value != m {
+		t.Fatal("cleanup did not restore normal manager borrow")
+	}
+}
+
+func TestPolynomialCacheMultiplePendingBorrowsReleaseIndependently(t *testing.T) {
+	m := polynomialPSCFullFixture(t)
+	first, e := NewPolynomialCache(m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, first.Close()) })
+	second, e := NewPolynomialCache(m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, second.Close()) })
+	for _, cache := range []*PolynomialCache{first, second} {
+		m.originalBudget.FailAfter(0)
+		body := cache.Reset()
+		m.originalBudget.FailAfter(-1)
+		if body == nil || !cache.pendingBound || !cache.resetting {
+			t.Fatal("actual pending cache borrow not retained", body)
+		}
+	}
+	if m.core.pendingCaches != second || second.nextPending != first {
+		t.Fatal("actual pending caller chain incomplete")
+	}
+	serviceMust(t, first.CleanupReset())
+	if first.pendingBound || m.core.pendingCaches != second || second.nextPending != nil {
+		t.Fatal("non-head cleanup changed independent pending owner")
+	}
+	if e := m.SourceFinalize(); !errors.Is(e, ErrPolynomialPending) {
+		t.Fatal("remaining stopped cache lost manager", e)
+	}
+	serviceMust(t, second.Close())
+	if m.core.pendingCaches != nil || second.pendingBound || first.pendingBound {
+		t.Fatal("finished cache cleanup retained pending borrows")
+	}
+	if m.sourceStarted || m.core.sourceStarted {
+		t.Fatal("pending cache checks advanced manager source destruction")
+	}
+}
+
+func TestPolynomialCacheStoppedDeletionRetainsBorrowedManager(t *testing.T) {
+	m := polynomialPSCFullFixture(t)
+	cache, e := NewPolynomialCache(m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, cache.Close()) })
+	n := unumeral.NewInt(17)
+	p, e := m.core.MkConstantTake(&n)
+	serviceMust(t, e)
+	_, e = cache.MkUnique(p)
+	serviceMust(t, e)
+	stop := errors.New("stop actual cache reset deletion")
+	armed := true
+	handler, e := NewPolynomialDeletionHandler(m.originalBudget, func(_ *PolynomialDeletionHandler, _ *MultivariatePolynomialCore, value Polynomial) error {
+		if armed && value == p {
+			return stop
+		}
+		return nil
+	})
+	serviceMust(t, e)
+	serviceMust(t, m.core.AddDeletionHandler(handler))
+	t.Cleanup(func() { serviceMust(t, m.core.RemoveDeletionHandler(handler)); serviceMust(t, handler.CloseChecked()) })
+	body := cache.Reset()
+	armed = false
+	if !errors.Is(body, stop) || !cache.pendingBound {
+		t.Fatal("actual deletion did not retain borrow", body)
+	}
+	for _, e := range []error{m.SourceFinalize(), m.CloseChecked(), m.core.SourceFinalizePrefix(), m.core.CloseChecked()} {
+		if !errors.Is(e, stop) {
+			t.Fatal("borrowed destructor lost deletion stop", e)
+		}
+	}
+	serviceMust(t, cache.CleanupReset())
+	if cache.pendingBound || m.core.pendingCaches != nil {
+		t.Fatal("completed cleanup retained borrow")
+	}
+}
