@@ -50829,7 +50829,9 @@
         "pkg/math/polynomial/upolynomial_convert_final_assertions.go",
         "pkg/math/polynomial/upolynomial_convert_final_assertions_test.go",
         "pkg/math/polynomial/upolynomial_normalize_interval_assertions.go",
-        "pkg/math/polynomial/upolynomial_normalize_interval_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_normalize_interval_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_frontend_normalize_trace.go",
+        "pkg/math/polynomial/upolynomial_frontend_normalize_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51173,7 +51175,11 @@
         "TestUPolynomialNormalizeIntervalSeparateActions",
         "TestUPolynomialNormalizeIntervalRuntimeOracles",
         "TestUPolynomialNormalizeIntervalErasureAndEarlyReturn",
-        "TestUPolynomialNormalizeIntervalNonzeroAction"
+        "TestUPolynomialNormalizeIntervalNonzeroAction",
+        "TestUPolynomialFrontendNormalizeTraceOperands",
+        "TestUPolynomialFrontendNormalizeTraceErasureAndCondition",
+        "TestUPolynomialFrontendNormalizeTraceExactChildren",
+        "TestUPolynomialFrontendNormalizeTraceValidFactorization"
       ],
       "conditionals": [
         {
@@ -51762,6 +51768,24 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained factor frontend normalization conditional diagnostic (upolynomial.cpp:391-392)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_frontend_normalize_trace.go",
+            "pkg/math/polynomial/upolynomial_frontend_normalize_trace_test.go",
+            "pkg/math/polynomial/upolynomial_content.go",
+            "pkg/math/polynomial/upolynomial_factor_frontend_invocation.go",
+            "pkg/math/polynomial/upolynomial_factor_quadratic_scalar_trace.go"
+          ],
+          "tests": [
+            "TestUPolynomialFrontendNormalizeTraceOperands",
+            "TestUPolynomialFrontendNormalizeTraceErasureAndCondition",
+            "TestUPolynomialFrontendNormalizeTraceExactChildren",
+            "TestUPolynomialFrontendNormalizeTraceValidFactorization"
+          ],
+          "notes": "DEBUG-only lazy div_bug condition and all four actual mpzzp to_string operands now run before the frontend coefficient identity assertion. Native Go strings replace STL streams. The actual frontend stores four exact numeral insertion receipts and history; genuine normalization source unwind is allowed, actual child source causes stop older NUM destruction, and owning cleanup releases only captured receipts. Independent direct diagnostic operands qualify mismatch/read-refusal branches without modifying a computed GCD, scratch, quota or constructor count. Tests cover sticky output failure, runtime assertion disabling without CTRACE erasure, each BIG operand read stop, whole-record callback borrowing, later independent formatter reuse, false/disabled predicate erasure, and actual enabled/disabled x^2-1 factorization. Default normalization diagnostic and broader source-lifetime audits remain open."
+        },
         {
           "name": "Interval normalization separate runtime assertion actions (upolynomial.cpp:2926,2930-2931,2942)",
           "status": "ported",

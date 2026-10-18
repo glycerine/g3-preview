@@ -303,6 +303,11 @@ func (m *UPolynomialManager) normalizeCoefficientWithSourceContext(v UPolynomial
 		if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Mul(g, x, tmp); e != nil {
 			return e
 		}
+		if q != nil {
+			if e = m.traceFrontendNormalization(q.owner, old, g, x, tmp); e != nil {
+				return e
+			}
+		}
 		return m.normalizationCoefficientAssert(tmp, old)
 	}
 	return nil

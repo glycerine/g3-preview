@@ -14,7 +14,7 @@ type upolyFactorFrontendInvocationReceipt struct {
 	history    *upolyFactorFrontendHistory
 }
 type upolyFactorFrontendHistory struct {
-	scalarTrace                                                                       [3]unumeral.NumeralInsertionReceipt
+	scalarTrace                                                                       [4]unumeral.NumeralInsertionReceipt
 	coreTrace                                                                         upolyDisplayInvocationReceipt
 	euclidTrace                                                                       upolyDisplayInvocationReceipt
 	modGCDTrace                                                                       upolyDisplayInvocationReceipt
@@ -187,7 +187,7 @@ type upolyFactorFlipScope struct {
 }
 
 type upolyFactorFrontendScope struct {
-	scalarTrace     [3]unumeral.NumeralInsertionReceipt
+	scalarTrace     [4]unumeral.NumeralInsertionReceipt
 	coreTrace       upolyDisplayInvocationReceipt
 	euclidTrace     upolyDisplayInvocationReceipt
 	modGCDTrace     upolyDisplayInvocationReceipt
@@ -1632,7 +1632,7 @@ func (q *upolyFactorVectorNormalizeScope) destroySource(until uint8, body error)
 	q.sourceExecuting = true
 	defer func() { q.sourceExecuting = false }()
 	z := q.owner.service.manager.config.Integer
-	for _, e := range []error{q.owner.numericSourceCause(), z.RawInvocationSourceCause(&q.owner.divisionRaw), z.RawInvocationSourceCause(&q.owner.gcdRaw)} {
+	for _, e := range []error{q.owner.scalarTraceBlocker(), q.owner.numericSourceCause(), z.RawInvocationSourceCause(&q.owner.divisionRaw), z.RawInvocationSourceCause(&q.owner.gcdRaw)} {
 		if e != nil {
 			q.sourceCause = e
 			return errors.Join(body, e)

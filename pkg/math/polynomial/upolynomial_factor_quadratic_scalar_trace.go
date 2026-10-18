@@ -27,7 +27,7 @@ func (q *upolyFactorFrontendScope) scalarTraceBlocker() error {
 // An unjoined body failure does not stop older source destructors. Permit
 // only this actual parent's source unwind, never output/runtime reentry.
 func (q *upolyFactorFrontendScope) scalarTraceSourceReadAllowed() bool {
-	if !q.actual() || !q.active || !(q.sourceExecuting || q.quadratic.sourceExecuting) {
+	if !q.actual() || !q.active || !(q.sourceExecuting || q.quadratic.sourceExecuting || q.vectorNormalize.sourceExecuting) {
 		return false
 	}
 	m := q.service.manager
