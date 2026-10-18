@@ -194,17 +194,7 @@ func (m *AlgebraicRootCore) displayRootIndex(l *algebraicLocation, view UPolynom
 	}
 	index := flags >> 3
 	if index == 0 {
-		// The polynomial view is supplied by the preceding display. Only
-		// lower(c), not the opposite endpoint or other cell members, is used.
-		var words [4]uint32
-		for i := range words {
-			words[i], e = m.config.Allocator.ReadUint32(l.raw, 24+uint64(i)*4)
-			if e != nil {
-				return 0, e
-			}
-		}
-		lower := unumeral.BinaryRationalFromBorrowedNumeral(algebraicWordsInt(words[:3]), words[3])
-		index, e = m.config.Polynomials.getRootIDWithReceipt(view, &lower, &m.rootDisplay.rootID)
+		index, e = m.displayRootIDAtLower(l, view)
 		if e != nil {
 			return 0, e
 		}
@@ -225,4 +215,31 @@ func (m *AlgebraicRootCore) displayRootIndex(l *algebraicLocation, view UPolynom
 		}
 	}
 	return index, nil
+}
+
+// Source get_root_id builds its scoped Sturm sequence before evaluating the
+// borrowed lower endpoint. This concrete encoded-cell entry preserves that
+// read frontier without an any-valued numeral or callback adapter.
+func (m *AlgebraicRootCore) displayRootIDAtLower(l *algebraicLocation, view UPolynomialView) (index uint32, cause error) {
+	q, e := m.config.Polynomials.beginRootID(view, &m.rootDisplay.rootID)
+	if e != nil {
+		return 0, e
+	}
+	defer func() { cause = q.finish(cause) }()
+	if e = q.sturm(view); e != nil {
+		return 0, e
+	}
+	s0, e := q.owner.sequenceVariations(&q.sequence, 1, nil)
+	if e != nil {
+		return 0, e
+	}
+	var words [4]uint32
+	for i := range words {
+		words[i], e = m.config.Allocator.ReadUint32(l.raw, 24+uint64(i)*4)
+		if e != nil {
+			return 0, e
+		}
+	}
+	lower := unumeral.BinaryRationalFromBorrowedNumeral(algebraicWordsInt(words[:3]), words[3])
+	return q.evaluateLower(&lower, s0)
 }

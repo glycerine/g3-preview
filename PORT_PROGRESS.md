@@ -44171,3 +44171,19 @@ Focused display/index/comparison/predicate tests pass ordinary (0.124s) and
 checked/debug/trace (0.049s), on CPUs8–16. The wider cold-path/read-order and
 whole-display ownership/stream audit remains partial; this does not promote
 the whole source unit or complete polynomial/AST. No full-suite repetition.
+
+Root-index cache miss now defers decoding the encoded lower endpoint until the
+actual get_root_id Sturm sequence and minus-infinity variation count complete
+(upolynomial.cpp2951–2958). The concrete encoded-cell entry uses the existing
+root-ID scope, exact invocation receipt and lexical finish, and shares the
+existing lower-endpoint evaluation/assertion engine. No any-valued callback or
+substitute numerical algorithm was introduced. Previously lower words were
+loaded before entering Sturm work, changing cancellation/error precedence.
+
+A real checkpoint refusal now wins over a deliberately missing lower word;
+the test verifies the accepted root-ID receipt, performs exact owning cleanup,
+and observes an unchanged zero index word and still-uninitialized endpoint.
+The earlier successful lower-only/cache-hit tests remain. Broader algebraic
+display/comparison/predicate plus UP root-ID suites pass ordinary (0.086s) and
+checked/debug/trace (0.193s), on CPUs8–16. Broader display/source ownership audits
+and the complete polynomial then AST port remain open. No full-suite rerun.

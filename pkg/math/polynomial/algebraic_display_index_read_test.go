@@ -85,3 +85,29 @@ func TestAlgebraicDisplayIndexMissUsesOnlyLowerAndPublishesFlags(t *testing.T) {
 		}
 	}
 }
+
+func TestAlgebraicDisplayIndexSturmCancellationPrecedesLowerRead(t *testing.T) {
+	c, p, control := algebraicControlledFixture(t)
+	poly := algebraicPolynomial(t, p, -2, 0, 1)
+	view, e := p.wholeView(poly)
+	serviceMust(t, e)
+	a := algebraicQueryRawCell(t, c, 1)
+	l, e := c.location(&a)
+	serviceMust(t, e)
+	serviceMust(t, c.config.Allocator.WriteUint32(l.raw, 16, 0))
+	control.limit = control.visits
+	_, body := c.displayRootIndex(l, view, 2652)
+	control.limit = 1000000
+	if !errors.Is(body, ErrUPolynomialCanceled) || !p.matchesRootID(&c.rootDisplay.rootID) {
+		t.Fatal("Sturm construction did not precede missing lower member", body)
+	}
+	serviceMust(t, p.cleanupRootIDWithReceipt(&c.rootDisplay.rootID))
+	flags, e := c.config.Allocator.ReadUint32(l.raw, 16)
+	serviceMust(t, e)
+	if flags != 0 {
+		t.Fatal("cancelled root ID published an index", flags)
+	}
+	if _, e := c.config.Allocator.ReadUint32(l.raw, 24); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
+		t.Fatal("cancelled Sturm work initialized lower member", e)
+	}
+}

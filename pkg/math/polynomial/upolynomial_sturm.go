@@ -154,6 +154,12 @@ func (q *upolyRootIDScope) evaluate(b *unumeral.BinaryRational) (uint32, error) 
 	if e != nil {
 		return 0, e
 	}
+	return q.evaluateLower(b, s0)
+}
+
+// The endpoint is reached only after the minus-infinity variation count.
+func (q *upolyRootIDScope) evaluateLower(b *unumeral.BinaryRational, s0 uint32) (uint32, error) {
+	m := q.owner
 	s1, e := m.sequenceVariationsWithReceipt(&q.sequence, 3, b, &q.evaluation)
 	if m.matchesBinaryEvaluationReceipt(&q.evaluation) && q.childStop == nil {
 		q.childStop = m.binaryEvaluation.sourceCause

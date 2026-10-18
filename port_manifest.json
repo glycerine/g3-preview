@@ -38917,18 +38917,20 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_display_root.go",
           "go_targets": [
+            "pkg/math/polynomial/upolynomial_sturm.go",
             "pkg/math/polynomial/algebraic_display_root.go",
             "pkg/math/polynomial/algebraic_display_index_read_test.go",
             "pkg/math/polynomial/algebraic_display_root_test.go",
             "pkg/math/polynomial/algebraic_display_mathematica_test.go"
           ],
           "tests": [
+            "TestAlgebraicDisplayIndexSturmCancellationPrecedesLowerRead",
             "TestAlgebraicDisplayIndexMissUsesOnlyLowerAndPublishesFlags",
             "TestAlgebraicCachedDisplayIndexReadsOnlyPackedFlags",
             "TestAlgebraicDisplayIndexFlagReadPrecedesAssertionSwitch",
             "TestAlgebraicMathematicaRationalsRootsAndSharedCache"
           ],
-          "notes": "The cached branch reads only actual offset16 packed m_i/flags, preserving all low bits and reaching the runtime assertion switch after the word read. Raw-prefix tests leave every other root word uninitialized and supply no polynomial view. A cache miss now decodes only the lower endpoint, uses the already supplied polynomial view for actual get_root_id, and publishes only the packed word instead of rewriting the whole record. Raw-prefix miss coverage leaves stored polynomial/size and the entire opposite bound uninitialized while verifying the actual sqrt(2) index and preserved low flag bits. Remaining whole-display scalar/stream and cold-path ownership audits are not promoted."
+          "notes": "The cached branch reads only actual offset16 packed m_i/flags, preserving all low bits and reaching the runtime assertion switch after the word read. Raw-prefix tests leave every other root word uninitialized and supply no polynomial view. A cache miss now decodes only the lower endpoint, uses the already supplied polynomial view for actual get_root_id, and publishes only the packed word instead of rewriting the whole record. Raw-prefix miss coverage leaves stored polynomial/size and the entire opposite bound uninitialized while verifying the actual sqrt(2) index and preserved low flag bits. A concrete encoded-lower entry now performs actual Sturm construction and minus-infinity variations before decoding the endpoint, sharing the existing lower-evaluation engine and exact root-ID receipt. Real immediate cancellation precedes missing lower bytes and publishes no index. Remaining whole-display scalar/stream and cold-path ownership audits are not promoted."
         },
         {
           "name": "Executing algebraic root/SMT2/Mathematica/interval/decimal displays protect borrowed inputs across stream and writer callbacks",
@@ -39538,18 +39540,20 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_display_root.go",
           "go_targets": [
+            "pkg/math/polynomial/upolynomial_sturm.go",
             "pkg/math/polynomial/algebraic_display_root.go",
             "pkg/math/polynomial/algebraic_display_index_read_test.go",
             "pkg/math/polynomial/algebraic_display_root_test.go",
             "pkg/math/polynomial/algebraic_display_mathematica_test.go"
           ],
           "tests": [
+            "TestAlgebraicDisplayIndexSturmCancellationPrecedesLowerRead",
             "TestAlgebraicDisplayIndexMissUsesOnlyLowerAndPublishesFlags",
             "TestAlgebraicCachedDisplayIndexReadsOnlyPackedFlags",
             "TestAlgebraicDisplayIndexFlagReadPrecedesAssertionSwitch",
             "TestAlgebraicMathematicaRationalsRootsAndSharedCache"
           ],
-          "notes": "The cached branch reads only actual offset16 packed m_i/flags, preserving all low bits and reaching the runtime assertion switch after the word read. Raw-prefix tests leave every other root word uninitialized and supply no polynomial view. A cache miss now decodes only the lower endpoint, uses the already supplied polynomial view for actual get_root_id, and publishes only the packed word instead of rewriting the whole record. Raw-prefix miss coverage leaves stored polynomial/size and the entire opposite bound uninitialized while verifying the actual sqrt(2) index and preserved low flag bits. Remaining whole-display scalar/stream and cold-path ownership audits are not promoted."
+          "notes": "The cached branch reads only actual offset16 packed m_i/flags, preserving all low bits and reaching the runtime assertion switch after the word read. Raw-prefix tests leave every other root word uninitialized and supply no polynomial view. A cache miss now decodes only the lower endpoint, uses the already supplied polynomial view for actual get_root_id, and publishes only the packed word instead of rewriting the whole record. Raw-prefix miss coverage leaves stored polynomial/size and the entire opposite bound uninitialized while verifying the actual sqrt(2) index and preserved low flag bits. A concrete encoded-lower entry now performs actual Sturm construction and minus-infinity variations before decoding the endpoint, sharing the existing lower-evaluation engine and exact root-ID receipt. Real immediate cancellation precedes missing lower bytes and publishes no index. Remaining whole-display scalar/stream and cold-path ownership audits are not promoted."
         },
         {
           "name": "Executing algebraic root/SMT2/Mathematica/interval/decimal displays protect borrowed inputs across stream and writer callbacks",
