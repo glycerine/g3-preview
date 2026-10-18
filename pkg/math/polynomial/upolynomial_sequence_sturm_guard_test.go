@@ -33,6 +33,9 @@ func TestUPolynomialSequenceSturmProtectsBorrowedNumericOwners(t *testing.T) {
 	}
 	m.config.Checkpoint = func() bool {
 		if probed {
+			if inner.sturm.executing && (s.sturm.currentNumericOwner() || !inner.sturm.currentNumericOwner()) {
+				t.Error("nested call exposed the suspended outer copy owner")
+			}
 			return true
 		}
 		probed = true
@@ -42,6 +45,11 @@ func TestUPolynomialSequenceSturmProtectsBorrowedNumericOwners(t *testing.T) {
 			return false
 		}
 		used, stats := z.Budget().Used(), z.RuntimeOwner().Stats()
+		sequenceBefore := s.Stats()
+		if e := s.sturm.pushCopy(v); !errors.Is(e, ErrUPolynomialOwner) || sequenceBefore != s.Stats() {
+			t.Error("checkpoint entered paused coefficient copy", e)
+			return false
+		}
 		for _, e := range []error{z.SourceFinalize(), z.CloseChecked(), c.config.Rationals.SourceFinalize(), c.config.Rationals.CloseChecked()} {
 			if !errors.Is(e, ErrPolynomialPending) {
 				t.Error("checkpoint acquired borrowed numeric owner", e)

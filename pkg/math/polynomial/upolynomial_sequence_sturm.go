@@ -7,9 +7,12 @@ import (
 )
 
 type upolySequenceSturmScope struct {
+	copy                           unumeral.IntegerCopyAllocationReceipt
+	normalize                      unumeral.IntegerNormalizeInvocationReceipt
 	integerBinding, naturalBinding unumeral.NumericCallerBinding
 	owner                          *UPolynomialSequence
 	invocation                     uint64
+	previousCallbackDepth          uint32
 	remainder, prime               upolyVectorState
 	live                           [2]bool // remainder, prime/product
 	sourceCursor, ownCursor        [2]uint32
@@ -96,11 +99,13 @@ func (s *UPolynomialSequence) buildSturm(a, b UPolynomialView, kind uint8) (caus
 		q.active = false
 		return e
 	}
-	defer func() { cause = errors.Join(cause, q.unbindNumericOwners()) }()
+	q.previousCallbackDepth = m.callbackDepth
+	m.callbackDepth = 0
+	defer func() { m.callbackDepth = q.previousCallbackDepth; cause = errors.Join(cause, q.unbindNumericOwners()) }()
 	defer func() {
 		cause = q.finishVector(1, cause)
 		q.executing = false
-		if !q.live[0] && !q.live[1] {
+		if !q.pending() {
 			q.active = false
 		}
 	}()
@@ -110,11 +115,11 @@ func (s *UPolynomialSequence) buildSturm(a, b UPolynomialView, kind uint8) (caus
 	if kind != 1 {
 		q.live[1] = true
 	} // declaration follows reset, before initial push
-	if e := m.sequencePush(&s.state, a, false); e != nil {
+	if e := q.pushCopy(a); e != nil {
 		return e
 	}
 	if kind == 1 {
-		if e := m.sequencePush(&s.state, b, false); e != nil {
+		if e := q.pushCopy(b); e != nil {
 			return e
 		}
 		return q.core()
@@ -177,6 +182,12 @@ func (s *UPolynomialSequence) CleanupSturm() (cause error) {
 	}
 	defer func() { cause = errors.Join(cause, q.unbindNumericOwners()) }()
 	m := s.manager
+	if e := m.modular.CleanupPNormalizeInvocation(&q.normalize, true); e != nil {
+		return e
+	}
+	if e := m.config.Integer.CleanupCopyAllocationInvocation(&q.copy); e != nil {
+		return e
+	}
 	for which := uint8(0); which < 2; which++ {
 		if !q.live[which] {
 			continue
@@ -219,4 +230,50 @@ func (q *upolySequenceSturmScope) unbindNumericOwners() error {
 	n := q.naturalBinding.Unbind()
 	z := q.integerBinding.Unbind()
 	return errors.Join(n, z)
+}
+
+func (q *upolySequenceSturmScope) pending() bool {
+	m := q.owner.manager
+	return q.live[0] || q.live[1] || m.config.Integer.MatchesCopyAllocationInvocation(&q.copy) || m.modular.MatchesPNormalizeInvocation(&q.normalize)
+}
+
+// Source seq.push(m(),sz,p): preserve metadata/default construction before
+// each SET, and capture only the integer copy actually accepted by that SET.
+func (q *upolySequenceSturmScope) pushCopy(v UPolynomialView) error {
+	if !q.valid() || !q.executing || q.finishing || q.owner.manager.callbackDepth != 0 || q.owner.manager.config.Integer.RuntimeOwner().FailureTransportActive() || !q.currentNumericOwner() {
+		return ErrUPolynomialOwner
+	}
+	m, s := q.owner.manager, &q.owner.state
+	if e := upolyUnsignedPush(&s.begins, s.coefficients.size); e != nil {
+		return e
+	}
+	if e := upolyUnsignedPush(&s.sizes, v.count); e != nil {
+		return e
+	}
+	for i := uint32(0); i < v.count; i++ {
+		dst, e := m.pushDefault(&s.coefficients)
+		if e != nil {
+			return e
+		}
+		src, e := m.read(v, i)
+		if e != nil {
+			return e
+		}
+		if e = m.modular.CopyFromOwnerTracked(dst, m.config.Integer, src, &q.copy, &q.normalize); e != nil {
+			return e
+		}
+	}
+	return nil
+}
+
+func (q *upolySequenceSturmScope) currentNumericOwner() bool {
+	if !q.valid() {
+		return false
+	}
+	for b := q.owner.manager.config.Integer.CallerBindings(); b != nil; b = b.Previous() {
+		if b.Kind() == 17 {
+			return b.Guard() == q
+		}
+	}
+	return false
 }
