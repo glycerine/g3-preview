@@ -109,8 +109,8 @@ func (s *PolynomialSparseInterpolator) CleanupInterpolation() error {
 	if s.running {
 		return ErrPolynomialPending
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	s.beginExecution()
+	defer s.endExecution()
 	return s.cleanupInterpolation()
 }
 func (s *PolynomialSparseInterpolator) cleanupInterpolation() error {
@@ -163,8 +163,8 @@ func (s *PolynomialSparseInterpolator) Interpolate(out *PolynomialRef) (ok bool,
 	if e := s.open(); e != nil {
 		return false, e
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	s.beginExecution()
+	defer s.endExecution()
 	m := s.owner.core
 	if out == nil || out.owner != m {
 		return false, ErrPolynomialOwner

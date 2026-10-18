@@ -47,6 +47,7 @@ type polynomialCreation struct {
 	buffer            *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	sparseCaller                                                                               *PolynomialSparseInterpolator
 	pendingCaches                                                                              *PolynomialCache
 	cacheCaller                                                                                *PolynomialCache
 	toPolynomialCaller                                                                         *MultivariatePolynomialManager
@@ -447,7 +448,7 @@ func (m *MultivariatePolynomialCore) MkTerms(as []unumeral.Int, ms []Monomial) (
 	return m.som.mk(false)
 }
 func (m *MultivariatePolynomialCore) CloseChecked() error {
-	if m.cacheExecuting() {
+	if m.cacheExecuting() || m.sparseExecuting(nil) {
 		return ErrPolynomialPending
 	}
 	if e := m.pendingCacheCause(); e != nil {

@@ -26,7 +26,8 @@ type PolynomialSparseInterpolator struct {
 	interpolation                                                polynomialSparseInterpolationScope
 	numeric                                                      polynomialNumericRoots
 
-	running bool
+	running  bool
+	previous *PolynomialSparseInterpolator
 }
 
 func NewPolynomialSparseInterpolator(m *MultivariatePolynomialManager, sk *PolynomialSkeleton) (s *PolynomialSparseInterpolator, err error) {
@@ -138,8 +139,8 @@ func (s *PolynomialSparseInterpolator) Add(in *unumeral.Int, q Polynomial) (bool
 	if e := s.open(); e != nil {
 		return false, e
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	s.beginExecution()
+	defer s.endExecution()
 	if s.skeleton == nil {
 		if polynomialSourceDebug {
 			return false, ErrPolynomialAssertion
@@ -257,8 +258,8 @@ func (s *PolynomialSparseInterpolator) SourceFinalize() error {
 	if e := s.identity(); e != nil {
 		return e
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	s.beginExecution()
+	defer s.endExecution()
 	if s.sourceFinalized {
 		return nil
 	}
@@ -274,8 +275,8 @@ func (s *PolynomialSparseInterpolator) CloseChecked() error {
 	if s.closed {
 		return nil
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	s.beginExecution()
+	defer s.endExecution()
 	s.closing = true
 	if e := s.cleanupInterpolation(); e != nil {
 		return e
@@ -311,8 +312,8 @@ func (s *PolynomialSparseInterpolator) Reset() (err error) {
 	if e := s.open(); e != nil {
 		return e
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	s.beginExecution()
+	defer s.endExecution()
 	if s.resetCause != nil {
 		return s.resetCause
 	}
@@ -336,4 +337,33 @@ func (s *PolynomialSparseInterpolator) Reset() (err error) {
 	s.resetActive = false
 	s.resetCursor = 0
 	return nil
+}
+
+// The active caller chain binds only actual operations to the exact borrowed
+// core and skeleton. Nested operations on another interpolator restore it.
+func (s *PolynomialSparseInterpolator) beginExecution() {
+	core := s.owner.core
+	s.previous = core.sparseCaller
+	s.running = true
+	core.sparseCaller = s
+}
+func (s *PolynomialSparseInterpolator) endExecution() {
+	core := s.owner.core
+	if core.sparseCaller != s {
+		panic(ErrPolynomialOwner)
+	}
+	core.sparseCaller = s.previous
+	s.previous = nil
+	s.running = false
+}
+func (m *MultivariatePolynomialCore) sparseExecuting(sk *PolynomialSkeleton) bool {
+	if m == nil || m.self != m {
+		return false
+	}
+	for s := m.sparseCaller; s != nil; s = s.previous {
+		if s.self == s && s.owner != nil && s.owner.self == s.owner && s.owner.core == m && s.running && (sk == nil || s.skeleton == sk) {
+			return true
+		}
+	}
+	return false
 }

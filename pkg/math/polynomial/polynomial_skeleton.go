@@ -297,6 +297,9 @@ func (s *PolynomialSkeleton) SourceFinalize() error {
 	if s == nil || s.self != s {
 		return ErrPolynomialOwner
 	}
+	if s.owner.sparseExecuting(s) {
+		return ErrPolynomialPending
+	}
 	if s.closed || s.closing || !s.completed {
 		return arena.ErrClosed
 	}
@@ -324,6 +327,9 @@ func (s *PolynomialSkeleton) SourceFinalize() error {
 func (s *PolynomialSkeleton) CloseChecked() error {
 	if s == nil || s.self != s {
 		return ErrPolynomialOwner
+	}
+	if s.owner.sparseExecuting(s) {
+		return ErrPolynomialPending
 	}
 	if s.closed {
 		return nil
