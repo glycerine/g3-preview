@@ -73,6 +73,15 @@ func (m *UPolynomialManager) displayIntoWithReceipt(p UPolynomialView, out unume
 			}
 			continue
 		}
+		enabled, e := refinementSourceAssertionsEnabled()
+		if e != nil {
+			return e
+		}
+		if enabled && i == 0 {
+			if e := m.scalarDivisionAssertionFailure(1129, "i > 0"); e != nil {
+				return e
+			}
+		}
 		one, e := m.modular.IsOne(&q.numeral)
 		if e != nil {
 			return e
@@ -157,8 +166,14 @@ func (m *UPolynomialManager) DisplaySMT2Into(p UPolynomialView, out unumeral.Rat
 		}
 	}
 	if count == 1 {
-		if polynomialSourceDebug && (index == ^uint32(0) || index < 1) {
-			return ErrUPolynomialAssertion
+		enabled, e := refinementSourceAssertionsEnabled()
+		if e != nil {
+			return e
+		}
+		if enabled && (index == ^uint32(0) || index < 1) {
+			if e := m.scalarDivisionAssertionFailure(1207, "non_zero_idx != UINT_MAX && non_zero_idx >= 1"); e != nil {
+				return e
+			}
 		}
 		a, e := m.read(p, index)
 		if e != nil {

@@ -50775,7 +50775,8 @@
         "pkg/math/polynomial/upolynomial_square_free_power_assertions_test.go",
         "pkg/math/polynomial/upolynomial_extended_gcd_assertions.go",
         "pkg/math/polynomial/upolynomial_extended_gcd_assertions_test.go",
-        "pkg/math/polynomial/upolynomial_extended_gcd_identity_test.go"
+        "pkg/math/polynomial/upolynomial_extended_gcd_identity_test.go",
+        "pkg/math/polynomial/upolynomial_display_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51027,7 +51028,9 @@
         "TestUPolynomialExtendedGCDFieldAssertionActions",
         "TestUPolynomialExtendedGCDClosedEntryGate",
         "TestUPolynomialExtendedGCDIdentitySourceActions",
-        "TestUPolynomialExtendedGCDIdentityGateErasure"
+        "TestUPolynomialExtendedGCDIdentityGateErasure",
+        "TestUPolynomialDisplaySMT2IndexAssertionActions",
+        "TestUPolynomialDisplayExponentAssertionProfiles"
       ],
       "conditionals": [
         {
@@ -51616,6 +51619,19 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Ordinary and SMT2 display source assertion runtime actions (upolynomial.cpp:1129,1207)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_display.go",
+            "pkg/math/polynomial/upolynomial_display_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialDisplaySMT2IndexAssertionActions",
+            "TestUPolynomialDisplayExponentAssertionProfiles"
+          ],
+          "notes": "Ordinary display gates i>0 before the coefficient-one query in the nonconstant branch. SMT2 gates its single-monomial index predicate before the monomial output, with actual debugger Throw/Continue and receiving numeric owner borrowing. Public Reserve on [7] creates a genuine initialized trailing-zero slot and reaches index0 without synthetic source state. Throw emits nothing; Continue/disabled/release preserve the literal single-monomial fallthrough output 7(+ 7). Caller coefficients remain [7,0], completed display scope/borrow retire, and ordinary enabled/disabled formatting remains 3*y^2 - 2*y + 1. The ordinary failing predicate is structurally unreachable in this loop and is not claimed as a reached failure profile. Broader source-unit completion remains partial."
+        },
         {
           "name": "Extended-GCD DEBUG identity runtime assertion actions (upolynomial.cpp:1076-1082)",
           "status": "ported",
