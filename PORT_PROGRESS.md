@@ -45792,3 +45792,11 @@ Ported upolynomial.cpp:833-834 after actual A/B copies and before the first Eucl
 An independent (x+1)(x+2),(x+1)(x+3) oracle verifies GCD x+1 and compares the complete record against actual input addresses and the reached B copy. Callback Close/SourceFinalize are refused. The initial test incorrectly used guarded manager reads from an output callback; it now captures genuine input addresses before entry and inspects only the actual copied backing at the callback frontier. Related modular-GCD/CRA/warm checks pass checked/debug/trace (0.090s). Polynomial-bearing Euclidean records and broader polynomial/AST completion audits remain open. All commands stay on CPUs8–16.
 
 Final related ordinary checks pass (0.067s) and manifest validation passes. The prior native full result remains historical evidence for1ece9130; no redundant full run was started within the hourly interval.
+
+### Modular-GCD prime-attempt source insertion
+
+Ported upolynomial.cpp:752 immediately after assigning each actual retained prime and before constructing scoped_set_zp. The exact source integer-insertion API evaluates the real p numeral. All231 retained primes (39103..41549) take the SMALL AppendInt32 branch; no character-buffer child/insertion receipt is constructed on this concrete source path. A table-domain check guards that assumption rather than adding an unused universal BIG adapter. Whole-record borrowing protects callbacks, and sticky physical output failure preserves numerical computation and reached footer flushes.
+
+Extended independent constant/reconstruction/unlucky-degree/both-leading-drop cases compare complete interleaved prime/branch record sequences. Callback checks distinguish the integer-mode prime frontier from the finite-field bad-prime frontier and refuse retirement at both. Polynomial-bearing modular-GCD displays and broader polynomial/AST completion audits remain open. All commands remain on CPUs8–16.
+
+Related modular-GCD/CRA/Euclidean-pointer/warm-allocation checks pass ordinary (0.068s) and checked/debug/trace (0.092s); manifest validation passes. No native full suite repeated inside its hourly interval.

@@ -15,11 +15,11 @@ func TestUPolynomialModularGCDLiteralTrace(t *testing.T) {
 		want  []int64
 		lines []int
 	}{
-		{[]int32{1, 1}, []int32{2, 1}, []int64{1}, []int{774}},
-		{[]int32{-200000, -99998, 1}, []int32{-300000, -99997, 1}, []int64{-100000, 1}, []int{802}},
-		{[]int32{-2, 1, 1}, []int32{-39105, 39104, 1}, []int64{-1, 1}, []int{786, 802}},
-		{[]int32{-2, 78205, 39103}, []int32{-3, 117308, 39103}, []int64{-1, 39103}, []int{758, 786, 802}},
-		{[]int32{-1, 0, 1}, []int32{-2, -39101, 39103}, []int64{-1, 1}, []int{762, 786, 802}},
+		{[]int32{1, 1}, []int32{2, 1}, []int64{1}, []int{752, 774}},
+		{[]int32{-200000, -99998, 1}, []int32{-300000, -99997, 1}, []int64{-100000, 1}, []int{752, 752, 802}},
+		{[]int32{-2, 1, 1}, []int32{-39105, 39104, 1}, []int64{-1, 1}, []int{752, 752, 786, 802}},
+		{[]int32{-2, 78205, 39103}, []int32{-3, 117308, 39103}, []int64{-1, 39103}, []int{752, 758, 752, 786, 752, 802}},
+		{[]int32{-1, 0, 1}, []int32{-2, -39101, 39103}, []int64{-1, 1}, []int{752, 762, 752, 786, 802}},
 	} {
 		for _, refused := range []bool{false, true} {
 			t.Run(fmt.Sprint(f.lines, refused), func(t *testing.T) {
@@ -49,9 +49,13 @@ func TestUPolynomialModularGCDLiteralTrace(t *testing.T) {
 					return
 				}
 				var want strings.Builder
+				primeIndex := 0
 				for _, line := range f.lines {
 					body := "bad prime, leading coefficient vanished\n"
 					switch line {
+					case 752:
+						body = fmt.Sprintf("trying prime: %d\n", upolyBigPrimes[primeIndex])
+						primeIndex++
 					case 774:
 						body = "done, modular gcd is one\n"
 					case 786:
@@ -77,6 +81,16 @@ type upolyModGCDTraceBorrowProbe struct {
 }
 
 func (w *upolyModGCDTraceBorrowProbe) Write(p []byte) (int, error) {
+	if string(p) == "trying prime: " {
+		finite, e := w.m.modular.Modular()
+		serviceMust(w.t, e)
+		if finite {
+			w.t.Fatal("prime record after entering finite field")
+		}
+		if w.m.Close() == nil || w.m.SourceFinalize() == nil {
+			w.t.Fatal("prime callback retired manager")
+		}
+	}
 	if string(p) == "bad prime, leading coefficient vanished\n" {
 		w.seen++
 		finite, e := w.m.modular.Modular()
@@ -104,5 +118,13 @@ func TestUPolynomialModularGCDBadPrimeTraceBorrow(t *testing.T) {
 	upolyGCDExpect(t, m, g, []int64{-1, 39103})
 	if tags.ShouldTrace("mgcd") && probe.seen != 1 {
 		t.Fatal("bad-prime scope not observed", probe.seen)
+	}
+}
+
+func TestUPolynomialModularGCDPrimeTableSmallInsertion(t *testing.T) {
+	for _, p := range upolyBigPrimes {
+		if p == 0 || p > 2147483647 {
+			t.Fatalf("source prime requires retained BIG insertion child: %d", p)
+		}
 	}
 }

@@ -365,6 +365,9 @@ func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, o
 		if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).SetUint32(p, prime); e != nil {
 			return e
 		}
+		if e = m.traceModGCDPrime(p); e != nil {
+			return e
+		}
 		bad, e := m.modularImageWithSourceContext(u, v, q, p, lcg, du, dv, context)
 		if e != nil {
 			return e
@@ -522,4 +525,31 @@ func (m *UPolynomialManager) traceModGCDLiteral(line int, text string) error {
 		return nil
 	})
 	return nil
+}
+
+// The retained source prime table contains only positive SMALL numerals
+// (39103..41549). Source integer insertion therefore takes AppendInt32 and
+// constructs no character-buffer child or retained insertion receipt.
+func (m *UPolynomialManager) traceModGCDPrime(p *unumeral.Int) error {
+	tags := m.modular.BorrowTraceTags()
+	if !tags.ShouldTrace("mgcd") {
+		return nil
+	}
+	var borrow upolyFactorTraceBorrow
+	if e := borrow.bindManagers([3]*UPolynomialManager{m}, tags); e != nil {
+		return e
+	}
+	defer borrow.unbind()
+	var computation error
+	_ = tags.EmitConditional("mgcd", "mod_gcd", "src/math/polynomial/upolynomial.cpp", 752, func() bool { return true }, func(raw io.Writer) error {
+		out := factorizationTraceWriter{raw}
+		_ = linearWriteText(out, "trying prime: ")
+		if e := m.config.Integer.InsertSourceIntegerTracked(factorizationTraceStream{out}, p, nil, nil); e != nil {
+			computation = e
+			return e
+		}
+		_ = linearWriteText(out, "\n")
+		return nil
+	})
+	return computation
 }

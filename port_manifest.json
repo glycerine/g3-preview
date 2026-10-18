@@ -51069,7 +51069,8 @@
         "TestUPolynomialCRATracePublicFactorSourceStop",
         "TestUPolynomialModularGCDLiteralTrace",
         "TestUPolynomialModularGCDBadPrimeTraceBorrow",
-        "TestUPolynomialEuclidPointerTrace"
+        "TestUPolynomialEuclidPointerTrace",
+        "TestUPolynomialModularGCDPrimeTableSmallInsertion"
       ],
       "conditionals": [
         {
@@ -51658,6 +51659,20 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Modular GCD prime-attempt integer insertion (upolynomial.cpp:752)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_gcd_modular.go",
+            "pkg/math/polynomial/upolynomial_modular_gcd_trace_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialModularGCDLiteralTrace",
+            "TestUPolynomialModularGCDBadPrimeTraceBorrow",
+            "TestUPolynomialModularGCDPrimeTableSmallInsertion"
+          ],
+          "notes": "Exact trying-prime record after actual prime assignment, before scoped_set_zp. Uses actual source integer insertion; all 231 retained primes are positive SMALL numerals (39103..41549), so no character-formatting child or insertion receipt is constructed. Table-domain check guards that concrete retained-instantiation assumption. Whole-record owner borrowing and sticky output semantics; exact interleaved multi-prime records and finite-field frontier callback checks. Polynomial-bearing modular-GCD records remain open."
+        },
         {
           "name": "Euclidean GCD input/copy pointer record (upolynomial.cpp:833-834)",
           "status": "ported",
