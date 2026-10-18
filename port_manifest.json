@@ -50805,7 +50805,9 @@
         "pkg/math/polynomial/upolynomial_factor_core.go",
         "pkg/math/polynomial/upolynomial_factor_core_assertion_test.go",
         "pkg/math/polynomial/upolynomial_quadratic_assertions.go",
-        "pkg/math/polynomial/upolynomial_quadratic_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_quadratic_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_factor_loop_assertions.go",
+        "pkg/math/polynomial/upolynomial_factor_loop_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51114,7 +51116,10 @@
         "TestUPolynomialFactorPrimitiveEmptyClosedGate",
         "TestUPolynomialQuadraticPredicateAssertionActions",
         "TestUPolynomialQuadraticRuntimeAssertionOracles",
-        "TestUPolynomialQuadraticPredicatesClosedAndErased"
+        "TestUPolynomialQuadraticPredicatesClosedAndErased",
+        "TestUPolynomialFactorLoopPredicateActions",
+        "TestUPolynomialFactorConstantSeparateActionsAndErasure",
+        "TestUPolynomialFactorLoopRuntimeOracles"
       ],
       "conditionals": [
         {
@@ -51703,6 +51708,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Factor-core squarefree/constant/final-one runtime assertion actions (upolynomial.cpp:3067,3094,3095,3107)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_core.go",
+            "pkg/math/polynomial/upolynomial_factor_loop_assertions.go",
+            "pkg/math/polynomial/upolynomial_factor_loop_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorLoopPredicateActions",
+            "TestUPolynomialFactorConstantSeparateActionsAndErasure",
+            "TestUPolynomialFactorLoopRuntimeOracles"
+          ],
+          "notes": "Runtime gates before actual nonconstant/size/unit/final-one predicates; actual debugger Throw/Continue under receiving-manager borrowing. Constant size and unit are separate actions, final size-and-one is one short-circuited assertion. Unit OR rereads actual C[0] only if is_one fails; ordinary sign handling retains its later independent read. Disabled/release skips all predicate reads. Qualified direct failed-invariant adapters use real caller storage, not executing numerical scratch or fabricated parent counts; continued empty size reaches actual absent-backing owner guard in next unit read. Public Factor enabled/disabled oracles x^2-1 and (x-1)^3 verify actual squarefree/repeated branches, exact products and multiplicity3. Broader diagnostic/VERIFY/numerical lifetime audits remain partial."
+        },
         {
           "name": "Quadratic discriminant and DEBUG product runtime assertion actions (upolynomial.cpp:2983,3007)",
           "status": "ported",

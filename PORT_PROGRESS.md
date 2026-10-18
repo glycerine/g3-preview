@@ -45901,3 +45901,12 @@ Focused tests pass ordinary (0.006s) and checked/debug/trace (0.011s). Broader f
 
 Periodic native process9825 is now terminal exit0: 68 packages passed,11 have no tests, polynomial93.098s, LP687.637s. Log: /mnt/oldrog/tmp/g3-storage-actions-native-full.log. The run began at4b51ff8f while subsequent shared-worktree edits continued; it is broad integration evidence, not proof of one exact later commit. Focused final checks validate each subsequent increment. Future periodic native runs should use a fixed separate checkout when edits continue concurrently. No duplicate suite was started.
 Final broader ordinary checks pass (19.977s); manifest validation passes.
+
+### Factor-core squarefree/constant/final-one runtime assertion actions
+
+Ported upolynomial.cpp:3067,3094,3095,3107 with runtime gates before actual nonconstant, constant-size/unit and final-one predicates. Failed actions use actual debugger Throw/Continue under receiving-manager borrowing. Constant size and unit remain separate assertions; final size-and-one remains one short-circuited predicate. Unit's OR rereads actual C[0] only after is_one fails, and ordinary later sign handling keeps its independent source read. Disabled/release erases predicate reads.
+
+Qualified direct failed-invariant adapters use genuine independent caller polynomial storage, not executing scratch or fabricated enclosing NUM counts. Continue after an empty constant-size failure reaches the actual absent-backing owner guard in the next unit read; it does not create a numerical frame. Erased predicates skip nil operands. Public Factor enabled/disabled oracles x^2-1 and (x-1)^3 verify actual squarefree/repeated branches, exact reconstructed products and multiplicity3. No values, quotas or construction counters are repaired.
+
+Broader factorization/frontend/GCD/Euclidean/CRA/content/storage/closed/basic/rational/raw-scalar/quadratic tests pass checked/debug/trace (31.380s); manifest validation passes. All commands stay on CPUs8–16. Broader factor-core diagnostic/VERIFY/numerical lifetime audits remain open for polynomial, followed by AST. The completed native process9825 remains historical evidence with its recorded shared-worktree scope caveat; no new full suite was started within the hourly interval.
+Final broader ordinary affected checks pass (19.222s).

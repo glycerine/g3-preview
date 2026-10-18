@@ -252,8 +252,8 @@ func (s *UPolynomialFactorizationService) factorCore(f UPolynomialView, fs *UPol
 	}
 	result := true
 	if B.size <= 1 {
-		if polynomialSourceDebug && pp.size <= 1 {
-			return false, ErrUPolynomialAssertion
+		if e := m.factorNonconstantAssertion(pp); e != nil {
+			return false, e
 		}
 		if e := s.flipLeadingIfNegative(pp, fs, 1); e != nil {
 			return false, e
@@ -291,28 +291,17 @@ func (s *UPolynomialFactorizationService) factorCore(f UPolynomialView, fs *UPol
 					result = false
 				}
 			} else {
-				if polynomialSourceDebug && pp.size != 1 {
-					return false, ErrUPolynomialAssertion
+				if e := m.factorConstantSizeAssertion(pp); e != nil {
+					return false, e
+				}
+				if e := m.factorConstantUnitAssertion(pp); e != nil {
+					return false, e
 				}
 				a, e := m.read(m.stateView(pp), 0)
 				if e != nil {
 					return false, e
 				}
-				if polynomialSourceDebug {
-					one, e := m.modular.IsOne(a)
-					if e != nil {
-						return false, e
-					}
-					if !one {
-						minus, e := m.modular.IsMinusOne(a)
-						if e != nil {
-							return false, e
-						}
-						if !minus {
-							return false, ErrUPolynomialAssertion
-						}
-					}
-				}
+
 				minus, e := m.modular.IsMinusOne(a)
 				if e != nil {
 					return false, e
@@ -328,18 +317,10 @@ func (s *UPolynomialFactorizationService) factorCore(f UPolynomialView, fs *UPol
 			}
 			*A, *D = *D, *A
 		}
-		if polynomialSourceDebug {
-			if A.size != 1 {
-				return false, ErrUPolynomialAssertion
-			}
-			one, e := m.modular.IsOne(&m.values(A)[0])
-			if e != nil {
-				return false, e
-			}
-			if !one {
-				return false, ErrUPolynomialAssertion
-			}
+		if e := m.factorFinalOneAssertion(A); e != nil {
+			return false, e
 		}
+
 	}
 	return result, nil
 }
