@@ -82,6 +82,9 @@ type UPolynomialManager struct {
 	squareFreeCaller             *upolyFactorSquareFreeScope
 	self                         *UPolynomialManager
 	pendingBerlekamp             *upolyBerlekampMatrix
+	craTrace                     upolyCRATrace
+	craValues                    [12]unumeral.Int
+	pendingCRATrace              *upolyCRATrace
 	exactDivTrace                upolyDisplayInvocationReceipt
 	pendingExactDivTrace         *upolyDisplayInvocationReceipt
 	origin                       uint64
@@ -154,6 +157,9 @@ func newUPolynomialManager(c UPolynomialConfig, store *UPolynomialCoefficientSto
 	return m, nil
 }
 func (m *UPolynomialManager) check() error {
+	if m != nil && m.pendingCRATrace != nil && m.pendingCRATrace.pending() && !m.pendingCRATrace.executing && !m.pendingCRATrace.sourceReadAllowed() {
+		return ErrUPolynomialCleanupPending
+	}
 	if m != nil && m.self == m && m.pendingExactDivTrace != nil && m.pendingExactDivTrace.owner.displayReceiptPending(m.pendingExactDivTrace) && !m.pendingExactDivTrace.frame.executing {
 		return ErrUPolynomialCleanupPending
 	}
@@ -325,6 +331,17 @@ func (m *UPolynomialManager) closeWithHenselOwners(r *upolyHenselPairInvocationR
 	return m.closeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
+	if m != nil && m.craTrace.executing {
+		return ErrUPolynomialCleanupPending
+	}
+	if m != nil && m.pendingCRATrace != nil && m.pendingCRATrace.pending() && m.pendingCRATrace != &m.craTrace {
+		return ErrUPolynomialCleanupPending
+	}
+	if m != nil && m.pendingCRATrace == &m.craTrace && m.craTrace.pending() {
+		if e := m.CleanupCRATrace(); e != nil {
+			return e
+		}
+	}
 	if m != nil && m.factorTrace != nil && m.factorTrace.executing {
 		return ErrUPolynomialCleanupPending
 	}

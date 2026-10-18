@@ -102,6 +102,7 @@ type upolyFactorMonicScope struct {
 }
 
 type upolyFactorCRAScope struct {
+	trace                                    upolyCRATrace
 	owner                                    *upolyFactorFrontendScope
 	invocation                               uint64
 	values                                   [12]unumeral.Int
@@ -352,6 +353,9 @@ func (q *upolyFactorFrontendScope) own(abort bool) (cause error) {
 		}
 		q.recordHistory()
 	}()
+	if e := q.cra.trace.cleanup(); e != nil {
+		return e
+	}
 	if e := q.exactTrace.cleanupOwned(); e != nil {
 		return e
 	}
@@ -474,6 +478,9 @@ func (q *upolyFactorFrontendScope) own(abort bool) (cause error) {
 // Retention is decided from exact captured child tuples and directly stamped
 // leaves; a nil square-free class frame does not imply diagnostic completion.
 func (q *upolyFactorFrontendScope) hasUnjoined() bool {
+	if q.cra.trace.pending() {
+		return true
+	}
 	z := q.service.manager.config.Integer
 	if z.MatchesPerfectSquareInvocation(&q.perfectSquare) {
 		return true
@@ -1030,6 +1037,10 @@ func (q *upolyFactorCRAScope) finish(body error) error {
 	if q.sourceCause != nil {
 		return errors.Join(q.bodyCause, q.sourceCause)
 	}
+	if e := q.trace.sourceFailure(); e != nil {
+		q.sourceCause = e
+		return errors.Join(q.bodyCause, e)
+	}
 	q.sourceExecuting = true
 	defer func() { q.sourceExecuting = false }()
 	z := q.owner.service.manager.config.Integer
@@ -1044,6 +1055,7 @@ func (q *upolyFactorCRAScope) finish(body error) error {
 	for q.constructed > 0 {
 		if _, e := upolynomialSourceNumeralDel(z, &q.values[q.constructed-1]); e != nil {
 			q.sourceCause = e
+			q.trace.sourceCause = e
 			return errors.Join(q.bodyCause, e)
 		}
 		q.constructed--
@@ -1059,6 +1071,9 @@ func (q *upolyFactorCRAScope) own() (cause error) {
 	}
 	if q.executing || q.sourceExecuting || q.ownExecuting {
 		return ErrUPolynomialCleanupPending
+	}
+	if e := q.trace.cleanup(); e != nil {
+		return e
 	}
 	q.ownExecuting = true
 	defer func() {

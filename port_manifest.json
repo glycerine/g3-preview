@@ -50785,7 +50785,9 @@
         "pkg/math/polynomial/upolynomial_remove_one_half_assertions_test.go",
         "pkg/math/polynomial/upolynomial_transform_assertions.go",
         "pkg/math/polynomial/upolynomial_transform_assertions_test.go",
-        "pkg/math/polynomial/upolynomial_sturm_sign_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_sturm_sign_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_cra_trace.go",
+        "pkg/math/polynomial/upolynomial_cra_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51057,7 +51059,11 @@
         "TestUPolynomialReciprocalClosedGateBeforeSwap",
         "TestUPolynomialSturmSignAssertionActions",
         "TestUPolynomialSturmVariationAssertionProfiles",
-        "TestUPolynomialSturmSignClosedGateAndEmptyReturn"
+        "TestUPolynomialSturmSignClosedGateAndEmptyReturn",
+        "TestUPolynomialCRATraceRecordsAndStickyStream",
+        "TestUPolynomialCRATraceSourceFrontiersAndBorrow",
+        "TestUPolynomialCRATraceActualInsertionReadGuard",
+        "TestUPolynomialCRATracePublicFactorSourceStop"
       ],
       "conditionals": [
         {
@@ -51646,6 +51652,26 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "CRA inverse/multiplier/bound numeral-insertion records and caller ownership (upolynomial.cpp:677,682,692)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_cra_trace.go",
+            "pkg/math/polynomial/upolynomial_cra_trace_test.go",
+            "pkg/math/polynomial/upolynomial_gcd_modular.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/upolynomial_factor_frontend_invocation.go"
+          ],
+          "tests": [
+            "TestUPolynomialCRATraceRecordsAndStickyStream",
+            "TestUPolynomialCRATraceSourceFrontiersAndBorrow",
+            "TestUPolynomialCRATraceActualInsertionReadGuard",
+            "TestUPolynomialCRATracePublicFactorSourceStop",
+            "TestUPolynomialGCDAndDivisionWarmPhysicalPlateau"
+          ],
+          "notes": "All three source records use actual scoped-numeral integer insertion with exact labels/raw newlines and source declaration frontiers3,5,12, not ordinary decimal String conversion or STL formatting. Whole-record borrowing protects owners; sticky stream refusal preserves operand evaluation and reached footer behavior. Accepted insertion receipts belong to the actual default or frontend CRA caller. Default lexical NUMs use reusable concrete Go storage, preserving source reverse destruction/owning cursors without adding warm GCD host allocations. Actual source destructor stops retain only reached NUMs; pending insertion work blocks new core work/retirement. Real frontend source-unwind reads remain admitted, excluding output/runtime callbacks. Exact default cleanup cannot adopt frontend receipts. Qualified fresh query-only backing profiles preserve genuine numerical values/allocations and restore original backing before owning cleanup; actual BIG inverse/multiplier read and NUM-DT stops protect older scalars and public Factor modular-GCD owners. These are guarded-read/destructor profiles, not descriptor-quota or reservation-prefix evidence. Independent later character invocation survives stale CRA receipt cleanup. Wider source-unit/numerical failure inventories remain partial."
+        },
         {
           "name": "Sturm sign-variation nonzero-sign assertion runtime actions (upolynomial.cpp:1877)",
           "status": "ported",

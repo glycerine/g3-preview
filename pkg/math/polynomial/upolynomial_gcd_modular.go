@@ -95,6 +95,9 @@ func (m *UPolynomialManager) combineImages(c1 *upolyVectorState, b1 *unumeral.In
 	return m.combineImagesWithSourceContext(c1, b1, c2, b2, integerAllocationInvocationContext{})
 }
 func (m *UPolynomialManager) combineImagesWithSourceContext(c1 *upolyVectorState, b1 *unumeral.Int, c2 *upolyVectorState, b2 *unumeral.Int, context integerAllocationInvocationContext) (cause error) {
+	if m.pendingCRATrace != nil && m.pendingCRATrace.pending() {
+		return ErrUPolynomialCleanupPending
+	}
 	for i, bound := range []*unumeral.Int{b1, b2} {
 		enabled, e := refinementSourceAssertionsEnabled()
 		if e != nil {
@@ -120,8 +123,9 @@ func (m *UPolynomialManager) combineImagesWithSourceContext(c1 *upolyVectorState
 	if e := m.reset(R); e != nil {
 		return e
 	}
-	var local [12]unumeral.Int
-	values := &local
+	var trace *upolyCRATrace
+	local := &m.craValues
+	values := local
 	var frame *upolyFactorCRAScope
 	if owner := context.factorFrontendFrame(m.config.Integer); owner != nil {
 		frame = &owner.cra
@@ -132,14 +136,34 @@ func (m *UPolynomialManager) combineImagesWithSourceContext(c1 *upolyVectorState
 		values = &frame.values
 		defer func() { frame.executing = false; cause = frame.finish(cause) }()
 	} else {
-		defer func() {
-			for i := 11; i >= 0; i-- {
-				m.modular.Del(&local[i])
-			}
-		}()
+		// Persistent Go storage is not a C++ member construction. Each call
+		// admits its actual first three NUM declarations after the R reset.
+		*local = [12]unumeral.Int{}
+		trace = &m.craTrace
+		*trace = upolyCRATrace{owner: m, executing: true, declared: 3, values: local}
+		defer func() { cause = trace.finishDefault(local, cause) }()
+	}
+	if frame != nil && m.modular.BorrowTraceTags().ShouldTrace("CRA") {
+		trace = &frame.trace
+		if trace.pending() {
+			return ErrUPolynomialCleanupPending
+		}
+		*trace = upolyCRATrace{owner: m, executing: true, declared: 3, values: values}
+		if frame != nil {
+			trace.frontend = frame.owner
+			defer func() {
+				trace.executing = false
+				if !trace.pending() {
+					trace.values = nil
+				}
+			}()
+		}
 	}
 	inv1, inv2, g, a1, a2, bound, lower, upper, newA, tmp1, tmp2, tmp3 := &values[0], &values[1], &values[2], &values[3], &values[4], &values[5], &values[6], &values[7], &values[8], &values[9], &values[10], &values[11]
 	construct := func(n uint8) {
+		if trace != nil {
+			trace.declared = n
+		}
 		if frame != nil {
 			frame.constructed = n
 			frame.peak = n
@@ -171,11 +195,17 @@ func (m *UPolynomialManager) combineImagesWithSourceContext(c1 *upolyVectorState
 	if e := z.WithAllocationContext((context).utility(z)).Mod(inv2, b1, inv2); e != nil {
 		return e
 	}
+	if e := m.traceCRAPair(trace, 677, inv1, inv2); e != nil {
+		return e
+	}
 	construct(5)
 	if e := m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Mul(b2, inv2, a1); e != nil {
 		return e
 	}
 	if e := m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Mul(b1, inv1, a2); e != nil {
+		return e
+	}
+	if e := m.traceCRAPair(trace, 682, a1, a2); e != nil {
 		return e
 	}
 	construct(6)
@@ -191,6 +221,9 @@ func (m *UPolynomialManager) combineImagesWithSourceContext(c1 *upolyVectorState
 		return e
 	}
 	if e := m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Neg(lower); e != nil {
+		return e
+	}
+	if e := m.traceCRAPair(trace, 692, lower, upper); e != nil {
 		return e
 	}
 	zero := unumeral.NewInt(0)
