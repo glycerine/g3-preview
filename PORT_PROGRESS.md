@@ -44121,3 +44121,22 @@ still live at this update; do not treat it as passed or restart it based on
 silence. Log: /mnt/oldrog/tmp/g3-decimal-refinement-faults-checked-tail.log.
 The new test stays uncommitted pending its terminal verification. Polynomial
 then AST completion remains active.
+
+Decimal precision20 allocation campaign terminal evidence: the existing checked
+continuation completed successfully in264.567s, log
+/mnt/oldrog/tmp/g3-decimal-refinement-faults-checked-tail.log. The earlier checked
+attempt completed every refusal0–4095 and failed only the top-level gate for
+not reaching success within its4096 horizon. The expanded32768-horizon
+continuation selected sentinel0 plus every ordinal4000 onward through actual
+first success, overlapping the earlier verified range. Together these cover
+all actual checked refusal positions through success without reducing the
+precision, numerical algorithm or per-prefix ownership cleanup checks.
+
+The new test verifies the independent twenty-digit sqrt(2) output on success,
+accepts only actual numerical storage refusals before success, explicitly
+cleans retained core/display work, and releases the caller root before each
+fixture's strict owner teardown. Ordinary focused execution passes in0.088s;
+the complete ordinary package including this campaign passes in88.384s as
+recorded above. Added the test to both decimal method manifest entries; no
+whole-source-unit promotion or full checked-suite completion claim. All work
+used CPUs8–16. Polynomial then AST completion remains active.

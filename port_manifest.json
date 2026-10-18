@@ -39120,7 +39120,12 @@
           "name": "algebraic_numbers.cpp:2721-2747 basic decimal and copied root-cell precision refinement with upper/exact-lower selection",
           "status": "ported",
           "go_target": "pkg/math/polynomial/algebraic_display_decimal.go",
+          "go_targets": [
+            "pkg/math/polynomial/algebraic_display_decimal.go",
+            "pkg/math/polynomial/algebraic_decimal_refinement_failure_test.go"
+          ],
           "tests": [
+            "TestAlgebraicDecimalRefinementReservationPrefixes",
             "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement"
           ]
         },
