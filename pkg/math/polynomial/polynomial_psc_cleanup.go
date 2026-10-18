@@ -107,14 +107,20 @@ func (m *MultivariatePolynomialCore) cleanupPSCCompleted(g uint64) error {
 			return e
 		}
 	}
-	if e := m.finishLazardPhase(true, false); e != nil {
-		return e
+	if m.lazardLocal.sourceGeneration == g {
+		if e := m.finishLazardPhase(true, false); e != nil {
+			return e
+		}
 	}
-	if e := m.finishPSCNextPhase(true, false); e != nil {
-		return e
+	if m.pscNext.sourceGeneration == g {
+		if e := m.finishPSCNextPhase(true, false); e != nil {
+			return e
+		}
 	}
-	if e := m.finishPSCPhase(true, false); e != nil {
-		return e
+	if m.pscLocal.sourceGeneration == g {
+		if e := m.finishPSCPhase(true, false); e != nil {
+			return e
+		}
 	}
 	return nil
 }
@@ -146,14 +152,20 @@ func (m *MultivariatePolynomialCore) cleanupPSCAborts(g uint64) error {
 	}
 
 	r := &m.pscReceipts
-	if e := m.finishLazardPhase(true, true); e != nil {
-		return e
+	if m.lazardLocal.sourceGeneration == g {
+		if e := m.finishLazardPhase(true, true); e != nil {
+			return e
+		}
 	}
-	if e := m.finishPSCNextPhase(true, true); e != nil {
-		return e
+	if m.pscNext.sourceGeneration == g {
+		if e := m.finishPSCNextPhase(true, true); e != nil {
+			return e
+		}
 	}
-	if e := m.finishPSCPhase(true, true); e != nil {
-		return e
+	if m.pscLocal.sourceGeneration == g {
+		if e := m.finishPSCPhase(true, true); e != nil {
+			return e
+		}
 	}
 	if m.powerLocal.pscOwner == g && g != 0 {
 		if e := m.CleanupPolynomialPower(); e != nil {
@@ -209,4 +221,17 @@ func (m *MultivariatePolynomialCore) pscPending() bool {
 	return m.pscLocal.active || m.pscNext.active || m.lazardLocal.active ||
 		(m.pscBuffer.constructed && !m.pscBuffer.finalized) ||
 		(g != 0 && (m.pending.pscOwner == g || m.powerLocal.pscOwner == g || m.pseudoDivision.pscOwner == g || m.exactDivision.pscOwner == g || m.generatedPSC == g)) || factory || (m.pscReceipts.singleton != (Monomial{}) && m.singletonReference && m.singletonMonomial == m.pscReceipts.singleton)
+}
+
+// A compatibility caller may observe only the source cohort it entered. This
+// read-only test conveys no authority over a different retained source frame.
+func (m *MultivariatePolynomialCore) pscPendingForGeneration(g uint64) bool {
+	if g == 0 || g != m.pscReceipts.generation {
+		return false
+	}
+	r := &m.pscReceipts
+	factory := r.factory != 0 && m.monomials.creation.generation == r.factory && m.monomials.creation.parent == m
+	h := &m.pscBuffer
+	buffer := h.constructed && !h.finalized && h.nextFrame == &m.pscNext && h.nextInvocation == m.pscNext.invocation && m.pscNext.sourceGeneration == g
+	return m.pscLocal.active && m.pscLocal.sourceGeneration == g || m.pscNext.active && m.pscNext.sourceGeneration == g || m.lazardLocal.active && m.lazardLocal.sourceGeneration == g || buffer || m.pending.pscOwner == g || m.powerLocal.pscOwner == g || m.pseudoDivision.pscOwner == g || m.exactDivision.pscOwner == g || m.generatedPSC == g || factory || (r.singleton != (Monomial{}) && m.singletonReference && m.singletonMonomial == r.singleton)
 }

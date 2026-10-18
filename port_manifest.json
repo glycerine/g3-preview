@@ -40320,7 +40320,9 @@
         "pkg/math/polynomial/polynomial_gcd_direct_children.go",
         "pkg/math/polynomial/polynomial_cra_independent_scope_test.go",
         "pkg/math/polynomial/polynomial_gcd_zpx_receipt_test.go",
-        "pkg/math/polynomial/polynomial_gcd_zpx_created.go"
+        "pkg/math/polynomial/polynomial_gcd_zpx_created.go",
+        "pkg/math/polynomial/polynomial_gcd_independent_scope_test.go",
+        "pkg/math/polynomial/polynomial_glex_monic_invocation.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -41186,7 +41188,9 @@
         "TestPolynomialICCPIndependentLazardReservationPrefixes",
         "TestPolynomialCRACleanupPreservesIndependentLazard",
         "TestPolynomialCRAIndependentLazardReservationPrefixes",
-        "TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes"
+        "TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes",
+        "TestPolynomialGCDCleanupPreservesIndependentLazard",
+        "TestPolynomialGCDIndependentLazardReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -42443,6 +42447,16 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Compatibility PSC cleanup and GCD pending observation select only the entered source cohort; GCD retains an exact accepted monic child and separate completed-local/owning-abort phases, preserving independent older Lazard work",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_glex_monic_invocation.go",
+          "tests": [
+            "TestPolynomialGCDCleanupPreservesIndependentLazard",
+            "TestPolynomialGCDIndependentLazardReservationPrefixes",
+            "TestPolynomialGlexMonicBigFieldEveryNumericPrefix"
+          ]
+        },
         {
           "name": "lc_glex_ZpX captures actual failed remove-variable/mk-variable monomial constructor outcomes and allocator invocation; owning cleanup requires matching constructor identity (polynomial.cpp:4018-4051); successful unjoined return/callback composition remains partial",
           "status": "partial",
@@ -45777,7 +45791,9 @@
         "pkg/math/polynomial/polynomial_gcd_direct_children.go",
         "pkg/math/polynomial/polynomial_cra_independent_scope_test.go",
         "pkg/math/polynomial/polynomial_gcd_zpx_receipt_test.go",
-        "pkg/math/polynomial/polynomial_gcd_zpx_created.go"
+        "pkg/math/polynomial/polynomial_gcd_zpx_created.go",
+        "pkg/math/polynomial/polynomial_gcd_independent_scope_test.go",
+        "pkg/math/polynomial/polynomial_glex_monic_invocation.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -46378,7 +46394,9 @@
         "TestPolynomialICCPFirstCoefficientChildPreservesConstructedEmptyCI",
         "TestPolynomialCRACleanupPreservesIndependentLazard",
         "TestPolynomialCRAIndependentLazardReservationPrefixes",
-        "TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes"
+        "TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes",
+        "TestPolynomialGCDCleanupPreservesIndependentLazard",
+        "TestPolynomialGCDIndependentLazardReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -46407,6 +46425,16 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Compatibility PSC cleanup and GCD pending observation select only the entered source cohort; GCD retains an exact accepted monic child and separate completed-local/owning-abort phases, preserving independent older Lazard work",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_glex_monic_invocation.go",
+          "tests": [
+            "TestPolynomialGCDCleanupPreservesIndependentLazard",
+            "TestPolynomialGCDIndependentLazardReservationPrefixes",
+            "TestPolynomialGlexMonicBigFieldEveryNumericPrefix"
+          ]
+        },
         {
           "name": "lc_glex_ZpX captures actual failed remove-variable/mk-variable monomial constructor outcomes and allocator invocation; owning cleanup requires matching constructor identity (polynomial.cpp:4018-4051); successful unjoined return/callback composition remains partial",
           "status": "partial",

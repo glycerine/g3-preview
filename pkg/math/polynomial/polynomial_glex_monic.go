@@ -8,6 +8,8 @@ import (
 )
 
 type polynomialMonicScope struct {
+	invocation              uint64
+	executing               bool
 	inv, newA               unumeral.Int
 	numeric                 polynomialNumericRoots
 	active                  bool
@@ -48,9 +50,15 @@ func (m *MultivariatePolynomialManager) CleanupGlexMonic() error {
 	if m == nil || m.self != m || m.core == nil {
 		return ErrPolynomialOwner
 	}
+	return m.cleanupGlexMonicPhase(true)
+}
+func (m *MultivariatePolynomialManager) cleanupGlexMonicPhase(abort bool) error {
 	s := &m.monic
 	if !s.active {
 		return nil
+	}
+	if s.executing {
+		return ErrPolynomialPending
 	}
 	c := m.core
 	if e := c.deleteNumeral(&s.newA); e != nil {
@@ -58,6 +66,9 @@ func (m *MultivariatePolynomialManager) CleanupGlexMonic() error {
 	}
 	if e := c.deleteNumeral(&s.inv); e != nil {
 		return e
+	}
+	if !abort {
+		return nil
 	}
 	if e := s.numeric.cleanup(c.integer); e != nil {
 		return e
@@ -68,10 +79,13 @@ func (m *MultivariatePolynomialManager) CleanupGlexMonic() error {
 	if e := c.cheap.cleanupAppendInvocation(&s.append, true); e != nil {
 		return e
 	}
-	*s = polynomialMonicScope{}
+	*s = polynomialMonicScope{invocation: s.invocation, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause}
 	return nil
 }
 func (m *MultivariatePolynomialManager) GlexMonic(p Polynomial) (result Polynomial, err error) {
+	return m.glexMonicWithReceipt(p, nil)
+}
+func (m *MultivariatePolynomialManager) glexMonicWithReceipt(p Polynomial, receipt *polynomialMonicInvocationReceipt) (result Polynomial, err error) {
 	if e := m.ready(); e != nil {
 		return Polynomial{}, e
 	}
@@ -108,14 +122,18 @@ func (m *MultivariatePolynomialManager) GlexMonic(p Polynomial) (result Polynomi
 		return p, nil
 	}
 	s := &m.monic
-	if s.active {
+	if s.active || s.invocation == ^uint64(0) {
 		return Polynomial{}, ErrPolynomialPending
 	}
 	if e = c.pscEnter(); e != nil {
 		return Polynomial{}, e
 	}
-	*s = polynomialMonicScope{active: true}
+	*s = polynomialMonicScope{active: true, executing: true, invocation: s.invocation + 1}
+	if receipt != nil {
+		*receipt = polynomialMonicInvocationReceipt{m, s, s.invocation}
+	}
 	defer func() {
+		s.executing = false
 		c.pscLeave()
 		s.bodyCause = err
 		if e := m.finishGlexMonicSource(); e != nil {
@@ -136,7 +154,7 @@ func (m *MultivariatePolynomialManager) GlexMonic(p Polynomial) (result Polynomi
 				hasRaw = hasRaw || p.OwnerID() != 0
 			}
 			if !hasRaw {
-				*s = polynomialMonicScope{}
+				*s = polynomialMonicScope{invocation: s.invocation, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause}
 			}
 		}
 	}()

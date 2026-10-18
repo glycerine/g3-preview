@@ -3,10 +3,13 @@ package polynomial
 
 func (m *MultivariatePolynomialManager) gcdDirectChildrenPending(s *polynomialGCDFunctionScope) bool {
 	c := m.core
-	return c.matchesArithmeticInvocation(&s.directArithmetic) || c.matchesArithmeticInvocation(&s.directConstant) || c.matchesNegInvocation(&s.directNeg) || c.matchesCoefficientInvocation(&s.directCoefficient) || c.cheap.matchesAppendInvocation(&s.directAppend) || c.matchesFactoryInvocation(&s.directFactory)
+	return m.matchesMonicInvocation(&s.directMonic) || c.matchesArithmeticInvocation(&s.directArithmetic) || c.matchesArithmeticInvocation(&s.directConstant) || c.matchesNegInvocation(&s.directNeg) || c.matchesCoefficientInvocation(&s.directCoefficient) || c.cheap.matchesAppendInvocation(&s.directAppend) || c.matchesFactoryInvocation(&s.directFactory)
 }
 func (m *MultivariatePolynomialManager) cleanupGCDDirectChildren(s *polynomialGCDFunctionScope, abort bool) error {
 	c := m.core
+	if e := m.cleanupMonicInvocation(&s.directMonic, abort); e != nil {
+		return e
+	}
 	if e := c.cleanupArithmeticInvocation(&s.directArithmetic, abort); e != nil {
 		return e
 	}
@@ -42,6 +45,9 @@ func (m *MultivariatePolynomialManager) gcdLeadingCoefficient(s *polynomialGCDFu
 
 func (m *MultivariatePolynomialManager) gcdDirectChildSourceCause(s *polynomialGCDFunctionScope) error {
 	c := m.core
+	if m.matchesMonicInvocation(&s.directMonic) && s.directMonic.frame.cleanupCause != nil {
+		return s.directMonic.frame.cleanupCause
+	}
 	for _, e := range []error{c.arithmeticInvocationSourceCause(&s.directArithmetic), c.arithmeticInvocationSourceCause(&s.directConstant), c.negInvocationSourceCause(&s.directNeg), c.coefficientInvocationSourceCause(&s.directCoefficient)} {
 		if e != nil {
 			return e

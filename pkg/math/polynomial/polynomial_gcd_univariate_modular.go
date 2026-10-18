@@ -56,7 +56,7 @@ func (m *MultivariatePolynomialManager) uniModImage(s *polynomialGCDFunctionScop
 	if e = m.gcdEuclid(s.refs[2].root.value, s.refs[3].root.value, &s.refs[5].root); e != nil {
 		return false, e
 	}
-	q, e := m.GlexMonic(s.refs[5].root.value)
+	q, e := m.glexMonicWithReceipt(s.refs[5].root.value, &s.directMonic)
 	if e != nil {
 		return false, e
 	}

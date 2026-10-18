@@ -58,7 +58,7 @@ func (m *MultivariatePolynomialManager) modularGCDImage(s *polynomialGCDFunction
 	if e = m.modGCDRec(s.refs[2].root.value, s.refs[3].root.value, prime, 0, s.vars, &s.refs[5].root); e != nil {
 		return false, e
 	}
-	q, e := m.GlexMonic(s.refs[5].root.value)
+	q, e := m.glexMonicWithReceipt(s.refs[5].root.value, &s.directMonic)
 	if e != nil {
 		return false, e
 	}

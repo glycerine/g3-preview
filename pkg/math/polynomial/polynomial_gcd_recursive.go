@@ -170,7 +170,7 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 		if e = m.modGCDRec(u1.value, v1.value, p, idx+1, vars, q); e != nil {
 			return e
 		}
-		a, e = m.GlexMonic(q.value)
+		a, e = m.glexMonicWithReceipt(q.value, &s.directMonic)
 		if e != nil {
 			return e
 		}
