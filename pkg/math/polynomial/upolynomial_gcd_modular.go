@@ -95,20 +95,25 @@ func (m *UPolynomialManager) combineImages(c1 *upolyVectorState, b1 *unumeral.In
 	return m.combineImagesWithSourceContext(c1, b1, c2, b2, integerAllocationInvocationContext{})
 }
 func (m *UPolynomialManager) combineImagesWithSourceContext(c1 *upolyVectorState, b1 *unumeral.Int, c2 *upolyVectorState, b2 *unumeral.Int, context integerAllocationInvocationContext) (cause error) {
-	if polynomialSourceDebug {
-		even, e := m.config.Integer.IsEven(b1)
+	for i, bound := range []*unumeral.Int{b1, b2} {
+		enabled, e := refinementSourceAssertionsEnabled()
 		if e != nil {
 			return e
 		}
-		if even {
-			return ErrUPolynomialAssertion
-		}
-		even, e = m.config.Integer.IsEven(b2)
-		if e != nil {
-			return e
-		}
-		if even {
-			return ErrUPolynomialAssertion
+		if enabled {
+			even, e := m.config.Integer.IsEven(bound)
+			if e != nil {
+				return e
+			}
+			if even {
+				expression := "!m().m().is_even(b1)"
+				if i == 1 {
+					expression = "!m().m().is_even(b2)"
+				}
+				if e := m.scalarDivisionAssertionFailure(int32(664+i), expression); e != nil {
+					return e
+				}
+			}
 		}
 	}
 	R := &m.cra
@@ -144,13 +149,19 @@ func (m *UPolynomialManager) combineImagesWithSourceContext(c1 *upolyVectorState
 	if e := m.modular.WithAllocationContext((context).utility(m.modular.Integers())).ExtendedGCD(b1, b2, inv1, inv2, g); e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled {
 		one, e := m.modular.IsOne(g)
 		if e != nil {
 			return e
 		}
 		if !one {
-			return ErrUPolynomialAssertion
+			if e := m.scalarDivisionAssertionFailure(671, "m().is_one(g)"); e != nil {
+				return e
+			}
 		}
 	}
 	z := m.config.Integer

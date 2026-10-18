@@ -50765,7 +50765,8 @@
         "pkg/math/polynomial/upolynomial_exact_div_loop_trace.go",
         "pkg/math/polynomial/upolynomial_exact_div_loop_trace_test.go",
         "pkg/math/polynomial/upolynomial_recombination_step_invocation.go",
-        "pkg/math/polynomial/upolynomial_factor_polynomial_trace.go"
+        "pkg/math/polynomial/upolynomial_factor_polynomial_trace.go",
+        "pkg/math/polynomial/upolynomial_cra_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -50994,7 +50995,10 @@
         "TestUPolynomialExactDivLoopRecordsAndStickyStream",
         "TestUPolynomialExactDivLoopExactDisplayCleanup",
         "TestUPolynomialExactDivLoopRetainsActualFactorFrontend",
-        "TestUPolynomialExactDivLoopRetainsRecombinationCaller"
+        "TestUPolynomialExactDivLoopRetainsRecombinationCaller",
+        "TestUPolynomialCRAAssertionSourceActions",
+        "TestUPolynomialCRAClosedAssertionSwitchBeforeReset",
+        "TestUPolynomialCRASeparateOddnessDebuggerActions"
       ],
       "conditionals": [
         {
@@ -51583,6 +51587,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "CRA odd-bound and coprime SASSERT runtime gates and debugger actions (upolynomial.cpp:664-665,671)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_gcd_modular.go",
+            "pkg/math/polynomial/upolynomial_division_assertions.go",
+            "pkg/math/polynomial/upolynomial_cra_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialCRAAssertionSourceActions",
+            "TestUPolynomialCRAClosedAssertionSwitchBeforeReset",
+            "TestUPolynomialCRASeparateOddnessDebuggerActions"
+          ],
+          "notes": "Each odd-bound assertion independently gates its numeral predicate before m_CRA_tmp reset and scalar declarations. The coprime assertion gates its actual gcd predicate after ExtendedGCD and before inverse normalization. Actual Throw/Continue actions borrow the receiving manager; disabled/release builds erase predicates. Real preceding reconstruction seeds private buffer state by its normal result swap. Tests verify both even-bound paths, noncoprime Throw after reset, independently calculated centered Continue results and bound publication, first-Continue/second-Throw, and closed debug state before reset. No scratch values or construction counts are rewritten. CRA diagnostics and broader modular-GCD lifetime auditing remain partial."
+        },
         {
           "name": "Exact division loop TRACE and actual caller display ownership (upolynomial.cpp:628)",
           "status": "ported",
