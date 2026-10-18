@@ -8,9 +8,9 @@ import (
 
 // The source multiplier is plain RAW, with no lexical destructor. Preserve an
 // actually allocated multiplier when the next iteration declares another one.
-type upolyRootIDDerivativeRaw struct {
+type upolySturmDerivativeRaw struct {
 	value  unumeral.Int
-	next   *upolyRootIDDerivativeRaw
+	next   *upolySturmDerivativeRaw
 	header uint64
 }
 
@@ -21,11 +21,11 @@ func (q *upolyRootIDScope) retireDerivativeMultiplier() error {
 	if q.derivative.NativeCellToken() == 0 {
 		return nil
 	}
-	n := uint64(reflect.TypeOf(upolyRootIDDerivativeRaw{}).Size())
+	n := uint64(reflect.TypeOf(upolySturmDerivativeRaw{}).Size())
 	if e := q.owner.config.Integer.Budget().Reserve(n); e != nil {
 		return e
 	}
-	q.derivativeRetired = &upolyRootIDDerivativeRaw{value: q.derivative, next: q.derivativeRetired, header: n}
+	q.derivativeRetired = &upolySturmDerivativeRaw{value: q.derivative, next: q.derivativeRetired, header: n}
 	q.derivative = unumeral.Int{}
 	return nil
 }

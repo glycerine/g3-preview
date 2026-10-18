@@ -333,6 +333,10 @@ func (m *UPolynomialManager) derivativeState(v UPolynomialView, s *upolyVectorSt
 
 // Source: src/math/polynomial/upolynomial.cpp:351-363 (plain RAW multiplier).
 func (m *UPolynomialManager) derivativeStateWithSourceContext(v UPolynomialView, s *upolyVectorState, context integerAllocationInvocationContext) (cause error) {
+	if context.sequenceSturm != nil && context.sequenceSturmFrame(m.config.Integer) == nil {
+		return ErrUPolynomialOwner
+	}
+	sturm := context.sequenceSturmFrame(m.config.Integer)
 	if context.rootID != nil && context.rootIDFrame(m.config.Integer) == nil {
 		return ErrUPolynomialOwner
 	}
@@ -388,6 +392,13 @@ func (m *UPolynomialManager) derivativeStateWithSourceContext(v UPolynomialView,
 			}
 			root.derivative = unumeral.Int{}
 			multiplier = &root.derivative
+		}
+		if sturm != nil {
+			if e = sturm.retireDerivativeMultiplier(); e != nil {
+				return e
+			}
+			sturm.derivative = unumeral.Int{}
+			multiplier = &sturm.derivative
 		}
 		if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).SetUint32(multiplier, i); e != nil {
 			return e

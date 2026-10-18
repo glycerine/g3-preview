@@ -7,6 +7,8 @@ import (
 )
 
 type upolySequenceSturmScope struct {
+	derivative                     unumeral.Int
+	derivativeRetired              *upolySturmDerivativeRaw
 	normalization                  upolySturmNormalizeScope
 	next                           *upolySequenceSturmScope
 	retained                       bool
@@ -113,7 +115,9 @@ func (s *UPolynomialSequence) buildSturm(a, b UPolynomialView, kind uint8) (caus
 		return e
 	}
 	if kind != 1 {
-		q.live[1] = true
+		if e := q.constructPrime(); e != nil {
+			return e
+		}
 	} // declaration follows reset, before initial push
 	if e := q.pushCopy(a); e != nil {
 		return e
@@ -133,7 +137,7 @@ func (s *UPolynomialSequence) buildSturm(a, b UPolynomialView, kind uint8) (caus
 			if e != nil {
 				return e
 			}
-			if e = m.derivativeState(v, &q.prime); e != nil {
+			if e = m.derivativeStateWithSourceContext(v, &q.prime, q.context()); e != nil {
 				return e
 			}
 			if e = m.normalizeWithSourceContext(m.stateView(&q.prime), q.context()); e != nil {
@@ -145,7 +149,7 @@ func (s *UPolynomialSequence) buildSturm(a, b UPolynomialView, kind uint8) (caus
 		}
 		return nil
 	}
-	if e := m.derivativeState(a, &q.prime); e != nil {
+	if e := m.derivativeStateWithSourceContext(a, &q.prime, q.context()); e != nil {
 		return e
 	}
 	if kind == 2 {
@@ -222,6 +226,9 @@ func (s *UPolynomialSequence) CleanupSturm() (cause error) {
 	if e := q.cleanupRemainderNumerics(); e != nil {
 		return e
 	}
+	if e := q.cleanupDerivativeMultiplier(); e != nil {
+		return e
+	}
 	if e := m.modular.CleanupPNormalizeInvocation(&q.normalize, true); e != nil {
 		return e
 	}
@@ -275,7 +282,7 @@ func (q *upolySequenceSturmScope) unbindNumericOwners() error {
 
 func (q *upolySequenceSturmScope) pending() bool {
 	m := q.owner.manager
-	return q.normalizePending() || q.remainderNumericPending() || q.live[0] || q.live[1] || m.config.Integer.MatchesCopyAllocationInvocation(&q.copy) || m.modular.MatchesPNormalizeInvocation(&q.normalize)
+	return q.derivative.NativeCellToken() != 0 || q.derivativeRetired != nil || q.normalizePending() || q.remainderNumericPending() || q.live[0] || q.live[1] || m.config.Integer.MatchesCopyAllocationInvocation(&q.copy) || m.modular.MatchesPNormalizeInvocation(&q.normalize)
 }
 
 // Source seq.push(m(),sz,p): preserve metadata/default construction before
@@ -317,4 +324,15 @@ func (q *upolySequenceSturmScope) currentNumericOwner() bool {
 		}
 	}
 	return false
+}
+
+func (q *upolySequenceSturmScope) constructPrime() error {
+	if q.context().sequenceSturmFrame(q.owner.manager.config.Integer) != q {
+		return ErrUPolynomialOwner
+	}
+	if q.live[1] {
+		return ErrUPolynomialCleanupPending
+	}
+	q.live[1] = true
+	return nil
 }

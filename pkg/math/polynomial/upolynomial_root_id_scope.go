@@ -10,7 +10,7 @@ type upolyRootIDScope struct {
 	remainderTrace                             upolyRootIDRemainderTrace
 	normalization                              upolySturmNormalizeScope
 	derivative                                 unumeral.Int
-	derivativeRetired                          *upolyRootIDDerivativeRaw
+	derivativeRetired                          *upolySturmDerivativeRaw
 	scalar                                     upolySturmRemainderScalar
 	hooks                                      unumeral.NumericInvocationHooks
 	numeric                                    unumeral.NumericAllocationRoots
