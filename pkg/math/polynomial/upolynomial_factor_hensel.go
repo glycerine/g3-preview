@@ -250,6 +250,9 @@ func (s *UPolynomialFactorizationService) henselQuadraticWithCaller(C UPolynomia
 		caller.enterCall()
 		defer caller.leaveCall()
 	}
+	if err := s.traceHenselQuadraticEntry(caller, zpe, m.stateView(A), m.stateView(B), C, e); err != nil {
+		return err
+	}
 	zp, err := NewRelatedUPolynomialManager(m)
 	if err != nil {
 		return err

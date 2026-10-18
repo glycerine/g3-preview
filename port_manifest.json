@@ -53238,7 +53238,8 @@
         "TestUPolynomialFactorHenselBoundaryTraceExactChildren",
         "TestUPolynomialHenselPairTraceRecordsAndBorrowedOwners",
         "TestUPolynomialHenselPairTraceActualBIGChildren",
-        "TestUPolynomialFactorHenselQuadraticTraceChildBeforeIteration"
+        "TestUPolynomialFactorHenselQuadraticTraceChildBeforeIteration",
+        "TestUPolynomialFactorHenselQuadraticEntryTraceBeforeRelatedCore"
       ],
       "conditionals": [
         {
@@ -53351,6 +53352,24 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Whole quadratic Hensel entry TRACE before related-core construction (713-719)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_hensel_trace.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_hensel.go",
+            "pkg/math/polynomial/upolynomial_factor_degree_trace_test.go",
+            "pkg/math/polynomial/upolynomial_factor_hensel_trace_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorDegreeTraceRetainedRecordsAndOwners",
+            "TestUPolynomialFactorHenselQuadraticEntryTraceBeforeRelatedCore",
+            "TestUPolynomialFactorHenselVectorTraceIndependentPublicCores",
+            "TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands",
+            "TestUPolynomialFactorDegreeTraceStreamFailureStillComputesDisplays"
+          ],
+          "notes": "Prints actual A,B,C followed by the reached borrowed lifted modulus and unsigned exponent, with source hansel spelling and endl. Runs before NewRelatedUPolynomialManager and quadratic local declarations; actual root/prime/lift owners remain borrowed across the complete record. Exact accepted display ownership retains a descriptor-after-physical failure on C without constructing a related core or quadratic/iteration vectors; four older outer vectors remain live. Issued enclosing receipts expose the blocker, physical owner audit passes and explicit cleanup acknowledges only the actual child. Independent public-core tests cover the record. Disabled trace skips absent caller/manager/views. Other helper diagnostics, verbose output and broader source-unit audit remain open; no whole-unit completion credit."
+        },
         {
           "name": "Whole quadratic Hensel lifted-vector and computed-g TRACE records (744-748,771-774)",
           "status": "ported",

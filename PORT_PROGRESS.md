@@ -45222,3 +45222,30 @@ updated exact g/modulus assertions pass checked/debug/trace0.032s. portcheck
 and diff checks pass:2103 units,677 APIs;211 ported,340 partial,1495 unported,
 11 dead/deleted. Commands use CPUs8-16. Old Go cache data older than one hour
 was pruned before the next hourly full native run; sources were untouched.
+
+2026-10-18: whole quadratic Hensel entry TRACE before related construction
+
+Implemented factorization.cpp:713-719. The complete record formats actual
+A,B,C, then the reached borrowed lifted modulus and unsigned exponent, retaining
+the source's hansel spelling, endl and sticky-stream behavior. It runs before
+constructing the quadratic related core or declaring quadratic locals. The
+actual root/prime/lift owners are borrowed across header/body/footer; exact
+accepted polynomial-display metadata owns any unfinished numerical child.
+
+The retained source fixture checks the full A=x,B=x+1,C=x^2+3*x+2,p=2,e=4
+record. Independent public-core coverage now requires this entry record too.
+An actual descriptor-after-physical refusal on C preserves the four older outer
+vectors with quadraticConstructed=0,iterationConstructed=0 and no related core.
+Issued enclosing receipts expose that exact child, physical graph auditing
+passes and explicit child-first cleanup succeeds. Disabled entry skips absent
+caller,manager,views and exponent operands. Focused checked/debug/trace checks
+pass0.092s on CPUs8-16.
+
+The full native suite against847864a4 remains live (session88429, output at
+/mnt/oldrog/tmp/g3-quadratic-hensel-native-full.log); it predates this entry
+increment. Other helper diagnostics, verbose output and broader factorization
+method/ownership audits remain open. Polynomial then AST remain unfinished.
+Broader focused checks pass ordinary16.905s and checked/debug/trace28.831s,
+CPUs8-16. portcheck and diff checks pass:2103 units,677 APIs;211 ported,
+340 partial,1495 unported,11 dead/deleted. Native full suite has passed
+polynomial and is still running LP; its terminal result is not yet available.

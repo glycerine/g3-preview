@@ -2,6 +2,7 @@ package polynomial
 
 import (
 	"io"
+	"strconv"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
@@ -163,6 +164,53 @@ func (s *UPolynomialFactorizationService) traceHenselQuadratic(caller *upolyHens
 				}
 			}
 			return nil
+		})
+	return computation
+}
+
+// Source: factorization.cpp:713-719, before the quadratic related core exists.
+func (s *UPolynomialFactorizationService) traceHenselQuadraticEntry(caller *upolyHenselCallerScope, zpe *UPolynomialManager, A, B, C UPolynomialView, exponent uint32) error {
+	tags := s.manager.modular.BorrowTraceTags()
+	if !tags.ShouldTrace("polynomial::factorization::bughunt") {
+		return nil
+	}
+	if caller == nil || !caller.matches() {
+		return ErrUPolynomialOwner
+	}
+	c := caller.owner
+	if e := c.traceBorrow.bindFamily([4]*UPolynomialManager{s.manager, caller.prime, zpe, caller.related}, tags); e != nil {
+		return e
+	}
+	defer c.traceBorrow.unbind()
+	var computation error
+	_ = tags.EmitConditional("polynomial::factorization::bughunt", "hensel_lift_quadratic", "src/math/polynomial/upolynomial_factorization.cpp", 713,
+		func() bool { return true }, func(raw io.Writer) error {
+			out := factorizationTraceWriter{raw}
+			_ = linearWriteText(out, "polynomial::hansel_lift_quadratic(")
+			for i, v := range [3]UPolynomialView{A, B, C} {
+				_ = linearWriteText(out, [3]string{"A = ", "B = ", "C = "}[i])
+				if e := s.manager.displayIntoWithReceipt(v, factorizationTraceStream{out}, "x", false, &c.tracePolynomial); e != nil {
+					computation = e
+					return e
+				}
+				_ = linearWriteText(out, ", ")
+			}
+			_ = linearWriteText(out, "p = ")
+			p, e := zpe.modular.BorrowedModulus()
+			if e != nil {
+				computation = e
+				return e
+			}
+			prime, e := s.manager.config.Integer.String(p)
+			if e != nil {
+				computation = e
+				return e
+			}
+			_ = linearWriteText(out, prime)
+			_ = linearWriteText(out, ", e = ")
+			_ = linearWriteText(out, strconv.FormatUint(uint64(exponent), 10))
+			_ = linearWriteText(out, ")")
+			return diagnostic.WriteTraceEndl(out)
 		})
 	return computation
 }

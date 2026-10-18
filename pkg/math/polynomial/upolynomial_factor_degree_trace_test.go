@@ -199,7 +199,7 @@ func TestUPolynomialFactorDegreeTraceRetainedRecordsAndOwners(t *testing.T) {
 	serviceMust(t, e)
 	if tags.ShouldTrace("polynomial::factorization::bughunt") {
 		text := w.seen.String()
-		for _, site := range []string{":744 ", ":771 ", "A_lifted = x + 2\nB_lifted = x + 1\nC = x^2 + 3 x + 2\n", "g = (1 - A_lifted*U - B_lifted*V)/2\ng == x + 1\n", "g = (1 - A_lifted*U - B_lifted*V)/4\ng == 0\n", ":637 ", ":641 ", ":646 ", ":653 ", ":658 ", ":663 ", ":886 ", ":960 ", "polynomial::hansel_lift(x^2 + 3 x + 2, 1 * (x)^1 * (x + 1)^1) => 1 * (x + 2)^1 * (x + 1)^1\n", ":906 ", ":921 ", ":927 ", "A = x\n", "C = x^2 + x\n", "B = x + 1\n", ":1274 ", "factors = 1 * (x + 2)^1\nf_pp*lc(f_pp) = x + 1\nlc(f_pp) = 1\n", ":1239 ", ":1246 ", "result = true\n", ":1052 ", ":1100 ", "sage: f_pp = x^2 + 3 x + 2\n", "sage: Rp.<x_p> = GF(2)['x_p']\nsage: f_pp_zp = x_p^2 + x_p\n", ":1163 ", "out p = 2, and we'll work p^e for e = 4\n", ":1088 ", "sage: if (not (gcd(2, 1)) == 1): print 'Error, wrong gcd'\n", ":1141 ", ":1155 ", ":1192 ", "best degree set: [0, 1, 2] represented by 111\n", "degree_set = [0, 1, 2] represented by 111\n", "STARTING TRIAL DIVISION\nzpe_fs1 * ("} {
+		for _, site := range []string{":713 ", "polynomial::hansel_lift_quadratic(A = x, B = x + 1, C = x^2 + 3 x + 2, p = 2, e = 4)\n", ":744 ", ":771 ", "A_lifted = x + 2\nB_lifted = x + 1\nC = x^2 + 3 x + 2\n", "g = (1 - A_lifted*U - B_lifted*V)/2\ng == x + 1\n", "g = (1 - A_lifted*U - B_lifted*V)/4\ng == 0\n", ":637 ", ":641 ", ":646 ", ":653 ", ":658 ", ":663 ", ":886 ", ":960 ", "polynomial::hansel_lift(x^2 + 3 x + 2, 1 * (x)^1 * (x + 1)^1) => 1 * (x + 2)^1 * (x + 1)^1\n", ":906 ", ":921 ", ":927 ", "A = x\n", "C = x^2 + x\n", "B = x + 1\n", ":1274 ", "factors = 1 * (x + 2)^1\nf_pp*lc(f_pp) = x + 1\nlc(f_pp) = 1\n", ":1239 ", ":1246 ", "result = true\n", ":1052 ", ":1100 ", "sage: f_pp = x^2 + 3 x + 2\n", "sage: Rp.<x_p> = GF(2)['x_p']\nsage: f_pp_zp = x_p^2 + x_p\n", ":1163 ", "out p = 2, and we'll work p^e for e = 4\n", ":1088 ", "sage: if (not (gcd(2, 1)) == 1): print 'Error, wrong gcd'\n", ":1141 ", ":1155 ", ":1192 ", "best degree set: [0, 1, 2] represented by 111\n", "degree_set = [0, 1, 2] represented by 111\n", "STARTING TRIAL DIVISION\nzpe_fs1 * ("} {
 			if !strings.Contains(text, site) {
 				t.Fatal("missing source trace record", site, text)
 			}
@@ -291,6 +291,7 @@ func TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands(t *testing.T
 	serviceMust(t, s.traceHenselPairEntry(nil, nil, nil, nil))
 	serviceMust(t, s.traceHenselQuadratic(nil, UPolynomialView{}, nil, 744))
 	serviceMust(t, s.traceHenselQuadratic(nil, UPolynomialView{}, nil, 771))
+	serviceMust(t, s.traceHenselQuadraticEntry(nil, nil, UPolynomialView{}, UPolynomialView{}, UPolynomialView{}, 0))
 	if s.scope != nil || s.manager.config.Integer.Budget().Used() != before {
 		t.Fatal("disabled trace acquired operands or scope")
 	}
@@ -619,6 +620,64 @@ func TestUPolynomialFactorHenselQuadraticTraceChildBeforeIteration(t *testing.T)
 	}
 	if c.hensel.quadraticConstructed != 5 || c.hensel.iterationConstructed != 0 || c.hensel.related == nil {
 		t.Fatal("quadratic trace lost older locals or declared younger iteration")
+	}
+	if c.zp == nil || !c.hensel.active || c.hensel.outerConstructed != 4 || c.fpp.size != 3 || fs.count != 0 || c.lifted.count != 0 || !m.displayReceiptPending(&c.tracePolynomial) {
+		t.Fatal("older Hensel vectors lost or factor prematurely published")
+	}
+	extras := upolyPhysicalExtraOwners{Services: []*UPolynomialFactorizationService{s}, RationalManagers: []*unumeral.RationalManager{q}}
+	for i := 0; i < w.count; i++ {
+		extras.Integers = append(extras.Integers, &w.held[i])
+	}
+	upolyHenselAuditPhysical(t, []*UPolynomialManager{m}, []*UPolynomialFactors{fs}, extras)
+	serviceMust(t, s.CleanupRetained())
+	if s.scope != nil {
+		t.Fatal("explicit trace cleanup retained source scope")
+	}
+}
+
+func TestUPolynomialFactorHenselQuadraticEntryTraceBeforeRelatedCore(t *testing.T) {
+	q, s := preparationPhysicalFixtureWithSlots(t, 256)
+	m, z := s.manager, q.Integers()
+	var coefficients [3]unumeral.Int
+	serviceMust(t, z.SetString(&coefficients[0], "1606938044258990275541962092344965554322887681987282944917506"))
+	serviceMust(t, z.SetString(&coefficients[1], "-2535301200456458802993406410755"))
+	coefficients[2] = unumeral.NewInt(1)
+	p, e := m.NewPolynomial()
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, m.DelPolynomial(&p)) })
+	serviceMust(t, m.SetInts(p, coefficients[:]))
+	for i := range coefficients {
+		serviceMust(t, z.Del(&coefficients[i]))
+	}
+	fs, e := m.NewFactors()
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, fs.Close()) })
+	w := factorDegreeTraceFailure{t: t, z: z, limit: 256, held: make([]unumeral.Int, 256), trigger: "polynomial::hansel_lift_quadratic("}
+	t.Cleanup(func() {
+		serviceMust(t, s.CleanupRetained())
+		for i := 0; i < w.count; i++ {
+			serviceMust(t, z.Del(&w.held[i]))
+		}
+	})
+	tags := diagnostic.NewTraceTagsWithWriter(&w)
+	tags.Enable("polynomial::factorization::bughunt")
+	serviceMust(t, m.modular.BindTrace(tags))
+	t.Cleanup(func() { serviceMust(t, m.modular.BindTrace(nil)) })
+	var receipt upolyFactorSquareFreeInvocationReceipt
+	_, body := s.factorSquareFreeWithReceipt(mustUPolyView(t, m, p), fs, 1, DefaultUPolynomialFactorParams(), &receipt)
+	if !tags.ShouldTrace("polynomial::factorization::bughunt") {
+		serviceMust(t, body)
+		return
+	}
+	c := s.scope
+	if !errors.Is(body, arena.ErrSlotLimit) || !w.armed || c == nil || c.constructed != 9 || !c.tracePending() {
+		t.Fatal("recombination display child/frontier", body, w.armed, c)
+	}
+	if !errors.Is(s.factorSquareFreeInvocationSourceCause(&receipt), ErrUPolynomialCleanupPending) {
+		t.Fatal("enclosing source caller lost exact display blocker", s.factorSquareFreeInvocationSourceCause(&receipt), s.matchesSquareFreeHistory(&receipt), c.traceSourceBlocker())
+	}
+	if c.hensel.quadraticConstructed != 0 || c.hensel.iterationConstructed != 0 || c.hensel.related != nil {
+		t.Fatal("quadratic entry constructed younger related core or vectors")
 	}
 	if c.zp == nil || !c.hensel.active || c.hensel.outerConstructed != 4 || c.fpp.size != 3 || fs.count != 0 || c.lifted.count != 0 || !m.displayReceiptPending(&c.tracePolynomial) {
 		t.Fatal("older Hensel vectors lost or factor prematurely published")
