@@ -43,7 +43,7 @@ func TestLinearModularCopyRefusalOwnsExactNumericRoot(t *testing.T) {
 				t.Fatal("actual copy descriptor refusal not reached", body)
 			}
 			root := z.PendingCell
-			if s.copyRoots.Cell != root {
+			if s.numericRoots.Cell != root {
 				t.Fatal("copy context lost exact allocation receipt")
 			}
 			before, oldRHS := budget.Used(), s.b[0]
@@ -94,7 +94,7 @@ func TestLinearModularCopyContextInactiveDuringSolveTrace(t *testing.T) {
 	serviceMust(t, s.Resize(1))
 	rhs := unumeral.NewInt(6)
 	serviceMust(t, s.Add(0, []unumeral.Int{unumeral.NewInt(2)}, &rhs))
-	previous := unumeral.NumericAllocationContext{}.WithCaller(&s.copyHooks)
+	previous := unumeral.NumericAllocationContext{}.WithCaller(&s.numericHooks)
 	sentinel, value := unumeral.NewInt(99), unumeral.NewInt(5)
 	writer := &linearOperationProbeWriter{probe: func() {
 		before := q.Budget().Used()
@@ -113,4 +113,58 @@ func TestLinearModularCopyContextInactiveDuringSolveTrace(t *testing.T) {
 		t.Fatal("trace copy guard changed source solution")
 	}
 	serviceMust(t, q.Integers().Del(&result[0]))
+}
+
+func TestLinearModularArithmeticOwnsEveryReservationPrefix(t *testing.T) {
+	success, failures := false, 0
+	sawDivision, sawExtended, sawAddMul := false, false, false
+	for prefix := int64(0); prefix < 1024 && !success; prefix++ {
+		z, budget := mpzPublicationDirectOwner(t)
+		m, e := unumeral.NewIntegerModularManager(z)
+		serviceMust(t, e)
+		serviceMust(t, m.SetZPUint64(18446744073709551557))
+		s, e := NewModularLinearSolver(m)
+		serviceMust(t, e)
+		serviceMust(t, s.Resize(2))
+		rhs0, rhs1 := unumeral.NewInt(7), unumeral.NewInt(11)
+		serviceMust(t, s.Add(0, []unumeral.Int{unumeral.NewInt(2), unumeral.NewInt(1)}, &rhs0))
+		serviceMust(t, s.Add(1, []unumeral.Int{unumeral.NewInt(1), unumeral.NewInt(3)}, &rhs1))
+		result := []unumeral.Int{{}, {}}
+		budget.FailAfter(prefix)
+		ok, body := s.Solve(result)
+		budget.FailAfter(-1)
+		linearNativeNamedAudit(t, s, &result[0], &result[1])
+		for i := range s.rawChildren {
+			r := &s.rawChildren[i]
+			sawDivision = sawDivision || (r.Invocation != 0 && r.Kind() == unumeral.IntegerRawDivision)
+			sawExtended = sawExtended || (r.Invocation != 0 && r.Kind() == unumeral.IntegerRawExtendedGCD)
+		}
+		sawAddMul = sawAddMul || s.addMulChild.Frame != nil
+		if body != nil && !numericPhysicalReservationRefusal(body) {
+			t.Fatal("unexpected arithmetic refusal", prefix, body)
+		}
+		if body == nil {
+			success = true
+			t.Log("all actual arithmetic prefixes before success", prefix)
+			if !ok || result[0] != unumeral.NewInt(2) || result[1] != unumeral.NewInt(3) {
+				t.Fatal("independent chosen solution", prefix, result)
+			}
+		} else {
+			failures++
+		}
+		if e := s.Close(); e != nil {
+			serviceMust(t, s.Close())
+		}
+		pending := z.PendingAllocationObject() != (umemory.ObjectRef{}) || z.DivisionRaw.Active || z.ExtendedRaw.Active || z.AddMulInvocation.Active
+		for i := range result {
+			serviceMust(t, z.Del(&result[i]))
+		}
+		serviceMust(t, m.Close())
+		if pending {
+			t.Fatalf("solver cleanup left actual arithmetic allocation/child at prefix %d", prefix)
+		}
+	}
+	if !success || failures == 0 || !sawExtended || !sawAddMul {
+		t.Fatal("arithmetic campaign missed reached callers or endpoint", failures, success, sawDivision, sawExtended, sawAddMul)
+	}
 }

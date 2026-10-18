@@ -39711,6 +39711,7 @@
         "pkg/math/polynomial/polynomial_linear_assertions.go"
       ],
       "tests": [
+        "TestLinearModularArithmeticOwnsEveryReservationPrefix",
         "TestLinearModularCopyRefusalOwnsExactNumericRoot",
         "TestLinearModularCopyContextInactiveDuringSolveTrace",
         "TestLinearRationalSourceDisplaySpacingAndOrder",
@@ -39792,6 +39793,16 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete modular Set/Div/SubMul calls retain their actual numerical allocation context, direct multiply-subtract child and accepted RAW children in acquisition order; owning cleanup uses exact completed-local then abort phases",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_linear_modular.go",
+          "tests": [
+            "TestLinearModularArithmeticOwnsEveryReservationPrefix",
+            "TestLinearModularCopyRefusalOwnsExactNumericRoot",
+            "TestLinearModularCopyContextInactiveDuringSolveTrace"
+          ]
+        },
         {
           "name": "Concrete modular RHS/coefficient/solution Copy calls use exact primitive allocation context with per-copy epoch and executing-leaf guard; owning Close cleans only acquired roots and preserves foreign replacement",
           "status": "partial",

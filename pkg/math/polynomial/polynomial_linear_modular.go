@@ -17,10 +17,14 @@ type ModularLinearSolver struct {
 	A [][]unumeral.Int
 	b []unumeral.Int
 
-	copyRoots      unumeral.NumericAllocationRoots
-	copyHooks      unumeral.NumericInvocationHooks
-	copyGeneration uint64
-	copyExecuting  bool
+	numericRoots      unumeral.NumericAllocationRoots
+	numericHooks      unumeral.NumericInvocationHooks
+	numericGeneration uint64
+	numericExecuting  bool
+	rawChildren       [3]unumeral.IntegerRawInvocationReceipt
+	rawOrder          [3]uint8
+	rawCount          uint8
+	addMulChild       unumeral.IntegerAddMulInvocationReceipt
 }
 
 func modularLinearConstructorGuard(m *unumeral.IntegerModularManager) error {
@@ -81,7 +85,7 @@ func (s *ModularLinearSolver) open() error {
 	if s.sourceCause != nil {
 		return s.sourceCause
 	}
-	if unumeral.NumericAllocationPending(&s.copyRoots) {
+	if s.numericPending() {
 		return ErrPolynomialPending
 	}
 	return nil
@@ -124,19 +128,34 @@ func (s *ModularLinearSolver) setInto(v *[]unumeral.Int, i uint32, value int64) 
 	if _, e := s.load(v, i); e != nil {
 		return e
 	}
-	return s.manager.SetInt64(&(*v)[i], value)
+	ops, e := s.beginNumeric()
+	if e != nil {
+		return e
+	}
+	defer s.endNumeric()
+	return ops.SetInt64(&(*v)[i], value)
 }
 func (s *ModularLinearSolver) divideInto(v *[]unumeral.Int, i uint32, divisor *unumeral.Int) error {
 	if _, e := s.load(v, i); e != nil {
 		return e
 	}
-	return s.manager.Div(&(*v)[i], divisor, &(*v)[i])
+	ops, e := s.beginNumeric()
+	if e != nil {
+		return e
+	}
+	defer s.endNumeric()
+	return ops.Div(&(*v)[i], divisor, &(*v)[i])
 }
 func (s *ModularLinearSolver) submulInto(v *[]unumeral.Int, i uint32, b, c *unumeral.Int) error {
 	if _, e := s.load(v, i); e != nil {
 		return e
 	}
-	return s.manager.SubMul(&(*v)[i], b, c, &(*v)[i])
+	ops, e := s.beginNumeric()
+	if e != nil {
+		return e
+	}
+	defer s.endNumeric()
+	return ops.SubMul(&(*v)[i], b, c, &(*v)[i], &s.addMulChild)
 }
 func (s *ModularLinearSolver) deleteInto(v *[]unumeral.Int, i uint32, owning bool) error {
 	if uint64(i) >= uint64(len(*v)) {
@@ -543,6 +562,9 @@ func (s *ModularLinearSolver) Close() error {
 	s.running = true
 	defer func() { s.running = false }()
 	// Explicit owning continuation releases actual numeral resources after a stopped source destructor.
+	if e := s.cleanupNumericChildren(false); e != nil {
+		return e
+	}
 	for i := range s.A {
 		for j := range s.A[i] {
 			if e := s.deleteInto(&s.A[i], uint32(j), true); e != nil {
@@ -555,7 +577,10 @@ func (s *ModularLinearSolver) Close() error {
 			return e
 		}
 	}
-	if e := s.copyRoots.Cleanup(s.integer); e != nil {
+	if e := s.cleanupNumericChildren(true); e != nil {
+		return e
+	}
+	if e := s.numericRoots.Cleanup(s.integer); e != nil {
 		return e
 	}
 	s.A, s.b = nil, nil
@@ -565,25 +590,30 @@ func (s *ModularLinearSolver) Close() error {
 	return nil
 }
 
-// Copy uses the primitive caller context, so only the actual numerical call's
-// acquisition enters this owner. Reused hook storage carries a fresh epoch.
-func (s *ModularLinearSolver) copyWithRoots(dst, src *unumeral.Int) error {
-	if !s.running || s.copyExecuting {
-		return ErrPolynomialPending
+// Every allocating numerical leaf uses the exact caller and a fresh epoch.
+func (s *ModularLinearSolver) beginNumeric() (unumeral.NumericModularOperations, error) {
+	if !s.running || s.numericExecuting || s.numericGeneration == ^uint64(0) {
+		return unumeral.NumericModularOperations{}, ErrPolynomialPending
 	}
-	s.copyExecuting = true
-	defer func() { s.copyExecuting = false }()
-	if s.copyGeneration == ^uint64(0) {
-		return ErrPolynomialPending
-	}
-	s.copyGeneration++
-	s.copyHooks.Policy = s
-	s.copyHooks.Generation = s.copyGeneration
-	context := unumeral.NumericAllocationContext{}.WithCaller(&s.copyHooks)
-	return s.manager.WithAllocationContext(context).Copy(dst, src)
+	s.numericExecuting = true
+	s.numericGeneration++
+	s.numericHooks.Policy = s
+	s.numericHooks.Generation = s.numericGeneration
+	context := unumeral.NumericAllocationContext{}.WithCaller(&s.numericHooks)
+	return s.manager.WithAllocationContext(context), nil
 }
+func (s *ModularLinearSolver) endNumeric() { s.numericExecuting = false }
+func (s *ModularLinearSolver) copyWithRoots(dst, src *unumeral.Int) error {
+	ops, e := s.beginNumeric()
+	if e != nil {
+		return e
+	}
+	defer s.endNumeric()
+	return ops.Copy(dst, src)
+}
+
 func (s *ModularLinearSolver) NumericBound(executing bool) bool {
-	return s != nil && s.self == s && s.manager != nil && s.copyGeneration != 0 && s.copyHooks.Generation == s.copyGeneration && !s.closed && (!executing || (s.running && s.copyExecuting))
+	return s != nil && s.self == s && s.manager != nil && s.numericGeneration != 0 && s.numericHooks.Generation == s.numericGeneration && !s.closed && (!executing || (s.running && s.numericExecuting))
 }
 func (s *ModularLinearSolver) NumericRoots(z *unumeral.IntegerManager, local *unumeral.NumericAllocationRoots) *unumeral.NumericAllocationRoots {
 	if !s.NumericBound(true) || s.integer != z {
@@ -592,8 +622,62 @@ func (s *ModularLinearSolver) NumericRoots(z *unumeral.IntegerManager, local *un
 	if local != nil {
 		return local
 	}
-	return &s.copyRoots
+	return &s.numericRoots
 }
 func (s *ModularLinearSolver) NumericModularOwner(m *unumeral.IntegerModularManager) bool {
 	return s.NumericBound(true) && s.manager == m
+}
+
+func (s *ModularLinearSolver) NumericRecord(z *unumeral.IntegerManager, _ string, receipt unumeral.NumericInvocationReceipt) {
+	if !s.NumericBound(true) || s.integer != z || receipt.Raw == nil || !receipt.Raw.Matches(z) {
+		return
+	}
+	var index uint8
+	switch receipt.Raw.Kind() {
+	case unumeral.IntegerRawDivision:
+		index = 0
+	case unumeral.IntegerRawGCD:
+		index = 1
+	case unumeral.IntegerRawExtendedGCD:
+		index = 2
+	default:
+		return
+	}
+	s.rawChildren[index] = *receipt.Raw
+	for i := uint8(0); i < s.rawCount; i++ {
+		if s.rawOrder[i] == index {
+			copy(s.rawOrder[i:s.rawCount-1], s.rawOrder[i+1:s.rawCount])
+			s.rawCount--
+			break
+		}
+	}
+	s.rawOrder[s.rawCount] = index
+	s.rawCount++
+}
+func (s *ModularLinearSolver) numericPending() bool {
+	if unumeral.NumericAllocationPending(&s.numericRoots) || s.addMulChild.Matches(s.integer) {
+		return true
+	}
+	for i := uint8(0); i < s.rawCount; i++ {
+		if s.rawChildren[s.rawOrder[i]].Matches(s.integer) {
+			return true
+		}
+	}
+	return false
+}
+func (s *ModularLinearSolver) cleanupNumericChildren(abort bool) error {
+	if s.addMulChild.Matches(s.integer) {
+		if e := s.addMulChild.Cleanup(abort); e != nil {
+			return e
+		}
+	}
+	for i := int(s.rawCount) - 1; i >= 0; i-- {
+		r := &s.rawChildren[s.rawOrder[i]]
+		if r.Matches(s.integer) {
+			if e := r.Cleanup(abort); e != nil {
+				return e
+			}
+		}
+	}
+	return nil
 }
