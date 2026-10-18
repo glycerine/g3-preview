@@ -53237,7 +53237,8 @@
         "TestUPolynomialFactorHenselVectorTraceIndependentPublicCores",
         "TestUPolynomialFactorHenselBoundaryTraceExactChildren",
         "TestUPolynomialHenselPairTraceRecordsAndBorrowedOwners",
-        "TestUPolynomialHenselPairTraceActualBIGChildren"
+        "TestUPolynomialHenselPairTraceActualBIGChildren",
+        "TestUPolynomialFactorHenselQuadraticTraceChildBeforeIteration"
       ],
       "conditionals": [
         {
@@ -53350,6 +53351,25 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Whole quadratic Hensel lifted-vector and computed-g TRACE records (744-748,771-774)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_hensel_trace.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_hensel.go",
+            "pkg/math/polynomial/upolynomial_factor_trace_borrow.go",
+            "pkg/math/polynomial/upolynomial_factor_degree_trace_test.go",
+            "pkg/math/polynomial/upolynomial_factor_hensel_trace_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorDegreeTraceRetainedRecordsAndOwners",
+            "TestUPolynomialFactorHenselQuadraticTraceChildBeforeIteration",
+            "TestUPolynomialFactorHenselVectorTraceIndependentPublicCores",
+            "TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands",
+            "TestUPolynomialFactorDegreeTraceStreamFailureStillComputesDisplays"
+          ],
+          "notes": "Formats actual A_lifted,B_lifted,C after pair lifting and before iteration locals; later formats the actual borrowed modulus and computed g before declaring S,T,t,tmp2. Uses raw integer numeral formatting and the exact accepted polynomial-display receipt. Whole-record borrows cover the actual root, prime, lift and quadratic related managers; duplicate identities share one exact binding. A real descriptor-after-physical refusal while displaying C retains four outer and five quadratic vectors, with no iteration locals constructed. Physical graph audit and explicit exact-child cleanup pass. Source formula with U=V=1 verifies first g=x+1 modulo2, and the next record uses actual modulus4 and g=0. Independent public-core tests cover both records; disabled traces skip absent caller/view/numeral operands. Other diagnostic helpers, verbose output and broader unit audits remain open; no whole-unit completion credit."
+        },
         {
           "name": "Whole two-factor Hensel entry and intermediate TRACE records (590-600,614-616,637-639,641-644,646-650,653-656,658-661,663-666)",
           "status": "ported",

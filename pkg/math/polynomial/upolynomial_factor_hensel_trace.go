@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/glycerine/g3/pkg/util/diagnostic"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
 // Source: factorization.cpp:906-908,921-923,927-929,935-939. All
@@ -112,6 +113,56 @@ func (s *UPolynomialFactorizationService) traceHenselFactors(caller *upolyHensel
 				_ = linearWriteText(out, ")")
 			}
 			return diagnostic.WriteTraceEndl(out)
+		})
+	return computation
+}
+
+// Source: factorization.cpp:744-748 and771-774. These displays borrow
+// the actual quadratic related core as well as root/prime/lift owners.
+func (s *UPolynomialFactorizationService) traceHenselQuadratic(caller *upolyHenselCallerScope, C UPolynomialView, pe *unumeral.Int, line int) error {
+	tags := s.manager.modular.BorrowTraceTags()
+	if !tags.ShouldTrace("polynomial::factorization::bughunt") {
+		return nil
+	}
+	if caller == nil || !caller.matches() {
+		return ErrUPolynomialOwner
+	}
+	c := caller.owner
+	if e := c.traceBorrow.bindFamily([4]*UPolynomialManager{s.manager, caller.prime, caller.lift, caller.related}, tags); e != nil {
+		return e
+	}
+	defer c.traceBorrow.unbind()
+	var computation error
+	_ = tags.EmitConditional("polynomial::factorization::bughunt", "hensel_lift_quadratic", "src/math/polynomial/upolynomial_factorization.cpp", line,
+		func() bool { return true }, func(raw io.Writer) error {
+			out := factorizationTraceWriter{raw}
+			if line == 771 {
+				_ = linearWriteText(out, "g = (1 - A_lifted*U - B_lifted*V)/")
+				prime, e := s.manager.config.Integer.String(pe)
+				if e != nil {
+					computation = e
+					return e
+				}
+				_ = linearWriteText(out, prime)
+				_ = diagnostic.WriteTraceEndl(out)
+				_ = linearWriteText(out, "g == ")
+				if e := s.manager.displayIntoWithReceipt(s.manager.stateView(&caller.iteration[1]), factorizationTraceStream{out}, "x", false, &c.tracePolynomial); e != nil {
+					computation = e
+					return e
+				}
+				_ = diagnostic.WriteTraceEndl(out)
+			} else {
+				views := [3]UPolynomialView{s.manager.stateView(&caller.quadratic[3]), s.manager.stateView(&caller.quadratic[4]), C}
+				for i, label := range [3]string{"A_lifted = ", "B_lifted = ", "C = "} {
+					_ = linearWriteText(out, label)
+					if e := s.manager.displayIntoWithReceipt(views[i], factorizationTraceStream{out}, "x", false, &c.tracePolynomial); e != nil {
+						computation = e
+						return e
+					}
+					_ = diagnostic.WriteTraceEndl(out)
+				}
+			}
+			return nil
 		})
 	return computation
 }

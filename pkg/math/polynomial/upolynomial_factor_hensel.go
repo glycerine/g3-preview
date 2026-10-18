@@ -322,6 +322,9 @@ func (s *UPolynomialFactorizationService) henselQuadraticWithCaller(C UPolynomia
 		if err = s.henselPairWithCaller(pe, pe, pe, m.stateView(U), m.stateView(A), m.stateView(V), m.stateView(B), C, Al, Bl, caller); err != nil {
 			return err
 		}
+		if err = s.traceHenselQuadratic(caller, C, pe, 744); err != nil {
+			return err
+		}
 		if err = s.henselQuadraticIterationWithCaller(zpe, pe, U, V, A, B, Al, Bl, caller); err != nil {
 			return err
 		}
@@ -370,6 +373,9 @@ func (s *UPolynomialFactorizationService) henselQuadraticIterationWithCaller(zpe
 		return e
 	}
 	if e := zpe.toZPInPlaceWithCaller(g, caller); e != nil {
+		return e
+	}
+	if e := s.traceHenselQuadratic(caller, UPolynomialView{}, pe, 771); e != nil {
 		return e
 	}
 	if caller == nil {

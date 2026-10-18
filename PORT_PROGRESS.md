@@ -45190,3 +45190,35 @@ and then AST remain unfinished. No full native repeat after the recent run.
 Final broader factor/Hensel/recombination/degree/display checks pass ordinary
 16.981s and checked/debug/trace28.657s on CPUs8-16. portcheck and diff checks
 pass:2103 units,677 APIs;211 ported,340 partial,1495 unported,11 dead/deleted.
+
+2026-10-18: two whole quadratic Hensel TRACE records
+
+Implemented factorization.cpp:744-748 and771-774 using the actual lifted A/B,
+input C, borrowed current modulus and computed g. Their source positions are
+after pair lifting/before iteration locals, and after g computation/before the
+S/T/t/tmp2 declarations. Raw integer numeral formatting matches the source.
+Exact accepted polynomial-display receipts retain any unfinished child. The
+whole-record borrow now covers the actual four-manager family (root,prime,
+lift,quadratic related); repeated manager identities receive one exact binding.
+
+The source fixture checks A_lifted=x+2,B_lifted=x+1,C=x^2+3*x+2. With actual
+U=V=1, the source g formula gives x+1 modulo2; a preliminary test expectation
+of zero was corrected from this calculation. The following iteration uses
+actual modulus4 and g=0. Callback probes exercise all four actual owners.
+Independent public-core tests now require both quadratic records. Disabled
+records skip absent caller/view/modulus operands.
+
+A real descriptor-after-physical display refusal on C preserves four outer
+vectors, five quadratic vectors, the actual related core and exact unfinished
+display child, before any iteration vector is constructed. Issued enclosing
+receipts expose that blocker. Physical graph auditing and child-first explicit
+cleanup pass. Focused checked/debug/trace checks pass0.073s.
+
+Other diagnostic helpers, verbose output and broader factorization method/
+ownership audits remain open. Polynomial then AST remain unfinished; no whole
+source-unit completion is claimed. No full native repeat since the recent run.
+Final broader checks pass ordinary16.778s and checked/debug/trace28.914s;
+updated exact g/modulus assertions pass checked/debug/trace0.032s. portcheck
+and diff checks pass:2103 units,677 APIs;211 ported,340 partial,1495 unported,
+11 dead/deleted. Commands use CPUs8-16. Old Go cache data older than one hour
+was pruned before the next hourly full native run; sources were untouched.
