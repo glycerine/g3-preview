@@ -48526,6 +48526,7 @@
         "pkg/math/polynomial/polynomial_cache_pending_psc_test.go"
       ],
       "tests": [
+        "TestPolynomialCacheDeferredFactorLocalDestructor",
         "TestPolynomialCacheFailedFactorRunsConstructedLocalDestructor",
         "TestPolynomialCacheFailedFactorRetainsDestructorStop",
         "TestPolynomialCacheCanonicalizationAndReset",
@@ -48545,6 +48546,14 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Stopped accepted factor-callee cleanup retains constructed cache-local source destructor obligation; continuation attempts it once before class abort, and borrowed manager reports exact callee source cause",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "tests": [
+            "TestPolynomialCacheDeferredFactorLocalDestructor"
+          ]
+        },
         {
           "name": "Constructed cache factor local runs literal destructor after failed body once accepted callee cleanup completes; failed constructor grants no class destructor; body and destructor errors are both retained (polynomial_cache.cpp:187-202, polynomial.cpp:1617-1630)",
           "status": "ported",

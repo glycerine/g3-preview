@@ -32,6 +32,8 @@ type PolynomialCache struct {
 	resetting      bool
 	closing        bool
 	closed         bool
+
+	factorLocalSourceOwed bool
 }
 
 type polynomialPSCKey struct {
@@ -145,6 +147,7 @@ func (c *PolynomialCache) finishFactorOwner(fs *PolynomialFactors, body error) e
 	if body != nil {
 		if e := c.cleanupFactorInvocation(); e != nil {
 			c.pendingFactors = fs
+			c.factorLocalSourceOwed = fs.constructed
 			return errors.Join(body, e)
 		}
 	}
@@ -185,6 +188,15 @@ func (c *PolynomialCache) cleanupFactor() error {
 	}
 	if e := c.cleanupFactorInvocation(); e != nil {
 		return e
+	}
+	// Callee abort may have stopped before the constructed cache local got
+	// its first source-destructor attempt. Consume that exact obligation once;
+	// a stopped source destructor subsequently receives only owning abort.
+	if c.factorLocalSourceOwed {
+		c.factorLocalSourceOwed = false
+		if e := c.pendingFactors.SourceFinalize(); e != nil {
+			return e
+		}
 	}
 	if e := c.pendingFactors.CloseChecked(); e != nil {
 		return e
@@ -514,6 +526,14 @@ func (c *PolynomialCache) currentPendingCause() error {
 		}
 		if c.pendingFactors.cleanupCause != nil {
 			return c.pendingFactors.cleanupCause
+		}
+	}
+	if c.pendingFactors != nil && c.manager.matchesFactorCore(&c.factorCall) {
+		if e := c.factorCall.frame.sourceCause; e != nil {
+			return e
+		}
+		if e := c.factorCall.frame.cleanupCause; e != nil {
+			return e
 		}
 	}
 	if c.pendingPSC && c.manager.core.matchesPSCInvocation(&c.pscCall) {

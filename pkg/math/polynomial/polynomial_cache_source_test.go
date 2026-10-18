@@ -440,6 +440,66 @@ func TestPolynomialCacheFailedFactorRetainsDestructorStop(t *testing.T) {
 	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, nil, handler.header, nil)
 }
 
+func TestPolynomialCacheDeferredFactorLocalDestructor(t *testing.T) {
+	m := polynomialPSCFullFixture(t)
+	c, e := NewPolynomialCache(m)
+	serviceMust(t, e)
+	t.Cleanup(func() {
+		if !c.closed {
+			serviceMust(t, c.CleanupFactor())
+			serviceMust(t, c.Close())
+		}
+	})
+	out, e := NewPolynomialRefVector(m.core)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, out.Close()) })
+	p := polynomialQueryTerms(t, m.core, []int32{1, 2, 1, 2, 4, 2, 1, 2, 1}, [][]MonomialPower{{{0, 2}, {1, 2}}, {{0, 2}, {1, 1}}, {{0, 2}}, {{0, 1}, {1, 2}}, {{0, 1}, {1, 1}}, {{0, 1}}, {{1, 2}}, {{1, 1}}, nil})
+	sourceStop, ownStop, localStop := errors.New("factor source stop"), errors.New("factor owning stop"), errors.New("deferred local destructor stop")
+	var local *PolynomialFactors
+	calls, localCalls := 0, 0
+	h, e := NewPolynomialDeletionHandler(m.originalBudget, func(_ *PolynomialDeletionHandler, _ *MultivariatePolynomialCore, _ Polynomial) error {
+		if m.matchesFactorCore(&c.factorCall) && c.factorCall.frame.finishing && calls < 2 {
+			local = c.factorCall.frame.target
+			calls++
+			if calls == 1 {
+				return sourceStop
+			}
+			return ownStop
+		}
+		if local != nil && local.sourceStarted && localCalls == 0 {
+			localCalls++
+			return localStop
+		}
+		return nil
+	})
+	serviceMust(t, e)
+	serviceMust(t, m.core.AddDeletionHandler(h))
+	t.Cleanup(func() { serviceMust(t, m.core.RemoveDeletionHandler(h)); serviceMust(t, h.CloseChecked()) })
+	body := c.Factor(p, out)
+	if calls != 2 || !errors.Is(body, sourceStop) || !errors.Is(body, ownStop) || c.pendingFactors != local || local.sourceStarted {
+		t.Fatal("actual factor source/owning stop pair not reached", calls, body)
+	}
+	if !c.factorLocalSourceOwed {
+		t.Fatal("constructed local lost deferred destructor obligation")
+	}
+	for _, guard := range []func() error{m.SourceFinalize, m.CloseChecked, m.core.SourceFinalizePrefix, m.core.CloseChecked} {
+		if err := guard(); !errors.Is(err, sourceStop) {
+			t.Fatal("pending cache lost exact callee source cause", err)
+		}
+	}
+	cleanup := c.CleanupFactor()
+	if localCalls != 1 || !errors.Is(cleanup, localStop) || c.pendingFactors != local || !local.sourceStarted || local.closed || c.factorLocalSourceOwed {
+		t.Fatal("callee continuation skipped deferred local source destructor", localCalls, cleanup)
+	}
+	serviceMust(t, c.CleanupFactor())
+	if !local.closed || c.pendingFactors != nil || !errors.Is(local.sourceCause, localStop) {
+		t.Fatal("deferred local cleanup lost source history")
+	}
+	serviceMust(t, out.Close())
+	serviceMust(t, c.Close())
+	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, nil, h.header, nil)
+}
+
 func TestPolynomialCacheConstructorBudgetAndRefusal(t *testing.T) {
 	m := polynomialPSCFullFixture(t)
 	b := m.core.integer.Budget()
