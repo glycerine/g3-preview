@@ -21,6 +21,8 @@ type UPolynomialFactorizationConfig struct {
 	FactorizationDebugTag bool
 }
 type UPolynomialFactorizationService struct {
+	entryTrace                  upolyDisplayInvocationReceipt
+	entryTraceBorrow            upolyFactorTraceBorrow
 	frontend                    upolyFactorFrontendScope
 	frontendHistory             *upolyFactorFrontendHistory
 	frontendConstant            upolyFactorConstantBinding
@@ -87,7 +89,7 @@ func (s *UPolynomialFactorizationService) check() error {
 	if e := s.checkOwner(); e != nil {
 		return e
 	}
-	if s.scope != nil {
+	if s.scope != nil || s.entryTraceBorrow.executing || s.manager.displayReceiptPending(&s.entryTrace) {
 		return ErrUPolynomialCleanupPending
 	}
 	return nil

@@ -8,7 +8,7 @@ import (
 // Header, body, endl and footer callbacks borrow the actual enclosing owners.
 // Accepted numerical child ownership remains with its separate receipt.
 type upolyFactorTraceBorrow struct {
-	owner     *upolyFactorSquareFreeScope
+	owners    [3]*UPolynomialManager
 	tags      *diagnostic.TraceTags
 	executing bool
 	previous  [3]*upolyFactorTraceBorrow
@@ -18,23 +18,26 @@ type upolyFactorTraceBorrow struct {
 
 func (q *upolyFactorTraceBorrow) NumericExecuting() bool { return q.executing }
 func (q *upolyFactorTraceBorrow) callback() bool {
-	return q.tags.OutputCallbackActive() || q.owner.manager.config.Integer.RuntimeOwner().FailureTransportActive()
+	return q.tags.OutputCallbackActive() || q.owners[0].config.Integer.RuntimeOwner().FailureTransportActive()
 }
 func (q *upolyFactorTraceBorrow) managers() [3]*UPolynomialManager {
-	return [3]*UPolynomialManager{q.owner.manager, q.owner.zp, q.owner.zpe}
+	return q.owners
 }
 func (q *upolyFactorTraceBorrow) bind(c *upolyFactorSquareFreeScope, tags *diagnostic.TraceTags) error {
+	return q.bindManagers([3]*UPolynomialManager{c.manager, c.zp, c.zpe}, tags)
+}
+func (q *upolyFactorTraceBorrow) bindManagers(owners [3]*UPolynomialManager, tags *diagnostic.TraceTags) error {
 	if q.executing {
 		return ErrUPolynomialCleanupPending
 	}
-	*q = upolyFactorTraceBorrow{owner: c, tags: tags, executing: true}
+	*q = upolyFactorTraceBorrow{owners: owners, tags: tags, executing: true}
 	for i, m := range q.managers() {
 		if m != nil {
 			q.previous[i] = m.factorTrace
 			m.factorTrace = q
 		}
 	}
-	z := c.manager.config.Integer
+	z := owners[0].config.Integer
 	if e := z.BindCaller(&q.bindings[0], q, 0); e != nil {
 		q.unbind()
 		return e

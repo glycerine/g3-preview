@@ -241,6 +241,9 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 	if s == nil || s.self != s || s.manager == nil {
 		return ErrUPolynomialOwner
 	}
+	if s.entryTraceBorrow.executing {
+		return ErrUPolynomialCleanupPending
+	}
 	if s.constantCallerExecuting() {
 		return ErrUPolynomialCleanupPending
 	}
@@ -252,6 +255,9 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 	}
 	if c := s.scope; c != nil && (c.executing || c.sourceExecuting || c.ownExecuting || c.callDepth != 0) {
 		return ErrUPolynomialCleanupPending
+	}
+	if e := s.manager.cleanupDisplayReceipt(&s.entryTrace); e != nil {
+		return e
 	}
 	if c := s.scope; c != nil {
 		if e := c.cleanupTrace(); e != nil {

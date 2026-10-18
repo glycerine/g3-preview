@@ -188,6 +188,9 @@ func (s *UPolynomialFactorizationService) factorSquareFreeWithReceipt(f UPolynom
 		return false, e
 	}
 	m := s.manager
+	if e := s.traceFactorEntry(f, receipt); e != nil {
+		return false, e
+	}
 	if polynomialSourceDebug {
 		if e := s.primitiveDiagnosticWithPreparationReceipt(f, receipt); e != nil {
 			return false, e
@@ -200,9 +203,9 @@ func (s *UPolynomialFactorizationService) factorSquareFreeWithReceipt(f UPolynom
 	c.executing = true
 	c.enterCall()
 	if receipt != nil {
-		d, h := receipt.diagnostic, receipt.history
+		d, h, entry := receipt.diagnostic, receipt.history, receipt.entry
 		c.historyRequired = true
-		*receipt = upolyFactorSquareFreeInvocationReceipt{service: s, frame: c, invocation: c.invocation, diagnostic: d, history: h}
+		*receipt = upolyFactorSquareFreeInvocationReceipt{service: s, frame: c, invocation: c.invocation, diagnostic: d, history: h, entry: entry}
 		c.issuedReceipt = *receipt
 	}
 	defer func() {

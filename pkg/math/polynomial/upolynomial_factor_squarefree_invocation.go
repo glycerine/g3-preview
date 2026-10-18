@@ -15,6 +15,7 @@ type upolySquareFreeDiagnosticHistory struct {
 }
 
 type upolyFactorSquareFreeInvocationReceipt struct {
+	entry      upolyDisplayInvocationReceipt
 	history    *upolySquareFreeDiagnosticHistory
 	service    *UPolynomialFactorizationService
 	frame      *upolyFactorSquareFreeScope
@@ -39,7 +40,7 @@ func (s *UPolynomialFactorizationService) matchesSquareFreeHistory(r *upolyFacto
 		return false
 	}
 	if r.frame == nil {
-		return r.invocation == 0 && s.matchesDiagnosticHistory(r)
+		return r.invocation == 0 && (s.matchesDiagnosticHistory(r) || s.manager.matchesDisplayReceipt(&r.entry))
 	}
 	c := r.frame
 	if *r != c.issuedReceipt {
@@ -64,6 +65,12 @@ func (s *UPolynomialFactorizationService) matchesSquareFreeHistory(r *upolyFacto
 func (s *UPolynomialFactorizationService) factorSquareFreeInvocationSourceCause(r *upolyFactorSquareFreeInvocationReceipt) error {
 	if !s.matchesSquareFreeHistory(r) {
 		return nil
+	}
+	if s.manager.displayReceiptPending(&r.entry) {
+		if e := s.manager.displayReceiptSourceCause(&r.entry); e != nil {
+			return e
+		}
+		return ErrUPolynomialCleanupPending
 	}
 	if s.matchesDiagnosticHistory(r) && r.history.sourceCause != nil {
 		return r.history.sourceCause
@@ -97,7 +104,7 @@ func (s *UPolynomialFactorizationService) captureSquareFreeDiagnostic(q *upolyFa
 	h := &upolySquareFreeDiagnosticHistory{service: s, receipt: q.receipt, header: n, next: s.squareFreeDiagnosticHistory}
 	h.self = h
 	s.squareFreeDiagnosticHistory = h
-	*r = upolyFactorSquareFreeInvocationReceipt{service: s, diagnostic: q.receipt, history: h}
+	*r = upolyFactorSquareFreeInvocationReceipt{service: s, diagnostic: q.receipt, history: h, entry: r.entry}
 	return nil
 }
 func (s *UPolynomialFactorizationService) cleanupFactorSquareFreeInvocation(r *upolyFactorSquareFreeInvocationReceipt, abort bool) (cause error) {
@@ -106,6 +113,12 @@ func (s *UPolynomialFactorizationService) cleanupFactorSquareFreeInvocation(r *u
 	}
 	if !s.matchesSquareFreeHistory(r) {
 		return ErrUPolynomialOwner
+	}
+	if s.entryTraceBorrow.executing {
+		return ErrUPolynomialCleanupPending
+	}
+	if e := s.manager.cleanupDisplayReceipt(&r.entry); e != nil {
+		return e
 	}
 	c := r.frame
 	if c != nil && (c.executing || c.sourceExecuting || c.ownExecuting || c.callDepth != 0) {

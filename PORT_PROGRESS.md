@@ -45033,3 +45033,30 @@ The full native run against 0e99e7de has now completed successfully: 68 packages
 pass,11 have no tests,zero failures (polynomial93.531s,LP692.502s). This run
 predates the subsequent GCD, exponent and primitive/image TRACE increments;
 those increments have their focused ordinary/checked/debug/trace verification.
+
+2026-10-18: whole entry TRACE before any square-free local
+
+Implemented factorization.cpp:1020-1025 before the existing primitive-debug
+scope. It formats the actual input and all four source entry lines with reached
+endl flushes and sticky-stream behavior. The service embeds only exact accepted
+display metadata and the actual root/numeric borrow; no square-free scope or
+source construction is invented to provide that ownership. The shared concrete
+trace borrow now stores its actual root/prime/lift owner list directly.
+
+The accepted outer invocation carries this exact entry receipt through later
+diagnostic/square-free histories. Actual descriptor-after-physical refusal
+retains the display child with both primitive-debug and square-free scopes
+absent. Exact invocation cleanup releases only that child. A subsequent actual
+independent display refusal remains pending after stale-entry and service
+cleanup attempts, then its own receipt cleans it. Physical owner auditing passes.
+Callback probes verify entry precedes both later scopes and cannot retire the
+active service/polynomial owners. Disabled entry skips an absent view and makes
+no charged acquisition. Focused checked/debug/trace tests pass (0.009s).
+
+Broader source-unit completion remains unclaimed: later records at1239,1246,
+1274 and earlier factorization helpers still need source/ownership audit. The
+full polynomial then AST goal remains active. No full native repeat is needed
+this soon after the successful 68-package run.
+Broader factor/Hensel/recombination/degree/display checks pass ordinary17.205s
+and checked/debug/trace28.671s on CPUs8-16. portcheck and git diff --check pass:
+2103 units,677 APIs;211 ported,340 partial,1495 unported,11 dead/deleted.

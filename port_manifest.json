@@ -53107,7 +53107,9 @@
         "pkg/math/polynomial/upolynomial_factor_degree_trace.go",
         "pkg/math/polynomial/upolynomial_factor_trace_borrow.go",
         "pkg/math/polynomial/upolynomial_factor_degree_trace_test.go",
-        "pkg/math/polynomial/upolynomial_factor_polynomial_trace.go"
+        "pkg/math/polynomial/upolynomial_factor_polynomial_trace.go",
+        "pkg/math/polynomial/upolynomial_factor_entry_trace.go",
+        "pkg/math/polynomial/upolynomial_factor_entry_trace_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53219,7 +53221,10 @@
         "TestUPolynomialFactorDegreeTraceStreamFailureStillComputesDisplays",
         "TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands",
         "TestUPolynomialFactorPrimeGCDTraceRejectedPrimeOrder",
-        "TestUPolynomialFactorPrimitiveTraceChildRefusalStopsPrimitiveVector"
+        "TestUPolynomialFactorPrimitiveTraceChildRefusalStopsPrimitiveVector",
+        "TestUPolynomialFactorEntryTraceBeforePrimitiveDebug",
+        "TestUPolynomialFactorEntryTraceExactChildBeforeAnyLocal",
+        "TestUPolynomialFactorEntryTraceDisabledSkipsView"
       ],
       "conditionals": [
         {
@@ -53333,6 +53338,23 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Whole entry bughunt TRACE before primitive debug and square-free locals (1020-1025)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_entry_trace.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_entry_trace_test.go",
+            "pkg/math/polynomial/upolynomial_factor_trace_borrow.go",
+            "pkg/math/polynomial/upolynomial_factor_squarefree_invocation.go",
+            "pkg/math/polynomial/upolynomial_factor_service.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorEntryTraceBeforePrimitiveDebug",
+            "TestUPolynomialFactorEntryTraceExactChildBeforeAnyLocal",
+            "TestUPolynomialFactorEntryTraceDisabledSkipsView"
+          ],
+          "notes": "Formats the actual input polynomial and all four source entry lines before the primitive-debug scope and before constructing square-free locals. Service-embedded exact accepted display metadata holds any unfinished child without inventing source construction. The enclosing whole-record borrow protects actual root/numeric owners across header/body/endl/footer; its concrete owner list also supports existing related-manager records. An accepted outer invocation carries the exact entry receipt through later diagnostic and square-free histories. Actual descriptor-after-physical refusal leaves no primitive-debug or square-free scope; exact cleanup releases the child, and stale entry cleanup cannot acquire an independently accepted replacement. Disabled traces skip even an absent view. Other records and the whole source-unit audit remain partial."
+        },
+        {
           "name": "Whole primitive and finite-field polynomial bughunt TRACE records (1052-1055,1100-1103)",
           "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_polynomial_trace.go",
@@ -53347,7 +53369,7 @@
             "TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands",
             "TestUPolynomialFactorDegreeTraceStreamFailureStillComputesDisplays"
           ],
-          "notes": "Prints actual f_pp after sign normalization and actual f_pp_zp before square-free testing, with x/x_p variables, actual prime, literal source diagnostic strings and reached endl flushes. Exact accepted polynomial-display receipts retain a descriptor-after-physical child before the older primitive vector or prime-trial image; source and explicit cleanup observe that frontier before older owners. Callback probes cover actual root and related polynomial displays. Sticky-stream failure preserves later operand computations; disabled records skip absent manager/view operands. Entry TRACE at1020 remains open because its source ordering precedes the existing separate primitive-debug scope; no entry-record or whole-unit completion credit."
+          "notes": "Prints actual f_pp after sign normalization and actual f_pp_zp before square-free testing, with x/x_p variables, actual prime, literal source diagnostic strings and reached endl flushes. Exact accepted polynomial-display receipts retain a descriptor-after-physical child before the older primitive vector or prime-trial image; source and explicit cleanup observe that frontier before older owners. Callback probes cover actual root and related polynomial displays. Sticky-stream failure preserves later operand computations; disabled records skip absent manager/view operands. Entry TRACE1020 is now implemented separately before the primitive-debug scope; no whole-unit completion credit."
         },
         {
           "name": "Actual Mignotte-result bughunt TRACE before lift-manager construction (1163-1165)",
