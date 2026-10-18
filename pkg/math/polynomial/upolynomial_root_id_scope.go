@@ -8,7 +8,7 @@ import (
 
 type upolyRootIDScope struct {
 	remainderTrace                             upolyRootIDRemainderTrace
-	normalization                              upolyRootIDNormalizeScope
+	normalization                              upolySturmNormalizeScope
 	derivative                                 unumeral.Int
 	derivativeRetired                          *upolyRootIDDerivativeRaw
 	scalar                                     upolySturmRemainderScalar

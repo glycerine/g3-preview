@@ -6,7 +6,7 @@ import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-type upolyRootIDNormalizeScope struct {
+type upolySturmNormalizeScope struct {
 	insertions                [4]unumeral.NumeralInsertionReceipt
 	values                    [3]unumeral.Int // g, old_p_i, tmp, in source construction order
 	copy                      unumeral.IntegerCopyAllocationReceipt
@@ -97,7 +97,7 @@ func (q *upolyRootIDScope) beginNormalization() error {
 	if q.normalizePending() || s.executing || s.invocation == ^uint64(0) {
 		return ErrUPolynomialCleanupPending
 	}
-	*s = upolyRootIDNormalizeScope{invocation: s.invocation + 1, constructed: 1, executing: true}
+	*s = upolySturmNormalizeScope{invocation: s.invocation + 1, constructed: 1, executing: true}
 	return nil
 }
 func (q *upolyRootIDScope) endNormalization(cause error) error {

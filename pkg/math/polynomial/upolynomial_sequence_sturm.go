@@ -7,6 +7,7 @@ import (
 )
 
 type upolySequenceSturmScope struct {
+	normalization                  upolySturmNormalizeScope
 	next                           *upolySequenceSturmScope
 	retained                       bool
 	scalar                         upolySturmRemainderScalar
@@ -93,7 +94,7 @@ func (q *upolySequenceSturmScope) core() (cause error) {
 		if q.remainder.size == 0 {
 			return nil
 		}
-		if e = m.normalize(m.stateView(&q.remainder)); e != nil {
+		if e = m.normalizeWithSourceContext(m.stateView(&q.remainder), q.context()); e != nil {
 			return e
 		}
 		if e = m.sequencePush(s, m.stateView(&q.remainder), true); e != nil {
@@ -103,32 +104,11 @@ func (q *upolySequenceSturmScope) core() (cause error) {
 }
 func (s *UPolynomialSequence) buildSturm(a, b UPolynomialView, kind uint8) (cause error) {
 	m := s.manager
-	if e := m.sequenceMutationOutput(s); e != nil {
+	q, e := s.beginSturm()
+	if e != nil {
 		return e
 	}
-	q := &s.sturm
-	if q.invocation == ^uint64(0) {
-		return ErrUPolynomialCleanupPending
-	}
-	*q = upolySequenceSturmScope{owner: s, invocation: q.invocation + 1, active: true, executing: true}
-	q.hooks.Policy = q
-	if e := q.bindNumericOwners(); e != nil {
-		q.executing = false
-		q.active = false
-		return e
-	}
-	q.previousCallbackDepth = m.callbackDepth
-	m.callbackDepth = 0
-	defer func() { m.callbackDepth = q.previousCallbackDepth; cause = errors.Join(cause, q.unbindNumericOwners()) }()
-	defer func() {
-		cause = q.finishVector(1, cause)
-		q.executing = false
-		if !q.pending() {
-			q.active = false
-		} else {
-			q.retainPending()
-		}
-	}()
+	defer func() { cause = q.finish(cause) }()
 	if e := m.sequenceReset(&s.state); e != nil {
 		return e
 	}
@@ -156,7 +136,7 @@ func (s *UPolynomialSequence) buildSturm(a, b UPolynomialView, kind uint8) (caus
 			if e = m.derivativeState(v, &q.prime); e != nil {
 				return e
 			}
-			if e = m.normalize(m.stateView(&q.prime)); e != nil {
+			if e = m.normalizeWithSourceContext(m.stateView(&q.prime), q.context()); e != nil {
 				return e
 			}
 			if e = m.sequencePush(&s.state, m.stateView(&q.prime), true); e != nil {
@@ -177,6 +157,43 @@ func (s *UPolynomialSequence) buildSturm(a, b UPolynomialView, kind uint8) (caus
 		return e
 	}
 	return q.core()
+}
+
+// Accepted entry/exit are shared by the public constructors and their source
+// phase tests. No source vector or numeral is constructed by entry alone.
+func (s *UPolynomialSequence) beginSturm() (*upolySequenceSturmScope, error) {
+	m := s.manager
+	if e := m.sequenceMutationOutput(s); e != nil {
+		return nil, e
+	}
+	q := &s.sturm
+	if q.invocation == ^uint64(0) {
+		return nil, ErrUPolynomialCleanupPending
+	}
+	*q = upolySequenceSturmScope{owner: s, invocation: q.invocation + 1, active: true, executing: true}
+	q.hooks.Policy = q
+	if e := q.bindNumericOwners(); e != nil {
+		q.executing = false
+		q.active = false
+		return nil, e
+	}
+	q.previousCallbackDepth = m.callbackDepth
+	m.callbackDepth = 0
+	return q, nil
+}
+func (q *upolySequenceSturmScope) finish(cause error) error {
+	if !q.valid() || !q.executing || q.finishing {
+		return errors.Join(cause, ErrUPolynomialCleanupPending)
+	}
+	cause = q.finishVector(1, cause)
+	q.executing = false
+	if !q.pending() {
+		q.active = false
+	} else {
+		q.retainPending()
+	}
+	q.owner.manager.callbackDepth = q.previousCallbackDepth
+	return errors.Join(cause, q.unbindNumericOwners())
 }
 
 // CleanupSturm owns only the persistent source vectors of this public sequence.
@@ -258,7 +275,7 @@ func (q *upolySequenceSturmScope) unbindNumericOwners() error {
 
 func (q *upolySequenceSturmScope) pending() bool {
 	m := q.owner.manager
-	return q.remainderNumericPending() || q.live[0] || q.live[1] || m.config.Integer.MatchesCopyAllocationInvocation(&q.copy) || m.modular.MatchesPNormalizeInvocation(&q.normalize)
+	return q.normalizePending() || q.remainderNumericPending() || q.live[0] || q.live[1] || m.config.Integer.MatchesCopyAllocationInvocation(&q.copy) || m.modular.MatchesPNormalizeInvocation(&q.normalize)
 }
 
 // Source seq.push(m(),sz,p): preserve metadata/default construction before

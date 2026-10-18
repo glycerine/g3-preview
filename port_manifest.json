@@ -48964,7 +48964,11 @@
         "pkg/math/polynomial/upolynomial_sequence_sturm_guard_test.go",
         "pkg/math/polynomial/upolynomial_sequence_sturm_copy_test.go",
         "pkg/math/polynomial/upolynomial_sequence_sturm_remainder.go",
-        "pkg/math/polynomial/upolynomial_sequence_sturm_remainder_test.go"
+        "pkg/math/polynomial/upolynomial_sequence_sturm_remainder_test.go",
+        "pkg/math/polynomial/upolynomial_sequence_sturm_normalize.go",
+        "pkg/math/polynomial/upolynomial_sequence_sturm_normalize_trace.go",
+        "pkg/math/polynomial/upolynomial_sequence_sturm_normalize_test.go",
+        "pkg/math/polynomial/upolynomial_sequence_sturm_normalize_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",

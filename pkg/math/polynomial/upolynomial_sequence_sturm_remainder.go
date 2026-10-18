@@ -94,6 +94,9 @@ func (q *upolySequenceSturmScope) cleanupRemainderNumerics() error {
 			return e
 		}
 	}
+	if e := q.cleanupNormalization(); e != nil {
+		return e
+	}
 	s := &q.scalar
 	if e := z.CleanupAddMulInvocation(&s.addMul, false); e != nil {
 		return e
