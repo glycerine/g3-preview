@@ -250,7 +250,13 @@ func (s *UPolynomialFactorizationService) primitiveDiagnosticWithPreparationRece
 	if e = m.gcdSpanWithSourceContext(f, &q.numeral, context); e != nil {
 		return e
 	}
-	if f.count == 0 {
+	// DEBUG_CODE computes content even when runtime assertions are disabled.
+	// Only SASSERT's predicate and debugger action are gated here.
+	enabled, e := factorHeaderAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if !enabled || f.count == 0 {
 		return nil
 	}
 	one, e := m.modular.IsOne(&q.numeral)
@@ -258,7 +264,7 @@ func (s *UPolynomialFactorizationService) primitiveDiagnosticWithPreparationRece
 		return e
 	}
 	if !one {
-		return ErrUPolynomialAssertion
+		return m.factorizationAssertionFailure(1033, "f.size() == 0 || nm.is_one(f_cont)")
 	}
 	return nil
 }

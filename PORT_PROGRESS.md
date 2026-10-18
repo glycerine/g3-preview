@@ -45534,3 +45534,11 @@ portcheck and diff checks pass:2103 units,677 APIs;211 ported,340 partial,
 Ported the factorization.cpp:982 process assertion gate and real debugger Throw/Continue actions before Mignotte local construction. Refactored the degree-precondition fixture to an independently registered degree-one polynomial and a direct adapter with zero constructed caller locals. Throw preserves the unaccepted receipt, invocation nonce and budget; Continue, disabled assertions and release compute the literal exponent 2 and finish the actual numeral destructors.
 
 Focused `TestUPolynomialMignotte*` passed in ordinary (0.014s) and g3checked/g3debug/g3trace (0.169s) builds, restricted to CPUs 8–16. Factorization and the overall polynomial/AST ports remain incomplete; primitive-content and final-remainder assertion sites still need runtime-action auditing.
+
+### Primitive-content and constant-remainder assertion actions
+
+Ported factorization.cpp:1033 and :1291 to actual runtime assertion gates and debugger Throw/Continue actions. The compiled DEBUG_CODE content GCD remains before the runtime gate: a genuine BIG-copy allocation refusal with assertions disabled verifies it still executes. Public nonprimitive input [2,6,2] Throw stops before f_pp construction; Continue, disabled assertions and release preserve the original irreducible factor without inventing content extraction.
+
+The final constant remainder now short-circuits its combined size/unit predicate exactly. Tests cover empty, nonunit and unit vectors, all actions, preserved source values/output/budget, actual constructed related-owner fixtures, read-only physical graph audits and completed source-call cleanup. Existing remainder assertion tests remain unchanged in their original file; new factor-remainder tests are separate.
+
+Broader factorization/recombination/primitive/Mignotte/Hensel tests passed ordinary (15.851s) and g3checked/g3debug/g3trace (27.700s). The added disabled-GCD focused check passed checked/debug/trace (0.007s). All commands ran on CPUs 8–16. Whole polynomial and AST completion remains unproven and incomplete; constructor trace and broader source-unit/ownership audits remain open.

@@ -53186,7 +53186,9 @@
         "pkg/math/polynomial/upolynomial_exception.go",
         "pkg/math/polynomial/upolynomial_exception_test.go",
         "pkg/math/polynomial/upolynomial_factorization_field_source_test.go",
-        "pkg/math/polynomial/upolynomial_hensel_precondition_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_hensel_precondition_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_primitive_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_factor_remainder_assertions_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53336,7 +53338,10 @@
         "TestUPolynomialSquareFreeEntryAssertionConstantPublication",
         "TestUPolynomialSquareFreeClosedAssertionSwitchBeforeConstantCopy",
         "TestUPolynomialHenselPairPreconditionSourceActions",
-        "TestUPolynomialHenselFactorAssertionActionsAndModulusFrontier"
+        "TestUPolynomialHenselFactorAssertionActionsAndModulusFrontier",
+        "TestUPolynomialPrimitiveContentAssertionPublicActions",
+        "TestUPolynomialPrimitiveDisabledAssertionStillComputesDebugContent",
+        "TestUPolynomialRecombinationConstantRemainderAssertionActions"
       ],
       "conditionals": [
         {
@@ -53449,6 +53454,22 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Primitive-content and final constant-remainder SASSERT runtime gates and debugger actions (upolynomial_factorization.cpp:1033,1291)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_preparation_invocation.go",
+            "pkg/math/polynomial/upolynomial_factor_recombine.go",
+            "pkg/math/polynomial/upolynomial_primitive_assertions_test.go",
+            "pkg/math/polynomial/upolynomial_factor_remainder_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialPrimitiveContentAssertionPublicActions",
+            "TestUPolynomialPrimitiveDisabledAssertionStillComputesDebugContent",
+            "TestUPolynomialRecombinationConstantRemainderAssertionActions"
+          ],
+          "notes": "Primitive content GCD stays outside the runtime SASSERT gate inside compiled DEBUG_CODE. A real BIG content-copy reservation refusal with assertions disabled proves that computation is retained. Public nonprimitive factorization Throw stops before f_pp construction; Continue and disabled/release preserve the original irreducible vector without extracting content. The final constant branch runtime-gates its combined size/unit predicate, short-circuits empty input, and invokes real debugger actions. Actual related managers, lifted factors, degree state and combination iterator back the direct remainder fixture; no source-local construction counts are invented. Empty/nonunit/unit remainders preserve original values, factor outputs and charged budget; read-only physical graph audit and source-call completion pass."
+        },
         {
           "name": "Mignotte degree precondition runtime gate and debugger action before local numeral construction (upolynomial_factorization.cpp:982)",
           "status": "ported",

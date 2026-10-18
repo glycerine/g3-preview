@@ -446,16 +446,22 @@ func (s *UPolynomialFactorizationService) publishRecombinationRemainder(fs *UPol
 		if e = fs.pushCopyWithSourceContext(m.stateView(&c.fpp), k, context); e != nil {
 			return e
 		}
-	} else if polynomialSourceDebug {
-		if c.fpp.size != 1 {
-			return ErrUPolynomialAssertion
-		}
-		one, e := nm.IsOne(&m.values(&c.fpp)[c.fpp.size-1])
+	} else {
+		enabled, e := factorHeaderAssertionsEnabled()
 		if e != nil {
 			return e
 		}
-		if !one {
-			return ErrUPolynomialAssertion
+		if enabled {
+			one := false
+			if c.fpp.size == 1 {
+				one, e = nm.IsOne(&m.values(&c.fpp)[0])
+				if e != nil {
+					return e
+				}
+			}
+			if !one {
+				return m.factorizationAssertionFailure(1291, "f_pp.size() == 1 && nm.is_one(f_pp.back())")
+			}
 		}
 	}
 	return nil
