@@ -50781,7 +50781,8 @@
         "pkg/math/polynomial/upolynomial_zero_roots_assertions_test.go",
         "pkg/math/polynomial/upolynomial_root_upper_assertions.go",
         "pkg/math/polynomial/upolynomial_root_upper_assertions_test.go",
-        "pkg/math/polynomial/upolynomial_nonzero_bound_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_nonzero_bound_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_remove_one_half_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51044,7 +51045,10 @@
         "TestUPolynomialRootUpperOrderingAssertionActions",
         "TestUPolynomialRootUpperClosedEntryAndErasedOrdering",
         "TestUPolynomialNonzeroBoundAssertionActions",
-        "TestUPolynomialNonzeroBoundAssertionProfiles"
+        "TestUPolynomialNonzeroBoundAssertionProfiles",
+        "TestUPolynomialRemoveOneHalfRootAssertionActions",
+        "TestUPolynomialRemoveOneHalfRootClosedAssertionBeforeHorner",
+        "TestUPolynomialRemoveOneHalfRootDisabledPreservesOlderHorner"
       ],
       "conditionals": [
         {
@@ -51633,6 +51637,20 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Remove-one-half-root numerical assertion runtime erasure and debugger actions (upolynomial.cpp:1325)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_root_bounds.go",
+            "pkg/math/polynomial/upolynomial_remove_one_half_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialRemoveOneHalfRootAssertionActions",
+            "TestUPolynomialRemoveOneHalfRootClosedAssertionBeforeHorner",
+            "TestUPolynomialRemoveOneHalfRootDisabledPreservesOlderHorner"
+          ],
+          "notes": "Runtime gating now encloses actual has_one_half_root evaluation, including its Horner NUM declarations, allocations and accepted child receipt. Failed predicates use actual Throw/Continue with receiving owner borrowing. Public p=x+1 reaches Throw before division/output publication; Continue/disabled/release return literal integer pseudo-quotient1 from 2*(x+1)=(2x-1)+3, discarding the remainder without claiming a removed root. Enabled debug creates one actual Horner invocation; disabled/release creates none. Closed runtime state stops valid-root input before Horner. Actual reservation-prefix failure in a separate HasOneHalfRoot retains independent numeric work; disabled nonempty removal and its exact owning cleanup leave that older frame unchanged, before explicit cleanup of its own receipt. No numerical scratch, quota or construction counters are rewritten. Existing every-prefix, field, unjoined-own-stop, transport and replacement tests remain separate ownership evidence. Broader source-unit completion remains partial."
+        },
         {
           "name": "Nonzero-root lower-bound separate source assertion actions (upolynomial.cpp:2053,2057,2062-2063)",
           "status": "ported",

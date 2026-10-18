@@ -172,13 +172,19 @@ func (m *UPolynomialManager) RemoveOneHalfRoot(v UPolynomialView, out UPolynomia
 		setRemoveOneHalfRootCaller(z, old)
 		setRemoveOneHalfRootCaller(z.Naturals(), oldN)
 	}()
-	if polynomialSourceDebug {
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled {
 		yes, e := m.hasOneHalfRootWithRemove(v, q)
 		if e != nil {
 			return e
 		}
 		if !yes {
-			return ErrUPolynomialAssertion
+			if e := m.scalarDivisionAssertionFailure(1325, "has_one_half_root(sz, p)"); e != nil {
+				return e
+			}
 		}
 	}
 	divisor := upolyDivisorSpan{immediate: true, pair: [2]unumeral.Int{unumeral.NewInt(-1), unumeral.NewInt(2)}}
