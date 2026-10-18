@@ -112,7 +112,7 @@ func (q *upolyDisplayScope) context() integerAllocationInvocationContext {
 }
 func (c integerAllocationInvocationContext) upolyDisplayFrame(z *unumeral.IntegerManager) *upolyDisplayScope {
 	q := c.upolyDisplay
-	if !q.actual() || q.owner.config.Integer != z || z == nil || !z.ValidOwner() || !q.active || !q.executing || !q.constructed || q.owner.callbackDepth != 0 || q.owner.currentDisplay != q || c.upolyDisplayInvocation != q.invocation {
+	if !q.actual() || q.owner.config.Integer != z || z == nil || !z.ValidOwner() || z.RuntimeOwner().FailureTransportActive() || !q.active || !q.executing || !q.constructed || q.owner.callbackDepth != 0 || q.owner.currentDisplay != q || c.upolyDisplayInvocation != q.invocation {
 		return nil
 	}
 	return q
@@ -309,7 +309,7 @@ func (q *upolyDisplayScope) NumericCharacterValid(n *unumeral.NaturalManager, ex
 	if !q.actual() || !q.active || q.owner.config.Integer.Naturals() != n {
 		return false
 	}
-	return !executing || q.executing && q.owner.currentDisplay == q && q.owner.callbackDepth == 0
+	return !executing || q.executing && q.owner.currentDisplay == q && q.owner.callbackDepth == 0 && !q.owner.config.Integer.RuntimeOwner().FailureTransportActive()
 }
 func (q *upolyDisplayScope) NumericCharacterPrepare() error { return q.prepareStorage() }
 
