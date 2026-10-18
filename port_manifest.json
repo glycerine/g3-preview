@@ -50797,7 +50797,8 @@
         "pkg/math/polynomial/upolynomial_modular_gcd_display_trace_test.go",
         "pkg/math/polynomial/upolynomial_euclid_display_trace.go",
         "pkg/math/polynomial/upolynomial_euclid_display_trace_test.go",
-        "pkg/math/polynomial/upolynomial_factor_assertion_actions_test.go"
+        "pkg/math/polynomial/upolynomial_factor_assertion_actions_test.go",
+        "pkg/math/polynomial/upolynomial_storage_assertion_actions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51090,7 +51091,10 @@
         "TestUPolynomialFactorMultiplicityAssertionActions",
         "TestUPolynomialFactorZeroConstantAssertionActions",
         "TestUPolynomialFactorClosedAssertionGate",
-        "TestUPolynomialFactorsZeroMultiplicityAndUnsignedCounterQuirks"
+        "TestUPolynomialFactorsZeroMultiplicityAndUnsignedCounterQuirks",
+        "TestUPolynomialSelfCopyAssertionActions",
+        "TestUPolynomialSetSizeAssertionActions",
+        "TestUPolynomialStorageClosedAssertionGate"
       ],
       "conditionals": [
         {
@@ -51679,6 +51683,20 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Coefficient set-size/self-copy runtime assertion actions (upolynomial.cpp:177,194)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_storage.go",
+            "pkg/math/polynomial/upolynomial_storage_assertion_actions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialSelfCopyAssertionActions",
+            "TestUPolynomialSetSizeAssertionActions",
+            "TestUPolynomialStorageClosedAssertionGate"
+          ],
+          "notes": "Runtime gates before source size predicates, with actual debugger Throw/Continue under receiving-manager borrowing. Same-base mismatched-count Continue returns before copy/resize and preserves all original coefficients. Direct size-invariant action test uses actual Reserve then trim to retain real constructed zero backing, with Throw before size publication and Continue publishing then trimming zeros; not claimed as an invalid request reached by valid algorithms. Closed runtime stops valid same-base return and set_size(0) before mutation. Disabled/release erases predicates. Wider storage destruction/failure audits remain partial."
+        },
         {
           "name": "Factor insertion multiplicity and zero-constant multiply assertion actions (upolynomial.cpp:57,66,78)",
           "status": "ported",

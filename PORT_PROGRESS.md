@@ -45844,3 +45844,12 @@ Zero-constant multiply resets output before its nonempty-factor assertion. Throw
 Manifest validation passes. All execution remains on CPUs8–16. Broader polynomial source assertion/failure inventories and completion audits remain open, followed by AST. The hourly native run is not yet due from its20:25UTC start; no redundant full suite was launched.
 
 Broader factorization/frontend/modular-GCD/Euclidean/CRA/warm tests pass ordinary (19.171s) and g3checked/g3debug/g3trace (31.360s). Focused ordinary factor assertion/lifecycle checks pass (0.007s). Worktree validation has no whitespace errors.
+
+### Coefficient set-size and same-base copy runtime assertions
+
+Ported upolynomial.cpp:177,194 with runtime gating and actual debugger Throw/Continue under receiving-manager borrowing. Same-base mismatched raw count now honors Continue's literal early return without copying, truncating or normalizing the original coefficients. Disabled/release profiles erase the predicates. Closed runtime state stops even valid same-base copy or set_size(0) before source mutation.
+
+The direct failed set-size invariant action uses genuinely reserved zero backing followed by actual trim; it does not rewrite logical state/values or claim a valid retained algorithm requests invalid growth. Throw stops before publication; Continue publishes requested size then trims the real zero tail. Native Go storage is used throughout; STL internals are not ported.
+
+Focused storage action tests pass ordinary (0.005s) and checked/debug/trace (0.008s). Broader factorization/frontend/modular-GCD/Euclidean/CRA/storage/closed-state/warm checks pass checked/debug/trace (31.432s); manifest validation passes. All commands stay on CPUs8–16. Wider polynomial source-lifetime/completion audits remain open, followed by AST. The next periodic native run will be recorded only against its exact committed state/process.
+Final broader ordinary affected checks pass (19.065s).

@@ -130,8 +130,14 @@ func (m *UPolynomialManager) trim(s *upolyVectorState) error {
 	return nil
 }
 func (m *UPolynomialManager) setSize(s *upolyVectorState, n uint32) error {
-	if polynomialSourceDebug && n > s.size {
-		return ErrUPolynomialAssertion
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled && n > s.size {
+		if e := m.scalarDivisionAssertionFailure(177, "old_sz >= sz"); e != nil {
+			return e
+		}
 	}
 	if s.backing == 0 {
 		return nil
@@ -344,8 +350,14 @@ func (m *UPolynomialManager) setViewWithSourceContext(s *upolyVectorState, v UPo
 		return ErrUPolynomialOwner
 	}
 	if m.alias(v, s) {
-		if polynomialSourceDebug && s.size != v.count {
-			return ErrUPolynomialAssertion
+		enabled, e := refinementSourceAssertionsEnabled()
+		if e != nil {
+			return e
+		}
+		if enabled && s.size != v.count {
+			if e := m.scalarDivisionAssertionFailure(194, "buffer.size() == sz"); e != nil {
+				return e
+			}
 		}
 		return nil
 	}
