@@ -46,6 +46,7 @@ type RationalService struct {
 	numericReceiver                                       atomic.Value // rationalNumericReceiver; actual synchronous allocator owner
 	lexicalPrepared, lexicalExecuting, lexicalInvocations *RationalServiceInvocation
 	lexicalSerial                                         uint64
+	lexicalGeneration                                     uint64 // actual accepted outer lexical entry
 	sourceRuntimeExecuting                                uint32 // actual held lower-allocation invocation stamp
 
 	sourceInsertionExecuting bool

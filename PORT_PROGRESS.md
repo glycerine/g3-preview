@@ -44757,3 +44757,38 @@ respectively. Broader arithmetic callback/destructor fault composition remains
 open; the affected parser/univariate units remain partial. Complete polynomial
 then AST remains unfinished. Manifest counts are unchanged: 210 ported,
 341 partial, 1495 unported, 11 dead/deleted (2103 units, 677 APIs).
+
+The converter arithmetic audit now includes a real multiplication allocation
+transport. It verifies that callbacks cannot acquire the converter, polynomial,
+modular or either numeral owner, nor reenter the held global service mutex.
+Both source/receiver synchronous bindings are restored after the stopped call;
+exact child cleanup then releases the older argument vector.
+
+A separate private-receiver campaign reaches 42 actual allocation-refusal
+prefixes of (x+a)^3-(x+a)+(x-7)*a+2, a=2^100+1. Every receiving physical owner
+is audited before disabling the fault, then all charged owners are released.
+The successful completion checks independently expanded BIG coefficients.
+Failed scalar construction can leave unusable source fields; this test does
+not repair those fields, replay the source algorithm or promise recovery.
+
+A further actual completed-rational destructor stop reproduced a global lexical
+ownership bug: an idle/stale converter whose new lexical entry was refused
+could acknowledge a newer independent pending scope. Converter conversion now
+records a concrete service/outer-invocation receipt only after accepted entry.
+Every real outer lexical entry advances cold call identity; nested scalar calls
+retain that identity, and refused entry preserves the previous receipt. Exact
+cleanup preserves completed locals before older vectors and partial locals
+afterward. Never-entered and stale completed converters now clean/close without
+changing the independent roots, causes or original exception. A separate exact
+owning receipt test checks cleanup order and unchanged receipt on refused entry.
+The independent-root regression failed before this fix.
+
+Focused ordinary polynomial/numeral selections passed (0.805s/11.433s), as did
+checked/debug/trace selections (1.220s/19.120s). The final extra exact-receipt
+cleanup test also passed in the checked parser/context selection (0.898s).
+Full native verification was attempted after more than an hour; compilation
+hit a full disk. Removed 4,334,152,289 bytes of Go cache data older than one hour,
+without touching sources/test vectors. The failed run is terminal; a serial
+package retry is running, logged in
+/mnt/oldrog/tmp/g3-polynomial-lexical-native-full-retry.log.
+Parser/univariate and broader polynomial/AST units remain partial.

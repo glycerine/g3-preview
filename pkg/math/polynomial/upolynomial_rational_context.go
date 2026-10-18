@@ -33,6 +33,9 @@ type UPolynomialRationalContext struct {
 }
 
 func numericRationalService_WithUPolynomialRationals(s *unumeral.RationalService, m *UPolynomialManager, body func(*UPolynomialRationalContext) error) error {
+	return numericRationalService_WithUPolynomialRationalsReceipt(s, m, nil, body)
+}
+func numericRationalService_WithUPolynomialRationalsReceipt(s *unumeral.RationalService, m *UPolynomialManager, receipt *unumeral.RationalNumericLexicalReceipt, body func(*UPolynomialRationalContext) error) error {
 	return s.WithNumericBorrow(func(b *unumeral.RationalNumericBorrow) error {
 		if m == nil || m.config.Integer == nil {
 			return ErrUPolynomialOwner
@@ -43,7 +46,7 @@ func numericRationalService_WithUPolynomialRationals(s *unumeral.RationalService
 		if body == nil {
 			return arena.ErrConfig
 		}
-		return b.WithLexical(func() error {
+		return b.WithLexicalReceipt(receipt, func() error {
 			c := &m.rationalContext
 			if c.active {
 				return ErrUPolynomialCleanupPending
@@ -100,7 +103,10 @@ func (c *UPolynomialRationalContext) SetIdentity(p UPolynomial) error {
 	})
 }
 func numericRationalService_CleanupUPolynomialRationals(s *unumeral.RationalService, m *UPolynomialManager, vectors func() error) error {
+	return numericRationalService_CleanupUPolynomialRationalsReceipt(s, m, nil, vectors)
+}
+func numericRationalService_CleanupUPolynomialRationalsReceipt(s *unumeral.RationalService, m *UPolynomialManager, receipt *unumeral.RationalNumericLexicalReceipt, vectors func() error) error {
 	return s.WithNumericBorrow(func(b *unumeral.RationalNumericBorrow) error {
-		return b.WithReceivingInteger(m.config.Integer, func() error { return b.CleanupAfterVectors(vectors) })
+		return b.WithReceivingInteger(m.config.Integer, func() error { return b.CleanupAfterVectorsReceipt(receipt, vectors) })
 	})
 }

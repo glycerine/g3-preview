@@ -8,7 +8,55 @@ import (
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usexpr "github.com/glycerine/g3/pkg/util/sexpr"
+	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
+
+func TestSexprPolynomialRefusedLexicalEntryPreservesIndependentScope(t *testing.T) {
+	t.Run("never-entered", func(t *testing.T) { sexprPolynomialRefusedLexicalEntry(t, false) })
+	t.Run("older-completed-entry", func(t *testing.T) { sexprPolynomialRefusedLexicalEntry(t, true) })
+}
+
+func sexprPolynomialRefusedLexicalEntry(t *testing.T, prior bool) {
+	globals, m, out, rt, budget := contextTLSOwner(t)
+	sy, e := usymbol.NewManager(usymbol.Config{Budget: budget, PageSize: 64, DescriptorPageSize: 2})
+	serviceMust(t, e)
+	sx, e := usexpr.NewSexprManager(usexpr.SexprConfig{Budget: budget, PageSize: 2, Symbols: sy, Rationals: globals})
+	serviceMust(t, e)
+	t.Cleanup(func() { contextTLSFinish(t, rt, sx.Close); serviceMust(t, sy.Close()) })
+	c, e := NewSexprPolynomialConverter(sx, m)
+	serviceMust(t, e)
+	t.Cleanup(func() { contextTLSFinish(t, rt, c.Close) })
+	one := sxPolyNum(t, sx, globals, "1")
+	if prior {
+		serviceMust(t, c.Convert(one, out))
+	}
+	a := contextBigOdd(t, globals, 2)
+	t.Cleanup(func() { contextTLSDelete(t, globals, &a, rt) })
+	original := errors.New("independent noninteger input")
+	body := numericRationalService_WithUPolynomialRationals(globals, m, func(ctx *UPolynomialRationalContext) error {
+		return ctx.SetConstant(out, &a, func() error {
+			contextTLSNearMinimum(t, rt)
+			return original
+		})
+	})
+	before := globals.Lexical.State()
+	if !errors.Is(body, original) || !errors.Is(body, arena.ErrBounds) || before.Roots != 1 || before.Completed != 1 || !before.Pending {
+		t.Fatal("independent actual destructor stop was not reached", body, before)
+	}
+	if e := c.Convert(one, out); !errors.Is(e, unumeral.ErrRationalLexicalPending) {
+		t.Fatal("converter entered an independent pending lexical scope", e)
+	}
+	serviceMust(t, c.Cleanup())
+	if after := globals.Lexical.State(); after != before {
+		t.Error("refused converter cleanup acquired independent lexical roots", before, after)
+	}
+	serviceMust(t, c.Close())
+	if after := globals.Lexical.State(); after != before {
+		t.Error("refused converter close acquired independent lexical roots", before, after)
+	}
+	serviceMust(t, numericRationalService_CleanupUPolynomialRationals(globals, m, func() error { return nil }))
+	contextTLSFinish(t, rt, func() error { return m.DelPolynomial(&out) })
+}
 
 func TestSexprPolynomialForeignCoefficientAllocationCallback(t *testing.T) {
 	sx, _, globals := sxOwner(t, arena.NewBudget(1<<24))

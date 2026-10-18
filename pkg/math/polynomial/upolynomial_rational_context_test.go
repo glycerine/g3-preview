@@ -206,6 +206,42 @@ func TestUPolynomialContextExceptionBeforeCompletedDestructor(t *testing.T) {
 	serviceMust(t, m.DelPolynomial(&p))
 }
 
+func TestUPolynomialContextLexicalReceiptCleanupOrderAndRefusal(t *testing.T) {
+	s, m, p, rt, _ := contextTLSOwner(t)
+	a := contextBigOdd(t, s, 2)
+	original := errors.New("receipted noninteger coefficient")
+	var receipt unumeral.RationalNumericLexicalReceipt
+	body := numericRationalService_WithUPolynomialRationalsReceipt(s, m, &receipt, func(c *UPolynomialRationalContext) error {
+		return c.SetConstant(p, &a, func() error {
+			contextTLSNearMinimum(t, rt)
+			return original
+		})
+	})
+	state := s.Lexical.State()
+	if !errors.Is(body, original) || !errors.Is(body, arena.ErrBounds) || state.Completed != 1 || !state.Pending {
+		t.Fatal("actual completed lexical destructor did not stop", body, state)
+	}
+	issued := receipt
+	if e := numericRationalService_WithUPolynomialRationalsReceipt(s, m, &receipt, func(*UPolynomialRationalContext) error {
+		t.Fatal("pending lexical entry accepted another body")
+		return nil
+	}); !errors.Is(e, unumeral.ErrRationalLexicalPending) || receipt != issued {
+		t.Fatal("refused entry replaced actual lexical receipt", e)
+	}
+	called := false
+	serviceMust(t, numericRationalService_CleanupUPolynomialRationalsReceipt(s, m, &receipt, func() error {
+		called = true
+		if state := s.Lexical.State(); state.Completed != 0 || state.Pending {
+			t.Fatal("older caller vector ran before completed lexical destructor", state)
+		}
+		return m.DelPolynomial(&p)
+	}))
+	if !called || s.Lexical.Pending() {
+		t.Fatal("exact lexical cleanup did not finish")
+	}
+	contextTLSDelete(t, s, &a, rt)
+}
+
 func TestUPolynomialContextPartialCopyWaitsForStoppedVector(t *testing.T) {
 	s, m, p, r, b := contextTLSOwner(t)
 	a := contextBigOdd(t, s, 1)

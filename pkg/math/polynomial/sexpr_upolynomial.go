@@ -8,6 +8,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 
 	ucmdexception "github.com/glycerine/g3/pkg/util/cmdexception"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	usexpr "github.com/glycerine/g3/pkg/util/sexpr"
 	usymbol "github.com/glycerine/g3/pkg/util/symbol"
 )
@@ -35,18 +36,19 @@ type sexprPolynomialFrame struct {
 // Native frames retain actual source scoped vectors, including stopped cleanup.
 // The converter header and actual numerical owners are charged separately.
 type SexprPolynomialConverter struct {
-	arithmetic   sexprPolynomialArithmeticScope
-	inputReceipt upolyRationalInputInvocationReceipt
-	borrowed     *usexpr.SexprBorrowedNodes
-	self         *SexprPolynomialConverter
-	sexpr        *usexpr.SexprManager
-	polynomial   *UPolynomialManager
-	frames       []sexprPolynomialFrame
-	depth        uint32
-	header       uint64
-	cause        error
-	converting   bool
-	closed       bool
+	lexicalReceipt unumeral.RationalNumericLexicalReceipt
+	arithmetic     sexprPolynomialArithmeticScope
+	inputReceipt   upolyRationalInputInvocationReceipt
+	borrowed       *usexpr.SexprBorrowedNodes
+	self           *SexprPolynomialConverter
+	sexpr          *usexpr.SexprManager
+	polynomial     *UPolynomialManager
+	frames         []sexprPolynomialFrame
+	depth          uint32
+	header         uint64
+	cause          error
+	converting     bool
+	closed         bool
 }
 
 func NewSexprPolynomialConverter(s *usexpr.SexprManager, m *UPolynomialManager) (out *SexprPolynomialConverter, cause error) {
@@ -116,7 +118,7 @@ func (c *SexprPolynomialConverter) convertAtDepthForRoot(h usexpr.SexprHandle, p
 	return c.sexpr.WithBorrowedNodes(func(nodes *usexpr.SexprBorrowedNodes) error {
 		c.borrowed = nodes
 		defer func() { c.borrowed = nil }()
-		return numericRationalService_WithUPolynomialRationals(c.sexpr.Configuration().Rationals, c.polynomial, func(ctx *UPolynomialRationalContext) error {
+		return numericRationalService_WithUPolynomialRationalsReceipt(c.sexpr.Configuration().Rationals, c.polynomial, &c.lexicalReceipt, func(ctx *UPolynomialRationalContext) error {
 			ctx.inputReceipt = &c.inputReceipt
 			if caller != nil {
 				caller.parserAccepted = true
@@ -266,7 +268,7 @@ func (c *SexprPolynomialConverter) Cleanup() error {
 	if e := c.open(); e != nil {
 		return e
 	}
-	err := numericRationalService_CleanupUPolynomialRationals(c.sexpr.Configuration().Rationals, c.polynomial, func() error {
+	err := numericRationalService_CleanupUPolynomialRationalsReceipt(c.sexpr.Configuration().Rationals, c.polynomial, &c.lexicalReceipt, func() error {
 		if e := c.cleanupArithmetic(); e != nil {
 			return e
 		}

@@ -50102,6 +50102,27 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Converter cleanup matches its accepted global lexical invocation; refused and stale calls preserve independent roots (sexpr2upolynomial.cpp:39-97)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_rational_context.go",
+            "pkg/util/numeral/rational_numeric_borrow.go",
+            "pkg/util/numeral/rational_lexical_scope.go",
+            "pkg/util/numeral/rational_service.go",
+            "pkg/math/polynomial/sexpr_upolynomial_owner_test.go",
+            "pkg/math/polynomial/upolynomial_rational_context_test.go",
+            "pkg/math/polynomial/sexpr_upolynomial_arithmetic_test.go"
+          ],
+          "tests": [
+            "TestSexprPolynomialRefusedLexicalEntryPreservesIndependentScope",
+            "TestUPolynomialContextLexicalReceiptCleanupOrderAndRefusal",
+            "TestSexprPolynomialPrivateArithmeticAllocationPrefixes",
+            "TestSexprPolynomialArithmeticReceivingAllocationCallback"
+          ],
+          "notes": "An actual independent completed rational destructor stop reproduced that converter cleanup could acknowledge unrelated global lexical roots after conversion entry was refused. The converter now carries a concrete service/outer-invocation receipt, issued only after accepted lexical entry. Refused entry preserves the previous receipt. Every accepted outer service lexical entry advances cold call identity; nested scalar calls keep their enclosing identity. Exact cleanup preserves completed-local-before-older-vector order and separately cleans partial locals afterward. A never-entered converter and a stale completed converter both clean and close without changing the independent pending roots, cause or original exception. The exact owning scope test verifies accepted cleanup and preserved receipt on refused reentry. A separate private receiving arithmetic campaign audits all 42 actual allocation-refusal prefixes before fault disabling, then releases every charged owner; its successful completion checks four independently expanded BIG coefficients of (x+a)^3-(x+a)+(x-7)*a+2. No failed source scalar is repaired or replayed. A real receiving multiplication allocation transport verifies source and receiver numeral lifetime, converter/polynomial/modular lifetime and global-service mutex reentry guards. Whole polynomial/AST completion remains open."
+        },
+        {
           "name": "S-expression arithmetic issued-child ownership before older argument-vector destruction (sexpr2upolynomial.cpp:39-85)",
           "status": "partial",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial_arithmetic.go",
@@ -50262,6 +50283,27 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Converter cleanup matches its accepted global lexical invocation; refused and stale calls preserve independent roots (sexpr2upolynomial.cpp:39-97)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_rational_context.go",
+            "pkg/util/numeral/rational_numeric_borrow.go",
+            "pkg/util/numeral/rational_lexical_scope.go",
+            "pkg/util/numeral/rational_service.go",
+            "pkg/math/polynomial/sexpr_upolynomial_owner_test.go",
+            "pkg/math/polynomial/upolynomial_rational_context_test.go",
+            "pkg/math/polynomial/sexpr_upolynomial_arithmetic_test.go"
+          ],
+          "tests": [
+            "TestSexprPolynomialRefusedLexicalEntryPreservesIndependentScope",
+            "TestUPolynomialContextLexicalReceiptCleanupOrderAndRefusal",
+            "TestSexprPolynomialPrivateArithmeticAllocationPrefixes",
+            "TestSexprPolynomialArithmeticReceivingAllocationCallback"
+          ],
+          "notes": "An actual independent completed rational destructor stop reproduced that converter cleanup could acknowledge unrelated global lexical roots after conversion entry was refused. The converter now carries a concrete service/outer-invocation receipt, issued only after accepted lexical entry. Refused entry preserves the previous receipt. Every accepted outer service lexical entry advances cold call identity; nested scalar calls keep their enclosing identity. Exact cleanup preserves completed-local-before-older-vector order and separately cleans partial locals afterward. A never-entered converter and a stale completed converter both clean and close without changing the independent pending roots, cause or original exception. The exact owning scope test verifies accepted cleanup and preserved receipt on refused reentry. A separate private receiving arithmetic campaign audits all 42 actual allocation-refusal prefixes before fault disabling, then releases every charged owner; its successful completion checks four independently expanded BIG coefficients of (x+a)^3-(x+a)+(x-7)*a+2. No failed source scalar is repaired or replayed. A real receiving multiplication allocation transport verifies source and receiver numeral lifetime, converter/polynomial/modular lifetime and global-service mutex reentry guards. Whole polynomial/AST completion remains open."
+        },
         {
           "name": "S-expression arithmetic issued-child ownership before older argument-vector destruction (sexpr2upolynomial.cpp:39-85)",
           "status": "partial",

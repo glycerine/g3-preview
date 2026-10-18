@@ -20,6 +20,14 @@ func (b *RationalNumericBorrow) NumericExecuting() bool { return b.Valid() }
 
 type rationalNumericReceiver struct{ runtime *umemory.Runtime }
 
+// RationalNumericLexicalReceipt identifies an accepted outer lexical call.
+// Refused entry preserves the caller's prior receipt. It grants no ownership
+// of a later scope on the same service.
+type RationalNumericLexicalReceipt struct {
+	service    *RationalService
+	invocation uint64
+}
+
 // WithReceivingInteger holds the concrete receiving allocator's callback
 // boundary while the service mutex is already held. Only actual transport
 // reentry is rejected; ordinary service calls continue to serialize on mu.
@@ -188,6 +196,9 @@ func (b *RationalNumericBorrow) Integers() *IntegerManager {
 	return b.service.Manager.Z
 }
 func (b *RationalNumericBorrow) WithLexical(body func() error) (cause error) {
+	return b.WithLexicalReceipt(nil, body)
+}
+func (b *RationalNumericBorrow) WithLexicalReceipt(receipt *RationalNumericLexicalReceipt, body func() error) (cause error) {
 	if !b.Valid() {
 		return ErrRationalServiceOwner
 	}
@@ -195,8 +206,14 @@ func (b *RationalNumericBorrow) WithLexical(body func() error) (cause error) {
 		return arena.ErrConfig
 	}
 	s := b.service
+	if receipt != nil && s.Lexical.depth != 0 {
+		return ErrRationalLexicalPending
+	}
 	if e := s.beginLexical(); e != nil {
 		return e
+	}
+	if receipt != nil {
+		*receipt = RationalNumericLexicalReceipt{service: s, invocation: s.lexicalGeneration}
 	}
 	defer func() {
 		s.endLexicalError(&cause)
@@ -205,6 +222,25 @@ func (b *RationalNumericBorrow) WithLexical(body func() error) (cause error) {
 		}
 	}()
 	return body()
+}
+
+// CleanupAfterVectorsReceipt leaves an independently entered lexical scope
+// alone, while still permitting the caller to release its own older vectors.
+func (b *RationalNumericBorrow) CleanupAfterVectorsReceipt(receipt *RationalNumericLexicalReceipt, vectors func() error) error {
+	if !b.Valid() {
+		return ErrRationalServiceOwner
+	}
+	if vectors == nil {
+		return arena.ErrConfig
+	}
+	s := b.service
+	if receipt != nil && (receipt.service != s || receipt.invocation == 0 || receipt.invocation != s.lexicalGeneration) {
+		return vectors()
+	}
+	if s.Lexical.depth != 0 {
+		return ErrRationalLexicalPending
+	}
+	return b.CleanupAfterVectors(vectors)
 }
 func (b *RationalNumericBorrow) Pending() bool {
 	return b.Valid() && b.service.Lexical.Cause != nil && b.service.Lexical.Pending()

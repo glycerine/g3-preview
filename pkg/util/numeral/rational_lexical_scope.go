@@ -3,6 +3,7 @@ package numeral
 
 import (
 	"errors"
+	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
@@ -183,6 +184,12 @@ func (s *RationalService) beginLexical() error {
 	}
 	if s.Lexical.depth == 255 {
 		return arena.ErrBounds
+	}
+	if s.Lexical.depth == 0 {
+		if s.lexicalGeneration == math.MaxUint64 {
+			return arena.ErrBounds
+		}
+		s.lexicalGeneration++
 	}
 	s.enterLexicalInvocation()
 	s.Lexical.depth++
