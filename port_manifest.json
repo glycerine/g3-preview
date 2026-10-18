@@ -50823,7 +50823,9 @@
         "pkg/math/polynomial/upolynomial_refinable_sign_assertions.go",
         "pkg/math/polynomial/upolynomial_refinable_sign_assertions_test.go",
         "pkg/math/polynomial/upolynomial_convert_entry_assertions.go",
-        "pkg/math/polynomial/upolynomial_convert_entry_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_convert_entry_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_convert_bound_assertions.go",
+        "pkg/math/polynomial/upolynomial_convert_bound_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51158,7 +51160,9 @@
         "TestUPolynomialRefinableSignClosedGate",
         "TestUPolynomialConvertEntrySeparateSourceActions",
         "TestUPolynomialConvertEntryContinueAndErasure",
-        "TestUPolynomialConvertEntryValidOracle"
+        "TestUPolynomialConvertEntryValidOracle",
+        "TestUPolynomialConvertBoundPredicateActions",
+        "TestUPolynomialConvertBoundPredicateErasure"
       ],
       "conditionals": [
         {
@@ -51747,6 +51751,22 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Rational interval lower-end conversion bound runtime actions (upolynomial.cpp:2833,2844,2845,2849)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_refinement.go",
+            "pkg/math/polynomial/upolynomial_convert_bound_assertions.go",
+            "pkg/math/polynomial/upolynomial_convert_bound_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialConvertBoundPredicateActions",
+            "TestUPolynomialConvertBoundPredicateErasure",
+            "TestUPolynomialQ2BQNineRegisteredIntervals",
+            "TestUPolynomialQ2BQAliasedOutputSourceDebugSite"
+          ],
+          "notes": "Runtime gates enclose actual binary/rational equality, lower<a, upper>a and upper<b comparisons, preserving separate predicates and preceding endpoint swap. Failed actions use actual debugger T/C under receiver borrowing. Qualified direct invariant adapters use independent actual values (binary1/2 versus rational3/2), not altered conversion scratch or fabricated parent frontiers. Disabled/release skips nil-manager/nil-operand predicates. Registered rational/binary conversion, alias site and actual algebraic comparison/inverse consumers verified. Later upper-end/final conversion assertions/traces and numerical lifetimes remain partial."
+        },
         {
           "name": "Rational-to-binary interval separate entry sign actions (upolynomial.cpp:2820-2821)",
           "status": "ported",
