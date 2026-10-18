@@ -44187,3 +44187,28 @@ The earlier successful lower-only/cache-hit tests remain. Broader algebraic
 display/comparison/predicate plus UP root-ID suites pass ordinary (0.086s) and
 checked/debug/trace (0.193s), on CPUs8–16. Broader display/source ownership audits
 and the complete polynomial then AST port remain open. No full-suite rerun.
+
+Stopped root display now excludes ordinary core access while its actual display
+scope remains active after returning. Previously only synchronous running was
+protected, permitting caller destruction before the retained root-ID child
+was acknowledged. A real TLS allocation refusal armed at polynomial output
+reaches that child; Del, CleanupValue and Reset now refuse without changing the
+input, then explicit core cleanup releases the exact retained operation. The
+existing root-ID ownership test uses the private cleanup lookup to inspect its
+stopped input, rather than bypassing the new ordinary-access exclusion.
+
+Correction to the prior investigation: same-owner retry failure is not a
+recovery defect. ensureTmpWithAllocationContext (mpz.go1160+) frees its old
+scratch before allocating its replacement and deliberately leaves a guarded
+zero token when replacement fails. This exact refusal profile reaches that
+source hole during derivative multiplication. Owning cleanup must not rebuild
+it. The regression verifies the hole remains, safely destroys the caller root,
+and separately verifies the same polynomial displays successfully on a fresh
+owner. Temporary diagnostic wrappers were removed; no numeral algorithm,
+source scratch state or allocation sequence was repaired or replaced.
+
+Broader display/comparison/predicate/conversion and UP root-ID tests pass
+ordinary (0.121s) and checked/debug/trace (0.307s), on CPUs8–16. Initial linking
+ran out of disk; bounded removal of4.017GiB of task cache data older than one
+hour allowed verification to finish. Source and vectors were untouched.
+Whole polynomial then AST completion remains active; no full-suite rerun.

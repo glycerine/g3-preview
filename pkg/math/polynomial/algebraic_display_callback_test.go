@@ -3,6 +3,7 @@ package polynomial
 import (
 	"bytes"
 	"errors"
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"strings"
 	"testing"
@@ -130,5 +131,56 @@ func TestAlgebraicIntervalDecimalRejectWriterMutation(t *testing.T) {
 				t.Fatal("writer changed input or output", calls, writer.String(), want)
 			}
 		})
+	}
+}
+
+func TestAlgebraicStoppedRootDisplayProtectsBorrowedCell(t *testing.T) {
+	c, _, runtime := algebraicNegTLSFixture(t, nil)
+	root := algebraicTinyBinaryBoundsRoot(t, c)
+	var pad umemory.Block
+	sink := &upolyDisplaySink{literalHook: func(text string) error {
+		if text == "#" && pad == (umemory.Block{}) {
+			pad = algebraicCellSourceTLSBoundary(t, c)
+		}
+		return nil
+	}}
+	body := c.DisplayRootInto(sink, &root)
+	serviceMust(t, runtime.SetMaxSize(0))
+	if pad != (umemory.Block{}) {
+		serviceMust(t, runtime.Deallocate(&pad))
+	}
+	p := c.config.Polynomials
+	if body == nil || !c.rootDisplay.active || !p.matchesRootID(&c.rootDisplay.rootID) || !p.rootID.active {
+		t.Fatal("no actual retained root-ID allocation failure reached", body)
+	}
+	before := root
+	for _, call := range []func() error{
+		func() error { return c.Del(&root) },
+		func() error { return c.CleanupValue(&root) },
+		func() error { return c.Reset(&root) },
+	} {
+		if e := call(); !errors.Is(e, ErrAlgebraicPending) || root != before {
+			t.Fatal("stopped root-ID borrow permitted caller destruction", e)
+		}
+	}
+	serviceMust(t, c.CleanupRetained())
+	serviceMust(t, p.CleanupDisplay())
+	// ensureTmp frees its previous backing before replacement allocation.
+	// This source failure leaves a guarded scratch hole, not a retryable core.
+	if c.config.Rationals.Integers().Tmp[0] != 0 {
+		t.Fatal("owning display cleanup reconstructed source scratch")
+	}
+	serviceMust(t, c.Del(&root))
+}
+
+func TestAlgebraicTinyBoundRootDisplayWithoutFailure(t *testing.T) {
+	c, _, _ := algebraicNegTLSFixture(t, nil)
+	root := algebraicTinyBinaryBoundsRoot(t, c)
+	sink := &algebraicRootTextSink{}
+	body := c.DisplayRootInto(sink, &root)
+	serviceMust(t, c.CleanupRetained())
+	serviceMust(t, c.Del(&root))
+	if body != nil {
+		t.Fatal("fresh display", body, sink.String())
 	}
 }

@@ -251,7 +251,7 @@ func TestAlgebraicRootDisplayOwnsAcceptedRootIDCopy(t *testing.T) {
 	if !armed || body == nil || !p.matchesRootID(&c.rootDisplay.rootID) || !p.rootID.active || !c.rootDisplay.active || !z.MatchesCopyAllocationInvocation(&p.rootID.initialCopy) {
 		t.Fatal("root display did not retain accepted root-ID copy", body, armed, sink.String())
 	}
-	l, e := c.location(&root)
+	l, e := c.locationCleanup(&root)
 	serviceMust(t, e)
 	r, e := c.load(l)
 	serviceMust(t, e)
