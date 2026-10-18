@@ -7,6 +7,8 @@ import (
 )
 
 type upolyRootIDScope struct {
+	derivative                                 unumeral.Int
+	derivativeRetired                          *upolyRootIDDerivativeRaw
 	scalar                                     upolyRootIDRemainderScalar
 	hooks                                      unumeral.NumericInvocationHooks
 	numeric                                    unumeral.NumericAllocationRoots
@@ -49,7 +51,7 @@ func (q *upolyRootIDScope) vector(which uint8) *upolyVectorState {
 }
 func (q *upolyRootIDScope) pending() bool {
 	m := q.owner
-	if q.scalarPending() || unumeral.NumericAllocationPending(&q.numeric) || m.config.Integer.MatchesCopyAllocationInvocation(&q.remainderCopy) || q.live[0] || q.live[1] || q.live[2] || m.config.Integer.MatchesCopyAllocationInvocation(&q.initialCopy) || m.modular.MatchesPNormalizeInvocation(&q.normalize) {
+	if q.derivative.NativeCellToken() != 0 || q.derivativeRetired != nil || q.scalarPending() || unumeral.NumericAllocationPending(&q.numeric) || m.config.Integer.MatchesCopyAllocationInvocation(&q.remainderCopy) || q.live[0] || q.live[1] || q.live[2] || m.config.Integer.MatchesCopyAllocationInvocation(&q.initialCopy) || m.modular.MatchesPNormalizeInvocation(&q.normalize) {
 		return true
 	}
 	return m.matchesBinaryEvaluationReceipt(&q.evaluation) && m.binaryEvaluation.active
@@ -121,7 +123,7 @@ func (q *upolyRootIDScope) sturmPrefix(p UPolynomialView) error {
 			return e
 		}
 	}
-	if e := m.derivativeState(p, &q.prime); e != nil {
+	if e := m.derivativeStateWithSourceContext(p, &q.prime, q.context()); e != nil {
 		return e
 	}
 	if e := m.sequencePush(&q.sequence, m.stateView(&q.prime), true); e != nil {
@@ -189,6 +191,9 @@ func (m *UPolynomialManager) cleanupRootIDWithReceipt(r *upolyRootIDInvocationRe
 		return e
 	}
 	if e := q.cleanupRemainderNumerics(); e != nil {
+		return e
+	}
+	if e := q.cleanupDerivativeMultiplier(); e != nil {
 		return e
 	}
 	if e := m.modular.CleanupPNormalizeInvocation(&q.normalize, true); e != nil {

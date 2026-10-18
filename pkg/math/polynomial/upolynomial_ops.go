@@ -1,6 +1,7 @@
 package polynomial
 
 import (
+	"errors"
 	"math"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -332,6 +333,21 @@ func (m *UPolynomialManager) derivativeState(v UPolynomialView, s *upolyVectorSt
 
 // Source: src/math/polynomial/upolynomial.cpp:351-363 (plain RAW multiplier).
 func (m *UPolynomialManager) derivativeStateWithSourceContext(v UPolynomialView, s *upolyVectorState, context integerAllocationInvocationContext) (cause error) {
+	if context.rootID != nil && context.rootIDFrame(m.config.Integer) == nil {
+		return ErrUPolynomialOwner
+	}
+	root := context.rootIDFrame(m.config.Integer)
+	if root != nil {
+		defer func() {
+			for i := len(root.raw) - 1; i >= 0; i-- {
+				if stop := m.config.Integer.RawInvocationSourceCause(&root.raw[i]); stop != nil {
+					root.childStop = stop
+					cause = errors.Join(cause, stop)
+					break
+				}
+			}
+		}()
+	}
 	var e error
 	if v.count <= 1 {
 		return m.reset(s)
@@ -365,6 +381,13 @@ func (m *UPolynomialManager) derivativeStateWithSourceContext(v UPolynomialView,
 			frame.constructed = true
 			frame.phase = 1
 			multiplier = &frame.d
+		}
+		if root != nil {
+			if e = root.retireDerivativeMultiplier(); e != nil {
+				return e
+			}
+			root.derivative = unumeral.Int{}
+			multiplier = &root.derivative
 		}
 		if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).SetUint32(multiplier, i); e != nil {
 			return e

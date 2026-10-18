@@ -405,6 +405,9 @@ func TestUPolynomialRootIDNumericalContextRejectsCheckpointAndRetirement(t *test
 		if e := p.setViewWithSourceContext(&untouched, v, context); !errors.Is(e, ErrUPolynomialOwner) || untouched != (upolyVectorState{}) {
 			t.Fatal("checkpoint acquired a native vector before context validation", e)
 		}
+		if e := p.derivativeStateWithSourceContext(v, &untouched, context); !errors.Is(e, ErrUPolynomialOwner) || untouched != (upolyVectorState{}) {
+			t.Fatal("checkpoint acquired derivative vector before context validation", e)
+		}
 		used := z.Budget().Used()
 		if context.rootIDFrame(z) != nil || p.rootID.NumericRoots(z, nil) != nil {
 			t.Fatal("checkpoint acquired paused numerical frame")
@@ -426,6 +429,11 @@ func TestUPolynomialRootIDNumericalContextRejectsCheckpointAndRetirement(t *test
 	}
 	if e := z.WithAllocationContext(context.utility(z)).SetUint32(&output, 9); e == nil || output.Val != 0 {
 		t.Fatal("retired context accepted numerical write", e)
+	}
+	var untouched upolyVectorState
+	used := z.Budget().Used()
+	if e := p.derivativeStateWithSourceContext(v, &untouched, context); !errors.Is(e, ErrUPolynomialOwner) || untouched != (upolyVectorState{}) || used != z.Budget().Used() {
+		t.Fatal("retired derivative context changed storage", e)
 	}
 	serviceMust(t, c.Del(&root))
 }

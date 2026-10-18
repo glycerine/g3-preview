@@ -48946,7 +48946,8 @@
         "pkg/math/polynomial/upolynomial_root_id_scope.go",
         "pkg/math/polynomial/upolynomial_root_id_scope_test.go",
         "pkg/math/polynomial/upolynomial_root_id_remainder.go",
-        "pkg/math/polynomial/upolynomial_root_id_remainder_test.go"
+        "pkg/math/polynomial/upolynomial_root_id_remainder_test.go",
+        "pkg/math/polynomial/upolynomial_root_id_derivative.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
