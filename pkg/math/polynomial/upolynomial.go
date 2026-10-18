@@ -30,6 +30,7 @@ type UPolynomialConfig struct {
 // are required, even though operations without a checkpoint do not call them.
 // Cold ownership and every actual typed backing are charged to Integer's budget.
 type UPolynomialManager struct {
+	rationalInput                  upolyRationalInputScope
 	algebraicCopyBorrowers         uint32
 	sturmIsolation                 upolySturmIsolationScope
 	sturmPending                   *upolySequenceSturmScope
@@ -147,6 +148,9 @@ func newUPolynomialManager(c UPolynomialConfig, store *UPolynomialCoefficientSto
 	return m, nil
 }
 func (m *UPolynomialManager) check() error {
+	if m != nil && m.self == m && m.rationalInput.running {
+		return ErrUPolynomialCleanupPending
+	}
 	if m == nil || m.self != m || m.config.Integer == nil {
 		return ErrUPolynomialOwner
 	}
@@ -282,6 +286,9 @@ func (m *UPolynomialManager) closeWithHenselOwners(r *upolyHenselPairInvocationR
 	return m.closeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
+	if m != nil && m.self == m && m.rationalInput.running {
+		return ErrUPolynomialCleanupPending
+	}
 	if m != nil && m.self == m && m.algebraicCopyBorrowers != 0 {
 		return ErrUPolynomialCleanupPending
 	}
@@ -302,6 +309,9 @@ func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationR
 	}
 	if m.live != 0 || m.liveSequences != 0 || m.liveFactors != 0 {
 		return ErrUPolynomialLive
+	}
+	if e := m.CleanupRationalInput(); e != nil {
+		return e
 	}
 	if e := m.CleanupSturmIsolation(); e != nil {
 		return e

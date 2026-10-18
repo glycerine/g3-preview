@@ -49912,6 +49912,26 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained global-rational coefficients into a distinct private polynomial numeral owner (sexpr2upolynomial.cpp:90-97; upolynomial.cpp:204-211)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/upolynomial_rational_input.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_ops.go",
+            "pkg/math/polynomial/upolynomial_rational_context.go",
+            "pkg/math/polynomial/sexpr_upolynomial.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/sexpr_upolynomial_owner_test.go"
+          ],
+          "tests": [
+            "TestSexprPolynomialForeignCoefficientPhysicalRefusal",
+            "TestAlgebraicPrivateOwnerSexprRoot",
+            "TestUPolynomialContextRawConstantCopy",
+            "TestUPolynomialContextBorrowIdentity"
+          ],
+          "notes": "The global rational borrow no longer rejects a distinct receiving integer owner. Constant conversion preserves the real global scoped-rational copy and integer check, then supplies the actual global integer owner to the shared receiving reserve/ascending SET/set_size path. Integer-denominator assertions read that source owner; modular SET uses CopyFromOwnerTracked with exact receiving copy/normalization receipts. Default SetRationals shares the same engine with its original owner. A concrete receiving scope excludes UP reentry and numeral-owner destruction while executing/cleaning; replacement input is refused while an issued receipt remains pending. Converter cleanup acknowledges only those receiving children before frame vectors and the existing global lexical cleanup; source finalization refuses retained children and owning Close acknowledges them after caller descriptors are gone. A bounded receiver test proves real descriptor-after-physical refusal and exact converter cleanup. The full owning private-unsynchronized-manager root path parses global BIG coefficients for 2^100*x^2-2^101, isolates positive sqrt(2), and squares it to 2 using the private owner. Whole parser/normalization/callback fault composition and AST lazy wrapper integration remain partial."
+        },
+        {
           "name": "sexpr2upolynomial_exception retains cmd_exception and default_exception base catches through shared concrete utility error, preserving message and signed line/position (cpp:22-24,h:26-29)",
           "status": "ported",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
@@ -50012,6 +50032,26 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained global-rational coefficients into a distinct private polynomial numeral owner (sexpr2upolynomial.cpp:90-97; upolynomial.cpp:204-211)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/upolynomial_rational_input.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_ops.go",
+            "pkg/math/polynomial/upolynomial_rational_context.go",
+            "pkg/math/polynomial/sexpr_upolynomial.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/sexpr_upolynomial_owner_test.go"
+          ],
+          "tests": [
+            "TestSexprPolynomialForeignCoefficientPhysicalRefusal",
+            "TestAlgebraicPrivateOwnerSexprRoot",
+            "TestUPolynomialContextRawConstantCopy",
+            "TestUPolynomialContextBorrowIdentity"
+          ],
+          "notes": "The global rational borrow no longer rejects a distinct receiving integer owner. Constant conversion preserves the real global scoped-rational copy and integer check, then supplies the actual global integer owner to the shared receiving reserve/ascending SET/set_size path. Integer-denominator assertions read that source owner; modular SET uses CopyFromOwnerTracked with exact receiving copy/normalization receipts. Default SetRationals shares the same engine with its original owner. A concrete receiving scope excludes UP reentry and numeral-owner destruction while executing/cleaning; replacement input is refused while an issued receipt remains pending. Converter cleanup acknowledges only those receiving children before frame vectors and the existing global lexical cleanup; source finalization refuses retained children and owning Close acknowledges them after caller descriptors are gone. A bounded receiver test proves real descriptor-after-physical refusal and exact converter cleanup. The full owning private-unsynchronized-manager root path parses global BIG coefficients for 2^100*x^2-2^101, isolates positive sqrt(2), and squares it to 2 using the private owner. Whole parser/normalization/callback fault composition and AST lazy wrapper integration remain partial."
+        },
         {
           "name": "sexpr2upolynomial_exception retains cmd_exception and default_exception base catches through shared concrete utility error, preserving message and signed line/position (cpp:22-24,h:26-29)",
           "status": "ported",
@@ -51038,6 +51078,26 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Retained global-rational coefficients into a distinct private polynomial numeral owner (sexpr2upolynomial.cpp:90-97; upolynomial.cpp:204-211)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/upolynomial_rational_input.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_ops.go",
+            "pkg/math/polynomial/upolynomial_rational_context.go",
+            "pkg/math/polynomial/sexpr_upolynomial.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/sexpr_upolynomial_owner_test.go"
+          ],
+          "tests": [
+            "TestSexprPolynomialForeignCoefficientPhysicalRefusal",
+            "TestAlgebraicPrivateOwnerSexprRoot",
+            "TestUPolynomialContextRawConstantCopy",
+            "TestUPolynomialContextBorrowIdentity"
+          ],
+          "notes": "The global rational borrow no longer rejects a distinct receiving integer owner. Constant conversion preserves the real global scoped-rational copy and integer check, then supplies the actual global integer owner to the shared receiving reserve/ascending SET/set_size path. Integer-denominator assertions read that source owner; modular SET uses CopyFromOwnerTracked with exact receiving copy/normalization receipts. Default SetRationals shares the same engine with its original owner. A concrete receiving scope excludes UP reentry and numeral-owner destruction while executing/cleaning; replacement input is refused while an issued receipt remains pending. Converter cleanup acknowledges only those receiving children before frame vectors and the existing global lexical cleanup; source finalization refuses retained children and owning Close acknowledges them after caller descriptors are gone. A bounded receiver test proves real descriptor-after-physical refusal and exact converter cleanup. The full owning private-unsynchronized-manager root path parses global BIG coefficients for 2^100*x^2-2^101, isolates positive sqrt(2), and squares it to 2 using the private owner. Whole parser/normalization/callback fault composition and AST lazy wrapper integration remain partial."
+        },
+        {
           "name": "selected complete dense storage/core arithmetic/sign evaluation and actual core/derived constructor/destructor/checkpoint actions",
           "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial.go",
@@ -51889,6 +51949,26 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Retained global-rational coefficients into a distinct private polynomial numeral owner (sexpr2upolynomial.cpp:90-97; upolynomial.cpp:204-211)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/upolynomial_rational_input.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_ops.go",
+            "pkg/math/polynomial/upolynomial_rational_context.go",
+            "pkg/math/polynomial/sexpr_upolynomial.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/sexpr_upolynomial_owner_test.go"
+          ],
+          "tests": [
+            "TestSexprPolynomialForeignCoefficientPhysicalRefusal",
+            "TestAlgebraicPrivateOwnerSexprRoot",
+            "TestUPolynomialContextRawConstantCopy",
+            "TestUPolynomialContextBorrowIdentity"
+          ],
+          "notes": "The global rational borrow no longer rejects a distinct receiving integer owner. Constant conversion preserves the real global scoped-rational copy and integer check, then supplies the actual global integer owner to the shared receiving reserve/ascending SET/set_size path. Integer-denominator assertions read that source owner; modular SET uses CopyFromOwnerTracked with exact receiving copy/normalization receipts. Default SetRationals shares the same engine with its original owner. A concrete receiving scope excludes UP reentry and numeral-owner destruction while executing/cleaning; replacement input is refused while an issued receipt remains pending. Converter cleanup acknowledges only those receiving children before frame vectors and the existing global lexical cleanup; source finalization refuses retained children and owning Close acknowledges them after caller descriptors are gone. A bounded receiver test proves real descriptor-after-physical refusal and exact converter cleanup. The full owning private-unsynchronized-manager root path parses global BIG coefficients for 2^100*x^2-2^101, isolates positive sqrt(2), and squares it to 2 using the private owner. Whole parser/normalization/callback fault composition and AST lazy wrapper integration remain partial."
+        },
         {
           "name": "upolynomial.h:401-424 actual external UP receiver for algebraic_numbers.cpp:812,837, same concrete integer service; output normalization and cleanup use the bound receiving numeral manager",
           "status": "partial",

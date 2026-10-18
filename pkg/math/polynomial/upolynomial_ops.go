@@ -16,13 +16,30 @@ func (m *UPolynomialManager) wholeView(p UPolynomial) (UPolynomialView, error) {
 	return m.stateView(&d.state), nil
 }
 func (m *UPolynomialManager) SetRationals(p UPolynomial, a []unumeral.Rational) error {
+	if e := m.check(); e != nil {
+		return e
+	}
+	return m.setRationalsFromOwner(p, m.config.Integer, a)
+}
+
+func (m *UPolynomialManager) setRationalsFromOwner(p UPolynomial, source *unumeral.IntegerManager, a []unumeral.Rational) error {
 	d, e := m.descriptor(p)
 	if e != nil {
 		return e
 	}
+	s := &m.rationalInput
+	if s.pending(m) {
+		return ErrUPolynomialCleanupPending
+	}
 	if uint64(len(a)) > math.MaxUint32 {
 		return arena.ErrBounds
 	}
+	s.running = true
+	if e := s.bind(m.config.Integer); e != nil {
+		s.running = false
+		return e
+	}
+	defer func() { s.unbind(); s.running = false }()
 	n := uint32(len(a))
 	if e = m.reserve(&d.state, n); e != nil {
 		return e
@@ -30,7 +47,7 @@ func (m *UPolynomialManager) SetRationals(p UPolynomial, a []unumeral.Rational) 
 	dst := m.values(&d.state)
 	for i := uint32(0); i < n; i++ {
 		if polynomialSourceDebug {
-			one, e := m.config.Integer.IsOne(&(*a[i].BorrowDenominator()))
+			one, e := source.IsOne(&(*a[i].BorrowDenominator()))
 			if e != nil {
 				return e
 			}
@@ -38,7 +55,7 @@ func (m *UPolynomialManager) SetRationals(p UPolynomial, a []unumeral.Rational) 
 				return ErrUPolynomialAssertion
 			}
 		}
-		if e = m.modular.Copy(&dst[i], &(*a[i].BorrowNumerator())); e != nil {
+		if e = m.modular.CopyFromOwnerTracked(&dst[i], source, a[i].BorrowNumerator(), &s.copy, &s.normalize); e != nil {
 			return e
 		}
 	}

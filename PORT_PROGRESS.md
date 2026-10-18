@@ -44507,3 +44507,36 @@ entries remain partial: broader ownership/callback composition and the owning
 AST lazy algebraic wrapper/ID consumer are still required; complete polynomial
 then AST remains the active objective.
 portcheck and git diff --check passed; manifest unit counts remain unchanged.
+
+Retained private-owner S-expression root construction: NewSexprPolynomialConverter
+and its borrowed rational context previously rejected any polynomial integer
+owner distinct from the global rational service. This blocked the actual AST
+wrapper shape despite the newly supported private unsynchronized manager.
+The global source scoped-rational copy and integer check are preserved; the
+shared univariate rational SET now reads the explicit source integer owner and
+uses receiving CopyFromOwnerTracked plus exact copy/normalization receipts.
+The default same-owner SetRationals path shares that engine. No extra imported
+numeral temporary or serialization is introduced.
+
+A concrete receiving rational-input scope excludes UP public reentry and
+numeral-owner destruction during execution/owning cleanup. Its synchronous
+integer/natural bindings leave on every return. An issued pending receipt
+prevents replacement SET. Converter cleanup acknowledges the actual receiving
+children before scoped frame vectors and existing global lexical cleanup.
+SourceFinalize refuses those pending numerical children; owning UP Close cleans
+them after caller-owned descriptors are gone. CleanupRationalInput provides the
+same explicit owning acknowledgement for direct rational-input callers.
+
+TestSexprPolynomialForeignCoefficientPhysicalRefusal uses a global BIG constant
+and a distinct eight-cell receiver, proving a real descriptor-after-physical
+SET refusal, retained exact receipt, refused replacement and physical release
+through converter cleanup. TestAlgebraicPrivateOwnerSexprRoot uses the complete
+owning private unsynchronized manager, parses global coefficients for
+2^100*x^2-2^101, isolates positive sqrt(2), and squares the result to 2 through
+the private numerical owner. Both new tests passed ordinary 0.006s. Broader
+SexprPolynomial/UPolynomialContext/UP SourceFinalize/algebraic S-expression,
+private-owner, Copy and Manager selections passed ordinary 0.703s and checked/
+debug/trace 1.191s on CPUs 8-16. No full repeat after the recent 93.929s ordinary
+polynomial pass. Whole-unit statuses and the complete polynomial then AST
+objective remain open; normalization/callback fault composition and the owning
+AST lazy wrapper are not claimed complete.

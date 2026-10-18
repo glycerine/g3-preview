@@ -21,6 +21,9 @@ func (m *UPolynomialManager) sourceFinalizeWithHenselOwners(r *upolyHenselPairIn
 	return m.sourceFinalizeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) sourceFinalizeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
+	if m != nil && m.self == m && (m.rationalInput.running || m.rationalInput.pending(m)) {
+		return ErrUPolynomialCleanupPending
+	}
 	if m != nil && m.self == m && m.algebraicCopyBorrowers != 0 {
 		return ErrUPolynomialCleanupPending
 	}

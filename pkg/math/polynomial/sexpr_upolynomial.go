@@ -268,6 +268,9 @@ func (c *SexprPolynomialConverter) Cleanup() error {
 		return e
 	}
 	err := numericRationalService_CleanupUPolynomialRationals(c.sexpr.Configuration().Rationals, func() error {
+		if e := c.polynomial.CleanupRationalInput(); e != nil {
+			return e
+		}
 		for i := len(c.frames) - 1; i >= 0; i-- {
 			f := &c.frames[i]
 			if f.live {

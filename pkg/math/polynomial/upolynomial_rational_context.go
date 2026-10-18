@@ -33,7 +33,7 @@ type UPolynomialRationalContext struct {
 
 func numericRationalService_WithUPolynomialRationals(s *unumeral.RationalService, m *UPolynomialManager, body func(*UPolynomialRationalContext) error) error {
 	return s.WithNumericBorrow(func(b *unumeral.RationalNumericBorrow) error {
-		if m == nil || m.config.Integer != b.Integers() {
+		if m == nil || m.config.Integer == nil {
 			return ErrUPolynomialOwner
 		}
 		if e := m.check(); e != nil {
@@ -79,7 +79,7 @@ func (c *UPolynomialRationalContext) SetConstant(p UPolynomial, a *unumeral.Owne
 		if !integer {
 			return nonInteger()
 		}
-		return c.polynomial.SetRationals(p, []unumeral.Rational{value})
+		return c.polynomial.setRationalsFromOwner(p, c.borrow.Integers(), []unumeral.Rational{value})
 	})
 }
 func (c *UPolynomialRationalContext) Exponent(a *unumeral.OwnedRational) (uint32, bool, error) {
