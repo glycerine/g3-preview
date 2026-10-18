@@ -38353,7 +38353,12 @@
         "pkg/math/polynomial/algebraic_predicate_assertions_test.go",
         "pkg/math/polynomial/algebraic_predicate_trace.go",
         "pkg/math/polynomial/algebraic_predicate_trace_test.go",
-        "pkg/math/polynomial/upolynomial_root_id_scope_test.go"
+        "pkg/math/polynomial/upolynomial_root_id_scope_test.go",
+        "pkg/math/polynomial/upolynomial_convert_entry_trace.go",
+        "pkg/math/polynomial/upolynomial_convert_entry_trace_test.go",
+        "pkg/math/polynomial/upolynomial_refinement.go",
+        "pkg/math/polynomial/upolynomial.go",
+        "pkg/math/polynomial/upolynomial_source_finalize.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -38507,7 +38512,8 @@
         "TestAlgebraicDefiningPolynomialCopyReceiptsAndRetry",
         "TestAlgebraicDefiningNegationPreservesOlderNumericAllocation",
         "TestAlgebraicBinaryBoundCopyActualReservationAndExponentPublication",
-        "TestAlgebraicPrecisionBasicBoundCopyActualRetention"
+        "TestAlgebraicPrecisionBasicBoundCopyActualRetention",
+        "TestAlgebraicInverseConversionEntryActualSourceStop"
       ],
       "conditionals": [
         {
@@ -38913,6 +38919,25 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Inverse conversion-entry child and literal scoped-rational destructor frontier (algebraic_numbers.cpp:1582-1647)",
+          "status": "partial",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_convert_entry_trace.go",
+            "pkg/math/polynomial/upolynomial_convert_entry_trace_test.go",
+            "pkg/math/polynomial/upolynomial_refinement.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/algebraic_rational_arithmetic.go",
+            "pkg/math/polynomial/algebraic_rational_multiply.go",
+            "pkg/math/polynomial/algebraic_inverse.go",
+            "pkg/math/polynomial/algebraic_root.go"
+          ],
+          "tests": [
+            "TestAlgebraicInverseConversionEntryActualSourceStop"
+          ],
+          "notes": "Actual root inversion captures only its callee-issued conversion-entry trace receipt. Stream callbacks cannot close or clean the executing algebraic owner. After the diagnostic body read failure, actual inv_upper NUM/DEN source destruction completes, then inv_lower stops on its actual unreadable numerator: sourceRemaining1 and sourceCursor2. Genuine backing is restored before explicit raw owning cleanup, which leaves the source cursor/cause unchanged. This corrects prior owning RationalManager.Del use in the source destructor. Wider inverse numerical/TRACE/source-lifetime completion remains open."
+        },
+        {
           "name": "Retained private unsynchronized qm() owner in manager construction (algebraic_numbers.h:61; algebraic_numbers.cpp:69,100,2772; arith_decl_plugin.cpp:25-35)",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_manager.go",
@@ -39053,25 +39078,45 @@
           "name": "algebraic_numbers.cpp:844-889,897-1084,1440-1563 concrete Add/Sub/Mul dispatch, factor/Sturm binary root selection, saved intervals, set_core zero handling and rational fallback; complete fault/callback and TRACE coverage remain open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_binary.go",
-          "tests": ["TestAlgebraicBinaryRootArithmeticAndAliases", "TestAlgebraicBinaryQuadraticCubicRootSelection", "TestAlgebraicBinaryMixedDispatchAndRefinementFallback", "TestAlgebraicBinaryEveryReachedCancellationAndRetry", "TestAlgebraicBinaryRestoresOverrefinedInputInterval", "TestAlgebraicBinaryEntryAssertionPrecedesLocalOwners"]
+          "tests": [
+            "TestAlgebraicBinaryRootArithmeticAndAliases",
+            "TestAlgebraicBinaryQuadraticCubicRootSelection",
+            "TestAlgebraicBinaryMixedDispatchAndRefinementFallback",
+            "TestAlgebraicBinaryEveryReachedCancellationAndRetry",
+            "TestAlgebraicBinaryRestoresOverrefinedInputInterval",
+            "TestAlgebraicBinaryEntryAssertionPrecedesLocalOwners"
+          ]
         },
         {
           "name": "algebraic_numbers.cpp:794-839 retained mk_add_polynomial<true/false> and mk_mul_polynomial through real multivariate composition/resultants and caller-owned dense conversion; mk_binary mathematical selection has separate evidence; complete failure and TRACE integration remain open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_resultant_polynomial.go",
-          "tests": ["TestAlgebraicResultantSumDifferenceAndProductPolynomials", "TestAlgebraicResultantPolynomialCancellationCleanupAndRetry"]
+          "tests": [
+            "TestAlgebraicResultantSumDifferenceAndProductPolynomials",
+            "TestAlgebraicResultantPolynomialCancellationCleanupAndRetry"
+          ]
         },
         {
           "name": "algebraic_numbers.cpp:1490-1563 concrete basic/rational and root/rational multiplication, source assertion gate at 1501, shared m_add_tmp composition and negative-factor interval reversal; two-root resultant route and complete child failure composition remain open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_rational_multiply.go",
-          "tests": ["TestAlgebraicRationalMultiplyRootsSignsAndAlias", "TestAlgebraicRationalMultiplyBasicAndZeroShortCircuit", "TestAlgebraicRationalMultiplySourceAssertionBeforeLocals", "TestAlgebraicRationalMultiplyBigScalarAndInverse"]
+          "tests": [
+            "TestAlgebraicRationalMultiplyRootsSignsAndAlias",
+            "TestAlgebraicRationalMultiplyBasicAndZeroShortCircuit",
+            "TestAlgebraicRationalMultiplySourceAssertionBeforeLocals",
+            "TestAlgebraicRationalMultiplyBigScalarAndInverse"
+          ]
         },
         {
           "name": "algebraic_numbers.cpp:685-697,1378-1494 concrete basic/rational and root/rational addition/subtraction, persistent translated polynomial and result interval normalization; two-root resultant dispatch and full child failure composition remain open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_rational_arithmetic.go",
-          "tests": ["TestAlgebraicRationalTranslationBinaryNonbinaryAndAlias", "TestAlgebraicRationalArithmeticBasicAndNormalizedZero", "TestAlgebraicRationalTranslationCancellationKeepsCallerValues", "TestAlgebraicRationalZeroSubtractionPublishesBeforeNegation"]
+          "tests": [
+            "TestAlgebraicRationalTranslationBinaryNonbinaryAndAlias",
+            "TestAlgebraicRationalArithmeticBasicAndNormalizedZero",
+            "TestAlgebraicRationalTranslationCancellationKeepsCallerValues",
+            "TestAlgebraicRationalZeroSubtractionPublishesBeforeNegation"
+          ]
         },
         {
           "name": "algebraic_numbers.cpp:1905-1924,2721-2730,2748-2769,2983-3040 defining-polynomial copies, binary/rational root bounds and precision getters through actual copied interval refinement; complete child failure composition and source consumers remain open",
@@ -39079,13 +39124,22 @@
           "go_target": "pkg/math/polynomial/algebraic_representation.go",
           "tests": [
             "TestAlgebraicDefiningPolynomialAccessorAndReserveOrder",
-            "TestAlgebraicIrrationalBoundAssertionActions","TestAlgebraicDefiningPolynomialZeroBasicAndNonminimalRoot", "TestAlgebraicBoundsExactAndCopiedPrecision", "TestAlgebraicDefiningPolynomialMinimumIntegerReservationPrefixes", "TestAlgebraicBoundsDiscoveredRootKeepsSourceUpperEndpoint"]
+            "TestAlgebraicIrrationalBoundAssertionActions",
+            "TestAlgebraicDefiningPolynomialZeroBasicAndNonminimalRoot",
+            "TestAlgebraicBoundsExactAndCopiedPrecision",
+            "TestAlgebraicDefiningPolynomialMinimumIntegerReservationPrefixes",
+            "TestAlgebraicBoundsDiscoveredRootKeepsSourceUpperEndpoint"
+          ]
         },
         {
           "name": "algebraic_numbers.cpp:1582-1647,2937-2939 nonzero-bound halving and in-place inversion through actual reciprocal polynomial and rational-to-binary interval conversion; selected ordinary and basic allocation-refusal profiles",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_inverse.go",
-          "tests": ["TestAlgebraicInverseBasicAndZero", "TestAlgebraicInverseRootAndZeroBoundRefinement", "TestAlgebraicInverseMinimumIntegerReservationPrefixes"]
+          "tests": [
+            "TestAlgebraicInverseBasicAndZero",
+            "TestAlgebraicInverseRootAndZeroBoundRefinement",
+            "TestAlgebraicInverseMinimumIntegerReservationPrefixes"
+          ]
         },
         {
           "name": "selected cell construction/copy/source destruction cpp180\u2013218/360\u2013539; unfinished construction guards and distinct owning abort",
@@ -39398,7 +39452,12 @@
         "pkg/math/polynomial/algebraic_refinement_rational_scope_test.go",
         "pkg/math/polynomial/algebraic_predicate_refinement_scope.go",
         "pkg/math/polynomial/algebraic_predicate_refinement_scope_test.go",
-        "pkg/math/polynomial/algebraic_predicate_destructor_test.go"
+        "pkg/math/polynomial/algebraic_predicate_destructor_test.go",
+        "pkg/math/polynomial/upolynomial_convert_entry_trace.go",
+        "pkg/math/polynomial/upolynomial_convert_entry_trace_test.go",
+        "pkg/math/polynomial/upolynomial_refinement.go",
+        "pkg/math/polynomial/upolynomial.go",
+        "pkg/math/polynomial/upolynomial_source_finalize.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -39550,7 +39609,8 @@
         "TestAlgebraicDefiningPolynomialCopyReceiptsAndRetry",
         "TestAlgebraicDefiningNegationPreservesOlderNumericAllocation",
         "TestAlgebraicBinaryBoundCopyActualReservationAndExponentPublication",
-        "TestAlgebraicPrecisionBasicBoundCopyActualRetention"
+        "TestAlgebraicPrecisionBasicBoundCopyActualRetention",
+        "TestAlgebraicInverseConversionEntryActualSourceStop"
       ],
       "conditionals": [
         {
@@ -39575,6 +39635,25 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Inverse conversion-entry child and literal scoped-rational destructor frontier (algebraic_numbers.cpp:1582-1647)",
+          "status": "partial",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_convert_entry_trace.go",
+            "pkg/math/polynomial/upolynomial_convert_entry_trace_test.go",
+            "pkg/math/polynomial/upolynomial_refinement.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/algebraic_rational_arithmetic.go",
+            "pkg/math/polynomial/algebraic_rational_multiply.go",
+            "pkg/math/polynomial/algebraic_inverse.go",
+            "pkg/math/polynomial/algebraic_root.go"
+          ],
+          "tests": [
+            "TestAlgebraicInverseConversionEntryActualSourceStop"
+          ],
+          "notes": "Actual root inversion captures only its callee-issued conversion-entry trace receipt. Stream callbacks cannot close or clean the executing algebraic owner. After the diagnostic body read failure, actual inv_upper NUM/DEN source destruction completes, then inv_lower stops on its actual unreadable numerator: sourceRemaining1 and sourceCursor2. Genuine backing is restored before explicit raw owning cleanup, which leaves the source cursor/cause unchanged. This corrects prior owning RationalManager.Del use in the source destructor. Wider inverse numerical/TRACE/source-lifetime completion remains open."
+        },
         {
           "name": "Retained private unsynchronized qm() owner in manager construction (algebraic_numbers.h:61; algebraic_numbers.cpp:69,100,2772; arith_decl_plugin.cpp:25-35)",
           "status": "partial",
@@ -39716,25 +39795,45 @@
           "name": "algebraic_numbers.cpp:844-889,897-1084,1440-1563 concrete Add/Sub/Mul dispatch, factor/Sturm binary root selection, saved intervals, set_core zero handling and rational fallback; complete fault/callback and TRACE coverage remain open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_binary.go",
-          "tests": ["TestAlgebraicBinaryRootArithmeticAndAliases", "TestAlgebraicBinaryQuadraticCubicRootSelection", "TestAlgebraicBinaryMixedDispatchAndRefinementFallback", "TestAlgebraicBinaryEveryReachedCancellationAndRetry", "TestAlgebraicBinaryRestoresOverrefinedInputInterval", "TestAlgebraicBinaryEntryAssertionPrecedesLocalOwners"]
+          "tests": [
+            "TestAlgebraicBinaryRootArithmeticAndAliases",
+            "TestAlgebraicBinaryQuadraticCubicRootSelection",
+            "TestAlgebraicBinaryMixedDispatchAndRefinementFallback",
+            "TestAlgebraicBinaryEveryReachedCancellationAndRetry",
+            "TestAlgebraicBinaryRestoresOverrefinedInputInterval",
+            "TestAlgebraicBinaryEntryAssertionPrecedesLocalOwners"
+          ]
         },
         {
           "name": "algebraic_numbers.cpp:794-839 retained mk_add_polynomial<true/false> and mk_mul_polynomial through real multivariate composition/resultants and caller-owned dense conversion; mk_binary mathematical selection has separate evidence; complete failure and TRACE integration remain open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_resultant_polynomial.go",
-          "tests": ["TestAlgebraicResultantSumDifferenceAndProductPolynomials", "TestAlgebraicResultantPolynomialCancellationCleanupAndRetry"]
+          "tests": [
+            "TestAlgebraicResultantSumDifferenceAndProductPolynomials",
+            "TestAlgebraicResultantPolynomialCancellationCleanupAndRetry"
+          ]
         },
         {
           "name": "algebraic_numbers.cpp:1490-1563 concrete basic/rational and root/rational multiplication, source assertion gate at 1501, shared m_add_tmp composition and negative-factor interval reversal; two-root resultant route and complete child failure composition remain open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_rational_multiply.go",
-          "tests": ["TestAlgebraicRationalMultiplyRootsSignsAndAlias", "TestAlgebraicRationalMultiplyBasicAndZeroShortCircuit", "TestAlgebraicRationalMultiplySourceAssertionBeforeLocals", "TestAlgebraicRationalMultiplyBigScalarAndInverse"]
+          "tests": [
+            "TestAlgebraicRationalMultiplyRootsSignsAndAlias",
+            "TestAlgebraicRationalMultiplyBasicAndZeroShortCircuit",
+            "TestAlgebraicRationalMultiplySourceAssertionBeforeLocals",
+            "TestAlgebraicRationalMultiplyBigScalarAndInverse"
+          ]
         },
         {
           "name": "algebraic_numbers.cpp:685-697,1378-1494 concrete basic/rational and root/rational addition/subtraction, persistent translated polynomial and result interval normalization; two-root resultant dispatch and full child failure composition remain open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_rational_arithmetic.go",
-          "tests": ["TestAlgebraicRationalTranslationBinaryNonbinaryAndAlias", "TestAlgebraicRationalArithmeticBasicAndNormalizedZero", "TestAlgebraicRationalTranslationCancellationKeepsCallerValues", "TestAlgebraicRationalZeroSubtractionPublishesBeforeNegation"]
+          "tests": [
+            "TestAlgebraicRationalTranslationBinaryNonbinaryAndAlias",
+            "TestAlgebraicRationalArithmeticBasicAndNormalizedZero",
+            "TestAlgebraicRationalTranslationCancellationKeepsCallerValues",
+            "TestAlgebraicRationalZeroSubtractionPublishesBeforeNegation"
+          ]
         },
         {
           "name": "algebraic_numbers.cpp:1905-1924,2721-2730,2748-2769,2983-3040 defining-polynomial copies, binary/rational root bounds and precision getters through actual copied interval refinement; complete child failure composition and source consumers remain open",
@@ -39742,13 +39841,22 @@
           "go_target": "pkg/math/polynomial/algebraic_representation.go",
           "tests": [
             "TestAlgebraicDefiningPolynomialAccessorAndReserveOrder",
-            "TestAlgebraicIrrationalBoundAssertionActions","TestAlgebraicDefiningPolynomialZeroBasicAndNonminimalRoot", "TestAlgebraicBoundsExactAndCopiedPrecision", "TestAlgebraicDefiningPolynomialMinimumIntegerReservationPrefixes", "TestAlgebraicBoundsDiscoveredRootKeepsSourceUpperEndpoint"]
+            "TestAlgebraicIrrationalBoundAssertionActions",
+            "TestAlgebraicDefiningPolynomialZeroBasicAndNonminimalRoot",
+            "TestAlgebraicBoundsExactAndCopiedPrecision",
+            "TestAlgebraicDefiningPolynomialMinimumIntegerReservationPrefixes",
+            "TestAlgebraicBoundsDiscoveredRootKeepsSourceUpperEndpoint"
+          ]
         },
         {
           "name": "algebraic_numbers.cpp:1582-1647,2937-2939 nonzero-bound halving and in-place inversion through actual reciprocal polynomial and rational-to-binary interval conversion; selected ordinary and basic allocation-refusal profiles",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_inverse.go",
-          "tests": ["TestAlgebraicInverseBasicAndZero", "TestAlgebraicInverseRootAndZeroBoundRefinement", "TestAlgebraicInverseMinimumIntegerReservationPrefixes"]
+          "tests": [
+            "TestAlgebraicInverseBasicAndZero",
+            "TestAlgebraicInverseRootAndZeroBoundRefinement",
+            "TestAlgebraicInverseMinimumIntegerReservationPrefixes"
+          ]
         },
         {
           "name": "selected cell construction/copy/source destruction cpp180\u2013218/360\u2013539; unfinished construction guards and distinct owning abort",
@@ -50843,7 +50951,12 @@
         "pkg/math/polynomial/algebraic_isolation.go",
         "pkg/math/polynomial/algebraic_isolation_polynomial.go",
         "pkg/math/polynomial/algebraic_root.go",
-        "pkg/math/polynomial/algebraic_root_construction.go"
+        "pkg/math/polynomial/algebraic_root_construction.go",
+        "pkg/math/polynomial/upolynomial_convert_entry_trace.go",
+        "pkg/math/polynomial/upolynomial_convert_entry_trace_test.go",
+        "pkg/math/polynomial/algebraic_rational_arithmetic.go",
+        "pkg/math/polynomial/algebraic_rational_multiply.go",
+        "pkg/math/polynomial/algebraic_inverse.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51200,7 +51313,11 @@
         "TestUPolynomialRefinableTraceSourceRecords",
         "TestUPolynomialRefinableActualReservationPrefixes",
         "TestUPolynomialRefinableTraceActualReadStops",
-        "TestUPolynomialRefinableTraceErasureAndEndedReceipt"
+        "TestUPolynomialRefinableTraceErasureAndEndedReceipt",
+        "TestUPolynomialConvertEntryTraceSourceRecord",
+        "TestUPolynomialConvertEntryTraceAfterAssertionsAndErasure",
+        "TestUPolynomialConvertEntryTraceActualReadStops",
+        "TestAlgebraicInverseConversionEntryActualSourceStop"
       ],
       "conditionals": [
         {
@@ -51789,6 +51906,28 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Rational-to-binary conversion entry trace before binary temporaries (upolynomial.cpp:2823-2827)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_convert_entry_trace.go",
+            "pkg/math/polynomial/upolynomial_convert_entry_trace_test.go",
+            "pkg/math/polynomial/upolynomial_refinement.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/algebraic_rational_arithmetic.go",
+            "pkg/math/polynomial/algebraic_rational_multiply.go",
+            "pkg/math/polynomial/algebraic_inverse.go",
+            "pkg/math/polynomial/algebraic_root.go"
+          ],
+          "tests": [
+            "TestUPolynomialConvertEntryTraceSourceRecord",
+            "TestUPolynomialConvertEntryTraceAfterAssertionsAndErasure",
+            "TestUPolynomialConvertEntryTraceActualReadStops",
+            "TestAlgebraicInverseConversionEntryActualSourceStop"
+          ],
+          "notes": "Actual source entry trace follows both independent sign assertions and precedes lower/upper declaration. Four actual mpzzp::to_string operands retain their character receipts; native Go strings replace STL. The entry-only scope represents no binary-bound construction or conversion work. Whole-record polynomial/integer/rational/binary callback borrowing and callee-issued exact receipts connect actual algebraic addition/subtraction/multiplication/inversion callers. Disabled trace erases operand access and scope admission; failed output remains sticky but later operands still execute. Four actual BIG operand read guards leave output sentinels unchanged, preserve later independently accepted formatters and reject an ended entry receipt acquiring a later invocation. Actual inverse caller testing exposed and corrected owning Del in its source destructor: explicit reverse NUM-before-DEN source cursor now stops after younger inv_upper ends, while owning raw cleanup preserves source history. Root owning cleanup now consumes exact captured children before guarded cell cleanup. Later conversion bound/display records and broader numerical/source-lifetime audits remain open."
+        },
         {
           "name": "Isolating-to-refinable four trace records and actual lexical scope (upolynomial.cpp:2599-2744; mpbq.cpp:384-392)",
           "status": "ported",
@@ -53430,7 +53569,12 @@
         "pkg/math/polynomial/algebraic_isolation.go",
         "pkg/math/polynomial/algebraic_isolation_polynomial.go",
         "pkg/math/polynomial/algebraic_root.go",
-        "pkg/math/polynomial/algebraic_root_construction.go"
+        "pkg/math/polynomial/algebraic_root_construction.go",
+        "pkg/math/polynomial/upolynomial_convert_entry_trace.go",
+        "pkg/math/polynomial/upolynomial_convert_entry_trace_test.go",
+        "pkg/math/polynomial/algebraic_rational_arithmetic.go",
+        "pkg/math/polynomial/algebraic_rational_multiply.go",
+        "pkg/math/polynomial/algebraic_inverse.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -53571,7 +53715,11 @@
         "TestUPolynomialRefinableTraceSourceRecords",
         "TestUPolynomialRefinableActualReservationPrefixes",
         "TestUPolynomialRefinableTraceActualReadStops",
-        "TestUPolynomialRefinableTraceErasureAndEndedReceipt"
+        "TestUPolynomialRefinableTraceErasureAndEndedReceipt",
+        "TestUPolynomialConvertEntryTraceSourceRecord",
+        "TestUPolynomialConvertEntryTraceAfterAssertionsAndErasure",
+        "TestUPolynomialConvertEntryTraceActualReadStops",
+        "TestAlgebraicInverseConversionEntryActualSourceStop"
       ],
       "conditionals": [
         {
@@ -53600,6 +53748,28 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Rational-to-binary conversion entry trace before binary temporaries (upolynomial.cpp:2823-2827)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_convert_entry_trace.go",
+            "pkg/math/polynomial/upolynomial_convert_entry_trace_test.go",
+            "pkg/math/polynomial/upolynomial_refinement.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/algebraic_rational_arithmetic.go",
+            "pkg/math/polynomial/algebraic_rational_multiply.go",
+            "pkg/math/polynomial/algebraic_inverse.go",
+            "pkg/math/polynomial/algebraic_root.go"
+          ],
+          "tests": [
+            "TestUPolynomialConvertEntryTraceSourceRecord",
+            "TestUPolynomialConvertEntryTraceAfterAssertionsAndErasure",
+            "TestUPolynomialConvertEntryTraceActualReadStops",
+            "TestAlgebraicInverseConversionEntryActualSourceStop"
+          ],
+          "notes": "Actual source entry trace follows both independent sign assertions and precedes lower/upper declaration. Four actual mpzzp::to_string operands retain their character receipts; native Go strings replace STL. The entry-only scope represents no binary-bound construction or conversion work. Whole-record polynomial/integer/rational/binary callback borrowing and callee-issued exact receipts connect actual algebraic addition/subtraction/multiplication/inversion callers. Disabled trace erases operand access and scope admission; failed output remains sticky but later operands still execute. Four actual BIG operand read guards leave output sentinels unchanged, preserve later independently accepted formatters and reject an ended entry receipt acquiring a later invocation. Actual inverse caller testing exposed and corrected owning Del in its source destructor: explicit reverse NUM-before-DEN source cursor now stops after younger inv_upper ends, while owning raw cleanup preserves source history. Root owning cleanup now consumes exact captured children before guarded cell cleanup. Later conversion bound/display records and broader numerical/source-lifetime audits remain open."
+        },
         {
           "name": "Isolating-to-refinable four trace records and actual lexical scope (upolynomial.cpp:2599-2744; mpbq.cpp:384-392)",
           "status": "ported",

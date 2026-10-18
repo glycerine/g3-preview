@@ -8,6 +8,7 @@ import (
 )
 
 type algebraicRationalArithmeticScope struct {
+	convertEntry      upolyConvertEntryReceipt
 	polynomialCaller  *polynomialAlgebraicEvaluationScope
 	integerAddition   *algebraicIntegerAddScope
 	q                 [3]unumeral.Rational       // nbv (or basic result), il, iu
@@ -141,6 +142,9 @@ func (m *AlgebraicRootCore) addSubRational(a *Algebraic, b *unumeral.Rational, o
 	defer func() {
 		s.executing = false
 		if s.sourceStop == nil {
+			s.sourceStop = p.convertEntryReceiptSourceCause(&s.convertEntry)
+		}
+		if s.sourceStop == nil {
 			cleanup := m.cleanupRationalArithmetic()
 			if cleanup != nil {
 				s.sourceStop = cleanup
@@ -231,7 +235,7 @@ func (m *AlgebraicRootCore) addSubRational(a *Algebraic, b *unumeral.Rational, o
 		if e != nil {
 			return e
 		}
-		if _, e = p.ConvertRationalToBinaryInterval(translated, qm, &s.q[1], &s.q[2], bm, &s.b[0], &s.b[1]); e != nil {
+		if _, e = p.convertRationalToBinaryIntervalWithEntryReceipt(translated, qm, &s.q[1], &s.q[2], bm, &s.b[0], &s.b[1], &s.convertEntry); e != nil {
 			return e
 		}
 		// il and iu leave their inner source scope before set(c, ...).

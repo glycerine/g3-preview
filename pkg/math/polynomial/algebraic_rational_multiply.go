@@ -69,6 +69,9 @@ func (m *AlgebraicRootCore) MulRational(a *Algebraic, b *unumeral.Rational, out 
 	defer func() {
 		s.executing = false
 		if s.sourceStop == nil {
+			s.sourceStop = p.convertEntryReceiptSourceCause(&s.convertEntry)
+		}
+		if s.sourceStop == nil {
 			cause = errors.Join(cause, m.cleanupRationalArithmetic())
 		}
 	}()
@@ -152,7 +155,7 @@ func (m *AlgebraicRootCore) MulRational(a *Algebraic, b *unumeral.Rational, out 
 				return e
 			}
 		}
-		if _, e = p.ConvertRationalToBinaryInterval(scaled, qm, &s.q[1], &s.q[2], bm, &s.b[0], &s.b[1]); e != nil {
+		if _, e = p.convertRationalToBinaryIntervalWithEntryReceipt(scaled, qm, &s.q[1], &s.q[2], bm, &s.b[0], &s.b[1], &s.convertEntry); e != nil {
 			return e
 		}
 		for s.qCount > 1 {

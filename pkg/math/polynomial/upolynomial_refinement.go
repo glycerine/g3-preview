@@ -406,6 +406,9 @@ func (m *UPolynomialManager) refineToPrecisionWithEvaluationReceipt(v UPolynomia
 	return m.refineCoreToPrecisionWithEvaluationReceipt(v, sa, bqm, a, b, k, receipt, temporaries)
 }
 func (m *UPolynomialManager) ConvertRationalToBinaryInterval(v UPolynomialView, qm *unumeral.RationalManager, a, b *unumeral.Rational, bqm *unumeral.BinaryRationalManager, c, d *unumeral.BinaryRational) (bool, error) {
+	return m.convertRationalToBinaryIntervalWithEntryReceipt(v, qm, a, b, bqm, c, d, nil)
+}
+func (m *UPolynomialManager) convertRationalToBinaryIntervalWithEntryReceipt(v UPolynomialView, qm *unumeral.RationalManager, a, b *unumeral.Rational, bqm *unumeral.BinaryRationalManager, c, d *unumeral.BinaryRational, receipt *upolyConvertEntryReceipt) (bool, error) {
 	if e := m.isolationBinary(bqm); e != nil {
 		return false, e
 	}
@@ -424,6 +427,9 @@ func (m *UPolynomialManager) ConvertRationalToBinaryInterval(v UPolynomialView, 
 		return false, e
 	}
 	foundD := false
+	if e := m.traceConvertEntry(bqm, a, b, sa, sb, receipt); e != nil {
+		return false, e
+	}
 	var lower, upper unumeral.BinaryRational
 	defer bqm.Del(&lower)
 	defer bqm.Del(&upper)

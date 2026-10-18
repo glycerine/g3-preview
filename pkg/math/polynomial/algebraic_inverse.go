@@ -12,13 +12,42 @@ var ErrAlgebraicDivisionByZero error = newAlgebraicException("division by zero")
 
 // The two source scoped rationals survive a refused destruction in the owner.
 type algebraicInverseScope struct {
-	polynomialCaller *polynomialAlgebraicEvaluationScope
-	sourceStop       error
-	values           [2]unumeral.Rational // inv_lower, inv_upper
-	remaining        uint8
-	executing        bool
+	sourceCursor, sourceRemaining uint8
+	convertEntry                  upolyConvertEntryReceipt
+	polynomialCaller              *polynomialAlgebraicEvaluationScope
+	sourceStop                    error
+	values                        [2]unumeral.Rational // inv_lower, inv_upper
+	remaining                     uint8
+	executing                     bool
 }
 
+// Literal reverse scoped_mpq destruction, NUM before DEN. Owning cleanup
+// below may consume the suffix without replaying or advancing this cursor.
+func (m *AlgebraicRootCore) finishInverseSource() error {
+	q := &m.inversion
+	if q.sourceStop != nil {
+		return q.sourceStop
+	}
+	q.executing = true
+	defer func() { q.executing = false }()
+	for q.remaining != 0 {
+		value := &q.values[q.remaining-1]
+		field := value.BorrowNumerator()
+		if q.sourceCursor%2 != 0 {
+			field = value.BorrowDenominator()
+		}
+		if e := unumeral.SourceIntegerDel(m.config.Rationals.Integers(), field); e != nil {
+			q.sourceRemaining = q.remaining
+			return e
+		}
+		q.sourceCursor++
+		if q.sourceCursor%2 == 0 {
+			q.remaining--
+		}
+	}
+	q.sourceRemaining = q.remaining
+	return nil
+}
 func (m *AlgebraicRootCore) cleanupInverse() error {
 	q := &m.inversion
 	if q.executing {
@@ -27,8 +56,11 @@ func (m *AlgebraicRootCore) cleanupInverse() error {
 	q.executing = true
 	defer func() { q.executing = false }()
 	for q.remaining != 0 {
-		if e := m.config.Rationals.Del(&q.values[q.remaining-1]); e != nil {
-			return e
+		value := &q.values[q.remaining-1]
+		for _, field := range [2]*unumeral.Int{value.BorrowNumerator(), value.BorrowDenominator()} {
+			if e := m.config.Rationals.Integers().CleanupRawNumeral(field); e != nil {
+				return e
+			}
 		}
 		q.remaining--
 	}
@@ -128,10 +160,14 @@ func (m *AlgebraicRootCore) Inv(a *Algebraic) (cause error) {
 	q := &m.inversion
 	q.polynomialCaller = m.polynomialCaller
 	q.sourceStop = nil
+	q.sourceCursor, q.sourceRemaining = 0, 0
 	q.executing = true
 	defer func() {
 		q.executing = false
-		cleanup := m.cleanupInverse()
+		cleanup := m.config.Polynomials.convertEntryReceiptSourceCause(&q.convertEntry)
+		if cleanup == nil {
+			cleanup = m.finishInverseSource()
+		}
 		if cleanup != nil {
 			q.sourceStop = cleanup
 		}
@@ -151,6 +187,7 @@ func (m *AlgebraicRootCore) Inv(a *Algebraic) (cause error) {
 	}
 	q.values = [2]unumeral.Rational{unumeral.NewRational(), unumeral.NewRational()}
 	q.remaining = 2
+	q.sourceRemaining = 2
 	qm, b := m.config.Rationals, m.config.Binary
 	if e = b.ToRational(qm, r.interval.BorrowLower(), &q.values[0]); e != nil {
 		return e
@@ -167,6 +204,6 @@ func (m *AlgebraicRootCore) Inv(a *Algebraic) (cause error) {
 	if e = qm.Swap(&q.values[0], &q.values[1]); e != nil {
 		return e
 	}
-	_, e = p.ConvertRationalToBinaryInterval(v, qm, &q.values[0], &q.values[1], b, r.interval.BorrowLower(), r.interval.BorrowUpper())
+	_, e = p.convertRationalToBinaryIntervalWithEntryReceipt(v, qm, &q.values[0], &q.values[1], b, r.interval.BorrowLower(), r.interval.BorrowUpper(), &q.convertEntry)
 	return m.save(l, &r, e)
 }

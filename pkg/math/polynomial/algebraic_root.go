@@ -197,6 +197,9 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m != nil && m.self == m && (m.config.Polynomials.convertEntryReceiptPending(&m.arithmetic.convertEntry) || m.config.Polynomials.convertEntryReceiptPending(&m.inversion.convertEntry)) {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.config.Polynomials.refinableReceiptPending(&m.isolateRefinable) {
 		return ErrAlgebraicPending
 	}
@@ -964,6 +967,13 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 }
 func (m *AlgebraicRootCore) CleanupRetained() error {
 	if m != nil && m.self == m {
+		for _, r := range []*upolyConvertEntryReceipt{&m.arithmetic.convertEntry, &m.inversion.convertEntry} {
+			if m.config.Polynomials.convertEntryReceiptPending(r) && m.config.Polynomials.convertEntry.NumericExecuting() {
+				return ErrAlgebraicPending
+			}
+		}
+	}
+	if m != nil && m.self == m {
 		for _, r := range []*upolyRefinableInvocationReceipt{&m.isolateRefinable, &m.isolationConversion.refinable, &m.rootConstruction.conversion.refinable, &m.binary.refinable} {
 			if m.config.Polynomials.refinableReceiptPending(r) && m.config.Polynomials.refinable.NumericExecuting() {
 				return ErrAlgebraicPending
@@ -1062,6 +1072,16 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	if m == nil || m.self != m || m.closed {
 		return ErrAlgebraicOwner
 	}
+	for _, r := range []*upolyRefinableInvocationReceipt{&m.isolateRefinable, &m.isolationConversion.refinable, &m.rootConstruction.conversion.refinable, &m.binary.refinable} {
+		if e := m.config.Polynomials.cleanupRefinableReceipt(r); e != nil {
+			return e
+		}
+	}
+	for _, r := range []*upolyConvertEntryReceipt{&m.arithmetic.convertEntry, &m.inversion.convertEntry} {
+		if e := m.config.Polynomials.cleanupConvertEntryReceipt(r); e != nil {
+			return e
+		}
+	}
 	if e := m.cleanupCellAllocation(); e != nil {
 		return e
 	}
@@ -1070,11 +1090,6 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	}
 	if p := m.config.Polynomials; p != nil {
 		if e := p.modular.CleanupPNormalizeInvocation(&m.representationNormalize, true); e != nil {
-			return e
-		}
-	}
-	for _, r := range []*upolyRefinableInvocationReceipt{&m.isolateRefinable, &m.isolationConversion.refinable, &m.rootConstruction.conversion.refinable, &m.binary.refinable} {
-		if e := m.config.Polynomials.cleanupRefinableReceipt(r); e != nil {
 			return e
 		}
 	}
