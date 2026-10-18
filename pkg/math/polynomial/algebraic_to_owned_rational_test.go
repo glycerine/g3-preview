@@ -40,11 +40,25 @@ func TestAlgebraicToOwnedRationalZeroBasicAndPredicateConversion(t *testing.T) {
 }
 
 func TestAlgebraicToOwnedRationalReturningTransportGuards(t *testing.T) {
+	algebraicOwnedRationalReturningTransport(t, 0)
+}
+
+func TestAlgebraicOwnedBoundReturningTransportGuards(t *testing.T) {
+	for _, operation := range []uint8{3, 4} {
+		t.Run(strconv.Itoa(int(operation)), func(t *testing.T) {
+			algebraicOwnedRationalReturningTransport(t, operation)
+		})
+	}
+}
+
+func algebraicOwnedRationalReturningTransport(t *testing.T, operation uint8) {
 	c, _, _ := algebraicCompareFixture(t)
 	q := c.config.Rationals
 	b := arena.NewBudget(1 << 26)
+	var input Algebraic
 	active, callbacks := false, 0
 	var closeErr, coreCleanupErr, wrapperCleanupErr, rationalCloseErr error
+	var recursiveErr, rawBoundErr, deleteErr error
 	runtime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64, Transport: func(f umemory.Failure) error {
 		if active {
 			callbacks++
@@ -52,6 +66,9 @@ func TestAlgebraicToOwnedRationalReturningTransportGuards(t *testing.T) {
 			coreCleanupErr = c.CleanupRetained()
 			wrapperCleanupErr = c.CleanupToOwnedRational()
 			rationalCloseErr = q.CloseChecked()
+			recursiveErr = c.GetLowerOwnedRationalAtPrecision(&input, nil, nil, 2)
+			rawBoundErr = c.GetLowerRationalAtPrecision(&input, nil, 2)
+			deleteErr = c.Del(&input)
 		}
 		return f
 	}})
@@ -64,7 +81,6 @@ func TestAlgebraicToOwnedRationalReturningTransportGuards(t *testing.T) {
 	words := make([]uint32, 2000)
 	words[0], words[len(words)-1] = 17, 1
 	serviceMust(t, q.Integers().SetLimbs(&value.Num, words))
-	var input Algebraic
 	serviceMust(t, c.SetRational(&input, &value))
 	out, e := s.NewValue()
 	serviceMust(t, e)
@@ -82,14 +98,26 @@ func TestAlgebraicToOwnedRationalReturningTransportGuards(t *testing.T) {
 		}
 	})
 	serviceMust(t, runtime.SetMaxSize(1))
+	originalInput := input
 	active = true
-	body := c.ToOwnedRational(&input, s, &out)
+	var body error
+	switch operation {
+	case 3:
+		body = c.GetLowerOwnedRationalAtPrecision(&input, s, &out, 2)
+	case 4:
+		body = c.GetUpperOwnedRationalAtPrecision(&input, s, &out, 2)
+	default:
+		body = c.ToOwnedRational(&input, s, &out)
+	}
 	active = false
 	if callbacks == 0 || body == nil {
 		t.Fatal("returning transport not reached", callbacks, body)
 	}
 	if !errors.Is(closeErr, ErrAlgebraicPending) || !errors.Is(coreCleanupErr, ErrAlgebraicPending) || !errors.Is(wrapperCleanupErr, ErrAlgebraicPending) || rationalCloseErr == nil {
 		t.Fatal("executing wrapper or borrowed core destroyed", closeErr, coreCleanupErr, wrapperCleanupErr, rationalCloseErr)
+	}
+	if !errors.Is(recursiveErr, ErrAlgebraicPending) || !errors.Is(rawBoundErr, ErrAlgebraicPending) || !errors.Is(deleteErr, ErrAlgebraicPending) || input != originalInput {
+		t.Fatal("transport obtained executing input or recursive bound", recursiveErr, rawBoundErr, deleteErr)
 	}
 	if out.Raw.Num != unumeral.NewInt(99) || c.closed || c.toOwnedRational.constructed {
 		t.Fatal("failed constructor published output or lost core", out)

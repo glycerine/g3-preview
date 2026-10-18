@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -179,6 +180,56 @@ func TestAlgebraicOwnedBoundRejectsReplacementRawCall(t *testing.T) {
 	serviceMust(t, c.GetUpperRational(&root, &raw))
 	serviceMust(t, c.CleanupRetained())
 	serviceMust(t, c.config.Rationals.Del(&raw))
+	serviceMust(t, service.Del(&out))
+	serviceMust(t, c.Del(&root))
+}
+
+func TestAlgebraicOwnedBoundRawTransportGuards(t *testing.T) {
+	var c *AlgebraicRootCore
+	var root Algebraic
+	active, callbacks := false, 0
+	transport := func(f umemory.Failure) error {
+		if active {
+			callbacks++
+			before := root
+			for _, call := range []func() error{
+				c.Close, c.CleanupRetained, c.CleanupToOwnedRational,
+				func() error { return c.Del(&root) },
+				func() error { return c.GetUpperRational(&root, nil) },
+				func() error { return c.GetUpperOwnedRational(&root, nil, nil) },
+			} {
+				if e := call(); !errors.Is(e, ErrAlgebraicPending) {
+					t.Fatal("raw bound transport obtained executing owner", e)
+				}
+			}
+			if root != before || c.closed {
+				t.Fatal("refused callback changed input or core")
+			}
+		}
+		return f
+	}
+	var runtime *umemory.Runtime
+	c, _, runtime = algebraicNegTLSFixture(t, transport)
+	root = algebraicTinyBinaryBoundsRoot(t, c)
+	service, _ := serviceNew(t)
+	out, e := service.NewValue()
+	serviceMust(t, e)
+	serviceMust(t, service.SetInt64(&out, 77))
+	pad := algebraicCellSourceTLSBoundary(t, c)
+	active = true
+	body := c.GetUpperOwnedRational(&root, service, &out)
+	active = false
+	serviceMust(t, runtime.SetMaxSize(0))
+	serviceMust(t, runtime.Deallocate(&pad))
+	if body == nil || callbacks == 0 || !c.bounds.conversion.pending(c) {
+		t.Fatal("actual raw bound transport was not reached", callbacks, body)
+	}
+	serviceMust(t, c.CleanupToOwnedRational())
+	text, e := service.String(&out)
+	serviceMust(t, e)
+	if text != "77" {
+		t.Fatal("raw constructor failure changed global output", text)
+	}
 	serviceMust(t, service.Del(&out))
 	serviceMust(t, c.Del(&root))
 }

@@ -38917,12 +38917,15 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_to_owned_rational.go",
           "go_targets": [
+            "pkg/math/polynomial/algebraic_to_owned_rational_test.go",
             "pkg/math/polynomial/algebraic_to_owned_rational_destructor_test.go",
             "pkg/math/polynomial/algebraic_to_owned_rational.go",
             "pkg/math/polynomial/algebraic_representation.go",
             "pkg/math/polynomial/algebraic_owned_bound_test.go"
           ],
           "tests": [
+            "TestAlgebraicOwnedBoundReturningTransportGuards",
+            "TestAlgebraicOwnedBoundRawTransportGuards",
             "TestAlgebraicOwnedBoundRejectsReplacementRawCall",
             "TestAlgebraicOwnedBoundOrderedDestructorStops",
             "TestAlgebraicOwnedBoundsDistinctGlobalOwner",
@@ -39497,12 +39500,15 @@
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_to_owned_rational.go",
           "go_targets": [
+            "pkg/math/polynomial/algebraic_to_owned_rational_test.go",
             "pkg/math/polynomial/algebraic_to_owned_rational_destructor_test.go",
             "pkg/math/polynomial/algebraic_to_owned_rational.go",
             "pkg/math/polynomial/algebraic_representation.go",
             "pkg/math/polynomial/algebraic_owned_bound_test.go"
           ],
           "tests": [
+            "TestAlgebraicOwnedBoundReturningTransportGuards",
+            "TestAlgebraicOwnedBoundRawTransportGuards",
             "TestAlgebraicOwnedBoundRejectsReplacementRawCall",
             "TestAlgebraicOwnedBoundOrderedDestructorStops",
             "TestAlgebraicOwnedBoundsDistinctGlobalOwner",

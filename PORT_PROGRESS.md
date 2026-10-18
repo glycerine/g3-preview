@@ -44038,3 +44038,19 @@ broader callback/TRACE and whole polynomial/AST completion remain open.
 
 Focused owning/raw bound and conversion suites pass ordinary (3.262s) and
 checked/debug/trace (0.187s), exclusively on CPUs8–16. No full-suite rerun.
+
+Owning algebraic bound callback evidence now covers actual returning failure
+transports on both sides of the raw/global owner handoff. Precision lower/upper
+wrappers reuse the concrete global-construction callback fixture; callbacks
+attempt core close, core/wrapper cleanup, rational-owner close, recursive raw
+and owning bounds, and deletion of the actual executing input. Existing
+ToOwnedRational coverage also gains the recursive-bound/input checks. A
+separate actual TLS power refusal exercises the raw bound child under its
+owning wrapper and the same lifecycle/recursive exclusions. No callbacks or
+execution flags are synthesized. Input identities and caller values remain
+intact, and explicit cleanup releases the stopped accepted child.
+
+Focused owning/raw bound/conversion suites pass ordinary (0.201s) and
+checked/debug/trace (3.368s); manifest validation and diff checks pass. Commands
+use CPUs8–16. These are selected callback profiles, not a universal callback or
+TRACE completion claim. Whole polynomial then AST completion remains active.
