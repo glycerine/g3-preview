@@ -44371,3 +44371,26 @@ and rebuilt suffix. This is split-build evidence, not a clean single full
 checked pass: the long prefix binary predates the new owner-aware utility
 bridges, which have separate focused checks. No full test process remains live.
 The complete polynomial then AST goal remains active.
+
+Cross-owner algebraic copy preparation: extracted the retained copy_poly body
+into copyPolynomialFromOwner. Source coefficient reads now use the explicit
+UPolynomialManager and its IntegerManager, while destination allocation,
+placement-prefix tracking and exact coefficientCopy receipts stay with the
+receiving core. The ordinary same-owner wrapper shares this implementation.
+TestAlgebraicCopyPolynomialFromOwner uses independent manager fixtures and BIG
+signed coefficients, deletes the source polynomial, then reads the receiving
+coefficients through their own integer owner. No public cross-core entry is
+claimed: source lifetime exclusion and integrated interval/const-rational
+branches remain required before arith_decl_plugin translation is available.
+
+Same-core Copy now reads the source cell's recorded polynomial extent through
+sourcePolynomial, matching algebraic_numbers.cpp copy(source->m_p_sz,source->m_p),
+rather than using the entire Go descriptor extent. A focused regression widens
+the actual backing and verifies copied extent, initialized prefix and flags.
+
+Verification on CPUs8-16: four focused owner/extent/existing Copy tests passed
+ordinary (0.005s) and checked/debug/trace (0.006s). Five existing checked copy
+publication, flags, normalization and deletion/allocation order tests passed
+(0.006s). portcheck passed: 2103 units, 677 APIs; status counts unchanged at
+208 ported, 343 partial, 1495 unported, 11 dead/deleted. No full suite rerun.
+The complete polynomial then AST objective remains open.

@@ -661,6 +661,13 @@ func (m *AlgebraicRootCore) SetTake(a *Algebraic, q *unumeral.Rational) error {
 	return nil
 }
 func (m *AlgebraicRootCore) copyPolynomial(l *algebraicLocation, r *algebraicRecord, v UPolynomialView) error {
+	return m.copyPolynomialFromOwner(l, r, m.config.Polynomials, v)
+}
+
+// copyPolynomialFromOwner follows copy_poly's ascending placement/copy order.
+// The view and its numeral cells belong to source, while backing allocation and
+// any accepted copy receipt belong to the receiving core.
+func (m *AlgebraicRootCore) copyPolynomialFromOwner(l *algebraicLocation, r *algebraicRecord, source *UPolynomialManager, v UPolynomialView) error {
 	if m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.coefficientCopy) {
 		return ErrAlgebraicPending
 	}
@@ -690,11 +697,11 @@ func (m *AlgebraicRootCore) copyPolynomial(l *algebraicLocation, r *algebraicRec
 	// prefix denotes source placement construction, then ascending numeral copy.
 	for i := uint32(0); i < v.count; i++ {
 		l.coefficientInitialized = i + 1
-		a, e := p.read(v, i)
+		a, e := source.read(v, i)
 		if e != nil {
 			return e
 		}
-		if e = m.config.Rationals.Integers().CopyFromOwnerWithReceipt(&p.values(&d.state)[i], m.config.Rationals.Integers(), a, &m.coefficientCopy); e != nil {
+		if e = m.config.Rationals.Integers().CopyFromOwnerWithReceipt(&p.values(&d.state)[i], source.config.Integer, a, &m.coefficientCopy); e != nil {
 			return e
 		}
 	}
@@ -925,7 +932,7 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	if e != nil {
 		return e
 	}
-	v, e := m.config.Polynomials.wholeView(r.poly)
+	v, e := m.sourcePolynomial(&r)
 	if e != nil {
 		return e
 	}
