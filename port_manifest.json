@@ -53193,7 +53193,9 @@
         "pkg/math/polynomial/upolynomial_berlekamp_cleanup.go",
         "pkg/math/polynomial/upolynomial_berlekamp_destructor_test.go",
         "pkg/math/polynomial/upolynomial_berlekamp_scoped_numeral.go",
-        "pkg/math/polynomial/upolynomial_berlekamp_scoped_numeral_test.go"
+        "pkg/math/polynomial/upolynomial_berlekamp_scoped_numeral_test.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_numeric.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_numeric_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53352,7 +53354,10 @@
         "TestUPolynomialBerlekampDestructorRetainsAscendingGuardPrefix",
         "TestUPolynomialBerlekampDestructorCompleteThenReuse",
         "TestUPolynomialBerlekampFailedConstructorHasOnlyOwningMemberAbort",
-        "TestUPolynomialBerlekampScopedNumeralDestructorRefusal"
+        "TestUPolynomialBerlekampScopedNumeralDestructorRefusal",
+        "TestUPolynomialBerlekampConstructorActualNumericReservationPrefixes",
+        "TestUPolynomialBerlekampNumericCleanupPreservesIndependentGCD",
+        "TestUPolynomialBerlekampActualNumericTransportProtectsCaller"
       ],
       "conditionals": [
         {
@@ -53465,6 +53470,22 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete Berlekamp constructor/diagonalization scalar allocation caller and accepted child receipts (upolynomial_factorization.cpp:125-139,176-189)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_field.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_cleanup.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_numeric.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_numeric_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialBerlekampConstructorActualNumericReservationPrefixes",
+            "TestUPolynomialBerlekampNumericCleanupPreservesIndependentGCD",
+            "TestUPolynomialBerlekampActualNumericTransportProtectsCaller"
+          ],
+          "notes": "Copy/SubMul/Mul/Neg/Dec/Inv/AddMul retain the actual numeric allocation leaves through a concrete matrix policy, fresh scalar generation and exact modular-owner validation. Only actually issued Division/GCD/ExtendedGCD receipts are retained, with latest accepted order per kind, plus tracked AddMul and normalization children. Runtime callbacks cannot reinitialize/destruct the matrix, advance null-vector output, run owning cleanup or retire the core; the whole actual numeric call borrows its real owner family. Source child stops precede older NUM/member destruction, while separate owning phases finish exact accepted children and release unjoined roots without adopting other manager activity. Explicit debug allocator fixtures in both builds enumerate genuine BIG constructor reservation prefixes, retain real AddMul acquisitions, verify independent B^2 and B^2-B-1 output, and recover all charges. A separately stopped genuine GCD survives matrix cleanup unchanged. The physical runtime-limit transport profile verifies actual callbacks rather than simulated allocator events. Valid finite-field regression/rank/product tests remain unchanged. Exhaustive diagonalization/refinement RAW-end-failure and wider factorization ownership audits remain partial."
+        },
         {
           "name": "Constructor tmp and diagonalization multiplier scoped NUM destructor frontiers (upolynomial_factorization.cpp:110,160)",
           "status": "ported",
@@ -175141,7 +175162,9 @@
         "pkg/math/polynomial/polynomial_discriminant_even_modulus_source_test.go",
         "pkg/math/polynomial/polynomial_normalize_allocation_context.go",
         "pkg/math/polynomial/polynomial_som_normalize_allocation_context.go",
-        "pkg/math/polynomial/polynomial_variable_recognition_owner_source_test.go"
+        "pkg/math/polynomial/polynomial_variable_recognition_owner_source_test.go",
+        "pkg/util/numeral/numeric_caller_operations_extra.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_numeric.go"
       ],
       "tests": [
         "TestIntegerModularCenteredOracle",
@@ -175211,7 +175234,8 @@
         "TestPolynomialNormalizeIndependentSignedIntegerContent",
         "TestPolynomialVariableRecognitionExecutingIntegerOwnerRefusesFinalize",
         "TestIntegerPNormalizeNilReturningTransportOwnerRefusal",
-        "TestIntegerModularFusedLargeAliasOracle"
+        "TestIntegerModularFusedLargeAliasOracle",
+        "TestUPolynomialBerlekampConstructorActualNumericReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -175400,6 +175424,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Dec context carries the retained Berlekamp Q-I diagonal through the existing scalar decrement and normalization (mpzzp.h:153)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/util/numeral/mpzzp_ops.go",
+            "pkg/util/numeral/numeric_caller_operations_extra.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_numeric.go"
+          ],
+          "tests": [
+            "TestIntegerModularCompleteScalarRoutes",
+            "TestIntegerModularScalarSourceAssertionActions",
+            "TestUPolynomialBerlekampConstructorActualNumericReservationPrefixes"
+          ],
+          "notes": "The public Dec and caller-aware Dec share one implementation. It preserves the line153 normalized assertion, the existing IntegerManager.Dec Add(-1) engine and subsequent normalization, while transporting the exact retained caller allocation context. No alternate arithmetic algorithm, generic adapter or synthetic allocation is introduced."
+        },
         {
           "name": "Lifecycle, seven real numeral fields, mode and centered normalization",
           "status": "partial",
@@ -175755,7 +175794,11 @@
           "name": "mpzzp setup_p and inv source TRACE records after reached arithmetic stages",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpzzp_trace.go",
-          "tests": ["TestIntegerModularSetupAndInverseSourceTrace", "TestIntegerModularTraceSourceInsertionPrefixes", "TestIntegerModularTraceNumberFailureAfterSourcePrefix"]
+          "tests": [
+            "TestIntegerModularSetupAndInverseSourceTrace",
+            "TestIntegerModularTraceSourceInsertionPrefixes",
+            "TestIntegerModularTraceNumberFailureAfterSourcePrefix"
+          ]
         }
       ],
       "ownership": [

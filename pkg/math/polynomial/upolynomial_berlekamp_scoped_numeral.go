@@ -17,6 +17,16 @@ func (q *upolyBerlekampMatrix) finishScopedNumeral(local *upolyBerlekampScopedNu
 	if !local.declared || local.sourceEnded {
 		return body
 	}
+	if e := q.numeric.sourceCause(); e != nil {
+		if local.cause == nil {
+			local.cause = e
+		}
+		if q.closeCause == nil {
+			q.closeCause = e
+		}
+		q.m.pendingBerlekamp = q
+		return errors.Join(body, e)
+	}
 	if local.cause != nil {
 		return errors.Join(body, local.cause)
 	}

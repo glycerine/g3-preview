@@ -166,16 +166,22 @@ func (m *IntegerModularManager) Inc(a *Int) error {
 	return m.PNormalize(a)
 }
 func (m *IntegerModularManager) Dec(a *Int) error {
+	return m.decWithSourceContext(a, integerAllocationInvocationContext{})
+}
+func (m *IntegerModularManager) decWithSourceContext(a *Int, context integerAllocationInvocationContext) error {
 	if e := m.check(); e != nil {
 		return e
 	}
 	if e := m.sourceAssertNormalized(a, 153); e != nil {
 		return e
 	}
-	if e := m.manager.Dec(a); e != nil {
+	// Preserve IntegerManager.Dec's existing concrete Add(-1) engine while
+	// carrying the retained caller to its actual allocation leaves.
+	minusOne := NewInt(-1)
+	if e := m.manager.addSubWithAllocationContext(a, &minusOne, a, false, context); e != nil {
 		return e
 	}
-	return m.PNormalize(a)
+	return m.normalizeWithSourceContext(a, context)
 }
 func (m *IntegerModularManager) Add(a, b, c *Int) error {
 	return m.addWithSourceContext(a, b, c, integerAllocationInvocationContext{})

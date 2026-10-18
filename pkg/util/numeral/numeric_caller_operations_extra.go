@@ -520,3 +520,12 @@ func (o NumericRationalOperations) SubMul(a, b, c, out *Rational) error {
 	}
 	return o.manager.fusedWithAllocationContext(a, b, c, out, true, o.context)
 }
+
+// Dec carries the retained Berlekamp Q-I diagonal call through the same scalar
+// decrement engine and subsequent modular normalization as the public method.
+func (o NumericModularOperations) Dec(a *Int) error {
+	if e := o.valid(); e != nil {
+		return e
+	}
+	return o.manager.decWithSourceContext(a, o.context)
+}

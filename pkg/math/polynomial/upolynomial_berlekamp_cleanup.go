@@ -22,7 +22,7 @@ func (m *UPolynomialManager) cleanupBerlekamp() error {
 	if q.m != m {
 		return ErrUPolynomialOwner
 	}
-	if q.displaying || q.destroying {
+	if q.displaying || q.destroying || q.numeric.executing || q.numeric.cleaning {
 		return ErrUPolynomialCleanupPending
 	}
 	if e := m.cleanupDisplayReceipt(&q.entryTrace); e != nil {
@@ -30,5 +30,17 @@ func (m *UPolynomialManager) cleanupBerlekamp() error {
 	}
 	q.destroying = true
 	defer func() { q.destroying = false }()
-	return q.closeOwnedMembers()
+	if e := q.numeric.cleanup(false); e != nil {
+		return e
+	}
+	if e := q.closeOwnedMembers(); e != nil {
+		return e
+	}
+	if e := q.numeric.cleanup(true); e != nil {
+		return e
+	}
+	if !q.numeric.pending() && m.pendingBerlekamp == q {
+		m.pendingBerlekamp = nil
+	}
+	return nil
 }
