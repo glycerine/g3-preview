@@ -136,96 +136,64 @@ func (m *MonomialManager) maxSmallerCore(a Monomial, x uint32) (uint32, error) {
 		return 0, e
 	}
 	if x == v {
-		if polynomialSourceDebug && high <= 0 {
-			return 0, ErrMonomialAssertion
+		if e := m.sourceScalarAssert(322, "high > 0", high > 0); e != nil {
+			return 0, e
 		}
 		return m.varCore(a, uint32(high-1))
 	}
 	for {
-		if polynomialSourceDebug {
-			if low < 0 || high >= int32(n) {
-				return 0, ErrMonomialAssertion
-			}
-			v, e = m.varCore(a, uint32(low))
-			if e != nil {
-				return 0, e
-			}
-			if v >= x {
-				return 0, ErrMonomialAssertion
-			}
-			v, e = m.varCore(a, uint32(high))
-			if e != nil {
-				return 0, e
-			}
-			if x >= v {
-				return 0, ErrMonomialAssertion
-			}
-			if low >= high {
-				return 0, ErrMonomialAssertion
-			}
+		if e := m.searchWindowAssert(a, low, high, 0, false); e != nil {
+			return 0, e
+		}
+		if e := m.searchVariableAssert(a, uint32(low), x, true, 327, "get_var(low) < x"); e != nil {
+			return 0, e
+		}
+		if e := m.searchVariableAssert(a, uint32(high), x, false, 328, "x < get_var(high)"); e != nil {
+			return 0, e
+		}
+		if e := m.sourceScalarAssert(329, "low < high", low < high); e != nil {
+			return 0, e
 		}
 		if high == low+1 {
-			if polynomialSourceDebug {
-				v, e = m.varCore(a, uint32(low))
-				if e != nil {
-					return 0, e
-				}
-				if v >= x {
-					return 0, ErrMonomialAssertion
-				}
-				v, e = m.varCore(a, uint32(low+1))
-				if e != nil {
-					return 0, e
-				}
-				if x >= v {
-					return 0, ErrMonomialAssertion
-				}
+			if e := m.searchVariableAssert(a, uint32(low), x, true, 331, "get_var(low) < x"); e != nil {
+				return 0, e
+			}
+			if e := m.searchVariableAssert(a, uint32(low+1), x, false, 332, "x < get_var(low+1)"); e != nil {
+				return 0, e
 			}
 			return m.varCore(a, uint32(low))
 		}
-		if polynomialSourceDebug && high <= low+1 {
-			return 0, ErrMonomialAssertion
+		if e := m.sourceScalarAssert(335, "high > low + 1", high > low+1); e != nil {
+			return 0, e
 		}
 		mid := low + (high-low)/2
-		if polynomialSourceDebug && !(low < mid && mid < high) {
-			return 0, ErrMonomialAssertion
+		if e := m.sourceScalarAssert(337, "low < mid && mid < high", low < mid && mid < high); e != nil {
+			return 0, e
 		}
 		v, e = m.varCore(a, uint32(mid))
 		if e != nil {
 			return 0, e
 		}
 		if v == x {
-			if polynomialSourceDebug {
-				if !(low < mid && mid < high && high < int32(n)) {
-					return 0, ErrMonomialAssertion
-				}
-				previous, e := m.varCore(a, uint32(mid-1))
-				if e != nil {
-					return 0, e
-				}
-				if previous >= x {
-					return 0, ErrMonomialAssertion
-				}
-				v, e = m.varCore(a, uint32(mid))
-				if e != nil {
-					return 0, e
-				}
-				if v != x {
-					return 0, ErrMonomialAssertion
-				}
+			if e := m.searchWindowAssert(a, low, high, mid, true); e != nil {
+				return 0, e
+			}
+			if e := m.searchPreviousAssert(a, uint32(mid), x); e != nil {
+				return 0, e
 			}
 			return m.varCore(a, uint32(mid-1))
 		}
 		if x < v {
 			high = mid
 		} else {
-			if polynomialSourceDebug && v >= x {
-				return 0, ErrMonomialAssertion
+			if e := m.sourceScalarAssert(348, "x_mid < x", v < x); e != nil {
+				return 0, e
 			}
 			low = mid
 		}
 	}
 }
+
 func (m *MonomialManager) IsValid(a Monomial) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
@@ -357,34 +325,33 @@ func (m *MonomialManager) MaxSmallerThan(a Monomial, x uint32) (uint32, error) {
 	if e := m.check(); e != nil {
 		return 0, e
 	}
-	if polynomialSourceDebug && x == math.MaxUint32 {
-		return 0, ErrMonomialAssertion
+	if e := m.sourceScalarAssert(356, "x != null_var", x != math.MaxUint32); e != nil {
+		return 0, e
 	}
 	v, e := m.maxSmallerCore(a, x)
 	if e != nil {
 		return 0, e
 	}
 	if polynomialSourceDebug {
-		n, e := m.sizeCore(a)
-		if e != nil {
-			return 0, e
-		}
 		found := false
-		for i := uint32(0); i < n; i++ {
+		for i := uint32(0); ; i++ {
+			n, e := m.sizeCore(a)
+			if e != nil {
+				return 0, e
+			}
+			if i >= n {
+				break
+			}
 			q, e := m.varCore(a, i)
 			if e != nil {
 				return 0, e
 			}
 			if q < x {
-				if v == math.MaxUint32 {
-					return 0, ErrMonomialAssertion
-				}
-				q, e = m.varCore(a, i)
-				if e != nil {
+				if e := m.tracePredecessorResult(a, x, v, i); e != nil {
 					return 0, e
 				}
-				if q > v {
-					return 0, ErrMonomialAssertion
+				if e := m.searchResultAssert(a, i, v); e != nil {
+					return 0, e
 				}
 			}
 			q, e = m.varCore(a, i)
@@ -395,8 +362,8 @@ func (m *MonomialManager) MaxSmallerThan(a Monomial, x uint32) (uint32, error) {
 				found = true
 			}
 		}
-		if v != math.MaxUint32 && (v >= x || !found) {
-			return 0, ErrMonomialAssertion
+		if e := m.sourceScalarAssert(373, "y == null_var || (y < x && found)", v == math.MaxUint32 || (v < x && found)); e != nil {
+			return 0, e
 		}
 	}
 	return v, nil

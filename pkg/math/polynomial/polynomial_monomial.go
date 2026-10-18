@@ -75,6 +75,7 @@ type monomialCreation struct {
 }
 type MonomialManager struct {
 	assertionRunning                                                          bool
+	queryTraceRunning                                                         bool
 	allocatorInvocation                                                       monomialAllocatorScope
 	unitDropConsumed                                                          bool
 	unitDropCause                                                             error

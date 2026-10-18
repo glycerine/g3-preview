@@ -748,6 +748,7 @@ func TestMonomialOwningCloseWithNativeIDRecycle(t *testing.T) {
 }
 
 func TestMonomialSourceMaxSmallerNullAssertion(t *testing.T) {
+	polynomialThrowAssertionFixture(t)
 	m := monomialFixture(t)
 	for i := 0; i < 2; i++ {
 		_, e := m.MkVar()

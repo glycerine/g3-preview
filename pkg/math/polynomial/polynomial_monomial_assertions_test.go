@@ -60,3 +60,107 @@ func TestMonomialPowerSourceAssertionSwitchAndClosedDebug(t *testing.T) {
 		t.Fatal("closed switch owner was not read before the degree", e)
 	}
 }
+
+func TestMonomialPredecessorSourceAssertionActions(t *testing.T) {
+	for _, choice := range []string{"T", "C", "disabled"} {
+		t.Run(choice, func(t *testing.T) {
+			m := monomialFixture(t)
+			actions := choice
+			if choice == "disabled" {
+				actions = "T"
+			}
+			polynomialAssertionActionsFixture(t, strings.Repeat(actions, 2))
+			if polynomialSourceDebug && choice == "disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+			}
+			// Actual raw variables, with the predecessor just above the matched
+			// midpoint. No placement-constructor validity is fabricated.
+			a := monomialReadProfileObject(t, m, 8)
+			for i, variable := range []uint32{0, 2, 7, 6, 8, 10, 12, 14} {
+				monomialReadWrite(t, m, a, 20+uint64(i)*8, variable)
+			}
+			v, e := m.MaxSmallerThan(a, 6)
+			if polynomialSourceDebug && choice == "T" {
+				if !errors.Is(e, ErrMonomialAssertion) {
+					t.Fatal("midpoint assertion did not Throw", v, e)
+				}
+			} else {
+				serviceMust(t, e)
+				if v != 7 {
+					t.Fatal("Continue/disabled/release changed reached predecessor", v)
+				}
+			}
+			monomialPhysicalAudit(t, m)
+		})
+	}
+}
+
+func TestMonomialPredecessorSourceNullAssertionAndClosedSwitch(t *testing.T) {
+	for _, choice := range []string{"T", "C", "disabled"} {
+		t.Run(choice, func(t *testing.T) {
+			m := monomialFixture(t)
+			actions := choice
+			if choice == "disabled" {
+				actions = "T"
+			}
+			polynomialAssertionActionsFixture(t, actions)
+			if polynomialSourceDebug && choice == "disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+			}
+			a := monomialReadProfileObject(t, m, 1)
+			monomialReadWrite(t, m, a, 20, 7)
+			v, e := m.MaxSmallerThan(a, ^uint32(0))
+			if polynomialSourceDebug && choice == "T" {
+				if !errors.Is(e, ErrMonomialAssertion) {
+					t.Fatal("null variable assertion did not Throw", e)
+				}
+			} else {
+				serviceMust(t, e)
+				if v != 7 {
+					t.Fatal("Continue/disabled/release predecessor", v)
+				}
+			}
+			if polynomialSourceDebug {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().Close())
+				if _, e := m.MaxSmallerThan(Monomial{}, 0); !errors.Is(e, arena.ErrClosed) {
+					t.Fatal("entry assertion switch was not read before monomial size", e)
+				}
+			}
+		})
+	}
+}
+
+func TestMonomialPredecessorAssertionOperandReadGates(t *testing.T) {
+	if !polynomialSourceDebug {
+		t.Skip("source SASSERT erased")
+	}
+	for _, choice := range []string{"T", "C", "disabled"} {
+		t.Run(choice, func(t *testing.T) {
+			m := monomialFixture(t)
+			actions := choice
+			if choice == "disabled" {
+				actions = "T"
+			}
+			polynomialAssertionActionsFixture(t, strings.Repeat(actions, 2))
+			a := monomialReadProfileRawObject(t, m, 8)
+			if choice == "disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+				serviceMust(t, m.searchVariableAssert(a, 0, 1, true, 327, "get_var(low) < x"))
+				serviceMust(t, m.searchPreviousAssert(a, 3, 6))
+			}
+			// Both source expressions short circuit before any uninitialized
+			// header/array field. Continue must not evaluate the skipped operand.
+			window := m.searchWindowAssert(a, 5, 7, 0, true)
+			result := m.searchResultAssert(a, 0, ^uint32(0))
+			for _, e := range []error{window, result} {
+				if choice == "T" {
+					if !errors.Is(e, ErrMonomialAssertion) {
+						t.Fatal("short-circuited source assertion read an unrelated field", e)
+					}
+				} else {
+					serviceMust(t, e)
+				}
+			}
+		})
+	}
+}
