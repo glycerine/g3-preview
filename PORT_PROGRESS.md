@@ -45881,3 +45881,12 @@ Actual rational input [7,3/2,5/3] reserves all three coefficients before checks.
 Legacy rational-copy and raw-mutable tests now explicitly supply debugger Throw. The rational-copy fixture requires two Throws because its later same-base zero-count copy reaches the separate assertion194 already ported, rather than a fixed returned error. No numerical values, quotas or construction counters are repaired. Focused ordinary checks passed (0.029s); manifest validation passes. All execution stays on CPUs8–16. Wider polynomial source/numerical lifetime audits remain open, followed by AST. Native process9825 remains live at LP with the shared-worktree scope caveat documented above; no duplicate suite was started.
 
 Final broader factorization/frontend/GCD/Euclidean/CRA/content/storage/closed-state/basic/rational/raw-scalar checks pass ordinary (18.075s) and checked/debug/trace (30.043s), including the corrected two-Throw legacy fixture.
+
+### Quadratic-size and primitive-factor leading-coefficient source assertions
+
+Ported upolynomial.cpp:2968,3015 with runtime gates and actual debugger Throw/Continue under receiving-manager borrowing. The primitive dispatcher preserves the empty-input short circuit after querying the runtime gate. Negative linear input [-1,-2] Throws before factor insertion; Continue/disabled/release copies the literal negative factor with unchanged multiplicity/degree and multiplication reproduces [-1,-2]. No sign repair is introduced.
+
+The short-quadratic test is explicitly a qualified direct invariant adapter: T stops before the first coefficient read, while C/disabled/release reaches actual guarded p[2] bounds failure. No frontend parent is admitted/manufactured and no quadratic NUM construction is claimed. Closed runtime stops the actual empty primitive dispatch before factor append. Numerical scratch, source construction counts and quotas remain untouched.
+
+Focused tests pass ordinary (0.004s) and checked/debug/trace (0.007s); broader factorization/frontend/GCD/Euclidean/CRA/content/storage/closed/basic/rational/raw-scalar checks pass checked/debug/trace (30.093s). Manifest validation passes. All commands remain on CPUs8–16. Broader quadratic diagnostics/numerical failure/source-lifetime audits remain open for polynomial, followed by AST. Periodic native process9825 remains confirmed live at LP; its shared-worktree scope limitation remains as recorded above, and no duplicate suite was launched.
+Final broader ordinary affected checks pass (18.240s).

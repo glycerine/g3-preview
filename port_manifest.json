@@ -50801,7 +50801,9 @@
         "pkg/math/polynomial/upolynomial_storage_assertion_actions_test.go",
         "pkg/math/polynomial/upolynomial_content_assertion_actions_test.go",
         "pkg/math/polynomial/upolynomial_basic_alias_assertion_test.go",
-        "pkg/math/polynomial/upolynomial_input_scalar_assertion_test.go"
+        "pkg/math/polynomial/upolynomial_input_scalar_assertion_test.go",
+        "pkg/math/polynomial/upolynomial_factor_core.go",
+        "pkg/math/polynomial/upolynomial_factor_core_assertion_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51104,7 +51106,10 @@
         "TestUPolynomialBasicAliasAssertionActions",
         "TestUPolynomialBasicAliasClosedGate",
         "TestUPolynomialRationalInputAssertionActions",
-        "TestUPolynomialRawScalarZeroAssertionActions"
+        "TestUPolynomialRawScalarZeroAssertionActions",
+        "TestUPolynomialFactorPrimitiveLeadingAssertionActions",
+        "TestUPolynomialFactorQuadraticSizeAssertionActions",
+        "TestUPolynomialFactorPrimitiveEmptyClosedGate"
       ],
       "conditionals": [
         {
@@ -51693,6 +51698,20 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Quadratic-size and primitive-factor leading-coefficient runtime assertions (upolynomial.cpp:2968,3015)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_core.go",
+            "pkg/math/polynomial/upolynomial_factor_core_assertion_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorPrimitiveLeadingAssertionActions",
+            "TestUPolynomialFactorQuadraticSizeAssertionActions",
+            "TestUPolynomialFactorPrimitiveEmptyClosedGate"
+          ],
+          "notes": "Runtime gates precede quadratic size and short-circuited empty-or-positive-leading predicates; failed actions use real debugger Throw/Continue under receiving-manager borrowing. Actual negative-linear dispatch T stops before factor insertion, C/disabled preserves negative coefficients/counters and reproduces original polynomial on multiplication. Qualified direct short-quadratic invariant adapter T stops before first read; C/disabled reaches actual p[2] bounds guard before any frontend NUM frame exists, without manufactured parent construction. Closed runtime stops even empty primitive dispatch before its factor append. Broader quadratic/factor numerical diagnostics and source-lifetime audit remain partial."
+        },
         {
           "name": "Rational-input integrality and raw scalar nonzero runtime assertions (upolynomial.cpp:207,415)",
           "status": "ported",

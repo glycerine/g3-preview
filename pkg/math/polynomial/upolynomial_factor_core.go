@@ -59,8 +59,14 @@ func (s *UPolynomialFactorizationService) flipLeadingIfNegative(p *upolyVectorSt
 }
 func (s *UPolynomialFactorizationService) factorQuadratic(p *upolyVectorState, fs *UPolynomialFactors, k uint32) (cause error) {
 	m := s.manager
-	if polynomialSourceDebug && p.size != 3 {
-		return ErrUPolynomialAssertion
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled && p.size != 3 {
+		if e := m.scalarDivisionAssertionFailure(2968, "p.size() == 3"); e != nil {
+			return e
+		}
 	}
 	a, e := m.read(m.stateView(p), 2)
 	if e != nil {
@@ -180,7 +186,11 @@ func (s *UPolynomialFactorizationService) factorSqfPrimitive(p *upolyVectorState
 }
 func (s *UPolynomialFactorizationService) factorSqfPrimitiveWithReceipt(p *upolyVectorState, fs *UPolynomialFactors, k uint32, params UPolynomialFactorParams, r *upolyFactorSquareFreeInvocationReceipt) (bool, error) {
 	m := s.manager
-	if polynomialSourceDebug && p.size != 0 {
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil {
+		return false, e
+	}
+	if enabled && p.size != 0 {
 		top, e := m.read(m.stateView(p), p.size-1)
 		if e != nil {
 			return false, e
@@ -190,7 +200,9 @@ func (s *UPolynomialFactorizationService) factorSqfPrimitiveWithReceipt(p *upoly
 			return false, e
 		}
 		if !positive {
-			return false, ErrUPolynomialAssertion
+			if e := m.scalarDivisionAssertionFailure(3015, "sz == 0 || m().is_pos(p[sz-1])"); e != nil {
+				return false, e
+			}
 		}
 	}
 	if p.size <= 2 {
