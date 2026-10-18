@@ -44254,3 +44254,18 @@ checked/debug/trace (0.016s), on CPUs8–16. Portcheck passes with2103 units,
 677 APIs:208 ported,343 partial,1495 unported,11 dead/deleted. No full-suite
 repetition after the recent complete ordinary run; polynomial then AST goal
 remains active.
+
+Generated algebraic getter audit now covers source kind matching for every
+retained setting. Actual constructor tests install wrong-kind local entries
+for all five UINT fields and the BOOL field. With correctly typed globals,
+each uses its corresponding global value; with wrong kinds in both layers,
+each uses its own generated default. This matches params.cpp GET_VALUE2's
+kind-filtered primary/fallback lookup, not numeric/bool coercion or eager
+schema rejection. The actual acquired module helper completes destruction in
+both cases, with no retained frame or destructor cause.
+
+Focused algebraic parameter/manager tests pass ordinary (0.019s) and
+checked/debug/trace (0.018s), exclusively on CPUs8–16. Added evidence to schema
+and generated-header entries while preserving their distinct completion states:
+static .pyg complete, runtime header helper broader composition still partial.
+Whole polynomial then AST completion remains active; no full-suite rerun.

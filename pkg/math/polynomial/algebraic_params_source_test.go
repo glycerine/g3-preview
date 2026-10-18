@@ -117,3 +117,46 @@ func TestAlgebraicParameterProductionCatalogRegistration(t *testing.T) {
 		}
 	}
 }
+
+func TestAlgebraicParameterWrongKindsUseFallbackThenDefaults(t *testing.T) {
+	for _, wrongGlobal := range []bool{false, true} {
+		t.Run(map[bool]string{false: "typed-global", true: "wrong-global"}[wrongGlobal], func(t *testing.T) {
+			cfg, context, _ := algebraicManagerFixture(t)
+			module, e := cfg.Globals.Symbols.Intern("algebraic")
+			serviceMust(t, e)
+			global, e := cfg.Globals.Current.GetParams(module)
+			serviceMust(t, e)
+			for key, value := range map[string]uint32{"min_mag": 11, "factor_max_prime": 23, "factor_num_primes": 3, "factor_search_size": 101, "zero_accuracy": 7} {
+				name := key
+				serviceMust(t, context.SetBoolName(cfg.Params, &name, true))
+				if wrongGlobal {
+					serviceMust(t, context.SetBoolName(global, &name, false))
+				} else {
+					serviceMust(t, context.SetUIntName(global, &name, value))
+				}
+			}
+			factor := "factor"
+			serviceMust(t, context.SetUIntName(cfg.Params, &factor, 1))
+			if wrongGlobal {
+				serviceMust(t, context.SetUIntName(global, &factor, 0))
+			} else {
+				serviceMust(t, context.SetBoolName(global, &factor, false))
+			}
+			m, e := NewAlgebraicManager(cfg)
+			serviceMust(t, e)
+			defer func() { serviceMust(t, m.Close()) }()
+			magnitude, accuracy := int32(-11), int32(-7)
+			prime, trials, search := uint32(23), uint32(3), uint32(101)
+			if wrongGlobal {
+				magnitude, accuracy = -16, 0
+				prime, trials, search = 31, 1, 5000
+			}
+			if m.minMagnitude != magnitude || m.zeroAccuracy != accuracy || m.factor != wrongGlobal || m.factorParams.MaxPrime != prime || m.factorParams.PrimeTrials != trials || m.factorParams.MaxSearchSize != search {
+				t.Fatal("typed source fallback/defaults", m.minMagnitude, m.zeroAccuracy, m.factor, m.factorParams)
+			}
+			if m.params.Helpers != nil || m.params.DestructorCause != nil {
+				t.Fatal("generated helper did not complete its source lifetime")
+			}
+		})
+	}
+}
