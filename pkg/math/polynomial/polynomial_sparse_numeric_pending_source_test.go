@@ -44,6 +44,20 @@ func TestPolynomialSparseBigInputDescriptorRefusalRetainsActualRoot(t *testing.T
 				t.Fatal("actual numeric physical allocation before descriptor refusal", e, q.Integers().PendingCell)
 			}
 			root := q.Integers().PendingCell
+			inputCount := len(s.inputs)
+			small := unumeral.NewInt(2)
+			_, retryErr := s.Add(&small, m.unit)
+			if !errors.Is(retryErr, ErrPolynomialPending) || len(s.inputs) != inputCount || q.Integers().PendingCell != root {
+				t.Error("pending sparse numerical owner accepted another sample", retryErr, len(s.inputs), inputCount)
+			}
+			for _, attempt := range []func() error{s.Reset, func() error { _, e := s.Interpolate(nil); return e }, func() error { _, e := s.Ready(); return e }} {
+				if err := attempt(); !errors.Is(err, ErrPolynomialPending) {
+					t.Fatal("pending sparse operation reached caller operands", err)
+				}
+			}
+			if len(s.inputs) != inputCount || q.Integers().PendingCell != root {
+				t.Fatal("pending sparse refusals changed samples or owned root")
+			}
 			if !s.pendingBound || m.pendingSparse != s {
 				t.Fatal("actual numeric refusal lost borrowed core binding")
 			}
@@ -76,6 +90,11 @@ func TestPolynomialSparseBigInputDescriptorRefusalRetainsActualRoot(t *testing.T
 					t.Fatal("actual later foreign pending", e)
 				}
 				newer := q.Integers().PendingCell
+				inputCount = len(s.inputs)
+				_, retryErr = s.Add(&small, m.unit)
+				if !errors.Is(retryErr, ErrPolynomialPending) || len(s.inputs) != inputCount || q.Integers().PendingCell != newer {
+					t.Fatal("stale sparse receipt adopted replacement or allowed sample publication", retryErr)
+				}
 				if newer.Object == root.Object {
 					t.Fatal("physical ObjectRef generation must distinguish replacement")
 				}

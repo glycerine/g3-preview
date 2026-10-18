@@ -42458,6 +42458,15 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Sparse operations refuse before sample publication or unused operand access while their own interpolation scope or numeric allocation receipt remains pending; stale receipt cannot acquire replacement allocation",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_sparse_interpolator.go",
+          "tests": [
+            "TestPolynomialSparseBigInputDescriptorRefusalRetainsActualRoot",
+            "TestPolynomialSparseInterpolationEveryActualReservationPrefix"
+          ]
+        },
+        {
           "name": "Externally allocated sparse interpolators retain exact borrowed core while actual interpolation/numeric/destructor work is pending; manager destruction reports original error until explicit owning acknowledgment; embedded GCD locals remain manager-owned",
           "status": "platform_replacement",
           "go_target": "pkg/math/polynomial/polynomial_sparse_interpolator.go",

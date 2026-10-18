@@ -2,6 +2,7 @@
 package polynomial
 
 import (
+	"errors"
 	"fmt"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
@@ -42,6 +43,17 @@ func TestPolynomialSparseInterpolationEveryActualReservationPrefix(t *testing.T)
 			ok, e := s.Interpolate(out)
 			if e != nil && !numericPhysicalReservationRefusal(e) {
 				t.Fatal("actual source allocation category", ordinal, e)
+			}
+			if s.interpolation.active {
+				before, samples := m.integer.Budget().Used(), len(s.inputs)
+				for _, attempt := range []func() error{s.Reset, func() error { _, e := s.Add(nil, Polynomial{}); return e }, func() error { _, e := s.Interpolate(nil); return e }} {
+					if err := attempt(); !errors.Is(err, ErrPolynomialPending) {
+						t.Fatal("retained interpolation admitted replacement operation", ordinal, err)
+					}
+				}
+				if before != m.integer.Budget().Used() || samples != len(s.inputs) || !s.interpolation.active {
+					t.Fatal("refused operation altered retained interpolation")
+				}
 			}
 			polynomialSparsePhysical(t, s, out, polys)
 			m.integer.Budget().FailAfter(-1)

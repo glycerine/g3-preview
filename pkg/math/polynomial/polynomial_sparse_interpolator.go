@@ -111,6 +111,9 @@ func (s *PolynomialSparseInterpolator) open() error {
 	if !s.constructed || s.closed || s.closing || s.sourceStarted || s.sourceFinalized {
 		return arena.ErrClosed
 	}
+	if s.interpolation.active || polynomialNegNumericPending(&s.numeric) {
+		return ErrPolynomialPending
+	}
 	return nil
 }
 func (s *PolynomialSparseInterpolator) Ready() (bool, error) {
