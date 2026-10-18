@@ -253,16 +253,28 @@ func (m *UPolynomialManager) modularGCD(a, b UPolynomialView, out *upolyVectorSt
 	return m.modularGCDWithSourceContext(a, b, out, integerAllocationInvocationContext{})
 }
 func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, out *upolyVectorState, context integerAllocationInvocationContext) (cause error) {
-	if polynomialSourceDebug {
-		if a.count == 0 || b.count == 0 {
-			return ErrUPolynomialAssertion
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled && (a.count == 0 || b.count == 0) {
+		if e := m.scalarDivisionAssertionFailure(727, "sz_u > 0 && sz_v > 0"); e != nil {
+			return e
 		}
+	}
+	enabled, e = refinementSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled {
 		finite, e := m.modular.Modular()
 		if e != nil {
 			return e
 		}
 		if finite {
-			return ErrUPolynomialAssertion
+			if e := m.scalarDivisionAssertionFailure(728, "!m().modular()"); e != nil {
+				return e
+			}
 		}
 	}
 	var local [6]unumeral.Int
@@ -370,8 +382,14 @@ func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, o
 		if e = m.primitiveWithSourceContext(m.stateView(C), q, context); e != nil {
 			return e
 		}
-		if polynomialSourceDebug && q.size == 0 {
-			return ErrUPolynomialAssertion
+		enabled, e := refinementSourceAssertionsEnabled()
+		if e != nil {
+			return e
+		}
+		if enabled && q.size == 0 {
+			if e := m.scalarDivisionAssertionFailure(797, "candidate.size() > 0"); e != nil {
+				return e
+			}
 		}
 		last, e := m.read(m.stateView(q), q.size-1)
 		if e != nil {

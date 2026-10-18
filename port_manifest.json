@@ -50766,7 +50766,8 @@
         "pkg/math/polynomial/upolynomial_exact_div_loop_trace_test.go",
         "pkg/math/polynomial/upolynomial_recombination_step_invocation.go",
         "pkg/math/polynomial/upolynomial_factor_polynomial_trace.go",
-        "pkg/math/polynomial/upolynomial_cra_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_cra_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_modular_gcd_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -50998,7 +50999,10 @@
         "TestUPolynomialExactDivLoopRetainsRecombinationCaller",
         "TestUPolynomialCRAAssertionSourceActions",
         "TestUPolynomialCRAClosedAssertionSwitchBeforeReset",
-        "TestUPolynomialCRASeparateOddnessDebuggerActions"
+        "TestUPolynomialCRASeparateOddnessDebuggerActions",
+        "TestUPolynomialModularGCDEntryAssertionActions",
+        "TestUPolynomialModularGCDEmptyThenModeAssertionOrder",
+        "TestUPolynomialModularGCDClosedAssertionSwitchBeforeCopies"
       ],
       "conditionals": [
         {
@@ -51587,6 +51591,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Modular-GCD entry SASSERT runtime gates and debugger actions (upolynomial.cpp:727-728)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_gcd_modular.go",
+            "pkg/math/polynomial/upolynomial_division_assertions.go",
+            "pkg/math/polynomial/upolynomial_modular_gcd_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialModularGCDEntryAssertionActions",
+            "TestUPolynomialModularGCDEmptyThenModeAssertionOrder",
+            "TestUPolynomialModularGCDClosedAssertionSwitchBeforeCopies"
+          ],
+          "notes": "Nonempty-input and integer-mode source predicates have independent runtime gates and actual Throw/Continue actions before scalar declarations and primitive input copies. Empty-input Throw and empty-Continue/mode-Throw prove ordering. A concrete raw pointer/count adapter with an intentionally missing second slot verifies mode Continue/disabled/release reaches the guarded primitive input read, while mode Throw stops before it; entering modulus and caller result remain unchanged. This is qualified control-flow evidence, not a claim that the integer algorithm is valid when entered in finite-field mode. Closed assertion state stops before copies. Candidate assertion at797 also uses runtime gating/actions and is exercised on valid candidates by reconstruction tests; a failing candidate frontier has not been independently reached and remains unaudited. CRA/modular-GCD diagnostics and allocation-context propagation through final content scaling and all-primes Euclid fallback remain incomplete."
+        },
         {
           "name": "CRA odd-bound and coprime SASSERT runtime gates and debugger actions (upolynomial.cpp:664-665,671)",
           "status": "ported",
