@@ -19,6 +19,9 @@ func (m *IntegerModularManager) dividesWithAllocationContext(a, b *Int, c intege
 }
 
 func (m *IntegerModularManager) setPSquareWithAllocationContext(context integerAllocationInvocationContext) error {
+	if m != nil && m.self == m && callerBindingsExecuting(m.callerBindings) {
+		return ErrNumericPending
+	}
 	if e := m.check(); e != nil {
 		return e
 	}

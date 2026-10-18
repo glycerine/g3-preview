@@ -25,6 +25,7 @@ type ModularLinearSolver struct {
 	rawOrder          [3]uint8
 	rawCount          uint8
 	addMulChild       unumeral.IntegerAddMulInvocationReceipt
+	modularBinding    unumeral.NumericCallerBinding
 }
 
 func modularLinearConstructorGuard(m *unumeral.IntegerModularManager) error {
@@ -180,8 +181,10 @@ func (s *ModularLinearSolver) Resize(n uint32) error {
 	if e := s.open(); e != nil {
 		return e
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	if e := s.beginExecution(); e != nil {
+		return e
+	}
+	defer s.endExecution()
 	if s.n == n {
 		return nil
 	}
@@ -204,8 +207,10 @@ func (s *ModularLinearSolver) Reset() error {
 	if e := s.open(); e != nil {
 		return e
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	if e := s.beginExecution(); e != nil {
+		return e
+	}
+	defer s.endExecution()
 	for i := uint32(0); i < s.n; i++ {
 		r, e := s.row(i)
 		if e != nil {
@@ -230,8 +235,10 @@ func (s *ModularLinearSolver) Add(i uint32, as []unumeral.Int, b *unumeral.Int) 
 	if e := s.open(); e != nil {
 		return e
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	if e := s.beginExecution(); e != nil {
+		return e
+	}
+	defer s.endExecution()
 	if e := linearSourceAssert(i < s.n, 78, "i < n"); e != nil {
 		return e
 	}
@@ -260,8 +267,10 @@ func (s *ModularLinearSolver) Solve(xs []unumeral.Int) (bool, error) {
 	if e := s.open(); e != nil {
 		return false, e
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	if e := s.beginExecution(); e != nil {
+		return false, e
+	}
+	defer s.endExecution()
 	for k := uint32(0); k < s.n; k++ {
 		if e := s.traceIteration(k, 90); e != nil {
 			return false, e
@@ -499,8 +508,10 @@ func (s *ModularLinearSolver) Flush() error {
 	if e := s.open(); e != nil {
 		return e
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	if e := s.beginExecution(); e != nil {
+		return e
+	}
+	defer s.endExecution()
 	return s.flushSource()
 }
 func (s *ModularLinearSolver) SourceFinalize() (err error) {
@@ -520,8 +531,10 @@ func (s *ModularLinearSolver) SourceFinalize() (err error) {
 	if s.sourceCause != nil {
 		return s.sourceCause
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	if e := s.beginExecution(); e != nil {
+		return e
+	}
+	defer s.endExecution()
 	defer func() {
 		if err != nil {
 			s.sourceCause = err
@@ -559,8 +572,10 @@ func (s *ModularLinearSolver) Close() error {
 			return e
 		}
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	if e := s.beginExecution(); e != nil {
+		return e
+	}
+	defer s.endExecution()
 	// Explicit owning continuation releases actual numeral resources after a stopped source destructor.
 	if e := s.cleanupNumericChildren(false); e != nil {
 		return e

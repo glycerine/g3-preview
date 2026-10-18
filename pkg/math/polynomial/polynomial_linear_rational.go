@@ -157,8 +157,10 @@ func (s *RationalLinearSolver) Resize(n uint32) error {
 	if e := s.open(); e != nil {
 		return e
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	if e := s.beginExecution(); e != nil {
+		return e
+	}
+	defer s.endExecution()
 	if s.n == n {
 		return nil
 	}
@@ -185,8 +187,10 @@ func (s *RationalLinearSolver) Reset() error {
 	if e := s.open(); e != nil {
 		return e
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	if e := s.beginExecution(); e != nil {
+		return e
+	}
+	defer s.endExecution()
 	for i := uint32(0); i < s.n; i++ {
 		r, e := s.row(i)
 		if e != nil {
@@ -211,8 +215,10 @@ func (s *RationalLinearSolver) Add(i uint32, as []unumeral.Rational, b *unumeral
 	if e := s.open(); e != nil {
 		return e
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	if e := s.beginExecution(); e != nil {
+		return e
+	}
+	defer s.endExecution()
 	if e := linearSourceAssert(i < s.n, 78, "i < n"); e != nil {
 		return e
 	}
@@ -241,8 +247,10 @@ func (s *RationalLinearSolver) Solve(xs []unumeral.Rational) (bool, error) {
 	if e := s.open(); e != nil {
 		return false, e
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	if e := s.beginExecution(); e != nil {
+		return false, e
+	}
+	defer s.endExecution()
 	for k := uint32(0); k < s.n; k++ {
 		if e := s.traceIteration(k, 90); e != nil {
 			return false, e
@@ -475,8 +483,10 @@ func (s *RationalLinearSolver) Flush() error {
 	if e := s.open(); e != nil {
 		return e
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	if e := s.beginExecution(); e != nil {
+		return e
+	}
+	defer s.endExecution()
 	return s.flushSource()
 }
 func (s *RationalLinearSolver) SourceFinalize() (err error) {
@@ -496,8 +506,10 @@ func (s *RationalLinearSolver) SourceFinalize() (err error) {
 	if s.sourceCause != nil {
 		return s.sourceCause
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	if e := s.beginExecution(); e != nil {
+		return e
+	}
+	defer s.endExecution()
 	defer func() {
 		if err != nil {
 			s.sourceCause = err
@@ -535,8 +547,10 @@ func (s *RationalLinearSolver) Close() error {
 			return e
 		}
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	if e := s.beginExecution(); e != nil {
+		return e
+	}
+	defer s.endExecution()
 	// Explicit owning continuation releases actual numeral resources after a stopped source destructor.
 	if e := s.cleanupNumericChildren(false); e != nil {
 		return e

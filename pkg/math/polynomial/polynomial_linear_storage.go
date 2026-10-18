@@ -16,4 +16,6 @@ type linearStorage struct {
 	flushStage                       uint8
 	flushRow, flushColumn            uint32
 	closing, sourceFinalized, closed bool
+
+	integerBinding, naturalBinding unumeral.NumericCallerBinding
 }

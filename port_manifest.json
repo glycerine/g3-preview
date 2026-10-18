@@ -39697,6 +39697,10 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_linear_borrowed.go",
+        "pkg/util/numeral/numeric_caller_guard.go",
+        "pkg/util/numeral/mpzzp.go",
+        "pkg/util/numeral/mpzzp_context_ops.go",
         "pkg/util/numeral/mpq_test.go",
         "pkg/util/numeral/mpq_ops_test.go",
         "pkg/util/numeral/numeric_caller_operations_extra.go",
@@ -39716,6 +39720,8 @@
         "pkg/math/polynomial/polynomial_linear_assertions.go"
       ],
       "tests": [
+        "TestLinearModularDisplayBorrowsFieldManager",
+        "TestLinearModularNestedDisplayRestoresBorrowedManagers",
         "TestLinearRationalCopyRefusalOwnsExactNumericRoot",
         "TestLinearModularArithmeticOwnsEveryReservationPrefix",
         "TestLinearModularCopyRefusalOwnsExactNumericRoot",
@@ -39799,6 +39805,22 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete linear operations bind borrowed integer/natural/modular managers for actual execution; direct Display and Solve TRACE callbacks cannot destroy managers or replace the borrowed field; nested owners restore exact outer bindings",
+          "status": "platform_replacement",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_linear_borrowed.go",
+            "pkg/util/numeral/numeric_caller_guard.go",
+            "pkg/util/numeral/mpzzp.go",
+            "pkg/util/numeral/mpzzp_context_ops.go"
+          ],
+          "tests": [
+            "TestLinearRationalExecutingOutputRefusesOwnerMutation",
+            "TestLinearModularExecutingOutputRefusesOwnerMutation",
+            "TestLinearModularDisplayBorrowsFieldManager",
+            "TestLinearModularNestedDisplayRestoresBorrowedManagers"
+          ]
+        },
         {
           "name": "Retained unsynchronized rational Copy/Set/Div/SubMul calls transport exact integer allocations and accepted GCD/division RAW receipts; owning solver cleanup releases these before header retirement and preserves foreign replacements",
           "status": "partial",

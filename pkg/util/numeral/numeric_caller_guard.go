@@ -12,6 +12,7 @@ type NumericCallerBinding struct {
 	kind     uint32
 	integer  *IntegerManager
 	natural  *NaturalManager
+	modular  *IntegerModularManager
 }
 
 func (b *NumericCallerBinding) Previous() *NumericCallerBinding {
@@ -58,6 +59,11 @@ func (b *NumericCallerBinding) Unbind() error {
 			return ErrNumericOwner
 		}
 		b.natural.callerBindings = b.previous
+	} else if b.modular != nil {
+		if b.modular.callerBindings != b {
+			return ErrNumericOwner
+		}
+		b.modular.callerBindings = b.previous
 	} else {
 		return ErrNumericOwner
 	}
@@ -78,4 +84,17 @@ func (b *NumericCallerBinding) Kind() uint32 {
 		return 0
 	}
 	return b.kind
+}
+
+func (m *IntegerModularManager) CallerBindings() *NumericCallerBinding { return m.callerBindings }
+func (m *IntegerModularManager) BindCaller(b *NumericCallerBinding, g NumericCallerGuard, kind uint32) error {
+	if e := m.check(); e != nil {
+		return e
+	}
+	if b == nil || g == nil || b.self != nil {
+		return ErrNumericOwner
+	}
+	*b = NumericCallerBinding{self: b, previous: m.callerBindings, guard: g, kind: kind, modular: m}
+	m.callerBindings = b
+	return nil
 }

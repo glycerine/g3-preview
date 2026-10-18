@@ -20,6 +20,7 @@ var ErrModularPowerPending = errors.New("mpnum: modular power raw integer cleanu
 // manager. It is caller-confined; Int operands obey the borrowed manager's
 // implicit ownership contract. Explicit Close replaces the source destructor.
 type IntegerModularManager struct {
+	callerBindings                                     *NumericCallerBinding
 	CallerExecuting                                    func() bool
 	Normalization                                      integerPNormalizeScope
 	self                                               *IntegerModularManager
@@ -218,6 +219,9 @@ func (m *IntegerModularManager) setupPWithAllocationContext(context integerAlloc
 	return m.traceSetupP()
 }
 func (m *IntegerModularManager) SetZ() error {
+	if m != nil && m.self == m && callerBindingsExecuting(m.callerBindings) {
+		return ErrNumericPending
+	}
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -228,6 +232,9 @@ func (m *IntegerModularManager) SetZP(p *Int) error {
 	return m.setZPWithAllocationContext(p, integerAllocationInvocationContext{})
 }
 func (m *IntegerModularManager) setZPWithAllocationContext(p *Int, context integerAllocationInvocationContext) error {
+	if m != nil && m.self == m && callerBindingsExecuting(m.callerBindings) {
+		return ErrNumericPending
+	}
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -240,6 +247,9 @@ func (m *IntegerModularManager) setZPWithAllocationContext(p *Int, context integ
 	return m.setupPWithAllocationContext(context)
 }
 func (m *IntegerModularManager) SetZPUint64(p uint64) error {
+	if m != nil && m.self == m && callerBindingsExecuting(m.callerBindings) {
+		return ErrNumericPending
+	}
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -255,6 +265,9 @@ func (m *IntegerModularManager) SetPSquare() error {
 	return m.setPSquareWithAllocationContext(integerAllocationInvocationContext{})
 }
 func (m *IntegerModularManager) SetZPSwap(p *Int) error {
+	if m != nil && m.self == m && callerBindingsExecuting(m.callerBindings) {
+		return ErrNumericPending
+	}
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -655,7 +668,7 @@ func (m *IntegerModularManager) BorrowedModulus() (*Int, error) {
 // src/util/mpzzp.h:97-105. A returning transport must not end the actual
 // modular owner while its registered source/NUM-destructor caller is executing.
 func (m *IntegerModularManager) numericCallerExecuting() bool {
-	return m != nil && m.self == m && m.CallerExecuting != nil && m.CallerExecuting()
+	return m != nil && m.self == m && (m.CallerExecuting != nil && m.CallerExecuting() || callerBindingsExecuting(m.callerBindings))
 }
 
 // IsPerfectSquareWithReceipt issues a receipt only when the six source RAW numerals are reached.

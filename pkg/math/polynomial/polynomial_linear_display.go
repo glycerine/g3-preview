@@ -30,8 +30,10 @@ func (s *RationalLinearSolver) Display(out io.Writer) error {
 	if e := s.open(); e != nil {
 		return e
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	if e := s.beginExecution(); e != nil {
+		return e
+	}
+	defer s.endExecution()
 	return s.displaySource(out)
 }
 func (s *RationalLinearSolver) displaySource(out io.Writer) error {
@@ -90,8 +92,10 @@ func (s *ModularLinearSolver) Display(out io.Writer) error {
 	if e := s.open(); e != nil {
 		return e
 	}
-	s.running = true
-	defer func() { s.running = false }()
+	if e := s.beginExecution(); e != nil {
+		return e
+	}
+	defer s.endExecution()
 	return s.displaySource(out)
 }
 func (s *ModularLinearSolver) displaySource(out io.Writer) error {
