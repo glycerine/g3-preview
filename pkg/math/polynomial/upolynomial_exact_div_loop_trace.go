@@ -25,6 +25,9 @@ func (r *upolyDisplayInvocationReceipt) cleanupOwned() error {
 	if m.pendingModGCDTrace == r && !m.displayReceiptPending(r) {
 		m.pendingModGCDTrace = nil
 	}
+	if m.pendingEuclidTrace == r && !m.displayReceiptPending(r) {
+		m.pendingEuclidTrace = nil
+	}
 	return nil
 }
 func (c integerAllocationInvocationContext) exactDivTraceSlot(m *UPolynomialManager) *upolyDisplayInvocationReceipt {

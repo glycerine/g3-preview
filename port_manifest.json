@@ -50794,7 +50794,9 @@
         "pkg/math/polynomial/upolynomial_modular_gcd_entry_trace.go",
         "pkg/math/polynomial/upolynomial_modular_gcd_entry_trace_test.go",
         "pkg/math/polynomial/upolynomial_modular_gcd_trace_scalars.go",
-        "pkg/math/polynomial/upolynomial_modular_gcd_display_trace_test.go"
+        "pkg/math/polynomial/upolynomial_modular_gcd_display_trace_test.go",
+        "pkg/math/polynomial/upolynomial_euclid_display_trace.go",
+        "pkg/math/polynomial/upolynomial_euclid_display_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51080,7 +51082,10 @@
         "TestUPolynomialModularGCDEntryRetainsActualFactorFrontend",
         "TestUPolynomialModularGCDLaterDisplayReceipts",
         "TestUPolynomialModularGCDLaterDisplayRecords",
-        "TestUPolynomialModularGCDLaterDisplayRetainsFactorFrontend"
+        "TestUPolynomialModularGCDLaterDisplayRetainsFactorFrontend",
+        "TestUPolynomialEuclidPolynomialRecords",
+        "TestUPolynomialEuclidDisplayReceipts",
+        "TestUPolynomialEuclidDisplayRetainsActualFactorFallback"
       ],
       "conditionals": [
         {
@@ -51669,6 +51674,28 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Euclidean GCD loop/result polynomial records and exact caller cleanup (upolynomial.cpp:836,847-848)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_euclid_display_trace.go",
+            "pkg/math/polynomial/upolynomial_euclid_display_trace_test.go",
+            "pkg/math/polynomial/upolynomial_euclid_pointer_trace_test.go",
+            "pkg/math/polynomial/upolynomial_gcd.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/upolynomial_factor_frontend_invocation.go",
+            "pkg/math/polynomial/upolynomial_modular_gcd_trace_scalars.go",
+            "pkg/math/polynomial/upolynomial_exact_div_loop_trace.go"
+          ],
+          "tests": [
+            "TestUPolynomialEuclidPolynomialRecords",
+            "TestUPolynomialEuclidDisplayReceipts",
+            "TestUPolynomialEuclidDisplayRetainsActualFactorFallback",
+            "TestUPolynomialEuclidPointerTrace"
+          ],
+          "notes": "Actual ordinary display (spaces, not stars) in every Euclidean loop including empty-B iteration, and input/result displays after normalized final swap/monic-or-sign handling. Whole-record borrowing, sticky output evaluation and exact default/frontend accepted receipts. Pending Euclidean displays block new work/source retirement, protect older default modular-GCD NUMs and frontend image/modular-GCD source scopes; owning frontend cleanup finishes its receipt before older objects. Default cleanup cannot adopt frontend/reused independent display receipts. Independent numerical/record oracles and actual descriptor-quota BIG loop/terminal failures verify output publication and stale cleanup. Public Factor on (1+P*x)^2 with P the product of every retained prime forces all231 actual bad images and reaches real Euclidean fallback, retaining six older frontend NUMs on display failure. Broader numerical failure inventories/source-unit audits remain partial."
+        },
         {
           "name": "Modular GCD image/combined/candidate/result displays and lexical NUM stop (upolynomial.cpp:772,792,796,806)",
           "status": "ported",

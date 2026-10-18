@@ -242,15 +242,22 @@ func (m *UPolynomialManager) euclidGCDWithSourceContext(a, b UPolynomialView, ou
 		return e
 	}
 	for {
+		if e = m.traceEuclidPolynomials(836, a, b, out, context); e != nil {
+			return e
+		}
 		if B.size == 0 {
 			if e = m.normalizeEuclidWithSourceContext(m.stateView(A), context); e != nil {
 				return e
 			}
 			*out, *A = *A, *out
 			if field {
-				return m.monicLocalWithSourceContext(m.stateView(out), context)
+				if e = m.monicLocalWithSourceContext(m.stateView(out), context); e != nil {
+					return e
+				}
+			} else if e = m.flipSign(out); e != nil {
+				return e
 			}
-			return m.flipSign(out)
+			return m.traceEuclidPolynomials(847, a, b, out, context)
 		}
 		var d uint32
 		if e = m.remStateWithSourceContext(m.stateView(A), m.stateView(B), &d, out, context); e != nil {

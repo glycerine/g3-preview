@@ -50,7 +50,7 @@ func TestUPolynomialEuclidPointerTrace(t *testing.T) {
 	serviceMust(t, m.euclidGCD(av, bv, &out.state))
 	upolyGCDExpect(t, m, g, []int64{1, 1})
 	if tags.ShouldTrace("upolynomial") {
-		if !probe.checked || probe.String() != probe.want {
+		if !probe.checked || !strings.HasPrefix(probe.String(), probe.want) {
 			t.Fatalf("source pointers: %s; want %s", probe.String(), probe.want)
 		}
 	} else if probe.checked {

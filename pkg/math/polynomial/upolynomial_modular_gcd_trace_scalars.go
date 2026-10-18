@@ -17,7 +17,10 @@ type upolyModGCDTraceScalars struct {
 
 func (q *upolyModGCDTraceScalars) finish(m *UPolynomialManager, body error) error {
 	q.bodyCause = body
-	q.sourceCause = m.modGCDTrace.sourceBlocker()
+	q.sourceCause = m.euclidTrace.sourceBlocker()
+	if q.sourceCause == nil {
+		q.sourceCause = m.modGCDTrace.sourceBlocker()
+	}
 	if q.sourceCause == nil && m.pendingCRATrace != nil && m.pendingCRATrace.pending() {
 		q.sourceCause = m.pendingCRATrace.sourceFailure()
 		if q.sourceCause == nil {
@@ -59,6 +62,9 @@ func (m *UPolynomialManager) CleanupModularGCDTrace() error {
 		return ErrUPolynomialCleanupPending
 	}
 	if m.pendingExactDivTrace != nil && m.displayReceiptPending(m.pendingExactDivTrace) {
+		return ErrUPolynomialCleanupPending
+	}
+	if m.pendingEuclidTrace != nil && m.displayReceiptPending(m.pendingEuclidTrace) {
 		return ErrUPolynomialCleanupPending
 	}
 	q := &m.modGCDScalars

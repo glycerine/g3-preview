@@ -14,6 +14,7 @@ type upolyFactorFrontendInvocationReceipt struct {
 	history    *upolyFactorFrontendHistory
 }
 type upolyFactorFrontendHistory struct {
+	euclidTrace                                                                       upolyDisplayInvocationReceipt
 	modGCDTrace                                                                       upolyDisplayInvocationReceipt
 	exactTrace                                                                        upolyDisplayInvocationReceipt
 	perfectSquare                                                                     unumeral.IntegerPerfectSquareInvocationReceipt
@@ -184,6 +185,7 @@ type upolyFactorFlipScope struct {
 }
 
 type upolyFactorFrontendScope struct {
+	euclidTrace     upolyDisplayInvocationReceipt
 	modGCDTrace     upolyDisplayInvocationReceipt
 	exactTrace      upolyDisplayInvocationReceipt
 	perfectSquare   unumeral.IntegerPerfectSquareInvocationReceipt
@@ -280,6 +282,9 @@ func (q *upolyFactorFrontendScope) finish(body error) error {
 		q.bodyCause = body
 	}
 	if q.sourceCause == nil {
+		q.sourceCause = q.euclidTrace.sourceBlocker()
+	}
+	if q.sourceCause == nil {
 		q.sourceCause = q.modGCDTrace.sourceBlocker()
 	}
 	if q.sourceCause == nil {
@@ -359,6 +364,9 @@ func (q *upolyFactorFrontendScope) own(abort bool) (cause error) {
 		q.recordHistory()
 	}()
 	if e := q.cra.trace.cleanup(); e != nil {
+		return e
+	}
+	if e := q.euclidTrace.cleanupOwned(); e != nil {
 		return e
 	}
 	if e := q.modGCDTrace.cleanupOwned(); e != nil {
@@ -486,6 +494,9 @@ func (q *upolyFactorFrontendScope) own(abort bool) (cause error) {
 // Retention is decided from exact captured child tuples and directly stamped
 // leaves; a nil square-free class frame does not imply diagnostic completion.
 func (q *upolyFactorFrontendScope) hasUnjoined() bool {
+	if q.service.manager.displayReceiptPending(&q.euclidTrace) {
+		return true
+	}
 	if q.service.manager.displayReceiptPending(&q.modGCDTrace) {
 		return true
 	}
@@ -545,6 +556,7 @@ func (q *upolyFactorFrontendScope) recordHistory() {
 	if h == nil || h.self != h || h.service != q.service || h.invocation != q.invocation || h.header == 0 {
 		return
 	}
+	h.euclidTrace = q.euclidTrace
 	h.modGCDTrace = q.modGCDTrace
 	h.exactTrace = q.exactTrace
 	h.perfectSquare = q.perfectSquare
@@ -639,6 +651,9 @@ func (q *upolyFactorModularGCDScope) finish(body error) error {
 	defer func() { q.sourceExecuting = false }()
 	if q.bodyCause == nil {
 		q.bodyCause = body
+	}
+	if q.sourceCause == nil {
+		q.sourceCause = q.owner.euclidTrace.sourceBlocker()
 	}
 	if q.sourceCause != nil {
 		return errors.Join(q.bodyCause, q.sourceCause)
@@ -754,6 +769,9 @@ func (q *upolyFactorImageScope) finish(body error) error {
 	defer func() { q.sourceExecuting = false }()
 	if q.bodyCause == nil {
 		q.bodyCause = body
+	}
+	if q.sourceCause == nil {
+		q.sourceCause = q.owner.euclidTrace.sourceBlocker()
 	}
 	if q.sourceCause != nil {
 		return errors.Join(q.bodyCause, q.sourceCause)
