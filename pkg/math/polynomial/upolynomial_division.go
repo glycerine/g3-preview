@@ -18,13 +18,19 @@ func (m *UPolynomialManager) divScalarWithHensel(v UPolynomialView, b *unumeral.
 	return m.divScalarWithSourceContext(v, b, context)
 }
 func (m *UPolynomialManager) divScalarWithSourceContext(v UPolynomialView, b *unumeral.Int, context integerAllocationInvocationContext) error {
-	if polynomialSourceDebug {
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled {
 		zero, e := m.modular.IsZero(b)
 		if e != nil {
 			return e
 		}
 		if zero {
-			return ErrUPolynomialAssertion
+			if e := m.scalarDivisionAssertionFailure(404, "!m().is_zero(b)"); e != nil {
+				return e
+			}
 		}
 	}
 	one, e := m.modular.IsOne(b)
@@ -36,13 +42,19 @@ func (m *UPolynomialManager) divScalarWithSourceContext(v UPolynomialView, b *un
 		if e != nil {
 			return e
 		}
-		if polynomialSourceDebug {
+		enabled, e = refinementSourceAssertionsEnabled()
+		if e != nil {
+			return e
+		}
+		if enabled {
 			ok, e := numericIntegerModularManager_dividesWithHenselContext(m.modular, b, x, context)
 			if e != nil {
 				return e
 			}
 			if !ok {
-				return ErrUPolynomialAssertion
+				if e := m.scalarDivisionAssertionFailure(409, "m().divides(b, p[i])"); e != nil {
+					return e
+				}
 			}
 		}
 		if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Div(x, b, x); e != nil {

@@ -50752,7 +50752,9 @@
         "pkg/math/polynomial/upolynomial_factors_display.go",
         "pkg/math/polynomial/upolynomial_factors_display_test.go",
         "pkg/math/polynomial/upolynomial_exception.go",
-        "pkg/math/polynomial/upolynomial_exception_test.go"
+        "pkg/math/polynomial/upolynomial_exception_test.go",
+        "pkg/math/polynomial/upolynomial_division_assertions.go",
+        "pkg/math/polynomial/upolynomial_division_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -50962,7 +50964,10 @@
         "TestUPolynomialNativeIsolationStacksAndNumericTransfer",
         "TestUPolynomialFactorsDisplaySourceOrderAndCallbacks",
         "TestUPolynomialFactorsDisplayExactPendingChildAndForeignReplacement",
-        "TestUPolynomialCheckpointSourceExceptionAndCooperationOrder"
+        "TestUPolynomialCheckpointSourceExceptionAndCooperationOrder",
+        "TestUPolynomialScalarDivisionAssertionCoefficientFrontiers",
+        "TestUPolynomialScalarDivisionZeroThrowAndClosedRuntimeSwitch",
+        "TestUPolynomialHenselPairPreconditionSourceActions"
       ],
       "conditionals": [
         {
@@ -51551,6 +51556,23 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Scalar division zero/divisibility SASSERT runtime operand gates and per-coefficient Throw/Continue (404,409)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_division.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_division_assertions.go",
+            "pkg/math/polynomial/upolynomial_division_assertions_test.go",
+            "pkg/math/polynomial/upolynomial_gcd_source_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialScalarDivisionAssertionCoefficientFrontiers",
+            "TestUPolynomialScalarDivisionZeroThrowAndClosedRuntimeSwitch",
+            "TestUPolynomialHenselPairPreconditionSourceActions",
+            "TestUPolynomialGCDChainImmediateFailureRoots"
+          ],
+          "notes": "The runtime switch precedes zero and divisibility operands, including each reached coefficient check. Continue divides the current coefficient; a later Throw preserves the already-published prefix. Actual [3,5]/2 tests verify Throw [3,5], Continue-then-Throw [1,5], and Continue/disabled/release [1,2]. Closed switch owner stops before division, and zero-divisor Throw preserves input. Actual receiving manager/numeric owners are borrowed during debugger actions. Existing GCD fault-prefix test now supplies real Throw responses for its deliberately non-exact scalar inputs, rather than relying on a fixed debug error. Numerical division remains the existing source algorithm, including negative Euclidean rounding (mpz.h468ff). CTRACE408 and broader scalar/lifetime/unit audits remain open; no whole-method/unit completion credit."
+        },
         {
           "name": "checkpoint canceled source exception class and message before cooperation (159)",
           "status": "ported",
@@ -53163,7 +53185,8 @@
         "pkg/math/polynomial/upolynomial_berlekamp_assertions_test.go",
         "pkg/math/polynomial/upolynomial_exception.go",
         "pkg/math/polynomial/upolynomial_exception_test.go",
-        "pkg/math/polynomial/upolynomial_factorization_field_source_test.go"
+        "pkg/math/polynomial/upolynomial_factorization_field_source_test.go",
+        "pkg/math/polynomial/upolynomial_hensel_precondition_assertions_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53309,7 +53332,10 @@
         "TestUPolynomialBerlekampNextClosedAssertionSwitchBeforeResize",
         "TestUPolynomialBerlekampEntryAssertionActionsAndPublication",
         "TestUPolynomialBerlekampDisabledAssertionsSkipEmptyLeadingRead",
-        "TestUPolynomialFactorBerlekampEmptyReleaseAndDebug"
+        "TestUPolynomialFactorBerlekampEmptyReleaseAndDebug",
+        "TestUPolynomialSquareFreeEntryAssertionConstantPublication",
+        "TestUPolynomialSquareFreeClosedAssertionSwitchBeforeConstantCopy",
+        "TestUPolynomialHenselPairPreconditionSourceActions"
       ],
       "conditionals": [
         {
@@ -53422,6 +53448,22 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Square-free and two-factor Hensel entry SASSERT runtime actions/short circuit before publication (262,604,605)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_field.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_hensel.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_assertions_test.go",
+            "pkg/math/polynomial/upolynomial_hensel_precondition_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialSquareFreeEntryAssertionConstantPublication",
+            "TestUPolynomialSquareFreeClosedAssertionSwitchBeforeConstantCopy",
+            "TestUPolynomialHenselPairPreconditionSourceActions"
+          ],
+          "notes": "Replaces fixed debug errors with actual per-site runtime gates and debugger Throw/Continue. Square-free constant input proves Throw preserves the old factor collection/constant, while Continue/disabled/release reaches the source constant update without altering older factors. The two Hensel predicates now read separate switches and preserve their literal degree and && order. Real public pair calls test Throw before output publication and Continue/disabled/release arithmetic, including the source Euclidean negative-division rule. All test vectors/scopes are actually constructed; no construction count or numerical scratch repair. Shared scalar-division assertion gates are audited separately so runtime-disabled continuation does not stop at a stale compiled-only guard. Other checks/diagnostics and whole-unit audits remain open."
+        },
         {
           "name": "Berlekamp null-vector and factor entry/tail project SASSERT runtime actions and operand gating (209,409,415,506)",
           "status": "ported",

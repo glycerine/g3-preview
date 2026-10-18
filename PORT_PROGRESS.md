@@ -45469,3 +45469,36 @@ CPUs8-16. portcheck and diff checks pass:2103 units,677 APIs;211 ported,
 340 partial,1495 unported,11 dead/deleted. The hourly full native suite is due
 and will run against this committed increment, with its terminal result tracked
 separately rather than inferred from these focused checks.
+
+2026-10-18: square-free/Hensel/scalar-division runtime assertion gates
+
+Implemented source SASSERT behavior at factorization.cpp:262,604,605 and
+upolynomial.cpp:404,409. The square-free constant case verifies Throw preserves
+the older factor/constant and Continue/disabled/release reaches the actual
+constant update. Hensel's two precondition predicates read separate runtime
+switches and preserve source short circuit/order before output publication.
+
+Those public Hensel tests exposed a deeper compiled-only scalar divisibility
+check that still stopped runtime-disabled continuation. Scalar division now
+reads the actual gate before zero/divisibility operands, including each reached
+coefficient. [3,5]/2 verifies Throw keeps [3,5], Continue then Throw leaves [1,5],
+and Continue/disabled/release produces [1,2]. Closed switch owner stops before
+division, and zero-divisor Throw preserves input. Actual receiving owners are
+borrowed across debugger actions. Existing GCD fault-prefix tests now supply
+real Throw actions for deliberately non-exact scalar inputs.
+
+The Hensel continuation oracle uses the existing source mpz::div Euclidean
+negative rounding (mpz.h468ff): in the bad-degree case f=-x^2, T=-x and the
+continued B_lifted=1-2*x. No numeral arithmetic algorithm, construction count,
+source scratch or quota is rewritten to make these cases pass.
+Focused checked/debug/trace cases plus GCD fault prefixes pass0.226s. Broader
+arithmetic/GCD/Hensel/factorization checks pass ordinary16.930s and checked/
+debug/trace29.043s, CPUs8-16.
+
+The hourly native run started atabd26237 has completed:68 packages pass,11 have
+no tests,zero failures (polynomial94.389s,LP693.029s). It predates this increment;
+these latest changes have the focused verification above. Other assertion/
+diagnostic sites (including scalar CTRACE408) and broader source-unit audits
+remain open. Whole polynomial then AST remain unfinished.
+portcheck and diff checks pass:2103 units,677 APIs;211 ported,340 partial,
+1495 unported,11 dead/deleted. No whole source-unit status changed.

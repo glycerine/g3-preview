@@ -232,3 +232,73 @@ func TestUPolynomialBerlekampDisabledAssertionsSkipEmptyLeadingRead(t *testing.T
 		t.Fatal("disabled source assertions did not reach literal empty/tail continuation", result, count)
 	}
 }
+
+func TestUPolynomialSquareFreeEntryAssertionConstantPublication(t *testing.T) {
+	for _, action := range []string{"T", "C", "disabled"} {
+		t.Run(action, func(t *testing.T) {
+			m, _, _ := upolySourceOwner(t)
+			five := unumeral.NewInt(5)
+			serviceMust(t, m.SetZP(&five))
+			f := upolySourceNew(t, m, []int32{2})
+			old := upolySourceNew(t, m, []int32{1, 1})
+			fs, e := m.NewFactors()
+			serviceMust(t, e)
+			t.Cleanup(func() { serviceMust(t, fs.Close()) })
+			serviceMust(t, fs.PushCopy(mustUPolyView(t, m, old), 1))
+			choice := action
+			if action == "disabled" {
+				choice = ""
+			}
+			polynomialAssertionActionsFixture(t, choice)
+			if polynomialSourceDebug && action == "disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+			}
+			e = m.SquareFreeFactorZP(mustUPolyView(t, m, f), fs)
+			expected := int64(2)
+			if polynomialSourceDebug && action == "T" {
+				if !errors.Is(e, ErrUPolynomialAssertion) || !linearThrownAssertion(e) {
+					t.Fatal("square-free source Throw", e)
+				}
+				expected = 1
+			} else {
+				serviceMust(t, e)
+			}
+			count, e := fs.DistinctFactors()
+			serviceMust(t, e)
+			constant, e := m.config.Integer.Int64(&fs.constant)
+			serviceMust(t, e)
+			if count != 1 || constant != expected {
+				t.Fatal("source constant/factor publication frontier", count, constant, expected)
+			}
+			factor, e := fs.FactorView(0)
+			serviceMust(t, e)
+			same, e := m.EqualViews(factor, mustUPolyView(t, m, old))
+			serviceMust(t, e)
+			if !same {
+				t.Fatal("older factor changed")
+			}
+			if m.factorTrace != nil {
+				t.Fatal("square-free entry retained assertion borrow")
+			}
+		})
+	}
+}
+func TestUPolynomialSquareFreeClosedAssertionSwitchBeforeConstantCopy(t *testing.T) {
+	if !polynomialSourceDebug {
+		t.Skip("source assertion erased")
+	}
+	m, _, _ := upolySourceOwner(t)
+	five := unumeral.NewInt(5)
+	serviceMust(t, m.SetZP(&five))
+	f := upolySourceNew(t, m, []int32{1, 1})
+	fs, e := m.NewFactors()
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, fs.Close()) })
+	before := m.config.Integer.Budget().Used()
+	polynomialAssertionActionsFixture(t, "")
+	serviceMust(t, diagnostic.BorrowProcessDebugContext().Close())
+	e = m.SquareFreeFactorZP(mustUPolyView(t, m, f), fs)
+	if !errors.Is(e, arena.ErrClosed) || fs.count != 0 || m.config.Integer.Budget().Used() != before {
+		t.Fatal("valid predicate bypassed closed switch before copy", e, fs.count)
+	}
+}

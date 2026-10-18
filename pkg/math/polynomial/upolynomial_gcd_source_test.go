@@ -4,6 +4,7 @@ import (
 	"errors"
 	"math/big"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
@@ -345,6 +346,8 @@ func TestUPolynomialGCDRegisteredFirstDerivativeExample(t *testing.T) {
 }
 
 func TestUPolynomialGCDChainImmediateFailureRoots(t *testing.T) {
+	// Non-exact scalar division intentionally reaches the real source debugger.
+	polynomialAssertionActionsFixture(t, strings.Repeat("T", 48))
 	for op := 0; op < 12; op++ {
 		for fail := int64(0); fail < 48; fail++ {
 			m, q, b := upolySourceOwner(t)

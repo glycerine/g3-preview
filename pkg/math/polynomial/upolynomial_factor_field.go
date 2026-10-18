@@ -490,9 +490,16 @@ func (m *UPolynomialManager) squareFreeFactorZP(f UPolynomialView, fs *UPolynomi
 	var divTmp, t0, t0d, t, v, w, a upolyVectorState
 	defer m.dropLocalVector(&divTmp)
 	defer m.dropLocalVector(&t0)
-	if polynomialSourceDebug && f.count <= 1 {
-		return ErrUPolynomialAssertion
+	enabled, e := factorHeaderAssertionsEnabled()
+	if e != nil {
+		return e
 	}
+	if enabled && !(f.count > 1) {
+		if e := m.factorizationAssertionFailure(262, "f.size() > 1"); e != nil {
+			return e
+		}
+	}
+
 	if e = m.setView(&t0, f); e != nil {
 		return e
 	}

@@ -161,9 +161,22 @@ func (s *UPolynomialFactorizationService) henselPairWithCaller(a, b, r *unumeral
 	if e = rm.modular.WithAllocationContext((numericIntegerModularManager_henselPairAllocationContext(rm.modular, &receipt)).utility(rm.modular.Integers())).SetZP(r); e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
-		if upolyViewDegree(h.borrowedInput(4)) != upolyViewDegree(h.borrowedInput(1))+upolyViewDegree(h.borrowedInput(3)) || upolyViewDegree(h.borrowedInput(0)) >= upolyViewDegree(h.borrowedInput(3)) || upolyViewDegree(h.borrowedInput(2)) >= upolyViewDegree(h.borrowedInput(1)) {
-			return ErrUPolynomialAssertion
+	enabled, e := factorHeaderAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled && !(upolyViewDegree(h.borrowedInput(4)) == upolyViewDegree(h.borrowedInput(1))+upolyViewDegree(h.borrowedInput(3))) {
+		if e := m.factorizationAssertionFailure(604, "upm.degree(C) == upm.degree(A) + upm.degree(B)"); e != nil {
+			return e
+		}
+	}
+	enabled, e = factorHeaderAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled && !(upolyViewDegree(h.borrowedInput(0)) < upolyViewDegree(h.borrowedInput(3)) && upolyViewDegree(h.borrowedInput(2)) < upolyViewDegree(h.borrowedInput(1))) {
+		if e := m.factorizationAssertionFailure(605, "upm.degree(U) < upm.degree(B) && upm.degree(V) < upm.degree(A)"); e != nil {
+			return e
 		}
 	}
 	h.constructed = 2
