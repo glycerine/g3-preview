@@ -39697,6 +39697,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_linear_numeric_owner_test.go",
         "pkg/math/polynomial/polynomial_linear_rational.go",
         "pkg/math/polynomial/polynomial_linear_modular.go",
         "pkg/math/polynomial/polynomial_linear_storage.go",
@@ -39710,6 +39711,8 @@
         "pkg/math/polynomial/polynomial_linear_assertions.go"
       ],
       "tests": [
+        "TestLinearModularCopyRefusalOwnsExactNumericRoot",
+        "TestLinearModularCopyContextInactiveDuringSolveTrace",
         "TestLinearRationalSourceDisplaySpacingAndOrder",
         "TestLinearModularSourceDisplayUsesUnderlyingInteger",
         "TestLinearSourceDisplayStoppedWriterBeforeRHSRead",
@@ -39789,6 +39792,16 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete modular RHS/coefficient/solution Copy calls use exact primitive allocation context with per-copy epoch and executing-leaf guard; owning Close cleans only acquired roots and preserves foreign replacement",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_linear_modular.go",
+          "tests": [
+            "TestLinearModularCopyRefusalOwnsExactNumericRoot",
+            "TestLinearModularCopyContextInactiveDuringSolveTrace",
+            "TestLinearNativeOutputCopyEveryRefusalPrefix"
+          ]
+        },
         {
           "name": "Concrete rational/modular constructor, resize/reset/add/solve/flush on native typed matrix/RHS slices; actual numeral destruction and separate owning continuation",
           "status": "ported",

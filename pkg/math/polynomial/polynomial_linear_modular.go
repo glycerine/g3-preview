@@ -16,6 +16,11 @@ type ModularLinearSolver struct {
 	linearStorage
 	A [][]unumeral.Int
 	b []unumeral.Int
+
+	copyRoots      unumeral.NumericAllocationRoots
+	copyHooks      unumeral.NumericInvocationHooks
+	copyGeneration uint64
+	copyExecuting  bool
 }
 
 func modularLinearConstructorGuard(m *unumeral.IntegerModularManager) error {
@@ -76,6 +81,9 @@ func (s *ModularLinearSolver) open() error {
 	if s.sourceCause != nil {
 		return s.sourceCause
 	}
+	if unumeral.NumericAllocationPending(&s.copyRoots) {
+		return ErrPolynomialPending
+	}
 	return nil
 }
 func (s *ModularLinearSolver) row(i uint32) (*[]unumeral.Int, error) {
@@ -110,7 +118,7 @@ func (s *ModularLinearSolver) copyInto(v *[]unumeral.Int, i uint32, a *unumeral.
 	if _, e := s.load(v, i); e != nil {
 		return e
 	}
-	return s.manager.Copy(&(*v)[i], a)
+	return s.copyWithRoots(&(*v)[i], a)
 }
 func (s *ModularLinearSolver) setInto(v *[]unumeral.Int, i uint32, value int64) error {
 	if _, e := s.load(v, i); e != nil {
@@ -388,7 +396,7 @@ func (s *ModularLinearSolver) Solve(xs []unumeral.Int) (bool, error) {
 		if uint64(k) >= uint64(len(xs)) {
 			return false, arena.ErrBounds
 		}
-		if e = s.manager.Copy(&xs[k], &s.b[k]); e != nil {
+		if e = s.copyWithRoots(&xs[k], &s.b[k]); e != nil {
 			return false, e
 		}
 
@@ -547,9 +555,45 @@ func (s *ModularLinearSolver) Close() error {
 			return e
 		}
 	}
+	if e := s.copyRoots.Cleanup(s.integer); e != nil {
+		return e
+	}
 	s.A, s.b = nil, nil
 	s.integer.Budget().Release(s.header)
 	s.header = 0
 	s.closed = true
 	return nil
+}
+
+// Copy uses the primitive caller context, so only the actual numerical call's
+// acquisition enters this owner. Reused hook storage carries a fresh epoch.
+func (s *ModularLinearSolver) copyWithRoots(dst, src *unumeral.Int) error {
+	if !s.running || s.copyExecuting {
+		return ErrPolynomialPending
+	}
+	s.copyExecuting = true
+	defer func() { s.copyExecuting = false }()
+	if s.copyGeneration == ^uint64(0) {
+		return ErrPolynomialPending
+	}
+	s.copyGeneration++
+	s.copyHooks.Policy = s
+	s.copyHooks.Generation = s.copyGeneration
+	context := unumeral.NumericAllocationContext{}.WithCaller(&s.copyHooks)
+	return s.manager.WithAllocationContext(context).Copy(dst, src)
+}
+func (s *ModularLinearSolver) NumericBound(executing bool) bool {
+	return s != nil && s.self == s && s.manager != nil && s.copyGeneration != 0 && s.copyHooks.Generation == s.copyGeneration && !s.closed && (!executing || (s.running && s.copyExecuting))
+}
+func (s *ModularLinearSolver) NumericRoots(z *unumeral.IntegerManager, local *unumeral.NumericAllocationRoots) *unumeral.NumericAllocationRoots {
+	if !s.NumericBound(true) || s.integer != z {
+		return nil
+	}
+	if local != nil {
+		return local
+	}
+	return &s.copyRoots
+}
+func (s *ModularLinearSolver) NumericModularOwner(m *unumeral.IntegerModularManager) bool {
+	return s.NumericBound(true) && s.manager == m
 }
