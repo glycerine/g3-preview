@@ -3,6 +3,7 @@ package polynomial
 
 import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	"io"
 )
 
 // modularImage implements the lexical scoped_set_zp body. The old modulus
@@ -70,10 +71,10 @@ func (m *UPolynomialManager) modularImageWithSourceContext(u, v, q *upolyVectorS
 		vd = V.size - 1
 	}
 	if ud < du {
-		return true, nil
+		return true, m.traceModGCDLiteral(758, "bad prime, leading coefficient vanished\n")
 	}
 	if vd < dv {
-		return true, nil
+		return true, m.traceModGCDLiteral(762, "bad prime, leading coefficient vanished\n")
 	}
 	if e = m.euclidGCDWithSourceContext(m.stateView(U), m.stateView(V), q, context); e != nil {
 		return false, e
@@ -375,6 +376,9 @@ func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, o
 			return e
 		}
 		if q.size <= 1 {
+			if e = m.traceModGCDLiteral(774, "done, modular gcd is one\n"); e != nil {
+				return e
+			}
 			if e = m.reset(out); e != nil {
 				return e
 			}
@@ -401,6 +405,11 @@ func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, o
 			}
 		}
 		if discard {
+			if i != 0 {
+				if e = m.traceModGCDLiteral(786, "discarding image\n"); e != nil {
+					return e
+				}
+			}
 			if e = m.setViewWithSourceContext(C, m.stateView(q), context); e != nil {
 				return e
 			}
@@ -445,6 +454,9 @@ func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, o
 			}
 		}
 		if ok {
+			if e = m.traceModGCDLiteral(802, "found GCD\n"); e != nil {
+				return e
+			}
 			if e = m.mulScalarStateWithSourceContext(q, cg, context); e != nil {
 				return e
 			}
@@ -491,4 +503,23 @@ func (m *UPolynomialManager) GCD(a, b, g UPolynomial) error {
 		return e
 	}
 	return m.GCDViews(av, bv, g)
+}
+
+// Literal records require no numeral insertion child, but borrow the actual
+// receiving managers throughout header, body and footer callbacks.
+func (m *UPolynomialManager) traceModGCDLiteral(line int, text string) error {
+	tags := m.modular.BorrowTraceTags()
+	if !tags.ShouldTrace("mgcd") {
+		return nil
+	}
+	var borrow upolyFactorTraceBorrow
+	if e := borrow.bindManagers([3]*UPolynomialManager{m}, tags); e != nil {
+		return e
+	}
+	defer borrow.unbind()
+	_ = tags.EmitConditional("mgcd", "mod_gcd", "src/math/polynomial/upolynomial.cpp", line, func() bool { return true }, func(raw io.Writer) error {
+		_ = linearWriteText(factorizationTraceWriter{raw}, text)
+		return nil
+	})
+	return nil
 }

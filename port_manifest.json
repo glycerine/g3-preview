@@ -50787,7 +50787,8 @@
         "pkg/math/polynomial/upolynomial_transform_assertions_test.go",
         "pkg/math/polynomial/upolynomial_sturm_sign_assertions_test.go",
         "pkg/math/polynomial/upolynomial_cra_trace.go",
-        "pkg/math/polynomial/upolynomial_cra_trace_test.go"
+        "pkg/math/polynomial/upolynomial_cra_trace_test.go",
+        "pkg/math/polynomial/upolynomial_modular_gcd_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51063,7 +51064,9 @@
         "TestUPolynomialCRATraceRecordsAndStickyStream",
         "TestUPolynomialCRATraceSourceFrontiersAndBorrow",
         "TestUPolynomialCRATraceActualInsertionReadGuard",
-        "TestUPolynomialCRATracePublicFactorSourceStop"
+        "TestUPolynomialCRATracePublicFactorSourceStop",
+        "TestUPolynomialModularGCDLiteralTrace",
+        "TestUPolynomialModularGCDBadPrimeTraceBorrow"
       ],
       "conditionals": [
         {
@@ -51652,6 +51655,19 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Modular GCD literal branch records (upolynomial.cpp:758,762,774,786,802)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_gcd_modular.go",
+            "pkg/math/polynomial/upolynomial_modular_gcd_trace_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialModularGCDLiteralTrace",
+            "TestUPolynomialModularGCDBadPrimeTraceBorrow"
+          ],
+          "notes": "Exact mgcd/mod_gcd literal records at actual branch frontiers, including bad-prime messages before scoped field restoration and discard only for noninitial source iteration. Whole-record receiving-manager borrowing; sticky physical output failure preserves GCD and reached footer flushes. Independent numerical oracles cover both leading-coefficient drop routes, constant image, unlucky degree and reconstructed GCD. Polynomial/numeral-bearing mgcd records and wider source-unit audits remain partial."
+        },
         {
           "name": "CRA inverse/multiplier/bound numeral-insertion records and caller ownership (upolynomial.cpp:677,682,692)",
           "status": "ported",
