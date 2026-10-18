@@ -287,6 +287,9 @@ func (m *UPolynomialManager) modularGCD(a, b UPolynomialView, out *upolyVectorSt
 	return m.modularGCDWithSourceContext(a, b, out, integerAllocationInvocationContext{})
 }
 func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, out *upolyVectorState, context integerAllocationInvocationContext) (cause error) {
+	if e := m.traceModGCDEntry(a, b, context); e != nil {
+		return e
+	}
 	enabled, e := refinementSourceAssertionsEnabled()
 	if e != nil {
 		return e

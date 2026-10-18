@@ -45800,3 +45800,14 @@ Ported upolynomial.cpp:752 immediately after assigning each actual retained prim
 Extended independent constant/reconstruction/unlucky-degree/both-leading-drop cases compare complete interleaved prime/branch record sequences. Callback checks distinguish the integer-mode prime frontier from the finite-field bad-prime frontier and refuse retirement at both. Polynomial-bearing modular-GCD displays and broader polynomial/AST completion audits remain open. All commands remain on CPUs8–16.
 
 Related modular-GCD/CRA/Euclidean-pointer/warm-allocation checks pass ordinary (0.068s) and checked/debug/trace (0.092s); manifest validation passes. No native full suite repeated inside its hourly interval.
+
+### Modular-GCD entry polynomial displays and caller-owned cleanup
+
+Ported upolynomial.cpp:726 using actual display_star invocations before source assertions and before all modular-GCD scoped NUM declarations. Exact u/v captions, raw newlines and star separators are preserved. Sticky output failure still evaluates both polynomial displays. Whole-record borrowing protects receiving owners through callbacks.
+
+Default and real factorization frontend calls retain separate accepted display receipts. Pending display work blocks new core work and source retirement. The frontend captures the exact receipt in invocation history, stops its older source suffix, and owns the accepted display before older objects. Default explicit cleanup cannot adopt frontend work or a later independent display that reuses the same frame. No parent construction counts, numerical scratch or quotas are rewritten.
+
+Independent oracle inputs (x+1)(x+2),(x+1)(x+3) verify exact entry formatting and GCD x+1. Actual descriptor-quota exhaustion during BIG display is tested for direct GCD and public Factor on independently expanded (x+(2^64+1))^2*(x+1), preserving caller output/private primitive state and older frontend vectors at the reached stop. A later independent accepted display survives stale default cleanup unchanged. Checked/debug/trace modular-GCD/CRA/Euclidean-pointer/exact-division/warm checks pass (0.104s); manifest validation passes. All execution remains on CPUs8–16. Later image/combined/candidate/result displays and wider polynomial completion audits remain open, followed by AST.
+
+Full ordinary polynomial tests pass (95.946s), including zero warm host allocations. Broader checked frontend/factorization and affected kernel checks pass (2.505s). Final checked entry tests pass (0.010s) after extending actual quota failure to either the first or second polynomial display. The second route replaces only its own completed first display receipt, then retains the actually stopped second display. No native full run repeated within its hourly interval.
+Final ordinary entry checks pass (0.005s).

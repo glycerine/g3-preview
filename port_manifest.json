@@ -50790,7 +50790,9 @@
         "pkg/math/polynomial/upolynomial_cra_trace_test.go",
         "pkg/math/polynomial/upolynomial_modular_gcd_trace_test.go",
         "pkg/math/polynomial/upolynomial_euclid_pointer_trace.go",
-        "pkg/math/polynomial/upolynomial_euclid_pointer_trace_test.go"
+        "pkg/math/polynomial/upolynomial_euclid_pointer_trace_test.go",
+        "pkg/math/polynomial/upolynomial_modular_gcd_entry_trace.go",
+        "pkg/math/polynomial/upolynomial_modular_gcd_entry_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51070,7 +51072,10 @@
         "TestUPolynomialModularGCDLiteralTrace",
         "TestUPolynomialModularGCDBadPrimeTraceBorrow",
         "TestUPolynomialEuclidPointerTrace",
-        "TestUPolynomialModularGCDPrimeTableSmallInsertion"
+        "TestUPolynomialModularGCDPrimeTableSmallInsertion",
+        "TestUPolynomialModularGCDEntryDisplay",
+        "TestUPolynomialModularGCDEntryDisplayReceipt",
+        "TestUPolynomialModularGCDEntryRetainsActualFactorFrontend"
       ],
       "conditionals": [
         {
@@ -51659,6 +51664,26 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Modular GCD entry polynomial displays and exact caller receipt (upolynomial.cpp:726)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_modular_gcd_entry_trace.go",
+            "pkg/math/polynomial/upolynomial_modular_gcd_entry_trace_test.go",
+            "pkg/math/polynomial/upolynomial_gcd_modular.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/upolynomial_factor_frontend_invocation.go",
+            "pkg/math/polynomial/upolynomial_exact_div_loop_trace.go"
+          ],
+          "tests": [
+            "TestUPolynomialModularGCDEntryDisplay",
+            "TestUPolynomialModularGCDEntryDisplayReceipt",
+            "TestUPolynomialModularGCDEntryRetainsActualFactorFrontend",
+            "TestUPolynomialModularGCDLiteralTrace"
+          ],
+          "notes": "Actual display_star calls before assertions and any modular-GCD scoped NUM, with source labels/raw newlines and sticky stream evaluation. Whole-record borrowing. Accepted display receipts belong separately to default or actual frontend; failed display protects older frontend source suffix, is retained in invocation history and cleaned before older ownership. Pending receipt blocks new core work/source retirement. Default cleanup never adopts frontend or later independent frame reuse. Real descriptor-quota failure covers BIG default/public-Factor formatting without synthetic construction counts. Later modular-GCD image/candidate/result displays and broader source-unit audits remain open."
+        },
         {
           "name": "Modular GCD prime-attempt integer insertion (upolynomial.cpp:752)",
           "status": "ported",

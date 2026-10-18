@@ -14,6 +14,7 @@ type upolyFactorFrontendInvocationReceipt struct {
 	history    *upolyFactorFrontendHistory
 }
 type upolyFactorFrontendHistory struct {
+	modGCDEntryTrace                                                                  upolyDisplayInvocationReceipt
 	exactTrace                                                                        upolyDisplayInvocationReceipt
 	perfectSquare                                                                     unumeral.IntegerPerfectSquareInvocationReceipt
 	perfectSquareBodyCause, perfectSquareSourceCause, perfectSquareOwnCause           error
@@ -183,13 +184,14 @@ type upolyFactorFlipScope struct {
 }
 
 type upolyFactorFrontendScope struct {
-	exactTrace      upolyDisplayInvocationReceipt
-	perfectSquare   unumeral.IntegerPerfectSquareInvocationReceipt
-	vectorNormalize upolyFactorVectorNormalizeScope
-	modularPower    upolyFactorModularPowerScope
-	quadratic       upolyFactorQuadraticScope
-	flip            upolyFactorFlipScope
-	result          *UPolynomialFactors
+	modGCDEntryTrace upolyDisplayInvocationReceipt
+	exactTrace       upolyDisplayInvocationReceipt
+	perfectSquare    unumeral.IntegerPerfectSquareInvocationReceipt
+	vectorNormalize  upolyFactorVectorNormalizeScope
+	modularPower     upolyFactorModularPowerScope
+	quadratic        upolyFactorQuadraticScope
+	flip             upolyFactorFlipScope
+	result           *UPolynomialFactors
 
 	primitive                                        upolyFactorPrimitiveScope
 	divisibility                                     upolyFactorDivisibilityScope
@@ -278,6 +280,9 @@ func (q *upolyFactorFrontendScope) finish(body error) error {
 		q.bodyCause = body
 	}
 	if q.sourceCause == nil {
+		q.sourceCause = q.modGCDEntryTrace.sourceBlocker()
+	}
+	if q.sourceCause == nil {
 		q.sourceCause = q.exactTrace.sourceBlocker()
 	}
 	if q.sourceCause == nil {
@@ -354,6 +359,9 @@ func (q *upolyFactorFrontendScope) own(abort bool) (cause error) {
 		q.recordHistory()
 	}()
 	if e := q.cra.trace.cleanup(); e != nil {
+		return e
+	}
+	if e := q.modGCDEntryTrace.cleanupOwned(); e != nil {
 		return e
 	}
 	if e := q.exactTrace.cleanupOwned(); e != nil {
@@ -478,6 +486,9 @@ func (q *upolyFactorFrontendScope) own(abort bool) (cause error) {
 // Retention is decided from exact captured child tuples and directly stamped
 // leaves; a nil square-free class frame does not imply diagnostic completion.
 func (q *upolyFactorFrontendScope) hasUnjoined() bool {
+	if q.service.manager.displayReceiptPending(&q.modGCDEntryTrace) {
+		return true
+	}
 	if q.cra.trace.pending() {
 		return true
 	}
@@ -534,6 +545,7 @@ func (q *upolyFactorFrontendScope) recordHistory() {
 	if h == nil || h.self != h || h.service != q.service || h.invocation != q.invocation || h.header == 0 {
 		return
 	}
+	h.modGCDEntryTrace = q.modGCDEntryTrace
 	h.exactTrace = q.exactTrace
 	h.perfectSquare = q.perfectSquare
 	if z := q.service.manager.config.Integer; z.MatchesPerfectSquareHistory(&q.perfectSquare) {

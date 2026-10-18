@@ -85,6 +85,8 @@ type UPolynomialManager struct {
 	craTrace                     upolyCRATrace
 	craValues                    [12]unumeral.Int
 	pendingCRATrace              *upolyCRATrace
+	modGCDEntryTrace             upolyDisplayInvocationReceipt
+	pendingModGCDEntryTrace      *upolyDisplayInvocationReceipt
 	exactDivTrace                upolyDisplayInvocationReceipt
 	pendingExactDivTrace         *upolyDisplayInvocationReceipt
 	origin                       uint64
@@ -157,6 +159,9 @@ func newUPolynomialManager(c UPolynomialConfig, store *UPolynomialCoefficientSto
 	return m, nil
 }
 func (m *UPolynomialManager) check() error {
+	if m != nil && m.self == m && m.pendingModGCDEntryTrace != nil && m.displayReceiptPending(m.pendingModGCDEntryTrace) && !m.pendingModGCDEntryTrace.frame.executing {
+		return ErrUPolynomialCleanupPending
+	}
 	if m != nil && m.pendingCRATrace != nil && m.pendingCRATrace.pending() && !m.pendingCRATrace.executing && !m.pendingCRATrace.sourceReadAllowed() {
 		return ErrUPolynomialCleanupPending
 	}

@@ -43,7 +43,7 @@ func TestUPolynomialModularGCDLiteralTrace(t *testing.T) {
 					return
 				}
 				if refused {
-					if bad.calls != 1 || bad.flushes != len(f.lines) {
+					if bad.calls != 1 || bad.flushes != len(f.lines)+1 {
 						t.Fatal("sticky writes/footer flushes", bad.calls, bad.flushes, f.lines)
 					}
 					return
@@ -65,7 +65,12 @@ func TestUPolynomialModularGCDLiteralTrace(t *testing.T) {
 					}
 					fmt.Fprintf(&want, "-------- [mgcd] mod_gcd src/math/polynomial/upolynomial.cpp:%d ---------\n%s------------------------------------------------\n", line, body)
 				}
-				if text.String() != want.String() {
+				entryEnd := strings.Index(text.String(), "------------------------------------------------\n")
+				if entryEnd < 0 || !strings.HasPrefix(text.String(), "-------- [mgcd] mod_gcd src/math/polynomial/upolynomial.cpp:726 ") {
+					t.Fatal("missing entry record", text.String())
+				}
+				got := text.String()[entryEnd+len("------------------------------------------------\n"):]
+				if got != want.String() {
 					t.Fatalf("records:\n%s\nwant:\n%s", text.String(), want.String())
 				}
 			})
