@@ -21,6 +21,11 @@ func (m *UPolynomialManager) sourceFinalizeWithHenselOwners(r *upolyHenselPairIn
 	return m.sourceFinalizeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) sourceFinalizeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
+	if m != nil && m.self == m && m.pendingExactDivTrace != nil {
+		if e := m.pendingExactDivTrace.sourceBlocker(); e != nil {
+			return e
+		}
+	}
 	if m != nil && m.self == m && m.pendingBerlekamp != nil {
 		if e := m.pendingBerlekamp.closeCause; e != nil {
 			return e

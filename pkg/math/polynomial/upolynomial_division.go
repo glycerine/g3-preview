@@ -490,6 +490,9 @@ func (m *UPolynomialManager) exactDivState(a, b UPolynomialView, out *upolyVecto
 	return m.exactDivStateWithSourceContext(a, b, out, nil, integerAllocationInvocationContext{})
 }
 func (m *UPolynomialManager) exactDivStateWithSourceContext(a, b UPolynomialView, out *upolyVectorState, child *unumeral.IntegerAddMulInvocationReceipt, context integerAllocationInvocationContext) (bool, error) {
+	if m.pendingExactDivTrace != nil && m.pendingExactDivTrace.owner.displayReceiptPending(m.pendingExactDivTrace) {
+		return false, ErrUPolynomialCleanupPending
+	}
 	if b.count == 0 {
 		return false, nil
 	}
@@ -549,6 +552,9 @@ func (m *UPolynomialManager) exactDivStateWithSourceContext(a, b UPolynomialView
 	}
 	n := a.count
 	for {
+		if e := m.traceExactDivLoop(context); e != nil {
+			return false, e
+		}
 		if n == 0 {
 			if e = m.setSize(q, deg+1); e != nil {
 				return false, e

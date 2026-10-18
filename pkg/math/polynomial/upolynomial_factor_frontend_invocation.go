@@ -14,6 +14,7 @@ type upolyFactorFrontendInvocationReceipt struct {
 	history    *upolyFactorFrontendHistory
 }
 type upolyFactorFrontendHistory struct {
+	exactTrace                                                                        upolyDisplayInvocationReceipt
 	perfectSquare                                                                     unumeral.IntegerPerfectSquareInvocationReceipt
 	perfectSquareBodyCause, perfectSquareSourceCause, perfectSquareOwnCause           error
 	vectorNormalizeInvocation                                                         uint64
@@ -181,6 +182,7 @@ type upolyFactorFlipScope struct {
 }
 
 type upolyFactorFrontendScope struct {
+	exactTrace      upolyDisplayInvocationReceipt
 	perfectSquare   unumeral.IntegerPerfectSquareInvocationReceipt
 	vectorNormalize upolyFactorVectorNormalizeScope
 	modularPower    upolyFactorModularPowerScope
@@ -275,6 +277,9 @@ func (q *upolyFactorFrontendScope) finish(body error) error {
 		q.bodyCause = body
 	}
 	if q.sourceCause == nil {
+		q.sourceCause = q.exactTrace.sourceBlocker()
+	}
+	if q.sourceCause == nil {
 		q.sourceCause = q.quadratic.sourceCause
 	}
 	if q.sourceCause == nil {
@@ -347,6 +352,9 @@ func (q *upolyFactorFrontendScope) own(abort bool) (cause error) {
 		}
 		q.recordHistory()
 	}()
+	if e := q.exactTrace.cleanupOwned(); e != nil {
+		return e
+	}
 	z := q.service.manager.config.Integer
 
 	if e := z.CleanupDividesNumeralInvocation(&q.boolNumeral, false); e != nil {
@@ -519,6 +527,7 @@ func (q *upolyFactorFrontendScope) recordHistory() {
 	if h == nil || h.self != h || h.service != q.service || h.invocation != q.invocation || h.header == 0 {
 		return
 	}
+	h.exactTrace = q.exactTrace
 	h.perfectSquare = q.perfectSquare
 	if z := q.service.manager.config.Integer; z.MatchesPerfectSquareHistory(&q.perfectSquare) {
 		h.perfectSquareBodyCause, h.perfectSquareSourceCause, h.perfectSquareOwnCause = q.perfectSquare.Causes()

@@ -82,6 +82,8 @@ type UPolynomialManager struct {
 	squareFreeCaller             *upolyFactorSquareFreeScope
 	self                         *UPolynomialManager
 	pendingBerlekamp             *upolyBerlekampMatrix
+	exactDivTrace                upolyDisplayInvocationReceipt
+	pendingExactDivTrace         *upolyDisplayInvocationReceipt
 	origin                       uint64
 	config                       UPolynomialConfig
 	modular                      *unumeral.IntegerModularManager
@@ -152,6 +154,9 @@ func newUPolynomialManager(c UPolynomialConfig, store *UPolynomialCoefficientSto
 	return m, nil
 }
 func (m *UPolynomialManager) check() error {
+	if m != nil && m.self == m && m.pendingExactDivTrace != nil && m.pendingExactDivTrace.owner.displayReceiptPending(m.pendingExactDivTrace) && !m.pendingExactDivTrace.frame.executing {
+		return ErrUPolynomialCleanupPending
+	}
 	if m != nil && m.self == m && m.pendingBerlekamp != nil {
 		return ErrUPolynomialCleanupPending
 	}

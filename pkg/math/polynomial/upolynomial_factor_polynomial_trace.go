@@ -7,9 +7,17 @@ import (
 )
 
 func (c *upolyFactorSquareFreeScope) tracePending() bool {
+	if q := &c.recombinationStep; q.matches() && q.owner == c && q.exactTrace.owner.displayReceiptPending(&q.exactTrace) {
+		return true
+	}
 	return c.trace.pending() || c.tracePolynomial.owner.displayReceiptPending(&c.tracePolynomial)
 }
 func (c *upolyFactorSquareFreeScope) traceSourceBlocker() error {
+	if q := &c.recombinationStep; q.matches() && q.owner == c {
+		if e := q.exactTrace.sourceBlocker(); e != nil {
+			return e
+		}
+	}
 	if e := c.trace.sourceBlocker(); e != nil {
 		return e
 	}
@@ -23,6 +31,14 @@ func (c *upolyFactorSquareFreeScope) traceSourceBlocker() error {
 	return nil
 }
 func (c *upolyFactorSquareFreeScope) cleanupTrace() error {
+	if q := &c.recombinationStep; q.matches() && q.owner == c {
+		if q.executing || q.sourceExecuting || q.ownExecuting || q.callDepth != 0 {
+			return ErrUPolynomialCleanupPending
+		}
+		if e := q.exactTrace.cleanupOwned(); e != nil {
+			return e
+		}
+	}
 	if e := c.trace.cleanup(); e != nil {
 		return e
 	}

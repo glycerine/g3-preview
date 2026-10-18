@@ -50761,7 +50761,11 @@
         "pkg/math/polynomial/upolynomial_berlekamp_monic_test.go",
         "pkg/math/polynomial/upolynomial_division_core_assertions_test.go",
         "pkg/math/polynomial/upolynomial_exact_div_pointer_trace.go",
-        "pkg/math/polynomial/upolynomial_exact_div_assertion_trace_test.go"
+        "pkg/math/polynomial/upolynomial_exact_div_assertion_trace_test.go",
+        "pkg/math/polynomial/upolynomial_exact_div_loop_trace.go",
+        "pkg/math/polynomial/upolynomial_exact_div_loop_trace_test.go",
+        "pkg/math/polynomial/upolynomial_recombination_step_invocation.go",
+        "pkg/math/polynomial/upolynomial_factor_polynomial_trace.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -50986,7 +50990,11 @@
         "TestUPolynomialDivRemCoreClosedAssertionSwitchBeforeD",
         "TestUPolynomialExactDivCopiedSizeAssertionActions",
         "TestUPolynomialExactDivPointerRecordUsesActualPreCopyStorage",
-        "TestUPolynomialExactDivPointerRecordStickyStreamFailure"
+        "TestUPolynomialExactDivPointerRecordStickyStreamFailure",
+        "TestUPolynomialExactDivLoopRecordsAndStickyStream",
+        "TestUPolynomialExactDivLoopExactDisplayCleanup",
+        "TestUPolynomialExactDivLoopRetainsActualFactorFrontend",
+        "TestUPolynomialExactDivLoopRetainsRecombinationCaller"
       ],
       "conditionals": [
         {
@@ -51575,6 +51583,27 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Exact division loop TRACE and actual caller display ownership (upolynomial.cpp:628)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_exact_div_loop_trace.go",
+            "pkg/math/polynomial/upolynomial_exact_div_loop_trace_test.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_division.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/upolynomial_factor_frontend_invocation.go",
+            "pkg/math/polynomial/upolynomial_recombination_step_invocation.go",
+            "pkg/math/polynomial/upolynomial_factor_polynomial_trace.go"
+          ],
+          "tests": [
+            "TestUPolynomialExactDivLoopRecordsAndStickyStream",
+            "TestUPolynomialExactDivLoopExactDisplayCleanup",
+            "TestUPolynomialExactDivLoopRetainsActualFactorFrontend",
+            "TestUPolynomialExactDivLoopRetainsRecombinationCaller"
+          ],
+          "notes": "Preserves literal loop text, both actual polynomial operands, raw newlines and final empty-remainder iteration. Whole-record borrowing protects owners; sticky stream refusal still evaluates operands and performs the footer flush. Interrupted display receipts belong to the actual public, factor frontend or recombination invocation. Exact accepted children block older kernel destruction and new work; source causes and cursors remain unchanged by owning cleanup. Public cleanup cannot adopt caller-owned or independently reused display frames. Real descriptor exhaustion covers default public division and public Factor on independently expanded (x+(2^64+1))^2*(x+1). A qualified direct retained recombination adapter uses genuinely acquired owners and reservation-prefix injection, separately from physical descriptor-quota evidence. Parent trace cleanup releases its accepted recombination display before outer manager checks. Broader polynomial source-unit auditing remains partial."
+        },
         {
           "name": "Exact division copied-size SASSERT runtime actions and pre-copy native pointer TRACE (upolynomial.cpp:624,626)",
           "status": "platform_replacement",

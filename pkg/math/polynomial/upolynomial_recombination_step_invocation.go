@@ -14,6 +14,7 @@ type upolyRecombinationStepInvocationReceipt struct {
 	invocation uint64
 }
 type upolyRecombinationStepScope struct {
+	exactTrace                                       upolyDisplayInvocationReceipt
 	receipt                                          upolyRecombinationStepInvocationReceipt
 	callerPrevious                                   [2]*upolyRecombinationStepScope
 	callDepth                                        uint32
@@ -56,6 +57,9 @@ func (q *upolyRecombinationStepScope) managers() [2]*UPolynomialManager {
 	return [2]*UPolynomialManager{q.owner.manager, q.related}
 }
 func (q *upolyRecombinationStepScope) childCause() error {
+	if e := q.exactTrace.sourceBlocker(); e != nil {
+		return e
+	}
 	if e := q.owner.traceSourceBlocker(); e != nil {
 		return e
 	}
@@ -110,6 +114,9 @@ func (q *upolyRecombinationStepScope) finish(r *upolyRecombinationStepInvocation
 	return q.bodyCause
 }
 func (q *upolyRecombinationStepScope) pending() bool {
+	if q.exactTrace.owner.displayReceiptPending(&q.exactTrace) {
+		return true
+	}
 	if q.owner.tracePending() {
 		return true
 	}
@@ -153,6 +160,9 @@ func (q *upolyRecombinationStepScope) own(r *upolyRecombinationStepInvocationRec
 	defer func() { q.ownExecuting = false }()
 	q.enterCall()
 	defer q.leaveCall()
+	if e := q.exactTrace.cleanupOwned(); e != nil {
+		return e
+	}
 	z := q.owner.manager.config.Integer
 	for i, m := range q.managers() {
 		if e := m.modular.CleanupPNormalizeInvocation(&q.normalize[i], false); e != nil {
