@@ -170104,6 +170104,20 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Concrete signed integer comparison across explicit numeral owners for retained algebraic interval-copy assertions",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpz_compare_owner.go",
+          "go_targets": [
+            "pkg/util/numeral/mpz.go",
+            "pkg/util/numeral/mpz_compare_owner.go",
+            "pkg/util/numeral/mpz_compare_owner_test.go"
+          ],
+          "tests": [
+            "TestIntegerCompareFromIndependentOwnersAndReceiverScratch"
+          ],
+          "notes": "Compare and CompareFromOwners share one signed comparison engine. Small operands use the receiver actual argument/IntMin scratch, preserving source signCell effects; big limbs are read through each actual IntegerManager owner. Owner readiness is separated from scalar validation without changing existing check guard order. No numerical staging copy, temporary allocation or normalization is added. Independent math/big sign/order oracle covers all81 pairs of nine negative/positive/small/MinInt32/multiword values with receiving allocations disabled and source values unchanged. This is a concrete prerequisite only; cross-owner binary scaling/comparison, interval SET and algebraic-core copying remain open."
+        },
+        {
           "name": "integer-owned Runtime explicitly joins the source process shared with rational parameter and environment consumers",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz.go",
@@ -172268,6 +172282,20 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete signed integer comparison across explicit numeral owners for retained algebraic interval-copy assertions",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpz_compare_owner.go",
+          "go_targets": [
+            "pkg/util/numeral/mpz.go",
+            "pkg/util/numeral/mpz_compare_owner.go",
+            "pkg/util/numeral/mpz_compare_owner_test.go"
+          ],
+          "tests": [
+            "TestIntegerCompareFromIndependentOwnersAndReceiverScratch"
+          ],
+          "notes": "Compare and CompareFromOwners share one signed comparison engine. Small operands use the receiver actual argument/IntMin scratch, preserving source signCell effects; big limbs are read through each actual IntegerManager owner. Owner readiness is separated from scalar validation without changing existing check guard order. No numerical staging copy, temporary allocation or normalization is added. Independent math/big sign/order oracle covers all81 pairs of nine negative/positive/small/MinInt32/multiword values with receiving allocations disabled and source values unchanged. This is a concrete prerequisite only; cross-owner binary scaling/comparison, interval SET and algebraic-core copying remain open."
+        },
         {
           "name": "Retained linear_equation::del consumer of mpz_manager::del, source-order coefficient release and stopped Go cleanup continuation (mpz.h:340-347; linear_equation.cpp:273-280)",
           "status": "ported",

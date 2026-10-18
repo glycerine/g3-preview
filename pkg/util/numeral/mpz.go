@@ -272,7 +272,7 @@ func (m *IntegerManager) checkCleanup(a *Int) error {
 	}
 	return nil
 }
-func (m *IntegerManager) check(a *Int) error {
+func (m *IntegerManager) checkReady() error {
 	if m == nil || m.self != m {
 		return umemory.ErrRuntimeOwner
 	}
@@ -284,6 +284,12 @@ func (m *IntegerManager) check(a *Int) error {
 	}
 	if m.closed || m.SourceFinalizing || m.constructionFailed {
 		return arena.ErrClosed
+	}
+	return nil
+}
+func (m *IntegerManager) check(a *Int) error {
+	if e := m.checkReady(); e != nil {
+		return e
 	}
 	if a == nil {
 		return arena.ErrInvalidSlot
@@ -1116,39 +1122,7 @@ func (m *IntegerManager) compareCells(a, b NumericCellRef) int {
 	return 0
 }
 func (m *IntegerManager) Compare(a, b *Int) (int, error) {
-	if e := m.check(a); e != nil {
-		return 0, e
-	}
-	if e := m.check(b); e != nil {
-		return 0, e
-	}
-	if a.IsSmall() && b.IsSmall() {
-		if a.Val < b.Val {
-			return -1, nil
-		}
-		if a.Val > b.Val {
-			return 1, nil
-		}
-		return 0, nil
-	}
-	sa, ca, e := m.signCell(a, 0)
-	if e != nil {
-		return 0, e
-	}
-	sb, cb, e := m.signCell(b, 1)
-	if e != nil {
-		return 0, e
-	}
-	if sa > 0 {
-		if sb > 0 {
-			return m.compareCells(ca, cb), nil
-		}
-		return 1, nil
-	}
-	if sb > 0 {
-		return -1, nil
-	}
-	return m.compareCells(cb, ca), nil
+	return m.CompareFromOwners(m, a, m, b)
 }
 
 func (m *IntegerManager) EnsureTmp(idx int, size uint32) error {

@@ -44316,3 +44316,26 @@ The existing full checked polynomial process remains live, with401 top-level
 tests completed and no failures at the latest poll. Its compiled binary predates
 this additive bound-copy API; the new primitive has separate focused checks.
 No full-suite pass is claimed while the process remains live.
+
+Added concrete IntegerManager.CompareFromOwners as the comparison prerequisite
+for cross-manager algebraic interval SET assertions. It shares one signed
+engine with ordinary Compare: small operands still use the receiver's actual
+argument/IntMin scratch, while big limbs are read through their real owners.
+Separated readiness from scalar checking without adding numeral copies,
+normalization, allocations or any-valued callbacks. All81 pairs of nine signed
+small/MinInt32/multiword values agree with an independent math/big oracle;
+receiving allocation failure is armed at0 throughout comparisons and source
+numerals remain unchanged.
+
+Focused integer comparison/source copy/binary copy tests pass ordinary (0.012s)
+and checked/debug/trace (0.011s). Algebraic comparison/relation/display/predicate
+consumers also pass ordinary (0.125s) and checked/debug/trace (0.048s). All
+commands use CPUs8–16. Cross-owner binary scaling/comparison, interval copying
+and full algebraic-core source lifetime composition remain open for AST; this
+primitive does not complete the cross-manager numeral set feature.
+
+The existing full checked polynomial process is still live; the latest poll
+observed1515 top-level passes, no failures, and UP refinement fault ordinal13135.
+Its compiled binary predates the new comparison bridge; current bridge changes
+have the focused evidence above. Do not count this live process as a full pass
+or restart it based on silence. Whole polynomial then AST goal remains active.
