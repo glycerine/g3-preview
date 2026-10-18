@@ -42605,8 +42605,21 @@
         },
         {
           "name": "Complete polynomial manager, arithmetic, PRS/resultant and source owning wrappers",
-          "status": "unported",
-          "tests": []
+          "status": "partial",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_manager.go",
+            "pkg/math/polynomial/polynomial_arithmetic.go",
+            "pkg/math/polynomial/polynomial_gcd.go",
+            "pkg/math/polynomial/polynomial_gcd_prs.go",
+            "pkg/math/polynomial/polynomial_resultant.go",
+            "pkg/math/polynomial/polynomial_imp_lifetime.go"
+          ],
+          "tests": [
+            "TestPolynomialCellIndependentArithmeticIdentity",
+            "TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS",
+            "TestPolynomialResultantActualArithmeticChildRetirementPrefixes",
+            "TestPolynomialImpSourceDestructorSeparateOwningClose"
+          ]
         },
         {
           "name": "Retained monomial2pos scalar Get/Reset/Set and polynomial imp set/reset loops through actual equality consumer (polynomial.cpp:456-499,4631-4655)",
@@ -46603,8 +46616,21 @@
         },
         {
           "name": "Complete polynomial manager, arithmetic, PRS/resultant and source owning wrappers",
-          "status": "unported",
-          "tests": []
+          "status": "partial",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_manager.go",
+            "pkg/math/polynomial/polynomial_arithmetic.go",
+            "pkg/math/polynomial/polynomial_gcd.go",
+            "pkg/math/polynomial/polynomial_gcd_prs.go",
+            "pkg/math/polynomial/polynomial_resultant.go",
+            "pkg/math/polynomial/polynomial_imp_lifetime.go"
+          ],
+          "tests": [
+            "TestPolynomialCellIndependentArithmeticIdentity",
+            "TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS",
+            "TestPolynomialResultantActualArithmeticChildRetirementPrefixes",
+            "TestPolynomialImpSourceDestructorSeparateOwningClose"
+          ]
         },
         {
           "name": "Retained monomial2pos scalar Get/Reset/Set and polynomial imp set/reset loops through actual equality consumer (polynomial.cpp:456-499,4631-4655)",
