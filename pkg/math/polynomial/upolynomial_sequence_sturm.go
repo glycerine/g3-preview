@@ -7,13 +7,14 @@ import (
 )
 
 type upolySequenceSturmScope struct {
-	owner                        *UPolynomialSequence
-	invocation                   uint64
-	remainder, prime             upolyVectorState
-	live                         [2]bool // remainder, prime/product
-	sourceCursor, ownCursor      [2]uint32
-	active, executing, finishing bool
-	bodyCause, sourceStop        error
+	integerBinding, naturalBinding unumeral.NumericCallerBinding
+	owner                          *UPolynomialSequence
+	invocation                     uint64
+	remainder, prime               upolyVectorState
+	live                           [2]bool // remainder, prime/product
+	sourceCursor, ownCursor        [2]uint32
+	active, executing, finishing   bool
+	bodyCause, sourceStop          error
 }
 
 func (q *upolySequenceSturmScope) valid() bool {
@@ -90,6 +91,12 @@ func (s *UPolynomialSequence) buildSturm(a, b UPolynomialView, kind uint8) (caus
 		return ErrUPolynomialCleanupPending
 	}
 	*q = upolySequenceSturmScope{owner: s, invocation: q.invocation + 1, active: true, executing: true}
+	if e := q.bindNumericOwners(); e != nil {
+		q.executing = false
+		q.active = false
+		return e
+	}
+	defer func() { cause = errors.Join(cause, q.unbindNumericOwners()) }()
 	defer func() {
 		cause = q.finishVector(1, cause)
 		q.executing = false
@@ -149,7 +156,7 @@ func (s *UPolynomialSequence) buildSturm(a, b UPolynomialView, kind uint8) (caus
 
 // CleanupSturm owns only the persistent source vectors of this public sequence.
 // Source cursors and the first destructor stop remain unchanged on continuation.
-func (s *UPolynomialSequence) CleanupSturm() error {
+func (s *UPolynomialSequence) CleanupSturm() (cause error) {
 	if e := s.check(); e != nil {
 		return e
 	}
@@ -165,6 +172,10 @@ func (s *UPolynomialSequence) CleanupSturm() error {
 	}
 	q.finishing = true
 	defer func() { q.finishing = false }()
+	if e := q.bindNumericOwners(); e != nil {
+		return e
+	}
+	defer func() { cause = errors.Join(cause, q.unbindNumericOwners()) }()
 	m := s.manager
 	for which := uint8(0); which < 2; which++ {
 		if !q.live[which] {
@@ -184,4 +195,28 @@ func (s *UPolynomialSequence) CleanupSturm() error {
 	}
 	q.active = false
 	return nil
+}
+
+// These bindings protect borrowed managers only during actual execution or
+// owning continuation. They confer no ownership over numeric failure roots.
+func (q *upolySequenceSturmScope) NumericExecuting() bool {
+	return q.valid() && q.active && (q.executing || q.finishing)
+}
+func (q *upolySequenceSturmScope) bindNumericOwners() error {
+	if !q.NumericExecuting() {
+		return ErrUPolynomialOwner
+	}
+	z := q.owner.manager.config.Integer
+	if e := z.BindCaller(&q.integerBinding, q, 17); e != nil {
+		return e
+	}
+	if e := z.Naturals().BindCaller(&q.naturalBinding, q, 17); e != nil {
+		return errors.Join(e, q.integerBinding.Unbind())
+	}
+	return nil
+}
+func (q *upolySequenceSturmScope) unbindNumericOwners() error {
+	n := q.naturalBinding.Unbind()
+	z := q.integerBinding.Unbind()
+	return errors.Join(n, z)
 }
