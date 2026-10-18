@@ -78,6 +78,9 @@ func (m *MultivariatePolynomialCore) mkTermsSource(n uint32, as polynomialUnivar
 	return m.mkTermsSourceLinear(n, as, ms, false)
 }
 func (m *MultivariatePolynomialCore) mkTermsSourceLinear(n uint32, as polynomialUnivariateCoefficients, ms monomialArrayView, linear bool) (Polynomial, error) {
+	return m.mkTermsSourceReceipts(n, as, ms, linear, nil, nil)
+}
+func (m *MultivariatePolynomialCore) mkTermsSourceReceipts(n uint32, as polynomialUnivariateCoefficients, ms monomialArrayView, linear bool, appendReceipt *polynomialCheapAppendInvocationReceipt, factoryReceipt *polynomialFactoryInvocationReceipt) (Polynomial, error) {
 	for i := uint32(0); i < n; i++ {
 		var local unumeral.Int
 		a, e := as.reference(m, i, &local)
@@ -89,7 +92,7 @@ func (m *MultivariatePolynomialCore) mkTermsSourceLinear(n uint32, as polynomial
 			return Polynomial{}, e
 		}
 		consumed := false
-		e = m.som.addConsumed(a, term, false, &consumed)
+		e = m.som.addConsumedReceipts(a, term, false, &consumed, nil, appendReceipt)
 		if linear && consumed && uint64(i) < uint64(len(m.linearGenerated)) {
 			m.linearGenerated[i] = false
 		}
@@ -97,7 +100,7 @@ func (m *MultivariatePolynomialCore) mkTermsSourceLinear(n uint32, as polynomial
 			return Polynomial{}, e
 		}
 	}
-	return m.som.mk(false)
+	return m.som.mkWithAppendReceipt(false, appendReceipt, factoryReceipt)
 }
 func (m *MultivariatePolynomialCore) MkRationalTerms(as []unumeral.Rational, ms []Monomial) (Polynomial, error) {
 	if e := m.check(); e != nil {

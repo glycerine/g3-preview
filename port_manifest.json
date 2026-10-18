@@ -40314,7 +40314,8 @@
         "pkg/math/polynomial/polynomial_cache_borrowed_owner_test.go",
         "pkg/math/polynomial/polynomial_cache_pending_psc_test.go",
         "pkg/math/polynomial/polynomial_content_independent_scope_test.go",
-        "pkg/math/polynomial/polynomial_glex_monic_independent_test.go"
+        "pkg/math/polynomial/polynomial_glex_monic_independent_test.go",
+        "pkg/math/polynomial/polynomial_sparse_independent_scope_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -41173,7 +41174,9 @@
         "TestPolynomialIntegerContentCleanupPreservesIndependentLazard",
         "TestPolynomialIntegerContentIndependentLazardReservationPrefixes",
         "TestPolynomialGlexMonicCleanupPreservesIndependentLazard",
-        "TestPolynomialGlexMonicIndependentLazardReservationPrefixes"
+        "TestPolynomialGlexMonicIndependentLazardReservationPrefixes",
+        "TestPolynomialSparseCleanupPreservesIndependentLazard",
+        "TestPolynomialSparseIndependentLazardReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -42430,6 +42433,18 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Sparse interpolation owns actual mk_polynomial append/factory children and output-reference transfer; source retirement and owning cleanup preserve independent stopped Lazard invocations (polynomial.cpp:3134-3182)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_sparse_interpolation.go",
+          "tests": [
+            "TestPolynomialSparseCleanupPreservesIndependentLazard",
+            "TestPolynomialSparseIndependentLazardReservationPrefixes",
+            "TestPolynomialSparseInterpolationEveryActualReservationPrefix",
+            "TestPolynomialSparseBigFieldInterpolationEveryNumericPrefix",
+            "TestPolynomialSparseOutputCallbackCreationRemainsForeign"
+          ]
+        },
         {
           "name": "GlexMonic owns exact cheap append/factory receipts and transfers the raw returned polynomial only after source new_a/inv_c destruction; cleanup preserves independent stopped Lazard frames (polynomial.cpp:6843-6862)",
           "status": "ported",
@@ -45695,7 +45710,8 @@
         "pkg/math/polynomial/algebraic_isolation_multivariate_cancel_test.go",
         "pkg/math/polynomial/algebraic_isolation_multivariate_owner_test.go",
         "pkg/math/polynomial/polynomial_content_independent_scope_test.go",
-        "pkg/math/polynomial/polynomial_glex_monic_independent_test.go"
+        "pkg/math/polynomial/polynomial_glex_monic_independent_test.go",
+        "pkg/math/polynomial/polynomial_sparse_independent_scope_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -46288,7 +46304,9 @@
         "TestPolynomialIntegerContentCleanupPreservesIndependentLazard",
         "TestPolynomialIntegerContentIndependentLazardReservationPrefixes",
         "TestPolynomialGlexMonicCleanupPreservesIndependentLazard",
-        "TestPolynomialGlexMonicIndependentLazardReservationPrefixes"
+        "TestPolynomialGlexMonicIndependentLazardReservationPrefixes",
+        "TestPolynomialSparseCleanupPreservesIndependentLazard",
+        "TestPolynomialSparseIndependentLazardReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -46317,6 +46335,18 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Sparse interpolation owns actual mk_polynomial append/factory children and output-reference transfer; source retirement and owning cleanup preserve independent stopped Lazard invocations (polynomial.cpp:3134-3182)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_sparse_interpolation.go",
+          "tests": [
+            "TestPolynomialSparseCleanupPreservesIndependentLazard",
+            "TestPolynomialSparseIndependentLazardReservationPrefixes",
+            "TestPolynomialSparseInterpolationEveryActualReservationPrefix",
+            "TestPolynomialSparseBigFieldInterpolationEveryNumericPrefix",
+            "TestPolynomialSparseOutputCallbackCreationRemainsForeign"
+          ]
+        },
         {
           "name": "GlexMonic owns exact cheap append/factory receipts and transfers the raw returned polynomial only after source new_a/inv_c destruction; cleanup preserves independent stopped Lazard frames (polynomial.cpp:6843-6862)",
           "status": "ported",

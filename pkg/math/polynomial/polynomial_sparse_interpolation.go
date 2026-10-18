@@ -14,15 +14,16 @@ import (
 // Concrete numeral locals own native slices and are constructed at their
 // declaration sites. The scalar cursor stops before older destruction.
 type polynomialSparseInterpolationScope struct {
-	vectors                                              [3][]unumeral.Int // cs, new_as, as
-	mons                                                 []Monomial
-	aux                                                  unumeral.Int
-	solver                                               ModularLinearSolver
-	active, solverConstructed, sourceFinalized, topOwner bool
-	cursor                                               uint8
-	numCursor                                            [3]uint32
-	generation                                           uint64
-	bodyCause, cleanupCause                              error
+	vectors                                    [3][]unumeral.Int // cs, new_as, as
+	mons                                       []Monomial
+	aux                                        unumeral.Int
+	solver                                     ModularLinearSolver
+	active, solverConstructed, sourceFinalized bool
+	cursor                                     uint8
+	numCursor                                  [3]uint32
+	append                                     polynomialCheapAppendInvocationReceipt
+	factory                                    polynomialFactoryInvocationReceipt
+	bodyCause, cleanupCause                    error
 }
 
 func (s *PolynomialSparseInterpolator) scopedPush(v *[]unumeral.Int, a *unumeral.Int) error {
@@ -65,10 +66,6 @@ func (s *PolynomialSparseInterpolator) finishInterpolationSource() (err error) {
 	}
 	if f.cleanupCause != nil {
 		return f.cleanupCause
-	}
-	if e := m.pscSourceStopped(); e != nil {
-		f.cleanupCause = e
-		return e
 	}
 	defer func() {
 		if err != nil {
@@ -145,10 +142,11 @@ func (s *PolynomialSparseInterpolator) CleanupInterpolation() error {
 		}
 		f.vectors[i] = nil
 	}
-	if f.topOwner && f.generation != 0 && m.pscReceipts.generation == f.generation {
-		if e := m.CleanupPSC(); e != nil {
-			return e
-		}
+	if e := m.cleanupFactoryInvocation(&f.factory, true); e != nil {
+		return e
+	}
+	if e := m.som.cleanupAppendInvocation(&f.append, true); e != nil {
+		return e
 	}
 	*f = polynomialSparseInterpolationScope{}
 	return nil
@@ -174,11 +172,10 @@ func (s *PolynomialSparseInterpolator) Interpolate(out *PolynomialRef) (ok bool,
 	if f.active {
 		return false, ErrPolynomialPending
 	}
-	topOwner := m.pscReceipts.depth == 0
 	if e := m.pscEnter(); e != nil {
 		return false, e
 	}
-	*f = polynomialSparseInterpolationScope{active: true, topOwner: topOwner, generation: m.pscReceipts.generation}
+	*f = polynomialSparseInterpolationScope{active: true}
 	defer func() {
 		m.pscLeave()
 		f.bodyCause = err
@@ -186,7 +183,7 @@ func (s *PolynomialSparseInterpolator) Interpolate(out *PolynomialRef) (ok bool,
 			err = errors.Join(err, e)
 			return
 		}
-		pending := (f.topOwner && m.pscPending()) || s.numeric.PendingObject() != (umemory.ObjectRef{})
+		pending := m.matchesFactoryInvocation(&f.factory) || m.som.matchesAppendInvocation(&f.append) || s.numeric.PendingObject() != (umemory.ObjectRef{})
 		for _, root := range s.numeric.PendingAllocatorBlocks() {
 			pending = pending || root != (umemory.Block{})
 		}
@@ -305,7 +302,7 @@ func (s *PolynomialSparseInterpolator) Interpolate(out *PolynomialRef) (ok bool,
 	var result Polynomial
 	e = m.som.reset()
 	if e == nil {
-		result, e = m.mkTermsSource(uint32(len(*as)), polynomialUnivariateCoefficients{values: *as}, view)
+		result, e = m.mkTermsSourceReceipts(uint32(len(*as)), polynomialUnivariateCoefficients{values: *as}, view, false, &f.append, &f.factory)
 	}
 	e = polynomialNewtonJoin(e, s.numericAfter(before))
 	if e != nil {
@@ -313,7 +310,7 @@ func (s *PolynomialSparseInterpolator) Interpolate(out *PolynomialRef) (ok bool,
 	}
 	// Reference assignment may invoke a caller deletion handler. Its newly
 	// allocated numeric roots belong to that caller, never this lexical scope.
-	e = out.root.assign(m, result)
+	e = out.root.assignWithFactoryReceipt(m, result, &f.factory)
 	if e != nil {
 		return false, e
 	}
