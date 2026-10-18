@@ -652,13 +652,25 @@ func (m *UPolynomialManager) nonzeroWithContext(v UPolynomialView, context integ
 	if e := m.check(); e != nil {
 		return 0, e
 	}
-	if polynomialSourceDebug && v.count == 0 {
-		return 0, ErrUPolynomialAssertion
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil {
+		return 0, e
+	}
+	if enabled && v.count == 0 {
+		if e := m.scalarDivisionAssertionFailure(2053, "sz > 0"); e != nil {
+			return 0, e
+		}
 	}
 	i := uint32(0)
 	for {
-		if polynomialSourceDebug && i >= v.count {
-			return 0, ErrUPolynomialAssertion
+		enabled, e := refinementSourceAssertionsEnabled()
+		if e != nil {
+			return 0, e
+		}
+		if enabled && i >= v.count {
+			if e := m.scalarDivisionAssertionFailure(2057, "i < sz"); e != nil {
+				return 0, e
+			}
 		}
 		a, e := m.read(v, i)
 		if e != nil {
@@ -673,10 +685,20 @@ func (m *UPolynomialManager) nonzeroWithContext(v UPolynomialView, context integ
 		}
 		i++
 	}
-	if polynomialSourceDebug {
-		if i >= v.count {
-			return 0, ErrUPolynomialAssertion
+	enabled, e = refinementSourceAssertionsEnabled()
+	if e != nil {
+		return 0, e
+	}
+	if enabled && i >= v.count {
+		if e := m.scalarDivisionAssertionFailure(2062, "i < sz"); e != nil {
+			return 0, e
 		}
+	}
+	enabled, e = refinementSourceAssertionsEnabled()
+	if e != nil {
+		return 0, e
+	}
+	if enabled {
 		a, e := m.read(v, i)
 		if e != nil {
 			return 0, e
@@ -686,7 +708,9 @@ func (m *UPolynomialManager) nonzeroWithContext(v UPolynomialView, context integ
 			return 0, e
 		}
 		if zero {
-			return 0, ErrUPolynomialAssertion
+			if e := m.scalarDivisionAssertionFailure(2063, "!m().is_zero(p[i])"); e != nil {
+				return 0, e
+			}
 		}
 	}
 	// The successful indexed read establishes physical representability of start+i.

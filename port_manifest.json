@@ -50780,7 +50780,8 @@
         "pkg/math/polynomial/upolynomial_zero_roots_assertions.go",
         "pkg/math/polynomial/upolynomial_zero_roots_assertions_test.go",
         "pkg/math/polynomial/upolynomial_root_upper_assertions.go",
-        "pkg/math/polynomial/upolynomial_root_upper_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_root_upper_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_nonzero_bound_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51041,7 +51042,9 @@
         "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard",
         "TestUPolynomialRootUpperEntryAssertionActions",
         "TestUPolynomialRootUpperOrderingAssertionActions",
-        "TestUPolynomialRootUpperClosedEntryAndErasedOrdering"
+        "TestUPolynomialRootUpperClosedEntryAndErasedOrdering",
+        "TestUPolynomialNonzeroBoundAssertionActions",
+        "TestUPolynomialNonzeroBoundAssertionProfiles"
       ],
       "conditionals": [
         {
@@ -51630,6 +51633,22 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Nonzero-root lower-bound separate source assertion actions (upolynomial.cpp:2053,2057,2062-2063)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_root_bounds.go",
+            "pkg/math/polynomial/upolynomial_nonzero_bound_assertions_test.go",
+            "pkg/math/polynomial/upolynomial_knuth_source_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialNonzeroBoundAssertionActions",
+            "TestUPolynomialNonzeroBoundAssertionProfiles",
+            "TestUPolynomialKnuthIndependentBoundsAndSourceAssertions",
+            "TestUPolynomialKnuthMinimumEveryActualPrefixAndDestructiveSuffix"
+          ],
+          "notes": "Nonempty input, scan index, postscan index and postscan nonzero predicates each have their own runtime gate and actual debugger Throw/Continue before the destructive reciprocal update. The postscan numeral query is skipped when assertions are disabled. Raw-count-zero input requires two actual Continue actions before the guarded read; initialized all-zero storage from public Reset/Reserve reaches the scan assertion without scratch or counter rewriting. Invalid inputs preserve caller coefficients and publish no bound. Valid x^2*(x^2-2) yields exponent1 and restores its actual coefficients with assertions enabled/disabled. The older source zero-count regression now supplies explicit Throw before reservation failure is armed. Existing actual allocation-prefix/destructive-suffix coverage remains separate numerical/lifetime evidence. Postscan invariant failures are structurally unreachable without unrelated state mutation and are not claimed reached. Broader Knuth diagnostics/source-unit auditing remains partial."
+        },
         {
           "name": "Cauchy root-upper-bound entry and final-order assertion actions (upolynomial.cpp:1913-1914,1950)",
           "status": "ported",

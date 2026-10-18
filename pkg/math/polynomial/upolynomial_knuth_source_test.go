@@ -145,6 +145,7 @@ func TestUPolynomialKnuthIndependentBoundsAndSourceAssertions(t *testing.T) {
 		empty := algebraicPolynomial(t, p)
 		v, e := p.wholeView(empty)
 		serviceMust(t, e)
+		polynomialAssertionActionsFixture(t, "T")
 		z.Budget().FailAfter(0)
 		_, e = p.NonzeroRootLowerBound(v)
 		z.Budget().FailAfter(-1)
