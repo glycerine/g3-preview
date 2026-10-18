@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync/atomic"
 
 	"github.com/glycerine/g3/pkg/util/memory"
 )
@@ -14,13 +15,20 @@ import (
 // TraceTags is the caller-owned, single-goroutine trace-tag control state.
 // The retained shell and API callers can bind one shared instance.
 type TraceTags struct {
-	all     bool
-	tags    map[string]struct{}
-	writer  io.Writer
-	openErr error
+	outputDepth uint32 // actual synchronous host Write/WriteString/Flush callbacks
+	all         bool
+	tags        map[string]struct{}
+	writer      io.Writer
+	openErr     error
 	// Source tout keeps badbit across records until an explicit reopen.
 	streamErr     error
 	memoryProcess *memory.ProcessAccounting
+}
+
+// OutputCallbackActive lets a caller reject reentry into a lock held across
+// this concrete trace stream. Ordinary trace-body computation is excluded.
+func (t *TraceTags) OutputCallbackActive() bool {
+	return t != nil && atomic.LoadUint32(&t.outputDepth) != 0
 }
 
 func NewTraceTags() *TraceTags { return &TraceTags{} }
@@ -122,9 +130,21 @@ func flushTrace(w io.Writer) error {
 // and the final flush still execute. Suppress later physical writes but allow
 // a TRACE/CTRACE body to run after a refused header insertion.
 type traceStickyWriter struct {
+	owner     *TraceTags
 	out       io.Writer
 	first     error
 	streamErr error
+}
+
+func (w *traceStickyWriter) enterOutput() {
+	if w.owner != nil {
+		atomic.AddUint32(&w.owner.outputDepth, 1)
+	}
+}
+func (w *traceStickyWriter) leaveOutput() {
+	if w.owner != nil {
+		atomic.AddUint32(&w.owner.outputDepth, ^uint32(0))
+	}
 }
 
 func (w *traceStickyWriter) capture(err error) {
@@ -146,6 +166,8 @@ func (w *traceStickyWriter) Write(p []byte) (int, error) {
 	if w.first != nil {
 		return 0, w.first
 	}
+	w.enterOutput()
+	defer w.leaveOutput()
 	n, err := w.out.Write(p)
 	return w.remember(n, len(p), err)
 }
@@ -153,6 +175,8 @@ func (w *traceStickyWriter) WriteString(s string) (int, error) {
 	if w.first != nil {
 		return 0, w.first
 	}
+	w.enterOutput()
+	defer w.leaveOutput()
 	n, err := io.WriteString(w.out, s)
 	return w.remember(n, len(s), err)
 }
@@ -160,6 +184,8 @@ func (w *traceStickyWriter) Flush() error {
 	if w.first != nil {
 		return w.first
 	}
+	w.enterOutput()
+	defer w.leaveOutput()
 	err := flushTrace(w.out)
 	w.capture(err)
 	if err != nil && w.streamErr == nil {
@@ -178,6 +204,8 @@ func WriteTraceEndl(w io.Writer) error {
 }
 
 func (w *traceStickyWriter) finish() error {
+	w.enterOutput()
+	defer w.leaveOutput()
 	if err := flushTrace(w.out); err != nil {
 		w.capture(err)
 		if w.streamErr == nil {
@@ -216,7 +244,7 @@ func (t *TraceTags) Emit(tag, function, file string, line int, body string) erro
 	if err != nil {
 		return err
 	}
-	sticky := &traceStickyWriter{out: w, first: t.streamErr, streamErr: t.streamErr}
+	sticky := &traceStickyWriter{owner: t, out: w, first: t.streamErr, streamErr: t.streamErr}
 	sticky.capture(writeTraceHeader(sticky, tag, function, file, line))
 	sticky.capture(writeTracePart(sticky, body))
 	sticky.capture(writeTracePart(sticky, "------------------------------------------------\n"))
@@ -235,7 +263,7 @@ func (t *TraceTags) EmitShort(tag string, body func(io.Writer) error) error {
 	if err != nil {
 		return err
 	}
-	sticky := &traceStickyWriter{out: w, first: t.streamErr, streamErr: t.streamErr}
+	sticky := &traceStickyWriter{owner: t, out: w, first: t.streamErr, streamErr: t.streamErr}
 	if body != nil {
 		bodyErr := body(sticky)
 		if sticky.bodyComputationFailed(bodyErr) {
@@ -260,7 +288,7 @@ func (t *TraceTags) EmitConditional(tag, function, file string, line int, condit
 	if err != nil {
 		return err
 	}
-	sticky := &traceStickyWriter{out: w, first: t.streamErr, streamErr: t.streamErr}
+	sticky := &traceStickyWriter{owner: t, out: w, first: t.streamErr, streamErr: t.streamErr}
 	sticky.capture(writeTraceHeader(sticky, tag, function, file, line))
 	if body != nil {
 		bodyErr := body(sticky)

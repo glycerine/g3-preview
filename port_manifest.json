@@ -50117,6 +50117,27 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Concrete converter numeric borrow rejects actual receiving trace Write/WriteString/Flush reentry before held service lock or arithmetic mutation",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/sexpr_upolynomial_arithmetic.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/util/numeral/rational_numeric_borrow.go",
+            "pkg/util/numeral/rational_service.go",
+            "pkg/util/diagnostic/util_trace_tags.go",
+            "pkg/math/polynomial/sexpr_upolynomial_arithmetic_test.go",
+            "pkg/util/numeral/rational_numeric_borrow_trace_test.go",
+            "pkg/util/diagnostic/util_trace_output_callback_test.go"
+          ],
+          "tests": [
+            "TestSexprPolynomialArithmeticChunkTraceGuardsBorrowedOwners",
+            "TestRationalNumericBorrowReceivingChunkTraceGuardsSourceLock",
+            "TestTraceOutputCallbacksExcludeBodyAndRestoreAfterPanic",
+            "TestSexprPolynomialWarmAndRemainingKinds"
+          ],
+          "notes": "An actual receiving small-allocator chunk trace reproduced a missing source-service lock guard; the existing guard recognized failure transport only. TraceTags now records only actual synchronous host Write/WriteString/Flush execution with an atomic depth, excluding ordinary trace-body computation and restoring it on panic. The rational numeric borrow atomically publishes the concrete receiving integer owner, whose immutable Runtime/trace bindings supply the callback domain; ordinary borrow calls still serialize rather than being rejected solely because a borrow is active. The one-pointer snapshot preserves warm converter allocation counts. Actual converter multiplication through the pooled debug profile proves source/receiving numeral, modular, polynomial and converter lifetimes, refusal of Reset and executing context acquisition, and no global-service mutex reentry. Independent BIG square and complete charged teardown pass; erased source trace emits no callback. This is concrete Go lifetime/callback metadata, not a source numeral, numerical algorithm, STL port or source construction credit. Whole unit and polynomial/AST completion remain open."
+        },
+        {
           "name": "Converter cleanup matches its accepted global lexical invocation; refused and stale calls preserve independent roots (sexpr2upolynomial.cpp:39-97)",
           "status": "partial",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
@@ -50298,6 +50319,27 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete converter numeric borrow rejects actual receiving trace Write/WriteString/Flush reentry before held service lock or arithmetic mutation",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/sexpr_upolynomial_arithmetic.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/util/numeral/rational_numeric_borrow.go",
+            "pkg/util/numeral/rational_service.go",
+            "pkg/util/diagnostic/util_trace_tags.go",
+            "pkg/math/polynomial/sexpr_upolynomial_arithmetic_test.go",
+            "pkg/util/numeral/rational_numeric_borrow_trace_test.go",
+            "pkg/util/diagnostic/util_trace_output_callback_test.go"
+          ],
+          "tests": [
+            "TestSexprPolynomialArithmeticChunkTraceGuardsBorrowedOwners",
+            "TestRationalNumericBorrowReceivingChunkTraceGuardsSourceLock",
+            "TestTraceOutputCallbacksExcludeBodyAndRestoreAfterPanic",
+            "TestSexprPolynomialWarmAndRemainingKinds"
+          ],
+          "notes": "An actual receiving small-allocator chunk trace reproduced a missing source-service lock guard; the existing guard recognized failure transport only. TraceTags now records only actual synchronous host Write/WriteString/Flush execution with an atomic depth, excluding ordinary trace-body computation and restoring it on panic. The rational numeric borrow atomically publishes the concrete receiving integer owner, whose immutable Runtime/trace bindings supply the callback domain; ordinary borrow calls still serialize rather than being rejected solely because a borrow is active. The one-pointer snapshot preserves warm converter allocation counts. Actual converter multiplication through the pooled debug profile proves source/receiving numeral, modular, polynomial and converter lifetimes, refusal of Reset and executing context acquisition, and no global-service mutex reentry. Independent BIG square and complete charged teardown pass; erased source trace emits no callback. This is concrete Go lifetime/callback metadata, not a source numeral, numerical algorithm, STL port or source construction credit. Whole unit and polynomial/AST completion remain open."
+        },
         {
           "name": "Converter cleanup matches its accepted global lexical invocation; refused and stale calls preserve independent roots (sexpr2upolynomial.cpp:39-97)",
           "status": "partial",

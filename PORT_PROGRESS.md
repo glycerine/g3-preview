@@ -44806,3 +44806,43 @@ interpolation and mathematical checks pass ordinary (0.244s) and
 checked/debug/trace (0.357s) on CPUs 8-16. These checks cover the final display
 increment; the full native run started before that increment and is still live.
 Full stream flags/exception composition and source-unit completion remain open.
+
+Full native verification completed successfully: 68 passing packages and 11
+packages without tests, no failure lines, process exit 0. Polynomial passed in
+93.523s, LP in 688.071s and numeral in 58.948s. Log:
+/mnt/oldrog/tmp/g3-polynomial-lexical-native-full-retry.log. This validates the
+snapshot before the later display/trace increments; their final behavior has
+separate focused verification below. No full-suite repeat for these increments.
+
+Actual converter numerical trace callbacks exposed another lock boundary:
+WithReceivingInteger recognized the receiver's allocation-failure transport,
+but a receiving allocator's chunk TRACE could invoke host output with the source
+service mutex already held. The regression safely checked the missing guard
+before attempting any lock acquisition and failed before the fix.
+
+TraceTags now records only actual host Write, WriteString and Flush execution,
+with atomic depth restored on normal return and panic. The trace body itself is
+not classified as host callback execution. A numeric borrow publishes its actual
+receiving integer owner through a one-pointer atomic snapshot, so its immutable
+Runtime and trace bindings protect the held source-service lock. Ordinary calls
+continue to serialize; an active borrow alone does not trigger refusal. The
+initial two-pointer snapshot introduced warm allocations; retaining the actual
+integer owner restores the existing one-vector/zero-atom warm allocation checks.
+
+A real receiving chunk trace covers source service Close/SourceFinalize/Zero
+and flush reentry. A full converter multiplication through the pooled debug
+profile covers source/receiver integer lifetimes, modular/polynomial/converter
+lifetimes, Reset refusal, executing numerical-context refusal and global mutex
+reentry. The independent BIG square and complete charged teardown pass. Erased
+trace builds produce no callback. Dedicated trace checks cover Write versus
+WriteString, reached flush, trace-body exclusion and panic restoration.
+
+Final focused polynomial/numeral selections passed ordinary (0.658s/11.481s).
+The checked/debug/trace polynomial selection passed in 0.625s; both full
+diagnostic selections passed (ordinary 0.185s, checked/debug/trace 0.189s).
+These are Go ownership/callback guards, not extra source numeral construction,
+source recovery or STL implementations. Whole polynomial then AST remains
+unfinished; source-unit status counts stay unchanged.
+The final checked/debug/trace numeral selection also passed in 18.731s.
+portcheck and git diff --check pass: 2103 units, 677 APIs; 210 ported,
+341 partial, 1495 unported and 11 dead/deleted. Commands remain on CPUs 8-16.

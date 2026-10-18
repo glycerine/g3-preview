@@ -149,7 +149,7 @@ func newUPolynomialManager(c UPolynomialConfig, store *UPolynomialCoefficientSto
 	return m, nil
 }
 func (m *UPolynomialManager) check() error {
-	if m != nil && m.self == m && (m.pendingSexprArithmetic != nil || m.sexprArithmeticExecuting() && (m.callbackDepth != 0 || m.config.Integer.RuntimeOwner().FailureTransportActive())) {
+	if m != nil && m.self == m && (m.pendingSexprArithmetic != nil || m.sexprArithmeticExecuting() && (m.callbackDepth != 0 || m.config.Integer.RuntimeOwner().FailureTransportActive() || m.config.Integer.BorrowTraceTags().OutputCallbackActive())) {
 		return ErrUPolynomialCleanupPending
 	}
 	if m != nil && m.self == m && m.rationalInput.running {

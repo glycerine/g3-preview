@@ -4,7 +4,6 @@ package numeral
 import (
 	"errors"
 	"github.com/glycerine/g3/pkg/arena"
-	umemory "github.com/glycerine/g3/pkg/util/memory"
 )
 
 // RationalNumericBorrow is valid only inside WithNumericBorrow's synchronous
@@ -18,7 +17,7 @@ type RationalNumericBorrow struct {
 
 func (b *RationalNumericBorrow) NumericExecuting() bool { return b.Valid() }
 
-type rationalNumericReceiver struct{ runtime *umemory.Runtime }
+type rationalNumericReceiver struct{ integer *IntegerManager }
 
 // RationalNumericLexicalReceipt identifies an accepted outer lexical call.
 // Refused entry preserves the caller's prior receipt. It grants no ownership
@@ -28,9 +27,9 @@ type RationalNumericLexicalReceipt struct {
 	invocation uint64
 }
 
-// WithReceivingInteger holds the concrete receiving allocator's callback
-// boundary while the service mutex is already held. Only actual transport
-// reentry is rejected; ordinary service calls continue to serialize on mu.
+// WithReceivingInteger holds the concrete receiving allocator and trace-output
+// callback boundary while the service mutex is already held. Only actual host
+// callback reentry is rejected; ordinary service calls continue to serialize.
 func (b *RationalNumericBorrow) WithReceivingInteger(z *IntegerManager, body func() error) error {
 	if !b.Valid() {
 		return ErrRationalServiceOwner
@@ -43,7 +42,7 @@ func (b *RationalNumericBorrow) WithReceivingInteger(z *IntegerManager, body fun
 	if v := s.numericReceiver.Load(); v != nil {
 		previous = v.(rationalNumericReceiver)
 	}
-	s.numericReceiver.Store(rationalNumericReceiver{runtime: z.RuntimeOwner()})
+	s.numericReceiver.Store(rationalNumericReceiver{integer: z})
 	defer s.numericReceiver.Store(previous)
 	return body()
 }

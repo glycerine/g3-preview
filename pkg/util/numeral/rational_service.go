@@ -493,14 +493,16 @@ func (s *RationalService) destroyInfinitesimalConstants() {
 }
 func (s *RationalService) Close() error { return s.CloseChecked() }
 
-// The Runtime callback is a caller-confined Go adapter domain, distinct from
-// ordinary concurrent service calls, which continue to serialize on mu.
+// Allocator failure transport and trace output are caller-confined Go callback
+// domains. Ordinary concurrent service calls continue to serialize on mu.
 func (s *RationalService) runtimeTransportExecuting() bool {
 	// A locked numeric borrow can invoke a different owner's allocator. Its
-	// actual transport callback must not reenter this service's held mutex.
+	// actual host callbacks must not reenter this service's held mutex.
 	if v := s.numericReceiver.Load(); v != nil {
-		if r := v.(rationalNumericReceiver).runtime; r != nil && r.FailureTransportActive() {
-			return true
+		if z := v.(rationalNumericReceiver).integer; z != nil {
+			if z.BorrowTraceTags().OutputCallbackActive() || z.Memory.FailureTransportActive() {
+				return true
+			}
 		}
 	}
 	if atomic.LoadUint32(&s.sourceRuntimeExecuting) == 0 {

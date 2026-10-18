@@ -54,7 +54,7 @@ func TestRationalNumericBorrowCopiesLexicalScalarAndExpires(t *testing.T) {
 	if retained.Valid() {
 		t.Fatal("borrow survived callback")
 	}
-	if v := s.numericReceiver.Load(); v != nil && v.(rationalNumericReceiver).runtime != nil {
+	if v := s.numericReceiver.Load(); v != nil && v.(rationalNumericReceiver).integer != nil {
 		t.Fatal("completed numeric borrow retained allocator owner")
 	}
 	if e := retained.WithReceivingInteger(s.Manager.Z, func() error { t.Fatal("expired borrow acquired receiving allocator"); return nil }); !errors.Is(e, ErrRationalServiceOwner) {

@@ -6,9 +6,106 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
+
+type sexprArithmeticTraceProbe struct {
+	t         *testing.T
+	converter *SexprPolynomialConverter
+	globals   *unumeral.RationalService
+	out       UPolynomial
+	called    bool
+}
+
+func (w *sexprArithmeticTraceProbe) Write(p []byte) (int, error) {
+	c := w.converter
+	if c == nil || !c.arithmetic.executing || w.called {
+		return len(p), nil
+	}
+	w.called = true
+	m := c.polynomial
+	for _, e := range []error{m.Reset(w.out), m.Close(), m.SourceFinalize()} {
+		if !errors.Is(e, ErrUPolynomialCleanupPending) {
+			w.t.Error("trace acquired arithmetic polynomial", e)
+		}
+	}
+	if c.arithmetic.NumericBound(true) {
+		w.t.Error("trace acquired executing numerical context")
+	}
+	for _, z := range []*unumeral.IntegerManager{w.globals.Manager.Integers(), m.config.Integer} {
+		for _, e := range []error{z.CloseChecked(), z.SourceFinalize()} {
+			if !errors.Is(e, unumeral.ErrNumericPending) {
+				w.t.Error("trace acquired borrowed numeral owner", e)
+			}
+		}
+	}
+	if e := m.modular.Close(); !errors.Is(e, unumeral.ErrNumericPending) {
+		w.t.Error("trace acquired borrowed modular owner", e)
+	}
+	for _, e := range []error{c.Cleanup(), c.Close()} {
+		if !errors.Is(e, ErrSexprPolynomialPending) {
+			w.t.Error("trace acquired converter", e)
+		}
+	}
+	for _, e := range []error{w.globals.CloseChecked(), w.globals.SourceFinalize()} {
+		if !errors.Is(e, arena.ErrInvalidSlot) {
+			w.t.Error("trace acquired borrowed global service", e)
+		}
+	}
+	if _, e := w.globals.Zero(); !errors.Is(e, arena.ErrInvalidSlot) {
+		w.t.Error("trace reentered global service", e)
+	}
+	return len(p), nil
+}
+
+func TestSexprPolynomialArithmeticChunkTraceGuardsBorrowedOwners(t *testing.T) {
+	sx, sy, globals := sxOwner(t, arena.NewBudget(1<<24))
+	w := sexprArithmeticTraceProbe{t: t, globals: globals}
+	tags := diagnostic.NewTraceTagsWithWriter(&w)
+	tags.Enable("memory")
+	budget := arena.NewBudget(1 << 24)
+	z, e := unumeral.NewIntegerManager(unumeral.IntegerConfig{
+		Cells: arena.Config{Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}},
+		Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true, Windows: true}, Trace: tags,
+	})
+	serviceMust(t, e)
+	t.Cleanup(func() {
+		serviceMust(t, z.CloseChecked())
+		if budget.Used() != 0 {
+			t.Fatal("private receiver charge", budget.Used())
+		}
+	})
+	m, e := NewUPolynomialManager(UPolynomialConfig{Integer: z, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }})
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, m.Close()) })
+	out, e := m.NewPolynomial()
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, m.DelPolynomial(&out)) })
+	c, e := NewSexprPolynomialConverter(sx, m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, c.Close()) })
+	w.converter, w.out = c, out
+	a := sxPolyNum(t, sx, globals, "1267650600228229401496703205377")
+	serviceMust(t, c.Convert(sxPolyApp(t, sx, sy, "*", a, a), out))
+	if w.called != tags.ShouldTrace("memory") {
+		t.Fatal("actual arithmetic chunk trace", w.called)
+	}
+	if c.arithmetic.active || m.sexprArithmetic != nil || m.pendingSexprArithmetic != nil {
+		t.Fatal("completed arithmetic retained scope")
+	}
+	var got, want unumeral.Int
+	serviceMust(t, m.ReadCoefficient(out, 0, &got))
+	serviceMust(t, z.SetString(&want, "1606938044258990275541962092343697903722659452585786241712129"))
+	equal, e := z.Equal(&got, &want)
+	serviceMust(t, e)
+	serviceMust(t, z.Del(&got))
+	serviceMust(t, z.Del(&want))
+	if !equal {
+		t.Fatal("independent square")
+	}
+}
 
 func TestSexprPolynomialArithmeticRefusalRetainsOlderArguments(t *testing.T) {
 	for _, op := range []string{"+", "-", "*", "^"} {

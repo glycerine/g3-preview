@@ -21,7 +21,7 @@ type sexprPolynomialArithmeticScope struct {
 func (s *sexprPolynomialArithmeticScope) NumericExecuting() bool { return s.executing || s.cleaning }
 func (s *sexprPolynomialArithmeticScope) NumericBound(executing bool) bool {
 	c := s.owner
-	return c != nil && c.self == c && !c.closed && s == &c.arithmetic && s.active && (!executing || s.executing && !s.cleaning && c.polynomial.callbackDepth == 0 && !c.polynomial.config.Integer.RuntimeOwner().FailureTransportActive())
+	return c != nil && c.self == c && !c.closed && s == &c.arithmetic && s.active && (!executing || s.executing && !s.cleaning && c.polynomial.callbackDepth == 0 && !c.polynomial.config.Integer.RuntimeOwner().FailureTransportActive() && !c.polynomial.config.Integer.BorrowTraceTags().OutputCallbackActive())
 }
 func (s *sexprPolynomialArithmeticScope) NumericRoots(z *unumeral.IntegerManager, local *unumeral.NumericAllocationRoots) *unumeral.NumericAllocationRoots {
 	if !s.NumericBound(true) || s.owner.polynomial.config.Integer != z {
