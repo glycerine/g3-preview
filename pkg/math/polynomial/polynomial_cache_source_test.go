@@ -30,6 +30,9 @@ func TestPolynomialCacheFactorStoppedBodyCleanupAndRetry(t *testing.T) {
 				return
 			}
 			stopped = true
+			if !m.matchesFactorCore(&c.factorCall) || c.factorCall != m.factorRoot {
+				t.Fatal("accepted cache factor receipt lost actual root identity")
+			}
 			if e := c.Factor(p, out); !errors.Is(e, ErrPolynomialPending) {
 				t.Fatal("incomplete factor entry permitted replay", e)
 			}
@@ -71,6 +74,9 @@ func TestPolynomialCachePSCStoppedBodyCleanupAndRetry(t *testing.T) {
 				return
 			}
 			stopped = true
+			if !m.core.matchesPSCInvocation(&c.pscCall) {
+				t.Fatal("accepted cache PSC receipt lost actual source identity")
+			}
 			serviceMust(t, c.CleanupPSC())
 			if m.core.pscReceipts.factory != 0 {
 				t.Fatal("completed PSC parent left an owning factory receipt")

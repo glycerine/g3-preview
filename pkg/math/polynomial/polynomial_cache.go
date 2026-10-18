@@ -11,6 +11,8 @@ import (
 // PolynomialCache owns canonical representatives and memoized results used by
 // the retained NLSAT cache.
 type PolynomialCache struct {
+	pscCall        polynomialPSCInvocationReceipt
+	factorCall     polynomialFactorCoreInvocationReceipt
 	self           *PolynomialCache
 	manager        *MultivariatePolynomialManager
 	refs           polynomialReferenceVector
@@ -92,6 +94,7 @@ func (c *PolynomialCache) Factor(p Polynomial, out *PolynomialRefVector) error {
 	}
 	entry := &polynomialFactorCacheEntry{}
 	c.factors[p] = entry
+	c.factorCall = polynomialFactorCoreInvocationReceipt{}
 	fs, e := NewPolynomialFactors(c.manager)
 	if e != nil {
 		if fs != nil {
@@ -99,7 +102,7 @@ func (c *PolynomialCache) Factor(p Polynomial, out *PolynomialRefVector) error {
 		}
 		return e
 	}
-	if e := c.manager.Factor(p, fs, DefaultUPolynomialFactorParams()); e != nil {
+	if e := c.manager.factorWithReceipt(p, fs, DefaultUPolynomialFactorParams(), &c.factorCall); e != nil {
 		return c.finishFactorOwner(fs, e)
 	}
 	n, e := fs.Distinct()
@@ -131,7 +134,7 @@ func (c *PolynomialCache) Factor(p Polynomial, out *PolynomialRefVector) error {
 
 func (c *PolynomialCache) finishFactorOwner(fs *PolynomialFactors, body error) error {
 	if body != nil {
-		if e := c.manager.CleanupFactor(); e != nil {
+		if e := c.cleanupFactorInvocation(); e != nil {
 			c.pendingFactors = fs
 			return errors.Join(body, e)
 		}
@@ -154,7 +157,7 @@ func (c *PolynomialCache) CleanupFactor() error {
 	if c.pendingFactors == nil {
 		return nil
 	}
-	if e := c.manager.CleanupFactor(); e != nil {
+	if e := c.cleanupFactorInvocation(); e != nil {
 		return e
 	}
 	if e := c.pendingFactors.CloseChecked(); e != nil {
@@ -165,7 +168,7 @@ func (c *PolynomialCache) CleanupFactor() error {
 }
 
 func (c *PolynomialCache) finishPSC(body error) error {
-	if e := c.manager.core.CleanupPSC(); e != nil {
+	if e := c.cleanupPSCInvocation(); e != nil {
 		c.pendingPSC = true
 		return errors.Join(body, e)
 	}
@@ -184,7 +187,7 @@ func (c *PolynomialCache) CleanupPSC() error {
 	if !c.pendingPSC {
 		return nil
 	}
-	if e := c.manager.core.CleanupPSC(); e != nil {
+	if e := c.cleanupPSCInvocation(); e != nil {
 		return e
 	}
 	c.pendingPSC = false
@@ -226,7 +229,8 @@ func (c *PolynomialCache) PSCChain(p, q Polynomial, x uint32, out *PolynomialRef
 	}
 	entry := &polynomialPSCEntry{}
 	c.psc[key] = entry
-	if e := c.manager.PSCChain(p, q, x, out); e != nil {
+	c.pscCall = polynomialPSCInvocationReceipt{}
+	if e := c.manager.pscChainWithReceipt(p, q, x, out, &c.pscCall); e != nil {
 		return c.finishPSC(e)
 	}
 	n, e := out.Size()
@@ -380,4 +384,26 @@ func (c *PolynomialCache) Close() error {
 	c.factors = nil
 	c.closed = true
 	return nil
+}
+
+// A refused cache call conveys no authority over the manager's public root.
+func (c *PolynomialCache) cleanupFactorInvocation() error {
+	if e := c.manager.cleanupFactorCoreInvocation(&c.factorCall, false); e != nil {
+		return e
+	}
+	return c.manager.cleanupFactorCoreInvocation(&c.factorCall, true)
+}
+
+// Compatibility cleanup is selected only after the cache's concrete accepted
+// owner/frame/nonce matches. A refused or retired tuple cannot select any work.
+func (c *PolynomialCache) cleanupPSCInvocation() error {
+	core := c.manager.core
+	if !core.matchesPSCInvocation(&c.pscCall) {
+		return nil
+	}
+	generation := c.pscCall.frame.sourceGeneration
+	if e := core.cleanupPSCCompleted(generation); e != nil {
+		return e
+	}
+	return core.cleanupPSCAborts(generation)
 }

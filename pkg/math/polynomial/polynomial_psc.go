@@ -98,13 +98,19 @@ func (m *MultivariatePolynomialCore) finishPSCPhase(owning, abort bool) (err err
 }
 
 func (m *MultivariatePolynomialManager) PSCChain(p, q Polynomial, x uint32, S *PolynomialRefVector) error {
+	return m.pscChainWithReceipt(p, q, x, S, nil)
+}
+func (m *MultivariatePolynomialManager) pscChainWithReceipt(p, q Polynomial, x uint32, S *PolynomialRefVector, receipt *polynomialPSCInvocationReceipt) error {
 	if e := m.ready(); e != nil {
 		return e
 	}
-	return m.core.PSCChain(p, q, x, S)
+	return m.core.pscChainWithReceipt(p, q, x, S, receipt)
 }
 
 func (m *MultivariatePolynomialCore) PSCChain(p, q Polynomial, x uint32, S *PolynomialRefVector) error {
+	return m.pscChainWithReceipt(p, q, x, S, nil)
+}
+func (m *MultivariatePolynomialCore) pscChainWithReceipt(p, q Polynomial, x uint32, S *PolynomialRefVector, receipt *polynomialPSCInvocationReceipt) error {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -145,9 +151,9 @@ func (m *MultivariatePolynomialCore) PSCChain(p, q Polynomial, x uint32, S *Poly
 		return e
 	}
 	if dp >= dq {
-		e = m.pscOptimizedCore(p, q, x, S)
+		e = m.pscOptimizedCoreWithReceipt(p, q, x, S, receipt)
 	} else {
-		e = m.pscOptimizedCore(q, p, x, S)
+		e = m.pscOptimizedCoreWithReceipt(q, p, x, S, receipt)
 	}
 	if e != nil {
 		return e

@@ -40309,7 +40309,8 @@
         "pkg/math/polynomial/algebraic_isolation_multivariate_scope.go",
         "pkg/math/polynomial/algebraic_isolation_multivariate_test.go",
         "pkg/math/polynomial/algebraic_isolation_multivariate_cancel_test.go",
-        "pkg/math/polynomial/algebraic_isolation_multivariate_owner_test.go"
+        "pkg/math/polynomial/algebraic_isolation_multivariate_owner_test.go",
+        "pkg/math/polynomial/polynomial_cache_child_owner_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -48189,7 +48190,8 @@
       "go_targets": [
         "pkg/math/polynomial/polynomial_cache.go",
         "pkg/math/polynomial/polynomial_cache_memory_trace.go",
-        "pkg/math/polynomial/polynomial_cache_source_test.go"
+        "pkg/math/polynomial/polynomial_cache_source_test.go",
+        "pkg/math/polynomial/polynomial_cache_child_owner_test.go"
       ],
       "tests": [
         "TestPolynomialCacheCanonicalizationAndReset",
@@ -48217,6 +48219,15 @@
           "status": "platform_replacement",
           "go_target": "pkg/math/polynomial/polynomial_cache_memory_trace.go",
           "tests": ["TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal"]
+        },
+        {
+          "name": "Cache miss factor/PSC owning acknowledgement uses only the accepted callee owner/frame/invocation; refused entry preserves independent pending work",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "tests": [
+            "TestPolynomialCacheRefusedFactorPreservesOlderInvocation",
+            "TestPolynomialCacheRefusedPSCPreservesOlderInvocation"
+          ]
         }
       ],
       "ownership": [],
@@ -48232,7 +48243,8 @@
       "go_targets": [
         "pkg/math/polynomial/polynomial_cache.go",
         "pkg/math/polynomial/polynomial_cache_memory_trace.go",
-        "pkg/math/polynomial/polynomial_cache_source_test.go"
+        "pkg/math/polynomial/polynomial_cache_source_test.go",
+        "pkg/math/polynomial/polynomial_cache_child_owner_test.go"
       ],
       "tests": [
         "TestPolynomialCacheCanonicalizationAndReset",

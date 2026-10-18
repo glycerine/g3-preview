@@ -70,9 +70,9 @@ func (m *MultivariatePolynomialManager) beginFactorCore(r *PolynomialFactors) (*
 	return s, nil
 }
 func (m *MultivariatePolynomialManager) factorCoreWithReceipt(p Polynomial, r *PolynomialFactors, params UPolynomialFactorParams, receipt *polynomialFactorCoreInvocationReceipt) (cause error) {
-	return m.factorCoreSource(p, r, params, receipt, nil)
+	return m.factorCoreSource(p, r, params, receipt, nil, nil)
 }
-func (m *MultivariatePolynomialManager) factorCoreSource(p Polynomial, r *PolynomialFactors, params UPolynomialFactorParams, receipt *polynomialFactorCoreInvocationReceipt, parent *polynomialFactorCoreFrame) (cause error) {
+func (m *MultivariatePolynomialManager) factorCoreSource(p Polynomial, r *PolynomialFactors, params UPolynomialFactorParams, receipt *polynomialFactorCoreInvocationReceipt, parent *polynomialFactorCoreFrame, accepted *polynomialFactorCoreInvocationReceipt) (cause error) {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -131,6 +131,9 @@ func (m *MultivariatePolynomialManager) factorCoreSource(p Polynomial, r *Polyno
 	if receipt != nil {
 		*receipt = direct
 	}
+	if accepted != nil {
+		*accepted = direct
+	}
 	defer func() {
 		s.executing = false
 		if s.bodyCause == nil {
@@ -172,7 +175,7 @@ func (m *MultivariatePolynomialManager) factorCoreSource(p Polynomial, r *Polyno
 	}
 	s.lastCall = 3
 	s.childEntering = true
-	if e = m.factorCoreSource(s.refs[0].value, r, params, &s.child, s); e != nil {
+	if e = m.factorCoreSource(s.refs[0].value, r, params, &s.child, s, nil); e != nil {
 		s.childEntering = false
 		return e
 	}
@@ -409,6 +412,12 @@ func (m *MultivariatePolynomialManager) factorSquareFreePrimitiveDispatch(p Poly
 }
 
 func (m *MultivariatePolynomialManager) Factor(p Polynomial, r *PolynomialFactors, params UPolynomialFactorParams) error {
+	return m.factorWithReceipt(p, r, params, nil)
+}
+
+// accepted is stamped only by an actually entered nonconstant source frame.
+// Constant children belong to the concrete factors owner supplied by the caller.
+func (m *MultivariatePolynomialManager) factorWithReceipt(p Polynomial, r *PolynomialFactors, params UPolynomialFactorParams, accepted *polynomialFactorCoreInvocationReceipt) error {
 	if e := m.ready(); e != nil {
 		return e
 	}
@@ -436,7 +445,7 @@ func (m *MultivariatePolynomialManager) Factor(p Polynomial, r *PolynomialFactor
 	if !constant && m.matchesFactorCore(&m.factorRoot) && m.factorRoot.frame.active {
 		return ErrPolynomialPending
 	}
-	return m.factorCoreWithReceipt(p, r, params, &m.factorRoot)
+	return m.factorCoreSource(p, r, params, &m.factorRoot, nil, accepted)
 }
 func (m *MultivariatePolynomialManager) factorCoreChildSource(s *polynomialFactorCoreFrame) error {
 	if e := m.factorLastChildSource(s); e != nil {
