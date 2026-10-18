@@ -554,6 +554,9 @@ func (s *UPolynomialFactorizationService) henselFactorsWithCaller(f UPolynomialV
 		if err = zp.setViewWithCaller(A, zp.stateView(&pf.factors[i]), caller); err != nil {
 			return err
 		}
+		if err = s.traceHenselVectors(caller, 906); err != nil {
+			return err
+		}
 		if i > 0 {
 			// parts was grown by the lifted core in the prior source division.
 			// Adopt its actual physical origin at this subsequent cross-core read.
@@ -568,7 +571,13 @@ func (s *UPolynomialFactorizationService) henselFactorsWithCaller(f UPolynomialV
 				return err
 			}
 		}
+		if err = s.traceHenselVectors(caller, 921); err != nil {
+			return err
+		}
 		if err = zp.divWithCaller(m.stateView(C), m.stateView(A), B, caller); err != nil {
+			return err
+		}
+		if err = s.traceHenselVectors(caller, 927); err != nil {
 			return err
 		}
 		p, err := zp.modular.BorrowedModulus()
@@ -589,6 +598,9 @@ func (s *UPolynomialFactorizationService) henselFactorsWithCaller(f UPolynomialV
 			if !ok {
 				return ErrUPolynomialAssertion
 			}
+		}
+		if err = s.traceHenselVectors(caller, 935); err != nil {
+			return err
 		}
 		if i == 0 {
 			if err = zpe.toZPCopyWithOwners(f, parts, nil, nil, caller); err != nil {

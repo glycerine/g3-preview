@@ -45100,3 +45100,34 @@ the enclosing source consumer, protecting that consumer's older inputs.
 Final broader factor/Hensel/recombination/degree/display checks pass ordinary
 16.701s and checked/debug/trace28.645s, CPUs8-16. portcheck and diff checks pass;
 2103 units,677 APIs;211 ported,340 partial,1495 unported,11 dead/deleted.
+
+2026-10-18: whole Hensel loop A/C/B and post-quadratic TRACE records
+
+Implemented factorization.cpp:906-908,921-923,927-929,935-939 at actual source
+positions. A/C/B use the integer display core, including modular coefficient
+vectors. The post-quadratic record follows the individual-lift assertion and
+precedes factor publication, using its distinct polynomial::factorization tag
+and actual lifted modulus. Other loop records use the bughunt tag. All preserve
+source endl, continued computation after stream failure and whole-record
+borrows of the actual root/prime/lift owners, including independent public
+Hensel callers. The Hensel child-cause check now observes the exact retained
+polynomial-display receipt before older vectors can be destroyed.
+
+The x^2+3*x+2 fixture checks actual A/C/B records and separately enabled lifted
+modulus16,A=x+2,B=x+1. Actual callback probes cover header, flush and numeric
+display owners. A real descriptor-after-physical refusal in that post-lift
+record leaves constructed=9, all four actual Hensel outer vectors, exact child
+and no published lifted factor. Issued enclosing source receipts expose that
+blocker. Physical owner audit and explicit child-first cleanup pass. Disabled
+records skip absent caller operands. Focused checked/debug/trace checks pass
+(0.032s/0.033s).
+
+Hensel entry/exit records at886/960 and earlier helper/verbose/source-unit audits
+remain open. No whole factorization completion is claimed. Polynomial then AST
+remain unfinished. No full native repeat since the recent successful run.
+Broader focused checks pass ordinary16.545s and checked/debug/trace28.507s.
+An additional traced public Hensel test uses actual independent root/prime/lift
+and donor cores: all four records appear, real callback guards hold and three
+lifted factors return with no retained adapter (checked/debug/trace0.021s).
+Commands remain on CPUs8-16. portcheck and diff checks pass; source-unit counts
+remain211 ported,340 partial,1495 unported,11 dead/deleted (2103 units,677 APIs).

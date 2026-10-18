@@ -53110,7 +53110,9 @@
         "pkg/math/polynomial/upolynomial_factor_polynomial_trace.go",
         "pkg/math/polynomial/upolynomial_factor_entry_trace.go",
         "pkg/math/polynomial/upolynomial_factor_entry_trace_test.go",
-        "pkg/math/polynomial/upolynomial_factor_recombination_trace_test.go"
+        "pkg/math/polynomial/upolynomial_factor_recombination_trace_test.go",
+        "pkg/math/polynomial/upolynomial_factor_hensel_trace.go",
+        "pkg/math/polynomial/upolynomial_factor_hensel_trace_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53227,7 +53229,10 @@
         "TestUPolynomialFactorEntryTraceExactChildBeforeAnyLocal",
         "TestUPolynomialFactorEntryTraceDisabledSkipsView",
         "TestUPolynomialFactorRecombinationTraceInexactDivision",
-        "TestUPolynomialFactorRecombinationTraceChildRefusalStopsOlderLocals"
+        "TestUPolynomialFactorRecombinationTraceChildRefusalStopsOlderLocals",
+        "TestUPolynomialFactorHenselLiftTraceSeparateTagAndOwners",
+        "TestUPolynomialFactorHenselTraceChildRefusalStopsOuterVectors",
+        "TestUPolynomialFactorHenselVectorTraceIndependentPublicCores"
       ],
       "conditionals": [
         {
@@ -53340,6 +53345,24 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Whole Hensel A/C/B and post-quadratic-lift TRACE records (906-908,921-923,927-929,935-939)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_hensel_trace.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_hensel.go",
+            "pkg/math/polynomial/upolynomial_hensel_caller_scope.go",
+            "pkg/math/polynomial/upolynomial_factor_hensel_trace_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorDegreeTraceRetainedRecordsAndOwners",
+            "TestUPolynomialFactorHenselLiftTraceSeparateTagAndOwners",
+            "TestUPolynomialFactorHenselTraceChildRefusalStopsOuterVectors",
+            "TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands",
+            "TestUPolynomialFactorHenselVectorTraceIndependentPublicCores"
+          ],
+          "notes": "Prints actual A, C and B at their source loop positions through the integer core, including modular coefficient vectors. The post-quadratic record separately gates polynomial::factorization, formats the actual lifted modulus and both actual vectors after the individual-lift assertion and before publishing a factor. Exact accepted polynomial-display ownership participates in Hensel child-cause checks before older vectors are destroyed; whole-record borrows use actual root/prime/lift managers even for independent public Hensel consumers. Actual descriptor-after-physical refusal retains four outer vectors with no lifted factor published. Disabled tags skip absent caller operands. The x^2+3*x+2 source fixture verifies lifted modulus16 and A=x+2,B=x+1. Entry/exit Hensel records at886/960 and broader helper/source-unit audits remain open; no whole-unit completion credit."
+        },
         {
           "name": "Whole pre-division, division-result and post-publication recombination bughunt TRACE records (1239-1242,1246-1250,1274-1278)",
           "status": "ported",

@@ -91,6 +91,9 @@ func (c *upolyHenselCallerScope) childCause() error {
 	if !c.matches() {
 		return ErrUPolynomialOwner
 	}
+	if e := c.owner.traceSourceBlocker(); e != nil {
+		return e
+	}
 	if e := c.owner.service.henselPairInvocationSourceCause(&c.pair); e != nil {
 		return e
 	}
