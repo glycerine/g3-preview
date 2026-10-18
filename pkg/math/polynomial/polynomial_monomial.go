@@ -424,6 +424,12 @@ type monomialDecrementOutcome struct{ written, last bool }
 
 func (m *MonomialManager) decRefCore(a Monomial) error { return m.decRefCoreOutcome(a, nil) }
 func (m *MonomialManager) decRefCoreOutcome(a Monomial, out *monomialDecrementOutcome) error {
+	// A borrowed trace writer can reenter through polynomial owners as well
+	// as DecRef. Refuse at the shared decrement before publishing RC or any
+	// table/allocator deletion prefix while the query still reads this owner.
+	if m != nil && m.self == m && m.queryTraceRunning {
+		return ErrMonomialPending
+	}
 	l, e := m.location(a)
 	if e != nil {
 		return e

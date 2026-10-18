@@ -108,6 +108,9 @@ type monomialQueryLifetimeWriter struct {
 	value                               Monomial
 	called                              bool
 	source, close, cleanup, nestedQuery error
+	decrement, coreDecrement            error
+	dropReference                       bool
+	decrementOutcome                    monomialDecrementOutcome
 }
 
 func (w *monomialQueryLifetimeWriter) Write(p []byte) (int, error) {
@@ -117,8 +120,61 @@ func (w *monomialQueryLifetimeWriter) Write(p []byte) (int, error) {
 		w.close = w.manager.CloseChecked()
 		w.cleanup = w.manager.CleanupValue(&w.value)
 		_, w.nestedQuery = w.manager.MaxSmallerThan(w.value, 12)
+		if w.dropReference {
+			w.decrement = w.manager.DecRef(w.value)
+			w.coreDecrement = w.manager.decRefCoreOutcome(w.value, &w.decrementOutcome)
+		}
 	}
 	return w.output.Write(p)
+}
+
+func TestMonomialPredecessorTraceRetainsReferencedInput(t *testing.T) {
+	m := monomialFixture(t)
+	polynomialAssertionActionsFixture(t, "C")
+	for i := 0; i < 15; i++ {
+		_, e := m.MkVar()
+		serviceMust(t, e)
+	}
+	powers := []MonomialPower{{0, 1}, {2, 1}, {4, 1}, {6, 1}, {8, 1}, {10, 1}, {12, 1}, {14, 1}}
+	a, e := m.MkMonomial(powers)
+	serviceMust(t, e)
+	serviceMust(t, m.IncRef(a))
+	l, e := m.location(a)
+	serviceMust(t, e)
+	t.Cleanup(func() {
+		if l.live && l.raw != (umemory.ObjectRef{}) {
+			for i := 4; i <= 6; i++ {
+				monomialReadWrite(t, m, a, 20+uint64(i)*8, powers[i].Var)
+			}
+			serviceMust(t, m.DecRef(a))
+		}
+	})
+	for i, variable := range []uint32{11, 8, 10} {
+		monomialReadWrite(t, m, a, 20+uint64(i+4)*8, variable)
+	}
+	w := &monomialQueryLifetimeWriter{manager: m, value: a, dropReference: true}
+	tags := diagnostic.NewTraceTagsWithWriter(w)
+	tags.Enable("poly_bug")
+	m.config.Trace = tags
+	v, e := m.MaxSmallerThan(a, 12)
+	serviceMust(t, e)
+	if v != 10 {
+		t.Fatal(v)
+	}
+	if polynomialSourceDebug && tags.ShouldTrace("poly_bug") {
+		if !w.called || !errors.Is(w.decrement, ErrMonomialPending) || !errors.Is(w.coreDecrement, ErrMonomialPending) {
+			t.Fatal("trace callback released a referenced input", w.called, w.decrement, w.coreDecrement)
+		}
+		if w.decrementOutcome != (monomialDecrementOutcome{}) {
+			t.Fatal("refused internal decrement published deletion authority", w.decrementOutcome)
+		}
+	}
+	info, e := m.Info(a)
+	serviceMust(t, e)
+	if info.RefCount != 1 || !l.live || l.stage != 0 {
+		t.Fatal("refused release changed actual reference/deletion prefix", info, l.stage)
+	}
+	monomialPhysicalAudit(t, m)
 }
 
 func TestMonomialPredecessorTraceOwnerReentry(t *testing.T) {
