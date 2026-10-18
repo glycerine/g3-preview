@@ -155,6 +155,16 @@ func (q *upolyBerlekampMatrix) releaseMembers() {
 // Owning cleanup does not retry a stopped source capacity read. It uses only
 // the remaining concrete member values, preserving the original source cause.
 func (q *upolyBerlekampMatrix) closeOwnedMembers() error {
+	if e := q.cleanupMonicOwned(); e != nil {
+		return e
+	}
+	local := &q.numeric.divisionAM
+	if local.declared && !local.sourceEnded && !local.ownEnded {
+		if e := q.m.config.Integer.CleanupRawNumeral(&local.value); e != nil {
+			return e
+		}
+		local.ownEnded = true
+	}
 	if e := q.cleanupSplitOwned(); e != nil {
 		return e
 	}

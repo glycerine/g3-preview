@@ -50755,7 +50755,10 @@
         "pkg/math/polynomial/upolynomial_exception_test.go",
         "pkg/math/polynomial/upolynomial_division_assertions.go",
         "pkg/math/polynomial/upolynomial_division_assertions_test.go",
-        "pkg/math/polynomial/upolynomial_berlekamp_vector_numeric_test.go"
+        "pkg/math/polynomial/upolynomial_berlekamp_vector_numeric_test.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_division_am_test.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_monic.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_monic_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -50970,7 +50973,11 @@
         "TestUPolynomialScalarDivisionZeroThrowAndClosedRuntimeSwitch",
         "TestUPolynomialHenselPairPreconditionSourceActions",
         "TestUPolynomialBerlekampVectorHelperActualAllocationPrefixes",
-        "TestUPolynomialBerlekampActualNumericTransportProtectsCaller"
+        "TestUPolynomialBerlekampActualNumericTransportProtectsCaller",
+        "TestUPolynomialBerlekampDivisionAMSourceStopAndOwningCleanup",
+        "TestUPolynomialBerlekampDivisionAMSuccessfulSourceEnd",
+        "TestUPolynomialBerlekampMonicRawBodyFailureAndExplicitEnds",
+        "TestUPolynomialBerlekampMonicExplicitLCGuardStopsInverseEnd"
       ],
       "conditionals": [
         {
@@ -51559,6 +51566,26 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete Berlekamp division a_m scoped NUM and mk_monic raw lc/lc_inv source ends (upolynomial.cpp:460; upolynomial.h:363)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_division.go",
+            "pkg/math/polynomial/upolynomial_gcd.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_numeric.go",
+            "pkg/math/polynomial/upolynomial_factor_field.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_division_am_test.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_monic.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_monic_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialBerlekampDivisionAMSourceStopAndOwningCleanup",
+            "TestUPolynomialBerlekampDivisionAMSuccessfulSourceEnd",
+            "TestUPolynomialBerlekampMonicRawBodyFailureAndExplicitEnds",
+            "TestUPolynomialBerlekampMonicExplicitLCGuardStopsInverseEnd"
+          ],
+          "notes": "The retained division context declares its actual a_m in the matrix numeric owner and joins its automatic source destructor on success or exceptional exit, preserving actual body and end errors. Actual unfinished scalar ownership/source causes block older split vectors, matrix and core retirement. A real second division checkpoint cancels after a_m holds BIG B; query-only fresh uninitialized capacity backing stops its reached destructor, preserves the actual leading quotient prefix B, and is restored before owning cleanup. Raw mk_monic lc/lc_inv are separately retained: body failure performs no explicit source DEL, successful body enters LC then inverse DEL, and a stopped LC DEL preserves the inverse. Independent owning cleanup keeps source counters/causes unchanged and reclaims raw/scoped locals before older vectors/matrix. Actual reservation-prefix tests cover raw body failure and both successful ends; inverse trace callback qualifies an actual first-end capacity guard with unchanged numeral values. A genuinely constructed p=3 matrix is the concrete direct owner adapter while general division/GCD helpers use real prime 2^127-1; no large-prime Berlekamp factorization is claimed. Broader kernel checkpoints/assertion/diagnostic inventories and complete polynomial/AST audits remain partial."
+        },
         {
           "name": "Quotient-only div wrapper preserves explicit retained caller context into div_rem_core (upolynomial.cpp:506-513)",
           "status": "ported",
@@ -52380,7 +52407,10 @@
         "pkg/math/polynomial/upolynomial_root_id_scope_test.go",
         "pkg/math/polynomial/upolynomial_root_id_remainder_test.go",
         "pkg/math/polynomial/upolynomial_exception.go",
-        "pkg/math/polynomial/upolynomial_exception_test.go"
+        "pkg/math/polynomial/upolynomial_exception_test.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_division_am_test.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_monic.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_monic_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -52504,7 +52534,11 @@
         "TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults",
         "TestUPolynomialNativeIsolationStacksAndNumericTransfer",
         "TestUPolynomialPrimeExtractionSourceExceptionAndPrefix",
-        "TestUPolynomialCheckpointSourceExceptionAndCooperationOrder"
+        "TestUPolynomialCheckpointSourceExceptionAndCooperationOrder",
+        "TestUPolynomialBerlekampDivisionAMSourceStopAndOwningCleanup",
+        "TestUPolynomialBerlekampDivisionAMSuccessfulSourceEnd",
+        "TestUPolynomialBerlekampMonicRawBodyFailureAndExplicitEnds",
+        "TestUPolynomialBerlekampMonicExplicitLCGuardStopsInverseEnd"
       ],
       "conditionals": [
         {
@@ -52533,6 +52567,26 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete Berlekamp division a_m scoped NUM and mk_monic raw lc/lc_inv source ends (upolynomial.cpp:460; upolynomial.h:363)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_division.go",
+            "pkg/math/polynomial/upolynomial_gcd.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_numeric.go",
+            "pkg/math/polynomial/upolynomial_factor_field.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_division_am_test.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_monic.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_monic_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialBerlekampDivisionAMSourceStopAndOwningCleanup",
+            "TestUPolynomialBerlekampDivisionAMSuccessfulSourceEnd",
+            "TestUPolynomialBerlekampMonicRawBodyFailureAndExplicitEnds",
+            "TestUPolynomialBerlekampMonicExplicitLCGuardStopsInverseEnd"
+          ],
+          "notes": "The retained division context declares its actual a_m in the matrix numeric owner and joins its automatic source destructor on success or exceptional exit, preserving actual body and end errors. Actual unfinished scalar ownership/source causes block older split vectors, matrix and core retirement. A real second division checkpoint cancels after a_m holds BIG B; query-only fresh uninitialized capacity backing stops its reached destructor, preserves the actual leading quotient prefix B, and is restored before owning cleanup. Raw mk_monic lc/lc_inv are separately retained: body failure performs no explicit source DEL, successful body enters LC then inverse DEL, and a stopped LC DEL preserves the inverse. Independent owning cleanup keeps source counters/causes unchanged and reclaims raw/scoped locals before older vectors/matrix. Actual reservation-prefix tests cover raw body failure and both successful ends; inverse trace callback qualifies an actual first-end capacity guard with unchanged numeral values. A genuinely constructed p=3 matrix is the concrete direct owner adapter while general division/GCD helpers use real prime 2^127-1; no large-prime Berlekamp factorization is claimed. Broader kernel checkpoints/assertion/diagnostic inventories and complete polynomial/AST audits remain partial."
+        },
         {
           "name": "upolynomial_exception concrete default_exception inheritance and retained messages (40-43)",
           "status": "ported",
@@ -53218,7 +53272,10 @@
         "pkg/math/polynomial/upolynomial_berlekamp_split_scope.go",
         "pkg/math/polynomial/upolynomial_berlekamp_split_trace.go",
         "pkg/math/polynomial/upolynomial_berlekamp_split_trace_test.go",
-        "pkg/math/polynomial/upolynomial_berlekamp_vector_numeric_test.go"
+        "pkg/math/polynomial/upolynomial_berlekamp_vector_numeric_test.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_division_am_test.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_monic.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_monic_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53389,7 +53446,11 @@
         "TestUPolynomialBerlekampCompleteSplitSourceRecords",
         "TestUPolynomialBerlekampSplitOutcomeStopsBeforeLocalVectorDT",
         "TestUPolynomialBerlekampSplitTraceStickyStreamPreservesResult",
-        "TestUPolynomialBerlekampVectorHelperActualAllocationPrefixes"
+        "TestUPolynomialBerlekampVectorHelperActualAllocationPrefixes",
+        "TestUPolynomialBerlekampDivisionAMSourceStopAndOwningCleanup",
+        "TestUPolynomialBerlekampDivisionAMSuccessfulSourceEnd",
+        "TestUPolynomialBerlekampMonicRawBodyFailureAndExplicitEnds",
+        "TestUPolynomialBerlekampMonicExplicitLCGuardStopsInverseEnd"
       ],
       "conditionals": [
         {
@@ -53502,6 +53563,26 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Concrete Berlekamp division a_m scoped NUM and mk_monic raw lc/lc_inv source ends (upolynomial.cpp:460; upolynomial.h:363)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_division.go",
+            "pkg/math/polynomial/upolynomial_gcd.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_numeric.go",
+            "pkg/math/polynomial/upolynomial_factor_field.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_division_am_test.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_monic.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_monic_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialBerlekampDivisionAMSourceStopAndOwningCleanup",
+            "TestUPolynomialBerlekampDivisionAMSuccessfulSourceEnd",
+            "TestUPolynomialBerlekampMonicRawBodyFailureAndExplicitEnds",
+            "TestUPolynomialBerlekampMonicExplicitLCGuardStopsInverseEnd"
+          ],
+          "notes": "The retained division context declares its actual a_m in the matrix numeric owner and joins its automatic source destructor on success or exceptional exit, preserving actual body and end errors. Actual unfinished scalar ownership/source causes block older split vectors, matrix and core retirement. A real second division checkpoint cancels after a_m holds BIG B; query-only fresh uninitialized capacity backing stops its reached destructor, preserves the actual leading quotient prefix B, and is restored before owning cleanup. Raw mk_monic lc/lc_inv are separately retained: body failure performs no explicit source DEL, successful body enters LC then inverse DEL, and a stopped LC DEL preserves the inverse. Independent owning cleanup keeps source counters/causes unchanged and reclaims raw/scoped locals before older vectors/matrix. Actual reservation-prefix tests cover raw body failure and both successful ends; inverse trace callback qualifies an actual first-end capacity guard with unchanged numeral values. A genuinely constructed p=3 matrix is the concrete direct owner adapter while general division/GCD helpers use real prime 2^127-1; no large-prime Berlekamp factorization is claimed. Broader kernel checkpoints/assertion/diagnostic inventories and complete polynomial/AST audits remain partial."
+        },
         {
           "name": "Berlekamp live nonempty GCD and quotient helper caller-context propagation (upolynomial_factorization.cpp:474,480)",
           "status": "ported",

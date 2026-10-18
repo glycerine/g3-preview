@@ -195,7 +195,7 @@ func (m *UPolynomialManager) divRemCoreSpanWithSourceContext(a UPolynomialView, 
 		h.amConstructed = true
 		am = &h.am
 	}
-	// The selected Remove/Hensel callers retain and join this actual lexical
+	// The selected Berlekamp/Remove/Hensel callers retain this actual lexical
 	// destructor. Legacy nil public Div/DivRem still ignore Del errors and remain
 	// a separate caller-lifetime obligation; scratch/source prefixes stay published.
 	if caller != nil {
@@ -205,7 +205,18 @@ func (m *UPolynomialManager) divRemCoreSpanWithSourceContext(a UPolynomialView, 
 		caller.amOwned = false
 		am = &caller.am
 	}
-	if removing := context.removeOneHalfRootFrame(m.config.Integer); removing != nil {
+	if n := context.berlekamp; n != nil {
+		if !n.NumericBound(true) || n.owner.m != m || context.berlekampGeneration != n.generation {
+			return ErrUPolynomialOwner
+		}
+		local := &n.divisionAM
+		if local.declared && !local.sourceEnded && !local.ownEnded {
+			return ErrUPolynomialCleanupPending
+		}
+		*local = upolyBerlekampScopedNumeral{declared: true}
+		am = &local.value
+		defer func() { failure = n.owner.finishScopedNumeral(local, failure) }()
+	} else if removing := context.removeOneHalfRootFrame(m.config.Integer); removing != nil {
 		removing.values[0] = unumeral.Int{}
 		removing.constructed = 1
 		removing.sourceRemaining = 1

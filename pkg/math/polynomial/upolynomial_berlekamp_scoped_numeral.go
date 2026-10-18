@@ -5,7 +5,8 @@ import (
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
-// The actual scoped_numeral at factorization.cpp:110 or :160. Source
+// The actual scoped_numerals at factorization.cpp:110/:160 and
+// upolynomial.cpp:460. Source
 // destruction and separate owning cleanup retain independent completion.
 type upolyBerlekampScopedNumeral struct {
 	value                           unumeral.Int

@@ -90,6 +90,20 @@ func (m *UPolynomialManager) monicLocal(v UPolynomialView) error {
 
 // Source: src/math/polynomial/upolynomial.h:361-364.
 func (m *UPolynomialManager) monicLocalWithSourceContext(v UPolynomialView, context integerAllocationInvocationContext) (cause error) {
+	if n := context.berlekamp; n != nil {
+		if !n.NumericBound(true) || n.owner.m != m || context.berlekampGeneration != n.generation {
+			return ErrUPolynomialOwner
+		}
+		local := &n.monic
+		if local.declared && local.sourceIndex < 2 && !local.ownEnded {
+			return ErrUPolynomialCleanupPending
+		}
+		*local = upolyBerlekampMonic{declared: true}
+		if e := m.monicWithSourceContext(v, &local.lc, &local.inv, context); e != nil {
+			return e
+		}
+		return n.finishMonicEnd()
+	}
 	owner := context.factorFrontendFrame(m.config.Integer)
 	if owner == nil {
 		var lc, inv unumeral.Int

@@ -15,6 +15,8 @@ type upolyBerlekampNumeric struct {
 	count               uint8
 	addMul              unumeral.IntegerAddMulInvocationReceipt
 	normalize           unumeral.IntegerNormalizeInvocationReceipt
+	divisionAM          upolyBerlekampScopedNumeral
+	monic               upolyBerlekampMonic
 }
 
 func (n *upolyBerlekampNumeric) NumericBound(executing bool) bool {
@@ -72,6 +74,12 @@ func (n *upolyBerlekampNumeric) pending() bool {
 	}
 	m := n.owner.m
 	z := m.config.Integer
+	if n.monic.declared && n.monic.sourceIndex < 2 && !n.monic.ownEnded {
+		return true
+	}
+	if n.divisionAM.declared && !n.divisionAM.sourceEnded && !n.divisionAM.ownEnded {
+		return true
+	}
 	if unumeral.NumericAllocationPending(&n.roots) || n.addMul.Matches(z) || n.normalize.Matches(m.modular) {
 		return true
 	}
@@ -85,6 +93,12 @@ func (n *upolyBerlekampNumeric) pending() bool {
 func (n *upolyBerlekampNumeric) sourceCause() error {
 	if n.owner == nil {
 		return nil
+	}
+	if n.divisionAM.declared && !n.divisionAM.sourceEnded && !n.divisionAM.ownEnded && n.divisionAM.cause != nil {
+		return n.divisionAM.cause
+	}
+	if n.monic.declared && n.monic.sourceIndex < 2 && !n.monic.ownEnded && n.monic.cause != nil {
+		return n.monic.cause
 	}
 	z := n.owner.m.config.Integer
 	if n.addMul.Matches(z) {
