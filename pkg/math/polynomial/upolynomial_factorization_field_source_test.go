@@ -102,6 +102,7 @@ func TestUPolynomialFactorBerlekampAppendAndIrreducibleReturn(t *testing.T) {
 }
 
 func TestUPolynomialFactorBerlekampEmptyReleaseAndDebug(t *testing.T) {
+	polynomialAssertionActionsFixture(t, "T")
 	m, _, _ := upolySourceOwner(t)
 	if e := m.SetZPUint64(5); e != nil {
 		t.Fatal(e)

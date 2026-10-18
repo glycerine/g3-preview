@@ -45440,3 +45440,32 @@ unchanged warm cancellation allocation check and algebraic/cross-operation
 consumers. Focused checked/debug/trace arithmetic/factorization/cancellation
 checks pass28.924s. portcheck and diff checks pass:2103 units,677 APIs;211 ported,
 340 partial,1495 unported,11 dead/deleted. All commands remain on CPUs8-16.
+
+2026-10-18: null-vector and Berlekamp entry/tail runtime assertion semantics
+
+Implemented project SASSERT behavior at factorization.cpp:209,409,415,506:
+actual runtime gates and debugger Throw/Continue replace fixed debug errors.
+The null-vector check precedes resize/search. Actual constructed caller output
+and matrix tests show Throw preserves the three-term vector and null-row cursor;
+Continue/disabled/release reaches source shrink/search. A valid predicate still
+observes a closed assertion-switch owner before modifying either state.
+
+The entry degree and monic assertions precede matrix/factor publication. The
+leading-coefficient read is now inside the runtime gate: disabled assertions
+skip empty f.back and reach the literal empty-factor/tail continuation. Degree
+and nonmonic fixtures verify Throw stops publication and Continue/disabled/
+release preserves actual rank-one factor copies. Final SASSERT(false) reads its
+own runtime gate. The existing invalid-empty test now supplies a real debugger
+Throw action instead of assuming a fixed noninteractive error.
+
+Actual matrix or manager/numeric borrows cover assertion diagnostics and reached
+reads/body where applicable, without fabricating construction counts, source
+locals or numerical scratch. Existing explicit physical/domain guards remain.
+Focused checked/debug/trace Berlekamp/finite-field/prime checks pass0.019s.
+Other checks/diagnostics and broader polynomial/AST unit audits remain open;
+no whole source-unit completion is claimed. All commands use CPUs8-16.
+Broader focused checks pass ordinary16.491s and checked/debug/trace28.316s,
+CPUs8-16. portcheck and diff checks pass:2103 units,677 APIs;211 ported,
+340 partial,1495 unported,11 dead/deleted. The hourly full native suite is due
+and will run against this committed increment, with its terminal result tracked
+separately rather than inferred from these focused checks.

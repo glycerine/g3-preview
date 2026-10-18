@@ -53162,7 +53162,8 @@
         "pkg/math/polynomial/upolynomial_berlekamp_assertions.go",
         "pkg/math/polynomial/upolynomial_berlekamp_assertions_test.go",
         "pkg/math/polynomial/upolynomial_exception.go",
-        "pkg/math/polynomial/upolynomial_exception_test.go"
+        "pkg/math/polynomial/upolynomial_exception_test.go",
+        "pkg/math/polynomial/upolynomial_factorization_field_source_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53303,7 +53304,12 @@
         "TestUPolynomialBerlekampMatrixTraceRetainedFactorizationConsumer",
         "TestUPolynomialBerlekampGetRuntimeAssertionActions",
         "TestUPolynomialBerlekampGetClosedRuntimeSwitchPrecedesRead",
-        "TestUPolynomialPrimeExtractionSourceExceptionAndPrefix"
+        "TestUPolynomialPrimeExtractionSourceExceptionAndPrefix",
+        "TestUPolynomialBerlekampNextAssertionBeforeResizeAndCursor",
+        "TestUPolynomialBerlekampNextClosedAssertionSwitchBeforeResize",
+        "TestUPolynomialBerlekampEntryAssertionActionsAndPublication",
+        "TestUPolynomialBerlekampDisabledAssertionsSkipEmptyLeadingRead",
+        "TestUPolynomialFactorBerlekampEmptyReleaseAndDebug"
       ],
       "conditionals": [
         {
@@ -53416,6 +53422,24 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Berlekamp null-vector and factor entry/tail project SASSERT runtime actions and operand gating (209,409,415,506)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_berlekamp_assertions.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_field.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_assertions_test.go",
+            "pkg/math/polynomial/upolynomial_factorization_field_source_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialBerlekampNextAssertionBeforeResizeAndCursor",
+            "TestUPolynomialBerlekampNextClosedAssertionSwitchBeforeResize",
+            "TestUPolynomialBerlekampEntryAssertionActionsAndPublication",
+            "TestUPolynomialBerlekampDisabledAssertionsSkipEmptyLeadingRead",
+            "TestUPolynomialFactorBerlekampEmptyReleaseAndDebug"
+          ],
+          "notes": "Replaces fixed debug returns with actual process runtime gates and source debugger Throw/Continue. The null-vector assertion precedes resize and cursor search; Throw preserves a genuine three-term caller vector/cursor, while Continue/disabled/release reaches source shrink/search. Factor entry degree and monic assertions precede matrix/factor publication, and the monic leading-coefficient read occurs only after the runtime assertion gate. Disabled assertions therefore skip an empty f.back read and reach literal empty/tail continuation. The final false assertion also reads its actual gate. Actual matrix or manager/numeric borrow spans diagnostic actions; no source construction fields or numerical scratch are fabricated. Tests cover genuine degree/monic failures, source output copies, closed runtime owner and both profiles. The legacy invalid-input test now supplies a real debugger Throw action. Other factorization checks/diagnostics and broader source-unit audits remain open; no whole-unit completion credit."
+        },
         {
           "name": "get_p_from_manager oversized-prime source exception at both uint64 and uint32 conversion guards (39,44)",
           "status": "ported",

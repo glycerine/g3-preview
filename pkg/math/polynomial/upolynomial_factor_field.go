@@ -89,15 +89,12 @@ func (q *upolyBerlekampMatrix) getSource(i, j uint32, line int32) (*unumeral.Int
 		return nil, e
 	}
 	if enabled && !(i < q.size && j < q.size) {
-		if !q.displaying {
-			q.displaying = true
-			defer func() { q.displaying = false }()
-			if e := q.traceBorrow.bindManagers([3]*UPolynomialManager{q.m}, q.m.modular.BorrowTraceTags()); e != nil {
-				return nil, e
-			}
-			defer q.traceBorrow.unbind()
+		owned, e := q.beginAssertionBorrow()
+		if e != nil {
+			return nil, e
 		}
-		if e := berlekampAssertionFailure(line); e != nil {
+		defer q.endAssertionBorrow(owned)
+		if e := factorizationSourceAssertionFailure(line, "i < m_size && j < m_size"); e != nil {
 			return nil, e
 		}
 	}
@@ -295,8 +292,19 @@ func (q *upolyBerlekampMatrix) next(v *upolyVectorState) (bool, error) {
 		return false, ErrUPolynomialCleanupPending
 	}
 	m := q.m
-	if polynomialSourceDebug && v.size > q.size {
-		return false, ErrUPolynomialAssertion
+	enabled, e := factorHeaderAssertionsEnabled()
+	if e != nil {
+		return false, e
+	}
+	if enabled && !(v.size <= q.size) {
+		owned, e := q.beginAssertionBorrow()
+		if e != nil {
+			return false, e
+		}
+		defer q.endAssertionBorrow(owned)
+		if e := factorizationSourceAssertionFailure(209, "v.size() <= m_size"); e != nil {
+			return false, e
+		}
 	}
 	// scoped_numeral_vector::resize, default zero cells; logical shrink deletes.
 	if q.size <= v.size {
@@ -351,14 +359,25 @@ func (m *UPolynomialManager) FactorZPSquareFree(f UPolynomialView, fs *UPolynomi
 func (m *UPolynomialManager) factorZPBerlekamp(f UPolynomialView, fs *UPolynomialFactors, randomized bool) (bool, error) {
 	// The actual source accepts randomized but implements the same deterministic
 	// splitting body for either value; no RNG is substituted.
-	if polynomialSourceDebug && upolyViewDegree(f) <= 1 {
-		return false, ErrUPolynomialAssertion
+	enabled, e := factorHeaderAssertionsEnabled()
+	if e != nil {
+		return false, e
 	}
+	if enabled && !(upolyViewDegree(f) > 1) {
+		if e := m.factorizationAssertionFailure(409, "upm.degree(f) > 1"); e != nil {
+			return false, e
+		}
+	}
+
 	p, e := m.factorPrime()
 	if e != nil {
 		return false, e
 	}
-	if polynomialSourceDebug {
+	enabled, e = factorHeaderAssertionsEnabled()
+	if e != nil {
+		return false, e
+	}
+	if enabled {
 		top, e := m.read(f, f.count-1)
 		if e != nil {
 			return false, e
@@ -368,7 +387,9 @@ func (m *UPolynomialManager) factorZPBerlekamp(f UPolynomialView, fs *UPolynomia
 			return false, e
 		}
 		if !one {
-			return false, ErrUPolynomialAssertion
+			if e := m.factorizationAssertionFailure(415, "zpm.is_one(f.back())"); e != nil {
+				return false, e
+			}
 		}
 	}
 	var matrix upolyBerlekampMatrix
@@ -441,8 +462,14 @@ func (m *UPolynomialManager) factorZPBerlekamp(f UPolynomialView, fs *UPolynomia
 			}
 		}
 	}
-	if polynomialSourceDebug {
-		return false, ErrUPolynomialAssertion
+	enabled, e = factorHeaderAssertionsEnabled()
+	if e != nil {
+		return false, e
+	}
+	if enabled {
+		if e := m.factorizationAssertionFailure(506, "false"); e != nil {
+			return false, e
+		}
 	}
 	return true, nil
 }
