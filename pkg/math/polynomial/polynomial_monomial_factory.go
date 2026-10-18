@@ -404,6 +404,11 @@ func (m *MonomialManager) completeCreationContinuation() {
 	if p := c.parent; p != nil && p.generatedCalleeGeneration == c.generation {
 		p.generatedCalleePending = false
 		p.generatedCalleeGeneration = 0
+		// This exact monomial continuation has ended. Retire its legacy PSC
+		// receipt here, so typed lexical cleanup needs no generation-wide scan.
+		if p.pscReceipts.factory == c.generation {
+			p.pscReceipts.factory = 0
+		}
 		if p.substitution.generatedCalleeReceipt == c.generation {
 			p.substitution.generatedCalleeReceipt = 0
 		}

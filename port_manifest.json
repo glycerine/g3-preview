@@ -40311,7 +40311,8 @@
         "pkg/math/polynomial/algebraic_isolation_multivariate_cancel_test.go",
         "pkg/math/polynomial/algebraic_isolation_multivariate_owner_test.go",
         "pkg/math/polynomial/polynomial_cache_child_owner_test.go",
-        "pkg/math/polynomial/polynomial_cache_borrowed_owner_test.go"
+        "pkg/math/polynomial/polynomial_cache_borrowed_owner_test.go",
+        "pkg/math/polynomial/polynomial_cache_pending_psc_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -41163,7 +41164,10 @@
         "TestAlgebraicMultivariateIsolationEveryReachedCheckpoint",
         "TestAlgebraicMultivariateIsolationPreservesOlderFactorInvocation",
         "TestAlgebraicMultivariateIsolationExecutingOwnerRefusals",
-        "TestAlgebraicMultivariateIsolationEmptyOutputAssertionBeforeLocals"
+        "TestAlgebraicMultivariateIsolationEmptyOutputAssertionBeforeLocals",
+        "TestPolynomialCachePendingPSCOriginalStop",
+        "TestPolynomialCachePSCCleanupPreservesIndependentLazard",
+        "TestPolynomialCachePSCExactCleanupReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -48195,7 +48199,8 @@
         "pkg/math/polynomial/polynomial_cache_child_owner_test.go",
         "pkg/math/polynomial/polynomial_cache_callback_test.go",
         "pkg/math/polynomial/polynomial_cache_manager_test.go",
-        "pkg/math/polynomial/polynomial_cache_borrowed_owner_test.go"
+        "pkg/math/polynomial/polynomial_cache_borrowed_owner_test.go",
+        "pkg/math/polynomial/polynomial_cache_pending_psc_test.go"
       ],
       "tests": [
         "TestPolynomialCacheCanonicalizationAndReset",
@@ -48207,11 +48212,24 @@
         "TestPolynomialCacheFactorStoppedBodyCleanupAndRetry",
         "TestPolynomialCachePSCStoppedBodyCleanupAndRetry",
         "TestPolynomialCachePSCResultReplacementStoppedDeletion",
-        "TestPolynomialCacheFactorTemporaryStoppedDeletion"
+        "TestPolynomialCacheFactorTemporaryStoppedDeletion",
+        "TestPolynomialCachePendingPSCOriginalStop",
+        "TestPolynomialCachePSCCleanupPreservesIndependentLazard",
+        "TestPolynomialCachePSCExactCleanupReservationPrefixes"
       ],
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Cache PSC owning continuation follows only its accepted concrete frame and child receipts; preserves an independently stopped Lazard source invocation (polynomial_cache.cpp:159-173, polynomial.cpp:5659-5831)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "tests": [
+            "TestPolynomialCachePendingPSCOriginalStop",
+            "TestPolynomialCachePSCCleanupPreservesIndependentLazard",
+            "TestPolynomialCachePSCExactCleanupReservationPrefixes"
+          ]
+        },
         {
           "name": "Stopped cache invocations retain the exact borrowed manager until explicit cleanup; full and core destructors refuse pending cache work without advancing source stages",
           "status": "platform_replacement",
@@ -48301,7 +48319,8 @@
         "pkg/math/polynomial/polynomial_cache_child_owner_test.go",
         "pkg/math/polynomial/polynomial_cache_callback_test.go",
         "pkg/math/polynomial/polynomial_cache_manager_test.go",
-        "pkg/math/polynomial/polynomial_cache_borrowed_owner_test.go"
+        "pkg/math/polynomial/polynomial_cache_borrowed_owner_test.go",
+        "pkg/math/polynomial/polynomial_cache_pending_psc_test.go"
       ],
       "tests": [
         "TestPolynomialCacheCanonicalizationAndReset",
@@ -48313,7 +48332,10 @@
         "TestPolynomialCacheFactorStoppedBodyCleanupAndRetry",
         "TestPolynomialCachePSCStoppedBodyCleanupAndRetry",
         "TestPolynomialCachePSCResultReplacementStoppedDeletion",
-        "TestPolynomialCacheFactorTemporaryStoppedDeletion"
+        "TestPolynomialCacheFactorTemporaryStoppedDeletion",
+        "TestPolynomialCachePendingPSCOriginalStop",
+        "TestPolynomialCachePSCCleanupPreservesIndependentLazard",
+        "TestPolynomialCachePSCExactCleanupReservationPrefixes"
       ],
       "conditionals": [
         {

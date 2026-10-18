@@ -443,18 +443,15 @@ func (c *PolynomialCache) cleanupFactorInvocation() error {
 	return c.manager.cleanupFactorCoreInvocation(&c.factorCall, true)
 }
 
-// Compatibility cleanup is selected only after the cache's concrete accepted
-// owner/frame/nonce matches. A refused or retired tuple cannot select any work.
+// Only the accepted PSC frame and its concrete child receipts grant cleanup
+// authority. Generation-wide compatibility cleanup also visits independent
+// Lazard/next scopes and must not be used by this lexical caller.
 func (c *PolynomialCache) cleanupPSCInvocation() error {
 	core := c.manager.core
-	if !core.matchesPSCInvocation(&c.pscCall) {
-		return nil
-	}
-	generation := c.pscCall.frame.sourceGeneration
-	if e := core.cleanupPSCCompleted(generation); e != nil {
+	if e := core.cleanupPSCInvocation(&c.pscCall, false); e != nil {
 		return e
 	}
-	return core.cleanupPSCAborts(generation)
+	return core.cleanupPSCInvocation(&c.pscCall, true)
 }
 
 // Manager borrows the source cache::m() polynomial manager.
