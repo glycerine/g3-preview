@@ -40013,6 +40013,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_monomial_assertions.go",
+        "pkg/math/polynomial/polynomial_monomial_assertions_test.go",
         "pkg/math/polynomial/polynomial_sparse_reentry_test.go",
         "pkg/math/polynomial/algebraic_sign.go",
         "pkg/math/polynomial/algebraic_sign_resultant.go",
@@ -42610,6 +42612,29 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "polynomial.cpp:228 monomial get_power index assertion and retained get_var/degree accessors: runtime switch, Throw/Continue and exact reached field reads",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_monomial_assertions.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_monomial_assertions.go",
+            "pkg/math/polynomial/polynomial_monomial_assertions_test.go",
+            "pkg/math/polynomial/polynomial_monomial.go",
+            "pkg/math/polynomial/polynomial_monomial_query.go",
+            "pkg/math/polynomial/polynomial_monomial_read_order_test.go",
+            "pkg/math/polynomial/polynomial_monomial_test.go"
+          ],
+          "tests": [
+            "TestMonomialPowerSourceAssertionActions",
+            "TestMonomialPowerSourceAssertionSwitchAndClosedDebug",
+            "TestMonomialSourceRetainedPhysicalPowerAccess",
+            "TestMonomialReadOrderSeparateMaximumFields",
+            "TestMonomialReadOrderVariableOnlySearch"
+          ],
+          "notes": [
+            "The compiled SASSERT reads the actual runtime assertion switch before size(), evaluates idx<size only when enabled, and dispatches the real process debugger Throw/Continue action at cpp228. Continue reaches the bounded physical power read. Disabled assertions skip genuinely uninitialized size and variable fields when only the degree is requested. A closed debug owner stops before operand/degree reads. The source diagnostic executing span refuses monomial destruction/owning cleanup reentry. Other monomial constructor/search/ordering assertions retain their separate incomplete audits."
+          ]
+        },
         {
           "name": "Sparse operations refuse before sample publication or unused operand access while their own interpolation scope or numeric allocation receipt remains pending; stale receipt cannot acquire replacement allocation",
           "status": "platform_replacement",
@@ -45736,6 +45761,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_monomial_assertions.go",
+        "pkg/math/polynomial/polynomial_monomial_assertions_test.go",
         "pkg/math/polynomial/algebraic_sign.go",
         "pkg/math/polynomial/algebraic_sign_resultant.go",
         "pkg/math/polynomial/algebraic_sign_test.go",
@@ -46669,6 +46696,29 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "polynomial.cpp:228 monomial get_power index assertion and retained get_var/degree accessors: runtime switch, Throw/Continue and exact reached field reads",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_monomial_assertions.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_monomial_assertions.go",
+            "pkg/math/polynomial/polynomial_monomial_assertions_test.go",
+            "pkg/math/polynomial/polynomial_monomial.go",
+            "pkg/math/polynomial/polynomial_monomial_query.go",
+            "pkg/math/polynomial/polynomial_monomial_read_order_test.go",
+            "pkg/math/polynomial/polynomial_monomial_test.go"
+          ],
+          "tests": [
+            "TestMonomialPowerSourceAssertionActions",
+            "TestMonomialPowerSourceAssertionSwitchAndClosedDebug",
+            "TestMonomialSourceRetainedPhysicalPowerAccess",
+            "TestMonomialReadOrderSeparateMaximumFields",
+            "TestMonomialReadOrderVariableOnlySearch"
+          ],
+          "notes": [
+            "The compiled SASSERT reads the actual runtime assertion switch before size(), evaluates idx<size only when enabled, and dispatches the real process debugger Throw/Continue action at cpp228. Continue reaches the bounded physical power read. Disabled assertions skip genuinely uninitialized size and variable fields when only the degree is requested. A closed debug owner stops before operand/degree reads. The source diagnostic executing span refuses monomial destruction/owning cleanup reentry. Other monomial constructor/search/ordering assertions retain their separate incomplete audits."
+          ]
+        },
         {
           "name": "Substitution modular-power numeric hooks carry the actual substitution invocation generation; a context captured through a real rational-map callback cannot acquire a replacement body",
           "status": "platform_replacement",

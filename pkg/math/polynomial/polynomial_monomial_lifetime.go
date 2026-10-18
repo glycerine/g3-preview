@@ -32,6 +32,9 @@ func (m *MonomialManager) externalEntries() bool {
 // SourceFinalize executes the completed source destructor body, then reverse
 // member destruction. It never manufactures destruction of caller monomials.
 func (m *MonomialManager) SourceFinalize() error {
+	if m != nil && m.self == m && m.assertionRunning {
+		return ErrMonomialPending
+	}
 	if m == nil || m.self != m {
 		return ErrMonomialOwner
 	}
@@ -110,6 +113,9 @@ func (m *MonomialManager) SourceFinalize() error {
 // CleanupValue is an explicit owning abort of a caller-supplied value after a
 // partial source mutation. It removes its actual table edge; no locator sweep.
 func (m *MonomialManager) CleanupValue(a *Monomial) error {
+	if m != nil && m.self == m && m.assertionRunning {
+		return ErrMonomialPending
+	}
 	if m == nil || m.self != m || m.closed {
 		return ErrMonomialOwner
 	}
@@ -184,6 +190,9 @@ func (m *MonomialManager) CleanupValue(a *Monomial) error {
 	return nil
 }
 func (m *MonomialManager) CloseChecked() error {
+	if m != nil && m.self == m && m.assertionRunning {
+		return ErrMonomialPending
+	}
 	if m == nil {
 		return nil
 	}

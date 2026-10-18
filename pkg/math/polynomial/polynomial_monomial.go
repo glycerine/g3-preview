@@ -74,6 +74,7 @@ type monomialCreation struct {
 	idConsumed, tableRemoved bool
 }
 type MonomialManager struct {
+	assertionRunning                                                          bool
 	allocatorInvocation                                                       monomialAllocatorScope
 	unitDropConsumed                                                          bool
 	unitDropCause                                                             error
@@ -236,6 +237,9 @@ func (m *MonomialManager) CleanupCause() error {
 	return m.cleanupCause
 }
 func (m *MonomialManager) check() error {
+	if m != nil && m.self == m && m.assertionRunning {
+		return ErrMonomialPending
+	}
 	if m == nil || m.self != m {
 		return ErrMonomialOwner
 	}
@@ -314,14 +318,8 @@ func (m *MonomialManager) powerCore(a Monomial, i uint32) (MonomialPower, error)
 	if e != nil {
 		return out, e
 	}
-	if polynomialSourceDebug {
-		n, e := m.allocator.ReadUint32(l.raw, 12)
-		if e != nil {
-			return out, e
-		}
-		if i >= n {
-			return out, ErrMonomialAssertion
-		}
+	if e := m.powerSourceIndexAssert(a, i); e != nil {
+		return out, e
 	}
 	out.Var, e = m.allocator.ReadUint32(l.raw, 20+uint64(i)*8)
 	if e != nil {

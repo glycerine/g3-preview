@@ -625,6 +625,7 @@ func TestMonomialDefaultSourceProfileAndWarmPhysicalGraph(t *testing.T) {
 }
 
 func TestMonomialSourceRetainedPhysicalPowerAccess(t *testing.T) {
+	polynomialThrowAssertionFixture(t)
 	m := monomialFixture(t)
 	for i := 0; i < 2; i++ {
 		_, e := m.MkVar()
@@ -767,6 +768,13 @@ func TestMonomialSourceMaxSmallerNullAssertion(t *testing.T) {
 // Their owning abort releases the real allocation without inventing fields.
 func monomialReadProfileObject(t *testing.T, m *MonomialManager, n uint32) Monomial {
 	t.Helper()
+	a := monomialReadProfileRawObject(t, m, n)
+	monomialReadWrite(t, m, a, 12, n)
+	return a
+}
+
+func monomialReadProfileRawObject(t *testing.T, m *MonomialManager, n uint32) Monomial {
+	t.Helper()
 	slot, e := m.prepareLocation()
 	serviceMust(t, e)
 	obj, e := m.allocator.Allocate(uint64(20 + 8*n))
@@ -777,7 +785,6 @@ func monomialReadProfileObject(t *testing.T, m *MonomialManager, n uint32) Monom
 	l.live = true
 	l.sourceRaw, l.sourceOffset, e = m.allocator.RawLocation(obj)
 	serviceMust(t, e)
-	serviceMust(t, m.allocator.WriteUint32(obj, 12, n))
 	a := Monomial{m.origin, slot, l.generation}
 	t.Cleanup(func() { serviceMust(t, m.CleanupValue(&a)) })
 	return a

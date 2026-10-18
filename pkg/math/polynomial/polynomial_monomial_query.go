@@ -289,14 +289,8 @@ func (m *MonomialManager) varCore(a Monomial, i uint32) (uint32, error) {
 	if e != nil {
 		return 0, e
 	}
-	if polynomialSourceDebug {
-		n, e := m.sizeCore(a)
-		if e != nil {
-			return 0, e
-		}
-		if i >= n {
-			return 0, ErrMonomialAssertion
-		}
+	if e := m.powerSourceIndexAssert(a, i); e != nil {
+		return 0, e
 	}
 	return m.allocator.ReadUint32(l.raw, 20+uint64(i)*8)
 }
@@ -308,14 +302,8 @@ func (m *MonomialManager) degreeAtCore(a Monomial, i uint32) (uint32, error) {
 	if e != nil {
 		return 0, e
 	}
-	if polynomialSourceDebug {
-		n, e := m.sizeCore(a)
-		if e != nil {
-			return 0, e
-		}
-		if i >= n {
-			return 0, ErrMonomialAssertion
-		}
+	if e := m.powerSourceIndexAssert(a, i); e != nil {
+		return 0, e
 	}
 	return m.allocator.ReadUint32(l.raw, 24+uint64(i)*8)
 }
