@@ -81,6 +81,7 @@ type UPolynomialManager struct {
 	primeTrialCaller             *upolyPrimeTrialScope
 	squareFreeCaller             *upolyFactorSquareFreeScope
 	self                         *UPolynomialManager
+	pendingBerlekamp             *upolyBerlekampMatrix
 	origin                       uint64
 	config                       UPolynomialConfig
 	modular                      *unumeral.IntegerModularManager
@@ -151,6 +152,9 @@ func newUPolynomialManager(c UPolynomialConfig, store *UPolynomialCoefficientSto
 	return m, nil
 }
 func (m *UPolynomialManager) check() error {
+	if m != nil && m.self == m && m.pendingBerlekamp != nil {
+		return ErrUPolynomialCleanupPending
+	}
 	if m != nil && m.self == m && m.factorTrace != nil && m.factorTrace.executing && m.factorTrace.callback() {
 		return ErrUPolynomialCleanupPending
 	}
@@ -348,6 +352,11 @@ func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationR
 	}
 	if m.live != 0 || m.liveSequences != 0 || m.liveFactors != 0 {
 		return ErrUPolynomialLive
+	}
+	if m != nil && m.self == m && m.pendingBerlekamp != nil {
+		if e := m.cleanupBerlekamp(); e != nil {
+			return e
+		}
 	}
 	if e := m.CleanupRationalInput(); e != nil {
 		return e

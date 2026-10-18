@@ -26,7 +26,7 @@ func (w *berlekampConstructorProbe) Write(p []byte) (int, error) {
 			w.t.Fatal("constructor trace crossed actual member/matrix frontier")
 		}
 		q.close()
-		for _, e := range []error{q.init(q.m, w.f), q.m.Close(), q.m.SourceFinalize(), q.m.CleanupDisplay()} {
+		for _, e := range []error{q.init(q.m, w.f), q.m.Close(), q.m.SourceFinalize(), q.m.CleanupDisplay(), q.m.CleanupBerlekampMatrix()} {
 			if !errors.Is(e, ErrUPolynomialCleanupPending) {
 				w.t.Fatal("constructor callback acquired active owner", e)
 			}

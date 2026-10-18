@@ -54,29 +54,94 @@ func (m *UPolynomialManager) scopedPush(s *upolyVectorState, value *unumeral.Int
 	return m.modular.Copy(out, value)
 }
 
-// The source matrix is lexical: its slice headers stay on the caller stack;
-// both geometrically grown pivot arrays and the numeral backing are individually charged.
+// The source matrix is lexical. Native Go arrays hold its pivots and
+// coefficients; interrupted destruction retains the actual matrix owner.
 type upolyBerlekampMatrix struct {
-	displaying    bool
-	traceBorrow   upolyFactorTraceBorrow
-	entryTrace    upolyDisplayInvocationReceipt
-	m             *UPolynomialManager
-	values        upolyVectorState
-	size, nullRow uint32
-	column, row   []int32
+	displaying                           bool
+	constructed, destroying, sourceGuard bool
+	deleteIndex                          uint32
+	ownIndex                             uint32
+	ownStarted                           bool
+	closeCause                           error
+	traceBorrow                          upolyFactorTraceBorrow
+	entryTrace                           upolyDisplayInvocationReceipt
+	m                                    *UPolynomialManager
+	values                               upolyVectorState
+	size, nullRow                        uint32
+	column, row                          []int32
 }
 
+// close keeps the lexical matrix reachable through its actual manager when
+// a source destructor or constructor-abort cleanup cannot complete.
 func (q *upolyBerlekampMatrix) close() {
-	if q.displaying || q.m != nil && q.m.displayReceiptPending(&q.entryTrace) {
-		return
+	if e := q.closeSource(); e != nil && q.m != nil && !q.displaying && !q.destroying {
+		if q.m.pendingBerlekamp == nil || q.m.pendingBerlekamp == q {
+			if q.closeCause == nil {
+				q.closeCause = e
+			}
+			q.m.pendingBerlekamp = q
+		}
 	}
+}
+func (q *upolyBerlekampMatrix) closeSource() error {
+	if q.displaying || q.destroying {
+		return ErrUPolynomialCleanupPending
+	}
+	if q.m == nil {
+		return nil
+	}
+	if q.m.displayReceiptPending(&q.entryTrace) {
+		return ErrUPolynomialCleanupPending
+	}
+	if q.values.backing == 0 && q.column == nil && q.row == nil {
+		return nil
+	}
+	if q.sourceGuard {
+		return q.closeCause
+	}
+	q.destroying = true
+	defer func() { q.destroying = false }()
 	m := q.m
-	// Source destructor body deletes matrix numerals ascending, then implicit
-	// member destructors release row, column and matrix physical storage.
-	m.reset(&q.values)
+	if !q.constructed {
+		// A failed C++ constructor grants no class destructor. This separate Go
+		// owning abort reclaims only the actual member coefficients acquired so far.
+		return q.closeOwnedMembers()
+	}
+	for q.deleteIndex < q.values.size {
+		guard, e := upolynomialSourceNumeralDel(m.config.Integer, &m.values(&q.values)[q.deleteIndex])
+		if e != nil {
+			q.sourceGuard, q.closeCause = guard, e
+			return e
+		}
+		q.deleteIndex++
+	}
+	q.releaseMembers()
+	return nil
+}
+func (q *upolyBerlekampMatrix) releaseMembers() {
 	q.row = nil
 	q.column = nil
-	m.freeBacking(&q.values)
+	q.m.freeBacking(&q.values)
+	q.constructed = false
+	if q.m.pendingBerlekamp == q {
+		q.m.pendingBerlekamp = nil
+	}
+}
+
+// Owning cleanup does not retry a stopped source capacity read. It uses only
+// the remaining concrete member values, preserving the original source cause.
+func (q *upolyBerlekampMatrix) closeOwnedMembers() error {
+	if !q.ownStarted {
+		q.ownIndex, q.ownStarted = q.deleteIndex, true
+	}
+	for q.ownIndex < q.values.size {
+		if e := q.m.config.Integer.CleanupRawNumeral(&q.m.values(&q.values)[q.ownIndex]); e != nil {
+			return e
+		}
+		q.ownIndex++
+	}
+	q.releaseMembers()
+	return nil
 }
 func (q *upolyBerlekampMatrix) get(i, j uint32) (*unumeral.Int, error) {
 	return q.getSource(i, j, 74)
@@ -107,9 +172,17 @@ func (q *upolyBerlekampMatrix) getSource(i, j uint32, line int32) (*unumeral.Int
 	return q.m.read(q.m.stateView(&q.values), uint32(index))
 }
 func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) error {
+	if m != nil && m.pendingBerlekamp != nil {
+		return ErrUPolynomialCleanupPending
+	}
 	if q.displaying || q.m != nil && q.m.displayReceiptPending(&q.entryTrace) {
 		return ErrUPolynomialCleanupPending
 	}
+	if q.m != nil && q.m.pendingBerlekamp == q {
+		return ErrUPolynomialCleanupPending
+	}
+	q.deleteIndex, q.closeCause, q.sourceGuard, q.constructed = 0, nil, false, false
+	q.ownIndex, q.ownStarted = 0, false
 	q.m = m
 	q.size = upolyViewDegree(f)
 	q.nullRow = 1
@@ -208,7 +281,11 @@ func (q *upolyBerlekampMatrix) init(m *UPolynomialManager, f UPolynomialView) er
 			return e
 		}
 	}
-	return q.traceMatrix(142)
+	if e := q.traceMatrix(142); e != nil {
+		return e
+	}
+	q.constructed = true
+	return nil
 }
 func (q *upolyBerlekampMatrix) diagonalize() (uint32, error) {
 	if q.displaying || q.m != nil && q.m.displayReceiptPending(&q.entryTrace) {
@@ -360,7 +437,7 @@ func (m *UPolynomialManager) FactorZPSquareFreeBerlekamp(f UPolynomialView, fs *
 func (m *UPolynomialManager) FactorZPSquareFree(f UPolynomialView, fs *UPolynomialFactors) (bool, error) {
 	return m.FactorZPSquareFreeBerlekamp(f, fs, false)
 }
-func (m *UPolynomialManager) factorZPBerlekamp(f UPolynomialView, fs *UPolynomialFactors, randomized bool) (bool, error) {
+func (m *UPolynomialManager) factorZPBerlekamp(f UPolynomialView, fs *UPolynomialFactors, randomized bool) (answer bool, cause error) {
 	// The actual source accepts randomized but implements the same deterministic
 	// splitting body for either value; no RNG is substituted.
 	enabled, e := factorHeaderAssertionsEnabled()
@@ -398,7 +475,12 @@ func (m *UPolynomialManager) factorZPBerlekamp(f UPolynomialView, fs *UPolynomia
 	}
 	var matrix upolyBerlekampMatrix
 	matrix.m = m
-	defer matrix.close()
+	defer func() {
+		matrix.close()
+		if m.pendingBerlekamp == &matrix {
+			cause = errors.Join(cause, matrix.closeCause, ErrUPolynomialCleanupPending)
+		}
+	}()
 	if e = matrix.init(m, f); e != nil {
 		return false, e
 	}

@@ -53189,7 +53189,9 @@
         "pkg/math/polynomial/upolynomial_hensel_precondition_assertions_test.go",
         "pkg/math/polynomial/upolynomial_primitive_assertions_test.go",
         "pkg/math/polynomial/upolynomial_factor_remainder_assertions_test.go",
-        "pkg/math/polynomial/upolynomial_berlekamp_constructor_trace_test.go"
+        "pkg/math/polynomial/upolynomial_berlekamp_constructor_trace_test.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_cleanup.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_destructor_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53344,7 +53346,10 @@
         "TestUPolynomialPrimitiveDisabledAssertionStillComputesDebugContent",
         "TestUPolynomialRecombinationConstantRemainderAssertionActions",
         "TestUPolynomialBerlekampConstructorTraceBeforeMatrixValues",
-        "TestUPolynomialBerlekampConstructorTraceExactDisplayRefusal"
+        "TestUPolynomialBerlekampConstructorTraceExactDisplayRefusal",
+        "TestUPolynomialBerlekampDestructorRetainsAscendingGuardPrefix",
+        "TestUPolynomialBerlekampDestructorCompleteThenReuse",
+        "TestUPolynomialBerlekampFailedConstructorHasOnlyOwningMemberAbort"
       ],
       "conditionals": [
         {
@@ -53457,6 +53462,22 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Berlekamp ascending matrix destructor prefix and exact retained owning cleanup (upolynomial_factorization.cpp:148-152)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_field.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_cleanup.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_destructor_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialBerlekampDestructorRetainsAscendingGuardPrefix",
+            "TestUPolynomialBerlekampDestructorCompleteThenReuse",
+            "TestUPolynomialBerlekampConstructorTraceBeforeMatrixValues",
+            "TestUPolynomialBerlekampFailedConstructorHasOnlyOwningMemberAbort"
+          ],
+          "notes": "The former ignored reset error could discard live coefficient backing and pivots. Completed constructors now run literal ascending SourceNumeralDel calls with a persistent source cursor/guard and release members only after all deletions complete. Failed construction receives only a separate Go member-owning abort, not a fabricated C++ class destructor. A stopped lexical matrix is retained by its exact numeric manager; public factorization joins cleanup refusal rather than reporting successful destruction. Manager SourceFinalize reports the retained source cause, new work refuses, and explicit CleanupBerlekampMatrix (also reached by owning Close once caller handles are released) reclaims remaining actual values with a separate owning cursor while preserving source history. A qualified integer-mode constructor supplies genuine BIG matrix members; a fresh direct uninitialized-capacity query backing stops the real source read after the earlier BIG coefficient was deleted. Genuine backing is restored before owning cleanup. This proves guarded-prefix retention, not an ordinary C++ allocation failure or valid finite-field BIG input. Successful destruction/reuse and callback rejection are covered. Other constructor/diagonalization numerical scratch invocation ownership remains partial. The actual default-modulus-zero constructor reaches its Go domain guard with a three-coefficient first row; owning abort frees those actual members while leaving the source class deletion cursor at zero."
+        },
         {
           "name": "Berlekamp constructor entry TRACE before matrix coefficients and scoped tmp (upolynomial_factorization.cpp:97)",
           "status": "ported",
