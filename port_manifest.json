@@ -50758,7 +50758,8 @@
         "pkg/math/polynomial/upolynomial_berlekamp_vector_numeric_test.go",
         "pkg/math/polynomial/upolynomial_berlekamp_division_am_test.go",
         "pkg/math/polynomial/upolynomial_berlekamp_monic.go",
-        "pkg/math/polynomial/upolynomial_berlekamp_monic_test.go"
+        "pkg/math/polynomial/upolynomial_berlekamp_monic_test.go",
+        "pkg/math/polynomial/upolynomial_division_core_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -50977,7 +50978,10 @@
         "TestUPolynomialBerlekampDivisionAMSourceStopAndOwningCleanup",
         "TestUPolynomialBerlekampDivisionAMSuccessfulSourceEnd",
         "TestUPolynomialBerlekampMonicRawBodyFailureAndExplicitEnds",
-        "TestUPolynomialBerlekampMonicExplicitLCGuardStopsInverseEnd"
+        "TestUPolynomialBerlekampMonicExplicitLCGuardStopsInverseEnd",
+        "TestUPolynomialDivRemCoreAliasAssertionSourceActions",
+        "TestUPolynomialDivRemCoreDivisorAssertionFrontiers",
+        "TestUPolynomialDivRemCoreClosedAssertionSwitchBeforeD"
       ],
       "conditionals": [
         {
@@ -51566,6 +51570,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "div_rem_core separate alias/divisor SASSERT runtime gates, debugger actions and publication frontiers (upolynomial.cpp:434-437,459)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_division.go",
+            "pkg/math/polynomial/upolynomial_division_assertions.go",
+            "pkg/math/polynomial/upolynomial_division_core_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialDivRemCoreAliasAssertionSourceActions",
+            "TestUPolynomialDivRemCoreDivisorAssertionFrontiers",
+            "TestUPolynomialDivRemCoreClosedAssertionSwitchBeforeD"
+          ],
+          "notes": "The four alias predicates are independently runtime-gated and evaluated in literal source order before d=0. They no longer collapse into a fixed combined error. Empty divisor assertion follows d=0, and the nonzero leading-coefficient assertion follows quotient reservation/remainder publication but precedes a_m declaration. Actual debugger Throw/Continue binds the real numeric owner; disabled/release assertions erase predicate reads/actions. Registered constant-array alias fixtures cover all four source routes without changing construction counts; Continue reaches the literal integer constant-divisor copy/reset branch. Empty-divisor Continue uses a constant dividend and returns before any invalid divisor read. A genuine public Reserve adds an actual trailing zero numeral for the zero-leading profile; Throw preserves the prepared zero quotient and copied remainder, while Continue/disabled/release compute literal pseudo-division Q=1,R=-1,d=1. Closed process assertion state stops even valid predicates before initializing d or publishing output. Broader division/remainder/exact-division source-unit auditing remains partial."
+        },
         {
           "name": "Concrete Berlekamp division a_m scoped NUM and mk_monic raw lc/lc_inv source ends (upolynomial.cpp:460; upolynomial.h:363)",
           "status": "ported",

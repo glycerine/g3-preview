@@ -132,12 +132,18 @@ func (m *UPolynomialManager) divRemCoreSpanWithSourceContext(a UPolynomialView, 
 	if d == nil {
 		return arena.ErrBounds
 	}
-	if polynomialSourceDebug && (m.alias(a, q) || m.aliasDivisor(b, q) || m.alias(a, r) || m.aliasDivisor(b, r)) {
-		return ErrUPolynomialAssertion
+	if e := m.divRemAliasAssertions(a, b, q, r); e != nil {
+		return e
 	}
 	*d = 0
-	if polynomialSourceDebug && b.count() == 0 {
-		return ErrUPolynomialAssertion
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled && b.count() == 0 {
+		if e := m.scalarDivisionAssertionFailure(437, "sz2 > 0"); e != nil {
+			return e
+		}
 	}
 	if b.count() == 1 {
 		if e := m.setViewWithSourceContext(q, a, context); e != nil {
@@ -178,13 +184,19 @@ func (m *UPolynomialManager) divRemCoreSpanWithSourceContext(a UPolynomialView, 
 	if e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
+	enabled, e = refinementSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled {
 		zero, e := m.modular.IsZero(bn)
 		if e != nil {
 			return e
 		}
 		if zero {
-			return ErrUPolynomialAssertion
+			if e := m.scalarDivisionAssertionFailure(459, "!m().is_zero(b_n)"); e != nil {
+				return e
+			}
 		}
 	}
 	var local unumeral.Int
