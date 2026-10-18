@@ -44467,3 +44467,43 @@ integrated evidence and keeps cross-manager set partial for destructor/cleanup
 callback composition and the owning AST wrapper consumer. No full suite repeat
 after the preceding 93.929s ordinary pass. Complete polynomial then AST remains
 active.
+
+Cross-core copy source/owning destruction composition: the qualified LP64 TLS
+fixture uses public realloc operations to reach the existing signed-host guard;
+no private accounting counters or source-completion flags are written. An actual
+mutable destination SET refusal is reached after both foreign scoped-q fields
+are copied. The literal NUM destructor then physically progresses and stops,
+retaining its source cursor and cause. A separate owning cleanup stop preserves
+the source-core borrow and clears synchronous numeral bindings on return. Retry
+releases the actual remaining physical prefixes, leaves the original source
+cursor/body/destructor histories unchanged, and finally releases the borrow.
+The mutable SET transport callback verifies both source and target core lifetime
+exclusion. Replaying the stopped literal destructor changes neither physical
+stats nor charged bytes. TestAlgebraicCopyFromCoreSourceDestructorAndOwningStop
+passed ordinary initially in 0.012s and in the combined checked selections.
+
+Inspection of the next retained AST consumer identified a concrete constructor
+mismatch: arith_decl_plugin's algebraic_numbers_wrapper owns an independent
+unsynch_mpq_manager (cpp 25-35), and algebraic_numbers::manager explicitly accepts
+that owner (h 61/cpp 2772). Go's owning manager previously forced the global
+RationalService.Manager. Added AlgebraicManagerConfig.Numerals as an explicit
+borrowed concrete RationalManager, defaulting to the existing service owner.
+All numeric children, allocator/runtime, qm() accessor and header budget use
+the selected owner; the RationalService remains the separate diagnostic owner.
+The default service-borrow constructor path is preserved. Distinct raw owners
+use the typed univariate constructor without claiming a global-service borrow.
+No synchronization flag is rewritten and neither supplied numeral owner is
+owned by algebraic manager cleanup.
+
+Two real private unsynchronized owners now construct complete owning algebraic
+managers, create/copy sqrt(2), close the source algebraic AND private numeral
+owners, and compute the receiving value's square as 2. Every reached private
+constructor reservation prefix through success exercises cleanup and verifies
+that the borrowed private and global numeral owners remain ready. The combined
+Manager/Copy/ConstRational selection passed ordinary 0.056s and checked/debug/
+trace 0.080s after the final explicit source-numeral close assertion, on CPUs 8-16.
+No full suite repeat after the recent 93.929s ordinary polynomial pass. Manifest
+entries remain partial: broader ownership/callback composition and the owning
+AST lazy algebraic wrapper/ID consumer are still required; complete polynomial
+then AST remains the active objective.
+portcheck and git diff --check passed; manifest unit counts remain unchanged.

@@ -16,7 +16,11 @@ import (
 // Borrowed configuration services outlive the manager. A nil Allocator selects
 // the source's private "algebraic" allocator; supplied allocators stay borrowed.
 type AlgebraicManagerConfig struct {
-	Rationals     *unumeral.RationalService
+	Rationals *unumeral.RationalService
+	// Numerals borrows the concrete source qm(), including the private
+	// unsynchronized owner in arith_decl_plugin::algebraic_numbers_wrapper.
+	// Nil selects Rationals.Manager; Rationals also supplies diagnostics.
+	Numerals      *unumeral.RationalManager
 	Limit         *control.Reslimit
 	Cooperation   *cooperate.Cooperation
 	Params        *uparams.ParamsRef
@@ -53,13 +57,19 @@ func NewAlgebraicManager(c AlgebraicManagerConfig) (*AlgebraicManager, error) {
 	if c.Limit.Closed() {
 		return nil, arena.ErrClosed
 	}
-	if e := c.Rationals.Manager.CheckOwnerReady(); e != nil {
+	if c.Numerals == nil {
+		c.Numerals = c.Rationals.Manager
+	}
+	if c.Numerals == nil {
+		return nil, arena.ErrConfig
+	}
+	if e := c.Numerals.CheckOwnerReady(); e != nil {
 		return nil, e
 	}
 	if _, e := c.Cooperation.Enabled(); e != nil {
 		return nil, e
 	}
-	b := c.Rationals.Manager.Budget()
+	b := c.Numerals.Budget()
 	n := uint64(reflect.TypeOf(AlgebraicManager{}).Size())
 	if e := b.Reserve(n); e != nil {
 		return nil, e
@@ -77,21 +87,21 @@ func NewAlgebraicManager(c AlgebraicManagerConfig) (*AlgebraicManager, error) {
 	var e error
 	m.allocator = c.Allocator
 	if m.allocator == nil {
-		m.allocator, e = umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: c.Rationals.Manager.Integers().RuntimeOwner(), Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: polynomialSourceDebug}})
+		m.allocator, e = umemory.NewSmallAllocator(umemory.SmallAllocatorConfig{Runtime: c.Numerals.Integers().RuntimeOwner(), Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: polynomialSourceDebug}})
 		if e != nil {
 			return fail(e)
 		}
 		m.ownAllocator = true
-	} else if m.allocator.RuntimeOwner() != c.Rationals.Manager.Integers().RuntimeOwner() {
+	} else if m.allocator.RuntimeOwner() != c.Numerals.Integers().RuntimeOwner() {
 		return fail(arena.ErrConfig)
 	}
-	m.AlgebraicRootCore, e = allocateAlgebraicRootCore(AlgebraicRootConfig{Rationals: c.Rationals.Manager, Allocator: m.allocator, Checkpoint: c.Limit.Inc, Cooperation: func() error { return c.Cooperation.Cooperate("algebraic") }})
+	m.AlgebraicRootCore, e = allocateAlgebraicRootCore(AlgebraicRootConfig{Rationals: c.Numerals, Allocator: m.allocator, Checkpoint: c.Limit.Inc, Cooperation: func() error { return c.Cooperation.Cooperate("algebraic") }})
 	if e != nil {
 		return fail(e)
 	}
 	core := m.AlgebraicRootCore
 	core.manager = m
-	m.binary, e = unumeral.NewBinaryRationalManager(c.Rationals.Manager.Integers(), unumeral.BinaryRationalConfig{Diagnostics: c.Rationals})
+	m.binary, e = unumeral.NewBinaryRationalManager(c.Numerals.Integers(), unumeral.BinaryRationalConfig{Diagnostics: c.Rationals})
 	if e != nil {
 		return fail(e)
 	}
@@ -101,13 +111,18 @@ func NewAlgebraicManager(c AlgebraicManagerConfig) (*AlgebraicManager, error) {
 		return fail(e)
 	}
 	core.config.Intervals = m.intervals
-	m.polynomial, e = NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: c.Rationals.Manager.Integers(), Rationals: c.Rationals.Manager, Checkpoint: c.Limit.Inc, Cooperation: func() error { return c.Cooperation.Cooperate("polynomial") }}, Allocator: m.allocator, Factorization: c.Factorization})
+	m.polynomial, e = NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: c.Numerals.Integers(), Rationals: c.Numerals, Checkpoint: c.Limit.Inc, Cooperation: func() error { return c.Cooperation.Cooperate("polynomial") }}, Allocator: m.allocator, Factorization: c.Factorization})
 	core.multivariate = m.polynomial
 	if e != nil {
 		return fail(e)
 	}
 	m.polynomialConstructed = true
-	m.univariate, e = NewUPolynomialManagerFromRationalService(c.Rationals, UPolynomialConfig{Checkpoint: c.Limit.Inc, Cooperation: func() error { return c.Cooperation.Cooperate("upolynomial") }})
+	upConfig := UPolynomialConfig{Integer: c.Numerals.Integers(), Checkpoint: c.Limit.Inc, Cooperation: func() error { return c.Cooperation.Cooperate("upolynomial") }}
+	if c.Numerals == c.Rationals.Manager {
+		m.univariate, e = NewUPolynomialManagerFromRationalService(c.Rationals, upConfig)
+	} else {
+		m.univariate, e = NewUPolynomialManager(upConfig)
+	}
 	if e != nil {
 		return fail(e)
 	}
@@ -308,7 +323,7 @@ func (m *AlgebraicManager) finish(owning bool) error {
 		}
 		m.allocator = nil
 	}
-	m.config.Rationals.Manager.Budget().Release(m.header)
+	m.config.Numerals.Budget().Release(m.header)
 	m.header = 0
 	m.closed = true
 	m.completed = false
@@ -324,7 +339,7 @@ func (m *AlgebraicManager) RationalManager() (*unumeral.RationalManager, error) 
 	if !m.completed || m.closed || m.finishing {
 		return nil, arena.ErrClosed
 	}
-	return m.config.Rationals.Manager, nil
+	return m.config.Numerals, nil
 }
 func (m *AlgebraicManager) BinaryRationalManager() (*unumeral.BinaryRationalManager, error) {
 	if m == nil || m.self != m {
