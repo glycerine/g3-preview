@@ -214,3 +214,52 @@ func (s *UPolynomialFactorizationService) traceHenselQuadraticEntry(caller *upol
 		})
 	return computation
 }
+
+// Source: factorization.cpp:688-698, reached only when UA+VB is not one.
+// This diagnostic uses the lifted modular display core, as in the source.
+func (s *UPolynomialFactorizationService) traceQuadraticCheckFailure(caller *upolyHenselCallerScope, zpe *UPolynomialManager, U, A, V, B UPolynomialView) error {
+	tags := s.manager.modular.BorrowTraceTags()
+	if !tags.ShouldTrace("polynomial::factorization::bughunt") {
+		return nil
+	}
+	if caller == nil || !caller.matches() {
+		return ErrUPolynomialOwner
+	}
+	c := caller.owner
+	if e := c.traceBorrow.bindFamily([4]*UPolynomialManager{s.manager, caller.prime, zpe, caller.related}, tags); e != nil {
+		return e
+	}
+	defer c.traceBorrow.unbind()
+	var computation error
+	_ = tags.EmitConditional("polynomial::factorization::bughunt", "check_quadratic_hensel", "src/math/polynomial/upolynomial_factorization.cpp", 688,
+		func() bool { return true }, func(raw io.Writer) error {
+			out := factorizationTraceWriter{raw}
+			_ = linearWriteText(out, "sage: R.<x> = Zmod(")
+			p, e := zpe.modular.BorrowedModulus()
+			if e != nil {
+				computation = e
+				return e
+			}
+			prime, e := s.manager.config.Integer.String(p)
+			if e != nil {
+				computation = e
+				return e
+			}
+			_ = linearWriteText(out, prime)
+			_ = linearWriteText(out, ")['x']")
+			_ = diagnostic.WriteTraceEndl(out)
+			for i, v := range [4]UPolynomialView{A, B, U, V} {
+				_ = linearWriteText(out, [4]string{"sage: A = ", "sage: B = ", "sage: U = ", "sage: V = "}[i])
+				if e := zpe.displayIntoWithReceipt(v, factorizationTraceStream{out}, "x", false, &c.tracePolynomial); e != nil {
+					computation = e
+					return e
+				}
+				_ = diagnostic.WriteTraceEndl(out)
+			}
+			_ = linearWriteText(out, "sage: print  (1 - UA - VB)")
+			_ = diagnostic.WriteTraceEndl(out)
+			_ = linearWriteText(out, "sage: print 'expected 0'")
+			return diagnostic.WriteTraceEndl(out)
+		})
+	return computation
+}

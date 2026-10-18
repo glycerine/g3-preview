@@ -158,7 +158,7 @@ func upolyHenselCheckVectorOwners(cores []*UPolynomialManager, factors []*UPolyn
 			}
 			scope = scope.Elem()
 			caller := testFieldBySourceName(scope, "hensel")
-			for _, name := range []string{"outer", "quadratic", "iteration"} {
+			for _, name := range []string{"outer", "quadratic", "iteration", "individual", "checkVectors", "quadraticCheck", "extended", "extendedDebug"} {
 				group := testFieldBySourceName(caller, name)
 				for i := 0; i < group.Len(); i++ {
 					if e := add(testFieldBySourceName(scope, "manager").Elem(), group.Index(i), "retained henselCaller."+name); e != nil {

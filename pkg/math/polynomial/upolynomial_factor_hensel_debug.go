@@ -123,10 +123,18 @@ func (s *UPolynomialFactorizationService) checkQuadraticHenselWithCaller(zpe *UP
 	if e := zpe.addSubWithCaller(m.stateView(tmp1), m.stateView(tmp2), one, false, caller); e != nil {
 		return false, e
 	}
-	if one.size != 1 {
-		return false, nil
+	if one.size == 1 {
+		ok, failure = m.config.Integer.IsOne(&m.values(one)[0])
+		if failure != nil {
+			return false, failure
+		}
 	}
-	return m.config.Integer.IsOne(&m.values(one)[0])
+	if !ok {
+		if e := s.traceQuadraticCheckFailure(caller, zpe, U, A, V, B); e != nil {
+			return false, e
+		}
+	}
+	return ok, nil
 }
 func (s *UPolynomialFactorizationService) checkIndividualLift(zp *UPolynomialManager, A UPolynomialView, zpe *UPolynomialManager, Al UPolynomialView) (bool, error) {
 	return s.checkIndividualLiftWithCaller(zp, A, zpe, Al, nil)

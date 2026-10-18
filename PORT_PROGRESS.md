@@ -45249,3 +45249,36 @@ Broader focused checks pass ordinary16.905s and checked/debug/trace28.831s,
 CPUs8-16. portcheck and diff checks pass:2103 units,677 APIs;211 ported,
 340 partial,1495 unported,11 dead/deleted. Native full suite has passed
 polynomial and is still running LP; its terminal result is not yet available.
+
+2026-10-18: failure-only quadratic Hensel checker TRACE
+
+Implemented the whole factorization.cpp:688-698 diagnostic only when computed
+UA+VB is not one, preserving the source's size/IsOne short circuit. It prints
+the actual lifted modulus, A,B,U,V through the lifted modular display core,
+then both exact source lines (including the double space). Whole-record actual
+owner borrows and exact accepted modular-display receipts protect the three
+older checker vectors. Their deferred source cleanup now observes that child
+before releasing the vectors.
+
+Tests cover nonconstant sum, constant-not-one and a silent successful identity,
+verify the actual modular display owner and callback guards, and force a real
+descriptor-after-physical display refusal using BIG normalized input. All three
+checker vectors remain source-owned. Physical graph auditing now explicitly
+includes the actual individual/check/extended checker vector acquisition fields,
+in addition to the previously covered outer/quadratic/iteration vectors. It
+does not infer ownership from allocator liveness. The concrete charged direct
+checker caller adapter keeps its C++ parent construction count at zero.
+
+The refused-output test verifies all four actual displays still execute. Sticky
+badbit suppresses body writes/physical flushes; only the record's final flush
+reaches the host. An initial expectation of seven physical flushes was corrected
+after inspecting the diagnostic stream's existing badbit handling; production
+stream behavior was unchanged. Disabled diagnostics skip absent operands.
+
+Other helper diagnostics, verbose output and broader method/ownership audits
+remain open; polynomial then AST remain unfinished. The full native run against
+847864a4 remains live as session88429, before these later increments.
+Final broader focused checks pass ordinary16.791s and checked/debug/trace
+28.629s. Exact full diagnostic-body assertions and refused-stream checks pass
+checked/debug/trace0.007s. portcheck and diff checks pass;2103 units,677 APIs,
+211 ported,340 partial,1495 unported,11 dead/deleted. Commands stay on CPUs8-16.

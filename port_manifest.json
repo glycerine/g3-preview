@@ -53114,7 +53114,8 @@
         "pkg/math/polynomial/upolynomial_factor_hensel_trace.go",
         "pkg/math/polynomial/upolynomial_factor_hensel_trace_test.go",
         "pkg/math/polynomial/upolynomial_hensel_pair_trace.go",
-        "pkg/math/polynomial/upolynomial_hensel_pair_trace_test.go"
+        "pkg/math/polynomial/upolynomial_hensel_pair_trace_test.go",
+        "pkg/math/polynomial/upolynomial_hensel_quadratic_failure_trace_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53239,7 +53240,10 @@
         "TestUPolynomialHenselPairTraceRecordsAndBorrowedOwners",
         "TestUPolynomialHenselPairTraceActualBIGChildren",
         "TestUPolynomialFactorHenselQuadraticTraceChildBeforeIteration",
-        "TestUPolynomialFactorHenselQuadraticEntryTraceBeforeRelatedCore"
+        "TestUPolynomialFactorHenselQuadraticEntryTraceBeforeRelatedCore",
+        "TestUPolynomialHenselQuadraticFailureTraceBranchesAndModularOwner",
+        "TestUPolynomialHenselQuadraticFailureTraceExactBIGChild",
+        "TestUPolynomialHenselQuadraticFailureTraceStreamFailure"
       ],
       "conditionals": [
         {
@@ -53352,6 +53356,23 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Whole failure-only check_quadratic_hensel TRACE with modular-display child before checker vectors (688-698)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_hensel_trace.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_hensel_debug.go",
+            "pkg/math/polynomial/upolynomial_hensel_caller_scope.go",
+            "pkg/math/polynomial/upolynomial_hensel_quadratic_failure_trace_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialHenselQuadraticFailureTraceBranchesAndModularOwner",
+            "TestUPolynomialHenselQuadraticFailureTraceExactBIGChild",
+            "TestUPolynomialHenselQuadraticFailureTraceStreamFailure",
+            "TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands"
+          ],
+          "notes": "Runs the complete source diagnostic only when computed UA+VB is not one, preserving short-circuit size/IsOne order. Prints actual lifted modulus then A,B,U,V through the lifted modular display core, including literal double-space source text and endl. Whole-record owner borrows and exact accepted display receipt protect the three older checker vectors; finishQuadraticCheckSource observes that child before destruction. Tests cover nonconstant sum, constant-not-one, silent successful identity, correct display owner, actual descriptor-after-physical refusal with all three checker vectors retained, and explicit cleanup/physical graph. Stream refusal still computes all four actual displays while sticky badbit suppresses physical body writes/flushes; final trace flush remains. The concrete direct-checker caller adapter claims no constructed C++ parent locals. Other diagnostics, verbose output and broader source-unit audits remain open; no whole-unit completion credit."
+        },
         {
           "name": "Whole quadratic Hensel entry TRACE before related-core construction (713-719)",
           "status": "ported",
