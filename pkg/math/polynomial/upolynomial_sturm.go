@@ -61,13 +61,13 @@ func (m *UPolynomialManager) sturmUnary(p UPolynomialView, s *upolySequenceState
 	return m.sturmSequenceCore(s)
 }
 func (m *UPolynomialManager) SturmSequence(p UPolynomialView, s *UPolynomialSequence) error {
-	if e := m.sequenceOutput(s); e != nil {
+	if e := m.sequenceMutationOutput(s); e != nil {
 		return e
 	}
 	return m.sturmUnary(p, &s.state)
 }
 func (m *UPolynomialManager) SturmSequencePair(a, b UPolynomialView, s *UPolynomialSequence) error {
-	if e := m.sequenceOutput(s); e != nil {
+	if e := m.sequenceMutationOutput(s); e != nil {
 		return e
 	}
 	if e := m.sequenceReset(&s.state); e != nil {
@@ -82,7 +82,7 @@ func (m *UPolynomialManager) SturmSequencePair(a, b UPolynomialView, s *UPolynom
 	return m.sturmSequenceCore(&s.state)
 }
 func (m *UPolynomialManager) SturmTarskiSequence(a, b UPolynomialView, s *UPolynomialSequence) error {
-	if e := m.sequenceOutput(s); e != nil {
+	if e := m.sequenceMutationOutput(s); e != nil {
 		return e
 	}
 	if e := m.sequenceReset(&s.state); e != nil {
@@ -105,7 +105,7 @@ func (m *UPolynomialManager) SturmTarskiSequence(a, b UPolynomialView, s *UPolyn
 	return m.sturmSequenceCore(&s.state)
 }
 func (m *UPolynomialManager) FourierSequence(p UPolynomialView, s *UPolynomialSequence) error {
-	if e := m.sequenceOutput(s); e != nil {
+	if e := m.sequenceMutationOutput(s); e != nil {
 		return e
 	}
 	if e := m.sequenceReset(&s.state); e != nil {
@@ -207,7 +207,7 @@ func (m *UPolynomialManager) SignVariationsBinary(s *UPolynomialSequence, b *unu
 	if e := m.sequenceOutput(s); e != nil {
 		return 0, e
 	}
-	return m.sequenceVariations(&s.state, 3, b)
+	return s.signVariationsBinary(b)
 }
 func (m *UPolynomialManager) GetRootID(p UPolynomialView, b *unumeral.BinaryRational) (uint32, error) {
 	return m.getRootIDWithReceipt(p, b, nil)

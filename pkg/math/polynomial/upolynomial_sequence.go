@@ -14,13 +14,16 @@ type upolySequenceState struct {
 	begins, sizes []uint32
 }
 type UPolynomialSequence struct {
-	callerBinding unumeral.NumericCallerBinding
-	self          *UPolynomialSequence
-	manager       *UPolynomialManager
-	state         upolySequenceState
-	header        uint64
-	closed        bool
-	displaying    bool
+	evaluation           upolyBinaryEvaluationInvocationReceipt
+	evaluationSourceStop error
+	evaluating           bool
+	callerBinding        unumeral.NumericCallerBinding
+	self                 *UPolynomialSequence
+	manager              *UPolynomialManager
+	state                upolySequenceState
+	header               uint64
+	closed               bool
+	displaying           bool
 }
 type UPolynomialSequenceStats struct {
 	OwnerBytes, MetadataBytes, ManagerBackingBytes, TotalBytes                                                   uint64
@@ -85,7 +88,7 @@ func (m *UPolynomialManager) sequencePush(s *upolySequenceState, v UPolynomialVi
 	return nil
 }
 func (s *UPolynomialSequence) PushCopy(v UPolynomialView) error {
-	if s != nil && s.self == s && s.displaying {
+	if s.mutationPending() {
 		return ErrUPolynomialCleanupPending
 	}
 	if e := s.check(); e != nil {
@@ -94,7 +97,7 @@ func (s *UPolynomialSequence) PushCopy(v UPolynomialView) error {
 	return s.manager.sequencePush(&s.state, v, false)
 }
 func (s *UPolynomialSequence) PushMove(v UPolynomialView) error {
-	if s != nil && s.self == s && s.displaying {
+	if s.mutationPending() {
 		return ErrUPolynomialCleanupPending
 	}
 	if e := s.check(); e != nil {
@@ -152,7 +155,7 @@ func (m *UPolynomialManager) sequenceReset(s *upolySequenceState) error {
 	return nil
 }
 func (s *UPolynomialSequence) Reset() error {
-	if s != nil && s.self == s && s.displaying {
+	if s.mutationPending() {
 		return ErrUPolynomialCleanupPending
 	}
 	if e := s.check(); e != nil {
@@ -170,10 +173,13 @@ func (m *UPolynomialManager) sequenceDestroy(s *upolySequenceState) error {
 	return nil
 }
 func (s *UPolynomialSequence) Close() error {
-	if s != nil && s.self == s && s.displaying {
+	if s != nil && s.self == s && (s.displaying || s.evaluating) {
 		return ErrUPolynomialCleanupPending
 	}
 	if e := s.check(); e != nil {
+		return e
+	}
+	if e := s.CleanupEvaluation(); e != nil {
 		return e
 	}
 	if e := s.manager.sequenceDestroy(&s.state); e != nil {
