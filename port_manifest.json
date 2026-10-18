@@ -39863,7 +39863,9 @@
         "pkg/util/params/util_gparams_catalog_dispatch.go",
         "pkg/math/polynomial/algebraic_manager.go",
         "pkg/math/polynomial/algebraic_params.go",
-        "pkg/util/params/util_module_params_source.go"
+        "pkg/util/params/util_module_params_source.go",
+        "pkg/math/polynomial/gparams_catalog_link_test.go",
+        "pkg/math/polynomial/algebraic_params_source_test.go"
       ],
       "tests": [
         "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
@@ -39877,7 +39879,8 @@
         "TestAlgebraicManagerEveryConstructorReservationAndCleanup",
         "TestAlgebraicManagerStoppedYoungestMemberProtectsOlderOwners",
         "TestAlgebraicParametersAllGlobalFallbackLocalPrecedenceAndSnapshot",
-        "TestAlgebraicParameterDescriptorSchemaSourceOrder"
+        "TestAlgebraicParameterDescriptorSchemaSourceOrder",
+        "TestAlgebraicParameterProductionCatalogRegistration"
       ],
       "conditionals": [
         {
@@ -39911,7 +39914,8 @@
       "ownership": [
         "Real descriptor ownership/merges and borrowed catalog-owned description bytes; source global temporary cleanup and unpublished heap descriptor pending roots preserved. All458ordered metadata rows independently checked. See PORT_PROGRESS.md#audit-gparams-catalog-port-status-md; Retained value getters now have concrete constructor evidence; broader helper failure/callback composition remains open.",
         "Owning AlgebraicManager now composes the actual core header, binary-rational and interval managers, private multivariate manager, independent univariate manager, eager isolation descriptors/factors/vectors and add temporary in source member order (algebraic_numbers.cpp:64-126,2772-2786). It reserves the two private variables after parameter loading/statistics reset. Constructor parameters use one actual algebraic module helper with local precedence and signed32 magnitude conversion; public updt_params remains the empty source method (:2788-2789). qm/bqm return actual owner identities; statistics preserve source order. Reverse private destruction stops before older owners when the youngest destructor fails. Every constructor reservation frontier verifies retained-owner cleanup and retry; tests distinguish the borrowed Runtime directory cache from manager storage. Own and borrowed allocators/services, eager descriptors, arithmetic, parameter precedence and stopped destruction pass ordinary and checked/debug/trace profiles on CPUs 8-16. Standalone borrowed cores retain lazy compatibility. Full allocation/callback/destructor/TRACE composition and polynomial/AST completion remain pending; no whole-unit completion credit.",
-        "Retained algebraic parameter schema/getter audit: source-wide algebraic_params references are only the polynomial CMake schema listing, generated header, algebraic_numbers.cpp descriptor delegation (:62), and constructor helper (:151). All six generated getters are concretely consumed by readConstructorParams; no unused public wrapper/template adapter is introduced. New all-global/all-local tests use distinct values for every setting, verify local precedence/global fallback and signed magnitude/accuracy translation, confirm the actual helper receipt ends at construction, mutate both caller/global dictionaries, and prove the captured configuration and empty public update remain unchanged. A direct production collector test checks all six descriptor names in source order, kinds, default strings, algebraic module and now exact source descriptions. The broad util catalog test uses fixture collectors, so it does not independently prove this production collector. An isolated production DisplayModule probe encounters the unlinked catalogCollectContextParams collector; full catalog bootstrap/composition remains unverified in the polynomial-only package. Existing constructor reservation/cleanup/retry tests remain part of the evidence. The .pyg generated-input status is corrected from wholly unported to partial, reflecting its concrete schema output and retained consumers; generated helper failure/callback composition and whole polynomial/AST completion remain pending. Focused ordinary and checked/debug/trace manager/parameter checks run on CPUs 8-16."
+        "Retained algebraic parameter schema/getter audit: source-wide algebraic_params references are only the polynomial CMake schema listing, generated header, algebraic_numbers.cpp descriptor delegation (:62), and constructor helper (:151). All six generated getters are concretely consumed by readConstructorParams; no unused public wrapper/template adapter is introduced. New all-global/all-local tests use distinct values for every setting, verify local precedence/global fallback and signed magnitude/accuracy translation, confirm the actual helper receipt ends at construction, mutate both caller/global dictionaries, and prove the captured configuration and empty public update remain unchanged. A direct production collector test checks all six descriptor names in source order, kinds, default strings, algebraic module and now exact source descriptions. The broad util catalog test uses fixture collectors, so it does not independently prove this production collector. An isolated production DisplayModule probe encounters the unlinked catalogCollectContextParams collector; full catalog bootstrap/composition remains unverified in the polynomial-only package. Existing constructor reservation/cleanup/retry tests remain part of the evidence. The .pyg generated-input status is corrected from wholly unported to partial, reflecting its concrete schema output and retained consumers; generated helper failure/callback composition and whole polynomial/AST completion remain pending. Focused ordinary and checked/debug/trace manager/parameter checks run on CPUs 8-16.",
+        "Production catalog linkage verification now passes in polynomial tests after an external polynomial_test imports the actual collector-owner packages, following existing smtcore/model/rewriter integration-test patterns. TestAlgebraicParameterProductionCatalogRegistration verifies actual exported algebraic module dispatch, exact module description and all six fields. This resolves the previously recorded isolated missing Context collector probe without fixture substitutes or new production dependency edges. Generated header helper failure/destructor/callback composition remains partial."
       ],
       "deviations": []
     },
@@ -39919,24 +39923,42 @@
       "path": "src/math/polynomial/algebraic_params.pyg",
       "component": "math",
       "role": "generated_input",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/math/polynomial/algebraic_params.go",
         "pkg/math/polynomial/algebraic_manager.go",
         "pkg/math/polynomial/gparams_catalog_collectors.go",
-        "pkg/util/params/util_module_params_source.go"
+        "pkg/util/params/util_module_params_source.go",
+        "pkg/math/polynomial/gparams_catalog_link_test.go",
+        "pkg/math/polynomial/algebraic_params_source_test.go"
       ],
       "tests": [
         "TestAlgebraicParametersAllGlobalFallbackLocalPrecedenceAndSnapshot",
         "TestAlgebraicParameterDescriptorSchemaSourceOrder",
         "TestAlgebraicManagerEveryConstructorReservationAndCleanup",
-        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher"
+        "TestGlobalParamsCatalogCompleteMetadataAndExactDispatcher",
+        "TestAlgebraicParameterProductionCatalogRegistration"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
-      "methods": [],
+      "methods_audited": true,
+      "ownership_audited": true,
+      "methods": [
+        {
+          "name": "def_module_params algebraic: complete six-field schema, defaults, exact descriptions, module description and exported production catalog registration",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/gparams_catalog_collectors.go",
+          "go_targets": [
+            "pkg/math/polynomial/algebraic_params_source_test.go",
+            "pkg/math/polynomial/gparams_catalog_link_test.go"
+          ],
+          "tests": [
+            "TestAlgebraicParameterDescriptorSchemaSourceOrder",
+            "TestAlgebraicParameterProductionCatalogRegistration",
+            "TestAlgebraicParametersAllGlobalFallbackLocalPrecedenceAndSnapshot"
+          ]
+        }
+      ],
       "ownership": [
-        "Retained algebraic parameter schema/getter audit: source-wide algebraic_params references are only the polynomial CMake schema listing, generated header, algebraic_numbers.cpp descriptor delegation (:62), and constructor helper (:151). All six generated getters are concretely consumed by readConstructorParams; no unused public wrapper/template adapter is introduced. New all-global/all-local tests use distinct values for every setting, verify local precedence/global fallback and signed magnitude/accuracy translation, confirm the actual helper receipt ends at construction, mutate both caller/global dictionaries, and prove the captured configuration and empty public update remain unchanged. A direct production collector test checks all six descriptor names in source order, kinds, default strings, algebraic module and now exact source descriptions. The broad util catalog test uses fixture collectors, so it does not independently prove this production collector. An isolated production DisplayModule probe encounters the unlinked catalogCollectContextParams collector; full catalog bootstrap/composition remains unverified in the polynomial-only package. Existing constructor reservation/cleanup/retry tests remain part of the evidence. The .pyg generated-input status is corrected from wholly unported to partial, reflecting its concrete schema output and retained consumers; generated helper failure/callback composition and whole polynomial/AST completion remain pending. Focused ordinary and checked/debug/trace manager/parameter checks run on CPUs 8-16."
+        "Complete generated-input audit: this source contains one static def_module_params declaration, with six ordered parameters (five UINT and one BOOL), defaults, exact per-field descriptions, algebraic module description and export=True. Production collector tests now compare every schema field and description exactly against frozen source constants. External polynomial_test linkage imports actual collector owners without changing production package dependencies; the production GlobalParams dispatcher displays the exported algebraic module with its exact module description and all six fields. Existing manager constructor tests verify all six retained values, local/global precedence and snapshot behavior. The schema declaration owns no runtime helper or numeral fields. Generated C++ header helper acquisition/destruction and full catalog runtime composition remain separate partial source audits; this completion credit applies to the entire static .pyg declaration, not the broader polynomial or AST units."
       ],
       "deviations": []
     },

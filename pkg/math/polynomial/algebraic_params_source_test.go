@@ -1,9 +1,12 @@
 package polynomial
 
 import (
+	"bytes"
+	"strings"
+	"testing"
+
 	"github.com/glycerine/g3/pkg/arena"
 	uparams "github.com/glycerine/g3/pkg/util/params"
-	"testing"
 )
 
 func TestAlgebraicParametersAllGlobalFallbackLocalPrecedenceAndSnapshot(t *testing.T) {
@@ -97,6 +100,20 @@ func TestAlgebraicParameterDescriptorSchemaSourceOrder(t *testing.T) {
 		serviceMust(t, e)
 		if name != expected || kind != row.kind || !present || value != row.defaultValue || !hasModule || module != "algebraic" || !hasDescription || description != row.description {
 			t.Fatal("source descriptor binding", i, row, value, module, description)
+		}
+	}
+}
+
+func TestAlgebraicParameterProductionCatalogRegistration(t *testing.T) {
+	cfg, _, _ := algebraicManagerFixture(t)
+	var text bytes.Buffer
+	serviceMust(t, cfg.Globals.Current.DisplayModuleInto(&text, "algebraic"))
+	if !strings.HasPrefix(text.String(), "[module] algebraic, description: real algebraic number package\n") {
+		t.Fatal("production module registration/description", text.String())
+	}
+	for _, key := range []string{"zero_accuracy", "min_mag", "factor", "factor_max_prime", "factor_num_primes", "factor_search_size"} {
+		if !strings.Contains(text.String(), key+" (") {
+			t.Fatal("production dispatcher missed schema field", key, text.String())
 		}
 	}
 }

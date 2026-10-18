@@ -44232,3 +44232,25 @@ then AST objective remains open.
 
 Focused algebraic parameter/manager suites pass ordinary and checked/debug/trace
 (0.016s each), on CPUs8–16. No full-suite repetition for this verification change.
+
+Resolved the isolated production catalog linkage gap using the existing external
+integration-test pattern from smtcore/model/rewriter: polynomial_test now imports
+the actual collector owners. Production polynomial imports remain unchanged;
+no collector fixture or universal fallback is installed. The restored production
+DisplayModule probe passes, verifying exported algebraic module registration,
+its exact module description, and all six production descriptor fields.
+
+Completed the entire static algebraic_params.pyg generated-input audit: one
+six-field schema declaration (five UINT, one BOOL), ordered names, kinds,
+defaults, exact descriptions, module description and export=True all have
+production evidence. The exact collector test and retained six-getter local/
+global/snapshot constructor tests also pass. This source declaration owns no
+runtime helper fields; generated header helper failure/destructor composition
+remains separately partial. Marked only this .pyg unit ported with audited
+methods/ownership. No whole polynomial, generated header or AST completion claim.
+
+Focused algebraic parameter/manager suites pass ordinary (0.048s) and
+checked/debug/trace (0.016s), on CPUs8–16. Portcheck passes with2103 units,
+677 APIs:208 ported,343 partial,1495 unported,11 dead/deleted. No full-suite
+repetition after the recent complete ordinary run; polynomial then AST goal
+remains active.
