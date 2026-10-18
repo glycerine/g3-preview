@@ -12,8 +12,9 @@ import (
 type polynomialCRAScope struct {
 	nums                    [12]unumeral.Int
 	constructed             uint8
-	active, topOwner        bool
-	generation              uint64
+	active                  bool
+	append                  polynomialCheapAppendInvocationReceipt
+	factory                 polynomialFactoryInvocationReceipt
 	numeric                 polynomialNumericRoots
 	bodyCause, cleanupCause error
 }
@@ -23,10 +24,6 @@ func (m *MultivariatePolynomialManager) craSourceEnd() error {
 	if s.cleanupCause != nil {
 		return s.cleanupCause
 	}
-	if e := m.core.pscSourceStopped(); e != nil {
-		s.cleanupCause = e
-		return e
-	}
 	for s.constructed != 0 {
 		i := s.constructed - 1
 		if _, e := unumeral.SourceNumeralDel(m.core.integer, &s.nums[i]); e != nil {
@@ -35,7 +32,7 @@ func (m *MultivariatePolynomialManager) craSourceEnd() error {
 		}
 		s.constructed--
 	}
-	pending := s.numeric.PendingObject().OwnerID() != 0 || s.topOwner && m.core.pscPending()
+	pending := s.numeric.PendingObject().OwnerID() != 0 || m.core.cheap.matchesAppendInvocation(&s.append) || m.core.matchesFactoryInvocation(&s.factory)
 	for _, raw := range s.numeric.PendingAllocatorBlocks() {
 		pending = pending || raw.OwnerID() != 0
 	}
@@ -64,21 +61,17 @@ func (m *MultivariatePolynomialManager) CleanupCRA() error {
 		return nil
 	}
 	c := m.core
-	if s.generation == c.pscReceipts.generation {
-		if e := c.cleanupPSCCompleted(s.generation); e != nil {
-			return e
-		}
-	}
 	if e := m.cleanupCRACompleted(); e != nil {
 		return e
 	}
 	if e := s.numeric.cleanup(c.integer); e != nil {
 		return e
 	}
-	if s.topOwner && s.generation == c.pscReceipts.generation {
-		if e := c.cleanupPSCAborts(s.generation); e != nil {
-			return e
-		}
+	if e := c.cleanupFactoryInvocation(&s.factory, true); e != nil {
+		return e
+	}
+	if e := c.cheap.cleanupAppendInvocation(&s.append, true); e != nil {
+		return e
 	}
 	*s = polynomialCRAScope{}
 	return nil
@@ -158,7 +151,7 @@ func (m *MultivariatePolynomialManager) craAdd(a Polynomial, ai uint32, b Polyno
 			return e
 		}
 	}
-	return c.cheap.add(&n[8], term, false)
+	return c.cheap.addWithAppendReceipt(&n[8], term, false, &m.cra.append)
 }
 func (m *MultivariatePolynomialManager) gcdCRA(a Polynomial, b1 *unumeral.Int, b Polynomial, b2 *unumeral.Int, out *PolynomialRef) (err error) {
 	if e := m.ready(); e != nil {
@@ -207,11 +200,10 @@ func (m *MultivariatePolynomialManager) gcdCRA(a Polynomial, b1 *unumeral.Int, b
 	if s.active {
 		return ErrPolynomialPending
 	}
-	top := c.pscReceipts.depth == 0
 	if e := c.pscEnter(); e != nil {
 		return e
 	}
-	*s = polynomialCRAScope{active: true, topOwner: top, generation: c.pscExecutingOwner(), constructed: 3}
+	*s = polynomialCRAScope{active: true, constructed: 3}
 	defer func() { s.bodyCause = err; err = errors.Join(err, m.craSourceEnd()); c.pscLeave() }()
 	n := &s.nums
 	before, e := polynomialNumericBefore(c.integer)
@@ -337,9 +329,9 @@ func (m *MultivariatePolynomialManager) gcdCRA(a Polynomial, b1 *unumeral.Int, b
 	if e = m.craLeaf(5, &n[5], nil, b2); e != nil {
 		return e
 	}
-	result, e := c.cheap.mk(false)
+	result, e := c.cheap.mkWithAppendReceipt(false, &s.append, &s.factory)
 	if e != nil {
 		return e
 	}
-	return out.root.assign(c, result)
+	return out.root.assignWithFactoryReceipt(c, result, &s.factory)
 }

@@ -40317,7 +40317,8 @@
         "pkg/math/polynomial/polynomial_glex_monic_independent_test.go",
         "pkg/math/polynomial/polynomial_sparse_independent_scope_test.go",
         "pkg/math/polynomial/polynomial_iccp_independent_scope_test.go",
-        "pkg/math/polynomial/polynomial_gcd_direct_children.go"
+        "pkg/math/polynomial/polynomial_gcd_direct_children.go",
+        "pkg/math/polynomial/polynomial_cra_independent_scope_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -41180,7 +41181,9 @@
         "TestPolynomialSparseCleanupPreservesIndependentLazard",
         "TestPolynomialSparseIndependentLazardReservationPrefixes",
         "TestPolynomialICCPCleanupPreservesIndependentLazard",
-        "TestPolynomialICCPIndependentLazardReservationPrefixes"
+        "TestPolynomialICCPIndependentLazardReservationPrefixes",
+        "TestPolynomialCRACleanupPreservesIndependentLazard",
+        "TestPolynomialCRAIndependentLazardReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -42437,6 +42440,17 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "CRA reconstruction records actual cheap append/factory children and output-reference transfer; source retirement and owning cleanup preserve independent stopped Lazard work (polynomial.cpp:3675-3767)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_cra.go",
+          "tests": [
+            "TestPolynomialCRACleanupPreservesIndependentLazard",
+            "TestPolynomialCRAIndependentLazardReservationPrefixes",
+            "TestPolynomialGCDCRAEveryActualBigNumeralPrefix",
+            "TestPolynomialGCDCRACompletedNumeralGuardRetainsOlderRoots"
+          ]
+        },
         {
           "name": "ICCP source retirement and owning continuation use exact recursive ICCP/GCD/content/coefficient/negation/division children, preserving an independent stopped Lazard invocation (polynomial.cpp:3432-3534)",
           "status": "ported",
@@ -45740,7 +45754,8 @@
         "pkg/math/polynomial/polynomial_glex_monic_independent_test.go",
         "pkg/math/polynomial/polynomial_sparse_independent_scope_test.go",
         "pkg/math/polynomial/polynomial_iccp_independent_scope_test.go",
-        "pkg/math/polynomial/polynomial_gcd_direct_children.go"
+        "pkg/math/polynomial/polynomial_gcd_direct_children.go",
+        "pkg/math/polynomial/polynomial_cra_independent_scope_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -46338,7 +46353,9 @@
         "TestPolynomialSparseIndependentLazardReservationPrefixes",
         "TestPolynomialICCPCleanupPreservesIndependentLazard",
         "TestPolynomialICCPIndependentLazardReservationPrefixes",
-        "TestPolynomialICCPFirstCoefficientChildPreservesConstructedEmptyCI"
+        "TestPolynomialICCPFirstCoefficientChildPreservesConstructedEmptyCI",
+        "TestPolynomialCRACleanupPreservesIndependentLazard",
+        "TestPolynomialCRAIndependentLazardReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -46367,6 +46384,17 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "CRA reconstruction records actual cheap append/factory children and output-reference transfer; source retirement and owning cleanup preserve independent stopped Lazard work (polynomial.cpp:3675-3767)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_cra.go",
+          "tests": [
+            "TestPolynomialCRACleanupPreservesIndependentLazard",
+            "TestPolynomialCRAIndependentLazardReservationPrefixes",
+            "TestPolynomialGCDCRAEveryActualBigNumeralPrefix",
+            "TestPolynomialGCDCRACompletedNumeralGuardRetainsOlderRoots"
+          ]
+        },
         {
           "name": "ICCP source retirement and owning continuation use exact recursive ICCP/GCD/content/coefficient/negation/division children, preserving an independent stopped Lazard invocation (polynomial.cpp:3432-3534)",
           "status": "ported",

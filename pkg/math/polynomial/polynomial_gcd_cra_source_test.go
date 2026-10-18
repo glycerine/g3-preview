@@ -91,7 +91,7 @@ func TestPolynomialGCDCRACompletedNumeralGuardRetainsOlderRoots(t *testing.T) {
 	z := c.integer
 	serviceMust(t, c.pscEnter())
 	s := &full.cra
-	*s = polynomialCRAScope{active: true, topOwner: true, generation: c.pscExecutingOwner(), constructed: 3}
+	*s = polynomialCRAScope{active: true, constructed: 3}
 	var large unumeral.Int
 	limbs := make([]uint32, 8192)
 	limbs[0], limbs[len(limbs)-1] = 17, 1
