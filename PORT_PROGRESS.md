@@ -45004,3 +45004,32 @@ Focused trace/prime-preparation/saved-prime checks pass ordinary (0.359s) and
 checked/debug/trace (0.409s), on CPUs 8-16. portcheck and diff whitespace checks
 pass; completion counts remain unchanged. Full native verification is still
 running against 0e99e7de, before these two subsequent trace additions.
+
+2026-10-18: actual primitive and finite-field polynomial TRACE records
+
+Implemented whole factorization.cpp:1052-1055 and1100-1103 records, after
+primitive sign normalization and before the modular square-free check. They
+format actual polynomial views with x/x_p and the actual prime, preserve the
+literal source diagnostic strings and reached endl flushes, and retain sticky
+stream behavior. Actual root and related display callbacks cannot retire their
+borrowed enclosing owners. Disabled records skip absent manager/view operands.
+
+An exact accepted direct polynomial-display receipt is now retained separately
+from factor-collection display receipts. Source destruction stops at that child
+before the primitive vector or prime-trial image. Explicit owning cleanup first
+acknowledges only that child. A real descriptor-after-physical refusal while
+printing BIG primitive coefficients leaves constructed=1, the actual three-term
+primitive vector and exact display child intact, with no prime manager yet
+constructed. Physical graph auditing and explicit cleanup pass.
+
+Broader focused factor/Hensel/recombination/degree/display checks pass ordinary
+(16.474s) and checked/debug/trace (28.079s); added actual direct-display callback
+probes pass checked/debug/trace (0.023s). All commands use CPUs 8-16.
+Entry TRACE1020 remains open: source ordering places it before the existing
+separate primitive-debug scope. It has not been inserted after that scope or
+claimed complete. Broader factorization and polynomial then AST remain open.
+
+The full native run against 0e99e7de has now completed successfully: 68 packages
+pass,11 have no tests,zero failures (polynomial93.531s,LP692.502s). This run
+predates the subsequent GCD, exponent and primitive/image TRACE increments;
+those increments have their focused ordinary/checked/debug/trace verification.

@@ -117,6 +117,9 @@ func (s *UPolynomialFactorizationService) factorPrimeTrial(zp *UPolynomialManage
 	if e := zp.toZPCopyWithPrimeReceipt(m.stateView(fpp), fzp, &r); e != nil {
 		return 0, e
 	}
+	if e = s.traceFactorPolynomial(zp, zp.stateView(fzp), 1100); e != nil {
+		return 0, e
+	}
 	squareFree, e := zp.IsSquareFreeView(zp.stateView(fzp))
 	if e != nil {
 		return 0, e
@@ -212,6 +215,9 @@ func (s *UPolynomialFactorizationService) factorSquareFreeWithReceipt(f UPolynom
 	}()
 	c.constructed = 1
 	if e := s.prepareSquareFree(f, fs, k); e != nil {
+		return false, e
+	}
+	if e = s.traceFactorPolynomial(m, m.stateView(&c.fpp), 1052); e != nil {
 		return false, e
 	}
 	if e = s.preparePrimeSearch(fs); e != nil {

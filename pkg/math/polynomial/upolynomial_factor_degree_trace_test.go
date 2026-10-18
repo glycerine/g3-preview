@@ -15,22 +15,28 @@ type factorDegreeTraceProbe struct {
 	service                     *UPolynomialFactorizationService
 	seen                        strings.Builder
 	checked                     map[*UPolynomialManager]bool
+	polynomialChecked           map[*UPolynomialManager]bool
 	flushes                     int
 	headerChecked, flushChecked bool
 }
 
 type factorDegreeTraceFailure struct {
-	t     *testing.T
-	z     *unumeral.IntegerManager
-	held  []unumeral.Int
-	count int
-	limit uint32
-	armed bool
-	seen  strings.Builder
+	t       *testing.T
+	z       *unumeral.IntegerManager
+	held    []unumeral.Int
+	count   int
+	limit   uint32
+	trigger string
+	armed   bool
+	seen    strings.Builder
 }
 
 func (w *factorDegreeTraceFailure) Write(p []byte) (int, error) {
-	if !w.armed && string(p) == "zpe_fs" {
+	trigger := w.trigger
+	if trigger == "" {
+		trigger = "zpe_fs"
+	}
+	if !w.armed && string(p) == trigger {
 		w.armed = true
 		// Fill the real descriptor limit using caller-owned numeral copies.
 		// No quota, source scratch, or source construction count is rewritten.
@@ -136,6 +142,18 @@ func (w *factorDegreeTraceProbe) Write(p []byte) (int, error) {
 		w.headerChecked = true
 		w.checkEnclosing()
 	}
+	if s != nil && s.scope != nil {
+		r := &s.scope.tracePolynomial
+		if r.owner.displayReceiptPending(r) && r.frame.executing {
+			if w.polynomialChecked == nil {
+				w.polynomialChecked = map[*UPolynomialManager]bool{}
+			}
+			if !w.polynomialChecked[r.owner] {
+				w.polynomialChecked[r.owner] = true
+				w.checkEnclosing()
+			}
+		}
+	}
 	if s != nil && s.scope != nil && s.scope.trace.matches() && s.scope.trace.frame.executing {
 		fs := s.scope.trace.owner
 		if !w.checked[fs.manager] {
@@ -176,12 +194,12 @@ func TestUPolynomialFactorDegreeTraceRetainedRecordsAndOwners(t *testing.T) {
 	serviceMust(t, e)
 	if tags.ShouldTrace("polynomial::factorization::bughunt") {
 		text := w.seen.String()
-		for _, site := range []string{":1163 ", "out p = 2, and we'll work p^e for e = 4\n", ":1088 ", "sage: if (not (gcd(2, 1)) == 1): print 'Error, wrong gcd'\n", ":1141 ", ":1155 ", ":1192 ", "best degree set: [0, 1, 2] represented by 111\n", "degree_set = [0, 1, 2] represented by 111\n", "STARTING TRIAL DIVISION\nzpe_fs1 * ("} {
+		for _, site := range []string{":1052 ", ":1100 ", "sage: f_pp = x^2 + 3 x + 2\n", "sage: Rp.<x_p> = GF(2)['x_p']\nsage: f_pp_zp = x_p^2 + x_p\n", ":1163 ", "out p = 2, and we'll work p^e for e = 4\n", ":1088 ", "sage: if (not (gcd(2, 1)) == 1): print 'Error, wrong gcd'\n", ":1141 ", ":1155 ", ":1192 ", "best degree set: [0, 1, 2] represented by 111\n", "degree_set = [0, 1, 2] represented by 111\n", "STARTING TRIAL DIVISION\nzpe_fs1 * ("} {
 			if !strings.Contains(text, site) {
 				t.Fatal("missing source trace record", site, text)
 			}
 		}
-		if strings.Count(text, "best zp factorization (Z_2): ") != 2 || len(w.checked) != 2 || w.flushes < 10 || !w.headerChecked || !w.flushChecked {
+		if strings.Count(text, "best zp factorization (Z_2): ") != 2 || len(w.checked) != 2 || len(w.polynomialChecked) != 2 || w.flushes < 10 || !w.headerChecked || !w.flushChecked {
 			t.Fatal("record order/borrowed managers/endl", text, len(w.checked), w.flushes)
 		}
 	} else if w.seen.Len() != 0 || w.flushes != 0 || len(w.checked) != 0 {
@@ -255,6 +273,7 @@ func TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands(t *testing.T
 	serviceMust(t, s.traceFactorDegreeSet(nil, 1155, false))
 	serviceMust(t, s.traceFactorPrimeGCD(nil))
 	serviceMust(t, s.traceFactorLiftExponent(0))
+	serviceMust(t, s.traceFactorPolynomial(nil, UPolynomialView{}, 1052))
 	if s.scope != nil || s.manager.config.Integer.Budget().Used() != before {
 		t.Fatal("disabled trace acquired operands or scope")
 	}
@@ -285,5 +304,56 @@ func TestUPolynomialFactorPrimeGCDTraceRejectedPrimeOrder(t *testing.T) {
 	b := strings.Index(text.String(), "sage: if (not (gcd(3, 2)) == 1): print 'Error, wrong gcd'\n")
 	if a < 0 || b <= a {
 		t.Fatal("rejected and accepted prime trace order", text.String())
+	}
+}
+
+func TestUPolynomialFactorPrimitiveTraceChildRefusalStopsPrimitiveVector(t *testing.T) {
+	q, s := preparationPhysicalFixtureWithSlots(t, 256)
+	m, z := s.manager, q.Integers()
+	var coefficients [3]unumeral.Int
+	serviceMust(t, z.SetString(&coefficients[0], "1606938044258990275541962092344965554322887681987282944917506"))
+	serviceMust(t, z.SetString(&coefficients[1], "-2535301200456458802993406410755"))
+	coefficients[2] = unumeral.NewInt(1)
+	p, e := m.NewPolynomial()
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, m.DelPolynomial(&p)) })
+	serviceMust(t, m.SetInts(p, coefficients[:]))
+	for i := range coefficients {
+		serviceMust(t, z.Del(&coefficients[i]))
+	}
+	fs, e := m.NewFactors()
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, fs.Close()) })
+	w := factorDegreeTraceFailure{t: t, z: z, limit: 256, held: make([]unumeral.Int, 256), trigger: "sage: f_pp = "}
+	t.Cleanup(func() {
+		serviceMust(t, s.CleanupRetained())
+		for i := 0; i < w.count; i++ {
+			serviceMust(t, z.Del(&w.held[i]))
+		}
+	})
+	tags := diagnostic.NewTraceTagsWithWriter(&w)
+	tags.Enable("polynomial::factorization::bughunt")
+	serviceMust(t, m.modular.BindTrace(tags))
+	t.Cleanup(func() { serviceMust(t, m.modular.BindTrace(nil)) })
+	_, body := s.FactorSquareFreeDefault(mustUPolyView(t, m, p), fs, DefaultUPolynomialFactorParams())
+	if !tags.ShouldTrace("polynomial::factorization::bughunt") {
+		serviceMust(t, body)
+		return
+	}
+	c := s.scope
+	if !errors.Is(body, arena.ErrSlotLimit) || !w.armed || c == nil || c.constructed != 1 || !c.tracePending() || !m.displayReceiptPending(&c.tracePolynomial) {
+		t.Fatal("primitive display child/frontier", body, w.armed, c)
+	}
+	if c.fpp.size != 3 || fs.count != 0 || c.zp != nil {
+		t.Fatal("older primitive vector lost or younger prime constructed")
+	}
+	extras := upolyPhysicalExtraOwners{Services: []*UPolynomialFactorizationService{s}, RationalManagers: []*unumeral.RationalManager{q}}
+	for i := 0; i < w.count; i++ {
+		extras.Integers = append(extras.Integers, &w.held[i])
+	}
+	upolyHenselAuditPhysical(t, []*UPolynomialManager{m}, nil, extras)
+	serviceMust(t, s.CleanupRetained())
+	if s.scope != nil {
+		t.Fatal("explicit trace cleanup retained source scope")
 	}
 }
