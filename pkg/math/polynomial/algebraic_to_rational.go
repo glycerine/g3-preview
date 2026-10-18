@@ -68,7 +68,7 @@ func (m *AlgebraicRootCore) CleanupToRational() error {
 	if m == nil || m.self != m || m.closed {
 		return ErrAlgebraicOwner
 	}
-	if m.toRationalRunning || m.predicateDiagnosticRunning {
+	if m.toRationalRunning || m.predicateDiagnosticRunning || m.toOwnedRational.active {
 		return ErrAlgebraicPending
 	}
 	return m.config.Rationals.Integers().CleanupCopyAllocationInvocation(&m.toRationalCopy)

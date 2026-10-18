@@ -44,6 +44,18 @@ func TestAlgebraicCleanupPreservesOlderIntegerCopyReceipt(t *testing.T) {
 				}
 				serviceMust(t, c.CleanupToRational())
 				serviceMust(t, c.config.Rationals.Del(&out))
+				global, _ := serviceNew(t)
+				owned, e := global.NewValue()
+				serviceMust(t, e)
+				serviceMust(t, global.SetInt64(&owned, 99))
+				if e := c.ToOwnedRational(&input, global, &owned); !errors.Is(e, unumeral.ErrNumericPending) {
+					t.Fatal("global wrapper did not preserve older copy refusal", e)
+				}
+				serviceMust(t, c.CleanupToOwnedRational())
+				if !z.MatchesCopyAllocationInvocation(&older) || z.CopyAllocation != state || z.Budget().Used() != used || owned.Raw.Num != unumeral.NewInt(99) {
+					t.Fatal("global wrapper adopted older copy or published caller output")
+				}
+				serviceMust(t, global.Del(&owned))
 				borrowed := unumeral.Rational{Num: z.Two64, Den: unumeral.NewInt(1)}
 				var untouched Algebraic
 				if e := c.SetRational(&untouched, &borrowed); !errors.Is(e, unumeral.ErrNumericPending) || untouched != (Algebraic{}) {

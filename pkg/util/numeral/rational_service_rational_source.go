@@ -55,3 +55,23 @@ func (s *RationalService) NewFromRationalOwnerWithInvocation(source *RationalMan
 	complete = true
 	return s.facadeTakeLocked(&result)
 }
+
+// SourceDelValue is the literal rational destructor, separate from the owning
+// CleanupValue continuation. A stopped NUM/DEN deletion retains the token and
+// its actual remaining fields; owning cleanup must not replay this destructor.
+func (s *RationalService) SourceDelValue(value *OwnedRational) error {
+	if e := s.lock(); e != nil {
+		return e
+	}
+	defer s.mu.Unlock()
+	if value == nil || value.ownerID == 0 || value.ownerID != s.ownerID {
+		return ErrRationalServiceOwner
+	}
+	atomic.StoreUint32(&s.sourceRuntimeExecuting, 1)
+	defer atomic.StoreUint32(&s.sourceRuntimeExecuting, 0)
+	if e := SourceRationalDel(s.Manager, &value.Raw); e != nil {
+		return e
+	}
+	*value = OwnedRational{}
+	return nil
+}

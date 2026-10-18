@@ -148,3 +148,46 @@ func TestRationalServiceRawRationalConstructorSameOwner(t *testing.T) {
 	}
 	serviceMust(t, s.Del(&out))
 }
+
+func TestRationalServiceSourceDelValueAssignmentFailurePrefix(t *testing.T) {
+	b := arena.NewBudget(1 << 26)
+	runtime, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
+	serviceMust(t, e)
+	cfg := serviceConfig(b)
+	cfg.Integers.Memory = runtime
+	s, e := NewRationalService(cfg)
+	serviceMust(t, e)
+	input, e := s.NewValue()
+	serviceMust(t, e)
+	words := make([]uint32, 2000)
+	words[0], words[len(words)-1] = 17, 1
+	serviceMust(t, s.Manager.Z.SetLimbs(&input.Raw.Num, words))
+	out, e := s.NewValue()
+	serviceMust(t, e)
+	serviceMust(t, s.SetInt64(&out, 99))
+	var call RationalServiceInvocation
+	serviceMust(t, runtime.SetMaxSize(1))
+	body := s.CopyWithInvocation(&out, &input, &call)
+	if body == nil || out.Raw.Num.Cell != s.Manager.Z.FailedNullRef {
+		t.Fatal("actual assignment failure prefix not reached", body, out)
+	}
+	// The actual failed allocation records a source NULL whose deletion is
+	// defined. Do not invent a dangling-header stop merely from the Go tag.
+	serviceMust(t, s.SourceDelValue(&out))
+	if out != (OwnedRational{}) {
+		t.Fatal("source NULL destructor retained token", out)
+	}
+	serviceMust(t, runtime.SetMaxSize(0))
+	serviceMust(t, call.Cleanup(false))
+	serviceMust(t, call.Cleanup(true))
+	serviceMust(t, call.EndContext())
+	serviceMust(t, s.SourceDelValue(&input))
+	if input != (OwnedRational{}) {
+		t.Fatal("completed source destructor retained token")
+	}
+	serviceMust(t, s.Close())
+	serviceMust(t, runtime.Close())
+	if b.Used() != 0 {
+		t.Fatal("source/owning destructor graph leaked", b.Used())
+	}
+}

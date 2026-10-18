@@ -49,6 +49,7 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	toOwnedRational                                            algebraicOwnedRationalScope
 	toRationalCopy                                             unumeral.IntegerCopyAllocationReceipt
 	toRationalRunning                                          bool
 	refinementQ                                                algebraicRefinementQScope
@@ -192,7 +193,10 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
-	if m != nil && m.self == m && (m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning) {
+	if m != nil && m.self == m && m.toOwnedRational.active && !m.toOwnedRational.running {
+		return errors.Join(ErrAlgebraicPending, m.toOwnedRational.sourceCause)
+	}
+	if m != nil && m.self == m && (m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning || m.toOwnedRational.executing) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && (m.cellAllocationRunning || m.cellPending.Block() != (umemory.Block{})) {
@@ -933,7 +937,10 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.cleanupRetainedCore()
 }
 func (m *AlgebraicRootCore) cleanupRetainedCore() error {
-	if m != nil && m.self == m && (m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning) {
+	if m != nil && m.self == m && m.toOwnedRational.running {
+		return ErrAlgebraicPending
+	}
+	if m != nil && m.self == m && (m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning || m.toOwnedRational.executing) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.cellAllocationRunning {
@@ -1018,6 +1025,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 		if e := p.modular.CleanupPNormalizeInvocation(&m.representationNormalize, true); e != nil {
 			return e
 		}
+	}
+	if e := m.cleanupToOwnedRational(); e != nil {
+		return e
 	}
 	if e := m.config.Rationals.Integers().CleanupCopyAllocationInvocation(&m.toRationalCopy); e != nil {
 		return e
@@ -1133,7 +1143,10 @@ func (m *AlgebraicRootCore) Close() error {
 	return m.closeCoreMembers()
 }
 func (m *AlgebraicRootCore) closeCoreMembers() error {
-	if m != nil && m.self == m && (m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning) {
+	if m != nil && m.self == m && m.toOwnedRational.running {
+		return ErrAlgebraicPending
+	}
+	if m != nil && m.self == m && (m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning || m.toOwnedRational.executing) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.cellAllocationRunning {

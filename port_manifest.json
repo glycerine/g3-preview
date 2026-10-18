@@ -38924,7 +38924,24 @@
         },
         {
           "name": "Global rational to_rational overload with scoped mpq and rational tmp2 lifetime (cpp:343-348,2835-2837), retained by arithmetic-plugin root numerals",
-          "status": "unported"
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/algebraic_to_owned_rational.go",
+          "go_targets": [
+            "pkg/math/polynomial/algebraic_to_owned_rational.go",
+            "pkg/math/polynomial/algebraic_to_owned_rational_test.go",
+            "pkg/math/polynomial/algebraic_copy_receipt_test.go",
+            "pkg/util/numeral/rational_service_rational_source.go"
+          ],
+          "tests": [
+            "TestAlgebraicToOwnedRationalZeroBasicAndPredicateConversion",
+            "TestAlgebraicToOwnedRationalEveryReservation",
+            "TestAlgebraicToOwnedRationalReturningTransportGuards",
+            "TestAlgebraicToOwnedRationalIrrationalAndForeignOutput",
+            "TestAlgebraicCleanupPreservesOlderIntegerCopyReceipt"
+          ],
+          "notes": [
+            "Implements the real raw conversion, cross-owner rational construction, caller assignment and reverse local source destruction. Embedded exact constructor/assignment invocations and raw-copy receipt retain actual local prefixes; explicit owning cleanup never deletes caller output or adopts an older independent copy. Distinct raw/service owner allocation-prefix sweeps reach raw, constructor and assignment failures; real returning transport protects the core and borrowed numeral owner. Predicate failure continuation still belongs to the raw overload/core; comprehensive interrupted predicate and local destructor suffix audits and AST consumer wiring remain open."
+          ]
         },
         {
           "name": "algebraic_numbers.cpp:844-889,897-1084,1440-1563 concrete Add/Sub/Mul dispatch, factor/Sturm binary root selection, saved intervals, set_core zero handling and rational fallback; complete fault/callback and TRACE coverage remain open",
@@ -39442,7 +39459,24 @@
         },
         {
           "name": "Global rational to_rational overload with scoped mpq and rational tmp2 lifetime (cpp:343-348,2835-2837), retained by arithmetic-plugin root numerals",
-          "status": "unported"
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/algebraic_to_owned_rational.go",
+          "go_targets": [
+            "pkg/math/polynomial/algebraic_to_owned_rational.go",
+            "pkg/math/polynomial/algebraic_to_owned_rational_test.go",
+            "pkg/math/polynomial/algebraic_copy_receipt_test.go",
+            "pkg/util/numeral/rational_service_rational_source.go"
+          ],
+          "tests": [
+            "TestAlgebraicToOwnedRationalZeroBasicAndPredicateConversion",
+            "TestAlgebraicToOwnedRationalEveryReservation",
+            "TestAlgebraicToOwnedRationalReturningTransportGuards",
+            "TestAlgebraicToOwnedRationalIrrationalAndForeignOutput",
+            "TestAlgebraicCleanupPreservesOlderIntegerCopyReceipt"
+          ],
+          "notes": [
+            "Implements the real raw conversion, cross-owner rational construction, caller assignment and reverse local source destruction. Embedded exact constructor/assignment invocations and raw-copy receipt retain actual local prefixes; explicit owning cleanup never deletes caller output or adopts an older independent copy. Distinct raw/service owner allocation-prefix sweeps reach raw, constructor and assignment failures; real returning transport protects the core and borrowed numeral owner. Predicate failure continuation still belongs to the raw overload/core; comprehensive interrupted predicate and local destructor suffix audits and AST consumer wiring remain open."
+          ]
         },
         {
           "name": "algebraic_numbers.cpp:844-889,897-1084,1440-1563 concrete Add/Sub/Mul dispatch, factor/Sturm binary root selection, saved intervals, set_core zero handling and rational fallback; complete fault/callback and TRACE coverage remain open",
@@ -177997,6 +178031,7 @@
         "pkg/util/lp/solver_expression_exact_test.go"
       ],
       "tests": [
+        "TestRationalServiceSourceDelValueAssignmentFailurePrefix",
         "TestRationalServiceRawRationalConstructorEveryReservation",
         "TestRationalServiceRawRationalConstructorReturningTransportProtectsSource",
         "TestRationalServiceRawRationalConstructorSameOwner",
@@ -178244,6 +178279,17 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "rational.h:67 literal rational destructor over the concrete owned token",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/rational_service_rational_source.go",
+          "tests": [
+            "TestRationalServiceSourceDelValueAssignmentFailurePrefix"
+          ],
+          "notes": [
+            "SourceDelValue uses the existing SourceRationalDel guards and invalidates the owned token only after both components complete. A real refused assignment leaves the source-recorded NULL prefix whose source deletion is defined; its exact invocation still owns unjoined allocations. Broader interrupted destructor prefixes remain open."
+          ]
+        },
         {
           "name": "rational.h:52 rational(mpq const&) explicit raw owner constructor for algebraic_numbers.cpp:346",
           "status": "ported",
