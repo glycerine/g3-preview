@@ -45,7 +45,7 @@ func numericIntegerManager_binaryEvaluationCallerExecuting(z *unumeral.IntegerMa
 }
 func (c integerAllocationInvocationContext) binaryEvaluationFrame(z *unumeral.IntegerManager) *upolyBinaryEvaluationScope {
 	q := c.binaryEvaluation
-	if z == nil || !z.ValidOwner() || q == nil || q.owner == nil || q.owner.self != q.owner || q != &q.owner.binaryEvaluation || q.owner.config.Integer != z || binaryEvaluationCaller(z) != q.owner || q.owner.callbackDepth != 0 || !q.active || !q.executing || c.binaryEvaluationInvocation == 0 || c.binaryEvaluationInvocation != q.invocation {
+	if z == nil || !z.ValidOwner() || z.RuntimeOwner().FailureTransportActive() || q == nil || q.owner == nil || q.owner.self != q.owner || q != &q.owner.binaryEvaluation || q.owner.config.Integer != z || binaryEvaluationCaller(z) != q.owner || q.owner.callbackDepth != 0 || !q.active || !q.executing || c.binaryEvaluationInvocation == 0 || c.binaryEvaluationInvocation != q.invocation {
 		return nil
 	}
 	if q.history != nil && (q.history.owner != q.owner || q.history.frame != q || q.history.invocation != q.invocation) {

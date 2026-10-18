@@ -27,6 +27,18 @@ func TestUPolynomialEvalSignBinaryActualCallbackOwnerAndTupleRefusal(t *testing.
 		used := z.Budget().Used()
 		physical := z.RuntimeOwner().Stats()
 		r := p.binaryEvaluationReceipt()
+		actual := q.context()
+		if actual.binaryEvaluationFrame(z) != nil || actual.roots(z) != nil {
+			t.Error("failure transport acquired paused binary Horner context")
+		}
+		probe := unumeral.NewInt(0)
+		if e := z.WithAllocationContext(actual.utility(z)).SetUint32(&probe, 11); e == nil || probe.Val != 0 || probe.Cell != 0 {
+			t.Error("failure transport wrote through binary Horner tuple", e, probe)
+		}
+		inflight := unumeral.NumericAllocationContext{}.WithCaller(&q.numeric.hooks)
+		if e := z.WithAllocationContext(inflight).SetUint32(&probe, 12); e == nil || probe.Val != 0 || probe.Cell != 0 {
+			t.Error("failure transport reused in-flight binary Horner policy", e, probe)
+		}
 		copied := *q
 		ctx := q.context()
 		ctx.binaryEvaluation = &copied

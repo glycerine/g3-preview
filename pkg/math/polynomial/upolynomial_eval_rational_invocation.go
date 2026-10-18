@@ -47,7 +47,7 @@ func numericIntegerManager_rationalEvaluationCallerExecuting(z *unumeral.Integer
 }
 func (c integerAllocationInvocationContext) rationalEvaluationFrame(z *unumeral.IntegerManager) *upolyRationalEvaluationScope {
 	q := c.rationalEvaluation
-	if z == nil || !z.ValidOwner() || q == nil || q.owner == nil || q.owner.self != q.owner || q != &q.owner.rationalEvaluation || q.owner.config.Integer != z || rationalEvaluationCaller(z) != q.owner || q.owner.callbackDepth != 0 || !q.active || !q.executing || c.rationalEvaluationInvocation == 0 || c.rationalEvaluationInvocation != q.invocation {
+	if z == nil || !z.ValidOwner() || z.RuntimeOwner().FailureTransportActive() || q == nil || q.owner == nil || q.owner.self != q.owner || q != &q.owner.rationalEvaluation || q.owner.config.Integer != z || rationalEvaluationCaller(z) != q.owner || q.owner.callbackDepth != 0 || !q.active || !q.executing || c.rationalEvaluationInvocation == 0 || c.rationalEvaluationInvocation != q.invocation {
 		return nil
 	}
 	if q.history != nil && (q.history.owner != q.owner || q.history.frame != q || q.history.invocation != q.invocation) {
