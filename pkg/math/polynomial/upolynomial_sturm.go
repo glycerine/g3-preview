@@ -232,6 +232,7 @@ func (m *UPolynomialManager) beginRootID(p UPolynomialView, receipt *upolyRootID
 		return nil, ErrUPolynomialCleanupPending
 	}
 	*q = upolyRootIDScope{owner: m, invocation: q.invocation + 1, active: true, executing: true, target: p}
+	q.hooks.Policy = q
 	q.live[2] = true
 	if receipt != nil {
 		*receipt = upolyRootIDInvocationReceipt{m, q, q.invocation}

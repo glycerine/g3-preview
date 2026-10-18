@@ -7,6 +7,12 @@ import (
 )
 
 type upolyRootIDScope struct {
+	scalar                                     upolyRootIDRemainderScalar
+	hooks                                      unumeral.NumericInvocationHooks
+	numeric                                    unumeral.NumericAllocationRoots
+	raw                                        []unumeral.IntegerRawInvocationReceipt
+	remainderCopy                              unumeral.IntegerCopyAllocationReceipt
+	remainderNormalize                         unumeral.IntegerNormalizeInvocationReceipt
 	owner                                      *UPolynomialManager
 	invocation                                 uint64
 	target                                     UPolynomialView
@@ -43,7 +49,7 @@ func (q *upolyRootIDScope) vector(which uint8) *upolyVectorState {
 }
 func (q *upolyRootIDScope) pending() bool {
 	m := q.owner
-	if q.live[0] || q.live[1] || q.live[2] || m.config.Integer.MatchesCopyAllocationInvocation(&q.initialCopy) || m.modular.MatchesPNormalizeInvocation(&q.normalize) {
+	if q.scalarPending() || unumeral.NumericAllocationPending(&q.numeric) || m.config.Integer.MatchesCopyAllocationInvocation(&q.remainderCopy) || q.live[0] || q.live[1] || q.live[2] || m.config.Integer.MatchesCopyAllocationInvocation(&q.initialCopy) || m.modular.MatchesPNormalizeInvocation(&q.normalize) {
 		return true
 	}
 	return m.matchesBinaryEvaluationReceipt(&q.evaluation) && m.binaryEvaluation.active
@@ -83,12 +89,18 @@ func (q *upolyRootIDScope) finishVector(which uint8, cause error) error {
 	return cause
 }
 func (q *upolyRootIDScope) sturm(p UPolynomialView) (cause error) {
+	defer func() { cause = q.finishVector(1, cause) }()
+	if e := q.sturmPrefix(p); e != nil {
+		return e
+	}
+	return q.sturmCore()
+}
+func (q *upolyRootIDScope) sturmPrefix(p UPolynomialView) error {
 	m := q.owner
 	if e := m.sequenceReset(&q.sequence); e != nil {
 		return e
 	}
 	q.live[1] = true
-	defer func() { cause = q.finishVector(1, cause) }()
 	// Source seq.push(m(),sz,p): record only the accepted initial copies.
 	if e := upolyUnsignedPush(&q.sequence.begins, q.sequence.coefficients.size); e != nil {
 		return e
@@ -115,7 +127,7 @@ func (q *upolyRootIDScope) sturm(p UPolynomialView) (cause error) {
 	if e := m.sequencePush(&q.sequence, m.stateView(&q.prime), true); e != nil {
 		return e
 	}
-	return q.sturmCore()
+	return nil
 }
 func (q *upolyRootIDScope) sturmCore() (cause error) {
 	m := q.owner
@@ -131,7 +143,7 @@ func (q *upolyRootIDScope) sturmCore() (cause error) {
 		if e != nil {
 			return e
 		}
-		if e = m.signedRemState(a, b, &q.remainder); e != nil {
+		if e = m.signedRemStateWithSourceContext(a, b, &q.remainder, q.context()); e != nil {
 			return e
 		}
 		if q.remainder.size == 0 {
@@ -174,6 +186,9 @@ func (m *UPolynomialManager) cleanupRootIDWithReceipt(r *upolyRootIDInvocationRe
 		return e
 	}
 	if e := m.cleanupBinaryEvaluationWithReceipt(&q.evaluation, true); e != nil {
+		return e
+	}
+	if e := q.cleanupRemainderNumerics(); e != nil {
 		return e
 	}
 	if e := m.modular.CleanupPNormalizeInvocation(&q.normalize, true); e != nil {

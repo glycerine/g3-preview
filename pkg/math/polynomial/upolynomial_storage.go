@@ -337,6 +337,9 @@ func (m *UPolynomialManager) setViewWithHensel(s *upolyVectorState, v UPolynomia
 	return m.setViewWithSourceContext(s, v, context)
 }
 func (m *UPolynomialManager) setViewWithSourceContext(s *upolyVectorState, v UPolynomialView, context integerAllocationInvocationContext) error {
+	if context.rootID != nil && context.rootIDFrame(m.config.Integer) == nil {
+		return ErrUPolynomialOwner
+	}
 	if m.alias(v, s) {
 		if polynomialSourceDebug && s.size != v.count {
 			return ErrUPolynomialAssertion
@@ -351,7 +354,12 @@ func (m *UPolynomialManager) setViewWithSourceContext(s *upolyVectorState, v UPo
 		if e != nil {
 			return e
 		}
-		if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Copy(&m.values(s)[i], a); e != nil {
+		if q := context.rootIDFrame(m.config.Integer); q != nil {
+			e = m.modular.CopyFromOwnerTracked(&m.values(s)[i], m.config.Integer, a, &q.remainderCopy, &q.remainderNormalize)
+		} else {
+			e = m.modular.WithAllocationContext(context.utility(m.modular.Integers())).Copy(&m.values(s)[i], a)
+		}
+		if e != nil {
 			if q := context.removeOneHalfRootFrame(m.config.Integer); q != nil {
 				q.recordFailedRow(s, i)
 			}

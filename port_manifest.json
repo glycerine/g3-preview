@@ -48944,7 +48944,9 @@
         "pkg/math/polynomial/algebraic_predicate_integer_test.go",
         "pkg/math/polynomial/algebraic_predicate_integer_stop_test.go",
         "pkg/math/polynomial/upolynomial_root_id_scope.go",
-        "pkg/math/polynomial/upolynomial_root_id_scope_test.go"
+        "pkg/math/polynomial/upolynomial_root_id_scope_test.go",
+        "pkg/math/polynomial/upolynomial_root_id_remainder.go",
+        "pkg/math/polynomial/upolynomial_root_id_remainder_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -50440,7 +50442,8 @@
         "pkg/math/polynomial/upolynomial_native_factor_storage_test.go",
         "pkg/math/polynomial/upolynomial_native_isolation_storage_test.go",
         "pkg/math/polynomial/upolynomial_root_id_scope.go",
-        "pkg/math/polynomial/upolynomial_root_id_scope_test.go"
+        "pkg/math/polynomial/upolynomial_root_id_scope_test.go",
+        "pkg/math/polynomial/upolynomial_root_id_remainder_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -170377,7 +170380,8 @@
         "pkg/util/numeral/mpz_short_trace.go",
         "pkg/util/numeral/mpz_neg_trace_test.go",
         "pkg/util/numeral/mpz_binary_trace_test.go",
-        "pkg/util/numeral/mpz_division_trace_test.go"
+        "pkg/util/numeral/mpz_division_trace_test.go",
+        "pkg/math/polynomial/upolynomial_root_id_remainder_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -180416,7 +180420,8 @@
         "pkg/math/polynomial/algebraic_predicate_rational_scope_test.go",
         "pkg/math/polynomial/algebraic_predicate_integer_stop_test.go",
         "pkg/math/polynomial/algebraic_const_rational_scope.go",
-        "pkg/math/polynomial/algebraic_const_rational_scope_test.go"
+        "pkg/math/polynomial/algebraic_const_rational_scope_test.go",
+        "pkg/math/polynomial/upolynomial_root_id_remainder_test.go"
       ],
       "tests": [
         "TestASTFPAFPComponentsNumeralsAndTrace",
