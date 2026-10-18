@@ -50788,7 +50788,9 @@
         "pkg/math/polynomial/upolynomial_sturm_sign_assertions_test.go",
         "pkg/math/polynomial/upolynomial_cra_trace.go",
         "pkg/math/polynomial/upolynomial_cra_trace_test.go",
-        "pkg/math/polynomial/upolynomial_modular_gcd_trace_test.go"
+        "pkg/math/polynomial/upolynomial_modular_gcd_trace_test.go",
+        "pkg/math/polynomial/upolynomial_euclid_pointer_trace.go",
+        "pkg/math/polynomial/upolynomial_euclid_pointer_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51066,7 +51068,8 @@
         "TestUPolynomialCRATraceActualInsertionReadGuard",
         "TestUPolynomialCRATracePublicFactorSourceStop",
         "TestUPolynomialModularGCDLiteralTrace",
-        "TestUPolynomialModularGCDBadPrimeTraceBorrow"
+        "TestUPolynomialModularGCDBadPrimeTraceBorrow",
+        "TestUPolynomialEuclidPointerTrace"
       ],
       "conditionals": [
         {
@@ -51655,6 +51658,19 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Euclidean GCD input/copy pointer record (upolynomial.cpp:833-834)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_gcd.go",
+            "pkg/math/polynomial/upolynomial_euclid_pointer_trace.go",
+            "pkg/math/polynomial/upolynomial_euclid_pointer_trace_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialEuclidPointerTrace"
+          ],
+          "notes": "Exact source record after actual A/B copies, with actual input counts and native Go backing pointers, consistent with exact_div pointer projection. Whole-record receiving-manager borrowing protects callbacks; erased trace and empty-input source early return skip evaluation. Numerical oracle GCD((x+1)(x+2),(x+1)(x+3))=x+1. Polynomial-bearing Euclidean records remain open; no claim of complete source-unit audit."
+        },
         {
           "name": "Modular GCD literal branch records (upolynomial.cpp:758,762,774,786,802)",
           "status": "ported",

@@ -238,6 +238,9 @@ func (m *UPolynomialManager) euclidGCDWithSourceContext(a, b UPolynomialView, ou
 	if e = m.setViewWithSourceContext(B, b, context); e != nil {
 		return e
 	}
+	if e = m.traceEuclidPointers(a, b, B); e != nil {
+		return e
+	}
 	for {
 		if B.size == 0 {
 			if e = m.normalizeEuclidWithSourceContext(m.stateView(A), context); e != nil {
