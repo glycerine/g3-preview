@@ -44319,7 +44319,17 @@
             "TestPolynomialFactorsSourceControlAndOwnership",
             "TestPolynomialFactorsSourceDegreeQuirkAndWrap",
             "TestPolynomialFactorsSourceFinalizeAndClosedGuards",
-            "TestPolynomialFactorsNativePushGrowthAndReferenceOwnership"
+            "TestPolynomialFactorsNativePushGrowthAndReferenceOwnership",
+            "TestPolynomialFactorsResetDeletionCannotReenterCaller"
+          ],
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_factors.go",
+            "pkg/math/polynomial/polynomial_factor_univariate.go",
+            "pkg/math/polynomial/polynomial_factors_multiply_callback_test.go",
+            "pkg/math/polynomial/polynomial_factors_lifetime_test.go"
+          ],
+          "notes": [
+            "Actual last-reference deletion callbacks reproduced index-out-of-range panics in both sourceReset and owning Cleanup when nested class lifetime operations emptied the active progress slice. Separate synchronous resetRunning and cleanupRunning spans now refuse source/owning lifecycle reentry before mutation. Persistent resetting/source-error state remains available after return for the existing owning continuation. The same concrete handler verifies Reset, SourceFinalize, Cleanup and CloseChecked outer calls: one actual deletion, all three nested lifetime calls refused, correct source versus owning completion flags, physical refunds and permitted later finalization. Display retains its separately tested source behavior; no universal class freeze or synthetic pending flags are introduced."
           ]
         },
         {
@@ -48288,7 +48298,17 @@
             "TestPolynomialFactorsSourceControlAndOwnership",
             "TestPolynomialFactorsSourceDegreeQuirkAndWrap",
             "TestPolynomialFactorsSourceFinalizeAndClosedGuards",
-            "TestPolynomialFactorsNativePushGrowthAndReferenceOwnership"
+            "TestPolynomialFactorsNativePushGrowthAndReferenceOwnership",
+            "TestPolynomialFactorsResetDeletionCannotReenterCaller"
+          ],
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_factors.go",
+            "pkg/math/polynomial/polynomial_factor_univariate.go",
+            "pkg/math/polynomial/polynomial_factors_multiply_callback_test.go",
+            "pkg/math/polynomial/polynomial_factors_lifetime_test.go"
+          ],
+          "notes": [
+            "Actual last-reference deletion callbacks reproduced index-out-of-range panics in both sourceReset and owning Cleanup when nested class lifetime operations emptied the active progress slice. Separate synchronous resetRunning and cleanupRunning spans now refuse source/owning lifecycle reentry before mutation. Persistent resetting/source-error state remains available after return for the existing owning continuation. The same concrete handler verifies Reset, SourceFinalize, Cleanup and CloseChecked outer calls: one actual deletion, all three nested lifetime calls refused, correct source versus owning completion flags, physical refunds and permitted later finalization. Display retains its separately tested source behavior; no universal class freeze or synthetic pending flags are introduced."
           ]
         },
         {

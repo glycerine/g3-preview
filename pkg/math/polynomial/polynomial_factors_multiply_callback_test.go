@@ -66,3 +66,54 @@ func TestPolynomialFactorsMultiplyCooperationCannotDestroyCaller(t *testing.T) {
 		})
 	}
 }
+
+func TestPolynomialFactorsResetDeletionCannotReenterCaller(t *testing.T) {
+	for _, operation := range []string{"reset", "source", "cleanup", "close"} {
+		t.Run(operation, func(t *testing.T) {
+			m, p, _ := polynomialEvalFixture(t, nil)
+			constant := unumeral.NewInt(17)
+			q, e := m.core.MkConstantTake(&constant)
+			serviceMust(t, e)
+			f, e := NewPolynomialFactors(m)
+			serviceMust(t, e)
+			serviceMust(t, f.Push(q, 2))
+			state := &polynomialFactorsCallbackState{target: q, guardTarget: f}
+			polynomialFactorsCallback = state
+			h, e := NewPolynomialDeletionHandler(m.core.integer.Budget(), polynomialFactorsDeletionCopy)
+			serviceMust(t, e)
+			serviceMust(t, m.core.AddDeletionHandler(h))
+			t.Cleanup(func() {
+				polynomialFactorsCallback = nil
+				serviceMust(t, f.CloseChecked())
+				serviceMust(t, m.core.RemoveDeletionHandler(h))
+				serviceMust(t, h.CloseChecked())
+			})
+			var body error
+			switch operation {
+			case "reset":
+				body = f.Reset()
+			case "source":
+				body = f.SourceFinalize()
+			case "cleanup":
+				body = f.Cleanup()
+			case "close":
+				body = f.CloseChecked()
+			}
+			if body != nil || state.calls != 1 {
+				t.Fatal("actual deletion callback failed or replayed", body, state.calls)
+			}
+			for _, e := range []error{state.guardSource, state.guardCleanup, state.guardClose} {
+				if !errors.Is(e, ErrPolynomialPending) {
+					t.Fatal("deletion callback entered caller lifetime continuation", e)
+				}
+			}
+			if f.closing != (operation == "close") || f.closed != (operation == "close") || f.sourceStarted != (operation == "source") || f.resetting || len(f.factors) != 0 || f.total != 0 {
+				t.Fatal("reentry changed actual class/source state", f.closing, f.closed, f.sourceStarted, f.resetting, len(f.factors), f.total)
+			}
+			polynomialFactorsAuditExtra(t, f, []Polynomial{p}, []*unumeral.Int{&state.source, &state.foreign}, h.header)
+			if operation != "close" {
+				serviceMust(t, f.SourceFinalize())
+			}
+		})
+	}
+}

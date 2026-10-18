@@ -41,6 +41,8 @@ type PolynomialFactors struct {
 	numeric                                                            polynomialNumericRoots
 	multiplyActive, executing                                          bool
 	multiplyRunning                                                    bool
+	resetRunning                                                       bool
+	cleanupRunning                                                     bool
 	powerGeneration, factoryGeneration, constantGeneration, generation uint64
 	singleton                                                          Monomial
 	singletonGeneration                                                uint64
@@ -251,6 +253,10 @@ func (f *PolynomialFactors) sourceReset() error {
 	if f.sourceCause != nil {
 		return f.sourceCause
 	}
+	// resetting survives a stopped source call for owning cleanup. This
+	// separate span protects the live loop/cursors only until source return.
+	f.resetRunning = true
+	defer func() { f.resetRunning = false }()
 	m := f.manager.core
 	f.resetting = true
 	for {
@@ -370,6 +376,8 @@ func (f *PolynomialFactors) Cleanup() error {
 	if f.factorCallerExecuting() || f.memberSet.executing || f.memberSet.finishing || f.constantInvocation.executing || f.constantInvocation.finishing {
 		return ErrPolynomialPending
 	}
+	f.cleanupRunning = true
+	defer func() { f.cleanupRunning = false }()
 	if e := f.cleanupFactorMemberSet(false); e != nil {
 		return e
 	}
