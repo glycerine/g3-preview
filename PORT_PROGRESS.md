@@ -44676,3 +44676,26 @@ on CPUs 8-16. No full-suite repeat after the preceding 94.230s ordinary polynomi
 pass. Cache source units remain partial for broader ownership/consumer audits;
 complete polynomial then AST remains active.
 portcheck and git diff --check passed; unit/API counts remain unchanged.
+
+Cache library completion audit: compared all eight public source members in
+polynomial_cache.h with their concrete Go implementations and reviewed the
+private imp, table keys/equality, entry construction/publication, result storage
+and destructor ordering in polynomial_cache.cpp. Constructor/destructor map to
+NewPolynomialCache/Close; m/pm to Manager/PM; mk_unique, psc_chain, factor and
+reset to their concrete methods. The source hash/equality delegation and native
+Go container replacements are explicit. Canonical refs own one reference each;
+entry arrays/buckets borrow; caller output vectors independently acquire/drop
+references. Existing normal, stopped publication, callee/destructor, exact
+receipt, independent-invocation, reset-replacement and borrowed-manager tests,
+plus this turn's hit-prefix and constructor callback tests, cover those local
+contracts. Retained consumer compatibility is demonstrated by constructing the
+reference-vector consumer through PM/Manager and preserving its owned value
+across cache reset; completing the NLSAT algorithm is outside this library unit.
+
+Marked polynomial_cache.cpp and polynomial_cache.h ported, with methods and
+ownership audited and a requirement-by-requirement ownership inventory in the
+manifest. Native Go maps/slices and guarded source-invalid prefixes remain
+explicit platform deviations. This closes the cache library audit; it does not
+close the broader polynomial/factor/algebraic source units or the overall goal.
+portcheck passed:2103 units,677 APIs;210 ported,341 partial,1495 unported,
+11 dead/deleted. The full polynomial then AST objective remains active.

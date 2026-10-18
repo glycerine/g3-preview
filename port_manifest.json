@@ -49279,7 +49279,7 @@
       "path": "src/math/polynomial/polynomial_cache.cpp",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/math/polynomial/polynomial_cache.go",
         "pkg/math/polynomial/polynomial_cache_memory_trace.go",
@@ -49288,7 +49288,10 @@
         "pkg/math/polynomial/polynomial_cache_callback_test.go",
         "pkg/math/polynomial/polynomial_cache_manager_test.go",
         "pkg/math/polynomial/polynomial_cache_borrowed_owner_test.go",
-        "pkg/math/polynomial/polynomial_cache_pending_psc_test.go"
+        "pkg/math/polynomial/polynomial_cache_pending_psc_test.go",
+        "pkg/math/polynomial/polynomial_cache_constructor_callback_test.go",
+        "pkg/math/polynomial/polynomial_cache_replay_prefix_test.go",
+        "pkg/math/polynomial/polynomial_cache_publication_test.go"
       ],
       "tests": [
         "TestPolynomialCacheKnownIDReadsOnlyIDField",
@@ -49307,10 +49310,19 @@
         "TestPolynomialCacheFactorTemporaryStoppedDeletion",
         "TestPolynomialCachePendingPSCOriginalStop",
         "TestPolynomialCachePSCCleanupPreservesIndependentLazard",
-        "TestPolynomialCachePSCExactCleanupReservationPrefixes"
+        "TestPolynomialCachePSCExactCleanupReservationPrefixes",
+        "TestPolynomialCacheConstructorTraceProtectsBorrowedManager",
+        "TestPolynomialCacheHitRetainsCallerPrefixAfterReferenceReadStop",
+        "TestPolynomialCacheTablePublicationPrecedesReferenceAcquisition",
+        "TestPolynomialCacheBorrowedManagerSupportsRetainedReferenceConsumer",
+        "TestPolynomialCacheCallbackProtectsBorrowedCoreSourceLifetime",
+        "TestPolynomialCacheNestedCallsRestoreBorrowedCoreBinding",
+        "TestPolynomialCacheStoppedResetRetainsBorrowedManager",
+        "TestPolynomialCacheMultiplePendingBorrowsReleaseIndependently",
+        "TestPolynomialCacheStoppedDeletionRetainsBorrowedManager"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Populated factor/PSC cache hit retains acquired caller-output prefix after a guarded reference read stop (polynomial_cache.cpp:151-158,179-186)",
@@ -49412,13 +49424,18 @@
           "name": "Cache miss result-array publication before element canonicalization; factor cache completed before local factors destruction (polynomial_cache.cpp:164-173,192-201)",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_cache.go",
-          "tests": ["TestPolynomialCachePSCResultReplacementStoppedDeletion", "TestPolynomialCacheFactorTemporaryStoppedDeletion"]
+          "tests": [
+            "TestPolynomialCachePSCResultReplacementStoppedDeletion",
+            "TestPolynomialCacheFactorTemporaryStoppedDeletion"
+          ]
         },
         {
           "name": "Polynomial cache private imp allocation at polynomial_cache.cpp:207, reset deallocation/replacement at :232-233 and destructor deallocation at :211 over a charged concrete Go owner",
           "status": "platform_replacement",
           "go_target": "pkg/math/polynomial/polynomial_cache_memory_trace.go",
-          "tests": ["TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal"]
+          "tests": [
+            "TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal"
+          ]
         },
         {
           "name": "Cache miss factor/PSC owning acknowledgement uses only the accepted callee owner/frame/invocation; refused entry preserves independent pending work",
@@ -49470,16 +49487,23 @@
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Complete local API inventory: cache constructor/NewPolynomialCache; destructor/Close; m/Manager; inline pm/PM; mk_unique/MkUnique; psc_chain/PSCChain; factor/Factor; reset/Reset. Private table hash/equality procedures delegate the actual polynomial hash/equality contracts. Entry construction starts with empty results; PSC ordered pair plus variable and canonical factor input are preserved by native Go keys.",
+        "Canonical representatives acquire exactly one owning reference in refs after table insertion, then publish the cached-ID flag. Buckets and factor/PSC result arrays borrow those representatives. Duplicate canonical lookup adds no cache reference. Reset/Close release the actual owning vector; independent caller vectors keep their own references across cache reset. Manager/PM borrow without allocation or ownership.",
+        "PSC misses publish result extent before per-slot canonicalization/replacement. Factor misses retain their actual constructed local, publish distinct canonical results, then run its literal source destructor. Failed construction does not run a class destructor. Only exact accepted factor/PSC callee receipts grant cleanup; independent older invocations remain untouched. Unwritten published slots are guarded from replay; pre-publication size-zero entries replay empty. Populated-hit reference stops retain only the successfully acquired caller prefix and never recompute the cached result.",
+        "Constructor/operations/owning cleanup protect the actual borrowed manager through callbacks and restore enclosing synchronous scopes. Only stopped work retains a pending borrow, released after exact cleanup. Full/core source and owning destruction refuse before member progress. Reset replaces its separate actual imp owner after canonical cleanup, preserving manager identity and supporting an explicit continuation after replacement refusal.",
+        "Retained NLSAT interface evidence uses PM/Manager to construct the same concrete reference-vector consumer and preserves canonical identity and independent ownership across reset. This closes the cache library interface audit; the NLSAT algorithm port is a separate consumer task and broader polynomial/factor/algebraic source-unit audits remain open."
+      ],
       "deviations": [
-        "The retained NLSAT cache's mk_unique path uses native Go hash buckets and an embedded owning polynomial reference vector. PSC-chain results are memoized by canonical ordered inputs and variable. Factor results are memoized by canonical input, with source-order output reset and distinct-factor canonicalization. Actual stopped factor and PSC body refusals finish their source scopes and permit reset/retry. A real PSC result SET deletion-callback refusal retains the acquired canonical reference until caller-vector close. A real temporary factor final-decrement refusal retains the factors owner and its consumed-drop receipt until CleanupFactor. Other stopped result-vector/destructor paths and NLSAT integration remain open."
+        "Native Go hash buckets/maps and slices replace chashtable, svector and raw pointer-result storage. Container allocations have Go runtime semantics rather than synthetic C++ capacity/failure states. A separately charged real Go imp owner preserves the retained cache wrapper replacement and memory-trace lifetime. Borrowed scalar handles carry no additional numeral ownership.",
+        "Source-invalid prefixes that would access unwritten slots or uninitialized/dangling C++ storage stop with guarded Go errors. Raw-prefix tests explicitly restore genuine owning records before destruction. Such guards do not normalize source data, invent constructor completion, roll back committed cache publication, or infer cleanup authority from unrelated manager activity."
       ]
     },
     {
       "path": "src/math/polynomial/polynomial_cache.h",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
       "go_targets": [
         "pkg/math/polynomial/polynomial_cache.go",
         "pkg/math/polynomial/polynomial_cache_memory_trace.go",
@@ -49488,7 +49512,10 @@
         "pkg/math/polynomial/polynomial_cache_callback_test.go",
         "pkg/math/polynomial/polynomial_cache_manager_test.go",
         "pkg/math/polynomial/polynomial_cache_borrowed_owner_test.go",
-        "pkg/math/polynomial/polynomial_cache_pending_psc_test.go"
+        "pkg/math/polynomial/polynomial_cache_pending_psc_test.go",
+        "pkg/math/polynomial/polynomial_cache_constructor_callback_test.go",
+        "pkg/math/polynomial/polynomial_cache_replay_prefix_test.go",
+        "pkg/math/polynomial/polynomial_cache_publication_test.go"
       ],
       "tests": [
         "TestPolynomialCacheKnownIDReadsOnlyIDField",
@@ -49504,7 +49531,16 @@
         "TestPolynomialCacheFactorTemporaryStoppedDeletion",
         "TestPolynomialCachePendingPSCOriginalStop",
         "TestPolynomialCachePSCCleanupPreservesIndependentLazard",
-        "TestPolynomialCachePSCExactCleanupReservationPrefixes"
+        "TestPolynomialCachePSCExactCleanupReservationPrefixes",
+        "TestPolynomialCacheConstructorTraceProtectsBorrowedManager",
+        "TestPolynomialCacheHitRetainsCallerPrefixAfterReferenceReadStop",
+        "TestPolynomialCacheTablePublicationPrecedesReferenceAcquisition",
+        "TestPolynomialCacheBorrowedManagerSupportsRetainedReferenceConsumer",
+        "TestPolynomialCacheCallbackProtectsBorrowedCoreSourceLifetime",
+        "TestPolynomialCacheNestedCallsRestoreBorrowedCoreBinding",
+        "TestPolynomialCacheStoppedResetRetainsBorrowedManager",
+        "TestPolynomialCacheMultiplePendingBorrowsReleaseIndependently",
+        "TestPolynomialCacheStoppedDeletionRetainsBorrowedManager"
       ],
       "conditionals": [
         {
@@ -49516,8 +49552,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Populated factor/PSC cache hit retains acquired caller-output prefix after a guarded reference read stop (polynomial_cache.cpp:151-158,179-186)",
@@ -49565,13 +49601,18 @@
           "name": "Cache miss result-array publication before element canonicalization; factor cache completed before local factors destruction (polynomial_cache.cpp:164-173,192-201)",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_cache.go",
-          "tests": ["TestPolynomialCachePSCResultReplacementStoppedDeletion", "TestPolynomialCacheFactorTemporaryStoppedDeletion"]
+          "tests": [
+            "TestPolynomialCachePSCResultReplacementStoppedDeletion",
+            "TestPolynomialCacheFactorTemporaryStoppedDeletion"
+          ]
         },
         {
           "name": "Polynomial cache private imp allocation at polynomial_cache.cpp:207, reset deallocation/replacement at :232-233 and destructor deallocation at :211 over a charged concrete Go owner",
           "status": "platform_replacement",
           "go_target": "pkg/math/polynomial/polynomial_cache_memory_trace.go",
-          "tests": ["TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal"]
+          "tests": [
+            "TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal"
+          ]
         },
         {
           "name": "cache::m() and inline cache::pm() borrow the actual polynomial manager (polynomial_cache.cpp:214-216, polynomial_cache.h:35-36), used by NLSAT todo_set reference-vector construction",
@@ -49583,9 +49624,16 @@
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Complete local API inventory: cache constructor/NewPolynomialCache; destructor/Close; m/Manager; inline pm/PM; mk_unique/MkUnique; psc_chain/PSCChain; factor/Factor; reset/Reset. Private table hash/equality procedures delegate the actual polynomial hash/equality contracts. Entry construction starts with empty results; PSC ordered pair plus variable and canonical factor input are preserved by native Go keys.",
+        "Canonical representatives acquire exactly one owning reference in refs after table insertion, then publish the cached-ID flag. Buckets and factor/PSC result arrays borrow those representatives. Duplicate canonical lookup adds no cache reference. Reset/Close release the actual owning vector; independent caller vectors keep their own references across cache reset. Manager/PM borrow without allocation or ownership.",
+        "PSC misses publish result extent before per-slot canonicalization/replacement. Factor misses retain their actual constructed local, publish distinct canonical results, then run its literal source destructor. Failed construction does not run a class destructor. Only exact accepted factor/PSC callee receipts grant cleanup; independent older invocations remain untouched. Unwritten published slots are guarded from replay; pre-publication size-zero entries replay empty. Populated-hit reference stops retain only the successfully acquired caller prefix and never recompute the cached result.",
+        "Constructor/operations/owning cleanup protect the actual borrowed manager through callbacks and restore enclosing synchronous scopes. Only stopped work retains a pending borrow, released after exact cleanup. Full/core source and owning destruction refuse before member progress. Reset replaces its separate actual imp owner after canonical cleanup, preserving manager identity and supporting an explicit continuation after replacement refusal.",
+        "Retained NLSAT interface evidence uses PM/Manager to construct the same concrete reference-vector consumer and preserves canonical identity and independent ownership across reset. This closes the cache library interface audit; the NLSAT algorithm port is a separate consumer task and broader polynomial/factor/algebraic source-unit audits remain open."
+      ],
       "deviations": [
-        "The concrete PolynomialCache exposes retained mk_unique, PSC-chain and factor memoization, and reset behavior with borrowed canonical handles. Selected actual stopped source scopes, a PSC result SET deletion refusal, and a temporary factor final-decrement refusal finish before retry; other result-vector/destructor cleanup and NLSAT integration remain open."
+        "Native Go hash buckets/maps and slices replace chashtable, svector and raw pointer-result storage. Container allocations have Go runtime semantics rather than synthetic C++ capacity/failure states. A separately charged real Go imp owner preserves the retained cache wrapper replacement and memory-trace lifetime. Borrowed scalar handles carry no additional numeral ownership.",
+        "Source-invalid prefixes that would access unwritten slots or uninitialized/dangling C++ storage stop with guarded Go errors. Raw-prefix tests explicitly restore genuine owning records before destruction. Such guards do not normalize source data, invent constructor completion, roll back committed cache publication, or infer cleanup authority from unrelated manager activity."
       ]
     },
     {
