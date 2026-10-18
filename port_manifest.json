@@ -49313,6 +49313,33 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Populated factor/PSC cache hit retains acquired caller-output prefix after a guarded reference read stop (polynomial_cache.cpp:151-158,179-186)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_cache_replay_prefix_test.go"
+          ],
+          "tests": [
+            "TestPolynomialCacheHitRetainsCallerPrefixAfterReferenceReadStop"
+          ],
+          "notes": "Both actual factor and PSC caches are populated with multiple distinct results, then replay reaches a query-only unreadable later reference count. Successful earlier pushes retain their actual caller references; the cache acquires no callee invocation/pending work and the complete cached result stays replayable. Restoring the genuine cell permits retry, which resets the old caller prefix and replays identical results without factor/PSC recomputation. Fresh direct backing supplies genuinely unreadable bytes; recycled small-object slots may retain initialized bytes. Genuine owning cells are restored before destruction. This is qualified guarded-prefix evidence, not an ordinary C++ INC allocation failure."
+        },
+        {
+          "name": "Initial cache imp memory trace protects the actual borrowed manager and constructor owner (polynomial_cache.cpp:207)",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_cache_memory_trace.go",
+            "pkg/math/polynomial/polynomial_cache_constructor_callback_test.go"
+          ],
+          "tests": [
+            "TestPolynomialCacheConstructorTraceProtectsBorrowedManager",
+            "TestPolynomialCacheConstructorBudgetAndRefusal",
+            "TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal"
+          ],
+          "notes": "NewPolynomialCache now enters its existing concrete execution/manager-borrow scope before newImp, including the actual debug memory allocation trace before the constructor returns. Its deferred exit restores the enclosing borrow on success or refusal. A real trace writer first exposed the missing constructor borrow, then verifies exact cache-frame identity and refusal of full/core source/owning manager destruction and cache Close/Reset/CleanupReset, without changing source stage or charged storage. The ordinary profile verifies trace erasure and both profiles verify scope restoration. No new source constructor flags or synthetic acquisition counters are introduced. Whole cache ownership and retained consumer integration remain separately partial."
+        },
+        {
           "name": "mk_unique table insertion precedes owning-reference push and cached-ID publication (polynomial_cache.cpp:141-149)",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_cache.go",
@@ -49492,6 +49519,33 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Populated factor/PSC cache hit retains acquired caller-output prefix after a guarded reference read stop (polynomial_cache.cpp:151-158,179-186)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_cache_replay_prefix_test.go"
+          ],
+          "tests": [
+            "TestPolynomialCacheHitRetainsCallerPrefixAfterReferenceReadStop"
+          ],
+          "notes": "Both actual factor and PSC caches are populated with multiple distinct results, then replay reaches a query-only unreadable later reference count. Successful earlier pushes retain their actual caller references; the cache acquires no callee invocation/pending work and the complete cached result stays replayable. Restoring the genuine cell permits retry, which resets the old caller prefix and replays identical results without factor/PSC recomputation. Fresh direct backing supplies genuinely unreadable bytes; recycled small-object slots may retain initialized bytes. Genuine owning cells are restored before destruction. This is qualified guarded-prefix evidence, not an ordinary C++ INC allocation failure."
+        },
+        {
+          "name": "Initial cache imp memory trace protects the actual borrowed manager and constructor owner (polynomial_cache.cpp:207)",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_cache_memory_trace.go",
+            "pkg/math/polynomial/polynomial_cache_constructor_callback_test.go"
+          ],
+          "tests": [
+            "TestPolynomialCacheConstructorTraceProtectsBorrowedManager",
+            "TestPolynomialCacheConstructorBudgetAndRefusal",
+            "TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal"
+          ],
+          "notes": "NewPolynomialCache now enters its existing concrete execution/manager-borrow scope before newImp, including the actual debug memory allocation trace before the constructor returns. Its deferred exit restores the enclosing borrow on success or refusal. A real trace writer first exposed the missing constructor borrow, then verifies exact cache-frame identity and refusal of full/core source/owning manager destruction and cache Close/Reset/CleanupReset, without changing source stage or charged storage. The ordinary profile verifies trace erasure and both profiles verify scope restoration. No new source constructor flags or synthetic acquisition counters are introduced. Whole cache ownership and retained consumer integration remain separately partial."
+        },
         {
           "name": "mk_unique table insertion precedes owning-reference push and cached-ID publication (polynomial_cache.cpp:141-149)",
           "status": "ported",

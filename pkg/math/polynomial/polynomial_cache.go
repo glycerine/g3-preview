@@ -61,6 +61,10 @@ func NewPolynomialCache(m *MultivariatePolynomialManager) (*PolynomialCache, err
 	}
 	c := &PolynomialCache{manager: m, header: header, buckets: make(map[uint32][]Polynomial), ids: make(map[uint32]bool), psc: make(map[polynomialPSCKey]*polynomialPSCEntry), factors: make(map[Polynomial]*polynomialFactorCacheEntry)}
 	c.self = c
+	// The source alloc(imp,m) memory trace executes before this constructor
+	// returns. Keep its borrowed manager alive across that actual callback.
+	c.beginExecution()
+	defer c.endExecution()
 	if e := c.newImp(207); e != nil {
 		m.core.integer.Budget().Release(header)
 		return nil, e

@@ -44644,3 +44644,35 @@ Full ordinary polynomial run completed successfully; terminal evidence is in
 passed; whole-unit counts remain unchanged (2103 units,677 APIs;208 ported,
 343 partial,1495 unported,11 dead/deleted).
 Full ordinary elapsed time:94.230s. The checked focused selection passed0.077s.
+
+Retained equality/cache audit: Equal follows the source size/zero/max-variable,
+shared monomial-position map and comparison/reset sequence. The cache hit audit
+added explicit factor and PSC replay-prefix coverage. After populating actual
+multi-result entries, a later queried reference count is unreadable. The hit
+retains every preceding actual caller reference, creates no factor/PSC callee
+or pending cache work, and leaves the cached result complete. Restoring the
+genuine cell permits reset/replay of identical cached identities without a
+new factor or PSC invocation. The raw query uses fresh direct backing because
+recycled small-object storage may legitimately retain initialized bytes; it
+verifies unreadability before replay and restores genuine owning records before
+teardown. No ordinary C++ INC-allocation failure or source construction is
+claimed. TestPolynomialCacheHitRetainsCallerPrefixAfterReferenceReadStop passed
+ordinary 0.006s initially and in both final cache/hash selections.
+
+The constructor audit then exposed a real missing lifetime boundary: newImp's
+initial debug memory trace executes before NewPolynomialCache returns, but the
+constructor had not entered the cache's borrowed-manager execution scope. A
+real trace writer reproduced that missing scope. The constructor now enters
+its existing beginExecution/endExecution pair around newImp, with unconditional
+reverse restoration on success/refusal. The trace callback verifies the exact
+cache being constructed and refuses full/core source/owning manager destruction
+and cache Close/Reset/CleanupReset before any source stage or charged storage
+changes. Ordinary compilation erases the trace; both builds verify restoration
+before return. Existing constructor budget/refusal and memory-wrapper lifecycle
+tests are included. No fake source-completion bits or new ownership counters.
+
+Final cache/hash selections passed ordinary 0.030s and checked/debug/trace 0.065s,
+on CPUs 8-16. No full-suite repeat after the preceding 94.230s ordinary polynomial
+pass. Cache source units remain partial for broader ownership/consumer audits;
+complete polynomial then AST remains active.
+portcheck and git diff --check passed; unit/API counts remain unchanged.
