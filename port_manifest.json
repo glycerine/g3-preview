@@ -50774,7 +50774,8 @@
         "pkg/math/polynomial/upolynomial_subresultant_assertions_test.go",
         "pkg/math/polynomial/upolynomial_square_free_power_assertions_test.go",
         "pkg/math/polynomial/upolynomial_extended_gcd_assertions.go",
-        "pkg/math/polynomial/upolynomial_extended_gcd_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_extended_gcd_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_extended_gcd_identity_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51024,7 +51025,9 @@
         "TestUPolynomialExtendedGCDEntryAliasActions",
         "TestUPolynomialExtendedGCDEntrySeparateAliases",
         "TestUPolynomialExtendedGCDFieldAssertionActions",
-        "TestUPolynomialExtendedGCDClosedEntryGate"
+        "TestUPolynomialExtendedGCDClosedEntryGate",
+        "TestUPolynomialExtendedGCDIdentitySourceActions",
+        "TestUPolynomialExtendedGCDIdentityGateErasure"
       ],
       "conditionals": [
         {
@@ -51613,6 +51616,23 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Extended-GCD DEBUG identity runtime assertion actions (upolynomial.cpp:1076-1082)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_gcd_extended.go",
+            "pkg/math/polynomial/upolynomial_hensel_extended_scope.go",
+            "pkg/math/polynomial/upolynomial_extended_gcd_assertions.go",
+            "pkg/math/polynomial/upolynomial_extended_gcd_identity_test.go",
+            "pkg/math/polynomial/upolynomial_gcd_source_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialExtendedGCDIdentitySourceActions",
+            "TestUPolynomialExtendedGCDIdentityGateErasure",
+            "TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks"
+          ],
+          "notes": "Both public nil-caller and concrete retained Hensel diagnostic paths use the same runtime-gated equality assertion and real debugger Throw/Continue at1081. DEBUG BV/expected_D construction and arithmetic remain compiled-debug work even when assertions are disabled; only equality predicate/actions are erased. Actual nonmonic inputs A=2+2x,B=2+x over Z7 reach failure without scratch repair. Throw preserves U=1,V=-2,D=-1 before final scaling NUM declaration. Continue/disabled/release publish U=-1,V=2,D=1, retaining the source quirk A*U+B*V=2 rather than falsely claiming a valid identity. The direct retained-caller adapter obtains an actual scope/related manager and registered independent inputs/outputs; no parent source construction count is invented. DEBUG vector source suffixes complete in the actual caller. Closed/erased query-only adapters verify no equality operand reads before runtime gating. Broader diagnostic allocation/destructor and source-unit audits remain partial."
+        },
         {
           "name": "Extended-GCD six separate alias assertions and field assertion actions (upolynomial.cpp:1047-1050)",
           "status": "ported",

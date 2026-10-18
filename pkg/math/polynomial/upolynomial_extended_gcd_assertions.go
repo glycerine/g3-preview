@@ -30,3 +30,20 @@ func (m *UPolynomialManager) extendedGCDEntryAssertions(a, b UPolynomialView, u,
 	}
 	return nil
 }
+
+// DEBUG_CODE computes BV and expected_D regardless of the runtime switch.
+// Only this SASSERT equality predicate and debugger action are runtime-gated.
+func (m *UPolynomialManager) extendedGCDIdentityAssertion(expected, d *upolyVectorState) error {
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil || !enabled {
+		return e
+	}
+	ok, e := m.EqualViews(m.stateView(expected), m.stateView(d))
+	if e != nil {
+		return e
+	}
+	if !ok {
+		return m.scalarDivisionAssertionFailure(1081, "eq(expected_D, D)")
+	}
+	return nil
+}

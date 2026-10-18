@@ -16,14 +16,7 @@ func (m *UPolynomialManager) extendedGCDDiagnostic(a, b UPolynomialView, u, v, d
 	if e := m.addSubState(m.stateView(au), m.stateView(&bv), &expected, false); e != nil {
 		return e
 	}
-	ok, e := m.EqualViews(m.stateView(&expected), m.stateView(d))
-	if e != nil {
-		return e
-	}
-	if !ok {
-		return ErrUPolynomialAssertion
-	}
-	return nil
+	return m.extendedGCDIdentityAssertion(&expected, d)
 }
 func (m *UPolynomialManager) extendedGCD(a, b UPolynomialView, u, v, d *upolyVectorState) error {
 	return m.extendedGCDWithCaller(a, b, u, v, d, nil)

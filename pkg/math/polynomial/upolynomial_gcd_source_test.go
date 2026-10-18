@@ -598,6 +598,7 @@ func TestUPolynomialExtendedGCDNonmonicAndOutputAliasQuirks(t *testing.T) {
 	u := upolySourceNew(t, m, nil)
 	v := upolySourceNew(t, m, nil)
 	d := upolySourceNew(t, m, nil)
+	polynomialAssertionActionsFixture(t, "T")
 	e := m.ExtendedGCD(a, b, u, v, d)
 	// Initial monic(A) does not rescale U. Actual release publication gives
 	// A*(-1)+B*2 = 2, while D=1. Source debug stops at its real equality check

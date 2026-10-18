@@ -122,14 +122,7 @@ func (m *UPolynomialManager) extendedGCDDiagnosticWithCaller(a, b UPolynomialVie
 	if e := m.addSubStateWithSourceContext(m.stateView(au), m.stateView(bv), expected, false, context); e != nil {
 		return e
 	}
-	ok, e := m.EqualViews(m.stateView(expected), m.stateView(d))
-	if e != nil {
-		return e
-	}
-	if !ok {
-		return ErrUPolynomialAssertion
-	}
-	return nil
+	return m.extendedGCDIdentityAssertion(expected, d)
 }
 func (m *UPolynomialManager) extendedGCDFinishWithCaller(u, v, d *upolyVectorState, c *upolyHenselCallerScope, context integerAllocationInvocationContext) (failure error) {
 	if c == nil {
