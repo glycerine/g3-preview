@@ -40013,6 +40013,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_deletion_execution_test.go",
         "pkg/math/polynomial/polynomial_reference_deletion_test.go",
         "pkg/math/polynomial/polynomial_factors_multiply_callback_test.go",
         "pkg/math/polynomial/polynomial_monomial_query_trace.go",
@@ -42624,17 +42625,21 @@
             "pkg/math/polynomial/polynomial_manager.go",
             "pkg/math/polynomial/polynomial_cell.go",
             "pkg/math/polynomial/polynomial_ref.go",
-            "pkg/math/polynomial/polynomial_reference_deletion_test.go"
+            "pkg/math/polynomial/polynomial_reference_deletion_test.go",
+            "pkg/math/polynomial/polynomial_callbacks.go",
+            "pkg/math/polynomial/polynomial_deletion_execution_test.go"
           ],
           "tests": [
             "TestPolynomialDeletingValueCannotAcquireReferences",
             "TestPolynomialFreshZeroReferenceAfterDeletionReuse",
             "TestPolynomialDeletingValueCannotRepeatDecrement",
-            "TestPolynomialReferenceOwnsDecrementBeforeDeletionTraceStop"
+            "TestPolynomialReferenceOwnsDecrementBeforeDeletionTraceStop",
+            "TestPolynomialDeletionTraceCannotCleanupExecutingValue"
           ],
           "notes": [
             "A real last-reference deletion handler reproduced successful public/internal INC and owning reference assignment against its zero-RC deleting value. The accepted deleteCoreMode now marks the concrete locator as deletionStarted before source TRACE, handlers or stage advancement, and the shared increment engine refuses acquisition from that committed lifetime. Public IncRef delegates to that same engine. This is explicit Go lifetime safety for a source raw pointer that will be destroyed despite a callback INC, not a new C++ algorithm branch or zero-RC heuristic. Fresh factory zero-RC objects remain acquirable. Tests retain the original actual handler stop, preserve an older owning reference and empty refused assignment prefix, exercise the earlier trace writer boundary before callbackStarted, grow the real cold locator directory with 32 independently retained peers, and reuse the retired descriptor in a later factory generation. The latter accepts both owning and public increments. Broader reference/constructor/deletion source audits remain partial.",
-            "The matching shared decrement now refuses committed deletion before RC reads/writes and outcome publication. A real handler reproduced unsigned repeated decrement and a second consumed outcome in the ordinary profile; the trace writer exercises the earlier frontier. The original accepted last-decrement outcome remains true/last, reentered outcomes remain empty, RC stays0 and owning cleanup remains permitted. PolynomialReferenceDrop now records only its actual decRefCoreOutcome instead of observing another scope through deleteStage/callbackStarted. Closing the real debug owner from a trace writer stops source deletion before either field is published; the exact original consumed/last outcome preserves the owning reference continuation through that stop and permits cleanup after restoring the debug owner. This also avoids granting cleanup authority to a refused decrement observing an older deletion."
+            "The matching shared decrement now refuses committed deletion before RC reads/writes and outcome publication. A real handler reproduced unsigned repeated decrement and a second consumed outcome in the ordinary profile; the trace writer exercises the earlier frontier. The original accepted last-decrement outcome remains true/last, reentered outcomes remain empty, RC stays0 and owning cleanup remains permitted. PolynomialReferenceDrop now records only its actual decRefCoreOutcome instead of observing another scope through deleteStage/callbackStarted. Closing the real debug owner from a trace writer stops source deletion before either field is published; the exact original consumed/last outcome preserves the owning reference continuation through that stop and permits cleanup after restoring the debug owner. This also avoids granting cleanup authority to a refused decrement observing an older deletion.",
+            "A real deletion-trace writer also reproduced CleanupValue freeing its still-formatting polynomial before callbackDepth was entered. A distinct per-locator deletionRunning span now refuses recursive source deletion and owning cleanup of that executing value; CleanupValue checks before changing deleteStage or caller handle. The span retires on return by reacquiring the matching locator generation, including a retired record, so cold-directory growth/reuse cannot clear the wrong execution. Persistent deletionStarted still bars acquisition/decrement after a source stop while exact owning cleanup is allowed once execution returns. The real writer test verifies unchanged stage0/handle, original deletion completion and successful independent peer cleanup during the same callback. Existing 32-peer growth/source-stop and reused-descriptor tests cover retirement and later cleanup. This is Go lifetime safety at an early source TRACE boundary; broader source-unit completion remains unclaimed."
           ]
         },
         {
@@ -45837,6 +45842,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_deletion_execution_test.go",
         "pkg/math/polynomial/polynomial_reference_deletion_test.go",
         "pkg/math/polynomial/polynomial_factors_multiply_callback_test.go",
         "pkg/math/polynomial/polynomial_monomial_query_trace.go",
@@ -46784,17 +46790,21 @@
             "pkg/math/polynomial/polynomial_manager.go",
             "pkg/math/polynomial/polynomial_cell.go",
             "pkg/math/polynomial/polynomial_ref.go",
-            "pkg/math/polynomial/polynomial_reference_deletion_test.go"
+            "pkg/math/polynomial/polynomial_reference_deletion_test.go",
+            "pkg/math/polynomial/polynomial_callbacks.go",
+            "pkg/math/polynomial/polynomial_deletion_execution_test.go"
           ],
           "tests": [
             "TestPolynomialDeletingValueCannotAcquireReferences",
             "TestPolynomialFreshZeroReferenceAfterDeletionReuse",
             "TestPolynomialDeletingValueCannotRepeatDecrement",
-            "TestPolynomialReferenceOwnsDecrementBeforeDeletionTraceStop"
+            "TestPolynomialReferenceOwnsDecrementBeforeDeletionTraceStop",
+            "TestPolynomialDeletionTraceCannotCleanupExecutingValue"
           ],
           "notes": [
             "A real last-reference deletion handler reproduced successful public/internal INC and owning reference assignment against its zero-RC deleting value. The accepted deleteCoreMode now marks the concrete locator as deletionStarted before source TRACE, handlers or stage advancement, and the shared increment engine refuses acquisition from that committed lifetime. Public IncRef delegates to that same engine. This is explicit Go lifetime safety for a source raw pointer that will be destroyed despite a callback INC, not a new C++ algorithm branch or zero-RC heuristic. Fresh factory zero-RC objects remain acquirable. Tests retain the original actual handler stop, preserve an older owning reference and empty refused assignment prefix, exercise the earlier trace writer boundary before callbackStarted, grow the real cold locator directory with 32 independently retained peers, and reuse the retired descriptor in a later factory generation. The latter accepts both owning and public increments. Broader reference/constructor/deletion source audits remain partial.",
-            "The matching shared decrement now refuses committed deletion before RC reads/writes and outcome publication. A real handler reproduced unsigned repeated decrement and a second consumed outcome in the ordinary profile; the trace writer exercises the earlier frontier. The original accepted last-decrement outcome remains true/last, reentered outcomes remain empty, RC stays0 and owning cleanup remains permitted. PolynomialReferenceDrop now records only its actual decRefCoreOutcome instead of observing another scope through deleteStage/callbackStarted. Closing the real debug owner from a trace writer stops source deletion before either field is published; the exact original consumed/last outcome preserves the owning reference continuation through that stop and permits cleanup after restoring the debug owner. This also avoids granting cleanup authority to a refused decrement observing an older deletion."
+            "The matching shared decrement now refuses committed deletion before RC reads/writes and outcome publication. A real handler reproduced unsigned repeated decrement and a second consumed outcome in the ordinary profile; the trace writer exercises the earlier frontier. The original accepted last-decrement outcome remains true/last, reentered outcomes remain empty, RC stays0 and owning cleanup remains permitted. PolynomialReferenceDrop now records only its actual decRefCoreOutcome instead of observing another scope through deleteStage/callbackStarted. Closing the real debug owner from a trace writer stops source deletion before either field is published; the exact original consumed/last outcome preserves the owning reference continuation through that stop and permits cleanup after restoring the debug owner. This also avoids granting cleanup authority to a refused decrement observing an older deletion.",
+            "A real deletion-trace writer also reproduced CleanupValue freeing its still-formatting polynomial before callbackDepth was entered. A distinct per-locator deletionRunning span now refuses recursive source deletion and owning cleanup of that executing value; CleanupValue checks before changing deleteStage or caller handle. The span retires on return by reacquiring the matching locator generation, including a retired record, so cold-directory growth/reuse cannot clear the wrong execution. Persistent deletionStarted still bars acquisition/decrement after a source stop while exact owning cleanup is allowed once execution returns. The real writer test verifies unchanged stage0/handle, original deletion completion and successful independent peer cleanup during the same callback. Existing 32-peer growth/source-stop and reused-descriptor tests cover retirement and later cleanup. This is Go lifetime safety at an early source TRACE boundary; broader source-unit completion remains unclaimed."
           ]
         },
         {

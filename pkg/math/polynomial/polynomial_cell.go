@@ -24,6 +24,7 @@ type polynomialLocation struct {
 	callbackCause                                                        error
 	callbackStarted, callbackInvoked                                     bool
 	deletionStarted                                                      bool // Go lifetime metadata, before source TRACE/callbacks
+	deletionRunning                                                      bool
 	raw                                                                  umemory.ObjectRef
 	monomialBase                                                         uint64
 	generation, requested, initializedCoefficients, initializedMonomials uint32
@@ -291,6 +292,21 @@ func (m *MultivariatePolynomialCore) deleteCoreMode(p Polynomial, owning bool) e
 	if e != nil {
 		return e
 	}
+	if l.deletionRunning {
+		return ErrPolynomialPending
+	}
+	l.deletionRunning = true
+	defer func() {
+		// External writers/handlers may grow the cold locator directory.
+		// Reacquire this generation, including its retired record, rather than
+		// clearing a captured old address or a reused slot's execution span.
+		if p.slot != 0 && uint64(p.slot) <= uint64(len(m.locations)) {
+			current := &m.locations[p.slot-1]
+			if current.generation == p.generation {
+				current.deletionRunning = false
+			}
+		}
+	}()
 	if !owning && l.monomialDropCause != nil {
 		return l.monomialDropCause
 	}

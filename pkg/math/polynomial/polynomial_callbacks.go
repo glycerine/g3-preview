@@ -211,6 +211,9 @@ func (m *MultivariatePolynomialCore) CleanupValue(p *Polynomial) error {
 	if e != nil {
 		return e
 	}
+	if l.deletionRunning {
+		return ErrPolynomialPending
+	}
 	if l.deleteStage == 0 {
 		l.deleteStage = 1
 	}
