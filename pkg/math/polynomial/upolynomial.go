@@ -30,6 +30,8 @@ type UPolynomialConfig struct {
 // are required, even though operations without a checkpoint do not call them.
 // Cold ownership and every actual typed backing are charged to Integer's budget.
 type UPolynomialManager struct {
+	factorTrace                             *upolyFactorTraceBorrow
+	factorsDisplay, pendingFactorsDisplay   *upolyFactorsDisplayScope
 	sexprArithmetic, pendingSexprArithmetic *sexprPolynomialArithmeticScope
 	rationalInput                           upolyRationalInputScope
 	algebraicCopyBorrowers                  uint32
@@ -149,6 +151,12 @@ func newUPolynomialManager(c UPolynomialConfig, store *UPolynomialCoefficientSto
 	return m, nil
 }
 func (m *UPolynomialManager) check() error {
+	if m != nil && m.self == m && m.factorTrace != nil && m.factorTrace.executing && m.factorTrace.callback() {
+		return ErrUPolynomialCleanupPending
+	}
+	if m != nil && m.self == m && (m.pendingFactorsDisplay != nil && m.pendingFactorsDisplay.pending() || m.factorsDisplay != nil && m.factorsDisplay.NumericExecuting() && m.factorsDisplay.callback()) {
+		return ErrUPolynomialCleanupPending
+	}
 	if m != nil && m.self == m && (m.pendingSexprArithmetic != nil || m.sexprArithmeticExecuting() && (m.callbackDepth != 0 || m.config.Integer.RuntimeOwner().FailureTransportActive() || m.config.Integer.BorrowTraceTags().OutputCallbackActive())) {
 		return ErrUPolynomialCleanupPending
 	}
@@ -195,6 +203,12 @@ func (m *UPolynomialManager) descriptor(p UPolynomial) (*upolyDescriptor, error)
 	return d, nil
 }
 func (m *UPolynomialManager) NewPolynomial() (UPolynomial, error) {
+	if m != nil && m.factorTrace != nil && m.factorTrace.executing {
+		return UPolynomial{}, ErrUPolynomialCleanupPending
+	}
+	if m != nil && m.factorsDisplay != nil && m.factorsDisplay.NumericExecuting() {
+		return UPolynomial{}, ErrUPolynomialCleanupPending
+	}
 	if m.sexprArithmeticExecuting() {
 		return UPolynomial{}, ErrUPolynomialCleanupPending
 	}
@@ -224,6 +238,12 @@ func (m *UPolynomialManager) NewPolynomial() (UPolynomial, error) {
 	return UPolynomial{m.origin, uint32((len(m.pages)-1)*32 + 1), 1}, nil
 }
 func (m *UPolynomialManager) DelPolynomial(p *UPolynomial) error {
+	if m != nil && m.factorTrace != nil && m.factorTrace.executing {
+		return ErrUPolynomialCleanupPending
+	}
+	if m != nil && m.factorsDisplay != nil && m.factorsDisplay.NumericExecuting() {
+		return ErrUPolynomialCleanupPending
+	}
 	if m.sexprArithmeticExecuting() {
 		return ErrUPolynomialCleanupPending
 	}
@@ -296,6 +316,12 @@ func (m *UPolynomialManager) closeWithHenselOwners(r *upolyHenselPairInvocationR
 	return m.closeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
+	if m != nil && m.factorTrace != nil && m.factorTrace.executing {
+		return ErrUPolynomialCleanupPending
+	}
+	if m != nil && m.self == m && (m.factorsDisplay != nil && m.factorsDisplay.NumericExecuting() || m.pendingFactorsDisplay != nil && m.pendingFactorsDisplay.pending()) {
+		return ErrUPolynomialCleanupPending
+	}
 	if m != nil && m.self == m && (m.sexprArithmeticExecuting() || m.pendingSexprArithmetic != nil) {
 		return ErrUPolynomialCleanupPending
 	}

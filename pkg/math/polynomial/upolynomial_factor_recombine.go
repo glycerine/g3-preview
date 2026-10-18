@@ -168,6 +168,9 @@ func (s *UPolynomialFactorizationService) factorPrimeTrial(zp *UPolynomialManage
 		if e = m.modular.WithAllocationContext((numericIntegerModularManager_primeTrialAllocationContext(m.modular, &r)).utility(m.modular.Integers())).Copy(bestP, p); e != nil {
 			return 0, e
 		}
+		if e = s.traceFactorDegreeSet(best, 1141, false); e != nil {
+			return 0, e
+		}
 	}
 	return 1, nil
 }
@@ -254,6 +257,9 @@ func (s *UPolynomialFactorizationService) factorSquareFreeWithReceipt(f UPolynom
 	}
 	c.constructed = 13
 	c.constructed = 14
+	if e = s.traceFactorDegreeSet(lifted, 1192, true); e != nil {
+		return false, e
+	}
 	result, remove := true, false
 	counter := uint32(0)
 	for {

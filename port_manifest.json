@@ -50748,7 +50748,9 @@
         "pkg/math/polynomial/upolynomial_sturm_isolation_normalize_test.go",
         "pkg/math/polynomial/upolynomial_sturm_isolation_normalize_trace_test.go",
         "pkg/math/polynomial/upolynomial_sturm_isolation_trace.go",
-        "pkg/math/polynomial/upolynomial_sturm_isolation_trace_test.go"
+        "pkg/math/polynomial/upolynomial_sturm_isolation_trace_test.go",
+        "pkg/math/polynomial/upolynomial_factors_display.go",
+        "pkg/math/polynomial/upolynomial_factors_display_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -50955,7 +50957,9 @@
         "TestUPolynomialNativeDegreeSubsetOracle",
         "TestUPolynomialNativeFactorGrowthMovesBIGAndPreservesViews",
         "TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults",
-        "TestUPolynomialNativeIsolationStacksAndNumericTransfer"
+        "TestUPolynomialNativeIsolationStacksAndNumericTransfer",
+        "TestUPolynomialFactorsDisplaySourceOrderAndCallbacks",
+        "TestUPolynomialFactorsDisplayExactPendingChildAndForeignReplacement"
       ],
       "conditionals": [
         {
@@ -51544,6 +51548,19 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "core_manager::factors::display actual constant, polynomial and multiplicity order (97-106)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factors_display.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factors_display_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorsDisplaySourceOrderAndCallbacks",
+            "TestUPolynomialFactorsDisplayExactPendingChildAndForeignReplacement"
+          ],
+          "notes": "Formats the actual normalized modular constant, then each actual polynomial and reached multiplicity through the existing display engine. An accepted exact polynomial-display receipt retains a refused child before older owners; stale or foreign receipts cannot clean an independent replacement. Synchronous output and failure-transport callbacks protect the actual factor, polynomial and numeric owners. Native Go string formatting replaces STL character storage; no whole source-unit completion credit."
+        },
         {
           "name": "S-expression arithmetic issued-child ownership before older argument-vector destruction (sexpr2upolynomial.cpp:39-85)",
           "status": "partial",
@@ -53086,7 +53103,10 @@
         "pkg/math/polynomial/upolynomial_factor_storage_test.go",
         "pkg/math/polynomial/upolynomial_factor_degree_source_test.go",
         "pkg/math/polynomial/upolynomial_native_factor_storage_test.go",
-        "pkg/math/polynomial/upolynomial_factor_degree.go"
+        "pkg/math/polynomial/upolynomial_factor_degree.go",
+        "pkg/math/polynomial/upolynomial_factor_degree_trace.go",
+        "pkg/math/polynomial/upolynomial_factor_trace_borrow.go",
+        "pkg/math/polynomial/upolynomial_factor_degree_trace_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53192,7 +53212,11 @@
         "TestUPolynomialBerlekampNativePivotResize",
         "TestUPolynomialFactorCombinationExactOrderRemovalAndProducts",
         "TestUPolynomialNativeDegreeSubsetOracle",
-        "TestUPolynomialNativeFactorGrowthMovesBIGAndPreservesViews"
+        "TestUPolynomialNativeFactorGrowthMovesBIGAndPreservesViews",
+        "TestUPolynomialFactorDegreeTraceRetainedRecordsAndOwners",
+        "TestUPolynomialFactorDegreeTraceChildRefusalStopsOlderLocals",
+        "TestUPolynomialFactorDegreeTraceStreamFailureStillComputesDisplays",
+        "TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands"
       ],
       "conditionals": [
         {
@@ -53305,6 +53329,22 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Whole degree-set bughunt TRACE records at 1141,1155,1192 with actual factor display and accepted child lifetime",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_degree_trace.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_trace_borrow.go",
+            "pkg/math/polynomial/upolynomial_factor_degree_trace_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorDegreeTraceRetainedRecordsAndOwners",
+            "TestUPolynomialFactorDegreeTraceChildRefusalStopsOlderLocals",
+            "TestUPolynomialFactorDegreeTraceStreamFailureStillComputesDisplays",
+            "TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands"
+          ],
+          "notes": "The three whole records print actual prime/factors/degrees, preserve source endl flushes and continue operand computation after stream failure. One concrete borrow protects actual root/prime/lift owners across header, body and footer. A descriptor-after-physical refusal retains the exact display child before the fourteen constructed square-free locals; explicit exact cleanup releases it first. Disabled traces skip unreached operands. Other bughunt records and the broader factorization-unit audit remain partial."
+        },
         {
           "name": "upolynomial_factorization.cpp:979-1017 mignotte_bound literal direct numeric body and reverse tmp/bound/norm source destruction",
           "status": "partial",
@@ -53771,7 +53811,7 @@
       "ownership_audited": false,
       "methods": [
         {
-          "name": "factorization_degree_set::display logical subset list and descending bit representation (h:112-120; bit_vector.cpp:188-201); production TRACE composition remains open",
+          "name": "factorization_degree_set::display logical subset list and descending bit representation (h:112-120; bit_vector.cpp:188-201) with retained production TRACE consumers",
           "status": "partial",
           "go_target": "pkg/math/polynomial/upolynomial_factor_degree_display.go",
           "go_targets": [
@@ -53783,7 +53823,7 @@
             "TestUPolynomialFactorDegreeDisplayCallbackProtectsNativeOwner",
             "TestUPolynomialFactorDegreeDisplayOutputRefusalReleasesBorrow"
           ],
-          "notes": "Ports the retained logical formatter over native []bool: literal [0 prefix, ascending included degrees from one, ] represented by , then descending logical bits with no trailing newline. No packed bit-vector storage, shifts, STL capacity or container failure machinery is recreated. Tests construct actual factor collections for empty, even-degree and 32/64-boundary subsets; removing bit zero changes the bit text while retaining the literal source zero prefix. Runtime reservations remain disabled during display, with no charged or packed-word storage acquisition. A concrete public display borrow blocks Remove/Intersect/Swap/Close and recursive Display during actual writer callbacks while permitting read-only queries, and ends after normal/error/short/nil-writer return. Direct io.Writer output uses the cold default-decimal Go adapter. This is the formatter dependency only: production bughunt TRACE records at cpp1144,1157,1195 also print actual factors first; their factor-display and accepted numeric-child lifetime integration remains unported. No whole header or factorization-unit completion credit."
+          "notes": "Ports the retained logical formatter over native []bool: literal [0 prefix, ascending included degrees from one, ] represented by , then descending logical bits with no trailing newline. No packed bit-vector storage, shifts, STL capacity or container failure machinery is recreated. Tests construct actual factor collections for empty, even-degree and 32/64-boundary subsets; removing bit zero changes the bit text while retaining the literal source zero prefix. Runtime reservations remain disabled during display, with no charged or packed-word storage acquisition. A concrete public display borrow blocks Remove/Intersect/Swap/Close and recursive Display during actual writer callbacks while permitting read-only queries, and ends after normal/error/short/nil-writer return. Direct io.Writer output uses the cold default-decimal Go adapter. The actual factor-display dependency and whole production records at cpp1141,1155,1192 are now wired with exact accepted display-child ownership, source endl flushes and whole-record callback borrows. Other trace records and the broader source-unit audit remain open; no whole-unit completion credit."
         },
         {
           "name": "Project degree-set/combination assertions at h:84,170-171,202,205,210,347,377,389,403 honor runtime enablement and source debugger actions",

@@ -11,6 +11,7 @@ import (
 )
 
 type UPolynomialFactors struct {
+	displayScope              upolyFactorsDisplayScope
 	factorUnivariateCaller    *MultivariatePolynomialManager
 	self                      *UPolynomialFactors
 	manager                   *UPolynomialManager
@@ -51,6 +52,9 @@ func (m *UPolynomialManager) NewFactors() (*UPolynomialFactors, error) {
 	return fs, nil
 }
 func (fs *UPolynomialFactors) checkCleanup() error {
+	if fs != nil && fs.self == fs && fs.displayScope.active {
+		return ErrUPolynomialCleanupPending
+	}
 	if fs.factorFrontendExecuting() {
 		return ErrUPolynomialCleanupPending
 	}
@@ -71,6 +75,9 @@ func (fs *UPolynomialFactors) checkCleanup() error {
 func (fs *UPolynomialFactors) check() error {
 	if fs == nil || fs.self != fs || fs.manager == nil {
 		return ErrUPolynomialOwner
+	}
+	if fs.displayScope.active && !fs.displayScope.executing {
+		return ErrUPolynomialCleanupPending
 	}
 	if fs.closed || fs.closing || fs.closeCleared {
 		return arena.ErrClosed

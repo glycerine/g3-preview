@@ -37,6 +37,9 @@ func (s *UPolynomialFactorizationService) prepareFactorLift(fs *UPolynomialFacto
 	if e = c.zp.modular.WithAllocationContext((numericIntegerModularManager_primePreparationAllocationContext(c.zp.modular, q)).utility(c.zp.modular.Integers())).SetZP(&c.bestP); e != nil {
 		return e
 	}
+	if e = s.traceFactorDegreeSet(c.best, 1155, false); e != nil {
+		return e
+	}
 	exponent, e := s.mignotteBoundWithReceipt(m.stateView(&c.fpp), &c.bestP, &q.mignotte)
 	if e != nil {
 		return e

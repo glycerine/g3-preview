@@ -566,12 +566,16 @@ func TestUPolynomialFactorPreparationDiagnosticOldLeafPreservesForeignReplacemen
 }
 
 func preparationPhysicalFixture(t *testing.T) (*unumeral.RationalManager, *UPolynomialFactorizationService) {
+	return preparationPhysicalFixtureWithSlots(t, 0)
+}
+func preparationPhysicalFixtureWithSlots(t *testing.T, slots uint32) (*unumeral.RationalManager, *UPolynomialFactorizationService) {
 	t.Helper()
 	b := arena.NewBudget(1 << 26)
 	rt, e := umemory.NewRuntime(umemory.RuntimeConfig{Budget: b, SizeTBits: 64})
 	serviceMust(t, e)
 	cfg := serviceConfig(b).Integers
 	cfg.Cells.PageSize = 1
+	cfg.Cells.SlotLimit = slots
 	cfg.Memory = rt
 	cfg.Profile = umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}
 	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: cfg})

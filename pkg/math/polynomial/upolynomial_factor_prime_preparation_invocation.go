@@ -59,6 +59,9 @@ func (q *upolyFactorPrimePreparationScope) managers() [3]*UPolynomialManager {
 	return [3]*UPolynomialManager{q.owner.manager, q.related, q.lift}
 }
 func (q *upolyFactorPrimePreparationScope) childCause() error {
+	if e := q.owner.trace.sourceBlocker(); e != nil {
+		return e
+	}
 	z := q.owner.manager.config.Integer
 	if e := q.owner.service.mignotteInvocationSourceCause(&q.mignotte); e != nil {
 		return e
@@ -110,6 +113,9 @@ func (q *upolyFactorPrimePreparationScope) finish(r *upolyFactorPrimePreparation
 	return q.bodyCause
 }
 func (q *upolyFactorPrimePreparationScope) pending() bool {
+	if q.owner.trace.pending() {
+		return true
+	}
 	if q.owner.service.matchesMignotteInvocation(&q.mignotte) || q.matchesHensel() && q.hensel.active {
 		return true
 	}

@@ -18,6 +18,8 @@ var ErrUPolynomialCleanupPending = unumeral.ErrNumericCleanupPending
 // the unfinished reverse destruction cursor instead of losing its owner. This
 // additional charged header is a Go exception/lifetime adapter, not C++ malloc.
 type upolyFactorSquareFreeScope struct {
+	traceBorrow                                       upolyFactorTraceBorrow
+	trace                                             upolyFactorsDisplayReceipt
 	issuedReceipt                                     upolyFactorSquareFreeInvocationReceipt
 	historyNext                                       *upolyFactorSquareFreeScope
 	historyRequired                                   bool
@@ -73,6 +75,9 @@ func (s *UPolynomialFactorizationService) newSquareFreeScope() (*upolyFactorSqua
 // prime, prime factors, prime core, prime, primitive vector. Only constructed
 // objects participate; publication/cleanup advances one completed action.
 func (c *upolyFactorSquareFreeScope) cleanup() error {
+	if e := c.trace.sourceBlocker(); e != nil {
+		return e
+	}
 	if q := &c.primePreparation; q.active {
 		if q.executing || q.sourceExecuting || q.ownExecuting {
 			return ErrUPolynomialCleanupPending
@@ -246,6 +251,11 @@ func (s *UPolynomialFactorizationService) CleanupRetained() error {
 	}
 	if c := s.scope; c != nil && (c.executing || c.sourceExecuting || c.ownExecuting || c.callDepth != 0) {
 		return ErrUPolynomialCleanupPending
+	}
+	if c := s.scope; c != nil {
+		if e := c.trace.cleanup(); e != nil {
+			return e
+		}
 	}
 	if q := &s.frontend; q.active {
 		if e := q.own(false); e != nil {
@@ -423,6 +433,9 @@ func (s *UPolynomialFactorizationService) finishSquareFreeScopeError(body error)
 }
 
 func (s *UPolynomialFactorizationService) cleanupSquareFreeMembers(caller *upolyFactorSquareFreeScope, abort bool) error {
+	if e := caller.trace.cleanup(); e != nil {
+		return e
+	}
 	if !abort {
 		if q := &caller.primePreparation; q.active {
 			if e := q.own(&q.receipt, false); e != nil {

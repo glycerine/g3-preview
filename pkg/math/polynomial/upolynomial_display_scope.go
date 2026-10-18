@@ -153,6 +153,12 @@ func (q *upolyDisplayScope) finish(body error) error {
 	return body
 }
 func (m *UPolynomialManager) CleanupDisplay() error {
+	if m != nil && m.factorTrace != nil && m.factorTrace.executing {
+		return ErrUPolynomialCleanupPending
+	}
+	if m != nil && m.factorsDisplay != nil && m.factorsDisplay.NumericExecuting() {
+		return ErrUPolynomialCleanupPending
+	}
 	if m == nil || m.self != m {
 		return ErrUPolynomialOwner
 	}

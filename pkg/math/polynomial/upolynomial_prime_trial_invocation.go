@@ -242,6 +242,10 @@ func (s *UPolynomialFactorizationService) finishPrimeTrialSource(r *upolyPrimeTr
 	if q.sourceEnded || q.sourceCause != nil {
 		return errors.Join(q.bodyCause, q.sourceCause)
 	}
+	if e := r.parent.trace.sourceBlocker(); e != nil {
+		q.sourceCause = e
+		return errors.Join(q.bodyCause, e)
+	}
 
 	if q.degreesStarted {
 		q.degrees.close()

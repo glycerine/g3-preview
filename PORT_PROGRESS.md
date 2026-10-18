@@ -44949,3 +44949,27 @@ and checked/debug/trace (27.212s), using CPUs 8-16. portcheck and git diff --che
 pass: 2103 units,677 APIs;211 ported,340 partial,1495 unported,11 dead/deleted.
 Source-unit statuses remain partial and the polynomial then AST goal remains
 unfinished. No full native repeat after the recent successful full verification.
+
+2026-10-18: actual factor display and three whole degree-set TRACE records
+
+Implemented core_manager::factors::display (upolynomial.cpp:97-106) using the
+actual modular constant, polynomial display engine and reached multiplicities.
+Accepted display-child receipts preserve exact ownership across refusal;
+cleanup cannot adopt a foreign replacement display. Callback guards protect
+actual factor, polynomial and numerical owners without rebuilding STL storage.
+
+The production factorization records at cpp1141,1155,1192 now print actual
+factors and degree sets. Their borrow spans header, body, endl and footer.
+Stream failure suppresses physical writes while later display computations and
+reached endl flushes continue. Disabled traces do not evaluate their operands.
+An actual fixed descriptor quota, filled by caller-owned BIG numerals using
+live plus retired descriptor counts, forces a descriptor-after-physical display
+refusal: the exact child remains ahead of fourteen constructed square-free
+locals. Physical-owner auditing and explicit child-first cleanup pass.
+
+Broader factor/Hensel/recombination/degree/display checks pass ordinary
+(16.153s) and checked/debug/trace (28.187s), exclusively on CPUs 8-16.
+The hourly full native suite is running; its result will be recorded separately.
+Other bughunt records (including entry, f_pp, GCD, f_pp_zp and Mignotte output)
+and the broader factorization audit remain open. Polynomial and then AST remain
+unfinished. Source-unit statuses and completion counts are unchanged.
