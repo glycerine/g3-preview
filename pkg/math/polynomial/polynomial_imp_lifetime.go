@@ -159,6 +159,9 @@ func (m *MultivariatePolynomialManager) SourceFinalize() error {
 		if e := m.core.pendingCacheCause(); e != nil {
 			return e
 		}
+		if e := m.core.pendingSparseCause(); e != nil {
+			return e
+		}
 	}
 	if m != nil && m.self == m && m.factorInline.manager != nil {
 		if cause := m.factorInline.manager.factorConstantInvocationSourceCause(&m.factorInline); cause != nil {

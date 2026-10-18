@@ -47,6 +47,7 @@ type polynomialCreation struct {
 	buffer            *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	pendingSparse                                                                              *PolynomialSparseInterpolator
 	sparseCaller                                                                               *PolynomialSparseInterpolator
 	pendingCaches                                                                              *PolynomialCache
 	cacheCaller                                                                                *PolynomialCache
@@ -452,6 +453,9 @@ func (m *MultivariatePolynomialCore) CloseChecked() error {
 		return ErrPolynomialPending
 	}
 	if e := m.pendingCacheCause(); e != nil {
+		return e
+	}
+	if e := m.pendingSparseCause(); e != nil {
 		return e
 	}
 	if m != nil && m.self == m && m.integer != nil && (m.factorConstantExecuting() || m.toPolynomialCallerExecuting() || numericIntegerManager_factorNumeralVectorCallerExecuting(m.integer) || numericIntegerManager_factorUnivariateCallerExecuting(m.integer) || numericIntegerManager_factorCoreCallerExecuting(m.integer)) {

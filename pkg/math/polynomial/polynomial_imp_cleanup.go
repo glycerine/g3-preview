@@ -110,6 +110,9 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 		if e := m.core.pendingCacheCause(); e != nil {
 			return e
 		}
+		if e := m.core.pendingSparseCause(); e != nil {
+			return e
+		}
 	}
 	if m != nil && m.self == m && m.algebraicIsolationBorrowers != 0 {
 		return ErrPolynomialPending

@@ -26,8 +26,11 @@ type PolynomialSparseInterpolator struct {
 	interpolation                                                polynomialSparseInterpolationScope
 	numeric                                                      polynomialNumericRoots
 
-	running  bool
-	previous *PolynomialSparseInterpolator
+	running      bool
+	previous     *PolynomialSparseInterpolator
+	nextPending  *PolynomialSparseInterpolator
+	pendingBound bool
+	pendingCause error
 }
 
 func NewPolynomialSparseInterpolator(m *MultivariatePolynomialManager, sk *PolynomialSkeleton) (s *PolynomialSparseInterpolator, err error) {
@@ -135,12 +138,12 @@ func (s *PolynomialSparseInterpolator) copyField(v []unumeral.Int, i uint32, a *
 	e = s.owner.core.modular.Copy(&v[i], a)
 	return polynomialNewtonJoin(e, s.numericAfter(before))
 }
-func (s *PolynomialSparseInterpolator) Add(in *unumeral.Int, q Polynomial) (bool, error) {
+func (s *PolynomialSparseInterpolator) Add(in *unumeral.Int, q Polynomial) (ok bool, err error) {
 	if e := s.open(); e != nil {
 		return false, e
 	}
 	s.beginExecution()
-	defer s.endExecution()
+	defer func() { s.endExecution(err) }()
 	if s.skeleton == nil {
 		if polynomialSourceDebug {
 			return false, ErrPolynomialAssertion
@@ -251,7 +254,7 @@ func (s *PolynomialSparseInterpolator) sourceFinish() (err error) {
 	s.sourceFinalized = true
 	return nil
 }
-func (s *PolynomialSparseInterpolator) SourceFinalize() error {
+func (s *PolynomialSparseInterpolator) SourceFinalize() (err error) {
 	if s != nil && s.self == s && s.running {
 		return ErrPolynomialPending
 	}
@@ -259,13 +262,13 @@ func (s *PolynomialSparseInterpolator) SourceFinalize() error {
 		return e
 	}
 	s.beginExecution()
-	defer s.endExecution()
+	defer func() { s.endExecution(err) }()
 	if s.sourceFinalized {
 		return nil
 	}
 	return s.sourceFinish()
 }
-func (s *PolynomialSparseInterpolator) CloseChecked() error {
+func (s *PolynomialSparseInterpolator) CloseChecked() (err error) {
 	if s == nil || s.self != s {
 		return ErrPolynomialOwner
 	}
@@ -276,7 +279,7 @@ func (s *PolynomialSparseInterpolator) CloseChecked() error {
 		return nil
 	}
 	s.beginExecution()
-	defer s.endExecution()
+	defer func() { s.endExecution(err) }()
 	s.closing = true
 	if e := s.cleanupInterpolation(); e != nil {
 		return e
@@ -313,7 +316,7 @@ func (s *PolynomialSparseInterpolator) Reset() (err error) {
 		return e
 	}
 	s.beginExecution()
-	defer s.endExecution()
+	defer func() { s.endExecution(err) }()
 	if s.resetCause != nil {
 		return s.resetCause
 	}
@@ -347,7 +350,7 @@ func (s *PolynomialSparseInterpolator) beginExecution() {
 	s.running = true
 	core.sparseCaller = s
 }
-func (s *PolynomialSparseInterpolator) endExecution() {
+func (s *PolynomialSparseInterpolator) endExecution(cause error) {
 	core := s.owner.core
 	if core.sparseCaller != s {
 		panic(ErrPolynomialOwner)
@@ -355,6 +358,7 @@ func (s *PolynomialSparseInterpolator) endExecution() {
 	core.sparseCaller = s.previous
 	s.previous = nil
 	s.running = false
+	s.syncPendingBorrow(cause)
 }
 func (m *MultivariatePolynomialCore) sparseExecuting(sk *PolynomialSkeleton) bool {
 	if m == nil || m.self != m {
@@ -366,4 +370,51 @@ func (m *MultivariatePolynomialCore) sparseExecuting(sk *PolynomialSkeleton) boo
 		}
 	}
 	return false
+}
+
+// Externally allocated owners borrow the core for explicit pending cleanup.
+// Embedded sparse-GCD locals are owned and retired by that manager itself.
+func (s *PolynomialSparseInterpolator) hasPendingBorrow() bool {
+	return !s.closed && s.header != 0 && (s.interpolation.active || polynomialNegNumericPending(&s.numeric) || s.cleanupCause != nil || (s.resetActive && s.resetCause != nil))
+}
+func (s *PolynomialSparseInterpolator) syncPendingBorrow(cause error) {
+	core := s.owner.core
+	if s.hasPendingBorrow() {
+		if !s.pendingBound {
+			s.nextPending = core.pendingSparse
+			s.pendingCause = cause
+			s.pendingBound = true
+			core.pendingSparse = s
+		}
+		return
+	}
+	if !s.pendingBound {
+		return
+	}
+	link := &core.pendingSparse
+	for *link != nil {
+		if *link == s {
+			*link = s.nextPending
+			s.nextPending = nil
+			s.pendingBound = false
+			return
+		}
+		link = &(*link).nextPending
+	}
+	panic(ErrPolynomialOwner)
+}
+func (m *MultivariatePolynomialCore) pendingSparseCause() error {
+	if m == nil || m.self != m {
+		return nil
+	}
+	for s := m.pendingSparse; s != nil; s = s.nextPending {
+		if s.self != s || s.owner == nil || s.owner.self != s.owner || s.owner.core != m || !s.pendingBound || !s.hasPendingBorrow() {
+			return ErrPolynomialOwner
+		}
+		if s.pendingCause != nil {
+			return s.pendingCause
+		}
+		return ErrPolynomialPending
+	}
+	return nil
 }

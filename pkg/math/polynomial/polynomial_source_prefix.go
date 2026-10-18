@@ -20,6 +20,9 @@ func (m *MultivariatePolynomialCore) SourceFinalizePrefix() error {
 	if e := m.pendingCacheCause(); e != nil {
 		return e
 	}
+	if e := m.pendingSparseCause(); e != nil {
+		return e
+	}
 	if m != nil && m.self == m && m.integer != nil && (m.factorConstantExecuting() || m.toPolynomialCallerExecuting() || numericIntegerManager_factorNumeralVectorCallerExecuting(m.integer) || numericIntegerManager_factorUnivariateCallerExecuting(m.integer) || numericIntegerManager_factorCoreCallerExecuting(m.integer)) {
 		return ErrPolynomialPending
 	}

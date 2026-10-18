@@ -13,8 +13,9 @@ import (
 )
 
 func TestPolynomialSparseBigInputDescriptorRefusalRetainsActualRoot(t *testing.T) {
-	for _, replacement := range []bool{false, true} {
-		t.Run(fmt.Sprint(replacement), func(t *testing.T) {
+	for _, mode := range []string{"owned", "foreign", "second-owner"} {
+		replacement := mode != "owned"
+		t.Run(mode, func(t *testing.T) {
 			budget := arena.NewBudget(1 << 24)
 			q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Cells: arena.Config{PageSize: 8, SlotLimit: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 			serviceMust(t, e)
@@ -43,11 +44,34 @@ func TestPolynomialSparseBigInputDescriptorRefusalRetainsActualRoot(t *testing.T
 				t.Fatal("actual numeric physical allocation before descriptor refusal", e, q.Integers().PendingCell)
 			}
 			root := q.Integers().PendingCell
+			if !s.pendingBound || m.pendingSparse != s {
+				t.Fatal("actual numeric refusal lost borrowed core binding")
+			}
+			before, fullStage, coreStage := budget.Used(), full.cleanupStage, m.sourceStage
+			for _, guard := range []func() error{full.SourceFinalize, full.CloseChecked, m.SourceFinalizePrefix, m.CloseChecked} {
+				if err := guard(); !errors.Is(err, arena.ErrSlotLimit) {
+					t.Fatal("pending sparse borrowed core lost original cause", err)
+				}
+			}
+			if budget.Used() != before || full.cleanupStage != fullStage || m.sourceStage != coreStage || full.closing || m.closing || q.Integers().PendingCell != root {
+				t.Fatal("pending sparse guard advanced borrowed destruction")
+			}
 			polynomialSparsePhysical(t, s, nil, []Polynomial{p})
 			if replacement {
 				serviceMust(t, q.Integers().CleanupPendingAllocation())
 				foreign := unumeral.NewInt(19)
-				e = q.Integers().Copy(&foreign, &q.Integers().Two64)
+				var second *PolynomialSparseInterpolator
+				if mode == "second-owner" {
+					second, e = NewPolynomialSparseInterpolator(full, sk)
+					serviceMust(t, e)
+					t.Cleanup(func() { serviceMust(t, second.CloseChecked()) })
+					_, e = second.Add(&q.Integers().Two64, m.unit)
+					if m.pendingSparse != second || second.nextPending != s || !second.pendingBound {
+						t.Fatal("two actual sparse borrowers not linked")
+					}
+				} else {
+					e = q.Integers().Copy(&foreign, &q.Integers().Two64)
+				}
 				if !errors.Is(e, arena.ErrSlotLimit) || q.Integers().PendingCell.Object == (umemory.ObjectRef{}) {
 					t.Fatal("actual later foreign pending", e)
 				}
@@ -55,18 +79,30 @@ func TestPolynomialSparseBigInputDescriptorRefusalRetainsActualRoot(t *testing.T
 				if newer.Object == root.Object {
 					t.Fatal("physical ObjectRef generation must distinguish replacement")
 				}
-				polynomialSparsePhysical(t, s, nil, []Polynomial{p})
+				if second == nil {
+					polynomialSparsePhysical(t, s, nil, []Polynomial{p})
+				}
 				serviceMust(t, s.CloseChecked())
+				if second != nil && (m.pendingSparse != second || second.nextPending != nil || s.pendingBound) {
+					t.Fatal("first sparse cleanup changed second actual borrower")
+				}
 				if q.Integers().PendingCell != newer {
 					t.Fatal("sparse receipt swept later foreign numeric allocation", newer, q.Integers().PendingCell)
 				}
-				serviceMust(t, q.Integers().CleanupPendingAllocation())
-				serviceMust(t, q.Integers().Del(&foreign))
+				if second != nil {
+					serviceMust(t, second.CloseChecked())
+				} else {
+					serviceMust(t, q.Integers().CleanupPendingAllocation())
+					serviceMust(t, q.Integers().Del(&foreign))
+				}
 			} else {
 				serviceMust(t, s.CloseChecked())
 				if q.Integers().PendingCell.Object != (umemory.ObjectRef{}) {
 					t.Fatal("owning sparse cleanup must drain only its actual numeric pending allocation", root, q.Integers().PendingCell)
 				}
+			}
+			if s.pendingBound || m.pendingSparse != nil {
+				t.Fatal("completed sparse owning cleanup retained borrowed core")
 			}
 			polynomialSparsePhysical(t, s, nil, []Polynomial{p})
 		})

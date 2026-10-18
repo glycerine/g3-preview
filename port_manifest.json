@@ -42458,6 +42458,16 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Externally allocated sparse interpolators retain exact borrowed core while actual interpolation/numeric/destructor work is pending; manager destruction reports original error until explicit owning acknowledgment; embedded GCD locals remain manager-owned",
+          "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_sparse_interpolator.go",
+          "tests": [
+            "TestPolynomialSparseBigInputDescriptorRefusalRetainsActualRoot",
+            "TestPolynomialSparseInterpolationEveryActualReservationPrefix",
+            "TestPolynomialSparseIndependentLazardReservationPrefixes"
+          ]
+        },
+        {
           "name": "Executing sparse operations bind exact borrowed core and skeleton through nested actual caller chain; skeleton and full/core source/owning destructors refuse before mutation, unrelated skeleton remains independent",
           "status": "platform_replacement",
           "go_target": "pkg/math/polynomial/polynomial_sparse_interpolator.go",
