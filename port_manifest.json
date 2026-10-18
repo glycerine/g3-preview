@@ -50750,7 +50750,9 @@
         "pkg/math/polynomial/upolynomial_sturm_isolation_trace.go",
         "pkg/math/polynomial/upolynomial_sturm_isolation_trace_test.go",
         "pkg/math/polynomial/upolynomial_factors_display.go",
-        "pkg/math/polynomial/upolynomial_factors_display_test.go"
+        "pkg/math/polynomial/upolynomial_factors_display_test.go",
+        "pkg/math/polynomial/upolynomial_exception.go",
+        "pkg/math/polynomial/upolynomial_exception_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -50959,7 +50961,8 @@
         "TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults",
         "TestUPolynomialNativeIsolationStacksAndNumericTransfer",
         "TestUPolynomialFactorsDisplaySourceOrderAndCallbacks",
-        "TestUPolynomialFactorsDisplayExactPendingChildAndForeignReplacement"
+        "TestUPolynomialFactorsDisplayExactPendingChildAndForeignReplacement",
+        "TestUPolynomialCheckpointSourceExceptionAndCooperationOrder"
       ],
       "conditionals": [
         {
@@ -51548,6 +51551,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "checkpoint canceled source exception class and message before cooperation (159)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_exception.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_exception_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialCheckpointSourceExceptionAndCooperationOrder",
+            "TestUPolynomialDivisionPublishedPrefixes",
+            "TestUPolynomialCancelledModularGCDZeroHostAllocation"
+          ],
+          "notes": "A failed actual resource checkpoint returns UPolynomialException/default_exception with source common_msgs.cpp canceled text, preserving errors.Is(ErrUPolynomialCanceled). Cooperation is not reached on cancellation; its own error remains unchanged after successful checkpoint, and callback borrow depth is restored. Existing division-prefix test now uses idiomatic errors.Is rather than assuming sentinel object identity. Other methods, constructors and unit-wide lifetime/source audit remain partial. The immutable cancellation value is boxed once to preserve the existing warm zero-host-allocation arithmetic contract; errors.As exposes a copy of its exported base value."
+        },
         {
           "name": "core_manager::factors::display actual constant, polynomial and multiplicity order (97-106)",
           "status": "ported",
@@ -52322,7 +52340,9 @@
         "pkg/math/polynomial/upolynomial_native_isolation_storage_test.go",
         "pkg/math/polynomial/upolynomial_root_id_scope.go",
         "pkg/math/polynomial/upolynomial_root_id_scope_test.go",
-        "pkg/math/polynomial/upolynomial_root_id_remainder_test.go"
+        "pkg/math/polynomial/upolynomial_root_id_remainder_test.go",
+        "pkg/math/polynomial/upolynomial_exception.go",
+        "pkg/math/polynomial/upolynomial_exception_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -52444,7 +52464,9 @@
         "TestUPolynomialNativeDegreeSubsetOracle",
         "TestUPolynomialNativeFactorGrowthMovesBIGAndPreservesViews",
         "TestUPolynomialNativeBinaryGrowthMovesBIGAndDefaults",
-        "TestUPolynomialNativeIsolationStacksAndNumericTransfer"
+        "TestUPolynomialNativeIsolationStacksAndNumericTransfer",
+        "TestUPolynomialPrimeExtractionSourceExceptionAndPrefix",
+        "TestUPolynomialCheckpointSourceExceptionAndCooperationOrder"
       ],
       "conditionals": [
         {
@@ -52473,6 +52495,19 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "upolynomial_exception concrete default_exception inheritance and retained messages (40-43)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_exception.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_exception_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialPrimeExtractionSourceExceptionAndPrefix",
+            "TestUPolynomialCheckpointSourceExceptionAndCooperationOrder"
+          ],
+          "notes": "Concrete UPolynomialException embeds and unwraps the existing DefaultException, preserving source text and no-error-code behavior. Actual retained throw sites cover oversized prime extraction and checkpoint cancellation. errors.As exposes both source class and base; errors.Is preserves existing Go domain/cancellation sentinels without replacing the source exception with a generic error. No STL string machinery or unused exception adapter is ported. Whole header/source-unit completion remains separate. The immutable cancellation value is boxed once to preserve the existing warm zero-host-allocation arithmetic contract; errors.As exposes a copy of its exported base value."
+        },
         {
           "name": "S-expression arithmetic issued-child ownership before older argument-vector destruction (sexpr2upolynomial.cpp:39-85)",
           "status": "partial",
@@ -52537,7 +52572,11 @@
           "name": "upolynomial.h:401-424 actual external UP receiver for algebraic_numbers.cpp:812,837, same concrete integer service; output normalization and cleanup use the bound receiving numeral manager",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_to_numeral_variable.go",
-          "tests": ["TestPolynomialToNumeralExternalOwnerAndNumeralMode", "TestPolynomialToNumeralExternalRejectsOtherIntegerService", "TestAlgebraicResultantSumDifferenceAndProductPolynomials"]
+          "tests": [
+            "TestPolynomialToNumeralExternalOwnerAndNumeralMode",
+            "TestPolynomialToNumeralExternalRejectsOtherIntegerService",
+            "TestAlgebraicResultantSumDifferenceAndProductPolynomials"
+          ]
         },
         {
           "name": "selected complete dense storage/core arithmetic/sign evaluation and actual core/derived constructor/destructor/checkpoint actions",
@@ -53121,7 +53160,9 @@
         "pkg/math/polynomial/upolynomial_berlekamp_display.go",
         "pkg/math/polynomial/upolynomial_berlekamp_display_test.go",
         "pkg/math/polynomial/upolynomial_berlekamp_assertions.go",
-        "pkg/math/polynomial/upolynomial_berlekamp_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_berlekamp_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_exception.go",
+        "pkg/math/polynomial/upolynomial_exception_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53261,7 +53302,8 @@
         "TestUPolynomialBerlekampMatrixTraceStreamFailure",
         "TestUPolynomialBerlekampMatrixTraceRetainedFactorizationConsumer",
         "TestUPolynomialBerlekampGetRuntimeAssertionActions",
-        "TestUPolynomialBerlekampGetClosedRuntimeSwitchPrecedesRead"
+        "TestUPolynomialBerlekampGetClosedRuntimeSwitchPrecedesRead",
+        "TestUPolynomialPrimeExtractionSourceExceptionAndPrefix"
       ],
       "conditionals": [
         {
@@ -53374,6 +53416,19 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "get_p_from_manager oversized-prime source exception at both uint64 and uint32 conversion guards (39,44)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_exception.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_field.go",
+            "pkg/math/polynomial/upolynomial_exception_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialPrimeExtractionSourceExceptionAndPrefix"
+          ],
+          "notes": "Both retained oversized-prime guards now throw the concrete upolynomial/default exception class with the exact source message, while retaining Go errors.Is(ErrUPolynomialDomain). Tests reach uint64 overflow and successful-uint64/failed-uint32 narrowing independently, and verify unsigned32 maximum conversion without running a huge-prime matrix loop. Public Berlekamp refusal leaves output factors and charged storage unchanged before matrix construction/publication. Other mathematical domain guards retain their existing distinct classification. Whole factorization audit remains partial."
+        },
         {
           "name": "Berlekamp mutable/const get project SASSERT runtime switch, Throw/Continue and reached physical read (74,79)",
           "status": "ported",

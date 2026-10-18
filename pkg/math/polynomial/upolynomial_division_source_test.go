@@ -1,6 +1,7 @@
 package polynomial
 
 import (
+	"errors"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	"testing"
 )
@@ -143,7 +144,7 @@ func TestUPolynomialDivisionPublishedPrefixes(t *testing.T) {
 	// scratch setup but before the first quotient arithmetic/counter increment.
 	limit.Cancel()
 	d := uint32(77)
-	if e := m.DivRem(a, b, q, r, &d); e != ErrUPolynomialCanceled {
+	if e := m.DivRem(a, b, q, r, &d); !errors.Is(e, ErrUPolynomialCanceled) {
 		t.Fatal(e)
 	}
 	if d != 0 {

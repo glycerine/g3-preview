@@ -23,14 +23,14 @@ func (m *UPolynomialManager) factorPrime() (uint32, error) {
 		return 0, e
 	}
 	if !ok {
-		return 0, ErrUPolynomialDomain
+		return 0, newUPolynomialPrimeException()
 	}
 	n, e := m.config.Integer.Uint64(p)
 	if e != nil {
 		return 0, e
 	}
 	if uint64(uint32(n)) != n {
-		return 0, ErrUPolynomialDomain
+		return 0, newUPolynomialPrimeException()
 	}
 	return uint32(n), nil
 }

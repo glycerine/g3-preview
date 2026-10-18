@@ -45404,3 +45404,39 @@ native repeat after the recent successful68-package run.
 Broader factor/Hensel/recombination/degree/display/Berlekamp checks pass ordinary
 16.670s and checked/debug/trace27.862s,CPUs8-16. portcheck and diff checks pass:
 2103 units,677 APIs;211 ported,340 partial,1495 unported,11 dead/deleted.
+
+2026-10-18: concrete univariate polynomial exception inheritance/messages
+
+A source comparison found get_p_from_manager returned only a generic Go domain
+error at both oversized-prime guards, and checkpoint returned only the shared
+cancellation sentinel. Added the concrete upolynomial_exception/default_exception
+mapping from upolynomial.h:40-43. Both prime guards (factorization.cpp:39,44)
+now carry the exact source message. checkpoint (upolynomial.cpp:159) carries
+common_msgs.cpp's canceled text and source class before cooperation is reached.
+The existing DefaultException provides native string/base/error-code behavior;
+no STL string allocation machinery is ported. errors.As exposes source/base
+classes and errors.Is preserves Go domain/cancellation classifications.
+
+Tests independently reach >uint64 and uint64-success/uint32-narrowing failures,
+plus the unsigned32 maximum conversion boundary without executing a huge-prime
+matrix loop. Public Berlekamp refusal publishes no factor and changes no charged
+storage. Checkpoint cancellation skips cooperation, preserves the actual borrow
+frontier, and leaves cooperation's own error unchanged after a successful check.
+The existing division publication-prefix check now uses errors.Is rather than
+sentinel object identity. Focused checked/debug/trace checks pass0.005s.
+
+Whole polynomial/AST completion remains unproved: multivariate/resultant/PSC,
+factorization and other source-unit lifetime/method audits remain open. Commands
+stay on CPUs8-16. A full ordinary polynomial-package check and focused checked/
+debug/trace arithmetic/factorization checks are running for exception propagation.
+The first full polynomial-package check exposed one host allocation per warm
+canceled modular GCD, caused by boxing the fresh typed exception. Cancellation
+now returns an immutable value boxed once; errors.As returns a copy, so callers
+cannot alter later error messages through the exported base value. The original
+zero-host-allocation GCD check remains unchanged and passes (focused ordinary
+0.007s). The full package check is being repeated after this correction.
+The corrected full ordinary polynomial package passes98.389s, including the
+unchanged warm cancellation allocation check and algebraic/cross-operation
+consumers. Focused checked/debug/trace arithmetic/factorization/cancellation
+checks pass28.924s. portcheck and diff checks pass:2103 units,677 APIs;211 ported,
+340 partial,1495 unported,11 dead/deleted. All commands remain on CPUs8-16.

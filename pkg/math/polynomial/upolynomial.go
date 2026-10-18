@@ -181,7 +181,7 @@ func (m *UPolynomialManager) checkpoint() error {
 	m.callbackDepth++
 	defer func() { m.callbackDepth-- }()
 	if !m.config.Checkpoint() {
-		return ErrUPolynomialCanceled
+		return upolynomialCancellationError
 	}
 	return m.config.Cooperation()
 }
