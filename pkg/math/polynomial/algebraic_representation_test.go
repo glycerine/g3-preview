@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
 
@@ -220,5 +221,37 @@ func TestAlgebraicBoundsDiscoveredRootKeepsSourceUpperEndpoint(t *testing.T) {
 	serviceMust(t, e)
 	if l.kind != 1 {
 		t.Fatal("a copied-interval query converted the stored root to a basic cell")
+	}
+}
+
+func TestAlgebraicIrrationalBoundAssertionActions(t *testing.T) {
+	for _, upper := range []bool{false, true} {
+		for _, action := range []string{"T", "C", "disabled"} {
+			t.Run(strconv.FormatBool(upper)+"/"+action, func(t *testing.T) {
+				c, _, _ := algebraicCompareFixture(t)
+				choices := action
+				if action == "disabled" {
+					choices = ""
+				}
+				polynomialAssertionActionsFixture(t, choices)
+				if polynomialSourceDebug && action == "disabled" {
+					serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+				}
+				var zero Algebraic
+				_, e := c.irrationalBoundRecord(&zero, upper)
+				if polynomialSourceDebug && action == "T" {
+					if !errors.Is(e, ErrAlgebraicAssertion) || !linearThrownAssertion(e) {
+						t.Fatal("bound assertion did not honor Throw", e)
+					}
+				} else if !errors.Is(e, ErrAlgebraicOwner) {
+					// Continue reaches the existing safe invalid-tag guard; C++
+					// would dereference the null algebraic cell after continuing.
+					t.Fatal("bound did not reach invalid root guard", e)
+				}
+				if c.predicateDiagnosticRunning {
+					t.Fatal("bound assertion retained execution guard")
+				}
+			})
+		}
 	}
 }

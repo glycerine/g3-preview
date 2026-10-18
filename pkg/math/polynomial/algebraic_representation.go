@@ -99,7 +99,7 @@ func (m *AlgebraicRootCore) irrationalBoundRecord(a *Algebraic, upper bool) (alg
 				if upper {
 					line = 3015
 				}
-				if e = diagnostic.DebugAssertionFailure(d, "src/math/polynomial/algebraic_numbers.cpp", line, "!is_rational(a)"); e != nil {
+				if e = m.predicateAssertionFailure(line, "!is_rational(a)"); e != nil {
 					return algebraicRecord{}, e
 				}
 			}

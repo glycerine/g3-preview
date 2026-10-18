@@ -43963,3 +43963,15 @@ refinement and the complete polynomial/AST port remain in progress.
 
 Focused refinement/comparison/predicate/conversion/magnitude checks passed
 ordinary (0.256s) and g3checked,g3debug,g3trace (0.083s), on CPUs8–16.
+
+Irrational lower/upper bound assertion failures (cpp2988/3015) now use the
+shared polynomial source assertion transport, including its synchronous
+diagnostic execution guard and ErrAlgebraicAssertion provenance. Previously
+these accessors bypassed that guard. Regression coverage exercises both bounds
+with actual Throw, Continue and disabled actions; Continue/erased assertions
+reach the existing safe invalid-root guard for null zero, where C++ would
+subsequently dereference a null root cell. No undefined C++ result is claimed.
+The wider bound/representation source audit remains partial.
+
+Focused bounds/defining-polynomial/predicate/refinement-promotion tests passed
+ordinary (0.251s) and g3checked,g3debug,g3trace (0.089s), on CPUs8–16.

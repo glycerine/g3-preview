@@ -38980,7 +38980,8 @@
           "name": "algebraic_numbers.cpp:1905-1924,2721-2730,2748-2769,2983-3040 defining-polynomial copies, binary/rational root bounds and precision getters through actual copied interval refinement; complete child failure composition and source consumers remain open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_representation.go",
-          "tests": ["TestAlgebraicDefiningPolynomialZeroBasicAndNonminimalRoot", "TestAlgebraicBoundsExactAndCopiedPrecision", "TestAlgebraicDefiningPolynomialMinimumIntegerReservationPrefixes", "TestAlgebraicBoundsDiscoveredRootKeepsSourceUpperEndpoint"]
+          "tests": [
+            "TestAlgebraicIrrationalBoundAssertionActions","TestAlgebraicDefiningPolynomialZeroBasicAndNonminimalRoot", "TestAlgebraicBoundsExactAndCopiedPrecision", "TestAlgebraicDefiningPolynomialMinimumIntegerReservationPrefixes", "TestAlgebraicBoundsDiscoveredRootKeepsSourceUpperEndpoint"]
         },
         {
           "name": "algebraic_numbers.cpp:1582-1647,2937-2939 nonzero-bound halving and in-place inversion through actual reciprocal polynomial and rational-to-binary interval conversion; selected ordinary and basic allocation-refusal profiles",
@@ -39539,7 +39540,8 @@
           "name": "algebraic_numbers.cpp:1905-1924,2721-2730,2748-2769,2983-3040 defining-polynomial copies, binary/rational root bounds and precision getters through actual copied interval refinement; complete child failure composition and source consumers remain open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_representation.go",
-          "tests": ["TestAlgebraicDefiningPolynomialZeroBasicAndNonminimalRoot", "TestAlgebraicBoundsExactAndCopiedPrecision", "TestAlgebraicDefiningPolynomialMinimumIntegerReservationPrefixes", "TestAlgebraicBoundsDiscoveredRootKeepsSourceUpperEndpoint"]
+          "tests": [
+            "TestAlgebraicIrrationalBoundAssertionActions","TestAlgebraicDefiningPolynomialZeroBasicAndNonminimalRoot", "TestAlgebraicBoundsExactAndCopiedPrecision", "TestAlgebraicDefiningPolynomialMinimumIntegerReservationPrefixes", "TestAlgebraicBoundsDiscoveredRootKeepsSourceUpperEndpoint"]
         },
         {
           "name": "algebraic_numbers.cpp:1582-1647,2937-2939 nonzero-bound halving and in-place inversion through actual reciprocal polynomial and rational-to-binary interval conversion; selected ordinary and basic allocation-refusal profiles",
