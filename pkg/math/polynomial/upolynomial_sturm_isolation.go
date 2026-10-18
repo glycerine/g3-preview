@@ -256,12 +256,11 @@ func (m *UPolynomialManager) SturmIsolateRoots(v UPolynomialView, b *unumeral.Bi
 		return e
 	}
 	defer func() { cause = q.finish(cause) }()
-	q.preparedLive = true
-	p := &q.prepared
-	if e := q.setPrepared(v); e != nil {
+	if e := q.constructPrepared(v); e != nil {
 		return e
 	}
-	if e := m.normalize(m.stateView(p)); e != nil {
+	p := &q.prepared
+	if e := m.normalizeWithSourceContext(m.stateView(p), q.context()); e != nil {
 		return e
 	}
 	pos, e := m.KnuthPositiveRootUpperBound(v)
