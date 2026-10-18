@@ -38228,6 +38228,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/algebraic_degree_read_order_test.go",
         "pkg/math/polynomial/algebraic_to_rational.go",
         "pkg/math/polynomial/algebraic_to_rational_test.go",
         "pkg/math/polynomial/algebraic_integer.go",
@@ -39035,7 +39036,18 @@
           "tests": [
             "TestAlgebraicSignAndDegreeLiteralBranches",
             "TestAlgebraicQueriesRejectCopiedForeignAndStaleOwners",
-            "TestAlgebraicDegreeUsesActualNonminimalPolynomial"
+            "TestAlgebraicDegreeUsesActualNonminimalPolynomial",
+            "TestAlgebraicDegreeReadsOnlyPolynomialSize",
+            "TestAlgebraicDegreeRootTagSwitchPrecedesSize",
+            "TestAlgebraicSignReadsOnlyReachedScalarFields"
+          ],
+          "go_targets": [
+            "pkg/math/polynomial/algebraic_query.go",
+            "pkg/math/polynomial/algebraic_query_source_test.go",
+            "pkg/math/polynomial/algebraic_degree_read_order_test.go"
+          ],
+          "notes": [
+            "The queries now read only the actual reached codec words, rather than decode every polynomial/flag/numeral/interval member. Degree reaches stored size then unsigned minus one; basic sign reaches NUM.m_val only; open interval sign reaches lower NUM.m_val >=0 or upper NUM.m_val <=0 (basic_interval.h177/182, mpbq.h98/99). The pointer-tag dispatch already establishes the accessor assertion predicate, but each reached runtime switch still executes: cpp236 for basic_value including null zero, h372 for nonnull basic access, and h373 for root access. Borrowed interval/binary owner checks remain through Bounds. Raw-prefix tests keep unrelated words genuinely uninitialized without claiming completed C++ construction; owning raw abort uses the existing cell destructor continuation. Closed debug owner precedence, zero/basic degree shortcuts, opposite-bound avoidance and literal unsigned/zero-bound semantics are verified. This adds field-read/source-assertion evidence to the existing nominal query tests, not whole algebraic source-unit completion."
           ]
         },
         {
@@ -39173,6 +39185,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/algebraic_degree_read_order_test.go",
         "pkg/math/polynomial/algebraic_to_rational.go",
         "pkg/math/polynomial/algebraic_to_rational_test.go",
         "pkg/math/polynomial/algebraic_integer.go",
@@ -39578,7 +39591,18 @@
           "tests": [
             "TestAlgebraicSignAndDegreeLiteralBranches",
             "TestAlgebraicQueriesRejectCopiedForeignAndStaleOwners",
-            "TestAlgebraicDegreeUsesActualNonminimalPolynomial"
+            "TestAlgebraicDegreeUsesActualNonminimalPolynomial",
+            "TestAlgebraicDegreeReadsOnlyPolynomialSize",
+            "TestAlgebraicDegreeRootTagSwitchPrecedesSize",
+            "TestAlgebraicSignReadsOnlyReachedScalarFields"
+          ],
+          "go_targets": [
+            "pkg/math/polynomial/algebraic_query.go",
+            "pkg/math/polynomial/algebraic_query_source_test.go",
+            "pkg/math/polynomial/algebraic_degree_read_order_test.go"
+          ],
+          "notes": [
+            "The queries now read only the actual reached codec words, rather than decode every polynomial/flag/numeral/interval member. Degree reaches stored size then unsigned minus one; basic sign reaches NUM.m_val only; open interval sign reaches lower NUM.m_val >=0 or upper NUM.m_val <=0 (basic_interval.h177/182, mpbq.h98/99). The pointer-tag dispatch already establishes the accessor assertion predicate, but each reached runtime switch still executes: cpp236 for basic_value including null zero, h372 for nonnull basic access, and h373 for root access. Borrowed interval/binary owner checks remain through Bounds. Raw-prefix tests keep unrelated words genuinely uninitialized without claiming completed C++ construction; owning raw abort uses the existing cell destructor continuation. Closed debug owner precedence, zero/basic degree shortcuts, opposite-bound avoidance and literal unsigned/zero-bound semantics are verified. This adds field-read/source-assertion evidence to the existing nominal query tests, not whole algebraic source-unit completion."
           ]
         },
         {
