@@ -368,10 +368,20 @@ func (m *UPolynomialManager) RootUpperBound(v UPolynomialView, out *unumeral.Int
 	if e := m.check(); e != nil {
 		return e
 	}
-	if polynomialSourceDebug && v.count == 0 {
-		return ErrUPolynomialAssertion
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil {
+		return e
 	}
-	if polynomialSourceDebug {
+	if enabled && v.count == 0 {
+		if e := m.scalarDivisionAssertionFailure(1913, "sz > 0"); e != nil {
+			return e
+		}
+	}
+	enabled, e = refinementSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled {
 		top, e := m.read(v, v.count-1)
 		if e != nil {
 			return e
@@ -381,7 +391,9 @@ func (m *UPolynomialManager) RootUpperBound(v UPolynomialView, out *unumeral.Int
 			return e
 		}
 		if zero {
-			return ErrUPolynomialAssertion
+			if e := m.scalarDivisionAssertionFailure(1914, "!m().is_zero(p[sz - 1])"); e != nil {
+				return e
+			}
 		}
 	}
 	q, e := m.beginRootUpperBound()
@@ -489,17 +501,9 @@ func (m *UPolynomialManager) RootUpperBound(v UPolynomialView, out *unumeral.Int
 	if less {
 		*out, *r2 = *r2, *out
 	}
-	if polynomialSourceDebug {
-		le, e := m.modular.LessEqual(out, r2)
-		if e != nil {
-			return e
-		}
-		if !le {
-			return ErrUPolynomialAssertion
-		}
-	}
-	return nil
+	return m.rootUpperOrderingAssertion(out, r2)
 }
+
 func (m *UPolynomialManager) KnuthPositiveRootUpperBound(v UPolynomialView) (uint32, error) {
 	if e := m.check(); e != nil {
 		return 0, e

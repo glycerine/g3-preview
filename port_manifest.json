@@ -50778,7 +50778,9 @@
         "pkg/math/polynomial/upolynomial_extended_gcd_identity_test.go",
         "pkg/math/polynomial/upolynomial_display_assertions_test.go",
         "pkg/math/polynomial/upolynomial_zero_roots_assertions.go",
-        "pkg/math/polynomial/upolynomial_zero_roots_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_zero_roots_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_root_upper_assertions.go",
+        "pkg/math/polynomial/upolynomial_root_upper_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51036,7 +51038,10 @@
         "TestUPolynomialZeroRootsAssertionActions",
         "TestUPolynomialZeroRootsClosedAssertionBeforeRead",
         "TestUPolynomialZeroRootsValidAssertionProfiles",
-        "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard"
+        "TestUPolynomialSquareFreeManagerResetBeforePolynomialGuard",
+        "TestUPolynomialRootUpperEntryAssertionActions",
+        "TestUPolynomialRootUpperOrderingAssertionActions",
+        "TestUPolynomialRootUpperClosedEntryAndErasedOrdering"
       ],
       "conditionals": [
         {
@@ -51625,6 +51630,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Cauchy root-upper-bound entry and final-order assertion actions (upolynomial.cpp:1913-1914,1950)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_root_bounds.go",
+            "pkg/math/polynomial/upolynomial_root_upper_assertions.go",
+            "pkg/math/polynomial/upolynomial_root_upper_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialRootUpperEntryAssertionActions",
+            "TestUPolynomialRootUpperOrderingAssertionActions",
+            "TestUPolynomialRootUpperClosedEntryAndErasedOrdering"
+          ],
+          "notes": "Nonempty and nonzero-leading predicates have separate runtime gates/debugger actions before scoped NUM construction; final ordering gates LessEqual after the actual smaller-bound swap. Public Reserve creates a genuine zero leading slot. Throw preserves caller99 without a scalar invocation; zero-leading Continue/disabled/release publish first bound3 before actual second-bound numerical failure. Raw-count-zero Continue reads the second assertion before NUM declarations, whereas erased/release predicates reach the body read after a real scope invocation; both preserve caller99 and use existing Go guarded bounds adaptation. A qualified direct final-order predicate adapter verifies Throw/Continue without manufacturing invalid Cauchy scratch state. Closed/erased query-only profiles skip predicate operands. Existing independent valid Cauchy and every-reservation-prefix checks remain separate numerical/lifetime evidence. Wider source-unit auditing remains partial."
+        },
         {
           "name": "Zero-root query/removal nonempty and traversal assertion actions (upolynomial.h:589; upolynomial.cpp:1275,1284)",
           "status": "ported",
