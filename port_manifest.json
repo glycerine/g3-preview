@@ -50772,7 +50772,9 @@
         "pkg/math/polynomial/upolynomial_gcd_alias_assertions_test.go",
         "pkg/math/polynomial/upolynomial_subresultant_assertions.go",
         "pkg/math/polynomial/upolynomial_subresultant_assertions_test.go",
-        "pkg/math/polynomial/upolynomial_square_free_power_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_square_free_power_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_extended_gcd_assertions.go",
+        "pkg/math/polynomial/upolynomial_extended_gcd_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51018,7 +51020,11 @@
         "TestUPolynomialSubresultantDegreeGapAssertionProfiles",
         "TestUPolynomialSquareFreeAliasAssertionActions",
         "TestUPolynomialZeroPowerAssertionActions",
-        "TestUPolynomialSquareFreePowerClosedAssertionBeforeWrites"
+        "TestUPolynomialSquareFreePowerClosedAssertionBeforeWrites",
+        "TestUPolynomialExtendedGCDEntryAliasActions",
+        "TestUPolynomialExtendedGCDEntrySeparateAliases",
+        "TestUPolynomialExtendedGCDFieldAssertionActions",
+        "TestUPolynomialExtendedGCDClosedEntryGate"
       ],
       "conditionals": [
         {
@@ -51607,6 +51613,22 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Extended-GCD six separate alias assertions and field assertion actions (upolynomial.cpp:1047-1050)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_gcd_extended.go",
+            "pkg/math/polynomial/upolynomial_extended_gcd_assertions.go",
+            "pkg/math/polynomial/upolynomial_extended_gcd_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialExtendedGCDEntryAliasActions",
+            "TestUPolynomialExtendedGCDEntrySeparateAliases",
+            "TestUPolynomialExtendedGCDFieldAssertionActions",
+            "TestUPolynomialExtendedGCDClosedEntryGate"
+          ],
+          "notes": "Each A/U,V,D then B/U,V,D alias predicate has its own runtime gate and actual debugger action, followed by separately gated field(). All precede six lexical vector declarations and U initialization. Public Throw covers each actual registered input/output alias and preserves caller outputs; a first-Continue/second-Throw profile proves ordering. Qualified entry-only adapters verify alias Continue/disabled/release without claiming valid Bezout results after invalid source aliasing. Public constant integer continuation computes U=0,V=1,D=1; zero polynomial U is represented by an empty coefficient vector. Closed process debug state stops nonalias valid inputs before output writes. Actual failure actions borrow/release the receiving numeric owner. DEBUG identity assertion and broader extended-GCD diagnostic/lifetime audits remain partial."
+        },
         {
           "name": "Square-free alias and zero-exponent power assertion runtime actions (upolynomial.cpp:963,995)",
           "status": "ported",

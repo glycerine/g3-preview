@@ -36,17 +36,8 @@ func (m *UPolynomialManager) extendedGCDWithCaller(a, b UPolynomialView, u, v, d
 			return ErrUPolynomialOwner
 		}
 	}
-	if polynomialSourceDebug {
-		if m.alias(a, u) || m.alias(a, v) || m.alias(a, d) || m.alias(b, u) || m.alias(b, v) || m.alias(b, d) {
-			return ErrUPolynomialAssertion
-		}
-		field, e := m.modular.Field()
-		if e != nil {
-			return e
-		}
-		if !field {
-			return ErrUPolynomialAssertion
-		}
+	if e := m.extendedGCDEntryAssertions(a, b, u, v, d); e != nil {
+		return e
 	}
 	var locals [6]upolyVectorState
 	v1, v3, q, r, t, v1q := &locals[0], &locals[1], &locals[2], &locals[3], &locals[4], &locals[5]
