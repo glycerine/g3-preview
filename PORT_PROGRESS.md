@@ -44585,3 +44585,30 @@ AST wrapper integration.
 Checked/debug/trace RationalService/NumericBorrow selection passed (2.771s).
 portcheck passed with unchanged counts (2103 units,677 APIs;208 ported,343 partial,
 1495 unported,11 dead/deleted). git diff --check passed before commit.
+
+Cache/hash retained-consumer audit found two source-order gaps. Hash used the
+whole Info decoder, reading refcount and ID before size, while cpp 2475-2480
+reads only size and returns 31 immediately for zero. Hash now reads the actual
+size word, takes that early return, otherwise executes lexical sort and reads
+size again for composite hashing. Raw-prefix query tests leave refcount unreadable
+in both branches; zero also leaves flags unreadable. The nonzero fixture runs
+actual lexical sorting and matches the hash of the genuine owning polynomial.
+
+mk_unique inserted its bucket only after the owning reference-vector push;
+cpp 145-148 inserts into the table first, then pushes the reference and finally
+publishes the cached-ID flag. Moved Go bucket publication before the reference
+push. A qualified raw-prefix fixture supplies ID/zero size and leaves refcount
+unreadable, so the actual guarded INC read stops after table publication. The
+entry remains present without an acquired reference or cached ID; retry hits
+that table entry without attempting INC again. This is guarded access-order
+evidence, not an ordinary C++ INC allocation failure. Every query restores the
+genuine owning record before destruction; no source-construction flags or fake
+ownership metadata are introduced.
+
+Both new regressions failed before correction. Hash/cache tests then passed
+ordinary 0.032s and checked/debug/trace 0.066s; the final checked selection also
+including LexSort and nonzero unreadable-refcount coverage passed 0.079s. All
+commands used CPUs 8-16. Full polynomial then AST remains active, with source
+units still partial; no full repeat after the recent 93.929s ordinary suite.
+Final rebuilt ordinary Hash/Cache/LexSort selection passed (0.032s). portcheck
+and git diff --check passed; whole-unit status counts remain unchanged.

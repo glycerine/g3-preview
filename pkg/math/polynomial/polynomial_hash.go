@@ -9,17 +9,21 @@ func (m *MultivariatePolynomialManager) Hash(p Polynomial) (uint32, error) {
 	if e := m.ready(); e != nil {
 		return 0, e
 	}
-	info, e := m.core.Info(p)
+	size, e := m.core.readWord(p, 8)
 	if e != nil {
 		return 0, e
 	}
-	if info.Size == 0 {
+	if size == 0 {
 		return 31, nil
 	}
 	if e = m.LexSort(p); e != nil {
 		return 0, e
 	}
-	children := make([]uint32, info.Size)
+	size, e = m.core.readWord(p, 8)
+	if e != nil {
+		return 0, e
+	}
+	children := make([]uint32, size)
 	for i := range children {
 		mono, e := m.core.monomialCore(p, uint32(i))
 		if e != nil {
@@ -39,5 +43,5 @@ func (m *MultivariatePolynomialManager) Hash(p Polynomial) (uint32, error) {
 		}
 		children[i] = uhash.UintPair(mi.Hash, valueHash)
 	}
-	return uhash.Composite(17, info.Size, func(i uint32) uint32 { return children[i] }), nil
+	return uhash.Composite(17, size, func(i uint32) uint32 { return children[i] }), nil
 }

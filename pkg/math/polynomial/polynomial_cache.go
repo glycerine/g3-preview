@@ -365,10 +365,12 @@ func (c *PolynomialCache) mkUnique(p Polynomial) (Polynomial, error) {
 			return old, nil
 		}
 	}
+	// cpp145-148 publishes insert_if_not_there before the owning reference
+	// push. A stopped INC leaves that table entry but no cached ID/reference.
+	c.buckets[h] = append(c.buckets[h], p)
 	if e := c.refs.push(c.manager.core, p); e != nil {
 		return Polynomial{}, e
 	}
-	c.buckets[h] = append(c.buckets[h], p)
 	c.ids[id] = true
 	return p, nil
 }

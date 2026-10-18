@@ -42881,6 +42881,20 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Hash size-first scalar access and zero early return without reference-count reads (polynomial.cpp:2475-2480)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_hash.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_cache_publication_test.go"
+          ],
+          "tests": [
+            "TestPolynomialHashZeroReadsOnlySize",
+            "TestPolynomialHashNonzeroDoesNotReadReferenceCount",
+            "TestPolynomialHashCacheKeysAndLexicalOrder"
+          ],
+          "notes": "Hash reads the source size word directly, returns31 for zero without touching refcount/ID/lexical flags, and otherwise runs lexical sorting then reads size for composite hashing. Removed the unrelated whole Info header decode. Query-only raw-prefix fixtures leave refcount uninitialized in both branches; zero also leaves flags uninitialized. The nonzero fixture executes actual lexical sorting over borrowed genuine terms and matches the normal hash. Genuine owning records are restored before any destruction; no constructor completion or ownership is fabricated. Whole polynomial-manager completion is not implied."
+        },
+        {
           "name": "polynomial.cpp:1633,1676 factors push_back/set_degree project SASSERT runtime switch and debugger actions",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factors_assertions.go",
@@ -47067,6 +47081,20 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Hash size-first scalar access and zero early return without reference-count reads (polynomial.cpp:2475-2480)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_hash.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_cache_publication_test.go"
+          ],
+          "tests": [
+            "TestPolynomialHashZeroReadsOnlySize",
+            "TestPolynomialHashNonzeroDoesNotReadReferenceCount",
+            "TestPolynomialHashCacheKeysAndLexicalOrder"
+          ],
+          "notes": "Hash reads the source size word directly, returns31 for zero without touching refcount/ID/lexical flags, and otherwise runs lexical sorting then reads size for composite hashing. Removed the unrelated whole Info header decode. Query-only raw-prefix fixtures leave refcount uninitialized in both branches; zero also leaves flags uninitialized. The nonzero fixture executes actual lexical sorting over borrowed genuine terms and matches the normal hash. Genuine owning records are restored before any destruction; no constructor completion or ownership is fabricated. Whole polynomial-manager completion is not implied."
+        },
+        {
           "name": "polynomial.cpp:1633,1676 factors push_back/set_degree project SASSERT runtime switch and debugger actions",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factors_assertions.go",
@@ -49255,6 +49283,21 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "mk_unique table insertion precedes owning-reference push and cached-ID publication (polynomial_cache.cpp:141-149)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_cache_publication_test.go",
+            "pkg/math/polynomial/polynomial_hash.go"
+          ],
+          "tests": [
+            "TestPolynomialCacheTablePublicationPrecedesReferenceAcquisition",
+            "TestPolynomialCacheCanonicalizationAndReset",
+            "TestPolynomialCacheKnownIDReadsOnlyIDField"
+          ],
+          "notes": "A new hash bucket entry is now published before the owning reference vector push, matching insert_if_not_there followed by push_back and the final m_in_cache update. A query-only raw header has readable ID/zero size but an unreadable refcount: hashing completes, INC reaches the real uninitialized-read guard, and the inserted table entry survives without an owning reference or cached ID. Retry hits that entry without replaying INC. The genuine owning record is restored before teardown; the test is a qualified guarded-prefix access fixture rather than a claim of an ordinary C++ INC allocation failure. Other cache ownership paths and retained NLSAT integration remain separately partial."
+        },
+        {
           "name": "Stopped accepted factor-callee cleanup retains constructed cache-local source destructor obligation; continuation attempts it once before class abort, and borrowed manager reports exact callee source cause",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_cache.go",
@@ -49419,6 +49462,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "mk_unique table insertion precedes owning-reference push and cached-ID publication (polynomial_cache.cpp:141-149)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_cache_publication_test.go",
+            "pkg/math/polynomial/polynomial_hash.go"
+          ],
+          "tests": [
+            "TestPolynomialCacheTablePublicationPrecedesReferenceAcquisition",
+            "TestPolynomialCacheCanonicalizationAndReset",
+            "TestPolynomialCacheKnownIDReadsOnlyIDField"
+          ],
+          "notes": "A new hash bucket entry is now published before the owning reference vector push, matching insert_if_not_there followed by push_back and the final m_in_cache update. A query-only raw header has readable ID/zero size but an unreadable refcount: hashing completes, INC reaches the real uninitialized-read guard, and the inserted table entry survives without an owning reference or cached ID. Retry hits that entry without replaying INC. The genuine owning record is restored before teardown; the test is a qualified guarded-prefix access fixture rather than a claim of an ordinary C++ INC allocation failure. Other cache ownership paths and retained NLSAT integration remain separately partial."
+        },
         {
           "name": "Cache miss result-array publication before element canonicalization; factor cache completed before local factors destruction (polynomial_cache.cpp:164-173,192-201)",
           "status": "ported",
