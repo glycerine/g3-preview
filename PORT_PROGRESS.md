@@ -45853,3 +45853,12 @@ The direct failed set-size invariant action uses genuinely reserved zero backing
 
 Focused storage action tests pass ordinary (0.005s) and checked/debug/trace (0.008s). Broader factorization/frontend/modular-GCD/Euclidean/CRA/storage/closed-state/warm checks pass checked/debug/trace (31.432s); manifest validation passes. All commands stay on CPUs8–16. Wider polynomial source-lifetime/completion audits remain open, followed by AST. The next periodic native run will be recorded only against its exact committed state/process.
 Final broader ordinary affected checks pass (19.065s).
+
+### Primitive/content entry and positive-content runtime assertion actions
+
+Ported upolynomial.cpp:214,216 with separate runtime gates before content calculation and after actual content GCD publication. Failed actions borrow the actual receiving numeric owner and use real debugger Throw/Continue. Disabled/release erases predicates. Empty-input T preserves caller content77; CT publishes content0 then Throws at positivity; CC continues through both and returns empty primitive output. Nonempty all-zero input is constructed through actual public Reserve, with Continue skipping division for zero coefficients and trimming the result. No numerical values or construction counters are rewritten.
+
+Enabled/disabled nonzero oracle [-6,0,12] gives content6 and primitive [-1,0,2]. Closed runtime stops valid input before content/output mutation. Focused tests pass ordinary (0.006s) and checked/debug/trace (0.014s). Broader factorization/frontend/GCD/Euclidean/CRA/content/storage/closed-state checks pass checked/debug/trace (29.959s); manifest validation passes. All execution stays on CPUs8–16. Wider polynomial failure/source-lifetime completion audits remain open, followed by AST.
+
+Periodic native process9825 remains confirmed live, logging to /mnt/oldrog/tmp/g3-storage-actions-native-full.log; its polynomial package passed93.098s. The run began at4b51ff8f but the shared worktree was subsequently edited for this content increment, so its overall results must not be attributed to one exact commit. Focused checks above validate this increment. Future periodic runs should use a separate fixed checkout if port edits continue concurrently. No new full suite was started.
+Final broader ordinary affected checks pass (18.888s).

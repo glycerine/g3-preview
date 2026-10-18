@@ -67,19 +67,31 @@ func (m *UPolynomialManager) primitiveState(v UPolynomialView, pp *upolyVectorSt
 	return m.primitiveStateWithSourceContext(v, pp, cont, integerAllocationInvocationContext{})
 }
 func (m *UPolynomialManager) primitiveStateWithSourceContext(v UPolynomialView, pp *upolyVectorState, cont *unumeral.Int, context integerAllocationInvocationContext) error {
-	if polynomialSourceDebug && v.count == 0 {
-		return ErrUPolynomialAssertion
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled && v.count == 0 {
+		if e := m.scalarDivisionAssertionFailure(214, "f_sz > 0"); e != nil {
+			return e
+		}
 	}
 	if e := m.gcdSpanWithSourceContext(v, cont, context); e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
+	enabled, e = refinementSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled {
 		positive, e := m.modular.IsPos(cont)
 		if e != nil {
 			return e
 		}
 		if !positive {
-			return ErrUPolynomialAssertion
+			if e := m.scalarDivisionAssertionFailure(216, "m().is_pos(cont)"); e != nil {
+				return e
+			}
 		}
 	}
 	one, e := m.modular.IsOne(cont)

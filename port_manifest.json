@@ -50798,7 +50798,8 @@
         "pkg/math/polynomial/upolynomial_euclid_display_trace.go",
         "pkg/math/polynomial/upolynomial_euclid_display_trace_test.go",
         "pkg/math/polynomial/upolynomial_factor_assertion_actions_test.go",
-        "pkg/math/polynomial/upolynomial_storage_assertion_actions_test.go"
+        "pkg/math/polynomial/upolynomial_storage_assertion_actions_test.go",
+        "pkg/math/polynomial/upolynomial_content_assertion_actions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51094,7 +51095,10 @@
         "TestUPolynomialFactorsZeroMultiplicityAndUnsignedCounterQuirks",
         "TestUPolynomialSelfCopyAssertionActions",
         "TestUPolynomialSetSizeAssertionActions",
-        "TestUPolynomialStorageClosedAssertionGate"
+        "TestUPolynomialStorageClosedAssertionGate",
+        "TestUPolynomialPrimitiveContentAssertionActions",
+        "TestUPolynomialPrimitiveContentNonzeroOracle",
+        "TestUPolynomialPrimitiveContentClosedGate"
       ],
       "conditionals": [
         {
@@ -51683,6 +51687,20 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Primitive/content entry and positive-content runtime assertions (upolynomial.cpp:214,216)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_content.go",
+            "pkg/math/polynomial/upolynomial_content_assertion_actions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialPrimitiveContentAssertionActions",
+            "TestUPolynomialPrimitiveContentNonzeroOracle",
+            "TestUPolynomialPrimitiveContentClosedGate"
+          ],
+          "notes": "Separate runtime assertion gates preserve source order before content calculation and after actual GCD publication. Actual debugger T/CT/CC and disabled profiles verify empty-input content77 preserved on entry Throw, content0 published before second Throw, and Continue through both producing empty primitive output. Nonempty all-zero input is reached via real public Reserve; Continue skips division for zero coefficients and trims the output, without invalid numerical repair. Nonzero oracle [-6,0,12] -> content6 and [-1,0,2] enabled/disabled. Closed runtime stops before content/output mutation. Wider numerical/source lifetime audits remain partial."
+        },
         {
           "name": "Coefficient set-size/self-copy runtime assertion actions (upolynomial.cpp:177,194)",
           "status": "ported",
