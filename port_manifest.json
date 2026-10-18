@@ -50799,7 +50799,8 @@
         "pkg/math/polynomial/upolynomial_euclid_display_trace_test.go",
         "pkg/math/polynomial/upolynomial_factor_assertion_actions_test.go",
         "pkg/math/polynomial/upolynomial_storage_assertion_actions_test.go",
-        "pkg/math/polynomial/upolynomial_content_assertion_actions_test.go"
+        "pkg/math/polynomial/upolynomial_content_assertion_actions_test.go",
+        "pkg/math/polynomial/upolynomial_basic_alias_assertion_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51098,7 +51099,9 @@
         "TestUPolynomialStorageClosedAssertionGate",
         "TestUPolynomialPrimitiveContentAssertionActions",
         "TestUPolynomialPrimitiveContentNonzeroOracle",
-        "TestUPolynomialPrimitiveContentClosedGate"
+        "TestUPolynomialPrimitiveContentClosedGate",
+        "TestUPolynomialBasicAliasAssertionActions",
+        "TestUPolynomialBasicAliasClosedGate"
       ],
       "conditionals": [
         {
@@ -51687,6 +51690,19 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Negation/addition/subtraction core alias runtime assertions (upolynomial.cpp:243,259-260,284-285)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_ops.go",
+            "pkg/math/polynomial/upolynomial_basic_alias_assertion_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialBasicAliasAssertionActions",
+            "TestUPolynomialBasicAliasClosedGate"
+          ],
+          "notes": "Separate runtime gates and actual debugger Throw/Continue before basic-buffer reservation/mutation. Genuine public Neg swap places an earlier captured view backing in the real private basic buffer; no synthetic state/constructed counters. Negation and each add/sub input alias are tested with T/C/CT/CC/disabled; both-input CT reaches second Throw, CC evaluates literal in-place arithmetic (double coefficients/add and zero/sub). Closed runtime stops valid nonalias operations before basic/output mutation. Disabled/release erases predicates. Wider source arithmetic/lifetime audits remain partial."
+        },
         {
           "name": "Primitive/content entry and positive-content runtime assertions (upolynomial.cpp:214,216)",
           "status": "ported",

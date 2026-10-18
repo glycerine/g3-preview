@@ -45862,3 +45862,12 @@ Enabled/disabled nonzero oracle [-6,0,12] gives content6 and primitive [-1,0,2].
 
 Periodic native process9825 remains confirmed live, logging to /mnt/oldrog/tmp/g3-storage-actions-native-full.log; its polynomial package passed93.098s. The run began at4b51ff8f but the shared worktree was subsequently edited for this content increment, so its overall results must not be attributed to one exact commit. Focused checks above validate this increment. Future periodic runs should use a separate fixed checkout if port edits continue concurrently. No new full suite was started.
 Final broader ordinary affected checks pass (18.888s).
+
+### Negation/addition/subtraction core alias source actions
+
+Ported upolynomial.cpp:243,259-260,284-285 with separate runtime gates and actual debugger Throw/Continue before shared basic-buffer reservation/mutation. Negation has its single check; add/sub resolve first and second aliases separately. Failed actions borrow the actual receiving manager. Disabled/release profiles erase predicate evaluation.
+
+A genuine public Neg swaps an earlier output backing into the real private basic buffer while a previously issued view remains bound to that backing. Tests use this actual retained alias, not fabricated scratch/state/counters, for negation, each add/sub input and both inputs. T preserves output and private coefficients. CT on both aliases reaches the second Throw; two Continues compute literal in-place results, including doubled coefficients for add and zero/empty polynomial for sub. Ordinary valid numerical results are independently specified. Closed runtime stops nonalias calls before basic/output mutation.
+
+Focused checks pass ordinary (0.008s) and checked/debug/trace (0.024s). Broader factorization/frontend/GCD/Euclidean/CRA/content/storage/closed-state/ordinary and finite arithmetic/multiplication action checks pass ordinary (18.145s) and checked/debug/trace (29.847s); manifest validation passes. All commands stay on CPUs8–16. Wider source arithmetic/failure/lifetime completion audits remain open for polynomial, followed by AST. Native process9825 remains confirmed live, unchanged log/scope caveat recorded above; no second native run was started.
+Final checked alias checks pass (0.024s), including private-buffer preservation on Throw.

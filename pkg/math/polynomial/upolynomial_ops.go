@@ -115,8 +115,14 @@ func (m *UPolynomialManager) NegView(v UPolynomialView, out UPolynomial) error {
 		return e
 	}
 	s := &m.basic
-	if polynomialSourceDebug && m.alias(v, s) {
-		return ErrUPolynomialAssertion
+	enabled, e := refinementSourceAssertionsEnabled()
+	if e != nil {
+		return e
+	}
+	if enabled && m.alias(v, s) {
+		if e := m.scalarDivisionAssertionFailure(243, "!is_alias(p, buffer)"); e != nil {
+			return e
+		}
 	}
 	if e = m.reserve(s, v.count); e != nil {
 		return e
@@ -160,8 +166,8 @@ func (m *UPolynomialManager) addSubStateWithSourceContext(a, b UPolynomialView, 
 
 	var e error
 	s := &m.basic
-	if polynomialSourceDebug && (m.alias(a, s) || m.alias(b, s)) {
-		return ErrUPolynomialAssertion
+	if e := m.addSubAliasAssertions(a, b, s, sub); e != nil {
+		return e
 	}
 	lo, hi := a.count, b.count
 	if lo > hi {
@@ -628,6 +634,31 @@ func (m *UPolynomialManager) mulScalarViewWithSourceContext(v UPolynomialView, b
 		}
 		if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Mul(a, b, a); e != nil {
 			return e
+		}
+	}
+	return nil
+}
+
+// Source: upolynomial.cpp:259-260,284-285. Resolve each runtime action before
+// reserving/mutating the shared basic buffer.
+func (m *UPolynomialManager) addSubAliasAssertions(a, b UPolynomialView, s *upolyVectorState, sub bool) error {
+	line := int32(259)
+	if sub {
+		line = 284
+	}
+	for i, v := range [2]UPolynomialView{a, b} {
+		enabled, e := refinementSourceAssertionsEnabled()
+		if e != nil {
+			return e
+		}
+		if enabled && m.alias(v, s) {
+			expression := "!is_alias(p1, buffer)"
+			if i == 1 {
+				expression = "!is_alias(p2, buffer)"
+			}
+			if e := m.scalarDivisionAssertionFailure(line+int32(i), expression); e != nil {
+				return e
+			}
 		}
 	}
 	return nil
