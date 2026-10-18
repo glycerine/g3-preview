@@ -177932,6 +177932,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/util/numeral/rational_service_rational_source.go",
+        "pkg/util/numeral/rational_service_rational_source_test.go",
         "pkg/util/numeral/inf_scalar_projection_test.go",
         "pkg/util/numeral/rational_32_getter_assertion_source_test.go",
         "pkg/util/numeral/rational_num_bits_assertion_source_test.go",
@@ -177995,6 +177997,9 @@
         "pkg/util/lp/solver_expression_exact_test.go"
       ],
       "tests": [
+        "TestRationalServiceRawRationalConstructorEveryReservation",
+        "TestRationalServiceRawRationalConstructorReturningTransportProtectsSource",
+        "TestRationalServiceRawRationalConstructorSameOwner",
         "TestRational32GetterSourceAssertionActions",
         "TestRationalNumBitsSourceAssertionActions",
         "TestRationalModHatSourceAssertionActions",
@@ -178239,6 +178244,23 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "rational.h:52 rational(mpq const&) explicit raw owner constructor for algebraic_numbers.cpp:346",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/rational_service_rational_source.go",
+          "go_targets": [
+            "pkg/util/numeral/rational_service_rational_source.go",
+            "pkg/util/numeral/rational_service_rational_source_test.go"
+          ],
+          "tests": [
+            "TestRationalServiceRawRationalConstructorEveryReservation",
+            "TestRationalServiceRawRationalConstructorReturningTransportProtectsSource",
+            "TestRationalServiceRawRationalConstructorSameOwner"
+          ],
+          "notes": [
+            "Copies NUM then DEN through the existing concrete integer copy engine with the actual invocation allocation context. Preserves unreduced representation and negative denominator; constructor failure retains only its reached lexical prefix. Returned values and borrowed sources remain independently owned. Actual returning allocation transport refuses source rational/integer destruction and invocation cleanup. This is a prerequisite for the still-unported global-rational algebraic conversion overload, not completion of that overload."
+          ]
+        },
         {
           "name": "is_unsigned/get_unsigned inclusive UINT_MAX projection through explicit manager",
           "status": "ported",
