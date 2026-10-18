@@ -420,6 +420,10 @@ func (c *upolyHenselCallerScope) finishCallerNumeral(initial bool) error {
 	if c.sourceCause != nil {
 		return c.sourceCause
 	}
+	if e := c.owner.traceSourceBlocker(); e != nil {
+		c.sourceCause = e
+		return e
+	}
 	if e := c.numericSourceCause(); e != nil {
 		c.sourceCause = e
 		return e

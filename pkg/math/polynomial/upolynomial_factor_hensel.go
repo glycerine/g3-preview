@@ -512,6 +512,9 @@ func (s *UPolynomialFactorizationService) henselFactorsWithCaller(f UPolynomialV
 	if err = zpe.modular.WithAllocationContext((numericIntegerModularManager_henselCallerAllocationContext(zpe.modular, caller)).utility(zpe.modular.Integers())).SetZP(p); err != nil {
 		return err
 	}
+	if err = s.traceHenselFactors(caller, f, pf, lf, false); err != nil {
+		return err
+	}
 	var locals [4]upolyVectorState
 	A, B, C, parts := &locals[0], &locals[1], &locals[2], &locals[3]
 	if caller == nil {
@@ -637,6 +640,9 @@ func (s *UPolynomialFactorizationService) henselFactorsWithCaller(f UPolynomialV
 		return err
 	}
 	if err = lf.pushSwap(m, B, 1); err != nil {
+		return err
+	}
+	if err = s.traceHenselFactors(caller, f, pf, lf, true); err != nil {
 		return err
 	}
 	if polynomialSourceDebug && s.config.FactorizationDebugTag {

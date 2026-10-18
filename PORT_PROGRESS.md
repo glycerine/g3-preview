@@ -45131,3 +45131,31 @@ and donor cores: all four records appear, real callback guards hold and three
 lifted factors return with no retained adapter (checked/debug/trace0.021s).
 Commands remain on CPUs8-16. portcheck and diff checks pass; source-unit counts
 remain211 ported,340 partial,1495 unported,11 dead/deleted (2103 units,677 APIs).
+
+2026-10-18: whole Hensel entry/exit traces and final inverse frontier
+
+Implemented factorization.cpp:886-888 and960-962, preserving the source's
+hansel spelling and actual input, prime factors and lifted factors. Entry
+follows lifted-modulus setup and precedes the four outer vectors. Exit follows
+final factor publication and precedes the final Hensel check and inverse
+numeral destruction. Exact accepted polynomial/factor display receipts and
+actual root/prime/lift callback borrows cover each complete record, including
+source endl and sticky-stream operand evaluation.
+
+The older final inverse's deferred destruction now checks the exact retained
+trace child first. Actual descriptor-after-physical failure tests prove both
+boundaries: entry has no constructed outer vectors, while exit retains four
+vectors, the constructed/unended final inverse and two already-published
+lifted factors. Issued enclosing receipts report the exact cleanup blocker;
+physical graph auditing and explicit child-first cleanup pass. No source
+construction flags, quotas or numerical scratch are repaired by these tests.
+Independent public-core coverage now checks both records as well as A/C/B and
+post-quadratic output. Disabled records skip absent caller/view/factor operands.
+Focused checked/debug/trace checks pass0.058s.
+
+Earlier factorization helpers, verbose output and broader source-unit method/
+ownership audits remain open. Whole polynomial and then AST remain unfinished.
+No full native repeat this soon after the recent successful run.
+Broader factor/Hensel/recombination/degree/display checks pass ordinary16.825s
+and checked/debug/trace28.238s on CPUs8-16. portcheck and diff checks pass:
+2103 units,677 APIs;211 ported,340 partial,1495 unported,11 dead/deleted.

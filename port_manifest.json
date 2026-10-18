@@ -53232,7 +53232,8 @@
         "TestUPolynomialFactorRecombinationTraceChildRefusalStopsOlderLocals",
         "TestUPolynomialFactorHenselLiftTraceSeparateTagAndOwners",
         "TestUPolynomialFactorHenselTraceChildRefusalStopsOuterVectors",
-        "TestUPolynomialFactorHenselVectorTraceIndependentPublicCores"
+        "TestUPolynomialFactorHenselVectorTraceIndependentPublicCores",
+        "TestUPolynomialFactorHenselBoundaryTraceExactChildren"
       ],
       "conditionals": [
         {
@@ -53346,6 +53347,24 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Whole Hensel entry and exit bughunt TRACE records (886-888,960-962), including final inverse destruction frontier",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_hensel_trace.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_hensel.go",
+            "pkg/math/polynomial/upolynomial_hensel_caller_scope.go",
+            "pkg/math/polynomial/upolynomial_factor_hensel_trace_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorDegreeTraceRetainedRecordsAndOwners",
+            "TestUPolynomialFactorHenselBoundaryTraceExactChildren",
+            "TestUPolynomialFactorHenselVectorTraceIndependentPublicCores",
+            "TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands",
+            "TestUPolynomialFactorDegreeTraceStreamFailureStillComputesDisplays"
+          ],
+          "notes": "Prints actual input, prime factors and (at exit) lifted factors with source hansel spelling. Entry follows actual lifted-modulus setup and precedes all four outer vectors; exit follows final factor publication and precedes final check_hensel_lift and inverse-numeral destruction. Exact polynomial and factor-display receipts retain unfinished numerical children; finishCallerNumeral now stops on that exact child before retiring the older final inverse. Actual descriptor-after-physical refusal tests prove entry has no constructed outer vector, while exit preserves four vectors, final inverse and two already-published lifted factors. Whole-record actual-manager borrows, source endl and sticky-stream computations remain intact. Disabled records skip absent caller/view/factors. Independent public-core tests cover both complete records. Earlier helper, verbose and broader source-unit audits remain open; no whole-unit completion credit."
+        },
+        {
           "name": "Whole Hensel A/C/B and post-quadratic-lift TRACE records (906-908,921-923,927-929,935-939)",
           "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_hensel_trace.go",
@@ -53361,7 +53380,7 @@
             "TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands",
             "TestUPolynomialFactorHenselVectorTraceIndependentPublicCores"
           ],
-          "notes": "Prints actual A, C and B at their source loop positions through the integer core, including modular coefficient vectors. The post-quadratic record separately gates polynomial::factorization, formats the actual lifted modulus and both actual vectors after the individual-lift assertion and before publishing a factor. Exact accepted polynomial-display ownership participates in Hensel child-cause checks before older vectors are destroyed; whole-record borrows use actual root/prime/lift managers even for independent public Hensel consumers. Actual descriptor-after-physical refusal retains four outer vectors with no lifted factor published. Disabled tags skip absent caller operands. The x^2+3*x+2 source fixture verifies lifted modulus16 and A=x+2,B=x+1. Entry/exit Hensel records at886/960 and broader helper/source-unit audits remain open; no whole-unit completion credit."
+          "notes": "Prints actual A, C and B at their source loop positions through the integer core, including modular coefficient vectors. The post-quadratic record separately gates polynomial::factorization, formats the actual lifted modulus and both actual vectors after the individual-lift assertion and before publishing a factor. Exact accepted polynomial-display ownership participates in Hensel child-cause checks before older vectors are destroyed; whole-record borrows use actual root/prime/lift managers even for independent public Hensel consumers. Actual descriptor-after-physical refusal retains four outer vectors with no lifted factor published. Disabled tags skip absent caller operands. The x^2+3*x+2 source fixture verifies lifted modulus16 and A=x+2,B=x+1. Entry/exit Hensel records at886/960 are now implemented separately; broader helper/source-unit audits remain open; no whole-unit completion credit."
         },
         {
           "name": "Whole pre-division, division-result and post-publication recombination bughunt TRACE records (1239-1242,1246-1250,1274-1278)",

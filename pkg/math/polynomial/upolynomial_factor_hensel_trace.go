@@ -68,3 +68,50 @@ func (s *UPolynomialFactorizationService) traceHenselVectors(caller *upolyHensel
 		})
 	return computation
 }
+
+// Source: factorization.cpp:886-888,960-962. Keep the source's "hansel"
+// spelling. The exit record precedes the final inverse numeral's destructor.
+func (s *UPolynomialFactorizationService) traceHenselFactors(caller *upolyHenselCallerScope, f UPolynomialView, pf, lf *UPolynomialFactors, exit bool) error {
+	tags := s.manager.modular.BorrowTraceTags()
+	if !tags.ShouldTrace("polynomial::factorization::bughunt") {
+		return nil
+	}
+	if caller == nil || !caller.matches() {
+		return ErrUPolynomialOwner
+	}
+	c := caller.owner
+	if e := c.traceBorrow.bindManagers([3]*UPolynomialManager{s.manager, caller.prime, caller.lift}, tags); e != nil {
+		return e
+	}
+	defer c.traceBorrow.unbind()
+	line := 886
+	if exit {
+		line = 960
+	}
+	var computation error
+	_ = tags.EmitConditional("polynomial::factorization::bughunt", "hensel_lift", "src/math/polynomial/upolynomial_factorization.cpp", line,
+		func() bool { return true }, func(raw io.Writer) error {
+			out := factorizationTraceWriter{raw}
+			_ = linearWriteText(out, "polynomial::hansel_lift(")
+			if e := s.manager.displayIntoWithReceipt(f, factorizationTraceStream{out}, "x", false, &c.tracePolynomial); e != nil {
+				computation = e
+				return e
+			}
+			_ = linearWriteText(out, ", ")
+			if e := pf.displayIntoWithReceipt(factorizationTraceStream{out}, &c.trace); e != nil {
+				computation = e
+				return e
+			}
+			if exit {
+				_ = linearWriteText(out, ") => ")
+				if e := lf.displayIntoWithReceipt(factorizationTraceStream{out}, &c.trace); e != nil {
+					computation = e
+					return e
+				}
+			} else {
+				_ = linearWriteText(out, ")")
+			}
+			return diagnostic.WriteTraceEndl(out)
+		})
+	return computation
+}

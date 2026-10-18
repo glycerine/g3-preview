@@ -42,7 +42,7 @@ func TestUPolynomialFactorHenselVectorTraceIndependentPublicCores(t *testing.T) 
 	t.Cleanup(func() { serviceMust(t, m.modular.BindTrace(nil)) })
 	serviceMust(t, s.HenselLiftFactors(f, pf, 16, lf))
 	if tags.ShouldTrace("polynomial::factorization") {
-		for _, record := range []string{":906 ", ":921 ", ":927 ", ":935 "} {
+		for _, record := range []string{":886 ", ":960 ", ":906 ", ":921 ", ":927 ", ":935 "} {
 			if !strings.Contains(w.seen.String(), record) {
 				t.Fatal("missing independent-core source record", record)
 			}
