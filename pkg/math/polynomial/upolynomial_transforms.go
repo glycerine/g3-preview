@@ -306,10 +306,7 @@ func (m *UPolynomialManager) ComposeBinaryXViewInPlace(v UPolynomialView, b *unu
 			return e
 		}
 	}
-	if polynomialSourceDebug && ki != 0 {
-		return ErrUPolynomialAssertion
-	}
-	return nil
+	return m.binaryCompositionExponentAssertion(ki)
 }
 func (m *UPolynomialManager) ComposeRationalXViewInPlace(v UPolynomialView, q *unumeral.Rational) error {
 	if e := m.check(); e != nil {
@@ -412,6 +409,9 @@ func (m *UPolynomialManager) ReciprocalViewInPlace(v UPolynomialView) error {
 		return nil
 	}
 	i, j := uint32(0), v.count-1
+	if e := m.reciprocalIndexAssertion(j); e != nil {
+		return e
+	}
 	for {
 		a, e := m.read(v, i)
 		if e != nil {

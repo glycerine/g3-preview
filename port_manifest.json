@@ -50782,7 +50782,9 @@
         "pkg/math/polynomial/upolynomial_root_upper_assertions.go",
         "pkg/math/polynomial/upolynomial_root_upper_assertions_test.go",
         "pkg/math/polynomial/upolynomial_nonzero_bound_assertions_test.go",
-        "pkg/math/polynomial/upolynomial_remove_one_half_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_remove_one_half_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_transform_assertions.go",
+        "pkg/math/polynomial/upolynomial_transform_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51048,7 +51050,10 @@
         "TestUPolynomialNonzeroBoundAssertionProfiles",
         "TestUPolynomialRemoveOneHalfRootAssertionActions",
         "TestUPolynomialRemoveOneHalfRootClosedAssertionBeforeHorner",
-        "TestUPolynomialRemoveOneHalfRootDisabledPreservesOlderHorner"
+        "TestUPolynomialRemoveOneHalfRootDisabledPreservesOlderHorner",
+        "TestUPolynomialTransformInvariantAssertionActions",
+        "TestUPolynomialTransformAssertionProfiles",
+        "TestUPolynomialReciprocalClosedGateBeforeSwap"
       ],
       "conditionals": [
         {
@@ -51637,6 +51642,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Reciprocal pre-swap and binary-composition final-exponent assertion actions (upolynomial.cpp:1610,1702)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_transforms.go",
+            "pkg/math/polynomial/upolynomial_transform_assertions.go",
+            "pkg/math/polynomial/upolynomial_transform_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialTransformInvariantAssertionActions",
+            "TestUPolynomialTransformAssertionProfiles",
+            "TestUPolynomialReciprocalClosedGateBeforeSwap"
+          ],
+          "notes": "Adds the missing reciprocal positive-index runtime assertion before coefficient reads/swaps and replaces the final binary-composition exponent fixed error with runtime gating/actual debugger actions. Failed actions borrow the receiving numeric owner. Qualified direct invariant adapters verify Throw/Continue/disabled/release without modifying numerical scratch; these failed counters are not reachable from valid transforms and are not claimed as algorithm failure profiles. Actual coefficient oracles verify reciprocal [1,2,3] -> [3,2,1] followed by 4*p(x/2) -> [12,4,1] in enabled/disabled builds. Closed runtime service stops a valid reciprocal before the first swap, while constant reciprocal/composition early returns remain before runtime predicates and operand reads. Broader transform diagnostics and lifetime/source-unit audits remain partial."
+        },
         {
           "name": "Remove-one-half-root numerical assertion runtime erasure and debugger actions (upolynomial.cpp:1325)",
           "status": "ported",
