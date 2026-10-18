@@ -53195,7 +53195,8 @@
         "pkg/math/polynomial/upolynomial_berlekamp_scoped_numeral.go",
         "pkg/math/polynomial/upolynomial_berlekamp_scoped_numeral_test.go",
         "pkg/math/polynomial/upolynomial_berlekamp_numeric.go",
-        "pkg/math/polynomial/upolynomial_berlekamp_numeric_test.go"
+        "pkg/math/polynomial/upolynomial_berlekamp_numeric_test.go",
+        "pkg/math/polynomial/upolynomial_berlekamp_entry_trace_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53357,7 +53358,10 @@
         "TestUPolynomialBerlekampScopedNumeralDestructorRefusal",
         "TestUPolynomialBerlekampConstructorActualNumericReservationPrefixes",
         "TestUPolynomialBerlekampNumericCleanupPreservesIndependentGCD",
-        "TestUPolynomialBerlekampActualNumericTransportProtectsCaller"
+        "TestUPolynomialBerlekampActualNumericTransportProtectsCaller",
+        "TestUPolynomialBerlekampEntryTraceBeforeMonicAssertion",
+        "TestUPolynomialBerlekampPublicEntryTraceRetainsExactDisplay",
+        "TestUPolynomialBerlekampPublicEntryTraceStickyStreamFailure"
       ],
       "conditionals": [
         {
@@ -53470,6 +53474,22 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Public finite-field Berlekamp entry TRACE before monic assertion and matrix construction (upolynomial_factorization.cpp:414)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_berlekamp_display.go",
+            "pkg/math/polynomial/upolynomial_factor_field.go",
+            "pkg/math/polynomial/upolynomial_berlekamp_entry_trace_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialBerlekampEntryTraceBeforeMonicAssertion",
+            "TestUPolynomialBerlekampPublicEntryTraceRetainsExactDisplay",
+            "TestUPolynomialBerlekampMatrixTraceRetainedFactorizationConsumer",
+            "TestUPolynomialBerlekampPublicEntryTraceStickyStreamFailure"
+          ],
+          "notes": "The exact polynomial::factorization record displays the actual input and extracted prime before the line415 monic predicate. The Go receipt holder owns no C++ matrix member or scoped numeral before class construction. The existing constructor trace uses the same concrete formatter with its own source tag/caption/location. Whole-record borrowing blocks callback core destruction, owning matrix cleanup and caller-factor destruction. A real monic Throw observes the entry text with no constructor record or factor publication. An actual BIG display descriptor refusal in a qualified integer-mode source prefix retains the exact display through the public call; the pending matrix receipt holder still has no pivots, coefficient backing, constructor NUM or completed source class. Exact owning cleanup reclaims the accepted display without inventing construction. A valid finite-field public irreducible case checks entry text, matrix records and unchanged product. Outcome/splitting traces and broader factorization audits remain open. A physically refused trace stream performs one host write, still reaches source endl, and preserves the public irreducible result and product."
+        },
         {
           "name": "Concrete Berlekamp constructor/diagonalization scalar allocation caller and accepted child receipts (upolynomial_factorization.cpp:125-139,176-189)",
           "status": "ported",

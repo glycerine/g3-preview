@@ -75,8 +75,21 @@ func (q *upolyBerlekampMatrix) traceMatrix(line int) error {
 // Source: factorization.cpp:97. Pivot members already exist, but neither
 // the first matrix coefficient nor the constructor's scoped tmp exists yet.
 func (q *upolyBerlekampMatrix) traceConstructor(f UPolynomialView, p uint32) error {
+	return q.tracePolynomialEntry(f, p, 97)
+}
+
+// Source: factorization.cpp:414 precedes the monic assertion and class
+// construction. The Go receipt holder has acquired no C++ matrix members.
+func (q *upolyBerlekampMatrix) traceFactorEntry(f UPolynomialView, p uint32) error {
+	return q.tracePolynomialEntry(f, p, 414)
+}
+func (q *upolyBerlekampMatrix) tracePolynomialEntry(f UPolynomialView, p uint32, line int) error {
+	tag, name, caption := "polynomial::factorization::bughunt", "berlekamp_matrix", "polynomial::berlekamp_matrix("
+	if line == 414 {
+		tag, name, caption = "polynomial::factorization", "zp_factor_square_free_berlekamp", "upolynomial::factor_square_free_berlekamp("
+	}
 	tags := q.m.modular.BorrowTraceTags()
-	if !tags.ShouldTrace("polynomial::factorization::bughunt") {
+	if !tags.ShouldTrace(tag) {
 		return nil
 	}
 	if q.displaying {
@@ -89,10 +102,10 @@ func (q *upolyBerlekampMatrix) traceConstructor(f UPolynomialView, p uint32) err
 	}
 	defer q.traceBorrow.unbind()
 	var computation error
-	_ = tags.EmitConditional("polynomial::factorization::bughunt", "berlekamp_matrix", "src/math/polynomial/upolynomial_factorization.cpp", 97,
+	_ = tags.EmitConditional(tag, name, "src/math/polynomial/upolynomial_factorization.cpp", line,
 		func() bool { return true }, func(raw io.Writer) error {
 			out := factorizationTraceWriter{raw}
-			_ = linearWriteText(out, "polynomial::berlekamp_matrix(")
+			_ = linearWriteText(out, caption)
 			var issued upolyDisplayInvocationReceipt
 			e := q.m.displayIntoWithReceipt(f, factorizationTraceStream{out}, "x", false, &issued)
 			if q.m.matchesDisplayReceipt(&issued) {

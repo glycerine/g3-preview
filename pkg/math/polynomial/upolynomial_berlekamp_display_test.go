@@ -166,6 +166,7 @@ func TestUPolynomialBerlekampMatrixTraceRetainedFactorizationConsumer(t *testing
 	var text strings.Builder
 	tags := diagnostic.NewTraceTagsWithWriter(&text)
 	tags.Enable("polynomial::factorization::bughunt")
+	tags.Enable("polynomial::factorization")
 	serviceMust(t, m.modular.BindTrace(tags))
 	t.Cleanup(func() { serviceMust(t, m.modular.BindTrace(nil)) })
 	ok, e := m.FactorZPSquareFreeBerlekamp(mustUPolyView(t, m, f), fs, false)
@@ -174,7 +175,7 @@ func TestUPolynomialBerlekampMatrixTraceRetainedFactorizationConsumer(t *testing
 		t.Fatal("irreducible source case reported a nontrivial split")
 	}
 	if tags.ShouldTrace("polynomial::factorization::bughunt") {
-		if !strings.Contains(text.String(), ":142 ") || !strings.Contains(text.String(), ":198 ") {
+		if !strings.Contains(text.String(), ":414 ") || !strings.Contains(text.String(), "upolynomial::factor_square_free_berlekamp(x^2 + 1, 3)\n") || !strings.Contains(text.String(), ":142 ") || !strings.Contains(text.String(), ":198 ") {
 			t.Fatal("retained consumer omitted matrix records", text.String())
 		}
 	} else if text.Len() != 0 {

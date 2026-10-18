@@ -486,6 +486,17 @@ func (m *UPolynomialManager) factorZPBerlekamp(f UPolynomialView, fs *UPolynomia
 	if e != nil {
 		return false, e
 	}
+	var matrix upolyBerlekampMatrix
+	matrix.m = m
+	defer func() {
+		matrix.close()
+		if m.pendingBerlekamp == &matrix {
+			cause = errors.Join(cause, matrix.closeCause, ErrUPolynomialCleanupPending)
+		}
+	}()
+	if e = matrix.traceFactorEntry(f, p); e != nil {
+		return false, e
+	}
 	enabled, e = factorHeaderAssertionsEnabled()
 	if e != nil {
 		return false, e
@@ -505,14 +516,6 @@ func (m *UPolynomialManager) factorZPBerlekamp(f UPolynomialView, fs *UPolynomia
 			}
 		}
 	}
-	var matrix upolyBerlekampMatrix
-	matrix.m = m
-	defer func() {
-		matrix.close()
-		if m.pendingBerlekamp == &matrix {
-			cause = errors.Join(cause, matrix.closeCause, ErrUPolynomialCleanupPending)
-		}
-	}()
 	if e = matrix.init(m, f); e != nil {
 		return false, e
 	}
