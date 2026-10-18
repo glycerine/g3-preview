@@ -189,14 +189,14 @@ func (q *upolySturmIsolationScope) isolate(v UPolynomialView, neg, pos uint32, b
 	if plus >= minus {
 		return nil
 	}
-	two := unumeral.NewBinaryInt(2)
-	if e = b.Power(&two, neg, lower); e != nil {
+	ops := b.WithAllocationContext(q.context().utility(m.config.Integer))
+	if e = ops.PowerOfTwo(neg, lower, &q.copy); e != nil {
 		return e
 	}
-	if e = b.Neg(lower); e != nil {
+	if e = ops.Neg(lower); e != nil {
 		return e
 	}
-	if e = b.Power(&two, pos, upper); e != nil {
+	if e = ops.PowerOfTwo(pos, upper, &q.copy); e != nil {
 		return e
 	}
 	zero := unumeral.NewBinaryInt(0)
@@ -225,10 +225,10 @@ func (q *upolySturmIsolationScope) isolate(v UPolynomialView, neg, pos uint32, b
 		if e = refinementSourceAssert(minus > plus+1, 2452, "lower_sv > upper_sv + 1"); e != nil {
 			return e
 		}
-		if e = b.Add(lower, upper, mid); e != nil {
+		if e = ops.AddSub(lower, upper, mid, false); e != nil {
 			return e
 		}
-		if e = b.Div2(mid); e != nil {
+		if e = ops.Div2(mid); e != nil {
 			return e
 		}
 		midSV, e := q.sequence.signVariationsBinary(mid)

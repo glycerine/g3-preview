@@ -181,6 +181,7 @@ func (s *UPolynomialSequence) beginSturm() (*upolySequenceSturmScope, error) {
 	}
 	*q = upolySequenceSturmScope{owner: s, invocation: q.invocation + 1, active: true, executing: true}
 	q.hooks.Policy = q
+	q.hooks.Generation = q.invocation
 	if e := q.bindNumericOwners(); e != nil {
 		q.executing = false
 		q.active = false

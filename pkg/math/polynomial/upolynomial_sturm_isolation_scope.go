@@ -7,6 +7,9 @@ import (
 )
 
 type upolySturmIsolationScope struct {
+	hooks                             unumeral.NumericInvocationHooks
+	numeric                           unumeral.NumericAllocationRoots
+	raw                               []unumeral.IntegerRawInvocationReceipt
 	knuth                             upolyKnuthInvocationReceipt
 	prepareNormalize                  unumeral.IntegerNormalizeInvocationReceipt
 	prepared                          upolyVectorState
@@ -59,6 +62,8 @@ func (m *UPolynomialManager) beginSturmIsolation(v UPolynomialView, b *unumeral.
 	// The embedded source object's address is reused; retired numeric tuples
 	// must retain a distinct generation across enclosing isolation invocations.
 	q.sequence.sturm.invocation = sequenceInvocation
+	q.hooks.Policy = q
+	q.hooks.Generation = q.invocation
 	if e := q.bind(); e != nil {
 		q.active = false
 		q.executing = false
@@ -72,9 +77,12 @@ func (q *upolySturmIsolationScope) pending() bool {
 			return true
 		}
 	}
-	return q.knuthPending() || q.owner.modular.MatchesPNormalizeInvocation(&q.prepareNormalize) || q.preparedLive || q.sequence.sturm.active || q.sequence.evaluationPending() || q.owner.matchesBinaryEvaluationReceipt(&q.endpoint) && q.owner.binaryEvaluation.active || q.owner.config.Integer.MatchesCopyAllocationInvocation(&q.copy)
+	return q.numericPending() || q.knuthPending() || q.owner.modular.MatchesPNormalizeInvocation(&q.prepareNormalize) || q.preparedLive || q.sequence.sturm.active || q.sequence.evaluationPending() || q.owner.matchesBinaryEvaluationReceipt(&q.endpoint) && q.owner.binaryEvaluation.active || q.owner.config.Integer.MatchesCopyAllocationInvocation(&q.copy)
 }
 func (q *upolySturmIsolationScope) sourceChild() error {
+	if e := q.numericSourceCause(); e != nil {
+		return e
+	}
 	if q.knuth == q.owner.knuthReceipt() && q.owner.knuth.sourceCause != nil {
 		return q.owner.knuth.sourceCause
 	}
@@ -221,6 +229,9 @@ func (m *UPolynomialManager) CleanupSturmIsolation() (cause error) {
 	}
 	defer func() { cause = errors.Join(cause, q.unbind()) }()
 	z := m.config.Integer
+	if e := q.cleanupNumeric(false); e != nil {
+		return e
+	}
 	if e := m.cleanupBinaryEvaluationWithReceipt(&q.endpoint, false); e != nil {
 		return e
 	}
@@ -295,6 +306,9 @@ func (m *UPolynomialManager) CleanupSturmIsolation() (cause error) {
 		return e
 	}
 	if e := m.cleanupKnuthWithReceipt(&q.knuth, true); e != nil {
+		return e
+	}
+	if e := q.cleanupNumeric(true); e != nil {
 		return e
 	}
 	q.active = false

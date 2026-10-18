@@ -12,10 +12,12 @@ import (
 // and generation before returning ownership of allocation prefixes.
 
 type NumericInvocationHooks struct {
-	Policy  NumericCallerPolicy
-	Roots   func(*IntegerManager, *NumericAllocationRoots) *NumericAllocationRoots
-	Prepare func(*IntegerManager, string) error
-	Record  func(*IntegerManager, string, NumericInvocationReceipt)
+	// Generation distinguishes reused caller storage when a caller opts in.
+	Generation uint64
+	Policy     NumericCallerPolicy
+	Roots      func(*IntegerManager, *NumericAllocationRoots) *NumericAllocationRoots
+	Prepare    func(*IntegerManager, string) error
+	Record     func(*IntegerManager, string, NumericInvocationReceipt)
 
 	ScalarRaw   func(*IntegerManager, string) (*IntegerScalarRawScope, error)
 	Normalize   func(*IntegerModularManager, Int) (Int, error)
@@ -38,9 +40,16 @@ type IntegerScalarRawScope = integerScalarRawScope
 
 func (c integerAllocationInvocationContext) WithCaller(h *NumericInvocationHooks) integerAllocationInvocationContext {
 	c.Caller = h
+	c.callerGeneration = 0
+	if h != nil {
+		c.callerGeneration = h.Generation
+	}
 	return c
 }
 func (c integerAllocationInvocationContext) roots(m *IntegerManager) *NumericAllocationRoots {
+	if !c.callerCurrent() {
+		return nil
+	}
 	r := c.localRoots(m)
 	if c.hasLocalInvocation() && r == nil {
 		return nil
@@ -61,12 +70,18 @@ func (c integerAllocationInvocationContext) hasLocalInvocation() bool {
 	return c.rationalService != nil || c.mpfRationalSet != nil || c.mpfFormattedSet != nil || c.mpfInput != nil || c.mpfConversion != nil || c.mpfFormat != nil || c.mpfPower != nil || c.mpfRound != nil || c.mpfRoundSqrt != nil || c.BoolDivides != nil || c.raw != nil || c.pn != nil || c.addMul != nil || c.perfectSquare != nil
 }
 func (c integerAllocationInvocationContext) prepareCaller(m *IntegerManager, phase string) error {
+	if !c.callerCurrent() {
+		return ErrNumericCallerOwner
+	}
 	if c.Caller != nil {
 		return c.Caller.callPrepare(m, phase)
 	}
 	return nil
 }
 func (c integerAllocationInvocationContext) recordCaller(m *IntegerManager, event string, r NumericInvocationReceipt) {
+	if !c.callerCurrent() {
+		return
+	}
 	if c.Caller != nil && r.Raw != nil && r.Raw.Frame != nil {
 		r.Raw.Frame.caller = c.Caller
 	}
@@ -158,4 +173,8 @@ func (c *NumericCharacterCaller) prepare() error {
 		return c.PrepareStorage()
 	}
 	return nil
+}
+
+func (c integerAllocationInvocationContext) callerCurrent() bool {
+	return c.Caller == nil || c.callerGeneration == c.Caller.Generation
 }

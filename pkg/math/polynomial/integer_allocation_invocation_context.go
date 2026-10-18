@@ -12,12 +12,14 @@ import (
 // creates no source numeral, reservation, or ambient callback owner hook.
 
 type integerAllocationInvocationContext struct {
-	sequenceSturm           *upolySequenceSturmScope
-	sequenceSturmInvocation uint64
-	rootID                  *upolyRootIDScope
-	rootIDInvocation        uint64
-	knuth                   *upolyKnuthScope
-	knuthInvocation         uint64
+	sturmIsolation           *upolySturmIsolationScope
+	sturmIsolationInvocation uint64
+	sequenceSturm            *upolySequenceSturmScope
+	sequenceSturmInvocation  uint64
+	rootID                   *upolyRootIDScope
+	rootIDInvocation         uint64
+	knuth                    *upolyKnuthScope
+	knuthInvocation          uint64
 
 	rootUpperBound              *upolyRootUpperBoundScope
 	removeOneHalfRoot           *upolyRemoveOneHalfRootScope

@@ -486,3 +486,24 @@ func (o NumericBinaryRationalOperations) LessIntegerWithCopyAllocationReceipt(a 
 	}
 	return o.manager.compareIntegerWithAllocationContext(a, b, false, o.context, receipt)
 }
+
+// PowerOfTwo is the retained mpbq power(mpbq(2), p, out) specialization.
+// It preserves Copy then PowerInPlace, including exponent/assertion order.
+func (o NumericBinaryRationalOperations) PowerOfTwo(p uint32, out *BinaryRational, receipt *IntegerCopyAllocationReceipt) error {
+	if e := o.valid(); e != nil {
+		return e
+	}
+	m := o.manager
+	two := NewBinaryInt(2)
+	if e := m.copyWithAllocationReceipt(out, &two, receipt); e != nil {
+		return e
+	}
+	if e := m.check(out); e != nil {
+		return e
+	}
+	if e := m.debugAssert(uint64(out.KField)*uint64(p) <= uint64(^uint32(0))); e != nil {
+		return e
+	}
+	out.KField *= p
+	return m.Z.powerWithAllocationContext(&out.Num, p, &out.Num, nil, o.context)
+}
