@@ -351,6 +351,95 @@ func TestPolynomialCacheFactorTemporaryStoppedDeletion(t *testing.T) {
 	}
 }
 
+func TestPolynomialCacheFailedFactorRunsConstructedLocalDestructor(t *testing.T) {
+	m := polynomialPSCFullFixture(t)
+	c, e := NewPolynomialCache(m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, c.Close()) })
+	out, e := NewPolynomialRefVector(m.core)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, out.Close()) })
+	p := polynomialQueryTerms(t, m.core, []int32{1, 2, 1}, [][]MonomialPower{nil, {{0, 1}}, {{0, 2}}})
+	stop := errors.New("stop actual cache factor body")
+	var local *PolynomialFactors
+	m.core.config.Cooperation = func() error {
+		if local == nil && m.matchesFactorCore(&c.factorCall) && c.factorCall.frame.executing {
+			local = c.factorCall.frame.target
+			return stop
+		}
+		return nil
+	}
+	body := c.Factor(p, out)
+	m.core.config.Cooperation = func() error { return nil }
+	if local == nil || !errors.Is(body, stop) {
+		t.Fatal("actual factor body stop not reached", body)
+	}
+	if !local.constructed || !local.closed || !local.sourceStarted || local.sourceStage != 4 || local.sourceCause != nil {
+		t.Fatal("failed factor call bypassed completed local destructor", local.sourceStarted, local.sourceStage, local.sourceCause)
+	}
+	if c.pendingFactors != nil {
+		t.Fatal("completed local destructor retained pending owner")
+	}
+	entry := c.factors[p]
+	if entry == nil || entry.complete || len(entry.result) != 0 {
+		t.Fatal("failed body changed source empty cache entry")
+	}
+	invocation := m.factorCoreInvocation
+	serviceMust(t, c.Factor(p, out))
+	if m.factorCoreInvocation != invocation {
+		t.Fatal("empty hit recomputed failed body")
+	}
+	serviceMust(t, out.Close())
+	serviceMust(t, c.Close())
+	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, nil, 0, nil)
+}
+
+func TestPolynomialCacheFailedFactorRetainsDestructorStop(t *testing.T) {
+	m := polynomialPSCFullFixture(t)
+	c, e := NewPolynomialCache(m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, c.Close()) })
+	out, e := NewPolynomialRefVector(m.core)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, out.Close()) })
+	p := polynomialQueryTerms(t, m.core, []int32{-1, 1}, [][]MonomialPower{nil, {{0, 2}}})
+	bodyStop, destructorStop := errors.New("factor callee source stop"), errors.New("cache local destructor stop")
+	var local *PolynomialFactors
+	bodyReached, destructorReached := false, false
+	handler, e := NewPolynomialDeletionHandler(m.originalBudget, func(_ *PolynomialDeletionHandler, _ *MultivariatePolynomialCore, _ Polynomial) error {
+		if m.matchesFactorCore(&c.factorCall) {
+			frame := c.factorCall.frame
+			if !bodyReached && frame.finishing && len(frame.target.factors) > 0 {
+				local = frame.target
+				bodyReached = true
+				return bodyStop
+			}
+		}
+		if local != nil && local.sourceStarted && !destructorReached {
+			destructorReached = true
+			return destructorStop
+		}
+		return nil
+	})
+	serviceMust(t, e)
+	serviceMust(t, m.core.AddDeletionHandler(handler))
+	t.Cleanup(func() { serviceMust(t, m.core.RemoveDeletionHandler(handler)); serviceMust(t, handler.CloseChecked()) })
+	body := c.Factor(p, out)
+	if !bodyReached || !destructorReached || !errors.Is(body, bodyStop) || !errors.Is(body, destructorStop) {
+		t.Fatal("actual failed-body and local-destructor stop pair not reached", bodyReached, destructorReached, body)
+	}
+	if c.pendingFactors != local || !errors.Is(local.sourceCause, destructorStop) || local.closed {
+		t.Fatal("failed local destructor lost its exact owner/cause")
+	}
+	serviceMust(t, c.CleanupFactor())
+	if !local.closed || !errors.Is(local.sourceCause, destructorStop) {
+		t.Fatal("cleanup lost original stopped source history")
+	}
+	serviceMust(t, out.Close())
+	serviceMust(t, c.Close())
+	polynomialImpPhysicalAuditNamedRaw(t, m, []Polynomial{p}, nil, handler.header, nil)
+}
+
 func TestPolynomialCacheConstructorBudgetAndRefusal(t *testing.T) {
 	m := polynomialPSCFullFixture(t)
 	b := m.core.integer.Budget()

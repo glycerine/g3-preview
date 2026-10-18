@@ -148,13 +148,13 @@ func (c *PolynomialCache) finishFactorOwner(fs *PolynomialFactors, body error) e
 			return errors.Join(body, e)
 		}
 	}
-	// A successful body leaves a constructed source local. Run its literal
-	// destructor before releasing the Go owner; CloseChecked alone is owning
-	// abort and deliberately does not execute factors::reset/member DT.
-	if body == nil {
+	// A completed constructor grants the local its source destructor even
+	// when the body fails. A refused constructor grants no class destructor.
+	// CloseChecked alone is owning abort and omits reset/member DT.
+	if fs.constructed {
 		if e := fs.SourceFinalize(); e != nil {
 			c.pendingFactors = fs
-			return e
+			return errors.Join(body, e)
 		}
 	}
 	if e := fs.CloseChecked(); e != nil {

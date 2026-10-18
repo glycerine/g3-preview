@@ -48526,6 +48526,8 @@
         "pkg/math/polynomial/polynomial_cache_pending_psc_test.go"
       ],
       "tests": [
+        "TestPolynomialCacheFailedFactorRunsConstructedLocalDestructor",
+        "TestPolynomialCacheFailedFactorRetainsDestructorStop",
         "TestPolynomialCacheCanonicalizationAndReset",
         "TestPolynomialCacheImpMemoryWrapperLifecycleAndResetRefusal",
         "TestPolynomialCacheConstructorBudgetAndRefusal",
@@ -48543,6 +48545,16 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Constructed cache factor local runs literal destructor after failed body once accepted callee cleanup completes; failed constructor grants no class destructor; body and destructor errors are both retained (polynomial_cache.cpp:187-202, polynomial.cpp:1617-1630)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_cache.go",
+          "tests": [
+            "TestPolynomialCacheFailedFactorRunsConstructedLocalDestructor",
+            "TestPolynomialCacheFailedFactorRetainsDestructorStop",
+            "TestPolynomialCacheFactorConstructorRefusalRetainsInsertedKey"
+          ]
+        },
         {
           "name": "Successful cache factor miss runs literal local factors destructor (reset then numeral/member destruction) after complete array publication; stopped source decrement retains exact local prefix for explicit owning abort (polynomial_cache.cpp:187-202, polynomial.cpp:1617-1630)",
           "status": "ported",
