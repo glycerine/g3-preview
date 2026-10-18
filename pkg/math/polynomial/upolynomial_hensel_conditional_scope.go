@@ -23,6 +23,10 @@ func (c *upolyHenselCallerScope) finishConditionalSource() error {
 	previous := c.sourceExecuting
 	c.sourceExecuting = true
 	defer func() { c.sourceExecuting = previous }()
+	if e := c.owner.traceSourceBlocker(); e != nil {
+		c.sourceCause = e
+		return e
+	}
 	if e := c.finishIndividualSource(); e != nil {
 		return e
 	}

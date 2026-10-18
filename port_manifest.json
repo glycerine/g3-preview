@@ -53115,7 +53115,8 @@
         "pkg/math/polynomial/upolynomial_factor_hensel_trace_test.go",
         "pkg/math/polynomial/upolynomial_hensel_pair_trace.go",
         "pkg/math/polynomial/upolynomial_hensel_pair_trace_test.go",
-        "pkg/math/polynomial/upolynomial_hensel_quadratic_failure_trace_test.go"
+        "pkg/math/polynomial/upolynomial_hensel_quadratic_failure_trace_test.go",
+        "pkg/math/polynomial/upolynomial_hensel_product_failure_trace_test.go"
       ],
       "tests": [
         "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
@@ -53243,7 +53244,10 @@
         "TestUPolynomialFactorHenselQuadraticEntryTraceBeforeRelatedCore",
         "TestUPolynomialHenselQuadraticFailureTraceBranchesAndModularOwner",
         "TestUPolynomialHenselQuadraticFailureTraceExactBIGChild",
-        "TestUPolynomialHenselQuadraticFailureTraceStreamFailure"
+        "TestUPolynomialHenselQuadraticFailureTraceStreamFailure",
+        "TestUPolynomialHenselProductFailureTraceSourceBranches",
+        "TestUPolynomialHenselProductFailureTraceExactBIGChildren",
+        "TestUPolynomialHenselProductFailureTraceStreamFailure"
       ],
       "conditionals": [
         {
@@ -53356,6 +53360,23 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Whole failed prime/lifted Hensel product TRACE records with power/vector lifetime frontier (826-833,848-855)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_hensel_trace.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_hensel_debug.go",
+            "pkg/math/polynomial/upolynomial_hensel_conditional_scope.go",
+            "pkg/math/polynomial/upolynomial_hensel_product_failure_trace_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialHenselProductFailureTraceSourceBranches",
+            "TestUPolynomialHenselProductFailureTraceExactBIGChildren",
+            "TestUPolynomialHenselProductFailureTraceStreamFailure",
+            "TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands"
+          ],
+          "notes": "Emits actual f,factor collection,modulus,computed product and reduced f only at the reached prime or lifted product mismatch. Uses integer-core vector display and the actual prime/lift factor owner, preserving source labels, ordering and endl. Whole-record actual-owner borrows and exact polynomial/factor-display receipts stop conditional source cleanup before older checker vectors and computed power. Tests cover prime mismatch, lifted mismatch, silent insufficient bound/count mismatch/success, exact full diagnostic bodies, callbacks, and actual descriptor-after-physical refusals with respectively two/four checker vectors plus live computed power. Caller-owned factors/cores are explicitly supplied to the physical graph audit; the charged direct caller adapter claims zero constructed C++ parent locals. Stream refusal still computes three root displays and both factor displays while sticky badbit suppresses physical body writes/flushes. Disabled records skip absent operands. Other diagnostics, verbose output and broader source-unit audits remain open; no whole-unit completion credit."
+        },
         {
           "name": "Whole failure-only check_quadratic_hensel TRACE with modular-display child before checker vectors (688-698)",
           "status": "ported",

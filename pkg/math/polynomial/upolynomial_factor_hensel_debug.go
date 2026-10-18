@@ -215,8 +215,14 @@ func (s *UPolynomialFactorizationService) checkHenselFactorsWithCaller(f UPolyno
 		return false, err
 	}
 	same, err := m.EqualViews(m.stateView(multp), m.stateView(fp))
-	if err != nil || !same {
+	if err != nil {
 		return false, err
+	}
+	if !same {
+		if err = s.traceHenselProductFailure(caller, f, pf, p, false); err != nil {
+			return false, err
+		}
+		return false, nil
 	}
 	if lf.count != pf.count {
 		return false, nil
@@ -244,5 +250,14 @@ func (s *UPolynomialFactorizationService) checkHenselFactorsWithCaller(f UPolyno
 	if err = zpe.scalarWithCaller(multpe, top, caller); err != nil {
 		return false, err
 	}
-	return m.EqualViews(m.stateView(multpe), m.stateView(fpe))
+	same, err = m.EqualViews(m.stateView(multpe), m.stateView(fpe))
+	if err != nil {
+		return false, err
+	}
+	if !same {
+		if err = s.traceHenselProductFailure(caller, f, lf, pe, true); err != nil {
+			return false, err
+		}
+	}
+	return same, nil
 }

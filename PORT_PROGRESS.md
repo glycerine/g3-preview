@@ -45282,3 +45282,36 @@ Final broader focused checks pass ordinary16.791s and checked/debug/trace
 28.629s. Exact full diagnostic-body assertions and refused-stream checks pass
 checked/debug/trace0.007s. portcheck and diff checks pass;2103 units,677 APIs,
 211 ported,340 partial,1495 unported,11 dead/deleted. Commands stay on CPUs8-16.
+
+2026-10-18: whole failed prime/lifted Hensel product diagnostics
+
+Implemented factorization.cpp:826-833 and848-855 only at the actual reached
+prime/lifted product mismatch. Both whole records use actual f, factor owner,
+modulus, product and reduced f, with integer-core vector displays and source
+labels/order/endl. Actual owner borrows and accepted polynomial/factor-display
+receipts cover the complete record. Conditional source cleanup now stops at
+that exact display child before older checker vectors and computed power.
+
+Independent inputs verify exact full records for mismatches modulo5 and25,
+and silent earlier exits for insufficient modulus/count mismatch plus a silent
+successful identity. Callback probes protect actual core/factor owners. Real
+descriptor-after-physical refusals in prime/lifted factor display retain two/four
+checker vectors respectively and the live computed power. Physical owner graph
+audits explicitly include the caller-owned factors/cores; the direct checker
+adapter claims zero constructed C++ parent locals. Explicit cleanup acknowledges
+the exact child first. Disabled records skip absent caller/view/factor/modulus.
+
+Stream refusal still computes all three root vector displays and both actual
+factor displays; sticky badbit suppresses physical body writes/flushes, with
+one final host flush. Source false result and normal cleanup remain unchanged.
+Focused checked/debug/trace checks pass0.011s.
+
+The full native run against847864a4 has completed successfully:68 packages pass,
+11 have no tests,zero failures;polynomial97.589s,LP698.994s. This run predates
+the later quadratic-entry/failure-diagnostic increments, which have focused
+ordinary/checked/debug/trace verification. Other helper diagnostics, verbose
+output and broader factorization audits remain open; polynomial then AST remain
+unfinished. All commands remain on CPUs8-16.
+Broader focused checks pass ordinary16.707s and checked/debug/trace28.473s,
+CPUs8-16. portcheck and diff checks pass:2103 units,677 APIs;211 ported,
+340 partial,1495 unported,11 dead/deleted. No whole source-unit status changed.

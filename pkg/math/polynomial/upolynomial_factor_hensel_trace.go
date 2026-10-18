@@ -263,3 +263,60 @@ func (s *UPolynomialFactorizationService) traceQuadraticCheckFailure(caller *upo
 		})
 	return computation
 }
+
+// Source: factorization.cpp:826-833 and848-855, only on unequal products.
+func (s *UPolynomialFactorizationService) traceHenselProductFailure(caller *upolyHenselCallerScope, f UPolynomialView, factors *UPolynomialFactors, prime *unumeral.Int, lifted bool) error {
+	tags := s.manager.modular.BorrowTraceTags()
+	if !tags.ShouldTrace("polynomial::factorization::bughunt") {
+		return nil
+	}
+	if caller == nil || !caller.matches() {
+		return ErrUPolynomialOwner
+	}
+	c := caller.owner
+	if e := c.traceBorrow.bindFamily([4]*UPolynomialManager{s.manager, caller.prime, caller.lift, caller.related}, tags); e != nil {
+		return e
+	}
+	defer c.traceBorrow.unbind()
+	line, index, suffix := 826, 0, "zp"
+	if lifted {
+		line, index, suffix = 848, 2, "zpe"
+	}
+	var computation error
+	_ = tags.EmitConditional("polynomial::factorization::bughunt", "check_hensel_lift", "src/math/polynomial/upolynomial_factorization.cpp", line,
+		func() bool { return true }, func(raw io.Writer) error {
+			out := factorizationTraceWriter{raw}
+			_ = linearWriteText(out, "f = ")
+			if e := s.manager.displayIntoWithReceipt(f, factorizationTraceStream{out}, "x", false, &c.tracePolynomial); e != nil {
+				computation = e
+				return e
+			}
+			_ = diagnostic.WriteTraceEndl(out)
+			_ = linearWriteText(out, suffix+"_fs = ")
+			if e := factors.displayIntoWithReceipt(factorizationTraceStream{out}, &c.trace); e != nil {
+				computation = e
+				return e
+			}
+			_ = diagnostic.WriteTraceEndl(out)
+			_ = linearWriteText(out, "sage: R.<x> = Zmod(")
+			p, e := s.manager.modular.String(prime)
+			if e != nil {
+				computation = e
+				return e
+			}
+			_ = linearWriteText(out, p)
+			_ = linearWriteText(out, ")['x']")
+			_ = diagnostic.WriteTraceEndl(out)
+			for i, label := range [2]string{"sage: mult_" + suffix + " = ", "sage: f_" + suffix + " = "} {
+				_ = linearWriteText(out, label)
+				if e := s.manager.displayIntoWithReceipt(s.manager.stateView(&caller.checkVectors[index+i]), factorizationTraceStream{out}, "x", false, &c.tracePolynomial); e != nil {
+					computation = e
+					return e
+				}
+				_ = diagnostic.WriteTraceEndl(out)
+			}
+			_ = linearWriteText(out, "sage: mult_"+suffix+" == f_"+suffix)
+			return diagnostic.WriteTraceEndl(out)
+		})
+	return computation
+}
