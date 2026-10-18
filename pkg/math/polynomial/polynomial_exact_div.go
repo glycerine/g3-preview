@@ -65,6 +65,7 @@ func (r *polynomialDivisionReference) assign(m *MultivariatePolynomialCore, p Mo
 // Both records are actual method locals embedded in the charged core header.
 // Scalar exact_div's numeral is RAW: no source Del on pre-end exceptions.
 type polynomialExactDivisionScope struct {
+	calleeGeneration         uint64
 	invocation               uint64
 	pscOwner                 uint64
 	monomial                 polynomialDivisionReference
@@ -88,6 +89,9 @@ type polynomialExactDivisionScope struct {
 }
 
 func (m *MultivariatePolynomialCore) generatedQuotient(a, b Monomial) (Monomial, bool, error) {
+	return m.generatedQuotientForExactDiv(a, b, nil)
+}
+func (m *MultivariatePolynomialCore) generatedQuotientForExactDiv(a, b Monomial, receipt *polynomialExactDivInvocationReceipt) (Monomial, bool, error) {
 	if m.generatedActive {
 		return Monomial{}, false, ErrPolynomialPending
 	}
@@ -95,6 +99,9 @@ func (m *MultivariatePolynomialCore) generatedQuotient(a, b Monomial) (Monomial,
 	r, ok, e := m.monomials.divideCreated(a, b, &outcome)
 	if e != nil && outcome.started {
 		m.recordGeneratedCallee(outcome)
+		if m.matchesExactDivInvocation(receipt) && receipt.frame.executing {
+			receipt.frame.calleeGeneration = outcome.generation
+		}
 	}
 	if e == nil && outcome.created {
 		m.generatedMonomial = r
@@ -181,7 +188,7 @@ func (m *MultivariatePolynomialCore) exactDivisionCleanupPhase(owning, abort boo
 		pendingNumeric = pendingNumeric || raw.OwnerID() != 0
 	}
 	if s.kind == 1 {
-		pendingNumeric = pendingNumeric || m.exactDivDirectPending(s) || m.matchesArithmeticInvocation(&s.output)
+		pendingNumeric = pendingNumeric || s.calleeGeneration != 0 || m.exactDivDirectPending(s) || m.matchesArithmeticInvocation(&s.output)
 	}
 	if !abort && (s.monomial.assigning || pendingNumeric) {
 		return nil
@@ -194,6 +201,14 @@ func (m *MultivariatePolynomialCore) exactDivisionCleanupPhase(owning, abort boo
 			if e := m.cleanupArithmeticInvocation(&s.output, true); e != nil {
 				return e
 			}
+		}
+		if s.calleeGeneration != 0 {
+			if m.monomials.creation.generation == s.calleeGeneration && m.monomials.creation.parent == m {
+				if e := m.monomials.CleanupCreation(); e != nil {
+					return e
+				}
+			}
+			s.calleeGeneration = 0
 		}
 		if e := s.numeric.cleanup(m.integer); e != nil {
 			return e
@@ -356,7 +371,7 @@ func (m *MultivariatePolynomialCore) exactDivWithReceipt(p, q Polynomial, receip
 		if e != nil {
 			return Polynomial{}, e
 		}
-		quotient, divides, e := m.generatedQuotient(monomialR, monomialQ)
+		quotient, divides, e := m.generatedQuotientForExactDiv(monomialR, monomialQ, &s.directReceipt)
 		if e != nil {
 			return Polynomial{}, e
 		}

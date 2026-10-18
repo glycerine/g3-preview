@@ -47,7 +47,7 @@ func (m *MultivariatePolynomialManager) gcdIntoWithReceipt(u, v Polynomial, r *p
 		if e = r.assign(c, v); e != nil {
 			return e
 		}
-		return m.flipLeadingSign(r)
+		return m.flipLeadingSignWithReceipt(r, &s.directNeg)
 	}
 	zero, e = c.IsZero(v)
 	if e != nil {
@@ -57,13 +57,13 @@ func (m *MultivariatePolynomialManager) gcdIntoWithReceipt(u, v Polynomial, r *p
 		if e = r.assign(c, u); e != nil {
 			return e
 		}
-		return m.flipLeadingSign(r)
+		return m.flipLeadingSignWithReceipt(r, &s.directNeg)
 	}
 	if u == v {
 		if e = r.assign(c, u); e != nil {
 			return e
 		}
-		return m.flipLeadingSign(r)
+		return m.flipLeadingSignWithReceipt(r, &s.directNeg)
 	}
 	constant, e := c.IsConstant(u)
 	if e != nil {
@@ -94,7 +94,7 @@ func (m *MultivariatePolynomialManager) gcdIntoWithReceipt(u, v Polynomial, r *p
 		if e != nil {
 			return e
 		}
-		p, e := c.MkConstantTakeCopy(&s.nums[2])
+		p, e := c.mkConstantTakeCopyWithArithmeticReceipt(&s.nums[2], &s.directConstant)
 		if e != nil {
 			return e
 		}

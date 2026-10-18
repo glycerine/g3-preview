@@ -100,7 +100,7 @@ func (m *MultivariatePolynomialManager) gcdEuclid(u, v Polynomial, r *polynomial
 		if e != nil {
 			return e
 		}
-		result, e := c.MkConstantTakeCopy(&s.nums[2])
+		result, e := c.mkConstantTakeCopyWithArithmeticReceipt(&s.nums[2], &s.directConstant)
 		if e != nil {
 			return e
 		}

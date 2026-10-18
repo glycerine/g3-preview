@@ -25,6 +25,12 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 			if !s.active {
 				continue
 			}
+			if e := c.cleanupArithmeticInvocation(&s.product, false); e != nil {
+				return e
+			}
+			if e := m.cleanupGCDDirectChildren(s, false); e != nil {
+				return e
+			}
 			if e := m.cleanupResultantConcreteChildren(s, false); e != nil {
 				return e
 			}
@@ -108,6 +114,12 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 		s := scopes[j]
 		if !s.active {
 			continue
+		}
+		if e := c.cleanupArithmeticInvocation(&s.product, true); e != nil {
+			return e
+		}
+		if e := m.cleanupGCDDirectChildren(s, true); e != nil {
+			return e
 		}
 		if e := m.cleanupResultantConcreteChildren(s, true); e != nil {
 			return e

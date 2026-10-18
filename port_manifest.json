@@ -40315,7 +40315,9 @@
         "pkg/math/polynomial/polynomial_cache_pending_psc_test.go",
         "pkg/math/polynomial/polynomial_content_independent_scope_test.go",
         "pkg/math/polynomial/polynomial_glex_monic_independent_test.go",
-        "pkg/math/polynomial/polynomial_sparse_independent_scope_test.go"
+        "pkg/math/polynomial/polynomial_sparse_independent_scope_test.go",
+        "pkg/math/polynomial/polynomial_iccp_independent_scope_test.go",
+        "pkg/math/polynomial/polynomial_gcd_direct_children.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -41176,7 +41178,9 @@
         "TestPolynomialGlexMonicCleanupPreservesIndependentLazard",
         "TestPolynomialGlexMonicIndependentLazardReservationPrefixes",
         "TestPolynomialSparseCleanupPreservesIndependentLazard",
-        "TestPolynomialSparseIndependentLazardReservationPrefixes"
+        "TestPolynomialSparseIndependentLazardReservationPrefixes",
+        "TestPolynomialICCPCleanupPreservesIndependentLazard",
+        "TestPolynomialICCPIndependentLazardReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -42433,6 +42437,29 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "ICCP source retirement and owning continuation use exact recursive ICCP/GCD/content/coefficient/negation/division children, preserving an independent stopped Lazard invocation (polynomial.cpp:3432-3534)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_iccp.go",
+          "tests": [
+            "TestPolynomialICCPCleanupPreservesIndependentLazard",
+            "TestPolynomialICCPIndependentLazardReservationPrefixes",
+            "TestPolynomialICCPExpandedFilterEveryActualReservation",
+            "TestPolynomialICCPFirstCoefficientChildPreservesConstructedEmptyCI"
+          ]
+        },
+        {
+          "name": "Reached GCD scalar-product and PRS pseudo-remainder, coefficient, multiplication, division, constant and sign children retain concrete invocation receipts; exact division captures actual failed monomial constructor outcome for owning cleanup",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_direct_children.go",
+          "tests": [
+            "TestPolynomialICCPCleanupPreservesIndependentLazard",
+            "TestPolynomialICCPIndependentLazardReservationPrefixes",
+            "TestPolynomialICCPExpandedFilterEveryActualReservation",
+            "TestPolynomialICCPFirstCoefficientChildPreservesConstructedEmptyCI",
+            "TestPolynomialGCDScalarProductSourceIndependentOrder"
+          ]
+        },
         {
           "name": "Sparse interpolation owns actual mk_polynomial append/factory children and output-reference transfer; source retirement and owning cleanup preserve independent stopped Lazard invocations (polynomial.cpp:3134-3182)",
           "status": "ported",
@@ -45711,7 +45738,9 @@
         "pkg/math/polynomial/algebraic_isolation_multivariate_owner_test.go",
         "pkg/math/polynomial/polynomial_content_independent_scope_test.go",
         "pkg/math/polynomial/polynomial_glex_monic_independent_test.go",
-        "pkg/math/polynomial/polynomial_sparse_independent_scope_test.go"
+        "pkg/math/polynomial/polynomial_sparse_independent_scope_test.go",
+        "pkg/math/polynomial/polynomial_iccp_independent_scope_test.go",
+        "pkg/math/polynomial/polynomial_gcd_direct_children.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -46306,7 +46335,10 @@
         "TestPolynomialGlexMonicCleanupPreservesIndependentLazard",
         "TestPolynomialGlexMonicIndependentLazardReservationPrefixes",
         "TestPolynomialSparseCleanupPreservesIndependentLazard",
-        "TestPolynomialSparseIndependentLazardReservationPrefixes"
+        "TestPolynomialSparseIndependentLazardReservationPrefixes",
+        "TestPolynomialICCPCleanupPreservesIndependentLazard",
+        "TestPolynomialICCPIndependentLazardReservationPrefixes",
+        "TestPolynomialICCPFirstCoefficientChildPreservesConstructedEmptyCI"
       ],
       "conditionals": [
         {
@@ -46335,6 +46367,29 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "ICCP source retirement and owning continuation use exact recursive ICCP/GCD/content/coefficient/negation/division children, preserving an independent stopped Lazard invocation (polynomial.cpp:3432-3534)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_iccp.go",
+          "tests": [
+            "TestPolynomialICCPCleanupPreservesIndependentLazard",
+            "TestPolynomialICCPIndependentLazardReservationPrefixes",
+            "TestPolynomialICCPExpandedFilterEveryActualReservation",
+            "TestPolynomialICCPFirstCoefficientChildPreservesConstructedEmptyCI"
+          ]
+        },
+        {
+          "name": "Reached GCD scalar-product and PRS pseudo-remainder, coefficient, multiplication, division, constant and sign children retain concrete invocation receipts; exact division captures actual failed monomial constructor outcome for owning cleanup",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_direct_children.go",
+          "tests": [
+            "TestPolynomialICCPCleanupPreservesIndependentLazard",
+            "TestPolynomialICCPIndependentLazardReservationPrefixes",
+            "TestPolynomialICCPExpandedFilterEveryActualReservation",
+            "TestPolynomialICCPFirstCoefficientChildPreservesConstructedEmptyCI",
+            "TestPolynomialGCDScalarProductSourceIndependentOrder"
+          ]
+        },
         {
           "name": "Sparse interpolation owns actual mk_polynomial append/factory children and output-reference transfer; source retirement and owning cleanup preserve independent stopped Lazard invocations (polynomial.cpp:3134-3182)",
           "status": "ported",

@@ -15,6 +15,14 @@ import (
 // PRS has nine references and three numerals. The dispatcher instead begins
 // with its two actual sbuffer<power,32> objects.
 type polynomialGCDFunctionScope struct {
+	directArithmetic  polynomialArithmeticInvocationReceipt
+	directConstant    polynomialArithmeticInvocationReceipt
+	directNeg         polynomialNegInvocationReceipt
+	directCoefficient polynomialCoefficientInvocationReceipt
+	directAppend      polynomialCheapAppendInvocationReceipt
+	directFactory     polynomialFactoryInvocationReceipt
+
+	product              polynomialArithmeticInvocationReceipt
 	resultantPseudo      polynomialPseudoDivisionInvocationReceipt
 	resultantPower       polynomialPowerInvocationReceipt
 	resultantArithmetic  polynomialArithmeticInvocationReceipt
@@ -173,6 +181,14 @@ func (m *MultivariatePolynomialManager) gcdYoungerSourceStop(s *polynomialGCDFun
 		s.cleanupCause = s.child.cleanupCause
 		return s.cleanupCause
 	}
+	if e := m.core.arithmeticInvocationSourceCause(&s.product); e != nil {
+		s.cleanupCause = e
+		return e
+	}
+	if e := m.gcdDirectChildSourceCause(s); e != nil {
+		s.cleanupCause = e
+		return e
+	}
 	if e := m.core.contentInvocationSourceCause(&s.contentInvocation); e != nil {
 		s.cleanupCause = e
 		return e
@@ -248,7 +264,8 @@ func (m *MultivariatePolynomialManager) finishGCDLocalsTo(s *polynomialGCDFuncti
 	if frontier != 0 {
 		return nil
 	}
-	pending := (s.child != nil && s.child.active && s.child.invocation == s.childInvocation) || m.matchesICCPInvocation(&s.iccpInvocation) || m.matchesICCPShortcutContent(&s.iccpInvocation) || m.core.matchesContentInvocation(&s.contentInvocation) || s.returned.value != (Polynomial{}) || s.returned.assigning || s.zp.active || s.topOwner && m.core.pscPending()
+	pending := m.gcdDirectChildrenPending(s) || (s.child != nil && s.child.active && s.child.invocation == s.childInvocation) || m.matchesICCPInvocation(&s.iccpInvocation) || m.matchesICCPShortcutContent(&s.iccpInvocation) || m.core.matchesContentInvocation(&s.contentInvocation) || s.returned.value != (Polynomial{}) || s.returned.assigning || s.zp.active || s.topOwner && m.core.pscPending()
+	pending = pending || m.core.matchesArithmeticInvocation(&s.product)
 	pending = pending || m.matchesNormalizeInvocation(&s.normalizeInvocation)
 	pending = pending || (m.matchesDerivativeInvocation(&s.derivativeInvocation) || m.derivativeInvocationHasOrphans(&s.derivativeInvocation)) || m.core.matchesExactDivInvocation(&s.divisionInvocation) || m.core.dividesInvocationPending(&s.dividesInvocation)
 	// Exact division can finish its lexical NUM/reference suffix while its
@@ -269,7 +286,7 @@ func (m *MultivariatePolynomialManager) finishGCDLocalsTo(s *polynomialGCDFuncti
 	}
 	if !pending {
 		h := s.header
-		*s = polynomialGCDFunctionScope{header: h, invocation: s.invocation, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, normalizeInvocation: s.normalizeInvocation, resultantPower: s.resultantPower, resultantPseudo: s.resultantPseudo, resultantArithmetic: s.resultantArithmetic, resultantCoefficient: s.resultantCoefficient, resultantAppend: s.resultantAppend, resultantFactory: s.resultantFactory, resultantNeg: s.resultantNeg}
+		*s = polynomialGCDFunctionScope{header: h, invocation: s.invocation, product: s.product, directArithmetic: s.directArithmetic, directConstant: s.directConstant, directNeg: s.directNeg, directCoefficient: s.directCoefficient, directAppend: s.directAppend, directFactory: s.directFactory, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, normalizeInvocation: s.normalizeInvocation, resultantPower: s.resultantPower, resultantPseudo: s.resultantPseudo, resultantArithmetic: s.resultantArithmetic, resultantCoefficient: s.resultantCoefficient, resultantAppend: s.resultantAppend, resultantFactory: s.resultantFactory, resultantNeg: s.resultantNeg}
 	}
 	return nil
 }

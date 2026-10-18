@@ -129,7 +129,7 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 		if e = s.refs[0].root.assign(c, a); e != nil {
 			return e
 		}
-		a, e = c.ExactDiv(p, s.refs[0].root.value)
+		a, e = c.exactDivWithReceipt(p, s.refs[0].root.value, &s.divisionInvocation)
 		if e != nil {
 			return e
 		}
@@ -139,7 +139,7 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 		if e = m.iccpZPXWithContentReceipt(s.refs[1].root.value, x, ci, content, pp, &s.contentInvocation); e != nil {
 			return e
 		}
-		a, e = c.Mul(s.refs[0].root.value, content.value)
+		a, e = c.mulWithReceipt(s.refs[0].root.value, content.value, &s.directArithmetic)
 		if e != nil {
 			return e
 		}
@@ -343,7 +343,7 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 		if e = content.assign(c, g.value); e != nil {
 			return e
 		}
-		a, e = c.ExactDiv(pp.value, content.value)
+		a, e = c.exactDivWithReceipt(pp.value, content.value, &s.divisionInvocation)
 		if e != nil {
 			return e
 		}

@@ -143,7 +143,7 @@ func TestPolynomialNormalizeInvocationReceiptRejectsReusedFrame(t *testing.T) {
 }
 
 func TestPolynomialICCPExpandedFilterEveryActualReservation(t *testing.T) {
-	success := false
+	success, monomialReceipt := false, false
 	for ordinal := int64(0); ordinal < 128 && !success; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {
 			m := polynomialPSCFullFixture(t)
@@ -165,6 +165,12 @@ func TestPolynomialICCPExpandedFilterEveryActualReservation(t *testing.T) {
 				t.Fatal("actual reservation failure", e)
 			}
 			polynomialImpPhysicalAuditNamed(t, m, []Polynomial{p, content.value, content.incoming, pp.value, pp.incoming}, []*unumeral.Int{&i}, 0)
+			if s := &c.exactDivision; s.calleeGeneration != 0 {
+				monomialReceipt = true
+				if !c.matchesExactDivInvocation(&s.directReceipt) || c.monomials.creation.generation != s.calleeGeneration || c.monomials.creation.parent != c {
+					t.Fatal("exact division lost actual monomial constructor identity")
+				}
+			}
 			c.integer.Budget().FailAfter(-1)
 			serviceMust(t, m.cleanupICCPInvocation(&receipt, false))
 			serviceMust(t, m.cleanupICCPInvocation(&receipt, true))
@@ -178,8 +184,8 @@ func TestPolynomialICCPExpandedFilterEveryActualReservation(t *testing.T) {
 			}
 		})
 	}
-	if !success {
-		t.Fatal("bounded source filter never completed")
+	if !success || !monomialReceipt {
+		t.Fatal("bounded source filter missed completion or actual monomial receipt", success, monomialReceipt)
 	}
 }
 

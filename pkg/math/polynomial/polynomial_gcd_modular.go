@@ -257,7 +257,7 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 		}
 		if constant {
 			m.traceModGCDLiteral(4310, "done, modular gcd is one\n")
-			result, e := c.MkConstantTakeCopy(&s.nums[2])
+			result, e := c.mkConstantTakeCopyWithArithmeticReceipt(&s.nums[2], &s.directConstant)
 			if e != nil {
 				return e
 			}
@@ -360,7 +360,7 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 			if e = r.assign(c, result); e != nil {
 				return e
 			}
-			if e = m.flipLeadingSign(r); e != nil {
+			if e = m.flipLeadingSignWithReceipt(r, &s.directNeg); e != nil {
 				return e
 			}
 			return m.traceModGCDPolynomials("mgcd", 4343, "r: ", r.value)

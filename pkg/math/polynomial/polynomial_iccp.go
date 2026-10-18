@@ -20,18 +20,17 @@ type polynomialICCPScope struct {
 	neg                polynomialNegInvocationReceipt
 	division           polynomialExactDivInvocationReceipt
 
-	invocation                      uint64
-	childInvocation                 uint64
-	gcdInvocation                   polynomialGCDInvocationReceipt
-	contentInvocation               polynomialContentInvocationReceipt
-	parent, child                   *polynomialICCPScope
-	filter, powers                  []uint32
-	ci                              polynomialReference
-	active, ciConstructed, topOwner bool
-	generation                      uint64
-	cursor                          uint8
-	bodyCause, cleanupCause         error
-	header                          uint64
+	invocation              uint64
+	childInvocation         uint64
+	gcdInvocation           polynomialGCDInvocationReceipt
+	contentInvocation       polynomialContentInvocationReceipt
+	parent, child           *polynomialICCPScope
+	filter, powers          []uint32
+	ci                      polynomialReference
+	active, ciConstructed   bool
+	cursor                  uint8
+	bodyCause, cleanupCause error
+	header                  uint64
 }
 
 func (m *MultivariatePolynomialManager) iccpFrame() (*polynomialICCPScope, error) {
@@ -71,10 +70,6 @@ func (m *MultivariatePolynomialManager) iccpSourceEnd(s *polynomialICCPScope) er
 		s.cleanupCause = s.child.cleanupCause
 		return s.cleanupCause
 	}
-	if e := c.pscSourceStopped(); e != nil {
-		s.cleanupCause = e
-		return e
-	}
 	if s.cursor == 0 {
 		if s.ciConstructed {
 			if e := s.ci.closeValue(c, false); e != nil {
@@ -92,7 +87,7 @@ func (m *MultivariatePolynomialManager) iccpSourceEnd(s *polynomialICCPScope) er
 		s.filter = nil
 		s.cursor = 3
 	}
-	if !s.ci.assigning && !(s.topOwner && c.pscPending()) && !c.matchesContentInvocation(&s.contentInvocation) && !m.iccpConcreteChildrenPending(s) {
+	if s.bodyCause == nil && !s.ci.assigning && !(s.child != nil && s.child.active && s.child.invocation == s.childInvocation) && !m.matchesGCDInvocation(&s.gcdInvocation) && !c.matchesContentInvocation(&s.contentInvocation) && !m.iccpConcreteChildrenPending(s) {
 		s.retireICCPInvocation()
 	}
 	return nil
@@ -198,12 +193,11 @@ func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uin
 	if s.invocation == ^uint64(0) {
 		return arena.ErrBounds
 	}
-	top := core.pscReceipts.depth == 0
 	if e = core.pscEnter(); e != nil {
 		return e
 	}
 	h := s.header
-	*s = polynomialICCPScope{invocation: s.invocation + 1, active: true, topOwner: top, generation: core.pscExecutingOwner(), header: h}
+	*s = polynomialICCPScope{invocation: s.invocation + 1, active: true, header: h}
 	if m.iccpDepth != 0 {
 		s.parent = m.iccpFrames[m.iccpDepth-1]
 		s.parent.child = s
@@ -407,13 +401,6 @@ func (m *MultivariatePolynomialManager) cleanupICCPScopes(scopes []*polynomialIC
 		}
 		s.powers = nil
 		s.filter = nil
-	}
-	for _, s := range scopes {
-		if s.active && s.topOwner && s.generation != 0 && s.generation == c.pscReceipts.generation {
-			if e := c.CleanupPSC(); e != nil {
-				return e
-			}
-		}
 	}
 	for _, s := range scopes {
 		if s.active {

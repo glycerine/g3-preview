@@ -325,7 +325,7 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 				}
 			}
 			if first && second {
-				a, e = c.Mul(cg.value, candidate.value)
+				a, e = c.mulWithReceipt(cg.value, candidate.value, &s.directArithmetic)
 				if e != nil {
 					return e
 				}

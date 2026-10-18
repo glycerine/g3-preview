@@ -235,7 +235,7 @@ func (m *MultivariatePolynomialManager) uniModGCD(u, v Polynomial, r *polynomial
 			if one {
 				return r.assign(c, s.refs[5].root.value)
 			}
-			result, e := c.MkConstantTakeCopy(&s.nums[2])
+			result, e := c.mkConstantTakeCopyWithArithmeticReceipt(&s.nums[2], &s.directConstant)
 			if e != nil {
 				return e
 			}
@@ -322,7 +322,7 @@ func (m *MultivariatePolynomialManager) uniModGCD(u, v Polynomial, r *polynomial
 			if e = r.assign(c, result); e != nil {
 				return e
 			}
-			if e = m.flipLeadingSign(r); e != nil {
+			if e = m.flipLeadingSignWithReceipt(r, &s.directNeg); e != nil {
 				return e
 			}
 			return m.traceUniModGCDPolynomials(3860, "r: ", r.value)

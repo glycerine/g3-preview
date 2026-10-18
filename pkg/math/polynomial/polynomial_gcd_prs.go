@@ -169,7 +169,7 @@ func (m *MultivariatePolynomialManager) gcdPRS(u, v Polynomial, x uint32, r *pol
 			return e
 		}
 		counter++
-		if e = c.ExactPseudoRemainder(pu.value, pv.value, x, &s.refs[7]); e != nil {
+		if e = c.exactPseudoRemainderWithReceipt(pu.value, pv.value, x, &s.refs[7], &s.resultantPseudo); e != nil {
 			return e
 		}
 		zero, e := c.IsZero(rem.value)
@@ -180,7 +180,7 @@ func (m *MultivariatePolynomialManager) gcdPRS(u, v Polynomial, x uint32, r *pol
 			if e = c.traceGCDPRSZero(pv.value); e != nil {
 				return e
 			}
-			if e = m.flipLeadingSign(pv); e != nil {
+			if e = m.flipLeadingSignWithReceipt(pv, &s.directNeg); e != nil {
 				return e
 			}
 			if e = m.gcdPrimitivePart(pv.value, x, r); e != nil {
@@ -213,7 +213,7 @@ func (m *MultivariatePolynomialManager) gcdPRS(u, v Polynomial, x uint32, r *pol
 		if e = pu.assign(c, pv.value); e != nil {
 			return e
 		}
-		q, e := c.ExactDiv(rem.value, g.value)
+		q, e := c.exactDivWithReceipt(rem.value, g.value, &s.divisionInvocation)
 		if e != nil {
 			return e
 		}
@@ -221,7 +221,7 @@ func (m *MultivariatePolynomialManager) gcdPRS(u, v Polynomial, x uint32, r *pol
 			return e
 		}
 		for i := uint32(0); i < delta; i++ {
-			q, e = c.ExactDiv(pv.value, h.value)
+			q, e = c.exactDivWithReceipt(pv.value, h.value, &s.divisionInvocation)
 			if e != nil {
 				return e
 			}
@@ -229,7 +229,7 @@ func (m *MultivariatePolynomialManager) gcdPRS(u, v Polynomial, x uint32, r *pol
 				return e
 			}
 		}
-		q, e = c.LeadingCoefficient(pu.value, x)
+		q, e = m.gcdLeadingCoefficient(s, pu.value, x)
 		if e != nil {
 			return e
 		}
@@ -240,7 +240,7 @@ func (m *MultivariatePolynomialManager) gcdPRS(u, v Polynomial, x uint32, r *pol
 			return e
 		}
 		for i := uint32(0); i < delta; i++ {
-			q, e = c.Mul(nh.value, g.value)
+			q, e = c.mulWithReceipt(nh.value, g.value, &s.directArithmetic)
 			if e != nil {
 				return e
 			}
@@ -250,7 +250,7 @@ func (m *MultivariatePolynomialManager) gcdPRS(u, v Polynomial, x uint32, r *pol
 		}
 		if delta > 1 {
 			for i := uint32(0); i < delta-1; i++ {
-				q, e = c.ExactDiv(nh.value, h.value)
+				q, e = c.exactDivWithReceipt(nh.value, h.value, &s.divisionInvocation)
 				if e != nil {
 					return e
 				}
@@ -303,6 +303,9 @@ func (m *MultivariatePolynomialManager) gcdScalarProduct(a *unumeral.Int, p, q P
 	if e = c.som.reset(); e != nil {
 		return Polynomial{}, e
 	}
+	if e = c.som.acquireArithmeticInvocation(&s.product); e != nil {
+		return Polynomial{}, e
+	}
 	size, e := c.readWord(p, 8)
 	if e != nil {
 		return Polynomial{}, e
@@ -328,9 +331,9 @@ func (m *MultivariatePolynomialManager) gcdScalarProduct(a *unumeral.Int, p, q P
 		if e != nil {
 			return Polynomial{}, e
 		}
-		if e = c.som.addMul(&s.nums[0], term, q); e != nil {
+		if e = c.som.addMulWithArithmeticReceipt(&s.nums[0], term, q, &s.product); e != nil {
 			return Polynomial{}, e
 		}
 	}
-	return c.som.mk(false)
+	return c.som.mkWithArithmeticReceipt(false, &s.product)
 }
