@@ -302,8 +302,8 @@ func (m *UPolynomialManager) subresultantGCD(a, b UPolynomialView, out *upolyVec
 		*A, *B = *B, *A
 	}
 	for {
-		if polynomialSourceDebug && A.size < B.size {
-			return ErrUPolynomialAssertion
+		if e = m.subresultantDegreeAssertion(A, B); e != nil {
+			return e
 		}
 		if B.size == 0 {
 			if e = m.normalize(m.stateView(A)); e != nil {
@@ -358,18 +358,15 @@ func (m *UPolynomialManager) subresultantGCD(a, b UPolynomialView, out *upolyVec
 				return e
 			}
 		} else if d > 1 {
+			if e = m.subresultantExponentAssertion(d); e != nil {
+				return e
+			}
 			d--
 			if e = m.modular.Power(&h, d, &h); e != nil {
 				return e
 			}
-			if polynomialSourceDebug {
-				ok, e := m.modular.Divides(&h, &aux)
-				if e != nil {
-					return e
-				}
-				if !ok {
-					return ErrUPolynomialAssertion
-				}
+			if e = m.subresultantDivisibilityAssertion(&h, &aux); e != nil {
+				return e
 			}
 			if e = m.modular.Div(&aux, &h, &h); e != nil {
 				return e

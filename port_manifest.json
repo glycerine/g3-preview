@@ -50769,7 +50769,9 @@
         "pkg/math/polynomial/upolynomial_cra_assertions_test.go",
         "pkg/math/polynomial/upolynomial_modular_gcd_assertions_test.go",
         "pkg/math/polynomial/upolynomial_modular_gcd_fallback_context_test.go",
-        "pkg/math/polynomial/upolynomial_gcd_alias_assertions_test.go"
+        "pkg/math/polynomial/upolynomial_gcd_alias_assertions_test.go",
+        "pkg/math/polynomial/upolynomial_subresultant_assertions.go",
+        "pkg/math/polynomial/upolynomial_subresultant_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51009,7 +51011,10 @@
         "TestUPolynomialGCDAliasAssertionSourceActions",
         "TestUPolynomialGCDSeparateAliasDebuggerActions",
         "TestUPolynomialGCDClosedAliasAssertionSwitchBeforeCopy",
-        "TestUPolynomialGCDAliasNonemptyContinuation"
+        "TestUPolynomialGCDAliasNonemptyContinuation",
+        "TestUPolynomialSubresultantAssertionActions",
+        "TestUPolynomialSubresultantAssertionErasureAndClosedGate",
+        "TestUPolynomialSubresultantDegreeGapAssertionProfiles"
       ],
       "conditionals": [
         {
@@ -51598,6 +51603,21 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Subresultant degree, exponent and exact-divisibility assertion runtime actions (upolynomial.cpp:902,952,955)",
+          "status": "ported",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_gcd.go",
+            "pkg/math/polynomial/upolynomial_subresultant_assertions.go",
+            "pkg/math/polynomial/upolynomial_subresultant_assertions_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialSubresultantAssertionActions",
+            "TestUPolynomialSubresultantAssertionErasureAndClosedGate",
+            "TestUPolynomialSubresultantDegreeGapAssertionProfiles"
+          ],
+          "notes": "The concrete routine is reached by retained src/test/upolynomial.cpp:321. All three source invariants gate their predicates at runtime and invoke actual debugger Throw/Continue, borrowing the receiving numeric owner only during failure actions. The degree guard precedes the loop body, exponent guard precedes decrement/power, and divisibility guard follows power but precedes division into h. Qualified direct predicate adapters cover failed conditions on actual registered polynomial owners and native numerals, with unchanged values; these are guard evidence, not a claim invalid invariants arise from valid PRS. Erased and closed-service adapters verify no numeral/vector reads precede runtime gates. A valid expanded degree-gap-two polynomial pair verifies independently known gcd x+1 in enabled and disabled profiles. Broader subresultant diagnostics and scalar lifetime/destructor audits remain partial."
+        },
         {
           "name": "GCD, Euclidean-GCD and subresultant-GCD separate alias assertion actions (upolynomial.cpp:816,859,877)",
           "status": "ported",

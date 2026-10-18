@@ -45678,3 +45678,11 @@ Broader polynomial checks passed ordinary (19.007s) and g3checked/g3debug/g3trac
 ### Periodic native full verification after GCD alias actions
 
 The exact native full process started at d72713b0 is terminal with exit 0. All 68 tested packages passed; 11 packages had no tests. Polynomial passed in 98.885s and LP reused its cached passing result. Command: native `go test -p 1 -timeout 30m ./...` from pkg, with GOMAXPROCS=9 and CPU affinity 8–16. Log: /mnt/oldrog/tmp/g3-gcd-alias-native-full.log. No native process remains live; this completed handle must not be restarted or polled as running. This verifies native regressions at that commit, not completion of the remaining polynomial/AST source audits.
+
+### Subresultant invariant assertion runtime actions
+
+Ported upolynomial.cpp:902,952,955: runtime-gated degree ordering, exponent and exact-divisibility predicates now invoke actual debugger Throw/Continue. The checks preserve source order before the loop body, before decrement/power, and after power/before h division. This concrete routine is reached by the retained source test at src/test/upolynomial.cpp:321. Failed actions borrow the actual receiving numeric owner.
+
+Qualified direct predicate adapters exercise failed guards using actual registered polynomials/native numerals, preserving input values and releasing borrows. These adapters are assertion evidence, not a claim failed invariants arise from valid subresultant PRS. Erased and closed-service profiles skip operand reads before runtime admission. A valid independently expanded degree-gap-two pair, (x+1)(2*x^3+3) and (x+1)(3*x+2), produces GCD x+1 with assertions enabled or disabled. No numerical scratch or constructor frontier is manufactured.
+
+Focused subresultant tests passed ordinary (0.006s) and g3checked/g3debug/g3trace (0.010s). Broader polynomial checks passed ordinary (19.592s) and checked/debug/trace (31.938s); manifest validation passes. All commands remain on CPUs 8–16. The completed native full result at d72713b0 predates this increment; no new full run was needed inside the hourly interval. Subresultant diagnostics/scalar lifetime audits and overall polynomial/AST completion remain open.
