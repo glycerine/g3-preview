@@ -53331,6 +53331,20 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Actual Mignotte-result bughunt TRACE before lift-manager construction (1163-1165)",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_degree_trace.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_saved_prime.go"
+          ],
+          "tests": [
+            "TestUPolynomialFactorDegreeTraceRetainedRecordsAndOwners",
+            "TestUPolynomialFactorDegreeTraceStreamFailureStillComputesDisplays",
+            "TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands"
+          ],
+          "notes": "Prints the actual saved prime using modular numeral formatting and the actual returned Mignotte exponent in decimal, then source endl. Uses the actual enclosing owner borrow across the whole record, preserves sticky-stream behavior, and skips all operands when disabled. The actual x^2+3*x+2 factorization checks prime 2 and exponent 4: source half-degree n=1 gives a bound below 16, and the source repeated squaring goes 2,4,16. Other records and whole-unit completion remain open."
+        },
+        {
           "name": "Prime-candidate GCD bughunt TRACE before rejection branch (1088-1091)",
           "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_degree_trace.go",

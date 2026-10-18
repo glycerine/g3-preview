@@ -44,6 +44,9 @@ func (s *UPolynomialFactorizationService) prepareFactorLift(fs *UPolynomialFacto
 	if e != nil {
 		return e
 	}
+	if e = s.traceFactorLiftExponent(exponent); e != nil {
+		return e
+	}
 	zpe, e := NewRelatedUPolynomialManager(m)
 	if e != nil {
 		return e

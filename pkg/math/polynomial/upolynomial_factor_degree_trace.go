@@ -129,3 +129,35 @@ func (s *UPolynomialFactorizationService) traceFactorPrimeGCD(top *unumeral.Int)
 		})
 	return computation
 }
+
+// Source: upolynomial_factorization.cpp:1163-1165, before lift-manager construction.
+func (s *UPolynomialFactorizationService) traceFactorLiftExponent(exponent uint32) error {
+	tags := s.manager.modular.BorrowTraceTags()
+	if !tags.ShouldTrace("polynomial::factorization::bughunt") {
+		return nil
+	}
+	c := s.scope
+	if c == nil || c.self != c {
+		return ErrUPolynomialOwner
+	}
+	if e := c.traceBorrow.bind(c, tags); e != nil {
+		return e
+	}
+	defer c.traceBorrow.unbind()
+	var computation error
+	_ = tags.EmitConditional("polynomial::factorization::bughunt", "factor_square_free", "src/math/polynomial/upolynomial_factorization.cpp", 1163,
+		func() bool { return true }, func(raw io.Writer) error {
+			out := factorizationTraceWriter{raw}
+			_ = linearWriteText(out, "out p = ")
+			prime, e := s.manager.modular.String(&c.bestP)
+			if e != nil {
+				computation = e
+				return e
+			}
+			_ = linearWriteText(out, prime)
+			_ = linearWriteText(out, ", and we'll work p^e for e = ")
+			_ = linearWriteText(out, strconv.FormatUint(uint64(exponent), 10))
+			return diagnostic.WriteTraceEndl(out)
+		})
+	return computation
+}

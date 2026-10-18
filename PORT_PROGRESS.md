@@ -44988,3 +44988,19 @@ prime 3/GCD 1. Focused trace and prime-preparation checks pass ordinary (0.375s)
 and checked/debug/trace (0.342s), on CPUs 8-16. Whole source-unit completion is
 still not claimed; entry, f_pp, f_pp_zp, Mignotte and other records remain open.
 The prior full native suite remains running against commit 0e99e7de.
+
+2026-10-18: actual Mignotte-result TRACE before lift construction
+
+Implemented factorization.cpp:1163-1165 using the actual saved prime and
+returned exponent, before constructing the lift manager. The whole-record
+borrow, sticky-stream numeric evaluation and source endl behavior match the
+other retained records. Disabled traces skip absent scope/operands. The actual
+x^2+3*x+2 test checks prime 2 and exponent 4: n=degree/2=1 gives a bound below
+16 and repeated squaring reaches 2,4,16. An initial test expectation of exponent
+8 incorrectly used full degree and was corrected from the source; production
+Mignotte computation was unchanged. Remaining entry/f_pp/f_pp_zp records and
+the broader polynomial then AST goal remain open.
+Focused trace/prime-preparation/saved-prime checks pass ordinary (0.359s) and
+checked/debug/trace (0.409s), on CPUs 8-16. portcheck and diff whitespace checks
+pass; completion counts remain unchanged. Full native verification is still
+running against 0e99e7de, before these two subsequent trace additions.

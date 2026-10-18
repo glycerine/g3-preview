@@ -176,7 +176,7 @@ func TestUPolynomialFactorDegreeTraceRetainedRecordsAndOwners(t *testing.T) {
 	serviceMust(t, e)
 	if tags.ShouldTrace("polynomial::factorization::bughunt") {
 		text := w.seen.String()
-		for _, site := range []string{":1088 ", "sage: if (not (gcd(2, 1)) == 1): print 'Error, wrong gcd'\n", ":1141 ", ":1155 ", ":1192 ", "best degree set: [0, 1, 2] represented by 111\n", "degree_set = [0, 1, 2] represented by 111\n", "STARTING TRIAL DIVISION\nzpe_fs1 * ("} {
+		for _, site := range []string{":1163 ", "out p = 2, and we'll work p^e for e = 4\n", ":1088 ", "sage: if (not (gcd(2, 1)) == 1): print 'Error, wrong gcd'\n", ":1141 ", ":1155 ", ":1192 ", "best degree set: [0, 1, 2] represented by 111\n", "degree_set = [0, 1, 2] represented by 111\n", "STARTING TRIAL DIVISION\nzpe_fs1 * ("} {
 			if !strings.Contains(text, site) {
 				t.Fatal("missing source trace record", site, text)
 			}
@@ -254,6 +254,7 @@ func TestUPolynomialFactorDegreeTraceDisabledSkipsUnreachedOperands(t *testing.T
 	// No enclosing source scope or factor operand exists at this erased site.
 	serviceMust(t, s.traceFactorDegreeSet(nil, 1155, false))
 	serviceMust(t, s.traceFactorPrimeGCD(nil))
+	serviceMust(t, s.traceFactorLiftExponent(0))
 	if s.scope != nil || s.manager.config.Integer.Budget().Used() != before {
 		t.Fatal("disabled trace acquired operands or scope")
 	}
