@@ -249,15 +249,19 @@ func (m *AlgebraicRootCore) IsInt(a *Algebraic) (result bool, err error) {
 	if l == nil {
 		return true, nil
 	}
-	r, err := m.load(l)
-	if err != nil {
-		return false, err
-	}
 	if l.kind == 0 {
+		r, err := m.load(l)
+		if err != nil {
+			return false, err
+		}
 		return m.config.Rationals.IsInt(&r.value)
 	}
-	if r.flags&4 != 0 {
-		return false, nil
+	if err = algebraicQueryTagAssertionSwitch(); err != nil {
+		return false, err
+	}
+	flags, err := m.config.Allocator.ReadUint32(l.raw, 16)
+	if err != nil || flags&4 != 0 {
+		return false, err
 	}
 	if m.predicate.active {
 		return false, ErrAlgebraicPending
@@ -276,7 +280,7 @@ func (m *AlgebraicRootCore) IsInt(a *Algebraic) (result bool, err error) {
 	if err != nil {
 		return false, err
 	}
-	r, err = m.load(l)
+	r, err := m.load(l)
 	if err != nil {
 		return false, err
 	}
@@ -319,12 +323,16 @@ func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 	if l == nil || l.kind == 0 {
 		return true, nil
 	}
+	if err = algebraicQueryTagAssertionSwitch(); err != nil {
+		return false, err
+	}
+	flags, err := m.config.Allocator.ReadUint32(l.raw, 16)
+	if err != nil || flags&4 != 0 {
+		return false, err
+	}
 	r, err := m.load(l)
 	if err != nil {
 		return false, err
-	}
-	if r.flags&4 != 0 {
-		return false, nil
 	}
 	if m.predicate.active {
 		return false, ErrAlgebraicPending

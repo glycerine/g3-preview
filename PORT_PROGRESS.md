@@ -43917,3 +43917,14 @@ Algebraic scalar query member-read fidelity (algebraic_numbers.cpp:217-240,350-3
 The pointer-tag dispatch establishes the accessor assertion predicates, but each reached runtime switch is still read: basic_value cpp236 even for canonical null zero, to_basic h372 for nonnull basic access, and to_algebraic h373 for roots. Degree zero/basic shortcuts reach no such assertion. A real closed debug owner verifies these distinct branches and precedence before uninitialized data. Raw physically allocated prefixes leave genuinely unrelated members uninitialized and never claim completed C++ placement construction; the existing owning raw-cell abort handles their actual allocations. Tests establish size-only degree, literal unsigned zero-size wrap, basic numerator-only sign, opposite-bound avoidance and zero-endpoint non-strict interval sign. Existing real root/nonminimal/copy/foreign/stale/numeric-allocation-free query behavior remains covered.
 
 Focused algebraic query/sign/comparison/inversion/rational-conversion/exact-sign evaluation checks pass ordinary (0.192s) and checked/debug/trace (0.423s), on CPUs8-16. Manifest validation passes with unchanged unit totals:2103 units,677 APIs;207 ported,344 partial,1495 unported,11 dead/deleted. This adds concrete field/assertion evidence to the existing query method entry and does not complete the broader algebraic/polynomial or AST source units. No full-suite repetition for this focused read-only source behavior correction; the complete polynomial then AST objective remains active.
+
+Algebraic cached irrational predicate dispatch now matches cpp243–248 and
+285–289: IsInt/IsRational evaluate the reached to_algebraic assertion switch,
+read only the actual flags word, and return false for m_not_rational before
+loading polynomial or interval members. Raw-prefix regression coverage keeps
+those unrelated members genuinely uninitialized and verifies a closed debug
+owner is observed before the cached flag. This completes this early-return
+branch only; the larger predicate/refinement source audit remains partial.
+
+Focused algebraic predicate, conversion, degree and sign tests passed ordinary
+(0.072s) and g3checked,g3debug,g3trace (0.229s), using CPUs8–16 exclusively.

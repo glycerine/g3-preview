@@ -132,3 +132,37 @@ func TestAlgebraicSignReadsOnlyReachedScalarFields(t *testing.T) {
 		}
 	}
 }
+
+func TestAlgebraicPredicatesReadCachedIrrationalFlagFirst(t *testing.T) {
+	c, _, _ := algebraicCompareFixture(t)
+	a := algebraicQueryRawCell(t, c, 1)
+	l, e := c.location(&a)
+	serviceMust(t, e)
+	for _, query := range []func(*Algebraic) (bool, error){c.IsInt, c.IsRational} {
+		if _, e := query(&a); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
+			t.Fatal("missing cached flag was not reached", e)
+		}
+	}
+	serviceMust(t, c.config.Allocator.WriteUint32(l.raw, 16, 4))
+	for _, query := range []func(*Algebraic) (bool, error){c.IsInt, c.IsRational} {
+		v, e := query(&a)
+		serviceMust(t, e)
+		if v || c.predicate.active {
+			t.Fatal("known irrational entered refinement", v)
+		}
+	}
+	for _, offset := range []uint64{0, 20, 24, 40} {
+		if _, e := c.config.Allocator.ReadUint32(l.raw, offset); !errors.Is(e, umemory.ErrRuntimeUninitialized) {
+			t.Fatal("unrelated field initialized", offset, e)
+		}
+	}
+	if polynomialSourceDebug {
+		polynomialAssertionActionsFixture(t, "T")
+		serviceMust(t, diagnostic.BorrowProcessDebugContext().Close())
+		for _, query := range []func(*Algebraic) (bool, error){c.IsInt, c.IsRational} {
+			if _, e := query(&a); !errors.Is(e, arena.ErrClosed) {
+				t.Fatal("accessor assertion switch skipped before cached flag", e)
+			}
+		}
+	}
+}
