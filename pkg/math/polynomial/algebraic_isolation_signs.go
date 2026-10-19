@@ -28,6 +28,7 @@ func (v *algebraicAllUnassigned) Algebraic(x uint32) (*Algebraic, error) {
 }
 
 type algebraicIsolationSignsScope struct {
+	traceRunning                                      bool
 	sample                                            Algebraic
 	calls                                             polynomialAlgebraicEvaluationScope
 	pm                                                *MultivariatePolynomialManager
@@ -159,6 +160,9 @@ func (m *AlgebraicRootCore) IsolateMultivariateRootsWithSigns(pm *MultivariatePo
 	}
 	s.constructed = true
 	if e := m.isolationSignsInteger(&roots.values[0], false); e != nil {
+		return e
+	}
+	if e := m.traceIsolationSignsSample(); e != nil {
 		return e
 	}
 	if e := m.appendIsolationSign(pm, p, values, signs, 2602); e != nil {

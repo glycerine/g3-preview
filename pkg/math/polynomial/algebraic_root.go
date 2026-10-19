@@ -217,7 +217,7 @@ func (m *AlgebraicRootCore) check() error {
 	if m != nil && m.self == m && m.toOwnedRational.active && !m.toOwnedRational.running {
 		return errors.Join(ErrAlgebraicPending, m.toOwnedRational.sourceCause)
 	}
-	if m != nil && m.self == m && (m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning || m.toOwnedRational.executing) {
+	if m != nil && m.self == m && (m.isolationSigns.traceRunning || m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning || m.toOwnedRational.executing) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && (m.cellAllocationRunning || m.cellPending.Block() != (umemory.Block{})) {
