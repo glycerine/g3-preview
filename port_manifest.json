@@ -53365,7 +53365,7 @@
         },
         {
           "name": "upolynomial.cpp:1045-1105 reached ext_gcd exact U=1/D=A initialization, source swaps and dynamic scoped DEBUG/final NUM suffix",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_gcd_extended.go",
           "tests": [
             "TestUPolynomialHenselActualExtendedGCDCallerIndependentIdentity",
@@ -53374,7 +53374,7 @@
         },
         {
           "name": "upolynomial.cpp:213-232,609-651 same primitive-content and exact-division source engines with concrete caller transport",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_division.go",
           "tests": [
             "TestUPolynomialRecombinationPublicationTransportProtectsActualCaller",
@@ -53389,7 +53389,7 @@
         },
         {
           "name": "upolynomial.cpp:2960-3118 actual Factor frontend NUM/vector frontiers, modular image/CRA/Euclid, flip/quadratic and whole square-free child",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_core.go",
           "tests": [
             "TestUPolynomialFactorFrontendActualCRAConstructorFrontiers",
@@ -53421,7 +53421,7 @@
         },
         {
           "name": "upolynomial.cpp:1108-1225,3120-3124 literal display/SMT2 fallthrough and sequence wrapper with per-call lexical character storage",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_display.go",
           "tests": [
             "TestUPolynomialDisplayActualTst1DriverOutput",
@@ -53526,7 +53526,7 @@
         },
         {
           "name": "upolynomial.cpp:1108-1225,1734-1820,1906-1951,2029-2074 exact registered modular caller retirement exclusion before Close mutation",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/util/numeral/mpzzp.go",
           "tests": [
             "TestUPolynomialActualModularCallerCloseBeforeReturn",
