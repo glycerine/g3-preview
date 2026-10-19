@@ -50347,7 +50347,8 @@
       "path": "src/math/polynomial/sexpr2upolynomial.cpp",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
+      "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
       "go_targets": [
         "pkg/util/cmdexception/cmd_exception.go",
         "pkg/smtcore/util_cmd_exception.go",
@@ -50385,8 +50386,8 @@
         "TestAlgebraicRootConstructionPreservesOlderFactorInvocation",
         "TestAlgebraicSexprRootExecutingOwnerAndConverterRefusals"
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete converter numeric borrow rejects actual receiving trace Write/WriteString/Flush reentry before held service lock or arithmetic mutation",
@@ -50411,7 +50412,7 @@
         },
         {
           "name": "Converter cleanup matches its accepted global lexical invocation; refused and stale calls preserve independent roots (sexpr2upolynomial.cpp:39-97)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_rational_context.go",
@@ -50432,7 +50433,7 @@
         },
         {
           "name": "S-expression arithmetic issued-child ownership before older argument-vector destruction (sexpr2upolynomial.cpp:39-85)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial_arithmetic.go",
           "go_targets": [
             "pkg/math/polynomial/sexpr_upolynomial_arithmetic_test.go",
@@ -50450,7 +50451,7 @@
         },
         {
           "name": "S-expression receiving-input invocation ownership and older argument-vector destruction frontier (sexpr2upolynomial.cpp:47-74,90-97)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_ops.go",
@@ -50467,7 +50468,7 @@
         },
         {
           "name": "Retained global-rational coefficients into a distinct private polynomial numeral owner (sexpr2upolynomial.cpp:90-97; upolynomial.cpp:204-211)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_rational_input.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_ops.go",
@@ -50505,8 +50506,8 @@
           ]
         },
         {
-          "name": "Recursive sexpr-to-upolynomial source arithmetic, error locations/depth/published prefixes and scoped vector/rational lifetime on real same-owner services; arithmetic plugin consumer remains open",
-          "status": "partial",
+          "name": "Recursive sexpr-to-upolynomial source arithmetic, error locations/depth/published prefixes and scoped vector/rational lifetime on real same-owner services",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
           "tests": [
             "TestSexprPolynomialSourceArithmetic",
@@ -50519,7 +50520,7 @@
         },
         {
           "name": "Same-Integer owning rational constant and borrowed exponent context with explicit ordered cleanup and reached provenance guards",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_rational_context.go",
           "tests": [
             "TestUPolynomialContextRawConstantCopy",
@@ -50531,16 +50532,21 @@
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Each accepted conversion holds the concrete borrowed S-expression nodes and one matched rational lexical receipt for the complete recursive call. Refused or stale cleanup cannot consume an independent lexical owner.",
+        "Composite +, -, and * calls construct one native argument polynomial after the first operand. Exact arithmetic and receiving-input receipts stop its source destructor when a younger numeric child remains pending; explicit cleanup consumes arithmetic, input and live argument frames in that order.",
+        "Numeral constants copy through the global RationalService borrow into the actual receiving UPolynomialManager integer owner. Exponents remain borrowed only inside the lexical callback. Published caller output survives parser and cleanup failures exactly as the source nontransactional conversion does."
+      ],
       "deviations": [
-        "The polynomial-ref and sexpr mk_root overloads (algebraic_numbers.cpp:665-680,2887-2893; retained AST arithmetic consumer arith_decl_plugin.cpp:95-98) now convert/parse directly into the actual persistent m_isolate_tmp1 and then invoke one-based distinct-real-root selection. Source index/univariate assertions precede workspace construction; with assertions erased, syntax and conversion still precede runtime index errors. Root construction throws the concrete algebraic_exception/default_exception class with unchanged source messages. A concrete construction owner retains only actually accepted dense conversion, parser lexical entry, factor frontend and private root vector; cleanup preserves older refused factor work. The converter records accepted lexical entry, refuses reentry/cleanup while converting, and can release completed native metadata without sweeping an unrelated lexical owner. Owning cleanup finishes younger children before private root vectors; conversion publications and caller output survive errors. Tests verify exact sqrt(2) identities, repeated-factor distinct indices, BIG linear coefficients, persistent descriptor/receiving owner, parser location and partial prefix, zero/out-of-range errors, assertion Throw/erasure ordering, both wrappers through every reached checkpoint/cleanup/retry, older actual factor refusal and parser/isolation callback owner guards. Focused ordinary and checked/debug/trace algebraic/evaluation/parser checks pass on CPUs 8-16. TRACE, full allocation/destructor/callback/eager-constructor composition and overall polynomial/AST completion remain incomplete."
+        "The polynomial-ref and sexpr mk_root overloads (algebraic_numbers.cpp:665-680,2887-2893; retained AST arithmetic consumer arith_decl_plugin.cpp:95-98) now convert/parse directly into the actual persistent m_isolate_tmp1 and then invoke one-based distinct-real-root selection. Source index/univariate assertions precede workspace construction; with assertions erased, syntax and conversion still precede runtime index errors. Root construction throws the concrete algebraic_exception/default_exception class with unchanged source messages. A concrete construction owner retains only actually accepted dense conversion, parser lexical entry, factor frontend and private root vector; cleanup preserves older refused factor work. The converter records accepted lexical entry, refuses reentry/cleanup while converting, and can release completed native metadata without sweeping an unrelated lexical owner. Owning cleanup finishes younger children before private root vectors; conversion publications and caller output survive errors. Tests verify exact sqrt(2) identities, repeated-factor distinct indices, BIG linear coefficients, persistent descriptor/receiving owner, parser location and partial prefix, zero/out-of-range errors, assertion Throw/erasure ordering, both wrappers through every reached checkpoint/cleanup/retry, older actual factor refusal and parser/isolation callback owner guards. Focused ordinary, checked, and debug/trace converter ownership checks pass on CPUs 8-16. The retained AST arithmetic consumer is audited in its own source unit; converter completion does not claim that consumer unit."
       ]
     },
     {
       "path": "src/math/polynomial/sexpr2upolynomial.h",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
+      "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
       "go_targets": [
         "pkg/util/cmdexception/cmd_exception.go",
         "pkg/smtcore/util_cmd_exception.go",
@@ -50588,8 +50594,8 @@
           "text": "#endif"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Concrete converter numeric borrow rejects actual receiving trace Write/WriteString/Flush reentry before held service lock or arithmetic mutation",
@@ -50614,7 +50620,7 @@
         },
         {
           "name": "Converter cleanup matches its accepted global lexical invocation; refused and stale calls preserve independent roots (sexpr2upolynomial.cpp:39-97)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_rational_context.go",
@@ -50635,7 +50641,7 @@
         },
         {
           "name": "S-expression arithmetic issued-child ownership before older argument-vector destruction (sexpr2upolynomial.cpp:39-85)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial_arithmetic.go",
           "go_targets": [
             "pkg/math/polynomial/sexpr_upolynomial_arithmetic_test.go",
@@ -50653,7 +50659,7 @@
         },
         {
           "name": "S-expression receiving-input invocation ownership and older argument-vector destruction frontier (sexpr2upolynomial.cpp:47-74,90-97)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_ops.go",
@@ -50670,7 +50676,7 @@
         },
         {
           "name": "Retained global-rational coefficients into a distinct private polynomial numeral owner (sexpr2upolynomial.cpp:90-97; upolynomial.cpp:204-211)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_rational_input.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_ops.go",
@@ -50708,8 +50714,8 @@
           ]
         },
         {
-          "name": "Recursive sexpr-to-upolynomial source arithmetic, error locations/depth/published prefixes and scoped vector/rational lifetime on real same-owner services; arithmetic plugin consumer remains open",
-          "status": "partial",
+          "name": "Recursive sexpr-to-upolynomial source arithmetic, error locations/depth/published prefixes and scoped vector/rational lifetime on real same-owner services",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/sexpr_upolynomial.go",
           "tests": [
             "TestSexprPolynomialSourceArithmetic",
@@ -50722,7 +50728,7 @@
         },
         {
           "name": "Same-Integer owning rational constant and borrowed exponent context with explicit ordered cleanup and reached provenance guards",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_rational_context.go",
           "tests": [
             "TestUPolynomialContextRawConstantCopy",
@@ -50734,9 +50740,13 @@
           ]
         }
       ],
-      "ownership": [],
+      "ownership": [
+        "Each accepted conversion holds the concrete borrowed S-expression nodes and one matched rational lexical receipt for the complete recursive call. Refused or stale cleanup cannot consume an independent lexical owner.",
+        "Composite +, -, and * calls construct one native argument polynomial after the first operand. Exact arithmetic and receiving-input receipts stop its source destructor when a younger numeric child remains pending; explicit cleanup consumes arithmetic, input and live argument frames in that order.",
+        "Numeral constants copy through the global RationalService borrow into the actual receiving UPolynomialManager integer owner. Exponents remain borrowed only inside the lexical callback. Published caller output survives parser and cleanup failures exactly as the source nontransactional conversion does."
+      ],
       "deviations": [
-        "The polynomial-ref and sexpr mk_root overloads (algebraic_numbers.cpp:665-680,2887-2893; retained AST arithmetic consumer arith_decl_plugin.cpp:95-98) now convert/parse directly into the actual persistent m_isolate_tmp1 and then invoke one-based distinct-real-root selection. Source index/univariate assertions precede workspace construction; with assertions erased, syntax and conversion still precede runtime index errors. Root construction throws the concrete algebraic_exception/default_exception class with unchanged source messages. A concrete construction owner retains only actually accepted dense conversion, parser lexical entry, factor frontend and private root vector; cleanup preserves older refused factor work. The converter records accepted lexical entry, refuses reentry/cleanup while converting, and can release completed native metadata without sweeping an unrelated lexical owner. Owning cleanup finishes younger children before private root vectors; conversion publications and caller output survive errors. Tests verify exact sqrt(2) identities, repeated-factor distinct indices, BIG linear coefficients, persistent descriptor/receiving owner, parser location and partial prefix, zero/out-of-range errors, assertion Throw/erasure ordering, both wrappers through every reached checkpoint/cleanup/retry, older actual factor refusal and parser/isolation callback owner guards. Focused ordinary and checked/debug/trace algebraic/evaluation/parser checks pass on CPUs 8-16. TRACE, full allocation/destructor/callback/eager-constructor composition and overall polynomial/AST completion remain incomplete."
+        "The polynomial-ref and sexpr mk_root overloads (algebraic_numbers.cpp:665-680,2887-2893; retained AST arithmetic consumer arith_decl_plugin.cpp:95-98) now convert/parse directly into the actual persistent m_isolate_tmp1 and then invoke one-based distinct-real-root selection. Source index/univariate assertions precede workspace construction; with assertions erased, syntax and conversion still precede runtime index errors. Root construction throws the concrete algebraic_exception/default_exception class with unchanged source messages. A concrete construction owner retains only actually accepted dense conversion, parser lexical entry, factor frontend and private root vector; cleanup preserves older refused factor work. The converter records accepted lexical entry, refuses reentry/cleanup while converting, and can release completed native metadata without sweeping an unrelated lexical owner. Owning cleanup finishes younger children before private root vectors; conversion publications and caller output survive errors. Tests verify exact sqrt(2) identities, repeated-factor distinct indices, BIG linear coefficients, persistent descriptor/receiving owner, parser location and partial prefix, zero/out-of-range errors, assertion Throw/erasure ordering, both wrappers through every reached checkpoint/cleanup/retry, older actual factor refusal and parser/isolation callback owner guards. Focused ordinary, checked, and debug/trace converter ownership checks pass on CPUs 8-16. The retained AST arithmetic consumer is audited in its own source unit; converter completion does not claim that consumer unit."
       ]
     },
     {
