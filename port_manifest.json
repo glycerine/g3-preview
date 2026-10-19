@@ -49010,7 +49010,7 @@
         },
         {
           "name": "Selected complete imp source constructors2303-2344 with actual independent UP/member defaults and late body MM/zero/unit publication; concrete Go owning composition",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_imp.go",
           "tests": [
             "TestPolynomialImpBorrowedMonomialConstructorHierarchy",
@@ -49024,7 +49024,7 @@
         },
         {
           "name": "Selected imp destructor2346-2370 then literal reverse completed-member destruction; explicit Go owning Close continuation retains stopped cause",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_imp_lifetime.go",
           "tests": [
             "TestPolynomialImpBorrowedMonomialConstructorHierarchy",

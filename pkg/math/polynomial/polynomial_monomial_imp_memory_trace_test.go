@@ -47,9 +47,9 @@ func TestPolynomialImpOwnedMonomialManagerMemoryWrappers(t *testing.T) {
 				serviceMust(t, allocator.Close())
 			}
 			got := output.String()
-			if !diagnostic.DebugBuild {
+			if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
 				if got != "" {
-					t.Fatal("ordinary build emitted memory records", got)
+					t.Fatal("disabled memory tracing emitted records", got)
 				}
 				return
 			}
@@ -110,9 +110,9 @@ func TestPolynomialImpFailedPlacementMemoryRecord(t *testing.T) {
 	}
 	serviceMust(t, full.CloseChecked())
 	got := output.String()
-	if !diagnostic.DebugBuild {
+	if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
 		if got != "" {
-			t.Fatal("ordinary build emitted memory records", got)
+			t.Fatal("disabled memory tracing emitted records", got)
 		}
 		return
 	}
@@ -138,9 +138,9 @@ func TestPolynomialImpMonomialFailedPlacementMemoryRecord(t *testing.T) {
 	}
 	serviceMust(t, child.CloseChecked())
 	got := output.String()
-	if !diagnostic.DebugBuild {
+	if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
 		if got != "" {
-			t.Fatal("ordinary build emitted memory records", got)
+			t.Fatal("disabled memory tracing emitted records", got)
 		}
 		return
 	}
@@ -165,9 +165,9 @@ func TestPolynomialMonomialAllocatorFailedConstructorMemoryRecord(t *testing.T) 
 	allocator := child.allocator
 	serviceMust(t, child.CloseChecked())
 	got := output.String()
-	if !diagnostic.DebugBuild {
+	if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
 		if got != "" {
-			t.Fatal("ordinary build emitted memory records", got)
+			t.Fatal("disabled memory tracing emitted records", got)
 		}
 		return
 	}
