@@ -9,6 +9,7 @@ import (
 
 type algebraicRationalArithmeticScope struct {
 	convertEntry      upolyConvertEntryReceipt
+	traceEvaluations  [2]upolyBinaryEvaluationInvocationReceipt
 	polynomialCaller  *polynomialAlgebraicEvaluationScope
 	integerAddition   *algebraicIntegerAddScope
 	q                 [3]unumeral.Rational       // nbv (or basic result), il, iu
@@ -20,6 +21,10 @@ type algebraicRationalArithmeticScope struct {
 }
 
 func (m *AlgebraicRootCore) cleanupRationalArithmetic() error {
+	return m.finishRationalArithmetic(true)
+}
+
+func (m *AlgebraicRootCore) finishRationalArithmetic(owning bool) error {
 	s := &m.arithmetic
 	if s.executing {
 		return ErrAlgebraicPending
@@ -29,6 +34,16 @@ func (m *AlgebraicRootCore) cleanupRationalArithmetic() error {
 	}
 	s.executing = true
 	defer func() { s.executing = false }()
+	// A completed Horner source scope can still own unjoined RAW. Only
+	// acknowledgement consumes it; ordinary source unwinding reaches the
+	// older arithmetic destructors without acquiring that ownership.
+	if owning {
+		for i := len(s.traceEvaluations) - 1; i >= 0; i-- {
+			if e := m.config.Polynomials.cleanupBinaryEvaluationWithReceipt(&s.traceEvaluations[i], false); e != nil {
+				return e
+			}
+		}
+	}
 	// The nonbinary branch's iu/il are younger than u/l, then comes nbv.
 	for s.stage < 5 {
 		var e error
@@ -52,6 +67,16 @@ func (m *AlgebraicRootCore) cleanupRationalArithmetic() error {
 			return e
 		}
 		s.stage++
+	}
+	for i := len(s.traceEvaluations) - 1; i >= 0; i-- {
+		p := m.config.Polynomials
+		if owning {
+			if e := p.cleanupBinaryEvaluationWithReceipt(&s.traceEvaluations[i], true); e != nil {
+				return e
+			}
+		} else if p.matchesBinaryEvaluationReceipt(&s.traceEvaluations[i]) && p.binaryEvaluation.active {
+			return nil
+		}
 	}
 	s.active = false
 	return nil
@@ -144,10 +169,20 @@ func (m *AlgebraicRootCore) addSubRational(a *Algebraic, b *unumeral.Rational, o
 			s.sourceStop = m.rootTraceSourceCause()
 		}
 		if s.sourceStop == nil {
+			for i := range s.traceEvaluations {
+				if p.matchesBinaryEvaluationReceipt(&s.traceEvaluations[i]) {
+					s.sourceStop = p.binaryEvaluation.sourceCause
+					if s.sourceStop != nil {
+						break
+					}
+				}
+			}
+		}
+		if s.sourceStop == nil {
 			s.sourceStop = p.convertEntryReceiptSourceCause(&s.convertEntry)
 		}
 		if s.sourceStop == nil {
-			cleanup := m.cleanupRationalArithmetic()
+			cleanup := m.finishRationalArithmetic(false)
 			if cleanup != nil {
 				s.sourceStop = cleanup
 			}
@@ -232,6 +267,9 @@ func (m *AlgebraicRootCore) addSubRational(a *Algebraic, b *unumeral.Rational, o
 		if e = bm.ToRational(qm, r.interval.BorrowUpper(), &s.q[2]); e != nil {
 			return e
 		}
+		if e = m.traceRationalTranslationBounds(); e != nil {
+			return e
+		}
 		if e = qm.Add(&s.q[1], &s.q[0], &s.q[1]); e != nil {
 			return e
 		}
@@ -256,6 +294,9 @@ func (m *AlgebraicRootCore) addSubRational(a *Algebraic, b *unumeral.Rational, o
 	}
 	translated, e := p.wholeView(m.addTmp)
 	if e != nil {
+		return e
+	}
+	if e = m.traceRationalTranslationResult(translated); e != nil {
 		return e
 	}
 	s.executing = false
