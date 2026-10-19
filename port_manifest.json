@@ -43217,7 +43217,7 @@
         },
         {
           "name": "polynomial.cpp:1370,2420-2460,7012; polynomial.h:260 concrete reference acquisition refuses committed deletion before trace/callback publication",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_manager.go",
           "go_targets": [
             "pkg/math/polynomial/polynomial_manager.go",
@@ -47432,7 +47432,7 @@
         },
         {
           "name": "polynomial.cpp:1370,2420-2460,7012; polynomial.h:260 concrete reference acquisition refuses committed deletion before trace/callback publication",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_manager.go",
           "go_targets": [
             "pkg/math/polynomial/polynomial_manager.go",
