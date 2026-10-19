@@ -528,23 +528,22 @@ func (n *PolynomialNewtonInterpolator) assertNumeralNormalized(a *unumeral.Int, 
 	})
 }
 func (n *PolynomialNewtonInterpolator) assertPolynomialNormalized(p Polynomial, outerLine int32, outerExpression string) error {
-	if !polynomialSourceDebug {
-		return nil
-	}
-	count, e := n.owner.readWord(p, 8)
-	if e != nil {
-		return e
-	}
-	for i := uint32(0); i < count; i++ {
-		a, e := n.owner.coefficientCore(p, i)
+	return polynomialNewtonSourceAssert(outerLine, outerExpression, func() (bool, error) {
+		count, e := n.owner.readWord(p, 8)
 		if e != nil {
-			return e
+			return false, e
 		}
-		if e = n.assertNumeralNormalized(&a, 2792, "m().is_p_normalized(p->a(i))"); e != nil {
-			return e
+		for i := uint32(0); i < count; i++ {
+			a, e := n.owner.coefficientCore(p, i)
+			if e != nil {
+				return false, e
+			}
+			if e = n.assertNumeralNormalized(&a, 2792, "m().is_p_normalized(p->a(i))"); e != nil {
+				return false, e
+			}
 		}
-	}
-	return polynomialNewtonScalarAssert(outerLine, outerExpression, true)
+		return true, nil
+	})
 }
 
 // NewtonInterpolation preserves the actual method-local interpolator until its

@@ -2,12 +2,38 @@ package polynomial
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
+
+func TestPolynomialNewtonDisabledOuterAssertionSkipsPolynomialReads(t *testing.T) {
+	for _, enabled := range []bool{false, true} {
+		t.Run(fmt.Sprint(enabled), func(t *testing.T) {
+			m := polynomialCellFixture(t)
+			n, e := NewPolynomialNewtonInterpolator(m)
+			serviceMust(t, e)
+			defer func() { serviceMust(t, n.Close()) }()
+			polynomialThrowAssertionFixture(t)
+			if polynomialSourceDebug {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(enabled))
+			}
+			unread := Polynomial{owner: m.origin, slot: ^uint32(0), generation: 1}
+			e = n.assertPolynomialNormalized(unread, 2863, "pm.is_p_normalized(temp)")
+			if polynomialSourceDebug && enabled {
+				if e == nil {
+					t.Fatal("enabled assertion omitted the polynomial read")
+				}
+			} else {
+				serviceMust(t, e)
+			}
+		})
+	}
+}
 
 func TestPolynomialNewtonEntryAssertionActions(t *testing.T) {
 	for _, action := range []string{"T", "C"} {

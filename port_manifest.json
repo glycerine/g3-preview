@@ -44331,6 +44331,7 @@
             "TestPolynomialNewtonSourceTraceSequenceAndRefusal",
             "TestPolynomialNewtonVectorSourceFinalizeNativeStorage",
             "TestPolynomialNewtonEntryAssertionActions",
+            "TestPolynomialNewtonDisabledOuterAssertionSkipsPolynomialReads",
             "TestPolynomialNewtonVectorOwnerAssertionActions",
             "TestPolynomialNewtonVectorSetOwnerContinue",
             "TestPolynomialNewtonMkEmptyAssertionActions"
