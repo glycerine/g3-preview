@@ -39100,7 +39100,8 @@
             "TestAlgebraicBinarySetCoreSourceTraces",
             "TestAlgebraicBinarySetCoreDisabledTracesDoNotRead",
             "TestAlgebraicBinarySetCoreStickyTraceFailure",
-            "TestAlgebraicBinaryTraceRetainsActualDisplayBeforeLocals"
+            "TestAlgebraicBinaryTraceRetainsActualDisplayBeforeLocals",
+            "TestAlgebraicBinaryIntervalTraceBeforeCandidateSelection"
           ]
         },
         {

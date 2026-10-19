@@ -401,6 +401,9 @@ func (m *AlgebraicRootCore) makeBinary(a, b, out *Algebraic, kind uint8) (cause 
 			if e != nil {
 				return e
 			}
+			if e = m.traceBinaryIntervals(a, b, lv, uv); e != nil {
+				return e
+			}
 			if lv <= uv {
 				if e = seq.Close(); e != nil {
 					return e
