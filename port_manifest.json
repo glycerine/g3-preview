@@ -40252,7 +40252,8 @@
       "path": "src/math/polynomial/linear_eq_solver.h",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
+      "go_target": "pkg/math/polynomial/polynomial_linear_rational.go",
       "go_targets": [
         "pkg/math/polynomial/polynomial_linear_borrowed.go",
         "pkg/util/numeral/numeric_caller_guard.go",
@@ -40278,7 +40279,11 @@
         "pkg/util/numeral/mp_display_stream.go",
         "pkg/math/polynomial/polynomial_linear_stream_flags_test.go",
         "pkg/math/polynomial/polynomial_linear_display_test.go",
-        "pkg/util/numeral/mp_display_stream_test.go"
+        "pkg/util/numeral/mp_display_stream_test.go",
+        "pkg/math/polynomial/polynomial_sparse_interpolation.go",
+        "pkg/math/polynomial/polynomial_sparse_interpolator_source_test.go",
+        "pkg/math/polynomial/polynomial_sparse_trace_test.go",
+        "pkg/math/polynomial/polynomial_sparse_physical_test.go"
       ],
       "tests": [
         "TestLinearModularDisplayBorrowsFieldManager",
@@ -40321,7 +40326,13 @@
         "TestLinearRationalDisplayReceivingNumericFlags",
         "TestLinearModularDisplayReceivingNumericFlags",
         "TestLinearNumericInsertionCallbackBorrowsActualOwners",
-        "TestIntegerAndRationalDisplaySourceInsertionOrder"
+        "TestLinearTraceRetainsReceivingNumericFlags",
+        "TestLinearRationalDisplayOwnsExactFormatterCallback",
+        "TestLinearModularDisplayOwnsExactFormatterCallback",
+        "TestIntegerAndRationalDisplaySourceInsertionOrder",
+        "TestPolynomialSparseInterpolatorIndependentThreeSamples",
+        "TestPolynomialSparseInterpolationSourceTraceSequence",
+        "TestPolynomialSparseInterpolationEveryActualReservationPrefix"
       ],
       "conditionals": [
         {
@@ -40367,8 +40378,8 @@
           "text": "SASSERT(A[i].size() == n);"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Direct concrete linear numeral display preserves receiving numeric/string formatting (linear_eq_solver.h:143-146; mpz.cpp:1385-1408; mpq.cpp:130-139)",
@@ -40394,11 +40405,11 @@
             "TestLinearModularDisplayOwnsExactFormatterCallback",
             "TestIntegerAndRationalDisplaySourceInsertionOrder"
           ],
-          "notes": "Cold io.Writer receivers that expose native AppendInt32/AppendUint32/AppendCString retain their actual formatting state. SMALL mpz insertion delegates int32 directly; BIG sign and decimal magnitude remain separate string insertions. Rational NUM/slash/DEN order and unnormalized modular display stay intact. Both real solvers reproduce baseline decimal-loss failures, then verify hexadecimal/showbase, width/fill and BIG positive/negative behavior on normalized actual matrix fields. The linear TRACE wrapper now preserves numeric insertion types for the iteration, matrix and RHS, while the shared sticky trace writer preserves CString and numeric header/body insertions, sticky failures and callback scope. DisplayToTracked exposes the exact BIG character/formatting receipt to each concrete solver. Actual magnitude callbacks observe that receipt active, cannot mutate the executing solver, and a refused output retires only the completed receipt before return. Native Go interfaces delegate only reached IO operations, not arithmetic, container templates or STL internals. Broader whole linear-unit source-destruction and arithmetic-child lifetime audits remain open."
+          "notes": "Cold io.Writer receivers that expose native AppendInt32/AppendUint32/AppendCString retain their actual formatting state. SMALL mpz insertion delegates int32 directly; BIG sign and decimal magnitude remain separate string insertions. Rational NUM/slash/DEN order and unnormalized modular display stay intact. Both real solvers reproduce baseline decimal-loss failures, then verify hexadecimal/showbase, width/fill and BIG positive/negative behavior on normalized actual matrix fields. The linear TRACE wrapper preserves numeric insertion types for the iteration, matrix and RHS, while the shared sticky trace writer preserves CString and numeric header/body insertions, sticky failures and callback scope. DisplayToTracked exposes the exact BIG character/formatting receipt to each concrete solver. Actual magnitude callbacks observe that receipt active, cannot mutate the executing solver, and a refused output retires only the completed receipt before return. Native Go interfaces delegate only reached IO operations, not arithmetic, container templates or STL internals."
         },
         {
           "name": "Concrete linear display delegates each numeral insertion at the reached matrix/RHS position (linear_eq_solver.h:143-146; mpq.cpp:130-139; mpz.cpp:1385-1408)",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_linear_display.go",
           "go_targets": [
             "pkg/math/polynomial/polynomial_linear_display_test.go",
@@ -40413,11 +40424,12 @@
             "TestLinearRationalDisplayOwnsExactFormatterCallback",
             "TestLinearModularDisplayOwnsExactFormatterCallback"
           ],
-          "notes": "The source calls the actual manager display, not to_string. Concrete DisplayToTracked now executes the retained integer character/formatting path and gives the real solver an exact receipt during each BIG insertion. Negative BIG values insert sign before magnitude formatting; rational numerator, slash and denominator retain separate reached insertions before the solver space/newline. Modular display still delegates directly to the underlying integer without asserting normalization. Actual callbacks observe the expected insertion sequence and exact active formatter child; refused output retires the completed child without acquiring other manager work. Existing owner reentry, trace failure, sparse interpolation and mathematical checks remain in the focused selection. Wider arithmetic-child/source-destruction and whole-unit audits remain partial."
+          "notes": "The source calls the actual manager display, not to_string. Concrete DisplayToTracked executes the retained integer character/formatting path and gives the real solver an exact receipt during each BIG insertion. Negative BIG values insert sign before magnitude formatting; rational numerator, slash and denominator retain separate reached insertions before the solver space/newline. Modular display delegates directly to the underlying integer without asserting normalization. Actual callbacks observe the expected insertion sequence and exact active formatter child; refused output retires the completed child without acquiring other manager work. Owner reentry, trace failure, sparse interpolation and mathematical checks cover the retained consumers."
         },
         {
           "name": "Concrete linear operations bind borrowed integer/natural/modular managers for actual execution; direct Display and Solve TRACE callbacks cannot destroy managers or replace the borrowed field; nested owners restore exact outer bindings",
           "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/polynomial_linear_borrowed.go",
           "go_targets": [
             "pkg/math/polynomial/polynomial_linear_borrowed.go",
             "pkg/util/numeral/numeric_caller_guard.go",
@@ -40433,7 +40445,8 @@
         },
         {
           "name": "Retained unsynchronized rational Copy/Set/Div/SubMul calls transport exact integer allocations and accepted GCD/division RAW receipts; owning solver cleanup releases these before header retirement and preserves foreign replacements",
-          "status": "partial",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_linear_rational.go",
           "go_targets": [
             "pkg/math/polynomial/polynomial_linear_rational.go",
             "pkg/util/numeral/mpq.go",
@@ -40449,7 +40462,7 @@
         },
         {
           "name": "Concrete modular Set/Div/SubMul calls retain their actual numerical allocation context, direct multiply-subtract child and accepted RAW children in acquisition order; owning cleanup uses exact completed-local then abort phases",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_linear_modular.go",
           "tests": [
             "TestLinearModularArithmeticOwnsEveryReservationPrefix",
@@ -40459,7 +40472,7 @@
         },
         {
           "name": "Concrete modular RHS/coefficient/solution Copy calls use exact primitive allocation context with per-copy epoch and executing-leaf guard; owning Close cleans only acquired roots and preserves foreign replacement",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_linear_modular.go",
           "tests": [
             "TestLinearModularCopyRefusalOwnsExactNumericRoot",
@@ -40492,8 +40505,8 @@
           ]
         },
         {
-          "name": "Literal field read/output order through borrowed cold io.Writer; direct and TRACE receivers retain concrete numeric/string formatting while broader failure/lifetime audit remains open",
-          "status": "partial",
+          "name": "Literal field read/output order through borrowed cold io.Writer; direct and TRACE receivers retain concrete numeric/string formatting and sticky source order",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_linear_display.go",
           "tests": [
             "TestLinearRationalSourceDisplaySpacingAndOrder",
@@ -40504,15 +40517,24 @@
         },
         {
           "name": "Concrete embedded modular solver with native slice Add/Solve: RHS-first reached input, descending back-substitution output and exact self-alias",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_linear_modular.go",
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_sparse_interpolation.go",
+            "pkg/math/polynomial/polynomial_sparse_interpolator_source_test.go",
+            "pkg/math/polynomial/polynomial_sparse_trace_test.go",
+            "pkg/math/polynomial/polynomial_sparse_physical_test.go"
+          ],
           "tests": [
             "TestLinearConcreteLocalConstructorGuardAndNoHeaderReservation",
             "TestLinearNativeEmptySolve",
             "TestLinearNativeOutputCopyEveryRefusalPrefix",
             "TestLinearNativeRHSBeforeReachedInput",
             "TestLinearNativeOutputsAndRHSAlias",
-            "TestLinearNativeBigSelfCopyAliases"
+            "TestLinearNativeBigSelfCopyAliases",
+            "TestPolynomialSparseInterpolatorIndependentThreeSamples",
+            "TestPolynomialSparseInterpolationSourceTraceSequence",
+            "TestPolynomialSparseInterpolationEveryActualReservationPrefix"
           ]
         }
       ],
@@ -40520,16 +40542,17 @@
         "Native [][]util.Int/[]util.Int and [][]util.Rational/[]util.Rational own matrix/RHS cells. Rational defaults are explicitly 0/1. Native slice capacity is outside Runtime budget. Actual BIG numeral resources remain manager-owned and are independently audited after arithmetic refusal prefixes. Source destruction stops sticky; explicit owning continuation drains actual retained numeral fields.",
         "Source pivot swaps matrix rows only, never RHS; source behavior preserved. Add publishes RHS before reached caller coefficient read. Singular return precedes output writes; descending back substitution copies each output before changing lower RHS cells. Literal Flush deletes RHS then row entries in ascending order, then clears native containers. Source class finalization releases their slices.",
         "Embedded solver has no separate header charge. Constructor source field guard precedes external header reservation. Add/Solve borrow concrete native slices at reached indices. Actual cell pointers preserve BIG self-copy aliases; empty Solve leaves nil output unread.",
-        "Both retained concrete linear solvers now emit the source linear_eq_solver TRACE at h:90 before pivot search/normalization and h:124 before each backward save/substitution. The actual numeric manager trace context is borrowed (including process fallback), so local sparse-interpolation solvers inherit the same tags without a separate solver configuration. Each body displays actual typed matrix/RHS storage through the existing source Display; disabled/erased tags skip formatting and reads. Independent diagonal-system tests verify forward/backward order 0,1,1,0, exact intermediate matrices, solved values, modular symmetric -2 for 9 mod 11, and empty output in the erased profile. Focused linear and sparse interpolation mathematical/trace checks run in ordinary and checked/debug/trace profiles on CPUs 8-16. Stream failure/callback/exception composition and full unit/polynomial/AST completion remain unaudited.",
-        "Linear TRACE failure semantics corrected: a call-local bridge suppresses only ostream insertion failures while the diagnostic sticky writer retains failbit; later numerical/display operands still execute. Actual Display computation errors are captured separately and propagated from Solve at the source pre-pivot/pre-back-substitution TRACE position. Valid rational solve tests retain solution 3 after the trace stream refuses its first write and verify no underlying retry. Rational/modular guarded tests deliberately truncate the actual RHS extent, observe its debug assertion/bounds guard after stream failure, and verify off-diagonal coefficient 4 has not yet been normalized. The malformed extent is restored solely for fixture destruction and is not malloc-refusal evidence. Existing iteration-state/erased-trace and sparse-interpolation checks pass ordinary and checked/debug/trace on CPUs 8-16. Broader writer callback/exception/destructor composition and full polynomial/AST audits remain pending.",
-        "Concrete linear source assertion sites now honor runtime SourceAssertionsEnabled and actual debugger actions at h:33 (field constructor),37/42 (flush shape),78 (Add index),102/109/125 (pivot/eliminated-prefix/diagonal checks),141 (display row shape). Numerical assertion operands are read only after the switch; the DEBUG_CODE prefix loop rechecks the switch for each SASSERT. Source T preserves the actual default_exception class/message while errors.Is retains the Go polynomial-assertion classification; C continues the literal body, and erased/disabled assertions do not synthesize a failure. Independent constructor tests cover T/C/disabled, no numeric budget acquisition and actual local owner publication; Add tests prove Throw precedes invalid unused operands and continued/disabled assertions reach separate bounds protection. Focused ordinary and checked/debug/trace linear/sparse-interpolation checks run on CPUs 8-16. Vector access guards remain separate Go safety guards, not newly ported STL assertions. Full callback/destructor/TRACE/allocation and polynomial/AST completion audits remain pending.",
-        "Concrete linear owners now enforce the single-goroutine executing-operation protocol across Resize/Reset/Add/Solve/Flush/SourceFinalize/Close/Display. Public callback reentry is refused before touching owner flags or borrowed numerical state. Resize uses its accepted private source flush; TRACE uses the accepted private display body, so legitimate source nesting continues without reopening public cleanup authority. Source finalization and the subsequent explicit owning continuation each protect their actual destructor execution. Real host-output callbacks during direct Display and Solve TRACE attempt all eight public mutation/destruction/display operations and verify ErrPolynomialPending, unchanged matrix/RHS/header lifecycle and budget, correct resumed solution 3, and successful later Reset/Close for rational and modular owners. These are actual executing callbacks, not manually assigned pending flags. Focused ordinary and checked/debug/trace linear/sparse-interpolation checks run on CPUs 8-16. Exhaustive numeric failure-transport/destructor callback composition and full polynomial/AST completion remain pending."
+        "Both retained concrete linear solvers emit the source linear_eq_solver TRACE at h:90 before pivot search/normalization and h:124 before each backward save/substitution. The actual numeric manager trace context is borrowed (including process fallback), so local sparse-interpolation solvers inherit the same tags without a separate solver configuration. Each body displays actual typed matrix/RHS storage through the existing source Display; disabled/erased tags skip formatting and reads. Independent diagonal-system tests verify forward/backward order 0,1,1,0, exact intermediate matrices, solved values, modular symmetric -2 for 9 mod 11, and empty output in the erased profile. Sticky failures, callbacks and concrete numeric insertion state are covered for both direct and TRACE display paths.",
+        "Linear TRACE failure semantics use a call-local bridge that suppresses only ostream insertion failures while the diagnostic sticky writer retains failbit; later numerical/display operands still execute. Actual Display computation errors are captured separately and propagated from Solve at the source pre-pivot/pre-back-substitution TRACE position. Valid rational solve tests retain solution 3 after the trace stream refuses its first write and verify no underlying retry. Rational/modular guarded tests truncate the actual RHS extent, observe its debug assertion/bounds guard after stream failure, and verify off-diagonal coefficient 4 has not yet been normalized. The malformed extent is restored solely for fixture destruction and is not malloc-refusal evidence.",
+        "Concrete linear source assertion sites honor runtime SourceAssertionsEnabled and actual debugger actions at h:33 (field constructor),37/42 (flush shape),78 (Add index),102/109/125 (pivot/eliminated-prefix/diagonal checks),141 (display row shape). Numerical assertion operands are read only after the switch; the DEBUG_CODE prefix loop rechecks the switch for each SASSERT. Source T preserves the actual default_exception class/message while errors.Is retains the Go polynomial-assertion classification; C continues the literal body, and erased/disabled assertions do not synthesize a failure. Independent constructor tests cover T/C/disabled, no numeric budget acquisition and actual local owner publication; Add tests prove Throw precedes invalid unused operands and continued/disabled assertions reach separate bounds protection. Vector access guards remain separate Go safety guards, not newly ported STL assertions.",
+        "Concrete linear owners enforce the single-goroutine executing-operation protocol across Resize/Reset/Add/Solve/Flush/SourceFinalize/Close/Display. Public callback reentry is refused before touching owner flags or borrowed numerical state. Resize uses its accepted private source flush; TRACE uses the accepted private display body, so legitimate source nesting continues without reopening public cleanup authority. Source finalization and the subsequent explicit owning continuation each protect their actual destructor execution. Real host-output callbacks during direct Display and Solve TRACE attempt all eight public mutation/destruction/display operations and verify ErrPolynomialPending, unchanged matrix/RHS/header lifecycle and budget, correct resumed solution 3, and successful later Reset/Close for rational and modular owners. Reservation-prefix campaigns cover actual rational and modular arithmetic children through success and verify exact owning cleanup.",
+        "The retained production consumer at polynomial.cpp:3134-3182 embeds the concrete modular solver in the sparse-interpolation lexical scope. Construction follows cs/new_as/as/mons/aux, then solver order; source cleanup runs solver first in reverse order. Each skeleton entry reaches Resize, RHS-first Add, source matrix Display and Solve. Independent interpolation, trace, physical-owner and every-reservation-prefix tests cover this integration."
       ],
       "deviations": [
-        "No Go generics: concrete rational and integer-modular specializations cover retained source clients. C++ vector capacity, allocation and relocation failure behavior intentionally replaced by native Go slices. Actual numerical allocation/refusal behavior and source arithmetic order remain. Global manager/assertion/TRACE binding remains open.",
-        "Display maps default decimal context to borrowed io.Writer; full NumericTextStream/ostream flag-state integration remains open. Actual modular display uses integer manager without normalization assertion.",
+        "No Go generics: concrete rational and integer-modular specializations cover retained source clients. C++ vector capacity, allocation and relocation failure behavior is intentionally replaced by native Go slices. Actual numerical allocation/refusal behavior and source arithmetic order remain.",
+        "Display uses a cold io.Writer boundary with optional concrete numeric insertion capabilities. NumericTextStream retains base/showbase/width/fill state; actual modular display uses the integer manager without a normalization assertion.",
         "Original polynomial linear fixture contains VERIFY plus three ENSURE sites but source driver returns before it; no active registered-source assertion credit. Independent finite rational determinant and modular inverse checks retained.",
-        "Selected concrete modular client only; global source diagnostic/assertion binding and other clients remain separately partial."
+        "The retained production instantiation is the embedded mpzzp solver in sparse interpolation. The unsynchronized rational instantiation is retained for the original polynomial source fixture and independent algorithm verification; no universal template adapter is introduced."
       ]
     },
     {
