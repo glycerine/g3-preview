@@ -141,8 +141,8 @@ func (m *MonomialManager) displaySMT2Product(a Monomial, out MonomialTextSink) e
 		if e != nil {
 			return e
 		}
-		if polynomialSourceDebug && d == 0 {
-			return ErrMonomialAssertion
+		if e = m.sourceScalarAssert(408, "k > 0", d > 0); e != nil {
+			return e
 		}
 		for j := uint32(0); j < d; j++ {
 			if e = monomialSinkLiteral(out, " "); e != nil {

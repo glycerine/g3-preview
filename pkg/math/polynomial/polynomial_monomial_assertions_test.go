@@ -61,6 +61,38 @@ func TestMonomialPowerSourceAssertionSwitchAndClosedDebug(t *testing.T) {
 	}
 }
 
+func TestMonomialSMT2PositiveDegreeAssertionActions(t *testing.T) {
+	for _, choice := range []string{"T", "C", "disabled"} {
+		t.Run(choice, func(t *testing.T) {
+			m := monomialFixture(t)
+			action := choice
+			if choice == "disabled" {
+				action = "T"
+			}
+			polynomialAssertionActionsFixture(t, action)
+			if polynomialSourceDebug && choice == "disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+			}
+			a := monomialReadProfileObject(t, m, 1)
+			monomialReadWrite(t, m, a, 20, 7)
+			monomialReadWrite(t, m, a, 24, 0)
+			out := &monomialTestSink{}
+			e := m.DisplaySMT2Into(a, out)
+			if polynomialSourceDebug && choice == "T" {
+				if !errors.Is(e, ErrMonomialAssertion) || out.text.String() != "(*" {
+					t.Fatal("positive-degree assertion did not stop at source prefix", e, out.text.String())
+				}
+			} else {
+				serviceMust(t, e)
+				if out.text.String() != "(*)" {
+					t.Fatal("Continue/disabled/release changed source suffix", out.text.String())
+				}
+			}
+			monomialPhysicalAudit(t, m)
+		})
+	}
+}
+
 func TestMonomialPredecessorSourceAssertionActions(t *testing.T) {
 	for _, choice := range []string{"T", "C", "disabled"} {
 		t.Run(choice, func(t *testing.T) {

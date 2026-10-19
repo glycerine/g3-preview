@@ -43787,8 +43787,8 @@
           ]
         },
         {
-          "name": "ordinary/SMT2 displays and rename cpp378\u2013445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
-          "status": "partial",
+          "name": "complete ordinary/SMT2 display and object rename block cpp378\u2013445: borrowed Go sink, exact source text/assertion actions and reached-field order; native sort preserves retained canonical result",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_display.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -43815,6 +43815,10 @@
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialReadOrderDisplayReachedPrefix",
+            "TestMonomialReadOrderSMT2DegreeBeforeVariable",
+            "TestMonomialReadOrderRenameVariablePublication",
+            "TestMonomialSMT2PositiveDegreeAssertionActions",
             "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower",
             "TestMonomialNativeScratchGrowthResetAndBounds",
             "TestMonomialNativeVariableCountingAndInterning",
@@ -43826,8 +43830,8 @@
           ]
         },
         {
-          "name": "ordinary/SMT2 displays and rename cpp378\u2013445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
-          "status": "partial",
+          "name": "complete ordinary/SMT2 display and object rename block cpp378\u2013445: borrowed Go sink, exact source text/assertion actions and reached-field order; native sort preserves retained canonical result",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -43854,6 +43858,10 @@
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialReadOrderDisplayReachedPrefix",
+            "TestMonomialReadOrderSMT2DegreeBeforeVariable",
+            "TestMonomialReadOrderRenameVariablePublication",
+            "TestMonomialSMT2PositiveDegreeAssertionActions",
             "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower",
             "TestMonomialNativeScratchGrowthResetAndBounds",
             "TestMonomialNativeVariableCountingAndInterning",
@@ -47963,8 +47971,8 @@
           ]
         },
         {
-          "name": "ordinary/SMT2 displays and rename cpp378\u2013445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
-          "status": "partial",
+          "name": "complete ordinary/SMT2 display and object rename block cpp378\u2013445: borrowed Go sink, exact source text/assertion actions and reached-field order; native sort preserves retained canonical result",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_display.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -47991,6 +47999,10 @@
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialReadOrderDisplayReachedPrefix",
+            "TestMonomialReadOrderSMT2DegreeBeforeVariable",
+            "TestMonomialReadOrderRenameVariablePublication",
+            "TestMonomialSMT2PositiveDegreeAssertionActions",
             "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower",
             "TestMonomialNativeScratchGrowthResetAndBounds",
             "TestMonomialNativeVariableCountingAndInterning",
@@ -48002,8 +48014,8 @@
           ]
         },
         {
-          "name": "ordinary/SMT2 displays and rename cpp378\u2013445: PARTIAL cold borrowed output sink substitutes external ostream/display_var_proc. Exact canonical text includes unconditional SMT2 final parenthesis. Eager header/field reads on partial malformed records remain open. In-place heapsort is external std::sort backend adaptation, canonical unique-variable result order only.",
-          "status": "partial",
+          "name": "complete ordinary/SMT2 display and object rename block cpp378\u2013445: borrowed Go sink, exact source text/assertion actions and reached-field order; native sort preserves retained canonical result",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -48030,6 +48042,10 @@
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialReadOrderDisplayReachedPrefix",
+            "TestMonomialReadOrderSMT2DegreeBeforeVariable",
+            "TestMonomialReadOrderRenameVariablePublication",
+            "TestMonomialSMT2PositiveDegreeAssertionActions",
             "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower",
             "TestMonomialNativeScratchGrowthResetAndBounds",
             "TestMonomialNativeVariableCountingAndInterning",
