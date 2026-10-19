@@ -149,34 +149,15 @@ func (m *AlgebraicRootCore) finishSignResultant(owning bool) (cause error) {
 		return e
 	}
 	for s.savedCursor < len(s.saved) {
-		saved := &s.saved[s.savedCursor]
-		if !saved.constructed && !owning {
-			s.savedCursor++
-			continue
+		if e := m.finishSavedInterval(&s.saved[s.savedCursor], owning); e != nil {
+			return e
 		}
-		if saved.constructed && !saved.restored {
-			if e := m.restoreBinaryInterval(saved); e != nil {
-				return e
-			}
-		}
-		if saved.owned {
-			if e := m.config.Intervals.Del(&saved.value); e != nil {
-				return e
-			}
-			saved.owned = false
-		}
-		saved.target = nil
 		s.savedCursor++
 	}
 	if owning {
 		for i := range s.saved {
-			saved := &s.saved[i]
-			if saved.owned {
-				if e := m.config.Intervals.Del(&saved.value); e != nil {
-					return e
-				}
-				saved.owned = false
-				saved.target = nil
+			if e := m.finishSavedInterval(&s.saved[i], true); e != nil {
+				return e
 			}
 		}
 	}
@@ -400,26 +381,10 @@ func (m *AlgebraicRootCore) exactSignResultant(pm *MultivariatePolynomialManager
 		if e != nil {
 			return 0, false, e
 		}
-		s.saved = append(s.saved, algebraicSavedInterval{target: a, owned: true})
-		saved := &s.saved[len(s.saved)-1]
-		if e = m.assertBinaryRoot(a, 907, "!num.is_basic()"); e != nil {
+		s.saved = append(s.saved, algebraicSavedInterval{})
+		if e = m.beginSavedInterval(&s.saved[len(s.saved)-1], a); e != nil {
 			return 0, false, e
 		}
-		l, e := m.location(a)
-		if e != nil {
-			return 0, false, e
-		}
-		if l == nil || l.kind != 1 {
-			return 0, false, ErrAlgebraicOwner
-		}
-		r, e := m.load(l)
-		if e != nil {
-			return 0, false, e
-		}
-		if e = m.config.Intervals.Copy(&saved.value, &r.interval); e != nil {
-			return 0, false, e
-		}
-		saved.constructed = true
 	}
 	mapping := algebraicRootIntervals{owner: m, values: values}
 	for {

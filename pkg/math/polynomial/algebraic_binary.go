@@ -11,6 +11,7 @@ import (
 )
 
 type algebraicSavedInterval struct {
+	copy                         unumeral.IntegerCopyAllocationReceipt
 	target                       *Algebraic
 	value                        unumeral.BinaryInterval
 	owned, constructed, restored bool
@@ -182,20 +183,9 @@ func (m *AlgebraicRootCore) finishBinaryLocals() error {
 		s.intervalConstructed = false
 	}
 	for i := 1; i >= 0; i-- {
-		saved := &s.saved[i]
-		if !saved.owned {
-			continue
-		}
-		if saved.constructed && !saved.restored {
-			if e := m.restoreBinaryInterval(saved); e != nil {
-				return e
-			}
-		}
-		if e := m.config.Intervals.Del(&saved.value); e != nil {
+		if e := m.finishSavedInterval(&s.saved[i], false); e != nil {
 			return e
 		}
-		saved.constructed = false
-		saved.owned = false
 	}
 	// scoped_ptr_vector destroys its elements in forward order.
 	for s.sequenceCursor < len(s.sequences) {
@@ -262,6 +252,11 @@ func (m *AlgebraicRootCore) cleanupBinary() error {
 	if e := m.finishBinaryLocals(); e != nil {
 		return e
 	}
+	for i := len(s.saved) - 1; i >= 0; i-- {
+		if e := m.finishSavedInterval(&s.saved[i], true); e != nil {
+			return e
+		}
+	}
 	for i := len(s.intervalRoots) - 1; i >= 0; i-- {
 		if e := s.intervalRoots[i].Cleanup(true); e != nil {
 			return e
@@ -293,6 +288,12 @@ func (m *AlgebraicRootCore) makeBinary(a, b, out *Algebraic, kind uint8) (cause 
 		return e
 	}
 	if e := m.assertBinaryRoot(b, 1006, "!b.is_basic()"); e != nil {
+		return e
+	}
+	if e := algebraicQueryTagAssertionSwitch(); e != nil {
+		return e
+	}
+	if e := algebraicQueryTagAssertionSwitch(); e != nil {
 		return e
 	}
 	*s = algebraicBinaryScope{polynomialCaller: m.polynomialCaller, active: true, running: true}
@@ -381,22 +382,9 @@ func (m *AlgebraicRootCore) makeBinary(a, b, out *Algebraic, kind uint8) (cause 
 		}
 	}
 	for i, target := range []*Algebraic{a, b} {
-		s.saved[i] = algebraicSavedInterval{target: target, owned: true}
-		if e = m.assertBinaryRoot(target, 907, "!num.is_basic()"); e != nil {
+		if e = m.beginSavedInterval(&s.saved[i], target); e != nil {
 			return e
 		}
-		l, e := m.location(target)
-		if e != nil {
-			return e
-		}
-		r, e := m.load(l)
-		if e != nil {
-			return e
-		}
-		if e = im.Copy(&s.saved[i].value, &r.interval); e != nil {
-			return e
-		}
-		s.saved[i].constructed = true
 	}
 	s.intervalConstructed = true
 	for {
@@ -646,7 +634,7 @@ func algebraicAssertionSwitch() (*diagnostic.DebugContext, bool, error) {
 	return d, enabled, e
 }
 func (m *AlgebraicRootCore) assertBinaryRoot(a *Algebraic, line int32, expression string) error {
-	d, enabled, e := algebraicAssertionSwitch()
+	_, enabled, e := algebraicAssertionSwitch()
 	if e != nil || !enabled {
 		return e
 	}
@@ -655,7 +643,7 @@ func (m *AlgebraicRootCore) assertBinaryRoot(a *Algebraic, line int32, expressio
 		return e
 	}
 	if l == nil || l.kind == 0 {
-		return diagnostic.DebugAssertionFailure(d, "src/math/polynomial/algebraic_numbers.cpp", line, expression)
+		return m.predicateAssertionFailure(line, expression)
 	}
 	return nil
 }

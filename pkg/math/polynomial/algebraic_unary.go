@@ -15,6 +15,9 @@ func (m *AlgebraicRootCore) makeUnary(a, out *Algebraic, k uint32, root bool) (c
 	if e := m.assertBinaryRoot(a, 1088, "!a.is_basic()"); e != nil {
 		return e
 	}
+	if e := algebraicQueryTagAssertionSwitch(); e != nil {
+		return e
+	}
 	*s = algebraicBinaryScope{polynomialCaller: m.polynomialCaller, active: true, running: true}
 	defer func() {
 		s.executing = false
@@ -94,23 +97,8 @@ func (m *AlgebraicRootCore) makeUnary(a, out *Algebraic, k uint32, root bool) (c
 			return e
 		}
 	}
-	for i, target := range []*Algebraic{a} {
-		s.saved[i] = algebraicSavedInterval{target: target, owned: true}
-		if e = m.assertBinaryRoot(target, 907, "!num.is_basic()"); e != nil {
-			return e
-		}
-		l, e := m.location(target)
-		if e != nil {
-			return e
-		}
-		r, e := m.load(l)
-		if e != nil {
-			return e
-		}
-		if e = im.Copy(&s.saved[i].value, &r.interval); e != nil {
-			return e
-		}
-		s.saved[i].constructed = true
+	if e = m.beginSavedInterval(&s.saved[0], a); e != nil {
+		return e
 	}
 	s.intervalConstructed = true
 	for {

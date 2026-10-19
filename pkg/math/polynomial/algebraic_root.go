@@ -67,6 +67,7 @@ type AlgebraicRootCore struct {
 	representationCopy                                         unumeral.IntegerCopyAllocationReceipt
 	intervalDisplayRunning, decimalDisplayRunning              bool
 	comparisonTraceRunning                                     bool
+	savedIntervalExecuting                                     *algebraicSavedInterval
 	predicateDiagnosticRunning                                 bool
 	predicateTrace                                             algebraicPredicateTraceScope
 	rationalCopy                                               unumeral.IntegerCopyAllocationReceipt
@@ -201,6 +202,10 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m != nil && m.self == m && m.savedIntervalExecuting != nil {
+		return ErrAlgebraicPending
+	}
+
 	if m != nil && m.self == m && (m.division.cleaning || m.integerAdd.cleaning) {
 		return ErrAlgebraicPending
 	}
@@ -1011,6 +1016,10 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.cleanupRetainedCore()
 }
 func (m *AlgebraicRootCore) cleanupRetainedCore() error {
+	if m != nil && m.self == m && m.savedIntervalExecuting != nil {
+		return ErrAlgebraicPending
+	}
+
 	if m != nil && m.self == m && (m.foreignCopyBorrowers != 0 || m.foreignCopy.running || m.foreignCopy.cleaning) {
 		return ErrAlgebraicPending
 	}
@@ -1241,6 +1250,10 @@ func (m *AlgebraicRootCore) Close() error {
 	return m.closeCoreMembers()
 }
 func (m *AlgebraicRootCore) closeCoreMembers() error {
+	if m != nil && m.self == m && m.savedIntervalExecuting != nil {
+		return ErrAlgebraicPending
+	}
+
 	if m != nil && m.self == m && (m.foreignCopyBorrowers != 0 || m.foreignCopy.running || m.foreignCopy.cleaning) {
 		return ErrAlgebraicPending
 	}
