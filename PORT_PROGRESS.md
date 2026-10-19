@@ -46215,3 +46215,13 @@ guard, and disabled assertions skip predicate reads. The existing coefficient
 algorithms, TRACE path, two-buffer ownership and constant numeral-copy receipts
 remain intact. Focused tests pass in native, checked, debug and combined
 checked/debug/trace profiles on CPUs 8-16.
+
+Polynomial variable-degree collection completion: `var_degrees<Max>` and its
+maximum/minimum wrappers at `polynomial.cpp:3214-3262` use a native typed power
+slice and persistent native variable-to-position scratch. They preserve first
+variable encounter order, update only the selected extremum, and restore every
+touched scratch position to `UINT_MAX`. The cleanup-position and debug
+uniqueness assertions now read the process switch before indexed predicates and
+honor Throw, Continue, and disabled execution. Focused degree-cache, sort, and
+assertion tests pass in native, checked, debug and combined checked/debug/trace
+profiles on CPUs 8-16.

@@ -44347,6 +44347,15 @@
           ]
         },
         {
+          "name": "Complete var_degrees, var_max_degrees and var_min_degrees bodies cpp3214-3262 with native typed scratch and source assertion actions",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_power_buffer.go",
+          "tests": [
+            "TestPolynomialGCDVariableDegreesNativeCache",
+            "TestPolynomialGCDPowerSourceAssertionActions"
+          ]
+        },
+        {
           "name": "Complete coeff and coeff-with-reduct, constant_coeff and lc bodies cpp3264-3338,3551-3553 with source assertion actions",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_degree_coefficient.go",
@@ -48588,6 +48597,15 @@
             "TestPolynomialQueryReachedFieldReadProfiles",
             "TestPolynomialQueryCoefficientPhysicalFailurePrefixes",
             "TestPolynomialQueryEqualNativeScratch"
+          ]
+        },
+        {
+          "name": "Complete var_degrees, var_max_degrees and var_min_degrees bodies cpp3214-3262 with native typed scratch and source assertion actions",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_power_buffer.go",
+          "tests": [
+            "TestPolynomialGCDVariableDegreesNativeCache",
+            "TestPolynomialGCDPowerSourceAssertionActions"
           ]
         },
         {

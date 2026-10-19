@@ -106,20 +106,19 @@ func (m *MultivariatePolynomialManager) variableDegrees(p Polynomial, pws *polyn
 		}
 	}
 	for i := uint32(0); i < uint32(len(*pws)); i++ {
-		x, e := pws.word(i, 0)
-		if e != nil {
+		if e := polynomialGCDPowerSourceAssert(3244, "var2pos[pws[i].get_var()] != UINT_MAX", func() (bool, error) {
+			x, xerr := pws.word(i, 0)
+			if xerr != nil {
+				return false, xerr
+			}
+			if uint64(x) >= uint64(len(m.varDegrees)) {
+				return false, arena.ErrBounds
+			}
+			return m.varDegrees[x] != ^uint32(0), nil
+		}); e != nil {
 			return e
 		}
-		if polynomialSourceDebug {
-			if uint64(x) >= uint64(len(m.varDegrees)) {
-				return arena.ErrBounds
-			}
-			pos := m.varDegrees[x]
-			if pos == ^uint32(0) {
-				return ErrPolynomialAssertion
-			}
-		}
-		x, e = pws.word(i, 0)
+		x, e := pws.word(i, 0)
 		if e != nil {
 			return e
 		}
@@ -128,16 +127,15 @@ func (m *MultivariatePolynomialManager) variableDegrees(p Polynomial, pws *polyn
 	if polynomialSourceDebug {
 		for i := uint32(0); i < uint32(len(*pws)); i++ {
 			for j := i + 1; j < uint32(len(*pws)); j++ {
-				x, e := pws.word(i, 0)
-				if e != nil {
+				if e := polynomialGCDPowerSourceAssert(3251, "pws[i].first != pws[j].first", func() (bool, error) {
+					x, xerr := pws.word(i, 0)
+					if xerr != nil {
+						return false, xerr
+					}
+					y, xerr := pws.word(j, 0)
+					return x != y, xerr
+				}); e != nil {
 					return e
-				}
-				y, e := pws.word(j, 0)
-				if e != nil {
-					return e
-				}
-				if x == y {
-					return ErrPolynomialAssertion
 				}
 			}
 		}
