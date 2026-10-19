@@ -40377,6 +40377,8 @@
           "go_targets": [
             "pkg/util/numeral/mp_display_stream.go",
             "pkg/math/polynomial/polynomial_linear_display.go",
+            "pkg/math/polynomial/polynomial_linear_trace.go",
+            "pkg/util/diagnostic/util_trace_tags.go",
             "pkg/math/polynomial/polynomial_linear_stream_flags_test.go",
             "pkg/math/polynomial/polynomial_linear_display_test.go",
             "pkg/util/numeral/mp_display_stream_test.go"
@@ -40385,9 +40387,10 @@
             "TestLinearRationalDisplayReceivingNumericFlags",
             "TestLinearModularDisplayReceivingNumericFlags",
             "TestLinearNumericInsertionCallbackBorrowsActualOwners",
+            "TestLinearTraceRetainsReceivingNumericFlags",
             "TestIntegerAndRationalDisplaySourceInsertionOrder"
           ],
-          "notes": "Cold io.Writer receivers that expose native AppendInt32/AppendCString retain their actual formatting state. SMALL mpz insertion delegates int32 directly; BIG sign and decimal magnitude remain separate string insertions. Rational NUM/slash/DEN order and unnormalized modular display stay intact. Both real solvers reproduce baseline decimal-loss failures, then verify hexadecimal/showbase, width/fill and BIG positive/negative behavior on normalized actual matrix fields. A concrete numeric-insertion callback cannot close/reset/source-finalize its actual solver or borrowed numeral managers; data/ownership stay unchanged. Native Go interfaces delegate only reached IO operations, not arithmetic, container templates or STL internals. Wrapped TRACE stream formatting/exception and broader whole linear-unit lifetime audits remain open."
+          "notes": "Cold io.Writer receivers that expose native AppendInt32/AppendUint32/AppendCString retain their actual formatting state. SMALL mpz insertion delegates int32 directly; BIG sign and decimal magnitude remain separate string insertions. Rational NUM/slash/DEN order and unnormalized modular display stay intact. Both real solvers reproduce baseline decimal-loss failures, then verify hexadecimal/showbase, width/fill and BIG positive/negative behavior on normalized actual matrix fields. The linear TRACE wrapper now preserves numeric insertion types for the iteration, matrix and RHS, while the shared sticky trace writer preserves CString and numeric header/body insertions, sticky failures and callback scope. A concrete numeric-insertion callback cannot close/reset/source-finalize its actual solver or borrowed numeral managers; data/ownership stay unchanged. Native Go interfaces delegate only reached IO operations, not arithmetic, container templates or STL internals. Broader whole linear-unit source-destruction and numerical child-lifetime audits remain open."
         },
         {
           "name": "Concrete linear display delegates each numeral insertion at the reached matrix/RHS position (linear_eq_solver.h:143-146; mpq.cpp:130-139; mpz.cpp:1385-1408)",
@@ -40481,7 +40484,7 @@
           ]
         },
         {
-          "name": "Literal default-decimal field read/output order through borrowed cold io.Writer; complete stream formatting state remains open",
+          "name": "Literal field read/output order through borrowed cold io.Writer; direct and TRACE receivers retain concrete numeric/string formatting while broader failure/lifetime audit remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_linear_display.go",
           "tests": [

@@ -119,6 +119,13 @@ func writeTracePart(w io.Writer, part string) error {
 	return nil
 }
 
+func writeTraceInt32(w io.Writer, value int32) error {
+	if out, ok := w.(interface{ AppendInt32(int32) error }); ok {
+		return out.AppendInt32(value)
+	}
+	return writeTracePart(w, strconv.FormatInt(int64(value), 10))
+}
+
 func flushTrace(w io.Writer) error {
 	if f, ok := w.(interface{ Flush() error }); ok {
 		return f.Flush()
@@ -177,8 +184,66 @@ func (w *traceStickyWriter) WriteString(s string) (int, error) {
 	}
 	w.enterOutput()
 	defer w.leaveOutput()
+	if out, ok := w.out.(interface{ AppendCString(string) error }); ok {
+		err := out.AppendCString(s)
+		if err != nil {
+			w.capture(err)
+			if w.streamErr == nil {
+				w.streamErr = err
+			}
+			return 0, err
+		}
+		return len(s), nil
+	}
 	n, err := io.WriteString(w.out, s)
 	return w.remember(n, len(s), err)
+}
+
+// AppendCString, AppendInt32 and AppendUint32 retain the receiving ostream's
+// formatting state while keeping the same sticky failure and callback scope as
+// ordinary trace writes. These small concrete insertion shapes are the ones
+// used by retained source trace consumers.
+func (w *traceStickyWriter) AppendCString(s string) error {
+	_, err := w.WriteString(s)
+	return err
+}
+func (w *traceStickyWriter) AppendInt32(v int32) error {
+	if w.first != nil {
+		return w.first
+	}
+	w.enterOutput()
+	defer w.leaveOutput()
+	if out, ok := w.out.(interface{ AppendInt32(int32) error }); ok {
+		err := out.AppendInt32(v)
+		w.capture(err)
+		if err != nil && w.streamErr == nil {
+			w.streamErr = err
+		}
+		return err
+	}
+	s := strconv.FormatInt(int64(v), 10)
+	n, err := io.WriteString(w.out, s)
+	_, err = w.remember(n, len(s), err)
+	return err
+}
+func (w *traceStickyWriter) AppendUint32(v uint32) error {
+	if w.first != nil {
+		return w.first
+	}
+	w.enterOutput()
+	defer w.leaveOutput()
+	if out, ok := w.out.(interface{ AppendUint32(uint32) error }); ok {
+		err := out.AppendUint32(v)
+		w.capture(err)
+		if err != nil && w.streamErr == nil {
+			w.streamErr = err
+		}
+		return err
+	}
+	s := strconv.FormatUint(uint64(v), 10)
+	n, err := io.WriteString(w.out, s)
+	_, err = w.remember(n, len(s), err)
+	return err
 }
 func (w *traceStickyWriter) Flush() error {
 	if w.first != nil {
@@ -224,12 +289,15 @@ func (w *traceStickyWriter) bodyComputationFailed(err error) bool {
 
 // TRACE and CTRACE insert each header component separately before CODE runs.
 func writeTraceHeader(w io.Writer, tag, function, file string, line int) error {
-	for _, part := range [...]string{"-------- [", traceTagCString(tag), "] ", function, " ", file, ":", strconv.Itoa(line), " ---------\n"} {
+	for _, part := range [...]string{"-------- [", traceTagCString(tag), "] ", function, " ", file, ":"} {
 		if err := writeTracePart(w, part); err != nil {
 			return err
 		}
 	}
-	return nil
+	if err := writeTraceInt32(w, int32(line)); err != nil {
+		return err
+	}
+	return writeTracePart(w, " ---------\n")
 }
 
 // Emit writes one TRACE record to the source-order stream. The caller

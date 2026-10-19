@@ -2,8 +2,10 @@ package polynomial
 
 import (
 	"errors"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	utext "github.com/glycerine/g3/pkg/util/text"
+	"strings"
 	"testing"
 )
 
@@ -149,5 +151,39 @@ func TestLinearNumericInsertionCallbackBorrowsActualOwners(t *testing.T) {
 	serviceMust(t, e)
 	if !w.called || s.running || text != "0xf/0x1f 0x1f\n" {
 		t.Fatal("numeric continuation/borrow lifetime", text, w.called)
+	}
+}
+
+func TestLinearTraceRetainsReceivingNumericFlags(t *testing.T) {
+	q, budget := rationalManager(t, false)
+	s, e := NewRationalLinearSolver(q)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, s.Close()); serviceMust(t, q.BindTrace(nil)) })
+	serviceMust(t, s.Resize(1))
+	a, b := unumeral.NewRational(), unumeral.NewRational()
+	serviceMust(t, q.SetFraction(&a, 15, 31))
+	serviceMust(t, q.SetInt64(&b, 31))
+	serviceMust(t, s.Add(0, []unumeral.Rational{a}, &b))
+	serviceMust(t, q.Del(&a))
+	serviceMust(t, q.Del(&b))
+	out, e := utext.NewNumericTextStream(utext.NumericTextStreamConfig{Budget: budget})
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, out.Close()) })
+	serviceMust(t, out.SetIntegerBase(16))
+	serviceMust(t, out.SetShowBase(true))
+	tags := diagnostic.NewTraceTagsWithWriter(linearNumericDisplayWriter{out})
+	tags.Enable("linear_eq_solver")
+	if !tags.ShouldTrace("linear_eq_solver") {
+		t.Skip("source TRACE erased")
+	}
+	serviceMust(t, q.BindTrace(tags))
+	result := []unumeral.Rational{unumeral.NewRational()}
+	ok, e := s.Solve(result)
+	serviceMust(t, e)
+	serviceMust(t, q.Del(&result[0]))
+	text, e := out.String()
+	serviceMust(t, e)
+	if !ok || !strings.Contains(text, "linear_eq_solver.h:0x5a ---------\n") || !strings.Contains(text, "iteration 0\n0xf/0x1f 0x1f\n") {
+		t.Fatal("trace lost receiving numeric flags", ok, text)
 	}
 }
