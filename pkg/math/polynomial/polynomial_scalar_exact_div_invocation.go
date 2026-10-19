@@ -86,14 +86,11 @@ func (m *MultivariatePolynomialCore) ExactDivScalar(p Polynomial, c *unumeral.In
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
-	if polynomialSourceDebug {
+	if e := polynomialExactDivSourceAssert(5095, "!m().is_zero(c)", func() (bool, error) {
 		zero, e := m.modular.IsZero(c)
-		if e != nil {
-			return Polynomial{}, e
-		}
-		if zero {
-			return Polynomial{}, ErrPolynomialAssertion
-		}
+		return !zero, e
+	}); e != nil {
+		return Polynomial{}, e
 	}
 	if m.exactDivision.active {
 		return Polynomial{}, ErrPolynomialPending
@@ -151,14 +148,11 @@ func (m *MultivariatePolynomialCore) ExactDivScalar(p Polynomial, c *unumeral.In
 		if e != nil {
 			return Polynomial{}, e
 		}
-		if polynomialSourceDebug {
+		if e = polynomialExactDivSourceAssert(5104, "m().divides(c, p->a(i))", func() (bool, error) {
 			divisible, e := numericIntegerModularManager_dividesWithScalarExactDivReceipt(m.modular, c, &a, r)
-			if e != nil {
-				return Polynomial{}, e
-			}
-			if !divisible {
-				return Polynomial{}, ErrPolynomialAssertion
-			}
+			return divisible, e
+		}); e != nil {
+			return Polynomial{}, e
 		}
 		if e = numericIntegerModularManager_divWithScalarExactDivReceipt(m.modular, &a, c, &s.numeral, r); e != nil {
 			return Polynomial{}, e

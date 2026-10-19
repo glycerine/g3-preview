@@ -272,14 +272,11 @@ func (m *MultivariatePolynomialCore) exactDivWithReceipt(p, q Polynomial, receip
 	if zero {
 		return p, nil
 	}
-	if polynomialSourceDebug {
+	if e = polynomialExactDivSourceAssert(5120, "!is_zero(q)", func() (bool, error) {
 		zero, e = m.IsZero(q)
-		if e != nil {
-			return Polynomial{}, e
-		}
-		if zero {
-			return Polynomial{}, ErrPolynomialAssertion
-		}
+		return !zero, e
+	}); e != nil {
+		return Polynomial{}, e
 	}
 	if m.exactDivision.active {
 		return Polynomial{}, ErrPolynomialPending

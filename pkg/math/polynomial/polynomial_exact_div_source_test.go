@@ -219,6 +219,7 @@ func TestPolynomialExactDivScalarRawLocalFailurePrefixes(t *testing.T) {
 }
 
 func TestPolynomialExactDivScalarDiagnosticsAndTruncation(t *testing.T) {
+	polynomialAssertionActionsFixture(t, "TT")
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{3, 5}, [][]MonomialPower{{{0, 2}}, nil})
 	c := unumeral.NewInt(2)
