@@ -41313,6 +41313,7 @@
         "TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation",
         "TestMonomialUnitNativeRecycleFinalizationIsIdempotent",
         "TestPolynomialLazardDichotomousIndependentCoefficients",
+            "TestPolynomialLazardSourceTraceAllBranches",
         "TestPolynomialLazardZeroExponentAvoidsUnreadLeadingCoefficient",
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
         "TestPolynomialPSCComposedEveryReservationPrefix",
@@ -44839,6 +44840,7 @@
           "go_target": "pkg/math/polynomial/polynomial_psc.go",
           "tests": [
             "TestPolynomialLazardDichotomousIndependentCoefficients",
+            "TestPolynomialLazardSourceTraceAllBranches",
             "TestPolynomialLazardZeroExponentAvoidsUnreadLeadingCoefficient",
             "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
             "TestPolynomialPSCComposedEveryReservationPrefix",
@@ -47164,6 +47166,7 @@
         "TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation",
         "TestMonomialUnitNativeRecycleFinalizationIsIdempotent",
         "TestPolynomialLazardDichotomousIndependentCoefficients",
+            "TestPolynomialLazardSourceTraceAllBranches",
         "TestPolynomialLazardZeroExponentAvoidsUnreadLeadingCoefficient",
         "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
         "TestPolynomialPSCComposedEveryReservationPrefix",
@@ -49091,6 +49094,7 @@
           "go_target": "pkg/math/polynomial/polynomial_psc.go",
           "tests": [
             "TestPolynomialLazardDichotomousIndependentCoefficients",
+            "TestPolynomialLazardSourceTraceAllBranches",
             "TestPolynomialLazardZeroExponentAvoidsUnreadLeadingCoefficient",
             "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
             "TestPolynomialPSCComposedEveryReservationPrefix",

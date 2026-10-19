@@ -171,6 +171,9 @@ func (m *MultivariatePolynomialCore) seLazardWithReceipt(d uint32, y, sd1 Polyno
 		return e
 	}
 	n := d - degree - 1
+	if e := m.traceLazardEntry(y, sd1, n); e != nil {
+		return e
+	}
 	if n == 0 {
 		return out.assign(m, sd1)
 	}
@@ -196,6 +199,9 @@ func (m *MultivariatePolynomialCore) seLazardWithReceipt(d uint32, y, sd1 Polyno
 	a := uint32(1)
 	for v := n; v > 1; v >>= 1 {
 		a <<= 1
+	}
+	if e := m.traceLazardPower(a); e != nil {
+		return e
 	}
 	if e := polynomialPSCSourceAssert(5672, "a <= n", func() (bool, error) {
 		return a <= n, nil
@@ -228,6 +234,9 @@ func (m *MultivariatePolynomialCore) seLazardWithReceipt(d uint32, y, sd1 Polyno
 		if e = s.c.assign(m, p); e != nil {
 			return e
 		}
+		if e := m.traceLazardLoop(a, s.c.value); e != nil {
+			return e
+		}
 		if n >= a {
 			p, e = m.lazardMul(s, s.c.value, s.x.value)
 			if e != nil {
@@ -244,7 +253,13 @@ func (m *MultivariatePolynomialCore) seLazardWithReceipt(d uint32, y, sd1 Polyno
 				return e
 			}
 			n -= a
+			if e := m.traceLazardBranch(s.c.value); e != nil {
+				return e
+			}
 		}
+	}
+	if e := m.traceLazardFinal(s.c.value, y); e != nil {
+		return e
 	}
 	p, e = m.lazardMul(s, s.c.value, sd1)
 	if e != nil {
