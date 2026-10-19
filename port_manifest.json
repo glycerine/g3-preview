@@ -44117,8 +44117,8 @@
           ]
         },
         {
-          "name": "manager Rename cpp1270\u20131292: native []bool permutation check, insertion-ordered insdict table traversal, each monomial mutation/project hash before debug contains/insert and final swap. Go sort.Slice sorts native power scratch; owning cleanup retains partial source mutations.",
-          "status": "partial",
+          "name": "complete manager Rename cpp1270\u20131292: native []bool permutation check, insertion-ordered insdict traversal, exact runtime assertion actions, per-monomial mutation/hash/table publication and final swap",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -44139,6 +44139,8 @@
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
+            "TestMonomialRenameEntryAssertionActions",
+            "TestMonomialRenamePermutationAssertionActions",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseWithNativeIDRecycle",
             "TestMonomialSourceMaxSmallerNullAssertion",
@@ -48316,8 +48318,8 @@
           ]
         },
         {
-          "name": "manager Rename cpp1270\u20131292: native []bool permutation check, insertion-ordered insdict table traversal, each monomial mutation/project hash before debug contains/insert and final swap. Go sort.Slice sorts native power scratch; owning cleanup retains partial source mutations.",
-          "status": "partial",
+          "name": "complete manager Rename cpp1270\u20131292: native []bool permutation check, insertion-ordered insdict traversal, exact runtime assertion actions, per-monomial mutation/hash/table publication and final swap",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -48338,6 +48340,8 @@
             "TestMonomialSourceRawPowerArrayProduct",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
+            "TestMonomialRenameEntryAssertionActions",
+            "TestMonomialRenamePermutationAssertionActions",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
             "TestMonomialOwningCloseWithNativeIDRecycle",
             "TestMonomialSourceMaxSmallerNullAssertion",

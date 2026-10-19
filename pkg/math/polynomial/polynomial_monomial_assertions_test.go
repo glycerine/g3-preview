@@ -174,6 +174,68 @@ func TestMonomialDecrementSourceAssertionActions(t *testing.T) {
 	}
 }
 
+func TestMonomialRenameEntryAssertionActions(t *testing.T) {
+	for _, choice := range []string{"T", "C", "disabled"} {
+		t.Run(choice, func(t *testing.T) {
+			m := monomialFixture(t)
+			_, e := m.MkVar()
+			serviceMust(t, e)
+			m.managerRefs = 2
+			actions := choice
+			if choice == "disabled" {
+				actions = "T"
+			}
+			polynomialAssertionActionsFixture(t, actions+actions)
+			if polynomialSourceDebug && choice == "disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+			}
+			e = m.Rename(nil)
+			if polynomialSourceDebug && choice == "T" {
+				if !errors.Is(e, ErrMonomialAssertion) || m.renameFound != nil || m.renameTable.entries.Len() != 0 {
+					t.Fatal("first entry assertion did not stop before lexical owners", e)
+				}
+			} else {
+				serviceMust(t, e)
+			}
+			m.managerRefs = 1
+			monomialPhysicalAudit(t, m)
+		})
+	}
+}
+
+func TestMonomialRenamePermutationAssertionActions(t *testing.T) {
+	for _, choice := range []string{"T", "C", "disabled"} {
+		t.Run(choice, func(t *testing.T) {
+			m := monomialFixture(t)
+			for i := 0; i < 2; i++ {
+				_, e := m.MkVar()
+				serviceMust(t, e)
+			}
+			action := choice
+			if choice == "disabled" {
+				action = "T"
+			}
+			polynomialAssertionActionsFixture(t, action)
+			if polynomialSourceDebug && choice == "disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+			}
+			e := m.Rename([]uint32{0, 0})
+			if polynomialSourceDebug && choice == "T" {
+				if !errors.Is(e, ErrMonomialAssertion) || m.renameFound == nil || !m.renameFound[0] {
+					t.Fatal("duplicate permutation assertion lost its reached local", e, m.renameFound)
+				}
+				serviceMust(t, m.CleanupRename())
+			} else {
+				serviceMust(t, e)
+				if m.renameFound != nil || m.renameTable.entries.Len() != 0 {
+					t.Fatal("completed rename retained lexical scratch")
+				}
+			}
+			monomialPhysicalAudit(t, m)
+		})
+	}
+}
+
 func TestMonomialPredecessorSourceAssertionActions(t *testing.T) {
 	for _, choice := range []string{"T", "C", "disabled"} {
 		t.Run(choice, func(t *testing.T) {

@@ -79,8 +79,11 @@ func (m *MonomialManager) Rename(xs []uint32) (err error) {
 	if e := m.check(); e != nil {
 		return e
 	}
-	if polynomialSourceDebug && (m.managerRefs > 1 || uint64(len(xs)) != uint64(m.nextVar)) {
-		return ErrMonomialAssertion
+	if e := m.sourceScalarAssert(1271, "m_ref_count <= 1", m.managerRefs <= 1); e != nil {
+		return e
+	}
+	if e := m.sourceScalarAssert(1272, "sz == num_vars()", uint64(len(xs)) == uint64(m.nextVar)); e != nil {
+		return e
 	}
 	if m.renameTable.entries.Len() != 0 || m.renameFound != nil {
 		return ErrMonomialPending
@@ -88,8 +91,14 @@ func (m *MonomialManager) Rename(xs []uint32) (err error) {
 	if polynomialSourceDebug {
 		m.renameFound = make([]bool, m.nextVar)
 		for _, x := range xs {
-			if x >= m.nextVar || m.renameFound[x] {
-				return ErrMonomialAssertion
+			if e := m.sourceScalarAssert(1278, "xs[i] < num_vars()", x < m.nextVar); e != nil {
+				return e
+			}
+			if x >= m.nextVar {
+				return arena.ErrBounds
+			}
+			if e := m.sourceScalarAssert(1279, "!found[xs[i]]", !m.renameFound[x]); e != nil {
+				return e
 			}
 			m.renameFound[x] = true
 		}
@@ -111,16 +120,13 @@ func (m *MonomialManager) Rename(xs []uint32) (err error) {
 			if e != nil {
 				return e
 			}
-			if found {
-				return ErrMonomialAssertion
+			if e := m.sourceScalarAssert(1289, "!new_table.contains(m)", !found); e != nil {
+				return e
 			}
 		}
-		_, inserted, e := t.insert(m, k)
+		_, _, e := t.insert(m, k)
 		if e != nil {
 			return e
-		}
-		if polynomialSourceDebug && !inserted {
-			return ErrMonomialAssertion
 		}
 	}
 	m.table, m.renameTable = m.renameTable, m.table
