@@ -43513,8 +43513,8 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92\u2013154: reached object validity/degree reads follow source; scratch uses concrete native []MonomialPower and project cached hash.",
-          "status": "partial",
+          "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92\u2013154; concrete []MonomialPower replaces source arrays",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_tmp.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -43533,6 +43533,7 @@
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
             "TestMonomialSourceRawPowerArrayProduct",
+            "TestMonomialMultiplySourceTraceBeforeAndAfterIntern",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
@@ -43551,8 +43552,8 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92\u2013154: reached object validity/degree reads follow source; scratch uses concrete native []MonomialPower and project cached hash.",
-          "status": "partial",
+          "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92\u2013154; concrete []MonomialPower replaces source arrays",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -43571,6 +43572,7 @@
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
             "TestMonomialSourceRawPowerArrayProduct",
+            "TestMonomialMultiplySourceTraceBeforeAndAfterIntern",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
@@ -43589,8 +43591,8 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92\u2013154: reached object validity/degree reads follow source; scratch uses concrete native []MonomialPower and project cached hash.",
-          "status": "partial",
+          "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92\u2013154; concrete []MonomialPower replaces source arrays",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -43609,6 +43611,7 @@
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
             "TestMonomialSourceRawPowerArrayProduct",
+            "TestMonomialMultiplySourceTraceBeforeAndAfterIntern",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
@@ -47697,8 +47700,8 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92\u2013154: reached object validity/degree reads follow source; scratch uses concrete native []MonomialPower and project cached hash.",
-          "status": "partial",
+          "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92\u2013154; concrete []MonomialPower replaces source arrays",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_tmp.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -47717,6 +47720,7 @@
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
             "TestMonomialSourceRawPowerArrayProduct",
+            "TestMonomialMultiplySourceTraceBeforeAndAfterIntern",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
@@ -47735,8 +47739,8 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92\u2013154: reached object validity/degree reads follow source; scratch uses concrete native []MonomialPower and project cached hash.",
-          "status": "partial",
+          "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92\u2013154; concrete []MonomialPower replaces source arrays",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -47755,6 +47759,7 @@
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
             "TestMonomialSourceRawPowerArrayProduct",
+            "TestMonomialMultiplySourceTraceBeforeAndAfterIntern",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
@@ -47773,8 +47778,8 @@
           ]
         },
         {
-          "name": "power product scalar fields and algorithms cpp92\u2013154: reached object validity/degree reads follow source; scratch uses concrete native []MonomialPower and project cached hash.",
-          "status": "partial",
+          "name": "complete retained power scalar fields, ordering/display and free power-product validity/degree algorithms cpp92\u2013154; concrete []MonomialPower replaces source arrays",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -47793,6 +47798,7 @@
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
             "TestMonomialSourceRawPowerArrayProduct",
+            "TestMonomialMultiplySourceTraceBeforeAndAfterIntern",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
