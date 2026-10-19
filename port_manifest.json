@@ -55531,7 +55531,7 @@
         },
         {
           "name": "upolynomial_factorization.cpp:1097-1145 selected prime-trial body and current_degree_set/current_fs/f_pp_zp reverse source destruction",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_recombine.go",
           "tests": [
             "TestUPolynomialPrimeTrialTransportCannotRetireActualRelatedOwner",
