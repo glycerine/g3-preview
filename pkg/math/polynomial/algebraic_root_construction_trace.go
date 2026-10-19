@@ -159,7 +159,7 @@ func (m *AlgebraicRootCore) traceRootSelection(roots *AlgebraicVector, count uin
 			if e != nil {
 				return e
 			}
-			if e = m.displayIntervalAtLocation(out, location); e != nil {
+			if e = m.displayIntervalAtLocationWithReceipts(out, location, &m.rootTrace.insertions[0], &m.rootTrace.insertions[1]); e != nil {
 				return e
 			}
 			_ = writeAlgebraicIntervalPart(out, "\n")

@@ -31,17 +31,44 @@ func (m *AlgebraicRootCore) DisplayInterval(w io.Writer, a *Algebraic) error {
 }
 
 func (m *AlgebraicRootCore) displayIntervalAtLocation(w io.Writer, l *algebraicLocation) error {
+	return m.displayIntervalAtLocationWithReceipts(w, l, &m.intervalDisplayInsertions[0], &m.intervalDisplayInsertions[1])
+}
+
+func (m *AlgebraicRootCore) displayIntervalAtLocationWithReceipts(w io.Writer, l *algebraicLocation, lower, upper *unumeral.NumeralInsertionReceipt) error {
+	if lower.Active() || upper.Active() {
+		return ErrAlgebraicPending
+	}
 	if m.intervalDisplayRunning {
 		return ErrAlgebraicPending
 	}
 	m.intervalDisplayRunning = true
 	defer func() { m.intervalDisplayRunning = false }()
 	if l != nil && l.kind == 1 {
-		r, err := m.load(l)
+		if err := algebraicQueryTagAssertionSwitch(); err != nil {
+			return err
+		}
+
+		if err := writeAlgebraicIntervalPart(w, "("); err != nil {
+			return err
+		}
+		text, err := (algebraicBinaryBoundView{core: m, cell: l}).sourceString(lower)
 		if err != nil {
 			return err
 		}
-		return m.config.Intervals.Display(w, &r.interval)
+		if err = writeAlgebraicIntervalPart(w, text); err != nil {
+			return err
+		}
+		if err = writeAlgebraicIntervalPart(w, ", "); err != nil {
+			return err
+		}
+		text, err = (algebraicBinaryBoundView{core: m, cell: l, upper: true}).sourceString(upper)
+		if err != nil {
+			return err
+		}
+		if err = writeAlgebraicIntervalPart(w, text); err != nil {
+			return err
+		}
+		return writeAlgebraicIntervalPart(w, ")")
 	}
 	if err := writeAlgebraicIntervalPart(w, "["); err != nil {
 		return err
@@ -72,4 +99,16 @@ func (m *AlgebraicRootCore) displayIntervalAtLocation(w io.Writer, l *algebraicL
 		return err
 	}
 	return writeAlgebraicIntervalPart(w, "]")
+}
+
+func (m *AlgebraicRootCore) cleanupIntervalDisplay() error {
+	if m.intervalDisplayRunning {
+		return ErrAlgebraicPending
+	}
+	for i := len(m.intervalDisplayInsertions) - 1; i >= 0; i-- {
+		if e := m.config.Binary.CleanupSourceString(&m.intervalDisplayInsertions[i]); e != nil {
+			return e
+		}
+	}
+	return nil
 }

@@ -81,7 +81,7 @@ func (m *AlgebraicRootCore) traceIsolationSignsRootsBody(w io.Writer, pm *Multiv
 		if e != nil {
 			return e
 		}
-		if e = m.displayIntervalAtLocation(algebraicComparisonTraceWriter{w}, location); e != nil {
+		if e = m.displayIntervalAtLocationWithReceipts(algebraicComparisonTraceWriter{w}, location, &m.rootTrace.insertions[0], &m.rootTrace.insertions[1]); e != nil {
 			return e
 		}
 		_ = out.AppendCString("\n")

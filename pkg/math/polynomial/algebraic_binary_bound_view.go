@@ -1,7 +1,10 @@
 // Source: algebraic_numbers.cpp:2987-3017; mpbq.h::set.
 package polynomial
 
-import unumeral "github.com/glycerine/g3/pkg/util/numeral"
+import (
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	"strconv"
+)
 
 // A selected bound reference reads no polynomial or opposite-bound fields.
 type algebraicBinaryBoundView struct {
@@ -70,4 +73,36 @@ func (m *AlgebraicRootCore) copyIntervalAtPrecisionFromCellWithRefinement(l *alg
 	}
 	defer func() { refinement.executing = false }()
 	return m.config.Polynomials.refineToPrecisionWithEvaluationReceipt(v, m.config.Binary, lower, upper, precision*4, &refinement.evaluation, refinement)
+}
+
+// sourceString follows mpbq.cpp:384-392: numerator formatting completes
+// before the exponent is reached. The borrowed fields acquire no ownership.
+func (v algebraicBinaryBoundView) sourceString(receipt *unumeral.NumeralInsertionReceipt) (string, error) {
+	offset := uint64(24)
+	if v.upper {
+		offset = 40
+	}
+	var words [3]uint32
+	for i := range words {
+		n, e := v.core.config.Allocator.ReadUint32(v.cell.raw, offset+4*uint64(i))
+		if e != nil {
+			return "", e
+		}
+		words[i] = n
+	}
+	n := algebraicWordsInt(words[:])
+	text, e := v.core.predicateIntegerString(&n, receipt)
+	if e != nil {
+		return "", e
+	}
+	k, e := v.core.config.Allocator.ReadUint32(v.cell.raw, offset+12)
+	if e != nil {
+		return "", e
+	}
+	if k == 1 {
+		text += "/2"
+	} else if k > 1 {
+		text += "/2^" + strconv.FormatUint(uint64(k), 10)
+	}
+	return text, nil
 }

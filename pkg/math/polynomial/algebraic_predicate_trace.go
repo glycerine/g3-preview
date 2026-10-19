@@ -90,28 +90,7 @@ func (m *AlgebraicRootCore) predicateIntervalTrace(out algebraicPredicateTraceSt
 	if l == nil || l.kind != 1 {
 		return m.displayIntervalAtLocation(out.Writer, l)
 	}
-	r, e := m.load(l)
-	if e != nil {
-		return e
-	}
-	_ = out.AppendCString("(")
-	bounds := [2]*unumeral.BinaryRational{r.interval.BorrowLower(), r.interval.BorrowUpper()}
-	for i, a := range bounds {
-		if i != 0 {
-			_ = out.AppendCString(", ")
-		}
-		text, e := m.predicateIntegerString(a.BorrowNumerator(), &m.predicateTrace.insertions[i+1])
-		if e != nil {
-			return e
-		}
-		if a.K() == 1 {
-			text += "/2"
-		} else if a.K() > 1 {
-			text += "/2^" + strconv.FormatUint(uint64(a.K()), 10)
-		}
-		_ = out.AppendCString(text)
-	}
-	return out.AppendCString(")")
+	return m.displayIntervalAtLocationWithReceipts(out.Writer, l, &m.predicateTrace.insertions[1], &m.predicateTrace.insertions[2])
 }
 func (m *AlgebraicRootCore) traceRationalPredicate(a *Algebraic, phase uint8, k uint32) error {
 	tags := m.config.Rationals.Integers().BorrowTraceTags()

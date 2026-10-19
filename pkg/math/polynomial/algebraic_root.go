@@ -74,6 +74,7 @@ type AlgebraicRootCore struct {
 	representationNeg                                          algebraicRepresentationNegNumeric
 	representationNormalize                                    unumeral.IntegerNormalizeInvocationReceipt
 	representationCopy                                         unumeral.IntegerCopyAllocationReceipt
+	intervalDisplayInsertions                                  [2]unumeral.NumeralInsertionReceipt
 	decimalDisplay                                             algebraicDecimalDisplayScope
 	intervalDisplayRunning, decimalDisplayRunning              bool
 	comparisonTraceRunning                                     bool
@@ -256,6 +257,9 @@ func (m *AlgebraicRootCore) check() error {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && (m.foreignCopyBorrowers != 0 || m.foreignCopy.active) {
+		return ErrAlgebraicPending
+	}
+	if m != nil && m.self == m && (m.intervalDisplayInsertions[0].Active() || m.intervalDisplayInsertions[1].Active()) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.rootDisplay.active && !m.rootDisplay.running {
@@ -1354,6 +1358,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 		return e
 	}
 	if e := m.cleanupDivision(); e != nil {
+		return e
+	}
+	if e := m.cleanupIntervalDisplay(); e != nil {
 		return e
 	}
 	if e := m.cleanupDecimalDisplay(); e != nil {
