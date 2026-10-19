@@ -202,6 +202,9 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m != nil && m.self == m && !m.binary.running && m.binary.conversion.pending(m) {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.savedIntervalExecuting != nil {
 		return ErrAlgebraicPending
 	}

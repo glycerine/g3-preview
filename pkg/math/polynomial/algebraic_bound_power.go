@@ -18,6 +18,9 @@ func (s *algebraicConversionScope) NumericBound(executing bool) bool {
 	if m == nil || m.self != m || m.closed {
 		return false
 	}
+	if s == &m.binary.conversion {
+		return !executing || s.executing && m.binary.executing && m.binary.qConstructed
+	}
 	if s == &m.bounds.conversion {
 		return !executing || s.executing && m.bounds.executing
 	}
@@ -93,7 +96,10 @@ func (s *algebraicConversionScope) run(m *AlgebraicRootCore, a *unumeral.BinaryR
 	if m == nil || m.self != m {
 		return ErrAlgebraicOwner
 	}
-	bound := s == &m.bounds.conversion || s == &m.refinementConversion
+	bound := s == &m.bounds.conversion || s == &m.refinementConversion || s == &m.binary.conversion
+	if s == &m.binary.conversion && (!m.binary.running || !m.binary.executing || !m.binary.qConstructed || out != &m.binary.localQ) {
+		return ErrAlgebraicOwner
+	}
 	for i := range m.inversion.conversions {
 		if s == &m.inversion.conversions[i] {
 			if !m.inversion.executing || out != &m.inversion.values[i] {

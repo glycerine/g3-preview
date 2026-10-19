@@ -17,6 +17,7 @@ type algebraicSavedInterval struct {
 	owned, constructed, restored bool
 }
 type algebraicBinaryScope struct {
+	conversion                           algebraicConversionScope
 	intervalRoots                        [2]unumeral.BinaryRootInvocation
 	intervalDebug                        unumeral.BinaryIntervalDebugInvocationReceipt
 	traceRootPending                     bool
@@ -139,6 +140,9 @@ func (m *AlgebraicRootCore) restoreBinaryInterval(saved *algebraicSavedInterval)
 
 func (m *AlgebraicRootCore) finishBinaryLocals() error {
 	s := &m.binary
+	if s.conversion.stop != nil {
+		return s.conversion.stop
+	}
 	for i := range s.intervalRoots {
 		if s.intervalRoots[i].Pending() {
 			if e := s.intervalRoots[i].SourceCause(); e != nil {
@@ -227,6 +231,9 @@ func (m *AlgebraicRootCore) cleanupBinary() error {
 	}
 	s.cleaning = true
 	defer func() { s.cleaning = false }()
+	if e := s.conversion.cleanup(); e != nil {
+		return e
+	}
 	for i := len(s.intervalRoots) - 1; i >= 0; i-- {
 		if e := s.intervalRoots[i].Cleanup(false); e != nil {
 			return e
@@ -617,7 +624,10 @@ func (m *AlgebraicRootCore) setBinaryCore(out *Algebraic, seq *UPolynomialSequen
 	}
 	if !refinable {
 		s.localQ, s.qConstructed = unumeral.NewRational(), true
-		if e = bm.ToRational(m.config.Rationals, s.interval.BorrowLower(), &s.localQ); e != nil {
+		s.executing = true
+		e = s.conversion.run(m, s.interval.BorrowLower(), &s.localQ)
+		s.executing = false
+		if e != nil {
 			return e
 		}
 		return m.SetTake(out, &s.localQ)
