@@ -13,14 +13,11 @@ func (m *MultivariatePolynomialManager) minimumDegreeVariable(p Polynomial) (x u
 	if e := m.ready(); e != nil {
 		return 0, nil, e
 	}
-	if polynomialSourceDebug {
+	if e := polynomialFactorSourceAssert(6560, "!is_const(p)", func() (bool, error) {
 		constant, e := m.core.IsConstant(p)
-		if e != nil {
-			return 0, nil, e
-		}
-		if constant {
-			return 0, nil, ErrPolynomialAssertion
-		}
+		return !constant, e
+	}); e != nil {
+		return 0, nil, e
 	}
 	scope, cause = NewScopedPolynomialMaxDegrees(&m.core.substitution.max, p)
 	if cause != nil {

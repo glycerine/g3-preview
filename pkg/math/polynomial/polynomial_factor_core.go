@@ -92,26 +92,28 @@ func (m *MultivariatePolynomialManager) factorCoreSource(p Polynomial, r *Polyno
 		return ErrPolynomialPending
 	}
 	c := m.core
-	zero, e := c.IsZero(p)
-	if e != nil {
+	if e := polynomialFactorSourceAssert(6757, "!is_zero(p)", func() (bool, error) {
+		zero, e := c.IsZero(p)
+		return !zero, e
+	}); e != nil {
 		return e
-	}
-	if polynomialSourceDebug && zero {
-		return ErrPolynomialAssertion
 	}
 	constant, e := c.IsConstant(p)
 	if e != nil {
 		return e
 	}
 	if constant {
-		if polynomialSourceDebug {
+		if e = polynomialFactorSourceAssert(6759, "!is_zero(p)", func() (bool, error) {
+			zero, e := c.IsZero(p)
+			return !zero, e
+		}); e != nil {
+			return e
+		}
+		if e = polynomialFactorSourceAssert(6760, "p->size() == 1", func() (bool, error) {
 			n, e := c.readWord(p, 8)
-			if e != nil {
-				return e
-			}
-			if zero || n != 1 {
-				return ErrPolynomialAssertion
-			}
+			return n == 1, e
+		}); e != nil {
+			return e
 		}
 		value, e := c.coefficientCore(p, 0)
 		if e != nil {
@@ -154,14 +156,11 @@ func (m *MultivariatePolynomialManager) factorCoreSource(p Polynomial, r *Polyno
 	if e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
+	if e = polynomialFactorSourceAssert(6765, "degree(p, x) > 0", func() (bool, error) {
 		d, e := c.Degree(p, x)
-		if e != nil {
-			return e
-		}
-		if d == 0 {
-			return ErrPolynomialAssertion
-		}
+		return d > 0, e
+	}); e != nil {
+		return e
 	}
 	s.numeralConstructed = true
 	s.references = 2
@@ -202,14 +201,11 @@ func (m *MultivariatePolynomialManager) factorCoreSource(p Polynomial, r *Polyno
 		return e
 	}
 	if constant {
-		if polynomialSourceDebug {
+		if e = polynomialFactorSourceAssert(6782, "degree(C, x) > 0", func() (bool, error) {
 			degree, e := c.Degree(s.refs[2].value, x)
-			if e != nil {
-				return e
-			}
-			if degree == 0 {
-				return ErrPolynomialAssertion
-			}
+			return degree > 0, e
+		}); e != nil {
+			return e
 		}
 		return m.factorSquareFreePrimitiveDispatch(s.refs[2].value, r, x, 1, params, s)
 	}
@@ -230,30 +226,23 @@ func (m *MultivariatePolynomialManager) factorCoreSource(p Polynomial, r *Polyno
 		if constant {
 			break
 		}
-		if polynomialSourceDebug {
+		if e = polynomialFactorSourceAssert(6791, "is_primitive(A, x)", func() (bool, error) {
 			s.lastCall = 7
-			yes, e := m.isPrimitiveWithReceipt(s.refs[5].value, x, &s.predicates[0])
-			if e != nil {
-				return e
-			}
-			if !yes {
-				return ErrPolynomialAssertion
-			}
+			return m.isPrimitiveWithReceipt(s.refs[5].value, x, &s.predicates[0])
+		}); e != nil {
+			return e
+		}
+		if e = polynomialFactorSourceAssert(6792, "is_square_free(A, x)", func() (bool, error) {
 			s.lastCall = 8
-			yes, e = m.isSquareFreeWithReceipt(s.refs[5].value, x, true, &s.predicates[1])
-			if e != nil {
-				return e
-			}
-			if !yes {
-				return ErrPolynomialAssertion
-			}
+			return m.isSquareFreeWithReceipt(s.refs[5].value, x, true, &s.predicates[1])
+		}); e != nil {
+			return e
+		}
+		if e = polynomialFactorSourceAssert(6793, "degree(A, x) > 0", func() (bool, error) {
 			degree, e := c.Degree(s.refs[5].value, x)
-			if e != nil {
-				return e
-			}
-			if degree == 0 {
-				return ErrPolynomialAssertion
-			}
+			return degree > 0, e
+		}); e != nil {
+			return e
 		}
 		if e = c.checkpoint(); e != nil {
 			return e
@@ -275,44 +264,34 @@ func (m *MultivariatePolynomialManager) factorCoreSource(p Polynomial, r *Polyno
 			return e
 		}
 		if !constant {
-			if polynomialSourceDebug {
+			if e = polynomialFactorSourceAssert(6803, "degree(C, x) > 0", func() (bool, error) {
 				degree, e := c.Degree(s.refs[2].value, x)
-				if e != nil {
-					return e
-				}
-				if degree == 0 {
-					return ErrPolynomialAssertion
-				}
+				return degree > 0, e
+			}); e != nil {
+				return e
 			}
 			if e = m.factorSquareFreePrimitiveDispatch(s.refs[2].value, r, x, j, params, s); e != nil {
 				return e
 			}
 		} else {
-			if polynomialSourceDebug {
+			if e = polynomialFactorSourceAssert(6808, "C->size() == 1", func() (bool, error) {
 				n, e := c.readWord(s.refs[2].value, 8)
-				if e != nil {
-					return e
-				}
-				if n != 1 {
-					return ErrPolynomialAssertion
-				}
+				return n == 1, e
+			}); e != nil {
+				return e
 			}
 			coefficient, e := c.coefficientCore(s.refs[2].value, 0)
 			if e != nil {
 				return e
 			}
-			if polynomialSourceDebug {
+			if e = polynomialFactorSourceAssert(6809, "m_manager.is_one(C->a(0)) || m_manager.is_minus_one(C->a(0))", func() (bool, error) {
 				one, e := c.modular.IsOne(&coefficient)
-				if e != nil {
-					return e
+				if e != nil || one {
+					return one, e
 				}
-				minus, e := c.modular.IsMinusOne(&coefficient)
-				if e != nil {
-					return e
-				}
-				if !one && !minus {
-					return ErrPolynomialAssertion
-				}
+				return c.modular.IsMinusOne(&coefficient)
+			}); e != nil {
+				return e
 			}
 			minus, e := c.modular.IsMinusOne(&coefficient)
 			if e != nil {
@@ -338,50 +317,38 @@ func (m *MultivariatePolynomialManager) factorCoreSource(p Polynomial, r *Polyno
 		}
 		j++
 	}
-	if polynomialSourceDebug {
-		same, e := c.Equal(c.unit, s.refs[5].value)
-		if e != nil {
-			return e
-		}
-		if !same {
-			return ErrPolynomialAssertion
-		}
+	if e = polynomialFactorSourceAssert(6819, "eq(mk_one(), A)", func() (bool, error) {
+		return c.Equal(c.unit, s.refs[5].value)
+	}); e != nil {
+		return e
 	}
 	return nil
 }
 func (m *MultivariatePolynomialManager) factorSquareFreePrimitiveDispatch(p Polynomial, r *PolynomialFactors, x, k uint32, params UPolynomialFactorParams, s *polynomialFactorCoreFrame) error {
 	c := m.core
-	if polynomialSourceDebug {
+	if e := polynomialFactorSourceAssert(6738, "degree(p, x) > 0", func() (bool, error) {
 		degree, e := c.Degree(p, x)
-		if e != nil {
-			return e
-		}
-		if degree == 0 {
-			return ErrPolynomialAssertion
-		}
+		return degree > 0, e
+	}); e != nil {
+		return e
+	}
+	if e := polynomialFactorSourceAssert(6739, "is_primitive(p, x)", func() (bool, error) {
 		s.lastCall = 9
-		primitive, e := m.isPrimitiveWithReceipt(p, x, &s.dispatchPredicates[0])
-		if e != nil {
-			return e
-		}
-		if !primitive {
-			return ErrPolynomialAssertion
-		}
+		return m.isPrimitiveWithReceipt(p, x, &s.dispatchPredicates[0])
+	}); e != nil {
+		return e
+	}
+	if e := polynomialFactorSourceAssert(6740, "is_square_free(p, x)", func() (bool, error) {
 		s.lastCall = 10
-		square, e := m.isSquareFreeWithReceipt(p, x, true, &s.dispatchPredicates[1])
-		if e != nil {
-			return e
-		}
-		if !square {
-			return ErrPolynomialAssertion
-		}
+		return m.isSquareFreeWithReceipt(p, x, true, &s.dispatchPredicates[1])
+	}); e != nil {
+		return e
+	}
+	if e := polynomialFactorSourceAssert(6741, "!is_zero(p)", func() (bool, error) {
 		zero, e := c.IsZero(p)
-		if e != nil {
-			return e
-		}
-		if zero {
-			return ErrPolynomialAssertion
-		}
+		return !zero, e
+	}); e != nil {
+		return e
 	}
 	degree, e := c.Degree(p, x)
 	if e != nil {

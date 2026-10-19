@@ -8,7 +8,7 @@ import (
 )
 
 func TestPolynomialFactorSourceAssertionActions(t *testing.T) {
-	for _, line := range []int32{6592, 6593, 6594, 6601, 6602, 6603, 6615, 6617, 6634, 6650, 6678, 6685, 6686, 6687, 6688, 6699, 6721, 6728, 6729, 6730} {
+	for _, line := range []int32{6560, 6592, 6593, 6594, 6601, 6602, 6603, 6615, 6617, 6634, 6650, 6678, 6685, 6686, 6687, 6688, 6699, 6721, 6728, 6729, 6730, 6738, 6739, 6740, 6741, 6757, 6759, 6760, 6765, 6782, 6791, 6792, 6793, 6803, 6808, 6809, 6819} {
 		for _, action := range []string{"T", "C", "disabled"} {
 			t.Run(action, func(t *testing.T) {
 				choices := action
