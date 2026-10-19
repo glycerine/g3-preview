@@ -13,6 +13,8 @@ import (
 // The created cohort is charged Go abort metadata for returned zero-RC locals;
 // it is not a source buffer or a source destructor repairing abandoned locals.
 type polynomialSquareRootScope struct {
+	receipt                              polynomialSqrtInvocationReceipt
+	numeric                              polynomialNumericRoots
 	invocation                           uint64
 	orphanInvocations                    []uint64
 	values                               [4]unumeral.Int
@@ -205,27 +207,18 @@ func (m *MultivariatePolynomialManager) squareRootNumeral(op uint8, a, b, out *u
 // The actual persistent buffer keeps its own coefficient fields. Only a newly
 // started subordinate physical allocation is an invocation's abort receipt.
 func (m *MultivariatePolynomialManager) squareRootAdd(b *polynomialSOM, a *unumeral.Int, t Monomial) error {
-	z := m.core.integer
+	if m == nil || m.self != m || m.core == nil || (b != &m.core.som && b != &m.core.som2) || b.owner != m.core {
+		return ErrPolynomialOwner
+	}
 	s := &m.squareRoot
-	pending := z.PendingAllocationObject()
-	raw, e := z.SourceAllocator().PendingRoots()
-	if e != nil {
-		return e
+	context := integerAllocationInvocationContext{squareRoot: &s.receipt, squareRootInvocation: s.invocation}
+	if context.roots(m.core.integer) == nil {
+		return ErrPolynomialOwner
 	}
-	e = b.add(a, t, false)
-	if pending == (umemory.ObjectRef{}) && z.PendingAllocationObject() != (umemory.ObjectRef{}) {
-		s.numericPending = z.PendingAllocationObject()
-	}
-	if raw == ([3]umemory.Block{}) {
-		after, x := z.SourceAllocator().PendingRoots()
-		if after != ([3]umemory.Block{}) {
-			s.integerRaw = after
-		}
-		if x != nil {
-			return errors.Join(e, x)
-		}
-	}
-	return e
+	// Bind the actual caller before the reached arithmetic leaf. No shared
+	// pending-allocation comparison grants ownership to this invocation.
+	_ = context.utility(m.core.integer)
+	return b.addConsumedReceipts(a, t, false, nil, &s.numeric, nil)
 }
 func (m *MultivariatePolynomialManager) squareRootTerm(p Polynomial, i uint32) (bool, error) {
 	t, e := m.core.monomialCore(p, i)
@@ -278,7 +271,7 @@ func (m *MultivariatePolynomialManager) finishSquareRoot(cause error) error {
 		}
 		s.stage++
 	}
-	if cause == nil && s.freshResult == (Polynomial{}) && s.factoryGeneration == 0 && s.calleeGeneration == 0 && s.numericPending == (umemory.ObjectRef{}) && s.integerRaw == ([3]umemory.Block{}) && s.monomialRaw == ([3]umemory.Block{}) {
+	if cause == nil && s.freshResult == (Polynomial{}) && s.factoryGeneration == 0 && s.calleeGeneration == 0 && s.numericPending == (umemory.ObjectRef{}) && s.integerRaw == ([3]umemory.Block{}) && s.monomialRaw == ([3]umemory.Block{}) && !polynomialNegNumericPending(&s.numeric) {
 		s.active = false
 	}
 	return cause
@@ -310,6 +303,7 @@ func (m *MultivariatePolynomialManager) beginSquareRootWithReceipt(receipt *poly
 	}
 	*s = polynomialSquareRootScope{invocation: nonce, active: true, executing: true, orphans: orphans, orphanInvocations: tags, drain: drain, mask: 1}
 	m.core.squareRootOwner = s
+	s.receipt = polynomialSqrtInvocationReceipt{manager: m, frame: s, invocation: s.invocation}
 	if receipt != nil {
 		*receipt = polynomialSqrtInvocationReceipt{manager: m, frame: s, invocation: s.invocation}
 	}
@@ -621,6 +615,10 @@ func (m *MultivariatePolynomialManager) cleanupSqrtModeOwned(abort bool, invocat
 		s.calleeGeneration = 0
 	}
 	if e := m.cleanupSqrtOrphanInvocation(invocation, cursor); e != nil {
+		return e
+	}
+	if e := s.numeric.cleanup(c.integer); e != nil {
+		s.cleanupCause = e
 		return e
 	}
 	if s.numericPending != (umemory.ObjectRef{}) {

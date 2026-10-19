@@ -12,6 +12,8 @@ import (
 // creates no source numeral, reservation, or ambient callback owner hook.
 
 type integerAllocationInvocationContext struct {
+	squareRoot                     *polynomialSqrtInvocationReceipt
+	squareRootInvocation           uint64
 	defaultNormalization           *upolyDefaultNormalizeScope
 	defaultNormalizationInvocation uint64
 	berlekamp                      *upolyBerlekampNumeric
@@ -110,6 +112,14 @@ type integerAllocationInvocationContext struct {
 }
 
 func (c integerAllocationInvocationContext) roots(m *unumeral.IntegerManager) *polynomialNumericRoots {
+	if c.squareRoot != nil {
+		r := c.squareRoot
+		if c.squareRootInvocation == 0 || c.squareRootInvocation != r.invocation || r.manager == nil || !r.manager.matchesSqrtInvocation(r) || r.manager.core.integer != m || !r.frame.executing || r.manager.core.callbackDepth != 0 {
+			return nil
+		}
+		return &r.frame.numeric
+	}
+
 	if c.knuth != nil && c.knuthFrame(m) == nil {
 		return nil
 	}

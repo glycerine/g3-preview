@@ -41573,6 +41573,7 @@
         "TestPolynomialCoefficientReceiptActualCalleeCompletionClearsTag",
         "TestPolynomialSqrtInvocationGuardAndActualAcquisition",
             "TestPolynomialSqrtActualAllocationTransportRefusesOwnerRetirement",
+            "TestPolynomialSqrtAppendAllocationUsesActualInvocation",
         "TestPolynomialSqrtReceiptPreservesOlderActualFalseQuotientCohort",
         "TestPolynomialSqrtReceiptCompletedNUMBeforeUnjoinedAbort",
         "TestPolynomialSqrtInvocationCompletedPhasePreservesUnenteredPerfectSquare",
@@ -45437,6 +45438,7 @@
           "tests": [
             "TestPolynomialSqrtInvocationGuardAndActualAcquisition",
             "TestPolynomialSqrtActualAllocationTransportRefusesOwnerRetirement",
+            "TestPolynomialSqrtAppendAllocationUsesActualInvocation",
             "TestPolynomialSqrtReceiptPreservesOlderActualFalseQuotientCohort",
             "TestPolynomialSqrtReceiptCompletedNUMBeforeUnjoinedAbort",
             "TestPolynomialSqrtInvocationCompletedPhasePreservesUnenteredPerfectSquare",

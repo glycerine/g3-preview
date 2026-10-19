@@ -1018,6 +1018,20 @@ func (b *polynomialSOM) addNumericLeaf(receipt *polynomialNumericRoots, op uint8
 	if receipt == nil {
 		return b.owner.compositionNumericCall(op, a, c, d, out)
 	}
+	if receipt.caller.squareRoot != nil {
+		context := receipt.caller
+		if context.roots(b.owner.integer) != receipt {
+			return ErrPolynomialOwner
+		}
+		m := b.owner.modular.WithAllocationContext(context.utility(b.owner.integer))
+		switch op {
+		case 0:
+			return m.Copy(out, a)
+		case 1:
+			return m.Add(a, c, out)
+		}
+		return ErrPolynomialAssertion
+	}
 	before, e := polynomialNumericBefore(b.owner.integer)
 	if e != nil {
 		return e

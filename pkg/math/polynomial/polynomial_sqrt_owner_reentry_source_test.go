@@ -13,6 +13,15 @@ import (
 )
 
 func TestPolynomialSqrtActualAllocationTransportRefusesOwnerRetirement(t *testing.T) {
+	polynomialSqrtAllocationTransport(t, false)
+}
+
+func TestPolynomialSqrtAppendAllocationUsesActualInvocation(t *testing.T) {
+	polynomialSqrtAllocationTransport(t, true)
+}
+
+func polynomialSqrtAllocationTransport(t *testing.T, appendOnly bool) {
+	t.Helper()
 	budget := arena.NewBudget(1 << 26)
 	var full *MultivariatePolynomialManager
 	active := false
@@ -59,7 +68,17 @@ func TestPolynomialSqrtActualAllocationTransportRefusesOwnerRetirement(t *testin
 	serviceMust(t, rt.SetMaxSize(1))
 	active = true
 	var receipt polynomialSqrtInvocationReceipt
-	_, body := full.sqrtWithReceipt(p, out, &receipt)
+	var body error
+	if appendOnly {
+		serviceMust(t, full.beginSquareRootWithReceipt(&receipt))
+		body = full.squareRootAdd(&c.som, &big, c.monomials.unit)
+		if !polynomialNegNumericPending(&full.squareRoot.numeric) {
+			t.Fatal("actual append allocation absent from invocation receipt", body)
+		}
+		body = full.finishSquareRoot(body)
+	} else {
+		_, body = full.sqrtWithReceipt(p, out, &receipt)
+	}
 	active = false
 	if calls != 1 || !numericPhysicalReservationRefusal(body) {
 		t.Fatal("actual square-root allocation transport not reached", calls, body)
