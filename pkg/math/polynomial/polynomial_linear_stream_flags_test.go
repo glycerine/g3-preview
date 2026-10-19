@@ -187,3 +187,86 @@ func TestLinearTraceRetainsReceivingNumericFlags(t *testing.T) {
 		t.Fatal("trace lost receiving numeric flags", ok, text)
 	}
 }
+
+type linearFormatterProbe struct {
+	want    string
+	probe   func()
+	refusal error
+	called  bool
+}
+
+func (w *linearFormatterProbe) Write(p []byte) (int, error) {
+	if e := w.AppendCString(string(p)); e != nil {
+		return 0, e
+	}
+	return len(p), nil
+}
+func (w *linearFormatterProbe) AppendInt32(int32) error { return nil }
+func (w *linearFormatterProbe) AppendCString(s string) error {
+	if !w.called && s == w.want {
+		w.called = true
+		w.probe()
+		return w.refusal
+	}
+	return nil
+}
+
+func TestLinearRationalDisplayOwnsExactFormatterCallback(t *testing.T) {
+	q, _ := rationalManager(t, false)
+	s, e := NewRationalLinearSolver(q)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, s.Close()) })
+	serviceMust(t, s.Resize(1))
+	a, b := unumeral.NewRational(), unumeral.NewRational()
+	serviceMust(t, q.SetString(&a, "18446744073709551617"))
+	serviceMust(t, q.SetInt64(&b, 1))
+	serviceMust(t, s.Add(0, []unumeral.Rational{a}, &b))
+	serviceMust(t, q.Del(&a))
+	serviceMust(t, q.Del(&b))
+	refusal := errors.New("rational magnitude refused")
+	w := linearFormatterProbe{want: "18446744073709551617", refusal: refusal}
+	w.probe = func() {
+		if !s.displayInsertion.Active() || s.displayInsertion.Character == nil {
+			t.Fatal("BIG output callback lacks exact formatter receipt")
+		}
+		for _, e := range []error{s.Reset(), s.Close()} {
+			if !errors.Is(e, ErrPolynomialPending) {
+				t.Fatal("formatter callback acquired solver", e)
+			}
+		}
+	}
+	if body := s.Display(&w); !errors.Is(body, refusal) || !w.called || s.displayInsertion.Active() || s.numericPending() {
+		t.Fatal("rational formatter callback cleanup", body, w.called, s.displayInsertion.Active())
+	}
+}
+
+func TestLinearModularDisplayOwnsExactFormatterCallback(t *testing.T) {
+	q, _ := rationalManager(t, false)
+	z := q.Integers()
+	m, e := unumeral.NewIntegerModularManager(z)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, m.Close()) })
+	serviceMust(t, m.SetZPUint64(2305843009213693951))
+	s, e := NewModularLinearSolver(m)
+	serviceMust(t, e)
+	t.Cleanup(func() { serviceMust(t, s.Close()) })
+	serviceMust(t, s.Resize(1))
+	var a unumeral.Int
+	serviceMust(t, z.SetString(&a, "4294967296"))
+	b := unumeral.NewInt(1)
+	serviceMust(t, s.Add(0, []unumeral.Int{a}, &b))
+	serviceMust(t, z.Del(&a))
+	refusal := errors.New("modular magnitude refused")
+	w := linearFormatterProbe{want: "4294967296", refusal: refusal}
+	w.probe = func() {
+		if !s.displayInsertion.Active() || s.displayInsertion.Character == nil {
+			t.Fatal("BIG modular output callback lacks exact formatter receipt")
+		}
+		if e := s.Reset(); !errors.Is(e, ErrPolynomialPending) {
+			t.Fatal("formatter callback acquired modular solver", e)
+		}
+	}
+	if body := s.Display(&w); !errors.Is(body, refusal) || !w.called || s.displayInsertion.Active() || s.numericPending() {
+		t.Fatal("modular formatter callback cleanup", body, w.called, s.displayInsertion.Active())
+	}
+}

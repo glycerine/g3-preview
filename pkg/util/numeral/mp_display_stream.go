@@ -3,9 +3,25 @@ package numeral
 
 import (
 	"io"
+	"strconv"
 
 	"github.com/glycerine/g3/pkg/arena"
 )
+
+type numeralDisplayStream struct{ io.Writer }
+
+func (out numeralDisplayStream) AppendInt32(v int32) error {
+	if w, ok := out.Writer.(interface{ AppendInt32(int32) error }); ok {
+		return w.AppendInt32(v)
+	}
+	return writeNumeralDisplayPart(out.Writer, strconv.FormatInt(int64(v), 10))
+}
+func (out numeralDisplayStream) AppendCString(s string) error {
+	return writeNumeralDisplayPart(out.Writer, s)
+}
+func (out numeralDisplayStream) AppendNumeralText(s string) error {
+	return writeNumeralDisplayPart(out.Writer, s)
+}
 
 func writeNumeralDisplayPart(w io.Writer, s string) error {
 	// A receiving numeric stream owns its formatting state. Keep CString
@@ -24,35 +40,26 @@ func writeNumeralDisplayPart(w io.Writer, s string) error {
 // integer writes its sign before formatting and inserting the magnitude.
 // Receiving numeric/string insertion methods retain their actual stream flags.
 func (m *IntegerManager) DisplayTo(w io.Writer, a *Int) error {
+	return m.DisplayToTracked(w, a, nil)
+}
+
+// DisplayToTracked exposes the exact BIG character/formatting child to a
+// retained source consumer. SMALL values remain direct numeric insertions.
+func (m *IntegerManager) DisplayToTracked(w io.Writer, a *Int, receipt *NumeralInsertionReceipt) error {
 	if w == nil {
 		return arena.ErrInvalidSlot
 	}
-	if err := m.check(a); err != nil {
-		return err
-	}
-	if a.IsSmall() {
-		if out, ok := w.(interface{ AppendInt32(int32) error }); ok {
-			return out.AppendInt32(a.Val)
-		}
-	}
-	largeNegative := !a.IsSmall() && a.Val < 0
-	if largeNegative {
-		if err := writeNumeralDisplayPart(w, "-"); err != nil {
-			return err
-		}
-	}
-	s, err := m.String(a)
-	if err != nil {
-		return err
-	}
-	if largeNegative {
-		s = s[1:]
-	}
-	return writeNumeralDisplayPart(w, s)
+	return m.InsertSourceIntegerTracked(numeralDisplayStream{w}, a, receipt, nil)
 }
 
 // DisplayTo preserves the numerator, slash and denominator source insertions.
 func (m *RationalManager) DisplayTo(w io.Writer, a *Rational) error {
+	return m.DisplayToTracked(w, a, nil)
+}
+
+// DisplayToTracked reuses one exact receipt in source order: a completed
+// numerator owns no child before a denominator insertion can begin.
+func (m *RationalManager) DisplayToTracked(w io.Writer, a *Rational, receipt *NumeralInsertionReceipt) error {
 	if w == nil {
 		return arena.ErrInvalidSlot
 	}
@@ -60,7 +67,7 @@ func (m *RationalManager) DisplayTo(w io.Writer, a *Rational) error {
 		return err
 	}
 	integer := isIntegerRational(a)
-	if err := m.Z.DisplayTo(w, &a.Num); err != nil {
+	if err := m.Z.DisplayToTracked(w, &a.Num, receipt); err != nil {
 		return err
 	}
 	if integer {
@@ -69,5 +76,5 @@ func (m *RationalManager) DisplayTo(w io.Writer, a *Rational) error {
 	if err := writeNumeralDisplayPart(w, "/"); err != nil {
 		return err
 	}
-	return m.Z.DisplayTo(w, &a.Den)
+	return m.Z.DisplayToTracked(w, &a.Den, receipt)
 }

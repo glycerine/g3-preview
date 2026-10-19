@@ -23,6 +23,7 @@ type RationalLinearSolver struct {
 	rawChildren       [2]unumeral.IntegerRawInvocationReceipt
 	rawOrder          [2]uint8
 	rawCount          uint8
+	displayInsertion  unumeral.NumeralInsertionReceipt
 }
 
 func NewRationalLinearSolver(m *unumeral.RationalManager) (*RationalLinearSolver, error) {
@@ -541,6 +542,9 @@ func (s *RationalLinearSolver) Close() error {
 	if e := s.identity(); e != nil {
 		return e
 	}
+	if e := cleanupLinearDisplayInsertion(&s.displayInsertion, s.integer); e != nil {
+		return e
+	}
 	if !s.closing {
 		s.closing = true
 		if e := s.SourceFinalize(); e != nil {
@@ -636,7 +640,7 @@ func (s *RationalLinearSolver) NumericRecord(z *unumeral.IntegerManager, _ strin
 	s.rawCount++
 }
 func (s *RationalLinearSolver) numericPending() bool {
-	if unumeral.NumericAllocationPending(&s.numericRoots) {
+	if s.displayInsertion.Active() || unumeral.NumericAllocationPending(&s.numericRoots) {
 		return true
 	}
 	for i := uint8(0); i < s.rawCount; i++ {

@@ -26,6 +26,7 @@ type ModularLinearSolver struct {
 	rawCount          uint8
 	addMulChild       unumeral.IntegerAddMulInvocationReceipt
 	modularBinding    unumeral.NumericCallerBinding
+	displayInsertion  unumeral.NumeralInsertionReceipt
 }
 
 func modularLinearConstructorGuard(m *unumeral.IntegerModularManager) error {
@@ -566,6 +567,9 @@ func (s *ModularLinearSolver) Close() error {
 	if e := s.identity(); e != nil {
 		return e
 	}
+	if e := cleanupLinearDisplayInsertion(&s.displayInsertion, s.integer); e != nil {
+		return e
+	}
 	if !s.closing {
 		s.closing = true
 		if e := s.SourceFinalize(); e != nil {
@@ -670,7 +674,7 @@ func (s *ModularLinearSolver) NumericRecord(z *unumeral.IntegerManager, _ string
 	s.rawCount++
 }
 func (s *ModularLinearSolver) numericPending() bool {
-	if unumeral.NumericAllocationPending(&s.numericRoots) || s.addMulChild.Matches(s.integer) {
+	if s.displayInsertion.Active() || unumeral.NumericAllocationPending(&s.numericRoots) || s.addMulChild.Matches(s.integer) {
 		return true
 	}
 	for i := uint8(0); i < s.rawCount; i++ {

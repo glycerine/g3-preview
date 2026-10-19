@@ -3,10 +3,45 @@
 package polynomial
 
 import (
+	"errors"
 	"io"
 
 	"github.com/glycerine/g3/pkg/arena"
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
+
+func finishLinearDisplayInsertion(body error, receipt *unumeral.NumeralInsertionReceipt, integer *unumeral.IntegerManager) error {
+	if !receipt.Active() || receipt.SourceCause() != nil {
+		return body
+	}
+	cleanup := receipt.Complete(integer.Naturals(), true)
+	if body != nil && cleanup != nil {
+		return errors.Join(body, cleanup)
+	}
+	if body != nil {
+		return body
+	}
+	return cleanup
+}
+
+func cleanupLinearDisplayInsertion(receipt *unumeral.NumeralInsertionReceipt, integer *unumeral.IntegerManager) error {
+	if !receipt.Active() {
+		return nil
+	}
+	if e := receipt.Complete(integer.Naturals(), false); e != nil {
+		return e
+	}
+	return receipt.Complete(integer.Naturals(), true)
+}
+
+func (s *RationalLinearSolver) displayRational(out io.Writer, a *unumeral.Rational) error {
+	body := s.manager.DisplayToTracked(out, a, &s.displayInsertion)
+	return finishLinearDisplayInsertion(body, &s.displayInsertion, s.integer)
+}
+func (s *ModularLinearSolver) displayInteger(out io.Writer, a *unumeral.Int) error {
+	body := s.integer.DisplayToTracked(out, a, &s.displayInsertion)
+	return finishLinearDisplayInsertion(body, &s.displayInsertion, s.integer)
+}
 
 // io.Writer is a cold host-output adapter. Read and format each actual source
 // field at its reached position; no matrix snapshot or numerical mirror.
@@ -57,7 +92,7 @@ func (s *RationalLinearSolver) displaySource(out io.Writer) error {
 			if e != nil {
 				return e
 			}
-			if e = s.manager.DisplayTo(out, &a); e != nil {
+			if e = s.displayRational(out, &a); e != nil {
 				return e
 			}
 			if e = linearWriteText(out, " "); e != nil {
@@ -68,7 +103,7 @@ func (s *RationalLinearSolver) displaySource(out io.Writer) error {
 		if e != nil {
 			return e
 		}
-		if e = s.manager.DisplayTo(out, &b); e != nil {
+		if e = s.displayRational(out, &b); e != nil {
 			return e
 		}
 		if e = linearWriteText(out, "\n"); e != nil {
@@ -113,7 +148,7 @@ func (s *ModularLinearSolver) displaySource(out io.Writer) error {
 			}
 			// mpzzp.h display calls the integer manager directly, without the
 			// normalization assertion of the separate modular String API.
-			if e = s.manager.Integers().DisplayTo(out, &a); e != nil {
+			if e = s.displayInteger(out, &a); e != nil {
 				return e
 			}
 			if e = linearWriteText(out, " "); e != nil {
@@ -124,7 +159,7 @@ func (s *ModularLinearSolver) displaySource(out io.Writer) error {
 		if e != nil {
 			return e
 		}
-		if e = s.manager.Integers().DisplayTo(out, &b); e != nil {
+		if e = s.displayInteger(out, &b); e != nil {
 			return e
 		}
 		if e = linearWriteText(out, "\n"); e != nil {

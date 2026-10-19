@@ -40377,6 +40377,8 @@
           "go_targets": [
             "pkg/util/numeral/mp_display_stream.go",
             "pkg/math/polynomial/polynomial_linear_display.go",
+            "pkg/math/polynomial/polynomial_linear_rational.go",
+            "pkg/math/polynomial/polynomial_linear_modular.go",
             "pkg/math/polynomial/polynomial_linear_trace.go",
             "pkg/util/diagnostic/util_trace_tags.go",
             "pkg/math/polynomial/polynomial_linear_stream_flags_test.go",
@@ -40388,24 +40390,30 @@
             "TestLinearModularDisplayReceivingNumericFlags",
             "TestLinearNumericInsertionCallbackBorrowsActualOwners",
             "TestLinearTraceRetainsReceivingNumericFlags",
+            "TestLinearRationalDisplayOwnsExactFormatterCallback",
+            "TestLinearModularDisplayOwnsExactFormatterCallback",
             "TestIntegerAndRationalDisplaySourceInsertionOrder"
           ],
-          "notes": "Cold io.Writer receivers that expose native AppendInt32/AppendUint32/AppendCString retain their actual formatting state. SMALL mpz insertion delegates int32 directly; BIG sign and decimal magnitude remain separate string insertions. Rational NUM/slash/DEN order and unnormalized modular display stay intact. Both real solvers reproduce baseline decimal-loss failures, then verify hexadecimal/showbase, width/fill and BIG positive/negative behavior on normalized actual matrix fields. The linear TRACE wrapper now preserves numeric insertion types for the iteration, matrix and RHS, while the shared sticky trace writer preserves CString and numeric header/body insertions, sticky failures and callback scope. A concrete numeric-insertion callback cannot close/reset/source-finalize its actual solver or borrowed numeral managers; data/ownership stay unchanged. Native Go interfaces delegate only reached IO operations, not arithmetic, container templates or STL internals. Broader whole linear-unit source-destruction and numerical child-lifetime audits remain open."
+          "notes": "Cold io.Writer receivers that expose native AppendInt32/AppendUint32/AppendCString retain their actual formatting state. SMALL mpz insertion delegates int32 directly; BIG sign and decimal magnitude remain separate string insertions. Rational NUM/slash/DEN order and unnormalized modular display stay intact. Both real solvers reproduce baseline decimal-loss failures, then verify hexadecimal/showbase, width/fill and BIG positive/negative behavior on normalized actual matrix fields. The linear TRACE wrapper now preserves numeric insertion types for the iteration, matrix and RHS, while the shared sticky trace writer preserves CString and numeric header/body insertions, sticky failures and callback scope. DisplayToTracked exposes the exact BIG character/formatting receipt to each concrete solver. Actual magnitude callbacks observe that receipt active, cannot mutate the executing solver, and a refused output retires only the completed receipt before return. Native Go interfaces delegate only reached IO operations, not arithmetic, container templates or STL internals. Broader whole linear-unit source-destruction and arithmetic-child lifetime audits remain open."
         },
         {
           "name": "Concrete linear display delegates each numeral insertion at the reached matrix/RHS position (linear_eq_solver.h:143-146; mpq.cpp:130-139; mpz.cpp:1385-1408)",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_linear_display.go",
           "go_targets": [
-            "pkg/math/polynomial/polynomial_linear_display_test.go"
+            "pkg/math/polynomial/polynomial_linear_display_test.go",
+            "pkg/math/polynomial/polynomial_linear_stream_flags_test.go",
+            "pkg/util/numeral/mp_display_stream.go"
           ],
           "tests": [
             "TestLinearRationalDisplayPreservesNumeralInsertions",
             "TestLinearModularDisplayPreservesIntegerInsertions",
             "TestLinearRationalSourceDisplaySpacingAndOrder",
-            "TestLinearModularSourceDisplayUsesUnderlyingInteger"
+            "TestLinearModularSourceDisplayUsesUnderlyingInteger",
+            "TestLinearRationalDisplayOwnsExactFormatterCallback",
+            "TestLinearModularDisplayOwnsExactFormatterCallback"
           ],
-          "notes": "The source calls the actual manager display, not to_string. Replaced whole-rational/integer String snapshots with existing concrete DisplayTo methods. Negative BIG values now insert sign before magnitude formatting; rational numerator, slash and denominator retain separate reached insertions before the solver space/newline. Modular display still delegates directly to the underlying integer without asserting normalization. Actual writer callbacks observe the independent expected insertion sequence for a negative BIG rational and an unnormalized negative BIG modular coefficient; the rational test failed before the fix. Existing owner reentry, trace failure, sparse interpolation and mathematical checks remain in the focused selection. Full stream flag/exception and whole-unit audits remain partial."
+          "notes": "The source calls the actual manager display, not to_string. Concrete DisplayToTracked now executes the retained integer character/formatting path and gives the real solver an exact receipt during each BIG insertion. Negative BIG values insert sign before magnitude formatting; rational numerator, slash and denominator retain separate reached insertions before the solver space/newline. Modular display still delegates directly to the underlying integer without asserting normalization. Actual callbacks observe the expected insertion sequence and exact active formatter child; refused output retires the completed child without acquiring other manager work. Existing owner reentry, trace failure, sparse interpolation and mathematical checks remain in the focused selection. Wider arithmetic-child/source-destruction and whole-unit audits remain partial."
         },
         {
           "name": "Concrete linear operations bind borrowed integer/natural/modular managers for actual execution; direct Display and Solve TRACE callbacks cannot destroy managers or replace the borrowed field; nested owners restore exact outer bindings",
