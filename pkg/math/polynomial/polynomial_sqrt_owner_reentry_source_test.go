@@ -24,6 +24,14 @@ func TestPolynomialSqrtScalarAllocationUsesActualInvocation(t *testing.T) {
 	polynomialSqrtAllocationTransport(t, 2)
 }
 
+func TestPolynomialSqrtDivisionAllocationUsesActualChild(t *testing.T) {
+	polynomialSqrtAllocationTransport(t, 3)
+}
+
+func TestPolynomialSqrtPositiveDivisionAllocationUsesActualInvocation(t *testing.T) {
+	polynomialSqrtAllocationTransport(t, 4)
+}
+
 func polynomialSqrtAllocationTransport(t *testing.T, mode uint8) {
 	t.Helper()
 	budget := arena.NewBudget(1 << 26)
@@ -58,6 +66,15 @@ func polynomialSqrtAllocationTransport(t *testing.T, mode uint8) {
 	words[79] = 1
 	var big unumeral.Int
 	serviceMust(t, c.integer.SetLimbs(&big, words))
+	var divisor unumeral.Int
+	if mode >= 3 {
+		digits := make([]uint32, 16)
+		digits[0], digits[15] = 3, 1
+		serviceMust(t, c.integer.SetLimbs(&divisor, digits))
+		if mode == 3 {
+			serviceMust(t, c.integer.Neg(&big))
+		}
+	}
 	p, e := c.MkConstantTakeCopy(&big)
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
@@ -77,10 +94,15 @@ func polynomialSqrtAllocationTransport(t *testing.T, mode uint8) {
 		serviceMust(t, full.beginSquareRootWithReceipt(&receipt))
 		if mode == 1 {
 			body = full.squareRootAdd(&c.som, &big, c.monomials.unit)
-		} else {
+		} else if mode == 2 {
 			_, body = full.squareRootNumeral(2, &big, &big, &full.squareRoot.values[0])
+		} else {
+			_, body = full.squareRootNumeral(4, &big, &divisor, &full.squareRoot.values[0])
 		}
-		if !polynomialNegNumericPending(&full.squareRoot.numeric) {
+		if mode == 3 && !c.integer.MatchesRawInvocation(&full.squareRoot.divisionRaw) {
+			t.Fatal("actual division child absent from square-root invocation", body)
+		}
+		if mode != 3 && !polynomialNegNumericPending(&full.squareRoot.numeric) {
 			t.Fatal("actual scalar/append allocation absent from invocation receipt", body)
 		}
 		if !full.squareRoot.numeric.NumericBound(true) {
@@ -104,7 +126,7 @@ func polynomialSqrtAllocationTransport(t *testing.T, mode uint8) {
 	if calls != 1 || !numericPhysicalReservationRefusal(body) {
 		t.Fatal("actual square-root allocation transport not reached", calls, body)
 	}
-	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p}, []*unumeral.Int{&big}, out.header, []umemory.Block{held})
+	polynomialImpPhysicalAuditNamedExtra(t, full, []Polynomial{p}, []*unumeral.Int{&big, &divisor}, out.header, []umemory.Block{held})
 	serviceMust(t, rt.SetMaxSize(0))
 	serviceMust(t, full.cleanupSqrtInvocation(&receipt, false))
 	serviceMust(t, full.cleanupSqrtInvocation(&receipt, true))
@@ -112,6 +134,7 @@ func polynomialSqrtAllocationTransport(t *testing.T, mode uint8) {
 		t.Fatal("retired numeric policy retained cleanup authority")
 	}
 	serviceMust(t, rt.Deallocate(&held))
+	serviceMust(t, c.integer.Del(&divisor))
 	serviceMust(t, c.integer.Del(&big))
 	serviceMust(t, c.DecRef(p))
 	serviceMust(t, out.Close())

@@ -15,6 +15,7 @@ import (
 type polynomialSquareRootScope struct {
 	receipt                              polynomialSqrtInvocationReceipt
 	numeric                              polynomialNumericRoots
+	divisionRaw                          unumeral.IntegerRawInvocationReceipt
 	invocation                           uint64
 	orphanInvocations                    []uint64
 	values                               [4]unumeral.Int
@@ -171,7 +172,7 @@ func (m *MultivariatePolynomialManager) squareRootNumeral(op uint8, a, b, out *u
 	c := m.core
 	z := c.integer
 	s := &m.squareRoot
-	if op >= 1 && op <= 3 {
+	if op >= 1 && op <= 4 {
 		context := integerAllocationInvocationContext{squareRoot: &s.receipt, squareRootInvocation: s.invocation}
 		if context.roots(z) == nil {
 			return false, ErrPolynomialOwner
@@ -184,6 +185,8 @@ func (m *MultivariatePolynomialManager) squareRootNumeral(op uint8, a, b, out *u
 			return true, arithmetic.Mul(a, b, out)
 		case 3:
 			return true, arithmetic.Neg(out)
+		case 4:
+			return true, arithmetic.Div(a, b, out)
 		}
 	}
 	pending := z.PendingAllocationObject()
@@ -195,8 +198,6 @@ func (m *MultivariatePolynomialManager) squareRootNumeral(op uint8, a, b, out *u
 	switch op {
 	case 0:
 		ok, e = c.modular.IsPerfectSquareWithReceipt(a, out, &s.perfectSquare)
-	case 4:
-		e = c.modular.Div(a, b, out)
 	}
 	if pending == (umemory.ObjectRef{}) && z.PendingAllocationObject() != (umemory.ObjectRef{}) {
 		s.numericPending = z.PendingAllocationObject()
@@ -257,6 +258,12 @@ func (m *MultivariatePolynomialManager) finishSquareRoot(cause error) error {
 			s.sourceCause = s.perfectSquare.SourceCause()
 		}
 	}
+	if e := z.RawInvocationSourceCause(&s.divisionRaw); e != nil {
+		s.stopped = true
+		if s.sourceCause == nil {
+			s.sourceCause = e
+		}
+	}
 	if s.stopped {
 		return errors.Join(cause, s.sourceCause)
 	}
@@ -280,7 +287,7 @@ func (m *MultivariatePolynomialManager) finishSquareRoot(cause error) error {
 		}
 		s.stage++
 	}
-	if cause == nil && s.freshResult == (Polynomial{}) && s.factoryGeneration == 0 && s.calleeGeneration == 0 && s.numericPending == (umemory.ObjectRef{}) && s.integerRaw == ([3]umemory.Block{}) && s.monomialRaw == ([3]umemory.Block{}) && !polynomialNegNumericPending(&s.numeric) {
+	if cause == nil && s.freshResult == (Polynomial{}) && s.factoryGeneration == 0 && s.calleeGeneration == 0 && s.numericPending == (umemory.ObjectRef{}) && s.integerRaw == ([3]umemory.Block{}) && s.monomialRaw == ([3]umemory.Block{}) && !polynomialNegNumericPending(&s.numeric) && !z.MatchesRawInvocation(&s.divisionRaw) {
 		s.active = false
 	}
 	return cause
@@ -570,6 +577,10 @@ func (m *MultivariatePolynomialManager) cleanupSqrtModeOwned(abort bool, invocat
 	if abort || !active {
 		s.perfectSquare = unumeral.IntegerPerfectSquareInvocationReceipt{}
 	}
+	if e := c.integer.CleanupRawInvocation(&s.divisionRaw, false); e != nil {
+		s.cleanupCause = e
+		return e
+	}
 	if e := s.reference.drop(c, &s.reference.value, &s.reference.consumed, true); e != nil {
 		s.cleanupCause = e
 		return e
@@ -624,6 +635,10 @@ func (m *MultivariatePolynomialManager) cleanupSqrtModeOwned(abort bool, invocat
 		s.calleeGeneration = 0
 	}
 	if e := m.cleanupSqrtOrphanInvocation(invocation, cursor); e != nil {
+		return e
+	}
+	if e := c.integer.CleanupRawInvocation(&s.divisionRaw, true); e != nil {
+		s.cleanupCause = e
 		return e
 	}
 	if e := s.numeric.cleanup(c.integer); e != nil {

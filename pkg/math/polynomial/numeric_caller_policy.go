@@ -174,6 +174,9 @@ func (r *polynomialNumericRoots) NumericRecord(z *unumeral.IntegerManager, event
 
 	switch event {
 	case "division", "extended":
+		if q := c.squareRoot; q != nil && event == "division" && z.MatchesRawInvocation(raw) {
+			q.frame.divisionRaw = *raw
+		}
 		c.recordRecombinationRaw(z, raw)
 		c.recordRootUpperRaw(z, raw)
 		c.recordRemoveOneHalfRaw(z, raw)
@@ -250,6 +253,9 @@ func (r *polynomialNumericRoots) NumericSourceCause(z *unumeral.IntegerManager) 
 		return nil
 	}
 	c := r.caller
+	if q := c.squareRoot; q != nil && q.manager != nil && q.manager.matchesSqrtInvocationHistory(q) && q.invocation == c.squareRootInvocation {
+		return z.RawInvocationSourceCause(&q.frame.divisionRaw)
+	}
 	if q := c.factorFrontend; q != nil && q.actual() && q.invocation == c.factorFrontendInvocation {
 		return q.numericSourceCause()
 	}
