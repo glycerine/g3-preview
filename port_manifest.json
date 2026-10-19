@@ -44078,8 +44078,8 @@
           ]
         },
         {
-          "name": "mul, divides/divide, gcd, unify, power/sqrt/variable division/derivative cpp919\u20131268: Actual temp merge and source reversed GCD remainder reserve quirks preserved. Cached/power degree source assertions preserved on canonical inputs; some partial-record field-read profiles beyond corrected validity/degree helpers remain OPEN. No independent multivariate polynomial substitute.",
-          "status": "partial",
+          "name": "complete mul, divides/divide, GCD, unify, power/sqrt, variable division/removal and derivative block cpp919\u20131268 with source reserves, assertions and reached-field order",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -44098,6 +44098,10 @@
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
             "TestMonomialSourceRawPowerArrayProduct",
+            "TestMonomialArithmeticReservesBeyondInitialTemporaryCapacity",
+            "TestMonomialMultiplyInvariantAssertionActions",
+            "TestMonomialVariableTransformAssertionActions",
+            "TestMonomialSquareRootUnitAssertionActions",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
@@ -44220,8 +44224,8 @@
           ]
         },
         {
-          "name": "Selected raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919\u20131268",
-          "status": "partial",
+          "name": "Complete retained raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919\u20131268",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
             "TestMonomialReadOrderEmptyQueries",
@@ -48279,8 +48283,8 @@
           ]
         },
         {
-          "name": "mul, divides/divide, gcd, unify, power/sqrt/variable division/derivative cpp919\u20131268: Actual temp merge and source reversed GCD remainder reserve quirks preserved. Cached/power degree source assertions preserved on canonical inputs; some partial-record field-read profiles beyond corrected validity/degree helpers remain OPEN. No independent multivariate polynomial substitute.",
-          "status": "partial",
+          "name": "complete mul, divides/divide, GCD, unify, power/sqrt, variable division/removal and derivative block cpp919\u20131268 with source reserves, assertions and reached-field order",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -48299,6 +48303,10 @@
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
             "TestMonomialSourceRawPowerArrayProduct",
+            "TestMonomialArithmeticReservesBeyondInitialTemporaryCapacity",
+            "TestMonomialMultiplyInvariantAssertionActions",
+            "TestMonomialVariableTransformAssertionActions",
+            "TestMonomialSquareRootUnitAssertionActions",
             "TestMonomialBorrowedAllocatorClosedGuardBeforeHeader",
             "TestMonomialSourceRepeatedRenameFreshLexicalTable",
             "TestMonomialScalarQueriesStopAtOwnerLifetime",
@@ -48421,8 +48429,8 @@
           ]
         },
         {
-          "name": "Selected raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919\u20131268",
-          "status": "partial",
+          "name": "Complete retained raw monomial merge/division/GCD copy branches and sqrt/remove/derivative reached-field reads cpp919\u20131268",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_ops.go",
           "tests": [
             "TestMonomialReadOrderEmptyQueries",

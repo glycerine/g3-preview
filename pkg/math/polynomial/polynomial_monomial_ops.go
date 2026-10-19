@@ -129,16 +129,11 @@ func (m *MonomialManager) mulInputsCreated(left, right monomialInput, outcome *m
 	}()
 	x, y := MonomialInfo{Size: left.count}, MonomialInfo{Size: right.count}
 	var e error
-	if polynomialSourceDebug {
-		for _, in := range [2]monomialInput{left, right} {
-			valid, e := in.valid()
-			if e != nil {
-				return Monomial{}, e
-			}
-			if !valid {
-				return Monomial{}, ErrMonomialAssertion
-			}
-		}
+	if e := m.inputValidAssert(left, 920, "is_valid_power_product(sz1, pws1)"); e != nil {
+		return Monomial{}, e
+	}
+	if e := m.inputValidAssert(right, 921, "is_valid_power_product(sz2, pws2)"); e != nil {
+		return Monomial{}, e
 	}
 	t := &m.temps[1]
 	if x.Size > ^uint32(0)-y.Size {
@@ -203,8 +198,8 @@ func (m *MonomialManager) mulInputsCreated(left, right monomialInput, outcome *m
 			}
 			i++
 		} else {
-			if polynomialSourceDebug && v1 <= v2 {
-				return Monomial{}, ErrMonomialAssertion
+			if e := m.sourceScalarAssert(953, "v1 > v2", v1 > v2); e != nil {
+				return Monomial{}, e
 			}
 			p, e = right.read(j)
 			if e != nil {
@@ -226,29 +221,11 @@ func (m *MonomialManager) mulInputsCreated(left, right monomialInput, outcome *m
 		return r, e
 	}
 	m.traceMultiplyAfter(left, right, t, k, r)
-	if polynomialSourceDebug {
-		ok, e := m.IsValid(r)
-		if e != nil {
-			return r, e
-		}
-		if !ok {
-			return r, ErrMonomialAssertion
-		}
-		total, e := m.degreeCore(r)
-		if e != nil {
-			return r, e
-		}
-		dx, e := left.degreeSum()
-		if e != nil {
-			return r, e
-		}
-		dy, e := right.degreeSum()
-		if e != nil {
-			return r, e
-		}
-		if total != dx+dy {
-			return r, ErrMonomialAssertion
-		}
+	if e := m.multiplicationResultValidAssert(r); e != nil {
+		return r, e
+	}
+	if e := m.multiplicationDegreeAssert(r, left, right); e != nil {
+		return r, e
 	}
 	return r, nil
 }
@@ -334,8 +311,8 @@ func (m *MonomialManager) divCore(a, b Monomial, store bool) (bool, error) {
 			}
 			i++
 		} else {
-			if polynomialSourceDebug && v1 <= v2 {
-				return false, ErrMonomialAssertion
+			if e := m.sourceScalarAssert(1034, "v1 > v2", v1 > v2); e != nil {
+				return false, e
 			}
 			return false, nil
 		}
@@ -499,8 +476,8 @@ func (m *MonomialManager) gcdCore(a, b Monomial) (bool, error) {
 				v++
 				w++
 			} else {
-				if polynomialSourceDebug && d1 != d2 {
-					return false, ErrMonomialAssertion
+				if e := m.sourceScalarAssert(1121, "d1 == d2", d1 == d2); e != nil {
+					return false, e
 				}
 				p, e := m.rawPowerCore(a, i)
 				if e != nil {
@@ -524,8 +501,8 @@ func (m *MonomialManager) gcdCore(a, b Monomial) (bool, error) {
 			u++
 			i++
 		} else {
-			if polynomialSourceDebug && v1 <= v2 {
-				return false, ErrMonomialAssertion
+			if e := m.sourceScalarAssert(1134, "v1 > v2", v1 > v2); e != nil {
+				return false, e
 			}
 			p, e := m.rawPowerCore(b, j)
 			if e != nil {
@@ -630,6 +607,9 @@ func (m *MonomialManager) sqrtCreated(a Monomial, outcome *monomialFactoryOutcom
 	if e := m.check(); e != nil {
 		return Monomial{}, false, e
 	}
+	if e := m.sourceScalarAssert(1180, "m_unit != 0", m.unit != (Monomial{})); e != nil {
+		return Monomial{}, false, e
+	}
 	if a == m.unit {
 		return a, true, nil
 	}
@@ -687,8 +667,14 @@ func (m *MonomialManager) variableTransformCreated(a Monomial, v, k uint32, oper
 	if e := m.check(); e != nil {
 		return Monomial{}, e
 	}
-	if polynomialSourceDebug && v >= m.nextVar {
-		return Monomial{}, ErrMonomialAssertion
+	line := int32(1199)
+	if operation == 1 {
+		line = 1228
+	} else if operation == 2 {
+		line = 1246
+	}
+	if e := m.sourceScalarAssert(line, "is_valid(x)", v < m.nextVar); e != nil {
+		return Monomial{}, e
 	}
 	info, e := m.sizeInfoCore(a)
 	if e != nil {
@@ -710,13 +696,19 @@ func (m *MonomialManager) variableTransformCreated(a Monomial, v, k uint32, oper
 		var p MonomialPower
 		if y == v {
 			if operation == 0 {
-				if polynomialSourceDebug {
+				enabled, e := monomialSourceAssertionsEnabled()
+				if e != nil {
+					return Monomial{}, e
+				}
+				if enabled {
 					d, e := m.powerFieldCore(a, i, 4)
 					if e != nil {
 						return Monomial{}, e
 					}
 					if k > d {
-						return Monomial{}, ErrMonomialAssertion
+						if e = m.sourceAssertionFailure(1212, "k <= pw.degree()"); e != nil {
+							return Monomial{}, e
+						}
 					}
 				}
 				d, e := m.powerFieldCore(a, i, 4)

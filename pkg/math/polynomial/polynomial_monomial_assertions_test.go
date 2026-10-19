@@ -236,6 +236,108 @@ func TestMonomialRenamePermutationAssertionActions(t *testing.T) {
 	}
 }
 
+func TestMonomialMultiplyInvariantAssertionActions(t *testing.T) {
+	for _, choice := range []string{"T", "C", "disabled"} {
+		t.Run(choice, func(t *testing.T) {
+			m := monomialFixture(t)
+			for i := 0; i < 2; i++ {
+				_, e := m.MkVar()
+				serviceMust(t, e)
+			}
+			action := choice
+			if choice == "disabled" {
+				action = "T"
+			}
+			polynomialAssertionActionsFixture(t, strings.Repeat(action, 4))
+			if polynomialSourceDebug && choice == "disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+			}
+			r, e := m.MulPowers([]MonomialPower{{1, 1}, {0, 1}}, nil)
+			if polynomialSourceDebug && choice == "T" {
+				if !errors.Is(e, ErrMonomialAssertion) || m.temps[1].capacity != 0 {
+					t.Fatal("input assertion did not precede product temporary reserve", e, m.temps[1].capacity)
+				}
+			} else {
+				serviceMust(t, e)
+				info, e := m.Info(r)
+				serviceMust(t, e)
+				if info.Size != 2 || info.TotalDegree != 2 {
+					t.Fatal("continued malformed multiplication lost reached result", info)
+				}
+				serviceMust(t, m.CleanupValue(&r))
+			}
+			monomialPhysicalAudit(t, m)
+		})
+	}
+}
+
+func TestMonomialVariableTransformAssertionActions(t *testing.T) {
+	for _, choice := range []string{"T", "C", "disabled"} {
+		t.Run(choice, func(t *testing.T) {
+			m := monomialFixture(t)
+			_, e := m.MkVar()
+			serviceMust(t, e)
+			a := monomialOwn(t, m, []MonomialPower{{0, 2}})
+			action := choice
+			if choice == "disabled" {
+				action = "T"
+			}
+			polynomialAssertionActionsFixture(t, action+action)
+			if polynomialSourceDebug && choice == "disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+			}
+
+			r, e := m.RemoveVariable(a, 1)
+			if polynomialSourceDebug && choice == "T" {
+				if !errors.Is(e, ErrMonomialAssertion) {
+					t.Fatal("invalid-variable assertion did not Throw", e)
+				}
+			} else if e != nil || r != a {
+				t.Fatal("continued invalid-variable transform", r, e)
+			}
+
+			r, e = m.DivideVariablePower(a, 0, 3)
+			if polynomialSourceDebug && choice == "T" {
+				if !errors.Is(e, ErrMonomialAssertion) {
+					t.Fatal("degree assertion did not Throw", e)
+				}
+			} else if e != nil || r != m.unit {
+				t.Fatal("continued overlarge variable division", r, e)
+			}
+			monomialPhysicalAudit(t, m)
+		})
+	}
+}
+
+func TestMonomialSquareRootUnitAssertionActions(t *testing.T) {
+	for _, choice := range []string{"T", "C", "disabled"} {
+		t.Run(choice, func(t *testing.T) {
+			m := monomialFixture(t)
+			unit := m.unit
+			m.unit = Monomial{}
+			t.Cleanup(func() { m.unit = unit })
+			action := choice
+			if choice == "disabled" {
+				action = "T"
+			}
+			polynomialAssertionActionsFixture(t, action)
+			if polynomialSourceDebug && choice == "disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+			}
+			r, ok, e := m.Sqrt(unit)
+			if polynomialSourceDebug && choice == "T" {
+				if !errors.Is(e, ErrMonomialAssertion) || ok {
+					t.Fatal("unit guard did not Throw", r, ok, e)
+				}
+			} else if e != nil || !ok || r != unit {
+				t.Fatal("continued unit guard", r, ok, e)
+			}
+			m.unit = unit
+			monomialPhysicalAudit(t, m)
+		})
+	}
+}
+
 func TestMonomialPredecessorSourceAssertionActions(t *testing.T) {
 	for _, choice := range []string{"T", "C", "disabled"} {
 		t.Run(choice, func(t *testing.T) {
