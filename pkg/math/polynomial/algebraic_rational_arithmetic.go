@@ -134,13 +134,15 @@ func (m *AlgebraicRootCore) addSubRational(a *Algebraic, b *unumeral.Rational, o
 	if s.active || m.localActive || m.negation.active {
 		return ErrAlgebraicPending
 	}
-	*s = algebraicRationalArithmeticScope{polynomialCaller: m.polynomialCaller, active: true, qCount: 1}
+	*s = algebraicRationalArithmeticScope{polynomialCaller: m.polynomialCaller, active: true}
 	if m.integerAdd.running {
 		s.integerAddition = &m.integerAdd
 	}
-	s.q[0] = unumeral.NewRational()
 	defer func() {
 		s.executing = false
+		if s.sourceStop == nil {
+			s.sourceStop = m.rootTraceSourceCause()
+		}
 		if s.sourceStop == nil {
 			s.sourceStop = p.convertEntryReceiptSourceCause(&s.convertEntry)
 		}
@@ -153,6 +155,7 @@ func (m *AlgebraicRootCore) addSubRational(a *Algebraic, b *unumeral.Rational, o
 		}
 	}()
 	if l.kind == 0 {
+		s.q[0], s.qCount = unumeral.NewRational(), 1
 		r, e := m.load(l)
 		if e != nil {
 			return e
@@ -177,6 +180,10 @@ func (m *AlgebraicRootCore) addSubRational(a *Algebraic, b *unumeral.Rational, o
 		return e
 	}
 	s.executing = true
+	if e = m.traceRationalTranslationInput(&r, b); e != nil {
+		return e
+	}
+	s.q[0], s.qCount = unumeral.NewRational(), 1
 	if e = qm.Copy(&s.q[0], b); e != nil {
 		return e
 	}
