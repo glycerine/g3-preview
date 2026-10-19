@@ -44,6 +44,9 @@ func (m *MultivariatePolynomialManager) Rename(xs []uint32) error {
 	if e := m.ready(); e != nil {
 		return e
 	}
+	if e := m.traceRename(xs, true); e != nil {
+		return e
+	}
 	if e := m.core.monomials.Rename(xs); e != nil {
 		return e
 	}
@@ -71,5 +74,5 @@ func (m *MultivariatePolynomialManager) Rename(xs []uint32) error {
 			return e
 		}
 	}
-	return nil
+	return m.traceRename(xs, false)
 }

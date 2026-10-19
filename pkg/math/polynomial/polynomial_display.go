@@ -333,6 +333,9 @@ func (f *polynomialDisplayFrame) destroyCharacters(body error) error {
 	return body
 }
 func (m *MultivariatePolynomialCore) CleanupDisplay() error {
+	if m != nil && m.self == m && m.renameTraceRunning {
+		return ErrPolynomialPending
+	}
 	if m == nil || m.self != m {
 		return ErrPolynomialOwner
 	}
@@ -469,6 +472,12 @@ func (m *MultivariatePolynomialCore) displayIntoCore(p Polynomial, sink Polynomi
 	}); e != nil {
 		return e
 	}
+	return m.displayPolynomialDirect(p, sink, star)
+}
+
+// displayPolynomialDirect implements polynomial::display, without the public
+// manager::display consistent_coeffs assertion.
+func (m *MultivariatePolynomialCore) displayPolynomialDirect(p Polynomial, sink PolynomialTextSink, star bool) error {
 	n, e := m.readWord(p, 8)
 	if e != nil {
 		return e

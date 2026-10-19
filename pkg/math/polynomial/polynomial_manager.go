@@ -46,6 +46,7 @@ type polynomialCreation struct {
 	buffer            *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	renameTraceRunning                                                                         bool
 	algebraicTraceRunning                                                                      bool
 	pendingSparse                                                                              *PolynomialSparseInterpolator
 	sparseCaller                                                                               *PolynomialSparseInterpolator
@@ -262,7 +263,7 @@ func (m *MultivariatePolynomialCore) Error() string {
 }
 func (m *MultivariatePolynomialCore) Unwrap() error { return m.originalCause }
 func (m *MultivariatePolynomialCore) check() error {
-	if m != nil && m.self == m && (m.collectingVariables || m.algebraicTraceRunning) {
+	if m != nil && m.self == m && (m.collectingVariables || m.algebraicTraceRunning || m.renameTraceRunning) {
 		return ErrPolynomialPending
 	}
 	if m == nil || m.self != m {
@@ -471,7 +472,7 @@ func (m *MultivariatePolynomialCore) CloseChecked() error {
 	if m != nil && m.self == m && (m.quasiResultant.active || m.variableNumeral.active) {
 		return ErrPolynomialPending
 	}
-	if m != nil && m.self == m && (m.collectingVariables || m.algebraicTraceRunning) {
+	if m != nil && m.self == m && (m.collectingVariables || m.algebraicTraceRunning || m.renameTraceRunning) {
 		return ErrPolynomialPending
 	}
 	if m != nil && m.self == m && m.normalizationPending() {
