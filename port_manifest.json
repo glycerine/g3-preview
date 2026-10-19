@@ -205983,13 +205983,13 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "a03d0473",
+    "commit": "c19bb8d7",
     "command": "cd pkg && go test ./... -count=1 -timeout=30m",
-    "started_utc": "2026-10-19 20:02:52 UTC",
-    "completed_utc": "2026-10-19 20:15:10 UTC",
+    "started_utc": "2026-10-19 21:03:22 UTC",
+    "completed_utc": "2026-10-19 21:15:24 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-a03d0473.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-a03d0473.exit",
+    "log": "/mnt/oldrog/tmp/g3-native-c19bb8d7.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-c19bb8d7.exit",
     "cpu_affinity": [
       8,
       9,
@@ -206005,13 +206005,13 @@
     "package_timeout": "30m",
     "packages_with_ok_result": 68,
     "packages_without_test_files": 11,
-    "ast_seconds": 12.792,
-    "polynomial_seconds": 107.637,
-    "lp_seconds": 704.36,
-    "numeral_seconds": 58.842,
-    "session_id": 74439,
+    "ast_seconds": 12.117,
+    "polynomial_seconds": 107.219,
+    "lp_seconds": 710.014,
+    "numeral_seconds": 58.382,
+    "session_id": 32317,
     "checkout_held_unchanged": true,
-    "scope_warning": "Full native module checkpoint a03d0473 passed on CPUs 8-16 with the checkout held unchanged. It includes cell bound-copy and coefficient-copy execution, basic-cell mutable setter lifetime/accessor, same/foreign source interval deletion, cross-manager branch/accessor/self-assignment and polynomial/interval/flag source-copy phase corrections. Subsequent borrowed basic-value NUM/DEN and scoped TMP field-read changes were prepared only in an overlay and are excluded. No statement coverage was collected and this does not establish polynomial or AST source-port completion."
+    "scope_warning": "Full native module checkpoint c19bb8d7 passed on CPUs 8-16 with the checkout held unchanged. It includes the borrowed basic-value NUM/DEN, defining-polynomial field/callee assertion and selected bound source-field increments, plus additive import correction a7475772. Bound temporary source deletion was developed only in an overlay and is excluded. No statement coverage was collected and polynomial/AST source-port completion remains open."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
