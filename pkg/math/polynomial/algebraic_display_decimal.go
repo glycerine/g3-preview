@@ -42,15 +42,14 @@ func (m *AlgebraicRootCore) DisplayDecimal(w io.Writer, a *Algebraic, precision 
 	m.decimalDisplayRunning = true
 	defer func() { m.decimalDisplayRunning = false }()
 	if l == nil || l.kind == 0 {
-		q := unumeral.NewRational()
-		if l != nil {
-			r, loadErr := m.load(l)
-			if loadErr != nil {
-				return loadErr
-			}
-			q = r.value
+		value, e := m.copySourceBasicValue(m, l)
+		if e != nil {
+			return e
 		}
-		return m.config.Rationals.DisplayDecimalInto(algebraicDecimalWriter{w}, &q, precision, false)
+		if value.cell == nil {
+			return m.config.Rationals.DisplayDecimalInto(algebraicDecimalWriter{w}, value.zero, precision, false)
+		}
+		return m.config.Rationals.DisplayDecimalStoredInto(algebraicDecimalWriter{w}, value.source.config.Allocator, value.cell.raw, precision, false)
 	}
 
 	s := &m.decimalDisplay

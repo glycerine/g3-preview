@@ -13,45 +13,59 @@ func (m *RationalManager) DisplayDecimalInto(out RationalSourceStream, a *Ration
 	if e := m.checkScalarValue(a); e != nil {
 		return e
 	}
+	s, e := m.beginDecimalStream(out)
+	if e != nil {
+		return e
+	}
+	defer func() { cause = s.finishCall(cause) }()
+	return s.run(out, a, precision, truncate)
+}
+
+func (m *RationalManager) beginDecimalStream(out RationalSourceStream) (*rationalDecimalStreamScope, error) {
 	s := &m.decimalStream
 	if s.active {
-		return ErrNumericPending
+		return nil, ErrNumericPending
 	}
 	if out == nil {
-		return utext.ErrOwnedStringOwner
+		return nil, utext.ErrOwnedStringOwner
 	}
 	if s.invocation == ^uint64(0) {
-		return ErrNumericPending
+		return nil, ErrNumericPending
 	}
-	// n1,d1,v1 are RAW declarations. ten is constructed only after sign handling.
+	// Literal n1,d1,v1 declarations precede the first component access.
 	*s = rationalDecimalStreamScope{manager: m, invocation: s.invocation + 1, count: 3, active: true, executing: true}
 	s.hooks.Policy = s
 	if e := s.bind(); e != nil {
 		s.executing = false
-		return e
+		return nil, e
 	}
-	defer func() {
-		s.executing = false
-		s.bodyCause = cause
-		s.bodySucceeded = cause == nil
-		cause = JoinNumericErrors(cause, m.finishDecimalStreamSource())
-		cause = JoinNumericErrors(cause, s.unbind())
-		if cause == nil {
-			s.active = false
-		}
-	}()
-	return s.run(out, a, precision, truncate)
+	return s, nil
+}
+func (s *rationalDecimalStreamScope) finishCall(cause error) error {
+	s.executing = false
+	s.bodyCause = cause
+	s.bodySucceeded = cause == nil
+	cause = JoinNumericErrors(cause, s.manager.finishDecimalStreamSource())
+	cause = JoinNumericErrors(cause, s.unbind())
+	if cause == nil {
+		s.active = false
+	}
+	return cause
 }
 func (s *rationalDecimalStreamScope) run(out RationalSourceStream, a *Rational, precision uint32, truncate bool) error {
 	z, c := s.manager.Z, integerAllocationInvocationContext{Caller: &s.hooks}
+	if e := z.copyFromOwnerWithAllocationContext(&s.values[1], z, &a.Num, nil, c); e != nil {
+		return e
+	}
+	if e := z.copyFromOwnerWithAllocationContext(&s.values[2], z, &a.Den, nil, c); e != nil {
+		return e
+	}
+	return s.runCopied(out, a.Num.Val < 0, precision, truncate)
+}
+func (s *rationalDecimalStreamScope) runCopied(out RationalSourceStream, negative bool, precision uint32, truncate bool) error {
+	z, c := s.manager.Z, integerAllocationInvocationContext{Caller: &s.hooks}
 	ten, n, d, v := &s.values[0], &s.values[1], &s.values[2], &s.values[3]
-	if e := z.copyFromOwnerWithAllocationContext(n, z, &a.Num, nil, c); e != nil {
-		return e
-	}
-	if e := z.copyFromOwnerWithAllocationContext(d, z, &a.Den, nil, c); e != nil {
-		return e
-	}
-	if a.Num.Val < 0 {
+	if negative {
 		if e := out.AppendCString("-"); e != nil {
 			return e
 		}
