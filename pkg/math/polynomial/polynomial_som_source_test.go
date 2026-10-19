@@ -179,6 +179,7 @@ func TestPolynomialStoppedMonomialUnitOwningGuardDependency(t *testing.T) {
 // compaction assertion. Owning cleanup must not re-DEC the consumed zero slot.
 func TestPolynomialSOMCompactionDuplicateAssertionAndOwnedIntervals(t *testing.T) {
 	m := polynomialCellFixture(t)
+	polynomialThrowAssertionFixture(t)
 	u, e := m.monomials.Unit()
 	serviceMust(t, e)
 	before, e := m.monomialRefCount(u)

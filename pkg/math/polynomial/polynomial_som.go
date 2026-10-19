@@ -612,8 +612,8 @@ func (b *polynomialSOM) resetWithNormalizationReceipt(receipt *polynomialNormali
 	if e != nil {
 		return e
 	}
-	if polynomialSourceDebug && sz != n {
-		return ErrPolynomialAssertion
+	if e = polynomialSOMSourceAssert(1936, "m_tmp_ms.size() == m_tmp_as.size()", sz == n); e != nil {
+		return e
 	}
 	b.resetActive = true
 	for i := uint32(0); i < n; i++ {
@@ -690,8 +690,8 @@ func (b *polynomialSOM) removeZeros(normalize bool) error {
 	if e != nil {
 		return e
 	}
-	if polynomialSourceDebug && sz != n {
-		return ErrPolynomialAssertion
+	if e = polynomialSOMSourceAssert(1898, "m_tmp_ms.size() == m_tmp_as.size()", sz == n); e != nil {
+		return e
 	}
 	if b.removeActive {
 		return ErrPolynomialPending
@@ -752,8 +752,8 @@ func (b *polynomialSOM) removeZeros(normalize bool) error {
 					if e != nil {
 						return e
 					}
-					if old == term {
-						return ErrPolynomialAssertion
+					if e = polynomialSOMSourceAssert(1910, "m_tmp_ms[j] != m", old != term); e != nil {
+						return e
 					}
 				}
 				if e = b.ms.putMonomial(m, j, term); e != nil {
@@ -802,8 +802,8 @@ func (b *polynomialSOM) removeZeros(normalize bool) error {
 			if e != nil {
 				return e
 			}
-			if !zero {
-				return ErrPolynomialAssertion
+			if e = polynomialSOMSourceAssert(1919, "mng.is_zero(m_tmp_as[i])", zero); e != nil {
+				return e
 			}
 		}
 	}

@@ -46122,3 +46122,13 @@ The production `polynomial.cpp:3134-3182` sparse interpolator embeds the modular
 Audited every declaration in `upolynomial_factorization.h`. The live interfaces map to concrete Go APIs for finite-field square-free decomposition, deterministic Berlekamp splitting, complete finite-field factorization, pair and multi-factor Hensel lifting, and integer square-free factorization with default or explicit multiplicity. The source inline overload that accepts and ignores `factor_params` has no retained caller, so no unused adapter was added. Default multiplicity is explicitly one, and the public interface test independently reconstructs `(x-2)(x+3)`.
 
 This completes the declaration/interface unit only. `upolynomial_factorization.cpp` remains partial while its deeper failure, callback and destructor audit continues. Focused factorization checks pass ordinary0.087s and checked/debug/trace0.093s; manifest validation reports213 ported,338 partial. The pinned full repository checkpoint at `a5d3b6e9` has already passed polynomial in98.167s and remains live, so no final full-suite result is claimed yet.
+Standalone polynomial SOM assertion increment: the retained `som_buffer` size,
+duplicate-compaction, zero-suffix and display `SASSERT` sites at
+`polynomial.cpp:1898,1910,1919,1936,2149` now use the process debug switch and
+debugger actions. Focused fixtures verify that Throw stops at the source site
+and Continue resumes at the following vector read or completes compaction,
+while preserving the exact owning cleanup frontier. The manifest SOM tests and
+new assertion tests pass in native, checked, debug, and combined
+`g3checked,g3debug,g3trace` profiles on CPUs 8-16; source-aware portcheck passes.
+The standalone row remains partial while its separately tracked graded-lex sort
+body is audited.

@@ -44617,7 +44617,11 @@
             "TestPolynomialSOMBufferActualModDAndScalarOverloads",
             "TestPolynomialSOMBufferNeverAbortsBorrowedCalleeCreation",
             "TestPolynomialSOMBufferSourceSelfAliasReadsChangedFutureCoefficient",
-            "TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation"
+            "TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation",
+            "TestPolynomialSOMResetSizeAssertionActions",
+            "TestPolynomialSOMRemoveZerosSizeAssertionActions",
+            "TestPolynomialSOMRemoveZerosDuplicateAssertionActions",
+            "TestPolynomialSOMDisplaySizeAssertionActions"
           ]
         },
         {

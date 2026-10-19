@@ -485,8 +485,8 @@ func (b *PolynomialSOMBuffer) DisplayInto(out MonomialTextSink) error {
 		if e != nil {
 			return e
 		}
-		if n != a {
-			return ErrPolynomialAssertion
+		if e = polynomialSOMSourceAssert(2149, "m_tmp_ms.size() == m_tmp_as.size()", n == a); e != nil {
+			return e
 		}
 	}
 	if b.buffer.owner == nil {
