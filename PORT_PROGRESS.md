@@ -46244,5 +46244,14 @@ predicate is evaluated only when enabled, and Throw/Continue use the source
 debugger action. Existing zero, constant, degree-zero, quick-filter, content,
 coefficient-GCD, sign, exact-division, TRACE and lexical ownership tests remain
 green in native, checked, debug and combined checked/debug/trace profiles on
-CPUs 8-16. The ICCP ledger stays partial while its remaining child-composition
-audit is open.
+CPUs 8-16.
+
+Complete retained ICCP audit: the five-argument body owns the exact reached
+constant SET, degree-zero Content, general Content, Coeff, recursive GCD, Neg,
+and ExactDiv invocation receipts. Source retirement checks younger children
+before destroying `ci`, powers, and filter; owning continuation resumes those
+same children in reverse lexical order and cannot acquire copied, stale, or
+foreign receipts. Reservation-prefix and callback fixtures cover constant,
+quick-filter, multi-coefficient, sign, and exact-division paths. The unused
+four-argument `max_var` wrapper at cpp3532-3534 has no retained C++ caller and
+is intentionally omitted. The ICCP body and invoked-child rows are now ported.

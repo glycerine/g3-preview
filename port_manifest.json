@@ -45119,8 +45119,8 @@
           ]
         },
         {
-          "name": "ICCP cpp3432-3534: zero/constant/degree-zero guards, inline128 filter/powers, runtime assertion actions, literal IC/coefficient GCD/sign/exact division and matched lexical invocation ownership",
-          "status": "partial",
+          "name": "Complete retained ICCP cpp3432-3530: zero/constant/degree-zero guards, native filter/powers, runtime assertion actions, literal IC/coefficient GCD/sign/exact division and matched lexical invocation ownership; unused four-argument max_var wrapper cpp3532-3534 omitted",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_iccp.go",
           "tests": [
             "TestPolynomialICCPSourceAssertionActions",
@@ -45845,8 +45845,8 @@
           ]
         },
         {
-          "name": "polynomial.cpp:3453-3530 ICCP actual constant SET and nonconstant Content/Coeff/GCD/Neg/ExactDiv invoked child ownership, lexical ci constructor/destructor order",
-          "status": "partial",
+          "name": "Complete ICCP invoked-child ownership cpp3453-3530: actual constant SET and nonconstant Content/Coeff/GCD/Neg/ExactDiv receipts with lexical ci construction and reverse destruction",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_iccp.go",
           "tests": [
             "TestPolynomialICCPFirstCoefficientChildPreservesConstructedEmptyCI",
