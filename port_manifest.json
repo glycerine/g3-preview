@@ -38402,7 +38402,8 @@
         "pkg/math/polynomial/algebraic_rational_multiply_trace_test.go",
         "pkg/math/polynomial/algebraic_inverse_refinement_source_test.go",
         "pkg/math/polynomial/algebraic_inverse_display_source_test.go",
-        "pkg/math/polynomial/algebraic_division_diagnostic_source_test.go"
+        "pkg/math/polynomial/algebraic_division_diagnostic_source_test.go",
+        "pkg/math/polynomial/algebraic_compare_inner_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -38610,7 +38611,11 @@
         "TestAlgebraicInverseTraceBorrowCoversEntireStream",
         "TestAlgebraicDivisionInverseDisplayStopProtectsScopedInverse",
         "TestAlgebraicDivisionInverseDisplayRAWDoesNotStopOlderSourceDestructor",
-        "TestAlgebraicDivisionScopedInverseDestructorPreservesCursor"
+        "TestAlgebraicDivisionScopedInverseDestructorPreservesCursor",
+        "TestAlgebraicCompareInnerTraceExactRecordsAndEarlyExits",
+        "TestAlgebraicCompareInnerDisplayStopPrecedesRefinement",
+        "TestAlgebraicCompareBasicTraceOwnsActualCharacterReadFailure",
+        "TestAlgebraicCompareDisabledInnerTraceDoesNotRead"
       ],
       "conditionals": [
         {
@@ -39323,13 +39328,17 @@
           ]
         },
         {
-          "name": "basic/root/rational dispatch and interval/minimal/refinement/Sturm\u2013Tarski comparison cpp1669\u20131821/1867\u20131885",
+          "name": "basic/root/rational dispatch and interval/minimal/refinement/Sturm\u2013Tarski comparison cpp1669\u20131821/1867\u20131885; inner and outer comparison TRACE records with accepted polynomial/numeral formatting children; complete numeric/source failure audit remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_compare.go",
           "tests": [
             "TestAlgebraicCompareMinimalAndMagnitudeRefinement",
             "TestAlgebraicCompareSturmTarskiIndependentOrder",
-            "TestAlgebraicCompareSequenceReservationPrefixes"
+            "TestAlgebraicCompareSequenceReservationPrefixes",
+            "TestAlgebraicCompareInnerTraceExactRecordsAndEarlyExits",
+            "TestAlgebraicCompareInnerDisplayStopPrecedesRefinement",
+            "TestAlgebraicCompareBasicTraceOwnsActualCharacterReadFailure",
+            "TestAlgebraicCompareDisabledInnerTraceDoesNotRead"
           ]
         },
         {
@@ -39556,7 +39565,8 @@
         "Mixed rational multiplication now retains the three source TRACE records at algebraic_numbers.cpp:1498,1525,1535 and both actual SASSERT Horner invocations at 1501 before scoped nbv construction. Shared concrete arithmetic source cleanup observes only accepted display/evaluation/interval-conversion receipts; source body failure preserves unjoined RAW for owning acknowledgement. Exact pending arithmetic Horner children block ordinary algebraic admission. Tests cover positive/negative dyadic and nonbinary records before primitive result normalization, input/final formatter stops, independently reached lower/upper assertion reservation failures before nbv/l/u, cleanup, erased operands and sticky output failure that still evaluates both final signs. Whole polynomial and AST completion audits remain open. A real returning allocation-failure transport during the actual assertion verifies refusal of deletion, multiplication reentry, retained cleanup and owner close with unchanged arithmetic frame, input, budget and physical allocation statistics.",
         "Nonzero-bound inversion refinement at algebraic_numbers.cpp:1582-1618 now retains the actual bound-copy allocation and Horner invocation receipts, pins its inversion owner across callbacks, preserves initial zero-test short circuit and source assertion gates, and uses the accepted binary-to-rational conversion child when a halving discovers an exact root. The halved bound is saved before evaluation. Exact pending refinement children block ordinary admission; owning cleanup consumes only matching accepted tuples. Positive/negative exact +/-2^-32 reservation sweeps cover Horner and conversion, ordinary numeric copies saturate descriptors to reach a real bound-SET allocation suffix, actual returning TLS failure verifies lifecycle/callback protection, and a refused refinement preserves a foreign pending Horner. Whole inversion/numeric-child and polynomial/AST source failure audits remain open. An ended debug context independently verifies that the reached source assertion switch precedes bound copy, Horner evaluation and local-rational construction.",
         "Inversion diagnostics at algebraic_numbers.cpp:1630,1641,1644 now use the shared source trace borrow with exact root-display and raw numeral insertion receipts. Binary interval bounds preserve actual mpbq display insertion order; qm().to_string finishes its project formatting children into a native Go string before inserting that completed string. Source unwinding observes actual child source causes, not the mere presence of unjoined display RAW. Owning inverse cleanup cannot acquire a later replacement root display. Qualified before/after root formatter stops verify older rational declaration/destruction frontiers and preserved source history; actual callback probes cover the full stream borrow, numeric/UP lifecycle refusal and unchanged allocation graphs. Full inversion reservation suites and new regressions pass all four profiles. Whole inversion/polynomial/AST source audits remain partial.",
-        "Division scoped-inverse destruction at algebraic_numbers.cpp:1663-1666 now distinguishes an actual inversion diagnostic source-END stop from completed formatting source work with unjoined RAW. Exact shared trace source causes protect the older invb and remain its source history; a private source destructor proceeds over completed younger formatting work without ordinary public admission. Owning acknowledgement uses the actual cell initialization/destruction frontier, while cleaning guards refuse public/lifecycle callback reentry before mutation. Source history survives acknowledgement and resets only at a new accepted division. Real before/after formatter guards, a reservation-armed actual RAW suffix, and a qualified private upper-bound destructor guard cover the nested causal/cursor behavior. The stopped-display and RAW regressions were run against the prior implementation and failed there. Whole division, polynomial and AST source audits remain open."
+        "Division scoped-inverse destruction at algebraic_numbers.cpp:1663-1666 now distinguishes an actual inversion diagnostic source-END stop from completed formatting source work with unjoined RAW. Exact shared trace source causes protect the older invb and remain its source history; a private source destructor proceeds over completed younger formatting work without ordinary public admission. Owning acknowledgement uses the actual cell initialization/destruction frontier, while cleaning guards refuse public/lifecycle callback reentry before mutation. Source history survives acknowledgement and resets only at a new accepted division. Real before/after formatter guards, a reservation-armed actual RAW suffix, and a qualified private upper-bound destructor guard cover the nested causal/cursor behavior. The stopped-display and RAW regressions were run against the prior implementation and failed there. Whole division, polynomial and AST source audits remain open.",
+        "The missing inner root comparison record at algebraic_numbers.cpp:1738-1743 now follows interval disjointness and polynomial equality exits and precedes refinement/Sturm work. It displays actual source polynomials, open binary intervals and minimal flags through accepted formatter receipts. The outer record at 1861 now uses tracked basic MPQ and root MPBQ display insertions through the same numeric/UP trace borrow. Exact records cover minimal/nonminimal and equal/disjoint branches; a real UP numeral destructor guard stops before algorithm advancement. Native Go formatting buffers do not consume the numerical allocation budget: a nested actual mpn_to_string result callback instead guards the completed character span before its reached C-string read, verifying accepted child retention, source completion, acknowledgement and unchanged input. Erased records do not read operands. Literal tests fail against the old compareCore dispatch in an exact Go overlay. Whole comparison/polynomial/AST source audits remain partial."
       ]
     },
     {
@@ -39714,7 +39724,8 @@
         "pkg/math/polynomial/algebraic_rational_multiply_trace_test.go",
         "pkg/math/polynomial/algebraic_inverse_refinement_source_test.go",
         "pkg/math/polynomial/algebraic_inverse_display_source_test.go",
-        "pkg/math/polynomial/algebraic_division_diagnostic_source_test.go"
+        "pkg/math/polynomial/algebraic_division_diagnostic_source_test.go",
+        "pkg/math/polynomial/algebraic_compare_inner_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -39919,7 +39930,11 @@
         "TestAlgebraicInverseTraceBorrowCoversEntireStream",
         "TestAlgebraicDivisionInverseDisplayStopProtectsScopedInverse",
         "TestAlgebraicDivisionInverseDisplayRAWDoesNotStopOlderSourceDestructor",
-        "TestAlgebraicDivisionScopedInverseDestructorPreservesCursor"
+        "TestAlgebraicDivisionScopedInverseDestructorPreservesCursor",
+        "TestAlgebraicCompareInnerTraceExactRecordsAndEarlyExits",
+        "TestAlgebraicCompareInnerDisplayStopPrecedesRefinement",
+        "TestAlgebraicCompareBasicTraceOwnsActualCharacterReadFailure",
+        "TestAlgebraicCompareDisabledInnerTraceDoesNotRead"
       ],
       "conditionals": [
         {
@@ -40234,13 +40249,17 @@
           ]
         },
         {
-          "name": "basic/root/rational dispatch and interval/minimal/refinement/Sturm\u2013Tarski comparison cpp1669\u20131821/1867\u20131885",
+          "name": "basic/root/rational dispatch and interval/minimal/refinement/Sturm\u2013Tarski comparison cpp1669\u20131821/1867\u20131885; inner and outer comparison TRACE records with accepted polynomial/numeral formatting children; complete numeric/source failure audit remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_compare.go",
           "tests": [
             "TestAlgebraicCompareMinimalAndMagnitudeRefinement",
             "TestAlgebraicCompareSturmTarskiIndependentOrder",
-            "TestAlgebraicCompareSequenceReservationPrefixes"
+            "TestAlgebraicCompareSequenceReservationPrefixes",
+            "TestAlgebraicCompareInnerTraceExactRecordsAndEarlyExits",
+            "TestAlgebraicCompareInnerDisplayStopPrecedesRefinement",
+            "TestAlgebraicCompareBasicTraceOwnsActualCharacterReadFailure",
+            "TestAlgebraicCompareDisabledInnerTraceDoesNotRead"
           ]
         },
         {
@@ -40444,7 +40463,8 @@
         "Mixed rational multiplication now retains the three source TRACE records at algebraic_numbers.cpp:1498,1525,1535 and both actual SASSERT Horner invocations at 1501 before scoped nbv construction. Shared concrete arithmetic source cleanup observes only accepted display/evaluation/interval-conversion receipts; source body failure preserves unjoined RAW for owning acknowledgement. Exact pending arithmetic Horner children block ordinary algebraic admission. Tests cover positive/negative dyadic and nonbinary records before primitive result normalization, input/final formatter stops, independently reached lower/upper assertion reservation failures before nbv/l/u, cleanup, erased operands and sticky output failure that still evaluates both final signs. Whole polynomial and AST completion audits remain open. A real returning allocation-failure transport during the actual assertion verifies refusal of deletion, multiplication reentry, retained cleanup and owner close with unchanged arithmetic frame, input, budget and physical allocation statistics.",
         "Nonzero-bound inversion refinement at algebraic_numbers.cpp:1582-1618 now retains the actual bound-copy allocation and Horner invocation receipts, pins its inversion owner across callbacks, preserves initial zero-test short circuit and source assertion gates, and uses the accepted binary-to-rational conversion child when a halving discovers an exact root. The halved bound is saved before evaluation. Exact pending refinement children block ordinary admission; owning cleanup consumes only matching accepted tuples. Positive/negative exact +/-2^-32 reservation sweeps cover Horner and conversion, ordinary numeric copies saturate descriptors to reach a real bound-SET allocation suffix, actual returning TLS failure verifies lifecycle/callback protection, and a refused refinement preserves a foreign pending Horner. Whole inversion/numeric-child and polynomial/AST source failure audits remain open. An ended debug context independently verifies that the reached source assertion switch precedes bound copy, Horner evaluation and local-rational construction.",
         "Inversion diagnostics at algebraic_numbers.cpp:1630,1641,1644 now use the shared source trace borrow with exact root-display and raw numeral insertion receipts. Binary interval bounds preserve actual mpbq display insertion order; qm().to_string finishes its project formatting children into a native Go string before inserting that completed string. Source unwinding observes actual child source causes, not the mere presence of unjoined display RAW. Owning inverse cleanup cannot acquire a later replacement root display. Qualified before/after root formatter stops verify older rational declaration/destruction frontiers and preserved source history; actual callback probes cover the full stream borrow, numeric/UP lifecycle refusal and unchanged allocation graphs. Full inversion reservation suites and new regressions pass all four profiles. Whole inversion/polynomial/AST source audits remain partial.",
-        "Division scoped-inverse destruction at algebraic_numbers.cpp:1663-1666 now distinguishes an actual inversion diagnostic source-END stop from completed formatting source work with unjoined RAW. Exact shared trace source causes protect the older invb and remain its source history; a private source destructor proceeds over completed younger formatting work without ordinary public admission. Owning acknowledgement uses the actual cell initialization/destruction frontier, while cleaning guards refuse public/lifecycle callback reentry before mutation. Source history survives acknowledgement and resets only at a new accepted division. Real before/after formatter guards, a reservation-armed actual RAW suffix, and a qualified private upper-bound destructor guard cover the nested causal/cursor behavior. The stopped-display and RAW regressions were run against the prior implementation and failed there. Whole division, polynomial and AST source audits remain open."
+        "Division scoped-inverse destruction at algebraic_numbers.cpp:1663-1666 now distinguishes an actual inversion diagnostic source-END stop from completed formatting source work with unjoined RAW. Exact shared trace source causes protect the older invb and remain its source history; a private source destructor proceeds over completed younger formatting work without ordinary public admission. Owning acknowledgement uses the actual cell initialization/destruction frontier, while cleaning guards refuse public/lifecycle callback reentry before mutation. Source history survives acknowledgement and resets only at a new accepted division. Real before/after formatter guards, a reservation-armed actual RAW suffix, and a qualified private upper-bound destructor guard cover the nested causal/cursor behavior. The stopped-display and RAW regressions were run against the prior implementation and failed there. Whole division, polynomial and AST source audits remain open.",
+        "The missing inner root comparison record at algebraic_numbers.cpp:1738-1743 now follows interval disjointness and polynomial equality exits and precedes refinement/Sturm work. It displays actual source polynomials, open binary intervals and minimal flags through accepted formatter receipts. The outer record at 1861 now uses tracked basic MPQ and root MPBQ display insertions through the same numeric/UP trace borrow. Exact records cover minimal/nonminimal and equal/disjoint branches; a real UP numeral destructor guard stops before algorithm advancement. Native Go formatting buffers do not consume the numerical allocation budget: a nested actual mpn_to_string result callback instead guards the completed character span before its reached C-string read, verifying accepted child retention, source completion, acknowledgement and unchanged input. Erased records do not read operands. Literal tests fail against the old compareCore dispatch in an exact Go overlay. Whole comparison/polynomial/AST source audits remain partial."
       ]
     },
     {
@@ -205694,7 +205714,7 @@
     "numeral_seconds": 56.846,
     "session_id": 58918,
     "checkout_held_unchanged": true,
-    "scope_warning": "Full native module checkpoint 300488b9 passed on CPUs 8-16 with the checkout held unchanged. This result covers that exact commit. Subsequent inversion diagnostic and division cleanup corrections have focused four-profile evidence and are not included in this full native result. This run collected no statement coverage and does not establish polynomial or AST source-port completion."
+    "scope_warning": "Full native module checkpoint 300488b9 passed on CPUs 8-16 with the checkout held unchanged. This result covers that exact commit. Subsequent inversion diagnostic, division cleanup and comparison diagnostic corrections have focused four-profile evidence and are not included in this full native result. This run collected no statement coverage and does not establish polynomial or AST source-port completion."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

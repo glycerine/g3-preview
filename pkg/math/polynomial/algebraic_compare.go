@@ -200,6 +200,9 @@ func (m *AlgebraicRootCore) compareCore(a, b *Algebraic) (_value int, _err error
 		m.comparePoly++
 		return 0, nil
 	}
+	if e = m.traceComparisonRoots(&ar, &br); e != nil {
+		return 0, e
+	}
 	if ar.flags&1 != 0 && br.flags&1 != 0 {
 		for {
 			if e = m.checkpoint(); e != nil {

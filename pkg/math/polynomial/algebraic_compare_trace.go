@@ -1,7 +1,47 @@
-// Source: algebraic_numbers.cpp:1861.
+// Source: algebraic_numbers.cpp:1738-1743,1861,2708-2719.
 package polynomial
 
-import "io"
+import (
+	"io"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+)
+
+// This inner record follows the interval and equal-polynomial exits. Its
+// operands are reached only when the source trace is enabled.
+func (m *AlgebraicRootCore) traceComparisonRoots(a, b *algebraicRecord) error {
+	return m.emitRootTrace("compare", 1738, func(w io.Writer) error {
+		out := algebraicTranslationTraceStream{algebraicPredicateTraceStream{w}}
+		_ = out.AppendCString("comparing\n")
+		for i, r := range [2]*algebraicRecord{a, b} {
+			name := "a"
+			if i != 0 {
+				name = "b"
+			}
+			_ = out.AppendCString(name + ": ")
+			p, e := m.sourcePolynomial(r)
+			if e != nil {
+				return e
+			}
+			if e = m.config.Polynomials.displayIntoWithReceipt(p, out, "x", false, &m.rootTrace.univariate); e != nil {
+				return e
+			}
+			_ = out.AppendCString("\n(")
+			for j, bound := range [2]*unumeral.BinaryRational{r.interval.BorrowLower(), r.interval.BorrowUpper()} {
+				if j != 0 {
+					_ = out.AppendCString(", ")
+				}
+				if e = m.config.Binary.DisplaySourceTracked(out, bound, &m.rootTrace.insertions[j]); e != nil {
+					return e
+				}
+			}
+			_ = out.AppendCString(")\ncell_" + name + "->m_minimal: ")
+			_ = out.AppendUint32(r.flags & 1)
+			_ = out.AppendCString("\n")
+		}
+		return nil
+	})
+}
 
 // Suppress insertion failures only. The diagnostic stream keeps its failbit,
 // while interval/numeral computations continue at the source operand positions.
@@ -25,30 +65,53 @@ func (m *AlgebraicRootCore) traceComparison(a, b *Algebraic) error {
 	}
 	m.comparisonTraceRunning = true
 	defer func() { m.comparisonTraceRunning = false }()
-	var computation error
-	_ = tags.EmitConditional("algebraic", "compare", "src/math/polynomial/algebraic_numbers.cpp", 1861,
-		func() bool { return true }, func(w io.Writer) error {
-			out := algebraicComparisonTraceWriter{w}
-			_ = writeAlgebraicIntervalPart(out, "comparing: ")
-			l, e := m.locationCleanup(a)
-			if e == nil {
-				e = m.displayIntervalAtLocation(out, l)
+	return m.emitRootTrace("compare", 1861, func(w io.Writer) error {
+		out := algebraicTranslationTraceStream{algebraicPredicateTraceStream{w}}
+		_ = out.AppendCString("comparing: ")
+		if e := m.traceComparisonInterval(out, a); e != nil {
+			return e
+		}
+		_ = out.AppendCString(" ")
+		if e := m.traceComparisonInterval(out, b); e != nil {
+			return e
+		}
+		return out.AppendCString("\n")
+	})
+}
+
+func (m *AlgebraicRootCore) traceComparisonInterval(out algebraicTranslationTraceStream, a *Algebraic) error {
+	location, e := m.locationCleanup(a)
+	if e != nil {
+		return e
+	}
+	q := unumeral.NewRational()
+	if location != nil {
+		r, e := m.load(location)
+		if e != nil {
+			return e
+		}
+		if location.kind == 1 {
+			_ = out.AppendCString("(")
+			for i, bound := range [2]*unumeral.BinaryRational{r.interval.BorrowLower(), r.interval.BorrowUpper()} {
+				if i != 0 {
+					_ = out.AppendCString(", ")
+				}
+				if e = m.config.Binary.DisplaySourceTracked(out, bound, &m.rootTrace.insertions[i]); e != nil {
+					return e
+				}
 			}
-			if e != nil {
-				computation = e
-				return e
-			}
-			_ = writeAlgebraicIntervalPart(out, " ")
-			l, e = m.locationCleanup(b)
-			if e == nil {
-				e = m.displayIntervalAtLocation(out, l)
-			}
-			if e != nil {
-				computation = e
-				return e
-			}
-			_ = writeAlgebraicIntervalPart(out, "\n")
-			return nil
-		})
-	return computation
+			return out.AppendCString(")")
+		}
+		q = r.value
+	}
+	_ = out.AppendCString("[")
+	for i := 0; i < 2; i++ {
+		if i != 0 {
+			_ = out.AppendCString(", ")
+		}
+		if e = m.config.Rationals.DisplayIntoTracked(out, &q, &m.rootTrace.insertions[i]); e != nil {
+			return e
+		}
+	}
+	return out.AppendCString("]")
 }
