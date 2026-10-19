@@ -30,7 +30,7 @@ func (m *AlgebraicRootCore) GetPolynomial(a *Algebraic, out UPolynomial) error {
 		if e = algebraicQueryTagAssertionSwitch(); e != nil {
 			return e
 		}
-		r, e := m.load(l)
+		r, e := m.copySourcePolynomialFields(l)
 		if e != nil {
 			return e
 		}
@@ -53,22 +53,23 @@ func (m *AlgebraicRootCore) GetPolynomial(a *Algebraic, out UPolynomial) error {
 			return e
 		}
 	} else {
-		// Source basic_value is reached after reserve(2), and asserts both
-		// at cpp236 and through nonnull anum::to_basic (header372).
-		if e = algebraicQueryTagAssertionSwitch(); e != nil {
-			return e
-		}
-		if e = algebraicQueryTagAssertionSwitch(); e != nil {
-			return e
-		}
-		r, e := m.load(l)
+		// basic_value is a reference: NUM SET precedes the DEN member read.
+		value, e := m.copySourceBasicValue(m, l)
 		if e != nil {
 			return e
 		}
-		if e = z.CopyFromOwnerWithReceipt(&values[0], z, r.value.BorrowNumerator(), &m.representationCopy); e != nil {
+		numerator, e := value.read(0)
+		if e != nil {
 			return e
 		}
-		if e = z.CopyFromOwnerWithReceipt(&values[1], z, r.value.BorrowDenominator(), &m.representationCopy); e != nil {
+		if e = z.CopyFromOwnerWithReceipt(&values[0], z, &numerator, &m.representationCopy); e != nil {
+			return e
+		}
+		denominator, e := value.read(12)
+		if e != nil {
+			return e
+		}
+		if e = z.CopyFromOwnerWithReceipt(&values[1], z, &denominator, &m.representationCopy); e != nil {
 			return e
 		}
 		s := &m.representationNeg
@@ -294,10 +295,8 @@ func (m *AlgebraicRootCore) intervalAtPrecisionWithReceipt(r *algebraicRecord, l
 func (m *AlgebraicRootCore) copyDefiningCoefficients(out *upolyVectorState, v UPolynomialView) error {
 	p := m.config.Polynomials
 	if p.alias(v, out) {
-		if polynomialSourceDebug && out.size != v.count {
-			return ErrUPolynomialAssertion
-		}
-		return nil
+		// Preserve the reached upolynomial.cpp:194 assertion and actions.
+		return p.setView(out, v)
 	}
 	if e := p.reserve(out, v.count); e != nil {
 		return e
