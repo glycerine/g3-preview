@@ -41321,6 +41321,7 @@
         "TestPolynomialPSCNextIndependentQuadraticLinearIdentity",
         "TestPolynomialPSCNextHeapBufferIndependentRemainder",
         "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
+            "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
         "TestPolynomialPSCActualSingletonINCReceiptAndAbort",
         "TestPolynomialPSCSameInputsResetSwapAndRepeatedOutput",
         "TestPolynomialPSCEveryCheckpointCancellationFrontier",
@@ -41514,6 +41515,7 @@
         "TestPolynomialResultantEveryReservationPrefix",
         "TestPolynomialResultantBigNumeralEveryReservationPrefix",
         "TestPolynomialResultantAllEightOriginalPSCAssertions",
+            "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
         "TestPolynomialScopedZPActualModeAndPrimeRestoration",
         "TestPolynomialScopedZPFailedBodyDoesNotRestoreMode",
         "TestPolynomialScopedZPFailedMemberCopyRetainsPhysicalPending",
@@ -44835,8 +44837,8 @@
           ]
         },
         {
-          "name": "Selected active optimized PSC dispatch, optimized core, Se_Lazard and optimized_S_e_1 (cpp5654-5810,5873-5901), full manager forward; classic alternatives and Resultant remain open",
-          "status": "partial",
+          "name": "Complete retained optimized PSC dispatch, core, Lazard and next-subresultant algorithms with source assertion actions, trace records and manager forwarding",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_psc.go",
           "tests": [
             "TestPolynomialLazardDichotomousIndependentCoefficients",
@@ -44848,6 +44850,7 @@
             "TestPolynomialPSCNextIndependentQuadraticLinearIdentity",
             "TestPolynomialPSCNextHeapBufferIndependentRemainder",
             "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
+            "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
             "TestPolynomialPSCActualSingletonINCReceiptAndAbort",
             "TestPolynomialPSCSameInputsResetSwapAndRepeatedOutput",
             "TestPolynomialPSCEveryCheckpointCancellationFrontier",
@@ -45307,6 +45310,7 @@
             "TestPolynomialResultantEveryReservationPrefix",
             "TestPolynomialResultantBigNumeralEveryReservationPrefix",
             "TestPolynomialResultantAllEightOriginalPSCAssertions",
+            "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
             "TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals",
             "TestPolynomialResultantSourceAssertionActions"
           ]
@@ -47174,6 +47178,7 @@
         "TestPolynomialPSCNextIndependentQuadraticLinearIdentity",
         "TestPolynomialPSCNextHeapBufferIndependentRemainder",
         "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
+            "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
         "TestPolynomialPSCActualSingletonINCReceiptAndAbort",
         "TestPolynomialPSCSameInputsResetSwapAndRepeatedOutput",
         "TestPolynomialPSCEveryCheckpointCancellationFrontier",
@@ -47341,6 +47346,7 @@
         "TestPolynomialResultantEveryReservationPrefix",
         "TestPolynomialResultantBigNumeralEveryReservationPrefix",
         "TestPolynomialResultantAllEightOriginalPSCAssertions",
+            "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
         "TestPolynomialScopedZPActualModeAndPrimeRestoration",
         "TestPolynomialScopedZPFailedBodyDoesNotRestoreMode",
         "TestPolynomialScopedZPFailedMemberCopyRetainsPhysicalPending",
@@ -49089,8 +49095,8 @@
           ]
         },
         {
-          "name": "Selected active optimized PSC dispatch, optimized core, Se_Lazard and optimized_S_e_1 (cpp5654-5810,5873-5901), full manager forward; classic alternatives and Resultant remain open",
-          "status": "partial",
+          "name": "Complete retained optimized PSC dispatch, core, Lazard and next-subresultant algorithms with source assertion actions, trace records and manager forwarding",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_psc.go",
           "tests": [
             "TestPolynomialLazardDichotomousIndependentCoefficients",
@@ -49102,6 +49108,7 @@
             "TestPolynomialPSCNextIndependentQuadraticLinearIdentity",
             "TestPolynomialPSCNextHeapBufferIndependentRemainder",
             "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
+            "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
             "TestPolynomialPSCActualSingletonINCReceiptAndAbort",
             "TestPolynomialPSCSameInputsResetSwapAndRepeatedOutput",
             "TestPolynomialPSCEveryCheckpointCancellationFrontier",
@@ -49403,6 +49410,7 @@
             "TestPolynomialResultantEveryReservationPrefix",
             "TestPolynomialResultantBigNumeralEveryReservationPrefix",
             "TestPolynomialResultantAllEightOriginalPSCAssertions",
+            "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
             "TestPolynomialScopedZPActualModeAndPrimeRestoration",
             "TestPolynomialScopedZPFailedBodyDoesNotRestoreMode",
             "TestPolynomialScopedZPFailedMemberCopyRetainsPhysicalPending",
@@ -123615,6 +123623,7 @@
         "TestPolynomialNewtonNativeNumeralGrowthResetAndReuse",
         "TestPolynomialNewtonNativeInputActualNumericCopyRefusals",
         "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
+            "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
         "TestPolynomialPSCRegisteredFirstFixture",
         "TestPolynomialEvaluationLiveAliasSource",
         "TestPolynomialEvaluationCancellationAndCachedFrames",
@@ -123679,6 +123688,7 @@
         "TestPolynomialResultantEveryReservationPrefix",
         "TestPolynomialResultantBigNumeralEveryReservationPrefix",
         "TestPolynomialResultantAllEightOriginalPSCAssertions",
+            "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
         "TestPolynomialVarsOriginalDormantAssertions",
         "TestPolynomialVarsNativeColdPushAndNormalReset",
         "TestPolynomialVarsLiteralResetEmptyWarmAndBorrowGuards",
@@ -124087,11 +124097,12 @@
           ]
         },
         {
-          "name": "Eight original PSC coefficient fixtures (cpp702-723,741-821), selected coefficient ENSURE sites only; Resultant ENSURE and complete registered driver remain open",
-          "status": "partial",
+          "name": "Complete registered PSC coefficient assertion coverage cpp702-723,741-821 alongside combined resultant and source-trace checks",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_psc_original_test.go",
           "tests": [
             "TestPolynomialPSCAllEightOriginalCoefficientFixtures",
+            "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
             "TestPolynomialPSCRegisteredFirstFixture"
           ]
         },
@@ -124176,11 +124187,12 @@
           ]
         },
         {
-          "name": "Selected original PSC third ENSURE cpp722 for all8 original inputs cpp741-821:8 dynamic Resultant equality checks. Alongside committed coefficient fixture campaign8first+5second,3static sites/21dynamic selected expressions; supersedes earlier unported-Resultant obligation only",
-          "status": "partial",
+          "name": "Complete registered PSC third ENSURE coverage cpp722 across all eight inputs with combined 21-assertion coefficient/resultant source-trace fixture",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_resultant_source_test.go",
           "tests": [
             "TestPolynomialResultantAllEightOriginalPSCAssertions",
+            "TestPolynomialPSCRegisteredDriverAssertionsWithTraces",
             "TestPolynomialResultantRegisteredPSCThirdAssertion"
           ]
         },
@@ -128670,8 +128682,8 @@
           ]
         },
         {
-          "name": "Selected concrete polynomial PSC native reference slice lifetime and source callbacks",
-          "status": "partial",
+          "name": "Complete concrete polynomial PSC native reference slice lifetime and source callbacks",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_psc_buffer.go",
           "tests": [
             "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
@@ -178961,8 +178973,8 @@
           ]
         },
         {
-          "name": "Selected concrete polynomial PSC native reference slice lifetime and source callbacks",
-          "status": "partial",
+          "name": "Complete concrete polynomial PSC native reference slice lifetime and source callbacks",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_psc_buffer.go",
           "tests": [
             "TestPolynomialPSCBufferPendingLocalBlocksOwningCoreClose",
