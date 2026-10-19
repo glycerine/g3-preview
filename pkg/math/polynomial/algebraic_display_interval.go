@@ -17,7 +17,7 @@ func writeAlgebraicIntervalPart(w io.Writer, text string) error {
 }
 
 // DisplayInterval writes the source's basic [q, q] or root-cell MPBQ/open
-// interval. A basic value obtains each rational spelling at its insertion
+// interval. A basic value obtains each rational reference at its insertion
 // point, preserving the already written prefix if formatting fails.
 func (m *AlgebraicRootCore) DisplayInterval(w io.Writer, a *Algebraic) error {
 	if w == nil {
@@ -73,31 +73,16 @@ func (m *AlgebraicRootCore) displayIntervalAtLocationWithReceipts(w io.Writer, l
 	if err := writeAlgebraicIntervalPart(w, "["); err != nil {
 		return err
 	}
-	q := unumeral.NewRational()
-	if l != nil {
-		r, err := m.load(l)
-		if err != nil {
-			return err
-		}
-		q = r.value
-	}
-	first, err := m.config.Rationals.String(&q)
-	if err != nil {
-		return err
-	}
-	if err := writeAlgebraicIntervalPart(w, first); err != nil {
+	if err := m.displayBasicIntervalValue(w, l, lower); err != nil {
 		return err
 	}
 	if err := writeAlgebraicIntervalPart(w, ", "); err != nil {
 		return err
 	}
-	second, err := m.config.Rationals.String(&q)
-	if err != nil {
+	if err := m.displayBasicIntervalValue(w, l, upper); err != nil {
 		return err
 	}
-	if err := writeAlgebraicIntervalPart(w, second); err != nil {
-		return err
-	}
+
 	return writeAlgebraicIntervalPart(w, "]")
 }
 
@@ -106,9 +91,21 @@ func (m *AlgebraicRootCore) cleanupIntervalDisplay() error {
 		return ErrAlgebraicPending
 	}
 	for i := len(m.intervalDisplayInsertions) - 1; i >= 0; i-- {
-		if e := m.config.Binary.CleanupSourceString(&m.intervalDisplayInsertions[i]); e != nil {
+		if e := m.config.Rationals.CleanupSourceDisplay(&m.intervalDisplayInsertions[i]); e != nil {
 			return e
 		}
 	}
 	return nil
+}
+
+func (m *AlgebraicRootCore) displayBasicIntervalValue(w io.Writer, l *algebraicLocation, receipt *unumeral.NumeralInsertionReceipt) error {
+	value, e := m.copySourceBasicValue(m, l)
+	if e != nil {
+		return e
+	}
+	q := m.config.Rationals
+	if value.cell == nil {
+		return q.DisplayToTracked(w, value.zero, receipt)
+	}
+	return q.DisplayStoredToTracked(w, value.source.config.Allocator, value.cell.raw, receipt)
 }

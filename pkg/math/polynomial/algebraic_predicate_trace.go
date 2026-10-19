@@ -87,9 +87,6 @@ func (m *AlgebraicRootCore) predicateIntegerString(a *unumeral.Int, r *unumeral.
 	return text.String(), e
 }
 func (m *AlgebraicRootCore) predicateIntervalTrace(out algebraicPredicateTraceStream, l *algebraicLocation) error {
-	if l == nil || l.kind != 1 {
-		return m.displayIntervalAtLocation(out.Writer, l)
-	}
 	return m.displayIntervalAtLocationWithReceipts(out.Writer, l, &m.predicateTrace.insertions[1], &m.predicateTrace.insertions[2])
 }
 func (m *AlgebraicRootCore) traceRationalPredicate(a *Algebraic, phase uint8, k uint32) error {

@@ -56,13 +56,13 @@ func TestAlgebraicDisplayIntervalSourceBranchesAndWritePrefixes(t *testing.T) {
 		prefixes []string
 	}{
 		{"zero", &Algebraic{}, "[0, 0]", []string{"", "[", "[0", "[0, ", "[0, 0"}},
-		{"basic", &basic, "[3/2, 3/2]", []string{"", "[", "[3/2", "[3/2, ", "[3/2, 3/2"}},
+		{"basic", &basic, "[3/2, 3/2]", []string{"", "[", "[3", "[3/", "[3/2", "[3/2, ", "[3/2, 3", "[3/2, 3/", "[3/2, 3/2"}},
 		{"root", &root, "(1, 2)", []string{"", "(", "(1", "(1, ", "(1, 2"}},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			out := &algebraicIntervalRefusingWriter{}
 			serviceMust(t, c.DisplayInterval(out, tc.value))
-			if out.String() != tc.want || out.writes != 5 {
+			if out.String() != tc.want || out.writes != len(tc.prefixes) {
 				t.Fatal("source spelling and insertion count", out.String(), out.writes)
 			}
 			for i, prefix := range tc.prefixes {
@@ -73,7 +73,7 @@ func TestAlgebraicDisplayIntervalSourceBranchesAndWritePrefixes(t *testing.T) {
 			}
 			short := &algebraicIntervalRefusingWriter{stop: 4}
 			if err := c.DisplayInterval(short, tc.value); !errors.Is(err, io.ErrShortWrite) || short.String() != tc.prefixes[3] {
-				t.Fatal("short second value insertion", short.String(), err)
+				t.Fatal("short interval insertion", short.String(), err)
 			}
 		})
 	}

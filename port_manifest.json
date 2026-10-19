@@ -38228,6 +38228,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/algebraic_display_interval_basic_test.go",
         "pkg/math/polynomial/algebraic_display_interval_fields_test.go",
         "pkg/math/polynomial/algebraic_degree_read_order_test.go",
         "pkg/math/polynomial/algebraic_to_rational.go",
@@ -38453,6 +38454,10 @@
         "pkg/math/polynomial/algebraic_basic_decimal_source_order_test.go"
       ],
       "tests": [
+        "TestAlgebraicDisplayIntervalBasicMultiwordNumerals",
+        "TestAlgebraicDisplayIntervalBasicReachedFields",
+        "TestAlgebraicDisplayIntervalBasicRereadsAtSourceInsertions",
+        "TestAlgebraicDisplayIntervalBasicGetterAssertionPrecedesNumeral",
         "TestAlgebraicDisplayIntervalReadsOnlyReachedBoundFields",
         "TestAlgebraicDisplayIntervalReadsBoundsAfterOpeningInsertion",
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -39755,6 +39760,7 @@
         "Decimal root precision locals now have the actual l/u declaration and reverse source/owning continuation. Issued refinement/copy/display receipts preserve younger source stops, reject replacement-child adoption and drop completed evaluation keys before new source copies. The basic decimal const-reference/accessor and deeper primitive/formatter call chains remain separate audits."
       ],
       "deviations": [
+        "Basic interval display cpp2709-2714 now invokes the source basic_value getter twice and preserves mpq numerator/slash/denominator insertions instead of buffering a rational string. The concrete stored display reads DEN pointer/value for is_int before NUM, and rereads DEN only after slash insertion. Each endpoint uses its own exact numeral insertion receipt. Raw nonowning source views and callback-time source field changes verify the reached prefixes and second getter. No whole-unit completion is claimed.",
         "Root interval display cpp2708-2719 now reaches only the selected bound NUM and exponent at each basic_interval.h:358-360 insertion, without eagerly loading polynomial metadata, packed flags or the opposite bound. Numerator source-string formatting completes before exponent decoding. Public display and root/predicate TRACE callers retain their own actual numeral insertion receipts; owning CleanupRetained handles only its named public-display receipts. Root TRACE source-stop composition reuses its existing captured insertion receipts. Basic interval display remains a separate audit; no whole-unit completion is claimed.",
         "Retained algebraic polynomial-evaluation coefficient overload prerequisites (cpp:2861-2865,2911-2915; polynomial.cpp:6436-6522 instantiated by algebraic_numbers.cpp:2387-2388,2406): SetInteger constructs its actual scoped rational before the ordinary algebraic setter; AddInteger constructs a real scoped algebraic coefficient, sets it and invokes Add. The wrapper temporaries are held in distinct owning scopes, with synchronous owner-close/cleanup refusal while running. Actual accepted beginQ and mixed-addition entries bind their wrapper parent so a younger scoped cleanup stop does not run the older wrapper destructor; explicit owning cleanup uses actual scalar-cell ownership. Tests cover zero/signed small and BIG coefficients, root-plus-integer inverse identities, an independent aliased sqrt(2)-2 bound, basic normalization to null zero, destination aliasing and workspace reuse. Ordinary and checked/debug/trace algebraic checks pass on CPUs 8-16. Full allocation-failure/callback/destructor composition and the concrete recursive algebraic polynomial evaluator remain partial; these overloads do not establish multivariate isolation or whole-unit completion.",
         "Algebraic isolation prerequisites (cpp:635-643,2212-2266): the univariate polynomial-ref overload now converts directly into actual persistent m_isolate_tmp1 and invokes the existing UP isolator; zero skips conversion and preserves existing output. Conversion ownership is captured only by the actual issued dense-conversion receipt. ext_var2num now overrides one borrowed assignment cell with exact short-circuit Contains/lookup behavior. filter_roots evaluates each candidate through EvalSign, copies surviving roots stably into the caller prefix, then destroys the suffix forward and shrinks only after all candidates. Tests independently filter the four conjugates of (x^2-2)*(x^2-3) to positive sqrt(2) for x-sqrt(2), retain both ordered roots for x^2-2, cover zero/constant filtering and unused-map errors, and sweep every reached checkpoint through success. An interrupted filter preserves source vector length and copied prefix; retry rebuilds the caller input rather than inventing rollback. Univariate x2-variable 7*x2^2-14 checks receiving owner, unchanged dense coefficients and two isolated roots; zero/nonzero constants preserve prior output and the source univariate assertion precedes workspace construction. Ordinary and checked/debug/trace algebraic tests pass on CPUs 8-16. Full multivariate isolation, vanished-resultant algebraic coefficient evaluation, TRACE and complete allocation/callback composition remain partial; no whole-unit completion credit.",
@@ -170482,6 +170488,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/util/numeral/mpq_display_stored.go",
         "pkg/util/numeral/mpq.go",
         "pkg/util/numeral/mpq_compare_assertion_source_test.go",
         "pkg/util/numeral/mpq_round.go",
@@ -170556,6 +170563,10 @@
         "pkg/math/polynomial/algebraic_basic_decimal_source_order_test.go"
       ],
       "tests": [
+        "TestAlgebraicDisplayIntervalBasicMultiwordNumerals",
+        "TestAlgebraicDisplayIntervalBasicReachedFields",
+        "TestAlgebraicDisplayIntervalBasicRereadsAtSourceInsertions",
+        "TestAlgebraicDisplayIntervalSourceBranchesAndWritePrefixes",
         "TestRationalCompareSourceSignAssertionSites",
         "TestRationalSourceDivAndInverseAliases",
         "TestRationalConstructorLifecycleAndBudget",
@@ -171512,6 +171523,7 @@
         "The retained algebraic basic-cell decimal caller now uses a concrete stored mpq reference: RAW decimal locals are entered before payload reads; NUM SET precedes DEN read/SET and the sign read precedes ten construction. This shares the existing rational decimal scope and copied-value loop, without adding numeral ownership or a generic callback reader. Pointer-backed rational inputs preserve their component-reference accesses. Six raw signed prefix checks and focused rational decimal source/failure/callback checks pass in all four profiles; statement-level audit of broader formatter/primitive failure composition is not claimed by this increment."
       ],
       "deviations": [
+        "Retained algebraic interval display now uses a concrete borrowed stored-mpq display at cpp130-139. DEN is_one short-circuits on its pointer before reading scalar value; NUM insertion precedes slash and fresh DEN decoding. Existing project numeral insertion receipts retain the actual formatting children; no copied numerical owner or general template adapter is added.",
         "Multi-component destination publication staged for failure atomicity while preserving successful source arithmetic and aliases.",
         "Undefined zero denominator/divisor/inverse classified ErrDivideByZero. Both source scratch modes operation-owner confined.",
         "Generic source uint32 mask loops nonterminate for exponents >=2^31: typed error before publication; integer finite 0/1/2 fast paths remain selected first. Integer 0^0 is invalid while rational 0^0 is one. Signed shift baseline retains source-derived small INT_MIN/2^31=+1, big=-1; unsigned limb shifts define intended bits.",
