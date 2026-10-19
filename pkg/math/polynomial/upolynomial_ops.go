@@ -97,12 +97,23 @@ func (m *UPolynomialManager) negViewInPlaceWithSourceContext(v UPolynomialView, 
 	if e := m.check(); e != nil {
 		return e
 	}
+	return m.negViewInPlaceNumerals(v, context.utility(m.modular.Integers()))
+}
+
+// Both retained callers use the same concrete coefficient negation loop.
+func (m *UPolynomialManager) negViewInPlaceWithNumericContext(v UPolynomialView, context unumeral.NumericAllocationContext) error {
+	if e := m.check(); e != nil {
+		return e
+	}
+	return m.negViewInPlaceNumerals(v, context)
+}
+func (m *UPolynomialManager) negViewInPlaceNumerals(v UPolynomialView, context unumeral.NumericAllocationContext) error {
 	for i := uint32(0); i < v.count; i++ {
 		a, e := m.read(v, i)
 		if e != nil {
 			return e
 		}
-		if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Neg(a); e != nil {
+		if e = m.modular.WithAllocationContext(context).Neg(a); e != nil {
 			return e
 		}
 	}

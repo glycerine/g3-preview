@@ -49,6 +49,7 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	cellNeg                                                    algebraicCellNegNumeric
 	cellEvaluation                                             [3]upolyBinaryEvaluationInvocationReceipt
 	cellEvaluationRunning                                      bool
 	isolationSquareFree                                        upolySquareFreeCallReceipt
@@ -206,7 +207,7 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
-	if m != nil && m.self == m && m.cellEvaluationPending() {
+	if m != nil && m.self == m && (m.cellEvaluationPending() || m.cellNeg.pending()) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.config.Polynomials != nil && m.config.Polynomials.squareFreeCallReceiptPending(&m.isolationSquareFree) {
@@ -218,7 +219,7 @@ func (m *AlgebraicRootCore) check() error {
 	if m != nil && m.self == m && !m.binary.running && m.binary.conversion.pending(m) {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting || m.cellEvaluationRunning) {
+	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting || m.cellEvaluationRunning || m.cellNeg.running) {
 		return ErrAlgebraicPending
 	}
 
@@ -819,7 +820,7 @@ func (m *AlgebraicRootCore) normalizeCoefficients(l *algebraicLocation, r *algeb
 		return e
 	}
 	if negative {
-		if e = m.config.Polynomials.NegViewInPlace(v); e != nil {
+		if e = m.negateCellCoefficients(v); e != nil {
 			return e
 		}
 		r.flags ^= 2
@@ -1067,7 +1068,7 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.cleanupRetainedCore()
 }
 func (m *AlgebraicRootCore) cleanupRetainedCore() error {
-	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting || m.cellEvaluationRunning) {
+	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting || m.cellEvaluationRunning || m.cellNeg.running) {
 		return ErrAlgebraicPending
 	}
 
@@ -1161,6 +1162,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 		return e
 	}
 	if e := m.cleanupCellEvaluations(); e != nil {
+		return e
+	}
+	if e := m.cleanupCellNeg(); e != nil {
 		return e
 	}
 	if p := m.config.Polynomials; p != nil {
@@ -1309,7 +1313,7 @@ func (m *AlgebraicRootCore) Close() error {
 	return m.closeCoreMembers()
 }
 func (m *AlgebraicRootCore) closeCoreMembers() error {
-	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting || m.cellEvaluationRunning) {
+	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting || m.cellEvaluationRunning || m.cellNeg.running) {
 		return ErrAlgebraicPending
 	}
 
