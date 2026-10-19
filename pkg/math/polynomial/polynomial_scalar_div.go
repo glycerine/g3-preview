@@ -137,12 +137,11 @@ func (m *MultivariatePolynomialCore) scalarDivWithParentReceipts(p Polynomial, d
 	if e := m.check(); e != nil {
 		return Polynomial{}, e
 	}
-	size, e := m.cheap.ms.size(m)
-	if e != nil {
+	if e := polynomialArithmeticSourceAssert(2758, func() (bool, error) {
+		size, e := m.cheap.ms.size(m)
+		return size == 0, e
+	}); e != nil {
 		return Polynomial{}, e
-	}
-	if polynomialSourceDebug && size != 0 {
-		return Polynomial{}, ErrPolynomialAssertion
 	}
 	// Source reads p->size before constructing scoped NUM a. The divisor is
 	// read only by an actual loop DIV, including when p has no coefficients.

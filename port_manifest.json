@@ -45321,13 +45321,14 @@
           ]
         },
         {
-          "name": "manager::imp::div scalar NUM scope cpp2757-2768",
-          "status": "partial",
+          "name": "Complete manager::imp::div scalar NUM scope cpp2757-2768 with source assertion action and exact source/owning cleanup",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_scalar_div.go",
           "tests": [
             "TestPolynomialScalarDivLiteralIntegerAndFieldValues",
             "TestPolynomialScalarDivEmptyDoesNotReadDivisor",
-            "TestPolynomialScalarDivEveryActualReservationPrefix"
+            "TestPolynomialScalarDivEveryActualReservationPrefix",
+            "TestPolynomialArithmeticSourceAssertionActions"
           ]
         },
         {
@@ -45396,7 +45397,7 @@
         },
         {
           "name": "Neg and scalar div optional parent append/factory receipts cpp2757-2768,5940-5951",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_scalar_div.go",
           "tests": [
             "TestPolynomialParentFactoryHelpersEveryActualPrefix"
@@ -45506,7 +45507,7 @@
         },
         {
           "name": "polynomial.cpp:2757-2768 selected ScalarDiv direct argument allocation/Natural/RAW transport through the same literal engines; source end-only RAW DEL versus exact owning abort",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_scalar_div.go",
           "tests": [
             "TestScalarDivDirectNumericNilContextSourceMath",

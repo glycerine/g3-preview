@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/polynomial.cpp:2722,5941.
+// Source: src/math/polynomial/polynomial.cpp:2722,2758,5941.
 package polynomial
 
 import (
