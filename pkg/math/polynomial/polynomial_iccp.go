@@ -247,17 +247,16 @@ func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uin
 		}
 		s.filter[k] = count
 	}
-	if polynomialSourceDebug && uint32(len(s.powers)) == 0 {
-		return ErrPolynomialAssertion
+	if e = polynomialICCPSourceAssert(3501, "!iccp_powers.empty()", func() (bool, error) { return len(s.powers) != 0, nil }); e != nil {
+		return e
 	}
 	number := uint32(len(s.powers))
 	for j := uint32(0); j < number; j++ {
 		k := s.powers[j]
-		if polynomialSourceDebug {
-			count := s.filter[k]
-			if count == 0 {
-				return ErrPolynomialAssertion
-			}
+		if e = polynomialICCPSourceAssert(3504, "iccp_filter[iccp_powers[j]] > 0", func() (bool, error) {
+			return s.filter[k] > 0, nil
+		}); e != nil {
+			return e
 		}
 		k = s.powers[j]
 		count := s.filter[k]
@@ -303,14 +302,11 @@ func (m *MultivariatePolynomialManager) iccpPartsWithReceipt(p Polynomial, x uin
 			return c.assign(core, core.unit)
 		}
 	}
-	if polynomialSourceDebug {
-		constant, e := core.IsConstant(c.value)
-		if e != nil {
-			return e
-		}
-		if constant {
-			return ErrPolynomialAssertion
-		}
+	if e = polynomialICCPSourceAssert(3525, "!is_const(c)", func() (bool, error) {
+		constant, x := core.IsConstant(c.value)
+		return !constant, x
+	}); e != nil {
+		return e
 	}
 	if e = m.flipLeadingSignWithReceipt(c, &s.neg); e != nil {
 		return e

@@ -45119,10 +45119,11 @@
           ]
         },
         {
-          "name": "ICCP cpp3432-3534: zero/constant/degree-zero guards, inline128 filter/powers, literal IC/coefficient GCD/sign/exact division and matched lexical invocation ownership",
+          "name": "ICCP cpp3432-3534: zero/constant/degree-zero guards, inline128 filter/powers, runtime assertion actions, literal IC/coefficient GCD/sign/exact division and matched lexical invocation ownership",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_iccp.go",
           "tests": [
+            "TestPolynomialICCPSourceAssertionActions",
             "TestPolynomialICCPIndependentContentAndPrimitiveBranches",
             "TestPolynomialGeneralGCDIndependentCommonContent",
             "TestPolynomialResultantICCPStoppedChildPrecedesOlderLocals",

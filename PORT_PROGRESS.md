@@ -46236,3 +46236,13 @@ execution. The nearby `abs_norm`, `numeral_lc`, and `numeral_tc` bodies have no
 retained source consumers and therefore receive no unused adapters. Focused
 normalization, ICCP and assertion tests pass in native, checked, debug and
 combined checked/debug/trace profiles on CPUs 8-16.
+
+ICCP assertion increment: the retained content/primitive-part body at
+`polynomial.cpp:3453-3530` now routes its nonempty-power, positive-filter and
+nonconstant-GCD `SASSERT` sites through the process assertion switch. Each
+predicate is evaluated only when enabled, and Throw/Continue use the source
+debugger action. Existing zero, constant, degree-zero, quick-filter, content,
+coefficient-GCD, sign, exact-division, TRACE and lexical ownership tests remain
+green in native, checked, debug and combined checked/debug/trace profiles on
+CPUs 8-16. The ICCP ledger stays partial while its remaining child-composition
+audit is open.
