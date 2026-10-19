@@ -104,6 +104,11 @@ func (m *AlgebraicRootCore) Compare(a, b *Algebraic) (int, error) {
 	if e != nil {
 		return 0, e
 	}
+	// Root/root dispatch reaches compare_core's assertion gates before any
+	// algebraic-cell member reads.
+	if al != nil && al.kind == 1 && bl != nil && bl.kind == 1 {
+		return m.compareCore(a, b)
+	}
 	ar, br := algebraicRecord{value: unumeral.NewRational()}, algebraicRecord{value: unumeral.NewRational()}
 	if al != nil {
 		ar, e = m.load(al)
@@ -176,6 +181,17 @@ func (m *AlgebraicRootCore) comparisonIntervals(a, b *Algebraic) (int, bool, err
 	return 0, false, nil
 }
 func (m *AlgebraicRootCore) compareCore(a, b *Algebraic) (_value int, _err error) {
+	if e := m.assertComparisonPair(a, b); e != nil {
+		return 0, e
+	}
+	// Each established to_algebraic access reaches its own source switch.
+	if e := algebraicQueryTagAssertionSwitch(); e != nil {
+		return 0, e
+	}
+	if e := algebraicQueryTagAssertionSwitch(); e != nil {
+		return 0, e
+	}
+
 	if v, done, e := m.comparisonIntervals(a, b); e != nil || done {
 		return v, e
 	}
@@ -215,21 +231,11 @@ func (m *AlgebraicRootCore) compareCore(a, b *Algebraic) (_value int, _err error
 				return 0, e
 			}
 			m.compareRefine++
-			if polynomialSourceDebug {
-				al, e := m.location(a)
-				if e != nil {
-					return 0, e
-				}
-				if al == nil || al.kind == 0 {
-					return 0, ErrAlgebraicAssertion
-				}
-				bl, e := m.location(b)
-				if e != nil {
-					return 0, e
-				}
-				if bl == nil || bl.kind == 0 {
-					return 0, ErrAlgebraicAssertion
-				}
+			if e = m.assertComparisonNonbasic(a, 1761, "!a.is_basic()"); e != nil {
+				return 0, e
+			}
+			if e = m.assertComparisonNonbasic(b, 1762, "!b.is_basic()"); e != nil {
+				return 0, e
 			}
 			if v, done, e := m.comparisonIntervals(a, b); e != nil || done {
 				return v, e

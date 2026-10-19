@@ -38405,7 +38405,9 @@
         "pkg/math/polynomial/algebraic_division_diagnostic_source_test.go",
         "pkg/math/polynomial/algebraic_compare_inner_trace_test.go",
         "pkg/math/polynomial/algebraic_manager_arithmetic.go",
-        "pkg/math/polynomial/algebraic_manager_arithmetic_trace_test.go"
+        "pkg/math/polynomial/algebraic_manager_arithmetic_trace_test.go",
+        "pkg/math/polynomial/algebraic_compare_assertions.go",
+        "pkg/math/polynomial/algebraic_compare_assertions_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -38626,7 +38628,13 @@
         "TestAlgebraicManagerIntegerDetailCompletedFormatterDoesNotStopTemporary",
         "TestAlgebraicManagerDetailDisabledDoesNotReadOperands",
         "TestAlgebraicManagerDetailPublishesInputRootIndexBeforePower",
-        "TestAlgebraicManagerDetailBorrowProtectsEntireStream"
+        "TestAlgebraicManagerDetailBorrowProtectsEntireStream",
+        "TestAlgebraicComparePostRefinementAssertionActions",
+        "TestAlgebraicCompareRefinementReachesConcreteAssertionThrow",
+        "TestAlgebraicCompareAssertionGatePrecedesOperandRead",
+        "TestAlgebraicCompareAssertionStatementsRequeryDynamicGate",
+        "TestAlgebraicCompareEntryAssertionShortCircuitAndGate",
+        "TestAlgebraicCompareEntrySwitchPrecedesCellMembers"
       ],
       "conditionals": [
         {
@@ -39349,7 +39357,13 @@
             "TestAlgebraicCompareInnerTraceExactRecordsAndEarlyExits",
             "TestAlgebraicCompareInnerDisplayStopPrecedesRefinement",
             "TestAlgebraicCompareBasicTraceOwnsActualCharacterReadFailure",
-            "TestAlgebraicCompareDisabledInnerTraceDoesNotRead"
+            "TestAlgebraicCompareDisabledInnerTraceDoesNotRead",
+            "TestAlgebraicComparePostRefinementAssertionActions",
+            "TestAlgebraicCompareRefinementReachesConcreteAssertionThrow",
+            "TestAlgebraicCompareAssertionGatePrecedesOperandRead",
+            "TestAlgebraicCompareAssertionStatementsRequeryDynamicGate",
+            "TestAlgebraicCompareEntryAssertionShortCircuitAndGate",
+            "TestAlgebraicCompareEntrySwitchPrecedesCellMembers"
           ]
         },
         {
@@ -39597,7 +39611,8 @@
         "Inversion diagnostics at algebraic_numbers.cpp:1630,1641,1644 now use the shared source trace borrow with exact root-display and raw numeral insertion receipts. Binary interval bounds preserve actual mpbq display insertion order; qm().to_string finishes its project formatting children into a native Go string before inserting that completed string. Source unwinding observes actual child source causes, not the mere presence of unjoined display RAW. Owning inverse cleanup cannot acquire a later replacement root display. Qualified before/after root formatter stops verify older rational declaration/destruction frontiers and preserved source history; actual callback probes cover the full stream borrow, numeric/UP lifecycle refusal and unchanged allocation graphs. Full inversion reservation suites and new regressions pass all four profiles. Whole inversion/polynomial/AST source audits remain partial.",
         "Division scoped-inverse destruction at algebraic_numbers.cpp:1663-1666 now distinguishes an actual inversion diagnostic source-END stop from completed formatting source work with unjoined RAW. Exact shared trace source causes protect the older invb and remain its source history; a private source destructor proceeds over completed younger formatting work without ordinary public admission. Owning acknowledgement uses the actual cell initialization/destruction frontier, while cleaning guards refuse public/lifecycle callback reentry before mutation. Source history survives acknowledgement and resets only at a new accepted division. Real before/after formatter guards, a reservation-armed actual RAW suffix, and a qualified private upper-bound destructor guard cover the nested causal/cursor behavior. The stopped-display and RAW regressions were run against the prior implementation and failed there. Whole division, polynomial and AST source audits remain open.",
         "The missing inner root comparison record at algebraic_numbers.cpp:1738-1743 now follows interval disjointness and polynomial equality exits and precedes refinement/Sturm work. It displays actual source polynomials, open binary intervals and minimal flags through accepted formatter receipts. The outer record at 1861 now uses tracked basic MPQ and root MPBQ display insertions through the same numeric/UP trace borrow. Exact records cover minimal/nonminimal and equal/disjoint branches; a real UP numeral destructor guard stops before algorithm advancement. Native Go formatting buffers do not consume the numerical allocation budget: a nested actual mpn_to_string result callback instead guards the completed character span before its reached C-string read, verifying accepted child retention, source completion, acknowledgement and unchanged input. Erased records do not read operands. Literal tests fail against the old compareCore dispatch in an exact Go overlay. Whole comparison/polynomial/AST source audits remain partial.",
-        "Public AlgebraicManager arithmetic now explicitly surrounds actual core power/add/sub/mul calls with the source anum_detail records. Internal imp/core operations remain direct. The retained integer overload calls the public addition wrapper after constructing its real scoped algebraic integer; an actual display source-END stop protects that temporary, while completed formatting source work with pending acknowledgement does not delay its private source destructor. Cleanup pins refuse callback owner mutation. Literal records/aliases cover all wrappers and the integer overload, before/after display stops preserve arithmetic publication boundaries, failed bodies omit result records, cached input root indices publish before power, and full-stream callbacks preserve algebraic/numeric/UP owners and allocation graphs. Actual qualified formatter and character-read guards verify integer temporary history and acknowledgement; disabled records do not read operands or break zero multiplication short circuit. A direct-core-forwarding overlay fails the public power record regression. Focused polynomial and retained AST arithmetic consumers pass all four profiles; complete polynomial/AST and callee failure audits remain open."
+        "Public AlgebraicManager arithmetic now explicitly surrounds actual core power/add/sub/mul calls with the source anum_detail records. Internal imp/core operations remain direct. The retained integer overload calls the public addition wrapper after constructing its real scoped algebraic integer; an actual display source-END stop protects that temporary, while completed formatting source work with pending acknowledgement does not delay its private source destructor. Cleanup pins refuse callback owner mutation. Literal records/aliases cover all wrappers and the integer overload, before/after display stops preserve arithmetic publication boundaries, failed bodies omit result records, cached input root indices publish before power, and full-stream callbacks preserve algebraic/numeric/UP owners and allocation graphs. Actual qualified formatter and character-read guards verify integer temporary history and acknowledgement; disabled records do not read operands or break zero multiplication short circuit. A direct-core-forwarding overlay fails the public power record regression. Focused polynomial and retained AST arithmetic consumers pass all four profiles; complete polynomial/AST and callee failure audits remain open.",
+        "Root/root comparison dispatch now reaches compare_core entry SASSERT and the two established to_algebraic assertion switches before decoding algebraic cell members (cpp1710, h373). The entry compound predicate preserves short circuit. Post-refinement SASSERT statements at cpp1761-1762 separately query the dynamic source switch and use the existing guarded assertion-action path, preserving the legacy Go marker alongside actual source Throw exceptions and allowing Continue or disabled assertions. Tests cover both real rational-promotion failure sites after both refinements and counter advancement, T/C/disabled actions, gate requery, disabled operand erasure, and ended-context priority over an uninitialized object-prefix member read. Baseline overlays fail the concrete-throw and entry-read-order regressions. The object-prefix vector claims no completed C++ placement constructor. Whole comparison/polynomial/AST and numeric-child audits remain open."
       ]
     },
     {
@@ -39758,7 +39773,10 @@
         "pkg/math/polynomial/algebraic_division_diagnostic_source_test.go",
         "pkg/math/polynomial/algebraic_compare_inner_trace_test.go",
         "pkg/math/polynomial/algebraic_manager_arithmetic.go",
-        "pkg/math/polynomial/algebraic_manager_arithmetic_trace_test.go"
+        "pkg/math/polynomial/algebraic_manager_arithmetic_trace_test.go",
+        "pkg/math/polynomial/algebraic_compare_assertions.go",
+        "pkg/math/polynomial/algebraic_compare_assertions_test.go",
+        "pkg/math/polynomial/algebraic_predicate_assertions.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -39976,7 +39994,13 @@
         "TestAlgebraicManagerIntegerDetailCompletedFormatterDoesNotStopTemporary",
         "TestAlgebraicManagerDetailDisabledDoesNotReadOperands",
         "TestAlgebraicManagerDetailPublishesInputRootIndexBeforePower",
-        "TestAlgebraicManagerDetailBorrowProtectsEntireStream"
+        "TestAlgebraicManagerDetailBorrowProtectsEntireStream",
+        "TestAlgebraicComparePostRefinementAssertionActions",
+        "TestAlgebraicCompareRefinementReachesConcreteAssertionThrow",
+        "TestAlgebraicCompareAssertionGatePrecedesOperandRead",
+        "TestAlgebraicCompareAssertionStatementsRequeryDynamicGate",
+        "TestAlgebraicCompareEntryAssertionShortCircuitAndGate",
+        "TestAlgebraicCompareEntrySwitchPrecedesCellMembers"
       ],
       "conditionals": [
         {
@@ -40301,7 +40325,13 @@
             "TestAlgebraicCompareInnerTraceExactRecordsAndEarlyExits",
             "TestAlgebraicCompareInnerDisplayStopPrecedesRefinement",
             "TestAlgebraicCompareBasicTraceOwnsActualCharacterReadFailure",
-            "TestAlgebraicCompareDisabledInnerTraceDoesNotRead"
+            "TestAlgebraicCompareDisabledInnerTraceDoesNotRead",
+            "TestAlgebraicComparePostRefinementAssertionActions",
+            "TestAlgebraicCompareRefinementReachesConcreteAssertionThrow",
+            "TestAlgebraicCompareAssertionGatePrecedesOperandRead",
+            "TestAlgebraicCompareAssertionStatementsRequeryDynamicGate",
+            "TestAlgebraicCompareEntryAssertionShortCircuitAndGate",
+            "TestAlgebraicCompareEntrySwitchPrecedesCellMembers"
           ]
         },
         {
@@ -40526,7 +40556,8 @@
         "Inversion diagnostics at algebraic_numbers.cpp:1630,1641,1644 now use the shared source trace borrow with exact root-display and raw numeral insertion receipts. Binary interval bounds preserve actual mpbq display insertion order; qm().to_string finishes its project formatting children into a native Go string before inserting that completed string. Source unwinding observes actual child source causes, not the mere presence of unjoined display RAW. Owning inverse cleanup cannot acquire a later replacement root display. Qualified before/after root formatter stops verify older rational declaration/destruction frontiers and preserved source history; actual callback probes cover the full stream borrow, numeric/UP lifecycle refusal and unchanged allocation graphs. Full inversion reservation suites and new regressions pass all four profiles. Whole inversion/polynomial/AST source audits remain partial.",
         "Division scoped-inverse destruction at algebraic_numbers.cpp:1663-1666 now distinguishes an actual inversion diagnostic source-END stop from completed formatting source work with unjoined RAW. Exact shared trace source causes protect the older invb and remain its source history; a private source destructor proceeds over completed younger formatting work without ordinary public admission. Owning acknowledgement uses the actual cell initialization/destruction frontier, while cleaning guards refuse public/lifecycle callback reentry before mutation. Source history survives acknowledgement and resets only at a new accepted division. Real before/after formatter guards, a reservation-armed actual RAW suffix, and a qualified private upper-bound destructor guard cover the nested causal/cursor behavior. The stopped-display and RAW regressions were run against the prior implementation and failed there. Whole division, polynomial and AST source audits remain open.",
         "The missing inner root comparison record at algebraic_numbers.cpp:1738-1743 now follows interval disjointness and polynomial equality exits and precedes refinement/Sturm work. It displays actual source polynomials, open binary intervals and minimal flags through accepted formatter receipts. The outer record at 1861 now uses tracked basic MPQ and root MPBQ display insertions through the same numeric/UP trace borrow. Exact records cover minimal/nonminimal and equal/disjoint branches; a real UP numeral destructor guard stops before algorithm advancement. Native Go formatting buffers do not consume the numerical allocation budget: a nested actual mpn_to_string result callback instead guards the completed character span before its reached C-string read, verifying accepted child retention, source completion, acknowledgement and unchanged input. Erased records do not read operands. Literal tests fail against the old compareCore dispatch in an exact Go overlay. Whole comparison/polynomial/AST source audits remain partial.",
-        "Public AlgebraicManager arithmetic now explicitly surrounds actual core power/add/sub/mul calls with the source anum_detail records. Internal imp/core operations remain direct. The retained integer overload calls the public addition wrapper after constructing its real scoped algebraic integer; an actual display source-END stop protects that temporary, while completed formatting source work with pending acknowledgement does not delay its private source destructor. Cleanup pins refuse callback owner mutation. Literal records/aliases cover all wrappers and the integer overload, before/after display stops preserve arithmetic publication boundaries, failed bodies omit result records, cached input root indices publish before power, and full-stream callbacks preserve algebraic/numeric/UP owners and allocation graphs. Actual qualified formatter and character-read guards verify integer temporary history and acknowledgement; disabled records do not read operands or break zero multiplication short circuit. A direct-core-forwarding overlay fails the public power record regression. Focused polynomial and retained AST arithmetic consumers pass all four profiles; complete polynomial/AST and callee failure audits remain open."
+        "Public AlgebraicManager arithmetic now explicitly surrounds actual core power/add/sub/mul calls with the source anum_detail records. Internal imp/core operations remain direct. The retained integer overload calls the public addition wrapper after constructing its real scoped algebraic integer; an actual display source-END stop protects that temporary, while completed formatting source work with pending acknowledgement does not delay its private source destructor. Cleanup pins refuse callback owner mutation. Literal records/aliases cover all wrappers and the integer overload, before/after display stops preserve arithmetic publication boundaries, failed bodies omit result records, cached input root indices publish before power, and full-stream callbacks preserve algebraic/numeric/UP owners and allocation graphs. Actual qualified formatter and character-read guards verify integer temporary history and acknowledgement; disabled records do not read operands or break zero multiplication short circuit. A direct-core-forwarding overlay fails the public power record regression. Focused polynomial and retained AST arithmetic consumers pass all four profiles; complete polynomial/AST and callee failure audits remain open.",
+        "Root/root comparison dispatch now reaches compare_core entry SASSERT and the two established to_algebraic assertion switches before decoding algebraic cell members (cpp1710, h373). The entry compound predicate preserves short circuit. Post-refinement SASSERT statements at cpp1761-1762 separately query the dynamic source switch and use the existing guarded assertion-action path, preserving the legacy Go marker alongside actual source Throw exceptions and allowing Continue or disabled assertions. Tests cover both real rational-promotion failure sites after both refinements and counter advancement, T/C/disabled actions, gate requery, disabled operand erasure, and ended-context priority over an uninitialized object-prefix member read. Baseline overlays fail the concrete-throw and entry-read-order regressions. The object-prefix vector claims no completed C++ placement constructor. Whole comparison/polynomial/AST and numeric-child audits remain open."
       ]
     },
     {
@@ -205776,7 +205807,7 @@
     "numeral_seconds": 56.165,
     "session_id": 61439,
     "checkout_held_unchanged": true,
-    "scope_warning": "Full native module checkpoint 4bbcf91c passed on CPUs 8-16 with the checkout held unchanged. This result covers that exact commit, not later changes or the separately tested comparison-assertion overlay. This run collected no statement coverage and does not establish polynomial or AST source-port completion."
+    "scope_warning": "Full native module checkpoint 4bbcf91c passed on CPUs 8-16 with the checkout held unchanged. This result covers that exact commit. Subsequent comparison assertion corrections have focused four-profile evidence and are not included in this full native result. This run collected no statement coverage and does not establish polynomial or AST source-port completion."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
