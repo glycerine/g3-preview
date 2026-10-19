@@ -36,6 +36,10 @@ func TestPolynomialSqrtMonomialAllocationUsesActualInvocation(t *testing.T) {
 	polynomialSqrtAllocationTransport(t, 5)
 }
 
+func TestPolynomialSqrtFinalFactoryAllocationUsesActualInvocation(t *testing.T) {
+	polynomialSqrtAllocationTransport(t, 6)
+}
+
 func polynomialSqrtAllocationTransport(t *testing.T, mode uint8) {
 	t.Helper()
 	budget := arena.NewBudget(1 << 26)
@@ -64,7 +68,7 @@ func polynomialSqrtAllocationTransport(t *testing.T, mode uint8) {
 	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
 	var mm *MonomialManager
-	if mode == 5 {
+	if mode >= 5 {
 		mm, e = NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
 		serviceMust(t, e)
 		serviceMust(t, mm.IncManagerRef())
@@ -100,6 +104,10 @@ func polynomialSqrtAllocationTransport(t *testing.T, mode uint8) {
 	serviceMust(t, c.IncRef(p))
 	out, e := NewPolynomialRef(c)
 	serviceMust(t, e)
+	if mode == 6 {
+		coefficient := unumeral.NewInt(3)
+		serviceMust(t, c.som.add(&coefficient, c.monomials.unit, false))
+	}
 	pad := int64(99996) - rt.State().LocalSize - 8
 	if pad <= 0 {
 		t.Fatal("source frontier setup", rt.State())
@@ -110,12 +118,20 @@ func polynomialSqrtAllocationTransport(t *testing.T, mode uint8) {
 	active = true
 	var receipt polynomialSqrtInvocationReceipt
 	var body error
-	if mode == 5 {
+	if mode >= 5 {
 		serviceMust(t, full.beginSquareRootWithReceipt(&receipt))
-		_, _, body = full.squareRootMonomial(0, term, Monomial{})
-		r := &full.squareRoot.monomialAllocator
-		if !c.monomials.matchesMonomialAllocatorInvocation(r) || r.outcome.Pending == (umemory.Block{}) {
-			t.Fatal("actual monomial allocation absent from invocation receipt", body)
+		if mode == 5 {
+			_, _, body = full.squareRootMonomial(0, term, Monomial{})
+			r := &full.squareRoot.monomialAllocator
+			if !c.monomials.matchesMonomialAllocatorInvocation(r) || r.outcome.Pending == (umemory.Block{}) {
+				t.Fatal("actual monomial allocation absent from invocation receipt", body)
+			}
+		} else {
+			_, body = c.som.mkWithFactoryReceipt(false, &full.squareRoot.factory)
+			r := &full.squareRoot.factory
+			if !c.matchesFactoryInvocation(r) || r.frame.allocation.Pending == (umemory.Block{}) {
+				t.Fatal("actual final factory allocation absent from invocation receipt", body)
+			}
 		}
 		body = full.finishSquareRoot(body)
 	} else if mode != 0 {

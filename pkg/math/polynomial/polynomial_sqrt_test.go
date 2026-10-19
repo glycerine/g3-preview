@@ -496,10 +496,10 @@ func TestPolynomialSqrtFinalFactoryPostphysicalRaw(t *testing.T) {
 	}
 	serviceMust(t, m.beginSquareRoot())
 	serviceMust(t, rt.SetMaxSize(1))
-	_, cause := c.som.mk(false)
+	_, cause := c.som.mkWithFactoryReceipt(false, &m.squareRoot.factory)
 	roots, e := c.monomials.allocator.PendingRoots()
 	serviceMust(t, e)
-	if !numericPhysicalReservationRefusal(cause) || roots[0] == (umemory.Block{}) || c.pending.generation != m.squareRoot.factoryGeneration {
+	if !numericPhysicalReservationRefusal(cause) || roots[0] == (umemory.Block{}) || c.pending.generation != m.squareRoot.factory.invocation {
 		t.Fatal("actual final cell source allocator postphysical stop", cause, roots, c.pending)
 	}
 	_ = m.finishSquareRoot(cause)

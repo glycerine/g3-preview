@@ -41578,6 +41578,7 @@
             "TestPolynomialSqrtDivisionAllocationUsesActualChild",
             "TestPolynomialSqrtPositiveDivisionAllocationUsesActualInvocation",
             "TestPolynomialSqrtMonomialAllocationUsesActualInvocation",
+            "TestPolynomialSqrtFinalFactoryAllocationUsesActualInvocation",
         "TestPolynomialSqrtReceiptPreservesOlderActualFalseQuotientCohort",
         "TestPolynomialSqrtReceiptCompletedNUMBeforeUnjoinedAbort",
         "TestPolynomialSqrtInvocationCompletedPhasePreservesUnenteredPerfectSquare",
@@ -45436,8 +45437,8 @@
           ]
         },
         {
-          "name": "Selected same sqrt cpp5964-6068 internal exact invocation receipt: guarded actual begin/nonce; completed source child acknowledgement versus later unjoined owning abort; created-only cohort tag at returned-new append and consumed actual INC",
-          "status": "partial",
+          "name": "Complete retained sqrt invocation ownership cpp5964-6068 with exact numeric, perfect-square, RAW division, monomial allocator and final polynomial factory receipts",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_sqrt_invocation.go",
           "tests": [
             "TestPolynomialSqrtInvocationGuardAndActualAcquisition",
@@ -45447,6 +45448,7 @@
             "TestPolynomialSqrtDivisionAllocationUsesActualChild",
             "TestPolynomialSqrtPositiveDivisionAllocationUsesActualInvocation",
             "TestPolynomialSqrtMonomialAllocationUsesActualInvocation",
+            "TestPolynomialSqrtFinalFactoryAllocationUsesActualInvocation",
             "TestPolynomialSqrtReceiptPreservesOlderActualFalseQuotientCohort",
             "TestPolynomialSqrtReceiptCompletedNUMBeforeUnjoinedAbort",
             "TestPolynomialSqrtInvocationCompletedPhasePreservesUnenteredPerfectSquare",

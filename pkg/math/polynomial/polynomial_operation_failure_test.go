@@ -183,8 +183,8 @@ func polynomialOperationMonomialAudit(t *testing.T, m *MultivariatePolynomialCor
 		for _, a := range owner.orphans {
 			add(a)
 		}
-		if owner.freshResult != (Polynomial{}) {
-			callers = append(callers, owner.freshResult)
+		if m.matchesFactoryInvocation(&owner.factory) && owner.factory.frame.result != (Polynomial{}) {
+			callers = append(callers, owner.factory.frame.result)
 		}
 	}
 	add(m.monomials.unit)

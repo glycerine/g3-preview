@@ -319,7 +319,9 @@ func polynomialImpPhysicalAuditNamedExtra(t *testing.T, full *MultivariatePolyno
 		addPolynomial(f.ci.value)
 		addPolynomial(f.ci.incoming)
 	}
-	addPolynomial(full.squareRoot.freshResult)
+	if full.core.matchesFactoryInvocation(&full.squareRoot.factory) {
+		addPolynomial(full.squareRoot.factory.frame.result)
+	}
 	addPolynomial(full.composition.local.value)
 	addPolynomial(full.composition.local.incoming)
 	addPolynomial(full.composition.freshResult)

@@ -63,9 +63,6 @@ func (r *polynomialReference) assignWithFactoryReceipt(m *MultivariatePolynomial
 	if e := m.transferFactoryResult(receipt, p); e != nil {
 		return e
 	}
-	if owner := m.squareRootOwner; owner != nil && owner.executing && m.callbackDepth == 0 && owner.freshResult == p {
-		owner.freshResult = Polynomial{}
-	}
 	if e := polynomialReferenceDrop(m, &r.value, &r.decremented); e != nil {
 		r.cleanupCause = e
 		return e

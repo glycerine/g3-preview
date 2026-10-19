@@ -38,7 +38,6 @@ type polynomialCreation struct {
 	substitutionOwned bool
 	translationOwned  bool
 	generation        uint64
-	squareRootParent  *polynomialSquareRootScope
 	derivativeParent  *polynomialDerivativeScope
 	raw               umemory.ObjectRef
 	value             Polynomial
