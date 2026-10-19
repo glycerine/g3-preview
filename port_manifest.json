@@ -43341,8 +43341,8 @@
           ]
         },
         {
-          "name": "Recursive GCD integer substitutions retain only the accepted core/frame/invocation; completed-local owning cleanup precedes separate construction abort; copied, refused and stale receipts grant no cleanup authority",
-          "status": "partial",
+          "name": "Complete recursive GCD integer-substitution invocation ownership with accepted frame identity, completed-local cleanup before construction abort and refusal of copied/stale receipts",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_substitution_invocation.go",
           "tests": [
             "TestPolynomialSubstitutionInvocationReservationPrefixes",
@@ -46077,8 +46077,8 @@
           ]
         },
         {
-          "name": "Substitution reached R.mk(true) captured normalize_numerals child and source/own continuation (polynomial.cpp:6237-6425)",
-          "status": "partial",
+          "name": "Complete substitution R.mk(true) normalization-child ownership and source/own continuation cpp6237-6425",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_substitution.go",
           "tests": [
             "TestPolynomialSubstitutionEveryReservationNamedPrefixes",
@@ -47675,8 +47675,8 @@
           ]
         },
         {
-          "name": "Recursive GCD integer substitutions retain only the accepted core/frame/invocation; completed-local owning cleanup precedes separate construction abort; copied, refused and stale receipts grant no cleanup authority",
-          "status": "partial",
+          "name": "Complete recursive GCD integer-substitution invocation ownership with accepted frame identity, completed-local cleanup before construction abort and refusal of copied/stale receipts",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_substitution_invocation.go",
           "tests": [
             "TestPolynomialSubstitutionInvocationReservationPrefixes",
