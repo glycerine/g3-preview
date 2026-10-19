@@ -53493,7 +53493,7 @@
         },
         {
           "name": "upolynomial.cpp:1906-1951 public Cauchy root_upper_bound exact reached NUM and numeric-child lifetime",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_root_bounds.go",
           "tests": [
             "TestUPolynomialRootUpperBoundActualBodyAndNumeralDT",
@@ -53504,7 +53504,7 @@
         },
         {
           "name": "upolynomial.cpp:2029-2035 Knuth negative bound destructive two p_minus_x calls and direct NEG/PN leaves",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_root_bounds.go",
           "tests": [
             "TestUPolynomialKnuthMinimumActualOwnerCallback",
@@ -53515,7 +53515,7 @@
         },
         {
           "name": "upolynomial.cpp:2052-2074 nonzero lower bound zero-consume assertions and destructive reverse/Knuth/reverse source order",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_root_bounds.go",
           "tests": [
             "TestUPolynomialKnuthMinimumActualOwnerCallback",
@@ -53538,7 +53538,7 @@
         },
         {
           "name": "upolynomial.cpp:1594-1602 public p_minus_x exact borrowed-view caller and direct odd coefficient NEG/PN source transport",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_transforms.go",
           "tests": [
             "TestUPolynomialPMinusXActualMinimumCallbackProtectsCaller",
@@ -53548,7 +53548,7 @@
         },
         {
           "name": "upolynomial.cpp:1298-1321 public has_one_half_root exact scaled-Horner r/ak caller/direct allocation and reverse lexical source suffix",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_root_bounds.go",
           "tests": [
             "TestUPolynomialHasOneHalfRootActualBodyAndNumeralDT",
@@ -53561,7 +53561,7 @@
         },
         {
           "name": "upolynomial.cpp:1324-1329 RemoveOneHalfRoot actual assertion child and same division caller; reached am lexical source suffix at432-493 before outer505-513 publication",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_root_bounds.go",
           "tests": [
             "TestUPolynomialRemoveOneHalfRootActualAmSourceStop",
