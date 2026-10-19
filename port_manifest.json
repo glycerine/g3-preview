@@ -38271,6 +38271,8 @@
         "pkg/math/polynomial/algebraic_representation.go",
         "pkg/math/polynomial/algebraic_representation_test.go",
         "pkg/math/polynomial/algebraic_inverse.go",
+        "pkg/math/polynomial/algebraic_inverse_trace.go",
+        "pkg/math/polynomial/algebraic_inverse_trace_test.go",
         "pkg/math/polynomial/algebraic_inverse_test.go",
         "pkg/math/polynomial/algebraic_root.go",
         "pkg/math/polynomial/algebraic_vector.go",
@@ -39134,13 +39136,20 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:1582-1647,2937-2939 nonzero-bound halving and in-place inversion through actual reciprocal polynomial and rational-to-binary interval conversion; selected ordinary and basic allocation-refusal profiles",
+          "name": "algebraic_numbers.cpp:1582-1647,2937-2939 nonzero-bound halving and in-place inversion; source TRACE, actual cached-index publication and reached multiword conversion ownership; broader source audit remains partial",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_inverse.go",
           "tests": [
             "TestAlgebraicInverseBasicAndZero",
             "TestAlgebraicInverseRootAndZeroBoundRefinement",
-            "TestAlgebraicInverseMinimumIntegerReservationPrefixes"
+            "TestAlgebraicInverseMinimumIntegerReservationPrefixes",
+            "TestAlgebraicInverseSourceTracesAndCachedIndex",
+            "TestAlgebraicInverseTraceCallbackKeepsActualCell",
+            "TestAlgebraicInverseTraceEveryReservationPrefix",
+            "TestAlgebraicInverseTraceBigBoundsSuccess"
+          ],
+          "deviations": [
+            "All three inversion TRACE sites use the actual source displays and rational strings. The initial display can publish the cached root index; subsequent interval saves retain that mutation. Inversion owns each actual bound-to-rational conversion receipt. Rational-to-binary conversion retains both initial sign-evaluation receipts and its reached binary conversion/refinement receipts, including RAW midpoint and debug rational-service invocations. The direct allocator campaign checks every reached reservation through success, named physical ownership after cleanup and full owner refunds. Full descendant source destructor/callback and eager constructor audits remain open."
           ]
         },
         {
@@ -39398,6 +39407,8 @@
         "pkg/math/polynomial/algebraic_representation.go",
         "pkg/math/polynomial/algebraic_representation_test.go",
         "pkg/math/polynomial/algebraic_inverse.go",
+        "pkg/math/polynomial/algebraic_inverse_trace.go",
+        "pkg/math/polynomial/algebraic_inverse_trace_test.go",
         "pkg/math/polynomial/algebraic_inverse_test.go",
         "pkg/math/polynomial/algebraic_root.go",
         "pkg/math/polynomial/algebraic_vector.go",
@@ -39859,13 +39870,20 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:1582-1647,2937-2939 nonzero-bound halving and in-place inversion through actual reciprocal polynomial and rational-to-binary interval conversion; selected ordinary and basic allocation-refusal profiles",
+          "name": "algebraic_numbers.cpp:1582-1647,2937-2939 nonzero-bound halving and in-place inversion; source TRACE, actual cached-index publication and reached multiword conversion ownership; broader source audit remains partial",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_inverse.go",
           "tests": [
             "TestAlgebraicInverseBasicAndZero",
             "TestAlgebraicInverseRootAndZeroBoundRefinement",
-            "TestAlgebraicInverseMinimumIntegerReservationPrefixes"
+            "TestAlgebraicInverseMinimumIntegerReservationPrefixes",
+            "TestAlgebraicInverseSourceTracesAndCachedIndex",
+            "TestAlgebraicInverseTraceCallbackKeepsActualCell",
+            "TestAlgebraicInverseTraceEveryReservationPrefix",
+            "TestAlgebraicInverseTraceBigBoundsSuccess"
+          ],
+          "deviations": [
+            "All three inversion TRACE sites use the actual source displays and rational strings. The initial display can publish the cached root index; subsequent interval saves retain that mutation. Inversion owns each actual bound-to-rational conversion receipt. Rational-to-binary conversion retains both initial sign-evaluation receipts and its reached binary conversion/refinement receipts, including RAW midpoint and debug rational-service invocations. The direct allocator campaign checks every reached reservation through success, named physical ownership after cleanup and full owner refunds. Full descendant source destructor/callback and eager constructor audits remain open."
           ]
         },
         {
@@ -162383,7 +162401,9 @@
         "pkg/util/numeral/mpbq_display_source.go",
         "pkg/util/numeral/mpbq_display_source_test.go",
         "pkg/math/polynomial/upolynomial_convert_bounds_trace.go",
-        "pkg/math/polynomial/upolynomial_convert_bounds_trace_test.go"
+        "pkg/math/polynomial/upolynomial_convert_bounds_trace_test.go",
+        "pkg/util/numeral/mpbq_refine_invocation.go",
+        "pkg/util/numeral/mpbq_convert_invocation.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -163048,7 +163068,9 @@
         "pkg/util/numeral/mpbq_display_source.go",
         "pkg/util/numeral/mpbq_display_source_test.go",
         "pkg/math/polynomial/upolynomial_convert_bounds_trace.go",
-        "pkg/math/polynomial/upolynomial_convert_bounds_trace_test.go"
+        "pkg/math/polynomial/upolynomial_convert_bounds_trace_test.go",
+        "pkg/util/numeral/mpbq_refine_invocation.go",
+        "pkg/util/numeral/mpbq_convert_invocation.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -181926,7 +181948,8 @@
         "pkg/ast/ast_low_level_printer_source_test.go",
         "pkg/util/numeral/rational_global_memory_trace.go",
         "pkg/util/numeral/rational_global_memory_trace_debug_test.go",
-        "pkg/util/process/symbol_memory_trace_debug_test.go"
+        "pkg/util/process/symbol_memory_trace_debug_test.go",
+        "pkg/util/numeral/rational_service_div_invocation_test.go"
       ],
       "tests": [
         "TestRationalServiceSourceConstructorAssertions",
@@ -182005,7 +182028,8 @@
         "TestRationalGlobalMemoryTraceAllocationReuseAndFinalization",
         "TestRationalGlobalMemoryTraceFinalizingSuppressesDeallocation",
         "TestRationalGlobalMemoryTraceRefusalDoesNotStopLifecycle",
-        "TestGeneratedProcessBindsSymbolMemoryTraceBeforeInitialize"
+        "TestGeneratedProcessBindsSymbolMemoryTraceBeforeInitialize",
+        "TestRationalServiceDivisionInvocationEveryActualReservation"
       ],
       "conditionals": [
         {
@@ -182280,7 +182304,8 @@
         "pkg/util/lp/primal_basis_limit_exact.go",
         "pkg/util/lp/primal_basis_dispatch_exact.go",
         "pkg/util/lp/solver_expression_exact.go",
-        "pkg/util/lp/solver_expression_exact_test.go"
+        "pkg/util/lp/solver_expression_exact_test.go",
+        "pkg/util/numeral/rational_service_div_invocation_test.go"
       ],
       "tests": [
         "TestRationalServiceSourceDelValueAssignmentFailurePrefix",
@@ -182490,7 +182515,8 @@
         "TestLPExactBasisDispatchGuardsAndZeroDirection",
         "TestLPExactBasisDispatchMultiplierOutputAlias",
         "TestLPRationalExpressionPhysicalReturnCopies",
-        "TestLPRationalExpressionPinConditionLifetime"
+        "TestLPRationalExpressionPinConditionLifetime",
+        "TestRationalServiceDivisionInvocationEveryActualReservation"
       ],
       "conditionals": [
         {

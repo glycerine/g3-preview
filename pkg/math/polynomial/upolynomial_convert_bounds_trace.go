@@ -9,6 +9,8 @@ import (
 )
 
 type upolyIntervalBoundsScope struct {
+	conversion                                 unumeral.BinaryConvertInvocationReceipt
+	refinement                                 unumeral.BinaryRefineInvocationReceipt
 	owner                                      *UPolynomialManager
 	binary                                     *unumeral.BinaryRationalManager
 	invocation                                 uint64
@@ -53,6 +55,12 @@ func (m *UPolynomialManager) beginIntervalBounds(b *unumeral.BinaryRationalManag
 	return q, nil
 }
 func (q *upolyIntervalBoundsScope) pending() bool {
+	if q.binary.ConvertInvocationPending(&q.conversion) {
+		return true
+	}
+	if q.binary.RefineInvocationPending(&q.refinement) {
+		return true
+	}
 	if q.constructed != 0 || q.owner.config.Integer.MatchesCopyAllocationInvocation(&q.copy) {
 		return true
 	}
@@ -75,6 +83,12 @@ func (q *upolyIntervalBoundsScope) finish(body error) error {
 		}
 	}()
 	q.bodyCause = body
+	if q.sourceCause == nil {
+		q.sourceCause = q.binary.ConvertInvocationSourceCause(&q.conversion)
+	}
+	if q.sourceCause == nil {
+		q.sourceCause = q.binary.RefineInvocationSourceCause(&q.refinement)
+	}
 	for i := range q.insertions {
 		if q.sourceCause == nil {
 			q.sourceCause = q.insertions[i].SourceCause()
@@ -159,11 +173,20 @@ func (m *UPolynomialManager) cleanupIntervalBounds() error {
 	if e := m.config.Integer.CleanupCopyAllocationInvocation(&q.copy); e != nil {
 		return e
 	}
+	if e := q.binary.CleanupConvertInvocation(&q.conversion); e != nil {
+		return e
+	}
+	if e := q.binary.CleanupRefineInvocation(&q.refinement, false); e != nil {
+		return e
+	}
 	for q.ownRemaining > 0 {
 		if e := m.config.Integer.CleanupRawNumeral(q.values[q.ownRemaining-1].BorrowNumerator()); e != nil {
 			return e
 		}
 		q.ownRemaining--
+	}
+	if e := q.binary.CleanupRefineInvocation(&q.refinement, true); e != nil {
+		return e
 	}
 	q.active = false
 	return nil

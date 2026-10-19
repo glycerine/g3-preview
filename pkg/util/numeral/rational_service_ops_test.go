@@ -564,6 +564,15 @@ func facadeAudit(t *testing.T, s *RationalService, values ...*OwnedRational) {
 	for i := range s.Cache {
 		roots = append(roots, &s.Cache[i].Num, &s.Cache[i].Den)
 	}
+	// Explicit invocation contexts own their transferred lexical prefixes.
+	// Enumerate these issued owners before checking the descriptor registry.
+	for c := s.lexicalInvocations; c != nil; c = c.next {
+		for i := uint8(0); i < c.scope.Count; i++ {
+			if c.scope.Done&(1<<i) == 0 {
+				roots = append(roots, &c.scope.Roots[i].Num, &c.scope.Roots[i].Den)
+			}
+		}
+	}
 	for _, v := range values {
 		if v != nil && v.ownerID != 0 {
 			roots = append(roots, &v.Raw.Num, &v.Raw.Den)

@@ -8,6 +8,7 @@ import (
 )
 
 type upolyConvertEntryReceipt struct {
+	signs            [2]upolyRationalEvaluationInvocationReceipt
 	boundsInvocation uint64
 	owner            *UPolynomialManager
 	invocation       uint64
@@ -38,11 +39,24 @@ func (q *upolyConvertEntryScope) pending() bool {
 	return false
 }
 func (m *UPolynomialManager) convertEntryReceiptPending(r *upolyConvertEntryReceipt) bool {
-	return r != nil && r.owner == m && ((r.invocation != 0 && r.invocation == m.convertEntry.invocation && m.convertEntry.active) || (r.boundsInvocation != 0 && r.boundsInvocation == m.intervalBounds.invocation && m.intervalBounds.active))
+	if r == nil || r.owner != m {
+		return false
+	}
+	for i := range r.signs {
+		if m.matchesRationalEvaluationReceipt(&r.signs[i]) && m.rationalEvaluation.active {
+			return true
+		}
+	}
+	return (r.invocation != 0 && r.invocation == m.convertEntry.invocation && m.convertEntry.active) || (r.boundsInvocation != 0 && r.boundsInvocation == m.intervalBounds.invocation && m.intervalBounds.active)
 }
 func (m *UPolynomialManager) convertEntryReceiptSourceCause(r *upolyConvertEntryReceipt) error {
 	if r == nil || r.owner != m {
 		return nil
+	}
+	for i := range r.signs {
+		if m.matchesRationalEvaluationReceipt(&r.signs[i]) && m.rationalEvaluation.sourceCause != nil {
+			return m.rationalEvaluation.sourceCause
+		}
 	}
 	if r.boundsInvocation != 0 && r.boundsInvocation == m.intervalBounds.invocation && m.intervalBounds.active {
 		return m.intervalBounds.sourceCause
@@ -55,6 +69,14 @@ func (m *UPolynomialManager) convertEntryReceiptSourceCause(r *upolyConvertEntry
 func (m *UPolynomialManager) cleanupConvertEntryReceipt(r *upolyConvertEntryReceipt) error {
 	if r == nil || r.owner != m {
 		return nil
+	}
+	for i := len(r.signs) - 1; i >= 0; i-- {
+		if e := m.cleanupRationalEvaluationWithReceipt(&r.signs[i], false); e != nil {
+			return e
+		}
+		if e := m.cleanupRationalEvaluationWithReceipt(&r.signs[i], true); e != nil {
+			return e
+		}
 	}
 	if r.boundsInvocation != 0 && r.boundsInvocation == m.intervalBounds.invocation && m.intervalBounds.active {
 		if e := m.cleanupIntervalBounds(); e != nil {
@@ -93,7 +115,8 @@ func (m *UPolynomialManager) traceConvertEntry(bqm *unumeral.BinaryRationalManag
 		}
 	}()
 	if receipt != nil {
-		*receipt = upolyConvertEntryReceipt{owner: m, invocation: q.invocation}
+		receipt.owner = m
+		receipt.invocation = q.invocation
 	}
 	defer func() {
 		q.executing = false

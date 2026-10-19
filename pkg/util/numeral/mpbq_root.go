@@ -147,16 +147,41 @@ func (m *BinaryRationalManager) CleanupRoundImported() error {
 	return m.cleanupRoundImported()
 }
 func (m *BinaryRationalManager) FromRational(qm *RationalManager, q *Rational, out *BinaryRational) (exact bool, err error) {
+	return m.FromRationalWithReceipt(qm, q, out, nil)
+}
+func (m *BinaryRationalManager) FromRationalWithReceipt(qm *RationalManager, q *Rational, out *BinaryRational, receipt *BinaryConvertInvocationReceipt) (exact bool, err error) {
 	if e := m.check(out); e != nil {
 		return false, e
+	}
+	if m.convertInvocation == ^uint64(0) {
+		return false, ErrBinaryConvertPending
+	}
+	m.convertInvocation++
+	m.convertSourceCause = nil
+	m.convertDebugPending = false
+	if receipt != nil {
+		*receipt = BinaryConvertInvocationReceipt{m, m.convertInvocation}
 	}
 	m.convertImported = NewRational()
 	m.convertImportedPending = true
 	m.convertImportedCursor = 0
 	m.convertExecuting = true
 	defer func() {
-		if cleanup := m.cleanupConvertImported(); err == nil {
-			err = cleanup
+		if cleanup := m.cleanupConvertImported(); cleanup != nil {
+			m.convertSourceCause = cleanup
+			if err == nil {
+				err = cleanup
+			}
+		}
+		m.convertDebugPending = m.toOwnedRationalScope.pending || m.debugIntegerPending || m.debugArithmeticPending || len(m.debugSnapshotQueue) != 0
+		if m.convertSourceCause == nil {
+			m.convertSourceCause = m.toOwnedRationalScope.sourceCause
+		}
+		if m.convertSourceCause == nil && m.debugArithmeticPending {
+			m.convertSourceCause = m.debugArithmeticCall.SourceReady()
+		}
+		if m.convertSourceCause == nil && (m.debugIntegerPending || len(m.debugSnapshotQueue) != 0) {
+			m.convertSourceCause = err
 		}
 		m.convertExecuting = false
 	}()
@@ -349,19 +374,45 @@ func (m *BinaryRationalManager) ToOwnedRational(s *RationalService, a *BinaryRat
 	if e = s.SetInt64(&scope.two, 2); e != nil {
 		return OwnedRational{}, e
 	}
-	scope.pw, e = s.Power(&scope.two, a.KField)
+	scope.callsPending[0] = true
+	scope.pw, e = s.PowerWithInvocation(&scope.two, a.KField, &scope.calls[0])
 	if e != nil {
 		return OwnedRational{}, e
 	}
-	if e = s.Copy(&scope.twok, &scope.pw); e != nil {
+	if e = scope.finishCall(0); e != nil {
+		return OwnedRational{}, e
+	}
+	scope.callsPending[1] = true
+	if e = s.CopyWithInvocation(&scope.twok, &scope.pw, &scope.calls[1]); e != nil {
+		return OwnedRational{}, e
+	}
+	if e = scope.finishCall(1); e != nil {
 		return OwnedRational{}, e
 	}
 	if e = m.cleanupToOwnedRational(2); e != nil {
 		stopped = true
 		return OwnedRational{}, e
 	}
-	scope.result, e = s.Div(&scope.r, &scope.twok)
-	return OwnedRational{}, e
+	scope.callsPending[2] = true
+	scope.result, e = s.DivWithInvocation(&scope.r, &scope.twok, &scope.calls[2])
+	if e != nil {
+		return OwnedRational{}, e
+	}
+	return OwnedRational{}, scope.finishCall(2)
+}
+
+func (s *binaryOwnedRationalScope) finishCall(i int) error {
+	if e := s.calls[i].Cleanup(false); e != nil {
+		return e
+	}
+	if e := s.calls[i].Cleanup(true); e != nil {
+		return e
+	}
+	if e := s.calls[i].EndContext(); e != nil {
+		return e
+	}
+	s.callsPending[i] = false
+	return nil
 }
 
 func (m *BinaryRationalManager) cleanupToOwnedRational(limit uint8) error {
@@ -369,18 +420,35 @@ func (m *BinaryRationalManager) cleanupToOwnedRational(limit uint8) error {
 	if !scope.pending {
 		return nil
 	}
+	if !scope.owning {
+		for i := len(scope.callsPending) - 1; i >= 0; i-- {
+			if scope.callsPending[i] {
+				if e := scope.calls[i].SourceReady(); e != nil {
+					scope.sourceCause = e
+					return e
+				}
+			}
+		}
+	}
 	roots := [5]*OwnedRational{&scope.pw, &scope.two, &scope.twok, &scope.r, &scope.result}
 	for scope.cursor < limit {
 		v := roots[scope.cursor]
 		if v.ownerID != 0 {
 			if e := scope.service.Del(v); e != nil {
+				scope.sourceCause = e
 				return e
 			}
 		}
 		scope.cursor++
 	}
 	if scope.cursor == 5 {
-		*scope = binaryOwnedRationalScope{}
+		pending := false
+		for _, call := range scope.callsPending {
+			pending = pending || call
+		}
+		if !pending {
+			*scope = binaryOwnedRationalScope{}
+		}
 	}
 	return nil
 }
@@ -393,5 +461,26 @@ func (m *BinaryRationalManager) CleanupToOwnedRational() error {
 	if m.toOwnedRationalScope.executing {
 		return ErrBinaryOwnedRationalPending
 	}
-	return m.cleanupToOwnedRational(5)
+	scope := &m.toOwnedRationalScope
+	scope.owning = true
+	defer func() { scope.owning = false }()
+	for i := len(scope.callsPending) - 1; i >= 0; i-- {
+		if scope.callsPending[i] {
+			if e := scope.calls[i].Cleanup(false); e != nil {
+				return e
+			}
+		}
+	}
+	if e := m.cleanupToOwnedRational(5); e != nil {
+		return e
+	}
+	for i := len(scope.callsPending) - 1; i >= 0; i-- {
+		if scope.callsPending[i] {
+			if e := scope.finishCall(i); e != nil {
+				return e
+			}
+		}
+	}
+	*scope = binaryOwnedRationalScope{}
+	return nil
 }

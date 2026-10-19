@@ -21,6 +21,11 @@ func (s *algebraicConversionScope) NumericBound(executing bool) bool {
 	if s == &m.bounds.conversion {
 		return !executing || s.executing && m.bounds.executing
 	}
+	for i := range m.inversion.conversions {
+		if s == &m.inversion.conversions[i] {
+			return !executing || s.executing && m.inversion.executing
+		}
+	}
 	return s == &m.refinementConversion && (!executing || s.executing && m.localActive)
 }
 func (s *algebraicConversionScope) NumericRoots(z *unumeral.IntegerManager, local *unumeral.NumericAllocationRoots) *unumeral.NumericAllocationRoots {
@@ -85,7 +90,19 @@ func (m *AlgebraicRootCore) boundToRational(a *unumeral.BinaryRational, out *unu
 	return m.bounds.conversion.run(m, a, out)
 }
 func (s *algebraicConversionScope) run(m *AlgebraicRootCore, a *unumeral.BinaryRational, out *unumeral.Rational) error {
-	if m == nil || m.self != m || (s != &m.bounds.conversion && s != &m.refinementConversion) {
+	if m == nil || m.self != m {
+		return ErrAlgebraicOwner
+	}
+	bound := s == &m.bounds.conversion || s == &m.refinementConversion
+	for i := range m.inversion.conversions {
+		if s == &m.inversion.conversions[i] {
+			if !m.inversion.executing || out != &m.inversion.values[i] {
+				return ErrAlgebraicOwner
+			}
+			bound = true
+		}
+	}
+	if !bound {
 		return ErrAlgebraicOwner
 	}
 	if s == &m.refinementConversion && (!m.localActive || out != &m.localQ) {

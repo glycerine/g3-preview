@@ -415,11 +415,16 @@ func (m *UPolynomialManager) convertRationalToBinaryIntervalWithEntryReceipt(v U
 	if qm == nil || qm.Integers() != m.config.Integer {
 		return false, ErrUPolynomialOwner
 	}
-	sa, e := m.EvalSignRational(v, a)
+	var first, second *upolyRationalEvaluationInvocationReceipt
+	if receipt != nil {
+		*receipt = upolyConvertEntryReceipt{owner: m}
+		first, second = &receipt.signs[0], &receipt.signs[1]
+	}
+	sa, e := m.evalSignRationalWithReceipt(v, a, first)
 	if e != nil {
 		return false, e
 	}
-	sb, e := m.EvalSignRational(v, b)
+	sb, e := m.evalSignRationalWithReceipt(v, b, second)
 	if e != nil {
 		return false, e
 	}
@@ -436,7 +441,7 @@ func (m *UPolynomialManager) convertRationalToBinaryIntervalWithEntryReceipt(v U
 	}
 	defer func() { cause = q.finish(cause) }()
 	lower, upper := &q.values[0], &q.values[1]
-	exact, e := bqm.FromRational(qm, a, lower)
+	exact, e := bqm.FromRationalWithReceipt(qm, a, lower, &q.conversion)
 	if e != nil {
 		return false, e
 	}
@@ -482,7 +487,7 @@ func (m *UPolynomialManager) convertRationalToBinaryIntervalWithEntryReceipt(v U
 			if !ge {
 				break
 			}
-			if e = bqm.RefineUpper(qm, a, lower, upper); e != nil {
+			if e = bqm.RefineUpperWithReceipt(qm, a, lower, upper, &q.refinement); e != nil {
 				return false, e
 			}
 		}
@@ -522,13 +527,13 @@ func (m *UPolynomialManager) convertRationalToBinaryIntervalWithEntryReceipt(v U
 					return false, e
 				}
 			}
-			if e = bqm.RefineUpper(qm, a, lower, upper); e != nil {
+			if e = bqm.RefineUpperWithReceipt(qm, a, lower, upper, &q.refinement); e != nil {
 				return false, e
 			}
 		}
 	}
 	if !foundD {
-		exact, e = bqm.FromRational(qm, b, lower)
+		exact, e = bqm.FromRationalWithReceipt(qm, b, lower, &q.conversion)
 		if e != nil {
 			return false, e
 		}
@@ -568,7 +573,7 @@ func (m *UPolynomialManager) convertRationalToBinaryIntervalWithEntryReceipt(v U
 				if !le {
 					break
 				}
-				if e = bqm.RefineLower(qm, b, lower, upper); e != nil {
+				if e = bqm.RefineLowerWithReceipt(qm, b, lower, upper, &q.refinement); e != nil {
 					return false, e
 				}
 			}
@@ -605,7 +610,7 @@ func (m *UPolynomialManager) convertRationalToBinaryIntervalWithEntryReceipt(v U
 					}
 					break
 				}
-				if e = bqm.RefineLower(qm, b, lower, upper); e != nil {
+				if e = bqm.RefineLowerWithReceipt(qm, b, lower, upper, &q.refinement); e != nil {
 					return false, e
 				}
 			}

@@ -535,16 +535,41 @@ func (m *BinaryRationalManager) RefineLower(qm *RationalManager, q *Rational, l,
 	return m.refine(qm, q, l, u, false)
 }
 func (m *BinaryRationalManager) refine(qm *RationalManager, q *Rational, l, u *BinaryRational, upper bool) (err error) {
+	return m.refineWithReceipt(qm, q, l, u, upper, nil)
+}
+func (m *BinaryRationalManager) refineWithReceipt(qm *RationalManager, q *Rational, l, u *BinaryRational, upper bool, receipt *BinaryRefineInvocationReceipt) (err error) {
 	if e := m.pair(l, u); e != nil {
 		return e
+	}
+	if m.refineInvocation == ^uint64(0) {
+		return ErrBinaryRefinePending
+	}
+	m.refineInvocation++
+	m.refineSourceCause = nil
+	m.refineDebugPending = false
+	if receipt != nil {
+		*receipt = BinaryRefineInvocationReceipt{m, m.refineInvocation}
 	}
 	m.refineImported = NewRational()
 	m.refineImportedCursor = 0
 	m.refineImportedPending = true
 	m.refineExecuting = true
 	defer func() {
-		if cleanup := m.cleanupRefineImported(); err == nil {
-			err = cleanup
+		if cleanup := m.cleanupRefineImported(); cleanup != nil {
+			m.refineSourceCause = cleanup
+			if err == nil {
+				err = cleanup
+			}
+		}
+		m.refineDebugPending = m.toOwnedRationalScope.pending || m.debugIntegerPending || m.debugArithmeticPending || len(m.debugSnapshotQueue) != 0
+		if m.refineSourceCause == nil {
+			m.refineSourceCause = m.toOwnedRationalScope.sourceCause
+		}
+		if m.refineSourceCause == nil && m.debugArithmeticPending {
+			m.refineSourceCause = m.debugArithmeticCall.SourceReady()
+		}
+		if (m.debugIntegerPending || len(m.debugSnapshotQueue) != 0) && m.refineSourceCause == nil {
+			m.refineSourceCause = err
 		}
 		m.refineExecuting = false
 	}()

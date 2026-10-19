@@ -110,6 +110,8 @@ func (s *RationalService) facadeValueRawOperandsLockedWithInvocation(a, b *Ratio
 			body = s.Manager.addSubWithAllocationContext(&work, b, &work, op == rationalFacadeSub, c.allocationContext())
 		} else if c != nil && op == rationalFacadeMul {
 			body = s.Manager.mulWithAllocationContext(&work, b, &work, c.allocationContext())
+		} else if c != nil && op == rationalFacadeDiv {
+			body = s.Manager.divWithAllocationContext(&work, b, &work, c.allocationContext())
 		} else {
 			body = s.facadeRawBinaryLocked(&work, b, &work, op)
 		}

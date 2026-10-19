@@ -42,6 +42,10 @@ var ErrBinaryDebugIntegerPending = errors.New("mpnum: binary-rational debug inte
 var ErrBinaryDebugSnapshotPending = errors.New("mpnum: binary-rational debug snapshot cleanup pending")
 
 type binaryOwnedRationalScope struct {
+	calls                    [3]RationalServiceInvocation
+	callsPending             [3]bool
+	sourceCause              error
+	owning                   bool
 	service                  *RationalService
 	r, twok, two, pw, result OwnedRational
 	cursor                   uint8
@@ -51,6 +55,15 @@ type binaryOwnedRationalScope struct {
 // This cold operation owner borrows z and diagnostics. Both must outlive it.
 // No operations or shared Budget accesses are concurrently safe.
 type BinaryRationalManager struct {
+	debugArithmeticCall                            RationalServiceInvocation
+	debugArithmeticPending                         bool
+	debugArithmeticExecuting                       bool
+	convertInvocation                              uint64
+	convertSourceCause                             error
+	convertDebugPending                            bool
+	refineInvocation                               uint64
+	refineSourceCause                              error
+	refineDebugPending                             bool
 	Z                                              *IntegerManager
 	Diagnostics                                    *RationalService
 	self                                           *BinaryRationalManager
@@ -156,6 +169,9 @@ func (m *BinaryRationalManager) open() error {
 	if len(m.debugSnapshotQueue) != 0 {
 		return ErrBinaryDebugSnapshotPending
 	}
+	if m.debugArithmeticPending && !m.debugArithmeticExecuting {
+		return ErrBinaryDebugSnapshotPending
+	}
 	return nil
 }
 func (m *BinaryRationalManager) check(a *BinaryRational) error {
@@ -169,7 +185,13 @@ func (m *BinaryRationalManager) check(a *BinaryRational) error {
 }
 func (m *BinaryRationalManager) checkCleanup(a *BinaryRational) error {
 	if e := m.open(); e != nil {
-		return e
+		// Completed source destructors leave only unjoined RAW children.
+		// Older deletions can proceed while new arithmetic remains guarded.
+		completed := e == ErrBinaryOwnedRationalPending && m.toOwnedRationalScope.cursor == 5 && m.toOwnedRationalScope.sourceCause == nil
+		completed = completed || (e == ErrBinaryDebugSnapshotPending && len(m.debugSnapshotQueue) == 0 && m.debugArithmeticPending && m.debugArithmeticCall.SourceReady() == nil)
+		if !completed {
+			return e
+		}
 	}
 	if a == nil {
 		return arena.ErrInvalidSlot
@@ -320,6 +342,14 @@ func (m *BinaryRationalManager) CleanupDebugSnapshots() error {
 	if m == nil || m.self != m {
 		return ErrBinaryOwner
 	}
+	if m.debugArithmeticExecuting {
+		return ErrBinaryDebugSnapshotPending
+	}
+	if m.debugArithmeticPending {
+		if e := m.debugArithmeticCall.Cleanup(false); e != nil {
+			return e
+		}
+	}
 	for len(m.debugSnapshotQueue) != 0 {
 		if e := m.Diagnostics.Del(&m.debugSnapshotQueue[0]); e != nil {
 			return e
@@ -328,6 +358,15 @@ func (m *BinaryRationalManager) CleanupDebugSnapshots() error {
 		m.debugSnapshotQueue = m.debugSnapshotQueue[1:]
 	}
 	m.debugSnapshotQueue = nil
+	if m.debugArithmeticPending {
+		if e := m.debugArithmeticCall.Cleanup(true); e != nil {
+			return e
+		}
+		if e := m.debugArithmeticCall.EndContext(); e != nil {
+			return e
+		}
+		m.debugArithmeticPending = false
+	}
 	return nil
 }
 

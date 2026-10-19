@@ -22,8 +22,9 @@ func TestBinaryRefineRetainsMidpointAfterActualBodyFailure(t *testing.T) {
 		serviceMust(t, qm.SetString(&q, numerator.String()+"/3"))
 		serviceMust(t, m.Z.SetString(&l.Num, floor.String()))
 		serviceMust(t, m.Z.SetString(&u.Num, ceil.String()))
+		var receipt BinaryRefineInvocationReceipt
 		budget.FailAfter(fault)
-		e := m.RefineUpper(qm, &q, &l, &u)
+		e := m.RefineUpperWithReceipt(qm, &q, &l, &u, &receipt)
 		if e != nil && m.refinePending && m.refineMid.Num.Cell != 0 {
 			if !numericPhysicalReservationRefusal(e) {
 				t.Fatal("unexpected midpoint body failure", fault, e)
@@ -35,8 +36,25 @@ func TestBinaryRefineRetainsMidpointAfterActualBodyFailure(t *testing.T) {
 			if e := m.open(); !errors.Is(e, ErrBinaryRefinePending) {
 				t.Fatal("new binary operation accepted retained midpoint", e)
 			}
+			if !m.RefineInvocationPending(&receipt) {
+				t.Fatal("actual midpoint owner was not issued to its caller")
+			}
+			before, pending := receipt, m.refineMid
+			if e := m.RefineUpperWithReceipt(qm, &q, &l, &u, &receipt); !errors.Is(e, ErrBinaryRefinePending) || receipt != before {
+				t.Fatal("refused invocation replaced actual caller receipt", e)
+			}
+			stale := receipt
+			stale.invocation++
+			copied := *m
+			copied.self = &copied
+			serviceMust(t, m.CleanupRefineInvocation(&stale, true))
+			serviceMust(t, copied.CleanupRefineInvocation(&receipt, true))
+			if pending != m.refineMid || !m.RefineInvocationPending(&receipt) {
+				t.Fatal("stale receipt or copied manager consumed actual midpoint")
+			}
 		}
-		serviceMust(t, m.CleanupRefineMid())
+		serviceMust(t, m.CleanupRefineInvocation(&receipt, false))
+		serviceMust(t, m.CleanupRefineInvocation(&receipt, true))
 		serviceMust(t, m.Del(&l))
 		serviceMust(t, m.Del(&u))
 		serviceMust(t, qm.Del(&q))

@@ -130,13 +130,17 @@ func (m *BinaryRationalManager) debugArithmetic(a, b *OwnedRational, out *Binary
 		}
 	}()
 	var want OwnedRational
+	m.debugArithmeticCall = RationalServiceInvocation{}
+	m.debugArithmeticPending = true
+	m.debugArithmeticExecuting = true
+	defer func() { m.debugArithmeticExecuting = false }()
 	switch op {
 	case 0:
-		want, e = m.Diagnostics.Add(a, b)
+		want, e = m.Diagnostics.AddWithInvocation(a, b, &m.debugArithmeticCall)
 	case 1:
-		want, e = m.Diagnostics.Sub(a, b)
+		want, e = m.Diagnostics.SubWithInvocation(a, b, &m.debugArithmeticCall)
 	case 2:
-		want, e = m.Diagnostics.Mul(a, b)
+		want, e = m.Diagnostics.MulWithInvocation(a, b, &m.debugArithmeticCall)
 	}
 	if e != nil {
 		return e
@@ -146,6 +150,16 @@ func (m *BinaryRationalManager) debugArithmetic(a, b *OwnedRational, out *Binary
 			err = cleanup
 		}
 	}()
+	if e = m.debugArithmeticCall.Cleanup(false); e != nil {
+		return e
+	}
+	if e = m.debugArithmeticCall.Cleanup(true); e != nil {
+		return e
+	}
+	if e = m.debugArithmeticCall.EndContext(); e != nil {
+		return e
+	}
+	m.debugArithmeticPending = false
 	if traceLine != 0 {
 		m.traceMPBQArithmetic(a, b, &r, &want, traceLine)
 	}

@@ -61,8 +61,11 @@ func (m *BinaryIntervalManager) check(a *BinaryInterval) error {
 	return m.bounds.pair(&a.lower, &a.upper)
 }
 func (m *BinaryIntervalManager) checkCleanup(a *BinaryInterval) error {
-	if e := m.open(); e != nil {
-		return e
+	if m == nil || m.self != m {
+		return ErrBinaryOwner
+	}
+	if m.closed || m.closing {
+		return arena.ErrClosed
 	}
 	if a == nil {
 		return arena.ErrInvalidSlot

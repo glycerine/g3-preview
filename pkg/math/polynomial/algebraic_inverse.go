@@ -12,6 +12,9 @@ var ErrAlgebraicDivisionByZero error = newAlgebraicException("division by zero")
 
 // The two source scoped rationals survive a refused destruction in the owner.
 type algebraicInverseScope struct {
+	conversions                   [2]algebraicConversionScope
+	traceStop                     error
+	traceDisplayPending           bool
 	sourceCursor, sourceRemaining uint8
 	convertEntry                  upolyConvertEntryReceipt
 	polynomialCaller              *polynomialAlgebraicEvaluationScope
@@ -27,6 +30,14 @@ func (m *AlgebraicRootCore) finishInverseSource() error {
 	q := &m.inversion
 	if q.sourceStop != nil {
 		return q.sourceStop
+	}
+	if q.traceDisplayPending {
+		return errors.Join(ErrAlgebraicPending, q.traceStop)
+	}
+	for i := len(q.conversions) - 1; i >= 0; i-- {
+		if q.conversions[i].stop != nil {
+			return q.conversions[i].stop
+		}
 	}
 	q.executing = true
 	defer func() { q.executing = false }()
@@ -55,6 +66,17 @@ func (m *AlgebraicRootCore) cleanupInverse() error {
 	}
 	q.executing = true
 	defer func() { q.executing = false }()
+	if q.traceDisplayPending {
+		if e := m.cleanupRootDisplay(); e != nil {
+			return e
+		}
+		q.traceDisplayPending = false
+	}
+	for i := len(q.conversions) - 1; i >= 0; i-- {
+		if e := q.conversions[i].cleanup(); e != nil {
+			return e
+		}
+	}
 	for q.remaining != 0 {
 		value := &q.values[q.remaining-1]
 		for _, field := range [2]*unumeral.Int{value.BorrowNumerator(), value.BorrowDenominator()} {
@@ -146,6 +168,11 @@ func (m *AlgebraicRootCore) Inv(a *Algebraic) (cause error) {
 	if m.inversion.remaining != 0 || m.localActive || m.negation.active {
 		return ErrAlgebraicPending
 	}
+	for i := range m.inversion.conversions {
+		if m.inversion.conversions[i].pending(m) {
+			return ErrAlgebraicPending
+		}
+	}
 	if e = m.refineNonzeroBounds(a); e != nil {
 		return e
 	}
@@ -160,11 +187,16 @@ func (m *AlgebraicRootCore) Inv(a *Algebraic) (cause error) {
 	q := &m.inversion
 	q.polynomialCaller = m.polynomialCaller
 	q.sourceStop = nil
+	q.traceStop = nil
+	q.traceDisplayPending = false
 	q.sourceCursor, q.sourceRemaining = 0, 0
 	q.executing = true
 	defer func() {
 		q.executing = false
-		cleanup := m.config.Polynomials.convertEntryReceiptSourceCause(&q.convertEntry)
+		cleanup := q.traceStop
+		if cleanup == nil {
+			cleanup = m.config.Polynomials.convertEntryReceiptSourceCause(&q.convertEntry)
+		}
 		if cleanup == nil {
 			cleanup = m.finishInverseSource()
 		}
@@ -178,6 +210,15 @@ func (m *AlgebraicRootCore) Inv(a *Algebraic) (cause error) {
 		return m.save(l, &r, e)
 	}
 	p := m.config.Polynomials
+	if e = m.traceInverseValue(a, false); e != nil {
+		return e
+	}
+	// Source display_root may publish the cached root index before cell_a is
+	// read. Keep that actual cell mutation in subsequent interval saves.
+	r, e = m.load(l)
+	if e != nil {
+		return e
+	}
 	v, e := m.sourcePolynomial(&r)
 	if e != nil {
 		return e
@@ -189,10 +230,10 @@ func (m *AlgebraicRootCore) Inv(a *Algebraic) (cause error) {
 	q.remaining = 2
 	q.sourceRemaining = 2
 	qm, b := m.config.Rationals, m.config.Binary
-	if e = b.ToRational(qm, r.interval.BorrowLower(), &q.values[0]); e != nil {
+	if e = q.conversions[0].run(m, r.interval.BorrowLower(), &q.values[0]); e != nil {
 		return e
 	}
-	if e = b.ToRational(qm, r.interval.BorrowUpper(), &q.values[1]); e != nil {
+	if e = q.conversions[1].run(m, r.interval.BorrowUpper(), &q.values[1]); e != nil {
 		return e
 	}
 	if e = qm.InvInPlace(&q.values[0]); e != nil {
@@ -204,6 +245,12 @@ func (m *AlgebraicRootCore) Inv(a *Algebraic) (cause error) {
 	if e = qm.Swap(&q.values[0], &q.values[1]); e != nil {
 		return e
 	}
+	if e = m.traceInverseBounds(); e != nil {
+		return e
+	}
 	_, e = p.convertRationalToBinaryIntervalWithEntryReceipt(v, qm, &q.values[0], &q.values[1], b, r.interval.BorrowLower(), r.interval.BorrowUpper(), &q.convertEntry)
-	return m.save(l, &r, e)
+	if e = m.save(l, &r, e); e != nil {
+		return e
+	}
+	return m.traceInverseValue(a, true)
 }

@@ -183,6 +183,7 @@ func (m *IntegerManager) gcdWithAllocationContext(a, b, c *Int, context integerA
 		return e
 	}
 	context.recordRationalSetRaw(m, receipt)
+	context.recordRationalServiceRaw(m, receipt)
 	context.recordConversionRaw(m, receipt)
 	context.recordFormatRaw(m, receipt)
 	context.recordCaller(m, "gcd", NumericInvocationReceipt{Raw: receipt})
