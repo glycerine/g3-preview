@@ -73,14 +73,13 @@ func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitiveWithRe
 		return e
 	}
 	c := m.core
-	if polynomialSourceDebug {
+	if e := polynomialFactorSourceAssert(6601, "degree(p, x) == 2", func() (bool, error) {
 		d, e := c.Degree(p, x)
-		if e != nil {
-			return e
-		}
-		if d != 2 {
-			return ErrPolynomialAssertion
-		}
+		return d == 2, e
+	}); e != nil {
+		return e
+	}
+	if e := polynomialFactorSourceAssert(6602, "is_primitive(p, x)", func() (bool, error) {
 		var guard *polynomialGCDInvocationReceipt
 		if guards != nil {
 			guard = &guards[0]
@@ -88,27 +87,21 @@ func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitiveWithRe
 		if phase != nil {
 			*phase = 13
 		}
-		primitive, e := m.isPrimitiveWithReceipt(p, x, guard)
-		if e != nil {
-			return e
-		}
-		if !primitive {
-			return ErrPolynomialAssertion
-		}
-		guard = nil
+		return m.isPrimitiveWithReceipt(p, x, guard)
+	}); e != nil {
+		return e
+	}
+	if e := polynomialFactorSourceAssert(6603, "is_square_free(p, x)", func() (bool, error) {
+		var guard *polynomialGCDInvocationReceipt
 		if guards != nil {
 			guard = &guards[1]
 		}
 		if phase != nil {
 			*phase = 14
 		}
-		sqf, e := m.isSquareFreeWithReceipt(p, x, true, guard)
-		if e != nil {
-			return e
-		}
-		if !sqf {
-			return ErrPolynomialAssertion
-		}
+		return m.isSquareFreeWithReceipt(p, x, true, guard)
+	}); e != nil {
+		return e
 	}
 	s, e := m.beginGCDFunction()
 	if e != nil {
@@ -138,21 +131,20 @@ func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitiveWithRe
 			return e
 		}
 	}
-	if polynomialSourceDebug {
+	if e = polynomialFactorSourceAssert(6615, "!is_zero(a)", func() (bool, error) {
 		zero, e := c.IsZero(s.refs[0].root.value)
-		if e != nil {
-			return e
-		}
-		if zero {
-			return ErrPolynomialAssertion
-		}
+		return !zero, e
+	}); e != nil {
+		return e
 	}
 	pos, e := c.gradedLexMaxPosition(s.refs[0].root.value)
 	if e != nil {
 		return e
 	}
-	if polynomialSourceDebug && pos == ^uint32(0) {
-		return ErrPolynomialAssertion
+	if e = polynomialFactorSourceAssert(6617, "a_glex_max_pos != UINT_MAX", func() (bool, error) {
+		return pos != ^uint32(0), nil
+	}); e != nil {
+		return e
 	}
 	leading, e := c.coefficientCore(s.refs[0].root.value, pos)
 	if e != nil {
@@ -207,14 +199,11 @@ func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitiveWithRe
 	if e = s.refs[5].root.assign(c, a); e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
+	if e = polynomialFactorSourceAssert(6634, "!is_zero(disc)", func() (bool, error) {
 		zero, e := c.IsZero(s.refs[5].root.value)
-		if e != nil {
-			return e
-		}
-		if zero {
-			return ErrPolynomialAssertion
-		}
+		return !zero, e
+	}); e != nil {
+		return e
 	}
 	s.constructReference(c, 6)
 	square, e := m.sqrtWithReceipt(s.refs[5].root.value, &s.refs[6], &s.quadraticSqrt)
@@ -239,12 +228,10 @@ func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitiveWithRe
 		if e = s.refs[11].root.assign(c, a); e != nil {
 			return e
 		}
-		equal, e := c.Equal(s.refs[5].root.value, s.refs[11].root.value)
-		if e != nil {
+		if e = polynomialFactorSourceAssert(6650, "eq(disc, tmp)", func() (bool, error) {
+			return c.Equal(s.refs[5].root.value, s.refs[11].root.value)
+		}); e != nil {
 			return e
-		}
-		if !equal {
-			return ErrPolynomialAssertion
 		}
 		if e = m.finishGCDLocalsTo(s, frontier); e != nil {
 			return e
@@ -321,12 +308,10 @@ func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitiveWithRe
 				return e
 			}
 		}
-		equal, e := c.Equal(s.refs[10].root.value, p)
-		if e != nil {
+		if e = polynomialFactorSourceAssert(6678, "eq(f1f2, p)", func() (bool, error) {
+			return c.Equal(s.refs[10].root.value, p)
+		}); e != nil {
 			return e
-		}
-		if !equal {
-			return ErrPolynomialAssertion
 		}
 		if e = m.finishGCDLocalsTo(s, frontier); e != nil {
 			return e

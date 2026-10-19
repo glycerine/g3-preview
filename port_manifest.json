@@ -45796,9 +45796,9 @@
           ]
         },
         {
-          "name": "polynomial.cpp:6591-6679 linear/quadratic primitive square-free factor helpers: linear assertion actions complete; quadratic assertion actions, parity, discriminant, primitive parts and publication remain under audit",
+          "name": "Complete polynomial.cpp:6591-6679 linear/quadratic primitive square-free factor helpers: assertion actions, parity, discriminant, primitive parts and ordered factor publication",
           "go_target": "pkg/math/polynomial/polynomial_factor_quadratic.go",
-          "status": "partial",
+          "status": "ported",
           "tests": [
             "TestPolynomialQuadraticEveryActualCheckpoint",
             "TestPolynomialQuadraticEveryActualReservation",
