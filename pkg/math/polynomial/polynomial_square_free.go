@@ -107,14 +107,14 @@ func (m *MultivariatePolynomialManager) squareFreeInto(p Polynomial, out *polyno
 	if e != nil {
 		return e
 	}
-	scalar, e := c.Scale(&s.nums[0], unit, s.refs[2].root.value)
+	scalar, e := c.scaleWithReceipt(&s.nums[0], unit, s.refs[2].root.value, &s.directArithmetic)
 	if e != nil {
 		return e
 	}
 	if e = out.assign(c, scalar); e != nil {
 		return e
 	}
-	result, e := c.Mul(out.value, s.refs[1].root.value)
+	result, e := c.mulWithReceipt(out.value, s.refs[1].root.value, &s.directArithmetic)
 	if e != nil {
 		return e
 	}
@@ -207,14 +207,18 @@ func (m *MultivariatePolynomialManager) isSquareFreeWithReceipt(p Polynomial, x 
 	if e != nil {
 		return false, e
 	}
-	if polynomialSourceDebug {
+	line := int32(4567)
+	if byVariable {
+		line = 4596
+	}
+	if e = polynomialSquareFreeSourceAssert(line, func() (bool, error) {
 		equal, e := c.Equal(p, s.refs[0].root.value)
 		if e != nil {
 			return false, e
 		}
-		if equal && p != s.refs[0].root.value {
-			return false, ErrPolynomialAssertion
-		}
+		return !equal || p == s.refs[0].root.value, nil
+	}); e != nil {
+		return false, e
 	}
 	return p == s.refs[0].root.value, nil
 }

@@ -45350,8 +45350,8 @@
           ]
         },
         {
-          "name": "SquareFree and IsSquareFree general/variable cpp4529-4598,7232-7246; PrimitivePart/IsPrimitive cpp3536-3549,7212-7214 are complete in the separate gcd_prs ledger",
-          "status": "partial",
+          "name": "Complete SquareFree and IsSquareFree general/variable cpp4529-4598,7232-7246: assertion actions, derivative/GCD/division and receipt-bound final arithmetic; PrimitivePart/IsPrimitive are complete in the gcd_prs ledger",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_square_free.go",
           "tests": [
             "TestPolynomialPublicPrimitivePartLiteralContent",
@@ -45364,7 +45364,8 @@
             "TestPolynomialSquareFreeDormantSourceSevenExpressions",
             "TestPolynomialSquareFreeEveryCheckpointFrontier",
             "TestPolynomialSquareFreeCallerPublicationPreservesForeignCallbackRoot",
-            "TestPolynomialSquareFreeCalleeAbortPreservesEarlierDerivativeCohort"
+            "TestPolynomialSquareFreeCalleeAbortPreservesEarlierDerivativeCohort",
+            "TestPolynomialSquareFreeSourceAssertionActions"
           ]
         },
         {
