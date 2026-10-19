@@ -43741,8 +43741,8 @@
           ]
         },
         {
-          "name": "max/search/is_valid/square queries cpp236\u2013375: PARTIAL precise malformed-field reads: several queries read whole header eagerly. IsValid raw sorted-vars then degree-sum then stored-degree read corrected; source source small-vs-large search branch/results preserved.",
-          "status": "partial",
+          "name": "complete max/search/is_valid/square query block cpp218,236\u2013375,423\u2013437 with exact reached-field reads and retained small/large search branches",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -43769,6 +43769,14 @@
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialReadOrderEmptyQueries",
+            "TestMonomialReadOrderVariableOnlySearch",
+            "TestMonomialReadOrderSeparateMaximumFields",
+            "TestMonomialReadOrderMaxSmallerVariableOnly",
+            "TestMonomialReadOrderParityOnly",
+            "TestMonomialPredecessorSourceAssertionActions",
+            "TestMonomialPredecessorResultAssertionActions",
+            "TestMonomialPredecessorSourceConditionalTrace",
             "TestMonomialNativeScratchGrowthResetAndBounds",
             "TestMonomialNativeVariableCountingAndInterning",
             "TestMonomialNativeTableGrowthRenameAndOrder",
@@ -47909,8 +47917,8 @@
           ]
         },
         {
-          "name": "max/search/is_valid/square queries cpp236\u2013375: PARTIAL precise malformed-field reads: several queries read whole header eagerly. IsValid raw sorted-vars then degree-sum then stored-degree read corrected; source source small-vs-large search branch/results preserved.",
-          "status": "partial",
+          "name": "complete max/search/is_valid/square query block cpp218,236\u2013375,423\u2013437 with exact reached-field reads and retained small/large search branches",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -47937,6 +47945,14 @@
             "TestMonomialSourceSingletonValidityDoesNotReadPower",
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
+            "TestMonomialReadOrderEmptyQueries",
+            "TestMonomialReadOrderVariableOnlySearch",
+            "TestMonomialReadOrderSeparateMaximumFields",
+            "TestMonomialReadOrderMaxSmallerVariableOnly",
+            "TestMonomialReadOrderParityOnly",
+            "TestMonomialPredecessorSourceAssertionActions",
+            "TestMonomialPredecessorResultAssertionActions",
+            "TestMonomialPredecessorSourceConditionalTrace",
             "TestMonomialNativeScratchGrowthResetAndBounds",
             "TestMonomialNativeVariableCountingAndInterning",
             "TestMonomialNativeTableGrowthRenameAndOrder",
