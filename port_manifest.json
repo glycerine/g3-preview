@@ -44890,7 +44890,19 @@
           ]
         },
         {
-          "name": "Sparse interpolator actual source constructor/reset/add/interpolate cpp3072-3182, scalar/integer content3343-3359/3384-3428, GlexMonic6843-6862/7388-7390 and borrowed indexed construction",
+          "name": "Complete sparse interpolator constructor, destructor, reset, ready, add and interpolate bodies cpp3072-3182 with source assertion actions",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_sparse_interpolator.go",
+          "tests": [
+            "TestPolynomialSparseNullSkeletonAssertionActions",
+            "TestPolynomialSparseInputLimitAssertionActions",
+            "TestPolynomialSparseInterpolatorIndependentThreeSamples",
+            "TestPolynomialSparseInterpolationSourceTraceSequence",
+            "TestPolynomialSparseInterpolationEveryActualReservationPrefix"
+          ]
+        },
+        {
+          "name": "Selected scalar/integer content cpp3343-3359/3384-3428, GlexMonic6843-6862/7388-7390 and borrowed indexed construction",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_sparse_interpolator.go",
           "tests": [
@@ -49050,7 +49062,19 @@
           ]
         },
         {
-          "name": "Sparse interpolator actual source constructor/reset/add/interpolate cpp3072-3182, scalar/integer content3343-3359/3384-3428, GlexMonic6843-6862/7388-7390 and borrowed indexed construction",
+          "name": "Complete sparse interpolator constructor, destructor, reset, ready, add and interpolate bodies cpp3072-3182 with source assertion actions",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_sparse_interpolator.go",
+          "tests": [
+            "TestPolynomialSparseNullSkeletonAssertionActions",
+            "TestPolynomialSparseInputLimitAssertionActions",
+            "TestPolynomialSparseInterpolatorIndependentThreeSamples",
+            "TestPolynomialSparseInterpolationSourceTraceSequence",
+            "TestPolynomialSparseInterpolationEveryActualReservationPrefix"
+          ]
+        },
+        {
+          "name": "Selected scalar/integer content cpp3343-3359/3384-3428, GlexMonic6843-6862/7388-7390 and borrowed indexed construction",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_sparse_interpolator.go",
           "tests": [

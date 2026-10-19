@@ -147,22 +147,19 @@ func (s *PolynomialSparseInterpolator) Add(in *unumeral.Int, q Polynomial) (ok b
 	}
 	s.beginExecution()
 	defer func() { s.endExecution(err) }()
+	if e := polynomialSparseSourceAssert(3113, "m_skeleton", func() (bool, error) { return s.skeleton != nil, nil }); e != nil {
+		return false, e
+	}
 	if s.skeleton == nil {
-		if polynomialSourceDebug {
-			return false, ErrPolynomialAssertion
-		}
 		return false, ErrPolynomialOwner
 	}
 	m := s.owner.core
 	inputIndex := uint32(len(s.inputs))
-	if polynomialSourceDebug {
-		n, e := s.skeleton.MaxNumPowers()
-		if e != nil {
-			return false, e
-		}
-		if inputIndex >= n {
-			return false, ErrPolynomialAssertion
-		}
+	if e := polynomialSparseSourceAssert(3114, "m_inputs.size() < m_skeleton->max_num_powers()", func() (bool, error) {
+		n, x := s.skeleton.MaxNumPowers()
+		return inputIndex < n, x
+	}); e != nil {
+		return false, e
 	}
 	s.inputs = append(s.inputs, unumeral.Int{})
 	if e := s.copyField(s.inputs, inputIndex, in); e != nil {

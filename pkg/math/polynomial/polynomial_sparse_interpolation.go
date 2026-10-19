@@ -172,10 +172,10 @@ func (s *PolynomialSparseInterpolator) Interpolate(out *PolynomialRef) (ok bool,
 	if e := out.open(); e != nil {
 		return false, e
 	}
+	if e := polynomialSparseSourceAssert(3135, "m_skeleton", func() (bool, error) { return s.skeleton != nil, nil }); e != nil {
+		return false, e
+	}
 	if s.skeleton == nil {
-		if polynomialSourceDebug {
-			return false, ErrPolynomialAssertion
-		}
 		return false, ErrPolynomialOwner
 	}
 	f := &s.interpolation

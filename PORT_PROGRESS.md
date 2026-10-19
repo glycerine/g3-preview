@@ -46192,3 +46192,16 @@ bounds boundary without recreating C++ vector storage. Skeleton/vector tests
 pass in native, checked, debug and combined checked/debug/trace profiles on
 CPUs 8-16. The skeleton method row is ported; sparse interpolation and recursive
 GCD consumers remain separate partial blocks.
+
+Sparse interpolator completion: `sparse_interpolator` at
+`polynomial.cpp:3072-3182` now covers construction, conditional destruction,
+reset, readiness, sample publication, missing-support refusal, Vandermonde
+construction, modular solving, coefficient filtering and polynomial-reference
+publication. Its lexical numeral vectors, monomial slice, scalar and modular
+solver preserve source construction and reverse destruction, including stopped
+owning continuations. Both TRACE bodies retain source insertion order. The
+three explicit `SASSERT` sites now read the process assertion switch before
+their predicates and honor Throw or Continue; disabled assertions skip the
+predicate. All sparse-focused tests pass in native, checked, debug and combined
+checked/debug/trace profiles on CPUs 8-16. The sparse method row is ported;
+scalar/integer content and GlexMonic remain separate partial algorithms.
