@@ -334,6 +334,8 @@ func TestUPolynomialRefinementFaultPrefixesImmediateRoots(t *testing.T) {
 
 					upolyHenselAuditPhysical(t, []*UPolynomialManager{m}, nil, upolyPhysicalExtraOwners{Rationals: []*unumeral.Rational{&qa, &qb}, RationalManagers: []*unumeral.RationalManager{q}, BinaryValues: []*unumeral.BinaryRational{&a, &b, &c, &d}, BinaryManagers: []*unumeral.BinaryRationalManager{bqm}})
 					budget.FailAfter(-1)
+					// Exact immediate owners were inspected before releasing the retained bounds.
+					serviceMust(t, m.CleanupIntervalConversion())
 					if e != nil {
 						failures++
 						if !numericStorageReservationRefusal(e) {

@@ -8,8 +8,9 @@ import (
 )
 
 type upolyConvertEntryReceipt struct {
-	owner      *UPolynomialManager
-	invocation uint64
+	boundsInvocation uint64
+	owner            *UPolynomialManager
+	invocation       uint64
 }
 type upolyConvertEntryScope struct {
 	owner                     *UPolynomialManager
@@ -37,19 +38,33 @@ func (q *upolyConvertEntryScope) pending() bool {
 	return false
 }
 func (m *UPolynomialManager) convertEntryReceiptPending(r *upolyConvertEntryReceipt) bool {
-	return r != nil && r.owner == m && r.invocation != 0 && r.invocation == m.convertEntry.invocation && m.convertEntry.active
+	return r != nil && r.owner == m && ((r.invocation != 0 && r.invocation == m.convertEntry.invocation && m.convertEntry.active) || (r.boundsInvocation != 0 && r.boundsInvocation == m.intervalBounds.invocation && m.intervalBounds.active))
 }
 func (m *UPolynomialManager) convertEntryReceiptSourceCause(r *upolyConvertEntryReceipt) error {
-	if m.convertEntryReceiptPending(r) {
+	if r == nil || r.owner != m {
+		return nil
+	}
+	if r.boundsInvocation != 0 && r.boundsInvocation == m.intervalBounds.invocation && m.intervalBounds.active {
+		return m.intervalBounds.sourceCause
+	}
+	if r.invocation != 0 && r.invocation == m.convertEntry.invocation && m.convertEntry.active {
 		return m.convertEntry.sourceCause
 	}
 	return nil
 }
 func (m *UPolynomialManager) cleanupConvertEntryReceipt(r *upolyConvertEntryReceipt) error {
-	if !m.convertEntryReceiptPending(r) {
+	if r == nil || r.owner != m {
 		return nil
 	}
-	return m.CleanupConversionEntryTrace()
+	if r.boundsInvocation != 0 && r.boundsInvocation == m.intervalBounds.invocation && m.intervalBounds.active {
+		if e := m.cleanupIntervalBounds(); e != nil {
+			return e
+		}
+	}
+	if r.invocation != 0 && r.invocation == m.convertEntry.invocation && m.convertEntry.active {
+		return m.CleanupConversionEntryTrace()
+	}
+	return nil
 }
 func (m *UPolynomialManager) traceConvertEntry(bqm *unumeral.BinaryRationalManager, a, b *unumeral.Rational, sa, sb int, receipt *upolyConvertEntryReceipt) error {
 	tags := m.modular.BorrowTraceTags()
@@ -78,7 +93,7 @@ func (m *UPolynomialManager) traceConvertEntry(bqm *unumeral.BinaryRationalManag
 		}
 	}()
 	if receipt != nil {
-		*receipt = upolyConvertEntryReceipt{m, q.invocation}
+		*receipt = upolyConvertEntryReceipt{owner: m, invocation: q.invocation}
 	}
 	defer func() {
 		q.executing = false

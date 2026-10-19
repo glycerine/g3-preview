@@ -174,6 +174,10 @@ func upolyHenselAuditPhysical(t *testing.T, cores []*UPolynomialManager, factors
 			store = testFieldBySourceName(bindings.Index(i), "store")
 			stores[store.Pointer()] = store.Elem()
 		}
+		boundValues := testFieldBySourceName(testFieldBySourceName(core, "intervalBounds"), "values")
+		for i := 0; i < boundValues.Len(); i++ {
+			addInt(boundValues.Index(i).FieldByName("Num"))
+		}
 		refinableValues := testFieldBySourceName(testFieldBySourceName(core, "refinable"), "values")
 		for i := 0; i < refinableValues.Len(); i++ {
 			addInt(refinableValues.Index(i).FieldByName("Num"))

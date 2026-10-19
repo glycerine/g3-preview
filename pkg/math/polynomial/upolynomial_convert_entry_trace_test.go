@@ -59,6 +59,11 @@ func TestUPolynomialConvertEntryTraceSourceRecord(t *testing.T) {
 						}
 					} else {
 						want := fmt.Sprintf("-------- [convert_bug] convert_q2bq_interval src/math/polynomial/upolynomial.cpp:2823 ---------\na: %d/%d\nb: %d/%d\nsign_a: -1\nsign_b: 1\n------------------------------------------------\n", an, ad, bn, bd)
+						if fractional {
+							want += "-------- [convert_bug] convert_q2bq_interval src/math/polynomial/upolynomial.cpp:2841 ---------\na: 2/3\nlower: 1/2, upper: 1\n------------------------------------------------\n"
+						} else {
+							want += "-------- [convert_bug] convert_q2bq_interval src/math/polynomial/upolynomial.cpp:2830 ---------\nfound c: 0\n------------------------------------------------\n"
+						}
 						if text.String() != want {
 							t.Fatal("source entry record", text.String(), want)
 						}

@@ -50958,7 +50958,11 @@
         "pkg/math/polynomial/algebraic_rational_multiply.go",
         "pkg/math/polynomial/algebraic_inverse.go",
         "pkg/util/numeral/mpbq_string_source.go",
-        "pkg/util/numeral/mpbq_string_source_test.go"
+        "pkg/util/numeral/mpbq_string_source_test.go",
+        "pkg/util/numeral/mpbq_display_source.go",
+        "pkg/util/numeral/mpbq_display_source_test.go",
+        "pkg/math/polynomial/upolynomial_convert_bounds_trace.go",
+        "pkg/math/polynomial/upolynomial_convert_bounds_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -51321,7 +51325,11 @@
         "TestUPolynomialConvertEntryTraceActualReadStops",
         "TestAlgebraicInverseConversionEntryActualSourceStop",
         "TestBinarySourceStringRawShapeAndScalarPower",
-        "TestBinarySourceStringLargeZeroNumeralBudget"
+        "TestBinarySourceStringLargeZeroNumeralBudget",
+        "TestBinaryDisplaySourceNumeratorStringAndExponentFlags",
+        "TestUPolynomialConvertNegativeBoundsTraceAfterSwap",
+        "TestUPolynomialConvertBoundsActualReadStops",
+        "TestAlgebraicInverseBoundsTraceActualSourceStop"
       ],
       "conditionals": [
         {
@@ -51910,6 +51918,35 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Remaining conversion bound trace records and concrete lower/upper scope (upolynomial.cpp:2828-2916; trace2830,2841)",
+          "status": "partial",
+          "go_targets": [
+            "pkg/util/numeral/mpbq_display_source.go",
+            "pkg/util/numeral/mpbq_display_source_test.go",
+            "pkg/math/polynomial/upolynomial_convert_bounds_trace.go",
+            "pkg/math/polynomial/upolynomial_convert_bounds_trace_test.go",
+            "pkg/math/polynomial/upolynomial_convert_entry_trace.go",
+            "pkg/math/polynomial/upolynomial_convert_entry_trace_test.go",
+            "pkg/math/polynomial/upolynomial_refinement.go",
+            "pkg/math/polynomial/upolynomial_refinement_source_test.go",
+            "pkg/math/polynomial/upolynomial_convert_final_assertions.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_modes.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/upolynomial_hensel_physical_source_test.go",
+            "pkg/math/polynomial/algebraic_root.go"
+          ],
+          "tests": [
+            "TestBinaryDisplaySourceNumeratorStringAndExponentFlags",
+            "TestUPolynomialConvertNegativeBoundsTraceAfterSwap",
+            "TestUPolynomialConvertBoundsActualReadStops",
+            "TestAlgebraicInverseBoundsTraceActualSourceStop",
+            "TestUPolynomialConvertEntryTraceSourceRecord",
+            "TestUPolynomialRefinementFaultPrefixesImmediateRoots"
+          ],
+          "notes": "Both remaining convert_bug records now preserve actual scoped-numeral display dispatch and source insertion order: found-c precedes publication, and nonexact lower/upper follows the negative swap. mpzzp rational NUM/DEN display uses direct tracked integer insertion without adding to_string normalization assertions; binary display completes a default numerator string then inserts exponent with receiving stream flags. Actual lower/upper locals have reverse source NUM destruction and separate owning cursors, accepted copy/evaluation/format receipts, exact entry/bounds invocation transport to existing algebraic callers and callback borrowing. Explicit found-root NUM deletes retain source order before scoped destruction. Read guards distinguish caller-input failure(count0/no invented source cause), lower(count1) and upper(count2) source stops without changing numerical data or construction counters. Actual inverse caller reaches its own denominator stop after both bounds finish. Original conversion refusal horizon/physical audit remains intact with explicit new bound cleanup afterward. Trace coverage is complete for convert_q2bq_interval, but wider binary-manager numerical/import/debug/source-lifetime audit remains open; no whole-unit promotion."
+        },
         {
           "name": "Refinable traces use concrete shared binary to_string (upolynomial.cpp:2615,2640,2693; mpbq.cpp:384-392)",
           "status": "ported",
@@ -53595,7 +53632,12 @@
         "pkg/math/polynomial/upolynomial_convert_entry_trace_test.go",
         "pkg/math/polynomial/algebraic_rational_arithmetic.go",
         "pkg/math/polynomial/algebraic_rational_multiply.go",
-        "pkg/math/polynomial/algebraic_inverse.go"
+        "pkg/math/polynomial/algebraic_inverse.go",
+        "pkg/util/numeral/mpbq_display_source.go",
+        "pkg/util/numeral/mpbq_display_source_test.go",
+        "pkg/math/polynomial/upolynomial_convert_bounds_trace.go",
+        "pkg/math/polynomial/upolynomial_convert_bounds_trace_test.go",
+        "pkg/math/polynomial/upolynomial_convert_final_assertions.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -53740,7 +53782,11 @@
         "TestUPolynomialConvertEntryTraceSourceRecord",
         "TestUPolynomialConvertEntryTraceAfterAssertionsAndErasure",
         "TestUPolynomialConvertEntryTraceActualReadStops",
-        "TestAlgebraicInverseConversionEntryActualSourceStop"
+        "TestAlgebraicInverseConversionEntryActualSourceStop",
+        "TestBinaryDisplaySourceNumeratorStringAndExponentFlags",
+        "TestUPolynomialConvertNegativeBoundsTraceAfterSwap",
+        "TestUPolynomialConvertBoundsActualReadStops",
+        "TestAlgebraicInverseBoundsTraceActualSourceStop"
       ],
       "conditionals": [
         {
@@ -53769,6 +53815,35 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Remaining conversion bound trace records and concrete lower/upper scope (upolynomial.cpp:2828-2916; trace2830,2841)",
+          "status": "partial",
+          "go_targets": [
+            "pkg/util/numeral/mpbq_display_source.go",
+            "pkg/util/numeral/mpbq_display_source_test.go",
+            "pkg/math/polynomial/upolynomial_convert_bounds_trace.go",
+            "pkg/math/polynomial/upolynomial_convert_bounds_trace_test.go",
+            "pkg/math/polynomial/upolynomial_convert_entry_trace.go",
+            "pkg/math/polynomial/upolynomial_convert_entry_trace_test.go",
+            "pkg/math/polynomial/upolynomial_refinement.go",
+            "pkg/math/polynomial/upolynomial_refinement_source_test.go",
+            "pkg/math/polynomial/upolynomial_convert_final_assertions.go",
+            "pkg/math/polynomial/upolynomial.go",
+            "pkg/math/polynomial/upolynomial_modes.go",
+            "pkg/math/polynomial/upolynomial_source_finalize.go",
+            "pkg/math/polynomial/upolynomial_hensel_physical_source_test.go",
+            "pkg/math/polynomial/algebraic_root.go"
+          ],
+          "tests": [
+            "TestBinaryDisplaySourceNumeratorStringAndExponentFlags",
+            "TestUPolynomialConvertNegativeBoundsTraceAfterSwap",
+            "TestUPolynomialConvertBoundsActualReadStops",
+            "TestAlgebraicInverseBoundsTraceActualSourceStop",
+            "TestUPolynomialConvertEntryTraceSourceRecord",
+            "TestUPolynomialRefinementFaultPrefixesImmediateRoots"
+          ],
+          "notes": "Both remaining convert_bug records now preserve actual scoped-numeral display dispatch and source insertion order: found-c precedes publication, and nonexact lower/upper follows the negative swap. mpzzp rational NUM/DEN display uses direct tracked integer insertion without adding to_string normalization assertions; binary display completes a default numerator string then inserts exponent with receiving stream flags. Actual lower/upper locals have reverse source NUM destruction and separate owning cursors, accepted copy/evaluation/format receipts, exact entry/bounds invocation transport to existing algebraic callers and callback borrowing. Explicit found-root NUM deletes retain source order before scoped destruction. Read guards distinguish caller-input failure(count0/no invented source cause), lower(count1) and upper(count2) source stops without changing numerical data or construction counters. Actual inverse caller reaches its own denominator stop after both bounds finish. Original conversion refusal horizon/physical audit remains intact with explicit new bound cleanup afterward. Trace coverage is complete for convert_q2bq_interval, but wider binary-manager numerical/import/debug/source-lifetime audit remains open; no whole-unit promotion."
+        },
         {
           "name": "Rational-to-binary conversion entry trace before binary temporaries (upolynomial.cpp:2823-2827)",
           "status": "ported",
@@ -161789,7 +161864,11 @@
         "pkg/util/numeral/mpbq_string_source.go",
         "pkg/util/numeral/mpbq_string_source_test.go",
         "pkg/math/polynomial/upolynomial_refinable_scope.go",
-        "pkg/math/polynomial/upolynomial_refinable_trace_test.go"
+        "pkg/math/polynomial/upolynomial_refinable_trace_test.go",
+        "pkg/util/numeral/mpbq_display_source.go",
+        "pkg/util/numeral/mpbq_display_source_test.go",
+        "pkg/math/polynomial/upolynomial_convert_bounds_trace.go",
+        "pkg/math/polynomial/upolynomial_convert_bounds_trace_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -161828,7 +161907,11 @@
         "TestBinarySourceStringRawShapeAndScalarPower",
         "TestBinarySourceStringLargeZeroNumeralBudget",
         "TestUPolynomialRefinableTraceSourceRecords",
-        "TestUPolynomialRefinableTraceActualReadStops"
+        "TestUPolynomialRefinableTraceActualReadStops",
+        "TestBinaryDisplaySourceNumeratorStringAndExponentFlags",
+        "TestUPolynomialConvertNegativeBoundsTraceAfterSwap",
+        "TestUPolynomialConvertBoundsActualReadStops",
+        "TestAlgebraicInverseBoundsTraceActualSourceStop"
       ],
       "conditionals": [
         {
@@ -162113,6 +162196,24 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained tracked binary display and scoped stream dispatch (mpbq.cpp:394-401; scoped_numeral.h:186-189)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpbq_display_source.go",
+          "go_targets": [
+            "pkg/util/numeral/mpbq_display_source.go",
+            "pkg/util/numeral/mpbq_display_source_test.go",
+            "pkg/math/polynomial/upolynomial_convert_bounds_trace.go",
+            "pkg/math/polynomial/upolynomial_convert_bounds_trace_test.go"
+          ],
+          "tests": [
+            "TestBinaryDisplaySourceNumeratorStringAndExponentFlags",
+            "TestUPolynomialConvertNegativeBoundsTraceAfterSwap",
+            "TestUPolynomialConvertBoundsActualReadStops",
+            "TestAlgebraicInverseBoundsTraceActualSourceStop"
+          ],
+          "notes": "Concrete BinaryRationalSourceStream exposes only the reached C-string and uint32 insertion types. DisplaySourceTracked completes actual integer-to-string formatting with a captured child before outputting the numerator, then inserts /2, ^ and unsigned exponent separately. An actual hexadecimal receiving NumericTextStream leaves numerator -31 decimal while rendering exponent31 as0x1f. This shares the retained source formatter without porting STL. Live polynomial exact/nonexact conversion records use the helper and retain its exact character receipts; source read-guard and owning cleanup evidence remains in the actual caller."
+        },
         {
           "name": "Retained binary to_string with actual formatting receipt (mpbq.cpp:384-392; upolynomial.cpp:2615,2640,2693)",
           "status": "ported",
@@ -162428,7 +162529,11 @@
         "pkg/util/numeral/mpbq_string_source.go",
         "pkg/util/numeral/mpbq_string_source_test.go",
         "pkg/math/polynomial/upolynomial_refinable_scope.go",
-        "pkg/math/polynomial/upolynomial_refinable_trace_test.go"
+        "pkg/math/polynomial/upolynomial_refinable_trace_test.go",
+        "pkg/util/numeral/mpbq_display_source.go",
+        "pkg/util/numeral/mpbq_display_source_test.go",
+        "pkg/math/polynomial/upolynomial_convert_bounds_trace.go",
+        "pkg/math/polynomial/upolynomial_convert_bounds_trace_test.go"
       ],
       "tests": [
         "TestBinarySourceTst1",
@@ -162467,7 +162572,11 @@
         "TestBinarySourceStringRawShapeAndScalarPower",
         "TestBinarySourceStringLargeZeroNumeralBudget",
         "TestUPolynomialRefinableTraceSourceRecords",
-        "TestUPolynomialRefinableTraceActualReadStops"
+        "TestUPolynomialRefinableTraceActualReadStops",
+        "TestBinaryDisplaySourceNumeratorStringAndExponentFlags",
+        "TestUPolynomialConvertNegativeBoundsTraceAfterSwap",
+        "TestUPolynomialConvertBoundsActualReadStops",
+        "TestAlgebraicInverseBoundsTraceActualSourceStop"
       ],
       "conditionals": [
         {
@@ -162482,6 +162591,24 @@
       "methods_audited": true,
       "ownership_audited": true,
       "methods": [
+        {
+          "name": "Retained tracked binary display and scoped stream dispatch (mpbq.cpp:394-401; scoped_numeral.h:186-189)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mpbq_display_source.go",
+          "go_targets": [
+            "pkg/util/numeral/mpbq_display_source.go",
+            "pkg/util/numeral/mpbq_display_source_test.go",
+            "pkg/math/polynomial/upolynomial_convert_bounds_trace.go",
+            "pkg/math/polynomial/upolynomial_convert_bounds_trace_test.go"
+          ],
+          "tests": [
+            "TestBinaryDisplaySourceNumeratorStringAndExponentFlags",
+            "TestUPolynomialConvertNegativeBoundsTraceAfterSwap",
+            "TestUPolynomialConvertBoundsActualReadStops",
+            "TestAlgebraicInverseBoundsTraceActualSourceStop"
+          ],
+          "notes": "Concrete BinaryRationalSourceStream exposes only the reached C-string and uint32 insertion types. DisplaySourceTracked completes actual integer-to-string formatting with a captured child before outputting the numerator, then inserts /2, ^ and unsigned exponent separately. An actual hexadecimal receiving NumericTextStream leaves numerator -31 decimal while rendering exponent31 as0x1f. This shares the retained source formatter without porting STL. Live polynomial exact/nonexact conversion records use the helper and retain its exact character receipts; source read-guard and owning cleanup evidence remains in the actual caller."
+        },
         {
           "name": "Retained binary to_string with actual formatting receipt (mpbq.cpp:384-392; upolynomial.cpp:2615,2640,2693)",
           "status": "ported",

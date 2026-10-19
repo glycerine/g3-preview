@@ -408,7 +408,7 @@ func (m *UPolynomialManager) refineToPrecisionWithEvaluationReceipt(v UPolynomia
 func (m *UPolynomialManager) ConvertRationalToBinaryInterval(v UPolynomialView, qm *unumeral.RationalManager, a, b *unumeral.Rational, bqm *unumeral.BinaryRationalManager, c, d *unumeral.BinaryRational) (bool, error) {
 	return m.convertRationalToBinaryIntervalWithEntryReceipt(v, qm, a, b, bqm, c, d, nil)
 }
-func (m *UPolynomialManager) convertRationalToBinaryIntervalWithEntryReceipt(v UPolynomialView, qm *unumeral.RationalManager, a, b *unumeral.Rational, bqm *unumeral.BinaryRationalManager, c, d *unumeral.BinaryRational, receipt *upolyConvertEntryReceipt) (bool, error) {
+func (m *UPolynomialManager) convertRationalToBinaryIntervalWithEntryReceipt(v UPolynomialView, qm *unumeral.RationalManager, a, b *unumeral.Rational, bqm *unumeral.BinaryRationalManager, c, d *unumeral.BinaryRational, receipt *upolyConvertEntryReceipt) (result bool, cause error) {
 	if e := m.isolationBinary(bqm); e != nil {
 		return false, e
 	}
@@ -430,25 +430,31 @@ func (m *UPolynomialManager) convertRationalToBinaryIntervalWithEntryReceipt(v U
 	if e := m.traceConvertEntry(bqm, a, b, sa, sb, receipt); e != nil {
 		return false, e
 	}
-	var lower, upper unumeral.BinaryRational
-	defer bqm.Del(&lower)
-	defer bqm.Del(&upper)
-	exact, e := bqm.FromRational(qm, a, &lower)
+	q, e := m.beginIntervalBounds(bqm, receipt)
+	if e != nil {
+		return false, e
+	}
+	defer func() { cause = q.finish(cause) }()
+	lower, upper := &q.values[0], &q.values[1]
+	exact, e := bqm.FromRational(qm, a, lower)
 	if e != nil {
 		return false, e
 	}
 	if exact {
-		if e = bqm.Swap(c, &lower); e != nil {
+		if e = q.trace(2830, nil); e != nil {
+			return false, e
+		}
+		if e = bqm.Swap(c, lower); e != nil {
 			return false, e
 		}
 		if e := m.convertBoundAssertion(2833, bqm, c, qm, a); e != nil {
 			return false, e
 		}
 	} else {
-		if e = bqm.Copy(&upper, &lower); e != nil {
+		if e = bqm.CopyWithAllocationReceipt(upper, lower, &q.copy); e != nil {
 			return false, e
 		}
-		if e = bqm.Mul2(&upper); e != nil {
+		if e = bqm.Mul2(upper); e != nil {
 			return false, e
 		}
 		neg, e := m.config.Integer.IsNeg(&(*a.BorrowNumerator()))
@@ -456,50 +462,53 @@ func (m *UPolynomialManager) convertRationalToBinaryIntervalWithEntryReceipt(v U
 			return false, e
 		}
 		if neg {
-			lower, upper = upper, lower
+			*lower, *upper = *upper, *lower
 		}
-		if e := m.convertBoundAssertion(2844, bqm, &lower, qm, a); e != nil {
+		if e = q.trace(2841, a); e != nil {
 			return false, e
 		}
-		if e := m.convertBoundAssertion(2845, bqm, &upper, qm, a); e != nil {
+		if e := m.convertBoundAssertion(2844, bqm, lower, qm, a); e != nil {
+			return false, e
+		}
+		if e := m.convertBoundAssertion(2845, bqm, upper, qm, a); e != nil {
 			return false, e
 		}
 
 		for {
-			ge, e := bqm.GreaterEqualRational(&upper, qm, b)
+			ge, e := bqm.GreaterEqualRational(upper, qm, b)
 			if e != nil {
 				return false, e
 			}
 			if !ge {
 				break
 			}
-			if e = bqm.RefineUpper(qm, a, &lower, &upper); e != nil {
+			if e = bqm.RefineUpper(qm, a, lower, upper); e != nil {
 				return false, e
 			}
 		}
-		if e := m.convertBoundAssertion(2849, bqm, &upper, qm, b); e != nil {
+		if e := m.convertBoundAssertion(2849, bqm, upper, qm, b); e != nil {
 			return false, e
 		}
 
 		for {
-			sign, e := m.EvalSignBinary(v, &upper)
+			sign, e := q.eval(v, upper)
 			if e != nil {
 				return false, e
 			}
 			if sign == 0 {
-				if e = bqm.Swap(c, &upper); e != nil {
+				if e = bqm.Swap(c, upper); e != nil {
 					return false, e
 				}
-				if e = bqm.Del(&lower); e != nil {
+				if e = unumeral.SourceIntegerDel(m.config.Integer, lower.BorrowNumerator()); e != nil {
 					return false, e
 				}
-				if e = bqm.Del(&upper); e != nil {
+				if e = unumeral.SourceIntegerDel(m.config.Integer, upper.BorrowNumerator()); e != nil {
 					return false, e
 				}
 				return false, nil
 			}
 			if sign == sa {
-				if e = bqm.Swap(c, &upper); e != nil {
+				if e = bqm.Swap(c, upper); e != nil {
 					return false, e
 				}
 				break
@@ -509,32 +518,32 @@ func (m *UPolynomialManager) convertRationalToBinaryIntervalWithEntryReceipt(v U
 			}
 			if !foundD {
 				foundD = true
-				if e = bqm.Copy(d, &upper); e != nil {
+				if e = bqm.CopyWithAllocationReceipt(d, upper, &q.copy); e != nil {
 					return false, e
 				}
 			}
-			if e = bqm.RefineUpper(qm, a, &lower, &upper); e != nil {
+			if e = bqm.RefineUpper(qm, a, lower, upper); e != nil {
 				return false, e
 			}
 		}
 	}
 	if !foundD {
-		exact, e = bqm.FromRational(qm, b, &lower)
+		exact, e = bqm.FromRational(qm, b, lower)
 		if e != nil {
 			return false, e
 		}
 		if exact {
-			if e = bqm.Swap(d, &lower); e != nil {
+			if e = bqm.Swap(d, lower); e != nil {
 				return false, e
 			}
 			if e := m.convertBoundAssertion(2879, bqm, d, qm, b); e != nil {
 				return false, e
 			}
 		} else {
-			if e = bqm.Copy(&upper, &lower); e != nil {
+			if e = bqm.CopyWithAllocationReceipt(upper, lower, &q.copy); e != nil {
 				return false, e
 			}
-			if e = bqm.Mul2(&upper); e != nil {
+			if e = bqm.Mul2(upper); e != nil {
 				return false, e
 			}
 			neg, e := m.config.Integer.IsNeg(&(*b.BorrowNumerator()))
@@ -542,61 +551,61 @@ func (m *UPolynomialManager) convertRationalToBinaryIntervalWithEntryReceipt(v U
 				return false, e
 			}
 			if neg {
-				lower, upper = upper, lower
+				*lower, *upper = *upper, *lower
 			}
-			if e := m.convertBoundAssertion(2887, bqm, &upper, qm, b); e != nil {
+			if e := m.convertBoundAssertion(2887, bqm, upper, qm, b); e != nil {
 				return false, e
 			}
-			if e := m.convertBoundAssertion(2888, bqm, &lower, qm, b); e != nil {
+			if e := m.convertBoundAssertion(2888, bqm, lower, qm, b); e != nil {
 				return false, e
 			}
 
 			for {
-				le, e := bqm.LessEqual(&lower, c)
+				le, e := bqm.LessEqual(lower, c)
 				if e != nil {
 					return false, e
 				}
 				if !le {
 					break
 				}
-				if e = bqm.RefineLower(qm, b, &lower, &upper); e != nil {
+				if e = bqm.RefineLower(qm, b, lower, upper); e != nil {
 					return false, e
 				}
 			}
-			if e := m.convertBinaryOrderAssertion(2892, bqm, c, &lower); e != nil {
+			if e := m.convertBinaryOrderAssertion(2892, bqm, c, lower); e != nil {
 				return false, e
 			}
-			if e := m.convertBinaryOrderAssertion(2893, bqm, &lower, &upper); e != nil {
+			if e := m.convertBinaryOrderAssertion(2893, bqm, lower, upper); e != nil {
 				return false, e
 			}
-			if e := m.convertBoundAssertion(2894, bqm, &lower, qm, b); e != nil {
+			if e := m.convertBoundAssertion(2894, bqm, lower, qm, b); e != nil {
 				return false, e
 			}
 
 			for {
-				sign, e := m.EvalSignBinary(v, &lower)
+				sign, e := q.eval(v, lower)
 				if e != nil {
 					return false, e
 				}
 				if sign == 0 {
-					if e = bqm.Swap(c, &lower); e != nil {
+					if e = bqm.Swap(c, lower); e != nil {
 						return false, e
 					}
-					if e = bqm.Del(&lower); e != nil {
+					if e = unumeral.SourceIntegerDel(m.config.Integer, lower.BorrowNumerator()); e != nil {
 						return false, e
 					}
-					if e = bqm.Del(&upper); e != nil {
+					if e = unumeral.SourceIntegerDel(m.config.Integer, upper.BorrowNumerator()); e != nil {
 						return false, e
 					}
 					return false, nil
 				}
 				if sign == sb {
-					if e = bqm.Swap(d, &lower); e != nil {
+					if e = bqm.Swap(d, lower); e != nil {
 						return false, e
 					}
 					break
 				}
-				if e = bqm.RefineLower(qm, b, &lower, &upper); e != nil {
+				if e = bqm.RefineLower(qm, b, lower, upper); e != nil {
 					return false, e
 				}
 			}
@@ -605,7 +614,7 @@ func (m *UPolynomialManager) convertRationalToBinaryIntervalWithEntryReceipt(v U
 	if e := m.convertBinaryOrderAssertion(2912, bqm, c, d); e != nil {
 		return false, e
 	}
-	if e := m.convertFinalSignAssertion(v, c, d); e != nil {
+	if e := m.convertFinalSignAssertionWithReceipt(v, c, d, &q.evaluation); e != nil {
 		return false, e
 	}
 	if e := m.convertBoundAssertion(2914, bqm, c, qm, a); e != nil {

@@ -37,15 +37,18 @@ func (m *UPolynomialManager) convertBinaryOrderAssertion(line int32, bqm *unumer
 // Source: upolynomial.cpp:2913. Both actual polynomial evaluations are inside
 // the runtime gate; disabled assertions create no evaluation child.
 func (m *UPolynomialManager) convertFinalSignAssertion(v UPolynomialView, c, d *unumeral.BinaryRational) error {
+	return m.convertFinalSignAssertionWithReceipt(v, c, d, nil)
+}
+func (m *UPolynomialManager) convertFinalSignAssertionWithReceipt(v UPolynomialView, c, d *unumeral.BinaryRational, receipt *upolyBinaryEvaluationInvocationReceipt) error {
 	enabled, e := refinementSourceAssertionsEnabled()
 	if e != nil || !enabled {
 		return e
 	}
-	sc, e := m.EvalSignBinary(v, c)
+	sc, e := m.evalSignBinaryWithNegScopeAndReceipt(v, c, nil, receipt)
 	if e != nil {
 		return e
 	}
-	sd, e := m.EvalSignBinary(v, d)
+	sd, e := m.evalSignBinaryWithNegScopeAndReceipt(v, d, nil, receipt)
 	if e != nil {
 		return e
 	}

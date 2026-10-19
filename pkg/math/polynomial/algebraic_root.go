@@ -968,7 +968,7 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 func (m *AlgebraicRootCore) CleanupRetained() error {
 	if m != nil && m.self == m {
 		for _, r := range []*upolyConvertEntryReceipt{&m.arithmetic.convertEntry, &m.inversion.convertEntry} {
-			if m.config.Polynomials.convertEntryReceiptPending(r) && m.config.Polynomials.convertEntry.NumericExecuting() {
+			if m.config.Polynomials.convertEntryReceiptPending(r) && (m.config.Polynomials.convertEntry.NumericExecuting() || m.config.Polynomials.intervalBounds.NumericExecuting()) {
 				return ErrAlgebraicPending
 			}
 		}

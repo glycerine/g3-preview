@@ -30,6 +30,7 @@ type UPolynomialConfig struct {
 // are required, even though operations without a checkpoint do not call them.
 // Cold ownership and every actual typed backing are charged to Integer's budget.
 type UPolynomialManager struct {
+	intervalBounds                          upolyIntervalBoundsScope
 	convertEntry                            upolyConvertEntryScope
 	refinable                               upolyRefinableScope
 	defaultNormalization                    upolyDefaultNormalizeScope
@@ -167,6 +168,9 @@ func newUPolynomialManager(c UPolynomialConfig, store *UPolynomialCoefficientSto
 	return m, nil
 }
 func (m *UPolynomialManager) check() error {
+	if m != nil && m.self == m && m.intervalBounds.active && (!m.intervalBounds.executing || m.intervalBounds.borrow.callback()) && !m.intervalBounds.sourceExecuting {
+		return ErrUPolynomialCleanupPending
+	}
 	if m != nil && m.self == m && m.convertEntry.active && (!m.convertEntry.executing || m.convertEntry.borrow.callback()) {
 		return ErrUPolynomialCleanupPending
 	}
@@ -368,6 +372,11 @@ func (m *UPolynomialManager) closeWithHenselOwners(r *upolyHenselPairInvocationR
 	return m.closeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
+	if m != nil && m.intervalBounds.active {
+		if e := m.CleanupIntervalConversion(); e != nil {
+			return e
+		}
+	}
 	if m != nil && m.convertEntry.active {
 		if e := m.CleanupConversionEntryTrace(); e != nil {
 			return e
