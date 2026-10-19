@@ -43449,8 +43449,8 @@
           ]
         },
         {
-          "name": "Horner composition exact MulAdd child binding and false/true owning acknowledgment before retry (polynomial.cpp:4798-4818); shared SOM cancellation state no longer strands borrowed linear monomials",
-          "status": "partial",
+          "name": "Complete Horner composition cpp4798-4818: exact MulAdd child binding, source cleanup, false/true owning acknowledgment and retry without stranded borrowed monomials",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_composition.go",
           "tests": ["TestPolynomialCompositionHornerChildCancellationCleanupAndRetry", "TestAlgebraicBinaryEveryReachedCancellationAndRetry"]
         },
@@ -47750,8 +47750,8 @@
           ]
         },
         {
-          "name": "Horner composition exact MulAdd child binding and false/true owning acknowledgment before retry (polynomial.cpp:4798-4818); shared SOM cancellation state no longer strands borrowed linear monomials",
-          "status": "partial",
+          "name": "Complete Horner composition cpp4798-4818: exact MulAdd child binding, source cleanup, false/true owning acknowledgment and retry without stranded borrowed monomials",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_composition.go",
           "tests": ["TestPolynomialCompositionHornerChildCancellationCleanupAndRetry", "TestAlgebraicBinaryEveryReachedCancellationAndRetry"]
         },
