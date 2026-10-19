@@ -43885,8 +43885,8 @@
           ]
         },
         {
-          "name": "tmp_monomial cpp507\u2013604: Real raw capacity128 source constructor and free-before-grow/copy-before-free paths. Source-only destructor versus explicit pending cleanup distinct; completed postphysical free acknowledged separately from genuine missing pointer hole.",
-          "status": "partial",
+          "name": "complete tmp_monomial block cpp507\u2013594: native []MonomialPower with source logical size/capacity 128, destructive reserve/init growth, preserving push-back growth, exact hash/reset and runtime assertion actions",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_tmp.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -43914,6 +43914,9 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialTemporaryCapacityAssertionActions",
+            "TestMonomialTemporaryDestructiveReserveAndPreservingExpand",
+            "TestMonomialReadOrderProductChosenCopyPrefix",
             "TestMonomialNativeVariableCountingAndInterning",
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",
@@ -48081,8 +48084,8 @@
           ]
         },
         {
-          "name": "tmp_monomial cpp507\u2013604: Real raw capacity128 source constructor and free-before-grow/copy-before-free paths. Source-only destructor versus explicit pending cleanup distinct; completed postphysical free acknowledged separately from genuine missing pointer hole.",
-          "status": "partial",
+          "name": "complete tmp_monomial block cpp507\u2013594: native []MonomialPower with source logical size/capacity 128, destructive reserve/init growth, preserving push-back growth, exact hash/reset and runtime assertion actions",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_tmp.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -48110,6 +48113,9 @@
             "TestMonomialSourceDegreeSumDoesNotReadVariable",
             "TestMonomialSourceValidityFieldShortCircuit",
             "TestMonomialNativeScratchGrowthResetAndBounds",
+            "TestMonomialTemporaryCapacityAssertionActions",
+            "TestMonomialTemporaryDestructiveReserveAndPreservingExpand",
+            "TestMonomialReadOrderProductChosenCopyPrefix",
             "TestMonomialNativeVariableCountingAndInterning",
             "TestMonomialNativeTableGrowthRenameAndOrder",
             "TestMonomialNativeTableCollisionsAndTemporaryPublication",

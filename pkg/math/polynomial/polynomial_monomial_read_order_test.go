@@ -296,13 +296,18 @@ func TestMonomialReadOrderProductChosenCopyPrefix(t *testing.T) {
 	if p != (MonomialPower{0, 3}) {
 		t.Fatal(p)
 	}
-	_, e = m.tempPower(&m.temps[1], 1)
+	p, e = m.tempPower(&m.temps[1], 1)
+	serviceMust(t, e)
+	if p != (MonomialPower{}) {
+		t.Fatal("source get_power reads the untouched allocated slot", p)
+	}
+	_, e = m.tempPower(&m.temps[1], m.temps[1].capacity)
 	if !errors.Is(e, arena.ErrBounds) {
-		t.Fatal("native scratch bounds", e)
+		t.Fatal("native scratch capacity bounds", e)
 	}
 	n, e := m.tempSize(&m.temps[1])
 	serviceMust(t, e)
-	if n != 1 {
+	if n != 0 {
 		t.Fatal(n)
 	}
 	monomialPhysicalAudit(t, m)

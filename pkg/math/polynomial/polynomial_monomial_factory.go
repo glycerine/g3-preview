@@ -433,7 +433,7 @@ func (m *MonomialManager) completeBorrowedContinuation() {
 func (m *MonomialManager) tempKeyWord(t *monomialTemp, word uint32) (uint32, error) {
 	switch word {
 	case 3:
-		return uint32(len(t.powers)), nil
+		return m.tempSize(t)
 	case 4:
 		return t.hash, nil
 	}

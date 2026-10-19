@@ -119,7 +119,9 @@ func TestMonomialNativeTableCollisionsAndTemporaryPublication(t *testing.T) {
 		}
 		ids[i] = id
 	}
-	serviceMust(t, m.tempInit(&m.temps[3], m.temps[1].powers))
+	powers, e := m.tempPowers(&m.temps[1])
+	serviceMust(t, e)
+	serviceMust(t, m.tempInit(&m.temps[3], powers))
 	m.temps[3].hash = 11
 	id, inserted, e := table.insert(m, monomialKey{monomialTemporaryKey, 3})
 	serviceMust(t, e)

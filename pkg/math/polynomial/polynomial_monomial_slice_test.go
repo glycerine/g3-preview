@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 )
 
 func TestMonomialNativeScratchGrowthResetAndBounds(t *testing.T) {
@@ -17,9 +18,9 @@ func TestMonomialNativeScratchGrowthResetAndBounds(t *testing.T) {
 	before, used := m.memory.Stats(), m.config.Budget.Used()
 	for _, tmp := range scratch {
 		for _, n := range []uint32{0, 1, 128, 129, 4097, 33} {
-			serviceMust(t, m.tempSetSize(tmp, 0))
+			serviceMust(t, m.tempReset(tmp))
 			for i := uint32(0); i < n; i++ {
-				serviceMust(t, m.tempSetPower(tmp, i, MonomialPower{17*i + 3, i%7 + 1}))
+				serviceMust(t, m.tempPushBack(tmp, MonomialPower{17*i + 3, i%7 + 1}))
 			}
 			size, e := m.tempSize(tmp)
 			serviceMust(t, e)
@@ -33,16 +34,16 @@ func TestMonomialNativeScratchGrowthResetAndBounds(t *testing.T) {
 					t.Fatal("independent power", i, got)
 				}
 			}
-			if _, e := m.tempPower(tmp, n); !errors.Is(e, arena.ErrBounds) {
-				t.Fatal("native bounds", e)
+			if _, e := m.tempPower(tmp, tmp.capacity); !errors.Is(e, arena.ErrBounds) {
+				t.Fatal("source capacity bounds", e)
 			}
 			serviceMust(t, m.tempSetSize(tmp, n/2))
 			serviceMust(t, m.tempSetSize(tmp, n))
 			for i := n / 2; i < n; i++ {
 				got, e := m.tempPower(tmp, i)
 				serviceMust(t, e)
-				if got != (MonomialPower{}) {
-					t.Fatal("regrown scalar", i, got)
+				if got != (MonomialPower{17*i + 3, i%7 + 1}) {
+					t.Fatal("source reset/set_size lost retained storage", i, got)
 				}
 			}
 		}
@@ -61,6 +62,89 @@ func TestMonomialNativeScratchGrowthResetAndBounds(t *testing.T) {
 		t.Fatal("native scratch changed Runtime accounting")
 	}
 	monomialPhysicalAudit(t, m)
+}
+
+func TestMonomialTemporaryCapacityAssertionActions(t *testing.T) {
+	for _, choice := range []string{"T", "C", "disabled"} {
+		t.Run(choice, func(t *testing.T) {
+			m := monomialFixture(t)
+			action := choice
+			if choice == "disabled" {
+				action = "T"
+			}
+			polynomialAssertionActionsFixture(t, action+action+action)
+			if polynomialSourceDebug && choice == "disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+			}
+
+			var initTemp monomialTemp
+			input := make([]MonomialPower, monomialTempInitialCapacity)
+			for i := range input {
+				input[i] = MonomialPower{uint32(i), 1}
+			}
+			e := m.tempInit(&initTemp, input)
+			if polynomialSourceDebug && choice == "T" {
+				if !errors.Is(e, ErrMonomialAssertion) || initTemp.size != 0 || initTemp.capacity != monomialTempInitialCapacity {
+					t.Fatal("equal-capacity init did not stop before size/copy", e, initTemp.size, initTemp.capacity)
+				}
+			} else {
+				serviceMust(t, e)
+				if initTemp.size != monomialTempInitialCapacity || initTemp.powers[127] != input[127] {
+					t.Fatal("init Continue/disabled/release", initTemp.size, initTemp.powers[127])
+				}
+			}
+
+			var sizeTemp monomialTemp
+			e = m.tempSetSize(&sizeTemp, monomialTempInitialCapacity+1)
+			if polynomialSourceDebug && choice == "T" {
+				if !errors.Is(e, ErrMonomialAssertion) || sizeTemp.size != 0 || sizeTemp.capacity != monomialTempInitialCapacity {
+					t.Fatal("set_size assertion mutation", e, sizeTemp.size, sizeTemp.capacity)
+				}
+			} else {
+				serviceMust(t, e)
+				if sizeTemp.size != monomialTempInitialCapacity+1 || sizeTemp.capacity != monomialTempInitialCapacity+1 {
+					t.Fatal("safe continued set_size adaptation", sizeTemp.size, sizeTemp.capacity)
+				}
+			}
+
+			var powerTemp monomialTemp
+			e = m.tempSetPower(&powerTemp, monomialTempInitialCapacity, MonomialPower{9, 7})
+			if polynomialSourceDebug && choice == "T" {
+				if !errors.Is(e, ErrMonomialAssertion) || powerTemp.size != 0 || powerTemp.capacity != monomialTempInitialCapacity {
+					t.Fatal("set_power assertion mutation", e, powerTemp.size, powerTemp.capacity)
+				}
+			} else {
+				serviceMust(t, e)
+				if powerTemp.size != 0 || powerTemp.capacity != 2*monomialTempInitialCapacity || powerTemp.powers[128] != (MonomialPower{9, 7}) {
+					t.Fatal("safe continued set_power adaptation", powerTemp.size, powerTemp.capacity, powerTemp.powers[128])
+				}
+			}
+			serviceMust(t, m.tempCleanup(&initTemp))
+			serviceMust(t, m.tempCleanup(&sizeTemp))
+			serviceMust(t, m.tempCleanup(&powerTemp))
+		})
+	}
+}
+
+func TestMonomialTemporaryDestructiveReserveAndPreservingExpand(t *testing.T) {
+	m := monomialFixture(t)
+	var tmp monomialTemp
+	serviceMust(t, m.tempPushBack(&tmp, MonomialPower{3, 5}))
+	serviceMust(t, m.tempPushBack(&tmp, MonomialPower{7, 11}))
+	tmp.hash = 99
+	serviceMust(t, m.tempReserve(&tmp, 129))
+	if tmp.size != 0 || tmp.capacity != 258 || tmp.hash != 0 || tmp.powers[0] != (MonomialPower{}) {
+		t.Fatal("increase_capacity did not replace the old temporary", tmp.size, tmp.capacity, tmp.hash, tmp.powers[0])
+	}
+	for i := uint32(0); i < tmp.capacity; i++ {
+		serviceMust(t, m.tempPushBack(&tmp, MonomialPower{i + 1, i + 2}))
+	}
+	tmp.hash = 77
+	serviceMust(t, m.tempPushBack(&tmp, MonomialPower{999, 1000}))
+	if tmp.size != 259 || tmp.capacity != 516 || tmp.hash != 0 || tmp.powers[0] != (MonomialPower{1, 2}) || tmp.powers[258] != (MonomialPower{999, 1000}) {
+		t.Fatal("expand_capacity did not preserve the active prefix", tmp.size, tmp.capacity, tmp.hash, tmp.powers[0], tmp.powers[258])
+	}
+	serviceMust(t, m.tempCleanup(&tmp))
 }
 
 func TestMonomialNativeVariableCountingAndInterning(t *testing.T) {
