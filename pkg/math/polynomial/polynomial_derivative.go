@@ -118,17 +118,16 @@ func (m *MultivariatePolynomialManager) derivativeWithReceipt(p Polynomial, x ui
 		return Polynomial{}, ErrPolynomialPending
 	}
 	c := m.core
-	if polynomialSourceDebug {
-		if x >= c.monomials.nextVar {
-			return Polynomial{}, ErrPolynomialAssertion
-		}
+	if e := polynomialDerivativeSourceAssert(4512, "is_valid(x)", func() (bool, error) {
+		return c.monomials.IsValidVar(x)
+	}); e != nil {
+		return Polynomial{}, e
+	}
+	if e := polynomialDerivativeSourceAssert(4513, "m_cheap_som_buffer.empty()", func() (bool, error) {
 		size, e := c.cheap.ms.size(c)
-		if e != nil {
-			return Polynomial{}, e
-		}
-		if size != 0 {
-			return Polynomial{}, ErrPolynomialAssertion
-		}
+		return size == 0, e
+	}); e != nil {
+		return Polynomial{}, e
 	}
 	size, e := c.readWord(p, 8)
 	if e != nil {

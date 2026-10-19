@@ -44802,8 +44802,8 @@
           ]
         },
         {
-          "name": "Derivative cpp4507-4528/7228-7229 and complete Rename cpp1464-1475/6070-6097/7356-7357 with source assertion action and actual directory/maximal terms; derivative operation-owned receipt and consumed DEC audit remains partial",
-          "status": "partial",
+          "name": "Complete Derivative cpp4507-4528/7228-7229 and Rename cpp1464-1475/6070-6097/7356-7357 with source assertion actions, actual directory/maximal terms, operation-owned receipts and consumed add_reset retirement",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_derivative.go",
           "tests": [
             "TestPolynomialDerivativeIndependentFiniteValue",
@@ -44817,7 +44817,8 @@
             "TestPolynomialDerivativeNumericPendingIdentity",
             "TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause",
             "TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation",
-            "TestMonomialUnitNativeRecycleFinalizationIsIdempotent"
+            "TestMonomialUnitNativeRecycleFinalizationIsIdempotent",
+            "TestPolynomialDerivativeSourceAssertionActions"
           ]
         },
         {
@@ -45474,7 +45475,7 @@
         },
         {
           "name": "derivativeWithReceipt/cleanupDerivativeScope src/math/polynomial/polynomial.cpp:4507-4528: Returned exact monomial allocator receipt joins actual callee continuation; NUM lexical suffix unchanged, unjoined raw only explicit true abort.",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_derivative.go",
           "tests": [
             "TestMonomialFactoryAllocatorActualPhysicalPrefix",
@@ -45585,7 +45586,7 @@
         },
         {
           "name": "src/math/polynomial/polynomial.cpp:4507-4528,7228-7229 derivativeWithReceipt: Same source public/optional engine, actual take=true Swap/default/INC/push and final factory receipts, successful raw return handoff.",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_derivative.go",
           "tests": [
             "TestPolynomialDerivativeActualAppendFactoryEveryPrefix",
@@ -45596,7 +45597,7 @@
         },
         {
           "name": "src/math/polynomial/polynomial.cpp:4507-4528,2217-2255,2280-2299 cleanupDerivativeModeOwned: Explicit owning source-completed false phase then exact unjoined true abort; source NUM order/first history preserved.",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_derivative.go",
           "tests": [
             "TestPolynomialDerivativeActualAppendFactoryEveryPrefix",
@@ -49035,8 +49036,8 @@
           ]
         },
         {
-          "name": "Derivative cpp4507-4528/7228-7229 and complete Rename cpp1464-1475/6070-6097/7356-7357 with source assertion action and actual directory/maximal terms; derivative operation-owned receipt and consumed DEC audit remains partial",
-          "status": "partial",
+          "name": "Complete Derivative cpp4507-4528/7228-7229 and Rename cpp1464-1475/6070-6097/7356-7357 with source assertion actions, actual directory/maximal terms, operation-owned receipts and consumed add_reset retirement",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_derivative.go",
           "tests": [
             "TestPolynomialDerivativeIndependentFiniteValue",
@@ -49050,7 +49051,8 @@
             "TestPolynomialDerivativeNumericPendingIdentity",
             "TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause",
             "TestPolynomialDerivativePostphysicalAllocatorRootOwnedByOperation",
-            "TestMonomialUnitNativeRecycleFinalizationIsIdempotent"
+            "TestMonomialUnitNativeRecycleFinalizationIsIdempotent",
+            "TestPolynomialDerivativeSourceAssertionActions"
           ]
         },
         {
@@ -49409,7 +49411,7 @@
         },
         {
           "name": "derivativeWithReceipt/cleanupDerivativeScope src/math/polynomial/polynomial.cpp:4507-4528: Returned exact monomial allocator receipt joins actual callee continuation; NUM lexical suffix unchanged, unjoined raw only explicit true abort.",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_derivative.go",
           "tests": [
             "TestMonomialFactoryAllocatorActualPhysicalPrefix",
