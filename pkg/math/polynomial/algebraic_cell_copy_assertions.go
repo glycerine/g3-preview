@@ -3,7 +3,7 @@ package polynomial
 
 import unumeral "github.com/glycerine/g3/pkg/util/numeral"
 
-func (m *AlgebraicRootCore) copySourceBasicValue(l *algebraicLocation) (*unumeral.Rational, error) {
+func (m *AlgebraicRootCore) copySourceBasicValue(source *AlgebraicRootCore, l *algebraicLocation) (*unumeral.Rational, error) {
 	if _, _, e := algebraicAssertionSwitch(); e != nil {
 		return nil, e
 	} // cpp:236
@@ -13,7 +13,7 @@ func (m *AlgebraicRootCore) copySourceBasicValue(l *algebraicLocation) (*unumera
 	if e := algebraicQueryTagAssertionSwitch(); e != nil {
 		return nil, e
 	} // h:372
-	r, e := m.load(l)
+	r, e := source.load(l)
 	if e != nil {
 		return nil, e
 	}

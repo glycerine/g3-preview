@@ -86,12 +86,14 @@ func (m *AlgebraicRootCore) CopyFromCore(dst *Algebraic, source *AlgebraicRootCo
 	if z.MatchesCopyAllocationInvocation(&m.coefficientCopy) || z.MatchesCopyAllocationInvocation(&m.rationalCopy) || m.constQ.active || m.localActive || m.pending.slot != 0 {
 		return ErrAlgebraicPending
 	}
-	r := algebraicRecord{value: source.zero}
-	if sl != nil {
-		r, e = source.load(sl)
-		if e != nil {
-			return e
-		}
+	// Canonical zero can be the same Go numeral in both admitted cores.
+	// cpp:510 returns before the selected branch assertion or source payload.
+	if dst == src {
+		return nil
+	}
+	// The selected cpp:514/518/528/533 branch asserts before payload reads.
+	if _, _, e = algebraicAssertionSwitch(); e != nil {
+		return e
 	}
 	s := &m.foreignCopy
 	*s = algebraicForeignCopyScope{owner: m, source: source, active: true, running: true}
@@ -114,15 +116,25 @@ func (m *AlgebraicRootCore) CopyFromCore(dst *Algebraic, source *AlgebraicRootCo
 		// The root-to-basic branch deletes its cell before the const-mpq
 		// overload constructs tmp. Other basic branches keep their cell.
 		if dl != nil && dl.kind == 1 {
+			if e = algebraicQueryTagAssertionSwitch(); e != nil {
+				return e
+			}
 			if e := m.destroyCell(dst, dl, false); e != nil {
 				return e
 			}
 			dl = nil
 		}
-		return m.copyForeignBasic(dst, dl, source, &r.value)
+		q, e := m.copySourceBasicValue(source, sl)
+		if e != nil {
+			return e
+		}
+		return m.copyForeignBasic(dst, dl, source, q)
 	}
 	if dl == nil || dl.kind == 0 {
 		if dl != nil {
+			if e = algebraicQueryTagAssertionSwitch(); e != nil {
+				return e
+			}
 			if e := m.destroyCell(dst, dl, false); e != nil {
 				return e
 			}
@@ -137,6 +149,9 @@ func (m *AlgebraicRootCore) CopyFromCore(dst *Algebraic, source *AlgebraicRootCo
 		m.publish(dst, next)
 		dl = &m.locations[dst.slot-1]
 	} else {
+		if e = algebraicQueryTagAssertionSwitch(); e != nil {
+			return e
+		}
 		old, e := m.load(dl)
 		if e != nil {
 			return e
@@ -144,10 +159,23 @@ func (m *AlgebraicRootCore) CopyFromCore(dst *Algebraic, source *AlgebraicRootCo
 		if e = m.deletePolynomial(dl, &old); e != nil {
 			return e
 		}
+		if e = algebraicQueryTagAssertionSwitch(); e != nil {
+			return e
+		}
 		e = unumeral.SourceBinaryIntervalDel(m.config.Intervals, &old.interval)
 		if e = m.save(dl, &old, e); e != nil {
 			return e
 		}
+		if e = algebraicQueryTagAssertionSwitch(); e != nil {
+			return e
+		}
+	}
+	if e = algebraicQueryTagAssertionSwitch(); e != nil {
+		return e
+	}
+	r, e := source.load(sl)
+	if e != nil {
+		return e
 	}
 	out, e := m.load(dl)
 	if e != nil {
@@ -191,12 +219,20 @@ func (m *AlgebraicRootCore) copyForeignBasic(dst *Algebraic, dl *algebraicLocati
 		return e
 	}
 	if zero {
-		if dl == nil {
-			return nil
+		if dl != nil {
+			if e = algebraicQueryTagAssertionSwitch(); e != nil {
+				return e
+			}
+			if e = m.destroyCell(dst, dl, false); e != nil {
+				return e
+			}
 		}
-		return m.destroyCell(dst, dl, false)
+		return m.assertCellResetZero(dst)
 	}
 	if dl != nil {
+		if e = algebraicQueryTagAssertionSwitch(); e != nil {
+			return e
+		}
 		r, e := m.load(dl)
 		if e != nil {
 			return e

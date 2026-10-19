@@ -1065,7 +1065,7 @@ func (m *AlgebraicRootCore) copyCellValue(dst, src *Algebraic) error {
 				return e
 			}
 		}
-		q, e := m.copySourceBasicValue(sl)
+		q, e := m.copySourceBasicValue(m, sl)
 		if e != nil {
 			return e
 		}
