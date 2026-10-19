@@ -50753,7 +50753,8 @@
       "path": "src/math/polynomial/upolynomial.cpp",
       "component": "math",
       "role": "production",
-      "status": "partial",
+      "status": "ported",
+      "go_target": "pkg/math/polynomial/upolynomial.go",
       "go_targets": [
         "pkg/math/polynomial/algebraic_sign.go",
         "pkg/math/polynomial/algebraic_sign_resultant.go",
@@ -51405,7 +51406,8 @@
         "TestBinaryDisplaySourceNumeratorStringAndExponentFlags",
         "TestUPolynomialConvertNegativeBoundsTraceAfterSwap",
         "TestUPolynomialConvertBoundsActualReadStops",
-        "TestAlgebraicInverseBoundsTraceActualSourceStop"
+        "TestAlgebraicInverseBoundsTraceActualSourceStop",
+        "TestUPolynomialPublicGCDAllPrimeFallbackUsesDefaultNormalization"
       ],
       "conditionals": [
         {
@@ -51991,8 +51993,8 @@
           "text": "SASSERT(A.size() == 1 && m().is_one(A[0]));"
         }
       ],
-      "methods_audited": false,
-      "ownership_audited": false,
+      "methods_audited": true,
+      "ownership_audited": true,
       "methods": [
         {
           "name": "Remaining conversion bound trace records and concrete lower/upper scope (upolynomial.cpp:2828-2916; trace2830,2841)",
@@ -52027,6 +52029,7 @@
         {
           "name": "Refinable traces use concrete shared binary to_string (upolynomial.cpp:2615,2640,2693; mpbq.cpp:384-392)",
           "status": "ported",
+          "go_target": "pkg/util/numeral/mpbq_string_source.go",
           "go_targets": [
             "pkg/util/numeral/mpbq_string_source.go",
             "pkg/util/numeral/mpbq_string_source_test.go",
@@ -52044,6 +52047,7 @@
         {
           "name": "Rational-to-binary conversion entry trace before binary temporaries (upolynomial.cpp:2823-2827)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_convert_entry_trace.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_convert_entry_trace.go",
             "pkg/math/polynomial/upolynomial_convert_entry_trace_test.go",
@@ -52066,6 +52070,7 @@
         {
           "name": "Isolating-to-refinable four trace records and actual lexical scope (upolynomial.cpp:2599-2744; mpbq.cpp:384-392)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_refinable_scope.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_refinable_scope.go",
             "pkg/math/polynomial/upolynomial_refinable_trace_test.go",
@@ -52091,6 +52096,7 @@
         {
           "name": "Default normalization conditional diagnostic and actual lexical caller scope (upolynomial.cpp:366-401,391-393)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_default_normalize.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_default_normalize.go",
             "pkg/math/polynomial/upolynomial_default_normalize_test.go",
@@ -52122,6 +52128,7 @@
         {
           "name": "Retained factor frontend normalization conditional diagnostic (upolynomial.cpp:391-392)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_frontend_normalize_trace.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_frontend_normalize_trace.go",
             "pkg/math/polynomial/upolynomial_frontend_normalize_trace_test.go",
@@ -52140,6 +52147,7 @@
         {
           "name": "Interval normalization separate runtime assertion actions (upolynomial.cpp:2926,2930-2931,2942)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_refinement.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_refinement.go",
             "pkg/math/polynomial/upolynomial_refinement_assertions.go",
@@ -52157,6 +52165,7 @@
         {
           "name": "Remaining rational-to-binary interval runtime assertion actions (upolynomial.cpp:2864,2879,2887-2888,2892-2894,2912-2915)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_refinement.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_refinement.go",
             "pkg/math/polynomial/upolynomial_convert_bound_assertions.go",
@@ -52179,6 +52188,7 @@
         {
           "name": "Rational interval lower-end conversion bound runtime actions (upolynomial.cpp:2833,2844,2845,2849)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_refinement.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_refinement.go",
             "pkg/math/polynomial/upolynomial_convert_bound_assertions.go",
@@ -52195,6 +52205,7 @@
         {
           "name": "Rational-to-binary interval separate entry sign actions (upolynomial.cpp:2820-2821)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_refinement.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_refinement.go",
             "pkg/math/polynomial/upolynomial_convert_entry_assertions.go",
@@ -52212,6 +52223,7 @@
         {
           "name": "isolating2refinable sign runtime actions (upolynomial.cpp:2605,2619,2624,2643,2652,2661,2727,2734)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_refinement.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_refinement.go",
             "pkg/math/polynomial/upolynomial_refinable_sign_assertions.go",
@@ -52229,6 +52241,7 @@
         {
           "name": "General normalization DEBUG identity runtime actions (upolynomial.cpp:393)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_content.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_content.go",
             "pkg/math/polynomial/upolynomial_root_id_normalize.go",
@@ -52247,6 +52260,7 @@
         {
           "name": "Public factor normal-return verbose distinct-factor summary (upolynomial.cpp:3113-3117; upolynomial.h:33)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_core.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_factor_core.go",
             "pkg/math/polynomial/upolynomial_factor_verbose.go",
@@ -52262,6 +52276,7 @@
         {
           "name": "Quadratic scalar to_string records and exact frontend insertion ownership (upolynomial.cpp:2974,2990)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_quadratic_scalar_trace.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_factor_quadratic_scalar_trace.go",
             "pkg/math/polynomial/upolynomial_quadratic_scalar_trace_test.go",
@@ -52281,6 +52296,7 @@
         {
           "name": "Quadratic input/factor-pair polynomial diagnostics and source suffix retention (upolynomial.cpp:2969,3003)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_quadratic_trace.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_factor_quadratic_trace.go",
             "pkg/math/polynomial/upolynomial_factor_quadratic_trace_test.go",
@@ -52296,6 +52312,7 @@
         {
           "name": "Factor-core repeated-factor polynomial diagnostics and exact frontend cleanup (upolynomial.cpp:3075,3080,3093,3099,3106)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_core_trace.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_factor_core_trace.go",
             "pkg/math/polynomial/upolynomial_factor_core_trace_test.go",
@@ -52314,6 +52331,7 @@
         {
           "name": "Factor-core exact-division VERIFY actions (upolynomial.cpp:3074,3085,3100)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_core.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_factor_core.go",
             "pkg/math/polynomial/upolynomial_factor_verify.go",
@@ -52328,6 +52346,7 @@
         {
           "name": "Factor-core squarefree/constant/final-one runtime assertion actions (upolynomial.cpp:3067,3094,3095,3107)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_core.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_factor_core.go",
             "pkg/math/polynomial/upolynomial_factor_loop_assertions.go",
@@ -52343,6 +52362,7 @@
         {
           "name": "Quadratic discriminant and DEBUG product runtime assertion actions (upolynomial.cpp:2983,3007)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_core.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_factor_core.go",
             "pkg/math/polynomial/upolynomial_quadratic_assertions.go",
@@ -52358,6 +52378,7 @@
         {
           "name": "Quadratic-size and primitive-factor leading-coefficient runtime assertions (upolynomial.cpp:2968,3015)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_core.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_factor_core.go",
             "pkg/math/polynomial/upolynomial_factor_core_assertion_test.go"
@@ -52372,6 +52393,7 @@
         {
           "name": "Rational-input integrality and raw scalar nonzero runtime assertions (upolynomial.cpp:207,415)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_ops.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_ops.go",
             "pkg/math/polynomial/upolynomial_input_scalar_assertion_test.go",
@@ -52388,6 +52410,7 @@
         {
           "name": "Negation/addition/subtraction core alias runtime assertions (upolynomial.cpp:243,259-260,284-285)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_ops.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_ops.go",
             "pkg/math/polynomial/upolynomial_basic_alias_assertion_test.go"
@@ -52401,6 +52424,7 @@
         {
           "name": "Primitive/content entry and positive-content runtime assertions (upolynomial.cpp:214,216)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_content.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_content.go",
             "pkg/math/polynomial/upolynomial_content_assertion_actions_test.go"
@@ -52415,6 +52439,7 @@
         {
           "name": "Coefficient set-size/self-copy runtime assertion actions (upolynomial.cpp:177,194)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_storage.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_storage.go",
             "pkg/math/polynomial/upolynomial_storage_assertion_actions_test.go"
@@ -52429,6 +52454,7 @@
         {
           "name": "Factor insertion multiplicity and zero-constant multiply assertion actions (upolynomial.cpp:57,66,78)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_factors.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_factors.go",
             "pkg/math/polynomial/upolynomial_factor_assertion_actions_test.go"
@@ -52444,6 +52470,7 @@
         {
           "name": "Euclidean GCD loop/result polynomial records and exact caller cleanup (upolynomial.cpp:836,847-848)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_euclid_display_trace.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_euclid_display_trace.go",
             "pkg/math/polynomial/upolynomial_euclid_display_trace_test.go",
@@ -52466,6 +52493,7 @@
         {
           "name": "Modular GCD image/combined/candidate/result displays and lexical NUM stop (upolynomial.cpp:772,792,796,806)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_modular_gcd_entry_trace.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_modular_gcd_entry_trace.go",
             "pkg/math/polynomial/upolynomial_modular_gcd_trace_scalars.go",
@@ -52488,6 +52516,7 @@
         {
           "name": "Modular GCD entry polynomial displays and exact caller receipt (upolynomial.cpp:726)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_modular_gcd_entry_trace.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_modular_gcd_entry_trace.go",
             "pkg/math/polynomial/upolynomial_modular_gcd_entry_trace_test.go",
@@ -52508,6 +52537,7 @@
         {
           "name": "Modular GCD prime-attempt integer insertion (upolynomial.cpp:752)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_gcd_modular.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_gcd_modular.go",
             "pkg/math/polynomial/upolynomial_modular_gcd_trace_test.go"
@@ -52522,6 +52552,7 @@
         {
           "name": "Euclidean GCD input/copy pointer record (upolynomial.cpp:833-834)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_gcd.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_gcd.go",
             "pkg/math/polynomial/upolynomial_euclid_pointer_trace.go",
@@ -52535,6 +52566,7 @@
         {
           "name": "Modular GCD literal branch records (upolynomial.cpp:758,762,774,786,802)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_gcd_modular.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_gcd_modular.go",
             "pkg/math/polynomial/upolynomial_modular_gcd_trace_test.go"
@@ -52548,6 +52580,7 @@
         {
           "name": "CRA inverse/multiplier/bound numeral-insertion records and caller ownership (upolynomial.cpp:677,682,692)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_cra_trace.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_cra_trace.go",
             "pkg/math/polynomial/upolynomial_cra_trace_test.go",
@@ -52568,6 +52601,7 @@
         {
           "name": "Sturm sign-variation nonzero-sign assertion runtime actions (upolynomial.cpp:1877)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_sturm.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_sturm.go",
             "pkg/math/polynomial/upolynomial_sturm_sign_assertions_test.go"
@@ -52582,6 +52616,7 @@
         {
           "name": "Reciprocal pre-swap and binary-composition final-exponent assertion actions (upolynomial.cpp:1610,1702)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_transforms.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_transforms.go",
             "pkg/math/polynomial/upolynomial_transform_assertions.go",
@@ -52597,6 +52632,7 @@
         {
           "name": "Remove-one-half-root numerical assertion runtime erasure and debugger actions (upolynomial.cpp:1325)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_root_bounds.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_root_bounds.go",
             "pkg/math/polynomial/upolynomial_remove_one_half_assertions_test.go"
@@ -52611,6 +52647,7 @@
         {
           "name": "Nonzero-root lower-bound separate source assertion actions (upolynomial.cpp:2053,2057,2062-2063)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_root_bounds.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_root_bounds.go",
             "pkg/math/polynomial/upolynomial_nonzero_bound_assertions_test.go",
@@ -52627,6 +52664,7 @@
         {
           "name": "Cauchy root-upper-bound entry and final-order assertion actions (upolynomial.cpp:1913-1914,1950)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_root_bounds.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_root_bounds.go",
             "pkg/math/polynomial/upolynomial_root_upper_assertions.go",
@@ -52642,6 +52680,7 @@
         {
           "name": "Zero-root query/removal nonempty and traversal assertion actions (upolynomial.h:589; upolynomial.cpp:1275,1284)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_root_bounds.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_root_bounds.go",
             "pkg/math/polynomial/upolynomial_zero_roots_assertions.go",
@@ -52659,6 +52698,7 @@
         {
           "name": "Ordinary and SMT2 display source assertion runtime actions (upolynomial.cpp:1129,1207)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_display.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_display.go",
             "pkg/math/polynomial/upolynomial_display_assertions_test.go"
@@ -52672,6 +52712,7 @@
         {
           "name": "Extended-GCD DEBUG identity runtime assertion actions (upolynomial.cpp:1076-1082)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_gcd_extended.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_gcd_extended.go",
             "pkg/math/polynomial/upolynomial_hensel_extended_scope.go",
@@ -52689,6 +52730,7 @@
         {
           "name": "Extended-GCD six separate alias assertions and field assertion actions (upolynomial.cpp:1047-1050)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_gcd_extended.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_gcd_extended.go",
             "pkg/math/polynomial/upolynomial_extended_gcd_assertions.go",
@@ -52705,6 +52747,7 @@
         {
           "name": "Square-free alias and zero-exponent power assertion runtime actions (upolynomial.cpp:963,995)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_gcd_extended.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_gcd_extended.go",
             "pkg/math/polynomial/upolynomial_ops.go",
@@ -52721,6 +52764,7 @@
         {
           "name": "Subresultant degree, exponent and exact-divisibility assertion runtime actions (upolynomial.cpp:902,952,955)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_gcd.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_gcd.go",
             "pkg/math/polynomial/upolynomial_subresultant_assertions.go",
@@ -52736,6 +52780,7 @@
         {
           "name": "GCD, Euclidean-GCD and subresultant-GCD separate alias assertion actions (upolynomial.cpp:816,859,877)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_gcd.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_gcd.go",
             "pkg/math/polynomial/upolynomial_gcd_modular.go",
@@ -52752,20 +52797,23 @@
         },
         {
           "name": "Modular-GCD final scaling and all-primes fallback caller context (upolynomial.cpp:803,812,838,852)",
-          "status": "partial",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_gcd_modular.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_gcd.go",
             "pkg/math/polynomial/upolynomial_gcd_modular.go",
             "pkg/math/polynomial/upolynomial_modular_gcd_fallback_context_test.go"
           ],
           "tests": [
-            "TestUPolynomialFactorFrontendActualAllPrimeFallbackContext"
+            "TestUPolynomialFactorFrontendActualAllPrimeFallbackContext",
+            "TestUPolynomialPublicGCDAllPrimeFallbackUsesDefaultNormalization"
           ],
-          "notes": "Passes the actual allocation context through final content scaling and all-primes Euclidean fallback. Euclidean normalization uses the already implemented concrete frontend vector-normalization owner when that is the actual caller; other caller normalization owners remain a separate obligation rather than fabricating frontend scopes. Public Factor on (1+P*x)^2, with P computed as the exact product of every retained trial prime, reaches every actual bad-prime image before integer fallback. Reservation-prefix failures are armed only at the genuine fallback checkpoint; actual owner audits and owning cleanup cover each prefix through completion. At the next real frontend checkpoint the successful path verifies independently known GCD 1+P*x and cancels before further factor work; source cleanup may then legitimately destroy caller locals. This is reservation-prefix evidence, not physical descriptor-quota evidence. The frontend final content scalar is a unit on this retained route; no unused BIG content instantiation is invented. Broader Euclidean caller-local am/normalization, diagnostics and source-unit completion remain partial."
+          "notes": "Passes the actual allocation context through final content scaling and all-primes Euclidean fallback. The retained callers are the concrete frontend vector-normalization owner, Berlekamp's default-normalization receipt, and the ordinary public GCD default scope. Public Factor on (1+P*x)^2, with P computed as the exact product of every retained trial prime, reaches every actual bad-prime image before integer fallback; reservation-prefix failures and owning cleanup cover the frontend path through publication of 1+P*x. A separate public GCD of (1+P*x)^2 and its derivative forces the same all-primes fallback without a frontend caller and independently verifies the default normalization invocation and exact GCD 1+P*x. No hypothetical allocation context is converted into a fabricated frontend scope."
         },
         {
           "name": "Modular-GCD entry SASSERT runtime gates and debugger actions (upolynomial.cpp:727-728)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_gcd_modular.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_gcd_modular.go",
             "pkg/math/polynomial/upolynomial_division_assertions.go",
@@ -52781,6 +52829,7 @@
         {
           "name": "CRA odd-bound and coprime SASSERT runtime gates and debugger actions (upolynomial.cpp:664-665,671)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_gcd_modular.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_gcd_modular.go",
             "pkg/math/polynomial/upolynomial_division_assertions.go",
@@ -52796,6 +52845,7 @@
         {
           "name": "Exact division loop TRACE and actual caller display ownership (upolynomial.cpp:628)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_exact_div_loop_trace.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_exact_div_loop_trace.go",
             "pkg/math/polynomial/upolynomial_exact_div_loop_trace_test.go",
@@ -52817,6 +52867,7 @@
         {
           "name": "Exact division copied-size SASSERT runtime actions and pre-copy native pointer TRACE (upolynomial.cpp:624,626)",
           "status": "platform_replacement",
+          "go_target": "pkg/math/polynomial/upolynomial_division.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_division.go",
             "pkg/math/polynomial/upolynomial_division_assertions.go",
@@ -52833,6 +52884,7 @@
         {
           "name": "div_rem_core separate alias/divisor SASSERT runtime gates, debugger actions and publication frontiers (upolynomial.cpp:434-437,459)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_division.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_division.go",
             "pkg/math/polynomial/upolynomial_division_assertions.go",
@@ -52848,6 +52900,7 @@
         {
           "name": "Concrete Berlekamp division a_m scoped NUM and mk_monic raw lc/lc_inv source ends (upolynomial.cpp:460; upolynomial.h:363)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_division.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_division.go",
             "pkg/math/polynomial/upolynomial_gcd.go",
@@ -52868,6 +52921,7 @@
         {
           "name": "Quotient-only div wrapper preserves explicit retained caller context into div_rem_core (upolynomial.cpp:506-513)",
           "status": "ported",
+          "go_target": "pkg/math/polynomial/upolynomial_division.go",
           "go_targets": [
             "pkg/math/polynomial/upolynomial_division.go",
             "pkg/math/polynomial/upolynomial_berlekamp_vector_numeric_test.go"
@@ -53580,34 +53634,20 @@
         "Actual Int coefficient arrays with concrete scalar descriptor pages/backing origins, all twenty-one scratch vectors and real modular child. Physical views guard at actual dereferences and follow swaps; old/new growth and immediate numeric roots are charged. See PORT_PROGRESS.md#audit-upolynomial-port-status-md.",
         "Real source content/division/GCD scratch, lexical scoped numerals/vectors, modular restoration, retained failure prefixes and actual numeric-root checks; see PORT_PROGRESS.md#audit-upolynomial-gcd-port-status-md.",
         "Actual flat coefficient storage plus two independent unsigned metadata vectors, partial row publication, source read timing, charged cold owner and manager Close guard. See PORT_PROGRESS.md#audit-upolynomial-sturm-packet-md; lexical numeral/vector cleanup is an explicit Go error adapter.",
-        "Isolation uses charged concrete binary output vectors and lexical coefficient/frame backings; actual initialized extents and source ascending/reverse destruction orders are retained. Refusal/cancellation tests audit real output, manager cells and allocator-backed limbs before fault disabling. See PORT_PROGRESS.md#audit-upolynomial-root-isolation-packet-md; allocator/backend integration remains open.",
         "Related cores retain one charged concrete coefficient store and borrowed IntegerManager. Descriptors and twenty-one scratch vectors remain core-owned; closing a parent releases its scratch without destroying child buffers. Sum core ExclusiveBytes and one store TotalBytes. See PORT_PROGRESS.md#audit-upolynomial-factorization-packet-md.",
         "Independent stores borrowing the same actual IntegerManager transfer scalar buffer states without coefficient copies. Charged cold bindings retain each distinct imported store once; captured physical views survive transfer and original-core close until actual backing growth/free. Related constructors inherit bindings and unwind retained refs on refusal. Sum core ExclusiveBytes plus each distinct store TotalBytes once; numeral cells belong to the shared IntegerManager. See PORT_PROGRESS.md#audit-upolynomial-store-adoption-port-status-md.",
-        "Literal ascending private numeral deletion and reverse backing destruction retain exact stopped cause/cursor. Caller descriptors survive source finalization and require explicit caller-field cleanup. No registry-derived ownership or acknowledgement of consumed physical release on source retry. Whole imp/global bindings remain open.",
         "Upper isolation/Sturm tests account for exact external shared Integer gcdRaw five declarations and matched AddMul child TMP separately from UPolynomial-owned/cached stats. Actual Integer self/frame/count and immutable child/parent invocation identities name roots; live/generation metadata only validates those exact tokens. Physical anonymous-root audits remain intact. This is Go allocation-failure observation coverage, not additional registered C++ assertion credit.",
         "Actual caller-owned stable V1/V3/Q/R/T/V1Q, conditional BV/expectedD and final lc_inv/lc frontiers; source youngest stop precedes older vectors and related owner.",
         "upolynomial.cpp:213-232,609-651: same actual array reads, scalar SET/Div, persistent quotient/remainder scratch, scoped compiled divisibility child and explicit RAW SubMul temporary; direct child acquisition and exact cleanup replace omitted source-call ownership transport without substituting algorithms.",
         "Exact owner/self/member/captured nonwrapping nonce and direct actual allocation outcomes grant authority. Completed child false phase precedes older lexical destruction; unjoined true phase follows it. Charged readonly histories preserve child tuples and original body/source/first-own causes to service end.",
-        "Executing source/own children refuse actual checkpoint and returning transport owner reentry before mutation. No census, registry, or before/after pending acquisition."
+        "Executing source/own children refuse actual checkpoint and returning transport owner reentry before mutation. No census, registry, or before/after pending acquisition.",
+        "The complete retained implementation inventory is reconciled against concrete typed Go algorithms and exact source/owning lifetime adapters. Public all-primes modular-GCD fallback, Berlekamp fallback and factor-frontend fallback each use their actual normalization owner; no hypothetical context fabricates a frontend frame."
       ],
       "deviations": [
-        "Algebraic exact sign evaluation mathematical-path increment (algebraic_numbers.cpp:1979-2188,3041-3043): EvalSign now connects optimistic rationals, rational elimination, interval refinement and exact resultant fallback. It creates y-p_prime in the private MM, stable-sorts actual variables by defining-polynomial degree, eliminates each source variable using its actual defining polynomial, converts into persistent eval-sign UP storage and computes the nonzero-root lower bound through an actually issued Knuth receipt. Saved intervals and +/-2^-k bounds follow source declaration/destruction order; exact refinement returns a strict sign or zero, restoring overrefined inputs, or restarts after rational discovery. The global converter binds an actual accepted algebraic caller and preserves existing public behavior. A real cancellation sweep exposed GCD source cleanup dropping an exact-division receipt while its earlier remainder-buffer arithmetic invocation still owned rows; pending detection now retains that precise child. Independent tests cover exact square/sum-of-squares zeros, signed sqrt(2)+sqrt(3)-3, mixed quadratic/cubic degree order, rational restart and raw-inline rational sign. The expected resultant y^4+12*y^3+44*y^2+48*y-8 and source input-interval restoration are checked independently. Every reached algebraic/resultant checkpoint cancellation/owning-cleanup/retry frontier passes in ordinary and checked/debug/trace profiles on CPUs 8-16. Full allocation-failure/callback/TRACE/eager-constructor and complete polynomial/AST audits remain partial; no whole-unit completion credit.",
-        "Explicit owning handles and charged cold backing directories, selected LP64 source extent separately checked from physical Go storage, real resource/cooperation callbacks. Full isolation/refinement/conversion/factorization/algebraic and printers remain open; input conversion adapters do not establish complete registered tests.",
-        "Registered tests retain explicit dense input conversion adapters. Unported multivariate conversion, root isolation/refinement/factorization and remaining registered test actions keep each complete source unit partial. Explicit cleanup on Go errors preserves rooted completed prefixes; it does not claim native C++ exception continuation.",
         "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks.",
-        "Selected sequence/Sturm/transform/Descartes/bounds algorithms translated. RowView binds source coeffs(i) plus size(i); source unsigned header8 is extent arithmetic while actual Go metadata arrays charge4*capacity and slice fields are in the charged cold owner. Source printers, full root isolation/refinement, multivariate conversion, factorization and algebraic consumers remain open; source units remain partial.",
-        "Owning reads and checked scalar lifetimes are Go adapters. Full-capacity guard rejects undersized source wrapped allocations after separate literal uint32 growth checks; raw allocation/header publication for that undefined domain is not represented. Multivariate conversion, factorization, algebraic consumers, full printers/TRACE and nonselected alternatives remain open.",
-        "Shared coefficient directory is a charged Go lifetime adapter for actual source buffers, without copying coefficients between related cores. Independent pools remain distinct. Prime/factor algorithms and multivariate conversion remain unported in this chunk.",
-        "Cold store-binding adoption is an explicit Go lifetime adapter, with retained successful metadata prefixes before source state swaps. Cross-IntegerManager buffer ownership still requires the real shared MPZ backend. Factor algorithms, multivariate conversion and whole source-unit completion remain open; these three tests add independent ownership evidence, not registered C++ assertions.",
-        "Source unit remains partial; this closes the selected existing UP frontend and actual reached child lifetime/leaf transports, without whole factorization promotion.",
         "Signed-host TLS postphysical release guards qualify Go continuation outside native signed-overflow accounting. No invented allocation or callback frontier.",
         "mpz.h:156-162 successful publication order is unchanged; released scratch descriptor remains exact disposal token and later capacity reuse refuses ErrInvalidSlot before freed reads.",
         "Count-zero/count-one erased SET issues no NUM/vector or per-call archival reserve. Stable call storage materializes only at actual Integer/Natural allocations. Field tests cover only literal count-one SET, not general field factorization. Native normalized SET completes PN without checked verification allocation; checked actual failed PN prefixes preserve exact child tuples.",
-        "Display drivers src/test/upolynomial.cpp:23-65,468-490 reach printing but contain no ENSURE assertions; these exact output assertions are independent new checks. No whole UP-unit promotion. Invalid-Go copied/stale view and insertion receipt fixtures prove lifetime guards, not native allocation credit. Root genuine stale view RED95325 and receipt RED36363 are corrected by captured display epoch, including receipt checks after character ownership ends. Signed-host TLS character-DT stops are qualified returning-transport guard profiles; the separate four-limb fixture reaches older NUM DT, not character heap DT. Nested scopes charge persistent metadata only at reached allocating leaves; repeated erased inline calls preserve older unjoined RAW without archival reservation.",
-        "Selected Neg ports algebraic_numbers.cpp:1565-1577,383-388,2933-2935 and its reached typed binary Horner child upolynomial.cpp:1734-1764 using literal r/ak declarations and ak then r destruction. Null returns without frame/history reservation, preserving older failed roots under FailAfter(0). Charged diagnostic-only records materialize at actual Integer/Natural allocating branches, retain final first body/source/own causes and captured child tuples through reuse, and carry no NUM/root/cleanup authority. Real MIN and BIG Horner prefixes audit named physical/cold ownership before fault lift. The returning-allocation plus signed-host TLS fixture reaches later ADD refusal with published BIG TMP, completed inline ak DT and consumed r DT Bounds; false child acknowledgment precedes caller Del and true exact unjoined abort. This qualifies the signed-host returning-transport guard domain, not ordinary native overflow. Copied/foreign/stale metadata guard fixtures are separate from source allocation credit. Actual Rational owner reentry RED is closed by an exact executing registered caller guard. Registered src/test/algebraic.cpp:376-379 reaches negation, but later multivariate evaluation is not claimed; new output assertions independently verify literal null/basic/root/p(-x)/lower-sign behavior. Public unrelated EvalSignBinary nil-route lifetimes remain separately qualified; no whole algebraic or UP driver/unit promotion. Actual core-owning lifecycle successor closes a genuine caller-Del then Close RED where header/history were refunded with BIG AddMul TMP still retained. CleanupRetained and Close now invoke exact false/true child acknowledgment; beginQ refuses actual pending Neg instead of silently aborting it. True abort refuses a still-live captured input token (a borrowed destruction-frontier identity, no INC/root acquisition). A real sticky Horner NUM-DT stop previously allowed direct caller Del to cross the younger stop; public Del/private delClosing/CleanupValue now protect only that exact caller token until completed-child false acknowledgment. The actual source/own TLS test proves caller-Del refusal with identical named graph, false ACK then caller Del, actual true-own Bounds protecting older core fields/header/history, and successful owning retry preserving original returned body/source/first-own histories and source cursor. Closed-core history queries end at the actual owner context; no archived diagnostic record authorizes cleanup.",
-        "Checked MPN division verification retains the original multiply/add/compare algorithm over reusable Go uint32 scratch. Native scratch has no Runtime allocation/destructor failure, so verification holders, invocation receipts, caller policies and private buffer acquisition/publication metadata are removed throughout utility and polynomial callers. PN normalization source-cause transport whose only source was that destructor is also removed. Tests requiring those eliminated allocation/release stops are retired; real integer/RAW/division allocation ownership and source arithmetic remain. Native scratch is cleared on entry, truncated on every exit and released on owning close; warm verification allocates nothing. No whole-unit or original driver assertion credit is added.",
-        "The four Algorithm D workspaces now use native Go uint32 slices. Division retains normalization, quotient estimate correction, product/subtraction, conditional add-back and output publication order. No Runtime events, inline16/doubling emulation, initialization masks, pending storage blocks or division-buffer receipts remain. Numeric and polynomial caller buffer hooks/cleanup/history transport are removed; actual numeral/RAW/cell allocation ownership stays live. Source and owning close release the native workspace; warmed division allocates nothing. New randomized math/big comparisons cover one/many-limb operands, normalization, size changes and scratch regrowth; the explicit add-back fixture remains. Obsolete buffer topology/fault tests are retired. This removes infrastructure emulation without adding whole-unit completion credit.",
-        "Univariate descriptor-page, coefficient-backing and imported-store binding directories now use native Go slice append. Removed manual directory doubling, overlap reservation/refund, directory/page Budget allocation faults and the unused directory-capacity adapter. Native descriptors retain scalar owner generation checks; imported bindings retain exact real store ownership and cross-core view provenance. Stats/physical audits exclude native directory/page capacity while retaining actual numeric coefficient allocations and cold owner headers. Tests grow 4097 descriptors with all reservations disabled, verify recycled generation rejection, grow 257 backing slots while allowing only the real coefficient payload reservation, and retain 33 independent stores cold/warm without Runtime allocation. The obsolete directory-arithmetic test is retired and two container-fault tests are replaced by native ownership checks. Hensel imported ownership campaigns now verify exact native retains before the real invocation-owner allocation failure and retain all later real allocation/refusal/math checks, without requiring a fabricated directory byte-growth transition. Coefficient payload vector growth/capacity and other remaining containers are still open; no whole-unit completion credit is added.",
         "Univariate coefficient fields now use native Go slices, native append growth and actual slice lengths for retained-field cleanup. C++ vector capacity/header arithmetic, backing-byte reservations and initialized-capacity masks are removed. Native growth does not inject numeric allocation failures; actual numeral copies, cell ownership and physical borrowed-view invalidation remain checked.",
         "Sequence row offsets/sizes and factor multiplicities now use direct []uint32 slices with native append, reslicing on reset and nil on destruction. Removed unsigned-vector capacity/header arithmetic, size/initialized masks, container-only reservation faults and metadata backing-byte charges. Actual sequence/factor owners and numeral allocation/copy/destruction remain explicit; uint32 index bounds remain checked.",
         "Factor owner records now grow with native Go append; relocation clears the old owning records while preserving inner coefficient backing/view bindings. Degree subsets use native []bool and a descending subset-sum update, removing bit-vector word growth/clone/shift/OR machinery and cross-budget capacity transfer. Native factor and degree storage contributes no Runtime buffer charges; real cold owners and numeric lifetimes remain explicit.",

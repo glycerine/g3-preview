@@ -96,3 +96,50 @@ func TestUPolynomialFactorFrontendActualAllPrimeFallbackContext(t *testing.T) {
 		t.Fatal("fallback reservation prefix horizon did not reach publication")
 	}
 }
+
+func TestUPolynomialPublicGCDAllPrimeFallbackUsesDefaultNormalization(t *testing.T) {
+	q, s := preparationPhysicalFixture(t)
+	m := s.manager
+	z := q.Integers()
+	var p, p2, twoP, twoP2 unumeral.Int
+	serviceMust(t, z.SetInt64(&p, 1))
+	for _, prime := range upolyBigPrimes {
+		n := unumeral.NewInt(int32(prime))
+		serviceMust(t, z.Mul(&p, &n, &p))
+	}
+	serviceMust(t, z.Mul(&p, &p, &p2))
+	two := unumeral.NewInt(2)
+	serviceMust(t, z.Mul(&p, &two, &twoP))
+	serviceMust(t, z.Mul(&p2, &two, &twoP2))
+	defer func() {
+		serviceMust(t, z.Del(&twoP2))
+		serviceMust(t, z.Del(&twoP))
+		serviceMust(t, z.Del(&p2))
+		serviceMust(t, z.Del(&p))
+	}()
+
+	a := upolySourceNew(t, m, nil)
+	b := upolySourceNew(t, m, nil)
+	g := upolySourceNew(t, m, nil)
+	serviceMust(t, m.SetInts(a, []unumeral.Int{unumeral.NewInt(1), twoP, p2}))
+	serviceMust(t, m.SetInts(b, []unumeral.Int{twoP, twoP2}))
+	serviceMust(t, m.GCD(a, b, g))
+	if m.defaultNormalization.invocation == 0 || m.factorFrontendCaller != nil {
+		t.Fatal("public fallback did not use its actual default normalization owner", m.defaultNormalization.invocation, m.factorFrontendCaller)
+	}
+	v := mustUPolyView(t, m, g)
+	if v.count != 2 {
+		t.Fatal("public fallback GCD degree", v.count)
+	}
+	one, e := m.read(v, 0)
+	serviceMust(t, e)
+	linear, e := m.read(v, 1)
+	serviceMust(t, e)
+	isOne, e := z.IsOne(one)
+	serviceMust(t, e)
+	same, e := z.Equal(linear, &p)
+	serviceMust(t, e)
+	if !isOne || !same {
+		t.Fatal("public fallback GCD is not 1 + P*x")
+	}
+}
