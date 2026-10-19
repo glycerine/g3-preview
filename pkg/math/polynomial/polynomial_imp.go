@@ -81,6 +81,7 @@ type MultivariatePolynomialManager struct {
 	lexCause                                                   error
 	modularIndex                                               uint8
 	mmConstructed, mmDropDone                                  bool
+	destructorTraceRunning                                     bool
 }
 
 func NewMultivariatePolynomialManager(c MultivariatePolynomialManagerConfig) (*MultivariatePolynomialManager, error) {

@@ -152,6 +152,9 @@ func (v *PolynomialNewtonVector) sourceFinalizeMember() error {
 }
 
 func (m *MultivariatePolynomialManager) SourceFinalize() error {
+	if m != nil && m.self == m && m.destructorTraceRunning {
+		return ErrPolynomialPending
+	}
 	if m != nil && m.self == m && (m.core.cacheExecuting() || m.core.sparseExecuting(nil)) {
 		return ErrPolynomialPending
 	}
@@ -230,8 +233,15 @@ func (m *MultivariatePolynomialManager) SourceFinalize() error {
 			e = m.skeletons.resetSource()
 		case 9:
 			if polynomialSourceDebug {
+				e = m.traceLeakedPolynomials()
+				if e != nil {
+					break
+				}
 				clear(m.core.polynomials)
 				m.core.polynomials = m.core.polynomials[:0]
+			}
+			if e == nil {
+				e = polynomialImpSourceAssert(2367, "m_polynomials.empty()", len(m.core.polynomials) == 0)
 			}
 		case 10:
 			before := m.core.monomials.managerRefs

@@ -46143,3 +46143,16 @@ and final vector swap. Independent 129-power and BIG-numeral fixtures verify
 order, movement and native storage without emulating C++ standard-library
 internals. Both the standalone SOM and sort method rows are now ported; the
 enclosing `polynomial.cpp` unit and later polynomial algorithms remain partial.
+
+Polynomial `imp` construction/destruction completion: both retained constructors
+at `polynomial.cpp:2324-2344` preserve the independent UP manager, declaration
+order, optional monomial-manager allocation, body retain, four SOM owner binds,
+zero/unit publication and late GCD flags. The destructor now emits the exact
+debug-only `polynomial` leak trace after its earlier body cleanup, formats every
+surviving nonnull directory entry, clears the nonowning directory, reads the
+source assertion switch at line2367, rejects trace reentry, then drops the
+monomial-manager reference before reverse member destruction. The existing
+reservation and stopped-child campaigns plus new trace/switch/reentry fixtures
+pass in native, checked, debug and combined checked/debug/trace profiles on
+CPUs8-16. The constructor, destructor and standalone SOM generated-continuation
+rows are ported; wider `polynomial.cpp` algorithms remain partial.
