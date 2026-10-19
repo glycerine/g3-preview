@@ -32,6 +32,10 @@ func TestPolynomialSqrtPositiveDivisionAllocationUsesActualInvocation(t *testing
 	polynomialSqrtAllocationTransport(t, 4)
 }
 
+func TestPolynomialSqrtMonomialAllocationUsesActualInvocation(t *testing.T) {
+	polynomialSqrtAllocationTransport(t, 5)
+}
+
 func polynomialSqrtAllocationTransport(t *testing.T, mode uint8) {
 	t.Helper()
 	budget := arena.NewBudget(1 << 26)
@@ -59,7 +63,13 @@ func polynomialSqrtAllocationTransport(t *testing.T, mode uint8) {
 	serviceMust(t, e)
 	q, e := unumeral.NewRationalManager(unumeral.RationalConfig{Integers: unumeral.IntegerConfig{Memory: rt, Cells: arena.Config{PageSize: 8, Budget: budget}, Words: arena.VectorConfig{Descriptors: arena.Config{Budget: budget}}, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}}})
 	serviceMust(t, e)
-	full, e = NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
+	var mm *MonomialManager
+	if mode == 5 {
+		mm, e = NewMonomialManager(MonomialManagerConfig{Budget: budget, Memory: rt, Profile: umemory.SmallAllocatorProfile{PointerBits: 64, Debug: true}})
+		serviceMust(t, e)
+		serviceMust(t, mm.IncManagerRef())
+	}
+	full, e = NewMultivariatePolynomialManager(MultivariatePolynomialManagerConfig{Core: MultivariatePolynomialConfig{Integer: q.Integers(), Rationals: q, Monomials: mm, Checkpoint: func() bool { return true }, Cooperation: func() error { return nil }}})
 	serviceMust(t, e)
 	c := full.core
 	words := make([]uint32, 80)
@@ -67,7 +77,7 @@ func polynomialSqrtAllocationTransport(t *testing.T, mode uint8) {
 	var big unumeral.Int
 	serviceMust(t, c.integer.SetLimbs(&big, words))
 	var divisor unumeral.Int
-	if mode >= 3 {
+	if mode == 3 || mode == 4 {
 		digits := make([]uint32, 16)
 		digits[0], digits[15] = 3, 1
 		serviceMust(t, c.integer.SetLimbs(&divisor, digits))
@@ -75,7 +85,17 @@ func polynomialSqrtAllocationTransport(t *testing.T, mode uint8) {
 			serviceMust(t, c.integer.Neg(&big))
 		}
 	}
-	p, e := c.MkConstantTakeCopy(&big)
+	var p Polynomial
+	var term Monomial
+	if mode == 5 {
+		_, e = c.monomials.MkVar()
+		serviceMust(t, e)
+		term, e = c.monomials.MkVariable(0, 2)
+		serviceMust(t, e)
+		p, e = c.MkTerms([]unumeral.Int{big}, []Monomial{term})
+	} else {
+		p, e = c.MkConstantTakeCopy(&big)
+	}
 	serviceMust(t, e)
 	serviceMust(t, c.IncRef(p))
 	out, e := NewPolynomialRef(c)
@@ -90,7 +110,15 @@ func polynomialSqrtAllocationTransport(t *testing.T, mode uint8) {
 	active = true
 	var receipt polynomialSqrtInvocationReceipt
 	var body error
-	if mode != 0 {
+	if mode == 5 {
+		serviceMust(t, full.beginSquareRootWithReceipt(&receipt))
+		_, _, body = full.squareRootMonomial(0, term, Monomial{})
+		r := &full.squareRoot.monomialAllocator
+		if !c.monomials.matchesMonomialAllocatorInvocation(r) || r.outcome.Pending == (umemory.Block{}) {
+			t.Fatal("actual monomial allocation absent from invocation receipt", body)
+		}
+		body = full.finishSquareRoot(body)
+	} else if mode != 0 {
 		serviceMust(t, full.beginSquareRootWithReceipt(&receipt))
 		if mode == 1 {
 			body = full.squareRootAdd(&c.som, &big, c.monomials.unit)
@@ -142,6 +170,9 @@ func polynomialSqrtAllocationTransport(t *testing.T, mode uint8) {
 	serviceMust(t, c.DecRef(p))
 	serviceMust(t, out.Close())
 	serviceMust(t, full.CloseChecked())
+	if mm != nil {
+		serviceMust(t, mm.DecManagerRef())
+	}
 	serviceMust(t, q.CloseChecked())
 	serviceMust(t, rt.Close())
 	if budget.Used() != 0 {

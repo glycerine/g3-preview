@@ -13,6 +13,7 @@ import (
 // The created cohort is charged Go abort metadata for returned zero-RC locals;
 // it is not a source buffer or a source destructor repairing abandoned locals.
 type polynomialSquareRootScope struct {
+	monomialAllocator                    monomialAllocatorInvocationReceipt
 	receipt                              polynomialSqrtInvocationReceipt
 	numeric                              polynomialNumericRoots
 	divisionRaw                          unumeral.IntegerRawInvocationReceipt
@@ -123,10 +124,7 @@ func (m *MultivariatePolynomialCore) gradedLexMinPosition(p Polynomial) (uint32,
 func (m *MultivariatePolynomialManager) squareRootMonomial(op uint8, a, b Monomial) (Monomial, bool, error) {
 	s := &m.squareRoot
 	c := m.core
-	before, e := c.monomials.allocator.PendingRoots()
-	if e != nil {
-		return Monomial{}, false, e
-	}
+	var e error
 	outcome := monomialFactoryOutcome{}
 	var p Monomial
 	ok := true
@@ -137,6 +135,9 @@ func (m *MultivariatePolynomialManager) squareRootMonomial(op uint8, a, b Monomi
 		p, ok, e = c.monomials.divideCreated(a, b, &outcome)
 	case 2:
 		p, e = c.monomials.mulCreated(a, b, &outcome)
+	}
+	if outcome.started {
+		s.monomialAllocator = outcome.allocatorInvocation
 	}
 	if e != nil && outcome.started {
 		c.recordGeneratedCallee(outcome)
@@ -153,15 +154,6 @@ func (m *MultivariatePolynomialManager) squareRootMonomial(op uint8, a, b Monomi
 		l := &c.monomials.locations[p.slot-1]
 		l.squareRootCohort = s
 		l.squareRootSlot = idx
-	}
-	if before == ([3]umemory.Block{}) {
-		after, x := c.monomials.allocator.PendingRoots()
-		if after != ([3]umemory.Block{}) {
-			s.monomialRaw = after
-		}
-		if x != nil {
-			return p, ok, errors.Join(e, x)
-		}
 	}
 	return p, ok, e
 }
@@ -264,7 +256,7 @@ func (m *MultivariatePolynomialManager) finishSquareRoot(cause error) error {
 		}
 		s.stage++
 	}
-	if cause == nil && s.freshResult == (Polynomial{}) && s.factoryGeneration == 0 && s.calleeGeneration == 0 && s.monomialRaw == ([3]umemory.Block{}) && !polynomialNegNumericPending(&s.numeric) && !z.MatchesRawInvocation(&s.divisionRaw) {
+	if cause == nil && s.freshResult == (Polynomial{}) && s.factoryGeneration == 0 && s.calleeGeneration == 0 && s.monomialRaw == ([3]umemory.Block{}) && !(m.core.monomials.matchesMonomialAllocatorInvocation(&s.monomialAllocator) && s.monomialAllocator.outcome.Pending != (umemory.Block{})) && !polynomialNegNumericPending(&s.numeric) && !z.MatchesRawInvocation(&s.divisionRaw) {
 		s.active = false
 	}
 	return cause
@@ -610,6 +602,10 @@ func (m *MultivariatePolynomialManager) cleanupSqrtModeOwned(abort bool, invocat
 			c.generatedCalleePending = false
 		}
 		s.calleeGeneration = 0
+	}
+	if e := c.monomials.cleanupMonomialAllocatorInvocation(&s.monomialAllocator, true); e != nil {
+		s.cleanupCause = e
+		return e
 	}
 	if e := m.cleanupSqrtOrphanInvocation(invocation, cursor); e != nil {
 		return e
