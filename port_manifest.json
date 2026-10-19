@@ -46088,7 +46088,7 @@
           ]
         },
         {
-          "name": "quasi_resultant polynomial.cpp:5193-5272,7320-7322: literal three-reference pseudo-remainder chain",
+          "name": "Complete quasi_resultant cpp5193-5272,7320-7322: assertion actions and literal three-reference pseudo-remainder chain",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_quasi_resultant.go",
           "tests": [
@@ -49435,7 +49435,7 @@
           ]
         },
         {
-          "name": "quasi_resultant polynomial.cpp:5193-5272,7320-7322: literal three-reference pseudo-remainder chain",
+          "name": "Complete quasi_resultant cpp5193-5272,7320-7322: assertion actions and literal three-reference pseudo-remainder chain",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_quasi_resultant.go",
           "tests": [
@@ -124129,7 +124129,7 @@
           ]
         },
         {
-          "name": "quasi_resultant polynomial.cpp:5193-5272,7320-7322: literal three-reference pseudo-remainder chain",
+          "name": "Complete quasi_resultant cpp5193-5272,7320-7322: assertion actions and literal three-reference pseudo-remainder chain",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_quasi_resultant.go",
           "tests": [

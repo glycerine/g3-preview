@@ -98,21 +98,17 @@ func (c *MultivariatePolynomialCore) quasiResultantWithReceipt(p, q Polynomial, 
 			s.active = false
 		}
 	}()
-	if polynomialSourceDebug {
+	if e := polynomialQuasiResultantSourceAssert(5243, "degree(p, x) > 0", func() (bool, error) {
 		dp, e := c.Degree(p, x)
-		if e != nil {
-			return e
-		}
-		if dp == 0 {
-			return ErrPolynomialAssertion
-		}
+		return dp > 0, e
+	}); e != nil {
+		return e
+	}
+	if e := polynomialQuasiResultantSourceAssert(5244, "degree(q, x) > 0", func() (bool, error) {
 		dq, e := c.Degree(q, x)
-		if e != nil {
-			return e
-		}
-		if dq == 0 {
-			return ErrPolynomialAssertion
-		}
+		return dq > 0, e
+	}); e != nil {
+		return e
 	}
 	// All three source reference declarations precede the degree swap.
 	for i := range s.refs {
@@ -140,35 +136,29 @@ func (c *MultivariatePolynomialCore) quasiResultantWithReceipt(p, q Polynomial, 
 		return e
 	}
 	for {
-		if polynomialSourceDebug {
+		if e = polynomialQuasiResultantSourceAssert(5254, "degree(h_1, x) <= degree(h_0, x)", func() (bool, error) {
 			d0, e := c.Degree(h0.root.value, x)
 			if e != nil {
-				return e
+				return false, e
 			}
 			d1, e := c.Degree(h1.root.value, x)
-			if e != nil {
-				return e
-			}
-			if d1 > d0 {
-				return ErrPolynomialAssertion
-			}
+			return d1 <= d0, e
+		}); e != nil {
+			return e
 		}
 		s.phase = 2
 		if e = c.pseudoRemainderWithReceipt(h0.root.value, h1.root.value, x, &s.exponent, h2, &s.pseudo); e != nil {
 			return e
 		}
-		if polynomialSourceDebug {
+		if e = polynomialQuasiResultantSourceAssert(5257, "degree(h_2, x) < degree(h_1, x)", func() (bool, error) {
 			d2, e := c.Degree(h2.root.value, x)
 			if e != nil {
-				return e
+				return false, e
 			}
 			d1, e := c.Degree(h1.root.value, x)
-			if e != nil {
-				return e
-			}
-			if d2 >= d1 {
-				return ErrPolynomialAssertion
-			}
+			return d2 < d1, e
+		}); e != nil {
+			return e
 		}
 		degree, e := c.Degree(h2.root.value, x)
 		if e != nil {
