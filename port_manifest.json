@@ -44798,7 +44798,7 @@
           ]
         },
         {
-          "name": "Selected literal Derivative cpp4507-4528/7228-7229 and Rename cpp1464-1475/6070-6097/7356-7357, source numeral destruction and actual directory/maximal terms; exact operation-owned pending receipts and consumed DEC owning recovery, zero registered display-only driver assertion credit",
+          "name": "Derivative cpp4507-4528/7228-7229 and complete Rename cpp1464-1475/6070-6097/7356-7357 with source assertion action and actual directory/maximal terms; derivative operation-owned receipt and consumed DEC audit remains partial",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_derivative.go",
           "tests": [
@@ -44808,6 +44808,7 @@
             "TestPolynomialDerivativeBorrowedZeroAndLaterActualINC",
             "TestPolynomialDerivativeEveryReservationNamedPrefix",
             "TestPolynomialNativeRenameKeepsActualAllCells",
+            "TestPolynomialRenameSourceAssertionActions",
             "TestMonomialUnitNativeRecycleDuringFinalization",
             "TestPolynomialDerivativeNumericPendingIdentity",
             "TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause",
@@ -49018,7 +49019,7 @@
           ]
         },
         {
-          "name": "Selected literal Derivative cpp4507-4528/7228-7229 and Rename cpp1464-1475/6070-6097/7356-7357, source numeral destruction and actual directory/maximal terms; exact operation-owned pending receipts and consumed DEC owning recovery, zero registered display-only driver assertion credit",
+          "name": "Derivative cpp4507-4528/7228-7229 and complete Rename cpp1464-1475/6070-6097/7356-7357 with source assertion action and actual directory/maximal terms; derivative operation-owned receipt and consumed DEC audit remains partial",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_derivative.go",
           "tests": [
@@ -49028,6 +49029,7 @@
             "TestPolynomialDerivativeBorrowedZeroAndLaterActualINC",
             "TestPolynomialDerivativeEveryReservationNamedPrefix",
             "TestPolynomialNativeRenameKeepsActualAllCells",
+            "TestPolynomialRenameSourceAssertionActions",
             "TestMonomialUnitNativeRecycleDuringFinalization",
             "TestPolynomialDerivativeNumericPendingIdentity",
             "TestPolynomialDerivativeStoppedNumeralDestructorKeepsSourceCause",

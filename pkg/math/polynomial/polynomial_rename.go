@@ -54,20 +54,21 @@ func (m *MultivariatePolynomialManager) Rename(xs []uint32) error {
 		if e := m.core.makeFirstMaximal(p); e != nil {
 			return e
 		}
-		if polynomialSourceDebug {
+		if e := polynomialRenameSourceAssert(6089, "p->size() <= 1 || !p->lex_sorted()", func() (bool, error) {
 			size, e := m.core.readWord(p, 8)
 			if e != nil {
-				return e
+				return false, e
 			}
-			if size > 1 {
-				flags, e := m.core.readWord(p, 4)
-				if e != nil {
-					return e
-				}
-				if flags>>31 != 0 {
-					return ErrPolynomialAssertion
-				}
+			if size <= 1 {
+				return true, nil
 			}
+			flags, e := m.core.readWord(p, 4)
+			if e != nil {
+				return false, e
+			}
+			return flags>>31 == 0, nil
+		}); e != nil {
+			return e
 		}
 	}
 	return nil
