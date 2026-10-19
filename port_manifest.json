@@ -44682,8 +44682,8 @@
           ]
         },
         {
-          "name": "Selected rational map/array6237-6304,6347-6361 and integer array6363-6399/scalar7364-7377 substitution source bodies; literal persistent tmp1/found/max/positions, full imp binding separate",
-          "status": "partial",
+          "name": "Complete rational map/array cpp6237-6304,6347-6361 and integer array cpp6363-6399/scalar cpp7364-7377 substitution bodies, position assertion actions and persistent tmp1/found/max/positions",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_substitution.go",
           "tests": [
             "TestPolynomialFoundVariablesNativeGrowthRetainsBits",
@@ -44705,18 +44705,20 @@
             "TestPolynomialSubstitutionNativeCohortPreservesBorrowedRoots",
             "TestPolynomialSubstitutionReceiptRejectsReplacementFactory",
             "TestPolynomialSubstitutionBorrowedReceiptRejectsReplacement",
-            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
+            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower",
+            "TestPolynomialSubstitutionSourceAssertionActions"
           ]
         },
         {
-          "name": "Selected polynomial fraction6401-6425 result ref/full-expression owning copy and exact constructed lexical reverse cleanup; full imp binding separate",
-          "status": "partial",
+          "name": "Complete polynomial fraction substitution cpp6401-6425: degree assertion action, result reference, full-expression owning copy and exact constructed lexical reverse cleanup",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_substitution.go",
           "tests": [
             "TestPolynomialSubstitutionPolynomialFractionIndependentIdentity",
             "TestPolynomialSubstitutionFractionZeroAndAliasProfiles",
             "TestPolynomialSubstitutionEveryReservationNamedPrefixes",
-            "TestPolynomialSubstitutionCompletedLocalStopsOlderSourceUnwind"
+            "TestPolynomialSubstitutionCompletedLocalStopsOlderSourceUnwind",
+            "TestPolynomialSubstitutionSourceAssertionActions"
           ]
         },
         {
@@ -48909,8 +48911,8 @@
           ]
         },
         {
-          "name": "Selected rational map/array6237-6304,6347-6361 and integer array6363-6399/scalar7364-7377 substitution source bodies; literal persistent tmp1/found/max/positions, full imp binding separate",
-          "status": "partial",
+          "name": "Complete rational map/array cpp6237-6304,6347-6361 and integer array cpp6363-6399/scalar cpp7364-7377 substitution bodies, position assertion actions and persistent tmp1/found/max/positions",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_substitution.go",
           "tests": [
             "TestPolynomialFoundVariablesNativeGrowthRetainsBits",
@@ -48932,18 +48934,20 @@
             "TestPolynomialSubstitutionNativeCohortPreservesBorrowedRoots",
             "TestPolynomialSubstitutionReceiptRejectsReplacementFactory",
             "TestPolynomialSubstitutionBorrowedReceiptRejectsReplacement",
-            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower"
+            "TestPolynomialSubstitutionStoppedCleanupDoesNotOwnLaterPower",
+            "TestPolynomialSubstitutionSourceAssertionActions"
           ]
         },
         {
-          "name": "Selected polynomial fraction6401-6425 result ref/full-expression owning copy and exact constructed lexical reverse cleanup; full imp binding separate",
-          "status": "partial",
+          "name": "Complete polynomial fraction substitution cpp6401-6425: degree assertion action, result reference, full-expression owning copy and exact constructed lexical reverse cleanup",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_substitution.go",
           "tests": [
             "TestPolynomialSubstitutionPolynomialFractionIndependentIdentity",
             "TestPolynomialSubstitutionFractionZeroAndAliasProfiles",
             "TestPolynomialSubstitutionEveryReservationNamedPrefixes",
-            "TestPolynomialSubstitutionCompletedLocalStopsOlderSourceUnwind"
+            "TestPolynomialSubstitutionCompletedLocalStopsOlderSourceUnwind",
+            "TestPolynomialSubstitutionSourceAssertionActions"
           ]
         },
         {

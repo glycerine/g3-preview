@@ -64,6 +64,7 @@ func TestPolynomialMaxDegreesIndependentFiniteModelAndRetainedVars(t *testing.T)
 	}
 }
 func TestPolynomialVariablePositionsSentinelDuplicateSourceProfiles(t *testing.T) {
+	polynomialAssertionActionsFixture(t, "TT")
 	r, _ := degreeCopyRuntime(t)
 	d, e := NewPolynomialVariablePositions(r)
 	serviceMust(t, e)
@@ -136,6 +137,7 @@ func TestScopedPolynomialVariablePositionsBorrowedSliceAfterCallerGrowth(t *test
 	serviceMust(t, s.SourceFinalize())
 }
 func TestScopedPolynomialVariablePositionsFailedConstructorNoReset(t *testing.T) {
+	polynomialThrowAssertionFixture(t)
 	r, _ := degreeCopyRuntime(t)
 	d, e := NewPolynomialVariablePositions(r)
 	serviceMust(t, e)
@@ -221,6 +223,7 @@ func TestPolynomialVariablePositionsNativeSliceFill(t *testing.T) {
 	}
 }
 func TestPolynomialVariableHelperImplicitCopyMoveAndScopedCopies(t *testing.T) {
+	polynomialThrowAssertionFixture(t)
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{7, 11}, [][]MonomialPower{{{0, 3}}, {{1, 4}}})
 	a, e := NewPolynomialMaxDegrees(m)

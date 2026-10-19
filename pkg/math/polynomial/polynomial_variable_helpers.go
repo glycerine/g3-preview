@@ -282,18 +282,18 @@ func (d *PolynomialVariablePositions) Init(n uint32, xs PolynomialVariablesView)
 		return e
 	}
 	for i := uint32(0); i < n; i++ {
-		if polynomialSourceDebug {
+		if e := polynomialSubstitutionSourceAssert(6313, "m_pos.get(xs[i], UINT_MAX) == UINT_MAX", func() (bool, error) {
 			x, e := xs.At(i)
 			if e != nil {
-				return e
+				return false, e
 			}
 			old, e := variableGet(&d.positions, x, ^uint32(0))
 			if e != nil {
-				return e
+				return false, e
 			}
-			if old != ^uint32(0) {
-				return ErrPolynomialAssertion
-			}
+			return old == ^uint32(0), nil
+		}); e != nil {
+			return e
 		}
 		x, e := xs.At(i)
 		if e != nil {
@@ -311,18 +311,18 @@ func (d *PolynomialVariablePositions) Reset(n uint32, xs PolynomialVariablesView
 		return e
 	}
 	for i := uint32(0); i < n; i++ {
-		if polynomialSourceDebug {
+		if e := polynomialSubstitutionSourceAssert(6320, "m_pos.get(xs[i], UINT_MAX) != UINT_MAX", func() (bool, error) {
 			x, e := xs.At(i)
 			if e != nil {
-				return e
+				return false, e
 			}
 			old, e := variableGet(&d.positions, x, ^uint32(0))
 			if e != nil {
-				return e
+				return false, e
 			}
-			if old == ^uint32(0) {
-				return ErrPolynomialAssertion
-			}
+			return old != ^uint32(0), nil
+		}); e != nil {
+			return e
 		}
 		x, e := xs.At(i)
 		if e != nil {

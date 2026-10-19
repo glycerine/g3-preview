@@ -475,14 +475,14 @@ func (m *MultivariatePolynomialCore) substituteIntegersWithReceipt(p Polynomial,
 					return Polynomial{}, e
 				}
 			} else {
-				if polynomialSourceDebug {
+				if e = polynomialSubstitutionSourceAssert(6388, "var2pos(x) == UINT_MAX", func() (bool, error) {
 					again, e := m.substitution.positions.Position(x)
 					if e != nil {
-						return Polynomial{}, e
+						return false, e
 					}
-					if again != ^uint32(0) {
-						return Polynomial{}, ErrPolynomialAssertion
-					}
+					return again == ^uint32(0), nil
+				}); e != nil {
+					return Polynomial{}, e
 				}
 				power, e := m.monomials.powerCore(term, j)
 				if e != nil {
@@ -512,14 +512,14 @@ func (d *PolynomialVariablePositions) initSingle(x uint32) error {
 	if e := d.open(); e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
+	if e := polynomialSubstitutionSourceAssert(6313, "m_pos.get(xs[i], UINT_MAX) == UINT_MAX", func() (bool, error) {
 		p, e := variableGet(&d.positions, x, ^uint32(0))
 		if e != nil {
-			return e
+			return false, e
 		}
-		if p != ^uint32(0) {
-			return ErrPolynomialAssertion
-		}
+		return p == ^uint32(0), nil
+	}); e != nil {
+		return e
 	}
 	return variableSetFilled(&d.positions, x, 0, ^uint32(0))
 }
@@ -527,14 +527,14 @@ func (m *MultivariatePolynomialCore) resetSubstitutionPositions(s *polynomialSub
 	if !s.single {
 		return m.substitution.positions.Reset(s.xsCount, s.xs)
 	}
-	if polynomialSourceDebug {
+	if e := polynomialSubstitutionSourceAssert(6320, "m_pos.get(xs[i], UINT_MAX) != UINT_MAX", func() (bool, error) {
 		p, e := m.substitution.positions.Position(s.singleX)
 		if e != nil {
-			return e
+			return false, e
 		}
-		if p == ^uint32(0) {
-			return ErrPolynomialAssertion
-		}
+		return p != ^uint32(0), nil
+	}); e != nil {
+		return e
 	}
 	return variablePut(&m.substitution.positions.positions, s.singleX, ^uint32(0))
 }
@@ -832,8 +832,10 @@ func (m *MultivariatePolynomialCore) SubstitutePolynomialFraction(r Polynomial, 
 		if e != nil {
 			return e
 		}
-		if polynomialSourceDebug && md < dm {
-			return ErrPolynomialAssertion
+		if e = polynomialSubstitutionSourceAssert(6414, "md >= dm", func() (bool, error) {
+			return md >= dm, nil
+		}); e != nil {
+			return e
 		}
 		priorGenerated, priorCallee := m.generatedActive, m.generatedCalleePending
 		mono, e := m.generatedRemoveVariable(term, x)
