@@ -394,6 +394,10 @@ func (m *RationalManager) normalizeWithAllocationContext(a *Rational, context in
 	return m.normalizeWithAllocationContextAndReceipt(a, context, nil)
 }
 func (m *RationalManager) normalizeWithAllocationContextAndReceipt(a *Rational, context integerAllocationInvocationContext, receipt *RationalNormalizeInvocationReceipt) (_rawErr error) {
+	if call := context.rationalPower; call != nil && call.valid() && call.executing && call.manager == m && call.power.executing {
+		receipt = &call.normalize
+	}
+
 	tmp := &m.NTmp
 	if m.Synchronized {
 		r := &m.RawArithmetic

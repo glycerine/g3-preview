@@ -74,6 +74,7 @@ func (m *AlgebraicRootCore) dispatchUnary(a *Algebraic, k uint32, out *Algebraic
 }
 
 type algebraicBasicRootScope struct {
+	power            unumeral.RationalPowerInvocation
 	adjust           unumeral.BinaryIntegerDebugInvocationReceipt
 	convert          unumeral.BinaryConvertInvocationReceipt
 	root             unumeral.RationalRootInvocation
@@ -88,7 +89,7 @@ type algebraicBasicRootScope struct {
 }
 
 func (s *algebraicBasicRootScope) pending(m *AlgebraicRootCore) bool {
-	return m.rootTracePending() || s.root.Pending() || m.config.Binary.ConvertInvocationPending(&s.convert) || m.config.Binary.IntegerDebugInvocationPending(&s.adjust)
+	return m.rootTracePending() || s.root.Pending() || s.power.Pending() || m.config.Binary.ConvertInvocationPending(&s.convert) || m.config.Binary.IntegerDebugInvocationPending(&s.adjust)
 }
 
 func (m *AlgebraicRootCore) cleanupBasicRoot() error {
@@ -108,10 +109,16 @@ func (m *AlgebraicRootCore) cleanupBasicRoot() error {
 	if e := m.config.Binary.CleanupConvertInvocation(&s.convert); e != nil {
 		return e
 	}
+	if e := s.power.Cleanup(false); e != nil {
+		return e
+	}
 	if e := s.root.Cleanup(false); e != nil {
 		return e
 	}
 	if e := m.finishBasicRootLocals(); e != nil {
+		return e
+	}
+	if e := s.power.Cleanup(true); e != nil {
 		return e
 	}
 	if e := s.root.Cleanup(true); e != nil {
@@ -131,6 +138,9 @@ func (m *AlgebraicRootCore) finishBasicRootSource() error {
 		if e := m.config.Binary.ConvertInvocationSourceCause(&s.convert); e != nil {
 			return e
 		}
+	}
+	if e := s.power.SourceCause(); e != nil {
+		return e
 	}
 	if e := s.root.SourceCause(); e != nil {
 		return e
@@ -320,7 +330,7 @@ func (m *AlgebraicRootCore) basicPower(value *unumeral.Rational, k uint32, out *
 	if value == nil {
 		e = m.config.Rationals.SetInt32(&s.q, 1)
 	} else {
-		e = m.config.Rationals.Power(value, k, &s.q)
+		e = m.config.Rationals.PowerWithInvocation(value, k, &s.q, &s.power)
 	}
 	if e != nil {
 		return e

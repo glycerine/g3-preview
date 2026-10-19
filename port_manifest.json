@@ -38382,7 +38382,10 @@
         "pkg/util/numeral/mpbq_debug_children.go",
         "pkg/util/numeral/mpbq_integer_debug_invocation.go",
         "pkg/util/numeral/mpbq_integer_debug_invocation_test.go",
-        "pkg/math/polynomial/algebraic_basic_root_bounds_source_test.go"
+        "pkg/math/polynomial/algebraic_basic_root_bounds_source_test.go",
+        "pkg/util/numeral/mpq_power_call.go",
+        "pkg/util/numeral/mpq_power_call_test.go",
+        "pkg/math/polynomial/algebraic_basic_power_source_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -38548,7 +38551,11 @@
         "TestAlgebraicBasicRootPolynomialTraceOwnsStoppedDisplay",
         "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation",
         "TestAlgebraicBasicRootNonexactBoundsEveryReservation",
-        "TestBinaryIntegerDebugReceiptRejectsLaterConversion"
+        "TestBinaryIntegerDebugReceiptRejectsLaterConversion",
+        "TestAlgebraicBasicPowerEveryReservation",
+        "TestRationalPowerInvocationEveryReservation",
+        "TestRationalPowerInvocationRejectsReplacementAndCopiedOwner",
+        "TestRationalPowerInvocationExecutingTransportGuards"
       ],
       "conditionals": [
         {
@@ -39364,12 +39371,15 @@
           ]
         },
         {
-          "name": "Unary power/root resultant selection cpp1086-1157 and dispatch cpp1271-1381; interval and root_core diagnostics, accepted integer-root children for exact rational construction; bound/power child failure audit remains open",
+          "name": "Unary power/root resultant selection cpp1086-1157 and dispatch cpp1271-1381; interval/root_core diagnostics and accepted basic-root conversion/adjustment, integer-root and basic-power numeric children; remaining nonbasic root/debug and trace ownership audits open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_unary.go",
           "go_targets": [
             "pkg/math/polynomial/algebraic_unary_trace.go",
-            "pkg/util/numeral/mpbqi_debug_invocation.go"
+            "pkg/util/numeral/mpbqi_debug_invocation.go",
+            "pkg/util/numeral/mpq_power_call.go",
+            "pkg/math/polynomial/algebraic_basic_root_bounds_source_test.go",
+            "pkg/math/polynomial/algebraic_basic_power_source_test.go"
           ],
           "tests": [
             "TestAlgebraicUnaryPowerRootAndAliases",
@@ -39387,7 +39397,9 @@
             "TestAlgebraicBasicRootTraceDisabledDoesNotRead",
             "TestAlgebraicBasicRootTraceCallbackBeforePublication",
             "TestAlgebraicBasicRootPolynomialTraceOwnsStoppedDisplay",
-            "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation"
+            "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation",
+            "TestAlgebraicBasicRootNonexactBoundsEveryReservation",
+            "TestAlgebraicBasicPowerEveryReservation"
           ]
         }
       ],
@@ -39578,7 +39590,10 @@
         "pkg/util/numeral/mpbq_debug_children.go",
         "pkg/util/numeral/mpbq_integer_debug_invocation.go",
         "pkg/util/numeral/mpbq_integer_debug_invocation_test.go",
-        "pkg/math/polynomial/algebraic_basic_root_bounds_source_test.go"
+        "pkg/math/polynomial/algebraic_basic_root_bounds_source_test.go",
+        "pkg/util/numeral/mpq_power_call.go",
+        "pkg/util/numeral/mpq_power_call_test.go",
+        "pkg/math/polynomial/algebraic_basic_power_source_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -39741,7 +39756,11 @@
         "TestAlgebraicBasicRootPolynomialTraceOwnsStoppedDisplay",
         "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation",
         "TestAlgebraicBasicRootNonexactBoundsEveryReservation",
-        "TestBinaryIntegerDebugReceiptRejectsLaterConversion"
+        "TestBinaryIntegerDebugReceiptRejectsLaterConversion",
+        "TestAlgebraicBasicPowerEveryReservation",
+        "TestRationalPowerInvocationEveryReservation",
+        "TestRationalPowerInvocationRejectsReplacementAndCopiedOwner",
+        "TestRationalPowerInvocationExecutingTransportGuards"
       ],
       "conditionals": [
         {
@@ -40138,12 +40157,15 @@
           ]
         },
         {
-          "name": "Unary power/root resultant selection cpp1086-1157 and dispatch cpp1271-1381; interval and root_core diagnostics, accepted integer-root children for exact rational construction; bound/power child failure audit remains open",
+          "name": "Unary power/root resultant selection cpp1086-1157 and dispatch cpp1271-1381; interval/root_core diagnostics and accepted basic-root conversion/adjustment, integer-root and basic-power numeric children; remaining nonbasic root/debug and trace ownership audits open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_unary.go",
           "go_targets": [
             "pkg/math/polynomial/algebraic_unary_trace.go",
-            "pkg/util/numeral/mpbqi_debug_invocation.go"
+            "pkg/util/numeral/mpbqi_debug_invocation.go",
+            "pkg/util/numeral/mpq_power_call.go",
+            "pkg/math/polynomial/algebraic_basic_root_bounds_source_test.go",
+            "pkg/math/polynomial/algebraic_basic_power_source_test.go"
           ],
           "tests": [
             "TestAlgebraicUnaryPowerRootAndAliases",
@@ -40161,7 +40183,9 @@
             "TestAlgebraicBasicRootTraceDisabledDoesNotRead",
             "TestAlgebraicBasicRootTraceCallbackBeforePublication",
             "TestAlgebraicBasicRootPolynomialTraceOwnsStoppedDisplay",
-            "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation"
+            "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation",
+            "TestAlgebraicBasicRootNonexactBoundsEveryReservation",
+            "TestAlgebraicBasicPowerEveryReservation"
           ]
         }
       ],
@@ -169888,7 +169912,10 @@
         "pkg/util/numeral/mpq_display_source_test.go",
         "pkg/util/numeral/mpq_root_invocation.go",
         "pkg/util/numeral/mpq_root_invocation_test.go",
-        "pkg/math/polynomial/algebraic_basic_root_trace_test.go"
+        "pkg/math/polynomial/algebraic_basic_root_trace_test.go",
+        "pkg/util/numeral/mpq_power_call.go",
+        "pkg/util/numeral/mpq_power_call_test.go",
+        "pkg/math/polynomial/algebraic_basic_power_source_test.go"
       ],
       "tests": [
         "TestRationalCompareSourceSignAssertionSites",
@@ -170098,7 +170125,11 @@
         "TestLinearNumericInsertionCallbackBorrowsActualOwners",
         "TestRationalRawDisplayLiteralAndLateDenominatorRead",
         "TestRationalRootInvocationActualRAWAndLaterIntegerCall",
-        "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation"
+        "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation",
+        "TestAlgebraicBasicPowerEveryReservation",
+        "TestRationalPowerInvocationEveryReservation",
+        "TestRationalPowerInvocationRejectsReplacementAndCopiedOwner",
+        "TestRationalPowerInvocationExecutingTransportGuards"
       ],
       "assertions": [
         {
@@ -170800,6 +170831,21 @@
             "TestRationalSetStringTraceEndlRefusalKeepsNumericResult",
             "TestRationalSetStringTraceFormatterGuardPropagates"
           ]
+        },
+        {
+          "name": "Retained algebraic basic-power caller captures actual rational power/normalization, reached integer RAW and numerical allocation children; source cleanup precedes older scoped rational and owning abort follows it; broader trace ownership audit remains open",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/mpq_power_call.go",
+          "go_targets": [
+            "pkg/util/numeral/mpq_power_call_test.go",
+            "pkg/math/polynomial/algebraic_basic_power_source_test.go"
+          ],
+          "tests": [
+            "TestAlgebraicBasicPowerEveryReservation",
+            "TestRationalPowerInvocationEveryReservation",
+            "TestRationalPowerInvocationRejectsReplacementAndCopiedOwner",
+            "TestRationalPowerInvocationExecutingTransportGuards"
+          ]
         }
       ],
       "ownership": [
@@ -170949,7 +170995,10 @@
         "pkg/util/numeral/mpq_display_source_test.go",
         "pkg/util/numeral/mpq_root_invocation.go",
         "pkg/util/numeral/mpq_root_invocation_test.go",
-        "pkg/math/polynomial/algebraic_basic_root_trace_test.go"
+        "pkg/math/polynomial/algebraic_basic_root_trace_test.go",
+        "pkg/util/numeral/mpq_power_call.go",
+        "pkg/util/numeral/mpq_power_call_test.go",
+        "pkg/math/polynomial/algebraic_basic_power_source_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -171252,7 +171301,11 @@
         "TestLinearNumericInsertionCallbackBorrowsActualOwners",
         "TestRationalRawDisplayLiteralAndLateDenominatorRead",
         "TestRationalRootInvocationActualRAWAndLaterIntegerCall",
-        "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation"
+        "TestAlgebraicBasicRootRationalTraceEveryMultiwordReservation",
+        "TestAlgebraicBasicPowerEveryReservation",
+        "TestRationalPowerInvocationEveryReservation",
+        "TestRationalPowerInvocationRejectsReplacementAndCopiedOwner",
+        "TestRationalPowerInvocationExecutingTransportGuards"
       ],
       "conditionals": [
         {
@@ -172567,6 +172620,21 @@
             "TestRationalSetStringTraceInsertionAndEndlBoundaries",
             "TestRationalSetStringTraceEndlRefusalKeepsNumericResult",
             "TestRationalSetStringTraceFormatterGuardPropagates"
+          ]
+        },
+        {
+          "name": "Retained algebraic basic-power caller captures actual rational power/normalization, reached integer RAW and numerical allocation children; source cleanup precedes older scoped rational and owning abort follows it; broader trace ownership audit remains open",
+          "status": "partial",
+          "go_target": "pkg/util/numeral/mpq_power_call.go",
+          "go_targets": [
+            "pkg/util/numeral/mpq_power_call_test.go",
+            "pkg/math/polynomial/algebraic_basic_power_source_test.go"
+          ],
+          "tests": [
+            "TestAlgebraicBasicPowerEveryReservation",
+            "TestRationalPowerInvocationEveryReservation",
+            "TestRationalPowerInvocationRejectsReplacementAndCopiedOwner",
+            "TestRationalPowerInvocationExecutingTransportGuards"
           ]
         }
       ],

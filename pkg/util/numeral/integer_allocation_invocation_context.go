@@ -4,6 +4,7 @@ package numeral
 // Explicit passed invocation identity. It carries no allocation snapshot and
 // creates no source numeral or reservation.
 type integerAllocationInvocationContext struct {
+	rationalPower    *RationalPowerInvocation
 	Caller           *NumericInvocationHooks
 	callerGeneration uint64
 
