@@ -47,8 +47,11 @@ func (m *AlgebraicRootCore) cleanupRootTrace() error {
 }
 
 func (m *AlgebraicRootCore) emitRootTrace(function string, line int, body func(io.Writer) error) error {
+	return m.emitRootTraceTag("algebraic", function, line, body)
+}
+func (m *AlgebraicRootCore) emitRootTraceTag(tag, function string, line int, body func(io.Writer) error) error {
 	tags := m.config.Rationals.Integers().BorrowTraceTags()
-	if !tags.ShouldTrace("algebraic") {
+	if !tags.ShouldTrace(tag) {
 		return nil
 	}
 	s := &m.rootTrace
@@ -64,7 +67,7 @@ func (m *AlgebraicRootCore) emitRootTrace(function string, line int, body func(i
 	s.running = true
 	defer func() { s.running = false; s.borrow.unbind() }()
 	var computation error
-	_ = tags.EmitConditional("algebraic", function, "src/math/polynomial/algebraic_numbers.cpp", line,
+	_ = tags.EmitConditional(tag, function, "src/math/polynomial/algebraic_numbers.cpp", line,
 		func() bool { return true }, func(w io.Writer) error {
 			computation = body(w)
 			return computation

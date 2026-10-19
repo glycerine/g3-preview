@@ -16,6 +16,8 @@ type algebraicSavedInterval struct {
 	owned, constructed, restored bool
 }
 type algebraicBinaryScope struct {
+	traceRootPending                     bool
+	traceRootStop                        error
 	refinable                            upolyRefinableInvocationReceipt
 	polynomialCaller                     *polynomialAlgebraicEvaluationScope
 	p, f                                 UPolynomial
@@ -132,6 +134,9 @@ func (m *AlgebraicRootCore) restoreBinaryInterval(saved *algebraicSavedInterval)
 func (m *AlgebraicRootCore) finishBinaryLocals() error {
 	s := &m.binary
 	p := m.config.Polynomials
+	if s.traceRootPending && s.traceRootStop != nil {
+		return s.traceRootStop
+	}
 	if e := m.rootTraceSourceCause(); e != nil {
 		return e
 	}
@@ -208,6 +213,12 @@ func (m *AlgebraicRootCore) cleanupBinary() error {
 	}
 	s.cleaning = true
 	defer func() { s.cleaning = false }()
+	if s.traceRootPending {
+		if e := m.cleanupRootDisplay(); e != nil {
+			return e
+		}
+		s.traceRootPending = false
+	}
 	if e := m.cleanupRootTrace(); e != nil {
 		return e
 	}
@@ -283,6 +294,9 @@ func (m *AlgebraicRootCore) makeBinary(a, b, out *Algebraic, kind uint8) (cause 
 	if e = m.binaryResultPolynomial(a, b, s.p, kind); e != nil {
 		return e
 	}
+	if e = m.traceBinaryOperands(a, b); e != nil {
+		return e
+	}
 	s.factors, e = p.NewFactors()
 	if e != nil {
 		return e
@@ -306,6 +320,9 @@ func (m *AlgebraicRootCore) makeBinary(a, b, out *Algebraic, kind uint8) (cause 
 		return e
 	}
 	for i := uint32(0); i < n; i++ {
+		if e = m.traceBinaryFactor(i); e != nil {
+			return e
+		}
 		s.pendingSequence, e = p.NewSequence()
 		if e != nil {
 			return e
@@ -393,6 +410,9 @@ func (m *AlgebraicRootCore) makeBinary(a, b, out *Algebraic, kind uint8) (cause 
 			if seq == nil {
 				continue
 			}
+			if e = m.traceBinarySequence(uint32(i), seq); e != nil {
+				return e
+			}
 			lv, e := p.SignVariationsBinary(seq, s.interval.BorrowLower())
 			if e != nil {
 				return e
@@ -417,6 +437,9 @@ func (m *AlgebraicRootCore) makeBinary(a, b, out *Algebraic, kind uint8) (cause 
 			}
 		}
 		if remaining == 1 && target != math.MaxUint32 {
+			if e = m.traceBinaryTarget(target); e != nil {
+				return e
+			}
 			if e = m.restoreBinaryInterval(&s.saved[0]); e != nil {
 				return e
 			}

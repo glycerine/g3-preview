@@ -10,6 +10,8 @@ import (
 )
 
 type algebraicRootDisplayScope struct {
+	display         upolyDisplayInvocationReceipt
+	sourceStop      error
 	rootID          upolyRootIDInvocationReceipt
 	insertions      [2]unumeral.NumeralInsertionReceipt
 	negative        unumeral.Int
@@ -36,6 +38,13 @@ func (m *AlgebraicRootCore) finishRootDisplay(owning bool) error {
 		} else if e := p.cleanupRootIDWithReceipt(&s.rootID); e != nil {
 			return e
 		}
+	}
+	if owning {
+		if e := p.cleanupDisplayReceipt(&s.display); e != nil {
+			return e
+		}
+	} else if e := p.displayReceiptSourceCause(&s.display); e != nil {
+		return e
 	}
 	for i := len(s.insertions) - 1; i >= 0; i-- {
 		if !s.insertions[i].Active() {
@@ -67,7 +76,7 @@ func (m *AlgebraicRootCore) finishRootDisplay(owning bool) error {
 		}
 		s.negativeOwned = false
 	}
-	s.active = p.matchesRootID(&s.rootID) && p.rootID.active
+	s.active = p.matchesRootID(&s.rootID) && p.rootID.active || p.displayReceiptPending(&s.display)
 	for i := range s.insertions {
 		if s.insertions[i].Active() {
 			s.active = true
@@ -113,7 +122,14 @@ func (m *AlgebraicRootCore) displayRootAtLocation(out unumeral.RationalSourceStr
 	var view UPolynomialView
 	s := &m.rootDisplay
 	*s = algebraicRootDisplayScope{active: true, running: true}
-	defer func() { s.running = false; cause = errors.Join(cause, m.finishRootDisplay(false)) }()
+	defer func() {
+		s.running = false
+		cleanup := m.finishRootDisplay(false)
+		if cleanup != nil {
+			s.sourceStop = cleanup
+		}
+		cause = errors.Join(cause, cleanup)
+	}()
 	if l.kind == 0 {
 		s.negativeOwned = true
 		z := m.config.Rationals.Integers()
@@ -153,9 +169,9 @@ func (m *AlgebraicRootCore) displayRootAtLocation(out unumeral.RationalSourceStr
 		return e
 	}
 	if smt {
-		e = p.DisplaySMT2Into(view, out, variable)
+		e = p.displaySMT2IntoWithReceipt(view, out, variable, &s.display)
 	} else {
-		e = p.DisplayInto(view, out, variable, false)
+		e = p.displayIntoWithReceipt(view, out, variable, false, &s.display)
 	}
 	if e != nil {
 		return e

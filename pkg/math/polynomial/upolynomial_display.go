@@ -131,9 +131,15 @@ func displayUnsigned(out unumeral.RationalSourceStream, n uint32) error {
 	return out.AppendCString(string(bytes[i:]))
 }
 func (m *UPolynomialManager) DisplaySMT2Into(p UPolynomialView, out unumeral.RationalSourceStream, variable string) (cause error) {
+	return m.displaySMT2IntoWithReceipt(p, out, variable, nil)
+}
+func (m *UPolynomialManager) displaySMT2IntoWithReceipt(p UPolynomialView, out unumeral.RationalSourceStream, variable string, receipt *upolyDisplayInvocationReceipt) (cause error) {
 	q, e := m.beginDisplay(true)
 	if e != nil {
 		return e
+	}
+	if receipt != nil {
+		*receipt = upolyDisplayInvocationReceipt{m, q, q.invocation}
 	}
 	defer func() { q.executing = false; cause = q.finish(cause); q.endCall() }()
 	if out == nil {

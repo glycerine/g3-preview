@@ -39019,7 +39019,8 @@
             "TestAlgebraicTinyBoundRootDisplayWithoutFailure",
             "TestAlgebraicStoppedRootDisplayProtectsBorrowedCell",
             "TestAlgebraicIntervalDecimalRejectWriterMutation",
-            "TestAlgebraicRootDisplaysRejectInputMutationFromStream"
+            "TestAlgebraicRootDisplaysRejectInputMutationFromStream",
+            "TestAlgebraicRootDisplayOwnsActualPolynomialDisplay"
           ],
           "notes": "A real first-insertion callback previously deleted the root input successfully. Public core access now rejects reentry while the existing rootDisplay.running span borrows input records and coefficient views. Regression exercises Del, CleanupValue, Swap and Copy in all three displays and checks exact original output and unchanged identities. Interval and decimal displays now likewise protect their actual full call spans, including deferred local destruction; writer regressions exercise root and basic values through both Write and WriteString. A stopped active display now also excludes ordinary core access until owning cleanup releases its exact root-ID child. Actual TLS allocation failure after polynomial output exercises Del/CleanupValue/Reset refusal and cleanup without reconstructing the source multiplication scratch hole; a fresh owner displays the same polynomial successfully. Broader display source/owning suffix, scalar assertion and stream audit remains open."
         },
@@ -39101,7 +39102,10 @@
             "TestAlgebraicBinarySetCoreDisabledTracesDoNotRead",
             "TestAlgebraicBinarySetCoreStickyTraceFailure",
             "TestAlgebraicBinaryTraceRetainsActualDisplayBeforeLocals",
-            "TestAlgebraicBinaryIntervalTraceBeforeCandidateSelection"
+            "TestAlgebraicBinaryIntervalTraceBeforeCandidateSelection",
+            "TestAlgebraicBinaryNamedTraceSourceFrontiers",
+            "TestAlgebraicBinaryNamedTraceActualDisplayStops",
+            "TestAlgebraicBinaryNamedTraceEveryReservationPrefix"
           ]
         },
         {
