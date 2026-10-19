@@ -45289,8 +45289,8 @@
           ]
         },
         {
-          "name": "Normalize cpp5904-5940: actual modular normalization and integer gcd/divide paths, source SOM NUM/g/a scopes and uniquely guarded invocation",
-          "status": "partial",
+          "name": "Complete Normalize cpp5904-5940: actual modular normalization and integer gcd/divide paths, source SOM NUM/g/a scopes and uniquely guarded invocation",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_normalize.go",
           "tests": [
             "TestPolynomialNormalizeIndependentSignedIntegerContent",
@@ -49371,8 +49371,8 @@
           ]
         },
         {
-          "name": "SquareFree and IsSquareFree general/variable cpp4529-4598,7232-7246; PrimitivePart/IsPrimitive cpp3536-3549,7212-7214 are complete in the separate gcd_prs ledger",
-          "status": "partial",
+          "name": "Complete SquareFree and IsSquareFree general/variable cpp4529-4598,7232-7246; PrimitivePart/IsPrimitive cpp3536-3549,7212-7214 are complete in the separate gcd_prs ledger",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_square_free.go",
           "tests": [
             "TestPolynomialPublicPrimitivePartLiteralContent",
