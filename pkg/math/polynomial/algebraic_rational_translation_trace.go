@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/algebraic_numbers.cpp:1394-1429.
+// Source: src/math/polynomial/algebraic_numbers.cpp:1394-1429,1498-1539.
 package polynomial
 
 import (
@@ -14,10 +14,14 @@ func (s algebraicTranslationTraceStream) AppendUint32(v uint32) error {
 	return s.AppendCString(strconv.FormatUint(uint64(v), 10))
 }
 
-func (m *AlgebraicRootCore) traceRationalTranslationInput(r *algebraicRecord, q *unumeral.Rational) error {
-	return m.emitRootTrace("add", 1394, func(w io.Writer) error {
+func (m *AlgebraicRootCore) traceRationalArithmeticInput(r *algebraicRecord, q *unumeral.Rational, multiply bool) error {
+	function, line, label := "add", 1394, "adding"
+	if multiply {
+		function, line, label = "mul", 1498, "mult"
+	}
+	return m.emitRootTrace(function, line, func(w io.Writer) error {
 		out := algebraicTranslationTraceStream{algebraicPredicateTraceStream{w}}
-		_ = out.AppendCString("adding algebraic and basic cells:\na: ")
+		_ = out.AppendCString(label + " algebraic and basic cells:\na: ")
 		p, e := m.sourcePolynomial(r)
 		if e != nil {
 			return e
@@ -41,8 +45,12 @@ func (m *AlgebraicRootCore) traceRationalTranslationInput(r *algebraicRecord, q 
 	})
 }
 
-func (m *AlgebraicRootCore) traceRationalTranslationBounds() error {
-	return m.emitRootTrace("add", 1417, func(w io.Writer) error {
+func (m *AlgebraicRootCore) traceRationalArithmeticBounds(multiply bool) error {
+	function, line := "add", 1417
+	if multiply {
+		function, line = "mul", 1525
+	}
+	return m.emitRootTrace(function, line, func(w io.Writer) error {
 		out := algebraicTranslationTraceStream{algebraicPredicateTraceStream{w}}
 		for i, prefix := range []string{"nbv: ", "\nil: ", ", iu: "} {
 			_ = out.AppendCString(prefix)
@@ -54,8 +62,12 @@ func (m *AlgebraicRootCore) traceRationalTranslationBounds() error {
 	})
 }
 
-func (m *AlgebraicRootCore) traceRationalTranslationResult(p UPolynomialView) error {
-	return m.emitRootTrace("add", 1425, func(w io.Writer) error {
+func (m *AlgebraicRootCore) traceRationalArithmeticResult(p UPolynomialView, multiply bool) error {
+	function, line := "add", 1425
+	if multiply {
+		function, line = "mul", 1535
+	}
+	return m.emitRootTrace(function, line, func(w io.Writer) error {
 		out := algebraicTranslationTraceStream{algebraicPredicateTraceStream{w}}
 		up := m.config.Polynomials
 		if e := up.displayIntoWithReceipt(p, out, "x", false, &m.rootTrace.univariate); e != nil {
@@ -70,7 +82,7 @@ func (m *AlgebraicRootCore) traceRationalTranslationResult(p UPolynomialView) er
 		_ = out.AppendCString("\n")
 		for i, prefix := range []string{"l_sign: ", "u_sign: "} {
 			_ = out.AppendCString(prefix)
-			sign, e := up.evalSignBinaryWithNegScopeAndReceipt(p, &m.arithmetic.b[i], nil, &m.arithmetic.traceEvaluations[i])
+			sign, e := up.evalSignBinaryWithNegScopeAndReceipt(p, &m.arithmetic.b[i], nil, &m.arithmetic.evaluations[i])
 			if e != nil {
 				return e
 			}

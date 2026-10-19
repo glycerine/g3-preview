@@ -9,7 +9,7 @@ import (
 
 type algebraicRationalArithmeticScope struct {
 	convertEntry      upolyConvertEntryReceipt
-	traceEvaluations  [2]upolyBinaryEvaluationInvocationReceipt
+	evaluations       [4]upolyBinaryEvaluationInvocationReceipt // diagnostic l/u, then debug assertion l/u
 	polynomialCaller  *polynomialAlgebraicEvaluationScope
 	integerAddition   *algebraicIntegerAddScope
 	q                 [3]unumeral.Rational       // nbv (or basic result), il, iu
@@ -18,6 +18,19 @@ type algebraicRationalArithmeticScope struct {
 	stage             uint8
 	active, executing bool
 	sourceStop        error
+}
+
+func (m *AlgebraicRootCore) rationalArithmeticEvaluationPending() bool {
+	if m == nil || m.self != m || !m.arithmetic.active {
+		return false
+	}
+	p := m.config.Polynomials
+	for i := range m.arithmetic.evaluations {
+		if p.matchesBinaryEvaluationReceipt(&m.arithmetic.evaluations[i]) && p.binaryEvaluation.active {
+			return true
+		}
+	}
+	return false
 }
 
 func (m *AlgebraicRootCore) cleanupRationalArithmetic() error {
@@ -38,8 +51,8 @@ func (m *AlgebraicRootCore) finishRationalArithmetic(owning bool) error {
 	// acknowledgement consumes it; ordinary source unwinding reaches the
 	// older arithmetic destructors without acquiring that ownership.
 	if owning {
-		for i := len(s.traceEvaluations) - 1; i >= 0; i-- {
-			if e := m.config.Polynomials.cleanupBinaryEvaluationWithReceipt(&s.traceEvaluations[i], false); e != nil {
+		for i := len(s.evaluations) - 1; i >= 0; i-- {
+			if e := m.config.Polynomials.cleanupBinaryEvaluationWithReceipt(&s.evaluations[i], false); e != nil {
 				return e
 			}
 		}
@@ -68,13 +81,13 @@ func (m *AlgebraicRootCore) finishRationalArithmetic(owning bool) error {
 		}
 		s.stage++
 	}
-	for i := len(s.traceEvaluations) - 1; i >= 0; i-- {
+	for i := len(s.evaluations) - 1; i >= 0; i-- {
 		p := m.config.Polynomials
 		if owning {
-			if e := p.cleanupBinaryEvaluationWithReceipt(&s.traceEvaluations[i], true); e != nil {
+			if e := p.cleanupBinaryEvaluationWithReceipt(&s.evaluations[i], true); e != nil {
 				return e
 			}
-		} else if p.matchesBinaryEvaluationReceipt(&s.traceEvaluations[i]) && p.binaryEvaluation.active {
+		} else if p.matchesBinaryEvaluationReceipt(&s.evaluations[i]) && p.binaryEvaluation.active {
 			return nil
 		}
 	}
@@ -163,32 +176,7 @@ func (m *AlgebraicRootCore) addSubRational(a *Algebraic, b *unumeral.Rational, o
 	if m.integerAdd.running {
 		s.integerAddition = &m.integerAdd
 	}
-	defer func() {
-		s.executing = false
-		if s.sourceStop == nil {
-			s.sourceStop = m.rootTraceSourceCause()
-		}
-		if s.sourceStop == nil {
-			for i := range s.traceEvaluations {
-				if p.matchesBinaryEvaluationReceipt(&s.traceEvaluations[i]) {
-					s.sourceStop = p.binaryEvaluation.sourceCause
-					if s.sourceStop != nil {
-						break
-					}
-				}
-			}
-		}
-		if s.sourceStop == nil {
-			s.sourceStop = p.convertEntryReceiptSourceCause(&s.convertEntry)
-		}
-		if s.sourceStop == nil {
-			cleanup := m.finishRationalArithmetic(false)
-			if cleanup != nil {
-				s.sourceStop = cleanup
-			}
-			cause = errors.Join(cause, cleanup)
-		}
-	}()
+	defer func() { cause = m.finishRationalArithmeticSource(cause) }()
 	if l.kind == 0 {
 		s.q[0], s.qCount = unumeral.NewRational(), 1
 		r, e := m.load(l)
@@ -215,7 +203,7 @@ func (m *AlgebraicRootCore) addSubRational(a *Algebraic, b *unumeral.Rational, o
 		return e
 	}
 	s.executing = true
-	if e = m.traceRationalTranslationInput(&r, b); e != nil {
+	if e = m.traceRationalArithmeticInput(&r, b, false); e != nil {
 		return e
 	}
 	s.q[0], s.qCount = unumeral.NewRational(), 1
@@ -267,7 +255,7 @@ func (m *AlgebraicRootCore) addSubRational(a *Algebraic, b *unumeral.Rational, o
 		if e = bm.ToRational(qm, r.interval.BorrowUpper(), &s.q[2]); e != nil {
 			return e
 		}
-		if e = m.traceRationalTranslationBounds(); e != nil {
+		if e = m.traceRationalArithmeticBounds(false); e != nil {
 			return e
 		}
 		if e = qm.Add(&s.q[1], &s.q[0], &s.q[1]); e != nil {
@@ -296,7 +284,7 @@ func (m *AlgebraicRootCore) addSubRational(a *Algebraic, b *unumeral.Rational, o
 	if e != nil {
 		return e
 	}
-	if e = m.traceRationalTranslationResult(translated); e != nil {
+	if e = m.traceRationalArithmeticResult(translated, false); e != nil {
 		return e
 	}
 	s.executing = false
@@ -304,4 +292,36 @@ func (m *AlgebraicRootCore) addSubRational(a *Algebraic, b *unumeral.Rational, o
 		return e
 	}
 	return m.Normalize(out)
+}
+
+// finishRationalArithmeticSource observes only accepted children before older
+// source destructors. Owning acknowledgement remains a separate continuation.
+func (m *AlgebraicRootCore) finishRationalArithmeticSource(cause error) error {
+	s, p := &m.arithmetic, m.config.Polynomials
+
+	s.executing = false
+	if s.sourceStop == nil {
+		s.sourceStop = m.rootTraceSourceCause()
+	}
+	if s.sourceStop == nil {
+		for i := range s.evaluations {
+			if p.matchesBinaryEvaluationReceipt(&s.evaluations[i]) {
+				s.sourceStop = p.binaryEvaluation.sourceCause
+				if s.sourceStop != nil {
+					break
+				}
+			}
+		}
+	}
+	if s.sourceStop == nil {
+		s.sourceStop = p.convertEntryReceiptSourceCause(&s.convertEntry)
+	}
+	if s.sourceStop == nil {
+		cleanup := m.finishRationalArithmetic(false)
+		if cleanup != nil {
+			s.sourceStop = cleanup
+		}
+		cause = errors.Join(cause, cleanup)
+	}
+	return cause
 }

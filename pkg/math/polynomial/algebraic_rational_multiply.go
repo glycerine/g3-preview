@@ -2,8 +2,6 @@
 package polynomial
 
 import (
-	"errors"
-
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
@@ -38,6 +36,13 @@ func (m *AlgebraicRootCore) MulRational(a *Algebraic, b *unumeral.Rational, out 
 	if e != nil {
 		return e
 	}
+	*s = algebraicRationalArithmeticScope{polynomialCaller: m.polynomialCaller, active: true, executing: true}
+	defer func() { cause = m.finishRationalArithmeticSource(cause) }()
+	if l.kind == 1 {
+		if e = m.traceRationalArithmeticInput(&r, b, true); e != nil {
+			return e
+		}
+	}
 	if l.kind == 1 && polynomialSourceDebug {
 		d := diagnostic.BorrowProcessDebugContext()
 		enabled, e := diagnostic.SourceAssertionsEnabled(d)
@@ -49,11 +54,11 @@ func (m *AlgebraicRootCore) MulRational(a *Algebraic, b *unumeral.Rational, out 
 			if e != nil {
 				return e
 			}
-			sl, e := p.EvalSignBinary(v, r.interval.BorrowLower())
+			sl, e := p.evalSignBinaryWithNegScopeAndReceipt(v, r.interval.BorrowLower(), nil, &s.evaluations[2])
 			if e != nil {
 				return e
 			}
-			su, e := p.EvalSignBinary(v, r.interval.BorrowUpper())
+			su, e := p.evalSignBinaryWithNegScopeAndReceipt(v, r.interval.BorrowUpper(), nil, &s.evaluations[3])
 			if e != nil {
 				return e
 			}
@@ -64,17 +69,7 @@ func (m *AlgebraicRootCore) MulRational(a *Algebraic, b *unumeral.Rational, out 
 			}
 		}
 	}
-	*s = algebraicRationalArithmeticScope{polynomialCaller: m.polynomialCaller, active: true, qCount: 1, executing: true}
-	s.q[0] = unumeral.NewRational()
-	defer func() {
-		s.executing = false
-		if s.sourceStop == nil {
-			s.sourceStop = p.convertEntryReceiptSourceCause(&s.convertEntry)
-		}
-		if s.sourceStop == nil {
-			cause = errors.Join(cause, m.cleanupRationalArithmetic())
-		}
-	}()
+	s.q[0], s.qCount = unumeral.NewRational(), 1
 	if l.kind == 0 {
 		if e = qm.Mul(&r.value, b, &s.q[0]); e != nil {
 			return e
@@ -144,6 +139,9 @@ func (m *AlgebraicRootCore) MulRational(a *Algebraic, b *unumeral.Rational, out 
 		if e = bm.ToRational(qm, r.interval.BorrowUpper(), &s.q[2]); e != nil {
 			return e
 		}
+		if e = m.traceRationalArithmeticBounds(true); e != nil {
+			return e
+		}
 		if e = qm.Mul(&s.q[1], &s.q[0], &s.q[1]); e != nil {
 			return e
 		}
@@ -165,6 +163,9 @@ func (m *AlgebraicRootCore) MulRational(a *Algebraic, b *unumeral.Rational, out 
 			}
 			s.qCount--
 		}
+	}
+	if e = m.traceRationalArithmeticResult(scaled, true); e != nil {
+		return e
 	}
 	s.executing = false
 	if e = m.SetRoot(out, scaled, &s.b[0], &s.b[1], r.flags&1 != 0); e != nil {

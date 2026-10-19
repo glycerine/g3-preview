@@ -38398,7 +38398,8 @@
         "pkg/math/polynomial/algebraic_owned_bound_child_source_test.go",
         "pkg/math/polynomial/algebraic_isolation_signs_display_source_test.go",
         "pkg/math/polynomial/algebraic_rational_translation_trace.go",
-        "pkg/math/polynomial/algebraic_rational_translation_trace_test.go"
+        "pkg/math/polynomial/algebraic_rational_translation_trace_test.go",
+        "pkg/math/polynomial/algebraic_rational_multiply_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -38590,7 +38591,12 @@
         "TestAlgebraicRationalTranslationInputTraceDeclarationFrontier",
         "TestAlgebraicRationalTranslationBoundsAndResultRecords",
         "TestAlgebraicRationalTranslationResultDisplayRetainsOlderBounds",
-        "TestAlgebraicRationalTranslationTraceActualEvaluationReservations"
+        "TestAlgebraicRationalTranslationTraceActualEvaluationReservations",
+        "TestAlgebraicRationalMultiplyDiagnosticRecords",
+        "TestAlgebraicRationalMultiplyDisplayDeclarationFrontiers",
+        "TestAlgebraicRationalMultiplyAssertionActualHornerOwnership",
+        "TestAlgebraicRationalMultiplyStickyStreamStillEvaluatesSigns",
+        "TestAlgebraicRationalMultiplyAssertionTransportProtectsOwner"
       ],
       "conditionals": [
         {
@@ -39191,25 +39197,34 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:1490-1563 concrete basic/rational and root/rational multiplication, source assertion gate at 1501, shared m_add_tmp composition and negative-factor interval reversal; two-root resultant route and complete child failure composition remain open",
+          "name": "algebraic_numbers.cpp:1490-1563 concrete basic/rational and root/rational multiplication, three source TRACE records, accepted debug/diagnostic Horner children, shared m_add_tmp composition and negative-factor interval reversal; broader two-root/resultant and complete child failure audits remain open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_rational_multiply.go",
           "tests": [
             "TestAlgebraicRationalMultiplyRootsSignsAndAlias",
             "TestAlgebraicRationalMultiplyBasicAndZeroShortCircuit",
             "TestAlgebraicRationalMultiplySourceAssertionBeforeLocals",
-            "TestAlgebraicRationalMultiplyBigScalarAndInverse"
+            "TestAlgebraicRationalMultiplyBigScalarAndInverse",
+            "TestAlgebraicRationalMultiplyDiagnosticRecords",
+            "TestAlgebraicRationalMultiplyDisplayDeclarationFrontiers",
+            "TestAlgebraicRationalMultiplyAssertionActualHornerOwnership",
+            "TestAlgebraicRationalMultiplyStickyStreamStillEvaluatesSigns",
+            "TestAlgebraicRationalMultiplyAssertionTransportProtectsOwner"
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:685-697,1378-1494 concrete basic/rational and root/rational addition/subtraction, persistent translated polynomial and result interval normalization; two-root resultant dispatch and full child failure composition remain open",
+          "name": "algebraic_numbers.cpp:685-697,1378-1494 concrete basic/rational and root/rational addition/subtraction, three source TRACE records with accepted formatter/Horner children, persistent translated polynomial and result interval normalization; broader two-root/resultant and complete child failure audits remain open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_rational_arithmetic.go",
           "tests": [
             "TestAlgebraicRationalTranslationBinaryNonbinaryAndAlias",
             "TestAlgebraicRationalArithmeticBasicAndNormalizedZero",
             "TestAlgebraicRationalTranslationCancellationKeepsCallerValues",
-            "TestAlgebraicRationalZeroSubtractionPublishesBeforeNegation"
+            "TestAlgebraicRationalZeroSubtractionPublishesBeforeNegation",
+            "TestAlgebraicRationalTranslationInputTraceDeclarationFrontier",
+            "TestAlgebraicRationalTranslationBoundsAndResultRecords",
+            "TestAlgebraicRationalTranslationResultDisplayRetainsOlderBounds",
+            "TestAlgebraicRationalTranslationTraceActualEvaluationReservations"
           ]
         },
         {
@@ -39515,7 +39530,8 @@
         "The retained signs-between-roots overload (algebraic_numbers.cpp:2549-2624,2883-2885; nlsat_evaluator.cpp:467) now isolates roots, refines each actual root to source precision two, and appends signs at an outside integer, between adjacent roots, and at the opposite outside integer. With no roots it evaluates at zero. Concrete ext2 mapping preserves contains/getter order, borrowing assigned cells and one shared fallback. Signs are native []int and retain raw qm.sign values and any existing/appended prefix. The actual scoped sample borrows its polynomial owner and survives a younger source destructor stop until owning cleanup. Accepted EvalSign and scalar-selection caller bindings preserve older refused evaluators; source cleanup errors are distinguished from body cancellation. IntLT/IntGT now invoke the actual SetInteger wrapper; younger scoped-rational stops protect older selection temporaries. Tests verify exact interval signs including raw -6/+6, repeated roots, rational/irrational inputs, actual precision, both reached checkpoint frontiers through success/cleanup/retry, partial output preservation, older real LexSort refusal, running-owner refusals, nonzero assertion Throw/erasure and a qualified actual BIG sample destructor stop followed by owning cleanup. Ordinary and checked/debug/trace focused checks use CPUs 8-16. Full allocation/callback/destructor/TRACE coverage, eager constructor composition and overall polynomial/AST completion remain incomplete.",
         "The polynomial-ref and sexpr mk_root overloads (algebraic_numbers.cpp:665-680,2887-2893; retained AST arithmetic consumer arith_decl_plugin.cpp:95-98) now convert/parse directly into the actual persistent m_isolate_tmp1 and then invoke one-based distinct-real-root selection. Source index/univariate assertions precede workspace construction; with assertions erased, syntax and conversion still precede runtime index errors. Root construction throws the concrete algebraic_exception/default_exception class with unchanged source messages. A concrete construction owner retains only actually accepted dense conversion, parser lexical entry, factor frontend and private root vector; cleanup preserves older refused factor work. The converter records accepted lexical entry, refuses reentry/cleanup while converting, and can release completed native metadata without sweeping an unrelated lexical owner. Owning cleanup finishes younger children before private root vectors; conversion publications and caller output survive errors. Tests verify exact sqrt(2) identities, repeated-factor distinct indices, BIG linear coefficients, persistent descriptor/receiving owner, parser location and partial prefix, zero/out-of-range errors, assertion Throw/erasure ordering, both wrappers through every reached checkpoint/cleanup/retry, older actual factor refusal and parser/isolation callback owner guards. Focused ordinary and checked/debug/trace algebraic/evaluation/parser checks pass on CPUs 8-16. TRACE, full allocation/destructor/callback/eager-constructor composition and overall polynomial/AST completion remain incomplete.",
         "Rational translation input TRACE at algebraic_numbers.cpp:1394-1396 now uses actual univariate display and raw binary/rational numeral insertion receipts. The nbv declaration follows that diagnostic; a qualified formatter stop retains the exact child before nbv/l/u construction. Both add/subtract literal input records and owning acknowledgement are checked. Later translation diagnostics and the complete polynomial/AST audit remain open; no unit is promoted.",
-        "The remaining mixed rational add/subtract TRACE records at algebraic_numbers.cpp:1417-1429 now preserve pretranslation nbv/il/iu, the translated polynomial/binary bounds and both actual Horner sign evaluations. Accepted binary-evaluation receipts identify only the reached invocations. A body failure performs older source destructors while retaining actual unjoined Horner RAW until owning acknowledgement; a source-END stop protects older arithmetic locals. Literal dyadic/nonbinary records, both source branches, final display declaration frontiers, and independently armed lower/upper evaluation reservation sweeps cover the increment. Whole polynomial/AST source failure-composition audits remain open."
+        "The remaining mixed rational add/subtract TRACE records at algebraic_numbers.cpp:1417-1429 now preserve pretranslation nbv/il/iu, the translated polynomial/binary bounds and both actual Horner sign evaluations. Accepted binary-evaluation receipts identify only the reached invocations. A body failure performs older source destructors while retaining actual unjoined Horner RAW until owning acknowledgement; a source-END stop protects older arithmetic locals. Literal dyadic/nonbinary records, both source branches, final display declaration frontiers, and independently armed lower/upper evaluation reservation sweeps cover the increment. Whole polynomial/AST source failure-composition audits remain open.",
+        "Mixed rational multiplication now retains the three source TRACE records at algebraic_numbers.cpp:1498,1525,1535 and both actual SASSERT Horner invocations at 1501 before scoped nbv construction. Shared concrete arithmetic source cleanup observes only accepted display/evaluation/interval-conversion receipts; source body failure preserves unjoined RAW for owning acknowledgement. Exact pending arithmetic Horner children block ordinary algebraic admission. Tests cover positive/negative dyadic and nonbinary records before primitive result normalization, input/final formatter stops, independently reached lower/upper assertion reservation failures before nbv/l/u, cleanup, erased operands and sticky output failure that still evaluates both final signs. Whole polynomial and AST completion audits remain open. A real returning allocation-failure transport during the actual assertion verifies refusal of deletion, multiplication reentry, retained cleanup and owner close with unchanged arithmetic frame, input, budget and physical allocation statistics."
       ]
     },
     {
@@ -39669,7 +39685,8 @@
         "pkg/math/polynomial/algebraic_owned_bound_child_source_test.go",
         "pkg/math/polynomial/algebraic_isolation_signs_display_source_test.go",
         "pkg/math/polynomial/algebraic_rational_translation_trace.go",
-        "pkg/math/polynomial/algebraic_rational_translation_trace_test.go"
+        "pkg/math/polynomial/algebraic_rational_translation_trace_test.go",
+        "pkg/math/polynomial/algebraic_rational_multiply_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -39858,7 +39875,12 @@
         "TestAlgebraicRationalTranslationInputTraceDeclarationFrontier",
         "TestAlgebraicRationalTranslationBoundsAndResultRecords",
         "TestAlgebraicRationalTranslationResultDisplayRetainsOlderBounds",
-        "TestAlgebraicRationalTranslationTraceActualEvaluationReservations"
+        "TestAlgebraicRationalTranslationTraceActualEvaluationReservations",
+        "TestAlgebraicRationalMultiplyDiagnosticRecords",
+        "TestAlgebraicRationalMultiplyDisplayDeclarationFrontiers",
+        "TestAlgebraicRationalMultiplyAssertionActualHornerOwnership",
+        "TestAlgebraicRationalMultiplyStickyStreamStillEvaluatesSigns",
+        "TestAlgebraicRationalMultiplyAssertionTransportProtectsOwner"
       ],
       "conditionals": [
         {
@@ -40069,25 +40091,34 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:1490-1563 concrete basic/rational and root/rational multiplication, source assertion gate at 1501, shared m_add_tmp composition and negative-factor interval reversal; two-root resultant route and complete child failure composition remain open",
+          "name": "algebraic_numbers.cpp:1490-1563 concrete basic/rational and root/rational multiplication, three source TRACE records, accepted debug/diagnostic Horner children, shared m_add_tmp composition and negative-factor interval reversal; broader two-root/resultant and complete child failure audits remain open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_rational_multiply.go",
           "tests": [
             "TestAlgebraicRationalMultiplyRootsSignsAndAlias",
             "TestAlgebraicRationalMultiplyBasicAndZeroShortCircuit",
             "TestAlgebraicRationalMultiplySourceAssertionBeforeLocals",
-            "TestAlgebraicRationalMultiplyBigScalarAndInverse"
+            "TestAlgebraicRationalMultiplyBigScalarAndInverse",
+            "TestAlgebraicRationalMultiplyDiagnosticRecords",
+            "TestAlgebraicRationalMultiplyDisplayDeclarationFrontiers",
+            "TestAlgebraicRationalMultiplyAssertionActualHornerOwnership",
+            "TestAlgebraicRationalMultiplyStickyStreamStillEvaluatesSigns",
+            "TestAlgebraicRationalMultiplyAssertionTransportProtectsOwner"
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:685-697,1378-1494 concrete basic/rational and root/rational addition/subtraction, persistent translated polynomial and result interval normalization; two-root resultant dispatch and full child failure composition remain open",
+          "name": "algebraic_numbers.cpp:685-697,1378-1494 concrete basic/rational and root/rational addition/subtraction, three source TRACE records with accepted formatter/Horner children, persistent translated polynomial and result interval normalization; broader two-root/resultant and complete child failure audits remain open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_rational_arithmetic.go",
           "tests": [
             "TestAlgebraicRationalTranslationBinaryNonbinaryAndAlias",
             "TestAlgebraicRationalArithmeticBasicAndNormalizedZero",
             "TestAlgebraicRationalTranslationCancellationKeepsCallerValues",
-            "TestAlgebraicRationalZeroSubtractionPublishesBeforeNegation"
+            "TestAlgebraicRationalZeroSubtractionPublishesBeforeNegation",
+            "TestAlgebraicRationalTranslationInputTraceDeclarationFrontier",
+            "TestAlgebraicRationalTranslationBoundsAndResultRecords",
+            "TestAlgebraicRationalTranslationResultDisplayRetainsOlderBounds",
+            "TestAlgebraicRationalTranslationTraceActualEvaluationReservations"
           ]
         },
         {
@@ -40362,7 +40393,8 @@
         "The retained signs-between-roots overload (algebraic_numbers.cpp:2549-2624,2883-2885; nlsat_evaluator.cpp:467) now isolates roots, refines each actual root to source precision two, and appends signs at an outside integer, between adjacent roots, and at the opposite outside integer. With no roots it evaluates at zero. Concrete ext2 mapping preserves contains/getter order, borrowing assigned cells and one shared fallback. Signs are native []int and retain raw qm.sign values and any existing/appended prefix. The actual scoped sample borrows its polynomial owner and survives a younger source destructor stop until owning cleanup. Accepted EvalSign and scalar-selection caller bindings preserve older refused evaluators; source cleanup errors are distinguished from body cancellation. IntLT/IntGT now invoke the actual SetInteger wrapper; younger scoped-rational stops protect older selection temporaries. Tests verify exact interval signs including raw -6/+6, repeated roots, rational/irrational inputs, actual precision, both reached checkpoint frontiers through success/cleanup/retry, partial output preservation, older real LexSort refusal, running-owner refusals, nonzero assertion Throw/erasure and a qualified actual BIG sample destructor stop followed by owning cleanup. Ordinary and checked/debug/trace focused checks use CPUs 8-16. Full allocation/callback/destructor/TRACE coverage, eager constructor composition and overall polynomial/AST completion remain incomplete.",
         "The polynomial-ref and sexpr mk_root overloads (algebraic_numbers.cpp:665-680,2887-2893; retained AST arithmetic consumer arith_decl_plugin.cpp:95-98) now convert/parse directly into the actual persistent m_isolate_tmp1 and then invoke one-based distinct-real-root selection. Source index/univariate assertions precede workspace construction; with assertions erased, syntax and conversion still precede runtime index errors. Root construction throws the concrete algebraic_exception/default_exception class with unchanged source messages. A concrete construction owner retains only actually accepted dense conversion, parser lexical entry, factor frontend and private root vector; cleanup preserves older refused factor work. The converter records accepted lexical entry, refuses reentry/cleanup while converting, and can release completed native metadata without sweeping an unrelated lexical owner. Owning cleanup finishes younger children before private root vectors; conversion publications and caller output survive errors. Tests verify exact sqrt(2) identities, repeated-factor distinct indices, BIG linear coefficients, persistent descriptor/receiving owner, parser location and partial prefix, zero/out-of-range errors, assertion Throw/erasure ordering, both wrappers through every reached checkpoint/cleanup/retry, older actual factor refusal and parser/isolation callback owner guards. Focused ordinary and checked/debug/trace algebraic/evaluation/parser checks pass on CPUs 8-16. TRACE, full allocation/destructor/callback/eager-constructor composition and overall polynomial/AST completion remain incomplete.",
         "Rational translation input TRACE at algebraic_numbers.cpp:1394-1396 now uses actual univariate display and raw binary/rational numeral insertion receipts. The nbv declaration follows that diagnostic; a qualified formatter stop retains the exact child before nbv/l/u construction. Both add/subtract literal input records and owning acknowledgement are checked. Later translation diagnostics and the complete polynomial/AST audit remain open; no unit is promoted.",
-        "The remaining mixed rational add/subtract TRACE records at algebraic_numbers.cpp:1417-1429 now preserve pretranslation nbv/il/iu, the translated polynomial/binary bounds and both actual Horner sign evaluations. Accepted binary-evaluation receipts identify only the reached invocations. A body failure performs older source destructors while retaining actual unjoined Horner RAW until owning acknowledgement; a source-END stop protects older arithmetic locals. Literal dyadic/nonbinary records, both source branches, final display declaration frontiers, and independently armed lower/upper evaluation reservation sweeps cover the increment. Whole polynomial/AST source failure-composition audits remain open."
+        "The remaining mixed rational add/subtract TRACE records at algebraic_numbers.cpp:1417-1429 now preserve pretranslation nbv/il/iu, the translated polynomial/binary bounds and both actual Horner sign evaluations. Accepted binary-evaluation receipts identify only the reached invocations. A body failure performs older source destructors while retaining actual unjoined Horner RAW until owning acknowledgement; a source-END stop protects older arithmetic locals. Literal dyadic/nonbinary records, both source branches, final display declaration frontiers, and independently armed lower/upper evaluation reservation sweeps cover the increment. Whole polynomial/AST source failure-composition audits remain open.",
+        "Mixed rational multiplication now retains the three source TRACE records at algebraic_numbers.cpp:1498,1525,1535 and both actual SASSERT Horner invocations at 1501 before scoped nbv construction. Shared concrete arithmetic source cleanup observes only accepted display/evaluation/interval-conversion receipts; source body failure preserves unjoined RAW for owning acknowledgement. Exact pending arithmetic Horner children block ordinary algebraic admission. Tests cover positive/negative dyadic and nonbinary records before primitive result normalization, input/final formatter stops, independently reached lower/upper assertion reservation failures before nbv/l/u, cleanup, erased operands and sticky output failure that still evaluates both final signs. Whole polynomial and AST completion audits remain open. A real returning allocation-failure transport during the actual assertion verifies refusal of deletion, multiplication reentry, retained cleanup and owner close with unchanged arithmetic frame, input, budget and physical allocation statistics."
       ]
     },
     {

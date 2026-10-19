@@ -146,10 +146,10 @@ func TestAlgebraicRationalTranslationBoundsAndResultRecords(t *testing.T) {
 							t.Fatal("dyadic result record", got, want)
 						}
 					}
-					if c.arithmetic.traceEvaluations[0].owner != p || c.arithmetic.traceEvaluations[1].owner != p {
+					if c.arithmetic.evaluations[0].owner != p || c.arithmetic.evaluations[1].owner != p {
 						t.Fatal("missing actual Horner children")
 					}
-				} else if text.Len() != 0 || c.arithmetic.traceEvaluations[0].owner != nil || c.arithmetic.traceEvaluations[1].owner != nil {
+				} else if text.Len() != 0 || c.arithmetic.evaluations[0].owner != nil || c.arithmetic.evaluations[1].owner != nil {
 					t.Fatal("erased diagnostic evaluated operands")
 				}
 				serviceMust(t, c.CleanupRetained())
@@ -178,7 +178,7 @@ func TestAlgebraicRationalTranslationResultDisplayRetainsOlderBounds(t *testing.
 		if !errors.Is(e, arena.ErrBounds) || w.ref == 0 || !c.rootTracePending() || !c.arithmetic.active || c.arithmetic.qCount != 1 || c.arithmetic.bCount != 2 || out.slot != 0 {
 			t.Fatal("final display lost older locals or published result", e)
 		}
-		if c.arithmetic.traceEvaluations[0].owner != nil || c.arithmetic.traceEvaluations[1].owner != nil {
+		if c.arithmetic.evaluations[0].owner != nil || c.arithmetic.evaluations[1].owner != nil {
 			t.Fatal("evaluations crossed polynomial display stop")
 		}
 		c.config.Rationals.Integers().Store(w.ref, w.original)
@@ -256,7 +256,7 @@ func TestAlgebraicRationalTranslationTraceActualEvaluationReservations(t *testin
 							if marker == "u_sign: " {
 								index = 1
 							}
-							receipt := &c.arithmetic.traceEvaluations[index]
+							receipt := &c.arithmetic.evaluations[index]
 							if receipt.owner != p || receipt.invocation == 0 || out.slot != 0 {
 								t.Fatal("failed Horner child lost identity or published output", body)
 							}

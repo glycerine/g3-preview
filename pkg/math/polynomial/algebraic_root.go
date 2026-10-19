@@ -201,6 +201,9 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m.rationalArithmeticEvaluationPending() {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && m.isolationSigns.traceVariablesConstructed && !m.isolationSigns.traceRunning {
 		return ErrAlgebraicPending
 	}
