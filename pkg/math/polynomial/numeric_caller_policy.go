@@ -12,6 +12,11 @@ func (r *polynomialNumericRoots) invocationBound() bool {
 		return false
 	}
 	c, z := r.caller, r.integer
+	if q := c.squareRoot; q != nil {
+		return q.manager != nil && q.manager.matchesSqrtInvocation(q) &&
+			q.manager.core.integer == z && c.squareRootInvocation != 0 &&
+			q.invocation == c.squareRootInvocation && &q.frame.numeric == r
+	}
 	if q := c.factorFrontend; q != nil {
 		if !(c.factorFrontendHistoryFrame(z) == q) || q.service.manager.config.Integer != r.integer || q.invocation == 0 || q.invocation != c.factorFrontendInvocation || &q.numeric != r {
 			return false
@@ -268,6 +273,9 @@ func (r *polynomialNumericRoots) NumericSourceCause(z *unumeral.IntegerManager) 
 
 // Frontend NUM receipts authorize their original modular owner.
 func (r *polynomialNumericRoots) NumericModularOwner(m *unumeral.IntegerModularManager) bool {
+	if q := r.caller.squareRoot; q != nil {
+		return q.manager != nil && q.manager.core != nil && q.manager.core.modular == m
+	}
 	if q := r.caller.factorFrontend; q != nil {
 		return q.service != nil && q.service.manager != nil && q.service.manager.modular == m
 	}

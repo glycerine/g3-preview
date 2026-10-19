@@ -75,7 +75,20 @@ func polynomialSqrtAllocationTransport(t *testing.T, appendOnly bool) {
 		if !polynomialNegNumericPending(&full.squareRoot.numeric) {
 			t.Fatal("actual append allocation absent from invocation receipt", body)
 		}
+		if !full.squareRoot.numeric.NumericBound(true) {
+			t.Fatal("actual executing square-root numeric policy is unbound")
+		}
 		body = full.finishSquareRoot(body)
+		if !full.squareRoot.numeric.NumericBound(false) || full.squareRoot.numeric.NumericBound(true) {
+			t.Fatal("completed numeric policy confused cleanup with execution")
+		}
+		foreign, e := unumeral.NewIntegerModularManager(c.integer)
+		serviceMust(t, e)
+		if full.squareRoot.numeric.NumericModularOwner(foreign) {
+			t.Fatal("numeric policy accepted a foreign modular receiver")
+		}
+		serviceMust(t, foreign.Close())
+
 	} else {
 		_, body = full.sqrtWithReceipt(p, out, &receipt)
 	}
@@ -87,6 +100,9 @@ func polynomialSqrtAllocationTransport(t *testing.T, appendOnly bool) {
 	serviceMust(t, rt.SetMaxSize(0))
 	serviceMust(t, full.cleanupSqrtInvocation(&receipt, false))
 	serviceMust(t, full.cleanupSqrtInvocation(&receipt, true))
+	if appendOnly && full.squareRoot.numeric.NumericBound(false) {
+		t.Fatal("retired numeric policy retained cleanup authority")
+	}
 	serviceMust(t, rt.Deallocate(&held))
 	serviceMust(t, c.integer.Del(&big))
 	serviceMust(t, c.DecRef(p))
