@@ -41572,6 +41572,7 @@
         "TestPolynomialCoefficientReceiptCachedMonomialCreatesNoLeafAuthority",
         "TestPolynomialCoefficientReceiptActualCalleeCompletionClearsTag",
         "TestPolynomialSqrtInvocationGuardAndActualAcquisition",
+            "TestPolynomialSqrtActualAllocationTransportRefusesOwnerRetirement",
         "TestPolynomialSqrtReceiptPreservesOlderActualFalseQuotientCohort",
         "TestPolynomialSqrtReceiptCompletedNUMBeforeUnjoinedAbort",
         "TestPolynomialSqrtInvocationCompletedPhasePreservesUnenteredPerfectSquare",
@@ -45435,6 +45436,7 @@
           "go_target": "pkg/math/polynomial/polynomial_sqrt_invocation.go",
           "tests": [
             "TestPolynomialSqrtInvocationGuardAndActualAcquisition",
+            "TestPolynomialSqrtActualAllocationTransportRefusesOwnerRetirement",
             "TestPolynomialSqrtReceiptPreservesOlderActualFalseQuotientCohort",
             "TestPolynomialSqrtReceiptCompletedNUMBeforeUnjoinedAbort",
             "TestPolynomialSqrtInvocationCompletedPhasePreservesUnenteredPerfectSquare",
