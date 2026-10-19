@@ -43358,8 +43358,8 @@
           ]
         },
         {
-          "name": "Compatibility PSC cleanup and GCD pending observation select only the entered source cohort; GCD retains an exact accepted monic child and separate completed-local/owning-abort phases, preserving independent older Lazard work",
-          "status": "partial",
+          "name": "Complete GCD monic-child invocation ownership and completed-local/owning-abort phases, preserving independent older Lazard work",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_glex_monic_invocation.go",
           "tests": [
             "TestPolynomialGCDCleanupPreservesIndependentLazard",
@@ -47692,8 +47692,8 @@
           ]
         },
         {
-          "name": "Compatibility PSC cleanup and GCD pending observation select only the entered source cohort; GCD retains an exact accepted monic child and separate completed-local/owning-abort phases, preserving independent older Lazard work",
-          "status": "partial",
+          "name": "Complete GCD monic-child invocation ownership and completed-local/owning-abort phases, preserving independent older Lazard work",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_glex_monic_invocation.go",
           "tests": [
             "TestPolynomialGCDCleanupPreservesIndependentLazard",
