@@ -196,6 +196,19 @@ func TestPolynomialSqrtReceiptCompletedNUMBeforeUnjoinedAbort(t *testing.T) {
 	if s.orphans[0] != (Monomial{}) || s.orphanInvocations[0] != 0 || s.sourceCause != saved || s.stage != 0 {
 		t.Fatal("exact owning abort/history")
 	}
+	if m.sqrtInvocationSourceCause(&receipt) != saved {
+		t.Fatal("completed owning abort hid the invocation source failure")
+	}
+	if m.matchesSqrtInvocation(&receipt) {
+		t.Fatal("historical source failure revived cleanup authority")
+	}
+	copied := *m
+	copiedReceipt := receipt
+	copiedReceipt.manager = &copied
+	copiedReceipt.frame = &copied.squareRoot
+	if copied.sqrtInvocationSourceCause(&copiedReceipt) != nil {
+		t.Fatal("copied manager claimed actual invocation history")
+	}
 	polynomialSqrtPhysicalAudit(t, m, nil, nil, 0, term)
 }
 

@@ -9,11 +9,14 @@ type polynomialSqrtInvocationReceipt struct {
 	orphanDrain uint32
 }
 
+func (m *MultivariatePolynomialManager) matchesSqrtInvocationHistory(r *polynomialSqrtInvocationReceipt) bool {
+	return m != nil && m.self == m && m.core != nil && m.core.self == m.core && r != nil && r.manager == m && r.frame == &m.squareRoot && r.invocation != 0 && r.invocation == m.squareRoot.invocation
+}
 func (m *MultivariatePolynomialManager) matchesSqrtInvocation(r *polynomialSqrtInvocationReceipt) bool {
-	return r != nil && r.manager == m && r.frame == &m.squareRoot && r.invocation != 0 && r.invocation == m.squareRoot.invocation && m.squareRoot.active
+	return m.matchesSqrtInvocationHistory(r) && r.frame.active
 }
 func (m *MultivariatePolynomialManager) sqrtInvocationSourceCause(r *polynomialSqrtInvocationReceipt) error {
-	if m.matchesSqrtInvocation(r) {
+	if m.matchesSqrtInvocationHistory(r) {
 		return r.frame.sourceCause
 	}
 	return nil
