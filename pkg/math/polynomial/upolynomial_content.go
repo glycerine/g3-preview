@@ -179,6 +179,13 @@ func (m *UPolynomialManager) normalize(v UPolynomialView) error {
 
 // Source: src/math/polynomial/upolynomial.cpp:366-401.
 func (m *UPolynomialManager) normalizeWithSourceContext(v UPolynomialView, context integerAllocationInvocationContext) (cause error) {
+	if context.squareFreeCall != nil {
+		q := context.squareFreeCallFrame(m.config.Integer)
+		if q == nil {
+			return ErrUPolynomialOwner
+		}
+		return m.normalizeDefaultViewWithReceipt(v, &q.normalization)
+	}
 	if context.sturmIsolation != nil {
 		q := context.sturmIsolationFrame(m.config.Integer)
 		if q == nil {

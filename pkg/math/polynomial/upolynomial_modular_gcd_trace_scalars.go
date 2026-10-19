@@ -9,6 +9,9 @@ import (
 // Persistent Go backing preserves warm allocations without inventing source
 // member construction. Source and owning cursors remain separate on failure.
 type upolyModGCDTraceScalars struct {
+	invocation                uint64
+	parent                    *upolySquareFreeCallScope
+	parentInvocation          uint64
 	values                    [6]unumeral.Int
 	constructed, ownRemaining uint8
 	executing                 bool
@@ -17,7 +20,23 @@ type upolyModGCDTraceScalars struct {
 
 func (q *upolyModGCDTraceScalars) finish(m *UPolynomialManager, body error) error {
 	q.bodyCause = body
-	q.sourceCause = m.euclidTrace.sourceBlocker()
+	if q.parent != nil && q.parent.valid() && q.parentInvocation == q.parent.invocation {
+		q.sourceCause = q.parent.numericSourceCause()
+		if q.sourceCause == nil {
+			q.sourceCause = q.parent.image.sourceStop
+		}
+		if q.sourceCause == nil {
+			q.sourceCause = q.parent.euclidTrace.sourceBlocker()
+		}
+		if q.sourceCause == nil {
+			q.sourceCause = q.parent.modGCDTrace.sourceBlocker()
+		}
+		if q.sourceCause == nil {
+			q.sourceCause = q.parent.exactTrace.sourceBlocker()
+		}
+	} else {
+		q.sourceCause = m.euclidTrace.sourceBlocker()
+	}
 	if q.sourceCause == nil {
 		q.sourceCause = m.modGCDTrace.sourceBlocker()
 	}

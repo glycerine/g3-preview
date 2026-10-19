@@ -529,3 +529,10 @@ func (o NumericModularOperations) Dec(a *Int) error {
 	}
 	return o.manager.decWithSourceContext(a, o.context)
 }
+
+func (o NumericModularOperations) SetZ() error {
+	if e := o.valid(); e != nil {
+		return e
+	}
+	return o.manager.setZWithAllocationContext(o.context)
+}

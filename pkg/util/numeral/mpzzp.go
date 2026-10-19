@@ -219,7 +219,10 @@ func (m *IntegerModularManager) setupPWithAllocationContext(context integerAlloc
 	return m.traceSetupP()
 }
 func (m *IntegerModularManager) SetZ() error {
-	if m != nil && m.self == m && callerBindingsExecuting(m.callerBindings) {
+	return m.setZWithAllocationContext(integerAllocationInvocationContext{})
+}
+func (m *IntegerModularManager) setZWithAllocationContext(context integerAllocationInvocationContext) error {
+	if m != nil && m.self == m && callerBindingsExecuting(m.callerBindings) && !m.acceptedModeContext(context) {
 		return ErrNumericPending
 	}
 	if e := m.check(); e != nil {
@@ -232,7 +235,7 @@ func (m *IntegerModularManager) SetZP(p *Int) error {
 	return m.setZPWithAllocationContext(p, integerAllocationInvocationContext{})
 }
 func (m *IntegerModularManager) setZPWithAllocationContext(p *Int, context integerAllocationInvocationContext) error {
-	if m != nil && m.self == m && callerBindingsExecuting(m.callerBindings) {
+	if m != nil && m.self == m && callerBindingsExecuting(m.callerBindings) && !m.acceptedModeContext(context) {
 		return ErrNumericPending
 	}
 	if e := m.check(); e != nil {
@@ -680,4 +683,14 @@ func (m *IntegerModularManager) IsPerfectSquareWithReceipt(a, out *Int, receipt 
 		return false, diagnostic.BorrowProcessDebugContext().NotImplementedYet("src/util/mpzzp.h", 261)
 	}
 	return m.manager.isPerfectSquareTracked(a, out, integerAllocationInvocationContext{}, receipt)
+}
+
+// An actual scoped_set_zp continuation may restore mode under its own borrow.
+// Ordinary calls, stale generations and callbacks retain the public refusal.
+func (m *IntegerModularManager) acceptedModeContext(c integerAllocationInvocationContext) bool {
+	if !c.callerCurrent() || c.Caller == nil {
+		return false
+	}
+	p, ok := c.Caller.Policy.(NumericCallerModularPolicy)
+	return ok && p.NumericModularOwner(m) && c.roots(m.manager) != nil
 }

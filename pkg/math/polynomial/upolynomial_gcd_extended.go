@@ -179,6 +179,9 @@ func (m *UPolynomialManager) ExtendedGCD(a, b, u, v, d UPolynomial) error {
 	return m.ExtendedGCDViews(av, bv, u, v, d)
 }
 func (m *UPolynomialManager) squareFree(v UPolynomialView, out *upolyVectorState) error {
+	return m.squareFreeWithContext(v, out, integerAllocationInvocationContext{})
+}
+func (m *UPolynomialManager) squareFreeWithContext(v UPolynomialView, out *upolyVectorState, context integerAllocationInvocationContext) error {
 	enabled, e := refinementSourceAssertionsEnabled()
 	if e != nil {
 		return e
@@ -189,29 +192,25 @@ func (m *UPolynomialManager) squareFree(v UPolynomialView, out *upolyVectorState
 		}
 	}
 	if v.count <= 1 {
-		return m.setView(out, v)
+		return m.setViewWithSourceContext(out, v, context)
 	}
 	derivative, g := &m.sqf1, &m.sqf2
-	if e := m.derivativeState(v, derivative); e != nil {
+	if e := m.derivativeStateWithSourceContext(v, derivative, context); e != nil {
 		return e
 	}
-	if e := m.gcd(v, m.stateView(derivative), g); e != nil {
+	if e := m.gcdWithSourceContext(v, m.stateView(derivative), g, context); e != nil {
 		return e
 	}
 	if g.size <= 1 {
-		return m.setView(out, v)
+		return m.setViewWithSourceContext(out, v, context)
 	}
-	if e := m.divState(v, m.stateView(g), out); e != nil {
+	if e := m.divStateWithCaller(v, m.stateView(g), out, nil, context); e != nil {
 		return e
 	}
-	return m.normalize(m.stateView(out))
+	return m.normalizeWithSourceContext(m.stateView(out), context)
 }
 func (m *UPolynomialManager) SquareFreeView(v UPolynomialView, out UPolynomial) error {
-	o, e := m.descriptor(out)
-	if e != nil {
-		return e
-	}
-	return m.squareFree(v, &o.state)
+	return m.squareFreeViewWithReceipt(v, out, nil)
 }
 func (m *UPolynomialManager) SquareFree(p, out UPolynomial) error {
 	v, e := m.wholeView(p)

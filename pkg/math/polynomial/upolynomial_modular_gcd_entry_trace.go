@@ -14,6 +14,9 @@ func (m *UPolynomialManager) traceModGCDEntry(a, b UPolynomialView, context inte
 	}
 	defer borrow.unbind()
 	slot := &m.modGCDTrace
+	if q := context.squareFreeCallFrame(m.config.Integer); q != nil {
+		slot = &q.modGCDTrace
+	}
 	if f := context.factorFrontendFrame(m.config.Integer); f != nil && f.service.manager == m {
 		slot = &f.modGCDTrace
 	}
@@ -69,6 +72,9 @@ func (m *UPolynomialManager) traceModGCDPolynomial(line int, caption string, v U
 	}
 	defer borrow.unbind()
 	slot := &m.modGCDTrace
+	if q := context.squareFreeCallFrame(m.config.Integer); q != nil {
+		slot = &q.modGCDTrace
+	}
 	if f := context.factorFrontendFrame(m.config.Integer); f != nil && f.service.manager == m {
 		slot = &f.modGCDTrace
 	}

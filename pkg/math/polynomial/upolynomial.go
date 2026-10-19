@@ -33,6 +33,7 @@ type UPolynomialManager struct {
 	intervalBounds                          upolyIntervalBoundsScope
 	convertEntry                            upolyConvertEntryScope
 	refinable                               upolyRefinableScope
+	squareFreeCall                          upolySquareFreeCallScope
 	defaultNormalization                    upolyDefaultNormalizeScope
 	factorTrace                             *upolyFactorTraceBorrow
 	factorsDisplay, pendingFactorsDisplay   *upolyFactorsDisplayScope
@@ -170,6 +171,9 @@ func newUPolynomialManager(c UPolynomialConfig, store *UPolynomialCoefficientSto
 	return m, nil
 }
 func (m *UPolynomialManager) check() error {
+	if m != nil && m.self == m && m.squareFreeCall.active && (!m.squareFreeCall.executing || m.squareFreeCall.callback()) && !m.squareFreeCall.sourceReadAllowed() {
+		return ErrUPolynomialCleanupPending
+	}
 	if m != nil && m.self == m && m.factorField != nil && !m.factorField.executing && !m.factorField.sourceExecuting && !m.factorField.ownExecuting {
 		return ErrUPolynomialCleanupPending
 	}
@@ -383,6 +387,11 @@ func (m *UPolynomialManager) closeWithHenselOwners(r *upolyHenselPairInvocationR
 	return m.closeWithCallerOwners(r, c, nil)
 }
 func (m *UPolynomialManager) closeWithCallerOwners(r *upolyHenselPairInvocationReceipt, c *upolyHenselCallerScope, p *upolyFactorPrimePreparationInvocationReceipt) error {
+	if m != nil && m.self == m {
+		if e := m.cleanupSquareFreeCall(nil); e != nil {
+			return e
+		}
+	}
 	if m != nil && m.factorField != nil {
 		if e := m.CleanupFactorFieldFactorization(); e != nil {
 			return e

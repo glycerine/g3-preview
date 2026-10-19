@@ -42,9 +42,18 @@ func (m *AlgebraicRootCore) ensureIsolation() error {
 	return nil
 }
 func (m *AlgebraicRootCore) factorPolynomial(v UPolynomialView) (bool, error) {
-	return m.factorPolynomialInto(v, m.factors)
+	return m.factorPolynomialIntoWithSquareFreeReceipt(v, m.factors, &m.isolationSquareFree)
 }
 func (m *AlgebraicRootCore) factorPolynomialInto(v UPolynomialView, factors *UPolynomialFactors) (bool, error) {
+	return m.factorPolynomialIntoWithSquareFreeReceipt(v, factors, nil)
+}
+func (m *AlgebraicRootCore) factorPolynomialIntoWithSquareFreeReceipt(v UPolynomialView, factors *UPolynomialFactors, r *upolySquareFreeCallReceipt) (bool, error) {
+	if m.factorExecuting {
+		return false, ErrAlgebraicPending
+	}
+	m.factorExecuting = true
+	defer func() { m.factorExecuting = false }()
+
 	if m.factor {
 		return m.config.Factors.Factor(v, factors, m.factorParams)
 	}
@@ -58,14 +67,19 @@ func (m *AlgebraicRootCore) factorPolynomialInto(v UPolynomialView, factors *UPo
 	if e := m.config.Polynomials.Reset(m.tmp3); e != nil {
 		return false, e
 	}
-	if e := m.config.Polynomials.SquareFreeView(v, m.tmp3); e != nil {
+	squareFreeError := m.config.Polynomials.squareFreeViewWithReceipt(v, m.tmp3, r)
+	if e := squareFreeError; e != nil {
 		return false, e
 	}
 	w, e := m.config.Polynomials.wholeView(m.tmp3)
 	if e != nil {
 		return false, e
 	}
-	if e = m.traceIsolationPolynomial(w, true); e != nil {
+	// The trace owns its callback borrow while this private helper enters it.
+	m.factorExecuting = false
+	traceError := m.traceIsolationPolynomial(w, true)
+	m.factorExecuting = true
+	if e = traceError; e != nil {
 		return false, e
 	}
 	return false, factors.PushCopy(w, 1)
@@ -249,7 +263,7 @@ func (m *AlgebraicRootCore) isolateRootsForPolynomial(v UPolynomialView, out *Al
 			}
 			var a Algebraic
 			if irr {
-				err = m.SetRoot(&a, f, lo, hi, full)
+				a, err = m.mkAlgebraicCell(f, lo, hi, full)
 			} else {
 				err = m.config.Binary.ToRational(m.config.Rationals, lo, &m.localQ)
 				if err == nil {

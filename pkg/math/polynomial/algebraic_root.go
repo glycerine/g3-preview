@@ -49,6 +49,8 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	isolationSquareFree                                        upolySquareFreeCallReceipt
+	factorExecuting                                            bool
 	coefficientNormalization                                   upolyDefaultNormalizeReceipt
 	univariateIsolationRunning                                 bool
 	univariateIsolationOutput                                  *AlgebraicVector
@@ -202,14 +204,20 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m != nil && m.self == m && m.config.Polynomials != nil && m.config.Polynomials.squareFreeCallReceiptPending(&m.isolationSquareFree) {
+		return ErrAlgebraicPending
+	}
+	if m != nil && m.self == m && !m.binary.running && m.config.Polynomials != nil && m.config.Polynomials.squareFreeCallReceiptPending(&m.binary.squareFree) {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && !m.binary.running && m.binary.conversion.pending(m) {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && m.savedIntervalExecuting != nil {
+	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting) {
 		return ErrAlgebraicPending
 	}
 
-	if m != nil && m.self == m && (m.division.cleaning || m.integerAdd.cleaning) {
+	if m != nil && m.self == m && (m.binary.cleaning || m.division.cleaning || m.integerAdd.cleaning) {
 		return ErrAlgebraicPending
 	}
 	if m.inverseRefinementEvaluationPending() || m.inverseRefinementCopyPending() {
@@ -816,7 +824,27 @@ func (m *AlgebraicRootCore) normalizeCoefficients(l *algebraicLocation, r *algeb
 	}
 	return m.store(l, r)
 }
-func (m *AlgebraicRootCore) SetRoot(a *Algebraic, p UPolynomialView, lower, upper *unumeral.BinaryRational, minimal bool) (err error) {
+func (m *AlgebraicRootCore) SetRoot(a *Algebraic, p UPolynomialView, lower, upper *unumeral.BinaryRational, minimal bool) error {
+	return m.setRoot(a, p, lower, upper, minimal, true)
+}
+
+// Isolation calls mk_algebraic_cell directly. Its constructor ends before
+// imp::set's later post-assignment sign assertion.
+func (m *AlgebraicRootCore) mkAlgebraicCell(p UPolynomialView, lower, upper *unumeral.BinaryRational, minimal bool) (Algebraic, error) {
+	var a Algebraic
+	_, enabled, e := algebraicAssertionSwitch()
+	if e != nil {
+		return a, e
+	}
+	if enabled && p.count <= 2 {
+		if e = m.predicateAssertionFailure(403, "sz > 2"); e != nil {
+			return a, e
+		}
+	}
+	e = m.setRoot(&a, p, lower, upper, minimal, false)
+	return a, e
+}
+func (m *AlgebraicRootCore) setRoot(a *Algebraic, p UPolynomialView, lower, upper *unumeral.BinaryRational, minimal, verifyAssignment bool) (err error) {
 	l, err := m.location(a)
 	if err != nil {
 		return err
@@ -910,7 +938,7 @@ func (m *AlgebraicRootCore) SetRoot(a *Algebraic, p UPolynomialView, lower, uppe
 	if !existing {
 		m.publish(a, m.pending)
 	}
-	if polynomialSourceDebug {
+	if verifyAssignment && polynomialSourceDebug {
 		v, e := m.config.Polynomials.wholeView(r.poly)
 		if e != nil {
 			return e
@@ -1019,7 +1047,7 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.cleanupRetainedCore()
 }
 func (m *AlgebraicRootCore) cleanupRetainedCore() error {
-	if m != nil && m.self == m && m.savedIntervalExecuting != nil {
+	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting) {
 		return ErrAlgebraicPending
 	}
 
@@ -1111,6 +1139,11 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	}
 	if e := m.cleanupRootTrace(); e != nil {
 		return e
+	}
+	if p := m.config.Polynomials; p != nil {
+		if e := p.cleanupSquareFreeCall(&m.isolationSquareFree); e != nil {
+			return e
+		}
 	}
 	if e := m.config.Polynomials.cleanupDefaultNormalizationReceipt(&m.coefficientNormalization); e != nil {
 		return e
@@ -1253,7 +1286,7 @@ func (m *AlgebraicRootCore) Close() error {
 	return m.closeCoreMembers()
 }
 func (m *AlgebraicRootCore) closeCoreMembers() error {
-	if m != nil && m.self == m && m.savedIntervalExecuting != nil {
+	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting) {
 		return ErrAlgebraicPending
 	}
 

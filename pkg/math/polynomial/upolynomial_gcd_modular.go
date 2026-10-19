@@ -21,8 +21,18 @@ func (m *UPolynomialManager) modularImageWithSourceContext(u, v, q *upolyVectorS
 	}
 	var localOld, localC unumeral.Int
 	old, c := &localOld, &localC
+	sf := context.squareFreeCallFrame(m.config.Integer)
+	var image *upolySquareFreeImageScope
 	var frame *upolyFactorImageScope
-	if owner := context.factorFrontendFrame(m.config.Integer); owner != nil {
+	if sf != nil {
+		image = &sf.image
+		if image.savedConstructed || image.classConstructed || image.cConstructed {
+			return false, ErrUPolynomialCleanupPending
+		}
+		*image = upolySquareFreeImageScope{oldMode: oldMode, savedConstructed: true}
+		old, c = &image.old, &image.c
+		defer func() { err = image.finish(sf, err, false) }()
+	} else if owner := context.factorFrontendFrame(m.config.Integer); owner != nil {
 		frame = &owner.image
 		if frame.savedConstructed || frame.classConstructed || frame.cConstructed || frame.invocation == ^uint64(0) {
 			return false, ErrUPolynomialCleanupPending
@@ -36,7 +46,7 @@ func (m *UPolynomialManager) modularImageWithSourceContext(u, v, q *upolyVectorS
 	if e = m.modular.WithAllocationContext((context).utility(m.modular.Integers())).Copy(old, &(*m.modular.BorrowModulus())); e != nil {
 		return false, e
 	}
-	if frame == nil {
+	if frame == nil && image == nil {
 		defer func() {
 			var restore error
 			if oldMode {
@@ -55,6 +65,8 @@ func (m *UPolynomialManager) modularImageWithSourceContext(u, v, q *upolyVectorS
 	}
 	if frame != nil {
 		frame.classConstructed = true
+	} else if image != nil {
+		image.classConstructed = true
 	}
 	U, V := &m.mgcd[2], &m.mgcd[3]
 	if e = m.setViewWithSourceContext(U, m.stateView(u), context); e != nil {
@@ -84,6 +96,8 @@ func (m *UPolynomialManager) modularImageWithSourceContext(u, v, q *upolyVectorS
 	}
 	if frame != nil {
 		frame.cConstructed = true
+	} else if image != nil {
+		image.cConstructed = true
 	} else {
 		defer m.modular.Del(c)
 	}
@@ -141,7 +155,15 @@ func (m *UPolynomialManager) combineImagesWithSourceContext(c1 *upolyVectorState
 		// admits its actual first three NUM declarations after the R reset.
 		*local = [12]unumeral.Int{}
 		trace = &m.craTrace
-		*trace = upolyCRATrace{owner: m, executing: true, declared: 3, values: local}
+		if trace.invocation == ^uint64(0) {
+			return ErrUPolynomialOwner
+		}
+		*trace = upolyCRATrace{invocation: trace.invocation + 1, owner: m, executing: true, declared: 3, values: local}
+		if parent := context.squareFreeCallFrame(m.config.Integer); parent != nil {
+			parent.craInvocation = trace.invocation
+			trace.parent = parent
+			trace.parentInvocation = parent.invocation
+		}
 		defer func() { cause = trace.finishDefault(local, cause) }()
 	}
 	if frame != nil && m.modular.BorrowTraceTags().ShouldTrace("CRA") {
@@ -329,7 +351,15 @@ func (m *UPolynomialManager) modularGCDWithSourceContext(a, b UPolynomialView, o
 		if m.modGCDScalars.ownRemaining != 0 || m.modGCDScalars.executing {
 			return ErrUPolynomialCleanupPending
 		}
-		m.modGCDScalars = upolyModGCDTraceScalars{constructed: 2, executing: true}
+		if m.modGCDScalars.invocation == ^uint64(0) {
+			return ErrUPolynomialOwner
+		}
+		m.modGCDScalars = upolyModGCDTraceScalars{invocation: m.modGCDScalars.invocation + 1, constructed: 2, executing: true}
+		if parent := context.squareFreeCallFrame(m.config.Integer); parent != nil {
+			parent.gcdInvocation = m.modGCDScalars.invocation
+			m.modGCDScalars.parent = parent
+			m.modGCDScalars.parentInvocation = parent.invocation
+		}
 		defer func() { cause = m.modGCDScalars.finish(m, cause); m.modGCDScalars.executing = false }()
 	}
 

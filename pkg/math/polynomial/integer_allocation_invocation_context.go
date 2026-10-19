@@ -12,6 +12,8 @@ import (
 // creates no source numeral, reservation, or ambient callback owner hook.
 
 type integerAllocationInvocationContext struct {
+	squareFreeCall                 *upolySquareFreeCallScope
+	squareFreeCallInvocation       uint64
 	squareRoot                     *polynomialSqrtInvocationReceipt
 	squareRootInvocation           uint64
 	defaultNormalization           *upolyDefaultNormalizeScope

@@ -98,3 +98,18 @@ func (m *IntegerModularManager) BindCaller(b *NumericCallerBinding, g NumericCal
 	m.callerBindings = b
 	return nil
 }
+
+// A higher owner reports its actual callback span separately from ordinary
+// execution, so literal numeral destructors remain available outside callbacks.
+type NumericCallbackGuard interface{ NumericCallbackActive() bool }
+
+func callerBindingsCallbackActive(b *NumericCallerBinding) bool {
+	for ; b != nil; b = b.previous {
+		if b.self == b && b.guard != nil && b.guard.NumericExecuting() {
+			if p, ok := b.guard.(NumericCallbackGuard); ok && p.NumericCallbackActive() {
+				return true
+			}
+		}
+	}
+	return false
+}

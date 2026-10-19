@@ -14,6 +14,9 @@ func (m *UPolynomialManager) traceEuclidPolynomials(line int, a, b UPolynomialVi
 	}
 	defer borrow.unbind()
 	slot := &m.euclidTrace
+	if q := context.squareFreeCallFrame(m.config.Integer); q != nil {
+		slot = &q.euclidTrace
+	}
 	if f := context.factorFrontendFrame(m.config.Integer); f != nil && f.service.manager == m {
 		slot = &f.euclidTrace
 	}

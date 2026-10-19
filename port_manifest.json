@@ -38410,7 +38410,9 @@
         "pkg/math/polynomial/algebraic_compare_assertions_test.go",
         "pkg/math/polynomial/algebraic_saved_interval.go",
         "pkg/math/polynomial/algebraic_saved_interval_test.go",
-        "pkg/math/polynomial/algebraic_selector_conversion_test.go"
+        "pkg/math/polynomial/algebraic_selector_conversion_test.go",
+        "pkg/math/polynomial/algebraic_squarefree_caller_test.go",
+        "pkg/math/polynomial/upolynomial_squarefree_call.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -38644,7 +38646,13 @@
         "TestAlgebraicSavedIntervalRestoreAccessorBeforeMemberRead",
         "TestAlgebraicSavedIntervalRestoreSkipsAccessorAfterBasicPromotion",
         "TestAlgebraicSavedIntervalSelectionOwnsPartialConstructorAbort",
-        "TestAlgebraicSelectorExactRootConversionReservations"
+        "TestAlgebraicSelectorExactRootConversionReservations",
+        "TestAlgebraicSquareFreeDefaultChildrenReservationClosure",
+        "TestAlgebraicSquareFreeActualTransportBorrow",
+        "TestAlgebraicSquareFreeOldReceiptCannotAbortReplacement",
+        "TestAlgebraicSquareFreeCooperationBorrow",
+        "TestAlgebraicIsolationOwnsStoppedSquareFreeChild",
+        "TestAlgebraicIsolationFactorCooperationProtectsCore"
       ],
       "conditionals": [
         {
@@ -39583,7 +39591,9 @@
         "Algebraic bound copies now retain actual integer-copy allocation receipts through BinaryRationalManager.CopyWithAllocationReceipt, preserving mpbq.h:86 numerator-copy then exponent publication. Direct lower/upper getters, rational-getter binary preludes, precision interval-copy preludes and basic precision rational copies capture the accepted child. Source temporary destruction remains separate from explicit owning acknowledgement: finishBounds(false) deletes source scoped values without consuming unjoined child storage; core cleanup acknowledges the exact receipt before older bound temporaries. Pending receipts refuse replacement getters. Direct lower/upper 32-output BIG-dyadic reservation campaigns require actual retained children, verify failed copies leave the old exponent unchanged, clean without global allocator calls and retry to independently specified sqrt(2) interval numerators/exponents. Basic lower/upper precision campaigns require actual retained BIG-rational copy frontiers and verify exact unrounded retry values. The shared decimal path retains its existing untracked entry unless a bound caller supplies a receipt. Ordinary and checked/debug/trace focused algebraic/evaluation/parser/assignment and binary numeric checks run on CPUs 8-16. Refinement/conversion arithmetic, exhaustive source-destructor/failure-transport/TRACE callback composition, and overall polynomial/AST completion remain pending.",
         "Saved-interval constructor cpp897-929 is shared by retained binary/unary selection and resultant signing. Its actual interval SET retains an exact integer-copy allocation receipt. Failed construction skips the custom source destructor and manager DEL; explicit owning abort acknowledges only that receipt and destroys partial members. Completed scopes retain source restoration and destruction order. A typed execution pin blocks owner deletion/cleanup during actual allocation transport. Reservation sweeps cover retained allocation suffixes and partially copied bounds; a real runtime callback verifies refusal and unchanged owner/allocation state. Existing predicate-specific saved-copy adaptation remains separate. Broad algebraic, polynomial and AST audits remain partial.",
         "Saved-interval restore_if_too_small cpp918-927 now queries the actual to_algebraic accessor assertion switch after publishing restore_invoked and after the basic-numeral early return, before reading algebraic cell members. Both binary/unary/resultant scopes and the retained rationality-predicate adapter reach the switch. A completed saved scope referencing an actual allocated but unconstructed object prefix proves ended-context priority over member initialization guards, without claiming a completed cell constructor. Basic promotion skips the accessor even with an ended debug owner. A dual logical/physical-path Go baseline overlay fails the nonbasic read-order regression. Full saved-interval descendant and containing-unit audits remain partial. A real Add reservation sweep additionally reaches a failed saved constructor with its lower bound installed, proves it survives source unwinding, then cleans through the selector owner without first invoking global integer-allocation cleanup. This integration vector claims partial-member ownership, while exact copy-allocation suffix ownership remains covered by the constructor component vectors.",
-        "The shared selector set_core exact-root branch cpp978-983 now binds its scoped to_mpq conversion to a concrete binary-scope conversion owner. Actual RAW power/normalization, integer invocation and physical allocation children use the existing algebraicConversionScope machinery; its policy accepts only the selector local rational during execution. A true child source stop protects the older rational/interval/saved scopes, while owning selector cleanup acknowledges the conversion before older local destruction. Public core mutation rejects an interrupted converter. A genuine Mul fixture computes a result interval (3,9)/2^64 for product roots {3,6,11,22}/2^64; the boundary root makes isolating2refinable find the exact midpoint 3/2^63 and reach this source branch. Its reservation sweep proves conversion-child refusals, cleanup through the selector owner without global cleanup on pending conversion, and the independent exact value. Earlier unrelated integer-allocation failures use explicit integer-allocation acknowledgement in the fixture; no global cleanup runs on a pending converter. A separate earlier candidate fixture exposed missing selector closure for default square-free/modular-GCD children; that broader prerequisite audit remains open. Whole-unit polynomial/AST and complete source-END/callback audits remain partial."
+        "The shared selector set_core exact-root branch cpp978-983 now binds its scoped to_mpq conversion to a concrete binary-scope conversion owner. Actual RAW power/normalization, integer invocation and physical allocation children use the existing algebraicConversionScope machinery; its policy accepts only the selector local rational during execution. A true child source stop protects the older rational/interval/saved scopes, while owning selector cleanup acknowledges the conversion before older local destruction. Public core mutation rejects an interrupted converter. A genuine Mul fixture computes a result interval (3,9)/2^64 for product roots {3,6,11,22}/2^64; the boundary root makes isolating2refinable find the exact midpoint 3/2^63 and reach this source branch. Its reservation sweep proves conversion-child refusals, cleanup through the selector owner without global cleanup on pending conversion, and the independent exact value. Earlier unrelated integer-allocation failures use explicit integer-allocation acknowledgement in the fixture; no global cleanup runs on a pending converter. A separate earlier candidate fixture exposed missing selector closure for default square-free/modular-GCD children; that broader prerequisite audit remains open. Whole-unit polynomial/AST and complete source-END/callback audits remain partial.",
+        "Retained factor(false) callers now capture the accepted public square_free invocation (upolynomial.cpp962-981; algebraic_numbers.cpp541-563,1015). Binary/unary selection and direct univariate isolation keep separate exact receipts. The concrete square-free scope carries its issued integer RAW/divisibility/PN allocation children, accepted normalization, generation-bound default modular-GCD/CRA scalar owners, actual scoped_set_zp saved member/class/c frontiers, and separate accepted display receipts. Source stops protect older caller locals; owning cleanup acknowledges these exact children before older destruction. Failed scoped_set_zp construction skips its custom restoration while preserving the already constructed scoped m_p member destructor. Numerical callbacks cannot delete borrowed storage or finalize the executing UP owner; ordinary source numeral destructors remain available outside callbacks. The algebraic factor helper protects its owner during both full and square-free factor modes, handing off to the existing trace borrow only during its private diagnostic. Reservation sweeps cover genuine pending children, a source-destructor stop and independent exact output; direct isolation also sweeps through successful quadratic isolation. A real runtime failure transport and real cooperation callbacks check refusal and unchanged physical/numeral state. An old square-free receipt cannot acknowledge a replacement generation. Failed scratch is never repaired or retried; owning teardown retains responsibility for its disposal. Complete descendant TRACE/source-action and other consumer audits remain open; this adds no whole polynomial/AST completion credit.",
+        "Univariate nonbasic collection at algebraic_numbers.cpp624-626 now calls a concrete mk_algebraic_cell continuation, with its degree assertion gate, and ends at constructor completion. The public setter retains its separate post-assignment sign verification at cpp504. Previously using SetRoot in collection added that later debug numerical evaluation after publication; an allocation refusal could orphan the local tagged value before vector publication. The applied debug reservation sweep now passes; restoring the setter call in an overlay reproduces the lost caller owner (g3-squarefree-closure/baseline-constructor.log). The source caller and its reachable constructor statements determine this split; no unused template/STL adapter is introduced. Broader constructor assertion/member/TRACE audit remains open."
       ],
       "deviations": [
         "Retained algebraic polynomial-evaluation coefficient overload prerequisites (cpp:2861-2865,2911-2915; polynomial.cpp:6436-6522 instantiated by algebraic_numbers.cpp:2387-2388,2406): SetInteger constructs its actual scoped rational before the ordinary algebraic setter; AddInteger constructs a real scoped algebraic coefficient, sets it and invokes Add. The wrapper temporaries are held in distinct owning scopes, with synchronous owner-close/cleanup refusal while running. Actual accepted beginQ and mixed-addition entries bind their wrapper parent so a younger scoped cleanup stop does not run the older wrapper destructor; explicit owning cleanup uses actual scalar-cell ownership. Tests cover zero/signed small and BIG coefficients, root-plus-integer inverse identities, an independent aliased sqrt(2)-2 bound, basic normalization to null zero, destination aliasing and workspace reuse. Ordinary and checked/debug/trace algebraic checks pass on CPUs 8-16. Full allocation-failure/callback/destructor composition and the concrete recursive algebraic polynomial evaluator remain partial; these overloads do not establish multivariate isolation or whole-unit completion.",
@@ -39792,7 +39802,9 @@
         "pkg/math/polynomial/algebraic_predicate_assertions.go",
         "pkg/math/polynomial/algebraic_saved_interval.go",
         "pkg/math/polynomial/algebraic_saved_interval_test.go",
-        "pkg/math/polynomial/algebraic_selector_conversion_test.go"
+        "pkg/math/polynomial/algebraic_selector_conversion_test.go",
+        "pkg/math/polynomial/algebraic_squarefree_caller_test.go",
+        "pkg/math/polynomial/upolynomial_squarefree_call.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -40023,7 +40035,13 @@
         "TestAlgebraicSavedIntervalRestoreAccessorBeforeMemberRead",
         "TestAlgebraicSavedIntervalRestoreSkipsAccessorAfterBasicPromotion",
         "TestAlgebraicSavedIntervalSelectionOwnsPartialConstructorAbort",
-        "TestAlgebraicSelectorExactRootConversionReservations"
+        "TestAlgebraicSelectorExactRootConversionReservations",
+        "TestAlgebraicSquareFreeDefaultChildrenReservationClosure",
+        "TestAlgebraicSquareFreeActualTransportBorrow",
+        "TestAlgebraicSquareFreeOldReceiptCannotAbortReplacement",
+        "TestAlgebraicSquareFreeCooperationBorrow",
+        "TestAlgebraicIsolationOwnsStoppedSquareFreeChild",
+        "TestAlgebraicIsolationFactorCooperationProtectsCore"
       ],
       "conditionals": [
         {
@@ -40543,7 +40561,9 @@
         "Algebraic bound copies now retain actual integer-copy allocation receipts through BinaryRationalManager.CopyWithAllocationReceipt, preserving mpbq.h:86 numerator-copy then exponent publication. Direct lower/upper getters, rational-getter binary preludes, precision interval-copy preludes and basic precision rational copies capture the accepted child. Source temporary destruction remains separate from explicit owning acknowledgement: finishBounds(false) deletes source scoped values without consuming unjoined child storage; core cleanup acknowledges the exact receipt before older bound temporaries. Pending receipts refuse replacement getters. Direct lower/upper 32-output BIG-dyadic reservation campaigns require actual retained children, verify failed copies leave the old exponent unchanged, clean without global allocator calls and retry to independently specified sqrt(2) interval numerators/exponents. Basic lower/upper precision campaigns require actual retained BIG-rational copy frontiers and verify exact unrounded retry values. The shared decimal path retains its existing untracked entry unless a bound caller supplies a receipt. Ordinary and checked/debug/trace focused algebraic/evaluation/parser/assignment and binary numeric checks run on CPUs 8-16. Refinement/conversion arithmetic, exhaustive source-destructor/failure-transport/TRACE callback composition, and overall polynomial/AST completion remain pending.",
         "Saved-interval constructor cpp897-929 is shared by retained binary/unary selection and resultant signing. Its actual interval SET retains an exact integer-copy allocation receipt. Failed construction skips the custom source destructor and manager DEL; explicit owning abort acknowledges only that receipt and destroys partial members. Completed scopes retain source restoration and destruction order. A typed execution pin blocks owner deletion/cleanup during actual allocation transport. Reservation sweeps cover retained allocation suffixes and partially copied bounds; a real runtime callback verifies refusal and unchanged owner/allocation state. Existing predicate-specific saved-copy adaptation remains separate. Broad algebraic, polynomial and AST audits remain partial.",
         "Saved-interval restore_if_too_small cpp918-927 now queries the actual to_algebraic accessor assertion switch after publishing restore_invoked and after the basic-numeral early return, before reading algebraic cell members. Both binary/unary/resultant scopes and the retained rationality-predicate adapter reach the switch. A completed saved scope referencing an actual allocated but unconstructed object prefix proves ended-context priority over member initialization guards, without claiming a completed cell constructor. Basic promotion skips the accessor even with an ended debug owner. A dual logical/physical-path Go baseline overlay fails the nonbasic read-order regression. Full saved-interval descendant and containing-unit audits remain partial. A real Add reservation sweep additionally reaches a failed saved constructor with its lower bound installed, proves it survives source unwinding, then cleans through the selector owner without first invoking global integer-allocation cleanup. This integration vector claims partial-member ownership, while exact copy-allocation suffix ownership remains covered by the constructor component vectors.",
-        "The shared selector set_core exact-root branch cpp978-983 now binds its scoped to_mpq conversion to a concrete binary-scope conversion owner. Actual RAW power/normalization, integer invocation and physical allocation children use the existing algebraicConversionScope machinery; its policy accepts only the selector local rational during execution. A true child source stop protects the older rational/interval/saved scopes, while owning selector cleanup acknowledges the conversion before older local destruction. Public core mutation rejects an interrupted converter. A genuine Mul fixture computes a result interval (3,9)/2^64 for product roots {3,6,11,22}/2^64; the boundary root makes isolating2refinable find the exact midpoint 3/2^63 and reach this source branch. Its reservation sweep proves conversion-child refusals, cleanup through the selector owner without global cleanup on pending conversion, and the independent exact value. Earlier unrelated integer-allocation failures use explicit integer-allocation acknowledgement in the fixture; no global cleanup runs on a pending converter. A separate earlier candidate fixture exposed missing selector closure for default square-free/modular-GCD children; that broader prerequisite audit remains open. Whole-unit polynomial/AST and complete source-END/callback audits remain partial."
+        "The shared selector set_core exact-root branch cpp978-983 now binds its scoped to_mpq conversion to a concrete binary-scope conversion owner. Actual RAW power/normalization, integer invocation and physical allocation children use the existing algebraicConversionScope machinery; its policy accepts only the selector local rational during execution. A true child source stop protects the older rational/interval/saved scopes, while owning selector cleanup acknowledges the conversion before older local destruction. Public core mutation rejects an interrupted converter. A genuine Mul fixture computes a result interval (3,9)/2^64 for product roots {3,6,11,22}/2^64; the boundary root makes isolating2refinable find the exact midpoint 3/2^63 and reach this source branch. Its reservation sweep proves conversion-child refusals, cleanup through the selector owner without global cleanup on pending conversion, and the independent exact value. Earlier unrelated integer-allocation failures use explicit integer-allocation acknowledgement in the fixture; no global cleanup runs on a pending converter. A separate earlier candidate fixture exposed missing selector closure for default square-free/modular-GCD children; that broader prerequisite audit remains open. Whole-unit polynomial/AST and complete source-END/callback audits remain partial.",
+        "Retained factor(false) callers now capture the accepted public square_free invocation (upolynomial.cpp962-981; algebraic_numbers.cpp541-563,1015). Binary/unary selection and direct univariate isolation keep separate exact receipts. The concrete square-free scope carries its issued integer RAW/divisibility/PN allocation children, accepted normalization, generation-bound default modular-GCD/CRA scalar owners, actual scoped_set_zp saved member/class/c frontiers, and separate accepted display receipts. Source stops protect older caller locals; owning cleanup acknowledges these exact children before older destruction. Failed scoped_set_zp construction skips its custom restoration while preserving the already constructed scoped m_p member destructor. Numerical callbacks cannot delete borrowed storage or finalize the executing UP owner; ordinary source numeral destructors remain available outside callbacks. The algebraic factor helper protects its owner during both full and square-free factor modes, handing off to the existing trace borrow only during its private diagnostic. Reservation sweeps cover genuine pending children, a source-destructor stop and independent exact output; direct isolation also sweeps through successful quadratic isolation. A real runtime failure transport and real cooperation callbacks check refusal and unchanged physical/numeral state. An old square-free receipt cannot acknowledge a replacement generation. Failed scratch is never repaired or retried; owning teardown retains responsibility for its disposal. Complete descendant TRACE/source-action and other consumer audits remain open; this adds no whole polynomial/AST completion credit.",
+        "Univariate nonbasic collection at algebraic_numbers.cpp624-626 now calls a concrete mk_algebraic_cell continuation, with its degree assertion gate, and ends at constructor completion. The public setter retains its separate post-assignment sign verification at cpp504. Previously using SetRoot in collection added that later debug numerical evaluation after publication; an allocation refusal could orphan the local tagged value before vector publication. The applied debug reservation sweep now passes; restoring the setter call in an overlay reproduces the lost caller owner (g3-squarefree-closure/baseline-constructor.log). The source caller and its reachable constructor statements determine this split; no unused template/STL adapter is introduced. Broader constructor assertion/member/TRACE audit remains open."
       ],
       "deviations": [
         "Retained algebraic polynomial-evaluation coefficient overload prerequisites (cpp:2861-2865,2911-2915; polynomial.cpp:6436-6522 instantiated by algebraic_numbers.cpp:2387-2388,2406): SetInteger constructs its actual scoped rational before the ordinary algebraic setter; AddInteger constructs a real scoped algebraic coefficient, sets it and invokes Add. The wrapper temporaries are held in distinct owning scopes, with synchronous owner-close/cleanup refusal while running. Actual accepted beginQ and mixed-addition entries bind their wrapper parent so a younger scoped cleanup stop does not run the older wrapper destructor; explicit owning cleanup uses actual scalar-cell ownership. Tests cover zero/signed small and BIG coefficients, root-plus-integer inverse identities, an independent aliased sqrt(2)-2 bound, basic normalization to null zero, destination aliasing and workspace reuse. Ordinary and checked/debug/trace algebraic checks pass on CPUs 8-16. Full allocation-failure/callback/destructor composition and the concrete recursive algebraic polynomial evaluator remain partial; these overloads do not establish multivariate isolation or whole-unit completion.",
@@ -51911,7 +51931,9 @@
         "pkg/util/numeral/mpbq_display_source_test.go",
         "pkg/math/polynomial/upolynomial_convert_bounds_trace.go",
         "pkg/math/polynomial/upolynomial_convert_bounds_trace_test.go",
-        "pkg/math/polynomial/algebraic_binary_trace_test.go"
+        "pkg/math/polynomial/algebraic_binary_trace_test.go",
+        "pkg/math/polynomial/algebraic_squarefree_caller_test.go",
+        "pkg/math/polynomial/upolynomial_squarefree_call.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -52280,7 +52302,13 @@
         "TestUPolynomialConvertBoundsActualReadStops",
         "TestAlgebraicInverseBoundsTraceActualSourceStop",
         "TestUPolynomialPublicGCDAllPrimeFallbackUsesDefaultNormalization",
-        "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix"
+        "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix",
+        "TestAlgebraicSquareFreeDefaultChildrenReservationClosure",
+        "TestAlgebraicSquareFreeActualTransportBorrow",
+        "TestAlgebraicSquareFreeOldReceiptCannotAbortReplacement",
+        "TestAlgebraicSquareFreeCooperationBorrow",
+        "TestAlgebraicIsolationOwnsStoppedSquareFreeChild",
+        "TestAlgebraicIsolationFactorCooperationProtectsCore"
       ],
       "conditionals": [
         {
@@ -54514,7 +54542,8 @@
         "upolynomial.cpp:213-232,609-651: same actual array reads, scalar SET/Div, persistent quotient/remainder scratch, scoped compiled divisibility child and explicit RAW SubMul temporary; direct child acquisition and exact cleanup replace omitted source-call ownership transport without substituting algorithms.",
         "Exact owner/self/member/captured nonwrapping nonce and direct actual allocation outcomes grant authority. Completed child false phase precedes older lexical destruction; unjoined true phase follows it. Charged readonly histories preserve child tuples and original body/source/first-own causes to service end.",
         "Executing source/own children refuse actual checkpoint and returning transport owner reentry before mutation. No census, registry, or before/after pending acquisition.",
-        "The complete retained implementation inventory is reconciled against concrete typed Go algorithms and exact source/owning lifetime adapters. Public all-primes modular-GCD fallback, Berlekamp fallback and factor-frontend fallback each use their actual normalization owner; no hypothetical context fabricates a frontend frame."
+        "The complete retained implementation inventory is reconciled against concrete typed Go algorithms and exact source/owning lifetime adapters. Public all-primes modular-GCD fallback, Berlekamp fallback and factor-frontend fallback each use their actual normalization owner; no hypothetical context fabricates a frontend frame.",
+        "Retained factor(false) callers now capture the accepted public square_free invocation (upolynomial.cpp962-981; algebraic_numbers.cpp541-563,1015). Binary/unary selection and direct univariate isolation keep separate exact receipts. The concrete square-free scope carries its issued integer RAW/divisibility/PN allocation children, accepted normalization, generation-bound default modular-GCD/CRA scalar owners, actual scoped_set_zp saved member/class/c frontiers, and separate accepted display receipts. Source stops protect older caller locals; owning cleanup acknowledges these exact children before older destruction. Failed scoped_set_zp construction skips its custom restoration while preserving the already constructed scoped m_p member destructor. Numerical callbacks cannot delete borrowed storage or finalize the executing UP owner; ordinary source numeral destructors remain available outside callbacks. The algebraic factor helper protects its owner during both full and square-free factor modes, handing off to the existing trace borrow only during its private diagnostic. Reservation sweeps cover genuine pending children, a source-destructor stop and independent exact output; direct isolation also sweeps through successful quadratic isolation. A real runtime failure transport and real cooperation callbacks check refusal and unchanged physical/numeral state. An old square-free receipt cannot acknowledge a replacement generation. Failed scratch is never repaired or retried; owning teardown retains responsibility for its disposal. Complete descendant TRACE/source-action and other consumer audits remain open; this adds no whole polynomial/AST completion credit."
       ],
       "deviations": [
         "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks.",
@@ -54628,7 +54657,9 @@
         "pkg/util/numeral/mpbq_display_source_test.go",
         "pkg/math/polynomial/upolynomial_convert_bounds_trace.go",
         "pkg/math/polynomial/upolynomial_convert_bounds_trace_test.go",
-        "pkg/math/polynomial/upolynomial_convert_final_assertions.go"
+        "pkg/math/polynomial/upolynomial_convert_final_assertions.go",
+        "pkg/math/polynomial/algebraic_squarefree_caller_test.go",
+        "pkg/math/polynomial/upolynomial_squarefree_call.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -54777,7 +54808,13 @@
         "TestBinaryDisplaySourceNumeratorStringAndExponentFlags",
         "TestUPolynomialConvertNegativeBoundsTraceAfterSwap",
         "TestUPolynomialConvertBoundsActualReadStops",
-        "TestAlgebraicInverseBoundsTraceActualSourceStop"
+        "TestAlgebraicInverseBoundsTraceActualSourceStop",
+        "TestAlgebraicSquareFreeDefaultChildrenReservationClosure",
+        "TestAlgebraicSquareFreeActualTransportBorrow",
+        "TestAlgebraicSquareFreeOldReceiptCannotAbortReplacement",
+        "TestAlgebraicSquareFreeCooperationBorrow",
+        "TestAlgebraicIsolationOwnsStoppedSquareFreeChild",
+        "TestAlgebraicIsolationFactorCooperationProtectsCore"
       ],
       "conditionals": [
         {
@@ -55459,7 +55496,8 @@
         "Related cores retain one charged concrete coefficient store and borrowed IntegerManager. Descriptors and twenty-one scratch vectors remain core-owned; closing a parent releases its scratch without destroying child buffers. Sum core ExclusiveBytes and one store TotalBytes. See PORT_PROGRESS.md#audit-upolynomial-factorization-packet-md.",
         "Independent stores borrowing the same actual IntegerManager transfer scalar buffer states without coefficient copies. Charged cold bindings retain each distinct imported store once; captured physical views survive transfer and original-core close until actual backing growth/free. Related constructors inherit bindings and unwind retained refs on refusal. Sum core ExclusiveBytes plus each distinct store TotalBytes once; numeral cells belong to the shared IntegerManager. See PORT_PROGRESS.md#audit-upolynomial-store-adoption-port-status-md.",
         "upolynomial.h:151-156: only actual executing trial caller chains refuse mode changes; idle retained scopes do not introduce a new busy refusal.",
-        "The complete retained header surface is reconciled against concrete typed Go managers, views, sequences, factors, isolation/refinement objects, conversion adapters and source-lifetime receipts. Template-only and STL storage mechanics without retained consumers have no Go surface."
+        "The complete retained header surface is reconciled against concrete typed Go managers, views, sequences, factors, isolation/refinement objects, conversion adapters and source-lifetime receipts. Template-only and STL storage mechanics without retained consumers have no Go surface.",
+        "Retained factor(false) callers now capture the accepted public square_free invocation (upolynomial.cpp962-981; algebraic_numbers.cpp541-563,1015). Binary/unary selection and direct univariate isolation keep separate exact receipts. The concrete square-free scope carries its issued integer RAW/divisibility/PN allocation children, accepted normalization, generation-bound default modular-GCD/CRA scalar owners, actual scoped_set_zp saved member/class/c frontiers, and separate accepted display receipts. Source stops protect older caller locals; owning cleanup acknowledges these exact children before older destruction. Failed scoped_set_zp construction skips its custom restoration while preserving the already constructed scoped m_p member destructor. Numerical callbacks cannot delete borrowed storage or finalize the executing UP owner; ordinary source numeral destructors remain available outside callbacks. The algebraic factor helper protects its owner during both full and square-free factor modes, handing off to the existing trace borrow only during its private diagnostic. Reservation sweeps cover genuine pending children, a source-destructor stop and independent exact output; direct isolation also sweeps through successful quadratic isolation. A real runtime failure transport and real cooperation callbacks check refusal and unchanged physical/numeral state. An old square-free receipt cannot acknowledge a replacement generation. Failed scratch is never repaired or retried; owning teardown retains responsibility for its disposal. Complete descendant TRACE/source-action and other consumer audits remain open; this adds no whole polynomial/AST completion credit."
       ],
       "deviations": [
         "WithCount copies the raw source pointer/size binding without dereference; indexed array GCD preserves early-one skipping and later content-copy failure publication. Late CRA sweep exercises actual post-append reservations, not virtual fault callbacks.",
@@ -173334,7 +173372,11 @@
         "pkg/math/polynomial/upolynomial_sturm_isolation_numeric_test.go",
         "pkg/math/polynomial/polynomial_linear_display.go",
         "pkg/math/polynomial/polynomial_linear_stream_flags_test.go",
-        "pkg/math/polynomial/polynomial_linear_display_test.go"
+        "pkg/math/polynomial/polynomial_linear_display_test.go",
+        "pkg/math/polynomial/algebraic_squarefree_caller_test.go",
+        "pkg/util/numeral/numeric_caller_guard.go",
+        "pkg/util/numeral/mpzzp.go",
+        "pkg/util/numeral/numeric_caller_operations_extra.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -173658,7 +173700,13 @@
         "TestIntegerDividesRetainedShortAndBugTrace",
         "TestLinearRationalDisplayReceivingNumericFlags",
         "TestLinearModularDisplayReceivingNumericFlags",
-        "TestLinearNumericInsertionCallbackBorrowsActualOwners"
+        "TestLinearNumericInsertionCallbackBorrowsActualOwners",
+        "TestAlgebraicSquareFreeDefaultChildrenReservationClosure",
+        "TestAlgebraicSquareFreeActualTransportBorrow",
+        "TestAlgebraicSquareFreeOldReceiptCannotAbortReplacement",
+        "TestAlgebraicSquareFreeCooperationBorrow",
+        "TestAlgebraicIsolationOwnsStoppedSquareFreeChild",
+        "TestAlgebraicIsolationFactorCooperationProtectsCore"
       ],
       "conditionals": [
         {
@@ -175887,7 +175935,8 @@
         "Exactly the IntegerManager borrowed by the active MPF integral-rounding scope is excluded from checked operations and DEL-backed scalar SET/Reset during that Runtime returning transport. MPF scope identity, actual parent/primitive equality and executing/finishing state are required. Unrelated numeric caller policies retain their own callback rules. The unpack regression proves const/scoped roots and bytes unchanged; polynomial constant/vector/polynomial conversions and unrelated modular-receiver callback regressions prove the guard does not broaden to other callers.",
         "New private Root caller-context adapter retains literal output COPY before domain/bisection, stamps actual copy/root/power invocation receipts, and routes contextual power/add/div allocating leaves to the real caller. Existing direct Root paths pass empty context through the original raw adapter and preserve original behavior. Invalid copied/ended MPF contexts are refused before scalar publication or child begin. Focused native/debug Root/Power and MPF sqrt cold/physical/authority checks cover this extension; no new source algorithm is substituted.",
         "Caller-stream SMT2 display borrows out and input for actual insertion calls only. The reflected Integer scope declares its actual DEFAULT temporary only in the negative branch, owns the issued COPY receipt, captures reached MinInt32 negation allocation roots directly through a typed caller policy, and retains the exact integer insertion receipt. Its source destructor follows younger insertion source causes; explicit owning cleanup joins retained children/roots without repeating stopped source destruction. The reflected rational composition scope records only actually begun integer child counters and joins completed children before the next call can reuse the frame. It never adopts an older refused child. Typed borrowed namespace guards protect scalar/lifecycle operations during real allocation transport; cleanup preserves caller stream backing/prefix.",
-        "Integer text SET now embeds and charges its actual RAW ten/tmp and scalar source index/stage, with declaration only after caller RESET. Typed allocation hooks capture actual numerical/buffer/verification prefixes. Body failure omits RAW end DEL; separate CleanupStringSet joins actual retained TMP and allocation roots without source/algorithm replay or destination ownership. The private begin capture issues only after successful entry and protects exact parent-child association. Source/owning manager lifecycle and actual callback namespace guards include this invocation; physical audits name its actual TMP field."
+        "Integer text SET now embeds and charges its actual RAW ten/tmp and scalar source index/stage, with declaration only after caller RESET. Typed allocation hooks capture actual numerical/buffer/verification prefixes. Body failure omits RAW end DEL; separate CleanupStringSet joins actual retained TMP and allocation roots without source/algorithm replay or destination ownership. The private begin capture issues only after successful entry and protects exact parent-child association. Source/owning manager lifecycle and actual callback namespace guards include this invocation; physical audits name its actual TMP field.",
+        "The retained square-free caller now borrows the numeric services through embedded, generation-bound caller bindings. A distinct callback guard reports actual cooperation callbacks; numeral cleanup refuses callback reentry before touching the supplied Int, while normal source destructors outside callbacks remain available. Runtime and trace callbacks under an executing caller are also refused. Qualified SetZ/SetZP accept only a current concrete modular-owner policy and actual roots; ordinary calls, stale contexts and callbacks retain refusal. These mode operations serve the actual scoped_set_zp continuation; no generic unused template or STL adapter is added. Genuine runtime/cooperation vectors exercise deletion/lifetime/mode refusals with unchanged numeral/allocation state; a baseline overlay restoring old numeral deletion fails the cooperation test. This is borrowed-owner integration evidence, not a new whole-unit or exhaustive callback-composition claim."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -176020,7 +176069,11 @@
         "pkg/math/polynomial/upolynomial_root_id_remainder_test.go",
         "pkg/math/polynomial/polynomial_linear_display.go",
         "pkg/math/polynomial/polynomial_linear_stream_flags_test.go",
-        "pkg/math/polynomial/polynomial_linear_display_test.go"
+        "pkg/math/polynomial/polynomial_linear_display_test.go",
+        "pkg/math/polynomial/algebraic_squarefree_caller_test.go",
+        "pkg/util/numeral/numeric_caller_guard.go",
+        "pkg/util/numeral/mpzzp.go",
+        "pkg/util/numeral/numeric_caller_operations_extra.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -176356,7 +176409,13 @@
         "TestIntegerDivisionShortTraceNestedSourceOrder",
         "TestLinearRationalDisplayReceivingNumericFlags",
         "TestLinearModularDisplayReceivingNumericFlags",
-        "TestLinearNumericInsertionCallbackBorrowsActualOwners"
+        "TestLinearNumericInsertionCallbackBorrowsActualOwners",
+        "TestAlgebraicSquareFreeDefaultChildrenReservationClosure",
+        "TestAlgebraicSquareFreeActualTransportBorrow",
+        "TestAlgebraicSquareFreeOldReceiptCannotAbortReplacement",
+        "TestAlgebraicSquareFreeCooperationBorrow",
+        "TestAlgebraicIsolationOwnsStoppedSquareFreeChild",
+        "TestAlgebraicIsolationFactorCooperationProtectsCore"
       ],
       "conditionals": [
         {
@@ -178107,7 +178166,8 @@
         "Exactly the IntegerManager borrowed by the active MPF integral-rounding scope is excluded from checked operations and DEL-backed scalar SET/Reset during that Runtime returning transport. MPF scope identity, actual parent/primitive equality and executing/finishing state are required. Unrelated numeric caller policies retain their own callback rules. The unpack regression proves const/scoped roots and bytes unchanged; polynomial constant/vector/polynomial conversions and unrelated modular-receiver callback regressions prove the guard does not broaden to other callers.",
         "New private Root caller-context adapter retains literal output COPY before domain/bisection, stamps actual copy/root/power invocation receipts, and routes contextual power/add/div allocating leaves to the real caller. Existing direct Root paths pass empty context through the original raw adapter and preserve original behavior. Invalid copied/ended MPF contexts are refused before scalar publication or child begin. Focused native/debug Root/Power and MPF sqrt cold/physical/authority checks cover this extension; no new source algorithm is substituted.",
         "Caller-stream SMT2 display borrows out and input for actual insertion calls only. The reflected Integer scope declares its actual DEFAULT temporary only in the negative branch, owns the issued COPY receipt, captures reached MinInt32 negation allocation roots directly through a typed caller policy, and retains the exact integer insertion receipt. Its source destructor follows younger insertion source causes; explicit owning cleanup joins retained children/roots without repeating stopped source destruction. The reflected rational composition scope records only actually begun integer child counters and joins completed children before the next call can reuse the frame. It never adopts an older refused child. Typed borrowed namespace guards protect scalar/lifecycle operations during real allocation transport; cleanup preserves caller stream backing/prefix.",
-        "Integer text SET now embeds and charges its actual RAW ten/tmp and scalar source index/stage, with declaration only after caller RESET. Typed allocation hooks capture actual numerical/buffer/verification prefixes. Body failure omits RAW end DEL; separate CleanupStringSet joins actual retained TMP and allocation roots without source/algorithm replay or destination ownership. The private begin capture issues only after successful entry and protects exact parent-child association. Source/owning manager lifecycle and actual callback namespace guards include this invocation; physical audits name its actual TMP field."
+        "Integer text SET now embeds and charges its actual RAW ten/tmp and scalar source index/stage, with declaration only after caller RESET. Typed allocation hooks capture actual numerical/buffer/verification prefixes. Body failure omits RAW end DEL; separate CleanupStringSet joins actual retained TMP and allocation roots without source/algorithm replay or destination ownership. The private begin capture issues only after successful entry and protects exact parent-child association. Source/owning manager lifecycle and actual callback namespace guards include this invocation; physical audits name its actual TMP field.",
+        "The retained square-free caller now borrows the numeric services through embedded, generation-bound caller bindings. A distinct callback guard reports actual cooperation callbacks; numeral cleanup refuses callback reentry before touching the supplied Int, while normal source destructors outside callbacks remain available. Runtime and trace callbacks under an executing caller are also refused. Qualified SetZ/SetZP accept only a current concrete modular-owner policy and actual roots; ordinary calls, stale contexts and callbacks retain refusal. These mode operations serve the actual scoped_set_zp continuation; no generic unused template or STL adapter is added. Genuine runtime/cooperation vectors exercise deletion/lifetime/mode refusals with unchanged numeral/allocation state; a baseline overlay restoring old numeral deletion fails the cooperation test. This is borrowed-owner integration evidence, not a new whole-unit or exhaustive callback-composition claim."
       ],
       "deviations": [
         "Divide by zero is a classified development error preserving destinations.",
@@ -178180,7 +178240,10 @@
         "pkg/math/polynomial/upolynomial_berlekamp_numeric.go",
         "pkg/util/numeral/mpzzp_string_source.go",
         "pkg/math/polynomial/upolynomial_quadratic_scalar_trace_test.go",
-        "pkg/math/polynomial/upolynomial_factor_quadratic_trace_test.go"
+        "pkg/math/polynomial/upolynomial_factor_quadratic_trace_test.go",
+        "pkg/math/polynomial/algebraic_squarefree_caller_test.go",
+        "pkg/util/numeral/numeric_caller_guard.go",
+        "pkg/util/numeral/mpz.go"
       ],
       "tests": [
         "TestIntegerModularCenteredOracle",
@@ -178253,7 +178316,13 @@
         "TestIntegerModularFusedLargeAliasOracle",
         "TestUPolynomialBerlekampConstructorActualNumericReservationPrefixes",
         "TestUPolynomialQuadraticScalarTraceActualReadStops",
-        "TestUPolynomialQuadraticPolynomialTraceRecords"
+        "TestUPolynomialQuadraticPolynomialTraceRecords",
+        "TestAlgebraicSquareFreeDefaultChildrenReservationClosure",
+        "TestAlgebraicSquareFreeActualTransportBorrow",
+        "TestAlgebraicSquareFreeOldReceiptCannotAbortReplacement",
+        "TestAlgebraicSquareFreeCooperationBorrow",
+        "TestAlgebraicIsolationOwnsStoppedSquareFreeChild",
+        "TestAlgebraicIsolationFactorCooperationProtectsCore"
       ],
       "conditionals": [
         {
@@ -178846,7 +178915,8 @@
         "Direct pseudo NUM context validates actual modular receiver and guarded frame/nonwrap nonce/executing/callback boundary before same-engine Copy/Neg/PN acquisition.",
         "Optional PNormalize child is bound only at the actual reached call after Integer Neg sign mutation; the legacy public Neg route delegates the same engine with nil child receipt.",
         "Same modular manager engine receives explicit concrete caller context; successful shared normalization temporaries remain member-owned, while actual pending acquisition belongs only its captured invocation.",
-        "mpz.cpp:1186-1207; mpzzp.h:58-68,111-114: returning Runtime transport cannot destroy executing Copy/PN Integer or enclosing Rational owner. Non-Z normalization execution scalar is a lifecycle guard only, set/restored around the same nil/receipt body; allocation authority remains exclusively explicit receipts."
+        "mpz.cpp:1186-1207; mpzzp.h:58-68,111-114: returning Runtime transport cannot destroy executing Copy/PN Integer or enclosing Rational owner. Non-Z normalization execution scalar is a lifecycle guard only, set/restored around the same nil/receipt body; allocation authority remains exclusively explicit receipts.",
+        "The retained square-free caller now borrows the numeric services through embedded, generation-bound caller bindings. A distinct callback guard reports actual cooperation callbacks; numeral cleanup refuses callback reentry before touching the supplied Int, while normal source destructors outside callbacks remain available. Runtime and trace callbacks under an executing caller are also refused. Qualified SetZ/SetZP accept only a current concrete modular-owner policy and actual roots; ordinary calls, stale contexts and callbacks retain refusal. These mode operations serve the actual scoped_set_zp continuation; no generic unused template or STL adapter is added. Genuine runtime/cooperation vectors exercise deletion/lifetime/mode refusals with unchanged numeral/allocation state; a baseline overlay restoring old numeral deletion fails the cooperation test. This is borrowed-owner integration evidence, not a new whole-unit or exhaustive callback-composition claim."
       ],
       "deviations": [
         "Source modulus constructors leave prime flag indeterminate; typed guard only actual read, not invented release Div precondition. Source Power maskwrap nontermination diagnosed after completed actions; deferred local/constructor cleanup is safe Go ownership adaptation, not claimed raw MPZ exception destructor. Source TRACE/unsupported/undefined and full consumer algorithms remain open. See PORT_PROGRESS.md#audit-mpzzp-port-status-md.",
@@ -205833,7 +205903,7 @@
     "numeral_seconds": 57.693,
     "session_id": 94669,
     "checkout_held_unchanged": true,
-    "scope_warning": "Full native module checkpoint 6f929b20 passed on CPUs 8-16 with the checkout held unchanged. This result covers that exact commit, including comparison assertions, saved-interval lifetime and selector-conversion corrections. Square-free caller closure was prepared only in an overlay during the run and is excluded. This run collected no statement coverage and does not establish polynomial or AST source-port completion."
+    "scope_warning": "Full native module checkpoint 6f929b20 passed on CPUs 8-16 with the checkout held unchanged. This result covers that exact commit, including comparison assertions, saved-interval lifetime and selector-conversion corrections. Subsequent square-free caller closure and numeric callback/mode corrections are excluded; they were prepared only in an overlay during this full run. This run collected no statement coverage and does not establish polynomial or AST source-port completion."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

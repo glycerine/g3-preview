@@ -17,6 +17,7 @@ type algebraicSavedInterval struct {
 	owned, constructed, restored bool
 }
 type algebraicBinaryScope struct {
+	squareFree                           upolySquareFreeCallReceipt
 	conversion                           algebraicConversionScope
 	intervalRoots                        [2]unumeral.BinaryRootInvocation
 	intervalDebug                        unumeral.BinaryIntervalDebugInvocationReceipt
@@ -151,6 +152,13 @@ func (m *AlgebraicRootCore) finishBinaryLocals() error {
 		}
 	}
 	p := m.config.Polynomials
+	if p.squareFreeCallReceiptPending(&s.squareFree) {
+		if e := p.squareFreeCall.sourceStop; e != nil {
+			return e
+		}
+		p.squareFreeCall.parentSourceExecuting = true
+		defer func() { p.squareFreeCall.parentSourceExecuting = false }()
+	}
 	if p.defaultNormalizationReceiptPending(&m.coefficientNormalization) {
 		if e := p.defaultNormalization.sourceCause; e != nil {
 			return e
@@ -232,6 +240,9 @@ func (m *AlgebraicRootCore) cleanupBinary() error {
 	s.cleaning = true
 	defer func() { s.cleaning = false }()
 	if e := s.conversion.cleanup(); e != nil {
+		return e
+	}
+	if e := m.config.Polynomials.cleanupSquareFreeCall(&s.squareFree); e != nil {
 		return e
 	}
 	for i := len(s.intervalRoots) - 1; i >= 0; i-- {
@@ -350,7 +361,9 @@ func (m *AlgebraicRootCore) makeBinary(a, b, out *Algebraic, kind uint8) (cause 
 	if e != nil {
 		return e
 	}
-	fullFactorization, e := m.factorPolynomialInto(v, s.factors)
+	s.executing = true
+	fullFactorization, e := m.factorPolynomialIntoWithSquareFreeReceipt(v, s.factors, &s.squareFree)
+	s.executing = false
 	// Capture the issued tuple bound to this actual factors owner. A service
 	// refusal caused by an older caller conveys no cleanup authority.
 	frontend := &m.config.Factors.frontend

@@ -253,6 +253,11 @@ func (m *IntegerManager) checkCleanup(a *Int) error {
 	if m == nil || m.self != m {
 		return umemory.ErrRuntimeOwner
 	}
+	// A callback cannot release a numeral borrowed by an executing caller.
+	// Literal source destructors run after the callback returns.
+	if callerBindingsCallbackActive(m.callerBindings) || m.numericCallerExecuting() && (m.RuntimeOwner().FailureTransportActive() || m.BorrowTraceTags().OutputCallbackActive()) {
+		return ErrNumericPending
+	}
 	if m.rationalServiceReadCallbackActive() || (m.mpfValueRead != nil && m.mpfBorrowedSourceCallbackActive()) {
 		return ErrNumericPending
 	}

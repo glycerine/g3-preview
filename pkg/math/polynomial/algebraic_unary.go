@@ -59,7 +59,9 @@ func (m *AlgebraicRootCore) makeUnary(a, out *Algebraic, k uint32, root bool) (c
 	if e != nil {
 		return e
 	}
-	fullFactorization, e := m.factorPolynomialInto(v, s.factors)
+	s.executing = true
+	fullFactorization, e := m.factorPolynomialIntoWithSquareFreeReceipt(v, s.factors, &s.squareFree)
+	s.executing = false
 	// Capture the issued tuple bound to this actual factors owner. A service
 	// refusal caused by an older caller conveys no cleanup authority.
 	frontend := &m.config.Factors.frontend

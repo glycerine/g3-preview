@@ -10,6 +10,9 @@ import (
 // Each actual caller holds its own accepted insertion receipts. The default
 // call retains its original lexical NUM array only if source destruction stops.
 type upolyCRATrace struct {
+	invocation                              uint64
+	parent                                  *upolySquareFreeCallScope
+	parentInvocation                        uint64
 	frontend                                *upolyFactorFrontendScope
 	owner                                   *UPolynomialManager
 	insertions                              [2]unumeral.NumeralInsertionReceipt
@@ -39,6 +42,11 @@ func (q *upolyCRATrace) sourceFailure() error {
 	}
 	if q.sourceCause != nil {
 		return q.sourceCause
+	}
+	if q.parent != nil && q.parent.valid() && q.parentInvocation == q.parent.invocation {
+		if e := q.parent.numericSourceCause(); e != nil {
+			return e
+		}
 	}
 	for i := range q.insertions {
 		if e := q.insertions[i].SourceCause(); e != nil {
