@@ -353,14 +353,13 @@ func (m *MultivariatePolynomialManager) factorLinearSquareFreePrimitiveWithRecei
 	if e := r.open(); e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
+	if e := polynomialFactorSourceAssert(6592, "degree(p, x) == 1", func() (bool, error) {
 		d, e := m.core.Degree(p, x)
-		if e != nil {
-			return e
-		}
-		if d != 1 {
-			return ErrPolynomialAssertion
-		}
+		return d == 1, e
+	}); e != nil {
+		return e
+	}
+	if e := polynomialFactorSourceAssert(6593, "is_primitive(p, x)", func() (bool, error) {
 		var guard *polynomialGCDInvocationReceipt
 		if guards != nil {
 			guard = &guards[0]
@@ -368,27 +367,21 @@ func (m *MultivariatePolynomialManager) factorLinearSquareFreePrimitiveWithRecei
 		if phase != nil {
 			*phase = 13
 		}
-		primitive, e := m.isPrimitiveWithReceipt(p, x, guard)
-		if e != nil {
-			return e
-		}
-		if !primitive {
-			return ErrPolynomialAssertion
-		}
-		guard = nil
+		return m.isPrimitiveWithReceipt(p, x, guard)
+	}); e != nil {
+		return e
+	}
+	if e := polynomialFactorSourceAssert(6594, "is_square_free(p, x)", func() (bool, error) {
+		var guard *polynomialGCDInvocationReceipt
 		if guards != nil {
 			guard = &guards[1]
 		}
 		if phase != nil {
 			*phase = 14
 		}
-		squareFree, e := m.isSquareFreeWithReceipt(p, x, true, guard)
-		if e != nil {
-			return e
-		}
-		if !squareFree {
-			return ErrPolynomialAssertion
-		}
+		return m.isSquareFreeWithReceipt(p, x, true, guard)
+	}); e != nil {
+		return e
 	}
 	return r.Push(p, k)
 }

@@ -3,6 +3,7 @@
 package polynomial
 
 import (
+	"errors"
 	"testing"
 )
 
@@ -38,6 +39,7 @@ func TestPolynomialLinearFactorLiteralPushAndMultiplicity(t *testing.T) {
 }
 
 func TestPolynomialLinearFactorSourceAssertionsAreCompiledOnly(t *testing.T) {
+	polynomialThrowAssertionFixture(t)
 	m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{2, 0, 0}}, {1, [3]uint32{}}})
 	f, e := NewPolynomialFactors(m)
 	serviceMust(t, e)
@@ -45,7 +47,7 @@ func TestPolynomialLinearFactorSourceAssertionsAreCompiledOnly(t *testing.T) {
 	budget, raw := m.core.integer.Budget().Used(), m.core.memory.State()
 	e = m.factorLinearSquareFreePrimitive(p, f, 0, 1)
 	if polynomialSourceDebug {
-		if e != ErrPolynomialAssertion || m.core.integer.Budget().Used() != budget || m.core.memory.State() != raw {
+		if !errors.Is(e, ErrPolynomialAssertion) || m.core.integer.Budget().Used() != budget || m.core.memory.State() != raw {
 			t.Fatal("source degree assertion frontier", e)
 		}
 		n, x := f.Distinct()

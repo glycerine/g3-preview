@@ -45796,7 +45796,7 @@
           ]
         },
         {
-          "name": "polynomial.cpp:6591-6679 linear/quadratic primitive square-free factor helpers: literal parity, discriminant, primitive parts and ordered factor publication",
+          "name": "polynomial.cpp:6591-6679 linear/quadratic primitive square-free factor helpers: linear assertion actions complete; quadratic assertion actions, parity, discriminant, primitive parts and publication remain under audit",
           "go_target": "pkg/math/polynomial/polynomial_factor_quadratic.go",
           "status": "partial",
           "tests": [
@@ -45805,7 +45805,8 @@
             "TestPolynomialQuadraticFactorDormantInputAndParity",
             "TestPolynomialQuadraticForeignCallbackRootsSurviveOwnAbort",
             "TestPolynomialQuadraticIrreducibleNegativeReturnsBeforeParityFlip",
-            "TestPolynomialQuadraticYoungerSqrtSourceStopPreservesOlderLocal"
+            "TestPolynomialQuadraticYoungerSqrtSourceStopPreservesOlderLocal",
+            "TestPolynomialFactorSourceAssertionActions"
           ]
         },
         {
@@ -45825,13 +45826,14 @@
           ]
         },
         {
-          "name": "polynomial.cpp:6727-6735 factor_n_sqf_pp: compiled degree/primitive/square-free assertions and literal Push of original p with k; source TODO retained",
-          "status": "partial",
+          "name": "Complete polynomial.cpp:6727-6735 factor_n_sqf_pp: degree/primitive/square-free assertion actions and literal Push of original p with k; source TODO retained",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factor_n_sqf.go",
           "tests": [
             "TestPolynomialHigherFactorSourceTODOKeepsOriginalFactor",
             "TestPolynomialHigherFactorDegreeAssertionPrecedesPublication",
-            "TestPolynomialHigherFactorEveryReachedAssertionAndPushPrefix"
+            "TestPolynomialHigherFactorEveryReachedAssertionAndPushPrefix",
+            "TestPolynomialFactorSourceAssertionActions"
           ]
         },
         {

@@ -2,6 +2,7 @@
 package polynomial
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 )
@@ -36,6 +37,7 @@ func TestPolynomialHigherFactorSourceTODOKeepsOriginalFactor(t *testing.T) {
 }
 
 func TestPolynomialHigherFactorDegreeAssertionPrecedesPublication(t *testing.T) {
+	polynomialThrowAssertionFixture(t)
 	m, p, _ := polynomialEvalFixture(t, []polynomialEvalTerm{{1, [3]uint32{2, 0, 0}}, {1, [3]uint32{}}})
 	f, e := NewPolynomialFactors(m)
 	serviceMust(t, e)
@@ -43,7 +45,7 @@ func TestPolynomialHigherFactorDegreeAssertionPrecedesPublication(t *testing.T) 
 	budget, raw := m.core.integer.Budget().Used(), m.core.memory.State()
 	e = m.factorHigherSquareFreePrimitive(p, f, 0, 2)
 	if polynomialSourceDebug {
-		if e != ErrPolynomialAssertion || m.core.integer.Budget().Used() != budget || m.core.memory.State() != raw {
+		if !errors.Is(e, ErrPolynomialAssertion) || m.core.integer.Budget().Used() != budget || m.core.memory.State() != raw {
 			t.Fatal("literal degree>2 assertion frontier", e)
 		}
 		n, e := f.Distinct()
