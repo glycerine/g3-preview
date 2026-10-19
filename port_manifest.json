@@ -38429,7 +38429,9 @@
         "pkg/math/polynomial/algebraic_cell_bounds_call_test.go",
         "pkg/math/polynomial/algebraic_cell_coefficient_copy.go",
         "pkg/math/polynomial/algebraic_cell_coefficient_copy_test.go",
-        "pkg/math/polynomial/algebraic_basic_cell_copy_test.go"
+        "pkg/math/polynomial/algebraic_basic_cell_copy_test.go",
+        "pkg/math/polynomial/algebraic_copy_interval_deletion_test.go",
+        "pkg/util/numeral/numeric_source_delete.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -38708,7 +38710,8 @@
         "TestAlgebraicCellCoefficientCopyActualTransport",
         "TestAlgebraicCellCoefficientCopyReservationMatrix",
         "TestAlgebraicBasicCellCopyAccessorSwitch",
-        "TestAlgebraicBasicCellCopyActualTransport"
+        "TestAlgebraicBasicCellCopyActualTransport",
+        "TestAlgebraicCopyIntervalDeletionReleasedNUMSourceGuard"
       ],
       "conditionals": [
         {
@@ -39700,7 +39703,8 @@
         "Cell deletion cpp:180-216 now distinguishes literal destruction from owning acknowledgement. Basic NUM/DEN, root bounds and polynomial coefficients use SourceIntegerDel on source paths, preserving the actual capacity/read guard after a physical free reports failure; owning paths retain Del and their exact release cursors. A consumed or unconstructed cell header is rejected by source deletion instead of silently consuming caller ownership. Del and delClosing query the established header tag assertion after the zero shortcut and before members. AlgebraicVector has explicit owning acknowledgement for stopped Reset/Close; simple mappings delegate stopped Close acknowledgement to actual stored elements. The retained root-selection scratch vector uses owning continuation from core Close. Public signed-host TLS operations produce actual release-then-error frontiers for basic headers, basic NUMs and root coefficients, with repeated source calls preserving pointer/cursor/budget/physical state and explicit cleanup releasing only owned resources. Actual vector reset/close, mapping and core-close continuations are checked. Closed-context source tag assertions precede members, while zero deletion skips them. Restoring the old root implementation fails all three real release-guard regressions (/mnt/oldrog/tmp/g3-cell-deletion-baseline/log). Deallocation domain errors return directly rather than invoking allocation transport; no imaginary callback or fabricated release flag is used. Existing teardown loops now use explicit owning APIs; source-stop assertions remain. Broader ownership/member/destructor and whole polynomial/AST audits remain open; no unit is promoted.",
         "The SetRoot/direct cell-constructor interval SET at cpp:411,462,495 now owns its actual bound-copy execution and accepted comparison/copy/numeric allocations through a concrete generation-bound scope. Actual allocator transport refuses owning cleanup, close, source/destination deletion and numeric/UP lifecycle without changing caller or physical state. Exact bound receipts and roots are acknowledged before older cell cleanup; no global numeric cleanup or source scratch repair is introduced. A three-destination actual reservation matrix reaches success, and restoring only the old bound SET makes the callback regression fail. The typed same-owner SetBoundsTracked continuation shares source ordering assertion, lower SET and upper SET with the existing concrete foreign interval-copy continuation, preserving Throw/Continue and disabled/closed-context behavior. All four focused profiles pass; complete native polynomial and focused AST arithmetic/algebraic evaluation pass. This increment follows and is excluded from full native checkpoint 9d6543aa. Earlier coefficient-copy and broader setter/member/destructor composition audits and whole polynomial/AST completion remain open; no unit is promoted.",
         "The constructor/setter coefficient loop cpp:405-410,445-455,494 now borrows its actual UP/modular/integer/natural services while executing. Core cleanup/close and public reentry refuse that executing loop; a qualified private polynomial factory continuation is available only to the current authenticated loop, while callback factory entry is refused. Existing coefficient SET allocation receipts retain their exact ownership and cleanup; no second numeric owner, new completion flags or global cleanup is introduced. A real coefficient-copy allocator callback previously deleted its live source algebraic cell successfully. Restoring only the old constructor/setter copy dispatch in /mnt/oldrog/tmp/g3-cell-coefficient/baseline-overlay.json reproduces that deletion (baseline-final.log); the applied guard preserves source/destination and allocation state. Three destination classes sweep actual reservation prefixes through successful equal values and dispose accepted failures with existing exact acknowledgement. Broad and final focused native/checked/debug/combined checks and native/combined AST arithmetic/algebraic evaluation validate the change. Full native checkpoint 9d6543aa predates this and the preceding bound-copy increment. Whole constructor/member/destructor composition and polynomial/AST source-port completion remain open; no unit is promoted.",
-        "Mutable rational setter reuse cpp:424-438 now reaches to_basic h:372 before loading the old value and protects the actual rational SET through cell-header writeback. Core public reentry, cleanup and close refuse that executing copy. The existing rationalCopy receipt remains the sole accepted numerical-child owner; no extra allocation owner, pending state or construction-completion flag is added. The original code skipped the accessor assertion switch after a real process-debug-context close and allowed actual allocation transport to delete its caller successfully. Restoring only the old reused-basic setter block reproduces both regressions (/mnt/oldrog/tmp/g3-basic-cell-copy/baseline-overlay.json and baseline-final.log). The corrected transport preserves caller/source rational and budget/physical state and retains the actual callee-issued copy receipt before exact cleanup. Broad and final focused native/checked/debug/combined checks, including existing rational-copy reservation prefixes, and native/combined AST arithmetic/algebraic evaluation pass. Full native checkpoint 9d6543aa excludes this and the later bound/coefficient-copy increments; no new full-suite result is claimed. Whole cell/source-destructor composition, polynomial and AST completion remain open; no unit is promoted."
+        "Mutable rational setter reuse cpp:424-438 now reaches to_basic h:372 before loading the old value and protects the actual rational SET through cell-header writeback. Core public reentry, cleanup and close refuse that executing copy. The existing rationalCopy receipt remains the sole accepted numerical-child owner; no extra allocation owner, pending state or construction-completion flag is added. The original code skipped the accessor assertion switch after a real process-debug-context close and allowed actual allocation transport to delete its caller successfully. Restoring only the old reused-basic setter block reproduces both regressions (/mnt/oldrog/tmp/g3-basic-cell-copy/baseline-overlay.json and baseline-final.log). The corrected transport preserves caller/source rational and budget/physical state and retains the actual callee-issued copy receipt before exact cleanup. Broad and final focused native/checked/debug/combined checks, including existing rational-copy reservation prefixes, and native/combined AST arithmetic/algebraic evaluation pass. Full native checkpoint 9d6543aa excludes this and the later bound/coefficient-copy increments; no new full-suite result is claimed. Whole cell/source-destructor composition, polynomial and AST completion remain open; no unit is promoted.",
+        "Root-to-root same-core and cross-manager copy cpp:198-200,533-536 now uses literal SourceBinaryIntervalDel for the old interval, preserving lower then upper NUM capacity/read guards after a real physical release reports an accounting error. Ordinary BinaryIntervalManager.Del remains the explicit owning primitive, and core CleanupValue keeps its existing exact release cursors. The new concrete helper retains existing Go owner admission and does not add pending/completed flags or numerical cleanup owners. Four actual public signed-host TLS cases cover lower/upper release stops in same/foreign manager copies; polynomial deletion precedes the stopped interval, repeated source copy refuses with ErrInvalidSlot and preserves caller/budget/physical state, then owning cleanup releases the actual descriptor and remaining members. Foreign-copy borrow acknowledgement occurs separately from value cleanup. Restoring the former owning interval deletion in /mnt/oldrog/tmp/g3-copy-interval-deletion/baseline-overlay.json fails all four cases (baseline-final.log); former upper-bound retries incorrectly completed successfully. Remaining copy branch/accessor gates, wider source-destructor composition and whole polynomial/AST completion remain open; no unit is promoted."
       ]
     },
     {
@@ -128569,7 +128573,9 @@
         "pkg/math/polynomial/algebraic_binary_trace_test.go",
         "pkg/math/polynomial/algebraic_unary_trace_test.go",
         "pkg/util/numeral/mpbq_compare_owner.go",
-        "pkg/util/numeral/mpbq_set_bounds_tracked_test.go"
+        "pkg/util/numeral/mpbq_set_bounds_tracked_test.go",
+        "pkg/util/numeral/numeric_source_delete.go",
+        "pkg/math/polynomial/algebraic_copy_interval_deletion_test.go"
       ],
       "tests": [
         "TestBinaryIntervalQueriesAndScalarRoutes",
@@ -128586,7 +128592,8 @@
         "TestBinaryIntervalDebugReceiptActualRAWAndCleanupReads",
         "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix",
         "TestAlgebraicUnaryPowerTraceMultiwordReservationPrefixes",
-        "TestBinaryIntervalSetBoundsTrackedAssertionActions"
+        "TestBinaryIntervalSetBoundsTrackedAssertionActions",
+        "TestAlgebraicCopyIntervalDeletionReleasedNUMSourceGuard"
       ],
       "conditionals": [
         {
@@ -128743,7 +128750,8 @@
       ],
       "deviations": [
         "Concrete MPBQ/open specialization replaces C++ templates without Go generics. Native io.Writer insertion preserves source delimiter/bound order, while staged strings retain existing callers. The old_interval.cpp integer instantiation is source-test-only; no production source instantiates a closed manager or calls field-only inv/div (mpbq_manager::field() is false). Real downstream consumers remain separate source units.",
-        "The retained algebraic cell setter now uses the concrete same-owner SetBoundsTracked continuation. Its lower/upper SETs share the existing foreign-copy helper while preserving the source assertion switch, diagnostic Throw/Continue, erased operands and closed-context refusal. Actual accepted comparison/copy/numeric allocation children belong to the concrete polynomial caller. Native and combined interval action/copy/comparison checks pass; no whole new source-unit promotion is added."
+        "The retained algebraic cell setter now uses the concrete same-owner SetBoundsTracked continuation. Its lower/upper SETs share the existing foreign-copy helper while preserving the source assertion switch, diagnostic Throw/Continue, erased operands and closed-context refusal. Actual accepted comparison/copy/numeric allocation children belong to the concrete polynomial caller. Native and combined interval action/copy/comparison checks pass; no whole new source-unit promotion is added.",
+        "The concrete retained algebraic copy caller now uses SourceBinaryIntervalDel for literal basic_interval.h:94-97 destruction: lower then upper SourceIntegerDel, without acknowledging already-consumed physical releases. Existing BinaryIntervalManager.Del remains owning. Same/foreign manager lower/upper actual release/error cases distinguish source guard refusal from owning cleanup without private counter or completion-state fabrication. Other existing interval source/owning consumers retain their current explicit APIs; no universal template adapter or whole new unit promotion is added."
       ]
     },
     {

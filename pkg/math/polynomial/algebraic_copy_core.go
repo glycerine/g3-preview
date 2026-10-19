@@ -144,7 +144,7 @@ func (m *AlgebraicRootCore) CopyFromCore(dst *Algebraic, source *AlgebraicRootCo
 		if e = m.deletePolynomial(dl, &old); e != nil {
 			return e
 		}
-		e = m.config.Intervals.Del(&old.interval)
+		e = unumeral.SourceBinaryIntervalDel(m.config.Intervals, &old.interval)
 		if e = m.save(dl, &old, e); e != nil {
 			return e
 		}

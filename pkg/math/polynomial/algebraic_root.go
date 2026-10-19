@@ -1098,7 +1098,7 @@ func (m *AlgebraicRootCore) copyCellValue(dst, src *Algebraic) error {
 		if e = algebraicQueryTagAssertionSwitch(); e != nil {
 			return e
 		}
-		e = m.config.Intervals.Del(&old.interval)
+		e = unumeral.SourceBinaryIntervalDel(m.config.Intervals, &old.interval)
 		if e = m.save(dl, &old, e); e != nil {
 			return e
 		}

@@ -34,3 +34,15 @@ func SourceRationalDel(q *RationalManager, a *Rational) error {
 	}
 	return SourceIntegerDel(q.Integers(), &a.Den)
 }
+
+// SourceBinaryIntervalDel follows basic_interval.h:94-97 and mpbq.h:78.
+// Literal lower/upper destruction cannot acknowledge a consumed NUM release.
+func SourceBinaryIntervalDel(m *BinaryIntervalManager, a *BinaryInterval) error {
+	if e := m.checkCleanup(a); e != nil {
+		return e
+	}
+	if e := SourceIntegerDel(m.bounds.Z, &a.lower.Num); e != nil {
+		return e
+	}
+	return SourceIntegerDel(m.bounds.Z, &a.upper.Num)
+}
