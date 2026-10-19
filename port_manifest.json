@@ -205931,13 +205931,13 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "d412365e",
+    "commit": "9d6543aa",
     "command": "cd pkg && go test ./... -count=1 -timeout=30m",
-    "started_utc": "2026-10-19 17:59:57 UTC",
-    "completed_utc": "2026-10-19 18:12:12 UTC",
+    "started_utc": "2026-10-19 19:10:46 UTC",
+    "completed_utc": "2026-10-19 19:22:53 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-d412365e.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-d412365e.exit",
+    "log": "/mnt/oldrog/tmp/g3-native-9d6543aa.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-9d6543aa.exit",
     "cpu_affinity": [
       8,
       9,
@@ -205953,13 +205953,13 @@
     "package_timeout": "30m",
     "packages_with_ok_result": 68,
     "packages_without_test_files": 11,
-    "ast_seconds": 12.531,
-    "polynomial_seconds": 106.215,
-    "lp_seconds": 703.507,
-    "numeral_seconds": 57.543,
-    "session_id": 93559,
+    "ast_seconds": 11.982,
+    "polynomial_seconds": 106.457,
+    "lp_seconds": 710.27,
+    "numeral_seconds": 57.937,
+    "session_id": 18328,
     "checkout_held_unchanged": true,
-    "scope_warning": "Full native module checkpoint d412365e passed on CPUs 8-16 with the checkout held unchanged. It includes square-free caller closure and independent modular-peer cleanup correction, constructor assertions/Horner ownership, setter source trace, coefficient-negation ownership and copy branch/deletion-order corrections. The subsequent same-core copy execution/numerical-child increment was prepared only in an overlay and is excluded. This run collected no statement coverage and does not establish polynomial or AST source-port completion."
+    "scope_warning": "Full native module checkpoint 9d6543aa passed on CPUs 8-16 with the checkout held unchanged. It includes same-core copy execution/numerical-child ownership and literal cell destruction with explicit vector/mapping/core owning continuations. Subsequent SetRoot bound-copy execution/numerical-child changes were prepared only in an overlay and are excluded. This run collected no statement coverage and does not establish polynomial or AST source-port completion."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
