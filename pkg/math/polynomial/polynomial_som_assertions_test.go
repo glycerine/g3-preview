@@ -47,6 +47,32 @@ func TestPolynomialCheapAppendDuplicateAssertionActions(t *testing.T) {
 	}
 }
 
+func TestPolynomialSOMNormalizePositiveGCDAssertionActions(t *testing.T) {
+	for _, action := range []string{"T", "C", "disabled"} {
+		t.Run(action, func(t *testing.T) {
+			m := polynomialCellFixture(t)
+			// Exercise normalize_numerals directly, before a SOM removes zeros.
+			m.cheap.as.values = []unumeral.Int{{}}
+			defer func() { m.cheap.as.values = nil }()
+			polynomialAssertionActionsFixture(t, action)
+			if polynomialSourceDebug && action == "disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+			}
+			e := m.cheap.normalize()
+			want := unumeral.ErrDivideByZero
+			if polynomialSourceDebug && action == "T" {
+				want = ErrPolynomialAssertion
+			}
+			if !errors.Is(e, want) {
+				t.Fatal("positive GCD assertion/division frontier", e, want)
+			}
+			if m.cheap.gcdActive || m.cheap.normalizeScope.active {
+				t.Fatal("completed source NUM destructor retained the invocation")
+			}
+		})
+	}
+}
+
 func polynomialSOMMismatchedBuffer(t *testing.T) (*MultivariatePolynomialCore, *PolynomialSOMBuffer) {
 	t.Helper()
 	m := polynomialCellFixture(t)

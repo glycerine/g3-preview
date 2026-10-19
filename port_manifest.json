@@ -44649,6 +44649,7 @@
             "TestPolynomialSOMBufferSourceSelfAliasReadsChangedFutureCoefficient",
             "TestPolynomialSOMVectorWrappedIndexReachesChildWithoutReservation",
             "TestPolynomialSOMResetSizeAssertionActions",
+            "TestPolynomialSOMNormalizePositiveGCDAssertionActions",
             "TestPolynomialSOMRemoveZerosSizeAssertionActions",
             "TestPolynomialSOMRemoveZerosDuplicateAssertionActions",
             "TestPolynomialSOMDisplaySizeAssertionActions"

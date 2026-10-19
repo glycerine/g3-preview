@@ -847,14 +847,10 @@ func (b *polynomialSOM) normalizeWithOwner(parent *polynomialNormalizeScope) (re
 		return e
 	}
 	if !one {
-		if polynomialSourceDebug {
-			pos, e := m.modular.IsPos(&b.gcd)
-			if e != nil {
-				return e
-			}
-			if !pos {
-				return ErrPolynomialAssertion
-			}
+		if e := polynomialSOMPredicateSourceAssert(1871, "m.is_pos(g)", func() (bool, error) {
+			return m.modular.IsPos(&b.gcd)
+		}); e != nil {
+			return e
 		}
 		for i := uint32(0); i < n; i++ {
 			a, e := b.as.coefficient(m, i)
