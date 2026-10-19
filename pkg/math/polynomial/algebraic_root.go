@@ -49,6 +49,7 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	cellBoundsCall                                             algebraicCellBoundsCallScope
 	copyCall                                                   algebraicCopyCallScope
 	cellNeg                                                    algebraicCellNegNumeric
 	cellEvaluation                                             [3]upolyBinaryEvaluationInvocationReceipt
@@ -208,7 +209,7 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
-	if m != nil && m.self == m && m.copyCall.callback() {
+	if m != nil && m.self == m && (m.copyCall.callback() || m.cellBoundsCall.callback()) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && (m.cellEvaluationPending() || m.cellNeg.pending()) {
@@ -897,6 +898,9 @@ func (m *AlgebraicRootCore) setRoot(a *Algebraic, p UPolynomialView, lower, uppe
 	if err = m.check(); err != nil {
 		return err
 	}
+	if m.cellBoundsCall.pending() {
+		return ErrAlgebraicPending
+	}
 	if verifyAssignment {
 		if err = m.assertCellDegree(p.count, 477, "sz > 1", 1); err != nil {
 			return err
@@ -977,7 +981,7 @@ func (m *AlgebraicRootCore) setRoot(a *Algebraic, p UPolynomialView, lower, uppe
 	if err != nil {
 		return err
 	}
-	if err = m.config.Intervals.SetBounds(&r.interval, lower, upper); err != nil {
+	if err = m.setCellBounds(&r.interval, lower, upper); err != nil {
 		return m.save(l, &r, err)
 	}
 	if err = m.store(l, &r); err != nil {
@@ -1146,7 +1150,7 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.cleanupRetainedCore()
 }
 func (m *AlgebraicRootCore) cleanupRetainedCore() error {
-	if m != nil && m.self == m && (m.copyCall.running || m.copyCall.cleaning) {
+	if m != nil && m.self == m && (m.copyCall.running || m.copyCall.cleaning || m.cellBoundsCall.running || m.cellBoundsCall.cleaning) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting || m.cellEvaluationRunning || m.cellNeg.running) {
@@ -1246,6 +1250,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 		return e
 	}
 	if e := m.cleanupCellNeg(); e != nil {
+		return e
+	}
+	if e := m.cleanupCellBoundsCall(); e != nil {
 		return e
 	}
 	if e := m.cleanupCopyCall(); e != nil {
@@ -1397,7 +1404,7 @@ func (m *AlgebraicRootCore) Close() error {
 	return m.closeCoreMembers()
 }
 func (m *AlgebraicRootCore) closeCoreMembers() error {
-	if m != nil && m.self == m && (m.copyCall.running || m.copyCall.cleaning) {
+	if m != nil && m.self == m && (m.copyCall.running || m.copyCall.cleaning || m.cellBoundsCall.running || m.cellBoundsCall.cleaning) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting || m.cellEvaluationRunning || m.cellNeg.running) {

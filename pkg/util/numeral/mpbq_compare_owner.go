@@ -70,6 +70,24 @@ func (o NumericBinaryIntervalOperations) CopyFromOwnerTracked(dst *BinaryInterva
 	if e := source.check(src); e != nil {
 		return e
 	}
+	return o.setBoundsFromOwnerTracked(dst, source.bounds, &src.lower, &src.upper, receipt)
+}
+
+// SetBoundsTracked retains the actual interval SET comparison and numeral copies.
+func (o NumericBinaryIntervalOperations) SetBoundsTracked(dst *BinaryInterval, lower, upper *BinaryRational, receipt *IntegerCopyAllocationReceipt) error {
+	if e := o.valid(); e != nil {
+		return e
+	}
+	if e := o.manager.check(dst); e != nil {
+		return e
+	}
+	if e := o.manager.bounds.pair(lower, upper); e != nil {
+		return e
+	}
+	return o.setBoundsFromOwnerTracked(dst, o.manager.bounds, lower, upper, receipt)
+}
+func (o NumericBinaryIntervalOperations) setBoundsFromOwnerTracked(dst *BinaryInterval, source *BinaryRationalManager, lower, upper *BinaryRational, receipt *IntegerCopyAllocationReceipt) error {
+	m := o.manager
 	if SourceExtendedGCDDebug {
 		d := diagnostic.BorrowProcessDebugContext()
 		enabled, e := diagnostic.SourceAssertionsEnabled(d)
@@ -77,7 +95,7 @@ func (o NumericBinaryIntervalOperations) CopyFromOwnerTracked(dst *BinaryInterva
 			return e
 		}
 		if enabled {
-			greater, e := m.bounds.WithAllocationContext(o.context).LessFromOwnerTracked(source.bounds, &src.upper, &src.lower, receipt)
+			greater, e := m.bounds.WithAllocationContext(o.context).LessFromOwnerTracked(source, upper, lower, receipt)
 			if e != nil {
 				return e
 			}
@@ -88,8 +106,8 @@ func (o NumericBinaryIntervalOperations) CopyFromOwnerTracked(dst *BinaryInterva
 			}
 		}
 	}
-	if e := m.bounds.CopyFromOwnerWithAllocationReceipt(&dst.lower, source.bounds, &src.lower, receipt); e != nil {
+	if e := m.bounds.CopyFromOwnerWithAllocationReceipt(&dst.lower, source, lower, receipt); e != nil {
 		return e
 	}
-	return m.bounds.CopyFromOwnerWithAllocationReceipt(&dst.upper, source.bounds, &src.upper, receipt)
+	return m.bounds.CopyFromOwnerWithAllocationReceipt(&dst.upper, source, upper, receipt)
 }
