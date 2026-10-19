@@ -55505,6 +55505,20 @@
           "notes": "The three whole records print actual prime/factors/degrees, preserve source endl flushes and continue operand computation after stream failure. One concrete borrow protects actual root/prime/lift owners across header, body and footer. A descriptor-after-physical refusal retains the exact display child before the fourteen constructed square-free locals; explicit exact cleanup releases it first. Disabled traces skip unreached operands. Other bughunt records and the broader factorization-unit audit remain partial."
         },
         {
+          "name": "Finite-field square-free/factor TRACE records and exact outcome child/destructor frontier (256,268-369,375,399)",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/upolynomial_factor_field_trace.go",
+          "go_targets": [
+            "pkg/math/polynomial/upolynomial_factor_field.go",
+            "pkg/math/polynomial/upolynomial_factor_field_trace_test.go"
+          ],
+          "tests": [
+            "TestUPolynomialFiniteFieldSquareFreeTraceRecords",
+            "TestUPolynomialFiniteFieldFactorEntryAndOutcomeTrace"
+          ],
+          "notes": "All live records and operands are emitted at their source positions and the successful-path order is covered. Exact retained ownership for a stopped polynomial/factor display at the final records, before older square-free vectors or the local factor collection destruct, remains open; no whole source-unit completion credit."
+        },
+        {
           "name": "upolynomial_factorization.cpp:979-1017 mignotte_bound literal direct numeric body and reverse tmp/bound/norm source destruction",
           "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_recombine.go",
@@ -55522,7 +55536,7 @@
         },
         {
           "name": "upolynomial_factorization.cpp:1023-1465 factor_square_free selected source-only enclosing epilogue and separate exact owning continuation",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_scope.go",
           "tests": [
             "TestUPolynomialMignotteSourceFinalizerPreservesOlderParent",
@@ -55717,7 +55731,7 @@
         },
         {
           "name": "upolynomial_factorization.cpp:1153-1175,1238-1292 actual retained child and source class owning continuation",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_retained_scope_source_test.go",
           "tests": [
             "TestUPolynomialFactorRetainedLexicalCleanup"
@@ -55725,7 +55739,7 @@
         },
         {
           "name": "upolynomial_factorization.cpp:1019-1299 exact whole square-free invocation source/own caller receipt",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_squarefree_invocation.go",
           "tests": [
             "TestUPolynomialFactorSquareFreeActualCheckerSourceStop",
