@@ -173,28 +173,23 @@ func (m *MultivariatePolynomialManager) gcdCRA(a Polynomial, b1 *unumeral.Int, b
 	if e := m.traceCRAImages(a, b); e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
-		size, e := c.cheap.ms.size(c)
-		if e != nil {
-			return e
-		}
-		if size != 0 {
-			return ErrPolynomialAssertion
-		}
-		even, e := c.integer.IsEven(b1)
-		if e != nil {
-			return e
-		}
-		if even {
-			return ErrPolynomialAssertion
-		}
-		even, e = c.integer.IsEven(b2)
-		if e != nil {
-			return e
-		}
-		if even {
-			return ErrPolynomialAssertion
-		}
+	if e := polynomialCRASourceAssert(3679, "m_cheap_som_buffer.empty()", func() (bool, error) {
+		size, x := c.cheap.ms.size(c)
+		return size == 0, x
+	}); e != nil {
+		return e
+	}
+	if e := polynomialCRASourceAssert(3680, "!m().m().is_even(b1)", func() (bool, error) {
+		even, x := c.integer.IsEven(b1)
+		return !even, x
+	}); e != nil {
+		return e
+	}
+	if e := polynomialCRASourceAssert(3681, "!m().m().is_even(b2)", func() (bool, error) {
+		even, x := c.integer.IsEven(b2)
+		return !even, x
+	}); e != nil {
+		return e
 	}
 	s := &m.cra
 	if s.active {
@@ -215,14 +210,8 @@ func (m *MultivariatePolynomialManager) gcdCRA(a Polynomial, b1 *unumeral.Int, b
 	if e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
-		one, e := c.modular.IsOne(&n[2])
-		if e != nil {
-			return e
-		}
-		if !one {
-			return ErrPolynomialAssertion
-		}
+	if e = polynomialCRASourceAssert(3687, "m().is_one(g)", func() (bool, error) { return c.modular.IsOne(&n[2]) }); e != nil {
+		return e
 	}
 	if e = m.traceCRABezout(b1, b2, &n[0], &n[1]); e != nil {
 		return e

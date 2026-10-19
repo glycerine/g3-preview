@@ -46276,3 +46276,14 @@ switch before their predicates and honor Throw, Continue, and disabled
 execution. Focused algorithm, trace, and assertion tests pass in native,
 checked, debug and combined checked/debug/trace profiles on CPUs 8-16. The
 Euclid-wrapper method row is ported.
+
+Polynomial CRA completion: `CRA_combine_images` at
+`polynomial.cpp:3675-3767` preserves both lex sorts, twelve scoped numerals,
+extended-GCD inverses, balanced modular representatives, ordered monomial
+merge branches, bound publication, cheap-buffer construction and output
+reference transfer. The empty-buffer, odd-bound, and coprime-GCD assertions now
+read the process switch before their predicates and honor Throw, Continue, and
+disabled execution. Existing source/owning cleanup preserves exact arithmetic,
+append and factory children. All CRA-focused tests pass in native, checked,
+debug and combined checked/debug/trace profiles on CPUs 8-16. The CRA method
+row is ported.

@@ -45163,10 +45163,12 @@
           ]
         },
         {
-          "name": "CRA cpp3675-3767: literal signed modular inverse, coefficient merge and indexed alias behavior with source-scoped NUM ownership",
-          "status": "partial",
+          "name": "Complete CRA_combine_images cpp3675-3767: assertion actions, signed modular inverses, balanced coefficient merge, indexed alias behavior and source-scoped numeral ownership",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_cra.go",
           "tests": [
+            "TestPolynomialGCDCRASourceAssertionActions",
+            "TestPolynomialCRASourceTraceMergeBranches",
             "TestPolynomialGCDCRAIndependentBalancedCoefficientTable",
             "TestPolynomialGCDCRAEveryActualBigNumeralPrefix",
             "TestPolynomialGCDCRACompletedNumeralGuardRetainsOlderRoots"
