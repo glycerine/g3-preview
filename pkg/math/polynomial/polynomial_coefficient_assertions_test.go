@@ -84,14 +84,23 @@ func TestPolynomialCoefficientBufferAssertionActions(t *testing.T) {
 					t.Fatal("nonempty buffer assertion did not throw", e)
 				}
 				serviceMust(t, m.cheap.reset())
-			} else if polynomialSourceDebug {
-				if !errors.Is(e, ErrPolynomialAssertion) {
-					t.Fatal("Continue did not reach the later dirty-buffer guard", e)
-				}
-				serviceMust(t, m.cheap.reset())
 			} else {
 				serviceMust(t, e)
 				polynomialCaller(t, m, r)
+				size, e := m.readWord(r, 8)
+				serviceMust(t, e)
+				if size != 2 {
+					t.Fatal("continued factory did not retain both source rows", size)
+				}
+				for i, want := range []int64{3, 1} {
+					a, e := m.coefficientCore(r, uint32(i))
+					serviceMust(t, e)
+					got, e := m.integer.Int64(&a)
+					serviceMust(t, e)
+					if got != want {
+						t.Fatal("continued coefficient row", i, got, want)
+					}
+				}
 			}
 		})
 	}

@@ -45395,8 +45395,8 @@
           ]
         },
         {
-          "name": "manager::imp::coeff optional actual invocation leaf ownership cpp3264-3277",
-          "status": "partial",
+          "name": "Complete manager::imp::coeff invocation leaf ownership cpp3264-3277",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_coefficient_receipt.go",
           "tests": [
             "TestPolynomialCoefficientReceiptActualSETBeforeINC",
@@ -45833,8 +45833,8 @@
         },
         {
           "go_target": "pkg/math/polynomial/polynomial_coefficient_receipt.go",
-          "name": "polynomial.cpp:3264-3277,3297-3312 Coeff two-buffer invocation continuation: actual leading/reduct ADD and mk children; reduct incoming INC handoff before leading factory; exact parent/buffer/factory frame and captured nonwrap generation.",
-          "status": "partial",
+          "name": "Complete Coeff two-buffer invocation continuation cpp3264-3277,3297-3312 with actual ADD/mk children, reduct INC before leading factory and exact frame generations",
+          "status": "ported",
           "tests": [
             "TestPolynomialCoefficientReductActualTwoBufferOwnershipPrefixes",
             "TestPolynomialCoefficientReductActualTwoBIGBufferPrefixes",
