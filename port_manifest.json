@@ -206036,13 +206036,13 @@
     "full_suite_qualification": "Full native checkpoint17ecadb7 passed after this audit; subsequent commits changed only ledgers/documentation, so current Go code is covered by that run. Focused checked evidence remains separate."
   },
   "latest_full_native_checkpoint": {
-    "commit": "c19bb8d7",
+    "commit": "14fa0836",
     "command": "cd pkg && go test ./... -count=1 -timeout=30m",
-    "started_utc": "2026-10-19 21:03:22 UTC",
-    "completed_utc": "2026-10-19 21:15:24 UTC",
+    "started_utc": "2026-10-19 22:14:13 UTC",
+    "completed_utc": "2026-10-19 22:26:37 UTC",
     "exit_code": 0,
-    "log": "/mnt/oldrog/tmp/g3-native-c19bb8d7.log",
-    "exit_file": "/mnt/oldrog/tmp/g3-native-c19bb8d7.exit",
+    "log": "/mnt/oldrog/tmp/g3-native-14fa0836.log",
+    "exit_file": "/mnt/oldrog/tmp/g3-native-14fa0836.exit",
     "cpu_affinity": [
       8,
       9,
@@ -206058,13 +206058,13 @@
     "package_timeout": "30m",
     "packages_with_ok_result": 68,
     "packages_without_test_files": 11,
-    "ast_seconds": 12.117,
-    "polynomial_seconds": 107.219,
-    "lp_seconds": 710.014,
-    "numeral_seconds": 58.382,
-    "session_id": 32317,
+    "ast_seconds": 12.615,
+    "polynomial_seconds": 110.166,
+    "lp_seconds": 709.898,
+    "numeral_seconds": 57.917,
+    "session_id": 94021,
     "checkout_held_unchanged": true,
-    "scope_warning": "Full native module checkpoint c19bb8d7 passed on CPUs 8-16 with the checkout held unchanged. It includes the borrowed basic-value NUM/DEN, defining-polynomial field/callee assertion and selected bound source-field increments, plus additive import correction a7475772. Bound temporary source deletion was developed only in an overlay and is excluded. No statement coverage was collected and polynomial/AST source-port completion remains open."
+    "scope_warning": "Full native module checkpoint14fa0836 passed on CPUs8-16 with the checkout held unchanged. It includes bound temporary source deletion52fe1a75, bound predicate declaration/TRACE child propagation8e70e534, refinement/conversion context generationsa8bb3db3 and decimal root scoped/child lifetime14fa0836, including its completed combined precision20 sweep. The next basic decimal stored-reference change was developed only in overlays and is excluded. No statement coverage was collected; whole polynomial and AST source-port completion remains open."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",
