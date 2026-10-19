@@ -171,6 +171,21 @@ func (m *MultivariatePolynomialManager) squareRootNumeral(op uint8, a, b, out *u
 	c := m.core
 	z := c.integer
 	s := &m.squareRoot
+	if op >= 1 && op <= 3 {
+		context := integerAllocationInvocationContext{squareRoot: &s.receipt, squareRootInvocation: s.invocation}
+		if context.roots(z) == nil {
+			return false, ErrPolynomialOwner
+		}
+		arithmetic := c.modular.WithAllocationContext(context.utility(z))
+		switch op {
+		case 1:
+			return true, arithmetic.SetInt32(out, 2)
+		case 2:
+			return true, arithmetic.Mul(a, b, out)
+		case 3:
+			return true, arithmetic.Neg(out)
+		}
+	}
 	pending := z.PendingAllocationObject()
 	raw, e := z.SourceAllocator().PendingRoots()
 	if e != nil {
@@ -180,12 +195,6 @@ func (m *MultivariatePolynomialManager) squareRootNumeral(op uint8, a, b, out *u
 	switch op {
 	case 0:
 		ok, e = c.modular.IsPerfectSquareWithReceipt(a, out, &s.perfectSquare)
-	case 1:
-		e = c.modular.SetInt32(out, 2)
-	case 2:
-		e = c.modular.Mul(a, b, out)
-	case 3:
-		e = c.modular.Neg(out)
 	case 4:
 		e = c.modular.Div(a, b, out)
 	}

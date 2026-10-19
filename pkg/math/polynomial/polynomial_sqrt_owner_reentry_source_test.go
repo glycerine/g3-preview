@@ -13,14 +13,18 @@ import (
 )
 
 func TestPolynomialSqrtActualAllocationTransportRefusesOwnerRetirement(t *testing.T) {
-	polynomialSqrtAllocationTransport(t, false)
+	polynomialSqrtAllocationTransport(t, 0)
 }
 
 func TestPolynomialSqrtAppendAllocationUsesActualInvocation(t *testing.T) {
-	polynomialSqrtAllocationTransport(t, true)
+	polynomialSqrtAllocationTransport(t, 1)
 }
 
-func polynomialSqrtAllocationTransport(t *testing.T, appendOnly bool) {
+func TestPolynomialSqrtScalarAllocationUsesActualInvocation(t *testing.T) {
+	polynomialSqrtAllocationTransport(t, 2)
+}
+
+func polynomialSqrtAllocationTransport(t *testing.T, mode uint8) {
 	t.Helper()
 	budget := arena.NewBudget(1 << 26)
 	var full *MultivariatePolynomialManager
@@ -69,11 +73,15 @@ func polynomialSqrtAllocationTransport(t *testing.T, appendOnly bool) {
 	active = true
 	var receipt polynomialSqrtInvocationReceipt
 	var body error
-	if appendOnly {
+	if mode != 0 {
 		serviceMust(t, full.beginSquareRootWithReceipt(&receipt))
-		body = full.squareRootAdd(&c.som, &big, c.monomials.unit)
+		if mode == 1 {
+			body = full.squareRootAdd(&c.som, &big, c.monomials.unit)
+		} else {
+			_, body = full.squareRootNumeral(2, &big, &big, &full.squareRoot.values[0])
+		}
 		if !polynomialNegNumericPending(&full.squareRoot.numeric) {
-			t.Fatal("actual append allocation absent from invocation receipt", body)
+			t.Fatal("actual scalar/append allocation absent from invocation receipt", body)
 		}
 		if !full.squareRoot.numeric.NumericBound(true) {
 			t.Fatal("actual executing square-root numeric policy is unbound")
@@ -100,7 +108,7 @@ func polynomialSqrtAllocationTransport(t *testing.T, appendOnly bool) {
 	serviceMust(t, rt.SetMaxSize(0))
 	serviceMust(t, full.cleanupSqrtInvocation(&receipt, false))
 	serviceMust(t, full.cleanupSqrtInvocation(&receipt, true))
-	if appendOnly && full.squareRoot.numeric.NumericBound(false) {
+	if mode != 0 && full.squareRoot.numeric.NumericBound(false) {
 		t.Fatal("retired numeric policy retained cleanup authority")
 	}
 	serviceMust(t, rt.Deallocate(&held))
