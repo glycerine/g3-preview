@@ -29,7 +29,7 @@ func (n *PolynomialNewtonInterpolator) traceAddEntry(input *unumeral.Int, output
 			}
 			_ = sink.WriteLiteral(value)
 			_ = sink.WriteLiteral(" -> ")
-			formatErr = m.displayIntoCore(output, sink, false)
+			formatErr = m.displayPolynomialDirect(output, sink, false)
 			if formatErr != nil {
 				return formatErr
 			}

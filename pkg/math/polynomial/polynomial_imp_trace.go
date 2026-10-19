@@ -27,7 +27,7 @@ func (m *MultivariatePolynomialManager) traceLeakedPolynomials() error {
 				if p == (Polynomial{}) {
 					continue
 				}
-				operandErr = m.core.displayIntoCore(p, sink, false)
+				operandErr = m.core.displayPolynomialDirect(p, sink, false)
 				if operandErr != nil {
 					return operandErr
 				}

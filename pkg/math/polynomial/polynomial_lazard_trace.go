@@ -19,10 +19,10 @@ func (m *MultivariatePolynomialCore) emitLazardTrace(line int, body func(*polyno
 
 func (m *MultivariatePolynomialCore) traceLazardEntry(y, p Polynomial, n uint32) error {
 	return m.emitLazardTrace(5661, func(sink *polynomialTraceSink) error {
-		if e := m.gcdPRSTracePolynomial(sink, "lc_S_d: ", y); e != nil {
+		if e := m.traceDirectPolynomial(sink, "lc_S_d: ", y); e != nil {
 			return e
 		}
-		if e := m.gcdPRSTracePolynomial(sink, "\nS_d_1: ", p); e != nil {
+		if e := m.traceDirectPolynomial(sink, "\nS_d_1: ", p); e != nil {
 			return e
 		}
 		_ = sink.WriteLiteral("\nn: ")

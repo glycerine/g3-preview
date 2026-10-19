@@ -47,12 +47,12 @@ func (m *MultivariatePolynomialManager) traceCRAImages(a, b Polynomial) error {
 		func() bool { return true }, func(w io.Writer) error {
 			sink := &polynomialTraceSink{writer: w}
 			_ = sink.WriteLiteral("C1: ")
-			formatErr = c.displayIntoCore(a, sink, false)
+			formatErr = c.displayPolynomialDirect(a, sink, false)
 			if formatErr != nil {
 				return formatErr
 			}
 			_ = sink.WriteLiteral("\nC2: ")
-			formatErr = c.displayIntoCore(b, sink, false)
+			formatErr = c.displayPolynomialDirect(b, sink, false)
 			if formatErr != nil {
 				return formatErr
 			}

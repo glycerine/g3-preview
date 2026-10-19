@@ -35,7 +35,7 @@ func (m *MultivariatePolynomialManager) traceICCPZPXContentBug(g, pp Polynomial,
 			}
 			_ = sink.WriteLiteral(value)
 			_ = sink.WriteLiteral(")\npp: ")
-			formatErr = c.displayIntoCore(pp, sink, false)
+			formatErr = c.displayPolynomialDirect(pp, sink, false)
 			if formatErr != nil {
 				return formatErr
 			}

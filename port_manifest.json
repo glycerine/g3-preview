@@ -41319,6 +41319,7 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_trace_display_dispatch_test.go",
         "pkg/math/polynomial/polynomial_rename_trace.go",
         "pkg/math/polynomial/polynomial_rename_trace_test.go",
         "pkg/math/polynomial/polynomial_factors_assertions.go",
@@ -41803,6 +41804,9 @@
         "pkg/math/polynomial/polynomial_gcd_check_test.go"
       ],
       "tests": [
+        "TestPolynomialTraceDirectDisplayOmitsPublicCheck",
+        "TestPolynomialTraceReferenceDisplayRetainsPublicCheck",
+        "TestPolynomialTraceObjectDirectDisplayOmitsPublicCheck",
         "TestPolynomialRenameSourceTrace",
         "TestPolynomialRenameTraceRefusalAndReentry",
         "TestPolynomialRenameTraceBeforeRejectedMutation",
@@ -47251,6 +47255,7 @@
         "Newton inputs and inverses now use owning []util.Int collections. A zero slot is published before actual modular Copy; partial numeric SET and ascending Del continuation remain in the owning slice. Reset retains only inverse zero, and source destruction clears inverse then input slices after polynomial references. Native growth/free has no Runtime blocks or faultpoints. Removed obsolete partial zero-inverse constructor roots and TLS/header-corruption fixtures. Independent 4097-entry growth/reuse checks run with Runtime reservations disabled; a 2^64 input campaign retains actual numeric allocation refusals and checks balanced residue -36 modulo 97. This does not convert other remaining polynomial numeral vectors or claim util split readiness."
       ],
       "deviations": [
+        "Implemented polynomial TRACE display calls now distinguish explicit polynomial::display from polynomial_ref ostream insertion through manager::display. Direct source calls skip the unrelated cpp7426 consistency assertion; reference insertions retain it. Mixed ICCP, PRS, recursive modular GCD, Newton, PSC and Lazard records preserve their respective entry points. Existing display frames and cleanup remain unchanged. This does not claim complete source TRACE coverage or promote the partial polynomial unit.",
         "Rename TRACE cpp6071/6091 traverses the literal nonnull polynomial directory before monomial mutation and after first-maximal updates. Direct polynomial::display bypasses the unrelated public manager::display assertion at cpp7426. Stream refusal preserves computation; formatting errors stop the source sequence; callbacks cannot mutate/close the borrowed manager or clean its active display. Whole-unit audit remains open.",
         "Algebraic exact sign evaluation mathematical-path increment (algebraic_numbers.cpp:1979-2188,3041-3043): EvalSign now connects optimistic rationals, rational elimination, interval refinement and exact resultant fallback. It creates y-p_prime in the private MM, stable-sorts actual variables by defining-polynomial degree, eliminates each source variable using its actual defining polynomial, converts into persistent eval-sign UP storage and computes the nonzero-root lower bound through an actually issued Knuth receipt. Saved intervals and +/-2^-k bounds follow source declaration/destruction order; exact refinement returns a strict sign or zero, restoring overrefined inputs, or restarts after rational discovery. The global converter binds an actual accepted algebraic caller and preserves existing public behavior. A real cancellation sweep exposed GCD source cleanup dropping an exact-division receipt while its earlier remainder-buffer arithmetic invocation still owned rows; pending detection now retains that precise child. Independent tests cover exact square/sum-of-squares zeros, signed sqrt(2)+sqrt(3)-3, mixed quadratic/cubic degree order, rational restart and raw-inline rational sign. The expected resultant y^4+12*y^3+44*y^2+48*y-8 and source input-interval restoration are checked independently. Every reached algebraic/resultant checkpoint cancellation/owning-cleanup/retry frontier passes in ordinary and checked/debug/trace profiles on CPUs 8-16. Full allocation-failure/callback/TRACE/eager-constructor and complete polynomial/AST audits remain partial; no whole-unit completion credit.",
         "Algebraic sign interval/refinement phase (algebraic_numbers.cpp:1965-1976,2013-2068): a concrete root-only interval mapping borrows refreshed per-variable encoded-cell records. The actual manager variable vector is populated in source encounter order; per-site assertion gates precede the reached Contains/root-tag expressions. The loop evaluates via the real polynomial interval engine, returns +/-1 only after excluding zero, refines each eligible source input by magnitude, signals outer restart when a root becomes rational and preserves unresolved ri for the exact resultant phase. The source positive zero-accuracy branch remains separate from exact evaluation. Actual recursive interval-engine entry binds the parent; refused older engines grant no cleanup authority, and unrelated new rational/integer/early calls clear old interval bindings. Tests independently verify +/- (sqrt(2)+sqrt(3)-3), unresolved x^2-2 retention, exact-rational restart followed by optimistic evaluation, source diagnostic timing, all reached algebraic and external polynomial checkpoint cancellation/cleanup/retry frontiers, and a real older LexSort bounds stop. Resultant fallback/public sign integration now have separate mathematical-path evidence; complete allocator/callback/TRACE composition and whole-unit completion remain pending.",
@@ -47386,7 +47391,43 @@
         "Persistent found-variable flags shared by substitution and Vars now use native []bool. Removed cap/size byte codecs, source 3/2 growth, Runtime binding/pending/interrupted state, container allocation/free failures and raw-root census adapters. Growth preserves old flags and initializes new flags false; reserve does not shrink. The original reached term/query reset loops remain, including visited flags surviving a source body failure. Native bounds retain debug assertions and release arena.ErrBounds; scalar member cleanup releases the slice. Native cold growth through 4097 flags and cold Vars output publication run under disabled Runtime reservations with unchanged accounting. An actual reached malformed-variable bounds fixture checks the published visited prefix and retained flags without inventing a source failure/reentry from deleted container allocation. Three obsolete container-only tests are retired. Real substitution numeric/factory/destructor and owner guards remain. No whole-unit completion credit is added.",
         "Concrete algebraic t_eval/t_eval_core (polynomial.cpp:6436-6522), required by algebraic_numbers.cpp:2387-2388,2406, now preserves recursive Horner grouping, borrowed mapped root cells, actual integer coefficient overloads and scoped algebraic auxiliaries. Actual accepted arithmetic and lexical-sort entries bind the evaluator caller; retained auxiliaries borrow their algebraic owner until explicit cleanup, and callbacks cannot close or clean executing owners. Independent 125-point rational grid, irrational bounds, exact single-term root square identity, early zero/constant lookup erasure, reached arithmetic checkpoint cancellation/retry, polynomial checkpoint cancellation, lookup stops and real lexical-sort ownership checks pass in ordinary and checked/debug/trace builds on CPUs 8-16. Full allocation/destructor/callback/TRACE audits, full multivariate isolation and whole polynomial/AST completion remain pending; source-unit statuses remain partial.",
         "Multivariate isolate_roots (algebraic_numbers.cpp:2268-2451,2879-2881) now follows rational-fragment substitution, stable defining-degree variable ordering, resultant elimination, univariate isolation and conjugate filtering. Vanished resultants evaluate actual coefficients: the linear branch computes -a0/a1; the higher-degree branch drops vanishing leading coefficients, converts lower terms to the local manager, introduces z*x^i and recurses with z mapped to the actual nonzero algebraic coefficient. Interleaved lexical reference/scalar lifetimes use concrete per-recursion frames. Only accepted substitution/conversion/evaluation/factor calls bind cleanup authority. Cancellation exposed the need to retain the actual factor frontend receipt and explicitly clean reached persistent isolation scratch vectors; cleanup now does so while preserving older refused factor calls. Tests independently cover exact root powers, signed root bounds, spurious conjugates, linear/nonlinear recovery, degree drop, vanished coefficients and variables, both checkpoint services through success/cleanup/retry, source output assertions and executing/older-owner refusals. Full allocation/destructor/callback/TRACE audit and eager constructor composition remain incomplete; polynomial and AST source units remain partial. The signs-between-roots overload is implemented with separate source failure and TRACE obligations remaining. The cpp2598 left-sample trace now uses the actual source display and protects its live sample across trace callbacks; disabled tracing does not read the sample, failed output preserves computations, and formatter allocation failure preserves isolated roots before sign publication. The cpp2578 input/assignment/root trace block now displays the actual polynomial, collects variables with the retained source Vars algorithm into a native local slice, rereads each assigned value separately for root and interval display, and displays each isolated root before precision refinement. Exact records, erased/no-root gates, sticky output failure, repeated-getter failure and callback refusal before manager/root-vector mutation are checked. Complete descendant allocation/destructor composition and eager constructor audits remain open."
-      ]
+      ],
+      "trace_polynomial_display_dispatch_audit": {
+        "source": "src/math/polynomial/polynomial.cpp",
+        "direct_source_records": [
+          "2357/2361 destructor directory",
+          "2421 deletion",
+          "2833 Newton input",
+          "3015 skeleton",
+          "3267 coefficient",
+          "3454 ICCP entry",
+          "3513 ICCP original p only",
+          "3556-3557 PRS operands",
+          "3574-3575 PRS original operands only",
+          "3642 Euclid diagnostic",
+          "3678 CRA images",
+          "3770 univariate modular GCD",
+          "3878 ICCP ZpX entry",
+          "4004 content_bug pp only",
+          "4078/4085 recursive modular GCD operands and early result",
+          "4103-4108/4115-4116 recursive modular GCD initial content/leading coefficients",
+          "4239-4240 modular GCD operands",
+          "5661 Lazard entry operands",
+          "5752 PSC entry operands",
+          "5972 square-root input"
+        ],
+        "retained_public_reference_records": [
+          "2871/2890/2896/2901 Newton references",
+          "3513 pp and 3528 pp/c ICCP references",
+          "3578-3583 PRS content/primitive references and later PRS loop/result references",
+          "4005 content_bug g",
+          "4149/4183/4185/4205/4223 recursive modular GCD references",
+          "5682/5688/5691 Lazard loop/result references",
+          "5772 PSC iteration references"
+        ],
+        "verification": "Real zero polynomial cells distinguish direct display from the public consistency scope with a closed Go-adapter reservation gate. Controls retain public checks. Existing trace output, refusal, callback and display tests cover reached nonzero terms and cleanup.",
+        "remaining_trace_audit": "Other source TRACE records remain unverified or absent, including main GCD entry cpp4355-4361, divides cpp5155-5156, PSC cpp5530/5578, evaluation cpp6438 and factor cpp6595-6755. This audit is limited to the implemented call sites listed above."
+      }
     },
     {
       "path": "src/math/polynomial/polynomial.h",

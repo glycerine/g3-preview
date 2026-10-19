@@ -22,7 +22,7 @@ func (m *MultivariatePolynomialManager) traceModGCDPolynomials(tag string, line 
 				if i != 0 {
 					_ = sink.WriteLiteral("\nv: ")
 				}
-				formatErr = c.displayIntoCore(p, sink, true)
+				formatErr = c.displayPolynomialDirect(p, sink, true)
 				if formatErr != nil {
 					return formatErr
 				}

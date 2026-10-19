@@ -27,12 +27,12 @@ func (m *MultivariatePolynomialManager) traceEuclidNonUnivariate(u, v Polynomial
 		func() bool { return true }, func(w io.Writer) error {
 			sink := &polynomialTraceSink{writer: w}
 			_ = sink.WriteLiteral("euclid_gcd, polynomials are not univariate\n")
-			formatErr = c.displayIntoCore(u, sink, false)
+			formatErr = c.displayPolynomialDirect(u, sink, false)
 			if formatErr != nil {
 				return formatErr
 			}
 			_ = sink.WriteLiteral("\n")
-			formatErr = c.displayIntoCore(v, sink, false)
+			formatErr = c.displayPolynomialDirect(v, sink, false)
 			if formatErr != nil {
 				return formatErr
 			}

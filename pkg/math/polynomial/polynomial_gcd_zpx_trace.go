@@ -14,7 +14,7 @@ func (m *MultivariatePolynomialManager) traceICCPZPXEntry(p Polynomial, x uint32
 		func() bool { return true }, func(w io.Writer) error {
 			sink := &polynomialTraceSink{writer: w}
 			_ = sink.WriteLiteral("iccp_ZpX, p: ")
-			formatErr = c.displayIntoCore(p, sink, false)
+			formatErr = c.displayPolynomialDirect(p, sink, false)
 			if formatErr != nil {
 				return formatErr
 			}

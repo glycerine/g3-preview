@@ -46,10 +46,11 @@ func TestPolynomialCacheConstructorTraceProtectsBorrowedManager(t *testing.T) {
 	c, e := NewPolynomialCache(m)
 	serviceMust(t, e)
 	t.Cleanup(func() { serviceMust(t, c.Close()) })
-	if w.called != diagnostic.DebugBuild {
+	traced := diagnostic.DebugBuild && tags.ShouldTrace("memory")
+	if w.called != traced {
 		t.Fatal("constructor trace compile gate", w.called)
 	}
-	if diagnostic.DebugBuild && w.frame != c {
+	if traced && w.frame != c {
 		t.Fatal("constructor guarded a different cache owner")
 	}
 	if m.core.cacheCaller != nil || c.previous != nil || c.executing || c.imp == nil {

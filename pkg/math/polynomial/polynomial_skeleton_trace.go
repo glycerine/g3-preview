@@ -44,7 +44,7 @@ func (s *PolynomialSkeleton) traceConstruction(p Polynomial) error {
 			_ = sink.WriteLiteral("\nmax: ")
 			_ = sink.WriteUnsigned(s.maxPowers)
 			_ = sink.WriteLiteral("\np: ")
-			formatErr = m.displayIntoCore(p, sink, false)
+			formatErr = m.displayPolynomialDirect(p, sink, false)
 			if formatErr != nil {
 				return formatErr
 			}

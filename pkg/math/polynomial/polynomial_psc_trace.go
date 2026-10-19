@@ -19,10 +19,10 @@ func (m *MultivariatePolynomialCore) emitPSCTrace(line int, body func(*polynomia
 
 func (m *MultivariatePolynomialCore) tracePSCEntry(p, q Polynomial) error {
 	return m.emitPSCTrace(5752, func(sink *polynomialTraceSink) error {
-		if e := m.gcdPRSTracePolynomial(sink, "P: ", p); e != nil {
+		if e := m.traceDirectPolynomial(sink, "P: ", p); e != nil {
 			return e
 		}
-		if e := m.gcdPRSTracePolynomial(sink, "\nQ: ", q); e != nil {
+		if e := m.traceDirectPolynomial(sink, "\nQ: ", q); e != nil {
 			return e
 		}
 		return sink.WriteLiteral("\n")

@@ -20,7 +20,7 @@ func (m *MultivariatePolynomialManager) emitSqrtTrace(line int, body func(*polyn
 func (m *MultivariatePolynomialManager) traceSqrtEntry(p Polynomial) error {
 	return m.emitSqrtTrace(5971, func(sink *polynomialTraceSink) error {
 		c := m.core
-		if e := c.gcdPRSTracePolynomial(sink, "sqrt:    ", p); e != nil {
+		if e := c.traceDirectPolynomial(sink, "sqrt:    ", p); e != nil {
 			return e
 		}
 		_ = sink.WriteLiteral("\nmin pos: ")

@@ -57,7 +57,7 @@ func (m *MultivariatePolynomialCore) traceDeletingPolynomial(p Polynomial) error
 		func() bool { return true }, func(w io.Writer) error {
 			sink := &polynomialTraceSink{writer: w}
 			_ = sink.WriteLiteral("deleting: ")
-			formatErr = m.displayIntoCore(p, sink, false)
+			formatErr = m.displayPolynomialDirect(p, sink, false)
 			if formatErr != nil {
 				return formatErr
 			}

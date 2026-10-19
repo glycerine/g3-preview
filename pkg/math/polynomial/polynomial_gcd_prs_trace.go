@@ -12,6 +12,13 @@ func (m *MultivariatePolynomialCore) gcdPRSTracePolynomial(sink *polynomialTrace
 	return m.displayIntoCore(p, sink, false)
 }
 
+// traceDirectPolynomial preserves an explicit polynomial::display source call.
+// polynomial_ref insertion uses gcdPRSTracePolynomial and its public wrapper.
+func (m *MultivariatePolynomialCore) traceDirectPolynomial(sink *polynomialTraceSink, label string, p Polynomial) error {
+	_ = sink.WriteLiteral(label)
+	return m.displayPolynomialDirect(p, sink, false)
+}
+
 func (m *MultivariatePolynomialCore) gcdPRSTraceNumeral(sink *polynomialTraceSink, label string, a *unumeral.Int) error {
 	_ = sink.WriteLiteral(label)
 	value, err := m.modular.String(a)
@@ -33,12 +40,12 @@ func (m *MultivariatePolynomialCore) traceGCDPRSEntry(u, v Polynomial, x uint32)
 			_ = sink.WriteLiteral("gcd prs with x")
 			_ = sink.WriteUnsigned(x)
 			_ = sink.WriteLiteral(" for\n")
-			formatErr = m.gcdPRSTracePolynomial(sink, "u: ", u)
+			formatErr = m.traceDirectPolynomial(sink, "u: ", u)
 			if formatErr != nil {
 				return formatErr
 			}
 			_ = sink.WriteLiteral("\n")
-			formatErr = m.gcdPRSTracePolynomial(sink, "v: ", v)
+			formatErr = m.traceDirectPolynomial(sink, "v: ", v)
 			if formatErr != nil {
 				return formatErr
 			}
@@ -61,7 +68,7 @@ func (m *MultivariatePolynomialCore) traceGCDPRSContent(u, v Polynomial, iu, iv 
 				label string
 				value Polynomial
 			}{{"u: ", u}, {"v: ", v}} {
-				formatErr = m.gcdPRSTracePolynomial(sink, row.label, row.value)
+				formatErr = m.traceDirectPolynomial(sink, row.label, row.value)
 				if formatErr != nil {
 					return formatErr
 				}

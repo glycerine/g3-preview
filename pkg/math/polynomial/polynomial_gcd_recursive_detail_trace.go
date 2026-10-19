@@ -23,7 +23,15 @@ func (m *MultivariatePolynomialManager) emitModGCDRecDetail(line int, body func(
 
 func (m *MultivariatePolynomialManager) gcdRecDetailPolynomial(sink *polynomialTraceSink, label string, p Polynomial, sourceDisplay bool) error {
 	_ = sink.WriteLiteral(label)
-	if err := m.core.displayIntoCore(p, sink, sourceDisplay); err != nil {
+	var err error
+	if sourceDisplay {
+		// cpp4103-4108,4115-4116 explicitly call polynomial::display(..., true).
+		err = m.core.displayPolynomialDirect(p, sink, true)
+	} else {
+		// Later records insert polynomial_ref values through manager::display.
+		err = m.core.displayIntoCore(p, sink, false)
+	}
+	if err != nil {
 		return err
 	}
 	return sink.WriteLiteral("\n")

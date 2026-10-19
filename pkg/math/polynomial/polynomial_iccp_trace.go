@@ -19,7 +19,7 @@ func (m *MultivariatePolynomialCore) traceICCPEntry(p Polynomial, x uint32) erro
 			_ = sink.WriteLiteral("iccp x")
 			_ = sink.WriteUnsigned(x)
 			_ = sink.WriteLiteral("\n")
-			formatErr = m.displayIntoCore(p, sink, false)
+			formatErr = m.displayPolynomialDirect(p, sink, false)
 			if formatErr != nil {
 				return formatErr
 			}
@@ -61,7 +61,7 @@ func (m *MultivariatePolynomialCore) traceICCPContent(p Polynomial, i *unumeral.
 		func() bool { return true }, func(w io.Writer) error {
 			sink := &polynomialTraceSink{writer: w}
 			_ = sink.WriteLiteral("p: ")
-			formatErr = m.displayIntoCore(p, sink, false)
+			formatErr = m.displayPolynomialDirect(p, sink, false)
 			if formatErr != nil {
 				return formatErr
 			}
