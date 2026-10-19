@@ -13,13 +13,17 @@ func (m *MonomialManager) MkFromVariables(xs []uint32) (Monomial, error) {
 		return m.unit, nil
 	}
 	if len(xs) == 1 {
-		return m.MkVariable(xs[0], 1)
+		return m.mkVariableCreatedAt(xs[0], 1, nil, 885)
 	}
 	m.powers = m.powers[:0]
 	sort.Slice(xs, func(i, j int) bool { return xs[i] < xs[j] })
-	for _, x := range xs {
-		if polynomialSourceDebug && x >= m.nextVar {
-			return Monomial{}, ErrMonomialAssertion
+	for i, x := range xs {
+		line := int32(909)
+		if i == 0 {
+			line = 905
+		}
+		if e := m.sourceScalarAssert(line, "is_valid(x)", x < m.nextVar); e != nil {
+			return Monomial{}, e
 		}
 		n := len(m.powers)
 		if n != 0 && m.powers[n-1].Var == x {

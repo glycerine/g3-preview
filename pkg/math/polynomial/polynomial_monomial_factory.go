@@ -247,36 +247,22 @@ func (m *MonomialManager) internSourceTempCreated(t *monomialTemp, key monomialK
 	if outcome != nil {
 		outcome.created = true
 	}
-	if polynomialSourceDebug {
-		key := monomialKey{monomialObjectKey, slot}
-		_, found, e := m.table.find(m, key)
-		if e != nil {
-			return Monomial{m.origin, slot, l.generation}, e
-		}
-		if !found {
-			return Monomial{m.origin, slot, l.generation}, ErrMonomialAssertion
-		}
-		pos, found, e := m.table.find(m, key)
-		if e != nil {
-			return Monomial{m.origin, slot, l.generation}, e
-		}
-		if !found {
-			return Monomial{m.origin, slot, l.generation}, ErrMonomialAssertion
-		}
-		got, e := m.table.key(pos)
-		if e != nil {
-			return Monomial{m.origin, slot, l.generation}, e
-		}
-		if got != key {
-			return Monomial{m.origin, slot, l.generation}, ErrMonomialAssertion
-		}
+	key = monomialKey{monomialObjectKey, slot}
+	if e := m.factoryContainsAssert(key); e != nil {
+		return Monomial{m.origin, slot, l.generation}, e
+	}
+	if e := m.factoryFindAssert(key); e != nil {
+		return Monomial{m.origin, slot, l.generation}, e
 	}
 	return Monomial{m.origin, slot, l.generation}, nil
 }
 func (m *MonomialManager) MkVariable(v, k uint32) (Monomial, error) {
-	return m.mkVariableCreated(v, k, nil)
+	return m.mkVariableCreatedAt(v, k, nil, 893)
 }
 func (m *MonomialManager) mkVariableCreated(v, k uint32, outcome *monomialFactoryOutcome) (Monomial, error) {
+	return m.mkVariableCreatedAt(v, k, outcome, 893)
+}
+func (m *MonomialManager) mkVariableCreatedAt(v, k uint32, outcome *monomialFactoryOutcome, line int32) (Monomial, error) {
 	if outcome != nil {
 		*outcome = monomialFactoryOutcome{}
 	}
@@ -286,8 +272,8 @@ func (m *MonomialManager) mkVariableCreated(v, k uint32, outcome *monomialFactor
 	if k == 0 {
 		return m.unit, nil
 	}
-	if polynomialSourceDebug && v >= m.nextVar {
-		return Monomial{}, ErrMonomialAssertion
+	if e := m.sourceScalarAssert(line, "is_valid(x)", v < m.nextVar); e != nil {
+		return Monomial{}, e
 	}
 	one := [1]MonomialPower{{v, k}}
 	return m.mkMonomialCreated(one[:], outcome)
@@ -323,6 +309,9 @@ func (m *MonomialManager) convertCreated(source *MonomialManager, a Monomial, ou
 			if _, e = m.MkVar(); e != nil {
 				return Monomial{}, e
 			}
+		}
+		if e = m.sourceScalarAssert(879, "x < num_vars()", v < m.nextVar); e != nil {
+			return Monomial{}, e
 		}
 	}
 	if m.creation.stage != 0 {

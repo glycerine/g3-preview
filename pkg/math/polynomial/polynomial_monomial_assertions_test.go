@@ -338,6 +338,52 @@ func TestMonomialSquareRootUnitAssertionActions(t *testing.T) {
 	}
 }
 
+func TestMonomialVariableFactoryAssertionActions(t *testing.T) {
+	for _, choice := range []string{"T", "C", "disabled"} {
+		t.Run(choice, func(t *testing.T) {
+			m := monomialFixture(t)
+			_, e := m.MkVar()
+			serviceMust(t, e)
+			action := choice
+			if choice == "disabled" {
+				action = "T"
+			}
+			polynomialAssertionActionsFixture(t, action+action)
+			if polynomialSourceDebug && choice == "disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+			}
+
+			a, e := m.MkVariable(1, 1)
+			if polynomialSourceDebug && choice == "T" {
+				if !errors.Is(e, ErrMonomialAssertion) || a != (Monomial{}) {
+					t.Fatal("two-argument variable assertion did not Throw", a, e)
+				}
+			} else {
+				serviceMust(t, e)
+				p, e := m.ReadPower(a, 0)
+				serviceMust(t, e)
+				if p != (MonomialPower{1, 1}) {
+					t.Fatal("continued variable constructor", p)
+				}
+				serviceMust(t, m.CleanupValue(&a))
+			}
+
+			xs := []uint32{2, 0}
+			a, e = m.MkFromVariables(xs)
+			if polynomialSourceDebug && choice == "T" {
+				if !errors.Is(e, ErrMonomialAssertion) || a != (Monomial{}) || m.powers == nil {
+					t.Fatal("variable-vector assertion lost reached sorted scratch", a, e, m.powers)
+				}
+			} else {
+				serviceMust(t, e)
+				monomialEqualPowers(t, m, a, []MonomialPower{{0, 1}, {2, 1}})
+				serviceMust(t, m.CleanupValue(&a))
+			}
+			monomialPhysicalAudit(t, m)
+		})
+	}
+}
+
 func TestMonomialPredecessorSourceAssertionActions(t *testing.T) {
 	for _, choice := range []string{"T", "C", "disabled"} {
 		t.Run(choice, func(t *testing.T) {

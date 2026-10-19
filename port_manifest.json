@@ -43926,8 +43926,8 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
-          "status": "partial",
+          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765\u2013918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -43942,6 +43942,9 @@
             "TestMonomialOwningCloseRejectsBorrowedUnitReference",
             "TestMonomialCompletedSourceDestructorReverseMembers",
             "TestMonomialSourceFinalizeCallerLifetime",
+            "TestMonomialManagerDestructorLeakTraceAndAssertionActions",
+            "TestMonomialManagerDecrementAssertionActions",
+            "TestMonomialVariableFactoryAssertionActions",
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
@@ -43964,8 +43967,8 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
-          "status": "partial",
+          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765\u2013918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_factory.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -43980,6 +43983,9 @@
             "TestMonomialOwningCloseRejectsBorrowedUnitReference",
             "TestMonomialCompletedSourceDestructorReverseMembers",
             "TestMonomialSourceFinalizeCallerLifetime",
+            "TestMonomialManagerDestructorLeakTraceAndAssertionActions",
+            "TestMonomialManagerDecrementAssertionActions",
+            "TestMonomialVariableFactoryAssertionActions",
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
@@ -44002,8 +44008,8 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
-          "status": "partial",
+          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765\u2013918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_lifetime.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -44018,6 +44024,9 @@
             "TestMonomialOwningCloseRejectsBorrowedUnitReference",
             "TestMonomialCompletedSourceDestructorReverseMembers",
             "TestMonomialSourceFinalizeCallerLifetime",
+            "TestMonomialManagerDestructorLeakTraceAndAssertionActions",
+            "TestMonomialManagerDecrementAssertionActions",
+            "TestMonomialVariableFactoryAssertionActions",
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
@@ -44040,8 +44049,8 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
-          "status": "partial",
+          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765\u2013918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_vector.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -44056,6 +44065,9 @@
             "TestMonomialOwningCloseRejectsBorrowedUnitReference",
             "TestMonomialCompletedSourceDestructorReverseMembers",
             "TestMonomialSourceFinalizeCallerLifetime",
+            "TestMonomialManagerDestructorLeakTraceAndAssertionActions",
+            "TestMonomialManagerDecrementAssertionActions",
+            "TestMonomialVariableFactoryAssertionActions",
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
@@ -48131,8 +48143,8 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
-          "status": "partial",
+          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765\u2013918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -48147,6 +48159,9 @@
             "TestMonomialOwningCloseRejectsBorrowedUnitReference",
             "TestMonomialCompletedSourceDestructorReverseMembers",
             "TestMonomialSourceFinalizeCallerLifetime",
+            "TestMonomialManagerDestructorLeakTraceAndAssertionActions",
+            "TestMonomialManagerDecrementAssertionActions",
+            "TestMonomialVariableFactoryAssertionActions",
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
@@ -48169,8 +48184,8 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
-          "status": "partial",
+          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765\u2013918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_factory.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -48185,6 +48200,9 @@
             "TestMonomialOwningCloseRejectsBorrowedUnitReference",
             "TestMonomialCompletedSourceDestructorReverseMembers",
             "TestMonomialSourceFinalizeCallerLifetime",
+            "TestMonomialManagerDestructorLeakTraceAndAssertionActions",
+            "TestMonomialManagerDecrementAssertionActions",
+            "TestMonomialVariableFactoryAssertionActions",
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
@@ -48207,8 +48225,8 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
-          "status": "partial",
+          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765\u2013918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_lifetime.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -48223,6 +48241,9 @@
             "TestMonomialOwningCloseRejectsBorrowedUnitReference",
             "TestMonomialCompletedSourceDestructorReverseMembers",
             "TestMonomialSourceFinalizeCallerLifetime",
+            "TestMonomialManagerDestructorLeakTraceAndAssertionActions",
+            "TestMonomialManagerDecrementAssertionActions",
+            "TestMonomialVariableFactoryAssertionActions",
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",
@@ -48245,8 +48266,8 @@
           ]
         },
         {
-          "name": "manager ctor/dtor/member refs/vars/intern/convert cpp765\u2013918: Real table/ID/temp/member order and source publication. Constructor member unwind does not execute completed destructor body. SourceFinalize release destroys members despite callers; DEBUG table.empty assertion stops at source site. Owning Close first rejects caller roots; CleanupValue operates only actual supplied caller or named private unit. Legacy global Runtime binding remains OPEN.",
-          "status": "partial",
+          "name": "complete manager constructor/destructor, references, variables, interning and conversion block cpp765\u2013918: exact member/source teardown order, leak trace and runtime assertions; configured Runtime plus native slices replace legacy global scratch allocation",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_vector.go",
           "tests": [
             "TestMonomialSourceConstructorAndInterning",
@@ -48261,6 +48282,9 @@
             "TestMonomialOwningCloseRejectsBorrowedUnitReference",
             "TestMonomialCompletedSourceDestructorReverseMembers",
             "TestMonomialSourceFinalizeCallerLifetime",
+            "TestMonomialManagerDestructorLeakTraceAndAssertionActions",
+            "TestMonomialManagerDecrementAssertionActions",
+            "TestMonomialVariableFactoryAssertionActions",
             "TestMonomialSourceInternFailurePrefixesAndRetry",
             "TestMonomialDefaultSourceProfileAndWarmPhysicalGraph",
             "TestMonomialSourceRetainedPhysicalPowerAccess",

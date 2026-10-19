@@ -107,6 +107,40 @@ func (m *MonomialManager) multiplicationDegreeAssert(a Monomial, left, right mon
 	return m.sourceAssertionFailure(975, "r->total_degree() == power_product_total_degree(sz1, pws1) + power_product_total_degree(sz2, pws2)")
 }
 
+func (m *MonomialManager) factoryContainsAssert(k monomialKey) error {
+	enabled, e := monomialSourceAssertionsEnabled()
+	if e != nil || !enabled {
+		return e
+	}
+	_, found, e := m.table.find(m, k)
+	if e != nil || found {
+		return e
+	}
+	return m.sourceAssertionFailure(861, "m_monomials.contains(r)")
+}
+
+func (m *MonomialManager) factoryFindAssert(k monomialKey) error {
+	enabled, e := monomialSourceAssertionsEnabled()
+	if e != nil || !enabled {
+		return e
+	}
+	pos, found, e := m.table.find(m, k)
+	if e != nil {
+		return e
+	}
+	if !found {
+		if e = m.sourceAssertionFailure(862, "*(m_monomials.find_core(r)) == r"); e != nil {
+			return e
+		}
+		return ErrMonomialPending
+	}
+	got, e := m.table.key(pos)
+	if e != nil || got == k {
+		return e
+	}
+	return m.sourceAssertionFailure(862, "*(m_monomials.find_core(r)) == r")
+}
+
 // The condition uses only already-loaded scalar locals. Assertions containing
 // source object reads use concrete helpers below, after the runtime switch.
 func (m *MonomialManager) sourceScalarAssert(line int32, expression string, condition bool) error {
