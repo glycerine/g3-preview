@@ -15,7 +15,7 @@ type algebraicConversionScope struct {
 
 func (s *algebraicConversionScope) NumericBound(executing bool) bool {
 	m := s.owner
-	if m == nil || m.self != m || m.closed {
+	if m == nil || m.self != m || m.closed || s.hooks.Generation == 0 {
 		return false
 	}
 	if s == &m.binary.conversion {
@@ -114,14 +114,15 @@ func (s *algebraicConversionScope) run(m *AlgebraicRootCore, a *unumeral.BinaryR
 	if s == &m.refinementConversion && (!m.localActive || out != &m.localQ) {
 		return ErrAlgebraicOwner
 	}
-	if s.pending(m) {
+	if s.pending(m) || s.hooks.Generation == ^uint64(0) {
 		return ErrAlgebraicPending
 	}
 	clear(s.raw)
 	s.raw = s.raw[:0]
 	s.invocation = unumeral.BinaryToRationalInvocation{}
 	s.owner = m
-	s.hooks.Policy = s
+	// Contexts retain this actual call generation across reused scope storage.
+	s.hooks = unumeral.NumericInvocationHooks{Generation: s.hooks.Generation + 1, Policy: s}
 	s.executing = true
 	defer func() { s.executing = false }()
 	context := unumeral.NumericAllocationContext{}.WithCaller(&s.hooks)

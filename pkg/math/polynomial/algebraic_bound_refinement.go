@@ -28,7 +28,7 @@ type algebraicRefinementScope struct {
 
 func (s *algebraicRefinementScope) NumericBound(executing bool) bool {
 	m := s.owner
-	if m == nil || m.self != m || m.closed {
+	if m == nil || m.self != m || m.closed || s.invocation == 0 || s.hooks.Generation != s.invocation {
 		return false
 	}
 	if s == &m.bounds.refinement {
@@ -138,7 +138,7 @@ func (s *algebraicRefinementScope) begin(m *AlgebraicRootCore) error {
 	}
 	s.invocation++
 	s.owner = m
-	s.hooks.Policy = s
+	s.hooks = unumeral.NumericInvocationHooks{Generation: s.invocation, Policy: s}
 	s.evaluation = upolyBinaryEvaluationInvocationReceipt{}
 	s.executing = true
 	return nil
