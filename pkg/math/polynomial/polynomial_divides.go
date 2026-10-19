@@ -140,14 +140,11 @@ func (m *MultivariatePolynomialCore) dividesWithReceipt(q, p Polynomial, receipt
 	if zero {
 		return true, nil
 	}
-	if polynomialSourceDebug {
+	if e = polynomialDividesSourceAssert(func() (bool, error) {
 		zero, e = m.IsZero(q)
-		if e != nil {
-			return false, e
-		}
-		if zero {
-			return false, ErrPolynomialAssertion
-		}
+		return !zero, e
+	}); e != nil {
+		return false, e
 	}
 	s := &m.dividesLocal
 	if s.active || s.invocation == ^uint64(0) {

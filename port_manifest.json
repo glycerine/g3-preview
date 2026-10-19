@@ -45256,13 +45256,14 @@
           ]
         },
         {
-          "name": "divides cpp5154-5194: source constant shortcuts and exact remainder-based decision with actual numeral local",
-          "status": "partial",
+          "name": "Complete divides cpp5154-5191: zero shortcut, nonzero-divisor assertion action and exact remainder decision with actual monomial/numeral locals",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_divides.go",
           "tests": [
             "TestPolynomialDividesIndependentFiniteAndZeroReadMask",
             "TestPolynomialDividesEveryActualReservationPrefix",
-            "TestPolynomialDividesBigNumericPendingBlocksOwningClose"
+            "TestPolynomialDividesBigNumericPendingBlocksOwningClose",
+            "TestPolynomialDividesSourceAssertionActions"
           ]
         },
         {
