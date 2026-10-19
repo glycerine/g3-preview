@@ -130,9 +130,9 @@ func (m *AlgebraicRootCore) makeUnary(a, out *Algebraic, k uint32, root bool) (c
 		}
 		s.executing = true
 		if root {
-			_, e = m.config.Binary.RootLower(ra.interval.BorrowLower(), k, s.interval.BorrowLower())
+			_, e = m.config.Binary.RootLowerWithInvocation(ra.interval.BorrowLower(), k, s.interval.BorrowLower(), &s.intervalRoots[0])
 			if e == nil {
-				_, e = m.config.Binary.RootUpper(ra.interval.BorrowUpper(), k, s.interval.BorrowUpper())
+				_, e = m.config.Binary.RootUpperWithInvocation(ra.interval.BorrowUpper(), k, s.interval.BorrowUpper(), &s.intervalRoots[1])
 			}
 		} else {
 			e = im.PowerWithDebugReceipt(&ra.interval, k, &s.interval, &s.intervalDebug)

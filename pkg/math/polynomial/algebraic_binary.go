@@ -16,6 +16,7 @@ type algebraicSavedInterval struct {
 	owned, constructed, restored bool
 }
 type algebraicBinaryScope struct {
+	intervalRoots                        [2]unumeral.BinaryRootInvocation
 	intervalDebug                        unumeral.BinaryIntervalDebugInvocationReceipt
 	traceRootPending                     bool
 	traceRootStop                        error
@@ -134,6 +135,13 @@ func (m *AlgebraicRootCore) restoreBinaryInterval(saved *algebraicSavedInterval)
 
 func (m *AlgebraicRootCore) finishBinaryLocals() error {
 	s := &m.binary
+	for i := range s.intervalRoots {
+		if s.intervalRoots[i].Pending() {
+			if e := s.intervalRoots[i].SourceCause(); e != nil {
+				return e
+			}
+		}
+	}
 	p := m.config.Polynomials
 	if p.defaultNormalizationReceiptPending(&m.coefficientNormalization) {
 		if e := p.defaultNormalization.sourceCause; e != nil {
@@ -226,6 +234,11 @@ func (m *AlgebraicRootCore) cleanupBinary() error {
 	}
 	s.cleaning = true
 	defer func() { s.cleaning = false }()
+	for i := len(s.intervalRoots) - 1; i >= 0; i-- {
+		if e := s.intervalRoots[i].Cleanup(false); e != nil {
+			return e
+		}
+	}
 	if e := m.config.Intervals.CleanupDebugInvocation(&s.intervalDebug); e != nil {
 		return e
 	}
@@ -248,6 +261,11 @@ func (m *AlgebraicRootCore) cleanupBinary() error {
 	}
 	if e := m.finishBinaryLocals(); e != nil {
 		return e
+	}
+	for i := len(s.intervalRoots) - 1; i >= 0; i-- {
+		if e := s.intervalRoots[i].Cleanup(true); e != nil {
+			return e
+		}
 	}
 	// A sequence not yet pushed when Sturm construction failed is an unjoined
 	// owning allocation, separate from the source pointer-vector destructor.

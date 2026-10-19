@@ -2,16 +2,10 @@
 package numeral
 
 func (m *BinaryRationalManager) RootLower(a *BinaryRational, n uint32, out *BinaryRational) (bool, error) {
-	if e := m.Copy(out, a); e != nil {
-		return false, e
-	}
-	return m.RootLowerInPlace(out, n)
+	return m.RootLowerWithInvocation(a, n, out, nil)
 }
 func (m *BinaryRationalManager) RootUpper(a *BinaryRational, n uint32, out *BinaryRational) (bool, error) {
-	if e := m.Copy(out, a); e != nil {
-		return false, e
-	}
-	return m.RootUpperInPlace(out, n)
+	return m.RootUpperWithInvocation(a, n, out, nil)
 }
 func (m *BinaryRationalManager) RootLowerInPlace(a *BinaryRational, n uint32) (bool, error) {
 	return m.root(a, n, true)
@@ -20,13 +14,16 @@ func (m *BinaryRationalManager) RootUpperInPlace(a *BinaryRational, n uint32) (b
 	return m.root(a, n, false)
 }
 func (m *BinaryRationalManager) root(a *BinaryRational, n uint32, lower bool) (bool, error) {
+	return m.rootWithReceipt(a, n, lower, nil)
+}
+func (m *BinaryRationalManager) rootWithReceipt(a *BinaryRational, n uint32, lower bool, receipt *IntegerRootInvocationReceipt) (bool, error) {
 	if e := m.check(a); e != nil {
 		return false, e
 	}
 	if n == 0 {
 		return false, ErrBinaryRootDegreeZero
 	}
-	exact, e := m.Z.RootInPlace(&a.Num, n)
+	exact, e := m.Z.rootInPlaceWithReceipt(&a.Num, n, receipt)
 	if e != nil {
 		return false, e
 	}
