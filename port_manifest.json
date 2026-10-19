@@ -45693,8 +45693,8 @@
           ]
         },
         {
-          "name": "src/math/polynomial/polynomial.cpp:2665-2744 Add/Sub/Mul/Scale/MulAdd same source wrapper shortcut and returned token custody",
-          "status": "partial",
+          "name": "Complete src/math/polynomial/polynomial.cpp:2665-2753 Add/Sub/Mul/Scale/MulAdd with source assertion actions, wrapper shortcuts and returned token custody",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_arithmetic.go",
           "tests": [
             "TestPolynomialArithmeticContextKeepsCapturedInvocationAcrossReceiptReuse",
@@ -45716,7 +45716,8 @@
             "TestPolynomialRegularSetActualDefaultSlotNumericAcquisition",
             "TestPolynomialRegularSourceZeroRemovalTransfersActualTags",
             "TestPolynomialRegularZeroAddMulPreservesUnreadInvocation",
-            "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame"
+            "TestPolynomialScaleEarlyAliasesDoNotAcquireOlderRegularFrame",
+            "TestPolynomialArithmeticSourceAssertionActions"
           ]
         },
         {
@@ -45763,8 +45764,8 @@
         },
         {
           "go_target": "pkg/math/polynomial/polynomial_arithmetic.go",
-          "name": "polynomial.cpp:5940-5951 neg: same source SET, Neg/PN, cheap Copy append, mk and scoped NUM destructor order with concrete direct invocation receipts",
-          "status": "partial",
+          "name": "Complete polynomial.cpp:5940-5951 neg with source assertion actions, same source SET, Neg/PN, cheap Copy append, mk and scoped NUM destructor order with concrete direct invocation receipts",
+          "status": "ported",
           "tests": [
             "TestPolynomialNegDirectReceiptsValidateActualExecutingFrame",
             "TestPolynomialNegDirectContextRejectsCopiedForeignAndReusedFrame",
@@ -45773,7 +45774,8 @@
             "TestPolynomialNegDirectBIGCopyActualAllocationPrefixes",
             "TestPolynomialNegActualCopyTransportRefusesOwnerRetirement",
             "TestPolynomialNegFailedSetterSourceDestructorGuard",
-            "TestPolynomialNegCompletedLocalGuardUnwind"
+            "TestPolynomialNegCompletedLocalGuardUnwind",
+            "TestPolynomialArithmeticSourceAssertionActions"
           ]
         },
         {

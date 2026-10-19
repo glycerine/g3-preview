@@ -15,6 +15,7 @@ import (
 // source destruction must stop at its capacity guard; owning cleanup may later
 // acknowledge it. This guarded source-pointer domain is not mathematical OOM.
 func TestPolynomialNegFailedSetterSourceDestructorGuard(t *testing.T) {
+	polynomialAssertionActionsFixture(t, "C")
 	success, guard := false, false
 	for ordinal := int64(0); ordinal < 256 && !success; ordinal++ {
 		t.Run(fmt.Sprint(ordinal), func(t *testing.T) {

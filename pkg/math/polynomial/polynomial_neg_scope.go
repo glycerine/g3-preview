@@ -143,12 +143,11 @@ func (m *MultivariatePolynomialCore) beginNegInvocation(out *polynomialNegInvoca
 	if e := m.check(); e != nil {
 		return nil, e
 	}
-	n, e := m.cheap.ms.size(m)
-	if e != nil {
+	if e := polynomialArithmeticSourceAssert(5941, func() (bool, error) {
+		n, e := m.cheap.ms.size(m)
+		return n == 0, e
+	}); e != nil {
 		return nil, e
-	}
-	if polynomialSourceDebug && n != 0 {
-		return nil, ErrPolynomialAssertion
 	}
 	if m.negativeActive || m.invocation == ^uint64(0) {
 		return nil, ErrPolynomialPending

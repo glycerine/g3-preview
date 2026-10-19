@@ -167,12 +167,11 @@ func (m *MultivariatePolynomialCore) scaleWithReceipt(a *unumeral.Int, t Monomia
 			return p, nil
 		}
 	}
-	n, e := m.cheap.ms.size(m)
-	if e != nil {
+	if e = polynomialArithmeticSourceAssert(2722, func() (bool, error) {
+		n, e := m.cheap.ms.size(m)
+		return n == 0, e
+	}); e != nil {
 		return Polynomial{}, e
-	}
-	if polynomialSourceDebug && n != 0 {
-		return Polynomial{}, ErrPolynomialAssertion
 	}
 	if receipt != nil {
 		if e = m.cheap.acquireArithmeticInvocation(receipt); e != nil {
