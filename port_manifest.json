@@ -38313,6 +38313,9 @@
         "pkg/math/polynomial/algebraic_isolation_signs_owner_test.go",
         "pkg/math/polynomial/algebraic_isolation_signs_dt_test.go",
         "pkg/math/polynomial/algebraic_root_construction.go",
+        "pkg/math/polynomial/algebraic_root_construction_trace.go",
+        "pkg/math/polynomial/algebraic_root_construction_trace_test.go",
+        "pkg/math/polynomial/polynomial_display_receipt.go",
         "pkg/math/polynomial/algebraic_exception.go",
         "pkg/math/polynomial/algebraic_root_construction_test.go",
         "pkg/math/polynomial/algebraic_root_construction_cancel_test.go",
@@ -39302,7 +39305,16 @@
             "TestAlgebraicSexprRootIndexAssertionBeforeSyntaxAndErasedGate",
             "TestAlgebraicPolynomialRootSourceAssertionsBeforeWorkspace",
             "TestAlgebraicRootConstructionPreservesOlderFactorInvocation",
-            "TestAlgebraicSexprRootExecutingOwnerAndConverterRefusals"
+            "TestAlgebraicSexprRootExecutingOwnerAndConverterRefusals",
+            "TestAlgebraicPolynomialRootTraceBeforeWorkspaceAndRangeError",
+            "TestAlgebraicSexprRootTraceAndStickyStreamFailure",
+            "TestAlgebraicRootConstructionTraceExecutingCallback",
+            "TestAlgebraicRootConstructionDisabledTraceDoesNotRead",
+            "TestAlgebraicRootSelectionTraceKeepsActualVector",
+            "TestAlgebraicRootPolynomialTraceOwnsActualStoppedDisplay"
+          ],
+          "deviations": [
+            "Source mk_root TRACE sites 655,668,678 now run before range failure/result assignment and at the actual polynomial/expression conversion frontiers. Literal polynomial/expression and interval records, erased input reads, sticky stream failure and executing manager/vector guards are checked. The polynomial trace retains a receipt issued at actual display-frame acceptance; a real guarded NUM destructor verifies stopped-child retention, copied/stale receipt rejection and owning cleanup without changing source history. The larger source ownership/allocator and other algebraic TRACE audits remain open."
           ]
         }
       ],
@@ -39445,6 +39457,9 @@
         "pkg/math/polynomial/algebraic_isolation_signs_owner_test.go",
         "pkg/math/polynomial/algebraic_isolation_signs_dt_test.go",
         "pkg/math/polynomial/algebraic_root_construction.go",
+        "pkg/math/polynomial/algebraic_root_construction_trace.go",
+        "pkg/math/polynomial/algebraic_root_construction_trace_test.go",
+        "pkg/math/polynomial/polynomial_display_receipt.go",
         "pkg/math/polynomial/algebraic_exception.go",
         "pkg/math/polynomial/algebraic_root_construction_test.go",
         "pkg/math/polynomial/algebraic_root_construction_cancel_test.go",
@@ -40015,7 +40030,16 @@
             "TestAlgebraicSexprRootIndexAssertionBeforeSyntaxAndErasedGate",
             "TestAlgebraicPolynomialRootSourceAssertionsBeforeWorkspace",
             "TestAlgebraicRootConstructionPreservesOlderFactorInvocation",
-            "TestAlgebraicSexprRootExecutingOwnerAndConverterRefusals"
+            "TestAlgebraicSexprRootExecutingOwnerAndConverterRefusals",
+            "TestAlgebraicPolynomialRootTraceBeforeWorkspaceAndRangeError",
+            "TestAlgebraicSexprRootTraceAndStickyStreamFailure",
+            "TestAlgebraicRootConstructionTraceExecutingCallback",
+            "TestAlgebraicRootConstructionDisabledTraceDoesNotRead",
+            "TestAlgebraicRootSelectionTraceKeepsActualVector",
+            "TestAlgebraicRootPolynomialTraceOwnsActualStoppedDisplay"
+          ],
+          "deviations": [
+            "Source mk_root TRACE sites 655,668,678 now run before range failure/result assignment and at the actual polynomial/expression conversion frontiers. Literal polynomial/expression and interval records, erased input reads, sticky stream failure and executing manager/vector guards are checked. The polynomial trace retains a receipt issued at actual display-frame acceptance; a real guarded NUM destructor verifies stopped-child retention, copied/stale receipt rejection and owning cleanup without changing source history. The larger source ownership/allocator and other algebraic TRACE audits remain open."
           ]
         }
       ],
@@ -40785,6 +40809,7 @@
         "pkg/util/numeral/mpn_cstring.go",
         "pkg/util/numeral/mpn_format_scope.go",
         "pkg/math/polynomial/polynomial_display.go",
+        "pkg/math/polynomial/polynomial_display_receipt.go",
         "pkg/math/polynomial/polynomial_display_source_test.go",
         "pkg/math/polynomial/polynomial_display_tls_test.go",
         "pkg/math/polynomial/polynomial_factors.go",
@@ -46817,6 +46842,7 @@
         "pkg/util/numeral/mpn_cstring.go",
         "pkg/util/numeral/mpn_format_scope.go",
         "pkg/math/polynomial/polynomial_display.go",
+        "pkg/math/polynomial/polynomial_display_receipt.go",
         "pkg/math/polynomial/polynomial_display_source_test.go",
         "pkg/math/polynomial/polynomial_display_tls_test.go",
         "pkg/math/polynomial/polynomial_factors.go",

@@ -116,7 +116,7 @@ func (v *AlgebraicVector) Close() error {
 	if v == nil || v.self != v {
 		return ErrAlgebraicOwner
 	}
-	if v.core != nil && v.core.isolationSigns.traceRunning {
+	if v.core != nil && (v.core.isolationSigns.traceRunning || v.core.rootTrace.running) {
 		return ErrAlgebraicPending
 	}
 	if v.closed {

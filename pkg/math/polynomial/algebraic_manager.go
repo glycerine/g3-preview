@@ -239,7 +239,7 @@ func (m *AlgebraicManager) Close() error {
 	if m.AlgebraicRootCore != nil && (m.foreignCopyBorrowers != 0 || m.foreignCopy.running || m.foreignCopy.cleaning) {
 		return ErrAlgebraicPending
 	}
-	if m.constructing || m.finishing || m.AlgebraicRootCore != nil && (m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning || m.toOwnedRational.running || m.toOwnedRational.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || m.integerSet.running || m.integerSet.finishing || m.constQ.running || m.constQ.executing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
+	if m.constructing || m.finishing || m.AlgebraicRootCore != nil && (m.rootTrace.running || m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning || m.toOwnedRational.running || m.toOwnedRational.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || m.integerSet.running || m.integerSet.finishing || m.constQ.running || m.constQ.executing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
 		return ErrAlgebraicPending
 	}
 	e := m.finish(true)

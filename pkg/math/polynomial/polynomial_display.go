@@ -62,6 +62,7 @@ func (v *PolynomialDecimalView) Length() (uint32, error) {
 }
 
 type polynomialDisplayState struct {
+	receipt *polynomialDisplayInvocationReceipt
 	frames  []*polynomialDisplayFrame
 	next    uint64
 	current *polynomialDisplayFrame
@@ -89,7 +90,12 @@ type polynomialDisplayFrame struct {
 	assembly                             strings.Builder
 }
 
-func (m *MultivariatePolynomialCore) displayFrame(sink PolynomialTextSink) (*polynomialDisplayFrame, error) {
+func (m *MultivariatePolynomialCore) displayFrame(sink PolynomialTextSink) (frame *polynomialDisplayFrame, cause error) {
+	defer func() {
+		if frame != nil && cause == nil && m.display.receipt != nil && m.callbackDepth == 0 {
+			*m.display.receipt = polynomialDisplayInvocationReceipt{frame, frame.generation}
+		}
+	}()
 	s := &m.display
 	for _, f := range s.frames {
 		if !f.active {

@@ -49,6 +49,7 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	rootTrace                                                  algebraicRootTraceScope
 	isolateRefinable                                           upolyRefinableInvocationReceipt
 	toOwnedRational                                            algebraicOwnedRationalScope
 	toRationalCopy                                             unumeral.IntegerCopyAllocationReceipt
@@ -197,6 +198,9 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m != nil && m.self == m && (m.rootTrace.running || m.rootTracePending()) {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && (m.config.Polynomials.convertEntryReceiptPending(&m.arithmetic.convertEntry) || m.config.Polynomials.convertEntryReceiptPending(&m.inversion.convertEntry)) {
 		return ErrAlgebraicPending
 	}
@@ -217,7 +221,7 @@ func (m *AlgebraicRootCore) check() error {
 	if m != nil && m.self == m && m.toOwnedRational.active && !m.toOwnedRational.running {
 		return errors.Join(ErrAlgebraicPending, m.toOwnedRational.sourceCause)
 	}
-	if m != nil && m.self == m && (m.isolationSigns.traceRunning || m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning || m.toOwnedRational.executing) {
+	if m != nil && m.self == m && (m.isolationSigns.traceRunning || m.rootTrace.running || m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning || m.toOwnedRational.executing) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && (m.cellAllocationRunning || m.cellPending.Block() != (umemory.Block{})) {
@@ -997,7 +1001,7 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	if m != nil && m.self == m && m.toOwnedRational.running {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning || m.toOwnedRational.executing) {
+	if m != nil && m.self == m && (m.rootTrace.running || m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning || m.toOwnedRational.executing) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.cellAllocationRunning {
@@ -1071,6 +1075,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	}
 	if m == nil || m.self != m || m.closed {
 		return ErrAlgebraicOwner
+	}
+	if e := m.cleanupRootTrace(); e != nil {
+		return e
 	}
 	for _, r := range []*upolyRefinableInvocationReceipt{&m.isolateRefinable, &m.isolationConversion.refinable, &m.rootConstruction.conversion.refinable, &m.binary.refinable} {
 		if e := m.config.Polynomials.cleanupRefinableReceipt(r); e != nil {
@@ -1216,7 +1223,7 @@ func (m *AlgebraicRootCore) closeCoreMembers() error {
 	if m != nil && m.self == m && m.toOwnedRational.running {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning || m.toOwnedRational.executing) {
+	if m != nil && m.self == m && (m.rootTrace.running || m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning || m.toOwnedRational.executing) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.cellAllocationRunning {

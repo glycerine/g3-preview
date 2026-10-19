@@ -1,0 +1,120 @@
+// Source: src/math/polynomial/algebraic_numbers.cpp:655-659,668,678.
+package polynomial
+
+import (
+	"io"
+	"strconv"
+)
+
+type algebraicRootTraceScope struct {
+	running    bool
+	borrow     upolyFactorTraceBorrow
+	polynomial *MultivariatePolynomialCore
+	poly       polynomialDisplayInvocationReceipt
+	univariate upolyDisplayInvocationReceipt
+}
+
+func (m *AlgebraicRootCore) rootTracePending() bool {
+	s := &m.rootTrace
+	return s.polynomial != nil && s.polynomial.displayReceiptPending(&s.poly) || m.config.Polynomials != nil && m.config.Polynomials.displayReceiptPending(&s.univariate)
+}
+func (m *AlgebraicRootCore) rootTraceSourceCause() error {
+	s := &m.rootTrace
+	if s.polynomial != nil {
+		if e := s.polynomial.displayReceiptSourceCause(&s.poly); e != nil {
+			return e
+		}
+	}
+	return m.config.Polynomials.displayReceiptSourceCause(&s.univariate)
+}
+func (m *AlgebraicRootCore) cleanupRootTrace() error {
+	s := &m.rootTrace
+	if s.running {
+		return ErrAlgebraicPending
+	}
+	if s.polynomial != nil {
+		if e := s.polynomial.cleanupDisplayReceipt(&s.poly); e != nil {
+			return e
+		}
+	}
+	if e := m.config.Polynomials.cleanupDisplayReceipt(&s.univariate); e != nil {
+		return e
+	}
+	s.polynomial = nil
+	s.poly = polynomialDisplayInvocationReceipt{}
+	s.univariate = upolyDisplayInvocationReceipt{}
+	return nil
+}
+
+func (m *AlgebraicRootCore) emitRootTrace(line int, body func(io.Writer) error) error {
+	tags := m.config.Rationals.Integers().BorrowTraceTags()
+	if !tags.ShouldTrace("algebraic") {
+		return nil
+	}
+	s := &m.rootTrace
+	if s.running || m.rootTracePending() {
+		return ErrAlgebraicPending
+	}
+	s.polynomial = nil
+	s.poly = polynomialDisplayInvocationReceipt{}
+	s.univariate = upolyDisplayInvocationReceipt{}
+	if e := s.borrow.bindManagers([3]*UPolynomialManager{m.config.Polynomials}, tags); e != nil {
+		return e
+	}
+	s.running = true
+	defer func() { s.running = false; s.borrow.unbind() }()
+	var computation error
+	_ = tags.EmitConditional("algebraic", "mk_root", "src/math/polynomial/algebraic_numbers.cpp", line,
+		func() bool { return true }, func(w io.Writer) error {
+			computation = body(w)
+			return computation
+		})
+	return computation
+}
+
+func (m *AlgebraicRootCore) traceRootPolynomial(pm *MultivariatePolynomialManager, p Polynomial) error {
+	if !m.config.Rationals.Integers().BorrowTraceTags().ShouldTrace("algebraic") {
+		return nil
+	}
+	previous := pm.core.algebraicTraceRunning
+	pm.core.algebraicTraceRunning = true
+	defer func() { pm.core.algebraicTraceRunning = previous }()
+	return m.emitRootTrace(668, func(w io.Writer) error {
+		sink := &polynomialTraceSink{writer: w}
+		_ = sink.WriteLiteral("isolating roots of: ")
+		m.rootTrace.polynomial = pm.core
+		if e := pm.core.displayIntoCoreWithReceipt(p, sink, false, &m.rootTrace.poly); e != nil {
+			return e
+		}
+		return sink.WriteLiteral("\n")
+	})
+}
+
+func (m *AlgebraicRootCore) traceRootExpression(p UPolynomialView, index uint32) error {
+	return m.emitRootTrace(678, func(w io.Writer) error {
+		out := upolyRemainderTraceStream{w}
+		_ = out.AppendCString("mk_root " + strconv.FormatUint(uint64(index), 10) + "\n")
+		if e := m.config.Polynomials.displayIntoWithReceipt(p, out, "x", false, &m.rootTrace.univariate); e != nil {
+			return e
+		}
+		return out.AppendCString("\n")
+	})
+}
+
+func (m *AlgebraicRootCore) traceRootSelection(roots *AlgebraicVector, count uint32) error {
+	return m.emitRootTrace(655, func(w io.Writer) error {
+		out := algebraicComparisonTraceWriter{w}
+		_ = writeAlgebraicIntervalPart(out, "num-roots: "+strconv.FormatUint(uint64(count), 10)+"\n")
+		for i := uint32(0); i < count; i++ {
+			location, e := m.locationCleanup(&roots.values[i])
+			if e != nil {
+				return e
+			}
+			if e = m.displayIntervalAtLocation(out, location); e != nil {
+				return e
+			}
+			_ = writeAlgebraicIntervalPart(out, "\n")
+		}
+		return nil
+	})
+}

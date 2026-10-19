@@ -26,6 +26,9 @@ type algebraicRootConstructionScope struct {
 
 func (s *algebraicRootConstructionScope) childSourceCause() error {
 	if s.owner != nil {
+		if e := s.owner.rootTraceSourceCause(); e != nil {
+			return e
+		}
 		if e := s.owner.config.Polynomials.refinableReceiptSourceCause(&s.conversion.refinable); e != nil {
 			return e
 		}
@@ -67,6 +70,9 @@ func (m *AlgebraicRootCore) cleanupRootConstruction() error {
 	}
 	s.finishing = true
 	defer func() { s.finishing = false }()
+	if e := m.cleanupRootTrace(); e != nil {
+		return e
+	}
 	if s.parser != nil {
 		if s.parserAccepted {
 			if e := s.parser.Close(); e != nil {
@@ -190,6 +196,9 @@ func (m *AlgebraicRootCore) MkPolynomialRoot(pm *MultivariatePolynomialManager, 
 		return e
 	}
 	defer func() { cause = m.finishRootConstruction(cause) }()
+	if e = m.traceRootPolynomial(pm, p); e != nil {
+		return e
+	}
 	up, e := m.rootConstructionWorkspace()
 	if e != nil {
 		return e
@@ -254,6 +263,9 @@ func (m *AlgebraicRootCore) MkSexprRoot(sx *usexpr.SexprManager, p usexpr.SexprH
 	s.conversion.active = true
 	view, e := m.config.Polynomials.wholeView(up)
 	if e != nil {
+		return e
+	}
+	if e = m.traceRootExpression(view, index); e != nil {
 		return e
 	}
 	previous := m.polynomialCaller

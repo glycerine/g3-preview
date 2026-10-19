@@ -337,7 +337,11 @@ func (m *AlgebraicRootCore) mkRootWithConstruction(v UPolynomialView, index uint
 	if err = m.isolateRootsForPolynomial(v, r, conversion); err != nil {
 		return err
 	}
-	if uint64(index) > uint64(len(r.values)) {
+	count := uint32(len(r.values))
+	if err = m.traceRootSelection(r, count); err != nil {
+		return err
+	}
+	if index > count {
 		return newAlgebraicException("invalid root object, polynomial does have sufficient roots")
 	}
 	return m.Copy(out, &r.values[index-1])
@@ -345,7 +349,7 @@ func (m *AlgebraicRootCore) mkRootWithConstruction(v UPolynomialView, index uint
 
 // CleanupIsolation retries only explicitly retained source lexical/vector roots.
 func (m *AlgebraicRootCore) CleanupIsolation() error {
-	if m != nil && m.self == m && m.comparisonTraceRunning {
+	if m != nil && m.self == m && (m.comparisonTraceRunning || m.rootTrace.running) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.manager != nil && (m.manager.constructing || m.manager.finishing) {
