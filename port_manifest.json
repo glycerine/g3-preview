@@ -45827,8 +45827,8 @@
           ]
         },
         {
-          "name": "Power polynomial.cpp:4600-4614 actual guarded invocation and Mul child, source result destructor and matched ownership history",
-          "status": "partial",
+          "name": "Complete Power polynomial.cpp:4600-4614: quick assignments, literal result reference, exact Mul child, caller handoff, source destruction and matched ownership history",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_power_invocation.go",
           "tests": [
             "TestPolynomialPowerActualProductChildPrefixes",
