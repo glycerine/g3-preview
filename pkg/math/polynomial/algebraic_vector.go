@@ -17,6 +17,10 @@ type AlgebraicVector struct {
 	closed, closing bool
 }
 
+func (v *AlgebraicVector) isolationOutputExecuting() bool {
+	return v != nil && v.self == v && v.core != nil && v.core.self == v.core && v.core.univariateIsolationRunning && v.core.univariateIsolationOutput == v
+}
+
 func (m *AlgebraicRootCore) NewVector() (*AlgebraicVector, error) {
 	if e := m.check(); e != nil {
 		return nil, e
@@ -75,6 +79,9 @@ func (v *AlgebraicVector) pushTake(a *Algebraic) error {
 	return nil
 }
 func (v *AlgebraicVector) PushCopy(a *Algebraic) error {
+	if v.isolationOutputExecuting() {
+		return ErrAlgebraicPending
+	}
 	if e := v.check(); e != nil {
 		return e
 	}
@@ -101,6 +108,9 @@ func (v *AlgebraicVector) PushCopy(a *Algebraic) error {
 	return nil
 }
 func (v *AlgebraicVector) Reset() error {
+	if v.isolationOutputExecuting() {
+		return ErrAlgebraicPending
+	}
 	if e := v.check(); e != nil {
 		return e
 	}
@@ -116,7 +126,7 @@ func (v *AlgebraicVector) Close() error {
 	if v == nil || v.self != v {
 		return ErrAlgebraicOwner
 	}
-	if v.core != nil && (v.core.isolationSigns.traceRunning || v.core.rootTrace.running) {
+	if v.isolationOutputExecuting() || v.core != nil && (v.core.isolationSigns.traceRunning || v.core.rootTrace.running || v.core.rootTracePending()) {
 		return ErrAlgebraicPending
 	}
 	if v.closed {

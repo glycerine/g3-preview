@@ -49,6 +49,8 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	univariateIsolationRunning                                 bool
+	univariateIsolationOutput                                  *AlgebraicVector
 	rootTrace                                                  algebraicRootTraceScope
 	isolateRefinable                                           upolyRefinableInvocationReceipt
 	toOwnedRational                                            algebraicOwnedRationalScope
@@ -1013,7 +1015,7 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	if m != nil && m.self == m && (m.isolationSigns.running || m.isolationSigns.finishing) {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && m.multivariateIsolationRunning {
+	if m != nil && m.self == m && (m.multivariateIsolationRunning || m.univariateIsolationRunning) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.polynomialEvaluationRunning != 0 {
@@ -1235,7 +1237,7 @@ func (m *AlgebraicRootCore) closeCoreMembers() error {
 	if m != nil && m.self == m && (m.isolationSigns.running || m.isolationSigns.finishing) {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && m.multivariateIsolationRunning {
+	if m != nil && m.self == m && (m.multivariateIsolationRunning || m.univariateIsolationRunning) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.polynomialEvaluationBorrowers != 0 {

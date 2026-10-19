@@ -108,6 +108,9 @@ func (m *AlgebraicRootCore) isolatePolynomialRootsForMultivariate(pm *Multivaria
 			}
 		}
 	}
+	if e = m.tracePolynomialInput(pm, p, false); e != nil {
+		return e
+	}
 	zero, e := pm.core.IsZero(p)
 	if e != nil || zero {
 		return e

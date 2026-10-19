@@ -190,6 +190,8 @@ func TestAlgebraicRootPolynomialTraceOwnsActualStoppedDisplay(t *testing.T) {
 	p, e := pm.core.MkConstantTake(&n)
 	serviceMust(t, e)
 	p = polynomialCaller(t, pm.core, p)
+	vector, e := c.NewVector()
+	serviceMust(t, e)
 	output := &algebraicRootTraceNumeralStop{core: c}
 	tags := diagnostic.NewTraceTagsWithWriter(output)
 	tags.Enable("algebraic")
@@ -216,12 +218,16 @@ func TestAlgebraicRootPolynomialTraceOwnsActualStoppedDisplay(t *testing.T) {
 		if !frame.active || frame.sourceCause != stop || frame.numeral.Cell != output.ref {
 			t.Fatal("copied owner or stale receipt consumed actual display")
 		}
+		if e = vector.Close(); !errors.Is(e, ErrAlgebraicPending) || vector.closing || vector.closed {
+			t.Fatal("stopped display allowed older vector header mutation", e)
+		}
 		z.Store(output.ref, output.original)
 	} else if body == nil || body.Error() != "invalid root object, polynomial does have sufficient roots" || output.ref != 0 {
 		t.Fatal("erased trace changed constant root route", body, output.ref)
 	}
 	serviceMust(t, c.config.Rationals.BindTrace(nil))
 	serviceMust(t, c.CleanupRetained())
+	serviceMust(t, vector.Close())
 	if c.rootTracePending() || pm.algebraicIsolationBorrowers != 0 || c.rootConstruction.active {
 		t.Fatal("owning cleanup retained trace or enclosing root constructor")
 	}

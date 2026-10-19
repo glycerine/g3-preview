@@ -55,11 +55,17 @@ func (m *AlgebraicRootCore) factorPolynomialInto(v UPolynomialView, factors *UPo
 			return false, e
 		}
 	}
+	if e := m.config.Polynomials.Reset(m.tmp3); e != nil {
+		return false, e
+	}
 	if e := m.config.Polynomials.SquareFreeView(v, m.tmp3); e != nil {
 		return false, e
 	}
 	w, e := m.config.Polynomials.wholeView(m.tmp3)
 	if e != nil {
+		return false, e
+	}
+	if e = m.traceIsolationPolynomial(w, true); e != nil {
 		return false, e
 	}
 	return false, factors.PushCopy(w, 1)
@@ -90,6 +96,15 @@ func (m *AlgebraicRootCore) isolateRootsForPolynomial(v UPolynomialView, out *Al
 		return ErrAlgebraicOwner
 	}
 	if err = out.check(); err != nil {
+		return err
+	}
+	if m.univariateIsolationRunning {
+		return ErrAlgebraicPending
+	}
+	m.univariateIsolationRunning = true
+	m.univariateIsolationOutput = out
+	defer func() { m.univariateIsolationRunning = false; m.univariateIsolationOutput = nil }()
+	if err = m.traceIsolationPolynomial(v, false); err != nil {
 		return err
 	}
 	if v.count == 0 {
@@ -145,13 +160,20 @@ func (m *AlgebraicRootCore) isolateRootsForPolynomial(v UPolynomialView, out *Al
 		if e != nil {
 			return e
 		}
-		if f.count <= 1 {
+		degree := upolyViewDegree(f)
+		if err = m.traceIsolationFactor(i, degree); err != nil {
+			return err
+		}
+		if degree == 0 {
 			continue
 		}
 		if err = m.beginQ(); err != nil {
 			return err
 		}
 		if f.count == 2 {
+			if err = m.traceIsolationLinear(); err != nil {
+				return m.finishQ(err)
+			}
 			x, e := m.config.Polynomials.read(f, 0)
 			if e != nil {
 				return m.finishQ(e)
@@ -179,8 +201,8 @@ func (m *AlgebraicRootCore) isolateRootsForPolynomial(v UPolynomialView, out *Al
 			}
 			continue
 		}
-		if polynomialSourceDebug && (m.roots.state.size != 0 || m.lowers.state.size != 0 || m.uppers.state.size != 0) {
-			return m.finishQ(ErrUPolynomialAssertion)
+		if err = m.assertIsolationScratchEmpty(); err != nil {
+			return m.finishQ(err)
 		}
 		if invocation != nil {
 			invocation.scratchStarted = true
@@ -188,7 +210,11 @@ func (m *AlgebraicRootCore) isolateRootsForPolynomial(v UPolynomialView, out *Al
 		if err = m.config.Polynomials.SquareFreeIsolateRoots(f, m.config.Binary, m.roots, m.lowers, m.uppers); err != nil {
 			return m.finishQ(err)
 		}
-		for j := uint32(0); j < m.roots.state.size; j++ {
+		size := m.roots.state.size
+		if err = m.traceIsolatedBasicRoots(size); err != nil {
+			return m.finishQ(err)
+		}
+		for j := uint32(0); j < size; j++ {
 			b := &m.roots.state.values[j]
 			if err = m.config.Binary.ToRational(m.config.Rationals, b, &m.localQ); err != nil {
 				return m.finishQ(err)
@@ -201,10 +227,11 @@ func (m *AlgebraicRootCore) isolateRootsForPolynomial(v UPolynomialView, out *Al
 				return m.finishQ(err)
 			}
 		}
-		if polynomialSourceDebug && m.lowers.state.size != m.uppers.state.size {
-			return m.finishQ(ErrAlgebraicAssertion)
+		if err = m.assertIsolationBoundsSizes(); err != nil {
+			return m.finishQ(err)
 		}
-		for j := uint32(0); j < m.lowers.state.size; j++ {
+		size = m.lowers.state.size
+		for j := uint32(0); j < size; j++ {
 			if j >= m.uppers.state.size {
 				return m.finishQ(arena.ErrBounds)
 			}
@@ -349,7 +376,7 @@ func (m *AlgebraicRootCore) mkRootWithConstruction(v UPolynomialView, index uint
 
 // CleanupIsolation retries only explicitly retained source lexical/vector roots.
 func (m *AlgebraicRootCore) CleanupIsolation() error {
-	if m != nil && m.self == m && (m.comparisonTraceRunning || m.rootTrace.running) {
+	if m != nil && m.self == m && (m.comparisonTraceRunning || m.rootTrace.running || m.univariateIsolationRunning) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.manager != nil && (m.manager.constructing || m.manager.finishing) {

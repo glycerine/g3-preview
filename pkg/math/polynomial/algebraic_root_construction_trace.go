@@ -46,7 +46,7 @@ func (m *AlgebraicRootCore) cleanupRootTrace() error {
 	return nil
 }
 
-func (m *AlgebraicRootCore) emitRootTrace(line int, body func(io.Writer) error) error {
+func (m *AlgebraicRootCore) emitRootTrace(function string, line int, body func(io.Writer) error) error {
 	tags := m.config.Rationals.Integers().BorrowTraceTags()
 	if !tags.ShouldTrace("algebraic") {
 		return nil
@@ -64,7 +64,7 @@ func (m *AlgebraicRootCore) emitRootTrace(line int, body func(io.Writer) error) 
 	s.running = true
 	defer func() { s.running = false; s.borrow.unbind() }()
 	var computation error
-	_ = tags.EmitConditional("algebraic", "mk_root", "src/math/polynomial/algebraic_numbers.cpp", line,
+	_ = tags.EmitConditional("algebraic", function, "src/math/polynomial/algebraic_numbers.cpp", line,
 		func() bool { return true }, func(w io.Writer) error {
 			computation = body(w)
 			return computation
@@ -73,13 +73,20 @@ func (m *AlgebraicRootCore) emitRootTrace(line int, body func(io.Writer) error) 
 }
 
 func (m *AlgebraicRootCore) traceRootPolynomial(pm *MultivariatePolynomialManager, p Polynomial) error {
+	return m.tracePolynomialInput(pm, p, true)
+}
+func (m *AlgebraicRootCore) tracePolynomialInput(pm *MultivariatePolynomialManager, p Polynomial, root bool) error {
 	if !m.config.Rationals.Integers().BorrowTraceTags().ShouldTrace("algebraic") {
 		return nil
 	}
 	previous := pm.core.algebraicTraceRunning
 	pm.core.algebraicTraceRunning = true
 	defer func() { pm.core.algebraicTraceRunning = previous }()
-	return m.emitRootTrace(668, func(w io.Writer) error {
+	line, function := 637, "isolate_roots"
+	if root {
+		line, function = 668, "mk_root"
+	}
+	return m.emitRootTrace(function, line, func(w io.Writer) error {
 		sink := &polynomialTraceSink{writer: w}
 		_ = sink.WriteLiteral("isolating roots of: ")
 		m.rootTrace.polynomial = pm.core
@@ -91,7 +98,7 @@ func (m *AlgebraicRootCore) traceRootPolynomial(pm *MultivariatePolynomialManage
 }
 
 func (m *AlgebraicRootCore) traceRootExpression(p UPolynomialView, index uint32) error {
-	return m.emitRootTrace(678, func(w io.Writer) error {
+	return m.emitRootTrace("mk_root", 678, func(w io.Writer) error {
 		out := upolyRemainderTraceStream{w}
 		_ = out.AppendCString("mk_root " + strconv.FormatUint(uint64(index), 10) + "\n")
 		if e := m.config.Polynomials.displayIntoWithReceipt(p, out, "x", false, &m.rootTrace.univariate); e != nil {
@@ -102,7 +109,7 @@ func (m *AlgebraicRootCore) traceRootExpression(p UPolynomialView, index uint32)
 }
 
 func (m *AlgebraicRootCore) traceRootSelection(roots *AlgebraicVector, count uint32) error {
-	return m.emitRootTrace(655, func(w io.Writer) error {
+	return m.emitRootTrace("mk_root", 655, func(w io.Writer) error {
 		out := algebraicComparisonTraceWriter{w}
 		_ = writeAlgebraicIntervalPart(out, "num-roots: "+strconv.FormatUint(uint64(count), 10)+"\n")
 		for i := uint32(0); i < count; i++ {

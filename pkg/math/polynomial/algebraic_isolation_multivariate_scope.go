@@ -83,6 +83,9 @@ func algebraicIsolationAssert(ok bool, line int32, expression string) error {
 	return nil
 }
 func (s *algebraicMultivariateIsolationFrame) childSourceCause() error {
+	if e := s.owner.rootTraceSourceCause(); e != nil {
+		return e
+	}
 	if s.child != nil && s.child.active && s.child.sourceStop != nil {
 		return s.child.sourceStop
 	}

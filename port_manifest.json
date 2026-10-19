@@ -38312,6 +38312,9 @@
         "pkg/math/polynomial/algebraic_isolation_signs_cancel_test.go",
         "pkg/math/polynomial/algebraic_isolation_signs_owner_test.go",
         "pkg/math/polynomial/algebraic_isolation_signs_dt_test.go",
+        "pkg/math/polynomial/algebraic_isolation_trace.go",
+        "pkg/math/polynomial/algebraic_isolation_assertions.go",
+        "pkg/math/polynomial/algebraic_isolation_source_test.go",
         "pkg/math/polynomial/algebraic_root_construction.go",
         "pkg/math/polynomial/algebraic_root_construction_trace.go",
         "pkg/math/polynomial/algebraic_root_construction_trace_test.go",
@@ -39174,7 +39177,14 @@
           "go_target": "pkg/math/polynomial/algebraic_isolation.go",
           "tests": [
             "TestAlgebraicSourceRootCounts",
-            "TestAlgebraicRootCopyRefineAndIndex"
+            "TestAlgebraicRootCopyRefineAndIndex",
+            "TestAlgebraicIsolationSourceTraceBranches",
+            "TestAlgebraicIsolationEmptyTraceBeforeLazyMembers",
+            "TestAlgebraicIsolationPolynomialZeroTraceBeforeConversion",
+            "TestAlgebraicSquareFreeFactorResetBeforeInputRead",
+            "TestAlgebraicIsolationDisabledScratchAssertionsDoNotRead",
+            "TestAlgebraicIsolationScratchAssertionActions",
+            "TestAlgebraicIsolationCooperationKeepsExecutingOwners"
           ]
         },
         {
