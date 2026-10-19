@@ -9,6 +9,7 @@ import (
 )
 
 type algebraicRootTraceScope struct {
+	root       algebraicRootDisplayInvocationReceipt
 	insertions [2]unumeral.NumeralInsertionReceipt
 	running    bool
 	borrow     upolyFactorTraceBorrow
@@ -19,6 +20,9 @@ type algebraicRootTraceScope struct {
 
 func (m *AlgebraicRootCore) rootTracePending() bool {
 	s := &m.rootTrace
+	if m.rootDisplayInvocationPending(&s.root) {
+		return true
+	}
 	for i := range s.insertions {
 		if s.insertions[i].Active() {
 			return true
@@ -28,6 +32,11 @@ func (m *AlgebraicRootCore) rootTracePending() bool {
 }
 func (m *AlgebraicRootCore) rootTraceSourceCause() error {
 	s := &m.rootTrace
+	if m.rootDisplayInvocationPending(&s.root) {
+		if e := m.rootDisplay.sourceStop; e != nil {
+			return e
+		}
+	}
 	for i := range s.insertions {
 		if s.insertions[i].Active() {
 			if e := s.insertions[i].SourceCause(); e != nil {
@@ -47,6 +56,9 @@ func (m *AlgebraicRootCore) cleanupRootTrace() error {
 	if s.running {
 		return ErrAlgebraicPending
 	}
+	if e := m.cleanupRootDisplayInvocation(&s.root); e != nil {
+		return e
+	}
 	for i := len(s.insertions) - 1; i >= 0; i-- {
 		if !s.insertions[i].Active() {
 			continue
@@ -64,6 +76,7 @@ func (m *AlgebraicRootCore) cleanupRootTrace() error {
 		return e
 	}
 	s.polynomial = nil
+	s.root = algebraicRootDisplayInvocationReceipt{}
 	s.insertions = [2]unumeral.NumeralInsertionReceipt{}
 	s.poly = polynomialDisplayInvocationReceipt{}
 	s.univariate = upolyDisplayInvocationReceipt{}
@@ -82,6 +95,7 @@ func (m *AlgebraicRootCore) emitRootTraceTag(tag, function string, line int, bod
 	if s.running || m.rootTracePending() {
 		return ErrAlgebraicPending
 	}
+	s.root = algebraicRootDisplayInvocationReceipt{}
 	s.insertions = [2]unumeral.NumeralInsertionReceipt{}
 	s.polynomial = nil
 	s.poly = polynomialDisplayInvocationReceipt{}

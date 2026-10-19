@@ -273,6 +273,9 @@ func (m *UPolynomialManager) NewPolynomial() (UPolynomial, error) {
 	if m.sexprArithmeticExecuting() {
 		return UPolynomial{}, ErrUPolynomialCleanupPending
 	}
+	return m.newPolynomial()
+}
+func (m *UPolynomialManager) newPolynomial() (UPolynomial, error) {
 	if e := m.check(); e != nil {
 		return UPolynomial{}, e
 	}
@@ -308,6 +311,9 @@ func (m *UPolynomialManager) DelPolynomial(p *UPolynomial) error {
 	if m.sexprArithmeticExecuting() {
 		return ErrUPolynomialCleanupPending
 	}
+	return m.delPolynomial(p)
+}
+func (m *UPolynomialManager) delPolynomial(p *UPolynomial) error {
 	if p == nil {
 		return ErrUPolynomialOwner
 	}

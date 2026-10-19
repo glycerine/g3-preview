@@ -5,6 +5,7 @@ import (
 	"github.com/glycerine/g3/pkg/arena"
 	"github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -212,6 +213,106 @@ func TestAlgebraicMultivariateIsolationTraceBranchRecords(t *testing.T) {
 			} else if output.Len() != 0 {
 				t.Fatal("erased trace emitted branch")
 			}
+		})
+	}
+}
+
+func TestAlgebraicMultivariateIsolationRecoveryRootTraceRecords(t *testing.T) {
+	for _, degree := range []uint32{1, 2} {
+		t.Run(strconv.Itoa(int(degree)), func(t *testing.T) {
+			c, up, _ := algebraicControlledFixture(t)
+			terms := []polynomialEvalTerm{{1, [3]uint32{1, 0, degree}}, {1, [3]uint32{0, 1, degree}}, {-1, [3]uint32{2, 0, 0}}, {-1, [3]uint32{1, 1, 0}}}
+			pm, p, _ := polynomialEvalFixtureWithRationals(t, c.config.Rationals, terms)
+			values := algebraicIsolationAssignmentsFixture(t, c, up, true)
+			roots, e := c.NewVector()
+			serviceMust(t, e)
+			t.Cleanup(func() { serviceMust(t, c.CleanupRetained()); serviceMust(t, roots.Close()) })
+			var output strings.Builder
+			tags := diagnostic.NewTraceTagsWithWriter(&output)
+			tags.Enable("isolate_roots")
+			serviceMust(t, c.config.Rationals.BindTrace(tags))
+			serviceMust(t, c.IsolateMultivariateRoots(pm, p, values, roots))
+			serviceMust(t, c.config.Rationals.BindTrace(nil))
+			if len(roots.values) != int(degree) {
+				t.Fatal("independent recovery root count", len(roots.values))
+			}
+			if tags.ShouldTrace("isolate_roots") {
+				want := ":2398 ---------\nafter trivial solving p has only one root:\n(#^2 - 2, 2)\n"
+				if degree == 2 {
+					want = ":2434 ---------\ninvoking isolate_roots with q2:\nx2^2 x3 - x0 x1 - x0^2\nz: x3 -> (#^2 - 8, 2)\n"
+				}
+				if !strings.Contains(output.String(), want) {
+					t.Fatalf("missing recovery diagnostic %q:\n%s", want, output.String())
+				}
+			} else if output.Len() != 0 {
+				t.Fatal("erased recovery diagnostic emitted output")
+			}
+			if degree == 1 {
+				cmp, e := c.Compare(&roots.values[0], &values.values[0])
+				serviceMust(t, e)
+				if cmp != 0 {
+					t.Fatal("independent linear recovery root", cmp)
+				}
+			} else {
+				algebraicIsolationCheckFourthRoots(t, c, roots)
+			}
+		})
+	}
+}
+
+func TestAlgebraicMultivariateIsolationRecoveryTraceRetainsRootDisplay(t *testing.T) {
+	for _, degree := range []uint32{1, 2} {
+		t.Run(strconv.Itoa(int(degree)), func(t *testing.T) {
+			c, _, _ := algebraicCompareFixtureProfile(t, true)
+			terms := []polynomialEvalTerm{{1, [3]uint32{1, 0, degree}}, {1, [3]uint32{0, 1, degree}}, {-1, [3]uint32{2, 0, 0}}, {-1, [3]uint32{1, 1, 0}}}
+			pm, p, _ := polynomialEvalFixtureWithRationals(t, c.config.Rationals, terms)
+			q := unumeral.NewRational()
+			serviceMust(t, c.config.Rationals.SetString(&q, "18446744073709551619"))
+			var n Algebraic
+			serviceMust(t, c.SetRational(&n, &q))
+			values := &algebraicIsolationAssignments{assigned: [3]bool{true, true, false}}
+			serviceMust(t, c.Root(&n, 2, &values.values[0]))
+			serviceMust(t, c.Copy(&values.values[1], &values.values[0]))
+			roots, e := c.NewVector()
+			serviceMust(t, e)
+			marker := ":2398 "
+			if degree == 2 {
+				marker = ":2434 "
+			}
+			writer := &algebraicBinaryDisplayStopWriter{core: c, marker: marker}
+			tags := diagnostic.NewTraceTagsWithWriter(writer)
+			tags.Enable("isolate_roots")
+			serviceMust(t, c.config.Rationals.BindTrace(tags))
+			body := c.IsolateMultivariateRoots(pm, p, values, roots)
+			var stop error
+			if tags.ShouldTrace("isolate_roots") {
+				if !errors.Is(body, arena.ErrBounds) || writer.ref == 0 || !c.rootTracePending() || !c.rootDisplay.active {
+					t.Fatal("actual recovery display guard", body)
+				}
+				stop = c.rootDisplay.sourceStop
+				if stop == nil || !errors.Is(body, stop) {
+					t.Fatal("recovery child source stop lost", body)
+				}
+				if len(c.multivariateIsolationFrames) != 1 || !c.multivariateIsolationFrames[0].active || c.multivariateIsolationFrames[0].depth == 0 || pm.algebraicIsolationBorrowers != 1 {
+					t.Fatal("older recovery locals destroyed before root display")
+				}
+				if e := roots.Close(); !errors.Is(e, ErrAlgebraicPending) || roots.closing || roots.closed {
+					t.Fatal("display stop mutated recovery output", e)
+				}
+				c.config.Rationals.Integers().Store(writer.ref, writer.original)
+			} else if body != nil || writer.ref != 0 {
+				t.Fatal("erased recovery trace changed result", body)
+			}
+			serviceMust(t, c.config.Rationals.BindTrace(nil))
+			serviceMust(t, c.CleanupRetained())
+			if c.rootTracePending() || c.rootDisplay.active || pm.algebraicIsolationBorrowers != 0 || stop != nil && c.rootDisplay.sourceStop != stop {
+				t.Fatal("owning recovery cleanup lost history or retained borrow")
+			}
+			serviceMust(t, roots.Close())
+			serviceMust(t, c.Del(&values.values[1]))
+			serviceMust(t, c.Del(&values.values[0]))
+			serviceMust(t, c.Del(&n))
+			serviceMust(t, c.config.Rationals.Del(&q))
 		})
 	}
 }

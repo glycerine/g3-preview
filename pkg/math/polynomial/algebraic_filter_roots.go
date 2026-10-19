@@ -45,6 +45,9 @@ func (m *AlgebraicRootCore) filterRoots(pm *MultivariatePolynomialManager, p Pol
 	}
 	m.filterRootsRunning = true
 	defer func() { m.filterRootsRunning = false }()
+	if e := m.traceFilterRoots(roots, x, false); e != nil {
+		return e
+	}
 	size := len(roots.values)
 	j := 0
 	for i := 0; i < size; i++ {
@@ -52,8 +55,14 @@ func (m *AlgebraicRootCore) filterRoots(pm *MultivariatePolynomialManager, p Pol
 			return e
 		}
 		extended := algebraicExtendedAssignment{base: values, x: x, value: &roots.values[i]}
+		if e := m.traceFilterRootCandidate(uint32(i), x, &roots.values[i]); e != nil {
+			return e
+		}
 		sign, e := m.EvalSign(pm, p, &extended)
 		if e != nil {
+			return e
+		}
+		if e = m.traceFilterRootSign(uint32(i), sign); e != nil {
 			return e
 		}
 		if sign != 0 {
@@ -72,5 +81,5 @@ func (m *AlgebraicRootCore) filterRoots(pm *MultivariatePolynomialManager, p Pol
 		}
 	}
 	roots.values = roots.values[:j]
-	return nil
+	return m.traceFilterRoots(roots, x, true)
 }

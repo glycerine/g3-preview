@@ -376,7 +376,10 @@ func (m *AlgebraicRootCore) isolateVanishedResultant(s *algebraicMultivariateIso
 		if e != nil {
 			return e
 		}
-		return m.negWithReceipt(&roots.values[0], &s.neg)
+		if e = m.negWithReceipt(&roots.values[0], &s.neg); e != nil {
+			return e
+		}
+		return m.traceMultivariateIsolationLinearRoot(&roots.values[0])
 	}
 	s.constructRef(2, pm)
 	s.constructValue(0)
@@ -495,6 +498,9 @@ func (m *AlgebraicRootCore) isolateVanishedResultant(s *algebraicMultivariateIso
 		return e
 	}
 	s.depth--
+	if e = m.traceMultivariateIsolationRecovery(local, combined, z, &s.values[0]); e != nil {
+		return e
+	}
 	extended := algebraicExtendedAssignment{base: values, x: z, value: &s.values[0]}
 	return m.isolateMultivariateRoots(local, combined, &extended, roots, true)
 }

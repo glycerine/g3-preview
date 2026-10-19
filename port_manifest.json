@@ -38390,7 +38390,11 @@
         "pkg/util/numeral/mpbq_root_invocation_test.go",
         "pkg/math/polynomial/algebraic_unary_root_source_test.go",
         "pkg/math/polynomial/algebraic_isolation_multivariate_trace.go",
-        "pkg/math/polynomial/algebraic_isolation_multivariate_trace_test.go"
+        "pkg/math/polynomial/algebraic_isolation_multivariate_trace_test.go",
+        "pkg/math/polynomial/algebraic_filter_roots_trace.go",
+        "pkg/math/polynomial/algebraic_filter_roots_trace_test.go",
+        "pkg/math/polynomial/algebraic_root_display_invocation.go",
+        "pkg/math/polynomial/algebraic_root_display_invocation_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -38567,7 +38571,13 @@
         "TestAlgebraicMultivariateIsolationTraceResultantFrontier",
         "TestAlgebraicMultivariateIsolationTraceBranchRecords",
         "TestAlgebraicMultivariateIsolationTraceDisabledSkipsOperands",
-        "TestAlgebraicMultivariateIsolationSubstitutionTraceOwnsStoppedDisplay"
+        "TestAlgebraicMultivariateIsolationSubstitutionTraceOwnsStoppedDisplay",
+        "TestAlgebraicFilterRootsTraceSourceOrderAndPublication",
+        "TestAlgebraicFilterTraceDisabledSkipsOperands",
+        "TestAlgebraicFilterRootTraceRetainsActualDisplayAndVector",
+        "TestAlgebraicRootTraceDisplayReceiptRejectsLaterInvocation",
+        "TestAlgebraicMultivariateIsolationRecoveryRootTraceRecords",
+        "TestAlgebraicMultivariateIsolationRecoveryTraceRetainsRootDisplay"
       ],
       "conditionals": [
         {
@@ -39030,7 +39040,7 @@
           "notes": "CopyFromCore now implements the concrete distinct-core zero/basic/root set branches, including root-to-basic deletion before the const scoped-mpq construction, NUM then DEN cross-owner SET, original destination allocation/publication order, recorded coefficient extent, receiving interval assertion/lower/upper SET, and packed flag copying without normalization. Source core and both univariate owners remain borrowed across stopped invocations until exact receiving copy/shift/cell allocation and scoped-rational cleanup completes. Synchronous integer/natural bindings exclude numeral owner destruction during actual allocation/cleanup callbacks. Nine branch combinations, independent BIG coefficients/basic NUM/DEN, every reached reservation prefix through success, actual TLS allocation callback refusal, and full owning-source manager lifetime are covered. The owning-source manager closes successfully after copy and the receiving value remains readable. Same-core calls delegate existing Copy. The integrated checked interval assertion now has a real descriptor-after-physical shift refusal with a full eight-cell receiver: all coefficients finish, no interval endpoint is assigned, source borrow stays live, and owning cleanup releases the exact shift backing. An independent replacement allocation and its issued copy receipt remain untouched by algebraic cleanup. The ordinary profile verifies assertion erasure and no exponent-alignment scratch use. A qualified LP64 public-realloc TLS fixture now reaches a mutable destination SET refusal after both foreign local-q fields copied, then a stopped literal NUM destructor and a separate owning cleanup stop. Both core lifetimes remain excluded in the SET callback; the source borrow survives the owning stop, synchronous bindings leave on every return, retries release the actual physical prefix, and stopped source cursor/body/destructor causes remain unchanged. Owning manager construction now also accepts an explicit private unsynchronized RationalManager distinct from global diagnostics, matching the AST wrapper numeral owner. Remaining work includes broader callback/failure composition and the owning AST algebraic wrapper/ID translation consumer. This partial method does not claim that arith_decl_plugin translation or the whole algebraic/polynomial/AST port is complete."
         },
         {
-          "name": "Root/SMT2/Mathematica display cached m_i lookup and packed-word publication cpp2648-2654,2666-2672,2698-2704; broader display audit remains open",
+          "name": "Root/SMT2/Mathematica display cached m_i lookup and packed-word publication cpp2648-2654,2666-2672,2698-2704; actual root-display invocation receipts and basic coefficient source continuation under trace borrow; broader display audit remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_display_root.go",
           "go_targets": [
@@ -39045,7 +39055,9 @@
             "TestAlgebraicDisplayIndexMissUsesOnlyLowerAndPublishesFlags",
             "TestAlgebraicCachedDisplayIndexReadsOnlyPackedFlags",
             "TestAlgebraicDisplayIndexFlagReadPrecedesAssertionSwitch",
-            "TestAlgebraicMathematicaRationalsRootsAndSharedCache"
+            "TestAlgebraicMathematicaRationalsRootsAndSharedCache",
+            "TestAlgebraicRootTraceDisplayReceiptRejectsLaterInvocation",
+            "TestAlgebraicFilterRootTraceRetainsActualDisplayAndVector"
           ],
           "notes": "The cached branch reads only actual offset16 packed m_i/flags, preserving all low bits and reaching the runtime assertion switch after the word read. Raw-prefix tests leave every other root word uninitialized and supply no polynomial view. A cache miss now decodes only the lower endpoint, uses the already supplied polynomial view for actual get_root_id, and publishes only the packed word instead of rewriting the whole record. Raw-prefix miss coverage leaves stored polynomial/size and the entire opposite bound uninitialized while verifying the actual sqrt(2) index and preserved low flag bits. A concrete encoded-lower entry now performs actual Sturm construction and minus-infinity variations before decoding the endpoint, sharing the existing lower-evaluation engine and exact root-ID receipt. Real immediate cancellation precedes missing lower bytes and publishes no index. Remaining whole-display scalar/stream and cold-path ownership audits are not promoted."
         },
@@ -39323,7 +39335,7 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:2268-2451,2879-2881 multivariate root isolation including both vanished-resultant recovery branches and tracked entry/rational-substitution/resultant/branch TRACE records; root-output/recovery/filter diagnostics and full failure audit remain open",
+          "name": "algebraic_numbers.cpp:2234-2451,2879-2881 multivariate isolation and conjugate filtering including both vanished-resultant recovery branches and all source isolation/filter TRACE records with accepted root-display receipts; full source failure audit remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_isolation_multivariate.go",
           "tests": [
@@ -39337,7 +39349,13 @@
             "TestAlgebraicMultivariateIsolationTraceResultantFrontier",
             "TestAlgebraicMultivariateIsolationTraceBranchRecords",
             "TestAlgebraicMultivariateIsolationTraceDisabledSkipsOperands",
-            "TestAlgebraicMultivariateIsolationSubstitutionTraceOwnsStoppedDisplay"
+            "TestAlgebraicMultivariateIsolationSubstitutionTraceOwnsStoppedDisplay",
+            "TestAlgebraicFilterRootsTraceSourceOrderAndPublication",
+            "TestAlgebraicFilterTraceDisabledSkipsOperands",
+            "TestAlgebraicFilterRootTraceRetainsActualDisplayAndVector",
+            "TestAlgebraicRootTraceDisplayReceiptRejectsLaterInvocation",
+            "TestAlgebraicMultivariateIsolationRecoveryRootTraceRecords",
+            "TestAlgebraicMultivariateIsolationRecoveryTraceRetainsRootDisplay"
           ]
         },
         {
@@ -39620,7 +39638,11 @@
         "pkg/util/numeral/mpbq_root_invocation_test.go",
         "pkg/math/polynomial/algebraic_unary_root_source_test.go",
         "pkg/math/polynomial/algebraic_isolation_multivariate_trace.go",
-        "pkg/math/polynomial/algebraic_isolation_multivariate_trace_test.go"
+        "pkg/math/polynomial/algebraic_isolation_multivariate_trace_test.go",
+        "pkg/math/polynomial/algebraic_filter_roots_trace.go",
+        "pkg/math/polynomial/algebraic_filter_roots_trace_test.go",
+        "pkg/math/polynomial/algebraic_root_display_invocation.go",
+        "pkg/math/polynomial/algebraic_root_display_invocation_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -39794,7 +39816,13 @@
         "TestAlgebraicMultivariateIsolationTraceResultantFrontier",
         "TestAlgebraicMultivariateIsolationTraceBranchRecords",
         "TestAlgebraicMultivariateIsolationTraceDisabledSkipsOperands",
-        "TestAlgebraicMultivariateIsolationSubstitutionTraceOwnsStoppedDisplay"
+        "TestAlgebraicMultivariateIsolationSubstitutionTraceOwnsStoppedDisplay",
+        "TestAlgebraicFilterRootsTraceSourceOrderAndPublication",
+        "TestAlgebraicFilterTraceDisabledSkipsOperands",
+        "TestAlgebraicFilterRootTraceRetainsActualDisplayAndVector",
+        "TestAlgebraicRootTraceDisplayReceiptRejectsLaterInvocation",
+        "TestAlgebraicMultivariateIsolationRecoveryRootTraceRecords",
+        "TestAlgebraicMultivariateIsolationRecoveryTraceRetainsRootDisplay"
       ],
       "conditionals": [
         {
@@ -39877,7 +39905,7 @@
           "notes": "CopyFromCore now implements the concrete distinct-core zero/basic/root set branches, including root-to-basic deletion before the const scoped-mpq construction, NUM then DEN cross-owner SET, original destination allocation/publication order, recorded coefficient extent, receiving interval assertion/lower/upper SET, and packed flag copying without normalization. Source core and both univariate owners remain borrowed across stopped invocations until exact receiving copy/shift/cell allocation and scoped-rational cleanup completes. Synchronous integer/natural bindings exclude numeral owner destruction during actual allocation/cleanup callbacks. Nine branch combinations, independent BIG coefficients/basic NUM/DEN, every reached reservation prefix through success, actual TLS allocation callback refusal, and full owning-source manager lifetime are covered. The owning-source manager closes successfully after copy and the receiving value remains readable. Same-core calls delegate existing Copy. The integrated checked interval assertion now has a real descriptor-after-physical shift refusal with a full eight-cell receiver: all coefficients finish, no interval endpoint is assigned, source borrow stays live, and owning cleanup releases the exact shift backing. An independent replacement allocation and its issued copy receipt remain untouched by algebraic cleanup. The ordinary profile verifies assertion erasure and no exponent-alignment scratch use. A qualified LP64 public-realloc TLS fixture now reaches a mutable destination SET refusal after both foreign local-q fields copied, then a stopped literal NUM destructor and a separate owning cleanup stop. Both core lifetimes remain excluded in the SET callback; the source borrow survives the owning stop, synchronous bindings leave on every return, retries release the actual physical prefix, and stopped source cursor/body/destructor causes remain unchanged. Owning manager construction now also accepts an explicit private unsynchronized RationalManager distinct from global diagnostics, matching the AST wrapper numeral owner. Remaining work includes broader callback/failure composition and the owning AST algebraic wrapper/ID translation consumer. This partial method does not claim that arith_decl_plugin translation or the whole algebraic/polynomial/AST port is complete."
         },
         {
-          "name": "Root/SMT2/Mathematica display cached m_i lookup and packed-word publication cpp2648-2654,2666-2672,2698-2704; broader display audit remains open",
+          "name": "Root/SMT2/Mathematica display cached m_i lookup and packed-word publication cpp2648-2654,2666-2672,2698-2704; actual root-display invocation receipts and basic coefficient source continuation under trace borrow; broader display audit remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_display_root.go",
           "go_targets": [
@@ -39892,7 +39920,9 @@
             "TestAlgebraicDisplayIndexMissUsesOnlyLowerAndPublishesFlags",
             "TestAlgebraicCachedDisplayIndexReadsOnlyPackedFlags",
             "TestAlgebraicDisplayIndexFlagReadPrecedesAssertionSwitch",
-            "TestAlgebraicMathematicaRationalsRootsAndSharedCache"
+            "TestAlgebraicMathematicaRationalsRootsAndSharedCache",
+            "TestAlgebraicRootTraceDisplayReceiptRejectsLaterInvocation",
+            "TestAlgebraicFilterRootTraceRetainsActualDisplayAndVector"
           ],
           "notes": "The cached branch reads only actual offset16 packed m_i/flags, preserving all low bits and reaching the runtime assertion switch after the word read. Raw-prefix tests leave every other root word uninitialized and supply no polynomial view. A cache miss now decodes only the lower endpoint, uses the already supplied polynomial view for actual get_root_id, and publishes only the packed word instead of rewriting the whole record. Raw-prefix miss coverage leaves stored polynomial/size and the entire opposite bound uninitialized while verifying the actual sqrt(2) index and preserved low flag bits. A concrete encoded-lower entry now performs actual Sturm construction and minus-infinity variations before decoding the endpoint, sharing the existing lower-evaluation engine and exact root-ID receipt. Real immediate cancellation precedes missing lower bytes and publishes no index. Remaining whole-display scalar/stream and cold-path ownership audits are not promoted."
         },
@@ -40131,7 +40161,7 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:2268-2451,2879-2881 multivariate root isolation including both vanished-resultant recovery branches and tracked entry/rational-substitution/resultant/branch TRACE records; root-output/recovery/filter diagnostics and full failure audit remain open",
+          "name": "algebraic_numbers.cpp:2234-2451,2879-2881 multivariate isolation and conjugate filtering including both vanished-resultant recovery branches and all source isolation/filter TRACE records with accepted root-display receipts; full source failure audit remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_isolation_multivariate.go",
           "tests": [
@@ -40145,7 +40175,13 @@
             "TestAlgebraicMultivariateIsolationTraceResultantFrontier",
             "TestAlgebraicMultivariateIsolationTraceBranchRecords",
             "TestAlgebraicMultivariateIsolationTraceDisabledSkipsOperands",
-            "TestAlgebraicMultivariateIsolationSubstitutionTraceOwnsStoppedDisplay"
+            "TestAlgebraicMultivariateIsolationSubstitutionTraceOwnsStoppedDisplay",
+            "TestAlgebraicFilterRootsTraceSourceOrderAndPublication",
+            "TestAlgebraicFilterTraceDisabledSkipsOperands",
+            "TestAlgebraicFilterRootTraceRetainsActualDisplayAndVector",
+            "TestAlgebraicRootTraceDisplayReceiptRejectsLaterInvocation",
+            "TestAlgebraicMultivariateIsolationRecoveryRootTraceRecords",
+            "TestAlgebraicMultivariateIsolationRecoveryTraceRetainsRootDisplay"
           ]
         },
         {

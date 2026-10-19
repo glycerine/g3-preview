@@ -10,6 +10,7 @@ import (
 )
 
 type algebraicRootDisplayScope struct {
+	invocation      uint64
 	display         upolyDisplayInvocationReceipt
 	sourceStop      error
 	rootID          upolyRootIDInvocationReceipt
@@ -104,6 +105,9 @@ func (m *AlgebraicRootCore) displayRootInto(out unumeral.RationalSourceStream, a
 	return m.displayRootAtLocation(out, l, smt)
 }
 func (m *AlgebraicRootCore) displayRootAtLocation(out unumeral.RationalSourceStream, l *algebraicLocation, smt bool) (cause error) {
+	return m.displayRootAtLocationWithReceipt(out, l, smt, nil)
+}
+func (m *AlgebraicRootCore) displayRootAtLocationWithReceipt(out unumeral.RationalSourceStream, l *algebraicLocation, smt bool, receipt *algebraicRootDisplayInvocationReceipt) (cause error) {
 	var e error
 	if m.rootDisplay.active {
 		return ErrAlgebraicPending
@@ -121,7 +125,13 @@ func (m *AlgebraicRootCore) displayRootAtLocation(out unumeral.RationalSourceStr
 	p := m.config.Polynomials
 	var view UPolynomialView
 	s := &m.rootDisplay
-	*s = algebraicRootDisplayScope{active: true, running: true}
+	if s.invocation == ^uint64(0) {
+		return arena.ErrBounds
+	}
+	*s = algebraicRootDisplayScope{invocation: s.invocation + 1, active: true, running: true}
+	if receipt != nil {
+		*receipt = algebraicRootDisplayInvocationReceipt{m, s.invocation}
+	}
 	defer func() {
 		s.running = false
 		cleanup := m.finishRootDisplay(false)
@@ -141,7 +151,7 @@ func (m *AlgebraicRootCore) displayRootAtLocation(out unumeral.RationalSourceStr
 		}
 		// The two source dup coefficients have actual independent numeral fields.
 		// Native UP storage supplies their checked view without container emulation.
-		s.coefficients, e = p.NewPolynomial()
+		s.coefficients, e = m.newRootDisplayPolynomial()
 		if e != nil {
 			return e
 		}
@@ -258,4 +268,29 @@ func (m *AlgebraicRootCore) displayRootIDAtLower(l *algebraicLocation, view UPol
 	}
 	lower := unumeral.BinaryRationalFromBorrowedNumeral(algebraicWordsInt(words[:3]), words[3])
 	return q.evaluateLower(&lower, s0)
+}
+
+// Basic root rendering owns two source duplicate coefficients. Its accepted
+// trace body may construct/destroy this local while public UP mutation remains
+// forbidden across header/body/footer callbacks.
+func (m *AlgebraicRootCore) rootDisplayPolynomialSourceAllowed() bool {
+	p := m.config.Polynomials
+	return m.rootTrace.running && p.factorTrace == &m.rootTrace.borrow && !p.factorTrace.callback()
+}
+func (m *AlgebraicRootCore) newRootDisplayPolynomial() (UPolynomial, error) {
+	p := m.config.Polynomials
+	if !m.rootDisplay.running {
+		return UPolynomial{}, ErrAlgebraicPending
+	}
+	if m.rootDisplayPolynomialSourceAllowed() {
+		return p.newPolynomial()
+	}
+	return p.NewPolynomial()
+}
+func (m *AlgebraicRootCore) delRootDisplayPolynomial() error {
+	p := m.config.Polynomials
+	if m.rootDisplayPolynomialSourceAllowed() {
+		return p.delPolynomial(&m.rootDisplay.coefficients)
+	}
+	return p.DelPolynomial(&m.rootDisplay.coefficients)
 }

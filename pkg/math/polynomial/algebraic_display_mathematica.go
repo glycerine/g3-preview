@@ -22,7 +22,10 @@ func (m *AlgebraicRootCore) DisplayMathematicaInto(out unumeral.RationalSourceSt
 	if s.active {
 		return ErrAlgebraicPending
 	}
-	*s = algebraicRootDisplayScope{active: true, running: true}
+	if s.invocation == ^uint64(0) {
+		return arena.ErrBounds
+	}
+	*s = algebraicRootDisplayScope{invocation: s.invocation + 1, active: true, running: true}
 	defer func() { s.running = false; cause = errors.Join(cause, m.finishRootDisplay(false)) }()
 	q := unumeral.NewRational()
 	var r algebraicRecord
