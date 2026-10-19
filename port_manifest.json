@@ -44875,7 +44875,7 @@
           ]
         },
         {
-          "name": "Selected reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition and matched younger constant destructor/source-owning result cleanup",
+          "name": "Selected reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition, cpp4655-4872 assertion actions, and matched younger constant destructor/source-owning result cleanup; complete suffix audit remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_composition.go",
           "tests": [
@@ -44899,7 +44899,8 @@
             "TestPolynomialCompositionReciprocalAndVariableOrders",
             "TestPolynomialCompositionIndependentFiniteAndAliases",
             "TestPolynomialCompositionNativeDegreeCacheNoRuntimeGrowth",
-            "TestPolynomialCompositionNativeDegreeCacheSparseHornerReuse"
+            "TestPolynomialCompositionNativeDegreeCacheSparseHornerReuse",
+            "TestPolynomialCompositionSourceAssertionActions"
           ]
         },
         {
@@ -49089,7 +49090,7 @@
           ]
         },
         {
-          "name": "Selected reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition and matched younger constant destructor/source-owning result cleanup",
+          "name": "Selected reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition, cpp4655-4872 assertion actions, and matched younger constant destructor/source-owning result cleanup; complete suffix audit remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_composition.go",
           "tests": [
@@ -49111,7 +49112,8 @@
             "TestPolynomialCompositionStoppedConstantResultHasSingleOwningCleanup",
             "TestPolynomialCompositionDormantOriginal",
             "TestPolynomialCompositionReciprocalAndVariableOrders",
-            "TestPolynomialCompositionIndependentFiniteAndAliases"
+            "TestPolynomialCompositionIndependentFiniteAndAliases",
+            "TestPolynomialCompositionSourceAssertionActions"
           ]
         },
         {
@@ -124057,7 +124059,7 @@
           ]
         },
         {
-          "name": "Selected reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition and matched younger constant destructor/source-owning result cleanup",
+          "name": "Selected reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition, cpp4655-4872 assertion actions, and matched younger constant destructor/source-owning result cleanup; complete suffix audit remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_composition.go",
           "tests": [
@@ -124079,7 +124081,8 @@
             "TestPolynomialCompositionStoppedConstantResultHasSingleOwningCleanup",
             "TestPolynomialCompositionDormantOriginal",
             "TestPolynomialCompositionReciprocalAndVariableOrders",
-            "TestPolynomialCompositionIndependentFiniteAndAliases"
+            "TestPolynomialCompositionIndependentFiniteAndAliases",
+            "TestPolynomialCompositionSourceAssertionActions"
           ]
         },
         {

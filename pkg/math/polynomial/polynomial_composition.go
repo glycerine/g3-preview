@@ -195,29 +195,16 @@ func (m *MultivariatePolynomialManager) compositionAdd(a *unumeral.Int, t Monomi
 	}
 	return e
 }
-func (m *MultivariatePolynomialManager) compositionCheapReady() error {
-	if polynomialSourceDebug {
+func (m *MultivariatePolynomialManager) compositionCheapReady(line int32) error {
+	return polynomialCompositionSourceAssert(line, "m_cheap_som_buffer.empty()", func() (bool, error) {
 		n, e := m.core.cheap.ms.size(m.core)
-		if e != nil {
-			return e
-		}
-		if n != 0 {
-			return ErrPolynomialAssertion
-		}
-	}
-	return nil
+		return n == 0, e
+	})
 }
-func (m *MultivariatePolynomialManager) compositionUnivariate(p Polynomial) error {
-	if polynomialSourceDebug {
-		yes, e := m.core.IsUnivariate(p)
-		if e != nil {
-			return e
-		}
-		if !yes {
-			return ErrPolynomialAssertion
-		}
-	}
-	return nil
+func (m *MultivariatePolynomialManager) compositionUnivariate(p Polynomial, line int32) error {
+	return polynomialCompositionSourceAssert(line, "is_univariate(p)", func() (bool, error) {
+		return m.core.IsUnivariate(p)
+	})
 }
 func (m *MultivariatePolynomialManager) compositionCheapResult() (Polynomial, error) {
 	p, e := m.core.cheap.mk(false)
@@ -231,7 +218,7 @@ func (m *MultivariatePolynomialManager) ComposeReciprocal(p Polynomial) (result 
 	if e := m.ready(); e != nil {
 		return Polynomial{}, e
 	}
-	if e := m.compositionUnivariate(p); e != nil {
+	if e := m.compositionUnivariate(p, 4655); e != nil {
 		return Polynomial{}, e
 	}
 	constant, e := m.core.IsConstant(p)
@@ -241,7 +228,7 @@ func (m *MultivariatePolynomialManager) ComposeReciprocal(p Polynomial) (result 
 	if constant {
 		return p, nil
 	}
-	if e = m.compositionCheapReady(); e != nil {
+	if e = m.compositionCheapReady(4658); e != nil {
 		return Polynomial{}, e
 	}
 	x, e := m.core.MaxVariable(p)
@@ -265,14 +252,11 @@ func (m *MultivariatePolynomialManager) ComposeReciprocal(p Polynomial) (result 
 		if e != nil {
 			return Polynomial{}, e
 		}
-		if polynomialSourceDebug {
+		if e = polynomialCompositionSourceAssert(4664, "m->size() <= 1", func() (bool, error) {
 			sz, e := m.core.monomials.sizeCore(t)
-			if e != nil {
-				return Polynomial{}, e
-			}
-			if sz > 1 {
-				return Polynomial{}, ErrPolynomialAssertion
-			}
+			return sz <= 1, e
+		}); e != nil {
+			return Polynomial{}, e
 		}
 		k, e := m.core.monomials.DegreeOf(t, x)
 		if e != nil {
@@ -296,17 +280,14 @@ func (m *MultivariatePolynomialManager) ComposeXDivY(p Polynomial, y uint32) (re
 	if e := m.ready(); e != nil {
 		return Polynomial{}, e
 	}
-	if e := m.compositionUnivariate(p); e != nil {
+	if e := m.compositionUnivariate(p, 4677); e != nil {
 		return Polynomial{}, e
 	}
-	if polynomialSourceDebug {
+	if e := polynomialCompositionSourceAssert(4678, "max_var(p) != y", func() (bool, error) {
 		x, e := m.core.MaxVariable(p)
-		if e != nil {
-			return Polynomial{}, e
-		}
-		if x == y {
-			return Polynomial{}, ErrPolynomialAssertion
-		}
+		return x != y, e
+	}); e != nil {
+		return Polynomial{}, e
 	}
 	constant, e := m.core.IsConstant(p)
 	if e != nil {
@@ -315,7 +296,7 @@ func (m *MultivariatePolynomialManager) ComposeXDivY(p Polynomial, y uint32) (re
 	if constant {
 		return p, nil
 	}
-	if e = m.compositionCheapReady(); e != nil {
+	if e = m.compositionCheapReady(4681); e != nil {
 		return Polynomial{}, e
 	}
 	x, e := m.core.MaxVariable(p)
@@ -384,10 +365,12 @@ func (m *MultivariatePolynomialManager) ComposeVariable(p Polynomial, y uint32) 
 	if e := m.ready(); e != nil {
 		return Polynomial{}, e
 	}
-	if polynomialSourceDebug && y >= m.core.monomials.nextVar {
-		return Polynomial{}, ErrPolynomialAssertion
+	if e := polynomialCompositionSourceAssert(4704, "is_valid(y)", func() (bool, error) {
+		return y < m.core.monomials.nextVar, nil
+	}); e != nil {
+		return Polynomial{}, e
 	}
-	if e := m.compositionUnivariate(p); e != nil {
+	if e := m.compositionUnivariate(p, 4705); e != nil {
 		return Polynomial{}, e
 	}
 	x, e := m.core.MaxVariable(p)
@@ -404,7 +387,7 @@ func (m *MultivariatePolynomialManager) ComposeVariable(p Polynomial, y uint32) 
 	if constant {
 		return p, nil
 	}
-	if e = m.compositionCheapReady(); e != nil {
+	if e = m.compositionCheapReady(4708); e != nil {
 		return Polynomial{}, e
 	}
 	size, e := m.core.readWord(p, 8)
@@ -420,14 +403,11 @@ func (m *MultivariatePolynomialManager) ComposeVariable(p Polynomial, y uint32) 
 		if e != nil {
 			return Polynomial{}, e
 		}
-		if polynomialSourceDebug {
+		if e = polynomialCompositionSourceAssert(4712, "m->size() <= 1", func() (bool, error) {
 			n, e := m.core.monomials.sizeCore(t)
-			if e != nil {
-				return Polynomial{}, e
-			}
-			if n > 1 {
-				return Polynomial{}, ErrPolynomialAssertion
-			}
+			return n <= 1, e
+		}); e != nil {
+			return Polynomial{}, e
 		}
 		sz, e := m.core.monomials.sizeCore(t)
 		if e != nil {
@@ -458,7 +438,7 @@ func (m *MultivariatePolynomialManager) ComposeMinusX(p Polynomial) (result Poly
 	if e := m.ready(); e != nil {
 		return Polynomial{}, e
 	}
-	if e := m.compositionUnivariate(p); e != nil {
+	if e := m.compositionUnivariate(p, 4724); e != nil {
 		return Polynomial{}, e
 	}
 	constant, e := m.core.IsConstant(p)
@@ -468,7 +448,7 @@ func (m *MultivariatePolynomialManager) ComposeMinusX(p Polynomial) (result Poly
 	if constant {
 		return p, nil
 	}
-	if e = m.compositionCheapReady(); e != nil {
+	if e = m.compositionCheapReady(4727); e != nil {
 		return Polynomial{}, e
 	}
 	if e = m.beginComposition(); e != nil {
@@ -533,7 +513,7 @@ func (m *MultivariatePolynomialManager) compositionDegreePosition(i uint32) (uin
 	return m.degree2pos[i], nil
 }
 func (m *MultivariatePolynomialManager) saveCompositionDegrees(p Polynomial) error {
-	if e := m.compositionUnivariate(p); e != nil {
+	if e := m.compositionUnivariate(p, 4748); e != nil {
 		return e
 	}
 	x, e := m.core.MaxVariable(p)
@@ -554,25 +534,21 @@ func (m *MultivariatePolynomialManager) saveCompositionDegrees(p Polynomial) err
 		if e != nil {
 			return e
 		}
-		if polynomialSourceDebug {
+		if e = polynomialCompositionSourceAssert(4755, "m->size() <= 1", func() (bool, error) {
 			sz, e := m.core.monomials.sizeCore(t)
-			if e != nil {
-				return e
-			}
-			if sz > 1 {
-				return ErrPolynomialAssertion
-			}
+			return sz <= 1, e
+		}); e != nil {
+			return e
+		}
+		if e = polynomialCompositionSourceAssert(4756, "m_degree2pos[m->total_degree()] == UINT_MAX", func() (bool, error) {
 			d, e := m.core.monomials.degreeCore(t)
 			if e != nil {
-				return e
+				return false, e
 			}
 			pos, e := m.compositionDegreePosition(d)
-			if e != nil {
-				return e
-			}
-			if pos != ^uint32(0) {
-				return ErrPolynomialAssertion
-			}
+			return pos == ^uint32(0), e
+		}); e != nil {
+			return e
 		}
 		d, e := m.core.monomials.degreeCore(t)
 		if e != nil {
@@ -587,7 +563,7 @@ func (m *MultivariatePolynomialManager) saveCompositionDegrees(p Polynomial) err
 	return nil
 }
 func (m *MultivariatePolynomialManager) resetCompositionDegrees(p Polynomial) error {
-	if e := m.compositionUnivariate(p); e != nil {
+	if e := m.compositionUnivariate(p, 4765); e != nil {
 		return e
 	}
 	size, e := m.core.readWord(p, 8)
@@ -599,25 +575,21 @@ func (m *MultivariatePolynomialManager) resetCompositionDegrees(p Polynomial) er
 		if e != nil {
 			return e
 		}
-		if polynomialSourceDebug {
+		if e = polynomialCompositionSourceAssert(4769, "m->size() <= 1", func() (bool, error) {
 			sz, e := m.core.monomials.sizeCore(t)
-			if e != nil {
-				return e
-			}
-			if sz > 1 {
-				return ErrPolynomialAssertion
-			}
+			return sz <= 1, e
+		}); e != nil {
+			return e
+		}
+		if e = polynomialCompositionSourceAssert(4770, "m_degree2pos[m->total_degree()] == i", func() (bool, error) {
 			d, e := m.core.monomials.degreeCore(t)
 			if e != nil {
-				return e
+				return false, e
 			}
 			pos, e := m.compositionDegreePosition(d)
-			if e != nil {
-				return e
-			}
-			if pos != i {
-				return ErrPolynomialAssertion
-			}
+			return pos == i, e
+		}); e != nil {
+			return e
 		}
 		d, e := m.core.monomials.degreeCore(t)
 		if e != nil {
@@ -654,7 +626,7 @@ func (m *MultivariatePolynomialManager) compositionAssignLocal(p Polynomial) err
 	return e
 }
 func (m *MultivariatePolynomialManager) composeBody(p, q Polynomial, r *PolynomialRef) error {
-	if e := m.compositionUnivariate(p); e != nil {
+	if e := m.compositionUnivariate(p, 4799); e != nil {
 		return e
 	}
 	constant, e := m.core.IsConstant(p)
@@ -743,7 +715,7 @@ func (m *MultivariatePolynomialManager) Compose(p, q Polynomial, r *PolynomialRe
 	if e := m.compositionOutput(r); e != nil {
 		return e
 	}
-	if e := m.compositionUnivariate(p); e != nil {
+	if e := m.compositionUnivariate(p, 4799); e != nil {
 		return e
 	}
 	constant, e := m.core.IsConstant(p)
@@ -815,10 +787,12 @@ func (m *MultivariatePolynomialManager) ComposeXMinusY(p Polynomial, y uint32, r
 	if e := m.compositionOutput(r); e != nil {
 		return e
 	}
-	if polynomialSourceDebug && y >= m.core.monomials.nextVar {
-		return ErrPolynomialAssertion
+	if e := polynomialCompositionSourceAssert(4830, "is_valid(y)", func() (bool, error) {
+		return y < m.core.monomials.nextVar, nil
+	}); e != nil {
+		return e
 	}
-	if e := m.compositionUnivariate(p); e != nil {
+	if e := m.compositionUnivariate(p, 4831); e != nil {
 		return e
 	}
 	x, e := m.core.MaxVariable(p)
@@ -870,10 +844,12 @@ func (m *MultivariatePolynomialManager) ComposeXPlusY(p Polynomial, y uint32, r 
 	if e := m.compositionOutput(r); e != nil {
 		return e
 	}
-	if polynomialSourceDebug && y >= m.core.monomials.nextVar {
-		return ErrPolynomialAssertion
+	if e := polynomialCompositionSourceAssert(4850, "is_valid(y)", func() (bool, error) {
+		return y < m.core.monomials.nextVar, nil
+	}); e != nil {
+		return e
 	}
-	if e := m.compositionUnivariate(p); e != nil {
+	if e := m.compositionUnivariate(p, 4851); e != nil {
 		return e
 	}
 	x, e := m.core.MaxVariable(p)
@@ -901,7 +877,7 @@ func (m *MultivariatePolynomialManager) ComposeXMinusConstant(p Polynomial, a *u
 	if e := m.compositionOutput(r); e != nil {
 		return e
 	}
-	if e := m.compositionUnivariate(p); e != nil {
+	if e := m.compositionUnivariate(p, 4872); e != nil {
 		return e
 	}
 	zero, e := m.core.modular.IsZero(a)
