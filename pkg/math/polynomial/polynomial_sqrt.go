@@ -325,6 +325,11 @@ func (m *MultivariatePolynomialManager) sqrtWithReceipt(p Polynomial, r *Polynom
 	if r == nil || r.self != r || r.owner != m.core || r.closed || r.closing {
 		return false, ErrPolynomialOwner
 	}
+	if e := polynomialSqrtSourceAssert(5965, "p != 0", func() (bool, error) {
+		return p != (Polynomial{}), nil
+	}); e != nil {
+		return false, e
+	}
 	c := m.core
 	n, e := c.readWord(p, 8)
 	if e != nil {
@@ -365,8 +370,10 @@ func (m *MultivariatePolynomialManager) sqrtWithReceipt(p Polynomial, r *Polynom
 	if e != nil {
 		return false, e
 	}
-	if polynomialSourceDebug && !ok {
-		return false, ErrPolynomialAssertion
+	if e = polynomialSqrtSourceAssert(6006, "m1 != 0", func() (bool, error) {
+		return ok, nil
+	}); e != nil {
+		return false, e
 	}
 	R, C := &c.som, &c.som2
 	if e = R.reset(); e != nil {

@@ -44966,8 +44966,8 @@
           ]
         },
         {
-          "name": "Selected sqrt cpp5954-6068/7284-7286 quick checks, persistent R/C SOM loop, checkpoints, exact result transfer and scoped destruction; dormant source assertions",
-          "status": "partial",
+          "name": "Complete sqrt cpp5954-6068/7284-7286: source assertion actions, quick checks, persistent R/C SOM loop, checkpoints, exact result transfer and scoped destruction",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_sqrt.go",
           "tests": [
             "TestPolynomialSqrtDormantOriginal",
@@ -44982,7 +44982,8 @@
             "TestPolynomialSqrtFinalFactoryPostphysicalRaw",
             "TestPolynomialSqrtEveryCheckpointFrontier",
             "TestPolynomialSqrtSourceAuxStopKeepsOlderFields",
-            "TestPolynomialSqrtDeletionCallbackForeignRootsStayCallerOwned"
+            "TestPolynomialSqrtDeletionCallbackForeignRootsStayCallerOwned",
+            "TestPolynomialSqrtSourceAssertionActions"
           ]
         },
         {
@@ -124090,8 +124091,8 @@
           ]
         },
         {
-          "name": "Selected sqrt cpp5954-6068/7284-7286 quick checks, persistent R/C SOM loop, checkpoints, exact result transfer and scoped destruction; dormant source assertions",
-          "status": "partial",
+          "name": "Complete sqrt cpp5954-6068/7284-7286: source assertion actions, quick checks, persistent R/C SOM loop, checkpoints, exact result transfer and scoped destruction",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_sqrt.go",
           "tests": [
             "TestPolynomialSqrtDormantOriginal",
@@ -124106,7 +124107,8 @@
             "TestPolynomialSqrtFinalFactoryPostphysicalRaw",
             "TestPolynomialSqrtEveryCheckpointFrontier",
             "TestPolynomialSqrtSourceAuxStopKeepsOlderFields",
-            "TestPolynomialSqrtDeletionCallbackForeignRootsStayCallerOwned"
+            "TestPolynomialSqrtDeletionCallbackForeignRootsStayCallerOwned",
+            "TestPolynomialSqrtSourceAssertionActions"
           ]
         },
         {
