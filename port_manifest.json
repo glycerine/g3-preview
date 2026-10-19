@@ -45222,8 +45222,8 @@
           ]
         },
         {
-          "name": "peek_fresh_value cpp4053-4068: actual shared source rand stream, source modulus behavior and occupied-degree traversal",
-          "status": "partial",
+          "name": "Complete peek_fresh cpp4053-4068 with shared source rand stream, source modulus behavior and occupied-value traversal",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_random.go",
           "tests": [
             "TestPolynomialFreshValueUsesSharedLibcStreamAndRejectsUsedInputs",
