@@ -280,8 +280,10 @@ func (m *MultivariatePolynomialCore) TranslateVariables(p Polynomial, xs *Polyno
 	if e != nil {
 		return e
 	}
-	if polynomialSourceDebug && uint64(n) != uint64(len(vs)) {
-		return ErrPolynomialAssertion
+	if e = polynomialTranslateSourceAssert(999, "xs.size() == vs.size()", func() (bool, error) {
+		return uint64(n) == uint64(len(vs)), nil
+	}); e != nil {
+		return e
 	}
 	return m.TranslateMany(p, n, variableView(xs), vs, r)
 }

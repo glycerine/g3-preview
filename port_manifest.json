@@ -44761,8 +44761,8 @@
           ]
         },
         {
-          "name": "Selected coeffs3282-3291 and scalar/array translate6865-6895, vector wrapper h998-1000: actual persistent coefficient vector, lexical monomial_ref, completed source cleanup and exact owning continuation; actual public forwarding cpp7392-7398",
-          "status": "partial",
+          "name": "Complete coeffs cpp3282-3291 and scalar/array translate cpp6865-6895, vector wrapper h998-1000 and public forwarding cpp7392-7398 with assertion actions and exact source/owning continuation",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_translate.go",
           "tests": [
             "TestPolynomialTranslateIndependentMultivariableIdentity",
@@ -44779,7 +44779,8 @@
             "TestPolynomialTranslateIndependentFiniteGrid",
             "TestPolynomialTranslateWrapperColdOwnerBeforeReads",
             "TestPolynomialTranslateImpEveryReservationAndLexSort",
-            "TestPolynomialTranslateImpArrayAndVectorFacade"
+            "TestPolynomialTranslateImpArrayAndVectorFacade",
+            "TestPolynomialTranslateSourceAssertionActions"
           ]
         },
         {
@@ -48992,8 +48993,8 @@
           ]
         },
         {
-          "name": "Selected coeffs3282-3291 and scalar/array translate6865-6895, vector wrapper h998-1000: actual persistent coefficient vector, lexical monomial_ref, completed source cleanup and exact owning continuation; actual public forwarding cpp7392-7398",
-          "status": "partial",
+          "name": "Complete coeffs cpp3282-3291 and scalar/array translate cpp6865-6895, vector wrapper h998-1000 and public forwarding cpp7392-7398 with assertion actions and exact source/owning continuation",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_translate.go",
           "tests": [
             "TestPolynomialTranslateIndependentMultivariableIdentity",
@@ -49010,7 +49011,8 @@
             "TestPolynomialTranslateIndependentFiniteGrid",
             "TestPolynomialTranslateWrapperColdOwnerBeforeReads",
             "TestPolynomialTranslateImpEveryReservationAndLexSort",
-            "TestPolynomialTranslateImpArrayAndVectorFacade"
+            "TestPolynomialTranslateImpArrayAndVectorFacade",
+            "TestPolynomialTranslateSourceAssertionActions"
           ]
         },
         {

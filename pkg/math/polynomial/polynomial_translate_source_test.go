@@ -182,6 +182,7 @@ func TestPolynomialTranslateManyEveryReservationPrefix(t *testing.T) {
 }
 
 func TestPolynomialTranslateCapturedVariablesAndWrapperProfiles(t *testing.T) {
+	polynomialThrowAssertionFixture(t)
 	m := polynomialCellFixture(t)
 	p := polynomialQueryTerms(t, m, []int32{1, 5}, [][]MonomialPower{{{0, 1}}, nil})
 	out, e := NewPolynomialRef(m)
