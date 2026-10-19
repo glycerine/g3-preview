@@ -119,6 +119,9 @@ func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitiveWithRe
 		cause = errors.Join(cause, m.finishGCDFunctionSource(s))
 		c.pscLeave()
 	}()
+	if e = m.traceQuadraticEntry(p, r, s); e != nil {
+		return e
+	}
 	for i := uint8(0); i < 3; i++ {
 		s.constructReference(c, i)
 	}
@@ -130,6 +133,9 @@ func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitiveWithRe
 		if e = s.refs[i].root.assignWithFactoryReceipt(c, a, &s.quadraticFactory[i]); e != nil {
 			return e
 		}
+	}
+	if e = m.traceQuadraticCoefficients(r, s); e != nil {
+		return e
 	}
 	if e = polynomialFactorSourceAssert(6615, "!is_zero(a)", func() (bool, error) {
 		zero, e := c.IsZero(s.refs[0].root.value)
@@ -206,6 +212,9 @@ func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitiveWithRe
 		return e
 	}
 	s.constructReference(c, 6)
+	if e = m.traceQuadraticReference(r, s, 6636, "disc: ", s.refs[5].root.value); e != nil {
+		return e
+	}
 	square, e := m.sqrtWithReceipt(s.refs[5].root.value, &s.refs[6], &s.quadraticSqrt)
 	if e != nil {
 		return e
@@ -236,6 +245,9 @@ func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitiveWithRe
 		if e = m.finishGCDLocalsTo(s, frontier); e != nil {
 			return e
 		}
+	}
+	if e = m.traceQuadraticReference(r, s, 6652, "disc_sqrt: ", s.refs[6].root.value); e != nil {
+		return e
 	}
 	s.nums[9] = unumeral.Int{}
 	if e = c.modular.SetInt32(&s.nums[9], 2); e != nil {
@@ -283,10 +295,16 @@ func (m *MultivariatePolynomialManager) factorQuadraticSquareFreePrimitiveWithRe
 	if e = s.refs[8].root.assign(c, a); e != nil {
 		return e
 	}
+	if e = m.traceQuadraticBeforePrimitive(r, s, x); e != nil {
+		return e
+	}
 	if e = m.gcdPrimitivePart(s.refs[7].root.value, x, &s.refs[7].root); e != nil {
 		return e
 	}
 	if e = m.gcdPrimitivePart(s.refs[8].root.value, x, &s.refs[8].root); e != nil {
+		return e
+	}
+	if e = m.traceQuadraticFactors(r, s); e != nil {
 		return e
 	}
 	if polynomialSourceDebug {

@@ -46,6 +46,7 @@ type polynomialCreation struct {
 	buffer            *polynomialSOM
 }
 type MultivariatePolynomialCore struct {
+	quadraticTrace                                                                             *polynomialQuadraticTraceBorrow
 	dividesTrace                                                                               polynomialDividesTraceScope
 	gcdTraceRunning                                                                            bool
 	renameTraceRunning                                                                         bool
@@ -265,7 +266,7 @@ func (m *MultivariatePolynomialCore) Error() string {
 }
 func (m *MultivariatePolynomialCore) Unwrap() error { return m.originalCause }
 func (m *MultivariatePolynomialCore) check() error {
-	if m != nil && m.self == m && (m.collectingVariables || m.algebraicTraceRunning || m.renameTraceRunning || m.gcdTraceRunning || m.dividesTrace.running) {
+	if m != nil && m.self == m && (m.collectingVariables || m.algebraicTraceRunning || m.renameTraceRunning || m.gcdTraceRunning || m.dividesTrace.running || m.quadraticTraceCallback()) {
 		return ErrPolynomialPending
 	}
 	if m == nil || m.self != m {
@@ -474,7 +475,7 @@ func (m *MultivariatePolynomialCore) CloseChecked() error {
 	if m != nil && m.self == m && (m.quasiResultant.active || m.variableNumeral.active) {
 		return ErrPolynomialPending
 	}
-	if m != nil && m.self == m && (m.collectingVariables || m.algebraicTraceRunning || m.renameTraceRunning || m.gcdTraceRunning || m.dividesTrace.running) {
+	if m != nil && m.self == m && (m.collectingVariables || m.algebraicTraceRunning || m.renameTraceRunning || m.gcdTraceRunning || m.dividesTrace.running || m.quadraticTraceCallback()) {
 		return ErrPolynomialPending
 	}
 	if m != nil && m.self == m && m.normalizationPending() {

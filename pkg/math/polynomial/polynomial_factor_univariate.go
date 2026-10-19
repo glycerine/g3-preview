@@ -392,6 +392,12 @@ func numericIntegerManager_factorUnivariateCallerExecuting(m *unumeral.IntegerMa
 }
 
 func (f *PolynomialFactors) factorCallerExecuting() bool {
+	if f != nil && f.manager != nil && f.manager.core != nil {
+		q := f.manager.core.quadraticTrace
+		if q != nil && q.target == f && f.manager.core.quadraticTraceCallback() {
+			return true
+		}
+	}
 	if f == nil || f.self != f || f.manager == nil || f.manager.self != f.manager {
 		return false
 	}

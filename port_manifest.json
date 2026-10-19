@@ -46766,7 +46766,7 @@
         },
         {
           "name": "subresultant_chain polynomial.cpp:5499-5572 literal regular/defective algorithm and ordered three-reference source suffix",
-          "status": "ported",
+          "status": "reference_only",
           "go_target": "pkg/math/polynomial/polynomial_subresultant_chain.go",
           "tests": [
             "TestPolynomialSubresultantChainResetCallbackBeforeLocalConstructorsRefusesOwnerClose",
@@ -46782,7 +46782,7 @@
         },
         {
           "name": "psc_chain1 polynomial.cpp:5574-5583 actual Subchain caller, captured uint32 size, ascending Coeff/Get/SET then last unit SET",
-          "status": "ported",
+          "status": "reference_only",
           "go_target": "pkg/math/polynomial/polynomial_psc_chain1.go",
           "tests": [
             "TestPolynomialPSCChain1AscendingSetAndLastUnitCallbackRefuseOwnerReentry",
@@ -47443,7 +47443,29 @@
           "5772 PSC iteration references"
         ],
         "verification": "Real zero polynomial cells distinguish direct display from the public consistency scope with a closed Go-adapter reservation gate. Controls retain public checks. Existing trace output, refusal, callback and display tests cover reached nonzero terms and cleanup.",
-        "remaining_trace_audit": "Other source TRACE records remain unverified or absent, including PSC cpp5530/5578, evaluation cpp6438 and factor cpp6595-6755. This audit is limited to the implemented call sites listed above."
+        "remaining_trace_audit": "Other live source TRACE records remain unverified or absent, including evaluation cpp6438 and factor records outside quadratic cpp6604-6672. PSC cpp5530/5578 belong to dormant alternatives; see dormant_psc_reachability_audit. This audit is limited to the implemented call sites listed above."
+      },
+      "public_content_and_quadratic_trace_audit": {
+        "source": "polynomial.cpp:7199-7210 and 6604-6672",
+        "status": "ported increment; whole source unit remains partial",
+        "go_targets": [
+          "pkg/math/polynomial/polynomial_content_public.go",
+          "pkg/math/polynomial/polynomial_factor_quadratic_trace.go",
+          "pkg/math/polynomial/polynomial_factor_quadratic.go"
+        ],
+        "behavior": "Both content overloads preserve inner pp destruction before outer integer scaling. Six quadratic TRACE records execute real content calls, including after stream refusal. Direct polynomial and public reference formatting retain their distinct source gates. Actual display invocation receipts preserve pre-local numeric failures; writer callbacks protect the manager and exact factor target.",
+        "tests": [
+          "TestPolynomialPublicContentIntegerAndPolynomialFactors",
+          "TestPolynomialPublicContentEveryReservationAndAlias",
+          "TestPolynomialPublicContentInnerReferenceEndsBeforeOuterAssignment",
+          "TestPolynomialQuadraticFactorTraceSourceRecordsAndContents",
+          "TestPolynomialQuadraticFactorTraceBorrowAndFailedStreamComputesContent",
+          "TestPolynomialQuadraticFactorTraceExactEntryReceiptBeforeReferences"
+        ]
+      },
+      "dormant_psc_reachability_audit": {
+        "source_search": "All src C++ headers/translation units: subresultant_chain only defined at cpp5499 and called by psc_chain1 at cpp5575. psc_chain1 only defined at cpp5574; dispatcher cpp5898 is commented out and cpp5901 selects psc_chain_optimized.",
+        "disposition": "Existing Go compatibility implementations retained as reference_only. No additional dormant TRACE port or retained-consumer completion credit."
       }
     },
     {
