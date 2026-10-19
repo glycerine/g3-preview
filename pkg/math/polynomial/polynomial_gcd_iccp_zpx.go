@@ -11,14 +11,8 @@ func (m *MultivariatePolynomialManager) iccpZPX(p Polynomial, x uint32, ci *unum
 }
 func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, x uint32, ci *unumeral.Int, content, pp *polynomialReference, contentReceipt *polynomialContentInvocationReceipt) (err error) {
 	c := m.core
-	if polynomialSourceDebug {
-		field, e := c.modular.Modular()
-		if e != nil {
-			return e
-		}
-		if !field {
-			return ErrPolynomialAssertion
-		}
+	if e := polynomialGCDZPXSourceAssert(3877, "m().modular()", c.modular.Modular); e != nil {
+		return e
 	}
 	if err = m.traceICCPZPXEntry(p, x); err != nil {
 		return err
@@ -112,12 +106,14 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 			minimum = k
 		}
 	}
-	if polynomialSourceDebug && minimum != 0 && uint32(len(ms.values)) != 0 {
-		return ErrPolynomialAssertion
+	if e = polynomialGCDZPXSourceAssert(3917, "min_degree == 0 || no_x_ms.empty()", func() (bool, error) {
+		return minimum == 0 || len(ms.values) == 0, nil
+	}); e != nil {
+		return e
 	}
 	if minimum > 0 {
-		if polynomialSourceDebug && uint32(len(ms.values)) != 0 {
-			return ErrPolynomialAssertion
+		if e = polynomialGCDZPXSourceAssert(3919, "no_x_ms.empty()", func() (bool, error) { return len(ms.values) == 0, nil }); e != nil {
+			return e
 		}
 		m.traceICCPZPXFactor(x, minimum)
 		s.constructReference(c, 0)
@@ -167,8 +163,8 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 		if e = tmp.assign(c, a); e != nil {
 			return e
 		}
-		if polynomialSourceDebug && tmp.value == term {
-			return ErrPolynomialAssertion
+		if e = polynomialGCDZPXSourceAssert(3942, "tmp_m != m", func() (bool, error) { return tmp.value != term, nil }); e != nil {
+			return e
 		}
 		pos, e := c.queryPositions.Get(tmp.value)
 		if e != nil {
@@ -179,19 +175,16 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 			if e = c.queryPositions.Reset(tmp.value); e != nil {
 				return e
 			}
-			if polynomialSourceDebug {
-				pos, e = c.queryPositions.Get(tmp.value)
-				if e != nil {
-					return e
-				}
-				if pos != ^uint32(0) {
-					return ErrPolynomialAssertion
-				}
+			if e = polynomialGCDZPXSourceAssert(3946, "m_m2pos.get(tmp_m) == UINT_MAX", func() (bool, error) {
+				pos, xerr := c.queryPositions.Get(tmp.value)
+				return pos == ^uint32(0), xerr
+			}); e != nil {
+				return e
 			}
 		}
 	}
-	if polynomialSourceDebug && unmarked > marked {
-		return ErrPolynomialAssertion
+	if e = polynomialGCDZPXSourceAssert(3949, "num_unmarked <= num_marked", func() (bool, error) { return unmarked <= marked, nil }); e != nil {
+		return e
 	}
 	if unmarked < marked {
 		for i := uint32(0); i < marked; i++ {
@@ -276,8 +269,8 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 			return e
 		}
 	}
-	if polynomialSourceDebug && count == 0 {
-		return ErrPolynomialAssertion
+	if e = polynomialGCDZPXSourceAssert(3987, "num_ms > 0", func() (bool, error) { return count > 0, nil }); e != nil {
+		return e
 	}
 	s.constructReference(c, 0)
 	s.constructReference(c, 1)
@@ -306,14 +299,10 @@ func (m *MultivariatePolynomialManager) iccpZPXWithContentReceipt(p Polynomial, 
 		if e = s.refs[2].root.assign(c, a); e != nil {
 			return e
 		}
-		if polynomialSourceDebug {
-			one, e := c.IsUnivariate(s.refs[2].root.value)
-			if e != nil {
-				return e
-			}
-			if !one {
-				return ErrPolynomialAssertion
-			}
+		if e = polynomialGCDZPXSourceAssert(3995, "is_univariate(a)", func() (bool, error) {
+			return c.IsUnivariate(s.refs[2].root.value)
+		}); e != nil {
+			return e
 		}
 		if e = m.gcdEuclid(g.value, s.refs[2].root.value, ng); e != nil {
 			return e

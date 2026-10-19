@@ -89,14 +89,11 @@ func (m *MultivariatePolynomialManager) lcGlexZPX(p Polynomial, x uint32) (resul
 			}
 		}
 	}
-	if polynomialSourceDebug {
-		n, e := c.som.ms.size(c)
-		if e != nil {
-			return result, e
-		}
-		if n == 0 {
-			return result, ErrPolynomialAssertion
-		}
+	if e = polynomialGCDZPXSourceAssert(4041, "!m_som_buffer.empty()", func() (bool, error) {
+		n, xerr := c.som.ms.size(c)
+		return n != 0, xerr
+	}); e != nil {
+		return result, e
 	}
 	if err = m.traceLCGlexZPXMax(max.value); err != nil {
 		return result, err

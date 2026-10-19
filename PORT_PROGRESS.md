@@ -46298,3 +46298,15 @@ predicates and honor Throw, Continue, and disabled execution. Focused prime,
 CRA, fallback, ownership and assertion tests pass in native, checked, debug and
 combined checked/debug/trace profiles on CPUs 8-16. The method row is ported;
 separately tracked child refinements remain open.
+
+Finite-field content completion: `iccp_ZpX` at
+`polynomial.cpp:3875-4013` and its `primitive_ZpX` wrapper preserve the field
+guard, zero/constant/degree-zero routes, marked monomial reference buffer,
+minimum-power recursion, cheap-content shortcut, per-base-monomial SOM
+construction, coefficient GCD, conditional content division, TRACE and reverse
+lexical cleanup. All eight ICCP assertions and the adjacent `lc_glex_ZpX`
+nonempty-buffer assertion now use lazy process debugger actions. Focused field
+content, native monomial growth, trace, ownership and assertion tests pass in
+native, checked, debug and combined checked/debug/trace profiles on CPUs 8-16.
+The ICCP/wrapper row is ported; `lc_glex_ZpX` constructor-return and callback
+refinements remain separately partial.

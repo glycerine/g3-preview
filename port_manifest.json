@@ -45190,10 +45190,11 @@
           ]
         },
         {
-          "name": "iccp_ZpX/gcd_ZpX cpp3867-4051: source Zp contents, monomial ref-buffer, dense remainder and sparse interpolation branch",
-          "status": "partial",
-          "go_target": "pkg/math/polynomial/polynomial_gcd_zpx.go",
+          "name": "Complete iccp_ZpX cpp3875-4013 and primitive_ZpX wrapper cpp4046-4051: assertion actions, field content, monomial ref-buffer, recursive factor extraction and coefficient GCD",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_gcd_iccp_zpx.go",
           "tests": [
+            "TestPolynomialGCDZPXSourceAssertionActions",
             "TestPolynomialGCDGlexZPXIndependentCoefficientModel",
             "TestPolynomialGCDICCPZPXContentAndPrimitiveIndependentModel",
             "TestPolynomialGCDICCPZPXSourceShortcutTable",
