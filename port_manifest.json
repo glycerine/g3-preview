@@ -44152,8 +44152,8 @@
           ]
         },
         {
-          "name": "Selected monomial SIZE/VAR/DEG-only reached queries cpp236\u2013375,423\u2013437 with actual get_power DEBUG reference guards",
-          "status": "partial",
+          "name": "Complete retained monomial SIZE/VAR/DEG-only reached queries cpp236\u2013375,423\u2013437 with actual get_power DEBUG reference guards",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
             "TestMonomialReadOrderEmptyQueries",
@@ -44173,8 +44173,8 @@
           ]
         },
         {
-          "name": "Selected ordinary and SMT2 display field/callback publication and repeated loop SIZE lifetime guards cpp378\u2013416",
-          "status": "partial",
+          "name": "Complete retained ordinary and SMT2 display field/callback publication and repeated loop SIZE lifetime guards cpp378\u2013416",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_display.go",
           "tests": [
             "TestMonomialReadOrderEmptyQueries",
@@ -44194,8 +44194,8 @@
           ]
         },
         {
-          "name": "Selected monomial rename VAR-only mutation before sort/hash cpp439\u2013445; declared concrete heapsort adaptation preserved",
-          "status": "partial",
+          "name": "Complete retained monomial rename VAR-only mutation before sort/hash cpp439\u2013445; declared concrete heapsort adaptation preserved",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
             "TestMonomialReadOrderEmptyQueries",
@@ -48348,8 +48348,8 @@
           ]
         },
         {
-          "name": "Selected monomial SIZE/VAR/DEG-only reached queries cpp236\u2013375,423\u2013437 with actual get_power DEBUG reference guards",
-          "status": "partial",
+          "name": "Complete retained monomial SIZE/VAR/DEG-only reached queries cpp236\u2013375,423\u2013437 with actual get_power DEBUG reference guards",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_query.go",
           "tests": [
             "TestMonomialReadOrderEmptyQueries",
@@ -48369,8 +48369,8 @@
           ]
         },
         {
-          "name": "Selected ordinary and SMT2 display field/callback publication and repeated loop SIZE lifetime guards cpp378\u2013416",
-          "status": "partial",
+          "name": "Complete retained ordinary and SMT2 display field/callback publication and repeated loop SIZE lifetime guards cpp378\u2013416",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_display.go",
           "tests": [
             "TestMonomialReadOrderEmptyQueries",
@@ -48390,8 +48390,8 @@
           ]
         },
         {
-          "name": "Selected monomial rename VAR-only mutation before sort/hash cpp439\u2013445; declared concrete heapsort adaptation preserved",
-          "status": "partial",
+          "name": "Complete retained monomial rename VAR-only mutation before sort/hash cpp439\u2013445; declared concrete heapsort adaptation preserved",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_rename.go",
           "tests": [
             "TestMonomialReadOrderEmptyQueries",
