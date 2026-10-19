@@ -40,6 +40,32 @@ func TestPolynomialCoefficientVariableAssertionActions(t *testing.T) {
 	}
 }
 
+func TestPolynomialUnivariateCoefficientAssertionActions(t *testing.T) {
+	for _, action := range []string{"T", "C", "disabled"} {
+		t.Run(action, func(t *testing.T) {
+			m := polynomialCellFixture(t)
+			p := polynomialQueryTerms(t, m, []int32{3, 7}, [][]MonomialPower{{{0, 2}}, {{1, 1}}})
+			polynomialAssertionActionsFixture(t, action)
+			if polynomialSourceDebug && action == "disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+			}
+			got, e := m.UnivariateCoefficient(p, 2)
+			if polynomialSourceDebug && action == "T" {
+				if !errors.Is(e, ErrPolynomialAssertion) {
+					t.Fatal("univariate assertion did not throw", e)
+				}
+				return
+			}
+			serviceMust(t, e)
+			value, e := m.integer.Int64(&got)
+			serviceMust(t, e)
+			if value != 3 {
+				t.Fatal("continued total-degree coefficient scan", value)
+			}
+		})
+	}
+}
+
 func TestPolynomialCoefficientBufferAssertionActions(t *testing.T) {
 	for _, action := range []string{"T", "C"} {
 		t.Run(action, func(t *testing.T) {

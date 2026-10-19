@@ -324,6 +324,7 @@ func TestPolynomialQueryReachedFieldReadProfiles(t *testing.T) {
 	if linear {
 		t.Fatal("nonlinear first term must stop before dead second term")
 	}
+	polynomialThrowAssertionFixture(t)
 	got, e := m.UnivariateCoefficient(p2, 2)
 	if polynomialSourceDebug {
 		if !errors.Is(e, ErrPolynomialAssertion) {

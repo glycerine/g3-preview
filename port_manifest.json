@@ -44367,6 +44367,7 @@
           "go_target": "pkg/math/polynomial/polynomial_degree_coefficient.go",
           "tests": [
             "TestPolynomialCoefficientVariableAssertionActions",
+            "TestPolynomialUnivariateCoefficientAssertionActions",
             "TestPolynomialCoefficientBufferAssertionActions",
             "TestPolynomialQueryCoefficientIndependentMaps",
             "TestPolynomialQueryPowerLinearIndependentOracle",
@@ -48678,6 +48679,7 @@
           "go_target": "pkg/math/polynomial/polynomial_degree_coefficient.go",
           "tests": [
             "TestPolynomialCoefficientVariableAssertionActions",
+            "TestPolynomialUnivariateCoefficientAssertionActions",
             "TestPolynomialCoefficientBufferAssertionActions",
             "TestPolynomialQueryCoefficientIndependentMaps",
             "TestPolynomialQueryPowerLinearIndependentOracle",

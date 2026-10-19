@@ -444,14 +444,10 @@ func (m *MultivariatePolynomialCore) UnivariateCoefficient(p Polynomial, k uint3
 	if e := m.check(); e != nil {
 		return unumeral.Int{}, e
 	}
-	if polynomialSourceDebug {
-		univariate, e := m.IsUnivariate(p)
-		if e != nil {
-			return unumeral.Int{}, e
-		}
-		if !univariate {
-			return unumeral.Int{}, ErrPolynomialAssertion
-		}
+	if e := polynomialCoefficientSourceAssert(1736, "is_univariate(p)", func() (bool, error) {
+		return m.IsUnivariate(p)
+	}); e != nil {
+		return unumeral.Int{}, e
 	}
 	n, e := m.readWord(p, 8)
 	if e != nil {
