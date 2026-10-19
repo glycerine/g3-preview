@@ -43364,8 +43364,8 @@
           ]
         },
         {
-          "name": "Nine reached GCD content/PRS/modular/univariate/recursive Scale calls pass concrete arithmetic receipts to the existing scaling engine; source-specific callback and suffix composition remains partial",
-          "status": "partial",
+          "name": "Complete nine retained GCD scaling callers with concrete arithmetic receipts, source assignment callback order and parent cleanup composition",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_direct_children.go",
           "tests": [
             "TestPolynomialGCDContentScaleReceiptReservationPrefixes",
@@ -43424,8 +43424,8 @@
           ]
         },
         {
-          "name": "Reached GCD scalar-product and PRS pseudo-remainder, coefficient, multiplication, division, constant and sign children retain concrete invocation receipts; exact division captures actual failed monomial constructor outcome for owning cleanup",
-          "status": "partial",
+          "name": "Complete retained GCD scalar-product and PRS child invocation ownership with exact failed monomial construction outcomes and source/owning cleanup",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_direct_children.go",
           "tests": [
             "TestPolynomialICCPCleanupPreservesIndependentLazard",
@@ -44991,8 +44991,8 @@
           ]
         },
         {
-          "name": "Shared rand/srand dependency of peek_fresh cpp4053-4068; selected Linux/glibc31 mathematical recurrence, process default/reseed and borrowed draws (peek_fresh/GCD body still open)",
-          "status": "partial",
+          "name": "Complete retained Linux/glibc31 shared rand/srand dependency for peek_fresh cpp4053-4068, including process default, reseeding and borrowed draws",
+          "status": "ported",
           "go_target": "pkg/clibrand/rand.go",
           "tests": [
             "TestGLibc31CapturedLibrarySeeds",
@@ -47719,8 +47719,8 @@
           ]
         },
         {
-          "name": "Nine reached GCD content/PRS/modular/univariate/recursive Scale calls pass concrete arithmetic receipts to the existing scaling engine; source-specific callback and suffix composition remains partial",
-          "status": "partial",
+          "name": "Complete nine retained GCD scaling callers with concrete arithmetic receipts, source assignment callback order and parent cleanup composition",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_direct_children.go",
           "tests": [
             "TestPolynomialGCDContentScaleReceiptReservationPrefixes",
@@ -47779,8 +47779,8 @@
           ]
         },
         {
-          "name": "Reached GCD scalar-product and PRS pseudo-remainder, coefficient, multiplication, division, constant and sign children retain concrete invocation receipts; exact division captures actual failed monomial constructor outcome for owning cleanup",
-          "status": "partial",
+          "name": "Complete retained GCD scalar-product and PRS child invocation ownership with exact failed monomial construction outcomes and source/owning cleanup",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_direct_children.go",
           "tests": [
             "TestPolynomialICCPCleanupPreservesIndependentLazard",
