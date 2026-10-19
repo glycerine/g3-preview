@@ -55659,7 +55659,7 @@
         },
         {
           "name": "upolynomial_factorization.cpp:1238-1292 actual scalar multiplication, exact division, primitive-content extraction and sequential factor/remaining publication",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_recombine.go",
           "tests": [
             "TestUPolynomialRecombinationPublicationTransportProtectsActualCaller",
