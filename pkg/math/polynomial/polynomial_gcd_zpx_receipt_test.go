@@ -1,7 +1,11 @@
 // Source: polynomial.cpp:4018-4051, actual leading-coefficient buffer calls.
 package polynomial
 
-import "testing"
+import (
+	"testing"
+
+	umemory "github.com/glycerine/g3/pkg/util/memory"
+)
 
 func TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes(t *testing.T) {
 	success, captured, monomialCaptured := false, false, false
@@ -59,4 +63,47 @@ func TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes(t *testing.T) {
 	if !success || !captured || !monomialCaptured {
 		t.Fatal("missed successful result or retained actual buffer receipt", success, captured, monomialCaptured)
 	}
+}
+
+func TestPolynomialGCDGlexZPXReturnedCallerCallbackComposition(t *testing.T) {
+	full := polynomialPSCFullFixture(t)
+	c := full.core
+	serviceMust(t, c.modular.SetZPUint64(11))
+	p := polynomialQueryTerms(t, c, []int32{3, 4, 5, 1}, [][]MonomialPower{{{0, 1}, {1, 2}}, {{1, 2}}, {{0, 3}, {1, 1}}, nil})
+	old := polynomialICCPUnownedTerms(t, c, []int32{1, 5}, [][]MonomialPower{{{0, 1}}, nil})
+	var destination polynomialReference
+	serviceMust(t, destination.assign(c, old))
+	var refused umemory.Block
+	calls := 0
+	h, e := NewPolynomialDeletionHandler(c.integer.Budget(), func(_ *PolynomialDeletionHandler, c *MultivariatePolynomialCore, deleted Polynomial) error {
+		if deleted != old {
+			return nil
+		}
+		calls++
+		if len(full.gcdFrames) == 0 || full.gcdFrames[0].active || full.gcdFrames[0].depth != 0 {
+			t.Errorf("lc_glex_ZpX locals must finish before caller old-DEC: %+v", full.gcdFrames)
+		}
+		if !destination.assigning || destination.incoming == (Polynomial{}) {
+			t.Errorf("caller did not own returned INC before old-DEC: %+v", destination)
+		}
+		c.integer.Budget().FailAfter(0)
+		var callback error
+		refused, callback = c.memory.Allocate(8)
+		return callback
+	})
+	serviceMust(t, e)
+	serviceMust(t, c.AddDeletionHandler(h))
+	e = full.lcGlexZPXInto(p, 0, &destination)
+	if !numericPhysicalReservationRefusal(e) || calls != 1 || !destination.assigning {
+		t.Fatal("actual returned assignment callback stop", e, calls, destination)
+	}
+	polynomialImpPhysicalAuditNamedRaw(t, full, []Polynomial{p, destination.value, destination.incoming}, nil, h.header, []umemory.Block{refused})
+	c.integer.Budget().FailAfter(-1)
+	serviceMust(t, full.CleanupGCD())
+	serviceMust(t, destination.close(c))
+	if calls != 1 {
+		t.Fatal("callback replay", calls)
+	}
+	serviceMust(t, c.RemoveDeletionHandler(h))
+	serviceMust(t, h.CloseChecked())
 }

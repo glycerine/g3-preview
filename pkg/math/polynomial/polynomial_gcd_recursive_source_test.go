@@ -129,7 +129,7 @@ func TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor(t *testing.T
 	}
 	serviceMust(t, full.skeletons.Reset())
 	got := memoryOutput.String()
-	if !diagnostic.DebugBuild {
+	if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
 		if got != "" {
 			t.Fatal("ordinary build emitted memory records", got)
 		}

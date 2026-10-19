@@ -101,6 +101,24 @@ func (m *MultivariatePolynomialManager) lcGlexZPX(p Polynomial, x uint32) (resul
 	return c.som.mkWithArithmeticReceipt(false, &s.product)
 }
 
+// lcGlexZPXInto is the retained source expression
+//
+//	destination = lc_glex_ZpX(p, x);
+//
+// The callee's monomial references and SOM invocation finish before the
+// destination assignment starts. The assignment records its completed INC as
+// incoming before an old-value DEC can invoke a deletion callback.
+func (m *MultivariatePolynomialManager) lcGlexZPXInto(p Polynomial, x uint32, destination *polynomialReference) error {
+	if destination == nil {
+		return ErrPolynomialOwner
+	}
+	result, e := m.lcGlexZPX(p, x)
+	if e != nil {
+		return e
+	}
+	return destination.assign(m.core, result)
+}
+
 func (m *MultivariatePolynomialManager) primitiveZPX(p Polynomial, x uint32, out *polynomialReference) (err error) {
 	s, e := m.beginGCDFunction()
 	if e != nil {

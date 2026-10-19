@@ -9,6 +9,7 @@ import (
 
 func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32, vars []uint32, r *polynomialReference) (err error) {
 	c := m.core
+	var a Polynomial
 	if err = m.traceModGCDRecPolynomials(4078, "mod_gcd_rec\nu: ", true, u, v); err != nil {
 		return err
 	}
@@ -69,18 +70,10 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 	if e = m.iccpZPXWithContentReceipt(v, x, &s.nums[1], cv, pv, &s.contentInvocation); e != nil {
 		return e
 	}
-	a, e := m.lcGlexZPX(pu.value, x)
-	if e != nil {
+	if e = m.lcGlexZPXInto(pu.value, x, lu); e != nil {
 		return e
 	}
-	if e = lu.assign(c, a); e != nil {
-		return e
-	}
-	a, e = m.lcGlexZPX(pv.value, x)
-	if e != nil {
-		return e
-	}
-	if e = lv.assign(c, a); e != nil {
+	if e = m.lcGlexZPXInto(pv.value, x, lv); e != nil {
 		return e
 	}
 	s.constructNumeral(2)
@@ -261,11 +254,7 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 			if e = m.traceModGCDRecCandidate(4184, idx, "candidate H: ", h.value, "", Polynomial{}); e != nil {
 				return e
 			}
-			a, e = m.lcGlexZPX(h.value, x)
-			if e != nil {
-				return e
-			}
-			if e = lh.assign(c, a); e != nil {
+			if e = m.lcGlexZPXInto(h.value, x, lh); e != nil {
 				return e
 			}
 			if e = m.traceModGCDRecCandidate(4186, idx, "lc_H: ", lh.value, "lc_g: ", lg.value); e != nil {

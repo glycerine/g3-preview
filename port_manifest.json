@@ -43364,20 +43364,22 @@
           ]
         },
         {
-          "name": "lc_glex_ZpX captures actual failed remove-variable/mk-variable monomial constructor outcomes and allocator invocation; owning cleanup requires matching constructor identity (polynomial.cpp:4018-4051); successful unjoined return/callback composition remains partial",
-          "status": "partial",
+          "name": "Complete lc_glex_ZpX monomial-constructor capture, exact allocator cleanup, and returned caller callback composition (polynomial.cpp:4018-4051)",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_zpx_created.go",
           "tests": [
-            "TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes"
+            "TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes",
+            "TestPolynomialGCDGlexZPXReturnedCallerCallbackComposition"
           ]
         },
         {
-          "name": "lc_glex_ZpX source SOM reset/add/mk now captures its actual per-segment arithmetic/append/factory invocation; monomial construction and full source-suffix audit remain open (polynomial.cpp:4018-4051)",
-          "status": "partial",
+          "name": "Complete lc_glex_ZpX SOM reset/add/mk invocation capture, source suffix, and retained caller assignments (polynomial.cpp:4018-4051)",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_zpx.go",
           "tests": [
             "TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes",
-            "TestPolynomialGCDGlexZPXIndependentCoefficientModel"
+            "TestPolynomialGCDGlexZPXIndependentCoefficientModel",
+            "TestPolynomialGCDGlexZPXReturnedCallerCallbackComposition"
           ]
         },
         {
@@ -47656,20 +47658,22 @@
           ]
         },
         {
-          "name": "lc_glex_ZpX captures actual failed remove-variable/mk-variable monomial constructor outcomes and allocator invocation; owning cleanup requires matching constructor identity (polynomial.cpp:4018-4051); successful unjoined return/callback composition remains partial",
-          "status": "partial",
+          "name": "Complete lc_glex_ZpX monomial-constructor capture, exact allocator cleanup, and returned caller callback composition (polynomial.cpp:4018-4051)",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_zpx_created.go",
           "tests": [
-            "TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes"
+            "TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes",
+            "TestPolynomialGCDGlexZPXReturnedCallerCallbackComposition"
           ]
         },
         {
-          "name": "lc_glex_ZpX source SOM reset/add/mk now captures its actual per-segment arithmetic/append/factory invocation; monomial construction and full source-suffix audit remain open (polynomial.cpp:4018-4051)",
-          "status": "partial",
+          "name": "Complete lc_glex_ZpX SOM reset/add/mk invocation capture, source suffix, and retained caller assignments (polynomial.cpp:4018-4051)",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_zpx.go",
           "tests": [
             "TestPolynomialGCDGlexZPXCapturedBufferReservationPrefixes",
-            "TestPolynomialGCDGlexZPXIndependentCoefficientModel"
+            "TestPolynomialGCDGlexZPXIndependentCoefficientModel",
+            "TestPolynomialGCDGlexZPXReturnedCallerCallbackComposition"
           ]
         },
         {
