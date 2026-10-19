@@ -95,6 +95,43 @@ func TestMonomialPredecessorSourceAssertionActions(t *testing.T) {
 	}
 }
 
+func TestMonomialPredecessorResultAssertionActions(t *testing.T) {
+	for _, choice := range []string{"T", "C", "disabled"} {
+		t.Run(choice, func(t *testing.T) {
+			m := monomialFixture(t)
+			action := choice
+			if choice == "disabled" {
+				action = "T"
+			}
+			polynomialAssertionActionsFixture(t, action)
+			if polynomialSourceDebug && choice == "disabled" {
+				serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+			}
+
+			// The binary-search path returns 10, while the deliberately
+			// malformed physical entry at index 1 is also below 12 and above
+			// that result. This reaches the source assertion at line 368
+			// through MaxSmallerThan itself; no helper-only failure is used.
+			a := monomialReadProfileObject(t, m, 8)
+			for i, variable := range []uint32{0, 11, 4, 6, 8, 9, 10, 14} {
+				monomialReadWrite(t, m, a, 20+uint64(i)*8, variable)
+			}
+			v, e := m.MaxSmallerThan(a, 12)
+			if polynomialSourceDebug && choice == "T" {
+				if !errors.Is(e, ErrMonomialAssertion) {
+					t.Fatal("result assertion did not Throw", v, e)
+				}
+			} else {
+				serviceMust(t, e)
+				if v != 10 {
+					t.Fatal("Continue/disabled/release changed reached predecessor", v)
+				}
+			}
+			monomialPhysicalAudit(t, m)
+		})
+	}
+}
+
 func TestMonomialPredecessorSourceNullAssertionAndClosedSwitch(t *testing.T) {
 	for _, choice := range []string{"T", "C", "disabled"} {
 		t.Run(choice, func(t *testing.T) {

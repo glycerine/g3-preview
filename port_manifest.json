@@ -43241,8 +43241,8 @@
           ]
         },
         {
-          "name": "polynomial.cpp:322-348,356-373 max_smaller_than runtime assertion actions and conditional poly_bug trace; broader query audit remains partial",
-          "status": "partial",
+          "name": "polynomial.cpp:292-374 complete retained max_smaller_than query, assertions and conditional poly_bug trace",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_assertions.go",
           "go_targets": [
             "pkg/math/polynomial/polynomial_monomial_assertions.go",
@@ -43254,6 +43254,7 @@
           ],
           "tests": [
             "TestMonomialPredecessorSourceAssertionActions",
+            "TestMonomialPredecessorResultAssertionActions",
             "TestMonomialPredecessorSourceNullAssertionAndClosedSwitch",
             "TestMonomialPredecessorAssertionOperandReadGates",
             "TestMonomialSourceMaxSmallerNullAssertion",
@@ -43264,7 +43265,7 @@
             "TestMonomialPredecessorTraceRetainsReferencedInput"
           ],
           "notes": [
-            "Each source SASSERT reads the actual runtime switch and dispatches the real debugger action. Concrete window, variable, midpoint-predecessor and result helpers preserve short circuit and repeated field/switch reads, including nested get_power assertions. The compiled postcondition loop rereads size independently of the runtime assertion switch. Malformed but physically initialized order reaches midpoint and final-result failures: Throw stops, Continue or disabled assertions return the reached source value. Raw uninitialized fields prove operand gating. The poly_bug CTRACE now evaluates its source condition only after compile/tag gates, uses the actual default monomial display and original scalar/get_var insertion sequence, suppresses footer after a computational operand failure, and continues after an ostream refusal. An actual trace writer callback refuses source/owning destruction, local cleanup and recursive query trace without changing the owner. Exact open/disabled/erased bytes, missing-degree operand and refused-stream behavior are tested. Broader malformed search-window/source callback profiles remain partial; no whole query or source-unit completion is claimed.",
+            "Each source SASSERT reads the actual runtime switch and dispatches the real debugger action. Concrete window, variable, midpoint-predecessor and result helpers preserve short circuit and repeated field/switch reads, including nested get_power assertions. The compiled postcondition loop rereads size independently of the runtime assertion switch. Malformed but physically initialized order reaches midpoint, per-entry result and final-result failures through the public query: Throw stops, Continue or disabled assertions return the reached source value. Raw uninitialized fields prove operand gating. The poly_bug CTRACE now evaluates its source condition only after compile/tag gates, uses the actual default monomial display and original scalar/get_var insertion sequence, suppresses footer after a computational operand failure, and continues after an ostream refusal. An actual trace writer callback refuses source/owning destruction, local cleanup and recursive query trace without changing the owner. Exact open/disabled/erased bytes, missing-degree operand and refused-stream behavior are tested. The fixed-size binary-search window assertions follow from the checked endpoints and update rules; the reachable malformed-order assertion frontiers and callback/lifetime boundaries are covered. This completes the retained query without claiming source-unit completion.",
             "A real writer callback on a fully interned, RC=1 input reproduced last-reference destruction followed by invalid-owner formatting. The shared decRefCoreOutcome now refuses while the actual query trace span executes, covering both public DecRef and internal polynomial-owner releases before RC/table/allocator mutation. The regression verifies RC=1, live stage=0, unchanged caller handle and an empty refused deletion outcome, then restores the deliberately malformed variable bytes and performs ordinary successful reference release. No constructor-validity/source counter is synthesized."
           ]
         },
@@ -47456,8 +47457,8 @@
           ]
         },
         {
-          "name": "polynomial.cpp:322-348,356-373 max_smaller_than runtime assertion actions and conditional poly_bug trace; broader query audit remains partial",
-          "status": "partial",
+          "name": "polynomial.cpp:292-374 complete retained max_smaller_than query, assertions and conditional poly_bug trace",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_monomial_assertions.go",
           "go_targets": [
             "pkg/math/polynomial/polynomial_monomial_assertions.go",
@@ -47469,6 +47470,7 @@
           ],
           "tests": [
             "TestMonomialPredecessorSourceAssertionActions",
+            "TestMonomialPredecessorResultAssertionActions",
             "TestMonomialPredecessorSourceNullAssertionAndClosedSwitch",
             "TestMonomialPredecessorAssertionOperandReadGates",
             "TestMonomialSourceMaxSmallerNullAssertion",
@@ -47479,7 +47481,7 @@
             "TestMonomialPredecessorTraceRetainsReferencedInput"
           ],
           "notes": [
-            "Each source SASSERT reads the actual runtime switch and dispatches the real debugger action. Concrete window, variable, midpoint-predecessor and result helpers preserve short circuit and repeated field/switch reads, including nested get_power assertions. The compiled postcondition loop rereads size independently of the runtime assertion switch. Malformed but physically initialized order reaches midpoint and final-result failures: Throw stops, Continue or disabled assertions return the reached source value. Raw uninitialized fields prove operand gating. The poly_bug CTRACE now evaluates its source condition only after compile/tag gates, uses the actual default monomial display and original scalar/get_var insertion sequence, suppresses footer after a computational operand failure, and continues after an ostream refusal. An actual trace writer callback refuses source/owning destruction, local cleanup and recursive query trace without changing the owner. Exact open/disabled/erased bytes, missing-degree operand and refused-stream behavior are tested. Broader malformed search-window/source callback profiles remain partial; no whole query or source-unit completion is claimed.",
+            "Each source SASSERT reads the actual runtime switch and dispatches the real debugger action. Concrete window, variable, midpoint-predecessor and result helpers preserve short circuit and repeated field/switch reads, including nested get_power assertions. The compiled postcondition loop rereads size independently of the runtime assertion switch. Malformed but physically initialized order reaches midpoint, per-entry result and final-result failures through the public query: Throw stops, Continue or disabled assertions return the reached source value. Raw uninitialized fields prove operand gating. The poly_bug CTRACE now evaluates its source condition only after compile/tag gates, uses the actual default monomial display and original scalar/get_var insertion sequence, suppresses footer after a computational operand failure, and continues after an ostream refusal. An actual trace writer callback refuses source/owning destruction, local cleanup and recursive query trace without changing the owner. Exact open/disabled/erased bytes, missing-degree operand and refused-stream behavior are tested. The fixed-size binary-search window assertions follow from the checked endpoints and update rules; the reachable malformed-order assertion frontiers and callback/lifetime boundaries are covered. This completes the retained query without claiming source-unit completion.",
             "A real writer callback on a fully interned, RC=1 input reproduced last-reference destruction followed by invalid-owner formatting. The shared decRefCoreOutcome now refuses while the actual query trace span executes, covering both public DecRef and internal polynomial-owner releases before RC/table/allocator mutation. The regression verifies RC=1, live stage=0, unchanged caller handle and an empty refused deletion outcome, then restores the deliberately malformed variable bytes and performs ordinary successful reference release. No constructor-validity/source counter is synthesized."
           ]
         },
