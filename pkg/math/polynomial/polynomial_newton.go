@@ -84,10 +84,12 @@ func (n *PolynomialNewtonInterpolator) Input(i uint32) (unumeral.Int, error) {
 	if e := n.owner.check(); e != nil {
 		return unumeral.Int{}, e
 	}
+	if e := polynomialNewtonSourceAssertAt("src/util/vector.h", 309, "idx < size()", func() (bool, error) {
+		return uint64(i) < uint64(len(n.inputs)), nil
+	}); e != nil {
+		return unumeral.Int{}, e
+	}
 	if uint64(i) >= uint64(len(n.inputs)) {
-		if polynomialSourceDebug {
-			return unumeral.Int{}, ErrPolynomialAssertion
-		}
 		return unumeral.Int{}, arena.ErrBounds
 	}
 	return n.inputs[i], nil
@@ -202,8 +204,8 @@ func (n *PolynomialNewtonInterpolator) Add(input *unumeral.Int, output Polynomia
 	if e := n.traceAddEntry(input, output); e != nil {
 		return e
 	}
-	if polynomialSourceDebug && m.modular.IntegerMode() {
-		return ErrPolynomialAssertion
+	if e := polynomialNewtonScalarAssert(2834, "m().modular()", !m.modular.IntegerMode()); e != nil {
+		return e
 	}
 	sz := uint32(len(n.inputs))
 	var e error
@@ -217,28 +219,22 @@ func (n *PolynomialNewtonInterpolator) Add(input *unumeral.Int, output Polynomia
 	defer func() { err = n.finish(err) }()
 	s := &n.scope
 	first := n.inputs[0]
-	if polynomialSourceDebug {
-		same, e := m.modular.Equal(input, &first)
-		if e != nil {
-			return e
-		}
-		if same {
-			return ErrPolynomialAssertion
-		}
+	if e := polynomialNewtonSourceAssert(2841, "!m().eq(input, m_inputs[0])", func() (bool, error) {
+		same, x := m.modular.Equal(input, &first)
+		return !same, x
+	}); e != nil {
+		return e
 	}
 	if e = m.modular.Sub(input, &first, &s.product); e != nil {
 		return e
 	}
 	for i := uint32(1); i < sz; i++ {
 		a := n.inputs[i]
-		if polynomialSourceDebug {
-			same, e := m.modular.Equal(input, &a)
-			if e != nil {
-				return e
-			}
-			if same {
-				return ErrPolynomialAssertion
-			}
+		if e = polynomialNewtonSourceAssert(2844, "!m().eq(input, m_inputs[i])", func() (bool, error) {
+			same, x := m.modular.Equal(input, &a)
+			return !same, x
+		}); e != nil {
+			return e
 		}
 		if e = m.modular.Sub(input, &a, &s.aux); e != nil {
 			return e
@@ -259,15 +255,11 @@ func (n *PolynomialNewtonInterpolator) Add(input *unumeral.Int, output Polynomia
 	if e = n.traceNumeral(2851, "add", newtonIndexLabel("invs", sz), &s.product); e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
+	if e = polynomialNewtonSourceAssert(2852, "m().eq(m_inputs[k], input)", func() (bool, error) {
 		a := n.inputs[sz]
-		same, e := m.modular.Equal(&a, input)
-		if e != nil {
-			return e
-		}
-		if !same {
-			return ErrPolynomialAssertion
-		}
+		return m.modular.Equal(&a, input)
+	}); e != nil {
+		return e
 	}
 	s.refsConstructed = true
 	p, e := n.vs.get(m, sz-1)
@@ -282,7 +274,7 @@ func (n *PolynomialNewtonInterpolator) Add(input *unumeral.Int, output Polynomia
 		if e = m.modular.Sub(input, &a, &s.aux); e != nil {
 			return e
 		}
-		if e = n.assertNumeralNormalized(&s.aux); e != nil {
+		if e = n.assertNumeralNormalized(&s.aux, 2860, "m().is_p_normalized(aux)"); e != nil {
 			return e
 		}
 		p, e = n.scale(&s.aux, s.temp.value)
@@ -303,7 +295,7 @@ func (n *PolynomialNewtonInterpolator) Add(input *unumeral.Int, output Polynomia
 		if e = s.temp.assign(m, p); e != nil {
 			return e
 		}
-		if e = n.assertPolynomialNormalized(s.temp.value); e != nil {
+		if e = n.assertPolynomialNormalized(s.temp.value, 2863, "pm.is_p_normalized(temp)"); e != nil {
 			return e
 		}
 	}
@@ -314,7 +306,7 @@ func (n *PolynomialNewtonInterpolator) Add(input *unumeral.Int, output Polynomia
 	if e = s.auxPoly.assign(m, p); e != nil {
 		return e
 	}
-	if e = n.assertPolynomialNormalized(s.auxPoly.value); e != nil {
+	if e = n.assertPolynomialNormalized(s.auxPoly.value, 2867, "pm.is_p_normalized(aux_poly)"); e != nil {
 		return e
 	}
 	a := n.invs[sz]
@@ -325,7 +317,7 @@ func (n *PolynomialNewtonInterpolator) Add(input *unumeral.Int, output Polynomia
 	if e = s.auxPoly.assign(m, p); e != nil {
 		return e
 	}
-	if e = n.assertPolynomialNormalized(s.auxPoly.value); e != nil {
+	if e = n.assertPolynomialNormalized(s.auxPoly.value, 2869, "pm.is_p_normalized(aux_poly)"); e != nil {
 		return e
 	}
 	if e = n.vs.push(m, s.auxPoly.value); e != nil {
@@ -351,8 +343,8 @@ func (n *PolynomialNewtonInterpolator) Mk(x uint32, r *PolynomialRef) (err error
 		return e
 	}
 	m := n.owner
-	if polynomialSourceDebug && m.modular.IntegerMode() {
-		return ErrPolynomialAssertion
+	if e := polynomialNewtonScalarAssert(2881, "m().modular()", !m.modular.IntegerMode()); e != nil {
+		return e
 	}
 	n.scope = polynomialNewtonScope{kind: 2, refsConstructed: true}
 	defer func() { err = n.finish(err) }()
@@ -363,8 +355,8 @@ func (n *PolynomialNewtonInterpolator) Mk(x uint32, r *PolynomialRef) (err error
 		return arena.ErrBounds
 	} // Reached signed d=num-1 UB domain.
 	d := num - 1
-	if polynomialSourceDebug && num <= 0 {
-		return ErrPolynomialAssertion
+	if e := polynomialNewtonScalarAssert(2886, "num > 0", num > 0); e != nil {
+		return e
 	}
 	p, e := n.vs.get(m, uint32(d))
 	if e != nil {
@@ -463,15 +455,11 @@ func (n *PolynomialNewtonInterpolator) Reset() (err error) {
 		}
 		n.resetStage = 4
 	}
-	if polynomialSourceDebug {
+	if e := polynomialNewtonSourceAssert(2822, "m().is_zero(m_invs[0])", func() (bool, error) {
 		a := n.invs[0]
-		zero, e := n.owner.modular.IsZero(&a)
-		if e != nil {
-			return e
-		}
-		if !zero {
-			return ErrPolynomialAssertion
-		}
+		return n.owner.modular.IsZero(&a)
+	}); e != nil {
+		return e
 	}
 	n.resetStage = 0
 	return nil
@@ -534,20 +522,12 @@ func (n *PolynomialNewtonInterpolator) closeMode(owning, abort bool) error {
 	return nil
 }
 
-func (n *PolynomialNewtonInterpolator) assertNumeralNormalized(a *unumeral.Int) error {
-	if !polynomialSourceDebug {
-		return nil
-	}
-	ok, e := n.owner.modular.IsPNormalized(a)
-	if e != nil {
-		return e
-	}
-	if !ok {
-		return ErrPolynomialAssertion
-	}
-	return nil
+func (n *PolynomialNewtonInterpolator) assertNumeralNormalized(a *unumeral.Int, line int32, expression string) error {
+	return polynomialNewtonSourceAssert(line, expression, func() (bool, error) {
+		return n.owner.modular.IsPNormalized(a)
+	})
 }
-func (n *PolynomialNewtonInterpolator) assertPolynomialNormalized(p Polynomial) error {
+func (n *PolynomialNewtonInterpolator) assertPolynomialNormalized(p Polynomial, outerLine int32, outerExpression string) error {
 	if !polynomialSourceDebug {
 		return nil
 	}
@@ -560,11 +540,11 @@ func (n *PolynomialNewtonInterpolator) assertPolynomialNormalized(p Polynomial) 
 		if e != nil {
 			return e
 		}
-		if e = n.assertNumeralNormalized(&a); e != nil {
+		if e = n.assertNumeralNormalized(&a, 2792, "m().is_p_normalized(p->a(i))"); e != nil {
 			return e
 		}
 	}
-	return nil
+	return polynomialNewtonScalarAssert(outerLine, outerExpression, true)
 }
 
 // NewtonInterpolation preserves the actual method-local interpolator until its
@@ -576,8 +556,8 @@ func (m *MultivariatePolynomialCore) NewtonInterpolation(x, d uint32, inputs []u
 	if m.newtonLocal != nil {
 		return ErrPolynomialPending
 	}
-	if polynomialSourceDebug && m.modular.IntegerMode() {
-		return ErrPolynomialAssertion
+	if e := polynomialNewtonScalarAssert(2916, "m().modular()", !m.modular.IntegerMode()); e != nil {
+		return e
 	}
 	n, e := NewPolynomialNewtonInterpolator(m)
 	if e != nil {

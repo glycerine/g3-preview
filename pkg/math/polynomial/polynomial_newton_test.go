@@ -301,12 +301,13 @@ func TestPolynomialNewtonConstructionAndLazyRefusals(t *testing.T) {
 
 func TestPolynomialNewtonSourceModularAndDuplicateProfiles(t *testing.T) {
 	m := polynomialCellFixture(t)
+	polynomialAssertionActionsFixture(t, "TT")
 	n, e := NewPolynomialNewtonInterpolator(m)
 	serviceMust(t, e)
 	input := unumeral.NewInt(0)
 	e = n.Add(&input, m.unit)
 	if polynomialSourceDebug {
-		if e != ErrPolynomialAssertion {
+		if !errors.Is(e, ErrPolynomialAssertion) {
 			t.Fatal(e)
 		}
 		if newtonCount(t, n) != 0 {
@@ -325,7 +326,7 @@ func TestPolynomialNewtonSourceModularAndDuplicateProfiles(t *testing.T) {
 	serviceMust(t, n.Add(&input, m.unit))
 	e = n.Add(&input, m.unit)
 	if polynomialSourceDebug {
-		if e != ErrPolynomialAssertion {
+		if !errors.Is(e, ErrPolynomialAssertion) {
 			t.Fatal(e)
 		}
 		if newtonCount(t, n) != 1 {
@@ -588,6 +589,7 @@ func TestPolynomialNewtonMkGrowthAndCancellationPrefixes(t *testing.T) {
 
 func TestPolynomialNewtonNativeInputBounds(t *testing.T) {
 	m := polynomialCellFixture(t)
+	polynomialAssertionActionsFixture(t, "TTTTT")
 	serviceMust(t, m.SetZPUint64(97))
 	n, e := NewPolynomialNewtonInterpolator(m)
 	serviceMust(t, e)
@@ -598,7 +600,7 @@ func TestPolynomialNewtonNativeInputBounds(t *testing.T) {
 		if polynomialSourceDebug {
 			want = ErrPolynomialAssertion
 		}
-		if e != want {
+		if !errors.Is(e, want) {
 			t.Fatal(i, e, want)
 		}
 	}
@@ -612,6 +614,7 @@ func TestPolynomialNewtonNativeInputBounds(t *testing.T) {
 
 func TestPolynomialNewtonVectorSourceOwnerBinding(t *testing.T) {
 	m := polynomialCellFixture(t)
+	polynomialThrowAssertionFixture(t)
 	v, e := NewPolynomialNewtonVector(m)
 	serviceMust(t, e)
 	if v.owner != nil {
@@ -619,7 +622,7 @@ func TestPolynomialNewtonVectorSourceOwnerBinding(t *testing.T) {
 	}
 	_, e = v.At(0)
 	if polynomialSourceDebug {
-		if e != ErrPolynomialAssertion {
+		if !errors.Is(e, ErrPolynomialAssertion) {
 			t.Fatal(e)
 		}
 	} else {

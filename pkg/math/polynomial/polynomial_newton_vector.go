@@ -58,8 +58,8 @@ func (v *PolynomialNewtonVector) At(i uint32) (*PolynomialNewtonInterpolator, er
 		return nil, ErrPolynomialPending
 	}
 	if v.owner == nil {
-		if polynomialSourceDebug {
-			return nil, ErrPolynomialAssertion
+		if e := polynomialNewtonScalarAssert(2946, "m_imp", false); e != nil {
+			return nil, e
 		}
 		return nil, ErrPolynomialOwner
 	}
@@ -148,8 +148,8 @@ func (v *PolynomialNewtonVector) SetOwner(m *MultivariatePolynomialCore) error {
 	if v.closed || v.closing || v.sourceFinalizing {
 		return arena.ErrClosed
 	}
-	if polynomialSourceDebug && v.owner != nil && v.owner != m {
-		return ErrPolynomialAssertion
+	if e := polynomialNewtonScalarAssert(2941, "m_imp == 0 || m_imp == owner", v.owner == nil || v.owner == m); e != nil {
+		return e
 	}
 	if m != nil {
 		if e := m.check(); e != nil {

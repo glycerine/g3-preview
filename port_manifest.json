@@ -44303,8 +44303,8 @@
           ]
         },
         {
-          "name": "Selected complete incremental Newton ctor/reset/const-input/count/Add/Mk and whole-method lexical owner; persistent owner-vector lazy At/SetOwner/Flush; explicit owning cleanup distinct from source destruction; vector SourceFinalize/full imp/TRACE remain open",
-          "status": "partial",
+          "name": "Complete incremental Newton ctor/reset/const-input/count/Add/Mk and whole-method lexical owner; persistent owner-vector lazy At/SetOwner/Flush/SourceFinalize, exact TRACE and assertion actions; explicit owning cleanup distinct from source destruction",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_newton.go",
           "tests": [
             "TestPolynomialNewtonSourceInterpolation",
@@ -44322,7 +44322,13 @@
             "TestPolynomialNewtonIndependentBoundedInterpolants",
             "TestPolynomialNewtonRefVectorSourceResetStop",
             "TestPolynomialNewtonNativeNumeralGrowthResetAndReuse",
-            "TestPolynomialNewtonNativeInputActualNumericCopyRefusals"
+            "TestPolynomialNewtonNativeInputActualNumericCopyRefusals",
+            "TestPolynomialNewtonSourceTraceSequenceAndRefusal",
+            "TestPolynomialNewtonVectorSourceFinalizeNativeStorage",
+            "TestPolynomialNewtonEntryAssertionActions",
+            "TestPolynomialNewtonVectorOwnerAssertionActions",
+            "TestPolynomialNewtonVectorSetOwnerContinue",
+            "TestPolynomialNewtonMkEmptyAssertionActions"
           ]
         },
         {

@@ -46167,3 +46167,16 @@ assertion-action fixtures pass in native, checked, debug and combined
 checked/debug/trace profiles on CPUs8-16. The base `mk_cell` method row is
 ported; its separately tracked lower allocation and mixed-buffer receipt
 refinements remain partial.
+
+Incremental Newton completion: `newton_interpolator` and its persistent vector
+at `polynomial.cpp:2807-2952` now cover construction, reset, inputs, incremental
+Add, Mk, whole-method lexical ownership, lazy vector growth, owner binding,
+Flush and source finalization. All retained `SASSERT` sites use the process
+assertion switch and debugger actions at their exact source statements;
+predicate reads occur after that switch, and Continue reaches the following
+numeric or vector operation. The public input accessor also preserves the live
+`vector.h:309` bound assertion before Go's safe bounds refusal. Existing exact
+Newton TRACE sequences, native numeral growth, stopped cleanup and allocation
+campaigns plus new Throw/Continue cases pass in native, checked, debug and
+combined checked/debug/trace profiles on CPUs8-16. The Newton method row is
+ported; later polynomial algorithms remain partial.
