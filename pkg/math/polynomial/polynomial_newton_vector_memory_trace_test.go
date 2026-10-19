@@ -34,9 +34,9 @@ func TestPolynomialNewtonVectorChildMemoryWrappers(t *testing.T) {
 	last := v.children[0]
 	serviceMust(t, v.Close())
 	got := output.String()
-	if !diagnostic.DebugBuild {
+	if !diagnostic.DebugBuild || !tags.ShouldTrace("memory") {
 		if got != "" {
-			t.Fatal("ordinary build emitted debug memory records", got)
+			t.Fatal("disabled memory tracing emitted records", got)
 		}
 		return
 	}
