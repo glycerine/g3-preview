@@ -49,6 +49,7 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	cellCoefficientCopy                                        algebraicCellCoefficientCopy
 	cellBoundsCall                                             algebraicCellBoundsCallScope
 	copyCall                                                   algebraicCopyCallScope
 	cellNeg                                                    algebraicCellNegNumeric
@@ -209,7 +210,7 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
-	if m != nil && m.self == m && (m.copyCall.callback() || m.cellBoundsCall.callback()) {
+	if m != nil && m.self == m && (m.copyCall.callback() || m.cellBoundsCall.callback() || m.cellCoefficientCopy.callback()) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && (m.cellEvaluationPending() || m.cellNeg.pending()) {
@@ -776,9 +777,9 @@ func (m *AlgebraicRootCore) copyPolynomialDataFromOwner(l *algebraicLocation, r 
 	p := m.config.Polynomials
 	var q UPolynomial
 	var e error
-	// The accepted copy_poly caller owns this factory continuation; ordinary
+	// The executing coefficient-copy caller owns this factory continuation; ordinary
 	// public factory calls remain refused during its borrowed execution.
-	if m.copyCall.NumericBound(true) {
+	if m.copyCall.NumericBound(true) || m.cellCoefficientFactoryContinuation() {
 		q, e = p.newPolynomial()
 	} else {
 		q, e = p.NewPolynomial()
@@ -973,11 +974,7 @@ func (m *AlgebraicRootCore) setRoot(a *Algebraic, p UPolynomialView, lower, uppe
 			return err
 		}
 	}
-	if existing {
-		err = m.copyPolynomial(l, &r, p)
-	} else {
-		err = m.copyPolynomialDataFromOwner(l, &r, m.config.Polynomials, p)
-	}
+	err = m.copyCellPolynomial(l, &r, p, existing)
 	if err != nil {
 		return err
 	}
@@ -1150,7 +1147,7 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.cleanupRetainedCore()
 }
 func (m *AlgebraicRootCore) cleanupRetainedCore() error {
-	if m != nil && m.self == m && (m.copyCall.running || m.copyCall.cleaning || m.cellBoundsCall.running || m.cellBoundsCall.cleaning) {
+	if m != nil && m.self == m && (m.copyCall.running || m.copyCall.cleaning || m.cellBoundsCall.running || m.cellBoundsCall.cleaning || m.cellCoefficientCopy.running) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting || m.cellEvaluationRunning || m.cellNeg.running) {
@@ -1404,7 +1401,7 @@ func (m *AlgebraicRootCore) Close() error {
 	return m.closeCoreMembers()
 }
 func (m *AlgebraicRootCore) closeCoreMembers() error {
-	if m != nil && m.self == m && (m.copyCall.running || m.copyCall.cleaning || m.cellBoundsCall.running || m.cellBoundsCall.cleaning) {
+	if m != nil && m.self == m && (m.copyCall.running || m.copyCall.cleaning || m.cellBoundsCall.running || m.cellBoundsCall.cleaning || m.cellCoefficientCopy.running) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting || m.cellEvaluationRunning || m.cellNeg.running) {
