@@ -40274,7 +40274,11 @@
         "pkg/math/polynomial/polynomial_linear_trace.go",
         "pkg/util/numeral/integer_trace_borrow.go",
         "pkg/math/polynomial/polynomial_linear_trace_failure_test.go",
-        "pkg/math/polynomial/polynomial_linear_assertions.go"
+        "pkg/math/polynomial/polynomial_linear_assertions.go",
+        "pkg/util/numeral/mp_display_stream.go",
+        "pkg/math/polynomial/polynomial_linear_stream_flags_test.go",
+        "pkg/math/polynomial/polynomial_linear_display_test.go",
+        "pkg/util/numeral/mp_display_stream_test.go"
       ],
       "tests": [
         "TestLinearModularDisplayBorrowsFieldManager",
@@ -40313,7 +40317,11 @@
         "TestLinearSourceConstructorAssertionActionsAndErasure",
         "TestLinearSourceAddAssertionBeforeReachedOperands",
         "TestLinearRationalExecutingOutputRefusesOwnerMutation",
-        "TestLinearModularExecutingOutputRefusesOwnerMutation"
+        "TestLinearModularExecutingOutputRefusesOwnerMutation",
+        "TestLinearRationalDisplayReceivingNumericFlags",
+        "TestLinearModularDisplayReceivingNumericFlags",
+        "TestLinearNumericInsertionCallbackBorrowsActualOwners",
+        "TestIntegerAndRationalDisplaySourceInsertionOrder"
       ],
       "conditionals": [
         {
@@ -40363,6 +40371,25 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Direct concrete linear numeral display preserves receiving numeric/string formatting (linear_eq_solver.h:143-146; mpz.cpp:1385-1408; mpq.cpp:130-139)",
+          "status": "ported",
+          "go_target": "pkg/util/numeral/mp_display_stream.go",
+          "go_targets": [
+            "pkg/util/numeral/mp_display_stream.go",
+            "pkg/math/polynomial/polynomial_linear_display.go",
+            "pkg/math/polynomial/polynomial_linear_stream_flags_test.go",
+            "pkg/math/polynomial/polynomial_linear_display_test.go",
+            "pkg/util/numeral/mp_display_stream_test.go"
+          ],
+          "tests": [
+            "TestLinearRationalDisplayReceivingNumericFlags",
+            "TestLinearModularDisplayReceivingNumericFlags",
+            "TestLinearNumericInsertionCallbackBorrowsActualOwners",
+            "TestIntegerAndRationalDisplaySourceInsertionOrder"
+          ],
+          "notes": "Cold io.Writer receivers that expose native AppendInt32/AppendCString retain their actual formatting state. SMALL mpz insertion delegates int32 directly; BIG sign and decimal magnitude remain separate string insertions. Rational NUM/slash/DEN order and unnormalized modular display stay intact. Both real solvers reproduce baseline decimal-loss failures, then verify hexadecimal/showbase, width/fill and BIG positive/negative behavior on normalized actual matrix fields. A concrete numeric-insertion callback cannot close/reset/source-finalize its actual solver or borrowed numeral managers; data/ownership stay unchanged. Native Go interfaces delegate only reached IO operations, not arithmetic, container templates or STL internals. Wrapped TRACE stream formatting/exception and broader whole linear-unit lifetime audits remain open."
+        },
+        {
           "name": "Concrete linear display delegates each numeral insertion at the reached matrix/RHS position (linear_eq_solver.h:143-146; mpq.cpp:130-139; mpz.cpp:1385-1408)",
           "status": "partial",
           "go_target": "pkg/math/polynomial/polynomial_linear_display.go",
@@ -40396,7 +40423,12 @@
         {
           "name": "Retained unsynchronized rational Copy/Set/Div/SubMul calls transport exact integer allocations and accepted GCD/division RAW receipts; owning solver cleanup releases these before header retirement and preserves foreign replacements",
           "status": "partial",
-          "go_targets": ["pkg/math/polynomial/polynomial_linear_rational.go", "pkg/util/numeral/mpq.go", "pkg/util/numeral/mpq_ops.go", "pkg/util/numeral/numeric_caller_operations_extra.go"],
+          "go_targets": [
+            "pkg/math/polynomial/polynomial_linear_rational.go",
+            "pkg/util/numeral/mpq.go",
+            "pkg/util/numeral/mpq_ops.go",
+            "pkg/util/numeral/numeric_caller_operations_extra.go"
+          ],
           "tests": [
             "TestLinearRationalArithmeticEveryReservationPrefix",
             "TestLinearRationalCopyRefusalOwnsExactNumericRoot",
@@ -169154,7 +169186,10 @@
         "pkg/math/polynomial/algebraic_display_decimal_test.go",
         "pkg/util/numeral/mp_display_stream.go",
         "pkg/util/numeral/mp_display_stream_test.go",
-        "pkg/util/numeral/mpq_parse_trace.go"
+        "pkg/util/numeral/mpq_parse_trace.go",
+        "pkg/math/polynomial/polynomial_linear_display.go",
+        "pkg/math/polynomial/polynomial_linear_stream_flags_test.go",
+        "pkg/math/polynomial/polynomial_linear_display_test.go"
       ],
       "tests": [
         "TestRationalCompareSourceSignAssertionSites",
@@ -169358,7 +169393,10 @@
         "TestRationalDivisionBoundaryGenerationExhaustion",
         "TestAlgebraicDisplayDecimalBasicRootAndExactRefinement",
         "TestIntegerAndRationalDisplaySourceInsertionOrder",
-        "TestRationalSetStringRetainedTraceBranches"
+        "TestRationalSetStringRetainedTraceBranches",
+        "TestLinearRationalDisplayReceivingNumericFlags",
+        "TestLinearModularDisplayReceivingNumericFlags",
+        "TestLinearNumericInsertionCallbackBorrowsActualOwners"
       ],
       "assertions": [
         {
@@ -169393,6 +169431,25 @@
       "methods_audited": false,
       "ownership_audited": false,
       "methods": [
+        {
+          "name": "Direct concrete linear numeral display preserves receiving numeric/string formatting (linear_eq_solver.h:143-146; mpz.cpp:1385-1408; mpq.cpp:130-139)",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mp_display_stream.go",
+          "go_targets": [
+            "pkg/util/numeral/mp_display_stream.go",
+            "pkg/math/polynomial/polynomial_linear_display.go",
+            "pkg/math/polynomial/polynomial_linear_stream_flags_test.go",
+            "pkg/math/polynomial/polynomial_linear_display_test.go",
+            "pkg/util/numeral/mp_display_stream_test.go"
+          ],
+          "tests": [
+            "TestLinearRationalDisplayReceivingNumericFlags",
+            "TestLinearModularDisplayReceivingNumericFlags",
+            "TestLinearNumericInsertionCallbackBorrowsActualOwners",
+            "TestIntegerAndRationalDisplaySourceInsertionOrder"
+          ],
+          "notes": "Cold io.Writer receivers that expose native AppendInt32/AppendCString retain their actual formatting state. SMALL mpz insertion delegates int32 directly; BIG sign and decimal magnitude remain separate string insertions. Rational NUM/slash/DEN order and unnormalized modular display stay intact. Both real solvers reproduce baseline decimal-loss failures, then verify hexadecimal/showbase, width/fill and BIG positive/negative behavior on normalized actual matrix fields. A concrete numeric-insertion callback cannot close/reset/source-finalize its actual solver or borrowed numeral managers; data/ownership stay unchanged. Native Go interfaces delegate only reached IO operations, not arithmetic, container templates or STL internals. Wrapped TRACE stream formatting/exception and broader whole linear-unit lifetime audits remain open."
+        },
         {
           "name": "mpq default construction/is_small",
           "status": "ported",
@@ -169590,15 +169647,28 @@
           "name": "set(char const*) outer and suffix scoped mpz temporary source deletion and owning continuation (mpq.cpp:188-255)",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpq_parse.go",
-          "go_targets": ["pkg/util/numeral/mpq_parse_scope_test.go", "pkg/util/numeral/mpq_parse_scope_runtime_test.go"],
-          "tests": ["TestRationalParserIntegerScopesRetainSuffixBeforeOuterCleanup", "TestRationalParserActualOuterScopedDeletionRefusal"]
+          "go_targets": [
+            "pkg/util/numeral/mpq_parse_scope_test.go",
+            "pkg/util/numeral/mpq_parse_scope_runtime_test.go"
+          ],
+          "tests": [
+            "TestRationalParserIntegerScopesRetainSuffixBeforeOuterCleanup",
+            "TestRationalParserActualOuterScopedDeletionRefusal"
+          ]
         },
         {
           "name": "set(char const*) concrete b, _exp and _ten scoped rational deletion in reverse construction order with numerator-before-denominator continuation (mpq.cpp:242-268)",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpq_parse.go",
-          "go_targets": ["pkg/util/numeral/mpq_parse_rational_scope_test.go", "pkg/util/numeral/mpq_parse_scope_runtime_test.go"],
-          "tests": ["TestRationalParserRationalScopesRetainReverseDeletionOrder", "TestRationalParserRationalScopeDenominatorStopKeepsComponentCursor", "TestRationalParserActualExponentScopedDeletionRefusal"]
+          "go_targets": [
+            "pkg/util/numeral/mpq_parse_rational_scope_test.go",
+            "pkg/util/numeral/mpq_parse_scope_runtime_test.go"
+          ],
+          "tests": [
+            "TestRationalParserRationalScopesRetainReverseDeletionOrder",
+            "TestRationalParserRationalScopeDenominatorStopKeepsComponentCursor",
+            "TestRationalParserActualExponentScopedDeletionRefusal"
+          ]
         },
         {
           "name": "set(char const*) complete permissive byte/text parser",
@@ -170169,7 +170239,10 @@
         "pkg/math/polynomial/algebraic_predicate_rational_scope_test.go",
         "pkg/math/polynomial/algebraic_predicate_integer_test.go",
         "pkg/math/polynomial/algebraic_predicate_integer_stop_test.go",
-        "pkg/math/polynomial/algebraic_const_rational_scope_test.go"
+        "pkg/math/polynomial/algebraic_const_rational_scope_test.go",
+        "pkg/math/polynomial/polynomial_linear_display.go",
+        "pkg/math/polynomial/polynomial_linear_stream_flags_test.go",
+        "pkg/math/polynomial/polynomial_linear_display_test.go"
       ],
       "tests": [
         "TestRationalSourceDivAndInverseAliases",
@@ -170466,7 +170539,10 @@
         "TestRationalBinaryShortTraceOuterAndRatBranches",
         "TestRationalTraceSharesNestedIntegerStream",
         "TestRationalMixedAndDivisionShortTraceSourceBranches",
-        "TestRationalSetStringRetainedTraceBranches"
+        "TestRationalSetStringRetainedTraceBranches",
+        "TestLinearRationalDisplayReceivingNumericFlags",
+        "TestLinearModularDisplayReceivingNumericFlags",
+        "TestLinearNumericInsertionCallbackBorrowsActualOwners"
       ],
       "conditionals": [
         {
@@ -170572,10 +170648,32 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Direct concrete linear numeral display preserves receiving numeric/string formatting (linear_eq_solver.h:143-146; mpz.cpp:1385-1408; mpq.cpp:130-139)",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mp_display_stream.go",
+          "go_targets": [
+            "pkg/util/numeral/mp_display_stream.go",
+            "pkg/math/polynomial/polynomial_linear_display.go",
+            "pkg/math/polynomial/polynomial_linear_stream_flags_test.go",
+            "pkg/math/polynomial/polynomial_linear_display_test.go",
+            "pkg/util/numeral/mp_display_stream_test.go"
+          ],
+          "tests": [
+            "TestLinearRationalDisplayReceivingNumericFlags",
+            "TestLinearModularDisplayReceivingNumericFlags",
+            "TestLinearNumericInsertionCallbackBorrowsActualOwners",
+            "TestIntegerAndRationalDisplaySourceInsertionOrder"
+          ],
+          "notes": "Cold io.Writer receivers that expose native AppendInt32/AppendCString retain their actual formatting state. SMALL mpz insertion delegates int32 directly; BIG sign and decimal magnitude remain separate string insertions. Rational NUM/slash/DEN order and unnormalized modular display stay intact. Both real solvers reproduce baseline decimal-loss failures, then verify hexadecimal/showbase, width/fill and BIG positive/negative behavior on normalized actual matrix fields. A concrete numeric-insertion callback cannot close/reset/source-finalize its actual solver or borrowed numeral managers; data/ownership stay unchanged. Native Go interfaces delegate only reached IO operations, not arithmetic, container templates or STL internals. Wrapped TRACE stream formatting/exception and broader whole linear-unit lifetime audits remain open."
+        },
+        {
           "name": "Retained bound-propagator reverse trail mpq deletion consumer with stopped Go owning continuation (bound_propagator.cpp:214-235,742-758)",
           "status": "ported",
           "go_target": "pkg/tactic/arith/bound_equation_store.go",
-          "tests": ["TestBoundEquationStoreCloseResumesReverseTrailAfterStoppedRelease", "TestBoundEquationStoreCloseResumesConstraintRelease"]
+          "tests": [
+            "TestBoundEquationStoreCloseResumesReverseTrailAfterStoppedRelease",
+            "TestBoundEquationStoreCloseResumesConstraintRelease"
+          ]
         },
         {
           "name": "mpq default construction/is_small",
@@ -170773,15 +170871,28 @@
           "name": "set(char const*) outer and suffix scoped mpz temporary source deletion and owning continuation (mpq.cpp:188-255)",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpq_parse.go",
-          "go_targets": ["pkg/util/numeral/mpq_parse_scope_test.go", "pkg/util/numeral/mpq_parse_scope_runtime_test.go"],
-          "tests": ["TestRationalParserIntegerScopesRetainSuffixBeforeOuterCleanup", "TestRationalParserActualOuterScopedDeletionRefusal"]
+          "go_targets": [
+            "pkg/util/numeral/mpq_parse_scope_test.go",
+            "pkg/util/numeral/mpq_parse_scope_runtime_test.go"
+          ],
+          "tests": [
+            "TestRationalParserIntegerScopesRetainSuffixBeforeOuterCleanup",
+            "TestRationalParserActualOuterScopedDeletionRefusal"
+          ]
         },
         {
           "name": "set(char const*) concrete b, _exp and _ten scoped rational deletion in reverse construction order with numerator-before-denominator continuation (mpq.cpp:242-268)",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpq_parse.go",
-          "go_targets": ["pkg/util/numeral/mpq_parse_rational_scope_test.go", "pkg/util/numeral/mpq_parse_scope_runtime_test.go"],
-          "tests": ["TestRationalParserRationalScopesRetainReverseDeletionOrder", "TestRationalParserRationalScopeDenominatorStopKeepsComponentCursor", "TestRationalParserActualExponentScopedDeletionRefusal"]
+          "go_targets": [
+            "pkg/util/numeral/mpq_parse_rational_scope_test.go",
+            "pkg/util/numeral/mpq_parse_scope_runtime_test.go"
+          ],
+          "tests": [
+            "TestRationalParserRationalScopesRetainReverseDeletionOrder",
+            "TestRationalParserRationalScopeDenominatorStopKeepsComponentCursor",
+            "TestRationalParserActualExponentScopedDeletionRefusal"
+          ]
         },
         {
           "name": "set(char const*) complete permissive byte/text parser",
@@ -171312,7 +171423,15 @@
           "name": "mpq_manager::inv in-place and copy-then-invert overloads: zero debug gate, sign normalization, component swap, receiver aliases and cold allocation refusal (mpq.h:443-455)",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpq.go",
-          "tests": ["TestRationalSourceDivAndInverseAliases", "TestRationalCheckedInitializationAndZero", "TestRationalColdInverseFailureCleanup", "TestDivisionPublicationInverseInPlaceOverload", "TestDivisionPublicationInverseMinNegFailureOrder", "TestDivisionPublicationInverseCopyFailureBeforeDebugAssertion", "TestDivisionPublicationInverseTwoMinNegActions"]
+          "tests": [
+            "TestRationalSourceDivAndInverseAliases",
+            "TestRationalCheckedInitializationAndZero",
+            "TestRationalColdInverseFailureCleanup",
+            "TestDivisionPublicationInverseInPlaceOverload",
+            "TestDivisionPublicationInverseMinNegFailureOrder",
+            "TestDivisionPublicationInverseCopyFailureBeforeDebugAssertion",
+            "TestDivisionPublicationInverseTwoMinNegActions"
+          ]
         },
         {
           "name": "Direct additive and mixed-product caller publication; source fused/unit and Inc/Dec dependency routes",
@@ -171672,8 +171791,13 @@
           "name": "mpq.h:689-695 int64/uint64 fraction SET debug assertion before numerator publication",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpq.go",
-          "go_targets": ["pkg/util/numeral/mpq_fraction_assertion.go"],
-          "tests": ["TestRationalFractionSourceAssertionActions", "TestRationalCheckedInitializationAndZero"]
+          "go_targets": [
+            "pkg/util/numeral/mpq_fraction_assertion.go"
+          ],
+          "tests": [
+            "TestRationalFractionSourceAssertionActions",
+            "TestRationalCheckedInitializationAndZero"
+          ]
         },
         {
           "name": "identity-checked caller observation/cleanup of actual synchronized rational comparison RAW invocation used by concrete LP priority queues",
@@ -172035,7 +172159,10 @@
         "pkg/util/numeral/mp_display_stream_test.go",
         "pkg/math/polynomial/algebraic_predicate_comparison_test.go",
         "pkg/math/polynomial/algebraic_predicate_trace_test.go",
-        "pkg/math/polynomial/upolynomial_sturm_isolation_numeric_test.go"
+        "pkg/math/polynomial/upolynomial_sturm_isolation_numeric_test.go",
+        "pkg/math/polynomial/polynomial_linear_display.go",
+        "pkg/math/polynomial/polynomial_linear_stream_flags_test.go",
+        "pkg/math/polynomial/polynomial_linear_display_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -172356,7 +172483,10 @@
         "TestOwnedStringCopyAndReconstructionLifetime",
         "TestIntegerRawObservationGenerationIdentity",
         "TestIntegerAndRationalDisplaySourceInsertionOrder",
-        "TestIntegerDividesRetainedShortAndBugTrace"
+        "TestIntegerDividesRetainedShortAndBugTrace",
+        "TestLinearRationalDisplayReceivingNumericFlags",
+        "TestLinearModularDisplayReceivingNumericFlags",
+        "TestLinearNumericInsertionCallbackBorrowsActualOwners"
       ],
       "conditionals": [
         {
@@ -173114,6 +173244,25 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Direct concrete linear numeral display preserves receiving numeric/string formatting (linear_eq_solver.h:143-146; mpz.cpp:1385-1408; mpq.cpp:130-139)",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mp_display_stream.go",
+          "go_targets": [
+            "pkg/util/numeral/mp_display_stream.go",
+            "pkg/math/polynomial/polynomial_linear_display.go",
+            "pkg/math/polynomial/polynomial_linear_stream_flags_test.go",
+            "pkg/math/polynomial/polynomial_linear_display_test.go",
+            "pkg/util/numeral/mp_display_stream_test.go"
+          ],
+          "tests": [
+            "TestLinearRationalDisplayReceivingNumericFlags",
+            "TestLinearModularDisplayReceivingNumericFlags",
+            "TestLinearNumericInsertionCallbackBorrowsActualOwners",
+            "TestIntegerAndRationalDisplaySourceInsertionOrder"
+          ],
+          "notes": "Cold io.Writer receivers that expose native AppendInt32/AppendCString retain their actual formatting state. SMALL mpz insertion delegates int32 directly; BIG sign and decimal magnitude remain separate string insertions. Rational NUM/slash/DEN order and unnormalized modular display stay intact. Both real solvers reproduce baseline decimal-loss failures, then verify hexadecimal/showbase, width/fill and BIG positive/negative behavior on normalized actual matrix fields. A concrete numeric-insertion callback cannot close/reset/source-finalize its actual solver or borrowed numeral managers; data/ownership stay unchanged. Native Go interfaces delegate only reached IO operations, not arithmetic, container templates or STL internals. Wrapped TRACE stream formatting/exception and broader whole linear-unit lifetime audits remain open."
+        },
+        {
           "name": "Concrete signed integer comparison across explicit numeral owners for retained algebraic interval-copy assertions",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_compare_owner.go",
@@ -173131,7 +173280,11 @@
           "name": "integer-owned Runtime explicitly joins the source process shared with rational parameter and environment consumers",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz.go",
-          "go_targets": ["pkg/util/numeral/mpz_process_binding_test.go", "pkg/util/params/util_env_params_test.go", "pkg/math/subpaving/tactic/core_process_binding_test.go"],
+          "go_targets": [
+            "pkg/util/numeral/mpz_process_binding_test.go",
+            "pkg/util/params/util_env_params_test.go",
+            "pkg/math/subpaving/tactic/core_process_binding_test.go"
+          ],
           "tests": [
             "TestIntegerOwnedRuntimeJoinsSourceProcess",
             "TestIntegerOwnedRuntimeRejectsProcessABIWithoutStorage",
@@ -174022,7 +174175,9 @@
           "name": "Selected Integer scalar getters: source 32/64-bit assertion switch/actions, low-word casts and strict predicates",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz.go",
-          "go_targets": ["pkg/util/numeral/mpz_misc.go"],
+          "go_targets": [
+            "pkg/util/numeral/mpz_misc.go"
+          ],
           "tests": [
             "TestMPZ32BitGetterSourceThrowContinueAndDisabled",
             "TestIntegerScalarStrictConversions",
@@ -174690,7 +174845,10 @@
         "pkg/util/numeral/mpz_neg_trace_test.go",
         "pkg/util/numeral/mpz_binary_trace_test.go",
         "pkg/util/numeral/mpz_division_trace_test.go",
-        "pkg/math/polynomial/upolynomial_root_id_remainder_test.go"
+        "pkg/math/polynomial/upolynomial_root_id_remainder_test.go",
+        "pkg/math/polynomial/polynomial_linear_display.go",
+        "pkg/math/polynomial/polynomial_linear_stream_flags_test.go",
+        "pkg/math/polynomial/polynomial_linear_display_test.go"
       ],
       "tests": [
         "TestIntegerSourceBug3",
@@ -175023,7 +175181,10 @@
         "TestIntegerNegSourceShortTraceAndAbsExclusion",
         "TestIntegerBinaryShortTraceAliasAndNestedAddMul",
         "TestIntegerBinaryShortTraceInsideStringSet",
-        "TestIntegerDivisionShortTraceNestedSourceOrder"
+        "TestIntegerDivisionShortTraceNestedSourceOrder",
+        "TestLinearRationalDisplayReceivingNumericFlags",
+        "TestLinearModularDisplayReceivingNumericFlags",
+        "TestLinearNumericInsertionCallbackBorrowsActualOwners"
       ],
       "conditionals": [
         {
@@ -175293,6 +175454,25 @@
       "ownership_audited": false,
       "methods": [
         {
+          "name": "Direct concrete linear numeral display preserves receiving numeric/string formatting (linear_eq_solver.h:143-146; mpz.cpp:1385-1408; mpq.cpp:130-139)",
+          "status": "platform_replacement",
+          "go_target": "pkg/util/numeral/mp_display_stream.go",
+          "go_targets": [
+            "pkg/util/numeral/mp_display_stream.go",
+            "pkg/math/polynomial/polynomial_linear_display.go",
+            "pkg/math/polynomial/polynomial_linear_stream_flags_test.go",
+            "pkg/math/polynomial/polynomial_linear_display_test.go",
+            "pkg/util/numeral/mp_display_stream_test.go"
+          ],
+          "tests": [
+            "TestLinearRationalDisplayReceivingNumericFlags",
+            "TestLinearModularDisplayReceivingNumericFlags",
+            "TestLinearNumericInsertionCallbackBorrowsActualOwners",
+            "TestIntegerAndRationalDisplaySourceInsertionOrder"
+          ],
+          "notes": "Cold io.Writer receivers that expose native AppendInt32/AppendCString retain their actual formatting state. SMALL mpz insertion delegates int32 directly; BIG sign and decimal magnitude remain separate string insertions. Rational NUM/slash/DEN order and unnormalized modular display stay intact. Both real solvers reproduce baseline decimal-loss failures, then verify hexadecimal/showbase, width/fill and BIG positive/negative behavior on normalized actual matrix fields. A concrete numeric-insertion callback cannot close/reset/source-finalize its actual solver or borrowed numeral managers; data/ownership stay unchanged. Native Go interfaces delegate only reached IO operations, not arithmetic, container templates or STL internals. Wrapped TRACE stream formatting/exception and broader whole linear-unit lifetime audits remain open."
+        },
+        {
           "name": "Concrete signed integer comparison across explicit numeral owners for retained algebraic interval-copy assertions",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz_compare_owner.go",
@@ -175310,13 +175490,19 @@
           "name": "Retained linear_equation::del consumer of mpz_manager::del, source-order coefficient release and stopped Go cleanup continuation (mpz.h:340-347; linear_equation.cpp:273-280)",
           "status": "ported",
           "go_target": "pkg/tactic/arith/linear_equation.go",
-          "tests": ["TestLinearEquationCloseResumesAfterStoppedCoefficientRelease"]
+          "tests": [
+            "TestLinearEquationCloseResumesAfterStoppedCoefficientRelease"
+          ]
         },
         {
           "name": "integer-owned Runtime explicitly joins the source process shared with rational parameter and environment consumers",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz.go",
-          "go_targets": ["pkg/util/numeral/mpz_process_binding_test.go", "pkg/util/params/util_env_params_test.go", "pkg/math/subpaving/tactic/core_process_binding_test.go"],
+          "go_targets": [
+            "pkg/util/numeral/mpz_process_binding_test.go",
+            "pkg/util/params/util_env_params_test.go",
+            "pkg/math/subpaving/tactic/core_process_binding_test.go"
+          ],
           "tests": [
             "TestIntegerOwnedRuntimeJoinsSourceProcess",
             "TestIntegerOwnedRuntimeRejectsProcessABIWithoutStorage",
@@ -176260,7 +176446,9 @@
           "name": "Selected Integer scalar getters: source 32/64-bit assertion switch/actions, low-word casts and strict predicates",
           "status": "ported",
           "go_target": "pkg/util/numeral/mpz.go",
-          "go_targets": ["pkg/util/numeral/mpz_misc.go"],
+          "go_targets": [
+            "pkg/util/numeral/mpz_misc.go"
+          ],
           "tests": [
             "TestMPZ32BitGetterSourceThrowContinueAndDisabled",
             "TestIntegerScalarStrictConversions",

@@ -8,6 +8,11 @@ import (
 )
 
 func writeNumeralDisplayPart(w io.Writer, s string) error {
+	// A receiving numeric stream owns its formatting state. Keep CString
+	// insertion distinct from raw io.Writer bytes (notably width/fill).
+	if out, ok := w.(interface{ AppendCString(string) error }); ok {
+		return out.AppendCString(s)
+	}
 	n, err := io.WriteString(w, s)
 	if err == nil && n != len(s) {
 		return io.ErrShortWrite
@@ -17,12 +22,18 @@ func writeNumeralDisplayPart(w io.Writer, s string) error {
 
 // DisplayTo writes an inline integer in one insertion. A large negative
 // integer writes its sign before formatting and inserting the magnitude.
+// Receiving numeric/string insertion methods retain their actual stream flags.
 func (m *IntegerManager) DisplayTo(w io.Writer, a *Int) error {
 	if w == nil {
 		return arena.ErrInvalidSlot
 	}
 	if err := m.check(a); err != nil {
 		return err
+	}
+	if a.IsSmall() {
+		if out, ok := w.(interface{ AppendInt32(int32) error }); ok {
+			return out.AppendInt32(a.Val)
+		}
 	}
 	largeNegative := !a.IsSmall() && a.Val < 0
 	if largeNegative {
