@@ -15,8 +15,8 @@ type algebraicInverseScope struct {
 	refineEvaluation              upolyBinaryEvaluationInvocationReceipt
 	refineCopy                    unumeral.IntegerCopyAllocationReceipt
 	conversions                   [2]algebraicConversionScope
-	traceStop                     error
 	traceDisplayPending           bool
+	traceDisplay                  algebraicRootDisplayInvocationReceipt
 	sourceCursor, sourceRemaining uint8
 	convertEntry                  upolyConvertEntryReceipt
 	polynomialCaller              *polynomialAlgebraicEvaluationScope
@@ -41,8 +41,8 @@ func (m *AlgebraicRootCore) finishInverseSource() error {
 	if q.sourceStop != nil {
 		return q.sourceStop
 	}
-	if q.traceDisplayPending {
-		return errors.Join(ErrAlgebraicPending, q.traceStop)
+	if e := m.rootTraceSourceCause(); e != nil {
+		return e
 	}
 	for i := len(q.conversions) - 1; i >= 0; i-- {
 		if q.conversions[i].stop != nil {
@@ -86,7 +86,7 @@ func (m *AlgebraicRootCore) cleanupInverse() error {
 		return e
 	}
 	if q.traceDisplayPending {
-		if e := m.cleanupRootDisplay(); e != nil {
+		if e := m.cleanupRootDisplayInvocation(&q.traceDisplay); e != nil {
 			return e
 		}
 		q.traceDisplayPending = false
@@ -235,13 +235,12 @@ func (m *AlgebraicRootCore) Inv(a *Algebraic) (cause error) {
 	q := &m.inversion
 	q.polynomialCaller = m.polynomialCaller
 	q.sourceStop = nil
-	q.traceStop = nil
 	q.traceDisplayPending = false
 	q.sourceCursor, q.sourceRemaining = 0, 0
 	q.executing = true
 	defer func() {
 		q.executing = false
-		cleanup := q.traceStop
+		cleanup := m.rootTraceSourceCause()
 		if cleanup == nil {
 			cleanup = m.config.Polynomials.convertEntryReceiptSourceCause(&q.convertEntry)
 		}

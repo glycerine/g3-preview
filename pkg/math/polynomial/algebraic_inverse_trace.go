@@ -1,69 +1,73 @@
 // Source: src/math/polynomial/algebraic_numbers.cpp:1630,1641,1644.
 package polynomial
 
-import "io"
+import (
+	"io"
+	"strings"
+
+	unumeral "github.com/glycerine/g3/pkg/util/numeral"
+)
 
 func (m *AlgebraicRootCore) traceInverseValue(a *Algebraic, after bool) error {
-	tags := m.config.Rationals.Integers().BorrowTraceTags()
-	if !tags.ShouldTrace("algebraic_bug") {
-		return nil
-	}
 	line, label := 1630, "before inv: "
 	if after {
 		line, label = 1644, "after inv: "
 	}
-	var computation error
-	_ = tags.EmitConditional("algebraic_bug", "inv", "src/math/polynomial/algebraic_numbers.cpp", line,
-		func() bool { return true }, func(w io.Writer) error {
-			out := algebraicPredicateTraceStream{w}
-			_ = out.AppendCString(label)
-			location, e := m.locationCleanup(a)
-			if e == nil {
-				e = m.displayRootAtLocation(out, location, false)
-				if m.rootDisplay.active {
-					m.inversion.traceDisplayPending = true
-					m.inversion.traceStop = e
-				}
-			}
-			if e == nil {
-				_ = out.AppendCString("\n")
-				location, e = m.locationCleanup(a)
-				if e == nil {
-					e = m.displayIntervalAtLocation(algebraicComparisonTraceWriter{w}, location)
-				}
-			}
-			computation = e
-			if e == nil {
-				_ = out.AppendCString("\n")
-			}
+	return m.emitRootTraceTag("algebraic_bug", "inv", line, func(w io.Writer) error {
+		out := algebraicTranslationTraceStream{algebraicPredicateTraceStream{w}}
+		_ = out.AppendCString(label)
+		location, e := m.locationCleanup(a)
+		if e != nil {
 			return e
-		})
-	return computation
+		}
+		e = m.displayRootAtLocationWithReceipt(out, location, false, &m.rootTrace.root)
+		m.inversion.traceDisplay = m.rootTrace.root
+		m.inversion.traceDisplayPending = m.rootDisplayInvocationPending(&m.inversion.traceDisplay)
+		if e != nil {
+			return e
+		}
+		_ = out.AppendCString("\n")
+		// display_root may publish its cached index. Read the actual cell again.
+		location, e = m.locationCleanup(a)
+		if e != nil {
+			return e
+		}
+		if location == nil || location.kind != 1 {
+			return ErrAlgebraicOwner
+		}
+		r, e := m.load(location)
+		if e != nil {
+			return e
+		}
+		_ = out.AppendCString("(")
+		for i, bound := range [2]*unumeral.BinaryRational{r.interval.BorrowLower(), r.interval.BorrowUpper()} {
+			if i != 0 {
+				_ = out.AppendCString(", ")
+			}
+			if e = m.config.Binary.DisplaySourceTracked(out, bound, &m.rootTrace.insertions[i]); e != nil {
+				return e
+			}
+		}
+		return out.AppendCString(")\n")
+	})
 }
 
 func (m *AlgebraicRootCore) traceInverseBounds() error {
-	tags := m.config.Rationals.Integers().BorrowTraceTags()
-	if !tags.ShouldTrace("algebraic_bug") {
-		return nil
-	}
-	var computation error
-	_ = tags.EmitConditional("algebraic_bug", "inv", "src/math/polynomial/algebraic_numbers.cpp", 1641,
-		func() bool { return true }, func(w io.Writer) error {
-			out := algebraicPredicateTraceStream{w}
-			_ = out.AppendCString("inv new_bounds: ")
-			for i := range m.inversion.values {
-				if i != 0 {
-					_ = out.AppendCString(", ")
-				}
-				text, e := m.config.Rationals.String(&m.inversion.values[i])
-				if e != nil {
-					computation = e
-					return e
-				}
-				_ = out.AppendCString(text)
+	return m.emitRootTraceTag("algebraic_bug", "inv", 1641, func(w io.Writer) error {
+		out := algebraicPredicateTraceStream{w}
+		_ = out.AppendCString("inv new_bounds: ")
+		for i := range m.inversion.values {
+			if i != 0 {
+				_ = out.AppendCString(", ")
 			}
-			_ = out.AppendCString("\n")
-			return nil
-		})
-	return computation
+			// qm().to_string finishes its project formatting children before the
+			// string insertion. Native Go storage replaces the local string stream.
+			var text strings.Builder
+			if e := m.config.Rationals.DisplayIntoTracked(algebraicPredicateTraceStream{&text}, &m.inversion.values[i], &m.rootTrace.insertions[i]); e != nil {
+				return e
+			}
+			_ = out.AppendCString(text.String())
+		}
+		return out.AppendCString("\n")
+	})
 }
