@@ -45041,8 +45041,8 @@
           ]
         },
         {
-          "name": "manager::factors ctor/destructor/reset/push/accessors/set_constant/set_degree/operator[] cpp1613-1638,1672-1684 and h120-190; source lifecycle versus explicit owning abort",
-          "status": "partial",
+          "name": "Complete manager::factors ctor/destructor/reset/push/accessors/set_constant/set_degree/operator[] cpp1613-1638,1672-1684 and h120-190, with source lifecycle and explicit owning continuation",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factors.go",
           "tests": [
             "TestPolynomialFactorsConstructorColdRefusal",
@@ -45068,8 +45068,8 @@
           ]
         },
         {
-          "name": "manager::factors multiply cpp1640-1661; literal per-loop reference/Power/mul/scalar-mul and exact operation receipts",
-          "status": "partial",
+          "name": "Complete manager::factors multiply cpp1640-1661: literal per-loop reference, Power, mul, scalar-mul and exact operation receipts",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factors_operations.go",
           "tests": [
             "TestPolynomialFactorsAbortOwnsReachedCalleesOnly",
@@ -45094,8 +45094,8 @@
           ]
         },
         {
-          "name": "manager::factors display cpp1663-1670; actual scalar to_string/term display and repeated SIZE after callbacks",
-          "status": "partial",
+          "name": "Complete manager::factors display cpp1663-1670: actual scalar to_string, term display and repeated SIZE after callbacks",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factors_operations.go",
           "tests": [
             "TestPolynomialFactorsDisplayEveryReservation",
@@ -45104,8 +45104,8 @@
           ]
         },
         {
-          "name": "imp acc_constant/flip_sign cpp6577-6589; literal scoped numeral Mul/Set/Neg/Set and source destructor; full factorization OPEN",
-          "status": "partial",
+          "name": "Complete imp acc_constant/flip_sign cpp6577-6589: literal scoped numeral Mul/Set/Neg/Set and source destructor",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factors_operations.go",
           "tests": [
             "TestPolynomialFactorsConstantHelpersEveryReservation",
@@ -49217,8 +49217,8 @@
           ]
         },
         {
-          "name": "manager::factors ctor/destructor/reset/push/accessors/set_constant/set_degree/operator[] cpp1613-1638,1672-1684 and h120-190; source lifecycle versus explicit owning abort",
-          "status": "partial",
+          "name": "Complete manager::factors ctor/destructor/reset/push/accessors/set_constant/set_degree/operator[] cpp1613-1638,1672-1684 and h120-190, with source lifecycle and explicit owning continuation",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factors.go",
           "tests": [
             "TestPolynomialFactorsConstructorColdRefusal",
@@ -49244,8 +49244,8 @@
           ]
         },
         {
-          "name": "manager::factors multiply cpp1640-1661; literal per-loop reference/Power/mul/scalar-mul and exact operation receipts",
-          "status": "partial",
+          "name": "Complete manager::factors multiply cpp1640-1661: literal per-loop reference, Power, mul, scalar-mul and exact operation receipts",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factors_operations.go",
           "tests": [
             "TestPolynomialFactorsAbortOwnsReachedCalleesOnly",
@@ -49270,8 +49270,8 @@
           ]
         },
         {
-          "name": "manager::factors display cpp1663-1670; actual scalar to_string/term display and repeated SIZE after callbacks",
-          "status": "partial",
+          "name": "Complete manager::factors display cpp1663-1670: actual scalar to_string, term display and repeated SIZE after callbacks",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factors_operations.go",
           "tests": [
             "TestPolynomialFactorsDisplayEveryReservation",
@@ -49280,8 +49280,8 @@
           ]
         },
         {
-          "name": "imp acc_constant/flip_sign cpp6577-6589; literal scoped numeral Mul/Set/Neg/Set and source destructor; full factorization OPEN",
-          "status": "partial",
+          "name": "Complete imp acc_constant/flip_sign cpp6577-6589: literal scoped numeral Mul/Set/Neg/Set and source destructor",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factors_operations.go",
           "tests": [
             "TestPolynomialFactorsConstantHelpersEveryReservation",
