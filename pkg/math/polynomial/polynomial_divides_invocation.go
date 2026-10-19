@@ -4,6 +4,7 @@ package polynomial
 
 // Names only the actual embedded source scope and its guarded invocation.
 type polynomialDividesInvocationReceipt struct {
+	trace      polynomialDividesTraceInvocation
 	prelude    polynomialArithmeticInvocationReceipt
 	core       *MultivariatePolynomialCore
 	frame      *polynomialDividesScope
@@ -18,12 +19,22 @@ func (m *MultivariatePolynomialCore) matchesDividesInvocation(r *polynomialDivid
 }
 
 func (m *MultivariatePolynomialCore) dividesInvocationSourceCause(r *polynomialDividesInvocationReceipt) error {
+	if r != nil {
+		if e := m.dividesTraceSourceCause(&r.trace); e != nil {
+			return e
+		}
+	}
 	if !m.matchesDividesInvocationHistory(r) {
 		return nil
 	}
 	return r.frame.sourceCause
 }
 func (m *MultivariatePolynomialCore) cleanupDividesInvocation(r *polynomialDividesInvocationReceipt, abort bool) error {
+	if r != nil {
+		if e := m.cleanupDividesTrace(&r.trace); e != nil {
+			return e
+		}
+	}
 	if !m.matchesDividesInvocationHistory(r) {
 		return nil
 	}
@@ -49,6 +60,9 @@ func (m *MultivariatePolynomialCore) cleanupDividesInvocation(r *polynomialDivid
 }
 
 func (m *MultivariatePolynomialCore) dividesInvocationPending(r *polynomialDividesInvocationReceipt) bool {
+	if r != nil && m.dividesTraceInvocationPending(&r.trace) {
+		return true
+	}
 	if !m.matchesDividesInvocationHistory(r) {
 		return false
 	}

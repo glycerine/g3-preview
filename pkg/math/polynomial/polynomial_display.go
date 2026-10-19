@@ -333,7 +333,7 @@ func (f *polynomialDisplayFrame) destroyCharacters(body error) error {
 	return body
 }
 func (m *MultivariatePolynomialCore) CleanupDisplay() error {
-	if m != nil && m.self == m && (m.renameTraceRunning || m.gcdTraceRunning) {
+	if m != nil && m.self == m && (m.renameTraceRunning || m.gcdTraceRunning || m.dividesTrace.running) {
 		return ErrPolynomialPending
 	}
 	if m == nil || m.self != m {

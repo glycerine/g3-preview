@@ -30,6 +30,9 @@ type polynomialDividesScope struct {
 }
 
 func (m *MultivariatePolynomialCore) dividesChildSourceCause(s *polynomialDividesScope) error {
+	if e := m.dividesTraceSourceCause(&s.directReceipt.trace); e != nil {
+		return e
+	}
 	if e := m.arithmeticInvocationSourceCause(&s.directReceipt.prelude); e != nil {
 		return e
 	}
@@ -65,7 +68,7 @@ func (m *MultivariatePolynomialCore) finishDividesSource() error {
 		}
 		s.stage = 2
 	}
-	if !m.matchesArithmeticInvocation(&s.directReceipt.prelude) && !s.monomial.assigning && !numericIntegerManager_dividesNumericPending(m.integer, &s.directReceipt) && s.generated == (Monomial{}) && s.calleeGeneration == 0 {
+	if !m.dividesTraceInvocationPending(&s.directReceipt.trace) && !m.matchesArithmeticInvocation(&s.directReceipt.prelude) && !s.monomial.assigning && !numericIntegerManager_dividesNumericPending(m.integer, &s.directReceipt) && s.generated == (Monomial{}) && s.calleeGeneration == 0 {
 		s.active = false
 	}
 	return nil
@@ -73,6 +76,9 @@ func (m *MultivariatePolynomialCore) finishDividesSource() error {
 func (m *MultivariatePolynomialCore) CleanupDivides() error {
 	if m == nil || m.self != m {
 		return ErrPolynomialOwner
+	}
+	if e := m.cleanupDividesTrace(&m.dividesTrace.current); e != nil {
+		return e
 	}
 	return m.cleanupDividesInvocation(&m.dividesLocal.directReceipt, true)
 }
@@ -133,6 +139,16 @@ func (m *MultivariatePolynomialCore) dividesWithReceipt(q, p Polynomial, receipt
 	if e := m.check(); e != nil {
 		return false, e
 	}
+	var entry polynomialDividesTraceInvocation
+	if e := m.traceDividesEntry(q, p, &entry); e != nil {
+		if receipt != nil && entry.core != nil {
+			receipt.trace = entry
+		}
+		return false, e
+	}
+	if receipt != nil && entry.core != nil {
+		receipt.trace = entry
+	}
 	zero, e := m.IsZero(p)
 	if e != nil {
 		return false, e
@@ -152,7 +168,7 @@ func (m *MultivariatePolynomialCore) dividesWithReceipt(q, p Polynomial, receipt
 	}
 	invocation := s.invocation + 1
 	*s = polynomialDividesScope{active: true, executing: true, invocation: invocation}
-	s.directReceipt = polynomialDividesInvocationReceipt{core: m, frame: s, invocation: invocation}
+	s.directReceipt = polynomialDividesInvocationReceipt{core: m, frame: s, invocation: invocation, trace: entry}
 	if receipt != nil {
 		*receipt = s.directReceipt
 	}
@@ -162,12 +178,13 @@ func (m *MultivariatePolynomialCore) dividesWithReceipt(q, p Polynomial, receipt
 		err = errors.Join(err, m.finishDividesSource())
 		if err == nil {
 			err = m.som.transferArithmeticRowsToMember(&s.directReceipt.prelude)
-			if err == nil && s.stage == 2 && !s.monomial.assigning && !numericIntegerManager_dividesNumericPending(m.integer, &s.directReceipt) && s.generated == (Monomial{}) && s.calleeGeneration == 0 {
+			if err == nil && !m.dividesTraceInvocationPending(&s.directReceipt.trace) && s.stage == 2 && !s.monomial.assigning && !numericIntegerManager_dividesNumericPending(m.integer, &s.directReceipt) && s.generated == (Monomial{}) && s.calleeGeneration == 0 {
 				s.active = false
 			}
 		}
 		if receipt != nil {
 			receipt.prelude = s.directReceipt.prelude
+			receipt.trace = s.directReceipt.trace
 		}
 	}()
 	if e = m.som.reset(); e != nil {
@@ -239,6 +256,9 @@ func (m *MultivariatePolynomialCore) dividesWithReceipt(q, p Polynomial, receipt
 			return false, e
 		}
 		if e = s.monomial.assign(m, quotient); e != nil {
+			return false, e
+		}
+		if e = m.traceDividesMonomials(mr, mq, quotient, &s.directReceipt.trace); e != nil {
 			return false, e
 		}
 		if !divides {

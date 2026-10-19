@@ -41319,6 +41319,8 @@
       "role": "production",
       "status": "partial",
       "go_targets": [
+        "pkg/math/polynomial/polynomial_divides_trace.go",
+        "pkg/math/polynomial/polynomial_divides_trace_test.go",
         "pkg/math/polynomial/polynomial_gcd_entry_trace.go",
         "pkg/math/polynomial/polynomial_gcd_entry_trace_test.go",
         "pkg/math/polynomial/polynomial_trace_display_dispatch_test.go",
@@ -41806,6 +41808,11 @@
         "pkg/math/polynomial/polynomial_gcd_check_test.go"
       ],
       "tests": [
+        "TestPolynomialDividesTraceZeroKeepsOlderAlgorithmReceipt",
+        "TestPolynomialDividesTracePrecedesZeroShortcut",
+        "TestPolynomialDividesTraceQuotientAndRefusal",
+        "TestPolynomialDividesTraceExecutingCallbackAndFailbit",
+        "TestPolynomialDividesTraceExactNumericReceiptBeforeLocals",
         "TestPolynomialGCDEntrySourceTraceBeforeZeroShortcut",
         "TestPolynomialGCDEntrySourceVariableRecords",
         "TestPolynomialGCDEntryTraceCallbackAndRefusal",
@@ -47261,6 +47268,7 @@
         "Newton inputs and inverses now use owning []util.Int collections. A zero slot is published before actual modular Copy; partial numeric SET and ascending Del continuation remain in the owning slice. Reset retains only inverse zero, and source destruction clears inverse then input slices after polynomial references. Native growth/free has no Runtime blocks or faultpoints. Removed obsolete partial zero-inverse constructor roots and TLS/header-corruption fixtures. Independent 4097-entry growth/reuse checks run with Runtime reservations disabled; a 2^64 input campaign retains actual numeric allocation refusals and checks balanced residue -36 modulo 97. This does not convert other remaining polynomial numeral vectors or claim util split readiness."
       ],
       "deviations": [
+        "Divisibility TRACE cpp5155-5156 now precedes the zero shortcut and algorithm locals; cpp5181-5182 reports remainder/divisor and the actual optional quotient after monomial reference assignment. Direct polynomial display uses a separate exact diagnostic invocation and display generation. The compound caller receipt captures that pre-local child independently of the existing algorithm/prelude tuple, preserving the disabled-trace zero shortcut and its untouched older receipt. Exact cleanup rejects copied/stale diagnostic frames. Callback guards cover executing header/body/footer writes. Broader source failure/consumer audits remain open; no whole-unit promotion is claimed.",
         "Main GCD TRACE cpp4355,4356 and4390 is now ported before zero/constant shortcuts and after sorted variable-degree collection. Operands use direct polynomial display; source booleans and powers preserve their read and insertion order. Each accepted formatter is captured by the actual GCD invocation and its exact display generation; owning GCD cleanup acknowledges only that receipt. Header/body/footer writer callbacks cannot mutate or destroy borrowed polynomial owners, including core SourceFinalizePrefix. The prefix guard also covers existing rename/algebraic trace borrows. Other missing TRACE/failure audits remain open.",
         "Implemented polynomial TRACE display calls now distinguish explicit polynomial::display from polynomial_ref ostream insertion through manager::display. Direct source calls skip the unrelated cpp7426 consistency assertion; reference insertions retain it. Mixed ICCP, PRS, recursive modular GCD, Newton, PSC and Lazard records preserve their respective entry points. Existing display frames and cleanup remain unchanged. This does not claim complete source TRACE coverage or promote the partial polynomial unit.",
         "Rename TRACE cpp6071/6091 traverses the literal nonnull polynomial directory before monomial mutation and after first-maximal updates. Direct polynomial::display bypasses the unrelated public manager::display assertion at cpp7426. Stream refusal preserves computation; formatting errors stop the source sequence; callbacks cannot mutate/close the borrowed manager or clean its active display. Whole-unit audit remains open.",
@@ -47402,6 +47410,7 @@
       "trace_polynomial_display_dispatch_audit": {
         "source": "src/math/polynomial/polynomial.cpp",
         "direct_source_records": [
+          "5155/5156 divisibility operands before algorithm locals; 5181 optional quotient monomial record",
           "4355/4356 main GCD operands (follow-up with actual GCD-owned display receipts); 4390 sorted variable-degree records",
           "2357/2361 destructor directory",
           "2421 deletion",
@@ -47434,7 +47443,7 @@
           "5772 PSC iteration references"
         ],
         "verification": "Real zero polynomial cells distinguish direct display from the public consistency scope with a closed Go-adapter reservation gate. Controls retain public checks. Existing trace output, refusal, callback and display tests cover reached nonzero terms and cleanup.",
-        "remaining_trace_audit": "Other source TRACE records remain unverified or absent, including divides cpp5155-5156, PSC cpp5530/5578, evaluation cpp6438 and factor cpp6595-6755. This audit is limited to the implemented call sites listed above."
+        "remaining_trace_audit": "Other source TRACE records remain unverified or absent, including PSC cpp5530/5578, evaluation cpp6438 and factor cpp6595-6755. This audit is limited to the implemented call sites listed above."
       }
     },
     {

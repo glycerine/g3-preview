@@ -135,7 +135,7 @@ func (m *MultivariatePolynomialManager) CloseChecked() error {
 	if m != nil && m.self == m && m.core != nil && m.core.self == m.core && (m.core.quasiResultant.active || m.core.variableNumeral.active) {
 		return ErrPolynomialPending
 	}
-	if m != nil && m.self == m && m.core != nil && m.core.self == m.core && (m.core.collectingVariables || m.core.algebraicTraceRunning || m.core.renameTraceRunning || m.core.gcdTraceRunning) {
+	if m != nil && m.self == m && m.core != nil && m.core.self == m.core && (m.core.collectingVariables || m.core.algebraicTraceRunning || m.core.renameTraceRunning || m.core.gcdTraceRunning || m.core.dividesTrace.running) {
 		return ErrPolynomialPending
 	}
 	if m != nil && m.self == m && m.core != nil && m.core.self == m.core && m.core.normalizationPending() {
