@@ -45343,8 +45343,8 @@
           ]
         },
         {
-          "name": "cheap_som append and constructor transfer optional owning receipts cpp2238-2299",
-          "status": "partial",
+          "name": "Complete cheap_som append and constructor-transfer owning receipts cpp2238-2299",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_cheap_append_receipt.go",
           "tests": [
             "TestPolynomialCheapAppendReceiptEveryActualConstructionPrefix",
@@ -45353,8 +45353,8 @@
           ]
         },
         {
-          "name": "Derivative cpp4507-4528 and ExactDiv cpp5114-5156 optional guarded invocation receipts with source NUM-first stopped destructor and separate exact owning continuation; owning SOM consumed-last DEC acknowledgment cpp1885-1940",
-          "status": "partial",
+          "name": "Complete Derivative cpp4507-4528 and ExactDiv cpp5114-5156 guarded invocation receipts with source NUM-first destruction, exact owning continuation and consumed-last SOM acknowledgment",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factor_callee_receipts.go",
           "tests": [
             "TestPolynomialDerivativeInvocationAcquisitionAndReplacement",
