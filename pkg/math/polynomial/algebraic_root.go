@@ -49,6 +49,7 @@ type algebraicLocation struct {
 	live, initialized, published              bool
 }
 type AlgebraicRootCore struct {
+	copyCall                                                   algebraicCopyCallScope
 	cellNeg                                                    algebraicCellNegNumeric
 	cellEvaluation                                             [3]upolyBinaryEvaluationInvocationReceipt
 	cellEvaluationRunning                                      bool
@@ -207,6 +208,9 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m != nil && m.self == m && m.copyCall.callback() {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && (m.cellEvaluationPending() || m.cellNeg.pending()) {
 		return ErrAlgebraicPending
 	}
@@ -758,7 +762,15 @@ func (m *AlgebraicRootCore) copyPolynomialDataFromOwner(l *algebraicLocation, r 
 		return e
 	}
 	p := m.config.Polynomials
-	q, e := p.NewPolynomial()
+	var q UPolynomial
+	var e error
+	// The accepted copy_poly caller owns this factory continuation; ordinary
+	// public factory calls remain refused during its borrowed execution.
+	if m.copyCall.NumericBound(true) {
+		q, e = p.newPolynomial()
+	} else {
+		q, e = p.NewPolynomial()
+	}
 	if e != nil {
 		return e
 	}
@@ -781,7 +793,13 @@ func (m *AlgebraicRootCore) copyPolynomialDataFromOwner(l *algebraicLocation, r 
 		if e != nil {
 			return e
 		}
-		if e = m.config.Rationals.Integers().CopyFromOwnerWithReceipt(&p.values(&d.state)[i], source.config.Integer, a, &m.coefficientCopy); e != nil {
+		before := m.coefficientCopy
+		e = m.config.Rationals.Integers().CopyFromOwnerWithReceipt(&p.values(&d.state)[i], source.config.Integer, a, &m.coefficientCopy)
+		// This key changes only when this actual SET accepts an allocation.
+		if m.copyCall.running && m.coefficientCopy != before {
+			m.copyCall.coefficients = m.coefficientCopy
+		}
+		if e != nil {
 			return e
 		}
 	}
@@ -997,7 +1015,7 @@ func (m *AlgebraicRootCore) setRoot(a *Algebraic, p UPolynomialView, lower, uppe
 	}
 	return nil
 }
-func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
+func (m *AlgebraicRootCore) copyCellValue(dst, src *Algebraic) error {
 	if m != nil && m.self == m && m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.coefficientCopy) {
 		return ErrAlgebraicPending
 	}
@@ -1088,7 +1106,7 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	if e = m.copyPolynomial(dl, &out, v); e != nil {
 		return e
 	}
-	e = m.config.Intervals.Copy(&out.interval, &r.interval)
+	e = m.config.Intervals.WithAllocationContext(m.copyCall.context()).CopyFromOwnerTracked(&out.interval, m.config.Intervals, &r.interval, &m.copyCall.bounds)
 	if e = m.save(dl, &out, e); e != nil {
 		return e
 	}
@@ -1117,6 +1135,9 @@ func (m *AlgebraicRootCore) CleanupRetained() error {
 	return m.cleanupRetainedCore()
 }
 func (m *AlgebraicRootCore) cleanupRetainedCore() error {
+	if m != nil && m.self == m && (m.copyCall.running || m.copyCall.cleaning) {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting || m.cellEvaluationRunning || m.cellNeg.running) {
 		return ErrAlgebraicPending
 	}
@@ -1214,6 +1235,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 		return e
 	}
 	if e := m.cleanupCellNeg(); e != nil {
+		return e
+	}
+	if e := m.cleanupCopyCall(); e != nil {
 		return e
 	}
 	if p := m.config.Polynomials; p != nil {
@@ -1362,6 +1386,9 @@ func (m *AlgebraicRootCore) Close() error {
 	return m.closeCoreMembers()
 }
 func (m *AlgebraicRootCore) closeCoreMembers() error {
+	if m != nil && m.self == m && (m.copyCall.running || m.copyCall.cleaning) {
+		return ErrAlgebraicPending
+	}
 	if m != nil && m.self == m && (m.savedIntervalExecuting != nil || m.factorExecuting || m.cellEvaluationRunning || m.cellNeg.running) {
 		return ErrAlgebraicPending
 	}
