@@ -105,8 +105,8 @@ func (m *MultivariatePolynomialManager) flipLeadingSignWithReceipt(p *polynomial
 	if e != nil {
 		return e
 	}
-	if polynomialSourceDebug && pos == ^uint32(0) {
-		return ErrPolynomialAssertion
+	if e = polynomialFlipSourceAssert(func() (bool, error) { return pos != ^uint32(0), nil }); e != nil {
+		return e
 	}
 	a, e := c.coefficientCore(p.value, pos)
 	if e != nil {

@@ -44901,6 +44901,16 @@
           ]
         },
         {
+          "name": "Complete flip_sign_if_lm_neg_core and reference wrapper cpp3433-3447 with graded-lex leading selection, conditional negation and source assertion actions",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_iccp.go",
+          "tests": [
+            "TestPolynomialFlipLeadingSignAssertionActions",
+            "TestPolynomialNormalizeIndependentSignedIntegerContent",
+            "TestPolynomialICCPIndependentContentAndPrimitiveBranches"
+          ]
+        },
+        {
           "name": "Complete sparse interpolator constructor, destructor, reset, ready, add and interpolate bodies cpp3072-3182 with source assertion actions",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_sparse_interpolator.go",
@@ -49081,6 +49091,16 @@
             "TestPolynomialCompositionDormantOriginal",
             "TestPolynomialCompositionReciprocalAndVariableOrders",
             "TestPolynomialCompositionIndependentFiniteAndAliases"
+          ]
+        },
+        {
+          "name": "Complete flip_sign_if_lm_neg_core and reference wrapper cpp3433-3447 with graded-lex leading selection, conditional negation and source assertion actions",
+          "status": "ported",
+          "go_target": "pkg/math/polynomial/polynomial_iccp.go",
+          "tests": [
+            "TestPolynomialFlipLeadingSignAssertionActions",
+            "TestPolynomialNormalizeIndependentSignedIntegerContent",
+            "TestPolynomialICCPIndependentContentAndPrimitiveBranches"
           ]
         },
         {

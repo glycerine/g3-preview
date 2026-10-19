@@ -46225,3 +46225,14 @@ uniqueness assertions now read the process switch before indexed predicates and
 honor Throw, Continue, and disabled execution. Focused degree-cache, sort, and
 assertion tests pass in native, checked, debug and combined checked/debug/trace
 profiles on CPUs 8-16.
+
+Polynomial leading-sign completion: the retained
+`flip_sign_if_lm_neg_core` and reference wrapper at
+`polynomial.cpp:3433-3447` preserve the zero identity route, graded-lex maximum
+selection, borrowed leading-coefficient sign test, conditional negation and
+reference publication. The line-3438 maximum-position assertion now reads the
+process switch before its predicate and honors Throw, Continue, and disabled
+execution. The nearby `abs_norm`, `numeral_lc`, and `numeral_tc` bodies have no
+retained source consumers and therefore receive no unused adapters. Focused
+normalization, ICCP and assertion tests pass in native, checked, debug and
+combined checked/debug/trace profiles on CPUs 8-16.
