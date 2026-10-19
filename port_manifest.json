@@ -44880,8 +44880,8 @@
           ]
         },
         {
-          "name": "Selected reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition, cpp4655-4872 assertion actions, and matched younger constant destructor/source-owning result cleanup; complete suffix audit remains open",
-          "status": "partial",
+          "name": "Complete reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition cpp4655-4872 with assertion actions and matched younger constant destructor/source-owning result cleanup",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_composition.go",
           "tests": [
             "TestPolynomialCompositionEveryReservation",
@@ -49111,8 +49111,8 @@
           ]
         },
         {
-          "name": "Selected reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition, cpp4655-4872 assertion actions, and matched younger constant destructor/source-owning result cleanup; complete suffix audit remains open",
-          "status": "partial",
+          "name": "Complete reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition cpp4655-4872 with assertion actions and matched younger constant destructor/source-owning result cleanup",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_composition.go",
           "tests": [
             "TestPolynomialCompositionEveryReservation",
@@ -124083,8 +124083,8 @@
           ]
         },
         {
-          "name": "Selected reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition, cpp4655-4872 assertion actions, and matched younger constant destructor/source-owning result cleanup; complete suffix audit remains open",
-          "status": "partial",
+          "name": "Complete reciprocal/homogenization/variable/parity/general Horner/x\u00b1y/x-c composition cpp4655-4872 with assertion actions and matched younger constant destructor/source-owning result cleanup",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_composition.go",
           "tests": [
             "TestPolynomialCompositionEveryReservation",
