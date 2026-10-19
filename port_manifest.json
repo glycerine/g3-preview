@@ -41266,7 +41266,9 @@
         "pkg/math/polynomial/polynomial_gcd_scale_receipt_test.go",
         "pkg/math/polynomial/polynomial_substitution_invocation.go",
         "pkg/math/polynomial/polynomial_substitution_invocation_test.go",
-        "pkg/math/polynomial/polynomial_substitution_numeric_epoch_test.go"
+        "pkg/math/polynomial/polynomial_substitution_numeric_epoch_test.go",
+        "pkg/math/polynomial/polynomial_gcd_check.go",
+        "pkg/math/polynomial/polynomial_gcd_check_test.go"
       ],
       "tests": [
         "TestPolynomialSparseNestedBorrowRestoresCaller",
@@ -42157,7 +42159,8 @@
         "TestPolynomialGCDContentScaleReceiptReservationPrefixes",
             "TestPolynomialGCDContentScaleAssignmentCallbackAndRetry",
         "TestPolynomialSubstitutionInvocationReservationPrefixes",
-        "TestPolynomialSubstitutionNumericContextRejectsReplacementEpoch"
+        "TestPolynomialSubstitutionNumericContextRejectsReplacementEpoch",
+        "TestPolynomialGCDMGCDCheckRereadsTagAndConstructsDebugLocals"
       ],
       "conditionals": [
         {
@@ -45508,7 +45511,7 @@
           ]
         },
         {
-          "name": "Complete GCD dispatcher cpp4352-4506: assertion actions, scalar/identity/content selection, variable ordering, modular/PRS choice and mgcd_check verification",
+          "name": "Complete GCD dispatcher cpp4352-4506: assertion actions, scalar/identity/content selection, variable ordering, modular/PRS choice, independently read mgcd_check gates, debug reference declaration and try/check block cleanup frontiers",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd.go",
           "tests": [
@@ -45524,7 +45527,8 @@
             "TestPolynomialResultantPhysicalDescriptorRefusalComposedCleanup",
             "TestPolynomialGCDDispatcherSourceAssertionActions",
             "TestPolynomialGCDMGCDCheckUsesIndependentPRS",
-            "TestPolynomialGCDMGCDCheckMismatchTrace"
+            "TestPolynomialGCDMGCDCheckMismatchTrace",
+            "TestPolynomialGCDMGCDCheckRereadsTagAndConstructsDebugLocals"
           ]
         },
         {
@@ -47161,7 +47165,9 @@
         "pkg/math/polynomial/polynomial_gcd_scale_receipt_test.go",
         "pkg/math/polynomial/polynomial_substitution_invocation.go",
         "pkg/math/polynomial/polynomial_substitution_invocation_test.go",
-        "pkg/math/polynomial/polynomial_substitution_numeric_epoch_test.go"
+        "pkg/math/polynomial/polynomial_substitution_numeric_epoch_test.go",
+        "pkg/math/polynomial/polynomial_gcd_check.go",
+        "pkg/math/polynomial/polynomial_gcd_check_test.go"
       ],
       "tests": [
         "TestAlgebraicEvalSignExactResultantsAndSignedBounds",
@@ -47777,7 +47783,8 @@
         "TestPolynomialGCDContentScaleReceiptReservationPrefixes",
             "TestPolynomialGCDContentScaleAssignmentCallbackAndRetry",
         "TestPolynomialSubstitutionInvocationReservationPrefixes",
-        "TestPolynomialSubstitutionNumericContextRejectsReplacementEpoch"
+        "TestPolynomialSubstitutionNumericContextRejectsReplacementEpoch",
+        "TestPolynomialGCDMGCDCheckRereadsTagAndConstructsDebugLocals"
       ],
       "conditionals": [
         {
