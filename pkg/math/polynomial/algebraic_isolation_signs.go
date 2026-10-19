@@ -28,6 +28,8 @@ func (v *algebraicAllUnassigned) Algebraic(x uint32) (*Algebraic, error) {
 }
 
 type algebraicIsolationSignsScope struct {
+	traceVariables                                    PolynomialVariableDegrees
+	traceVariablesConstructed                         bool
 	traceRunning                                      bool
 	sample                                            Algebraic
 	calls                                             polynomialAlgebraicEvaluationScope
@@ -38,6 +40,9 @@ type algebraicIsolationSignsScope struct {
 
 func (m *AlgebraicRootCore) isolationSignsChildSourceCause() error {
 	s := &m.isolationSigns
+	if e := m.rootTraceSourceCause(); e != nil {
+		return e
+	}
 	if e := s.calls.childSourceCause(); e != nil {
 		return e
 	}
@@ -69,7 +74,7 @@ func (m *AlgebraicRootCore) finishIsolationSigns(owning bool) (cause error) {
 	if s.running || s.finishing {
 		return ErrAlgebraicPending
 	}
-	if !s.active {
+	if !s.active && !s.traceVariablesConstructed {
 		return nil
 	}
 	s.finishing = true
@@ -82,6 +87,9 @@ func (m *AlgebraicRootCore) finishIsolationSigns(owning bool) (cause error) {
 			s.sourceStop = e
 			return e
 		}
+	}
+	if e := m.cleanupIsolationSignsTraceVariables(owning); e != nil {
+		return e
 	}
 	if s.constructed {
 		if owning {

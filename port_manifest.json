@@ -38395,7 +38395,8 @@
         "pkg/math/polynomial/algebraic_filter_roots_trace_test.go",
         "pkg/math/polynomial/algebraic_root_display_invocation.go",
         "pkg/math/polynomial/algebraic_root_display_invocation_test.go",
-        "pkg/math/polynomial/algebraic_owned_bound_child_source_test.go"
+        "pkg/math/polynomial/algebraic_owned_bound_child_source_test.go",
+        "pkg/math/polynomial/algebraic_isolation_signs_display_source_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -38580,7 +38581,10 @@
         "TestAlgebraicMultivariateIsolationRecoveryRootTraceRecords",
         "TestAlgebraicMultivariateIsolationRecoveryTraceRetainsRootDisplay",
         "TestAlgebraicOwnedBoundBodyFailureFinishesOlderTemporary",
-        "TestAlgebraicOwnedBoundChildSourceStopProtectsOuterTemporary"
+        "TestAlgebraicOwnedBoundChildSourceStopProtectsOuterTemporary",
+        "TestAlgebraicIsolationSignsTraceRetainsActualRootDisplay",
+        "TestAlgebraicRootDisplayTraceBasicCoefficientsSourceCleanup",
+        "TestAlgebraicIsolationSignsPolynomialDisplayStopsBeforeVariables"
       ],
       "conditionals": [
         {
@@ -39060,7 +39064,9 @@
             "TestAlgebraicDisplayIndexFlagReadPrecedesAssertionSwitch",
             "TestAlgebraicMathematicaRationalsRootsAndSharedCache",
             "TestAlgebraicRootTraceDisplayReceiptRejectsLaterInvocation",
-            "TestAlgebraicFilterRootTraceRetainsActualDisplayAndVector"
+            "TestAlgebraicFilterRootTraceRetainsActualDisplayAndVector",
+            "TestAlgebraicRootDisplayTraceBasicCoefficientsSourceCleanup",
+            "TestAlgebraicIsolationSignsTraceRetainsActualRootDisplay"
           ],
           "notes": "The cached branch reads only actual offset16 packed m_i/flags, preserving all low bits and reaching the runtime assertion switch after the word read. Raw-prefix tests leave every other root word uninitialized and supply no polynomial view. A cache miss now decodes only the lower endpoint, uses the already supplied polynomial view for actual get_root_id, and publishes only the packed word instead of rewriting the whole record. Raw-prefix miss coverage leaves stored polynomial/size and the entire opposite bound uninitialized while verifying the actual sqrt(2) index and preserved low flag bits. A concrete encoded-lower entry now performs actual Sturm construction and minus-infinity variations before decoding the endpoint, sharing the existing lower-evaluation engine and exact root-ID receipt. Real immediate cancellation precedes missing lower bytes and publishes no index. Remaining whole-display scalar/stream and cold-path ownership audits are not promoted."
         },
@@ -39365,7 +39371,7 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:2549-2624,2883-2885 isolate_roots with signs: zero fallback, refinement, exterior/interior samples and incremental signs; full source failure/TRACE audit pending",
+          "name": "algebraic_numbers.cpp:2549-2624,2883-2885 isolate_roots with signs: zero fallback, refinement, exterior/interior samples, incremental signs and accepted polynomial/root/sample diagnostic children with lexical trace-variable lifetime; full source failure audit remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_isolation_signs.go",
           "tests": [
@@ -39382,7 +39388,10 @@
             "TestAlgebraicIsolationSignsSampleTraceCallbackAndAllocationFailure",
             "TestAlgebraicIsolationSignsRootsTraceSourceRecordsAndReads",
             "TestAlgebraicIsolationSignsRootsTraceSecondGetterFailure",
-            "TestAlgebraicIsolationSignsNoRootsErasesTraceBlock"
+            "TestAlgebraicIsolationSignsNoRootsErasesTraceBlock",
+            "TestAlgebraicIsolationSignsTraceRetainsActualRootDisplay",
+            "TestAlgebraicRootDisplayTraceBasicCoefficientsSourceCleanup",
+            "TestAlgebraicIsolationSignsPolynomialDisplayStopsBeforeVariables"
           ]
         },
         {
@@ -39649,7 +39658,8 @@
         "pkg/math/polynomial/algebraic_filter_roots_trace_test.go",
         "pkg/math/polynomial/algebraic_root_display_invocation.go",
         "pkg/math/polynomial/algebraic_root_display_invocation_test.go",
-        "pkg/math/polynomial/algebraic_owned_bound_child_source_test.go"
+        "pkg/math/polynomial/algebraic_owned_bound_child_source_test.go",
+        "pkg/math/polynomial/algebraic_isolation_signs_display_source_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -39831,7 +39841,10 @@
         "TestAlgebraicMultivariateIsolationRecoveryRootTraceRecords",
         "TestAlgebraicMultivariateIsolationRecoveryTraceRetainsRootDisplay",
         "TestAlgebraicOwnedBoundBodyFailureFinishesOlderTemporary",
-        "TestAlgebraicOwnedBoundChildSourceStopProtectsOuterTemporary"
+        "TestAlgebraicOwnedBoundChildSourceStopProtectsOuterTemporary",
+        "TestAlgebraicIsolationSignsTraceRetainsActualRootDisplay",
+        "TestAlgebraicRootDisplayTraceBasicCoefficientsSourceCleanup",
+        "TestAlgebraicIsolationSignsPolynomialDisplayStopsBeforeVariables"
       ],
       "conditionals": [
         {
@@ -39931,7 +39944,9 @@
             "TestAlgebraicDisplayIndexFlagReadPrecedesAssertionSwitch",
             "TestAlgebraicMathematicaRationalsRootsAndSharedCache",
             "TestAlgebraicRootTraceDisplayReceiptRejectsLaterInvocation",
-            "TestAlgebraicFilterRootTraceRetainsActualDisplayAndVector"
+            "TestAlgebraicFilterRootTraceRetainsActualDisplayAndVector",
+            "TestAlgebraicRootDisplayTraceBasicCoefficientsSourceCleanup",
+            "TestAlgebraicIsolationSignsTraceRetainsActualRootDisplay"
           ],
           "notes": "The cached branch reads only actual offset16 packed m_i/flags, preserving all low bits and reaching the runtime assertion switch after the word read. Raw-prefix tests leave every other root word uninitialized and supply no polynomial view. A cache miss now decodes only the lower endpoint, uses the already supplied polynomial view for actual get_root_id, and publishes only the packed word instead of rewriting the whole record. Raw-prefix miss coverage leaves stored polynomial/size and the entire opposite bound uninitialized while verifying the actual sqrt(2) index and preserved low flag bits. A concrete encoded-lower entry now performs actual Sturm construction and minus-infinity variations before decoding the endpoint, sharing the existing lower-evaluation engine and exact root-ID receipt. Real immediate cancellation precedes missing lower bytes and publishes no index. Remaining whole-display scalar/stream and cold-path ownership audits are not promoted."
         },
@@ -40197,7 +40212,7 @@
           ]
         },
         {
-          "name": "algebraic_numbers.cpp:2549-2624,2883-2885 isolate_roots with signs: zero fallback, refinement, exterior/interior samples and incremental signs; full source failure/TRACE audit pending",
+          "name": "algebraic_numbers.cpp:2549-2624,2883-2885 isolate_roots with signs: zero fallback, refinement, exterior/interior samples, incremental signs and accepted polynomial/root/sample diagnostic children with lexical trace-variable lifetime; full source failure audit remains open",
           "status": "partial",
           "go_target": "pkg/math/polynomial/algebraic_isolation_signs.go",
           "tests": [
@@ -40214,7 +40229,10 @@
             "TestAlgebraicIsolationSignsSampleTraceCallbackAndAllocationFailure",
             "TestAlgebraicIsolationSignsRootsTraceSourceRecordsAndReads",
             "TestAlgebraicIsolationSignsRootsTraceSecondGetterFailure",
-            "TestAlgebraicIsolationSignsNoRootsErasesTraceBlock"
+            "TestAlgebraicIsolationSignsNoRootsErasesTraceBlock",
+            "TestAlgebraicIsolationSignsTraceRetainsActualRootDisplay",
+            "TestAlgebraicRootDisplayTraceBasicCoefficientsSourceCleanup",
+            "TestAlgebraicIsolationSignsPolynomialDisplayStopsBeforeVariables"
           ]
         },
         {
@@ -205578,7 +205596,7 @@
     "numeral_seconds": 57.339,
     "session_id": 26851,
     "checkout_held_unchanged": true,
-    "scope_warning": "Full native module checkpoint b7552f5b passed on CPUs 8-16 with the checkout held unchanged. The subsequent owned-bound source-stop correction was prepared and verified separately through a Go overlay, then applied after this checkpoint completed; it has focused four-profile evidence and is not included in this full native result. This run collected no statement coverage and does not establish polynomial or AST source-port completion."
+    "scope_warning": "Full native module checkpoint b7552f5b passed on CPUs 8-16 with the checkout held unchanged. Later owned-bound and signs-isolation cleanup corrections have focused four-profile evidence and are not included in this full native result. This run collected no statement coverage and does not establish polynomial or AST source-port completion."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

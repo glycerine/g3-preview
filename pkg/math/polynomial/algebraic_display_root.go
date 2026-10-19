@@ -67,7 +67,7 @@ func (m *AlgebraicRootCore) finishRootDisplay(owning bool) error {
 	}
 
 	if s.coefficients.slot != 0 {
-		if e := m.config.Polynomials.DelPolynomial(&s.coefficients); e != nil {
+		if e := m.delRootDisplayPolynomial(); e != nil {
 			return e
 		}
 	}

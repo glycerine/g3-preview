@@ -11,33 +11,41 @@ func (m *AlgebraicRootCore) traceIsolationSignsRoots(pm *MultivariatePolynomialM
 	if !tags.ShouldTrace("isolate_roots_bug") {
 		return nil
 	}
+	if m.isolationSigns.traceVariablesConstructed {
+		return ErrAlgebraicPending
+	}
 	m.isolationSigns.traceRunning = true
+	previous := pm.core.algebraicTraceRunning
 	pm.core.algebraicTraceRunning = true
 	defer func() {
 		m.isolationSigns.traceRunning = false
-		pm.core.algebraicTraceRunning = false
+		pm.core.algebraicTraceRunning = previous
 	}()
-	var computation error
-	_ = tags.EmitConditional("isolate_roots_bug", "isolate_roots", "src/math/polynomial/algebraic_numbers.cpp", 2578,
-		func() bool { return true }, func(w io.Writer) error {
-			computation = m.traceIsolationSignsRootsBody(w, pm, p, values, roots)
-			return computation
-		})
-	return computation
+	return m.emitRootTraceTag("isolate_roots_bug", "isolate_roots", 2578, func(w io.Writer) error {
+		return m.traceIsolationSignsRootsBody(w, pm, p, values, roots)
+	})
 }
 
 func (m *AlgebraicRootCore) traceIsolationSignsRootsBody(w io.Writer, pm *MultivariatePolynomialManager, p Polynomial, values PolynomialAlgebraicEvaluation, roots *AlgebraicVector) (cause error) {
 	sink := &polynomialTraceSink{writer: w}
 	out := algebraicPredicateTraceStream{w}
 	_ = out.AppendCString("p: ")
-	if e := pm.core.displayIntoCore(p, sink, false); e != nil {
+	m.rootTrace.polynomial = pm.core
+	if e := pm.core.displayIntoCoreWithReceipt(p, sink, false, &m.rootTrace.poly); e != nil {
 		return e
 	}
 	_ = out.AppendCString("\n")
-	var xs PolynomialVariableDegrees
-	variableEmbedded(&xs, pm.core.memory, true)
-	defer func() { cause = errors.Join(cause, xs.CloseChecked()) }()
-	if e := pm.core.varsCore(p, &xs); e != nil {
+	xs := &m.isolationSigns.traceVariables
+	variableEmbedded(xs, pm.core.memory, true)
+	m.isolationSigns.traceVariablesConstructed = true
+	defer func() {
+		cleanup := m.cleanupIsolationSignsTraceVariables(false)
+		if cleanup != nil {
+			m.isolationSigns.sourceStop = cleanup
+		}
+		cause = errors.Join(cause, cleanup)
+	}()
+	if e := pm.core.varsCore(p, xs); e != nil {
 		return e
 	}
 	for i := 0; i < len(xs.values); i++ {
@@ -60,7 +68,7 @@ func (m *AlgebraicRootCore) traceIsolationSignsRootsBody(w io.Writer, pm *Multiv
 		if e != nil {
 			return e
 		}
-		if e = m.displayRootAtLocation(out, location, false); e != nil {
+		if e = m.displayRootAtLocationWithReceipt(out, location, false, &m.rootTrace.root); e != nil {
 			return e
 		}
 		_ = out.AppendCString(" ")
@@ -84,7 +92,7 @@ func (m *AlgebraicRootCore) traceIsolationSignsRootsBody(w io.Writer, pm *Multiv
 		if e != nil {
 			return e
 		}
-		if e = m.displayRootAtLocation(out, location, false); e != nil {
+		if e = m.displayRootAtLocationWithReceipt(out, location, false, &m.rootTrace.root); e != nil {
 			return e
 		}
 		_ = out.AppendCString("\n")
@@ -97,23 +105,34 @@ func (m *AlgebraicRootCore) traceIsolationSignsSample() error {
 	if !tags.ShouldTrace("isolate_roots_bug") {
 		return nil
 	}
+	if m.isolationSigns.traceVariablesConstructed {
+		return ErrAlgebraicPending
+	}
 	m.isolationSigns.traceRunning = true
 	defer func() { m.isolationSigns.traceRunning = false }()
-	var computation error
-	_ = tags.EmitConditional("isolate_roots_bug", "isolate_roots", "src/math/polynomial/algebraic_numbers.cpp", 2598,
-		func() bool { return true }, func(w io.Writer) error {
-			out := algebraicPredicateTraceStream{w}
-			_ = out.AppendCString("w: ")
-			location, e := m.locationCleanup(&m.isolationSigns.sample)
-			computation = e
-			if computation == nil {
-				computation = m.displayRootAtLocation(out, location, false)
-			}
-			if computation != nil {
-				return computation
-			}
-			_ = out.AppendCString("\n")
-			return nil
-		})
-	return computation
+	return m.emitRootTraceTag("isolate_roots_bug", "isolate_roots", 2598, func(w io.Writer) error {
+		out := algebraicPredicateTraceStream{w}
+		_ = out.AppendCString("w: ")
+		if e := m.traceIsolationRoot(out, &m.isolationSigns.sample); e != nil {
+			return e
+		}
+		return out.AppendCString("\n")
+	})
+}
+
+func (m *AlgebraicRootCore) cleanupIsolationSignsTraceVariables(owning bool) error {
+	s := &m.isolationSigns
+	if !s.traceVariablesConstructed {
+		return nil
+	}
+	if !owning {
+		if e := m.rootTraceSourceCause(); e != nil {
+			return e
+		}
+	}
+	if e := s.traceVariables.CloseChecked(); e != nil {
+		return e
+	}
+	s.traceVariablesConstructed = false
+	return nil
 }
