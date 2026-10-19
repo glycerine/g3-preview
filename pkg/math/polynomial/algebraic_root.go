@@ -74,6 +74,7 @@ type AlgebraicRootCore struct {
 	representationNeg                                          algebraicRepresentationNegNumeric
 	representationNormalize                                    unumeral.IntegerNormalizeInvocationReceipt
 	representationCopy                                         unumeral.IntegerCopyAllocationReceipt
+	decimalDisplay                                             algebraicDecimalDisplayScope
 	intervalDisplayRunning, decimalDisplayRunning              bool
 	comparisonTraceRunning                                     bool
 	savedIntervalExecuting                                     *algebraicSavedInterval
@@ -1353,6 +1354,9 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 		return e
 	}
 	if e := m.cleanupDivision(); e != nil {
+		return e
+	}
+	if e := m.cleanupDecimalDisplay(); e != nil {
 		return e
 	}
 	if e := m.cleanupBounds(); e != nil {

@@ -25,7 +25,9 @@ func (w algebraicDecimalWriter) AppendNumeralText(s string) error {
 // DisplayDecimal refines local copies of a root cell's bounds before selecting
 // the source's upper approximation or exact lower root. The stored cell is not
 // refined by this display operation. A stopped numeral insertion retains its
-// manager's source locals for CleanupDecimalStream or CleanupDisplay.
+// manager's source locals for CleanupDecimalStream or CleanupDisplay. Root
+// bound and accepted display/refinement continuations also have core owning
+// cleanup through CleanupRetained; stopped source destruction is not replayed.
 func (m *AlgebraicRootCore) DisplayDecimal(w io.Writer, a *Algebraic, precision uint32) (err error) {
 	if w == nil {
 		return arena.ErrInvalidSlot
@@ -33,6 +35,9 @@ func (m *AlgebraicRootCore) DisplayDecimal(w io.Writer, a *Algebraic, precision 
 	l, err := m.location(a)
 	if err != nil {
 		return err
+	}
+	if m.decimalDisplay.pending(m) {
+		return ErrAlgebraicPending
 	}
 	m.decimalDisplayRunning = true
 	defer func() { m.decimalDisplayRunning = false }()
@@ -47,21 +52,32 @@ func (m *AlgebraicRootCore) DisplayDecimal(w io.Writer, a *Algebraic, precision 
 		}
 		return m.config.Rationals.DisplayDecimalInto(algebraicDecimalWriter{w}, &q, precision, false)
 	}
-	r, err := m.load(l)
-	if err != nil {
-		return err
+
+	s := &m.decimalDisplay
+	s.values = [2]unumeral.BinaryRational{}
+	s.remaining = 2
+	s.sourceStop = nil
+	s.displayStop = nil
+	s.display = unumeral.BinaryDisplayInvocationReceipt{}
+	// A failed new bound copy must not inherit a retired evaluation stop.
+	s.refinement.evaluation = upolyBinaryEvaluationInvocationReceipt{}
+	defer func() {
+		m.decimalDisplayRunning = false
+		cleanup := m.finishDecimalDisplay(false)
+		if cleanup != nil {
+			s.sourceStop = cleanup
+		}
+		err = errors.Join(err, cleanup)
+	}()
+	interval, e := m.copyIntervalAtPrecisionFromCellWithRefinement(l, &s.values[0], &s.values[1], precision, &s.copy, &s.refinement)
+	if e != nil {
+		return e
 	}
-	b := m.config.Binary
-	lower, upper := unumeral.NewBinaryRational(), unumeral.NewBinaryRational()
-	defer func() { err = errors.Join(err, b.Del(&lower)) }()
-	defer func() { err = errors.Join(err, b.Del(&upper)) }()
-	interval, err := m.intervalAtPrecision(&r, &lower, &upper, precision)
-	if err != nil {
-		return err
-	}
-	selected := &lower
+	selected := &s.values[0]
 	if interval {
-		selected = &upper
+		selected = &s.values[1]
 	}
-	return b.DisplayDecimalTo(w, selected, precision)
+	e = m.config.Binary.DisplayDecimalToWithInvocation(w, selected, precision, &s.display)
+	s.displayStop = m.config.Binary.DisplayInvocationSourceCause(&s.display)
+	return e
 }

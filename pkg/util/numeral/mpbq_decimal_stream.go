@@ -11,6 +11,10 @@ import (
 // individual digits and uncertainty marker in order. A failed insertion
 // leaves the raw numeric display locals for explicit CleanupDisplay.
 func (m *BinaryRationalManager) DisplayDecimalTo(w io.Writer, a *BinaryRational, prec uint32) (err error) {
+	return m.DisplayDecimalToWithInvocation(w, a, prec, nil)
+}
+
+func (m *BinaryRationalManager) DisplayDecimalToWithInvocation(w io.Writer, a *BinaryRational, prec uint32, receipt *BinaryDisplayInvocationReceipt) (err error) {
 	if w == nil {
 		return arena.ErrInvalidSlot
 	}
@@ -26,6 +30,9 @@ func (m *BinaryRationalManager) DisplayDecimalTo(w io.Writer, a *BinaryRational,
 	}
 	if err = m.beginBinaryDisplay(); err != nil {
 		return err
+	}
+	if receipt != nil {
+		*receipt = BinaryDisplayInvocationReceipt{m, m.Display.invocation}
 	}
 	defer func() {
 		var unused uint32

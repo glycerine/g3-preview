@@ -42,6 +42,9 @@ func (v algebraicBinaryBoundView) copyTo(out *unumeral.BinaryRational, receipt *
 // Source get_interval copies both bounds before passing polynomial arguments
 // to refinement; packed root flags are not an operand of this helper.
 func (m *AlgebraicRootCore) copyIntervalAtPrecisionFromCell(l *algebraicLocation, lower, upper *unumeral.BinaryRational, precision uint32, receipt *unumeral.IntegerCopyAllocationReceipt) (bool, error) {
+	return m.copyIntervalAtPrecisionFromCellWithRefinement(l, lower, upper, precision, receipt, &m.bounds.refinement)
+}
+func (m *AlgebraicRootCore) copyIntervalAtPrecisionFromCellWithRefinement(l *algebraicLocation, lower, upper *unumeral.BinaryRational, precision uint32, receipt *unumeral.IntegerCopyAllocationReceipt, refinement *algebraicRefinementScope) (bool, error) {
 	if _, _, e := algebraicAssertionSwitch(); e != nil {
 		return false, e
 	}
@@ -62,5 +65,9 @@ func (m *AlgebraicRootCore) copyIntervalAtPrecisionFromCell(l *algebraicLocation
 	if e != nil {
 		return false, e
 	}
-	return m.refineBoundInterval(v, lower, upper, precision*4)
+	if e := refinement.begin(m); e != nil {
+		return false, e
+	}
+	defer func() { refinement.executing = false }()
+	return m.config.Polynomials.refineToPrecisionWithEvaluationReceipt(v, m.config.Binary, lower, upper, precision*4, &refinement.evaluation, refinement)
 }

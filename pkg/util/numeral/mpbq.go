@@ -145,6 +145,9 @@ func (m *BinaryRationalManager) open() error {
 	if m.closed || m.closing || m.Z.closed {
 		return arena.ErrClosed
 	}
+	if m.Display.running {
+		return ErrBinaryDisplayPending
+	}
 	if m.selectIntPending {
 		return ErrBinarySelectPending
 	}
@@ -224,6 +227,9 @@ func (m *BinaryRationalManager) Field() bool   { return false }
 func (m *BinaryRationalManager) CloseChecked() error {
 	if m == nil || m.self != m {
 		return ErrBinaryOwner
+	}
+	if m.Display.running {
+		return ErrBinaryDisplayPending
 	}
 	for binding := m.Z.CallerBindings(); binding != nil; binding = binding.Previous() {
 		if guard, ok := binding.Guard().(interface {

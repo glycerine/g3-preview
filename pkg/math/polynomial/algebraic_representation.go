@@ -287,27 +287,6 @@ func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, 
 	return m.boundToRational(selected, out)
 }
 
-func (m *AlgebraicRootCore) intervalAtPrecision(r *algebraicRecord, lower, upper *unumeral.BinaryRational, precision uint32) (bool, error) {
-	return m.intervalAtPrecisionWithReceipt(r, lower, upper, precision, nil, nil)
-}
-func (m *AlgebraicRootCore) intervalAtPrecisionWithReceipt(r *algebraicRecord, lower, upper *unumeral.BinaryRational, precision uint32, receipt *unumeral.IntegerCopyAllocationReceipt, evaluation *upolyBinaryEvaluationInvocationReceipt) (bool, error) {
-	b := m.config.Binary
-	if e := b.CopyWithAllocationReceipt(lower, r.interval.BorrowLower(), receipt); e != nil {
-		return false, e
-	}
-	if e := b.CopyWithAllocationReceipt(upper, r.interval.BorrowUpper(), receipt); e != nil {
-		return false, e
-	}
-	v, e := m.sourcePolynomial(r)
-	if e != nil {
-		return false, e
-	}
-	if evaluation != nil {
-		return m.refineBoundInterval(v, lower, upper, precision*4)
-	}
-	return m.config.Polynomials.refineToPrecisionWithEvaluationReceipt(v, b, lower, upper, precision*4, nil, nil)
-}
-
 // Preserve reserve, ascending numeral SET and final size adjustment from
 // upm().set, retaining the actual receiving manager and its normalization.
 func (m *AlgebraicRootCore) copyDefiningCoefficients(out *upolyVectorState, v UPolynomialView) error {

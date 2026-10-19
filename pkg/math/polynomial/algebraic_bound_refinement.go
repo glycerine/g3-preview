@@ -34,6 +34,9 @@ func (s *algebraicRefinementScope) NumericBound(executing bool) bool {
 	if s == &m.bounds.refinement {
 		return !executing || s.executing && m.bounds.executing
 	}
+	if s == &m.decimalDisplay.refinement {
+		return !executing || s.executing && m.decimalDisplayRunning
+	}
 	return s == &m.refinement && (!executing || s.executing)
 }
 func (s *algebraicRefinementScope) NumericRoots(z *unumeral.IntegerManager, local *unumeral.NumericAllocationRoots) *unumeral.NumericAllocationRoots {
@@ -117,17 +120,9 @@ func (s *algebraicRefinementScope) cleanup() error {
 	s.stop = nil
 	return nil
 }
-func (m *AlgebraicRootCore) refineBoundInterval(v UPolynomialView, lower, upper *unumeral.BinaryRational, k uint32) (bool, error) {
-	s := &m.bounds.refinement
-	if e := s.begin(m); e != nil {
-		return false, e
-	}
-	defer func() { s.executing = false }()
-	return m.config.Polynomials.refineToPrecisionWithEvaluationReceipt(v, m.config.Binary, lower, upper, k, &s.evaluation, s)
-}
 
 func (s *algebraicRefinementScope) begin(m *AlgebraicRootCore) error {
-	if m == nil || m.self != m || (s != &m.bounds.refinement && s != &m.refinement) {
+	if m == nil || m.self != m || (s != &m.bounds.refinement && s != &m.refinement && s != &m.decimalDisplay.refinement) {
 		return ErrAlgebraicOwner
 	}
 	if s.executing || s.pending(m) {

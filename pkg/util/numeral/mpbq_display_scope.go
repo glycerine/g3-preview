@@ -13,6 +13,8 @@ var ErrBinaryDisplayPending = errors.New("mpnum: raw binary display locals pendi
 // not jump to the source end label. These actual owning scalar records and cold
 // cursors are charged in the BinaryRationalManager header.
 type binaryDisplayScope struct {
+	running                           bool
+	invocation                        uint64
 	Values                            [3]Int // n1,v1,two_k
 	active, sourceEnd, guard, aborted bool
 	sourceStage, owningStage          uint8
@@ -32,10 +34,10 @@ func (m *BinaryRationalManager) DisplayState() BinaryDisplayState {
 	return BinaryDisplayState{s.active, s.sourceEnd, s.guard, s.aborted, s.sourceStage, s.owningStage, s.original, s.cleanup}
 }
 func (m *BinaryRationalManager) beginBinaryDisplay() error {
-	if m.Display.active {
+	if m.Display.active || m.Display.invocation == ^uint64(0) {
 		return ErrBinaryDisplayPending
 	}
-	m.Display = binaryDisplayScope{active: true}
+	m.Display = binaryDisplayScope{active: true, running: true, invocation: m.Display.invocation + 1}
 	return nil
 }
 func (s *binaryDisplayScope) count() uint8 { return 3 }
@@ -61,6 +63,7 @@ func (m *BinaryRationalManager) sourceBinaryDisplayEnd() error {
 }
 func (m *BinaryRationalManager) finishBinaryDisplay(length *uint32, result *error) {
 	s := &m.Display
+	defer func() { s.running = false }()
 	if !s.active {
 		return
 	}
@@ -87,6 +90,9 @@ func (m *BinaryRationalManager) CleanupDisplay() error {
 		return arena.ErrClosed
 	}
 	s := &m.Display
+	if s.running {
+		return ErrBinaryDisplayPending
+	}
 	if !s.active {
 		return nil
 	}
