@@ -54794,14 +54794,15 @@
           ]
         },
         {
-          "name": "upolynomial.h:401-450 both converters: allocation-frontier diagnostic histories and repeated erased-zero reuse",
+          "name": "Complete upolynomial.h:401-450 both converters: source assertion actions, allocation-frontier diagnostic histories and repeated erased-zero reuse",
           "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factor_to_numeral_vector.go",
           "tests": [
             "TestPolynomialToNumeralZeroReuseErasesHistoryReservation",
             "TestPolynomialToNumeralSelectedVariableMatchedOwnHistory",
             "TestPolynomialFactorToNumeralVectorRetainsHistoryAcrossActualReuse",
-            "TestPolynomialFactorToNumeralVectorTransportCannotRetireExecutingOwner"
+            "TestPolynomialFactorToNumeralVectorTransportCannotRetireExecutingOwner",
+            "TestPolynomialToNumeralSourceAssertionActions"
           ]
         }
       ],

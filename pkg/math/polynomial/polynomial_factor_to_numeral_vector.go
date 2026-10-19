@@ -68,13 +68,11 @@ func (m *MultivariatePolynomialManager) toNumeralVectorIntoSource(p Polynomial, 
 		return e
 	}
 	c := m.core
-	if polynomialSourceDebug && !selected {
-		ok, e := c.IsUnivariate(p)
-		if e != nil {
+	if !selected {
+		if e := polynomialToNumeralSourceAssert(404, "pm.is_univariate(p)", func() (bool, error) {
+			return c.IsUnivariate(p)
+		}); e != nil {
 			return e
-		}
-		if !ok {
-			return ErrPolynomialAssertion
 		}
 	}
 	s := &m.factorNumeralVector
@@ -166,8 +164,12 @@ func (m *MultivariatePolynomialManager) toNumeralVectorIntoSource(p Polynomial, 
 				return e
 			}
 		}
-		if polynomialSourceDebug && !selected && k > degree {
-			return ErrPolynomialAssertion
+		if !selected {
+			if e = polynomialToNumeralSourceAssert(415, "k <= deg", func() (bool, error) {
+				return k <= degree, nil
+			}); e != nil {
+				return e
+			}
 		}
 		value, e := outputManager.read(outputManager.stateView(output), k)
 		if e != nil {
