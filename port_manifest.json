@@ -38370,7 +38370,9 @@
         "pkg/math/polynomial/upolynomial_convert_entry_trace_test.go",
         "pkg/math/polynomial/upolynomial_refinement.go",
         "pkg/math/polynomial/upolynomial.go",
-        "pkg/math/polynomial/upolynomial_source_finalize.go"
+        "pkg/math/polynomial/upolynomial_source_finalize.go",
+        "pkg/math/polynomial/algebraic_unary_trace.go",
+        "pkg/math/polynomial/algebraic_unary_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -38526,7 +38528,10 @@
         "TestAlgebraicBinaryBoundCopyActualReservationAndExponentPublication",
         "TestAlgebraicPrecisionBasicBoundCopyActualRetention",
         "TestAlgebraicInverseConversionEntryActualSourceStop",
-        "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix"
+        "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix",
+        "TestAlgebraicUnaryIntervalTraceSourceFrontier",
+        "TestAlgebraicUnaryIntervalTraceDisabledDoesNotRead",
+        "TestAlgebraicUnaryPowerTraceMultiwordReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -39340,6 +39345,28 @@
           "deviations": [
             "Source mk_root TRACE sites 655,668,678 now run before range failure/result assignment and at the actual polynomial/expression conversion frontiers. Literal polynomial/expression and interval records, erased input reads, sticky stream failure and executing manager/vector guards are checked. The polynomial trace retains a receipt issued at actual display-frame acceptance; a real guarded NUM destructor verifies stopped-child retention, copied/stale receipt rejection and owning cleanup without changing source history. The larger source ownership/allocator and other algebraic TRACE audits remain open."
           ]
+        },
+        {
+          "name": "Unary power/root resultant selection cpp1086-1157 and dispatch cpp1271-1381; source interval diagnostic at 1123, actual interval-power debug children; root_core diagnostics and complete child audit remain open",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/algebraic_unary.go",
+          "go_targets": [
+            "pkg/math/polynomial/algebraic_unary_trace.go",
+            "pkg/util/numeral/mpbqi_debug_invocation.go"
+          ],
+          "tests": [
+            "TestAlgebraicUnaryPowerRootAndAliases",
+            "TestAlgebraicUnaryRationalRootsAndDomains",
+            "TestAlgebraicUnaryEveryCheckpointCancellationRetry",
+            "TestAlgebraicUnaryNegativeRootsAndCubicInput",
+            "TestAlgebraicUnaryRationalRefinementFallback",
+            "TestAlgebraicUnarySourceAssertionsBeforeLocals",
+            "TestAlgebraicUnaryResultantIndependentIdentities",
+            "TestAlgebraicUnaryResultantEveryCheckpointRetry",
+            "TestAlgebraicUnaryIntervalTraceSourceFrontier",
+            "TestAlgebraicUnaryIntervalTraceDisabledDoesNotRead",
+            "TestAlgebraicUnaryPowerTraceMultiwordReservationPrefixes"
+          ]
         }
       ],
       "ownership": [
@@ -39517,7 +39544,9 @@
         "pkg/math/polynomial/upolynomial_convert_entry_trace_test.go",
         "pkg/math/polynomial/upolynomial_refinement.go",
         "pkg/math/polynomial/upolynomial.go",
-        "pkg/math/polynomial/upolynomial_source_finalize.go"
+        "pkg/math/polynomial/upolynomial_source_finalize.go",
+        "pkg/math/polynomial/algebraic_unary_trace.go",
+        "pkg/math/polynomial/algebraic_unary_trace_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -39670,7 +39699,10 @@
         "TestAlgebraicDefiningNegationPreservesOlderNumericAllocation",
         "TestAlgebraicBinaryBoundCopyActualReservationAndExponentPublication",
         "TestAlgebraicPrecisionBasicBoundCopyActualRetention",
-        "TestAlgebraicInverseConversionEntryActualSourceStop"
+        "TestAlgebraicInverseConversionEntryActualSourceStop",
+        "TestAlgebraicUnaryIntervalTraceSourceFrontier",
+        "TestAlgebraicUnaryIntervalTraceDisabledDoesNotRead",
+        "TestAlgebraicUnaryPowerTraceMultiwordReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -40064,6 +40096,28 @@
           ],
           "deviations": [
             "Source mk_root TRACE sites 655,668,678 now run before range failure/result assignment and at the actual polynomial/expression conversion frontiers. Literal polynomial/expression and interval records, erased input reads, sticky stream failure and executing manager/vector guards are checked. The polynomial trace retains a receipt issued at actual display-frame acceptance; a real guarded NUM destructor verifies stopped-child retention, copied/stale receipt rejection and owning cleanup without changing source history. The larger source ownership/allocator and other algebraic TRACE audits remain open."
+          ]
+        },
+        {
+          "name": "Unary power/root resultant selection cpp1086-1157 and dispatch cpp1271-1381; source interval diagnostic at 1123, actual interval-power debug children; root_core diagnostics and complete child audit remain open",
+          "status": "partial",
+          "go_target": "pkg/math/polynomial/algebraic_unary.go",
+          "go_targets": [
+            "pkg/math/polynomial/algebraic_unary_trace.go",
+            "pkg/util/numeral/mpbqi_debug_invocation.go"
+          ],
+          "tests": [
+            "TestAlgebraicUnaryPowerRootAndAliases",
+            "TestAlgebraicUnaryRationalRootsAndDomains",
+            "TestAlgebraicUnaryEveryCheckpointCancellationRetry",
+            "TestAlgebraicUnaryNegativeRootsAndCubicInput",
+            "TestAlgebraicUnaryRationalRefinementFallback",
+            "TestAlgebraicUnarySourceAssertionsBeforeLocals",
+            "TestAlgebraicUnaryResultantIndependentIdentities",
+            "TestAlgebraicUnaryResultantEveryCheckpointRetry",
+            "TestAlgebraicUnaryIntervalTraceSourceFrontier",
+            "TestAlgebraicUnaryIntervalTraceDisabledDoesNotRead",
+            "TestAlgebraicUnaryPowerTraceMultiwordReservationPrefixes"
           ]
         }
       ],
@@ -127984,7 +128038,8 @@
         "pkg/util/numeral/mpbqi_stream_test.go",
         "pkg/util/numeral/mpbqi_debug_invocation.go",
         "pkg/util/numeral/mpbqi_debug_invocation_test.go",
-        "pkg/math/polynomial/algebraic_binary_trace_test.go"
+        "pkg/math/polynomial/algebraic_binary_trace_test.go",
+        "pkg/math/polynomial/algebraic_unary_trace_test.go"
       ],
       "tests": [
         "TestBinaryIntervalQueriesAndScalarRoutes",
@@ -127999,7 +128054,8 @@
         "TestBinaryIntervalRetainedProductsAndDeepCopies",
         "TestBinaryIntervalSourceStreamOrderAndRefusalPrefixes",
         "TestBinaryIntervalDebugReceiptActualRAWAndCleanupReads",
-        "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix"
+        "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix",
+        "TestAlgebraicUnaryPowerTraceMultiwordReservationPrefixes"
       ],
       "conditionals": [
         {
@@ -163525,7 +163581,8 @@
         "pkg/util/numeral/mpbqi_debug_invocation.go",
         "pkg/util/numeral/mpbqi_debug_invocation_test.go",
         "pkg/util/numeral/mpbq_cleanup_observe.go",
-        "pkg/math/polynomial/algebraic_binary_trace_test.go"
+        "pkg/math/polynomial/algebraic_binary_trace_test.go",
+        "pkg/math/polynomial/algebraic_unary_trace_test.go"
       ],
       "tests": [
         "TestBinaryIntervalQueriesAndScalarRoutes",
@@ -163541,7 +163598,8 @@
         "TestBinaryIntervalSourceStreamOrderAndRefusalPrefixes",
         "TestAlgebraicDisplayIntervalSourceBranchesAndWritePrefixes",
         "TestBinaryIntervalDebugReceiptActualRAWAndCleanupReads",
-        "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix"
+        "TestAlgebraicBinaryNamedBigTraceEveryReservationPrefix",
+        "TestAlgebraicUnaryPowerTraceMultiwordReservationPrefixes"
       ],
       "conditionals": [
         {

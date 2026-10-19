@@ -41,19 +41,26 @@ func (s *binaryIntervalDebugChildren) pending(b *BinaryRationalManager) bool {
 }
 
 func (m *BinaryIntervalManager) AddWithDebugReceipt(a, b, out *BinaryInterval, r *BinaryIntervalDebugInvocationReceipt) error {
-	return m.arithmeticWithDebugReceipt(a, b, out, 0, r)
+	return m.arithmeticWithDebugReceipt(a, b, out, 0, 0, r)
 }
 func (m *BinaryIntervalManager) SubWithDebugReceipt(a, b, out *BinaryInterval, r *BinaryIntervalDebugInvocationReceipt) error {
-	return m.arithmeticWithDebugReceipt(a, b, out, 1, r)
+	return m.arithmeticWithDebugReceipt(a, b, out, 1, 0, r)
 }
 func (m *BinaryIntervalManager) MulWithDebugReceipt(a, b, out *BinaryInterval, r *BinaryIntervalDebugInvocationReceipt) error {
-	return m.arithmeticWithDebugReceipt(a, b, out, 2, r)
+	return m.arithmeticWithDebugReceipt(a, b, out, 2, 0, r)
 }
-func (m *BinaryIntervalManager) arithmeticWithDebugReceipt(a, b, out *BinaryInterval, kind uint8, r *BinaryIntervalDebugInvocationReceipt) (cause error) {
+func (m *BinaryIntervalManager) PowerWithDebugReceipt(a *BinaryInterval, n uint32, out *BinaryInterval, r *BinaryIntervalDebugInvocationReceipt) error {
+	return m.arithmeticWithDebugReceipt(a, nil, out, 3, n, r)
+}
+func (m *BinaryIntervalManager) arithmeticWithDebugReceipt(a, b, out *BinaryInterval, kind uint8, power uint32, r *BinaryIntervalDebugInvocationReceipt) (cause error) {
 	if m != nil && m.self == m && (m.debugExecuting || m.debugPending) {
 		return ErrBinaryDebugSnapshotPending
 	}
-	if e := m.triple(a, b, out); e != nil {
+	if kind == 3 {
+		if e := m.pair(a, out); e != nil {
+			return e
+		}
+	} else if e := m.triple(a, b, out); e != nil {
 		return e
 	}
 	if m.debugInvocation == ^uint64(0) {
@@ -83,8 +90,10 @@ func (m *BinaryIntervalManager) arithmeticWithDebugReceipt(a, b, out *BinaryInte
 		return m.Add(a, b, out)
 	case 1:
 		return m.Sub(a, b, out)
-	default:
+	case 2:
 		return m.Mul(a, b, out)
+	default:
+		return m.Power(a, power, out)
 	}
 }
 func (m *BinaryIntervalManager) matchesDebugInvocation(r *BinaryIntervalDebugInvocationReceipt) bool {

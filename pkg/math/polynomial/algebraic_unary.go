@@ -135,7 +135,7 @@ func (m *AlgebraicRootCore) makeUnary(a, out *Algebraic, k uint32, root bool) (c
 				_, e = m.config.Binary.RootUpper(ra.interval.BorrowUpper(), k, s.interval.BorrowUpper())
 			}
 		} else {
-			e = im.Power(&ra.interval, k, &s.interval)
+			e = im.PowerWithDebugReceipt(&ra.interval, k, &s.interval, &s.intervalDebug)
 		}
 		s.executing = false
 		if e != nil {
@@ -153,6 +153,9 @@ func (m *AlgebraicRootCore) makeUnary(a, out *Algebraic, k uint32, root bool) (c
 			}
 			uv, e := p.SignVariationsBinary(seq, s.interval.BorrowUpper())
 			if e != nil {
+				return e
+			}
+			if e = m.traceUnaryIntervals(a, lv, uv); e != nil {
 				return e
 			}
 			if lv <= uv {
