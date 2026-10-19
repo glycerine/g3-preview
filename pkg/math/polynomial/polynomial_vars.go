@@ -10,7 +10,10 @@ func (m *MultivariatePolynomialManager) Vars(p Polynomial, xs *PolynomialVariabl
 	if e := m.ready(); e != nil {
 		return e
 	}
-	c := m.core
+	return m.core.varsCore(p, xs)
+}
+
+func (c *MultivariatePolynomialCore) varsCore(p Polynomial, xs *PolynomialVariableDegrees) error {
 	if e := xs.open(); e != nil {
 		return e
 	}

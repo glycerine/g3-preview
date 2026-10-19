@@ -153,6 +153,9 @@ func (m *AlgebraicRootCore) IsolateMultivariateRootsWithSigns(pm *MultivariatePo
 		*signs = append(*signs, sign)
 		return nil
 	}
+	if e := m.traceIsolationSignsRoots(pm, p, values, roots); e != nil {
+		return e
+	}
 	for i := 0; i < count; i++ {
 		if e := m.RefineToPrecision(&roots.values[i], 2); e != nil {
 			return e
