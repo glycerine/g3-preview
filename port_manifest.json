@@ -45469,8 +45469,8 @@
           ]
         },
         {
-          "name": "Derivative numeric allocation and stopped-child continuation src/math/polynomial/polynomial.cpp:4507-4528; direct unsigned SET src/util/mpz.h:680-694 and modular SET/MUL src/util/mpzzp.h:154,230-233",
-          "status": "partial",
+          "name": "Complete Derivative numeric allocation and stopped-child continuation src/math/polynomial/polynomial.cpp:4507-4528; direct unsigned SET src/util/mpz.h:680-694 and modular SET/MUL src/util/mpzzp.h:154,230-233",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_derivative_allocation_context.go",
           "tests": [
             "TestPolynomialDerivativeDirectEveryBigCoefficientPrefix",
@@ -45804,8 +45804,8 @@
         },
         {
           "go_target": "pkg/math/polynomial/polynomial_divides_allocation_context.go",
-          "name": "polynomial.cpp:5154-5194 lower direct Div/Neg/bool NUM transport prerequisite only: exact actual constructed>=2 frame, captured nonce, receiver, executing/callback-depth guard and named child source/own suffix helpers.",
-          "status": "partial",
+          "name": "Complete polynomial.cpp:5154-5194 lower direct Div/Neg/bool NUM transport: exact actual constructed>=2 frame, captured nonce, receiver, executing/callback-depth guard and named child source/own suffix helpers.",
+          "status": "ported",
           "tests": [
             "TestDividesNumericActualFrameAndImmutableContext",
             "TestDividesNumericLowerActualPrefixes",
@@ -178051,8 +178051,8 @@
           ]
         },
         {
-          "name": "src/util/mpzzp.h:167-185,208-233 ExactDiv same Div/Neg and actual PN/RAW/Natural children",
-          "status": "partial",
+          "name": "Complete src/util/mpzzp.h:167-185,208-233 ExactDiv same Div/Neg and actual PN/RAW/Natural children",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_exact_div_allocation_context.go",
           "tests": [
             "TestExactDivNumericActualFrameAndImmutableContext",
@@ -178065,8 +178065,8 @@
         },
         {
           "go_target": "pkg/math/polynomial/polynomial_divides_allocation_context.go",
-          "name": "mpzzp.h:131,192,195-208 same Neg/Div/Divides engines with exact receiver and captured polynomial Divides NUM frame; field nonzero boolean shortcut creates no Integer scoped tmp invocation.",
-          "status": "partial",
+          "name": "Complete mpzzp.h:131,192,195-208 same Neg/Div/Divides engines with exact receiver and captured polynomial Divides NUM frame; field nonzero boolean shortcut creates no Integer scoped tmp invocation.",
+          "status": "ported",
           "tests": [
             "TestDividesNumericActualFrameAndImmutableContext",
             "TestDividesNumericLowerActualPrefixes",
@@ -178085,8 +178085,8 @@
           ]
         },
         {
-          "name": "Actual Normalize/SOM SET/GCD/Div wrappers preserve mpzzp.h:167-185,211 manager engine and exact receiver contexts",
-          "status": "partial",
+          "name": "Complete Actual Normalize/SOM SET/GCD/Div wrappers preserve mpzzp.h:167-185,211 manager engine and exact receiver contexts",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_normalize_allocation_context.go",
           "tests": [
             "TestPolynomialNormalizeActualTransportOwnerSourceRefusal",
