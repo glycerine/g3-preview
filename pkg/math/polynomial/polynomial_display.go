@@ -3,6 +3,7 @@
 package polynomial
 
 import (
+	"errors"
 	"reflect"
 	"strings"
 
@@ -453,10 +454,14 @@ func (m *MultivariatePolynomialCore) displayIntoCore(p Polynomial, sink Polynomi
 	if sink == nil {
 		return ErrPolynomialOwner
 	}
-	if polynomialSourceDebug {
-		if e := m.displayConsistent(p, sink); e != nil {
-			return e
+	if e := polynomialDisplaySourceAssert(7426, "m_imp->consistent_coeffs(p)", func() (bool, error) {
+		e := m.displayConsistent(p, sink)
+		if errors.Is(e, ErrPolynomialAssertion) {
+			return false, nil
 		}
+		return e == nil, e
+	}); e != nil {
+		return e
 	}
 	n, e := m.readWord(p, 8)
 	if e != nil {
@@ -601,14 +606,11 @@ func (m *MultivariatePolynomialCore) displayNumberSMT2(p Polynomial, i uint32, s
 	return f.displayInteger(&a)
 }
 func (m *MultivariatePolynomialCore) displaySMT2Term(p Polynomial, i uint32, sink PolynomialTextSink) error {
-	if polynomialSourceDebug {
+	if e := polynomialDisplaySourceAssert(1573, "i < m_size", func() (bool, error) {
 		n, e := m.readWord(p, 8)
-		if e != nil {
-			return e
-		}
-		if i >= n {
-			return ErrPolynomialAssertion
-		}
+		return i < n, e
+	}); e != nil {
+		return e
 	}
 	mon, e := m.monomialCore(p, i)
 	if e != nil {

@@ -45026,8 +45026,8 @@
           ]
         },
         {
-          "name": "Selected literal ordinary/SMT2 polynomial and monomial display, cached ref-vector stream loop, nested lexical NUM/char/MPN destruction and exact owning cleanup; native/global ostream remains open",
-          "status": "partial",
+          "name": "Complete literal ordinary/SMT2 polynomial and monomial display with native Go text sinks, source assertion actions, cached ref-vector loop, nested lexical NUM/char/MPN destruction and exact owning cleanup",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_display.go",
           "tests": [
             "TestPolynomialDisplayLiteralSourceQuirks",
@@ -45042,7 +45042,8 @@
             "TestPolynomialDisplayOwnerGuards",
             "TestPolynomialDisplayMonomialWrapperAndFiniteField",
             "TestPolynomialDisplayExactNumericReceiptAndReplacement",
-            "TestPolynomialDisplaySinkCreatesForeignPending"
+            "TestPolynomialDisplaySinkCreatesForeignPending",
+            "TestPolynomialDisplaySourceAssertionActions"
           ]
         },
         {
@@ -49207,8 +49208,8 @@
           ]
         },
         {
-          "name": "Selected literal ordinary/SMT2 polynomial and monomial display, cached ref-vector stream loop, nested lexical NUM/char/MPN destruction and exact owning cleanup; native/global ostream remains open",
-          "status": "partial",
+          "name": "Complete literal ordinary/SMT2 polynomial and monomial display with native Go text sinks, source assertion actions, cached ref-vector loop, nested lexical NUM/char/MPN destruction and exact owning cleanup",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_display.go",
           "tests": [
             "TestPolynomialDisplayLiteralSourceQuirks",
@@ -49223,7 +49224,8 @@
             "TestPolynomialDisplayOwnerGuards",
             "TestPolynomialDisplayMonomialWrapperAndFiniteField",
             "TestPolynomialDisplayExactNumericReceiptAndReplacement",
-            "TestPolynomialDisplaySinkCreatesForeignPending"
+            "TestPolynomialDisplaySinkCreatesForeignPending",
+            "TestPolynomialDisplaySourceAssertionActions"
           ]
         },
         {
@@ -168728,8 +168730,8 @@
           ]
         },
         {
-          "name": "Selected literal ordinary/SMT2 polynomial and monomial display, cached ref-vector stream loop, nested lexical NUM/char/MPN destruction and exact owning cleanup; native/global ostream remains open",
-          "status": "partial",
+          "name": "Complete literal ordinary/SMT2 polynomial and monomial display with native Go text sinks, source assertion actions, cached ref-vector loop, nested lexical NUM/char/MPN destruction and exact owning cleanup",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_display.go",
           "tests": [
             "TestPolynomialDisplayLiteralSourceQuirks",
@@ -168744,7 +168746,8 @@
             "TestPolynomialDisplayOwnerGuards",
             "TestPolynomialDisplayMonomialWrapperAndFiniteField",
             "TestPolynomialDisplayExactNumericReceiptAndReplacement",
-            "TestPolynomialDisplaySinkCreatesForeignPending"
+            "TestPolynomialDisplaySinkCreatesForeignPending",
+            "TestPolynomialDisplaySourceAssertionActions"
           ]
         },
         {
