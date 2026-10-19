@@ -12,6 +12,8 @@ var ErrAlgebraicDivisionByZero error = newAlgebraicException("division by zero")
 
 // The two source scoped rationals survive a refused destruction in the owner.
 type algebraicInverseScope struct {
+	refineEvaluation              upolyBinaryEvaluationInvocationReceipt
+	refineCopy                    unumeral.IntegerCopyAllocationReceipt
 	conversions                   [2]algebraicConversionScope
 	traceStop                     error
 	traceDisplayPending           bool
@@ -22,6 +24,14 @@ type algebraicInverseScope struct {
 	values                        [2]unumeral.Rational // inv_lower, inv_upper
 	remaining                     uint8
 	executing                     bool
+}
+
+func (m *AlgebraicRootCore) inverseRefinementEvaluationPending() bool {
+	return m != nil && m.self == m && m.config.Polynomials.matchesBinaryEvaluationReceipt(&m.inversion.refineEvaluation) && m.config.Polynomials.binaryEvaluation.active
+}
+
+func (m *AlgebraicRootCore) inverseRefinementCopyPending() bool {
+	return m != nil && m.self == m && m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.inversion.refineCopy)
 }
 
 // Literal reverse scoped_mpq destruction, NUM before DEN. Owning cleanup
@@ -66,6 +76,15 @@ func (m *AlgebraicRootCore) cleanupInverse() error {
 	}
 	q.executing = true
 	defer func() { q.executing = false }()
+	if e := m.config.Polynomials.cleanupBinaryEvaluationWithReceipt(&q.refineEvaluation, false); e != nil {
+		return e
+	}
+	if e := m.config.Polynomials.cleanupBinaryEvaluationWithReceipt(&q.refineEvaluation, true); e != nil {
+		return e
+	}
+	if e := m.config.Rationals.Integers().CleanupCopyAllocationInvocation(&q.refineCopy); e != nil {
+		return e
+	}
 	if q.traceDisplayPending {
 		if e := m.cleanupRootDisplay(); e != nil {
 			return e
@@ -100,26 +119,50 @@ func (m *AlgebraicRootCore) refineNonzeroBounds(a *Algebraic) error {
 	if e != nil {
 		return e
 	}
+	q := &m.inversion
+	q.refineEvaluation = upolyBinaryEvaluationInvocationReceipt{}
+	q.executing = true
+	defer func() { q.executing = false }()
 	b := m.config.Binary
 	lower, upper := r.interval.BorrowLower(), r.interval.BorrowUpper()
 	lz, e := b.IsZero(lower)
 	if e != nil {
 		return e
 	}
-	uz, e := b.IsZero(upper)
-	if e != nil || !lz && !uz {
-		return e
+	if !lz {
+		uz, e := b.IsZero(upper)
+		if e != nil || !uz {
+			return e
+		}
 	}
 	sign := 1
 	if r.flags&2 != 0 {
 		sign = -1
 	}
+	if e = algebraicIsolationAssert(sign != 0, 1591, "sign_l != 0"); e != nil {
+		return e
+	}
 	bound, other := lower, upper
 	if !lz {
+		d, enabled, e := algebraicAssertionSwitch()
+		if e != nil {
+			return e
+		}
+		if enabled {
+			zero, e := b.IsZero(upper)
+			if e != nil {
+				return e
+			}
+			if !zero {
+				if e = diagnostic.DebugAssertionFailure(d, "src/math/polynomial/algebraic_numbers.cpp", 1614, "bqm().is_zero(upper)"); e != nil {
+					return e
+				}
+			}
+		}
 		bound, other = upper, lower
 		sign = -sign
 	}
-	e = b.Copy(bound, other)
+	e = b.CopyWithAllocationReceipt(bound, other, &q.refineCopy)
 	if e = m.save(l, &r, e); e != nil {
 		return e
 	}
@@ -132,7 +175,7 @@ func (m *AlgebraicRootCore) refineNonzeroBounds(a *Algebraic) error {
 		if e = m.save(l, &r, e); e != nil {
 			return e
 		}
-		next, e := m.config.Polynomials.EvalSignBinary(v, bound)
+		next, e := m.config.Polynomials.evalSignBinaryWithNegScopeAndReceipt(v, bound, nil, &q.refineEvaluation)
 		if e != nil {
 			return e
 		}
@@ -140,9 +183,14 @@ func (m *AlgebraicRootCore) refineNonzeroBounds(a *Algebraic) error {
 			if e = m.beginQ(); e != nil {
 				return e
 			}
-			e = b.ToRational(m.config.Rationals, bound, &m.localQ)
+			e = m.refinementConversion.run(m, bound, &m.localQ)
 			if e == nil {
+				q.executing = false
 				e = m.SetTake(a, &m.localQ)
+				q.executing = true
+			}
+			if m.refinementConversion.stop != nil {
+				return e
 			}
 			return m.finishQ(e)
 		}

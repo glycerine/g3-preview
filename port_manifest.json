@@ -38399,7 +38399,8 @@
         "pkg/math/polynomial/algebraic_isolation_signs_display_source_test.go",
         "pkg/math/polynomial/algebraic_rational_translation_trace.go",
         "pkg/math/polynomial/algebraic_rational_translation_trace_test.go",
-        "pkg/math/polynomial/algebraic_rational_multiply_trace_test.go"
+        "pkg/math/polynomial/algebraic_rational_multiply_trace_test.go",
+        "pkg/math/polynomial/algebraic_inverse_refinement_source_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -38596,7 +38597,12 @@
         "TestAlgebraicRationalMultiplyDisplayDeclarationFrontiers",
         "TestAlgebraicRationalMultiplyAssertionActualHornerOwnership",
         "TestAlgebraicRationalMultiplyStickyStreamStillEvaluatesSigns",
-        "TestAlgebraicRationalMultiplyAssertionTransportProtectsOwner"
+        "TestAlgebraicRationalMultiplyAssertionTransportProtectsOwner",
+        "TestAlgebraicInverseRefinementActualHornerAndConversionReservations",
+        "TestAlgebraicInverseRefinementActualTransportProtectsOwner",
+        "TestAlgebraicInverseRefinementPreservesForeignHorner",
+        "TestAlgebraicInverseRefinementActualBoundCopyReceipt",
+        "TestAlgebraicInverseRefinementAssertionGateBeforeBoundCopy"
       ],
       "conditionals": [
         {
@@ -39251,7 +39257,12 @@
             "TestAlgebraicInverseSourceTracesAndCachedIndex",
             "TestAlgebraicInverseTraceCallbackKeepsActualCell",
             "TestAlgebraicInverseTraceEveryReservationPrefix",
-            "TestAlgebraicInverseTraceBigBoundsSuccess"
+            "TestAlgebraicInverseTraceBigBoundsSuccess",
+            "TestAlgebraicInverseRefinementActualHornerAndConversionReservations",
+            "TestAlgebraicInverseRefinementActualTransportProtectsOwner",
+            "TestAlgebraicInverseRefinementPreservesForeignHorner",
+            "TestAlgebraicInverseRefinementActualBoundCopyReceipt",
+            "TestAlgebraicInverseRefinementAssertionGateBeforeBoundCopy"
           ],
           "deviations": [
             "All three inversion TRACE sites use the actual source displays and rational strings. The initial display can publish the cached root index; subsequent interval saves retain that mutation. Inversion owns each actual bound-to-rational conversion receipt. Rational-to-binary conversion retains both initial sign-evaluation receipts and its reached binary conversion/refinement receipts, including RAW midpoint and debug rational-service invocations. The direct allocator campaign checks every reached reservation through success, named physical ownership after cleanup and full owner refunds. Full descendant source destructor/callback and eager constructor audits remain open."
@@ -39531,7 +39542,8 @@
         "The polynomial-ref and sexpr mk_root overloads (algebraic_numbers.cpp:665-680,2887-2893; retained AST arithmetic consumer arith_decl_plugin.cpp:95-98) now convert/parse directly into the actual persistent m_isolate_tmp1 and then invoke one-based distinct-real-root selection. Source index/univariate assertions precede workspace construction; with assertions erased, syntax and conversion still precede runtime index errors. Root construction throws the concrete algebraic_exception/default_exception class with unchanged source messages. A concrete construction owner retains only actually accepted dense conversion, parser lexical entry, factor frontend and private root vector; cleanup preserves older refused factor work. The converter records accepted lexical entry, refuses reentry/cleanup while converting, and can release completed native metadata without sweeping an unrelated lexical owner. Owning cleanup finishes younger children before private root vectors; conversion publications and caller output survive errors. Tests verify exact sqrt(2) identities, repeated-factor distinct indices, BIG linear coefficients, persistent descriptor/receiving owner, parser location and partial prefix, zero/out-of-range errors, assertion Throw/erasure ordering, both wrappers through every reached checkpoint/cleanup/retry, older actual factor refusal and parser/isolation callback owner guards. Focused ordinary and checked/debug/trace algebraic/evaluation/parser checks pass on CPUs 8-16. TRACE, full allocation/destructor/callback/eager-constructor composition and overall polynomial/AST completion remain incomplete.",
         "Rational translation input TRACE at algebraic_numbers.cpp:1394-1396 now uses actual univariate display and raw binary/rational numeral insertion receipts. The nbv declaration follows that diagnostic; a qualified formatter stop retains the exact child before nbv/l/u construction. Both add/subtract literal input records and owning acknowledgement are checked. Later translation diagnostics and the complete polynomial/AST audit remain open; no unit is promoted.",
         "The remaining mixed rational add/subtract TRACE records at algebraic_numbers.cpp:1417-1429 now preserve pretranslation nbv/il/iu, the translated polynomial/binary bounds and both actual Horner sign evaluations. Accepted binary-evaluation receipts identify only the reached invocations. A body failure performs older source destructors while retaining actual unjoined Horner RAW until owning acknowledgement; a source-END stop protects older arithmetic locals. Literal dyadic/nonbinary records, both source branches, final display declaration frontiers, and independently armed lower/upper evaluation reservation sweeps cover the increment. Whole polynomial/AST source failure-composition audits remain open.",
-        "Mixed rational multiplication now retains the three source TRACE records at algebraic_numbers.cpp:1498,1525,1535 and both actual SASSERT Horner invocations at 1501 before scoped nbv construction. Shared concrete arithmetic source cleanup observes only accepted display/evaluation/interval-conversion receipts; source body failure preserves unjoined RAW for owning acknowledgement. Exact pending arithmetic Horner children block ordinary algebraic admission. Tests cover positive/negative dyadic and nonbinary records before primitive result normalization, input/final formatter stops, independently reached lower/upper assertion reservation failures before nbv/l/u, cleanup, erased operands and sticky output failure that still evaluates both final signs. Whole polynomial and AST completion audits remain open. A real returning allocation-failure transport during the actual assertion verifies refusal of deletion, multiplication reentry, retained cleanup and owner close with unchanged arithmetic frame, input, budget and physical allocation statistics."
+        "Mixed rational multiplication now retains the three source TRACE records at algebraic_numbers.cpp:1498,1525,1535 and both actual SASSERT Horner invocations at 1501 before scoped nbv construction. Shared concrete arithmetic source cleanup observes only accepted display/evaluation/interval-conversion receipts; source body failure preserves unjoined RAW for owning acknowledgement. Exact pending arithmetic Horner children block ordinary algebraic admission. Tests cover positive/negative dyadic and nonbinary records before primitive result normalization, input/final formatter stops, independently reached lower/upper assertion reservation failures before nbv/l/u, cleanup, erased operands and sticky output failure that still evaluates both final signs. Whole polynomial and AST completion audits remain open. A real returning allocation-failure transport during the actual assertion verifies refusal of deletion, multiplication reentry, retained cleanup and owner close with unchanged arithmetic frame, input, budget and physical allocation statistics.",
+        "Nonzero-bound inversion refinement at algebraic_numbers.cpp:1582-1618 now retains the actual bound-copy allocation and Horner invocation receipts, pins its inversion owner across callbacks, preserves initial zero-test short circuit and source assertion gates, and uses the accepted binary-to-rational conversion child when a halving discovers an exact root. The halved bound is saved before evaluation. Exact pending refinement children block ordinary admission; owning cleanup consumes only matching accepted tuples. Positive/negative exact +/-2^-32 reservation sweeps cover Horner and conversion, ordinary numeric copies saturate descriptors to reach a real bound-SET allocation suffix, actual returning TLS failure verifies lifecycle/callback protection, and a refused refinement preserves a foreign pending Horner. Whole inversion/numeric-child and polynomial/AST source failure audits remain open. An ended debug context independently verifies that the reached source assertion switch precedes bound copy, Horner evaluation and local-rational construction."
       ]
     },
     {
@@ -39686,7 +39698,8 @@
         "pkg/math/polynomial/algebraic_isolation_signs_display_source_test.go",
         "pkg/math/polynomial/algebraic_rational_translation_trace.go",
         "pkg/math/polynomial/algebraic_rational_translation_trace_test.go",
-        "pkg/math/polynomial/algebraic_rational_multiply_trace_test.go"
+        "pkg/math/polynomial/algebraic_rational_multiply_trace_test.go",
+        "pkg/math/polynomial/algebraic_inverse_refinement_source_test.go"
       ],
       "tests": [
         "TestAlgebraicToRationalZeroBasicAndPredicateConversion",
@@ -39880,7 +39893,12 @@
         "TestAlgebraicRationalMultiplyDisplayDeclarationFrontiers",
         "TestAlgebraicRationalMultiplyAssertionActualHornerOwnership",
         "TestAlgebraicRationalMultiplyStickyStreamStillEvaluatesSigns",
-        "TestAlgebraicRationalMultiplyAssertionTransportProtectsOwner"
+        "TestAlgebraicRationalMultiplyAssertionTransportProtectsOwner",
+        "TestAlgebraicInverseRefinementActualHornerAndConversionReservations",
+        "TestAlgebraicInverseRefinementActualTransportProtectsOwner",
+        "TestAlgebraicInverseRefinementPreservesForeignHorner",
+        "TestAlgebraicInverseRefinementActualBoundCopyReceipt",
+        "TestAlgebraicInverseRefinementAssertionGateBeforeBoundCopy"
       ],
       "conditionals": [
         {
@@ -40145,7 +40163,12 @@
             "TestAlgebraicInverseSourceTracesAndCachedIndex",
             "TestAlgebraicInverseTraceCallbackKeepsActualCell",
             "TestAlgebraicInverseTraceEveryReservationPrefix",
-            "TestAlgebraicInverseTraceBigBoundsSuccess"
+            "TestAlgebraicInverseTraceBigBoundsSuccess",
+            "TestAlgebraicInverseRefinementActualHornerAndConversionReservations",
+            "TestAlgebraicInverseRefinementActualTransportProtectsOwner",
+            "TestAlgebraicInverseRefinementPreservesForeignHorner",
+            "TestAlgebraicInverseRefinementActualBoundCopyReceipt",
+            "TestAlgebraicInverseRefinementAssertionGateBeforeBoundCopy"
           ],
           "deviations": [
             "All three inversion TRACE sites use the actual source displays and rational strings. The initial display can publish the cached root index; subsequent interval saves retain that mutation. Inversion owns each actual bound-to-rational conversion receipt. Rational-to-binary conversion retains both initial sign-evaluation receipts and its reached binary conversion/refinement receipts, including RAW midpoint and debug rational-service invocations. The direct allocator campaign checks every reached reservation through success, named physical ownership after cleanup and full owner refunds. Full descendant source destructor/callback and eager constructor audits remain open."
@@ -40394,7 +40417,8 @@
         "The polynomial-ref and sexpr mk_root overloads (algebraic_numbers.cpp:665-680,2887-2893; retained AST arithmetic consumer arith_decl_plugin.cpp:95-98) now convert/parse directly into the actual persistent m_isolate_tmp1 and then invoke one-based distinct-real-root selection. Source index/univariate assertions precede workspace construction; with assertions erased, syntax and conversion still precede runtime index errors. Root construction throws the concrete algebraic_exception/default_exception class with unchanged source messages. A concrete construction owner retains only actually accepted dense conversion, parser lexical entry, factor frontend and private root vector; cleanup preserves older refused factor work. The converter records accepted lexical entry, refuses reentry/cleanup while converting, and can release completed native metadata without sweeping an unrelated lexical owner. Owning cleanup finishes younger children before private root vectors; conversion publications and caller output survive errors. Tests verify exact sqrt(2) identities, repeated-factor distinct indices, BIG linear coefficients, persistent descriptor/receiving owner, parser location and partial prefix, zero/out-of-range errors, assertion Throw/erasure ordering, both wrappers through every reached checkpoint/cleanup/retry, older actual factor refusal and parser/isolation callback owner guards. Focused ordinary and checked/debug/trace algebraic/evaluation/parser checks pass on CPUs 8-16. TRACE, full allocation/destructor/callback/eager-constructor composition and overall polynomial/AST completion remain incomplete.",
         "Rational translation input TRACE at algebraic_numbers.cpp:1394-1396 now uses actual univariate display and raw binary/rational numeral insertion receipts. The nbv declaration follows that diagnostic; a qualified formatter stop retains the exact child before nbv/l/u construction. Both add/subtract literal input records and owning acknowledgement are checked. Later translation diagnostics and the complete polynomial/AST audit remain open; no unit is promoted.",
         "The remaining mixed rational add/subtract TRACE records at algebraic_numbers.cpp:1417-1429 now preserve pretranslation nbv/il/iu, the translated polynomial/binary bounds and both actual Horner sign evaluations. Accepted binary-evaluation receipts identify only the reached invocations. A body failure performs older source destructors while retaining actual unjoined Horner RAW until owning acknowledgement; a source-END stop protects older arithmetic locals. Literal dyadic/nonbinary records, both source branches, final display declaration frontiers, and independently armed lower/upper evaluation reservation sweeps cover the increment. Whole polynomial/AST source failure-composition audits remain open.",
-        "Mixed rational multiplication now retains the three source TRACE records at algebraic_numbers.cpp:1498,1525,1535 and both actual SASSERT Horner invocations at 1501 before scoped nbv construction. Shared concrete arithmetic source cleanup observes only accepted display/evaluation/interval-conversion receipts; source body failure preserves unjoined RAW for owning acknowledgement. Exact pending arithmetic Horner children block ordinary algebraic admission. Tests cover positive/negative dyadic and nonbinary records before primitive result normalization, input/final formatter stops, independently reached lower/upper assertion reservation failures before nbv/l/u, cleanup, erased operands and sticky output failure that still evaluates both final signs. Whole polynomial and AST completion audits remain open. A real returning allocation-failure transport during the actual assertion verifies refusal of deletion, multiplication reentry, retained cleanup and owner close with unchanged arithmetic frame, input, budget and physical allocation statistics."
+        "Mixed rational multiplication now retains the three source TRACE records at algebraic_numbers.cpp:1498,1525,1535 and both actual SASSERT Horner invocations at 1501 before scoped nbv construction. Shared concrete arithmetic source cleanup observes only accepted display/evaluation/interval-conversion receipts; source body failure preserves unjoined RAW for owning acknowledgement. Exact pending arithmetic Horner children block ordinary algebraic admission. Tests cover positive/negative dyadic and nonbinary records before primitive result normalization, input/final formatter stops, independently reached lower/upper assertion reservation failures before nbv/l/u, cleanup, erased operands and sticky output failure that still evaluates both final signs. Whole polynomial and AST completion audits remain open. A real returning allocation-failure transport during the actual assertion verifies refusal of deletion, multiplication reentry, retained cleanup and owner close with unchanged arithmetic frame, input, budget and physical allocation statistics.",
+        "Nonzero-bound inversion refinement at algebraic_numbers.cpp:1582-1618 now retains the actual bound-copy allocation and Horner invocation receipts, pins its inversion owner across callbacks, preserves initial zero-test short circuit and source assertion gates, and uses the accepted binary-to-rational conversion child when a halving discovers an exact root. The halved bound is saved before evaluation. Exact pending refinement children block ordinary admission; owning cleanup consumes only matching accepted tuples. Positive/negative exact +/-2^-32 reservation sweeps cover Horner and conversion, ordinary numeric copies saturate descriptors to reach a real bound-SET allocation suffix, actual returning TLS failure verifies lifecycle/callback protection, and a refused refinement preserves a foreign pending Horner. Whole inversion/numeric-child and polynomial/AST source failure audits remain open. An ended debug context independently verifies that the reached source assertion switch precedes bound copy, Horner evaluation and local-rational construction."
       ]
     },
     {
@@ -205644,7 +205668,7 @@
     "numeral_seconds": 57.339,
     "session_id": 26851,
     "checkout_held_unchanged": true,
-    "scope_warning": "Full native module checkpoint b7552f5b passed on CPUs 8-16 with the checkout held unchanged. Later owned-bound and signs-isolation cleanup corrections have focused four-profile evidence and are not included in this full native result. This run collected no statement coverage and does not establish polynomial or AST source-port completion."
+    "scope_warning": "Full native module checkpoint b7552f5b passed on CPUs 8-16 with the checkout held unchanged. Later owned-bound, signs-isolation, mixed rational arithmetic and inverse-refinement corrections have focused four-profile evidence and are not included in this full native result. This run collected no statement coverage and does not establish polynomial or AST source-port completion."
   },
   "latest_indexed_vector_forward_owner_increment": {
     "scope": "Exact indexed vector close now has an explicit forward dense-element path for retained source vector<T> members; pair core and primal core use it for their persistent rational and pair vectors. Reverse Close continues for lexical expression work. Source util/vector.h:47-52 destroys elements from begin to end. Three indexed source units remain partial pending all other retained owners and exact template-root reachability.",

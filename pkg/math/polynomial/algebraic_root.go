@@ -201,6 +201,9 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
+	if m.inverseRefinementEvaluationPending() || m.inverseRefinementCopyPending() {
+		return ErrAlgebraicPending
+	}
 	if m.rationalArithmeticEvaluationPending() {
 		return ErrAlgebraicPending
 	}
