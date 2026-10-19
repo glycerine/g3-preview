@@ -44990,8 +44990,8 @@
           ]
         },
         {
-          "name": "to_polynomial cpp6832-6841 and same-engine indexed mk_univariate cpp2582-2594",
-          "status": "partial",
+          "name": "Complete to_polynomial cpp6832-6841 and same-engine indexed mk_univariate cpp2582-2594 with source assertion action",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_to_polynomial.go",
           "tests": [
             "TestPolynomialToPolynomialZeroBeforeLocal",
@@ -45000,7 +45000,8 @@
             "TestPolynomialToPolynomialZeroKeepsOlderStoppedLocal",
             "TestPolynomialToPolynomialModularSourceSets",
             "TestPolynomialToPolynomialExactNumericForeignReplacement",
-            "TestPolynomialToPolynomialReturnedResultAfterNativeBufferFinalize"
+            "TestPolynomialToPolynomialReturnedResultAfterNativeBufferFinalize",
+            "TestPolynomialUnivariateSourceAssertionActions"
           ]
         },
         {

@@ -38,8 +38,10 @@ func (m *MultivariatePolynomialCore) mkUnivariateToPolynomial(v, n uint32, as po
 	if e != nil {
 		return Polynomial{}, e
 	}
-	if polynomialSourceDebug && size != 0 {
-		return Polynomial{}, ErrPolynomialAssertion
+	if e = polynomialUnivariateSourceAssert(2583, "m_cheap_som_buffer.empty()", func() (bool, error) {
+		return size == 0, nil
+	}); e != nil {
+		return Polynomial{}, e
 	}
 	if r != nil {
 		if !r.manager.matchesToPolynomialInvocation(r) || r.manager.core != m || !r.frame.executing || m.callbackDepth != 0 {
