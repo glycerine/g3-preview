@@ -343,6 +343,12 @@ func (m *AlgebraicRootCore) IsInt(a *Algebraic) (result bool, err error) {
 }
 
 func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
+	return m.isRationalWithSourceStop(a, nil)
+}
+
+// Report only this actual call's source stop to its lexical caller. The core
+// retains ownership of predicate work; the caller does not acquire its cleanup.
+func (m *AlgebraicRootCore) isRationalWithSourceStop(a *Algebraic, sourceStop *error) (result bool, err error) {
 	l, err := m.location(a)
 	if err != nil {
 		return false, err
@@ -364,7 +370,14 @@ func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 	if m.predicate.active {
 		return false, ErrAlgebraicPending
 	}
+	traceBefore := m.predicateTrace.invocation
 	if err = m.traceRationalPredicate(a, 0, 0); err != nil {
+		// Phase zero precedes predicate construction. Only a newly accepted trace
+		// call can report its source stop; an older refused frame is unrelated.
+		trace := &m.predicateTrace
+		if sourceStop != nil && trace.invocation != traceBefore && trace.owner == m && trace.active {
+			*sourceStop = trace.stop
+		}
 		return false, err
 	}
 	if err = m.beginPredicate(); err != nil {
@@ -373,7 +386,13 @@ func (m *AlgebraicRootCore) IsRational(a *Algebraic) (result bool, err error) {
 	// cpp292 passes c, implicitly creating temporary anum (header366),
 	// whose const& in save_intervals cpp897–929 dangles. Go explicitly binds
 	// this actual caller for safe ownership; this is not defined C++ cleanup.
-	defer func() { m.predicate.owner = *a; err = m.finishPredicate(err) }()
+	defer func() {
+		m.predicate.owner = *a
+		err = m.finishPredicate(err)
+		if sourceStop != nil {
+			*sourceStop = errors.Join(m.predicate.childStop, m.predicate.sourceStop)
+		}
+	}()
 	p := &m.predicate
 	if err = m.constructPredicateSaved(a, &r); err != nil {
 		return false, err

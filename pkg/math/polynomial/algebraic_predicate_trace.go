@@ -10,6 +10,7 @@ import (
 )
 
 type algebraicPredicateTraceScope struct {
+	root       algebraicRootDisplayInvocationReceipt
 	owner      *AlgebraicRootCore
 	invocation uint64
 	insertions [3]unumeral.NumeralInsertionReceipt // coefficient, lower, upper
@@ -32,6 +33,9 @@ func (s algebraicPredicateTraceStream) AppendInt32(v int32) error {
 	return s.AppendCString(strconv.FormatInt(int64(v), 10))
 }
 func (s *algebraicPredicateTraceScope) pending() bool {
+	if s.owner.rootDisplayInvocationPending(&s.root) {
+		return true
+	}
 	for i := range s.insertions {
 		if s.insertions[i].Active() {
 			return true
@@ -67,6 +71,9 @@ func (m *AlgebraicRootCore) cleanupPredicateTrace() error {
 		if e := r.Complete(m.config.Rationals.Integers().Natural, true); e != nil {
 			return e
 		}
+	}
+	if e := m.cleanupRootDisplayInvocation(&s.root); e != nil {
+		return e
 	}
 	s.active = false
 	return nil
@@ -133,6 +140,9 @@ func (m *AlgebraicRootCore) traceRationalPredicate(a *Algebraic, phase uint8, k 
 				s.stop = s.insertions[i].SourceCause()
 			}
 		}
+		if s.stop == nil && m.matchesRootDisplayInvocation(&s.root) {
+			s.stop = m.rootDisplay.sourceStop
+		}
 		s.active = s.pending()
 		if phase > 0 && s.stop != nil {
 			m.predicate.childStop = s.stop
@@ -155,7 +165,7 @@ func (m *AlgebraicRootCore) traceRationalPredicate(a *Algebraic, phase uint8, k 
 		switch phase {
 		case 0:
 			_ = out.AppendCString("is_rational(a):\n")
-			e = m.displayRootAtLocation(out, l, false)
+			e = m.displayRootAtLocationWithReceipt(out, l, false, &s.root)
 			if e == nil {
 				_ = out.AppendCString("\n")
 				e = m.predicateIntervalTrace(out, l)

@@ -92,6 +92,9 @@ func (m *AlgebraicRootCore) GetUpper(a *Algebraic, out *unumeral.BinaryRational)
 	return m.copyBinaryBound(a, out, true)
 }
 func (m *AlgebraicRootCore) irrationalBoundView(a *Algebraic, upper bool) (algebraicBinaryBoundView, error) {
+	return m.irrationalBoundViewWithSourceStop(a, upper, nil)
+}
+func (m *AlgebraicRootCore) irrationalBoundViewWithSourceStop(a *Algebraic, upper bool, sourceStop *error) (algebraicBinaryBoundView, error) {
 	if e := m.check(); e != nil {
 		return algebraicBinaryBoundView{}, e
 	}
@@ -102,7 +105,7 @@ func (m *AlgebraicRootCore) irrationalBoundView(a *Algebraic, upper bool) (algeb
 			return algebraicBinaryBoundView{}, e
 		}
 		if enabled {
-			rational, e := m.IsRational(a)
+			rational, e := m.isRationalWithSourceStop(a, sourceStop)
 			if e != nil {
 				return algebraicBinaryBoundView{}, e
 			}
@@ -146,24 +149,29 @@ func (m *AlgebraicRootCore) copyBinaryBound(a *Algebraic, out *unumeral.BinaryRa
 }
 
 type algebraicBoundScope struct {
-	sourceStop error
-	invocation uint64 // actual entered raw bound call; owning wrapper identity
-	refinement algebraicRefinementScope
-	conversion algebraicConversionScope
-	copy       unumeral.IntegerCopyAllocationReceipt
-	values     [2]unumeral.BinaryRational
-	remaining  uint8
-	executing  bool
+	preconditionStop    error // source failure returned by this call's predicate
+	preconditionRunning bool
+	sourceStop          error
+	invocation          uint64 // actual entered raw bound call; owning wrapper identity
+	refinement          algebraicRefinementScope
+	conversion          algebraicConversionScope
+	copy                unumeral.IntegerCopyAllocationReceipt
+	values              [2]unumeral.BinaryRational
+	remaining           uint8
+	executing           bool
 }
 
 func (m *AlgebraicRootCore) cleanupBounds() error { return m.finishBounds(true) }
 func (m *AlgebraicRootCore) finishBounds(owning bool) error {
 	s := &m.bounds
-	if s.executing {
+	if s.executing || s.preconditionRunning {
 		return ErrAlgebraicPending
 	}
 	s.executing = true
 	defer func() { s.executing = false }()
+	if !owning && s.preconditionStop != nil {
+		return s.preconditionStop
+	}
 	if !owning && s.refinement.stop != nil {
 		return s.refinement.stop
 	}
@@ -225,20 +233,15 @@ func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, 
 		return ErrAlgebraicPending
 	}
 	s.sourceStop = nil
+	s.preconditionStop = nil
 	s.invocation++
 	if s.invocation == 0 {
 		s.invocation++
 	}
 	s.refinement.evaluation = upolyBinaryEvaluationInvocationReceipt{}
 	var bound algebraicBinaryBoundView
-	if !refine {
-		bound, e = m.irrationalBoundView(a, upper)
-	}
-	if e != nil {
-		return e
-	}
-	s.executing = true
 	defer func() {
+		s.preconditionRunning = false
 		s.executing = false
 		cleanup := m.finishBounds(false)
 		if cleanup != nil {
@@ -246,6 +249,19 @@ func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, 
 		}
 		cause = errors.Join(cause, cleanup)
 	}()
+	// cpp2999/3027 declares scoped_mpbq before the irrationality predicate.
+	// Keep its zero NUM alive across the actual predicate and its source stops.
+	if !refine {
+		s.values = [2]unumeral.BinaryRational{}
+		s.remaining = 1
+		s.preconditionRunning = true
+		bound, e = m.irrationalBoundViewWithSourceStop(a, upper, &s.preconditionStop)
+		s.preconditionRunning = false
+		if e != nil {
+			return e
+		}
+	}
+	s.executing = true
 	if refine && (l == nil || l.kind == 0) {
 		value, e := m.copySourceBasicValue(m, l)
 		if e != nil {
@@ -253,9 +269,8 @@ func (m *AlgebraicRootCore) rationalBound(a *Algebraic, out *unumeral.Rational, 
 		}
 		return value.copyTo(m, out, &s.copy)
 	}
-	s.values = [2]unumeral.BinaryRational{}
-	s.remaining = 1
 	if refine {
+		s.values = [2]unumeral.BinaryRational{}
 		s.remaining = 2
 		if _, e = m.copyIntervalAtPrecisionFromCell(l, &s.values[0], &s.values[1], precision, &s.copy); e != nil {
 			return e
