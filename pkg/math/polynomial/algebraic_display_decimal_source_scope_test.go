@@ -177,6 +177,13 @@ func TestAlgebraicDecimalDisplayAndBoundDestructorStops(t *testing.T) {
 			called := false
 			writer := &algebraicDisplayCallbackWriter{callback: func() { called = true; lane = algebraicCellDeletionTLSLane(t, rt) }}
 			body := c.DisplayDecimal(writer, &root, 0)
+			wantText := "18446744073709551617"
+			if raw {
+				wantText = "1.?"
+			}
+			if writer.String() != wantText {
+				t.Error("selected source decimal bound", writer.String(), wantText)
+			}
 			defer func() {
 				contextTLSFinish(t, rt, c.CleanupRetained)
 				contextTLSFinish(t, rt, func() error { return c.CleanupValue(&root) })
