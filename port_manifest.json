@@ -45449,8 +45449,8 @@
           ]
         },
         {
-          "name": "Selected Coeff cpp3264-3277 and actual quadratic sequential callers cpp6607-6609: completed append adapter acknowledgement at returned factory actual incomingINC before older DEC callback",
-          "status": "partial",
+          "name": "Complete Coeff cpp3264-3277 and actual quadratic sequential callers cpp6607-6609: completed append adapter acknowledgement at returned factory actual incomingINC before older DEC callback",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factory_receipt.go",
           "tests": [
             "TestPolynomialCoefficientSequentialActualCompletedTransfer",
@@ -45563,8 +45563,8 @@
           ]
         },
         {
-          "name": "src/math/polynomial/polynomial.cpp:1414-1416,2485-2492 mkCellWithReceipts: Coefficient clear/publication and monomial publication stamp actual transfer; raw ms read preserved, no logical SIZE assertion.",
-          "status": "partial",
+          "name": "Complete src/math/polynomial/polynomial.cpp:1414-1416,2485-2492 mkCellWithReceipts: Coefficient clear/publication and monomial publication stamp actual transfer; raw ms read preserved, no logical SIZE assertion.",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_store.go",
           "tests": [
             "TestPolynomialCheapMatchedRootRowRetirementPreservesForeign",
@@ -45631,8 +45631,8 @@
           ]
         },
         {
-          "name": "polynomial.cpp:2481-2495 mkCellWithReceipts: Actual guarded factory receipt passes embedded lower AllocateWithOutcomeStarted outcome; acquire only returned Pending, never PendingRoots differences.",
-          "status": "partial",
+          "name": "Complete polynomial.cpp:2481-2495 mkCellWithReceipts: Actual guarded factory receipt passes embedded lower AllocateWithOutcomeStarted outcome; acquire only returned Pending, never PendingRoots differences.",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_store.go",
           "tests": [
             "TestPolynomialFactoryAllocationActualLeaf",
@@ -45642,8 +45642,8 @@
           ]
         },
         {
-          "name": "polynomial.cpp:2481-2495 guarded factory malloc executing receipt and supported Go ErrorTransport reentry",
-          "status": "partial",
+          "name": "Complete polynomial.cpp:2481-2495 guarded factory malloc executing receipt and supported Go ErrorTransport reentry",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_factory_receipt.go",
           "tests": [
             "TestPolynomialFactoryAllocationTransportCannotRetireExecutingReceipt"
@@ -45745,8 +45745,8 @@
           ]
         },
         {
-          "name": "src/math/polynomial/polynomial.cpp:2485-2495 actual source-buffer-bound constructor/factory transfer receipt",
-          "status": "partial",
+          "name": "Complete src/math/polynomial/polynomial.cpp:2485-2495 actual source-buffer-bound constructor/factory transfer receipt",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_store.go",
           "tests": [
             "TestPolynomialArithmeticContextKeepsCapturedInvocationAcrossReceiptReuse",
@@ -49001,8 +49001,8 @@
           ]
         },
         {
-          "name": "Explicit owning continuation distinguishes exact actual factory generation/parent and generated source token from stale replaced invocations; no source dtor repair",
-          "status": "partial",
+          "name": "Complete Explicit owning continuation distinguishes exact actual factory generation/parent and generated source token from stale replaced invocations; no source dtor repair",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_som_owner.go",
           "tests": [
             "TestPolynomialSOMStoppedCalleeReplacementIdentity"
