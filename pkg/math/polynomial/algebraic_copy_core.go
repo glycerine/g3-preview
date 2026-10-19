@@ -173,7 +173,7 @@ func (m *AlgebraicRootCore) CopyFromCore(dst *Algebraic, source *AlgebraicRootCo
 	if e = algebraicQueryTagAssertionSwitch(); e != nil {
 		return e
 	}
-	r, e := source.load(sl)
+	r, e := source.copySourcePolynomialFields(sl)
 	if e != nil {
 		return e
 	}
@@ -188,12 +188,19 @@ func (m *AlgebraicRootCore) CopyFromCore(dst *Algebraic, source *AlgebraicRootCo
 	if e = m.copyPolynomialFromOwner(dl, &out, source.config.Polynomials, v); e != nil {
 		return e
 	}
+	r.interval, e = source.copySourceIntervalFields(sl)
+	if e != nil {
+		return e
+	}
 	context := unumeral.NumericAllocationContext{}.WithCaller(&s.hooks)
 	e = m.config.Intervals.WithAllocationContext(context).CopyFromOwnerTracked(&out.interval, source.config.Intervals, &r.interval, &s.boundCopy)
 	if e = m.save(dl, &out, e); e != nil {
 		return e
 	}
-	out.flags = r.flags
+	out.flags, e = source.copySourceFlags(sl)
+	if e != nil {
+		return e
+	}
 	return m.store(dl, &out)
 }
 

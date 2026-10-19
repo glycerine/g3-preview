@@ -1110,7 +1110,7 @@ func (m *AlgebraicRootCore) copyCellValue(dst, src *Algebraic) error {
 	if e = algebraicQueryTagAssertionSwitch(); e != nil {
 		return e
 	}
-	r, e := m.load(sl)
+	r, e := m.copySourcePolynomialFields(sl)
 	if e != nil {
 		return e
 	}
@@ -1125,11 +1125,18 @@ func (m *AlgebraicRootCore) copyCellValue(dst, src *Algebraic) error {
 	if e = m.copyPolynomial(dl, &out, v); e != nil {
 		return e
 	}
+	r.interval, e = m.copySourceIntervalFields(sl)
+	if e != nil {
+		return e
+	}
 	e = m.config.Intervals.WithAllocationContext(m.copyCall.context()).CopyFromOwnerTracked(&out.interval, m.config.Intervals, &r.interval, &m.copyCall.bounds)
 	if e = m.save(dl, &out, e); e != nil {
 		return e
 	}
-	out.flags = r.flags
+	out.flags, e = m.copySourceFlags(sl)
+	if e != nil {
+		return e
+	}
 	return m.store(dl, &out)
 }
 
