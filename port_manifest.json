@@ -45892,8 +45892,8 @@
           ]
         },
         {
-          "name": "polynomial.cpp:5356-5480 Resultant actual Power/Pseudo/AR/Coeff/Neg/ExactDiv source child calls and younger-source-stop versus owning continuation",
-          "status": "partial",
+          "name": "Complete polynomial.cpp:5356-5480 Resultant child calls and suffix: actual Power/Pseudo/AR/Coeff/Neg/ExactDiv source calls and younger-source-stop versus owning continuation",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_resultant.go",
           "tests": [
             "TestPolynomialResultantActualConstantPowerChildPrefixes",
