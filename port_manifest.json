@@ -44271,8 +44271,8 @@
           ]
         },
         {
-          "name": "Selected actual polynomial cell, accessors, normal/cheap SOM, construction/overloads, Add/Sub/Mul/Scale/Neg/Normalize, deletion callbacks; diagnostic literal destructor prefix through2353, not complete imp constructor/destructor or PSC",
-          "status": "partial",
+          "name": "Complete retained polynomial cell, accessors, native SOM, construction, arithmetic and deletion callbacks with full manager lifecycle and optimized PSC composition",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_manager.go",
           "tests": [
             "TestPolynomialCellSourceTakeAndFirstMaximum",
@@ -44585,8 +44585,8 @@
           ]
         },
         {
-          "name": "Selected concrete preparation/default/body constructor stages and tmp_monomial Runtime placement cpp193/507\u2013544/2308\u20132344; full imp composition remains open",
-          "status": "partial",
+          "name": "Complete concrete preparation/default/body constructor stages and tmp_monomial placement cpp193/507\u2013544/2308\u20132344 with full imp lifecycle composition",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_manager.go",
           "tests": [
             "TestPolynomialMemberPreparationBeforeBody"
@@ -48607,8 +48607,8 @@
           ]
         },
         {
-          "name": "Selected actual polynomial cell, accessors, normal/cheap SOM, construction/overloads, Add/Sub/Mul/Scale/Neg/Normalize, deletion callbacks; diagnostic literal destructor prefix through2353, not complete imp constructor/destructor or PSC",
-          "status": "partial",
+          "name": "Complete retained polynomial cell, accessors, native SOM, construction, arithmetic and deletion callbacks with full manager lifecycle and optimized PSC composition",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_manager.go",
           "tests": [
             "TestPolynomialCellSourceTakeAndFirstMaximum",
@@ -48914,8 +48914,8 @@
           ]
         },
         {
-          "name": "Selected concrete preparation/default/body constructor stages and tmp_monomial Runtime placement cpp193/507\u2013544/2308\u20132344; full imp composition remains open",
-          "status": "partial",
+          "name": "Complete concrete preparation/default/body constructor stages and tmp_monomial placement cpp193/507\u2013544/2308\u20132344 with full imp lifecycle composition",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_manager.go",
           "tests": [
             "TestPolynomialMemberPreparationBeforeBody"
