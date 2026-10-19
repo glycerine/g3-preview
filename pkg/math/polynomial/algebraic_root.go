@@ -688,7 +688,10 @@ func (m *AlgebraicRootCore) SetTake(a *Algebraic, q *unumeral.Rational) error {
 		return e
 	}
 	if zero {
-		return m.Del(a)
+		if e = m.Del(a); e != nil {
+			return e
+		}
+		return m.assertCellResetZero(a)
 	}
 	if l != nil && l.kind == 1 {
 		if e = m.Del(a); e != nil {
@@ -734,6 +737,17 @@ func (m *AlgebraicRootCore) copyPolynomial(l *algebraicLocation, r *algebraicRec
 // The view and its numeral cells belong to source, while backing allocation and
 // any accepted copy receipt belong to the receiving core.
 func (m *AlgebraicRootCore) copyPolynomialFromOwner(l *algebraicLocation, r *algebraicRecord, source *UPolynomialManager, v UPolynomialView) error {
+	if m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.coefficientCopy) {
+		return ErrAlgebraicPending
+	}
+	if e := m.assertCellCopyPolynomialEmpty(r); e != nil {
+		return e
+	}
+	return m.copyPolynomialDataFromOwner(l, r, source, v)
+}
+
+// mk_algebraic_cell copies its inline placement loop without copy_poly's gates.
+func (m *AlgebraicRootCore) copyPolynomialDataFromOwner(l *algebraicLocation, r *algebraicRecord, source *UPolynomialManager, v UPolynomialView) error {
 	if m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.coefficientCopy) {
 		return ErrAlgebraicPending
 	}
@@ -926,7 +940,12 @@ func (m *AlgebraicRootCore) setRoot(a *Algebraic, p UPolynomialView, lower, uppe
 			return err
 		}
 	}
-	if err = m.copyPolynomial(l, &r, p); err != nil {
+	if existing {
+		err = m.copyPolynomial(l, &r, p)
+	} else {
+		err = m.copyPolynomialDataFromOwner(l, &r, m.config.Polynomials, p)
+	}
+	if err != nil {
 		return err
 	}
 	if err = m.config.Intervals.SetBounds(&r.interval, lower, upper); err != nil {
@@ -982,28 +1001,40 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	if m != nil && m.self == m && m.config.Rationals.Integers().MatchesCopyAllocationInvocation(&m.coefficientCopy) {
 		return ErrAlgebraicPending
 	}
-	sl, e := m.location(src)
+	if e := m.check(); e != nil {
+		return e
+	}
+	sl, e := m.locationCleanup(src)
 	if e != nil {
 		return e
 	}
-	dl, e := m.location(dst)
+	dl, e := m.locationCleanup(dst)
 	if e != nil {
 		return e
 	}
+	// Go handle admission precedes the source cursor; self-assignment reads
+	// neither cell payload nor an assertion switch.
 	if dst == src {
 		return nil
 	}
-	if sl == nil {
-		return m.Del(dst)
-	}
-	r, e := m.load(sl)
-	if e != nil {
+	sourceBasic, targetBasic := sl == nil || sl.kind == 0, dl == nil || dl.kind == 0
+	// The selected branch reaches one SASSERT (cpp:514/518/528/533).
+	if _, _, e = algebraicAssertionSwitch(); e != nil {
 		return e
 	}
-	if sl.kind == 0 {
-		return m.SetRational(dst, &r.value)
+	if sourceBasic {
+		if !targetBasic {
+			if e = m.Del(dst); e != nil {
+				return e
+			}
+		}
+		q, e := m.copySourceBasicValue(sl)
+		if e != nil {
+			return e
+		}
+		return m.SetRational(dst, q)
 	}
-	if dl == nil || dl.kind == 0 {
+	if targetBasic {
 		if e = m.Del(dst); e != nil {
 			return e
 		}
@@ -1017,6 +1048,9 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 		m.publish(dst, next)
 		dl = &m.locations[dst.slot-1]
 	} else {
+		if e = algebraicQueryTagAssertionSwitch(); e != nil {
+			return e
+		}
 		old, e := m.load(dl)
 		if e != nil {
 			return e
@@ -1024,10 +1058,24 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 		if e = m.deletePolynomial(dl, &old); e != nil {
 			return e
 		}
+		if e = algebraicQueryTagAssertionSwitch(); e != nil {
+			return e
+		}
 		e = m.config.Intervals.Del(&old.interval)
 		if e = m.save(dl, &old, e); e != nil {
 			return e
 		}
+		// copy(a.to_algebraic(), b.to_algebraic()) reaches both accessors.
+		if e = algebraicQueryTagAssertionSwitch(); e != nil {
+			return e
+		}
+	}
+	if e = algebraicQueryTagAssertionSwitch(); e != nil {
+		return e
+	}
+	r, e := m.load(sl)
+	if e != nil {
+		return e
 	}
 	out, e := m.load(dl)
 	if e != nil {
@@ -1047,6 +1095,7 @@ func (m *AlgebraicRootCore) Copy(dst, src *Algebraic) error {
 	out.flags = r.flags
 	return m.store(dl, &out)
 }
+
 func (m *AlgebraicRootCore) CleanupRetained() error {
 	if m != nil && m.self == m {
 		for _, r := range []*upolyConvertEntryReceipt{&m.arithmetic.convertEntry, &m.inversion.convertEntry} {
