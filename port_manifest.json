@@ -45235,8 +45235,8 @@
           ]
         },
         {
-          "name": "GCD dispatcher cpp4352-4506: assertion actions, actual scalar/identity/content selection, source variable degree ordering, modular/PRS choice; mgcd_check global diagnostic remains open",
-          "status": "partial",
+          "name": "Complete GCD dispatcher cpp4352-4506: assertion actions, scalar/identity/content selection, variable ordering, modular/PRS choice and mgcd_check verification",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd.go",
           "tests": [
             "TestPolynomialGCDSourceZeroIdentityAndConstantContent",
@@ -45249,7 +45249,9 @@
             "TestPolynomialGCDDefaultIntegerCRAReconstruction",
             "TestPolynomialGCDSourcePrimeExhaustionUsesLiteralPRS",
             "TestPolynomialResultantPhysicalDescriptorRefusalComposedCleanup",
-            "TestPolynomialGCDDispatcherSourceAssertionActions"
+            "TestPolynomialGCDDispatcherSourceAssertionActions",
+            "TestPolynomialGCDMGCDCheckUsesIndependentPRS",
+            "TestPolynomialGCDMGCDCheckMismatchTrace"
           ]
         },
         {

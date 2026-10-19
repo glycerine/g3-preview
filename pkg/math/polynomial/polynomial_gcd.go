@@ -211,9 +211,42 @@ func (m *MultivariatePolynomialManager) gcdIntoWithReceipt(u, v Polynomial, r *p
 			return m.uniModGCD(u, v, r)
 		}
 		// The enabled mgcd_check global debug-tag adapter is a separate open
-		// diagnostic binding. The default algorithm is the actual modular engine;
-		// only its source sparse_mgcd_failed exception selects PRS fallback.
+		// diagnostic binding. Its source locals exist only on the enabled branch.
+		check, e := polynomialMGCDCheckEnabled()
+		if e != nil {
+			return e
+		}
+		if check {
+			s.constructReference(c, 0)
+			s.constructReference(c, 1)
+			if e = s.refs[0].root.assign(c, u); e != nil {
+				return e
+			}
+			if e = s.refs[1].root.assign(c, v); e != nil {
+				return e
+			}
+		}
 		e = m.modGCD(u, v, &s.powers[0], &s.powers[1], r)
+		if e == nil && check {
+			s.constructReference(c, 2)
+			old := m.usePRSGCD
+			m.usePRSGCD = false
+			e = m.gcdPRS(s.refs[0].root.value, s.refs[1].root.value, x, &s.refs[2].root)
+			m.usePRSGCD = old
+			if e != nil {
+				return e
+			}
+			if e = m.traceMGCDCheckMismatch(s.refs[0].root.value, s.refs[1].root.value, r.value, s.refs[2].root.value); e != nil {
+				return e
+			}
+			if e = polynomialGCDDispatchSourceAssert(4492, "eq(r, r2)", func() (bool, error) {
+				return c.Equal(r.value, s.refs[2].root.value)
+			}); e != nil {
+				return e
+			}
+		}
+		// The default algorithm is the actual modular engine; only its source
+		// sparse_mgcd_failed exception selects PRS fallback.
 		if !m.gcdMayCatchSparse(s, e) {
 			return e
 		}
