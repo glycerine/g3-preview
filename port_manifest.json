@@ -55506,7 +55506,7 @@
         },
         {
           "name": "upolynomial_factorization.cpp:979-1017 mignotte_bound literal direct numeric body and reverse tmp/bound/norm source destruction",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_recombine.go",
           "tests": [
             "TestUPolynomialMignotteActualAddMulEndStopsOlderNUM",
