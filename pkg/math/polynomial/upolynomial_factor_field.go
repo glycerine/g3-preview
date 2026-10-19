@@ -647,6 +647,9 @@ func (m *UPolynomialManager) squareFreeFactorZP(f UPolynomialView, fs *UPolynomi
 	if p == 0 {
 		return ErrUPolynomialDomain
 	}
+	if e = m.traceFactorFieldEntry(f, p, 256); e != nil {
+		return e
+	}
 	var divTmp, t0, t0d, t, v, w, a upolyVectorState
 	defer m.dropLocalVector(&divTmp)
 	defer m.dropLocalVector(&t0)
@@ -672,6 +675,9 @@ func (m *UPolynomialManager) squareFreeFactorZP(f UPolynomialView, fs *UPolynomi
 	if e = fs.SetConstant(&constant); e != nil {
 		return e
 	}
+	if e = m.traceSquareFreeInitial(fs, m.stateView(&t0), p); e != nil {
+		return e
+	}
 	exponent := uint32(1)
 	defer m.dropLocalVector(&t0d)
 	defer m.dropLocalVector(&t)
@@ -680,13 +686,25 @@ func (m *UPolynomialManager) squareFreeFactorZP(f UPolynomialView, fs *UPolynomi
 	defer m.dropLocalVector(&a)
 	for t0.size > 1 {
 		k := uint32(0)
+		if e = m.traceSquareFreeKZero(); e != nil {
+			return e
+		}
 		if e = m.derivativeState(m.stateView(&t0), &t0d); e != nil {
+			return e
+		}
+		if e = m.traceSquareFreeState(289, "T_0_d = T_0.derivative(x)", "T_0_d == ", m.stateView(&t0d)); e != nil {
 			return e
 		}
 		if e = m.gcd(m.stateView(&t0), m.stateView(&t0d), &t); e != nil {
 			return e
 		}
+		if e = m.traceSquareFreeState(296, "T = T_0.gcd(T_0_d)", "T == ", m.stateView(&t)); e != nil {
+			return e
+		}
 		if e = m.divState(m.stateView(&t0), m.stateView(&t), &v); e != nil {
+			return e
+		}
+		if e = m.traceSquareFreeState(303, "V = T_0.quo_rem(T)[0]", "V == ", m.stateView(&v)); e != nil {
 			return e
 		}
 		for v.size > 1 {
@@ -696,18 +714,36 @@ func (m *UPolynomialManager) squareFreeFactorZP(f UPolynomialView, fs *UPolynomi
 				if e = m.divState(m.stateView(&t), m.stateView(&v), &t); e != nil {
 					return e
 				}
+				if e = m.traceSquareFreeState(314, "T = T.quo_rem(V)[0]", "T == ", m.stateView(&t)); e != nil {
+					return e
+				}
 			}
 			if e = m.gcd(m.stateView(&t), m.stateView(&v), &w); e != nil {
+				return e
+			}
+			if e = m.traceSquareFreeState(324, "W = T.gcd(V)", "", m.stateView(&w)); e != nil {
 				return e
 			}
 			if e = m.divState(m.stateView(&v), m.stateView(&w), &a); e != nil {
 				return e
 			}
+			if e = m.traceSquareFreeState(331, "A_ek = V.quo_rem(W)[0]", "A_ek == ", m.stateView(&a)); e != nil {
+				return e
+			}
 			v, w = w, v
+			if e = m.traceSquareFreeState(338, "V = W", "V == ", m.stateView(&v)); e != nil {
+				return e
+			}
 			if e = m.divState(m.stateView(&t), m.stateView(&v), &t); e != nil {
 				return e
 			}
+			if e = m.traceSquareFreeState(345, "T = T.quo_rem(V)[0]", "T == ", m.stateView(&t)); e != nil {
+				return e
+			}
 			if a.size > 1 {
+				if e = m.traceSquareFreeFactor(m.stateView(&a), exponent*k); e != nil {
+					return e
+				}
 				if e = fs.PushCopy(m.stateView(&a), exponent*k); e != nil {
 					return e
 				}
@@ -738,8 +774,11 @@ func (m *UPolynomialManager) squareFreeFactorZP(f UPolynomialView, fs *UPolynomi
 			}
 			deg += p
 		}
+		if e = m.traceSquareFreeState(364, "", "T_0 = ", m.stateView(&t0)); e != nil {
+			return e
+		}
 	}
-	return nil
+	return m.traceFactorFieldOutcome(f, fs, 369)
 }
 func (m *UPolynomialManager) factorMonic(v UPolynomialView, leading *unumeral.Int) error {
 	var inverse unumeral.Int
@@ -748,6 +787,13 @@ func (m *UPolynomialManager) factorMonic(v UPolynomialView, leading *unumeral.In
 }
 func (m *UPolynomialManager) FactorZP(f UPolynomialView, fs *UPolynomialFactors) (bool, error) {
 	if e := m.checkFactors(fs); e != nil {
+		return false, e
+	}
+	p, e := m.factorPrime()
+	if e != nil {
+		return false, e
+	}
+	if e = m.traceFactorFieldEntry(f, p, 375); e != nil {
 		return false, e
 	}
 	sq, e := m.NewFactors()
@@ -789,6 +835,9 @@ func (m *UPolynomialManager) FactorZP(f UPolynomialView, fs *UPolynomialFactors)
 		}
 	}
 	if e = fs.SetConstant(&sq.constant); e != nil {
+		return false, e
+	}
+	if e = m.traceFactorFieldOutcome(f, fs, 399); e != nil {
 		return false, e
 	}
 	return fs.totalFactors > 1, nil
