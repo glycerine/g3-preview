@@ -55688,7 +55688,7 @@
         },
         {
           "name": "upolynomial_factorization.cpp:1058-1094 actual prime-search declarations and candidate preparation",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/upolynomial_factor_prime_preparation_invocation.go",
           "tests": [
             "TestUPolynomialFactorPrimePreparationActualCheckpointOwnerRefusal",
