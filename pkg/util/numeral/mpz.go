@@ -246,7 +246,8 @@ func (m *IntegerManager) Cleanup() error       { return m.CloseChecked() }
 
 // checkCleanup accepts the owner's permanently dead allocation token only for
 // release/reset after a source allocation prefix. Ordinary reads use check.
-func (m *IntegerManager) checkCleanup(a *Int) error {
+func (m *IntegerManager) checkCleanup(a *Int) error { return m.checkCleanupWithModularOwner(a, nil) }
+func (m *IntegerManager) checkCleanupWithModularOwner(a *Int, owner *IntegerModularManager) error {
 	if m.stringSetTransportActive() {
 		return ErrNumericPending
 	}
@@ -255,7 +256,7 @@ func (m *IntegerManager) checkCleanup(a *Int) error {
 	}
 	// A callback cannot release a numeral borrowed by an executing caller.
 	// Literal source destructors run after the callback returns.
-	if callerBindingsCallbackActive(m.callerBindings) || m.numericCallerExecuting() && (m.RuntimeOwner().FailureTransportActive() || m.BorrowTraceTags().OutputCallbackActive()) {
+	if (callerBindingsCallbackActive(m.callerBindings) || m.numericCallerExecuting() && (m.RuntimeOwner().FailureTransportActive() || m.BorrowTraceTags().OutputCallbackActive())) && !m.modularMemberCleanupAuthorized(owner, a) {
 		return ErrNumericPending
 	}
 	if m.rationalServiceReadCallbackActive() || (m.mpfValueRead != nil && m.mpfBorrowedSourceCallbackActive()) {
@@ -684,11 +685,12 @@ func (m *IntegerManager) CloseChecked() error {
 
 // Del preserves the source's m_val after releasing a big cell. Thus deleting a
 // big positive/negative value leaves inline +1/-1. Reset additionally writes 0.
-func (m *IntegerManager) Del(a *Int) error {
+func (m *IntegerManager) Del(a *Int) error { return m.delWithModularOwner(a, nil) }
+func (m *IntegerManager) delWithModularOwner(a *Int, owner *IntegerModularManager) error {
 	if m.stringSetTransportActive() || m.decimalStreamExecuting(true) || m.smt2StreamExecuting(true) || m.rationalStringExecuting(true) || m.mpfToMPZExecuting(true) || m.mpfArithmeticTransportActive() || m.myMPZSqrtTransportActive() {
 		return ErrNumericPending
 	}
-	if e := m.checkCleanup(a); e != nil {
+	if e := m.checkCleanupWithModularOwner(a, owner); e != nil {
 		return e
 	}
 	if m.FailedRef != 0 && (a.Cell == m.FailedRef || a.Cell == m.FailedNullRef) {
@@ -1518,4 +1520,20 @@ func (m *IntegerManager) Int64(a *Int) (int64, error) {
 // descriptors. Ordinary reads still reject both through the normal live guard.
 func (m *IntegerManager) IsFailureRef(ref NumericCellRef) bool {
 	return ref != 0 && m.FailedRef != 0 && (ref == m.FailedRef || ref == m.FailedNullRef)
+}
+
+// A separate modular receiver owns these exact NUM members even when another
+// receiver borrows the shared integer service. This is a private destructor
+// continuation; it cannot authorize a supplied operand or an executing owner.
+func (m *IntegerManager) modularMemberCleanupAuthorized(owner *IntegerModularManager, a *Int) bool {
+	if owner == nil || owner.self != owner || owner.manager != m || owner.closed || owner.numericCallerExecuting() {
+		return false
+	}
+	if owner.closing {
+		switch a {
+		case &owner.P, &owner.Lower, &owner.Upper, &owner.InvTmp1, &owner.InvTmp2, &owner.InvTmp3, &owner.DivTmp:
+			return true
+		}
+	}
+	return owner.PowerPending && a == &owner.PowerTemporary
 }

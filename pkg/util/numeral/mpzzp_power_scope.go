@@ -21,7 +21,7 @@ func (m *IntegerModularManager) CleanupPowerTemporary() error {
 	if !m.PowerPending {
 		return nil
 	}
-	if e := m.manager.Del(&m.PowerTemporary); e != nil {
+	if e := m.manager.delWithModularOwner(&m.PowerTemporary, m); e != nil {
 		return e
 	}
 	m.PowerTemporary = Int{}

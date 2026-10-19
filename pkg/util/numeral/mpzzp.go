@@ -130,7 +130,7 @@ func (m *IntegerModularManager) Close() error {
 		}
 		values := [...]*Int{&m.P, &m.Lower, &m.Upper, &m.InvTmp1, &m.InvTmp2, &m.InvTmp3, &m.DivTmp}
 		for m.closeCursor < uint8(len(values)) {
-			if e := m.manager.Del(values[m.closeCursor]); e != nil {
+			if e := m.manager.delWithModularOwner(values[m.closeCursor], m); e != nil {
 				return e
 			}
 			m.closeCursor++
