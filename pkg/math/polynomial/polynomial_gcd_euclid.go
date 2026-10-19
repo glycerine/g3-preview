@@ -7,33 +7,17 @@ import (
 
 func (m *MultivariatePolynomialManager) gcdEuclid(u, v Polynomial, r *polynomialReference) (err error) {
 	c := m.core
-	if polynomialSourceDebug {
-		field, e := c.modular.Modular()
-		if e != nil {
-			return e
-		}
-		if !field {
-			return ErrPolynomialAssertion
-		}
+	if e := polynomialGCDEuclidSourceAssert(3640, "m().modular()", c.modular.Modular); e != nil {
+		return e
 	}
 	if err = m.traceEuclidNonUnivariate(u, v); err != nil {
 		return err
 	}
-	if polynomialSourceDebug {
-		one, e := c.IsUnivariate(u)
-		if e != nil {
-			return e
-		}
-		if !one {
-			return ErrPolynomialAssertion
-		}
-		one, e = c.IsUnivariate(v)
-		if e != nil {
-			return e
-		}
-		if !one {
-			return ErrPolynomialAssertion
-		}
+	if e := polynomialGCDEuclidSourceAssert(3643, "is_univariate(u)", func() (bool, error) { return c.IsUnivariate(u) }); e != nil {
+		return e
+	}
+	if e := polynomialGCDEuclidSourceAssert(3644, "is_univariate(v)", func() (bool, error) { return c.IsUnivariate(v) }); e != nil {
+		return e
 	}
 	zero, e := c.IsZero(u)
 	if e != nil {

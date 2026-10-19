@@ -46266,3 +46266,13 @@ disabled execution. Primitive and PRS-focused tests pass in native, checked,
 debug and combined checked/debug/trace profiles on CPUs 8-16. The base row is
 ported; separately listed GCD arithmetic-child callback refinements remain
 partial, as do the following square-free algorithms.
+
+Polynomial Euclid-wrapper completion: `euclid_gcd` at
+`polynomial.cpp:3639-3672` now preserves the modular and univariate source
+guards, the conditional diagnostic before the latter guards, sign-normalized
+zero and identity shortcuts, constant scalar-content/GCD construction, and PRS
+delegation for the remaining case. All three `SASSERT` sites read the process
+switch before their predicates and honor Throw, Continue, and disabled
+execution. Focused algorithm, trace, and assertion tests pass in native,
+checked, debug and combined checked/debug/trace profiles on CPUs 8-16. The
+Euclid-wrapper method row is ported.

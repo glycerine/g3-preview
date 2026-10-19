@@ -45151,10 +45151,13 @@
           ]
         },
         {
-          "name": "gcd_euclid cpp3639-3672: modular wrapper scalar SET/GCD route",
-          "status": "partial",
+          "name": "Complete gcd_euclid cpp3639-3672 modular wrapper: assertion actions, conditional trace, sign-normalized shortcuts, scalar content/GCD and PRS delegation",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_euclid.go",
           "tests": [
+            "TestPolynomialGCDEuclidFieldAssertionActions",
+            "TestPolynomialGCDEuclidUnivariateAssertionActions",
+            "TestPolynomialEuclidNonUnivariateConditionalSourceTrace",
             "TestPolynomialGCDEuclidSourceShortcutsAndIntegerContent",
             "TestPolynomialGCDDispatcherConstantNormalizesSourceScalarSets"
           ]

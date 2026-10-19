@@ -40,6 +40,7 @@ func TestPolynomialEuclidNonUnivariateConditionalSourceTrace(t *testing.T) {
 		t.Fatalf("univariate inputs emitted conditional trace: %q", output.String())
 	}
 	if polynomialSourceDebug {
+		polynomialThrowAssertionFixture(t)
 		r, e := NewPolynomialRef(c)
 		serviceMust(t, e)
 		t.Cleanup(func() { serviceMust(t, r.Close()) })
