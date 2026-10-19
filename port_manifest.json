@@ -41475,6 +41475,7 @@
         "TestPolynomialGCDPowerDegreeSortSourceAdapter",
         "TestPolynomialFreshValueUsesSharedLibcStreamAndRejectsUsedInputs",
         "TestPolynomialFreshValueZeroModulusSourceProfile",
+            "TestPolynomialFreshValueAssertionActions",
         "TestPolynomialGCDRecursiveDenseIndependentCommonFactor",
         "TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor",
         "TestPolynomialGCDRecursiveActualSparseBodyExceptionAfterCompletedUnwind",
@@ -45231,7 +45232,8 @@
           "go_target": "pkg/math/polynomial/polynomial_gcd_random.go",
           "tests": [
             "TestPolynomialFreshValueUsesSharedLibcStreamAndRejectsUsedInputs",
-            "TestPolynomialFreshValueZeroModulusSourceProfile"
+            "TestPolynomialFreshValueZeroModulusSourceProfile",
+            "TestPolynomialFreshValueAssertionActions"
           ]
         },
         {
@@ -47287,6 +47289,7 @@
         "TestPolynomialGCDPowerDegreeSortSourceAdapter",
         "TestPolynomialFreshValueUsesSharedLibcStreamAndRejectsUsedInputs",
         "TestPolynomialFreshValueZeroModulusSourceProfile",
+            "TestPolynomialFreshValueAssertionActions",
         "TestPolynomialGCDRecursiveDenseIndependentCommonFactor",
         "TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor",
         "TestPolynomialGCDRecursiveActualSparseBodyExceptionAfterCompletedUnwind",
@@ -49341,6 +49344,7 @@
             "TestPolynomialGCDPowerDegreeSortSourceAdapter",
             "TestPolynomialFreshValueUsesSharedLibcStreamAndRejectsUsedInputs",
             "TestPolynomialFreshValueZeroModulusSourceProfile",
+            "TestPolynomialFreshValueAssertionActions",
             "TestPolynomialGCDRecursiveDenseIndependentCommonFactor",
             "TestPolynomialGCDRecursiveSavedSkeletonIndependentCommonFactor",
             "TestPolynomialGCDRecursiveActualSparseBodyExceptionAfterCompletedUnwind",

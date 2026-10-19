@@ -13,14 +13,11 @@ func (m *MultivariatePolynomialManager) peekFresh(vals PolynomialNewtonInputs, p
 	if e := m.ready(); e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
+	if e := polynomialFreshValueSourceAssert(func() (bool, error) {
 		n, e := vals.Size()
-		if e != nil {
-			return e
-		}
-		if n >= p {
-			return ErrPolynomialAssertion
-		}
+		return n < p, e
+	}); e != nil {
+		return e
 	}
 	size, e := vals.Size()
 	if e != nil {
