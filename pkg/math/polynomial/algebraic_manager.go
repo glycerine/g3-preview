@@ -30,7 +30,7 @@ type AlgebraicManagerConfig struct {
 }
 
 // AlgebraicManager supplies the owning source manager around the numerical
-// core. Methods promoted from the core operate on these same eager members.
+// core. Arithmetic wrappers and promoted methods use these same eager members.
 // A failed constructor can return a retained owner with an error; Close owns
 // its unfinished cleanup and must precede release of the borrowed services.
 type AlgebraicManager struct {
@@ -239,7 +239,7 @@ func (m *AlgebraicManager) Close() error {
 	if m.AlgebraicRootCore != nil && (m.foreignCopyBorrowers != 0 || m.foreignCopy.running || m.foreignCopy.cleaning) {
 		return ErrAlgebraicPending
 	}
-	if m.constructing || m.finishing || m.AlgebraicRootCore != nil && (m.univariateIsolationRunning || m.division.cleaning || m.rootTrace.running || m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning || m.toOwnedRational.running || m.toOwnedRational.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || m.integerSet.running || m.integerSet.finishing || m.constQ.running || m.constQ.executing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
+	if m.constructing || m.finishing || m.AlgebraicRootCore != nil && (m.univariateIsolationRunning || m.division.cleaning || m.integerAdd.cleaning || m.rootTrace.running || m.comparisonTraceRunning || m.predicateDiagnosticRunning || m.toRationalRunning || m.toOwnedRational.running || m.toOwnedRational.executing || m.refinement.executing || m.refinementConversion.executing || m.refinementQ.executing || m.predicateQ.executing || m.integerSet.running || m.integerSet.finishing || m.constQ.running || m.constQ.executing || (m.predicate.finishing || m.predicate.arithmeticExecuting)) {
 		return ErrAlgebraicPending
 	}
 	e := m.finish(true)

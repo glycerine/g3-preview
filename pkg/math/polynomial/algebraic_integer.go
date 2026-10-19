@@ -20,10 +20,10 @@ type algebraicIntegerSetScope struct {
 	sourceStop              error
 }
 type algebraicIntegerAddScope struct {
-	polynomialCaller *polynomialAlgebraicEvaluationScope
-	value            Algebraic
-	active, running  bool
-	sourceStop       error
+	polynomialCaller          *polynomialAlgebraicEvaluationScope
+	value                     Algebraic
+	active, running, cleaning bool
+	sourceStop                error
 }
 
 func (m *AlgebraicRootCore) cleanupIntegerSet() error {
@@ -86,24 +86,22 @@ func (m *AlgebraicRootCore) finishIntegerSet(cause error) error {
 
 func (m *AlgebraicRootCore) cleanupIntegerAdd(owning bool) error {
 	s := &m.integerAdd
-	if s.running {
+	if s.running || s.cleaning {
 		return ErrAlgebraicPending
 	}
 	if !s.active {
 		return nil
 	}
-	if owning {
-		l, e := m.locationCleanup(&s.value)
-		if e != nil {
+	s.cleaning = true
+	defer func() { s.cleaning = false }()
+	l, e := m.locationCleanup(&s.value)
+	if e != nil {
+		return e
+	}
+	if l != nil {
+		if e = m.destroyCell(&s.value, l, owning); e != nil {
 			return e
 		}
-		if l != nil {
-			if e = m.destroyCell(&s.value, l, true); e != nil {
-				return e
-			}
-		}
-	} else if e := m.Del(&s.value); e != nil {
-		return e
 	}
 	s.active = false
 	return nil
@@ -141,7 +139,10 @@ func (m *AlgebraicRootCore) setIntegerWithInvocation(out *Algebraic, n *unumeral
 
 // AddInteger constructs a real scoped algebraic coefficient before adding it.
 // The source overload is not equivalent in lifetime to adding a borrowed mpq.
-func (m *AlgebraicRootCore) AddInteger(a *Algebraic, n *unumeral.Int, out *Algebraic) (cause error) {
+func (m *AlgebraicRootCore) AddInteger(a *Algebraic, n *unumeral.Int, out *Algebraic) error {
+	return m.addIntegerWithManager(a, n, out, nil)
+}
+func (m *AlgebraicRootCore) addIntegerWithManager(a *Algebraic, n *unumeral.Int, out *Algebraic, wrapper *AlgebraicManager) (cause error) {
 	if e := m.check(); e != nil {
 		return e
 	}
@@ -152,14 +153,14 @@ func (m *AlgebraicRootCore) AddInteger(a *Algebraic, n *unumeral.Int, out *Algeb
 	*s = algebraicIntegerAddScope{polynomialCaller: m.polynomialCaller, active: true, running: true}
 	defer func() {
 		s.running = false
-		var stopped error
-		if m.integerSet.addition == s && m.integerSet.active {
+		stopped := m.rootTraceSourceCause()
+		if stopped == nil && m.integerSet.addition == s && m.integerSet.active {
 			stopped = m.integerSet.sourceStop
 		}
-		if m.localIntegerAdd == s && m.localActive && m.localCleanup != nil {
+		if stopped == nil && m.localIntegerAdd == s && m.localActive && m.localCleanup != nil {
 			stopped = m.localCleanup
 		}
-		if m.arithmetic.integerAddition == s && m.arithmetic.active && m.arithmetic.sourceStop != nil {
+		if stopped == nil && m.arithmetic.integerAddition == s && m.arithmetic.active && m.arithmetic.sourceStop != nil {
 			stopped = m.arithmetic.sourceStop
 		}
 		if stopped != nil {
@@ -175,6 +176,9 @@ func (m *AlgebraicRootCore) AddInteger(a *Algebraic, n *unumeral.Int, out *Algeb
 	}()
 	if e := m.SetInteger(&s.value, n); e != nil {
 		return e
+	}
+	if wrapper != nil {
+		return wrapper.Add(a, &s.value, out)
 	}
 	return m.Add(a, &s.value, out)
 }

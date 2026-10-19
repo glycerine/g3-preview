@@ -201,7 +201,7 @@ func allocateAlgebraicRootCore(c AlgebraicRootConfig) (*AlgebraicRootCore, error
 	return m, nil
 }
 func (m *AlgebraicRootCore) check() error {
-	if m != nil && m.self == m && m.division.cleaning {
+	if m != nil && m.self == m && (m.division.cleaning || m.integerAdd.cleaning) {
 		return ErrAlgebraicPending
 	}
 	if m.inverseRefinementEvaluationPending() || m.inverseRefinementCopyPending() {
@@ -1040,7 +1040,7 @@ func (m *AlgebraicRootCore) cleanupRetainedCore() error {
 	if m != nil && m.self == m && m.polynomialEvaluationRunning != 0 {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.integerSet.running || m.integerAdd.running || m.constQ.running) {
+	if m != nil && m.self == m && (m.integerSet.running || m.integerAdd.running || m.integerAdd.cleaning || m.constQ.running) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.isolationConversion.running {
@@ -1265,7 +1265,7 @@ func (m *AlgebraicRootCore) closeCoreMembers() error {
 	if m != nil && m.self == m && m.polynomialEvaluationBorrowers != 0 {
 		return ErrAlgebraicPending
 	}
-	if m != nil && m.self == m && (m.integerSet.running || m.integerAdd.running || m.constQ.running) {
+	if m != nil && m.self == m && (m.integerSet.running || m.integerAdd.running || m.integerAdd.cleaning || m.constQ.running) {
 		return ErrAlgebraicPending
 	}
 	if m != nil && m.self == m && m.isolationConversion.running {
