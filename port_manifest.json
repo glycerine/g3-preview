@@ -44848,8 +44848,8 @@
           ]
         },
         {
-          "name": "Selected cpp1425-1433/6436-6550/7409-7414 recursive evaluation: concrete Rational, IntegerModular and BinaryInterval domains; source short-circuit reads, live alias and Horner publication",
-          "status": "partial",
+          "name": "Complete cpp1425-1433/6436-6550/7409-7414 recursive evaluation for concrete Rational, IntegerModular and BinaryInterval domains with source assertion actions, short-circuit reads, live aliases and Horner publication",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_evaluation.go",
           "tests": [
             "TestPolynomialEvaluationLiveAliasSource",
@@ -44876,7 +44876,8 @@
             "TestPolynomialEvaluationNativeRationalDirectory",
             "TestPolynomialEvaluationNativeIntegerDirectory",
             "TestPolynomialEvaluationNativeIntervalDirectory",
-            "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary"
+            "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary",
+            "TestPolynomialEvaluationSourceAssertionActions"
           ]
         },
         {
@@ -49079,8 +49080,8 @@
           ]
         },
         {
-          "name": "Selected h931-932 concrete borrowed Rational/BinaryInterval var2value callbacks and univariate modular adapter",
-          "status": "partial",
+          "name": "Complete h931-932 concrete borrowed Rational/BinaryInterval var2value callbacks and univariate modular adapter with source assertion actions",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_evaluation.go",
           "tests": [
             "TestPolynomialEvaluationLiveAliasSource",
@@ -49107,7 +49108,8 @@
             "TestPolynomialEvaluationNativeRationalDirectory",
             "TestPolynomialEvaluationNativeIntegerDirectory",
             "TestPolynomialEvaluationNativeIntervalDirectory",
-            "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary"
+            "TestPolynomialEvaluationYoungerSourceStopPreservesOlderAuxiliary",
+            "TestPolynomialEvaluationSourceAssertionActions"
           ]
         },
         {

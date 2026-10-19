@@ -178,24 +178,8 @@ func (m *MultivariatePolynomialManager) evaluationDegree(p Polynomial, i, x uint
 	return m.core.monomials.DegreeOf(a, x)
 }
 func (m *MultivariatePolynomialManager) evaluationRationalCore(p Polynomial, v PolynomialRationalEvaluation, start, end, x uint32, out *unumeral.Rational) (cause error) {
-	if polynomialSourceDebug {
-		if start >= end {
-			return ErrPolynomialAssertion
-		}
-		n, e := m.core.readWord(p, 8)
-		if e != nil {
-			return e
-		}
-		if end > n {
-			return ErrPolynomialAssertion
-		}
-		valid, e := m.core.monomials.IsValidVar(x)
-		if e != nil {
-			return e
-		}
-		if !valid {
-			return ErrPolynomialAssertion
-		}
+	if e := m.evaluationCoreSourceAssertions(p, start, end, x); e != nil {
+		return e
 	}
 	f, e := m.evaluationRationalFrame()
 	if e != nil {
@@ -228,14 +212,11 @@ func (m *MultivariatePolynomialManager) evaluationRationalCore(p Polynomial, v P
 		if e != nil {
 			return e
 		}
-		if polynomialSourceDebug {
+		if e = polynomialEvaluationSourceAssert(6447, "m->degree_of(x) > 0", func() (bool, error) {
 			d, e := m.core.monomials.DegreeOf(term, x)
-			if e != nil {
-				return e
-			}
-			if d == 0 {
-				return ErrPolynomialAssertion
-			}
+			return d > 0, e
+		}); e != nil {
+			return e
 		}
 		sz, e := m.core.monomials.sizeCore(term)
 		if e != nil {
@@ -249,14 +230,10 @@ func (m *MultivariatePolynomialManager) evaluationRationalCore(p Polynomial, v P
 			if y > x {
 				break
 			}
-			if polynomialSourceDebug {
-				ok, e := v.Contains(y)
-				if e != nil {
-					return e
-				}
-				if !ok {
-					return ErrPolynomialAssertion
-				}
+			if e = polynomialEvaluationSourceAssert(6453, "x2v.contains(y)", func() (bool, error) {
+				return v.Contains(y)
+			}); e != nil {
+				return e
 			}
 			d, e := m.core.monomials.degreeAtCore(term, i)
 			if e != nil {
@@ -275,14 +252,10 @@ func (m *MultivariatePolynomialManager) evaluationRationalCore(p Polynomial, v P
 		}
 		return nil
 	}
-	if polynomialSourceDebug {
-		ok, e := v.Contains(x)
-		if e != nil {
-			return e
-		}
-		if !ok {
-			return ErrPolynomialAssertion
-		}
+	if e = polynomialEvaluationSourceAssert(6460, "x2v.contains(x)", func() (bool, error) {
+		return v.Contains(x)
+	}); e != nil {
+		return e
 	}
 	value, e := v.Rational(x)
 	if e != nil {
@@ -305,8 +278,10 @@ func (m *MultivariatePolynomialManager) evaluationRationalCore(p Polynomial, v P
 				return e
 			}
 			if y == ^uint32(0) {
-				if polynomialSourceDebug && end != i+1 {
-					return ErrPolynomialAssertion
+				if e = polynomialEvaluationSourceAssert(6470, "end == i+1", func() (bool, error) {
+					return end == i+1, nil
+				}); e != nil {
+					return e
 				}
 				n, e := m.core.coefficientCore(p, i)
 				if e != nil {
@@ -325,30 +300,34 @@ func (m *MultivariatePolynomialManager) evaluationRationalCore(p Polynomial, v P
 			if e != nil {
 				return e
 			}
-			if polynomialSourceDebug && dj > d {
-				return ErrPolynomialAssertion
+			if e = polynomialEvaluationSourceAssert(6483, "d_j <= d", func() (bool, error) {
+				return dj <= d, nil
+			}); e != nil {
+				return e
 			}
 			if dj < d {
 				next = dj
 				break
 			}
 		}
-		if polynomialSourceDebug && j != end {
+		if e = polynomialEvaluationSourceAssert(6489, "j == end || p->m(j)->degree_of(x) < d", func() (bool, error) {
+			if j == end {
+				return true, nil
+			}
 			dj, e := m.evaluationDegree(p, j, x)
-			if e != nil {
-				return e
-			}
-			if dj >= d {
-				return ErrPolynomialAssertion
-			}
+			return dj < d, e
+		}); e != nil {
+			return e
 		}
 		y, e := m.evaluationMaxSmaller(p, i, j, x)
 		if e != nil {
 			return e
 		}
 		if y == ^uint32(0) {
-			if polynomialSourceDebug && j != i+1 {
-				return ErrPolynomialAssertion
+			if e = polynomialEvaluationSourceAssert(6492, "j == i+1", func() (bool, error) {
+				return j == i+1, nil
+			}); e != nil {
+				return e
 			}
 			n, e := m.core.coefficientCore(p, i)
 			if e != nil {
@@ -405,14 +384,8 @@ func (m *MultivariatePolynomialManager) evaluateRationalForAlgebraic(p Polynomia
 		return e
 	}
 	if constant {
-		if polynomialSourceDebug {
-			n, e := m.core.readWord(p, 8)
-			if e != nil {
-				return e
-			}
-			if n != 1 {
-				return ErrPolynomialAssertion
-			}
+		if e = m.evaluationConstantSourceAssert(p); e != nil {
+			return e
 		}
 		n, e := m.core.coefficientCore(p, 0)
 		if e != nil {
@@ -617,8 +590,10 @@ type polynomialEvalIntegerMap struct {
 
 func (v *polynomialEvalIntegerMap) Contains(x uint32) (bool, error) { return x == v.x, nil }
 func (v *polynomialEvalIntegerMap) integerValue(x uint32) (*unumeral.Int, error) {
-	if polynomialSourceDebug && x != v.x {
-		return nil, ErrPolynomialAssertion
+	if e := polynomialEvaluationSourceAssert(6532, "m_x == x", func() (bool, error) {
+		return x == v.x, nil
+	}); e != nil {
+		return nil, e
 	}
 	return v.value, nil
 }
@@ -675,24 +650,8 @@ func (m *MultivariatePolynomialManager) finishEvaluationIntegerFrame(f *polynomi
 }
 
 func (m *MultivariatePolynomialManager) evaluationIntegerCore(p Polynomial, v *polynomialEvalIntegerMap, start, end, x uint32, out *unumeral.Int) (cause error) {
-	if polynomialSourceDebug {
-		if start >= end {
-			return ErrPolynomialAssertion
-		}
-		n, e := m.core.readWord(p, 8)
-		if e != nil {
-			return e
-		}
-		if end > n {
-			return ErrPolynomialAssertion
-		}
-		valid, e := m.core.monomials.IsValidVar(x)
-		if e != nil {
-			return e
-		}
-		if !valid {
-			return ErrPolynomialAssertion
-		}
+	if e := m.evaluationCoreSourceAssertions(p, start, end, x); e != nil {
+		return e
 	}
 	f, e := m.evaluationIntegerFrame()
 	if e != nil {
@@ -725,14 +684,11 @@ func (m *MultivariatePolynomialManager) evaluationIntegerCore(p Polynomial, v *p
 		if e != nil {
 			return e
 		}
-		if polynomialSourceDebug {
+		if e = polynomialEvaluationSourceAssert(6447, "m->degree_of(x) > 0", func() (bool, error) {
 			d, e := m.core.monomials.DegreeOf(term, x)
-			if e != nil {
-				return e
-			}
-			if d == 0 {
-				return ErrPolynomialAssertion
-			}
+			return d > 0, e
+		}); e != nil {
+			return e
 		}
 		sz, e := m.core.monomials.sizeCore(term)
 		if e != nil {
@@ -746,14 +702,10 @@ func (m *MultivariatePolynomialManager) evaluationIntegerCore(p Polynomial, v *p
 			if y > x {
 				break
 			}
-			if polynomialSourceDebug {
-				ok, e := v.Contains(y)
-				if e != nil {
-					return e
-				}
-				if !ok {
-					return ErrPolynomialAssertion
-				}
+			if e = polynomialEvaluationSourceAssert(6453, "x2v.contains(y)", func() (bool, error) {
+				return v.Contains(y)
+			}); e != nil {
+				return e
 			}
 			d, e := m.core.monomials.degreeAtCore(term, i)
 			if e != nil {
@@ -772,14 +724,10 @@ func (m *MultivariatePolynomialManager) evaluationIntegerCore(p Polynomial, v *p
 		}
 		return nil
 	}
-	if polynomialSourceDebug {
-		ok, e := v.Contains(x)
-		if e != nil {
-			return e
-		}
-		if !ok {
-			return ErrPolynomialAssertion
-		}
+	if e = polynomialEvaluationSourceAssert(6460, "x2v.contains(x)", func() (bool, error) {
+		return v.Contains(x)
+	}); e != nil {
+		return e
 	}
 	value, e := v.integerValue(x)
 	if e != nil {
@@ -802,8 +750,10 @@ func (m *MultivariatePolynomialManager) evaluationIntegerCore(p Polynomial, v *p
 				return e
 			}
 			if y == ^uint32(0) {
-				if polynomialSourceDebug && end != i+1 {
-					return ErrPolynomialAssertion
+				if e = polynomialEvaluationSourceAssert(6470, "end == i+1", func() (bool, error) {
+					return end == i+1, nil
+				}); e != nil {
+					return e
 				}
 				n, e := m.core.coefficientCore(p, i)
 				if e != nil {
@@ -822,30 +772,34 @@ func (m *MultivariatePolynomialManager) evaluationIntegerCore(p Polynomial, v *p
 			if e != nil {
 				return e
 			}
-			if polynomialSourceDebug && dj > d {
-				return ErrPolynomialAssertion
+			if e = polynomialEvaluationSourceAssert(6483, "d_j <= d", func() (bool, error) {
+				return dj <= d, nil
+			}); e != nil {
+				return e
 			}
 			if dj < d {
 				next = dj
 				break
 			}
 		}
-		if polynomialSourceDebug && j != end {
+		if e = polynomialEvaluationSourceAssert(6489, "j == end || p->m(j)->degree_of(x) < d", func() (bool, error) {
+			if j == end {
+				return true, nil
+			}
 			dj, e := m.evaluationDegree(p, j, x)
-			if e != nil {
-				return e
-			}
-			if dj >= d {
-				return ErrPolynomialAssertion
-			}
+			return dj < d, e
+		}); e != nil {
+			return e
 		}
 		y, e := m.evaluationMaxSmaller(p, i, j, x)
 		if e != nil {
 			return e
 		}
 		if y == ^uint32(0) {
-			if polynomialSourceDebug && j != i+1 {
-				return ErrPolynomialAssertion
+			if e = polynomialEvaluationSourceAssert(6492, "j == i+1", func() (bool, error) {
+				return j == i+1, nil
+			}); e != nil {
+				return e
 			}
 			n, e := m.core.coefficientCore(p, i)
 			if e != nil {
@@ -926,24 +880,8 @@ func (m *MultivariatePolynomialManager) finishEvaluationIntervalFrame(f *polynom
 }
 
 func (m *MultivariatePolynomialManager) evaluationIntervalCore(p Polynomial, v PolynomialIntervalEvaluation, start, end, x uint32, out *unumeral.BinaryInterval) (cause error) {
-	if polynomialSourceDebug {
-		if start >= end {
-			return ErrPolynomialAssertion
-		}
-		n, e := m.core.readWord(p, 8)
-		if e != nil {
-			return e
-		}
-		if end > n {
-			return ErrPolynomialAssertion
-		}
-		valid, e := m.core.monomials.IsValidVar(x)
-		if e != nil {
-			return e
-		}
-		if !valid {
-			return ErrPolynomialAssertion
-		}
+	if e := m.evaluationCoreSourceAssertions(p, start, end, x); e != nil {
+		return e
 	}
 	f, e := m.evaluationIntervalFrame()
 	if e != nil {
@@ -976,14 +914,11 @@ func (m *MultivariatePolynomialManager) evaluationIntervalCore(p Polynomial, v P
 		if e != nil {
 			return e
 		}
-		if polynomialSourceDebug {
+		if e = polynomialEvaluationSourceAssert(6447, "m->degree_of(x) > 0", func() (bool, error) {
 			d, e := m.core.monomials.DegreeOf(term, x)
-			if e != nil {
-				return e
-			}
-			if d == 0 {
-				return ErrPolynomialAssertion
-			}
+			return d > 0, e
+		}); e != nil {
+			return e
 		}
 		sz, e := m.core.monomials.sizeCore(term)
 		if e != nil {
@@ -997,14 +932,10 @@ func (m *MultivariatePolynomialManager) evaluationIntervalCore(p Polynomial, v P
 			if y > x {
 				break
 			}
-			if polynomialSourceDebug {
-				ok, e := v.Contains(y)
-				if e != nil {
-					return e
-				}
-				if !ok {
-					return ErrPolynomialAssertion
-				}
+			if e = polynomialEvaluationSourceAssert(6453, "x2v.contains(y)", func() (bool, error) {
+				return v.Contains(y)
+			}); e != nil {
+				return e
 			}
 			d, e := m.core.monomials.degreeAtCore(term, i)
 			if e != nil {
@@ -1023,14 +954,10 @@ func (m *MultivariatePolynomialManager) evaluationIntervalCore(p Polynomial, v P
 		}
 		return nil
 	}
-	if polynomialSourceDebug {
-		ok, e := v.Contains(x)
-		if e != nil {
-			return e
-		}
-		if !ok {
-			return ErrPolynomialAssertion
-		}
+	if e = polynomialEvaluationSourceAssert(6460, "x2v.contains(x)", func() (bool, error) {
+		return v.Contains(x)
+	}); e != nil {
+		return e
 	}
 	value, e := v.Interval(x)
 	if e != nil {
@@ -1053,8 +980,10 @@ func (m *MultivariatePolynomialManager) evaluationIntervalCore(p Polynomial, v P
 				return e
 			}
 			if y == ^uint32(0) {
-				if polynomialSourceDebug && end != i+1 {
-					return ErrPolynomialAssertion
+				if e = polynomialEvaluationSourceAssert(6470, "end == i+1", func() (bool, error) {
+					return end == i+1, nil
+				}); e != nil {
+					return e
 				}
 				n, e := m.core.coefficientCore(p, i)
 				if e != nil {
@@ -1073,30 +1002,34 @@ func (m *MultivariatePolynomialManager) evaluationIntervalCore(p Polynomial, v P
 			if e != nil {
 				return e
 			}
-			if polynomialSourceDebug && dj > d {
-				return ErrPolynomialAssertion
+			if e = polynomialEvaluationSourceAssert(6483, "d_j <= d", func() (bool, error) {
+				return dj <= d, nil
+			}); e != nil {
+				return e
 			}
 			if dj < d {
 				next = dj
 				break
 			}
 		}
-		if polynomialSourceDebug && j != end {
+		if e = polynomialEvaluationSourceAssert(6489, "j == end || p->m(j)->degree_of(x) < d", func() (bool, error) {
+			if j == end {
+				return true, nil
+			}
 			dj, e := m.evaluationDegree(p, j, x)
-			if e != nil {
-				return e
-			}
-			if dj >= d {
-				return ErrPolynomialAssertion
-			}
+			return dj < d, e
+		}); e != nil {
+			return e
 		}
 		y, e := m.evaluationMaxSmaller(p, i, j, x)
 		if e != nil {
 			return e
 		}
 		if y == ^uint32(0) {
-			if polynomialSourceDebug && j != i+1 {
-				return ErrPolynomialAssertion
+			if e = polynomialEvaluationSourceAssert(6492, "j == i+1", func() (bool, error) {
+				return j == i+1, nil
+			}); e != nil {
+				return e
 			}
 			n, e := m.core.coefficientCore(p, i)
 			if e != nil {
@@ -1202,14 +1135,10 @@ func (m *MultivariatePolynomialManager) UnivariateEvaluate(p Polynomial, x uint3
 	if e := m.ready(); e != nil {
 		return e
 	}
-	if polynomialSourceDebug {
-		valid, e := m.core.IsUnivariate(p)
-		if e != nil {
-			return e
-		}
-		if !valid {
-			return ErrPolynomialAssertion
-		}
+	if e := polynomialEvaluationSourceAssert(6536, "is_univariate(p)", func() (bool, error) {
+		return m.core.IsUnivariate(p)
+	}); e != nil {
+		return e
 	}
 	zero, e := m.core.IsZero(p)
 	if e != nil {
@@ -1315,14 +1244,8 @@ func (m *MultivariatePolynomialManager) evaluateIntervalForAlgebraic(p Polynomia
 		return e
 	}
 	if constant {
-		if polynomialSourceDebug {
-			n, e := m.core.readWord(p, 8)
-			if e != nil {
-				return e
-			}
-			if n != 1 {
-				return ErrPolynomialAssertion
-			}
+		if e = m.evaluationConstantSourceAssert(p); e != nil {
+			return e
 		}
 		n, e := m.core.coefficientCore(p, 0)
 		if e != nil {
