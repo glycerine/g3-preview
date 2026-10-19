@@ -45219,8 +45219,8 @@
           ]
         },
         {
-          "name": "mod_gcd_rec/mod_gcd cpp4076-4350: source degree/variable choice, exact sample/interpolator recursion, skeleton restoration and typed sparse failure fallback",
-          "status": "partial",
+          "name": "Complete mod_gcd_rec/mod_gcd cpp4076-4350: assertion actions, degree/variable choice, exact sample/interpolator recursion, skeleton restoration and typed sparse fallback",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_gcd_recursive.go",
           "tests": [
             "TestPolynomialGCDRecursiveDenseIndependentCommonFactor",
@@ -45229,7 +45229,9 @@
             "TestPolynomialGCDSparseCatchWaitsForGuardedActualDestructorStop",
             "TestPolynomialGCDAndResultantEveryReachedCancellation",
             "TestPolynomialGCDCheckpointPreservesActualForeignPrimitiveCreation",
-            "TestPolynomialGCDCooperationPreservesActualForeignPrimitiveCreation"
+            "TestPolynomialGCDCooperationPreservesActualForeignPrimitiveCreation",
+            "TestPolynomialModGCDSourceAssertionActions",
+            "TestPolynomialModGCDRecursiveTerminalAssertionActions"
           ]
         },
         {

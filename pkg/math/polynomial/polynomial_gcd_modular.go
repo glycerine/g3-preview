@@ -90,21 +90,22 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 	if err = m.traceModGCDPolynomials("mgcd_call", 4240, "mod_gcd\nu: ", u, v); err != nil {
 		return err
 	}
-	if polynomialSourceDebug {
+	if err = polynomialModGCDSourceAssert(4241, "!m().modular()", func() (bool, error) {
 		field, e := c.modular.Modular()
-		if e != nil {
-			return e
-		}
-		if field {
-			return ErrPolynomialAssertion
-		}
-		if uint32(len(*ud)) != uint32(len(*vd)) {
-			return ErrPolynomialAssertion
-		}
+		return !field, e
+	}); err != nil {
+		return err
+	}
+	if err = polynomialModGCDSourceAssert(4243, "u_var_degrees.size() == v_var_degrees.size()", func() (bool, error) {
+		return uint32(len(*ud)) == uint32(len(*vd)), nil
+	}); err != nil {
+		return err
 	}
 	size := uint32(len(*ud))
-	if polynomialSourceDebug && size <= 1 {
-		return ErrPolynomialAssertion
+	if err = polynomialModGCDSourceAssert(4245, "num_vars > 1", func() (bool, error) {
+		return size > 1, nil
+	}); err != nil {
+		return err
 	}
 	s, e := m.beginGCDFunction()
 	if e != nil {
@@ -121,18 +122,15 @@ func (m *MultivariatePolynomialManager) modGCD(u, v Polynomial, ud, vd *polynomi
 		c.pscLeave()
 	}()
 	for i := uint32(0); i < size; i++ {
-		if polynomialSourceDebug {
+		if err = polynomialModGCDSourceAssert(4249, "u_var_degrees[i].get_var() == v_var_degrees[i].get_var()", func() (bool, error) {
 			ux, e := ud.word(i, 0)
 			if e != nil {
-				return e
+				return false, e
 			}
 			vx, e := vd.word(i, 0)
-			if e != nil {
-				return e
-			}
-			if ux != vx {
-				return ErrPolynomialAssertion
-			}
+			return ux == vx, e
+		}); err != nil {
+			return err
 		}
 		x, e := ud.word(i, 0)
 		if e != nil {

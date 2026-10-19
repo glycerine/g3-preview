@@ -14,25 +14,21 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 		return err
 	}
 	numVars := uint32(len(vars))
-	if polynomialSourceDebug && numVars == 0 {
-		return ErrPolynomialAssertion
+	if err = polynomialModGCDSourceAssert(4080, "num_vars > 0", func() (bool, error) {
+		return numVars > 0, nil
+	}); err != nil {
+		return err
 	}
 	if idx == numVars-1 {
-		if polynomialSourceDebug {
-			a, e := c.IsUnivariate(u)
-			if e != nil {
-				return e
-			}
-			if !a {
-				return ErrPolynomialAssertion
-			}
-			a, e = c.IsUnivariate(v)
-			if e != nil {
-				return e
-			}
-			if !a {
-				return ErrPolynomialAssertion
-			}
+		if err = polynomialModGCDSourceAssert(4082, "is_univariate(u)", func() (bool, error) {
+			return c.IsUnivariate(u)
+		}); err != nil {
+			return err
+		}
+		if err = polynomialModGCDSourceAssert(4083, "is_univariate(v)", func() (bool, error) {
+			return c.IsUnivariate(v)
+		}); err != nil {
+			return err
 		}
 		if err = m.gcdEuclid(u, v, r); err != nil {
 			return err
@@ -239,14 +235,11 @@ func (m *MultivariatePolynomialManager) modGCDRec(u, v Polynomial, p, idx uint32
 		}
 		found := false
 		if sk == nil {
-			if polynomialSourceDebug {
+			if e = polynomialModGCDSourceAssert(4182, "interpolator.num_sample_points() > 0", func() (bool, error) {
 				n, e := interpolator.NumSamplePoints()
-				if e != nil {
-					return e
-				}
-				if n == 0 {
-					return ErrPolynomialAssertion
-				}
+				return n > 0, e
+			}); e != nil {
+				return e
 			}
 			if e = interpolator.Mk(x, &s.refs[11]); e != nil {
 				return e
