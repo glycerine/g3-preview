@@ -132,6 +132,9 @@ func (m *AlgebraicRootCore) restoreBinaryInterval(saved *algebraicSavedInterval)
 func (m *AlgebraicRootCore) finishBinaryLocals() error {
 	s := &m.binary
 	p := m.config.Polynomials
+	if e := m.rootTraceSourceCause(); e != nil {
+		return e
+	}
 	if p.refinableReceiptPending(&s.refinable) {
 		if e := p.refinableReceiptSourceCause(&s.refinable); e != nil {
 			return e
@@ -205,6 +208,9 @@ func (m *AlgebraicRootCore) cleanupBinary() error {
 	}
 	s.cleaning = true
 	defer func() { s.cleaning = false }()
+	if e := m.cleanupRootTrace(); e != nil {
+		return e
+	}
 	if e := m.config.Polynomials.cleanupRefinableReceipt(&s.refinable); e != nil {
 		return e
 	}
@@ -476,6 +482,9 @@ func (m *AlgebraicRootCore) setBinaryCore(out *Algebraic, seq *UPolynomialSequen
 	if e != nil {
 		return e
 	}
+	if e = m.traceSetCorePolynomial(v); e != nil {
+		return e
+	}
 	containsZero, e := im.ContainsZero(&s.interval)
 	if e != nil {
 		return e
@@ -486,7 +495,10 @@ func (m *AlgebraicRootCore) setBinaryCore(out *Algebraic, seq *UPolynomialSequen
 			return e
 		}
 		if hasZero {
-			return m.Del(out)
+			if e = m.Del(out); e != nil {
+				return e
+			}
+			return m.traceSetCoreReset(out)
 		}
 		zv, e := p.SignVariationsZero(seq)
 		if e != nil {
@@ -558,6 +570,9 @@ func (m *AlgebraicRootCore) setBinaryCore(out *Algebraic, seq *UPolynomialSequen
 			return e
 		}
 		return m.SetTake(out, &s.localQ)
+	}
+	if e = m.traceSetCoreAlgebraic(); e != nil {
+		return e
 	}
 	return m.SetRoot(out, v, s.interval.BorrowLower(), s.interval.BorrowUpper(), minimal)
 }

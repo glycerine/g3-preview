@@ -38261,6 +38261,8 @@
         "pkg/math/polynomial/algebraic_division.go",
         "pkg/math/polynomial/algebraic_division_test.go",
         "pkg/math/polynomial/algebraic_binary.go",
+        "pkg/math/polynomial/algebraic_binary_trace.go",
+        "pkg/math/polynomial/algebraic_binary_trace_test.go",
         "pkg/math/polynomial/algebraic_binary_test.go",
         "pkg/math/polynomial/algebraic_resultant_polynomial.go",
         "pkg/math/polynomial/algebraic_resultant_polynomial_test.go",
@@ -39094,7 +39096,11 @@
             "TestAlgebraicBinaryMixedDispatchAndRefinementFallback",
             "TestAlgebraicBinaryEveryReachedCancellationAndRetry",
             "TestAlgebraicBinaryRestoresOverrefinedInputInterval",
-            "TestAlgebraicBinaryEntryAssertionPrecedesLocalOwners"
+            "TestAlgebraicBinaryEntryAssertionPrecedesLocalOwners",
+            "TestAlgebraicBinarySetCoreSourceTraces",
+            "TestAlgebraicBinarySetCoreDisabledTracesDoNotRead",
+            "TestAlgebraicBinarySetCoreStickyTraceFailure",
+            "TestAlgebraicBinaryTraceRetainsActualDisplayBeforeLocals"
           ]
         },
         {
