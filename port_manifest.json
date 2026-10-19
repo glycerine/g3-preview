@@ -45313,8 +45313,8 @@
           ]
         },
         {
-          "name": "manager::imp::neg scoped NUM epilogue cpp5940-5951",
-          "status": "partial",
+          "name": "Complete manager::imp::neg body and scoped NUM epilogue cpp5940-5951",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_neg_scope.go",
           "tests": [
             "TestPolynomialNegFailedSetterSourceDestructorGuard"
