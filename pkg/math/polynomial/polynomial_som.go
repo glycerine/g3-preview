@@ -83,19 +83,13 @@ func (b *polynomialSOM) addConsumedScalarNegEngine(a *unumeral.Int, term Monomia
 		*consumed = false
 	}
 	m := b.owner
-	if b.cheap && polynomialSourceDebug {
-		n, e := b.ms.size(m)
-		if e != nil {
-			return e
+	if b.cheap {
+		line := int32(2248)
+		if take {
+			line = 2234
 		}
-		for i := uint32(0); i < n; i++ {
-			x, e := b.ms.monomial(m, i)
-			if e != nil {
-				return e
-			}
-			if x == term {
-				return ErrPolynomialAssertion
-			}
+		if e := b.assertUniqueMonomial(term, line); e != nil {
+			return e
 		}
 	}
 	zero, e := m.modular.IsZero(a)
@@ -427,15 +421,9 @@ func (b *polynomialSOM) addSourceInputWithArithmeticReceipt(a *unumeral.Int, ter
 			if e != nil {
 				return e
 			}
-			if b.cheap && polynomialSourceDebug {
-				for j := uint32(0); j < n; j++ {
-					x, e := b.ms.monomial(m, j)
-					if e != nil {
-						return e
-					}
-					if x == prod {
-						return ErrPolynomialAssertion
-					}
+			if b.cheap {
+				if e := b.assertUniqueMonomial(prod, 2270); e != nil {
+					return e
 				}
 			}
 			var appendScope *polynomialCheapAppendScope

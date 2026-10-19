@@ -2,11 +2,50 @@ package polynomial
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
+
+func TestPolynomialCheapAppendDuplicateAssertionActions(t *testing.T) {
+	for _, mode := range []string{"copy", "take", "multiply"} {
+		for _, action := range []string{"T", "C", "disabled"} {
+			t.Run(fmt.Sprintf("%s/%s", mode, action), func(t *testing.T) {
+				m := polynomialCellFixture(t)
+				a := unumeral.NewInt(3)
+				serviceMust(t, m.cheap.add(&a, m.monomials.unit, false))
+				polynomialAssertionActionsFixture(t, action)
+				if polynomialSourceDebug && action == "disabled" {
+					serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+				}
+				var e error
+				if mode == "multiply" {
+					e = m.cheap.addMul(&a, m.monomials.unit, m.unit)
+				} else {
+					e = m.cheap.add(&a, m.monomials.unit, mode == "take")
+				}
+				want := uint32(2)
+				if polynomialSourceDebug && action == "T" {
+					if !errors.Is(e, ErrPolynomialAssertion) {
+						t.Fatal("duplicate assertion did not throw", e)
+					}
+					want = 1
+				} else {
+					serviceMust(t, e)
+				}
+				count, e := m.cheap.ms.size(m)
+				serviceMust(t, e)
+				if count != want {
+					t.Fatal("duplicate append publication", count, want)
+				}
+				serviceMust(t, m.cheap.reset())
+			})
+		}
+	}
+}
 
 func polynomialSOMMismatchedBuffer(t *testing.T) (*MultivariatePolynomialCore, *PolynomialSOMBuffer) {
 	t.Helper()

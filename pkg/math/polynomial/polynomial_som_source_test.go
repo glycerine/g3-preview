@@ -12,6 +12,7 @@ import (
 )
 
 func TestPolynomialCheapDuplicateAssertionBeforeZero(t *testing.T) {
+	polynomialThrowAssertionFixture(t)
 	m := polynomialCellFixture(t)
 	u, e := m.monomials.Unit()
 	serviceMust(t, e)
