@@ -29,7 +29,7 @@ func (m *MultivariatePolynomialCore) SourceFinalizePrefix() error {
 	if m != nil && m.self == m && (m.quasiResultant.active || m.variableNumeral.active) {
 		return ErrPolynomialPending
 	}
-	if m != nil && m.self == m && m.collectingVariables {
+	if m != nil && m.self == m && (m.collectingVariables || m.algebraicTraceRunning || m.renameTraceRunning || m.gcdTraceRunning) {
 		return ErrPolynomialPending
 	}
 	if m != nil && m.self == m && m.normalizationPending() {

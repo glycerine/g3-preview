@@ -17,11 +17,16 @@ func (m *MultivariatePolynomialCore) IsConstant(p Polynomial) (bool, error) {
 	if e := m.check(); e != nil {
 		return false, e
 	}
-	zero, e := m.IsZero(p)
+	return m.isConstantCore(p)
+}
+func (m *MultivariatePolynomialCore) isConstantCore(p Polynomial) (bool, error) {
+	n, e := m.readWord(p, 8)
+	zero := n == 0
+
 	if e != nil || zero {
 		return zero, e
 	}
-	n, e := m.readWord(p, 8)
+	n, e = m.readWord(p, 8)
 	if e != nil || n != 1 {
 		return false, e
 	}

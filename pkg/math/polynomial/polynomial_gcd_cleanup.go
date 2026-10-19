@@ -25,6 +25,9 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 			if !s.active {
 				continue
 			}
+			if e := c.cleanupDisplayReceipt(&s.traceDisplay); e != nil {
+				return e
+			}
 			if e := c.cleanupArithmeticInvocation(&s.product, false); e != nil {
 				return e
 			}
@@ -206,7 +209,7 @@ func (m *MultivariatePolynomialManager) cleanupGCDScopes(scopes []*polynomialGCD
 		if s.active {
 			h := s.header
 			// Retain captured diagnostic causes only; the next guarded begin resets them.
-			*s = polynomialGCDFunctionScope{header: h, invocation: s.invocation, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, normalizeInvocation: s.normalizeInvocation, resultantPower: s.resultantPower, resultantPseudo: s.resultantPseudo, resultantArithmetic: s.resultantArithmetic, resultantCoefficient: s.resultantCoefficient, resultantAppend: s.resultantAppend, resultantFactory: s.resultantFactory, resultantNeg: s.resultantNeg}
+			*s = polynomialGCDFunctionScope{header: h, invocation: s.invocation, traceDisplay: s.traceDisplay, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, normalizeInvocation: s.normalizeInvocation, resultantPower: s.resultantPower, resultantPseudo: s.resultantPseudo, resultantArithmetic: s.resultantArithmetic, resultantCoefficient: s.resultantCoefficient, resultantAppend: s.resultantAppend, resultantFactory: s.resultantFactory, resultantNeg: s.resultantNeg}
 		}
 	}
 	return nil

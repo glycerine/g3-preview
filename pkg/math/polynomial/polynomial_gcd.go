@@ -39,6 +39,9 @@ func (m *MultivariatePolynomialManager) gcdIntoWithReceipt(u, v Polynomial, r *p
 		err = errors.Join(err, m.finishGCDFunctionSource(s))
 		c.pscLeave()
 	}()
+	if e := m.traceGCDEntry(u, v, s); e != nil {
+		return e
+	}
 	zero, e := c.IsZero(u)
 	if e != nil {
 		return e
@@ -108,6 +111,9 @@ func (m *MultivariatePolynomialManager) gcdIntoWithReceipt(u, v Polynomial, r *p
 		return e
 	}
 	s.powers[1].sortVariables()
+	if e := m.traceGCDVariables(s); e != nil {
+		return e
+	}
 	x := ^uint32(0)
 	uFound, vFound := false, false
 	i := uint32(0)

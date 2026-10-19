@@ -38,3 +38,10 @@ func (m *MultivariatePolynomialCore) cleanupDisplayReceipt(r *polynomialDisplayI
 	}
 	return m.cleanupDisplayFrame(r.frame)
 }
+
+func (m *MultivariatePolynomialCore) displayPolynomialDirectWithReceipt(p Polynomial, sink PolynomialTextSink, star bool, receipt *polynomialDisplayInvocationReceipt) error {
+	previous := m.display.receipt
+	m.display.receipt = receipt
+	defer func() { m.display.receipt = previous }()
+	return m.displayPolynomialDirect(p, sink, star)
+}

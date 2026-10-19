@@ -55,7 +55,7 @@ type polynomialRenameTraceWriter struct {
 
 func (w *polynomialRenameTraceWriter) Write(p []byte) (int, error) {
 	w.calls++
-	for _, e := range []error{w.m.Rename([]uint32{0, 1}), w.m.CloseChecked(), w.m.core.CloseChecked(), w.m.CleanupDisplay()} {
+	for _, e := range []error{w.m.Rename([]uint32{0, 1}), w.m.CloseChecked(), w.m.core.CloseChecked(), w.m.core.SourceFinalizePrefix(), w.m.CleanupDisplay()} {
 		if !errors.Is(e, ErrPolynomialPending) {
 			w.t.Fatalf("trace callback admitted mutation/cleanup: %v", e)
 		}

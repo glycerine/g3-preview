@@ -15,6 +15,7 @@ import (
 // PRS has nine references and three numerals. The dispatcher instead begins
 // with its two actual sbuffer<power,32> objects.
 type polynomialGCDFunctionScope struct {
+	traceDisplay        polynomialDisplayInvocationReceipt
 	directSubstitution  polynomialSubstitutionInvocationReceipt
 	directMonic         polynomialMonicInvocationReceipt
 	zpxCalleeGeneration uint64
@@ -135,6 +136,10 @@ func (m *MultivariatePolynomialManager) beginGCDFunction() (*polynomialGCDFuncti
 	return s, nil
 }
 func (m *MultivariatePolynomialManager) gcdYoungerSourceStop(s *polynomialGCDFunctionScope) error {
+	if e := m.core.displayReceiptSourceCause(&s.traceDisplay); e != nil {
+		s.cleanupCause = e
+		return e
+	}
 	if e := m.resultantConcreteChildSourceCause(s); e != nil {
 		if s.cleanupCause == nil {
 			s.cleanupCause = e
@@ -268,7 +273,7 @@ func (m *MultivariatePolynomialManager) finishGCDLocalsTo(s *polynomialGCDFuncti
 	if frontier != 0 {
 		return nil
 	}
-	pending := m.gcdZPXMonomialPending(s) || m.gcdDirectChildrenPending(s) || (s.child != nil && s.child.active && s.child.invocation == s.childInvocation) || m.matchesICCPInvocation(&s.iccpInvocation) || m.matchesICCPShortcutContent(&s.iccpInvocation) || m.core.matchesContentInvocation(&s.contentInvocation) || s.returned.value != (Polynomial{}) || s.returned.assigning || s.zp.active || s.topOwner && m.core.pscPendingForGeneration(s.generation)
+	pending := m.core.displayReceiptPending(&s.traceDisplay) || m.gcdZPXMonomialPending(s) || m.gcdDirectChildrenPending(s) || (s.child != nil && s.child.active && s.child.invocation == s.childInvocation) || m.matchesICCPInvocation(&s.iccpInvocation) || m.matchesICCPShortcutContent(&s.iccpInvocation) || m.core.matchesContentInvocation(&s.contentInvocation) || s.returned.value != (Polynomial{}) || s.returned.assigning || s.zp.active || s.topOwner && m.core.pscPendingForGeneration(s.generation)
 	pending = pending || m.core.matchesArithmeticInvocation(&s.product)
 	pending = pending || m.matchesNormalizeInvocation(&s.normalizeInvocation)
 	pending = pending || (m.matchesDerivativeInvocation(&s.derivativeInvocation) || m.derivativeInvocationHasOrphans(&s.derivativeInvocation)) || m.core.matchesExactDivInvocation(&s.divisionInvocation) || m.core.dividesInvocationPending(&s.dividesInvocation)
@@ -290,7 +295,7 @@ func (m *MultivariatePolynomialManager) finishGCDLocalsTo(s *polynomialGCDFuncti
 	}
 	if !pending {
 		h := s.header
-		*s = polynomialGCDFunctionScope{header: h, invocation: s.invocation, product: s.product, directSubstitution: s.directSubstitution, directMonic: s.directMonic, directArithmetic: s.directArithmetic, directConstant: s.directConstant, directNeg: s.directNeg, directCoefficient: s.directCoefficient, directAppend: s.directAppend, directFactory: s.directFactory, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, normalizeInvocation: s.normalizeInvocation, resultantPower: s.resultantPower, resultantPseudo: s.resultantPseudo, resultantArithmetic: s.resultantArithmetic, resultantCoefficient: s.resultantCoefficient, resultantAppend: s.resultantAppend, resultantFactory: s.resultantFactory, resultantNeg: s.resultantNeg}
+		*s = polynomialGCDFunctionScope{header: h, invocation: s.invocation, traceDisplay: s.traceDisplay, product: s.product, directSubstitution: s.directSubstitution, directMonic: s.directMonic, directArithmetic: s.directArithmetic, directConstant: s.directConstant, directNeg: s.directNeg, directCoefficient: s.directCoefficient, directAppend: s.directAppend, directFactory: s.directFactory, bodyCause: s.bodyCause, cleanupCause: s.cleanupCause, normalizeInvocation: s.normalizeInvocation, resultantPower: s.resultantPower, resultantPseudo: s.resultantPseudo, resultantArithmetic: s.resultantArithmetic, resultantCoefficient: s.resultantCoefficient, resultantAppend: s.resultantAppend, resultantFactory: s.resultantFactory, resultantNeg: s.resultantNeg}
 	}
 	return nil
 }
