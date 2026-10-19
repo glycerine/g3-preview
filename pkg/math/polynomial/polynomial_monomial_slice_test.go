@@ -191,3 +191,54 @@ func TestMonomialNativeVariableCountingAndInterning(t *testing.T) {
 	}
 	monomialPhysicalAudit(t, m)
 }
+
+func TestMonomialArithmeticReservesBeyondInitialTemporaryCapacity(t *testing.T) {
+	m := monomialFixture(t)
+	powers := make([]MonomialPower, 129)
+	for i := range powers {
+		_, e := m.MkVar()
+		serviceMust(t, e)
+		powers[i] = MonomialPower{uint32(i), 1}
+	}
+	base := monomialOwn(t, m, powers)
+	squared, e := m.Mul(base, base)
+	serviceMust(t, e)
+	serviceMust(t, m.IncRef(squared))
+	t.Cleanup(func() { serviceMust(t, m.DecRef(squared)) })
+	if m.temps[1].capacity != 4*uint32(len(powers)) {
+		t.Fatal("source product reserve did not replace capacity-128 scratch", m.temps[1].capacity)
+	}
+	for i := range powers {
+		powers[i].Degree = 2
+	}
+	monomialEqualPowers(t, m, squared, powers)
+
+	powered, e := m.Power(base, 2)
+	serviceMust(t, e)
+	if powered != squared {
+		t.Fatal("large power did not intern product", powered, squared)
+	}
+	root, ok, e := m.Sqrt(squared)
+	serviceMust(t, e)
+	if !ok || root != base {
+		t.Fatal("large square root", root, ok)
+	}
+	quotient, ok, e := m.Divide(squared, base)
+	serviceMust(t, e)
+	if !ok || quotient != base {
+		t.Fatal("large division", quotient, ok)
+	}
+	g, q1, q2, e := m.GCD(squared, base)
+	serviceMust(t, e)
+	if g != base || q1 != base || q2 != m.unit {
+		t.Fatal("large gcd", g, q1, q2)
+	}
+	removed, e := m.RemoveVariable(base, 0)
+	serviceMust(t, e)
+	serviceMust(t, m.IncRef(removed))
+	t.Cleanup(func() { serviceMust(t, m.DecRef(removed)) })
+	if info, e := m.Info(removed); e != nil || info.Size != 128 {
+		t.Fatal("large variable transform", info, e)
+	}
+	monomialPhysicalAudit(t, m)
+}

@@ -141,6 +141,12 @@ func (m *MonomialManager) mulInputsCreated(left, right monomialInput, outcome *m
 		}
 	}
 	t := &m.temps[1]
+	if x.Size > ^uint32(0)-y.Size {
+		return Monomial{}, arena.ErrBounds
+	}
+	if e = m.tempReserve(t, x.Size+y.Size); e != nil {
+		return Monomial{}, e
+	}
 	i, j, k := uint32(0), uint32(0), uint32(0)
 	for {
 		if i == x.Size {
@@ -256,6 +262,11 @@ func (m *MonomialManager) divCore(a, b Monomial, store bool) (bool, error) {
 		return false, e
 	}
 	t := &m.temps[1]
+	if store {
+		if e = m.tempReserve(t, n); e != nil {
+			return false, e
+		}
+	}
 	i, j, k := uint32(0), uint32(0), uint32(0)
 	if n < k2 {
 		return false, nil
@@ -394,6 +405,20 @@ func (m *MonomialManager) gcdCore(a, b Monomial) (bool, error) {
 		return false, e
 	}
 	g, r1, r2 := &m.temps[1], &m.temps[2], &m.temps[3]
+	minimum := n1
+	if n2 < minimum {
+		minimum = n2
+	}
+	if e = m.tempReserve(g, minimum); e != nil {
+		return false, e
+	}
+	// Preserve the source's reversed quotient-reserve bounds.
+	if e = m.tempReserve(r1, n2); e != nil {
+		return false, e
+	}
+	if e = m.tempReserve(r2, n1); e != nil {
+		return false, e
+	}
 	found := false
 	i, j, u, v, w := uint32(0), uint32(0), uint32(0), uint32(0), uint32(0)
 	for {
@@ -576,6 +601,9 @@ func (m *MonomialManager) Power(a Monomial, k uint32) (Monomial, error) {
 		return Monomial{}, e
 	}
 	t := &m.temps[1]
+	if e = m.tempReserve(t, x.Size); e != nil {
+		return Monomial{}, e
+	}
 	for i := uint32(0); i < x.Size; i++ {
 		p, e := m.powerCore(a, i)
 		if e != nil {
@@ -610,6 +638,9 @@ func (m *MonomialManager) sqrtCreated(a Monomial, outcome *monomialFactoryOutcom
 		return Monomial{}, false, e
 	}
 	t := &m.temps[1]
+	if e = m.tempReserve(t, x.Size); e != nil {
+		return Monomial{}, false, e
+	}
 	for i := uint32(0); i < x.Size; i++ {
 		d, e := m.degreeAtCore(a, i)
 		if e != nil {
@@ -664,6 +695,9 @@ func (m *MonomialManager) variableTransformCreated(a Monomial, v, k uint32, oper
 		return Monomial{}, e
 	}
 	t := &m.temps[1]
+	if e = m.tempReserve(t, info.Size); e != nil {
+		return Monomial{}, e
+	}
 	n := uint32(0)
 	for i := uint32(0); i < info.Size; i++ {
 		y, e := m.varCore(a, i)
