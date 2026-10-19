@@ -46132,3 +46132,14 @@ new assertion tests pass in native, checked, debug, and combined
 `g3checked,g3debug,g3trace` profiles on CPUs 8-16; source-aware portcheck passes.
 The standalone row remains partial while its separately tracked graded-lex sort
 body is audited.
+
+Standalone polynomial SOM completion: the retained `som_buffer` body at
+`polynomial.cpp:1885-2156` now has exact nullable-owner, query, reset,
+add/addmul, compaction, ModD, mk, display, assertion, source-member destruction
+and explicit owning-abort coverage. Its `sort_graded_lex` body uses Go sorting
+only for the required descending graded-lex result, then performs the source
+fresh numeral-slice construction, coefficient swaps, position-map reset/set
+and final vector swap. Independent 129-power and BIG-numeral fixtures verify
+order, movement and native storage without emulating C++ standard-library
+internals. Both the standalone SOM and sort method rows are now ported; the
+enclosing `polynomial.cpp` unit and later polynomial algorithms remain partial.

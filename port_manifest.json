@@ -44599,7 +44599,7 @@
         },
         {
           "name": "Standalone som_buffer1885-2156 actual nullable owner, queries/reset/add/addmul concrete overloads, ModD and mk; implicit source reverse raw-only members and distinct retained-owning abort",
-          "status": "partial",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_som_owner.go",
           "tests": [
             "TestPolynomialSOMVectorDefaultOwnerAndSourceMembers",
@@ -44649,12 +44649,13 @@
           ]
         },
         {
-          "name": "sort_graded_lex2104-2119 actual fresh local numeral vector, swaps/map updates/vector swap/source raw destructor; std::sort final-order heap contract adapter, stopped local owner rejects overwrite",
-          "status": "partial",
+          "name": "sort_graded_lex2100-2113 uses Go sorting for the required descending graded-lex result, then an actual fresh native numeral slice, source swaps/map updates/vector swap and raw local destruction",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_som_sort.go",
           "tests": [
             "TestPolynomialSOMBufferSourceSortMovesCoefficients",
-            "TestPolynomialSOMBufferNativeSortBIGMoves"
+            "TestPolynomialSOMBufferNativeSortBIGMoves",
+            "TestPolynomialSOMNativeMonomialSortIndependentPowers"
           ]
         },
         {

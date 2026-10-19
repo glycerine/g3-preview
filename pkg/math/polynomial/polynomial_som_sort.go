@@ -1,4 +1,4 @@
-// Source: src/math/polynomial/polynomial.cpp:2104-2119; src/util/vector.h.
+// Source: src/math/polynomial/polynomial.cpp:2100-2113.
 package polynomial
 
 import (
@@ -6,7 +6,8 @@ import (
 	"sort"
 )
 
-// std::sort contributes its descending graded-lex order, not library internals.
+// Go's sort supplies the source's descending graded-lex result. The C++
+// standard-library implementation and its internal movement are not ported.
 func (b *PolynomialSOMBuffer) sortMonomials() error {
 	var cause error
 	sort.Slice(b.buffer.ms, func(i, j int) bool {
