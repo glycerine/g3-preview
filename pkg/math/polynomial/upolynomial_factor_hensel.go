@@ -243,13 +243,19 @@ func (s *UPolynomialFactorizationService) henselPairWithCaller(a, b, r *unumeral
 	if e = m.addSubStateWithHensel(h.borrowedInput(3), m.stateView(&h.T), outB, false, &receipt); e != nil {
 		return e
 	}
-	if polynomialSourceDebug && s.config.FactorizationDebugTag {
+	conditional, e := s.henselConditionalAssertionEnabled()
+	if e != nil {
+		return e
+	}
+	if conditional {
 		ok, e := s.checkHenselPair(h.borrowedInput(4), a, b, r, h.borrowedInput(1), h.borrowedInput(3), m.stateView(outA), m.stateView(outB), &receipt)
 		if e != nil {
 			return e
 		}
 		if !ok {
-			return ErrUPolynomialAssertion
+			if e := henselConditionalAssertionFailure(674, "check_hansel_lift(upm, C, a, b, r, A, B, A_lifted, B_lifted)"); e != nil {
+				return e
+			}
 		}
 	}
 	return nil
@@ -454,13 +460,19 @@ func (s *UPolynomialFactorizationService) henselQuadraticIterationWithCaller(zpe
 	}
 	*A, *Al = *Al, *A
 	*B, *Bl = *Bl, *B
-	if polynomialSourceDebug && s.config.FactorizationDebugTag {
+	conditional, err := s.henselConditionalAssertionEnabled()
+	if err != nil {
+		return err
+	}
+	if conditional {
 		ok, e := s.checkQuadraticHenselWithCaller(zpe, m.stateView(U), m.stateView(A), m.stateView(V), m.stateView(B), caller)
 		if e != nil {
 			return e
 		}
 		if !ok {
-			return ErrUPolynomialAssertion
+			if e := henselConditionalAssertionFailure(801, "check_quadratic_hensel(zpe_upm, U, A, V, B)"); e != nil {
+				return e
+			}
 		}
 	}
 	return nil
@@ -663,13 +675,19 @@ func (s *UPolynomialFactorizationService) henselFactorsWithCaller(f UPolynomialV
 		if err = s.henselQuadraticWithCaller(m.stateView(parts), zpe, A, B, e, caller); err != nil {
 			return err
 		}
-		if polynomialSourceDebug && s.config.FactorizationDebugTag {
+		conditional, err := s.henselConditionalAssertionEnabled()
+		if err != nil {
+			return err
+		}
+		if conditional {
 			ok, err := s.checkIndividualLiftWithCaller(zp, zp.stateView(&pf.factors[i]), zpe, m.stateView(A), caller)
 			if err != nil {
 				return err
 			}
 			if !ok {
-				return ErrUPolynomialAssertion
+				if e := henselConditionalAssertionFailure(934, "check_individual_lift(zp_upm, zp_fs[i], zpe_upm, A)"); e != nil {
+					return e
+				}
 			}
 		}
 		if err = s.traceHenselVectors(caller, 935); err != nil {
@@ -715,13 +733,19 @@ func (s *UPolynomialFactorizationService) henselFactorsWithCaller(f UPolynomialV
 	if err = s.traceHenselFactors(caller, f, pf, lf, true); err != nil {
 		return err
 	}
-	if polynomialSourceDebug && s.config.FactorizationDebugTag {
+	conditional, err := s.henselConditionalAssertionEnabled()
+	if err != nil {
+		return err
+	}
+	if conditional {
 		ok, err := s.checkHenselFactorsWithCaller(f, pf, lf, e, caller)
 		if err != nil {
 			return err
 		}
 		if !ok {
-			return ErrUPolynomialAssertion
+			if e := henselConditionalAssertionFailure(964, "check_hensel_lift(upm, f, zp_fs, zpe_fs, e)"); e != nil {
+				return e
+			}
 		}
 	}
 	return nil

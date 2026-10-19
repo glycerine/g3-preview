@@ -6,11 +6,56 @@ import (
 	"testing"
 
 	"github.com/glycerine/g3/pkg/arena"
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 
 	umemory "github.com/glycerine/g3/pkg/util/memory"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 	primegen "github.com/glycerine/g3/pkg/util/prime"
 )
+
+func TestUPolynomialHenselCASSERTGateAndDebuggerActions(t *testing.T) {
+	if !polynomialSourceDebug {
+		t.Skip("source CASSERT erased")
+	}
+	for _, action := range []string{"T", "C"} {
+		t.Run(action, func(t *testing.T) {
+			_, s := henselDirectFixtureWithConfig(t, func() bool { return true }, true)
+			polynomialAssertionActionsFixture(t, action)
+			on, e := s.henselConditionalAssertionEnabled()
+			serviceMust(t, e)
+			if !on {
+				t.Fatal("enabled Hensel CASSERT tag was erased")
+			}
+			e = henselConditionalAssertionFailure(934, "check_individual_lift(zp_upm, zp_fs[i], zpe_upm, A)")
+			if action == "T" {
+				if !errors.Is(e, ErrUPolynomialAssertion) || !linearThrownAssertion(e) {
+					t.Fatal("Hensel CASSERT Throw action", e)
+				}
+			} else if e != nil {
+				t.Fatal("Hensel CASSERT Continue action", e)
+			}
+		})
+	}
+	t.Run("assertions-disabled", func(t *testing.T) {
+		_, s := henselDirectFixtureWithConfig(t, func() bool { return true }, true)
+		polynomialAssertionActionsFixture(t, "")
+		serviceMust(t, diagnostic.BorrowProcessDebugContext().EnableAssertions(false))
+		on, e := s.henselConditionalAssertionEnabled()
+		serviceMust(t, e)
+		if on {
+			t.Fatal("disabled process assertions evaluated Hensel checker")
+		}
+	})
+	t.Run("tag-disabled", func(t *testing.T) {
+		_, s := henselDirectFixtureWithConfig(t, func() bool { return true }, false)
+		polynomialAssertionActionsFixture(t, "T")
+		on, e := s.henselConditionalAssertionEnabled()
+		serviceMust(t, e)
+		if on {
+			t.Fatal("disabled Hensel debug tag evaluated checker")
+		}
+	})
+}
 
 func TestUPolynomialHenselActualConditionalCheckerDeclarations(t *testing.T) {
 	_, s := henselDirectFixtureWithConfig(t, func() bool { return true }, true)

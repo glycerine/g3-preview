@@ -3,8 +3,29 @@
 package polynomial
 
 import (
+	"errors"
+
+	"github.com/glycerine/g3/pkg/util/diagnostic"
 	unumeral "github.com/glycerine/g3/pkg/util/numeral"
 )
+
+// The source CASSERT tag is spelled "factorizatio::bughunt". The explicit
+// service option represents that tag, while the process debug context retains
+// the independent assertions_enabled switch and debugger action.
+func (s *UPolynomialFactorizationService) henselConditionalAssertionEnabled() (bool, error) {
+	if !polynomialSourceDebug || !s.config.FactorizationDebugTag {
+		return false, nil
+	}
+	return diagnostic.SourceAssertionsEnabled(diagnostic.BorrowProcessDebugContext())
+}
+
+func henselConditionalAssertionFailure(line int32, expression string) error {
+	e := diagnostic.DebugAssertionFailure(diagnostic.BorrowProcessDebugContext(), "src/math/polynomial/upolynomial_factorization.cpp", line, expression)
+	if e != nil {
+		return errors.Join(ErrUPolynomialAssertion, e)
+	}
+	return nil
+}
 
 func (s *UPolynomialFactorizationService) checkHenselPair(C UPolynomialView, a, b, r *unumeral.Int, A, B, Al, Bl UPolynomialView, receipt *upolyHenselPairInvocationReceipt) (ok bool, failure error) {
 	m := s.manager
