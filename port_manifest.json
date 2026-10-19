@@ -45855,8 +45855,8 @@
           ]
         },
         {
-          "name": "pseudo_remainder cpp4905-5065 and exact_pseudo_division_mod_d cpp5065-5091 assertion actions plus actual Coeff/Power/NUM/R/Q/generated/DEBUG invocation transport; full suffix audit remains open",
-          "status": "partial",
+          "name": "Complete pseudo_remainder cpp4905-5065 and exact_pseudo_division_mod_d cpp5065-5091 with assertion actions and actual Coeff/Power/NUM/R/Q/generated/DEBUG invocation transport and suffix cleanup",
+          "status": "ported",
           "go_target": "pkg/math/polynomial/polynomial_pseudo_invocation.go",
           "tests": [
             "TestPolynomialPseudoActualCoefficientChildPrefixes",
